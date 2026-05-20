@@ -47,6 +47,14 @@ Not every architectural pattern fits every paradigm equally. Many examples carry
 
 Authority basis: Norvig 1996; Seemann ([Design patterns across paradigms](https://blog.ploeh.dk/2012/05/25/Designpatternsacrossparadigms/), 2012; [SOLID: the next step is Functional](https://blog.ploeh.dk/2014/03/10/solid-the-next-step-is-functional/), 2014); Wlaschin ([Domain Modeling Made Functional](https://pragprog.com/titles/swdddf/domain-modeling-made-functional/)); Hickey ([Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/)); Evans (_Domain-Driven Design_); Fowler ([PEAA](https://martinfowler.com/eaaCatalog/)).
 
+## Where Go Fits (Partial)
+
+Go has **interface satisfaction without inheritance** — methods on structs, structural typing, no class hierarchies. Rob Pike (Google SPLASH 2012 keynote: ["Go at Google: Language Design in the Service of Software Engineering"](https://go.dev/talks/2012/splash.article)) explicitly rejected type hierarchies: "Type hierarchies result in brittle code... Go therefore encourages composition over inheritance, using simple, often one-method interfaces." That makes Go a **partial fit** for this OOP track:
+
+- **Translates one-to-one to Go**: SOLID (especially ISP — Go interfaces are tiny by convention), composition over inheritance, dependency injection via constructor functions, Adapter pattern (concrete type satisfies a `interface`), Decorator pattern (embedding), Strategy / Command pattern (function values or interface values).
+- **Does NOT translate to Go**: LSP (no subtype hierarchies to substitute against), Template Method (no abstract methods + inheritance), GoF "OOP-NATIVE" patterns that hinge on inheritance hierarchies (Visitor with double dispatch, Bridge, Abstract Factory family hierarchies).
+- **Honest path**: read this track for patterns that translate, then see [in-procedural-by-example](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-procedural-by-example) for patterns where composition + structural typing + explicit data flow are the design force — that track teaches what only Go and Rust teach (no inheritance assumed; ownership / structural typing as primary mechanism).
+
 ## Structure of Each Example
 
 Every example follows a consistent five-part format:

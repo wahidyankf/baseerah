@@ -19,7 +19,10 @@ Both disciplines complement each other. An e-commerce monolith primarily needs s
 
 This section explores proven architectural methodologies used in modern software engineering:
 
-- **By Example** (umbrella): 93 heavily annotated examples — 85 canonical + 5 FP-native extras (#86–90: ROP, Free Monads / Tagless Final, Reader, Kleisli, State) + 3 OOP-native extras (#91–93: Active Record, GRASP, Singleton-with-FP-counterexample). Available in OOP (Java, Kotlin, C#, TypeScript) and FP (F#, Clojure, TypeScript, Haskell) variants with explicit paradigm-fit framing (Norvig/Seemann/Wlaschin/Hickey/Evans/Fowler citations)
+- **By Example** (umbrella): 93 heavily annotated examples — 85 canonical + 5 FP-native extras (#86–90: ROP, Free Monads / Tagless Final, Reader, Kleisli, State) + 3 OOP-native extras (#91–93: Active Record, GRASP, Singleton-with-FP-counterexample). Available in three paradigm tracks with explicit paradigm-fit framing (Norvig/Seemann/Wlaschin/Hickey/Evans/Fowler/Pike citations):
+  - **OOP** — Java, Kotlin, C#, TypeScript (inheritance-bearing class hierarchies)
+  - **FP** — F#, Clojure, TypeScript, Haskell (ADTs, HOFs, Railway-Oriented Programming) — Rust also appears where the FP idiom translates one-to-one
+  - **Procedural** (new) — Go (canonical), Rust, C (sidebar) — composition + structural typing + explicit data flow, without inheritance hierarchies. Authority: Pike ([Go at Google](https://go.dev/talks/2012/splash.article), 2012); Boyle ([_Domain-Driven Design with Golang_](https://www.oreilly.com/library/view/domain-driven-design-with/9781804613450/), 2022); Hoverbear ([Pretty State Machine Patterns in Rust](https://hoverbear.org/blog/rust-state-machine-pattern/)); Samek ([_Practical UML Statecharts in C/C++_](https://www.routledge.com/Practical-UML-Statecharts-in-CC-Event-Driven-Programming-for-Embedded-Systems/Samek/p/book/9780750687065))
 - **C4 Model**: Hierarchical approach to visualizing software architecture at multiple levels of abstraction (Context, Containers, Components, Code)
 - **Domain-Driven Design (DDD)**: Strategic and tactical patterns for modeling complex business domains and organizing code around business concepts
 - **Hexagonal Architecture**: Ports-and-adapters approach that isolates the domain core from external concerns (databases, frameworks, UIs)
@@ -86,6 +89,7 @@ After the by-example tutorials for C4, DDD, Hexagonal Architecture, and FSM, the
 
 - Next step (production wiring): [In FP — F# / Giraffe / Npgsql, Clojure / Ring / next.jdbc, TypeScript / Hono / node-postgres, Haskell / Servant / postgresql-simple](/en/learn/software-engineering/software-architecture/cases/in-fp)
 - Next step (production wiring): [In OOP — Java / Spring Boot 4, Kotlin / Spring Boot 4, C# / ASP.NET Core, TypeScript / NestJS](/en/learn/software-engineering/software-architecture/cases/in-oop)
+- Next step (production wiring): [In Procedural — Go / chi / database/sql, Rust / axum / sqlx](/en/learn/software-engineering/software-architecture/cases/in-procedural)
 
 ## 🚀 Getting Started
 

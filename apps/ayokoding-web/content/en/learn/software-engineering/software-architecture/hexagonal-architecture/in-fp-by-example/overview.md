@@ -44,6 +44,21 @@ The functional core / imperative shell pattern and hexagonal architecture are th
 
 Both demand that the centre is pure. Both push effects to the boundary. Both enable easy testing by substituting the effectful shell.
 
+## Rust as an FP-Adjacent Member — With Concept Adjustments
+
+Rust shares deep DNA with the FP languages on this track: `enum` is a sum type (Blandy & Orendorff, _Programming Rust_, Ch. 10), traits cover much of the territory typeclasses cover, and `Result<T, E>` is the Railway-Oriented Programming primitive natively. Hexagonal idioms that translate cleanly — output ports as traits, adapter implementations satisfying those traits, in-memory test adapters, dependency injection via constructor arguments — appear without adjustment. Patterns where ownership is the design force (move-on-call ports, borrowed input adapters) live in the [in-procedural-by-example](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example) track.
+
+**Six concept adjustments when you read this hexagonal-in-FP track through a Rust lens:**
+
+1. **Ownership / affine types — no F# equivalent.** Every Rust value is used at most once before it is moved. Port methods that take an aggregate may **consume** it (`fn save(self, agg: PurchaseOrder)`) or **borrow** it (`fn save(&self, agg: &PurchaseOrder)`); the choice is a port-design decision with no F# counterpart. Partial application as DI becomes "store the dependency in a struct field" with explicit ownership/borrowing rules. (Source: [without.boats — Ownership](https://without.boats/blog/ownership/))
+2. **No higher-kinded types (HKT).** F# / Haskell can express "any effect monad implementing this port" abstractly; Rust cannot. Rust's `async fn` in traits (stabilised in 1.75) closes part of the gap, but kind-polymorphic abstraction over "any port-shaped effect" is not available. (Source: [GAT stabilisation — Matsakis & Huey](https://blog.rust-lang.org/2022/10/28/gats-stabilization/))
+3. **`?` operator is sugar, not monadic bind.** Hexagonal application services that chain port calls in F# use `Result.bind` or `asyncResult { }`; in Rust they use `.await?` repeatedly. Same engineering effect, different machinery. (Source: [Rust By Example — `?` operator](https://doc.rust-lang.org/rust-by-example/std/result/question_mark.html))
+4. **`async` / `Future` is not a monad.** F# `Async<Result<>>` composition uses computation expressions; Rust uses `async fn` + `.await` + `?` and concrete `Future` state machines. There is no `asyncResult { }` equivalent as a generic monadic abstraction. Adapter implementations that need parallel composition use `tokio::try_join!` or `futures::future::try_join_all` — ad-hoc combinators, not monadic algebra.
+5. **No persistent immutable shared structures by default.** Composition roots in F# typically wire records-of-functions captured by closures; in Rust, dependencies are held in `Arc<dyn Trait>` for shared ownership across threads. The wiring shape transfers; the sharing mechanism changes.
+6. **Traits ≈ typeclasses minus HKT (but trait objects fill much of the gap).** A port is a `trait Repository { async fn save(&self, po: &PurchaseOrder) -> Result<(), RepoError>; }`. Adapters implement this trait. Application services accept `Arc<dyn Repository>` or generic `R: Repository`. This is type-level dispatch akin to typeclasses — minus the kind-polymorphism Haskell offers.
+
+Where the FP idiom translates one-to-one, Rust appears as an additional language tab alongside F# / Clojure / TypeScript / Haskell. Where the idiom requires an ownership-driven re-formulation (typestate-encoded port contracts, owned-vs-borrowed adapter handles, `Send + Sync` bounds at the composition root), the example points to the procedural track instead.
+
 ## Running Domain
 
 All 75 examples use the same **procurement-platform-be** — the backend of a Procure-to-Pay (P2P) platform where employees request goods and services, managers approve, suppliers fulfil, and finance pays. The core workflow is:

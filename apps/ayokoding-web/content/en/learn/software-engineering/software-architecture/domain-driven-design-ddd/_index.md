@@ -17,3 +17,5 @@ description: "Learn Domain-Driven Design through tactical and strategic patterns
   - [Beginner](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-oop-by-example/beginner)
   - [Intermediate](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-oop-by-example/intermediate)
   - [Advanced](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-oop-by-example/advanced)
+- [DDD By Example in Procedural](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-procedural-by-example) _(in progress)_
+  - [Overview](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-procedural-by-example/overview)

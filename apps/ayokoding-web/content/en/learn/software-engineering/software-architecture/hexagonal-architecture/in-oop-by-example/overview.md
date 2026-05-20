@@ -81,6 +81,19 @@ The running domain across all examples is **procurement-platform-be** — a Proc
 
 If you prefer a functional programming treatment of Hexagonal Architecture, see [Hexagonal Architecture By Example in FP](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-fp-by-example/overview). That tutorial covers the same patterns through F# function type aliases, partial application, and Railway-Oriented Programming pipelines, using the same procurement-platform-be domain.
 
+## Where Go Fits (Strong)
+
+Hexagonal Architecture is the **strongest fit for Go** of any track on this site. Alistair Cockburn's [original definition](https://alistair.cockburn.us/hexagonal-architecture) is explicitly language-agnostic — ports are interfaces, adapters are implementations. Go's **implicit interface satisfaction (structural typing)** is arguably a _better_ fit than Java's explicit `implements` because adding a new adapter requires only satisfying the method set, with no declaration coupling to the port. Canonical references: Matías Varela — [Hexagonal Architecture in Go](https://medium.com/@matiasvarela/hexagonal-architecture-in-go-cfd4e436faa3); [Three Dots Labs](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/) DDD + CQRS + Clean Architecture in Go reference implementation; Matthew Boyle, [_Domain-Driven Design with Golang_](https://www.oreilly.com/library/view/domain-driven-design-with/9781804613450/) (Packt, 2022).
+
+What Go _does_ for hexagonal:
+
+- **Output ports as one-method interfaces** — Go's "interface segregation by default" convention naturally produces the small, focused port interfaces hexagonal demands.
+- **Adapters as concrete struct implementations** — no `@Component` annotation needed; the struct simply has matching method signatures.
+- **Composition root in `main.go`** — explicit constructor wiring rather than a Spring `@Configuration` reflection container; the wiring is plain code, readable and step-debuggable.
+- **In-memory test adapter is trivial** — a struct holding a `map[ID]Entity`; no mocking framework.
+
+That makes Go a **first-class hexagonal language**. However, the OOP track teaches patterns that depend on Java/C#/Kotlin features (`@Configuration`-driven DI, Spring `@Profile` conditional wiring, `@Autowired` constructor injection, sealed types for domain errors). For the Go-canonical formulation — manual constructor wiring, `interface` ports, struct adapters — see [in-procedural-by-example](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example).
+
 ## Structure of Each Example
 
 Every example follows a consistent five-part format:

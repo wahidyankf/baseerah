@@ -52,6 +52,21 @@ The four architecture pattern families slot together at different levels of each
 
 The composition root in each language assembles concrete adapter implementations into the port slots before the HTTP framework takes over the request pipeline.
 
+## Rust as an FP-Adjacent Member — With Concept Adjustments
+
+Rust shares deep DNA with the FP languages on this case: `enum` is a sum type (Blandy & Orendorff, _Programming Rust_, Ch. 10), traits cover much of the territory typeclasses cover, and `Result<T, E>` is the Railway-Oriented Programming primitive natively. The wiring decisions taught here — bounded-context folder layout, output ports as traits, adapter swap at the composition root, in-memory test adapters, OpenTelemetry observability adapter, retry / circuit-breaker decorators, outbox pattern — translate to Rust (axum / actix-web for HTTP, sqlx / diesel for repository, tokio for async). Patterns where ownership is the wiring force (move-on-call ports, typestate-encoded request lifecycles) live in the [in-procedural](/en/learn/software-engineering/software-architecture/cases/in-procedural) case.
+
+**Six concept adjustments when you read this case through a Rust lens (axum / sqlx / tokio):**
+
+1. **Ownership / affine types — no F# equivalent.** Port method signatures explicitly choose between consuming (`self`), shared-borrow (`&self`), and exclusive-borrow (`&mut self`); the choice is a wiring decision F# does not have to make. (Source: [without.boats — Ownership](https://without.boats/blog/ownership/))
+2. **No higher-kinded types (HKT).** Rust cannot abstract over "any effect monad implementing this port"; output ports are traits over concrete effect types. `async fn` in traits (stabilised in Rust 1.75) closes part of the gap. (Source: [GAT stabilisation — Matsakis & Huey](https://blog.rust-lang.org/2022/10/28/gats-stabilization/))
+3. **`?` operator is sugar, not monadic bind.** Hexagonal application services that chain port calls in F# use `Result.bind` or `asyncResult { }`; in Rust they use `.await?` repeatedly. Same Railway-Oriented effect, different conceptual machinery. (Source: [Rust By Example — `?` operator](https://doc.rust-lang.org/rust-by-example/std/result/question_mark.html))
+4. **`async` / `Future` is not a monad.** F# `Async<Result<>>` composition uses computation expressions; Rust uses `async fn` + `.await` + `?` and concrete `Future` state machines. `tokio::try_join!` provides ad-hoc parallel-composition combinators.
+5. **No persistent immutable shared structures by default.** Composition roots in F# wire records-of-functions captured by closures; in Rust, dependencies are held in `Arc<dyn Trait + Send + Sync>` for shared ownership across the tokio runtime.
+6. **Traits ≈ typeclasses minus HKT.** Output ports as `#[async_trait] trait Repository { ... }`. Adapter implementations satisfy the trait. Application services accept `Arc<dyn Repository + Send + Sync>` or generic `R: Repository`. Type-level dispatch akin to typeclasses, minus kind-polymorphism.
+
+Where the FP wiring idiom translates one-to-one, Rust appears as an additional language tab alongside F# / Clojure / TypeScript / Haskell. Where the wiring requires an ownership-driven re-formulation (move-on-call ports, typestate-encoded request pipelines, `Send + Sync` bounds at the composition root), the guide points to the procedural case instead.
+
 ## Running Domain — Procure-to-Pay Procurement Platform
 
 Every guide reasons against the same hypothetical service: **`procurement-platform-be`**, the backend of a Procure-to-Pay (P2P) platform. Employees request goods and services, managers approve, suppliers fulfill, and finance pays. Picking a single coherent domain (instead of one toy example per guide) lets the wiring decisions in Guide 14 reference the port introduced in Guide 5 and the aggregate introduced in Guide 3 without re-establishing context.

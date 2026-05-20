@@ -118,3 +118,12 @@ The functional programming parallel of this case uses F# / Giraffe / Npgsql (can
 - [In FP](/en/learn/software-engineering/software-architecture/cases/in-fp/overview)
 
 Both cases teach the same wiring concerns against the same domain; comparing the two side-by-side is the fastest way to see what changes when you swap object-oriented Java / Kotlin / C# / TypeScript wiring for functional F# / Clojure / Hono wiring.
+
+## Procedural Sibling — Go / Rust
+
+The OOP wiring taught here depends on Spring Boot / ASP.NET Core / NestJS framework conventions: `@Configuration` reflection-driven DI, `@RestController` request mapping, `@Transactional` for transaction boundaries, framework-managed JPA / EF Core / TypeORM repositories. Real Go and Rust production codebases wire the same hexagonal pieces differently:
+
+- **Go** (canonical Go DDD wiring): [Three Dots Labs](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/) reference implementation; Matthew Boyle, [_Domain-Driven Design with Golang_](https://www.oreilly.com/library/view/domain-driven-design-with/9781804613450/) (Packt, 2022) — `main.go` as the composition root, `interface` ports, struct adapters, manual constructor wiring, [chi](https://github.com/go-chi/chi) or [echo](https://github.com/labstack/echo) for HTTP, [`database/sql`](https://pkg.go.dev/database/sql) for repository adapters.
+- **Rust**: axum or actix-web for HTTP, sqlx or diesel for repositories, tokio for async, `Arc<dyn Trait + Send + Sync>` for shared port handles at the composition root.
+
+For the Go / Rust formulations of the same wiring decisions — bounded-context folder layout, output-port traits, adapter swap, in-memory test adapters, OpenTelemetry observability adapter, retry / circuit-breaker, outbox pattern — see [In Procedural](/en/learn/software-engineering/software-architecture/cases/in-procedural/overview).

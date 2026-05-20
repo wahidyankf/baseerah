@@ -71,6 +71,16 @@ The running domain across all examples is the **`procurement-platform-be`** — 
 
 If you prefer a functional programming treatment of DDD, see [DDD By Example in FP](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-fp-by-example/overview). That tutorial covers the same strategic and tactical patterns through F# discriminated unions, Railway-Oriented Programming, and workflow pipelines, using the same shared procurement-platform-be P2P domain.
 
+## Where Go Fits (Partial)
+
+Go has **interface satisfaction without inheritance** — domain types as structs with methods, repositories as small interfaces satisfied implicitly by concrete adapters. Rob Pike (Google SPLASH 2012 keynote: ["Go at Google: Language Design in the Service of Software Engineering"](https://go.dev/talks/2012/splash.article)) explicitly rejected inheritance hierarchies in favour of composition + interfaces. The most credible Go DDD treatment is Matthew Boyle's [_Domain-Driven Design with Golang_](https://www.oreilly.com/library/view/domain-driven-design-with/9781804613450/) (Packt, 2022); [Three Dots Labs](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/) maintains the most-cited open-source Go DDD reference.
+
+That makes Go a **partial fit** for this OOP-DDD track:
+
+- **Translates one-to-one to Go**: value objects as struct types with constructors, repositories as small interfaces (one to three methods), application services as functions taking repository interfaces, domain events as structs, bounded contexts as Go packages with clear public surfaces.
+- **Does NOT translate to Go**: aggregate roots enforcing invariants via inheritance, hierarchical entity types via `extends`, Specification pattern via abstract class composition, GoF-flavoured factory class hierarchies. Go DDD usually models aggregates as plain structs with explicit transition functions (closer to FP-style transitions than to encapsulated mutable OOP aggregates).
+- **Honest path**: read this track for tactical patterns that translate (value objects, repository interfaces, application services, domain events), then see [in-procedural-by-example](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-procedural-by-example) for the Go-canonical formulation where composition + structural typing + explicit transition functions are the design force.
+
 ## Structure of Each Example
 
 Every example follows a consistent five-part format:

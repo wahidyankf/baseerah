@@ -34,6 +34,16 @@ Three progressive levels, each adding a new aggregate. Java is the canonical imp
 - **Intermediate** — adds `Invoice` state machine: three-way match guards, state-entry/exit actions, XState-style library usage (TypeScript), FSM as protocol enforcement — all four languages.
 - **Advanced** — adds `Supplier` lifecycle and `Payment` state machine: hierarchical states, parallel regions, history states, FSM persistence and event-sourcing intersection, statecharts — all four languages.
 
+## Where Go and C Fit
+
+FSM is the architecture topic with the **widest paradigm reach**. Beyond the OOP and FP idioms taught on this and the sibling FP track, two further idioms have first-class canonical literature:
+
+- **Go**: state-as-field switch dispatch + the [`looplab/fsm`](https://github.com/looplab/fsm) library (3.4k stars, Apache 2.0, actively maintained). State is an `int` or `string` field; transitions are dispatched via `switch`; the library adds event-table configuration (`Event{Name, Src []string, Dst string}`) with callback hooks. Runtime-checked, not compile-time.
+- **C**: the **function-pointer table** idiom — a 2D array `action[state][event]` of function pointers; each cell is the transition action. Miro Samek's [_Practical UML Statecharts in C/C++_](https://www.routledge.com/Practical-UML-Statecharts-in-CC-Event-Driven-Programming-for-Embedded-Systems/Samek/p/book/9780750687065) (Routledge, 2nd ed. 2008) is the authoritative book-length treatment, including the QP/C active-object framework for hierarchical state machines on embedded systems. The Linux kernel TCP and USB state machines are real-world examples of this idiom at production scale.
+- **Rust**: the **typestate** idiom — each state is a distinct struct type, transitions are functions consuming `self` and returning a different state type, and ownership makes illegal transitions **fail to compile**. Canonical sources: [Pretty State Machine Patterns in Rust — Hoverbear](https://hoverbear.org/blog/rust-state-machine-pattern/); [Type-Driven API Design in Rust — Will Crichton](https://willcrichton.net/rust-api-type-patterns/typestate.html). Strictly stronger compile-time guarantee than the FP `enum`-based formulation taught on the sibling FP track.
+
+The OOP idioms taught here (state as enum or sealed type field, transitions as aggregate methods, XState-style declarative config in TypeScript) translate to all three with adjustments — but Go, C, and Rust each have a **canonical native idiom that does not collapse to the OOP form**. The [in-procedural-by-example](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example) track teaches those three native idioms side by side.
+
 ## Examples by Level
 
 ### Beginner (Examples 1–25)
