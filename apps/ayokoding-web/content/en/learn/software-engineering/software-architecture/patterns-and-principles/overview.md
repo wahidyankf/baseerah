@@ -3,7 +3,7 @@ title: "Overview"
 date: 2026-05-18T00:00:00+07:00
 draft: false
 weight: 10000000
-description: "Software architecture patterns and principles — SOLID, GRASP, GoF patterns, architectural styles, trade-offs, and real-world decisions taught through 93 annotated examples (85 canonical + 5 FP-native extras + 3 OOP-native extras) across two paradigm tracks (OOP and FP) with explicit paradigm-fit framing"
+description: "Software architecture patterns and principles — SOLID, GRASP, GoF patterns, architectural styles, trade-offs, and real-world decisions taught through 93 annotated examples (85 canonical + 5 FP-native extras + 3 OOP-native extras) across three paradigm tracks (OOP, FP, and Procedural) with explicit paradigm-fit framing"
 tags:
   ["software-architecture", "patterns", "principles", "solid", "design-patterns", "tutorial", "clojure", "typescript"]
 ---
@@ -12,12 +12,13 @@ tags:
 
 ## What's in this section
 
-Two parallel paradigm tracks, each covering the same 93-example progression:
+Three paradigm tracks covering the same 93-example progression (the OOP and FP tracks are complete; the Procedural track is scaffolded with content rollout in progress):
 
 - [Patterns and Principles in OOP](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-oop-by-example) — Java, Kotlin, C#, and TypeScript examples emphasising classes, interfaces, sealed hierarchies, and pattern-matching
-- [Patterns and Principles in FP](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-fp-by-example) — F#, Clojure, TypeScript, and Haskell examples emphasising records, discriminated unions, function composition, and pipeline-shaped data flow
+- [Patterns and Principles in FP](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-fp-by-example) — F#, Clojure, TypeScript, and Haskell examples emphasising records, discriminated unions, function composition, and pipeline-shaped data flow; Rust appears here for patterns that translate one-to-one (with explicit concept adjustments for ownership, no-HKT, and the `?` operator)
+- [Patterns and Principles in Procedural](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-procedural-by-example) — Go (canonical), Rust, and (rarely) C — composition + structural typing + explicit data flow, without inheritance hierarchies (Pike 2012, Boyle 2022; tier content rollout in progress)
 
-Each example carries the same number and conceptual title across both tracks, enabling direct cross-paradigm comparison. For paradigm-foreign patterns, the "non-native" track shows a stub pointing to the native form rather than a contrived reproduction.
+Each example carries the same number and conceptual title across the OOP and FP tracks, enabling direct cross-paradigm comparison. For paradigm-foreign patterns, the "non-native" track shows a stub pointing to the native form rather than a contrived reproduction. The Procedural track teaches the patterns that fit neither OOP (no inheritance) nor FP (no HKT, no persistent shared structures) cleanly.
 
 ## Paradigm-fit framing
 
@@ -56,9 +57,9 @@ Start at the level that matches your current understanding. If you are new to ar
 
 Pick the paradigm track that matches the language you write daily — but consider reading the matching example in the other paradigm whenever a pattern feels awkward. Many "OOP patterns" disappear in FP (the Strategy pattern collapses to a function parameter), and many "FP patterns" become heavier in OOP (immutable updates require `with` expressions or builder copies). Seeing both forms makes the underlying principle visible.
 
-## Why two parallel tracks
+## Why three parallel tracks
 
-A Strategy pattern in Java is an interface plus implementations plus a constructor injection. The same Strategy in F# is a function value passed as a parameter; in Clojure it is a higher-order function; in TypeScript it can be either, depending on which paradigm track you follow. The intent — swap algorithms without touching call sites — is identical; the syntax difference is paradigm-shaped, not principle-shaped. Reading both forms in parallel teaches the principle directly instead of memorising one syntactic costume of it.
+A Strategy pattern in Java is an interface plus implementations plus a constructor injection. The same Strategy in F# is a function value passed as a parameter; in Clojure it is a higher-order function; in Go it is a function value or one-method interface satisfied structurally; in Rust it is a `dyn Fn` or trait object. The intent — swap algorithms without touching call sites — is identical; the syntax difference is paradigm-shaped, not principle-shaped. Reading all three forms in parallel teaches the principle directly instead of memorising one syntactic costume of it. The Procedural track exists because Go and Rust reject both OOP inheritance (so the OOP track misrepresents them) and FP's higher-kinded effect abstraction (so the FP track misrepresents them too); they deserve their own honest formulation.
 
 ## What this section is not
 
