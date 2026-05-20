@@ -1,6 +1,6 @@
 ---
 title: "Overview"
-weight: 10000003
+weight: 10000002
 date: 2026-05-20T00:00:00+07:00
 draft: false
 description: "Procedural variant — Hexagonal Architecture in Go (canonical, structural typing makes Go arguably the strongest fit for ports-and-adapters), with Rust formulations where ownership reshapes port design. C is out-of-scope (no canonical hexagonal literature for C)."

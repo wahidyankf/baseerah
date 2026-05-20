@@ -1,6 +1,6 @@
 ---
 title: "Overview"
-weight: 10000003
+weight: 10000000
 date: 2026-05-20T00:00:00+07:00
 draft: false
 description: "Procedural variant — Finite State Machines through three native idioms with canonical literature for each: Go (looplab/fsm + switch dispatch), Rust (typestate with compile-time-enforced transitions), and C (function-pointer table + Miro Samek hierarchical statecharts)"
