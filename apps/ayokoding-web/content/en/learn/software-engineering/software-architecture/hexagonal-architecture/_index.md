@@ -17,5 +17,5 @@ description: "Learn Hexagonal Architecture (Ports and Adapters) through annotate
   - [Beginner](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-oop-by-example/beginner)
   - [Intermediate](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-oop-by-example/intermediate)
   - [Advanced](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-oop-by-example/advanced)
-- [Hexagonal Architecture By Example in Procedural](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example) _(in progress)_
+- [Hexagonal Architecture By Example in Procedural](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example)
   - [Overview](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/overview)

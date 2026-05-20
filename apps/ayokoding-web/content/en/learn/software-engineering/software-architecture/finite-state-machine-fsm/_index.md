@@ -17,5 +17,5 @@ description: "Finite State Machine (FSM) - a computational model managing applic
   - [Beginner](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-fp-by-example/beginner)
   - [Intermediate](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-fp-by-example/intermediate)
   - [Advanced](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-fp-by-example/advanced)
-- [FSM By Example in Procedural](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example) _(in progress)_
+- [FSM By Example in Procedural](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example)
   - [Overview](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example/overview)

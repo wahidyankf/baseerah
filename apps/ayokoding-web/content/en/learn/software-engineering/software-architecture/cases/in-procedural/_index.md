@@ -9,6 +9,3 @@ description: "Procedural variant of the production wiring case — Go (canonical
 ---
 
 - [Overview](/en/learn/software-engineering/software-architecture/cases/in-procedural/overview)
-- Beginner _(content rollout in progress — see [plan](https://github.com/wahidyankf/ose-public/tree/main/plans/in-progress/architecture-procedural-track))_
-- Intermediate _(content rollout in progress)_
-- Advanced _(content rollout in progress)_

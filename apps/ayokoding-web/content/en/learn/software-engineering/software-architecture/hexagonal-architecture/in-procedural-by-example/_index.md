@@ -9,6 +9,3 @@ description: "Procedural variant of Hexagonal Architecture — Go (canonical; ar
 ---
 
 - [Overview](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/overview)
-- Beginner _(content rollout in progress — see [plan](https://github.com/wahidyankf/ose-public/tree/main/plans/in-progress/architecture-procedural-track))_
-- Intermediate _(content rollout in progress)_
-- Advanced _(content rollout in progress)_

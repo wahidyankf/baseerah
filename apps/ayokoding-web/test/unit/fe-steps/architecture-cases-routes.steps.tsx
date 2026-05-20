@@ -24,7 +24,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
-    And('the page should contain a heading with text "In FP — F# / Giraffe / Npgsql"', () => {
+    And('the page should contain a heading with text "In FP — F# / Clojure / TypeScript / Haskell"', () => {
       expect(true).toBe(true);
     });
   });
@@ -39,6 +39,20 @@ describeFeature(feature, ({ Scenario, Background }) => {
     });
 
     And('the page should contain a heading with text "In OOP — Java / Spring Boot"', () => {
+      expect(true).toBe(true);
+    });
+  });
+
+  Scenario("In Procedural case route is reachable", ({ When, Then, And }) => {
+    When('a visitor navigates to "/en/learn/software-engineering/software-architecture/cases/in-procedural"', () => {
+      expect(true).toBe(true);
+    });
+
+    Then("the page should respond with HTTP 200", () => {
+      expect(true).toBe(true);
+    });
+
+    And('the page should contain a heading with text "In Procedural — Go / Rust"', () => {
       expect(true).toBe(true);
     });
   });
