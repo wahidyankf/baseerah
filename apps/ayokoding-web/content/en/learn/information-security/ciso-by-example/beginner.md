@@ -1913,7 +1913,7 @@ dashboard_note: >
 
 **Scenario:** You present AcmeSoft's quarterly risk summary to the board. You have one slide.
 
-```markdown
+````markdown
 # AcmeSoft Security Risk Summary — Q1 2027
 
 # Presented by: CISO | Date: 2026-05-21 | Audience: Board of Directors
@@ -1923,6 +1923,7 @@ dashboard_note: >
 ## RISK POSTURE OVERVIEW
 
 # => The heat map tells the whole story at a glance
+
 ```
 
         IMPACT →
@@ -1944,46 +1945,53 @@ Legend: [RED=Critical 20-25] [ORANGE=High 12-19] [YELLOW=Medium 6-11] [GREEN=Low
 ```
 
 ## HEADLINE: Risk posture improving
+
 # => Lead with the narrative, then show the data
+
 - 1 Critical risk CLOSED this quarter (RISK-001: database credentials — fully remediated)
 - 0 Critical risks currently open
 - 2 High risks in active treatment (RISK-005, RISK-003)
+
 # => Board needs to know: are we getting better or worse? Answer first.
 
 ---
 
 ## TOP 3 OPEN RISKS
+
 # => Name the risks, state what is being done, state when they will be resolved
 
-| # | Risk | Score | Band | What We Are Doing | Expected Closure |
-|---|------|-------|------|-------------------|-----------------|
-| 1 | RISK-005: Credential stuffing on login API | 16 | High | Rate limiting + MFA implementation in progress | Jun 15 2027 |
-| 2 | RISK-003: Over-privileged AWS IAM access | 10 | Medium | Least-privilege IAM redesign; Eng Lead owns | Jul 30 2027 |
-| 3 | RISK-002: Laptop encryption gap | 9 | Medium | MDM deployment 85% complete; 30 devices remaining | Jun 1 2027 |
+| #   | Risk                                       | Score | Band   | What We Are Doing                                 | Expected Closure |
+| --- | ------------------------------------------ | ----- | ------ | ------------------------------------------------- | ---------------- |
+| 1   | RISK-005: Credential stuffing on login API | 16    | High   | Rate limiting + MFA implementation in progress    | Jun 15 2027      |
+| 2   | RISK-003: Over-privileged AWS IAM access   | 10    | Medium | Least-privilege IAM redesign; Eng Lead owns       | Jul 30 2027      |
+| 3   | RISK-002: Laptop encryption gap            | 9     | Medium | MDM deployment 85% complete; 30 devices remaining | Jun 1 2027       |
 
 # => Format rule: one row per risk, no jargon, concrete closure date
 
 ---
 
 ## PROGRAM HEALTH SNAPSHOT (KPIs)
+
 # => Five numbers that summarize program health — link to Example 24 for detail
 
-| KPI | Current | Last Quarter | Target | Status |
-|-----|---------|-------------|--------|--------|
-| Phishing click rate | 28% | (baseline) | < 5% | Amber |
-| Training completion | 68% | 0% | 100% | Amber |
-| Critical vulns patched within SLA | N/A | N/A | 95% | Grey (scanner not deployed) |
-| Open Critical risks > 14 days | 0 | 1 | 0 | Green |
-| MTTD (mean time to detect) | TBD | N/A | < 4 hrs | Grey (SIEM not deployed) |
+| KPI                               | Current | Last Quarter | Target  | Status                      |
+| --------------------------------- | ------- | ------------ | ------- | --------------------------- |
+| Phishing click rate               | 28%     | (baseline)   | < 5%    | Amber                       |
+| Training completion               | 68%     | 0%           | 100%    | Amber                       |
+| Critical vulns patched within SLA | N/A     | N/A          | 95%     | Grey (scanner not deployed) |
+| Open Critical risks > 14 days     | 0       | 1            | 0       | Green                       |
+| MTTD (mean time to detect)        | TBD     | N/A          | < 4 hrs | Grey (SIEM not deployed)    |
 
 ---
 
 ## BOARD ASKS
+
 # => Be explicit — what do you need from the board today?
+
 1. INFORMATION ONLY: Risk posture update (no action required)
 2. APPROVAL: Q2 security roadmap initiatives — confirm budget allocation remains on track
 3. AWARENESS: SOC 2 Type II decision point in Q3 — we will return with a recommendation
-```
+````
 
 **Key Takeaway:** Board slides should lead with the headline ("risk posture improving"), not the data — executives will ask for detail if they want it.
 
@@ -2315,3 +2323,7 @@ Priority focus areas for FY2027:
 **Key Takeaway:** Psychological safety is the hidden multiplier — an organization where employees fear reporting mistakes will never build genuine security culture regardless of how good the technical controls are.
 
 **Why It Matters:** Organizations with strong security cultures detect incidents on average 52 days faster than those with weak cultures, primarily because employees report suspicious activity rather than hoping it was nothing. A culture assessment baseline also allows the CISO to demonstrate culture improvement to boards over time — moving from 58% to 75% overall score is a concrete governance achievement that justifies continued investment in awareness and training programs.
+
+```
+
+```
