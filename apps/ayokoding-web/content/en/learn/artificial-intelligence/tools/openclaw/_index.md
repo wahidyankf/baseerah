@@ -14,3 +14,8 @@ description: "Learn OpenClaw - the free, open-source, local-first AI agent platf
   - [Beginner](/en/learn/artificial-intelligence/tools/openclaw/by-example/beginner)
   - [Intermediate](/en/learn/artificial-intelligence/tools/openclaw/by-example/intermediate)
   - [Advanced](/en/learn/artificial-intelligence/tools/openclaw/by-example/advanced)
+- [By Concept](/en/learn/artificial-intelligence/tools/openclaw/by-concept)
+  - [Overview](/en/learn/artificial-intelligence/tools/openclaw/by-concept/overview)
+  - [Beginner](/en/learn/artificial-intelligence/tools/openclaw/by-concept/beginner)
+  - [Intermediate](/en/learn/artificial-intelligence/tools/openclaw/by-concept/intermediate)
+  - [Advanced](/en/learn/artificial-intelligence/tools/openclaw/by-concept/advanced)
