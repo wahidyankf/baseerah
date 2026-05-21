@@ -1554,7 +1554,7 @@ This convention implements and respects:
 
 ## Related Workflows
 
-- [ayokoding-web-by-example-quality-gate](../../workflows/ayokoding-web/ayokoding-web-by-example-quality-gate.md) - Quality assurance workflow for by-example tutorials
+- [ayokoding-web-swe-by-example-quality-gate](../../workflows/ayokoding-web/ayokoding-web-swe-by-example-quality-gate.md) - Quality assurance workflow for by-example tutorials
 
 ## Related agent skills
 

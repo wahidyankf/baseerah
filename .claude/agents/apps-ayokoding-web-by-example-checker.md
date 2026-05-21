@@ -41,7 +41,7 @@ The `repo-generating-validation-reports` Skill provides UUID generation, timesta
 
 **CRITICAL - Read these first**:
 
-- [By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/by-example.md) - Primary validation authority
+- [By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/swe-by-example.md) - Primary validation authority
 - [By Example Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md) - Annotation requirements
 - [Tutorial Naming Convention](../../repo-governance/conventions/tutorials/naming.md) - By Example definition
 
@@ -241,7 +241,7 @@ Count Mermaid diagrams across all tutorial files:
 ### Step 5.7: Validate Examples-by-Level Section in Overview
 
 **CRITICAL validation**. See the
-[Examples-by-Level Section rule](../../repo-governance/conventions/tutorials/by-example.md#examples-by-level-section-mandatory)
+[Examples-by-Level Section rule](../../repo-governance/conventions/tutorials/swe-by-example.md#examples-by-level-section-mandatory)
 for the full standard.
 
 For each tutorial's `overview.md`:

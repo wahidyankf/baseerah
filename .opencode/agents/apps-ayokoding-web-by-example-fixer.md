@@ -104,7 +104,7 @@ The `repo-assessing-criticality-confidence` Skill provides confidence definition
 - Subsection heading does not use en-dash (`–`) in `(Examples N–M)` → replace hyphen with en-dash.
 
 When regenerating the section, recompute slugs with `github-slugger` against the live heading text — never hand-edit a slug. See the
-[Examples-by-Level Section rule](../../repo-governance/conventions/tutorials/by-example.md#examples-by-level-section-mandatory)
+[Examples-by-Level Section rule](../../repo-governance/conventions/tutorials/swe-by-example.md#examples-by-level-section-mandatory)
 for the canonical algorithm and worked snippet.
 
 **FALSE_POSITIVE** (Report to checker):
@@ -126,7 +126,7 @@ See `repo-applying-maker-checker-fixer` Skill for:
 
 **Project Guidance:**
 
-- [By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/by-example.md) - Standards for fix validation
+- [By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/swe-by-example.md) - Standards for fix validation
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
 - [By Example Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md) - Annotation requirements
 

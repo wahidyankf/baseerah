@@ -31,7 +31,7 @@ This convention implements the following core principles:
 
 This convention establishes comprehensive standards for tutorial content across all tutorial types (Initial Setup, Quick Start, Beginner, Intermediate, Advanced, Cookbook, By Example). These types combine to form the **Full Set Tutorial Package** for programming languages - a complete educational bundle with 5 mandatory components. See [Tutorial Naming Convention](./naming.md) for the complete architecture and [Programming Language Structure](./programming-language-structure.md) for directory organization.
 
-**Note**: The By Example tutorial type has specialized standards defined in [By-Example Tutorial Convention](./by-example.md) that extend the general requirements in this document for code-first learning.
+**Note**: The By Example tutorial type has specialized standards defined in [By-Example Tutorial Convention](./swe-by-example.md) that extend the general requirements in this document for code-first learning.
 
 ## Scope
 

@@ -48,7 +48,7 @@ This separation follows the **DRY principle** (Don't Repeat Yourself) - educatio
 
 ### What This Convention Does NOT Cover
 
-- **How to write educational content** - Covered in tutorial conventions ([Programming Language Content Standard](../tutorials/programming-language-content.md), [By Example Tutorial](../tutorials/by-example.md))
+- **How to write educational content** - Covered in tutorial conventions ([Programming Language Content Standard](../tutorials/programming-language-content.md), [By Example Tutorial](../tutorials/swe-by-example.md))
 - **How to write style guides** - Covered in [Content Quality Principles](../writing/quality.md)
 - **Diátaxis framework application** - Covered in [Diátaxis Framework Convention](./diataxis-framework.md)
 - **Hugo content conventions** - Covered in Hugo conventions ([ayokoding](../hugo/ayokoding.md), [shared](../hugo/shared.md))
@@ -768,7 +768,7 @@ Before publishing programming language documentation:
 
 - [ ] Content covers language fundamentals and generic patterns (0-95% coverage)
 - [ ] No OSE Platform-specific conventions (framework choices, naming standards)
-- [ ] By-example tutorial follows [By Example Convention](../tutorials/by-example.md)
+- [ ] By-example tutorial follows [By Example Convention](../tutorials/swe-by-example.md)
 - [ ] In-practice guides follow [Programming Language Content Standard](../tutorials/programming-language-content.md)
 - [ ] Optional cross-reference to docs/explanation/ for contributors
 - [ ] Clear scope: Generic programming education, not repository-specific
@@ -784,7 +784,7 @@ Before publishing programming language documentation:
 **Tutorial Standards**:
 
 - [Programming Language Content Standard](../tutorials/programming-language-content.md) - Full Set Tutorial Package for programming languages (ayokoding-web follows this)
-- [By Example Tutorial](../tutorials/by-example.md) - Code-first tutorial standards (Component 3 of Full Set)
+- [By Example Tutorial](../tutorials/swe-by-example.md) - Code-first tutorial standards (Component 3 of Full Set)
 - [Tutorial Naming](../tutorials/naming.md) - Tutorial type standards and naming patterns
 
 **Content Quality**:

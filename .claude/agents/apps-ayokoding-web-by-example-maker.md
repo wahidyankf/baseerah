@@ -38,7 +38,7 @@ Create By Example tutorial content in `apps/ayokoding-web/` following ayokoding-
 
 - [By Example Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md) - Annotation requirements
 - [Tutorial Naming Convention](../../repo-governance/conventions/tutorials/naming.md) - By Example type definition
-- [By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/by-example.md) - Primary authority for by-example standards
+- [By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/swe-by-example.md) - Primary authority for by-example standards
 
 ## When to Use This Agent
 
@@ -72,7 +72,7 @@ The `docs-creating-by-example-tutorials` Skill provides complete By Example stan
 ## Examples-by-Level Section (MANDATORY)
 
 Every `overview.md` MUST end with a `## Examples by Level` section listing every example as a deep link to the matching `### Example N:` heading on the corresponding level page. See the
-[Examples-by-Level Section rule in the By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/by-example.md#examples-by-level-section-mandatory)
+[Examples-by-Level Section rule in the By-Example Tutorial Convention](../../repo-governance/conventions/tutorials/swe-by-example.md#examples-by-level-section-mandatory)
 for the exact format, slug algorithm (`github-slugger`, matches `rehype-slug`),
 and worked snippet.
 

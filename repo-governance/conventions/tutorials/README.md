@@ -28,7 +28,9 @@ This directory contains standards for tutorial creation, structure, naming, and 
 ### Tutorial Types
 
 - [By Concept Tutorial](./by-concept.md) - Standards for narrative-driven by-concept tutorials (Component 4 of Full Set Tutorial Package) achieving 95% coverage through comprehensive concept explanations
-- [By Example Tutorial](./by-example.md) - Standards for code-first by-example tutorials (Component 3 of Full Set Tutorial Package - PRIORITY) with 75-85 heavily annotated, self-contained, runnable examples. Prioritized for fast learning
+- [SWE By-Example Tutorial](./swe-by-example.md) - Standards for code-first by-example tutorials (Component 3 of Full Set Tutorial Package - PRIORITY) with 75-85 heavily annotated, self-contained, runnable examples for SWE languages and frameworks. Prioritized for fast learning
+- [Security By-Example Tutorial](./security-by-example.md) - Extends SWE by-example for security domains: tool output, lab scenarios, SIEM queries. Covers Foundations, Red Team, and Blue Team by-example tracks
+- [Scenario By-Example Tutorial](./scenario-by-example.md) - Extends SWE by-example for any domain where examples are annotated documents and decisions rather than code. Covers CISO and governance tracks
 - [Cookbook Tutorial](./cookbook.md) - Standards for problem-focused cookbook tutorials (Component 5 of Full Set Tutorial Package) with 30+ practical, copy-paste ready recipes organized by problem type
 - [In-the-Field Tutorial Convention](./in-the-field.md) - Standards for production-ready implementation guides building on by-example/by-concept foundations with frameworks, libraries, and enterprise patterns
 

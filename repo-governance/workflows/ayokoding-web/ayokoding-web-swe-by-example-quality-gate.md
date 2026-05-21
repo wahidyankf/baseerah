@@ -1,6 +1,6 @@
 ---
-name: ayokoding-web-by-example-quality-gate
-title: "ayokoding-web-by-example-quality-gate"
+name: ayokoding-web-swe-by-example-quality-gate
+title: "ayokoding-web-swe-by-example-quality-gate"
 goal: Validate by-example tutorial quality and apply fixes iteratively until EXCELLENT status achieved with zero mechanical issues
 termination: "Tutorial achieves EXCELLENT status with 75-85 examples, 95% coverage, and zero mechanical issues on two consecutive validations (max-iterations defaults to 7, escalation warning at 5)"
 inputs:
@@ -153,7 +153,7 @@ lean. The delegation is encoded in each agent's prompt — no workflow-level con
 
 **Option A: Manual creation** (human author)
 
-- Write examples following [By-Example Tutorial Convention](../../conventions/tutorials/by-example.md)
+- Write examples following [By-Example Tutorial Convention](../../conventions/tutorials/swe-by-example.md)
 - Focus on educational value and code quality
 - Don't worry about perfect compliance (checker will catch issues)
 
@@ -197,7 +197,7 @@ prompt: "Validate apps/ayokoding-web/content/en/learn/software-engineering/progr
 6. **Format**: Five-part structure: (1) Brief Explanation (2-3 sentences), (2) Mermaid Diagram (when appropriate), (3) Heavily Annotated Code, (4) Key Takeaway (1-2 sentences), (5) Why It Matters (50-100 words)
 7. **Frontmatter**: Complete and correct
 8. **Examples-by-Level section** (CRITICAL — see
-   [By-Example Convention §Examples-by-Level Section](../../conventions/tutorials/by-example.md#examples-by-level-section-mandatory)):
+   [By-Example Convention §Examples-by-Level Section](../../conventions/tutorials/swe-by-example.md#examples-by-level-section-mandatory)):
    - `overview.md` MUST contain a `## Examples by Level` heading (exact text, exact level).
    - Every `### Example N: Title` heading on every level page (`beginner.md`,
      `intermediate.md`, `advanced.md`, and `production.md` if present) MUST appear as a
@@ -206,7 +206,7 @@ prompt: "Validate apps/ayokoding-web/content/en/learn/software-engineering/progr
      heading and whose href is `<level-page-url>#<slug>` — where `<slug>` is
      produced by `github-slugger` against the verbatim heading text (same
      algorithm as `rehype-slug`). See the
-     [Examples-by-Level Section rule](../../conventions/tutorials/by-example.md#examples-by-level-section-mandatory)
+     [Examples-by-Level Section rule](../../conventions/tutorials/swe-by-example.md#examples-by-level-section-mandatory)
      for the literal pattern and a worked snippet.
    - No bullet may point to an anchor that does not exist on the target level page (the
      link checker validates this).
@@ -786,7 +786,7 @@ This workflow is part of the **Tutorial Quality Family**:
 
 - **[Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md)**: General pattern
 - **docs-tutorial workflow**: General tutorial validation
-- **ayokoding-web-by-example-quality-gate** (this workflow): Specialized for by-example tutorials
+- **ayokoding-web-swe-by-example-quality-gate** (this workflow): Specialized for by-example tutorials
 - **ayokoding-web workflow**: Hugo content validation
 
 ## Notes
@@ -817,7 +817,7 @@ This workflow is part of the **Tutorial Quality Family**:
 
 ## Related Documentation
 
-- **[By-Example Tutorial Convention](../../conventions/tutorials/by-example.md)**: Quality standards
+- **[By-Example Tutorial Convention](../../conventions/tutorials/swe-by-example.md)**: Quality standards
 - **[Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md)**: Workflow pattern
 - **[Fixer Confidence Levels](../../development/quality/fixer-confidence-levels.md)**: Confidence assessment
 - **[`apps-ayokoding-web-by-example-checker` agent](../../../.claude/agents/apps-ayokoding-web-by-example-checker.md)**: Validation agent

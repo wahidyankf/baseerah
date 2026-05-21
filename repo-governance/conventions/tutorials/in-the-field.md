@@ -2294,7 +2294,7 @@ When creating in-the-field tutorials for multiple languages:
 
 ## Production-Validated Standards Summary
 
-This convention reflects standards validated by production in-the-field content on ayokoding-web, enhanced with comprehensive examples matching by-example.md quality standards:
+This convention reflects standards validated by production in-the-field content on ayokoding-web, enhanced with comprehensive examples matching swe-by-example.md quality standards:
 
 **Guide Count**: 20-40 production guides (currently 31 for Java)
 
@@ -2367,7 +2367,7 @@ This convention reflects standards validated by production in-the-field content 
 - **Code example depth**: Multiple comprehensive annotated examples per major topic
 - **Standard library emphasis**: Enhanced with 5 detailed progressions + 5 anti-patterns
 - **Annotation quality**: All code blocks meet 1.0-2.25 density with production focus
-- **Educational value**: Matches by-example.md quality (62-78 word "Why It Matters" sections, multiple code blocks with text between)
+- **Educational value**: Matches swe-by-example.md quality (62-78 word "Why It Matters" sections, multiple code blocks with text between)
 
 ## Principles Implemented/Respected
 
@@ -2409,13 +2409,13 @@ This convention implements and respects:
 
 ## Related Documentation
 
-- [By-Example Tutorial Convention](./by-example.md): Code-first foundation achieving 95% language coverage
+- [By-Example Tutorial Convention](./swe-by-example.md): Code-first foundation achieving 95% language coverage
 - [By-Concept Tutorial Convention](./by-concept.md): Narrative-driven foundation achieving 95% language coverage
 - [Tutorial Naming Convention](./naming.md): Tutorial type definitions and naming standards
 - [Content Quality Principles](../writing/quality.md): General content quality standards
 - [Diagrams Convention](../formatting/diagrams.md): Mermaid diagram standards
 - [Color Accessibility Convention](../formatting/color-accessibility.md): Color-blind friendly palette
-- [Core Features First Principle](./by-example.md): Foundation for standard library first approach
+- [Core Features First Principle](./swe-by-example.md): Foundation for standard library first approach
 
 ## Related Agents
 

@@ -785,7 +785,7 @@ This convention implements and respects:
 
 ## Related Documentation
 
-- [By-Example Tutorial Convention](./by-example.md): Code-first alternative achieving same 95% coverage
+- [By-Example Tutorial Convention](./swe-by-example.md): Code-first alternative achieving same 95% coverage
 - [Tutorial Naming Convention](./naming.md): Tutorial type definitions and naming standards
 - [Content Quality Principles](../writing/quality.md): General content quality standards
 - [Diagrams Convention](../formatting/diagrams.md): Mermaid diagram standards

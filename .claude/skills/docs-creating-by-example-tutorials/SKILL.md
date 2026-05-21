@@ -485,7 +485,7 @@ int x = 10;  // This line declares a variable named x and assigns it the integer
 
 ## References
 
-**Primary Convention**: [By Example Tutorial Convention](../../../repo-governance/conventions/tutorials/by-example.md)
+**Primary Convention**: [By Example Tutorial Convention](../../../repo-governance/conventions/tutorials/swe-by-example.md)
 
 **Related Conventions**:
 

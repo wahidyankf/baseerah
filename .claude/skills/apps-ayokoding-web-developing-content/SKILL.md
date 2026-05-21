@@ -119,7 +119,7 @@ Or use the `apps-ayokoding-web-deployer` agent for a guided deployment.
 **Related Conventions**:
 
 - [Programming Language Tutorial Structure](../../../repo-governance/conventions/tutorials/programming-language-structure.md) - Dual-path organization
-- [By Example Tutorial Convention](../../../repo-governance/conventions/tutorials/by-example.md) - Annotation standards
+- [By Example Tutorial Convention](../../../repo-governance/conventions/tutorials/swe-by-example.md) - Annotation standards
 - [Content Quality Principles](../../../repo-governance/conventions/writing/quality.md) - Universal quality standards
 
 **Related Skills**:

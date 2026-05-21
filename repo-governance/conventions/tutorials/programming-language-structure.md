@@ -166,7 +166,7 @@ by-example/
 
 **Content Requirements:**
 
-See [By Example Tutorial Convention](./by-example.md) for complete by-example standards including:
+See [By Example Tutorial Convention](./swe-by-example.md) for complete by-example standards including:
 
 - Five-part example structure
 - Self-containment rules
@@ -762,7 +762,7 @@ Ensure correct order (by-example first):
 
 **Step 5: Write content**
 
-Follow [By Example Tutorial Convention](./by-example.md) to create 75-90 annotated examples.
+Follow [By Example Tutorial Convention](./swe-by-example.md) to create 75-90 annotated examples.
 
 **Step 6: Validate**
 
@@ -771,7 +771,7 @@ Run `apps-ayokoding-web-by-example-checker` to verify structure and content qual
 ## Related Conventions
 
 - **[Programming Language Content Standard](./programming-language-content.md)** - Universal content architecture for programming languages (5 tutorial levels, coverage philosophy, quality metrics, pedagogical patterns)
-- **[By Example Tutorial Convention](./by-example.md)** - Complete standards for creating code-first by-example tutorials (five-part structure, self-containment, educational comments, coverage progression)
+- **[By Example Tutorial Convention](./swe-by-example.md)** - Complete standards for creating code-first by-example tutorials (five-part structure, self-containment, educational comments, coverage progression)
 - **[Hugo Content Convention - ayokoding](../hugo/ayokoding.md)** - Hextra theme specifics (level-based weights, absolute paths, navigation depth, frontmatter requirements)
 - **[Tutorial Naming Convention](./naming.md)** - Tutorial type definitions (Initial Setup, Quick Start, Beginner, Intermediate, Advanced coverage percentages)
 - **[Content Quality Principles](../writing/quality.md)** - Universal markdown quality standards (active voice, heading hierarchy, accessibility)

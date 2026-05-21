@@ -155,7 +155,7 @@ The annotation MUST appear on the line immediately preceding the construct it an
 
 ### S6: Annotation Density
 
-Every code block in both tabs MUST meet the annotation density standard defined in the [By-Example Tutorial Convention](../tutorials/by-example.md): **1.0–2.25 comment lines per code line, measured per individual example** (not tutorial-wide). This ratio applies independently to the F# tab and the Clojure tab.
+Every code block in both tabs MUST meet the annotation density standard defined in the [By-Example Tutorial Convention](../tutorials/swe-by-example.md): **1.0–2.25 comment lines per code line, measured per individual example** (not tutorial-wide). This ratio applies independently to the F# tab and the Clojure tab.
 
 Lines that are blank, closing braces, or closing brackets do not count as code lines. Comment lines beginning with `//` (F#) or `;` (Clojure) count as comment lines. Inline comments on a code line count as 0.5 comment lines toward the ratio.
 
@@ -310,7 +310,7 @@ The following checks determine whether an FP-variant by-example page complies wi
 
 **Related Conventions:**
 
-- [By-Example Tutorial Convention](../tutorials/by-example.md) — primary authority for five-part example structure, annotation density (1.0–2.25 ratio), and coverage progression. This convention is a specialisation of that standard for FP-variant multi-language content.
+- [By-Example Tutorial Convention](../tutorials/swe-by-example.md) — primary authority for five-part example structure, annotation density (1.0–2.25 ratio), and coverage progression. This convention is a specialisation of that standard for FP-variant multi-language content.
 - [Content Quality Principles](./quality.md) — universal markdown quality standards (active voice, heading nesting, accessibility) that apply to all content including FP-variant by-example pages.
 - [Why It Matters Content Convention](./why-it-matters-content.md) — prohibits fabricated scenarios and unsourced claims in `**Why It Matters**:` sections; applies to both tabs in FP-variant examples.
 - [Programming Language Content Standard](../tutorials/programming-language-content.md) — Full Set Tutorial Package architecture; FP-variant by-example is Component 3 (code-first priority track).

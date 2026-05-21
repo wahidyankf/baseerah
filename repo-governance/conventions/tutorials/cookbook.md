@@ -565,5 +565,5 @@ This convention implements and respects:
 - **[Tutorial Convention](./general.md)**: Base tutorial standards that cookbook inherits
 - **[Programming Language Structure](./programming-language-structure.md)**: Where cookbook/ folder fits in directory structure
 - **[Programming Language Content](./programming-language-content.md)**: Cookbook as mandatory component for complete language content
-- **[By-Example Tutorial](./by-example.md)**: Comparison with code-first learning path
+- **[By-Example Tutorial](./swe-by-example.md)**: Comparison with code-first learning path
 - **[By-Concept Tutorial](./by-concept.md)**: Comparison with narrative-driven learning path

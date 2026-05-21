@@ -405,7 +405,7 @@ Report final status and summary.
 This workflow is part of the **Tutorial Quality Family**:
 
 - **[Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md)**: General pattern
-- **ayokoding-web-by-example-quality-gate**: Specialized for by-example tutorials
+- **ayokoding-web-swe-by-example-quality-gate**: Specialized for by-example tutorials
 - **ayokoding-web-in-the-field-quality-gate** (this workflow): Specialized for in-the-field production guides
 
 ## Principles Implemented/Respected
