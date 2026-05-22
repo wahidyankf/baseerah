@@ -44,11 +44,18 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 The redirect file lands before any rename. Empty/skeleton, but wired in — so phase 2's renames have a target to push entries into immediately.
 
-- [ ] [RED] Create `specs/apps/ayokoding/behavior/web/gherkin/navigation/learn-reorg-redirects.feature` (_New file_) with a failing scenario asserting that visiting `/en/learn/software-engineering/platform-web` redirects to `/en/learn/software-engineering/platforms/web`. Create the corresponding step file `apps/ayokoding-web-fe-e2e/src/steps/learn-reorg-redirects.steps.ts` (_New file_) implementing the step definitions using `createBdd()` from `playwright-bdd`. Run `nx run ayokoding-web-fe-e2e:test:e2e` — confirm the new scenario appears in test output and fails (expected — redirect not yet wired).
-- [ ] Create `apps/ayokoding-web/src/redirects/learn-reorg.ts` (_New file_) with `export const learnReorgRedirects: Array<{source: string; destination: string; permanent: boolean}> = [];`
-- [ ] Edit `apps/ayokoding-web/next.config.ts` to import and spread `learnReorgRedirects` into `redirects()`
-- [ ] Run `nx run ayokoding-web:build` to confirm Next.js still builds with the empty array — exit code must be 0.
-- [ ] Add a smoke test asserting that a known unredirected path still 200s (e.g., `GET /en/learn/software-engineering/programming-languages/typescript`) — establishes the "no redirect yet" baseline. Run `nx run ayokoding-web:test:quick` — exit code must be 0.
+- [x] [RED] Create `specs/apps/ayokoding/behavior/web/gherkin/navigation/learn-reorg-redirects.feature`
+
+<!-- Date: 2026-05-22 | Status: done | Files: specs/apps/ayokoding/behavior/web/gherkin/navigation/learn-reorg-redirects.feature, apps/ayokoding-web-fe-e2e/src/steps/learn-reorg-redirects.steps.ts | Scenario discovered and failing in all 3 browsers (RED confirmed) --> (_New file_) with a failing scenario asserting that visiting `/en/learn/software-engineering/platform-web` redirects to `/en/learn/software-engineering/platforms/web`. Create the corresponding step file `apps/ayokoding-web-fe-e2e/src/steps/learn-reorg-redirects.steps.ts` (_New file_) implementing the step definitions using `createBdd()` from `playwright-bdd`. Run `nx run ayokoding-web-fe-e2e:test:e2e` — confirm the new scenario appears in test output and fails (expected — redirect not yet wired).
+
+- [x] Create `apps/ayokoding-web/src/redirects/learn-reorg.ts` (_New file_) with `export const learnReorgRedirects: Array<{source: string; destination: string; permanent: boolean}> = [];`
+<!-- Date: 2026-05-22 | Status: done | Files: apps/ayokoding-web/src/redirects/learn-reorg.ts -->
+- [x] Edit `apps/ayokoding-web/next.config.ts` to import and spread `learnReorgRedirects` into `redirects()`
+<!-- Date: 2026-05-22 | Status: done | Files: apps/ayokoding-web/next.config.ts -->
+- [x] Run `nx run ayokoding-web:build` to confirm Next.js still builds with the empty array — exit code must be 0.
+<!-- Date: 2026-05-22 | Status: done | Build success -->
+- [x] Add a smoke test asserting that a known unredirected path still 200s (e.g., `GET /en/learn/software-engineering/programming-languages/typescript`) — establishes the "no redirect yet" baseline. Run `nx run ayokoding-web:test:quick` — exit code must be 0.
+<!-- Date: 2026-05-22 | Status: done | Coverage 86.21% >= 82% -->
 - [ ] Commit: `feat(ayokoding-web): scaffold learn-reorg redirect map`
 
 ## Phase 2 — Platforms Rename (`platform-*` → `platforms/*`)
