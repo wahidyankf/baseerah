@@ -6,6 +6,35 @@ import (
 	"testing"
 )
 
+func TestParseOutputFormat(t *testing.T) {
+	origOutput := output
+	defer func() { output = origOutput }()
+
+	cases := []struct {
+		name    string
+		value   string
+		wantErr bool
+	}{
+		{"text accepted", "text", false},
+		{"json accepted", "json", false},
+		{"markdown accepted", "markdown", false},
+		{"unknown rejected", "xml", true},
+		{"empty rejected", "", true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			output = tc.value
+			err := parseOutputFormat(nil, nil)
+			if tc.wantErr && err == nil {
+				t.Fatalf("expected error for %q", tc.value)
+			}
+			if !tc.wantErr && err != nil {
+				t.Fatalf("unexpected error for %q: %v", tc.value, err)
+			}
+		})
+	}
+}
+
 func TestRootCommand_Initialization(t *testing.T) {
 	if rootCmd.Use != "ose-cli" {
 		t.Errorf("Expected use 'ose-cli', got %s", rootCmd.Use)

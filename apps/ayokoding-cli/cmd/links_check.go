@@ -50,7 +50,7 @@ func runLinksCheck(_ *cobra.Command, _ []string) error {
 	var outputErr error
 	switch output {
 	case "json":
-		outputErr = links.OutputLinksJSON(result, elapsed)
+		outputErr = outputLinksJSONFn(result, elapsed)
 	case "markdown":
 		links.OutputLinksMarkdown(result, elapsed)
 	default:

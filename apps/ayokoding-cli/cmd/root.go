@@ -26,7 +26,20 @@ var rootCmd = &cobra.Command{
 
 Provides fast internal link checking with support for multiple output formats
 and verbose logging.`,
-	Version: "0.5.0",
+	Version:           "0.5.0",
+	CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
+	PersistentPreRunE: parseOutputFormat,
+}
+
+// parseOutputFormat validates the --output flag before each subcommand runs.
+// Allowed values: text, json, markdown. Mirrors rhino-cli's behavior.
+func parseOutputFormat(_ *cobra.Command, _ []string) error {
+	switch output {
+	case "text", "json", "markdown":
+		return nil
+	default:
+		return fmt.Errorf("unknown output format %q: must be text, json, or markdown", output)
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
