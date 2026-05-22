@@ -3,4 +3,5 @@
 
 pub mod cliout;
 pub mod gitutil;
+pub mod speccoverage;
 pub mod testcoverage;
