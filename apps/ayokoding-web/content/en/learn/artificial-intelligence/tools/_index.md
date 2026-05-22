@@ -9,6 +9,12 @@ description: "AI coding agent tools — OpenClaw, Hermes Agent, and Pi Coding Ag
 ---
 
 - [Overview](/en/learn/artificial-intelligence/tools/overview)
+- [Claude Code](/en/learn/artificial-intelligence/tools/claude-code)
+  - [Overview](/en/learn/artificial-intelligence/tools/claude-code/overview)
+  - [By Example](/en/learn/artificial-intelligence/tools/claude-code/by-example)
+    - [Overview](/en/learn/artificial-intelligence/tools/claude-code/by-example/overview)
+  - [By Concept](/en/learn/artificial-intelligence/tools/claude-code/by-concept)
+    - [Overview](/en/learn/artificial-intelligence/tools/claude-code/by-concept/overview)
 - [OpenClaw](/en/learn/artificial-intelligence/tools/openclaw)
   - [Overview](/en/learn/artificial-intelligence/tools/openclaw/overview)
   - [By Example](/en/learn/artificial-intelligence/tools/openclaw/by-example)

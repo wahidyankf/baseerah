@@ -36,6 +36,7 @@ weight: 10
   - [Overview](/en/learn/artificial-intelligence/overview)
   - [Chat with Pdf](/en/learn/artificial-intelligence/chat-with-pdf)
   - [Tools](/en/learn/artificial-intelligence/tools)
+    - [Claude Code](/en/learn/artificial-intelligence/tools/claude-code)
     - [OpenClaw](/en/learn/artificial-intelligence/tools/openclaw)
     - [Hermes Agent](/en/learn/artificial-intelligence/tools/hermes-agent)
     - [Pi Coding Agent](/en/learn/artificial-intelligence/tools/pi-coding-agent)

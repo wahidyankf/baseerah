@@ -1629,5 +1629,5 @@ This intermediate tutorial covered Examples 31-60 (40-75% of Claude Code capabil
 
 **Continue learning**:
 
-- [Beginner](/en/learn/software-engineering/automation-tools/claude-code/by-example/beginner) - Examples 1-30 reviewing essential commands and basic workflows
-- [Advanced](/en/learn/software-engineering/automation-tools/claude-code/by-example/advanced) - Examples 61-85 covering custom agents, production orchestration, and enterprise integration patterns
+- [Beginner](/en/learn/artificial-intelligence/tools/claude-code/by-example/beginner) - Examples 1-30 reviewing essential commands and basic workflows
+- [Advanced](/en/learn/artificial-intelligence/tools/claude-code/by-example/advanced) - Examples 61-85 covering custom agents, production orchestration, and enterprise integration patterns

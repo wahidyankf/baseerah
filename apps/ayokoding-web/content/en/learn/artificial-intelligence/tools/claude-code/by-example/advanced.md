@@ -1607,8 +1607,8 @@ This advanced tutorial covered Examples 61-85 (75-95% of Claude Code capabilitie
 
 **Continue practicing**:
 
-- [Beginner](/en/learn/software-engineering/automation-tools/claude-code/by-example/beginner) - Examples 1-30 reviewing essential commands and basic workflows
-- [Intermediate](/en/learn/software-engineering/automation-tools/claude-code/by-example/intermediate) - Examples 31-60 reviewing production patterns and testing workflows
+- [Beginner](/en/learn/artificial-intelligence/tools/claude-code/by-example/beginner) - Examples 1-30 reviewing essential commands and basic workflows
+- [Intermediate](/en/learn/artificial-intelligence/tools/claude-code/by-example/intermediate) - Examples 31-60 reviewing production patterns and testing workflows
 
 **Apply to real projects**:
 

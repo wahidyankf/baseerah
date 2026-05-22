@@ -8,11 +8,6 @@ layout: list
 ---
 
 - [Overview](/en/learn/software-engineering/automation-tools/overview)
-- [Claude Code](/en/learn/software-engineering/automation-tools/claude-code)
-  - [Overview](/en/learn/software-engineering/automation-tools/claude-code/overview)
-  - [Initial Setup](/en/learn/software-engineering/automation-tools/claude-code/initial-setup)
-  - [Quick Start](/en/learn/software-engineering/automation-tools/claude-code/quick-start)
-  - [By Example](/en/learn/software-engineering/automation-tools/claude-code/by-example)
 - [Git](/en/learn/software-engineering/automation-tools/git)
   - [By Example](/en/learn/software-engineering/automation-tools/git/by-example)
   - [Overview](/en/learn/software-engineering/automation-tools/git/overview)

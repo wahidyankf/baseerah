@@ -32,7 +32,7 @@ A **Task Management REST API** with:
 
 ## Prerequisites
 
-- Claude Code installed and configured ([Initial Setup](/en/learn/software-engineering/automation-tools/claude-code/initial-setup))
+- Claude Code installed and configured ([Initial Setup](/en/learn/artificial-intelligence/tools/claude-code/initial-setup))
 - Basic programming experience (any language)
 - Terminal familiarity
 
@@ -655,8 +655,8 @@ Try asking Claude Code to:
 
 Continue to:
 
-- **By Example** → [By Example (75+ Examples)](/en/learn/software-engineering/automation-tools/claude-code/by-example) - Comprehensive coverage of all Claude Code features
-- **Overview** → [Claude Code Overview](/en/learn/software-engineering/automation-tools/claude-code/overview) - Understand full capabilities
+- **By Example** → [By Example (75+ Examples)](/en/learn/artificial-intelligence/tools/claude-code/by-example) - Comprehensive coverage of all Claude Code features
+- **Overview** → [Claude Code Overview](/en/learn/artificial-intelligence/tools/claude-code/overview) - Understand full capabilities
 
 ## Key Takeaways
 
@@ -749,4 +749,4 @@ You've learned:
 - Logging and monitoring
 - Production error handling
 
-Learn these in [By Example](/en/learn/software-engineering/automation-tools/claude-code/by-example) tutorial!
+Learn these in [By Example](/en/learn/artificial-intelligence/tools/claude-code/by-example) tutorial!

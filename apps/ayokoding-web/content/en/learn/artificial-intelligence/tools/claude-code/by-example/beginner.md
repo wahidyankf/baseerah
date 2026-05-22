@@ -820,5 +820,5 @@ This beginner tutorial covered Examples 1-30 (0-40% of Claude Code capabilities)
 
 **Continue learning**:
 
-- [Intermediate](/en/learn/software-engineering/automation-tools/claude-code/by-example/intermediate) - Examples 31-60 covering agent configuration, advanced refactoring, and testing workflows
-- [Advanced](/en/learn/software-engineering/automation-tools/claude-code/by-example/advanced) - Examples 61-85 covering custom agents, production orchestration, and enterprise integration patterns
+- [Intermediate](/en/learn/artificial-intelligence/tools/claude-code/by-example/intermediate) - Examples 31-60 covering agent configuration, advanced refactoring, and testing workflows
+- [Advanced](/en/learn/artificial-intelligence/tools/claude-code/by-example/advanced) - Examples 61-85 covering custom agents, production orchestration, and enterprise integration patterns

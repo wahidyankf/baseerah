@@ -459,9 +459,9 @@ Before proceeding to Quick Start, verify:
 
 Setup complete! You're ready to:
 
-- **Quick Start** → [Quick Start Tutorial](/en/learn/software-engineering/automation-tools/claude-code/quick-start) - Build your first project with Claude Code
-- **By Example** → [By Example (75+ Examples)](/en/learn/software-engineering/automation-tools/claude-code/by-example) - Learn through heavily annotated code examples
-- **Overview** → [Claude Code Overview](/en/learn/software-engineering/automation-tools/claude-code/overview) - Understand capabilities and use cases
+- **Quick Start** → [Quick Start Tutorial](/en/learn/artificial-intelligence/tools/claude-code/quick-start) - Build your first project with Claude Code
+- **By Example** → [By Example (75+ Examples)](/en/learn/artificial-intelligence/tools/claude-code/by-example) - Learn through heavily annotated code examples
+- **Overview** → [Claude Code Overview](/en/learn/artificial-intelligence/tools/claude-code/overview) - Understand capabilities and use cases
 
 ## Additional Resources
 
