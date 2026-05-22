@@ -252,10 +252,7 @@ This makes automation accessible to developers at all skill levels.
 
 Ready to start automating? Choose your first tool:
 
-- **New to AI coding assistants?** → [Claude Code](/en/learn/software-engineering/automation-tools/claude-code)
-- **Want a self-improving AI agent?** → [Hermes Agent](/en/learn/software-engineering/automation-tools/hermes-agent)
-- **Need a local-first AI agent platform?** → [OpenClaw](/en/learn/software-engineering/automation-tools/openclaw)
-- **Want a minimal, extensible coding harness?** → [Pi Coding Agent](/en/learn/software-engineering/automation-tools/pi-coding-agent)
+- **AI coding assistants** → see [Artificial Intelligence → Tools](/en/learn/artificial-intelligence/tools) (Claude Code, Hermes Agent, OpenClaw, Pi Coding Agent)
 - **Need to automate deployments?** → Coming soon (GitHub Actions)
 - **Managing complex builds?** → Coming soon (Nx)
 
