@@ -1001,7 +1001,7 @@ public class DonationService {
 
 **Hands-on Learning (AyoKoding)**:
 
-- [Spring In-the-Field - DI Strategies](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/in-the-field/dependency-injection.md) - Production patterns
+- [Spring In-the-Field - DI Strategies](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/in-the-field/dependency-injection.md) - Production patterns
 
 **Spring Boot Extension**:
 

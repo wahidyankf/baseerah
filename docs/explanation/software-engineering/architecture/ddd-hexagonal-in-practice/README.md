@@ -23,7 +23,7 @@ OSE Platform conventions for integrating Domain-Driven Design bounded contexts w
 
 - **DDD fundamentals** — [Domain-Driven Design Learning Path](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/)
 - **Hexagonal fundamentals** — [Hexagonal Architecture Overview](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/hexagonal-architecture/overview.md)
-- **DDD + Hexagonal in Production** — [Cases](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/cases/overview.md) (In FP and In OOP cases)
+- **DDD + Hexagonal in Production** — [Cases](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/by-example/cases/overview.md) (In FP and In OOP cases)
 
 This directory is **OSE Platform-specific conventions** — not educational tutorials. The ayokoding-web tutorials above supply the conceptual foundation.
 
@@ -92,7 +92,7 @@ Practitioners working on a specific concern can jump directly to the relevant st
 
 Maintaining separate documentation for DDD and Hexagonal Architecture risks gaps at their intersection — the integration decisions that most commonly cause implementation confusion. This directory closes that gap by codifying how OSE Platform resolves the tension between DDD's context-centric view and Hexagonal Architecture's port-centric view.
 
-**See**: [Cases](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/cases/overview.md) for the educational counterpart with worked production examples.
+**See**: [Cases](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/by-example/cases/overview.md) for the educational counterpart with worked production examples.
 
 ## Related Documentation
 
@@ -101,5 +101,5 @@ Maintaining separate documentation for DDD and Hexagonal Architecture risks gaps
 - **[C4 Architecture Model](../c4-architecture-model/README.md)** — Visual representation of hexagonal layers and bounded context containers
 - **[FSM Standards](../finite-state-machine-fsm/README.md)** — Entity lifecycle state machines living inside the domain core
 - **[Architecture Index](../README.md)** — All architecture pattern documentation
-- **[Cases — In FP](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/cases/in-fp/overview.md)** — Production F#/Giraffe case
-- **[Cases — In OOP](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/cases/in-oop/overview.md)** — Production Java/Spring Boot case
+- **[Cases — In FP](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/by-example/cases/in-fp/overview.md)** — Production F#/Giraffe case
+- **[Cases — In OOP](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/overview.md)** — Production Java/Spring Boot case

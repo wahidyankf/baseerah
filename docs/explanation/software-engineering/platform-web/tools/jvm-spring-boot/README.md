@@ -46,12 +46,12 @@ Spring Boot builds on Spring Framework and auto-configures Spring concepts. You 
 
 **2. Learn Spring Boot Fundamentals**:
 
-You MUST complete the [AyoKoding Spring Boot Learning Path](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/) before using these standards.
+You MUST complete the [AyoKoding Spring Boot Learning Path](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) before using these standards.
 
-- [Spring Boot Initial Setup](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/initial-setup.md) - Environment and tooling setup
-- [Spring Boot Overview](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/overview.md) - Auto-configuration, starters, opinionated defaults
-- [Spring Boot By Example](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/by-example/) (85+ annotated examples) - Hands-on code learning
-- [Spring Boot In-the-Field](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/in-the-field/) (37 practical guides) - Production patterns
+- [Spring Boot Initial Setup](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/initial-setup.md) - Environment and tooling setup
+- [Spring Boot Overview](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/overview.md) - Auto-configuration, starters, opinionated defaults
+- [Spring Boot By Example](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/by-example/) (85+ annotated examples) - Hands-on code learning
+- [Spring Boot In-the-Field](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/in-the-field/) (37 practical guides) - Production patterns
 
 **Separation of Concerns**: See [Programming Language Documentation Separation Convention](../../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md).
 

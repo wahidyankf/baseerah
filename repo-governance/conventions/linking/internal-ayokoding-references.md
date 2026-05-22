@@ -140,24 +140,24 @@ content/en/learn/software-engineering/programming-languages/java/     (down to t
 
 **Depth:** 6 levels deep
 
-**Target:** `apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/`
+**Target:** `apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/`
 
 **Path:**
 
 ```markdown
-../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/
+../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/
 ```
 
 #### From docs/explanation/software-engineering/platform-web/tools/jvm-spring-boot/
 
 **Depth:** 6 levels deep
 
-**Target:** `apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/`
+**Target:** `apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/`
 
 **Path:**
 
 ```markdown
-../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/
+../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/
 ```
 
 ### Language Selection
@@ -187,9 +187,9 @@ Use **descriptive, context-appropriate link text** that follows [Content Quality
 ```markdown
 [Java programming language explanation](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/)
 
-[Spring Framework fundamentals](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/)
+[Spring Framework fundamentals](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/)
 
-[Complete Spring Boot tutorial series](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/)
+[Complete Spring Boot tutorial series](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/)
 ```
 
 **Avoid:**
@@ -197,9 +197,9 @@ Use **descriptive, context-appropriate link text** that follows [Content Quality
 ```markdown
 [here](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/) ← Vague
 
-[Click this link](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/) ← Non-descriptive
+[Click this link](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/) ← Non-descriptive
 
-[ayokoding-web](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/) ← Technical, not semantic
+[ayokoding-web](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) ← Technical, not semantic
 ```
 
 ## Examples
@@ -237,7 +237,7 @@ Learn Spring Framework basics at [ayokoding.com](https://ayokoding.com/en/learn/
 ✅ **CORRECT:**
 
 ```markdown
-Learn Spring Framework basics in our [comprehensive Spring tutorial series](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/).
+Learn Spring Framework basics in our [comprehensive Spring tutorial series](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/).
 ```
 
 ### Example 3: Spring Boot Deep Dive
@@ -255,7 +255,7 @@ Check out our [Spring Boot tutorials](https://ayokoding.com/en/learn/software-en
 ✅ **CORRECT:**
 
 ```markdown
-Check out our [Spring Boot tutorials](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/) for practical examples.
+Check out our [Spring Boot tutorials](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) for practical examples.
 ```
 
 ### Example 4: Multiple Cross-References in One Document
@@ -272,8 +272,8 @@ Check out our [Spring Boot tutorials](../../../../../../apps/ayokoding-web/conte
 This documentation provides reference material for Java in the open-sharia-enterprise project. For comprehensive learning content, explore:
 
 - **[Java Fundamentals](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/)** - Core language concepts, syntax, and basic programming
-- **[Spring Framework](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/)** - Dependency injection, AOP, and enterprise patterns
-- **[Spring Boot](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/)** - Rapid application development with Spring ecosystem
+- **[Spring Framework](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/)** - Dependency injection, AOP, and enterprise patterns
+- **[Spring Boot](../../../../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/)** - Rapid application development with Spring ecosystem
 ```
 
 ## Path Verification Checklist

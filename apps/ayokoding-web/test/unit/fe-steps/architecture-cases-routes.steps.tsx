@@ -16,7 +16,7 @@ describeFeature(feature, ({ Scenario, Background }) => {
   });
 
   Scenario("In FP case route is reachable", ({ When, Then, And }) => {
-    When('a visitor navigates to "/en/learn/software-engineering/software-architecture/cases/in-fp"', () => {
+    When('a visitor navigates to "/en/learn/software-engineering/software-architecture/by-example/cases/in-fp"', () => {
       expect(true).toBe(true);
     });
 
@@ -30,9 +30,12 @@ describeFeature(feature, ({ Scenario, Background }) => {
   });
 
   Scenario("In OOP case route is reachable", ({ When, Then, And }) => {
-    When('a visitor navigates to "/en/learn/software-engineering/software-architecture/cases/in-oop"', () => {
-      expect(true).toBe(true);
-    });
+    When(
+      'a visitor navigates to "/en/learn/software-engineering/software-architecture/by-example/cases/in-oop"',
+      () => {
+        expect(true).toBe(true);
+      },
+    );
 
     Then("the page should respond with HTTP 200", () => {
       expect(true).toBe(true);
@@ -44,9 +47,12 @@ describeFeature(feature, ({ Scenario, Background }) => {
   });
 
   Scenario("In Procedural case route is reachable", ({ When, Then, And }) => {
-    When('a visitor navigates to "/en/learn/software-engineering/software-architecture/cases/in-procedural"', () => {
-      expect(true).toBe(true);
-    });
+    When(
+      'a visitor navigates to "/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural"',
+      () => {
+        expect(true).toBe(true);
+      },
+    );
 
     Then("the page should respond with HTTP 200", () => {
       expect(true).toBe(true);

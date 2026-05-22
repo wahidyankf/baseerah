@@ -1049,7 +1049,7 @@ title: Programming Languages # Clear, descriptive, properly capitalized
 ---
 title: AI Engineering # Human-readable, proper acronym capitalization
 ---
-# File: content/en/learn/human/tools/cliftonstrengths/_index.md
+# File: content/en/learn/personal-development/tools/cliftonstrengths/_index.md
 ---
 title: CliftonStrengths # Proper product name capitalization
 ---

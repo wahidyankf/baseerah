@@ -128,13 +128,13 @@ Software design documentation in `docs/explanation/software-engineering/` contai
 
 The following `docs/explanation/` content assumes readers have completed the corresponding AyoKoding learning paths:
 
-| Advanced Reference (docs/explanation/)                                       | Prerequisite Learning (ayokoding-web)                                                                                                                                   |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [programming-languages/java/](./programming-languages/java/)                 | [learn/software-engineering/programming-languages/java/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/)                 |
-| [programming-languages/golang/](./programming-languages/golang/)             | [learn/software-engineering/programming-languages/golang/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)             |
-| [programming-languages/elixir/](./programming-languages/elixir/)             | [learn/software-engineering/programming-languages/elixir/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/elixir/)             |
-| [platform-web/tools/jvm-spring/](./platform-web/tools/jvm-spring/)           | [learn/software-engineering/platform-web/tools/jvm-spring/](../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring/)           |
-| [platform-web/tools/jvm-spring-boot/](./platform-web/tools/jvm-spring-boot/) | [learn/software-engineering/platform-web/tools/jvm-spring-boot/](../../../apps/ayokoding-web/content/en/learn/software-engineering/platform-web/tools/jvm-spring-boot/) |
+| Advanced Reference (docs/explanation/)                                       | Prerequisite Learning (ayokoding-web)                                                                                                                                    |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [programming-languages/java/](./programming-languages/java/)                 | [learn/software-engineering/programming-languages/java/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/)                  |
+| [programming-languages/golang/](./programming-languages/golang/)             | [learn/software-engineering/programming-languages/golang/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)              |
+| [programming-languages/elixir/](./programming-languages/elixir/)             | [learn/software-engineering/programming-languages/elixir/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/elixir/)              |
+| [platform-web/tools/jvm-spring/](./platform-web/tools/jvm-spring/)           | [learn/software-engineering/platform-web/tools/jvm-spring/](../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/)           |
+| [platform-web/tools/jvm-spring-boot/](./platform-web/tools/jvm-spring-boot/) | [learn/software-engineering/platform-web/tools/jvm-spring-boot/](../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) |
 
 ### Content Types and Scope
 
