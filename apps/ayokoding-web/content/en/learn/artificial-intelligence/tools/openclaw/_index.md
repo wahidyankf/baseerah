@@ -9,13 +9,13 @@ description: "Learn OpenClaw - the free, open-source, local-first AI agent platf
 ---
 
 - [Overview](/en/learn/artificial-intelligence/tools/openclaw/overview)
-- [By Example](/en/learn/artificial-intelligence/tools/openclaw/by-example)
-  - [Overview](/en/learn/artificial-intelligence/tools/openclaw/by-example/overview)
-  - [Beginner](/en/learn/artificial-intelligence/tools/openclaw/by-example/beginner)
-  - [Intermediate](/en/learn/artificial-intelligence/tools/openclaw/by-example/intermediate)
-  - [Advanced](/en/learn/artificial-intelligence/tools/openclaw/by-example/advanced)
 - [By Concept](/en/learn/artificial-intelligence/tools/openclaw/by-concept)
   - [Overview](/en/learn/artificial-intelligence/tools/openclaw/by-concept/overview)
   - [Beginner](/en/learn/artificial-intelligence/tools/openclaw/by-concept/beginner)
   - [Intermediate](/en/learn/artificial-intelligence/tools/openclaw/by-concept/intermediate)
   - [Advanced](/en/learn/artificial-intelligence/tools/openclaw/by-concept/advanced)
+- [By Example](/en/learn/artificial-intelligence/tools/openclaw/by-example)
+  - [Overview](/en/learn/artificial-intelligence/tools/openclaw/by-example/overview)
+  - [Beginner](/en/learn/artificial-intelligence/tools/openclaw/by-example/beginner)
+  - [Intermediate](/en/learn/artificial-intelligence/tools/openclaw/by-example/intermediate)
+  - [Advanced](/en/learn/artificial-intelligence/tools/openclaw/by-example/advanced)

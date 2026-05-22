@@ -8,9 +8,9 @@ layout: list
 description: "Foundational security learning path for software engineers — start here before specializing into a role"
 ---
 
-- [Overview](/en/learn/information-security/foundations/overview)
 - [By Example](/en/learn/information-security/foundations/by-example)
   - [Overview](/en/learn/information-security/foundations/by-example/overview)
   - [Beginner](/en/learn/information-security/foundations/by-example/beginner)
   - [Intermediate](/en/learn/information-security/foundations/by-example/intermediate)
   - [Advanced](/en/learn/information-security/foundations/by-example/advanced)
+- [Overview](/en/learn/information-security/foundations/overview)

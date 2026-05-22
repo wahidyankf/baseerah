@@ -9,13 +9,13 @@ description: "Learn Pi Coding Agent - the minimal, extensible terminal coding ha
 ---
 
 - [Overview](/en/learn/artificial-intelligence/tools/pi-coding-agent/overview)
-- [By Example](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example)
-  - [Overview](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/overview)
-  - [Beginner](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/beginner)
-  - [Intermediate](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/intermediate)
-  - [Advanced](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/advanced)
 - [By Concept](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept)
   - [Overview](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept/overview)
   - [Beginner](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept/beginner)
   - [Intermediate](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept/intermediate)
   - [Advanced](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept/advanced)
+- [By Example](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example)
+  - [Overview](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/overview)
+  - [Beginner](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/beginner)
+  - [Intermediate](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/intermediate)
+  - [Advanced](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/advanced)

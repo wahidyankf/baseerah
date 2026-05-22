@@ -7,6 +7,11 @@ type: docs
 layout: list
 ---
 
+- [By Concept](/en/learn/artificial-intelligence/tools/claude-code/by-concept)
+  - [Overview](/en/learn/artificial-intelligence/tools/claude-code/by-concept/overview)
+  - [Beginner](/en/learn/artificial-intelligence/tools/claude-code/by-concept/beginner)
+  - [Intermediate](/en/learn/artificial-intelligence/tools/claude-code/by-concept/intermediate)
+  - [Advanced](/en/learn/artificial-intelligence/tools/claude-code/by-concept/advanced)
 - [Overview](/en/learn/artificial-intelligence/tools/claude-code/overview)
 - [Initial Setup](/en/learn/artificial-intelligence/tools/claude-code/initial-setup)
 - [Quick Start](/en/learn/artificial-intelligence/tools/claude-code/quick-start)
@@ -15,8 +20,3 @@ layout: list
   - [Beginner](/en/learn/artificial-intelligence/tools/claude-code/by-example/beginner)
   - [Intermediate](/en/learn/artificial-intelligence/tools/claude-code/by-example/intermediate)
   - [Advanced](/en/learn/artificial-intelligence/tools/claude-code/by-example/advanced)
-- [By Concept](/en/learn/artificial-intelligence/tools/claude-code/by-concept)
-  - [Overview](/en/learn/artificial-intelligence/tools/claude-code/by-concept/overview)
-  - [Beginner](/en/learn/artificial-intelligence/tools/claude-code/by-concept/beginner)
-  - [Intermediate](/en/learn/artificial-intelligence/tools/claude-code/by-concept/intermediate)
-  - [Advanced](/en/learn/artificial-intelligence/tools/claude-code/by-concept/advanced)
