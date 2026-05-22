@@ -126,8 +126,7 @@ Do this once per renamed prefix. Do not batch across multiple renames — single
 Each phase ends with:
 
 ```bash
-cd apps/ayokoding-web
-node --import tsx src/scripts/generate-indexes.ts
+nx run ayokoding-web:generate-indexes
 ```
 
 Then commit any `_index.md` changes the script produced. Do NOT run `--validate` mid-phase; let the script regenerate freely and review the diff.
@@ -245,8 +244,7 @@ cd apps/ayokoding-web
 ../../apps/ayokoding-cli/dist/ayokoding-cli links check --content content
 
 # 2. Index freshness
-cd apps/ayokoding-web
-node --import tsx src/scripts/generate-indexes.ts --validate
+nx run ayokoding-web:validate-indexes
 
 # 3. Test suite
 nx run ayokoding-web:test:quick
@@ -256,7 +254,7 @@ Pre-push hook covers (3) and adds `typecheck`, `lint`, `spec-coverage`. The hook
 
 ## Worktree Setup
 
-Per Standard 11 and the ose-public worktree-path override, the entire plan runs inside one worktree.
+Per the [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) (ose-public override), the entire plan runs inside one worktree.
 
 ```bash
 # From parent ose-projects/ root, open ose-public-rooted Claude session
@@ -276,7 +274,7 @@ The worktree is the only place `git mv` happens. Direct edits to the main checko
 
 ## Publish Path
 
-Per the Subrepo Worktree Workflow Convention Standard 14, ose-public defaults to direct-to-main. This plan inherits that default:
+Per the [Trunk Based Development Convention](../../../repo-governance/development/workflow/trunk-based-development.md) and the [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md), ose-public defaults to direct-to-main. This plan inherits that default:
 
 1. All phase commits accumulate on `worktree-ayokoding-web-learn-reorg`
 2. After all phases pass validation, fast-forward `main` into the worktree branch and push `main` to `origin`
@@ -290,10 +288,10 @@ The plan does NOT use a draft PR. Reviewer-of-record is the executor; the redire
 - **The link checker compares against the live content tree, not against URLs.** It does not understand redirects. The plan validates redirects separately via `curl -I` against staging.
 - **`generate-indexes.ts` is not idempotent across the version of itself in the worktree.** If the script is modified mid-plan (unlikely but possible), the regen output may shift. The plan does not touch the script.
 - **The pre-push hook runs `affected -t spec-coverage`.** Folder renames invalidate the Nx affected cache; the first push after each phase will look like it's testing everything. This is expected; subsequent pushes are fast.
-- **Redirects do not cascade.** If a user lands at `/en/learn/software-engineering/platform-linux/concepts/how-to/foo`, two redirects fire (platform-linux → platforms/linux, then concepts/how-to → by-example). Next.js handles this in a single 301 when source patterns are layered correctly, but it is worth checking with `curl -IL` end-to-end.
+- **Redirects do not cascade.** If a user lands at `/en/learn/software-engineering/platform-linux/concepts/how-to/foo`, two redirects fire (platform-linux → platforms/linux, then concepts/how-to → by-example). Next.js handles this in a single 301 when source patterns are layered correctly [Judgment call — verify empirically in Phase 9 via `curl -IL`], but it is worth checking with `curl -IL` end-to-end.
 
 ## Open Questions (Resolve Before Execution)
 
-1. **Vercel build minutes**: each push to `worktree-ayokoding-web-learn-reorg` triggers a preview build. Across ~10 phases × 1-2 pushes each = ~15-20 preview builds. Confirm Vercel quota tolerates this.
+1. **Vercel build minutes**: each push to `worktree-ayokoding-web-learn-reorg` triggers a preview build. Across ~10 phases × 1-2 pushes each = ~15-20 preview builds [Judgment call]. Confirm Vercel quota tolerates this.
 2. **`apps/ayokoding-web/specs/`**: Gherkin specs reference URLs. Plan does not yet inventory them. Add to delivery checklist Phase 0 inventory step.
 3. **External link cache**: `docs/metadata/external-links-status.yaml` (per `docs-link-checker` skill) caches the URL list. Not affected by this plan, but the link cache for `docs/` is separate from the content-tree link checker. Sanity-check after merge.

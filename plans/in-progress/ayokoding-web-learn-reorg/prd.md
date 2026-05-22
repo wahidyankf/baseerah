@@ -1,5 +1,26 @@
 # PRD — Learn-Tree Reorganization
 
+## Product Overview
+
+This change reorganizes the `apps/ayokoding-web/content/en/learn/` content tree to enforce a single canonical three-track structure (`overview.md` + `by-concept/` + `by-example/` + `in-the-field/`) at every leaf topic. It normalizes folder names to real hierarchy (e.g., `platform-linux/` → `platforms/linux/`), renames ambiguous domain names (`human/` → `personal-development/`), and ships a complete Next.js redirect map so no inbound link breaks. The result is a tree that readers can predict, authors can follow mechanically, and agents can validate structurally.
+
+## Personas
+
+- **Content reader** — visits `ayokoding.com/en/learn/` and navigates the learn tree; needs stable URLs and predictable topic structure.
+- **Content author / maker agent** — creates or extends content under `learn/`; needs a single unambiguous shape to follow so new topics do not introduce structural drift.
+- **Checker / fixer agent family** (`apps-ayokoding-web-by-example-checker`, `apps-ayokoding-web-in-the-field-checker`, and related agents) — validates structural compliance of the content tree; needs a canonical shape to compare against.
+- **Repository owner (self)** — owns deployment risk, SEO impact, and long-term maintainability of the content tree.
+
+## User Stories
+
+As a content reader, I want every learn topic to expose the same folder structure (`overview.md`, `by-concept/`, `by-example/`, `in-the-field/`) so that I can predict where to find conceptual explanations versus code walkthroughs across all domains.
+
+As a content author / maker agent, I want a single canonical folder-name vocabulary (`by-concept`, `by-example`, `in-the-field`) so that I never have to decide between `concepts/`, `explanation/`, `foundations/`, or `by-concept/` when creating new content.
+
+As a checker / fixer agent, I want the content tree to use only the three canonical track names so that I can write deterministic structural validation rules without special-casing ad-hoc folder names.
+
+As the repository owner, I want every URL renamed by this reorganization to return an HTTP 301 redirect in production so that inbound links from past blog posts and external references continue to resolve.
+
 ## Functional Requirements
 
 ### FR-1: Canonical Leaf-Topic Shape
@@ -14,13 +35,13 @@ A leaf topic MUST NOT contain any other track-style folder. Specifically: `conce
 
 ### FR-2: Allowed Track Vocabulary
 
-The canonical three tracks correspond to the existing maker skills:
+The canonical three tracks correspond to maker agents as follows:
 
-| Folder          | Skill                                   | Purpose                                  |
-| --------------- | --------------------------------------- | ---------------------------------------- |
-| `by-concept/`   | `apps-ayokoding-web-by-concept-maker`   | Mental models and narrative explanations |
-| `by-example/`   | `apps-ayokoding-web-by-example-maker`   | Annotated code-first walk-throughs       |
-| `in-the-field/` | `apps-ayokoding-web-in-the-field-maker` | Production-grade implementation guides   |
+| Folder          | Agent                                                                         | Purpose                                  |
+| --------------- | ----------------------------------------------------------------------------- | ---------------------------------------- |
+| `by-concept/`   | `apps-ayokoding-web-general-maker` (no dedicated by-concept-maker exists yet) | Mental models and narrative explanations |
+| `by-example/`   | `apps-ayokoding-web-by-example-maker`                                         | Annotated code-first walk-throughs       |
+| `in-the-field/` | `apps-ayokoding-web-in-the-field-maker`                                       | Production-grade implementation guides   |
 
 No other track folder is permitted at any depth inside `learn/`. Content currently filed under non-canonical track folders is folded into the appropriate canonical track or, if it is genuinely cross-track narrative, lifted into `overview.md`.
 
@@ -47,14 +68,14 @@ Every URL renamed by this plan MUST resolve to its new location via HTTP 301 in 
 The reorg is not considered complete until all of the following pass against the worktree branch:
 
 - `ayokoding-cli links check --content apps/ayokoding-web/content` reports zero broken links
-- `node --import tsx apps/ayokoding-web/src/scripts/generate-indexes.ts --validate` reports zero stale indexes
-- `nx run ayokoding-web:test:quick` passes (line coverage ≥ 82%)
+- `nx run ayokoding-web:validate-indexes` reports zero stale indexes
+- `nx run ayokoding-web:test:quick` passes (line coverage ≥ 82% [Repo-grounded])
 - `nx affected -t typecheck lint test:quick spec-coverage` (the pre-push hook surface) passes
 - Spot-check: `curl -I https://ayokoding.com/<one-randomly-chosen-renamed-url>` returns 301 with the new URL in `Location`
 
 ### FR-7: Worktree Discipline
 
-Per the [Subrepo Worktree Workflow Convention](../../../../repo-governance/conventions/structure/subrepo-worktrees.md) Standard 11 and the [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) (ose-public override), all work for this plan runs in `worktrees/ayokoding-web-learn-reorg/` at the repo root. Direct edits to the main checkout are forbidden during execution.
+Per the [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and the [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification), all work for this plan runs in `worktrees/ayokoding-web-learn-reorg/` at the repo root. Direct edits to the main checkout are forbidden during execution.
 
 ## Non-Functional Requirements
 
@@ -68,11 +89,20 @@ All file moves use `git mv` (or equivalent that preserves rename detection). Rev
 
 ### NFR-3: SEO Continuity
 
-Redirects deploy in the same Vercel build as the renames. The window where an inbound link goes to a 404 is bounded by Vercel build time (~2-5 minutes), not by a separate redirect-rollout step.
+Redirects deploy in the same Vercel build as the renames. The window where an inbound link goes to a 404 is bounded by Vercel build time (~2-5 minutes [Judgment call]), not by a separate redirect-rollout step.
 
 ### NFR-4: Documentation Co-Movement
 
 Any `repo-governance/` or `docs/explanation/` page that references a renamed path MUST be updated in the same phase that does the rename. The plan does not allow `governance docs say X, content tree says Y` as an interim state.
+
+## Product Risks
+
+| Risk                                                                                                                       | Impact                                                              | Mitigation                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Redirects do not deploy atomically with renames — Vercel deploys content renames before the redirect config update is live | Readers hit 404 on renamed URLs during the ~2-5 minute build window | Ship redirects and renames in the same Vercel build (same commit); verify with `curl -I` before promoting to production |
+| Checker agents unable to parse the reshaped tree if they hardcode old path patterns                                        | Structural validation silently passes on non-canonical shapes       | Phase 8 sweeps agent definitions for hardcoded paths before final merge                                                 |
+| Index regeneration overwrites hand-curated `_index.md` wording                                                             | Content quality regression in topic overviews                       | Diff every regeneration output; reinstate curated wording before committing                                             |
+| Test coverage regression below 82% threshold after folder renames invalidate Nx cache                                      | Pre-push hook blocks publish                                        | Folder renames do not touch test files; Nx affected recomputes correctly; monitor in Phase 10 gate                      |
 
 ## Acceptance Criteria (Gherkin)
 
@@ -109,7 +139,7 @@ Feature: Learn-tree leaf-topic shape
 
   Scenario: Generated indexes are current
     Given the working tree at apps/ayokoding-web
-    When I run "node --import tsx src/scripts/generate-indexes.ts --validate"
+    When I run "nx run ayokoding-web:validate-indexes"
     Then the exit code is 0
 
   Scenario: Pre-push gate passes
