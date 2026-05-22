@@ -5,6 +5,9 @@ draft: false
 weight: 103
 ---
 
+- [By Example](/en/learn/information-security/by-example)
+  - [By Example Overview](/en/learn/information-security/by-example/overview)
+  - [By Example](/en/learn/information-security/by-example/foundations)
 - [Overview](/en/learn/information-security/overview)
 - [Tools](/en/learn/information-security/tools)
   - [Overview](/en/learn/information-security/tools/overview)

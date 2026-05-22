@@ -25,6 +25,12 @@ export const learnReorgRedirects: Array<{
     destination: "/en/learn/software-engineering/infrastructure/by-concept/:path*",
     permanent: true,
   },
+  // Phase 5 fixup — by-example parent page to foundations
+  {
+    source: "/en/learn/information-security/by-example",
+    destination: "/en/learn/information-security/by-example/foundations",
+    permanent: false,
+  },
   // Phase 5 — information-security track normalization
   {
     source: "/en/learn/information-security/concepts/explanation/:path*",
