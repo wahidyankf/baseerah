@@ -153,6 +153,7 @@ export const journalMachine = createMachine(
             on: Object.fromEntries(
               MUTATION_EVENTS.map((type) => [
                 type,
+                // @ts-expect-error XState v5 `assign` inference limitation with dynamic event maps
                 { actions: assign(({ event }) => ({ pendingMutationEvent: event as JournalEvent })) },
               ]),
             ),
