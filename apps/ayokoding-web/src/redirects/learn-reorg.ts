@@ -3,6 +3,12 @@ export const learnReorgRedirects: Array<{
   destination: string;
   permanent: boolean;
 }> = [
+  // Phase 4 — human → personal-development
+  {
+    source: "/en/learn/human/:path*",
+    destination: "/en/learn/personal-development/:path*",
+    permanent: true,
+  },
   // Phase 3 — algorithm plural rename
   {
     source: "/en/learn/software-engineering/algorithm-and-data-structures/:path*",
