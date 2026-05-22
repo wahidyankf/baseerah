@@ -2,3 +2,4 @@
 // Populated phase-by-phase as the port progresses.
 
 pub mod cliout;
+pub mod testcoverage;
