@@ -69,11 +69,13 @@ pulldown-cmark  = "0.13.4"
 tree-sitter     = "0.26.9"
 anyhow          = "1.0.102"
 thiserror       = "2.0.18"
+quick-xml       = { version = "0.40.1", features = ["serialize"] }  # Phase 1 — JaCoCo + Cobertura XML parsing
 
 [dev-dependencies]
 cucumber        = "0.23.0"
 assert_cmd      = "2.2.2"
 predicates      = "3.1.4"
+tempfile        = "3.27.0"
 
 [build-dependencies]
 # (none currently planned; tree-sitter grammar fetched via runtime FFI loader)
@@ -85,6 +87,16 @@ predicates      = "3.1.4"
 - `serde_yaml` is deprecated since March 2024; `serde_norway` is the actively-maintained drop-in [Web-cited — "serde_yaml deprecated March 2024, serde_norway is the maintained fork" — https://users.rust-lang.org/t/108868, accessed 2026-05-22].
 - `tree-sitter` 0.26.9 is current; the `tree-sitter-markdown` grammar is loaded as a separate crate (TBD: pin to the same upstream SHA the Go binding uses; verified before Phase 3 starts).
 - Coverage tooling: `cargo-llvm-cov` invoked from Nx targets — not a Cargo dependency. Doctor probes for it.
+
+### Dependency CVE Clearance
+
+Per the [Dependency Bump Stability & Safety Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md), every pinned dep must be CVE-clean before landing.
+
+| Audit date | Crates scanned | Vulnerabilities | Warnings | Tool                                                               |
+| ---------- | -------------- | --------------- | -------- | ------------------------------------------------------------------ |
+| 2026-05-23 | 156            | 0               | 0        | `cargo audit 0.22.1` (RustSec advisory-db; 1098 advisories loaded) |
+
+[Repo-grounded — `cargo audit --file apps/rhino-cli-rs/Cargo.lock --json` returns `{"vulnerabilities":{"found":false,"count":0,"list":[]},"warnings":null}`.] RustSec advisory database aggregates GitHub Advisories + NVD CVEs + vendor disclosures for the Rust ecosystem. Re-audit on every dep bump per the policy.
 
 ### CLI Framework — clap
 
