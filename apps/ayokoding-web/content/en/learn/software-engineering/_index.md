@@ -61,6 +61,7 @@ weight: 102
   - [Platform Web](/en/learn/software-engineering/platforms/web)
   - [Platform Mobile](/en/learn/software-engineering/platforms/mobile)
 - [Software Architecture](/en/learn/software-engineering/software-architecture)
+  - [By Example](/en/learn/software-engineering/software-architecture/by-example)
   - [Overview](/en/learn/software-engineering/software-architecture/overview)
   - [Patterns and Principles](/en/learn/software-engineering/software-architecture/patterns-and-principles)
   - [C4 Model](/en/learn/software-engineering/software-architecture/c4-model)

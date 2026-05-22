@@ -5,6 +5,9 @@ date: 2026-01-30T00:00:00+07:00
 draft: false
 ---
 
+- [By Example](/en/learn/software-engineering/software-architecture/by-example)
+  - [By Example Overview](/en/learn/software-engineering/software-architecture/by-example/overview)
+  - [Cases](/en/learn/software-engineering/software-architecture/by-example/cases)
 - [Overview](/en/learn/software-engineering/software-architecture/overview)
 - [Patterns and Principles](/en/learn/software-engineering/software-architecture/patterns-and-principles)
   - [Overview](/en/learn/software-engineering/software-architecture/patterns-and-principles/overview)

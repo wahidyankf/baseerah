@@ -3,6 +3,17 @@ export const learnReorgRedirects: Array<{
   destination: string;
   permanent: boolean;
 }> = [
+  // Phase 7 fixups — by-example parent pages to overview (prevents RSC networkidle timeout)
+  {
+    source: "/en/learn/software-engineering/software-architecture/by-example",
+    destination: "/en/learn/software-engineering/software-architecture/by-example/overview",
+    permanent: false,
+  },
+  {
+    source: "/en/learn/software-engineering/system-design/by-example",
+    destination: "/en/learn/software-engineering/system-design/by-example/overview",
+    permanent: false,
+  },
   // Phase 7 — cases → by-example/cases
   {
     source: "/en/learn/software-engineering/software-architecture/cases/:path*",
