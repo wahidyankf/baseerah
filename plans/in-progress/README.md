@@ -5,6 +5,7 @@ Active project plans currently being worked on.
 ## Active Plans
 
 - [organiclever-web-responsive-breakpoints](./organiclever-web-responsive-breakpoints/README.md) — Distinct mobile/tablet/desktop layouts for organiclever-web
+- [rhino-cli-rust-rewrite](./rhino-cli-rust-rewrite/README.md) — Rewrite rhino-cli from Go to Rust, archive Go implementation to `archived/rhino-cli-go/`
 
 ## Instructions
 
