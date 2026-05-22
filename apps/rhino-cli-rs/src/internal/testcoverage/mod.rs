@@ -3,4 +3,5 @@
 // `apps/rhino-cli/internal/testcoverage/go_coverage.go:116`.
 
 pub mod go_coverage;
+pub mod lcov;
 pub mod types;
