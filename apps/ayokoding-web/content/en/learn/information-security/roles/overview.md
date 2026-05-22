@@ -7,7 +7,7 @@ description: "Role-based security learning paths — Red Team, Blue Team, and CI
 tags: ["security-roles", "learning-path", "by-example"]
 ---
 
-Once you have the [security foundations](/en/learn/information-security/foundations/overview),
+Once you have the [security foundations](/en/learn/information-security/by-concept/overview),
 pick the role that matches your goal. Each role is a specialized discipline with its own
 tools, mindset, and career path.
 
@@ -33,7 +33,7 @@ vendor risk, or board-level security communication.
 ## Prerequisite
 
 All role tracks assume you have completed or are familiar with
-[Foundations](/en/learn/information-security/foundations/overview). If you are new to
+[Foundations](/en/learn/information-security/by-concept/overview). If you are new to
 security, start there.
 
 ## All Tracks Are Progressive

@@ -43,5 +43,5 @@ After completing Foundations, pick a role:
 - [Blue Team](/en/learn/information-security/roles/blue-team/overview) — detect and respond
 - [CISO](/en/learn/information-security/roles/ciso/overview) — govern and lead
 
-Start at [By Example — Beginner](/en/learn/information-security/foundations/by-example/beginner)
-or see the [full example list](/en/learn/information-security/foundations/by-example/overview).
+Start at [By Example — Beginner](/en/learn/information-security/by-example/foundations/beginner)
+or see the [full example list](/en/learn/information-security/by-example/foundations/overview).

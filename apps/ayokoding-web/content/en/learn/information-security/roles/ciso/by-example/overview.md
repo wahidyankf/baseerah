@@ -63,7 +63,7 @@ examples provide the vocabulary every intermediate and advanced example assumes.
 
 ### What Is Not Covered
 
-- Hands-on technical security operations (see [IT Security by Example](/en/learn/information-security/foundations/by-example/overview))
+- Hands-on technical security operations (see [IT Security by Example](/en/learn/information-security/by-example/foundations/overview))
 - Offensive exploitation or detection engineering (see [Red Team](/en/learn/information-security/roles/red-team/by-example/overview) and [Blue Team by Example](/en/learn/information-security/roles/blue-team/by-example/overview))
 
 ## Prerequisites

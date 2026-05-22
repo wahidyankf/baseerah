@@ -60,7 +60,7 @@ the foundation everything else builds on.
 
 - Offensive exploitation techniques (see [Red Team by Example](/en/learn/information-security/roles/red-team/by-example/overview))
 - Strategic security governance (see [CISO by Example](/en/learn/information-security/roles/ciso/by-example/overview))
-- General IT infrastructure hardening (see [IT Security by Example](/en/learn/information-security/foundations/by-example/overview))
+- General IT infrastructure hardening (see [IT Security by Example](/en/learn/information-security/by-example/foundations/overview))
 
 ## Prerequisites
 

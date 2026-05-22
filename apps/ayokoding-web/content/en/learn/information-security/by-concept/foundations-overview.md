@@ -9,4 +9,4 @@ Complete learning path for information security concepts.
 
 ## Available Content
 
-- **[Explanation](/en/learn/information-security/concepts/explanation)** - Deep dives into security concepts and principles
+- **[Explanation](/en/learn/information-security/by-concept)** - Deep dives into security concepts and principles

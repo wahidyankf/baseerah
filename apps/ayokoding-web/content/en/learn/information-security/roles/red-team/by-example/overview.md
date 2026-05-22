@@ -62,7 +62,7 @@ build mental models that the exploitation examples depend on.
 
 - Defensive detection and response (see [Blue Team by Example](/en/learn/information-security/roles/blue-team/by-example/overview))
 - Strategic risk management and governance (see [CISO by Example](/en/learn/information-security/roles/ciso/by-example/overview))
-- General IT security hardening (see [IT Security by Example](/en/learn/information-security/foundations/by-example/overview))
+- General IT security hardening (see [IT Security by Example](/en/learn/information-security/by-example/foundations/overview))
 
 ## Prerequisites
 

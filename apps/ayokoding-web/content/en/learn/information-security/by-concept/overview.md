@@ -1,0 +1,14 @@
+---
+title: Overview
+date: 2025-12-18T00:00:00+07:00
+draft: false
+weight: 100000
+---
+
+Deep conceptual understanding of information security principles and why things work the way they do.
+
+## Available Explanations
+
+- **[Offensive Security](/en/learn/information-security/by-concept/offensive-security)** - Understanding offensive security methodologies, practices, and its critical role in modern cybersecurity defense strategies
+- **[Defensive Security](/en/learn/information-security/by-concept/defensive-security)** - Understanding defensive security strategies, practices, and its fundamental role in protecting systems from cyber threats
+- **[Security Roles](/en/learn/information-security/by-concept/security-roles)** - Understanding different roles and career paths in information security

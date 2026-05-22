@@ -3,6 +3,27 @@ export const learnReorgRedirects: Array<{
   destination: string;
   permanent: boolean;
 }> = [
+  // Phase 5 — information-security track normalization
+  {
+    source: "/en/learn/information-security/concepts/explanation/:path*",
+    destination: "/en/learn/information-security/by-concept/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/information-security/foundations/by-example/:path*",
+    destination: "/en/learn/information-security/by-example/foundations/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/information-security/foundations/:path*",
+    destination: "/en/learn/information-security/by-concept/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/information-security/concepts/:path*",
+    destination: "/en/learn/information-security/by-concept/:path*",
+    permanent: true,
+  },
   // Phase 4 — human → personal-development
   {
     source: "/en/learn/human/:path*",
