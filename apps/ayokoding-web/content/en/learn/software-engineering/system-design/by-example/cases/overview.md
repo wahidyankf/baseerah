@@ -67,7 +67,7 @@ After completing these cases, you'll be able to:
 
 ## 📚 Available Cases
 
-- [**AI Personal Finance Advisor**](/en/learn/software-engineering/system-design/cases/ai-personal-finance-advisor) - Design a system where users upload payment receipts and receive AI-generated financial insights, spending patterns, and personalized budget recommendations. Covers OCR processing, ML inference, multi-region deployment, and financial data compliance.
+- [**AI Personal Finance Advisor**](/en/learn/software-engineering/system-design/by-example/cases/ai-personal-finance-advisor) - Design a system where users upload payment receipts and receive AI-generated financial insights, spending patterns, and personalized budget recommendations. Covers OCR processing, ML inference, multi-region deployment, and financial data compliance.
 
 ## 🔗 Related Content
 

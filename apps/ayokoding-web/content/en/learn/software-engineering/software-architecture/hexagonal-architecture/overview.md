@@ -110,5 +110,5 @@ Both tutorials use the same shared **procurement-platform-be Procure-to-Pay doma
 
 Once the by-example tracks above are clear, the cases tutorials show ports and adapters wired around real DDD aggregates in production code:
 
-- Next step (production wiring): [In FP — F# / Giraffe / Npgsql, Clojure / Ring / next.jdbc, TypeScript / Hono / node-postgres](/en/learn/software-engineering/software-architecture/cases/in-fp) — pairs with the FP by-example track.
-- Next step (production wiring): [In OOP — Java / Spring Boot 4, Kotlin / Spring Boot 4, C# / ASP.NET Core, TypeScript / NestJS](/en/learn/software-engineering/software-architecture/cases/in-oop) — pairs with the OOP by-example track.
+- Next step (production wiring): [In FP — F# / Giraffe / Npgsql, Clojure / Ring / next.jdbc, TypeScript / Hono / node-postgres](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp) — pairs with the FP by-example track.
+- Next step (production wiring): [In OOP — Java / Spring Boot 4, Kotlin / Spring Boot 4, C# / ASP.NET Core, TypeScript / NestJS](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop) — pairs with the OOP by-example track.

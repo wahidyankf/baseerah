@@ -107,15 +107,15 @@ Guides are numbered monotonically across all difficulty tiers (1, 2, 3 … 27). 
 
 ## Learning Path
 
-- [Beginner (Guides 1–7)](/en/learn/software-engineering/software-architecture/cases/in-oop/beginner) — One context = one hexagon, per-context package layout, domain types without framework annotations, application service signatures, output port as Java interface, Spring `@RestController` as primary adapter, Spring `@Configuration` as composition root.
-- [Intermediate (Guides 8–15)](/en/learn/software-engineering/software-architecture/cases/in-oop/intermediate) — Spring Data JDBC adapter behind the repository port, in-memory test adapter, domain event publisher port, outbox event adapter, full `@RestController` pipeline, contract codegen, cross-context ACL, composition root `@Configuration`.
-- [Advanced (Guides 16–27)](/en/learn/software-engineering/software-architecture/cases/in-oop/advanced) — Testcontainers harness, Flyway migration adapter, banking port and Spring `RestClient` adapter, Resilience4j retry / circuit-breaker, Micrometer tracing observability adapter, end-to-end domain event flow, hexagonal anti-patterns, Kubernetes deployment topology, Micrometer + OTLP + Prometheus observability stack, failure-mode `HealthIndicator` wiring, Flyway at deploy time, configuration adapter (Secret to typed `@ConfigurationProperties`).
+- [Beginner (Guides 1–7)](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/beginner) — One context = one hexagon, per-context package layout, domain types without framework annotations, application service signatures, output port as Java interface, Spring `@RestController` as primary adapter, Spring `@Configuration` as composition root.
+- [Intermediate (Guides 8–15)](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/intermediate) — Spring Data JDBC adapter behind the repository port, in-memory test adapter, domain event publisher port, outbox event adapter, full `@RestController` pipeline, contract codegen, cross-context ACL, composition root `@Configuration`.
+- [Advanced (Guides 16–27)](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/advanced) — Testcontainers harness, Flyway migration adapter, banking port and Spring `RestClient` adapter, Resilience4j retry / circuit-breaker, Micrometer tracing observability adapter, end-to-end domain event flow, hexagonal anti-patterns, Kubernetes deployment topology, Micrometer + OTLP + Prometheus observability stack, failure-mode `HealthIndicator` wiring, Flyway at deploy time, configuration adapter (Secret to typed `@ConfigurationProperties`).
 
 ## Sibling Case
 
 The functional programming parallel of this case uses F# / Giraffe / Npgsql (canonical), Clojure / Ring / next.jdbc, and TypeScript / Hono against the same hypothetical Procure-to-Pay procurement platform:
 
-- [In FP](/en/learn/software-engineering/software-architecture/cases/in-fp/overview)
+- [In FP](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp/overview)
 
 Both cases teach the same wiring concerns against the same domain; comparing the two side-by-side is the fastest way to see what changes when you swap object-oriented Java / Kotlin / C# / TypeScript wiring for functional F# / Clojure / Hono wiring.
 
@@ -126,4 +126,4 @@ The OOP wiring taught here depends on Spring Boot / ASP.NET Core / NestJS framew
 - **Go** (canonical Go DDD wiring): [Three Dots Labs](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/) reference implementation; Matthew Boyle, [_Domain-Driven Design with Golang_](https://www.oreilly.com/library/view/domain-driven-design-with/9781804613450/) (Packt, 2022) — `main.go` as the composition root, `interface` ports, struct adapters, manual constructor wiring, [chi](https://github.com/go-chi/chi) or [echo](https://github.com/labstack/echo) for HTTP, [`database/sql`](https://pkg.go.dev/database/sql) for repository adapters.
 - **Rust**: axum or actix-web for HTTP, sqlx or diesel for repositories, tokio for async, `Arc<dyn Trait + Send + Sync>` for shared port handles at the composition root.
 
-For the Go / Rust formulations of the same wiring decisions — bounded-context folder layout, output-port traits, adapter swap, in-memory test adapters, OpenTelemetry observability adapter, retry / circuit-breaker, outbox pattern — see [In Procedural](/en/learn/software-engineering/software-architecture/cases/in-procedural/overview).
+For the Go / Rust formulations of the same wiring decisions — bounded-context folder layout, output-port traits, adapter swap, in-memory test adapters, OpenTelemetry observability adapter, retry / circuit-breaker, outbox pattern — see [In Procedural](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural/overview).

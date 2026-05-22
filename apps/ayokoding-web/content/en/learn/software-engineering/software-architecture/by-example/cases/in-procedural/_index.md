@@ -8,4 +8,4 @@ layout: list
 description: "Procedural variant of the production wiring case — Go (canonical, Three Dots Labs reference) and Rust (axum + sqlx + tokio) running against the procurement-platform-be P2P domain"
 ---
 
-- [Overview](/en/learn/software-engineering/software-architecture/cases/in-procedural/overview)
+- [Overview](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural/overview)

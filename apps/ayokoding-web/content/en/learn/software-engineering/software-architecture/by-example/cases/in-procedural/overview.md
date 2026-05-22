@@ -92,8 +92,8 @@ Same `procurement-platform-be` Procure-to-Pay domain as the OOP and FP cases. Bo
 
 ## Sibling Cases
 
-- [In OOP](/en/learn/software-engineering/software-architecture/cases/in-oop/overview) — Java 25 / Spring Boot 4 (canonical), Kotlin, C# / ASP.NET Core, TypeScript / NestJS.
-- [In FP](/en/learn/software-engineering/software-architecture/cases/in-fp/overview) — F# / Giraffe (canonical), Clojure, TypeScript / Hono, Haskell / Servant.
+- [In OOP](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/overview) — Java 25 / Spring Boot 4 (canonical), Kotlin, C# / ASP.NET Core, TypeScript / NestJS.
+- [In FP](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp/overview) — F# / Giraffe (canonical), Clojure, TypeScript / Hono, Haskell / Servant.
 
 Comparing the three side-by-side is the fastest way to see what changes when you swap framework-driven OOP wiring → records-of-functions FP wiring → explicit-main procedural wiring.
 

@@ -54,7 +54,7 @@ The composition root in each language assembles concrete adapter implementations
 
 ## Rust as an FP-Adjacent Member — With Concept Adjustments
 
-Rust shares deep DNA with the FP languages on this case: `enum` is a sum type (Blandy & Orendorff, _Programming Rust_, Ch. 10), traits cover much of the territory typeclasses cover, and `Result<T, E>` is the Railway-Oriented Programming primitive natively. The wiring decisions taught here — bounded-context folder layout, output ports as traits, adapter swap at the composition root, in-memory test adapters, OpenTelemetry observability adapter, retry / circuit-breaker decorators, outbox pattern — translate to Rust (axum / actix-web for HTTP, sqlx / diesel for repository, tokio for async). Patterns where ownership is the wiring force (move-on-call ports, typestate-encoded request lifecycles) live in the [in-procedural](/en/learn/software-engineering/software-architecture/cases/in-procedural) case.
+Rust shares deep DNA with the FP languages on this case: `enum` is a sum type (Blandy & Orendorff, _Programming Rust_, Ch. 10), traits cover much of the territory typeclasses cover, and `Result<T, E>` is the Railway-Oriented Programming primitive natively. The wiring decisions taught here — bounded-context folder layout, output ports as traits, adapter swap at the composition root, in-memory test adapters, OpenTelemetry observability adapter, retry / circuit-breaker decorators, outbox pattern — translate to Rust (axum / actix-web for HTTP, sqlx / diesel for repository, tokio for async). Patterns where ownership is the wiring force (move-on-call ports, typestate-encoded request lifecycles) live in the [in-procedural](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural) case.
 
 **Six concept adjustments when you read this case through a Rust lens (axum / sqlx / tokio):**
 
@@ -113,14 +113,14 @@ Guides are numbered monotonically across all difficulty tiers (1, 2, 3 … 27). 
 
 ## Learning Path
 
-- [Beginner (Guides 1–6)](/en/learn/software-engineering/software-architecture/cases/in-fp/beginner) — One context = one hexagon, per-context folder layout, domain types without framework imports, application service signatures, output port as F# function type alias, Giraffe handler as primary adapter.
-- [Intermediate (Guides 7–14)](/en/learn/software-engineering/software-architecture/cases/in-fp/intermediate) — Npgsql adapter behind the repository port, in-memory test adapter, domain event publisher port, outbox adapter, full Giraffe pipeline, contract codegen, cross-context ACL, composition root in `Program.fs`.
-- [Advanced (Guides 15–27)](/en/learn/software-engineering/software-architecture/cases/in-fp/advanced) — docker-compose integration harness, DbUp migrations, banking port and payment adapter, retry and circuit-breaker, end-to-end domain event flow, OpenTelemetry observability adapter, murabaha-finance optional context, hexagonal anti-patterns, Kubernetes deployment topology, OpenTelemetry deployment wiring, failure-mode degraded adapters, configuration adapter at the deploy seam, background job adapter.
+- [Beginner (Guides 1–6)](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp/beginner) — One context = one hexagon, per-context folder layout, domain types without framework imports, application service signatures, output port as F# function type alias, Giraffe handler as primary adapter.
+- [Intermediate (Guides 7–14)](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp/intermediate) — Npgsql adapter behind the repository port, in-memory test adapter, domain event publisher port, outbox adapter, full Giraffe pipeline, contract codegen, cross-context ACL, composition root in `Program.fs`.
+- [Advanced (Guides 15–27)](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp/advanced) — docker-compose integration harness, DbUp migrations, banking port and payment adapter, retry and circuit-breaker, end-to-end domain event flow, OpenTelemetry observability adapter, murabaha-finance optional context, hexagonal anti-patterns, Kubernetes deployment topology, OpenTelemetry deployment wiring, failure-mode degraded adapters, configuration adapter at the deploy seam, background job adapter.
 
 ## Sibling Case
 
 The object-oriented parallel of this case uses Java 25 / Spring Boot 4 (canonical), Kotlin / Spring Boot, C# / ASP.NET Core, and TypeScript / NestJS against the same hypothetical procurement platform:
 
-- [In OOP](/en/learn/software-engineering/software-architecture/cases/in-oop/overview)
+- [In OOP](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/overview)
 
 Both cases teach the same wiring concerns against the same domain; comparing the two side-by-side is the fastest way to see what changes when you swap functional wiring (F#, Clojure, TypeScript functional style, Haskell) for object-oriented wiring (Java, Kotlin, C#, NestJS).

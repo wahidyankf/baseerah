@@ -70,13 +70,13 @@ Study cases should be:
 
 This section focuses on case studies and practical system design:
 
-- [**Case Studies**](/en/learn/software-engineering/system-design/cases) - Work through real-world system design scenarios with progressive scaling from startup to planet-scale
+- [**Case Studies**](/en/learn/software-engineering/system-design/by-example/cases) - Work through real-world system design scenarios with progressive scaling from startup to planet-scale
 
 For architectural patterns and methodologies, see [**Architecture**](/en/learn/software-engineering/software-architecture) section.
 
 ### Available Case Studies
 
-- [**AI-Powered Personal Finance Advisor**](/en/learn/software-engineering/system-design/cases/ai-personal-finance-advisor) - Design a system where users upload payment receipts and receive AI-generated financial insights, spending patterns, and budget recommendations
+- [**AI-Powered Personal Finance Advisor**](/en/learn/software-engineering/system-design/by-example/cases/ai-personal-finance-advisor) - Design a system where users upload payment receipts and receive AI-generated financial insights, spending patterns, and budget recommendations
 
 ## 🏗️ Structure of a Study Case
 

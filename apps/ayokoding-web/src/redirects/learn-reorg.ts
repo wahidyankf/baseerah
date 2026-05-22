@@ -3,6 +3,17 @@ export const learnReorgRedirects: Array<{
   destination: string;
   permanent: boolean;
 }> = [
+  // Phase 7 — cases → by-example/cases
+  {
+    source: "/en/learn/software-engineering/software-architecture/cases/:path*",
+    destination: "/en/learn/software-engineering/software-architecture/by-example/cases/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/software-engineering/system-design/cases/:path*",
+    destination: "/en/learn/software-engineering/system-design/by-example/cases/:path*",
+    permanent: true,
+  },
   // Phase 6 — infrastructure concepts fold-in
   {
     source: "/en/learn/software-engineering/infrastructure/concepts/how-to/:path*",

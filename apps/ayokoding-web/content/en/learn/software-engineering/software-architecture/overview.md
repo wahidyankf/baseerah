@@ -81,15 +81,15 @@ Each architecture pattern section covers:
 
 ## 🔗 Related Content
 
-- [**System Design Cases**](/en/learn/software-engineering/system-design/cases) - See these patterns applied in real-world system designs
+- [**System Design Cases**](/en/learn/software-engineering/system-design/by-example/cases) - See these patterns applied in real-world system designs
 
 ## Production Wiring
 
 After the by-example tutorials for C4, DDD, Hexagonal Architecture, and FSM, the production cases show how the four families compose in real production code:
 
-- Next step (production wiring): [In FP — F# / Giraffe / Npgsql, Clojure / Ring / next.jdbc, TypeScript / Hono / node-postgres, Haskell / Servant / postgresql-simple](/en/learn/software-engineering/software-architecture/cases/in-fp)
-- Next step (production wiring): [In OOP — Java / Spring Boot 4, Kotlin / Spring Boot 4, C# / ASP.NET Core, TypeScript / NestJS](/en/learn/software-engineering/software-architecture/cases/in-oop)
-- Next step (production wiring): [In Procedural — Go / chi / database/sql, Rust / axum / sqlx](/en/learn/software-engineering/software-architecture/cases/in-procedural)
+- Next step (production wiring): [In FP — F# / Giraffe / Npgsql, Clojure / Ring / next.jdbc, TypeScript / Hono / node-postgres, Haskell / Servant / postgresql-simple](/en/learn/software-engineering/software-architecture/by-example/cases/in-fp)
+- Next step (production wiring): [In OOP — Java / Spring Boot 4, Kotlin / Spring Boot 4, C# / ASP.NET Core, TypeScript / NestJS](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop)
+- Next step (production wiring): [In Procedural — Go / chi / database/sql, Rust / axum / sqlx](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural)
 
 ## 🚀 Getting Started
 

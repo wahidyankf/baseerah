@@ -229,7 +229,7 @@ The C4 Model works with **any technology stack**:
 
 ## 🔗 Related Content
 
-- [**System Design Cases**](/en/learn/software-engineering/system-design/cases) - See C4 principles applied in real-world designs
+- [**System Design Cases**](/en/learn/software-engineering/system-design/by-example/cases) - See C4 principles applied in real-world designs
 - [**Domain-Driven Design**](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd) - Complements C4 with domain modeling
 - [**Finite State Machine**](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm) - Use for component-level behavior modeling
 

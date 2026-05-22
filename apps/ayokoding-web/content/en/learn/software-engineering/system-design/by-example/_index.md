@@ -8,6 +8,9 @@ layout: list
 description: "Learn system design through 85 heavily annotated examples covering scalability, availability, consistency, caching, load balancing, microservices, and more (95% coverage)"
 ---
 
+- [Cases](/en/learn/software-engineering/system-design/by-example/cases)
+  - [AI Personal Finance Advisor](/en/learn/software-engineering/system-design/by-example/cases/ai-personal-finance-advisor)
+  - [Overview](/en/learn/software-engineering/system-design/by-example/cases/overview)
 - [Overview](/en/learn/software-engineering/system-design/by-example/overview)
 - [Beginner](/en/learn/software-engineering/system-design/by-example/beginner)
 - [Intermediate](/en/learn/software-engineering/system-design/by-example/intermediate)
