@@ -7,4 +7,5 @@ pub mod detect;
 pub mod go_coverage;
 pub mod jacoco;
 pub mod lcov;
+pub mod reporter;
 pub mod types;
