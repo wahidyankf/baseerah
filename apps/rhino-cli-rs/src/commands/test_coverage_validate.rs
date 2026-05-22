@@ -196,7 +196,6 @@ mod tests {
     #[test]
     fn run_on_passing_go_cover_out_succeeds() {
         let tmp = TempDir::new().unwrap();
-        // Mock a tiny go module + cover.out at all-covered state
         write(tmp.path(), "go.mod", "module example.com/p\n");
         write(tmp.path(), "foo.go", "func F() { x := 1 }\n");
         let cover = write(
@@ -204,12 +203,84 @@ mod tests {
             "cover.out",
             "mode: set\nexample.com/p/foo.go:1.1,1.20 1 1\n",
         );
-        // Invoke compute path directly (not run() since it requires git repo discovery).
         let r = crate::internal::testcoverage::go_coverage::compute_go_result(
             cover.to_str().unwrap(),
             50.0,
         )
         .unwrap();
         assert!(r.passed);
+    }
+
+    #[test]
+    fn apply_exclude_no_patterns_returns_unchanged() {
+        let result = CoverageResult {
+            file: "x".into(),
+            format: Format::Go,
+            covered: 5,
+            partial: 0,
+            missed: 5,
+            total: 10,
+            pct: 50.0,
+            threshold: 80.0,
+            passed: false,
+            files: vec![],
+        };
+        let unchanged = apply_exclude(result.clone(), &[]);
+        assert_eq!(unchanged.covered, result.covered);
+        assert_eq!(unchanged.total, result.total);
+    }
+
+    #[test]
+    fn apply_exclude_with_invalid_glob_skips_pattern() {
+        let result = CoverageResult {
+            file: "x".into(),
+            format: Format::Go,
+            covered: 0,
+            partial: 0,
+            missed: 0,
+            total: 0,
+            pct: 100.0,
+            threshold: 80.0,
+            passed: true,
+            files: vec![crate::internal::testcoverage::types::FileResult {
+                path: "a.rs".into(),
+                covered: 5,
+                partial: 0,
+                missed: 0,
+                total: 5,
+                pct: 100.0,
+            }],
+        };
+        let r = apply_exclude(result, &["[invalid".to_string()]);
+        // Invalid glob is filtered out → no patterns remain → matchers.is_empty() → return early.
+        assert_eq!(r.files.len(), 1);
+    }
+
+    #[test]
+    fn apply_exclude_recomputes_aggregate_to_zero_total() {
+        let result = CoverageResult {
+            file: "x".into(),
+            format: Format::Go,
+            covered: 0,
+            partial: 0,
+            missed: 0,
+            total: 0,
+            pct: 100.0,
+            threshold: 80.0,
+            passed: true,
+            files: vec![crate::internal::testcoverage::types::FileResult {
+                path: "drop.rs".into(),
+                covered: 5,
+                partial: 0,
+                missed: 0,
+                total: 5,
+                pct: 100.0,
+            }],
+        };
+        let r = apply_exclude(result, &["drop.rs".to_string()]);
+        assert_eq!(r.files.len(), 0);
+        assert_eq!(r.total, 0);
+        assert!((r.pct - 100.0).abs() < 0.001);
+        assert!(r.passed); // 100% on empty → passes any threshold
     }
 }
