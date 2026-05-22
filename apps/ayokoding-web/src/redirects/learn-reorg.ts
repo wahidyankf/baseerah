@@ -3,6 +3,12 @@ export const learnReorgRedirects: Array<{
   destination: string;
   permanent: boolean;
 }> = [
+  // Phase 3 — algorithm plural rename
+  {
+    source: "/en/learn/software-engineering/algorithm-and-data-structures/:path*",
+    destination: "/en/learn/software-engineering/algorithms-and-data-structures/:path*",
+    permanent: true,
+  },
   // Phase 2 — platforms rename
   {
     source: "/en/learn/software-engineering/platform-linux/:path*",

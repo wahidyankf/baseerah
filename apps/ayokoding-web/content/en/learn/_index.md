@@ -14,7 +14,7 @@ weight: 10
   - [Automation Tools](/en/learn/software-engineering/automation-tools)
   - [Infrastructure](/en/learn/software-engineering/infrastructure)
   - [Networking](/en/learn/software-engineering/networking)
-  - [Algorithm and Data Structures](/en/learn/software-engineering/algorithm-and-data-structures)
+  - [Algorithm and Data Structures](/en/learn/software-engineering/algorithms-and-data-structures)
   - [System Design](/en/learn/software-engineering/system-design)
   - [Compilers and Interpreters](/en/learn/software-engineering/compilers-and-interpreters)
   - [Platforms](/en/learn/software-engineering/platforms)
