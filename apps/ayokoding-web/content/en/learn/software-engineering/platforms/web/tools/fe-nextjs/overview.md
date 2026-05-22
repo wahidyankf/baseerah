@@ -154,7 +154,7 @@ app/
 ## Next.js Ecosystem
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#2563eb','primaryTextColor':'#1e293b','primaryBorderColor':'#1e40af','lineColor':'#64748b','secondaryColor':'#10b981','tertiaryColor':'#f59e0b','fontSize':'14px'}}}%%
+%%{init: {'theme':'base',<br/>'themeVariables': {<br/>'primaryColor':'#2563eb','primaryTextColor':'#1e293b','primaryBorderColor':'#1e40af','lineColor':'#64748b','secondaryColor':'#10b981','tertiaryColor':'#f59e0b','fontSize':'14px'}}}%%
 graph TB
     A[Next.js Core] --> B[React Foundation]
     A --> C[Vercel Platform]

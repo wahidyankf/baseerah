@@ -699,7 +699,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 ```mermaid
 graph TD
-    A[Manual Servlet REST<br/>ObjectMapper + HttpServletResponse] -->|80+ Lines| B[Manual JSON]
+    A[Manual Servlet REST<br/>ObjectMapper +<br/>HttpServletResponse] -->|80+ Lines| B[Manual JSON]
     A -->|Manual Status Codes| C[Boilerplate]
     A -->|No Content Negotiation| D[JSON Only]
 

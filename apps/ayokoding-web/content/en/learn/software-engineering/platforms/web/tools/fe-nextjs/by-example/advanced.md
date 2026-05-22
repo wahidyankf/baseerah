@@ -2125,7 +2125,7 @@ sequenceDiagram
   SA->>Q: Enqueue job
   SA->>U: Return "Processing..." (immediate)
   Q->>W: Dequeue job
-  W->>W: Process (slow: send emails, generate PDF)
+  W->>W: Process (slow: send emails, generate<br/>PDF)
   W->>Q: Mark complete
 ```
 
@@ -2305,7 +2305,7 @@ graph TD
   D -->|admin role| E[Admin Dashboard]
   D -->|user role| F[User Dashboard]
   D -->|wrong role| G[403 Forbidden]
-  E --> H[Server Action: verify role again]
+  E --> H[Server Action: verify role<br/>again]
   F --> H
 
   style A fill:#CC78BC,stroke:#000,color:#000
@@ -2648,7 +2648,7 @@ graph TD
   B --> C[Update donor total]
   C --> D[Update charity balance]
   D -->|all succeed| E[COMMIT: all 3 updates persist]
-  B -->|any error| F[ROLLBACK: none of the 3 persist]
+  B -->|any error| F[ROLLBACK: none of the 3<br/>persist]
   C -->|any error| F
   D -->|any error| F
 

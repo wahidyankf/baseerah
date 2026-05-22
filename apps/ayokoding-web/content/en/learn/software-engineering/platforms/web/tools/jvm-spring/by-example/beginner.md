@@ -1191,11 +1191,11 @@ Email sent: Thank you, Ali
 
 ```mermaid
 graph TD
-    A[Spring creates NotificationService] -->|1. Constructor called| B[NotificationService instance]
-    B -->|2. emailService field null| C[Spring detects @Autowired setter]
+    A[Spring creates<br/>NotificationService] -->|1. Constructor called| B[NotificationService instance]
+    B -->|2. emailService field null| C[Spring detects @Autowired<br/>setter]
     C -->|3. Spring calls setter| D[setEmailService method]
     D -->|4. Injects EmailService bean| E[emailService field populated]
-    E -->|5. Bean ready| F[Fully wired NotificationService]
+    E -->|5. Bean ready| F[Fully wired<br/>NotificationService]
 
     style A fill:#0173B2,stroke:#000,color:#fff
     style B fill:#DE8F05,stroke:#000,color:#000
@@ -1851,7 +1851,7 @@ graph TD
         A3[Third getBean call] -->|Returns cached| B1
     end
 
-    subgraph Prototype [Prototype Scope - @Scope prototype]
+    subgraph Prototype [Prototype Scope - @Scope<br/>prototype]
         C1[First getBean call] -->|Creates new| D1[Bean Instance 1]
         C2[Second getBean call] -->|Creates new| D2[Bean Instance 2]
         C3[Third getBean call] -->|Creates new| D3[Bean Instance 3]

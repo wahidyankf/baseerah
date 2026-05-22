@@ -592,7 +592,7 @@ sequenceDiagram
     U->>C: Click button phx-click="increment"
     C->>S: Send event over WebSocket
     S->>S: handle_event("increment", params, socket)
-    S->>S: update(socket, :count, fn c -> c + 1 end)
+    S->>S: update(socket, :count, fn c -> c + 1<br/>end)
     S->>C: Send minimal HTML diff
     C->>U: Patch DOM (only count changes)
 
@@ -1054,17 +1054,8 @@ Database associations relate tables. A post has many comments, a comment belongs
 ```mermaid
 %% One-to-many association structure
 erDiagram
-    POST ||--o{ COMMENT : has
-    POST {
-        int id PK
-        string title
-        string body
-    }
-    COMMENT {
-        int id PK
-        int post_id FK
-        string body
-    }
+    POST ||--o{COMMENT : has POST { int id PK<br/>string title string body}
+    COMMENT {int id PK int post_id FK<br/>string body}
 
     style POST fill:#0173B2,color:#fff
     style COMMENT fill:#DE8F05,color:#fff
@@ -1661,7 +1652,7 @@ graph TD
     B --> D[POST create - new comment]
     B --> E[GET :id/show - view comment]
     B --> F[PUT :id/update - edit comment]
-    B --> G[DELETE :id/delete - remove comment]
+    B --> G[DELETE :id/delete - remove<br/>comment]
 
     style A fill:#0173B2,color:#fff
     style B fill:#DE8F05,color:#fff

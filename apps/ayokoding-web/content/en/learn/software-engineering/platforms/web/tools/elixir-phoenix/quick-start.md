@@ -43,7 +43,7 @@ By the end of this tutorial, you will understand:
 ## Learning Path
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0ea5e9','primaryTextColor':'#1e293b','primaryBorderColor':'#0369a1','lineColor':'#64748b','secondaryColor':'#f97316','tertiaryColor':'#8b5cf6','background':'#ffffff','mainBkg':'#f1f5f9','secondBkg':'#e2e8f0'}}}%%
+%%{init: {'theme':'base',<br/>'themeVariables': {<br/>'primaryColor':'#0ea5e9','primaryTextColor':'#1e293b','primaryBorderColor':'#0369a1','lineColor':'#64748b','secondaryColor':'#f97316','tertiaryColor':'#8b5cf6','background':'#ffffff','mainBkg':'#f1f5f9','secondBkg':'#e2e8f0'}}}%%
 graph TB
     Start[Quick Start] --> Setup[Prerequisites Check]
     Setup --> Lifecycle[Request Lifecycle]
@@ -73,7 +73,7 @@ Understanding how Phoenix processes requests is fundamental.
 ### The Full Journey
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0ea5e9','primaryTextColor':'#1e293b','primaryBorderColor':'#0369a1','lineColor':'#64748b','secondaryColor':'#f97316','tertiaryColor':'#8b5cf6','background':'#ffffff','mainBkg':'#f1f5f9','secondBkg':'#e2e8f0'}}}%%
+%%{init: {'theme':'base',<br/>'themeVariables': {<br/>'primaryColor':'#0ea5e9','primaryTextColor':'#1e293b','primaryBorderColor':'#0369a1','lineColor':'#64748b','secondaryColor':'#f97316','tertiaryColor':'#8b5cf6','background':'#ffffff','mainBkg':'#f1f5f9','secondBkg':'#e2e8f0'}}}%%
 graph TD
     Browser[Browser] --> Endpoint[Endpoint]
     Endpoint --> Router[Router]

@@ -1194,7 +1194,7 @@ graph LR
   A[Server Action] --> B[Update Database]
   B --> C[revalidatePath '/donations']
   C --> D[Stale cache cleared]
-  D --> E[Next request fetches fresh data]
+  D --> E[Next request fetches fresh<br/>data]
   E --> F[User sees updated list]
 
   style A fill:#0173B2,stroke:#000,color:#fff

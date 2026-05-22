@@ -1203,7 +1203,7 @@ graph TD
     B --> C[Phoenix.Token.sign]
     C --> D[Return JWT to client]
     D --> E[Client stores token]
-    E --> F[GET /api with Authorization header]
+    E --> F[GET /api with Authorization<br/>header]
     F --> G[VerifyToken plug]
     G --> H[Phoenix.Token.verify]
     H --> I{Valid?}
@@ -1784,7 +1784,7 @@ Version your API to support multiple client versions. Use URL versioning or head
 graph TD
     A[Client Request] --> B{Version Strategy}
     B -->|URL| C[/api/v1/posts]
-    B -->|Header| D[Accept: application/vnd.api.v1+json]
+    B -->|Header| D[Accept:<br/>application/vnd.api.v1+json]
     B -->|Content Type| E[application/vnd.myapp.v1+json]
     C --> F[Route to V1 Controller]
     D --> F

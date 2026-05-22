@@ -266,31 +266,11 @@ Model flexible relationships where the same entity can have many different types
 ```mermaid
 %% Many-to-many through join table
 erDiagram
-    POST ||--o{ POST_TAG : has
-    TAG ||--o{ POST_TAG : has
-    COMMENT ||--o{ COMMENT_TAG : has
-    TAG ||--o{ COMMENT_TAG : has
-
-    POST {
-        int id PK
-        string title
-    }
-    TAG {
-        int id PK
-        string name
-    }
-    POST_TAG {
-        int post_id FK
-        int tag_id FK
-    }
-    COMMENT {
-        int id PK
-        string body
-    }
-    COMMENT_TAG {
-        int comment_id FK
-        int tag_id FK
-    }
+    POST ||--o{POST_TAG : has TAG ||--o{<br/>POST_TAG : has COMMENT ||--o{<br/>COMMENT_TAG : has TAG ||--o{<br/>COMMENT_TAG : has POST { int<br/>id PK string title}
+    TAG {int id PK string name}
+    POST_TAG {int post_id FK int tag_id FK}
+    COMMENT {int id PK string body}
+    COMMENT_TAG {int comment_id FK int tag_id<br/>FK}
 ```
 
 ```elixir
@@ -548,13 +528,13 @@ Load related data efficiently to avoid N+1 queries where one query results in N 
 %% N+1 problem vs preload solution
 graph TD
     A[❌ N+1 Problem] --> B[Query 1: SELECT * FROM posts]
-    B --> C[Query 2: SELECT * FROM authors WHERE id = 1]
-    B --> D[Query 3: SELECT * FROM authors WHERE id = 2]
-    B --> E[Query 4: SELECT * FROM authors WHERE id = 3]
+    B --> C[Query 2: SELECT * FROM authors<br/>WHERE id = 1]
+    B --> D[Query 3: SELECT * FROM authors<br/>WHERE id = 2]
+    B --> E[Query 4: SELECT * FROM authors<br/>WHERE id = 3]
     B --> F[... N queries]
 
     G[✅ Preload Solution] --> H[Query 1: SELECT * FROM posts]
-    H --> I[Query 2: SELECT * FROM authors WHERE id IN]
+    H --> I[Query 2: SELECT * FROM authors<br/>WHERE id IN]
     I --> J[Total: 2 queries]
 
     style A fill:#CA9161,color:#fff

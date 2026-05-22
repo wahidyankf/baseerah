@@ -21,7 +21,7 @@ The following diagram shows the complete setup process:
 
 ```mermaid
 flowchart TD
-    Start([Start Setup]) --> CreateDroplet[Create Ubuntu 24.04 LTS Droplet]
+    Start([Start Setup]) --> CreateDroplet[Create Ubuntu 24.04 LTS<br/>Droplet]
     CreateDroplet --> UpdateSystem[Update System Packages]
     UpdateSystem --> ConfigSSH[Configure SSH Access]
 

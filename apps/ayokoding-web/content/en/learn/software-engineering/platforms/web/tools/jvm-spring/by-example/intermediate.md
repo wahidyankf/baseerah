@@ -1732,7 +1732,7 @@ class AccountService {  # => Defines AccountService class
 
 ```mermaid
 graph TD
-    A[Method with @Transactional called] -->|Begin transaction| B[Transaction Started]
+    A[Method with @Transactional<br/>called] -->|Begin transaction| B[Transaction Started]
     B --> C{Method executes}
     C -->|Success| D[Commit transaction]
     C -->|Unchecked Exception| E[Rollback transaction]
@@ -1859,7 +1859,7 @@ graph TD
 
     subgraph REQUIRES_NEW [REQUIRES_NEW - Always New]
         A2[Method called] --> B2[Suspend current transaction]
-        B2 --> C2[Create NEW independent transaction]
+        B2 --> C2[Create NEW independent<br/>transaction]
         C2 --> D2[Commit/rollback independently]
     end
 
@@ -2017,7 +2017,7 @@ Demonstrates custom rollback behavior.
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
 graph TD
-    A["@Transactional\n(rollbackFor=DataIntegrityViolation.class,\n noRollbackFor=BusinessWarning.class)"] -->|"on exception"| B{"Exception Type?"}
+    A["@Transactional\n(rollbackFor=DataIntegrityViolation.class,\n<br/>noRollbackFor=BusinessWarning.class)"] -->|"on exception"| B{"Exception Type?"}
     B -->|"DataIntegrityViolationException"| C["ROLLBACK\n(data reverted)"]
     B -->|"BusinessWarningException"| D["COMMIT\n(warning logged only)"]
     B -->|"other RuntimeException"| C
@@ -3225,7 +3225,7 @@ graph TD
     E --> G[Return response]
     F --> H[400 Bad Request with errors]
 
-    I[@NotBlank, @Min, @Max annotations] -.->|Define rules| D
+    I[@NotBlank, @Min, @Max<br/>annotations] -.->|Define rules| D
 
     style A fill:#0173B2,stroke:#000,color:#fff
     style B fill:#DE8F05,stroke:#000,color:#000

@@ -1296,7 +1296,7 @@ sequenceDiagram
     participant Z as Zipkin
 
     C->>O: GET /order/1 [TraceID: abc123]
-    O->>U: GET /user/1 [TraceID: abc123, SpanID: def456]
+    O->>U: GET /user/1 [TraceID: abc123, SpanID:<br/>def456]
     U->>Z: Report Span
     U-->>O: User Data
     O->>Z: Report Span

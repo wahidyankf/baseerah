@@ -3008,7 +3008,7 @@ graph TD
     C -->|No| D[Redirect unauthorized]
     C -->|Yes| E[Rate limit check]
     E --> F{Under limit?}
-    F -->|No| G[Flash error - too many requests]
+    F -->|No| G[Flash error - too many<br/>requests]
     F -->|Yes| H[Process event]
     H --> I[Per-operation auth check]
 

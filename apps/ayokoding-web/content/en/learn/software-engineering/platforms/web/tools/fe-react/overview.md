@@ -82,7 +82,7 @@ Large talent pool, extensive resources, and proven scalability.
 ## React Ecosystem
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#2563eb','primaryTextColor':'#1e293b','primaryBorderColor':'#1e40af','lineColor':'#64748b','secondaryColor':'#10b981','tertiaryColor':'#f59e0b','fontSize':'14px'}}}%%
+%%{init: {'theme':'base',<br/>'themeVariables': {<br/>'primaryColor':'#2563eb','primaryTextColor':'#1e293b','primaryBorderColor':'#1e40af','lineColor':'#64748b','secondaryColor':'#10b981','tertiaryColor':'#f59e0b','fontSize':'14px'}}}%%
 graph TB
     A[React Core] --> B[React Router]
     A --> C[State Management]

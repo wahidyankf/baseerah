@@ -850,7 +850,7 @@ HEEx provides powerful template syntax for dynamic HTML generation. This example
 graph LR
     A[HEEx Template] --> B[Compile Time Parse]
     B --> C[Static Parts Cached]
-    C --> D[Runtime: Dynamic Expressions Evaluated]
+    C --> D[Runtime: Dynamic Expressions<br/>Evaluated]
     D --> E[HTML Output with Assigns]
 
     style A fill:#0173B2,color:#fff
