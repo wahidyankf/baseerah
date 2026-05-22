@@ -2,4 +2,21 @@ export const learnReorgRedirects: Array<{
   source: string;
   destination: string;
   permanent: boolean;
-}> = [];
+}> = [
+  // Phase 2 — platforms rename
+  {
+    source: "/en/learn/software-engineering/platform-linux/:path*",
+    destination: "/en/learn/software-engineering/platforms/linux/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/software-engineering/platform-web/:path*",
+    destination: "/en/learn/software-engineering/platforms/web/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/software-engineering/platform-mobile/:path*",
+    destination: "/en/learn/software-engineering/platforms/mobile/:path*",
+    permanent: true,
+  },
+];
