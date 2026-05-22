@@ -39,7 +39,6 @@ weight: 102
 - [Infrastructure](/en/learn/software-engineering/infrastructure)
   - [Infrastructure as Code](/en/learn/software-engineering/infrastructure/infrastructure-as-code)
   - [Overview](/en/learn/software-engineering/infrastructure/overview)
-  - [Concepts](/en/learn/software-engineering/infrastructure/concepts)
   - [Tools](/en/learn/software-engineering/infrastructure/tools)
 - [Networking](/en/learn/software-engineering/networking)
   - [Introduction](/en/learn/software-engineering/networking/introduction)

@@ -11,8 +11,6 @@ layout: list
   - [By Example](/en/learn/software-engineering/infrastructure/infrastructure-as-code/by-example)
   - [Overview](/en/learn/software-engineering/infrastructure/infrastructure-as-code/overview)
 - [Overview](/en/learn/software-engineering/infrastructure/overview)
-- [Concepts](/en/learn/software-engineering/infrastructure/concepts)
-  - [How to](/en/learn/software-engineering/infrastructure/concepts/how-to)
 - [Tools](/en/learn/software-engineering/infrastructure/tools)
   - [Overview](/en/learn/software-engineering/infrastructure/tools/overview)
   - [Ansible](/en/learn/software-engineering/infrastructure/tools/ansible)

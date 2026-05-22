@@ -3,6 +3,17 @@ export const learnReorgRedirects: Array<{
   destination: string;
   permanent: boolean;
 }> = [
+  // Phase 6 — infrastructure concepts fold-in
+  {
+    source: "/en/learn/software-engineering/infrastructure/concepts/how-to/:path*",
+    destination: "/en/learn/software-engineering/infrastructure/by-example/:path*",
+    permanent: true,
+  },
+  {
+    source: "/en/learn/software-engineering/infrastructure/concepts/:path*",
+    destination: "/en/learn/software-engineering/infrastructure/by-concept/:path*",
+    permanent: true,
+  },
   // Phase 5 — information-security track normalization
   {
     source: "/en/learn/information-security/concepts/explanation/:path*",
