@@ -172,7 +172,7 @@ The new `apps/rhino-cli-rs/project.json` mirrors the Go version's targets [Repo-
 | `spec-coverage`                    | `cargo run --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate specs/apps/rhino/behavior/cli/gherkin apps/rhino-cli-rs --shared-steps`                                                                         |
 | `validate:*` (21 validate targets) | Same `cargo run` invocations with `--` separator                                                                                                                                                                                  |
 
-[Note: `cargo llvm-cov` emits LCOV; the validator's auto-detect already handles `.info`/LCOV inputs. Threshold 90 is the agreed unified floor from the [recent CLI alignment commit `d4bacc851`](#).]
+[Note: `cargo llvm-cov` emits LCOV; the validator's auto-detect already handles `.info`/LCOV inputs. Threshold 90 is the agreed unified floor from the recent CLI alignment commit `d4bacc851`.]
 
 ## Command-Specific Risks
 

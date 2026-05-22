@@ -8,7 +8,7 @@ Consolidate platform tooling on Rust to reduce long-run maintenance cost, improv
 
 - The Go `rhino-cli` is the only Go binary on the critical path of every other app's quality gates. Keeping one Go-language footprint solely for tooling means the doctor must keep probing Go for every contributor, every CI run, every Vercel build. Removing it lets us optionally drop Go from the developer toolchain entirely once `ayokoding-cli` and `ose-cli` follow (out of scope for this plan).
 - The doctor already probes `rustc` and `cargo-llvm-cov` [Repo-grounded — `apps/rhino-cli/internal/doctor/checker.go:parseRustVersion`, `parseCargoLlvmCov`]. Rust toolchain readiness is already a requirement — the missing piece is using it.
-- The recent CLI alignment work ([commit `d4bacc851`](#)) settled the three Go CLIs at parity. That parity is the natural staging point: lift `rhino-cli` to Rust and the other two siblings continue using whichever rhino implementation is on `main`.
+- The recent CLI alignment work (commit `d4bacc851`) settled the three Go CLIs at parity. That parity is the natural staging point: lift `rhino-cli` to Rust and the other two siblings continue using whichever rhino implementation is on `main`.
 
 ## Why Rust over alternative consolidation targets
 
