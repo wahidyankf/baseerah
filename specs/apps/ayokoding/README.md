@@ -36,21 +36,14 @@ specs/apps/ayokoding/
 │   └── ubiquitous-language/
 │       ├── README.md
 │       └── *.md           # One glossary file per bounded context
-└── behavior/              # Gherkin scenarios (web UI-semantic + api HTTP-semantic)
+└── behavior/              # Gherkin scenarios (all surfaces)
     ├── README.md
-    ├── api/gherkin/       # tRPC API Gherkin scenarios
-    └── web/gherkin/       # Browser UI Gherkin scenarios (per bounded context)
+    ├── api/gherkin/        # tRPC API Gherkin scenarios (per bounded context)
+    ├── build-tools/gherkin/ # Build-time index-generation scripts
+    │   └── index-generation/
+    ├── cli/gherkin/        # ayokoding-cli link-validation scenarios
+    └── web/gherkin/        # Browser UI Gherkin scenarios (per bounded context)
 ```
-
-> **Out of scope for this spec tree** (preserved unchanged as legacy slugs):
->
-> - `cli/` — owned by the separate `ayokoding-cli` deployable (Go binary). Has its own
->   `cli/gherkin/` tree.
-> - `build-tools/` — build-time index-generation scripts. Has its own
->   `build-tools/gherkin/` tree.
->
-> Both stay alongside this five-folder tree; their migration is a separate plan if/when
-> they grow into independent spec trees.
 
 ## Containers and perspectives
 

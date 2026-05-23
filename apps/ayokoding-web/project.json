@@ -112,13 +112,13 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ayokoding/behavior/web/gherkin specs/apps/ayokoding/behavior/api/gherkin specs/apps/ayokoding/build-tools/gherkin apps/ayokoding-web"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ayokoding/behavior/web/gherkin specs/apps/ayokoding/behavior/api/gherkin specs/apps/ayokoding/behavior/build-tools/gherkin apps/ayokoding-web"
       },
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/ayokoding/behavior/web/gherkin/**/*.feature",
         "{workspaceRoot}/specs/apps/ayokoding/behavior/api/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ayokoding/build-tools/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/ayokoding/behavior/build-tools/gherkin/**/*.feature",
         "{projectRoot}/**/*.{ts,tsx}"
       ]
     }

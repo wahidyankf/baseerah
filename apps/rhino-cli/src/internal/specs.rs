@@ -440,4 +440,20 @@ mod tests {
         }
         assert!(validate_spec_tree(dir.path(), "x").is_empty());
     }
+
+    #[test]
+    fn validate_spec_tree_build_tools_surface_accepted() {
+        // Regression: behavior/build-tools/gherkin/ is a valid surface — validator must not
+        // reject unknown surface names under behavior/.
+        let dir = tempdir().unwrap();
+        for folder in required_spec_folders() {
+            let p = dir.path().join("specs/apps/x").join(folder);
+            std::fs::create_dir_all(&p).unwrap();
+            std::fs::write(p.join("README.md"), "x").unwrap();
+        }
+        let gherkin = dir.path().join("specs/apps/x/behavior/build-tools/gherkin");
+        std::fs::create_dir_all(&gherkin).unwrap();
+        std::fs::write(gherkin.join("build-tools.feature"), "Feature: build-tools").unwrap();
+        assert!(validate_spec_tree(dir.path(), "x").is_empty());
+    }
 }

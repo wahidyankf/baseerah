@@ -8,7 +8,7 @@ import { processAllIndexFiles } from "../../../src/contexts/content/infrastructu
 const feature = await loadFeature(
   path.resolve(
     process.cwd(),
-    "../../specs/apps/ayokoding/build-tools/gherkin/index-generation/index-generation.feature",
+    "../../specs/apps/ayokoding/behavior/build-tools/gherkin/index-generation/index-generation.feature",
   ),
 );
 

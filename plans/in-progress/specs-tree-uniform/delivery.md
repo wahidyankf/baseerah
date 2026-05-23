@@ -207,8 +207,9 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 - [x] Verify rhino-cli unit + integration tests:
     `nx run rhino-cli:test:quick && nx run rhino-cli:test:integration` — both exit 0.
 <!-- Date: 2026-05-23 | Status: done | Notes: 754 unit tests pass; integration tests pass -->
-- [ ] Commit atomically:
-      `git add -A && git commit -m "refactor(specs/rhino): fill out CLI tree and regroup features into domains"`.
+- [x] Commit atomically:
+    `git add -A && git commit -m "refactor(specs/rhino): fill out CLI tree and regroup features into domains"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit bca539c6d; 54 files changed, 459 insertions, 157 deletions -->
 
 ## Phase 4 — Ayokoding build-tools resolution
 
@@ -216,37 +217,45 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 
 ### Phase 4.A — If D1 == A (migrate under `behavior/build-tools/gherkin/`)
 
-- [ ] Locate the surface-allowlist constant in rhino-cli. Authoritative search:
-      `grep -rn '"cli"\|"be"\|"web"' apps/rhino-cli/src/commands/specs_validate_tree.rs apps/rhino-cli/src/internal/specs.rs`.
-      Likely owner: `apps/rhino-cli/src/internal/specs.rs` (helpers) or
-      `apps/rhino-cli/src/commands/specs_validate_tree.rs` (validator entry). [Repo-grounded —
-      both files confirmed via `find` at plan-authoring time]
-- [ ] Write a FAILING `#[cfg(test)]` unit test in the file that owns the surface enum/allowlist:
+- [x] Locate the surface-allowlist constant in rhino-cli. Authoritative search:
+    `grep -rn '"cli"\|"be"\|"web"' apps/rhino-cli/src/commands/specs_validate_tree.rs apps/rhino-cli/src/internal/specs.rs`.
+    Likely owner: `apps/rhino-cli/src/internal/specs.rs` (helpers) or
+    `apps/rhino-cli/src/commands/specs_validate_tree.rs` (validator entry). [Repo-grounded —
+    both files confirmed via `find` at plan-authoring time]
+<!-- Date: 2026-05-23 | Status: done | Notes: NO surface allowlist exists in the Rust port; validate-tree checks only the 5 C4 folders, not surface names — validator is already surface-agnostic; build-tools is already accepted; nx validate:specs-tree --apps ayokoding exits 0 with build-tools/ present -->
+- [x] Write a FAILING `#[cfg(test)]` unit test in the file that owns the surface enum/allowlist:
       scenario "build-tools surface accepted by validate-tree" — assert that `"build-tools"` is
       a valid surface. Run `nx run rhino-cli:test:quick` — new test MUST FAIL (RED state
       confirms `"build-tools"` is not yet accepted).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Edit the surface enum/allowlist to add `"build-tools"` as a valid surface. Run
+  <!-- Date: 2026-05-23 | Status: done | Notes: test validate_spec_tree_build_tools_surface_accepted added to specs.rs; GREEN immediately (no RED) — validator already surface-agnostic; no allowlist to fail against; test is a regression guard -->
+- [x] Edit the surface enum/allowlist to add `"build-tools"` as a valid surface. Run
       `nx run rhino-cli:test:quick` — the previously failing test now PASSES (GREEN);
       `cargo check --manifest-path apps/rhino-cli/Cargo.toml` exits 0; coverage remains ≥90%.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Execute the migration block (`mkdir -p`, `git mv`, `rmdir`) verbatim from
-      [tech-docs.md §R4](./tech-docs.md#r4--ayokoding-build-tools-migration-assuming-d1a).
-      Acceptance: `specs/apps/ayokoding/build-tools/` no longer exists and
-      `specs/apps/ayokoding/behavior/build-tools/gherkin/index-generation/` does.
-- [ ] Path-reference sweep — execute the `grep | xargs sed; find -name '*.bak' -delete` block
-      from [tech-docs.md §R4](./tech-docs.md#r4--ayokoding-build-tools-migration-assuming-d1a).
-      Acceptance: `grep -rln 'specs/apps/ayokoding/build-tools[^/]' . | wc -l` returns 0.
-- [ ] Edit `specs/apps/ayokoding/README.md`: remove the "Out of scope for this spec tree
+  <!-- Date: 2026-05-23 | Status: done | Notes: no code change needed — no surface enum exists; test already GREEN; cargo check passes; coverage unaffected -->
+- [x] Execute the migration block (`mkdir -p`, `git mv`, `rmdir`) verbatim from
+    [tech-docs.md §R4](./tech-docs.md#r4--ayokoding-build-tools-migration-assuming-d1a).
+    Acceptance: `specs/apps/ayokoding/build-tools/` no longer exists and
+    `specs/apps/ayokoding/behavior/build-tools/gherkin/index-generation/` does.
+<!-- Date: 2026-05-23 | Status: done | Notes: feature moved to behavior/build-tools/gherkin/index-generation/index-generation.feature; old build-tools/ dir removed -->
+- [x] Path-reference sweep — execute the `grep | xargs sed; find -name '*.bak' -delete` block
+    from [tech-docs.md §R4](./tech-docs.md#r4--ayokoding-build-tools-migration-assuming-d1a).
+    Acceptance: `grep -rln 'specs/apps/ayokoding/build-tools[^/]' . | wc -l` returns 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: 2 files updated (ayokoding-web/project.json, index-generation.steps.ts); 3 remaining matches are inside plan docs (grep patterns in acceptance criteria — not actionable paths) -->
+- [x] Edit `specs/apps/ayokoding/README.md`: remove the "Out of scope for this spec tree
       (preserved unchanged as legacy slugs)" note (currently lines 45–53) referencing
       `build-tools/`. Update the "Structure" tree block to include
       `behavior/build-tools/gherkin/`.
   - _Suggested executor: `specs-maker`_
-- [ ] Verify:
-      `nx run rhino-cli:validate:specs-tree --apps ayokoding && nx run rhino-cli:validate:specs-counts --apps ayokoding && nx run rhino-cli:validate:specs-links --apps ayokoding`
-      — all three exit 0.
-- [ ] Verify ayokoding-web tests still pass:
-      `nx run ayokoding-web:test:quick` — exits 0.
+  <!-- Date: 2026-05-23 | Status: done | Notes: Out of scope blockquote removed; behavior/ block expanded to show all 4 surfaces (api, build-tools, cli, web) -->
+- [x] Verify:
+    `nx run rhino-cli:validate:specs-tree --apps ayokoding && nx run rhino-cli:validate:specs-counts --apps ayokoding && nx run rhino-cli:validate:specs-links --apps ayokoding`
+    — all three exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: all three 0 findings -->
+- [x] Verify ayokoding-web tests still pass:
+    `nx run ayokoding-web:test:quick` — exits 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: 86.21% coverage >= 82% threshold; 11061 links checked, 0 broken -->
 - [ ] Commit atomically:
       `git add -A && git commit -m "refactor(specs/ayokoding): migrate build-tools slug under behavior/"`.
 
