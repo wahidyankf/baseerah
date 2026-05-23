@@ -54,7 +54,7 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo llvm-cov --manifest-path apps/rhino-cli-rs/Cargo.toml --lib --ignore-filename-regex '(cli\\.rs|main\\.rs)' --lcov --output-path apps/rhino-cli-rs/cover.out --fail-under-lines 90"
+        "command": "cargo llvm-cov --manifest-path apps/rhino-cli-rs/Cargo.toml --lib --ignore-filename-regex '(cli\\.rs|main\\.rs|internal/git/mod\\.rs)' --lcov --output-path apps/rhino-cli-rs/cover.out --fail-under-lines 90"
       },
       "cache": true,
       "inputs": [

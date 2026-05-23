@@ -1,2 +1,2 @@
 ./scripts/git-identity-check.sh
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go git pre-commit
+cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- git pre-commit

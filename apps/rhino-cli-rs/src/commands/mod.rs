@@ -13,6 +13,7 @@ pub mod docs_validate_heading_hierarchy;
 pub mod docs_validate_links;
 pub mod docs_validate_mermaid;
 pub mod docs_validate_naming;
+pub mod git_pre_commit;
 pub mod governance_agents_md_size;
 pub mod governance_audit;
 pub mod governance_emoji_audit;
