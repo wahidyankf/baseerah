@@ -1,21 +1,29 @@
 ---
 title: "Related Repositories"
-description: Ecosystem of sibling repositories derived from or related to open-sharia-enterprise
+description: Ecosystem of sibling repositories in the open-sharia-enterprise ecosystem
 category: reference
 subcategory: ecosystem
 tags:
   - reference
   - ose-primer
+  - ose-infra
   - ecosystem
   - cross-repo
 created: 2026-04-18
+updated: 2026-05-23
 ---
 
 # Related Repositories
 
 This reference documents the external repositories that exist in the `open-sharia-enterprise` ecosystem, the relationships between them, and where to find authoritative source-of-truth for each concern.
 
-As of 2026-04-18, one related repository is actively tracked: [`ose-primer`](https://github.com/wahidyankf/ose-primer).
+The ecosystem consists of three independent sibling repositories. No parent coordination repository exists.
+
+| Repository                                               | Visibility | License     | Purpose                                                    |
+| -------------------------------------------------------- | ---------- | ----------- | ---------------------------------------------------------- |
+| [`ose-public`](https://github.com/wahidyankf/ose-public) | Public     | MIT         | Enterprise platform — upstream source of truth (this repo) |
+| [`ose-primer`](https://github.com/wahidyankf/ose-primer) | Public     | MIT         | Scaffolding template derived from `ose-public`             |
+| [`ose-infra`](https://github.com/wahidyankf/ose-infra)   | Private    | Proprietary | Infrastructure — self-hosted CI runner, `coralpolyp` app   |
 
 ## `ose-primer`
 
@@ -29,7 +37,7 @@ As of 2026-04-18, one related repository is actively tracked: [`ose-primer`](htt
 
 The two flows are directional — propagation (upstream → downstream) and adoption (downstream → upstream) — and classified per path in the convention's classifier table. Paths that are product-specific (for example, `apps/organiclever-*` or `apps/ose-web`) are tagged `neither` and never flow in either direction.
 
-### Licensing difference
+### Licensing
 
 `ose-public` is **MIT throughout**. See [LICENSING-NOTICE.md](../../LICENSING-NOTICE.md) for details.
 
@@ -45,3 +53,21 @@ The two flows are directional — propagation (upstream → downstream) and adop
 
 - [ose-primer sync convention](../../repo-governance/conventions/structure/ose-primer-sync.md) — directional classification, transforms, safety invariants, and audit rules.
 - [ose-primer on GitHub](https://github.com/wahidyankf/ose-primer) — downstream template repository.
+
+## `ose-infra`
+
+`ose-infra` ([github.com/wahidyankf/ose-infra](https://github.com/wahidyankf/ose-infra)) is a **private, proprietary** repository hosting the operational infrastructure for the OSE Platform ecosystem. It is not publicly accessible.
+
+### What lives in `ose-infra`
+
+- **Self-hosted GitHub Actions runner** — multi-arch Docker image with `launchd` supervisor, per-container resource caps, and stale-runner cleanup. Serves `ose-infra`'s own CI exclusively; `ose-public` uses GitHub-hosted `ubuntu-latest`.
+- **`coralpolyp`** — infrastructure orchestrator app (Rust/Axum backend, Next.js + Effect TS frontend). Purpose is proprietary and not described in public documentation.
+- Infrastructure-only governance and conventions that diverge from `ose-public` norms.
+
+### Relationship to `ose-public`
+
+`ose-infra` shares its root commit with `ose-public` (forked from the same origin). It has since diverged in stack and conventions. There is **no classifier-driven content sync** between `ose-public` and `ose-infra` — neither propagation nor adoption flows apply. Any cross-repo work between them is performed manually on a case-by-case basis.
+
+### Licensing
+
+`ose-infra` is **proprietary** (not MIT). It is listed here for ecosystem awareness; contributors to `ose-public` are not expected to have access.

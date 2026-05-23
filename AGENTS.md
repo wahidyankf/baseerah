@@ -582,14 +582,22 @@ Project planning in `plans/` folder:
 
 ## Related Repositories
 
-`ose-public` is the **upstream source of truth**. A downstream template repository, [`ose-primer`](https://github.com/wahidyankf/ose-primer), is a public MIT-licensed template packaging the scaffolding layer (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) for teams building their own Sharia-compliant enterprise products. `ose-public` is MIT throughout; `ose-primer` is also MIT throughout.
+The `open-sharia-enterprise` ecosystem consists of three independent sibling repositories — no parent coordination repo exists:
 
-Content flows in both directions under classifier-driven rules:
+- [`ose-public`](https://github.com/wahidyankf/ose-public) — this repository. Open-source enterprise platform. MIT licensed.
+- [`ose-primer`](https://github.com/wahidyankf/ose-primer) — downstream public template packaging the scaffolding layer (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) for teams building their own Sharia-compliant enterprise products. MIT licensed.
+- [`ose-infra`](https://github.com/wahidyankf/ose-infra) — private infrastructure repository. Hosts the self-hosted GitHub Actions runner stack, `coralpolyp` app, and infrastructure-only governance. Proprietary; not publicly accessible.
+
+### `ose-public` ↔ `ose-primer` sync
+
+`ose-public` is the **upstream source of truth** for scaffolding. Content flows in both directions under classifier-driven rules:
 
 - **Propagation** (`ose-public` → `ose-primer`): scaffolding improvements authored upstream flow to the template via `repo-ose-primer-propagation-maker`. Always via pull request against the primer's `main` branch; never direct commits.
 - **Adoption** (`ose-primer` → `ose-public`): generic improvements contributed downstream can flow back via `repo-ose-primer-adoption-maker`. Applied to `ose-public` as direct commits to `main` per Trunk-Based Development.
 
 Product-specific paths (`apps/organiclever-*`, `apps/ayokoding-*`, `apps/ose-web`, `apps/ose-web-be-e2e`, `apps/ose-web-fe-e2e`, `apps/ose-cli`, product specs, product roadmap, product plans) are classified `neither` and never sync.
+
+`ose-infra` does not participate in the propagation/adoption sync loop; it is an independent sibling with no classifier-driven content exchange with `ose-public`.
 
 See: [Related Repositories reference](./docs/reference/related-repositories.md), [ose-primer sync convention](./repo-governance/conventions/structure/ose-primer-sync.md).
 

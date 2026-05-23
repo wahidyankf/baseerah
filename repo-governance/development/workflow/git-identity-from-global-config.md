@@ -63,10 +63,10 @@ pre-commit guard that prevents commits entirely when an override is present.
 
 ## Standards
 
-### Standard 1: No `[user]` Section in Any Subrepo `.git/config`
+### Standard 1: No `[user]` Section in Any Sibling Repo `.git/config`
 
-The `[user]` section MUST NOT appear in `.git/config` for any subrepo tracked by this
-monorepo (`ose-public`, `ose-infra`, `ose-primer`).
+The `[user]` section MUST NOT appear in `.git/config` for any repository in the
+ecosystem (`ose-public`, `ose-infra`, `ose-primer`).
 
 **Violation:**
 
@@ -267,10 +267,10 @@ git config --local --list | grep "^user\."
 
 Then retry the commit. The global `~/.gitconfig` takes effect immediately.
 
-## Future Work: Sibling Subrepos
+## Future Work: Sibling Repos
 
 The enforcement described above is **currently active in `ose-public` only**. The two sibling
-subrepos tracked from the `ose-projects` parent — `ose-infra` and `ose-primer` — are
+repositories — `ose-infra` and `ose-primer` — are
 expected to adopt identical guards as a future plan:
 
 - Copy `scripts/git-identity-check.sh` into each sibling subrepo.

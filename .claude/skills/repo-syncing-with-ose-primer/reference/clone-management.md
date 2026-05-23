@@ -10,7 +10,7 @@ Sync agents resolve the primer clone path from the `OSE_PRIMER_CLONE` environmen
 export OSE_PRIMER_CLONE="$HOME/ose-projects/ose-primer"
 ```
 
-The convention default is `$HOME/ose-projects/ose-primer` (a sibling of the `ose-public` checkout). Operators may override to any location. No committed document may encode an absolute path to a specific machine — `$OSE_PRIMER_CLONE` is the only reference allowed in governance and skill documents.
+The convention default is `$HOME/ose-projects/ose-primer`. Operators may override to any location. No committed document may encode an absolute path to a specific machine — `$OSE_PRIMER_CLONE` is the only reference allowed in governance and skill documents.
 
 If `OSE_PRIMER_CLONE` is unset, pre-flight fails with an explicit error: `OSE_PRIMER_CLONE is not set; export it to the path of your local ose-primer clone (default: $HOME/ose-projects/ose-primer)`.
 
