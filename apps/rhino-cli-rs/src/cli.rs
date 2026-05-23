@@ -2,11 +2,12 @@ use clap::{Parser, Subcommand};
 
 use crate::commands::{
     agents_detect_duplication, agents_validate_claude, agents_validate_naming,
-    docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
-    docs_validate_mermaid, docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
-    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
-    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
-    spec_coverage_validate, test_coverage_validate, workflows_validate_naming,
+    agents_validate_sync, docs_validate_frontmatter, docs_validate_heading_hierarchy,
+    docs_validate_links, docs_validate_mermaid, docs_validate_naming, governance_agents_md_size,
+    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
+    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
+    governance_vendor_audit, spec_coverage_validate, test_coverage_validate,
+    workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -90,6 +91,9 @@ pub enum AgentsCommands {
     /// Validate Claude Code agent and skill format in .claude/ directory.
     #[command(name = "validate-claude")]
     ValidateClaude(agents_validate_claude::ValidateClaudeArgs),
+    /// Validate that .claude/ and .opencode/ are in sync.
+    #[command(name = "validate-sync")]
+    ValidateSync(agents_validate_sync::ValidateSyncArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -250,6 +254,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             AgentsCommands::ValidateClaude(args) => {
                 agents_validate_claude::run(args, output_format)
             }
+            AgentsCommands::ValidateSync(args) => agents_validate_sync::run(args, output_format),
         },
         Commands::Workflows(wc) => match wc {
             WorkflowsCommands::ValidateNaming(args) => {

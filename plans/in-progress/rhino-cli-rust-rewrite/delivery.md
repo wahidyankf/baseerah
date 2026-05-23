@@ -300,7 +300,11 @@ Goal: port the `agents` and `workflows` namespaces. `agents sync` generates `.op
     - **Files Changed**: `apps/rhino-cli-rs/src/internal/agents/{types,frontmatter,yaml_formatting,agent_validator,skill_validator,claude_validator,reporter}.rs`, `apps/rhino-cli-rs/src/internal/agents/mod.rs`, `apps/rhino-cli-rs/src/commands/agents_validate_claude.rs`, `apps/rhino-cli-rs/src/commands/mod.rs`, `apps/rhino-cli-rs/src/cli.rs`
     - **Notes**: Full validate-claude pipeline ported byte-for-byte. 98 unit tests pass. Shadow-diff against real `.claude/agents/` + `.claude/skills/` corpus PASS for text + JSON + markdown (1088 checks total, 1084 passed, 4 unknown-field warnings — all three formats byte-identical modulo Duration/timestamp). No Nx target to flip — Go `validate-claude` has no caller in `project.json` / `.husky` / `.github`; manual invocation only.
   - [ ] `agents validate-naming` — port `cmd/agents_validate_naming.go`.
-  - [ ] `agents validate-sync` — port `cmd/agents_validate_sync.go`.
+  - [x] `agents validate-sync` — port `cmd/agents_validate_sync.go`.
+    - **Date**: 2026-05-23
+    - **Status**: Completed
+    - **Files Changed**: `apps/rhino-cli-rs/src/internal/agents/{converter,sync_validator}.rs`, `apps/rhino-cli-rs/src/internal/agents/mod.rs`, `apps/rhino-cli-rs/src/commands/agents_validate_sync.rs`, `apps/rhino-cli-rs/src/commands/mod.rs`, `apps/rhino-cli-rs/src/cli.rs`
+    - **Notes**: sync_validator + converter helpers (ConvertModel, ConvertTools) ported. 18 sync_validator unit tests pass; total 511 across workspace. Shadow-diff PASS for text + JSON + markdown against real .claude/agents + .opencode/agents corpus (modulo Duration/timestamp). Coverage 90.60% lines (> 90 gate). No Nx target to flip — no callers in project.json / .husky / .github.
   - [ ] `workflows validate-naming` — port `cmd/workflows_validate_naming.go`.
   - _Suggested executor for each: `swe-rust-dev`_
 - [ ] Verify caller-graph: `grep -E "go run.*rhino-cli.*(agents|workflows)" apps/*/project.json .github/ .husky/` returns no matches.
