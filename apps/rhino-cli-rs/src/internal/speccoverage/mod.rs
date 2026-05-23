@@ -6,5 +6,6 @@ pub mod cucumber_expr;
 pub mod extractors;
 pub mod matcher;
 pub mod parser;
+pub mod reporter;
 pub mod types;
 pub mod util;

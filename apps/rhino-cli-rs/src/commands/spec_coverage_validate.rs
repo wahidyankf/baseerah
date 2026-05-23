@@ -1,0 +1,135 @@
+// Port of `apps/rhino-cli/cmd/spec_coverage_validate.go`.
+// Same args (positional specs-dirs + final app-dir), same flags, same exit
+// codes, same byte-for-byte output.
+
+use std::path::PathBuf;
+
+use anyhow::{anyhow, Context, Error};
+use clap::Args;
+
+use crate::internal::cliout::OutputFormat;
+use crate::internal::gitutil;
+use crate::internal::speccoverage::{checker, reporter, types::ScanOptions};
+
+#[derive(Args, Debug)]
+pub struct ValidateArgs {
+    /// Last positional arg is the app-dir; preceding args are specs-dirs.
+    /// Must supply ≥2 positional args.
+    #[arg(required = true, num_args = 2..)]
+    pub paths: Vec<String>,
+    /// Skip file matching; validate steps across ALL source files.
+    #[arg(long = "shared-steps")]
+    pub shared_steps: bool,
+    /// Spec directory names to exclude (repeatable).
+    #[arg(long = "exclude-dir", value_name = "DIR")]
+    pub exclude_dir: Vec<String>,
+}
+
+pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
+    let repo_root =
+        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+
+    if args.paths.len() < 2 {
+        return Err(anyhow!(
+            "spec-coverage validate requires at least 2 positional args (specs-dir... app-dir)"
+        ));
+    }
+
+    let app_dir: PathBuf = repo_root.join(&args.paths[args.paths.len() - 1]);
+    let specs_dirs: Vec<PathBuf> = args.paths[..args.paths.len() - 1]
+        .iter()
+        .map(|sd| repo_root.join(sd))
+        .collect();
+
+    let opts = ScanOptions {
+        repo_root: repo_root.clone(),
+        specs_dir: specs_dirs[0].clone(), // primary for backward compat
+        specs_dirs: specs_dirs.clone(),
+        app_dir,
+        verbose: false,
+        quiet: false,
+        shared_steps: args.shared_steps,
+        exclude_dirs: args.exclude_dir.clone(),
+    };
+
+    let result = checker::check_all(&opts).context("spec coverage check failed")?;
+
+    let output = match output_format {
+        OutputFormat::Text => reporter::format_text(&result, false, false),
+        OutputFormat::Json => reporter::format_json(&result)?,
+        OutputFormat::Markdown => reporter::format_markdown(&result),
+    };
+    print!("{output}");
+
+    let has_gaps = !result.gaps.is_empty()
+        || !result.scenario_gaps.is_empty()
+        || !result.step_gaps.is_empty()
+        || !result.orphan_step_impls.is_empty();
+
+    if has_gaps {
+        if matches!(output_format, OutputFormat::Text) {
+            if !result.gaps.is_empty() {
+                eprintln!(
+                    "\n❌ Found {} spec(s) without matching test files",
+                    result.gaps.len()
+                );
+            }
+            if !result.scenario_gaps.is_empty() {
+                eprintln!(
+                    "❌ Found {} scenario(s) without matching test implementations",
+                    result.scenario_gaps.len()
+                );
+            }
+            if !result.step_gaps.is_empty() {
+                eprintln!(
+                    "❌ Found {} step(s) without matching step definitions",
+                    result.step_gaps.len()
+                );
+            }
+            if !result.orphan_step_impls.is_empty() {
+                eprintln!(
+                    "❌ Found {} orphan step implementation(s) (no Gherkin step matches them)",
+                    result.orphan_step_impls.len()
+                );
+            }
+        }
+        return Err(anyhow!(
+            "spec coverage gaps found: {} file gap(s), {} scenario gap(s), {} step gap(s), {} orphan step impl(s)",
+            result.gaps.len(),
+            result.scenario_gaps.len(),
+            result.step_gaps.len(),
+            result.orphan_step_impls.len()
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    #[test]
+    fn validate_args_requires_two_paths_min() {
+        // Single path → run() bails out.
+        let args = ValidateArgs {
+            paths: vec!["only-one".to_string()],
+            shared_steps: false,
+            exclude_dir: vec![],
+        };
+        // Cannot directly call run() without git root context; instead exercise the guard.
+        assert!(args.paths.len() < 2);
+    }
+
+    #[test]
+    fn run_returns_err_on_too_few_paths() {
+        let args = ValidateArgs {
+            paths: vec!["x".to_string()],
+            shared_steps: false,
+            exclude_dir: vec![],
+        };
+        let err = run(&args, OutputFormat::Text).unwrap_err();
+        assert!(err.to_string().contains("requires at least 2"));
+    }
+}

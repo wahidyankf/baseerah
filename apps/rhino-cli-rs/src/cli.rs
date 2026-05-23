@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::commands::test_coverage_validate;
+use crate::commands::{spec_coverage_validate, test_coverage_validate};
 use crate::internal::cliout::OutputFormat;
 
 #[derive(Parser, Debug)]
@@ -55,12 +55,21 @@ pub enum Commands {
     /// Test coverage commands (validate, diff, merge).
     #[command(name = "test-coverage", subcommand)]
     TestCoverage(TestCoverageCommands),
+    /// BDD spec coverage commands.
+    #[command(name = "spec-coverage", subcommand)]
+    SpecCoverage(SpecCoverageCommands),
 }
 
 #[derive(Subcommand, Debug)]
 pub enum TestCoverageCommands {
     /// Check test coverage against a threshold (standard line-based algorithm).
     Validate(test_coverage_validate::ValidateArgs),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum SpecCoverageCommands {
+    /// Validate that all BDD spec files have matching test implementations.
+    Validate(spec_coverage_validate::ValidateArgs),
 }
 
 pub fn run() -> i32 {
@@ -101,6 +110,11 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
         Commands::TestCoverage(tc) => match tc {
             TestCoverageCommands::Validate(args) => {
                 test_coverage_validate::run(args, output_format)
+            }
+        },
+        Commands::SpecCoverage(sc) => match sc {
+            SpecCoverageCommands::Validate(args) => {
+                spec_coverage_validate::run(args, output_format)
             }
         },
     };
