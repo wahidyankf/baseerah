@@ -107,18 +107,14 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
-    use tempfile::TempDir;
 
     #[test]
     fn validate_args_requires_two_paths_min() {
-        // Single path → run() bails out.
         let args = ValidateArgs {
             paths: vec!["only-one".to_string()],
             shared_steps: false,
             exclude_dir: vec![],
         };
-        // Cannot directly call run() without git root context; instead exercise the guard.
         assert!(args.paths.len() < 2);
     }
 
@@ -131,5 +127,47 @@ mod tests {
         };
         let err = run(&args, OutputFormat::Text).unwrap_err();
         assert!(err.to_string().contains("requires at least 2"));
+    }
+
+    #[test]
+    fn run_returns_err_with_gaps_when_specs_missing_test_files() {
+        let args = ValidateArgs {
+            paths: vec![
+                "specs/apps/rhino/behavior/cli/gherkin".to_string(),
+                "apps/rhino-cli-rs/scripts".to_string(), // wrong dir → 0 step matchers → step gaps
+            ],
+            shared_steps: true,
+            exclude_dir: vec![],
+        };
+        let err = run(&args, OutputFormat::Text).unwrap_err();
+        assert!(err.to_string().contains("spec coverage gaps found"));
+    }
+
+    #[test]
+    fn run_returns_err_with_json_output_format() {
+        let args = ValidateArgs {
+            paths: vec![
+                "specs/apps/rhino/behavior/cli/gherkin".to_string(),
+                "apps/rhino-cli-rs/scripts".to_string(),
+            ],
+            shared_steps: true,
+            exclude_dir: vec![],
+        };
+        let err = run(&args, OutputFormat::Json).unwrap_err();
+        assert!(err.to_string().contains("spec coverage gaps found"));
+    }
+
+    #[test]
+    fn run_returns_ok_on_real_rhino_cli_gherkin() {
+        // Runs against the actual repo state — both rhino-cli specs and impls present.
+        let args = ValidateArgs {
+            paths: vec![
+                "specs/apps/rhino/behavior/cli/gherkin".to_string(),
+                "apps/rhino-cli".to_string(),
+            ],
+            shared_steps: true,
+            exclude_dir: vec![],
+        };
+        assert!(run(&args, OutputFormat::Text).is_ok());
     }
 }
