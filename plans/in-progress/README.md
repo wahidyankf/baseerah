@@ -4,7 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [organiclever-web-responsive-breakpoints](./organiclever-web-responsive-breakpoints/README.md) — Distinct mobile/tablet/desktop layouts for organiclever-web
+- [architecture-procedural-track](./architecture-procedural-track/README.md) — Third paradigm track (Go/Rust/C) on ayokoding-web
+- [specs-tree-uniform](./specs-tree-uniform/README.md) — Bring every `specs/` area onto the canonical C4-aware five-folder tree
 
 ## Instructions
 
