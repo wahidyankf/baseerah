@@ -75,7 +75,7 @@ OSE Platform Rust applications MUST use the following stack:
 - **cargo-llvm-cov** (RECOMMENDED) - LLVM-based coverage measurement
 - **cargo-tarpaulin** - Alternative coverage tool
 
-**Go Version Strategy**:
+**Rust Version Strategy**:
 
 - **Edition**: Rust 2024 (stabilized in 1.85.0, 2025-02-20; current `ose-public` crates use `edition = "2024"`)
 - **MSRV**: declared in [`apps/rhino-cli/Cargo.toml`](../../../../../apps/rhino-cli/Cargo.toml) (`rust-version` field); toolchain pin in `rust-toolchain.toml`
@@ -113,30 +113,23 @@ Rust development in OSE Platform enforces foundational software engineering prin
 
 ## Rust Edition Strategy
 
-OSE Platform follows a three-tier Rust edition strategy:
+OSE Platform **requires Rust 2024 edition** for all crates:
 
-**Rust 2018 Edition (Minimum - REQUIRED)**:
+**Rust 2024 Edition (Current — REQUIRED)**:
 
-- All projects MUST support Rust 2018 edition as minimum
-- `extern crate` no longer required
-- `use` paths simplified
-- NLL (Non-Lexical Lifetimes) stabilized
-
-**Rust 2021 Edition (Recommended - SHOULD use)**:
-
-- Projects SHOULD use Rust 2021 for all new work
-- `use` in closures captures only needed fields (closure capture improvements)
-- `IntoIterator` for arrays stabilized
-- `panic!` macro takes format strings uniformly
-- Or-patterns in `match` (`A | B` in patterns)
-- `Cargo.toml` `resolver = "2"` default (better feature unification)
-
-**Rust 2024 Edition (Upcoming - SHOULD adopt)**:
-
-- Projects SHOULD adopt Rust 2024 when stabilized
+- All OSE Platform crates MUST declare `edition = "2024"` in `Cargo.toml`
+- Stabilized in Rust 1.85.0 (2025-02-20); all `ose-public` crates already use this edition
 - `gen` blocks for generator syntax
 - Stricter lifetime inference in `impl Trait`
 - `unsafe` in `extern` blocks required explicitly
+- Migrate existing crates: `cargo fix --edition`
+
+**Rust 2021 Edition (Previous standard — do not use for new crates)**:
+
+- Prior OSE Platform standard; superseded by 2024
+- `use` in closures captures only needed fields (closure capture improvements)
+- `IntoIterator` for arrays stabilized
+- `Cargo.toml` `resolver = "2"` default (better feature unification)
 
 **Unlike Java's LTS model**: Rust editions are backward compatible — Rust 2015 code compiles with Rust 2024 toolchains. Editions change language idioms, not remove features. Migrate editions using `cargo fix --edition`.
 
