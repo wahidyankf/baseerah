@@ -65,8 +65,7 @@ specs/
 │   │       ├── web/gherkin/
 │   │       │   └── <domain>/<feature>.feature          # existing
 │   │       ├── cli/gherkin/
-│   │       │   ├── system/{check-all,version}.feature  # NEW (Phase 6.a)
-│   │       │   └── links/links-check.feature           # NEW (Phase 6.a)
+│   │       │   └── links/links-check.feature           # NEW (Phase 6.a — only 1 feature exists)
 │   │       └── build-tools/gherkin/                    # NEW (Phase 4.A, if D1==A)
 │   │           └── index-generation/<feature>.feature
 │   ├── crane/                                          # FULLY MIGRATED (Phase 2)
@@ -80,7 +79,8 @@ specs/
 │   │       ├── pdf/pdf-commands.feature
 │   │       ├── content/{text-check,heading-check,nesting-check}.feature
 │   │       ├── media/{table-check,figure-check,mermaid-validate,ocr-quality}.feature
-│   │       └── reporting/{report-management,skiplist-management}.feature
+│   │       ├── reporting/{report-management,skiplist-management}.feature
+│   │       └── system/{check-all,version}.feature          # NEW (Phase 2)
 │   ├── organiclever/                                   # ALREADY COMPLIANT
 │   │   ├── README.md
 │   │   ├── product/                                    # existing
@@ -219,12 +219,12 @@ prefixes so execution has a starting point.
 
 **Default groupings (apply unless maintainer overrides at execution time):**
 
-| App                                             | Source files                                                                                                                                                                                                                                                                                                                                     | Proposed domain subdirs                                                                                                                                                                                                       |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `specs/apps/crane/behavior/cli/gherkin/`        | `pdf-commands`, `text-check`, `heading-check`, `nesting-check`, `table-check`, `figure-check`, `mermaid-validate`, `ocr-quality`, `report-management`, `skiplist-management` (10 features, after migration from flat `gherkin/`)                                                                                                                 | `pdf/`, `content/` (text + heading + nesting), `media/` (table + figure + mermaid + ocr), `reporting/` (report + skiplist) — collapses 10 files into 4 domains                                                                |
-| `specs/apps/rhino/behavior/cli/gherkin/`        | 44 features prefixed by domain: `agents-*` (4), `ddd-*` (2), `docs-*` (5), `env-*` (3), `git-*` (1), `repo-governance-*` (9), `spec-coverage-*` (1), `test-coverage-*` (3), `workflows-*` (1), plus `check-all`, `doctor`, `links-check`, `version`, `pdf-commands` and other singletons. (Re-verify count at execution start — `ls` may drift.) | `agents/`, `ddd/`, `docs/`, `env/`, `git/`, `repo-governance/`, `spec-coverage/`, `test-coverage/`, `workflows/`, plus `system/` for `doctor`, `version`, `check-all`. One-feature singletons fold into their natural domain. |
-| `specs/apps/ayokoding/behavior/cli/gherkin/`    | `check-all`, `links-check`, `version`                                                                                                                                                                                                                                                                                                            | `system/` (check-all, version), `links/` (links-check)                                                                                                                                                                        |
-| `specs/apps/ose-platform/behavior/cli/gherkin/` | `links-check`                                                                                                                                                                                                                                                                                                                                    | `links/` (single feature; one-feature domain is allowed per convention)                                                                                                                                                       |
+| App                                             | Source files                                                                                                                                                                                                                                                                                                                                                                                                                                              | Proposed domain subdirs                                                                                                                                                                                                                            |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `specs/apps/crane/behavior/cli/gherkin/`        | `pdf-commands`, `text-check`, `heading-check`, `nesting-check`, `table-check`, `figure-check`, `mermaid-validate`, `ocr-quality`, `report-management`, `skiplist-management`, `check-all`, `version` (12 features, after migration from flat `gherkin/` — verified 2026-05-23)                                                                                                                                                                            | `pdf/`, `content/` (text + heading + nesting), `media/` (table + figure + mermaid + ocr), `reporting/` (report + skiplist), `system/` (check-all + version) — collapses 12 files into 5 domains                                                    |
+| `specs/apps/rhino/behavior/cli/gherkin/`        | 34 features total: 30 domain-prefixed files at root + 4 already in `specs/` subdomain (`validate-adoption`, `validate-counts`, `validate-links`, `validate-tree`). Domain prefixes: `agents-*` (4), `ddd-*` (2), `docs-*` (5), `env-*` (3), `git-*` (1), `repo-governance-*` (9), `spec-coverage-*` (1), `test-coverage-*` (3), `workflows-*` (1), plus `doctor` as the only standalone singleton. (Re-verify count at execution start — `ls` may drift.) | `agents/`, `ddd/`, `docs/`, `env/`, `git/`, `repo-governance/`, `spec-coverage/`, `test-coverage/`, `workflows/`, `specs/` (already grouped — leave in place), plus `system/` for `doctor`. One-feature singletons fold into their natural domain. |
+| `specs/apps/ayokoding/behavior/cli/gherkin/`    | `links-check` (1 feature; `check-all` and `version` do NOT exist on disk — verified 2026-05-23)                                                                                                                                                                                                                                                                                                                                                           | `links/` (links-check)                                                                                                                                                                                                                             |
+| `specs/apps/ose-platform/behavior/cli/gherkin/` | `links-check`                                                                                                                                                                                                                                                                                                                                                                                                                                             | `links/` (single feature; one-feature domain is allowed per convention)                                                                                                                                                                            |
 
 **Severity escape hatch**: For one-feature domains (e.g., `ose-platform/links/`), the convention
 update must explicitly permit single-file domain folders so `validate-tree` does not flag them.
@@ -245,7 +245,7 @@ subdir per [§D5](#d5--domain-groupings-for-cli-gherkin-trees).
 cd worktrees/specs-tree-uniform
 
 # Step 1 — create destination tree with domain subdirs
-mkdir -p specs/apps/crane/behavior/cli/gherkin/{pdf,content,media,reporting}
+mkdir -p specs/apps/crane/behavior/cli/gherkin/{pdf,content,media,reporting,system}
 mkdir -p specs/apps/crane/product
 mkdir -p specs/apps/crane/system-context
 mkdir -p specs/apps/crane/containers
@@ -266,6 +266,9 @@ git mv specs/apps/crane/gherkin/ocr-quality.feature        specs/apps/crane/beha
 # reporting/ (report + skiplist)
 git mv specs/apps/crane/gherkin/report-management.feature  specs/apps/crane/behavior/cli/gherkin/reporting/report-management.feature
 git mv specs/apps/crane/gherkin/skiplist-management.feature specs/apps/crane/behavior/cli/gherkin/reporting/skiplist-management.feature
+# system/ (check-all + version — verified present 2026-05-23)
+git mv specs/apps/crane/gherkin/check-all.feature          specs/apps/crane/behavior/cli/gherkin/system/check-all.feature
+git mv specs/apps/crane/gherkin/version.feature            specs/apps/crane/behavior/cli/gherkin/system/version.feature
 # README
 git mv specs/apps/crane/gherkin/README.md                  specs/apps/crane/behavior/cli/gherkin/README.md
 
@@ -281,7 +284,7 @@ find . -name '*.bak' -delete
 
 # Step 4 — author skeleton READMEs (see R3 template) for product/, system-context/,
 # containers/, components/cli/. Also a one-paragraph index README in each new domain
-# subdir (pdf/, content/, media/, reporting/) listing its features.
+# subdir (pdf/, content/, media/, reporting/, system/) listing its features.
 
 # Step 5 — update specs/apps/crane/README.md "Structure" block to show domain subdirs
 
@@ -305,7 +308,7 @@ before execution. If new features have appeared, assign each to a D5 domain at m
 ### R2 — Rhino: add missing top-level folders AND regroup `.feature` files into domain subdirs
 
 Two changes in one atomic commit: (a) create the four missing CLI-only top-level folders,
-(b) regroup the 44 existing `.feature` files under `behavior/cli/gherkin/<domain>/` per
+(b) regroup the 34 existing `.feature` files under `behavior/cli/gherkin/<domain>/` per
 the D5 grouping table.
 
 ```bash
@@ -349,11 +352,14 @@ for f in specs/apps/rhino/behavior/cli/gherkin/workflows-*.feature; do
   git mv "$f" specs/apps/rhino/behavior/cli/gherkin/workflows/"$(basename "$f")"
 done
 # system/ catches the singletons that have no domain prefix.
+# Verified 2026-05-23: only doctor.feature exists as a standalone singleton at root.
+# version.feature and check-all.feature are NOT present in rhino gherkin root.
 git mv specs/apps/rhino/behavior/cli/gherkin/doctor.feature       specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature
-git mv specs/apps/rhino/behavior/cli/gherkin/version.feature      specs/apps/rhino/behavior/cli/gherkin/system/version.feature
-git mv specs/apps/rhino/behavior/cli/gherkin/check-all.feature    specs/apps/rhino/behavior/cli/gherkin/system/check-all.feature
 # Re-verify nothing left at the root via `find specs/apps/rhino/behavior/cli/gherkin -maxdepth 1 -name '*.feature'`
 # — output must be empty before commit.
+# NOTE: 4 features already live under a specs/ subdomain (validate-adoption, validate-counts,
+# validate-links, validate-tree) and must also be handled: they are already domain-grouped
+# under behavior/cli/gherkin/specs/ and do NOT need to be moved.
 
 # Step 4 — sweep path references for rhino integration tests + Nx inputs
 grep -rln 'specs/apps/rhino/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance \
@@ -432,24 +438,40 @@ In-place rewrite of `specs/README.md` Sections "Standard Folder Pattern", "App S
 
 ### R6 — Allowlist update
 
+The allowlist is implemented as a function, not a constant. The actual API (confirmed via
+`apps/rhino-cli/src/internal/allowlist.rs`):
+
+```rust
+pub fn apps_with_ddd() -> &'static [&'static str] {
+    &["organiclever", "wahidyankf", "ose-platform", "ayokoding"]
+}
+```
+
+To add `ose-app`, extend the array literal inside the function body:
+
 ```rust
 // apps/rhino-cli/src/internal/allowlist.rs
 // Apps with a populated DDD bounded-context registry.
 // Inclusion criterion: specs/apps/<app>/ddd/bounded-contexts.yaml exists AND has ≥1
 // BC entry whose `code:` path resolves to actual layered source.
 // ose-app: included as of <commit-sha> — BC content authoring tracked separately.
-pub const APPS_WITH_DDD: &[&str] = &[
-    "organiclever",
-    "wahidyankf",
-    "ose-platform",
-    "ayokoding",
-    "ose-app",  // added by specs-tree-uniform plan
-];
+pub fn apps_with_ddd() -> &'static [&'static str] {
+    &[
+        "organiclever",
+        "wahidyankf",
+        "ose-platform",
+        "ayokoding",
+        "ose-app",  // added by specs-tree-uniform plan
+    ]
+}
 ```
 
-[Repo-grounded — `apps/rhino-cli/src/internal/allowlist.rs` path verified via `find`. Constant
-name and exact syntax MUST be confirmed by reading the file at execution start; the snippet
-above is illustrative.]
+**Important**: The `#[cfg(test)]` block in the same file contains a `membership` test that
+asserts `v.len() == 4`. After adding `"ose-app"`, update that assertion to `v.len() == 5`
+and add `assert!(v.contains(&"ose-app"));`.
+
+[Repo-grounded — `apps/rhino-cli/src/internal/allowlist.rs` confirmed: function `apps_with_ddd()`
+returning `&'static [&'static str]`; existing test at line 13 asserts `.len() == 4`.]
 
 ### R7 — Domain regrouping for ayokoding-cli, ose-platform-cli, and validator enforcement
 
@@ -457,10 +479,10 @@ Two short atomic commits — one per app — plus a third commit that hardens th
 the convention so future flat CLI gherkin layouts are rejected at the gate.
 
 ```bash
-# Commit 7.a — ayokoding-cli domain regrouping (3 features)
-mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/{system,links}
-git mv specs/apps/ayokoding/behavior/cli/gherkin/check-all.feature   specs/apps/ayokoding/behavior/cli/gherkin/system/check-all.feature
-git mv specs/apps/ayokoding/behavior/cli/gherkin/version.feature     specs/apps/ayokoding/behavior/cli/gherkin/system/version.feature
+# Commit 7.a — ayokoding-cli domain regrouping (1 feature)
+# Verified 2026-05-23: only links-check.feature exists. check-all.feature and
+# version.feature are NOT present — do not attempt git mv for those.
+mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/links
 git mv specs/apps/ayokoding/behavior/cli/gherkin/links-check.feature specs/apps/ayokoding/behavior/cli/gherkin/links/links-check.feature
 # Sweep refs in step files + Nx inputs
 grep -rln 'ayokoding/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance > /tmp/ayko-cli-refs.txt
@@ -483,9 +505,12 @@ git add -A
 git commit -m "refactor(specs/ose-platform): regroup cli features into domain subdirs"
 
 # Commit 7.c — validator enforcement (Rust) + convention update
-# Edit apps/rhino-cli/src/specs/validate_tree.rs (or equivalent file located via
-# `grep -rln 'flat CLI\|cli.*flat\|gherkin.*domain' apps/rhino-cli/src/`) so that a
-# .feature directly under behavior/<surface>/gherkin/ now emits HIGH.
+# ADD a new check (no carve-out exists to remove — this is a net-new rule).
+# Locate the validate_spec_tree function in apps/rhino-cli/src/internal/specs.rs and
+# apps/rhino-cli/src/commands/specs_validate_tree.rs. Neither file currently checks for
+# flat .feature files under behavior/<surface>/gherkin/. The task is to write this check
+# from scratch as a new helper that walks behavior/<surface>/gherkin/ and emits HIGH for
+# any .feature found at depth 0 (directly under gherkin/, not inside a domain subdir).
 # Add a unit test covering the new rule.
 cargo check --manifest-path apps/rhino-cli/Cargo.toml
 nx run rhino-cli:test:quick

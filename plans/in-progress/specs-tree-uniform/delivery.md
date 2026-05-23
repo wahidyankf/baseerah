@@ -90,7 +90,7 @@ match canonical five-folder tree"`.
 ## Phase 2 — Crane migration with domain subdirs (atomic commit per R1)
 
 - [ ] Create destination tree with domain subdirs:
-      `mkdir -p specs/apps/crane/{product,system-context,containers,components/cli,behavior/cli/gherkin/{pdf,content,media,reporting}}`.
+      `mkdir -p specs/apps/crane/{product,system-context,containers,components/cli,behavior/cli/gherkin/{pdf,content,media,reporting,system}}`.
 - [ ] Author skeleton READMEs per [tech-docs.md §R3](./tech-docs.md#r3--skeleton-readme-template)
       at:
       `specs/apps/crane/product/README.md`,
@@ -98,8 +98,8 @@ match canonical five-folder tree"`.
       `specs/apps/crane/containers/README.md`,
       `specs/apps/crane/components/cli/README.md`,
       plus a one-paragraph index `README.md` in each new domain subdir
-      (`behavior/cli/gherkin/{pdf,content,media,reporting}/README.md`) listing the features it
-      contains.
+      (`behavior/cli/gherkin/{pdf,content,media,reporting,system}/README.md`) listing the
+      features it contains.
       Each top-level skeleton: ~5 lines per template. Verify relative-link depth via
       `validate:specs-links`.
   - _Suggested executor: `specs-maker`_
@@ -116,7 +116,7 @@ match canonical five-folder tree"`.
       new `<domain>/` path. Acceptance: `grep -rln 'specs/apps/crane/gherkin[^/c]' . | wc -l`
       returns 0 AND no per-file reference cites the old flat path.
 - [ ] Edit `specs/apps/crane/README.md`: rewrite the "Structure" block to show the canonical
-      CLI-only five-folder tree with `behavior/cli/gherkin/{pdf,content,media,reporting}/`
+      CLI-only five-folder tree with `behavior/cli/gherkin/{pdf,content,media,reporting,system}/`
       subdirs. Update the "Running the Tests" code block step paths.
   - _Suggested executor: `specs-maker`_
 - [ ] Verify locally inside the worktree:
@@ -175,13 +175,14 @@ match canonical five-folder tree"`.
       Likely owner: `apps/rhino-cli/src/internal/specs.rs` (helpers) or
       `apps/rhino-cli/src/commands/specs_validate_tree.rs` (validator entry). [Repo-grounded —
       both files confirmed via `find` at plan-authoring time]
-- [ ] Edit the surface enum/allowlist to add `"build-tools"` as a valid surface in whichever of
-      the two files above owns the rule. Acceptance: `cargo check --manifest-path
-apps/rhino-cli/Cargo.toml` exits 0.
+- [ ] Write a FAILING `#[cfg(test)]` unit test in the file that owns the surface enum/allowlist:
+      scenario "build-tools surface accepted by validate-tree" — assert that `"build-tools"` is
+      a valid surface. Run `nx run rhino-cli:test:quick` — new test MUST FAIL (RED state
+      confirms `"build-tools"` is not yet accepted).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Add a `#[cfg(test)]` unit test in the same Rust file: scenario "build-tools surface
-      accepted by validate-tree". Run `nx run rhino-cli:test:quick` — new test passes; coverage
-      remains ≥90%.
+- [ ] Edit the surface enum/allowlist to add `"build-tools"` as a valid surface. Run
+      `nx run rhino-cli:test:quick` — the previously failing test now PASSES (GREEN);
+      `cargo check --manifest-path apps/rhino-cli/Cargo.toml` exits 0; coverage remains ≥90%.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] Execute the migration block (`mkdir -p`, `git mv`, `rmdir`) verbatim from
       [tech-docs.md §R4](./tech-docs.md#r4--ayokoding-build-tools-migration-assuming-d1a).
@@ -266,11 +267,14 @@ last two CLI trees and hardening rhino-cli so the rule is enforced going forward
 ### Phase 6.a — ayokoding-cli domain regrouping (R7.a)
 
 - [ ] Create domain subdirs:
-      `mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/{system,links}` (adjust per Phase 0
-      D5 override if any).
+      `mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/links` (only `links/` needed — see D5
+      table; `system/` is not required because `check-all.feature` and `version.feature` do NOT
+      exist in `specs/apps/ayokoding/behavior/cli/gherkin/` — verified 2026-05-23).
 - [ ] Execute `git mv` per [tech-docs.md §R7](./tech-docs.md#r7--domain-regrouping-for-ayokoding-cli-ose-platform-cli-and-validator-enforcement):
-      `check-all.feature` and `version.feature` into `system/`, `links-check.feature` into
-      `links/`.
+      `links-check.feature` into `links/`. Only this one file exists at the gherkin root.
+      Verify before running: `ls specs/apps/ayokoding/behavior/cli/gherkin/*.feature` — must
+      list only `links-check.feature`; if other files have been added since 2026-05-23, assign
+      them to appropriate domains at execution time.
 - [ ] Author one-paragraph index `README.md` in each new domain subdir.
   - _Suggested executor: `specs-maker`_
 - [ ] Path-reference sweep: `grep -rln 'specs/apps/ayokoding/behavior/cli/gherkin/' apps libs
@@ -308,22 +312,32 @@ cli features into domain subdirs"`.
 This is the apps/rhino-cli code change that locks in the new "no flat CLI" rule plus the
 governance line that authorizes it.
 
-- [ ] Read the current rule sites in rhino-cli: - `apps/rhino-cli/src/commands/specs_validate_tree.rs` — top-level shape validator - `apps/rhino-cli/src/internal/specs.rs` — shared helpers (`required_spec_folders`,
-      `walk_feature_files`, etc.)
-      Identify where the current CLI-flat carve-out lives (likely a conditional skipping the
-      "no .feature directly under gherkin/" check when surface == "cli").
-- [ ] Edit the validator so that for ANY surface (be, web, cli, build-tools), a `.feature`
-      file directly under `behavior/<surface>/gherkin/` (zero domain levels) emits a HIGH
-      finding with category `Spec Tree Shape Compliance` and message
-      `"flat feature file at <path>; expected behavior/<surface>/gherkin/<domain>/<feature>.feature"`.
+- [ ] Read the current rule sites in rhino-cli to understand the existing shape:
+      `apps/rhino-cli/src/commands/specs_validate_tree.rs` — top-level shape validator;
+      `apps/rhino-cli/src/internal/specs.rs` — shared helpers (`required_spec_folders`,
+      `walk_feature_files`, etc.).
+      Confirmed: neither file currently contains a flat-feature check OR a CLI-surface carve-out.
+      The task is to ADD a new rule from scratch — there is no existing carve-out to remove.
+      [Repo-grounded — verified at plan-authoring time 2026-05-23]
+- [ ] Write a FAILING `#[cfg(test)]` unit test in `apps/rhino-cli/src/internal/specs.rs` (or a
+      new test module in `specs_validate_tree.rs`): create a synthetic tree where
+      `behavior/cli/gherkin/flat-file.feature` exists (depth 0, no domain subdir) and assert
+      that the validator emits at least one HIGH finding with category
+      `Spec Tree Shape Compliance`. Run `nx run rhino-cli:test:quick` — new test MUST FAIL
+      (RED state confirms the rule does not yet exist).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Add a `#[cfg(test)]` unit test in the same file proving the rule fires for a synthetic
-      flat CLI tree and stays silent for a domain-grouped tree. Coverage gate (≥90%) must
-      still pass via `nx run rhino-cli:test:quick`.
+- [ ] Add the new flat-feature check to the validator: for ANY surface (be, web, cli,
+      build-tools), a `.feature` file directly under `behavior/<surface>/gherkin/` (zero domain
+      levels) emits a HIGH finding with category `Spec Tree Shape Compliance` and message
+      `"flat feature file at <path>; expected behavior/<surface>/gherkin/<domain>/<feature>.feature"`.
+      Run `nx run rhino-cli:test:quick` — the previously failing test now PASSES (GREEN).
+      Coverage gate (≥90%) must still pass.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] Update `apps/rhino-cli/src/commands/specs_validate_counts.rs` if it carries a separate
-      assumption that CLI gherkin can be flat — change to expect each `<domain>/` subdir to
-      contain ≥1 `.feature`. Add unit test mirroring the change.
+      assumption that CLI gherkin can be flat — verify first:
+      `grep -n 'flat\|domain\|directly' apps/rhino-cli/src/commands/specs_validate_counts.rs`
+      — if output is empty, this step is N/A; otherwise, change to expect each `<domain>/`
+      subdir to contain ≥1 `.feature` and add a unit test mirroring the change.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] Edit
       [`repo-governance/conventions/structure/specs-directory-structure.md`](../../../repo-governance/conventions/structure/specs-directory-structure.md):
@@ -511,12 +525,18 @@ nx run rhino-cli:validate:specs-links && nx run rhino-cli:validate:specs-adoptio
 - [ ] Push the worktree branch (or its commits merged back to main per
       [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md)):
       `git push origin main`.
-- [ ] Monitor GitHub Actions workflows triggered by the push.
-- [ ] Verify all CI checks pass.
+- [ ] Identify the triggered workflow run IDs immediately after push:
+      `gh run list --branch main --limit 5` — note the run IDs for `pr-quality-gate.yml` and
+      `_reusable-test-and-deploy.yml`.
+- [ ] Poll every 3 minutes per
+      [ci-monitoring.md](../../../repo-governance/development/workflow/ci-monitoring.md):
+      `gh run view <run-id> --json status,conclusion` for each run ID. Do NOT use
+      `gh run watch`. If rate-limited (HTTP 403), wait ~35 minutes before retrying.
+- [ ] Verify all CI checks pass — both `pr-quality-gate.yml` and `_reusable-test-and-deploy.yml`
+      must show `conclusion: success`.
 - [ ] If any CI check fails, fix immediately and push a follow-up commit; do NOT proceed to
       Plan Archival until CI is green.
-- [ ] Verify the four `validate:specs-*` jobs in `pr-quality-gate.yml` and
-      `_reusable-test-and-deploy.yml` are green for this push.
+- [ ] Verify the four `validate:specs-*` jobs within those workflows are green for this push.
 
 ## Plan Archival
 
