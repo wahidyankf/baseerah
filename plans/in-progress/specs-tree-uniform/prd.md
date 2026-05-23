@@ -83,7 +83,17 @@ This applies to crane (11 features), rhino (44 features), ayokoding-cli (3 featu
 ose-platform-cli (1 feature). The convention itself must be updated to drop the CLI-flat
 exception; this is the governance-side change propagated by `repo-rules-maker`.
 
-### US-9 — Governance and agents propagated by `repo-rules-maker`
+### US-9 — Every related .md file updated for uniform structure
+
+**As** a contributor adding a brand-new app to the monorepo,
+**I want** every governance doc, convention, agent definition, skill file, per-app README,
+new-app how-to, and CI/Nx reference doc that mentions the spec tree to reflect the
+post-migration domain-subdir layout,
+**so that** the uniform structure propagates automatically into the next app I author — no
+re-discovery, no consulting a historical migration plan, no second-class CLI layout. This is
+the "make the new project inherit the rule" condition that closes the loop on this plan.
+
+### US-10 — Governance and agents propagated by `repo-rules-maker`
 
 **As** an AI agent (or human contributor) reading `repo-governance/`, agent definitions, or
 `AGENTS.md` after this plan completes,
@@ -265,7 +275,50 @@ Feature: CLI gherkin trees use domain subdirectories
         any `behavior/<surface>/gherkin/`
 ```
 
-### AC-9 — Governance propagated to match migrated state
+### AC-9 — Repo-wide .md files reference uniform structure only
+
+```gherkin
+Feature: Every .md file in the repo reflects the post-migration spec structure
+
+  Scenario: Discovery grep returns zero unintentional hits
+    Given Phase 7 propagation has completed
+    When I run from repo root:
+      """
+      grep -rln --include='*.md' \
+        -e 'cli/gherkin/' \
+        -e 'flat structure' \
+        -e 'flat-root' \
+        -e 'specs/apps/crane/gherkin' \
+        -e 'specs/apps/ayokoding/build-tools' \
+        -e 'no domain dirs' \
+        . | grep -v node_modules | grep -v '/.next/' | grep -v generated-reports
+      """
+    Then every remaining hit is in one of the documented exclusion zones
+        (plans/done/, apps/ayokoding-web/content/ educational tutorials,
+         repo-governance/conventions/hugo/ stale Hugo content)
+    And no hit is a live canonical reference an onboarding doc, agent, or skill would consume
+
+  Scenario: New-app onboarding doc teaches uniform structure
+    Given Phase 7 propagation has completed
+    When I read docs/how-to/add-new-app.md
+    Then the document shows the canonical five-folder tree with
+        `behavior/<surface>/gherkin/<domain>/<feature>.feature`
+    And it does NOT show a flat CLI gherkin example as canonical
+
+  Scenario: Per-app READMEs show post-migration paths
+    Given Phase 7 propagation has completed
+    When I read each of apps/{crane-cli,rhino-cli,ayokoding-cli,ose-cli}/README.md
+    Then every `specs/apps/...` path reference resolves to a real file on disk
+    And no path cites the pre-migration flat layout
+
+  Scenario: Agent / skill files cite uniform layout
+    Given Phase 7 propagation has completed
+    When I read each of .claude/agents/{specs-checker,specs-maker,specs-fixer}.md and
+        .claude/skills/repo-syncing-with-ose-primer/SKILL.md
+    Then no example path or validation rule references the retired CLI-flat layout
+```
+
+### AC-10 — Governance propagated to match migrated state
 
 ```gherkin
 Feature: repo-rules-maker propagates the new uniform state into governance
@@ -315,6 +368,11 @@ Feature: repo-rules-maker propagates the new uniform state into governance
   `behavior/<surface>/gherkin/` now emits HIGH
 - Per-app README updates for crane, rhino, ayokoding, ose-platform to reflect post-migration state
 - README link integrity sweep across all migrated paths
+- Repo-wide .md sweep — every governance doc, convention file, agent/skill definition,
+  per-app README, BDD/testing reference, new-app how-to, monorepo-structure reference, and
+  related markdown file updated to reflect the uniform structure. Discovered list in
+  [tech-docs.md File Impact](./tech-docs.md#file-impact) + the repo-wide grep block in
+  [delivery.md Phase 7 propagation brief](./delivery.md#propagation-brief)
 
 ### Out of Scope (Product Scope)
 

@@ -52,7 +52,8 @@ that documents a pattern the repository abandoned.
 3. **Validator gates** — every migration commit re-runs `nx run rhino-cli:validate:specs-{adoption,tree,counts,links}` with `--apps` scoped to the changed app. Plan exits when all four exit 0 across the full repo.
 4. **Allowlist sweep** — once `ose-app` is convention-compliant, evaluate adding it to `AppsWithDDD` (or document its exclusion).
 5. **Domain-subdir sweep across CLI gherkin** — group every flat `.feature` file under `behavior/cli/gherkin/<domain>/` matching organiclever's existing BE/web pattern. Retire the CLI-flat carve-out in the convention.
-6. **Governance propagation** — delegate to `repo-rules-maker` to fold the new uniform state (including the CLI-flat-exception retirement) into `repo-governance/`, agent definitions, and `AGENTS.md`; then `repo-rules-checker` validates the propagation; then `npm run sync:claude-to-opencode` mirrors agent changes to `.opencode/`.
+6. **Repo-wide .md sweep** — every governance doc, convention, agent/skill, per-app README, new-app how-to, and BDD/testing reference markdown is updated to teach the uniform layout, so future apps inherit it automatically.
+7. **Governance propagation** — delegate to `repo-rules-maker` to fold the new uniform state (including the CLI-flat-exception retirement and the repo-wide .md sweep) into `repo-governance/`, agent definitions, `AGENTS.md`, `docs/`, and per-app READMEs; then `repo-rules-checker` validates the propagation; then `npm run sync:claude-to-opencode` mirrors agent changes to `.opencode/`.
 
 ## Worktree
 
