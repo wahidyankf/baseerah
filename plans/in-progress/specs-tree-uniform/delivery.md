@@ -223,44 +223,8 @@ is delegated to the `repo-rules-maker` agent — it owns `repo-governance/` and 
 agent authorized to write rules and conventions there per
 [Agent Naming Convention](../../../repo-governance/conventions/structure/agent-naming.md).
 
-- [ ] Invoke `repo-rules-maker` with the following propagation brief (paste verbatim into the
-      agent invocation):
-
-      > Propagation brief for repo-rules-maker — driven by plan
-      > `plans/in-progress/specs-tree-uniform/`. Phases 2–5 of that plan have landed: crane is
-      > now CLI-canonical, rhino has the full CLI-only surface profile, ayokoding `build-tools`
-      > is resolved per Decision D1 (see callout at top of `delivery.md`), and the
-      > `AppsWithDDD` allowlist policy is settled per Decision D2. Update governance to match:
-      >
-      > 1. **`repo-governance/conventions/structure/specs-directory-structure.md`** —
-      >    (a) Append a dated migration-history note in the §Migration Path section recording
-      >    the crane + rhino + ayokoding/build-tools moves (mirror the existing
-      >    "DDD relocation (2026-05-09)" note style at lines 273–278).
-      >    (b) If D1 == A: add `build-tools` to the `<surface>` enum description (currently
-      >    "be, web, or cli") and document the rationale.
-      >    (c) If D1 == B: add `build-tools` to the canonical perspective-slug list (sibling
-      >    of `api`) with rationale.
-      > 2. **`repo-governance/conventions/structure/app-readme-vs-specs.md`** — refresh the
-      >    Adoption Matrix and any per-app examples that cite crane, rhino, ayokoding or
-      >    `ose-app` if they still reference pre-migration paths.
-      > 3. **`AGENTS.md` Project Structure tree** — update `specs/` block if it documents
-      >    legacy paths; cross-check against the new root `specs/README.md`.
-      > 4. **`.claude/agents/specs-checker.md`** — refresh Category 1 (Structural Completeness)
-      >    enumeration of required folders and Category 8 (Spec Tree Shape Compliance) if it
-      >    cites flat-root forms that are now eliminated.
-      > 5. **`.claude/agents/specs-maker.md` and `.claude/agents/specs-fixer.md`** — refresh
-      >    any path examples that cited the legacy crane/rhino layouts.
-      > 6. **`.claude/skills/repo-syncing-with-ose-primer/SKILL.md`** — confirm the extraction
-      >    scope for crane/rhino/ayokoding paths still resolves; update if any old path is
-      >    referenced.
-      > 7. **`docs/reference/related-repositories.md` and `docs/reference/platform-bindings.md`** —
-      >    quick grep for any stale path references to `specs/apps/crane/gherkin/` or
-      >    `specs/apps/ayokoding/build-tools/`; update if found.
-      >
-      > **Out of scope**: do NOT re-author the migration recipes (they live in this plan's
-      > `tech-docs.md`); do NOT modify any `specs/` file (already migrated); do NOT introduce
-      > new conventions, only update existing ones.
-
+- [ ] Invoke `repo-rules-maker` with the brief in [§Propagation Brief](#propagation-brief)
+      below. Pass the brief verbatim.
 - [ ] Verify `repo-rules-maker` only modified files under `repo-governance/`, `AGENTS.md`,
       `.claude/agents/`, `.claude/skills/`, or `docs/reference/`. If it touched anything else,
       reject and re-invoke with tighter scope.
@@ -277,6 +241,44 @@ agent authorized to write rules and conventions there per
       manually if the fix is trivial).
 - [ ] Commit governance + agent changes as one or two thematic commits per
       [Commit Messages Convention](../../../repo-governance/development/workflow/commit-messages.md): - `docs(repo-governance): propagate specs-tree-uniform changes to conventions and agents` - `chore(agents): sync .opencode mirror after specs propagation` (only if sync diff is non-empty)
+
+### Propagation Brief
+
+Pass the following brief verbatim to `repo-rules-maker` when invoking the propagation step
+above.
+
+Driven by plan `plans/in-progress/specs-tree-uniform/`. Phases 2–5 have landed: crane is now
+CLI-canonical, rhino has the full CLI-only surface profile, ayokoding `build-tools` is resolved
+per Decision D1 (see callout at top of `delivery.md`), and the `AppsWithDDD` allowlist policy
+is settled per Decision D2. Update governance to match:
+
+1. **`repo-governance/conventions/structure/specs-directory-structure.md`** —
+   (a) Append a dated migration-history note in §Migration Path recording the crane, rhino,
+   and ayokoding/build-tools moves (mirror the existing "DDD relocation (2026-05-09)" note
+   style at lines 273–278).
+   (b) If D1 == A: add `build-tools` to the `<surface>` enum description (currently
+   "be, web, or cli") and document the rationale.
+   (c) If D1 == B: add `build-tools` to the canonical perspective-slug list (sibling of `api`)
+   with rationale.
+2. **`repo-governance/conventions/structure/app-readme-vs-specs.md`** — refresh the Adoption
+   Matrix and any per-app examples that cite crane, rhino, ayokoding, or `ose-app` if they
+   still reference pre-migration paths.
+3. **`AGENTS.md` Project Structure tree** — update `specs/` block if it documents legacy
+   paths; cross-check against the new root `specs/README.md`.
+4. **`.claude/agents/specs-checker.md`** — refresh Category 1 (Structural Completeness)
+   enumeration of required folders and Category 8 (Spec Tree Shape Compliance) if it cites
+   flat-root forms that are now eliminated.
+5. **`.claude/agents/specs-maker.md` and `.claude/agents/specs-fixer.md`** — refresh any path
+   examples that cited the legacy crane/rhino layouts.
+6. **`.claude/skills/repo-syncing-with-ose-primer/SKILL.md`** — confirm the extraction scope
+   for crane/rhino/ayokoding paths still resolves; update if any old path is referenced.
+7. **`docs/reference/related-repositories.md` and `docs/reference/platform-bindings.md`** —
+   quick grep for any stale path references to `specs/apps/crane/gherkin/` or
+   `specs/apps/ayokoding/build-tools/`; update if found.
+
+**Out of scope**: do NOT re-author the migration recipes (they live in this plan's
+`tech-docs.md`); do NOT modify any `specs/` file (already migrated); do NOT introduce new
+conventions, only update existing ones.
 
 ## Phase 7 — Local Quality Gates (Before Push)
 
