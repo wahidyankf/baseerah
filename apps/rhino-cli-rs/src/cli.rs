@@ -1,10 +1,10 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    governance_agents_md_size, governance_emoji_audit, governance_frontmatter_audit,
-    governance_layer_coherence, governance_license_audit, governance_readme_index_audit,
-    governance_traceability_audit, governance_vendor_audit, spec_coverage_validate,
-    test_coverage_validate,
+    docs_validate_frontmatter, docs_validate_naming, governance_agents_md_size,
+    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
+    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
+    governance_vendor_audit, spec_coverage_validate, test_coverage_validate,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -66,6 +66,19 @@ pub enum Commands {
     /// Repository governance audits.
     #[command(name = "repo-governance", subcommand)]
     RepoGovernance(RepoGovernanceCommands),
+    /// Documentation validators.
+    #[command(name = "docs", subcommand)]
+    Docs(DocsCommands),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum DocsCommands {
+    /// Validate markdown filenames against the lowercase-kebab-case rule.
+    #[command(name = "validate-naming")]
+    ValidateNaming(docs_validate_naming::ValidateNamingArgs),
+    /// Validate documentation YAML frontmatter against area-specific schemas.
+    #[command(name = "validate-frontmatter")]
+    ValidateFrontmatter(docs_validate_frontmatter::ValidateFrontmatterArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -177,6 +190,12 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             RepoGovernanceCommands::VendorAudit(args) => {
                 governance_vendor_audit::run(args, output_format)
+            }
+        },
+        Commands::Docs(dc) => match dc {
+            DocsCommands::ValidateNaming(args) => docs_validate_naming::run(args, output_format),
+            DocsCommands::ValidateFrontmatter(args) => {
+                docs_validate_frontmatter::run(args, output_format)
             }
         },
     };

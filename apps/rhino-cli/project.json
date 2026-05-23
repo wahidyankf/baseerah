@@ -103,7 +103,7 @@
       "outputs": []
     },
     "validate:docs-validate-frontmatter": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go docs validate-frontmatter",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- docs validate-frontmatter",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/docs/**/*.md", "{workspaceRoot}/repo-governance/**/*.md"],
       "outputs": []
@@ -115,7 +115,7 @@
       "outputs": []
     },
     "validate:docs-validate-naming": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go docs validate-naming",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- docs validate-naming",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/docs/**/*.md", "{workspaceRoot}/repo-governance/**/*.md"],
       "outputs": []
