@@ -1,6 +1,9 @@
 use clap::{Parser, Subcommand};
 
-use crate::commands::{governance_agents_md_size, spec_coverage_validate, test_coverage_validate};
+use crate::commands::{
+    governance_agents_md_size, governance_emoji_audit, spec_coverage_validate,
+    test_coverage_validate,
+};
 use crate::internal::cliout::OutputFormat;
 
 #[derive(Parser, Debug)]
@@ -68,6 +71,9 @@ pub enum RepoGovernanceCommands {
     /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
     #[command(name = "agents-md-size")]
     AgentsMdSize(governance_agents_md_size::AgentsMdSizeArgs),
+    /// Audit forbidden file types for emoji codepoints.
+    #[command(name = "emoji-audit")]
+    EmojiAudit(governance_emoji_audit::EmojiAuditArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -130,6 +136,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
         Commands::RepoGovernance(rg) => match rg {
             RepoGovernanceCommands::AgentsMdSize(args) => {
                 governance_agents_md_size::run(args, output_format)
+            }
+            RepoGovernanceCommands::EmojiAudit(args) => {
+                governance_emoji_audit::run(args, output_format)
             }
         },
     };

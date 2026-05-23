@@ -121,7 +121,7 @@
       "outputs": []
     },
     "validate:emoji-audit": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go repo-governance emoji-audit",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- repo-governance emoji-audit",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",
