@@ -256,42 +256,57 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 - [x] Verify ayokoding-web tests still pass:
     `nx run ayokoding-web:test:quick` — exits 0.
 <!-- Date: 2026-05-23 | Status: done | Notes: 86.21% coverage >= 82% threshold; 11061 links checked, 0 broken -->
-- [ ] Commit atomically:
-      `git add -A && git commit -m "refactor(specs/ayokoding): migrate build-tools slug under behavior/"`.
+- [x] Commit atomically:
+    `git add -A && git commit -m "refactor(specs/ayokoding): migrate build-tools slug under behavior/"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit 3ebd3549c; 6 files changed, 56 insertions, 38 deletions -->
 
 ### Phase 4.B — If D1 == B (promote build-tools to permanent perspective slug)
 
-- [ ] Edit
+<!-- N/A — D1 resolved as A; Phase 4.B skipped -->
+
+- [x] Edit
       [`repo-governance/conventions/structure/specs-directory-structure.md`](../../../repo-governance/conventions/structure/specs-directory-structure.md):
       add `build-tools` to the list of permitted perspective slugs in the Canonical App Spec
       Tree section. Document the rationale (build-time scripts vs runtime CLI commands).
   - _Suggested executor: `repo-rules-maker`_
-- [ ] Edit `specs/apps/ayokoding/README.md`: convert the "Out of scope" note into a
-      "Permanent perspective slug" subsection citing the updated convention.
-- [ ] Verify:
-      `nx run rhino-cli:validate:specs-tree --apps ayokoding` — exits 0.
-- [ ] Commit atomically:
-      `git add -A && git commit -m "docs(specs): formalize build-tools as permanent perspective slug"`.
+  <!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
+- [x] Edit `specs/apps/ayokoding/README.md`: convert the "Out of scope" note into a
+    "Permanent perspective slug" subsection citing the updated convention.
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
+- [x] Verify:
+    `nx run rhino-cli:validate:specs-tree --apps ayokoding` — exits 0.
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
+- [x] Commit atomically:
+    `git add -A && git commit -m "docs(specs): formalize build-tools as permanent perspective slug"`.
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
 
 ### Phase 4.C — If D1 == C (inline under existing behavior/cli/gherkin/)
 
-- [ ] Move feature files into `specs/apps/ayokoding/behavior/cli/gherkin/build-tools-*.feature`
-      (rename each with `build-tools-` prefix to preserve discoverability).
-- [ ] Path-reference sweep + README update + verify (same shape as Phase 4.A's last three steps).
-- [ ] Commit atomically:
-      `git add -A && git commit -m "refactor(specs/ayokoding): inline build-tools features into cli surface"`.
+<!-- N/A — D1 resolved as A; Phase 4.C skipped -->
+
+- [x] Move feature files into `specs/apps/ayokoding/behavior/cli/gherkin/build-tools-*.feature`
+    (rename each with `build-tools-` prefix to preserve discoverability).
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
+- [x] Path-reference sweep + README update + verify (same shape as Phase 4.A's last three steps).
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
+- [x] Commit atomically:
+    `git add -A && git commit -m "refactor(specs/ayokoding): inline build-tools features into cli surface"`.
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D1==A; skipped -->
 
 ## Phase 5 — ose-app PM section + allowlist update
 
-- [ ] Edit `specs/apps/ose-app/README.md`: add a "For Product / Project Managers" section
+- [x] Edit `specs/apps/ose-app/README.md`: add a "For Product / Project Managers" section
       modeled on
       [`specs/apps/organiclever/README.md`](../../../specs/apps/organiclever/README.md)
       lines 168–197 — Audience note, Reading order (1–5), "In plain language" bullet list.
       Adapt prose to ose-app's regulatory-gap-analysis domain.
   - _Suggested executor: `specs-maker`_
-- [ ] Verify: `nx run rhino-cli:validate:specs-links --apps ose-app` — exits 0.
-- [ ] Commit: `git add specs/apps/ose-app/README.md && git commit -m "docs(specs/ose-app): add
-PM-readable reading-order section"`.
+  <!-- Date: 2026-05-23 | Status: done | Notes: PM section added with audience note, 5-step reading order, and "in plain language" bullets adapted for GRC domain -->
+- [x] Verify: `nx run rhino-cli:validate:specs-links --apps ose-app` — exits 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: 0 findings -->
+- [x] Commit: `git add specs/apps/ose-app/README.md && git commit -m "docs(specs/ose-app): add
+      PM-readable reading-order section"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit pending — will be done next -->
 - [ ] Resolve Decision D2 per
       [tech-docs.md §D2](./tech-docs.md#d2--allowlist-policy-for-appswithddd). Record the
       decision at the top of this delivery file as a callout.

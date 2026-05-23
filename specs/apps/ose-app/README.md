@@ -59,6 +59,41 @@ specs/apps/ose-app/
 - **[containers/](./containers/README.md)** — C4 architecture diagrams (L2)
 - **[behavior/](./behavior/README.md)** — Gherkin acceptance criteria
 
+## For Product / Project Managers
+
+**Audience note**: This folder is written for engineers and SWE-background TPMs familiar
+with system diagrams and DDD vocabulary (bounded context, ubiquitous language, aggregate).
+If you are new to DDD, ask an engineer to walk you through `bounded-context-map.md` first.
+Non-technical PMs should start with the product overview and containers docs; the Gherkin
+acceptance criteria (behavior/) are readable without coding knowledge once you are
+comfortable with Given-When-Then format.
+
+**Reading order**:
+
+1. **[product/README.md](./product/README.md)** — Start here. Plain-language summary of
+   what OSE Application does, who it is for (compliance officers, risk teams), what ships
+   today, and what is deferred.
+2. **[system-context/README.md](./system-context/README.md)** — Where OSE Application sits
+   in the broader landscape: actors (compliance officer, regulator), external systems
+   (regulator document store, LLM provider), and trust boundaries.
+3. **[containers/container.md](./containers/container.md)** — The two deployable units:
+   Next.js frontend and F#/Giraffe backend API. How they connect. See
+   [containers/deployment.md](./containers/deployment.md) for environments.
+4. **[components/README.md](./components/README.md)** — Internal architecture by bounded
+   context: regulatory-source ingestion, internal-policy ingestion, gap-analysis engine,
+   AI orchestration layer.
+5. **[behavior/](./behavior/README.md)** — What the system is supposed to do, expressed as
+   Gherkin (Given-When-Then) acceptance criteria per bounded context. The same files drive
+   automated tests.
+
+**In plain language**:
+
+- You upload a regulator's rule document and your company's policy documents.
+- The system compares them and surfaces gaps — places where your policy does not cover a
+  regulatory requirement.
+- Each gap is a traceable record linking the regulatory clause, the missing policy area,
+  and the AI-generated analysis.
+
 ## Related
 
 - [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md)
