@@ -1751,7 +1751,7 @@ func main() {
 
 ## Audit Trail and Event Log (Examples 17–21)
 
-### Example 17: Defining the Audit Event Type
+### Example 16: Defining the Audit Event Type
 
 Every state transition generates an audit event recording who triggered the transition, from which state, to which state, and at what time. This is the foundation of the immutable audit log.
 
@@ -1863,7 +1863,7 @@ func main() {
 
 ---
 
-### Example 18: Attaching an Audit Log to the PO
+### Example 17: Attaching an Audit Log to the PO
 
 The audit log is a `Vec<StateTransition>` (Rust) or `[]StateTransition` (Go) attached to the PO struct. Each transition appends a new entry to the log — entries are never modified or deleted.
 
@@ -1987,7 +1987,7 @@ func main() {
 
 ---
 
-### Example 19: Querying the Audit Log
+### Example 18: Querying the Audit Log
 
 Common audit queries include finding when a specific event occurred, who approved a PO, and how many transitions a PO went through before reaching its current state.
 
@@ -2089,7 +2089,7 @@ func main() {
 
 ---
 
-### Example 20: Serialising the Audit Log with Serde
+### Example 19: Serialising the Audit Log with Serde
 
 Persisting and transmitting the audit log requires serialisation. Rust uses `serde` with `serde_json`; Go uses the standard `encoding/json` package.
 
@@ -2219,7 +2219,7 @@ func main() {
 
 ---
 
-### Example 21: Testing the Audit Log
+### Example 20: Testing the Audit Log
 
 The audit log is business-critical data — it must be tested to verify that every transition appends exactly one entry with the correct fields.
 
@@ -2322,7 +2322,7 @@ func TestSubmitAppendsTransitionEntry(t *testing.T) {
 
 ## Testing (Examples 22–25)
 
-### Example 22: Testing the Happy Path End-to-End
+### Example 21: Testing the Happy Path End-to-End
 
 A happy-path test walks the PO through every valid transition from `Draft` to `Paid` and verifies the final state. This test documents the expected lifecycle and serves as executable specification.
 
@@ -2420,7 +2420,7 @@ func TestHappyPathDraftToPaid(t *testing.T) {
 
 ---
 
-### Example 23: Testing Invalid Transitions
+### Example 22: Testing Invalid Transitions
 
 Invalid transition tests verify that the state machine correctly rejects operations that are not permitted in the current state.
 
@@ -2528,7 +2528,7 @@ func TestCannotPayFromSubmitted(t *testing.T) {
 
 ---
 
-### Example 24: Testing State After a Guard Failure
+### Example 23: Testing State After a Guard Failure
 
 When a guard fails, the PO must remain in its original state — the failed transition must not partially advance the machine.
 
@@ -2617,7 +2617,7 @@ func TestGuardFailureDoesNotAdvanceState(t *testing.T) {
 
 ---
 
-### Example 25: Integration Test — Full Lifecycle with Audit Log
+### Example 24: Integration Test — Full Lifecycle with Audit Log
 
 The integration test combines all concepts from Examples 1–24 to verify the complete PO lifecycle from creation to payment, including the audit log entries at each step.
 
