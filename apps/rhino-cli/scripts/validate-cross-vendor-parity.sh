@@ -37,7 +37,7 @@ pass() {
 
 # Invariant 1: governance prose vendor-neutrality.
 print_invariant 1 "Governance prose vendor-neutrality"
-if (cd apps/rhino-cli && CGO_ENABLED=0 go run main.go repo-governance vendor-audit repo-governance/ >/tmp/parity-inv1.log 2>&1); then
+if (cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit repo-governance/ >/tmp/parity-inv1.log 2>&1); then
   pass "rhino-cli repo-governance vendor-audit repo-governance/ (0 violations)"
 else
   cat /tmp/parity-inv1.log
@@ -47,7 +47,7 @@ fi
 # Invariant 2: root instruction surface vendor-neutrality.
 print_invariant 2 "AGENTS.md and CLAUDE.md vendor-neutrality"
 for target in AGENTS.md CLAUDE.md; do
-  if (cd apps/rhino-cli && CGO_ENABLED=0 go run main.go repo-governance vendor-audit "${target}" >/tmp/parity-inv2.log 2>&1); then
+  if (cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit "${target}" >/tmp/parity-inv2.log 2>&1); then
     pass "rhino-cli repo-governance vendor-audit ${target} (0 violations)"
   else
     cat /tmp/parity-inv2.log

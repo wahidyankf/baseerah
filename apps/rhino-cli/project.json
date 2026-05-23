@@ -77,6 +77,94 @@
       "options": {
         "command": "cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets"
       }
+    },
+    "validate:specs-adoption": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate-adoption"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.feature"]
+    },
+    "validate:specs-tree": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate-tree"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "validate:specs-counts": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate-counts"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "validate:specs-links": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate-links"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.md"]
+    },
+    "validate:naming-agents": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- agents validate-naming"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/.claude/agents/**/*.md",
+        "{workspaceRoot}/.opencode/agents/**/*.md"
+      ]
+    },
+    "validate:naming-workflows": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- workflows validate-naming"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/repo-governance/workflows/**/*.md"]
+    },
+    "validate:mermaid": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid --max-depth=4 repo-governance/ .claude/"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/repo-governance/**/*.md",
+        "{workspaceRoot}/.claude/**/*.md"
+      ]
+    },
+    "validate:repo-governance-vendor-audit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit repo-governance/"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/repo-governance/**/*.md"]
+    },
+    "validate:cross-vendor-parity": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash apps/rhino-cli/scripts/validate-cross-vendor-parity.sh"
+      },
+      "cache": false,
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{projectRoot}/scripts/validate-cross-vendor-parity.sh",
+        "{workspaceRoot}/repo-governance/**/*.md",
+        "{workspaceRoot}/AGENTS.md",
+        "{workspaceRoot}/CLAUDE.md",
+        "{workspaceRoot}/.claude/agents/**/*.md",
+        "{workspaceRoot}/.opencode/agents/**/*.md"
+      ]
     }
   }
 }
