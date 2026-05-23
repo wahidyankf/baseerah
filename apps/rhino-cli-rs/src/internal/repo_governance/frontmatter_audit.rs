@@ -1,0 +1,299 @@
+// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/frontmatter_audit.go`.
+
+use std::fs;
+use std::path::Path;
+use std::sync::OnceLock;
+
+use anyhow::{anyhow, Context, Error};
+use regex::Regex;
+use walkdir::WalkDir;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FrontmatterFinding {
+    pub file: String,
+    pub line: usize,
+    pub severity: String,
+    pub message: String,
+}
+
+const WEBSITE_APP_PREFIXES: &[&str] = &[
+    "apps/ayokoding-web/",
+    "apps/ose-web/",
+    "apps/organiclever-web/",
+    "apps/wahidyankf-web/",
+];
+
+fn last_updated_footer_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"\*\*Last Updated\*\*").unwrap())
+}
+
+fn inline_date_annotation_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(r"^\s*-\s+\*\*(Created|Last Updated)\*\*:\s*\d{4}-\d{2}-\d{2}").unwrap()
+    })
+}
+
+pub fn audit_frontmatter(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
+    if paths.is_empty() {
+        return Err(anyhow!("at least one path is required"));
+    }
+    let mut findings = Vec::new();
+    for root in paths {
+        let files = walk_paths(root);
+        let mut more = scan_paths(&files)?;
+        findings.append(&mut more);
+    }
+    findings.sort_by(|a, b| a.file.cmp(&b.file).then(a.line.cmp(&b.line)));
+    Ok(findings)
+}
+
+fn walk_paths(root: &str) -> Vec<String> {
+    let root_p = Path::new(root);
+    if !root_p.exists() {
+        return Vec::new();
+    }
+    let mut files: Vec<String> = WalkDir::new(root_p)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+        .filter(|e| e.file_name().to_string_lossy().ends_with(".md"))
+        .map(|e| e.path().to_string_lossy().to_string())
+        .filter(|p| !is_website_app(p))
+        .collect();
+    files.sort();
+    files
+}
+
+fn scan_paths(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
+    let mut findings = Vec::new();
+    for p in paths {
+        let data = fs::read_to_string(p).with_context(|| format!("read {p}"))?;
+        findings.append(&mut scan_frontmatter_content(p, &data));
+    }
+    Ok(findings)
+}
+
+fn scan_frontmatter_content(path: &str, content: &str) -> Vec<FrontmatterFinding> {
+    let mut findings = Vec::new();
+    let (frontmatter, frontmatter_end_line, body) = split_frontmatter(content);
+    findings.extend(check_frontmatter_updated_field(path, &frontmatter));
+    findings.extend(check_body_annotations(path, &body, frontmatter_end_line));
+    findings
+}
+
+fn split_frontmatter(content: &str) -> (String, usize, String) {
+    let lines: Vec<&str> = content.split('\n').collect();
+    if lines.is_empty() || lines[0].trim() != "---" {
+        return (String::new(), 0, content.to_string());
+    }
+    for i in 1..lines.len() {
+        if lines[i].trim() == "---" {
+            let fm = lines[1..i].join("\n");
+            let body_start = i + 1;
+            if body_start >= lines.len() {
+                return (fm, i + 1, String::new());
+            }
+            return (fm, i + 1, lines[body_start..].join("\n"));
+        }
+    }
+    // Unclosed frontmatter: treat as no frontmatter.
+    (String::new(), 0, content.to_string())
+}
+
+fn check_frontmatter_updated_field(path: &str, frontmatter: &str) -> Vec<FrontmatterFinding> {
+    if frontmatter.is_empty() {
+        return Vec::new();
+    }
+    let parsed: serde_norway::Value = match serde_norway::from_str(frontmatter) {
+        Ok(v) => v,
+        Err(_) => return Vec::new(), // unparseable YAML is out of scope
+    };
+    let mapping = match parsed {
+        serde_norway::Value::Mapping(m) => m,
+        _ => return Vec::new(),
+    };
+    if !mapping.contains_key(serde_norway::Value::String("updated".to_string())) {
+        return Vec::new();
+    }
+    let line = find_field_line(frontmatter, "updated");
+    vec![FrontmatterFinding {
+        file: path.to_string(),
+        line,
+        severity: "high".to_string(),
+        message: r#"forbidden "updated:" field in YAML frontmatter; remove per no-date-metadata convention"#.to_string(),
+    }]
+}
+
+fn find_field_line(frontmatter: &str, field: &str) -> usize {
+    let prefix = format!("{field}:");
+    for (i, line) in frontmatter.split('\n').enumerate() {
+        if line.trim_start_matches(' ').starts_with(&prefix) {
+            return i + 2;
+        }
+    }
+    2
+}
+
+fn check_body_annotations(
+    path: &str,
+    body: &str,
+    frontmatter_end_line: usize,
+) -> Vec<FrontmatterFinding> {
+    if body.is_empty() {
+        return Vec::new();
+    }
+    let mut findings = Vec::new();
+    let start_line = if frontmatter_end_line == 0 {
+        1
+    } else {
+        frontmatter_end_line + 1
+    };
+    for (i, line) in body.split('\n').enumerate() {
+        let line_num = start_line + i;
+        if inline_date_annotation_re().is_match(line) {
+            findings.push(FrontmatterFinding {
+                file: path.to_string(),
+                line: line_num,
+                severity: "high".to_string(),
+                message: "forbidden inline date annotation in body; remove per no-date-metadata convention".to_string(),
+            });
+            continue;
+        }
+        if last_updated_footer_re().is_match(line) {
+            findings.push(FrontmatterFinding {
+                file: path.to_string(),
+                line: line_num,
+                severity: "high".to_string(),
+                message: "forbidden **Last Updated** footer marker in body; remove per no-date-metadata convention".to_string(),
+            });
+        }
+    }
+    findings
+}
+
+fn is_website_app(path: &str) -> bool {
+    let slashed = path.replace('\\', "/");
+    WEBSITE_APP_PREFIXES.iter().any(|p| slashed.contains(p))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    #[test]
+    fn audit_frontmatter_empty_paths_errors() {
+        let err = audit_frontmatter(&[]).unwrap_err();
+        assert!(err.to_string().contains("at least one path"));
+    }
+
+    #[test]
+    fn detects_forbidden_updated_frontmatter_field() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("doc.md");
+        fs::write(&p, "---\ntitle: Doc\nupdated: 2026-01-01\n---\n\n# Body\n").unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert!(findings[0].message.contains("updated:"));
+        assert_eq!(findings[0].line, 3);
+        assert_eq!(findings[0].severity, "high");
+    }
+
+    #[test]
+    fn detects_last_updated_footer() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("doc.md");
+        fs::write(&p, "# Title\n\nBody.\n\n**Last Updated**: 2026-01-01\n").unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert!(findings[0].message.contains("**Last Updated**"));
+        assert_eq!(findings[0].line, 5);
+    }
+
+    #[test]
+    fn detects_inline_date_annotation() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("doc.md");
+        fs::write(
+            &p,
+            "# Title\n\n- **Created**: 2026-01-01\n- **Last Updated**: 2026-02-02\n",
+        )
+        .unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert_eq!(findings.len(), 2);
+        assert!(findings[0].message.contains("inline date annotation"));
+        assert!(findings[1].message.contains("inline date annotation"));
+    }
+
+    #[test]
+    fn skips_website_apps() {
+        let tmp = TempDir::new().unwrap();
+        let dir = tmp.path().join("apps/ose-web/content");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("post.md"), "---\nupdated: 2026-01-01\n---\n").unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn passes_clean_file() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("doc.md");
+        fs::write(&p, "---\ntitle: Doc\n---\n\nClean body.\n").unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn sorts_findings_by_file_then_line() {
+        let tmp = TempDir::new().unwrap();
+        fs::write(tmp.path().join("b.md"), "---\nupdated: 2026-01-01\n---\n").unwrap();
+        fs::write(
+            tmp.path().join("a.md"),
+            "# T\n\n**Last Updated**: 2026-01-01\n",
+        )
+        .unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert_eq!(findings.len(), 2);
+        assert!(findings[0].file.ends_with("a.md"));
+        assert!(findings[1].file.ends_with("b.md"));
+    }
+
+    #[test]
+    fn unclosed_frontmatter_treated_as_body() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("doc.md");
+        // Unclosed frontmatter — entire content treated as body.
+        fs::write(&p, "---\ntitle: Doc\n\n**Last Updated**: x\n").unwrap();
+        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].line, 4);
+    }
+
+    #[test]
+    fn split_frontmatter_returns_close_line() {
+        let (fm, end, body) = split_frontmatter("---\ntitle: x\n---\nbody\n");
+        assert_eq!(fm, "title: x");
+        assert_eq!(end, 3);
+        assert_eq!(body, "body\n");
+    }
+
+    #[test]
+    fn split_frontmatter_no_fence() {
+        let (fm, end, body) = split_frontmatter("just body\n");
+        assert!(fm.is_empty());
+        assert_eq!(end, 0);
+        assert_eq!(body, "just body\n");
+    }
+
+    #[test]
+    fn find_field_line_locates_updated() {
+        let fm = "title: x\nfoo: bar\nupdated: 2026-01-01\n";
+        // updated is line 3 inside frontmatter = line 4 in file (line 1 = ---).
+        // findFieldLine returns i+2 where i=2 (0-based) → 4.
+        assert_eq!(find_field_line(fm, "updated"), 4);
+    }
+}

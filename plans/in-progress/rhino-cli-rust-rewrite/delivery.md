@@ -219,9 +219,18 @@ Goal: port the `repo-governance` namespace and its 9 sub-validators. Each comman
   - _Suggested executor: `swe-rust-dev`_
 - [ ] For each command below, follow the RED→GREEN pattern: (1) create a stub command returning `todo!()` + write cucumber step defs consuming the `.feature` file, verify `cargo test --manifest-path apps/rhino-cli-rs/Cargo.toml --test cucumber -- <feature-name>` exits non-zero; (2) port the command to green; (3) run shadow-diff for at least 2 CI runs; (4) flip the matching `validate:*` target. Acceptance per command: `npx nx run rhino-cli:validate:<target-name>` exits 0 AND `shadow-diff.sh repo-governance <subcmd>` reports no divergence. Feature files: [Repo-grounded — `specs/apps/rhino/behavior/cli/gherkin/repo-governance-*.feature`].
   - [ ] `repo-governance audit` — uses sub-audit aggregator; port `cmd/governance_audit.go` + `internal/repo-governance/aggregator.go`.
-  - [ ] `repo-governance agents-md-size` — port `cmd/governance_agents_md_size.go`.
-  - [ ] `repo-governance emoji-audit` — port `cmd/governance_emoji_audit.go`.
-  - [ ] `repo-governance frontmatter-audit` — port `cmd/governance_frontmatter_audit.go`.
+  - [x] `repo-governance agents-md-size` — port `cmd/governance_agents_md_size.go`.
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/agents_md_size.rs`, `apps/rhino-cli-rs/src/commands/governance_agents_md_size.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: Schema `rhino-cli/agents-md-size/v1`. Shadow-diff PASS text+JSON+markdown. Nx target flipped.
+  - [x] `repo-governance emoji-audit` — port `cmd/governance_emoji_audit.go`.
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/emoji_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_emoji_audit.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: 19 forbidden exts, 24 skip dirs. UTF-8 char-iteration (not byte). Shadow-diff PASS on `.github/workflows` (clean) and content-match on findings. Nx target flipped.
+  - [x] `repo-governance frontmatter-audit` — port `cmd/governance_frontmatter_audit.go`.
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/frontmatter_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_frontmatter_audit.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: serde_norway YAML parse for `updated:` field detect. `lastUpdatedFooterRe` + `inlineDateAnnotationRe` regexes verbatim. website-app prefix skip. Shadow-diff stdout byte-identical text+JSON+markdown against `repo-governance/` (21 findings). Nx target flipped.
   - [ ] `repo-governance layer-coherence` — port `cmd/governance_layer_coherence.go`.
   - [ ] `repo-governance license-audit` — port `cmd/governance_license_audit.go`. Corpus diff-test against `apps/*/LICENSE` + `libs/*/LICENSE`.
   - [ ] `repo-governance readme-index-audit` — port `cmd/governance_readme_index_audit.go`.

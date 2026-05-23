@@ -138,7 +138,7 @@
       "outputs": []
     },
     "validate:frontmatter-audit": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go repo-governance frontmatter-audit",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- repo-governance frontmatter-audit",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",

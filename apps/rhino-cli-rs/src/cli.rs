@@ -1,8 +1,8 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    governance_agents_md_size, governance_emoji_audit, spec_coverage_validate,
-    test_coverage_validate,
+    governance_agents_md_size, governance_emoji_audit, governance_frontmatter_audit,
+    spec_coverage_validate, test_coverage_validate,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -74,6 +74,9 @@ pub enum RepoGovernanceCommands {
     /// Audit forbidden file types for emoji codepoints.
     #[command(name = "emoji-audit")]
     EmojiAudit(governance_emoji_audit::EmojiAuditArgs),
+    /// Audit markdown files for forbidden manual date metadata.
+    #[command(name = "frontmatter-audit")]
+    FrontmatterAudit(governance_frontmatter_audit::FrontmatterAuditArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -139,6 +142,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             RepoGovernanceCommands::EmojiAudit(args) => {
                 governance_emoji_audit::run(args, output_format)
+            }
+            RepoGovernanceCommands::FrontmatterAudit(args) => {
+                governance_frontmatter_audit::run(args, output_format)
             }
         },
     };

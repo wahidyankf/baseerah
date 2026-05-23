@@ -3,3 +3,4 @@
 
 pub mod agents_md_size;
 pub mod emoji_audit;
+pub mod frontmatter_audit;
