@@ -372,27 +372,33 @@ last two CLI trees and hardening rhino-cli so the rule is enforced going forward
       rhino-cli:validate:specs-links --apps ayokoding && nx run ayokoding-cli:test:quick` —
     all exit 0.
 <!-- Date: 2026-05-23 | Status: done | Notes: all pass; fixed broken relative link in links/README.md (8→7 levels); ayokoding-cli:test:quick pass -->
-- [ ] Commit atomically: `git add -A && git commit -m "refactor(specs/ayokoding): regroup cli
+- [x] Commit atomically: `git add -A && git commit -m "refactor(specs/ayokoding): regroup cli
   features into domain subdirs"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit 46a244836; 5 files changed, 67 insertions, 39 deletions -->
 
 ### Phase 6.b — ose-platform-cli domain regrouping (R7.b)
 
-- [ ] Create domain subdir: `mkdir -p specs/apps/ose-platform/behavior/cli/gherkin/links`
-      (single-feature domain).
-- [ ] `git mv specs/apps/ose-platform/behavior/cli/gherkin/links-check.feature
-specs/apps/ose-platform/behavior/cli/gherkin/links/links-check.feature`.
-- [ ] Author one-paragraph index `README.md` in the new `links/` subdir.
+- [x] Create domain subdir: `mkdir -p specs/apps/ose-platform/behavior/cli/gherkin/links`
+    (single-feature domain).
+<!-- Date: 2026-05-23 | Status: done | Notes: links/ created -->
+- [x] `git mv specs/apps/ose-platform/behavior/cli/gherkin/links-check.feature
+      specs/apps/ose-platform/behavior/cli/gherkin/links/links-check.feature`.
+<!-- Date: 2026-05-23 | Status: done | Notes: moved; 0 flat features at gherkin root -->
+- [x] Author one-paragraph index `README.md` in the new `links/` subdir.
   - _Suggested executor: `specs-maker`_
-- [ ] Path-reference sweep: `grep -rln 'specs/apps/ose-platform/behavior/cli/gherkin/' apps
-libs .github .husky docs repo-governance > /tmp/osep-cli-refs.txt`. Inspect; hand-rewrite
-      every per-`.feature` reference (likely in `apps/ose-cli/`'s step files + `project.json`
-      `inputs`).
-- [ ] Verify: `nx run rhino-cli:validate:specs-tree --apps ose-platform && nx run
-rhino-cli:validate:specs-counts --apps ose-platform && nx run
-rhino-cli:validate:specs-links --apps ose-platform && nx run ose-cli:test:quick` —
-      all exit 0.
+  <!-- Date: 2026-05-23 | Status: done | Notes: links/README.md written with feature table -->
+- [x] Path-reference sweep: `grep -rln 'specs/apps/ose-platform/behavior/cli/gherkin/' apps
+      libs .github .husky docs repo-governance > /tmp/osep-cli-refs.txt`. Inspect; hand-rewrite
+    every per-`.feature` reference (likely in `apps/ose-cli/`'s step files + `project.json`
+    `inputs`).
+<!-- Date: 2026-05-23 | Status: done | Notes: 2 files matched; project.json uses glob (no change); ose-cli/README.md:102 updated to links/links-check.feature -->
+- [x] Verify: `nx run rhino-cli:validate:specs-tree --apps ose-platform && nx run
+      rhino-cli:validate:specs-counts --apps ose-platform && nx run
+      rhino-cli:validate:specs-links --apps ose-platform && nx run ose-cli:test:quick` —
+    all exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: all pass 0 findings; ose-cli:test:quick pass -->
 - [ ] Commit atomically: `git add -A && git commit -m "refactor(specs/ose-platform): regroup
-cli features into domain subdirs"`.
+  cli features into domain subdirs"`.
 
 ### Phase 6.c — Validator enforcement + convention update (R7.c)
 
