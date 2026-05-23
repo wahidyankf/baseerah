@@ -71,7 +71,19 @@ decommission review,
 `contracts/`,
 **so that** my mental model matches the on-disk pattern used by `organiclever` and `ose-app`.
 
-### US-8 — Governance and agents propagated by `repo-rules-maker`
+### US-8 — Domain subdirs under every CLI `gherkin/`
+
+**As** a contributor reading any app's `behavior/cli/gherkin/`,
+**I want** `.feature` files grouped under domain subdirectories (matching the existing
+organiclever `behavior/be/gherkin/<domain>/` pattern),
+**so that** the layout is uniform across BE, web, and CLI surfaces — eliminating the
+"CLI is special" carve-out that today's convention preserves at
+[specs-directory-structure.md lines 184–193](../../../repo-governance/conventions/structure/specs-directory-structure.md).
+This applies to crane (11 features), rhino (44 features), ayokoding-cli (3 features), and
+ose-platform-cli (1 feature). The convention itself must be updated to drop the CLI-flat
+exception; this is the governance-side change propagated by `repo-rules-maker`.
+
+### US-9 — Governance and agents propagated by `repo-rules-maker`
 
 **As** an AI agent (or human contributor) reading `repo-governance/`, agent definitions, or
 `AGENTS.md` after this plan completes,
@@ -220,33 +232,67 @@ Feature: pre-push validator does not regress
     Then it exits 0
 ```
 
-### AC-8 — Governance propagated to match migrated state
+### AC-8 — Domain subdirs under every CLI `gherkin/`
+
+```gherkin
+Feature: CLI gherkin trees use domain subdirectories
+
+  Scenario Outline: Every CLI .feature file lives under a domain subdir
+    Given the directory <cli-gherkin-root>
+    When I list its direct children
+    Then no entry is a `.feature` file
+    And every `.feature` file lives at least one level deeper inside a domain subdirectory
+
+    Examples:
+      | cli-gherkin-root                                          |
+      | specs/apps/crane/behavior/cli/gherkin                     |
+      | specs/apps/rhino/behavior/cli/gherkin                     |
+      | specs/apps/ayokoding/behavior/cli/gherkin                 |
+      | specs/apps/ose-platform/behavior/cli/gherkin              |
+
+  Scenario: Convention drops the CLI-flat exception
+    Given the file repo-governance/conventions/structure/specs-directory-structure.md
+    When I read the "Domain Subdirectory Rules" section
+    Then it states CLI specs use domain subdirectories under `gherkin/`
+    And the prior "CLI specs use a flat structure" rule (lines 184–193) is removed
+    And the historical exception is documented in §Migration Path as a dated retirement note
+
+  Scenario: validate-tree enforces the new shape
+    Given the working tree at plan completion
+    When I run `nx run rhino-cli:validate:specs-tree`
+    Then it exits 0
+    And the validator emits HIGH if any future commit places a `.feature` directly under
+        any `behavior/<surface>/gherkin/`
+```
+
+### AC-9 — Governance propagated to match migrated state
 
 ```gherkin
 Feature: repo-rules-maker propagates the new uniform state into governance
 
   Scenario: Convention migration-history note appended
-    Given Phases 2–5 of this plan have landed
-    When repo-rules-maker completes its propagation per delivery.md Phase 6
+    Given Phases 2–6 of this plan have landed
+    When repo-rules-maker completes its propagation per delivery.md Phase 7
     Then repo-governance/conventions/structure/specs-directory-structure.md §Migration Path
-      contains a dated note recording the crane, rhino, and ayokoding/build-tools migrations
+      contains a dated note recording the crane, rhino, ayokoding/build-tools, and
+      CLI-domain-subdir migrations
     And the note follows the style of the existing "DDD relocation (2026-05-09)" entry
 
   Scenario: Agents and skills cite post-migration paths only
-    Given repo-rules-maker has completed Phase 6
+    Given repo-rules-maker has completed Phase 7
     When I `grep -rn 'specs/apps/crane/gherkin\|specs/apps/ayokoding/build-tools' \
       .claude/agents .claude/skills AGENTS.md repo-governance`
     Then the only hits are inside historical migration notes
     And no hit is a live path reference an agent or skill would consume
 
   Scenario: OpenCode mirror stays in sync
-    Given any .claude/agents/*.md file was updated in Phase 6
+    Given any .claude/agents/*.md file was updated in Phase 7
     When I run `npm run sync:claude-to-opencode`
     Then it exits 0
     And `.opencode/agents/` carries the mechanical translation of the changed agents
 
   Scenario: repo-rules-checker validates the propagation
-    Given Phase 6 governance commits are in the working tree
+    Given Phase 7 governance commits are in the working tree
     When I run `repo-rules-checker` against the repo
     Then it exits 0 OR all findings are pre-existing and unrelated to this propagation
 ```
@@ -256,11 +302,18 @@ Feature: repo-rules-maker propagates the new uniform state into governance
 ### In Scope
 
 - `specs/README.md` rewrite
-- `specs/apps/crane/` migration to `behavior/cli/gherkin/`
-- `specs/apps/rhino/` fill-out to full CLI-only surface profile
+- `specs/apps/crane/` migration to `behavior/cli/gherkin/<domain>/`
+- `specs/apps/rhino/` fill-out to full CLI-only surface profile **plus** domain regrouping under
+  `behavior/cli/gherkin/<domain>/`
 - `specs/apps/ayokoding/build-tools/` decision + migration (or convention update)
+- `specs/apps/ayokoding/behavior/cli/gherkin/` domain regrouping
+- `specs/apps/ose-platform/behavior/cli/gherkin/` domain regrouping
+- `repo-governance/conventions/structure/specs-directory-structure.md` — drop the CLI-flat
+  exception, require domain subdirs for every surface
 - `apps/rhino-cli/src/internal/allowlist.rs` allowlist update with inline rationale
-- Per-app README updates for crane, rhino, ayokoding to reflect post-migration state
+- `apps/rhino-cli/src/specs/` validator update — flat `.feature` directly under
+  `behavior/<surface>/gherkin/` now emits HIGH
+- Per-app README updates for crane, rhino, ayokoding, ose-platform to reflect post-migration state
 - README link integrity sweep across all migrated paths
 
 ### Out of Scope (Product Scope)

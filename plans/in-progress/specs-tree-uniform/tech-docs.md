@@ -4,16 +4,17 @@
 
 Numbered references trace back to acceptance criteria in [prd.md](./prd.md).
 
-| ID    | Location                                                                | Current state                                                   | Target state                                                                                                       | Severity | Source                                                                                                               |
-| ----- | ----------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------- |
-| GAP-1 | `specs/README.md` "Standard Folder Pattern" section                     | Documents flat `be/fe/fs/cli/gherkin/`                          | Canonical five-folder tree + `behavior/<surface>/gherkin/`                                                         | HIGH     | [Repo-grounded — `specs/README.md` lines 46–73]                                                                      |
-| GAP-2 | `specs/README.md` "App Specs" + "Library Specs" + "Standards" lists     | Missing: ose-app, wahidyankf, crane. Lib list partially correct | Lists every app present under `specs/apps/`                                                                        | HIGH     | [Repo-grounded — `specs/README.md` lines 29–45 vs `find specs/apps -maxdepth 1 -type d`]                             |
-| GAP-3 | `specs/README.md` line 67                                               | "Contracts live at `specs/apps/{domain}/contracts/`"            | Contracts live at `specs/apps/{domain}/containers/contracts/`                                                      | HIGH     | [Repo-grounded — `specs-directory-structure.md` line 271 + `specs/apps/organiclever/containers/contracts/README.md`] |
-| GAP-4 | `specs/apps/crane/`                                                     | Flat `gherkin/<feature>.feature` at app root                    | `behavior/cli/gherkin/<feature>.feature`                                                                           | HIGH     | [Repo-grounded — `specs/apps/crane/README.md` lines 16–31 vs `specs-directory-structure.md` lines 184–193]           |
-| GAP-5 | `specs/apps/rhino/`                                                     | Only `behavior/cli/gherkin/` populated                          | CLI-only surface profile: `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/cli/gherkin/` | MEDIUM   | [Repo-grounded — `specs/apps/rhino/README.md` lines 18–24 vs `specs-directory-structure.md` line 151]                |
-| GAP-6 | `specs/apps/ayokoding/build-tools/`                                     | Legacy flat-root slug containing `gherkin/index-generation/`    | Migrated under `behavior/build-tools/gherkin/` OR documented as permanent slug                                     | MEDIUM   | [Repo-grounded — `specs/apps/ayokoding/README.md` lines 45–53]                                                       |
-| GAP-7 | `apps/rhino-cli/src/internal/allowlist.rs` `AppsWithDDD`                | Lists `organiclever`, `wahidyankf`, `ose-platform`, `ayokoding` | Inline-commented rationale for include/exclude per app; ose-app evaluated                                          | LOW      | [Repo-grounded — `apps/rhino-cli/src/internal/allowlist.rs` exists per `find` output]                                |
-| GAP-8 | `specs/apps/ose-app/README.md` "For Product / Project Managers" section | Absent (organiclever has equivalent section)                    | Present with reading-order guidance                                                                                | LOW      | [Repo-grounded — `specs/apps/ose-app/README.md` lines 1–66 vs `specs/apps/organiclever/README.md` lines 168–197]     |
+| ID    | Location                                                                | Current state                                                                                                                               | Target state                                                                                                                                                                                 | Severity | Source                                                                                                                                                                                       |
+| ----- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GAP-1 | `specs/README.md` "Standard Folder Pattern" section                     | Documents flat `be/fe/fs/cli/gherkin/`                                                                                                      | Canonical five-folder tree + `behavior/<surface>/gherkin/`                                                                                                                                   | HIGH     | [Repo-grounded — `specs/README.md` lines 46–73]                                                                                                                                              |
+| GAP-2 | `specs/README.md` "App Specs" + "Library Specs" + "Standards" lists     | Missing: ose-app, wahidyankf, crane. Lib list partially correct                                                                             | Lists every app present under `specs/apps/`                                                                                                                                                  | HIGH     | [Repo-grounded — `specs/README.md` lines 29–45 vs `find specs/apps -maxdepth 1 -type d`]                                                                                                     |
+| GAP-3 | `specs/README.md` line 67                                               | "Contracts live at `specs/apps/{domain}/contracts/`"                                                                                        | Contracts live at `specs/apps/{domain}/containers/contracts/`                                                                                                                                | HIGH     | [Repo-grounded — `specs-directory-structure.md` line 271 + `specs/apps/organiclever/containers/contracts/README.md`]                                                                         |
+| GAP-4 | `specs/apps/crane/`                                                     | Flat `gherkin/<feature>.feature` at app root                                                                                                | `behavior/cli/gherkin/<feature>.feature`                                                                                                                                                     | HIGH     | [Repo-grounded — `specs/apps/crane/README.md` lines 16–31 vs `specs-directory-structure.md` lines 184–193]                                                                                   |
+| GAP-5 | `specs/apps/rhino/`                                                     | Only `behavior/cli/gherkin/` populated                                                                                                      | CLI-only surface profile: `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/cli/gherkin/`                                                                           | MEDIUM   | [Repo-grounded — `specs/apps/rhino/README.md` lines 18–24 vs `specs-directory-structure.md` line 151]                                                                                        |
+| GAP-6 | `specs/apps/ayokoding/build-tools/`                                     | Legacy flat-root slug containing `gherkin/index-generation/`                                                                                | Migrated under `behavior/build-tools/gherkin/` OR documented as permanent slug                                                                                                               | MEDIUM   | [Repo-grounded — `specs/apps/ayokoding/README.md` lines 45–53]                                                                                                                               |
+| GAP-7 | `apps/rhino-cli/src/internal/allowlist.rs` `AppsWithDDD`                | Lists `organiclever`, `wahidyankf`, `ose-platform`, `ayokoding`                                                                             | Inline-commented rationale for include/exclude per app; ose-app evaluated                                                                                                                    | LOW      | [Repo-grounded — `apps/rhino-cli/src/internal/allowlist.rs` exists per `find` output]                                                                                                        |
+| GAP-8 | `specs/apps/ose-app/README.md` "For Product / Project Managers" section | Absent (organiclever has equivalent section)                                                                                                | Present with reading-order guidance                                                                                                                                                          | LOW      | [Repo-grounded — `specs/apps/ose-app/README.md` lines 1–66 vs `specs/apps/organiclever/README.md` lines 168–197]                                                                             |
+| GAP-9 | CLI `gherkin/` trees across 4 apps                                      | Flat `.feature` files at root of `behavior/cli/gherkin/` (crane=11 files in flat `gherkin/`; rhino=44; ayokoding-cli=3; ose-platform-cli=1) | Domain subdirs everywhere: `behavior/cli/gherkin/<domain>/<feature>.feature` matching organiclever BE/web pattern. Convention §Domain Subdirectory Rules updated to drop CLI-flat exception. | HIGH     | [Repo-grounded — `ls` of each CLI gherkin folder vs `specs/apps/organiclever/behavior/be/gherkin/<domain>/` pattern, plus current carve-out at `specs-directory-structure.md` lines 184–193] |
 
 ## Target Structure per App
 
@@ -30,6 +31,119 @@ is authoritative. Mapping every in-scope app to its declared profile:
 | ose-platform | Web-only + perspective `api` | `product/`, `system-context/`, `containers/`, `components/{web,api}/`, `behavior/{web,api}/gherkin/`     | Compliant (legacy `cli/` already retired) | No structural action                                                                 |
 | rhino        | CLI-only                     | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/cli/gherkin/`                 | Only `behavior/cli/gherkin/`              | Add four missing folders, each with `README.md` skeleton                             |
 | wahidyankf   | Web-only                     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/web/gherkin/`                 | Compliant                                 | No structural action                                                                 |
+
+## Target Final `specs/` Tree (ASCII)
+
+The full post-migration tree. Every leaf path here MUST exist (or be a directory containing
+≥1 `.feature`) at plan completion. Per-domain `README.md` files are required at every
+directory level but omitted from this rendering for brevity except where they sit at a
+non-obvious depth.
+
+```
+specs/
+├── README.md                                           # rewritten per Phase 1
+├── LICENSE
+├── apps/
+│   ├── ayokoding/
+│   │   ├── README.md
+│   │   ├── product/README.md
+│   │   ├── system-context/{README.md,context.md}
+│   │   ├── containers/{README.md,container.md}
+│   │   ├── components/
+│   │   │   ├── README.md
+│   │   │   ├── api/{README.md,component-api.md}
+│   │   │   └── web/{README.md,component-web.md}
+│   │   ├── ddd/
+│   │   │   ├── README.md
+│   │   │   ├── bounded-contexts.yaml
+│   │   │   ├── bounded-context-map.md
+│   │   │   └── ubiquitous-language/{README.md,<bc>.md}
+│   │   └── behavior/
+│   │       ├── README.md
+│   │       ├── api/gherkin/
+│   │       │   └── <domain>/<feature>.feature          # existing
+│   │       ├── web/gherkin/
+│   │       │   └── <domain>/<feature>.feature          # existing
+│   │       ├── cli/gherkin/
+│   │       │   ├── system/{check-all,version}.feature  # NEW (Phase 6.a)
+│   │       │   └── links/links-check.feature           # NEW (Phase 6.a)
+│   │       └── build-tools/gherkin/                    # NEW (Phase 4.A, if D1==A)
+│   │           └── index-generation/<feature>.feature
+│   ├── crane/                                          # FULLY MIGRATED (Phase 2)
+│   │   ├── README.md
+│   │   ├── product/README.md                           # NEW skeleton
+│   │   ├── system-context/README.md                    # NEW skeleton
+│   │   ├── containers/README.md                        # NEW skeleton
+│   │   ├── components/cli/README.md                    # NEW skeleton
+│   │   └── behavior/cli/gherkin/
+│   │       ├── README.md
+│   │       ├── pdf/pdf-commands.feature
+│   │       ├── content/{text-check,heading-check,nesting-check}.feature
+│   │       ├── media/{table-check,figure-check,mermaid-validate,ocr-quality}.feature
+│   │       └── reporting/{report-management,skiplist-management}.feature
+│   ├── organiclever/                                   # ALREADY COMPLIANT
+│   │   ├── README.md
+│   │   ├── product/                                    # existing
+│   │   ├── system-context/                             # existing
+│   │   ├── containers/{contracts/,container.md,deployment.md}
+│   │   ├── components/{be,web}/                        # existing
+│   │   ├── ddd/                                        # existing
+│   │   └── behavior/{be,web}/gherkin/<domain>/<feature>.feature
+│   ├── ose-app/                                        # ALREADY COMPLIANT (+ PM section added Phase 5)
+│   │   ├── README.md                                   # NEW PM section
+│   │   ├── product/                                    # existing
+│   │   ├── system-context/                             # existing
+│   │   ├── containers/{contracts/,...}
+│   │   ├── components/                                 # existing
+│   │   ├── ddd/                                        # existing
+│   │   └── behavior/{be,web}/gherkin/<domain>/<feature>.feature
+│   ├── ose-platform/                                   # ALREADY COMPLIANT (+ cli regrouped Phase 6.b)
+│   │   ├── README.md
+│   │   ├── product/                                    # existing
+│   │   ├── system-context/                             # existing
+│   │   ├── containers/                                 # existing
+│   │   ├── components/{api,web}/                       # existing
+│   │   ├── ddd/                                        # existing
+│   │   └── behavior/
+│   │       ├── api/gherkin/<domain>/<feature>.feature  # existing
+│   │       ├── web/gherkin/<domain>/<feature>.feature  # existing
+│   │       └── cli/gherkin/
+│   │           └── links/links-check.feature           # NEW (Phase 6.b — single-feature domain)
+│   ├── rhino/                                          # FILLED OUT + REGROUPED (Phase 3)
+│   │   ├── README.md
+│   │   ├── product/README.md                           # NEW skeleton
+│   │   ├── system-context/README.md                    # NEW skeleton
+│   │   ├── containers/README.md                        # NEW skeleton
+│   │   ├── components/cli/README.md                    # NEW skeleton
+│   │   └── behavior/cli/gherkin/
+│   │       ├── README.md
+│   │       ├── agents/{agents-detect-duplication,agents-sync,agents-validate-claude,agents-validate-naming}.feature
+│   │       ├── ddd/{ddd-bc,ddd-ul}.feature
+│   │       ├── docs/{docs-validate-frontmatter,docs-validate-heading-hierarchy,docs-validate-links,docs-validate-mermaid,docs-validate-naming}.feature
+│   │       ├── env/{env-backup,env-init,env-restore}.feature
+│   │       ├── git/git-pre-commit.feature
+│   │       ├── repo-governance/{repo-governance-agents-md-size,repo-governance-audit,repo-governance-emoji-audit,repo-governance-frontmatter-audit,repo-governance-layer-coherence,repo-governance-license-audit,repo-governance-readme-index-audit,repo-governance-traceability-audit,repo-governance-vendor-audit}.feature
+│   │       ├── spec-coverage/spec-coverage-validate.feature
+│   │       ├── test-coverage/{test-coverage-diff,test-coverage-merge,test-coverage-validate}.feature
+│   │       ├── workflows/workflows-validate-naming.feature
+│   │       └── system/{doctor,version,check-all}.feature   # singletons land here
+│   └── wahidyankf/                                     # ALREADY COMPLIANT
+│       └── ...                                         # unchanged
+├── apps-labs/
+│   └── README.md                                       # placeholder, empty
+└── libs/
+    ├── golang-commons/
+    │   └── gherkin/<package>/<feature>.feature         # already domain-grouped
+    ├── hugo-commons/
+    │   └── gherkin/links/check-links.feature           # already grouped; lib retention TBD
+    └── web-ui/
+        └── gherkin/<component>/<component>.feature     # already grouped
+```
+
+**Universal invariant** (post-plan): `find specs -type f -name '*.feature'` must return zero
+results matching `behavior/<surface>/gherkin/<feature>.feature` — every feature lives at
+`behavior/<surface>/gherkin/<domain>/<feature>.feature` or
+`gherkin/<package>/<feature>.feature` (libs).
 
 ## Decisions
 
@@ -96,68 +210,173 @@ forcing this structural plan to author technical content. [Judgment call]
 Same recommendation as D3. Skeleton READMEs only; behavior preserved as the source of truth for
 rhino-cli command contracts.
 
+### D5 — Domain groupings for CLI gherkin trees
+
+Per US-8 / AC-8, every flat CLI `gherkin/` tree must adopt domain subdirectories matching
+organiclever's BE/web pattern. The domain choice for each app is delegated to execution-time
+maintainer judgment, but the plan supplies a default mapping inferred from current filename
+prefixes so execution has a starting point.
+
+**Default groupings (apply unless maintainer overrides at execution time):**
+
+| App                                             | Source files                                                                                                                                                                                                                                                                                                                                     | Proposed domain subdirs                                                                                                                                                                                                       |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `specs/apps/crane/behavior/cli/gherkin/`        | `pdf-commands`, `text-check`, `heading-check`, `nesting-check`, `table-check`, `figure-check`, `mermaid-validate`, `ocr-quality`, `report-management`, `skiplist-management` (10 features, after migration from flat `gherkin/`)                                                                                                                 | `pdf/`, `content/` (text + heading + nesting), `media/` (table + figure + mermaid + ocr), `reporting/` (report + skiplist) — collapses 10 files into 4 domains                                                                |
+| `specs/apps/rhino/behavior/cli/gherkin/`        | 44 features prefixed by domain: `agents-*` (4), `ddd-*` (2), `docs-*` (5), `env-*` (3), `git-*` (1), `repo-governance-*` (9), `spec-coverage-*` (1), `test-coverage-*` (3), `workflows-*` (1), plus `check-all`, `doctor`, `links-check`, `version`, `pdf-commands` and other singletons. (Re-verify count at execution start — `ls` may drift.) | `agents/`, `ddd/`, `docs/`, `env/`, `git/`, `repo-governance/`, `spec-coverage/`, `test-coverage/`, `workflows/`, plus `system/` for `doctor`, `version`, `check-all`. One-feature singletons fold into their natural domain. |
+| `specs/apps/ayokoding/behavior/cli/gherkin/`    | `check-all`, `links-check`, `version`                                                                                                                                                                                                                                                                                                            | `system/` (check-all, version), `links/` (links-check)                                                                                                                                                                        |
+| `specs/apps/ose-platform/behavior/cli/gherkin/` | `links-check`                                                                                                                                                                                                                                                                                                                                    | `links/` (single feature; one-feature domain is allowed per convention)                                                                                                                                                       |
+
+**Severity escape hatch**: For one-feature domains (e.g., `ose-platform/links/`), the convention
+update must explicitly permit single-file domain folders so `validate-tree` does not flag them.
+[Judgment call]
+
+**Resolution required at delivery.md Phase 0** (before Phase 2 crane migration begins).
+Default to the table above unless maintainer overrides per app.
+
 ## Migration Recipes
 
-### R1 — Crane: flat `gherkin/` → `behavior/cli/gherkin/`
+### R1 — Crane: flat `gherkin/` → `behavior/cli/gherkin/<domain>/`
+
+Migrates crane to the CLI-only five-folder tree AND groups every `.feature` under a domain
+subdir per [§D5](#d5--domain-groupings-for-cli-gherkin-trees).
 
 ```bash
 # All commands run inside the worktree at worktrees/specs-tree-uniform/
 cd worktrees/specs-tree-uniform
 
-# Step 1 — create destination
-mkdir -p specs/apps/crane/behavior/cli/gherkin
+# Step 1 — create destination tree with domain subdirs
+mkdir -p specs/apps/crane/behavior/cli/gherkin/{pdf,content,media,reporting}
 mkdir -p specs/apps/crane/product
 mkdir -p specs/apps/crane/system-context
 mkdir -p specs/apps/crane/containers
 mkdir -p specs/apps/crane/components/cli
 
-# Step 2 — git mv every .feature plus the gherkin README
-git mv specs/apps/crane/gherkin/README.md         specs/apps/crane/behavior/cli/gherkin/README.md
-git mv specs/apps/crane/gherkin/figure-check.feature      specs/apps/crane/behavior/cli/gherkin/figure-check.feature
-git mv specs/apps/crane/gherkin/heading-check.feature     specs/apps/crane/behavior/cli/gherkin/heading-check.feature
-git mv specs/apps/crane/gherkin/mermaid-validate.feature  specs/apps/crane/behavior/cli/gherkin/mermaid-validate.feature
-git mv specs/apps/crane/gherkin/nesting-check.feature     specs/apps/crane/behavior/cli/gherkin/nesting-check.feature
-git mv specs/apps/crane/gherkin/ocr-quality.feature       specs/apps/crane/behavior/cli/gherkin/ocr-quality.feature
-git mv specs/apps/crane/gherkin/pdf-commands.feature      specs/apps/crane/behavior/cli/gherkin/pdf-commands.feature
-git mv specs/apps/crane/gherkin/report-management.feature specs/apps/crane/behavior/cli/gherkin/report-management.feature
-git mv specs/apps/crane/gherkin/skiplist-management.feature specs/apps/crane/behavior/cli/gherkin/skiplist-management.feature
-git mv specs/apps/crane/gherkin/table-check.feature       specs/apps/crane/behavior/cli/gherkin/table-check.feature
-git mv specs/apps/crane/gherkin/text-check.feature        specs/apps/crane/behavior/cli/gherkin/text-check.feature
+# Step 2 — git mv every .feature into its domain folder per D5 grouping
+# pdf/
+git mv specs/apps/crane/gherkin/pdf-commands.feature       specs/apps/crane/behavior/cli/gherkin/pdf/pdf-commands.feature
+# content/ (text + heading + nesting)
+git mv specs/apps/crane/gherkin/text-check.feature         specs/apps/crane/behavior/cli/gherkin/content/text-check.feature
+git mv specs/apps/crane/gherkin/heading-check.feature      specs/apps/crane/behavior/cli/gherkin/content/heading-check.feature
+git mv specs/apps/crane/gherkin/nesting-check.feature      specs/apps/crane/behavior/cli/gherkin/content/nesting-check.feature
+# media/ (table + figure + mermaid + ocr)
+git mv specs/apps/crane/gherkin/table-check.feature        specs/apps/crane/behavior/cli/gherkin/media/table-check.feature
+git mv specs/apps/crane/gherkin/figure-check.feature       specs/apps/crane/behavior/cli/gherkin/media/figure-check.feature
+git mv specs/apps/crane/gherkin/mermaid-validate.feature   specs/apps/crane/behavior/cli/gherkin/media/mermaid-validate.feature
+git mv specs/apps/crane/gherkin/ocr-quality.feature        specs/apps/crane/behavior/cli/gherkin/media/ocr-quality.feature
+# reporting/ (report + skiplist)
+git mv specs/apps/crane/gherkin/report-management.feature  specs/apps/crane/behavior/cli/gherkin/reporting/report-management.feature
+git mv specs/apps/crane/gherkin/skiplist-management.feature specs/apps/crane/behavior/cli/gherkin/reporting/skiplist-management.feature
+# README
+git mv specs/apps/crane/gherkin/README.md                  specs/apps/crane/behavior/cli/gherkin/README.md
 
-# Step 3 — sweep all path references in the same commit
+# Step 3 — sweep all path references in the same commit. Two sweeps needed because
+# files moved from a flat layout into different domain subdirs — a single sed can't
+# rewrite filename-aware paths. Most references use directory paths only.
 grep -rln 'specs/apps/crane/gherkin' apps libs .github .husky docs repo-governance \
   | xargs -I {} sed -i.bak 's|specs/apps/crane/gherkin|specs/apps/crane/behavior/cli/gherkin|g' {}
 find . -name '*.bak' -delete
+# Hand-verify any per-file refs (e.g., direct .feature path imports in step files).
+# `grep -rn 'pdf-commands.feature\|text-check.feature\|...' apps/crane-cli/` and
+# rewrite per the D5 grouping table.
 
-# Step 4 — author skeleton READMEs (see R3 template)
-# Step 5 — update specs/apps/crane/README.md "Structure" block
+# Step 4 — author skeleton READMEs (see R3 template) for product/, system-context/,
+# containers/, components/cli/. Also a one-paragraph index README in each new domain
+# subdir (pdf/, content/, media/, reporting/) listing its features.
+
+# Step 5 — update specs/apps/crane/README.md "Structure" block to show domain subdirs
+
 # Step 6 — verify
 nx run rhino-cli:validate:specs-tree --apps crane
 nx run rhino-cli:validate:specs-counts --apps crane
 nx run rhino-cli:validate:specs-links --apps crane
+nx run crane-cli:test:unit
+nx run crane-cli:test:integration
 
 # Step 7 — atomic commit
 git add -A
-git commit -m "refactor(specs/crane): migrate to canonical CLI-only five-folder tree"
+git commit -m "refactor(specs/crane): migrate to canonical CLI tree with domain subdirs"
 ```
 
-**Pre-flight verification** (mandatory before `git mv`): confirm the exact feature-file list with
-`ls specs/apps/crane/gherkin/`. The list above is from a 2026-05-23 `find` and may drift before
-execution. [Repo-grounded — verify at execution start]
+**Pre-flight verification** (mandatory before `git mv`): confirm the exact feature-file list
+with `ls specs/apps/crane/gherkin/`. The list above is from a 2026-05-23 `find` and may drift
+before execution. If new features have appeared, assign each to a D5 domain at migration time.
+[Repo-grounded — verify at execution start]
 
-### R2 — Rhino: add missing top-level folders
+### R2 — Rhino: add missing top-level folders AND regroup `.feature` files into domain subdirs
+
+Two changes in one atomic commit: (a) create the four missing CLI-only top-level folders,
+(b) regroup the 44 existing `.feature` files under `behavior/cli/gherkin/<domain>/` per
+the D5 grouping table.
 
 ```bash
+# Step 1 — create missing C4 folders
 mkdir -p specs/apps/rhino/product
 mkdir -p specs/apps/rhino/system-context
 mkdir -p specs/apps/rhino/containers
 mkdir -p specs/apps/rhino/components/cli
 
-# Author skeleton READMEs via R3 template
-# Update specs/apps/rhino/README.md "Structure" block
-# Verify
+# Step 2 — create CLI-gherkin domain subdirs
+mkdir -p specs/apps/rhino/behavior/cli/gherkin/{agents,ddd,docs,env,git,repo-governance,spec-coverage,test-coverage,workflows,system}
+
+# Step 3 — regroup features by prefix.
+# Idiom: for every `<domain>-*.feature` file at the gherkin root, git mv into <domain>/.
+# Execute these one domain at a time so each line is auditable:
+for f in specs/apps/rhino/behavior/cli/gherkin/agents-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/agents/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/ddd-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/ddd/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/docs-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/docs/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/env-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/env/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/git-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/git/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/repo-governance-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/repo-governance/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/spec-coverage-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/spec-coverage/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/test-coverage-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/test-coverage/"$(basename "$f")"
+done
+for f in specs/apps/rhino/behavior/cli/gherkin/workflows-*.feature; do
+  git mv "$f" specs/apps/rhino/behavior/cli/gherkin/workflows/"$(basename "$f")"
+done
+# system/ catches the singletons that have no domain prefix.
+git mv specs/apps/rhino/behavior/cli/gherkin/doctor.feature       specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature
+git mv specs/apps/rhino/behavior/cli/gherkin/version.feature      specs/apps/rhino/behavior/cli/gherkin/system/version.feature
+git mv specs/apps/rhino/behavior/cli/gherkin/check-all.feature    specs/apps/rhino/behavior/cli/gherkin/system/check-all.feature
+# Re-verify nothing left at the root via `find specs/apps/rhino/behavior/cli/gherkin -maxdepth 1 -name '*.feature'`
+# — output must be empty before commit.
+
+# Step 4 — sweep path references for rhino integration tests + Nx inputs
+grep -rln 'specs/apps/rhino/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance \
+  > /tmp/rhino-spec-refs.txt
+# Inspect /tmp/rhino-spec-refs.txt — each match must be rewritten by hand or scripted
+# per the new domain layout. Pre-push will fail loudly if any reference is stale.
+
+# Step 5 — author skeleton READMEs at product/, system-context/, containers/,
+# components/cli/ and a one-paragraph index README in each new domain subdir.
+
+# Step 6 — update specs/apps/rhino/README.md and behavior/cli/gherkin/README.md
+# "Structure" blocks to show the domain layout.
+
+# Step 7 — verify
 nx run rhino-cli:validate:specs-tree --apps rhino
 nx run rhino-cli:validate:specs-counts --apps rhino
+nx run rhino-cli:validate:specs-links --apps rhino
+nx run rhino-cli:test:quick
+nx run rhino-cli:test:integration
+
+# Step 8 — atomic commit
+git add -A
+git commit -m "refactor(specs/rhino): fill out CLI tree and regroup features into domains"
 ```
 
 ### R3 — Skeleton README template
@@ -232,25 +451,81 @@ pub const APPS_WITH_DDD: &[&str] = &[
 name and exact syntax MUST be confirmed by reading the file at execution start; the snippet
 above is illustrative.]
 
+### R7 — Domain regrouping for ayokoding-cli, ose-platform-cli, and validator enforcement
+
+Two short atomic commits — one per app — plus a third commit that hardens the validator and
+the convention so future flat CLI gherkin layouts are rejected at the gate.
+
+```bash
+# Commit 7.a — ayokoding-cli domain regrouping (3 features)
+mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/{system,links}
+git mv specs/apps/ayokoding/behavior/cli/gherkin/check-all.feature   specs/apps/ayokoding/behavior/cli/gherkin/system/check-all.feature
+git mv specs/apps/ayokoding/behavior/cli/gherkin/version.feature     specs/apps/ayokoding/behavior/cli/gherkin/system/version.feature
+git mv specs/apps/ayokoding/behavior/cli/gherkin/links-check.feature specs/apps/ayokoding/behavior/cli/gherkin/links/links-check.feature
+# Sweep refs in step files + Nx inputs
+grep -rln 'ayokoding/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance > /tmp/ayko-cli-refs.txt
+# Inspect and rewrite each match by hand (per-file paths only)
+nx run rhino-cli:validate:specs-tree --apps ayokoding
+nx run rhino-cli:validate:specs-counts --apps ayokoding
+nx run ayokoding-cli:test:quick
+git add -A
+git commit -m "refactor(specs/ayokoding): regroup cli features into domain subdirs"
+
+# Commit 7.b — ose-platform-cli domain regrouping (1 feature, single-feature domain)
+mkdir -p specs/apps/ose-platform/behavior/cli/gherkin/links
+git mv specs/apps/ose-platform/behavior/cli/gherkin/links-check.feature specs/apps/ose-platform/behavior/cli/gherkin/links/links-check.feature
+grep -rln 'ose-platform/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance > /tmp/osep-cli-refs.txt
+# Inspect and rewrite
+nx run rhino-cli:validate:specs-tree --apps ose-platform
+nx run rhino-cli:validate:specs-counts --apps ose-platform
+nx run ose-cli:test:quick
+git add -A
+git commit -m "refactor(specs/ose-platform): regroup cli features into domain subdirs"
+
+# Commit 7.c — validator enforcement (Rust) + convention update
+# Edit apps/rhino-cli/src/specs/validate_tree.rs (or equivalent file located via
+# `grep -rln 'flat CLI\|cli.*flat\|gherkin.*domain' apps/rhino-cli/src/`) so that a
+# .feature directly under behavior/<surface>/gherkin/ now emits HIGH.
+# Add a unit test covering the new rule.
+cargo check --manifest-path apps/rhino-cli/Cargo.toml
+nx run rhino-cli:test:quick
+# Edit repo-governance/conventions/structure/specs-directory-structure.md:
+#   - drop "CLI specs use a flat structure under `gherkin/` with NO domain subdirectories"
+#     (current lines 184–193)
+#   - replace with "Every surface (BE, web, CLI) uses domain subdirectories under `gherkin/`.
+#     Single-feature domains are permitted when the CLI surface area is small."
+#   - append a §Migration Path retirement note dated YYYY-MM-DD documenting the change.
+git add -A
+git commit -m "feat(rhino-cli): enforce domain subdirs under every behavior/<surface>/gherkin/"
+```
+
+This commit triplet is the structural-side counterpart to the Phase 7 propagation step that
+`repo-rules-maker` reflects into all other governance/agent surfaces.
+
 ## File Impact
 
-| File                                                                            | Action                                                             |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `specs/README.md`                                                               | Rewrite Standard Folder Pattern, App Specs, Library Specs sections |
-| `specs/apps/crane/README.md`                                                    | Update Structure block + Running the Tests paths                   |
-| `specs/apps/crane/gherkin/`                                                     | Deleted via `git mv`                                               |
-| `specs/apps/crane/behavior/cli/gherkin/**`                                      | New location for every feature file                                |
-| `specs/apps/crane/{product,system-context,containers,components/cli}/README.md` | New skeleton files                                                 |
-| `specs/apps/rhino/{product,system-context,containers,components/cli}/README.md` | New skeleton files                                                 |
-| `specs/apps/rhino/README.md`                                                    | Update Structure block to show full CLI-only tree                  |
-| `specs/apps/ayokoding/README.md`                                                | Remove "Out of scope" legacy slug warning for `build-tools/`       |
-| `specs/apps/ayokoding/build-tools/`                                             | Deleted via `git mv` (if D1.A chosen)                              |
-| `specs/apps/ayokoding/behavior/build-tools/gherkin/**`                          | New location (if D1.A chosen)                                      |
-| `specs/apps/ose-app/README.md`                                                  | Add "For Product / Project Managers" section                       |
-| `apps/rhino-cli/src/internal/allowlist.rs`                                      | Add `ose-app` to allowlist + inline rationale comment              |
-| `apps/rhino-cli/src/specs/<surface-enum>.rs` (if D1.A)                          | Add `build-tools` to canonical surface enum                        |
-| `apps/crane-cli/tests/unit/steps/**`                                            | Update any hardcoded `specs/apps/crane/gherkin` path references    |
-| `apps/crane-cli/project.json`                                                   | Update Nx target `inputs` referencing the spec path                |
+| File                                                                                      | Action                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `specs/README.md`                                                                         | Rewrite Standard Folder Pattern, App Specs, Library Specs sections                                                       |
+| `specs/apps/crane/README.md`                                                              | Update Structure block + Running the Tests paths                                                                         |
+| `specs/apps/crane/gherkin/`                                                               | Deleted via `git mv`                                                                                                     |
+| `specs/apps/crane/behavior/cli/gherkin/**`                                                | New location for every feature file                                                                                      |
+| `specs/apps/crane/{product,system-context,containers,components/cli}/README.md`           | New skeleton files                                                                                                       |
+| `specs/apps/rhino/{product,system-context,containers,components/cli}/README.md`           | New skeleton files                                                                                                       |
+| `specs/apps/rhino/README.md`                                                              | Update Structure block to show full CLI-only tree                                                                        |
+| `specs/apps/ayokoding/README.md`                                                          | Remove "Out of scope" legacy slug warning for `build-tools/`                                                             |
+| `specs/apps/ayokoding/build-tools/`                                                       | Deleted via `git mv` (if D1.A chosen)                                                                                    |
+| `specs/apps/ayokoding/behavior/build-tools/gherkin/**`                                    | New location (if D1.A chosen)                                                                                            |
+| `specs/apps/ose-app/README.md`                                                            | Add "For Product / Project Managers" section                                                                             |
+| `apps/rhino-cli/src/internal/allowlist.rs`                                                | Add `ose-app` to allowlist + inline rationale comment                                                                    |
+| `apps/rhino-cli/src/specs/<surface-enum>.rs` (if D1.A)                                    | Add `build-tools` to canonical surface enum                                                                              |
+| `apps/rhino-cli/src/specs/validate_tree.rs`                                               | Add HIGH finding for flat `.feature` directly under any `behavior/<surface>/gherkin/`; add unit test for the rule        |
+| `repo-governance/conventions/structure/specs-directory-structure.md`                      | Drop CLI-flat exception (lines 184–193); add domain-subdir-for-all-surfaces rule; append §Migration Path retirement note |
+| `apps/crane-cli/tests/unit/steps/**`                                                      | Update any hardcoded `specs/apps/crane/gherkin` path references plus per-file domain-subdir paths                        |
+| `apps/crane-cli/project.json`                                                             | Update Nx target `inputs` referencing the spec path                                                                      |
+| `apps/ayokoding-cli/**` (step files + project.json)                                       | Update path references to the new `behavior/cli/gherkin/<domain>/` layout                                                |
+| `apps/ose-cli/**` (step files + project.json)                                             | Update path references to the new `behavior/cli/gherkin/links/` layout                                                   |
+| `specs/apps/{crane,rhino,ayokoding,ose-platform}/behavior/cli/gherkin/<domain>/README.md` | New one-paragraph domain index README per domain subdir created                                                          |
 
 The exact set of step-definition files and Nx config files touched by path sweeps is determined
 by `grep -rln 'specs/apps/crane/gherkin' .` AND `grep -rln 'specs/apps/ayokoding/build-tools' .`
@@ -271,9 +546,12 @@ all `sed`-driven path updates** for that path. Do not push between `git mv` and 
 Each migration commit is atomic, so rollback is `git revert <commit-sha>` for any one of:
 
 - Root README rewrite
-- Crane migration
-- Rhino fill-out
+- Crane migration (with domain subdirs)
+- Rhino fill-out (with domain regrouping)
 - Ayokoding build-tools migration
+- Ayokoding-cli domain regrouping (R7.a)
+- ose-platform-cli domain regrouping (R7.b)
+- Validator enforcement + convention update (R7.c)
 - Allowlist update
 
 Reverting one commit does not require touching the others. Validator state returns to pre-commit
