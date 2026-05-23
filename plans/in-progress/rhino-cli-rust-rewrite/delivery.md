@@ -247,7 +247,10 @@ Goal: port the `repo-governance` namespace and its 9 sub-validators. Each comman
     - **Date**: 2026-05-23 **Status**: Completed
     - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/traceability_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_traceability_audit.rs`, `apps/rhino-cli/project.json`
     - **Notes**: Four sub-audits (principles/conventions/development/workflows) check required H2 headings + agent references. META_EXEMPT skips meta workflow docs. Schema `rhino-cli/traceability-audit/v1`. Shadow-diff PASS text+JSON+markdown. Nx target flipped.
-  - [ ] `repo-governance vendor-audit` — port `cmd/governance_vendor_audit.go`. Heading-state-machine verbatim port per [tech-docs.md §Command-Specific Risks](./tech-docs.md#command-specific-risks).
+  - [x] `repo-governance vendor-audit` — port `cmd/governance_vendor_audit.go`. Heading-state-machine verbatim port per [tech-docs.md §Command-Specific Risks](./tech-docs.md#command-specific-risks).
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/vendor_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_vendor_audit.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: State-machine scanner with CommonMark length-aware code fences, YAML frontmatter, multi-line HTML comments, Platform Binding Examples heading scope (level-aware exit). 29 forbidden terms (brands, binding paths, vendors, models, branded concepts). `strip_non_prose` chains HTML comments → inline code → link URL stripping. Convention definition file self-exempted via path suffix match. JSON output is raw status/count/findings shape (no envelope wrapper). Shadow-diff PASS text+JSON+markdown against real repo-governance/ corpus. Nx target flipped.
   - _Suggested executor for each: `swe-rust-dev`_
 - [ ] After all governance commands flip, run `grep -E "go run.*rhino-cli.*(repo-governance|governance)" apps/*/project.json .github/ .husky/`. Verify: no matches.
 - [ ] Run local quality gates; commit and push.

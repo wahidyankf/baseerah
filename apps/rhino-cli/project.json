@@ -225,7 +225,7 @@
       "outputs": []
     },
     "validate:repo-governance-vendor-audit": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go repo-governance vendor-audit repo-governance/",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- repo-governance vendor-audit repo-governance/",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/repo-governance/**/*.md"],
       "outputs": []

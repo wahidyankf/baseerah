@@ -3,7 +3,8 @@ use clap::{Parser, Subcommand};
 use crate::commands::{
     governance_agents_md_size, governance_emoji_audit, governance_frontmatter_audit,
     governance_layer_coherence, governance_license_audit, governance_readme_index_audit,
-    governance_traceability_audit, spec_coverage_validate, test_coverage_validate,
+    governance_traceability_audit, governance_vendor_audit, spec_coverage_validate,
+    test_coverage_validate,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -90,6 +91,9 @@ pub enum RepoGovernanceCommands {
     /// Audit governance documents for required traceability sections.
     #[command(name = "traceability-audit")]
     TraceabilityAudit(governance_traceability_audit::TraceabilityAuditArgs),
+    /// Scan governance markdown for forbidden vendor-specific terms.
+    #[command(name = "vendor-audit")]
+    VendorAudit(governance_vendor_audit::VendorAuditArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -170,6 +174,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             RepoGovernanceCommands::TraceabilityAudit(args) => {
                 governance_traceability_audit::run(args, output_format)
+            }
+            RepoGovernanceCommands::VendorAudit(args) => {
+                governance_vendor_audit::run(args, output_format)
             }
         },
     };
