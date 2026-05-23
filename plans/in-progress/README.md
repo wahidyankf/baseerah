@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [architecture-procedural-track](./architecture-procedural-track/README.md) — Third paradigm track (Go/Rust/C) on ayokoding-web
+_(none)_
 
 ## Instructions
 

@@ -4,7 +4,7 @@ Adds a third paradigm track — **`in-procedural-by-example`** — to the softwa
 
 ## Status
 
-**Scaffolding complete (2026-05-20).** Overview pages and `_index.md` indexes for all five top-level architecture topics (patterns-and-principles, ddd, hexagonal, fsm, cases) are live with full paradigm framing, language-fit reasoning, and authoritative citations. Full beginner / intermediate / advanced example content authoring is pending — see [delivery.md](./delivery.md) for the rollout checklist.
+**Done (2026-05-24).** All 15 tier files shipped. Overview scaffolding (Stage 1) completed 2026-05-20; full beginner/intermediate/advanced content authoring (Stage 2) completed 2026-05-24. All 15 files lint clean, Go canonical throughout (Rust typestate canonical for FSM), C in FSM advanced only (Samek statecharts). 74–77 examples per topic track; 27 production guides for cases. All Stage 2 acceptance criteria met.
 
 ## Documents
 
