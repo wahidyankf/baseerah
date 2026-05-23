@@ -109,7 +109,7 @@ Goal: a buildable `apps/rhino-cli-rs/` crate with an empty CLI surface, wired in
   - **Status**: Completed
   - **Files Changed**: `apps/rhino-cli-rs/README.md` (new)
   - **Notes**: Mirrors `apps/rhino-cli/README.md` structure (heading hierarchy, Quick Start, Installation, Global Flags). Adds Phase 0 Status callout, Nx Targets table (Phase 0 stubs called out for spec-coverage + test:quick swap-in-Phase-1), and "See also" links to the Go README + migration plan + Gherkin specs. Direct execution (not `readme-maker`) — single-shot scaffold work, no value-add from agent delegation. `npm run lint:md` exits 0 over all 3995 markdown files. Pre-commit hook applied Prettier formatting (PostToolUse hook fired after Write).
-- [ ] Smoke-test Nx targets:
+- [x] Smoke-test Nx targets:
   - [x] `npx nx run rhino-cli-rs:build` exits 0 and produces `apps/rhino-cli-rs/dist/rhino-cli`.
     - **Date**: 2026-05-23 — exit 0; release profile compile 12.81s; binary present, Mach-O 64-bit arm64.
   - [x] `npx nx run rhino-cli-rs:typecheck` exits 0.

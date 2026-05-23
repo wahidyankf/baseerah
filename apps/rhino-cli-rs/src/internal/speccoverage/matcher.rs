@@ -25,7 +25,6 @@ pub struct StepMatcherEntry {
     pub exact_text: String,   // populated when kind == Exact (ws-normalized)
     pub pattern_text: String, // raw regex source (kind == Pattern)
     pub file: String,         // origin file (absolute path; reporter resolves)
-    pub(crate) compiled: Option<Regex>,
 }
 
 #[derive(Debug, Default)]
@@ -70,7 +69,6 @@ impl StepMatcher {
             exact_text: normalized.clone(),
             pattern_text: String::new(),
             file: origin_file.to_string(),
-            compiled: None,
         });
         self.exact_index.insert(normalized.clone(), idx);
         self.exact.insert(normalized, true);
@@ -83,7 +81,6 @@ impl StepMatcher {
             exact_text: String::new(),
             pattern_text: pattern_text.to_string(),
             file: origin_file.to_string(),
-            compiled: Some(re.clone()),
         });
         self.patterns.push(re);
     }
