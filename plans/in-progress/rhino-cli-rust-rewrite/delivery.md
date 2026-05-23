@@ -243,7 +243,10 @@ Goal: port the `repo-governance` namespace and its 9 sub-validators. Each comman
     - **Date**: 2026-05-23 **Status**: Completed
     - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/readme_index_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_readme_index_audit.rs`, `apps/rhino-cli/project.json`
     - **Notes**: Orphan/ghost detection for README.md indexes. Walker honors hidden + reserved skip dirs (node_modules/target/dist/build/.next/.git). Markdown link regex extracts `.md` targets, skips URLs/abs paths/`..`. SiblingTargets handles bare-dir links (`structure` → `structure/README.md`). `glob` crate for excludes (full path / basename / component match). Shadow-diff PASS text+JSON+markdown. Nx target flipped.
-  - [ ] `repo-governance traceability-audit` — port `cmd/governance_traceability_audit.go`.
+  - [x] `repo-governance traceability-audit` — port `cmd/governance_traceability_audit.go`.
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/traceability_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_traceability_audit.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: Four sub-audits (principles/conventions/development/workflows) check required H2 headings + agent references. META_EXEMPT skips meta workflow docs. Schema `rhino-cli/traceability-audit/v1`. Shadow-diff PASS text+JSON+markdown. Nx target flipped.
   - [ ] `repo-governance vendor-audit` — port `cmd/governance_vendor_audit.go`. Heading-state-machine verbatim port per [tech-docs.md §Command-Specific Risks](./tech-docs.md#command-specific-risks).
   - _Suggested executor for each: `swe-rust-dev`_
 - [ ] After all governance commands flip, run `grep -E "go run.*rhino-cli.*(repo-governance|governance)" apps/*/project.json .github/ .husky/`. Verify: no matches.

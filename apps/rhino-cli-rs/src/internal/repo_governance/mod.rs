@@ -7,3 +7,4 @@ pub mod frontmatter_audit;
 pub mod layer_coherence;
 pub mod license_audit;
 pub mod readme_index_audit;
+pub mod traceability_audit;
