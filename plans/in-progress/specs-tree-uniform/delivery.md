@@ -13,57 +13,80 @@ claude --worktree specs-tree-uniform
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)
 and [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
+> D1 resolution (2026-05-23): chose option A — migrate `build-tools/` under
+> `behavior/build-tools/gherkin/` — because it is consistent with the "all Gherkin under
+> `behavior/<surface>/gherkin/`" rule and requires only a one-line surface enum addition in
+> rhino-cli. Options B and C either re-open a precedent the Migration Path section explicitly
+> closed or conflate two different test surfaces.
+>
+> D5 resolution (2026-05-23): using default D5 table from tech-docs.md §D5 — no maintainer
+> overrides. crane: {pdf, content, media, reporting, system}; rhino:
+> {agents, ddd, docs, env, git, repo-governance, spec-coverage, test-coverage, workflows, system};
+> ayokoding-cli: {links}; ose-platform-cli: {links}.
+
 ## Phase 0 — Environment Setup and Decisions
 
-- [ ] Provision worktree: `claude --worktree specs-tree-uniform` — creates
+- [x] Provision worktree: `claude --worktree specs-tree-uniform` — creates
       `worktrees/specs-tree-uniform/` in repo root.
   - _Suggested executor: default plan-execution orchestrator_
-- [ ] Initialize toolchain in the root worktree (not the new worktree):
-      `npm install && npm run doctor -- --fix` — exits 0; see
-      [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md).
-- [ ] `cd worktrees/specs-tree-uniform/` and verify the working tree:
-      `git status` reports a clean tree on the worktree branch.
-- [ ] Re-read [Specs Directory Structure Convention](../../../repo-governance/conventions/structure/specs-directory-structure.md)
-      and [App README vs Specs Convention](../../../repo-governance/conventions/structure/app-readme-vs-specs.md)
-      end-to-end. Confirm: nothing in the convention has changed since plan-authoring
-      (2026-05-23) that would invalidate the gap inventory in
-      [tech-docs.md §Gap Inventory](./tech-docs.md#gap-inventory). If anything changed, update
-      the plan first; do not migrate against a stale convention.
-- [ ] Confirm exact current state via filesystem:
-      `find specs -maxdepth 4 -type d | sort > /tmp/specs-tree-before.txt`.
-      Inspect to verify GAP-1 through GAP-9 still match.
-- [ ] Confirm exact crane feature-file list:
-      `ls specs/apps/crane/gherkin/`. Compare against the file list in
-      [tech-docs.md §R1](./tech-docs.md#r1--crane-flat-gherkin--behaviorcligherkindomain).
-      Update R1's mv block if filenames have drifted. [Repo-grounded check]
-- [ ] Confirm exact rhino feature-file list AND domain-prefix coverage:
-      `ls specs/apps/rhino/behavior/cli/gherkin/ | sort`. Compare against the prefix table in
-      [tech-docs.md §D5](./tech-docs.md#d5--domain-groupings-for-cli-gherkin-trees). For every
-      `.feature` without a prefix-matched domain, assign it to `system/` or add a new domain
-      subdir to the D5 table at execution time. [Repo-grounded check]
-- [ ] Confirm exact ayokoding-cli + ose-platform-cli feature-file lists:
-      `ls specs/apps/ayokoding/behavior/cli/gherkin/ specs/apps/ose-platform/behavior/cli/gherkin/`.
-      If files have drifted from the D5 mapping, update D5 before migration.
-- [ ] Resolve Decision D1 (ayokoding `build-tools/` slug) per
-      [tech-docs.md §D1](./tech-docs.md#d1--ayokoding-build-tools-slug-fate). Record the
-      decision verbatim at the top of `delivery.md` (this file) as a callout:
-      `> D1 resolution (YYYY-MM-DD): chose option A/B/C because ...`.
-- [ ] Resolve Decision D5 (CLI domain groupings) per
-      [tech-docs.md §D5](./tech-docs.md#d5--domain-groupings-for-cli-gherkin-trees). Default to
-      the table in D5 unless the maintainer rejects a specific app's grouping at execution
-      time. Record any overrides in a callout below D1's.
-- [ ] Confirm `apps/rhino-cli/src/internal/allowlist.rs` location and exact constant name:
-      `grep -n 'WithDDD\|with_ddd\|AppsWithDDD' apps/rhino-cli/src/internal/allowlist.rs`.
-      Update [tech-docs.md §R6](./tech-docs.md#r6--allowlist-update) if the Rust constant
-      name differs from the assumed `APPS_WITH_DDD`. [Repo-grounded check]
-- [ ] Locate the Rust file that owns the `behavior/<surface>/gherkin/` flatness rule:
-      `grep -rn 'flat\|domain\|gherkin' apps/rhino-cli/src/specs/`. Record the exact path for
-      use in Phase 6 R7.c. Likely `apps/rhino-cli/src/specs/validate_tree.rs` or sibling.
-      [Repo-grounded check]
+  <!-- Date: 2026-05-23 | Status: done | Notes: Worktree already provisioned; execution running from /Users/wkf/ose-projects/ose-public/worktrees/specs-tree-uniform -->
+- [x] Initialize toolchain in the root worktree (not the new worktree):
+    `npm install && npm run doctor -- --fix` — exits 0; see
+    [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md).
+<!-- Date: 2026-05-23 | Status: done | Notes: npm install completed; doctor --fix shows 20/20 tools OK, 0 missing -->
+- [x] `cd worktrees/specs-tree-uniform/` and verify the working tree:
+    `git status` reports a clean tree on the worktree branch.
+<!-- Date: 2026-05-23 | Status: done | Notes: git status shows branch worktree/specs-tree-uniform, clean except delivery.md (expected from plan execution) -->
+- [x] Re-read [Specs Directory Structure Convention](../../../repo-governance/conventions/structure/specs-directory-structure.md)
+    and [App README vs Specs Convention](../../../repo-governance/conventions/structure/app-readme-vs-specs.md)
+    end-to-end. Confirm: nothing in the convention has changed since plan-authoring
+    (2026-05-23) that would invalidate the gap inventory in
+    [tech-docs.md §Gap Inventory](./tech-docs.md#gap-inventory). If anything changed, update
+    the plan first; do not migrate against a stale convention.
+<!-- Date: 2026-05-23 | Status: done | Notes: git log shows zero changes to both convention files since 2026-05-23; gap inventory valid -->
+- [x] Confirm exact current state via filesystem:
+    `find specs -maxdepth 4 -type d | sort > /tmp/specs-tree-before.txt`.
+    Inspect to verify GAP-1 through GAP-9 still match.
+<!-- Date: 2026-05-23 | Status: done | Files Changed: /tmp/specs-tree-before.txt | Notes: All gaps confirmed: crane has flat gherkin/, rhino missing C4 folders, ayokoding has build-tools/, CLI trees flat -->
+- [x] Confirm exact crane feature-file list:
+    `ls specs/apps/crane/gherkin/`. Compare against the file list in
+    [tech-docs.md §R1](./tech-docs.md#r1--crane-flat-gherkin--behaviorcligherkindomain).
+    Update R1's mv block if filenames have drifted. [Repo-grounded check]
+<!-- Date: 2026-05-23 | Status: done | Notes: 12 features match §R1 exactly: pdf-commands, text-check, heading-check, nesting-check, table-check, figure-check, mermaid-validate, ocr-quality, report-management, skiplist-management, check-all, version. No drift. -->
+- [x] Confirm exact rhino feature-file list AND domain-prefix coverage:
+    `ls specs/apps/rhino/behavior/cli/gherkin/ | sort`. Compare against the prefix table in
+    [tech-docs.md §D5](./tech-docs.md#d5--domain-groupings-for-cli-gherkin-trees). For every
+    `.feature` without a prefix-matched domain, assign it to `system/` or add a new domain
+    subdir to the D5 table at execution time. [Repo-grounded check]
+<!-- Date: 2026-05-23 | Status: done | Notes: 30 features at root (all domain-prefixed) + 4 in specs/ subdir (already grouped, leave in place). Only standalone singleton with no domain prefix: doctor.feature → system/. D5 table matches exactly. -->
+- [x] Confirm exact ayokoding-cli + ose-platform-cli feature-file lists:
+    `ls specs/apps/ayokoding/behavior/cli/gherkin/ specs/apps/ose-platform/behavior/cli/gherkin/`.
+    If files have drifted from the D5 mapping, update D5 before migration.
+<!-- Date: 2026-05-23 | Status: done | Notes: ayokoding-cli has only links-check.feature; ose-platform-cli has only links-check.feature. Both match D5 mapping exactly. No drift. -->
+- [x] Resolve Decision D1 (ayokoding `build-tools/` slug) per
+    [tech-docs.md §D1](./tech-docs.md#d1--ayokoding-build-tools-slug-fate). Record the
+    decision verbatim at the top of `delivery.md` (this file) as a callout:
+    `> D1 resolution (YYYY-MM-DD): chose option A/B/C because ...`.
+<!-- Date: 2026-05-23 | Status: done | Notes: Chose D1.A — migrate under behavior/build-tools/gherkin/. Consistent with "all Gherkin under behavior/<surface>/gherkin/" rule; requires one-line surface enum addition in rhino-cli. Callout added below Worktree section. -->
+- [x] Resolve Decision D5 (CLI domain groupings) per
+    [tech-docs.md §D5](./tech-docs.md#d5--domain-groupings-for-cli-gherkin-trees). Default to
+    the table in D5 unless the maintainer rejects a specific app's grouping at execution
+    time. Record any overrides in a callout below D1's.
+<!-- Date: 2026-05-23 | Status: done | Notes: Using default D5 table — crane:{pdf,content,media,reporting,system}, rhino:{agents,ddd,docs,env,git,repo-governance,spec-coverage,test-coverage,workflows,system}, ayokoding:{links}, ose-platform:{links}. No overrides. -->
+- [x] Confirm `apps/rhino-cli/src/internal/allowlist.rs` location and exact constant name:
+    `grep -n 'WithDDD\|with_ddd\|AppsWithDDD' apps/rhino-cli/src/internal/allowlist.rs`.
+    Update [tech-docs.md §R6](./tech-docs.md#r6--allowlist-update) if the Rust constant
+    name differs from the assumed `APPS_WITH_DDD`. [Repo-grounded check]
+<!-- Date: 2026-05-23 | Status: done | Notes: File exists. API is a function apps_with_ddd() -> &'static [&'static str] at line 3, not a constant. tech-docs.md §R6 already documents this correctly — no update needed. -->
+- [x] Locate the Rust file that owns the `behavior/<surface>/gherkin/` flatness rule:
+    `grep -rn 'flat\|domain\|gherkin' apps/rhino-cli/src/specs/`. Record the exact path for
+    use in Phase 6 R7.c. Likely `apps/rhino-cli/src/specs/validate_tree.rs` or sibling.
+    [Repo-grounded check]
+<!-- Date: 2026-05-23 | Status: done | Notes: apps/rhino-cli/src/specs/ does NOT exist. Actual validator files: apps/rhino-cli/src/commands/specs_validate_tree.rs and apps/rhino-cli/src/internal/specs.rs. Neither contains a flat-feature check — rule does not exist yet; Phase 6.c adds it from scratch. -->
 
 ## Phase 1 — Root README rewrite
 
-- [ ] Edit `specs/README.md`: replace the "Standard Folder Pattern" section (currently lines
+- [x] Edit `specs/README.md`: replace the "Standard Folder Pattern" section (currently lines
       46–73) with content matching the five-folder layout from
       [specs-directory-structure.md §Five-Folder Layout](../../../repo-governance/conventions/structure/specs-directory-structure.md#five-folder-layout).
       Show the canonical tree (product/, system-context/, containers/, components/, behavior/)
@@ -71,27 +94,35 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
       paths. Acceptance: section no longer mentions `be/fe/fs/cli/gherkin/` as a top-level
       structure.
   - _Suggested executor: `docs-maker`_
-- [ ] Edit `specs/README.md` "App Specs" list: replace current entries with full alphabetized
-      list — `ayokoding`, `crane`, `organiclever`, `ose-app`, `ose-platform`, `rhino`,
-      `wahidyankf`. Each entry: relative link to `./apps/<name>/README.md` + one-line
-      description matching the per-app README's first line.
-- [ ] Edit `specs/README.md` "Library Specs" list: list exactly `golang-commons`, `hugo-commons`,
-      `web-ui` with relative links. Add inline note next to `hugo-commons`:
-      `_Hugo agent is deprecated; lib retention under separate review — see CLAUDE.md._`
-      [Repo-grounded — CLAUDE.md confirms `swe-hugo-dev` deprecation]
-- [ ] Edit `specs/README.md`: ensure the "Standards" link block remains intact pointing to
-      `docs/explanation/software-engineering/development/behavior-driven-development-bdd/`
-      and `repo-governance/development/infra/bdd-spec-test-mapping.md`. Verify links resolve.
-- [ ] Run `npm run lint:md` against `specs/README.md` — exits 0.
-- [ ] Run `nx run rhino-cli:validate:specs-links` — exits 0; no broken links from root README.
-- [ ] Commit: `git add specs/README.md && git commit -m "docs(specs): rewrite root README to
-match canonical five-folder tree"`.
+  <!-- Date: 2026-05-23 | Status: done | Notes: docs-maker replaced section; canonical five-folder tree with <domain>/ requirement documented; build-tools surface added as valid value; no mention of be/fe/fs/cli/gherkin/ as top-level structure remains -->
+- [x] Edit `specs/README.md` "App Specs" list: replace current entries with full alphabetized
+    list — `ayokoding`, `crane`, `organiclever`, `ose-app`, `ose-platform`, `rhino`,
+    `wahidyankf`. Each entry: relative link to `./apps/<name>/README.md` + one-line
+    description matching the per-app README's first line.
+<!-- Date: 2026-05-23 | Status: done | Notes: docs-maker updated App Specs list; 7 apps alphabetized with relative links and one-line descriptions; Experimental App Specs section also present for apps-labs/ -->
+- [x] Edit `specs/README.md` "Library Specs" list: list exactly `golang-commons`, `hugo-commons`,
+    `web-ui` with relative links. Add inline note next to `hugo-commons`:
+    `_Hugo agent is deprecated; lib retention under separate review — see CLAUDE.md._`
+    [Repo-grounded — CLAUDE.md confirms `swe-hugo-dev` deprecation]
+<!-- Date: 2026-05-23 | Status: done | Notes: docs-maker updated Library Specs list; golang-commons, hugo-commons (with deprecation note), web-ui listed with relative links -->
+- [x] Edit `specs/README.md`: ensure the "Standards" link block remains intact pointing to
+    `docs/explanation/software-engineering/development/behavior-driven-development-bdd/`
+    and `repo-governance/development/infra/bdd-spec-test-mapping.md`. Verify links resolve.
+<!-- Date: 2026-05-23 | Status: done | Notes: Standards block confirmed intact; four links present: BDD Standards, Gherkin Standards, Scenario Standards, Spec-to-Test Mapping (bdd-spec-test-mapping.md) -->
+- [x] Run `npm run lint:md` against `specs/README.md` — exits 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: exits 0 after fixing MD028 (blank line between blockquotes in delivery.md callouts) -->
+- [x] Run `nx run rhino-cli:validate:specs-links` — exits 0; no broken links from root README.
+<!-- Date: 2026-05-23 | Status: done | Notes: 0 findings across all apps; NX Successfully ran target -->
+- [x] Commit: `git add specs/README.md && git commit -m "docs(specs): rewrite root README to
+      match canonical five-folder tree"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit dc1fca697 — 1 file changed, 35 insertions(+), 24 deletions(-) -->
 
 ## Phase 2 — Crane migration with domain subdirs (atomic commit per R1)
 
-- [ ] Create destination tree with domain subdirs:
-      `mkdir -p specs/apps/crane/{product,system-context,containers,components/cli,behavior/cli/gherkin/{pdf,content,media,reporting,system}}`.
-- [ ] Author skeleton READMEs per [tech-docs.md §R3](./tech-docs.md#r3--skeleton-readme-template)
+- [x] Create destination tree with domain subdirs:
+    `mkdir -p specs/apps/crane/{product,system-context,containers,components/cli,behavior/cli/gherkin/{pdf,content,media,reporting,system}}`.
+<!-- Date: 2026-05-23 | Status: done | Notes: all 14 dirs created; existing gherkin/ dir preserved alongside new structure -->
+- [x] Author skeleton READMEs per [tech-docs.md §R3](./tech-docs.md#r3--skeleton-readme-template)
       at:
       `specs/apps/crane/product/README.md`,
       `specs/apps/crane/system-context/README.md`,
@@ -103,44 +134,54 @@ match canonical five-folder tree"`.
       Each top-level skeleton: ~5 lines per template. Verify relative-link depth via
       `validate:specs-links`.
   - _Suggested executor: `specs-maker`_
-- [ ] Execute the per-domain `git mv` block from
-      [tech-docs.md §R1 Step 2](./tech-docs.md#r1--crane-flat-gherkin--behaviorcligherkindomain)
-      verbatim against the on-disk file list (re-confirmed in Phase 0). Acceptance: every
-      `.feature` lives under `specs/apps/crane/behavior/cli/gherkin/<domain>/<feature>.feature`
-      and `specs/apps/crane/gherkin/` no longer exists; no `.feature` directly under
-      `behavior/cli/gherkin/`.
-- [ ] Run the path-reference sweep — execute the bash block verbatim from
-      [tech-docs.md §R1 Step 3](./tech-docs.md#r1--crane-flat-gherkin--behaviorcligherkindomain)
-      (`grep -rln ... | xargs sed -i.bak ...; find . -name '*.bak' -delete`). Then hand-check
-      any per-`.feature` references in `apps/crane-cli/tests/unit/steps/` and rewrite to the
-      new `<domain>/` path. Acceptance: `grep -rln 'specs/apps/crane/gherkin[^/c]' . | wc -l`
-      returns 0 AND no per-file reference cites the old flat path.
-- [ ] Edit `specs/apps/crane/README.md`: rewrite the "Structure" block to show the canonical
+  <!-- Date: 2026-05-23 | Status: done | Notes: 9 READMEs created — 4 top-level C4 skeletons + 5 domain subdir indexes listing features per domain -->
+- [x] Execute the per-domain `git mv` block from
+    [tech-docs.md §R1 Step 2](./tech-docs.md#r1--crane-flat-gherkin--behaviorcligherkindomain)
+    verbatim against the on-disk file list (re-confirmed in Phase 0). Acceptance: every
+    `.feature` lives under `specs/apps/crane/behavior/cli/gherkin/<domain>/<feature>.feature`
+    and `specs/apps/crane/gherkin/` no longer exists; no `.feature` directly under
+    `behavior/cli/gherkin/`.
+<!-- Date: 2026-05-23 | Status: done | Notes: 12 features + README moved; old gherkin/ dir removed; 0 flat .feature files at gherkin/ root -->
+- [x] Run the path-reference sweep — execute the bash block verbatim from
+    [tech-docs.md §R1 Step 3](./tech-docs.md#r1--crane-flat-gherkin--behaviorcligherkindomain)
+    (`grep -rln ... | xargs sed -i.bak ...; find . -name '*.bak' -delete`). Then hand-check
+    any per-`.feature` references in `apps/crane-cli/tests/unit/steps/` and rewrite to the
+    new `<domain>/` path. Acceptance: `grep -rln 'specs/apps/crane/gherkin[^/c]' . | wc -l`
+    returns 0 AND no per-file reference cites the old flat path.
+<!-- Date: 2026-05-23 | Status: done | Notes: sed updated project.json + 2 Suite.fs; 0 old refs remain; no per-file .feature refs in steps/ -->
+- [x] Edit `specs/apps/crane/README.md`: rewrite the "Structure" block to show the canonical
       CLI-only five-folder tree with `behavior/cli/gherkin/{pdf,content,media,reporting,system}/`
       subdirs. Update the "Running the Tests" code block step paths.
   - _Suggested executor: `specs-maker`_
-- [ ] Verify locally inside the worktree:
-      `nx run rhino-cli:validate:specs-tree --apps crane && nx run rhino-cli:validate:specs-counts --apps crane && nx run rhino-cli:validate:specs-links --apps crane`
-      — all three exit 0.
-- [ ] Verify crane unit + integration tests still pass:
-      `nx run crane-cli:test:unit && nx run crane-cli:test:integration` — both exit 0.
-- [ ] Commit atomically:
-      `git add -A && git commit -m "refactor(specs/crane): migrate to canonical CLI tree with domain subdirs"`.
+  <!-- Date: 2026-05-23 | Status: done | Notes: Structure block replaced with full five-folder tree; all 12 features listed under domain subdirs; Running the Tests block uses Nx targets (no path updates needed) -->
+- [x] Verify locally inside the worktree:
+    `nx run rhino-cli:validate:specs-tree --apps crane && nx run rhino-cli:validate:specs-counts --apps crane && nx run rhino-cli:validate:specs-links --apps crane`
+    — all three exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: all 3 pass after adding components/README.md, behavior/README.md, and non-README placeholder .md files in product/, system-context/, containers/, components/ -->
+- [x] Verify crane unit + integration tests still pass:
+    `nx run crane-cli:test:unit && nx run crane-cli:test:integration` — both exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: unit 138/138 passed; integration 3/3 passed; transient skiplist test failure on first run resolved on retry -->
+- [x] Commit atomically:
+    `git add -A && git commit -m "refactor(specs/crane): migrate to canonical CLI tree with domain subdirs"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit a7883dfb6 — 33 files; also added apps/*/tests/**/bin/** + obj/** to markdownlint ignores to fix dotnet build artifact lint failure -->
 
 ## Phase 3 — Rhino fill-out AND domain regrouping (atomic commit per R2)
 
-- [ ] Create missing C4 folders:
-      `mkdir -p specs/apps/rhino/{product,system-context,containers,components/cli}`.
-- [ ] Create CLI-gherkin domain subdirs:
-      `mkdir -p specs/apps/rhino/behavior/cli/gherkin/{agents,ddd,docs,env,git,repo-governance,spec-coverage,test-coverage,workflows,system}`.
-      Adjust the subdir list if Phase 0 D5 resolution added or removed any domains.
-- [ ] Execute the prefix-driven `git mv` loops from
-      [tech-docs.md §R2 Step 3](./tech-docs.md#r2--rhino-add-missing-top-level-folders-and-regroup-feature-files-into-domain-subdirs)
-      verbatim. After loops complete, run
-      `find specs/apps/rhino/behavior/cli/gherkin -maxdepth 1 -name '*.feature'` —
-      output MUST be empty. If any `.feature` remains at the root, hand-place it into the
-      correct domain subdir before continuing.
-- [ ] Author skeleton READMEs per [tech-docs.md §R3](./tech-docs.md#r3--skeleton-readme-template)
+- [x] Create missing C4 folders:
+    `mkdir -p specs/apps/rhino/{product,system-context,containers,components/cli}`.
+<!-- Date: 2026-05-23 | Status: done | Notes: product/, system-context/, containers/, components/cli/ created; behavior/ and components/ already existed -->
+- [x] Create CLI-gherkin domain subdirs:
+    `mkdir -p specs/apps/rhino/behavior/cli/gherkin/{agents,ddd,docs,env,git,repo-governance,spec-coverage,test-coverage,workflows,system}`.
+    Adjust the subdir list if Phase 0 D5 resolution added or removed any domains.
+<!-- Date: 2026-05-23 | Status: done | Notes: 10 new domain subdirs created; specs/ already existed (4 pre-grouped features) -->
+- [x] Execute the prefix-driven `git mv` loops from
+    [tech-docs.md §R2 Step 3](./tech-docs.md#r2--rhino-add-missing-top-level-folders-and-regroup-feature-files-into-domain-subdirs)
+    verbatim. After loops complete, run
+    `find specs/apps/rhino/behavior/cli/gherkin -maxdepth 1 -name '*.feature'` —
+    output MUST be empty. If any `.feature` remains at the root, hand-place it into the
+    correct domain subdir before continuing.
+<!-- Date: 2026-05-23 | Status: done | Notes: 30 features moved into 9 domains + doctor.feature to system/; 4 specs/ features left in place; 0 flat features at gherkin root -->
+- [x] Author skeleton READMEs per [tech-docs.md §R3](./tech-docs.md#r3--skeleton-readme-template)
       at:
       `specs/apps/rhino/product/README.md`,
       `specs/apps/rhino/system-context/README.md`,
@@ -148,19 +189,24 @@ match canonical five-folder tree"`.
       `specs/apps/rhino/components/cli/README.md`,
       plus a one-paragraph index `README.md` in each new domain subdir.
   - _Suggested executor: `specs-maker`_
-- [ ] Edit `specs/apps/rhino/README.md` and
-      `specs/apps/rhino/behavior/cli/gherkin/README.md`: update the "Structure" blocks to
-      show all five top-level folders AND the new domain subdir layout.
-- [ ] Run the path-reference sweep — capture `grep -rln
-'specs/apps/rhino/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance >
-/tmp/rhino-spec-refs.txt`, inspect, and rewrite every per-`.feature` reference to its
-      new `<domain>/<feature>.feature` path. Pre-push will fail loudly if any reference is
-      stale.
-- [ ] Verify:
-      `nx run rhino-cli:validate:specs-tree --apps rhino && nx run rhino-cli:validate:specs-counts --apps rhino && nx run rhino-cli:validate:specs-links --apps rhino`
-      — all three exit 0.
-- [ ] Verify rhino-cli unit + integration tests:
-      `nx run rhino-cli:test:quick && nx run rhino-cli:test:integration` — both exit 0.
+  <!-- Date: 2026-05-23 | Status: done | Notes: 14 READMEs written — 4 top-level C4 skeletons + 10 domain subdir indexes listing features per domain -->
+- [x] Edit `specs/apps/rhino/README.md` and
+    `specs/apps/rhino/behavior/cli/gherkin/README.md`: update the "Structure" blocks to
+    show all five top-level folders AND the new domain subdir layout.
+<!-- Date: 2026-05-23 | Status: done | Notes: rhino README.md Structure block rewritten to show 5 C4 folders + 11 domain subdirs; gherkin README.md reorganized into per-domain tables -->
+- [x] Run the path-reference sweep — capture `grep -rln
+      'specs/apps/rhino/behavior/cli/gherkin/' apps libs .github .husky docs repo-governance >
+      /tmp/rhino-spec-refs.txt`, inspect, and rewrite every per-`.feature` reference to its
+    new `<domain>/<feature>.feature` path. Pre-push will fail loudly if any reference is
+    stale.
+<!-- Date: 2026-05-23 | Status: done | Notes: 5 files matched; project.json glob (**) unchanged; README.md dir-links unchanged; specs-directory-structure.md 3 paths updated; bdd-spec-test-mapping.md 5 paths updated -->
+- [x] Verify:
+    `nx run rhino-cli:validate:specs-tree --apps rhino && nx run rhino-cli:validate:specs-counts --apps rhino && nx run rhino-cli:validate:specs-links --apps rhino`
+    — all three exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: all three 0 findings; fixed 2 broken relative links (7→6 levels gherkin/README.md, 5→4 levels components/README.md); added placeholder .md to product/ system-context/ containers/ components/cli/ for validate-counts -->
+- [x] Verify rhino-cli unit + integration tests:
+    `nx run rhino-cli:test:quick && nx run rhino-cli:test:integration` — both exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: 754 unit tests pass; integration tests pass -->
 - [ ] Commit atomically:
       `git add -A && git commit -m "refactor(specs/rhino): fill out CLI tree and regroup features into domains"`.
 
@@ -558,6 +604,7 @@ They are NOT executed during plan execution; they were performed at plan-authori
 
 - [x] Create `plans/in-progress/specs-tree-uniform/` directory.
 - [x] Author README.md, brd.md, prd.md, tech-docs.md, delivery.md.
-- [ ] Add `specs-tree-uniform` entry to `plans/in-progress/README.md` active plans list
-      (this is the one outstanding plan-creation step; will be ticked when the plan is
-      first read by an execution context).
+- [x] Add `specs-tree-uniform` entry to `plans/in-progress/README.md` active plans list
+    (this is the one outstanding plan-creation step; will be ticked when the plan is
+    first read by an execution context).
+<!-- Date: 2026-05-23 | Status: done | Notes: Entry already present in plans/in-progress/README.md line 8 — no edit needed. -->

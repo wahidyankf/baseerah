@@ -3,26 +3,71 @@
 Gherkin feature files for [rhino-cli](../../../../../../apps/rhino-cli/README.md) — the Repository
 Hygiene & INtegration Orchestrator CLI.
 
-## Feature Files
+## Structure
+
+Feature files are grouped into domain subdirectories, one per subcommand family:
+
+```
+behavior/cli/gherkin/
+├── agents/           # agents subcommand family
+├── ddd/              # ddd subcommand family
+├── docs/             # docs subcommand family
+├── env/              # env subcommand family
+├── git/              # git subcommand family
+├── repo-governance/  # repo-governance subcommand family
+├── spec-coverage/    # spec-coverage subcommand family
+├── specs/            # specs subcommand family
+├── system/           # system commands (doctor)
+├── test-coverage/    # test-coverage subcommand family
+└── workflows/        # workflows subcommand family
+```
+
+## Feature Files by Domain
+
+### agents
+
+| File                                | Command(s)                  | Scenarios |
+| ----------------------------------- | --------------------------- | --------- |
+| `agents-detect-duplication.feature` | `agents detect-duplication` | 4         |
+| `agents-sync.feature`               | `agents sync`               | 7         |
+| `agents-validate-claude.feature`    | `agents validate-claude`    | 5         |
+| `agents-validate-naming.feature`    | `agents validate-naming`    | 4         |
+
+### ddd
+
+| File             | Command(s) | Scenarios |
+| ---------------- | ---------- | --------- |
+| `ddd-bc.feature` | `ddd bc`   | 11        |
+| `ddd-ul.feature` | `ddd ul`   | 7         |
+
+### docs
+
+| File                                      | Command(s)                        | Scenarios |
+| ----------------------------------------- | --------------------------------- | --------- |
+| `docs-validate-frontmatter.feature`       | `docs validate-frontmatter`       | 5         |
+| `docs-validate-heading-hierarchy.feature` | `docs validate-heading-hierarchy` | 4         |
+| `docs-validate-links.feature`             | `docs validate-links`             | 4         |
+| `docs-validate-mermaid.feature`           | `docs validate-mermaid`           | 22        |
+| `docs-validate-naming.feature`            | `docs validate-naming`            | 3         |
+
+### env
+
+| File                  | Command(s)    | Scenarios |
+| --------------------- | ------------- | --------- |
+| `env-backup.feature`  | `env backup`  | 18        |
+| `env-init.feature`    | `env init`    | 4         |
+| `env-restore.feature` | `env restore` | 13        |
+
+### git
+
+| File                     | Command(s)       | Scenarios |
+| ------------------------ | ---------------- | --------- |
+| `git-pre-commit.feature` | `git pre-commit` | 1         |
+
+### repo-governance
 
 | File                                         | Command(s)                           | Scenarios |
 | -------------------------------------------- | ------------------------------------ | --------- |
-| `agents-detect-duplication.feature`          | `agents detect-duplication`          | 4         |
-| `agents-sync.feature`                        | `agents sync`                        | 7         |
-| `agents-validate-claude.feature`             | `agents validate-claude`             | 5         |
-| `agents-validate-naming.feature`             | `agents validate-naming`             | 4         |
-| `ddd-bc.feature`                             | `ddd bc`                             | 11        |
-| `ddd-ul.feature`                             | `ddd ul`                             | 7         |
-| `docs-validate-frontmatter.feature`          | `docs validate-frontmatter`          | 5         |
-| `docs-validate-heading-hierarchy.feature`    | `docs validate-heading-hierarchy`    | 4         |
-| `docs-validate-links.feature`                | `docs validate-links`                | 4         |
-| `docs-validate-mermaid.feature`              | `docs validate-mermaid`              | 22        |
-| `docs-validate-naming.feature`               | `docs validate-naming`               | 3         |
-| `doctor.feature`                             | `doctor`                             | 9         |
-| `env-backup.feature`                         | `env backup`                         | 18        |
-| `env-init.feature`                           | `env init`                           | 4         |
-| `env-restore.feature`                        | `env restore`                        | 13        |
-| `git-pre-commit.feature`                     | `git pre-commit`                     | 1         |
 | `repo-governance-agents-md-size.feature`     | `repo-governance agents-md-size`     | 3         |
 | `repo-governance-audit.feature`              | `repo-governance audit`              | 5         |
 | `repo-governance-emoji-audit.feature`        | `repo-governance emoji-audit`        | 4         |
@@ -32,22 +77,41 @@ Hygiene & INtegration Orchestrator CLI.
 | `repo-governance-readme-index-audit.feature` | `repo-governance readme-index-audit` | 4         |
 | `repo-governance-traceability-audit.feature` | `repo-governance traceability-audit` | 5         |
 | `repo-governance-vendor-audit.feature`       | `repo-governance vendor-audit`       | 7         |
-| `spec-coverage-validate.feature`             | `spec-coverage validate`             | 6         |
-| `test-coverage-diff.feature`                 | `test-coverage diff`                 | 4         |
-| `test-coverage-merge.feature`                | `test-coverage merge`                | 3         |
-| `test-coverage-validate.feature`             | `test-coverage validate`             | 10        |
-| `workflows-validate-naming.feature`          | `workflows validate-naming`          | 4         |
 
-## `specs/` Subfolder — Planned Feature Files
+### spec-coverage
 
-The `specs/` subfolder covers the `specs` subcommand family (deterministic spec validation, FR-14).
+| File                             | Command(s)               | Scenarios |
+| -------------------------------- | ------------------------ | --------- |
+| `spec-coverage-validate.feature` | `spec-coverage validate` | 6         |
 
-| File                        | Command(s)                | Status  |
-| --------------------------- | ------------------------- | ------- |
-| `validate-tree.feature`     | `specs validate-tree`     | planned |
-| `validate-counts.feature`   | `specs validate-counts`   | planned |
-| `validate-links.feature`    | `specs validate-links`    | planned |
-| `validate-adoption.feature` | `specs validate-adoption` | planned |
+### specs
+
+| File                        | Command(s)                | Scenarios |
+| --------------------------- | ------------------------- | --------- |
+| `validate-adoption.feature` | `specs validate-adoption` | planned   |
+| `validate-counts.feature`   | `specs validate-counts`   | planned   |
+| `validate-links.feature`    | `specs validate-links`    | planned   |
+| `validate-tree.feature`     | `specs validate-tree`     | planned   |
+
+### system
+
+| File             | Command(s) | Scenarios |
+| ---------------- | ---------- | --------- |
+| `doctor.feature` | `doctor`   | 9         |
+
+### test-coverage
+
+| File                             | Command(s)               | Scenarios |
+| -------------------------------- | ------------------------ | --------- |
+| `test-coverage-diff.feature`     | `test-coverage diff`     | 4         |
+| `test-coverage-merge.feature`    | `test-coverage merge`    | 3         |
+| `test-coverage-validate.feature` | `test-coverage validate` | 10        |
+
+### workflows
+
+| File                                | Command(s)                  | Scenarios |
+| ----------------------------------- | --------------------------- | --------- |
+| `workflows-validate-naming.feature` | `workflows validate-naming` | 4         |
 
 ## Conventions
 
@@ -59,3 +123,6 @@ The `specs/` subfolder covers the `specs` subcommand family (deterministic spec 
 
 - **Parent**: [rhino-cli specs](../../README.md)
 - **BDD Standards**: [behavior-driven-development-bdd/](../../../../../../docs/explanation/software-engineering/development/behavior-driven-development-bdd/README.md)
+
+See [Specs Directory Structure Convention](../../../../../../repo-governance/conventions/structure/specs-directory-structure.md)
+for the canonical purpose of this folder.

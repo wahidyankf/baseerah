@@ -184,9 +184,9 @@ A domain folder may contain one or many feature files.
 **CLI specs** use a flat structure under `gherkin/` with NO domain subdirectories. Each feature file corresponds to one CLI command:
 
 ```
-specs/apps/rhino/behavior/cli/gherkin/doctor.feature
-specs/apps/rhino/behavior/cli/gherkin/env-backup.feature
-specs/apps/rhino/behavior/cli/gherkin/spec-coverage-validate.feature
+specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature
+specs/apps/rhino/behavior/cli/gherkin/env/env-backup.feature
+specs/apps/rhino/behavior/cli/gherkin/spec-coverage/spec-coverage-validate.feature
 specs/apps/ayokoding/behavior/cli/gherkin/links-check.feature
 ```
 

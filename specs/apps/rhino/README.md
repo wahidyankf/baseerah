@@ -13,14 +13,30 @@ the contract between the CLI implementation and its consumers.
 
 ## Structure
 
-All feature files live under `behavior/cli/gherkin/`:
+Feature files live under `behavior/cli/gherkin/`, organized into domain subdirs:
 
 ```
 specs/apps/rhino/
 ├── README.md
+├── product/          # C4 L1 product framing
+├── system-context/   # C4 L1 actors and external systems
+├── containers/       # C4 L2 deployable units
+├── components/
+│   └── cli/          # C4 L3 CLI internals
 └── behavior/
     └── cli/
-        └── gherkin/    # All rhino-cli Gherkin feature files
+        └── gherkin/
+            ├── agents/           # agents subcommand family (4 features)
+            ├── ddd/              # ddd subcommand family (2 features)
+            ├── docs/             # docs subcommand family (5 features)
+            ├── env/              # env subcommand family (3 features)
+            ├── git/              # git subcommand family (1 feature)
+            ├── repo-governance/  # repo-governance subcommand family (9 features)
+            ├── spec-coverage/    # spec-coverage subcommand family (1 feature)
+            ├── specs/            # specs subcommand family (4 features)
+            ├── system/           # system commands — doctor (1 feature)
+            ├── test-coverage/    # test-coverage subcommand family (3 features)
+            └── workflows/        # workflows subcommand family (1 feature)
 ```
 
 See [behavior/cli/gherkin/README.md](./behavior/cli/gherkin/README.md) for the full file inventory.
@@ -52,7 +68,7 @@ cache-invalidated when spec files change.
 
 ## Adding New Specs
 
-1. Create `specs/apps/rhino/behavior/cli/gherkin/<domain>-<action>.feature`
+1. Create `specs/apps/rhino/behavior/cli/gherkin/<domain>/<domain>-<action>.feature`
 2. Add unit coverage inside the relevant module in `apps/rhino-cli/src/`:
    - Add a `#[cfg(test)]` block to the module under test
    - Include a doc-comment citing the Gherkin scenario name on each `#[test]` function
