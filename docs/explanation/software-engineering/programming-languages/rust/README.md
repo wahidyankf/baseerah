@@ -1,6 +1,6 @@
 ---
 title: Rust
-description: OSE Platform Authoritative Rust Coding Standards and Framework Stack (Rust 1.82+)
+description: OSE Platform Authoritative Rust Coding Standards and Framework Stack
 category: explanation
 subcategory: prog-lang
 tags:
@@ -8,8 +8,6 @@ tags:
   - programming-languages
   - coding-standards
   - framework-stack
-  - rust-1.82
-  - rust-2021-edition
   - rust-2024-edition
 principles:
   - automation-over-manual
@@ -79,10 +77,8 @@ OSE Platform Rust applications MUST use the following stack:
 
 **Go Version Strategy**:
 
-- **Baseline**: Rust 2018 edition (MUST support minimum)
-- **Recommended**: Rust 2021 edition (SHOULD use for all current projects)
-- **Upcoming**: Rust 2024 edition (SHOULD adopt when stabilized)
-- **Version**: Rust 1.82+ (stable)
+- **Edition**: Rust 2024 (stabilized in 1.85.0, 2025-02-20; current `ose-public` crates use `edition = "2024"`)
+- **MSRV**: declared in [`apps/rhino-cli/Cargo.toml`](../../../../../apps/rhino-cli/Cargo.toml) (`rust-version` field); toolchain pin in `rust-toolchain.toml`
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for Rust-specific release documentation location
 
@@ -332,6 +328,6 @@ graph LR
 
 **Status**: Authoritative Standard (Mandatory Compliance)
 
-**Rust Version**: 1.82+ (stable), Edition 2021 (recommended)
+**Rust Version**: MSRV declared in [`apps/rhino-cli/Cargo.toml`](../../../../../apps/rhino-cli/Cargo.toml); Edition 2024
 **Framework Stack**: Axum 0.8, Tokio 1.x, SQLx, Serde, thiserror, anyhow, Clippy, rustfmt
 **Maintainers**: Platform Architecture Team

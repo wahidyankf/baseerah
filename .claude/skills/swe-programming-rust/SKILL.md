@@ -155,7 +155,7 @@ async fn calculate_zakat_handler(
 
 ```toml
 # .rustfmt.toml
-edition = "2021"
+edition = "2024"
 max_width = 100
 use_field_init_shorthand = true
 ```

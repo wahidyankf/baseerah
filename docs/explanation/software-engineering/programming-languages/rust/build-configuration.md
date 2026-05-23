@@ -73,8 +73,8 @@ Build automation MUST use standard tools:
 [package]
 name = "zakat-service"
 version = "0.1.0"
-edition = "2021"
-rust-version = "1.82"
+edition = "2024"
+rust-version = "1.88"
 authors = ["OSE Platform Team"]
 description = "Zakat calculation service for OSE Platform"
 license = "MIT"
@@ -227,7 +227,7 @@ target/
 ```toml
 # rust-toolchain.toml
 [toolchain]
-channel = "1.82.0"
+channel = "1.95.0"
 components = ["rustfmt", "clippy", "rust-src"]
 targets = ["x86_64-unknown-linux-gnu", "wasm32-unknown-unknown"]
 ```
@@ -353,4 +353,4 @@ cargo deny check
 
 **Maintainers**: Platform Documentation Team
 
-**Rust Version**: 1.82+ (stable), Edition 2021
+**Rust Version**: MSRV declared in [`apps/rhino-cli/Cargo.toml`](../../../../../apps/rhino-cli/Cargo.toml); Edition 2024

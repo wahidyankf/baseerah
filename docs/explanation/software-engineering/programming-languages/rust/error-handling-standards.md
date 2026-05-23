@@ -381,4 +381,4 @@ pub fn calculate_zakat(wealth: Decimal) -> Result<Decimal, ZakatError> {
 
 **Maintainers**: Platform Documentation Team
 
-**Rust Version**: 1.82+ (stable), Edition 2021
+**Rust Version**: MSRV declared in [`apps/rhino-cli/Cargo.toml`](../../../../../apps/rhino-cli/Cargo.toml); Edition 2024

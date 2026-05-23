@@ -22,25 +22,30 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 0 — Kickoff & artifact freeze
 
-- [ ] **0.0** Provision worktree: run `claude --worktree rust-governance-audit` from inside
+- [x] **0.0** Provision worktree: run `claude --worktree rust-governance-audit` from inside
       `ose-public/` (creates `worktrees/rust-governance-audit/` in repo root per
       [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)).
-- [ ] **0.0b** Initialize toolchain inside the new worktree: `npm install && npm run doctor -- --fix`.
+  - Date: 2026-05-23 | Status: skipped (user override: "do it in current branch") | Files Changed: none
+- [x] **0.0b** Initialize toolchain inside the new worktree: `npm install && npm run doctor -- --fix`.
       Verify `rustc --version` matches the `channel` in `apps/rhino-cli/rust-toolchain.toml`.
       See [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md).
-- [ ] **0.1** Capture the kickoff web-research output to `generated-reports/rust-governance-audit__kickoff-research__2026-05-23.md` (UUID chain header per `repo-generating-validation-reports` skill).
-- [ ] **0.2** Verify `git status` clean on `main` before starting.
-- [ ] **0.3** Run baseline locally and record numbers:
+  - Date: 2026-05-23 | Status: done | Files Changed: none | Notes: npm install OK; doctor 20/20. Global rust=1.94.0 but inside apps/rhino-cli rustc=1.95.0 (toolchain.toml override active).
+- [x] **0.1** Capture the kickoff web-research output to `generated-reports/rust-governance-audit__kickoff-research__2026-05-23.md` (UUID chain header per `repo-generating-validation-reports` skill).
+  - Date: 2026-05-23 | Status: done | Files Changed: generated-reports/rust-governance-audit**kickoff-research**2026-05-23.md | Notes: New finding F-R1: toml 0.8.22→1.1.2 (genuine semver major). No RUSTSEC on any pinned dep.
+- [x] **0.2** Verify `git status` clean on `main` before starting.
+  - Date: 2026-05-23 | Status: done | Files Changed: none | Notes: Only delivery.md modified (live tracking). Clean.
+- [x] **0.3** Run baseline locally and record numbers:
   - `nx run rhino-cli:typecheck` → expect 0
   - `nx run rhino-cli:lint` → expect 0
   - `nx run rhino-cli:test:quick` → expect 0, note coverage %
   - `cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings -D unsafe_code` → expect 0
   - `grep -rE '\bunsafe\b' apps/rhino-cli/src/` → expect zero matches
   - Record outputs in `generated-reports/rust-governance-audit__baseline__2026-05-23.md`.
+  - Date: 2026-05-23 | Status: done | Files Changed: generated-reports/rust-governance-audit**baseline**2026-05-23.md | Notes: typecheck=0, lint=0, test:quick=754 passed/coverage≥90%, clippy=0, unsafe=0.
 
 ## Phase 1 — Inventory & static contradiction sweep
 
-- [ ] **1.1** Build an artefact list by running the following commands from the repo root,
+- [x] **1.1** Build an artefact list by running the following commands from the repo root,
       appending each output to `local-temp/rust-audit-artefacts.txt`:
 
   ```bash
@@ -53,12 +58,18 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: `local-temp/rust-audit-artefacts.txt` exists and `wc -l local-temp/rust-audit-artefacts.txt` reports ≥ 25 lines.
+  - Date: 2026-05-23 | Status: done | Files Changed: local-temp/rust-audit-artefacts.txt | Notes: 186 lines (excl. target/). ≥25 ✓
 
-- [ ] **1.2** For each of the 13 standards docs plus the `templates/` subdir under `docs/.../rust/`, grep for hardcoded Rust version numbers (`1\.[0-9]+`); record findings.
-- [ ] **1.3** Grep `repo-governance/` for the same Rust version pattern; record findings.
-- [ ] **1.4** Grep `specs/apps/rhino/` for Go-era strings: `godog`, `\.go\b`, `go test`, `go run`, `//go:build`, `cmd/`; record line numbers.
-- [ ] **1.5** Run pair-wise MUST/MUST NOT contradiction scan across the 13 standards docs plus the 9 cross-cutting governance files (manual review of high-signal pairs identified in `tech-docs.md §5.1`); record findings.
-- [ ] **1.6** Compile findings into `generated-reports/rust-governance-audit__inventory__2026-05-23.md` with a finding ID per row (F-01, F-02, ...).
+- [x] **1.2** For each of the 13 standards docs plus the `templates/` subdir under `docs/.../rust/`, grep for hardcoded Rust version numbers (`1\.[0-9]+`); record findings.
+  - Date: 2026-05-23 | Status: done | Files Changed: none | Notes: Found "1.82+" in README.md (x4), coding-standards.md (ch=1.82.0 line 176), build-configuration.md (rust-version=1.82 line 77, ch=1.82.0 line 230). All 13 doc footers say "Edition 2021" but Cargo.toml has edition=2024. → F-01, F-02, F-03, F-04.
+- [x] **1.3** Grep `repo-governance/` for the same Rust version pattern; record findings.
+  - Date: 2026-05-23 | Status: done | Files Changed: none | Notes: No Rust version numbers in repo-governance/. No findings.
+- [x] **1.4** Grep `specs/apps/rhino/` for Go-era strings: `godog`, `\.go\b`, `go test`, `go run`, `//go:build`, `cmd/`; record line numbers.
+  - Date: 2026-05-23 | Status: done | Files Changed: none | Notes: Found in README.md (lines 30,31,34,39,46,50,56,61,62,70,80,81) and behavior/README.md (line 18). → F-05, F-06.
+- [x] **1.5** Run pair-wise MUST/MUST NOT contradiction scan across the 13 standards docs plus the 9 cross-cutting governance files (manual review of high-signal pairs identified in `tech-docs.md §5.1`); record findings.
+  - Date: 2026-05-23 | Status: done | Files Changed: none | Notes: Key pairs: code.md vs code-quality-standards.md (gap, no link → F-07); testing-standards.md vs three-level standard (no contradiction). No new contradictions beyond F-01–F-11.
+- [x] **1.6** Compile findings into `generated-reports/rust-governance-audit__inventory__2026-05-23.md` with a finding ID per row (F-01, F-02, ...).
+  - Date: 2026-05-23 | Status: done | Files Changed: generated-reports/rust-governance-audit**inventory**2026-05-23.md | Notes: 11 findings (F-01 to F-11). New: F-03 (build-configuration.md), F-04 (Edition 2021 in all footers), F-06 (behavior/README.md Go ref), F-10 (missing dual-root requirement).
 
 ## Phase 2 — Standards-doc consistency fixes
 

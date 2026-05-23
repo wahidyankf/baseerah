@@ -41,6 +41,8 @@ cargo build --release
 
 Toolchain is pinned to Rust 1.95.0 via `rust-toolchain.toml`; the first `cargo` call inside this crate auto-bootstraps the toolchain through `rustup`. MSRV is 1.88 (`cucumber 0.23.0` bound).
 
+> **Note (C-06):** `rust-version = "1.88"` in `Cargo.toml` is the _minimum_ compiler version that can build this crate (MSRV). `channel = "1.95.0"` in `rust-toolchain.toml` is the _installed_ toolchain version used by developers and CI. Both are correct — installed ≥ MSRV is the invariant.
+
 ## Nx Targets
 
 | Target             | Command                                                                                 |
@@ -57,7 +59,7 @@ Toolchain is pinned to Rust 1.95.0 via `rust-toolchain.toml`; the first `cargo` 
 
 ## Global Flags
 
-Mirror the Go binary's Cobra root command (`apps/rhino-cli/cmd/root.go:23`):
+Global flags (see `src/cli.rs`):
 
 - `--verbose, -v` — verbose output with timestamps
 - `--quiet, -q` — quiet mode (errors only)

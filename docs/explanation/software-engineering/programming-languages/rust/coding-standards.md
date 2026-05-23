@@ -173,7 +173,7 @@ Rust builds are reproducible by design with proper tooling:
 ```toml
 # rust-toolchain.toml — Pins exact toolchain for reproducibility
 [toolchain]
-channel = "1.82.0"
+channel = "1.95.0"
 components = ["rustfmt", "clippy"]
 targets = ["x86_64-unknown-linux-gnu"]
 ```
@@ -554,4 +554,4 @@ These standards are enforced through:
 
 **Maintainers**: Platform Documentation Team
 
-**Rust Version**: 1.82+ (stable), Edition 2021
+**Rust Version**: MSRV declared in [`apps/rhino-cli/Cargo.toml`](../../../../../apps/rhino-cli/Cargo.toml); Edition 2024
