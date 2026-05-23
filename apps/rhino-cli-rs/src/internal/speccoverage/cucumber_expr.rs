@@ -18,15 +18,15 @@ fn python_parsers_param_re() -> &'static Regex {
 /// Processes Cucumber expression escape sequences in literal text.
 /// `\X` → `X` for `\(`, `\)`, `\{`, `\}`, `\/`, `\\`.
 pub fn unescape_cucumber_expr(s: &str) -> String {
-    let bytes = s.as_bytes();
+    let chars: Vec<char> = s.chars().collect();
     let mut out = String::with_capacity(s.len());
     let mut i = 0usize;
-    while i < bytes.len() {
-        if bytes[i] == b'\\' && i + 1 < bytes.len() {
-            out.push(bytes[i + 1] as char);
+    while i < chars.len() {
+        if chars[i] == '\\' && i + 1 < chars.len() {
+            out.push(chars[i + 1]);
             i += 2;
         } else {
-            out.push(bytes[i] as char);
+            out.push(chars[i]);
             i += 1;
         }
     }

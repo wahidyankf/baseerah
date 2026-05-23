@@ -16,7 +16,7 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "CGO_ENABLED=0 go test -coverprofile=cover.out ./... && (cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go test-coverage validate apps/ayokoding-cli/cover.out 90)",
+        "command": "CGO_ENABLED=0 go test -coverprofile=cover.out ./... && (cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/ayokoding-cli/cover.out 90)",
         "cwd": "apps/ayokoding-cli"
       },
       "inputs": ["{projectRoot}/cmd/**/*.go", "{workspaceRoot}/specs/apps/ayokoding/**/*.feature"]
@@ -68,7 +68,7 @@
       }
     },
     "spec-coverage": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go spec-coverage validate specs/apps/ayokoding/behavior/cli/gherkin apps/ayokoding-cli --shared-steps",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate specs/apps/ayokoding/behavior/cli/gherkin apps/ayokoding-cli --shared-steps",
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ayokoding/behavior/cli/gherkin/**/*.feature", "{projectRoot}/**/*.go"]
     }

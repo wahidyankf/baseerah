@@ -63,7 +63,7 @@
       "outputs": ["{projectRoot}/coverage"],
       "options": {
         "commands": [
-          "npx vitest run --coverage && (cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go test-coverage validate apps/ose-app-web/coverage/lcov.info 88)"
+          "npx vitest run --coverage && (cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/ose-app-web/coverage/lcov.info 88)"
         ],
         "parallel": false,
         "cwd": "{projectRoot}"
@@ -105,7 +105,7 @@
       "outputs": ["{projectRoot}/storybook-static"]
     },
     "spec-coverage": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go spec-coverage validate --shared-steps specs/apps/ose-app/behavior/web/gherkin apps/ose-app-web-e2e",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ose-app/behavior/web/gherkin apps/ose-app-web-e2e",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/ose-app/behavior/web/gherkin/**/*.feature",

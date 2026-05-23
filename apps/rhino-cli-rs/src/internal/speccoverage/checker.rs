@@ -587,28 +587,28 @@ fn extract_go_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Resu
     Ok(())
 }
 
-/// Strip JS/TS comments from source.
+/// Strip JS/TS comments from source. UTF-8 safe (walks chars, not bytes).
 /// - `/* ... */` anywhere (multi-line aware).
 /// - `// ...` only when after whitespace at line start.
 /// - Preserves string/template literals verbatim.
 fn strip_js_comments(src: &str) -> String {
-    let bytes = src.as_bytes();
-    let n = bytes.len();
-    let mut out = String::with_capacity(n);
+    let chars: Vec<char> = src.chars().collect();
+    let n = chars.len();
+    let mut out = String::with_capacity(src.len());
     let mut i = 0usize;
     let mut at_line_start = true;
     while i < n {
-        let c = bytes[i];
-        if c == b'\n' {
+        let c = chars[i];
+        if c == '\n' {
             out.push('\n');
             i += 1;
             at_line_start = true;
             continue;
         }
-        if c == b'/' && i + 1 < n && bytes[i + 1] == b'*' {
+        if c == '/' && i + 1 < n && chars[i + 1] == '*' {
             let mut j = i + 2;
-            while j + 1 < n && !(bytes[j] == b'*' && bytes[j + 1] == b'/') {
-                if bytes[j] == b'\n' {
+            while j + 1 < n && !(chars[j] == '*' && chars[j + 1] == '/') {
+                if chars[j] == '\n' {
                     out.push('\n');
                 }
                 j += 1;
@@ -616,27 +616,27 @@ fn strip_js_comments(src: &str) -> String {
             i = j + 2;
             continue;
         }
-        if at_line_start && c == b'/' && i + 1 < n && bytes[i + 1] == b'/' {
+        if at_line_start && c == '/' && i + 1 < n && chars[i + 1] == '/' {
             let mut j = i + 2;
-            while j < n && bytes[j] != b'\n' {
+            while j < n && chars[j] != '\n' {
                 j += 1;
             }
             i = j;
             continue;
         }
-        if c == b'"' || c == b'\'' || c == b'`' {
+        if c == '"' || c == '\'' || c == '`' {
             let quote = c;
-            out.push(c as char);
+            out.push(c);
             i += 1;
             while i < n {
-                if bytes[i] == b'\\' && i + 1 < n {
-                    out.push(bytes[i] as char);
-                    out.push(bytes[i + 1] as char);
+                if chars[i] == '\\' && i + 1 < n {
+                    out.push(chars[i]);
+                    out.push(chars[i + 1]);
                     i += 2;
                     continue;
                 }
-                out.push(bytes[i] as char);
-                if bytes[i] == quote {
+                out.push(chars[i]);
+                if chars[i] == quote {
                     i += 1;
                     break;
                 }
@@ -645,8 +645,8 @@ fn strip_js_comments(src: &str) -> String {
             at_line_start = false;
             continue;
         }
-        out.push(c as char);
-        if c != b' ' && c != b'\t' {
+        out.push(c);
+        if c != ' ' && c != '\t' {
             at_line_start = false;
         }
         i += 1;

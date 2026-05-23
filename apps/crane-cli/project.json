@@ -26,7 +26,7 @@
           "dotnet build tests/unit/crane-cli-unit-tests.fsproj",
           "dotnet altcover --inputDirectory tests/unit/bin/Debug/net10.0 --outputDirectory tests/unit/bin/Debug/net10.0/__Instrumented --assemblyExcludeFilter=crane-cli-unit-tests '--assemblyFilter=xunit|TickSpec|Microsoft|FSharp|testhost|AltCover|Argu|TesseractOCR|UglyToad|F23|FSharp.SystemTextJson' '--fileFilter=Program|OcrAdapter|PdfExtractionCache' '--attributeFilter=ExcludeFromCodeCoverage' '--typeFilter=RealPdfAdapter|Pipe' --linecover --reportFormat=lcov --report=coverage/altcov.info --save",
           "dotnet altcover Runner --recorderDirectory tests/unit/bin/Debug/net10.0/__Instrumented --lcovReport coverage/altcov.info --executable dotnet -- test tests/unit/bin/Debug/net10.0/__Instrumented/crane-cli-unit-tests.dll",
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go test-coverage validate apps/crane-cli/coverage/altcov.info 95)"
+          "(cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/crane-cli/coverage/altcov.info 95)"
         ],
         "parallel": false,
         "cwd": "apps/crane-cli"
@@ -77,7 +77,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go spec-coverage validate --shared-steps specs/apps/crane/gherkin apps/crane-cli"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/crane/gherkin apps/crane-cli"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/crane/gherkin/**/*.feature", "{projectRoot}/**/*.fs"]

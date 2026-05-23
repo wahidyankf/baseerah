@@ -14,26 +14,27 @@ pub fn first_non_empty<'a>(a: &'a str, b: &'a str) -> &'a str {
 }
 
 /// JS/TS-style escape sequence handling: `\'`, `\"`, `\\`, `\/`, `\n`, `\t`, `\r`.
+/// UTF-8 safe — iterates by chars, not bytes.
 pub fn unescape_string(s: &str) -> String {
-    let bytes = s.as_bytes();
+    let chars: Vec<char> = s.chars().collect();
     let mut out = String::with_capacity(s.len());
     let mut i = 0usize;
-    while i < bytes.len() {
-        if bytes[i] == b'\\' && i + 1 < bytes.len() {
-            let c = match bytes[i + 1] {
-                b'\'' => '\'',
-                b'"' => '"',
-                b'\\' => '\\',
-                b'/' => '/',
-                b'n' => '\n',
-                b't' => '\t',
-                b'r' => '\r',
-                other => other as char,
+    while i < chars.len() {
+        if chars[i] == '\\' && i + 1 < chars.len() {
+            let c = match chars[i + 1] {
+                '\'' => '\'',
+                '"' => '"',
+                '\\' => '\\',
+                '/' => '/',
+                'n' => '\n',
+                't' => '\t',
+                'r' => '\r',
+                other => other,
             };
             out.push(c);
             i += 2;
         } else {
-            out.push(bytes[i] as char);
+            out.push(chars[i]);
             i += 1;
         }
     }
