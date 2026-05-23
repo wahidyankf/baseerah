@@ -239,7 +239,10 @@ Goal: port the `repo-governance` namespace and its 9 sub-validators. Each comman
     - **Date**: 2026-05-23 **Status**: Completed
     - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/license_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_license_audit.rs`, `apps/rhino-cli/project.json`
     - **Notes**: Required dirs walk apps/ (skip rhino-cli, _-e2e) + libs/_ + specs/. LICENSE classifier (MIT/Apache-2.0/BSD-3/BSD-2/MPL-2.0/GPL/SPDX). LICENSING-NOTICE.md markdown table parser w/ escape-pipe handling. Shadow-diff PASS text+JSON+markdown against real corpus (currently clean: zero findings). Nx target flipped.
-  - [ ] `repo-governance readme-index-audit` — port `cmd/governance_readme_index_audit.go`.
+  - [x] `repo-governance readme-index-audit` — port `cmd/governance_readme_index_audit.go`.
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/readme_index_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_readme_index_audit.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: Orphan/ghost detection for README.md indexes. Walker honors hidden + reserved skip dirs (node_modules/target/dist/build/.next/.git). Markdown link regex extracts `.md` targets, skips URLs/abs paths/`..`. SiblingTargets handles bare-dir links (`structure` → `structure/README.md`). `glob` crate for excludes (full path / basename / component match). Shadow-diff PASS text+JSON+markdown. Nx target flipped.
   - [ ] `repo-governance traceability-audit` — port `cmd/governance_traceability_audit.go`.
   - [ ] `repo-governance vendor-audit` — port `cmd/governance_vendor_audit.go`. Heading-state-machine verbatim port per [tech-docs.md §Command-Specific Risks](./tech-docs.md#command-specific-risks).
   - _Suggested executor for each: `swe-rust-dev`_

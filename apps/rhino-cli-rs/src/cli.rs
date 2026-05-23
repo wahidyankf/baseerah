@@ -2,8 +2,8 @@ use clap::{Parser, Subcommand};
 
 use crate::commands::{
     governance_agents_md_size, governance_emoji_audit, governance_frontmatter_audit,
-    governance_layer_coherence, governance_license_audit, spec_coverage_validate,
-    test_coverage_validate,
+    governance_layer_coherence, governance_license_audit, governance_readme_index_audit,
+    spec_coverage_validate, test_coverage_validate,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -84,6 +84,9 @@ pub enum RepoGovernanceCommands {
     /// Verify per-directory LICENSE files match the licensing convention.
     #[command(name = "license-audit")]
     LicenseAudit(governance_license_audit::LicenseAuditArgs),
+    /// Audit directory README.md indexes against sibling markdown files.
+    #[command(name = "readme-index-audit")]
+    ReadmeIndexAudit(governance_readme_index_audit::ReadmeIndexAuditArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -158,6 +161,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             RepoGovernanceCommands::LicenseAudit(args) => {
                 governance_license_audit::run(args, output_format)
+            }
+            RepoGovernanceCommands::ReadmeIndexAudit(args) => {
+                governance_readme_index_audit::run(args, output_format)
             }
         },
     };
