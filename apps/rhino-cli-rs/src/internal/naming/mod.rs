@@ -203,4 +203,46 @@ mod tests {
         let vs = validate_mirror(&claude, &opencode);
         assert!(vs.is_empty());
     }
+
+    #[test]
+    fn validate_mirror_empty_inputs_is_clean() {
+        let vs = validate_mirror(&[], &[]);
+        assert!(vs.is_empty());
+    }
+
+    #[test]
+    fn validate_mirror_returns_sorted_by_path() {
+        let claude = vec![
+            ".claude/agents/z.md".to_string(),
+            ".claude/agents/a.md".to_string(),
+        ];
+        let vs = validate_mirror(&claude, &[]);
+        assert_eq!(vs.len(), 2);
+        assert!(vs[0].path.contains("a.md"));
+        assert!(vs[1].path.contains("z.md"));
+    }
+
+    #[test]
+    fn extract_frontmatter_handles_crlf() {
+        let content = b"---\r\nname: foo\r\n---\r\n";
+        assert_eq!(extract_frontmatter_name(content), "foo");
+    }
+
+    #[test]
+    fn extract_frontmatter_missing_closing_returns_empty() {
+        assert_eq!(extract_frontmatter_name(b"---\nname: foo\n"), "");
+    }
+
+    #[test]
+    fn validate_frontmatter_name_no_name_is_none() {
+        assert!(validate_frontmatter_name("foo.md", b"---\ndescription: D\n---\n").is_none());
+    }
+
+    #[test]
+    fn validate_suffix_message_includes_all_allowed() {
+        let v = validate_suffix("foo.md", &["maker", "checker", "fixer"], "role-suffix").unwrap();
+        assert!(v.message.contains("maker"));
+        assert!(v.message.contains("checker"));
+        assert!(v.message.contains("fixer"));
+    }
 }
