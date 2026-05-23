@@ -4,10 +4,10 @@ use crate::commands::{
     agents_detect_duplication, agents_sync, agents_validate_claude, agents_validate_naming,
     agents_validate_sync, docs_validate_frontmatter, docs_validate_heading_hierarchy,
     docs_validate_links, docs_validate_mermaid, docs_validate_naming, governance_agents_md_size,
-    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
-    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
-    governance_vendor_audit, spec_coverage_validate, test_coverage_validate,
-    workflows_validate_naming,
+    governance_audit, governance_emoji_audit, governance_frontmatter_audit,
+    governance_layer_coherence, governance_license_audit, governance_readme_index_audit,
+    governance_traceability_audit, governance_vendor_audit, spec_coverage_validate,
+    test_coverage_validate, workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -130,6 +130,9 @@ pub enum RepoGovernanceCommands {
     /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
     #[command(name = "agents-md-size")]
     AgentsMdSize(governance_agents_md_size::AgentsMdSizeArgs),
+    /// Run all 11 deterministic governance audits and emit a JSON envelope.
+    #[command(name = "audit")]
+    Audit(governance_audit::AuditArgs),
     /// Audit forbidden file types for emoji codepoints.
     #[command(name = "emoji-audit")]
     EmojiAudit(governance_emoji_audit::EmojiAuditArgs),
@@ -214,6 +217,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             RepoGovernanceCommands::AgentsMdSize(args) => {
                 governance_agents_md_size::run(args, output_format)
             }
+            RepoGovernanceCommands::Audit(args) => governance_audit::run(args, output_format),
             RepoGovernanceCommands::EmojiAudit(args) => {
                 governance_emoji_audit::run(args, output_format)
             }

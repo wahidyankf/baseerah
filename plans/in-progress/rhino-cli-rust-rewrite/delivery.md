@@ -218,7 +218,11 @@ Goal: port the `repo-governance` namespace and its 9 sub-validators. Each comman
 - [ ] GREEN: Port `internal/repo-governance/` Go package → `apps/rhino-cli-rs/src/internal/repo_governance/mod.rs`. Verify: `cargo test --manifest-path apps/rhino-cli-rs/Cargo.toml --lib repo_governance` exits 0.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] For each command below, follow the RED→GREEN pattern: (1) create a stub command returning `todo!()` + write cucumber step defs consuming the `.feature` file, verify `cargo test --manifest-path apps/rhino-cli-rs/Cargo.toml --test cucumber -- <feature-name>` exits non-zero; (2) port the command to green; (3) run shadow-diff for at least 2 CI runs; (4) flip the matching `validate:*` target. Acceptance per command: `npx nx run rhino-cli:validate:<target-name>` exits 0 AND `shadow-diff.sh repo-governance <subcmd>` reports no divergence. Feature files: [Repo-grounded — `specs/apps/rhino/behavior/cli/gherkin/repo-governance-*.feature`].
-  - [ ] `repo-governance audit` — uses sub-audit aggregator; port `cmd/governance_audit.go` + `internal/repo-governance/aggregator.go`.
+  - [x] `repo-governance audit` — uses sub-audit aggregator; port `cmd/governance_audit.go` + `internal/repo-governance/aggregator.go`.
+    - **Date**: 2026-05-23
+    - **Status**: Completed
+    - **Files Changed**: `apps/rhino-cli-rs/src/internal/repo_governance/{audit_orchestrator,mod}.rs`, `apps/rhino-cli-rs/src/commands/{governance_audit,mod}.rs`, `apps/rhino-cli-rs/src/cli.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: Full umbrella orchestrator ported. Custom `go_filepath_join` + `clean_path` helpers ensure path output matches Go's `filepath.Join`. RUN against real repo produces 1689 findings byte-identical to Go output (JSON diff = 0 modulo git_sha). Nx target `validate:repo-governance-audit` flipped from `go run` to `cargo run`. 564 tests pass. Coverage 90.21% lines.
   - [x] `repo-governance agents-md-size` — port `cmd/governance_agents_md_size.go`.
     - **Date**: 2026-05-23 **Status**: Completed
     - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/agents_md_size.rs`, `apps/rhino-cli-rs/src/commands/governance_agents_md_size.rs`, `apps/rhino-cli/project.json`
