@@ -231,7 +231,7 @@
       "outputs": []
     },
     "validate:specs-adoption": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go specs validate-adoption",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- specs validate-adoption",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",
@@ -241,7 +241,7 @@
       "outputs": []
     },
     "validate:specs-counts": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go specs validate-counts",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- specs validate-counts",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",
@@ -251,13 +251,13 @@
       "outputs": []
     },
     "validate:specs-links": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go specs validate-links",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- specs validate-links",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/specs/apps/**/*.md"],
       "outputs": []
     },
     "validate:specs-tree": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go specs validate-tree",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- specs validate-tree",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",

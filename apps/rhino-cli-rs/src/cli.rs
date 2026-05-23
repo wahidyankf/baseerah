@@ -2,12 +2,13 @@ use clap::{Parser, Subcommand};
 
 use crate::commands::{
     agents_detect_duplication, agents_sync, agents_validate_claude, agents_validate_naming,
-    agents_validate_sync, docs_validate_frontmatter, docs_validate_heading_hierarchy,
-    docs_validate_links, docs_validate_mermaid, docs_validate_naming, governance_agents_md_size,
-    governance_audit, governance_emoji_audit, governance_frontmatter_audit,
-    governance_layer_coherence, governance_license_audit, governance_readme_index_audit,
-    governance_traceability_audit, governance_vendor_audit, spec_coverage_validate,
-    test_coverage_validate, workflows_validate_naming,
+    agents_validate_sync, ddd_bc, ddd_ul, docs_validate_frontmatter,
+    docs_validate_heading_hierarchy, docs_validate_links, docs_validate_mermaid,
+    docs_validate_naming, governance_agents_md_size, governance_audit, governance_emoji_audit,
+    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
+    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
+    spec_coverage_validate, specs_validate_adoption, specs_validate_counts, specs_validate_links,
+    specs_validate_tree, test_coverage_validate, workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -78,6 +79,38 @@ pub enum Commands {
     /// Workflow file validators.
     #[command(name = "workflows", subcommand)]
     Workflows(WorkflowsCommands),
+    /// Spec tree validators (adoption, counts, links, tree).
+    #[command(name = "specs", subcommand)]
+    Specs(SpecsCommands),
+    /// DDD validators (bounded-context, ubiquitous-language).
+    #[command(name = "ddd", subcommand)]
+    Ddd(DddCommands),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum SpecsCommands {
+    /// Verify an app has adopted BDD and DDD practices.
+    #[command(name = "validate-adoption")]
+    ValidateAdoption(specs_validate_adoption::ValidateAdoptionArgs),
+    /// Validate each required spec subfolder contains at least one spec file.
+    #[command(name = "validate-counts")]
+    ValidateCounts(specs_validate_counts::ValidateCountsArgs),
+    /// Check that markdown links in spec files resolve.
+    #[command(name = "validate-links")]
+    ValidateLinks(specs_validate_links::ValidateLinksArgs),
+    /// Validate canonical C4-aware five-folder spec tree.
+    #[command(name = "validate-tree")]
+    ValidateTree(specs_validate_tree::ValidateTreeArgs),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum DddCommands {
+    /// Validate bounded-context structural parity against the registry.
+    #[command(name = "bc")]
+    Bc(ddd_bc::DddBcArgs),
+    /// Validate ubiquitous-language glossary parity against the registry.
+    #[command(name = "ul")]
+    Ul(ddd_ul::DddUlArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -268,6 +301,18 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             WorkflowsCommands::ValidateNaming(args) => {
                 workflows_validate_naming::run(args, output_format)
             }
+        },
+        Commands::Specs(sc) => match sc {
+            SpecsCommands::ValidateAdoption(args) => {
+                specs_validate_adoption::run(args, output_format)
+            }
+            SpecsCommands::ValidateCounts(args) => specs_validate_counts::run(args, output_format),
+            SpecsCommands::ValidateLinks(args) => specs_validate_links::run(args, output_format),
+            SpecsCommands::ValidateTree(args) => specs_validate_tree::run(args, output_format),
+        },
+        Commands::Ddd(dc) => match dc {
+            DddCommands::Bc(args) => ddd_bc::run(args, output_format),
+            DddCommands::Ul(args) => ddd_ul::run(args, output_format),
         },
     };
     match result {
