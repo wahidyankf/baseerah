@@ -231,7 +231,10 @@ Goal: port the `repo-governance` namespace and its 9 sub-validators. Each comman
     - **Date**: 2026-05-23 **Status**: Completed
     - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/frontmatter_audit.rs`, `apps/rhino-cli-rs/src/commands/governance_frontmatter_audit.rs`, `apps/rhino-cli/project.json`
     - **Notes**: serde_norway YAML parse for `updated:` field detect. `lastUpdatedFooterRe` + `inlineDateAnnotationRe` regexes verbatim. website-app prefix skip. Shadow-diff stdout byte-identical text+JSON+markdown against `repo-governance/` (21 findings). Nx target flipped.
-  - [ ] `repo-governance layer-coherence` — port `cmd/governance_layer_coherence.go`.
+  - [x] `repo-governance layer-coherence` — port `cmd/governance_layer_coherence.go`.
+    - **Date**: 2026-05-23 **Status**: Completed
+    - **Files**: `apps/rhino-cli-rs/src/internal/repo_governance/layer_coherence.rs`, `apps/rhino-cli-rs/src/commands/governance_layer_coherence.rs`, `apps/rhino-cli/project.json`
+    - **Notes**: 5 finding kinds (intra-file conflict, cross-file number, cross-file name, numbering gap, missing doc). Bold + H2 regexes verbatim. Nested envelope: `{schema, status, result: {status, count, findings}}`. Shadow-diff PASS text+JSON+markdown against real repo state. Nx target flipped.
   - [ ] `repo-governance license-audit` — port `cmd/governance_license_audit.go`. Corpus diff-test against `apps/*/LICENSE` + `libs/*/LICENSE`.
   - [ ] `repo-governance readme-index-audit` — port `cmd/governance_readme_index_audit.go`.
   - [ ] `repo-governance traceability-audit` — port `cmd/governance_traceability_audit.go`.

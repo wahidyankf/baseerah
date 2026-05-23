@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 
 use crate::commands::{
     governance_agents_md_size, governance_emoji_audit, governance_frontmatter_audit,
-    spec_coverage_validate, test_coverage_validate,
+    governance_layer_coherence, spec_coverage_validate, test_coverage_validate,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -77,6 +77,9 @@ pub enum RepoGovernanceCommands {
     /// Audit markdown files for forbidden manual date metadata.
     #[command(name = "frontmatter-audit")]
     FrontmatterAudit(governance_frontmatter_audit::FrontmatterAuditArgs),
+    /// Audit governance docs for layer numbering/naming coherence.
+    #[command(name = "layer-coherence")]
+    LayerCoherence(governance_layer_coherence::LayerCoherenceArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -145,6 +148,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             RepoGovernanceCommands::FrontmatterAudit(args) => {
                 governance_frontmatter_audit::run(args, output_format)
+            }
+            RepoGovernanceCommands::LayerCoherence(args) => {
+                governance_layer_coherence::run(args, output_format)
             }
         },
     };

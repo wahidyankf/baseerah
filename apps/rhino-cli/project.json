@@ -151,7 +151,7 @@
       "outputs": []
     },
     "validate:layer-coherence": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go repo-governance layer-coherence",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- repo-governance layer-coherence",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",
