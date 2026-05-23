@@ -73,7 +73,7 @@
       }
     },
     "validate:agents-detect-duplication": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go agents detect-duplication",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- agents detect-duplication",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",

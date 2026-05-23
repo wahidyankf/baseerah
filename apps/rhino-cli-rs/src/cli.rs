@@ -1,12 +1,12 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    agents_validate_naming, docs_validate_frontmatter, docs_validate_heading_hierarchy,
-    docs_validate_links, docs_validate_mermaid, docs_validate_naming, governance_agents_md_size,
-    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
-    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
-    governance_vendor_audit, spec_coverage_validate, test_coverage_validate,
-    workflows_validate_naming,
+    agents_detect_duplication, agents_validate_naming, docs_validate_frontmatter,
+    docs_validate_heading_hierarchy, docs_validate_links, docs_validate_mermaid,
+    docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
+    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
+    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
+    spec_coverage_validate, test_coverage_validate, workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -84,6 +84,9 @@ pub enum AgentsCommands {
     /// Validate agent filename suffixes and mirror parity.
     #[command(name = "validate-naming")]
     ValidateNaming(agents_validate_naming::ValidateNamingArgs),
+    /// Detect verbatim duplication across agent and skill files.
+    #[command(name = "detect-duplication")]
+    DetectDuplication(agents_detect_duplication::DetectDuplicationArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -237,6 +240,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
         Commands::Agents(ac) => match ac {
             AgentsCommands::ValidateNaming(args) => {
                 agents_validate_naming::run(args, output_format)
+            }
+            AgentsCommands::DetectDuplication(args) => {
+                agents_detect_duplication::run(args, output_format)
             }
         },
         Commands::Workflows(wc) => match wc {
