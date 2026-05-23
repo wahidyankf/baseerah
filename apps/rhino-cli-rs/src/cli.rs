@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::commands::{spec_coverage_validate, test_coverage_validate};
+use crate::commands::{governance_agents_md_size, spec_coverage_validate, test_coverage_validate};
 use crate::internal::cliout::OutputFormat;
 
 #[derive(Parser, Debug)]
@@ -58,6 +58,16 @@ pub enum Commands {
     /// BDD spec coverage commands.
     #[command(name = "spec-coverage", subcommand)]
     SpecCoverage(SpecCoverageCommands),
+    /// Repository governance audits.
+    #[command(name = "repo-governance", subcommand)]
+    RepoGovernance(RepoGovernanceCommands),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum RepoGovernanceCommands {
+    /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
+    #[command(name = "agents-md-size")]
+    AgentsMdSize(governance_agents_md_size::AgentsMdSizeArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -115,6 +125,11 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
         Commands::SpecCoverage(sc) => match sc {
             SpecCoverageCommands::Validate(args) => {
                 spec_coverage_validate::run(args, output_format)
+            }
+        },
+        Commands::RepoGovernance(rg) => match rg {
+            RepoGovernanceCommands::AgentsMdSize(args) => {
+                governance_agents_md_size::run(args, output_format)
             }
         },
     };

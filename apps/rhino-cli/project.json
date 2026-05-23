@@ -83,7 +83,7 @@
       "outputs": []
     },
     "validate:agents-md-size": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go repo-governance agents-md-size",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- repo-governance agents-md-size",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/AGENTS.md"],
       "outputs": []
