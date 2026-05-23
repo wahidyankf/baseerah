@@ -2,6 +2,7 @@
 // Populated phase-by-phase as the port progresses.
 
 pub mod agents_detect_duplication;
+pub mod agents_validate_claude;
 pub mod agents_validate_naming;
 pub mod docs_validate_frontmatter;
 pub mod docs_validate_heading_hierarchy;

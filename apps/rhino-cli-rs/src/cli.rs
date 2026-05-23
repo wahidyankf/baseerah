@@ -1,9 +1,9 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    agents_detect_duplication, agents_validate_naming, docs_validate_frontmatter,
-    docs_validate_heading_hierarchy, docs_validate_links, docs_validate_mermaid,
-    docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
+    agents_detect_duplication, agents_validate_claude, agents_validate_naming,
+    docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
+    docs_validate_mermaid, docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
     governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
     governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
     spec_coverage_validate, test_coverage_validate, workflows_validate_naming,
@@ -87,6 +87,9 @@ pub enum AgentsCommands {
     /// Detect verbatim duplication across agent and skill files.
     #[command(name = "detect-duplication")]
     DetectDuplication(agents_detect_duplication::DetectDuplicationArgs),
+    /// Validate Claude Code agent and skill format in .claude/ directory.
+    #[command(name = "validate-claude")]
+    ValidateClaude(agents_validate_claude::ValidateClaudeArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -243,6 +246,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             AgentsCommands::DetectDuplication(args) => {
                 agents_detect_duplication::run(args, output_format)
+            }
+            AgentsCommands::ValidateClaude(args) => {
+                agents_validate_claude::run(args, output_format)
             }
         },
         Commands::Workflows(wc) => match wc {

@@ -294,7 +294,11 @@ Goal: port the `agents` and `workflows` namespaces. `agents sync` generates `.op
 - [ ] Port each command following the RED→GREEN pattern per Phase 2 (stub + failing tests first, then implement, then shadow-diff, then flip target):
   - [ ] `agents detect-duplication` — port `cmd/agents_detect_duplication.go`. Diff-test against current `.claude/agents/*.md` + `.claude/skills/*/SKILL.md`.
   - [ ] `agents sync` — port `cmd/agents_sync.go`. After flip, run `cargo run -- agents sync` and assert `.opencode/agents/` is byte-identical to the Go-binary baseline. Verify: `diff -r .opencode/agents/ /tmp/opencode-go-baseline/agents/` reports no differences.
-  - [ ] `agents validate-claude` — port `cmd/agents_validate_claude.go`.
+  - [x] `agents validate-claude` — port `cmd/agents_validate_claude.go`.
+    - **Date**: 2026-05-23
+    - **Status**: Completed
+    - **Files Changed**: `apps/rhino-cli-rs/src/internal/agents/{types,frontmatter,yaml_formatting,agent_validator,skill_validator,claude_validator,reporter}.rs`, `apps/rhino-cli-rs/src/internal/agents/mod.rs`, `apps/rhino-cli-rs/src/commands/agents_validate_claude.rs`, `apps/rhino-cli-rs/src/commands/mod.rs`, `apps/rhino-cli-rs/src/cli.rs`
+    - **Notes**: Full validate-claude pipeline ported byte-for-byte. 98 unit tests pass. Shadow-diff against real `.claude/agents/` + `.claude/skills/` corpus PASS for text + JSON + markdown (1088 checks total, 1084 passed, 4 unknown-field warnings — all three formats byte-identical modulo Duration/timestamp). No Nx target to flip — Go `validate-claude` has no caller in `project.json` / `.husky` / `.github`; manual invocation only.
   - [ ] `agents validate-naming` — port `cmd/agents_validate_naming.go`.
   - [ ] `agents validate-sync` — port `cmd/agents_validate_sync.go`.
   - [ ] `workflows validate-naming` — port `cmd/workflows_validate_naming.go`.

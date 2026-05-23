@@ -317,15 +317,11 @@ fn find_columns(cells: &[String]) -> (i64, i64) {
     for (i, c) in cells.iter().enumerate() {
         let h = c.trim().to_lowercase();
         match h.as_str() {
-            "path" | "directory" => {
-                if path_col == -1 {
-                    path_col = i as i64;
-                }
+            "path" | "directory" if path_col == -1 => {
+                path_col = i as i64;
             }
-            "license" => {
-                if license_col == -1 {
-                    license_col = i as i64;
-                }
+            "license" if license_col == -1 => {
+                license_col = i as i64;
             }
             _ => {}
         }
