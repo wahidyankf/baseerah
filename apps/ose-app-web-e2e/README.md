@@ -17,4 +17,4 @@ Playwright-BDD frontend E2E tests for ose-app-web.
 
 ## Feature Files
 
-- [smoke.feature](../../specs/apps/ose-app/behavior/web/gherkin/smoke.feature)
+- [smoke.feature](../../specs/apps/ose-app/behavior/web/gherkin/smoke/smoke.feature)

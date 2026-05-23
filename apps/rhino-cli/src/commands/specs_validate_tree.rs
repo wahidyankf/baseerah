@@ -6,7 +6,7 @@ use clap::Args;
 use crate::internal::allowlist::apps_with_ddd;
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::specs::validate_spec_tree;
+use crate::internal::specs::{validate_spec_gherkin_domains, validate_spec_tree};
 
 #[derive(Args, Debug)]
 pub struct ValidateTreeArgs {
@@ -40,13 +40,14 @@ pub fn run_at_root(
     let apps = resolve_apps(args.app.as_ref(), &args.apps);
     let mut total = 0usize;
     for app in &apps {
-        let findings = validate_spec_tree(repo_root, app);
+        let mut findings = validate_spec_tree(repo_root, app);
+        findings.extend(validate_spec_gherkin_domains(repo_root, app));
         if findings.is_empty() {
             writeln!(w, "specs validate-tree: 0 finding(s) for \"{app}\"")?;
             continue;
         }
         for f in &findings {
-            writeln!(w, "{}: HIGH: {}", f.file, f.evidence)?;
+            writeln!(w, "{}: {}: {}", f.file, f.criticality, f.evidence)?;
         }
         total += findings.len();
     }

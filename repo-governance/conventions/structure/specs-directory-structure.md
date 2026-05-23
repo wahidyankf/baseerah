@@ -27,7 +27,7 @@ This convention implements the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The directory structure communicates spec scope through path segments. Reading a path like `specs/apps/organiclever/behavior/be/gherkin/expenses/expense-management.feature` immediately reveals the project, C4 level, layer, domain, and feature without any external metadata.
 
-- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: CLI specs use a flat structure under `gherkin/` because CLI commands are independent operations that do not group into business domains. Adding domain subdirectories with one or two files each would create indirection without value.
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Every surface (BE, web, CLI) uses domain subdirectories under `gherkin/`. Single-feature domains are permitted for CLI surfaces with a small command surface area — the domain name still communicates the command group without requiring multiple files.
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: The specs directory serves as living documentation of system behavior. Gherkin features describe what the system does in human-readable language, C4 diagrams describe architectural context at three zoom levels, and OpenAPI contracts describe API surfaces.
 
@@ -129,7 +129,8 @@ specs/apps/<app-family>/
     └── cli/
         └── gherkin/
             ├── README.md
-            └── <command>.feature    # Flat structure — no domain dirs
+            └── <domain>/            # Domain subdir — same rule as be/web
+                └── <command>.feature
 ```
 
 ### Folder Purposes
@@ -165,12 +166,12 @@ Where:
 
 - **`<app-family>`** = project name (e.g., `organiclever`, `ayokoding`, `rhino`)
 - **`<surface>`** = `be`, `web`, or `cli`
-- **`{domain}`** = business domain grouping folder (BE/web only; omitted for CLI)
+- **`{domain}`** = business domain grouping folder (all surfaces, including CLI)
 - **`{feature}`** = feature file name in kebab-case
 
 ### Domain Subdirectory Rules
 
-**BE and web specs** ALWAYS use domain subdirectories under `gherkin/`. Each domain folder groups related feature files by business domain, not by technical concern:
+**Every surface** (BE, web, CLI, build-tools) uses domain subdirectories under `gherkin/`. Each domain folder groups related feature files by business domain or command group, not by technical concern. Single-feature domains are permitted when the surface area is small.
 
 ```
 specs/apps/organiclever/behavior/be/gherkin/expenses/expense-management.feature
@@ -181,7 +182,7 @@ specs/apps/ayokoding/behavior/web/gherkin/accessibility/accessibility.feature
 
 A domain folder may contain one or many feature files.
 
-**CLI specs** use a flat structure under `gherkin/` with NO domain subdirectories. Each feature file corresponds to one CLI command:
+**CLI specs** use the same domain subdirectory rule as BE and web. Group features by command domain (e.g., `system/`, `env/`, `links/`). Single-feature domains are fine when the CLI surface area is small:
 
 ```
 specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature
@@ -190,7 +191,7 @@ specs/apps/rhino/behavior/cli/gherkin/spec-coverage/spec-coverage-validate.featu
 specs/apps/ayokoding/behavior/cli/gherkin/links/links-check.feature
 ```
 
-**Rationale for CLI exception**: CLI commands are independent operations, not grouped into business domains. Domain folders containing one or two files each would add indirection without value. The flat structure communicates that each file is an independent command specification.
+`rhino-cli specs validate-tree` enforces this rule: a `.feature` file placed directly under `behavior/<surface>/gherkin/` (with no domain subdirectory) is a HIGH finding.
 
 ## Lib Spec Structure
 
@@ -279,13 +280,17 @@ inputs, every cross-link, governance) to relocate.
 
 The atomic commit is mandatory — splitting the move and the path updates causes test failures between commits.
 
+**CLI-flat exception retired (2026-05-23)**: crane, rhino, ayokoding-cli, and ose-platform-cli
+all regrouped under `behavior/cli/gherkin/<domain>/` during the `specs-tree-uniform` pass.
+`rhino-cli specs validate-tree` now enforces domain subdirs for every surface.
+
 ## Adding New Specs
 
 ### Adding a Feature File to an Existing Project
 
-1. Identify the correct surface (`be`, `web`, or `cli`)
-2. For BE/web: place the file in the appropriate domain subdirectory under `behavior/<surface>/gherkin/`, creating the domain folder if it does not exist
-3. For CLI: place the file directly under `behavior/cli/gherkin/` with no domain subdirectory
+1. Identify the correct surface (`be`, `web`, `cli`, or `build-tools`)
+2. Place the file in the appropriate domain subdirectory under `behavior/<surface>/gherkin/<domain>/`, creating the domain folder if it does not exist
+3. For CLI: choose a domain that matches the command group (e.g., `system/`, `env/`, `links/`); single-feature domains are permitted
 4. Update the relevant `README.md` index file
 
 ### Adding Specs for a New Project

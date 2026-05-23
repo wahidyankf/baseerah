@@ -1,7 +1,7 @@
 /**
  * Step definitions for the OSE Application BE health endpoint feature.
  *
- * Covers: specs/apps/ose-app/behavior/be/gherkin/health.feature
+ * Covers: specs/apps/ose-app/behavior/be/gherkin/health/health.feature
  */
 import { expect } from "@playwright/test";
 import { createBdd } from "playwright-bdd";

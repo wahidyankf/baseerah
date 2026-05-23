@@ -284,6 +284,59 @@ pub fn validate_spec_tree(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
     findings
 }
 
+// ---- validate-gherkin-domains ----
+
+/// Every `.feature` file under `behavior/<surface>/gherkin/` must live inside a domain
+/// subdirectory, not at the gherkin root. Flat files are a HIGH finding.
+pub fn validate_spec_gherkin_domains(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
+    let mut findings = Vec::new();
+    let behavior = repo_root.join("specs/apps").join(app).join("behavior");
+    if !behavior.exists() {
+        return findings;
+    }
+    let surfaces = match fs::read_dir(&behavior) {
+        Ok(e) => e,
+        Err(_) => return findings,
+    };
+    for surface_entry in surfaces.flatten() {
+        let surface_path = surface_entry.path();
+        if !surface_path.is_dir() {
+            continue;
+        }
+        let gherkin = surface_path.join("gherkin");
+        if !gherkin.exists() {
+            continue;
+        }
+        let gherkin_entries = match fs::read_dir(&gherkin) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+        for entry in gherkin_entries.flatten() {
+            let p = entry.path();
+            if p.is_file()
+                && p.file_name()
+                    .and_then(|s| s.to_str())
+                    .map(|s| s.to_lowercase().ends_with(".feature"))
+                    .unwrap_or(false)
+            {
+                let rel = pathdiff_starts_with(&p, repo_root);
+                findings.push(SpecFinding {
+                    category: "tree-shape".into(),
+                    criticality: "HIGH".into(),
+                    file: rel.clone(),
+                    evidence: format!(
+                        "flat feature file at {rel}; expected behavior/<surface>/gherkin/<domain>/<feature>.feature"
+                    ),
+                    expected: format!(
+                        "move {rel} into a domain subdirectory under the gherkin/ folder"
+                    ),
+                });
+            }
+        }
+    }
+    findings
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -455,5 +508,28 @@ mod tests {
         std::fs::create_dir_all(&gherkin).unwrap();
         std::fs::write(gherkin.join("build-tools.feature"), "Feature: build-tools").unwrap();
         assert!(validate_spec_tree(dir.path(), "x").is_empty());
+    }
+
+    #[test]
+    fn validate_spec_gherkin_domains_flat_feature_rejected() {
+        let dir = tempdir().unwrap();
+        let gherkin = dir.path().join("specs/apps/x/behavior/cli/gherkin");
+        std::fs::create_dir_all(&gherkin).unwrap();
+        std::fs::write(gherkin.join("flat.feature"), "Feature: flat").unwrap();
+        let f = validate_spec_gherkin_domains(dir.path(), "x");
+        assert!(
+            !f.is_empty(),
+            "expected HIGH finding for flat feature at gherkin root"
+        );
+        assert!(f.iter().any(|x| x.criticality == "HIGH"));
+    }
+
+    #[test]
+    fn validate_spec_gherkin_domains_domain_subdir_accepted() {
+        let dir = tempdir().unwrap();
+        let domain = dir.path().join("specs/apps/x/behavior/cli/gherkin/links");
+        std::fs::create_dir_all(&domain).unwrap();
+        std::fs::write(domain.join("links-check.feature"), "Feature: links").unwrap();
+        assert!(validate_spec_gherkin_domains(dir.path(), "x").is_empty());
     }
 }

@@ -397,42 +397,47 @@ last two CLI trees and hardening rhino-cli so the rule is enforced going forward
       rhino-cli:validate:specs-links --apps ose-platform && nx run ose-cli:test:quick` —
     all exit 0.
 <!-- Date: 2026-05-23 | Status: done | Notes: all pass 0 findings; ose-cli:test:quick pass -->
-- [ ] Commit atomically: `git add -A && git commit -m "refactor(specs/ose-platform): regroup
+- [x] Commit atomically: `git add -A && git commit -m "refactor(specs/ose-platform): regroup
   cli features into domain subdirs"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit 17fe4c223; 4 files changed, 35 insertions, 18 deletions -->
 
 ### Phase 6.c — Validator enforcement + convention update (R7.c)
 
 This is the apps/rhino-cli code change that locks in the new "no flat CLI" rule plus the
 governance line that authorizes it.
 
-- [ ] Read the current rule sites in rhino-cli to understand the existing shape:
-      `apps/rhino-cli/src/commands/specs_validate_tree.rs` — top-level shape validator;
-      `apps/rhino-cli/src/internal/specs.rs` — shared helpers (`required_spec_folders`,
-      `walk_feature_files`, etc.).
-      Confirmed: neither file currently contains a flat-feature check OR a CLI-surface carve-out.
-      The task is to ADD a new rule from scratch — there is no existing carve-out to remove.
-      [Repo-grounded — verified at plan-authoring time 2026-05-23]
-- [ ] Write a FAILING `#[cfg(test)]` unit test in `apps/rhino-cli/src/internal/specs.rs` (or a
+- [x] Read the current rule sites in rhino-cli to understand the existing shape:
+    `apps/rhino-cli/src/commands/specs_validate_tree.rs` — top-level shape validator;
+    `apps/rhino-cli/src/internal/specs.rs` — shared helpers (`required_spec_folders`,
+    `walk_feature_files`, etc.).
+    Confirmed: neither file currently contains a flat-feature check OR a CLI-surface carve-out.
+    The task is to ADD a new rule from scratch — there is no existing carve-out to remove.
+    [Repo-grounded — verified at plan-authoring time 2026-05-23]
+<!-- Date: 2026-05-23 | Status: done | Notes: confirmed via grep — zero matches for flat/domain/gherkin in validate_tree.rs; specs.rs only has flatten() iterator calls -->
+- [x] Write a FAILING `#[cfg(test)]` unit test in `apps/rhino-cli/src/internal/specs.rs` (or a
       new test module in `specs_validate_tree.rs`): create a synthetic tree where
       `behavior/cli/gherkin/flat-file.feature` exists (depth 0, no domain subdir) and assert
       that the validator emits at least one HIGH finding with category
       `Spec Tree Shape Compliance`. Run `nx run rhino-cli:test:quick` — new test MUST FAIL
       (RED state confirms the rule does not yet exist).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Add the new flat-feature check to the validator: for ANY surface (be, web, cli,
+  <!-- Date: 2026-05-23 | Status: done | Notes: 2 tests added (flat_feature_rejected + domain_subdir_accepted); compile error confirmed RED before implementation -->
+- [x] Add the new flat-feature check to the validator: for ANY surface (be, web, cli,
       build-tools), a `.feature` file directly under `behavior/<surface>/gherkin/` (zero domain
       levels) emits a HIGH finding with category `Spec Tree Shape Compliance` and message
       `"flat feature file at <path>; expected behavior/<surface>/gherkin/<domain>/<feature>.feature"`.
       Run `nx run rhino-cli:test:quick` — the previously failing test now PASSES (GREEN).
       Coverage gate (≥90%) must still pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Update `apps/rhino-cli/src/commands/specs_validate_counts.rs` if it carries a separate
+  <!-- Date: 2026-05-23 | Status: done | Notes: validate_spec_gherkin_domains() added to specs.rs; wired into specs_validate_tree.rs command; 757/757 tests pass; coverage gate pass -->
+- [x] Update `apps/rhino-cli/src/commands/specs_validate_counts.rs` if it carries a separate
       assumption that CLI gherkin can be flat — verify first:
       `grep -n 'flat\|domain\|directly' apps/rhino-cli/src/commands/specs_validate_counts.rs`
       — if output is empty, this step is N/A; otherwise, change to expect each `<domain>/`
       subdir to contain ≥1 `.feature` and add a unit test mirroring the change.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Edit
+  <!-- Date: 2026-05-23 | Status: N/A | Notes: grep returned empty; no flat assumption in validate_counts -->
+- [x] Edit
       [`repo-governance/conventions/structure/specs-directory-structure.md`](../../../repo-governance/conventions/structure/specs-directory-structure.md):
       (a) In the Canonical App Spec Tree code block, replace the line
       `└── <command>.feature    # Flat structure — no domain dirs`
@@ -446,9 +451,12 @@ governance line that authorizes it.
       (YYYY-MM-DD): crane, rhino, ayokoding-cli, and ose-platform-cli all regrouped under
       `behavior/cli/gherkin/<domain>/`."
   - _Suggested executor: `repo-rules-maker`_
-- [ ] Run `nx run rhino-cli:validate:specs-tree` (no `--apps` flag) — exits 0 across every
-      app in `AppsWithDDD` plus every other in-scope spec area.
-- [ ] Run `npm run lint:md` — exits 0.
+  <!-- Date: 2026-05-23 | Status: done | Notes: 7 edits applied to specs-directory-structure.md; canonical tree, surface description, domain rule, CLI-exception retirement, Adding a Feature File steps, Simplicity principle, Migration Path all updated -->
+- [x] Run `nx run rhino-cli:validate:specs-tree` (no `--apps` flag) — exits 0 across every
+    app in `AppsWithDDD` plus every other in-scope spec area.
+<!-- Date: 2026-05-23 | Status: done | Notes: 0 findings for organiclever, wahidyankf, ose-platform, ayokoding, ose-app; ose-app flat features (health.feature, smoke.feature) moved to domain subdirs and per-feature refs updated -->
+- [x] Run `npm run lint:md` — exits 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: 2759 files linted, 0 errors -->
 - [ ] Commit atomically: `git add -A && git commit -m "feat(rhino-cli): enforce domain
 subdirs under every behavior/<surface>/gherkin/"`.
 
