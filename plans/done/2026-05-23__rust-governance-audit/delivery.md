@@ -344,6 +344,22 @@ For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree a
     exists today. Promote when a second crate is added to validate the abstraction level. Record in
     `plans/ideas.md` as low-priority backlog item.
 
+## Post-close-out findings (recheck 2026-05-23)
+
+Two findings caught during a full recheck after plan archival. Both fixed and pushed (SHA `f8fc6711f`).
+
+- [x] **R-01** `docs/explanation/software-engineering/programming-languages/rust/README.md` —
+      `**Go Version Strategy**:` label was a Go-era leftover in the Framework Stack section.
+      Renamed to `**Rust Version Strategy**:`.
+  - Date: 2026-05-23 | Status: done | Commit: `f8fc6711f`
+
+- [x] **R-02** `docs/explanation/software-engineering/programming-languages/rust/README.md` —
+      "Rust Edition Strategy" section described a stale three-tier model: 2024 called
+      "Upcoming — SHOULD adopt" and 2021 called "Recommended — SHOULD use", contradicting
+      every other Rust doc that mandates `edition = "2024"`. Rewrote section: 2024 = REQUIRED
+      (stabilized 1.85.0, 2025-02-20), 2021 = previous standard (do not use for new crates).
+  - Date: 2026-05-23 | Status: done | Commit: `f8fc6711f`
+
 ## Commit hygiene
 
 - Follow the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/)
