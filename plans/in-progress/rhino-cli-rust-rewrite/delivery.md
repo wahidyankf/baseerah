@@ -293,7 +293,11 @@ Goal: port the `agents` and `workflows` namespaces. `agents sync` generates `.op
   - _Suggested executor: `swe-rust-dev`_
 - [ ] Port each command following the RED→GREEN pattern per Phase 2 (stub + failing tests first, then implement, then shadow-diff, then flip target):
   - [ ] `agents detect-duplication` — port `cmd/agents_detect_duplication.go`. Diff-test against current `.claude/agents/*.md` + `.claude/skills/*/SKILL.md`.
-  - [ ] `agents sync` — port `cmd/agents_sync.go`. After flip, run `cargo run -- agents sync` and assert `.opencode/agents/` is byte-identical to the Go-binary baseline. Verify: `diff -r .opencode/agents/ /tmp/opencode-go-baseline/agents/` reports no differences.
+  - [x] `agents sync` — port `cmd/agents_sync.go`. After flip, run `cargo run -- agents sync` and assert `.opencode/agents/` is byte-identical to the Go-binary baseline. Verify: `diff -r .opencode/agents/ /tmp/opencode-go-baseline/agents/` reports no differences.
+    - **Date**: 2026-05-23
+    - **Status**: Completed
+    - **Files Changed**: `apps/rhino-cli-rs/src/internal/agents/{converter,sync,reporter}.rs`, `apps/rhino-cli-rs/src/internal/agents/mod.rs`, `apps/rhino-cli-rs/src/commands/agents_sync.rs`, `apps/rhino-cli-rs/src/commands/mod.rs`, `apps/rhino-cli-rs/src/cli.rs`
+    - **Notes**: Full ConvertAgent + ConvertAllAgents + SyncAll + FormatSync{Text,JSON,Markdown} ported. Custom YAML emitter matches Go yaml.v3 plain-scalar rules (quote only on leading reserved chars, ": ", " #", or trailing whitespace). Diff -r against fresh Go output produces zero differences across full .opencode/agents/ tree. Reporter shadow-diff PASS for text + JSON + markdown (modulo Duration/timestamp). 534 cargo tests pass. Coverage 90.61% lines. No Nx target to flip — sync is invoked via `npm run sync:claude-to-opencode` shell hook, not Nx.
   - [x] `agents validate-claude` — port `cmd/agents_validate_claude.go`.
     - **Date**: 2026-05-23
     - **Status**: Completed

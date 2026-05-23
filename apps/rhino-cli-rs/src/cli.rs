@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    agents_detect_duplication, agents_validate_claude, agents_validate_naming,
+    agents_detect_duplication, agents_sync, agents_validate_claude, agents_validate_naming,
     agents_validate_sync, docs_validate_frontmatter, docs_validate_heading_hierarchy,
     docs_validate_links, docs_validate_mermaid, docs_validate_naming, governance_agents_md_size,
     governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
@@ -94,6 +94,9 @@ pub enum AgentsCommands {
     /// Validate that .claude/ and .opencode/ are in sync.
     #[command(name = "validate-sync")]
     ValidateSync(agents_validate_sync::ValidateSyncArgs),
+    /// Sync Claude Code agents to OpenCode format.
+    #[command(name = "sync")]
+    Sync(agents_sync::SyncArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -255,6 +258,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
                 agents_validate_claude::run(args, output_format)
             }
             AgentsCommands::ValidateSync(args) => agents_validate_sync::run(args, output_format),
+            AgentsCommands::Sync(args) => agents_sync::run(args, output_format),
         },
         Commands::Workflows(wc) => match wc {
             WorkflowsCommands::ValidateNaming(args) => {

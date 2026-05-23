@@ -8,6 +8,7 @@ use anyhow::Error;
 use chrono::Local;
 use serde::Serialize;
 
+use super::sync::SyncResult;
 use super::types::ValidationResult;
 
 fn status_banner(result: &ValidationResult) -> &'static str {
@@ -298,6 +299,148 @@ pub fn format_validation_markdown(result: &ValidationResult, verbose: bool) -> S
     sb
 }
 
+// ---- Sync formatting ----
+
+pub fn format_sync_text(result: &SyncResult, verbose: bool, quiet: bool) -> String {
+    let mut sb = String::new();
+    if !quiet {
+        sb.push_str("Sync Complete\n");
+        sb.push_str(&"=".repeat(50));
+        sb.push_str("\n\n");
+    }
+    let _ = write!(sb, "Agents: {} converted", result.agents_converted);
+    if result.agents_failed > 0 {
+        let _ = write!(sb, ", {} failed", result.agents_failed);
+    }
+    sb.push('\n');
+    let _ = write!(sb, "Skills: {} copied", result.skills_copied);
+    if result.skills_failed > 0 {
+        let _ = write!(sb, ", {} failed", result.skills_failed);
+    }
+    sb.push('\n');
+    let _ = writeln!(sb, "Duration: {}", format_go_duration(result.duration));
+
+    if !result.failed_files.is_empty() {
+        sb.push_str("\nFailed Files:\n");
+        for f in &result.failed_files {
+            let _ = writeln!(sb, "  - {f}");
+        }
+    }
+
+    if !quiet {
+        sb.push('\n');
+        if !result.failed_files.is_empty() {
+            sb.push_str("Status: \u{274C} FAILED\n");
+        } else {
+            sb.push_str("Status: \u{2713} SUCCESS\n");
+        }
+    }
+
+    if verbose && !result.warnings.is_empty() {
+        sb.push_str("\nWarnings:\n");
+        for w in &result.warnings {
+            let _ = writeln!(
+                sb,
+                "  \u{26A0} {}: dropped field \"{}\" ({})",
+                w.agent_name, w.field, w.reason
+            );
+        }
+    }
+    sb
+}
+
+#[derive(Serialize)]
+struct SyncJsonOut<'a> {
+    status: &'a str,
+    timestamp: String,
+    agents_converted: usize,
+    agents_failed: usize,
+    skills_copied: usize,
+    skills_failed: usize,
+    failed_files: &'a [String],
+    warnings: Vec<SyncJsonWarning<'a>>,
+    duration_ms: i64,
+}
+
+#[derive(Serialize)]
+struct SyncJsonWarning<'a> {
+    agent: &'a str,
+    field: &'a str,
+    reason: &'a str,
+}
+
+pub fn format_sync_json(result: &SyncResult) -> std::result::Result<String, Error> {
+    let status = if result.failed_files.is_empty() {
+        "success"
+    } else {
+        "failure"
+    };
+    let timestamp = Local::now().format("%Y-%m-%dT%H:%M:%S%:z").to_string();
+    let warnings: Vec<SyncJsonWarning> = result
+        .warnings
+        .iter()
+        .map(|w| SyncJsonWarning {
+            agent: &w.agent_name,
+            field: &w.field,
+            reason: &w.reason,
+        })
+        .collect();
+    let out = SyncJsonOut {
+        status,
+        timestamp,
+        agents_converted: result.agents_converted,
+        agents_failed: result.agents_failed,
+        skills_copied: result.skills_copied,
+        skills_failed: result.skills_failed,
+        failed_files: &result.failed_files,
+        warnings,
+        duration_ms: result.duration.as_millis() as i64,
+    };
+    Ok(serde_json::to_string_pretty(&out)?)
+}
+
+pub fn format_sync_markdown(result: &SyncResult) -> String {
+    let mut sb = String::new();
+    sb.push_str("# Sync Results\n\n");
+    sb.push_str("## Summary\n\n");
+    let _ = writeln!(sb, "- **Agents Converted**: {}", result.agents_converted);
+    if result.agents_failed > 0 {
+        let _ = writeln!(sb, "- **Agents Failed**: {}", result.agents_failed);
+    }
+    let _ = writeln!(sb, "- **Skills Copied**: {}", result.skills_copied);
+    if result.skills_failed > 0 {
+        let _ = writeln!(sb, "- **Skills Failed**: {}", result.skills_failed);
+    }
+    let _ = writeln!(
+        sb,
+        "- **Duration**: {}\n",
+        format_go_duration(result.duration)
+    );
+    if !result.failed_files.is_empty() {
+        sb.push_str("## Failed Files\n\n");
+        for f in &result.failed_files {
+            let _ = writeln!(sb, "- `{f}`");
+        }
+        sb.push('\n');
+    }
+    if !result.failed_files.is_empty() {
+        sb.push_str("**Status**: \u{274C} FAILED\n");
+    } else {
+        sb.push_str("**Status**: \u{2713} SUCCESS\n");
+    }
+    if !result.warnings.is_empty() {
+        sb.push_str("\n## Warnings\n\n");
+        for w in &result.warnings {
+            let _ = writeln!(
+                sb,
+                "- \u{26A0} `{}`: dropped field `{}` ({})",
+                w.agent_name, w.field, w.reason
+            );
+        }
+    }
+    sb
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -428,5 +571,114 @@ mod tests {
     #[test]
     fn format_go_duration_hour() {
         assert_eq!(format_go_duration(Duration::from_secs(3661)), "1h1m1s");
+    }
+
+    fn sync_sample(failed: bool) -> SyncResult {
+        let mut r = SyncResult {
+            agents_converted: 5,
+            agents_failed: 0,
+            skills_copied: 3,
+            skills_failed: 0,
+            failed_files: vec![],
+            warnings: vec![],
+            duration: Duration::from_secs(1),
+        };
+        if failed {
+            r.agents_failed = 1;
+            r.skills_failed = 1;
+            r.failed_files.push("broken.md".to_string());
+        }
+        r
+    }
+
+    #[test]
+    fn format_sync_text_success() {
+        let s = format_sync_text(&sync_sample(false), false, false);
+        assert!(s.contains("Sync Complete"));
+        assert!(s.contains("Agents: 5 converted"));
+        assert!(s.contains("Skills: 3 copied"));
+        assert!(s.contains("SUCCESS"));
+    }
+
+    #[test]
+    fn format_sync_text_failed() {
+        let s = format_sync_text(&sync_sample(true), false, false);
+        assert!(s.contains("FAILED"));
+        assert!(s.contains("broken.md"));
+        assert!(s.contains("Agents: 5 converted, 1 failed"));
+        assert!(s.contains("Skills: 3 copied, 1 failed"));
+    }
+
+    #[test]
+    fn format_sync_text_quiet_omits_banner() {
+        let s = format_sync_text(&sync_sample(false), false, true);
+        assert!(!s.contains("Sync Complete"));
+        assert!(!s.contains("Status:"));
+    }
+
+    #[test]
+    fn format_sync_text_verbose_lists_warnings() {
+        let mut r = sync_sample(false);
+        r.warnings
+            .push(crate::internal::agents::converter::ConversionWarning {
+                agent_name: "foo".into(),
+                field: "mcpServers".into(),
+                reason: "no opencode equivalent".into(),
+            });
+        let s = format_sync_text(&r, true, false);
+        assert!(s.contains("Warnings:"));
+        assert!(s.contains("foo"));
+    }
+
+    #[test]
+    fn format_sync_json_success() {
+        let s = format_sync_json(&sync_sample(false)).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&s).unwrap();
+        assert_eq!(v["status"], "success");
+        assert_eq!(v["agents_converted"], 5);
+        assert_eq!(v["duration_ms"], 1000);
+    }
+
+    #[test]
+    fn format_sync_json_failure() {
+        let s = format_sync_json(&sync_sample(true)).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&s).unwrap();
+        assert_eq!(v["status"], "failure");
+        assert_eq!(v["failed_files"][0], "broken.md");
+    }
+
+    #[test]
+    fn format_sync_markdown_success() {
+        let s = format_sync_markdown(&sync_sample(false));
+        assert!(s.contains("# Sync Results"));
+        assert!(s.contains("**Agents Converted**: 5"));
+        assert!(s.contains("SUCCESS"));
+    }
+
+    #[test]
+    fn format_sync_markdown_failure_with_warnings() {
+        let mut r = sync_sample(true);
+        r.warnings
+            .push(crate::internal::agents::converter::ConversionWarning {
+                agent_name: "agent-a".into(),
+                field: "memory".into(),
+                reason: "claude-only".into(),
+            });
+        let s = format_sync_markdown(&r);
+        assert!(s.contains("FAILED"));
+        assert!(s.contains("## Warnings"));
+        assert!(s.contains("agent-a"));
+    }
+
+    #[test]
+    fn use_super_conversion_warning() {
+        // Re-exported via reporter format_sync_* path.
+        use crate::internal::agents::converter::ConversionWarning;
+        let w = ConversionWarning {
+            agent_name: "x".into(),
+            field: "y".into(),
+            reason: "z".into(),
+        };
+        assert_eq!(w.field, "y");
     }
 }
