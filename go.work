@@ -3,7 +3,6 @@ go 1.26
 use (
 	./apps/ayokoding-cli
 	./apps/ose-cli
-	./apps/rhino-cli
 	./libs/golang-commons
 	./libs/hugo-commons
 )

@@ -44,7 +44,7 @@ func TestComputeJaCoCoResult_ValidReport(t *testing.T) {
 	if !result.Passed {
 		t.Error("expected Passed=true")
 	}
-	if result.Format .Code() != "jacoco" {
+	if result.Format.Code() != "jacoco" {
 		t.Errorf("expected FormatJaCoCo, got %v", result.Format)
 	}
 }

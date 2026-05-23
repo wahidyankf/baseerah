@@ -1,5 +1,0 @@
-target/
-dist/
-cover.out
-cover_spec.out
-*.profraw

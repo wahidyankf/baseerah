@@ -90,9 +90,9 @@
       ],
       "options": {
         "commands": [
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go ddd bc ayokoding)",
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go ddd ul ayokoding)",
-          "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/ayokoding-web/coverage/lcov.info 82)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc ayokoding)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul ayokoding)",
+          "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ayokoding-web/coverage/lcov.info 82)",
           "../../apps/ayokoding-cli/dist/ayokoding-cli links check --content content",
           "npx tsx src/scripts/generate-indexes.ts --validate"
         ],
@@ -112,7 +112,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ayokoding/behavior/web/gherkin specs/apps/ayokoding/behavior/api/gherkin specs/apps/ayokoding/build-tools/gherkin apps/ayokoding-web"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ayokoding/behavior/web/gherkin specs/apps/ayokoding/behavior/api/gherkin specs/apps/ayokoding/build-tools/gherkin apps/ayokoding-web"
       },
       "cache": true,
       "inputs": [
@@ -124,5 +124,5 @@
     }
   },
   "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"],
-  "implicitDependencies": ["rhino-cli", "ayokoding-cli"]
+  "implicitDependencies": ["ayokoding-cli"]
 }

@@ -45,10 +45,10 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go ddd bc organiclever)",
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go ddd ul organiclever)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc organiclever)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul organiclever)",
           "mvn test",
-          "(cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/organiclever-be/target/site/jacoco/jacoco.xml 95)"
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/organiclever-be/target/site/jacoco/jacoco.xml 95)"
         ],
         "parallel": false,
         "cwd": "apps/organiclever-be"
@@ -104,11 +104,11 @@
       "cache": true
     },
     "spec-coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/be/gherkin apps/organiclever-be",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/be/gherkin apps/organiclever-be",
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/organiclever/behavior/be/gherkin/**/*.feature", "{projectRoot}/**/*.java"]
     }
   },
   "tags": ["type:app", "platform:spring-boot", "lang:java", "domain:organiclever"],
-  "implicitDependencies": ["organiclever-contracts", "rhino-cli"]
+  "implicitDependencies": ["organiclever-contracts"]
 }

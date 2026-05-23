@@ -2,7 +2,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/ose-web/src",
   "projectType": "application",
-  "implicitDependencies": ["ose-cli", "rhino-cli"],
+  "implicitDependencies": ["ose-cli"],
   "targets": {
     "generate-search-data": {
       "command": "npx tsx src/scripts/generate-search-data.ts",
@@ -69,9 +69,9 @@
       "options": {
         "cwd": "apps/ose-web",
         "commands": [
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go ddd bc ose-platform)",
-          "(cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go ddd ul ose-platform)",
-          "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/ose-web/coverage/lcov.info 86)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc ose-platform)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul ose-platform)",
+          "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ose-web/coverage/lcov.info 86)",
           "../../apps/ose-cli/dist/ose-cli links check --content content"
         ],
         "parallel": false
@@ -107,7 +107,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ose-platform/behavior/web/gherkin specs/apps/ose-platform/behavior/api/gherkin apps/ose-web"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ose-platform/behavior/web/gherkin specs/apps/ose-platform/behavior/api/gherkin apps/ose-web"
       },
       "cache": true,
       "inputs": [

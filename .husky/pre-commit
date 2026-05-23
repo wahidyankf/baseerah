@@ -1,2 +1,2 @@
 ./scripts/git-identity-check.sh
-cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- git pre-commit
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- git pre-commit

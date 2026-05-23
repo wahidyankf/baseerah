@@ -18,7 +18,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 GO_DIR="${REPO_ROOT}/apps/rhino-cli"
-RS_MANIFEST="${REPO_ROOT}/apps/rhino-cli-rs/Cargo.toml"
+RS_MANIFEST="${REPO_ROOT}/apps/rhino-cli/Cargo.toml"
 
 if [[ ! -f "${GO_DIR}/main.go" ]]; then
   echo "shadow-diff: Go binary not found at ${GO_DIR}/main.go" >&2

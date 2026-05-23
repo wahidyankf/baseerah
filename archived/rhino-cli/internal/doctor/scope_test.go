@@ -28,7 +28,7 @@ func TestParseScope(t *testing.T) {
 	}{
 		{"full", "full", true},
 		{"minimal", "minimal", true},
-		{"", "full", true},   // empty defaults to full
+		{"", "full", true}, // empty defaults to full
 		{"bad", "", false},
 	}
 	for _, tt := range tests {

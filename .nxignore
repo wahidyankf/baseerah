@@ -22,3 +22,6 @@ temp/
 # CI artifacts
 coverage/
 .nyc_output/
+
+# Archived applications (legacy code, not part of active build graph)
+archived/

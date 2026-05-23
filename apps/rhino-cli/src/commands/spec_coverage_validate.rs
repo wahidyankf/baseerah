@@ -159,11 +159,14 @@ mod tests {
 
     #[test]
     fn run_returns_ok_on_real_rhino_cli_gherkin() {
-        // Runs against the actual repo state — both rhino-cli specs and impls present.
+        // Runs against the actual repo state. After the Rust archival the Go step
+        // implementations live under archived/rhino-cli; the spec scanner aggregates
+        // both apps/rhino-cli (Rust) and archived/rhino-cli (Go) step defs.
         let args = ValidateArgs {
             paths: vec![
                 "specs/apps/rhino/behavior/cli/gherkin".to_string(),
                 "apps/rhino-cli".to_string(),
+                "archived/rhino-cli".to_string(),
             ],
             shared_steps: true,
             exclude_dir: vec![],

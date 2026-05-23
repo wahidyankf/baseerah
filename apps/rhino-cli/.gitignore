@@ -1,18 +1,5 @@
-# Binary output
+target/
 dist/
-
-# Go build artifacts
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool
-*.out
-
-# Dependency directories
-vendor/
+cover.out
+cover_spec.out
+*.profraw

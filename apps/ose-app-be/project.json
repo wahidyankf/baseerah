@@ -45,7 +45,7 @@
           "dotnet build tests/OseAppBe.Tests/OseAppBe.Tests.fsproj",
           "dotnet altcover --inputDirectory tests/OseAppBe.Tests/bin/Debug/net10.0 --outputDirectory tests/OseAppBe.Tests/bin/Debug/net10.0/__Instrumented --assemblyExcludeFilter=OseAppBe.Tests '--assemblyFilter=xunit|TickSpec|Microsoft|FSharp|testhost|AltCover|coverlet|dbup|Npgsql|EFCore' '--fileFilter=Program|AppDbContext' --linecover --reportFormat=lcov --report=coverage/altcov.info --save",
           "dotnet altcover Runner --recorderDirectory tests/OseAppBe.Tests/bin/Debug/net10.0/__Instrumented --lcovReport coverage/altcov.info --executable dotnet -- test tests/OseAppBe.Tests/bin/Debug/net10.0/__Instrumented/OseAppBe.Tests.dll",
-          "(cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate apps/ose-app-be/coverage/altcov.info 95)"
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ose-app-be/coverage/altcov.info 95)"
         ],
         "parallel": false,
         "cwd": "apps/ose-app-be"
@@ -103,11 +103,11 @@
       "cache": true
     },
     "spec-coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration specs/apps/ose-app/behavior/be/gherkin apps/ose-app-be",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration specs/apps/ose-app/behavior/be/gherkin apps/ose-app-be",
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ose-app/behavior/be/gherkin/**/*.feature", "{projectRoot}/**/*.fs"]
     }
   },
   "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:ose-app"],
-  "implicitDependencies": ["ose-app-contracts", "rhino-cli"]
+  "implicitDependencies": ["ose-app-contracts"]
 }
