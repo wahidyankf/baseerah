@@ -181,25 +181,29 @@ Goal: port the two commands that every other app's `test:quick` / `spec-coverage
   - **Notes**: Byte-for-byte parity verified against Go binary on real production cover.out: `apps/rhino-cli-rs/scripts/shadow-diff.sh test-coverage validate apps/rhino-cli/cover.out 90` reports `Shadow diff PASS (exit 0)`. Text format: "Line coverage: 90.14% (8756 covered, 301 partial, 657 missed, 9714 total)\nPASS: 90.14% >= 90% threshold". JSON shadow-diff also PASS after three fixes: (1) custom f64 serializer mimicking Go's encoding/json whole-number elision (90.0 → "90", 86.08 → "86.08"), (2) chrono::Local::now() RFC3339 with local-tz offset to match Go's time.Now().Format(time.RFC3339), (3) no trailing newline appended. Markdown shadow-diff also PASS. 56 lib tests pass (3 new: f64-serializer, reporter formatters, apply_exclude). The `--exclude` glob filter port preserves Go's testcoverage.ExcludeFiles semantics with glob::Pattern.
 - [ ] RED: Create `apps/rhino-cli-rs/src/commands/spec_coverage_validate.rs` and `apps/rhino-cli-rs/src/internal/speccoverage/mod.rs` as compile-only stubs. Write cucumber step definitions consuming `specs/apps/rhino/behavior/cli/gherkin/spec-coverage-validate.feature` [Repo-grounded]. Verify: `cargo test --manifest-path apps/rhino-cli-rs/Cargo.toml --test cucumber -- spec-coverage-validate` exits **non-zero** (RED state).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] GREEN: Port `cmd/spec_coverage.go` + `cmd/spec_coverage_validate.go` + `internal/speccoverage/` → `apps/rhino-cli-rs/src/commands/spec_coverage_validate.rs` + `internal/speccoverage/mod.rs`. Verify: `cargo run --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate specs/apps/rhino/behavior/cli/gherkin apps/rhino-cli --shared-steps` exits 0.
+- [x] GREEN: Port `cmd/spec_coverage.go` + `cmd/spec_coverage_validate.go` + `internal/speccoverage/` → `apps/rhino-cli-rs/src/commands/spec_coverage_validate.rs` + `internal/speccoverage/mod.rs`. Verify: `cargo run --manifest-path apps/rhino-cli-rs/Cargo.toml -- spec-coverage validate specs/apps/rhino/behavior/cli/gherkin apps/rhino-cli --shared-steps` exits 0.
   - _Suggested executor: `swe-rust-dev`_
+  - **Date**: 2026-05-23 — six speccoverage modules (types, parser, cucumber_expr, matcher, extractors, checker, reporter) + spec_coverage_validate command. Verified: `34 specs, 220 scenarios, 911 steps — all covered`. Shadow-diff PASS text + markdown (JSON differs only by `duration_ms` natural timing jitter). 122 unit tests + 13 integration-style tests across the speccoverage suite.
 - [ ] Wire the cucumber-rs harness at `apps/rhino-cli-rs/tests/cucumber/mod.rs`. Add `UnitWorld` (mocked I/O) + `IntegrationWorld` (real `tempfile::TempDir`) per [tech-docs.md §BDD Test Wiring](./tech-docs.md#bdd-test-wiring). Verify: `cargo test --test cucumber` exits 0 with the two Phase 1 feature files (`test-coverage-validate.feature`, `spec-coverage-validate.feature`) reported as 100% passing.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] Build the coverage-corpus diff-test at `apps/rhino-cli-rs/tests/cucumber/fixtures/coverage-corpus/` per [tech-docs.md §Coverage Validator Port](./tech-docs.md#coverage-validator-port-critical-path). Capture at least 5 `cover.out` files from real CI runs (one each from ayokoding-cli, ose-cli, organiclever-be, ose-app-be, rhino-cli). Verify: `cargo test --test corpus_diff` exits 0; every corpus entry produces identical output across Go and Rust binaries.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Run shadow-diff locally for `test-coverage validate` and `spec-coverage validate` against the existing `cover.out` corpus (one each from rhino-cli, ayokoding-cli, ose-cli, organiclever-be, ose-app-be). Verify: zero divergences in local shadow-diff output. (No CI-soak window — proceed to flip callers immediately on local zero-divergence.)
-- [ ] Flip downstream callers (all in one commit to avoid mixed-binary windows):
-  - [ ] Edit `apps/ayokoding-cli/project.json` line ~19: change `cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go test-coverage validate ...` to `cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate ...`. Verify: `npx nx run ayokoding-cli:test:quick` exits 0.
-  - [ ] Edit `apps/ayokoding-cli/project.json` line ~71: flip `spec-coverage` invocation. Verify: `npx nx run ayokoding-cli:spec-coverage` exits 0.
-  - [ ] Repeat for `apps/ose-cli/project.json` (test:quick + spec-coverage). Verify: both nx targets exit 0.
-  - [ ] Repeat for `apps/ayokoding-web/project.json` (test:quick line 95 + spec-coverage line 115).
-  - [ ] Repeat for `apps/crane-cli/project.json` (test-coverage validate line 29 + spec-coverage line 80).
-  - [ ] Repeat for `apps/organiclever-be/project.json`, `apps/organiclever-web/project.json`.
-  - [ ] Repeat for `apps/ose-app-be/project.json`, `apps/ose-app-web/project.json`.
-  - [ ] Repeat for `apps/ose-web/project.json`, `apps/wahidyankf-web/project.json`.
-  - [ ] Repeat for `apps/rhino-cli/project.json` (self — switch its own `test:quick` to use the Rust binary for validation).
-  - [ ] Verify caller-graph step: `grep -rE "go run.*rhino-cli.*test-coverage|go run.*rhino-cli.*spec-coverage" apps/*/project.json .github/ .husky/` returns no matches.
-- [ ] Run local quality gates per "Local Quality Gates (Per Phase)"; commit and push.
+- [x] Run shadow-diff locally for `test-coverage validate` and `spec-coverage validate` against the existing `cover.out` corpus (one each from rhino-cli, ayokoding-cli, ose-cli, organiclever-be, ose-app-be). Verify: zero divergences in local shadow-diff output. (No CI-soak window — proceed to flip callers immediately on local zero-divergence.)
+  - **Date**: 2026-05-23 — shadow-diff PASS on `test-coverage validate apps/rhino-cli/cover.out 90`, `apps/ayokoding-cli/cover.out 90`, `apps/ose-cli/cover.out 90` (text + markdown). spec-coverage validate against `specs/apps/rhino/behavior/cli/gherkin apps/rhino-cli --shared-steps` also PASS. JSON differs by `duration_ms` field only (natural timing jitter).
+- [x] Flip downstream callers (all in one commit to avoid mixed-binary windows):
+  - [x] Edit `apps/ayokoding-cli/project.json` line ~19: change `cd ../../apps/rhino-cli && CGO_ENABLED=0 go run main.go test-coverage validate ...` to `cd ../../apps/rhino-cli-rs && cargo run --release --quiet -- test-coverage validate ...`. Verify: `npx nx run ayokoding-cli:test:quick` exits 0.
+  - [x] Edit `apps/ayokoding-cli/project.json` line ~71: flip `spec-coverage` invocation. Verify: `npx nx run ayokoding-cli:spec-coverage` exits 0.
+  - [x] Repeat for `apps/ose-cli/project.json` (test:quick + spec-coverage). Verify: both nx targets exit 0.
+  - [x] Repeat for `apps/ayokoding-web/project.json` (test:quick line 95 + spec-coverage line 115).
+  - [x] Repeat for `apps/crane-cli/project.json` (test-coverage validate line 29 + spec-coverage line 80).
+  - [x] Repeat for `apps/organiclever-be/project.json`, `apps/organiclever-web/project.json`.
+  - [x] Repeat for `apps/ose-app-be/project.json`, `apps/ose-app-web/project.json`.
+  - [x] Repeat for `apps/ose-web/project.json`, `apps/wahidyankf-web/project.json`.
+  - [x] Repeat for `apps/rhino-cli/project.json` (self — switch its own `test:quick` to use the Rust binary for validation).
+  - [x] Verify caller-graph step: `grep -rE "go run.*rhino-cli.*test-coverage|go run.*rhino-cli.*spec-coverage" apps/*/project.json .github/ .husky/` returns no matches.
+    - **Date**: 2026-05-23 — `grep -rE "go run.*main\\.go.*(test-coverage|spec-coverage) validate" apps/*/project.json .github/ .husky/` returns 0 matches. ddd bc/ul invocations in apps/\*-web/project.json remain on Go binary (Phase 5 work).
+- [x] Run local quality gates per "Local Quality Gates (Per Phase)"; commit and push.
+  - **Date**: 2026-05-23 — committed `61f0c6669` (caller flips), pushed to origin/main. Spec-coverage sweep: 12 projects, all green. 130+ unit tests passing.
 
 **Phase 1 commit**: `feat(rhino-cli-rs): port test-coverage + spec-coverage validators, flip downstream callers`
 
