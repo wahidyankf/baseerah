@@ -3,5 +3,6 @@
 
 pub mod cliout;
 pub mod gitutil;
+pub mod repo_governance;
 pub mod speccoverage;
 pub mod testcoverage;

@@ -1,0 +1,113 @@
+// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/agents_md_size.go`.
+
+use std::fs;
+
+use anyhow::{Context, Error};
+
+/// Soft target size for AGENTS.md (30 KB).
+pub const AGENTS_MD_TARGET_SIZE: i64 = 30_000;
+/// Second-tier warning threshold (35 KB).
+pub const AGENTS_MD_WARNING_SIZE: i64 = 35_000;
+/// Hard upper bound that fails the audit (40 KB).
+pub const AGENTS_MD_HARD_LIMIT_SIZE: i64 = 40_000;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AgentsMdSizeFinding {
+    pub file: String,
+    pub size: i64,
+    pub severity: String,
+    pub message: String,
+}
+
+pub fn check_agents_md_size(path: &str) -> std::result::Result<AgentsMdSizeFinding, Error> {
+    let meta = fs::metadata(path).context("stat AGENTS.md")?;
+    let size = meta.len() as i64;
+    let (severity, message) = classify(size);
+    Ok(AgentsMdSizeFinding {
+        file: path.to_string(),
+        size,
+        severity: severity.to_string(),
+        message,
+    })
+}
+
+fn classify(size: i64) -> (&'static str, String) {
+    if size <= AGENTS_MD_TARGET_SIZE {
+        (
+            "ok",
+            format!("AGENTS.md is {size} bytes (within {AGENTS_MD_TARGET_SIZE}-byte target)"),
+        )
+    } else if size <= AGENTS_MD_WARNING_SIZE {
+        (
+            "warn",
+            format!("AGENTS.md is {size} bytes (over {AGENTS_MD_TARGET_SIZE}-byte target)"),
+        )
+    } else if size <= AGENTS_MD_HARD_LIMIT_SIZE {
+        (
+            "warn",
+            format!(
+                "AGENTS.md is {size} bytes (over {AGENTS_MD_WARNING_SIZE}-byte warning threshold)"
+            ),
+        )
+    } else {
+        (
+            "fail",
+            format!("AGENTS.md is {size} bytes (over {AGENTS_MD_HARD_LIMIT_SIZE}-byte hard limit)"),
+        )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    fn write_size(dir: &std::path::Path, bytes: usize) -> std::path::PathBuf {
+        let p = dir.join("AGENTS.md");
+        fs::write(&p, "x".repeat(bytes)).unwrap();
+        p
+    }
+
+    #[test]
+    fn ok_under_target() {
+        let tmp = TempDir::new().unwrap();
+        let p = write_size(tmp.path(), 25_000);
+        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        assert_eq!(f.severity, "ok");
+        assert!(f.message.contains("within 30000-byte target"));
+    }
+
+    #[test]
+    fn warn_over_target_under_warning() {
+        let tmp = TempDir::new().unwrap();
+        let p = write_size(tmp.path(), 32_000);
+        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        assert_eq!(f.severity, "warn");
+        assert!(f.message.contains("over 30000-byte target"));
+    }
+
+    #[test]
+    fn warn_over_warning_under_hard_limit() {
+        let tmp = TempDir::new().unwrap();
+        let p = write_size(tmp.path(), 38_000);
+        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        assert_eq!(f.severity, "warn");
+        assert!(f.message.contains("over 35000-byte warning threshold"));
+    }
+
+    #[test]
+    fn fail_over_hard_limit() {
+        let tmp = TempDir::new().unwrap();
+        let p = write_size(tmp.path(), 45_000);
+        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        assert_eq!(f.severity, "fail");
+        assert!(f.message.contains("over 40000-byte hard limit"));
+    }
+
+    #[test]
+    fn missing_file_errors() {
+        let err = check_agents_md_size("/nonexistent").unwrap_err();
+        assert!(err.to_string().contains("stat AGENTS.md"));
+    }
+}
