@@ -176,4 +176,36 @@ mod tests {
         assert_eq!(v["status"], "passed");
         assert_eq!(v["schema"], SCHEMA);
     }
+
+    fn sample() -> EmojiFinding {
+        EmojiFinding {
+            file: "x.json".to_string(),
+            line: 1,
+            column: 2,
+            codepoint: "U+2713".to_string(),
+            severity: "high".to_string(),
+        }
+    }
+
+    #[test]
+    fn format_json_status_failed_on_findings() {
+        let s = format_json(&[sample()]).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&s).unwrap();
+        assert_eq!(v["status"], "failed");
+        assert_eq!(v["result"][0]["codepoint"], "U+2713");
+    }
+
+    #[test]
+    fn format_markdown_passed_when_empty() {
+        let s = format_markdown(&[]);
+        assert!(s.contains("**PASSED**"));
+    }
+
+    #[test]
+    fn format_markdown_table_with_findings() {
+        let s = format_markdown(&[sample()]);
+        assert!(s.contains("**FAILED**: 1"));
+        assert!(s.contains("| File | Line | Column | Codepoint | Severity |"));
+        assert!(s.contains("| x.json | 1 | 2 | U+2713 | high |"));
+    }
 }

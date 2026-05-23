@@ -183,4 +183,36 @@ mod tests {
         assert_eq!(v["status"], "passed");
         assert_eq!(v["schema"], SCHEMA);
     }
+
+    fn sample() -> FrontmatterFinding {
+        FrontmatterFinding {
+            file: "x.md".to_string(),
+            line: 3,
+            severity: "high".to_string(),
+            message: "msg".to_string(),
+        }
+    }
+
+    #[test]
+    fn format_json_status_failed_on_findings() {
+        let s = format_json(&[sample()]).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&s).unwrap();
+        assert_eq!(v["status"], "failed");
+        assert_eq!(v["result"][0]["file"], "x.md");
+        assert_eq!(v["result"][0]["line"], 3);
+    }
+
+    #[test]
+    fn format_markdown_passed_when_empty() {
+        let s = format_markdown(&[]);
+        assert!(s.contains("**PASSED**"));
+    }
+
+    #[test]
+    fn format_markdown_table_with_findings() {
+        let s = format_markdown(&[sample()]);
+        assert!(s.contains("**FAILED**: 1"));
+        assert!(s.contains("| File | Line | Severity | Message |"));
+        assert!(s.contains("| x.md | 3 | high | msg |"));
+    }
 }
