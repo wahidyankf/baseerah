@@ -26,12 +26,13 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 
 ## App Specs
 
-- **[organiclever/](./apps/organiclever/README.md)** — OrganicLever specifications (backend REST API +
-  frontend landing page)
-
-- **[rhino/](./apps/rhino/README.md)** — Repository management CLI specifications (Go, godog)
-- **[ayokoding/](./apps/ayokoding/README.md)** — Content automation CLI specifications (Go, godog)
-- **[ose-platform/](./apps/ose-platform/README.md)** — OSE Platform site CLI specifications (Go, godog)
+- **[ayokoding](./apps/ayokoding/README.md)** — AyoKoding educational website specifications (Next.js 16, multilingual programming, AI, and security tutorials)
+- **[crane](./apps/crane/README.md)** — crane-cli specifications (Content Retrieval And Normalization Engine CLI, Python/pytest-bdd)
+- **[organiclever](./apps/organiclever/README.md)** — OrganicLever fullstack specifications (F#/Giraffe backend REST API + Next.js 16 frontend)
+- **[ose-app](./apps/ose-app/README.md)** — OSE Application specifications (GRC platform, F#/Giraffe backend + Next.js 16 frontend)
+- **[ose-platform](./apps/ose-platform/README.md)** — OSE Platform web specifications (Next.js 16 + tRPC marketing and updates site)
+- **[rhino](./apps/rhino/README.md)** — rhino-cli specifications (Repository Hygiene and INtegration Orchestrator CLI, Rust)
+- **[wahidyankf](./apps/wahidyankf/README.md)** — wahidyankf-web specifications (personal portfolio site, Next.js 16, static)
 
 ## Experimental App Specs
 
@@ -40,36 +41,46 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 
 ## Library Specs
 
-- **[golang-commons/](./libs/golang-commons/)** — Shared Go utility specifications (godog)
-- **[hugo-commons/](./libs/hugo-commons/)** — Hugo site utility specifications (godog)
+- **[golang-commons](./libs/golang-commons/)** — Shared Go utility specifications
+- **[hugo-commons](./libs/hugo-commons/)** — Hugo site utility specifications _Hugo agent is deprecated; lib retention under separate review — see CLAUDE.md._
+- **[web-ui](./libs/web-ui/)** — Shared web UI component specifications
 
 ## Standard Folder Pattern
 
-Each application domain follows this layout under `specs/apps/{domain}/`:
+Each application domain follows this canonical five-folder layout under `specs/apps/{domain}/`:
 
 ```
 specs/apps/{domain}/
 ├── README.md               # Describes app, BDD framework, and feature organization
-├── contracts/              # OpenAPI 3.1 contract spec (bundled + source files)
-├── be/gherkin/             # Backend acceptance specs (.feature files)
-├── fe/gherkin/             # Frontend acceptance specs (.feature files)
-├── fs/gherkin/             # Fullstack acceptance specs (.feature files, if applicable)
-└── c4/                     # C4 architecture diagrams (if applicable)
+├── product/                # Product framing above C4 (vision, personas, scope)
+├── system-context/         # C4 L1 — actors and external systems
+├── containers/             # C4 L2 — deployable units
+│   └── contracts/          # OpenAPI 3.1 contract spec (bundled + source files)
+├── components/             # C4 L3 — per-container or per-perspective internals
+└── behavior/               # Gherkin acceptance scenarios
+    └── <surface>/
+        └── gherkin/
+            └── <domain>/   # Domain subdirectory (required — no flat feature files)
+                └── <feature>.feature
 ```
 
-Where `{role}` in `{domain}/{role}/gherkin/` is one of:
+The `<surface>` segment identifies the execution context for the scenarios. Valid values are:
 
-- `be` — backend service (REST API, GraphQL, etc.)
-- `fe` — frontend application (Next.js, Flutter, etc.)
-- `fs` — fullstack application (combined frontend + backend in one app)
-- `cli` — CLI tool (Go, etc.)
+- `be` — HTTP-semantic backend surface (REST API, GraphQL, etc.)
+- `web` — UI-semantic browser surface (Next.js, Flutter web, etc.)
+- `cli` — command-line tool surface (Go, Rust, etc.)
+- `api` — tRPC or other in-process API perspective (used when no separate backend container exists)
+- `build-tools` — build-time tooling or index-generation scripts
 
-**Contracts** live at `specs/apps/{domain}/contracts/` and are the source of truth for API
-contracts shared between frontend and backend. The `{domain}-contracts` Nx project lints and
-bundles the spec; downstream apps consume it via their `codegen` target.
+Domain subdirectories are required under `behavior/<surface>/gherkin/`. Feature files must
+not sit directly under the `gherkin/` directory.
 
-**C4 diagrams** live at `specs/apps/{domain}/c4/` and describe the system architecture at the
-context, container, and component levels.
+**Contracts** live at `specs/apps/{domain}/containers/contracts/` and are the source of truth
+for API contracts shared between frontend and backend. The `{domain}-contracts` Nx project
+lints and bundles the spec; downstream apps consume it via their `codegen` target.
+
+**C4 diagrams** live in `system-context/`, `containers/`, and `components/` and describe the
+system architecture at the context (L1), container (L2), and component (L3) levels.
 
 ## Standards
 
