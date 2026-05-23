@@ -174,7 +174,8 @@ appropriate for the `surface-profile` are created — empty folders are never pr
     └── cli/
         └── gherkin/
             ├── README.md
-            └── {command}.feature   # flat — no domain subdirectories
+            └── {domain}/           # domain subdir required (same rule as be/web)
+                └── {command}.feature
 ```
 
 **Multi-CLI profile** (`surface-profile: multi-cli`): same as CLI-only, with additional
@@ -198,8 +199,8 @@ Create new `.feature` files following conventions:
 - `Background:` with standard context step (surface-appropriate)
 - `Scenario:` blocks with Given/When/Then steps
 - UI-semantic steps for web specs, HTTP-semantic for BE specs, shell-semantic for CLI specs
-- BE/web: placed in domain subdirectory under `behavior/<surface>/gherkin/<domain>/`
-- CLI: placed flat under `behavior/cli/gherkin/` (no domain subdirectory)
+- BE/web/CLI: placed in domain subdirectory under `behavior/<surface>/gherkin/<domain>/`
+  (build-time CLI features also belong under `behavior/cli/gherkin/<domain>/`)
 
 ### 4. Create C4 Diagrams
 
@@ -253,8 +254,8 @@ Standard 5 for the complete PM-readability contract.
 
 ### Feature File Placement
 
-- BE/web: MUST be placed in domain subdirectories under `behavior/<surface>/gherkin/<domain>/`
-- CLI: MUST be placed flat under `behavior/cli/gherkin/` (no domain subdirectories)
+- BE/web/CLI: MUST be placed in domain subdirectories under `behavior/<surface>/gherkin/<domain>/`
+  (all surfaces use the same domain-subdir rule; build-time CLI features share the `cli` surface)
 - Libs: MUST be placed in package subdirectories under `gherkin/<package>/`
 
 See [Specs Directory Structure Convention](../../repo-governance/conventions/structure/specs-directory-structure.md)
