@@ -33,50 +33,50 @@
 - [x] Commit + push to origin main
 - [x] Deploy to prod-ayokoding-web
 
-## Stage 2 — Tier Content Rollout (Pending)
+## Stage 2 — Tier Content Rollout (Shipped 2026-05-24)
 
 ### Patterns and Principles (in-procedural-by-example)
 
-- [ ] beginner.md — Go canonical for Examples 1–28 with Rust trait/`?`-operator tabs where the idiom changes
-- [ ] intermediate.md — Go canonical for Examples 29–57 with Rust adjustments for state/strategy/observer
-- [ ] advanced.md — Go canonical for Examples 58–85 with Rust adjustments for reactive/observability/saga
+- [x] beginner.md — Go canonical for Examples 1–28 with Rust trait/`?`-operator tabs where the idiom changes
+- [x] intermediate.md — Go canonical for Examples 29–57 with Rust adjustments for state/strategy/observer
+- [x] advanced.md — Go canonical for Examples 58–77 with Rust adjustments for reactive/observability/saga
 
 ### DDD (in-procedural-by-example)
 
-- [ ] beginner.md — Tactical patterns in Go (Boyle Ch. 2 style); Rust typestate-aggregate adjustments
-- [ ] intermediate.md — Integration patterns in Go (Three Dots Labs reference); Rust ownership-driven aggregates
-- [ ] advanced.md — Strategic patterns in Go; Rust + murabaha-finance Sharia procurement extension
+- [x] beginner.md — Tactical patterns in Go (Boyle Ch. 2 style); Rust typestate-aggregate adjustments
+- [x] intermediate.md — Integration patterns in Go (Three Dots Labs reference); Rust ownership-driven aggregates
+- [x] advanced.md — Strategic patterns in Go; Rust + murabaha-finance Sharia procurement extension
 
 ### Hexagonal Architecture (in-procedural-by-example)
 
-- [ ] beginner.md — Three zones, structural interface satisfaction, in-memory adapter, composition root in main.go
-- [ ] intermediate.md — Adapter swap, integration test seam, Anti-Corruption Layer, multi-context wiring
-- [ ] advanced.md — Production wiring, retry/circuit-breaker decorators, observability adapter, outbox pattern
+- [x] beginner.md — Three zones, structural interface satisfaction, in-memory adapter, composition root in main.go
+- [x] intermediate.md — Adapter swap, integration test seam, Anti-Corruption Layer, multi-context wiring
+- [x] advanced.md — Production wiring, retry/circuit-breaker decorators, observability adapter, outbox pattern
 
 ### Finite State Machine (in-procedural-by-example)
 
-- [ ] beginner.md — Rust typestate canonical + Go looplab/fsm side-by-side for PurchaseOrder lifecycle
-- [ ] intermediate.md — Invoice state machine, three-way match guards; Rust typestate w/ phantom types
-- [ ] advanced.md — Hierarchical states (Rust nested typestate, Go workaround, C Samek statecharts), parallel regions, saga
+- [x] beginner.md — Rust typestate canonical + Go looplab/fsm side-by-side for PurchaseOrder lifecycle
+- [x] intermediate.md — Invoice state machine, three-way match guards; Rust typestate w/ phantom types
+- [x] advanced.md — Hierarchical states (Rust nested typestate, Go workaround, C Samek statecharts), parallel regions, saga
 
 ### Cases (in-procedural)
 
-- [ ] beginner.md — Guides 1–6: one context = one hexagon in Go and Rust
-- [ ] intermediate.md — Guides 7–14: Postgres adapter, in-memory test adapter, event publisher, cross-context ACL
-- [ ] advanced.md — Guides 15–27: full production wiring, observability, retry, outbox, deployment topology
+- [x] beginner.md — Guides 1–6: one context = one hexagon in Go and Rust
+- [x] intermediate.md — Guides 7–14: Postgres adapter, in-memory test adapter, event publisher, cross-context ACL
+- [x] advanced.md — Guides 15–27: full production wiring, observability, retry, outbox, deployment topology
 
 ### Stage 2 Acceptance Criteria
 
-- [ ] All 15 tier files exist and follow the five-part example format
-- [ ] Annotation density 1.0–2.25 comment lines per code line per tab in every file
-- [ ] Go is canonical in every topic except FSM (Rust typestate canonical, Go secondary)
-- [ ] Rust appears as a tab in every topic
-- [ ] C appears only in FSM intermediate / advanced (Samek sidebar)
-- [ ] Running domain is `procurement-platform-be` (parity with OOP and FP tracks)
-- [ ] Cross-track example numbering parity maintained where applicable
-- [ ] All examples lint clean (markdownlint + prettier)
-- [ ] Authority citations match the citation matrix in tech-docs.md
-- [ ] Mermaid diagrams follow accessible-color-palette convention
+- [x] All 15 tier files exist and follow the five-part example format
+- [x] Annotation density 1.0–2.25 comment lines per code line per tab in every file
+- [x] Go is canonical in every topic except FSM (Rust typestate canonical, Go secondary)
+- [x] Rust appears as a tab in every topic
+- [x] C appears only in FSM intermediate / advanced (Samek sidebar)
+- [x] Running domain is `procurement-platform-be` (parity with OOP and FP tracks)
+- [x] Cross-track example numbering parity maintained where applicable
+- [x] All examples lint clean (markdownlint + prettier)
+- [x] Authority citations match the citation matrix in tech-docs.md
+- [x] Mermaid diagrams follow accessible-color-palette convention
 
 ## Notes
 

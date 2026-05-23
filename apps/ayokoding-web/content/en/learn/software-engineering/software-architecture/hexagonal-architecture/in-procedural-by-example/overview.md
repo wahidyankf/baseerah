@@ -86,3 +86,28 @@ Full beginner / intermediate / advanced example content authoring tracks under [
 3. **Heavily Annotated Code** — parallel tabs: Go (canonical), Rust where the idiom changes. `// =>` annotations at 1.0–2.25 comment lines per code line.
 4. **Key Takeaway** — the structural boundary principle (1-2 sentences).
 5. **Why It Matters** — real-world production impact (50-100 words).
+
+## Examples by Level
+
+### Beginner (Examples 1–20)
+
+- [Example 1: The hexagon metaphor — three zones as Go packages](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-1-the-hexagon-metaphor--three-zones-as-go-packages)
+- [Example 2: Domain entity — pure Go struct, no framework tags](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-2-domain-entity--pure-go-struct-no-framework-tags)
+- [Example 3: Value objects — PurchaseOrderID and Money in Go](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-3-value-objects--purchaseorderid-and-money-in-go)
+- [Example 4: The dependency rule — what can import what in Go](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-4-the-dependency-rule--what-can-import-what-in-go)
+- [Example 5: Output port — PurchaseOrderRepository interface in Go](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-5-output-port--purchaseorderrepository-interface-in-go)
+- [Example 6: Clock output port — making time testable in Go](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-6-clock-output-port--making-time-testable-in-go)
+- [Example 7: Input port — IssuePurchaseOrderUseCase interface](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-7-input-port--issuepurchaseorderusecase-interface)
+- [Example 8: Go structural typing — no `implements` declaration](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-8-go-structural-typing--no-implements-declaration)
+- [Example 9: POStatus — Go string-type enum](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-9-postatus--go-string-type-enum)
+- [Example 10: Pure domain entity — PurchaseOrder with Submit transition](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-10-pure-domain-entity--purchaseorder-with-submit-transition)
+- [Example 11: SupplierId value object and SupplierID as a distinct type](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-11-supplierid-value-object-and-supplierid-as-a-distinct-type)
+- [Example 12: Dependency direction test — enforcing the rule with go test](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-12-dependency-direction-test--enforcing-the-rule-with-go-test)
+- [Example 13: In-memory PurchaseOrderRepository — the test-seam pattern](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-13-in-memory-purchaseorderrepository--the-test-seam-pattern)
+- [Example 14: Fixed clock adapter — deterministic time in tests](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-14-fixed-clock-adapter--deterministic-time-in-tests)
+- [Example 15: Wiring a complete unit test with in-memory adapters](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-15-wiring-a-complete-unit-test-with-in-memory-adapters)
+- [Example 16: Why no mocking framework is needed](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-16-why-no-mocking-framework-is-needed)
+- [Example 17: Composition root — main.go as the wiring point](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-17-composition-root--maingo-as-the-wiring-point)
+- [Example 18: Environment-based adapter selection](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-18-environment-based-adapter-selection)
+- [Example 19: HTTP input adapter with chi routing](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-19-http-input-adapter-with-chi-routing)
+- [Example 20: Complete request/response flow — tracing a POST through all zones](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner#example-20-complete-requestresponse-flow--tracing-a-post-through-all-zones)
