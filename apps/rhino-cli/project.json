@@ -109,7 +109,7 @@
       "outputs": []
     },
     "validate:docs-validate-heading-hierarchy": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go docs validate-heading-hierarchy",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- docs validate-heading-hierarchy",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/docs/**/*.md", "{workspaceRoot}/repo-governance/**/*.md"],
       "outputs": []

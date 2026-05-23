@@ -20,7 +20,7 @@ fn kebab_case_re() -> &'static Regex {
     RE.get_or_init(|| Regex::new(r"^[a-z0-9-]+\.md$").unwrap())
 }
 
-const SKIP_DIRS: &[&str] = &["node_modules", ".git", ".next", "dist", "build", "target"];
+pub const SKIP_DIRS: &[&str] = &["node_modules", ".git", ".next", "dist", "build", "target"];
 
 pub fn validate_docs_naming(
     paths: &[String],

@@ -1,10 +1,11 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    docs_validate_frontmatter, docs_validate_naming, governance_agents_md_size,
-    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
-    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
-    governance_vendor_audit, spec_coverage_validate, test_coverage_validate,
+    docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
+    docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
+    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
+    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
+    spec_coverage_validate, test_coverage_validate,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -79,6 +80,12 @@ pub enum DocsCommands {
     /// Validate documentation YAML frontmatter against area-specific schemas.
     #[command(name = "validate-frontmatter")]
     ValidateFrontmatter(docs_validate_frontmatter::ValidateFrontmatterArgs),
+    /// Validate markdown heading hierarchy (one H1, no skipped levels).
+    #[command(name = "validate-heading-hierarchy")]
+    ValidateHeadingHierarchy(docs_validate_heading_hierarchy::ValidateHeadingHierarchyArgs),
+    /// Validate markdown links (relative paths exist on disk).
+    #[command(name = "validate-links")]
+    ValidateLinks(docs_validate_links::ValidateLinksArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -197,6 +204,10 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             DocsCommands::ValidateFrontmatter(args) => {
                 docs_validate_frontmatter::run(args, output_format)
             }
+            DocsCommands::ValidateHeadingHierarchy(args) => {
+                docs_validate_heading_hierarchy::run(args, output_format)
+            }
+            DocsCommands::ValidateLinks(args) => docs_validate_links::run(args, output_format),
         },
     };
     match result {
