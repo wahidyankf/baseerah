@@ -1,11 +1,12 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
-    docs_validate_mermaid, docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
-    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
-    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
-    spec_coverage_validate, test_coverage_validate,
+    agents_validate_naming, docs_validate_frontmatter, docs_validate_heading_hierarchy,
+    docs_validate_links, docs_validate_mermaid, docs_validate_naming, governance_agents_md_size,
+    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
+    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
+    governance_vendor_audit, spec_coverage_validate, test_coverage_validate,
+    workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -70,6 +71,26 @@ pub enum Commands {
     /// Documentation validators.
     #[command(name = "docs", subcommand)]
     Docs(DocsCommands),
+    /// Agent definition validators.
+    #[command(name = "agents", subcommand)]
+    Agents(AgentsCommands),
+    /// Workflow file validators.
+    #[command(name = "workflows", subcommand)]
+    Workflows(WorkflowsCommands),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum AgentsCommands {
+    /// Validate agent filename suffixes and mirror parity.
+    #[command(name = "validate-naming")]
+    ValidateNaming(agents_validate_naming::ValidateNamingArgs),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum WorkflowsCommands {
+    /// Validate workflow filename suffixes and frontmatter name consistency.
+    #[command(name = "validate-naming")]
+    ValidateNaming(workflows_validate_naming::ValidateNamingArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -212,6 +233,16 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             DocsCommands::ValidateLinks(args) => docs_validate_links::run(args, output_format),
             DocsCommands::ValidateMermaid(args) => docs_validate_mermaid::run(args, output_format),
+        },
+        Commands::Agents(ac) => match ac {
+            AgentsCommands::ValidateNaming(args) => {
+                agents_validate_naming::run(args, output_format)
+            }
+        },
+        Commands::Workflows(wc) => match wc {
+            WorkflowsCommands::ValidateNaming(args) => {
+                workflows_validate_naming::run(args, output_format)
+            }
         },
     };
     match result {

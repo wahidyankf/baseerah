@@ -179,7 +179,7 @@
       "outputs": []
     },
     "validate:naming-agents": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go agents validate-naming",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- agents validate-naming",
       "cache": true,
       "inputs": [
         "{projectRoot}/**/*.go",
@@ -189,7 +189,7 @@
       "outputs": []
     },
     "validate:naming-workflows": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go workflows validate-naming",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- workflows validate-naming",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/repo-governance/workflows/**/*.md"],
       "outputs": []
