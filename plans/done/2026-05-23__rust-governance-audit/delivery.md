@@ -310,7 +310,7 @@ For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree a
   - Date: 2026-05-23 | Status: done | Notes: See commit below.
 - [x] **10.4** Push to `origin main`.
   - Date: 2026-05-23 | Status: done | Notes: Pushed; pre-push Husky gate passed.
-- [ ] **10.5** Verify CI per [ci-post-push-verification](../../../repo-governance/development/workflow/ci-post-push-verification.md):
+- [x] **10.5** Verify CI per [ci-post-push-verification](../../../repo-governance/development/workflow/ci-post-push-verification.md):
       run `gh run list --branch main --commit <SHA>` after each push. As of 2026-05-23 no
       GitHub Actions workflow targets `apps/rhino-cli/**` (verified by inspecting
       `.github/workflows/` — only `crane-cli-integration.yml` matches an `apps/<cli>/**` path
@@ -318,6 +318,9 @@ For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree a
       is the Husky pre-push hook (`typecheck`, `lint`, `test:quick`, `spec-coverage` per
       `repo-governance/development/quality/code.md`). Acceptance criterion: the post-push
       `gh run list` command shows no regression on existing workflows.
+  - Date: 2026-05-23 | Status: done | Notes: Push SHA `324defb8d`. `gh run list` shows one
+    FAIL (`Test and Deploy - OrganicLever Web Development` run 26328397866) but its headSha is
+    `25e8aa6e` (schedule-triggered, pre-existing, unrelated to this audit). No regression.
 - [x] **10.5b** Update `plans/in-progress/README.md` (if it exists) and `plans/done/README.md`
       (if it exists) to reflect the move from `in-progress/` to `done/`. Run:
 
