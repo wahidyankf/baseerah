@@ -6,6 +6,7 @@ pub mod allowlist;
 pub mod bcregistry;
 pub mod cliout;
 pub mod docs;
+pub mod doctor;
 pub mod envbackup;
 pub mod git;
 pub mod gitutil;

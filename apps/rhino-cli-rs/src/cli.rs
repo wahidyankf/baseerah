@@ -4,7 +4,7 @@ use crate::commands::{
     agents_detect_duplication, agents_sync, agents_validate_claude, agents_validate_naming,
     agents_validate_sync, ddd_bc, ddd_ul, docs_validate_frontmatter,
     docs_validate_heading_hierarchy, docs_validate_links, docs_validate_mermaid,
-    docs_validate_naming, env_backup, env_init, env_restore, git_pre_commit,
+    docs_validate_naming, doctor, env_backup, env_init, env_restore, git_pre_commit,
     governance_agents_md_size, governance_audit, governance_emoji_audit,
     governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
     governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
@@ -92,6 +92,9 @@ pub enum Commands {
     /// Environment file helpers (init, backup, restore).
     #[command(name = "env", subcommand)]
     Env(EnvCommands),
+    /// Check required tool versions are installed and correct.
+    #[command(name = "doctor")]
+    Doctor(doctor::DoctorArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -349,6 +352,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             EnvCommands::Backup(args) => env_backup::run(args, output_format),
             EnvCommands::Restore(args) => env_restore::run(args, output_format),
         },
+        Commands::Doctor(args) => doctor::run(args, output_format),
     };
     match result {
         Ok(()) => 0,

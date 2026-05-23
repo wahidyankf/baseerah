@@ -38,7 +38,7 @@
     "validate:claude": "nx run rhino-cli:build --skip-nx-cache && ./apps/rhino-cli/dist/rhino-cli agents validate-claude",
     "validate:opencode": "npm run validate:sync",
     "validate:config": "npm run validate:claude && npm run sync:claude-to-opencode && npm run validate:opencode",
-    "doctor": "nx run rhino-cli:build && ./apps/rhino-cli/dist/rhino-cli doctor"
+    "doctor": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- doctor"
   },
   "keywords": [],
   "author": "",
