@@ -6,6 +6,63 @@ created: 2026-05-23
 
 # Product Requirements
 
+## Product Overview
+
+The deliverable is a set of edits — no new product surface. Specifically, the audit produces:
+
+- A reconciled MSRV statement across `apps/rhino-cli/Cargo.toml`, `apps/rhino-cli/rust-toolchain.toml`, and every doc under `docs/explanation/software-engineering/programming-languages/rust/` that names a Rust version.
+- A rewritten `specs/apps/rhino/README.md` that documents the Rust testing pipeline (not the Go-era one).
+- A "Dependency Status" section in `apps/rhino-cli/README.md` recording bump-or-waiver decisions for every Cargo dependency the kickoff web-research flagged as behind upstream.
+- A discoverable cross-reference from `repo-governance/development/quality/code.md` to the `#![forbid(unsafe_code)]` MUST clause in `docs/.../rust/code-quality-standards.md`.
+- A structural compliance pass over `apps/rhino-cli/src/` against the eleven applicable platform Rust standards documents.
+- A reproducible audit checklist (`delivery.md`) that future Rust crates can re-run.
+
+There is no new code feature; the artefacts are documentation, configuration, and validated dependency pins.
+
+## Personas
+
+| Persona                             | Goals                                                                                                                                       | Pain today                                                                                                                         |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Governance maintainer**           | Keep Rust artefacts internally consistent; defensible audit trail; minimum surface for future drift.                                        | Four conflicting MSRV statements; stale spec README; undocumented dependency-bump decisions.                                       |
+| **Rust contributor on `rhino-cli`** | Add a feature or fix a bug without spending time figuring out the toolchain version, lint expectations, or whether a stale dep blocks them. | Reading three docs to find the MSRV; spec README still shows Go commands; no clear answer on whether `sha2 0.11.0` is OK to adopt. |
+| **Plan-executor agent (future)**    | Tick off the audit checklist mechanically against the next Rust crate added to the repo.                                                    | No reproducible audit checklist exists today.                                                                                      |
+
+## User Stories
+
+- As a **governance maintainer**, I want a single declared MSRV referenced by every Rust-related doc so that contributors stop having to choose between conflicting numbers.
+- As a **Rust contributor on `rhino-cli`**, I want `specs/apps/rhino/README.md` to describe the Rust test pipeline so that I don't waste time chasing Go tooling that no longer exists in this crate.
+- As a **governance maintainer**, I want every behind-upstream Cargo dependency to carry either a bump diff or a written waiver so that future security upgrades have a clear decision trail.
+- As a **Rust contributor**, I want a one-line invariant ("this crate forbids unsafe Rust") in the crate README so that I don't need to read the platform standards doc to know the rule.
+- As a **plan-executor agent**, I want every `- [ ]` checkbox to name a file, a verbatim command, and a concrete acceptance criterion so that I can re-run the audit without out-of-band context.
+- As a **future Rust crate author**, I want a structural-compliance checklist promoted into governance (out of this plan's scope, deferred to delivery item 10.7) so that my new crate inherits the same quality bar.
+
+## Product Scope
+
+**In scope** (matches `README.md ## Scope at a glance` — repeated here as the PRD authoritative copy):
+
+- Edits to `docs/explanation/software-engineering/programming-languages/rust/` (14 docs + templates)
+- Edits to `apps/rhino-cli/` (`Cargo.toml`, `rust-toolchain.toml`, `project.json`, `src/`, `tests/`, `scripts/`, `README.md`)
+- Edits to `specs/apps/rhino/` (`README.md`, `behavior/cli/gherkin/*.feature`)
+- Edits to the nine `repo-governance/development/` files that name Rust (enumerated in `tech-docs.md §1.4`)
+- Edits to `.claude/agents/swe-rust-dev.md` and `.opencode/agents/swe-rust-dev.md` (mirror) and `.claude/skills/swe-programming-rust/SKILL.md`
+
+**Out of scope**:
+
+- Editing `apps/ayokoding-web/content/.../rust/` tutorials (separate `ayokoding-web` content plan).
+- Adding new Rust crates.
+- Migrating any unrelated language's governance.
+
+## Product Risks
+
+| Risk                                                                                | Likelihood | Impact                               | Mitigation                                                                                                                                                                                                                                                         |
+| ----------------------------------------------------------------------------------- | ---------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `sha2 0.11.0` major upgrade breaks `rhino-cli` compile                              | Medium     | High (blocks Phase 4 close-out)      | Bump in isolation with full `nx run rhino-cli:test:quick` + `cargo clippy -- -D warnings` verification; if migration cost > value, document a Path C waiver per [Dependency Bump Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md). |
+| `tempfile 3.27.0` rename (`into_path` → `keep`) breaks dev tests                    | Medium     | Medium (blocks `cargo test --tests`) | Targeted grep + rename within `tests/`; verify with `cargo test --tests` before commit.                                                                                                                                                                            |
+| Spec README rewrite reveals untested behaviour                                      | Low        | Low                                  | Audit existing `.feature` files against the `rhino-cli` command surface during Phase 1 before rewriting README in Phase 3.                                                                                                                                         |
+| Governance docs become inconsistent with future crates                              | Low        | Medium (drift recurs)                | Add a `repo-rules-checker`-style audit step to the delivery list (Phase 10.7) so the next Rust crate triggers the same checks.                                                                                                                                     |
+| Pair-wise contradiction sweep finds new contradictions not in the kickoff catalogue | Medium     | Low (handled by Phase 7 loop)        | Phase 7.3 loops fixes until empty; no time pressure on the loop because the plan is direct-to-main with no release dependency.                                                                                                                                     |
+| Web-research-cited dependency versions move upstream during the audit               | Medium     | Low                                  | Phase 9 re-invokes `web-research-maker` and re-opens Phase 4 for any newly-stale crate.                                                                                                                                                                            |
+
 ## Functional Requirements
 
 ### FR-1. Single source of truth for Rust toolchain version

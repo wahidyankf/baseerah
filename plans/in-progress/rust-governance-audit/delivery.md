@@ -8,8 +8,26 @@ created: 2026-05-23
 
 Granular, item-per-commit-friendly checklist. Items use `- [ ]` so a future executor (or `plan-executor` agent) can tick them off. Phases run sequentially unless marked PARALLEL.
 
+## Worktree
+
+Worktree path: `worktrees/rust-governance-audit/`
+
+Provision before execution (run from repo root):
+
+```bash
+claude --worktree rust-governance-audit
+```
+
+See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
+
 ## Phase 0 — Kickoff & artifact freeze
 
+- [ ] **0.0** Provision worktree: run `claude --worktree rust-governance-audit` from inside
+      `ose-public/` (creates `worktrees/rust-governance-audit/` in repo root per
+      [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)).
+- [ ] **0.0b** Initialize toolchain inside the new worktree: `npm install && npm run doctor -- --fix`.
+      Verify `rustc --version` matches the `channel` in `apps/rhino-cli/rust-toolchain.toml`.
+      See [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md).
 - [ ] **0.1** Capture the kickoff web-research output to `generated-reports/rust-governance-audit__kickoff-research__2026-05-23.md` (UUID chain header per `repo-generating-validation-reports` skill).
 - [ ] **0.2** Verify `git status` clean on `main` before starting.
 - [ ] **0.3** Run baseline locally and record numbers:
@@ -22,7 +40,20 @@ Granular, item-per-commit-friendly checklist. Items use `- [ ]` so a future exec
 
 ## Phase 1 — Inventory & static contradiction sweep
 
-- [ ] **1.1** Build an artefact list by `find` over the five categories listed in `tech-docs.md §1`; save to `local-temp/rust-audit-artefacts.txt`.
+- [ ] **1.1** Build an artefact list by running the following commands from the repo root,
+      appending each output to `local-temp/rust-audit-artefacts.txt`:
+
+  ```bash
+  : > local-temp/rust-audit-artefacts.txt
+  find apps/rhino-cli -type f | sort >> local-temp/rust-audit-artefacts.txt
+  find docs/explanation/software-engineering/programming-languages/rust -type f | sort >> local-temp/rust-audit-artefacts.txt
+  find specs/apps/rhino -type f | sort >> local-temp/rust-audit-artefacts.txt
+  find repo-governance/development -type f -name "*.md" | xargs grep -l -i rust | sort >> local-temp/rust-audit-artefacts.txt
+  find .claude/agents .claude/skills/swe-programming-rust .opencode/agents -type f -name "*.md" | grep -i rust | sort >> local-temp/rust-audit-artefacts.txt
+  ```
+
+  Acceptance criterion: `local-temp/rust-audit-artefacts.txt` exists and `wc -l local-temp/rust-audit-artefacts.txt` reports ≥ 25 lines.
+
 - [ ] **1.2** For each of the 13 standards docs plus the `templates/` subdir under `docs/.../rust/`, grep for hardcoded Rust version numbers (`1\.[0-9]+`); record findings.
 - [ ] **1.3** Grep `repo-governance/` for the same Rust version pattern; record findings.
 - [ ] **1.4** Grep `specs/apps/rhino/` for Go-era strings: `godog`, `\.go\b`, `go test`, `go run`, `//go:build`, `cmd/`; record line numbers.
@@ -33,7 +64,27 @@ Granular, item-per-commit-friendly checklist. Items use `- [ ]` so a future exec
 
 - [ ] **2.1** `docs/.../rust/README.md`: replace any hardcoded "Rust 1.82+" / "Rust 1.X" prose with a link of the form `MSRV declared in Cargo.toml` pointing at `apps/rhino-cli/Cargo.toml` (relative path computed at edit time).
 - [ ] **2.2** `docs/.../rust/coding-standards.md` line 176: update `channel = "1.82.0"` example to current pin (`1.95.0` or whatever `rust-toolchain.toml` shows on edit day).
-- [ ] **2.3** Pair-wise resolve every contradiction (C-01 through C-05) in `tech-docs.md §3` and apply the C-06 clarification note. One commit per resolution.
+- [ ] **2.3.1** C-01: Edit `docs/explanation/software-engineering/programming-languages/rust/README.md` —
+      replace hardcoded "Rust 1.82+" prose with a link pointing to `apps/rhino-cli/Cargo.toml`
+      (`rust-version` field). Acceptance criterion: `grep -n '1\.82' docs/.../rust/README.md`
+      returns zero matches.
+- [ ] **2.3.2** C-02: Edit `docs/explanation/software-engineering/programming-languages/rust/coding-standards.md`
+      line 176 — update `channel = "1.82.0"` to current `rust-toolchain.toml` pin (e.g. `"1.95.0"`).
+      Acceptance criterion: `grep -n '1\.82' docs/.../rust/coding-standards.md` returns zero matches.
+- [ ] **2.3.3** C-03: Full rewrite of `specs/apps/rhino/README.md` (covered in Phase 3 items 3.5–3.7).
+      Mark complete when Phase 3 is complete. Acceptance criterion: `grep -n 'godog\|go test\|go run\|\.go\b' specs/apps/rhino/README.md` returns zero matches.
+- [ ] **2.3.4** C-04: Edit `repo-governance/development/quality/code.md` — add a discoverable link
+      to `docs/.../rust/code-quality-standards.md` referencing the `forbid(unsafe_code)` MUST clause
+      at line 246. Acceptance criterion: `grep -n 'forbid\|unsafe' repo-governance/development/quality/code.md`
+      returns at least one match with a link.
+- [ ] **2.3.5** C-05: Add a "Dependency Status" section to `apps/rhino-cli/README.md` documenting
+      every stale dependency decision from Phase 4 (chrono, glob, sha2, tempfile) with date and
+      Dependency Bump Policy path (A/B/C). Acceptance criterion: `grep -n 'Dependency Status'
+apps/rhino-cli/README.md` returns a match.
+- [ ] **2.3.6** C-06: Add a one-line clarification note to `apps/rhino-cli/README.md` (or
+      `rust-toolchain.toml` header comment) explaining that `rust-version` in `Cargo.toml` is the
+      MSRV while `channel` in `rust-toolchain.toml` is the installed toolchain — both are correct.
+      Acceptance criterion: file contains the clarification text and `npm run lint:md` exits 0.
 - [ ] **2.4** Add a discoverable link from `repo-governance/development/quality/code.md` to `docs/.../rust/code-quality-standards.md` §246 (`forbid(unsafe_code)` MUST clause) — resolves C-04.
 - [ ] **2.5** Cross-check `swe-rust-dev.md` and `swe-programming-rust/SKILL.md` for any version claim; align with Cargo.toml link.
 - [ ] **2.6** Run `npm run lint:md` after each edit batch.
@@ -44,9 +95,20 @@ Granular, item-per-commit-friendly checklist. Items use `- [ ]` so a future exec
 - [ ] **3.2** Read `apps/rhino-cli/tests/` directory to confirm the actual Rust test pipeline (unit + integration shape).
 - [ ] **3.3** Read `apps/rhino-cli/project.json` test targets to confirm exact `nx` commands.
 - [ ] **3.4** Read the memory entry `project_rhino_cli_rust_cucumber_gap.md` to capture cucumber harness deferral context.
-- [ ] **3.5** Rewrite "Running the Tests" section using `cargo test` / `nx run rhino-cli:test:quick` / `nx run rhino-cli:test:integration`; remove every `go ...` line.
-- [ ] **3.6** Rewrite "Adding New Specs" section pointing at `tests/cucumber/` patterns (acknowledging deferral) + `assert_cmd`/`predicates` for binary integration tests.
-- [ ] **3.7** Rewrite "Dual Consumption" table with Rust file patterns.
+- [ ] **3.5** Edit `specs/apps/rhino/README.md`: rewrite the "Running the Tests" section using
+      `cargo test`, `nx run rhino-cli:test:quick`, and `nx run rhino-cli:test:integration`;
+      remove every `go …` line. Acceptance criterion: `grep -n 'godog\|go test\|go run\|\.go\b'
+specs/apps/rhino/README.md` returns zero matches AND `npm run lint:md` exits 0.
+- [ ] **3.6** Edit `specs/apps/rhino/README.md`: rewrite the "Adding New Specs" section so
+      command listings point at `apps/rhino-cli/tests/cucumber/` for Gherkin-driven scenarios
+      (acknowledging the cucumber harness is currently deferred per the
+      `project_rhino_cli_rust_cucumber_gap` memory) and at `tests/cli/` with `assert_cmd` +
+      `predicates` for binary integration tests. Acceptance criterion: `grep -nE 'godog|go test|go run|//go:build' specs/apps/rhino/README.md`
+      returns zero matches.
+- [ ] **3.7** Edit `specs/apps/rhino/README.md`: rewrite the "Dual Consumption" table replacing
+      Go file patterns (`.go`, `_test.go`, `cmd/`) with Rust equivalents (`src/`, `tests/cli/`,
+      `tests/cucumber/`). Acceptance criterion: the table contains no `.go` file references AND
+      `npm run lint:md` exits 0.
 - [ ] **3.8** Update "Convention" link if BDD spec-test-mapping doc has Rust-specific guidance; if not, file a follow-up note.
 - [ ] **3.9** Verify with `npm run lint:md` and a manual read.
 
@@ -55,7 +117,10 @@ Granular, item-per-commit-friendly checklist. Items use `- [ ]` so a future exec
 PARALLEL within phase; each crate decision is an independent commit.
 
 - [ ] **4.1** `chrono` 0.4.39 → 0.4.44: bump in `Cargo.toml`, run `cargo update -p chrono`, `nx run rhino-cli:test:quick`, `cargo clippy --all-targets -- -D warnings`. Commit.
-- [ ] **4.2** `glob` 0.3.2 → 0.3.3: same flow as 4.1.
+- [ ] **4.2** `glob` 0.3.2 → 0.3.3: bump the `glob` line in `apps/rhino-cli/Cargo.toml` to
+      `"0.3.3"`, run `cargo update -p glob`, `nx run rhino-cli:test:quick`,
+      `cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings`.
+      Commit. Acceptance criterion: all three commands exit 0.
 - [ ] **4.3** `sha2` 0.10.9 → 0.11.0 (**major**):
   - [ ] **4.3.1** Grep `apps/rhino-cli/src/` for `sha2::` usage; record call sites.
   - [ ] **4.3.2** Check if any call site uses removed APIs (`compress256`, `compress512`, removed feature flags) per the [RustCrypto sha2 0.11.0 CHANGELOG](https://github.com/RustCrypto/hashes/blob/master/sha2/CHANGELOG.md).
@@ -85,9 +150,20 @@ PARALLEL within phase; each crate decision is an independent commit.
 
 For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree and verify.
 
-- [ ] **6.1** Module layout audit (§4.1): list every `pub mod` declaration, verify `cli`/`commands`/`internal` boundary.
-- [ ] **6.2** Public API audit (§4.2): grep every `pub fn`, `pub struct`, `pub enum` in `lib.rs` and immediate descendants; verify intentionality.
-- [ ] **6.3** Error handling audit (§4.3): grep `unwrap()`, `expect(`, `panic!`; classify each occurrence as test-only or production.
+- [ ] **6.1** Module layout audit (§4.1): run
+      `grep -nH 'pub mod' apps/rhino-cli/src/lib.rs apps/rhino-cli/src/**/*.rs`
+      to list every `pub mod` declaration; save output to
+      `local-temp/rust-audit-module-layout.txt`. Verify the `cli`, `commands`, and `internal`
+      module boundaries match the intent in `tech-docs.md §4.1`. Acceptance criterion: file
+      `local-temp/rust-audit-module-layout.txt` exists and no cross-boundary dependency is found.
+- [ ] **6.2** Public API audit (§4.2): grep every `pub fn`, `pub struct`, `pub enum` in
+      `apps/rhino-cli/src/lib.rs` and immediate descendants; verify intentionality.
+- [ ] **6.3** Error handling audit (§4.3): run
+      `grep -nH 'unwrap()\|expect(\|panic!' apps/rhino-cli/src/**/*.rs`
+      and save output to `local-temp/rust-audit-error-handling.txt`; classify each occurrence
+      as test-only or production. Acceptance criterion:
+      `grep -nH 'unwrap()\|expect(\|panic!' apps/rhino-cli/src/**/*.rs | grep -v '#\[cfg(test)\]'`
+      returns zero production-code occurrences.
 - [ ] **6.4** Safety audit (§4.4): re-run unsafe grep (also covered in 5.3) — recorded twice intentionally because Phase 5 is forbid-clause-focused and Phase 6 is breadth-focused.
 - [ ] **6.5** Lints audit (§4.5):
   - [ ] **6.5.1** Decide whether to add `[lints.rust]` and `[lints.clippy]` blocks to `Cargo.toml` (Cargo manifest format supported since edition 2024).
@@ -104,16 +180,32 @@ For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree a
 ## Phase 7 — Cross-doc final contradiction sweep
 
 - [ ] **7.1** Re-run §1.5 pair-wise scan on the **edited** docs (post Phase 2-6 changes).
-- [ ] **7.2** Compile the post-fix contradiction report; should be empty.
+- [ ] **7.2** Compile findings to `generated-reports/rust-governance-audit__post-fix-contradictions__YYYY-MM-DD.md`
+      using the inventory report's UUID chain. Run:
+
+  ```bash
+  ls generated-reports/rust-governance-audit__post-fix-contradictions__*.md
+  ```
+
+  Acceptance criterion: the file exists and contains either "0 findings" or a numbered list of
+  remaining contradictions.
+
 - [ ] **7.3** If non-empty, fix and loop until empty.
 
 ## Phase 8 — Verification gate
 
+- [ ] **8.0** **Fix-all-failures rule**: if any of items 8.1–8.9 below fails, fix the root cause
+      before continuing — including any preexisting failure that is not caused by this audit's
+      changes. Do not mask, skip, or defer. See [Root Cause Orientation](../../../repo-governance/principles/general/root-cause-orientation.md)
+      and [CI Blocker Resolution](../../../repo-governance/development/quality/ci-blocker-resolution.md).
 - [ ] **8.1** `nx run rhino-cli:typecheck` → 0
 - [ ] **8.2** `nx run rhino-cli:lint` → 0
 - [ ] **8.3** `nx run rhino-cli:test:quick` → 0; coverage ≥ 90%
 - [ ] **8.4** `nx run rhino-cli:test:integration` → 0
-- [ ] **8.5** All ten `nx run rhino-cli:validate:*` targets → 0
+- [ ] **8.5** All nine `nx run rhino-cli:validate:*` targets → 0 (`validate:specs-adoption`,
+      `validate:specs-tree`, `validate:specs-counts`, `validate:specs-links`,
+      `validate:naming-agents`, `validate:naming-workflows`, `validate:mermaid`,
+      `validate:repo-governance-vendor-audit`, `validate:cross-vendor-parity`)
 - [ ] **8.6** `cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings -D unsafe_code` → 0
 - [ ] **8.7** `grep -rE '\bunsafe\b' apps/rhino-cli/src/ apps/rhino-cli/tests/` → 0 matches
 - [ ] **8.8** `npm run lint:md` → 0
@@ -131,13 +223,35 @@ For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree a
 - [ ] **10.2** Update `plans/done/` index README if it exists.
 - [ ] **10.3** Commit close-out.
 - [ ] **10.4** Push to `origin main`.
-- [ ] **10.5** Trigger and verify CI per `ci-post-push-verification` (poll every 3 min, no `gh run watch`).
+- [ ] **10.5** Verify CI per [ci-post-push-verification](../../../repo-governance/development/workflow/ci-post-push-verification.md):
+      run `gh run list --branch main --commit <SHA>` after each push. As of 2026-05-23 no
+      GitHub Actions workflow targets `apps/rhino-cli/**` (verified by inspecting
+      `.github/workflows/` — only `crane-cli-integration.yml` matches an `apps/<cli>/**` path
+      and it scopes to `apps/crane-cli/**`), so the authoritative pre-merge gate for this audit
+      is the Husky pre-push hook (`typecheck`, `lint`, `test:quick`, `spec-coverage` per
+      `repo-governance/development/quality/code.md`). Acceptance criterion: the post-push
+      `gh run list` command shows no regression on existing workflows.
+- [ ] **10.5b** Update `plans/in-progress/README.md` (if it exists) and `plans/done/README.md`
+      (if it exists) to reflect the move from `in-progress/` to `done/`. Run:
+
+  ```bash
+  ls plans/in-progress/README.md plans/done/README.md 2>/dev/null
+  ```
+
+  If either exists, edit and add/remove the corresponding row; if neither exists, mark this
+  item N/A with a one-line justification commit body.
+
 - [ ] **10.6** Update auto-memory with anything surprising discovered (e.g. if a doc kept drifting back, note the reason).
 - [ ] **10.7** Decide whether Section 4 of `tech-docs.md` should be promoted to a `repo-governance/development/quality/rust-crate-structural-checklist.md` for the next Rust crate.
 
 ## Commit hygiene
 
+- Follow the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/)
+  and the repo's [Commit Messages Convention](../../../repo-governance/development/workflow/commit-messages.md).
 - One conventional commit per finding-resolution (or small batch per file when atomic).
+- **One domain per commit** — never bundle unrelated changes (e.g. do not combine a `chrono`
+  bump with a `coding-standards.md` edit). Split into separate commits if their `<type>(<scope>)`
+  prefixes would differ.
 - `chore(rhino-cli):`, `docs(rust):`, `chore(plans):`, `chore(deps):` scopes as appropriate.
 - All commits land on `main` (Trunk Based Development).
 - Reference the finding ID (`F-XX`) from the inventory report in each commit body.

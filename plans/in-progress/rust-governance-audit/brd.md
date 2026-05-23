@@ -6,7 +6,7 @@ created: 2026-05-23
 
 # Business Rationale
 
-## Problem
+## Business Goal and Rationale
 
 The `rhino-cli` Go→Rust port (completed 2026-05-23) and the subsequent `forbid(unsafe_code)` patch were focused on shipping working code. They did not include a sweep of every Rust-touching artefact in the repository. The result is a measurable governance drift surface:
 
@@ -16,14 +16,14 @@ The `rhino-cli` Go→Rust port (completed 2026-05-23) and the subsequent `forbid
 4. **No structural code-review pass against platform Rust standards** since the port — module boundaries, error-handling patterns, public API surface, lint configuration have not been validated against `docs/.../rust/*-standards.md`.
 5. **`unsafe` is a non-negotiable no** but the forbid attribute only lives in two crate roots. Governance docs do not yet codify "all OSE application crates MUST forbid unsafe", so a future crate could re-introduce it without violating a written rule.
 
-## Cost of not acting
+## Business Impact
 
 - **Onboarding friction**: a new contributor reading `specs/apps/rhino/README.md` runs Go commands against a Rust crate, hits a wall, blames the docs, files a support ticket.
 - **Silent dependency rot**: `sha2 0.11.0` carries a non-trivial API migration. Sleeping on it pushes the cost forward and makes a future security-driven upgrade harder.
 - **Standards erosion**: every additional Rust crate added in this state inherits the same drift and copies the same `forbid(unsafe_code)` ad-hoc instead of from a written rule.
 - **Audit findability**: nothing in `repo-governance/` currently enumerates Rust artefacts in one place — every future Rust audit starts from a `grep -r rust` and rediscovers the same surface area.
 
-## Outcome (success state)
+## Success Criteria
 
 After this plan executes, the following statements are true and verifiable:
 
@@ -34,6 +34,16 @@ After this plan executes, the following statements are true and verifiable:
 - `rhino-cli` source code passes a structural compliance audit against the platform Rust standards (naming, error handling, module layout, public API surface, lint configuration).
 - A static `cargo audit` and `cargo deny check` invocation are wired into either CI or a pre-merge target so the next dependency CVE is caught automatically.
 - All six audit findings from `tech-docs.md §3` (two version-reconciliation rows C-01/C-02, one spec-README Go-residue row C-03, one cross-link gap C-04, one dependency-status gap C-05, one MSRV-vs-pin clarification C-06) plus the four dependency-currency rows from `tech-docs.md §2.2–2.3` (chrono, glob, sha2, tempfile) are each closed with a corresponding diff in the commit history.
+
+## Affected Roles
+
+| Role                                         | How this plan affects them                                                                                                                                                                                                  |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Governance maintainer**                    | Owns the audit; runs the inventory sweep, files contradictions, applies fixes across `docs/.../rust/`, `repo-governance/`, `apps/rhino-cli/`, and `specs/apps/rhino/`. Primary executor of the delivery checklist.          |
+| **Rust contributor on `rhino-cli`**          | Consumer of the corrected standards docs. After delivery, gets a single MSRV statement, accurate dependency status, and a one-line `forbid(unsafe_code)` invariant they can rely on without cross-referencing four sources. |
+| **Plan-executor agent (future)**             | Re-runs the checklist as a checker pass for any subsequent Rust crate added to the repo. The granular `- [ ]` items are designed to be ticked off mechanically.                                                             |
+| **AyoKoding learner reading Rust tutorials** | Indirectly affected — their tutorial content is out of scope here, but cross-references from tutorial → standards must continue to resolve, so the audit MUST NOT break tutorial deep-links into `docs/.../rust/`.          |
+| **Repo-rules-checker / docs-checker agents** | Their next run against the repo should see a smaller Rust-related finding surface; expect a measurable reduction in "Rust version inconsistency" and "stale tooling reference" finding categories.                          |
 
 ## Non-goals
 

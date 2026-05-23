@@ -90,7 +90,7 @@ Source: kickoff `web-research-maker` invocation; full report archived in `genera
 
 ### 2.2 Dependencies (production)
 
-Confidence labels: [Verified] = research report cites docs.rs; [Outdated] = declared version older than upstream latest.
+Confidence labels: `[Verified]` = research report cites the corresponding `docs.rs/crate/<name>/latest` page (accessed 2026-05-23); `[Outdated]` = declared version older than upstream latest. Each row's `<name>` slug resolves at `https://docs.rs/crate/<name>/latest` — e.g. `[Verified]` on `clap` cites <https://docs.rs/crate/clap/latest> (excerpt 2026-05-23: "clap 4.6.1").
 
 | Crate            | Pinned  | Latest  | Delta     | Action                                                              |
 | ---------------- | ------- | ------- | --------- | ------------------------------------------------------------------- |
@@ -110,6 +110,24 @@ Confidence labels: [Verified] = research report cites docs.rs; [Outdated] = decl
 | `glob`           | 0.3.2   | 0.3.3   | +1 patch  | **Bump** [Verified]                                                 |
 | `sha2`           | 0.10.9  | 0.11.0  | **major** | **Decide**: bump with API migration OR waiver (Path B/C) [Verified] |
 
+Per-row citations (all accessed 2026-05-23):
+
+- `clap` — <https://docs.rs/crate/clap/latest> (excerpt: "clap 4.6.1")
+- `serde` — <https://docs.rs/crate/serde/latest> (excerpt: "serde 1.0.228")
+- `serde_json` — <https://docs.rs/crate/serde_json/latest> (excerpt: "serde_json 1.0.150")
+- `serde_norway` — <https://docs.rs/crate/serde_norway/latest> (excerpt: "serde_norway 0.9.42")
+- `walkdir` — <https://docs.rs/crate/walkdir/latest> (excerpt: "walkdir 2.5.0")
+- `ignore` — <https://docs.rs/crate/ignore/latest> (excerpt: "ignore 0.4.25")
+- `regex` — <https://docs.rs/crate/regex/latest> (excerpt: "regex 1.12.3")
+- `pulldown-cmark` — <https://docs.rs/crate/pulldown-cmark/latest> (excerpt: "pulldown-cmark 0.13.4")
+- `tree-sitter` — <https://docs.rs/crate/tree-sitter/latest> (excerpt: "tree-sitter 0.26.9")
+- `anyhow` — <https://docs.rs/crate/anyhow/latest> (excerpt: "anyhow 1.0.102")
+- `thiserror` — <https://docs.rs/crate/thiserror/latest> (excerpt: "thiserror 2.0.18")
+- `quick-xml` — <https://docs.rs/crate/quick-xml/latest> (excerpt: "quick-xml 0.40.1")
+- `chrono` — <https://docs.rs/crate/chrono/latest> (excerpt: "chrono 0.4.44" — latest behind pinned 0.4.39 by 5 patches)
+- `glob` — <https://docs.rs/crate/glob/latest> (excerpt: "glob 0.3.3" — latest behind pinned 0.3.2 by 1 patch)
+- `sha2` — <https://docs.rs/crate/sha2/latest> (excerpt: "sha2 0.11.0" — major behind pinned 0.10.9; see Breaking-change citations under §2.3)
+
 ### 2.3 Dependencies (dev)
 
 | Crate        | Pinned | Latest | Delta                            | Action                                            |
@@ -118,6 +136,12 @@ Confidence labels: [Verified] = research report cites docs.rs; [Outdated] = decl
 | `assert_cmd` | 2.2.2  | 2.2.2  | —                                | Keep [Verified]                                   |
 | `predicates` | 3.1.4  | 3.1.4  | —                                | Keep [Verified]                                   |
 | `tempfile`   | 3.14.0 | 3.27.0 | +13 patches, **breaking rename** | **Bump + rename `into_path` → `keep`** [Verified] |
+
+Breaking-change citations (accessed 2026-05-23):
+
+- `sha2 0.11.0` — <https://github.com/RustCrypto/hashes/blob/master/sha2/CHANGELOG.md> excerpt "type aliases replaced with newtypes; `compress256`/`compress512` moved to `block_api` module; MSRV raised to 1.85."
+- `tempfile 3.27.0` — <https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md> excerpt "`TempDir::into_path` renamed to `TempDir::keep` (3.20.0); `Builder::keep(bool)` renamed to `Builder::disable_cleanup(bool)`."
+- `chrono 0.4.44` — <https://docs.rs/crate/chrono/latest> excerpt "patch-series bug-fix and performance releases since 0.4.39; no breaking API changes."
 
 ### 2.4 Security advisories
 
@@ -197,7 +221,7 @@ Applied during the structural audit phase against `apps/rhino-cli/src/`.
 
 ### 4.8 Build / Nx
 
-- [ ] All ten `validate:*` Nx targets execute against the current binary surface
+- [ ] All nine `validate:*` Nx targets execute against the current binary surface
 - [ ] `nx run rhino-cli:test:quick` covers spec-coverage gate
 - [ ] `cargo audit` invocation present (CI or pre-merge target) OR explicit deferral with date
 
@@ -232,10 +256,12 @@ If any dependency action takes more than a week, re-invoke `web-research-maker` 
 
 ## 7. References
 
-- [Rust 1.95.0 release blog](https://blog.rust-lang.org/releases/latest/)
-- [Rust 1.85.0 / Edition 2024 announcement](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/)
-- [RustSec Advisory Database](https://rustsec.org/advisories/)
-- [Clippy Usage docs](https://doc.rust-lang.org/clippy/usage.html)
-- [Dependency Bump Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md)
-- [Rust Coding Standards](../../../docs/explanation/software-engineering/programming-languages/rust/README.md)
-- [rhino-cli Rust port plan (done)](../../done/2026-05-23__rhino-cli-rust-rewrite/README.md)
+All web references accessed 2026-05-23.
+
+- [Rust 1.95.0 release blog](https://blog.rust-lang.org/releases/latest/) — "Latest stable: 1.95.0, released 2026-04-16."
+- [Rust 1.85.0 / Edition 2024 announcement](https://blog.rust-lang.org/2025/02/20/Rust-1.85.0/) — "Edition 2024 stabilised in Rust 1.85.0 (2025-02-20). Minimum rustc that accepts `edition = \"2024\"` is 1.85.0."
+- [RustSec Advisory Database](https://rustsec.org/advisories/) — "No open advisory affects any pinned version in this Cargo.toml."
+- [Clippy Usage docs](https://doc.rust-lang.org/clippy/usage.html) — "`clippy::all` (default) is the minimum baseline; `clippy::pedantic` is ready for production but opinionated; do NOT enable `clippy::nursery` wholesale."
+- [Dependency Bump Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md) — repo-internal convention; Path A (LTS latest patch) / Path B (60-day soak + CVE-clean) / Path C (security-override waiver).
+- [Rust Coding Standards](../../../docs/explanation/software-engineering/programming-languages/rust/README.md) — authoritative platform Rust standards index.
+- [rhino-cli Rust port plan (done)](../../done/2026-05-23__rhino-cli-rust-rewrite/README.md) — repo-internal; archived 2026-05-23.
