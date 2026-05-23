@@ -26,6 +26,7 @@
   - `ayokoding-cli` — Go CLI tool for content link validation
   - `rhino-cli` — Rust CLI tool for repository management (Repository Hygiene & INtegration Orchestrator). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
   - `ose-cli` — Go CLI tool for OSE Platform site maintenance (link validation)
+  - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine)
   - `organiclever-web` — Next.js 16 landing and promotional website (www.organiclever.com)
   - `organiclever-be` — F#/Giraffe REST API backend for OrganicLever
   - `organiclever-web-e2e` — Playwright FE E2E tests for organiclever-web
@@ -54,6 +55,7 @@ ose-public/
 │   ├── ayokoding-cli/        # Content link validation CLI
 │   ├── rhino-cli/            # Repository management CLI
 │   ├── ose-cli/      # OSE Platform site CLI
+│   ├── crane-cli/    # PDF-to-Markdown pipeline CLI (F#)
 │   ├── organiclever-web/     # OrganicLever landing website (Next.js)
 │   ├── organiclever-be/      # OrganicLever Java/Spring Boot 4 REST API backend
 │   ├── organiclever-web-e2e/ # Playwright FE E2E tests for organiclever-web
@@ -588,16 +590,7 @@ The `open-sharia-enterprise` ecosystem consists of three independent sibling rep
 - [`ose-primer`](https://github.com/wahidyankf/ose-primer) — downstream public template packaging the scaffolding layer (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) for teams building their own Sharia-compliant enterprise products. MIT licensed.
 - [`ose-infra`](https://github.com/wahidyankf/ose-infra) — private infrastructure repository. Hosts the self-hosted GitHub Actions runner stack, `coralpolyp` app, and infrastructure-only governance. Proprietary; not publicly accessible.
 
-### `ose-public` ↔ `ose-primer` sync
-
-`ose-public` is the **upstream source of truth** for scaffolding. Content flows in both directions under classifier-driven rules:
-
-- **Propagation** (`ose-public` → `ose-primer`): scaffolding improvements authored upstream flow to the template via `repo-ose-primer-propagation-maker`. Always via pull request against the primer's `main` branch; never direct commits.
-- **Adoption** (`ose-primer` → `ose-public`): generic improvements contributed downstream can flow back via `repo-ose-primer-adoption-maker`. Applied to `ose-public` as direct commits to `main` per Trunk-Based Development.
-
-Product-specific paths (`apps/organiclever-*`, `apps/ayokoding-*`, `apps/ose-web`, `apps/ose-web-be-e2e`, `apps/ose-web-fe-e2e`, `apps/ose-cli`, product specs, product roadmap, product plans) are classified `neither` and never sync.
-
-`ose-infra` does not participate in the propagation/adoption sync loop; it is an independent sibling with no classifier-driven content exchange with `ose-public`.
+`ose-public` is the **upstream source of truth** for scaffolding. Content flows bidirectionally between `ose-public` and `ose-primer` via `repo-ose-primer-propagation-maker` (upstream → template, always via PR) and `repo-ose-primer-adoption-maker` (downstream → upstream, direct commits to `main`). `ose-infra` does not participate in the sync loop.
 
 See: [Related Repositories reference](./docs/reference/related-repositories.md), [ose-primer sync convention](./repo-governance/conventions/structure/ose-primer-sync.md).
 

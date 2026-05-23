@@ -75,6 +75,7 @@ all use the same MIT text.
 | `LICENSE` (root)                | MIT     |
 | `apps/ayokoding-cli/`           | MIT     |
 | `apps/ayokoding-web/`           | MIT     |
+| `apps/crane-cli/`               | MIT     |
 | `apps/organiclever-be/`         | MIT     |
 | `apps/organiclever-web/`        | MIT     |
 | `apps/ose-cli/`                 | MIT     |

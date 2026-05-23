@@ -10,7 +10,7 @@ The root [LICENSE](./LICENSE) is MIT. Selected product app directories and `spec
 their own MIT `LICENSE` file — these override the root for files in that subtree. All
 per-directory LICENSE files currently contain identical MIT text; the override mechanism is
 preserved so future maintainers can relicense specific subdirectories independently if needed.
-Internal CLI tools (`apps/rhino-cli/`) and E2E test suites (`apps/*-e2e/`) do not carry
+`apps/rhino-cli/` and E2E test suites (`apps/*-e2e/`) do not carry
 per-directory LICENSE files and fall back to the root LICENSE. See
 [Licensing Convention](./repo-governance/conventions/structure/licensing.md) for the complete
 exemption list.

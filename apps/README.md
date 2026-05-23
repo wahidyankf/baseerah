@@ -35,7 +35,8 @@ Where `{part}` describes the role and technology stack:
 - `ayokoding-web-be-e2e` - Playwright BE E2E tests for ayokoding-web tRPC API
 - `ayokoding-web-fe-e2e` - Playwright FE E2E tests for ayokoding-web UI
 - `ayokoding-cli` - AyoKoding CLI tool for link validation - Go application
-- `rhino-cli` - Repository management CLI tools - Go application
+- `crane-cli` - Content Retrieval And Normalization Engine CLI for PDF-to-Markdown pipeline - F# application
+- `rhino-cli` - Repository management CLI tools - Rust application (ported from Go 2026-05-23)
 - `ose-cli` - OSE Platform CLI tool for link validation - Go application
 - `organiclever-web` - OrganicLever landing website (www.organiclever.com) - Next.js app (port 3200)
 - `organiclever-be` - OrganicLever backend API (F#/Giraffe) - F# application (port 8202)
@@ -270,9 +271,10 @@ Use the corresponding deployer agent (e.g. `apps-organiclever-web-deployer`) for
 
 Currently:
 
-- **Go** (CLI tools) - ayokoding-cli, rhino-cli, ose-cli
+- **Go** (CLI tools) - ayokoding-cli, ose-cli
+- **Rust** (CLI tools) - rhino-cli
 - **TypeScript/Next.js** (web applications) - ose-web, organiclever-web, ayokoding-web
-- **F#/Giraffe** (backend API) - organiclever-be
+- **F#** (CLI tools, backend API) - crane-cli, organiclever-be
 - **TypeScript/Playwright** (E2E testing) - organiclever-web-e2e, organiclever-be-e2e
 
 Future: Kotlin, Python apps (each language will have language-specific structure and tooling)
