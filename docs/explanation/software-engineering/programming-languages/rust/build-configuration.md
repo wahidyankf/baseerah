@@ -44,7 +44,7 @@ Rust build reproducibility requires discipline:
 
 - `Cargo.lock` committed for binaries — exact dependency versions locked
 - `rust-toolchain.toml` pins exact compiler version
-- `edition = "2021"` explicit in every `Cargo.toml`
+- `edition = "2024"` explicit in every `Cargo.toml`
 - `cargo verify-project` validates configuration in CI
 
 ### 2. Explicit Over Implicit
@@ -83,7 +83,7 @@ repository = "https://github.com/open-sharia-enterprise/ose-platform"
 
 **Key fields**:
 
-- `edition = "2021"` — MUST be declared explicitly (never omit)
+- `edition = "2024"` — MUST be declared explicitly (never omit)
 - `rust-version` — SHOULD declare minimum supported Rust version (MSRV)
 
 ### Dependencies
@@ -190,7 +190,7 @@ nursery = "deny"
 [package]
 name = "zakat-domain"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 serde = { workspace = true }
@@ -328,7 +328,7 @@ cargo deny check
 
 **Pre-commit checklist**:
 
-- [ ] `edition = "2021"` declared in all `Cargo.toml` files
+- [ ] `edition = "2024"` declared in all `Cargo.toml` files
 - [ ] `rust-toolchain.toml` present at workspace root
 - [ ] `Cargo.lock` committed for binary crates, gitignored for libraries
 - [ ] Workspace dependencies use `workspace = true`

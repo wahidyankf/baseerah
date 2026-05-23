@@ -250,7 +250,7 @@ graph LR
 **Version Management (REQUIRED)**:
 
 - MUST use `rust-toolchain.toml` to pin exact toolchain version
-- MUST specify `edition = "2021"` (or later) in `Cargo.toml`
+- MUST specify `edition = "2024"` (or later) in `Cargo.toml`
 - SHOULD use `rustup` for local toolchain management
 - MUST NOT rely on system-installed Rust without toolchain file verification
 
