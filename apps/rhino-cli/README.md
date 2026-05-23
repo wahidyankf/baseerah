@@ -10,7 +10,7 @@ A Rust CLI binary delivering the same observable contract as the original Go imp
 
 ## Status
 
-Production. All commands ported and byte-identical to the original Go binary across shadow-diff corpora.
+Production. All commands ported and byte-identical to the original Go binary across shadow-diff corpora. This crate forbids unsafe Rust in both `lib.rs` and `main.rs`; see [`code-quality-standards.md` §Unsafe Code Policy](../../docs/explanation/software-engineering/programming-languages/rust/code-quality-standards.md#unsafe-code-policy).
 
 ## Quick Start
 

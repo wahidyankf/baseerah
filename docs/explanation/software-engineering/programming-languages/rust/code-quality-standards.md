@@ -255,6 +255,17 @@ pub mod application;
 pub mod infrastructure;
 ```
 
+**MUST** include `#![forbid(unsafe_code)]` in **both** `lib.rs` and `main.rs` when a crate exposes both a library target and a binary target. The attribute is not inherited between targets — omitting it from one root silently permits unsafe in that target.
+
+```rust
+// CORRECT: Both crate roots forbid unsafe
+// src/lib.rs — line 1
+#![forbid(unsafe_code)]
+
+// src/main.rs — line 1
+#![forbid(unsafe_code)]
+```
+
 **MUST** include a `// SAFETY:` comment on every `unsafe` block in infrastructure crates:
 
 ```rust

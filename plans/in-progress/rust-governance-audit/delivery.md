@@ -177,15 +177,23 @@ PARALLEL within phase; each crate decision is an independent commit.
 
 ## Phase 5 — `forbid(unsafe_code)` governance hardening
 
-- [ ] **5.1** Verify `apps/rhino-cli/src/lib.rs` line 1 = `#![forbid(unsafe_code)]` (done 2026-05-23 — confirm not regressed).
-- [ ] **5.2** Verify `apps/rhino-cli/src/main.rs` line 1 = `#![forbid(unsafe_code)]` (done 2026-05-23 — confirm not regressed).
-- [ ] **5.3** Run `grep -rE '\bunsafe\b' apps/rhino-cli/src/ apps/rhino-cli/tests/` — expect zero matches.
-- [ ] **5.4** Audit `docs/.../rust/code-quality-standards.md §246` clause wording; ensure it explicitly:
-  - [ ] **5.4.1** Mandates `#![forbid(unsafe_code)]` (not `deny`) for application crates.
-  - [ ] **5.4.2** Names the exception clause for infrastructure crates with documented justification.
-  - [ ] **5.4.3** Says the forbid attribute MUST appear in both crate roots (lib.rs and main.rs) when both exist.
-- [ ] **5.5** If §246 lacks any of 5.4.1-5.4.3, add the missing clause(s); cross-link from `quality/code.md`.
-- [ ] **5.6** Add a one-line invariant to `apps/rhino-cli/README.md` ("This crate forbids unsafe Rust; see `code-quality-standards.md` §246" with a real relative link to `docs/explanation/software-engineering/programming-languages/rust/code-quality-standards.md`).
+- [x] **5.1** Verify `apps/rhino-cli/src/lib.rs` line 1 = `#![forbid(unsafe_code)]` (done 2026-05-23 — confirm not regressed).
+  - Date: 2026-05-23 | Status: done | Notes: Confirmed line 1 = `#![forbid(unsafe_code)]` ✓
+- [x] **5.2** Verify `apps/rhino-cli/src/main.rs` line 1 = `#![forbid(unsafe_code)]` (done 2026-05-23 — confirm not regressed).
+  - Date: 2026-05-23 | Status: done | Notes: Confirmed line 1 = `#![forbid(unsafe_code)]` ✓
+- [x] **5.3** Run `grep -rE '\bunsafe\b' apps/rhino-cli/src/ apps/rhino-cli/tests/` — expect zero matches.
+  - Date: 2026-05-23 | Status: done | Notes: Zero matches ✓
+- [x] **5.4** Audit `docs/.../rust/code-quality-standards.md §246` clause wording; ensure it explicitly:
+  - [x] **5.4.1** Mandates `#![forbid(unsafe_code)]` (not `deny`) for application crates.
+    - Date: 2026-05-23 | Status: done | Notes: Present at line 246 — "**MUST** apply `#![forbid(unsafe_code)]`" ✓
+  - [x] **5.4.2** Names the exception clause for infrastructure crates with documented justification.
+    - Date: 2026-05-23 | Status: done | Notes: Present — "Unsafe code is only permitted in infrastructure crates with documented justification" ✓
+  - [x] **5.4.3** Says the forbid attribute MUST appear in both crate roots (lib.rs and main.rs) when both exist.
+    - Date: 2026-05-23 | Status: MISSING → fixed in 5.5
+- [x] **5.5** If §246 lacks any of 5.4.1-5.4.3, add the missing clause(s); cross-link from `quality/code.md`.
+  - Date: 2026-05-23 | Status: done | Files Changed: docs/.../rust/code-quality-standards.md | Notes: Added dual-root MUST clause with code example. Already cross-linked from quality/code.md (item 2.3.4).
+- [x] **5.6** Add a one-line invariant to `apps/rhino-cli/README.md` ("This crate forbids unsafe Rust; see `code-quality-standards.md` §246" with a real relative link to `docs/explanation/software-engineering/programming-languages/rust/code-quality-standards.md`).
+  - Date: 2026-05-23 | Status: done | Files Changed: apps/rhino-cli/README.md | Notes: Added to Status section.
 
 ## Phase 6 — Code structure compliance audit
 
