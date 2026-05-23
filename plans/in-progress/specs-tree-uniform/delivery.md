@@ -23,6 +23,13 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 > overrides. crane: {pdf, content, media, reporting, system}; rhino:
 > {agents, ddd, docs, env, git, repo-governance, spec-coverage, test-coverage, workflows, system};
 > ayokoding-cli: {links}; ose-platform-cli: {links}.
+>
+> D2 resolution (2026-05-23): chose option A — add `ose-app` to `apps_with_ddd()` allowlist —
+> because ose-app has a populated `ddd/bounded-contexts.yaml` with four declared BCs
+> (regulatory-source, internal-policy, gap-analysis, ai-orchestration). All BCs show `--`
+> feature counts today, but the DDD registry exists and should be validated. Consistent with
+> the "every full-stack app with a DDD registry is validated" principle. Any latent adoption
+> findings from empty BCs will be triaged in Phase 8.
 
 ## Phase 0 — Environment Setup and Decisions
 
@@ -306,27 +313,32 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 <!-- Date: 2026-05-23 | Status: done | Notes: 0 findings -->
 - [x] Commit: `git add specs/apps/ose-app/README.md && git commit -m "docs(specs/ose-app): add
       PM-readable reading-order section"`.
-<!-- Date: 2026-05-23 | Status: done | Notes: commit pending — will be done next -->
-- [ ] Resolve Decision D2 per
-      [tech-docs.md §D2](./tech-docs.md#d2--allowlist-policy-for-appswithddd). Record the
-      decision at the top of this delivery file as a callout.
-- [ ] If D2 == A (add ose-app to allowlist): edit `apps/rhino-cli/src/internal/allowlist.rs`
+<!-- Date: 2026-05-23 | Status: done | Notes: commit 96b85002a; 2 files changed, 68 insertions, 18 deletions -->
+- [x] Resolve Decision D2 per
+    [tech-docs.md §D2](./tech-docs.md#d2--allowlist-policy-for-appswithddd). Record the
+    decision at the top of this delivery file as a callout.
+<!-- Date: 2026-05-23 | Status: done | Notes: D2.A chosen — add ose-app to allowlist; callout added above Phase 0 section -->
+- [x] If D2 == A (add ose-app to allowlist): edit `apps/rhino-cli/src/internal/allowlist.rs`
       to add `"ose-app"` to the `APPS_WITH_DDD` (or actual constant name from Phase 0 grep).
       Add inline `//` comment block above the constant documenting the inclusion criterion.
       Acceptance: `cargo check --manifest-path apps/rhino-cli/Cargo.toml` exits 0 AND
       `nx run rhino-cli:test:quick` exits 0.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] Run `nx run rhino-cli:validate:specs-tree && nx run rhino-cli:validate:specs-adoption &&
-nx run rhino-cli:validate:specs-counts && nx run rhino-cli:validate:specs-links` — all
-      four exit 0 with no `--apps` flag.
-      **Expected**: ose-app DDD entries with empty BC content may surface adoption findings.
-      Address each finding by either populating the BC field or removing the BC entry from
-      `ddd/bounded-contexts.yaml` (consult the user before deleting entries).
-- [ ] If D2 == B (exclude ose-app): add `//` comment block above the constant in
-      `allowlist.rs` documenting the exclusion criterion (zero populated BC entries today).
-- [ ] Commit: `git add apps/rhino-cli/src/internal/allowlist.rs && git commit -m
-"feat(rhino-cli): document AppsWithDDD allowlist policy"` (or `feat(rhino-cli): add
-ose-app to AppsWithDDD allowlist`).
+  <!-- Date: 2026-05-23 | Status: done | Notes: ose-app added to apps_with_ddd(); inline comment block added documenting all 5 apps' inclusion criterion; 4 resolve_default tests updated 4→5; cargo check OK; nx run rhino-cli:test:quick 755/755 pass -->
+- [x] Run `nx run rhino-cli:validate:specs-tree && nx run rhino-cli:validate:specs-adoption &&
+      nx run rhino-cli:validate:specs-counts && nx run rhino-cli:validate:specs-links` — all
+    four exit 0 with no `--apps` flag.
+    **Expected**: ose-app DDD entries with empty BC content may surface adoption findings.
+    Address each finding by either populating the BC field or removing the BC entry from
+    `ddd/bounded-contexts.yaml` (consult the user before deleting entries).
+<!-- Date: 2026-05-23 | Status: done | Notes: all 4 pass 0 findings; ose-app adoption 0 findings (behavior/ has feature files); counts fixed by adding product/overview.md, system-context/context.md, components/be/component-be.md as placeholder spec files -->
+- [x] If D2 == B (exclude ose-app): add `//` comment block above the constant in
+    `allowlist.rs` documenting the exclusion criterion (zero populated BC entries today).
+<!-- Date: 2026-05-23 | Status: N/A | Notes: D2==A; skipped -->
+- [x] Commit: `git add apps/rhino-cli/src/internal/allowlist.rs && git commit -m
+    "feat(rhino-cli): document AppsWithDDD allowlist policy"` (or `feat(rhino-cli): add
+    ose-app to AppsWithDDD allowlist`).
+<!-- Date: 2026-05-23 | Status: done | Notes: commit 8e9ffb8cb; 8 files changed, 69 insertions, 6 deletions -->
 
 ## Phase 6 — CLI domain regrouping for ayokoding-cli, ose-platform-cli + validator enforcement (R7)
 
@@ -336,27 +348,32 @@ last two CLI trees and hardening rhino-cli so the rule is enforced going forward
 
 ### Phase 6.a — ayokoding-cli domain regrouping (R7.a)
 
-- [ ] Create domain subdirs:
-      `mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/links` (only `links/` needed — see D5
-      table; `system/` is not required because `check-all.feature` and `version.feature` do NOT
-      exist in `specs/apps/ayokoding/behavior/cli/gherkin/` — verified 2026-05-23).
-- [ ] Execute `git mv` per [tech-docs.md §R7](./tech-docs.md#r7--domain-regrouping-for-ayokoding-cli-ose-platform-cli-and-validator-enforcement):
-      `links-check.feature` into `links/`. Only this one file exists at the gherkin root.
-      Verify before running: `ls specs/apps/ayokoding/behavior/cli/gherkin/*.feature` — must
-      list only `links-check.feature`; if other files have been added since 2026-05-23, assign
-      them to appropriate domains at execution time.
-- [ ] Author one-paragraph index `README.md` in each new domain subdir.
+- [x] Create domain subdirs:
+    `mkdir -p specs/apps/ayokoding/behavior/cli/gherkin/links` (only `links/` needed — see D5
+    table; `system/` is not required because `check-all.feature` and `version.feature` do NOT
+    exist in `specs/apps/ayokoding/behavior/cli/gherkin/` — verified 2026-05-23).
+<!-- Date: 2026-05-23 | Status: done | Notes: links/ created -->
+- [x] Execute `git mv` per [tech-docs.md §R7](./tech-docs.md#r7--domain-regrouping-for-ayokoding-cli-ose-platform-cli-and-validator-enforcement):
+    `links-check.feature` into `links/`. Only this one file exists at the gherkin root.
+    Verify before running: `ls specs/apps/ayokoding/behavior/cli/gherkin/*.feature` — must
+    list only `links-check.feature`; if other files have been added since 2026-05-23, assign
+    them to appropriate domains at execution time.
+<!-- Date: 2026-05-23 | Status: done | Notes: git mv done; 0 flat features at gherkin root -->
+- [x] Author one-paragraph index `README.md` in each new domain subdir.
   - _Suggested executor: `specs-maker`_
-- [ ] Path-reference sweep: `grep -rln 'specs/apps/ayokoding/behavior/cli/gherkin/' apps libs
-.github .husky docs repo-governance > /tmp/ayko-cli-refs.txt`. Inspect; hand-rewrite
-      every per-`.feature` reference (likely in `apps/ayokoding-cli/`'s step files +
-      `project.json` `inputs`).
-- [ ] Verify: `nx run rhino-cli:validate:specs-tree --apps ayokoding && nx run
-rhino-cli:validate:specs-counts --apps ayokoding && nx run
-rhino-cli:validate:specs-links --apps ayokoding && nx run ayokoding-cli:test:quick` —
-      all exit 0.
+  <!-- Date: 2026-05-23 | Status: done | Notes: links/README.md written with feature table -->
+- [x] Path-reference sweep: `grep -rln 'specs/apps/ayokoding/behavior/cli/gherkin/' apps libs
+      .github .husky docs repo-governance > /tmp/ayko-cli-refs.txt`. Inspect; hand-rewrite
+    every per-`.feature` reference (likely in `apps/ayokoding-cli/`'s step files +
+    `project.json` `inputs`).
+<!-- Date: 2026-05-23 | Status: done | Notes: 3 files matched; project.json uses glob (no change needed); README.md:218 updated to links/links-check.feature; specs-directory-structure.md:190 updated to links/links-check.feature -->
+- [x] Verify: `nx run rhino-cli:validate:specs-tree --apps ayokoding && nx run
+      rhino-cli:validate:specs-counts --apps ayokoding && nx run
+      rhino-cli:validate:specs-links --apps ayokoding && nx run ayokoding-cli:test:quick` —
+    all exit 0.
+<!-- Date: 2026-05-23 | Status: done | Notes: all pass; fixed broken relative link in links/README.md (8→7 levels); ayokoding-cli:test:quick pass -->
 - [ ] Commit atomically: `git add -A && git commit -m "refactor(specs/ayokoding): regroup cli
-features into domain subdirs"`.
+  features into domain subdirs"`.
 
 ### Phase 6.b — ose-platform-cli domain regrouping (R7.b)
 

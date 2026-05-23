@@ -187,7 +187,7 @@ A domain folder may contain one or many feature files.
 specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature
 specs/apps/rhino/behavior/cli/gherkin/env/env-backup.feature
 specs/apps/rhino/behavior/cli/gherkin/spec-coverage/spec-coverage-validate.feature
-specs/apps/ayokoding/behavior/cli/gherkin/links-check.feature
+specs/apps/ayokoding/behavior/cli/gherkin/links/links-check.feature
 ```
 
 **Rationale for CLI exception**: CLI commands are independent operations, not grouped into business domains. Domain folders containing one or two files each would add indirection without value. The flat structure communicates that each file is an independent command specification.
