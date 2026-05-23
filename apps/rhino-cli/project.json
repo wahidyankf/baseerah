@@ -173,7 +173,7 @@
       "outputs": []
     },
     "validate:mermaid": {
-      "command": "CGO_ENABLED=0 go run -C apps/rhino-cli main.go docs validate-mermaid --max-depth=4 repo-governance/ .claude/",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli-rs/Cargo.toml -- docs validate-mermaid --max-depth=4 repo-governance/ .claude/",
       "cache": true,
       "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/repo-governance/**/*.md", "{workspaceRoot}/.claude/**/*.md"],
       "outputs": []

@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 
 use crate::commands::{
     docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
-    docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
+    docs_validate_mermaid, docs_validate_naming, governance_agents_md_size, governance_emoji_audit,
     governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
     governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
     spec_coverage_validate, test_coverage_validate,
@@ -86,6 +86,9 @@ pub enum DocsCommands {
     /// Validate markdown links (relative paths exist on disk).
     #[command(name = "validate-links")]
     ValidateLinks(docs_validate_links::ValidateLinksArgs),
+    /// Validate Mermaid flowchart diagrams (label length, span, single-diagram).
+    #[command(name = "validate-mermaid")]
+    ValidateMermaid(docs_validate_mermaid::ValidateMermaidArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -208,6 +211,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
                 docs_validate_heading_hierarchy::run(args, output_format)
             }
             DocsCommands::ValidateLinks(args) => docs_validate_links::run(args, output_format),
+            DocsCommands::ValidateMermaid(args) => docs_validate_mermaid::run(args, output_format),
         },
     };
     match result {
