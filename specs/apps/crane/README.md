@@ -15,19 +15,30 @@ and its consumers (the `pdf-to-md` agents and the quality gate workflow).
 
 ```
 specs/apps/crane/
-├── README.md                 — This file
-└── gherkin/
-    ├── README.md             — Feature file inventory
-    ├── pdf-commands.feature  — crane pdf info/type/extract
-    ├── text-check.feature    — crane text check/search
-    ├── heading-check.feature — crane heading infer/check
-    ├── nesting-check.feature — crane nesting infer/check
-    ├── table-check.feature   — crane table detect/check
-    ├── figure-check.feature  — crane figure detect/check
-    ├── mermaid-validate.feature — crane mermaid validate
-    ├── ocr-quality.feature   — crane ocr quality/extract
-    ├── report-management.feature — crane report init/finalize
-    └── skiplist-management.feature — crane skiplist add/check/list
+├── README.md                          — This file
+├── product/README.md                  — Product framing (vision, personas, scope)
+├── system-context/README.md           — C4 L1 actors and external systems
+├── containers/README.md               — C4 L2 deployable units
+├── components/cli/README.md           — C4 L3 CLI internals
+└── behavior/cli/gherkin/
+    ├── README.md                      — Feature file inventory
+    ├── pdf/
+    │   └── pdf-commands.feature       — crane pdf info/type/extract
+    ├── content/
+    │   ├── text-check.feature         — crane text check/search
+    │   ├── heading-check.feature      — crane heading infer/check
+    │   └── nesting-check.feature      — crane nesting infer/check
+    ├── media/
+    │   ├── table-check.feature        — crane table detect/check
+    │   ├── figure-check.feature       — crane figure detect/check
+    │   ├── mermaid-validate.feature   — crane mermaid validate
+    │   └── ocr-quality.feature        — crane ocr quality/extract
+    ├── reporting/
+    │   ├── report-management.feature  — crane report init/finalize
+    │   └── skiplist-management.feature — crane skiplist add/check/list
+    └── system/
+        ├── check-all.feature          — crane check-all command
+        └── version.feature            — crane version command
 ```
 
 ## Running the Tests

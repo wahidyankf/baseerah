@@ -9,7 +9,7 @@ let private assembly = Assembly.GetExecutingAssembly()
 
 let private gherkinRoot =
     match System.Environment.GetEnvironmentVariable("GHERKIN_ROOT") with
-    | null -> Path.Combine(__SOURCE_DIRECTORY__, "../../../../specs/apps/crane/gherkin")
+    | null -> Path.Combine(__SOURCE_DIRECTORY__, "../../../../specs/apps/crane/behavior/cli/gherkin")
     | root -> root
 
 let private buildScenarioData () : seq<obj[]> =

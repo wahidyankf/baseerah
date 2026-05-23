@@ -21,6 +21,8 @@
     "apps/*/playwright-report/**",
     "apps/*/test-results/**",
     "apps/*/.venv/**",
+    "apps/*/tests/**/bin/**",
+    "apps/*/tests/**/obj/**",
     ".claude/worktrees/**",
     "worktrees/**",
     "local-temp/**",

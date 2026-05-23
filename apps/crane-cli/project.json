@@ -35,7 +35,7 @@
       "inputs": [
         "{projectRoot}/**/*.fs",
         "{projectRoot}/**/*.fsproj",
-        "{workspaceRoot}/specs/apps/crane/gherkin/**/*.feature"
+        "{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature"
       ],
       "outputs": ["{projectRoot}/coverage/"]
     },
@@ -49,7 +49,7 @@
       "inputs": [
         "{projectRoot}/**/*.fs",
         "{projectRoot}/**/*.fsproj",
-        "{workspaceRoot}/specs/apps/crane/gherkin/**/*.feature"
+        "{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature"
       ]
     },
     "test:integration": {
@@ -77,10 +77,10 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/crane/gherkin apps/crane-cli"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/crane/behavior/cli/gherkin apps/crane-cli"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/crane/gherkin/**/*.feature", "{projectRoot}/**/*.fs"]
+      "inputs": ["{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature", "{projectRoot}/**/*.fs"]
     }
   },
   "tags": ["type:app", "platform:cli", "lang:fsharp", "domain:crane"],
