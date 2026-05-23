@@ -245,8 +245,8 @@ grep -A2 "Dual-Mode Color Translation" governance/development/agents/ai-agents.m
 grep -A2 "capability tier" governance/development/agents/model-selection.md
 
 # 8. Final audit (after all remediation)
-go run apps/rhino-cli/main.go governance vendor-audit governance/
-go run apps/rhino-cli/main.go governance vendor-audit AGENTS.md CLAUDE.md   # After convention amendment
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- governance vendor-audit governance/
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- governance vendor-audit AGENTS.md CLAUDE.md   # After convention amendment
 ```
 
 If `rhino-cli governance vendor-audit` does not yet accept arbitrary file targets (only `governance/` directory by default), Phase 4 prep includes either extending the CLI to accept file paths OR running an equivalent grep against AGENTS.md / CLAUDE.md using the combined audit regex from the convention.

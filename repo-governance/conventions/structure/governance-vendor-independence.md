@@ -215,7 +215,7 @@ Enforcement is automated via `rhino-cli repo-governance vendor-audit`.
 
 ```bash
 # Audit the repo-governance/ directory (default)
-go run apps/rhino-cli/main.go repo-governance vendor-audit repo-governance/
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit repo-governance/
 
 # Or via Nx (cached)
 npx nx run rhino-cli:validate:repo-governance-vendor-audit

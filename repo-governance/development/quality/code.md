@@ -534,11 +534,11 @@ Go CLI projects (`apps/rhino-cli`, `apps/ayokoding-cli`) use [golangci-lint](htt
 
 ```bash
 # Run from app directory
-cd apps/rhino-cli && golangci-lint run ./...
+cd apps/ayokoding-cli && golangci-lint run ./...
 
 # Run via Nx
-nx lint rhino-cli
 nx lint ayokoding-cli
+nx lint ose-cli
 
 # Verify which config file is resolved (verbose flag)
 golangci-lint run -v ./... 2>&1 | grep "Config"

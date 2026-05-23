@@ -182,7 +182,7 @@ The new agents need a workflow document that orchestrates the iterative check-fi
 
 - [ ] Provision worktree: `claude --worktree cross-vendor-agent-parity` (creates `worktrees/cross-vendor-agent-parity/` in repo root, per `governance/conventions/structure/worktree-path.md`)
 - [ ] Run `npm install && npm run doctor -- --fix` to converge toolchain
-- [ ] Verify `rhino-cli` is available: `go run apps/rhino-cli/main.go --version`
+- [ ] Verify `rhino-cli` is available: `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- --version`
 
 ### Local Quality Gates (Before Push)
 
