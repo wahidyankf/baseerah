@@ -27,60 +27,60 @@ See [behavior/cli/gherkin/README.md](./behavior/cli/gherkin/README.md) for the f
 
 ## Running the Tests
 
-Both unit and integration tests consume these specs. Unit tests use godog with mocked
-dependencies; integration tests use godog with real filesystem fixtures.
+Unit tests live as `#[cfg(test)]` modules inside `src/`; binary integration tests live in
+`tests/cli/`. A cucumber-rs harness (`tests/cucumber/`) is scaffolded but deferred — the
+existing 754-test suite plus shadow-diff already establishes full behavioral parity. See
+the `project-rhino-cli-rust-cucumber-gap` memory entry for context.
 
 ```bash
-# Run all unit tests (includes godog BDD scenarios with mocked I/O)
+# Run all unit tests with coverage gate (≥90% line coverage)
 nx run rhino-cli:test:quick
 
-# Run unit tests directly
-cd apps/rhino-cli
-go test -v -run TestUnit ./cmd/...
+# Run unit tests directly (no coverage threshold)
+cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib
 
-# Run all BDD integration tests (real filesystem fixtures)
+# Run all binary integration tests
 nx run rhino-cli:test:integration
 
-# Run a specific integration suite during development
-cd apps/rhino-cli
-go test -v -tags=integration -run TestIntegrationDoctor ./cmd/...
+# Run a specific integration test during development
+cargo test --manifest-path apps/rhino-cli/Cargo.toml --tests -- <test_name>
 ```
 
-The `test:integration` target is cached — it only re-runs when source files in
-`cmd/**/*.go` or `specs/apps/rhino/**/*.feature` change. The `test:unit` target
-(via `test:quick`) is also cache-invalidated when these spec files change.
+The `test:integration` target re-runs when `src/**/*.rs`, `tests/**/*.rs`, or
+`specs/apps/rhino/**/*.feature` change. `test:quick` (unit + coverage) is also
+cache-invalidated when spec files change.
 
 ## Adding New Specs
 
 1. Create `specs/apps/rhino/behavior/cli/gherkin/<domain>-<action>.feature`
-2. Create `apps/rhino-cli/cmd/<domain>_<action>_test.go` (no build tag — unit test with godog):
-   - Add `package cmd` at the top
-   - Include `// Scenario: <title>` comments for every scenario
-   - Register step definitions using package-level mock function variables for all I/O
-   - Name the test function `TestUnit<Command>(t *testing.T)`
-3. Create `apps/rhino-cli/cmd/<domain>_<action>.integration_test.go` (integration test with godog):
-   - Add `//go:build integration` and `package cmd` at the top
-   - Include `// Scenario: <title>` comments for every scenario
-   - Register step definitions that drive `cmd.RunE()` against real `/tmp` fixtures
-   - Name the test function `TestIntegration<Command>(t *testing.T)`
-4. Verify with:
+2. Add unit coverage inside the relevant module in `apps/rhino-cli/src/`:
+   - Add a `#[cfg(test)]` block to the module under test
+   - Include a doc-comment citing the Gherkin scenario name on each `#[test]` function
+   - Use in-source mocks and pure-function calls to cover all scenario branches
+3. Add a binary integration test at `apps/rhino-cli/tests/cli/<domain>_<action>.rs`
+   using `assert_cmd` and `predicates`:
+   - Call the real binary via `Command::cargo_bin("rhino-cli")`
+   - Assert stdout, stderr, and exit code from the feature file scenarios
+   - Wire cucumber-rs step definitions into `tests/cucumber/` once that harness lands
+4. Verify:
 
    ```bash
-   cd apps/rhino-cli
-   go run main.go spec-coverage validate specs/apps/rhino/behavior/cli/gherkin apps/rhino-cli
+   nx run rhino-cli:test:quick
+   nx run rhino-cli:test:integration
    ```
 
 ## Dual Consumption
 
-Every feature file in this directory is consumed at two test levels. The step implementations
-differ but the Gherkin scenarios are identical:
+Every feature file is consumed at two test levels. Step implementations differ; Gherkin
+scenarios are identical:
 
-| Level       | Test File Pattern                           | Step Implementation                             | Nx Target          |
-| ----------- | ------------------------------------------- | ----------------------------------------------- | ------------------ |
-| Unit        | `cmd/{domain}_{action}_test.go`             | Mocked I/O via package-level function variables | `test:unit`        |
-| Integration | `cmd/{domain}_{action}.integration_test.go` | Real filesystem via `/tmp` fixtures             | `test:integration` |
+| Level       | Test File Pattern                    | Step Implementation                         | Nx Target          |
+| ----------- | ------------------------------------ | ------------------------------------------- | ------------------ |
+| Unit        | `src/**/*.rs` (`#[cfg(test)]` block) | In-source mocks via pure functions          | `test:quick`       |
+| Integration | `tests/cli/<domain>_<action>.rs`     | Real binary via `assert_cmd` + `predicates` | `test:integration` |
+| Cucumber    | `tests/cucumber/` (harness deferred) | cucumber-rs step definitions (future)       | `spec-coverage`    |
 
-Coverage is measured at the unit level only (≥95% line coverage).
+Coverage is measured at the unit level only (≥90% line coverage via `cargo llvm-cov`).
 
 ## Convention
 

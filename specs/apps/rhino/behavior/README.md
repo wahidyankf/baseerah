@@ -13,9 +13,9 @@ step implementations against the right glob.
 
 ## Perspectives
 
-| Perspective | Background                          | Step style                           | Consumed by                                        |
-| ----------- | ----------------------------------- | ------------------------------------ | -------------------------------------------------- |
-| `cli`       | `Given the CLI binary is available` | `runs`, exit code, output assertions | `apps/rhino-cli` (Go test + godog, `cli/gherkin/`) |
+| Perspective | Background                          | Step style                           | Consumed by                                                         |
+| ----------- | ----------------------------------- | ------------------------------------ | ------------------------------------------------------------------- |
+| `cli`       | `Given the CLI binary is available` | `runs`, exit code, output assertions | `apps/rhino-cli` (Rust `cargo test` + `assert_cmd`, `cli/gherkin/`) |
 
 ## Related
 

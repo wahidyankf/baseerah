@@ -73,55 +73,74 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 2 — Standards-doc consistency fixes
 
-- [ ] **2.1** `docs/.../rust/README.md`: replace any hardcoded "Rust 1.82+" / "Rust 1.X" prose with a link of the form `MSRV declared in Cargo.toml` pointing at `apps/rhino-cli/Cargo.toml` (relative path computed at edit time).
-- [ ] **2.2** `docs/.../rust/coding-standards.md` line 176: update `channel = "1.82.0"` example to current pin (`1.95.0` or whatever `rust-toolchain.toml` shows on edit day).
-- [ ] **2.3.1** C-01: Edit `docs/explanation/software-engineering/programming-languages/rust/README.md` —
+- [x] **2.1** `docs/.../rust/README.md`: replace any hardcoded "Rust 1.82+" / "Rust 1.X" prose with a link of the form `MSRV declared in Cargo.toml` pointing at `apps/rhino-cli/Cargo.toml` (relative path computed at edit time).
+  - Date: 2026-05-23 | Status: done | Files Changed: docs/.../rust/README.md | Notes: Replaced description, tags, body version text, and footer. grep 1.82 → 0 matches.
+- [x] **2.2** `docs/.../rust/coding-standards.md` line 176: update `channel = "1.82.0"` example to current pin (`1.95.0` or whatever `rust-toolchain.toml` shows on edit day).
+  - Date: 2026-05-23 | Status: done | Files Changed: docs/.../rust/coding-standards.md | Notes: channel "1.82.0" → "1.95.0". Footer updated to Edition 2024. grep 1.82 → 0 matches.
+- [x] **2.3.1** C-01: Edit `docs/explanation/software-engineering/programming-languages/rust/README.md` —
       replace hardcoded "Rust 1.82+" prose with a link pointing to `apps/rhino-cli/Cargo.toml`
       (`rust-version` field). Acceptance criterion: `grep -n '1\.82' docs/.../rust/README.md`
       returns zero matches.
-- [ ] **2.3.2** C-02: Edit `docs/explanation/software-engineering/programming-languages/rust/coding-standards.md`
+  - Date: 2026-05-23 | Status: done | Notes: grep 1.82 → 0 ✓ (same as 2.1)
+- [x] **2.3.2** C-02: Edit `docs/explanation/software-engineering/programming-languages/rust/coding-standards.md`
       line 176 — update `channel = "1.82.0"` to current `rust-toolchain.toml` pin (e.g. `"1.95.0"`).
       Acceptance criterion: `grep -n '1\.82' docs/.../rust/coding-standards.md` returns zero matches.
-- [ ] **2.3.3** C-03: Full rewrite of `specs/apps/rhino/README.md` (covered in Phase 3 items 3.5–3.7).
+  - Date: 2026-05-23 | Status: done | Notes: grep 1.82 → 0 ✓ (same as 2.2)
+- [x] **2.3.3** C-03: Full rewrite of `specs/apps/rhino/README.md` (covered in Phase 3 items 3.5–3.7).
       Mark complete when Phase 3 is complete. Acceptance criterion: `grep -n 'godog\|go test\|go run\|\.go\b' specs/apps/rhino/README.md` returns zero matches.
-- [ ] **2.3.4** C-04: Edit `repo-governance/development/quality/code.md` — add a discoverable link
+  - Date: 2026-05-23 | Status: done | Files Changed: specs/apps/rhino/README.md, specs/apps/rhino/behavior/README.md | Notes: grep → 0 ✓
+- [x] **2.3.4** C-04: Edit `repo-governance/development/quality/code.md` — add a discoverable link
       to `docs/.../rust/code-quality-standards.md` referencing the `forbid(unsafe_code)` MUST clause
       at line 246. Acceptance criterion: `grep -n 'forbid\|unsafe' repo-governance/development/quality/code.md`
       returns at least one match with a link.
+  - Date: 2026-05-23 | Status: done | Files Changed: repo-governance/development/quality/code.md | Notes: Link added to Related Documentation section. grep forbid → 1 match ✓
 - [ ] **2.3.5** C-05: Add a "Dependency Status" section to `apps/rhino-cli/README.md` documenting
       every stale dependency decision from Phase 4 (chrono, glob, sha2, tempfile) with date and
       Dependency Bump Policy path (A/B/C). Acceptance criterion: `grep -n 'Dependency Status'
 apps/rhino-cli/README.md` returns a match.
-- [ ] **2.3.6** C-06: Add a one-line clarification note to `apps/rhino-cli/README.md` (or
+- [x] **2.3.6** C-06: Add a one-line clarification note to `apps/rhino-cli/README.md` (or
       `rust-toolchain.toml` header comment) explaining that `rust-version` in `Cargo.toml` is the
       MSRV while `channel` in `rust-toolchain.toml` is the installed toolchain — both are correct.
       Acceptance criterion: file contains the clarification text and `npm run lint:md` exits 0.
-- [ ] **2.4** Add a discoverable link from `repo-governance/development/quality/code.md` to `docs/.../rust/code-quality-standards.md` §246 (`forbid(unsafe_code)` MUST clause) — resolves C-04.
-- [ ] **2.5** Cross-check `swe-rust-dev.md` and `swe-programming-rust/SKILL.md` for any version claim; align with Cargo.toml link.
-- [ ] **2.6** Run `npm run lint:md` after each edit batch.
+  - Date: 2026-05-23 | Status: done | Files Changed: apps/rhino-cli/README.md | Notes: Note (C-06) block added to Installation section. lint:md → 0 ✓
+- [x] **2.4** Add a discoverable link from `repo-governance/development/quality/code.md` to `docs/.../rust/code-quality-standards.md` §246 (`forbid(unsafe_code)` MUST clause) — resolves C-04.
+  - Date: 2026-05-23 | Status: done | Notes: Same as 2.3.4
+- [x] **2.5** Cross-check `swe-rust-dev.md` and `swe-programming-rust/SKILL.md` for any version claim; align with Cargo.toml link.
+  - Date: 2026-05-23 | Status: done | Files Changed: .claude/skills/swe-programming-rust/SKILL.md | Notes: swe-rust-dev.md had no version claims. SKILL.md rustfmt.toml example edition=2021 → 2024.
+- [x] **2.6** Run `npm run lint:md` after each edit batch.
+  - Date: 2026-05-23 | Status: done | Notes: lint:md → 0 errors ✓
 
 ## Phase 3 — `specs/apps/rhino/README.md` rewrite
 
-- [ ] **3.1** Read current README end-to-end; flag every Go reference inline in `local-temp/spec-readme-findings.md`.
-- [ ] **3.2** Read `apps/rhino-cli/tests/` directory to confirm the actual Rust test pipeline (unit + integration shape).
-- [ ] **3.3** Read `apps/rhino-cli/project.json` test targets to confirm exact `nx` commands.
-- [ ] **3.4** Read the memory entry `project_rhino_cli_rust_cucumber_gap.md` to capture cucumber harness deferral context.
-- [ ] **3.5** Edit `specs/apps/rhino/README.md`: rewrite the "Running the Tests" section using
+- [x] **3.1** Read current README end-to-end; flag every Go reference inline in `local-temp/spec-readme-findings.md`.
+  - Date: 2026-05-23 | Status: done | Notes: Found godog/go test/go run/.go/cmd/ refs in Running Tests, Adding New Specs, Dual Consumption sections.
+- [x] **3.2** Read `apps/rhino-cli/tests/` directory to confirm the actual Rust test pipeline (unit + integration shape).
+  - Date: 2026-05-23 | Status: done | Notes: tests/cli/ and tests/cucumber/ both empty dirs. Unit tests are in src/ as #[cfg(test)] modules.
+- [x] **3.3** Read `apps/rhino-cli/project.json` test targets to confirm exact `nx` commands.
+  - Date: 2026-05-23 | Status: done | Notes: test:quick = llvm-cov --lib; test:integration = cargo test --tests; spec-coverage = stubbed echo.
+- [x] **3.4** Read the memory entry `project_rhino_cli_rust_cucumber_gap.md` to capture cucumber harness deferral context.
+  - Date: 2026-05-23 | Status: done | Notes: 754 unit tests + shadow-diff establishes parity. Harness deferred; wire when needed.
+- [x] **3.5** Edit `specs/apps/rhino/README.md`: rewrite the "Running the Tests" section using
       `cargo test`, `nx run rhino-cli:test:quick`, and `nx run rhino-cli:test:integration`;
       remove every `go …` line. Acceptance criterion: `grep -n 'godog\|go test\|go run\|\.go\b'
 specs/apps/rhino/README.md` returns zero matches AND `npm run lint:md` exits 0.
-- [ ] **3.6** Edit `specs/apps/rhino/README.md`: rewrite the "Adding New Specs" section so
+  - Date: 2026-05-23 | Status: done | Files Changed: specs/apps/rhino/README.md | Notes: grep → 0 ✓, lint:md → 0 ✓
+- [x] **3.6** Edit `specs/apps/rhino/README.md`: rewrite the "Adding New Specs" section so
       command listings point at `apps/rhino-cli/tests/cucumber/` for Gherkin-driven scenarios
       (acknowledging the cucumber harness is currently deferred per the
       `project_rhino_cli_rust_cucumber_gap` memory) and at `tests/cli/` with `assert_cmd` +
       `predicates` for binary integration tests. Acceptance criterion: `grep -nE 'godog|go test|go run|//go:build' specs/apps/rhino/README.md`
       returns zero matches.
-- [ ] **3.7** Edit `specs/apps/rhino/README.md`: rewrite the "Dual Consumption" table replacing
+  - Date: 2026-05-23 | Status: done | Notes: grep → 0 ✓ (all three sections rewritten in single edit)
+- [x] **3.7** Edit `specs/apps/rhino/README.md`: rewrite the "Dual Consumption" table replacing
       Go file patterns (`.go`, `_test.go`, `cmd/`) with Rust equivalents (`src/`, `tests/cli/`,
       `tests/cucumber/`). Acceptance criterion: the table contains no `.go` file references AND
       `npm run lint:md` exits 0.
-- [ ] **3.8** Update "Convention" link if BDD spec-test-mapping doc has Rust-specific guidance; if not, file a follow-up note.
-- [ ] **3.9** Verify with `npm run lint:md` and a manual read.
+  - Date: 2026-05-23 | Status: done | Notes: Table updated; no .go refs ✓
+- [x] **3.8** Update "Convention" link if BDD spec-test-mapping doc has Rust-specific guidance; if not, file a follow-up note.
+  - Date: 2026-05-23 | Status: done | Notes: bdd-spec-test-mapping.md is Go-era (godog-only). Convention link kept as is; follow-up: update bdd-spec-test-mapping.md for Rust/assert_cmd patterns when cucumber harness lands.
+- [x] **3.9** Verify with `npm run lint:md` and a manual read.
+  - Date: 2026-05-23 | Status: done | Notes: lint:md → 0 ✓. behavior/README.md F-06 also fixed (Go test + godog → Rust cargo test + assert_cmd).
 
 ## Phase 4 — Dependency currency decisions
 
