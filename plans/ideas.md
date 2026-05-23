@@ -6,6 +6,12 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 
 ## Ideas List
 
+### Rust Governance (added 2026-05-23 as rust-governance-audit after-action)
+
+- Future plan: promote `tech-docs.md §4` (Rust crate structural checklist) to
+  `repo-governance/development/quality/rust-crate-structural-checklist.md` once a second Rust crate
+  is added to `ose-public`. Single-crate evidence is insufficient to validate the abstraction level.
+
 ### AyoKoding Web (added 2026-05-22 as ayokoding-web-learn-reorg after-action)
 
 - Future plan: add canonical shape enforcement rules to `apps-ayokoding-web-by-example-checker` and `apps-ayokoding-web-in-the-field-checker` — validate that every checked topic follows the `<domain>/<area>/<topic>/{overview.md,by-example/,by-concept/,in-the-field/}` tree shape.
