@@ -803,6 +803,141 @@ mod tests {
     }
 
     #[test]
+    fn check_orphan_step_impls_flags_uncovered_exact_entries() {
+        let mut sm = StepMatcher::new();
+        sm.add_exact_with_origin("user logs in", "/repo/x.rs");
+        sm.add_exact_with_origin("orphaned step", "/repo/y.rs");
+        let gherkin = vec!["user logs in".to_string()];
+        let orphans = check_orphan_step_impls(&sm, &gherkin, Path::new("/repo"));
+        assert_eq!(orphans.len(), 1);
+        assert_eq!(orphans[0].matcher_text, "orphaned step");
+        assert_eq!(orphans[0].matcher_kind, "exact");
+        // Path becomes repo-relative.
+        assert_eq!(orphans[0].file, "y.rs");
+    }
+
+    #[test]
+    fn check_orphan_step_impls_handles_pattern_entries() {
+        let mut sm = StepMatcher::new();
+        let re = Regex::new(r"^count is \d+$").unwrap();
+        sm.add_pattern_with_origin(re, r"^count is \d+$", "/repo/x.rs");
+        let orphans_no_match =
+            check_orphan_step_impls(&sm, &["different step".to_string()], Path::new("/repo"));
+        assert_eq!(orphans_no_match.len(), 1);
+        assert_eq!(orphans_no_match[0].matcher_kind, "pattern");
+
+        // Now with a matching Gherkin step.
+        let orphans_match =
+            check_orphan_step_impls(&sm, &["count is 42".to_string()], Path::new("/repo"));
+        assert_eq!(orphans_match.len(), 0);
+    }
+
+    #[test]
+    fn check_orphan_step_impls_empty_matcher_returns_empty() {
+        let sm = StepMatcher::new();
+        let orphans = check_orphan_step_impls(&sm, &["a".to_string()], Path::new("/repo"));
+        assert!(orphans.is_empty());
+    }
+
+    #[test]
+    fn step_covered_with_variants_requires_all_to_match() {
+        let mut sm = StepMatcher::new();
+        sm.add_exact_with_origin("user enters A", "x.rs");
+        sm.add_exact_with_origin("user enters B", "x.rs");
+        let step = ParsedStep {
+            keyword: "Given".to_string(),
+            text: "user enters <state>".to_string(),
+            variants: vec!["user enters A".to_string(), "user enters B".to_string()],
+        };
+        assert!(step_covered(&sm, &step));
+
+        let step_partial = ParsedStep {
+            keyword: "Given".to_string(),
+            text: "user enters <state>".to_string(),
+            variants: vec!["user enters A".to_string(), "user enters C".to_string()],
+        };
+        assert!(!step_covered(&sm, &step_partial));
+    }
+
+    #[test]
+    fn extract_ts_scenario_titles_picks_up_double_quoted_title() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("x.test.ts");
+        std::fs::write(
+            &p,
+            "Scenario(\"User logs in\", () => {});\nScenario('Another title', () => {});\n",
+        )
+        .unwrap();
+        let titles = extract_ts_scenario_titles(&p).unwrap();
+        assert!(titles.contains("User logs in"));
+        assert!(titles.contains("Another title"));
+    }
+
+    #[test]
+    fn extract_go_scenario_titles_picks_up_comment() {
+        let tmp = TempDir::new().unwrap();
+        let p = tmp.path().join("x_test.go");
+        std::fs::write(&p, "// Scenario: Foo bar baz\nfunc Test() {}\n").unwrap();
+        let titles = extract_go_scenario_titles(&p).unwrap();
+        assert!(titles.contains("Foo bar baz"));
+    }
+
+    #[test]
+    fn extract_scenario_titles_dispatches_by_extension() {
+        let tmp = TempDir::new().unwrap();
+        let go = tmp.path().join("x_test.go");
+        std::fs::write(&go, "// Scenario: Go T\n").unwrap();
+        assert!(extract_scenario_titles(&go).unwrap().contains("Go T"));
+
+        let ts = tmp.path().join("x.test.ts");
+        std::fs::write(&ts, "Scenario(\"TS T\", () => {});\n").unwrap();
+        assert!(extract_scenario_titles(&ts).unwrap().contains("TS T"));
+
+        // Auto-bind frameworks return empty.
+        let fs = tmp.path().join("x.fs");
+        std::fs::write(&fs, "// nothing\n").unwrap();
+        assert!(extract_scenario_titles(&fs).unwrap().is_empty());
+    }
+
+    #[test]
+    fn find_all_matching_test_files_respects_skip_dirs() {
+        let tmp = TempDir::new().unwrap();
+        std::fs::create_dir_all(tmp.path().join("node_modules")).unwrap();
+        std::fs::create_dir_all(tmp.path().join("src")).unwrap();
+        std::fs::write(tmp.path().join("node_modules/x.test.ts"), "").unwrap();
+        std::fs::write(tmp.path().join("src/x.test.ts"), "").unwrap();
+        let matches = find_all_matching_test_files(tmp.path(), "x").unwrap();
+        assert_eq!(matches.len(), 1);
+        assert!(matches[0].to_string_lossy().contains("src"));
+    }
+
+    #[test]
+    fn find_all_matching_test_files_returns_empty_for_missing_dir() {
+        let matches = find_all_matching_test_files(Path::new("/nonexistent"), "x").unwrap();
+        assert!(matches.is_empty());
+    }
+
+    #[test]
+    fn collect_feature_files_falls_back_to_specs_dir_when_dirs_empty() {
+        let tmp = TempDir::new().unwrap();
+        let specs = tmp.path().join("specs");
+        std::fs::create_dir_all(&specs).unwrap();
+        std::fs::write(specs.join("x.feature"), "Feature: x").unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            specs_dir: specs.clone(),
+            specs_dirs: vec![],
+            app_dir: PathBuf::new(),
+            verbose: false,
+            quiet: false,
+            shared_steps: false,
+            exclude_dirs: vec![],
+        };
+        let files = collect_feature_files(&opts).unwrap();
+        assert_eq!(files.len(), 1);
+    }
+
+    #[test]
     fn check_all_shared_steps_skips_file_matching() {
         let tmp = TempDir::new().unwrap();
         let specs = tmp.path().join("specs");
