@@ -281,16 +281,16 @@ The repository uses `rhino-cli` for environment file management:
 
 ```bash
 # Initialize .env files from .env.example templates
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env init
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env init
 
 # Backup current .env files
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env backup
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env backup
 
 # Restore .env files from backup
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env restore --force
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env restore --force
 
 # Restore including config files (AI tool settings, Docker overrides, etc.)
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env restore --force --include-config
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env restore --force --include-config
 ```
 
 ### When to Run Environment Setup

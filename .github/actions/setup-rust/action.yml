@@ -2,7 +2,7 @@ name: "Setup Rust"
 description: "Install Rust toolchain pinned by rust-toolchain.toml, with build cache and cargo-llvm-cov"
 inputs:
   cargo-llvm-cov-version:
-    description: "cargo-llvm-cov version (used by rhino-cli-rs test:quick coverage gate)"
+    description: "cargo-llvm-cov version (used by rhino-cli test:quick coverage gate)"
     required: false
     default: "0.8.5"
 runs:
@@ -18,7 +18,7 @@ runs:
       uses: Swatinem/rust-cache@v2
       with:
         workspaces: "apps/rhino-cli -> target"
-        shared-key: "rhino-cli-rs"
+        shared-key: "rhino-cli"
 
     - name: Install cargo-llvm-cov
       shell: bash

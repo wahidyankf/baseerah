@@ -202,10 +202,10 @@ restore them:
 
 ```bash
 # Restore .env files from default backup location (~/ose-open-env-backup)
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env restore --force
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env restore --force
 
 # Also restore uncommitted config files (AI tool settings, Docker overrides, etc.)
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env restore --force --include-config
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env restore --force --include-config
 ```
 
 If this is a fresh setup with no backup, copy `.env.example` to `.env` in each app you
@@ -214,7 +214,7 @@ plan to work on and fill in the required values.
 To create a backup for future use:
 
 ```bash
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go env backup --include-config
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env backup --include-config
 ```
 
 ### Step 8: Install Playwright Browsers

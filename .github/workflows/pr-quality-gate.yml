@@ -187,7 +187,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-golang
+      - uses: ./.github/actions/setup-rust
       - run: npx nx run rhino-cli:validate:naming-agents
       - run: npx nx run rhino-cli:validate:naming-workflows
 
@@ -197,7 +197,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-golang
+      - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --projects=rhino-cli
 
   quality-gate:

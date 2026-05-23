@@ -134,7 +134,7 @@ mod tests {
         let args = ValidateArgs {
             paths: vec![
                 "specs/apps/rhino/behavior/cli/gherkin".to_string(),
-                "apps/rhino-cli-rs/scripts".to_string(), // wrong dir → 0 step matchers → step gaps
+                "apps/rhino-cli/scripts".to_string(), // wrong dir → 0 step matchers → step gaps
             ],
             shared_steps: true,
             exclude_dir: vec![],
@@ -148,7 +148,7 @@ mod tests {
         let args = ValidateArgs {
             paths: vec![
                 "specs/apps/rhino/behavior/cli/gherkin".to_string(),
-                "apps/rhino-cli-rs/scripts".to_string(),
+                "apps/rhino-cli/scripts".to_string(),
             ],
             shared_steps: true,
             exclude_dir: vec![],

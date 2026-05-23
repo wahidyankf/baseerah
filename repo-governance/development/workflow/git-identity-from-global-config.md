@@ -153,7 +153,7 @@ git config --local --remove-section user 2>/dev/null || true
 
 ```bash
 ./scripts/git-identity-check.sh
-CGO_ENABLED=0 go run -C apps/rhino-cli main.go git pre-commit
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- git pre-commit
 ```
 
 The identity check runs before `rhino-cli` to ensure an invalid identity cannot slip

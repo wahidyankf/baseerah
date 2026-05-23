@@ -16,7 +16,7 @@ Production. All commands ported and byte-identical to the original Go binary acr
 
 ```bash
 # Build the release binary (Nx)
-nx build rhino-cli-rs
+nx build rhino-cli
 
 # Run the binary
 cargo run --manifest-path apps/rhino-cli/Cargo.toml -- --help
@@ -36,7 +36,7 @@ The crate is local to this monorepo. To produce a standalone binary:
 cd apps/rhino-cli
 cargo build --release
 # Binary at apps/rhino-cli/target/release/rhino-cli
-# Or via Nx: nx build rhino-cli-rs → apps/rhino-cli/dist/rhino-cli
+# Or via Nx: nx build rhino-cli → apps/rhino-cli/dist/rhino-cli
 ```
 
 Toolchain is pinned to Rust 1.95.0 via `rust-toolchain.toml`; the first `cargo` call inside this crate auto-bootstraps the toolchain through `rustup`. MSRV is 1.88 (`cucumber 0.23.0` bound).
@@ -68,6 +68,6 @@ Mirror the Go binary's Cobra root command (`apps/rhino-cli/cmd/root.go:23`):
 
 ## See also
 
-- Go implementation (archived at cutover): [`apps/rhino-cli/README.md`](../rhino-cli/README.md)
-- Migration plan: [`plans/in-progress/rhino-cli-rust-rewrite/`](../../plans/in-progress/rhino-cli-rust-rewrite/README.md)
+- Go implementation (archived at cutover): [`archived/rhino-cli/README.md`](../../archived/rhino-cli/README.md)
+- Migration plan (completed 2026-05-23): [`plans/done/2026-05-23__rhino-cli-rust-rewrite/`](../../plans/done/2026-05-23__rhino-cli-rust-rewrite/README.md)
 - Gherkin specs (shared with Go binary): [`specs/apps/rhino/behavior/cli/gherkin/`](../../specs/apps/rhino/behavior/cli/gherkin/)
