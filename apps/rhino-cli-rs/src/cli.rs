@@ -4,12 +4,12 @@ use crate::commands::{
     agents_detect_duplication, agents_sync, agents_validate_claude, agents_validate_naming,
     agents_validate_sync, ddd_bc, ddd_ul, docs_validate_frontmatter,
     docs_validate_heading_hierarchy, docs_validate_links, docs_validate_mermaid,
-    docs_validate_naming, git_pre_commit, governance_agents_md_size, governance_audit,
-    governance_emoji_audit, governance_frontmatter_audit, governance_layer_coherence,
-    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
-    governance_vendor_audit, spec_coverage_validate, specs_validate_adoption,
-    specs_validate_counts, specs_validate_links, specs_validate_tree, test_coverage_validate,
-    workflows_validate_naming,
+    docs_validate_naming, env_backup, env_init, env_restore, git_pre_commit,
+    governance_agents_md_size, governance_audit, governance_emoji_audit,
+    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
+    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
+    spec_coverage_validate, specs_validate_adoption, specs_validate_counts, specs_validate_links,
+    specs_validate_tree, test_coverage_validate, workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -89,6 +89,9 @@ pub enum Commands {
     /// Git hook helpers (pre-commit).
     #[command(name = "git", subcommand)]
     Git(GitCommands),
+    /// Environment file helpers (init, backup, restore).
+    #[command(name = "env", subcommand)]
+    Env(EnvCommands),
 }
 
 #[derive(Subcommand, Debug)]
@@ -96,6 +99,19 @@ pub enum GitCommands {
     /// Run all pre-commit checks (config, lint, format, docs).
     #[command(name = "pre-commit")]
     PreCommit(git_pre_commit::PreCommitArgs),
+}
+
+#[derive(Subcommand, Debug)]
+pub enum EnvCommands {
+    /// Create .env files from .env.example templates.
+    #[command(name = "init")]
+    Init(env_init::EnvInitArgs),
+    /// Back up .env files from the repository.
+    #[command(name = "backup")]
+    Backup(env_backup::EnvBackupArgs),
+    /// Restore .env files from a backup.
+    #[command(name = "restore")]
+    Restore(env_restore::EnvRestoreArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -327,6 +343,11 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
         },
         Commands::Git(gc) => match gc {
             GitCommands::PreCommit(args) => git_pre_commit::run_cmd(args, output_format),
+        },
+        Commands::Env(ec) => match ec {
+            EnvCommands::Init(args) => env_init::run(args, output_format),
+            EnvCommands::Backup(args) => env_backup::run(args, output_format),
+            EnvCommands::Restore(args) => env_restore::run(args, output_format),
         },
     };
     match result {
