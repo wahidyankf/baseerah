@@ -17,7 +17,7 @@ End-to-end audit ensuring every Rust artefact in `ose-public` is **consistent**,
 Between the `rhino-cli` Go→Rust port (landed 2026-05-23, see [plans/done/2026-05-23\_\_rhino-cli-rust-rewrite/](../../done/2026-05-23__rhino-cli-rust-rewrite/)) and the recent `forbid(unsafe_code)` addition, governance drift accumulated:
 
 - `specs/apps/rhino/README.md` still describes the Go-era tooling (`godog`, `.go` files, `//go:build integration` tags) — the spec README is now factually wrong about its own crate.
-- The Rust toolchain version is declared in three places with three different values: `docs/.../rust/README.md` says `1.82+`, `coding-standards.md` example pins `1.82.0`, `Cargo.toml` has `rust-version = "1.88"`, and `rust-toolchain.toml` pins `1.95.0`.
+- The Rust toolchain version is declared in four places with three distinct numeric values: `docs/.../rust/README.md` says `1.82+`, `coding-standards.md` example pins `1.82.0`, `Cargo.toml` has `rust-version = "1.88"`, and `rust-toolchain.toml` pins `1.95.0`.
 - Three Cargo dependencies are behind upstream (`chrono` minor, `glob` patch, `sha2` **major**, `tempfile` 13 patches with a breaking rename); none triggers a CVE but the Dependency Bump Policy expects an explicit decision per crate.
 - `unsafe` Rust is a hard-line non-goal; the `forbid(unsafe_code)` invariant must be encoded into governance docs (not just crate roots) so it cannot regress.
 - Code structure compliance (module boundaries, error-handling shape, lint configuration, public API surface) has not been audited against the platform Rust standards since the port.

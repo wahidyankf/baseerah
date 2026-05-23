@@ -33,7 +33,7 @@ After this plan executes, the following statements are true and verifiable:
 - `repo-governance/` contains a written rule mandating `#![forbid(unsafe_code)]` for OSE application crates with a documented escape hatch only for infrastructure crates (the existing `code-quality-standards.md` MUST clause is referenced from a discoverable index entry).
 - `rhino-cli` source code passes a structural compliance audit against the platform Rust standards (naming, error handling, module layout, public API surface, lint configuration).
 - A static `cargo audit` and `cargo deny check` invocation are wired into either CI or a pre-merge target so the next dependency CVE is caught automatically.
-- All four `1.95.0`/`1.88` reconciliation findings, three dependency-currency findings, and one spec-README staleness finding from the kickoff web-research report are closed with diffs in the commit history.
+- All six audit findings from `tech-docs.md §3` (two version-reconciliation rows C-01/C-02, one spec-README Go-residue row C-03, one cross-link gap C-04, one dependency-status gap C-05, one MSRV-vs-pin clarification C-06) plus the four dependency-currency rows from `tech-docs.md §2.2–2.3` (chrono, glob, sha2, tempfile) are each closed with a corresponding diff in the commit history.
 
 ## Non-goals
 
@@ -52,4 +52,4 @@ After this plan executes, the following statements are true and verifiable:
 
 ## Success metric
 
-Zero findings on a re-run of the kickoff audit checklist after delivery, plus all six Gherkin scenarios in [prd.md](./prd.md) pass.
+Zero findings on a re-run of the kickoff audit checklist after delivery, plus all seven Gherkin scenarios in [prd.md](./prd.md) pass.

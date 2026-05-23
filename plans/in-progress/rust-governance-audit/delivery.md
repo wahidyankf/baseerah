@@ -23,17 +23,17 @@ Granular, item-per-commit-friendly checklist. Items use `- [ ]` so a future exec
 ## Phase 1 — Inventory & static contradiction sweep
 
 - [ ] **1.1** Build an artefact list by `find` over the five categories listed in `tech-docs.md §1`; save to `local-temp/rust-audit-artefacts.txt`.
-- [ ] **1.2** For each of the 14 docs in `docs/.../rust/`, grep for hardcoded Rust version numbers (`1\.[0-9]+`); record findings.
+- [ ] **1.2** For each of the 13 standards docs plus the `templates/` subdir under `docs/.../rust/`, grep for hardcoded Rust version numbers (`1\.[0-9]+`); record findings.
 - [ ] **1.3** Grep `repo-governance/` for the same Rust version pattern; record findings.
 - [ ] **1.4** Grep `specs/apps/rhino/` for Go-era strings: `godog`, `\.go\b`, `go test`, `go run`, `//go:build`, `cmd/`; record line numbers.
-- [ ] **1.5** Run pair-wise MUST/MUST NOT contradiction scan across the 14 standards docs (manual review of high-signal pairs identified in `tech-docs.md §5.1`); record findings.
+- [ ] **1.5** Run pair-wise MUST/MUST NOT contradiction scan across the 13 standards docs plus the 9 cross-cutting governance files (manual review of high-signal pairs identified in `tech-docs.md §5.1`); record findings.
 - [ ] **1.6** Compile findings into `generated-reports/rust-governance-audit__inventory__2026-05-23.md` with a finding ID per row (F-01, F-02, ...).
 
 ## Phase 2 — Standards-doc consistency fixes
 
 - [ ] **2.1** `docs/.../rust/README.md`: replace any hardcoded "Rust 1.82+" / "Rust 1.X" prose with a link of the form `MSRV declared in Cargo.toml` pointing at `apps/rhino-cli/Cargo.toml` (relative path computed at edit time).
 - [ ] **2.2** `docs/.../rust/coding-standards.md` line 176: update `channel = "1.82.0"` example to current pin (`1.95.0` or whatever `rust-toolchain.toml` shows on edit day).
-- [ ] **2.3** Pair-wise resolve every remaining contradiction in `tech-docs.md §3` table (C-01 through C-06). One commit per resolution.
+- [ ] **2.3** Pair-wise resolve every contradiction (C-01 through C-05) in `tech-docs.md §3` and apply the C-06 clarification note. One commit per resolution.
 - [ ] **2.4** Add a discoverable link from `repo-governance/development/quality/code.md` to `docs/.../rust/code-quality-standards.md` §246 (`forbid(unsafe_code)` MUST clause) — resolves C-04.
 - [ ] **2.5** Cross-check `swe-rust-dev.md` and `swe-programming-rust/SKILL.md` for any version claim; align with Cargo.toml link.
 - [ ] **2.6** Run `npm run lint:md` after each edit batch.

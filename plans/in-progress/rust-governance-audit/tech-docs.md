@@ -131,18 +131,18 @@ Confidence labels: [Verified] = research report cites docs.rs; [Outdated] = decl
 | Clippy baseline                          | `clippy::all` + opt-in `clippy::pedantic` with targeted `#[allow]`; do NOT enable `clippy::nursery` wholesale | [Verified] — official Clippy docs                             |
 | `cargo audit` cadence                    | Per-CI run + dependabot-style watch                                                                           | [Verified]                                                    |
 
-## 3. Contradiction Catalogue
+## 3. Findings Catalogue
 
-Discovered before delivery; each one becomes a delivery item.
+Five contradictions and one clarification discovered before delivery; each one becomes a delivery item. Rows C-01 through C-05 are genuine contradictions to resolve; row C-06 is a clarification (the MSRV-vs-pin distinction is structurally correct but is easy to misread, so it ships as a documentation note rather than a code change).
 
-| ID   | Statement A                                                   | Statement B                                                    | Resolution                                                               |
-| ---- | ------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| C-01 | `docs/.../rust/README.md`: "Rust 1.82+"                       | `Cargo.toml`: `rust-version = "1.88"`                          | Replace prose with link to `Cargo.toml`                                  |
-| C-02 | `coding-standards.md`: `channel = "1.82.0"` example           | `rust-toolchain.toml`: `channel = "1.95.0"`                    | Update example to current pin                                            |
-| C-03 | `specs/apps/rhino/README.md`: `go test`, `godog`, `.go` files | `apps/rhino-cli/`: Rust crate, `cargo test`, deferred cucumber | Full rewrite to Rust                                                     |
-| C-04 | `code-quality-standards.md:246`: "MUST forbid(unsafe_code)"   | No discoverable cross-reference from `quality/code.md`         | Add link from `code.md`                                                  |
-| C-05 | `apps/rhino-cli/README.md`: no dependency status section      | Three deps stale per research                                  | Add "Dependency Status" section OR resolve all stale deps                |
-| C-06 | `Cargo.toml` `rust-version = "1.88"`                          | `rust-toolchain.toml` `channel = "1.95.0"`                     | **Not** a contradiction; MSRV ≤ pin. Document the distinction in README. |
+| ID   | Type          | Statement A                                                   | Statement B                                                    | Resolution                                                                                                                                    |
+| ---- | ------------- | ------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| C-01 | Contradiction | `docs/.../rust/README.md`: "Rust 1.82+"                       | `Cargo.toml`: `rust-version = "1.88"`                          | Replace prose with link to `Cargo.toml`                                                                                                       |
+| C-02 | Contradiction | `coding-standards.md`: `channel = "1.82.0"` example           | `rust-toolchain.toml`: `channel = "1.95.0"`                    | Update example to current pin                                                                                                                 |
+| C-03 | Contradiction | `specs/apps/rhino/README.md`: `go test`, `godog`, `.go` files | `apps/rhino-cli/`: Rust crate, `cargo test`, deferred cucumber | Full rewrite to Rust                                                                                                                          |
+| C-04 | Contradiction | `code-quality-standards.md:246`: "MUST forbid(unsafe_code)"   | No discoverable cross-reference from `quality/code.md`         | Add link from `code.md`                                                                                                                       |
+| C-05 | Contradiction | `apps/rhino-cli/README.md`: no dependency status section      | Three production deps + one dev-dep stale per research         | Add "Dependency Status" section AND/OR resolve all stale deps                                                                                 |
+| C-06 | Clarification | `Cargo.toml` `rust-version = "1.88"`                          | `rust-toolchain.toml` `channel = "1.95.0"`                     | Structurally correct (MSRV ≤ installed toolchain); add a one-line note to `README.md` so future readers do not misread it as a contradiction. |
 
 ## 4. Code Structure Best-Practice Checklist
 
@@ -205,7 +205,7 @@ Applied during the structural audit phase against `apps/rhino-cli/src/`.
 
 ### 5.1 Pair-wise contradiction sweep
 
-For the 14 standards docs × 7 cross-cutting governance files = 98 pair comparisons. Reduce to the ~25 pairs that share at least one keyword (Rust version, framework name, lint set, unsafe policy). Manual review; record findings in a checker-style report at `generated-reports/rust-governance-audit__YYYY-MM-DD.md` with UUID chain.
+For the 13 standards docs (excluding the `templates/` subdir) × the 9 cross-cutting governance files enumerated in §1.4 = 117 ordered pair comparisons (58 unordered). Reduce to the ~25 pairs that share at least one keyword (Rust version, framework name, lint set, unsafe policy). Manual review; record findings in a checker-style report at `generated-reports/rust-governance-audit__YYYY-MM-DD.md` with UUID chain.
 
 ### 5.2 Re-validation loop
 
@@ -228,7 +228,7 @@ If any dependency action takes more than a week, re-invoke `web-research-maker` 
 
 - **AyoKoding Rust learning content** is separate platform; if any tutorial there contradicts the standards, file a finding linking to this plan but do not edit cross-platform.
 - **`archived/rhino-cli/`** (Go preserved copy) is read-only history; do not edit during this audit.
-- **Future Rust crates** beyond `rhino-cli` should adopt the same audit checklist; consider promoting Section 4 into a `repo-governance/development/quality/rust-crate-structural-checklist.md` document — flagged as a Phase 5 enhancement.
+- **Future Rust crates** beyond `rhino-cli` should adopt the same audit checklist; consider promoting Section 4 into a `repo-governance/development/quality/rust-crate-structural-checklist.md` document — flagged in `delivery.md` step 10.7 as a post-delivery decision.
 
 ## 7. References
 

@@ -44,7 +44,7 @@ No silent stale dependencies.
 
 ### FR-5. Code structure complies with platform Rust standards
 
-`apps/rhino-cli/src/` MUST pass a structural audit against the eight standards documents under `docs/.../rust/`:
+`apps/rhino-cli/src/` MUST pass a structural audit against the eleven standards documents under `docs/.../rust/` (excluding the `README.md` index, `build-configuration.md`, and the `templates/` subdir which are reference-only):
 
 | Standard                         | Specific check                                                                                                                    |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,7 +62,7 @@ No silent stale dependencies.
 
 ### FR-6. Cross-doc contradictions resolved
 
-Pair-wise comparison of every Rust-naming governance doc against every other yields zero contradictory MUST/MUST NOT statements. Comparison scope: 14 docs in `docs/.../rust/`, 7 cross-cutting governance files, agent + skill files.
+Pair-wise comparison of every Rust-naming governance doc against every other yields zero contradictory MUST/MUST NOT statements. Comparison scope: 13 standards docs plus 1 templates subdir under `docs/.../rust/`, 9 cross-cutting governance files enumerated in `tech-docs.md §1.4`, plus the `swe-rust-dev` agent file (Claude + OpenCode mirror) and the `swe-programming-rust` skill file.
 
 ### FR-7. Web-research findings encoded
 
@@ -124,12 +124,12 @@ Feature: Rust governance is consistent, correct, current, and contradiction-free
 
   Scenario: Code structure complies with platform Rust standards
     Given apps/rhino-cli/src/
-    When I cross-reference each module against the eleven standards documents in docs/.../rust/
+    When I cross-reference each module against the eleven standards documents under docs/.../rust/ (excluding the README index, build-configuration.md, and templates/)
     Then every applicable standard's MUST clauses are satisfied
     And any N/A standard (api, ddd, concurrency for a CLI) is explicitly justified in tech-docs.md
 
   Scenario: Cross-document contradictions are zero
-    Given the 14 docs in docs/.../rust/ plus 7 cross-cutting governance files plus the agent and skill
+    Given the 13 standards docs under docs/.../rust/, the 9 cross-cutting governance files enumerated in tech-docs.md §1.4, the swe-rust-dev agent (Claude + OpenCode mirror), and the swe-programming-rust skill
     When I run a pair-wise audit comparing MUST/MUST NOT statements
     Then no two documents make conflicting normative claims
 
