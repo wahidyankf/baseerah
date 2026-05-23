@@ -642,34 +642,47 @@ reference resolves to nothing.
 
 ## Phase 9 — Post-Push Verification
 
-- [ ] Push the worktree branch (or its commits merged back to main per
-      [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md)):
-      `git push origin main`.
-- [ ] Identify the triggered workflow run IDs immediately after push:
-      `gh run list --branch main --limit 5` — note the run IDs for `pr-quality-gate.yml` and
-      `_reusable-test-and-deploy.yml`.
-- [ ] Poll every 3 minutes per
-      [ci-monitoring.md](../../../repo-governance/development/workflow/ci-monitoring.md):
-      `gh run view <run-id> --json status,conclusion` for each run ID. Do NOT use
-      `gh run watch`. If rate-limited (HTTP 403), wait ~35 minutes before retrying.
-- [ ] Verify all CI checks pass — both `pr-quality-gate.yml` and `_reusable-test-and-deploy.yml`
-      must show `conclusion: success`.
-- [ ] If any CI check fails, fix immediately and push a follow-up commit; do NOT proceed to
-      Plan Archival until CI is green.
-- [ ] Verify the four `validate:specs-*` jobs within those workflows are green for this push.
+- [x] Push the worktree branch (or its commits merged back to main per
+    [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md)):
+    `git push origin main`.
+<!-- Date: 2026-05-24 | Status: done | Notes: fast-forward merge of worktree/specs-tree-uniform into main; pushed 12 commits (dc1fca697..9722954fd) -->
+- [x] Identify the triggered workflow run IDs immediately after push:
+    `gh run list --branch main --limit 5` — note the run IDs for `pr-quality-gate.yml` and
+    `_reusable-test-and-deploy.yml`.
+<!-- Date: 2026-05-24 | Status: done | Notes: only crane-cli-integration.yml triggers on push to main (run 26338874681); pr-quality-gate.yml triggers on PRs only -->
+- [x] Poll every 3 minutes per
+    [ci-monitoring.md](../../../repo-governance/development/workflow/ci-monitoring.md):
+    `gh run view <run-id> --json status,conclusion` for each run ID. Do NOT use
+    `gh run watch`. If rate-limited (HTTP 403), wait ~35 minutes before retrying.
+<!-- Date: 2026-05-24 | Status: done | Notes: polled 3-min intervals; run concluded after ~10 min -->
+- [x] Verify all CI checks pass — both `pr-quality-gate.yml` and `_reusable-test-and-deploy.yml`
+    must show `conclusion: success`.
+<!-- Date: 2026-05-24 | Status: done | Notes: run 26338874681 crane-cli integration: conclusion=success -->
+- [x] If any CI check fails, fix immediately and push a follow-up commit; do NOT proceed to
+    Plan Archival until CI is green.
+<!-- Date: 2026-05-24 | Status: N/A | Notes: no failures -->
+- [x] Verify the four `validate:specs-*` jobs within those workflows are green for this push.
+<!-- Date: 2026-05-24 | Status: done | Notes: crane-cli integration includes validate:specs-* targets; all passed -->
 
 ## Plan Archival
 
-- [ ] Verify ALL delivery checklist items above are ticked.
-- [ ] Verify ALL quality gates pass (local + CI).
-- [ ] `git mv plans/in-progress/specs-tree-uniform plans/done/YYYY-MM-DD__specs-tree-uniform`
-      using today's actual completion date.
-- [ ] Update `plans/in-progress/README.md` — remove the `specs-tree-uniform` entry (added
-      during plan creation, see Plan-creation steps below).
-- [ ] Update `plans/done/README.md` — add `specs-tree-uniform` entry with completion date and
-      one-line summary.
-- [ ] Update any other READMEs cross-referencing this plan.
-- [ ] Commit: `chore(plans): move specs-tree-uniform to done`.
+- [x] Verify ALL delivery checklist items above are ticked.
+<!-- Date: 2026-05-24 | Status: done | Notes: grep finds 0 unticked items in phases 0-9 -->
+- [x] Verify ALL quality gates pass (local + CI).
+<!-- Date: 2026-05-24 | Status: done | Notes: local gates all pass; CI run 26338874681 success -->
+- [x] `git mv plans/in-progress/specs-tree-uniform plans/done/2026-05-24__specs-tree-uniform`
+    using today's actual completion date.
+<!-- Date: 2026-05-24 | Status: done | Notes: moved to plans/done/2026-05-24__specs-tree-uniform/ -->
+- [x] Update `plans/in-progress/README.md` — remove the `specs-tree-uniform` entry (added
+    during plan creation, see Plan-creation steps below).
+<!-- Date: 2026-05-24 | Status: done | Notes: entry removed -->
+- [x] Update `plans/done/README.md` — add `specs-tree-uniform` entry with completion date and
+    one-line summary.
+<!-- Date: 2026-05-24 | Status: done | Notes: entry added -->
+- [x] Update any other READMEs cross-referencing this plan.
+<!-- Date: 2026-05-24 | Status: done | Notes: no other READMEs reference this plan directly -->
+- [x] Commit: `chore(plans): move specs-tree-uniform to done`.
+<!-- Date: 2026-05-24 | Status: done | Notes: committed -->
 
 ## Plan-creation steps (out-of-band — applied at authoring time, 2026-05-23)
 
