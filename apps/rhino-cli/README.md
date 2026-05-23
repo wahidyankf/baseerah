@@ -68,6 +68,17 @@ Global flags (see `src/cli.rs`):
 - `--say <msg>` — echo a message to stdout
 - `--help, -h` — print help
 
+## Dependency Status
+
+Reviewed 2026-05-23. Policy paths per [Dependency Bump Stability & Safety Policy](../../repo-governance/development/workflow/dependency-bump-policy.md).
+
+| Dependency | Pinned | Latest | Path | Decision                                         |
+| ---------- | ------ | ------ | ---- | ------------------------------------------------ |
+| `chrono`   | 0.4.44 | 0.4.44 | A    | Bumped from 0.4.39; patch-only                   |
+| `glob`     | 0.3.3  | 0.3.3  | A    | Bumped from 0.3.2; patch-only                    |
+| `sha2`     | 0.11.0 | 0.11.0 | A    | Bumped from 0.10.9; only `{Digest, Sha256}` used |
+| `tempfile` | 3.27.0 | 3.27.0 | A    | Bumped from 3.14.0; only `TempDir::new()` used   |
+
 ## See also
 
 - Go implementation (archived at cutover): [`archived/rhino-cli/README.md`](../../archived/rhino-cli/README.md)

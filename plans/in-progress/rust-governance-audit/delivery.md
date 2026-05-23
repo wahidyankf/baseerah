@@ -94,10 +94,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       at line 246. Acceptance criterion: `grep -n 'forbid\|unsafe' repo-governance/development/quality/code.md`
       returns at least one match with a link.
   - Date: 2026-05-23 | Status: done | Files Changed: repo-governance/development/quality/code.md | Notes: Link added to Related Documentation section. grep forbid → 1 match ✓
-- [ ] **2.3.5** C-05: Add a "Dependency Status" section to `apps/rhino-cli/README.md` documenting
+- [x] **2.3.5** C-05: Add a "Dependency Status" section to `apps/rhino-cli/README.md` documenting
       every stale dependency decision from Phase 4 (chrono, glob, sha2, tempfile) with date and
       Dependency Bump Policy path (A/B/C). Acceptance criterion: `grep -n 'Dependency Status'
 apps/rhino-cli/README.md` returns a match.
+  - Date: 2026-05-23 | Status: done | Files Changed: apps/rhino-cli/README.md | Notes: Section added after Phase 4 bumps completed. grep → 1 match ✓
 - [x] **2.3.6** C-06: Add a one-line clarification note to `apps/rhino-cli/README.md` (or
       `rust-toolchain.toml` header comment) explaining that `rust-version` in `Cargo.toml` is the
       MSRV while `channel` in `rust-toolchain.toml` is the installed toolchain — both are correct.
@@ -146,22 +147,32 @@ specs/apps/rhino/README.md` returns zero matches AND `npm run lint:md` exits 0.
 
 PARALLEL within phase; each crate decision is an independent commit.
 
-- [ ] **4.1** `chrono` 0.4.39 → 0.4.44: bump in `Cargo.toml`, run `cargo update -p chrono`, `nx run rhino-cli:test:quick`, `cargo clippy --all-targets -- -D warnings`. Commit.
-- [ ] **4.2** `glob` 0.3.2 → 0.3.3: bump the `glob` line in `apps/rhino-cli/Cargo.toml` to
+- [x] **4.1** `chrono` 0.4.39 → 0.4.44: bump in `Cargo.toml`, run `cargo update -p chrono`, `nx run rhino-cli:test:quick`, `cargo clippy --all-targets -- -D warnings`. Commit.
+  - Date: 2026-05-23 | Status: done | Notes: Patch bump. 754 tests pass, clippy 0.
+- [x] **4.2** `glob` 0.3.2 → 0.3.3: bump the `glob` line in `apps/rhino-cli/Cargo.toml` to
       `"0.3.3"`, run `cargo update -p glob`, `nx run rhino-cli:test:quick`,
       `cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings`.
       Commit. Acceptance criterion: all three commands exit 0.
-- [ ] **4.3** `sha2` 0.10.9 → 0.11.0 (**major**):
-  - [ ] **4.3.1** Grep `apps/rhino-cli/src/` for `sha2::` usage; record call sites.
-  - [ ] **4.3.2** Check if any call site uses removed APIs (`compress256`, `compress512`, removed feature flags) per the [RustCrypto sha2 0.11.0 CHANGELOG](https://github.com/RustCrypto/hashes/blob/master/sha2/CHANGELOG.md).
-  - [ ] **4.3.3** **Decision branch A** — if migration is straightforward: bump, fix call sites, run full validation, commit. Update `apps/rhino-cli/README.md` "Dependency Status" with the bump.
-  - [ ] **4.3.4** **Decision branch B** — if migration cost exceeds value: add a Path C waiver to `apps/rhino-cli/README.md` "Dependency Status" citing reason and review date.
-- [ ] **4.4** `tempfile` 3.14.0 → 3.27.0 (dev-dep, breaking rename):
-  - [ ] **4.4.1** Grep `apps/rhino-cli/tests/` and any dev module for `into_path`, `Builder::keep(`; record sites.
-  - [ ] **4.4.2** Bump in `Cargo.toml`; rename `into_path()` → `keep()` per [tempfile CHANGELOG](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md).
-  - [ ] **4.4.3** Update any `Builder::keep(bool)` → `Builder::disable_cleanup(bool)`.
-  - [ ] **4.4.4** Run `nx run rhino-cli:test:integration` to validate tempdir lifecycle.
-- [ ] **4.5** Add a "Dependency Status" section to `apps/rhino-cli/README.md` recording every decision from 4.1-4.4 with date and Path (A/B/C).
+  - Date: 2026-05-23 | Status: done | Notes: Patch bump. All gates pass.
+- [x] **4.3** `sha2` 0.10.9 → 0.11.0 (**major**):
+  - [x] **4.3.1** Grep `apps/rhino-cli/src/` for `sha2::` usage; record call sites.
+    - Date: 2026-05-23 | Status: done | Notes: 2 files: audit_orchestrator.rs:16, detect_duplication.rs:8. Both use `{Digest, Sha256}` only.
+  - [x] **4.3.2** Check if any call site uses removed APIs (`compress256`, `compress512`, removed feature flags) per the [RustCrypto sha2 0.11.0 CHANGELOG](https://github.com/RustCrypto/hashes/blob/master/sha2/CHANGELOG.md).
+    - Date: 2026-05-23 | Status: done | Notes: No removed APIs used. Core trait API unchanged.
+  - [x] **4.3.3** **Decision branch A** — if migration is straightforward: bump, fix call sites, run full validation, commit. Update `apps/rhino-cli/README.md` "Dependency Status" with the bump.
+    - Date: 2026-05-23 | Status: done | Notes: Path A taken. cargo check + 754 tests + clippy all pass.
+  - [x] **4.3.4** **Decision branch B** — not taken (Path A succeeded).
+- [x] **4.4** `tempfile` 3.14.0 → 3.27.0 (dev-dep, breaking rename):
+  - [x] **4.4.1** Grep `apps/rhino-cli/tests/` and any dev module for `into_path`, `Builder::keep(`; record sites.
+    - Date: 2026-05-23 | Status: done | Notes: No `NamedTempFile::into_path()` or `Builder::keep()`. Only `TempDir::new()` and `tempfile::tempdir()` used. The `into_path()` in emoji_audit.rs:98 is `walkdir::DirEntry::into_path()`, not tempfile.
+  - [x] **4.4.2** Bump in `Cargo.toml`; rename `into_path()` → `keep()` per [tempfile CHANGELOG](https://github.com/Stebalien/tempfile/blob/master/CHANGELOG.md).
+    - Date: 2026-05-23 | Status: done | Notes: Bumped. No renames needed.
+  - [x] **4.4.3** Update any `Builder::keep(bool)` → `Builder::disable_cleanup(bool)`.
+    - Date: 2026-05-23 | Status: done | Notes: No `Builder::keep` found. No changes needed.
+  - [x] **4.4.4** Run `nx run rhino-cli:test:integration` to validate tempdir lifecycle.
+    - Date: 2026-05-23 | Status: done | Notes: Integration tests pass (0 failures).
+- [x] **4.5** Add a "Dependency Status" section to `apps/rhino-cli/README.md` recording every decision from 4.1-4.4 with date and Path (A/B/C).
+  - Date: 2026-05-23 | Status: done | Files Changed: apps/rhino-cli/README.md | Notes: Section added. grep "Dependency Status" → 1 match ✓
 - [ ] **4.6** Optional: install `cargo-outdated` locally (do not bake into `npm run doctor` yet) and verify the bumped state matches.
 
 ## Phase 5 — `forbid(unsafe_code)` governance hardening
