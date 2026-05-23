@@ -55,6 +55,8 @@ pub(crate) struct CoberturaLines {
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct CoberturaLine {
+    #[serde(rename = "@number", default)]
+    pub number: i64,
     #[serde(rename = "@hits", default)]
     pub hits: i64,
     #[serde(rename = "@branch", default)]

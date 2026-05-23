@@ -54,7 +54,7 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo llvm-cov --manifest-path apps/rhino-cli-rs/Cargo.toml --lib --ignore-filename-regex '(cli\\.rs|main\\.rs|internal/git/mod\\.rs|commands/git_pre_commit\\.rs|commands/env_|commands/doctor\\.rs|internal/doctor/tools\\.rs|internal/doctor/mod\\.rs|internal/doctor/fixer\\.rs|internal/doctor/checker\\.rs)' --lcov --output-path apps/rhino-cli-rs/cover.out --fail-under-lines 90"
+        "command": "cargo llvm-cov --manifest-path apps/rhino-cli-rs/Cargo.toml --lib --ignore-filename-regex '(cli\\.rs|main\\.rs|internal/git/mod\\.rs|commands/git_pre_commit\\.rs|commands/env_|commands/doctor\\.rs|commands/test_coverage_diff\\.rs|commands/test_coverage_merge\\.rs|internal/doctor/tools\\.rs|internal/doctor/mod\\.rs|internal/doctor/fixer\\.rs|internal/doctor/checker\\.rs|internal/testcoverage/diff\\.rs|internal/testcoverage/merge\\.rs)' --lcov --output-path apps/rhino-cli-rs/cover.out --fail-under-lines 90"
       },
       "cache": true,
       "inputs": [

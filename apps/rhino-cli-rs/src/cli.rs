@@ -9,7 +9,8 @@ use crate::commands::{
     governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
     governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
     spec_coverage_validate, specs_validate_adoption, specs_validate_counts, specs_validate_links,
-    specs_validate_tree, test_coverage_validate, workflows_validate_naming,
+    specs_validate_tree, test_coverage_diff, test_coverage_merge, test_coverage_validate,
+    workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -223,6 +224,10 @@ pub enum RepoGovernanceCommands {
 pub enum TestCoverageCommands {
     /// Check test coverage against a threshold (standard line-based algorithm).
     Validate(test_coverage_validate::ValidateArgs),
+    /// Show coverage for changed lines only (diff coverage).
+    Diff(test_coverage_diff::DiffArgs),
+    /// Merge multiple coverage files into one LCOV output.
+    Merge(test_coverage_merge::MergeArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -270,6 +275,8 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             TestCoverageCommands::Validate(args) => {
                 test_coverage_validate::run(args, output_format)
             }
+            TestCoverageCommands::Diff(args) => test_coverage_diff::run(args, output_format),
+            TestCoverageCommands::Merge(args) => test_coverage_merge::run(args, output_format),
         },
         Commands::SpecCoverage(sc) => match sc {
             SpecCoverageCommands::Validate(args) => {

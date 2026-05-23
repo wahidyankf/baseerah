@@ -33,5 +33,7 @@ pub mod specs_validate_adoption;
 pub mod specs_validate_counts;
 pub mod specs_validate_links;
 pub mod specs_validate_tree;
+pub mod test_coverage_diff;
+pub mod test_coverage_merge;
 pub mod test_coverage_validate;
 pub mod workflows_validate_naming;
