@@ -165,7 +165,7 @@ expects. This will be addressed in a follow-up plan.
 ## Adding a New Command
 
 1. Create the parent command file `apps/{app}/cmd/{domain}.go` if the domain is new
-2. Create the feature file `specs/{app}/{domain}/{domain}-{action}.feature`
+2. Create the feature file `specs/apps/{app}/behavior/cli/gherkin/{domain}/{domain}-{action}.feature`
 3. Create `apps/{app}/cmd/{domain}_{action}.go` with the Cobra command (register with parent)
 4. Create `apps/{app}/cmd/{domain}_{action}_test.go` with godog unit step definitions — use package-level function variables to mock all I/O, no build tag (runs in `test:quick`)
 5. Create `apps/{app}/cmd/{domain}_{action}.integration_test.go` with godog integration steps — add `//go:build integration`, drive via `cmd.RunE()` against real `/tmp` fixtures
@@ -211,14 +211,14 @@ specs/apps/rhino/behavior/cli/gherkin/agents/agents-sync.feature  (contains @age
 
 ## API Backend: Three-Level Spec Consumption
 
-API backends consume shared Gherkin scenarios from their own `specs/apps/<backend-name>/gherkin/`
+API backends consume shared Gherkin scenarios from their own `specs/apps/<backend-name>/behavior/be/gherkin/`
 directory at three test levels. The feature files are the shared contract — only the step
 implementations change per level.
 
 ### Shared Specs
 
 ```
-specs/apps/<backend-name>/gherkin/
+specs/apps/<backend-name>/behavior/be/gherkin/
 ├── auth/
 │   ├── login.feature
 │   ├── register.feature

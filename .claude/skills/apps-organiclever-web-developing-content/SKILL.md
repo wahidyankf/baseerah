@@ -100,7 +100,7 @@ src/contexts/<bc>/
 
 1. Identify which bounded context owns the feature. Consult [`docs/explanation/bounded-context-map.md`](./docs/explanation/bounded-context-map.md).
 2. Ensure the domain term appears in [`specs/apps/organiclever/ddd/ubiquitous-language/<bc>.md`](../../../specs/apps/organiclever/ddd/ubiquitous-language/README.md). Add it if missing — same commit as the code change.
-3. Write or update the Gherkin spec in `specs/apps/organiclever/web/gherkin/<bc>/`.
+3. Write or update the Gherkin spec in `specs/apps/organiclever/behavior/web/gherkin/<bc>/`.
 4. Implement: Red (failing step) → Green (minimal code) → Refactor.
 5. Keep all new code inside the correct context layer. If it touches IO, it goes in `infrastructure/`. If it is a use-case, it goes in `application/`. Never break the layer rules.
 6. Run `nx run organiclever-web:lint` to confirm 0 boundary errors before committing.
@@ -396,7 +396,7 @@ docker compose -f infra/dev/organiclever-web/docker-compose.yml up organiclever-
 ```typescript
 // 1. Add term to specs/apps/organiclever/ddd/ubiquitous-language/<bc>.md (same commit as code)
 
-// 2. Add Gherkin scenario in specs/apps/organiclever/web/gherkin/<bc>/<file>.feature
+// 2. Add Gherkin scenario in specs/apps/organiclever/behavior/web/gherkin/<bc>/<file>.feature
 
 // 3. Add step implementation in test/unit/steps/<bc>/<file>.steps.tsx
 
@@ -556,7 +556,7 @@ If either reports a finding:
 - **Term collision** — add cross-linked Forbidden synonyms to both glossaries.
 - **Layer subfolder mismatch** — update the registry's `layers` array OR remove the unused subfolder.
 
-NEVER silence a finding by lowering severity in production. Use `ORGANICLEVER_RHINO_DDD_SEVERITY=warn` only for local exploratory work.
+NEVER silence a finding by lowering severity in production. Use `OSE_RHINO_DDD_SEVERITY=warn` only for local exploratory work.
 
 ## Reference Documentation
 

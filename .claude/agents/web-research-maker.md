@@ -52,7 +52,7 @@ When you receive a research query:
    - `docs/` (Diátaxis-structured documentation)
    - `repo-governance/conventions/`, `repo-governance/development/`, `repo-governance/principles/`
    - `apps/*/README.md`
-   - `specs/apps/*/gherkin/` for behaviour specs
+   - `specs/apps/*/behavior/*/gherkin/` for behaviour specs
    - `plans/in-progress/`, `plans/done/` for recent project context
    - `CLAUDE.md`, `AGENTS.md`
      If the repo already has the fact, cite the file path and skip the web. Duplicating knowledge wastes context and drifts from source of truth.

@@ -186,15 +186,15 @@ All testable projects must consume Gherkin specifications at every applicable te
 (historical -- no active Hugo sites remain) were exempt because they had no application logic. E2E
 runner projects ARE the Gherkin consumers at the E2E level.
 
-| App Type                   | Unit consumes Gherkin                        | Integration consumes Gherkin | E2E consumes Gherkin              |
-| -------------------------- | -------------------------------------------- | ---------------------------- | --------------------------------- |
-| BE API (`organiclever-be`) | Yes — `specs/apps/organiclever-be/gherkin/`  | Yes — same specs             | Yes — same specs                  |
-| FE (`organiclever-web`)    | Yes — `specs/apps/organiclever-web/gherkin/` | Yes — same specs             | Yes — via `organiclever-web-e2e`  |
-| CLI (`*-cli`)              | Yes — `specs/apps/{domain}/cli/gherkin/`     | Yes — same specs             | Not applicable                    |
-| Content platform           | Yes — project-local specs                    | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
-| Library                    | Yes — library-specific specs                 | Yes — same specs             | Not applicable                    |
-| Hugo site (historical)     | Exempt                                       | Exempt                       | Exempt                            |
-| E2E runner                 | Not applicable                               | Not applicable               | Yes — consumes shared specs       |
+| App Type                   | Unit consumes Gherkin                                 | Integration consumes Gherkin | E2E consumes Gherkin              |
+| -------------------------- | ----------------------------------------------------- | ---------------------------- | --------------------------------- |
+| BE API (`organiclever-be`) | Yes — `specs/apps/organiclever/behavior/be/gherkin/`  | Yes — same specs             | Yes — same specs                  |
+| FE (`organiclever-web`)    | Yes — `specs/apps/organiclever/behavior/web/gherkin/` | Yes — same specs             | Yes — via `organiclever-web-e2e`  |
+| CLI (`*-cli`)              | Yes — `specs/apps/{domain}/behavior/cli/gherkin/`     | Yes — same specs             | Not applicable                    |
+| Content platform           | Yes — project-local specs                             | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
+| Library                    | Yes — library-specific specs                          | Yes — same specs             | Not applicable                    |
+| Hugo site (historical)     | Exempt                                                | Exempt                       | Exempt                            |
+| E2E runner                 | Not applicable                                        | Not applicable               | Yes — consumes shared specs       |
 
 ## Coverage Threshold Rationale
 

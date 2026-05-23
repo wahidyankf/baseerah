@@ -457,8 +457,9 @@ governance line that authorizes it.
 <!-- Date: 2026-05-23 | Status: done | Notes: 0 findings for organiclever, wahidyankf, ose-platform, ayokoding, ose-app; ose-app flat features (health.feature, smoke.feature) moved to domain subdirs and per-feature refs updated -->
 - [x] Run `npm run lint:md` — exits 0.
 <!-- Date: 2026-05-23 | Status: done | Notes: 2759 files linted, 0 errors -->
-- [ ] Commit atomically: `git add -A && git commit -m "feat(rhino-cli): enforce domain
-subdirs under every behavior/<surface>/gherkin/"`.
+- [x] Commit atomically: `git add -A && git commit -m "feat(rhino-cli): enforce domain
+  subdirs under every behavior/<surface>/gherkin/"`.
+<!-- Date: 2026-05-23 | Status: done | Notes: commit d695025f8; 10 files changed, 118 insertions, 31 deletions -->
 
 ## Phase 7 — Governance Propagation (repo-rules-maker)
 
@@ -468,22 +469,29 @@ is delegated to the `repo-rules-maker` agent — it owns `repo-governance/` and 
 agent authorized to write rules and conventions there per
 [Agent Naming Convention](../../../repo-governance/conventions/structure/agent-naming.md).
 
-- [ ] Invoke `repo-rules-maker` with the brief in [§Propagation Brief](#propagation-brief)
-      below. Pass the brief verbatim.
-- [ ] Verify `repo-rules-maker` only modified files under `repo-governance/`, `AGENTS.md`,
-      `.claude/agents/`, `.claude/skills/`, or `docs/reference/`. If it touched anything else,
-      reject and re-invoke with tighter scope.
-- [ ] Run `npm run sync:claude-to-opencode` to mirror `.claude/agents/` changes into
-      `.opencode/agents/`. Acceptance: exit code 0; diff shows only mechanical
-      Claude-Code-to-OpenCode translations (color tokens, tool array → boolean flags).
-- [ ] Run `nx run rhino-cli:validate:specs-links` — exits 0 (governance updates may have
-      changed cross-link targets).
-- [ ] Run `npm run lint:md` — exits 0.
-- [ ] Invoke `repo-rules-checker` to validate the propagated changes for consistency,
-      contradictions, and Skill/agent duplication. Acceptance: exits 0 OR all findings are
-      pre-existing and unrelated to this propagation.
-- [ ] Address any HIGH/CRITICAL findings from `repo-rules-checker` via `repo-rules-fixer` (or
-      manually if the fix is trivial).
+- [x] Invoke `repo-rules-maker` with the brief in [§Propagation Brief](#propagation-brief)
+    below. Pass the brief verbatim.
+<!-- Date: 2026-05-24 | Status: done | Notes: 14 files updated: specs-directory-structure.md, app-readme-vs-specs.md, deterministic-vs-ai-validation-split.md, bdd-spec-test-mapping.md, ci-conventions.md, feature-change-completeness.md, specs-application-sync.md, specs-quality-gate.md, specs-checker.md, specs-maker.md, web-research-maker.md, apps-ose-web/apps-organiclever-web SKILL.md, docs/how-to/add-new-app.md, docs/reference/monorepo-structure.md; also fixed ose-app gherkin READMEs broken links (health/ and smoke/ domain moves) -->
+- [x] Verify `repo-rules-maker` only modified files under `repo-governance/`, `AGENTS.md`,
+    `.claude/agents/`, `.claude/skills/`, or `docs/reference/`. If it touched anything else,
+    reject and re-invoke with tighter scope.
+<!-- Date: 2026-05-24 | Status: done | Notes: docs/how-to/add-new-app.md accepted (explicitly listed in propagation brief); remaining grep hits in AGENTS.md/libs/README.md/ai-agents.md are false positives about libs/ flat structure, not gherkin -->
+- [x] Run `npm run sync:claude-to-opencode` to mirror `.claude/agents/` changes into
+    `.opencode/agents/`. Acceptance: exit code 0; diff shows only mechanical
+    Claude-Code-to-OpenCode translations (color tokens, tool array → boolean flags).
+<!-- Date: 2026-05-24 | Status: done | Notes: 75 agents converted; .opencode mirrors updated for specs-checker, specs-maker, web-research-maker -->
+- [x] Run `nx run rhino-cli:validate:specs-links` — exits 0 (governance updates may have
+    changed cross-link targets).
+<!-- Date: 2026-05-24 | Status: done | Notes: 0 findings; fixed broken links in ose-app gherkin READMEs pointing to health/ and smoke/ domain subdirs -->
+- [x] Run `npm run lint:md` — exits 0.
+<!-- Date: 2026-05-24 | Status: done | Notes: 2759 files, 0 errors -->
+- [x] Invoke `repo-rules-checker` to validate the propagated changes for consistency,
+    contradictions, and Skill/agent duplication. Acceptance: exits 0 OR all findings are
+    pre-existing and unrelated to this propagation.
+<!-- Date: 2026-05-24 | Status: done | Notes: 2 HIGH + 1 LOW found; HIGH-1: stale ORGANICLEVER_RHINO_DDD_SEVERITY env var in SKILL.md (renamed to OSE_RHINO_DDD_SEVERITY); HIGH-2: ddd/ location in app-readme-vs-specs.md canonical tree showed under components/web/ (should be app root); LOW: duplicate link in specs-application-sync.md -->
+- [x] Address any HIGH/CRITICAL findings from `repo-rules-checker` via `repo-rules-fixer` (or
+    manually if the fix is trivial).
+<!-- Date: 2026-05-24 | Status: done | Notes: Fixed all 3 findings manually: SKILL.md env var renamed; app-readme-vs-specs.md canonical tree ddd/ moved to app root + table note updated; specs-application-sync.md duplicate link removed -->
 - [ ] Commit governance + agent changes as one or two thematic commits per
       [Commit Messages Convention](../../../repo-governance/development/workflow/commit-messages.md): - `docs(repo-governance): propagate specs-tree-uniform changes to conventions and agents` - `chore(agents): sync .opencode mirror after specs propagation` (only if sync diff is non-empty)
 

@@ -171,7 +171,9 @@ Where:
 
 ### Domain Subdirectory Rules
 
-**Every surface** (BE, web, CLI, build-tools) uses domain subdirectories under `gherkin/`. Each domain folder groups related feature files by business domain or command group, not by technical concern. Single-feature domains are permitted when the surface area is small.
+**Every surface** (BE, web, CLI) uses domain subdirectories under `gherkin/`. Each domain folder groups related feature files by business domain or command group, not by technical concern. Single-feature domains are permitted when the surface area is small.
+
+Build-time features (formerly a separate `build-tools` surface) live under `behavior/cli/gherkin/<domain>/` alongside runtime CLI features. Build-time and runtime CLI features share the `cli` surface — there is no separate `build-tools` surface directory.
 
 ```
 specs/apps/organiclever/behavior/be/gherkin/expenses/expense-management.feature
@@ -284,11 +286,28 @@ The atomic commit is mandatory — splitting the move and the path updates cause
 all regrouped under `behavior/cli/gherkin/<domain>/` during the `specs-tree-uniform` pass.
 `rhino-cli specs validate-tree` now enforces domain subdirs for every surface.
 
+**CLI domain-subdir moves and build-tools inlining (2026-05-23)**. As part of the `specs-tree-uniform`
+plan, four CLI apps completed migration to the universal domain-subdir layout:
+
+- `crane` — features moved from flat `behavior/cli/gherkin/*.feature` to domain subdirs
+  (`pdf/`, `content/`, `media/`, `reporting/`, `system/`).
+- `rhino` — features regrouped under `behavior/cli/gherkin/<domain>/`
+  (e.g., `agents/`, `system/`, `env/`, `git/`, `ddd/`, `docs/`, `spec-coverage/`,
+  `test-coverage/`, `repo-governance/`, `workflows/`).
+- `ayokoding-cli` — features moved to `behavior/cli/gherkin/links/`.
+- `ose-platform-cli` — features moved to `behavior/cli/gherkin/<domain>/`.
+
+The `build-tools` surface was retired: ayokoding-web's build-time features were inlined into
+`behavior/cli/gherkin/` (Decision D1==A). The `<surface>` enum is now `be`, `web`, `cli` only.
+
+`ose-app` was added to the `AppsWithDDD` allowlist (Decision D2==A). The single source of truth
+is `apps/rhino-cli/src/internal/allowlist.rs`.
+
 ## Adding New Specs
 
 ### Adding a Feature File to an Existing Project
 
-1. Identify the correct surface (`be`, `web`, `cli`, or `build-tools`)
+1. Identify the correct surface (`be`, `web`, or `cli`). Build-time CLI features belong under `cli` — there is no separate `build-tools` surface
 2. Place the file in the appropriate domain subdirectory under `behavior/<surface>/gherkin/<domain>/`, creating the domain folder if it does not exist
 3. For CLI: choose a domain that matches the command group (e.g., `system/`, `env/`, `links/`); single-feature domains are permitted
 4. Update the relevant `README.md` index file
@@ -330,9 +349,9 @@ These commands run as part of the `specs-quality-gate` workflow deterministic-of
 
 - Positional `<folder>` or `<app>` — single-target legacy behavior preserved.
 - `--apps <csv>` — multi-app validation across an explicit list.
-- No positional, no flag — defaults to the `AppsWithDDD` allowlist (`organiclever`, `wahidyankf`, `ose-platform`, `ayokoding`).
+- No positional, no flag — defaults to the `AppsWithDDD` allowlist (`organiclever`, `wahidyankf`, `ose-platform`, `ayokoding`, `ose-app`).
 
-The single source of truth for the allowlist is `apps/rhino-cli/internal/allowlist/allowlist.go`. Pre-push and CI surfaces invoke the four targets without arguments so adding a new app is a one-line edit there.
+The single source of truth for the allowlist is `apps/rhino-cli/src/internal/allowlist.rs`. Pre-push and CI surfaces invoke the four targets without arguments so adding a new app is a one-line edit there.
 
 #### Per-bounded-context `code_lang:` field (DDD validators)
 
@@ -374,7 +393,7 @@ The validator handles Scenario Outline forms in both directions: outline steps a
 
 #### Combined gherkin scopes per app
 
-`spec-coverage validate` accepts a variadic specs-dirs list (`validate <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-web has web + api; ayokoding-web has web + api + build-tools) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
+`spec-coverage validate` accepts a variadic specs-dirs list (`validate <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-web has web + api; ayokoding-web has web + api + cli) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
 
 #### Expanded relationship symmetry (DDD validators)
 
@@ -411,8 +430,7 @@ When reviewing changes to the `specs/` directory, verify:
 
 - [ ] App spec tree uses the five-folder layout at the top level
 - [ ] No flat-root artifacts remain (`be/`, `web/`, `cli/`, `c4/`, `contracts/` at root)
-- [ ] BE and web specs use domain subdirectories (never flat under `gherkin/`)
-- [ ] CLI specs are flat under `gherkin/` (never domain subdirectories)
+- [ ] BE, web, and CLI specs use domain subdirectories (never flat under `gherkin/`)
 - [ ] Lib specs use package subdirectories under `gherkin/`
 - [ ] `README.md` index files exist at every directory level
 - [ ] New projects include only the folders their surface profile needs

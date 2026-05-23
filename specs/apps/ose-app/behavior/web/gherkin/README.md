@@ -4,6 +4,6 @@ Frontend (UI-semantic) Gherkin scenarios for `ose-app-web`. Consumed by Playwrig
 
 ## Feature files
 
-| Feature file                     | Domain |
-| -------------------------------- | ------ |
-| [smoke.feature](./smoke.feature) | smoke  |
+| Feature file                                 | Domain |
+| -------------------------------------------- | ------ |
+| [smoke/smoke.feature](./smoke/smoke.feature) | smoke  |

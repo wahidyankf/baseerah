@@ -41,7 +41,7 @@ This practice implements/respects the following conventions:
 
 ### C4 Diagrams
 
-C4 diagrams under `specs/apps/*/c4/` document architecture at the container and component levels. They must reflect the actual system at all times.
+C4 diagrams under `specs/apps/*/system-context/`, `specs/apps/*/containers/`, and `specs/apps/*/components/` document architecture at the context, container, and component levels. They must reflect the actual system at all times.
 
 **Update C4 diagrams when:**
 
@@ -153,9 +153,11 @@ Use this table when uncertain whether a change requires a spec update:
 
 `specs/apps/organiclever/` serves both the backend (`organiclever-be`) and frontend (`organiclever-web`) from a shared set of specs:
 
-- `specs/apps/organiclever/system-context/` — C4 diagrams for the OrganicLever application architecture
-- `specs/apps/organiclever-be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
-- `specs/apps/organiclever-web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
+- `specs/apps/organiclever/system-context/` — C4 L1 context diagram for OrganicLever
+- `specs/apps/organiclever/containers/` — C4 L2 container diagram and deployment topology
+- `specs/apps/organiclever/components/` — C4 L3 component diagrams (be/, web/)
+- `specs/apps/organiclever/behavior/be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
+- `specs/apps/organiclever/behavior/web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
 - `specs/apps/organiclever/containers/contracts/` — OpenAPI 3.1 contract spec that both backend and frontend implement
 
 When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, both the corresponding Gherkin scenarios and the C4 component diagram must be updated to reflect the new behavior and component.
@@ -164,8 +166,8 @@ When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, bo
 
 `specs/apps/ayokoding/` maintains C4 diagrams and Gherkin scenarios for the Next.js 16 fullstack platform:
 
-- `specs/apps/ayokoding/c4/` — Architecture diagrams kept current with the Next.js App Router structure and tRPC routers
-- `specs/apps/ayokoding/be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-web-be-e2e`
+- `specs/apps/ayokoding/system-context/`, `containers/`, `components/` — C4 diagrams kept current with the Next.js App Router structure and tRPC routers
+- `specs/apps/ayokoding/behavior/be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-web-be-e2e`
 
 When a new tRPC router is added to `apps/ayokoding-web/`, a new component entry appears in the C4 component diagram and new scenarios are added to the Gherkin directory.
 
@@ -189,7 +191,7 @@ They:
 
 1. Update `specs/apps/organiclever/containers/contracts/` (OpenAPI spec) with the new endpoint definition
 2. Run `nx run organiclever-contracts:codegen` and related codegen targets
-3. Add a Gherkin scenario to `specs/apps/organiclever-be/gherkin/products/get-product.feature`
+3. Add a Gherkin scenario to `specs/apps/organiclever/behavior/be/gherkin/products/get-product.feature`
 4. Update the C4 component diagram in `specs/apps/organiclever/system-context/` if the endpoint belongs to a new component
 5. Implement the endpoint in `apps/organiclever-be/`
 
@@ -261,5 +263,4 @@ It does not apply to:
 - [Three-Level Testing Standard](./three-level-testing-standard.md) - How all three test levels consume shared Gherkin specs
 - [BDD Spec-to-Test Mapping](../infra/bdd-spec-test-mapping.md) - Mandatory 1:1 mapping for CLI apps; three-level consumption for demo-be backends
 - [Nx Target Standards](../infra/nx-targets.md) - Cache input declarations that include Gherkin specs
-- [specs/README.md](../../../specs/README.md) - Spec directory organization and per-app spec structure
 - [specs/README.md](../../../specs/README.md) - Spec directory organization and per-app spec structure

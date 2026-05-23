@@ -4,10 +4,10 @@ Backend (HTTP-semantic) Gherkin scenarios for `ose-app-be`. Consumed by xUnit + 
 
 ## Feature files
 
-| Feature file                               | Domain            |
-| ------------------------------------------ | ----------------- |
-| [health.feature](./health.feature)         | health            |
-| [regulatory-source/](./regulatory-source/) | regulatory-source |
-| [internal-policy/](./internal-policy/)     | internal-policy   |
-| [gap-analysis/](./gap-analysis/)           | gap-analysis      |
-| [ai-orchestration/](./ai-orchestration/)   | ai-orchestration  |
+| Feature file                                     | Domain            |
+| ------------------------------------------------ | ----------------- |
+| [health/health.feature](./health/health.feature) | health            |
+| [regulatory-source/](./regulatory-source/)       | regulatory-source |
+| [internal-policy/](./internal-policy/)           | internal-policy   |
+| [gap-analysis/](./gap-analysis/)                 | gap-analysis      |
+| [ai-orchestration/](./ai-orchestration/)         | ai-orchestration  |

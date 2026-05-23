@@ -38,14 +38,16 @@ open-sharia-enterprise/
 │   ├── dev/                  # Local development Docker Compose files per service
 │   │   └── [service]/        # docker-compose.yml for local dev environment
 │   └── k8s/                  # Kubernetes deployments
-├── specs/                     # Gherkin acceptance specs and OpenAPI contracts
-│   ├── apps/                  # Per-app specs
+├── specs/                     # Gherkin acceptance specs, C4 diagrams, and OpenAPI contracts
+│   ├── apps/                  # Per-app specs (C4-aware five-folder layout)
 │   │   └── [domain]/         # e.g. organiclever/, rhino/
-│   │       ├── contracts/    # OpenAPI 3.1 contract spec
-│   │       ├── be/gherkin/   # Backend acceptance specs
-│   │       ├── fe/gherkin/   # Frontend acceptance specs
-│   │       ├── fs/gherkin/   # Fullstack acceptance specs (if applicable)
-│   │       └── c4/           # C4 architecture diagrams (if applicable)
+│   │       ├── product/      # PM-first content (overview, roadmap)
+│   │       ├── system-context/ # C4 L1 — system boundary diagram
+│   │       ├── containers/   # C4 L2 — runtime containers + OpenAPI contracts
+│   │       ├── components/   # C4 L3 — internal structure (be/, web/, cli/)
+│   │       ├── ddd/          # Domain-Driven Design artefacts (when adopted)
+│   │       └── behavior/     # Gherkin feature files (be/, web/, cli/)
+│   │           └── [surface]/gherkin/[domain]/ # e.g. behavior/cli/gherkin/system/
 │   └── libs/                  # Per-library specs
 ├── .husky/                    # Git hooks
 ├── .nx/                       # Nx cache (gitignored)

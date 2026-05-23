@@ -182,24 +182,28 @@ specs/apps/<app-family>/
 │       ├── component-web.md
 │       ├── architecture.md
 │       ├── design-system.md
-│       ├── routes-and-screens.md
-│       └── ddd/            # When DDD adopted
-│           ├── README.md
-│           ├── bounded-contexts.yaml
-│           ├── bounded-context-map.md
-│           └── ubiquitous-language/
-│               ├── README.md
-│               └── <bc>.md
+│       └── routes-and-screens.md
+├── ddd/                    # When DDD adopted (app root, not under components/)
+│   ├── README.md
+│   ├── bounded-contexts.yaml
+│   ├── bounded-context-map.md
+│   └── ubiquitous-language/
+│       ├── README.md
+│       └── <bc>.md
 └── behavior/
     ├── README.md
     ├── be/
     │   └── gherkin/        # Full-stack only
     │       ├── README.md
     │       └── <domain>/
-    └── web/
-        └── gherkin/
+    ├── web/
+    │   └── gherkin/
+    │       ├── README.md
+    │       └── <domain>/
+    └── cli/
+        └── gherkin/        # CLI-only and multi-CLI
             ├── README.md
-            └── <domain>/
+            └── <domain>/   # Domain subdir — same rule as be/web
 ```
 
 #### Folder purposes
@@ -209,7 +213,7 @@ specs/apps/<app-family>/
 | `product/`        | "What does this product do for the user? What is in this version?" | PM-first content. Not architecture (so not under `system-context/`). Not behavior (so not under `behavior/`). Deserves its own home. |
 | `system-context/` | "What is the system boundary? Who/what interacts with it?"         | C4 L1 — the canonical system context level.                                                                                          |
 | `containers/`     | "What runtime processes exist? What are their boundaries?"         | C4 L2 — naturally hosts API contracts and deployment topology.                                                                       |
-| `components/`     | "What is inside each container?"                                   | C4 L3. Bounded contexts are components, so DDD lives here naturally.                                                                 |
+| `components/`     | "What is inside each container?"                                   | C4 L3. Internal component breakdown per surface (be/, web/). DDD lives at app root (not nested here) to stay surface-agnostic.       |
 | `behavior/`       | "Does the system actually do what the specs say?"                  | Gherkin tests behavior at every C4 level — orthogonal to zoom hierarchy. Forcing it under one C4 level would misrepresent its scope. |
 
 #### Per-surface variant table
@@ -330,6 +334,7 @@ This standard defines adoption expectations per app type and rollout timeline. "
 | App            | BDD              | DDD                          | Contracts       |
 | -------------- | ---------------- | ---------------------------- | --------------- |
 | `organiclever` | Adopted (pilot)  | Adopted (pilot)              | Adopted (pilot) |
+| `ose-app`      | SHOULD — backlog | SHOULD — backlog             | SHOULD          |
 | `ayokoding`    | Adopted          | Deferred (multi-CLI profile) | NOT APPLICABLE  |
 | `ose-platform` | Adopted          | SHOULD — backlog             | NOT APPLICABLE  |
 | `wahidyankf`   | SHOULD — backlog | SHOULD — backlog             | NOT APPLICABLE  |
@@ -431,21 +436,23 @@ specs/apps/organiclever/
 ├── system-context/
 ├── containers/
 │   └── contracts/
+├── ddd/
 ├── components/
 │   ├── be/
 │   └── web/
-│       └── ddd/
 └── behavior/
     ├── be/
     │   └── gherkin/
+    │       └── <domain>/
     └── web/
         └── gherkin/
+            └── <domain>/
 ```
 
 **Migration checklist**:
 
 1. Create five top-level folders with `README.md` placeholders.
-2. In one atomic `git mv` commit: move `be/gherkin/` → `behavior/be/gherkin/`, `web/gherkin/` → `behavior/web/gherkin/`, `c4/*.md` files → their new positions, `contracts/` → `containers/contracts/`. `ddd/` stays at the app root (do not relocate it under `components/web/`; the ubiquitous language is per bounded context, not per surface).
+2. In one atomic `git mv` commit: move `be/gherkin/` → `behavior/be/gherkin/`, `web/gherkin/` → `behavior/web/gherkin/`, `cli/gherkin/` → `behavior/cli/gherkin/`, `c4/*.md` files → their new positions, `contracts/` → `containers/contracts/`. `ddd/` stays at the app root (do not relocate it under `components/web/`; the ubiquitous language is per bounded context, not per surface). CLI feature files must be nested under a domain subdir — e.g., `behavior/cli/gherkin/<domain>/<feature>.feature`.
 3. In the same commit: update rhino-cli path constants, Nx `project.json` `inputs`, step file references, and governance cross-links.
 4. Run `rhino-cli specs validate-tree <app>` to verify.
 
@@ -484,9 +491,10 @@ A README exceeding its line-count cap is a HIGH finding regardless of content.
 
 ## Refinement log
 
-| Date       | Entry                                                                                                |
-| ---------- | ---------------------------------------------------------------------------------------------------- |
-| 2026-05-09 | CLI DDD adoption deferred; revisit if a CLI grows past ~10 commands or shows aggregate-shaped state. |
+| Date       | Entry                                                                                                                                                                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-05-09 | CLI DDD adoption deferred; revisit if a CLI grows past ~10 commands or shows aggregate-shaped state.                                                                                                                                                                           |
+| 2026-05-23 | CLI-flat exception retired. All CLI surfaces now use domain subdirs under `behavior/cli/gherkin/<domain>/` (same rule as BE and web). `build-tools` surface retired; features inlined into `cli`. `ose-app` added to the `AppsWithDDD` allowlist and rollout adoption mapping. |
 
 ## Related
 

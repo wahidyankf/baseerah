@@ -56,7 +56,7 @@ A feature change is not complete until all four categories are addressed.
 
 ### 1. Specs (Gherkin Feature Files)
 
-**Location**: `specs/apps/*/be/gherkin/`, `specs/apps/*/fe/gherkin/`, `specs/libs/*/`
+**Location**: `specs/apps/*/behavior/be/gherkin/`, `specs/apps/*/behavior/web/gherkin/`, `specs/apps/*/behavior/cli/gherkin/`, `specs/libs/*/`
 
 **Update when:**
 
@@ -69,7 +69,7 @@ A feature change is not complete until all four categories are addressed.
 
 ### 2. Contracts (OpenAPI Specs)
 
-**Location**: `specs/apps/*/contracts/`
+**Location**: `specs/apps/*/containers/contracts/`
 
 **Update when:**
 
@@ -142,7 +142,7 @@ A developer adds a `GET /api/products/:id` endpoint to `organiclever-be`.
 They update, in the same commit or PR:
 
 1. `specs/apps/organiclever/containers/contracts/` -- add path and response schema
-2. `specs/apps/organiclever-be/gherkin/products/get-product.feature` -- add scenarios
+2. `specs/apps/organiclever/behavior/be/gherkin/products/get-product.feature` -- add scenarios
 3. Unit tests -- test service function with mocked repository
 4. Integration tests -- test with real database
 5. E2E tests -- test full HTTP flow
@@ -163,7 +163,7 @@ A developer removes the `DELETE /api/products/:id` endpoint.
 They update, in the same commit or PR:
 
 1. `specs/apps/organiclever/containers/contracts/` -- remove path definition
-2. `specs/apps/organiclever-be/gherkin/products/delete-product.feature` -- remove scenarios
+2. `specs/apps/organiclever/behavior/be/gherkin/products/delete-product.feature` -- remove scenarios
 3. Remove related unit, integration, and E2E tests
 4. Update any documentation that referenced the endpoint
 

@@ -54,7 +54,7 @@ fixes iteratively until all issues are resolved.
 
 **Key Design Principle**: This workflow only validates folders you explicitly list. It does not
 discover or scan the entire specs/ tree. Subfolders are included automatically — listing
-`specs/apps/organiclever-be` includes `specs/apps/organiclever-be/gherkin/`, etc.
+`specs/apps/organiclever` includes `specs/apps/organiclever/behavior/be/gherkin/`, etc.
 When multiple folders are listed, cross-folder consistency is checked between them (contradictions,
 coverage gaps, terminology drift).
 

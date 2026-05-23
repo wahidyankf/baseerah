@@ -292,7 +292,7 @@ satisfy these additional requirements:
 
 **Mandatory Nx targets** (all 7 required):
 
-- [ ] `codegen` — generates types + encoders/decoders from the OpenAPI spec at `specs/apps/[domain]/contracts/`
+- [ ] `codegen` — generates types + encoders/decoders from the OpenAPI spec at `specs/apps/[domain]/containers/contracts/`
 - [ ] `typecheck` — verifies types compile; must include `dependsOn: ["codegen"]`
 - [ ] `lint` — static analysis / format check
 - [ ] `build` — production build; must include `dependsOn: ["codegen"]`
@@ -306,25 +306,34 @@ satisfy these additional requirements:
 `docker compose -f docker-compose.integration.yml up --abort-on-container-exit --exit-code-from test-runner --build`
 and must set `"cache": false` in `project.json`.
 
-**Specs folder**: Create a `specs/apps/[domain]/` folder at the repository root with the following
-standard layout. Gherkin feature files must be placed here, not inside the app:
+**Specs folder**: Create a `specs/apps/[domain]/` folder at the repository root following the
+C4-aware five-folder layout. Gherkin feature files must be placed here, not inside the app:
 
 ```
 specs/apps/[domain]/
-├── README.md               # Describes the app and BDD framework used
-├── contracts/              # OpenAPI contract spec (if applicable)
-├── be/gherkin/             # Backend acceptance specs (.feature files)
-├── fe/gherkin/             # Frontend acceptance specs (.feature files)
-├── fs/gherkin/             # Fullstack acceptance specs (if applicable)
-└── c4/                     # C4 architecture diagrams (if applicable)
+├── README.md               # Describes the app, surface profile, and BDD framework
+├── product/                # PM-first content (overview, roadmap)
+├── system-context/         # C4 L1 — system boundary diagram
+├── containers/             # C4 L2 — runtime containers
+│   └── contracts/          # OpenAPI contract spec (full-stack only)
+├── components/             # C4 L3 — internal structure
+│   ├── be/                 # Full-stack only
+│   └── web/                # Web and full-stack
+├── ddd/                    # Domain-Driven Design artefacts (when adopted)
+└── behavior/               # Gherkin feature files — domain subdirs required
+    ├── be/gherkin/[domain]/ # Backend acceptance specs
+    ├── web/gherkin/[domain]/ # Frontend acceptance specs
+    └── cli/gherkin/[domain]/ # CLI acceptance specs
 ```
+
+See [Specs Directory Structure Convention](../../repo-governance/conventions/structure/specs-directory-structure.md) for per-surface variants and full rules.
 
 **Codegen dependency chain**: Both `typecheck` and `build` must declare `dependsOn: ["codegen"]`. This ensures contract violations surface during `nx affected -t typecheck` and the pre-push `test:quick` gate.
 
 **Canonical inputs for cache invalidation** (add to `test:unit` and `test:quick`):
 
 - Include `{projectRoot}/generated-contracts/**/*`
-- Include `{workspaceRoot}/specs/apps/[domain]/be/gherkin/**/*.feature` for backends
+- Include `{workspaceRoot}/specs/apps/[domain]/behavior/be/gherkin/**/*.feature` for backends
 - Include language-specific source file globs (see `repo-governance/development/infra/nx-targets.md` for per-language patterns)
 
 **See**: [Nx Target Standards](../../repo-governance/development/infra/nx-targets.md) for canonical target names, caching rules, and per-language input patterns.

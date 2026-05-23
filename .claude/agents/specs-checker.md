@@ -59,9 +59,10 @@ Every directory within the listed folders must have a `README.md`. This includes
 
 - All five top-level folders at `specs/apps/<app-family>/` (`product/`, `system-context/`,
   `containers/`, `components/`, `behavior/`)
-- Per-surface subfolders (`components/be/`, `components/web/`, `behavior/be/gherkin/`,
-  `behavior/web/gherkin/`, `behavior/cli/gherkin/`)
-- All domain subdirectories within `behavior/<surface>/gherkin/<domain>/`
+- Per-surface subfolders (`components/be/`, `components/web/`, `components/cli/`,
+  `behavior/be/gherkin/`, `behavior/web/gherkin/`, `behavior/cli/gherkin/`)
+- All domain subdirectories within `behavior/<surface>/gherkin/<domain>/` — domain subdirs
+  are required for every surface (BE, web, CLI)
 - DDD subdirectories (`ddd/`, `ddd/ubiquitous-language/`)
 - `containers/contracts/` (when present)
 
@@ -167,10 +168,8 @@ Shell out to `rhino-cli specs validate-tree <app>` for the deterministic check. 
 **HIGH**: Top-level folder at `specs/apps/<app-family>/` is not one of the five canonical folders
 (`product/`, `system-context/`, `containers/`, `components/`, `behavior/`)
 **HIGH**: Flat-root artifact exists (`be/`, `web/`, `cli/`, `c4/`, `contracts/` at app root)
-**HIGH**: BE or web Gherkin feature file placed directly under `behavior/<surface>/gherkin/`
-without a domain subdirectory
-**HIGH**: CLI Gherkin feature file placed in a domain subdirectory under `behavior/cli/gherkin/`
-(should be flat)
+**HIGH**: BE, web, or CLI Gherkin feature file placed directly under `behavior/<surface>/gherkin/`
+without a domain subdirectory (all surfaces require domain subdirs)
 **HIGH**: Lib feature file placed directly under `gherkin/` without a package subdirectory
 **MEDIUM**: Domain subdirectory name does not follow kebab-case convention
 **LOW**: Domain subdirectory contains only one feature file with a different name than the directory
@@ -179,7 +178,8 @@ For each listed folder containing gherkin specs:
 
 1. Run `rhino-cli specs validate-tree <app>` and parse JSONL output
 2. Identify the surface type (be, web, cli) from the path
-3. Check that feature files follow the correct nesting rule for that surface type
+3. Check that feature files for every surface are nested under a domain subdirectory —
+   the rule is identical for BE, web, and CLI: `behavior/<surface>/gherkin/<domain>/<feature>.feature`
 4. Report violations with the expected structure
 
 ### Category 9: Adoption Gaps (BDD/DDD/Contracts) [Deterministic via rhino-cli]
@@ -215,7 +215,7 @@ Note: Adoption gap findings are always `[Adoption Gap]` tagged in the report and
 Before completing validation of any listed `specs/apps/<app-family>/` folder, run the four
 allowlist-driven `rhino-cli specs validate-*` Nx targets via `nx run rhino-cli:validate:specs-{adoption,tree,counts,links}`.
 Each target accepts a `--apps <csv>` flag for explicit scoping; absent any flag, it defaults to the
-`AppsWithDDD` allowlist (`organiclever`, `wahidyankf`, `ose-platform`, `ayokoding`).
+`AppsWithDDD` allowlist (`organiclever`, `wahidyankf`, `ose-platform`, `ayokoding`, `ose-app`).
 
 | Target                    | What it checks                                                        | Finding level |
 | ------------------------- | --------------------------------------------------------------------- | ------------- |
