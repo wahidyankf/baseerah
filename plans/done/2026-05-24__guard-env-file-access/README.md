@@ -1,8 +1,9 @@
 # Guard `.env*` File Access & Commits by AI Agents
 
-**Status**: In Progress
+**Status**: Done
 **Type**: Security / repo-governance guardrail (config + hooks + git + convention)
 **Created**: 2026-05-24
+**Completed**: 2026-05-24
 
 ## Context
 
