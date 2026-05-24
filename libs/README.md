@@ -54,7 +54,7 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 **`golang-commons`** - Shared Go utilities used by `ayokoding-cli` and `ose-cli` (links
 checker, output formatting).
 
-**`hugo-commons`** - Shared Hugo utilities used by Hugo-based sites.
+**`golang-link-commons`** - Shared Go link-checking utilities used by `ayokoding-cli` and `ose-cli`.
 
 ## Library Characteristics
 

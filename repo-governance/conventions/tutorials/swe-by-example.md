@@ -928,7 +928,7 @@ go processRequest(req)  // => Goroutine spawned (runs concurrently with minimal 
 - Keep code annotations focused on state tracking (`// =>` notation)
 - Reserve extensive explanations for "Brief Explanation" and "Why It Matters" sections
 
-**Note**: This annotation density standard (1-2.25 per example) is the general [ayokoding-web code annotation standard](../hugo/ayokoding.md#code-annotation-standards) applied to all content. By-example tutorials follow the same standard as other tutorial types, with additional requirements for self-containment and five-part format.
+**Note**: This annotation density standard (1-2.25 per example) is the general ayokoding-web code annotation standard applied to all content. By-example tutorials follow the same standard as other tutorial types, with additional requirements for self-containment and five-part format.
 
 ### Output Annotation Pattern
 
@@ -1518,7 +1518,7 @@ This convention implements and respects:
 - **apps/ose-web/content/** - Platform tutorials using by-example approach
 - **Any other location** - By-example tutorials regardless of directory
 
-**Implementation Notes**: While these standards apply universally, Hugo-specific details (frontmatter, weights, navigation) are covered in [Hugo conventions](../hugo/README.md)
+**Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.
 
 ### What This Convention Covers
 
@@ -1534,7 +1534,6 @@ This convention implements and respects:
 
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
-- **Hugo-specific implementation** - Frontmatter, weights, navigation covered in [Hugo conventions](../hugo/README.md)
 - **Code quality** - Source code standards in development conventions
 - **Tutorial validation** - Covered by apps-ayokoding-web-by-example-checker agent
 

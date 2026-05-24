@@ -25,7 +25,7 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes the standard linking format for all markdown files in the repository. It ensures links are GitHub-compatible, use relative paths with `.md` extensions, and follow consistent patterns across documentation and Hugo sites. This prevents broken links and maintains portability.
+This convention establishes the standard linking format for all markdown files in the repository. It ensures links are GitHub-compatible, use relative paths with `.md` extensions, and follow consistent patterns across all documentation. This prevents broken links and maintains portability.
 
 ## Scope
 
@@ -33,7 +33,7 @@ This convention establishes the standard linking format for all markdown files i
 
 - **Markdown link syntax** - `Display Text` format
 - **Relative vs. absolute paths** - When to use each
-- **Extension requirements** - `.md` extension for docs/, no extension for Hugo sites
+- **Extension requirements** - `.md` extension for all markdown files
 - **Cross-directory linking** - How to link between different documentation areas
 - **External link formatting** - How to format links to external resources
 
@@ -41,7 +41,6 @@ This convention establishes the standard linking format for all markdown files i
 
 - **Link validation** - Covered by docs-link-checker and apps-ayokoding-web-link-checker agents
 - **Link text quality** - Descriptive link text is covered in [Content Quality Principles](../writing/quality.md)
-- **Hugo site URLs** - Hugo-specific linking covered in Hugo content conventions
 - **Anchor links** - Deep linking to specific sections (implementation detail)
 
 ## Why GitHub-Compatible Links?
@@ -301,18 +300,6 @@ Start:  repo-governance/conventions/structure/file-naming.md
 
 Final path: ../../../docs/tutorials/README.md
 ```
-
-## Historical: Hugo Content Linking (DEPRECATED)
-
-**Note**: Both `apps/ayokoding-web/` and `apps/ose-web/` have migrated to Next.js 16. The Hugo-specific linking rules below no longer apply to active sites. This section is preserved for historical reference only.
-
-**Previous Hugo rules** (no longer applicable):
-
-- **Hugo internal links** used absolute paths starting with `/` (e.g., `/learn/ai/chat-with-pdf`)
-- **Hugo links omitted** the `.md` extension
-- **Why different**: Hugo rendered the same navigation content in different page contexts (sidebar, mobile menu, homepage), so relative paths would resolve incorrectly
-
-Both sites now follow standard GitHub-compatible markdown linking with `.md` extension. See [Hugo Content Convention - Shared](../hugo/shared.md) for historical Hugo standards.
 
 ## Anchor Links (Same Page)
 

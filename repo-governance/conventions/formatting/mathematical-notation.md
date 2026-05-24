@@ -26,7 +26,7 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes LaTeX notation as the standard for all mathematical expressions in markdown files. It ensures equations render consistently across GitHub and Hugo sites using `$...$` (inline) and `$$...$$` (display) syntax, providing professional mathematical typography.
+This convention establishes LaTeX notation as the standard for all mathematical expressions in markdown files. It ensures equations render consistently across GitHub and Next.js sites using `$...$` (inline) and `$$...$$` (display) syntax, providing professional mathematical typography.
 
 ## Scope
 
@@ -194,7 +194,7 @@ $
 
 **Why this matters:**
 
-1. **KaTeX Compatibility**: This project uses KaTeX for math rendering (Hugo sites use KaTeX). KaTeX does NOT support the `align` environment - it only supports `aligned`. Always use `\begin{aligned}...\end{aligned}` for multi-line equations.
+1. **KaTeX Compatibility**: This project uses KaTeX for math rendering. KaTeX does NOT support the `align` environment - it only supports `aligned`. Always use `\begin{aligned}...\end{aligned}` for multi-line equations.
 
 2. **Delimiter Requirement**: Single `$` on its own line breaks rendering on GitHub - the LaTeX code displays as raw text instead of rendered math.
 

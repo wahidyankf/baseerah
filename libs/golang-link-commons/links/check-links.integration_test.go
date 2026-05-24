@@ -15,12 +15,12 @@ import (
 
 	"github.com/cucumber/godog"
 	"github.com/wahidyankf/ose-public/libs/golang-commons/testutil"
-	"github.com/wahidyankf/ose-public/libs/hugo-commons/links"
+	"github.com/wahidyankf/ose-public/libs/golang-link-commons/links"
 )
 
 var specsCheckLinksDir = func() string {
 	_, f, _, _ := runtime.Caller(0)
-	return filepath.Join(filepath.Dir(f), "../../../specs/libs/hugo-commons/gherkin/links")
+	return filepath.Join(filepath.Dir(f), "../../../specs/libs/golang-link-commons/gherkin/links")
 }()
 
 type checkLinksSteps struct {

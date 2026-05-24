@@ -27,7 +27,7 @@ These workflows define **WHEN and HOW to validate ayokoding-web content**, orche
 **❌ Not Included:**
 
 - Single-agent operations (use agents directly)
-- Other Hugo sites (ose-web has separate workflows)
+- ose-web (has separate workflows)
 - Non-workflow documentation (that's conventions/)
 
 ## Workflows
@@ -39,6 +39,6 @@ These workflows define **WHEN and HOW to validate ayokoding-web content**, orche
 ## Related Documentation
 
 - [Workflows Index](../README.md) - All orchestrated workflows
-- [AyoKoding Web Conventions](../../conventions/hugo/ayokoding.md) - Content conventions these workflows enforce
+- [By Concept Tutorial Convention](../../conventions/tutorials/by-concept.md) - Content conventions these workflows enforce
 - [By Example Tutorial Convention](../../conventions/tutorials/swe-by-example.md) - By-example standards
 - [Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md) - Core workflow pattern

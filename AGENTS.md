@@ -361,7 +361,7 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 
 **Planning**: plan-maker, plan-checker, plan-execution-checker, plan-fixer (see [plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md))
 
-**Development**: swe-elixir-dev, swe-golang-dev, swe-java-dev, swe-python-dev, swe-typescript-dev, swe-e2e-dev, swe-dart-dev, swe-kotlin-dev, swe-csharp-dev, swe-fsharp-dev, swe-clojure-dev, swe-rust-dev, swe-hugo-dev (**DEPRECATED** — no active Hugo sites remain; formerly ose-web)
+**Development**: swe-elixir-dev, swe-golang-dev, swe-java-dev, swe-python-dev, swe-typescript-dev, swe-e2e-dev, swe-dart-dev, swe-kotlin-dev, swe-csharp-dev, swe-fsharp-dev, swe-clojure-dev, swe-rust-dev
 
 **Operations**: apps-ayokoding-web-deployer, apps-ose-web-deployer, apps-organiclever-web-deployer, apps-wahidyankf-web-deployer
 

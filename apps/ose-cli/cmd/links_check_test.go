@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/cucumber/godog"
-	"github.com/wahidyankf/ose-public/libs/hugo-commons/links"
+	"github.com/wahidyankf/ose-public/libs/golang-link-commons/links"
 )
 
 var specsDirUnitLinksCheckOseplatform = func() string {

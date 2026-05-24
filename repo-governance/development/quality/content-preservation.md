@@ -120,7 +120,7 @@ When offloading content, you must choose the appropriate destination folder. Bot
 - File naming, linking, emoji usage
 - Diagram formats, color accessibility
 - Content quality, mathematical notation
-- Hugo content, tutorials, acceptance criteria
+- Tutorials, acceptance criteria
 - Documentation organization (Diátaxis)
 - Timestamp format
 
@@ -419,7 +419,7 @@ Before completing a content offload, verify:
 
 - File naming, linking, emoji, diagrams, colors
 - Content quality, mathematical notation
-- Hugo content, tutorials, acceptance criteria
+- Tutorials, acceptance criteria
 - Documentation organization
 
 **For repo-governance/development/** (process/workflow):

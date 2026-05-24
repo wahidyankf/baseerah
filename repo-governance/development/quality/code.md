@@ -55,11 +55,9 @@ These tools work together to ensure code consistency and quality without manual 
 
 - JavaScript/TypeScript: `*.{js,jsx,ts,tsx,mjs,cjs}`
 - JSON: `*.json`
-- Markdown: `*.md` (excluding Hugo archetypes)
+- Markdown: `*.md`
 - YAML: `*.{yml,yaml}`
 - CSS/SCSS: `*.{css,scss}`
-
-**Note**: Hugo archetype template files (`apps/ose-web/archetypes/**/*.md`) are excluded from Prettier formatting as they contain Go template syntax.
 
 **When It Runs**: Automatically on staged files before each commit via the pre-commit hook.
 
@@ -94,7 +92,6 @@ npx prettier --write [file-path]
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": "prettier --write",
     "*.json": "prettier --write",
-    "apps/ose-web/archetypes/**/*.md": "echo 'Skipping Hugo archetype'",
     "*.md": "prettier --write",
     "*.{yml,yaml}": "prettier --write",
     "*.{css,scss}": "prettier --write"
@@ -486,11 +483,11 @@ automatically on every `test:quick` run via `ayokoding-cli links check`.
 
 [Learn](/en/learn)
 
-<!-- Wrong — relative paths break in Hugo sidebar/menu contexts -->
+<!-- Wrong — relative paths break in sidebar/menu contexts -->
 
 [Overview](../overview)
 
-<!-- Wrong — .md extension is not used in Hugo internal links -->
+<!-- Wrong — .md extension is not used in internal links -->
 
 [Overview](/en/learn/swe/overview.md)
 ```

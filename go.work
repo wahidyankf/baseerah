@@ -4,5 +4,5 @@ use (
 	./apps/ayokoding-cli
 	./apps/ose-cli
 	./libs/golang-commons
-	./libs/hugo-commons
+	./libs/golang-link-commons
 )

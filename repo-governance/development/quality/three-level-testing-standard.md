@@ -195,7 +195,6 @@ The table below states which test levels are mandatory per app type:
 | Content platforms | Mandatory | Mandatory (MSW)             | Mandatory (Playwright) |
 | FE apps           | Mandatory | N/A                         | Mandatory (Playwright) |
 | Libraries         | Mandatory | Optional                    | N/A                    |
-| Hugo sites        | Exempt    | Exempt                      | Exempt                 |
 | E2E runners       | N/A       | N/A                         | Mandatory              |
 
 ## Gherkin-Everywhere Mandate
@@ -395,10 +394,7 @@ The three-level standard applies universally, with adaptations per project type:
 | Content platform                | Vitest mocks                    | MSW/tRPC in-process (cacheable)  | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
 | CLI app (Go)                    | Go test mocks + Gherkin (godog) | Godog BDD in-process (cacheable) | N/A                | Yes        | `specs/apps/<cli-name>/`               |
 | Library (Go)                    | Go test mocks                   | Godog BDD in-process (cacheable) | N/A                | Yes        | `specs/libs/<lib-name>/`               |
-| Hugo site                       | Exempt                          | Exempt                           | Exempt             | Yes\*      | N/A                                    |
 | E2E runner                      | N/A                             | N/A                              | Playwright         | N/A        | Shared specs                           |
-
-_\* Hugo sites run `test:quick` for link checking only, not test execution._
 
 **Key rules by project type**:
 
@@ -407,7 +403,6 @@ _\* Hugo sites run `test:quick` for link checking only, not test execution._
 - **Web UI apps**: All three levels mandatory; integration uses in-process mocking (MSW); cacheable
 - **CLI apps**: Unit + integration mandatory; both levels consume Gherkin specs via godog; unit mocks all I/O via package-level function variables; integration uses real filesystem with `/tmp` fixtures; cacheable
 - **Libraries**: Unit mandatory; integration optional (Godog BDD with public API calls); cacheable
-- **Hugo sites**: Exempt from all test levels (only `test:quick` for link checking)
 
 ## Anti-Patterns
 

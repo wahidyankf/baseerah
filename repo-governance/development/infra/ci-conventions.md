@@ -170,20 +170,18 @@ per-backend implementation patterns, see the
 Each app type implements the three levels according to its domain. The table below shows how each
 app type realises each level.
 
-| App Type                                                  | Unit (`test:unit`)                                 | Integration (`test:integration`)                                                                   | E2E (`test:e2e`)                                     |
-| --------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **BE API** (`organiclever-be`)                            | BDD, mocked repos, calls service fns directly      | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)                           | Playwright, real HTTP + real PostgreSQL              |
-| **FE** (`organiclever-web`)                               | Vitest, all API calls mocked (MSW / mock services) | MSW with real DOM; in-process mocking only                                                         | Playwright against running FE + BE                   |
-| **CLI** (`*-cli`)                                         | Godog, all I/O mocked via function variables       | Godog (`//go:build integration`), real filesystem via `/tmp` fixtures, in-process via `cmd.RunE()` | Not applicable                                       |
-| **Content platform** (`ayokoding-web`, `ose-web`)         | Vitest, components and tRPC routes mocked          | MSW, in-process mocking                                                                            | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
-| **Library** (`golang-commons`)                            | Unit tests + Godog, mock closures                  | Godog, tmpdir mocks, cacheable                                                                     | Not applicable                                       |
-| **Hugo site** (historical -- no active Hugo sites remain) | Not applicable                                     | Not applicable                                                                                     | Not applicable                                       |
-| **E2E runner** (`*-e2e`)                                  | Not applicable                                     | Not applicable                                                                                     | Playwright — this project IS the E2E suite           |
+| App Type                                          | Unit (`test:unit`)                                 | Integration (`test:integration`)                                                                   | E2E (`test:e2e`)                                     |
+| ------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **BE API** (`organiclever-be`)                    | BDD, mocked repos, calls service fns directly      | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)                           | Playwright, real HTTP + real PostgreSQL              |
+| **FE** (`organiclever-web`)                       | Vitest, all API calls mocked (MSW / mock services) | MSW with real DOM; in-process mocking only                                                         | Playwright against running FE + BE                   |
+| **CLI** (`*-cli`)                                 | Godog, all I/O mocked via function variables       | Godog (`//go:build integration`), real filesystem via `/tmp` fixtures, in-process via `cmd.RunE()` | Not applicable                                       |
+| **Content platform** (`ayokoding-web`, `ose-web`) | Vitest, components and tRPC routes mocked          | MSW, in-process mocking                                                                            | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
+| **Library** (`golang-commons`)                    | Unit tests + Godog, mock closures                  | Godog, tmpdir mocks, cacheable                                                                     | Not applicable                                       |
+| **E2E runner** (`*-e2e`)                          | Not applicable                                     | Not applicable                                                                                     | Playwright — this project IS the E2E suite           |
 
 ## Gherkin Consumption Matrix
 
-All testable projects must consume Gherkin specifications at every applicable test level. Hugo sites
-(historical -- no active Hugo sites remain) were exempt because they had no application logic. E2E
+All testable projects must consume Gherkin specifications at every applicable test level. E2E
 runner projects ARE the Gherkin consumers at the E2E level.
 
 | App Type                   | Unit consumes Gherkin                                 | Integration consumes Gherkin | E2E consumes Gherkin              |
@@ -193,7 +191,6 @@ runner projects ARE the Gherkin consumers at the E2E level.
 | CLI (`*-cli`)              | Yes — `specs/apps/{domain}/behavior/cli/gherkin/`     | Yes — same specs             | Not applicable                    |
 | Content platform           | Yes — project-local specs                             | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
 | Library                    | Yes — library-specific specs                          | Yes — same specs             | Not applicable                    |
-| Hugo site (historical)     | Exempt                                                | Exempt                       | Exempt                            |
 | E2E runner                 | Not applicable                                        | Not applicable               | Yes — consumes shared specs       |
 
 ## Coverage Threshold Rationale

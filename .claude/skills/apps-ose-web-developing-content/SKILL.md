@@ -279,7 +279,7 @@ Next.js 16 provides:
 ### Theme Toggle
 
 ```yaml
-# Site config (hugo.yaml)
+# Site config (next.config.ts / app layout)
 params:
   defaultTheme: auto # Options: light, dark, auto
 ```
@@ -289,7 +289,7 @@ params:
 ### Social Sharing
 
 ```yaml
-# Site config (hugo.yaml)
+# Site config (next.config.ts / app layout)
 params:
   ShareButtons:
     - twitter
@@ -308,7 +308,7 @@ ShowShareButtons: true # Enable share buttons for this post
 ### Home Page Configuration
 
 ```yaml
-# Site config (hugo.yaml)
+# Site config (next.config.ts / app layout)
 params:
   homeInfoParams:
     Title: "Welcome to OSE Platform"
@@ -348,7 +348,7 @@ params:
 
 ```bash
 # 1. Create file with date prefix
-hugo new content/updates/2025-12-07-feature-release.md
+# apps/ose-web/content/updates/2025-12-07-feature-release.md
 
 # 2. Edit frontmatter
 # (add title, date, tags, cover image)
@@ -363,7 +363,7 @@ hugo new content/updates/2025-12-07-feature-release.md
 
 ```bash
 # 1. Create file
-hugo new content/about.md
+# apps/ose-web/content/about.md
 
 # 2. Edit frontmatter
 # (add title, url, summary)
@@ -444,11 +444,8 @@ cover:
 
 ## Reference Documentation
 
-**Primary Convention**: [Next.js Content Convention - ose-web](../../../repo-governance/conventions/hugo/ose-platform.md)
-
 **Related Conventions**:
 
-- [Next.js Content Shared](../../../repo-governance/conventions/hugo/shared.md) - Shared Next.js patterns
 - [Content Quality Principles](../../../repo-governance/conventions/writing/quality.md) - Universal quality standards
 
 **Related Skills**:
@@ -464,8 +461,7 @@ cover:
 
 **External Resources**:
 
-- [Next.js 16 Official Documentation](https://adityatelange.github.io/hugo-Next.js 16/)
-- [Next.js 16 GitHub Repository](https://github.com/adityatelange/hugo-Next.js 16)
+- [Next.js 16 Documentation](https://nextjs.org/docs)
 
 ---
 
@@ -512,11 +508,8 @@ Or use the `apps-ose-web-deployer` agent for a guided deployment.
 
 ## References
 
-**Primary Convention**: [Next.js Content Convention - ose-web](../../../repo-governance/conventions/hugo/ose-platform.md)
-
 **Related Conventions**:
 
-- [Next.js Content Shared](../../../repo-governance/conventions/hugo/shared.md) - Shared Next.js patterns
 - [Content Quality Principles](../../../repo-governance/conventions/writing/quality.md) - Universal quality standards
 
 **Related Skills**:

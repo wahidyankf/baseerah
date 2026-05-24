@@ -41,14 +41,14 @@ This convention establishes the pattern for nesting code fences when documenting
 
 - **Regular code blocks** - Single-level code blocks use standard 3 backticks
 - **Code quality** - This is about markdown syntax, not code content
-- **Hugo shortcodes** - Alternative approaches for Hugo sites (different syntax)
+- **Platform shortcodes** - Platform-specific alternatives (different syntax)
 
 ## Scope
 
 This convention applies to markdown content in:
 
 - **docs/** - Documentation showing markdown examples
-- **Hugo sites** - Content demonstrating markdown structure (ayokoding-web, ose-web)
+- **Next.js sites** - Content demonstrating markdown structure (ayokoding-web, ose-web)
 - **plans/** - Planning documents with markdown examples
 - **Repository root files** - README.md, CONTRIBUTING.md when documenting markdown
 
@@ -401,7 +401,7 @@ Before committing markdown with nested fences:
 
 - **GitHub Preview**: View file on GitHub web interface
 - **VS Code**: Use markdown preview (Cmd/Ctrl + Shift + V)
-- **hugo server**: For Hugo sites, test with local server
+- **nx dev**: For Next.js sites, test with local dev server
 
 ## Integration with Other Conventions
 
@@ -409,7 +409,6 @@ This convention works with:
 
 - **[Content Quality Principles](../writing/quality.md)**: Proper code block formatting is part of content quality
 - **[Indentation Convention](./indentation.md)**: Code blocks use language-specific indentation
-- **[Hugo Content Convention - Shared](../hugo/shared.md)**: Hugo sites need nested fences for markdown examples
 - **[Tutorial Convention](../tutorials/general.md)**: Tutorials often demonstrate markdown syntax
 
 ## Related Conventions
@@ -422,7 +421,6 @@ This convention works with:
 
 **Context-Specific**:
 
-- [Hugo Content Convention - Shared](../hugo/shared.md) - Hugo markdown specifics
 - [Tutorial Convention](../tutorials/general.md) - Teaching markdown syntax in tutorials
 - [README Quality Convention](../writing/readme-quality.md) - Code examples in README files
 

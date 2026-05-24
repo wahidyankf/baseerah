@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/wahidyankf/ose-public/libs/hugo-commons/links"
+	"github.com/wahidyankf/ose-public/libs/golang-link-commons/links"
 )
 
 // checkLinksFn is a package-level variable for dependency injection in tests.

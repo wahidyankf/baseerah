@@ -37,7 +37,7 @@ Convention documents define **how to write and format documentation** in this re
 - Content organization frameworks (Diátaxis, tutorials, plans)
 - Visual elements in documentation (diagrams, colors, emojis, mathematical notation)
 - Content quality and accessibility standards
-- Specific documentation types (tutorials, plans, READMEs, Hugo content)
+- Specific documentation types (tutorials, plans, READMEs, app content)
 - Documentation file formats and structures
 
 ### What Does NOT Belong in conventions/
@@ -46,7 +46,7 @@ Convention documents define **how to write and format documentation** in this re
 
 - Development workflows (git, commits, testing, BDD)
 - Build processes and tooling
-- Hugo theme/layout development (HTML templates, asset pipeline)
+- App theme/layout development (HTML templates, asset pipeline)
 - Development infrastructure (temporary files, build artifacts)
 - AI agent development standards
 - Code quality and testing practices
@@ -63,14 +63,14 @@ Does this define HOW TO WRITE OR FORMAT DOCUMENTATION?
 
 ### Examples of Scope Boundaries
 
-| Topic                                             | Location                                        | Reasoning                            |
-| ------------------------------------------------- | ----------------------------------------------- | ------------------------------------ |
-| How to write Hugo content (frontmatter, markdown) | `conventions/hugo/hugo-content-ose-platform.md` | About **writing** content            |
-| How to develop Hugo themes (layouts, templates)   | `development/hugo/development.md`               | About **building** infrastructure    |
-| How to format tutorials                           | `conventions/tutorials/general.md`              | About **writing** tutorials          |
-| How to write acceptance criteria                  | `development/infra/acceptance-criteria.md`      | About **software quality** process   |
-| How to name files                                 | `conventions/structure/file-naming.md`          | About **documentation** organization |
-| How to write commit messages                      | `development/workflow/commit-messages.md`       | About **git workflow**               |
+| Topic                                             | Location                                                | Reasoning                            |
+| ------------------------------------------------- | ------------------------------------------------------- | ------------------------------------ |
+| How to write app content (frontmatter, markdown)  | `conventions/tutorials/programming-language-content.md` | About **writing** content            |
+| How to develop Next.js components (layouts, etc.) | `development/` practices                                | About **building** infrastructure    |
+| How to format tutorials                           | `conventions/tutorials/general.md`                      | About **writing** tutorials          |
+| How to write acceptance criteria                  | `development/infra/acceptance-criteria.md`              | About **software quality** process   |
+| How to name files                                 | `conventions/structure/file-naming.md`                  | About **documentation** organization |
+| How to write commit messages                      | `development/workflow/commit-messages.md`               | About **git workflow**               |
 
 ## Convention Document Structure
 
@@ -360,7 +360,7 @@ Convention documents vary in length based on complexity:
 
 ### Long Conventions (1500+ lines)
 
-**Examples:** Hugo Content, Diátaxis Framework, Tutorials, Content Quality
+**Examples:** Diátaxis Framework, Tutorials, Content Quality
 
 **When appropriate:**
 
@@ -540,7 +540,7 @@ Conventions are most effective when enforced or assisted by agents:
 
 - **docs-checker** - Validates documentation follows conventions
 - **docs-link-checker** - Enforces linking convention
-- **apps-ayokoding-web-general-checker** - Validates general Hugo content conventions
+- **apps-ayokoding-web-general-checker** - Validates general ayokoding-web content conventions
 - **apps-ayokoding-web-by-example-checker** - Validates by-example tutorial conventions
 - **repo-rules-checker** - Audits convention compliance
 

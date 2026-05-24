@@ -121,7 +121,7 @@ These rules are intentionally disabled to align with repository conventions:
 - **MD013**: Line length (allow long links)
 - **MD024**: Duplicate headings (common in long docs)
 - **MD025**: Multiple H1s (some files intentionally have multiple)
-- **MD033**: Inline HTML (allowed for Hugo frontmatter)
+- **MD033**: Inline HTML (allowed for frontmatter)
 - **MD036**: Emphasis as heading (intentional styling pattern)
 - **MD040**: Code language (many code blocks are plain text)
 - **MD041**: First line H1 (conflicts with frontmatter)
@@ -271,7 +271,7 @@ The following directories are excluded from linting and formatting:
 
 - `node_modules/`
 - `dist/`, `build/`, `.next/`, `.nx/`
-- `apps/*/public/` (Hugo public directories)
+- `apps/*/public/`
 - `apps-labs/` (experimental apps)
 - `generated-reports/`
 - `.vscode/`, `.idea/` (IDE files)

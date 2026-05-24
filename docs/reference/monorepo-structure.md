@@ -184,7 +184,7 @@ Contains reusable library packages.
 **Current Libraries**:
 
 - `golang-commons` - Shared Go utilities (links checker + output functions)
-- `hugo-commons` - Shared Hugo utilities (Godog BDD testing)
+- `golang-link-commons` - Shared Go link-checking utilities (Godog BDD testing)
 
 **Examples** (planned):
 
@@ -225,7 +225,7 @@ libs/ts-utils/
 
 ### Current Scope
 
-Go (`golang-commons`, `hugo-commons`) and future TypeScript, Java, Kotlin, Python libraries.
+Go (`golang-commons`, `golang-link-commons`) and future TypeScript, Java, Kotlin, Python libraries.
 
 ## Experimental Projects vs Monorepo Projects
 

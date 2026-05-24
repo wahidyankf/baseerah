@@ -86,7 +86,7 @@ all use the same MIT text.
 | `specs/`                        | MIT     |
 | `libs/clojure-openapi-codegen/` | MIT     |
 | `libs/golang-commons/`          | MIT     |
-| `libs/hugo-commons/`            | MIT     |
+| `libs/golang-link-commons/`     | MIT     |
 | `libs/ts-ui/`                   | MIT     |
 | `libs/web-ui/`                  | MIT     |
 | `libs/web-ui-token/`            | MIT     |

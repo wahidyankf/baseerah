@@ -583,7 +583,6 @@ npm install
 
 - [Reproducible Environments](../../development/workflow/reproducible-environments.md) - Implementation practices
 - [Code Quality Convention](../../development/quality/code.md) - Automated consistency
-- [Hugo Development](../../development/hugo/development.md) - Reproducible builds
 
 ## References
 

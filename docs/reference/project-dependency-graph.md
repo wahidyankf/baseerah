@@ -67,7 +67,7 @@ graph TD
   RC[rhino-cli]
 
   %% Go libs (leaf / near-leaf)
-  HC[hugo-commons]
+  HC[golang-link-commons]
   GC[golang-commons]
 
   %% Content site → CLI
@@ -158,7 +158,7 @@ Repository management CLI used by most projects for coverage validation
 
 Shared Go utilities (time formatting, test helpers, output capture).
 
-- **Dependents**: `rhino-cli`, `hugo-commons`, `ayokoding-cli`, `ose-cli`
+- **Dependents**: `rhino-cli`, `golang-link-commons`, `ayokoding-cli`, `ose-cli`
 - **Mechanism**: Go module `replace` directives + `implicitDependencies`
 
 ## Project Dependency Table
@@ -183,18 +183,18 @@ Shared Go utilities (time formatting, test helpers, output capture).
 
 ### CLI Tools
 
-| Project       | Dependencies                            | Spec Inputs                         |
-| ------------- | --------------------------------------- | ----------------------------------- |
-| ayokoding-cli | golang-commons, hugo-commons, rhino-cli | ayokoding-cli/\* (test:integration) |
-| ose-cli       | golang-commons, hugo-commons, rhino-cli | ose-cli/\* (test:integration)       |
-| rhino-cli     | golang-commons                          | rhino-cli/\* (test:integration)     |
+| Project       | Dependencies                                   | Spec Inputs                         |
+| ------------- | ---------------------------------------------- | ----------------------------------- |
+| ayokoding-cli | golang-commons, golang-link-commons, rhino-cli | ayokoding-cli/\* (test:integration) |
+| ose-cli       | golang-commons, golang-link-commons, rhino-cli | ose-cli/\* (test:integration)       |
+| rhino-cli     | golang-commons                                 | rhino-cli/\* (test:integration)     |
 
 ### Libraries
 
-| Project        | Dependencies              | Spec Inputs                          |
-| -------------- | ------------------------- | ------------------------------------ |
-| golang-commons | (none)                    | golang-commons/\* (test:integration) |
-| hugo-commons   | golang-commons, rhino-cli | hugo-commons/\* (test:integration)   |
+| Project             | Dependencies              | Spec Inputs                               |
+| ------------------- | ------------------------- | ----------------------------------------- |
+| golang-commons      | (none)                    | golang-commons/\* (test:integration)      |
+| golang-link-commons | golang-commons, rhino-cli | golang-link-commons/\* (test:integration) |
 
 ## Spec Directory Mapping
 
@@ -209,7 +209,7 @@ All Gherkin specs and API contracts live under `specs/` and are consumed via
 | `specs/apps/ayokoding/`                         | ayokoding-cli, ayokoding-web           | test:integration                        |
 | `specs/apps/ose-platform/`                      | ose-cli, ose-web                       | test:integration                        |
 | `specs/libs/golang-commons/`                    | golang-commons                         | test:integration                        |
-| `specs/libs/hugo-commons/`                      | hugo-commons                           | test:integration                        |
+| `specs/libs/golang-link-commons/`               | golang-link-commons                    | test:integration                        |
 
 ## Design Decisions
 

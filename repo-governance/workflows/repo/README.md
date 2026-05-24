@@ -27,7 +27,7 @@ These workflows define **WHEN and HOW to validate and synchronize repository art
 **❌ Not Included:**
 
 - Content quality validation (that's docs/)
-- Hugo content validation (that's ayokoding-web/)
+- ayokoding-web content validation (that's ayokoding-web/)
 - Plan validation (that's plan/)
 
 ## Workflows

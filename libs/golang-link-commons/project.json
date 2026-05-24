@@ -1,44 +1,44 @@
 {
-  "name": "hugo-commons",
-  "sourceRoot": "libs/hugo-commons",
+  "name": "golang-link-commons",
+  "sourceRoot": "libs/golang-link-commons",
   "projectType": "library",
   "targets": {
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "CGO_ENABLED=0 go test -coverprofile=cover.out ./... && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate libs/hugo-commons/cover.out 90)",
-        "cwd": "libs/hugo-commons"
+        "command": "CGO_ENABLED=0 go test -coverprofile=cover.out ./... && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate libs/golang-link-commons/cover.out 90)",
+        "cwd": "libs/golang-link-commons"
       }
     },
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
         "command": "CGO_ENABLED=0 go test ./... -count=1",
-        "cwd": "libs/hugo-commons"
+        "cwd": "libs/golang-link-commons"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "CGO_ENABLED=0 golangci-lint run --allow-parallel-runners ./...",
-        "cwd": "libs/hugo-commons"
+        "cwd": "libs/golang-link-commons"
       }
     },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
         "command": "CGO_ENABLED=0 go test -v -tags=integration -run TestIntegration -coverprofile=cover_spec.out ./...",
-        "cwd": "libs/hugo-commons"
+        "cwd": "libs/golang-link-commons"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/specs/libs/hugo-commons/**/*.feature"],
+      "inputs": ["{projectRoot}/**/*.go", "{workspaceRoot}/specs/libs/golang-link-commons/**/*.feature"],
       "outputs": ["{projectRoot}/cover_spec.out"]
     },
     "install": {
       "executor": "nx:run-commands",
       "options": {
         "command": "go mod tidy",
-        "cwd": "libs/hugo-commons"
+        "cwd": "libs/golang-link-commons"
       }
     }
   },

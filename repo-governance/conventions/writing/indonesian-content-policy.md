@@ -48,9 +48,8 @@ This convention establishes a clear content language policy for ayokoding-web to
 ### What This Convention Does NOT Cover
 
 - Indonesian language writing style and tone (covered in general content quality standards)
-- Indonesian-specific frontmatter or markdown conventions (covered in [Hugo Content - ayokoding-web (historical)](../hugo/ayokoding.md))
-- Bilingual navigation structure (covered in [Hugo Content - ayokoding-web (historical)](../hugo/ayokoding.md))
-- Hugo multilingual configuration (covered in [Hugo Content - Shared (historical)](../hugo/shared.md))
+- Indonesian-specific frontmatter or markdown conventions (covered in [Programming Language Content Standard](../tutorials/programming-language-content.md))
+- Bilingual navigation structure (covered in [Programming Language Content Standard](../tutorials/programming-language-content.md))
 
 ---
 
@@ -223,7 +222,7 @@ START: Should I create Indonesian content?
 > _Artikel ini adalah hasil terjemahan dengan bantuan mesin. Karenanya akan ada pergeseran nuansa dari artikel aslinya. Untuk mendapatkan pesan dan nuansa asli dari artikel ini, silakan kunjungi artikel yang asli di: [English Article Title](/en/learn/path/to/article)_
 ```
 
-**See**: [Hugo Content - ayokoding-web (historical)](../hugo/ayokoding.md#cross-reference-pattern-bilingual-blogging-content) for complete cross-reference standards.
+**See**: [Programming Language Content Standard](../tutorials/programming-language-content.md) for complete content standards.
 
 ---
 
@@ -325,7 +324,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial only
-hugo new content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md --kind learn
+# apps/ayokoding-web/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # No automatic Indonesian creation
 # /id/belajar/swe/programming-languages/typescript/ does NOT exist
@@ -335,10 +334,10 @@ hugo new content/en/learn/swe/programming-languages/typescript/tutorials/by-exam
 
 ```bash
 # Agent creates English tutorial
-hugo new content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md --kind learn
+# apps/ayokoding-web/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # Agent ALSO creates Indonesian mirror (WRONG!)
-hugo new content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md --kind learn
+# apps/ayokoding-web/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 # This violates English-first policy unless explicitly requested
 ```
 
@@ -350,7 +349,7 @@ hugo new content/id/belajar/swe/programming-languages/typescript/tutorials/by-ex
 
 ```bash
 # Create Indonesian personal essay (encouraged)
-hugo new content/id/celoteh/2024/02/refleksi-belajar-golang.md --kind celoteh
+# apps/ayokoding-web/content/id/celoteh/2024/02/refleksi-belajar-golang.md
 ```
 
 **Content Focus**:
@@ -376,13 +375,13 @@ User: "Please translate the Golang Initial Setup tutorial to Indonesian. This is
 
 ```bash
 # Create Indonesian translation
-hugo new content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md --kind learn
+# apps/ayokoding-web/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in English version
-echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/ayokoding-web/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in Indonesian version with machine translation disclaimer
-echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/ayokoding-web/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 ```
 
 **Key Points**:
@@ -413,8 +412,6 @@ Before creating Indonesian content, verify:
 
 **Related Conventions**:
 
-- [Hugo Content - ayokoding-web (historical)](../hugo/ayokoding.md) - Site-specific conventions including bilingual support, cross-reference patterns, and navigation structure
-- [Hugo Content - Shared (historical)](../hugo/shared.md) - Common Hugo conventions applying to all sites
 - [Programming Language Content Standard](../tutorials/programming-language-content.md) - Full Set Tutorial Package architecture (applies to English tutorials)
 
 **Related Principles**:

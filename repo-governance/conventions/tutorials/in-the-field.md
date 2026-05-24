@@ -2387,7 +2387,7 @@ This convention implements and respects:
 - **apps/ose-web/content/** - Platform in-the-field guides
 - **Any other location** - In-the-field tutorials regardless of directory
 
-**Implementation Notes**: While these standards apply universally, Hugo-specific details (frontmatter, weights, navigation) are covered in [Hugo conventions](../hugo/README.md)
+**Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.
 
 ### What This Convention Covers
 
@@ -2403,7 +2403,6 @@ This convention implements and respects:
 
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
-- **Hugo-specific implementation** - Frontmatter, weights, navigation covered in [Hugo conventions](../hugo/README.md)
 - **Code quality** - Source code standards in development conventions
 - **Tutorial validation** - Covered by apps-ayokoding-web-general-checker agent
 

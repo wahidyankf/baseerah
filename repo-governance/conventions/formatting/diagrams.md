@@ -43,7 +43,6 @@ This convention establishes Mermaid diagrams as the primary visualization format
 
 ### What This Convention Does NOT Cover
 
-- **Hugo theme diagram rendering** - Previously covered in Hugo Development Convention (now deprecated; no active Hugo sites remain)
 - **Diagram content strategy** - What diagrams to create (covered in specific domain conventions)
 - **Vector graphics or images** - This convention is only for text-based diagrams (Mermaid and ASCII)
 - **Interactive diagram features** - Platform-specific interactivity (zoom, pan) is implementation detail
@@ -1334,7 +1333,7 @@ flowchart LR
 
 ### Error 5: Sequence Diagram Participant Syntax with "as" Keyword
 
-**CRITICAL**: Using `participant X as "Display Name"` syntax with quotes in sequence diagrams causes rendering failures in Hugo/Hextra environments.
+**CRITICAL**: Using `participant X as "Display Name"` syntax with quotes in sequence diagrams causes rendering failures in some Mermaid environments.
 
 **Problem Example (FAIL: BROKEN)**:
 
@@ -1349,7 +1348,7 @@ sequenceDiagram
     F1-->>Loop: Return result
 ```
 
-**Why it fails**: The Hextra theme's Mermaid renderer struggles with complex display names containing spaces, parentheses, or special characters when combined with the `as` keyword and quotes. This syntax pattern causes parsing errors in Hugo/Hextra contexts.
+**Why it fails**: Some Mermaid renderers struggle with complex display names containing spaces, parentheses, or special characters when combined with the `as` keyword and quotes. This syntax pattern causes parsing errors.
 
 **Solution (PASS: WORKING)**:
 
@@ -1385,10 +1384,9 @@ sequenceDiagram
 
 **Rationale**:
 
-- The Hextra theme documentation shows working examples using simple participant syntax
-- Complex display names with `as` keyword and quotes cause parsing errors
+- Simple participant syntax is the canonical example in Mermaid documentation
+- Complex display names with `as` keyword and quotes cause parsing errors in some renderers
 - Simple identifiers are more reliable across different Mermaid versions and rendering contexts
-- Hugo/Hextra environments have different parser constraints than standalone Mermaid
 
 **Affected diagram types**: `sequenceDiagram` only (not `graph`/`flowchart`)
 
@@ -1479,11 +1477,11 @@ graph TD
 
 Renders as: "HashMap<K, V> / O(1) lookup / Values: [1, 2, 3] / Dict: {a: 1}"
 
-### Error 7: `\n` Escape Sequences Do Not Create Line Breaks in Hugo Mermaid Rendering
+### Error 7: `\n` Escape Sequences Do Not Create Line Breaks in Mermaid Rendering
 
-**CRITICAL**: The `\n` escape sequence does not create line breaks in Mermaid diagrams rendered via Hugo's code block render hook. It renders as the literal characters `\n` in both node labels and edge labels.
+**CRITICAL**: The `\n` escape sequence does not create line breaks in Mermaid diagrams. It renders as the literal characters `\n` in both node labels and edge labels.
 
-**Root Cause**: Hugo's `render-codeblock-mermaid.html` render hook pipes the diagram source through `htmlEscape`, which passes `\n` through unchanged (backslash is not an HTML special character). Mermaid ESM loaded from CDN then receives the literal string `\n` and does not interpret it as a line break in this rendering context.
+**Root Cause**: Mermaid ESM receives the literal string `\n` and does not interpret it as a line break. This is a Mermaid behavior, not a platform issue.
 
 **Context**:
 
@@ -1568,7 +1566,7 @@ Both node label lines (each segment between `<br/>` tags) and edge label strings
 
 Count every character including spaces, colons, slashes, and Unicode.
 
-**Note**: `rhino-cli docs validate-mermaid` enforces ≤ **30** raw characters per `<br/>`-split line (Mermaid's `wrappingWidth` baseline). The stricter 20-character limit documented here is specific to Hugo/Hextra rendering clipping. Use `--max-label-len 20` when validating content for Hugo-based sites.
+**Note**: `rhino-cli docs validate-mermaid` enforces ≤ **30** raw characters per `<br/>`-split line (Mermaid's `wrappingWidth` baseline). Use `--max-label-len 20` for stricter validation to guard against rendering clipping in some environments.
 
 **Safe examples (≤20 chars):**
 
@@ -1673,7 +1671,7 @@ graph TD
 
 **Automated enforcement**: Run `rhino-cli docs validate-mermaid` to check these rules
 mechanically instead of counting characters manually. Use `--max-label-len 20` to enforce
-the 20-character Hugo/Hextra limit (the default is 30, matching Mermaid's `wrappingWidth`
+the 20-character limit (the default is 30, matching Mermaid's `wrappingWidth`
 baseline). The tool also checks parallel rank width (Rule 2 above) and single-diagram-per-block.
 
 **Real-World Context**: All five rules were verified when fixing C4 architecture diagrams in the monorepo. Failures observed:

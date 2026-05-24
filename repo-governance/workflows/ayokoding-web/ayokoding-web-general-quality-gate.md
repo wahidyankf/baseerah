@@ -161,7 +161,7 @@ Analyze all audit reports to determine if fixes are needed.
 
 ### 3. Apply Content Fixes (Sequential, Conditional)
 
-Fix Hugo convention violations, frontmatter issues, and content quality problems.
+Fix convention violations, frontmatter issues, and content quality problems.
 
 **Agent**: `apps-ayokoding-web-general-fixer`
 

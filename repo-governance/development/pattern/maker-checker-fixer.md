@@ -733,7 +733,6 @@ The maker-checker-fixer pattern integrates with repository conventions:
 | [Fixer Confidence Levels Convention](../quality/fixer-confidence-levels.md) | Fixers assess confidence, combine with criticality for priority |
 | [Repository Validation Methodology](../quality/repository-validation.md)    | Standard validation patterns used by checker/fixer              |
 | [Content Quality Principles](../../conventions/writing/quality.md)          | What checkers validate (quality standards)                      |
-| [Hugo Content Convention](../../conventions/hugo/shared.md)                 | Historical Hugo standards (both sites now on Next.js 16)        |
 | [Tutorial Convention](../../conventions/tutorials/general.md)               | What docs-tutorial-maker/checker enforce                        |
 | [README Quality Convention](../../conventions/writing/readme-quality.md)    | What readme-maker/checker enforce                               |
 | [Temporary Files Convention](../infra/temporary-files.md)                   | Where checker/fixer reports are stored                          |
@@ -806,9 +805,6 @@ If verification fails, log the fix as FAILED (not applied). Do NOT log as "fixed
 **Domain-Specific Standards**:
 
 - [Content Quality Principles](../../conventions/writing/quality.md) - Universal content standards
-- [Hugo Content Convention - Shared](../../conventions/hugo/shared.md) - Historical Hugo standards (DEPRECATED — both sites migrated to Next.js 16)
-- [Hugo Content Convention - ayokoding](../../conventions/hugo/ayokoding.md) - Historical ayokoding-web Hugo specifics (DEPRECATED)
-- [Hugo Content Convention - OSE Platform](../../conventions/hugo/ose-platform.md) - Historical ose-web Hugo specifics (DEPRECATED)
 - [Tutorial Convention](../../conventions/tutorials/general.md) - Tutorial quality standards
 - [README Quality Convention](../../conventions/writing/readme-quality.md) - README standards
 

@@ -30,7 +30,6 @@ These conventions define **HOW to format markdown content** including indentatio
 - Content quality standards (that's writing/)
 - Writing style guidelines (that's writing/)
 - Tutorial structure (that's tutorials/)
-- Hugo content rules (that's hugo/)
 
 ## Conventions
 

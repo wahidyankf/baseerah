@@ -75,7 +75,7 @@ graph TD
 #### Layer 2: Conventions (WHAT - Documentation Rules)
 
 - **[Conventions](./conventions/README.md)** - Documentation writing and organization standards
-  - Conventions organized across categories (formatting, linking, writing, structure, tutorials, hugo)
+  - Conventions organized across categories (formatting, linking, writing, structure, tutorials)
   - Implements principles in concrete documentation rules
   - Each convention includes "Principles Implemented/Respected" section
   - Enforced by AI agents (docs-checker, docs-maker, etc.)
@@ -84,7 +84,7 @@ graph TD
 #### Layer 3: Development (HOW - Software Practices)
 
 - **[Development](./development/README.md)** - Software development practices and workflows
-  - Practices organized across categories (workflow, quality, pattern, practice, agents, infra, frontend, hugo)
+  - Practices organized across categories (workflow, quality, pattern, practice, agents, infra, frontend)
   - Implements principles in concrete software standards
   - Each practice includes "Principles Implemented/Respected" AND "Conventions Implemented/Respected" sections
   - Enforced by AI agents and automation (git hooks, build tools)

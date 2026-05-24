@@ -212,7 +212,7 @@ specs/libs/<lib-name>/
 ```
 specs/libs/golang-commons/gherkin/testutil/capture-stdout.feature
 specs/libs/golang-commons/gherkin/timeutil/timestamp.feature
-specs/libs/hugo-commons/gherkin/links/check-links.feature
+specs/libs/golang-link-commons/gherkin/links/check-links.feature
 ```
 
 ## Full Directory Structure

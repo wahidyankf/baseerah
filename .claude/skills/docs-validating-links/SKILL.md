@@ -66,7 +66,7 @@ Use this Skill when:
 ❌ FAIL: [[file-naming]] ← Wiki-link syntax (GitHub does not render these)
 ❌ FAIL: [file-naming.md](../meta/file-naming.md) ← Using filename as link text
 
-**Note**: Both `apps/ayokoding-web/` and `apps/ose-web/` have migrated to Next.js 16. Their content links are validated by their respective CLI tools (`ayokoding-cli links check`, `ose-cli links check`), not by this Skill's Hugo link rules.
+**Note**: Both `apps/ayokoding-web/` and `apps/ose-web/` have migrated to Next.js 16. Their content links are validated by their respective CLI tools (`ayokoding-cli links check`, `ose-cli links check`), not by this Skill's link validation rules.
 
 ### Validation Methodology
 
@@ -285,7 +285,7 @@ Finding: [BROKEN] - Internal Link to Non-Existent File
 **Linking Standards**:
 
 - Linking Convention - Complete linking standards
-- Hugo Content Convention - Historical Hugo linking patterns (DEPRECATED — both sites now on Next.js 16)
+- Linking Convention - Standard linking patterns for docs/ and app content
 
 **Validation Standards**:
 

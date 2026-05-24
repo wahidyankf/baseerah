@@ -9,7 +9,7 @@ services:
     volumes:
       - ../../../apps/ayokoding-cli:/app/apps/ayokoding-cli
       - ../../../libs/golang-commons:/app/libs/golang-commons
-      - ../../../libs/hugo-commons:/app/libs/hugo-commons
+      - ../../../libs/golang-link-commons:/app/libs/golang-link-commons
       - ../../../specs:/app/specs:ro
     working_dir: /app/apps/ayokoding-cli
     command: go test ./... -v

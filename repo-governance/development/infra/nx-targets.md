@@ -133,16 +133,14 @@ Tags are the standard mechanism for attaching structured metadata to projects in
 
 Every project declares tags along four dimensions. Each dimension uses a fixed prefix and a controlled vocabulary.
 
-| Dimension | Prefix      | Allowed Values                                                                                                        | Required                       | Purpose                                                       |
-| --------- | ----------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Type      | `type:`     | `app`, `lib`, `e2e`                                                                                                   | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
-| Platform  | `platform:` | `hugo`, `cli`, `nextjs`, `spring-boot`, `phoenix`, `giraffe`, `gin`, `fastapi`, `axum`, `ktor`, `vertx`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
-| Language  | `lang:`     | `golang`, `ts`, `java`, `elixir`, `fsharp`, `python`, `rust`, `kotlin`, `dart`                                        | Projects with application code | Primary language of source code                               |
-| Domain    | `domain:`   | `ayokoding`, `ose-platform`, `organiclever`, `wahidyankf`, `demo-be`, `demo-fe`, `tooling`                            | Always                         | Business or product domain                                    |
+| Dimension | Prefix      | Allowed Values                                                                                                | Required                       | Purpose                                                       |
+| --------- | ----------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Type      | `type:`     | `app`, `lib`, `e2e`                                                                                           | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
+| Platform  | `platform:` | `cli`, `nextjs`, `spring-boot`, `phoenix`, `giraffe`, `gin`, `fastapi`, `axum`, `ktor`, `vertx`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
+| Language  | `lang:`     | `golang`, `ts`, `java`, `elixir`, `fsharp`, `python`, `rust`, `kotlin`, `dart`                                | Projects with application code | Primary language of source code                               |
+| Domain    | `domain:`   | `ayokoding`, `ose-platform`, `organiclever`, `wahidyankf`, `demo-be`, `demo-fe`, `tooling`                    | Always                         | Business or product domain                                    |
 
 ### Special Rules
-
-**Hugo sites omit `lang:` (historical -- no active Hugo sites remain)**: Hugo sites consist of templates and markdown content; `go.mod` and `go.sum` present in a Hugo project are Hugo module dependency files, not application source code. No application code is written in Go, so `lang:` does not apply.
 
 **Go libs omit `platform:`**: A Go library has no framework or runtime boundary — only a primary language. Declare `type:lib` and `lang:golang`; omit `platform:`.
 
@@ -163,7 +161,7 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 | `ose-web`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose-platform"]`      |
 | `wahidyankf-web`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`        |
 | `wahidyankf-web-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`    |
-| `hugo-commons`          | `["type:lib", "lang:golang"]`                                            |
+| `golang-link-commons`   | `["type:lib", "lang:golang"]`                                            |
 | `golang-commons`        | `["type:lib", "lang:golang"]`                                            |
 
 ### Example: Complete Tag Declaration
@@ -198,18 +196,17 @@ A Go lib has no platform boundary and no domain, so it omits both:
 
 ### Summary Matrix
 
-Derived from three rules: (1) All apps+libs → unit tests, (2) All apps → integration tests, (3) All web apps (APIs + web UIs) → E2E tests. Hugo sites are exempt from all rules. `spec-coverage` is compulsory for all apps and E2E runners.
+Derived from three rules: (1) All apps+libs → unit tests, (2) All apps → integration tests, (3) All web apps (APIs + web UIs) → E2E tests. `spec-coverage` is compulsory for all apps and E2E runners.
 
-| Project Type           | `test:unit` | `test:integration` | `test:e2e` | `test:quick` | `spec-coverage` | `lint` | `build` | `typecheck`  |
-| ---------------------- | ----------- | ------------------ | ---------- | ------------ | --------------- | ------ | ------- | ------------ |
-| API Backend            | Yes         | Yes (PG)           | Yes\*      | Yes          | Yes             | Yes    | Yes     | Yes (all 11) |
-| Web UI App             | Yes         | Yes (MSW)          | Yes\*      | Yes          | Yes             | Yes    | Yes     | If typed     |
-| Demo-fe FE             | Yes         | —                  | Yes\*      | Yes          | Yes             | Yes    | Yes     | If typed     |
-| Fullstack              | Yes         | Yes                | Yes\*      | Yes          | Yes             | Yes    | Yes     | If typed     |
-| CLI App                | Yes         | Yes (Godog)        | —          | Yes          | Yes             | Yes    | Yes     | If typed     |
-| Library                | Yes         | Optional           | —          | Yes          | Yes             | Yes    | —       | If typed     |
-| Hugo Site (historical) | —           | —                  | —          | Yes          | —               | —      | Yes     | —            |
-| E2E Runner             | —           | —                  | Yes        | Yes          | Yes             | Yes    | —       | If typed     |
+| Project Type | `test:unit` | `test:integration` | `test:e2e` | `test:quick` | `spec-coverage` | `lint` | `build` | `typecheck`  |
+| ------------ | ----------- | ------------------ | ---------- | ------------ | --------------- | ------ | ------- | ------------ |
+| API Backend  | Yes         | Yes (PG)           | Yes\*      | Yes          | Yes             | Yes    | Yes     | Yes (all 11) |
+| Web UI App   | Yes         | Yes (MSW)          | Yes\*      | Yes          | Yes             | Yes    | Yes     | If typed     |
+| Demo-fe FE   | Yes         | —                  | Yes\*      | Yes          | Yes             | Yes    | Yes     | If typed     |
+| Fullstack    | Yes         | Yes                | Yes\*      | Yes          | Yes             | Yes    | Yes     | If typed     |
+| CLI App      | Yes         | Yes (Godog)        | —          | Yes          | Yes             | Yes    | Yes     | If typed     |
+| Library      | Yes         | Optional           | —          | Yes          | Yes             | Yes    | —       | If typed     |
+| E2E Runner   | —           | —                  | Yes        | Yes          | Yes             | Yes    | —       | If typed     |
 
 **Product backend `typecheck` examples** (all statically typed backends use `typecheck` with `dependsOn: ["codegen"]` where codegen applies):
 
@@ -236,13 +233,12 @@ Every project in `apps/` and `libs/` must expose:
 
 **`test:quick` composition** — each project decides which fast checks form its gate. The target runs its checks directly (calling the underlying tools, not other Nx targets) to avoid double execution when `lint` or `typecheck` are also run standalone by the pre-push hook. Common compositions:
 
-| Project type           | Typical `test:quick` composition                                                                                                                                                                                                               |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TypeScript app         | unit tests via vitest (typecheck and lint run separately in pre-push); coverage from unit tests only via `rhino-cli test-coverage validate` ≥90%                                                                                               |
-| Go app                 | `go test -coverprofile=cover.out ./... && rhino-cli test-coverage validate <project>/cover.out 90` — compiles and runs unit tests (excluding `//go:build integration` files), then enforces ≥90% line coverage (standard line-based algorithm) |
-| F#/Giraffe             | unit tests via xUnit + AltCover LCOV → `rhino-cli test-coverage validate` ≥90%                                                                                                                                                                 |
-| Hugo site (historical) | link check via the site's CLI tool (build runs separately via `nx build`)                                                                                                                                                                      |
-| Playwright `*-e2e`     | run the linter directly (no unit tests to add beyond linting)                                                                                                                                                                                  |
+| Project type       | Typical `test:quick` composition                                                                                                                                                                                                               |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TypeScript app     | unit tests via vitest (typecheck and lint run separately in pre-push); coverage from unit tests only via `rhino-cli test-coverage validate` ≥90%                                                                                               |
+| Go app             | `go test -coverprofile=cover.out ./... && rhino-cli test-coverage validate <project>/cover.out 90` — compiles and runs unit tests (excluding `//go:build integration` files), then enforces ≥90% line coverage (standard line-based algorithm) |
+| F#/Giraffe         | unit tests via xUnit + AltCover LCOV → `rhino-cli test-coverage validate` ≥90%                                                                                                                                                                 |
+| Playwright `*-e2e` | run the linter directly (no unit tests to add beyond linting)                                                                                                                                                                                  |
 
 > For polyglot `test:quick` composition patterns (Java, Kotlin, Python, Rust, Elixir, TypeScript backend, C#, Clojure, Dart/Flutter), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -266,7 +262,7 @@ analysis pass is warranted.
 
 ### Compiled and Bundled Projects
 
-Projects that produce artifacts from a compilation or bundling step (Go, Java, Hugo, Next.js):
+Projects that produce artifacts from a compilation or bundling step (Go, Java, Next.js):
 
 | Target  | Requirement                                                          |
 | ------- | -------------------------------------------------------------------- |
@@ -276,7 +272,7 @@ Projects that produce artifacts from a compilation or bundling step (Go, Java, H
 
 ### Apps with Development Servers
 
-Hugo sites, Next.js, Spring Boot, Python web apps:
+Next.js, Spring Boot, Python web apps:
 
 | Target | Requirement                                       |
 | ------ | ------------------------------------------------- |
@@ -320,11 +316,11 @@ Both files are co-located in the same `cmd/` package (not a separate folder) to 
 [BDD Spec-to-Test Mapping Convention](./bdd-spec-test-mapping.md) for the mandatory 1:1 mapping
 between commands and feature file `@tags`.
 
-**Go libs** (`hugo-commons`, `golang-commons`) also expose `test:integration` using the same Godog
+**Go libs** (`golang-link-commons`, `golang-commons`) also expose `test:integration` using the same Godog
 BDD pattern. Because libs have no CLI commands, integration tests call the public package API
 directly and use external test packages (`package foo_test`). They test complete library pipelines
 (e.g., `CheckLinks` → `OutputLinksText/JSON/Markdown`) and realistic consumer scenarios rather than
-isolated functions. Mock filesystem fixtures (tmpdir with controlled `.md` files) replace real Hugo
+isolated functions. Mock filesystem fixtures (tmpdir with controlled `.md` files) stand in for real
 sites; `testutil.CaptureStdout` captures stdout from output functions. Feature files live in
 `specs/{lib-name}/{package}/`.
 
@@ -387,7 +383,7 @@ the project's feature files has a matching step definition in the implementation
 | E2E runners (`organiclever-be-e2e`, `organiclever-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                              |
 | Content platforms (`ayokoding-web`, `ose-web`)              | Enforced | `--shared-steps`                                                                            |
 | Web UI apps (`organiclever-web`)                            | Enforced | `--shared-steps`                                                                            |
-| Libraries (`golang-commons`, `hugo-commons`)                | Enforced | `--shared-steps`                                                                            |
+| Libraries (`golang-commons`, `golang-link-commons`)         | Enforced | `--shared-steps`                                                                            |
 | Projects with genuine step gaps                             | Deferred | `spec-coverage` target exists but validation deferred until step implementation is complete |
 
 All apps and E2E runners are required to have a `spec-coverage` target. Projects with genuine step
@@ -444,15 +440,9 @@ or `layout/accessibility.feature`). UI component library specs in
 `specs/libs/web-ui/gherkin/<component>/` must include "Has no accessibility violations" scenarios for
 each component.
 
-### Hugo Sites (Historical -- No Active Hugo Sites Remain)
-
-| Target  | Requirement                                            |
-| ------- | ------------------------------------------------------ |
-| `clean` | Remove `public/`, `resources/`, and `.hugo_build.lock` |
-
 ## Workspace-Level Defaults
 
-`nx.json` `targetDefaults` provide inherited behaviour for standard targets. Individual `project.json` files override these when the project differs (e.g., Hugo sites output to `public/` not `dist/`).
+`nx.json` `targetDefaults` provide inherited behaviour for standard targets. Individual `project.json` files override these when the project differs.
 
 ```json
 {
@@ -511,22 +501,21 @@ each component.
 
 Declare the output directory in `project.json` `outputs` to enable Nx cache restoration.
 
-| Project Type           | Output Directory        |
-| ---------------------- | ----------------------- |
-| Go CLI                 | `{projectRoot}/dist/`   |
-| Hugo site (historical) | `{projectRoot}/public/` |
-| Next.js                | `{projectRoot}/.next/`  |
-| Spring Boot            | `{projectRoot}/target/` |
+| Project Type | Output Directory        |
+| ------------ | ----------------------- |
+| Go CLI       | `{projectRoot}/dist/`   |
+| Next.js      | `{projectRoot}/.next/`  |
+| Spring Boot  | `{projectRoot}/target/` |
 
-Example override for a Hugo site:
+Example override for a Next.js app with custom output:
 
 ```json
 {
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/public"],
-      "options": { "command": "bash build.sh" }
+      "outputs": ["{projectRoot}/.next"],
+      "options": { "command": "next build" }
     }
   }
 }

@@ -1,4 +1,4 @@
-module github.com/wahidyankf/ose-public/libs/hugo-commons
+module github.com/wahidyankf/ose-public/libs/golang-link-commons
 
 go 1.26
 

@@ -15,13 +15,13 @@ created: 2026-05-17
 
 # FP-Variant Multi-Language Convention
 
-FP-variant by-example tutorials in ayokoding-web teach functional programming concepts through architecture examples. Without a normative language rule, authors may present only one language, mechanically translate idioms across languages, or present non-idiomatic code that misleads learners. This convention establishes the bidirectional idiomatic-language rule: every FP-variant by-example page presents code in F# AND Clojure using Hugo tabs, and each language stays idiomatic to its own community and runtime rather than being forced into the shape of the other.
+FP-variant by-example tutorials in ayokoding-web teach functional programming concepts through architecture examples. Without a normative language rule, authors may present only one language, mechanically translate idioms across languages, or present non-idiomatic code that misleads learners. This convention establishes the bidirectional idiomatic-language rule: every FP-variant by-example page presents code in F# AND Clojure using tabbed format, and each language stays idiomatic to its own community and runtime rather than being forced into the shape of the other.
 
 ## Principles Implemented/Respected
 
 This convention implements the following core principles:
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The two-language requirement and the Hugo tabs format are stated explicitly — not left to author preference. The list of idiomatic patterns for each language, the annotation density requirement, and the cross-paradigm annotation rule are all stated as numbered standards rather than vague guidance.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The two-language requirement and the tabbed format are stated explicitly — not left to author preference. The list of idiomatic patterns for each language, the annotation density requirement, and the cross-paradigm annotation rule are all stated as numbered standards rather than vague guidance.
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: When a paradigm-specific concept has no direct counterpart in the other language, the rule requires the closest native equivalent plus a short annotation — not an elaborate simulation. The simplest truthful representation takes precedence over architectural symmetry for its own sake.
 
@@ -57,9 +57,9 @@ This convention exists to:
 
 ## Standards
 
-### S1: Hugo Tabs Format — F# First, Clojure Second
+### S1: Tabbed Format — F# First, Clojure Second
 
-Every code block in an FP-variant by-example page MUST use Hugo tabs with F# as the first tab and Clojure as the second tab.
+Every code block in an FP-variant by-example page MUST use tabbed format with F# as the first tab and Clojure as the second tab.
 
 The outer shortcode structure is:
 

@@ -27,7 +27,7 @@ These workflows define **WHEN and HOW to validate documentation**, orchestrating
 
 **❌ Not Included:**
 
-- Hugo site validation (that's ayokoding-web/)
+- ayokoding-web content validation (that's ayokoding-web/)
 - README validation (that's separate workflow)
 - Single-agent operations (use agents directly)
 

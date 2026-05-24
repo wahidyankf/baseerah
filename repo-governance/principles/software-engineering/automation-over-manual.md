@@ -427,7 +427,7 @@ The project enforces code quality through automated git hooks:
 
 - JavaScript/TypeScript formatting (2 spaces)
 - JSON formatting
-- Markdown formatting (excluding Hugo archetypes)
+- Markdown formatting
 - YAML formatting
 
 **Automation benefits**:

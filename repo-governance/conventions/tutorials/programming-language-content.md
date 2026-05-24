@@ -47,7 +47,7 @@ This convention applies to:
 - Includes: tutorials (foundational, by-concept, by-example, cookbook), how-to guides, best practices, anti-patterns
 - Enforced by: `apps-ayokoding-web-general-checker`, `apps-ayokoding-web-by-example-checker`, `apps-ayokoding-web-general-maker`, `apps-ayokoding-web-by-example-maker`, `apps-ayokoding-web-facts-checker` agents
 
-**Implementation Notes**: While the Full Set Tutorial Package architecture applies universally, Hugo-specific implementation details (frontmatter, weight values, navigation) are covered in [Hugo conventions](../hugo/README.md)
+**Implementation Notes**: While the Full Set Tutorial Package architecture applies universally, implementation details (frontmatter, weight values, navigation) are documented in the Content Requirements section below.
 
 ## Universal Directory Structure
 
@@ -109,7 +109,7 @@ The level-based weight system uses a two-part rule:
 
 - `_index.md` IS the folder (navigation hub) → uses the folder's own level
 - Regular content files LIVE INSIDE the folder → one level deeper in hierarchy
-- Hugo compares siblings only → weights reset independently per parent
+- Navigation compares siblings only → weights reset independently per parent
 
 **Detailed Weight Calculation:**
 
@@ -145,7 +145,7 @@ The level-based weight system uses a two-part rule:
 
 The rule connects them: folder at directory depth N uses weight range N, content inside uses weight range N+1.
 
-For complete details on the level-based weight system, see [Hugo Content Convention - ayokoding](../hugo/ayokoding.md).
+The level-based weight system above is the complete reference for ayokoding-web content navigation.
 
 **Notes:**
 
@@ -214,7 +214,7 @@ reference/
 ├── overview.md         (1000000) ← Level 7 base RESET (different parent, content inside reference/)
 ```
 
-**RESET Explanation:** Different parent folders independently use the same base weight (1000000) for their children. Hugo only compares siblings (files with the same parent), so `tutorials/overview.md` (1000000) and `how-to/overview.md` (1000000) never conflict - they have different parents and appear in different navigation contexts.
+**RESET Explanation:** Different parent folders independently use the same base weight (1000000) for their children. Navigation only compares siblings (files with the same parent), so `tutorials/overview.md` (1000000) and `how-to/overview.md` (1000000) never conflict - they have different parents and appear in different navigation contexts.
 
 **Weight System Summary:**
 
@@ -683,7 +683,7 @@ Content creators MUST:
 
 Content MUST pass:
 
-1. **apps-ayokoding-web-general-checker** or **apps-ayokoding-web-by-example-checker** validation (Hugo conventions, quality principles)
+1. **apps-ayokoding-web-general-checker** or **apps-ayokoding-web-by-example-checker** validation (quality principles)
 2. **apps-ayokoding-web-facts-checker** verification (factual correctness)
 3. **apps-ayokoding-web-link-checker** validation (all links work)
 4. **Manual review** (pedagogical effectiveness, clarity)
@@ -798,8 +798,6 @@ Even Elixir, the highest standard, has gaps:
 
 ## Related Conventions
 
-- [Hugo Content Convention - Shared](../hugo/shared.md) - Base Hugo content rules
-- [Hugo Content Convention - ayokoding](../hugo/ayokoding.md) - Hextra theme specifics
 - [Tutorial Naming Convention](./naming.md) - Tutorial level definitions
 - [Content Quality Principles](../writing/quality.md) - Quality standards
 - [Diátaxis Framework](../structure/diataxis-framework.md) - Documentation categorization

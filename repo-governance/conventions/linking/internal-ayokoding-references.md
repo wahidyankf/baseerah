@@ -52,7 +52,7 @@ This convention ensures documentation references to AyoKoding educational conten
 ### What This Convention Does NOT Cover
 
 - **General markdown linking** - Covered by [Linking Convention](../formatting/linking.md)
-- **Hugo internal navigation** - Covered by [Hugo Content Convention - ayokoding](../hugo/ayokoding.md)
+- **ayokoding-web internal navigation** - Covered by [Programming Language Content Standard](../tutorials/programming-language-content.md)
 - **External web resources** - Public URLs to third-party sites (Stack Overflow, GitHub, etc.)
 - **Cross-repository references** - Links to content in separate git repositories
 - **apps/ayokoding-web/ → docs/** - Reverse direction (educational content linking to docs)
@@ -362,10 +362,7 @@ If AyoKoding content structure changes (directory reorganization):
 **Related Conventions:**
 
 - [Linking Convention](../formatting/linking.md) - General markdown linking standards (GitHub-compatible paths with `.md`)
-- [Hugo Content Convention - ayokoding](../hugo/ayokoding.md) - How AyoKoding content itself handles internal navigation
-- [Hugo Content Convention - Shared](../hugo/shared.md) - Adapted linking conventions for Hugo sites
-
-**Related Principles:**
+  **Related Principles:**
 
 - [Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md) - Why explicit relative paths over implicit external URLs
 - [Reproducibility First](../../principles/software-engineering/reproducibility.md) - Why links must work across all environments

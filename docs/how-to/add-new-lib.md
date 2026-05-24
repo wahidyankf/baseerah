@@ -29,8 +29,7 @@ Follow the naming convention: `[language-prefix]-[name]`
 **Language Prefixes**:
 
 - `ts-` - TypeScript
-- `golang-` - Go (e.g., `golang-commons`)
-- `hugo-` - Hugo shared utilities (e.g., `hugo-commons`)
+- `golang-` - Go (e.g., `golang-commons`, `golang-link-commons`)
 - `java-` - Java (future)
 - `py-` - Python (future)
 
@@ -38,8 +37,8 @@ Follow the naming convention: `[language-prefix]-[name]`
 
 - `ts-utils` - TypeScript utility functions
 - `ts-components` - Reusable React components
-- `golang-commons` - Shared Go utilities (links checker, output)
-- `hugo-commons` - Shared Hugo test utilities (Godog BDD)
+- `golang-commons` - Shared Go utilities (output, formatting)
+- `golang-link-commons` - Shared Go link-checking utilities (Godog BDD)
 
 ### Step 2: Create Library Directory
 

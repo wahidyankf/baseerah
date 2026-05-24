@@ -146,7 +146,7 @@ Workflows for creating and validating documentation:
 
 ### Web Content Workflows
 
-Workflows for web application content (Next.js sites, formerly Hugo):
+Workflows for web application content (Next.js sites):
 
 - **ayokoding-web**: ayokoding-web content creation and validation
 - **ayokoding-facts**: Factual accuracy validation for ayokoding-web (planned - no workflow file yet)

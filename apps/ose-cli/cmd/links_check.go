@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/wahidyankf/ose-public/libs/hugo-commons/links"
+	"github.com/wahidyankf/ose-public/libs/golang-link-commons/links"
 )
 
 var linksContentDir string

@@ -51,7 +51,7 @@ This convention ensures:
 - `apps-ayokoding-web-by-example-checker` (validates by-example structure)
 - `docs-tutorial-checker` (validates docs/ tutorial quality)
 
-**Implementation Notes**: The Full Set Tutorial Package structure is universal. Hugo-specific implementation details (weight values, frontmatter, navigation) are covered in [Hugo conventions](../hugo/README.md)
+**Implementation Notes**: The Full Set Tutorial Package structure is universal. Platform-specific details (weight values, frontmatter, navigation) are covered in site-specific skills.
 
 ## Directory Structure Pattern
 
@@ -370,7 +370,7 @@ tutorials/
 2. **Content INSIDE folder** is one level deeper → uses level N+1 base weight
 3. **Weights RESET per parent**: by-concept/ and by-example/ both start at 10000000 for overview.md (different parents, independent sequences)
 
-See [Hugo Content Convention - ayokoding](../hugo/ayokoding.md) for complete level-based weight system details.
+See the ayokoding-web developing content skill for complete level-based weight system details.
 
 ## Full Set Completeness Requirements
 
@@ -392,11 +392,11 @@ See [Hugo Content Convention - ayokoding](../hugo/ayokoding.md) for complete lev
 
 **Quality Gate**: A language is NOT complete until all 5 components exist and pass validation. Languages can be production-ready with a subset of components.
 
-## Hugo Requirements
+## Content Requirements
 
 ### Frontmatter
 
-All tutorial files follow standard Hugo frontmatter:
+All tutorial files follow this frontmatter format:
 
 ```yaml
 ---
@@ -411,8 +411,8 @@ tags: ["language-name", "tutorial-type", "skill-level"]
 
 **Rules:**
 
-- **No categories field**: Causes raw text leak in Hextra theme
-- **No author field**: Uses site-level config (params.author in hugo.yaml)
+- **No categories field**: Not used in ayokoding-web content
+- **No author field**: Not used in ayokoding-web content
 - **Date format**: UTC+7 with ISO 8601 format
 - **Weight field**: MANDATORY - uses level-based system
 - **Tags**: JSON array format `["tag1", "tag2"]` (NOT dash-based YAML)
@@ -438,12 +438,9 @@ tags: ["language-name", "tutorial-type", "skill-level"]
 
 **Why absolute paths?**
 
-- Hugo resolves links based on current page context
-- Relative paths break when content rendered in different locations
+- Relative paths break when content is rendered in different contexts (sidebar, mobile menu, homepage)
 - Absolute paths work from ANY page context
 - Language prefix ensures correct bilingual routing
-
-See [Hugo Content Convention - ayokoding](../hugo/ayokoding.md#internal-link-requirements) for complete details.
 
 ### Overview Files
 
@@ -772,7 +769,6 @@ Run `apps-ayokoding-web-by-example-checker` to verify structure and content qual
 
 - **[Programming Language Content Standard](./programming-language-content.md)** - Universal content architecture for programming languages (5 tutorial levels, coverage philosophy, quality metrics, pedagogical patterns)
 - **[By Example Tutorial Convention](./swe-by-example.md)** - Complete standards for creating code-first by-example tutorials (five-part structure, self-containment, educational comments, coverage progression)
-- **[Hugo Content Convention - ayokoding](../hugo/ayokoding.md)** - Hextra theme specifics (level-based weights, absolute paths, navigation depth, frontmatter requirements)
 - **[Tutorial Naming Convention](./naming.md)** - Tutorial type definitions (Initial Setup, Quick Start, Beginner, Intermediate, Advanced coverage percentages)
 - **[Content Quality Principles](../writing/quality.md)** - Universal markdown quality standards (active voice, heading hierarchy, accessibility)
 - **[Diátaxis Framework](../structure/diataxis-framework.md)** - Documentation categorization (tutorials vs how-to vs reference vs explanation)

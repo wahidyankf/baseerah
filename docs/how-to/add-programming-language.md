@@ -27,7 +27,6 @@ Before starting, ensure you have:
 - [ ] **Access to repository** with write permissions to `apps/ayokoding-web/`
 - [ ] **Familiarity with conventions**:
   - [Programming Language Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md)
-  - [Hugo Content Convention - ayokoding](../../repo-governance/conventions/hugo/ayokoding.md)
   - [Content Quality Principles](../../repo-governance/conventions/writing/quality.md)
 - [ ] **AI agents available**:
   - `ayokoding-web-general-maker` (general content creation)
@@ -170,7 +169,7 @@ Before starting, ensure you have:
 
 ### Step 2.2: Set Up Navigation Files
 
-**Why:** Enable Hugo navigation and establish content hierarchy.
+**Why:** Enable navigation and establish content hierarchy.
 
 **Actions:**
 
@@ -628,7 +627,7 @@ Before starting, ensure you have:
 
 ### Step 4.1: Run Content Quality Checks
 
-**Why:** Ensure content meets Hugo and quality standards.
+**Why:** Ensure content meets quality standards.
 
 **Actions:**
 
@@ -638,7 +637,7 @@ Before starting, ensure you have:
    Spawn ayokoding-web-general-checker agent:
    "Validate all [Language] content at apps/ayokoding-web/content/en/learn/swe/programming-languages/[language]/
 
-   Check: Hugo conventions, content quality principles, structure compliance"
+   Check: content quality principles, structure compliance"
    ```
 
 2. **Review audit report** in `generated-reports/`
@@ -797,9 +796,9 @@ Before starting, ensure you have:
 
 ### Common Issues
 
-**Issue:** ayokoding-web-general-checker reports Hugo convention violations
+**Issue:** ayokoding-web-general-checker reports content convention violations
 
-**Solution:** Review [Hugo Content Convention - ayokoding](../../repo-governance/conventions/hugo/ayokoding.md) and fix violations. Common issues:
+**Solution:** Review [Programming Language Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md) and fix violations. Common issues:
 
 - Missing frontmatter fields
 - Incorrect weight values (use level-based system with correct levels)
@@ -907,7 +906,6 @@ Use this final checklist to verify completion:
 ## Related Documentation
 
 - [Programming Language Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md) - Complete standard definition
-- [Hugo Content Convention - ayokoding](../../repo-governance/conventions/hugo/ayokoding.md) - Hextra theme specifics
 - [Content Quality Principles](../../repo-governance/conventions/writing/quality.md) - Quality requirements
 - [Tutorial Naming Convention](../../repo-governance/conventions/tutorials/naming.md) - Tutorial level definitions
 - [Factual Validation Convention](../../repo-governance/conventions/writing/factual-validation.md) - Fact-checking methodology

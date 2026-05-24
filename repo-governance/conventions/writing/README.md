@@ -16,7 +16,7 @@ Content quality standards, validation methodology, and writing guidelines for do
 
 ## Purpose
 
-This directory contains universal standards for writing documentation content that apply to ALL repository markdown contexts (docs/, Hugo sites, plans/, root files). These are the foundational writing conventions that all other content builds upon.
+This directory contains universal standards for writing documentation content that apply to ALL repository markdown contexts (docs/, apps/, plans/, root files). These are the foundational writing conventions that all other content builds upon.
 
 ## Documents
 
@@ -24,7 +24,7 @@ This directory contains universal standards for writing documentation content th
 - [Conventions](./conventions.md) - **Meta-convention** defining how to write and organize convention documents. Covers document structure, scope boundaries, quality checklist, when to create new vs update existing, length guidelines, and integration with agents. Essential reading for creating or updating conventions
 - [Dynamic Collection References](./dynamic-collection-references.md) - Standards for referencing dynamic collections (agents, principles, conventions, practices, skills) without hardcoding counts. Prevents documentation drift by requiring count-free references with links to authoritative index documents
 - [Factual Validation](./factual-validation.md) - Universal methodology for validating factual correctness across all repository content using web verification (WebSearch + WebFetch). Defines core validation methodology, web verification workflow, confidence classification (Verified, Unverified, Error, Outdated)
-- [FP-Variant Multi-Language Convention](./fp-variant-multi-language.md) - Bidirectional idiomatic-language rule for FP-variant by-example tutorials in ayokoding-web. Requires F# AND Clojure tabs using Hugo tabs format with each language kept idiomatic to its own community. Defines idiomatic patterns for each language, cross-paradigm concept handling (closest native equivalent + annotation), and per-tab annotation density (1.0–2.25 ratio)
+- [FP-Variant Multi-Language Convention](./fp-variant-multi-language.md) - Bidirectional idiomatic-language rule for FP-variant by-example tutorials in ayokoding-web. Requires F# AND Clojure tabs using tabbed format with each language kept idiomatic to its own community. Defines idiomatic patterns for each language, cross-paradigm concept handling (closest native equivalent + annotation), and per-tab annotation density (1.0–2.25 ratio)
 - [Indonesian Content Policy](./indonesian-content-policy.md) - Policy defining when and how to create Indonesian content in ayokoding-web bilingual platform. Establishes English-first policy, defines Indonesian content categories (unique content, strategic translations, discouraged mirrors), and provides decision tree for language selection
 - [OSS Documentation](./oss-documentation.md) - Standards for repository documentation files (README, CONTRIBUTING, ADRs, security) following open source best practices
 - [README Quality](./readme-quality.md) - Quality standards for README.md files ensuring engagement, accessibility, and scannability. Defines problem-solution hooks, jargon elimination, acronym context requirements, benefits-focused language, navigation structure, and paragraph length limits
@@ -36,7 +36,6 @@ This directory contains universal standards for writing documentation content th
 - [Formatting Conventions](../formatting/README.md) - Markdown syntax, visual elements
 - [Structure Conventions](../structure/README.md) - File organization and naming
 - [Tutorials Conventions](../tutorials/README.md) - Tutorial creation standards
-- [Hugo Conventions](../hugo/README.md) - Hugo site content standards
 
 ## Principles Implemented/Respected
 

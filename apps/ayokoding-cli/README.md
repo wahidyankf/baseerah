@@ -72,7 +72,7 @@ ayokoding-cli links check --quiet
 
 | Type                     | Example                  | Handled by                              |
 | ------------------------ | ------------------------ | --------------------------------------- |
-| Internal (Hugo absolute) | `/en/learn/swe/overview` | `ayokoding-cli links check`             |
+| Internal (absolute path) | `/en/learn/swe/overview` | `ayokoding-cli links check`             |
 | External URL             | `https://example.com`    | `apps-ayokoding-web-link-checker` agent |
 | Same-page anchor         | `#section-name`          | Not validated                           |
 
@@ -274,5 +274,5 @@ nx run ayokoding-cli
 
 ## References
 
-- [Hugo Content Convention - ayokoding-web](../../repo-governance/conventions/hugo/ayokoding.md)
+- [Programming Language Content Standard](../../repo-governance/conventions/tutorials/programming-language-content.md)
 - [AI Agents Convention](../../repo-governance/development/agents/ai-agents.md)

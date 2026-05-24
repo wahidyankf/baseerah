@@ -49,7 +49,7 @@ This convention establishes comprehensive standards for tutorial content across 
 ### What This Convention Does NOT Cover
 
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
-- **Hugo site tutorials** - Hextra theme specifics covered in [ayokoding-web convention](../hugo/ayokoding.md)
+- **ayokoding-web-specific implementation** - Platform-specific frontmatter and navigation details covered in the ayokoding-web developing content skill
 - **Non-tutorial content** - How-To guides, Reference, Explanation covered separately
 - **Tutorial validation** - Covered by docs-tutorial-checker agent
 
@@ -65,7 +65,7 @@ Tutorials are **learning-oriented** documentation that guide learners through ac
 - **apps/ose-web/content/** - Platform tutorials and guides
 - **Any other location** - Tutorial content regardless of directory
 
-**Implementation Notes**: While these standards apply universally, implementation details (Hugo frontmatter, weight values, navigation structure) vary by platform and are covered in site-specific conventions ([ayokoding-web](../hugo/ayokoding.md), [ose-web](../hugo/ose-platform.md))
+**Implementation Notes**: While these standards apply universally, implementation details (frontmatter, weight values, navigation structure) vary by platform and are covered in site-specific skills (see the ayokoding-web developing content skill).
 
 ## Diátaxis Principles for Tutorials
 

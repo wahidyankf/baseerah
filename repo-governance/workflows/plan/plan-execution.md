@@ -89,7 +89,7 @@ The orchestrator selects the best agent for each delivery checklist item using t
 
 3. **Match by content type**: If the item involves documentation (`docs/`, `README.md`), governance (`repo-governance/`), specs (`specs/`), or E2E tests (`*-e2e`, Playwright), use the appropriate content agent (`docs-maker`, `repo-rules-maker`, `readme-maker`, `specs-maker`, `swe-e2e-dev`).
 
-4. **Match by framework/tool keywords**: If the item mentions a framework (Spring Boot, Ktor, FastAPI, Gin, Phoenix, Giraffe, Axum, Pedestal, Hugo, Next.js, Flutter), use the agent for that framework's language.
+4. **Match by framework/tool keywords**: If the item mentions a framework (Spring Boot, Ktor, FastAPI, Gin, Phoenix, Giraffe, Axum, Pedestal, Next.js, Flutter), use the agent for that framework's language.
 
 5. **Fallback (direct execution)**: If no specialized agent cleanly matches — e.g., a one-line edit to a governance doc, a grep or file-move operation, an `npm` command — the orchestrator executes the item directly via `Edit` / `Bash` without delegating. Direct execution is only for trivial, context-bounded work; substantive changes always route through an agent.
 

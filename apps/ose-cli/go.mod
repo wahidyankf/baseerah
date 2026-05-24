@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/cucumber/godog v0.15.1
 	github.com/spf13/cobra v1.10.2
-	github.com/wahidyankf/ose-public/libs/hugo-commons v0.0.0-20260515180206-9f4c59a7c82c
+	github.com/wahidyankf/ose-public/libs/golang-link-commons v0.0.0-00010101000000-000000000000
 )
 
 require (
@@ -31,13 +31,13 @@ require (
 	github.com/vladopajic/go-test-coverage/v2 v2.18.3 // indirect
 	github.com/wahidyankf/ose-public/libs/golang-commons v0.0.0-20260515180206-9f4c59a7c82c // indirect
 	golang.org/x/image v0.39.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
-	golang.org/x/tools v0.41.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 replace github.com/wahidyankf/ose-public/libs/golang-commons v0.0.0-00010101000000-000000000000 => ../../libs/golang-commons
 
-replace github.com/wahidyankf/ose-public/libs/hugo-commons v0.0.0-00010101000000-000000000000 => ../../libs/hugo-commons
+replace github.com/wahidyankf/ose-public/libs/golang-link-commons v0.0.0-00010101000000-000000000000 => ../../libs/golang-link-commons
 
 tool github.com/vladopajic/go-test-coverage/v2

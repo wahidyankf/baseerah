@@ -58,7 +58,7 @@ This convention establishes quality standards for README.md files to make them e
 
 - **Technical accuracy** - Factual validation covered in [Factual Validation Convention](./factual-validation.md)
 - **Code examples in README** - Code quality covered in development conventions
-- **Hugo site READMEs** - Hugo-specific patterns in Hugo content conventions
+- **App-specific content** - Covered in app-specific content conventions (e.g., [Programming Language Content Standard](../tutorials/programming-language-content.md))
 - **OSS compliance** - License, contribution guidelines covered in [OSS Documentation Convention](./oss-documentation.md)
 
 ## Motivation

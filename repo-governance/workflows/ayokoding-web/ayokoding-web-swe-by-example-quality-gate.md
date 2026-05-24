@@ -787,7 +787,7 @@ This workflow is part of the **Tutorial Quality Family**:
 - **[Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md)**: General pattern
 - **docs-tutorial workflow**: General tutorial validation
 - **ayokoding-web-swe-by-example-quality-gate** (this workflow): Specialized for by-example tutorials
-- **ayokoding-web workflow**: Hugo content validation
+- **ayokoding-web workflow**: General content validation
 
 ## Notes
 
