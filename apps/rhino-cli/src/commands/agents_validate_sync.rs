@@ -8,7 +8,7 @@ use crate::internal::agents::reporter::{
 };
 use crate::internal::agents::sync_validator::validate_sync;
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 
 #[derive(Args, Debug)]
 pub struct ValidateSyncArgs {
@@ -22,7 +22,7 @@ pub struct ValidateSyncArgs {
 
 pub fn run(args: &ValidateSyncArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let result = validate_sync(&repo_root);
 
     match output_format {

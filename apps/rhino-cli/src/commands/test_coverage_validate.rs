@@ -7,7 +7,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::testcoverage::{
     cobertura, detect, go_coverage, jacoco, lcov, reporter,
     types::{Format, Result as CoverageResult},
@@ -32,7 +32,7 @@ pub struct ValidateArgs {
 
 pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let abs_path = repo_root.join(&args.coverage_file);
 
     let threshold: f64 = args.threshold.parse().map_err(|_| {

@@ -4,7 +4,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::testcoverage::diff::{DiffCoverageOptions, compute_diff_coverage};
 use crate::internal::testcoverage::reporter;
 
@@ -35,7 +35,7 @@ pub struct DiffArgs {
 
 pub fn run(args: &DiffArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let abs_path = repo_root.join(&args.coverage_file);
     let abs_path_str = abs_path
         .to_str()

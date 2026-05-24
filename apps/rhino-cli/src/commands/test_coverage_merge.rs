@@ -4,7 +4,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::testcoverage::merge::{
     CoverageMap, merge_coverage_maps, result_from_coverage_map, to_coverage_map, write_lcov,
 };
@@ -32,7 +32,7 @@ pub struct MergeArgs {
 
 pub fn run(args: &MergeArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
 
     let mut maps: Vec<CoverageMap> = Vec::with_capacity(args.files.len());
     for arg in &args.files {

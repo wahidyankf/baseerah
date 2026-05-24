@@ -7,7 +7,7 @@ use clap::Args;
 use walkdir::WalkDir;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 
 #[derive(Args, Debug)]
 pub struct EnvInitArgs {
@@ -18,7 +18,7 @@ pub struct EnvInitArgs {
 
 pub fn run(args: &EnvInitArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let infra_dev = repo_root.join("infra/dev");
     let mut created = 0usize;
     let mut skipped = 0usize;

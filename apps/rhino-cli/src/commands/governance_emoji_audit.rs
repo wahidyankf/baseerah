@@ -8,7 +8,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::repo_governance::emoji_audit::{EmojiFinding, audit_emoji};
 
 const SCHEMA: &str = "rhino-cli/emoji-audit/v1";
@@ -40,7 +40,7 @@ struct Envelope<'a> {
 
 pub fn run(args: &EmojiAuditArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
 
     let rel_paths: Vec<String> = if !args.positional.is_empty() {
         args.positional.clone()

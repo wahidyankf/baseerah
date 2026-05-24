@@ -8,7 +8,7 @@ use crate::internal::envbackup::{
     DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE, Options, detect_worktree, expand_tilde, format_json,
     format_markdown, format_text, restore,
 };
-use crate::internal::gitutil;
+use crate::internal::git;
 
 #[derive(Args, Debug)]
 pub struct EnvRestoreArgs {
@@ -28,7 +28,7 @@ pub struct EnvRestoreArgs {
 
 pub fn run(args: &EnvRestoreArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let backup_dir = if args.dir.is_empty() {
         let home = expand_tilde("~")?;
         home.join(DEFAULT_BACKUP_DIR)

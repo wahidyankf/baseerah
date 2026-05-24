@@ -7,7 +7,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::repo_governance::license_audit::{LicenseFinding, audit_license};
 
 const SCHEMA: &str = "rhino-cli/license-audit/v1";
@@ -33,7 +33,7 @@ pub fn run(
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let findings = audit_license(&repo_root).context("license audit failed")?;
 
     match output_format {

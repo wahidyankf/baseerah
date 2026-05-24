@@ -8,7 +8,7 @@ use serde::Serialize;
 
 use crate::internal::agents::detect_duplication::{DuplicationFinding, detect_duplication};
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 
 const SCHEMA: &str = "rhino-cli/agents-detect-duplication/v1";
 
@@ -36,7 +36,7 @@ pub fn run(
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let findings = detect_duplication(&repo_root).context("agents detect-duplication failed")?;
 
     match output_format {

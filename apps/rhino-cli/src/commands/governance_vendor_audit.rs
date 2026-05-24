@@ -8,7 +8,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::repo_governance::vendor_audit::{Finding, walk};
 
 #[derive(Args, Debug)]
@@ -34,7 +34,7 @@ struct JsonResult<'a> {
 
 pub fn run(args: &VendorAuditArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let scan_path = args.path.as_deref().unwrap_or("repo-governance");
     let full_path = if Path::new(scan_path).is_absolute() {
         scan_path.into()

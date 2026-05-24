@@ -4,6 +4,8 @@
 // External dependencies (validate-claude, sync, validate-sync, validate-links)
 // call the same Rust internal modules already ported.
 
+pub mod root;
+
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;

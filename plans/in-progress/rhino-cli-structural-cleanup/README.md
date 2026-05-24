@@ -422,7 +422,7 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 ### Phase 3: Consolidate `gitutil` into `git::root`
 
-- [ ] Confirm Red gate — verify existing `gitutil` tests reference `find_git_root`:
+- [x] Confirm Red gate — verify existing `gitutil` tests reference `find_git_root`:
       `grep -n "find_git_root" apps/rhino-cli/src/internal/gitutil.rs` — must show
       at least the function definition and its test. Also confirm that `cargo check`
       currently PASSES (Phase 2 complete) before creating the new file. These tests
@@ -430,30 +430,30 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
       rename is complete.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/rhino-cli/src/internal/git/root.rs` [_New file_]:
+- [x] Create `apps/rhino-cli/src/internal/git/root.rs` [_New file_]:
       Copy the entire content of `apps/rhino-cli/src/internal/gitutil.rs` to this
       new file. Then rename `find_git_root` → `find_root` everywhere in `root.rs`
       (function definition and the test assertion message).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Edit `apps/rhino-cli/src/internal/git.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/internal/git.rs` [Repo-grounded]:
       Add `pub mod root;` as the first `pub mod` declaration (before any `use`
       statements or function definitions).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Edit `apps/rhino-cli/src/internal.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/internal.rs` [Repo-grounded]:
       Remove the line `pub mod gitutil;` (this line declares the old `gitutil` module;
       removing it causes `cargo check` to fail until all 35 caller files are updated —
       that compile failure is the expected Red gate confirming work is not yet done).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Delete `apps/rhino-cli/src/internal/gitutil.rs`:
+- [x] Delete `apps/rhino-cli/src/internal/gitutil.rs`:
 
   ```bash
   rm apps/rhino-cli/src/internal/gitutil.rs
   ```
 
-- [ ] Update all 35 caller files — change `use crate::internal::gitutil;` →
+- [x] Update all 35 caller files — change `use crate::internal::gitutil;` →
       `use crate::internal::git;` and `gitutil::find_git_root()` →
       `git::root::find_root()` [Repo-grounded]. Use this `sed` one-liner to update
       all files atomically:
@@ -504,12 +504,12 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
   > (Green gate: all callers updated, module removed).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Verify: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
+- [x] Verify: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
       exits 0 (Green gate — confirms `git::root::find_root()` resolves correctly for
       all 35 callers); then `npx nx run rhino-cli:test:unit` exits 0
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit: `refactor(rhino-cli): consolidate gitutil into git::root, rename find_git_root→find_root`
+- [x] Commit: `refactor(rhino-cli): consolidate gitutil into git::root, rename find_git_root→find_root`
 
 ---
 

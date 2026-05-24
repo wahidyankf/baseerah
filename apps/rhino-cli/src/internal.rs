@@ -6,7 +6,6 @@ pub mod docs;
 pub mod doctor;
 pub mod envbackup;
 pub mod git;
-pub mod gitutil;
 pub mod glossary;
 pub mod mermaid;
 pub mod naming;

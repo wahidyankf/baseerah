@@ -6,7 +6,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::repo_governance::agents_md_size::{AgentsMdSizeFinding, check_agents_md_size};
 
 const SCHEMA: &str = "rhino-cli/agents-md-size/v1";
@@ -34,7 +34,7 @@ pub fn run(
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let path = repo_root.join("AGENTS.md");
     let path_str = path.to_string_lossy().to_string();
     let finding = check_agents_md_size(&path_str).context("agents-md-size audit failed")?;

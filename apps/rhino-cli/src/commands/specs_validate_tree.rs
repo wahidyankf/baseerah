@@ -5,7 +5,7 @@ use clap::Args;
 
 use crate::internal::allowlist::apps_with_ddd;
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::specs::{validate_spec_gherkin_domains, validate_spec_tree};
 
 #[derive(Args, Debug)]
@@ -28,7 +28,7 @@ fn resolve_apps(positional: Option<&String>, flag: &[String]) -> Vec<String> {
 
 pub fn run(args: &ValidateTreeArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     run_at_root(&repo_root, args, &mut std::io::stdout())
 }
 

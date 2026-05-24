@@ -6,7 +6,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::repo_governance::audit_orchestrator::{
     AuditEnvelope, AuditOptions, run_audit,
 };
@@ -26,7 +26,7 @@ pub struct AuditArgs {
 
 pub fn run(args: &AuditArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let mut opts = AuditOptions {
         repo_root,
         skip: args.skip.clone(),

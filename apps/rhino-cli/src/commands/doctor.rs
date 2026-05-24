@@ -8,7 +8,7 @@ use crate::internal::doctor::{
     self, CheckOptions, FixOptions, Scope, check_all, fix_all, format_fix_summary, format_json,
     format_markdown, format_text,
 };
-use crate::internal::gitutil;
+use crate::internal::git;
 
 #[derive(Args, Debug)]
 pub struct DoctorArgs {
@@ -29,7 +29,7 @@ pub struct DoctorArgs {
 
 pub fn run(args: &DoctorArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
 
     let parsed_scope = Scope::parse(&args.scope).unwrap_or(Scope::Full);
 

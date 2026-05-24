@@ -11,7 +11,7 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::docs::frontmatter::{
     DocsFrontmatterFinding, count_severity, has_fail_findings, validate_docs_frontmatter,
 };
-use crate::internal::gitutil;
+use crate::internal::git;
 
 const SCHEMA: &str = "rhino-cli/docs-validate-frontmatter/v1";
 
@@ -52,7 +52,7 @@ pub fn run(
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let rel_paths: Vec<String> = if args.positional.is_empty() {
         DEFAULT_PATHS
             .iter()

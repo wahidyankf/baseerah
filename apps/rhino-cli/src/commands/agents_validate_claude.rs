@@ -9,7 +9,7 @@ use crate::internal::agents::reporter::{
 };
 use crate::internal::agents::types::ValidateClaudeOptions;
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 
 #[derive(Args, Debug)]
 pub struct ValidateClaudeArgs {
@@ -38,7 +38,7 @@ pub fn run(
     }
 
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let opts = ValidateClaudeOptions {
         repo_root,
         agents_only: args.agents_only,

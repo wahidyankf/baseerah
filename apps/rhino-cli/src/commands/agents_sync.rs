@@ -6,7 +6,7 @@ use clap::Args;
 use crate::internal::agents::reporter::{format_sync_json, format_sync_markdown, format_sync_text};
 use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 
 #[derive(Args, Debug)]
 pub struct SyncArgs {
@@ -33,7 +33,7 @@ pub fn run(args: &SyncArgs, output_format: OutputFormat) -> std::result::Result<
     }
 
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let opts = SyncOptions {
         repo_root,
         dry_run: args.dry_run,

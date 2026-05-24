@@ -5,7 +5,7 @@ use clap::Args;
 
 use crate::internal::bcregistry;
 use crate::internal::cliout::OutputFormat;
-use crate::internal::gitutil;
+use crate::internal::git;
 use crate::internal::severity::{Severity, resolve};
 
 #[derive(Args, Debug)]
@@ -19,7 +19,7 @@ pub struct DddBcArgs {
 
 pub fn run(args: &DddBcArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
-        gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     run_at_root(
         &repo_root,
         args,
