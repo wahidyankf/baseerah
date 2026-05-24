@@ -26,7 +26,6 @@ graph LR
 
     subgraph "Build System"
         NX_BUILD[Nx Build System<br/>Affected Detection]
-        HUGO_BUILD[Hugo Build<br/>v0.156.0 Extended]
         NEXT_BUILD[Next.js Build<br/>Standalone Output]
         SPRING_BUILD[Spring Boot Build<br/>Maven]
         GO_BUILD[Go Build<br/>CLI Tools]
@@ -43,18 +42,17 @@ graph LR
     MAIN -->|Merge/Push| PROD_AYO
     MAIN -->|Merge/Push| PROD_OL
 
-    PROD_OSE --> HUGO_BUILD
+    PROD_OSE --> NEXT_BUILD
     PROD_AYO --> NEXT_BUILD
     PROD_OL --> NEXT_BUILD
     MAIN --> GO_BUILD
     MAIN --> SPRING_BUILD
 
-    HUGO_BUILD --> VERCEL_OSE
+    NEXT_BUILD --> VERCEL_OSE
     NEXT_BUILD --> VERCEL_AYO
     NEXT_BUILD --> VERCEL_OL
     GO_BUILD --> LOCAL
 
-    NX_BUILD -.->|Orchestrates| HUGO_BUILD
     NX_BUILD -.->|Orchestrates| NEXT_BUILD
     NX_BUILD -.->|Orchestrates| SPRING_BUILD
     NX_BUILD -.->|Orchestrates| GO_BUILD
@@ -64,7 +62,6 @@ graph LR
     style PROD_AYO fill:#2a9d8f,stroke:#264653,color:#ffffff
     style PROD_OL fill:#2a9d8f,stroke:#264653,color:#ffffff
     style NX_BUILD fill:#6a4c93,stroke:#22223b,color:#ffffff
-    style HUGO_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
     style NEXT_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
     style SPRING_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
     style GO_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
@@ -78,12 +75,11 @@ graph LR
 
 ### Vercel Deployment
 
-**Hugo Static Sites** (ose-web):
+**Next.js Sites** (ose-web, ayokoding-web, organiclever-web):
 
-- **Build Framework**: `@vercel/static-build`
-- **Build Script**: `build.sh` in each app directory
-- **Output Directory**: `public/`
-- **Hugo Version**: 0.156.0 (configured via environment variable)
+- **Build Framework**: Next.js (standalone output)
+- **Build Command**: `next build`
+- **Output Directory**: `.next/`
 
 **Security Headers (All Vercel Sites):**
 

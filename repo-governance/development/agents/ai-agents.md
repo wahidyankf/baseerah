@@ -764,7 +764,7 @@ The content below is platform-specific. It documents the concrete translation ap
 
 ### Color Translation Table
 
-**Translation table** (mirrors `ClaudeToOpenCodeColor` in `apps/rhino-cli/internal/agents/types.go`):
+**Translation table** (mirrors `claude_to_opencode_color()` in `apps/rhino-cli/src/internal/agents/converter.rs`):
 
 | Claude color | OpenCode value | Role hint                         |
 | ------------ | -------------- | --------------------------------- |
@@ -777,7 +777,7 @@ The content below is platform-specific. It documents the concrete translation ap
 | `pink`       | `accent`       | Reserved future role              |
 | `cyan`       | `info`         | Reserved future role              |
 
-**Single source of truth**: `apps/rhino-cli/internal/agents/types.go` — `ClaudeToOpenCodeColor` map. Any change to the mapping MUST update both the map and this table in the same commit.
+**Single source of truth**: `apps/rhino-cli/src/internal/agents/converter.rs` — `claude_to_opencode_color()` function. Any change to the mapping MUST update both the function and this table in the same commit.
 
 **Escape hatch**: If you write a hex code (e.g., `#3B82F6`) or a valid OpenCode theme token (e.g., `primary`) directly in `.claude/agents/*.md`, the converter passes it through unchanged.
 

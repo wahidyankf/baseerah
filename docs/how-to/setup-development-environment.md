@@ -150,7 +150,7 @@ volta install npm@11.10.1
 
 ### Step 4: Go
 
-Required for `rhino-cli`, `ayokoding-cli`, `ose-cli`,
+Required for `ayokoding-cli`, `ose-cli`,
 and `libs/golang-commons`.
 
 ```bash
@@ -160,7 +160,7 @@ brew install go
 # Linux — download from https://go.dev/dl/
 ```
 
-Verify the installed version meets or exceeds the `go` directive in `apps/rhino-cli/go.mod`:
+Verify the installed version meets or exceeds the `go` directive in `apps/ayokoding-cli/go.mod`:
 
 ```bash
 go version
@@ -344,14 +344,14 @@ npx playwright install-deps
 
 All version requirements are auto-detected by `npm run doctor` from these config files:
 
-| Tool       | Version Source                             |
-| ---------- | ------------------------------------------ |
-| Node.js    | `package.json` → `volta.node`              |
-| npm        | `package.json` → `volta.npm`               |
-| Go         | `apps/rhino-cli/go.mod` → `go` directive   |
-| .NET       | `apps/organiclever-be/global.json` → `sdk` |
-| Hugo       | (legacy — no active config file)           |
-| Docker, jq | Any (no pinned version)                    |
+| Tool       | Version Source                                   |
+| ---------- | ------------------------------------------------ |
+| Node.js    | `package.json` → `volta.node`                    |
+| npm        | `package.json` → `volta.npm`                     |
+| Go         | `apps/ayokoding-cli/go.mod` → `go` directive     |
+| Rust       | `apps/rhino-cli/rust-toolchain.toml` → `channel` |
+| .NET       | `apps/organiclever-be/global.json` → `sdk`       |
+| Docker, jq | Any (no pinned version)                          |
 
 Never hardcode version numbers in scripts — always read from these source-of-truth files.
 

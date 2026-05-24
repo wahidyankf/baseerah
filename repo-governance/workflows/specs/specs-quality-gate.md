@@ -132,7 +132,7 @@ The checker validates nine categories across all spec areas:
 ### Deterministic Offload
 
 Category 8 (Spec Tree Shape) is a **deterministic check** owned by
-`rhino-cli specs <subcmd>` Go code (per FR-14 of the App README vs Specs Convention). Agents shell
+`rhino-cli specs <subcmd>` Rust code (per FR-14 of the App README vs Specs Convention). Agents shell
 out to these commands rather than re-implementing the check in prompt logic. Category 9 (Adoption
 Gaps) uses `rhino-cli specs validate-adoption` for the structural portion and LLM reasoning for
 the narrative justification assessment.

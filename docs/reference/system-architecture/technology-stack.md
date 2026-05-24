@@ -17,20 +17,13 @@ Technology stack summary, quality tools, and future architecture considerations 
 
 ### Frontend
 
-**Static Sites** (Hugo):
-
-- **Hugo**: 0.156.0 Extended
-- **Themes**: PaperMod (ose-web)
-- **Deployment**: Vercel
-- **Applications**: ose-web
-
 **Web Applications** (Next.js):
 
 - **Next.js**: 16 (App Router)
 - **React**: 19
 - **Styling**: TailwindCSS + Radix UI / shadcn-ui
 - **Deployment**: Vercel
-- **Applications**: organiclever-web, ayokoding-web (with tRPC backend)
+- **Applications**: ose-web, organiclever-web, ayokoding-web (with tRPC backend)
 
 ### Backend
 
@@ -44,10 +37,19 @@ Technology stack summary, quality tools, and future architecture considerations 
 
 ### CLI Tools
 
+**Go CLI Tools**:
+
 - **Language**: Go 1.26
 - **Build**: Native Go toolchain via Nx
 - **Distribution**: Local binaries
-- **Applications**: ayokoding-cli, rhino-cli, ose-cli
+- **Applications**: ayokoding-cli, ose-cli
+
+**Rust CLI Tools**:
+
+- **Language**: Rust (edition 2024, rust-version 1.88)
+- **Build**: Cargo via Nx
+- **Distribution**: Local binaries
+- **Applications**: rhino-cli (Repository Hygiene & INtegration Orchestrator)
 
 ### Infrastructure
 
@@ -56,13 +58,13 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **Package Manager**: npm 11.10.1
 - **Git Workflow**: Trunk-Based Development
 - **CI**: GitHub Actions
-- **CD**: Vercel (Hugo sites, Next.js apps)
+- **CD**: Vercel (Next.js apps)
 
 ### Quality Tools
 
 - **Formatting**: Prettier 3.6.2
 - **Markdown Linting**: markdownlint-cli2 0.21.0
-- **Link Validation**: rhino-cli docs validate-links (Go)
+- **Link Validation**: rhino-cli docs validate-links (Rust)
 - **Commit Linting**: Commitlint + Conventional Commits
 - **Git Hooks**: Husky + lint-staged
 - **Testing**: Nx test orchestration
@@ -83,10 +85,10 @@ Technology stack summary, quality tools, and future architecture considerations 
 ### Scalability Considerations
 
 - **Nx Cloud**: Distributed task execution and caching
-- **CDN**: Static asset delivery optimization (currently Vercel for Hugo sites)
-- **Additional Hugo Sites**: More specialized content platforms
+- **CDN**: Static asset delivery optimization (currently Vercel for Next.js sites)
+- **Additional Next.js Sites**: More specialized content platforms
 - **CLI Tool Suite Expansion**: More specialized automation tools
-- **Shared Go Modules**: Common functionality across CLI tools
+- **Shared Go Modules**: Common functionality across Go CLI tools
 
 ## Related Documentation
 

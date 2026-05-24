@@ -18,7 +18,7 @@ sync.
 The mechanical translations (color names → theme tokens, model aliases →
 provider model IDs, tool arrays → tool flags) are documented in
 [`docs/reference/platform-bindings.md`](../../docs/reference/platform-bindings.md)
-and implemented by `apps/rhino-cli/internal/agents/types.go`.
+and implemented by `apps/rhino-cli/src/internal/agents/converter.rs`.
 
 ## Behavioral parity
 

@@ -40,22 +40,22 @@ This document defines **authoritative standards** for visualizing Nx monorepo st
 
 ```
 apps/
-├── ose-web/        # Hugo static site
-├── ayokoding-web/          # Hugo static site
+├── ose-web/        # Next.js 16 fullstack platform
+├── ayokoding-web/          # Next.js 16 fullstack platform
 ├── ayokoding-cli/          # Go CLI tool
-└── rhino-cli/              # Go CLI tool
+└── rhino-cli/              # Rust CLI tool
 ```
 
 **C4 Container Diagram**:
 
 ```mermaid
 graph TD
-    OseWeb["OSE Platform Web<br/>[Container: Hugo/PaperMod]<br/>Landing page"]:::blue
-    AyoWeb["AyoKoding Web<br/>[Container: Hugo/Hextra]<br/>Educational content"]:::blue
-    AyoCLI["AyoKoding CLI<br/>[Container: Go]<br/>Content automation"]:::blue
-    RhinoCLI["Rhino CLI<br/>[Container: Go]<br/>Repository management"]:::blue
+    OseWeb["OSE Platform Web<br/>[Container: Next.js 16 (App Router)]<br/>Landing page"]:::blue
+    AyoWeb["AyoKoding Web<br/>[Container: Next.js 16 (App Router, TypeScript, tRPC)]<br/>Educational content"]:::blue
+    AyoCLI["AyoKoding CLI<br/>[Container: Go]<br/>Content link validation"]:::blue
+    RhinoCLI["Rhino CLI<br/>[Container: Rust]<br/>Repository management"]:::blue
 
-    AyoCLI -->|"Generates content<br/>[File system]"| AyoWeb
+    AyoCLI -->|"Validates links<br/>[File system]"| AyoWeb
     RhinoCLI -->|"Manages repository<br/>[File system]"| OseWeb
     RhinoCLI -->|"Manages repository<br/>[File system]"| AyoWeb
 
@@ -96,9 +96,9 @@ If `ayokoding-cli` has an Nx dependency on `ayokoding-web` (builds it), show thi
 
 **Examples**:
 
-- `"OSE Platform Web<br/>[Container: Hugo/PaperMod]<br/>Landing page and platform documentation"`
-- `"AyoKoding Web<br/>[Container: Hugo/Hextra]<br/>Bilingual educational content"`
-- `"AyoKoding CLI<br/>[Container: Go]<br/>Content automation for Hugo site"`
+- `"OSE Platform Web<br/>[Container: Next.js 16 (App Router)]<br/>Landing page and platform documentation"`
+- `"AyoKoding Web<br/>[Container: Next.js 16 (App Router, TypeScript, tRPC)]<br/>Bilingual educational content"`
+- `"AyoKoding CLI<br/>[Container: Go]<br/>Content link validation"`
 - `"Zakat API<br/>[Container: Spring Boot]<br/>Zakat calculation business logic"`
 
 ## Example: OSE Platform Container Diagram
@@ -109,11 +109,11 @@ If `ayokoding-cli` has an Nx dependency on `ayokoding-web` (builds it), show thi
 
 ```mermaid
 graph LR
-    OseWeb["OSE Platform Web<br/>[Container: Hugo/PaperMod]<br/>Landing page"]:::blue
-    AyoWeb["AyoKoding Web<br/>[Container: Hugo/Hextra]<br/>Educational content"]:::blue
-    AyoCLI["AyoKoding CLI<br/>[Container: Go]<br/>Content automation"]:::blue
-    RhinoCLI["Rhino CLI<br/>[Container: Go]<br/>Repository management"]:::blue
-    Vercel["Vercel<br/>[Platform]<br/>Static site hosting"]:::teal
+    OseWeb["OSE Platform Web<br/>[Container: Next.js 16 (App Router)]<br/>Landing page"]:::blue
+    AyoWeb["AyoKoding Web<br/>[Container: Next.js 16 (App Router, TypeScript, tRPC)]<br/>Educational content"]:::blue
+    AyoCLI["AyoKoding CLI<br/>[Container: Go]<br/>Content link validation"]:::blue
+    RhinoCLI["Rhino CLI<br/>[Container: Rust]<br/>Repository management"]:::blue
+    Vercel["Vercel<br/>[Platform]<br/>Next.js hosting"]:::teal
 
     AyoCLI --> AyoWeb
     RhinoCLI --> OseWeb

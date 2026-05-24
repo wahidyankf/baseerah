@@ -564,7 +564,7 @@ for the current agent frontmatter aliases.
 
 **Note on OpenCode Go mapping**: The full opencode-go roster has 12 models as of May 2026. The
 3-to-2 collapse (minimax-m2.7 for planning+execution, glm-5 for fast) reflects the mapping
-encoded in `apps/rhino-cli/internal/agents/converter.go` at time of last sync. As the OpenCode
+encoded in `apps/rhino-cli/src/internal/agents/converter.rs` at time of last sync. As the OpenCode
 Go roster evolves, the converter may be updated to point to higher-capability models. See
 `model-selection.md` for the authoritative mapping rationale.
 

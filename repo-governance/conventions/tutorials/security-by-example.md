@@ -265,6 +265,23 @@ Extend the [SWE By-Example validation checklist](./swe-by-example.md#quality-che
 
 ---
 
+## Principles Implemented/Respected
+
+- **[Progressive Disclosure](../../principles/content/progressive-disclosure.md)** — Coverage
+  levels (Beginner/Intermediate/Advanced) layer complexity progressively; beginners use only
+  built-in OS tools while advanced examples introduce full-ecosystem tooling.
+- **[No Time Estimates](../../principles/content/no-time-estimates.md)** — Coverage expressed
+  as percentages of the domain's primary framework (MITRE ATT&CK, essential security controls)
+  rather than time-based estimates; practitioners set their own pace.
+- **[Accessibility First](../../principles/content/accessibility-first.md)** — Color-blind
+  friendly Mermaid palette (Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown
+  #CA9161) required for all diagrams; WCAG AA compliance throughout.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**
+  — Each example must specify lab environment, prerequisites, and all commands explicitly; no
+  hidden steps or "run the previous setup" cross-references permitted.
+
+---
+
 ## Related Documentation
 
 - [SWE By-Example Tutorial Convention](./swe-by-example.md) — base convention this extends

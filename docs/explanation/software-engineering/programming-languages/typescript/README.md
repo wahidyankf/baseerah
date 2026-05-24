@@ -680,7 +680,7 @@ apps/
 ├── organiclever-web/         # Next.js 16 landing website
 ├── wahidyankf-web/           # Next.js 16 personal portfolio
 ├── ayokoding-cli/            # Go CLI tool (content link validation)
-└── rhino-cli/               # Go CLI tool (repository management)
+└── rhino-cli/               # Rust CLI tool (repository management)
 
 libs/
 ├── ts-ui/                   # Shared TypeScript UI components

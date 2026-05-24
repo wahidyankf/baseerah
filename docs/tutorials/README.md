@@ -38,7 +38,7 @@ Content migrated: **December 8, 2025**
 All tutorials are now part of the AyoKoding educational platform and benefit from:
 
 - Better navigation and discoverability
-- Consistent Hugo/Hextra theme
+- Consistent Next.js theme
 - Integration with other learning content
 - Public web access
 

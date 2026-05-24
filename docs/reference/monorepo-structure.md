@@ -87,7 +87,7 @@ Flat structure - all apps at the same level, no subdirectories.
 - `ose-web` - OSE Platform website (Next.js 16 content platform)
 - `ayokoding-web` - AyoKoding educational platform (Next.js 16 fullstack content platform)
 - `ayokoding-cli` - AyoKoding CLI tool (Go application)
-- `rhino-cli` - Repository management CLI (Go application)
+- `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
 - `ose-cli` - OSE Platform site maintenance CLI (Go application)
 - `organiclever-web` - OrganicLever landing website (Next.js application)
 - `organiclever-be` - OrganicLever REST API backend (F#/Giraffe application)

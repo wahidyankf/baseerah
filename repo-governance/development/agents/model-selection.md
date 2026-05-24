@@ -301,7 +301,7 @@ MiniMax M2.7 is adopted based on lab trajectory and model recency. Its predecess
 Verified at 80.2%. M2.7's SWE-Pro score (56.22%) is on a harder suite and not directly comparable to
 GLM-5.1 (58.4% SWE-Bench Pro). Available via the flat-rate secondary binding subscription; no per-token
 billing. If a stronger model joins the secondary binding's model roster, update only `ConvertModel()` in
-`apps/rhino-cli/internal/agents/converter.go` and re-run `npm run sync:claude-to-opencode`.
+`apps/rhino-cli/src/internal/agents/converter.rs` and re-run `npm run sync:claude-to-opencode`.
 
 ## Special Considerations
 

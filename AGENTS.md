@@ -69,7 +69,8 @@ ose-public/
 ├── archived/                 # Archived applications (no longer active)
 ├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
-│   └── golang-commons/       # Shared Go utilities (links checker, output)
+│   ├── golang-commons/       # Shared Go utilities (output, common helpers)
+│   └── golang-link-commons/  # Shared Go link-checking utilities
 ├── docs/                     # Documentation (Diátaxis framework)
 │   ├── tutorials/            # Learning-oriented
 │   ├── how-to/               # Problem-solving

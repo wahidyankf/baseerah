@@ -414,7 +414,7 @@ Every `validate:specs-*` target runs on all four gating surfaces — no surface 
 
 `docs validate-links` is NOT gated by this plan — it scans the entire repo's markdown (repo-governance/, docs/, app READMEs) and is owned by a separate planned validator-unification effort.
 
-After this plan ships, **zero specs/BDD/DDD scripts in `rhino-cli` are dead** — every command file under `apps/rhino-cli/cmd/specs_*.go`, `cmd/ddd_*.go`, and `cmd/spec_coverage*.go` is invoked by at least one Nx target or pre-push surface.
+After this plan ships, **zero specs/BDD/DDD scripts in `rhino-cli` are dead** — every command file under `apps/rhino-cli/src/commands/specs_*.rs`, `src/commands/ddd_*.rs`, and `src/commands/spec_coverage*.rs` is invoked by at least one Nx target or pre-push surface.
 
 ### LLM Semantic Validation (specs-checker)
 
@@ -422,7 +422,7 @@ After this plan ships, **zero specs/BDD/DDD scripts in `rhino-cli` are dead** �
 
 ### Deterministic Offload
 
-The reasoning split between deterministic and LLM checks follows the principle that counting, path comparison, and file-system walking belong in Go, not in LLM context. Categories tagged `[Deterministic]` in `specs-checker` shell out to `rhino-cli`; categories tagged `[LLM]` keep LLM-driven reasoning.
+The reasoning split between deterministic and LLM checks follows the principle that counting, path comparison, and file-system walking belong in Rust/deterministic tooling, not in LLM context. Categories tagged `[Deterministic]` in `specs-checker` shell out to `rhino-cli`; categories tagged `[LLM]` keep LLM-driven reasoning.
 
 ### Manual Verification Checklist
 

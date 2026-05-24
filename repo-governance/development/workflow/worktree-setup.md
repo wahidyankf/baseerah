@@ -58,7 +58,7 @@ npm run doctor -- --fix
 
 The root worktree is the primary checkout of the repository — the directory that contains the canonical `node_modules/` used by Nx across all worktrees. Replace `/path/to/root/open-sharia-enterprise` with the actual absolute path to the root checkout on the current machine.
 
-**Order matters.** Run `npm install` first, because `rhino-cli doctor` itself is a Go binary built and invoked through the Node tooling; the doctor script may need a freshly synchronized `node_modules/` to run correctly. Run `npm run doctor -- --fix` second to actively converge the native toolchain.
+**Order matters.** Run `npm install` first, because `rhino-cli doctor` itself is a Rust binary built and invoked through the Node tooling; the doctor script may need a freshly synchronized `node_modules/` to run correctly. Run `npm run doctor -- --fix` second to actively converge the native toolchain.
 
 **Use `--fix`, not plain `doctor`.** Plain `npm run doctor` only detects drift and requires a second human action. `npm run doctor -- --fix` actively converges to the declared toolchain state in a single step. If a human wants a preview of what would change first, use `npm run doctor -- --fix --dry-run`.
 
@@ -87,7 +87,7 @@ When the Nx workspace resolves dependencies, it reads from `node_modules/` relat
 
 ### Worktrees Routinely Touch Many Languages
 
-AI agents working on worktrees routinely touch apps across many languages: `organiclever-be` in F#, `rhino-cli` and other Go CLIs, TypeScript frontends, and more. The probability that a new worktree session will need a toolchain that has drifted is high, and the cost of discovering the drift mid-task — through an obscure Gradle, Cargo, `mix`, or `dotnet` error — is much higher than the cost of running `npm run doctor -- --fix` deliberately upfront.
+AI agents working on worktrees routinely touch apps across many languages: `organiclever-be` in F#, `rhino-cli` (Rust CLI), `ayokoding-cli` and `ose-cli` (Go CLIs), TypeScript frontends, and more. The probability that a new worktree session will need a toolchain that has drifted is high, and the cost of discovering the drift mid-task — through an obscure Gradle, Cargo, `mix`, or `dotnet` error — is much higher than the cost of running `npm run doctor -- --fix` deliberately upfront.
 
 Even worktree sessions whose stated intent is "I'm just editing docs" should run the full two-step init, because the pre-push hook runs `nx affected -t typecheck lint test:quick spec-coverage` which can fan out to arbitrary language tasks depending on what the doc change touches.
 

@@ -138,7 +138,7 @@ npx prettier --write [file-path]
 
 1. Commit proceeds if no errors
 
-**Implementation**: `apps/rhino-cli/internal/git/runner.go` — all steps call internal Go functions directly (no subprocess round-trips for rhino-cli-owned logic); external tools are shelled out via `os/exec`.
+**Implementation**: `apps/rhino-cli/src/` — all steps call internal Rust functions directly (no subprocess round-trips for rhino-cli-owned logic); external tools are shelled out via `std::process::Command`.
 
 **What It Validates**:
 
@@ -513,7 +513,7 @@ nx run ayokoding-web:links:check
 
 ## Go CLI Linting
 
-Go CLI projects (`apps/rhino-cli`, `apps/ayokoding-cli`) use [golangci-lint](https://golangci-lint.run/) for static analysis.
+Go CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`) use [golangci-lint](https://golangci-lint.run/) for static analysis.
 
 **Shared configuration**: A single `.golangci.yml` at the repository root serves all Go CLIs. golangci-lint discovers it automatically by walking up the directory tree from each app's working directory — no `--config` flag or per-project files are needed.
 
@@ -562,7 +562,7 @@ lint-staged changes the working directory per file glob, which breaks the projec
 A dedicated hook step groups staged files by their nearest Mix project root and runs `mix format`
 from each one.
 
-**Implementation**: `apps/rhino-cli/internal/git/runner.go` (`step6ElixirFormat`). The logic runs as part of `rhino-cli git pre-commit` (step 6).
+**Implementation**: `apps/rhino-cli/src/` (`step6_elixir_format`). The logic runs as part of `rhino-cli git pre-commit` (step 6).
 
 **How It Works**:
 

@@ -45,22 +45,22 @@ The Claude Code binding uses named color strings (`blue`, `green`, `yellow`, `pu
 agent frontmatter. OpenCode uses theme tokens (`primary`, `success`, `warning`, `secondary`, etc.).
 
 - **Source**: `.claude/agents/<name>.md` frontmatter `color:` field
-- **Transform**: `ClaudeToOpenCodeColor` in `apps/rhino-cli/internal/agents/types.go`
+- **Transform**: `convert_color` in `apps/rhino-cli/src/internal/agents/converter.rs`
 - **Sink**: `.opencode/agents/<name>.md` frontmatter `color:` field
-- **Policy**: [Dual-Mode Color Translation](../../repo-governance/development/agents/ai-agents.md)
-  ("Dual-Mode Color Translation — Claude Code to OpenCode" subsection)
+- **Policy**: [Platform Binding Color Translation](../../repo-governance/development/agents/ai-agents.md#platform-binding-color-translation)
+  ("Platform Binding Color Translation" subsection)
 
-| Claude Code color | OpenCode theme token | Role hint         |
-| ----------------- | -------------------- | ----------------- |
-| `blue`            | `primary`            | Maker agents      |
-| `green`           | `success`            | Checker agents    |
-| `yellow`          | `warning`            | Fixer agents      |
-| `purple`          | `secondary`          | Executor agents   |
-| `red`             | `error`              | Critical/alert    |
-| `orange`          | `warning`            | (maps to warning) |
-| `gray`/`grey`     | `muted`              | Utility/misc      |
-| `cyan`/`teal`     | `info`               | Informational     |
-| unrecognized/hex  | passed through       | Escape hatch      |
+| Claude Code color | OpenCode theme token | Role hint            |
+| ----------------- | -------------------- | -------------------- |
+| `blue`            | `primary`            | Maker agents         |
+| `green`           | `success`            | Checker agents       |
+| `yellow`          | `warning`            | Fixer agents         |
+| `purple`          | `secondary`          | Executor agents      |
+| `red`             | `error`              | Critical/alert       |
+| `orange`          | `warning`            | (maps to warning)    |
+| `pink`            | `accent`             | Reserved future role |
+| `cyan`            | `info`               | Informational        |
+| unrecognized/hex  | passed through       | Escape hatch         |
 
 ### Model ID Translation (Claude Code → OpenCode)
 
@@ -68,7 +68,7 @@ Claude Code agent frontmatter uses short aliases (`sonnet`, `haiku`) or omits `m
 planning-grade inheritance. OpenCode uses Zhipu AI GLM model IDs.
 
 - **Source**: `.claude/agents/<name>.md` frontmatter `model:` field
-- **Transform**: `ClaudeToOpenCodeModel` in `apps/rhino-cli/internal/agents/types.go`
+- **Transform**: `convert_model` in `apps/rhino-cli/src/internal/agents/converter.rs`
 - **Sink**: `.opencode/agents/<name>.md` frontmatter `model:` field
 - **Policy**: [Model Selection Convention](../../repo-governance/development/agents/model-selection.md)
   ("Platform Binding Equivalents" section)
@@ -85,7 +85,7 @@ Claude Code agent frontmatter lists tools as an array of string names. OpenCode 
 objects.
 
 - **Source**: `.claude/agents/<name>.md` frontmatter `tools:` array
-- **Transform**: `ClaudeToOpenCodeTools` in `apps/rhino-cli/internal/agents/types.go`
+- **Transform**: `convert_tools` in `apps/rhino-cli/src/internal/agents/converter.rs`
 - **Sink**: `.opencode/agents/<name>.md` frontmatter tool flags (`read`, `write`, `edit`, etc.)
 
 ## Adding a New Platform Binding
@@ -95,7 +95,7 @@ To add a new binding (e.g., `.cursor/rules/`):
 1. Create the binding directory and its root instruction file (or confirm `AGENTS.md` suffices).
 2. Add a row to the Platform Binding Directories table above.
 3. Identify any per-field translations needed (`rhino-cli agents sync` applies them).
-4. Implement translations in `apps/rhino-cli/internal/agents/types.go` and add godog scenarios.
+4. Implement translations in `apps/rhino-cli/src/internal/agents/converter.rs` and add Rust integration tests.
 5. Update this document's Translation Artifacts section.
 
 ## Related

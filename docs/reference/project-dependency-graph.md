@@ -147,10 +147,10 @@ Repository management CLI used by most projects for coverage validation
 
 - **Dependents**: CLI tools, libs, content platforms, organiclever-web
 - **Mechanism**: `implicitDependencies`
-- **Own dependency**: `golang-commons`
-- **Note**: `golang-commons` does NOT depend on `rhino-cli` to avoid a circular
-  dependency. Changes to `rhino-cli`'s coverage algorithm are caught by the
-  main CI running `--all`.
+- **Own dependency**: None (self-contained Rust application with only Rust crate dependencies)
+- **Note**: rhino-cli was ported from Go to Rust (2026-05-23); it no longer depends on `golang-commons`.
+  `golang-commons` does NOT depend on `rhino-cli` to avoid a circular dependency.
+  Changes to `rhino-cli`'s coverage algorithm are caught by the main CI running `--all`.
 
 ### golang-commons
 
@@ -158,7 +158,7 @@ Repository management CLI used by most projects for coverage validation
 
 Shared Go utilities (time formatting, test helpers, output capture).
 
-- **Dependents**: `rhino-cli`, `golang-link-commons`, `ayokoding-cli`, `ose-cli`
+- **Dependents**: `golang-link-commons`, `ayokoding-cli`, `ose-cli`
 - **Mechanism**: Go module `replace` directives + `implicitDependencies`
 
 ## Project Dependency Table
@@ -187,7 +187,7 @@ Shared Go utilities (time formatting, test helpers, output capture).
 | ------------- | ---------------------------------------------- | ----------------------------------- |
 | ayokoding-cli | golang-commons, golang-link-commons, rhino-cli | ayokoding-cli/\* (test:integration) |
 | ose-cli       | golang-commons, golang-link-commons, rhino-cli | ose-cli/\* (test:integration)       |
-| rhino-cli     | golang-commons                                 | rhino-cli/\* (test:integration)     |
+| rhino-cli     | (none — self-contained Rust app)               | rhino-cli/\* (test:integration)     |
 
 ### Libraries
 

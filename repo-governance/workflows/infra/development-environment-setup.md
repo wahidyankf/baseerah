@@ -60,7 +60,7 @@ All tools checked by `rhino-cli doctor`:
 | 2   | volta      | Any                   | (no config file)                 | curl script    |
 | 3   | node       | 24.13.1               | package.json > volta.node        | Volta          |
 | 4   | npm        | 11.10.1               | package.json > volta.npm         | Volta          |
-| 5   | golang     | >= go.mod directive   | apps/rhino-cli/go.mod            | Brew/asdf      |
+| 5   | golang     | >= go.mod directive   | apps/ayokoding-cli/go.mod        | Brew/asdf      |
 | 6   | dotnet     | >= global.json major  | apps/organiclever-be/global.json | Brew/Script    |
 | 7   | docker     | Any                   | (no config file)                 | Docker Desktop |
 | 8   | jq         | Any                   | (no config file)                 | Brew           |
@@ -221,7 +221,7 @@ volta install npm@11.10.1
 
 ### Phase 4: Go Ecosystem (Sequential)
 
-Required for: `rhino-cli`, `ayokoding-cli`, `ose-cli`, `libs/golang-commons`
+Required for: `ayokoding-cli`, `ose-cli`, `libs/golang-commons`
 
 #### 5.1 Install Go
 
@@ -232,7 +232,7 @@ brew install go
 # Linux — download from https://go.dev/dl/
 ```
 
-The required minimum version is specified in `apps/rhino-cli/go.mod`. As of this writing,
+The required minimum version is specified in `apps/ayokoding-cli/go.mod`. As of this writing,
 Go >= 1.26.
 
 **Success criteria**: `go version` shows a version >= the go.mod directive.
@@ -270,7 +270,7 @@ The required minimum version is in the `ose-primer` repository's `.python-versio
 
 **Condition**: `{input.scope} == full`
 
-Required for: polyglot demo apps in ose-primer (extracted 2026-04-18)
+Required for: `rhino-cli`, polyglot demo apps in ose-primer (extracted 2026-04-18)
 
 #### 7.1 Install Rust via rustup
 

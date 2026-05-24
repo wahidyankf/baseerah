@@ -57,6 +57,11 @@ The mapping operates at three levels:
 
 ### 1. Command to Tag (mandatory)
 
+> **Scope note**: The file naming and tag derivation rules below apply to Go CLI apps
+> (`ayokoding-cli`, `ose-cli`). For the Rust CLI app (`rhino-cli`), see the
+> ["CLI App Families"](#cli-apps-dual-level-spec-consumption) section for the equivalent
+> `.rs` file patterns and test file locations.
+
 The `@tag` is derived from the Go filename: replace underscores with hyphens.
 
 | Command File                | Full Invocation          | Feature `@tag`            |
@@ -140,7 +145,7 @@ func TestIntegrationValidateSync(t *testing.T) {
 
 **Unit test files** (`{domain}_{action}_test.go`) serve dual purpose: they contain both godog BDD step definitions (consuming Gherkin specs via `TestUnit*` functions) and any non-BDD pure function tests for edge cases not covered by the Gherkin scenarios. The godog step definitions in unit test files use mocked I/O function variables instead of real filesystem access.
 
-**The universal rule**: All Go files (command, unit test, integration test) use underscores. Feature files and `@tag`s use hyphens. The `spec-coverage validate` tool normalises hyphens to underscores when matching feature stems to Go test files.
+**The universal rule**: All Go CLI files (command, unit test, integration test) use underscores. Feature files and `@tag`s use hyphens. The `spec-coverage validate` tool normalises hyphens to underscores when matching feature stems to Go test files.
 
 ## Coverage Enforcement
 
@@ -164,6 +169,8 @@ expects. This will be addressed in a follow-up plan.
 
 ## Adding a New Command
 
+### Go CLI apps (ayokoding-cli, ose-cli)
+
 1. Create the parent command file `apps/{app}/cmd/{domain}.go` if the domain is new
 2. Create the feature file `specs/apps/{app}/behavior/cli/gherkin/{domain}/{domain}-{action}.feature`
 3. Create `apps/{app}/cmd/{domain}_{action}.go` with the Cobra command (register with parent)
@@ -171,9 +178,19 @@ expects. This will be addressed in a follow-up plan.
 5. Create `apps/{app}/cmd/{domain}_{action}.integration_test.go` with godog integration steps — add `//go:build integration`, drive via `cmd.RunE()` against real `/tmp` fixtures
 6. Verify: `rhino-cli spec-coverage validate specs/{app} apps/{app}`
 
+### Rust CLI app (rhino-cli)
+
+1. Create the feature file `specs/apps/rhino/behavior/cli/gherkin/{domain}/{domain}-{action}.feature`
+2. Create `apps/rhino-cli/src/commands/{domain}_{action}.rs` with the Clap subcommand (register in `main.rs`)
+3. Create `apps/rhino-cli/src/commands/{domain}_{action}_test.rs` (or inline `#[cfg(test)]` module) with unit step definitions — mock I/O via injected function types, no special build tag
+4. Create `apps/rhino-cli/tests/{domain}_{action}_integration_test.rs` with integration steps — drive via process invocation against real `/tmp` fixtures
+5. Verify: `rhino-cli spec-coverage validate specs/apps/rhino apps/rhino-cli`
+
 ## CLI Apps: Dual-Level Spec Consumption
 
-Go CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`) consume Gherkin specs at both the unit and integration test levels. The same feature files serve as the contract for both levels — only the step implementations differ.
+Go CLI apps (`ayokoding-cli`, `ose-cli`) consume Gherkin specs at both the unit and integration test levels. The same feature files serve as the contract for both levels — only the step implementations differ.
+
+The Rust CLI app (`rhino-cli`) also consumes Gherkin specs at both the unit and integration test levels using the same dual-level contract pattern, but with Rust test files (`.rs`) instead of Go test files (`.go`).
 
 ### Architecture
 
@@ -205,8 +222,8 @@ The `@agents-validate-sync` tag lives inside `agents-sync.feature` (shared featu
 
 ```
 specs/apps/rhino/behavior/cli/gherkin/agents/agents-sync.feature  (contains @agents-sync + @agents-validate-sync)
-  -> Unit steps in:       apps/rhino-cli/cmd/agents_validate_sync_test.go
-  -> Integration steps in: apps/rhino-cli/cmd/agents_validate_sync.integration_test.go
+  -> Unit steps in:       apps/rhino-cli/src/commands/agents_validate_sync_test.rs
+  -> Integration steps in: apps/rhino-cli/tests/agents_validate_sync_integration_test.rs
 ```
 
 ## API Backend: Three-Level Spec Consumption

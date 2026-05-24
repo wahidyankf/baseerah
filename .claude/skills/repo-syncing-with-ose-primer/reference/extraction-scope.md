@@ -39,7 +39,7 @@ The parity check does NOT cover the following, even though they are affected by 
 - `open-sharia-enterprise.sln` project blocks for demo C# backend — pruned in Phase 8 Commit E.
 - `docs/reference/demo-apps-ci-coverage.md` — deleted in Phase 8 Commit D; the narrative content has no counterpart in the primer.
 - `libs/clojure-openapi-codegen`, `libs/elixir-cabbage`, `libs/elixir-gherkin`, `libs/elixir-openapi-codegen` — deleted in Phase 8 Commit I; primer retains these if needed.
-- `apps/rhino-cli/cmd/java*.go`, `apps/rhino-cli/cmd/contracts*.go`, `apps/rhino-cli/internal/java/` — demo-only commands trimmed in Phase 8 Commit J; primer retains the fuller CLI.
+- `apps/rhino-cli/cmd/java*.go`, `apps/rhino-cli/cmd/contracts*.go`, `apps/rhino-cli/internal/java/` — demo-only Go commands trimmed in Phase 8 Commit J (pre-Rust-port; rhino-cli was ported from Go to Rust on 2026-05-23; these paths no longer exist in the Rust codebase).
 
 The parity check focuses on whether the primer carries byte-equivalent or newer state for the 18 in-scope paths. Configuration cleanup and library removal follow afterward as their own commits and are not verified by parity.
 

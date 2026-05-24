@@ -17,49 +17,14 @@ C4 Level 3 component diagrams and Level 4 code architecture for the Open Sharia 
 
 Shows the internal components within each container. Components are groupings of related functionality behind a well-defined interface.
 
-### ose-web Components (Hugo Static Site)
-
-```mermaid
-graph LR
-    subgraph "Content"
-        MD_CONTENT[Markdown Content<br/>Platform documentation]
-        FRONTMATTER_OSE[Frontmatter<br/>Page metadata]
-        ASSETS[Static Assets<br/>Images, CSS, JS]
-    end
-
-    subgraph "Theme - PaperMod"
-        LAYOUTS_OSE[Layouts<br/>HTML templates]
-        PARTIALS_OSE[Partials<br/>Reusable components]
-        THEME_CONFIG[Theme Config<br/>config.yaml]
-    end
-
-    subgraph "Build Output"
-        HTML_OSE[HTML Files<br/>Generated pages]
-        STATIC_OSE[Static Files<br/>Processed assets]
-    end
-
-    HUGO_OSE[Hugo Build Engine<br/>v0.156.0 Extended]
-
-    MD_CONTENT --> HUGO_OSE
-    FRONTMATTER_OSE --> HUGO_OSE
-    LAYOUTS_OSE --> HUGO_OSE
-    PARTIALS_OSE --> HUGO_OSE
-    THEME_CONFIG --> HUGO_OSE
-    ASSETS --> HUGO_OSE
-    HUGO_OSE --> HTML_OSE
-    HUGO_OSE --> STATIC_OSE
-
-    style MD_CONTENT fill:#0077b6,stroke:#03045e,color:#ffffff
-    style LAYOUTS_OSE fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style HUGO_OSE fill:#e76f51,stroke:#9d0208,color:#ffffff
-    style HTML_OSE fill:#457b9d,stroke:#1d3557,color:#ffffff
-```
+### ose-web Components (Next.js 16)
 
 **Component Responsibilities:**
 
-- **Markdown Content**: Platform marketing and documentation content
-- **Layouts**: PaperMod theme templates for page structure
-- **Theme Config**: Site configuration, navigation menus, theme settings
+- **Next.js App Router**: Static generation and routing for platform content
+- **tRPC API**: Backend API for content retrieval and navigation
+- **Source Directory**: App source at `apps/ose-web/src/`
+- **Static Assets**: Images and public assets at `apps/ose-web/public/`
 
 ### ayokoding-cli Components (Go CLI Tool)
 
@@ -68,7 +33,7 @@ graph LR
 - **Root Command**: CLI entry point, command routing, help text
 - **Links Check Command**: Validate internal links in ayokoding-web content
 
-### rhino-cli Components (Go CLI Tool)
+### rhino-cli Components (Rust CLI Tool)
 
 ```mermaid
 graph TB

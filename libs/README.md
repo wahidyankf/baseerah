@@ -10,7 +10,12 @@ The `libs/` directory contains **reusable library packages** that can be shared 
 
 ```
 libs/
-└── golang-commons/    # Shared Go utilities (current)
+├── clojure-openapi-codegen/   # Clojure OpenAPI codegen utilities
+├── golang-commons/            # Shared Go utilities (output, common helpers)
+├── golang-link-commons/       # Shared Go link-checking utilities
+├── ts-ui/                     # TypeScript UI component library
+├── web-ui/                    # Web UI component library
+└── web-ui-token/              # Web UI design token library
 ```
 
 ## Naming Convention

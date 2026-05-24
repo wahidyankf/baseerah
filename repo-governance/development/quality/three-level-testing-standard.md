@@ -365,7 +365,7 @@ The exact directory structure varies by language convention (e.g., Go uses `_tes
 
 ## CLI App Implementation Pattern
 
-Go CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`) consume the same Gherkin specs from `specs/apps/<cli-name>/` at both the unit and integration levels. The difference is what the step definitions use as their I/O substrate:
+Go CLI apps (`ayokoding-cli`, `ose-cli`) consume the same Gherkin specs from `specs/apps/<cli-name>/` at both the unit and integration levels. The difference is what the step definitions use as their I/O substrate:
 
 | Level       | Test File Pattern                       | Step Implementation                                                 | What's Real                   |
 | ----------- | --------------------------------------- | ------------------------------------------------------------------- | ----------------------------- |
@@ -382,6 +382,8 @@ Integration: Gherkin Step -> cmd.RunE()   -> Real /tmp filesystem
 **Coverage**: Coverage is measured at the unit level only (≥90% line coverage via `rhino-cli test-coverage validate`). Both levels must consume all Gherkin scenarios for their command.
 
 **Spec directory**: `specs/apps/<cli-name>/` — one feature file per command, organized by domain subdirectory.
+
+The Rust CLI app (`rhino-cli`) follows the same dual-level spec consumption pattern but uses Rust test files (`.rs`) instead of Go test files (`.go`). Unit tests live alongside source in `apps/rhino-cli/src/` and integration tests in `apps/rhino-cli/tests/`.
 
 ## Applicability by Project Type
 

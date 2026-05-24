@@ -67,7 +67,7 @@ The platform consists of the following applications across its technology stacks
 #### rhino-cli
 
 - **Purpose**: Repository management and automation
-- **Language**: Go 1.26
+- **Language**: Rust
 - **Build Command**: `nx build rhino-cli`
 - **Location**: `apps/rhino-cli/`
 - **Status**: Active development
@@ -185,7 +185,7 @@ graph LR
 
     subgraph "CLI Tools"
         AYOCLI[ayokoding-cli<br/>Go CLI]
-        RHINO[rhino-cli<br/>Go CLI]
+        RHINO[rhino-cli<br/>Rust CLI]
         OSECLI[ose-cli<br/>Go CLI]
     end
 

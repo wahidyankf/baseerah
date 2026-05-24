@@ -152,7 +152,7 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 | ----------------------- | ------------------------------------------------------------------------ |
 | `ayokoding-web`         | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`         |
 | `ayokoding-cli`         | `["type:app", "platform:cli", "lang:golang", "domain:ayokoding"]`        |
-| `rhino-cli`             | `["type:app", "platform:cli", "lang:golang", "domain:tooling"]`          |
+| `rhino-cli`             | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`            |
 | `organiclever-web`      | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`      |
 | `organiclever-be`       | `["type:app", "platform:giraffe", "lang:fsharp", "domain:organiclever"]` |
 | `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
@@ -378,7 +378,8 @@ the project's feature files has a matching step definition in the implementation
 
 | Project group                                               | Status   | Notes                                                                                       |
 | ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
-| Go CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`)       | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                    |
+| Rust CLI apps (`rhino-cli`)                                 | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                    |
+| Go CLI apps (`ayokoding-cli`, `ose-cli`)                    | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                    |
 | API backends (`organiclever-be`)                            | Enforced | `--shared-steps --exclude-dir test-support`                                                 |
 | E2E runners (`organiclever-be-e2e`, `organiclever-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                              |
 | Content platforms (`ayokoding-web`, `ose-web`)              | Enforced | `--shared-steps`                                                                            |
@@ -540,15 +541,32 @@ language:
 
 > For canonical inputs patterns across Go, Java, Kotlin, Rust, TypeScript, Python, Elixir, C#, Clojure, and Dart, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
-**Go CLI apps** (`rhino-cli`, `ayokoding-cli`, `ose-cli`) also consume Gherkin specs in `test:unit` (godog unit step definitions run without a build tag). Their `test:unit` and `test:quick` inputs must include the CLI's own spec files:
+**Rust CLI app** (`rhino-cli`) also consumes Gherkin specs in `test:unit`. Its `test:unit` and `test:quick` inputs must include the CLI's own spec files:
+
+| CLI App     | Gherkin specs input                             |
+| ----------- | ----------------------------------------------- |
+| `rhino-cli` | `{workspaceRoot}/specs/apps/rhino/**/*.feature` |
+
+Example for `rhino-cli` `test:unit` inputs:
+
+```json
+"inputs": [
+  "{projectRoot}/src/**/*.rs",
+  "{projectRoot}/tests/**/*.rs",
+  "{projectRoot}/Cargo.toml",
+  "{projectRoot}/Cargo.lock",
+  "{workspaceRoot}/specs/apps/rhino/**/*.feature"
+]
+```
+
+**Go CLI apps** (`ayokoding-cli`, `ose-cli`) also consume Gherkin specs in `test:unit` (godog unit step definitions run without a build tag). Their `test:unit` and `test:quick` inputs must include the CLI's own spec files:
 
 | CLI App         | Gherkin specs input                                    |
 | --------------- | ------------------------------------------------------ |
-| `rhino-cli`     | `{workspaceRoot}/specs/apps/rhino/**/*.feature`        |
 | `ayokoding-cli` | `{workspaceRoot}/specs/apps/ayokoding/**/*.feature`    |
 | `ose-cli`       | `{workspaceRoot}/specs/apps/ose-platform/**/*.feature` |
 
-Example for `rhino-cli` `test:unit` inputs:
+Example for `ayokoding-cli` `test:unit` inputs:
 
 ```json
 "inputs": [
@@ -556,7 +574,7 @@ Example for `rhino-cli` `test:unit` inputs:
   "{projectRoot}/internal/**/*.go",
   "{projectRoot}/go.mod",
   "{projectRoot}/go.sum",
-  "{workspaceRoot}/specs/apps/rhino/**/*.feature"
+  "{workspaceRoot}/specs/apps/ayokoding/**/*.feature"
 ]
 ```
 

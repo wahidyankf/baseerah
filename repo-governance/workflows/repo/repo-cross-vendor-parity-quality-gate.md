@@ -93,7 +93,7 @@ The orchestrator executes the validation script directly via
 
 - After creating or modifying agents in `.claude/agents/`
 - After modifying governance prose, `AGENTS.md`, or `CLAUDE.md`
-- After modifying the binding-sync logic in `apps/rhino-cli/internal/agents/`
+- After modifying the binding-sync logic in `apps/rhino-cli/src/internal/agents/`
 - Periodically as a parity audit (the same target runs in `.husky/pre-push` for any
   push that touches one of these surfaces)
 
