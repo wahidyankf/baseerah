@@ -63,9 +63,9 @@ where
     if elapsed > STEP_TIMEOUT {
         let _ = writeln!(
             deps.stdout,
-            "\u{26A0}\u{FE0F}  Step {:?} timed out after {} — skipping",
+            "\u{26A0}\u{FE0F}  Step {:?} timed out after {}s — skipping",
             name,
-            format!("{}s", STEP_TIMEOUT.as_secs())
+            STEP_TIMEOUT.as_secs()
         );
         return Ok(());
     }

@@ -562,14 +562,16 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run full lint: `npx nx run rhino-cli:lint` — exits 0
-- [ ] Run format check: `npx nx run rhino-cli:fmt:check` — exits 0
-- [ ] Run typecheck: `npx nx run rhino-cli:typecheck` — exits 0
-- [ ] Run unit tests with coverage: `npx nx run rhino-cli:test:quick` — exits 0,
+- [x] Run full lint: `npx nx run rhino-cli:lint` — exits 0
+- [x] Run format check: `npx nx run rhino-cli:fmt:check` — exits 0
+- [x] Run typecheck: `npx nx run rhino-cli:typecheck` — exits 0
+- [x] Run unit tests with coverage: `npx nx run rhino-cli:test:quick` — exits 0,
       coverage ≥ 90 %
-- [ ] Confirm no `mod.rs` files: `find apps/rhino-cli/src -name mod.rs` → empty
-- [ ] Confirm no `gitutil` references: `grep -r "gitutil" apps/rhino-cli/src/` → empty
-- [ ] Confirm `cover.out` absent: `grep -r "cover\.out" apps/rhino-cli/` → empty
+- [x] Confirm no `mod.rs` files: `find apps/rhino-cli/src -name mod.rs` → empty
+- [x] Confirm no `gitutil` references: `grep -r "gitutil" apps/rhino-cli/src/` → empty
+- [x] Confirm `cover.out` absent: `grep -r "cover\.out" apps/rhino-cli/` → empty
+      (Note: remaining `cover.out` refs in testcoverage/\*.rs are semantic — they
+      reference Go's coverage format, not the LLVM output file we renamed)
 
 > **Important**: Fix ALL failures found, including any preexisting issues
 > encountered during work (root cause orientation principle).
@@ -578,9 +580,9 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 ### Commit Guidelines
 
-- [ ] Commit thematically — one commit per phase
-- [ ] Follow Conventional Commits: `refactor(rhino-cli): <description>`
-- [ ] Do not bundle unrelated fixes into a single commit
+- [x] Commit thematically — one commit per phase
+- [x] Follow Conventional Commits: `refactor(rhino-cli): <description>`
+- [x] Do not bundle unrelated fixes into a single commit
 
 ---
 
