@@ -41,9 +41,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[plan-checker](plan-checker.md)** - Project plan validation
 - **[plan-execution-checker](plan-execution-checker.md)** - Plan execution validation
 - **[repo-rules-checker](repo-rules-checker.md)** - Governance compliance validation
-- **[repo-parity-checker](repo-parity-checker.md)** - Cross-vendor behavioral-parity validation (rhino-cli vendor-audit, binding-sync drift)
 - **[repo-workflow-checker](repo-workflow-checker.md)** - Workflow documentation validation
-- **[repo-harness-compatibility-checker](repo-harness-compatibility-checker.md)** - Detects drift between supported coding-agent harness conventions and the platform-binding catalog (delegates research to web-research-maker)
+- **[repo-harness-compatibility-checker](repo-harness-compatibility-checker.md)** - Validates cross-vendor parity invariants (Phase 0, deterministic) and detects external harness drift (Phase 1, web-research-backed)
 - **[specs-checker](specs-checker.md)** - Gherkin/BDD specs directory structural and content validation
 - **[swe-code-checker](swe-code-checker.md)** - Validates projects against platform coding standards (validates application code rather than documentation)
 - **[swe-ui-checker](swe-ui-checker.md)** - UI component quality validation
@@ -65,9 +64,8 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[pdf-to-md-fixer](pdf-to-md-fixer.md)** - Apply validated PDF-to-Markdown fixes (re-extracts missing content from PDF source)
 - **[plan-fixer](plan-fixer.md)** - Apply plan fixes
 - **[repo-rules-fixer](repo-rules-fixer.md)** - Fix governance compliance issues
-- **[repo-parity-fixer](repo-parity-fixer.md)** - Apply validated cross-vendor parity fixes (auto-remediates binding-sync drift; flags color-map/tier-map gaps)
 - **[repo-workflow-fixer](repo-workflow-fixer.md)** - Fix workflow documentation
-- **[repo-harness-compatibility-fixer](repo-harness-compatibility-fixer.md)** - Apply validated harness-compatibility catalog/binding updates from a drift audit
+- **[repo-harness-compatibility-fixer](repo-harness-compatibility-fixer.md)** - Apply validated parity and harness-compatibility fixes; auto-remediates binding-sync drift; updates specs/apps/rhino/ when harness changes alter documented CLI behavior
 - **[specs-fixer](specs-fixer.md)** - Fix specs structural and accuracy issues
 - **[swe-ui-fixer](swe-ui-fixer.md)** - Apply validated UI component fixes
 - **[ci-fixer](ci-fixer.md)** - Apply validated CI/CD standards fixes

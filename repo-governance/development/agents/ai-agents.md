@@ -609,18 +609,19 @@ ALL checker agents MUST write their validation/audit reports to `generated-repor
 18. swe-code-checker
 19. ci-checker
 20. swe-ui-checker
-21. repo-parity-checker
+21. repo-harness-compatibility-checker
 
-> **Cross-vendor behavioral parity**: `repo-parity-checker` (green) and
-> `repo-parity-fixer` (yellow) validate the cross-vendor parity invariants
-> (governance prose vendor-neutrality; AGENTS.md / CLAUDE.md vendor-neutrality;
-> binding sync no-op; agent count parity; color-translation map and
-> capability-tier map coverage). They are orchestrated by the
-> [`repo-cross-vendor-parity-quality-gate` workflow](../../workflows/repo/repo-cross-vendor-parity-quality-gate.md)
-> and gated automatically on every push that touches a parity-relevant surface
-> via the `validate:cross-vendor-parity` Nx target wired into `.husky/pre-push`.
-> The fixer auto-remediates only sync drift; all other invariant violations are
-> surfaced as findings requiring human resolution.
+> **Harness compatibility (Phase 0 + Phase 1)**: `repo-harness-compatibility-checker`
+> (green) and `repo-harness-compatibility-fixer` (yellow) validate both internal
+> cross-vendor parity invariants (Phase 0: governance prose vendor-neutrality;
+> AGENTS.md / CLAUDE.md vendor-neutrality; binding sync no-op; agent count parity;
+> color-translation map and capability-tier map coverage) and external harness drift
+> (Phase 1: per-harness web-research-backed comparison against upstream docs). They
+> are orchestrated by the
+> [`repo-harness-compatibility-quality-gate` workflow](../../workflows/repo/repo-harness-compatibility-quality-gate.md).
+> The fixer auto-remediates only Phase 0 sync drift and unambiguous catalog updates;
+> all other invariant violations and ambiguous findings are surfaced for human
+> resolution.
 
 **NO conversation-only output**: Checker agents MUST NOT output validation results in conversation only. All validation findings MUST be written to audit report files following the 4-part pattern `{agent-family}__{uuid-chain}__{YYYY-MM-DD--HH-MM}__audit.md`. The UUID chain enables parallel execution without file collisions.
 
