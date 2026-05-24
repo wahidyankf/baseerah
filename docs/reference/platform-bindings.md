@@ -18,21 +18,111 @@ bindings live in their own directories and are explicitly excluded from the
 
 ## Platform Binding Directories
 
-| Platform         | Binding location                                | Root instruction file                                                                                                                          | Status                                       |
-| ---------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Claude Code      | `.claude/`                                      | `CLAUDE.md` (shim → `AGENTS.md`)                                                                                                               | Active                                       |
-| OpenCode         | `.opencode/agents/`, `.claude/skills/` (native) | `AGENTS.md` (read natively)                                                                                                                    | Active                                       |
-| OpenAI Codex CLI | (no dotdir)                                     | `AGENTS.md` (read natively)                                                                                                                    | Provided automatically via `AGENTS.md`       |
-| Aider            | n/a                                             | `CONVENTIONS.md` (read natively per Aider's own docs); AGENTS.md support claimed by agents.md standard site but not documented by Aider itself | Reserved (`CONVENTIONS.md` not yet provided) |
-| Cursor           | `.cursor/rules/*.mdc`                           | `AGENTS.md` (also reads `.cursor/rules/`)                                                                                                      | Reserved (not yet provided)                  |
-| GitHub Copilot   | `.github/copilot-instructions.md`               | `AGENTS.md` (coding agent mode)                                                                                                                | Reserved (not yet provided)                  |
-| Gemini CLI       | (no dotdir)                                     | `GEMINI.md` or `AGENTS.md`                                                                                                                     | Reserved                                     |
-| Continue         | TBD                                             | TBD                                                                                                                                            | Not researched conclusively; see plan brd.md |
-| Sourcegraph Cody | search-based context                            | none                                                                                                                                           | Not applicable (no instruction file)         |
+The table below catalogs all nine named coding-agent harnesses plus OpenCode. Columns record every
+surface each harness exposes so contributors know exactly which files to create or extend when
+adding support for a given tool.
 
-**Root instruction file hierarchy**: Any platform that reads `AGENTS.md` natively requires no
-additional binding directory. Platforms that predate `AGENTS.md` (e.g., the Claude Code binding,
-which uses `CLAUDE.md`) receive a shim that imports `AGENTS.md`.
+**Verified 2026-05-24.**
+
+| Platform               | Reads root `AGENTS.md` natively?                                                             | Tool-specific instruction surface                                                                        | Project MCP config                     | Custom-agent surface                                                   | Skills surface                     | Status                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------- |
+| Claude Code            | No — reads `CLAUDE.md` (shim `@AGENTS.md`)                                                   | `CLAUDE.md`, `.claude/`                                                                                  | `.mcp.json`                            | `.claude/agents/*.md`                                                  | `.claude/skills/*/SKILL.md`        | Active                                            |
+| OpenCode               | Yes                                                                                          | `.opencode/agents/` (auto-synced); reads `.claude/skills/` natively                                      | `opencode.json`                        | `.opencode/agents/*.md`                                                | reads `.claude/skills/`            | Active                                            |
+| OpenAI Codex CLI       | Yes (since Apr 2025)                                                                         | `AGENTS.override.md` (overrides), `.codex/config.toml`                                                   | `.codex/config.toml` `[mcp_servers]`   | `[agents.<name>]` in `config.toml`                                     | `.agents/skills/`                  | Partial (`.codex/` exists)                        |
+| GitHub Copilot         | Yes (nearest file wins)                                                                      | `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`                              | `.vscode/mcp.json`                     | `.github/agents/*.agent.md` (also reads `.claude/agents/`)             | n/a                                | Partial (`.github/{agents,prompts,skills}` exist) |
+| Cursor                 | Yes                                                                                          | `.cursor/rules/*.mdc` (+ legacy `.cursorrules`)                                                          | `.cursor/mcp.json`                     | `.cursor/agents/*.md` (also reads `.claude/agents/`, `.codex/agents/`) | `.cursor/skills/`                  | Reserved                                          |
+| Windsurf               | Yes                                                                                          | `.windsurf/rules/*.md`, `.windsurf/workflows/`                                                           | global only                            | not officially documented                                              | `.windsurf/skills/` (unverified)   | Reserved                                          |
+| JetBrains Junie        | Yes — `.junie/AGENTS.md` outranks root `AGENTS.md`                                           | `.junie/AGENTS.md`, `.junie/rules/*.md` (imports `.claude/agents/`, `.codex/agents/`, `.claude/skills/`) | `.junie/mcp/mcp.json`                  | `.junie/agents/`, `.agents/`                                           | `.junie/skills/<name>/SKILL.md`    | Reserved                                          |
+| Amazon Q Developer     | No (open feature request #2712)                                                              | `.amazonq/rules/*.md` (via agent JSON `resources`)                                                       | `.amazonq/mcp.json`                    | JSON in `.amazonq/` / `~/.aws/amazonq/cli-agents/`                     | none                               | Reserved                                          |
+| Google Antigravity CLI | Yes (since v1.20.3) — `GEMINI.md` outranks `AGENTS.md`                                       | `GEMINI.md` (overrides), `.agent/rules/*.md`                                                             | `mcp_config.json` (root or `.agents/`) | runtime-orchestrated (no declarative file)                             | `.agents/skills/<name>/SKILL.md`   | Reserved                                          |
+| Pi (pi.dev)            | Yes (also reads `CLAUDE.md`)                                                                 | `.pi/settings.json`, `.pi/AGENTS.md`, `.pi/SYSTEM.md`                                                    | none (intentionally no native MCP)     | none built-in (extension-based)                                        | `.agents/skills/` or `.pi/skills/` | Reserved                                          |
+| Aider                  | Yes (AGENTS.md standard site lists support; Aider's own docs cite `CONVENTIONS.md` natively) | `CONVENTIONS.md`                                                                                         | n/a                                    | n/a                                                                    | n/a                                | Reserved (`CONVENTIONS.md` not yet provided)      |
+
+### Root instruction file hierarchy
+
+Platforms that read `AGENTS.md` natively require no additional binding directory — the native read
+is sufficient. Platforms that predate the `AGENTS.md` standard (or that require a harness-specific
+entry point) receive either a shim that imports `AGENTS.md` (Claude Code's `CLAUDE.md`) or a
+generated bridge file.
+
+Some harnesses rank a tool-specific file **above** `AGENTS.md` when both are present. Those files
+must never carry content that diverges from `AGENTS.md`. See the
+[No-shadowing note](#no-shadowing-note) below.
+
+> **Note on Gemini CLI**: The former "Gemini CLI" row referred to the standalone Gemini CLI tool,
+> which was superseded in 2026 by the Google Antigravity CLI (which bundles Gemini model access
+> alongside broader agent orchestration). The Antigravity CLI reads `AGENTS.md` natively since
+> v1.20.3. All previous "Gemini CLI" entries in this document are replaced by the "Google Antigravity
+> CLI" row above.
+
+### Provenance of pre-existing partial bindings
+
+Two binding directories already exist in the repository but were **not produced by `rhino-cli agents
+sync`**:
+
+- **`.github/{agents,prompts,skills}`** — These directories are provided by the Nx MCP tooling
+  infrastructure (specifically the `nx-mcp` server and the Nx CI monitor skill). The
+  `.github/agents/ci-monitor-subagent.agent.md` and `.github/prompts/monitor-ci.prompt.md` files
+  are GitHub Copilot agent and prompt artifacts used by the Nx CI-monitoring workflow, not by the
+  repo's own agent authoring pipeline. `rhino-cli agents sync` does not write to `.github/` and
+  will not clobber these files.
+
+- **`.codex/config.toml` and `.codex/agents/`** — These files are provided by the OpenAI Codex CLI
+  tooling. `.codex/config.toml` configures the `nx-mcp` MCP server for Codex and declares the
+  `ci-monitor-subagent` agent entry. Like the `.github/` artifacts, these files are Nx/Codex
+  infrastructure — not hand-authored custom agents produced by this repo's pipeline. `rhino-cli agents sync` does not write to `.codex/` and will not clobber these files.
+
+Both sets of files are safe to leave in place. They serve the Nx CI-monitoring capability and do
+not affect the canonical `AGENTS.md` instruction surface.
+
+### Generated Amazon Q Developer bridge
+
+Amazon Q Developer does not read the canonical `AGENTS.md` natively (open feature request #2712), so
+its instruction surface is generated mechanically by `rhino-cli agents emit-bindings`:
+
+- **`.amazonq/rules/00-agents-md.md`** — a pointer file (not a copy) directing Amazon Q to read and
+  follow `AGENTS.md` at the repository root.
+- **`.amazonq/cli-agents/ose-default.json`** — a minimal Amazon Q agent definition whose `resources`
+  load `file://AGENTS.md` and `file://.amazonq/rules/**/*.md`.
+
+These files are deterministic and idempotent — never hand-edit them. The companion guard
+`rhino-cli agents validate-bindings` enforces byte-for-byte parity against the generator and runs in
+the pre-push pipeline. The same guard asserts that every present binding directory under `.amazonq`,
+`.claude`, `.opencode`, `.codex`, and `.github` is referenced in this catalog.
+
+### No-shadowing note
+
+Some harnesses rank a tool-specific file **above** the canonical `AGENTS.md` when both files are
+present in the repository. These higher-precedence files silently override `AGENTS.md` for that
+tool only, producing divergent behavior invisible to contributors using any other harness.
+
+The following files trigger this rule:
+
+- `AGENTS.override.md` — OpenAI Codex CLI ranks this above `AGENTS.md` when present.
+- `.junie/AGENTS.md` — JetBrains Junie ranks this above the root `AGENTS.md`.
+- `GEMINI.md` — Google Antigravity CLI ranks this above `AGENTS.md` when present.
+
+**The repo's default is not to create any of these files.** If a future operational need forces one
+to exist, it must be implemented as a pure pointer or import directive referencing `AGENTS.md` —
+never as a file with independent prose. Any exception must be recorded in this catalog with an
+explicit justification.
+
+See [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md)
+for the full no-shadowing rule (Rule 3 / AD3) and the two-tier binding model that governs all
+harness integrations.
+
+### Optional thin pointers
+
+Tier-1 harnesses (Cursor, Windsurf, JetBrains Junie, GitHub Copilot, OpenAI Codex CLI, Google
+Antigravity CLI, Pi, OpenCode) read the root `AGENTS.md` natively, so they need no tool-specific
+instruction file to receive the canonical instructions.
+
+**Decision: the repo ships no optional thin pointer files** (e.g., `.github/copilot-instructions.md`,
+`.cursor/rules/*.mdc`, `.windsurf/rules/*.md`) by default. Rationale: each would be either redundant
+(the native `AGENTS.md` read already applies) or a drift/shadowing risk. Only the Tier-2 Amazon Q
+bridge is generated, because Amazon Q does not read `AGENTS.md` natively. If a thin pointer is added
+later, it must be a pure `AGENTS.md` pointer emitted by `rhino-cli agents emit-bindings` and covered
+by `rhino-cli agents validate-bindings`.
 
 ## Translation Artifacts
 
@@ -102,6 +192,8 @@ To add a new binding (e.g., `.cursor/rules/`):
 
 - [Governance Vendor-Independence Convention](../../repo-governance/conventions/structure/governance-vendor-independence.md) —
   policy separating vendor-neutral governance from platform bindings
+- [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) —
+  two-tier binding model, no-shadowing rule, mechanical-generation requirement, and parity guard
 - [AI Agents Development Guide](../../repo-governance/development/agents/ai-agents.md) — agent authoring
   guide with binding-specific Platform Binding Examples
 - [Model Selection Convention](../../repo-governance/development/agents/model-selection.md) — capability

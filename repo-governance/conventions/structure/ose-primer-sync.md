@@ -218,6 +218,11 @@ These rules are absolute; no agent or operator may bypass them:
 
 ## Relationship to other conventions
 
+- [Multi-Harness Binding Convention](./multi-harness-binding.md) — The multi-harness binding scaffolding (the
+  binding convention itself, the generated bridge for non-native harnesses, the deterministic parity guard, and
+  the compatibility-audit workflow plus its checker/fixer agents) is scaffolding-layer content and propagates
+  downstream to the template like the rest of the governance/agent/workflow surface. Product-specific binding
+  content stays out of scope.
 - [Per-Directory Licensing](./licensing.md) — Documents the per-directory MIT licensing approach for `ose-public`.
 - [File Naming Convention](./file-naming.md) — Applies uniformly to both repositories; no sync transform is required for filenames.
 - [Agent Naming Convention](./agent-naming.md) — Sync agents conform (`repo-ose-primer-adoption-maker`, `repo-ose-primer-propagation-maker`).

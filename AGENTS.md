@@ -358,9 +358,9 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 
 **Content Creation**: docs-maker, docs-tutorial-maker, readme-maker, specs-maker, apps-ayokoding-web-general-maker, apps-ayokoding-web-by-example-maker, apps-ayokoding-web-in-the-field-maker, apps-ose-web-content-maker, swe-ui-maker
 
-**Validation**: docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, apps-ayokoding-web-general-checker, apps-ayokoding-web-by-example-checker, apps-ayokoding-web-in-the-field-checker, apps-ayokoding-web-facts-checker, apps-ayokoding-web-link-checker, apps-ose-web-content-checker, swe-code-checker, swe-ui-checker, ci-checker, web-research-maker, repo-parity-checker, repo-rules-checker, repo-workflow-checker
+**Validation**: docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, apps-ayokoding-web-general-checker, apps-ayokoding-web-by-example-checker, apps-ayokoding-web-in-the-field-checker, apps-ayokoding-web-facts-checker, apps-ayokoding-web-link-checker, apps-ose-web-content-checker, swe-code-checker, swe-ui-checker, ci-checker, web-research-maker, repo-parity-checker, repo-rules-checker, repo-workflow-checker, repo-harness-compatibility-checker
 
-**Fixing**: docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, apps-ayokoding-web-general-fixer, apps-ayokoding-web-by-example-fixer, apps-ayokoding-web-in-the-field-fixer, apps-ayokoding-web-facts-fixer, apps-ayokoding-web-link-fixer, apps-ose-web-content-fixer, docs-file-manager, swe-ui-fixer, ci-fixer, repo-parity-fixer, repo-rules-fixer, repo-workflow-fixer
+**Fixing**: docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, apps-ayokoding-web-general-fixer, apps-ayokoding-web-by-example-fixer, apps-ayokoding-web-in-the-field-fixer, apps-ayokoding-web-facts-fixer, apps-ayokoding-web-link-fixer, apps-ose-web-content-fixer, docs-file-manager, swe-ui-fixer, ci-fixer, repo-parity-fixer, repo-rules-fixer, repo-workflow-fixer, repo-harness-compatibility-fixer
 
 **Planning**: plan-maker, plan-checker, plan-execution-checker, plan-fixer (see [plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md))
 
@@ -641,11 +641,13 @@ Concrete tool integrations live **outside** `repo-governance/` in platform-bindi
 
 - **Claude Code** → `.claude/`, with `CLAUDE.md` as the Claude-Code-discoverable shim importing this file
 - **OpenCode** → `.opencode/agents/` (auto-synced from `.claude/`); reads this file (`AGENTS.md`) natively; reads agent skill files at `.claude/skills/<name>/SKILL.md` natively
-- **OpenAI Codex CLI** → reads `AGENTS.md` natively (no dotdir required)
+- **OpenAI Codex CLI** → reads `AGENTS.md` natively (`.codex/config.toml` present)
+- **GitHub Copilot, Cursor, Windsurf, JetBrains Junie, Google Antigravity CLI, Pi** → read root `AGENTS.md` natively (Tier-1); no per-tool instruction file shipped by default (see no-shadowing rule)
+- **Amazon Q Developer** → does not read `AGENTS.md` natively; receives a generated bridge under `.amazonq/` (`rules/00-agents-md.md` + a default agent config), emitted by `rhino-cli agents emit-bindings`
 - **Aider** → reads `CONVENTIONS.md` natively per Aider's own docs (<https://aider.chat/docs/usage/conventions.html>); the agents.md standard site lists Aider as a supported tool but Aider's own documentation does not document AGENTS.md specifically
-- **Future**: `.cursor/`, `.github/copilot-instructions.md`, `GEMINI.md`, `CONVENTIONS.md` (Aider)
+- **Future**: `CONVENTIONS.md` (Aider)
 
-See [docs/reference/platform-bindings.md](./docs/reference/platform-bindings.md) for the full catalog of binding directories, root instruction files, and mechanical translation artifacts.
+See [docs/reference/platform-bindings.md](./docs/reference/platform-bindings.md) for the full catalog of binding directories, root instruction files, and mechanical translation artifacts. The two-tier binding model and no-shadowing rule are defined in [repo-governance/conventions/structure/multi-harness-binding.md](./repo-governance/conventions/structure/multi-harness-binding.md).
 
 ### Concrete Vendor Model IDs
 
