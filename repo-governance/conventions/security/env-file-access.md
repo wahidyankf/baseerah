@@ -153,11 +153,11 @@ details live in the binding directories and must not be reproduced here (per the
 [Governance Vendor-Independence Convention](../structure/governance-vendor-independence.md)).
 The binding paths are:
 
-- **Claude Code binding**: `.claude/settings.json` (declarative allow and deny rules) and
+- **`.claude/` platform binding**: `.claude/settings.json` (declarative allow and deny rules) and
   `.claude/hooks/block-env-file-access.sh` (PreToolUse hook — authoritative for direct file access
   and best-effort Bash guard).
-- **OpenCode binding**: `opencode.json` `permission` block (path-scoped read and edit deny with
-  `.env.example` allow using last-match-wins semantics).
+- **`opencode.json` platform binding**: `opencode.json` `permission` block (path-scoped read and
+  edit deny with `.env.example` allow using last-match-wins semantics).
 
 Any future platform binding added to this repository must implement equivalent enforcement before
 being considered production-ready for this repo.
@@ -167,24 +167,24 @@ being considered production-ready for this repo.
 The following gaps exist in the current enforcement posture. They are accepted with documented
 compensating controls and are not silently left unaddressed.
 
-**Bash guard is best-effort heuristic**: The Claude Code hook inspects Bash command strings using
-pattern matching. It cannot cover all indirect manipulation paths — for example, creative piping,
-`sed -i` patterns, or subshell constructs that achieve the same effect without spelling out a
-`.env*` filename literally. The pre-commit guard and gitignore are the robust backstop for any
-write that reaches the filesystem.
+**Bash guard is best-effort heuristic**: The PreToolUse hook in the `.claude/` platform binding
+inspects Bash command strings using pattern matching. It cannot cover all indirect manipulation
+paths — for example, creative piping, `sed -i` patterns, or subshell constructs that achieve the
+same effect without spelling out a `.env*` filename literally. The pre-commit guard and gitignore
+are the robust backstop for any write that reaches the filesystem.
 
-**OpenCode bash permission is coarse-grained**: OpenCode's permission schema (as of this rule's
-authoring) allows path-scoped deny for read and edit operations but does not support
-command-level deny for Bash invocations. The `bash` permission uses `"*": "allow"`, meaning
-OpenCode cannot express "deny Bash commands that directly manipulate `.env*`." The compensating
+**`opencode.json` bash permission is coarse-grained**: The `opencode.json` permission schema (as
+of this rule's authoring) allows path-scoped deny for read and edit operations but does not support
+command-level deny for Bash invocations. The `bash` permission uses `"*": "allow"`, meaning this
+binding cannot express "deny Bash commands that directly manipulate `.env*`." The compensating
 control is the pre-commit guard, which is platform-agnostic and catches any write that would be
 staged, and the declarative read/edit deny, which blocks the more direct file-tool paths.
 
 **Sandbox hardening is a future option**: The only OS-level block for indirect Bash manipulation in
-Claude Code would be a filesystem-level sandbox (`denyRead`/`denyWrite`). This would also block the
-script carve-out unless explicit allow lists are added for the script directories. Adopting this is
-a future hardening option, not delivered as part of the current policy. If adopted, it would
-require careful allow-list design to preserve the carve-out.
+the `.claude/` platform binding would be a filesystem-level sandbox (`denyRead`/`denyWrite`). This
+would also block the script carve-out unless explicit allow lists are added for the script
+directories. Adopting this is a future hardening option, not delivered as part of the current
+policy. If adopted, it would require careful allow-list design to preserve the carve-out.
 
 ## Validation
 
@@ -215,12 +215,12 @@ cases.
 
 **Platform-Binding Enforcement Paths:**
 
-- `.claude/settings.json` — Claude Code declarative allow/deny rules
-- `.claude/hooks/block-env-file-access.sh` — Claude Code PreToolUse hook (authoritative)
-- `.claude/hooks/block-env-file-access.test.sh` — Hook test harness
-- `scripts/check-no-env-staged.sh` — Pre-commit guard script
-- `.husky/pre-commit` — Hook invocation point
-- `opencode.json` — OpenCode permission block
+- `.claude/settings.json` — primary platform binding declarative allow/deny rules
+- `.claude/hooks/block-env-file-access.sh` — primary platform binding PreToolUse hook (authoritative)
+- `.claude/hooks/block-env-file-access.test.sh` — hook test harness
+- `scripts/check-no-env-staged.sh` — pre-commit guard script
+- `.husky/pre-commit` — hook invocation point
+- `opencode.json` — secondary platform binding permission block
 
 **Agents:**
 
