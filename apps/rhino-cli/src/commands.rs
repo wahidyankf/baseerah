@@ -1,6 +1,3 @@
-// Command modules mirror `apps/rhino-cli/cmd/*.go` (one file per command).
-// Populated phase-by-phase as the port progresses.
-
 pub mod agents_detect_duplication;
 pub mod agents_sync;
 pub mod agents_validate_claude;

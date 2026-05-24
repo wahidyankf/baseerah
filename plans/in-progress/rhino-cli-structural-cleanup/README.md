@@ -269,7 +269,7 @@ Work is done when all of the following are true:
 
 #### 2a: Top-level `mod.rs` files
 
-- [ ] Move `apps/rhino-cli/src/internal/mod.rs` → `apps/rhino-cli/src/internal.rs`
+- [x] Move `apps/rhino-cli/src/internal/mod.rs` → `apps/rhino-cli/src/internal.rs`
       (preserves git rename history):
 
   ```bash
@@ -279,7 +279,7 @@ Work is done when all of the following are true:
   `apps/rhino-cli/src/lib.rs` already has `pub mod internal;` — no change needed.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Move `apps/rhino-cli/src/commands/mod.rs` → `apps/rhino-cli/src/commands.rs`:
+- [x] Move `apps/rhino-cli/src/commands/mod.rs` → `apps/rhino-cli/src/commands.rs`:
 
   ```bash
   git mv apps/rhino-cli/src/commands/mod.rs apps/rhino-cli/src/commands.rs
@@ -290,35 +290,35 @@ Work is done when all of the following are true:
 For each module below: `git mv <module>/mod.rs <module>.rs`, then `rmdir` the
 now-empty directory.
 
-- [ ] `bcregistry`:
+- [x] `bcregistry`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/bcregistry/mod.rs apps/rhino-cli/src/internal/bcregistry.rs
   rmdir apps/rhino-cli/src/internal/bcregistry/
   ```
 
-- [ ] `cliout`:
+- [x] `cliout`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/cliout/mod.rs apps/rhino-cli/src/internal/cliout.rs
   rmdir apps/rhino-cli/src/internal/cliout/
   ```
 
-- [ ] `envbackup`:
+- [x] `envbackup`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/envbackup/mod.rs apps/rhino-cli/src/internal/envbackup.rs
   rmdir apps/rhino-cli/src/internal/envbackup/
   ```
 
-- [ ] `glossary`:
+- [x] `glossary`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/glossary/mod.rs apps/rhino-cli/src/internal/glossary.rs
   rmdir apps/rhino-cli/src/internal/glossary/
   ```
 
-- [ ] `mermaid`:
+- [x] `mermaid`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/mermaid/mod.rs apps/rhino-cli/src/internal/mermaid.rs
@@ -330,43 +330,43 @@ now-empty directory.
 For each module below: `git mv <name>/mod.rs <name>.rs` at the `internal/` level.
 All sub-files remain in `<name>/` unchanged; the directory is kept.
 
-- [ ] `agents`: move `internal/agents/mod.rs` → `internal/agents.rs`:
+- [x] `agents`: move `internal/agents/mod.rs` → `internal/agents.rs`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/agents/mod.rs apps/rhino-cli/src/internal/agents.rs
   ```
 
-- [ ] `docs`:
+- [x] `docs`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/docs/mod.rs apps/rhino-cli/src/internal/docs.rs
   ```
 
-- [ ] `doctor`:
+- [x] `doctor`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/doctor/mod.rs apps/rhino-cli/src/internal/doctor.rs
   ```
 
-- [ ] `naming` (keep `naming/` directory — Phase 4 will add `naming/reporter.rs`):
+- [x] `naming` (keep `naming/` directory — Phase 4 will add `naming/reporter.rs`):
 
   ```bash
   git mv apps/rhino-cli/src/internal/naming/mod.rs apps/rhino-cli/src/internal/naming.rs
   ```
 
-- [ ] `repo_governance`:
+- [x] `repo_governance`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/repo_governance/mod.rs apps/rhino-cli/src/internal/repo_governance.rs
   ```
 
-- [ ] `speccoverage`:
+- [x] `speccoverage`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/speccoverage/mod.rs apps/rhino-cli/src/internal/speccoverage.rs
   ```
 
-- [ ] `testcoverage`:
+- [x] `testcoverage`:
 
   ```bash
   git mv apps/rhino-cli/src/internal/testcoverage/mod.rs apps/rhino-cli/src/internal/testcoverage.rs
@@ -374,7 +374,7 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 #### 2d: Special — `git/` (keep directory for Phase 3)
 
-- [ ] Move `git/mod.rs` → `git.rs` at `internal/` level, keep `git/` directory:
+- [x] Move `git/mod.rs` → `git.rs` at `internal/` level, keep `git/` directory:
 
   ```bash
   git mv apps/rhino-cli/src/internal/git/mod.rs apps/rhino-cli/src/internal/git.rs
@@ -384,29 +384,29 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 #### 2e: Update `project.json` coverage ignore regex
 
-- [ ] Edit `apps/rhino-cli/project.json` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/project.json` [Repo-grounded]:
       In the `test:quick` `command` string, update the `--ignore-filename-regex` value [Repo-grounded — existing flag in project.json]:
   - Replace `internal/git/mod\\.rs` with `internal/git\\.rs`
   - Replace `internal/doctor/mod\\.rs` with `internal/doctor\\.rs`
   - Verify: `grep "internal/git/mod" apps/rhino-cli/project.json` → no output; `grep "internal/git\\.rs" apps/rhino-cli/project.json` → shows the updated regex.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Remove the Go-port origin comments from `apps/rhino-cli/src/internal.rs`
+- [x] Remove the Go-port origin comments from `apps/rhino-cli/src/internal.rs`
       (was `internal/mod.rs`): delete the two comment lines at the top that reference
       `apps/rhino-cli/internal/<pkg>/` Go paths. Leave a single brief comment if needed.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Remove the Go-port origin comment from `apps/rhino-cli/src/commands.rs`
+- [x] Remove the Go-port origin comment from `apps/rhino-cli/src/commands.rs`
       (was `commands/mod.rs`): delete comment referencing `apps/rhino-cli/cmd/*.go`.
   - _Suggested executor: `swe-rust-dev`_
 
 #### 2f: Verify Phase 2
 
-- [ ] Verify compile: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
+- [x] Verify compile: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
       exits 0
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Confirm no `mod.rs` files remain:
+- [x] Confirm no `mod.rs` files remain:
 
   ```bash
   find apps/rhino-cli/src -name mod.rs
@@ -414,9 +414,9 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
   Must return empty.
 
-- [ ] Run full test suite: `npx nx run rhino-cli:test:unit` exits 0
+- [x] Run full test suite: `npx nx run rhino-cli:test:unit` exits 0
 
-- [ ] Commit: `refactor(rhino-cli): convert all mod.rs to Rust 2018+ flat-file style`
+- [x] Commit: `refactor(rhino-cli): convert all mod.rs to Rust 2018+ flat-file style`
 
 ---
 
