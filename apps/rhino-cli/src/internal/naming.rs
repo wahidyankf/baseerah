@@ -3,6 +3,8 @@
 // Pure validators for agent and workflow naming conventions. Filesystem-agnostic:
 // callers collect file lists (and content bytes for frontmatter checks) and pass them in.
 
+pub mod reporter;
+
 use std::path::Path;
 
 #[derive(Debug, Clone, PartialEq, Eq)]

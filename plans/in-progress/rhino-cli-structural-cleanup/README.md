@@ -515,39 +515,39 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 ### Phase 4: Move `naming_reporter` to `internal/naming/`
 
-- [ ] Create `apps/rhino-cli/src/internal/naming/reporter.rs` [_New file_]:
+- [x] Create `apps/rhino-cli/src/internal/naming/reporter.rs` [_New file_]:
       Copy the entire content of `apps/rhino-cli/src/commands/naming_reporter.rs`
       into this new file. No content changes needed.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Edit `apps/rhino-cli/src/internal/naming.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/internal/naming.rs` [Repo-grounded]:
       Add `pub mod reporter;` as the first `pub mod` line.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Delete `apps/rhino-cli/src/commands/naming_reporter.rs`:
+- [x] Delete `apps/rhino-cli/src/commands/naming_reporter.rs`:
 
   ```bash
   rm apps/rhino-cli/src/commands/naming_reporter.rs
   ```
 
-- [ ] Edit `apps/rhino-cli/src/commands.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/commands.rs` [Repo-grounded]:
       Remove the line `pub mod naming_reporter;`
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Edit `apps/rhino-cli/src/commands/agents_validate_naming.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/commands/agents_validate_naming.rs` [Repo-grounded]:
       Replace `use super::naming_reporter::{format_json, format_markdown, format_text};`
       with `use crate::internal::naming::reporter::{format_json, format_markdown, format_text};`
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Edit `apps/rhino-cli/src/commands/workflows_validate_naming.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/commands/workflows_validate_naming.rs` [Repo-grounded]:
       Same substitution as above.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Verify: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
+- [x] Verify: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
       exits 0; then `npx nx run rhino-cli:test:unit` exits 0
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Confirm placement:
+- [x] Confirm placement:
 
   ```bash
   find apps/rhino-cli/src/commands -name naming_reporter.rs
@@ -556,7 +556,7 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
   Must return empty.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit: `refactor(rhino-cli): move naming_reporter from commands/ to internal/naming/`
+- [x] Commit: `refactor(rhino-cli): move naming_reporter from commands/ to internal/naming/`
 
 ---
 

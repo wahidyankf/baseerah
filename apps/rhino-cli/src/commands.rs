@@ -24,7 +24,6 @@ pub mod governance_license_audit;
 pub mod governance_readme_index_audit;
 pub mod governance_traceability_audit;
 pub mod governance_vendor_audit;
-pub mod naming_reporter;
 pub mod spec_coverage_validate;
 pub mod specs_validate_adoption;
 pub mod specs_validate_counts;

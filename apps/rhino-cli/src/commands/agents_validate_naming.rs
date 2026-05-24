@@ -10,7 +10,7 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::naming::{self, Violation};
 
-use super::naming_reporter::{format_json, format_markdown, format_text};
+use crate::internal::naming::reporter::{format_json, format_markdown, format_text};
 
 const AGENT_ROLES: &[&str] = &["maker", "checker", "fixer", "dev", "deployer", "manager"];
 
