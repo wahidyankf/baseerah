@@ -66,6 +66,7 @@ pub fn detect_format(filename: &str) -> Format {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

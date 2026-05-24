@@ -8,7 +8,7 @@
 use std::collections::BTreeMap;
 use std::fs;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use serde::Deserialize;
 
 use super::types::{FileResult, Format, Result as CoverageResult};
@@ -189,6 +189,7 @@ pub fn compute_cobertura_result(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

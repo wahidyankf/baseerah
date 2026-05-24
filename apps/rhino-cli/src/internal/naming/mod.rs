@@ -50,9 +50,8 @@ pub fn extract_frontmatter_name(content: &[u8]) -> String {
         return String::new();
     }
     let rest = &text[4..];
-    let end = match rest.find("\n---") {
-        Some(i) => i,
-        None => return String::new(),
+    let Some(end) = rest.find("\n---") else {
+        return String::new();
     };
     let frontmatter = &rest[..end];
     for line in frontmatter.split('\n') {
@@ -99,8 +98,7 @@ pub fn validate_mirror(claude_files: &[String], opencode_files: &[String]) -> Ve
                 path: path.clone(),
                 kind: "mirror-drift".to_string(),
                 message: format!(
-                    "{}.md exists in .claude/agents/ but not in .opencode/agents/",
-                    name
+                    "{name}.md exists in .claude/agents/ but not in .opencode/agents/"
                 ),
             });
         }
@@ -111,8 +109,7 @@ pub fn validate_mirror(claude_files: &[String], opencode_files: &[String]) -> Ve
                 path: path.clone(),
                 kind: "mirror-drift".to_string(),
                 message: format!(
-                    "{}.md exists in .opencode/agents/ but not in .claude/agents/",
-                    name
+                    "{name}.md exists in .opencode/agents/ but not in .claude/agents/"
                 ),
             });
         }
@@ -122,6 +119,7 @@ pub fn validate_mirror(claude_files: &[String], opencode_files: &[String]) -> Ve
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

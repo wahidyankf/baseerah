@@ -1,11 +1,11 @@
 // Port of `apps/rhino-cli/cmd/test_coverage_diff.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::testcoverage::diff::{compute_diff_coverage, DiffCoverageOptions};
+use crate::internal::testcoverage::diff::{DiffCoverageOptions, compute_diff_coverage};
 use crate::internal::testcoverage::reporter;
 
 #[derive(Args, Debug)]
@@ -66,7 +66,7 @@ pub fn run(args: &DiffArgs, output: OutputFormat) -> std::result::Result<(), Err
         ),
         OutputFormat::Json => println!("{}", reporter::format_json(&result, args.per_file, 0.0)?),
         OutputFormat::Markdown => {
-            print!("{}", reporter::format_markdown(&result, args.per_file, 0.0))
+            print!("{}", reporter::format_markdown(&result, args.per_file, 0.0));
         }
     }
 

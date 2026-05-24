@@ -4,7 +4,7 @@
 
 use std::path::PathBuf;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
@@ -105,6 +105,7 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

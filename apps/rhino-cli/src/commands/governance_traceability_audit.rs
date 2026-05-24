@@ -2,14 +2,14 @@
 
 use std::fmt::Write as _;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 use crate::internal::repo_governance::traceability_audit::{
-    audit_traceability, TraceabilityFinding,
+    TraceabilityFinding, audit_traceability,
 };
 
 const SCHEMA: &str = "rhino-cli/traceability-audit/v1";
@@ -130,6 +130,7 @@ fn format_markdown(findings: &[TraceabilityFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

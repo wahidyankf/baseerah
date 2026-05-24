@@ -5,7 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use glob::Pattern;
 use regex::Regex;
 use walkdir::WalkDir;
@@ -20,7 +20,9 @@ pub struct ReadmeIndexFinding {
 
 fn readme_link_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\[[^\]]+\]\(([^)]*\.md(?:[#?][^)]*)?)\)").unwrap())
+    RE.get_or_init(|| {
+        Regex::new(r"\[[^\]]+\]\(([^)]*\.md(?:[#?][^)]*)?)\)").expect("valid hardcoded regex")
+    })
 }
 
 const SKIP_DIRS: &[&str] = &["node_modules", "target", "dist", "build", ".next", ".git"];
@@ -59,11 +61,11 @@ fn find_readmes(root: &str, excludes: &[String]) -> std::result::Result<Vec<Stri
             if name.starts_with('.') || SKIP_DIRS.contains(&name.as_str()) {
                 return false;
             }
-            if let Ok(rel) = path.strip_prefix(root_p) {
-                let excluded = matches_any_glob(&rel.to_string_lossy(), excludes);
-                if excluded {
-                    return false;
-                }
+            if path
+                .strip_prefix(root_p)
+                .is_ok_and(|rel| matches_any_glob(&rel.to_string_lossy(), excludes))
+            {
+                return false;
             }
         }
         true
@@ -155,7 +157,7 @@ fn extract_readme_links(content: &str) -> HashSet<String> {
         let url_like = match raw.find(':') {
             Some(colon) if colon > 0 => {
                 let slash = raw.find('/');
-                slash.is_none() || colon < slash.unwrap()
+                slash.is_none_or(|s| colon < s)
             }
             _ => false,
         };
@@ -222,9 +224,8 @@ fn list_sibling_targets(
         if matches_any_glob(&rel, excludes) {
             continue;
         }
-        let ft = match entry.file_type() {
-            Ok(t) => t,
-            Err(_) => continue,
+        let Ok(ft) = entry.file_type() else {
+            continue;
         };
         if ft.is_dir() {
             if name.starts_with('.') || SKIP_DIRS.contains(&name.as_str()) {
@@ -265,9 +266,8 @@ fn matches_any_glob(rel: &str, patterns: &[String]) -> bool {
         if p.is_empty() {
             continue;
         }
-        let pat = match Pattern::new(p) {
-            Ok(pat) => pat,
-            Err(_) => continue,
+        let Ok(pat) = Pattern::new(p) else {
+            continue;
         };
         if pat.matches(&slashed) {
             return true;
@@ -285,6 +285,7 @@ fn matches_any_glob(rel: &str, patterns: &[String]) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

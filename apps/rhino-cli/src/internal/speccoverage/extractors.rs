@@ -15,7 +15,7 @@ use anyhow::Error;
 use regex::Regex;
 
 use super::matcher::{
-    add_python_step_to_matcher_with_origin, add_step_to_matcher_with_origin, StepMatcher,
+    StepMatcher, add_python_step_to_matcher_with_origin, add_step_to_matcher_with_origin,
 };
 use super::util::{first_non_empty, normalize_ws, unescape_string};
 
@@ -42,7 +42,7 @@ fn rs_step_expr_re() -> &'static Regex {
 fn rs_step_regex_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r####"#\[(?:given|when|then)\s*\(\s*regex\s*=\s*r#"(.*?)"#\s*\)\s*\]"####)
+        Regex::new(r##"#\[(?:given|when|then)\s*\(\s*regex\s*=\s*r#"(.*?)"#\s*\)\s*\]"##)
             .expect("valid regex")
     })
 }
@@ -144,18 +144,33 @@ pub fn extract_rust_step_texts(
     for line in content.lines() {
         // Regex form (most specific) first.
         for caps in rs_step_regex_re().captures_iter(line) {
-            let pattern = caps.get(1).unwrap().as_str();
+            let pattern = caps
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str();
             if let Ok(re) = Regex::new(pattern) {
                 sm.add_pattern_with_origin(re, pattern, &path_s);
             }
         }
         // Expr form — Cucumber expressions.
         for caps in rs_step_expr_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(sm, caps.get(1).unwrap().as_str(), &path_s);
+            add_step_to_matcher_with_origin(
+                sm,
+                caps.get(1)
+                    .expect("capture group 1 always present")
+                    .as_str(),
+                &path_s,
+            );
         }
         // Literal form — also may have Cucumber expressions.
         for caps in rs_step_literal_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(sm, caps.get(1).unwrap().as_str(), &path_s);
+            add_step_to_matcher_with_origin(
+                sm,
+                caps.get(1)
+                    .expect("capture group 1 always present")
+                    .as_str(),
+                &path_s,
+            );
         }
     }
     Ok(())
@@ -166,7 +181,13 @@ pub fn extract_jvm_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result:
     let path_s = path.to_string_lossy();
     for line in content.lines() {
         for caps in jvm_step_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(sm, caps.get(1).unwrap().as_str(), &path_s);
+            add_step_to_matcher_with_origin(
+                sm,
+                caps.get(1)
+                    .expect("capture group 1 always present")
+                    .as_str(),
+                &path_s,
+            );
         }
     }
     Ok(())
@@ -179,8 +200,8 @@ pub fn extract_dart_step_texts(
     let content = fs::read_to_string(path)?;
     let path_s = path.to_string_lossy();
     for caps in dart_step_re().captures_iter(&content) {
-        let dq = caps.get(1).map(|m| m.as_str()).unwrap_or("");
-        let sq = caps.get(2).map(|m| m.as_str()).unwrap_or("");
+        let dq = caps.get(1).map_or("", |m| m.as_str());
+        let sq = caps.get(2).map_or("", |m| m.as_str());
         let text = unescape_string(first_non_empty(dq, sq));
         add_step_to_matcher_with_origin(sm, &text, &path_s);
     }
@@ -195,7 +216,13 @@ pub fn extract_clojure_step_texts(
     let path_s = path.to_string_lossy();
     for line in content.lines() {
         for caps in clj_step_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(sm, caps.get(1).unwrap().as_str(), &path_s);
+            add_step_to_matcher_with_origin(
+                sm,
+                caps.get(1)
+                    .expect("capture group 1 always present")
+                    .as_str(),
+                &path_s,
+            );
         }
     }
     Ok(())
@@ -209,7 +236,10 @@ pub fn extract_elixir_step_texts(
     let path_s = path.to_string_lossy();
     for line in content.lines() {
         for caps in ex_step_re().captures_iter(line) {
-            let pattern = caps.get(1).unwrap().as_str();
+            let pattern = caps
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str();
             if let Ok(re) = Regex::new(pattern) {
                 sm.add_pattern_with_origin(re, pattern, &path_s);
             }
@@ -225,8 +255,8 @@ pub fn extract_python_step_texts(
     let content = fs::read_to_string(path)?;
     let path_s = path.to_string_lossy();
     for caps in py_step_re().captures_iter(&content) {
-        let dq = caps.get(1).map(|m| m.as_str()).unwrap_or("");
-        let sq = caps.get(2).map(|m| m.as_str()).unwrap_or("");
+        let dq = caps.get(1).map_or("", |m| m.as_str());
+        let sq = caps.get(2).map_or("", |m| m.as_str());
         let mut text = first_non_empty(dq, sq).to_string();
         // Python uses {{...}} for literal braces in parsers.parse format strings.
         text = text.replace("{{", "{").replace("}}", "}");
@@ -243,7 +273,11 @@ pub fn extract_python_scenario_titles(
     let mut titles = HashSet::new();
     for line in content.lines() {
         for caps in py_scenario_re().captures_iter(line) {
-            titles.insert(normalize_ws(caps.get(1).unwrap().as_str()));
+            titles.insert(normalize_ws(
+                caps.get(1)
+                    .expect("capture group 1 always present")
+                    .as_str(),
+            ));
         }
     }
     Ok(titles)
@@ -257,12 +291,22 @@ pub fn extract_csharp_step_texts(
     let path_s = path.to_string_lossy();
     // Verbatim strings first (more specific).
     for caps in cs_verbatim_step_re().captures_iter(&content) {
-        let text = caps.get(1).unwrap().as_str().replace("\"\"", "\"");
+        let text = caps
+            .get(1)
+            .expect("capture group 1 always present")
+            .as_str()
+            .replace("\"\"", "\"");
         add_step_to_matcher_with_origin(sm, &text, &path_s);
     }
     // Regular strings.
     for caps in cs_regular_step_re().captures_iter(&content) {
-        add_step_to_matcher_with_origin(sm, caps.get(1).unwrap().as_str(), &path_s);
+        add_step_to_matcher_with_origin(
+            sm,
+            caps.get(1)
+                .expect("capture group 1 always present")
+                .as_str(),
+            &path_s,
+        );
     }
     Ok(())
 }
@@ -280,14 +324,26 @@ pub fn extract_fsharp_step_texts(
         // Case 1: inline style — attribute + backtick name on same line.
         if this_line_has_step_attr {
             for caps in fs_step_re().captures_iter(line) {
-                add_fsharp_step_pattern(caps.get(1).unwrap().as_str(), &path_s, sm);
+                add_fsharp_step_pattern(
+                    caps.get(1)
+                        .expect("capture group 1 always present")
+                        .as_str(),
+                    &path_s,
+                    sm,
+                );
             }
         }
 
         // Case 2: multiline style — attribute on previous line, this line is `let ``…``  () =`.
         if prev_line_has_step_attr && !this_line_has_step_attr {
             for caps in fs_let_backtick_re().captures_iter(line) {
-                add_fsharp_step_pattern(caps.get(1).unwrap().as_str(), &path_s, sm);
+                add_fsharp_step_pattern(
+                    caps.get(1)
+                        .expect("capture group 1 always present")
+                        .as_str(),
+                    &path_s,
+                    sm,
+                );
             }
         }
         prev_line_has_step_attr = this_line_has_step_attr;
@@ -304,6 +360,7 @@ fn add_fsharp_step_pattern(name: &str, path: &str, sm: &mut StepMatcher) {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

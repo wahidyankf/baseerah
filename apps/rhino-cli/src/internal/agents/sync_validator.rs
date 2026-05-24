@@ -8,7 +8,7 @@ use std::time::Instant;
 
 use serde_norway::Value;
 
-use super::converter::{convert_model, convert_tools, OPENCODE_AGENT_DIR};
+use super::converter::{OPENCODE_AGENT_DIR, convert_model, convert_tools};
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 use super::types::{ValidationCheck, ValidationResult};
 
@@ -115,7 +115,7 @@ fn validate_agent_equivalence(repo_root: &Path) -> Vec<ValidationCheck> {
     let mut files: Vec<(PathBuf, String)> = Vec::new();
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         if !name.ends_with(".md") || name == "README.md" {
@@ -142,7 +142,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             return ValidationCheck::failed_msg(
                 &check_name,
                 format!("Failed to read Claude agent: {e}"),
-            )
+            );
         }
     };
     let opencode_content = match fs::read(opencode_path) {
@@ -151,7 +151,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             return ValidationCheck::failed_msg(
                 &check_name,
                 format!("Failed to read OpenCode agent: {e}"),
-            )
+            );
         }
     };
 
@@ -161,7 +161,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             return ValidationCheck::failed_msg(
                 &check_name,
                 format!("Failed to parse Claude frontmatter: {e}"),
-            )
+            );
         }
     };
     let (opencode_front, opencode_body) = match extract_frontmatter(&opencode_content) {
@@ -170,7 +170,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             return ValidationCheck::failed_msg(
                 &check_name,
                 format!("Failed to parse OpenCode frontmatter: {e}"),
-            )
+            );
         }
     };
 
@@ -183,7 +183,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             return ValidationCheck::failed_msg(
                 &check_name,
                 format!("Failed to parse Claude YAML: {e}"),
-            )
+            );
         }
     };
     let opencode_yaml: Value = match serde_norway::from_str(&opencode_str) {
@@ -192,10 +192,26 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             return ValidationCheck::failed_msg(
                 &check_name,
                 format!("Failed to parse OpenCode YAML: {e}"),
-            )
+            );
         }
     };
 
+    validate_agent_yaml(
+        &check_name,
+        &claude_yaml,
+        &opencode_yaml,
+        &claude_body,
+        &opencode_body,
+    )
+}
+
+fn validate_agent_yaml(
+    check_name: &str,
+    claude_yaml: &Value,
+    opencode_yaml: &Value,
+    claude_body: &[u8],
+    opencode_body: &[u8],
+) -> ValidationCheck {
     let claude_desc = claude_yaml
         .get("description")
         .and_then(|v| v.as_str())
@@ -206,7 +222,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
         .unwrap_or("");
     if claude_desc != opencode_desc {
         return ValidationCheck::failed(
-            &check_name,
+            check_name,
             "Matching descriptions",
             "Descriptions differ",
             "Description mismatch",
@@ -224,7 +240,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
         .unwrap_or("");
     if expected_model != opencode_model {
         return ValidationCheck::failed(
-            &check_name,
+            check_name,
             format!("Model: {expected_model}"),
             format!("Model: {opencode_model}"),
             "Model mismatch",
@@ -239,7 +255,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
     let opencode_tools = parse_opencode_tools(opencode_yaml.get("tools"));
     if !tools_match(&expected_tools, &opencode_tools) {
         return ValidationCheck::failed(
-            &check_name,
+            check_name,
             format!(
                 "Tools: {}",
                 format_string_slice_owned(&sorted_keys(&expected_tools))
@@ -256,7 +272,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
     let opencode_skills = parse_string_seq(opencode_yaml.get("skills"));
     if !skills_match(&claude_skills, &opencode_skills) {
         return ValidationCheck::failed(
-            &check_name,
+            check_name,
             format!("Skills: {}", format_string_slice_owned(&claude_skills)),
             format!("Skills: {}", format_string_slice_owned(&opencode_skills)),
             "Skills mismatch",
@@ -265,14 +281,14 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
 
     if claude_body != opencode_body {
         return ValidationCheck::failed(
-            &check_name,
+            check_name,
             "Matching body content",
             "Body content differs",
             "Body mismatch",
         );
     }
 
-    ValidationCheck::passed(&check_name, "Agent is semantically equivalent")
+    ValidationCheck::passed(check_name, "Agent is semantically equivalent")
 }
 
 fn parse_opencode_tools(v: Option<&Value>) -> BTreeMap<String, bool> {
@@ -305,7 +321,7 @@ fn validate_no_synced_skills(repo_root: &Path) -> ValidationCheck {
     let mut claude_names: std::collections::HashSet<String> = std::collections::HashSet::new();
     if let Ok(entries) = fs::read_dir(&claude_dir) {
         for entry in entries.flatten() {
-            if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+            if entry.file_type().is_ok_and(|t| t.is_dir()) {
                 let skill_file = entry.path().join("SKILL.md");
                 if skill_file.exists() {
                     claude_names.insert(entry.file_name().to_string_lossy().into_owned());
@@ -324,9 +340,7 @@ fn validate_no_synced_skills(repo_root: &Path) -> ValidationCheck {
         if let Ok(entries) = fs::read_dir(dir) {
             for entry in entries.flatten() {
                 let name = entry.file_name().to_string_lossy().into_owned();
-                if entry.file_type().map(|t| t.is_dir()).unwrap_or(false)
-                    && claude_names.contains(&name)
-                {
+                if entry.file_type().is_ok_and(|t| t.is_dir()) && claude_names.contains(&name) {
                     let skill_file = entry.path().join("SKILL.md");
                     if skill_file.exists() {
                         offenders.push(entry.path().to_string_lossy().into_owned());
@@ -356,14 +370,13 @@ fn validate_no_synced_skills(repo_root: &Path) -> ValidationCheck {
 }
 
 fn count_markdown_files(dir: &Path) -> usize {
-    let entries = match fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return 0,
+    let Ok(entries) = fs::read_dir(dir) else {
+        return 0;
     };
     let mut count = 0;
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if entry.file_type().map(|t| !t.is_dir()).unwrap_or(false)
+        if entry.file_type().is_ok_and(|t| !t.is_dir())
             && name.ends_with(".md")
             && name != "README.md"
         {
@@ -398,6 +411,7 @@ fn format_string_slice_owned(s: &[String]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -483,9 +497,11 @@ mod tests {
             "---\ndescription: NOPE\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.message == "Description mismatch"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.message == "Description mismatch")
+        );
     }
 
     #[test]
@@ -496,9 +512,11 @@ mod tests {
             "---\ndescription: desc\nmodel: opencode-go/wrong\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.message == "Model mismatch"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.message == "Model mismatch")
+        );
     }
 
     #[test]
@@ -509,9 +527,11 @@ mod tests {
             "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.message == "Tools mismatch"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.message == "Tools mismatch")
+        );
     }
 
     #[test]
@@ -522,9 +542,11 @@ mod tests {
             "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - other-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.message == "Skills mismatch"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.message == "Skills mismatch")
+        );
     }
 
     #[test]
@@ -535,9 +557,11 @@ mod tests {
             "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nDifferent Body\n",
         );
         let checks = validate_agent_equivalence(dir.path());
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.message == "Body mismatch"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.message == "Body mismatch")
+        );
     }
 
     #[test]

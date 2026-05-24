@@ -4,7 +4,7 @@ use std::fmt::Write;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use serde::Serialize;
 use walkdir::WalkDir;
 
@@ -156,6 +156,7 @@ pub struct FileEntry {
     pub source: String,
 }
 
+#[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero_i64(n: &i64) -> bool {
     *n == 0
 }
@@ -197,8 +198,11 @@ pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
     } else {
         opts.max_size
     };
-    let skip_set: std::collections::HashSet<&str> =
-        opts.skip_dirs.iter().map(|s| s.as_str()).collect();
+    let skip_set: std::collections::HashSet<&str> = opts
+        .skip_dirs
+        .iter()
+        .map(std::string::String::as_str)
+        .collect();
 
     let mut entries: Vec<FileEntry> = Vec::new();
     let mut walker = WalkDir::new(&opts.repo_root).into_iter();
@@ -234,9 +238,8 @@ pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
             Ok(r) => r.to_string_lossy().into_owned(),
             Err(_) => continue,
         };
-        let meta = match fs::symlink_metadata(&path) {
-            Ok(m) => m,
-            Err(_) => continue,
+        let Ok(meta) = fs::symlink_metadata(&path) else {
+            continue;
         };
         let ft = meta.file_type();
         if ft.is_symlink() {
@@ -353,7 +356,10 @@ pub fn backup(opts: &mut Options) -> std::result::Result<Result, Error> {
         opts.max_size = DEFAULT_MAX_SIZE;
     }
     if opts.skip_dirs.is_empty() {
-        opts.skip_dirs = default_skip_dirs().iter().map(|s| s.to_string()).collect();
+        opts.skip_dirs = default_skip_dirs()
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect();
     }
     let backup_dir_str = opts.backup_dir.to_string_lossy().into_owned();
     let expanded = expand_tilde(&backup_dir_str)?;
@@ -369,7 +375,7 @@ pub fn backup(opts: &mut Options) -> std::result::Result<Result, Error> {
 
     let mut entries = discover(opts)?;
     if opts.include_config {
-        for e in entries.iter_mut() {
+        for e in &mut entries {
             if e.source.is_empty() {
                 e.source = "env".to_string();
             }
@@ -445,7 +451,7 @@ pub fn restore(opts: &mut Options) -> std::result::Result<Result, Error> {
     };
     let mut entries = discover(&discover_opts)?;
     if opts.include_config {
-        for e in entries.iter_mut() {
+        for e in &mut entries {
             if e.source.is_empty() {
                 e.source = "env".to_string();
             }
@@ -717,6 +723,7 @@ fn capitalize(s: &str) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -754,7 +761,10 @@ mod tests {
         std::fs::write(dir.path().join("README.md"), "x").unwrap();
         let opts = Options {
             repo_root: dir.path().to_path_buf(),
-            skip_dirs: default_skip_dirs().iter().map(|s| s.to_string()).collect(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
             max_size: DEFAULT_MAX_SIZE,
             ..Default::default()
         };
@@ -768,7 +778,10 @@ mod tests {
         std::fs::write(dir.path().join(".env"), vec![0u8; 100]).unwrap();
         let opts = Options {
             repo_root: dir.path().to_path_buf(),
-            skip_dirs: default_skip_dirs().iter().map(|s| s.to_string()).collect(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
             max_size: 10,
             ..Default::default()
         };
@@ -786,7 +799,10 @@ mod tests {
         std::fs::write(dir.path().join(".env"), "y").unwrap();
         let opts = Options {
             repo_root: dir.path().to_path_buf(),
-            skip_dirs: default_skip_dirs().iter().map(|s| s.to_string()).collect(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
             max_size: DEFAULT_MAX_SIZE,
             ..Default::default()
         };
@@ -843,7 +859,10 @@ mod tests {
         let mut opts = Options {
             repo_root: repo.path().to_path_buf(),
             backup_dir: dest.path().to_path_buf(),
-            skip_dirs: default_skip_dirs().iter().map(|s| s.to_string()).collect(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
             max_size: DEFAULT_MAX_SIZE,
             force: true,
             ..Default::default()

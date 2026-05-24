@@ -2,8 +2,8 @@
 
 use std::process::Command;
 
-use super::tools::{build_tool_defs, InstallStep, ToolDef};
-use super::{is_minimal_tool, CheckOptions, DoctorResult, Scope, ToolStatus};
+use super::tools::{InstallStep, ToolDef, build_tool_defs};
+use super::{CheckOptions, DoctorResult, Scope, ToolStatus, is_minimal_tool};
 
 /// Run a fix command. Return Err on failure.
 pub type FixRunnerFunc<'a> = &'a dyn Fn(&str, &[&str]) -> Result<(), String>;
@@ -76,7 +76,9 @@ where
             fr.skipped += 1;
             continue;
         }
-        let install_fn = defs[i].install_cmd.unwrap();
+        let install_fn = defs[i]
+            .install_cmd
+            .expect("install_cmd is Some — is_none() checked above");
         let steps: Vec<InstallStep> = install_fn(&check.required_version, platform);
         if steps.is_empty() {
             printf(&format!(
@@ -102,7 +104,7 @@ where
                 "Installing {}: {}\n",
                 check.name, step.description
             ));
-            let arg_refs: Vec<&str> = step.args.iter().map(|s| s.as_str()).collect();
+            let arg_refs: Vec<&str> = step.args.iter().map(std::string::String::as_str).collect();
             if let Err(e) = runner(&step.command, &arg_refs) {
                 printf(&format!("  Failed: {e}\n"));
                 fr.failed += 1;
@@ -144,6 +146,7 @@ pub fn format_fix_summary(fr: &FixResult) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use crate::internal::doctor::ToolCheck;
@@ -155,9 +158,9 @@ mod tests {
             name: name.into(),
             binary: name.into(),
             status: ToolStatus::Missing,
-            installed_version: "".into(),
-            required_version: "".into(),
-            source: "".into(),
+            installed_version: String::new(),
+            required_version: String::new(),
+            source: String::new(),
             note: "not found in PATH".into(),
         }
     }
@@ -168,8 +171,8 @@ mod tests {
             binary: name.into(),
             status: ToolStatus::Ok,
             installed_version: "1".into(),
-            required_version: "".into(),
-            source: "".into(),
+            required_version: String::new(),
+            source: String::new(),
             note: "no version requirement".into(),
         }
     }
@@ -178,12 +181,12 @@ mod tests {
         ToolDef {
             name: name.into(),
             binary: name.into(),
-            source: "".into(),
+            source: String::new(),
             args: vec![],
             use_stderr: false,
             parse_ver: |s| s.into(),
-            compare: |_, _| (ToolStatus::Ok, "".into()),
-            read_req: || "".into(),
+            compare: |_, _| (ToolStatus::Ok, String::new()),
+            read_req: || String::new(),
             install_cmd: install,
         }
     }
@@ -231,6 +234,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::items_after_statements)]
     fn missing_empty_steps_skipped() {
         let res = DoctorResult {
             checks: vec![miss("a")],

@@ -180,48 +180,53 @@ pub fn extract_blocks(file_path: &str, content: &str) -> Vec<MermaidBlock> {
 
 fn flowchart_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"(?m)^\s*(flowchart|graph)(\s+(TB|TD|BT|LR|RL))?\s*$").unwrap())
+    RE.get_or_init(|| {
+        Regex::new(r"(?m)^\s*(flowchart|graph)(\s+(TB|TD|BT|LR|RL))?\s*$")
+            .expect("valid hardcoded regex")
+    })
 }
 
 fn subgraph_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r#"^subgraph(?:\s+([^\s\["]+))?(?:\s*\[\s*"?([^"\]]*)"?\s*\])?\s*$"#).unwrap()
+        Regex::new(r#"^subgraph(?:\s+([^\s\["]+))?(?:\s*\[\s*"?([^"\]]*)"?\s*\])?\s*$"#)
+            .expect("valid hardcoded regex")
     })
 }
 
 fn arrow_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"-->|---|-\.->|==>|--o|--x|<-->").unwrap())
+    RE.get_or_init(|| Regex::new(r"-->|---|-\.->|==>|--o|--x|<-->").expect("valid hardcoded regex"))
 }
 
 fn link_text_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"--[^->\n]+?-->").unwrap())
+    RE.get_or_init(|| Regex::new(r"--[^->\n]+?-->").expect("valid hardcoded regex"))
 }
 
 fn node_id_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^(\w+)$").unwrap())
+    RE.get_or_init(|| Regex::new(r"^(\w+)$").expect("valid hardcoded regex"))
 }
 
 fn node_shape_patterns() -> &'static Vec<Regex> {
     static PATTERNS: OnceLock<Vec<Regex>> = OnceLock::new();
     PATTERNS.get_or_init(|| {
         vec![
-            Regex::new(r"^(\w+)\(\(\(([^)]*)\)\)\)").unwrap(),
-            Regex::new(r"^(\w+)\(\[([^\]]*)\]\)").unwrap(),
-            Regex::new(r"^(\w+)\(\(([^)]*)\)\)").unwrap(),
-            Regex::new(r"^(\w+)\[\[([^\]]*)\]\]").unwrap(),
-            Regex::new(r"^(\w+)\[\(([^)]*)\)\]").unwrap(),
-            Regex::new(r"^(\w+)\(([^)]*)\)").unwrap(),
-            Regex::new(r"^(\w+)\{\{([^}]*)\}\}").unwrap(),
-            Regex::new(r"^(\w+)\{([^}]*)\}").unwrap(),
-            Regex::new(r"^(\w+)>([^\]]*)\]").unwrap(),
-            Regex::new(r"^(\w+)\[/([^/]*)/\]").unwrap(),
-            Regex::new(r"^(\w+)\[\\([^\\]*)\\]").unwrap(),
-            Regex::new(r"^(\w+)\[([^\]]*)\]").unwrap(),
-            Regex::new(r#"^(\w+)@\{\s*[^}]*label:\s*"([^"]*)"\s*[^}]*\}"#).unwrap(),
+            Regex::new(r"^(\w+)\(\(\(([^)]*)\)\)\)").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\(\[([^\]]*)\]\)").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\(\(([^)]*)\)\)").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\[\[([^\]]*)\]\]").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\[\(([^)]*)\)\]").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\(([^)]*)\)").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\{\{([^}]*)\}\}").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\{([^}]*)\}").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)>([^\]]*)\]").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\[/([^/]*)/\]").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\[\\([^\\]*)\\]").expect("valid hardcoded regex"),
+            Regex::new(r"^(\w+)\[([^\]]*)\]").expect("valid hardcoded regex"),
+            Regex::new(r#"^(\w+)@\{\s*[^}]*label:\s*"([^"]*)"\s*[^}]*\}"#)
+                .expect("valid hardcoded regex"),
         ]
     })
 }
@@ -388,11 +393,7 @@ fn extract_node_ids_from_segment(seg: &str) -> Vec<String> {
     seg.split('&')
         .filter_map(|sub| {
             let id = extract_node_id_from_segment(sub);
-            if id.is_empty() {
-                None
-            } else {
-                Some(id)
-            }
+            if id.is_empty() { None } else { Some(id) }
         })
         .collect()
 }
@@ -462,11 +463,7 @@ fn extract_edge_line(
         .iter()
         .filter_map(|p| {
             let ids = extract_node_group(p, node_map, node_index);
-            if ids.is_empty() {
-                None
-            } else {
-                Some(ids)
-            }
+            if ids.is_empty() { None } else { Some(ids) }
         })
         .collect();
     for i in 0..groups.len().saturating_sub(1) {
@@ -493,11 +490,7 @@ fn extract_node_group(
                 return None;
             }
             let id = extract_node_id_and_label(seg, node_map, node_index);
-            if id.is_empty() {
-                None
-            } else {
-                Some(id)
-            }
+            if id.is_empty() { None } else { Some(id) }
         })
         .collect()
 }
@@ -647,103 +640,112 @@ pub fn validate_blocks(blocks: Vec<MermaidBlock>, opts: ValidateOptions) -> Vali
     let total = blocks.len();
     for block in blocks {
         files_seen.insert(block.file_path.clone());
-        let fp = block.file_path.clone();
-        let bi = block.block_index;
-        let sl = block.start_line;
-        let (diagram, count) = parse_diagram(block);
-        if count > 1 {
-            violations.push(Violation {
-                kind: ViolationKind::MultipleDiagrams,
-                file_path: fp.clone(),
-                block_index: bi,
-                start_line: sl,
-                node_id: String::new(),
-                label_text: String::new(),
-                label_len: 0,
-                max_label_len: 0,
-                actual_width: 0,
-                max_width: 0,
-            });
-        }
-        if count == 0 {
-            continue;
-        }
-        for node in &diagram.nodes {
-            let label_len = effective_label_len(&node.label);
-            if label_len > opts.max_label_len {
-                violations.push(Violation {
-                    kind: ViolationKind::LabelTooLong,
-                    file_path: fp.clone(),
-                    block_index: bi,
-                    start_line: sl,
-                    node_id: node.id.clone(),
-                    label_text: node.label.clone(),
-                    label_len,
-                    max_label_len: opts.max_label_len,
-                    actual_width: 0,
-                    max_width: 0,
-                });
-            }
-        }
-        let span = max_width(&diagram.nodes, &diagram.edges);
-        let dep = depth(&diagram.nodes, &diagram.edges);
-        let (horizontal, vertical) = match diagram.direction {
-            Direction::LR | Direction::RL => (dep, span),
-            _ => (span, dep),
-        };
-        if horizontal > opts.max_width && vertical > opts.max_depth {
-            warnings.push(Warning {
-                kind: WarningKind::ComplexDiagram,
-                file_path: fp.clone(),
-                block_index: bi,
-                start_line: sl,
-                actual_width: horizontal,
-                actual_depth: vertical,
-                max_width: opts.max_width,
-                max_depth: opts.max_depth,
-                subgraph_label: String::new(),
-                subgraph_node_count: 0,
-                max_subgraph_nodes: 0,
-            });
-        } else if horizontal > opts.max_width {
-            violations.push(Violation {
-                kind: ViolationKind::WidthExceeded,
-                file_path: fp.clone(),
-                block_index: bi,
-                start_line: sl,
-                node_id: String::new(),
-                label_text: String::new(),
-                label_len: 0,
-                max_label_len: 0,
-                actual_width: horizontal,
-                max_width: opts.max_width,
-            });
-        }
-        if opts.max_subgraph_nodes > 0 {
-            for sg in &diagram.subgraphs {
-                if sg.node_ids.len() > opts.max_subgraph_nodes {
-                    warnings.push(Warning {
-                        kind: WarningKind::SubgraphDense,
-                        file_path: fp.clone(),
-                        block_index: bi,
-                        start_line: sl + sg.start_line,
-                        actual_width: 0,
-                        actual_depth: 0,
-                        max_width: 0,
-                        max_depth: 0,
-                        subgraph_label: sg.label.clone(),
-                        subgraph_node_count: sg.node_ids.len(),
-                        max_subgraph_nodes: opts.max_subgraph_nodes,
-                    });
-                }
-            }
-        }
+        validate_one_block(block, &opts, &mut violations, &mut warnings);
     }
     ValidationResult {
         files_scanned: files_seen.len(),
         blocks_scanned: total,
         violations,
         warnings,
+    }
+}
+
+fn validate_one_block(
+    block: MermaidBlock,
+    opts: &ValidateOptions,
+    violations: &mut Vec<Violation>,
+    warnings: &mut Vec<Warning>,
+) {
+    let fp = block.file_path.clone();
+    let bi = block.block_index;
+    let sl = block.start_line;
+    let (diagram, count) = parse_diagram(block);
+    if count > 1 {
+        violations.push(Violation {
+            kind: ViolationKind::MultipleDiagrams,
+            file_path: fp.clone(),
+            block_index: bi,
+            start_line: sl,
+            node_id: String::new(),
+            label_text: String::new(),
+            label_len: 0,
+            max_label_len: 0,
+            actual_width: 0,
+            max_width: 0,
+        });
+    }
+    if count == 0 {
+        return;
+    }
+    for node in &diagram.nodes {
+        let label_len = effective_label_len(&node.label);
+        if label_len > opts.max_label_len {
+            violations.push(Violation {
+                kind: ViolationKind::LabelTooLong,
+                file_path: fp.clone(),
+                block_index: bi,
+                start_line: sl,
+                node_id: node.id.clone(),
+                label_text: node.label.clone(),
+                label_len,
+                max_label_len: opts.max_label_len,
+                actual_width: 0,
+                max_width: 0,
+            });
+        }
+    }
+    let span = max_width(&diagram.nodes, &diagram.edges);
+    let dep = depth(&diagram.nodes, &diagram.edges);
+    let (horizontal, vertical) = match diagram.direction {
+        Direction::LR | Direction::RL => (dep, span),
+        _ => (span, dep),
+    };
+    if horizontal > opts.max_width && vertical > opts.max_depth {
+        warnings.push(Warning {
+            kind: WarningKind::ComplexDiagram,
+            file_path: fp.clone(),
+            block_index: bi,
+            start_line: sl,
+            actual_width: horizontal,
+            actual_depth: vertical,
+            max_width: opts.max_width,
+            max_depth: opts.max_depth,
+            subgraph_label: String::new(),
+            subgraph_node_count: 0,
+            max_subgraph_nodes: 0,
+        });
+    } else if horizontal > opts.max_width {
+        violations.push(Violation {
+            kind: ViolationKind::WidthExceeded,
+            file_path: fp.clone(),
+            block_index: bi,
+            start_line: sl,
+            node_id: String::new(),
+            label_text: String::new(),
+            label_len: 0,
+            max_label_len: 0,
+            actual_width: horizontal,
+            max_width: opts.max_width,
+        });
+    }
+    if opts.max_subgraph_nodes > 0 {
+        for sg in &diagram.subgraphs {
+            if sg.node_ids.len() > opts.max_subgraph_nodes {
+                warnings.push(Warning {
+                    kind: WarningKind::SubgraphDense,
+                    file_path: fp.clone(),
+                    block_index: bi,
+                    start_line: sl + sg.start_line,
+                    actual_width: 0,
+                    actual_depth: 0,
+                    max_width: 0,
+                    max_depth: 0,
+                    subgraph_label: sg.label.clone(),
+                    subgraph_node_count: sg.node_ids.len(),
+                    max_subgraph_nodes: opts.max_subgraph_nodes,
+                });
+            }
+        }
     }
 }
 
@@ -919,6 +921,7 @@ struct JsonWarning<'a> {
     max_subgraph_nodes: usize,
 }
 
+#[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero_usize(n: &usize) -> bool {
     *n == 0
 }
@@ -1012,6 +1015,7 @@ pub fn format_markdown(result: &ValidationResult) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -1075,10 +1079,12 @@ mod tests {
             start_line: 1,
         };
         let result = validate_blocks(vec![block], default_validate_options());
-        assert!(result
-            .violations
-            .iter()
-            .any(|v| v.kind == ViolationKind::LabelTooLong));
+        assert!(
+            result
+                .violations
+                .iter()
+                .any(|v| v.kind == ViolationKind::LabelTooLong)
+        );
     }
 
     #[test]
@@ -1090,10 +1096,12 @@ mod tests {
             start_line: 1,
         };
         let result = validate_blocks(vec![block], default_validate_options());
-        assert!(result
-            .violations
-            .iter()
-            .any(|v| v.kind == ViolationKind::MultipleDiagrams));
+        assert!(
+            result
+                .violations
+                .iter()
+                .any(|v| v.kind == ViolationKind::MultipleDiagrams)
+        );
     }
 
     #[test]
@@ -1434,9 +1442,11 @@ mod tests {
             start_line: 1,
         };
         let result = validate_blocks(vec![block], default_validate_options());
-        assert!(result
-            .warnings
-            .iter()
-            .any(|w| w.kind == WarningKind::SubgraphDense));
+        assert!(
+            result
+                .warnings
+                .iter()
+                .any(|w| w.kind == WarningKind::SubgraphDense)
+        );
     }
 }

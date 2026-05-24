@@ -10,7 +10,7 @@ use serde_norway::Value;
 /// space-after-colon. Replaces with "name: value".
 fn yaml_colon_norm() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"(?m)^([a-zA-Z0-9_-]+):([^\s])").unwrap())
+    R.get_or_init(|| Regex::new(r"(?m)^([a-zA-Z0-9_-]+):([^\s])").expect("valid hardcoded regex"))
 }
 
 pub fn normalize_yaml(content: &[u8]) -> Vec<u8> {
@@ -30,17 +30,14 @@ pub fn extract_frontmatter(content: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String>
     if lines[0].trim() != "---" {
         return Err("frontmatter does not start with ---".to_string());
     }
-    let mut end_index: i32 = -1;
-    for (i, line) in lines.iter().enumerate().skip(1) {
-        if line.trim() == "---" {
-            end_index = i as i32;
-            break;
-        }
-    }
-    if end_index == -1 {
+    let Some(end) = lines
+        .iter()
+        .enumerate()
+        .skip(1)
+        .find_map(|(i, line)| (line.trim() == "---").then_some(i))
+    else {
         return Err("frontmatter closing --- not found".to_string());
-    }
-    let end = end_index as usize;
+    };
     let front = lines[1..end].join("\n");
     let body = if end + 1 < lines.len() {
         lines[end + 1..].join("\n")
@@ -55,7 +52,7 @@ pub fn parse_claude_tools(tools_raw: &Value) -> Vec<String> {
     match tools_raw {
         Value::Sequence(seq) => seq
             .iter()
-            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+            .filter_map(|v| v.as_str().map(std::string::ToString::to_string))
             .collect(),
         Value::String(s) => s
             .split(',')
@@ -67,6 +64,7 @@ pub fn parse_claude_tools(tools_raw: &Value) -> Vec<String> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

@@ -2,7 +2,7 @@
 
 use std::fs;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 use walkdir::WalkDir;
 
@@ -59,7 +59,9 @@ pub fn run(args: &EnvInitArgs, _output: OutputFormat) -> std::result::Result<(),
         println!(
             "Created: {} (from {})",
             rel.display(),
-            path.file_name().unwrap().to_string_lossy()
+            path.file_name()
+                .expect("walkdir entry always has file_name")
+                .to_string_lossy()
         );
         created += 1;
     }
@@ -72,6 +74,7 @@ pub fn run(args: &EnvInitArgs, _output: OutputFormat) -> std::result::Result<(),
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

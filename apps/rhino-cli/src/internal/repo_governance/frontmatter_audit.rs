@@ -4,7 +4,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use regex::Regex;
 use walkdir::WalkDir;
 
@@ -25,13 +25,14 @@ const WEBSITE_APP_PREFIXES: &[&str] = &[
 
 fn last_updated_footer_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\*\*Last Updated\*\*").unwrap())
+    RE.get_or_init(|| Regex::new(r"\*\*Last Updated\*\*").expect("valid hardcoded regex"))
 }
 
 fn inline_date_annotation_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"^\s*-\s+\*\*(Created|Last Updated)\*\*:\s*\d{4}-\d{2}-\d{2}").unwrap()
+        Regex::new(r"^\s*-\s+\*\*(Created|Last Updated)\*\*:\s*\d{4}-\d{2}-\d{2}")
+            .expect("valid hardcoded regex")
     })
 }
 
@@ -56,7 +57,7 @@ fn walk_paths(root: &str) -> Vec<String> {
     }
     let mut files: Vec<String> = WalkDir::new(root_p)
         .into_iter()
-        .filter_map(|e| e.ok())
+        .filter_map(std::result::Result::ok)
         .filter(|e| e.file_type().is_file())
         .filter(|e| e.file_name().to_string_lossy().ends_with(".md"))
         .map(|e| e.path().to_string_lossy().to_string())
@@ -106,13 +107,13 @@ fn check_frontmatter_updated_field(path: &str, frontmatter: &str) -> Vec<Frontma
     if frontmatter.is_empty() {
         return Vec::new();
     }
-    let parsed: serde_norway::Value = match serde_norway::from_str(frontmatter) {
-        Ok(v) => v,
-        Err(_) => return Vec::new(), // unparseable YAML is out of scope
+    let Ok(parsed): std::result::Result<serde_norway::Value, _> =
+        serde_norway::from_str(frontmatter)
+    else {
+        return Vec::new(); // unparseable YAML is out of scope
     };
-    let mapping = match parsed {
-        serde_norway::Value::Mapping(m) => m,
-        _ => return Vec::new(),
+    let serde_norway::Value::Mapping(mapping) = parsed else {
+        return Vec::new();
     };
     if !mapping.contains_key(serde_norway::Value::String("updated".to_string())) {
         return Vec::new();
@@ -179,6 +180,7 @@ fn is_website_app(path: &str) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

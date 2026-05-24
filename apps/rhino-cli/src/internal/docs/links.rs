@@ -44,12 +44,12 @@ struct LinkInfo {
 
 fn link_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").unwrap())
+    RE.get_or_init(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").expect("valid hardcoded regex"))
 }
 
 fn bracket_placeholder_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\[[\w-]+\]").unwrap())
+    RE.get_or_init(|| Regex::new(r"\[[\w-]+\]").expect("valid hardcoded regex"))
 }
 
 pub fn validate_all_links(opts: &ScanOptions) -> std::result::Result<LinkValidationResult, Error> {
@@ -64,15 +64,13 @@ pub fn validate_all_links(opts: &ScanOptions) -> std::result::Result<LinkValidat
     };
 
     for path in &files {
-        let links = match extract_links(path) {
-            Ok(l) => l,
-            Err(_) => continue,
+        let Ok(links) = extract_links(path) else {
+            continue;
         };
         result.total_links += links.len();
 
-        let broken = match validate_file(path, opts, &links) {
-            Ok(b) => b,
-            Err(_) => continue,
+        let Ok(broken) = validate_file(path, opts, &links) else {
+            continue;
         };
         for b in broken {
             result
@@ -83,7 +81,8 @@ pub fn validate_all_links(opts: &ScanOptions) -> std::result::Result<LinkValidat
             result.broken_links.push(b);
         }
     }
-    result.scan_duration_ms = start.elapsed().as_millis() as i64;
+    result.scan_duration_ms =
+        i64::try_from(start.elapsed().as_millis()).expect("duration fits in i64");
     Ok(result)
 }
 
@@ -104,8 +103,7 @@ fn get_staged_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBu
         .context("git diff --cached")?;
     let text = String::from_utf8_lossy(&output.stdout);
     Ok(text
-        .trim()
-        .split('\n')
+        .lines()
         .filter(|l| !l.is_empty() && l.ends_with(".md"))
         .map(|l| repo_root.join(l))
         .collect())
@@ -271,10 +269,10 @@ fn validate_file(
     for link in links {
         let target = resolve_link(file_path, &link.url);
         if !target.exists() {
-            let rel = file_path
-                .strip_prefix(&opts.repo_root)
-                .map(|p| p.to_string_lossy().to_string())
-                .unwrap_or_else(|_| file_path.to_string_lossy().to_string());
+            let rel = file_path.strip_prefix(&opts.repo_root).map_or_else(
+                |_| file_path.to_string_lossy().to_string(),
+                |p| p.to_string_lossy().to_string(),
+            );
             let category = categorize_broken_link(&link.url);
             broken.push(BrokenLink {
                 line_number: link.line_number,
@@ -305,12 +303,12 @@ fn clean_path(p: &Path) -> PathBuf {
     for comp in p.components() {
         use std::path::Component;
         match comp {
-            Component::CurDir => {}
+            Component::CurDir | Component::Prefix(_) => {}
             Component::ParentDir => {
-                if !matches!(out.last(), Some(s) if s != ".." && s != "/") {
-                    out.push("..".to_string());
-                } else {
+                if matches!(out.last(), Some(s) if s != ".." && s != "/") {
                     out.pop();
+                } else {
+                    out.push("..".to_string());
                 }
             }
             Component::Normal(s) => out.push(s.to_string_lossy().to_string()),
@@ -318,7 +316,6 @@ fn clean_path(p: &Path) -> PathBuf {
                 is_abs = true;
                 out.clear();
             }
-            Component::Prefix(_) => {}
         }
     }
     let mut result = PathBuf::new();
@@ -460,6 +457,7 @@ pub fn format_link_markdown(result: &LinkValidationResult) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

@@ -3,13 +3,13 @@
 use std::fmt::Write as _;
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::repo_governance::emoji_audit::{audit_emoji, EmojiFinding};
+use crate::internal::repo_governance::emoji_audit::{EmojiFinding, audit_emoji};
 
 const SCHEMA: &str = "rhino-cli/emoji-audit/v1";
 
@@ -146,6 +146,7 @@ fn format_markdown(findings: &[EmojiFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

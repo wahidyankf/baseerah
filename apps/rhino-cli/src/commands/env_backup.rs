@@ -1,12 +1,12 @@
 // Port of `apps/rhino-cli/cmd/env_backup.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::envbackup::{
-    backup, default_skip_dirs, detect_worktree, expand_tilde, format_json, format_markdown,
-    format_text, Options, DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE,
+    DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE, Options, backup, default_skip_dirs, detect_worktree,
+    expand_tilde, format_json, format_markdown, format_text,
 };
 use crate::internal::gitutil;
 
@@ -49,7 +49,10 @@ pub fn run(args: &EnvBackupArgs, output: OutputFormat) -> std::result::Result<()
     let mut opts = Options {
         repo_root,
         backup_dir,
-        skip_dirs: default_skip_dirs().iter().map(|s| s.to_string()).collect(),
+        skip_dirs: default_skip_dirs()
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect(),
         max_size: DEFAULT_MAX_SIZE,
         worktree_aware: args.worktree_aware,
         force,
@@ -79,7 +82,7 @@ mod tests {
     #[test]
     fn args_constructible() {
         let _ = EnvBackupArgs {
-            dir: "".into(),
+            dir: String::new(),
             worktree_aware: false,
             force: true,
             include_config: false,

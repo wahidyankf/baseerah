@@ -14,7 +14,7 @@ use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use regex::Regex;
 
 use super::types::{FileResult, Format, Result as CoverageResult};
@@ -107,10 +107,29 @@ pub(crate) fn parse_cover_out(filename: &str) -> std::result::Result<Vec<CoverBl
         let Some(caps) = re.captures(trimmed) else {
             continue;
         };
-        let filepath = caps.get(1).unwrap().as_str().to_string();
-        let start_line: usize = caps.get(2).unwrap().as_str().parse().unwrap_or(0);
-        let end_line: usize = caps.get(3).unwrap().as_str().parse().unwrap_or(0);
-        let count: usize = caps.get(4).unwrap().as_str().parse().unwrap_or(0);
+        let filepath = caps
+            .get(1)
+            .expect("capture group 1 always present")
+            .as_str()
+            .to_string();
+        let start_line: usize = caps
+            .get(2)
+            .expect("capture group 2 always present")
+            .as_str()
+            .parse()
+            .unwrap_or(0);
+        let end_line: usize = caps
+            .get(3)
+            .expect("capture group 3 always present")
+            .as_str()
+            .parse()
+            .unwrap_or(0);
+        let count: usize = caps
+            .get(4)
+            .expect("capture group 4 always present")
+            .as_str()
+            .parse()
+            .unwrap_or(0);
         blocks.push(CoverBlock {
             filepath,
             start_line,
@@ -133,8 +152,7 @@ pub fn compute_go_result(
     // Derive project dir from the cover.out path (mirrors Python cwd behaviour).
     let project_dir: PathBuf = Path::new(filename)
         .parent()
-        .map(Path::to_path_buf)
-        .unwrap_or_else(|| PathBuf::from("."));
+        .map_or_else(|| PathBuf::from("."), Path::to_path_buf);
     let module_name = get_module_name_from(&project_dir);
 
     // Group blocks by file.
@@ -242,6 +260,7 @@ pub fn compute_go_result(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

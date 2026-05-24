@@ -1,12 +1,12 @@
 // Port of `apps/rhino-cli/cmd/ddd_ul.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 use crate::internal::glossary;
-use crate::internal::severity::{resolve, Severity};
+use crate::internal::severity::{Severity, resolve};
 
 #[derive(Args, Debug)]
 pub struct DddUlArgs {
@@ -54,6 +54,7 @@ pub fn run_at_root(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -61,7 +62,7 @@ mod tests {
     fn args_constructible() {
         let a = DddUlArgs {
             app: "x".to_string(),
-            severity: "".to_string(),
+            severity: String::new(),
         };
         assert_eq!(a.app, "x");
     }
@@ -73,7 +74,7 @@ mod tests {
         let mut err: Vec<u8> = Vec::new();
         let args = DddUlArgs {
             app: "missing".to_string(),
-            severity: "".to_string(),
+            severity: String::new(),
         };
         assert!(run_at_root(dir.path(), &args, &mut out, &mut err).is_err());
     }

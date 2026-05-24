@@ -6,7 +6,7 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use walkdir::WalkDir;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -92,10 +92,10 @@ fn walk_emoji_paths(root: &Path) -> Vec<std::path::PathBuf> {
                 true
             }
         })
-        .filter_map(|e| e.ok())
+        .filter_map(std::result::Result::ok)
         .filter(|e| e.file_type().is_file())
         .filter(|e| has_forbidden_emoji_extension(&e.file_name().to_string_lossy()))
-        .map(|e| e.into_path())
+        .map(walkdir::DirEntry::into_path)
         .collect();
     files.sort();
     files
@@ -152,6 +152,7 @@ fn format_codepoint(r: char) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

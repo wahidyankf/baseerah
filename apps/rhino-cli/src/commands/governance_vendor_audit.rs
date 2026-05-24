@@ -3,13 +3,13 @@
 use std::fmt::Write as _;
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::repo_governance::vendor_audit::{walk, Finding};
+use crate::internal::repo_governance::vendor_audit::{Finding, walk};
 
 #[derive(Args, Debug)]
 pub struct VendorAuditArgs {
@@ -123,6 +123,7 @@ fn format_markdown(findings: &[Finding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

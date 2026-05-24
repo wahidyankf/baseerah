@@ -105,7 +105,9 @@ fn parse_feature_file_inner(
                 continue;
             }
             if let (Some(idxs), Some(idx)) = (pending_outline_indices.as_ref(), current_idx) {
-                let headers = ex_headers.as_ref().unwrap();
+                let headers = ex_headers
+                    .as_ref()
+                    .expect("ex_headers is Some — is_none() branch above continues");
                 for &step_idx in idxs {
                     let text = scenarios[idx].steps[step_idx].text.clone();
                     let exp = expand_step(&text, headers, &row);
@@ -164,6 +166,7 @@ fn expand_step(text: &str, headers: &[String], row: &[String]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

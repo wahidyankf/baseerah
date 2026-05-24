@@ -3,7 +3,7 @@
 use std::fs;
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
@@ -70,13 +70,12 @@ fn agents_validate_naming(repo_root: &str) -> std::result::Result<Vec<Violation>
 }
 
 fn list_agent_files(dir: &Path) -> Vec<String> {
-    let entries = match fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return Vec::new(),
+    let Ok(entries) = fs::read_dir(dir) else {
+        return Vec::new();
     };
     let mut files = Vec::new();
     for entry in entries.flatten() {
-        if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         let name = entry.file_name().to_string_lossy().to_string();
@@ -93,6 +92,7 @@ fn list_agent_files(dir: &Path) -> Vec<String> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

@@ -23,22 +23,28 @@ pub const KIND_MISSING_AGENT_REFERENCE: &str = "missing-agent-reference";
 
 fn vision_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"(?m)^##\s+Vision Supported\s*$").unwrap())
+    RE.get_or_init(|| Regex::new(r"(?m)^##\s+Vision Supported\s*$").expect("valid hardcoded regex"))
 }
 
 fn principles_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"(?m)^##\s+Principles Implemented/Respected\s*$").unwrap())
+    RE.get_or_init(|| {
+        Regex::new(r"(?m)^##\s+Principles Implemented/Respected\s*$")
+            .expect("valid hardcoded regex")
+    })
 }
 
 fn conventions_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"(?m)^##\s+Conventions Implemented/Respected\s*$").unwrap())
+    RE.get_or_init(|| {
+        Regex::new(r"(?m)^##\s+Conventions Implemented/Respected\s*$")
+            .expect("valid hardcoded regex")
+    })
 }
 
 fn agent_ref_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\.claude/agents/[a-z0-9-]+\.md").unwrap())
+    RE.get_or_init(|| Regex::new(r"\.claude/agents/[a-z0-9-]+\.md").expect("valid hardcoded regex"))
 }
 
 const META_EXEMPT: &[&str] = &["meta/execution-modes.md", "meta/workflow-identifier.md"];
@@ -169,7 +175,7 @@ fn list_governance_markdown(root: &Path) -> std::result::Result<Vec<String>, Err
     }
     let mut files: Vec<String> = WalkDir::new(root)
         .into_iter()
-        .filter_map(|e| e.ok())
+        .filter_map(std::result::Result::ok)
         .filter(|e| e.file_type().is_file())
         .filter(|e| {
             let n = e.file_name().to_string_lossy();
@@ -182,6 +188,7 @@ fn list_governance_markdown(root: &Path) -> std::result::Result<Vec<String>, Err
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;
@@ -208,9 +215,11 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         write(&tmp.path().join("repo-governance/principles/p.md"), "# P\n");
         let findings = audit_traceability(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_MISSING_VISION_SUPPORTED));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_MISSING_VISION_SUPPORTED)
+        );
     }
 
     #[test]
@@ -221,9 +230,11 @@ mod tests {
             "# C\n",
         );
         let findings = audit_traceability(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_MISSING_PRINCIPLES_IMPLEMENTED));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_MISSING_PRINCIPLES_IMPLEMENTED)
+        );
     }
 
     #[test]
@@ -258,9 +269,11 @@ mod tests {
             "# W\n\nno agent here\n",
         );
         let findings = audit_traceability(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_MISSING_AGENT_REFERENCE));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_MISSING_AGENT_REFERENCE)
+        );
     }
 
     #[test]

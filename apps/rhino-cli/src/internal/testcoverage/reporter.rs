@@ -10,6 +10,7 @@ use super::types::{FileResult, Result as CoverageResult};
 
 /// Serializes f64 the way Go's `encoding/json` does: whole-number floats render
 /// without trailing `.0` (so 90.0 → "90", but 86.08 → "86.08").
+#[allow(clippy::trivially_copy_pass_by_ref, clippy::cast_possible_truncation)]
 fn serialize_f64_gostyle<S: Serializer>(value: &f64, s: S) -> Result<S::Ok, S::Error> {
     if value.fract() == 0.0 && value.is_finite() && value.abs() < 1e15 {
         s.serialize_i64(*value as i64)
@@ -192,6 +193,7 @@ pub fn format_markdown(r: &CoverageResult, per_file: bool, below_threshold: f64)
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use crate::internal::testcoverage::types::Format;

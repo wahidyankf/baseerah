@@ -3,13 +3,13 @@
 use std::fmt::Write as _;
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::repo_governance::frontmatter_audit::{audit_frontmatter, FrontmatterFinding};
+use crate::internal::repo_governance::frontmatter_audit::{FrontmatterFinding, audit_frontmatter};
 
 const SCHEMA: &str = "rhino-cli/frontmatter-audit/v1";
 
@@ -57,7 +57,10 @@ pub fn run(
     } else if !args.path.is_empty() {
         args.path.clone()
     } else {
-        DEFAULT_PATHS.iter().map(|s| s.to_string()).collect()
+        DEFAULT_PATHS
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect()
     };
 
     let full_paths: Vec<String> = rel_paths
@@ -154,6 +157,7 @@ fn format_markdown(findings: &[FrontmatterFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

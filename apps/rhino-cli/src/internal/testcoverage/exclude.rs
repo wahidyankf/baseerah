@@ -46,8 +46,7 @@ pub fn exclude_files(r: &mut CoverageResult, patterns: &[String]) {
 pub fn matches_any_exclude_pattern(path: &str, patterns: &[String]) -> bool {
     let base = Path::new(path)
         .file_name()
-        .map(|s| s.to_string_lossy().to_string())
-        .unwrap_or_else(|| path.to_string());
+        .map_or_else(|| path.to_string(), |s| s.to_string_lossy().to_string());
 
     for pattern in patterns {
         if go_filepath_match(pattern, path) {
@@ -172,7 +171,7 @@ mod tests {
         let covered: usize = files.iter().map(|f| f.covered).sum();
         let missed: usize = files.iter().map(|f| f.missed).sum();
         CoverageResult {
-            file: "".into(),
+            file: String::new(),
             format: Format::Lcov,
             covered,
             partial: 0,

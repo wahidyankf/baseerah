@@ -1,6 +1,6 @@
 // Port of `apps/rhino-cli/cmd/agents_validate_sync.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::agents::reporter::{

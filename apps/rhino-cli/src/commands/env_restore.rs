@@ -1,12 +1,12 @@
 // Port of `apps/rhino-cli/cmd/env_restore.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::envbackup::{
-    detect_worktree, expand_tilde, format_json, format_markdown, format_text, restore, Options,
-    DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE,
+    DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE, Options, detect_worktree, expand_tilde, format_json,
+    format_markdown, format_text, restore,
 };
 use crate::internal::gitutil;
 
@@ -71,7 +71,7 @@ mod tests {
     #[test]
     fn args_default() {
         let _ = EnvRestoreArgs {
-            dir: "".into(),
+            dir: String::new(),
             worktree_aware: false,
             force: true,
             include_config: false,

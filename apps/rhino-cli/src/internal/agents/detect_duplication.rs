@@ -1,6 +1,7 @@
 // Byte-for-byte port of `apps/rhino-cli/internal/agents/detect_duplication.go`.
 
 use std::collections::HashMap;
+use std::fmt::Write as FmtWrite;
 use std::fs;
 use std::path::Path;
 
@@ -18,14 +19,14 @@ pub struct DuplicationFinding {
     pub message: String,
 }
 
+#[derive(Debug, Clone)]
+struct WindowRef {
+    file: String,
+    start_line: usize,
+}
+
 pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<DuplicationFinding>, Error> {
     let files = enumerate_agent_and_skill_files(repo_root)?;
-
-    #[derive(Debug, Clone)]
-    struct WindowRef {
-        file: String,
-        start_line: usize,
-    }
     let mut hash_index: HashMap<String, Vec<WindowRef>> = HashMap::new();
 
     for path in &files {
@@ -76,10 +77,10 @@ pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<Duplicati
     }
 
     findings.sort_by(|a, b| {
-        if a.files[0] != b.files[0] {
-            a.files[0].cmp(&b.files[0])
-        } else {
+        if a.files[0] == b.files[0] {
             a.start_lines[0].cmp(&b.start_lines[0])
+        } else {
+            a.files[0].cmp(&b.files[0])
         }
     });
     Ok(findings)
@@ -92,7 +93,7 @@ fn enumerate_agent_and_skill_files(repo_root: &Path) -> std::result::Result<Vec<
     match fs::read_dir(&agents_dir) {
         Ok(entries) => {
             for entry in entries.flatten() {
-                if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+                if entry.file_type().is_ok_and(|t| t.is_dir()) {
                     continue;
                 }
                 let name = entry.file_name().to_string_lossy().to_string();
@@ -112,7 +113,7 @@ fn enumerate_agent_and_skill_files(repo_root: &Path) -> std::result::Result<Vec<
     match fs::read_dir(&skills_dir) {
         Ok(entries) => {
             for entry in entries.flatten() {
-                if !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+                if !entry.file_type().is_ok_and(|t| t.is_dir()) {
                     continue;
                 }
                 let skill_file = entry.path().join("SKILL.md");
@@ -135,18 +136,16 @@ fn strip_frontmatter(s: &str) -> String {
     if !s.starts_with("---\n") && !s.starts_with("---\r\n") {
         return s.to_string();
     }
-    let body = match s.find('\n') {
-        Some(i) => &s[i + 1..],
-        None => return s.to_string(),
+    let Some(nl) = s.find('\n') else {
+        return s.to_string();
     };
-    let idx = match index_of_fence_line(body) {
-        Some(i) => i,
-        None => return s.to_string(),
+    let body = &s[nl + 1..];
+    let Some(idx) = index_of_fence_line(body) else {
+        return s.to_string();
     };
     let close_line = &body[idx..];
-    let close_nl = match close_line.find('\n') {
-        Some(i) => i,
-        None => return String::new(),
+    let Some(close_nl) = close_line.find('\n') else {
+        return String::new();
     };
     body[idx + close_nl + 1..].to_string()
 }
@@ -224,12 +223,13 @@ fn hash_window(lines: &[String]) -> String {
     let sum = hasher.finalize();
     let mut out = String::with_capacity(sum.len() * 2);
     for b in sum {
-        out.push_str(&format!("{b:02x}"));
+        let _ = write!(out, "{b:02x}");
     }
     out
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic, clippy::format_collect)]
 mod tests {
     use super::*;
     use std::fs;

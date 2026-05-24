@@ -268,8 +268,8 @@ pub fn to_coverage_map_jacoco(filename: &str) -> Result<CoverageMap, Error> {
                     hit_count: line.ci,
                     branches: Vec::new(),
                 };
-                if line.mb > 0 || line._cb > 0 {
-                    for i in 0..line._cb {
+                if line.mb > 0 || line.cb > 0 {
+                    for i in 0..line.cb {
                         lc.branches.push(BranchCoverage {
                             block_id: 0,
                             branch_id: i,
@@ -279,12 +279,12 @@ pub fn to_coverage_map_jacoco(filename: &str) -> Result<CoverageMap, Error> {
                     for i in 0..line.mb {
                         lc.branches.push(BranchCoverage {
                             block_id: 0,
-                            branch_id: line._cb + i,
+                            branch_id: line.cb + i,
                             hit_count: 0,
                         });
                     }
                 }
-                entry.insert(line._nr, lc);
+                entry.insert(line.nr, lc);
             }
         }
     }
@@ -345,6 +345,7 @@ pub fn to_coverage_map(filename: &str) -> Result<CoverageMap, Error> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

@@ -60,12 +60,12 @@ pub struct ValidateOptions {
 
 fn re_frontmatter() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"^\*\*([^*]+)\*\*:\s*(.+)$").unwrap())
+    R.get_or_init(|| Regex::new(r"^\*\*([^*]+)\*\*:\s*(.+)$").expect("valid hardcoded regex"))
 }
 
 fn re_backtick_idents() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"`([^`]+)`").unwrap())
+    R.get_or_init(|| Regex::new(r"`([^`]+)`").expect("valid hardcoded regex"))
 }
 
 fn required_frontmatter_keys() -> &'static [&'static str] {
@@ -455,9 +455,8 @@ fn check_term_collisions(
         }
         let mut all_covered = true;
         'outer: for ctx_name in &contexts {
-            let g = match glossaries.get(ctx_name) {
-                Some(g) => g,
-                None => continue,
+            let Some(g) = glossaries.get(ctx_name) else {
+                continue;
             };
             let others: Vec<&String> = contexts.iter().filter(|c| *c != ctx_name).collect();
             for other in others {
@@ -493,9 +492,8 @@ fn has_forbidden_for(g: &Glossary, term: &str, _other: &str) -> bool {
 
 fn grep_files(pattern: &str, root: &Path, exts: &[String]) -> usize {
     let escaped = regex::escape(pattern);
-    let re = match Regex::new(&format!(r"\b{escaped}\b")) {
-        Ok(r) => r,
-        Err(_) => return 0,
+    let Ok(re) = Regex::new(&format!(r"\b{escaped}\b")) else {
+        return 0;
     };
     let mut count = 0usize;
     for entry in WalkDir::new(root).into_iter().flatten() {
@@ -514,9 +512,8 @@ fn grep_files(pattern: &str, root: &Path, exts: &[String]) -> usize {
         if !matched {
             continue;
         }
-        let f = match fs::File::open(entry.path()) {
-            Ok(f) => f,
-            Err(_) => continue,
+        let Ok(f) = fs::File::open(entry.path()) else {
+            continue;
         };
         let reader = BufReader::new(f);
         for line in reader.lines().map_while(Result::ok) {
@@ -528,12 +525,13 @@ fn grep_files(pattern: &str, root: &Path, exts: &[String]) -> usize {
     count
 }
 
-pub fn ctx_first_code_path(_ctx: &BcContext) -> &str {
+pub fn ctx_first_code_path(_ctx: &BcContext) -> &'static str {
     // unused but kept for parity
     ""
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -553,7 +551,9 @@ mod tests {
         );
         let g = parse(&p);
         assert_eq!(
-            g.frontmatter.get("Bounded context").map(|s| s.as_str()),
+            g.frontmatter
+                .get("Bounded context")
+                .map(std::string::String::as_str),
             Some("ctx-a")
         );
         assert_eq!(g.terms.len(), 1);
@@ -570,10 +570,11 @@ mod tests {
             "## Terms\n\n| Whatever | Wrong |\n|---|---|\n| x | y |\n",
         );
         let g = parse(&p);
-        assert!(g
-            .parse_errors
-            .iter()
-            .any(|pe| pe.message.contains("malformed")));
+        assert!(
+            g.parse_errors
+                .iter()
+                .any(|pe| pe.message.contains("malformed"))
+        );
     }
 
     #[test]
@@ -756,7 +757,7 @@ mod tests {
         let mut g = Glossary::default();
         g.forbidden_synonyms.push(Forbidden {
             term: "OldTerm".into(),
-            reason: "".into(),
+            reason: String::new(),
             source_line: 0,
         });
         assert!(has_forbidden_for(&g, "oldterm", "any"));

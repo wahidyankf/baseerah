@@ -8,6 +8,7 @@
 // - ConvertAllAgents: iterates .claude/agents/ and writes .opencode/agents/
 
 use std::collections::{BTreeMap, HashMap};
+use std::fmt::Write as FmtWrite;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
@@ -51,123 +52,52 @@ struct FieldPolicy {
     reason: &'static str,
 }
 
+const FIELD_POLICY_TABLE: &[(&str, FieldAction, &str)] = &[
+    ("name", FieldAction::Drop, "filename carries name"),
+    ("description", FieldAction::Preserve, ""),
+    ("tools", FieldAction::Translate, ""),
+    ("model", FieldAction::Translate, ""),
+    ("color", FieldAction::Translate, ""),
+    ("skills", FieldAction::Preserve, ""),
+    ("maxTurns", FieldAction::Translate, ""),
+    (
+        "disallowedTools",
+        FieldAction::DropWarn,
+        "no opencode equivalent",
+    ),
+    (
+        "permissionMode",
+        FieldAction::DropWarn,
+        "use opencode permission block",
+    ),
+    ("effort", FieldAction::DropWarn, "claude-only"),
+    ("memory", FieldAction::DropWarn, "claude-only"),
+    ("isolation", FieldAction::DropWarn, "claude-only"),
+    ("background", FieldAction::DropWarn, "claude-only"),
+    ("initialPrompt", FieldAction::DropWarn, "claude-only"),
+    (
+        "mcpServers",
+        FieldAction::DropWarn,
+        "opencode declares mcp at config level",
+    ),
+    ("hooks", FieldAction::DropWarn, "no opencode equivalent"),
+];
+
 fn claude_agent_field_policy() -> &'static HashMap<&'static str, FieldPolicy> {
     static M: OnceLock<HashMap<&'static str, FieldPolicy>> = OnceLock::new();
     M.get_or_init(|| {
-        let mut m: HashMap<&'static str, FieldPolicy> = HashMap::new();
-        m.insert(
-            "name",
-            FieldPolicy {
-                action: FieldAction::Drop,
-                reason: "filename carries name",
-            },
-        );
-        m.insert(
-            "description",
-            FieldPolicy {
-                action: FieldAction::Preserve,
-                reason: "",
-            },
-        );
-        m.insert(
-            "tools",
-            FieldPolicy {
-                action: FieldAction::Translate,
-                reason: "",
-            },
-        );
-        m.insert(
-            "model",
-            FieldPolicy {
-                action: FieldAction::Translate,
-                reason: "",
-            },
-        );
-        m.insert(
-            "color",
-            FieldPolicy {
-                action: FieldAction::Translate,
-                reason: "",
-            },
-        );
-        m.insert(
-            "skills",
-            FieldPolicy {
-                action: FieldAction::Preserve,
-                reason: "",
-            },
-        );
-        m.insert(
-            "disallowedTools",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "no opencode equivalent",
-            },
-        );
-        m.insert(
-            "permissionMode",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "use opencode permission block",
-            },
-        );
-        m.insert(
-            "maxTurns",
-            FieldPolicy {
-                action: FieldAction::Translate,
-                reason: "",
-            },
-        );
-        m.insert(
-            "effort",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "claude-only",
-            },
-        );
-        m.insert(
-            "memory",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "claude-only",
-            },
-        );
-        m.insert(
-            "isolation",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "claude-only",
-            },
-        );
-        m.insert(
-            "background",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "claude-only",
-            },
-        );
-        m.insert(
-            "initialPrompt",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "claude-only",
-            },
-        );
-        m.insert(
-            "mcpServers",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "opencode declares mcp at config level",
-            },
-        );
-        m.insert(
-            "hooks",
-            FieldPolicy {
-                action: FieldAction::DropWarn,
-                reason: "no opencode equivalent",
-            },
-        );
-        m
+        FIELD_POLICY_TABLE
+            .iter()
+            .map(|(k, action, reason)| {
+                (
+                    *k,
+                    FieldPolicy {
+                        action: *action,
+                        reason,
+                    },
+                )
+            })
+            .collect()
     })
 }
 
@@ -220,9 +150,8 @@ pub fn convert_agent(
     let value: Value = serde_norway::from_str(&frontmatter_str)
         .map_err(|e| format!("failed to parse YAML: {e}"))?;
 
-    let mapping = match value {
-        Value::Mapping(m) => m,
-        _ => return Err("frontmatter is not a mapping".to_string()),
+    let Value::Mapping(mapping) = value else {
+        return Err("frontmatter is not a mapping".to_string());
     };
 
     let agent_name = agent_name_from_path(input_path);
@@ -232,23 +161,18 @@ pub fn convert_agent(
     let policy_map = claude_agent_field_policy();
 
     for (k, v) in mapping {
-        let key = match k.as_str() {
-            Some(s) => s.to_string(),
-            None => continue,
-        };
-        let policy = match policy_map.get(key.as_str()) {
-            Some(p) => p,
-            None => {
-                warnings.push(ConversionWarning {
-                    agent_name: agent_name.clone(),
-                    field: key.clone(),
-                    reason: "unknown claude code field".to_string(),
-                });
-                continue;
-            }
+        let Some(s) = k.as_str() else { continue };
+        let key = s.to_string();
+        let Some(policy) = policy_map.get(key.as_str()) else {
+            warnings.push(ConversionWarning {
+                agent_name: agent_name.clone(),
+                field: key.clone(),
+                reason: "unknown claude code field".to_string(),
+            });
+            continue;
         };
         match policy.action {
-            FieldAction::Drop => continue,
+            FieldAction::Drop => {}
             FieldAction::DropWarn => {
                 warnings.push(ConversionWarning {
                     agent_name: agent_name.clone(),
@@ -291,7 +215,7 @@ fn apply_preserve(out: &mut OpenCodeAgent, key: &str, value: &Value) {
             if let Value::Sequence(seq) = value {
                 out.skills = seq
                     .iter()
-                    .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                    .filter_map(|v| v.as_str().map(std::string::ToString::to_string))
                     .collect();
             }
         }
@@ -299,6 +223,8 @@ fn apply_preserve(out: &mut OpenCodeAgent, key: &str, value: &Value) {
     }
 }
 
+// maxTurns may arrive as f64 from YAML; cast to i64 is safe for small whole-number turn counts.
+#[allow(clippy::cast_possible_truncation)]
 fn apply_translate(out: &mut OpenCodeAgent, key: &str, value: &Value) {
     match key {
         "tools" => {
@@ -333,26 +259,26 @@ fn apply_translate(out: &mut OpenCodeAgent, key: &str, value: &Value) {
 /// - skills is a sequence (each entry on own line, "- skill-name")
 fn encode_opencode_agent(a: &OpenCodeAgent) -> String {
     let mut s = String::new();
-    s.push_str(&format!("description: {}\n", yaml_string(&a.description)));
-    s.push_str(&format!("model: {}\n", yaml_string(&a.model)));
+    let _ = writeln!(s, "description: {}", yaml_string(&a.description));
+    let _ = writeln!(s, "model: {}", yaml_string(&a.model));
     if a.tools.is_empty() {
         s.push_str("tools: {}\n");
     } else {
         s.push_str("tools:\n");
         for (k, v) in &a.tools {
-            s.push_str(&format!("  {k}: {v}\n"));
+            let _ = writeln!(s, "  {k}: {v}");
         }
     }
     if !a.color.is_empty() {
-        s.push_str(&format!("color: {}\n", yaml_string(&a.color)));
+        let _ = writeln!(s, "color: {}", yaml_string(&a.color));
     }
     if a.steps != 0 {
-        s.push_str(&format!("steps: {}\n", a.steps));
+        let _ = writeln!(s, "steps: {}", a.steps);
     }
     if !a.skills.is_empty() {
         s.push_str("skills:\n");
         for sk in &a.skills {
-            s.push_str(&format!("  - {}\n", yaml_string(sk)));
+            let _ = writeln!(s, "  - {}", yaml_string(sk));
         }
     }
     s
@@ -459,7 +385,7 @@ pub fn convert_all_agents(repo_root: &Path, dry_run: bool) -> Result<ConvertAllR
     let mut paths: Vec<(PathBuf, String)> = Vec::new();
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         if !name.ends_with(".md") || name == "README.md" {
@@ -472,15 +398,12 @@ pub fn convert_all_agents(repo_root: &Path, dry_run: bool) -> Result<ConvertAllR
     let mut result = ConvertAllResult::default();
     for (input, name) in paths {
         let output = opencode_dir.join(&name);
-        match convert_agent(&input, &output, dry_run) {
-            Ok(w) => {
-                result.converted += 1;
-                result.warnings.extend(w);
-            }
-            Err(_) => {
-                result.failed += 1;
-                result.failed_files.push(name);
-            }
+        if let Ok(w) = convert_agent(&input, &output, dry_run) {
+            result.converted += 1;
+            result.warnings.extend(w);
+        } else {
+            result.failed += 1;
+            result.failed_files.push(name);
         }
     }
 
@@ -488,6 +411,7 @@ pub fn convert_all_agents(repo_root: &Path, dry_run: bool) -> Result<ConvertAllR
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -582,9 +506,11 @@ mod tests {
             "---\nname: foo\ndescription: d\ntools: Read\nmodel: sonnet\nbogus: yes\n---\nBody\n",
         );
         let warnings = convert_agent(&input, &output, true).unwrap();
-        assert!(warnings
-            .iter()
-            .any(|w| w.field == "bogus" && w.reason == "unknown claude code field"));
+        assert!(
+            warnings
+                .iter()
+                .any(|w| w.field == "bogus" && w.reason == "unknown claude code field")
+        );
     }
 
     #[test]
@@ -620,7 +546,7 @@ mod tests {
 
     #[test]
     fn convert_tools_skips_empty() {
-        let in_tools = vec!["".to_string(), "  ".to_string(), "Read".to_string()];
+        let in_tools = vec![String::new(), "  ".to_string(), "Read".to_string()];
         let out = convert_tools(&in_tools);
         assert_eq!(out.len(), 1);
     }

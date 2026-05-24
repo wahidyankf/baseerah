@@ -13,8 +13,8 @@ use regex::Regex;
 use walkdir::WalkDir;
 
 use super::extractors;
-use super::matcher::{add_step_to_matcher_with_origin, MatcherKind, StepMatcher};
-use super::parser::{parse_feature_file, ParsedStep};
+use super::matcher::{MatcherKind, StepMatcher, add_step_to_matcher_with_origin};
+use super::parser::{ParsedStep, parse_feature_file};
 use super::types::{CheckResult, CoverageGap, OrphanStepImpl, ScanOptions, ScenarioGap, StepGap};
 use super::util::{first_non_empty, normalize_ws, unescape_string};
 
@@ -299,13 +299,12 @@ fn check_orphan_step_impls(
         } else {
             e.exact_text.clone()
         };
-        let file_path = if !repo_root.as_os_str().is_empty() {
+        let file_path = if repo_root.as_os_str().is_empty() {
+            e.file.clone()
+        } else {
             Path::new(&e.file)
                 .strip_prefix(repo_root)
-                .map(|p| p.to_string_lossy().to_string())
-                .unwrap_or_else(|_| e.file.clone())
-        } else {
-            e.file.clone()
+                .map_or_else(|_| e.file.clone(), |p| p.to_string_lossy().to_string())
         };
         orphans.push(OrphanStepImpl {
             file: file_path,
@@ -431,12 +430,8 @@ fn is_test_file(path: &Path) -> bool {
 }
 
 fn is_in_test_dir(path: &Path) -> bool {
-    path.components().any(|comp| {
-        matches!(
-            comp.as_os_str().to_str(),
-            Some("test") | Some("tests") | Some("Tests")
-        )
-    })
+    path.components()
+        .any(|comp| matches!(comp.as_os_str().to_str(), Some("test" | "tests" | "Tests")))
 }
 
 fn find_all_matching_test_files(
@@ -490,8 +485,8 @@ fn extract_ts_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, 
     let mut titles = HashSet::new();
     for line in content.lines() {
         for caps in scenario_def_re().captures_iter(line) {
-            let dq = caps.get(1).map(|m| m.as_str()).unwrap_or("");
-            let sq = caps.get(2).map(|m| m.as_str()).unwrap_or("");
+            let dq = caps.get(1).map_or("", |m| m.as_str());
+            let sq = caps.get(2).map_or("", |m| m.as_str());
             let title = unescape_string(first_non_empty(dq, sq));
             titles.insert(normalize_ws(&title));
         }
@@ -504,7 +499,11 @@ fn extract_go_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, 
     let mut titles = HashSet::new();
     for line in content.lines() {
         if let Some(caps) = go_scenario_comment_re().captures(line) {
-            titles.insert(normalize_ws(caps.get(1).unwrap().as_str()));
+            titles.insert(normalize_ws(
+                caps.get(1)
+                    .expect("capture group 1 always present")
+                    .as_str(),
+            ));
         }
     }
     Ok(titles)
@@ -559,13 +558,16 @@ fn extract_ts_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Resu
     let path_s = path.to_string_lossy();
 
     for caps in step_def_re().captures_iter(&src) {
-        let dq = caps.get(1).map(|m| m.as_str()).unwrap_or("");
-        let sq = caps.get(2).map(|m| m.as_str()).unwrap_or("");
+        let dq = caps.get(1).map_or("", |m| m.as_str());
+        let sq = caps.get(2).map_or("", |m| m.as_str());
         let text = unescape_string(first_non_empty(dq, sq));
         add_step_to_matcher_with_origin(sm, &text, &path_s);
     }
     for caps in ts_regex_step_re().captures_iter(&src) {
-        let pattern = caps.get(1).unwrap().as_str();
+        let pattern = caps
+            .get(1)
+            .expect("capture group 1 always present")
+            .as_str();
         if let Ok(re) = Regex::new(pattern) {
             sm.add_pattern_with_origin(re, pattern, &path_s);
         }
@@ -578,7 +580,10 @@ fn extract_go_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Resu
     let path_s = path.to_string_lossy();
     for line in content.lines() {
         for caps in go_step_re().captures_iter(line) {
-            let pattern = caps.get(1).unwrap().as_str();
+            let pattern = caps
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str();
             if let Ok(re) = Regex::new(pattern) {
                 sm.add_pattern_with_origin(re, pattern, &path_s);
             }
@@ -662,12 +667,14 @@ fn rel_to(root: &Path, p: &Path) -> String {
     if root.as_os_str().is_empty() {
         return p.to_string_lossy().to_string();
     }
-    p.strip_prefix(root)
-        .map(|r| r.to_string_lossy().to_string())
-        .unwrap_or_else(|_| p.to_string_lossy().to_string())
+    p.strip_prefix(root).map_or_else(
+        |_| p.to_string_lossy().to_string(),
+        |r| r.to_string_lossy().to_string(),
+    )
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::TempDir;
@@ -819,7 +826,7 @@ mod tests {
     #[test]
     fn check_orphan_step_impls_handles_pattern_entries() {
         let mut sm = StepMatcher::new();
-        let re = Regex::new(r"^count is \d+$").unwrap();
+        let re = Regex::new(r"^count is \d+$").expect("valid hardcoded regex");
         sm.add_pattern_with_origin(re, r"^count is \d+$", "/repo/x.rs");
         let orphans_no_match =
             check_orphan_step_impls(&sm, &["different step".to_string()], Path::new("/repo"));

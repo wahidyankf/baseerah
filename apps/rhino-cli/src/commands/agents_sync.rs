@@ -1,10 +1,10 @@
 // Port of `apps/rhino-cli/cmd/agents_sync.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::agents::reporter::{format_sync_json, format_sync_markdown, format_sync_text};
-use crate::internal::agents::sync::{sync_all, SyncOptions};
+use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 

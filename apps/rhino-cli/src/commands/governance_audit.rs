@@ -2,13 +2,13 @@
 
 use std::fmt::Write as _;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 use crate::internal::repo_governance::audit_orchestrator::{
-    run_audit, AuditEnvelope, AuditOptions,
+    AuditEnvelope, AuditOptions, run_audit,
 };
 
 #[derive(Args, Debug)]
@@ -148,6 +148,7 @@ fn format_markdown(env: &AuditEnvelope) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use crate::internal::repo_governance::audit_orchestrator::{
@@ -231,9 +232,9 @@ mod tests {
             key: "x".into(),
             severity: "high".into(),
             criticality: "HIGH".into(),
-            file: "".into(),
+            file: String::new(),
             line: 0,
-            message: "".into(),
+            message: String::new(),
         });
         let s = format_markdown(&env);
         assert!(s.contains("FAILED"));

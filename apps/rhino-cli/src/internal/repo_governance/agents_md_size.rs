@@ -58,6 +58,7 @@ fn classify(size: i64) -> (&'static str, String) {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

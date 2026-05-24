@@ -124,7 +124,7 @@ fn forbidden_terms() -> &'static Vec<ForbiddenTerm> {
 
 fn mk(pattern: &str, term: &'static str, replacement: &'static str) -> ForbiddenTerm {
     ForbiddenTerm {
-        re: Regex::new(pattern).unwrap(),
+        re: Regex::new(pattern).expect("valid hardcoded regex"),
         display_term: term,
         replacement,
     }
@@ -132,17 +132,17 @@ fn mk(pattern: &str, term: &'static str, replacement: &'static str) -> Forbidden
 
 fn html_comment_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"<!--.*?-->").unwrap())
+    RE.get_or_init(|| Regex::new(r"<!--.*?-->").expect("valid hardcoded regex"))
 }
 
 fn inline_code_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"`[^`]*`").unwrap())
+    RE.get_or_init(|| Regex::new(r"`[^`]*`").expect("valid hardcoded regex"))
 }
 
 fn link_url_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\[([^\]]*)\]\([^)]*\)").unwrap())
+    RE.get_or_init(|| Regex::new(r"\[([^\]]*)\]\([^)]*\)").expect("valid hardcoded regex"))
 }
 
 pub fn scan_file(path: &Path) -> std::result::Result<Vec<Finding>, Error> {
@@ -286,11 +286,7 @@ fn fence_line_len(line: &str) -> usize {
             break;
         }
     }
-    if n >= 3 {
-        n
-    } else {
-        0
-    }
+    if n >= 3 { n } else { 0 }
 }
 
 fn strip_non_prose(line: &str) -> String {
@@ -328,6 +324,7 @@ fn is_platform_binding_heading(line: &str) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

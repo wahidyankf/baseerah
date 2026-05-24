@@ -83,7 +83,7 @@ fn format_fraction(nanos: i128, scale: i128) -> String {
             1_000_000 => 6,
             _ => 9,
         };
-        let frac_str = format!("{frac:0width$}", width = width);
+        let frac_str = format!("{frac:0width$}");
         let trimmed = trim_trailing_zeros(&frac_str);
         if !trimmed.is_empty() {
             s.push('.');
@@ -217,7 +217,7 @@ pub fn format_validation_json(result: &ValidationResult) -> std::result::Result<
         passed_checks: result.passed_checks,
         warning_checks: result.warning_checks,
         failed_checks: result.failed_checks,
-        duration_ms: result.duration.as_millis() as i64,
+        duration_ms: i64::try_from(result.duration.as_millis()).expect("duration fits in i64"),
         checks,
     };
     Ok(serde_json::to_string_pretty(&out)?)
@@ -329,10 +329,10 @@ pub fn format_sync_text(result: &SyncResult, verbose: bool, quiet: bool) -> Stri
 
     if !quiet {
         sb.push('\n');
-        if !result.failed_files.is_empty() {
-            sb.push_str("Status: \u{274C} FAILED\n");
-        } else {
+        if result.failed_files.is_empty() {
             sb.push_str("Status: \u{2713} SUCCESS\n");
+        } else {
+            sb.push_str("Status: \u{274C} FAILED\n");
         }
     }
 
@@ -394,7 +394,7 @@ pub fn format_sync_json(result: &SyncResult) -> std::result::Result<String, Erro
         skills_failed: result.skills_failed,
         failed_files: &result.failed_files,
         warnings,
-        duration_ms: result.duration.as_millis() as i64,
+        duration_ms: i64::try_from(result.duration.as_millis()).expect("duration fits in i64"),
     };
     Ok(serde_json::to_string_pretty(&out)?)
 }
@@ -423,10 +423,10 @@ pub fn format_sync_markdown(result: &SyncResult) -> String {
         }
         sb.push('\n');
     }
-    if !result.failed_files.is_empty() {
-        sb.push_str("**Status**: \u{274C} FAILED\n");
-    } else {
+    if result.failed_files.is_empty() {
         sb.push_str("**Status**: \u{2713} SUCCESS\n");
+    } else {
+        sb.push_str("**Status**: \u{274C} FAILED\n");
     }
     if !result.warnings.is_empty() {
         sb.push_str("\n## Warnings\n\n");
@@ -442,6 +442,7 @@ pub fn format_sync_markdown(result: &SyncResult) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use crate::internal::agents::types::ValidationCheck;

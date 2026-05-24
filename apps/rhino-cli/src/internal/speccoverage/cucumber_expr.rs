@@ -83,8 +83,10 @@ pub fn convert_python_parsers_expr(text: &str) -> String {
             }
             Some(m) => {
                 sb.push_str(&regex::escape(&remaining[..m.start()]));
-                let caps = re.captures(&remaining[m.start()..m.end()]).unwrap();
-                let format_spec = caps.get(2).map(|x| x.as_str()).unwrap_or("");
+                let caps = re
+                    .captures(&remaining[m.start()..m.end()])
+                    .expect("re.find matched so captures always succeeds");
+                let format_spec = caps.get(2).map_or("", |x| x.as_str());
                 let chunk = match format_spec {
                     "d" => r"-?\d+",
                     "g" => r"-?\d+\.?\d*",
@@ -104,6 +106,7 @@ pub fn is_python_parsers_expr(text: &str) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

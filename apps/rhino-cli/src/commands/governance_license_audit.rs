@@ -2,13 +2,13 @@
 
 use std::fmt::Write as _;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::repo_governance::license_audit::{audit_license, LicenseFinding};
+use crate::internal::repo_governance::license_audit::{LicenseFinding, audit_license};
 
 const SCHEMA: &str = "rhino-cli/license-audit/v1";
 
@@ -96,6 +96,7 @@ fn format_markdown(findings: &[LicenseFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

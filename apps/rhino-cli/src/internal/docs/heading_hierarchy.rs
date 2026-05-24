@@ -3,7 +3,7 @@
 use std::fs;
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use walkdir::WalkDir;
 
 use super::naming::SKIP_DIRS as NAMING_SKIP_DIRS;
@@ -109,7 +109,7 @@ fn parse_fence_open(s: &str) -> Option<(char, usize)> {
     if s.is_empty() {
         return None;
     }
-    let first = s.chars().next().unwrap();
+    let first = s.chars().next().expect("s is non-empty — checked above");
     if first != '`' && first != '~' {
         return None;
     }
@@ -212,6 +212,7 @@ fn analyze_headings(file: &str, headings: &[Heading]) -> Vec<DocsHeadingFinding>
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

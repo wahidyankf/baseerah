@@ -159,12 +159,12 @@ pub fn valid_model_alias() -> &'static HashMap<&'static str, bool> {
 
 pub fn valid_model_id_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"^claude-[a-z0-9.-]+$").unwrap())
+    R.get_or_init(|| Regex::new(r"^claude-[a-z0-9.-]+$").expect("valid hardcoded regex"))
 }
 
 pub fn agent_tool_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"^([A-Za-z][A-Za-z0-9_]*)\(.*\)$").unwrap())
+    R.get_or_init(|| Regex::new(r"^([A-Za-z][A-Za-z0-9_]*)\(.*\)$").expect("valid hardcoded regex"))
 }
 
 pub fn valid_colors() -> &'static HashMap<&'static str, bool> {
@@ -182,7 +182,7 @@ pub fn valid_colors() -> &'static HashMap<&'static str, bool> {
 
 pub fn valid_skill_name_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"^[a-z0-9-]{1,64}$").unwrap())
+    R.get_or_init(|| Regex::new(r"^[a-z0-9-]{1,64}$").expect("valid hardcoded regex"))
 }
 
 pub fn required_fields() -> &'static [&'static str] {
@@ -254,7 +254,7 @@ pub fn valid_claude_skill_fields() -> &'static HashMap<&'static str, bool> {
 /// list for tool failures by running shadow-diff on success-paths only.
 pub fn valid_tools_sorted() -> Vec<&'static str> {
     let mut v: Vec<&'static str> = valid_tools().keys().copied().collect();
-    v.sort();
+    v.sort_unstable();
     v
 }
 
@@ -268,6 +268,7 @@ pub fn valid_claude_agent_fields_sorted() -> BTreeMap<&'static str, bool> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

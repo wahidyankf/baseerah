@@ -2,7 +2,7 @@
 
 use std::process::Command;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use regex::Regex;
 
 use super::exclude::matches_any_exclude_pattern;
@@ -34,9 +34,10 @@ pub fn parse_git_diff(diff_output: &str) -> Vec<DiffHunk> {
     let mut file_lines: std::collections::HashMap<String, Vec<i64>> =
         std::collections::HashMap::new();
 
-    let diff_file_re = Regex::new(r"^diff --git a/.+ b/(.+)$").unwrap();
-    let hunk_re = Regex::new(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@").unwrap();
-    let rename_re = Regex::new(r"^rename to (.+)$").unwrap();
+    let diff_file_re = Regex::new(r"^diff --git a/.+ b/(.+)$").expect("valid hardcoded regex");
+    let hunk_re =
+        Regex::new(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@").expect("valid hardcoded regex");
+    let rename_re = Regex::new(r"^rename to (.+)$").expect("valid hardcoded regex");
 
     let mut current_file = String::new();
     let mut in_hunk = false;
@@ -44,12 +45,20 @@ pub fn parse_git_diff(diff_output: &str) -> Vec<DiffHunk> {
 
     for line in diff_output.split('\n') {
         if let Some(m) = diff_file_re.captures(line) {
-            current_file = m.get(1).unwrap().as_str().to_string();
+            current_file = m
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str()
+                .to_string();
             in_hunk = false;
             continue;
         }
         if let Some(m) = rename_re.captures(line) {
-            current_file = m.get(1).unwrap().as_str().to_string();
+            current_file = m
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str()
+                .to_string();
             continue;
         }
         if line.starts_with("Binary files") {
@@ -57,7 +66,12 @@ pub fn parse_git_diff(diff_output: &str) -> Vec<DiffHunk> {
             continue;
         }
         if let Some(m) = hunk_re.captures(line) {
-            current_line_no = m.get(1).unwrap().as_str().parse().unwrap_or(0);
+            current_line_no = m
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str()
+                .parse()
+                .unwrap_or(0);
             in_hunk = true;
             continue;
         }
@@ -226,6 +240,7 @@ pub fn get_git_diff(base: &str, staged: bool) -> Result<String, Error> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

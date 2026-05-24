@@ -154,6 +154,7 @@ pub struct AuditFinding {
     pub message: String,
 }
 
+#[allow(clippy::trivially_copy_pass_by_ref)]
 fn skip_zero(n: &usize) -> bool {
     *n == 0
 }
@@ -217,6 +218,23 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
 
 fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<AuditFinding>, Error> {
     match name {
+        "agents-md-size" | "frontmatter-audit" | "traceability-audit" | "license-audit"
+        | "readme-index-audit" | "emoji-audit" | "layer-coherence" => {
+            run_category_governance(name, opts)
+        }
+        "docs-validate-naming"
+        | "docs-validate-frontmatter"
+        | "docs-validate-heading-hierarchy"
+        | "agents-detect-duplication" => run_category_docs(name, opts),
+        _ => Err(anyhow::anyhow!("unknown category {name}")),
+    }
+}
+
+fn run_category_governance(
+    name: &str,
+    opts: &AuditOptions,
+) -> std::result::Result<Vec<AuditFinding>, Error> {
+    match name {
         "agents-md-size" => {
             let p = opts.repo_root.join("AGENTS.md");
             if !p.exists() {
@@ -228,10 +246,10 @@ fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<Audi
                 )]);
             }
             let f = check_agents_md_size(&p.to_string_lossy())?;
-            if f.severity != "fail" {
-                Ok(Vec::new())
-            } else {
+            if f.severity == "fail" {
                 Ok(vec![new_audit_finding(name, &f.file, 0, &f.message)])
+            } else {
+                Ok(Vec::new())
             }
         }
         "frontmatter-audit" => {
@@ -297,6 +315,15 @@ fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<Audi
                 .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
                 .collect())
         }
+        _ => Err(anyhow::anyhow!("unknown category {name}")),
+    }
+}
+
+fn run_category_docs(
+    name: &str,
+    opts: &AuditOptions,
+) -> std::result::Result<Vec<AuditFinding>, Error> {
+    match name {
         "docs-validate-naming" => {
             let paths = resolve_paths(
                 &opts.repo_root,
@@ -362,12 +389,12 @@ fn resolve_paths(repo_root: &Path, override_paths: &[String], defaults: &[&str])
             out.push(go_filepath_join(&repo_root.to_string_lossy(), p));
         }
     };
-    if !override_paths.is_empty() {
-        for p in override_paths {
+    if override_paths.is_empty() {
+        for p in defaults {
             push_resolved(&mut out, p);
         }
     } else {
-        for p in defaults {
+        for p in override_paths {
             push_resolved(&mut out, p);
         }
     }
@@ -394,7 +421,7 @@ fn clean_path(p: &str) -> String {
     let mut stack: Vec<&str> = Vec::new();
     for seg in p.split('/') {
         match seg {
-            "" | "." => continue,
+            "" | "." => {}
             ".." => {
                 if let Some(last) = stack.last() {
                     if *last != ".." {
@@ -511,7 +538,7 @@ fn sort_audit_findings(findings: &mut [AuditFinding]) {
 
 fn known_false_positive_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"(?m)^\s*-\s+`([^`]+)`").unwrap())
+    R.get_or_init(|| Regex::new(r"(?m)^\s*-\s+`([^`]+)`").expect("valid hardcoded regex"))
 }
 
 fn load_known_false_positives(
@@ -540,7 +567,7 @@ fn partition_false_positives(
     skip_set: &std::collections::HashSet<String>,
 ) -> (Vec<AuditCategoryResult>, Vec<AuditFinding>) {
     let mut skipped: Vec<AuditFinding> = Vec::new();
-    for c in categories.iter_mut() {
+    for c in &mut categories {
         let mut kept: Vec<AuditFinding> = Vec::new();
         for f in c.findings.drain(..) {
             if skip_set.contains(&f.key) {
@@ -572,17 +599,20 @@ fn read_git_sha(repo_root: &Path) -> String {
 
 // hex encoding (no `hex` crate dependency).
 mod hex {
+    use std::fmt::Write as FmtWrite;
+
     pub fn encode<T: AsRef<[u8]>>(bytes: T) -> String {
         let b = bytes.as_ref();
         let mut s = String::with_capacity(b.len() * 2);
         for byte in b {
-            s.push_str(&format!("{:02x}", byte));
+            let _ = write!(s, "{byte:02x}");
         }
         s
     }
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -749,7 +779,7 @@ mod tests {
             repo_root: dir.path().to_path_buf(),
             skip: audit_category_order()
                 .iter()
-                .map(|s| s.to_string())
+                .map(std::string::ToString::to_string)
                 .collect(),
             now: Some("2026-05-23T00:00:00Z".to_string()),
             ..Default::default()

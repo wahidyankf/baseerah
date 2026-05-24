@@ -12,10 +12,10 @@ use std::path::Path;
 use std::process::Command;
 use std::time::Instant;
 
-use super::tools::{build_tool_defs, ToolDef};
+use super::tools::{ToolDef, build_tool_defs};
 use super::{
-    is_minimal_tool, CheckOptions, CommandOutput, CommandRunner, DoctorResult, Scope, ToolCheck,
-    ToolStatus,
+    CheckOptions, CommandOutput, CommandRunner, DoctorResult, Scope, ToolCheck, ToolStatus,
+    is_minimal_tool,
 };
 
 /// Strip a leading "v" from a version string.
@@ -55,13 +55,19 @@ pub(super) fn parse_line_word(
 pub(super) fn read_node_version(path: &Path) -> Option<String> {
     let data = std::fs::read(path).ok()?;
     let v: serde_json::Value = serde_json::from_slice(&data).ok()?;
-    v.get("volta")?.get("node")?.as_str().map(|s| s.to_string())
+    v.get("volta")?
+        .get("node")?
+        .as_str()
+        .map(std::string::ToString::to_string)
 }
 
 pub(super) fn read_npm_version(path: &Path) -> Option<String> {
     let data = std::fs::read(path).ok()?;
     let v: serde_json::Value = serde_json::from_slice(&data).ok()?;
-    v.get("volta")?.get("npm")?.as_str().map(|s| s.to_string())
+    v.get("volta")?
+        .get("npm")?
+        .as_str()
+        .map(std::string::ToString::to_string)
 }
 
 pub(super) fn read_java_version(path: &Path) -> Option<String> {
@@ -110,7 +116,7 @@ pub(super) fn read_dotnet_version(path: &Path) -> Option<String> {
     v.get("sdk")?
         .get("version")?
         .as_str()
-        .map(|s| s.to_string())
+        .map(std::string::ToString::to_string)
 }
 
 pub(super) fn read_dart_sdk_version(path: &Path) -> Option<String> {
@@ -355,10 +361,11 @@ pub(super) fn compare_gte(installed: &str, required: &str) -> (ToolStatus, Strin
     }
     let i = parse_version_parts(installed);
     let r = parse_version_parts(required);
-    let ((i_maj, i_min, i_pat), (r_maj, r_min, r_pat)) = match (i, r) {
-        (Some(a), Some(b)) => (a, b),
-        _ => return compare_exact(installed, required),
+    let (Some(a), Some(b)) = (i, r) else {
+        return compare_exact(installed, required);
     };
+    let (i_maj, i_min, i_pat) = a;
+    let (r_maj, r_min, r_pat) = b;
     if i_maj > r_maj
         || (i_maj == r_maj && i_min > r_min)
         || (i_maj == r_maj && i_min == r_min && i_pat >= r_pat)
@@ -431,9 +438,7 @@ pub fn real_runner(name: &str, args: &[&str]) -> CommandOutput {
 /// Mirror of Go's exec.LookPath. Walk $PATH for an executable file named `name`.
 fn binary_in_path(name: &str) -> bool {
     if name.contains('/') {
-        return std::fs::metadata(name)
-            .map(|m| m.is_file())
-            .unwrap_or(false);
+        return std::fs::metadata(name).is_ok_and(|m| m.is_file());
     }
     let Some(path_var) = std::env::var_os("PATH") else {
         return false;
@@ -450,7 +455,7 @@ fn binary_in_path(name: &str) -> bool {
 /// Execute one tool check.
 pub(super) fn run_one_def(runner: CommandRunner<'_>, def: &ToolDef) -> ToolCheck {
     let required_version = (def.read_req)();
-    let args_strs: Vec<&str> = def.args.iter().map(|s| s.as_str()).collect();
+    let args_strs: Vec<&str> = def.args.iter().map(std::string::String::as_str).collect();
     match runner(&def.binary, &args_strs) {
         Err(_) => ToolCheck {
             name: def.name.clone(),
@@ -517,6 +522,7 @@ pub fn check_all(opts: &CheckOptions<'_>) -> DoctorResult {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -722,12 +728,12 @@ mod tests {
         let def = ToolDef {
             name: "ghosttool".into(),
             binary: "ghosttool-binary-that-does-not-exist".into(),
-            source: "".into(),
+            source: String::new(),
             args: vec!["--version".into()],
             use_stderr: false,
             parse_ver: |s| s.trim().to_string(),
             compare: compare_exact,
-            read_req: || "".into(),
+            read_req: || String::new(),
             install_cmd: None,
         };
         let runner: CommandRunner = &|_, _| Err("not found".into());
@@ -741,7 +747,7 @@ mod tests {
         let def = ToolDef {
             name: "fake".into(),
             binary: "fake".into(),
-            source: "".into(),
+            source: String::new(),
             args: vec!["--version".into()],
             use_stderr: false,
             parse_ver: |s| s.trim().to_string(),

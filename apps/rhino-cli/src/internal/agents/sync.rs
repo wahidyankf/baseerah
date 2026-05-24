@@ -8,7 +8,7 @@
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
-use super::converter::{convert_all_agents, ConversionWarning};
+use super::converter::{ConversionWarning, convert_all_agents};
 
 #[derive(Debug, Clone, Default)]
 pub struct SyncOptions {
@@ -48,6 +48,7 @@ pub fn sync_all(opts: &SyncOptions) -> Result<SyncResult, String> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;

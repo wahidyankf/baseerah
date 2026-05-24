@@ -3,23 +3,24 @@
 
 use std::collections::HashSet;
 use std::fs;
+use std::hash::BuildHasher;
 use std::path::Path;
 
 use serde_norway::Value;
 
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 use super::types::{
-    agent_tool_pattern, required_fields, valid_claude_agent_fields, valid_colors,
-    valid_model_alias, valid_model_id_pattern, valid_tools, valid_tools_sorted, ClaudeAgentFull,
-    ValidationCheck,
+    ClaudeAgentFull, ValidationCheck, agent_tool_pattern, required_fields,
+    valid_claude_agent_fields, valid_colors, valid_model_alias, valid_model_id_pattern,
+    valid_tools, valid_tools_sorted,
 };
 use super::yaml_formatting::validate_yaml_formatting_raw;
 
-pub fn validate_agent(
+pub fn validate_agent<S1: BuildHasher, S2: BuildHasher>(
     agent_path: &Path,
     filename: &str,
-    agent_names: &mut HashSet<String>,
-    skill_names: &HashSet<String>,
+    agent_names: &mut HashSet<String, S1>,
+    skill_names: &HashSet<String, S2>,
 ) -> Vec<ValidationCheck> {
     let mut checks: Vec<ValidationCheck> = Vec::new();
 
@@ -116,7 +117,7 @@ fn parse_agent_yaml(frontmatter: &str) -> Result<ClaudeAgentFull, String> {
                     if let Value::Sequence(seq) = val {
                         agent.skills = seq
                             .into_iter()
-                            .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                            .filter_map(|x| x.as_str().map(std::string::ToString::to_string))
                             .collect();
                     }
                 }
@@ -157,7 +158,7 @@ fn validate_field_order(filename: &str, frontmatter: &str) -> Vec<ValidationChec
             return vec![ValidationCheck::failed_msg(
                 format!("Agent: {filename} - Field Order"),
                 format!("Failed to parse YAML for order check: {e}"),
-            )]
+            )];
         }
     };
 
@@ -185,7 +186,12 @@ fn validate_field_order(filename: &str, frontmatter: &str) -> Vec<ValidationChec
     }
 
     let mut checks: Vec<ValidationCheck> = Vec::new();
-    if !out_of_order.is_empty() {
+    if out_of_order.is_empty() {
+        checks.push(ValidationCheck::passed(
+            format!("Agent: {filename} - Field Order"),
+            "Required fields appear before optional fields",
+        ));
+    } else {
         checks.push(ValidationCheck::failed(
             format!("Agent: {filename} - Field Order"),
             format!(
@@ -197,11 +203,6 @@ fn validate_field_order(filename: &str, frontmatter: &str) -> Vec<ValidationChec
                 format_string_slice_owned(&out_of_order)
             ),
             "Required fields must appear before optional fields",
-        ));
-    } else {
-        checks.push(ValidationCheck::passed(
-            format!("Agent: {filename} - Field Order"),
-            "Required fields appear before optional fields",
         ));
     }
 
@@ -301,10 +302,10 @@ fn validate_filename_check(filename: &str, name: &str) -> ValidationCheck {
     )
 }
 
-fn validate_uniqueness(
+fn validate_uniqueness<S: BuildHasher>(
     filename: &str,
     name: &str,
-    agent_names: &HashSet<String>,
+    agent_names: &HashSet<String, S>,
 ) -> ValidationCheck {
     if agent_names.contains(name) {
         return ValidationCheck::failed(
@@ -320,10 +321,10 @@ fn validate_uniqueness(
     )
 }
 
-fn validate_skills_exist(
+fn validate_skills_exist<S: BuildHasher>(
     filename: &str,
     skills: &[String],
-    skill_names: &HashSet<String>,
+    skill_names: &HashSet<String, S>,
 ) -> ValidationCheck {
     let mut missing: Vec<String> = Vec::new();
     for s in skills {
@@ -398,9 +399,9 @@ fn validate_generated_reports_tools(filename: &str, tools: &[String]) -> Validat
     )
 }
 
-pub fn validate_all_agents(
+pub fn validate_all_agents<S: BuildHasher>(
     repo_root: &Path,
-    skill_names: &HashSet<String>,
+    skill_names: &HashSet<String, S>,
 ) -> Vec<ValidationCheck> {
     let agents_dir = repo_root.join(".claude").join("agents");
     let entries = match fs::read_dir(&agents_dir) {
@@ -419,7 +420,7 @@ pub fn validate_all_agents(
     let mut paths: Vec<(std::path::PathBuf, String)> = Vec::new();
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         if !name.ends_with(".md") || name == "README.md" {
@@ -439,7 +440,7 @@ pub fn validate_all_agents(
 
 /// Formats a slice of &str into Go's `%v` for a string slice: `[a b c]`.
 fn format_string_slice(s: &[&str]) -> String {
-    let inner: Vec<String> = s.iter().map(|x| x.to_string()).collect();
+    let inner: Vec<String> = s.iter().map(std::string::ToString::to_string).collect();
     format!("[{}]", inner.join(" "))
 }
 
@@ -453,6 +454,7 @@ fn format_slice(s: &[&str]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::collections::HashSet;
@@ -595,27 +597,33 @@ mod tests {
     fn validate_field_order_passes() {
         let f = "name: foo\ndescription: bar\ntools:\n  - Read\nmodel: sonnet\n";
         let checks = validate_field_order("x.md", f);
-        assert!(checks
-            .iter()
-            .any(|c| c.name.ends_with("Field Order") && c.status == "passed"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.name.ends_with("Field Order") && c.status == "passed")
+        );
     }
 
     #[test]
     fn validate_field_order_fails_required_after_optional() {
         let f = "description: foo\ntools: Read\nname: x\n";
         let checks = validate_field_order("x.md", f);
-        assert!(checks
-            .iter()
-            .any(|c| c.name.ends_with("Field Order") && c.status == "failed"));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.name.ends_with("Field Order") && c.status == "failed")
+        );
     }
 
     #[test]
     fn validate_field_order_warns_unknown_field() {
         let f = "name: x\ndescription: y\nbogus: z\n";
         let checks = validate_field_order("x.md", f);
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "warning" && c.name.contains("Unknown Field: bogus")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "warning" && c.name.contains("Unknown Field: bogus"))
+        );
     }
 
     #[test]

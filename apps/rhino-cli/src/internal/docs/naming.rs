@@ -3,7 +3,7 @@
 use std::path::Path;
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use glob::Pattern;
 use regex::Regex;
 use walkdir::WalkDir;
@@ -17,7 +17,7 @@ pub struct DocsNamingFinding {
 
 fn kebab_case_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^[a-z0-9-]+\.md$").unwrap())
+    RE.get_or_init(|| Regex::new(r"^[a-z0-9-]+\.md$").expect("valid hardcoded regex"))
 }
 
 pub const SKIP_DIRS: &[&str] = &["node_modules", ".git", ".next", "dist", "build", "target"];
@@ -85,9 +85,7 @@ fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
         return true;
     }
     for pat in exempt_globs {
-        let matched = Pattern::new(pat)
-            .map(|p| p.matches(basename))
-            .unwrap_or(false);
+        let matched = Pattern::new(pat).is_ok_and(|p| p.matches(basename));
         if matched {
             return true;
         }
@@ -96,6 +94,7 @@ fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

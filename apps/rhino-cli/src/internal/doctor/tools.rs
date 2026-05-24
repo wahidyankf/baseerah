@@ -2,6 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
+use super::ToolStatus;
 use super::checker::{
     compare_exact, compare_gte, compare_major, compare_major_gte, compare_playwright,
     parse_cargo_llvm_cov, parse_clojure_version, parse_dart_version, parse_docker_version,
@@ -12,7 +13,6 @@ use super::checker::{
     read_java_version, read_node_version, read_npm_version, read_python_version, read_rust_version,
     read_tool_versions_entry,
 };
-use super::ToolStatus;
 
 /// Single installation step.
 pub struct InstallStep {
@@ -304,7 +304,9 @@ fn install_elixir(req: &str, _platform: &str) -> Vec<InstallStep> {
         command: "bash".into(),
         args: vec![
             "-c".into(),
-            format!("asdf plugin add elixir 2>/dev/null; asdf install elixir {req} && asdf global elixir {req}"),
+            format!(
+                "asdf plugin add elixir 2>/dev/null; asdf install elixir {req} && asdf global elixir {req}"
+            ),
         ],
     }]
 }
@@ -315,7 +317,9 @@ fn install_erlang(req: &str, _platform: &str) -> Vec<InstallStep> {
         command: "bash".into(),
         args: vec![
             "-c".into(),
-            format!("asdf plugin add erlang 2>/dev/null; asdf install erlang {req} && asdf global erlang {req}"),
+            format!(
+                "asdf plugin add erlang 2>/dev/null; asdf install erlang {req} && asdf global erlang {req}"
+            ),
         ],
     }]
 }
@@ -455,7 +459,15 @@ fn install_playwright(_req: &str, platform: &str) -> Vec<InstallStep> {
 pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
     // PATHS is a OnceLock — only set once per process. Tests use isolated runners.
     set_paths(repo_root);
+    let mut defs = tool_defs_core();
+    defs.extend(tool_defs_jvm_and_go());
+    defs.extend(tool_defs_scripting_and_beam());
+    defs.extend(tool_defs_dotnet_and_mobile());
+    defs.extend(tool_defs_infra());
+    defs
+}
 
+fn tool_defs_core() -> Vec<ToolDef> {
     vec![
         ToolDef {
             name: "git".into(),
@@ -501,6 +513,11 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
             read_req: read_npm_v,
             install_cmd: Some(install_npm),
         },
+    ]
+}
+
+fn tool_defs_jvm_and_go() -> Vec<ToolDef> {
+    vec![
         ToolDef {
             name: "java".into(),
             binary: "java".into(),
@@ -534,6 +551,11 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
             read_req: read_go_v,
             install_cmd: Some(install_golang),
         },
+    ]
+}
+
+fn tool_defs_scripting_and_beam() -> Vec<ToolDef> {
+    vec![
         ToolDef {
             name: "python".into(),
             binary: "python3".into(),
@@ -593,6 +615,11 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
             read_req: read_erlang_v,
             install_cmd: Some(install_erlang),
         },
+    ]
+}
+
+fn tool_defs_dotnet_and_mobile() -> Vec<ToolDef> {
+    vec![
         ToolDef {
             name: "dotnet".into(),
             binary: "dotnet".into(),
@@ -637,6 +664,11 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
             read_req: read_flutter_v,
             install_cmd: Some(install_flutter),
         },
+    ]
+}
+
+fn tool_defs_infra() -> Vec<ToolDef> {
+    vec![
         ToolDef {
             name: "docker".into(),
             binary: "docker".into(),
@@ -685,6 +717,7 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

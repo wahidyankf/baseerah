@@ -1,6 +1,6 @@
 // Port of `apps/rhino-cli/cmd/specs_validate_adoption.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::allowlist::apps_with_ddd;
@@ -61,6 +61,7 @@ pub fn run_at_root(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

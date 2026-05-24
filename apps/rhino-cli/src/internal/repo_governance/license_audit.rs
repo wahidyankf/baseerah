@@ -31,8 +31,7 @@ pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding
             Err(e) => {
                 let is_not_found = e
                     .downcast_ref::<std::io::Error>()
-                    .map(|io| io.kind() == std::io::ErrorKind::NotFound)
-                    .unwrap_or(false);
+                    .is_some_and(|io| io.kind() == std::io::ErrorKind::NotFound);
                 if is_not_found {
                     findings.push(LicenseFinding {
                         path: rel.clone(),
@@ -71,9 +70,8 @@ pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding
         if !owned_by_license_audit(&normalised) {
             continue;
         }
-        let identified = match license_by_dir.get(&normalised) {
-            Some(v) => v,
-            None => continue,
+        let Some(identified) = license_by_dir.get(&normalised) else {
+            continue;
         };
         if !licenses_equal(identified, &claim.license) {
             findings.push(LicenseFinding {
@@ -128,7 +126,7 @@ fn read_non_hidden_dirs(dir: &Path) -> std::result::Result<Vec<String>, Error> {
     };
     let mut names = Vec::new();
     for entry in entries.flatten() {
-        if !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if !entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         let name = entry.file_name().to_string_lossy().to_string();
@@ -207,16 +205,16 @@ fn parse_licensing_notice(path: &Path) -> std::result::Result<Vec<LicenseClaim>,
     let data = fs::read_to_string(path)?;
     let lines: Vec<&str> = data.split('\n').collect();
     let mut claims = Vec::new();
-    let mut path_col: i64 = -1;
-    let mut license_col: i64 = -1;
+    let mut path_col: Option<usize> = None;
+    let mut license_col: Option<usize> = None;
     let mut in_table = false;
 
     let mut i = 0;
     while i < lines.len() {
         let line = lines[i].trim();
         if !line.starts_with('|') {
-            path_col = -1;
-            license_col = -1;
+            path_col = None;
+            license_col = None;
             in_table = false;
             i += 1;
             continue;
@@ -235,18 +233,22 @@ fn parse_licensing_notice(path: &Path) -> std::result::Result<Vec<LicenseClaim>,
             let (pc, lc) = find_columns(&cells);
             path_col = pc;
             license_col = lc;
-            if path_col >= 0 && license_col >= 0 {
+            if path_col.is_some() && license_col.is_some() {
                 in_table = true;
             }
             i += 2; // skip header + separator
             continue;
         }
-        if (path_col as usize) >= cells.len() || (license_col as usize) >= cells.len() {
+        let (Some(pc), Some(lc)) = (path_col, license_col) else {
+            i += 1;
+            continue;
+        };
+        if pc >= cells.len() || lc >= cells.len() {
             i += 1;
             continue;
         }
-        let raw_path = cells[path_col as usize].trim();
-        let raw_license = cells[license_col as usize].trim();
+        let raw_path = cells[pc].trim();
+        let raw_license = cells[lc].trim();
         if raw_path.is_empty() || raw_license.is_empty() {
             i += 1;
             continue;
@@ -311,17 +313,17 @@ fn is_markdown_table_separator(line: &str) -> bool {
     true
 }
 
-fn find_columns(cells: &[String]) -> (i64, i64) {
-    let mut path_col: i64 = -1;
-    let mut license_col: i64 = -1;
+fn find_columns(cells: &[String]) -> (Option<usize>, Option<usize>) {
+    let mut path_col: Option<usize> = None;
+    let mut license_col: Option<usize> = None;
     for (i, c) in cells.iter().enumerate() {
         let h = c.trim().to_lowercase();
         match h.as_str() {
-            "path" | "directory" if path_col == -1 => {
-                path_col = i as i64;
+            "path" | "directory" if path_col.is_none() => {
+                path_col = Some(i);
             }
-            "license" if license_col == -1 => {
-                license_col = i as i64;
+            "license" if license_col.is_none() => {
+                license_col = Some(i);
             }
             _ => {}
         }
@@ -366,6 +368,7 @@ fn licenses_equal(identified: &str, claim: &str) -> bool {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;
@@ -406,9 +409,11 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         fs::create_dir_all(tmp.path().join("apps/foo")).unwrap();
         let findings = audit_license(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == "missing-license" && f.path == "apps/foo"));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == "missing-license" && f.path == "apps/foo")
+        );
     }
 
     #[test]
@@ -486,7 +491,7 @@ mod tests {
             "Notes".to_string(),
         ];
         let (p, l) = find_columns(&cells);
-        assert_eq!(p, 0);
-        assert_eq!(l, 1);
+        assert_eq!(p, Some(0));
+        assert_eq!(l, Some(1));
     }
 }

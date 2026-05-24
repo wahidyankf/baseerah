@@ -1,11 +1,11 @@
 // Port of `apps/rhino-cli/cmd/docs_validate_links.go`.
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::docs::links::{
-    format_link_json, format_link_markdown, format_link_text, validate_all_links, ScanOptions,
+    ScanOptions, format_link_json, format_link_markdown, format_link_text, validate_all_links,
 };
 use crate::internal::gitutil;
 

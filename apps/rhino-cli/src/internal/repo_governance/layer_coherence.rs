@@ -27,13 +27,17 @@ const README_PATH: &str = "repo-governance/README.md";
 
 fn bold_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\*\*Layer (\d+):\s*([A-Za-z][A-Za-z0-9 -]+?)\*\*").unwrap())
+    RE.get_or_init(|| {
+        Regex::new(r"\*\*Layer (\d+):\s*([A-Za-z][A-Za-z0-9 -]+?)\*\*")
+            .expect("valid hardcoded regex")
+    })
 }
 
 fn head_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"(?m)^##\s+Layer (\d+):\s*([A-Za-z][A-Za-z0-9 -]+?)\s*\(").unwrap()
+        Regex::new(r"(?m)^##\s+Layer (\d+):\s*([A-Za-z][A-Za-z0-9 -]+?)\s*\(")
+            .expect("valid hardcoded regex")
     })
 }
 
@@ -177,7 +181,10 @@ fn check_numbering_gap(
     if seen.is_empty() {
         return Vec::new();
     }
-    let max = *seen.iter().max().unwrap();
+    let max = *seen
+        .iter()
+        .max()
+        .expect("seen is non-empty — is_empty() check above guards this");
     let mut findings = Vec::new();
     for i in 0..=max {
         if !seen.contains(&i) {
@@ -195,6 +202,7 @@ fn check_numbering_gap(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;
@@ -229,9 +237,11 @@ mod tests {
             "**Layer 0: Vision**\n",
         );
         let findings = audit_layer_coherence(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_INTRA_FILE_NAME_CONFLICT));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_INTRA_FILE_NAME_CONFLICT)
+        );
     }
 
     #[test]
@@ -243,9 +253,11 @@ mod tests {
             "**Layer 0: Vision**\n",
         );
         let findings = audit_layer_coherence(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_CROSS_FILE_NUMBER_MISMATCH));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_CROSS_FILE_NUMBER_MISMATCH)
+        );
     }
 
     #[test]
@@ -253,9 +265,11 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         write_docs(&tmp, "## Layer 0: Vision (x)\n", "**Layer 0: Mission**\n");
         let findings = audit_layer_coherence(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_CROSS_FILE_NAME_MISMATCH));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_CROSS_FILE_NAME_MISMATCH)
+        );
     }
 
     #[test]
@@ -267,9 +281,11 @@ mod tests {
             "**Layer 0: Vision**\n**Layer 2: Conventions**\n",
         );
         let findings = audit_layer_coherence(tmp.path()).unwrap();
-        assert!(findings
-            .iter()
-            .any(|f| f.kind == KIND_NUMBERING_GAP && f.message.contains("Layer 1")));
+        assert!(
+            findings
+                .iter()
+                .any(|f| f.kind == KIND_NUMBERING_GAP && f.message.contains("Layer 1"))
+        );
     }
 
     #[test]

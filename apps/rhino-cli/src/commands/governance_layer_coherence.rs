@@ -2,14 +2,14 @@
 
 use std::fmt::Write as _;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 use crate::internal::repo_governance::layer_coherence::{
-    audit_layer_coherence, LayerCoherenceFinding,
+    LayerCoherenceFinding, audit_layer_coherence,
 };
 
 const SCHEMA: &str = "rhino-cli/layer-coherence/v1";
@@ -134,6 +134,7 @@ fn format_markdown(findings: &[LayerCoherenceFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

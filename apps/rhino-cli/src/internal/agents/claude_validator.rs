@@ -12,16 +12,16 @@ pub fn validate_claude(opts: &ValidateClaudeOptions) -> ValidationResult {
     let mut result = ValidationResult::default();
 
     let skill_names;
-    if !opts.agents_only {
+    if opts.agents_only {
+        // agents-only — still need skill names for skills-exist validation
+        let (_, names) = validate_all_skills(&opts.repo_root);
+        skill_names = names;
+    } else {
         let (skill_checks, names) = validate_all_skills(&opts.repo_root);
         skill_names = names;
         for check in skill_checks {
             result.tally(check);
         }
-    } else {
-        // agents-only — still need skill names for skills-exist validation
-        let (_, names) = validate_all_skills(&opts.repo_root);
-        skill_names = names;
     }
 
     if !opts.skills_only {
@@ -36,6 +36,7 @@ pub fn validate_claude(opts: &ValidateClaudeOptions) -> ValidationResult {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;

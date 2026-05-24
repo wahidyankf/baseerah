@@ -12,13 +12,13 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 
 use crate::internal::agents::claude_validator::validate_claude;
-use crate::internal::agents::sync::{sync_all, SyncOptions};
+use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::agents::sync_validator::validate_sync;
 use crate::internal::agents::types::ValidateClaudeOptions;
-use crate::internal::docs::links::{validate_all_links, ScanOptions};
+use crate::internal::docs::links::{ScanOptions, validate_all_links};
 
 const STEP_TIMEOUT: Duration = Duration::from_secs(30);
 const TOTAL_TIMEOUT: Duration = Duration::from_secs(120);
@@ -88,7 +88,10 @@ pub fn get_staged_files(git_root: &Path) -> Result<Vec<String>, Error> {
     if trimmed.is_empty() {
         return Ok(Vec::new());
     }
-    Ok(trimmed.split('\n').map(|s| s.to_string()).collect())
+    Ok(trimmed
+        .split('\n')
+        .map(std::string::ToString::to_string)
+        .collect())
 }
 
 pub fn run(deps: &mut Deps) -> Result<(), Error> {
@@ -257,7 +260,7 @@ fn step3_nx_pre_commit(git_root: &Path, deps: &mut Deps) {
         .arg("--skip-nx-cache")
         .current_dir(git_root)
         .status();
-    if r.is_err() || !r.as_ref().map(|s| s.success()).unwrap_or(false) {
+    if !r.is_ok_and(|s| s.success()) {
         let _ = writeln!(
             deps.stdout,
             "\u{26A0}\u{FE0F}  Skipping run-pre-commit (not affected or binary missing)"
@@ -384,6 +387,7 @@ fn _unused() {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -531,7 +535,9 @@ mod tests {
             stdout: Box::new(Vec::<u8>::new()),
             stderr: Box::new(Vec::<u8>::new()),
         };
-        let past = Instant::now() - Duration::from_secs(200);
+        let past = Instant::now()
+            .checked_sub(Duration::from_secs(200))
+            .unwrap();
         let r: Result<(), Error> = run_with_step_timeout(past, "test", &mut deps, |_| Ok(()));
         assert!(r.is_ok());
     }

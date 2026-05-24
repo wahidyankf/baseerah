@@ -1,12 +1,12 @@
 // Port of `apps/rhino-cli/cmd/ddd_bc.go` + `ddd_runner.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::bcregistry;
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::severity::{resolve, Severity};
+use crate::internal::severity::{Severity, resolve};
 
 #[derive(Args, Debug)]
 pub struct DddBcArgs {
@@ -55,6 +55,7 @@ pub fn run_at_root(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 
@@ -75,7 +76,7 @@ mod tests {
         let mut err: Vec<u8> = Vec::new();
         let args = DddBcArgs {
             app: "missing".to_string(),
-            severity: "".to_string(),
+            severity: String::new(),
         };
         assert!(run_at_root(dir.path(), &args, &mut out, &mut err).is_err());
     }

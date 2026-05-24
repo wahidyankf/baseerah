@@ -2,11 +2,11 @@
 
 use std::fmt::Write as _;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::internal::agents::detect_duplication::{detect_duplication, DuplicationFinding};
+use crate::internal::agents::detect_duplication::{DuplicationFinding, detect_duplication};
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 
@@ -119,7 +119,11 @@ fn format_markdown(findings: &[DuplicationFinding]) -> String {
     sb.push_str("|----------|--------|-------|-------------|---------|\n");
     for f in findings {
         let files = f.files.join("<br>");
-        let starts: Vec<String> = f.start_lines.iter().map(|s| s.to_string()).collect();
+        let starts: Vec<String> = f
+            .start_lines
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect();
         let _ = writeln!(
             sb,
             "| {} | {} | {} | {} | {} |",
@@ -134,6 +138,7 @@ fn format_markdown(findings: &[DuplicationFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

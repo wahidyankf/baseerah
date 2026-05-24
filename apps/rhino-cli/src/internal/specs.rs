@@ -28,9 +28,8 @@ pub fn required_spec_folders() -> &'static [&'static str] {
 
 pub fn walk_feature_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
-    let entries = match fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return out,
+    let Ok(entries) = fs::read_dir(dir) else {
+        return out;
     };
     let mut items: Vec<std::path::PathBuf> = entries.flatten().map(|e| e.path()).collect();
     items.sort();
@@ -41,8 +40,7 @@ pub fn walk_feature_files(dir: &Path) -> Vec<PathBuf> {
         }
         if p.file_name()
             .and_then(|s| s.to_str())
-            .map(|s| s.to_lowercase().ends_with(".feature"))
-            .unwrap_or(false)
+            .is_some_and(|s| s.to_lowercase().ends_with(".feature"))
         {
             out.push(p);
         }
@@ -52,9 +50,8 @@ pub fn walk_feature_files(dir: &Path) -> Vec<PathBuf> {
 
 pub fn walk_md_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
-    let entries = match fs::read_dir(dir) {
-        Ok(e) => e,
-        Err(_) => return out,
+    let Ok(entries) = fs::read_dir(dir) else {
+        return out;
     };
     let mut items: Vec<std::path::PathBuf> = entries.flatten().map(|e| e.path()).collect();
     items.sort();
@@ -65,8 +62,7 @@ pub fn walk_md_files(dir: &Path) -> Vec<PathBuf> {
         }
         if p.file_name()
             .and_then(|s| s.to_str())
-            .map(|s| s.to_lowercase().ends_with(".md"))
-            .unwrap_or(false)
+            .is_some_and(|s| s.to_lowercase().ends_with(".md"))
         {
             out.push(p);
         }
@@ -183,7 +179,7 @@ pub fn validate_spec_counts(repo_root: &Path, folder: &str) -> Vec<SpecFinding> 
 
 fn markdown_link_re() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"\[([^\]]*)\]\(([^)]+)\)").unwrap())
+    R.get_or_init(|| Regex::new(r"\[([^\]]*)\]\(([^)]+)\)").expect("valid hardcoded regex"))
 }
 
 pub fn validate_spec_links(repo_root: &Path, folder: &str) -> Vec<SpecFinding> {
@@ -206,9 +202,8 @@ pub fn validate_spec_links(repo_root: &Path, folder: &str) -> Vec<SpecFinding> {
     let md_files = walk_md_files(&abs);
     let re = markdown_link_re();
     for md in &md_files {
-        let content = match fs::read(md) {
-            Ok(c) => c,
-            Err(_) => continue,
+        let Ok(content) = fs::read(md) else {
+            continue;
         };
         let s = String::from_utf8_lossy(&content);
         for cap in re.captures_iter(&s) {
@@ -294,9 +289,8 @@ pub fn validate_spec_gherkin_domains(repo_root: &Path, app: &str) -> Vec<SpecFin
     if !behavior.exists() {
         return findings;
     }
-    let surfaces = match fs::read_dir(&behavior) {
-        Ok(e) => e,
-        Err(_) => return findings,
+    let Ok(surfaces) = fs::read_dir(&behavior) else {
+        return findings;
     };
     for surface_entry in surfaces.flatten() {
         let surface_path = surface_entry.path();
@@ -307,17 +301,15 @@ pub fn validate_spec_gherkin_domains(repo_root: &Path, app: &str) -> Vec<SpecFin
         if !gherkin.exists() {
             continue;
         }
-        let gherkin_entries = match fs::read_dir(&gherkin) {
-            Ok(e) => e,
-            Err(_) => continue,
+        let Ok(gherkin_entries) = fs::read_dir(&gherkin) else {
+            continue;
         };
         for entry in gherkin_entries.flatten() {
             let p = entry.path();
             if p.is_file()
                 && p.file_name()
                     .and_then(|s| s.to_str())
-                    .map(|s| s.to_lowercase().ends_with(".feature"))
-                    .unwrap_or(false)
+                    .is_some_and(|s| s.to_lowercase().ends_with(".feature"))
             {
                 let rel = pathdiff_starts_with(&p, repo_root);
                 findings.push(SpecFinding {
@@ -338,6 +330,7 @@ pub fn validate_spec_gherkin_domains(repo_root: &Path, app: &str) -> Vec<SpecFin
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;

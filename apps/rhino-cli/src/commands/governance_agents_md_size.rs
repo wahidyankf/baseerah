@@ -1,13 +1,13 @@
 // Port of `apps/rhino-cli/cmd/governance_agents_md_size.go`.
 // Text/JSON/Markdown output formats matching Go byte-for-byte.
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
-use crate::internal::repo_governance::agents_md_size::{check_agents_md_size, AgentsMdSizeFinding};
+use crate::internal::repo_governance::agents_md_size::{AgentsMdSizeFinding, check_agents_md_size};
 
 const SCHEMA: &str = "rhino-cli/agents-md-size/v1";
 

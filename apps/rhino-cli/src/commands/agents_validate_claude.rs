@@ -1,6 +1,6 @@
 // Port of `apps/rhino-cli/cmd/agents_validate_claude.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::agents::claude_validator::validate_claude;

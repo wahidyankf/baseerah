@@ -4,7 +4,7 @@
 
 use std::fs;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use serde::Deserialize;
 
 use super::types::{FileResult, Format, Result as CoverageResult};
@@ -34,7 +34,7 @@ pub(crate) struct JacocoSourceFile {
 #[derive(Debug, Deserialize)]
 pub(crate) struct JacocoLine {
     #[serde(rename = "@nr", default)]
-    pub _nr: i64,
+    pub nr: i64,
     #[serde(rename = "@mi", default)]
     pub _mi: i64,
     #[serde(rename = "@ci", default)]
@@ -42,7 +42,7 @@ pub(crate) struct JacocoLine {
     #[serde(rename = "@mb", default)]
     pub mb: i64,
     #[serde(rename = "@cb", default)]
-    pub _cb: i64,
+    pub cb: i64,
 }
 
 pub(crate) fn parse_jacoco(filename: &str) -> std::result::Result<JacocoReport, Error> {
@@ -122,6 +122,7 @@ pub fn compute_jacoco_result(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

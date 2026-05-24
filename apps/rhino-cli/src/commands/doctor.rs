@@ -1,12 +1,12 @@
 // Port of `apps/rhino-cli/cmd/doctor.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::doctor::{
-    self, check_all, fix_all, format_fix_summary, format_json, format_markdown, format_text,
-    CheckOptions, FixOptions, Scope,
+    self, CheckOptions, FixOptions, Scope, check_all, fix_all, format_fix_summary, format_json,
+    format_markdown, format_text,
 };
 use crate::internal::gitutil;
 

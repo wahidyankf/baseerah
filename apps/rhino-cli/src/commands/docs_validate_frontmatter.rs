@@ -3,13 +3,13 @@
 use std::fmt::Write as _;
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::docs::frontmatter::{
-    count_severity, has_fail_findings, validate_docs_frontmatter, DocsFrontmatterFinding,
+    DocsFrontmatterFinding, count_severity, has_fail_findings, validate_docs_frontmatter,
 };
 use crate::internal::gitutil;
 
@@ -53,10 +53,13 @@ pub fn run(
 ) -> std::result::Result<(), Error> {
     let repo_root =
         gitutil::find_git_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
-    let rel_paths: Vec<String> = if !args.positional.is_empty() {
-        args.positional.clone()
+    let rel_paths: Vec<String> = if args.positional.is_empty() {
+        DEFAULT_PATHS
+            .iter()
+            .map(std::string::ToString::to_string)
+            .collect()
     } else {
-        DEFAULT_PATHS.iter().map(|s| s.to_string()).collect()
+        args.positional.clone()
     };
     let full_paths: Vec<String> = rel_paths
         .iter()
@@ -179,6 +182,7 @@ fn format_markdown(findings: &[DocsFrontmatterFinding]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

@@ -9,7 +9,7 @@ use serde_norway::Value;
 
 use super::frontmatter::extract_frontmatter;
 use super::types::{
-    valid_claude_skill_fields, valid_skill_name_pattern, ClaudeSkill, ValidationCheck,
+    ClaudeSkill, ValidationCheck, valid_claude_skill_fields, valid_skill_name_pattern,
 };
 use super::yaml_formatting::validate_yaml_formatting_raw;
 
@@ -77,6 +77,17 @@ pub fn validate_skill(skill_path: &Path, skill_name: &str) -> Vec<ValidationChec
         }
     };
 
+    checks.extend(validate_skill_fields(&skill, &frontmatter_str, skill_name));
+    checks
+}
+
+fn validate_skill_fields(
+    skill: &ClaudeSkill,
+    frontmatter_str: &str,
+    skill_name: &str,
+) -> Vec<ValidationCheck> {
+    let mut checks: Vec<ValidationCheck> = Vec::new();
+
     if skill.description.is_empty() {
         checks.push(ValidationCheck::failed(
             format!("Skill: {skill_name} - Description Field Required"),
@@ -134,7 +145,7 @@ pub fn validate_skill(skill_path: &Path, skill_name: &str) -> Vec<ValidationChec
     ));
 
     #[allow(clippy::collapsible_if)]
-    if let Ok(Value::Mapping(m)) = serde_norway::from_str::<Value>(&frontmatter_str) {
+    if let Ok(Value::Mapping(m)) = serde_norway::from_str::<Value>(frontmatter_str) {
         let allow = valid_claude_skill_fields();
         for (k, _) in m {
             if let Some(key) = k.as_str() {
@@ -193,7 +204,7 @@ pub fn validate_all_skills(repo_root: &Path) -> (Vec<ValidationCheck>, HashSet<S
     let mut dirs: Vec<(std::path::PathBuf, String)> = Vec::new();
     for entry in entries.flatten() {
         let name = entry.file_name().to_string_lossy().into_owned();
-        if !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if !entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         if name.starts_with('.') {
@@ -216,6 +227,7 @@ pub fn validate_all_skills(repo_root: &Path) -> (Vec<ValidationCheck>, HashSet<S
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -261,9 +273,11 @@ mod tests {
             "---\nname: other-name\ndescription: ok\n---\n",
         );
         let checks = validate_skill(&skill_dir, "dir-name");
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.name.contains("Name Match")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.name.contains("Name Match"))
+        );
     }
 
     #[test]
@@ -276,9 +290,11 @@ mod tests {
             "---\nname: Bad_Name\ndescription: ok\n---\n",
         );
         let checks = validate_skill(&skill_dir, "Bad_Name");
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.name.contains("Name Format")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.name.contains("Name Format"))
+        );
     }
 
     #[test]
@@ -288,9 +304,11 @@ mod tests {
         std::fs::create_dir_all(&skill_dir).unwrap();
         write(&skill_dir.join("SKILL.md"), "---\nname: no-desc\n---\n");
         let checks = validate_skill(&skill_dir, "no-desc");
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.name.contains("Description Field Required")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.name.contains("Description Field Required"))
+        );
     }
 
     #[test]
@@ -300,9 +318,11 @@ mod tests {
         std::fs::create_dir_all(&skill_dir).unwrap();
         write(&skill_dir.join("SKILL.md"), "---\ndescription: ok\n---\n");
         let checks = validate_skill(&skill_dir, "no-name");
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.name.contains("Name Field Required")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.name.contains("Name Field Required"))
+        );
     }
 
     #[test]
@@ -315,9 +335,11 @@ mod tests {
             "---\nname: with-unknown\ndescription: ok\nbogus: yes\n---\n",
         );
         let checks = validate_skill(&skill_dir, "with-unknown");
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "warning" && c.name.contains("Unknown Field: bogus")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "warning" && c.name.contains("Unknown Field: bogus"))
+        );
     }
 
     #[test]
@@ -358,8 +380,10 @@ mod tests {
             "---\nname:bad\ndescription: ok\n---\n",
         );
         let checks = validate_skill(&skill_dir, "bad");
-        assert!(checks
-            .iter()
-            .any(|c| c.status == "failed" && c.name.contains("YAML Formatting")));
+        assert!(
+            checks
+                .iter()
+                .any(|c| c.status == "failed" && c.name.contains("YAML Formatting"))
+        );
     }
 }

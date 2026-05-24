@@ -1,10 +1,10 @@
 // Port of `apps/rhino-cli/cmd/git_pre_commit.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
-use crate::internal::git::{run, Deps};
+use crate::internal::git::{Deps, run};
 use crate::internal::gitutil;
 
 #[derive(Args, Debug)]

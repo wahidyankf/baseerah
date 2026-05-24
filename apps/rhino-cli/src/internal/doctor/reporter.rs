@@ -43,10 +43,12 @@ fn rfc3339_now() -> String {
 
 /// Mirror Go's `d.Round(time.Millisecond)` formatted with `%v`.
 fn format_go_duration_ms_rounded(d: std::time::Duration) -> String {
-    let nanos_total = d.as_nanos() as i128;
+    let nanos_total = i128::try_from(d.as_nanos()).expect("nanos fit in i128");
     // Banker-free half-up rounding to the nearest millisecond, like Go's time.Duration.Round.
     let ms_rounded = (nanos_total + 500_000) / 1_000_000;
-    let rounded = std::time::Duration::from_nanos((ms_rounded * 1_000_000) as u64);
+    let rounded = std::time::Duration::from_nanos(
+        u64::try_from(ms_rounded * 1_000_000).expect("rounded nanos fit in u64"),
+    );
     crate::internal::agents::reporter::format_go_duration(rounded)
 }
 
@@ -138,7 +140,7 @@ pub fn format_json(result: &DoctorResult) -> anyhow::Result<String> {
         ok_count: result.ok_count,
         warn_count: result.warn_count,
         missing_count: result.missing_count,
-        duration_ms: result.duration.as_millis() as u64,
+        duration_ms: u64::try_from(result.duration.as_millis()).expect("duration fits in u64"),
         tools,
     };
     Ok(serde_json::to_string_pretty(&out)?)
@@ -157,7 +159,7 @@ pub fn format_markdown(result: &DoctorResult) -> String {
     let _ = writeln!(sb, "| OK | {} |", result.ok_count);
     let _ = writeln!(sb, "| Warning | {} |", result.warn_count);
     let _ = writeln!(sb, "| Missing | {} |", result.missing_count);
-    let _ = writeln!(sb, "| Total | {} |", total);
+    let _ = writeln!(sb, "| Total | {total} |");
     sb.push('\n');
 
     sb.push_str("### Tools\n\n");
@@ -183,6 +185,7 @@ pub fn format_markdown(result: &DoctorResult) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::time::Duration;
@@ -195,7 +198,7 @@ mod tests {
                     binary: "git".into(),
                     status: ToolStatus::Ok,
                     installed_version: "2.42.0".into(),
-                    required_version: "".into(),
+                    required_version: String::new(),
                     source: "(no config file)".into(),
                     note: "no version requirement".into(),
                 },
@@ -212,9 +215,9 @@ mod tests {
                     name: "ghost".into(),
                     binary: "ghost".into(),
                     status: ToolStatus::Missing,
-                    installed_version: "".into(),
-                    required_version: "".into(),
-                    source: "".into(),
+                    installed_version: String::new(),
+                    required_version: String::new(),
+                    source: String::new(),
                     note: "not found in PATH".into(),
                 },
             ],

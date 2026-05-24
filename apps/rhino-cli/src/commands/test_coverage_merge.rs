@@ -1,12 +1,12 @@
 // Port of `apps/rhino-cli/cmd/test_coverage_merge.go`.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 use crate::internal::testcoverage::merge::{
-    merge_coverage_maps, result_from_coverage_map, to_coverage_map, write_lcov, CoverageMap,
+    CoverageMap, merge_coverage_maps, result_from_coverage_map, to_coverage_map, write_lcov,
 };
 use crate::internal::testcoverage::{exclude::matches_any_exclude_pattern, reporter};
 
@@ -104,8 +104,8 @@ mod tests {
     fn args_default_values() {
         let _ = MergeArgs {
             files: vec!["a".into(), "b".into()],
-            out_file: "".into(),
-            validate: "".into(),
+            out_file: String::new(),
+            validate: String::new(),
             exclude: vec![],
             verbose: false,
             quiet: false,

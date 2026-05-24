@@ -3,7 +3,7 @@
 use std::fs;
 use std::path::Path;
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 use walkdir::WalkDir;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -111,16 +111,13 @@ fn scan_frontmatter_file(
     area: DocArea,
 ) -> std::result::Result<Vec<DocsFrontmatterFinding>, Error> {
     let data = fs::read_to_string(path)?;
-    let frontmatter = match extract_frontmatter(&data) {
-        Some(fm) => fm,
-        None => {
-            return Ok(vec![DocsFrontmatterFinding {
-                file: path.to_string(),
-                severity: SEVERITY_FAIL.to_string(),
-                kind: KIND_MISSING_FRONTMATTER.to_string(),
-                message: "file has no YAML frontmatter (delimited by `---` fences)".to_string(),
-            }]);
-        }
+    let Some(frontmatter) = extract_frontmatter(&data) else {
+        return Ok(vec![DocsFrontmatterFinding {
+            file: path.to_string(),
+            severity: SEVERITY_FAIL.to_string(),
+            kind: KIND_MISSING_FRONTMATTER.to_string(),
+            message: "file has no YAML frontmatter (delimited by `---` fences)".to_string(),
+        }]);
     };
     let parsed: serde_norway::Value = match serde_norway::from_str(&frontmatter) {
         Ok(v) => v,
@@ -169,13 +166,7 @@ fn validate_software_schema(path: &str, fm: &serde_norway::Value) -> Vec<DocsFro
             "required field \"description\" is missing or empty",
         ));
     }
-    if !has_non_empty_string(fm, "category") {
-        findings.push(mk_fail(
-            path,
-            KIND_MISSING_CATEGORY,
-            "required field \"category\" is missing or empty",
-        ));
-    } else {
+    if has_non_empty_string(fm, "category") {
         let v = string_value(fm.get("category"));
         if VALID_CATEGORIES.contains(&v.as_str()) {
             // ok
@@ -196,6 +187,12 @@ fn validate_software_schema(path: &str, fm: &serde_norway::Value) -> Vec<DocsFro
                 ),
             });
         }
+    } else {
+        findings.push(mk_fail(
+            path,
+            KIND_MISSING_CATEGORY,
+            "required field \"category\" is missing or empty",
+        ));
     }
     if !has_non_empty_string(fm, "subcategory") {
         findings.push(mk_fail(
@@ -251,8 +248,7 @@ fn has_non_empty_string(fm: &serde_norway::Value, key: &str) -> bool {
 
 fn string_value(v: Option<&serde_norway::Value>) -> String {
     match v {
-        None => String::new(),
-        Some(serde_norway::Value::Null) => String::new(),
+        None | Some(serde_norway::Value::Null) => String::new(),
         Some(serde_norway::Value::String(s)) => s.clone(),
         Some(serde_norway::Value::Bool(b)) => b.to_string(),
         Some(serde_norway::Value::Number(n)) => n.to_string(),
@@ -279,6 +275,7 @@ pub fn count_severity(findings: &[DocsFrontmatterFinding], sev: &str) -> usize {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;
@@ -312,7 +309,8 @@ mod tests {
     fn software_full_schema_passes() {
         let tmp = TempDir::new().unwrap();
         write(
-            &tmp.path().join("docs/explanation/software-engineering/foo.md"),
+            &tmp.path()
+                .join("docs/explanation/software-engineering/foo.md"),
             "---\ntitle: T\ndescription: D\ncategory: explanation\nsubcategory: S\ntags: [a]\n---\nbody\n",
         );
         let findings =
@@ -341,7 +339,8 @@ mod tests {
     fn software_deprecated_category_emits_warn() {
         let tmp = TempDir::new().unwrap();
         write(
-            &tmp.path().join("docs/explanation/software-engineering/foo.md"),
+            &tmp.path()
+                .join("docs/explanation/software-engineering/foo.md"),
             "---\ntitle: T\ndescription: D\ncategory: software\nsubcategory: S\ntags: [a]\n---\nbody\n",
         );
         let findings =
@@ -357,7 +356,8 @@ mod tests {
     fn software_wrong_category_emits_fail() {
         let tmp = TempDir::new().unwrap();
         write(
-            &tmp.path().join("docs/explanation/software-engineering/foo.md"),
+            &tmp.path()
+                .join("docs/explanation/software-engineering/foo.md"),
             "---\ntitle: T\ndescription: D\ncategory: random\nsubcategory: S\ntags: [a]\n---\nbody\n",
         );
         let findings =

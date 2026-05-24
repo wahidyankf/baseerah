@@ -1,7 +1,7 @@
 // Sealed OutputFormat enum. Mirrors `apps/rhino-cli/internal/cliout/format.go`
 // — same canonical codes, same "" → Text default, same error string on unknown.
 
-use anyhow::{anyhow, Error};
+use anyhow::{Error, anyhow};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OutputFormat {
@@ -35,6 +35,7 @@ impl OutputFormat {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

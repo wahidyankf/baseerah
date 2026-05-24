@@ -9,7 +9,7 @@ mod tools;
 use std::time::Duration;
 
 pub use checker::{check_all, real_runner};
-pub use fixer::{fix_all, format_fix_summary, FixOptions, FixResult};
+pub use fixer::{FixOptions, FixResult, fix_all, format_fix_summary};
 pub use reporter::{format_json, format_markdown, format_text};
 
 /// Health status of a tool check.

@@ -5,7 +5,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use serde_norway::Value;
 
 use crate::internal::severity::Severity;
@@ -113,7 +113,7 @@ pub fn load(repo_root: &Path, app: &str) -> Result<Registry, Error> {
             path.display()
         ));
     }
-    for ctx in reg.contexts.iter_mut() {
+    for ctx in &mut reg.contexts {
         if ctx.code.is_empty() {
             return Err(anyhow!(
                 "registry for app \"{app}\" context \"{}\" has empty code list at {}",
@@ -317,7 +317,7 @@ fn check_layers_at_path(
     };
     let mut actual: HashMap<String, bool> = HashMap::new();
     for entry in entries.flatten() {
-        if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if entry.file_type().is_ok_and(|t| t.is_dir()) {
             actual.insert(entry.file_name().to_string_lossy().into_owned(), true);
         }
     }
@@ -379,7 +379,7 @@ fn check_gherkin(repo_root: &Path, ctx: &BcContext, sev: Severity) -> Vec<Findin
         let mut has = false;
         for entry in entries.flatten() {
             let n = entry.file_name().to_string_lossy().into_owned();
-            if entry.file_type().map(|t| !t.is_dir()).unwrap_or(false) && n.ends_with(".feature") {
+            if entry.file_type().is_ok_and(|t| !t.is_dir()) && n.ends_with(".feature") {
                 has = true;
                 break;
             }
@@ -466,13 +466,12 @@ fn detect_orphan_dirs(
     sev: Severity,
 ) -> Vec<Finding> {
     let mut findings = Vec::new();
-    let entries = match fs::read_dir(root) {
-        Ok(e) => e,
-        Err(_) => return findings,
+    let Ok(entries) = fs::read_dir(root) else {
+        return findings;
     };
     let mut items: Vec<(String, std::path::PathBuf)> = Vec::new();
     for entry in entries.flatten() {
-        if !entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if !entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         let n = entry.file_name().to_string_lossy().into_owned();
@@ -500,13 +499,12 @@ fn detect_orphan_files(
     sev: Severity,
 ) -> Vec<Finding> {
     let mut findings = Vec::new();
-    let entries = match fs::read_dir(root) {
-        Ok(e) => e,
-        Err(_) => return findings,
+    let Ok(entries) = fs::read_dir(root) else {
+        return findings;
     };
     let mut items: Vec<(String, std::path::PathBuf)> = Vec::new();
     for entry in entries.flatten() {
-        if entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+        if entry.file_type().is_ok_and(|t| t.is_dir()) {
             continue;
         }
         let n = entry.file_name().to_string_lossy().into_owned();
@@ -538,26 +536,24 @@ fn check_relationship_symmetry(
     let yaml_path = format!("specs/apps/{}/ddd/bounded-contexts.yaml", reg.app);
     for ctx in &reg.contexts {
         for rel in &ctx.relationships {
-            let asym = match relationship_kind_is_asymmetric(&rel.kind) {
-                Some(b) => b,
-                None => continue, // unknown kinds reported elsewhere
+            let Some(asym) = relationship_kind_is_asymmetric(&rel.kind) else {
+                continue; // unknown kinds reported elsewhere
             };
             if !asym {
                 continue;
             }
-            let target = match by_name.get(&rel.to) {
-                Some(t) => *t,
-                None => {
-                    findings.push(Finding {
-                        file: yaml_path.clone(),
-                        message: format!(
-                            "relationship target \"{}\" declared by \"{}\" does not exist in registry",
-                            rel.to, ctx.name
-                        ),
-                        severity: sev,
-                    });
-                    continue;
-                }
+            let target = if let Some(t) = by_name.get(&rel.to) {
+                *t
+            } else {
+                findings.push(Finding {
+                    file: yaml_path.clone(),
+                    message: format!(
+                        "relationship target \"{}\" declared by \"{}\" does not exist in registry",
+                        rel.to, ctx.name
+                    ),
+                    severity: sev,
+                });
+                continue;
             };
             if !has_reciprocal(target, &ctx.name, &rel.kind) {
                 findings.push(Finding {
@@ -601,6 +597,7 @@ fn check_relationship_kinds(reg: &Registry, sev: Severity) -> Vec<Finding> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::tempdir;
@@ -638,7 +635,7 @@ mod tests {
     }
 
     fn minimal_registry_yaml() -> &'static str {
-        r#"version: 2
+        r"version: 2
 app: testapp
 contexts:
   - name: ctx-a
@@ -649,7 +646,7 @@ contexts:
     glossary: specs/apps/testapp/glossary/ctx-a.md
     gherkin: specs/apps/testapp/behavior/gherkin/ctx-a
     relationships: []
-"#
+"
     }
 
     #[test]
@@ -796,8 +793,9 @@ contexts:
             severity: Some(Severity::Error),
         })
         .unwrap();
-        assert!(r
-            .iter()
-            .any(|f| f.message.contains("unknown relationship kind")));
+        assert!(
+            r.iter()
+                .any(|f| f.message.contains("unknown relationship kind"))
+        );
     }
 }

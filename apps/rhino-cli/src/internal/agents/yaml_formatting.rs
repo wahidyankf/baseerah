@@ -18,19 +18,17 @@ pub fn validate_yaml_formatting_raw(check_name: &str, content: &[u8]) -> Validat
         return ValidationCheck::failed_msg(check_name, "Frontmatter does not start with ---");
     }
 
-    let mut end_index: i32 = -1;
-    for (i, line) in lines.iter().enumerate().skip(1) {
-        if line.trim() == "---" {
-            end_index = i as i32;
-            break;
-        }
-    }
-    if end_index == -1 {
+    let Some(end) = lines
+        .iter()
+        .enumerate()
+        .skip(1)
+        .find_map(|(i, line)| (line.trim() == "---").then_some(i))
+    else {
         return ValidationCheck::failed_msg(check_name, "Frontmatter closing --- not found");
-    }
+    };
 
     let mut issues: Vec<String> = Vec::new();
-    for (i, line) in lines.iter().enumerate().take(end_index as usize).skip(1) {
+    for (i, line) in lines.iter().enumerate().take(end).skip(1) {
         let trimmed = line.trim();
         if trimmed.is_empty() || trimmed.starts_with('-') || trimmed.starts_with('#') {
             continue;

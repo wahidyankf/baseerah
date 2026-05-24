@@ -4,15 +4,15 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use walkdir::WalkDir;
 
 use crate::internal::cliout::OutputFormat;
 use crate::internal::gitutil;
 use crate::internal::mermaid::{
-    extract_blocks, format_json, format_markdown, format_text, validate_blocks, MermaidBlock,
-    ValidateOptions,
+    MermaidBlock, ValidateOptions, extract_blocks, format_json, format_markdown, format_text,
+    validate_blocks,
 };
 
 #[derive(Args, Debug)]
@@ -61,9 +61,8 @@ pub fn run(
     let mut all_blocks: Vec<MermaidBlock> = Vec::new();
     let mut file_set: std::collections::HashSet<String> = std::collections::HashSet::new();
     for f in &md_files {
-        let content = match fs::read_to_string(f) {
-            Ok(c) => c,
-            Err(_) => continue,
+        let Ok(content) = fs::read_to_string(f) else {
+            continue;
         };
         let blocks = extract_blocks(&f.to_string_lossy(), &content);
         if !blocks.is_empty() {
@@ -111,7 +110,7 @@ fn get_staged_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error
         .output()
         .context("git diff --cached")?;
     let text = String::from_utf8_lossy(&out.stdout);
-    Ok(filter_md_paths(repo_root, text.trim().split('\n')))
+    Ok(filter_md_paths(repo_root, text.lines()))
 }
 
 fn get_changed_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error> {
@@ -128,7 +127,7 @@ fn get_changed_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Erro
         Ok(o) => String::from_utf8_lossy(&o.stdout).to_string(),
         Err(_) => return Ok(collect_md_default_dirs(repo_root)),
     };
-    let files = filter_md_paths(repo_root, text.trim().split('\n'));
+    let files = filter_md_paths(repo_root, text.lines());
     if files.is_empty() {
         Ok(collect_md_default_dirs(repo_root))
     } else {
@@ -202,6 +201,7 @@ fn walk_md_files(dir: &Path) -> Vec<PathBuf> {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use tempfile::TempDir;

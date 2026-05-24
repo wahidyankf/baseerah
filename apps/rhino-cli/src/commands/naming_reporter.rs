@@ -86,6 +86,7 @@ pub fn format_markdown(label: &str, violations: &[Violation]) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
 

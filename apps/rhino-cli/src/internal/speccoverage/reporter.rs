@@ -208,7 +208,7 @@ pub fn format_json(r: &CheckResult) -> std::result::Result<String, Error> {
         scenario_gap_count: r.scenario_gaps.len(),
         step_gap_count: r.step_gaps.len(),
         orphan_step_impl_count: r.orphan_step_impls.len(),
-        duration_ms: r.duration.as_millis() as i64,
+        duration_ms: i64::try_from(r.duration.as_millis()).expect("duration fits in i64"),
         gaps,
         scenario_gaps,
         step_gaps,
@@ -225,6 +225,7 @@ pub fn format_markdown(r: &CheckResult) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use crate::internal::speccoverage::types::{

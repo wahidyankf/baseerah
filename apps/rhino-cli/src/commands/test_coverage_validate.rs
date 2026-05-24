@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
 use crate::internal::cliout::OutputFormat;
@@ -141,6 +141,7 @@ fn apply_exclude(mut result: CoverageResult, patterns: &[String]) -> CoverageRes
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
     use std::fs;

@@ -6,11 +6,7 @@ pub fn normalize_ws(s: &str) -> String {
 }
 
 pub fn first_non_empty<'a>(a: &'a str, b: &'a str) -> &'a str {
-    if !a.is_empty() {
-        a
-    } else {
-        b
-    }
+    if a.is_empty() { b } else { a }
 }
 
 /// JS/TS-style escape sequence handling: `\'`, `\"`, `\\`, `\/`, `\n`, `\t`, `\r`.

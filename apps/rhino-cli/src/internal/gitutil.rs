@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 use std::process::Command;
 
-use anyhow::{anyhow, Context, Error};
+use anyhow::{Context, Error, anyhow};
 
 /// Returns the absolute path to the git repository root, derived by running
 /// `git rev-parse --show-toplevel` from the current working directory.
