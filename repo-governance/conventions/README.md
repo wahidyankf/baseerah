@@ -65,13 +65,14 @@ Documentation conventions and standards for the open-sharia-enterprise project. 
 
 ## Directory Structure
 
-Conventions are organized into 5 semantic categories:
+Conventions are organized into semantic categories:
 
 - **[formatting/](#formatting)** - Markdown formatting, syntax, visual elements
 - **[linking/](#linking)** - Cross-reference and internal linking standards
 - **[writing/](#writing)** - Content quality, validation, writing standards
 - **[structure/](#structure)** - Documentation organization, file naming, plans
 - **[tutorials/](#tutorials)** - Tutorial creation and structure conventions
+- **[security/](#security)** - Security conventions governing agent behavior and data protection
 
 ---
 
@@ -141,6 +142,12 @@ Tutorial creation, structure, naming, and content standards applying to **all tu
 - [Tutorial Convention](./tutorials/general.md) - **Universal** standards for creating learning-oriented tutorials with narrative flow, progressive scaffolding, and hands-on elements. Covers all 7 tutorial types that combine into Full Set Tutorial Package. Applies to all tutorial content (docs/, ayokoding-web, ose-web, anywhere)
 - [Tutorial Naming](./tutorials/naming.md) - **Universal** Full Set Tutorial Package definition (5 mandatory components) and tutorial type standards (Initial Setup, Quick Start, Beginner, Intermediate, Advanced, Cookbook, By Example). Replaces old "Full Set" concept (5 sequential levels) with new architecture emphasizing component completeness. Applies to all tutorial content across the repository
 - [In-the-Field Tutorial Convention](./tutorials/in-the-field.md) - **Universal** standards for production-ready implementation guides that build on by-example and by-concept foundations by introducing frameworks, libraries, and enterprise patterns used in real-world systems. Targets developers ready to apply concepts in production environments. Applies to all in-the-field tutorial content across the repository
+
+## Security
+
+Security conventions governing how agents and contributors interact with sensitive repository artifacts.
+
+- [Environment File Access](./security/env-file-access.md) - The `guard-env-file-access` policy. AI agents must not directly read, write, edit, or commit any `.env*` file except `.env.example`. Covers the script carve-out, trust boundary, git-commit prevention (gitignore + pre-commit guard), cross-platform enforcement paths, and known gaps with accepted compensating controls. **Agents**: repo-rules-checker, repo-rules-fixer
 
 ## Related Documentation
 

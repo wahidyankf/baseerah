@@ -329,6 +329,8 @@ Write the failing test first, then make it pass, then refactor — Red → Green
 
 Volta for Node.js/npm pinning, package-lock.json, .env.example.
 
+**Guardrail**: Agents must not directly read, write, edit, or commit real `.env*` files — only `.env.example` is permitted directly; project scripts under `apps/`/`libs/`/`scripts/` are exempt. See [guard-env-file-access convention](./repo-governance/conventions/security/env-file-access.md).
+
 **See**: [repo-governance/development/workflow/reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md)
 
 ### Dependency Bump Stability & Safety Policy
