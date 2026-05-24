@@ -4,6 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
+- [guard-env-file-access](./guard-env-file-access/README.md) — hard-block AI agents from directly reading/writing/editing `.env*` except `.env.example`; scripts under `apps`/`libs`/`scripts` exempt (PreToolUse hook + deny rules + convention)
+
 ## Instructions
 
 **Quick Idea Capture**: For 1-3 liner ideas not ready for formal planning, use `../ideas.md`.
