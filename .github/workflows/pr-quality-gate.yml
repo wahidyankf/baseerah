@@ -170,6 +170,9 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:rust'
+      - run: npx nx run rhino-cli:fmt:check
+      - run: npx nx run rhino-cli:deny:check
+      - run: npx nx run rhino-cli:check:msrv
 
   markdown:
     name: Markdown quality gate

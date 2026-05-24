@@ -18,11 +18,45 @@
         "command": "cargo fetch --manifest-path apps/rhino-cli/Cargo.toml"
       }
     },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo fmt --manifest-path apps/rhino-cli/Cargo.toml"
+      }
+    },
+    "fmt:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo fmt --manifest-path apps/rhino-cli/Cargo.toml -- --check"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{projectRoot}/.rustfmt.toml", "{workspaceRoot}/.rustfmt.toml"]
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings"
+        "commands": [
+          "cargo fmt --manifest-path apps/rhino-cli/Cargo.toml -- --check",
+          "cargo clippy --manifest-path apps/rhino-cli/Cargo.toml --all-targets -- -D warnings"
+        ],
+        "parallel": false
       }
+    },
+    "deny:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo deny --manifest-path apps/rhino-cli/Cargo.toml check"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/Cargo.lock", "{projectRoot}/deny.toml"]
+    },
+    "check:msrv": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo hack --manifest-path apps/rhino-cli/Cargo.toml check --rust-version"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
     },
     "run": {
       "executor": "nx:run-commands",
