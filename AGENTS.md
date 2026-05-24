@@ -402,7 +402,7 @@ Six-layer governance hierarchy:
 - **Layer 2: Conventions** — WHAT documentation rules
 - **Layer 3: Development** — HOW we develop
 - **Layer 4: AI Agents** — WHO enforces rules
-- **Layer 5: Workflows** — WHEN we run processes (orchestrated sequences)
+- **Layer 5: Workflows** — WHEN we compose agents, procedures, and/or other workflows (multi-step orchestrated processes)
 
 **Agent skills**: Delivery infrastructure (inline and fork modes) serving agents — not a governance layer. See AI Agents section above.
 

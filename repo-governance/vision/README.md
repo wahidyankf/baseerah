@@ -54,7 +54,7 @@ graph TD
 - **Conventions** (Layer 2) - Standards implementing principles
 - **Development** (Layer 3) - Practices implementing principles
 - **Agents** (Layer 4) - Tools enforcing conventions and practices
-- **Workflows** (Layer 5) - Processes orchestrating agents
+- **Workflows** (Layer 5) - Processes composing agents, procedures, and/or other workflows
 
 See [Repository Governance Architecture](../repository-governance-architecture.md) for the authoritative reference on all layer relationships, governance flows, and traceability examples.
 

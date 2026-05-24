@@ -200,7 +200,7 @@ Agent: docs-fixer (applies corrections)
 
 ## Layer 5: Workflows (WHEN - Multi-Step Processes)
 
-**Purpose**: Orchestrated multi-step processes composing AI agents.
+**Purpose**: Orchestrated multi-step processes that compose agents, procedures, and/or other workflows.
 
 **Location**: `repo-governance/workflows/`
 
@@ -349,7 +349,7 @@ Skills (context: fork) ──delegates to──> Isolated Agent Context
 
 ### When Creating Workflows
 
-1. **Identify agent sequence** - What agents needed, in what order?
+1. **Identify step sequence** - What agents, procedures, and/or nested workflows needed, in what order?
 2. **Define termination criteria** - When does workflow complete?
 3. **Add approval checkpoints** - Where does user review?
 4. **Document state management** - How does state flow between steps?

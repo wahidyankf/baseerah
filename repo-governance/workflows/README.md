@@ -1,6 +1,6 @@
 ---
 title: "Workflows"
-description: Orchestrated multi-step processes that compose AI agents for systematic content creation, validation, and remediation
+description: Orchestrated multi-step processes that compose agents, procedures, and/or other workflows to achieve specific goals
 category: explanation
 subcategory: workflows
 tags:
@@ -13,9 +13,9 @@ created: 2026-01-04
 
 # Workflows Index
 
-**Purpose**: Orchestrated multi-step processes that compose AI agents to achieve specific goals with clear termination criteria.
+**Purpose**: Orchestrated multi-step processes that compose agents, procedures, and/or other workflows to achieve specific goals with clear termination criteria.
 
-**Layer**: 5th layer in repository hierarchy (orchestrates Layer 4 agents)
+**Layer**: 5th layer in repository hierarchy (composes agents, procedures, and/or other workflows)
 
 ## What Are Workflows?
 
@@ -192,6 +192,7 @@ Workflows for repository rules and cross-vendor consistency:
 
 - **repo-rules**: Validate consistency across principles, conventions, development, agents, AGENTS.md
 - **repo-parity**: Validate cross-vendor behavioral-parity invariants (vendor-neutrality, sync no-op, count parity, color/tier-map coverage)
+- **repo-harness-compatibility**: Validate cross-harness compatibility between platform-binding catalog and upstream coding-agent harness conventions
 - **ose-primer**: Sync content between `ose-public` and the downstream `ose-primer` template (adopt, propagate, parity-check)
 
 ## Step Execution Patterns
@@ -274,7 +275,7 @@ Workflows pass data between steps using references:
 
 To create a new workflow:
 
-1. **Identify need**: 2 or more agents in sequence, or repeated process, or complex orchestration
+1. **Identify need**: 2 or more agents, procedures, or workflows needed in sequence, or repeated process, or complex orchestration
 2. **Design structure**: Define inputs, steps, outputs, goals, termination criteria
 3. **Write workflow file**: Use plain descriptive name in the appropriate subdirectory of `repo-governance/workflows/[category]/`
 4. **Document thoroughly**: Purpose, when to use, example usage, related workflows
@@ -356,8 +357,8 @@ Planned workflow features:
 
 ## Questions?
 
-- **What is a workflow?** - A composed multi-step process orchestrating agents
-- **When should I create a workflow?** - When 2 or more agents are used repeatedly in sequence
+- **What is a workflow?** - A composed multi-step process orchestrating agents, procedures, and/or other workflows
+- **When should I create a workflow?** - When 2 or more agents, procedures, or workflows are used repeatedly in sequence or in composition
 - **How do I run a workflow?** - Use manual orchestration (see "Using Workflows" above)
 - **Can workflows call other workflows?** - Yes, workflows are composable
 - **Do workflows replace agents?** - No, workflows orchestrate agents

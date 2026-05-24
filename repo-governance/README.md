@@ -100,7 +100,7 @@ graph TD
 
 #### Layer 5: Workflows (WHEN - Multi-Step Processes)
 
-- **[Workflows](./workflows/README.md)** - Orchestrated multi-step processes composing AI agents
+- **[Workflows](./workflows/README.md)** - Orchestrated multi-step processes composing agents, procedures, and/or other workflows
   - Workflows across categories (ayokoding-web, ci, content, docs, infra, meta, plan, repo, specs, ui)
   - Define sequences (sequential/parallel/conditional), state management, termination criteria
   - Examples: Maker-Checker-Fixer, Plan-Execute-Validate
@@ -165,7 +165,7 @@ Use these questions to determine the correct subdirectory:
 
 ### Workflows Test
 
-**Question**: Can you ask "**WHEN do we orchestrate multiple agents?**" about the content?
+**Question**: Can you ask "**WHEN do we compose agents, procedures, and/or other workflows in a multi-step process?**" about the content?
 
 - ✅ **YES** → Place in `repo-governance/workflows/` - It's a multi-step process
 - ❌ **NO** → Continue to next test
@@ -191,7 +191,7 @@ Is it about WHY the project exists?
         ├─ YES → conventions/
         └─ NO → Is it about HOW to develop software?
             ├─ YES → development/
-            └─ NO → Is it about WHEN to orchestrate agents?
+            └─ NO → Is it about WHEN to compose agents, procedures, and/or workflows?
                 ├─ YES → workflows/
                 └─ NO → Is the content vendor-specific?
                     ├─ YES → platform-binding dir (.claude/, .opencode/) OR docs/reference/
@@ -214,7 +214,7 @@ Is it about WHY the project exists?
 - **Principles** → MUST include "Vision Supported" section
 - **Conventions** → MUST include "Principles Implemented/Respected" section
 - **Development** → MUST include both "Principles" AND "Conventions" sections
-- **Workflows** → SHOULD reference which agents they orchestrate
+- **Workflows** → SHOULD reference which agents, procedures, and/or nested workflows they compose
 
 ### Changes Propagate Down
 

@@ -1,6 +1,6 @@
 ---
 name: repo-defining-workflows
-description: Workflow pattern standards for creating multi-agent orchestrations including YAML frontmatter (name, description, tags, status, agents, parameters), execution phases (sequential/parallel/conditional), agent coordination patterns, and Gherkin success criteria. Essential for defining reusable, validated workflow processes.
+description: Workflow pattern standards for creating multi-agent orchestrations including YAML frontmatter (name, goal, termination, inputs, outputs), execution phases (sequential/parallel/conditional), agent coordination patterns, and Gherkin success criteria. Essential for defining reusable, validated workflow processes.
 ---
 
 # Defining Workflows
@@ -23,22 +23,25 @@ This Skill provides comprehensive guidance for **defining workflows** - multi-ag
 
 ```yaml
 ---
-name: workflow-name
-description: Clear description of workflow purpose and outcomes
-tags:
-  - workflow-category
-  - domain-area
-status: active | draft | deprecated
-agents:
-  - agent-name-1
-  - agent-name-2
-parameters:
-  - name: param-name
-    type: string | number | boolean
+name: workflow-identifier
+goal: What this workflow achieves
+termination: Success/failure criteria
+inputs:
+  - name: input-name
+    type: string | number | boolean | file | file-list | enum
+    description: What this input is for
     required: true | false
-    default: value
-    description: Parameter purpose
-created: YYYY-MM-DD
+    default: value (if not required)
+  - name: max-concurrency
+    type: number
+    description: Maximum number of agents/tasks that can run in parallel
+    required: false
+    default: 2
+outputs:
+  - name: output-name
+    type: string | number | boolean | file | file-list | enum
+    description: What this output contains
+    pattern: file-pattern (for file/file-list types)
 ---
 ```
 
@@ -237,9 +240,10 @@ Before publishing workflow:
 
 - [ ] Valid YAML frontmatter (all colons quoted)
 - [ ] name field matches filename
-- [ ] description is clear and concise
-- [ ] All agents listed in frontmatter
-- [ ] All parameters documented (type, required, default)
+- [ ] goal is clear and concise
+- [ ] termination criteria defined (success/failure)
+- [ ] All inputs documented (type, required, default)
+- [ ] All outputs documented (type, pattern for file outputs)
 - [ ] Execution phases clearly defined
 - [ ] Dependencies explicit (sequential vs parallel)
 - [ ] Success criteria in Gherkin format

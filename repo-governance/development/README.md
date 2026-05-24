@@ -177,4 +177,4 @@ These companion files exist in each subdirectory: `workflow/`, `quality/`, `patt
 - [Repository Governance Architecture](../repository-governance-architecture.md) - Complete six-layer architecture (Layer 3: Development)
 - [Core Principles](../principles/README.md) - Layer 1: Foundational values that govern development practices
 - [Conventions](../conventions/README.md) - Layer 2: Documentation conventions (parallel governance with development)
-- [Workflows](../workflows/README.md) - Layer 5: Multi-step processes orchestrating agents
+- [Workflows](../workflows/README.md) - Layer 5: Multi-step processes composing agents, procedures, and/or other workflows

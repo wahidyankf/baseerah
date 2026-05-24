@@ -1,6 +1,6 @@
 ---
 title: "Workflow Pattern Convention"
-description: Standards for creating orchestrated multi-step processes that compose AI agents
+description: Standards for creating orchestrated multi-step processes that compose agents, procedures, and/or other workflows
 category: explanation
 subcategory: workflows
 tags:
@@ -16,7 +16,7 @@ created: 2025-12-23
 
 ## Overview
 
-Workflows are **composed multi-step processes** that orchestrate AI agents to achieve specific goals with clear termination criteria. They represent the fifth layer in the repository's governance hierarchy, sitting above individual agents to coordinate complex tasks.
+Workflows are **composed multi-step processes** that orchestrate agents, procedures, and/or other workflows to achieve specific goals with clear termination criteria. They represent the fifth layer in the repository's governance hierarchy, sitting above individual agents to coordinate complex tasks.
 
 ## Repository Hierarchy
 
