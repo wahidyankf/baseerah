@@ -375,22 +375,22 @@ Code, OpenCode, Codex, etc. — sees it).
 
 ## Worktree
 
-Worktree path: `worktrees/guard-env-file-access/`
+**No worktree — execute directly on `main`** (per explicit user direction).
 
-Provision before execution (run from repo root):
+This plan is executed directly on the `main` branch with no worktree and no
+feature branch. Rationale: the changes are small, self-contained config/hook/git/
+docs edits (no app or library source), and align with Trunk Based Development
+(direct, small, frequent commits to `main`). Commits land on `main` per the
+thematic commit guidance below; no branch isolation is used.
 
-```bash
-claude --worktree guard-env-file-access
-```
-
-See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
+See [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md). The [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) is intentionally not applied here.
 
 ## Delivery Checklist
 
 ### Environment Setup
 
-- [ ] Provision worktree: `claude --worktree guard-env-file-access` (creates `worktrees/guard-env-file-access/` in repo root).
-- [ ] Initialize toolchain in the root worktree (not the new worktree): `npm install && npm run doctor -- --fix`.
+- [ ] Work directly on `main` in the root checkout — no worktree, no feature branch.
+- [ ] Initialize toolchain: `npm install && npm run doctor -- --fix`.
 - [ ] Confirm `jq` is available: `command -v jq` — prints a path.
 - [ ] Confirm carve-out dirs exist: `test -d apps && test -d libs && test -d scripts` — exits 0.
 - [ ] Confirm baseline: `jq -e '.permissions.allow' .claude/settings.json` exits 0.
