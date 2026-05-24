@@ -1,11 +1,11 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    agents_detect_duplication, agents_sync, agents_validate_claude, agents_validate_naming,
-    agents_validate_sync, ddd_bc, ddd_ul, docs_validate_frontmatter,
-    docs_validate_heading_hierarchy, docs_validate_links, docs_validate_mermaid,
-    docs_validate_naming, doctor, env_backup, env_init, env_restore, git_pre_commit,
-    governance_agents_md_size, governance_audit, governance_emoji_audit,
+    agents_detect_duplication, agents_emit_bindings, agents_sync, agents_validate_bindings,
+    agents_validate_claude, agents_validate_naming, agents_validate_sync, ddd_bc, ddd_ul,
+    docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
+    docs_validate_mermaid, docs_validate_naming, doctor, env_backup, env_init, env_restore,
+    git_pre_commit, governance_agents_md_size, governance_audit, governance_emoji_audit,
     governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
     governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
     spec_coverage_validate, specs_validate_adoption, specs_validate_counts, specs_validate_links,
@@ -161,6 +161,12 @@ pub enum AgentsCommands {
     /// Sync Claude Code agents to OpenCode format.
     #[command(name = "sync")]
     Sync(agents_sync::SyncArgs),
+    /// Emit the Amazon Q Developer binding bridge files (idempotent).
+    #[command(name = "emit-bindings")]
+    EmitBindings(agents_emit_bindings::EmitBindingsArgs),
+    /// Validate the Amazon Q binding bridge files and catalog coverage.
+    #[command(name = "validate-bindings")]
+    ValidateBindings(agents_validate_bindings::ValidateBindingsArgs),
 }
 
 #[derive(Subcommand, Debug)]
@@ -321,19 +327,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             DocsCommands::ValidateLinks(args) => docs_validate_links::run(args, output_format),
             DocsCommands::ValidateMermaid(args) => docs_validate_mermaid::run(args, output_format),
         },
-        Commands::Agents(ac) => match ac {
-            AgentsCommands::ValidateNaming(args) => {
-                agents_validate_naming::run(args, output_format)
-            }
-            AgentsCommands::DetectDuplication(args) => {
-                agents_detect_duplication::run(args, output_format)
-            }
-            AgentsCommands::ValidateClaude(args) => {
-                agents_validate_claude::run(args, output_format)
-            }
-            AgentsCommands::ValidateSync(args) => agents_validate_sync::run(args, output_format),
-            AgentsCommands::Sync(args) => agents_sync::run(args, output_format),
-        },
+        Commands::Agents(ac) => dispatch_agents(ac, output_format),
         Commands::Workflows(wc) => match wc {
             WorkflowsCommands::ValidateNaming(args) => {
                 workflows_validate_naming::run(args, output_format)
@@ -366,6 +360,25 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
         Err(e) => {
             eprintln!("Error: {e}");
             1
+        }
+    }
+}
+
+fn dispatch_agents(
+    ac: &AgentsCommands,
+    output_format: OutputFormat,
+) -> std::result::Result<(), anyhow::Error> {
+    match ac {
+        AgentsCommands::ValidateNaming(args) => agents_validate_naming::run(args, output_format),
+        AgentsCommands::DetectDuplication(args) => {
+            agents_detect_duplication::run(args, output_format)
+        }
+        AgentsCommands::ValidateClaude(args) => agents_validate_claude::run(args, output_format),
+        AgentsCommands::ValidateSync(args) => agents_validate_sync::run(args, output_format),
+        AgentsCommands::Sync(args) => agents_sync::run(args, output_format),
+        AgentsCommands::EmitBindings(args) => agents_emit_bindings::run(args, output_format),
+        AgentsCommands::ValidateBindings(args) => {
+            agents_validate_bindings::run(args, output_format)
         }
     }
 }

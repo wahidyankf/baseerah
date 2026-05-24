@@ -29,4 +29,8 @@ if [ -n "$RANGE" ]; then
   if echo "$CHANGED" | grep -qE '^(repo-governance/.*\.md$|AGENTS\.md$|CLAUDE\.md$|\.claude/agents/|\.opencode/agents/)'; then
     npx nx run rhino-cli:validate:cross-vendor-parity
   fi
+  # Harness binding-parity guard (deterministic, no agent): run when binding surfaces change.
+  if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|docs/reference/platform-bindings\.md$|\.claude/|\.opencode/|\.codex/|\.github/)'; then
+    npm run validate:harness-bindings
+  fi
 fi

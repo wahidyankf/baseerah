@@ -1,5 +1,7 @@
 pub mod agents_detect_duplication;
+pub mod agents_emit_bindings;
 pub mod agents_sync;
+pub mod agents_validate_bindings;
 pub mod agents_validate_claude;
 pub mod agents_validate_naming;
 pub mod agents_validate_sync;

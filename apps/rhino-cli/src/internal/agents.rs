@@ -2,6 +2,7 @@
 // Populated phase-by-phase as the Phase 4 port progresses.
 
 pub mod agent_validator;
+pub mod bindings;
 pub mod claude_validator;
 pub mod converter;
 pub mod detect_duplication;
