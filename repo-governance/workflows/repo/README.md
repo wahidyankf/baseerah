@@ -1,6 +1,6 @@
 ---
 title: "Repository Workflows"
-description: ""
+description: "Orchestrated repository-level governance workflows — rules consistency, cross-vendor parity, harness compatibility, and ose-primer content synchronization."
 category: explanation
 subcategory: workflows
 tags: []
@@ -13,7 +13,7 @@ Orchestrated workflows for repository-level governance — validation, cross-ven
 
 ## Purpose
 
-These workflows define **WHEN and HOW to validate and synchronize repository artifacts**, orchestrating agents for three concerns: repository rules consistency (repo-rules-checker, repo-rules-fixer), cross-vendor behavioral parity (repo-parity-checker, repo-parity-fixer), and ose-primer content sync (repo-ose-primer-adoption-maker, repo-ose-primer-propagation-maker).
+These workflows define **WHEN and HOW to validate and synchronize repository artifacts**, orchestrating agents for four concerns: repository rules consistency (repo-rules-checker, repo-rules-fixer), cross-vendor behavioral parity (repo-parity-checker, repo-parity-fixer), harness compatibility (repo-harness-compatibility-checker, repo-harness-compatibility-fixer), and ose-primer content sync (repo-ose-primer-adoption-maker, repo-ose-primer-propagation-maker).
 
 ## Scope
 
@@ -36,6 +36,7 @@ These workflows define **WHEN and HOW to validate and synchronize repository art
 - [ose-primer Sync Execution](./repo-ose-primer-sync-execution.md) - Single-pass sync orchestration between `ose-public` and `ose-primer`. Dispatches the adoption-maker or propagation-maker agent, collects its report, and (in apply mode) surfaces the resulting primer PR URL.
 - [ose-primer Extraction Execution](./repo-ose-primer-extraction-execution.md) - One-time orchestration for Phase 8 of the 2026-04-18 ose-primer-separation plan. Runs the primer-parity gate, a bounded catch-up loop, and ten ordered extraction commits (A → J) with per-commit CI verification.
 - [Cross-Vendor Parity Validation](./repo-cross-vendor-parity-quality-gate.md) - Validate cross-vendor behavioral-parity invariants (vendor-neutrality, sync no-op, count parity, color/tier-map coverage), iterate to double-zero.
+- [Harness Compatibility Quality Gate](./repo-harness-compatibility-quality-gate.md) - On-demand verification that the platform-binding catalog and committed binding files still match each supported coding-agent harness's current upstream configuration conventions; fixes external drift iteratively to double-zero.
 
 ## Related Documentation
 
