@@ -4,11 +4,6 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [multi-harness-compatibility](./multi-harness-compatibility/README.md) — Make `repo-governance/`
-  harness-agnostic and add verified platform bindings for nine coding-agent harnesses (Copilot, Cursor,
-  Windsurf, Junie, Amazon Q, Claude Code, Codex CLI, Antigravity CLI, Pi), plus a research-backed
-  compatibility-audit workflow.
-
 ## Instructions
 
 **Quick Idea Capture**: For 1-3 liner ideas not ready for formal planning, use `../ideas.md`.
