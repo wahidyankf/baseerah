@@ -55,7 +55,7 @@ The **open-sharia-enterprise** repository employs a six-layer governance archite
 - **Layer 2 (Conventions)**: WHAT documentation rules must we follow?
 - **Layer 3 (Development)**: HOW do we develop software and automation?
 - **Layer 4 (AI Agents)**: WHO enforces rules and automates tasks?
-- **Layer 5 (Workflows)**: WHEN do we run which agents in what order?
+- **Layer 5 (Workflows)**: WHEN do we orchestrate agents, procedures, and/or other workflows, and in what sequence?
 
 **Delivery Infrastructure** (agent skills): HOW do we package and deliver knowledge to agents? (Service infrastructure, not governance)
 
@@ -120,14 +120,14 @@ Layer 5: Workflows    WHEN - Orchestrate (multi-step processes)
 
 ### Quick Reference Table
 
-| Layer | Location                     | Purpose                       | Changes?        | Answers?                  |
-| ----- | ---------------------------- | ----------------------------- | --------------- | ------------------------- |
-| **0** | repo-governance/vision/      | WHY we exist                  | Extremely rare  | Why does project exist?   |
-| **1** | repo-governance/principles/  | WHY we value approaches       | Rarely          | Why value this approach?  |
-| **2** | repo-governance/conventions/ | WHAT documentation rules      | Occasionally    | What documentation rules? |
-| **3** | repo-governance/development/ | HOW we develop software       | More frequently | How develop software?     |
-| **4** | `.claude/agents/`            | WHO enforces rules            | Often           | Who enforces rules?       |
-| **5** | repo-governance/workflows/   | WHEN run agents in what order | As needed       | When run which agents?    |
+| Layer | Location                     | Purpose                                                     | Changes?        | Answers?                  |
+| ----- | ---------------------------- | ----------------------------------------------------------- | --------------- | ------------------------- |
+| **0** | repo-governance/vision/      | WHY we exist                                                | Extremely rare  | Why does project exist?   |
+| **1** | repo-governance/principles/  | WHY we value approaches                                     | Rarely          | Why value this approach?  |
+| **2** | repo-governance/conventions/ | WHAT documentation rules                                    | Occasionally    | What documentation rules? |
+| **3** | repo-governance/development/ | HOW we develop software                                     | More frequently | How develop software?     |
+| **4** | `.claude/agents/`            | WHO enforces rules                                          | Often           | Who enforces rules?       |
+| **5** | repo-governance/workflows/   | WHEN orchestrate agents, procedures, and/or other workflows | As needed       | When run which steps?     |
 
 **Agent skills**: `.claude/skills/` - Delivery infrastructure serving agents (inline knowledge injection or fork-based delegation)
 
@@ -368,7 +368,7 @@ Agent: docs-fixer (applies color corrections)
 
 ## Layer 5: Workflows (WHEN - Multi-Step Processes)
 
-**Purpose**: Orchestrated multi-step processes composing AI agents. Answers WHEN to run which agents in what order.
+**Purpose**: Orchestrated multi-step processes that compose agents, procedures, and/or other workflows. Answers WHEN to orchestrate which steps and in what sequence.
 
 **Location**: `repo-governance/workflows/`
 
@@ -400,13 +400,14 @@ Maker-Checker-Fixer Workflow:
 
 **Requirements**:
 
-- Each workflow MUST document agent sequence
+- Each workflow MUST document step sequence (agents, procedures, and/or nested workflows)
 - Each workflow MUST define termination criteria
 - Human approval checkpoints MUST be explicit
+- Workflows must not create circular nesting (A calling B calling A)
 
 **Relationship to Other Layers**:
 
-- **Orchestrates** Layer 4 (AI Agents)
+- **Composes** Layer 4 (AI Agents), procedures, and/or other workflows
 - **Implements** Layer 3 (Development patterns like Maker-Checker-Fixer)
 - **No governance authority**: Workflows don't govern agents, they compose them
 
@@ -621,7 +622,7 @@ Agent skills ──does NOT govern──> Agents
 
 **Layer 5 → Layer 4**:
 
-- Workflows orchestrate agents (composition, not governance)
+- Workflows compose agents, procedures, and/or other workflows (composition, not governance)
 - Workflows don't create new rules for agents
 
 **Agent skills ↔ Agents**:
@@ -656,7 +657,7 @@ Agent skills ──does NOT govern──> Agents
 
 **Layer 5 (Workflows)**:
 
-- SHOULD document which agents are orchestrated
+- SHOULD document which steps are composed (agents, procedures, and/or nested workflows)
 - SHOULD reference development patterns implemented
 
 **Agent skills (Infrastructure)**:
@@ -695,10 +696,11 @@ Agent skills ──does NOT govern──> Agents
 
 ### When Creating Workflows
 
-1. **Identify agent sequence** - What agents needed, in what order?
+1. **Identify step sequence** - What agents, procedures, and/or nested workflows are needed, and in what order?
 2. **Define termination criteria** - When does workflow complete?
 3. **Add approval checkpoints** - Where does user review?
 4. **Document state management** - How does state flow between steps?
+5. **Check for circular nesting** - Ensure no workflow calls another that calls back to itself
 
 ### When Creating agent skills
 
@@ -728,7 +730,7 @@ Agent skills ──does NOT govern──> Agents
 
 ❌ **Wrong**: Workflows don't replace agents, they orchestrate them.
 
-✅ **Correct**: Workflows compose multiple agents into multi-step processes. Agents remain atomic, workflows handle sequencing.
+✅ **Correct**: Workflows compose agents, procedures, and/or other workflows into multi-step processes. Agents remain atomic; workflows handle sequencing and composition.
 
 ### Misconception 4: "Principles can conflict"
 

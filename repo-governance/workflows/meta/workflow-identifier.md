@@ -40,7 +40,8 @@ Layer 5: Workflows (WHEN - multi-step processes)
 
 Workflows define:
 
-- **Sequences of operations** - Multiple agents executed in order
+- **Sequences of operations** - Agents, procedures, and/or other workflows executed in any combination
+- **Looping** - Steps can repeat until termination criteria are met
 - **Clear goals** - What the workflow achieves
 - **Termination criteria** - When the workflow completes (success/failure/partial)
 - **Input/output contracts** - What goes in, what comes out
@@ -58,12 +59,13 @@ Workflows define:
 
 Create a workflow when:
 
-- PASS: A task requires **2 or more agents in sequence**
+- PASS: A task requires **2 or more agents, procedures, or workflows in sequence**
 - PASS: The same sequence is **repeated multiple times**
 - PASS: The process has **conditional logic** (if X, then Y)
 - PASS: Steps need to run in **parallel** for efficiency
 - PASS: **Human approval** is required at specific checkpoints
 - PASS: **Outputs from one step** feed into another step
+- PASS: **Multiple existing workflows** need to be orchestrated together
 
 Don't create a workflow when:
 
@@ -112,7 +114,9 @@ Execution modes: Sequential | Parallel | Conditional
 
 Description of what this step does.
 
-**Agent**: `agent-name`
+**Agent**: `agent-name` _(use for agent steps)_
+**Workflow**: `category/workflow-name` _(use for nested workflow steps)_
+**Procedure**: description of manual/scripted step _(use for procedure steps)_
 
 - **Args**: Key-value pairs or references to inputs/previous outputs
 - **Output**: What this step produces
@@ -409,6 +413,15 @@ Workflows **orchestrate** agents:
 - Workflows pass inputs/outputs between agents
 - Workflows handle agent failures
 
+### Workflows ↔ Workflows
+
+Workflows **compose** other workflows:
+
+- A workflow step can be another workflow (nested)
+- Outer workflow passes inputs; inner workflow returns outputs
+- Nesting is explicit — the step declares `**Workflow**: category/name`
+- No circular nesting (workflow A calling workflow B calling workflow A)
+
 ### Workflows ↔ Plans
 
 Workflows **operationalize** plans:
@@ -420,7 +433,7 @@ Workflows **operationalize** plans:
 
 ## Composability
 
-Workflows can compose with other workflows:
+Workflows are first-class composable units. A workflow step can be another workflow, an agent, or a procedure — in any combination and order, with looping.
 
 ```markdown
 ### 2. Run Validation Workflow (Nested)
@@ -431,6 +444,34 @@ Workflows can compose with other workflows:
 - **Output**: `{validation-status}`
 
 This step executes another workflow.
+```
+
+Mixed composition example — agents, procedures, and nested workflows in one workflow:
+
+```markdown
+### 1. Prepare Environment (Procedure)
+
+Run `npm install && npm run doctor`.
+
+### 2. Validate Docs (Nested Workflow)
+
+**Workflow**: `docs/docs-quality-gate`
+
+- **Args**: `scope: all, mode: strict`
+- **Output**: `{docs-status}`
+
+### 3. Validate CI (Nested Workflow)
+
+**Workflow**: `ci/ci-quality-gate`
+
+- **Args**: `scope: all`
+- **Output**: `{ci-status}`
+
+### 4. Report Summary (Agent)
+
+**Agent**: `docs-maker`
+
+- **Args**: `docs-status: {step2.outputs.docs-status}, ci-status: {step3.outputs.ci-status}`
 ```
 
 Output from one workflow becomes input to another:

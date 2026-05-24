@@ -21,14 +21,15 @@ created: 2026-01-04
 
 Workflows are **composed processes** that:
 
-- 🔄 Orchestrate multiple AI agents in sequence
+- 🔄 Orchestrate sequences of agents, procedures, and/or other workflows — in any combination
 - 🎯 Have clear goals and termination criteria
 - 📊 Manage state between steps
 - ⚡ Support parallel, sequential, and conditional execution
 - 👤 Include human approval checkpoints
-- ♻️ Are reusable and composable
+- ♻️ Are reusable and composable — workflows can nest other workflows
+- 🔁 Can loop until termination criteria are met
 
-**Key insight**: Workflows are to Agents what Agents are to Tools - a composition layer.
+**Key insight**: Workflows are to Agents what Agents are to Tools - a composition layer. A workflow step can itself be another workflow.
 
 ## Repository Hierarchy
 
@@ -350,7 +351,6 @@ Planned workflow features:
 - 📊 **Workflow Visualization** - Auto-generate diagrams from definitions
 - 🧪 **Workflow Testing** - Dry-run mode, validation suite
 - 📈 **Metrics Dashboard** - Track workflow performance
-- 🔄 **Workflow Composition** - Nest workflows within workflows
 - ⏱️ **Timeouts and Retries** - Handle long-running or failing steps
 - 🔙 **Rollback Support** - Undo steps on failure
 

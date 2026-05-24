@@ -69,6 +69,8 @@ Exactly one of the following tokens MUST appear as the last token of every workf
 
 No other type suffixes are permitted. Introducing a new type requires amending this table first.
 
+**Note on composed workflows**: A workflow step can be an agent, a procedure, or another workflow (nested). The type suffix describes the execution model of the workflow as a whole, not the nature of its individual steps. A `quality-gate` workflow may orchestrate sub-workflows internally; it still carries the `quality-gate` suffix because that describes its overall iterative loop-to-zero-findings model.
+
 ## Meta reference exception
 
 Files under `repo-governance/workflows/meta/` are **reference documentation about the workflow system itself** (e.g., `execution-modes.md`, `workflow-identifier.md`). They describe how workflows are identified, how they are executed, and which patterns govern them. They are not workflows and therefore are exempt from the type-suffix rule.

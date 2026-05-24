@@ -1453,7 +1453,7 @@ Quick categorization for existing agents:
 **Focus on single responsibility**:
 
 - Each agent should do ONE thing well
-- Complex workflows should orchestrate multiple agents
+- Complex workflows should compose multiple agents, procedures, and/or other workflows
 - Don't create "Swiss Army knife" agents
 
 **Detailed but targeted prompts**:

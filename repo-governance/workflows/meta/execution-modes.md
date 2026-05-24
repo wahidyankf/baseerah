@@ -139,11 +139,12 @@ AI: [Executes workflow steps directly]
 ## Execution Mode Decision Flow
 
 ```
-Workflow step references a named agent?
-├── YES → Agent exists as defined subagent_type in .claude/agents/?
+What does the workflow step reference?
+├── Named agent → Agent exists as defined subagent_type in .claude/agents/?
 │   ├── YES → Use Agent Delegation (preferred)
 │   └── NO  → Use Manual Orchestration (fallback)
-└── NO  → Use Manual Orchestration
+├── Nested workflow → Execute that workflow (recursively apply this decision flow)
+└── Procedure → Use Manual Orchestration (follow procedure steps directly)
 ```
 
 ## Manual Mode Execution Pattern
