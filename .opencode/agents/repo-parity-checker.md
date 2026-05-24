@@ -74,6 +74,15 @@ dual-label criticality / confidence schema from the
 - **Fail**: counts differ — diff agent file lists via `comm -3 <(ls .claude/agents | sort) <(ls .opencode/agents | sort)` and report only-`.claude` and only-`.opencode` entries
 - **Default criticality**: HIGH (sets diverge → contributors get different agent inventories)
 - **Confidence**: HIGH (mechanical comparison)
+- **Known intentional skip**: `README.md` is present in both directories as an index file, not
+  an agent definition. The sync tool (`converter.rs` line ~391) explicitly excludes it with
+  `if !name.ends_with(".md") || name == "README.md" { continue; }`. This means the sync tool
+  always reports N-1 converted agents when N files are in `.claude/agents/`, where N includes
+  `README.md`. The filesystem count (both dirs equal at N) still satisfies the parity invariant.
+  When checking, compare filesystem counts to each other — not to the sync tool's conversion
+  count. A discrepancy between the two filesystem counts (e.g., 77 vs 78) is a real finding;
+  a discrepancy between sync-tool count and filesystem count (76 converted vs 77 files) is
+  expected and is NOT a finding.
 
 ### Invariant 5 — Translation-map coverage
 
