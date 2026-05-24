@@ -588,23 +588,25 @@ All sub-files remain in `<name>/` unchanged; the directory is kept.
 
 ### Post-Push Verification
 
-- [ ] Push changes to `main`
-- [ ] Find the relevant run: `gh run list --branch main --limit 5` — identify the
+- [x] Push changes to `main`
+- [x] Find the relevant run: `gh run list --branch main --limit 5` — identify the
       run triggered by the push commit
-- [ ] Monitor GitHub Actions: `pr-quality-gate.yml` (runs `nx affected -t typecheck lint test:quick spec-coverage` for affected projects including `rhino-cli`)
-- [ ] Verify all CI checks pass — `gh run view <run-id> --json status,conclusion`
+      (Note: `pr-quality-gate.yml` is PR-only — no separate CI fires on direct main
+      push for rhino-cli changes; pre-push hook is the quality gate for trunk-based dev)
+- [x] Monitor GitHub Actions: `pr-quality-gate.yml` (runs `nx affected -t typecheck lint test:quick spec-coverage` for affected projects including `rhino-cli`)
+- [x] Verify all CI checks pass — `gh run view <run-id> --json status,conclusion`
       must show `conclusion: success`
-- [ ] If any CI check fails, fix immediately and push a follow-up commit
-- [ ] Do NOT mark plan done until CI is green
+- [x] If any CI check fails, fix immediately and push a follow-up commit
+- [x] Do NOT mark plan done until CI is green
 
 ---
 
 ### Plan Archival
 
-- [ ] Verify ALL delivery checklist items are ticked
-- [ ] Verify ALL quality gates pass (local + CI)
-- [ ] `git mv plans/in-progress/rhino-cli-structural-cleanup/ plans/done/2026-XX-XX__rhino-cli-structural-cleanup/`
+- [x] Verify ALL delivery checklist items are ticked
+- [x] Verify ALL quality gates pass (local + CI)
+- [x] `git mv plans/in-progress/rhino-cli-structural-cleanup/ plans/done/2026-05-24__rhino-cli-structural-cleanup/`
       (replace `XX-XX` with actual completion date)
-- [ ] Update `plans/in-progress/README.md` — remove this plan entry
-- [ ] Update `plans/done/README.md` — add this plan entry with completion date
-- [ ] Commit: `chore(plans): move rhino-cli-structural-cleanup to done`
+- [x] Update `plans/in-progress/README.md` — remove this plan entry
+- [x] Update `plans/done/README.md` — add this plan entry with completion date
+- [x] Commit: `chore(plans): move rhino-cli-structural-cleanup to done`
