@@ -4,8 +4,6 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [rhino-cli-structural-cleanup](./rhino-cli-structural-cleanup/README.md) — Remove Go-isms (mod.rs → flat files, gitutil rename, lcov.info, naming_reporter relocation)
-
 ## Instructions
 
 **Quick Idea Capture**: For 1-3 liner ideas not ready for formal planning, use `../ideas.md`.
