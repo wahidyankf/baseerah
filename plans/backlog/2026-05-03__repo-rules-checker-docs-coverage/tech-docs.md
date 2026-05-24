@@ -67,7 +67,7 @@ Mechanical drift only on first iteration. Semantic drift (capability claims, beh
 
 ### D-1: Extend existing agent vs. new agent
 
-**Decision**: extend `repo-rules-checker`. **Rationale**: the new step shares the same dual-label-finding format, the same audit-report file convention (`generated-reports/repo-rules__*__audit.md`), the same iteration logic, the same false-positive skip-list integration. A separate agent would duplicate plumbing without semantic justification. **Risk**: agent body grows past 43.2K [Repo-grounded — `ls -la .claude/agents/repo-rules-checker.md` size]. **Mitigation**: revisit splitting only if total body crosses an agreed threshold during execution (recorded as a delivery checkbox).
+**Decision**: extend `repo-rules-checker`. **Rationale**: the new step shares the same dual-label-finding format, the same audit-report file convention (`generated-reports/repo-rules__*__audit.md`), the same iteration logic, the same false-positive skip-list integration. A separate agent would duplicate plumbing without semantic justification. **Risk**: agent body grows past ~51K [Repo-grounded — `ls -la .claude/agents/repo-rules-checker.md` size]. **Mitigation**: revisit splitting only if total body crosses an agreed threshold during execution (recorded as a delivery checkbox).
 
 ### D-2: Vendor-binding drift scope (mechanical only on first iteration)
 

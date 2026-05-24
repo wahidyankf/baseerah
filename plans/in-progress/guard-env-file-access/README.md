@@ -231,7 +231,7 @@ Add `permissions.deny` (enumerated real env names; never matches `.env.example`)
 ```
 
 > **Note**: `Write` is not a valid Claude Code permission rule name — `Edit` covers all file-write operations (Write, Edit, MultiEdit, Patch). Hook matchers (Layer 2) correctly use `Write` as a tool name, which is distinct from permission rule names.
-
+>
 > These apply to the file tools by path — they do NOT affect `Bash`, so
 > project-script execution is untouched by this layer.
 

@@ -23,11 +23,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 2: Extend `repo-rules-checker` with Step 8b
 
-- [ ] Read the current `.claude/agents/repo-rules-checker.md` end-to-end to understand the existing Step 8 structure (lines 698-1104 [Repo-grounded — `grep -n "^### Step" .claude/agents/repo-rules-checker.md`]). Verify by running `Bash wc -l .claude/agents/repo-rules-checker.md` and recording the current line count in implementation notes.
+- [ ] Read the current `.claude/agents/repo-rules-checker.md` end-to-end to understand the existing Step 8 structure (lines 738-1146 [Repo-grounded — `grep -n "^### Step" .claude/agents/repo-rules-checker.md`]). Verify by running `Bash wc -l .claude/agents/repo-rules-checker.md` and recording the current line count in implementation notes.
   - _Suggested executor: direct execution (read-only)_
 - [ ] Author a TDD-shaped failing fixture in `generated-reports/test-fixtures/cross-doc-step-8b-fixtures/` (new dir; mark `_New directory_` and `_New fixtures_`): create one fixture file per Anti-Pattern category Step 8b will catch (intentional-bad-naming, intentional-no-date-metadata-violation, intentional-broken-cross-ref, intentional-missing-frontmatter, intentional-vendor-binding-drift). Verify by running `Bash ls generated-reports/test-fixtures/cross-doc-step-8b-fixtures/` — lists 5+ files.
   - _Suggested executor: `repo-rules-maker` (governance-domain authoring)_
-- [ ] Edit `.claude/agents/repo-rules-checker.md` to insert a new "### Step 8b: Cross-Documentation Rules Governance" section AFTER the existing Step 8 conclusion (`## Step 8 Summary: Software Documentation Validation` heading [Repo-grounded — line 1104 of current file]) and BEFORE the existing "### Step 9: Finalize Report" section. The new section MUST include: scope statement (full `docs/` excluding subtrees already covered), per-category validation list (file naming / frontmatter / no-date-metadata / traceability / cross-reference integrity), vendor-binding drift sub-step (mechanical only), finding format with criticality, criticality severity table. Follow the structure of the existing Step 8 as a template. Verify by running `Bash grep -c "^### Step 8b:" .claude/agents/repo-rules-checker.md` — returns `1`.
+- [ ] Edit `.claude/agents/repo-rules-checker.md` to insert a new "### Step 8b: Cross-Documentation Rules Governance" section AFTER the existing Step 8 conclusion (`## Step 8 Summary: Software Documentation Validation` heading [Repo-grounded — line 1146 of current file]) and BEFORE the existing "### Step 9: Finalize Report" section. The new section MUST include: scope statement (full `docs/` excluding subtrees already covered), per-category validation list (file naming / frontmatter / no-date-metadata / traceability / cross-reference integrity), vendor-binding drift sub-step (mechanical only), finding format with criticality, criticality severity table. Follow the structure of the existing Step 8 as a template. Verify by running `Bash grep -c "^### Step 8b:" .claude/agents/repo-rules-checker.md` — returns `1`.
   - _Suggested executor: `repo-rules-maker`_
 - [ ] Within the new Step 8b body, document the vendor-binding drift sub-step explicitly with the parsing rules from `tech-docs.md §Vendor-Binding Drift Detection`: directory existence (`Bash test -d`), file existence (`Bash test -f`), agent-count-parity (`ls .claude/agents/*.md | wc -l` vs cited count). Verify by running `Bash grep -c "vendor-binding drift" .claude/agents/repo-rules-checker.md` — returns at least `3` (heading + 2+ body references).
   - _Suggested executor: `repo-rules-maker`_
@@ -56,7 +56,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   - _Suggested executor: direct execution_
 - [ ] Run `npx nx affected -t test:quick` — exits 0 with no failed tests.
   - _Suggested executor: direct execution_
-- [ ] Run `npx nx affected -t spec-coverage` — exits 0; coverage thresholds (≥90% Go / ≥90% F# / ≥80% Next.js / ≥70% organiclever-web per AGENTS.md [Repo-grounded]) hold for all affected projects.
+- [ ] Run `npx nx affected -t spec-coverage` — exits 0; coverage thresholds (≥90% Go / ≥90% F# / ≥90% TypeScript (Next.js) / ≥74% organiclever-web per [nx-targets.md](../../../repo-governance/development/infra/nx-targets.md) and project.json [Repo-grounded]) hold for all affected projects.
   - _Suggested executor: direct execution_
 - [ ] Run `npm run lint:md` — exits 0 with `Summary: 0 error(s)`.
   - _Suggested executor: direct execution_
