@@ -2933,7 +2933,7 @@ What does this initiative do?
 [ ] Internal tool or process automation
 [ ] Data pipeline or analytics system
 
-Brief description (2-3 sentences): ****\*\*****\*\*****\*\*****\_\_\_****\*\*****\*\*****\*\*****
+Brief description (2-3 sentences): \***\*\*\*\*\***\*\*\***\*\*\*\*\***\_\_\_\***\*\*\*\*\***\*\*\***\*\*\*\*\***
 
 # => Requestor fills this in, not security — captures intent before security frames the risk
 

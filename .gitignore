@@ -24,6 +24,10 @@ Brewfile.lock.json
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.staging
+.env.test
 !.env.example
 
 # IDE and editor
