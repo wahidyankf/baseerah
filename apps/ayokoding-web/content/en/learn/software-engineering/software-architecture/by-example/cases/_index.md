@@ -18,4 +18,7 @@ description: "Integrated production-wiring cases — how C4, DDD, Hexagonal Arch
   - [Intermediate](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/intermediate)
   - [Advanced](/en/learn/software-engineering/software-architecture/by-example/cases/in-oop/advanced)
 - [In Procedural — Go / Rust](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural)
+  - [Cases: In-the-Field Production Guides — Advanced](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural/advanced)
   - [Overview](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural/overview)
+  - [Intermediate](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural/intermediate)
+  - [Beginner](/en/learn/software-engineering/software-architecture/by-example/cases/in-procedural/beginner)

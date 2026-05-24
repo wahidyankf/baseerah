@@ -46,3 +46,33 @@ Feature: Governance Vendor Audit
     When the developer runs repo-governance vendor-audit on the file
     Then the command exits successfully
     And the output reports zero findings
+
+  Scenario: A newly forbidden coding-agent vendor name in plain prose fails the audit
+    Given a governance markdown file containing "Junie" in plain prose
+    When the developer runs repo-governance vendor-audit on the file
+    Then the command exits with a failure code
+    And the output identifies the forbidden term and its location
+
+  Scenario: The Amazon Q vendor name in plain prose fails the audit
+    Given a governance markdown file containing "Amazon Q" in plain prose
+    When the developer runs repo-governance vendor-audit on the file
+    Then the command exits with a failure code
+    And the output identifies the forbidden term and its location
+
+  Scenario: The Antigravity vendor name in plain prose fails the audit
+    Given a governance markdown file containing "Antigravity" in plain prose
+    When the developer runs repo-governance vendor-audit on the file
+    Then the command exits with a failure code
+    And the output identifies the forbidden term and its location
+
+  Scenario: The mathematical constant pi in plain prose passes the audit
+    Given a governance markdown file containing "The value of pi is 3.14159." in plain prose
+    When the developer runs repo-governance vendor-audit on the file
+    Then the command exits successfully
+    And the output reports zero findings
+
+  Scenario: A newly forbidden vendor name under a Platform Binding Examples heading passes the audit
+    Given a governance markdown file containing "Junie" under a "Platform Binding Examples" heading
+    When the developer runs repo-governance vendor-audit on the file
+    Then the command exits successfully
+    And the output reports zero findings

@@ -9,3 +9,6 @@ description: "Procedural variant of Hexagonal Architecture — Go (canonical; ar
 ---
 
 - [Overview](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/overview)
+- [Beginner](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/beginner)
+- [Intermediate](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/intermediate)
+- [Advanced](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/advanced)

@@ -55,17 +55,24 @@ The following patterns are forbidden in `repo-governance/` prose except inside t
 
 ### Coding-agent / harness product names
 
-| Pattern (regex) | Reason                                                     |
-| --------------- | ---------------------------------------------------------- |
-| `Claude Code`   | Vendor product name                                        |
-| `OpenCode`      | Vendor product name                                        |
-| `\bCursor\b`    | Vendor product name (Anysphere)                            |
-| `\bWindsurf\b`  | Vendor product name (Cognition AI; formerly Codeium)       |
-| `\bCodeium\b`   | Vendor product name (legacy brand for Windsurf)            |
-| `\bCopilot\b`   | Vendor product name (GitHub / Microsoft)                   |
-| `\bAider\b`     | Vendor product name                                        |
-| `\bCline\b`     | Vendor product name                                        |
-| `\bDevin\b`     | Vendor product name (Cognition AI; FP risk: personal name) |
+| Pattern (regex)   | Reason                                                                   |
+| ----------------- | ------------------------------------------------------------------------ |
+| `Claude Code`     | Vendor product name                                                      |
+| `OpenCode`        | Vendor product name                                                      |
+| `\bCursor\b`      | Vendor product name (Anysphere)                                          |
+| `\bWindsurf\b`    | Vendor product name (Cognition AI; formerly Codeium)                     |
+| `\bCodeium\b`     | Vendor product name (legacy brand for Windsurf)                          |
+| `\bCopilot\b`     | Vendor product name (GitHub / Microsoft)                                 |
+| `\bAider\b`       | Vendor product name                                                      |
+| `\bCline\b`       | Vendor product name                                                      |
+| `\bDevin\b`       | Vendor product name (Cognition AI; FP risk: personal name)               |
+| `\bJunie\b`       | Vendor product name (JetBrains)                                          |
+| `\bJetBrains\b`   | Vendor company name                                                      |
+| `\bAmazon Q\b`    | Vendor product name (AWS); use the qualified phrase — never bare `\bQ\b` |
+| `\bAntigravity\b` | Vendor product name (Google)                                             |
+| `Pi Coding Agent` | Vendor product name (Earendil); qualified phrase — never bare `\bpi\b`   |
+| `pi\.dev`         | Vendor product domain (Earendil); qualified — never bare `\bpi\b`        |
+| `\bEarendil\b`    | Vendor company name (Pi)                                                 |
 
 ### Vendor-specific binding directory paths
 
@@ -77,6 +84,12 @@ The following patterns are forbidden in `repo-governance/` prose except inside t
 | `\.windsurf/`   | Vendor-specific path |
 | `\.continue/`   | Vendor-specific path |
 | `\.clinerules/` | Vendor-specific path |
+| `\.junie/`      | Vendor-specific path |
+| `\.amazonq/`    | Vendor-specific path |
+| `\.pi/`         | Vendor-specific path |
+| `\.gemini/`     | Vendor-specific path |
+| `\.agent/`      | Vendor-specific path |
+| `\.agents/`     | Vendor-specific path |
 
 ### Model-vendor company names
 
@@ -110,7 +123,7 @@ The following patterns are forbidden in `repo-governance/` prose except inside t
 Combined audit regex used by `rhino-cli repo-governance vendor-audit`:
 
 ```
-Claude Code|OpenCode|\bCursor\b|\bWindsurf\b|\bCodeium\b|\bCopilot\b|\bAider\b|\bCline\b|\bDevin\b|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/|Anthropic|\bOpenAI\b|\bxAI\b|\bSonnet\b|\bOpus\b|\bHaiku\b|\bGPT\b|\bGemini\b|\bDeepSeek\b|\bQwen\b|\bLlama\b|\bMistral\b|\bGrok\b|\bSkills\b
+Claude Code|OpenCode|\bCursor\b|\bWindsurf\b|\bCodeium\b|\bCopilot\b|\bAider\b|\bCline\b|\bDevin\b|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/|Anthropic|\bOpenAI\b|\bxAI\b|\bSonnet\b|\bOpus\b|\bHaiku\b|\bGPT\b|\bGemini\b|\bDeepSeek\b|\bQwen\b|\bLlama\b|\bMistral\b|\bGrok\b|\bSkills\b|\bJunie\b|\bJetBrains\b|\bAmazon Q\b|\bAntigravity\b|Pi Coding Agent|pi\.dev|\bEarendil\b|\.junie/|\.amazonq/|\.pi/|\.gemini/|\.agent/|\.agents/
 ```
 
 > **Note**: `MCP`, `AGENTS.md`, and `Goose` are NOT forbidden — all three are Linux Foundation / AAIF cross-vendor standards shared across all major coding agents.
@@ -120,6 +133,9 @@ Claude Code|OpenCode|\bCursor\b|\bWindsurf\b|\bCodeium\b|\bCopilot\b|\bAider\b|\
 > - `\bDevin\b` collides with the personal name. Reviewers should confirm context before treating as a violation.
 > - `\bGrok\b` collides with the verb "to grok" (Heinlein, common in tech writing). Reviewers should distinguish product reference from verb usage.
 > - `\bLlama\b`, `\bMistral\b` collide with non-AI English words but rarely appear in governance prose.
+> - `\bAmazon Q\b` is matched only as the qualified phrase; bare `\bQ\b` is intentionally NOT forbidden (single-letter false-positive risk).
+> - `Pi Coding Agent` / `pi\.dev` are matched only as qualified forms; bare `\bpi\b` is intentionally NOT forbidden (collides with the mathematical constant). The binary name `agy` is intentionally NOT forbidden (collides with common substrings).
+> - `\.agents/` is an emerging cross-vendor skills directory; reviewers should confirm a match is load-bearing prose, not an allowlisted Platform Binding Examples region.
 
 ## Allowlist Mechanism
 
@@ -176,6 +192,8 @@ When rewriting governance prose, replace vendor-specific terms with the vendor-n
 | "`.claude/agents/<name>.md`" (as generic path) | "the agent definition file" or `<platform-binding>/agents/<name>.md` | Use exact path only inside platform-binding examples                                                              |
 | "`.claude/skills/<name>/SKILL.md`"             | "the agent skill file" or `<skill-search-path>/<name>/SKILL.md`      | Concrete path inside binding examples only                                                                        |
 | "`.opencode/agents/<name>.md`"                 | same treatment as `.claude/agents/`                                  |                                                                                                                   |
+| "Junie" / "Amazon Q" / "Antigravity" / "Pi"    | "the coding agent"                                                   | Allowed inside `binding-example` blocks and in the platform-bindings catalog                                      |
+| "JetBrains" / "Earendil"                       | "the model vendor" / drop                                            | Allowed only in citation context                                                                                  |
 
 ## Platform Binding Directory Pattern
 
@@ -197,7 +215,7 @@ See [`docs/reference/platform-bindings.md`](../../../docs/reference/platform-bin
 
 To refactor an existing governance file:
 
-1. **Scan**: prefer `rhino-cli repo-governance vendor-audit <path>` (it respects all allowlist regions). For ad-hoc grep, use `grep -n -E "Claude Code|OpenCode|Cursor|Windsurf|Codeium|Copilot|Aider|Cline|Devin|Anthropic|OpenAI|xAI|Sonnet|Opus|Haiku|GPT|Gemini|DeepSeek|Qwen|Llama|Mistral|Grok|Skills|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/" <file>` to find all matches.
+1. **Scan**: prefer `rhino-cli repo-governance vendor-audit <path>` (it respects all allowlist regions). For ad-hoc grep, use `grep -n -E "Claude Code|OpenCode|Cursor|Windsurf|Codeium|Copilot|Aider|Cline|Devin|Junie|JetBrains|Amazon Q|Antigravity|Pi Coding Agent|pi\.dev|Earendil|Anthropic|OpenAI|xAI|Sonnet|Opus|Haiku|GPT|Gemini|DeepSeek|Qwen|Llama|Mistral|Grok|Skills|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/|\.junie/|\.amazonq/|\.pi/|\.gemini/|\.agent/|\.agents/" <file>` to find all matches.
 2. **Classify each match**:
    - Load-bearing prose → rewrite using the Vocabulary Map above.
    - Cross-reference link → rewrite anchor text and link target to neutral equivalent.

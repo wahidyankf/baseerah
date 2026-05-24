@@ -9,3 +9,6 @@ description: "Procedural variant of Finite State Machines — Rust typestate (co
 ---
 
 - [Overview](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example/overview)
+- [Beginner](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example/beginner)
+- [Intermediate](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example/intermediate)
+- [Advanced](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example/advanced)

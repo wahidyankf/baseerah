@@ -25,101 +25,146 @@ struct ForbiddenTerm {
     replacement: &'static str,
 }
 
+/// Source data for [`forbidden_terms`]: `(pattern, display_term, replacement)`.
+///
+/// Kept as a module-level `const` slice (not a function body) so the table can
+/// grow without tripping Clippy's `too_many_lines` ceiling.
+const FORBIDDEN: &[(&str, &str, &str)] = &[
+    (r"Claude Code", "Claude Code", "\"the coding agent\""),
+    (
+        r"OpenCode",
+        "OpenCode",
+        "\"the coding agent\" or drop where redundant",
+    ),
+    (
+        r"\bCursor\b",
+        "Cursor",
+        "\"the coding agent\" or \"AI coding editor\"",
+    ),
+    (
+        r"\bWindsurf\b",
+        "Windsurf",
+        "\"the coding agent\" or \"AI coding editor\"",
+    ),
+    (
+        r"\bCodeium\b",
+        "Codeium",
+        "\"the coding agent\" (legacy Windsurf brand)",
+    ),
+    (
+        r"\bCopilot\b",
+        "Copilot",
+        "\"the coding agent\" or \"AI coding assistant\"",
+    ),
+    (
+        r"\bAider\b",
+        "Aider",
+        "\"the coding agent\" or \"AI coding assistant\"",
+    ),
+    (
+        r"\bCline\b",
+        "Cline",
+        "\"the coding agent\" or \"AI coding assistant\"",
+    ),
+    (
+        r"\bDevin\b",
+        "Devin",
+        "\"the coding agent\" (false-positive risk: personal name; review context)",
+    ),
+    (
+        r"\bJunie\b",
+        "Junie",
+        "\"the coding agent\" or \"AI coding assistant\"",
+    ),
+    (
+        r"\bJetBrains\b",
+        "JetBrains",
+        "\"the model vendor\" or drop",
+    ),
+    (r"\bAmazon Q\b", "Amazon Q", "\"the coding agent\""),
+    (
+        r"\bAntigravity\b",
+        "Antigravity",
+        "\"the coding agent\" or \"AI coding editor\"",
+    ),
+    (
+        r"Pi Coding Agent",
+        "Pi Coding Agent",
+        "\"the coding agent\"",
+    ),
+    (r"pi\.dev", "pi.dev", "\"the coding agent\""),
+    (r"\bEarendil\b", "Earendil", "\"the model vendor\" or drop"),
+    (r"\.claude/", ".claude/", "\"primary binding directory\""),
+    (
+        r"\.opencode/",
+        ".opencode/",
+        "\"secondary binding directory\"",
+    ),
+    (
+        r"\.cursor/",
+        ".cursor/",
+        "\"the platform binding directory\"",
+    ),
+    (
+        r"\.windsurf/",
+        ".windsurf/",
+        "\"the platform binding directory\"",
+    ),
+    (
+        r"\.continue/",
+        ".continue/",
+        "\"the platform binding directory\"",
+    ),
+    (
+        r"\.clinerules/",
+        ".clinerules/",
+        "\"the platform binding directory\"",
+    ),
+    (r"\.junie/", ".junie/", "\"the platform binding directory\""),
+    (
+        r"\.amazonq/",
+        ".amazonq/",
+        "\"the platform binding directory\"",
+    ),
+    (r"\.pi/", ".pi/", "\"the platform binding directory\""),
+    (
+        r"\.gemini/",
+        ".gemini/",
+        "\"the platform binding directory\"",
+    ),
+    (r"\.agent/", ".agent/", "\"the platform binding directory\""),
+    (
+        r"\.agents/",
+        ".agents/",
+        "\"the platform binding directory\"",
+    ),
+    (r"Anthropic", "Anthropic", "\"the model vendor\" or drop"),
+    (r"\bOpenAI\b", "OpenAI", "\"the model vendor\" or drop"),
+    (r"\bxAI\b", "xAI", "\"the model vendor\" or drop"),
+    (r"\bSonnet\b", "Sonnet", "\"execution-grade\""),
+    (r"\bOpus\b", "Opus", "\"planning-grade\""),
+    (r"\bHaiku\b", "Haiku", "\"fast\""),
+    (r"\bGPT\b", "GPT", "\"AI model\" or capability tier"),
+    (r"\bGemini\b", "Gemini", "\"AI model\" or capability tier"),
+    (
+        r"\bDeepSeek\b",
+        "DeepSeek",
+        "\"AI model\" or capability tier",
+    ),
+    (r"\bQwen\b", "Qwen", "\"AI model\" or capability tier"),
+    (r"\bLlama\b", "Llama", "\"AI model\" or capability tier"),
+    (r"\bMistral\b", "Mistral", "\"AI model\" or capability tier"),
+    (
+        r"\bGrok\b",
+        "Grok",
+        "\"AI model\" (false-positive risk: verb \"to grok\"; review context)",
+    ),
+    (r"\bSkills\b", "Skills", "\"agent skills\" (lowercase)"),
+];
+
 fn forbidden_terms() -> &'static Vec<ForbiddenTerm> {
     static TERMS: OnceLock<Vec<ForbiddenTerm>> = OnceLock::new();
-    TERMS.get_or_init(|| {
-        vec![
-            mk(r"Claude Code", "Claude Code", "\"the coding agent\""),
-            mk(
-                r"OpenCode",
-                "OpenCode",
-                "\"the coding agent\" or drop where redundant",
-            ),
-            mk(
-                r"\bCursor\b",
-                "Cursor",
-                "\"the coding agent\" or \"AI coding editor\"",
-            ),
-            mk(
-                r"\bWindsurf\b",
-                "Windsurf",
-                "\"the coding agent\" or \"AI coding editor\"",
-            ),
-            mk(
-                r"\bCodeium\b",
-                "Codeium",
-                "\"the coding agent\" (legacy Windsurf brand)",
-            ),
-            mk(
-                r"\bCopilot\b",
-                "Copilot",
-                "\"the coding agent\" or \"AI coding assistant\"",
-            ),
-            mk(
-                r"\bAider\b",
-                "Aider",
-                "\"the coding agent\" or \"AI coding assistant\"",
-            ),
-            mk(
-                r"\bCline\b",
-                "Cline",
-                "\"the coding agent\" or \"AI coding assistant\"",
-            ),
-            mk(
-                r"\bDevin\b",
-                "Devin",
-                "\"the coding agent\" (false-positive risk: personal name; review context)",
-            ),
-            mk(r"\.claude/", ".claude/", "\"primary binding directory\""),
-            mk(
-                r"\.opencode/",
-                ".opencode/",
-                "\"secondary binding directory\"",
-            ),
-            mk(
-                r"\.cursor/",
-                ".cursor/",
-                "\"the platform binding directory\"",
-            ),
-            mk(
-                r"\.windsurf/",
-                ".windsurf/",
-                "\"the platform binding directory\"",
-            ),
-            mk(
-                r"\.continue/",
-                ".continue/",
-                "\"the platform binding directory\"",
-            ),
-            mk(
-                r"\.clinerules/",
-                ".clinerules/",
-                "\"the platform binding directory\"",
-            ),
-            mk(r"Anthropic", "Anthropic", "\"the model vendor\" or drop"),
-            mk(r"\bOpenAI\b", "OpenAI", "\"the model vendor\" or drop"),
-            mk(r"\bxAI\b", "xAI", "\"the model vendor\" or drop"),
-            mk(r"\bSonnet\b", "Sonnet", "\"execution-grade\""),
-            mk(r"\bOpus\b", "Opus", "\"planning-grade\""),
-            mk(r"\bHaiku\b", "Haiku", "\"fast\""),
-            mk(r"\bGPT\b", "GPT", "\"AI model\" or capability tier"),
-            mk(r"\bGemini\b", "Gemini", "\"AI model\" or capability tier"),
-            mk(
-                r"\bDeepSeek\b",
-                "DeepSeek",
-                "\"AI model\" or capability tier",
-            ),
-            mk(r"\bQwen\b", "Qwen", "\"AI model\" or capability tier"),
-            mk(r"\bLlama\b", "Llama", "\"AI model\" or capability tier"),
-            mk(r"\bMistral\b", "Mistral", "\"AI model\" or capability tier"),
-            mk(
-                r"\bGrok\b",
-                "Grok",
-                "\"AI model\" (false-positive risk: verb \"to grok\"; review context)",
-            ),
-            mk(r"\bSkills\b", "Skills", "\"agent skills\" (lowercase)"),
-        ]
-    })
+    TERMS.get_or_init(|| FORBIDDEN.iter().map(|&(p, t, r)| mk(p, t, r)).collect())
 }
 
 fn mk(pattern: &str, term: &'static str, replacement: &'static str) -> ForbiddenTerm {
@@ -417,6 +462,44 @@ mod tests {
         fs::create_dir_all(p.parent().unwrap()).unwrap();
         fs::write(&p, "Claude Code\n").unwrap();
         let findings = walk(tmp.path()).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn detects_junie_in_prose() {
+        let findings = scan_lines("x.md", "I use Junie for coding.\n");
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].r#match, "Junie");
+    }
+
+    #[test]
+    fn detects_amazon_q_in_prose() {
+        let findings = scan_lines("x.md", "I use Amazon Q for coding.\n");
+        assert!(findings.iter().any(|f| f.r#match == "Amazon Q"));
+    }
+
+    #[test]
+    fn detects_antigravity_in_prose() {
+        let findings = scan_lines("x.md", "I use Antigravity for coding.\n");
+        assert!(findings.iter().any(|f| f.r#match == "Antigravity"));
+    }
+
+    #[test]
+    fn does_not_flag_math_constant_pi() {
+        let findings = scan_lines("x.md", "The value of pi is 3.14159.\n");
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn does_not_flag_bare_capital_q() {
+        let findings = scan_lines("x.md", "Press Q to quit.\n");
+        assert!(findings.is_empty());
+    }
+
+    #[test]
+    fn skips_new_vendor_in_platform_binding_section() {
+        let content = "# X\n\n## Platform Binding Examples\n\nJunie\n\n## Next\n";
+        let findings = scan_lines("x.md", content);
         assert!(findings.is_empty());
     }
 

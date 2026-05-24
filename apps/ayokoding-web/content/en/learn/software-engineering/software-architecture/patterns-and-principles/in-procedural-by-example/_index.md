@@ -8,4 +8,7 @@ layout: list
 description: "Procedural variant of software architecture patterns and principles — Go (canonical), Rust, and C — composition + structural typing without inheritance"
 ---
 
+- [Patterns and Principles in Procedural Languages — Advanced](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-procedural-by-example/advanced)
 - [Overview](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-procedural-by-example/overview)
+- [Beginner](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-procedural-by-example/beginner)
+- [Intermediate](/en/learn/software-engineering/software-architecture/patterns-and-principles/in-procedural-by-example/intermediate)
