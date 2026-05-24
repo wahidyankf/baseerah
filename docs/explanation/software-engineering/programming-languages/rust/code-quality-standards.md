@@ -76,8 +76,6 @@ max_width = 100
 use_small_heuristics = "Default"
 reorder_imports = true
 reorder_modules = true
-imports_granularity = "Module"
-group_imports = "StdExternalCrate"
 ```
 
 **Enforce on pre-commit**:
@@ -96,45 +94,55 @@ cargo fmt --all
 
 **MUST** run Clippy with at minimum the `clippy::pedantic` lint group. All warnings are treated as errors in CI.
 
-### Minimum Clippy Invocation
+### Clippy Invocation
 
 ```bash
-# CI invocation — denies all warnings
-cargo clippy --all-targets --all-features -- \
-  -D warnings \
-  -D clippy::pedantic \
-  -D clippy::nursery \
-  -A clippy::module_name_repetitions \
-  -A clippy::must_use_candidate
+# CI invocation — denies all warnings (lints configured in Cargo.toml)
+cargo clippy --all-targets -- -D warnings
 ```
 
-### Workspace-Level Clippy Configuration
+### Cargo.toml Clippy Configuration
 
-**SHOULD** configure Clippy in `Cargo.toml` at the workspace level:
+**MUST** configure Clippy in `Cargo.toml` via `[lints.clippy]`. This is preferred over CLI flags because
+it is checked into source control, applies consistently across all contributors and CI, and allows
+per-lint overrides with priority ordering.
 
 ```toml
-# Cargo.toml (workspace)
-[workspace.lints.clippy]
-pedantic = "deny"
-nursery = "deny"
-# Commonly relaxed pedantic lints
-module_name_repetitions = "allow"
+# Cargo.toml
+[lints.clippy]
+# Enable pedantic group at low priority — individual allows below override via priority 0
+pedantic = { level = "warn", priority = -1 }
+
+# --- Documented allows ---
 must_use_candidate = "allow"
-missing_errors_doc = "warn"
-missing_panics_doc = "warn"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+# --- Restriction lints (hard errors, cannot be suppressed by -D warnings alone) ---
+unwrap_used = "deny"
+panic = "deny"
+undocumented_unsafe_blocks = "deny"
 ```
+
+**Key config decisions**:
+
+- `pedantic = { level = "warn", priority = -1 }` — enables the group at lower priority so per-lint
+  `"allow"` or `"deny"` entries (which default to priority 0) take precedence without needing
+  `priority` on every override
+- Restriction lints set to `"deny"` become hard errors even without `-D warnings`; they cannot be
+  silenced by `--cap-lints warn`
 
 ### Key Clippy Lints (MUST address)
 
-| Lint                         | Severity | Description                                |
-| ---------------------------- | -------- | ------------------------------------------ |
-| `clippy::unwrap_used`        | DENY     | Forbid `unwrap()` in production code       |
-| `clippy::expect_used`        | WARN     | Warn on `expect()` — document invariant    |
-| `clippy::panic`              | DENY     | Forbid panic in library code               |
-| `clippy::indexing_slicing`   | WARN     | Prefer `get()` over direct indexing        |
-| `clippy::integer_arithmetic` | WARN     | Prefer checked arithmetic in domain logic  |
-| `clippy::float_arithmetic`   | DENY     | Forbid float in financial calculations     |
-| `clippy::clone_on_ref_ptr`   | DENY     | Explicit `Arc::clone(&x)` over `x.clone()` |
+| Lint                              | Severity | Description                                |
+| --------------------------------- | -------- | ------------------------------------------ |
+| `clippy::unwrap_used`             | DENY     | Forbid `unwrap()` in production code       |
+| `clippy::expect_used`             | WARN     | Warn on `expect()` — document invariant    |
+| `clippy::panic`                   | DENY     | Forbid panic in library code               |
+| `clippy::indexing_slicing`        | WARN     | Prefer `get()` over direct indexing        |
+| `clippy::arithmetic_side_effects` | WARN     | Prefer checked arithmetic in domain logic  |
+| `clippy::float_arithmetic`        | DENY     | Forbid float in financial calculations     |
+| `clippy::clone_on_ref_ptr`        | DENY     | Explicit `Arc::clone(&x)` over `x.clone()` |
 
 ### Suppressing Lints (Requires Justification)
 

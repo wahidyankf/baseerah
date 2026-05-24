@@ -206,14 +206,35 @@ strip = "symbols"
 # .rustfmt.toml
 edition = "2024"
 max_width = 100
-use_field_init_shorthand = true
+use_small_heuristics = "Default"
+reorder_imports = true
+reorder_modules = true
+```
+
+Configure Clippy via `[lints.clippy]` in `Cargo.toml` (not CLI flags) — checked into source
+control, applies consistently across contributors and CI:
+
+```toml
+# Cargo.toml
+[lints.clippy]
+# Enable pedantic at low priority — per-lint allows below override at default priority 0
+pedantic = { level = "warn", priority = -1 }
+
+# --- Documented allows (document the why for each) ---
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+
+# --- Restriction lints: hard errors even without -D warnings ---
+unwrap_used = "deny"
+panic = "deny"
+undocumented_unsafe_blocks = "deny"
 ```
 
 ```bash
 # Run before commit
-cargo fmt --check                                    # Check formatting
-cargo clippy -- -D warnings -D unsafe_code           # Fail on any warning or unsafe
-cargo test                                           # Run all tests
+cargo fmt --check                    # Check formatting
+cargo clippy --all-targets -- -D warnings  # Fail on any warning (lints from Cargo.toml)
+cargo test                           # Run all tests
 ```
 
 ## Comprehensive Documentation
