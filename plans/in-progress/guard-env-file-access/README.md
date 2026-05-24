@@ -139,11 +139,13 @@ one) operating on repo files, running tooling, and committing.
   `.env*` file refused on every agent platform, so secrets are neither exposed
   nor written via an agent.
 - As a maintainer, I want any attempt to **commit** a real `.env*` file rejected
-  before it lands in history.
+  before it lands in history, so that real env files can never enter git history
+  even via force-add.
 - As a maintainer, I want agents to freely read/write/edit/commit `.env.example`,
-  without a prompt.
+  without a prompt, so that template setup work proceeds without interruption.
 - As a maintainer, I want agents to still run project scripts under
-  `apps`/`libs`/`scripts` that manage `.env*` at runtime.
+  `apps`/`libs`/`scripts` that manage `.env*` at runtime, so that legitimate
+  env-setup automation is never blocked.
 - As a maintainer, I want this codified as a repo-governance rule so it is
   discoverable and enforced regardless of which agent tool is used.
 
@@ -211,7 +213,6 @@ Add to `permissions.allow` (template prompt-free):
 
 ```jsonc
 "Read(**/.env.example)",
-"Write(**/.env.example)",
 "Edit(**/.env.example)"
 ```
 
@@ -219,15 +220,17 @@ Add `permissions.deny` (enumerated real env names; never matches `.env.example`)
 
 ```jsonc
 "deny": [
-  "Read(**/.env)",            "Write(**/.env)",            "Edit(**/.env)",
-  "Read(**/.env.local)",      "Write(**/.env.local)",      "Edit(**/.env.local)",
-  "Read(**/.env.*.local)",    "Write(**/.env.*.local)",    "Edit(**/.env.*.local)",
-  "Read(**/.env.development)","Write(**/.env.development)","Edit(**/.env.development)",
-  "Read(**/.env.production)", "Write(**/.env.production)", "Edit(**/.env.production)",
-  "Read(**/.env.staging)",    "Write(**/.env.staging)",    "Edit(**/.env.staging)",
-  "Read(**/.env.test)",       "Write(**/.env.test)",       "Edit(**/.env.test)"
+  "Read(**/.env)",            "Edit(**/.env)",
+  "Read(**/.env.local)",      "Edit(**/.env.local)",
+  "Read(**/.env.*.local)",    "Edit(**/.env.*.local)",
+  "Read(**/.env.development)","Edit(**/.env.development)",
+  "Read(**/.env.production)", "Edit(**/.env.production)",
+  "Read(**/.env.staging)",    "Edit(**/.env.staging)",
+  "Read(**/.env.test)",       "Edit(**/.env.test)"
 ]
 ```
+
+> **Note**: `Write` is not a valid Claude Code permission rule name — `Edit` covers all file-write operations (Write, Edit, MultiEdit, Patch). Hook matchers (Layer 2) correctly use `Write` as a tool name, which is distinct from permission rule names.
 
 > These apply to the file tools by path — they do NOT affect `Bash`, so
 > project-script execution is untouched by this layer.
@@ -397,30 +400,30 @@ See [Trunk Based Development](../../../repo-governance/development/workflow/trun
 
 ### Phase 1 — Claude PreToolUse access guard (authoritative)
 
-- [ ] Create `_New file_` `.claude/hooks/block-env-file-access.sh` per `Technical Approach §Layer 2`. `chmod +x` it. Acceptance: `test -x .claude/hooks/block-env-file-access.sh` exits 0.
-- [ ] Unit-test the file-tool branch (plain bash + `jq`). Assert:
+- [ ] (Red) Create `_New file_` `.claude/hooks/block-env-file-access.test.sh` with all DENY/ALLOW assertion cases below (sequential `set -e`, one assertion per line). Acceptance: `bash .claude/hooks/block-env-file-access.test.sh` exits **non-zero** (hook not yet created).
   - DENY: `echo '{"tool_name":"Read","tool_input":{"file_path":".env.local"}}' | .claude/hooks/block-env-file-access.sh | jq -e '.hookSpecificOutput.permissionDecision=="deny"'` exits 0.
   - DENY: `Write` on `apps/organiclever-web/.env.local` → deny.
   - DENY: `Edit` on `.env.production` → deny.
   - DENY: `Write` on `.env.whatever` → deny.
   - ALLOW: `Read` on `.env.example` → empty output, exit 0.
   - ALLOW: `Write` on `infra/dev/ose-web/.env.example` → empty output, exit 0.
-- [ ] Save assertions as `_New file_` `.claude/hooks/block-env-file-access.test.sh` (sequential `set -e`, one pass line per case). Acceptance: `bash .claude/hooks/block-env-file-access.test.sh` exits 0.
+- [ ] (Green) Create `_New file_` `.claude/hooks/block-env-file-access.sh` per `Technical Approach §Layer 2`. `chmod +x` it. Acceptance: `bash .claude/hooks/block-env-file-access.test.sh` exits 0.
 - [ ] Register the `Read|Write|Edit|MultiEdit` matcher block in `.claude/settings.json`. Acceptance: `jq -e '.hooks.PreToolUse[] | select(.matcher=="Read|Write|Edit|MultiEdit") | .hooks[0].command | test("block-env-file-access.sh")' .claude/settings.json` exits 0.
 - [ ] Prove live: attempt `Read` on a manually-created `local-temp/.env.local` → denied; `Read`/`Write` on `local-temp/.env.example` → allowed; delete test files.
 
 ### Phase 2 — Claude declarative allow + deny (defense in depth)
 
-- [ ] Add the three `Read/Write/Edit(**/.env.example)` entries to `permissions.allow`. Acceptance: `jq -e '.permissions.allow | index("Write(**/.env.example)")' .claude/settings.json` exits 0.
+- [ ] Add the two `Read/Edit(**/.env.example)` entries to `permissions.allow`. Acceptance: `jq -e '.permissions.allow | index("Edit(**/.env.example)")' .claude/settings.json` exits 0.
 - [ ] Merge the `permissions.deny` array from `§Layer 1`. Acceptance: `jq -e '.permissions.deny | index("Read(**/.env.local)")' .claude/settings.json` exits 0 AND `jq -e '.permissions.allow | length > 0' .claude/settings.json` exits 0.
 - [ ] Validate JSON: `jq -e . .claude/settings.json` exits 0.
 
 ### Phase 3 — Claude Bash guard (with script carve-out)
 
-- [ ] Extend the hook per `§Layer 3`, allow-before-deny. Acceptance — all of:
+- [ ] (Red) Add Bash deny/allow cases to `.claude/hooks/block-env-file-access.test.sh`:
   - DENY: `cat .env.local`, `echo X > .env.local`, `git add .env.local` → deny.
   - ALLOW: `cat .env.example`, `bash scripts/setup-env.sh`, `node apps/foo/seed-env.js`, `npm run setup:env` → empty output, exit 0.
-- [ ] Add the Bash cases to the test file. Acceptance: `bash .claude/hooks/block-env-file-access.test.sh` exits 0.
+    Acceptance: `bash .claude/hooks/block-env-file-access.test.sh` exits **non-zero** (Bash guard not yet implemented).
+- [ ] (Green) Extend the hook per `§Layer 3`, allow-before-deny. Acceptance: all deny/allow assertions pass; `bash .claude/hooks/block-env-file-access.test.sh` exits 0.
 
 ### Phase 4 — OpenCode enforcement (mandatory)
 
@@ -432,8 +435,8 @@ See [Trunk Based Development](../../../repo-governance/development/workflow/trun
 ### Phase 5 — Git-commit prevention
 
 - [ ] Edit `.gitignore`: append `.env.development`, `.env.production`, `.env.staging`, `.env.test`; keep `!.env.example` as the last line of the env block. Acceptance: `git check-ignore .env.production` prints `.env.production` AND `git check-ignore .env.example` prints nothing (exit 1).
-- [ ] Add the staged-`.env*` rejection logic from `§Layer 5` to `.husky/pre-commit` (or a `scripts/` guard it invokes). Acceptance — temp test: `printf 'X\n' > local-temp/.env.local && git add -f local-temp/.env.local`, run the guard logic → exits non-zero naming the file; `git restore --staged local-temp/.env.local && rm local-temp/.env.local`. Then `cp apps/ose-app-be/.env.example local-temp/.env.example && git add local-temp/.env.example`, run guard → exits 0; clean up (`git restore --staged` + `rm`).
-- [ ] Add a guard self-test (`_New test_`) capturing the two cases above; wire it into the hook-test script or a `scripts/` test. Acceptance: the self-test exits 0.
+- [ ] (Red) Create `_New test_` guard self-test capturing: `git add -f` on `local-temp/.env.local` then run guard logic → exits non-zero (naming the file); stage `local-temp/.env.example` then run guard → exits 0. Acceptance: run self-test → exits **non-zero** (guard logic not yet added to pre-commit).
+- [ ] (Green) Add the staged-`.env*` rejection logic from `§Layer 5` to `.husky/pre-commit` (or a `scripts/` guard it invokes). Acceptance: run self-test → exits 0.
 
 ### Phase 6 — Governance rule propagation (repo-rules-maker)
 
@@ -449,7 +452,7 @@ See [Trunk Based Development](../../../repo-governance/development/workflow/trun
 - [ ] Validate config JSON: `jq -e . .claude/settings.json && jq -e . opencode.json` — exits 0.
 - [ ] Run markdown lint: `npm run lint:md` — exits 0.
 - [ ] Run markdown format check: `npm run format:md:check` — exits 0.
-- [ ] Run affected checks: `npx nx affected -t typecheck lint test:quick` — exits 0 or "no projects".
+- [ ] Run affected checks: `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0 or "no projects".
 - [ ] Fix ALL failures found — including preexisting issues not caused by these changes (root cause orientation).
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes (root cause orientation — proactively fix preexisting errors encountered during work).
