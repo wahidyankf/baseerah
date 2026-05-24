@@ -1,5 +1,5 @@
 target/
 dist/
-cover.out
-cover_spec.out
+lcov.info
+lcov_spec.info
 *.profraw

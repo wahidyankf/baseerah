@@ -4,12 +4,9 @@
 // External dependencies (validate-claude, sync, validate-sync, validate-links)
 // call the same Rust internal modules already ported.
 
-use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::sync::mpsc;
-use std::thread;
 use std::time::{Duration, Instant};
 
 use anyhow::{Error, anyhow};
@@ -66,7 +63,7 @@ where
             deps.stdout,
             "\u{26A0}\u{FE0F}  Step {:?} timed out after {} — skipping",
             name,
-            humantime::format_duration(STEP_TIMEOUT)
+            format!("{}s", STEP_TIMEOUT.as_secs())
         );
         return Ok(());
     }
@@ -134,6 +131,8 @@ pub fn run(deps: &mut Deps) -> Result<(), Error> {
         step5b_sync_lockfiles(&root5b, &staged5b, d)
     })?;
 
+    // Step 6 (agent-format hook) was present in the Go source but removed
+    // during the Go→Rust port; gap in numbering is intentional.
     let root7 = git_root.clone();
     run_with_step_timeout(total_start, "step7ValidateLinks", deps, move |d| {
         step7_validate_links(&root7, d)
@@ -369,23 +368,6 @@ fn step8_lint_markdown(git_root: &Path, _deps: &mut Deps) -> Result<(), Error> {
     Ok(())
 }
 
-mod humantime {
-    use std::time::Duration;
-    pub fn format_duration(d: Duration) -> String {
-        let secs = d.as_secs();
-        format!("{secs}s")
-    }
-}
-
-// Suppress unused warnings for the thread/mpsc imports until full timeout
-// support is added (current impl uses elapsed-after rather than parallel).
-#[allow(dead_code)]
-fn _unused() {
-    let (_tx, _rx) = mpsc::channel::<()>();
-    let _ = thread::spawn(|| {});
-    let _ = fs::read("/dev/null");
-}
-
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
@@ -514,11 +496,6 @@ mod tests {
         };
         // No staged files → 0 broken links → Ok.
         let _ = step7_validate_links(dir.path(), &mut deps);
-    }
-
-    #[test]
-    fn humantime_format_seconds() {
-        assert_eq!(humantime::format_duration(Duration::from_secs(30)), "30s");
     }
 
     #[test]

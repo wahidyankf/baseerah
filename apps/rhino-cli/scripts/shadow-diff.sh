@@ -6,7 +6,7 @@
 # switches to the Rust binary outright.
 #
 # Usage:   shadow-diff.sh <args-to-rhino-cli>
-# Example: shadow-diff.sh test-coverage validate apps/rhino-cli/cover.out 90
+# Example: shadow-diff.sh test-coverage validate apps/rhino-cli/lcov.info 90
 #          shadow-diff.sh --help
 #
 # Exit codes:

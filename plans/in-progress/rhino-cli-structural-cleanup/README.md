@@ -202,10 +202,10 @@ Work is done when all of the following are true:
 
 ### Phase 0: Environment Setup
 
-- [ ] Provision worktree: `claude --worktree rhino-cli-structural-cleanup`
-- [ ] In repo root, run `npm install && npm run doctor -- --fix` to initialize
+- [x] Provision worktree: `claude --worktree rhino-cli-structural-cleanup`
+- [x] In repo root, run `npm install && npm run doctor -- --fix` to initialize
       the toolchain (see [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md))
-- [ ] Verify baseline passes before making changes:
+- [x] Verify baseline passes before making changes:
       `npx nx run rhino-cli:test:quick` — must exit 0 and report ≥ 90% line coverage.
       Record the exact coverage percentage as the baseline to compare at the end.
 
@@ -213,7 +213,7 @@ Work is done when all of the following are true:
 
 ### Phase 1: Dead Code and Go Artifact Cleanup
 
-- [ ] Edit `apps/rhino-cli/src/internal/git/mod.rs` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/src/internal/git/mod.rs` [Repo-grounded]:
   - Remove `use std::sync::mpsc;` and `use std::thread;` imports
   - Remove `use std::fs;` — it is only used in the dead `_unused()` function being removed (the test module uses `std::fs::create_dir_all` and `std::fs::write` with fully qualified paths that do not depend on this import)
   - Remove the `_unused()` function and its preceding comment block
@@ -227,7 +227,7 @@ Work is done when all of the following are true:
   - Acceptance criterion: `grep -n "_unused\|mpsc\|thread::spawn\|use std::fs;\|mod humantime" apps/rhino-cli/src/internal/git/mod.rs` returns no matches (the suppressor block and dead imports are gone).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Delete untracked directories (contain no tracked files — no git history to preserve):
+- [x] Delete untracked directories (contain no tracked files — no git history to preserve):
 
   ```bash
   rm -rf apps/rhino-cli/tests/cli apps/rhino-cli/tests/cucumber
@@ -235,7 +235,7 @@ Work is done when all of the following are true:
 
   Verify: `find apps/rhino-cli/tests -mindepth 1 | wc -l` → `0`
 
-- [ ] Edit `apps/rhino-cli/project.json` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/project.json` [Repo-grounded]:
   - In the `test:quick` target `command` string: replace
     `--output-path apps/rhino-cli/cover.out` with
     `--output-path apps/rhino-cli/lcov.info`
@@ -244,21 +244,21 @@ Work is done when all of the following are true:
   - Verify: `grep "cover.out" apps/rhino-cli/project.json` → no matches; `grep "lcov.info" apps/rhino-cli/project.json` → 2 matches (one in command, one in outputs).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Edit `apps/rhino-cli/.gitignore` [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/.gitignore` [Repo-grounded]:
   - Replace `cover.out` with `lcov.info`
   - Replace `cover_spec.out` with `lcov_spec.info`
 
-- [ ] Edit `apps/rhino-cli/scripts/shadow-diff.sh` line 9 [Repo-grounded]:
+- [x] Edit `apps/rhino-cli/scripts/shadow-diff.sh` line 9 [Repo-grounded]:
   - Update the example comment from
     `shadow-diff.sh test-coverage validate apps/rhino-cli/cover.out 90` to
     `shadow-diff.sh test-coverage validate apps/rhino-cli/lcov.info 90`
 
-- [ ] Verify Phase 1: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
+- [x] Verify Phase 1: `cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets`
       exits 0; `npx nx run rhino-cli:test:unit` exits 0 with the same test count as the
       Phase 0 baseline (confirms no tests were accidentally deleted with the dead code).
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit: `refactor(rhino-cli): remove dead code and rename cover.out to lcov.info`
+- [x] Commit: `refactor(rhino-cli): remove dead code and rename cover.out to lcov.info`
 
 ---
 
