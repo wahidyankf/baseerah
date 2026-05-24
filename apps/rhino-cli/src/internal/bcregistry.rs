@@ -6,7 +6,7 @@ use std::path::Path;
 use std::sync::OnceLock;
 
 use anyhow::{Context, Error, anyhow};
-use serde_norway::Value;
+use serde_yml::Value;
 
 use crate::internal::severity::Severity;
 
@@ -103,7 +103,7 @@ pub fn load(repo_root: &Path, app: &str) -> Result<Registry, Error> {
     let data = fs::read(&path)
         .with_context(|| format!("registry not found for app \"{app}\" at {}", path.display()))?;
     let s = String::from_utf8_lossy(&data);
-    let v: Value = serde_norway::from_str(&s)
+    let v: Value = serde_yml::from_str(&s)
         .with_context(|| format!("failed to parse registry for app \"{app}\""))?;
     let mut reg = parse_registry(&v)?;
     if reg.version != SCHEMA_VERSION {

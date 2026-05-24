@@ -19,14 +19,13 @@ path = "src/lib.rs"
 clap = { version = "4.6.1", features = ["derive", "env"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
-serde_norway = "0.9.42"
+serde_yml = "0.0.12"
 walkdir = "2.5.0"
 ignore = "0.4.25"
 regex = "1.12.3"
 pulldown-cmark = "0.13.4"
 tree-sitter = "0.26.9"
 anyhow = "1.0.102"
-thiserror = "2.0.18"
 quick-xml = { version = "0.40.1", features = ["serialize"] }
 chrono = { version = "0.4.44", default-features = false, features = ["serde", "clock"] }
 glob = "0.3.3"

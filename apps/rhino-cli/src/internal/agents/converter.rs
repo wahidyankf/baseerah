@@ -13,7 +13,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use serde_norway::Value;
+use serde_yml::Value;
 
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 
@@ -147,8 +147,8 @@ pub fn convert_agent(
         extract_frontmatter(&content).map_err(|e| format!("failed to extract frontmatter: {e}"))?;
 
     let frontmatter_str = String::from_utf8_lossy(&frontmatter).into_owned();
-    let value: Value = serde_norway::from_str(&frontmatter_str)
-        .map_err(|e| format!("failed to parse YAML: {e}"))?;
+    let value: Value =
+        serde_yml::from_str(&frontmatter_str).map_err(|e| format!("failed to parse YAML: {e}"))?;
 
     let Value::Mapping(mapping) = value else {
         return Err("frontmatter is not a mapping".to_string());

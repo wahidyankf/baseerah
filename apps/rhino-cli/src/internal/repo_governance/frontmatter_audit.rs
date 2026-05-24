@@ -107,15 +107,14 @@ fn check_frontmatter_updated_field(path: &str, frontmatter: &str) -> Vec<Frontma
     if frontmatter.is_empty() {
         return Vec::new();
     }
-    let Ok(parsed): std::result::Result<serde_norway::Value, _> =
-        serde_norway::from_str(frontmatter)
+    let Ok(parsed): std::result::Result<serde_yml::Value, _> = serde_yml::from_str(frontmatter)
     else {
         return Vec::new(); // unparseable YAML is out of scope
     };
-    let serde_norway::Value::Mapping(mapping) = parsed else {
+    let serde_yml::Value::Mapping(mapping) = parsed else {
         return Vec::new();
     };
-    if !mapping.contains_key(serde_norway::Value::String("updated".to_string())) {
+    if !mapping.contains_key(serde_yml::Value::String("updated".to_string())) {
         return Vec::new();
     }
     let line = find_field_line(frontmatter, "updated");

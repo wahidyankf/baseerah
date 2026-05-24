@@ -6,7 +6,7 @@ use std::fs;
 use std::hash::BuildHasher;
 use std::path::Path;
 
-use serde_norway::Value;
+use serde_yml::Value;
 
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 use super::types::{
@@ -102,7 +102,7 @@ pub fn validate_agent<S1: BuildHasher, S2: BuildHasher>(
 
 fn parse_agent_yaml(frontmatter: &str) -> Result<ClaudeAgentFull, String> {
     let v: Value =
-        serde_norway::from_str(frontmatter).map_err(|e| format!("yaml parse error: {e}"))?;
+        serde_yml::from_str(frontmatter).map_err(|e| format!("yaml parse error: {e}"))?;
     let mut agent = ClaudeAgentFull::default();
     if let Value::Mapping(m) = v {
         for (k, val) in m {
@@ -151,7 +151,7 @@ fn validate_required_fields(filename: &str, agent: &ClaudeAgentFull) -> Validati
 }
 
 fn validate_field_order(filename: &str, frontmatter: &str) -> Vec<ValidationCheck> {
-    let v: Result<Value, _> = serde_norway::from_str(frontmatter);
+    let v: Result<Value, _> = serde_yml::from_str(frontmatter);
     let v = match v {
         Ok(v) => v,
         Err(e) => {
