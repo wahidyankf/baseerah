@@ -8,7 +8,7 @@ step, this plan removes the now-unused Go shared libraries (`libs/golang-link-co
 
 ## Status
 
-In Progress
+Completed (2026-05-25)
 
 ## Context
 

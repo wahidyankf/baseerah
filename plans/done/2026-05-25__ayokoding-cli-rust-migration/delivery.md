@@ -727,7 +727,10 @@ mandatory — do not skip it.
 
 ### Commit Guidelines (Phase 3)
 
-- [ ] Commit: `chore(libs): remove golang-link-commons and golang-commons (all consumers migrated to Rust)`
+- [x] Commit: `chore(libs): remove golang-link-commons and golang-commons (all consumers migrated to Rust)`
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Committed as 02f7b017a.
 
 ---
 
@@ -743,33 +746,48 @@ this plan's changes.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run affected typecheck: `npx nx affected -t typecheck` — exits 0.
-- [ ] Run affected linting: `npx nx affected -t lint` — exits 0.
-- [ ] Run affected quick tests: `npx nx affected -t test:quick` — exits 0, all coverage gates pass.
-- [ ] Run affected spec-coverage: `npx nx affected -t spec-coverage` — exits 0.
-- [ ] Fix ALL failures — including preexisting issues not caused by your changes.
-- [ ] Re-run failing checks to confirm resolution.
-- [ ] Verify zero failures before pushing.
+- [x] Run affected typecheck: `npx nx affected -t typecheck` — exits 0.
+  - **Date**: 2026-05-25
+  - **Notes**: ayokoding-cli exits 0, rust-commons exits 0 (from cache).
+- [x] Run affected linting: `npx nx affected -t lint` — exits 0.
+  - **Date**: 2026-05-25
+  - **Notes**: ayokoding-cli exits 0, rust-commons exits 0 (from cache).
+- [x] Run affected quick tests: `npx nx affected -t test:quick` — exits 0, all coverage gates pass.
+  - **Date**: 2026-05-25
+  - **Notes**: ayokoding-cli 97.94% lib coverage. rust-commons 96.65% (from cache). Both ≥ 90%.
+- [x] Run affected spec-coverage: `npx nx affected -t spec-coverage` — exits 0.
+  - **Date**: 2026-05-25
+  - **Notes**: Both stubbed, exits 0.
+- [x] Fix ALL failures — including preexisting issues not caused by your changes.
+  - **Notes**: No failures found.
+- [x] Re-run failing checks to confirm resolution.
+  - **Notes**: No failures to re-run.
+- [x] Verify zero failures before pushing.
+  - **Notes**: Zero failures.
 
 ### Commit Guidelines (Phase 4)
 
-- [ ] Group related fixes into thematically cohesive commits.
-- [ ] Follow Conventional Commits format: `<type>(<scope>): <description>`.
-- [ ] Split different domains/concerns into separate commits.
-- [ ] Preexisting fixes get their own commits, separate from plan work.
-- [ ] Do NOT bundle unrelated changes into a single commit.
+- [x] Group related fixes into thematically cohesive commits.
+- [x] Follow Conventional Commits format: `<type>(<scope>): <description>`.
+- [x] Split different domains/concerns into separate commits.
+- [x] Preexisting fixes get their own commits, separate from plan work.
+  - **Notes**: No preexisting failures found.
+- [x] Do NOT bundle unrelated changes into a single commit.
 
 ---
 
 ## Phase 5: Post-Push CI Verification
 
-- [ ] Push changes to `main`:
+- [x] Push changes to `main`:
 
   ```bash
   git push origin main
   ```
 
-- [ ] Monitor ALL GitHub Actions workflows triggered by the push using:
+  - **Date**: 2026-05-25
+  - **Notes**: Pushed successfully. 3 commits pushed (Phase 2 archive, Phase 1 rewrite, Phase 3 Go lib removal).
+
+- [x] Monitor ALL GitHub Actions workflows triggered by the push using:
 
   ```bash
   gh run list --limit 5
@@ -777,13 +795,18 @@ this plan's changes.
   ```
 
   Poll every 3 minutes. Do not use `gh run watch`.
+  - **Date**: 2026-05-25
+  - **Notes**: No new CI runs triggered for CLI tool changes — no push-triggered workflow covers ayokoding-cli/rust-commons (only web apps have scheduled CI). Pre-push hook enforced local quality gates before push.
 
-- [ ] Verify ALL CI checks pass — no exceptions. Check especially:
+- [x] Verify ALL CI checks pass — no exceptions. Check especially:
   - `nx affected` build, lint, typecheck, test:quick, spec-coverage targets for `ayokoding-cli`
   - Any markdownlint or link-checker CI steps
-- [ ] If any CI check fails, fix immediately and push a follow-up commit.
-- [ ] Repeat until ALL GitHub Actions pass with zero failures.
-- [ ] Do NOT proceed to Plan Archival until CI is fully green.
+  - **Date**: 2026-05-25
+  - **Notes**: All existing CI workflows (ose-web, ayokoding-web, wahidyankf-web) at success. No CLI-specific push CI to check. Local gates all passed.
+- [x] If any CI check fails, fix immediately and push a follow-up commit.
+  - **Notes**: No failures.
+- [x] Repeat until ALL GitHub Actions pass with zero failures.
+- [x] Do NOT proceed to Plan Archival until CI is fully green.
 
 ---
 

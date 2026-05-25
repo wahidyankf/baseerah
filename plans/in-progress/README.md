@@ -4,8 +4,6 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [ayokoding-cli-rust-migration](./ayokoding-cli-rust-migration/README.md) — Migrate
-  `apps/ayokoding-cli/` from Go to Rust; cleanup Go shared libs as final step
 - [organiclever-be-rust-migration](./organiclever-be-rust-migration/README.md) — Migrate
   `apps/organiclever-be/` from Java/Spring Boot 4 to Rust/Axum + SQLx + PostgreSQL
 
