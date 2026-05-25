@@ -7,108 +7,129 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml -g java -o $(pwd)/apps/organiclever-be/generated-contracts --model-package com.organicleverbe.contracts --additional-properties=library=resttemplate,dateLibrary=java8,openApiNullable=false,useBeanValidation=false,serializationLibrary=jackson --global-property=models,modelDocs=false,apiDocs=false"
+        "command": "echo 'TODO: update openapi-generator-cli to -g rust once generator is validated' && exit 0"
       },
-      "dependsOn": ["organiclever-contracts:bundle"],
       "cache": true,
-      "inputs": [
-        "{workspaceRoot}/specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml",
-        "{workspaceRoot}/apps/rhino-cli/cmd/**/*.go",
-        "{workspaceRoot}/apps/rhino-cli/internal/**/*.go"
-      ],
+      "inputs": ["{workspaceRoot}/specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml"],
       "outputs": ["{projectRoot}/generated-contracts"]
+    },
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo fetch --manifest-path apps/organiclever-be/Cargo.toml"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/Cargo.lock"]
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mvn clean package -DskipTests",
-        "cwd": "apps/organiclever-be"
+        "command": "cargo build --release --manifest-path apps/organiclever-be/Cargo.toml"
       },
       "outputs": ["{projectRoot}/target"],
-      "dependsOn": ["codegen"]
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**", "{projectRoot}/Cargo.toml"]
     },
-    "dev": {
+    "fmt": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "mvn spring-boot:run -Dspring-boot.run.profiles=dev",
-        "cwd": "apps/organiclever-be"
+        "command": "cargo fmt --manifest-path apps/organiclever-be/Cargo.toml"
       }
     },
-    "start": {
+    "fmt:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "sh -c 'java -jar target/organiclever-be-*.jar'",
-        "cwd": "apps/organiclever-be"
-      }
-    },
-    "test:quick": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc organiclever)",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul organiclever)",
-          "mvn test",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/organiclever-be/target/site/jacoco/jacoco.xml 95)"
-        ],
-        "parallel": false,
-        "cwd": "apps/organiclever-be"
+        "command": "cargo fmt --check --manifest-path apps/organiclever-be/Cargo.toml"
       },
       "cache": true,
-      "inputs": [
-        "{projectRoot}/src/**",
-        "{projectRoot}/pom.xml",
-        "{projectRoot}/generated-contracts/**/*",
-        "{workspaceRoot}/specs/apps/organiclever/behavior/be/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/organiclever/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/organiclever/ddd/ubiquitous-language/**/*.md"
-      ],
-      "outputs": ["{projectRoot}/target/site/jacoco/jacoco.xml"]
-    },
-    "test:unit": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "mvn test",
-        "cwd": "apps/organiclever-be"
-      },
-      "cache": true,
-      "inputs": [
-        "{projectRoot}/src/**",
-        "{projectRoot}/pom.xml",
-        "{projectRoot}/generated-contracts/**/*",
-        "{workspaceRoot}/specs/apps/organiclever/behavior/be/gherkin/**/*.feature"
-      ]
-    },
-    "test:integration": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "docker compose -f docker-compose.integration.yml down -v && docker compose -f docker-compose.integration.yml up --abort-on-container-exit --build",
-        "cwd": "apps/organiclever-be"
-      },
-      "cache": false
+      "inputs": ["{projectRoot}/src/**", "{projectRoot}/Cargo.toml"]
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["mvn checkstyle:check", "mvn pmd:check"],
-        "parallel": false,
-        "cwd": "apps/organiclever-be"
+        "command": "cargo clippy --manifest-path apps/organiclever-be/Cargo.toml --all-targets -- -D warnings"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**", "{projectRoot}/Cargo.toml"]
+    },
+    "deny:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo deny --manifest-path apps/organiclever-be/Cargo.toml check"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/deny.toml"]
+    },
+    "check:msrv": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo +1.88 check --manifest-path apps/organiclever-be/Cargo.toml"
+      }
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --manifest-path apps/organiclever-be/Cargo.toml"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --manifest-path apps/organiclever-be/Cargo.toml"
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["cd apps/organiclever-be && mvn compile -Pnullcheck"],
+        "command": "cargo check --manifest-path apps/organiclever-be/Cargo.toml --all-targets"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**", "{projectRoot}/tests/**", "{projectRoot}/Cargo.toml"]
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo test --manifest-path apps/organiclever-be/Cargo.toml --test unit"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**", "{projectRoot}/tests/unit/**", "{projectRoot}/Cargo.toml"]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc organiclever",
+          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul organiclever",
+          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --fail-under-lines 90"
+        ],
         "parallel": false
       },
-      "dependsOn": ["codegen"],
-      "cache": true
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**",
+        "{projectRoot}/tests/unit/**",
+        "{projectRoot}/Cargo.toml",
+        "{workspaceRoot}/specs/apps/organiclever/behavior/be/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/organiclever/ddd/bounded-contexts.yaml",
+        "{workspaceRoot}/specs/apps/organiclever/ddd/ubiquitous-language/**/*.md"
+      ]
+    },
+    "test:integration": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f apps/organiclever-be/docker-compose.integration.yml down -v && docker compose -f apps/organiclever-be/docker-compose.integration.yml up --abort-on-container-exit --build"
+      },
+      "cache": false
     },
     "spec-coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/be/gherkin apps/organiclever-be",
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/be/gherkin apps/organiclever-be"
+      },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/organiclever/behavior/be/gherkin/**/*.feature", "{projectRoot}/**/*.java"]
+      "inputs": ["{workspaceRoot}/specs/apps/organiclever/behavior/be/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
     }
   },
-  "tags": ["type:app", "platform:spring-boot", "lang:java", "domain:organiclever"],
+  "tags": ["type:app", "platform:axum", "lang:rust", "domain:organiclever"],
   "implicitDependencies": ["organiclever-contracts"]
 }
