@@ -25,18 +25,19 @@ Edit `.claude/` and `.opencode/` files with normal `Write` / `Edit` tools. Both 
 
 **See**: [primary binding agent catalog](./.claude/agents/README.md)
 
-### Dual-mode configuration (Claude Code + OpenCode)
+### Multi-harness configuration (Claude Code + OpenCode + Amazon Q)
 
-Repo maintains **dual compatibility** with Claude Code and OpenCode:
+Repo maintains **multi-harness compatibility** with Claude Code, OpenCode, and Amazon Q Developer:
 
 - **`.claude/`**: Source of truth (PRIMARY) — All updates happen here first
 - **`.opencode/`**: Auto-generated (SECONDARY) — Synced from `.claude/`
+- **`.amazonq/`**: Auto-generated (SECONDARY) — Emitted from `.claude/`
 
 **Making changes:**
 
 1. Edit agents/skills in `.claude/` first
 2. Run sync: `npm run generate:bindings`
-3. Both systems stay synced automatically
+3. All secondary binding artifacts stay synced automatically
 
 **Format differences:**
 

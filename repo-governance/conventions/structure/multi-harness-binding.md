@@ -63,6 +63,7 @@ no-shadowing rule, a mechanical-generation requirement, and a deterministic pre-
 - The no-shadowing rule for harness-specific files ranked above `AGENTS.md`.
 - The mechanical-generation requirement for binding files that must exist.
 - The deterministic parity guard and how it differs from the periodic compatibility-audit workflow.
+- The harness-neutral npm script naming pattern for scripts that produce or validate binding artifacts.
 - The catalog requirement for every committed binding directory.
 
 ### What This Convention Does NOT Cover
@@ -155,7 +156,33 @@ periodic compatibility-audit workflow (see
 which catches _external_ drift — an upstream harness changing its conventions — and requires
 web-research-backed agent work.
 
-### Rule 6 — Catalog Requirement
+### Rule 6 — Harness-Neutral npm Script Naming (AD8)
+
+Every npm script that produces or validates platform-binding artifacts must satisfy three constraints:
+
+1. **`generate:` namespace prefix** — scripts that produce binding output are named
+   `generate:<operation>`. Scripts that validate binding output without producing new files use
+   `validate:<operation>` (already established in the pre-push hook).
+2. **No harness or vendor names in script identifiers** — the script key must describe the logical
+   operation, not the tools or harnesses involved. A script that emits several harnesses' files in a
+   single invocation must not be named after any one of them.
+3. **One script per logical operation** — a single logical output (for example, "emit all
+   platform-binding files from `AGENTS.md`") maps to exactly one npm script. Per-harness scripts are
+   forbidden; if a new harness is added, the existing generator and its single script handle it.
+
+**Rationale**: Per-harness script names couple the npm interface to vendor product names, must be
+renamed whenever a harness is added or removed, and imply per-vendor invocation rather than the
+single-generator model mandated by Rule 4. A harness-neutral namespace (`generate:bindings`) remains
+stable as the harness matrix grows.
+
+**Canonical example**:
+
+| PASS: Correct                                                       | FAIL: Incorrect                               | Reason for failure                                     |
+| ------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------ |
+| `"generate:bindings": "rhino-cli agents emit-bindings"`             | `"sync:vendor-a-to-vendor-b": "..."`          | Contains vendor names; implies per-harness             |
+| `"validate:harness-bindings": "rhino-cli agents validate-bindings"` | `"validate:specific-harness-bindings": "..."` | Names a specific harness rather than the logical check |
+
+### Rule 7 — Catalog Requirement
 
 Every committed binding directory must have an entry in
 [docs/reference/platform-bindings.md](../../../docs/reference/platform-bindings.md) that records:
@@ -247,14 +274,18 @@ of 2026-05-24. They must not be committed with content that diverges from `AGENT
 
 ## Tools and Automation
 
-- **`rhino-cli agents sync`** — existing generator; produces `.opencode/` agent definition files
-  from `.claude/`. Extended under AD4 to emit Tier-2 bridge files.
-- **`rhino-cli agents validate-bindings`** — new deterministic subcommand (AD7); re-derives each
+- **`rhino-cli agents sync`** — existing generator; produces agent definition files for secondary
+  platform bindings from the primary binding source. Extended under AD4 to emit Tier-2 bridge files.
+- **`rhino-cli agents emit-bindings`** — generator subcommand; emits all platform-binding artifacts
+  from `AGENTS.md` in a single invocation (AD4). Invoked by the `generate:bindings` npm script.
+- **`generate:bindings`** npm script — harness-neutral name for the single binding-generation
+  operation (AD8). Runs `rhino-cli agents emit-bindings`; re-run whenever `AGENTS.md` changes.
+- **`rhino-cli agents validate-bindings`** — deterministic subcommand (AD7); re-derives each
   generated binding in memory, asserts byte-equality, asserts catalog completeness. Exits non-zero on
   any mismatch.
 - **`validate:harness-bindings`** npm script — wraps `rhino-cli agents validate-bindings`; appended
   to the pre-push hook alongside `validate:repo-governance-vendor-audit` and
-  `validate:cross-vendor-parity`.
+  `validate:cross-vendor-parity` (AD8).
 - **`repo-harness-compatibility-checker`** / **`repo-harness-compatibility-fixer`** agents — run on
   demand or on a schedule; use web research to detect external upstream convention drift (distinct
   from the deterministic parity guard above).
