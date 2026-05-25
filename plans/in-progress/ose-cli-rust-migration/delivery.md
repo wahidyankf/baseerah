@@ -1035,13 +1035,13 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
 ### Step 2.1: Create archived/ose-cli/ and copy Go source
 
-- [ ] Create `archived/ose-cli/` (_New directory_):
+- [x] Create `archived/ose-cli/` (_New directory_):
 
   ```bash
   mkdir -p archived/ose-cli
   ```
 
-- [ ] Copy the Go source files to the archive (NOT using `git mv` to avoid losing the Rust files already in `apps/ose-cli/`):
+- [x] Copy the Go source files to the archive (NOT using `git mv` to avoid losing the Rust files already in `apps/ose-cli/`):
 
   ```bash
   cp apps/ose-cli/main.go archived/ose-cli/
@@ -1051,10 +1051,12 @@ Verify all output formats and exit code semantics match the acceptance criteria 
   ```
 
   Acceptance criterion: `archived/ose-cli/main.go` exists; `archived/ose-cli/cmd/` directory exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
 ### Step 2.2: Add a README to archived/ose-cli/
 
-- [ ] Create `archived/ose-cli/README.md` (_New file_):
+- [x] Create `archived/ose-cli/README.md` (_New file_):
 
   ```markdown
   # archived/ose-cli
@@ -1070,10 +1072,12 @@ Verify all output formats and exit code semantics match the acceptance criteria 
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
 ### Step 2.3: Delete Go artifacts from apps/ose-cli/
 
-- [ ] Delete Go source and artifacts from `apps/ose-cli/` using `git rm`:
+- [x] Delete Go source and artifacts from `apps/ose-cli/` using `git rm`:
 
   ```bash
   git rm apps/ose-cli/main.go
@@ -1089,20 +1093,26 @@ Verify all output formats and exit code semantics match the acceptance criteria 
   Note: If `cover.out`, `cover_spec.out`, `dist/ose-cli`, or `dist/oseplatform-cli` are gitignored (not tracked), use plain `rm` instead of `git rm -f`. Verify with `git status` after each deletion.
 
   Acceptance criterion: `git status` shows these files as deleted; `apps/ose-cli/` contains only Rust source, `project.json`, `rust-toolchain.toml`, `deny.toml`, `Cargo.toml`, `Cargo.lock`, `dist/ose-cli` (new Rust binary), and `target/`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: git rm removed 10 tracked Go files. cover.out and cover_spec.out were gitignored (removed with plain rm).
 
 ### Step 2.4: Verify Rust build still works after Go file removal
 
-- [ ] Confirm the Rust build is unaffected:
+- [x] Confirm the Rust build is unaffected:
 
   ```bash
   npx nx run ose-cli:build
   ```
 
   Acceptance criterion: exits 0; `apps/ose-cli/dist/ose-cli` is the Rust binary (not the old Go binary).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: nx run ose-cli:build exits 0 (from cache). Binary confirmed at apps/ose-cli/dist/ose-cli.
 
 ### Step 2.5: Commit Phase 2
 
-- [ ] Stage archived files and commit:
+- [x] Stage archived files and commit:
 
   ```bash
   git add archived/ose-cli/
