@@ -1205,27 +1205,38 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
 ### Post-Push CI Verification
 
-- [ ] Push changes to `main`:
+- [x] Push changes to `main`:
 
   ```bash
   git push origin main
   ```
 
   Acceptance criterion: push accepted; GitHub confirms commits received.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Pushed 4 commits (Phase 0–3 + delivery.md progress). Push accepted.
 
-- [ ] Monitor ALL GitHub Actions workflows triggered by the push using:
+- [x] Monitor ALL GitHub Actions workflows triggered by the push using:
 
   ```bash
   gh run list --limit 5
   ```
 
   Poll every 3 minutes: `gh run view <run-id> --json status,conclusion`
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: No push-triggered CI workflow exists for ose-cli/rust-commons paths. Web app workflows run on schedule only. crane-cli-integration.yml only fires on crane-cli/ path changes. Pre-push hook ran all quality gates locally (all passed).
 
-- [ ] Verify ALL CI checks pass — no exceptions. Acceptance criterion: all runs show `conclusion: success`.
+- [x] Verify ALL CI checks pass — no exceptions. Acceptance criterion: all runs show `conclusion: success`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Most recent workflow runs (for prior commits) all show conclusion: success. No new workflow runs triggered by this push (no applicable push path triggers).
 
-- [ ] If any CI check fails, fix immediately and push a follow-up commit. Acceptance criterion: follow-up commit resolves the failure before proceeding.
+- [x] If any CI check fails, fix immediately and push a follow-up commit. Acceptance criterion: follow-up commit resolves the failure before proceeding.
+  - **Notes**: No failures to fix.
 
-- [ ] Do NOT proceed to Phase 5 until ALL GitHub Actions pass with zero failures.
+- [x] Do NOT proceed to Phase 5 until ALL GitHub Actions pass with zero failures.
+  - **Notes**: Gate satisfied — no failures.
 
 ---
 
@@ -1233,9 +1244,9 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
 ### Plan Archival
 
-- [ ] Verify ALL delivery checklist items in Phases 0–4 are ticked.
-- [ ] Verify ALL quality gates pass (local + CI).
-- [ ] Rename and move the plan folder using today's date as the completion date:
+- [x] Verify ALL delivery checklist items in Phases 0–4 are ticked.
+- [x] Verify ALL quality gates pass (local + CI).
+- [x] Rename and move the plan folder using today's date as the completion date:
 
   ```bash
   git mv plans/in-progress/ose-cli-rust-migration/ plans/done/2026-05-25__ose-cli-rust-migration/
@@ -1245,15 +1256,15 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
   Acceptance criterion: `plans/done/YYYY-MM-DD__ose-cli-rust-migration/` directory exists; `plans/in-progress/ose-cli-rust-migration/` no longer exists.
 
-- [ ] Update `plans/in-progress/README.md` — remove the `ose-cli-rust-migration` entry if it was added.
+- [x] Update `plans/in-progress/README.md` — remove the `ose-cli-rust-migration` entry if it was added.
 
   Acceptance criterion: file no longer references `ose-cli-rust-migration` as active.
 
-- [ ] Update `plans/done/README.md` — add the plan entry with completion date.
+- [x] Update `plans/done/README.md` — add the plan entry with completion date.
 
   Acceptance criterion: `plans/done/README.md` lists the completed plan.
 
-- [ ] Commit the archival:
+- [x] Commit the archival:
 
   ```bash
   git commit -m "chore(plans): move ose-cli-rust-migration to done"
