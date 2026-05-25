@@ -379,8 +379,8 @@ The plan-checker validates:
   `repo-governance/` paths): Verifies (1) agent definitions follow
   [multi-harness-binding conventions](../../conventions/structure/multi-harness-binding.md);
   (2) agent mirrors are generated via `npm run generate:bindings`, not hand-written; (3) skill body
-  is plain markdown with no harness-specific syntax; (4) no OpenCode skill mirror is manually
-  created (OpenCode reads `.claude/skills/` natively per `AGENTS.md`); (5) governance doc changes
+  is plain markdown with no harness-specific syntax; (4) no secondary skill mirror is manually
+  created (the coding agent reads `.claude/skills/` natively per `AGENTS.md`); (5) governance doc changes
   live outside any "Platform Binding Examples" heading unless intentionally vendor-specific per
   [governance-vendor-independence.md](../../conventions/structure/governance-vendor-independence.md).
   Reports CRITICAL if a plan skips this check when in scope. Skip entirely when plan touches only
