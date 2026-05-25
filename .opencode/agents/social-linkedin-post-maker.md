@@ -27,6 +27,8 @@ Create LinkedIn posts in `generated-socials/linkedin/` from project updates.
 
 Use this agent **every time** a LinkedIn post is created in `generated-socials/linkedin/`. It owns the file format, the data-gathering window, and the hard character limit. Do not hand-author posts in that directory without it.
 
+**Canonical exemplar**: model every new post on [`generated-socials/linkedin/2026-05-25__linkedin__ose-update-week-0027.md`](../../generated-socials/linkedin/2026-05-25__linkedin__ose-update-week-0027.md) — match its header, section structure, tone, and length. Always read the latest existing post before drafting so format and voice stay consistent.
+
 ## Hard Constraints
 
 ### LinkedIn character limit — 3,000
