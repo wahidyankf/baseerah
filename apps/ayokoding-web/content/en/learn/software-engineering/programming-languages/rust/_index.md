@@ -16,3 +16,5 @@ layout: list
   - [Beginner](/en/learn/software-engineering/programming-languages/rust/by-example/beginner)
   - [Intermediate](/en/learn/software-engineering/programming-languages/rust/by-example/intermediate)
   - [Advanced](/en/learn/software-engineering/programming-languages/rust/by-example/advanced)
+- [CLI with Rust](/en/learn/software-engineering/programming-languages/rust/cli-with-rust)
+  - [By Example](/en/learn/software-engineering/programming-languages/rust/cli-with-rust/by-example)

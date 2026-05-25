@@ -42,6 +42,7 @@ draft: false
   - [Initial Setup](/en/learn/software-engineering/programming-languages/rust/initial-setup)
   - [Quick Start](/en/learn/software-engineering/programming-languages/rust/quick-start)
   - [By Example](/en/learn/software-engineering/programming-languages/rust/by-example)
+  - [CLI with Rust](/en/learn/software-engineering/programming-languages/rust/cli-with-rust)
 - [Elixir](/en/learn/software-engineering/programming-languages/elixir)
   - [Overview](/en/learn/software-engineering/programming-languages/elixir/overview)
   - [Initial Setup](/en/learn/software-engineering/programming-languages/elixir/initial-setup)
