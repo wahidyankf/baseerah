@@ -4,8 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [organiclever-be-rust-migration](./organiclever-be-rust-migration/README.md) — Migrate
-  `apps/organiclever-be/` from Java/Spring Boot 4 to Rust/Axum + SQLx + PostgreSQL
+_No active plans._
 
 ## Instructions
 

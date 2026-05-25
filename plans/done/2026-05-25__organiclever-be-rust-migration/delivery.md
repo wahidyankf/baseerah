@@ -17,27 +17,27 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 
 ## Phase 0: Environment Setup
 
-- [ ] Provision worktree: run `claude --worktree organiclever-be-rust-migration` from the repo
+- [x] Provision worktree: run `claude --worktree organiclever-be-rust-migration` from the repo
       root — creates `worktrees/organiclever-be-rust-migration/`. Verify:
       `test -d worktrees/organiclever-be-rust-migration/` exits 0.
       See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md).
 
-- [ ] Install Node.js dependencies and converge the full polyglot toolchain in the worktree
+- [x] Install Node.js dependencies and converge the full polyglot toolchain in the worktree
       root (not the worktree subdirectory): run `npm install` then
       `npm run doctor -- --fix` from the repo root (the `postinstall` hook
       runs `doctor || true` and silently tolerates drift; the explicit `--fix` call is required to
       converge all tools including Rust, cargo-llvm-cov, cargo-deny). Verify by confirming
       `npm run doctor` exits 0 with no `[MISSING]` entries.
 
-- [ ] Verify existing Java build passes as baseline before any changes: run
+- [x] Verify existing Java build passes as baseline before any changes: run
       `npx nx run organiclever-be:build` from the repo root. Note the result (pass or known-failing
       state) so any pre-existing failures are not attributed to this migration.
 
-- [ ] Verify `cargo-deny` is installed: run `cargo deny --version` from the repo root. If
+- [x] Verify `cargo-deny` is installed: run `cargo deny --version` from the repo root. If
       missing, run `cargo install cargo-deny --locked` and confirm `cargo deny --version` reports
       a version string.
 
-- [ ] Verify `cargo-llvm-cov` is installed: run `cargo llvm-cov --version` from the repo root.
+- [x] Verify `cargo-llvm-cov` is installed: run `cargo llvm-cov --version` from the repo root.
       If missing, run `cargo install cargo-llvm-cov --locked` and confirm `cargo llvm-cov --version`
       reports a version string.
 
@@ -52,45 +52,45 @@ _Suggested executor: `swe-rust-dev`_
 > (`.gitignore`, `project.json`, `docker-compose.integration.yml`, `LICENSE`, `README.md`)
 > before the Rust skeleton is added.
 
-- [ ] Delete Java build descriptor: run
+- [x] Delete Java build descriptor: run
       `git rm apps/organiclever-be/pom.xml`.
       Verify: `git status` shows `apps/organiclever-be/pom.xml` as deleted.
 
-- [ ] Delete Java lint configs: run
+- [x] Delete Java lint configs: run
       `git rm apps/organiclever-be/checkstyle.xml` and
       `git rm apps/organiclever-be/pmd-ruleset.xml`.
       Verify: both files absent from `git ls-files apps/organiclever-be/`.
 
-- [ ] Delete Java EditorConfig (Java-specific formatting rules): run
+- [x] Delete Java EditorConfig (Java-specific formatting rules): run
       `git rm apps/organiclever-be/.editorconfig`.
       Verify: absent from `git ls-files apps/organiclever-be/`.
 
-- [ ] Delete Java source tree: run
+- [x] Delete Java source tree: run
       `git rm -r apps/organiclever-be/src/main/java/`.
       Verify: `git ls-files apps/organiclever-be/src/main/java/` returns empty.
 
-- [ ] Delete Java test tree: run
+- [x] Delete Java test tree: run
       `git rm -r apps/organiclever-be/src/test/java/`.
       Verify: `git ls-files apps/organiclever-be/src/test/java/` returns empty. If the path does
       not exist, skip and note.
 
-- [ ] Delete Spring Boot resource trees: run
+- [x] Delete Spring Boot resource trees: run
       `git rm -r apps/organiclever-be/src/main/resources/` and
       `git rm -r apps/organiclever-be/src/test/resources/`.
       For each, if the path does not exist, skip and note. Verify: both paths absent from
       `git ls-files apps/organiclever-be/src/`.
 
-- [ ] Delete stale F# build artifacts: run
+- [x] Delete stale F# build artifacts: run
       `rm -rf apps/organiclever-be/src/OrganicLeverBe/`.
       These are untracked build artifacts (bin/obj directories); they are not tracked by git, so
       `rm -rf` is appropriate. Verify: path no longer exists via
       `test ! -d apps/organiclever-be/src/OrganicLeverBe/`.
 
-- [ ] Delete Java integration Dockerfile: run
+- [x] Delete Java integration Dockerfile: run
       `git rm apps/organiclever-be/Dockerfile.integration`.
       Verify: absent from `git ls-files apps/organiclever-be/`.
 
-- [ ] Update `apps/organiclever-be/.gitignore` [Repo-grounded: file exists at
+- [x] Update `apps/organiclever-be/.gitignore` [Repo-grounded: file exists at
       `apps/organiclever-be/.gitignore`]: read the existing
       file, remove Java/Maven patterns (`target/`, `coverage/`, `*.class`), add Rust patterns
       (`target/`, `generated-contracts/`). After edit, verify
@@ -98,7 +98,7 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit Phase 1 cleanup:
+- [x] Commit Phase 1 cleanup:
 
   ```bash
   git add -A
@@ -109,8 +109,8 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Commit Guidelines
 
-- [ ] Follow Conventional Commits format: `<type>(<scope>): <description>`
-- [ ] Keep Java cleanup in its own commit, separate from Rust skeleton additions
+- [x] Follow Conventional Commits format: `<type>(<scope>): <description>`
+- [x] Keep Java cleanup in its own commit, separate from Rust skeleton additions
 
 ---
 
@@ -123,7 +123,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ### 2.1 Project Config Files
 
-- [ ] Create `apps/organiclever-be/rust-toolchain.toml` _[New file]_ with content matching
+- [x] Create `apps/organiclever-be/rust-toolchain.toml` _[New file]_ with content matching
       `apps/rhino-cli/rust-toolchain.toml` [Repo-grounded]: channel = "1.95.0", components =
       `["clippy", "rustfmt", "llvm-tools"]`, profile = "minimal".
       Verify: `cat apps/organiclever-be/rust-toolchain.toml`
@@ -131,14 +131,14 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/organiclever-be/deny.toml` _[New file]_ with content identical to
+- [x] Create `apps/organiclever-be/deny.toml` _[New file]_ with content identical to
       `apps/rhino-cli/deny.toml` [Repo-grounded] (copy verbatim, update the comment header to
       reference `organiclever-be`). Verify:
       `grep 'MIT' apps/organiclever-be/deny.toml` exits 0.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/organiclever-be/.env.example` _[New file]_ with:
+- [x] Create `apps/organiclever-be/.env.example` _[New file]_ with:
 
   ```
   DATABASE_URL=postgres://postgres:postgres@localhost:5432/organiclever
@@ -158,7 +158,7 @@ so `cargo build` can attempt to compile and fail with "unresolved dependency" or
 Actually: `Cargo.toml` must exist first for cargo to run — skip the red step for the manifest
 itself; the RED step applies to the handler tests in 2.3+.
 
-- [ ] Create `apps/organiclever-be/Cargo.toml` _[New file]_:
+- [x] Create `apps/organiclever-be/Cargo.toml` _[New file]_:
 
   ```toml
   [package]
@@ -245,7 +245,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
 #### config.rs
 
-- [ ] **RED**: Create `apps/organiclever-be/tests/unit/main.rs` _[New file]_ with a failing
+- [x] **RED**: Create `apps/organiclever-be/tests/unit/main.rs` _[New file]_ with a failing
       test for `Config::from_env()`:
 
   ```rust
@@ -269,7 +269,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **GREEN**: Implement `apps/organiclever-be/src/config.rs` _[New file]_:
+- [x] **GREEN**: Implement `apps/organiclever-be/src/config.rs` _[New file]_:
 
   ```rust
   //! Application configuration loaded from environment variables.
@@ -306,7 +306,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **REFACTOR**: Review `config.rs` for doc completeness (all public items have `///` docs,
+- [x] **REFACTOR**: Review `config.rs` for doc completeness (all public items have `///` docs,
       `missing_docs` lint satisfied). Run `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml 2>&1 | grep -i error`.
       Verify: zero errors.
 
@@ -314,7 +314,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
 #### errors.rs
 
-- [ ] **RED**: Add a failing test to `tests/unit/main.rs` for `AppError`:
+- [x] **RED**: Add a failing test to `tests/unit/main.rs` for `AppError`:
 
   ```rust
   mod error_tests {
@@ -333,7 +333,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **GREEN**: Create `apps/organiclever-be/src/errors.rs` _[New file]_:
+- [x] **GREEN**: Create `apps/organiclever-be/src/errors.rs` _[New file]_:
 
   ```rust
   //! Global error types and HTTP error response conversion.
@@ -369,7 +369,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **REFACTOR**: Ensure all public types and fields have `///` doc comments. Run
+- [x] **REFACTOR**: Ensure all public types and fields have `///` doc comments. Run
       `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml 2>&1 | grep -i error`.
       Verify: zero errors.
 
@@ -377,7 +377,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
 #### health/mod.rs
 
-- [ ] **RED**: Add a failing test to `tests/unit/main.rs` for the health handler:
+- [x] **RED**: Add a failing test to `tests/unit/main.rs` for the health handler:
 
   ```rust
   mod health_tests {
@@ -396,7 +396,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **GREEN**: Create `apps/organiclever-be/src/health/mod.rs` _[New file]_:
+- [x] **GREEN**: Create `apps/organiclever-be/src/health/mod.rs` _[New file]_:
 
   ```rust
   //! Health check endpoint handler.
@@ -419,14 +419,14 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **REFACTOR**: Run `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml 2>&1 | grep -i error`.
+- [x] **REFACTOR**: Run `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml 2>&1 | grep -i error`.
       Verify: zero errors.
 
   _Suggested executor: `swe-rust-dev`_
 
 #### app.rs
 
-- [ ] **RED**: Add a failing test to `tests/unit/main.rs` _[New test]_ for the router export:
+- [x] **RED**: Add a failing test to `tests/unit/main.rs` _[New test]_ for the router export:
 
   ```rust
   mod router_tests {
@@ -444,7 +444,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **GREEN**: Create `apps/organiclever-be/src/app.rs` _[New file]_:
+- [x] **GREEN**: Create `apps/organiclever-be/src/app.rs` _[New file]_:
 
   ```rust
   //! Axum router and middleware configuration.
@@ -475,14 +475,14 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **REFACTOR**: Run `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml 2>&1 | grep -i error`.
+- [x] **REFACTOR**: Run `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml 2>&1 | grep -i error`.
       Verify: zero errors.
 
   _Suggested executor: `swe-rust-dev`_
 
 #### main.rs
 
-- [ ] **RED**: Verify that `cargo check` fails before `main.rs` is created. Since `Cargo.toml`
+- [x] **RED**: Verify that `cargo check` fails before `main.rs` is created. Since `Cargo.toml`
       declares `[[bin]] path = "src/main.rs"`, the binary target cannot compile without the file.
       Run `cargo check --manifest-path apps/organiclever-be/Cargo.toml 2>&1`.
       Verify: exits non-zero with "couldn't read `apps/organiclever-be/src/main.rs`" or similar
@@ -490,7 +490,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **GREEN**: Create `apps/organiclever-be/src/main.rs` _[New file]_:
+- [x] **GREEN**: Create `apps/organiclever-be/src/main.rs` _[New file]_:
 
   ```rust
   //! OrganicLever backend — Axum entry point.
@@ -525,7 +525,7 @@ itself; the RED step applies to the handler tests in 2.3+.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit Phase 2 Rust skeleton:
+- [x] Commit Phase 2 Rust skeleton:
 
   ```bash
   git add apps/organiclever-be/Cargo.toml apps/organiclever-be/rust-toolchain.toml \
@@ -548,7 +548,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ### 3.1 Update Gherkin Feature File
 
-- [ ] Edit `specs/apps/organiclever/behavior/be/gherkin/health/health-check.feature`
+- [x] Edit `specs/apps/organiclever/behavior/be/gherkin/health/health-check.feature`
       [Repo-grounded: exists at
       `specs/apps/organiclever/behavior/be/gherkin/health/health-check.feature`]:
       change `And the health status should be "UP"` to `And the health status should be "ok"` in
@@ -560,7 +560,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ### 3.2 Cucumber-rs Integration Tests (RED → GREEN → REFACTOR)
 
-- [ ] **RED**: Create `apps/organiclever-be/tests/integration/main.rs` _[New file]_ with a
+- [x] **RED**: Create `apps/organiclever-be/tests/integration/main.rs` _[New file]_ with a
       minimal cucumber-rs harness that imports the feature file but has no step implementations:
 
   ```rust
@@ -587,7 +587,7 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **GREEN**: Add step definitions to `tests/integration/main.rs` covering:
+- [x] **GREEN**: Add step definitions to `tests/integration/main.rs` covering:
   - `Given the API is running` — spawn `axum::serve` in a `tokio::spawn` task on an ephemeral
     port; store `base_url` in `ApiWorld`
   - `When an operations engineer sends GET /health` — `reqwest::get(base_url + "/api/v1/health")`
@@ -603,7 +603,7 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] **REFACTOR**: Review integration test for duplicate step code; extract shared helpers if
+- [x] **REFACTOR**: Review integration test for duplicate step code; extract shared helpers if
       any step function body exceeds ~10 lines. Run
       `cargo clippy --manifest-path apps/organiclever-be/Cargo.toml --tests 2>&1 | grep -i error`.
       Verify: zero errors.
@@ -612,7 +612,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ### 3.3 Docker Integration Setup
 
-- [ ] Rewrite `apps/organiclever-be/Dockerfile.integration` _[replacing deleted Java Dockerfile]_
+- [x] Rewrite `apps/organiclever-be/Dockerfile.integration` _[replacing deleted Java Dockerfile]_
       with a Rust multi-stage build:
 
   ```dockerfile
@@ -637,7 +637,7 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Rewrite `apps/organiclever-be/docker-compose.integration.yml` _[adapting existing file]_
+- [x] Rewrite `apps/organiclever-be/docker-compose.integration.yml` _[adapting existing file]_
       to remove the Java test-runner service, add a PostgreSQL service, and add the Rust app service:
 
   ```yaml
@@ -688,7 +688,7 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit Phase 3 tests and Docker:
+- [x] Commit Phase 3 tests and Docker:
 
   ```bash
   git add apps/organiclever-be/tests/ apps/organiclever-be/Dockerfile.integration \
@@ -711,7 +711,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ### 4.1 Rewrite project.json
 
-- [ ] Edit `apps/organiclever-be/project.json` [Repo-grounded: exists at
+- [x] Edit `apps/organiclever-be/project.json` [Repo-grounded: exists at
       `apps/organiclever-be/project.json`]: replace ALL
       existing `targets` with the following cargo-based targets:
 
@@ -857,7 +857,7 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Commit Phase 4 project.json update:
+- [x] Commit Phase 4 project.json update:
 
   ```bash
   git add apps/organiclever-be/project.json
@@ -875,49 +875,49 @@ _Suggested executor: `swe-rust-dev`_
 > errors encountered during work. Do not defer or skip existing issues. Commit preexisting
 > fixes separately with appropriate conventional commit messages.
 
-- [ ] Run format check:
+- [x] Run format check:
       `npx nx run organiclever-be:fmt:check`
       Verify: exits 0. If it fails, run `npx nx run organiclever-be:fmt` and re-check.
 
-- [ ] Run affected typecheck:
+- [x] Run affected typecheck:
       `npx nx affected -t typecheck`
       Verify: exits 0 with no type errors reported.
 
-- [ ] Run lint (clippy):
+- [x] Run lint (clippy):
       `npx nx run organiclever-be:lint`
       Verify: exits 0 — zero clippy warnings treated as errors.
 
-- [ ] Run deny check:
+- [x] Run deny check:
       `npx nx run organiclever-be:deny:check`
       Verify: exits 0 — no license violations or known security advisories.
 
-- [ ] Run MSRV check:
+- [x] Run MSRV check:
       `npx nx run organiclever-be:check:msrv`
       Verify: exits 0 — project compiles on Rust 1.88 (requires Rust 1.88 toolchain installed).
       If toolchain not installed, run `rustup install 1.88` first.
 
-- [ ] Run unit tests:
+- [x] Run unit tests:
       `npx nx run organiclever-be:test:unit`
       Verify: all unit tests pass, exit 0.
 
-- [ ] Run test:quick (includes DDD checks + llvm-cov 90% gate):
+- [x] Run test:quick (includes DDD checks + llvm-cov 90% gate):
       `npx nx run organiclever-be:test:quick`
       Verify: exits 0. Coverage is ≥ 90 lines.
 
-- [ ] Run spec-coverage:
+- [x] Run spec-coverage:
       `npx nx run organiclever-be:spec-coverage`
       Verify: exits 0 — rhino-cli spec-coverage tool finds matching step implementations for all
       Gherkin scenarios.
 
-- [ ] Run full affected suite:
+- [x] Run full affected suite:
       `npx nx affected -t typecheck lint test:quick spec-coverage`
       Verify: all four targets exit 0.
 
 ### Commit Guidelines
 
-- [ ] Commit quality-gate fixes thematically — each concern in its own commit
-- [ ] Follow Conventional Commits: `fix(organiclever-be): <description>`
-- [ ] Preexisting failures fixed in this phase get separate commits from plan work
+- [x] Commit quality-gate fixes thematically — each concern in its own commit
+- [x] Follow Conventional Commits: `fix(organiclever-be): <description>`
+- [x] Preexisting failures fixed in this phase get separate commits from plan work
 
 ---
 
@@ -925,7 +925,7 @@ _Suggested executor: `swe-rust-dev`_
 
 > **Goal**: The running server responds correctly to the health endpoint before pushing.
 
-- [ ] Start the dev server:
+- [x] Start the dev server:
 
   ```bash
   cargo run --manifest-path apps/organiclever-be/Cargo.toml
@@ -934,7 +934,7 @@ _Suggested executor: `swe-rust-dev`_
   (Run in a background shell or separate terminal.)
   Verify: terminal prints `Listening on 0.0.0.0:8202`.
 
-- [ ] Verify health endpoint happy path:
+- [x] Verify health endpoint happy path:
 
   ```bash
   curl -s http://localhost:8202/api/v1/health | jq .
@@ -942,7 +942,7 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: response is `{"status":"ok"}` and `curl` exit code is 0.
 
-- [ ] Verify HTTP status code is 200:
+- [x] Verify HTTP status code is 200:
 
   ```bash
   curl -s -o /dev/null -w "%{http_code}" http://localhost:8202/api/v1/health
@@ -950,7 +950,7 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: output is `200`.
 
-- [ ] Verify CORS preflight:
+- [x] Verify CORS preflight:
 
   ```bash
   curl -s -X OPTIONS http://localhost:8202/api/v1/health \
@@ -961,7 +961,7 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: response includes `access-control-allow-origin: *` (or specific origin).
 
-- [ ] Verify unknown route returns 404 (Axum default):
+- [x] Verify unknown route returns 404 (Axum default):
 
   ```bash
   curl -s -o /dev/null -w "%{http_code}" http://localhost:8202/api/v1/unknown
@@ -969,13 +969,13 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: output is `404`.
 
-- [ ] Stop the dev server.
+- [x] Stop the dev server.
 
 ---
 
 ## Phase 7: Post-Push CI Verification
 
-- [ ] Stage and commit any remaining uncommitted changes (format fixes, README updates, etc.):
+- [x] Stage and commit any remaining uncommitted changes (format fixes, README updates, etc.):
 
   ```bash
   git add -A
@@ -984,7 +984,7 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: no unintended files staged.
 
-- [ ] Push to `main`:
+- [x] Push to `main`:
 
   ```bash
   git push origin main
@@ -993,7 +993,7 @@ _Suggested executor: `swe-rust-dev`_
   Verify: push completes without error; pre-push hook (typecheck, lint, test:quick,
   spec-coverage for affected projects) passes.
 
-- [ ] List triggered GitHub Actions workflows and identify which ran for the push commit:
+- [x] List triggered GitHub Actions workflows and identify which ran for the push commit:
 
   ```bash
   gh run list --limit 10
@@ -1008,7 +1008,7 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: any runs triggered by this commit show `status: completed` before proceeding.
 
-- [ ] Monitor any triggered CI runs (poll every 3 minutes — do NOT use `gh run watch`):
+- [x] Monitor any triggered CI runs (poll every 3 minutes — do NOT use `gh run watch`):
 
   ```bash
   gh run view <run-id> --json status,conclusion
@@ -1016,18 +1016,18 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: all triggered jobs show `conclusion: success` before proceeding.
 
-- [ ] If any CI job fails: investigate root cause, fix, commit, and push. Do NOT proceed to
+- [x] If any CI job fails: investigate root cause, fix, commit, and push. Do NOT proceed to
       archival until ALL triggered GitHub Actions passes with zero failures.
 
 ---
 
 ## Phase 8: Plan Archival
 
-- [ ] Verify ALL delivery checklist items above are ticked.
-- [ ] Verify ALL quality gates pass (local + CI).
-- [ ] Verify ALL manual API assertions pass.
+- [x] Verify ALL delivery checklist items above are ticked.
+- [x] Verify ALL quality gates pass (local + CI).
+- [x] Verify ALL manual API assertions pass.
 
-- [ ] Rename and move the plan folder:
+- [x] Rename and move the plan folder:
 
   ```bash
   git mv plans/in-progress/organiclever-be-rust-migration/ \
@@ -1037,16 +1037,16 @@ _Suggested executor: `swe-rust-dev`_
   Replace `2026-MM-DD` with today's actual completion date.
   Verify: `ls plans/done/` shows the renamed folder.
 
-- [ ] Update `plans/in-progress/README.md`
+- [x] Update `plans/in-progress/README.md`
       [Repo-grounded: `plans/in-progress/README.md`]: remove
       the `organiclever-be-rust-migration` entry from the Active Plans list.
       Verify: the entry is absent from the file.
 
-- [ ] Update `plans/done/README.md`
+- [x] Update `plans/done/README.md`
       [Repo-grounded: verify path with `test -f plans/done/README.md`]:
       add an entry for `YYYY-MM-DD__organiclever-be-rust-migration` with the completion date.
 
-- [ ] Commit the archival:
+- [x] Commit the archival:
 
   ```bash
   git add plans/
@@ -1055,7 +1055,7 @@ _Suggested executor: `swe-rust-dev`_
 
   Verify: `git show --stat HEAD` shows only plan directory movement.
 
-- [ ] Push archival commit to `main`:
+- [x] Push archival commit to `main`:
 
   ```bash
   git push origin main
