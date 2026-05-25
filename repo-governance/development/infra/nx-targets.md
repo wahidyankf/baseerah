@@ -148,30 +148,29 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 
 ### Current Project Tags
 
-| Project                 | Tags                                                                     |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `ayokoding-web`         | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`         |
-| `ayokoding-cli`         | `["type:app", "platform:cli", "lang:golang", "domain:ayokoding"]`        |
-| `rhino-cli`             | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`            |
-| `organiclever-web`      | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`      |
-| `organiclever-be`       | `["type:app", "platform:giraffe", "lang:fsharp", "domain:organiclever"]` |
-| `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
-| `organiclever-be-e2e`   | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
-| `ose-cli`               | `["type:app", "platform:cli", "lang:golang", "domain:ose-platform"]`     |
-| `ose-web`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose-platform"]`      |
-| `wahidyankf-web`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`        |
-| `wahidyankf-web-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`    |
-| `golang-link-commons`   | `["type:lib", "lang:golang"]`                                            |
-| `golang-commons`        | `["type:lib", "lang:golang"]`                                            |
+| Project                 | Tags                                                                    |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `ayokoding-web`         | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`        |
+| `ayokoding-cli`         | `["type:app", "platform:cli", "lang:rust", "domain:ayokoding"]`         |
+| `rhino-cli`             | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`           |
+| `organiclever-web`      | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`     |
+| `organiclever-be`       | `["type:app", "platform:axum", "lang:rust", "domain:organiclever"]`     |
+| `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]` |
+| `organiclever-be-e2e`   | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]` |
+| `ose-cli`               | `["type:app", "platform:cli", "lang:rust", "domain:ose-platform"]`      |
+| `ose-web`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose-platform"]`     |
+| `wahidyankf-web`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`       |
+| `wahidyankf-web-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`   |
+| `rust-commons`          | `["type:lib", "lang:rust"]`                                             |
 
 ### Example: Complete Tag Declaration
 
-An F#/Giraffe backend app declares all four dimensions:
+A Rust/Axum backend app declares all four dimensions:
 
 ```json
 {
   "name": "organiclever-be",
-  "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:organiclever"]
+  "tags": ["type:app", "platform:axum", "lang:rust", "domain:organiclever"]
 }
 ```
 
@@ -179,8 +178,8 @@ A Go lib has no platform boundary and no domain, so it omits both:
 
 ```json
 {
-  "name": "golang-commons",
-  "tags": ["type:lib", "lang:golang"]
+  "name": "rust-commons",
+  "tags": ["type:lib", "lang:rust"]
 }
 ```
 
@@ -210,9 +209,9 @@ Derived from three rules: (1) All apps+libs → unit tests, (2) All apps → int
 
 **Product backend `typecheck` examples** (all statically typed backends use `typecheck` with `dependsOn: ["codegen"]` where codegen applies):
 
-| Backend           | `typecheck` command                                               |
-| ----------------- | ----------------------------------------------------------------- |
-| `organiclever-be` | `dotnet build .fsproj /p:TreatWarningsAsErrors=true --no-restore` |
+| Backend           | `typecheck` command                                                         |
+| ----------------- | --------------------------------------------------------------------------- |
+| `organiclever-be` | `cargo check --manifest-path apps/organiclever-be/Cargo.toml --all-targets` |
 
 > For polyglot backend `typecheck` patterns (Go, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, Clojure, F#), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -316,13 +315,9 @@ Both files are co-located in the same `cmd/` package (not a separate folder) to 
 [BDD Spec-to-Test Mapping Convention](./bdd-spec-test-mapping.md) for the mandatory 1:1 mapping
 between commands and feature file `@tags`.
 
-**Go libs** (`golang-link-commons`, `golang-commons`) also expose `test:integration` using the same Godog
-BDD pattern. Because libs have no CLI commands, integration tests call the public package API
-directly and use external test packages (`package foo_test`). They test complete library pipelines
-(e.g., `CheckLinks` → `OutputLinksText/JSON/Markdown`) and realistic consumer scenarios rather than
-isolated functions. Mock filesystem fixtures (tmpdir with controlled `.md` files) stand in for real
-sites; `testutil.CaptureStdout` captures stdout from output functions. Feature files live in
-`specs/{lib-name}/{package}/`.
+**Rust libs** (`rust-commons`) expose `test:unit` using the standard `cargo test` harness with
+`cargo-llvm-cov` for coverage. Because libs have no CLI commands, unit tests call the public API
+directly. Feature files live in `specs/libs/{lib-name}/`.
 
 ### CLI Applications
 
@@ -384,7 +379,7 @@ the project's feature files has a matching step definition in the implementation
 | E2E runners (`organiclever-be-e2e`, `organiclever-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                              |
 | Content platforms (`ayokoding-web`, `ose-web`)              | Enforced | `--shared-steps`                                                                            |
 | Web UI apps (`organiclever-web`)                            | Enforced | `--shared-steps`                                                                            |
-| Libraries (`golang-commons`, `golang-link-commons`)         | Enforced | `--shared-steps`                                                                            |
+| Libraries (`rust-commons`)                                  | Enforced | `--shared-steps`                                                                            |
 | Projects with genuine step gaps                             | Deferred | `spec-coverage` target exists but validation deferred until step implementation is complete |
 
 All apps and E2E runners are required to have a `spec-coverage` target. Projects with genuine step

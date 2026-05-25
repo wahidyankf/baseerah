@@ -150,8 +150,7 @@ volta install npm@11.10.1
 
 ### Step 4: Go
 
-Required for `ayokoding-cli`, `ose-cli`,
-and `libs/golang-commons`.
+Required for Go-based tooling. Note: `ayokoding-cli` and `ose-cli` have migrated to Rust (2026-05-25); Go is no longer required for those apps.
 
 ```bash
 # macOS
@@ -166,19 +165,19 @@ Verify the installed version meets or exceeds the `go` directive in `apps/ayokod
 go version
 ```
 
-### Step 5: .NET SDK
+### Step 5: Rust Toolchain
 
-Required for `organiclever-be` (F#/Giraffe).
-
-The required major version is in `apps/organiclever-be/global.json`.
+Required for `organiclever-be` (Rust/Axum), `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
 
 ```bash
-# macOS
-brew install dotnet
+# Install rustup (if not present)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-# Linux — https://learn.microsoft.com/en-us/dotnet/core/install/linux
+# Install additional cargo tools used by test:quick and deny:check
+cargo install cargo-llvm-cov --locked
+cargo install cargo-deny --locked
 
-dotnet --version
+rustc --version
 ```
 
 ### Step 6: Clone and Bootstrap

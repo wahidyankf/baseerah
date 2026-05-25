@@ -191,7 +191,7 @@ graph LR
 
     subgraph "Shared Infrastructure"
         NX[Nx Workspace<br/>Build Orchestration]
-        LIBS[Shared Libraries<br/>golang-commons]
+        LIBS[Shared Libraries<br/>rust-commons]
     end
 
     AYOCLI -->|Validates links| AYO
@@ -221,7 +221,7 @@ graph LR
 graph LR
     subgraph "OrganicLever Platform"
         OL_FE[organiclever-web<br/>Next.js App]
-        OL_BE[organiclever-be<br/>F#/Giraffe API]
+        OL_BE[organiclever-be<br/>Rust/Axum API]
     end
 
     subgraph "E2E Test Suites"

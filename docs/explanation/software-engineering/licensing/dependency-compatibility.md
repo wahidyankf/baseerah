@@ -38,9 +38,9 @@ scoped to FSL-1.1-MIT; now MIT throughout.
 | `organiclever-web` | npm       | All permissive after LGPL removal (see below) |
 | `organiclever-be`  | .NET/F#   | All permissive (MIT, Apache-2.0, PostgreSQL)  |
 | `rhino-cli`        | Rust      | MIT (Cargo dependencies — all permissive)     |
-| `ayokoding-cli`    | Go        | MPL-2.0 indirect (see below)                  |
-| `ose-cli`          | Go        | MPL-2.0 indirect (see below)                  |
-| `golang-commons`   | Go        | MPL-2.0 indirect (see below)                  |
+| `ayokoding-cli`    | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
+| `ose-cli`          | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
+| `rust-commons`     | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
 | `elixir-cabbage`   | Elixir    | All permissive (MIT, Apache-2.0)              |
 | `elixir-gherkin`   | Elixir    | All permissive (MIT, Apache-2.0)              |
 

@@ -1,6 +1,6 @@
 # organiclever-be
 
-Java 25/Spring Boot 4.0 REST API backend for OrganicLever. Today ships one endpoint: health check.
+Rust/Axum REST API backend for OrganicLever. Ships one endpoint: health check.
 
 ## Quick Start
 
@@ -10,33 +10,46 @@ nx dev organiclever-be   # http://localhost:8202
 
 ## Commands
 
-| Nx target                                 | What it does                          |
-| ----------------------------------------- | ------------------------------------- |
-| `nx dev organiclever-be`                  | Dev server (localhost:8202)           |
-| `nx build organiclever-be`                | Production build                      |
-| `nx run organiclever-be:test:quick`       | Unit tests + JaCoCo coverage (90%)    |
-| `nx run organiclever-be:test:unit`        | Unit tests only                       |
-| `nx run organiclever-be:test:integration` | Integration tests (real HTTP)         |
-| `nx run organiclever-be:lint`             | Checkstyle + SpotBugs + PMD analyzers |
-| `nx run organiclever-be:typecheck`        | Compile with strict error checking    |
+| Nx target                                 | What it does                               |
+| ----------------------------------------- | ------------------------------------------ |
+| `nx dev organiclever-be`                  | Dev server (localhost:8202)                |
+| `nx build organiclever-be`                | Production build (`cargo build --release`) |
+| `nx run organiclever-be:test:quick`       | DDD checks + llvm-cov (≥90% line)          |
+| `nx run organiclever-be:test:unit`        | Unit tests only                            |
+| `nx run organiclever-be:test:integration` | Integration tests (Docker + real DB)       |
+| `nx run organiclever-be:lint`             | Clippy pedantic `-D warnings`              |
+| `nx run organiclever-be:typecheck`        | `cargo check --all-targets`                |
+| `nx run organiclever-be:fmt`              | `cargo fmt`                                |
+| `nx run organiclever-be:fmt:check`        | `cargo fmt --check`                        |
+| `nx run organiclever-be:deny:check`       | License + advisory check (`cargo deny`)    |
+| `nx run organiclever-be:check:msrv`       | Compile with Rust 1.88 (MSRV)              |
+| `nx run organiclever-be:spec-coverage`    | Gherkin step coverage (rhino-cli)          |
 
 ## Prerequisites
 
-- **Java 25 JDK** (`java --version` → 25.x)
-- **Maven 3.9** (`mvn --version` → 3.9.x)
+- **Rust toolchain 1.95.0** (pinned via `rust-toolchain.toml`; installed by `rustup`)
+- **cargo-llvm-cov** (`cargo install cargo-llvm-cov --locked`)
+- **cargo-deny** (`cargo install cargo-deny --locked`)
+- **Docker** (for `test:integration`)
 
 ## Environment Variables
 
-No required environment variables today. Future endpoints will document theirs here.
+| Variable       | Default                                                    | Description               |
+| -------------- | ---------------------------------------------------------- | ------------------------- |
+| `DATABASE_URL` | `postgres://postgres:postgres@localhost:5432/organiclever` | PostgreSQL connection URL |
+| `PORT`         | `8202`                                                     | TCP port to listen on     |
+| `CORS_ORIGINS` | `*`                                                        | Allowed CORS origins      |
+
+See `.env.example` for a local template.
 
 ## Tech Stack
 
-- **Language**: Java 25
-- **Framework**: Spring Boot 4.0.4
-- **Build tool**: Maven 3.9
+- **Language**: Rust (edition 2024, MSRV 1.88)
+- **Framework**: Axum 0.8.9
+- **Database**: SQLx 0.8 + PostgreSQL
 - **Port**: 8202 | **API base**: `/api/v1`
-- **Testing**: JUnit 5, Spring Boot Test, JaCoCo (≥90% coverage)
-- **Coverage report**: `target/site/jacoco/jacoco.xml`
+- **Testing**: cargo-llvm-cov (≥90% line coverage), cucumber-rs BDD integration tests
+- **Lints**: `unsafe_code = "forbid"`, `missing_docs = "deny"`, clippy pedantic
 
 ## Behavior & Architecture
 

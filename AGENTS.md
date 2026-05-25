@@ -28,7 +28,7 @@
   - `ose-cli` — Go CLI tool for OSE Platform site maintenance (link validation)
   - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine)
   - `organiclever-web` — Next.js 16 landing and promotional website (www.organiclever.com)
-  - `organiclever-be` — F#/Giraffe REST API backend for OrganicLever
+  - `organiclever-be` — Rust/Axum REST API backend for OrganicLever
   - `organiclever-web-e2e` — Playwright FE E2E tests for organiclever-web
   - `organiclever-be-e2e` — Playwright BE E2E tests for organiclever-be
   - `organiclever-contracts` — OpenAPI 3.1 API contract spec (in `specs/apps/organiclever/containers/contracts/`); generates types + encoders/decoders for organiclever apps via `codegen` Nx target
@@ -57,7 +57,7 @@ ose-public/
 │   ├── ose-cli/      # OSE Platform site CLI
 │   ├── crane-cli/    # PDF-to-Markdown pipeline CLI (F#)
 │   ├── organiclever-web/     # OrganicLever landing website (Next.js)
-│   ├── organiclever-be/      # OrganicLever Java/Spring Boot 4 REST API backend
+│   ├── organiclever-be/      # OrganicLever Rust/Axum REST API backend
 │   ├── organiclever-web-e2e/ # Playwright FE E2E tests for organiclever-web
 │   ├── organiclever-be-e2e/  # Playwright BE E2E tests for organiclever-be
 │   ├── ose-app-be/               # OSE Application F#/Giraffe REST API (api.oseplatform.com)
@@ -69,8 +69,7 @@ ose-public/
 ├── archived/                 # Archived applications (no longer active)
 ├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
-│   ├── golang-commons/       # Shared Go utilities (output, common helpers)
-│   └── golang-link-commons/  # Shared Go link-checking utilities
+│   └── rust-commons/         # Shared Rust utilities (link-checking, HTTP)
 ├── docs/                     # Documentation (Diátaxis framework)
 │   ├── tutorials/            # Learning-oriented
 │   ├── how-to/               # Problem-solving
@@ -523,7 +522,7 @@ nx run ose-app-web-e2e:test:e2e             # Frontend E2E tests
 
 ### organiclever-be
 
-- **Framework**: Java/Spring Boot 4 REST API
+- **Framework**: Rust/Axum REST API
 - **Deployment**: Kubernetes (staging/production)
 - **Content**: Backend API for OrganicLever productivity tracker
 - **E2E tests**: `organiclever-be-e2e`
@@ -535,7 +534,7 @@ nx run ose-app-web-e2e:test:e2e             # Frontend E2E tests
 ```bash
 nx dev organiclever-be                     # Development server (localhost:8202)
 nx build organiclever-be                   # Production build
-nx run organiclever-be:test:quick          # Unit tests + coverage validation
+nx run organiclever-be:test:quick          # Unit tests + coverage validation (≥90%)
 nx run organiclever-be:test:integration    # Integration tests with real DB
 nx run organiclever-be-e2e:test:e2e        # Run BE E2E tests headlessly
 ```

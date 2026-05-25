@@ -511,37 +511,32 @@ nx run ayokoding-web:links:check
 
 **Dependency chain:** `ayokoding-cli:build` → `ayokoding-web:links:check` → `ayokoding-web:test:quick`
 
-## Go CLI Linting
+## Rust CLI Linting
 
-Go CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`) use [golangci-lint](https://golangci-lint.run/) for static analysis.
+Rust CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`, `apps/rhino-cli`, `apps/organiclever-be`) use [Clippy](https://github.com/rust-lang/rust-clippy) for static analysis.
 
-**Shared configuration**: A single `.golangci.yml` at the repository root serves all Go CLIs. golangci-lint discovers it automatically by walking up the directory tree from each app's working directory — no `--config` flag or per-project files are needed.
+**Configuration**: Each project declares lints in its `Cargo.toml` under `[lints.clippy]`. The standard pedantic profile is used with selective allows.
 
-**Active linter set** (from `.golangci.yml`):
+**Standard lint set** (from each project's `Cargo.toml`):
 
-- **Standard**: `errcheck`, `govet`, `ineffassign`, `staticcheck`, `unused`
-- **Nil-safety**: `forcetypeassert`, `nilerr`, `nilnesserr`, `nilnil`
-- **Exhaustiveness**: `exhaustive` (typed-constant switch/map) · `gochecksumtype` (sealed-interface type switches)
-- **Error-handling discipline**: `errorlint` (forces `errors.Is`/`errors.As`; requires `%w` in `fmt.Errorf`)
-- **Const hygiene**: `iotamixing` (forbids mixing iota with non-iota in same const block)
-- **Documentation style**: `godot` (doc comments must end with period) · `revive exported` (exported identifiers must have doc) · `revive package-comments` (every package needs a doc comment)
-- **staticcheck checks**: `all` (SA\*, ST\*, S\*, QF\*) with 4 cosmetic ST checks excluded
+- `pedantic` at `warn` priority -1 (baseline)
+- `unwrap_used = "deny"` — no `.unwrap()` in production code
+- `panic = "deny"` — no `panic!()` in production code
+- `missing_docs = "deny"` / `missing_docs_in_private_items = "deny"` — full doc coverage
+- `undocumented_unsafe_blocks = "deny"` — every `unsafe` block must have a comment
+- `unsafe_code = "forbid"` (in `[lints.rust]`) — no unsafe code at all
 
 **Usage**:
 
 ```bash
-# Run from app directory
-cd apps/ayokoding-cli && golangci-lint run ./...
-
-# Run via Nx
+# Run via Nx (standard)
 nx lint ayokoding-cli
 nx lint ose-cli
+nx lint organiclever-be
 
-# Verify which config file is resolved (verbose flag)
-golangci-lint run -v ./... 2>&1 | grep "Config"
+# Run directly
+cargo clippy --manifest-path apps/ayokoding-cli/Cargo.toml --all-targets -- -D warnings
 ```
-
-**Convention**: All Go projects in this repository share the root `.golangci.yml`. Per-project override files should only be added if a specific project genuinely needs different rules — which should be rare given the CLIs have the same purpose and audience.
 
 ## Elixir Formatting
 

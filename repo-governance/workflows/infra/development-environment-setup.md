@@ -221,7 +221,7 @@ volta install npm@11.10.1
 
 ### Phase 4: Go Ecosystem (Sequential)
 
-Required for: `ayokoding-cli`, `ose-cli`, `libs/golang-commons`
+Required for Go-based tooling. Note: `ayokoding-cli` and `ose-cli` have migrated to Rust (2026-05-25).
 
 #### 5.1 Install Go
 

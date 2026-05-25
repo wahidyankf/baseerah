@@ -49,7 +49,7 @@ Partial lines count as NOT covered.
 | ---------------- | --------- | --------------------------------------- |
 | CLI tools (Go)   | >= 90%    | Core business logic                     |
 | Go libraries     | >= 90%    | Shared utilities                        |
-| organiclever-be  | >= 90%    | F#/Giraffe backend API                  |
+| organiclever-be  | >= 90%    | Rust/Axum backend API                   |
 | organiclever-web | >= 70%    | Frontend app with MSW integration tests |
 | ayokoding-web    | >= 80%    | Content platform with UI rendering code |
 | ose-web          | >= 80%    | Content platform with UI rendering code |
@@ -62,13 +62,12 @@ Partial lines count as NOT covered.
 **Tool**: `go test -coverprofile=cover.out`
 **Format**: Go cover.out (statement-based, mode: set)
 
-| Project             | Coverage File | Threshold | Exclusions |
-| ------------------- | ------------- | --------- | ---------- |
-| rhino-cli           | `cover.out`   | 90%       | None       |
-| ayokoding-cli       | `cover.out`   | 90%       | None       |
-| ose-cli             | `cover.out`   | 90%       | None       |
-| golang-commons      | `cover.out`   | 90%       | None       |
-| golang-link-commons | `cover.out`   | 90%       | None       |
+| Project       | Coverage File | Threshold | Exclusions |
+| ------------- | ------------- | --------- | ---------- |
+| rhino-cli     | `cover.out`   | 90%       | None       |
+| ayokoding-cli | `cover.out`   | 90%       | None       |
+| ose-cli       | `cover.out`   | 90%       | None       |
+| rust-commons  | `lcov.info`   | 90%       | None       |
 
 ### TypeScript Projects
 

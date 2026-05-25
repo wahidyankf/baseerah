@@ -85,8 +85,7 @@ all use the same MIT text.
 | `apps/wahidyankf-web/`          | MIT     |
 | `specs/`                        | MIT     |
 | `libs/clojure-openapi-codegen/` | MIT     |
-| `libs/golang-commons/`          | MIT     |
-| `libs/golang-link-commons/`     | MIT     |
+| `libs/rust-commons/`            | MIT     |
 | `libs/ts-ui/`                   | MIT     |
 | `libs/web-ui/`                  | MIT     |
 | `libs/web-ui-token/`            | MIT     |
@@ -159,7 +158,7 @@ apps/
     cmd/
     ...
 libs/
-  golang-commons/
+  rust-commons/
     LICENSE          <-- MIT (shared library)
     ...
 ```

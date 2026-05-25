@@ -48,14 +48,14 @@ OSE Platform Phase 1 centers on **OrganicLever** — a Sharia-compliant producti
 
 | Bounded Context | Nx App             | Primary Stack      | Status  |
 | --------------- | ------------------ | ------------------ | ------- |
-| Purchasing      | `organiclever-be`  | Java/Spring Boot   | Active  |
-| Supplier        | `organiclever-be`  | Java/Spring Boot   | Active  |
-| Receiving       | `organiclever-be`  | Java/Spring Boot   | Active  |
-| Invoicing       | `organiclever-be`  | Java/Spring Boot   | Planned |
-| Payments        | `organiclever-be`  | Java/Spring Boot   | Planned |
+| Purchasing      | `organiclever-be`  | Rust/Axum          | Active  |
+| Supplier        | `organiclever-be`  | Rust/Axum          | Active  |
+| Receiving       | `organiclever-be`  | Rust/Axum          | Active  |
+| Invoicing       | `organiclever-be`  | Rust/Axum          | Planned |
+| Payments        | `organiclever-be`  | Rust/Axum          | Planned |
 | Frontend shell  | `organiclever-web` | Next.js/TypeScript | Active  |
 
-The F#/Giraffe backend (`organiclever-be` F# layer) exposes the composition root and HTTP adapter while the domain and port definitions are language-agnostic by design.
+The Rust/Axum backend (`organiclever-be`) exposes the composition root and HTTP adapter while the domain and port definitions are language-agnostic by design.
 
 ## Dependency Direction Rule
 

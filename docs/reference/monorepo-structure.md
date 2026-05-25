@@ -90,7 +90,7 @@ Flat structure - all apps at the same level, no subdirectories.
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
 - `ose-cli` - OSE Platform site maintenance CLI (Go application)
 - `organiclever-web` - OrganicLever landing website (Next.js application)
-- `organiclever-be` - OrganicLever REST API backend (F#/Giraffe application)
+- `organiclever-be` - OrganicLever REST API backend (Rust/Axum application)
 - `organiclever-web-e2e` - Playwright FE E2E tests for organiclever-web
 - `organiclever-be-e2e` - Playwright BE E2E tests for organiclever-be
 - `wahidyankf-web` - Personal portfolio website (Next.js 16 application, port 3201)
@@ -176,15 +176,14 @@ Contains reusable library packages.
 **Language Prefixes**:
 
 - `ts-` - TypeScript (future)
-- `go-` - Go (current — `golang-commons` uses full name for clarity)
+- `rust-` - Rust (e.g., `rust-commons`)
 - `java-` - Java (future)
 - `kt-` - Kotlin (future)
 - `py-` - Python (future)
 
 **Current Libraries**:
 
-- `golang-commons` - Shared Go utilities (links checker + output functions)
-- `golang-link-commons` - Shared Go link-checking utilities (Godog BDD testing)
+- `rust-commons` - Shared Rust utilities (link-checking, HTTP)
 
 **Examples** (planned):
 
@@ -225,7 +224,7 @@ libs/ts-utils/
 
 ### Current Scope
 
-Go (`golang-commons`, `golang-link-commons`) and future TypeScript, Java, Kotlin, Python libraries.
+Rust (`rust-commons`) and future TypeScript, Java, Kotlin, Python libraries.
 
 ## Experimental Projects vs Monorepo Projects
 

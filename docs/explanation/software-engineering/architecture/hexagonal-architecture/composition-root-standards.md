@@ -21,7 +21,7 @@ created: 2026-05-17
 
 ## Purpose
 
-OSE Platform standards for the composition root: the single location in each bounded context where port interfaces are bound to concrete adapter implementations. These conventions apply to both Java/Spring Boot and F#/Giraffe stacks in `organiclever-be`.
+OSE Platform standards for the composition root: the single location in each bounded context where port interfaces are bound to concrete adapter implementations. These conventions apply to the Rust/Axum stack in `organiclever-be`.
 
 ## Standard 1: Single Composition Root Per Bounded Context
 

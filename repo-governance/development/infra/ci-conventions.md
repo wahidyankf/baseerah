@@ -170,14 +170,14 @@ per-backend implementation patterns, see the
 Each app type implements the three levels according to its domain. The table below shows how each
 app type realises each level.
 
-| App Type                                          | Unit (`test:unit`)                                 | Integration (`test:integration`)                                                                   | E2E (`test:e2e`)                                     |
-| ------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **BE API** (`organiclever-be`)                    | BDD, mocked repos, calls service fns directly      | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)                           | Playwright, real HTTP + real PostgreSQL              |
-| **FE** (`organiclever-web`)                       | Vitest, all API calls mocked (MSW / mock services) | MSW with real DOM; in-process mocking only                                                         | Playwright against running FE + BE                   |
-| **CLI** (`*-cli`)                                 | Godog, all I/O mocked via function variables       | Godog (`//go:build integration`), real filesystem via `/tmp` fixtures, in-process via `cmd.RunE()` | Not applicable                                       |
-| **Content platform** (`ayokoding-web`, `ose-web`) | Vitest, components and tRPC routes mocked          | MSW, in-process mocking                                                                            | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
-| **Library** (`golang-commons`)                    | Unit tests + Godog, mock closures                  | Godog, tmpdir mocks, cacheable                                                                     | Not applicable                                       |
-| **E2E runner** (`*-e2e`)                          | Not applicable                                     | Not applicable                                                                                     | Playwright — this project IS the E2E suite           |
+| App Type                                          | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                     |
+| ------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **BE API** (`organiclever-be`)                    | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
+| **FE** (`organiclever-web`)                       | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
+| **CLI** (`*-cli`)                                 | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
+| **Content platform** (`ayokoding-web`, `ose-web`) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
+| **Library** (`rust-commons`)                      | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
+| **E2E runner** (`*-e2e`)                          | Not applicable                                        | Not applicable                                                                | Playwright — this project IS the E2E suite           |
 
 ## Gherkin Consumption Matrix
 

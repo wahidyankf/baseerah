@@ -44,15 +44,15 @@ DDD and Hexagonal Architecture are complementary but address different concerns.
 
 OSE Platform Phase 1 centers on **OrganicLever** — a Sharia-compliant procurement tracker for the Procure-to-Pay workflow. All conventions in this directory use OrganicLever bounded contexts as canonical examples.
 
-| Bounded Context | Nx App            | Primary Stack    | Aggregate Roots                        |
-| --------------- | ----------------- | ---------------- | -------------------------------------- |
-| Purchasing      | `organiclever-be` | Java/Spring Boot | `PurchaseRequisition`, `PurchaseOrder` |
-| Supplier        | `organiclever-be` | Java/Spring Boot | `Supplier`                             |
-| Receiving       | `organiclever-be` | Java/Spring Boot | `GoodsReceiptNote`                     |
-| Invoicing       | `organiclever-be` | Java/Spring Boot | `Invoice`                              |
-| Payments        | `organiclever-be` | Java/Spring Boot | `Payment`                              |
+| Bounded Context | Nx App            | Primary Stack | Aggregate Roots                        |
+| --------------- | ----------------- | ------------- | -------------------------------------- |
+| Purchasing      | `organiclever-be` | Rust/Axum     | `PurchaseRequisition`, `PurchaseOrder` |
+| Supplier        | `organiclever-be` | Rust/Axum     | `Supplier`                             |
+| Receiving       | `organiclever-be` | Rust/Axum     | `GoodsReceiptNote`                     |
+| Invoicing       | `organiclever-be` | Rust/Axum     | `Invoice`                              |
+| Payments        | `organiclever-be` | Rust/Axum     | `Payment`                              |
 
-The F#/Giraffe layer (`organiclever-be`) hosts the composition root and HTTP adapter while domain and port definitions remain language-agnostic by design. These same bounded contexts appear in the ayokoding-web cases using the name `procurement-platform-be`.
+The Rust/Axum backend (`organiclever-be`) hosts the composition root and HTTP adapter while domain and port definitions remain language-agnostic by design. These same bounded contexts appear in the ayokoding-web cases using the name `procurement-platform-be`.
 
 ## Convention Standards
 

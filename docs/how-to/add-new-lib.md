@@ -29,7 +29,7 @@ Follow the naming convention: `[language-prefix]-[name]`
 **Language Prefixes**:
 
 - `ts-` - TypeScript
-- `golang-` - Go (e.g., `golang-commons`, `golang-link-commons`)
+- `rust-` - Rust (e.g., `rust-commons`)
 - `java-` - Java (future)
 - `py-` - Python (future)
 
@@ -37,8 +37,7 @@ Follow the naming convention: `[language-prefix]-[name]`
 
 - `ts-utils` - TypeScript utility functions
 - `ts-components` - Reusable React components
-- `golang-commons` - Shared Go utilities (output, formatting)
-- `golang-link-commons` - Shared Go link-checking utilities (Godog BDD)
+- `rust-commons` - Shared Rust utilities (link-checking, HTTP)
 
 ### Step 2: Create Library Directory
 

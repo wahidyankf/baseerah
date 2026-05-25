@@ -52,7 +52,7 @@ invalidated and `nx affected` flags the project.
 
 ## Visual Dependency Graph
 
-**Go ecosystem and content sites:**
+**Rust CLI ecosystem and content sites:**
 
 ```mermaid
 graph TD
@@ -66,32 +66,24 @@ graph TD
   OPC[ose-cli]
   RC[rhino-cli]
 
-  %% Go libs (leaf / near-leaf)
-  HC[golang-link-commons]
-  GC[golang-commons]
+  %% Rust lib
+  RSC[rust-commons]
 
   %% Content site → CLI
   AKW --> AKC
   OPW --> OPC
 
   %% CLI → shared libs
-  AKC --> HC
+  AKC --> RSC
   AKC --> RC
-  AKC --> GC
-  OPC --> HC
+  OPC --> RSC
   OPC --> RC
-  OPC --> GC
-
-  %% Lib chain
-  HC --> RC
-  HC --> GC
-  RC --> GC
 
   classDef lib fill:#029E73,stroke:#016B4E,color:#FFFFFF
   classDef cli fill:#DE8F05,stroke:#A56A04,color:#FFFFFF
   classDef site fill:#CC78BC,stroke:#9A5A8E,color:#FFFFFF
 
-  class GC,HC lib
+  class RSC lib
   class RC,AKC,OPC cli
   class AKW,OPW,WKF site
 ```
@@ -148,18 +140,17 @@ Repository management CLI used by most projects for coverage validation
 - **Dependents**: CLI tools, libs, content platforms, organiclever-web
 - **Mechanism**: `implicitDependencies`
 - **Own dependency**: None (self-contained Rust application with only Rust crate dependencies)
-- **Note**: rhino-cli was ported from Go to Rust (2026-05-23); it no longer depends on `golang-commons`.
-  `golang-commons` does NOT depend on `rhino-cli` to avoid a circular dependency.
-  Changes to `rhino-cli`'s coverage algorithm are caught by the main CI running `--all`.
+- **Note**: rhino-cli was ported from Go to Rust (2026-05-23).
 
-### golang-commons
+### rust-commons
 
-**Location**: `libs/golang-commons/`
+**Location**: `libs/rust-commons/`
 
-Shared Go utilities (time formatting, test helpers, output capture).
+Shared Rust utilities (link-checking, HTTP utilities). Created 2026-05-25 to
+consolidate logic shared by `ose-cli` and `ayokoding-cli` after their Go-to-Rust migration.
 
-- **Dependents**: `golang-link-commons`, `ayokoding-cli`, `ose-cli`
-- **Mechanism**: Go module `replace` directives + `implicitDependencies`
+- **Dependents**: `ose-cli`, `ayokoding-cli`
+- **Mechanism**: Cargo workspace `path` dependency
 
 ## Project Dependency Table
 
@@ -183,18 +174,17 @@ Shared Go utilities (time formatting, test helpers, output capture).
 
 ### CLI Tools
 
-| Project       | Dependencies                                   | Spec Inputs                         |
-| ------------- | ---------------------------------------------- | ----------------------------------- |
-| ayokoding-cli | golang-commons, golang-link-commons, rhino-cli | ayokoding-cli/\* (test:integration) |
-| ose-cli       | golang-commons, golang-link-commons, rhino-cli | ose-cli/\* (test:integration)       |
-| rhino-cli     | (none — self-contained Rust app)               | rhino-cli/\* (test:integration)     |
+| Project       | Dependencies            | Spec Inputs                         |
+| ------------- | ----------------------- | ----------------------------------- |
+| ayokoding-cli | rust-commons, rhino-cli | ayokoding-cli/\* (test:integration) |
+| ose-cli       | rust-commons, rhino-cli | ose-cli/\* (test:integration)       |
+| rhino-cli     | (none — self-contained) | rhino-cli/\* (test:integration)     |
 
 ### Libraries
 
-| Project             | Dependencies              | Spec Inputs                               |
-| ------------------- | ------------------------- | ----------------------------------------- |
-| golang-commons      | (none)                    | golang-commons/\* (test:integration)      |
-| golang-link-commons | golang-commons, rhino-cli | golang-link-commons/\* (test:integration) |
+| Project      | Dependencies | Spec Inputs                 |
+| ------------ | ------------ | --------------------------- |
+| rust-commons | (none)       | rust-commons/\* (test:unit) |
 
 ## Spec Directory Mapping
 
@@ -208,18 +198,6 @@ All Gherkin specs and API contracts live under `specs/` and are consumed via
 | `specs/apps/rhino/`                             | rhino-cli                              | test:integration                        |
 | `specs/apps/ayokoding/`                         | ayokoding-cli, ayokoding-web           | test:integration                        |
 | `specs/apps/ose-platform/`                      | ose-cli, ose-web                       | test:integration                        |
-| `specs/libs/golang-commons/`                    | golang-commons                         | test:integration                        |
-| `specs/libs/golang-link-commons/`               | golang-link-commons                    | test:integration                        |
-
-## Design Decisions
-
-### Why `golang-commons` does not depend on `rhino-cli`
-
-`golang-commons` uses `rhino-cli` in its `test:quick` target for coverage
-validation, but declaring this dependency would create a circular dependency:
-`golang-commons -> rhino-cli -> golang-commons`. The risk is minimal because
-`rhino-cli` coverage algorithm changes are rare and are caught by the main CI
-workflow which runs `--all` projects.
 
 ## Related Documentation
 
