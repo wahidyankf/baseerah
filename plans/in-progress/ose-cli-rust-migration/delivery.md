@@ -1123,13 +1123,16 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
 ### Step 2.6: Update in-progress README if needed
 
-- [ ] Check `plans/in-progress/README.md` for any references to `ose-cli` that need updating:
+- [x] Check `plans/in-progress/README.md` for any references to `ose-cli` that need updating:
 
   ```bash
   grep -n "ose-cli" plans/in-progress/README.md
   ```
 
   If found, update the entry to reflect the plan is in progress. Acceptance criterion: file accurately reflects plan state.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Entry found; already reflects in-progress state. No update needed.
 
 ---
 
@@ -1139,49 +1142,62 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
 ### Commit Guidelines
 
-- [ ] Commit changes thematically — group related changes into logically cohesive commits
-- [ ] Follow Conventional Commits format: `<type>(<scope>): <description>`
-- [ ] Split different domains/concerns into separate commits (e.g., Phase 0 commit, Phase 1 commit, Phase 2 commit, plus any preexisting fixes as their own commits)
-- [ ] Preexisting fixes get their own commits, separate from plan work
-- [ ] Do NOT bundle unrelated changes into a single commit
+- [x] Commit changes thematically — group related changes into logically cohesive commits
+- [x] Follow Conventional Commits format: `<type>(<scope>): <description>`
+- [x] Split different domains/concerns into separate commits (e.g., Phase 0 commit, Phase 1 commit, Phase 2 commit, plus any preexisting fixes as their own commits)
+- [x] Preexisting fixes get their own commits, separate from plan work
+- [x] Do NOT bundle unrelated changes into a single commit
 
 ### Local Quality Gates (Before Push)
 
-- [ ] Run affected typecheck:
+- [x] Run affected typecheck:
 
   ```bash
   npx nx affected -t typecheck
   ```
 
   Acceptance criterion: exits 0 for all affected projects.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: nx run ose-cli:typecheck exits 0. nx run rust-commons:typecheck exits 0.
 
-- [ ] Run affected linting:
+- [x] Run affected linting:
 
   ```bash
   npx nx affected -t lint
   ```
 
   Acceptance criterion: exits 0 for all affected projects.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: nx run ose-cli:lint exits 0. nx run rust-commons:lint exits 0.
 
-- [ ] Run affected quick tests:
+- [x] Run affected quick tests:
 
   ```bash
   npx nx affected -t test:quick
   ```
 
   Acceptance criterion: exits 0 for `ose-cli` and `rust-commons`; all other affected projects unchanged.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: ose-cli: 14 tests, 97.56% coverage. rust-commons: 34 tests, 96.65% coverage. Both exits 0.
 
-- [ ] Run affected spec-coverage:
+- [x] Run affected spec-coverage:
 
   ```bash
   npx nx affected -t spec-coverage
   ```
 
   Acceptance criterion: exits 0 (stub echo passes for `ose-cli`).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Both ose-cli and rust-commons spec-coverage stubs exit 0.
 
-- [ ] Fix ALL failures — including preexisting issues not caused by your changes.
-- [ ] Re-run failing checks to confirm resolution.
-- [ ] Verify zero failures before pushing.
+- [x] Fix ALL failures — including preexisting issues not caused by your changes.
+- [x] Re-run failing checks to confirm resolution.
+- [x] Verify zero failures before pushing.
+  - **Notes**: No failures found. All gates pass: typecheck, lint, test:quick, spec-coverage.
 
 ---
 
