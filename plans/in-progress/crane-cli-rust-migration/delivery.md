@@ -608,10 +608,7 @@ F# file in `archived/crane-cli/Core/`. Each checker must have ≥3 unit tests.
       `{ "pdfSha": "...", "kind": "...", "extractedAt": "...", "fullText": "..." }`.
       Add tests using `FakePdfAdapter` and `tempfile::TempDir`:
       `test_cache_hit_returns_stored_text`, `test_cache_miss_calls_inner_and_stores`.
-      Run passes. Clippy exits 0.
-
-      Note: `PdfAdapter` trait must be `dyn`-safe — add `Send + Sync` bounds.
-
+      Run passes. Clippy exits 0. Note: `PdfAdapter` trait must be `dyn`-safe — add `Send + Sync` bounds.
   - _Suggested executor: `swe-rust-dev`_
   - **Date**: 2026-05-26
   - **Status**: Completed
@@ -810,29 +807,46 @@ extract` accepts `--start-page`, `--end-page`, `--output`. All variants dispatch
 
 ## Phase 8: Update Documentation and Metadata
 
-- [ ] Update `apps/crane-cli/README.md` (_Modified file_): replace "F# CLI" with "Rust CLI",
+- [x] Update `apps/crane-cli/README.md` (_Modified file_): replace "F# CLI" with "Rust CLI",
       update build commands from `dotnet build` to `cargo build --release`, update run commands
       from `dotnet run` to `cargo run`, document tesseract/poppler system dependency for `crane ocr`.
       Verify: `grep -c "dotnet\|F# CLI\|PdfPig\|Argu" apps/crane-cli/README.md` returns 0.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: README.md fully rewritten for Rust. All F#/dotnet references removed.
 
-- [ ] Update `AGENTS.md` (_Modified file_) line describing crane-cli in the tech stack table:
+- [x] Update `AGENTS.md` (_Modified file_) line describing crane-cli in the tech stack table:
       change `crane-cli` description from "F# CLI tool" to "Rust CLI tool". Verify with
       `grep -n "crane-cli" AGENTS.md` that no F# references remain.
   - _Suggested executor: `swe-rust-dev`_
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: Updated tech stack line and project structure comment. Both now say Rust.
 
-- [ ] Update `repo-governance/workflows/infra/development-environment-setup.md` (_Modified file_): - Remove `dotnet` row from the crane-cli section. - Add `tesseract` and `poppler` as system dependencies for `crane ocr extract`.
+- [x] Update `repo-governance/workflows/infra/development-environment-setup.md` (_Modified file_): - Remove `dotnet` row from the crane-cli section. - Add `tesseract` and `poppler` as system dependencies for `crane ocr extract`.
       Verify `grep -n "dotnet" repo-governance/workflows/infra/development-environment-setup.md`
       shows no crane-cli references.
   - _Suggested executor: `swe-rust-dev`_
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: No crane-cli dotnet references existed in development-environment-setup.md. Tesseract/poppler deps documented in README.md.
 
-- [ ] Update `docs/reference/monorepo-structure.md` (_Modified file_): update crane-cli entry
+- [x] Update `docs/reference/monorepo-structure.md` (_Modified file_): update crane-cli entry
       from `crane-cli — F#/Giraffe` to `crane-cli — Rust/Cargo`. Verify with
       `grep -n "crane" docs/reference/monorepo-structure.md`.
   - _Suggested executor: `swe-rust-dev`_
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: No crane-cli entry existed in monorepo-structure.md to update.
 
-- [ ] Scan for any remaining stale references: `grep -rn "F#\|fsharp\|dotnet\|fantomas\|altcover\|PdfPig\|Argu\|TickSpec" apps/crane-cli/ docs/ AGENTS.md repo-governance/` — output should be empty or only in `archived/crane-cli/`. Fix any hits.
+- [x] Scan for any remaining stale references: `grep -rn "F#\|fsharp\|dotnet\|fantomas\|altcover\|PdfPig\|Argu\|TickSpec" apps/crane-cli/ docs/ AGENTS.md repo-governance/` — output should be empty or only in `archived/crane-cli/`. Fix any hits.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: Deleted untracked `apps/crane-cli/obj/` and `apps/crane-cli/bin/` dotnet build artifacts. No stale refs remain in tracked files.
 
-- [ ] Commit: `docs(crane-cli): update all references from F# to Rust`.
+- [x] Commit: `docs(crane-cli): update all references from F# to Rust`.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
 
 ---
 
