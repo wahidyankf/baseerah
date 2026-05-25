@@ -43,6 +43,8 @@ outputs:
 - For plans that require iterative refinement to meet all requirements
 - When you need automated archival of completed plans to done/ folder
 - For systematic plan completion with zero-findings quality standard
+- Before executing, invoke the `grill-me` skill (`.claude/skills/grill-me/SKILL.md`) to
+  stress-test any unresolved design decisions in the plan
 
 ## Execution Mode
 
@@ -753,7 +755,9 @@ write the minimum code to pass, then refactor. Mini-TDD passes are encouraged �
 into multiple small Red→Green→Refactor cycles rather than one large test up front. Gherkin
 acceptance criteria in `prd.md` are the natural source of the first failing tests.
 
-**See**: [Test-Driven Development Convention](../../development/workflow/test-driven-development.md)
+**See**: [Test-Driven Development Convention](../../development/workflow/test-driven-development.md) — in particular, the
+[TDD Shape for Delivery Checklists](../../development/workflow/test-driven-development.md#tdd-shape-for-delivery-checklists)
+section for the required RED/GREEN/REFACTOR three-substep template (explicit file path, verbatim command, acceptance criterion per substep).
 
 ## Principles Implemented/Respected
 

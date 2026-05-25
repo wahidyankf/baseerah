@@ -9,6 +9,7 @@ skills:
   - plan-writing-gherkin-criteria
   - plan-creating-project-plans
   - docs-validating-factual-accuracy
+  - grill-me
 ---
 
 # Plan Maker Agent
@@ -219,10 +220,11 @@ Unsolicited PR steps conflict with Trunk Based Development. `plan-checker` will 
 
 **Related Agents / Workflows:**
 
-- `plan-checker` - Validates plan quality
-- [plan-execution workflow](../../repo-governance/workflows/plan/plan-execution.md) - Execute plans (calling context orchestrates; no dedicated subagent)
+- `plan-checker` - Validates plan quality (includes Step 5g harness-neutrality scan when the plan touches agents, skills, rules, or `repo-governance/` paths)
+- [plan-execution workflow](../../repo-governance/workflows/plan/plan-execution.md) - Execute plans (calling context orchestrates; no dedicated subagent); invokes the `grill-me` skill to stress-test unresolved design decisions before execution begins
 - `plan-execution-checker` - Validates completed work
 - `plan-fixer` - Fixes plan issues
+- `grill-me` skill - Stress-test open design decisions before committing to implementation; invoke via the `grill-me` Skill when requirements have unresolved branches
 
 **Remember**: Good plans are executable blueprints, not vague intentions. Make them specific, structured, and actionable.
 

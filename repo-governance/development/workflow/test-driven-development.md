@@ -200,6 +200,35 @@ language-specific `swe-*-dev` agents follow TDD when implementing delivery items
 This applies inside subrepo worktrees too. The worktree execution context does not change the
 TDD requirement.
 
+## TDD Shape for Delivery Checklists
+
+All code delivery steps in plan checklists must follow this three-substep pattern. Each substep
+names an explicit file path, verbatim shell command, and a concrete acceptance criterion so the
+step is machine-executable without ambiguity:
+
+```markdown
+- [ ] **RED**: Write failing test for [specific behavior]
+      — command: `nx run [project]:test:unit`
+      — acceptance: test fails with `[expected error message]`
+- [ ] **GREEN**: Implement `[function/component]` in `[file path]`
+      — command: `nx run [project]:test:unit`
+      — acceptance: test passes, no other tests broken
+- [ ] **REFACTOR**: Clean up [specific concern] in `[file path]`
+      — command: `nx run [project]:test:unit`
+      — acceptance: all tests still pass, code is cleaner
+```
+
+Non-code steps (doc edits, config changes, file creation, governance updates) do not require
+RED-GREEN-REFACTOR. They use direct action + acceptance criterion instead:
+
+```markdown
+- [ ] [Action verb] `[file path]` — add/update [specific content]
+      — acceptance: [concrete observable outcome]
+```
+
+`plan-checker` flags delivery checklist items that reference code changes without this
+three-substep structure as a HIGH finding.
+
 ## Enforcement
 
 The pre-push hook runs `test:quick` for affected projects before every push. A code change with

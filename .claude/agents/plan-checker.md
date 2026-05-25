@@ -237,6 +237,11 @@ Update status to "Complete", add summary statistics and prioritized recommendati
 - `plan-execution-checker` - Validates completed work
 - `plan-fixer` - Fixes plan issues
 
+**Harness Conventions (Step 5g):**
+
+- [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) - Two-tier binding model and no-shadowing rule
+- [Governance Vendor-Independence Convention](../../repo-governance/conventions/structure/governance-vendor-independence.md) - Platform Binding Examples heading rule
+
 ### Escalation After Repeated Disagreements
 
 If a finding was flagged in iteration N, marked FALSE_POSITIVE by fixer, and re-flagged by checker in iteration N+2:
@@ -502,3 +507,46 @@ This prevents re-verification thrash and keeps the audit deterministic.
 - AP-8, AP-9, missing inline excerpt on `[Web-cited]`, executor-mismatch: **MEDIUM** per occurrence
 - Bare unlabeled non-trivial claim (defaults to `[Unverified]`): **MEDIUM** per claim
 - Missing `web-research-maker` delegation when threshold (any external claim not single-shot URL) was crossed: **MEDIUM** finding
+
+### 13. Harness-Neutrality Scan (Step 5g — CONDITIONAL)
+
+Run this step ONLY when the plan touches agents, skills, rules, or `repo-governance/` paths. Skip entirely when the plan touches only application code and tests.
+
+Reports CRITICAL if a plan skips this check when in scope.
+
+#### What to Validate
+
+1. **Agent definitions follow multi-harness-binding conventions**
+   - Agent frontmatter fields (`name`, `description`, `tools`, `model`, `color`, `skills`) are present and correctly formatted per the [AI Agents Convention](../../repo-governance/development/agents/ai-agents.md).
+   - `color` field uses a named color value (`blue`, `green`, `yellow`, `purple`, etc.) — not an OpenCode theme token or hex code.
+   - `tools` field uses the Claude Code array format (`Read, Write, Edit`) — not boolean flags.
+   - Non-conforming agent: **HIGH** finding per violation.
+
+2. **Agent mirrors are generated via `npm run generate:bindings`, not hand-written**
+   - No delivery checklist step instructs manual editing of `.opencode/agents/` files.
+   - No delivery checklist step creates `.opencode/agents/` files directly.
+   - Hand-written secondary binding: **HIGH** finding.
+
+3. **Skill body is plain markdown with no harness-specific syntax**
+   - `SKILL.md` files must contain only plain markdown — no Claude Code tool invocations, no OpenCode-specific YAML frontmatter beyond the skill metadata.
+   - Harness-specific syntax in skill body: **HIGH** finding.
+
+4. **No OpenCode skill mirror manually created**
+   - OpenCode reads `.claude/skills/<name>/SKILL.md` natively per `AGENTS.md`. No `.opencode/skill/` or `.opencode/skills/<name>/` mirror should be created.
+   - Manual skill mirror: **HIGH** finding.
+
+5. **Governance doc changes outside "Platform Binding Examples" heading**
+   - Any proposed changes to `repo-governance/` content MUST live outside any `## Platform Binding Examples` heading unless the change is intentionally vendor-specific.
+   - Governance change under vendor-specific heading: **MEDIUM** finding.
+
+**Reference**: [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) and
+[Governance Vendor-Independence Convention](../../repo-governance/conventions/structure/governance-vendor-independence.md).
+
+#### Finding Severity
+
+- Missing harness-neutrality check when plan is in scope: **CRITICAL**
+- Hand-written secondary binding file: **HIGH**
+- Agent frontmatter violates multi-harness format: **HIGH** per violation
+- Skill body contains harness-specific syntax: **HIGH**
+- Manual OpenCode skill mirror: **HIGH**
+- Governance change placed under vendor-specific heading: **MEDIUM**

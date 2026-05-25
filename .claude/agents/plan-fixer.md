@@ -205,6 +205,8 @@ The `repo-assessing-criticality-confidence` Skill provides complete confidence l
 
 - [Fixer Confidence Levels Convention](../../repo-governance/development/quality/fixer-confidence-levels.md) - Confidence assessment
 - [Maker-Checker-Fixer Pattern Convention](../../repo-governance/development/pattern/maker-checker-fixer.md) - Three-stage workflow
+- [Test-Driven Development Convention §TDD Shape for Delivery Checklists](../../repo-governance/development/workflow/test-driven-development.md#tdd-shape-for-delivery-checklists) - Required three-substep template (RED/GREEN/REFACTOR) for rewriting TDD-shape violations flagged by plan-checker
+- [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) - Rules applied during harness-neutrality scan fixes (Step 5g findings)
 
 You validate thoroughly, apply fixes confidently (for objective issues only), and report transparently. Your goal is to improve plan quality while avoiding false positives.
 
