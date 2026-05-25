@@ -43,6 +43,28 @@ mod config_tests {
         let cfg = Config::from_env_with("", "8202", "https://example.com");
         assert_eq!(cfg.cors_origins, "https://example.com");
     }
+
+    #[test]
+    fn test_from_env_returns_valid_config() {
+        // Exercises Config::from_env() code path; env vars may or may not be set,
+        // but the function must always return a structurally valid Config.
+        let cfg = Config::from_env();
+        assert!(cfg.port > 0, "port must be non-zero");
+        assert!(
+            !cfg.database_url.is_empty(),
+            "database_url must be non-empty"
+        );
+        assert!(
+            !cfg.cors_origins.is_empty(),
+            "cors_origins must be non-empty"
+        );
+    }
+
+    #[test]
+    fn test_from_env_with_invalid_port_defaults_to_8202() {
+        let cfg = Config::from_env_with("", "not-a-number", "");
+        assert_eq!(cfg.port, 8202);
+    }
 }
 
 mod error_tests {

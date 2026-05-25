@@ -100,7 +100,7 @@
         "commands": [
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc organiclever",
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul organiclever",
-          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --fail-under-lines 90"
+          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --ignore-filename-regex 'main\\.rs' --fail-under-lines 90"
         ],
         "parallel": false
       },

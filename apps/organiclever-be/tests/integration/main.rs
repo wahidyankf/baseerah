@@ -26,6 +26,7 @@ async fn send_get_health(world: &mut ApiWorld) {
     world.last_body = resp.text().await.expect("response body text");
 }
 
+/// Spin up the Axum server on an ephemeral port and record the base URL in world.
 #[given("the API is running")]
 async fn the_api_is_running(world: &mut ApiWorld) {
     let router = app::router();
@@ -39,23 +40,28 @@ async fn the_api_is_running(world: &mut ApiWorld) {
     world.base_url = format!("http://127.0.0.1:{port}");
 }
 
+/// Send GET `/health` as an operations engineer.
 #[when("an operations engineer sends GET /health")]
 async fn ops_engineer_sends_get_health(world: &mut ApiWorld) {
     send_get_health(world).await;
 }
 
+/// Send GET `/health` as an unauthenticated engineer.
 #[when("an unauthenticated engineer sends GET /health")]
 async fn unauthenticated_engineer_sends_get_health(world: &mut ApiWorld) {
     send_get_health(world).await;
 }
 
+/// Assert the last response had HTTP status 200.
 #[then("the response status code should be 200")]
-async fn response_status_code_200(world: &mut ApiWorld) {
+fn response_status_code_200(world: &mut ApiWorld) {
     assert_eq!(world.last_status, 200, "expected HTTP 200");
 }
 
+/// Assert the JSON `status` field equals `expected`.
 #[then(expr = "the health status should be {string}")]
-async fn health_status_should_be(world: &mut ApiWorld, expected: String) {
+#[allow(clippy::needless_pass_by_value)] // cucumber-rs {string} captures must be owned String
+fn health_status_should_be(world: &mut ApiWorld, expected: String) {
     let body: serde_json::Value = serde_json::from_str(&world.last_body).expect("parse JSON body");
     let actual = body
         .get("status")
@@ -64,8 +70,9 @@ async fn health_status_should_be(world: &mut ApiWorld, expected: String) {
     assert_eq!(actual, expected, "health status mismatch");
 }
 
+/// Assert the response body does not contain component-level health details.
 #[then("the response should not include detailed component health information")]
-async fn no_component_health_details(world: &mut ApiWorld) {
+fn no_component_health_details(world: &mut ApiWorld) {
     assert!(
         !world.last_body.contains("components"),
         "response must not include component details but got: {}",
