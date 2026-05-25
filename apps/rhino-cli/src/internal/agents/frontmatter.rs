@@ -1,5 +1,5 @@
-// Frontmatter extraction + YAML normalization + tools parsing.
-// Ported from `apps/rhino-cli/internal/agents/converter.go` (subset).
+//! Frontmatter extraction, YAML normalization, and tools parsing.
+//! Ported from `apps/rhino-cli/internal/agents/converter.go` (subset).
 
 use std::sync::OnceLock;
 
@@ -13,6 +13,7 @@ fn yaml_colon_norm() -> &'static Regex {
     R.get_or_init(|| Regex::new(r"(?m)^([a-zA-Z0-9_-]+):([^\s])").expect("valid hardcoded regex"))
 }
 
+/// Normalize a YAML snippet by inserting a space after colons without one.
 pub fn normalize_yaml(content: &[u8]) -> Vec<u8> {
     let s = String::from_utf8_lossy(content).into_owned();
     let out = yaml_colon_norm().replace_all(&s, "$1: $2");
@@ -21,6 +22,12 @@ pub fn normalize_yaml(content: &[u8]) -> Vec<u8> {
 
 /// Extracts YAML frontmatter and body from markdown content. Returns
 /// (frontmatter, body) with the frontmatter normalized (space-after-colon).
+///
+/// # Errors
+///
+/// Returns an error string if the content is not valid UTF-8, if the file is
+/// too short to contain frontmatter, if it does not begin with `---`, or if
+/// the closing `---` delimiter is not found.
 pub fn extract_frontmatter(content: &[u8]) -> Result<(Vec<u8>, Vec<u8>), String> {
     let s = std::str::from_utf8(content).map_err(|e| format!("invalid UTF-8: {e}"))?;
     let lines: Vec<&str> = s.split('\n').collect();

@@ -1,4 +1,8 @@
-// Port of `apps/rhino-cli/internal/doctor/tools.go`.
+//! Port of `apps/rhino-cli/internal/doctor/tools.go`.
+//!
+//! Defines [`ToolDef`] (the per-tool check configuration) and
+//! [`build_tool_defs`] (the ordered list of all known tools), together with
+//! their install-step factories and version readers.
 
 use std::path::{Path, PathBuf};
 
@@ -14,44 +18,66 @@ use super::checker::{
     read_tool_versions_entry,
 };
 
-/// Single installation step.
+/// A single step in an auto-install sequence.
 pub struct InstallStep {
+    /// Short description shown to the user (e.g. `"Install Node.js 24.11.1 via Volta"`).
     pub description: String,
+    /// Command to run (e.g. `"volta"`).
     pub command: String,
+    /// Arguments passed to `command`.
     pub args: Vec<String>,
 }
 
-/// Closure that returns install steps for `(required, platform)`.
-/// Returns empty when the tool cannot be auto-installed on that platform.
+/// Function pointer that returns platform-specific install steps.
+///
+/// `required` is the version string from the project config; `platform` is
+/// `"darwin"`, `"linux"`, or another `std::env::consts::OS` value.
+/// Returns an empty `Vec` when auto-install is not supported on `platform`.
 pub type InstallFunc = fn(required: &str, platform: &str) -> Vec<InstallStep>;
 
-/// Tool check definition.
+/// Complete specification for checking one tool.
 pub struct ToolDef {
+    /// Human-readable name (e.g. `"node"`).
     pub name: String,
+    /// Executable name passed to the runner (e.g. `"node"`, `"go"`).
     pub binary: String,
+    /// Config file that provides the required version (for display only).
     pub source: String,
+    /// Arguments appended to `binary` when querying the installed version.
     pub args: Vec<String>,
+    /// When `true`, version information is parsed from stderr instead of stdout.
     pub use_stderr: bool,
+    /// Extracts the version string from raw command output.
     pub parse_ver: fn(&str) -> String,
+    /// Compares the installed and required versions and returns a status + note.
     pub compare: fn(&str, &str) -> (ToolStatus, String),
+    /// Reads the required version from the project config.
     pub read_req: fn() -> String,
+    /// Optional install function; `None` means auto-install is unavailable.
     pub install_cmd: Option<InstallFunc>,
 }
 
 // --- ToolDef builders ---
 
+/// Returns an empty string indicating no version requirement for this tool.
 fn no_req() -> String {
     String::new()
 }
 
+/// Extracts the Git version from `git --version` output
+/// (e.g. `"git version 2.42.0"`).
 fn parse_git_version(s: &str) -> String {
     parse_line_word(s, "git version ", 2, "")
 }
 
+/// Extracts the Maven version from `mvn --version` output
+/// (e.g. `"Apache Maven 3.9.9 ..."`).
 fn parse_maven_version(s: &str) -> String {
     parse_line_word(s, "Apache Maven ", 2, "")
 }
 
+/// Extracts the Go version from `go version` output
+/// (e.g. `"go version go1.25.0 darwin/arm64"` → `"1.25.0"`).
 fn parse_go_version(s: &str) -> String {
     parse_line_word(s, "go version ", 2, "go")
 }
@@ -61,19 +87,33 @@ fn parse_go_version(s: &str) -> String {
 // once-locks keyed off PID-stable build_tool_defs(repo_root) call.
 use std::sync::OnceLock;
 
+/// Process-wide cached collection of config-file paths derived from the repo root.
 static PATHS: OnceLock<Paths> = OnceLock::new();
 
+/// Pre-computed absolute paths to project config files used by version readers.
 struct Paths {
+    /// Path to the root `package.json` (for `volta.node` / `volta.npm`).
     package_json: PathBuf,
+    /// Path to `apps/organiclever-be/pom.xml` (for `<java.version>`).
     pom_xml: PathBuf,
+    /// Path to `apps/rhino-cli/go.mod` (for `go` directive).
     go_mod: PathBuf,
+    /// Path to the Python `.python-version` file.
     python_version: PathBuf,
+    /// Path to the root `.tool-versions` file (for Elixir / Erlang).
     tool_versions: PathBuf,
+    /// Path to `apps/ose-app-be/global.json` (for .NET `sdk.version`).
     global_json: PathBuf,
+    /// Path to the Flutter `pubspec.yaml` (for Dart SDK / Flutter versions).
     pubspec: PathBuf,
+    /// Path to the Rust demo `Cargo.toml` (for `rust-version`).
     cargo_toml: PathBuf,
 }
 
+/// Initialises [`PATHS`] from `repo_root`.
+///
+/// The [`OnceLock`] guarantees only the first call has any effect; subsequent
+/// calls with a different root are silently ignored.
 fn set_paths(repo_root: &Path) {
     let p = Paths {
         package_json: repo_root.join("package.json"),
@@ -104,37 +144,55 @@ fn set_paths(repo_root: &Path) {
     let _ = PATHS.set(p);
 }
 
+/// Returns a reference to the global [`Paths`] instance.
+///
+/// # Panics
+///
+/// Panics when [`set_paths`] has not been called (i.e. [`PATHS`] is still
+/// uninitialised), which should never happen in normal usage because
+/// [`build_tool_defs`] always calls [`set_paths`] first.
 fn p() -> &'static Paths {
     PATHS.get().expect("PATHS not initialized")
 }
 
+/// Reads the `node` version from the cached `package.json`.
 fn read_node_v() -> String {
     read_node_version(&p().package_json).unwrap_or_default()
 }
+/// Reads the `npm` version from the cached `package.json`.
 fn read_npm_v() -> String {
     read_npm_version(&p().package_json).unwrap_or_default()
 }
+/// Reads the Java version from the cached `pom.xml`.
 fn read_java_v() -> String {
     read_java_version(&p().pom_xml).unwrap_or_default()
 }
+/// Reads the Go version from the cached `go.mod`.
 fn read_go_v() -> String {
     read_go_version(&p().go_mod).unwrap_or_default()
 }
+/// Reads the Python version from the cached `.python-version` file.
 fn read_python_v() -> String {
     read_python_version(&p().python_version).unwrap_or_default()
 }
+/// Reads the .NET SDK version from the cached `global.json`.
 fn read_dotnet_v() -> String {
     read_dotnet_version(&p().global_json).unwrap_or_default()
 }
+/// Reads the Dart SDK minimum version from the cached `pubspec.yaml`.
 fn read_dart_v() -> String {
     read_dart_sdk_version(&p().pubspec).unwrap_or_default()
 }
+/// Reads the `rust-version` (MSRV) from the cached `Cargo.toml`.
 fn read_rust_v() -> String {
     read_rust_version(&p().cargo_toml).unwrap_or_default()
 }
+/// Reads the Flutter minimum version from the cached `pubspec.yaml`.
 fn read_flutter_v() -> String {
     read_flutter_version(&p().pubspec).unwrap_or_default()
 }
+/// Reads the Elixir version from the cached `.tool-versions`, stripping the
+/// `-otp-XX` suffix (e.g. `"1.19.5-otp-27"` → `"1.19.5"`).
 fn read_elixir_v() -> String {
     let v = read_tool_versions_entry(&p().tool_versions, "elixir").unwrap_or_default();
     // Strip -otp-XX suffix: "1.19.5-otp-27" → "1.19.5"
@@ -143,15 +201,21 @@ fn read_elixir_v() -> String {
     }
     v
 }
+/// Reads the Erlang OTP version from the cached `.tool-versions`.
 fn read_erlang_v() -> String {
     read_tool_versions_entry(&p().tool_versions, "erlang").unwrap_or_default()
 }
+/// Returns the pinned `golangci-lint` version required by this project.
 fn read_golangci_v() -> String {
     "2.11.3".into()
 }
 
 // --- Install commands ---
 
+/// Returns install steps for `git`.
+///
+/// On macOS: `xcode-select --install`.
+/// On Linux: `sudo apt-get install -y git`.
 fn install_git(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -173,6 +237,7 @@ fn install_git(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for Volta (the Node.js version manager).
 fn install_volta(_req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: "Install Volta".into(),
@@ -181,6 +246,7 @@ fn install_volta(_req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Node.js via `volta install node@<req>`.
 fn install_node(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: format!("Install Node.js {req} via Volta"),
@@ -189,6 +255,7 @@ fn install_node(req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for npm via `volta install npm@<req>`.
 fn install_npm(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: format!("Install npm {req} via Volta"),
@@ -197,6 +264,7 @@ fn install_npm(req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Java via SDKMAN (`sdk install java <req>-tem`).
 fn install_java(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: format!("Install Java {req} via SDKMAN"),
@@ -208,6 +276,7 @@ fn install_java(req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Maven via SDKMAN (`sdk install maven`).
 fn install_maven(_req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: "Install Maven via SDKMAN".into(),
@@ -219,6 +288,10 @@ fn install_maven(_req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Go.
+///
+/// On macOS: `brew install go`.
+/// On Linux: downloads and extracts the tarball from `go.dev`.
 fn install_golang(req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -240,6 +313,7 @@ fn install_golang(req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for Python via pyenv.
 fn install_python(req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![
@@ -276,6 +350,7 @@ fn install_python(req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for Rust via `rustup`.
 fn install_rust(_req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: "Install Rust via rustup".into(),
@@ -287,6 +362,7 @@ fn install_rust(_req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for `cargo-llvm-cov` via `cargo install`.
 fn install_cargo_llvm_cov(_req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: "Install cargo-llvm-cov".into(),
@@ -298,6 +374,7 @@ fn install_cargo_llvm_cov(_req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Elixir via asdf.
 fn install_elixir(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: format!("Install Elixir {req} via asdf"),
@@ -311,6 +388,7 @@ fn install_elixir(req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Erlang via asdf.
 fn install_erlang(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: format!("Install Erlang {req} via asdf"),
@@ -324,6 +402,10 @@ fn install_erlang(req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for .NET SDK.
+///
+/// On macOS: `brew install dotnet`.
+/// On Linux: `sudo snap install dotnet-sdk --classic --channel=10.0`.
 fn install_dotnet(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -346,6 +428,10 @@ fn install_dotnet(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for Clojure CLI.
+///
+/// On macOS: `brew install clojure/tools/clojure`.
+/// On Linux: downloads and runs the official install script.
 fn install_clojure(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -365,6 +451,10 @@ fn install_clojure(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for Flutter.
+///
+/// On macOS: `brew install --cask flutter`.
+/// On Linux: `sudo snap install flutter --classic`.
 fn install_flutter(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -386,6 +476,10 @@ fn install_flutter(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for Docker.
+///
+/// On macOS: returns an empty `Vec` (Docker Desktop must be installed manually).
+/// On Linux: `sudo apt-get install -y docker.io docker-compose-v2`.
 fn install_docker(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         // Docker Desktop must be installed manually on macOS.
@@ -405,6 +499,10 @@ fn install_docker(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for `jq`.
+///
+/// On macOS: `brew install jq`.
+/// On Linux: `sudo apt-get install -y jq`.
 fn install_jq(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -421,6 +519,7 @@ fn install_jq(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for `golangci-lint` via `go install`.
 fn install_golangci_lint(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
         description: format!("Install golangci-lint v{req} via go install"),
@@ -432,6 +531,10 @@ fn install_golangci_lint(req: &str, _platform: &str) -> Vec<InstallStep> {
     }]
 }
 
+/// Returns install steps for Playwright browsers.
+///
+/// On macOS: `npx playwright install`.
+/// On Linux: `npx playwright install` followed by `npx playwright install-deps`.
 fn install_playwright(_req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
         vec![InstallStep {
@@ -467,6 +570,7 @@ pub fn build_tool_defs(repo_root: &Path) -> Vec<ToolDef> {
     defs
 }
 
+/// Returns the core tool definitions: `git`, `volta`, `node`, `npm`.
 fn tool_defs_core() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -516,6 +620,7 @@ fn tool_defs_core() -> Vec<ToolDef> {
     ]
 }
 
+/// Returns tool definitions for JVM and Go: `java`, `maven`, `golang`.
 fn tool_defs_jvm_and_go() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -554,6 +659,8 @@ fn tool_defs_jvm_and_go() -> Vec<ToolDef> {
     ]
 }
 
+/// Returns tool definitions for scripting and BEAM: `python`, `rust`, `cargo-llvm-cov`,
+/// `elixir`, `erlang`.
 fn tool_defs_scripting_and_beam() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -618,6 +725,7 @@ fn tool_defs_scripting_and_beam() -> Vec<ToolDef> {
     ]
 }
 
+/// Returns tool definitions for .NET and mobile: `dotnet`, `clojure`, `dart`, `flutter`.
 fn tool_defs_dotnet_and_mobile() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -667,6 +775,7 @@ fn tool_defs_dotnet_and_mobile() -> Vec<ToolDef> {
     ]
 }
 
+/// Returns tool definitions for infrastructure: `docker`, `jq`, `golangci-lint`, `playwright`.
 fn tool_defs_infra() -> Vec<ToolDef> {
     vec![
         ToolDef {

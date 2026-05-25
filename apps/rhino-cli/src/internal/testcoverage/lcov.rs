@@ -1,6 +1,14 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/lcov_coverage.go`.
-// Same SF:/DA:/BRDA: state machine, same "duplicate DA → take max count" rule,
-// same branch-coverage classification (allPositive→covered, anyPositive→partial, none→missed).
+//! LCOV format parser and result computer.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/lcov_coverage.go`.
+//!
+//! Uses the same `SF:`/`DA:`/`BRDA:` state machine, the same
+//! "duplicate `DA` → take max count" rule, and the same branch-coverage
+//! classification:
+//!
+//! - all branch counts positive → **covered**
+//! - any branch count positive → **partial**
+//! - none positive → **missed**
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -10,13 +18,26 @@ use anyhow::{Context, Error, anyhow};
 
 use super::types::{FileResult, Format, Result as CoverageResult};
 
+/// Parsed data for a single source file recorded in an LCOV info file.
 #[derive(Debug, Default, Clone)]
 pub(crate) struct LcovFile {
+    /// Source-file path as recorded in the `SF:` line.
     pub path: String,
-    pub da_lines: HashMap<i64, i64>,       // line_no → count
-    pub brda_data: HashMap<i64, Vec<i64>>, // line_no → branch counts
+    /// Line execution counts keyed by 1-based line number (`DA:` records).
+    /// When a line appears multiple times, only the maximum count is kept.
+    pub da_lines: HashMap<i64, i64>,
+    /// Branch hit counts keyed by 1-based line number (`BRDA:` records).
+    /// Each entry is a `Vec` of counts, one per branch (in declaration order).
+    pub brda_data: HashMap<i64, Vec<i64>>,
 }
 
+/// Reads and parses an LCOV info file from `filename`.
+///
+/// Returns one `LcovFile` per `end_of_record` section in the file.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be opened or an I/O error occurs while reading.
 pub(crate) fn parse_lcov(filename: &str) -> std::result::Result<Vec<LcovFile>, Error> {
     let file = File::open(filename).map_err(|_| anyhow!("file not found: {filename}"))?;
     let mut files = Vec::new();
@@ -38,6 +59,11 @@ pub(crate) fn parse_lcov(filename: &str) -> std::result::Result<Vec<LcovFile>, E
     Ok(files)
 }
 
+/// Parses the portion of a `DA:` record after the prefix and updates `current`.
+///
+/// Expected format: `<line_no>,<count>[,<checksum>]`.
+/// Silently ignores malformed records. When the same line number appears more
+/// than once, keeps only the maximum count (matching the Go implementation).
 fn parse_da(rest: &str, current: &mut LcovFile) {
     let parts: Vec<&str> = rest.splitn(3, ',').collect();
     if parts.len() < 2 {
@@ -55,6 +81,10 @@ fn parse_da(rest: &str, current: &mut LcovFile) {
     }
 }
 
+/// Parses the portion of a `BRDA:` record after the prefix and updates `current`.
+///
+/// Expected format: `<line_no>,<block>,<branch>,<taken>` where `<taken>` may be
+/// `"-"` (never executed). Silently ignores malformed records.
 fn parse_brda(rest: &str, current: &mut LcovFile) {
     let parts: Vec<&str> = rest.splitn(4, ',').collect();
     if parts.len() < 4 {
@@ -72,14 +102,21 @@ fn parse_brda(rest: &str, current: &mut LcovFile) {
     current.brda_data.entry(ln).or_default().push(cnt);
 }
 
+/// Returns `true` when `counts` is non-empty and every value is greater than zero.
 fn all_positive(counts: &[i64]) -> bool {
     !counts.is_empty() && counts.iter().all(|c| *c > 0)
 }
 
+/// Returns `true` when at least one value in `counts` is greater than zero.
 fn any_positive(counts: &[i64]) -> bool {
     counts.iter().any(|c| *c > 0)
 }
 
+/// Parses `filename` as an LCOV info file and computes aggregated coverage.
+///
+/// # Errors
+///
+/// Returns an error when `parse_lcov` fails (file not found or I/O error).
 pub fn compute_lcov_result(
     filename: &str,
     threshold: f64,

@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/ddd_bc.go` + `ddd_runner.go`.
+//! `ddd bc` — validates DDD bounded-context registry files for a given app.
+//!
+//! Port of `apps/rhino-cli/cmd/ddd_bc.go` + `ddd_runner.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -8,8 +10,10 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::severity::{Severity, resolve};
 
+/// CLI arguments for `ddd bc`.
 #[derive(Args, Debug)]
 pub struct DddBcArgs {
+    /// Application name to validate.
     #[arg(value_name = "app")]
     pub app: String,
     /// Override finding severity: warn|error.
@@ -17,6 +21,12 @@ pub struct DddBcArgs {
     pub severity: String,
 }
 
+/// Run the `ddd bc` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found or if error-level findings
+/// are detected.
 pub fn run(args: &DddBcArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -28,6 +38,12 @@ pub fn run(args: &DddBcArgs, _output: OutputFormat) -> std::result::Result<(), E
     )
 }
 
+/// Run `ddd bc` from a known `repo_root` (testable entry point).
+///
+/// # Errors
+///
+/// Returns an error if the registry cannot be read or if error-level findings
+/// are detected.
 pub fn run_at_root(
     repo_root: &std::path::Path,
     args: &DddBcArgs,

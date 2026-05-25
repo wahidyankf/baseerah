@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/env_init.go`.
+//! `env init` — copies `.env.example` files to `.env` files under `infra/dev/`.
+//!
+//! Port of `apps/rhino-cli/cmd/env_init.go`.
 
 use std::fs;
 
@@ -9,6 +11,7 @@ use walkdir::WalkDir;
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// CLI arguments for `env init`.
 #[derive(Args, Debug)]
 pub struct EnvInitArgs {
     /// Overwrite existing .env files.
@@ -16,6 +19,17 @@ pub struct EnvInitArgs {
     pub force: bool,
 }
 
+/// Run the `env init` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found or if a path operation
+/// fails unexpectedly.
+///
+/// # Panics
+///
+/// Panics if a `walkdir` entry path has no filename component, which cannot
+/// happen for entries produced by `WalkDir`.
 pub fn run(args: &EnvInitArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

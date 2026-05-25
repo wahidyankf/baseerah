@@ -1,5 +1,5 @@
-// Sync validator ported from
-// `apps/rhino-cli/internal/agents/sync_validator.go`.
+//! Sync validator ported from
+//! `apps/rhino-cli/internal/agents/sync_validator.go`.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -12,6 +12,7 @@ use super::converter::{OPENCODE_AGENT_DIR, convert_model, convert_tools};
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 use super::types::{ValidationCheck, ValidationResult};
 
+/// Run all sync-parity checks between `.claude/agents/` and `.opencode/agents/`.
 pub fn validate_sync(repo_root: &Path) -> ValidationResult {
     let start = Instant::now();
     let mut result = ValidationResult::default();
@@ -30,6 +31,7 @@ pub fn validate_sync(repo_root: &Path) -> ValidationResult {
     result
 }
 
+/// Check that the legacy singular `.opencode/agent/` path does not exist.
 fn validate_no_stale_agent_dir(repo_root: &Path) -> ValidationCheck {
     let stale = repo_root.join(".opencode").join("agent");
     match fs::metadata(&stale) {
@@ -56,6 +58,7 @@ fn validate_no_stale_agent_dir(repo_root: &Path) -> ValidationCheck {
     }
 }
 
+/// Check that `.opencode/agents/` contains at least as many `.md` files as `.claude/agents/`.
 fn validate_agent_count(repo_root: &Path) -> ValidationCheck {
     let claude_dir = repo_root.join(".claude").join("agents");
     let opencode_dir = repo_root.join(OPENCODE_AGENT_DIR);
@@ -80,8 +83,11 @@ fn validate_agent_count(repo_root: &Path) -> ValidationCheck {
     }
 }
 
+/// Builder extension for setting `expected`/`actual` fields after construction.
 trait WithExpectedActual {
+    /// Set the `expected` field and return `self`.
     fn with_expected(self, e: String) -> Self;
+    /// Set the `actual` field and return `self`.
     fn with_actual(self, a: String) -> Self;
 }
 
@@ -96,6 +102,7 @@ impl WithExpectedActual for ValidationCheck {
     }
 }
 
+/// Compare each Claude agent to its `OpenCode` counterpart for semantic equivalence.
 fn validate_agent_equivalence(repo_root: &Path) -> Vec<ValidationCheck> {
     let mut checks = Vec::new();
     let claude_dir = repo_root.join(".claude").join("agents");
@@ -133,6 +140,7 @@ fn validate_agent_equivalence(repo_root: &Path) -> Vec<ValidationCheck> {
     checks
 }
 
+/// Read and parse both copies of `name` then delegate to `validate_agent_yaml`.
 fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> ValidationCheck {
     let check_name = format!("Agent: {name}");
 
@@ -205,6 +213,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
     )
 }
 
+/// Check description, model, tools, skills, and body parity between the two YAML trees.
 fn validate_agent_yaml(
     check_name: &str,
     claude_yaml: &Value,
@@ -291,6 +300,7 @@ fn validate_agent_yaml(
     ValidationCheck::passed(check_name, "Agent is semantically equivalent")
 }
 
+/// Parse an `OpenCode` tools YAML mapping into a `BTreeMap<tool, enabled>`.
 fn parse_opencode_tools(v: Option<&Value>) -> BTreeMap<String, bool> {
     let mut out = BTreeMap::new();
     if let Some(Value::Mapping(m)) = v {
@@ -304,6 +314,7 @@ fn parse_opencode_tools(v: Option<&Value>) -> BTreeMap<String, bool> {
     out
 }
 
+/// Parse a YAML sequence of strings into a `Vec<String>`.
 fn parse_string_seq(v: Option<&Value>) -> Vec<String> {
     let mut out = Vec::new();
     if let Some(Value::Sequence(seq)) = v {
@@ -316,6 +327,7 @@ fn parse_string_seq(v: Option<&Value>) -> Vec<String> {
     out
 }
 
+/// Check that no `.claude/skills/<name>/SKILL.md` mirror exists under `.opencode/skill[s]/`.
 fn validate_no_synced_skills(repo_root: &Path) -> ValidationCheck {
     let claude_dir = repo_root.join(".claude").join("skills");
     let mut claude_names: std::collections::HashSet<String> = std::collections::HashSet::new();
@@ -369,6 +381,7 @@ fn validate_no_synced_skills(repo_root: &Path) -> ValidationCheck {
     }
 }
 
+/// Count non-README `.md` files directly inside `dir` (returns 0 if dir doesn't exist).
 fn count_markdown_files(dir: &Path) -> usize {
     let Ok(entries) = fs::read_dir(dir) else {
         return 0;
@@ -386,6 +399,7 @@ fn count_markdown_files(dir: &Path) -> usize {
     count
 }
 
+/// Return true if two tool maps are identical (same keys and values).
 fn tools_match(a: &BTreeMap<String, bool>, b: &BTreeMap<String, bool>) -> bool {
     if a.len() != b.len() {
         return false;
@@ -398,14 +412,17 @@ fn tools_match(a: &BTreeMap<String, bool>, b: &BTreeMap<String, bool>) -> bool {
     true
 }
 
+/// Return true if both skill sequences are identical (order-sensitive).
 fn skills_match(a: &[String], b: &[String]) -> bool {
     a == b
 }
 
+/// Return the keys of `m` in sorted order for deterministic display.
 fn sorted_keys(m: &BTreeMap<String, bool>) -> Vec<String> {
     m.keys().cloned().collect()
 }
 
+/// Format an owned string slice as `[a b c]` — Go `%v` style.
 fn format_string_slice_owned(s: &[String]) -> String {
     format!("[{}]", s.join(" "))
 }

@@ -1,4 +1,13 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/docs/heading_hierarchy.go`.
+//! Markdown heading-hierarchy validator.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/docs/heading_hierarchy.go`.
+//!
+//! Validates two rules across every `.md` file reachable from the supplied root
+//! paths:
+//! 1. Each file must have exactly one H1 heading.
+//! 2. Heading levels must not skip (e.g. H1 → H3 without an intervening H2).
+//!
+//! Headings inside fenced code blocks are ignored.
 
 use std::fs;
 use std::path::Path;
@@ -8,15 +17,28 @@ use walkdir::WalkDir;
 
 use super::naming::SKIP_DIRS as NAMING_SKIP_DIRS;
 
+/// A single heading-hierarchy finding for a markdown file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DocsHeadingFinding {
+    /// Path to the file that contains the finding.
     pub file: String,
+    /// One-based line number where the problematic heading appears.
     pub line: usize,
+    /// Severity string (currently always `"high"`).
     pub severity: String,
+    /// Machine-readable kind: `"missing-h1"`, `"duplicate-h1"`, or `"skipped-level"`.
     pub kind: String,
+    /// Human-readable description of the heading issue.
     pub message: String,
 }
 
+/// Validates heading hierarchy in every markdown file reachable from `paths`.
+///
+/// Findings are sorted by file path, then by line number.
+///
+/// # Errors
+///
+/// Returns an error when `paths` is empty, or when a file cannot be read.
 pub fn validate_docs_heading_hierarchy(
     paths: &[String],
 ) -> std::result::Result<Vec<DocsHeadingFinding>, Error> {
@@ -31,6 +53,13 @@ pub fn validate_docs_heading_hierarchy(
     Ok(findings)
 }
 
+/// Walks `root` recursively and validates each markdown file.
+///
+/// Returns an empty list if `root` does not exist on the filesystem.
+///
+/// # Errors
+///
+/// Returns an error when a markdown file cannot be read.
 fn walk_heading_hierarchy_path(root: &str) -> std::result::Result<Vec<DocsHeadingFinding>, Error> {
     let root_p = Path::new(root);
     if !root_p.exists() {
@@ -60,18 +89,28 @@ fn walk_heading_hierarchy_path(root: &str) -> std::result::Result<Vec<DocsHeadin
     Ok(findings)
 }
 
+/// Internal representation of a parsed markdown heading.
 #[derive(Debug, Clone, Copy)]
 struct Heading {
+    /// One-based source line number.
     line: usize,
+    /// ATX heading level (1–6).
     level: usize,
 }
 
+/// Reads `path`, extracts headings (ignoring fenced code blocks), and
+/// applies the hierarchy rules.
+///
+/// # Errors
+///
+/// Returns an error when `path` cannot be read.
 fn scan_file_heading_hierarchy(path: &str) -> std::result::Result<Vec<DocsHeadingFinding>, Error> {
     let data = fs::read_to_string(path).with_context(|| format!("read {path}"))?;
     let headings = collect_headings(&data);
     Ok(analyze_headings(path, &headings))
 }
 
+/// Parses all ATX headings from `content`, skipping lines inside fenced code blocks.
 fn collect_headings(content: &str) -> Vec<Heading> {
     let mut headings = Vec::new();
     let mut in_fence = false;
@@ -105,6 +144,14 @@ fn collect_headings(content: &str) -> Vec<Heading> {
     headings
 }
 
+/// Parses the opening of a fenced code block from the start of a line.
+///
+/// Returns `Some((fence_char, length))` when the line begins with three or
+/// more identical `` ` `` or `~` characters; otherwise returns `None`.
+///
+/// # Panics
+///
+/// Panics if `s` is non-empty but has no first character (impossible in practice).
 fn parse_fence_open(s: &str) -> Option<(char, usize)> {
     if s.is_empty() {
         return None;
@@ -127,6 +174,10 @@ fn parse_fence_open(s: &str) -> Option<(char, usize)> {
     Some((first, n))
 }
 
+/// Parses the ATX heading level (1–6) from the start of a trimmed line.
+///
+/// Returns `None` when the line is not a valid ATX heading (wrong prefix,
+/// no space after `#` characters, or empty heading text).
 fn parse_heading_level(s: &str) -> Option<usize> {
     let bytes = s.as_bytes();
     if bytes.is_empty() || bytes[0] != b'#' {
@@ -153,6 +204,9 @@ fn parse_heading_level(s: &str) -> Option<usize> {
     Some(level)
 }
 
+/// Applies the H1-uniqueness and no-level-skipping rules to a list of headings.
+///
+/// Returns an empty list when `headings` is empty (file has no headings at all).
 fn analyze_headings(file: &str, headings: &[Heading]) -> Vec<DocsHeadingFinding> {
     if headings.is_empty() {
         return Vec::new();
@@ -218,12 +272,14 @@ mod tests {
     use std::fs;
     use tempfile::TempDir;
 
+    /// Verifies that an empty paths slice returns an error.
     #[test]
     fn errors_on_empty_paths() {
         let err = validate_docs_heading_hierarchy(&[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
+    /// Verifies that a file with one H1 and properly nested headings passes.
     #[test]
     fn passes_when_one_h1_no_skips() {
         let tmp = TempDir::new().unwrap();
@@ -233,6 +289,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that a file with no H1 emits a `missing-h1` finding.
     #[test]
     fn detects_missing_h1() {
         let tmp = TempDir::new().unwrap();
@@ -242,6 +299,7 @@ mod tests {
         assert!(findings.iter().any(|f| f.kind == "missing-h1"));
     }
 
+    /// Verifies that a file with two H1 headings emits a `duplicate-h1` finding.
     #[test]
     fn detects_duplicate_h1() {
         let tmp = TempDir::new().unwrap();
@@ -251,6 +309,7 @@ mod tests {
         assert!(findings.iter().any(|f| f.kind == "duplicate-h1"));
     }
 
+    /// Verifies that H1 → H3 (skipping H2) emits a `skipped-level` finding.
     #[test]
     fn detects_skipped_level() {
         let tmp = TempDir::new().unwrap();
@@ -260,6 +319,7 @@ mod tests {
         assert!(findings.iter().any(|f| f.kind == "skipped-level"));
     }
 
+    /// Verifies that headings inside a fenced code block are not counted.
     #[test]
     fn ignores_headings_inside_code_fence() {
         let tmp = TempDir::new().unwrap();
@@ -273,6 +333,8 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that a nested fence (e.g. inside a four-backtick fence) does not
+    /// prematurely close the outer fence.
     #[test]
     fn nested_fence_does_not_close_outer() {
         let tmp = TempDir::new().unwrap();
@@ -286,6 +348,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that a completely empty file produces no findings.
     #[test]
     fn empty_file_yields_no_findings() {
         let tmp = TempDir::new().unwrap();
@@ -295,6 +358,8 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that [`parse_heading_level`] returns the correct level for valid
+    /// ATX headings and `None` for invalid inputs.
     #[test]
     fn parse_heading_level_returns_levels() {
         assert_eq!(parse_heading_level("# A"), Some(1));
@@ -305,6 +370,7 @@ mod tests {
         assert_eq!(parse_heading_level("Not heading"), None);
     }
 
+    /// Verifies that [`parse_fence_open`] correctly identifies and measures fence openers.
     #[test]
     fn parse_fence_open_counts_chars() {
         assert_eq!(parse_fence_open("```"), Some(('`', 3)));

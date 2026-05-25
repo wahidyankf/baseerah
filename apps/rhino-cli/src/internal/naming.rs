@@ -1,19 +1,29 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/naming/naming.go`.
-//
-// Pure validators for agent and workflow naming conventions. Filesystem-agnostic:
-// callers collect file lists (and content bytes for frontmatter checks) and pass them in.
+//! Pure validators for agent and workflow naming conventions.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/naming/naming.go`.
+//!
+//! Filesystem-agnostic: callers collect file lists (and content bytes for
+//! frontmatter checks) and pass them in.
 
 pub mod reporter;
 
 use std::path::Path;
 
+/// A single naming-convention violation detected by a validator.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Violation {
+    /// Relative (or absolute) path of the offending file.
     pub path: String,
+    /// Short machine-readable category for the violation (e.g., `"role-suffix"`).
     pub kind: String,
+    /// Human-readable description of what is wrong.
     pub message: String,
 }
 
+/// Returns the file stem (basename without extension) of `path`.
+///
+/// Falls back to the full filename when there is no extension, and to an empty
+/// string when the path has no filename component at all.
 pub fn basename_sans_ext(path: &str) -> String {
     let p = Path::new(path);
     let stem = p.file_stem().map(|s| s.to_string_lossy().to_string());
@@ -25,6 +35,13 @@ pub fn basename_sans_ext(path: &str) -> String {
     })
 }
 
+/// Validates that the file at `path` ends with one of the `allowed_suffixes`.
+///
+/// A bare suffix filename (e.g., `maker.md` where `"maker"` is an allowed
+/// suffix) is considered invalid because it carries no scope prefix.
+///
+/// Returns `None` when the name is valid, or `Some(Violation)` when it is not.
+/// The returned violation has its `kind` field set to the `kind` argument.
 pub fn validate_suffix(path: &str, allowed_suffixes: &[&str], kind: &str) -> Option<Violation> {
     let name = basename_sans_ext(path);
     for suffix in allowed_suffixes {
@@ -46,6 +63,11 @@ pub fn validate_suffix(path: &str, allowed_suffixes: &[&str], kind: &str) -> Opt
     })
 }
 
+/// Extracts the `name:` value from a YAML frontmatter block.
+///
+/// Returns the value of the first `name:` key found inside the leading `---`
+/// fences, with surrounding quotes stripped.  Returns an empty string when
+/// there is no valid frontmatter block or no `name:` key.
 pub fn extract_frontmatter_name(content: &[u8]) -> String {
     let text = String::from_utf8_lossy(content);
     if !text.starts_with("---\n") && !text.starts_with("---\r\n") {
@@ -67,6 +89,12 @@ pub fn extract_frontmatter_name(content: &[u8]) -> String {
     String::new()
 }
 
+/// Validates that the frontmatter `name:` field matches the file's basename.
+///
+/// Returns `None` when the frontmatter contains no `name:` field (treated as
+/// conforming) or when the name matches the basename.  Returns
+/// `Some(Violation)` with `kind = "frontmatter-mismatch"` when the values
+/// differ.
 pub fn validate_frontmatter_name(path: &str, content: &[u8]) -> Option<Violation> {
     let name = extract_frontmatter_name(content);
     if name.is_empty() {
@@ -83,6 +111,13 @@ pub fn validate_frontmatter_name(path: &str, content: &[u8]) -> Option<Violation
     })
 }
 
+/// Validates that every agent definition file has a counterpart in both binding
+/// directories.
+///
+/// `claude_files` are paths under `.claude/agents/` and `opencode_files` are
+/// paths under `.opencode/agents/`.  For each stem that exists in only one set
+/// a `"mirror-drift"` `Violation` is emitted.  The returned slice is sorted by
+/// `path`.
 pub fn validate_mirror(claude_files: &[String], opencode_files: &[String]) -> Vec<Violation> {
     use std::collections::HashMap;
     let mut claude_set: HashMap<String, String> = HashMap::new();

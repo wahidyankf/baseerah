@@ -1,4 +1,4 @@
-// `agents emit-bindings` — writes the Amazon Q Developer bridge files
+//! `agents emit-bindings` — writes the Amazon Q Developer bridge files
 // deterministically (idempotent overwrite). See
 // `crate::internal::agents::bindings` for the canonical content source.
 
@@ -11,13 +11,20 @@ use crate::internal::agents::bindings::{EmitResult, emit_bindings};
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// CLI arguments for `agents emit-bindings`.
 #[derive(Args, Debug)]
 pub struct EmitBindingsArgs {
-    /// Quiet output (suppress the per-file listing).
+    /// Suppress the per-file listing in text output.
     #[arg(long, short = 'q')]
     pub quiet: bool,
 }
 
+/// Run the `agents emit-bindings` command.
+///
+/// # Errors
+///
+/// Returns an error if the git repository root cannot be found or if the
+/// binding emission fails.
 pub fn run(args: &EmitBindingsArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -31,6 +38,7 @@ pub fn run(args: &EmitBindingsArgs, output_format: OutputFormat) -> std::result:
     Ok(())
 }
 
+/// Format the emit result as human-readable text.
 fn format_text(result: &EmitResult, quiet: bool) -> String {
     let mut s = String::new();
     if !quiet {
@@ -46,6 +54,7 @@ fn format_text(result: &EmitResult, quiet: bool) -> String {
     s
 }
 
+/// Format the emit result as Markdown.
 fn format_markdown(result: &EmitResult) -> String {
     let mut s = String::from("# Amazon Q Bindings Emit\n\n");
     for path in &result.written {
@@ -55,11 +64,19 @@ fn format_markdown(result: &EmitResult) -> String {
     s
 }
 
+/// Serialize the emit result as a JSON string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(result: &EmitResult) -> std::result::Result<String, Error> {
     #[derive(serde::Serialize)]
     struct Out<'a> {
+        /// `"success"` always.
         status: &'a str,
+        /// Paths of files written during the emit.
         written: &'a [String],
+        /// Number of files written.
         count: usize,
     }
     let out = Out {

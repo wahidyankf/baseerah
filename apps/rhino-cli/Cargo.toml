@@ -39,6 +39,7 @@ tempfile = "3.27.0"
 
 [lints.rust]
 unsafe_code = "forbid"
+missing_docs = "deny"
 
 [lints.clippy]
 # Enable pedantic group at low priority — individual allows below override via priority 0
@@ -65,11 +66,11 @@ unnecessary_wraps = "allow"
 # using Path::extension() would add allocation with no correctness benefit on case-sensitive fs
 case_sensitive_file_extension_comparisons = "allow"
 
-# --- Deferred doc lints: requires per-function documentation pass ---
-# TODO: remove these allows as # Errors / # Panics / backtick sections are written
-missing_errors_doc = "allow"
-missing_panics_doc = "allow"
-doc_markdown = "allow"
+# --- Doc lints: all enforced as hard errors ---
+missing_errors_doc = "deny"
+missing_panics_doc = "deny"
+doc_markdown = "deny"
+missing_docs_in_private_items = "deny"
 
 # --- Restriction lints (deny = hard error, cannot be suppressed by -D warnings alone) ---
 unwrap_used = "deny"

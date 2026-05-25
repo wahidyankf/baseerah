@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/docs_validate_naming.go`.
+//! `docs validate-naming` — checks that markdown file names follow kebab-case conventions.
+//!
+//! Port of `apps/rhino-cli/cmd/docs_validate_naming.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -11,10 +13,13 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::docs::naming::{DocsNamingFinding, validate_docs_naming};
 use crate::internal::git;
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/docs-validate-naming/v1";
 
+/// Default paths scanned when no positional arguments are supplied.
 const DEFAULT_PATHS: &[&str] = &["docs/", "repo-governance/"];
 
+/// CLI arguments for `docs validate-naming`.
 #[derive(Args, Debug)]
 pub struct ValidateNamingArgs {
     /// Basename glob to exempt from the kebab-case rule (repeatable).
@@ -24,20 +29,34 @@ pub struct ValidateNamingArgs {
     pub positional: Vec<String>,
 }
 
+/// Single naming finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the offending file.
     file: &'a str,
+    /// Severity label.
     severity: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// JSON envelope wrapping the naming scan result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Individual findings.
     result: Vec<JsonFinding<'a>>,
 }
 
+/// Run the `docs validate-naming` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the scan fails, or
+/// naming violations are found.
 pub fn run(
     args: &ValidateNamingArgs,
     output_format: OutputFormat,
@@ -78,6 +97,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format naming findings as human-readable text.
 fn format_text(findings: &[DocsNamingFinding]) -> String {
     if findings.is_empty() {
         return "DOCS NAMING VALIDATION PASSED: no naming violations found\n".to_string();
@@ -94,6 +114,11 @@ fn format_text(findings: &[DocsNamingFinding]) -> String {
     sb
 }
 
+/// Serialize naming findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[DocsNamingFinding]) -> std::result::Result<String, Error> {
     let jf: Vec<JsonFinding> = findings
         .iter()
@@ -118,6 +143,7 @@ fn format_json(findings: &[DocsNamingFinding]) -> std::result::Result<String, Er
     Ok(s)
 }
 
+/// Format naming findings as a Markdown table.
 fn format_markdown(findings: &[DocsNamingFinding]) -> String {
     if findings.is_empty() {
         return "## Docs Filename Naming Validation\n\n**PASSED**: no naming violations found\n"

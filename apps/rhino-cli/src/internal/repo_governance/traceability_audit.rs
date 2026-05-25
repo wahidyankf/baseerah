@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/traceability_audit.go`.
+//! Traceability audit for governance Markdown documents.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/traceability_audit.go`.
 
 use std::fs;
 use std::path::Path;
@@ -8,24 +10,43 @@ use anyhow::{Context, Error};
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A single finding from the traceability audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TraceabilityFinding {
+    /// Path of the governance document that is missing a required heading or
+    /// reference.
     pub path: String,
+    /// 1-based line number where the issue was detected (typically `1` when
+    /// the heading is entirely absent).
     pub line: usize,
+    /// Machine-readable violation category (one of the `KIND_*` constants).
     pub kind: String,
+    /// Human-readable description of the finding.
     pub message: String,
 }
 
+/// Finding kind: a principle document is missing the required
+/// `## Vision Supported` heading.
 pub const KIND_MISSING_VISION_SUPPORTED: &str = "missing-vision-supported";
+/// Finding kind: a convention or development document is missing the required
+/// `## Principles Implemented/Respected` heading.
 pub const KIND_MISSING_PRINCIPLES_IMPLEMENTED: &str = "missing-principles-implemented";
+/// Finding kind: a development document is missing the required
+/// `## Conventions Implemented/Respected` heading.
 pub const KIND_MISSING_CONVENTIONS_IMPLEMENTED: &str = "missing-conventions-implemented";
+/// Finding kind: a workflow document does not reference any
+/// `.claude/agents/<name>.md` file.
 pub const KIND_MISSING_AGENT_REFERENCE: &str = "missing-agent-reference";
 
+/// Returns a compiled `Regex` that matches the `## Vision Supported` ATX
+/// heading.
 fn vision_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"(?m)^##\s+Vision Supported\s*$").expect("valid hardcoded regex"))
 }
 
+/// Returns a compiled `Regex` that matches the
+/// `## Principles Implemented/Respected` ATX heading.
 fn principles_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -34,6 +55,8 @@ fn principles_re() -> &'static Regex {
     })
 }
 
+/// Returns a compiled `Regex` that matches the
+/// `## Conventions Implemented/Respected` ATX heading.
 fn conventions_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -42,13 +65,34 @@ fn conventions_re() -> &'static Regex {
     })
 }
 
+/// Returns a compiled `Regex` that matches any `.claude/agents/<name>.md`
+/// reference in a workflow document.
 fn agent_ref_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\.claude/agents/[a-z0-9-]+\.md").expect("valid hardcoded regex"))
 }
 
+/// Relative paths (within the workflows directory) that are exempt from the
+/// agent-reference requirement.
 const META_EXEMPT: &[&str] = &["meta/execution-modes.md", "meta/workflow-identifier.md"];
 
+/// Audits traceability across four governance document families.
+///
+/// - `repo-governance/principles/` — each file must have `## Vision Supported`.
+/// - `repo-governance/conventions/` — each file must have
+///   `## Principles Implemented/Respected`.
+/// - `repo-governance/development/` — each file must have both
+///   `## Principles Implemented/Respected` and
+///   `## Conventions Implemented/Respected`.
+/// - `repo-governance/workflows/` — each non-exempt file must reference at
+///   least one `.claude/agents/<name>.md` path.
+///
+/// `README.md` files are exempt from all checks.  Findings are sorted by
+/// `path`, then by `line`.
+///
+/// # Errors
+///
+/// Returns an error when any governance document cannot be read.
 pub fn audit_traceability(
     repo_root: &Path,
 ) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
@@ -70,6 +114,12 @@ pub fn audit_traceability(
     Ok(findings)
 }
 
+/// Checks that every Markdown file under `root` contains a
+/// `## Vision Supported` heading.
+///
+/// # Errors
+///
+/// Returns an error when a file cannot be read.
 fn audit_principles(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
     let files = list_governance_markdown(root)?;
     let mut findings = Vec::new();
@@ -88,6 +138,12 @@ fn audit_principles(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>
     Ok(findings)
 }
 
+/// Checks that every Markdown file under `root` contains a
+/// `## Principles Implemented/Respected` heading.
+///
+/// # Errors
+///
+/// Returns an error when a file cannot be read.
 fn audit_conventions(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
     let files = list_governance_markdown(root)?;
     let mut findings = Vec::new();
@@ -107,6 +163,13 @@ fn audit_conventions(root: &Path) -> std::result::Result<Vec<TraceabilityFinding
     Ok(findings)
 }
 
+/// Checks that every Markdown file under `root` contains both
+/// `## Principles Implemented/Respected` and
+/// `## Conventions Implemented/Respected` headings.
+///
+/// # Errors
+///
+/// Returns an error when a file cannot be read.
 fn audit_development(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
     let files = list_governance_markdown(root)?;
     let mut findings = Vec::new();
@@ -134,6 +197,14 @@ fn audit_development(root: &Path) -> std::result::Result<Vec<TraceabilityFinding
     Ok(findings)
 }
 
+/// Checks that every non-exempt Markdown file under `root` contains at least
+/// one `.claude/agents/<name>.md` reference.
+///
+/// Files listed in [`META_EXEMPT`] are skipped.
+///
+/// # Errors
+///
+/// Returns an error when a file cannot be read.
 fn audit_workflows(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
     let files = list_governance_markdown(root)?;
     let mut findings = Vec::new();
@@ -160,6 +231,9 @@ fn audit_workflows(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>,
     Ok(findings)
 }
 
+/// Returns the 1-based line number of the first non-empty line in `data`.
+///
+/// Returns `1` when `data` is empty or consists entirely of blank lines.
 fn first_non_empty_line(data: &str) -> usize {
     for (idx, line) in data.split('\n').enumerate() {
         if !line.trim().is_empty() {
@@ -169,6 +243,14 @@ fn first_non_empty_line(data: &str) -> usize {
     1
 }
 
+/// Returns a sorted list of paths to all `.md` files under `root`, excluding
+/// `README.md` files.
+///
+/// Returns an empty `Vec` when `root` does not exist.
+///
+/// # Errors
+///
+/// Returns an error when the directory walk fails.
 fn list_governance_markdown(root: &Path) -> std::result::Result<Vec<String>, Error> {
     if !root.exists() {
         return Ok(Vec::new());

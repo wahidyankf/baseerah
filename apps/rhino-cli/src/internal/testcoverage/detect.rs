@@ -1,15 +1,26 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/detect.go`.
-//
-// Detection priority:
-//   1. Filename-based: .info / contains "lcov" → LCOV; .xml + "jacoco" → JaCoCo; .xml + "cobertura" → Cobertura
-//   2. Content-based:  mode: → Go; SF:/TN: → LCOV; <report → JaCoCo; <coverage → Cobertura
-//   3. Fallback: Go
+//! Coverage-format detection by filename and file content.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/detect.go`.
+//!
+//! Detection priority:
+//!
+//! 1. Filename-based: `.info` / contains `"lcov"` → `LCOV`; `.xml` + `"jacoco"` → `JaCoCo`;
+//!    `.xml` + `"cobertura"` → `Cobertura`.
+//! 2. Content-based: `mode:` → `Go`; `SF:`/`TN:` → `LCOV`; `<report` → `JaCoCo`;
+//!    `<coverage` → `Cobertura`.
+//! 3. Fallback: `Go`.
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 use super::types::Format;
 
+/// Detects the coverage format of `filename`.
+///
+/// First applies filename heuristics (extension and substring), then reads up
+/// to the first meaningful line of the file and matches against known XML root
+/// elements and LCOV/Go preamble tokens. Falls back to `Format::Go` when the
+/// file cannot be opened or no heuristic matches.
 pub fn detect_format(filename: &str) -> Format {
     let lower = filename.to_lowercase();
 

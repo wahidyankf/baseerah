@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/agents_sync.go`.
+//! `agents sync` — syncs `.claude/agents/` to `.opencode/agents/`.
+//!
+//! Port of `apps/rhino-cli/cmd/agents_sync.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -8,6 +10,7 @@ use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// CLI arguments for `agents sync`.
 #[derive(Args, Debug)]
 pub struct SyncArgs {
     /// Preview changes without modifying files.
@@ -27,6 +30,13 @@ pub struct SyncArgs {
     pub quiet: bool,
 }
 
+/// Run the `agents sync` command.
+///
+/// # Errors
+///
+/// Returns an error if `--agents-only` and `--skills-only` are both set, if
+/// the git root cannot be found, if the sync operation fails, or if any files
+/// failed to sync.
 pub fn run(args: &SyncArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     if args.agents_only && args.skills_only {
         return Err(anyhow!("cannot use both --agents-only and --skills-only"));

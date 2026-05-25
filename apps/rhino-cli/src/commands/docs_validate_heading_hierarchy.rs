@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/docs_validate_heading_hierarchy.go`.
+//! `docs validate-heading-hierarchy` — checks that markdown heading levels do not skip.
+//!
+//! Port of `apps/rhino-cli/cmd/docs_validate_heading_hierarchy.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -13,32 +15,51 @@ use crate::internal::docs::heading_hierarchy::{
 };
 use crate::internal::git;
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/docs-validate-heading-hierarchy/v1";
 
+/// Default paths scanned when no positional arguments are supplied.
 const DEFAULT_PATHS: &[&str] = &["docs/", "repo-governance/"];
 
+/// CLI arguments for `docs validate-heading-hierarchy`.
 #[derive(Args, Debug)]
 pub struct ValidateHeadingHierarchyArgs {
     /// Optional positional paths (override defaults).
     pub positional: Vec<String>,
 }
 
+/// Single heading hierarchy finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the file containing the finding.
     file: &'a str,
+    /// Line number of the offending heading.
     line: usize,
+    /// Severity label.
     severity: &'a str,
+    /// Finding category (e.g. `"missing-h1"`).
     kind: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// JSON envelope wrapping the heading hierarchy scan result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Individual findings.
     result: Vec<JsonFinding<'a>>,
 }
 
+/// Run the `docs validate-heading-hierarchy` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the scan fails, or
+/// heading hierarchy violations are found.
 pub fn run(
     args: &ValidateHeadingHierarchyArgs,
     output_format: OutputFormat,
@@ -82,6 +103,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format heading hierarchy findings as human-readable text.
 fn format_text(findings: &[DocsHeadingFinding]) -> String {
     if findings.is_empty() {
         return "DOCS HEADING HIERARCHY VALIDATION PASSED: no heading hierarchy violations found\n"
@@ -103,6 +125,11 @@ fn format_text(findings: &[DocsHeadingFinding]) -> String {
     sb
 }
 
+/// Serialize heading hierarchy findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[DocsHeadingFinding]) -> std::result::Result<String, Error> {
     let jf: Vec<JsonFinding> = findings
         .iter()
@@ -129,6 +156,7 @@ fn format_json(findings: &[DocsHeadingFinding]) -> std::result::Result<String, E
     Ok(s)
 }
 
+/// Format heading hierarchy findings as a Markdown table.
 fn format_markdown(findings: &[DocsHeadingFinding]) -> String {
     if findings.is_empty() {
         return "## Docs Heading Hierarchy Validation\n\n**PASSED**: no heading hierarchy violations found\n"

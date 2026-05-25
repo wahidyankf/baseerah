@@ -1,3 +1,4 @@
+//! Internal implementation modules shared across commands.
 pub mod agents;
 pub mod allowlist;
 pub mod bcregistry;

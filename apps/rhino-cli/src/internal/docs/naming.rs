@@ -1,4 +1,11 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/docs/naming.go`.
+//! Markdown filename convention validator.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/docs/naming.go`.
+//!
+//! Enforces the lowercase-kebab-case filename rule (`^[a-z0-9-]+\.md$`) for
+//! every `.md` file found under the supplied root paths.  `README.md` is
+//! always exempt, and callers may supply additional glob patterns to exclude
+//! further filenames.
 
 use std::path::Path;
 use std::sync::OnceLock;
@@ -8,20 +15,40 @@ use glob::Pattern;
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A single naming-convention finding for a markdown file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DocsNamingFinding {
+    /// Path to the file whose name violates the convention.
     pub file: String,
+    /// Severity string (currently always `"high"`).
     pub severity: String,
+    /// Human-readable description of the violation including the suggested fix.
     pub message: String,
 }
 
+/// Returns the compiled regex that accepts valid lowercase-kebab-case filenames.
 fn kebab_case_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"^[a-z0-9-]+\.md$").expect("valid hardcoded regex"))
 }
 
+/// Directory names that are skipped during recursive walks (shared with
+/// [`super::frontmatter`] and [`super::heading_hierarchy`]).
 pub const SKIP_DIRS: &[&str] = &["node_modules", ".git", ".next", "dist", "build", "target"];
 
+/// Validates the filename convention for every `.md` file reachable from `paths`.
+///
+/// `exempt_globs` is a list of glob patterns (matched against the bare filename,
+/// not the full path).  Files whose name matches any pattern are silently skipped.
+/// `README.md` is always exempt regardless of `exempt_globs`.
+///
+/// Findings are sorted by file path.
+///
+/// # Errors
+///
+/// Returns an error when:
+/// - `paths` is empty.
+/// - Any pattern in `exempt_globs` is not a valid glob expression.
 pub fn validate_docs_naming(
     paths: &[String],
     exempt_globs: &[String],
@@ -42,6 +69,9 @@ pub fn validate_docs_naming(
     Ok(findings)
 }
 
+/// Walks `root` recursively and collects naming findings for non-compliant files.
+///
+/// Returns an empty list if `root` does not exist on the filesystem.
 fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFinding> {
     let root_p = Path::new(root);
     if !root_p.exists() {
@@ -80,6 +110,9 @@ fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFindin
     findings
 }
 
+/// Returns `true` when `basename` should be skipped during naming validation.
+///
+/// `README.md` is always exempt.  Additional exemptions are matched via `exempt_globs`.
 fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
     if basename == "README.md" {
         return true;
@@ -100,12 +133,14 @@ mod tests {
     use std::fs;
     use tempfile::TempDir;
 
+    /// Verifies that an empty paths slice returns an error.
     #[test]
     fn errors_on_empty_paths() {
         let err = validate_docs_naming(&[], &[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
+    /// Verifies that a file with an uppercase letter in its basename is reported.
     #[test]
     fn detects_uppercase_basename() {
         let tmp = TempDir::new().unwrap();
@@ -116,6 +151,7 @@ mod tests {
         assert!(findings[0].message.contains("lowercase-kebab-case"));
     }
 
+    /// Verifies that a filename with underscores is reported as a violation.
     #[test]
     fn detects_underscore_basename() {
         let tmp = TempDir::new().unwrap();
@@ -125,6 +161,7 @@ mod tests {
         assert_eq!(findings.len(), 1);
     }
 
+    /// Verifies that `README.md` is always exempt from the naming convention.
     #[test]
     fn readme_always_exempt() {
         let tmp = TempDir::new().unwrap();
@@ -134,6 +171,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that a file matching an exempt glob is not reported.
     #[test]
     fn exempt_glob_excludes_match() {
         let tmp = TempDir::new().unwrap();
@@ -146,6 +184,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that `node_modules/` directories are skipped during the walk.
     #[test]
     fn skips_node_modules() {
         let tmp = TempDir::new().unwrap();
@@ -156,6 +195,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that a valid lowercase-kebab-case filename produces no finding.
     #[test]
     fn passes_valid_kebab_basename() {
         let tmp = TempDir::new().unwrap();
@@ -165,6 +205,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that an invalid glob pattern in `exempt_globs` returns an error.
     #[test]
     fn invalid_glob_errors() {
         let err = validate_docs_naming(&["x".to_string()], &["[unclosed".to_string()]).unwrap_err();

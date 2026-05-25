@@ -1,4 +1,4 @@
-// `agents validate-bindings` — deterministic guard that enforces parity
+//! `agents validate-bindings` — deterministic guard that enforces parity
 // between the committed Amazon Q bridge files and their canonical content,
 // plus catalog coverage for every present known binding directory. Exits
 // non-zero on any drift. See `crate::internal::agents::bindings`.
@@ -13,6 +13,7 @@ use crate::internal::agents::reporter::{
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// CLI arguments for `agents validate-bindings`.
 #[derive(Args, Debug)]
 pub struct ValidateBindingsArgs {
     /// Verbose output (show all checks).
@@ -23,6 +24,12 @@ pub struct ValidateBindingsArgs {
     pub quiet: bool,
 }
 
+/// Run the `agents validate-bindings` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found or if any binding
+/// validation checks fail.
 pub fn run(
     args: &ValidateBindingsArgs,
     output_format: OutputFormat,

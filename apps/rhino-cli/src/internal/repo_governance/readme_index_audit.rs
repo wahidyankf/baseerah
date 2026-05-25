@@ -1,4 +1,7 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/readme_index_audit.go`.
+//! Audit that every `README.md` links to all sibling `.md` files and
+//! subdirectory `README.md` files, and has no ghost links.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/readme_index_audit.go`.
 
 use std::collections::{BTreeSet, HashSet};
 use std::fs;
@@ -10,14 +13,21 @@ use glob::Pattern;
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A single finding from the README index audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReadmeIndexFinding {
+    /// Absolute or relative path of the file implicated in the finding.
     pub file: String,
+    /// Severity; currently always `"high"`.
     pub severity: String,
+    /// Machine-readable violation category: `"orphan"` or `"ghost"`.
     pub kind: String,
+    /// Human-readable description of the finding.
     pub message: String,
 }
 
+/// Returns a compiled `Regex` that captures the target of a Markdown link
+/// whose href ends with `.md` (optionally with a fragment or query string).
 fn readme_link_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -25,8 +35,22 @@ fn readme_link_re() -> &'static Regex {
     })
 }
 
+/// Directory names skipped during the recursive walk.
 const SKIP_DIRS: &[&str] = &["node_modules", "target", "dist", "build", ".next", ".git"];
 
+/// Audits every `README.md` found under each directory in `paths`.
+///
+/// For each `README.md`, sibling `.md` files and subdirectories (those that
+/// contain their own `README.md`) must be linked from the `README.md`.
+/// Unlinked siblings are reported as `"orphan"` findings; links to
+/// non-existent targets are reported as `"ghost"` findings.
+///
+/// Paths and globs in `excludes` are skipped.  Findings are sorted by `file`,
+/// then by `kind`.
+///
+/// # Errors
+///
+/// Returns an error when `paths` is empty or when any file cannot be read.
 pub fn audit_readme_index(
     paths: &[String],
     excludes: &[String],
@@ -45,6 +69,15 @@ pub fn audit_readme_index(
     Ok(findings)
 }
 
+/// Recursively finds all `README.md` files under `root`, respecting `excludes`
+/// and [`SKIP_DIRS`].
+///
+/// Returns an empty `Vec` when `root` does not exist.
+///
+/// # Errors
+///
+/// Returns an error when the directory walk encounters an unrecoverable IO
+/// error.
 fn find_readmes(root: &str, excludes: &[String]) -> std::result::Result<Vec<String>, Error> {
     let root_p = Path::new(root);
     if !root_p.exists() {
@@ -91,6 +124,13 @@ fn find_readmes(root: &str, excludes: &[String]) -> std::result::Result<Vec<Stri
     Ok(readmes)
 }
 
+/// Audits a single `README.md` at `readme_path` against the sibling targets
+/// present under the same directory within `root`.
+///
+/// # Errors
+///
+/// Returns an error when `readme_path` has no parent component or when the
+/// file or its sibling directory cannot be read.
 fn audit_one_readme(
     readme_path: &str,
     root: &str,
@@ -138,6 +178,9 @@ fn audit_one_readme(
     Ok(findings)
 }
 
+/// Extracts all relative `.md` link targets from `content`, stripping fragment
+/// and query suffixes, leading `./`, and ignoring absolute paths, parent paths,
+/// and URL-like hrefs.
 fn extract_readme_links(content: &str) -> HashSet<String> {
     let mut out = HashSet::new();
     for cap in readme_link_re().captures_iter(content) {
@@ -169,12 +212,16 @@ fn extract_readme_links(content: &str) -> HashSet<String> {
     out
 }
 
+/// The set of linkable targets adjacent to a `README.md`.
 struct SiblingTargets {
+    /// Sibling `.md` files (excluding `README.md` itself).
     files: HashSet<String>,
+    /// Subdirectory `README.md` paths relative to the parent directory.
     sub_dirs: HashSet<String>,
 }
 
 impl SiblingTargets {
+    /// Creates an empty `SiblingTargets`.
     fn new() -> Self {
         Self {
             files: HashSet::new(),
@@ -182,6 +229,7 @@ impl SiblingTargets {
         }
     }
 
+    /// Returns a sorted `Vec` of all linkable target names.
     fn sorted_names(&self) -> Vec<String> {
         let mut all: BTreeSet<String> = BTreeSet::new();
         all.extend(self.files.iter().cloned());
@@ -189,6 +237,9 @@ impl SiblingTargets {
         all.into_iter().collect()
     }
 
+    /// Returns `true` when `link` refers to a file or subdirectory that exists
+    /// on disk, including bare-directory links (e.g., `"structure"` resolves to
+    /// `"structure/README.md"`).
     fn present(&self, link: &str) -> bool {
         let normalized = link.replace('\\', "/");
         let normalized = normalized.trim_end_matches('/').to_string();
@@ -207,6 +258,15 @@ impl SiblingTargets {
     }
 }
 
+/// Lists the sibling `.md` files and subdirectories that contain a `README.md`
+/// adjacent to a `README.md` at `dir`, relative to `root`.
+///
+/// Hidden entries and those in [`SKIP_DIRS`] are excluded.  Paths matching
+/// `excludes` globs are also excluded.
+///
+/// # Errors
+///
+/// Returns an error when `dir` cannot be read.
 fn list_sibling_targets(
     dir: &Path,
     root: &Path,
@@ -252,6 +312,11 @@ fn list_sibling_targets(
     Ok(out)
 }
 
+/// Returns `true` when `rel` matches at least one of the `patterns` using
+/// `glob::Pattern`.
+///
+/// Matching is attempted against the full path, the basename, and each path
+/// component.
 fn matches_any_glob(rel: &str, patterns: &[String]) -> bool {
     if rel.is_empty() || rel == "." {
         return false;

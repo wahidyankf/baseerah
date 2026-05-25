@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/governance_vendor_audit.go`.
+//! Vendor-independence audit for governance Markdown documents.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/governance_vendor_audit.go`.
 
 use std::fs;
 use std::path::Path;
@@ -8,20 +10,30 @@ use anyhow::{Context, Error};
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A single vendor-term finding in a governance Markdown document.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Finding {
+    /// Path of the file containing the forbidden term.
     pub path: String,
+    /// 1-based line number of the match.
     pub line: usize,
+    /// The display name of the matched term (e.g., `"Claude Code"`).
     pub r#match: String,
+    /// Suggested vendor-neutral replacement text.
     pub replacement: String,
 }
 
+/// The convention-definition file that is always exempt from this audit.
 const FORBIDDEN_CONVENTION_SUFFIX: &str =
     "repo-governance/conventions/structure/governance-vendor-independence.md";
 
+/// A compiled forbidden-term entry.
 struct ForbiddenTerm {
+    /// Compiled regex that matches the term in prose.
     re: Regex,
+    /// Human-readable name used in the `Finding::match` field.
     display_term: &'static str,
+    /// Suggested vendor-neutral replacement text.
     replacement: &'static str,
 }
 
@@ -162,11 +174,19 @@ const FORBIDDEN: &[(&str, &str, &str)] = &[
     (r"\bSkills\b", "Skills", "\"agent skills\" (lowercase)"),
 ];
 
+/// Returns the lazily-compiled slice of all [`ForbiddenTerm`]s built from
+/// [`FORBIDDEN`].
 fn forbidden_terms() -> &'static Vec<ForbiddenTerm> {
     static TERMS: OnceLock<Vec<ForbiddenTerm>> = OnceLock::new();
     TERMS.get_or_init(|| FORBIDDEN.iter().map(|&(p, t, r)| mk(p, t, r)).collect())
 }
 
+/// Constructs a [`ForbiddenTerm`] from a raw regex `pattern`.
+///
+/// # Panics
+///
+/// Panics when `pattern` is not a valid regex — all patterns in [`FORBIDDEN`]
+/// are validated at compile time so this should never occur in practice.
 fn mk(pattern: &str, term: &'static str, replacement: &'static str) -> ForbiddenTerm {
     ForbiddenTerm {
         re: Regex::new(pattern).expect("valid hardcoded regex"),
@@ -175,26 +195,42 @@ fn mk(pattern: &str, term: &'static str, replacement: &'static str) -> Forbidden
     }
 }
 
+/// Returns a compiled `Regex` matching inline HTML comments (`<!-- … -->`).
 fn html_comment_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"<!--.*?-->").expect("valid hardcoded regex"))
 }
 
+/// Returns a compiled `Regex` matching inline code spans (`` `…` ``).
 fn inline_code_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"`[^`]*`").expect("valid hardcoded regex"))
 }
 
+/// Returns a compiled `Regex` matching Markdown links `[text](url)`.
 fn link_url_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\[([^\]]*)\]\([^)]*\)").expect("valid hardcoded regex"))
 }
 
+/// Reads the file at `path` and scans it for forbidden vendor terms.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be read.
 pub fn scan_file(path: &Path) -> std::result::Result<Vec<Finding>, Error> {
     let data = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
     Ok(scan_lines(&path.to_string_lossy(), &data))
 }
 
+/// Recursively walks `root` and scans every `.md` file for forbidden vendor
+/// terms, skipping the convention-definition file.
+///
+/// Returns an empty `Vec` when `root` does not exist.
+///
+/// # Errors
+///
+/// Returns an error when any file cannot be read.
 pub fn walk(root: &Path) -> std::result::Result<Vec<Finding>, Error> {
     if !root.exists() {
         return Ok(Vec::new());
@@ -218,6 +254,9 @@ pub fn walk(root: &Path) -> std::result::Result<Vec<Finding>, Error> {
     Ok(findings)
 }
 
+/// Scans `content` line-by-line for forbidden vendor terms, respecting YAML
+/// frontmatter, code fences, HTML comments, inline code, link URLs, and the
+/// "Platform Binding Examples" heading scope.
 fn scan_lines(path: &str, content: &str) -> Vec<Finding> {
     let lines: Vec<&str> = content.split('\n').collect();
     let mut findings = Vec::new();
@@ -271,7 +310,7 @@ fn scan_lines(path: &str, content: &str) -> Vec<Finding> {
             continue;
         }
 
-        // Code fences (length-aware per CommonMark).
+        // Code fences (length-aware per `CommonMark`).
         let fl = fence_line_len(line);
         if fl > 0 {
             if in_code_fence_len == 0 {
@@ -321,6 +360,8 @@ fn scan_lines(path: &str, content: &str) -> Vec<Finding> {
     findings
 }
 
+/// Returns the number of leading backtick characters on `line` when it is a
+/// valid `CommonMark` code fence (3 or more backticks), or `0` otherwise.
 fn fence_line_len(line: &str) -> usize {
     let trimmed = line.trim();
     let mut n = 0;
@@ -334,6 +375,8 @@ fn fence_line_len(line: &str) -> usize {
     if n >= 3 { n } else { 0 }
 }
 
+/// Removes inline HTML comments, inline code spans, and link URLs from `line`
+/// so that only prose text remains for vendor-term matching.
 fn strip_non_prose(line: &str) -> String {
     let s = html_comment_re().replace_all(line, "");
     let s = inline_code_re().replace_all(&s, "``");
@@ -341,6 +384,8 @@ fn strip_non_prose(line: &str) -> String {
     s.into_owned()
 }
 
+/// Parses `line` as an ATX heading and returns its level (1–6), or `None` when
+/// the line is not a valid heading.
 fn parse_heading(line: &str) -> Option<usize> {
     let trimmed = line.trim();
     if !trimmed.starts_with('#') {
@@ -364,6 +409,8 @@ fn parse_heading(line: &str) -> Option<usize> {
     Some(level)
 }
 
+/// Returns `true` when `line` is a "Platform Binding Examples" heading that
+/// opens a vendor-exempt section.
 fn is_platform_binding_heading(line: &str) -> bool {
     line.to_lowercase().contains("platform binding examples")
 }

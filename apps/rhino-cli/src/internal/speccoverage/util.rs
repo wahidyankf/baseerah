@@ -1,16 +1,32 @@
-// Shared string utilities for the speccoverage suite.
-// Ports normalizeWS, firstNonEmpty, unescapeString from checker.go.
+//! Shared string utilities for the spec-coverage suite.
+//!
+//! Ports `normalizeWS`, `firstNonEmpty`, and `unescapeString` from
+//! `checker.go`. All functions are pure and allocation-minimal.
 
+/// Collapses all runs of ASCII whitespace to a single space and trims leading
+/// and trailing whitespace.
+///
+/// Uses [`str::split_whitespace`], which handles tabs, newlines, and multiple
+/// consecutive spaces uniformly.
 pub fn normalize_ws(s: &str) -> String {
     s.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
+/// Returns `a` if it is non-empty, otherwise returns `b`.
+///
+/// Mirrors Go's `firstNonEmpty(a, b string) string` helper used when
+/// extracting step text from regex capture groups that may be empty.
 pub fn first_non_empty<'a>(a: &'a str, b: &'a str) -> &'a str {
     if a.is_empty() { b } else { a }
 }
 
-/// JS/TS-style escape sequence handling: `\'`, `\"`, `\\`, `\/`, `\n`, `\t`, `\r`.
-/// UTF-8 safe — iterates by chars, not bytes.
+/// Interprets JS/TS-style escape sequences and returns the decoded string.
+///
+/// Recognized sequences: `\'`, `\"`, `\\`, `\/`, `\n`, `\t`, `\r`.
+/// Any other `\X` pair passes `X` through unchanged.
+///
+/// The implementation iterates by Unicode scalar values (chars), not bytes,
+/// making it safe for arbitrary UTF-8 input.
 pub fn unescape_string(s: &str) -> String {
     let chars: Vec<char> = s.chars().collect();
     let mut out = String::with_capacity(s.len());

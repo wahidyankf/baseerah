@@ -1,5 +1,7 @@
-// Port of `apps/rhino-cli/cmd/governance_agents_md_size.go`.
-// Text/JSON/Markdown output formats matching Go byte-for-byte.
+//! `repo-governance agents-md-size` — checks that `AGENTS.md` stays within size limits.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_agents_md_size.go`.
+//! Text/JSON/Markdown output formats matching Go byte-for-byte.
 
 use anyhow::{Context, Error, anyhow};
 use clap::Args;
@@ -9,26 +11,43 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::agents_md_size::{AgentsMdSizeFinding, check_agents_md_size};
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/agents-md-size/v1";
 
+/// CLI arguments for `repo-governance agents-md-size` (none required).
 #[derive(Args, Debug)]
 pub struct AgentsMdSizeArgs;
 
+/// Size audit result payload in JSON output.
 #[derive(Serialize)]
 struct ResultPayload<'a> {
+    /// Path of the file checked.
     file: &'a str,
+    /// File size in bytes.
     size: i64,
+    /// Severity label (`"ok"`, `"warn"`, or `"fail"`).
     severity: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// JSON envelope wrapping the size audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"ok"`, `"warn"`, or `"fail"`.
     status: &'a str,
+    /// Detailed result.
     result: ResultPayload<'a>,
 }
 
+/// Run the `repo-governance agents-md-size` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the size check fails, or
+/// `AGENTS.md` exceeds the hard limit.
 pub fn run(
     _args: &AgentsMdSizeArgs,
     output_format: OutputFormat,
@@ -54,6 +73,7 @@ pub fn run(
     Ok(())
 }
 
+/// Print the size finding as a single human-readable line.
 fn print_text(f: &AgentsMdSizeFinding) {
     println!(
         "AGENTS.MD SIZE: {} — {}",
@@ -62,6 +82,11 @@ fn print_text(f: &AgentsMdSizeFinding) {
     );
 }
 
+/// Print the size finding as a JSON envelope.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn print_json(f: &AgentsMdSizeFinding) -> std::result::Result<(), Error> {
     let env = Envelope {
         schema: SCHEMA,
@@ -78,6 +103,7 @@ fn print_json(f: &AgentsMdSizeFinding) -> std::result::Result<(), Error> {
     Ok(())
 }
 
+/// Print the size finding as a Markdown table.
 fn print_markdown(f: &AgentsMdSizeFinding) {
     println!(
         "## AGENTS.md Size Audit\n\n**Status**: {}\n\n| File | Size (bytes) | Severity | Message |\n|------|--------------|----------|---------|\n| {} | {} | {} | {} |",
@@ -89,6 +115,7 @@ fn print_markdown(f: &AgentsMdSizeFinding) {
     );
 }
 
+/// Map a severity string to a display label (`"PASS"`, `"WARN"`, `"FAIL"`).
 pub(crate) fn status_label(severity: &str) -> &str {
     match severity {
         "ok" => "PASS",

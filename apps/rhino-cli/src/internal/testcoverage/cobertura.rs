@@ -1,9 +1,15 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/cobertura_coverage.go`.
-// Cobertura XML: <coverage><packages><package><classes><class filename="..."><lines><line number hits branch condition-coverage/>
-// Classification:
-//   hits > 0 && (!branch || all branches covered) → covered
-//   hits > 0 && branch && some uncovered          → partial
-//   hits == 0                                      → missed
+//! Cobertura XML coverage format parser and result computer.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/cobertura_coverage.go`.
+//!
+//! Cobertura XML schema:
+//! `<coverage><packages><package><classes><class filename="…"><lines><line number hits branch condition-coverage/>`
+//!
+//! Line classification:
+//!
+//! - `hits > 0` and (`!branch` or all branches covered) → **covered**
+//! - `hits > 0` and `branch` and some uncovered branches → **partial**
+//! - `hits == 0` → **missed**
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -13,58 +19,82 @@ use serde::Deserialize;
 
 use super::types::{FileResult, Format, Result as CoverageResult};
 
+/// Top-level deserialization target for a Cobertura XML report.
 #[derive(Debug, Deserialize, Default)]
 pub(crate) struct CoberturaReport {
+    /// Optional `<packages>` element; absent in empty reports.
     #[serde(default)]
     pub packages: Option<CoberturaPackages>,
 }
 
+/// The `<packages>` container element in a Cobertura XML report.
 #[derive(Debug, Deserialize, Default)]
 pub(crate) struct CoberturaPackages {
+    /// List of `<package>` child elements.
     #[serde(rename = "package", default)]
     pub package: Vec<CoberturaPackage>,
 }
 
+/// A `<package>` element grouping related classes.
 #[derive(Debug, Deserialize)]
 pub(crate) struct CoberturaPackage {
+    /// The `name` XML attribute (unused in coverage computation; kept for completeness).
     #[serde(rename = "@name", default)]
     pub _name: String,
+    /// Optional `<classes>` child element.
     #[serde(default)]
     pub classes: Option<CoberturaClasses>,
 }
 
+/// The `<classes>` container element inside a `<package>`.
 #[derive(Debug, Deserialize, Default)]
 pub(crate) struct CoberturaClasses {
+    /// List of `<class>` child elements.
     #[serde(rename = "class", default)]
     pub class: Vec<CoberturaClass>,
 }
 
+/// A `<class>` element representing a single source file.
 #[derive(Debug, Deserialize)]
 pub(crate) struct CoberturaClass {
+    /// The `filename` XML attribute — path to the source file.
     #[serde(rename = "@filename")]
     pub filename: String,
+    /// Optional `<lines>` child element containing line-level data.
     #[serde(default)]
     pub lines: Option<CoberturaLines>,
 }
 
+/// The `<lines>` container element inside a `<class>`.
 #[derive(Debug, Deserialize, Default)]
 pub(crate) struct CoberturaLines {
+    /// List of `<line>` child elements.
     #[serde(rename = "line", default)]
     pub line: Vec<CoberturaLine>,
 }
 
+/// A single `<line>` element with hit-count and optional branch data.
 #[derive(Debug, Deserialize)]
 pub(crate) struct CoberturaLine {
+    /// Line number in the source file.
     #[serde(rename = "@number", default)]
     pub number: i64,
+    /// Number of times this line was executed.
     #[serde(rename = "@hits", default)]
     pub hits: i64,
+    /// `true` when this line has branch coverage data.
     #[serde(rename = "@branch", default)]
     pub branch: bool,
+    /// Raw `condition-coverage` attribute string, e.g. `"50% (1/2)"`.
     #[serde(rename = "@condition-coverage", default)]
     pub condition_coverage: String,
 }
 
+/// Reads and parses a Cobertura XML file from `filename`.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be read or the XML is malformed.
 pub(crate) fn parse_cobertura(filename: &str) -> std::result::Result<CoberturaReport, Error> {
     let data = fs::read_to_string(filename).map_err(|_| anyhow!("file not found: {filename}"))?;
     let report: CoberturaReport =
@@ -99,13 +129,22 @@ pub(crate) fn parse_branch_coverage(cond_cov: &str) -> (i64, i64) {
     (c, t)
 }
 
+/// Accumulator for covered/partial/missed line counts within a single source file.
 #[derive(Default)]
 struct FileCounts {
+    /// Number of fully covered lines.
     c: usize,
+    /// Number of partially covered lines (executed but with uncovered branches).
     p: usize,
+    /// Number of missed (unexecuted) lines.
     m: usize,
 }
 
+/// Parses `filename` as a Cobertura XML report and computes aggregated coverage.
+///
+/// # Errors
+///
+/// Returns an error when `parse_cobertura` fails (file not found or invalid XML).
 pub fn compute_cobertura_result(
     filename: &str,
     threshold: f64,

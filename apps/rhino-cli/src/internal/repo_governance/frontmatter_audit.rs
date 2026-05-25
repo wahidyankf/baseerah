@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/frontmatter_audit.go`.
+//! Frontmatter and body date-annotation audit.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/frontmatter_audit.go`.
 
 use std::fs;
 use std::path::Path;
@@ -8,14 +10,21 @@ use anyhow::{Context, Error, anyhow};
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A violation found by the frontmatter or body-annotation audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FrontmatterFinding {
+    /// Path of the file containing the violation.
     pub file: String,
+    /// 1-based line number of the offending content.
     pub line: usize,
+    /// Severity; currently always `"high"`.
     pub severity: String,
+    /// Human-readable description of the violation.
     pub message: String,
 }
 
+/// Path prefixes that identify website app content directories, which are
+/// exempt from this audit.
 const WEBSITE_APP_PREFIXES: &[&str] = &[
     "apps/ayokoding-web/",
     "apps/ose-web/",
@@ -23,11 +32,15 @@ const WEBSITE_APP_PREFIXES: &[&str] = &[
     "apps/wahidyankf-web/",
 ];
 
+/// Returns a compiled `Regex` matching a `**Last Updated**` bold marker in
+/// body text.
 fn last_updated_footer_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\*\*Last Updated\*\*").expect("valid hardcoded regex"))
 }
 
+/// Returns a compiled `Regex` matching an inline bullet `**Created**:` or
+/// `**Last Updated**:` date annotation in body text.
 fn inline_date_annotation_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -36,6 +49,15 @@ fn inline_date_annotation_re() -> &'static Regex {
     })
 }
 
+/// Audits each directory in `paths` for YAML frontmatter violations and
+/// forbidden body-level date annotations.
+///
+/// Skips files under any of the [`WEBSITE_APP_PREFIXES`] paths.  Findings are
+/// sorted by `file`, then by `line`.
+///
+/// # Errors
+///
+/// Returns an error when `paths` is empty or when a file cannot be read.
 pub fn audit_frontmatter(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
     if paths.is_empty() {
         return Err(anyhow!("at least one path is required"));
@@ -50,6 +72,8 @@ pub fn audit_frontmatter(paths: &[String]) -> std::result::Result<Vec<Frontmatte
     Ok(findings)
 }
 
+/// Recursively walks `root` and returns sorted paths of `.md` files that are
+/// not inside a website-app directory.
 fn walk_paths(root: &str) -> Vec<String> {
     let root_p = Path::new(root);
     if !root_p.exists() {
@@ -67,6 +91,12 @@ fn walk_paths(root: &str) -> Vec<String> {
     files
 }
 
+/// Reads each file in `paths` and scans its content for frontmatter and body
+/// violations.
+///
+/// # Errors
+///
+/// Returns an error when a file cannot be read.
 fn scan_paths(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
     let mut findings = Vec::new();
     for p in paths {
@@ -76,6 +106,8 @@ fn scan_paths(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, 
     Ok(findings)
 }
 
+/// Extracts the frontmatter and body from `content` and delegates to the
+/// per-section checkers.
 fn scan_frontmatter_content(path: &str, content: &str) -> Vec<FrontmatterFinding> {
     let mut findings = Vec::new();
     let (frontmatter, frontmatter_end_line, body) = split_frontmatter(content);
@@ -84,6 +116,11 @@ fn scan_frontmatter_content(path: &str, content: &str) -> Vec<FrontmatterFinding
     findings
 }
 
+/// Splits `content` into `(frontmatter, end_line, body)`.
+///
+/// `end_line` is the 1-based line number of the closing `---` fence, or `0`
+/// when no valid frontmatter is present.  An unclosed block is treated as if
+/// there is no frontmatter.
 fn split_frontmatter(content: &str) -> (String, usize, String) {
     let lines: Vec<&str> = content.split('\n').collect();
     if lines.is_empty() || lines[0].trim() != "---" {
@@ -103,6 +140,8 @@ fn split_frontmatter(content: &str) -> (String, usize, String) {
     (String::new(), 0, content.to_string())
 }
 
+/// Returns a finding when the parsed `frontmatter` YAML contains a forbidden
+/// `updated:` field.
 fn check_frontmatter_updated_field(path: &str, frontmatter: &str) -> Vec<FrontmatterFinding> {
     if frontmatter.is_empty() {
         return Vec::new();
@@ -126,6 +165,11 @@ fn check_frontmatter_updated_field(path: &str, frontmatter: &str) -> Vec<Frontma
     }]
 }
 
+/// Returns the 1-based file-level line number of the first occurrence of
+/// `field:` within `frontmatter`.
+///
+/// Falls back to line `2` (the first line after the opening `---`) when the
+/// field is not found.
 fn find_field_line(frontmatter: &str, field: &str) -> usize {
     let prefix = format!("{field}:");
     for (i, line) in frontmatter.split('\n').enumerate() {
@@ -136,6 +180,11 @@ fn find_field_line(frontmatter: &str, field: &str) -> usize {
     2
 }
 
+/// Scans `body` for forbidden inline date annotations and `**Last Updated**`
+/// footer markers.
+///
+/// `frontmatter_end_line` is added to each relative line index to produce
+/// absolute file-level line numbers.
 fn check_body_annotations(
     path: &str,
     body: &str,
@@ -173,6 +222,8 @@ fn check_body_annotations(
     findings
 }
 
+/// Returns `true` when `path` is inside a website-app directory and should be
+/// excluded from the audit.
 fn is_website_app(path: &str) -> bool {
     let slashed = path.replace('\\', "/");
     WEBSITE_APP_PREFIXES.iter().any(|p| slashed.contains(p))

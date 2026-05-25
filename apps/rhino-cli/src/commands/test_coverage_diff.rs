@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/test_coverage_diff.go`.
+//! `test-coverage diff` — computes test coverage for lines changed since a base ref.
+//!
+//! Port of `apps/rhino-cli/cmd/test_coverage_diff.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -8,6 +10,7 @@ use crate::internal::git;
 use crate::internal::testcoverage::diff::{DiffCoverageOptions, compute_diff_coverage};
 use crate::internal::testcoverage::reporter;
 
+/// CLI arguments for `test-coverage diff`.
 #[derive(Args, Debug)]
 pub struct DiffArgs {
     /// Coverage file path relative to git repo root.
@@ -27,12 +30,20 @@ pub struct DiffArgs {
     /// Exclude files matching glob pattern (repeatable).
     #[arg(long = "exclude", value_name = "PATTERN")]
     pub exclude: Vec<String>,
+    /// Verbose output.
     #[arg(long, short = 'v')]
     pub verbose: bool,
+    /// Quiet output.
     #[arg(long, short = 'q')]
     pub quiet: bool,
 }
 
+/// Run the `test-coverage diff` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the diff computation fails,
+/// or coverage is below the threshold.
 pub fn run(args: &DiffArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

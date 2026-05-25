@@ -1,4 +1,4 @@
-// Shared agent types ported from `apps/rhino-cli/internal/agents/types.go`.
+//! Shared agent types ported from `apps/rhino-cli/internal/agents/types.go`.
 //
 // Sub-set covering validate-claude path: ClaudeAgentFull, ClaudeSkill,
 // ValidationCheck, ValidationResult, ValidateClaudeOptions, plus the
@@ -11,32 +11,49 @@ use std::time::Duration;
 
 use regex::Regex;
 
+/// Full Claude Code agent definition parsed from a `.claude/agents/*.md` file.
 #[derive(Debug, Clone, Default)]
 pub struct ClaudeAgentFull {
+    /// The `name` frontmatter field — must match the filename stem.
     pub name: String,
+    /// The `description` frontmatter field.
     pub description: String,
+    /// Tool names from the `tools` frontmatter field.
     pub tools: Vec<String>,
+    /// Model alias or full ID from the `model` frontmatter field.
     pub model: String,
+    /// Color token from the `color` frontmatter field.
     pub color: String,
+    /// Skill names from the `skills` frontmatter sequence.
     pub skills: Vec<String>,
 }
 
+/// Minimal Claude Code skill definition parsed from a `SKILL.md` file.
 #[derive(Debug, Clone, Default)]
 pub struct ClaudeSkill {
+    /// The `name` frontmatter field — must match the directory name.
     pub name: String,
+    /// The `description` frontmatter field.
     pub description: String,
 }
 
+/// One validation check result with status, expected/actual pair, and message.
 #[derive(Debug, Clone)]
 pub struct ValidationCheck {
+    /// Human-readable check identifier (e.g. `"Agent: foo.md - Valid Tools"`).
     pub name: String,
-    pub status: String, // "passed" | "warning" | "failed"
+    /// Result: `"passed"`, `"warning"`, or `"failed"`.
+    pub status: String,
+    /// What was expected (empty when not applicable).
     pub expected: String,
+    /// What was observed (empty when not applicable).
     pub actual: String,
+    /// Human-readable explanation of the failure or outcome.
     pub message: String,
 }
 
 impl ValidationCheck {
+    /// Create a `passed` check with the given name and message.
     pub fn passed(name: impl Into<String>, message: impl Into<String>) -> Self {
         Self {
             name: name.into(),
@@ -46,6 +63,7 @@ impl ValidationCheck {
             message: message.into(),
         }
     }
+    /// Create a `warning` check with name, expected, actual, and message.
     pub fn warning(
         name: impl Into<String>,
         expected: impl Into<String>,
@@ -60,6 +78,7 @@ impl ValidationCheck {
             message: message.into(),
         }
     }
+    /// Create a `failed` check with name, expected, actual, and message.
     pub fn failed(
         name: impl Into<String>,
         expected: impl Into<String>,
@@ -74,6 +93,7 @@ impl ValidationCheck {
             message: message.into(),
         }
     }
+    /// Create a `failed` check with only name and message (no expected/actual).
     pub fn failed_msg(name: impl Into<String>, message: impl Into<String>) -> Self {
         Self {
             name: name.into(),
@@ -85,17 +105,25 @@ impl ValidationCheck {
     }
 }
 
+/// Aggregated result of running a set of validation checks.
 #[derive(Debug, Clone, Default)]
 pub struct ValidationResult {
+    /// Total number of checks tallied.
     pub total_checks: usize,
+    /// Number of checks with status `"passed"`.
     pub passed_checks: usize,
+    /// Number of checks with status `"warning"`.
     pub warning_checks: usize,
+    /// Number of checks with status `"failed"`.
     pub failed_checks: usize,
+    /// Ordered list of individual check results.
     pub checks: Vec<ValidationCheck>,
+    /// Wall time for the full validation run.
     pub duration: Duration,
 }
 
 impl ValidationResult {
+    /// Append `check` and increment the appropriate status counter.
     pub fn tally(&mut self, check: ValidationCheck) {
         match check.status.as_str() {
             "passed" => self.passed_checks += 1,
@@ -107,13 +135,18 @@ impl ValidationResult {
     }
 }
 
+/// Options controlling which parts of the Claude binding to validate.
 #[derive(Debug, Clone, Default)]
 pub struct ValidateClaudeOptions {
+    /// Absolute path to the repository root.
     pub repo_root: std::path::PathBuf,
+    /// When true, only agent checks are run (skill checks are still used for skill-exist resolution).
     pub agents_only: bool,
+    /// When true, only skill checks are run; agent checks are skipped.
     pub skills_only: bool,
 }
 
+/// Return the allow-list of known Claude Code tool names.
 pub fn valid_tools() -> &'static HashMap<&'static str, bool> {
     static M: OnceLock<HashMap<&'static str, bool>> = OnceLock::new();
     M.get_or_init(|| {
@@ -146,6 +179,7 @@ pub fn valid_tools() -> &'static HashMap<&'static str, bool> {
     })
 }
 
+/// Return the allow-list of accepted Claude model alias strings (empty string means default).
 pub fn valid_model_alias() -> &'static HashMap<&'static str, bool> {
     static M: OnceLock<HashMap<&'static str, bool>> = OnceLock::new();
     M.get_or_init(|| {
@@ -157,16 +191,27 @@ pub fn valid_model_alias() -> &'static HashMap<&'static str, bool> {
     })
 }
 
+/// Return compiled regex matching full Claude model IDs (e.g. `claude-sonnet-4-6`).
+///
+/// # Panics
+///
+/// Panics if the hardcoded regex pattern is invalid, which cannot happen.
 pub fn valid_model_id_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"^claude-[a-z0-9.-]+$").expect("valid hardcoded regex"))
 }
 
+/// Return compiled regex matching agent tool entries in call form (`ToolName(...)`).
+///
+/// # Panics
+///
+/// Panics if the hardcoded regex pattern is invalid, which cannot happen.
 pub fn agent_tool_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"^([A-Za-z][A-Za-z0-9_]*)\(.*\)$").expect("valid hardcoded regex"))
 }
 
+/// Return the allow-list of accepted `color` values for agent definitions.
 pub fn valid_colors() -> &'static HashMap<&'static str, bool> {
     static M: OnceLock<HashMap<&'static str, bool>> = OnceLock::new();
     M.get_or_init(|| {
@@ -180,15 +225,22 @@ pub fn valid_colors() -> &'static HashMap<&'static str, bool> {
     })
 }
 
+/// Return compiled regex that valid skill directory names must match.
+///
+/// # Panics
+///
+/// Panics if the hardcoded regex pattern is invalid, which cannot happen.
 pub fn valid_skill_name_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"^[a-z0-9-]{1,64}$").expect("valid hardcoded regex"))
 }
 
+/// Return the ordered list of required frontmatter fields for agent definitions.
 pub fn required_fields() -> &'static [&'static str] {
     &["name", "description"]
 }
 
+/// Return the allow-list of known frontmatter field names for Claude Code agents.
 pub fn valid_claude_agent_fields() -> &'static HashMap<&'static str, bool> {
     static M: OnceLock<HashMap<&'static str, bool>> = OnceLock::new();
     M.get_or_init(|| {
@@ -217,6 +269,7 @@ pub fn valid_claude_agent_fields() -> &'static HashMap<&'static str, bool> {
     })
 }
 
+/// Return the allow-list of known frontmatter field names for Claude Code skills.
 pub fn valid_claude_skill_fields() -> &'static HashMap<&'static str, bool> {
     static M: OnceLock<HashMap<&'static str, bool>> = OnceLock::new();
     M.get_or_init(|| {
@@ -258,7 +311,7 @@ pub fn valid_tools_sorted() -> Vec<&'static str> {
     v
 }
 
-/// Build a BTreeMap view of the agent field allow-list for deterministic
+/// Build a `BTreeMap` view of the agent field allow-list for deterministic
 /// iteration (used in tests).
 pub fn valid_claude_agent_fields_sorted() -> BTreeMap<&'static str, bool> {
     valid_claude_agent_fields()

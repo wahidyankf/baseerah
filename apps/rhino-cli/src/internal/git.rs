@@ -1,8 +1,10 @@
-// Git pre-commit runner ported from `apps/rhino-cli/internal/git/runner.go`.
-//
-// Reproduces the 8-step pre-commit pipeline with per-step + total timeouts.
-// External dependencies (validate-claude, sync, validate-sync, validate-links)
-// call the same Rust internal modules already ported.
+//! Git pre-commit runner ported from `apps/rhino-cli/internal/git/runner.go`.
+//!
+//! Reproduces the 8-step pre-commit pipeline with per-step and total timeouts.
+//! External dependencies (`validate-claude`, `sync`, `validate-sync`,
+//! `validate-links`) call the same Rust internal modules already ported.
+//!
+//! Primary entry point: [`run`].
 
 pub mod root;
 
@@ -19,17 +21,24 @@ use crate::internal::agents::sync_validator::validate_sync;
 use crate::internal::agents::types::ValidateClaudeOptions;
 use crate::internal::docs::links::{ScanOptions, validate_all_links};
 
+/// Maximum time allowed for a single pipeline step before it is skipped.
 const STEP_TIMEOUT: Duration = Duration::from_secs(30);
+
+/// Maximum total wall-clock time for the entire pre-commit pipeline.
 const TOTAL_TIMEOUT: Duration = Duration::from_secs(120);
 
-/// Inject points for testing.
+/// Injectable dependencies for the pre-commit pipeline, enabling test isolation.
 pub struct Deps {
+    /// Absolute path to the repository root used as the working directory.
     pub git_root: PathBuf,
+    /// Writer for progress and status messages (defaults to `stdout`).
     pub stdout: Box<dyn Write + Send>,
+    /// Writer for error output (defaults to `stderr`).
     pub stderr: Box<dyn Write + Send>,
 }
 
 impl Deps {
+    /// Creates a [`Deps`] instance that writes to the process's real `stdout`/`stderr`.
     pub fn default_for(git_root: PathBuf) -> Self {
         Self {
             git_root,
@@ -39,6 +48,12 @@ impl Deps {
     }
 }
 
+/// Runs `fn_` inline and enforces both the per-step and total timeouts.
+///
+/// When the total elapsed time since `total_start` already exceeds
+/// [`TOTAL_TIMEOUT`], the step is skipped with a warning message and `Ok(())`
+/// is returned.  When `fn_` completes but exceeded [`STEP_TIMEOUT`], a
+/// warning is logged and `Ok(())` is returned regardless of the step's result.
 fn run_with_step_timeout<F>(
     total_start: Instant,
     name: &str,
@@ -72,6 +87,13 @@ where
     r
 }
 
+/// Returns the list of files staged for the next commit by running
+/// `git diff --cached --name-only`.
+///
+/// # Errors
+///
+/// Returns an error when `git diff --cached` fails to run or exits with a
+/// non-zero status.
 pub fn get_staged_files(git_root: &Path) -> Result<Vec<String>, Error> {
     let out = Command::new("git")
         .arg("diff")
@@ -93,6 +115,16 @@ pub fn get_staged_files(git_root: &Path) -> Result<Vec<String>, Error> {
         .collect())
 }
 
+/// Runs the full 8-step pre-commit pipeline.
+///
+/// Steps are executed sequentially.  Each step is guarded by
+/// [`run_with_step_timeout`] so that a slow step does not block the commit
+/// indefinitely.
+///
+/// # Errors
+///
+/// Returns an error when any pipeline step fails (e.g. lint-staged exits
+/// non-zero, broken links detected, or markdown linting fails).
 pub fn run(deps: &mut Deps) -> Result<(), Error> {
     let total_start = Instant::now();
     let git_root = deps.git_root.clone();
@@ -148,10 +180,18 @@ pub fn run(deps: &mut Deps) -> Result<(), Error> {
     Ok(())
 }
 
+/// Returns `true` when at least one staged file path satisfies `pred`.
 fn has_match(staged: &[String], pred: impl Fn(&str) -> bool) -> bool {
     staged.iter().any(|f| pred(f))
 }
 
+/// Step 1: validates `.claude/` and `.opencode/` configuration when any such files are staged.
+///
+/// Runs `validate-claude`, `sync-all`, and `validate-sync` in sequence.
+///
+/// # Errors
+///
+/// Returns an error when validation or sync fails.
 fn step1_config(git_root: &Path, staged: &[String], deps: &mut Deps) -> Result<(), Error> {
     let has = has_match(staged, |f| {
         f.starts_with(".claude/") || f.starts_with(".opencode/")
@@ -206,6 +246,12 @@ fn step1_config(git_root: &Path, staged: &[String], deps: &mut Deps) -> Result<(
     Ok(())
 }
 
+/// Step 2: validates any staged `docker-compose.yml` / `docker-compose.yaml` files
+/// using `docker compose config`.
+///
+/// # Errors
+///
+/// Returns an error when `docker compose config` fails for any staged file.
 fn step2_docker_compose(git_root: &Path, staged: &[String], deps: &mut Deps) -> Result<(), Error> {
     let compose: Vec<&String> = staged
         .iter()
@@ -253,6 +299,9 @@ fn step2_docker_compose(git_root: &Path, staged: &[String], deps: &mut Deps) -> 
     Ok(())
 }
 
+/// Step 3: runs `nx affected -t run-pre-commit --skip-nx-cache` for affected projects.
+///
+/// Failures are logged as warnings; the overall pipeline continues.
 fn step3_nx_pre_commit(git_root: &Path, deps: &mut Deps) {
     let r = Command::new("nx")
         .arg("affected")
@@ -269,6 +318,7 @@ fn step3_nx_pre_commit(git_root: &Path, deps: &mut Deps) {
     }
 }
 
+/// Step 4: stages any changes in `apps/ayokoding-web/content/` produced by earlier steps.
 fn step4_stage_ayokoding(git_root: &Path, _deps: &mut Deps) {
     let _ = Command::new("git")
         .arg("add")
@@ -277,6 +327,11 @@ fn step4_stage_ayokoding(git_root: &Path, _deps: &mut Deps) {
         .status();
 }
 
+/// Step 5: runs `npx lint-staged` to format and lint staged files.
+///
+/// # Errors
+///
+/// Returns an error when `lint-staged` exits with a non-zero status.
 fn step5_lint_staged(git_root: &Path, _deps: &mut Deps) -> Result<(), Error> {
     let status = Command::new("npx")
         .arg("lint-staged")
@@ -288,6 +343,14 @@ fn step5_lint_staged(git_root: &Path, _deps: &mut Deps) -> Result<(), Error> {
     Ok(())
 }
 
+/// Step 5b: regenerates and stages `package-lock.json` for any app whose `package.json` is staged.
+///
+/// Only applies when an `apps/<app>/package.json` is staged and a
+/// `apps/<app>/package-lock.json` already exists.
+///
+/// # Errors
+///
+/// Returns an error when `npm install --package-lock-only` fails for any app.
 fn step5b_sync_lockfiles(git_root: &Path, staged: &[String], deps: &mut Deps) -> Result<(), Error> {
     let mut apps_to_sync: Vec<String> = Vec::new();
     for f in staged {
@@ -339,6 +402,11 @@ fn step5b_sync_lockfiles(git_root: &Path, staged: &[String], deps: &mut Deps) ->
     Ok(())
 }
 
+/// Step 7: validates Markdown links in staged files.
+///
+/// # Errors
+///
+/// Returns an error when any broken links are found.
 fn step7_validate_links(git_root: &Path, deps: &mut Deps) -> Result<(), Error> {
     let r = validate_all_links(&ScanOptions {
         repo_root: git_root.to_path_buf(),
@@ -358,6 +426,11 @@ fn step7_validate_links(git_root: &Path, deps: &mut Deps) -> Result<(), Error> {
     Ok(())
 }
 
+/// Step 8: runs `npm run lint:md` to lint all Markdown files.
+///
+/// # Errors
+///
+/// Returns an error when `npm run lint:md` exits with a non-zero status.
 fn step8_lint_markdown(git_root: &Path, _deps: &mut Deps) -> Result<(), Error> {
     let status = Command::new("npm")
         .arg("run")

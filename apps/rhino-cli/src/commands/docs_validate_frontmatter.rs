@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/docs_validate_frontmatter.go`.
+//! `docs validate-frontmatter` — validates YAML frontmatter in docs and governance files.
+//!
+//! Port of `apps/rhino-cli/cmd/docs_validate_frontmatter.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -13,40 +15,64 @@ use crate::internal::docs::frontmatter::{
 };
 use crate::internal::git;
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/docs-validate-frontmatter/v1";
 
+/// Default paths scanned when no positional arguments are supplied.
 const DEFAULT_PATHS: &[&str] = &["docs/", "repo-governance/"];
 
+/// CLI arguments for `docs validate-frontmatter`.
 #[derive(Args, Debug)]
 pub struct ValidateFrontmatterArgs {
     /// Optional positional paths (override defaults).
     pub positional: Vec<String>,
 }
 
+/// Single frontmatter finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the file containing the finding.
     file: &'a str,
+    /// Severity label (e.g. `"fail"` or `"warn"`).
     severity: &'a str,
+    /// Finding category (e.g. `"missing-title"`).
     kind: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// Inner result summary in JSON output.
 #[derive(Serialize)]
 struct InnerResult<'a> {
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Total number of findings.
     count: usize,
+    /// Number of fail-level findings.
     fail_count: usize,
+    /// Number of warn-level findings.
     warn_count: usize,
+    /// Individual findings.
     findings: Vec<JsonFinding<'a>>,
 }
 
+/// JSON envelope wrapping the frontmatter scan result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Detailed result.
     result: InnerResult<'a>,
 }
 
+/// Run the `docs validate-frontmatter` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the scan fails, or
+/// fail-level findings are detected.
 pub fn run(
     args: &ValidateFrontmatterArgs,
     output_format: OutputFormat,
@@ -88,6 +114,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format frontmatter findings as human-readable text.
 fn format_text(findings: &[DocsFrontmatterFinding]) -> String {
     if !has_fail_findings(findings) && findings.is_empty() {
         return "DOCS FRONTMATTER VALIDATION PASSED: no findings\n".to_string();
@@ -120,6 +147,11 @@ fn format_text(findings: &[DocsFrontmatterFinding]) -> String {
     sb
 }
 
+/// Serialize frontmatter findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[DocsFrontmatterFinding]) -> std::result::Result<String, Error> {
     let status = if has_fail_findings(findings) {
         "failed"
@@ -151,6 +183,7 @@ fn format_json(findings: &[DocsFrontmatterFinding]) -> std::result::Result<Strin
     Ok(s)
 }
 
+/// Format frontmatter findings as a Markdown table.
 fn format_markdown(findings: &[DocsFrontmatterFinding]) -> String {
     if findings.is_empty() {
         return "## Docs Frontmatter Validation\n\n**PASSED**: no findings\n".to_string();

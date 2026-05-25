@@ -1,29 +1,45 @@
-// Port of `apps/rhino-cli/internal/doctor/fixer.go`.
+//! Port of `apps/rhino-cli/internal/doctor/fixer.go`.
+//!
+//! Attempts to auto-install missing tools using the install commands defined
+//! in each [`ToolDef`].  The main entry points are [`fix_all`] (high-level,
+//! rebuilds defs automatically) and [`fix`] (lower-level, accepts pre-built
+//! defs for testing).
 
 use std::process::Command;
 
 use super::tools::{InstallStep, ToolDef, build_tool_defs};
 use super::{CheckOptions, DoctorResult, Scope, ToolStatus, is_minimal_tool};
 
-/// Run a fix command. Return Err on failure.
+/// Executes a single install command step.
+///
+/// Returns `Err(String)` on non-zero exit or spawn failure.
 pub type FixRunnerFunc<'a> = &'a dyn Fn(&str, &[&str]) -> Result<(), String>;
 
-/// Fix invocation options.
+/// Options controlling a fix run.
 #[derive(Default)]
 pub struct FixOptions<'a> {
+    /// When `true`, print what would be done but do not execute any commands.
     pub dry_run: bool,
+    /// Optional runner override; defaults to the real subprocess runner when `None`.
     pub runner: Option<FixRunnerFunc<'a>>,
 }
 
-/// Fix attempt summary.
+/// Summary of a completed fix run.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct FixResult {
+    /// Number of tools that were successfully installed.
     pub fixed: usize,
+    /// Number of tools whose install command returned a non-zero exit code.
     pub failed: usize,
+    /// Number of tools that were already `Ok` or `Warning` (not missing).
     pub already_ok: usize,
+    /// Number of missing tools skipped because no install steps were available.
     pub skipped: usize,
 }
 
+/// Default fix runner: executes `command` with `args`, inheriting stdout/stderr.
+///
+/// Returns `Err` when the process fails to spawn or exits with a non-zero status.
 fn real_fix_runner(command: &str, args: &[&str]) -> Result<(), String> {
     let status = Command::new(command)
         .args(args)
@@ -38,6 +54,8 @@ fn real_fix_runner(command: &str, args: &[&str]) -> Result<(), String> {
     }
 }
 
+/// Returns a platform identifier string: `"darwin"` on macOS, `"linux"` on
+/// Linux, or the Rust `std::env::consts::OS` value otherwise.
 fn current_platform() -> &'static str {
     if cfg!(target_os = "macos") {
         "darwin"
@@ -48,7 +66,15 @@ fn current_platform() -> &'static str {
     }
 }
 
-/// Attempt to install missing tools.
+/// Attempts to install missing tools from a pre-built `defs` list.
+///
+/// For each check in `result` that has status [`ToolStatus::Missing`], the
+/// matching [`ToolDef`] is used to obtain install steps.  Progress messages
+/// are emitted via `printf`.  Tools that are `Ok` or `Warning` are counted
+/// in [`FixResult::already_ok`] and skipped.
+///
+/// When `opts.dry_run` is `true`, steps are printed but not executed, and
+/// [`FixResult::fixed`] remains zero.
 pub fn fix<F>(
     result: &DoctorResult,
     defs: &[ToolDef],
@@ -120,7 +146,11 @@ where
     fr
 }
 
-/// Rebuild defs from check options then call fix.
+/// Builds tool definitions from `opts` and then delegates to [`fix`].
+///
+/// This is the high-level entry point used by the CLI.  It re-creates the
+/// full tool list from the repo root recorded in `opts`, applies the scope
+/// filter, and passes everything to [`fix`].
 pub fn fix_all<F>(
     result: &DoctorResult,
     opts: &CheckOptions<'_>,
@@ -137,7 +167,7 @@ where
     fix(result, &defs, fix_opts, printf)
 }
 
-/// One-line summary.
+/// Returns a one-line human-readable summary of a [`FixResult`].
 pub fn format_fix_summary(fr: &FixResult) -> String {
     format!(
         "\nFix summary: {} fixed, {} failed, {} already OK\n",
@@ -153,6 +183,7 @@ mod tests {
     use std::cell::RefCell;
     use std::time::Duration;
 
+    /// Builds a [`ToolCheck`] with [`ToolStatus::Missing`] for testing.
     fn miss(name: &str) -> ToolCheck {
         ToolCheck {
             name: name.into(),
@@ -165,6 +196,7 @@ mod tests {
         }
     }
 
+    /// Builds a [`ToolCheck`] with [`ToolStatus::Ok`] for testing.
     fn ok(name: &str) -> ToolCheck {
         ToolCheck {
             name: name.into(),
@@ -177,6 +209,7 @@ mod tests {
         }
     }
 
+    /// Builds a minimal [`ToolDef`] with the given `name` and optional install function.
     fn def(name: &str, install: Option<crate::internal::doctor::tools::InstallFunc>) -> ToolDef {
         ToolDef {
             name: name.into(),
@@ -191,6 +224,7 @@ mod tests {
         }
     }
 
+    /// A stub install function that returns a single step running `/bin/echo x`.
     fn install_echo(_req: &str, _platform: &str) -> Vec<InstallStep> {
         vec![InstallStep {
             description: "echo".into(),

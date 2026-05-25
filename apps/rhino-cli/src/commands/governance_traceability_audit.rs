@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_traceability_audit.go`.
+//! `repo-governance traceability-audit` — checks that governance docs reference required vision sections.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_traceability_audit.go`.
 
 use std::fmt::Write as _;
 
@@ -12,33 +14,54 @@ use crate::internal::repo_governance::traceability_audit::{
     TraceabilityFinding, audit_traceability,
 };
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/traceability-audit/v1";
 
+/// CLI arguments for `repo-governance traceability-audit` (none required).
 #[derive(Args, Debug)]
 pub struct TraceabilityAuditArgs {}
 
+/// Single traceability finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the file containing the finding.
     path: &'a str,
+    /// Line number of the offending reference.
     line: usize,
+    /// Finding category.
     kind: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// Inner result summary in JSON output.
 #[derive(Serialize)]
 struct InnerResult<'a> {
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Total number of findings.
     count: usize,
+    /// Individual findings.
     findings: Vec<JsonFinding<'a>>,
 }
 
+/// JSON envelope wrapping the traceability audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Detailed result.
     result: InnerResult<'a>,
 }
 
+/// Run the `repo-governance traceability-audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// traceability findings are detected.
 pub fn run(
     _args: &TraceabilityAuditArgs,
     output_format: OutputFormat,
@@ -62,6 +85,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format traceability findings as human-readable text.
 fn format_text(findings: &[TraceabilityFinding]) -> String {
     if findings.is_empty() {
         return "TRACEABILITY AUDIT PASSED: zero findings\n".to_string();
@@ -78,6 +102,11 @@ fn format_text(findings: &[TraceabilityFinding]) -> String {
     sb
 }
 
+/// Serialize traceability findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[TraceabilityFinding]) -> std::result::Result<String, Error> {
     let status = if findings.is_empty() {
         "passed"
@@ -107,6 +136,7 @@ fn format_json(findings: &[TraceabilityFinding]) -> std::result::Result<String, 
     Ok(s)
 }
 
+/// Format traceability findings as a Markdown table.
 fn format_markdown(findings: &[TraceabilityFinding]) -> String {
     if findings.is_empty() {
         return "## Traceability Audit\n\n**PASSED**: zero findings\n".to_string();

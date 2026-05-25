@@ -1,8 +1,10 @@
-// Audit orchestrator ported from
-// `apps/rhino-cli/internal/repo-governance/audit_orchestrator.go`.
-//
-// Runs the 11 deterministic governance audits in fixed order, normalizes
-// per-category findings to AuditFinding, aggregates into AuditEnvelope.
+//! Audit orchestrator for repository governance.
+//!
+//! Ported from `apps/rhino-cli/internal/repo-governance/audit_orchestrator.go`.
+//!
+//! Runs the 11 deterministic governance audits in fixed order, normalises
+//! per-category findings to [`AuditFinding`], and aggregates them into an
+//! [`AuditEnvelope`].
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -27,10 +29,16 @@ use crate::internal::docs::frontmatter::validate_docs_frontmatter;
 use crate::internal::docs::heading_hierarchy::validate_docs_heading_hierarchy;
 use crate::internal::docs::naming::validate_docs_naming;
 
+/// JSON schema identifier embedded in every [`AuditEnvelope`].
 pub const AUDIT_ENVELOPE_SCHEMA: &str = "rhino-cli/repo-governance-audit/v1";
+/// Severity label applied to all findings emitted by this orchestrator.
 const AUDIT_SEVERITY_HIGH: &str = "high";
+/// Criticality label applied to all findings emitted by this orchestrator.
 const AUDIT_CRITICALITY_HIGH: &str = "HIGH";
 
+/// Returns the fixed ordered slice of audit category names.
+///
+/// Categories are executed in this order by [`run_audit`].
 pub fn audit_category_order() -> &'static [&'static str] {
     &[
         "agents-md-size",
@@ -47,6 +55,9 @@ pub fn audit_category_order() -> &'static [&'static str] {
     ]
 }
 
+/// Maps an audit category `name` to the CLI sub-command that runs it.
+///
+/// Returns an empty string for unrecognised names.
 fn audit_category_command(name: &str) -> &'static str {
     match name {
         "agents-md-size" => "repo-governance agents-md-size",
@@ -64,6 +75,7 @@ fn audit_category_command(name: &str) -> &'static str {
     }
 }
 
+/// Default directory roots scanned by the `frontmatter-audit` category.
 fn default_frontmatter_paths() -> &'static [&'static str] {
     &[
         "repo-governance/",
@@ -73,6 +85,7 @@ fn default_frontmatter_paths() -> &'static [&'static str] {
         "plans/",
     ]
 }
+/// Default directory roots scanned by the `readme-index-audit` category.
 fn default_readme_index_paths() -> &'static [&'static str] {
     &[
         "repo-governance/",
@@ -81,12 +94,15 @@ fn default_readme_index_paths() -> &'static [&'static str] {
         "docs/explanation/software-engineering/",
     ]
 }
+/// Default directory roots scanned by the `emoji-audit` category.
 fn default_emoji_paths() -> &'static [&'static str] {
     &["."]
 }
+/// Default directory roots scanned by the `docs-validate-naming` category.
 fn default_docs_validate_naming_paths() -> &'static [&'static str] {
     &["docs/", "repo-governance/"]
 }
+/// Default directory roots scanned by the `docs-validate-frontmatter` category.
 fn default_docs_validate_frontmatter_paths() -> &'static [&'static str] {
     &[
         "docs/explanation/software-engineering/",
@@ -96,69 +112,122 @@ fn default_docs_validate_frontmatter_paths() -> &'static [&'static str] {
         "repo-governance/workflows/",
     ]
 }
+/// Default directory roots scanned by the `docs-validate-heading-hierarchy` category.
 fn default_docs_validate_heading_hierarchy_paths() -> &'static [&'static str] {
     &["docs/", "repo-governance/"]
 }
 
+/// Configuration options for a single [`run_audit`] invocation.
 #[derive(Debug, Clone, Default)]
 pub struct AuditOptions {
+    /// Absolute path to the repository root used to resolve relative search paths.
     pub repo_root: PathBuf,
+    /// Category names to skip entirely.
     pub skip: Vec<String>,
+    /// When non-empty only these category names are executed (allowlist).
     pub include_only: Vec<String>,
-    pub now: Option<String>, // RFC3339; None → time::now
+    /// Override for the `ran_at` timestamp (RFC 3339). `None` defaults to `Utc::now()`.
+    pub now: Option<String>,
+    /// Override search roots for the `frontmatter-audit` category.
     pub frontmatter_audit_paths: Vec<String>,
+    /// Override search roots for the `readme-index-audit` category.
     pub readme_index_audit_paths: Vec<String>,
+    /// Override search roots for the `emoji-audit` category.
     pub emoji_audit_paths: Vec<String>,
+    /// Override search roots for the `docs-validate-naming` category.
     pub docs_validate_naming_paths: Vec<String>,
+    /// Override search roots for the `docs-validate-frontmatter` category.
     pub docs_validate_frontmatter_paths: Vec<String>,
+    /// Override search roots for the `docs-validate-heading-hierarchy` category.
     pub docs_validate_heading_hierarchy_paths: Vec<String>,
+    /// Path to a known-false-positives Markdown file. Defaults to
+    /// `generated-reports/.known-false-positives.md` under `repo_root`.
     pub known_false_positives_path: Option<PathBuf>,
+    /// Glob patterns; findings whose `file` field matches are excluded.
     pub exclude_globs: Vec<String>,
 }
 
+/// Top-level JSON envelope returned by [`run_audit`].
 #[derive(Debug, Clone, Serialize)]
 pub struct AuditEnvelope {
+    /// Schema identifier; always `AUDIT_ENVELOPE_SCHEMA`.
     pub schema: String,
+    /// Overall outcome: `"ok"` (zero findings) or `"failed"`.
     pub status: String,
+    /// Detailed audit results.
     pub result: AuditResult,
 }
 
+/// Detailed outcome of a [`run_audit`] call.
 #[derive(Debug, Clone, Serialize)]
 pub struct AuditResult {
+    /// Short git SHA of `HEAD` at audit time, or `"unknown"`.
     pub git_sha: String,
+    /// RFC 3339 timestamp at which the audit ran.
     pub ran_at: String,
+    /// Total number of findings across all categories.
     pub total_findings: usize,
+    /// Finding counts keyed by severity string.
     pub by_severity: BTreeMap<String, usize>,
+    /// Finding counts keyed by category name.
     pub by_category: BTreeMap<String, usize>,
+    /// Per-category results in execution order.
     pub categories: Vec<AuditCategoryResult>,
+    /// Findings that were suppressed via the known-false-positives list.
     pub skipped_false_positives: Vec<AuditFinding>,
 }
 
+/// Result for a single audit category.
 #[derive(Debug, Clone, Serialize)]
 pub struct AuditCategoryResult {
+    /// Category name (matches an entry in [`audit_category_order`]).
     pub name: String,
+    /// CLI sub-command that runs this category.
     pub command: String,
+    /// `true` when `findings` is empty after false-positive filtering.
     pub passed: bool,
+    /// All findings for this category.
     pub findings: Vec<AuditFinding>,
 }
 
+/// A single governance finding produced by any audit category.
 #[derive(Debug, Clone, Serialize)]
 pub struct AuditFinding {
+    /// Stable key used for false-positive suppression (format:
+    /// `<category>|<file>|<hash8>`).
     pub key: String,
+    /// Severity label (currently always `"high"`).
     pub severity: String,
+    /// Criticality label (currently always `"HIGH"`).
     pub criticality: String,
+    /// Path of the file that triggered the finding; omitted when empty.
     #[serde(skip_serializing_if = "str::is_empty")]
     pub file: String,
+    /// 1-based line number within `file`; omitted when zero.
     #[serde(skip_serializing_if = "skip_zero")]
     pub line: usize,
+    /// Human-readable description of the finding.
     pub message: String,
 }
 
+/// Returns `true` when `n` is zero; used as a `serde` skip predicate.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn skip_zero(n: &usize) -> bool {
     *n == 0
 }
 
+/// Runs all governance audits described by `opts` and returns a consolidated
+/// [`AuditEnvelope`].
+///
+/// Categories listed in `opts.skip` are not executed.  When `opts.include_only`
+/// is non-empty only those categories are executed.  Known false positives
+/// loaded from the file referenced by `opts.known_false_positives_path` are
+/// moved from `categories` findings into `skipped_false_positives`.
+///
+/// # Errors
+///
+/// Returns an error if any category fails to execute (e.g., an IO error while
+/// walking the filesystem or deserialising YAML).
 pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Error> {
     let ran_at = opts
         .now
@@ -216,6 +285,12 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
     })
 }
 
+/// Dispatches a single audit `name` to the appropriate runner.
+///
+/// # Errors
+///
+/// Returns an error for unrecognised category names or when the delegated
+/// runner propagates an IO or parse error.
 fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<AuditFinding>, Error> {
     match name {
         "agents-md-size" | "frontmatter-audit" | "traceability-audit" | "license-audit"
@@ -230,6 +305,13 @@ fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<Audi
     }
 }
 
+/// Executes one of the seven governance-specific audit categories and returns
+/// normalised [`AuditFinding`]s.
+///
+/// # Errors
+///
+/// Returns an error for unrecognised category names or IO failures within the
+/// delegated audit function.
 fn run_category_governance(
     name: &str,
     opts: &AuditOptions,
@@ -319,6 +401,13 @@ fn run_category_governance(
     }
 }
 
+/// Executes one of the four docs/agents audit categories and returns normalised
+/// [`AuditFinding`]s.
+///
+/// # Errors
+///
+/// Returns an error for unrecognised category names or IO failures within the
+/// delegated audit function.
 fn run_category_docs(
     name: &str,
     opts: &AuditOptions,
@@ -380,6 +469,11 @@ fn run_category_docs(
     }
 }
 
+/// Resolves a search-path list against `repo_root`.
+///
+/// When `override_paths` is non-empty those paths are used; otherwise
+/// `defaults` are used.  Relative paths are joined to `repo_root`; absolute
+/// paths are kept as-is.
 fn resolve_paths(repo_root: &Path, override_paths: &[String], defaults: &[&str]) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let push_resolved = |out: &mut Vec<String>, p: &str| {
@@ -412,6 +506,8 @@ fn go_filepath_join(base: &str, rel: &str) -> String {
     clean_path(&joined)
 }
 
+/// Lexically cleans `p` by resolving `.` and `..` segments and collapsing
+/// duplicate slashes — mirrors Go's `path.Clean`.
 #[allow(clippy::collapsible_if, clippy::collapsible_match)]
 fn clean_path(p: &str) -> String {
     if p.is_empty() {
@@ -446,6 +542,10 @@ fn clean_path(p: &str) -> String {
     }
 }
 
+/// Returns `true` when `path` matches at least one of the `globs`.
+///
+/// Supports `/**` suffix (directory subtree) and simple `*` wildcards.
+/// Path separators are normalised to `/` before matching.
 fn path_matches_any_glob(path: &str, globs: &[String]) -> bool {
     let slashed_path = path.replace('\\', "/");
     for g in globs {
@@ -475,6 +575,11 @@ fn path_matches_any_glob(path: &str, globs: &[String]) -> bool {
     false
 }
 
+/// Minimal `*`-wildcard glob matcher.
+///
+/// Splits `pattern` on `*` and verifies that the resulting segments appear in
+/// `s` in order, anchoring the first segment to the start and the last to the
+/// end.
 fn simple_match(pattern: &str, s: &str) -> bool {
     // Minimal `*` glob matcher.
     let parts: Vec<&str> = pattern.split('*').collect();
@@ -499,6 +604,7 @@ fn simple_match(pattern: &str, s: &str) -> bool {
     true
 }
 
+/// Removes findings whose `file` field matches any of `exclude_globs`.
 fn filter_excluded(findings: Vec<AuditFinding>, exclude_globs: &[String]) -> Vec<AuditFinding> {
     if exclude_globs.is_empty() {
         return findings;
@@ -509,6 +615,8 @@ fn filter_excluded(findings: Vec<AuditFinding>, exclude_globs: &[String]) -> Vec
         .collect()
 }
 
+/// Constructs a new [`AuditFinding`] with a deterministic `key` derived from
+/// `category`, `file`, and `message`.
 fn new_audit_finding(category: &str, file: &str, line: usize, message: &str) -> AuditFinding {
     AuditFinding {
         key: build_audit_key(category, file, message),
@@ -520,6 +628,10 @@ fn new_audit_finding(category: &str, file: &str, line: usize, message: &str) -> 
     }
 }
 
+/// Builds a stable, human-readable key for a finding.
+///
+/// Format: `<category>|<file>|<sha256_prefix_8>` where the hash covers only
+/// `message`.
 fn build_audit_key(category: &str, file: &str, message: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(message.as_bytes());
@@ -527,6 +639,8 @@ fn build_audit_key(category: &str, file: &str, message: &str) -> String {
     format!("{category}|{file}|{}", &digest[..8])
 }
 
+/// Sorts `findings` by `file`, then by `line`, then by `key` for a stable,
+/// deterministic output order.
 fn sort_audit_findings(findings: &mut [AuditFinding]) {
     findings.sort_by(|a, b| {
         a.file
@@ -536,11 +650,21 @@ fn sort_audit_findings(findings: &mut [AuditFinding]) {
     });
 }
 
+/// Returns a compiled `Regex` that matches backtick-quoted keys in a
+/// known-false-positives Markdown bullet list.
 fn known_false_positive_pattern() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"(?m)^\s*-\s+`([^`]+)`").expect("valid hardcoded regex"))
 }
 
+/// Loads the set of known-false-positive keys from the Markdown file referenced
+/// by `opts`.
+///
+/// Returns an empty set when the file does not exist (not an error).
+///
+/// # Errors
+///
+/// Returns an error when the file exists but cannot be read.
 fn load_known_false_positives(
     opts: &AuditOptions,
 ) -> std::result::Result<std::collections::HashSet<String>, Error> {
@@ -562,6 +686,11 @@ fn load_known_false_positives(
     }
 }
 
+/// Splits each category's findings into kept and skipped sets.
+///
+/// Any finding whose `key` is present in `skip_set` is moved into the returned
+/// `skipped` vector; the rest remain in the category.  The skipped vector is
+/// sorted by `key` for deterministic output.
 fn partition_false_positives(
     mut categories: Vec<AuditCategoryResult>,
     skip_set: &std::collections::HashSet<String>,
@@ -583,6 +712,10 @@ fn partition_false_positives(
     (categories, skipped)
 }
 
+/// Reads the short `HEAD` SHA from the git repository at `repo_root`.
+///
+/// Returns `"unknown"` when the `git` command fails or produces non-UTF-8
+/// output.
 fn read_git_sha(repo_root: &Path) -> String {
     let out = std::process::Command::new("git")
         .arg("-C")
@@ -597,10 +730,11 @@ fn read_git_sha(repo_root: &Path) -> String {
     }
 }
 
-// hex encoding (no `hex` crate dependency).
+/// Minimal hex encoding without a `hex` crate dependency.
 mod hex {
     use std::fmt::Write as FmtWrite;
 
+    /// Encodes `bytes` as a lowercase hexadecimal string.
     pub fn encode<T: AsRef<[u8]>>(bytes: T) -> String {
         let b = bytes.as_ref();
         let mut s = String::with_capacity(b.len() * 2);

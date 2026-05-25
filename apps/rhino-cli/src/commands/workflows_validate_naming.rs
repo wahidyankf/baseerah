@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/workflows_validate_naming.go`.
+//! `workflows validate-naming` — checks that workflow file names carry valid type suffixes.
+//!
+//! Port of `apps/rhino-cli/cmd/workflows_validate_naming.go`.
 
 use std::fs;
 use std::path::Path;
@@ -13,11 +15,19 @@ use crate::internal::naming::{self, Violation};
 
 use crate::internal::naming::reporter::{format_json, format_markdown, format_text};
 
+/// Accepted type suffixes for workflow file names.
 const WORKFLOW_TYPES: &[&str] = &["quality-gate", "execution", "setup"];
 
+/// CLI arguments for `workflows validate-naming` (none required).
 #[derive(Args, Debug)]
 pub struct ValidateNamingArgs {}
 
+/// Run the `workflows validate-naming` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, a workflow file cannot be
+/// read, or naming violations are detected.
 pub fn run(
     _args: &ValidateNamingArgs,
     output_format: OutputFormat,
@@ -38,6 +48,11 @@ pub fn run(
     Ok(())
 }
 
+/// Collect naming violations for workflow files under `repo_root`.
+///
+/// # Errors
+///
+/// Returns an error if a workflow file cannot be read from disk.
 fn workflows_validate_naming(repo_root: &str) -> std::result::Result<Vec<Violation>, Error> {
     let root = Path::new(repo_root)
         .join("repo-governance")
@@ -57,6 +72,7 @@ fn workflows_validate_naming(repo_root: &str) -> std::result::Result<Vec<Violati
     Ok(violations)
 }
 
+/// Return sorted paths of workflow `.md` files in `root`, excluding `meta/` subdirs and `README.md`.
 fn list_workflow_files(root: &Path) -> Vec<String> {
     if !root.exists() {
         return Vec::new();

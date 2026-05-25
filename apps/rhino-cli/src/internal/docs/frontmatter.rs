@@ -1,4 +1,11 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/docs/frontmatter.go`.
+//! YAML frontmatter validator for repository markdown files.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/docs/frontmatter.go`.
+//!
+//! Files in `docs/explanation/software-engineering/` are checked against the
+//! full software schema (title, description, category, subcategory, tags).
+//! Files under `repo-governance/` subdirectories are checked against the
+//! lighter governance schema (title required, description recommended).
 
 use std::fs;
 use std::path::Path;
@@ -6,31 +13,50 @@ use std::path::Path;
 use anyhow::{Error, anyhow};
 use walkdir::WalkDir;
 
+/// A single frontmatter validation finding for a markdown file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DocsFrontmatterFinding {
+    /// Path to the file that contains the finding.
     pub file: String,
+    /// Severity string: `"fail"` or `"warn"`.
     pub severity: String,
+    /// Machine-readable kind identifier (e.g. `"missing-title"`).
     pub kind: String,
+    /// Human-readable description of the issue.
     pub message: String,
 }
 
+/// Severity string for findings that must block the pipeline.
 const SEVERITY_FAIL: &str = "fail";
+/// Severity string for findings that are advisory warnings only.
 const SEVERITY_WARN: &str = "warn";
 
+/// Finding kind for files whose frontmatter block is not valid YAML.
 const KIND_INVALID_YAML: &str = "invalid-yaml";
+/// Finding kind for files that have no `---`-delimited frontmatter block at all.
 const KIND_MISSING_FRONTMATTER: &str = "missing-frontmatter";
+/// Finding kind for frontmatter blocks that are missing the `title` field.
 const KIND_MISSING_TITLE: &str = "missing-title";
+/// Finding kind for frontmatter blocks that are missing the `description` field.
 const KIND_MISSING_DESCRIPTION: &str = "missing-description";
+/// Finding kind for frontmatter blocks that are missing the `category` field.
 const KIND_MISSING_CATEGORY: &str = "missing-category";
+/// Finding kind for frontmatter blocks that are missing the `subcategory` field.
 const KIND_MISSING_SUBCATEGORY: &str = "missing-subcategory";
+/// Finding kind for frontmatter blocks that are missing the `tags` field.
 const KIND_MISSING_TAGS: &str = "missing-tags";
+/// Finding kind for frontmatter blocks whose `category` value is not in the allowed set.
 const KIND_WRONG_CATEGORY_VALUE: &str = "wrong-category-value";
+/// Finding kind for frontmatter blocks whose `category` is `"software"` (deprecated).
 const KIND_CATEGORY_DEPRECATED: &str = "category-deprecated";
 
+/// The allowed values for the `category` frontmatter field (Diátaxis framework).
 const VALID_CATEGORIES: &[&str] = &["tutorial", "how-to", "reference", "explanation"];
 
+/// Path fragment that identifies software-engineering explanation documents.
 const SOFTWARE_DOC_PREFIX: &str = "docs/explanation/software-engineering/";
 
+/// Path fragments that identify governance documents.
 const GOVERNANCE_DOC_PREFIXES: &[&str] = &[
     "repo-governance/conventions/",
     "repo-governance/principles/",
@@ -38,15 +64,29 @@ const GOVERNANCE_DOC_PREFIXES: &[&str] = &[
     "repo-governance/workflows/",
 ];
 
+/// Directory names that are skipped during recursive walks.
 const SKIP_DIRS: &[&str] = &["node_modules", ".git", ".next", "dist", "build", "target"];
 
+/// Classifies a markdown file as belonging to a known documentation area.
 #[derive(Clone, Copy)]
 enum DocArea {
+    /// The file is not in any recognised documentation area.
     Unknown,
+    /// The file is in `docs/explanation/software-engineering/`.
     Software,
+    /// The file is under one of the `repo-governance/` sub-trees.
     Governance,
 }
 
+/// Validates the YAML frontmatter of every markdown file reachable from `paths`.
+///
+/// Files outside the recognised documentation areas ([`SOFTWARE_DOC_PREFIX`],
+/// [`GOVERNANCE_DOC_PREFIXES`]) are silently skipped.  The returned list is
+/// sorted by file path, then by finding kind.
+///
+/// # Errors
+///
+/// Returns an error when `paths` is empty, or when a file cannot be read.
 pub fn validate_docs_frontmatter(
     paths: &[String],
 ) -> std::result::Result<Vec<DocsFrontmatterFinding>, Error> {
@@ -61,6 +101,14 @@ pub fn validate_docs_frontmatter(
     Ok(findings)
 }
 
+/// Walks `root` recursively and collects frontmatter findings from every
+/// markdown file in a recognised documentation area.
+///
+/// Returns an empty list if `root` does not exist on the filesystem.
+///
+/// # Errors
+///
+/// Returns an error when a markdown file cannot be read.
 fn walk_frontmatter_path(root: &str) -> std::result::Result<Vec<DocsFrontmatterFinding>, Error> {
     let root_p = Path::new(root);
     if !root_p.exists() {
@@ -93,6 +141,9 @@ fn walk_frontmatter_path(root: &str) -> std::result::Result<Vec<DocsFrontmatterF
     Ok(findings)
 }
 
+/// Determines which documentation area `path` belongs to.
+///
+/// Returns [`DocArea::Unknown`] when the path does not match any known prefix.
 fn classify_doc_area(path: &str) -> DocArea {
     let slashed = path.replace('\\', "/");
     if slashed.contains(SOFTWARE_DOC_PREFIX) {
@@ -106,6 +157,15 @@ fn classify_doc_area(path: &str) -> DocArea {
     DocArea::Unknown
 }
 
+/// Reads `path`, extracts the frontmatter block, parses it as YAML, and
+/// delegates to the area-specific schema validator.
+///
+/// Returns a single `missing-frontmatter` finding when no `---` fence is found,
+/// or a single `invalid-yaml` finding when the block is not valid YAML.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be read from disk.
 fn scan_frontmatter_file(
     path: &str,
     area: DocArea,
@@ -137,6 +197,9 @@ fn scan_frontmatter_file(
     })
 }
 
+/// Extracts the YAML content between the first pair of `---` fences.
+///
+/// Returns `None` when the file does not begin with `---` or has no closing fence.
 fn extract_frontmatter(content: &str) -> Option<String> {
     let lines: Vec<&str> = content.split('\n').collect();
     if lines.is_empty() || lines[0].trim() != "---" {
@@ -150,6 +213,10 @@ fn extract_frontmatter(content: &str) -> Option<String> {
     None
 }
 
+/// Validates the full software-engineering frontmatter schema.
+///
+/// Required fields: `title`, `description`, `category` (one of
+/// [`VALID_CATEGORIES`]), `subcategory`, `tags` (non-empty list).
 fn validate_software_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFrontmatterFinding> {
     let mut findings = Vec::new();
     if !has_non_empty_string(fm, "title") {
@@ -211,6 +278,9 @@ fn validate_software_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFrontm
     findings
 }
 
+/// Validates the lighter governance-document frontmatter schema.
+///
+/// `title` is required (fail); `description` is recommended (warn).
 fn validate_governance_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFrontmatterFinding> {
     let mut findings = Vec::new();
     if !has_non_empty_string(fm, "title") {
@@ -231,6 +301,7 @@ fn validate_governance_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFron
     findings
 }
 
+/// Constructs a `fail`-severity [`DocsFrontmatterFinding`].
 fn mk_fail(path: &str, kind: &str, message: &str) -> DocsFrontmatterFinding {
     DocsFrontmatterFinding {
         file: path.to_string(),
@@ -240,12 +311,16 @@ fn mk_fail(path: &str, kind: &str, message: &str) -> DocsFrontmatterFinding {
     }
 }
 
+/// Returns `true` when `fm[key]` is a non-empty, non-whitespace-only string.
 fn has_non_empty_string(fm: &serde_yml::Value, key: &str) -> bool {
     let v = fm.get(key);
     let s = string_value(v);
     !s.trim().is_empty()
 }
 
+/// Coerces a YAML value to a `String` for display and comparison purposes.
+///
+/// `None` and `Null` map to an empty string.
 fn string_value(v: Option<&serde_yml::Value>) -> String {
     match v {
         None | Some(serde_yml::Value::Null) => String::new(),
@@ -259,6 +334,7 @@ fn string_value(v: Option<&serde_yml::Value>) -> String {
     }
 }
 
+/// Returns `true` when `fm[key]` is a YAML sequence with at least one element.
 fn has_non_empty_list(fm: &serde_yml::Value, key: &str) -> bool {
     match fm.get(key) {
         Some(serde_yml::Value::Sequence(list)) => !list.is_empty(),
@@ -266,10 +342,12 @@ fn has_non_empty_list(fm: &serde_yml::Value, key: &str) -> bool {
     }
 }
 
+/// Returns `true` when any finding in the slice has severity `"fail"`.
 pub fn has_fail_findings(findings: &[DocsFrontmatterFinding]) -> bool {
     findings.iter().any(|f| f.severity == SEVERITY_FAIL)
 }
 
+/// Counts the number of findings in `findings` that match the given severity string.
 pub fn count_severity(findings: &[DocsFrontmatterFinding], sev: &str) -> usize {
     findings.iter().filter(|f| f.severity == sev).count()
 }
@@ -281,17 +359,20 @@ mod tests {
     use std::fs;
     use tempfile::TempDir;
 
+    /// Creates a file at `p`, making parent directories as needed.
     fn write(p: &Path, content: &str) {
         fs::create_dir_all(p.parent().unwrap()).unwrap();
         fs::write(p, content).unwrap();
     }
 
+    /// Verifies that an empty paths slice returns an error.
     #[test]
     fn errors_on_empty_paths() {
         let err = validate_docs_frontmatter(&[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
+    /// Verifies that a file with no frontmatter emits a `missing-frontmatter` fail finding.
     #[test]
     fn missing_frontmatter_emits_fail() {
         let tmp = TempDir::new().unwrap();
@@ -305,6 +386,7 @@ mod tests {
         assert!(findings.iter().any(|f| f.kind == KIND_MISSING_FRONTMATTER));
     }
 
+    /// Verifies that a file with all required software fields passes without findings.
     #[test]
     fn software_full_schema_passes() {
         let tmp = TempDir::new().unwrap();
@@ -318,6 +400,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that missing required software fields each produce a fail finding.
     #[test]
     fn software_missing_required_fields_emit_fails() {
         let tmp = TempDir::new().unwrap();
@@ -335,6 +418,7 @@ mod tests {
         assert!(kinds.contains(&KIND_MISSING_TAGS));
     }
 
+    /// Verifies that the deprecated `"software"` category value emits a warn finding.
     #[test]
     fn software_deprecated_category_emits_warn() {
         let tmp = TempDir::new().unwrap();
@@ -352,6 +436,7 @@ mod tests {
         assert_eq!(f.severity, SEVERITY_WARN);
     }
 
+    /// Verifies that an unrecognised category value emits a fail finding.
     #[test]
     fn software_wrong_category_emits_fail() {
         let tmp = TempDir::new().unwrap();
@@ -365,6 +450,8 @@ mod tests {
         assert!(findings.iter().any(|f| f.kind == KIND_WRONG_CATEGORY_VALUE));
     }
 
+    /// Verifies that a governance file with no `title` gets a fail and a missing
+    /// `description` gets a warn.
     #[test]
     fn governance_title_required_description_warned() {
         let tmp = TempDir::new().unwrap();
@@ -384,6 +471,7 @@ mod tests {
         assert_eq!(desc.severity, SEVERITY_WARN);
     }
 
+    /// Verifies that a governance file with all recommended fields passes.
     #[test]
     fn governance_full_schema_passes() {
         let tmp = TempDir::new().unwrap();
@@ -396,6 +484,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that files outside recognised areas are silently skipped.
     #[test]
     fn unknown_area_passes() {
         let tmp = TempDir::new().unwrap();
@@ -405,6 +494,7 @@ mod tests {
         assert!(findings.is_empty());
     }
 
+    /// Verifies that invalid YAML in the frontmatter block emits an `invalid-yaml` fail.
     #[test]
     fn invalid_yaml_emits_fail() {
         let tmp = TempDir::new().unwrap();
@@ -418,6 +508,8 @@ mod tests {
         assert!(findings.iter().any(|f| f.kind == KIND_INVALID_YAML));
     }
 
+    /// Verifies that [`has_fail_findings`] correctly identifies the presence or absence
+    /// of fail-severity findings.
     #[test]
     fn has_fail_findings_detects_severity() {
         let f1 = DocsFrontmatterFinding {

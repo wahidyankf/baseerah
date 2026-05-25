@@ -1,4 +1,8 @@
-// Specs validators ported from `apps/rhino-cli/cmd/specs_validate_*.go`.
+//! Spec-tree validators for OSE Platform spec conventions.
+//!
+//! Ports `apps/rhino-cli/cmd/specs_validate_*.go`. Each public function
+//! validates one aspect of the spec-tree structure and returns a
+//! (potentially empty) list of [`SpecFinding`] values.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -7,15 +11,25 @@ use std::sync::OnceLock;
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A single validation finding produced by one of the `validate_spec_*`
+/// functions.
 #[derive(Debug, Clone)]
 pub struct SpecFinding {
+    /// Validation category (e.g. `"adoption"`, `"count"`, `"links"`,
+    /// `"tree-shape"`).
     pub category: String,
+    /// Severity level: `"HIGH"`, `"MEDIUM"`, or `"LOW"`.
     pub criticality: String,
+    /// Repo-relative path to the offending file or directory.
     pub file: String,
+    /// Human-readable description of what was found.
     pub evidence: String,
+    /// Suggested remediation step.
     pub expected: String,
 }
 
+/// Returns the ordered list of subfolder names that every spec tree is required
+/// to contain.
 pub fn required_spec_folders() -> &'static [&'static str] {
     &[
         "product",
@@ -26,6 +40,9 @@ pub fn required_spec_folders() -> &'static [&'static str] {
     ]
 }
 
+/// Recursively walks `dir` and returns all `.feature` files in sorted order.
+///
+/// Returns an empty `Vec` if `dir` cannot be read.
 pub fn walk_feature_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
     let Ok(entries) = fs::read_dir(dir) else {
@@ -48,6 +65,9 @@ pub fn walk_feature_files(dir: &Path) -> Vec<PathBuf> {
     out
 }
 
+/// Recursively walks `dir` and returns all `.md` files in sorted order.
+///
+/// Returns an empty `Vec` if `dir` cannot be read.
 pub fn walk_md_files(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
     let Ok(entries) = fs::read_dir(dir) else {
@@ -70,6 +90,11 @@ pub fn walk_md_files(dir: &Path) -> Vec<PathBuf> {
     out
 }
 
+/// Counts `.feature` files and non-`README.md` `.md` files under `dir`
+/// recursively.
+///
+/// `README.md` (case-insensitive) is excluded from the count because it is
+/// the required index file for each folder and does not constitute a spec.
 pub fn count_non_readme_md_files(dir: &Path) -> usize {
     let mut count = 0;
     for entry in WalkDir::new(dir).into_iter().flatten() {
@@ -89,6 +114,13 @@ pub fn count_non_readme_md_files(dir: &Path) -> usize {
 
 // ---- validate-adoption ----
 
+/// Checks that `app` has adopted the OSE spec conventions by verifying that:
+///
+/// - `specs/apps/<app>/behavior/` exists and contains at least one `.feature`
+///   file.
+/// - `specs/apps/<app>/ddd/bounded-contexts.yaml` exists.
+///
+/// Returns a [`SpecFinding`] with `criticality = "HIGH"` for each violation.
 pub fn validate_spec_adoption(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
     let mut findings = Vec::new();
     let base = repo_root.join("specs/apps").join(app);
@@ -129,6 +161,12 @@ pub fn validate_spec_adoption(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
 
 // ---- validate-counts ----
 
+/// Checks that `folder` (resolved against `repo_root` if relative) exists and
+/// that each of the [`required_spec_folders`] is present and non-empty.
+///
+/// Returns a `"HIGH"` finding if the root folder or a required subfolder is
+/// missing, and a `"MEDIUM"` finding if a subfolder exists but contains no
+/// non-`README.md` spec files.
 pub fn validate_spec_counts(repo_root: &Path, folder: &str) -> Vec<SpecFinding> {
     let mut findings = Vec::new();
     let abs = if Path::new(folder).is_absolute() {
@@ -177,11 +215,21 @@ pub fn validate_spec_counts(repo_root: &Path, folder: &str) -> Vec<SpecFinding> 
 
 // ---- validate-links ----
 
+/// Returns the lazily-compiled regex that matches a Markdown link of the form
+/// `[text](target)`.
 fn markdown_link_re() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"\[([^\]]*)\]\(([^)]+)\)").expect("valid hardcoded regex"))
 }
 
+/// Checks all `.md` files under `folder` for broken internal links.
+///
+/// External links (starting with `http://` or `https://`) and anchor-only
+/// links (empty path before `#`) are ignored.  A finding with
+/// `criticality = "HIGH"` is emitted for each link whose resolved target file
+/// does not exist.
+///
+/// `folder` is resolved against `repo_root` if it is a relative path.
 pub fn validate_spec_links(repo_root: &Path, folder: &str) -> Vec<SpecFinding> {
     let mut findings = Vec::new();
     let abs = if Path::new(folder).is_absolute() {
@@ -238,6 +286,11 @@ pub fn validate_spec_links(repo_root: &Path, folder: &str) -> Vec<SpecFinding> {
     findings
 }
 
+/// Returns `path` relative to `base` by stripping the `base` prefix from the
+/// string representation.
+///
+/// Returns the full string of `path` unchanged if it does not start with
+/// `base`.
 fn pathdiff_starts_with(path: &Path, base: &Path) -> String {
     let p = path.to_string_lossy().to_string();
     let b = base.to_string_lossy().to_string();
@@ -250,6 +303,11 @@ fn pathdiff_starts_with(path: &Path, base: &Path) -> String {
 
 // ---- validate-tree ----
 
+/// Checks that the spec-tree for `app` has all required top-level subfolders
+/// and that each subfolder contains a `README.md`.
+///
+/// Returns a `"HIGH"` finding for each missing folder and each missing
+/// `README.md`.
 pub fn validate_spec_tree(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
     let mut findings = Vec::new();
     let base = repo_root.join("specs/apps").join(app);
@@ -281,8 +339,13 @@ pub fn validate_spec_tree(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
 
 // ---- validate-gherkin-domains ----
 
-/// Every `.feature` file under `behavior/<surface>/gherkin/` must live inside a domain
-/// subdirectory, not at the gherkin root. Flat files are a HIGH finding.
+/// Checks that every `.feature` file under
+/// `behavior/<surface>/gherkin/` lives inside a domain subdirectory rather
+/// than directly at the `gherkin/` root.
+///
+/// Flat `.feature` files at the `gherkin/` level are reported as `"HIGH"`
+/// findings because they violate the required layout:
+/// `behavior/<surface>/gherkin/<domain>/<feature>.feature`.
 pub fn validate_spec_gherkin_domains(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
     let mut findings = Vec::new();
     let behavior = repo_root.join("specs/apps").join(app).join("behavior");

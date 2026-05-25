@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/agents_validate_sync.go`.
+//! `agents validate-sync` — checks that `.opencode/agents/` mirrors `.claude/agents/` exactly.
+//!
+//! Port of `apps/rhino-cli/cmd/agents_validate_sync.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -10,6 +12,7 @@ use crate::internal::agents::sync_validator::validate_sync;
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// CLI arguments for `agents validate-sync`.
 #[derive(Args, Debug)]
 pub struct ValidateSyncArgs {
     /// Verbose output (show all checks).
@@ -20,6 +23,12 @@ pub struct ValidateSyncArgs {
     pub quiet: bool,
 }
 
+/// Run the `agents validate-sync` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found or if any sync validation
+/// checks fail.
 pub fn run(args: &ValidateSyncArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

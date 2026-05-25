@@ -1,4 +1,10 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/docs/links_*.go`.
+//! Relative markdown link validator.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/docs/links_*.go`.
+//!
+//! Scans markdown files for relative links and verifies that each target
+//! exists on the filesystem.  External URLs, anchor-only links, and a
+//! curated set of known placeholder patterns are silently skipped.
 
 use std::collections::HashMap;
 use std::fmt::Write as _;
@@ -13,45 +19,78 @@ use chrono::Local;
 use regex::Regex;
 use walkdir::WalkDir;
 
+/// A relative markdown link that could not be resolved to an existing file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BrokenLink {
+    /// One-based line number where the link appears in the source file.
     pub line_number: usize,
+    /// Repository-relative path of the file that contains the link.
     pub source_file: String,
+    /// The raw link target string (after stripping angle-bracket wrappers).
     pub link_text: String,
+    /// Absolute path that the link resolved to (does not exist).
     pub target_path: String,
+    /// Human-readable category for grouping in reports.
     pub category: String,
 }
 
+/// Aggregated result returned by [`validate_all_links`].
 pub struct LinkValidationResult {
+    /// Total number of markdown files scanned.
     pub total_files: usize,
+    /// Total number of relative links examined.
     pub total_links: usize,
+    /// All broken links found during the scan.
     pub broken_links: Vec<BrokenLink>,
+    /// Broken links grouped by their [`categorize_broken_link`] category string.
     pub broken_by_category: HashMap<String, Vec<BrokenLink>>,
+    /// Wall-clock time for the full scan, in milliseconds.
     pub scan_duration_ms: i64,
 }
 
+/// Options that control the behaviour of [`validate_all_links`].
 pub struct ScanOptions {
+    /// Absolute path to the repository root.
     pub repo_root: PathBuf,
+    /// When `true`, only files staged in the Git index are scanned.
     pub staged_only: bool,
+    /// Repository-relative path prefixes that are excluded from scanning.
     pub skip_paths: Vec<String>,
 }
 
+/// Internal representation of a parsed markdown link before validation.
 #[derive(Debug, Clone)]
 struct LinkInfo {
+    /// One-based source line number.
     line_number: usize,
+    /// Raw URL string extracted from the markdown link syntax.
     url: String,
 }
 
+/// Returns the compiled regex for matching `[text](url)` markdown links.
 fn link_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\[([^\]]+)\]\(([^)]+)\)").expect("valid hardcoded regex"))
 }
 
+/// Returns the compiled regex for matching bracket-style placeholder tokens
+/// such as `[placeholder-name]`.
 fn bracket_placeholder_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\[[\w-]+\]").expect("valid hardcoded regex"))
 }
 
+/// Scans all markdown files according to `opts` and returns a [`LinkValidationResult`].
+///
+/// # Errors
+///
+/// Returns an error when the list of files to scan cannot be determined (e.g. the
+/// `git diff --cached` command fails when `staged_only` is `true`).
+///
+/// # Panics
+///
+/// Panics if the elapsed scan duration in milliseconds does not fit in `i64`,
+/// which cannot happen for any realistic scan duration.
 pub fn validate_all_links(opts: &ScanOptions) -> std::result::Result<LinkValidationResult, Error> {
     let start = Instant::now();
     let files = get_markdown_files(opts)?;
@@ -86,6 +125,12 @@ pub fn validate_all_links(opts: &ScanOptions) -> std::result::Result<LinkValidat
     Ok(result)
 }
 
+/// Selects the markdown files to scan based on `opts.staged_only` and applies
+/// the skip-path filter.
+///
+/// # Errors
+///
+/// Returns an error when the staged-file list cannot be retrieved from Git.
 fn get_markdown_files(opts: &ScanOptions) -> std::result::Result<Vec<PathBuf>, Error> {
     let files = if opts.staged_only {
         get_staged_markdown_files(&opts.repo_root)?
@@ -95,6 +140,11 @@ fn get_markdown_files(opts: &ScanOptions) -> std::result::Result<Vec<PathBuf>, E
     Ok(filter_skip_paths(files, &opts.repo_root, &opts.skip_paths))
 }
 
+/// Returns the list of staged `.md` files reported by `git diff --cached`.
+///
+/// # Errors
+///
+/// Returns an error when the `git` command cannot be executed.
 fn get_staged_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error> {
     let output = Command::new("git")
         .args(["diff", "--cached", "--name-only", "--diff-filter=ACM"])
@@ -109,6 +159,13 @@ fn get_staged_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBu
         .collect())
 }
 
+/// Returns all `.md` files inside the `repo-governance/`, `docs/`, and `.claude/`
+/// directories, plus any `.md` files at the repository root.
+///
+/// # Errors
+///
+/// This function currently never returns an error (filesystem errors are silently
+/// swallowed), but the signature is kept for future extensibility.
 fn get_all_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error> {
     let dirs = ["repo-governance", "docs", ".claude"];
     let mut files = Vec::new();
@@ -135,6 +192,8 @@ fn get_all_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>,
     Ok(files)
 }
 
+/// Removes paths from `files` that start with any of the `skip_paths` prefixes
+/// (relative to `repo_root`).
 fn filter_skip_paths(files: Vec<PathBuf>, repo_root: &Path, skip_paths: &[String]) -> Vec<PathBuf> {
     if skip_paths.is_empty() {
         return files;
@@ -156,6 +215,12 @@ fn filter_skip_paths(files: Vec<PathBuf>, repo_root: &Path, skip_paths: &[String
         .collect()
 }
 
+/// Extracts all relative links from `path`, skipping lines inside fenced code blocks
+/// and discarding external URLs, anchor-only links, and placeholder patterns.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be read.
 fn extract_links(path: &Path) -> std::result::Result<Vec<LinkInfo>, Error> {
     let data = fs::read_to_string(path)?;
     let mut links = Vec::new();
@@ -194,6 +259,8 @@ fn extract_links(path: &Path) -> std::result::Result<Vec<LinkInfo>, Error> {
     Ok(links)
 }
 
+/// Returns `true` when `link` matches a known placeholder or example pattern that
+/// should not be validated against the filesystem.
 pub fn should_skip_link(link: &str) -> bool {
     if link.starts_with('/') {
         return true;
@@ -255,6 +322,14 @@ pub fn should_skip_link(link: &str) -> bool {
     false
 }
 
+/// Validates each link in `links` against the filesystem, relative to `file_path`.
+///
+/// Skill files (paths containing `.claude/skills/`) are unconditionally skipped.
+///
+/// # Errors
+///
+/// This function currently never returns an error but retains the `Result` return
+/// type for future extensibility.
 fn validate_file(
     file_path: &Path,
     opts: &ScanOptions,
@@ -286,6 +361,16 @@ fn validate_file(
     Ok(broken)
 }
 
+/// Resolves a relative `link` against the directory containing `source_file`.
+///
+/// Anchor fragments (everything after `#`) are stripped before resolution.
+/// An empty link (pure anchor) returns `source_file` unchanged.
+///
+/// # Panics
+///
+/// Panics if `source_file` has no parent component (i.e. it is a bare filename
+/// with no directory component and no parent at the filesystem root), which
+/// cannot happen for any real repository file path.
 fn resolve_link(source_file: &Path, link: &str) -> PathBuf {
     let without_anchor = link.split('#').next().unwrap_or("");
     if without_anchor.is_empty() {
@@ -297,6 +382,8 @@ fn resolve_link(source_file: &Path, link: &str) -> PathBuf {
     clean_path(&joined)
 }
 
+/// Normalises a path by resolving `.` and `..` components, equivalent to Go's
+/// `filepath.Clean`.
 fn clean_path(p: &Path) -> PathBuf {
     let mut out = Vec::new();
     let mut is_abs = false;
@@ -331,6 +418,7 @@ fn clean_path(p: &Path) -> PathBuf {
     result
 }
 
+/// Assigns a human-readable category string to a broken link for report grouping.
 pub fn categorize_broken_link(link: &str) -> String {
     if link.contains("workflows/") && !link.contains("repo-governance/workflows/") {
         return "workflows/ paths".to_string();
@@ -347,6 +435,10 @@ pub fn categorize_broken_link(link: &str) -> String {
     "General/other paths".to_string()
 }
 
+/// Formats `result` as a human-readable plain-text report.
+///
+/// When `quiet` is `true` and there are no broken links, returns an empty string.
+/// The `_verbose` flag is reserved for future use.
 pub fn format_link_text(result: &LinkValidationResult, _verbose: bool, quiet: bool) -> String {
     let mut output = String::new();
     if result.broken_links.is_empty() {
@@ -399,25 +491,44 @@ pub fn format_link_text(result: &LinkValidationResult, _verbose: bool, quiet: bo
     output
 }
 
+/// Formats `result` as a pretty-printed JSON string.
+///
+/// # Errors
+///
+/// Returns an error when JSON serialisation fails (extremely unlikely with
+/// the simple data types involved).
 pub fn format_link_json(result: &LinkValidationResult) -> std::result::Result<String, Error> {
     use serde::Serialize;
 
+    /// JSON shape for a single broken link entry.
     #[derive(Serialize)]
     struct JsonBrokenLink<'a> {
+        /// Repository-relative path of the source file.
         source_file: &'a str,
+        /// One-based line number.
         line_number: usize,
+        /// Raw link target string.
         link_text: &'a str,
+        /// Absolute path the link resolved to.
         target_path: &'a str,
     }
 
+    /// Top-level JSON output object.
     #[derive(Serialize)]
     struct JsonOutput<'a> {
+        /// `"success"` or `"failure"`.
         status: &'a str,
+        /// ISO-8601 timestamp of the scan.
         timestamp: String,
+        /// Total files scanned.
         total_files: usize,
+        /// Total relative links examined.
         total_links: usize,
+        /// Number of broken links found.
         broken_count: usize,
+        /// Wall-clock duration of the scan in milliseconds.
         duration_ms: i64,
+        /// Broken links grouped by category.
         categories: HashMap<&'a str, Vec<JsonBrokenLink<'a>>>,
     }
 
@@ -452,6 +563,7 @@ pub fn format_link_json(result: &LinkValidationResult) -> std::result::Result<St
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
+/// Formats `result` as a Markdown report (delegates to [`format_link_text`]).
 pub fn format_link_markdown(result: &LinkValidationResult) -> String {
     format_link_text(result, false, false)
 }
@@ -463,6 +575,8 @@ mod tests {
     use std::fs;
     use tempfile::TempDir;
 
+    /// Verifies that [`should_skip_link`] correctly identifies placeholder and
+    /// example links that should not be validated.
     #[test]
     fn skip_link_recognises_placeholders() {
         assert!(should_skip_link("/absolute"));
@@ -475,6 +589,8 @@ mod tests {
         assert!(!should_skip_link("real.md"));
     }
 
+    /// Verifies that [`categorize_broken_link`] assigns the correct category for
+    /// each recognised pattern.
     #[test]
     fn categorize_returns_categories() {
         assert_eq!(
@@ -496,6 +612,7 @@ mod tests {
         assert_eq!(categorize_broken_link("foo.md"), "General/other paths");
     }
 
+    /// Verifies that [`extract_links`] finds all relative links in a file.
     #[test]
     fn extract_links_finds_valid_links() {
         let tmp = TempDir::new().unwrap();
@@ -505,6 +622,7 @@ mod tests {
         assert_eq!(links.len(), 2);
     }
 
+    /// Verifies that links inside fenced code blocks are ignored.
     #[test]
     fn extract_links_skips_inside_fence() {
         let tmp = TempDir::new().unwrap();
@@ -515,6 +633,7 @@ mod tests {
         assert_eq!(links[0].url, "y.md");
     }
 
+    /// Verifies that external URLs, anchor-only links, and mailto links are skipped.
     #[test]
     fn extract_links_skips_external_urls() {
         let tmp = TempDir::new().unwrap();
@@ -529,6 +648,7 @@ mod tests {
         assert_eq!(links[0].url, "real.md");
     }
 
+    /// Verifies that [`validate_all_links`] detects broken links in the `docs/` directory.
     #[test]
     fn validate_all_links_returns_broken() {
         let tmp = TempDir::new().unwrap();
@@ -544,6 +664,7 @@ mod tests {
         assert!(!result.broken_links.is_empty());
     }
 
+    /// Verifies that a clean scan (no broken links) produces the expected success message.
     #[test]
     fn format_link_text_succeeds_with_no_broken() {
         let result = LinkValidationResult {
@@ -557,6 +678,7 @@ mod tests {
         assert!(s.contains("All links valid"));
     }
 
+    /// Verifies that `quiet` mode returns an empty string when there are no broken links.
     #[test]
     fn format_link_text_quiet_is_empty_when_clean() {
         let result = LinkValidationResult {
@@ -570,6 +692,7 @@ mod tests {
         assert!(s.is_empty());
     }
 
+    /// Constructs a [`BrokenLink`] fixture for use in multiple tests.
     fn broken_link() -> BrokenLink {
         BrokenLink {
             line_number: 5,
@@ -580,6 +703,7 @@ mod tests {
         }
     }
 
+    /// Constructs a [`LinkValidationResult`] that contains one broken link.
     fn result_with_broken() -> LinkValidationResult {
         let mut by_cat = HashMap::new();
         by_cat.insert("General/other paths".to_string(), vec![broken_link()]);
@@ -592,6 +716,7 @@ mod tests {
         }
     }
 
+    /// Verifies that a text report with broken links includes all expected sections.
     #[test]
     fn format_link_text_with_broken_renders_report() {
         let s = format_link_text(&result_with_broken(), false, false);
@@ -602,12 +727,14 @@ mod tests {
         assert!(s.contains("nonexistent.md"));
     }
 
+    /// Verifies that [`format_link_markdown`] delegates to [`format_link_text`].
     #[test]
     fn format_link_markdown_delegates_to_text() {
         let s = format_link_markdown(&result_with_broken());
         assert!(s.contains("Broken Links Report"));
     }
 
+    /// Verifies that the JSON output for a result with broken links has `"failure"` status.
     #[test]
     fn format_link_json_with_broken_status_failure() {
         let s = format_link_json(&result_with_broken()).unwrap();
@@ -617,6 +744,7 @@ mod tests {
         assert!(v["categories"]["General/other paths"].is_array());
     }
 
+    /// Verifies that skill files (`.claude/skills/`) are unconditionally skipped.
     #[test]
     fn validate_file_skips_skill_files() {
         let tmp = TempDir::new().unwrap();
@@ -634,6 +762,7 @@ mod tests {
         assert!(broken.is_empty());
     }
 
+    /// Verifies that listed `skip_paths` prefixes are removed from the file list.
     #[test]
     fn filter_skip_paths_excludes_listed() {
         let tmp = TempDir::new().unwrap();
@@ -645,6 +774,7 @@ mod tests {
         assert_eq!(filtered[0], f1);
     }
 
+    /// Verifies that [`resolve_link`] strips anchor fragments before resolving.
     #[test]
     fn resolve_link_handles_anchors() {
         let source = PathBuf::from("/repo/docs/a.md");
@@ -652,6 +782,7 @@ mod tests {
         assert_eq!(resolved, PathBuf::from("/repo/docs/b.md"));
     }
 
+    /// Verifies that a pure anchor link resolves to the source file itself.
     #[test]
     fn resolve_link_pure_anchor_returns_source() {
         let source = PathBuf::from("/repo/docs/a.md");
@@ -659,6 +790,7 @@ mod tests {
         assert_eq!(resolved, source);
     }
 
+    /// Verifies that [`clean_path`] resolves `..` components correctly.
     #[test]
     fn clean_path_resolves_dotdot() {
         let p = PathBuf::from("/a/b/../c");
@@ -666,6 +798,7 @@ mod tests {
         assert_eq!(cleaned, PathBuf::from("/a/c"));
     }
 
+    /// Verifies that [`format_link_json`] produces a `"success"` JSON payload for a clean scan.
     #[test]
     fn format_link_json_has_status() {
         let result = LinkValidationResult {

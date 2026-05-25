@@ -1,7 +1,9 @@
-// Port of `stepMatcher` from `apps/rhino-cli/internal/speccoverage/checker.go`.
-// Same `entries: [stepMatcherEntry]` canonical store + O(1) `exactIndex` lookup
-// + legacy `exact` / `patterns` write-through views consumed by per-language
-// extractors and unit tests.
+//! Step-definition matcher — stores compiled step patterns and performs lookups.
+//!
+//! Port of `stepMatcher` from `apps/rhino-cli/internal/speccoverage/checker.go`.
+//! Maintains the canonical `entries` store alongside O(1) `exact_index` lookup
+//! and legacy `exact` / `patterns` write-through views consumed by per-language
+//! extractors and unit tests.
 
 use std::collections::HashMap;
 
@@ -13,37 +15,60 @@ use super::cucumber_expr::{
 };
 use super::util::normalize_ws;
 
+/// Distinguishes how a step entry was registered.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MatcherKind {
+    /// The step was registered as a verbatim (whitespace-normalised) string.
     Exact,
+    /// The step was registered as a compiled regex pattern.
     Pattern,
 }
 
+/// A single step-definition record stored inside [`StepMatcher`].
 #[derive(Debug, Clone)]
 pub struct StepMatcherEntry {
+    /// How this entry is matched.
     pub kind: MatcherKind,
-    pub exact_text: String,   // populated when kind == Exact (ws-normalized)
-    pub pattern_text: String, // raw regex source (kind == Pattern)
-    pub file: String,         // origin file (absolute path; reporter resolves)
+    /// Whitespace-normalised text used when `kind == Exact`.
+    pub exact_text: String,
+    /// Raw regex source string used when `kind == Pattern`.
+    pub pattern_text: String,
+    /// Absolute path of the source file that defines this step.
+    /// The reporter resolves it to a repo-relative path before display.
+    pub file: String,
 }
 
+/// In-memory collection of step definitions extracted from source files.
+///
+/// Supports two match modes:
+/// - **Exact** – O(1) `HashMap` lookup after whitespace normalisation.
+/// - **Pattern** – linear scan over compiled [`Regex`] patterns.
+///
+/// The `entries` field is the canonical store; `exact` and `patterns` are
+/// derived write-through views kept for compatibility with the Go original.
 #[derive(Debug, Default)]
 pub struct StepMatcher {
+    /// All registered entries in insertion order.
     pub(crate) entries: Vec<StepMatcherEntry>,
+    /// Maps normalised exact text to its index in `entries`.
     pub(crate) exact_index: HashMap<String, usize>,
-    /// Legacy: derived view of exact strings present in entries.
+    /// Legacy derived view — maps normalised exact text to `true`.
     pub(crate) exact: HashMap<String, bool>,
-    /// Legacy: derived view of compiled patterns.
+    /// Legacy derived view — compiled regex patterns in insertion order.
     pub(crate) patterns: Vec<Regex>,
 }
 
 impl StepMatcher {
+    /// Creates an empty `StepMatcher`.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Returns true if `step_text` matches either an exact entry or a compiled
-    /// regex pattern. O(1) exact-lookup → linear-scan over patterns (mirrors Go).
+    /// Returns `true` if `step_text` matches either an exact entry (O(1)) or
+    /// any compiled regex pattern (linear scan).
+    ///
+    /// Whitespace in `step_text` is normalised before comparison, mirroring
+    /// the Go implementation.
     pub fn matches(&self, step_text: &str) -> bool {
         let normalized = normalize_ws(step_text);
         if self.exact.contains_key(&normalized) {
@@ -57,7 +82,9 @@ impl StepMatcher {
         false
     }
 
-    /// Records an exact-text step entry, normalizing whitespace.
+    /// Registers `text` as an exact-match entry after whitespace normalisation.
+    ///
+    /// Empty strings (after normalisation) are silently ignored.
     pub fn add_exact_with_origin(&mut self, text: &str, origin_file: &str) {
         let normalized = normalize_ws(text);
         if normalized.is_empty() {
@@ -74,7 +101,10 @@ impl StepMatcher {
         self.exact.insert(normalized, true);
     }
 
-    /// Records a regex-pattern entry compiled from `pattern_text`.
+    /// Registers `re` as a compiled regex pattern entry.
+    ///
+    /// `pattern_text` is the raw source string stored for display; `re` is the
+    /// pre-compiled pattern used for matching.
     pub fn add_pattern_with_origin(&mut self, re: Regex, pattern_text: &str, origin_file: &str) {
         self.entries.push(StepMatcherEntry {
             kind: MatcherKind::Pattern,
@@ -86,10 +116,13 @@ impl StepMatcher {
     }
 }
 
-/// Generic step-text → matcher inserter.
-/// - Text starting with `^` → traditional regex.
-/// - Text containing `{...}` → Cucumber expression (compiled with `^…$` anchors).
-/// - Otherwise → exact literal (Cucumber escapes unescaped first).
+/// Inserts a step-text string into `sm`, choosing the correct entry kind
+/// automatically:
+///
+/// - Text starting with `^` → compiled as a traditional regex pattern.
+/// - Text containing `{...}` → compiled as a Cucumber expression (anchored
+///   with `^…$`).
+/// - Otherwise → stored as an exact literal after Cucumber escape decoding.
 pub fn add_step_to_matcher_with_origin(sm: &mut StepMatcher, text: &str, origin_file: &str) {
     let text = normalize_ws(text);
     if text.is_empty() {
@@ -111,8 +144,15 @@ pub fn add_step_to_matcher_with_origin(sm: &mut StepMatcher, text: &str, origin_
     sm.add_exact_with_origin(&unescape_cucumber_expr(&text), origin_file);
 }
 
-/// Python-specific variant — handles `parsers.parse({name:d})` format strings before
-/// falling back to the generic Cucumber path.
+/// Python-specific variant of [`add_step_to_matcher_with_origin`].
+///
+/// Handles `parsers.parse({name:d})` format strings before falling back to
+/// the generic Cucumber expression path. The dispatch order is:
+///
+/// 1. Regex (starts with `^`).
+/// 2. Python `parsers.parse` expression (`{name:spec}`).
+/// 3. Cucumber expression (`{type}`).
+/// 4. Exact literal.
 pub fn add_python_step_to_matcher_with_origin(sm: &mut StepMatcher, text: &str, origin_file: &str) {
     let text = normalize_ws(text);
     if text.is_empty() {

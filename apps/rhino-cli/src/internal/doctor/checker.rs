@@ -1,4 +1,9 @@
-// Port of `apps/rhino-cli/internal/doctor/checker.go`.
+//! Port of `apps/rhino-cli/internal/doctor/checker.go`.
+//!
+//! Provides version readers (parse a config file to get the required version),
+//! output parsers (extract the installed version from a tool's `--version`
+//! output), comparators (decide `Ok` vs `Warning`), and the top-level
+//! [`check_all`] orchestrator.
 
 #![allow(
     clippy::collapsible_if,
@@ -52,6 +57,9 @@ pub(super) fn parse_line_word(
 
 // --- Version readers ---
 
+/// Reads the `volta.node` version from a `package.json` file.
+///
+/// Returns `None` when the file is missing, malformed, or lacks a `volta.node` key.
 pub(super) fn read_node_version(path: &Path) -> Option<String> {
     let data = std::fs::read(path).ok()?;
     let v: serde_json::Value = serde_json::from_slice(&data).ok()?;
@@ -61,6 +69,9 @@ pub(super) fn read_node_version(path: &Path) -> Option<String> {
         .map(std::string::ToString::to_string)
 }
 
+/// Reads the `volta.npm` version from a `package.json` file.
+///
+/// Returns `None` when the file is missing, malformed, or lacks a `volta.npm` key.
 pub(super) fn read_npm_version(path: &Path) -> Option<String> {
     let data = std::fs::read(path).ok()?;
     let v: serde_json::Value = serde_json::from_slice(&data).ok()?;
@@ -70,6 +81,10 @@ pub(super) fn read_npm_version(path: &Path) -> Option<String> {
         .map(std::string::ToString::to_string)
 }
 
+/// Reads the `<java.version>` value from a Maven `pom.xml` file.
+///
+/// Performs a minimal XML scan without a full XML parser.  Returns `None`
+/// when the file is missing or does not contain a `<java.version>` element.
 pub(super) fn read_java_version(path: &Path) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     // Minimal XML scan for <java.version>X</java.version> under <properties>.
@@ -80,6 +95,9 @@ pub(super) fn read_java_version(path: &Path) -> Option<String> {
     Some(data[s + needle_open.len()..s + needle_open.len() + e].to_string())
 }
 
+/// Reads the `go` directive version from a `go.mod` file.
+///
+/// Returns `None` when the file is missing or contains no `go` directive.
 pub(super) fn read_go_version(path: &Path) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     for line in data.lines() {
@@ -94,11 +112,18 @@ pub(super) fn read_go_version(path: &Path) -> Option<String> {
     None
 }
 
+/// Reads the Python version from a `.python-version` file (plain text, trimmed).
+///
+/// Returns `None` when the file is missing.
 pub(super) fn read_python_version(path: &Path) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     Some(data.trim().to_string())
 }
 
+/// Reads the version for `tool` from an `.tool-versions` file.
+///
+/// Each line has the form `<tool_name> <version>`.  Returns `None` when the
+/// file is missing or does not contain an entry for `tool`.
 pub(super) fn read_tool_versions_entry(path: &Path, tool: &str) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     for line in data.lines() {
@@ -110,6 +135,9 @@ pub(super) fn read_tool_versions_entry(path: &Path, tool: &str) -> Option<String
     None
 }
 
+/// Reads the .NET SDK version from a `global.json` file (`sdk.version`).
+///
+/// Returns `None` when the file is missing, malformed, or lacks `sdk.version`.
 pub(super) fn read_dotnet_version(path: &Path) -> Option<String> {
     let data = std::fs::read(path).ok()?;
     let v: serde_json::Value = serde_json::from_slice(&data).ok()?;
@@ -119,6 +147,11 @@ pub(super) fn read_dotnet_version(path: &Path) -> Option<String> {
         .map(std::string::ToString::to_string)
 }
 
+/// Reads the Dart SDK minimum version from a `pubspec.yaml` file.
+///
+/// Looks for the `sdk:` key inside the `environment:` block and strips
+/// range prefixes (`^`, `>=`).  Returns `None` when the file is missing or
+/// the `environment.sdk` key is absent.
 pub(super) fn read_dart_sdk_version(path: &Path) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     let mut in_env = false;
@@ -144,6 +177,10 @@ pub(super) fn read_dart_sdk_version(path: &Path) -> Option<String> {
     None
 }
 
+/// Reads the `rust-version` (MSRV) from a `Cargo.toml` file.
+///
+/// Returns `None` when the file is missing or does not contain a
+/// `rust-version` key in the `[package]` table.
 pub(super) fn read_rust_version(path: &Path) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     for line in data.lines() {
@@ -159,6 +196,11 @@ pub(super) fn read_rust_version(path: &Path) -> Option<String> {
     None
 }
 
+/// Reads the Flutter minimum version from a `pubspec.yaml` file.
+///
+/// Looks for the `flutter:` key inside the `environment:` block and strips
+/// range prefixes (`^`, `>=`).  Returns `None` when the file is missing or
+/// the `environment.flutter` key is absent.
 pub(super) fn read_flutter_version(path: &Path) -> Option<String> {
     let data = std::fs::read_to_string(path).ok()?;
     let mut in_env = false;
@@ -186,6 +228,11 @@ pub(super) fn read_flutter_version(path: &Path) -> Option<String> {
 
 // --- Parsers for tool output ---
 
+/// Extracts the Java major version number from `java -version` stderr output.
+///
+/// Handles both old-style (`"1.8.0_292"` → `"8"`) and new-style
+/// (`"21.0.1"` → `"21"`) version strings.  Returns an empty string when
+/// no version line is found.
 pub(super) fn parse_java_version(stderr: &str) -> String {
     for line in stderr.split('\n') {
         if line.contains("version") {
@@ -210,34 +257,44 @@ pub(super) fn parse_java_version(stderr: &str) -> String {
     String::new()
 }
 
+/// Extracts the Python version from `python3 --version` output (e.g. `"Python 3.12.0"`).
 pub(super) fn parse_python_version(out: &str) -> String {
     parse_line_word(out, "Python ", 1, "")
 }
 
+/// Extracts the Rust version from `rustc --version` output (e.g. `"rustc 1.88.0 ..."`).
 pub(super) fn parse_rust_version(out: &str) -> String {
     parse_line_word(out, "rustc ", 1, "")
 }
 
+/// Extracts the `cargo-llvm-cov` version from `cargo llvm-cov --version` output.
 pub(super) fn parse_cargo_llvm_cov(out: &str) -> String {
     parse_line_word(out, "cargo-llvm-cov ", 1, "")
 }
 
+/// Extracts the Elixir version from `elixir --version` output (e.g. `"Elixir 1.19.0 ..."`).
 pub(super) fn parse_elixir_version(out: &str) -> String {
     parse_line_word(out, "Elixir ", 1, "")
 }
 
+/// Extracts the Erlang OTP release string from `erl -noshell -eval` output (trimmed).
 pub(super) fn parse_erlang_version(out: &str) -> String {
     out.trim().to_string()
 }
 
+/// Extracts the .NET SDK version from `dotnet --version` output (trimmed).
 pub(super) fn parse_dotnet_version(out: &str) -> String {
     out.trim().to_string()
 }
 
+/// Extracts the Clojure CLI version from `clj --version` output
+/// (e.g. `"Clojure CLI version 1.12.4.1582"`).
 pub(super) fn parse_clojure_version(out: &str) -> String {
     parse_line_word(out, "Clojure CLI version ", 3, "")
 }
 
+/// Extracts the Dart SDK version from `dart --version` output
+/// (e.g. `"Dart SDK version: 3.11.3 (stable) ..."`).
 pub(super) fn parse_dart_version(out: &str) -> String {
     for line in out.split('\n') {
         let t = line.trim();
@@ -251,10 +308,14 @@ pub(super) fn parse_dart_version(out: &str) -> String {
     String::new()
 }
 
+/// Extracts the Flutter version from `flutter --version` output
+/// (e.g. `"Flutter 3.41.5 ..."`).
 pub(super) fn parse_flutter_version(out: &str) -> String {
     parse_line_word(out, "Flutter ", 1, "")
 }
 
+/// Extracts the Docker version from `docker --version` output
+/// (e.g. `"Docker version 29.2.1, build abc"` → `"29.2.1"`).
 pub(super) fn parse_docker_version(out: &str) -> String {
     for line in out.split('\n') {
         let t = line.trim();
@@ -268,10 +329,13 @@ pub(super) fn parse_docker_version(out: &str) -> String {
     String::new()
 }
 
+/// Extracts the `golangci-lint` version from `golangci-lint version` output.
 pub(super) fn parse_golangci_lint_version(out: &str) -> String {
     parse_line_word(out, "golangci-lint", 3, "")
 }
 
+/// Extracts the `jq` version from `jq --version` output
+/// (e.g. `"jq-1.8.1"` → `"1.8.1"`).
 pub(super) fn parse_jq_version(out: &str) -> String {
     out.trim()
         .strip_prefix("jq-")
@@ -279,12 +343,19 @@ pub(super) fn parse_jq_version(out: &str) -> String {
         .to_string()
 }
 
+/// Extracts the Playwright version from `npx playwright --version` output
+/// (e.g. `"Version 1.58.2"`).
 pub(super) fn parse_playwright_version(out: &str) -> String {
     parse_line_word(out, "Version ", 1, "")
 }
 
 // --- Comparators ---
 
+/// Compares two version strings for exact equality (after stripping a leading `v`).
+///
+/// Returns `(`[`ToolStatus::Ok`]`, note)` when they match, or
+/// `(`[`ToolStatus::Warning`]`, note)` on mismatch.
+/// Returns `Ok` immediately when `required` is empty.
 pub(super) fn compare_exact(installed: &str, required: &str) -> (ToolStatus, String) {
     if required.is_empty() {
         return (ToolStatus::Ok, "no version requirement".into());
@@ -301,6 +372,10 @@ pub(super) fn compare_exact(installed: &str, required: &str) -> (ToolStatus, Str
     }
 }
 
+/// Compares only the major version component of two version strings.
+///
+/// Returns `Ok` when the major components match, `Warning` otherwise.
+/// Returns `Ok` immediately when `required` is empty.
 pub(super) fn compare_major(installed: &str, required: &str) -> (ToolStatus, String) {
     if required.is_empty() {
         return (ToolStatus::Ok, "no version requirement".into());
@@ -319,6 +394,10 @@ pub(super) fn compare_major(installed: &str, required: &str) -> (ToolStatus, Str
     }
 }
 
+/// Parses a semver-style string into `(major, minor, patch)` integers.
+///
+/// Strips a leading `v`, then splits on `.`.  Returns `None` when any
+/// component fails to parse as an integer.
 pub(super) fn parse_version_parts(s: &str) -> Option<(i64, i64, i64)> {
     let s = normalize_simple_version(s);
     let parts: Vec<&str> = s.splitn(3, '.').collect();
@@ -330,6 +409,10 @@ pub(super) fn parse_version_parts(s: &str) -> Option<(i64, i64, i64)> {
     Some((nums[0], nums[1], nums[2]))
 }
 
+/// Checks that the installed major version is greater than or equal to the required major version.
+///
+/// Falls back to [`compare_exact`] when either major component cannot be
+/// parsed as an integer.  Returns `Ok` immediately when `required` is empty.
 pub(super) fn compare_major_gte(installed: &str, required: &str) -> (ToolStatus, String) {
     if required.is_empty() {
         return (ToolStatus::Ok, "no version requirement".into());
@@ -355,6 +438,11 @@ pub(super) fn compare_major_gte(installed: &str, required: &str) -> (ToolStatus,
     }
 }
 
+/// Checks that the installed version is greater than or equal to the required version
+/// using full semver comparison (`major.minor.patch`).
+///
+/// Falls back to [`compare_exact`] when either version cannot be parsed.
+/// Returns `Ok` immediately when `required` is empty.
 pub(super) fn compare_gte(installed: &str, required: &str) -> (ToolStatus, String) {
     if required.is_empty() {
         return (ToolStatus::Ok, "no version requirement".into());
@@ -381,6 +469,12 @@ pub(super) fn compare_gte(installed: &str, required: &str) -> (ToolStatus, Strin
 
 // --- Playwright browser detection ---
 
+/// Returns `true` when at least one Chromium Playwright browser bundle is
+/// found in the platform-specific Playwright cache directory.
+///
+/// On macOS the cache is `~/Library/Caches/ms-playwright`; on other systems it
+/// is `~/.cache/ms-playwright`.  Returns `false` when the home directory
+/// cannot be determined or the cache directory does not exist.
 pub(super) fn check_playwright_browsers() -> bool {
     let Some(home) = dirs_home() else {
         return false;
@@ -403,12 +497,19 @@ pub(super) fn check_playwright_browsers() -> bool {
     false
 }
 
+/// Returns the current user's home directory from the `HOME` environment variable.
+///
+/// Returns `None` when `HOME` is unset or empty.
 fn dirs_home() -> Option<std::path::PathBuf> {
     std::env::var_os("HOME")
         .map(std::path::PathBuf::from)
         .filter(|p| !p.as_os_str().is_empty())
 }
 
+/// Checks whether Playwright browsers are installed; ignores the version strings.
+///
+/// Returns `Warning` with an install hint when no Chromium bundle is found in
+/// the Playwright cache.  Returns `Ok` otherwise.
 pub(super) fn compare_playwright(_installed: &str, _required: &str) -> (ToolStatus, String) {
     if !check_playwright_browsers() {
         return (
@@ -421,6 +522,14 @@ pub(super) fn compare_playwright(_installed: &str, _required: &str) -> (ToolStat
 
 // --- Runner ---
 
+/// Executes `name` with `args` and returns `(stdout, stderr, exit_code)`.
+///
+/// Returns `Err` when `name` is not found in `PATH` (no process is started).
+///
+/// # Errors
+///
+/// Returns `Err(String)` when the binary is absent from `PATH` or the OS
+/// fails to spawn the process.
 pub fn real_runner(name: &str, args: &[&str]) -> CommandOutput {
     if !binary_in_path(name) {
         return Err(format!("binary not found in PATH: {name}"));
@@ -435,7 +544,9 @@ pub fn real_runner(name: &str, args: &[&str]) -> CommandOutput {
     Ok((stdout, stderr, code))
 }
 
-/// Mirror of Go's exec.LookPath. Walk $PATH for an executable file named `name`.
+/// Mirror of Go's `exec.LookPath`. Walks `$PATH` for an executable file named `name`.
+///
+/// When `name` contains a `/`, checks the path directly instead of walking `PATH`.
 fn binary_in_path(name: &str) -> bool {
     if name.contains('/') {
         return std::fs::metadata(name).is_ok_and(|m| m.is_file());
@@ -452,7 +563,10 @@ fn binary_in_path(name: &str) -> bool {
     false
 }
 
-/// Execute one tool check.
+/// Executes a single [`ToolDef`] check using `runner` and returns a [`ToolCheck`].
+///
+/// When the runner returns `Err` (binary not found), the check is immediately
+/// recorded as [`ToolStatus::Missing`] without calling any parser or comparator.
 pub(super) fn run_one_def(runner: CommandRunner<'_>, def: &ToolDef) -> ToolCheck {
     let required_version = (def.read_req)();
     let args_strs: Vec<&str> = def.args.iter().map(std::string::String::as_str).collect();
@@ -483,7 +597,10 @@ pub(super) fn run_one_def(runner: CommandRunner<'_>, def: &ToolDef) -> ToolCheck
     }
 }
 
-/// Run all tool checks.
+/// Runs all tool checks described in [`CheckOptions`] and returns aggregated results.
+///
+/// When `opts.scope` is [`Scope::Minimal`], only the core tool set is checked.
+/// The `opts.runner` field overrides the default [`real_runner`] for testing.
 pub fn check_all(opts: &CheckOptions<'_>) -> DoctorResult {
     let start = Instant::now();
 

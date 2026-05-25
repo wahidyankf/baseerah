@@ -1,4 +1,10 @@
-// envbackup — port of `apps/rhino-cli/internal/envbackup/`.
+//! Env-backup module — port of `apps/rhino-cli/internal/envbackup/`.
+//!
+//! Discovers `.env*` files (and optionally AI-tool config files) under a
+//! repository root, then copies them to or from an external backup directory.
+//!
+//! Primary entry points: [`backup`], [`restore`], [`discover`],
+//! [`discover_config`], [`format_text`], [`format_json`], [`format_markdown`].
 
 use std::fmt::Write;
 use std::fs;
@@ -8,9 +14,16 @@ use anyhow::{Context, Error, anyhow};
 use serde::Serialize;
 use walkdir::WalkDir;
 
+/// Maximum file size (in bytes) that will be backed up or restored (1 MiB).
 pub const DEFAULT_MAX_SIZE: i64 = 1024 * 1024;
+
+/// Default name of the backup directory placed outside the repository.
 pub const DEFAULT_BACKUP_DIR: &str = "ose-open-env-backup";
 
+/// Returns the default list of directory names that the walker skips.
+///
+/// Includes build artifacts, package caches, IDE directories, and other
+/// directories that are unlikely to contain `.env` files.
 pub fn default_skip_dirs() -> &'static [&'static str] {
     &[
         ".git",
@@ -47,12 +60,18 @@ pub fn default_skip_dirs() -> &'static [&'static str] {
     ]
 }
 
+/// Describes a well-known config file that can be included in a backup.
 pub struct ConfigPattern {
+    /// Relative path from the repo root (e.g. `".claude/settings.local.json"`).
     pub rel_path: &'static str,
+    /// Human-readable description shown in reports.
     pub description: &'static str,
+    /// Logical category (e.g. `"ai-tools"`, `"docker"`, `"environment"`).
     pub category: &'static str,
 }
 
+/// Returns the default list of config-file patterns checked during
+/// `--include-config` backup/restore operations.
 pub fn default_config_patterns() -> &'static [ConfigPattern] {
     &[
         ConfigPattern {
@@ -128,51 +147,85 @@ pub fn default_config_patterns() -> &'static [ConfigPattern] {
     ]
 }
 
+/// Options for a [`backup`] or [`restore`] operation.
 #[derive(Debug, Clone, Default)]
 pub struct Options {
+    /// Absolute path to the repository root to scan.
     pub repo_root: PathBuf,
+    /// Destination directory for backups (or source for restores).
     pub backup_dir: PathBuf,
+    /// Directory names to skip during the walk; defaults to [`default_skip_dirs`] when empty.
     pub skip_dirs: Vec<String>,
+    /// Maximum file size in bytes; defaults to [`DEFAULT_MAX_SIZE`] when `<= 0`.
     pub max_size: i64,
+    /// When `true`, appends [`worktree_name`](Options::worktree_name) as a subdirectory.
     pub worktree_aware: bool,
+    /// Worktree name used when [`worktree_aware`](Options::worktree_aware) is `true`.
     pub worktree_name: String,
+    /// When `true`, overwrite existing files in the destination without prompting.
     pub force: bool,
+    /// When `true`, also back up / restore the config files from [`default_config_patterns`].
     pub include_config: bool,
 }
 
+/// A single file discovered during a scan, along with its copy outcome.
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct FileEntry {
+    /// Repository-relative path (e.g. `"apps/foo/.env.local"`).
     #[serde(rename = "relPath")]
     pub rel_path: String,
+    /// Absolute path at the time of discovery (omitted when empty).
     #[serde(skip_serializing_if = "String::is_empty", rename = "absPath")]
     pub abs_path: String,
+    /// File size in bytes (omitted when zero).
     #[serde(skip_serializing_if = "is_zero_i64")]
     pub size: i64,
+    /// When `true`, this file was not copied (see [`reason`](FileEntry::reason)).
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     pub skipped: bool,
+    /// Human-readable explanation of why the file was skipped (omitted when empty).
     #[serde(skip_serializing_if = "String::is_empty")]
     pub reason: String,
+    /// `"env"` for `.env*` files, `"config"` for config-pattern files (omitted when empty).
     #[serde(skip_serializing_if = "String::is_empty")]
     pub source: String,
 }
 
+/// Returns `true` when `n` is zero; used to suppress zero-valued size fields in JSON.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero_i64(n: &i64) -> bool {
     *n == 0
 }
 
+/// Outcome of a [`backup`] or [`restore`] operation.
 #[derive(Debug, Clone, Default)]
 pub struct Result {
+    /// `"backup"` or `"restore"`.
     pub direction: String,
+    /// Absolute path to the backup directory.
     pub dir: String,
+    /// All files considered (both copied and skipped).
     pub files: Vec<FileEntry>,
+    /// Number of files successfully copied.
     pub copied: usize,
+    /// Number of files skipped (oversized, symlinks, or copy errors).
     pub skipped: usize,
+    /// Non-fatal errors encountered during the operation.
     pub errors: Vec<String>,
+    /// Worktree name used when the backup was worktree-aware.
     pub worktree_name: String,
+    /// When `true`, the user cancelled the operation before it started.
     pub cancelled: bool,
 }
 
+/// Expands a leading `~` in `path` to the value of the `HOME` environment variable.
+///
+/// When `path` does not start with `~`, the path is returned unchanged.
+///
+/// # Errors
+///
+/// Returns an error when `path` starts with `~` but the `HOME` environment
+/// variable is not set.
 pub fn expand_tilde(path: &str) -> std::result::Result<PathBuf, Error> {
     if !path.starts_with('~') {
         return Ok(PathBuf::from(path));
@@ -188,10 +241,22 @@ pub fn expand_tilde(path: &str) -> std::result::Result<PathBuf, Error> {
     Ok(p)
 }
 
+/// Returns `true` when `backup_dir` is a subdirectory of (or equal to) `repo_root`.
 fn is_inside_repo(backup_dir: &Path, repo_root: &Path) -> bool {
     backup_dir.strip_prefix(repo_root).is_ok()
 }
 
+/// Walks the repo root and returns all `.env*` files found.
+///
+/// Hidden directories (names starting with `.`) and directories listed in
+/// [`Options::skip_dirs`] are skipped entirely.  Files whose size exceeds
+/// [`Options::max_size`] or that are symlinks are included but marked
+/// `skipped = true` with an explanatory `reason`.
+///
+/// # Errors
+///
+/// Does not propagate walk errors; individual entry errors are silently
+/// skipped.  The function itself should not fail.
 pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
     let max_size = if opts.max_size <= 0 {
         DEFAULT_MAX_SIZE
@@ -275,6 +340,17 @@ pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
     Ok(entries)
 }
 
+/// Checks each [`ConfigPattern`] relative to `repo_root` and returns entries
+/// for any that exist on disk.
+///
+/// Symlinks are included but marked `skipped = true`.  Files larger than
+/// `max_size` (defaults to [`DEFAULT_MAX_SIZE`] when `<= 0`) are similarly
+/// marked skipped.
+///
+/// # Errors
+///
+/// Returns an error when `lstat` fails for any reason other than
+/// `NotFound`.
 pub fn discover_config(
     repo_root: &Path,
     patterns: &[ConfigPattern],
@@ -331,11 +407,18 @@ pub fn discover_config(
     Ok(entries)
 }
 
+/// Copies `src` to `dst`, returning an error with context on failure.
+///
+/// # Errors
+///
+/// Returns an error when `fs::copy` fails (e.g. permission denied or disk full).
 fn copy_file(src: &Path, dst: &Path) -> std::result::Result<(), Error> {
     fs::copy(src, dst).with_context(|| format!("copy {} -> {}", src.display(), dst.display()))?;
     Ok(())
 }
 
+/// Returns the relative paths of `entries` (excluding skipped ones) that
+/// already exist under `dest_root`.
 pub fn find_existing(entries: &[FileEntry], dest_root: &Path) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for e in entries {
@@ -350,6 +433,17 @@ pub fn find_existing(entries: &[FileEntry], dest_root: &Path) -> Vec<String> {
     out
 }
 
+/// Copies `.env*` files (and optionally config files) from the repo to the backup directory.
+///
+/// Mutates `opts` to apply defaults (`max_size`, `skip_dirs`, tilde expansion of
+/// `backup_dir`).  The backup directory must not be inside the repository.
+///
+/// # Errors
+///
+/// Returns an error when:
+/// - `backup_dir` (after expansion) is inside `repo_root`.
+/// - [`discover`] or [`discover_config`] fails.
+/// - The backup directory cannot be created.
 #[allow(clippy::collapsible_if, clippy::collapsible_match)]
 pub fn backup(opts: &mut Options) -> std::result::Result<Result, Error> {
     if opts.max_size <= 0 {
@@ -426,6 +520,16 @@ pub fn backup(opts: &mut Options) -> std::result::Result<Result, Error> {
     Ok(result)
 }
 
+/// Copies `.env*` files (and optionally config files) from the backup directory back
+/// into the repository.
+///
+/// Mutates `opts` to apply defaults and expand the tilde in `backup_dir`.
+///
+/// # Errors
+///
+/// Returns an error when:
+/// - `backup_dir` does not exist.
+/// - [`discover`] or [`discover_config`] fails.
 #[allow(clippy::collapsible_if, clippy::collapsible_match)]
 pub fn restore(opts: &mut Options) -> std::result::Result<Result, Error> {
     if opts.max_size <= 0 {
@@ -501,11 +605,23 @@ pub fn restore(opts: &mut Options) -> std::result::Result<Result, Error> {
     Ok(result)
 }
 
+/// Information about whether the given path is a Git linked worktree.
 pub struct WorktreeInfo {
+    /// `true` when `.git` is a file (linked worktree) rather than a directory.
     pub is_worktree: bool,
+    /// The name of the worktree directory (last component of `repo_root`).
     pub worktree_name: String,
 }
 
+/// Detects whether `repo_root` is a linked Git worktree by inspecting its `.git` entry.
+///
+/// A regular checkout has `.git` as a directory; a linked worktree has `.git`
+/// as a file starting with `"gitdir:"`.
+///
+/// # Errors
+///
+/// Returns an error when `.git` does not exist at `repo_root` or when the
+/// `.git` file cannot be read or parsed.
 pub fn detect_worktree(repo_root: &Path) -> std::result::Result<WorktreeInfo, Error> {
     let git_path = repo_root.join(".git");
     let meta = fs::symlink_metadata(&git_path).map_err(|e| {
@@ -540,6 +656,10 @@ pub fn detect_worktree(repo_root: &Path) -> std::result::Result<WorktreeInfo, Er
 
 // ---- Reporters ----
 
+/// Formats the backup/restore result as human-readable text.
+///
+/// When `quiet` is `true`, per-file lines are suppressed and only the summary
+/// line is printed.  When `verbose` is `true`, skipped files are also listed.
 pub fn format_text(r: &Result, verbose: bool, quiet: bool) -> String {
     let mut sb = String::new();
     if r.cancelled {
@@ -598,35 +718,55 @@ pub fn format_text(r: &Result, verbose: bool, quiet: bool) -> String {
     sb
 }
 
+/// Top-level JSON document for a backup or restore result.
 #[derive(Serialize)]
 struct JsonOut<'a> {
+    /// `"backup"` or `"restore"`.
     direction: &'a str,
+    /// Absolute path to the backup directory.
     dir: &'a str,
+    /// Per-file entries.
     files: Vec<JsonEntry<'a>>,
+    /// Number of files successfully copied.
     copied: usize,
+    /// Number of files skipped.
     skipped: usize,
+    /// Non-fatal errors (omitted when empty).
     #[serde(skip_serializing_if = "Vec::is_empty")]
     errors: &'a Vec<String>,
+    /// Worktree name (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty", rename = "worktreeName")]
     worktree_name: &'a str,
+    /// Whether the operation was cancelled before copying.
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     cancelled: bool,
 }
 
+/// JSON representation of a single file entry.
 #[derive(Serialize)]
 struct JsonEntry<'a> {
+    /// Repository-relative path.
     #[serde(rename = "relPath")]
     rel_path: &'a str,
+    /// File size in bytes (omitted when zero).
     #[serde(skip_serializing_if = "is_zero_i64")]
     size: i64,
+    /// Whether the file was skipped.
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     skipped: bool,
+    /// Reason for skipping (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty")]
     reason: &'a str,
+    /// Source type: `"env"` or `"config"` (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty")]
     source: &'a str,
 }
 
+/// Serialises the backup/restore result to a pretty-printed JSON string.
+///
+/// # Errors
+///
+/// Returns an error when `serde_json` serialisation fails.
 pub fn format_json(r: &Result) -> std::result::Result<String, Error> {
     let files: Vec<JsonEntry> = r
         .files
@@ -652,6 +792,7 @@ pub fn format_json(r: &Result) -> std::result::Result<String, Error> {
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
+/// Formats the backup/restore result as a Markdown report.
 pub fn format_markdown(r: &Result) -> String {
     let mut sb = String::new();
     let action = capitalize(&r.direction);
@@ -714,6 +855,7 @@ pub fn format_markdown(r: &Result) -> String {
     sb
 }
 
+/// Capitalises the first character of `s`, leaving the rest unchanged.
 fn capitalize(s: &str) -> String {
     let mut c = s.chars();
     match c.next() {
@@ -926,6 +1068,8 @@ mod tests {
         assert!(r.is_err());
     }
 
+    /// Builds a sample [`Result`] with a copied `.env`, a skipped large file,
+    /// and a copied config file.
     fn sample_result() -> Result {
         Result {
             direction: "backup".to_string(),

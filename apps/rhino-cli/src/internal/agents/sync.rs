@@ -1,4 +1,4 @@
-// Sync orchestration ported from `apps/rhino-cli/internal/agents/sync.go`.
+//! Sync orchestration ported from `apps/rhino-cli/internal/agents/sync.go`.
 //
 // SyncAll iterates `.claude/agents/` and writes the converted OpenCode
 // equivalents into `.opencode/agents/`. Skills are NOT copied (OpenCode
@@ -10,27 +10,47 @@ use std::time::{Duration, Instant};
 
 use super::converter::{ConversionWarning, convert_all_agents};
 
+/// Options controlling a `sync_all` run.
 #[derive(Debug, Clone, Default)]
 pub struct SyncOptions {
+    /// Absolute path to the repository root.
     pub repo_root: PathBuf,
+    /// When true, perform a dry run: compute conversions but do not write files.
     pub dry_run: bool,
+    /// When true, sync only agents (skills are never synced either way).
     pub agents_only: bool,
+    /// When true, skip agent sync (no-op since skills are not copied).
     pub skills_only: bool,
+    /// When true, emit verbose output in the reporter.
     pub verbose: bool,
+    /// When true, suppress progress headers in the reporter.
     pub quiet: bool,
 }
 
+/// Aggregated result of a `sync_all` run.
 #[derive(Debug, Clone, Default)]
 pub struct SyncResult {
+    /// Number of agents successfully converted.
     pub agents_converted: usize,
+    /// Number of agents that failed to convert.
     pub agents_failed: usize,
+    /// Number of skills copied (always 0 — skills are not copied).
     pub skills_copied: usize,
+    /// Number of skills that failed to copy (always 0).
     pub skills_failed: usize,
+    /// Filenames of files that failed during sync.
     pub failed_files: Vec<String>,
+    /// Collected conversion warnings.
     pub warnings: Vec<ConversionWarning>,
+    /// Wall time for the sync operation.
     pub duration: Duration,
 }
 
+/// Run the agent sync: convert `.claude/agents/` → `.opencode/agents/`.
+///
+/// # Errors
+///
+/// Returns an error if `.claude/agents/` cannot be read.
 pub fn sync_all(opts: &SyncOptions) -> Result<SyncResult, String> {
     let start = Instant::now();
     let mut result = SyncResult::default();

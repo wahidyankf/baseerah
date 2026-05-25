@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/internal/testcoverage/merge.go`.
+//! `CoverageMap` merge utilities, LCOV serialisation, and format-dispatch helpers.
+//!
+//! Port of `apps/rhino-cli/internal/testcoverage/merge.go`.
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
@@ -13,26 +15,35 @@ use super::jacoco::parse_jacoco;
 use super::lcov::parse_lcov;
 use super::types::{FileResult, Format, Result as CoverageResult};
 
-/// Per-line coverage data.
+/// Coverage data for a single executable line.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct LineCoverage {
+    /// Number of times this line was executed (0 = missed).
     pub hit_count: i64,
+    /// Per-branch execution counts; empty when no branch data is available.
     pub branches: Vec<BranchCoverage>,
 }
 
-/// Per-branch coverage data.
+/// Coverage data for a single branch within a line.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct BranchCoverage {
+    /// Block identifier as reported by the coverage format.
     pub block_id: i64,
+    /// Branch identifier within the block.
     pub branch_id: i64,
+    /// Number of times this branch was taken (0 = never taken).
     pub hit_count: i64,
 }
 
-/// filepath → line_number → LineCoverage.
-/// BTreeMap to mirror Go's `sort.Strings(files)` + `sort.Ints(lineNos)` deterministic output.
+/// filepath → `line_number` → `LineCoverage`.
+/// `BTreeMap` to mirror Go's `sort.Strings(files)` + `sort.Ints(lineNos)` deterministic output.
 pub type CoverageMap = BTreeMap<String, BTreeMap<i64, LineCoverage>>;
 
-/// Union multiple CoverageMaps. Max hit count per line; branches unioned by (block, branch).
+/// Union multiple `CoverageMap`s. Max hit count per line; branches unioned by (block, branch).
+///
+/// # Panics
+///
+/// Does not panic.
 pub fn merge_coverage_maps(maps: &[CoverageMap]) -> CoverageMap {
     let mut result: CoverageMap = BTreeMap::new();
     for m in maps {
@@ -57,6 +68,7 @@ pub fn merge_coverage_maps(maps: &[CoverageMap]) -> CoverageMap {
     result
 }
 
+/// Merges two branch lists, taking the maximum `hit_count` per `(block_id, branch_id)` key.
 fn merge_branches(a: &[BranchCoverage], b: &[BranchCoverage]) -> Vec<BranchCoverage> {
     let mut m: BTreeMap<(i64, i64), i64> = BTreeMap::new();
     for br in a {
@@ -78,7 +90,11 @@ fn merge_branches(a: &[BranchCoverage], b: &[BranchCoverage]) -> Vec<BranchCover
         .collect()
 }
 
-/// Format the CoverageMap as LCOV text. Deterministic order via BTreeMap.
+/// Format the `CoverageMap` as LCOV text. Deterministic order via `BTreeMap`.
+///
+/// # Panics
+///
+/// Does not panic.
 pub fn format_lcov_string(cm: &CoverageMap) -> String {
     let mut sb = String::new();
     for (file_path, lines) in cm {
@@ -105,19 +121,23 @@ pub fn format_lcov_string(cm: &CoverageMap) -> String {
     sb
 }
 
-/// Write the CoverageMap as an LCOV file.
+/// Writes `cm` serialised as LCOV text to `out_path`.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be written.
 pub fn write_lcov(cm: &CoverageMap, out_path: &Path) -> Result<(), Error> {
     let content = format_lcov_string(cm);
     std::fs::write(out_path, content).with_context(|| format!("write {}", out_path.display()))?;
     Ok(())
 }
 
-/// Whether any branch in the list has hit_count <= 0.
+/// Whether any branch in the list has `hit_count` <= 0.
 pub fn has_missed_branch(branches: &[BranchCoverage]) -> bool {
     branches.iter().any(|b| b.hit_count <= 0)
 }
 
-/// Compute a Result from a CoverageMap using the standard line-based algorithm.
+/// Compute a `Result` from a `CoverageMap` using the standard line-based algorithm.
 pub fn result_from_coverage_map(cm: &CoverageMap, threshold: f64) -> CoverageResult {
     let mut covered = 0usize;
     let mut partial = 0usize;
@@ -182,6 +202,11 @@ pub fn result_from_coverage_map(cm: &CoverageMap, threshold: f64) -> CoverageRes
 
 // --- Format-specific CoverageMap converters ---
 
+/// Converts an LCOV info file into a `CoverageMap`.
+///
+/// # Errors
+///
+/// Returns an error when `parse_lcov` fails (file not found or I/O error).
 pub fn to_coverage_map_lcov(filename: &str) -> Result<CoverageMap, Error> {
     let files = parse_lcov(filename)?;
     let mut cm: CoverageMap = BTreeMap::new();
@@ -227,6 +252,11 @@ pub fn to_coverage_map_lcov(filename: &str) -> Result<CoverageMap, Error> {
     Ok(cm)
 }
 
+/// Converts a Go `cover.out` file into a `CoverageMap`.
+///
+/// # Errors
+///
+/// Returns an error when `parse_cover_out` fails (file not found or I/O error).
 pub fn to_coverage_map_go(filename: &str) -> Result<CoverageMap, Error> {
     let blocks = parse_cover_out(filename)?;
     let mut cm: CoverageMap = BTreeMap::new();
@@ -256,6 +286,11 @@ pub fn to_coverage_map_go(filename: &str) -> Result<CoverageMap, Error> {
     Ok(cm)
 }
 
+/// Converts a `JaCoCo` XML file into a `CoverageMap`.
+///
+/// # Errors
+///
+/// Returns an error when `parse_jacoco` fails (file not found or invalid XML).
 pub fn to_coverage_map_jacoco(filename: &str) -> Result<CoverageMap, Error> {
     let report = parse_jacoco(filename)?;
     let mut cm: CoverageMap = BTreeMap::new();
@@ -291,6 +326,11 @@ pub fn to_coverage_map_jacoco(filename: &str) -> Result<CoverageMap, Error> {
     Ok(cm)
 }
 
+/// Converts a Cobertura XML file into a `CoverageMap`.
+///
+/// # Errors
+///
+/// Returns an error when `parse_cobertura` fails (file not found or invalid XML).
 pub fn to_coverage_map_cobertura(filename: &str) -> Result<CoverageMap, Error> {
     let report = parse_cobertura(filename)?;
     let mut cm: CoverageMap = BTreeMap::new();
@@ -334,7 +374,14 @@ pub fn to_coverage_map_cobertura(filename: &str) -> Result<CoverageMap, Error> {
     Ok(cm)
 }
 
-/// Dispatch by detected format.
+/// Detects the format of `filename` and converts it to a `CoverageMap`.
+///
+/// Dispatches to the appropriate `to_coverage_map_*` function based on the
+/// format detected by `detect_format`.
+///
+/// # Errors
+///
+/// Propagates any error returned by the format-specific converter.
 pub fn to_coverage_map(filename: &str) -> Result<CoverageMap, Error> {
     match detect_format(filename) {
         Format::Lcov => to_coverage_map_lcov(filename),

@@ -1,10 +1,21 @@
+//! Utilities for locating the Git repository root.
+
 use std::path::PathBuf;
 use std::process::Command;
 
 use anyhow::{Context, Error, anyhow};
 
-/// Returns the absolute path to the git repository root, derived by running
-/// `git rev-parse --show-toplevel` from the current working directory.
+/// Returns the absolute path to the Git repository root.
+///
+/// Executes `git rev-parse --show-toplevel` from the current working directory.
+///
+/// # Errors
+///
+/// Returns an error when:
+/// - `git` is not found in `PATH`.
+/// - The command exits with a non-zero status (i.e. not inside a Git repository).
+/// - The output contains invalid UTF-8.
+/// - The resolved path is empty.
 pub fn find_root() -> std::result::Result<PathBuf, Error> {
     let output = Command::new("git")
         .args(["rev-parse", "--show-toplevel"])

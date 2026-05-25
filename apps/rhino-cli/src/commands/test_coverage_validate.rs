@@ -1,5 +1,7 @@
-// Port of `apps/rhino-cli/cmd/test_coverage_validate.go`.
-// Same output, same exit codes, same byte-for-byte text format.
+//! `test-coverage validate` — validates coverage from LCOV, `JaCoCo`, Cobertura, or Go files.
+//!
+//! Port of `apps/rhino-cli/cmd/test_coverage_validate.go`.
+//! Same output, same exit codes, same byte-for-byte text format.
 
 use std::path::Path;
 
@@ -13,6 +15,7 @@ use crate::internal::testcoverage::{
     types::{Format, Result as CoverageResult},
 };
 
+/// CLI arguments for `test-coverage validate`.
 #[derive(Args, Debug)]
 pub struct ValidateArgs {
     /// Coverage file path relative to git repo root.
@@ -30,6 +33,12 @@ pub struct ValidateArgs {
     pub exclude: Vec<String>,
 }
 
+/// Run the `test-coverage validate` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the threshold cannot be
+/// parsed, the coverage file cannot be parsed, or coverage is below the threshold.
 pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -102,7 +111,7 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
     Ok(())
 }
 
-/// Filters out FileResult entries whose path matches any of the supplied glob patterns
+/// Filters out `FileResult` entries whose path matches any of the supplied glob patterns
 /// and recomputes the aggregate counts. Mirrors Go's `testcoverage.ExcludeFiles`.
 fn apply_exclude(mut result: CoverageResult, patterns: &[String]) -> CoverageResult {
     let matchers: Vec<glob::Pattern> = patterns

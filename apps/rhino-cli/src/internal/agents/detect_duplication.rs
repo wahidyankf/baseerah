@@ -1,4 +1,4 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/agents/detect_duplication.go`.
+//! Byte-for-byte port of `apps/rhino-cli/internal/agents/detect_duplication.go`.
 
 use std::collections::HashMap;
 use std::fmt::Write as FmtWrite;
@@ -8,23 +8,38 @@ use std::path::Path;
 use anyhow::{Context, Error};
 use sha2::{Digest, Sha256};
 
+/// Number of consecutive normalized lines used as a duplication window.
 pub const DUPLICATION_WINDOW_SIZE: usize = 10;
 
+/// A single duplication finding: same 10-line window in two or more files.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DuplicationFinding {
+    /// Sorted list of absolute file paths where the duplicated window appears.
     pub files: Vec<String>,
+    /// First line number (1-based) of the window in each corresponding file.
     pub start_lines: Vec<usize>,
+    /// Always `DUPLICATION_WINDOW_SIZE`.
     pub window_size: usize,
+    /// Severity of the finding (always `"high"`).
     pub severity: String,
+    /// Human-readable description of the finding.
     pub message: String,
 }
 
+/// A file + start-line pair in the rolling window index.
 #[derive(Debug, Clone)]
 struct WindowRef {
+    /// Absolute path of the file.
     file: String,
+    /// 1-based line number where this window begins.
     start_line: usize,
 }
 
+/// Scan `.claude/agents/` and `.claude/skills/*/SKILL.md` for 10-line verbatim duplications.
+///
+/// # Errors
+///
+/// Returns an error if a file listed in the agent or skill directories cannot be read.
 pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<DuplicationFinding>, Error> {
     let files = enumerate_agent_and_skill_files(repo_root)?;
     let mut hash_index: HashMap<String, Vec<WindowRef>> = HashMap::new();
@@ -86,6 +101,11 @@ pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<Duplicati
     Ok(findings)
 }
 
+/// Collect all agent `.md` and skill `SKILL.md` file paths under `repo_root`.
+///
+/// # Errors
+///
+/// Returns an error if `.claude/agents/` or `.claude/skills/` exists but cannot be read.
 fn enumerate_agent_and_skill_files(repo_root: &Path) -> std::result::Result<Vec<String>, Error> {
     let mut files = Vec::new();
 
@@ -132,6 +152,7 @@ fn enumerate_agent_and_skill_files(repo_root: &Path) -> std::result::Result<Vec<
     Ok(files)
 }
 
+/// Remove the YAML frontmatter block from a markdown string, returning only the body.
 fn strip_frontmatter(s: &str) -> String {
     if !s.starts_with("---\n") && !s.starts_with("---\r\n") {
         return s.to_string();
@@ -150,6 +171,7 @@ fn strip_frontmatter(s: &str) -> String {
     body[idx + close_nl + 1..].to_string()
 }
 
+/// Return the byte offset of the closing `---` fence line within `body`, if present.
 fn index_of_fence_line(body: &str) -> Option<usize> {
     let mut offset = 0;
     while offset <= body.len() {
@@ -185,6 +207,7 @@ fn index_of_fence_line(body: &str) -> Option<usize> {
     None
 }
 
+/// Normalize a string into lines: trim trailing whitespace, collapse consecutive blank lines.
 fn normalize_lines(s: &str) -> Vec<String> {
     let s = s.replace("\r\n", "\n");
     let mut out: Vec<String> = Vec::new();
@@ -201,6 +224,7 @@ fn normalize_lines(s: &str) -> Vec<String> {
     out
 }
 
+/// Return true if `lines` consists entirely of blank lines or heading lines — not worth hashing.
 fn is_excluded_window(lines: &[String]) -> bool {
     let mut all_blank = true;
     let mut all_heading_or_blank = true;
@@ -216,6 +240,7 @@ fn is_excluded_window(lines: &[String]) -> bool {
     all_blank || all_heading_or_blank
 }
 
+/// Compute a hex-encoded SHA-256 hash of the newline-joined window for index lookup.
 fn hash_window(lines: &[String]) -> String {
     let joined = lines.join("\n");
     let mut hasher = Sha256::new();

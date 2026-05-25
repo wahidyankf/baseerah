@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_audit.go`.
+//! `repo-governance audit` — runs all governance audit categories.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_audit.go`.
 
 use std::fmt::Write as _;
 
@@ -11,6 +13,7 @@ use crate::internal::repo_governance::audit_orchestrator::{
     AuditEnvelope, AuditOptions, run_audit,
 };
 
+/// CLI arguments for `repo-governance audit`.
 #[derive(Args, Debug)]
 pub struct AuditArgs {
     /// Category to skip (repeatable).
@@ -24,6 +27,12 @@ pub struct AuditArgs {
     pub exclude: Vec<String>,
 }
 
+/// Run the `repo-governance audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// any governance findings are reported.
 pub fn run(args: &AuditArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -58,6 +67,7 @@ pub fn run(args: &AuditArgs, output_format: OutputFormat) -> std::result::Result
     Ok(())
 }
 
+/// Format the audit result as human-readable text.
 fn format_text(env: &AuditEnvelope) -> String {
     let mut sb = String::new();
     if env.result.total_findings == 0 {
@@ -106,10 +116,16 @@ fn format_text(env: &AuditEnvelope) -> String {
     sb
 }
 
+/// Serialize the audit result as a JSON string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(env: &AuditEnvelope) -> std::result::Result<String, Error> {
     Ok(serde_json::to_string_pretty(env)?)
 }
 
+/// Format the audit result as a Markdown summary table.
 fn format_markdown(env: &AuditEnvelope) -> String {
     let mut sb = String::new();
     sb.push_str("## Governance Audit\n\n");

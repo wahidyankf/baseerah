@@ -1,4 +1,22 @@
-// Glossary validator — port of `apps/rhino-cli/internal/glossary/`.
+//! Glossary validator for bounded-context glossary markdown files.
+//!
+//! Port of `apps/rhino-cli/internal/glossary/`.
+//!
+//! A glossary file has three sections:
+//! - **Frontmatter** — bold key-value pairs (`**Key**: value`) at the top.
+//! - **Terms table** — a markdown table under `## Terms` or `## Term index`.
+//! - **Forbidden synonyms** — a bullet list under `## Forbidden synonyms`.
+//!
+//! The validator:
+//! 1. Parses every glossary file declared in the bounded-context registry.
+//! 2. Checks that required frontmatter keys are present.
+//! 3. Verifies that every code identifier in the terms table exists in the
+//!    corresponding source code directory.
+//! 4. Verifies that every feature reference resolves to an existing file.
+//! 5. Checks that forbidden synonyms are not used in the context's own code
+//!    or Gherkin.
+//! 6. Detects term collisions across contexts that lack mutual
+//!    `Forbidden synonyms` cross-links.
 
 use std::collections::HashMap;
 use std::fs;
@@ -13,69 +31,107 @@ use walkdir::WalkDir;
 use crate::internal::bcregistry::{self, BcContext};
 use crate::internal::severity::Severity;
 
+/// In-memory representation of a parsed glossary file.
 #[derive(Debug, Clone, Default)]
 pub struct Glossary {
+    /// Filesystem path to this glossary file.
     pub path: String,
+    /// Key-value pairs parsed from the bold-formatted frontmatter section.
     pub frontmatter: HashMap<String, String>,
+    /// Terms parsed from the `## Terms` or `## Term index` table.
     pub terms: Vec<Term>,
+    /// Forbidden synonym entries parsed from the `## Forbidden synonyms` list.
     pub forbidden_synonyms: Vec<Forbidden>,
+    /// Structural parse errors encountered while reading the file.
     pub parse_errors: Vec<ParseError>,
 }
 
+/// A single term entry from the glossary terms table.
 #[derive(Debug, Clone, Default)]
 pub struct Term {
+    /// The term name as it appears in the first column.
     pub term: String,
+    /// Human-readable definition (not yet populated by the parser).
     pub definition: String,
+    /// Backtick-delimited code identifiers from the second column.
     pub code_identifiers: Vec<String>,
+    /// Feature file references from the third column.
     pub used_in_features: Vec<String>,
+    /// One-based source line number of the table row.
     pub source_line: usize,
 }
 
+/// A forbidden synonym entry from the `## Forbidden synonyms` bullet list.
 #[derive(Debug, Clone, Default)]
 pub struct Forbidden {
+    /// The synonym string that must not appear in the context's own code.
     pub term: String,
+    /// Explanation of why this synonym is forbidden.
     pub reason: String,
+    /// One-based source line number of the bullet item.
     pub source_line: usize,
 }
 
+/// A structural parse error that prevented a glossary element from being read.
 #[derive(Debug, Clone, Default)]
 pub struct ParseError {
+    /// One-based line number where the error was detected (0 for file-level errors).
     pub line: usize,
+    /// Human-readable description of the parse failure.
     pub message: String,
 }
 
+/// A validation finding produced by the glossary checker.
 #[derive(Debug, Clone)]
 pub struct Finding {
+    /// Relative path to the glossary file that contains the finding.
     pub file: String,
+    /// Human-readable description of the issue.
     pub message: String,
+    /// Severity level of this finding.
     pub severity: Severity,
 }
 
+/// Options that control how [`validate_all`] runs.
 #[derive(Debug, Clone, Default)]
 pub struct ValidateOptions {
+    /// Absolute path to the repository root.
     pub repo_root: PathBuf,
+    /// Application identifier to validate (e.g. `"organiclever"`).
     pub app: String,
+    /// Severity override; defaults to [`Severity::Error`] when `None`.
     pub severity: Option<Severity>,
 }
 
+/// Returns the compiled regex for matching bold frontmatter key-value pairs.
+///
+/// Pattern: `**Key**: value`
 fn re_frontmatter() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"^\*\*([^*]+)\*\*:\s*(.+)$").expect("valid hardcoded regex"))
 }
 
+/// Returns the compiled regex for extracting backtick-delimited identifiers.
 fn re_backtick_idents() -> &'static Regex {
     static R: OnceLock<Regex> = OnceLock::new();
     R.get_or_init(|| Regex::new(r"`([^`]+)`").expect("valid hardcoded regex"))
 }
 
+/// Returns the keys that every glossary frontmatter block must contain.
 fn required_frontmatter_keys() -> &'static [&'static str] {
     &["Bounded context", "Maintainer", "Last reviewed"]
 }
 
+/// Returns the expected column headers for the terms table.
 fn expected_table_columns() -> &'static [&'static str] {
     &["Term", "Code identifier(s)", "Used in features"]
 }
 
+/// Reads and parses the glossary file at `path`.
+///
+/// Parse errors (e.g. unreadable file, malformed table header) are collected
+/// in [`Glossary::parse_errors`] rather than propagated as `Result` errors, so
+/// the caller can still run structural validations on a partially-parsed glossary.
 pub fn parse(path: &Path) -> Glossary {
     let mut g = Glossary {
         path: path.to_string_lossy().into_owned(),
@@ -95,6 +151,8 @@ pub fn parse(path: &Path) -> Glossary {
     g
 }
 
+/// Parses `content` into `g` line by line, filling frontmatter, terms, and
+/// forbidden-synonym sections.
 fn parse_content(g: &mut Glossary, content: &str) {
     let mut line_num = 0usize;
     let mut in_terms = false;
@@ -164,6 +222,10 @@ fn parse_content(g: &mut Glossary, content: &str) {
     }
 }
 
+/// Validates that the terms table header row has the correct column names.
+///
+/// Returns a `Vec<ParseError>` (possibly empty) rather than short-circuiting,
+/// so the caller can collect all structural issues in one pass.
 fn validate_table_header(cells: &[String], line_num: usize) -> Vec<ParseError> {
     let expected = expected_table_columns();
     if cells.len() < expected.len() {
@@ -184,6 +246,8 @@ fn validate_table_header(cells: &[String], line_num: usize) -> Vec<ParseError> {
     Vec::new()
 }
 
+/// Splits a markdown table row on `|` separators, trimming leading/trailing
+/// pipes and whitespace from each cell.
 fn split_table_row(line: &str) -> Vec<String> {
     let line = line.trim();
     let line = line.strip_prefix('|').unwrap_or(line);
@@ -191,6 +255,8 @@ fn split_table_row(line: &str) -> Vec<String> {
     line.split('|').map(|p| p.trim().to_string()).collect()
 }
 
+/// Returns `true` when every cell in `cells` contains only dashes and optional
+/// alignment colons (i.e. the row is a markdown table separator).
 fn is_separator_row(cells: &[String]) -> bool {
     if cells.is_empty() {
         return false;
@@ -205,10 +271,12 @@ fn is_separator_row(cells: &[String]) -> bool {
     true
 }
 
+/// Removes backticks and trims surrounding whitespace from a markdown cell value.
 fn strip_markup(s: &str) -> String {
     s.trim().replace('`', "")
 }
 
+/// Extracts all backtick-delimited identifiers from a table cell string.
 fn parse_backtick_list(cell: &str) -> Vec<String> {
     re_backtick_idents()
         .captures_iter(cell)
@@ -217,6 +285,8 @@ fn parse_backtick_list(cell: &str) -> Vec<String> {
         .collect()
 }
 
+/// Parses feature file references from a table cell, handling `<br>` separators,
+/// comma-separated lists, and trailing parenthetical annotations.
 fn parse_feature_refs(cell: &str) -> Vec<String> {
     let cell = cell.replace("<br>", ",");
     cell.split(',')
@@ -233,6 +303,9 @@ fn parse_feature_refs(cell: &str) -> Vec<String> {
         .collect()
 }
 
+/// Parses a single forbidden-synonym bullet line into a `(term, reason)` pair.
+///
+/// Supports both em-dash (`—`) and ASCII hyphen (`-`) as separators.
 fn parse_forbidden_entry(line: &str) -> (String, String) {
     let em_dash = "—";
     let idx = line
@@ -249,6 +322,22 @@ fn parse_forbidden_entry(line: &str) -> (String, String) {
     }
 }
 
+/// Loads the bounded-context registry for `opts.app` and validates every declared
+/// glossary file.
+///
+/// Validation checks include:
+/// - Required frontmatter keys present.
+/// - Terms table header matches expected columns.
+/// - All code identifiers exist in the declared code directories.
+/// - All feature references resolve to existing files.
+/// - Forbidden synonyms are not used in the context's own code or Gherkin.
+/// - No term collisions across contexts without mutual forbidden-synonym cross-links.
+///
+/// Returns a sorted list of [`Finding`]s (empty means no issues).
+///
+/// # Errors
+///
+/// Returns an error when the registry file cannot be loaded.
 pub fn validate_all(opts: &ValidateOptions) -> Result<Vec<Finding>, Error> {
     let sev = opts.severity.unwrap_or(Severity::Error);
     let reg = bcregistry::load(&opts.repo_root, &opts.app)?;
@@ -304,6 +393,7 @@ pub fn validate_all(opts: &ValidateOptions) -> Result<Vec<Finding>, Error> {
     Ok(findings)
 }
 
+/// Returns findings for any required frontmatter key that is absent from `g`.
 fn check_frontmatter(file: &str, g: &Glossary, sev: Severity) -> Vec<Finding> {
     required_frontmatter_keys()
         .iter()
@@ -316,6 +406,7 @@ fn check_frontmatter(file: &str, g: &Glossary, sev: Severity) -> Vec<Finding> {
         .collect()
 }
 
+/// Returns findings for any malformed terms-table-header parse error stored in `g`.
 fn check_table_header(file: &str, g: &Glossary, sev: Severity) -> Vec<Finding> {
     g.parse_errors
         .iter()
@@ -328,6 +419,10 @@ fn check_table_header(file: &str, g: &Glossary, sev: Severity) -> Vec<Finding> {
         .collect()
 }
 
+/// Validates every term's code identifiers and feature references.
+///
+/// Returns a finding for each identifier not found in `code_paths` and each
+/// feature reference that does not resolve to an existing file.
 fn check_terms(
     file: &str,
     g: &Glossary,
@@ -368,6 +463,7 @@ fn check_terms(
     findings
 }
 
+/// Formats a slice of paths as a bracketed, space-separated string.
 fn format_paths(paths: &[PathBuf]) -> String {
     let parts: Vec<String> = paths
         .iter()
@@ -376,6 +472,10 @@ fn format_paths(paths: &[PathBuf]) -> String {
     format!("[{}]", parts.join(" "))
 }
 
+/// Returns `true` when `reference` resolves to at least one existing file inside
+/// one of the `gherkin_paths` directories.
+///
+/// Supports simple filenames, slash-separated sub-paths, and glob patterns.
 #[allow(clippy::collapsible_if, clippy::collapsible_match)]
 fn feature_ref_resolves(reference: &str, gherkin_paths: &[PathBuf]) -> bool {
     for gh in gherkin_paths {
@@ -402,6 +502,8 @@ fn feature_ref_resolves(reference: &str, gherkin_paths: &[PathBuf]) -> bool {
     false
 }
 
+/// Returns a finding for each forbidden synonym that is found in the context's
+/// own code directories or Gherkin directories.
 fn check_forbidden_synonyms(
     file: &str,
     g: &Glossary,
@@ -430,6 +532,8 @@ fn check_forbidden_synonyms(
     findings
 }
 
+/// Detects terms that appear in multiple bounded contexts without mutual
+/// `Forbidden synonyms` cross-links between those contexts.
 fn check_term_collisions(
     reg: &bcregistry::Registry,
     glossaries: &HashMap<String, Glossary>,
@@ -480,16 +584,23 @@ fn check_term_collisions(
     findings
 }
 
+/// Formats a slice of owned strings as a bracketed, space-separated list.
 fn format_string_slice_owned(s: &[String]) -> String {
     format!("[{}]", s.join(" "))
 }
 
+/// Returns `true` when `g` has at least one forbidden synonym entry whose term
+/// matches `term` (case-insensitively).
+///
+/// The `_other` parameter is reserved for future directional cross-link checking.
 fn has_forbidden_for(g: &Glossary, term: &str, _other: &str) -> bool {
     g.forbidden_synonyms
         .iter()
         .any(|fb| fb.term.eq_ignore_ascii_case(term))
 }
 
+/// Counts the number of lines in files under `root` (filtered by `exts`) that
+/// contain a whole-word match for `pattern`.
 fn grep_files(pattern: &str, root: &Path, exts: &[String]) -> usize {
     let escaped = regex::escape(pattern);
     let Ok(re) = Regex::new(&format!(r"\b{escaped}\b")) else {
@@ -525,6 +636,7 @@ fn grep_files(pattern: &str, root: &Path, exts: &[String]) -> usize {
     count
 }
 
+/// Returns the first code path for `_ctx` (unused; kept for Go-port parity).
 pub fn ctx_first_code_path(_ctx: &BcContext) -> &'static str {
     // unused but kept for parity
     ""
@@ -536,11 +648,14 @@ mod tests {
     use super::*;
     use tempfile::tempdir;
 
+    /// Creates a file at `path`, making parent directories as needed.
     fn write(path: &Path, content: &str) {
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
         std::fs::write(path, content).unwrap();
     }
 
+    /// Verifies that [`parse`] correctly extracts frontmatter key-value pairs and
+    /// a term row from a minimal glossary file.
     #[test]
     fn parse_frontmatter_and_terms() {
         let dir = tempdir().unwrap();
@@ -561,6 +676,7 @@ mod tests {
         assert_eq!(g.terms[0].code_identifiers, vec!["Foo"]);
     }
 
+    /// Verifies that a malformed terms table header produces a parse error.
     #[test]
     fn parse_malformed_header_reports_error() {
         let dir = tempdir().unwrap();
@@ -577,6 +693,7 @@ mod tests {
         );
     }
 
+    /// Verifies that a forbidden synonym using an em-dash separator is parsed correctly.
     #[test]
     fn parse_forbidden_synonyms_em_dash() {
         let dir = tempdir().unwrap();
@@ -591,18 +708,21 @@ mod tests {
         assert_eq!(g.forbidden_synonyms[0].reason, "replaced by Foo");
     }
 
+    /// Verifies that [`split_table_row`] removes surrounding pipes and trims whitespace.
     #[test]
     fn split_table_row_strips_pipes() {
         let cells = split_table_row("| a | b | c |");
         assert_eq!(cells, vec!["a", "b", "c"]);
     }
 
+    /// Verifies that [`is_separator_row`] correctly identifies markdown table separator rows.
     #[test]
     fn is_separator_row_detects_dashes() {
         assert!(is_separator_row(&["---".to_string(), "---".to_string()]));
         assert!(!is_separator_row(&["a".to_string(), "---".to_string()]));
     }
 
+    /// Verifies that [`parse_backtick_list`] extracts backtick-delimited identifiers.
     #[test]
     fn parse_backtick_list_extracts_ids() {
         assert_eq!(
@@ -611,18 +731,21 @@ mod tests {
         );
     }
 
+    /// Verifies that [`parse_feature_refs`] strips trailing parenthetical annotations.
     #[test]
     fn parse_feature_refs_strips_parenthetical() {
         let v = parse_feature_refs("a.feature (Scenario: x), `b.feature`");
         assert_eq!(v, vec!["a.feature".to_string(), "b.feature".to_string()]);
     }
 
+    /// Verifies that [`parse_feature_refs`] handles `<br>` as a cell separator.
     #[test]
     fn parse_feature_refs_handles_br() {
         let v = parse_feature_refs("a.feature<br>b.feature");
         assert_eq!(v, vec!["a.feature".to_string(), "b.feature".to_string()]);
     }
 
+    /// Verifies that [`check_frontmatter`] reports each missing required key.
     #[test]
     fn check_frontmatter_reports_missing() {
         let mut g = Glossary::default();
@@ -633,6 +756,7 @@ mod tests {
         assert_eq!(r2.len(), 2);
     }
 
+    /// Verifies that [`grep_files`] counts whole-word matches across source files.
     #[test]
     fn grep_files_counts_matches() {
         let dir = tempdir().unwrap();
@@ -641,6 +765,7 @@ mod tests {
         assert_eq!(c, 2);
     }
 
+    /// Verifies that [`check_table_header`] surfaces malformed-header parse errors as findings.
     #[test]
     fn check_table_header_extracts_malformed() {
         let mut g = Glossary::default();
@@ -652,6 +777,7 @@ mod tests {
         assert_eq!(r.len(), 1);
     }
 
+    /// Verifies that [`feature_ref_resolves`] correctly resolves simple feature file references.
     #[test]
     fn feature_ref_resolves_simple_path() {
         let dir = tempdir().unwrap();
@@ -665,6 +791,8 @@ mod tests {
         assert!(!feature_ref_resolves("missing.feature", &[gpath]));
     }
 
+    /// Verifies that [`parse_forbidden_entry`] handles both quoted and unquoted terms
+    /// separated by ASCII hyphens.
     #[test]
     fn parse_forbidden_entry_quoted_and_unquoted() {
         let (t, r) = parse_forbidden_entry("\"X\" - reason");
@@ -675,6 +803,7 @@ mod tests {
         assert_eq!(r2, "");
     }
 
+    /// Writes a minimal `bounded-contexts.yaml` registry under `root` for test fixtures.
     fn write_min_reg(root: &Path) {
         let yaml = "version: 2\napp: testapp\ncontexts:\n  - name: ctx-a\n    summary: ok\n    layers: [domain]\n    code: [\"apps/testapp/src\"]\n    glossary: specs/apps/testapp/glossary/ctx-a.md\n    gherkin: specs/apps/testapp/behavior/gherkin/ctx-a\n";
         let p = root.join("specs/apps/testapp/ddd/bounded-contexts.yaml");
@@ -682,6 +811,7 @@ mod tests {
         std::fs::write(p, yaml).unwrap();
     }
 
+    /// Verifies that [`validate_all`] reports issues when the glossary file is missing.
     #[test]
     fn validate_all_missing_glossary_reports() {
         let dir = tempdir().unwrap();
@@ -696,6 +826,7 @@ mod tests {
         assert!(!r.is_empty());
     }
 
+    /// Verifies that [`validate_all`] returns no findings for a correctly structured glossary.
     #[test]
     fn validate_all_clean_glossary() {
         let dir = tempdir().unwrap();
@@ -719,6 +850,8 @@ mod tests {
         assert!(r.is_empty(), "{r:#?}");
     }
 
+    /// Verifies that [`validate_all`] reports a stale identifier that is no longer
+    /// present in the codebase.
     #[test]
     fn validate_all_detects_stale_identifier() {
         let dir = tempdir().unwrap();
@@ -742,16 +875,19 @@ mod tests {
         assert!(r.iter().any(|f| f.message.contains("stale identifier")));
     }
 
+    /// Verifies that [`parse_feature_refs`] returns an empty vec for an empty cell.
     #[test]
     fn parse_feature_refs_empty_cell() {
         assert!(parse_feature_refs("").is_empty());
     }
 
+    /// Verifies that [`strip_markup`] removes backticks and trims surrounding whitespace.
     #[test]
     fn strip_markup_removes_backticks_and_trims() {
         assert_eq!(strip_markup(" `Foo` "), "Foo");
     }
 
+    /// Verifies that [`has_forbidden_for`] performs case-insensitive term matching.
     #[test]
     fn has_forbidden_for_case_insensitive() {
         let mut g = Glossary::default();

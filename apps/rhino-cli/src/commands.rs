@@ -1,3 +1,4 @@
+//! Top-level command modules, one per `rhino-cli` subcommand.
 pub mod agents_detect_duplication;
 pub mod agents_emit_bindings;
 pub mod agents_sync;

@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/env_restore.go`.
+//! `env restore` — restores `.env*` files from an external backup directory.
+//!
+//! Port of `apps/rhino-cli/cmd/env_restore.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -10,22 +12,35 @@ use crate::internal::envbackup::{
 };
 use crate::internal::git;
 
+/// CLI arguments for `env restore`.
 #[derive(Args, Debug)]
 pub struct EnvRestoreArgs {
+    /// Backup directory (default: ~/ose-open-env-backup).
     #[arg(long = "dir", default_value = "")]
     pub dir: String,
+    /// Namespace restore by worktree/repo directory name.
     #[arg(long = "worktree-aware")]
     pub worktree_aware: bool,
+    /// Skip overwrite confirmation.
     #[arg(long = "force", short = 'f')]
     pub force: bool,
+    /// Also restore known uncommitted config files.
     #[arg(long = "include-config")]
     pub include_config: bool,
+    /// Verbose output.
     #[arg(long, short = 'v')]
     pub verbose: bool,
+    /// Quiet output.
     #[arg(long, short = 'q')]
     pub quiet: bool,
 }
 
+/// Run the `env restore` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, worktree detection fails,
+/// or the restore operation fails.
 pub fn run(args: &EnvRestoreArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

@@ -1,6 +1,14 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/jacoco_coverage.go`.
-// JaCoCo XML schema: <report><package name=...><sourcefile name=...><line nr,mi,ci,mb,cb/>...
-// Classification: ci > 0 && mb == 0 → covered; ci > 0 && mb > 0 → partial; ci == 0 → missed.
+//! JaCoCo XML coverage format parser and result computer.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/jacoco_coverage.go`.
+//!
+//! JaCoCo XML schema: `<report><package name=…><sourcefile name=…><line nr,mi,ci,mb,cb/>…`
+//!
+//! Line classification:
+//!
+//! - `ci > 0` and `mb == 0` → **covered**
+//! - `ci > 0` and `mb > 0` → **partial**
+//! - `ci == 0` → **missed**
 
 use std::fs;
 
@@ -9,42 +17,61 @@ use serde::Deserialize;
 
 use super::types::{FileResult, Format, Result as CoverageResult};
 
+/// Top-level deserialization target for a `JaCoCo` XML report.
 #[derive(Debug, Deserialize, Default)]
 pub(crate) struct JacocoReport {
+    /// List of `<package>` child elements.
     #[serde(rename = "package", default)]
     pub packages: Vec<JacocoPackage>,
 }
 
+/// A `<package>` element grouping source files belonging to one Java package.
 #[derive(Debug, Deserialize)]
 pub(crate) struct JacocoPackage {
+    /// Package name in slash-separated form (e.g. `com/example`).
     #[serde(rename = "@name")]
     pub name: String,
+    /// List of `<sourcefile>` child elements.
     #[serde(rename = "sourcefile", default)]
     pub source_files: Vec<JacocoSourceFile>,
 }
 
+/// A `<sourcefile>` element representing one source file in a `JaCoCo` report.
 #[derive(Debug, Deserialize)]
 pub(crate) struct JacocoSourceFile {
+    /// Base filename (e.g. `Foo.java`); prepend the package name to get the full path.
     #[serde(rename = "@name")]
     pub name: String,
+    /// List of `<line>` child elements with per-line coverage data.
     #[serde(rename = "line", default)]
     pub lines: Vec<JacocoLine>,
 }
 
+/// A `<line>` element in a `JaCoCo` report with instruction and branch counters.
 #[derive(Debug, Deserialize)]
 pub(crate) struct JacocoLine {
+    /// Line number in the source file (`nr` attribute).
     #[serde(rename = "@nr", default)]
     pub nr: i64,
+    /// Missed instruction count (`mi` attribute; unused in coverage computation).
     #[serde(rename = "@mi", default)]
     pub _mi: i64,
+    /// Covered instruction count (`ci` attribute). `ci > 0` means the line was executed.
     #[serde(rename = "@ci", default)]
     pub ci: i64,
+    /// Missed branch count (`mb` attribute). `mb > 0` signals a partially covered branch.
     #[serde(rename = "@mb", default)]
     pub mb: i64,
+    /// Covered branch count (`cb` attribute).
     #[serde(rename = "@cb", default)]
     pub cb: i64,
 }
 
+/// Reads and parses a `JaCoCo` XML file from `filename`.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be read or the XML is malformed.
 pub(crate) fn parse_jacoco(filename: &str) -> std::result::Result<JacocoReport, Error> {
     let data = fs::read_to_string(filename).map_err(|_| anyhow!("file not found: {filename}"))?;
     let report: JacocoReport =
@@ -52,6 +79,11 @@ pub(crate) fn parse_jacoco(filename: &str) -> std::result::Result<JacocoReport, 
     Ok(report)
 }
 
+/// Parses `filename` as a `JaCoCo` XML report and computes aggregated coverage.
+///
+/// # Errors
+///
+/// Returns an error when `parse_jacoco` fails (file not found or invalid XML).
 pub fn compute_jacoco_result(
     filename: &str,
     threshold: f64,

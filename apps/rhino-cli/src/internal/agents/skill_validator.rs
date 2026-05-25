@@ -1,5 +1,5 @@
-// Skill validator ported from
-// `apps/rhino-cli/internal/agents/skill_validator.go`.
+//! Skill validator ported from
+//! `apps/rhino-cli/internal/agents/skill_validator.go`.
 
 use std::collections::HashSet;
 use std::fs;
@@ -13,6 +13,7 @@ use super::types::{
 };
 use super::yaml_formatting::validate_yaml_formatting_raw;
 
+/// Validate a single skill directory at `skill_path` and return all check results.
 pub fn validate_skill(skill_path: &Path, skill_name: &str) -> Vec<ValidationCheck> {
     let mut checks: Vec<ValidationCheck> = Vec::new();
     let skill_file = skill_path.join("SKILL.md");
@@ -81,6 +82,7 @@ pub fn validate_skill(skill_path: &Path, skill_name: &str) -> Vec<ValidationChec
     checks
 }
 
+/// Run field-level checks on a parsed skill (description, name, name format, uniqueness).
 fn validate_skill_fields(
     skill: &ClaudeSkill,
     frontmatter_str: &str,
@@ -166,6 +168,7 @@ fn validate_skill_fields(
     checks
 }
 
+/// Parse a YAML frontmatter string into a `ClaudeSkill`.
 fn parse_skill_yaml(frontmatter: &str) -> Result<ClaudeSkill, String> {
     let v: Value =
         serde_yml::from_str(frontmatter).map_err(|e| format!("yaml parse error: {e}"))?;
@@ -183,6 +186,7 @@ fn parse_skill_yaml(frontmatter: &str) -> Result<ClaudeSkill, String> {
     Ok(skill)
 }
 
+/// Validate all skill directories under `.claude/skills/` and return checks + passing skill names.
 pub fn validate_all_skills(repo_root: &Path) -> (Vec<ValidationCheck>, HashSet<String>) {
     let skills_dir = repo_root.join(".claude").join("skills");
     let entries = match fs::read_dir(&skills_dir) {

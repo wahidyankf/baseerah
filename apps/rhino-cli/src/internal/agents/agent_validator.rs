@@ -1,5 +1,5 @@
-// Agent validator ported from
-// `apps/rhino-cli/internal/agents/agent_validator.go`.
+//! Agent validator ported from
+//! `apps/rhino-cli/internal/agents/agent_validator.go`.
 
 use std::collections::HashSet;
 use std::fs;
@@ -16,6 +16,8 @@ use super::types::{
 };
 use super::yaml_formatting::validate_yaml_formatting_raw;
 
+/// Validate a single agent file at `agent_path` and return a list of check results.
+/// Inserts the agent name into `agent_names` on success for uniqueness tracking.
 pub fn validate_agent<S1: BuildHasher, S2: BuildHasher>(
     agent_path: &Path,
     filename: &str,
@@ -100,6 +102,7 @@ pub fn validate_agent<S1: BuildHasher, S2: BuildHasher>(
     checks
 }
 
+/// Parse a YAML frontmatter string into a `ClaudeAgentFull`.
 fn parse_agent_yaml(frontmatter: &str) -> Result<ClaudeAgentFull, String> {
     let v: Value =
         serde_yml::from_str(frontmatter).map_err(|e| format!("yaml parse error: {e}"))?;
@@ -128,6 +131,7 @@ fn parse_agent_yaml(frontmatter: &str) -> Result<ClaudeAgentFull, String> {
     Ok(agent)
 }
 
+/// Check that `name` and `description` are both non-empty.
 fn validate_required_fields(filename: &str, agent: &ClaudeAgentFull) -> ValidationCheck {
     let mut missing: Vec<&str> = Vec::new();
     if agent.name.is_empty() {
@@ -150,6 +154,7 @@ fn validate_required_fields(filename: &str, agent: &ClaudeAgentFull) -> Validati
     )
 }
 
+/// Check that required fields appear before optional fields, and warn on unknown fields.
 fn validate_field_order(filename: &str, frontmatter: &str) -> Vec<ValidationCheck> {
     let v: Result<Value, _> = serde_yml::from_str(frontmatter);
     let v = match v {
@@ -222,6 +227,7 @@ fn validate_field_order(filename: &str, frontmatter: &str) -> Vec<ValidationChec
     checks
 }
 
+/// Check that every tool name (or base name of call-form entries) is in the allow-list.
 #[allow(clippy::collapsible_match, clippy::collapsible_if)]
 fn validate_tools_check(filename: &str, tools: &[String]) -> ValidationCheck {
     let mut invalid: Vec<String> = Vec::new();
@@ -257,6 +263,7 @@ fn validate_tools_check(filename: &str, tools: &[String]) -> ValidationCheck {
     )
 }
 
+/// Check that `model` is a valid alias or a full `claude-*` model ID.
 fn validate_model_check(filename: &str, model: &str) -> ValidationCheck {
     let aliases = valid_model_alias();
     let pat = valid_model_id_pattern();
@@ -271,6 +278,7 @@ fn validate_model_check(filename: &str, model: &str) -> ValidationCheck {
     )
 }
 
+/// Check that `color` is in the allow-list of named color tokens.
 fn validate_color_check(filename: &str, color: &str) -> ValidationCheck {
     if !valid_colors().contains_key(color) {
         let valid_colors_list = [
@@ -286,6 +294,7 @@ fn validate_color_check(filename: &str, color: &str) -> ValidationCheck {
     ValidationCheck::passed(format!("Agent: {filename} - Valid Color"), "Color valid")
 }
 
+/// Check that the filename equals `<name>.md`.
 fn validate_filename_check(filename: &str, name: &str) -> ValidationCheck {
     let expected = format!("{name}.md");
     if filename != expected {
@@ -302,6 +311,7 @@ fn validate_filename_check(filename: &str, name: &str) -> ValidationCheck {
     )
 }
 
+/// Check that `name` has not already been registered in `agent_names`.
 fn validate_uniqueness<S: BuildHasher>(
     filename: &str,
     name: &str,
@@ -321,6 +331,7 @@ fn validate_uniqueness<S: BuildHasher>(
     )
 }
 
+/// Check that every skill listed in `skills` exists in `skill_names`.
 fn validate_skills_exist<S: BuildHasher>(
     filename: &str,
     skills: &[String],
@@ -346,6 +357,7 @@ fn validate_skills_exist<S: BuildHasher>(
     )
 }
 
+/// Check that frontmatter contains no YAML comment lines (`#`).
 fn validate_no_comments(filename: &str, frontmatter: &[u8]) -> ValidationCheck {
     let s = String::from_utf8_lossy(frontmatter);
     for line in s.split('\n') {
@@ -365,6 +377,7 @@ fn validate_no_comments(filename: &str, frontmatter: &[u8]) -> ValidationCheck {
     )
 }
 
+/// Check that agents in `generated-reports/` declare both `Write` and `Bash` tools.
 #[allow(clippy::collapsible_match, clippy::collapsible_if)]
 fn validate_generated_reports_tools(filename: &str, tools: &[String]) -> ValidationCheck {
     let mut has_write = false;
@@ -399,6 +412,7 @@ fn validate_generated_reports_tools(filename: &str, tools: &[String]) -> Validat
     )
 }
 
+/// Validate all `.md` agent files in `.claude/agents/` and return every check result.
 pub fn validate_all_agents<S: BuildHasher>(
     repo_root: &Path,
     skill_names: &HashSet<String, S>,
@@ -444,6 +458,7 @@ fn format_string_slice(s: &[&str]) -> String {
     format!("[{}]", inner.join(" "))
 }
 
+/// Format an owned string slice as `[a b c]` — Go `%v` style.
 fn format_string_slice_owned(s: &[String]) -> String {
     format!("[{}]", s.join(" "))
 }

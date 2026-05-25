@@ -1,3 +1,4 @@
+//! Smoke tests for the `rhino-cli` binary — verifies the binary builds and responds.
 use assert_cmd::Command;
 use predicates::str::contains;
 

@@ -1,6 +1,8 @@
-// Shared naming-violation reporter used by `agents validate-naming` and
-// `workflows validate-naming`. Mirrors `formatNamingText/JSON/Markdown` in
-// apps/rhino-cli/cmd/agents_validate_naming.go.
+//! Shared naming-violation reporter used by `agents validate-naming` and
+//! `workflows validate-naming`.
+//!
+//! Mirrors `formatNamingText/JSON/Markdown` in
+//! `apps/rhino-cli/cmd/agents_validate_naming.go`.
 
 use std::fmt::Write as _;
 
@@ -9,6 +11,12 @@ use serde::Serialize;
 
 use crate::internal::naming::Violation;
 
+/// Formats a list of [`Violation`]s as human-readable plain text.
+///
+/// When `violations` is empty and `quiet` is `false` a "VALIDATION PASSED"
+/// line is emitted.  When `quiet` is `true` and there are no violations the
+/// returned string is empty.  When `verbose` is `true` a normative-reference
+/// note is appended after the violation list.
 pub fn format_text(label: &str, violations: &[Violation], verbose: bool, quiet: bool) -> String {
     let mut b = String::new();
     if violations.is_empty() {
@@ -34,23 +42,39 @@ pub fn format_text(label: &str, violations: &[Violation], verbose: bool, quiet: 
     b
 }
 
+/// JSON serialisation shape for a single [`Violation`].
 #[derive(Serialize)]
 struct JsonViolation<'a> {
+    /// Relative path of the offending file.
     #[serde(rename = "Path")]
     path: &'a str,
+    /// Machine-readable violation category.
     #[serde(rename = "Kind")]
     kind: &'a str,
+    /// Human-readable violation description.
     #[serde(rename = "Message")]
     message: &'a str,
 }
 
+/// Top-level JSON output envelope.
 #[derive(Serialize)]
 struct JsonOut<'a> {
+    /// The audit kind (e.g., `"agents"` or `"workflows"`).
     kind: &'a str,
+    /// All violations found.
     violations: Vec<JsonViolation<'a>>,
+    /// Total violation count (convenience field).
     count: usize,
 }
 
+/// Serialises `violations` to a pretty-printed JSON string.
+///
+/// The returned string is terminated with a newline.
+///
+/// # Errors
+///
+/// Returns an error when [`serde_json`] fails to serialise the output
+/// envelope — in practice this should not occur for the types involved.
 pub fn format_json(kind: &str, violations: &[Violation]) -> std::result::Result<String, Error> {
     let jv: Vec<JsonViolation> = violations
         .iter()
@@ -70,6 +94,11 @@ pub fn format_json(kind: &str, violations: &[Violation]) -> std::result::Result<
     Ok(s)
 }
 
+/// Formats `violations` as a Markdown section.
+///
+/// Emits a `## <label> naming validation` heading followed either by a clean
+/// message (no violations) or a GFM table with `Kind`, `Path`, and `Message`
+/// columns.
 pub fn format_markdown(label: &str, violations: &[Violation]) -> String {
     let mut b = String::new();
     let _ = writeln!(b, "## {label} naming validation\n");

@@ -1,5 +1,6 @@
-// Repository governance audits.
-// Port of `apps/rhino-cli/internal/repo-governance/`.
+//! Repository governance audits.
+//!
+//! Port of `apps/rhino-cli/internal/repo-governance/`.
 
 pub mod agents_md_size;
 pub mod audit_orchestrator;

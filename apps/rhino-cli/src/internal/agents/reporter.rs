@@ -1,5 +1,5 @@
-// Validation reporter ported from
-// `apps/rhino-cli/internal/agents/reporter.go` (validation-only paths).
+//! Validation reporter ported from
+//! `apps/rhino-cli/internal/agents/reporter.go` (validation-only paths).
 
 use std::fmt::Write as _;
 use std::time::Duration;
@@ -11,6 +11,7 @@ use serde::Serialize;
 use super::sync::SyncResult;
 use super::types::ValidationResult;
 
+/// Return the human-readable status banner string for a validation result.
 fn status_banner(result: &ValidationResult) -> &'static str {
     if result.failed_checks > 0 {
         "\u{274C} VALIDATION FAILED"
@@ -21,6 +22,7 @@ fn status_banner(result: &ValidationResult) -> &'static str {
     }
 }
 
+/// Return the machine-readable status string (`"success"`, `"warning"`, or `"failure"`) for JSON output.
 fn status_json(result: &ValidationResult) -> &'static str {
     if result.failed_checks > 0 {
         "failure"
@@ -73,6 +75,7 @@ pub fn format_go_duration(d: Duration) -> String {
     }
 }
 
+/// Format a sub-second nanosecond value as a decimal fraction for `format_go_duration`.
 fn format_fraction(nanos: i128, scale: i128) -> String {
     let whole = nanos / scale;
     let frac = nanos % scale;
@@ -93,6 +96,7 @@ fn format_fraction(nanos: i128, scale: i128) -> String {
     s
 }
 
+/// Remove trailing `'0'` characters from a numeric string.
 fn trim_trailing_zeros(s: &str) -> String {
     let trimmed = s.trim_end_matches('0');
     trimmed.to_string()
@@ -173,30 +177,55 @@ pub fn format_validation_text(result: &ValidationResult, verbose: bool, quiet: b
     sb
 }
 
+/// JSON envelope for a full validation result.
 #[derive(Serialize)]
 struct JsonOut<'a> {
+    /// Overall status: `"success"`, `"warning"`, or `"failure"`.
     status: &'a str,
+    /// ISO-8601 timestamp of when the report was generated.
     timestamp: String,
+    /// Total number of checks run.
     total_checks: usize,
+    /// Number of passed checks.
     passed_checks: usize,
+    /// Number of warning checks.
     warning_checks: usize,
+    /// Number of failed checks.
     failed_checks: usize,
+    /// Duration of the validation run in milliseconds.
     duration_ms: i64,
+    /// Per-check detail records.
     checks: Vec<JsonCheck<'a>>,
 }
 
+/// JSON representation of a single validation check.
 #[derive(Serialize)]
 struct JsonCheck<'a> {
+    /// Check identifier string.
     name: &'a str,
+    /// Check status: `"passed"`, `"warning"`, or `"failed"`.
     status: &'a str,
     #[serde(skip_serializing_if = "str::is_empty")]
+    /// What was expected (omitted when empty).
     expected: &'a str,
     #[serde(skip_serializing_if = "str::is_empty")]
+    /// What was observed (omitted when empty).
     actual: &'a str,
     #[serde(skip_serializing_if = "str::is_empty")]
+    /// Human-readable message (omitted when empty).
     message: &'a str,
 }
 
+/// Format a validation result as pretty-printed JSON.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
+///
+/// # Panics
+///
+/// Panics if the validation duration in milliseconds overflows `i64`, which
+/// cannot happen for any realistic duration.
 pub fn format_validation_json(result: &ValidationResult) -> std::result::Result<String, Error> {
     let timestamp = Local::now().format("%Y-%m-%dT%H:%M:%S%:z").to_string();
     let checks: Vec<JsonCheck> = result
@@ -223,6 +252,7 @@ pub fn format_validation_json(result: &ValidationResult) -> std::result::Result<
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
+/// Format a validation result as a Markdown report.
 pub fn format_validation_markdown(result: &ValidationResult, verbose: bool) -> String {
     let mut sb = String::new();
     sb.push_str("# Validation Results\n\n");
@@ -299,8 +329,7 @@ pub fn format_validation_markdown(result: &ValidationResult, verbose: bool) -> S
     sb
 }
 
-// ---- Sync formatting ----
-
+/// Format a sync result as plain text.
 pub fn format_sync_text(result: &SyncResult, verbose: bool, quiet: bool) -> String {
     let mut sb = String::new();
     if !quiet {
@@ -349,26 +378,50 @@ pub fn format_sync_text(result: &SyncResult, verbose: bool, quiet: bool) -> Stri
     sb
 }
 
+/// JSON envelope for a sync operation result.
 #[derive(Serialize)]
 struct SyncJsonOut<'a> {
+    /// Overall status: `"success"` or `"failure"`.
     status: &'a str,
+    /// ISO-8601 timestamp of when the report was generated.
     timestamp: String,
+    /// Number of agents successfully converted.
     agents_converted: usize,
+    /// Number of agents that failed to convert.
     agents_failed: usize,
+    /// Number of skills successfully copied (always 0 — skills are not copied).
     skills_copied: usize,
+    /// Number of skills that failed to copy (always 0).
     skills_failed: usize,
+    /// Filenames of files that failed during sync.
     failed_files: &'a [String],
+    /// Per-field conversion warnings.
     warnings: Vec<SyncJsonWarning<'a>>,
+    /// Duration of the sync operation in milliseconds.
     duration_ms: i64,
 }
 
+/// JSON representation of a single conversion warning.
 #[derive(Serialize)]
 struct SyncJsonWarning<'a> {
+    /// Name of the agent the warning belongs to.
     agent: &'a str,
+    /// Field key that was dropped or translated.
     field: &'a str,
+    /// Human-readable reason for the warning.
     reason: &'a str,
 }
 
+/// Format a sync result as pretty-printed JSON.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
+///
+/// # Panics
+///
+/// Panics if the sync duration in milliseconds overflows `i64`, which cannot
+/// happen for any realistic duration.
 pub fn format_sync_json(result: &SyncResult) -> std::result::Result<String, Error> {
     let status = if result.failed_files.is_empty() {
         "success"
@@ -399,6 +452,7 @@ pub fn format_sync_json(result: &SyncResult) -> std::result::Result<String, Erro
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
+/// Format a sync result as a Markdown report.
 pub fn format_sync_markdown(result: &SyncResult) -> String {
     let mut sb = String::new();
     sb.push_str("# Sync Results\n\n");

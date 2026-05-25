@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/internal/testcoverage/diff.go` + `gitdiff.go`.
+//! Diff-based coverage: measures line coverage restricted to lines changed in a git diff.
+//!
+//! Port of `apps/rhino-cli/internal/testcoverage/diff.go` and `gitdiff.go`.
 
 use std::process::Command;
 
@@ -9,24 +11,37 @@ use super::exclude::matches_any_exclude_pattern;
 use super::merge::{has_missed_branch, to_coverage_map};
 use super::types::{FileResult, Format, Result as CoverageResult};
 
-/// Options controlling diff coverage.
+/// Options controlling diff-based coverage computation.
 pub struct DiffCoverageOptions {
+    /// Path to the coverage report file (any supported format).
     pub coverage_file: String,
+    /// Base git ref to diff against (e.g. `"main"`). Ignored when `staged` is `true`.
     pub base: String,
+    /// When `true`, diffs the index (staged changes) instead of `<base>...HEAD`.
     pub staged: bool,
+    /// Minimum coverage percentage required for the result to pass.
     pub threshold: f64,
+    /// When `true`, include per-file breakdown in the result.
     pub per_file: bool,
+    /// Glob patterns for files to exclude from coverage computation.
     pub exclude_patterns: Vec<String>,
 }
 
-/// Diff hunk = changed lines (added/modified) per file.
+/// A single diff hunk: the set of added or modified line numbers for one file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiffHunk {
+    /// Relative path to the file as reported by `git diff`.
     pub file_path: String,
+    /// 1-based line numbers of added/modified lines in the new version of the file.
     pub changed_lines: Vec<i64>,
 }
 
-/// Parse unified diff output. Returns one DiffHunk per touched file.
+/// Parse unified diff output. Returns one `DiffHunk` per touched file.
+///
+/// # Panics
+///
+/// Panics if the hardcoded regular expressions fail to compile (this cannot
+/// happen in practice as they are compile-time constants).
 pub fn parse_git_diff(diff_output: &str) -> Vec<DiffHunk> {
     // Use Vec to preserve insertion order matching Go's iteration over fileLines map —
     // Go's map iteration is non-deterministic but we use insertion-order here for stability.
@@ -106,7 +121,15 @@ pub fn parse_git_diff(diff_output: &str) -> Vec<DiffHunk> {
         .collect()
 }
 
-/// Compute coverage for changed lines only.
+/// Computes coverage restricted to lines changed in the current git diff.
+///
+/// Calls `get_git_diff` to obtain the diff, parses it with `parse_git_diff`,
+/// then intersects the changed lines with the coverage map from `opts.coverage_file`.
+///
+/// # Errors
+///
+/// Returns an error when `get_git_diff` fails (e.g. git not found or non-zero exit)
+/// or when the coverage file cannot be parsed by `to_coverage_map`.
 pub fn compute_diff_coverage(opts: &DiffCoverageOptions) -> Result<CoverageResult, Error> {
     let diff_output = get_git_diff(&opts.base, opts.staged)?;
     let hunks = parse_git_diff(&diff_output);
@@ -214,7 +237,16 @@ pub fn compute_diff_coverage(opts: &DiffCoverageOptions) -> Result<CoverageResul
     })
 }
 
-/// Wrap `git diff` so callers can substitute for tests.
+/// Runs `git diff` and returns its stdout as a `String`.
+///
+/// When `staged` is `true`, runs `git diff --staged --unified=0`.
+/// Otherwise runs `git diff --unified=0 <base>...HEAD`, defaulting `base` to
+/// `"main"` when it is empty.
+///
+/// # Errors
+///
+/// Returns an error when the `git` process cannot be spawned or exits with a
+/// non-zero status code.
 pub fn get_git_diff(base: &str, staged: bool) -> Result<String, Error> {
     let mut args: Vec<String> = Vec::new();
     if staged {

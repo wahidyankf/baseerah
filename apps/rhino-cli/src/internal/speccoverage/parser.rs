@@ -1,6 +1,14 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/speccoverage/parser.go`.
-// Same Background → "(Background)" synthetic scenario rule, same Scenario Outline
-// expansion via Examples table, same stepKeywords list.
+//! Gherkin feature-file parser.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/speccoverage/parser.go`.
+//! Implements the same rules as the Go original:
+//!
+//! - `Background:` steps are collected and inserted as a synthetic
+//!   `"(Background)"` scenario at position 0.
+//! - `Scenario Outline:` steps have their `<placeholder>` tokens expanded
+//!   for each row in the associated `Examples:` table and stored in
+//!   [`ParsedStep::variants`].
+//! - Plain `Scenario:` steps have an empty `variants` vector.
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -8,33 +16,64 @@ use std::path::Path;
 
 use anyhow::Error;
 
+/// A single parsed Gherkin step.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ParsedStep {
+    /// Gherkin keyword without trailing whitespace (e.g. `"Given"`, `"When"`, `"Then"`).
     pub keyword: String,
+    /// Step text after the keyword, with `<placeholder>` tokens left verbatim.
     pub text: String,
-    /// Expanded step texts when the step belongs to a Scenario Outline with Examples.
-    /// Empty for plain scenarios.
+    /// Expanded step texts produced by substituting each `Examples` row into
+    /// the `<placeholder>` tokens.  Empty for plain (non-outline) steps.
     pub variants: Vec<String>,
 }
 
+/// A single parsed Gherkin scenario (or the synthetic `Background` scenario).
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct ParsedScenario {
+    /// Scenario title as it appears after `Scenario:` or `Scenario Outline:`.
+    /// The synthetic background uses the title `"(Background)"`.
     pub title: String,
+    /// Ordered list of steps belonging to this scenario.
     pub steps: Vec<ParsedStep>,
 }
 
+/// Gherkin step keywords recognised by the parser (each includes a trailing space).
 const STEP_KEYWORDS: [&str; 5] = ["Given ", "When ", "Then ", "And ", "But "];
 
+/// Parses a `.feature` file and returns all scenarios, including a synthetic
+/// `(Background)` scenario prepended when a `Background:` block is present.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be opened or if a line cannot be read.
 pub fn parse_feature_file(path: &Path) -> std::result::Result<Vec<ParsedScenario>, Error> {
     let (scenarios, _, ()) = parse_feature_file_inner(path)?;
     Ok(scenarios)
 }
 
+/// Returns all expanded step texts produced by `Scenario Outline` + `Examples`
+/// substitution in the given feature file.
+///
+/// Useful for collecting the full set of concrete step strings when checking
+/// whether step definitions cover parametrised scenarios.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be opened or if a line cannot be read.
 pub fn expanded_outline_step_texts(path: &Path) -> std::result::Result<Vec<String>, Error> {
     let (_, expanded, ()) = parse_feature_file_inner(path)?;
     Ok(expanded)
 }
 
+/// Internal parser implementation shared by [`parse_feature_file`] and
+/// [`expanded_outline_step_texts`].
+///
+/// Returns a triple of `(scenarios, expanded_steps, ())`.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be opened or if a line cannot be read.
 fn parse_feature_file_inner(
     path: &Path,
 ) -> std::result::Result<(Vec<ParsedScenario>, Vec<String>, ()), Error> {
@@ -149,11 +188,18 @@ fn parse_feature_file_inner(
     Ok((scenarios, expanded_steps, ()))
 }
 
+/// Splits a Gherkin table row into its cell values, trimming whitespace.
+///
+/// Leading and trailing pipe characters are removed before splitting.
 fn parse_row(line: &str) -> Vec<String> {
     let s = line.trim().trim_matches('|');
     s.split('|').map(|p| p.trim().to_string()).collect()
 }
 
+/// Substitutes `<header>` tokens in `text` with the corresponding values from
+/// `row`, paired by index into `headers`.
+///
+/// If `row` is shorter than `headers`, the excess headers are left unexpanded.
 fn expand_step(text: &str, headers: &[String], row: &[String]) -> String {
     let mut out = text.to_string();
     for (i, h) in headers.iter().enumerate() {

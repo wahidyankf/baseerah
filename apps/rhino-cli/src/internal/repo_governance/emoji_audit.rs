@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/emoji_audit.go`.
+//! Emoji audit for source and configuration files.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/emoji_audit.go`.
 
 use std::collections::HashSet;
 use std::fs::File;
@@ -9,20 +11,28 @@ use std::sync::OnceLock;
 use anyhow::{Context, Error, anyhow};
 use walkdir::WalkDir;
 
+/// A single emoji violation found in a source or configuration file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EmojiFinding {
+    /// Path of the file containing the emoji.
     pub file: String,
+    /// 1-based line number.
     pub line: usize,
+    /// 1-based column (character offset within the line).
     pub column: usize,
+    /// Unicode codepoint formatted as `U+XXXX`.
     pub codepoint: String,
+    /// Severity; currently always `"high"`.
     pub severity: String,
 }
 
+/// File extensions for which emoji are forbidden.
 const EMOJI_FORBIDDEN_EXTENSIONS: &[&str] = &[
     ".json", ".yaml", ".yml", ".toml", ".go", ".ts", ".tsx", ".js", ".jsx", ".py", ".java", ".kt",
     ".rs", ".fs", ".cs", ".dart", ".exs", ".ex", ".clj",
 ];
 
+/// Returns a lazily-initialised set of directory names to skip during the walk.
 fn emoji_skip_dirs() -> &'static HashSet<&'static str> {
     static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
     SET.get_or_init(|| {
@@ -57,6 +67,15 @@ fn emoji_skip_dirs() -> &'static HashSet<&'static str> {
     })
 }
 
+/// Walks each directory in `paths` and reports any emoji codepoints found in
+/// files with a forbidden extension.
+///
+/// Findings are sorted by `file`, then `line`, then `column`.
+///
+/// # Errors
+///
+/// Returns an error when `paths` is empty or when a file cannot be read during
+/// the scan.
 pub fn audit_emoji(paths: &[String]) -> std::result::Result<Vec<EmojiFinding>, Error> {
     if paths.is_empty() {
         return Err(anyhow!("at least one path is required"));
@@ -78,6 +97,9 @@ pub fn audit_emoji(paths: &[String]) -> std::result::Result<Vec<EmojiFinding>, E
     Ok(findings)
 }
 
+/// Recursively walks `root` and returns paths of files that have a forbidden
+/// emoji extension, skipping hidden directories and those listed in
+/// [`emoji_skip_dirs`].
 fn walk_emoji_paths(root: &Path) -> Vec<std::path::PathBuf> {
     if !root.exists() {
         return Vec::new();
@@ -101,6 +123,8 @@ fn walk_emoji_paths(root: &Path) -> Vec<std::path::PathBuf> {
     files
 }
 
+/// Returns `true` when `name` ends with one of [`EMOJI_FORBIDDEN_EXTENSIONS`]
+/// (case-insensitive).
 fn has_forbidden_emoji_extension(name: &str) -> bool {
     let lower = name.to_lowercase();
     EMOJI_FORBIDDEN_EXTENSIONS
@@ -108,6 +132,11 @@ fn has_forbidden_emoji_extension(name: &str) -> bool {
         .any(|ext| lower.ends_with(ext))
 }
 
+/// Scans a single file for emoji codepoints line by line.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be opened.
 fn scan_emoji_file(path: &Path) -> std::result::Result<Vec<EmojiFinding>, Error> {
     let file = File::open(path)?;
     let path_s = path.to_string_lossy().to_string();
@@ -131,6 +160,8 @@ fn scan_emoji_file(path: &Path) -> std::result::Result<Vec<EmojiFinding>, Error>
     Ok(findings)
 }
 
+/// Returns `true` when `r` falls within one of the emoji Unicode blocks
+/// checked by this audit.
 fn is_emoji_rune(r: char) -> bool {
     let n = r as u32;
     matches!(n,
@@ -142,6 +173,10 @@ fn is_emoji_rune(r: char) -> bool {
     )
 }
 
+/// Formats `r` as a Unicode codepoint string (e.g., `U+1F680`).
+///
+/// Codepoints up to `U+FFFF` are zero-padded to four hex digits; higher
+/// codepoints use the minimal number of digits.
 fn format_codepoint(r: char) -> String {
     let n = r as u32;
     if n <= 0xFFFF {

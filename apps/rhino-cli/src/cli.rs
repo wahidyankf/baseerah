@@ -1,3 +1,5 @@
+//! CLI entry point: argument parsing, subcommand dispatch, and help output.
+
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
@@ -22,7 +24,9 @@ use crate::internal::cliout::OutputFormat;
     long_about = "Command-line tools for repository management and automation.",
     disable_help_flag = true
 )]
+/// Root CLI arguments shared across all subcommands.
 pub struct Cli {
+    /// Enable verbose output with timestamps.
     #[arg(
         long,
         short = 'v',
@@ -31,9 +35,11 @@ pub struct Cli {
     )]
     pub verbose: bool,
 
+    /// Suppress all output except errors.
     #[arg(long, short = 'q', global = true, help = "quiet mode (errors only)")]
     pub quiet: bool,
 
+    /// Output format: `text`, `json`, or `markdown`.
     #[arg(
         long,
         short = 'o',
@@ -43,9 +49,11 @@ pub struct Cli {
     )]
     pub output: String,
 
+    /// Disable ANSI color codes in output.
     #[arg(long = "no-color", global = true, help = "disable colored output")]
     pub no_color: bool,
 
+    /// Echo a literal message to stdout and exit.
     #[arg(
         long,
         global = true,
@@ -54,13 +62,16 @@ pub struct Cli {
     )]
     pub say: String,
 
+    /// Print help and exit.
     #[arg(long, short = 'h', global = true, help = "Print help")]
     pub help: bool,
 
+    /// Subcommand to execute.
     #[command(subcommand)]
     pub command: Option<Commands>,
 }
 
+/// Top-level CLI subcommands dispatched by the root `Cli` parser.
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Test coverage commands (validate, diff, merge).
@@ -98,6 +109,7 @@ pub enum Commands {
     Doctor(doctor::DoctorArgs),
 }
 
+/// Git hook helper subcommands.
 #[derive(Subcommand, Debug)]
 pub enum GitCommands {
     /// Run all pre-commit checks (config, lint, format, docs).
@@ -105,6 +117,7 @@ pub enum GitCommands {
     PreCommit(git_pre_commit::PreCommitArgs),
 }
 
+/// Environment file subcommands (`init`, `backup`, `restore`).
 #[derive(Subcommand, Debug)]
 pub enum EnvCommands {
     /// Create .env files from .env.example templates.
@@ -118,6 +131,7 @@ pub enum EnvCommands {
     Restore(env_restore::EnvRestoreArgs),
 }
 
+/// Spec tree subcommands (`validate-adoption`, `validate-counts`, `validate-links`, `validate-tree`).
 #[derive(Subcommand, Debug)]
 pub enum SpecsCommands {
     /// Verify an app has adopted BDD and DDD practices.
@@ -134,6 +148,7 @@ pub enum SpecsCommands {
     ValidateTree(specs_validate_tree::ValidateTreeArgs),
 }
 
+/// DDD subcommands (`bc`, `ul`).
 #[derive(Subcommand, Debug)]
 pub enum DddCommands {
     /// Validate bounded-context structural parity against the registry.
@@ -144,6 +159,7 @@ pub enum DddCommands {
     Ul(ddd_ul::DddUlArgs),
 }
 
+/// Agent definition subcommands.
 #[derive(Subcommand, Debug)]
 pub enum AgentsCommands {
     /// Validate agent filename suffixes and mirror parity.
@@ -158,7 +174,7 @@ pub enum AgentsCommands {
     /// Validate that .claude/ and .opencode/ are in sync.
     #[command(name = "validate-sync")]
     ValidateSync(agents_validate_sync::ValidateSyncArgs),
-    /// Sync Claude Code agents to OpenCode format.
+    /// Sync Claude Code agents to `OpenCode` format.
     #[command(name = "sync")]
     Sync(agents_sync::SyncArgs),
     /// Emit the Amazon Q Developer binding bridge files (idempotent).
@@ -169,6 +185,7 @@ pub enum AgentsCommands {
     ValidateBindings(agents_validate_bindings::ValidateBindingsArgs),
 }
 
+/// Workflow file subcommands.
 #[derive(Subcommand, Debug)]
 pub enum WorkflowsCommands {
     /// Validate workflow filename suffixes and frontmatter name consistency.
@@ -176,6 +193,7 @@ pub enum WorkflowsCommands {
     ValidateNaming(workflows_validate_naming::ValidateNamingArgs),
 }
 
+/// Documentation validator subcommands.
 #[derive(Subcommand, Debug)]
 pub enum DocsCommands {
     /// Validate markdown filenames against the lowercase-kebab-case rule.
@@ -195,6 +213,7 @@ pub enum DocsCommands {
     ValidateMermaid(docs_validate_mermaid::ValidateMermaidArgs),
 }
 
+/// Repository governance subcommands.
 #[derive(Subcommand, Debug)]
 pub enum RepoGovernanceCommands {
     /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
@@ -226,6 +245,7 @@ pub enum RepoGovernanceCommands {
     VendorAudit(governance_vendor_audit::VendorAuditArgs),
 }
 
+/// Test coverage subcommands (`validate`, `diff`, `merge`).
 #[derive(Subcommand, Debug)]
 pub enum TestCoverageCommands {
     /// Check test coverage against a threshold (standard line-based algorithm).
@@ -236,12 +256,21 @@ pub enum TestCoverageCommands {
     Merge(test_coverage_merge::MergeArgs),
 }
 
+/// BDD spec coverage subcommands.
 #[derive(Subcommand, Debug)]
 pub enum SpecCoverageCommands {
     /// Validate that all BDD spec files have matching test implementations.
     Validate(spec_coverage_validate::ValidateArgs),
 }
 
+/// Parse CLI arguments and dispatch to the appropriate subcommand.
+///
+/// Returns the process exit code: `0` on success, `1` on command error, `2` on
+/// argument parse error.
+///
+/// # Errors
+///
+/// Returns a non-zero exit code when the selected subcommand reports an error.
 pub fn run() -> i32 {
     let cli = match Cli::try_parse() {
         Ok(c) => c,
@@ -275,6 +304,9 @@ pub fn run() -> i32 {
     print_help_and_exit()
 }
 
+/// Route a top-level [`Commands`] variant to its subcommand handler.
+///
+/// Returns `0` on success or `1` on error.
 fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
     let result = match cmd {
         Commands::TestCoverage(tc) => match tc {
@@ -364,6 +396,11 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
     }
 }
 
+/// Route an [`AgentsCommands`] variant to its handler.
+///
+/// # Errors
+///
+/// Propagates any error returned by the selected agent subcommand.
 fn dispatch_agents(
     ac: &AgentsCommands,
     output_format: OutputFormat,
@@ -383,6 +420,7 @@ fn dispatch_agents(
     }
 }
 
+/// Print the top-level help message to stdout and return exit code `0`.
 fn print_help_and_exit() -> i32 {
     let mut cmd = <Cli as clap::CommandFactory>::command();
     cmd.print_help().ok();

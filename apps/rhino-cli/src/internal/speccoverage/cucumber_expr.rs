@@ -1,22 +1,30 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/speccoverage/cucumber_expr.go`.
-// Cucumber-expression → regex conversion, plus Python pytest-bdd parsers.parse format.
+//! Cucumber-expression to regex conversion, plus Python `parsers.parse` format support.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/speccoverage/cucumber_expr.go`.
 
 use std::sync::OnceLock;
 
 use regex::Regex;
 
+/// Returns the lazily-compiled regex that matches a single Cucumber parameter
+/// placeholder such as `{string}` or `{int}`.
 fn cucumber_param_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\{[^}]+\}").expect("valid regex"))
 }
 
+/// Returns the lazily-compiled regex for Python `parsers.parse` format
+/// placeholders such as `{name}` or `{n:d}`.
 fn python_parsers_param_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\{(\w+)(?::([dgw]))?\}").expect("valid regex"))
 }
 
-/// Processes Cucumber expression escape sequences in literal text.
-/// `\X` → `X` for `\(`, `\)`, `\{`, `\}`, `\/`, `\\`.
+/// Decodes Cucumber expression escape sequences in literal text.
+///
+/// The sequence `\X` becomes `X` for any character `X`, matching the
+/// Cucumber specification that allows escaping `\(`, `\)`, `\{`, `\}`,
+/// `\/`, and `\\`.
 pub fn unescape_cucumber_expr(s: &str) -> String {
     let chars: Vec<char> = s.chars().collect();
     let mut out = String::with_capacity(s.len());
@@ -33,6 +41,10 @@ pub fn unescape_cucumber_expr(s: &str) -> String {
     out
 }
 
+/// Maps a Cucumber parameter type name to the corresponding regex fragment.
+///
+/// Known types: `string`, `int`, `byte`, `short`, `long`, `float`, `double`,
+/// `bigdecimal`, `word`. Any unrecognised name maps to `.+`.
 pub fn cucumber_param_to_regex(param_name: &str) -> &'static str {
     match param_name {
         "string" => "\"[^\"]*\"",
@@ -43,6 +55,12 @@ pub fn cucumber_param_to_regex(param_name: &str) -> &'static str {
     }
 }
 
+/// Converts a full Cucumber expression string into a regex pattern string
+/// (without anchors).
+///
+/// Each `{type}` placeholder is replaced by the regex from
+/// [`cucumber_param_to_regex`]. Literal text segments are regex-escaped and
+/// Cucumber escape sequences are decoded first.
 pub fn cucumber_expr_to_regex(text: &str) -> String {
     let re = cucumber_param_re();
     let mut sb = String::new();
@@ -67,10 +85,22 @@ pub fn cucumber_expr_to_regex(text: &str) -> String {
     sb
 }
 
+/// Returns `true` if `text` contains at least one Cucumber parameter
+/// placeholder (e.g. `{string}`, `{int}`).
 pub fn has_cucumber_expressions(text: &str) -> bool {
     cucumber_param_re().is_match(text)
 }
 
+/// Converts a Python `parsers.parse` format string into a regex pattern string
+/// (without anchors).
+///
+/// Supported format specifiers: `d` (integer), `g` (float), `w` (word).
+/// Plain `{name}` without a specifier maps to `.+`.
+///
+/// # Panics
+///
+/// Panics if the regex matches but capture groups are absent (indicates a bug
+/// in the compiled regex, which cannot happen in practice).
 pub fn convert_python_parsers_expr(text: &str) -> String {
     let re = python_parsers_param_re();
     let mut sb = String::new();
@@ -101,6 +131,8 @@ pub fn convert_python_parsers_expr(text: &str) -> String {
     sb
 }
 
+/// Returns `true` if `text` contains at least one Python `parsers.parse`
+/// format placeholder (e.g. `{name}` or `{n:d}`).
 pub fn is_python_parsers_expr(text: &str) -> bool {
     python_parsers_param_re().is_match(text)
 }

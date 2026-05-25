@@ -1,4 +1,4 @@
-// Amazon Q Developer binding bridge generator and parity guard.
+//! Amazon Q Developer binding bridge generator and parity guard.
 //
 // Amazon Q Developer does not read the repository's canonical `AGENTS.md`
 // natively (unlike Claude Code, OpenCode, or Codex). To keep its instruction
@@ -43,7 +43,9 @@ pub const PLATFORM_BINDINGS_CATALOG: &str = "docs/reference/platform-bindings.md
 /// One canonical (relative path, expected content) pair for a generated file.
 #[derive(Debug, Clone)]
 pub struct BindingFile {
+    /// POSIX-style path relative to the repository root (e.g. `.amazonq/rules/00-agents-md.md`).
     pub rel_path: &'static str,
+    /// Exact byte content the file must contain.
     pub content: &'static str,
 }
 
@@ -68,7 +70,9 @@ pub fn expected_bindings() -> Vec<BindingFile> {
 /// Result of emitting the bridge files.
 #[derive(Debug, Clone, Default)]
 pub struct EmitResult {
+    /// Relative paths of the files that were written.
     pub written: Vec<String>,
+    /// Wall time for the emit operation.
     pub duration: std::time::Duration,
 }
 
@@ -119,6 +123,7 @@ pub fn validate_bindings(repo_root: &Path) -> ValidationResult {
     result
 }
 
+/// Check that the committed file at `binding.rel_path` has the exact expected bytes.
 fn validate_binding_file(repo_root: &Path, binding: &BindingFile) -> ValidationCheck {
     let check_name = format!("Binding: {}", binding.rel_path);
     let abs = join_rel(repo_root, binding.rel_path);
@@ -158,6 +163,7 @@ fn validate_binding_file(repo_root: &Path, binding: &BindingFile) -> ValidationC
     }
 }
 
+/// Check that `dir` is referenced in the platform-bindings catalog when it exists on disk.
 fn validate_catalog_coverage(repo_root: &Path, dir: &str) -> ValidationCheck {
     let check_name = format!("Catalog Coverage: {dir}");
     let dir_path = repo_root.join(strip_leading_slash(dir));
@@ -208,6 +214,7 @@ fn join_rel(repo_root: &Path, rel: &str) -> PathBuf {
     path
 }
 
+/// Strip a leading `/` from `s` if present, to allow safe `Path::join`.
 fn strip_leading_slash(s: &str) -> &str {
     s.strip_prefix('/').unwrap_or(s)
 }

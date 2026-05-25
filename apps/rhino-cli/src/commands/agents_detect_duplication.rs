@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/agents_detect_duplication.go`.
+//! `agents detect-duplication` — finds verbatim duplication across agent and skill files.
+//!
+//! Port of `apps/rhino-cli/cmd/agents_detect_duplication.go`.
 
 use std::fmt::Write as _;
 
@@ -10,27 +12,45 @@ use crate::internal::agents::detect_duplication::{DuplicationFinding, detect_dup
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/agents-detect-duplication/v1";
 
+/// CLI arguments for `agents detect-duplication` (none required).
 #[derive(Args, Debug)]
 pub struct DetectDuplicationArgs {}
 
+/// Single duplication finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Paths of files containing the duplicated block.
     files: &'a [String],
+    /// Starting line numbers in each file.
     start_lines: &'a [usize],
+    /// Number of consecutive lines compared.
     window_size: usize,
+    /// Severity label (e.g. `"high"`).
     severity: &'a str,
+    /// Human-readable description of the duplication.
     message: &'a str,
 }
 
+/// JSON envelope wrapping the duplication scan result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// List of duplication findings.
     result: Vec<JsonFinding<'a>>,
 }
 
+/// Run the `agents detect-duplication` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, if the duplication scan
+/// fails, or if one or more duplication clusters are detected.
 pub fn run(
     _args: &DetectDuplicationArgs,
     output_format: OutputFormat,
@@ -54,6 +74,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format duplication findings as human-readable text.
 fn format_text(findings: &[DuplicationFinding]) -> String {
     if findings.is_empty() {
         return "AGENTS DUPLICATION VALIDATION PASSED: 0 clusters\n".to_string();
@@ -77,6 +98,11 @@ fn format_text(findings: &[DuplicationFinding]) -> String {
     sb
 }
 
+/// Serialize duplication findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[DuplicationFinding]) -> std::result::Result<String, Error> {
     let jf: Vec<JsonFinding> = findings
         .iter()
@@ -103,6 +129,7 @@ fn format_json(findings: &[DuplicationFinding]) -> std::result::Result<String, E
     Ok(s)
 }
 
+/// Format duplication findings as a Markdown table.
 fn format_markdown(findings: &[DuplicationFinding]) -> String {
     let mut sb = String::new();
     sb.push_str("## Agents Duplication Detection\n\n");

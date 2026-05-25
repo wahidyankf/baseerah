@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_layer_coherence.go`.
+//! `repo-governance layer-coherence` — checks that governance docs exist for each defined layer.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_layer_coherence.go`.
 
 use std::fmt::Write as _;
 
@@ -12,33 +14,54 @@ use crate::internal::repo_governance::layer_coherence::{
     LayerCoherenceFinding, audit_layer_coherence,
 };
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/layer-coherence/v1";
 
+/// CLI arguments for `repo-governance layer-coherence` (none required).
 #[derive(Args, Debug)]
 pub struct LayerCoherenceArgs {}
 
+/// Single layer coherence finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the file containing the finding.
     file: &'a str,
+    /// Severity label.
     severity: &'a str,
+    /// Finding category.
     kind: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// Inner result summary in JSON output.
 #[derive(Serialize)]
 struct InnerResult<'a> {
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Total number of findings.
     count: usize,
+    /// Individual findings.
     findings: Vec<JsonFinding<'a>>,
 }
 
+/// JSON envelope wrapping the layer coherence audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Detailed result.
     result: InnerResult<'a>,
 }
 
+/// Run the `repo-governance layer-coherence` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// layer coherence findings are detected.
 pub fn run(
     _args: &LayerCoherenceArgs,
     output_format: OutputFormat,
@@ -62,6 +85,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format layer coherence findings as human-readable text.
 fn format_text(findings: &[LayerCoherenceFinding]) -> String {
     if findings.is_empty() {
         return "LAYER COHERENCE AUDIT PASSED: zero findings\n".to_string();
@@ -82,6 +106,11 @@ fn format_text(findings: &[LayerCoherenceFinding]) -> String {
     sb
 }
 
+/// Serialize layer coherence findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[LayerCoherenceFinding]) -> std::result::Result<String, Error> {
     let status = if findings.is_empty() {
         "passed"
@@ -111,6 +140,7 @@ fn format_json(findings: &[LayerCoherenceFinding]) -> std::result::Result<String
     Ok(s)
 }
 
+/// Format layer coherence findings as a Markdown table.
 fn format_markdown(findings: &[LayerCoherenceFinding]) -> String {
     if findings.is_empty() {
         return "## Layer Coherence Audit\n\n**PASSED**: zero findings\n".to_string();

@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_license_audit.go`.
+//! `repo-governance license-audit` — checks that all apps/libs carry required license files.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_license_audit.go`.
 
 use std::fmt::Write as _;
 
@@ -10,24 +12,39 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::license_audit::{LicenseFinding, audit_license};
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/license-audit/v1";
 
+/// CLI arguments for `repo-governance license-audit` (none required).
 #[derive(Args, Debug)]
 pub struct LicenseAuditArgs {}
 
+/// Inner result summary in JSON output.
 #[derive(Serialize)]
 struct InnerResult<'a> {
+    /// Total number of license findings.
     total_findings: usize,
+    /// Individual findings.
     findings: &'a [LicenseFinding],
 }
 
+/// JSON envelope wrapping the license audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Detailed result.
     result: InnerResult<'a>,
 }
 
+/// Run the `repo-governance license-audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// license findings are detected.
 pub fn run(
     _args: &LicenseAuditArgs,
     output_format: OutputFormat,
@@ -48,6 +65,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format license findings as human-readable text.
 fn format_text(findings: &[LicenseFinding]) -> String {
     if findings.is_empty() {
         return "LICENSE AUDIT PASSED: no findings\n".to_string();
@@ -60,6 +78,11 @@ fn format_text(findings: &[LicenseFinding]) -> String {
     sb
 }
 
+/// Serialize license findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[LicenseFinding]) -> std::result::Result<String, Error> {
     let status = if findings.is_empty() {
         "passed"
@@ -79,6 +102,7 @@ fn format_json(findings: &[LicenseFinding]) -> std::result::Result<String, Error
     Ok(s)
 }
 
+/// Format license findings as a Markdown table.
 fn format_markdown(findings: &[LicenseFinding]) -> String {
     let mut sb = String::new();
     sb.push_str("## License Audit\n\n");

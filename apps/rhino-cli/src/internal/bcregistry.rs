@@ -1,4 +1,11 @@
-// Bounded-context registry — port of `apps/rhino-cli/internal/bcregistry/`.
+//! Bounded-context registry loader and validator.
+//!
+//! Port of `apps/rhino-cli/internal/bcregistry/`.
+//!
+//! This module reads `specs/apps/<app>/ddd/bounded-contexts.yaml`, validates
+//! its schema, and checks that every declared code directory, glossary file,
+//! and Gherkin directory exists on the filesystem with the expected layer
+//! structure.
 
 use std::collections::HashMap;
 use std::fs;
@@ -10,48 +17,77 @@ use serde_yml::Value;
 
 use crate::internal::severity::Severity;
 
+/// The only schema version this tool understands for `bounded-contexts.yaml`.
 pub const SCHEMA_VERSION: i64 = 2;
 
+/// In-memory representation of a parsed `bounded-contexts.yaml` registry.
 #[derive(Debug, Clone, Default)]
 pub struct Registry {
+    /// Schema version declared in the YAML file.
     pub version: i64,
+    /// Application identifier (e.g. `"organiclever"`).
     pub app: String,
+    /// All bounded contexts declared in the registry.
     pub contexts: Vec<BcContext>,
 }
 
+/// A single bounded context entry within the registry.
 #[derive(Debug, Clone, Default)]
 pub struct BcContext {
+    /// Unique name of this bounded context within the application.
     pub name: String,
+    /// Short human-readable summary of the context's responsibility.
     pub summary: String,
+    /// DDD layer directory names expected inside each code directory.
     pub layers: Vec<String>,
+    /// Relative paths (from the repo root) to code directories for this context.
     pub code: Vec<String>,
+    /// Language identifiers for source files in the code directories.
     pub code_lang: Vec<String>,
+    /// Relative path to the glossary markdown file for this context.
     pub glossary: String,
+    /// Relative paths (from the repo root) to Gherkin feature directories.
     pub gherkin: Vec<String>,
+    /// Declared relationships to other bounded contexts.
     pub relationships: Vec<Relationship>,
 }
 
+/// A directional relationship between two bounded contexts.
 #[derive(Debug, Clone, Default)]
 pub struct Relationship {
+    /// Name of the target bounded context.
     pub to: String,
+    /// Relationship kind (e.g. `"customer-supplier"`, `"anticorruption-layer"`).
     pub kind: String,
+    /// Role of the declaring context in this relationship.
     pub role: String,
 }
 
+/// A validation finding produced by the registry checker.
 #[derive(Debug, Clone)]
 pub struct Finding {
+    /// File path (relative or absolute) where the finding originates.
     pub file: String,
+    /// Human-readable description of the issue.
     pub message: String,
+    /// Severity level of this finding.
     pub severity: Severity,
 }
 
+/// Options that control how [`validate_all`] runs.
 #[derive(Debug, Clone, Default)]
 pub struct ValidateOptions {
+    /// Absolute path to the repository root.
     pub repo_root: std::path::PathBuf,
+    /// Application identifier to validate (e.g. `"organiclever"`).
     pub app: String,
+    /// Severity override; defaults to [`Severity::Error`] when `None`.
     pub severity: Option<Severity>,
 }
 
+/// Returns a map from language identifier to file-glob patterns for that language.
+///
+/// The map is initialised once and reused for all subsequent calls.
 pub fn supported_lang_globs() -> &'static HashMap<&'static str, &'static [&'static str]> {
     static M: OnceLock<HashMap<&'static str, &'static [&'static str]>> = OnceLock::new();
     M.get_or_init(|| {
@@ -73,6 +109,11 @@ pub fn supported_lang_globs() -> &'static HashMap<&'static str, &'static [&'stat
     })
 }
 
+/// Returns an error if any element of `langs` is not a recognised language identifier.
+///
+/// # Errors
+///
+/// Returns an error when a language string is not present in [`supported_lang_globs`].
 fn validate_code_lang(langs: &[String]) -> Result<(), Error> {
     let m = supported_lang_globs();
     for l in langs {
@@ -85,6 +126,11 @@ fn validate_code_lang(langs: &[String]) -> Result<(), Error> {
     Ok(())
 }
 
+/// Returns whether `kind` is a symmetric relationship kind.
+///
+/// - `Some(true)` — the kind requires a reciprocal declaration by the target context.
+/// - `Some(false)` — the kind is unidirectional and does not require a reciprocal.
+/// - `None` — the kind is not recognised.
 pub fn relationship_kind_is_asymmetric(kind: &str) -> Option<bool> {
     match kind {
         "customer-supplier" | "conformist" | "partnership" | "shared-kernel" => Some(true),
@@ -93,6 +139,20 @@ pub fn relationship_kind_is_asymmetric(kind: &str) -> Option<bool> {
     }
 }
 
+/// Loads and parses the bounded-context registry for `app` under `repo_root`.
+///
+/// The function reads `specs/apps/<app>/ddd/bounded-contexts.yaml`, validates
+/// the schema version, and checks that every context has non-empty `code` and
+/// `gherkin` lists.  Default `code_lang` values (`["ts", "tsx"]`) are applied
+/// when a context omits the field.
+///
+/// # Errors
+///
+/// Returns an error when:
+/// - The YAML file cannot be read or parsed.
+/// - The declared schema version does not equal [`SCHEMA_VERSION`].
+/// - Any context has an empty `code` or `gherkin` list.
+/// - Any language in `code_lang` is not supported.
 pub fn load(repo_root: &Path, app: &str) -> Result<Registry, Error> {
     let path = repo_root
         .join("specs")
@@ -137,6 +197,12 @@ pub fn load(repo_root: &Path, app: &str) -> Result<Registry, Error> {
     Ok(reg)
 }
 
+/// Parses a raw YAML [`Value`] into a [`Registry`].
+///
+/// # Errors
+///
+/// Returns an error if the YAML structure is malformed in a way that prevents
+/// construction of a valid [`Registry`].
 fn parse_registry(v: &Value) -> Result<Registry, Error> {
     let mut r = Registry::default();
     if let Value::Mapping(m) = v {
@@ -158,6 +224,7 @@ fn parse_registry(v: &Value) -> Result<Registry, Error> {
     Ok(r)
 }
 
+/// Parses a single context YAML node into a [`BcContext`].
 fn parse_context(v: &Value) -> BcContext {
     let mut c = BcContext::default();
     if let Value::Mapping(m) = v {
@@ -184,6 +251,7 @@ fn parse_context(v: &Value) -> BcContext {
     c
 }
 
+/// Parses a YAML sequence of strings into a `Vec<String>`.
 fn parse_string_seq(v: &Value) -> Vec<String> {
     let mut out = Vec::new();
     if let Value::Sequence(seq) = v {
@@ -196,6 +264,9 @@ fn parse_string_seq(v: &Value) -> Vec<String> {
     out
 }
 
+/// Parses the `gherkin` field which may be a scalar string or a sequence.
+///
+/// A scalar string is wrapped into a single-element `Vec`.
 fn parse_gherkin(v: &Value) -> Vec<String> {
     match v {
         Value::String(s) => vec![s.clone()],
@@ -204,6 +275,7 @@ fn parse_gherkin(v: &Value) -> Vec<String> {
     }
 }
 
+/// Parses a single relationship YAML node into a [`Relationship`].
 fn parse_relationship(v: &Value) -> Relationship {
     let mut r = Relationship::default();
     if let Value::Mapping(m) = v {
@@ -219,12 +291,20 @@ fn parse_relationship(v: &Value) -> Relationship {
     r
 }
 
+/// Loads the registry for `opts.app` and validates all contexts against the filesystem.
+///
+/// Returns a sorted list of [`Finding`]s.  An empty list means no issues were detected.
+///
+/// # Errors
+///
+/// Returns an error when the registry file cannot be loaded (see [`load`]).
 pub fn validate_all(opts: &ValidateOptions) -> Result<Vec<Finding>, Error> {
     let sev = opts.severity.unwrap_or(Severity::Error);
     let reg = load(&opts.repo_root, &opts.app)?;
     Ok(validate_registry(&opts.repo_root, &reg, sev))
 }
 
+/// Runs all registry validation checks and returns a deduplicated, sorted list of findings.
 fn validate_registry(repo_root: &Path, reg: &Registry, sev: Severity) -> Vec<Finding> {
     let mut findings: Vec<Finding> = Vec::new();
     let mut registered_code: HashMap<String, bool> = HashMap::new();
@@ -268,6 +348,7 @@ fn validate_registry(repo_root: &Path, reg: &Registry, sev: Severity) -> Vec<Fin
     findings
 }
 
+/// Validates a single bounded context: code directories, layer structure, glossary, and Gherkin.
 fn check_context(repo_root: &Path, ctx: &BcContext, sev: Severity) -> Vec<Finding> {
     let mut findings: Vec<Finding> = Vec::new();
     for code_rel in &ctx.code {
@@ -294,6 +375,8 @@ fn check_context(repo_root: &Path, ctx: &BcContext, sev: Severity) -> Vec<Findin
     findings
 }
 
+/// Checks that the declared layers exist inside `code_rel` and that no undeclared
+/// layer directories are present on the filesystem.
 fn check_layers_at_path(
     repo_root: &Path,
     ctx: &BcContext,
@@ -350,6 +433,7 @@ fn check_layers_at_path(
     findings
 }
 
+/// Verifies that every Gherkin directory exists and contains at least one `.feature` file.
 fn check_gherkin(repo_root: &Path, ctx: &BcContext, sev: Severity) -> Vec<Finding> {
     let mut findings = Vec::new();
     for gh in &ctx.gherkin {
@@ -398,6 +482,8 @@ fn check_gherkin(repo_root: &Path, ctx: &BcContext, sev: Severity) -> Vec<Findin
     findings
 }
 
+/// Scans the filesystem for directories and files that exist on disk but are
+/// not declared in the registry (orphans), and reports them as findings.
 fn detect_orphans(
     repo_root: &Path,
     reg: &Registry,
@@ -458,6 +544,8 @@ fn detect_orphans(
     findings
 }
 
+/// Scans `root` for sub-directories not present in `registered` and emits
+/// a finding of type `kind` for each one.
 fn detect_orphan_dirs(
     root: &str,
     registered: &HashMap<String, bool>,
@@ -491,6 +579,8 @@ fn detect_orphan_dirs(
     findings
 }
 
+/// Scans `root` for `.md` files (excluding `README.md`) not present in
+/// `registered` and emits a finding of type `kind` for each one.
 fn detect_orphan_files(
     root: &str,
     registered: &HashMap<String, bool>,
@@ -527,6 +617,9 @@ fn detect_orphan_files(
     findings
 }
 
+/// Checks that every symmetric relationship (`customer-supplier`, `conformist`,
+/// `partnership`, `shared-kernel`) has a matching reciprocal declaration in the
+/// target context.
 fn check_relationship_symmetry(
     reg: &Registry,
     by_name: &HashMap<String, &BcContext>,
@@ -570,12 +663,14 @@ fn check_relationship_symmetry(
     findings
 }
 
+/// Returns `true` when `ctx` has a relationship back to `source` with the same `kind`.
 fn has_reciprocal(ctx: &BcContext, source: &str, kind: &str) -> bool {
     ctx.relationships
         .iter()
         .any(|r| r.to == source && r.kind == kind)
 }
 
+/// Checks that all declared relationship kinds are among the recognised values.
 fn check_relationship_kinds(reg: &Registry, sev: Severity) -> Vec<Finding> {
     let mut findings = Vec::new();
     let yaml_path = format!("specs/apps/{}/ddd/bounded-contexts.yaml", reg.app);
@@ -602,11 +697,13 @@ mod tests {
     use super::*;
     use tempfile::tempdir;
 
+    /// Creates a file at `p`, making parent directories as needed.
     fn write(p: &Path, s: &str) {
         std::fs::create_dir_all(p.parent().unwrap()).unwrap();
         std::fs::write(p, s).unwrap();
     }
 
+    /// Verifies that [`supported_lang_globs`] includes a representative set of languages.
     #[test]
     fn supported_lang_includes_known() {
         let m = supported_lang_globs();
@@ -615,12 +712,15 @@ mod tests {
         assert!(m.contains_key("dart"));
     }
 
+    /// Verifies that [`validate_code_lang`] rejects unknown language identifiers.
     #[test]
     fn validate_code_lang_rejects_unknown() {
         assert!(validate_code_lang(&["ts".into(), "bogus".into()]).is_err());
         assert!(validate_code_lang(&["ts".into(), "tsx".into()]).is_ok());
     }
 
+    /// Verifies that [`relationship_kind_is_asymmetric`] returns the correct
+    /// symmetry flag for known relationship kinds and `None` for unknown ones.
     #[test]
     fn relationship_kind_asymmetry() {
         assert_eq!(
@@ -634,6 +734,7 @@ mod tests {
         assert_eq!(relationship_kind_is_asymmetric("bogus"), None);
     }
 
+    /// Returns a minimal valid `bounded-contexts.yaml` YAML string for testing.
     fn minimal_registry_yaml() -> &'static str {
         r"version: 2
 app: testapp
@@ -649,6 +750,8 @@ contexts:
 "
     }
 
+    /// Verifies that [`load`] correctly parses a minimal valid registry, including
+    /// applying the default `code_lang` when none is specified.
     #[test]
     fn load_parses_minimal_yaml() {
         let dir = tempdir().unwrap();
@@ -663,6 +766,7 @@ contexts:
         assert_eq!(r.contexts[0].code_lang, vec!["ts", "tsx"]);
     }
 
+    /// Verifies that [`load`] returns an error when the schema version is unsupported.
     #[test]
     fn load_rejects_wrong_version() {
         let dir = tempdir().unwrap();
@@ -672,6 +776,7 @@ contexts:
         assert!(r.is_err());
     }
 
+    /// Verifies that [`load`] returns an error when a context has an empty `code` list.
     #[test]
     fn load_rejects_empty_code() {
         let dir = tempdir().unwrap();
@@ -684,6 +789,7 @@ contexts:
         assert!(r.is_err());
     }
 
+    /// Verifies that a scalar `gherkin` value is wrapped into a single-element list.
     #[test]
     fn load_gherkin_scalar_becomes_singleton() {
         let dir = tempdir().unwrap();
@@ -696,6 +802,7 @@ contexts:
         assert_eq!(r.contexts[0].gherkin, vec!["behavior/gherkin/x"]);
     }
 
+    /// Verifies that [`validate_all`] reports missing code, glossary, and gherkin paths.
     #[test]
     fn validate_all_with_missing_paths_reports() {
         let dir = tempdir().unwrap();
@@ -715,6 +822,8 @@ contexts:
         assert!(r.iter().any(|f| f.message.contains("missing gherkin")));
     }
 
+    /// Verifies that [`validate_all`] returns no findings when the filesystem matches
+    /// the registry exactly.
     #[test]
     fn validate_all_clean_corpus() {
         let dir = tempdir().unwrap();
@@ -738,6 +847,8 @@ contexts:
         assert_eq!(r.len(), 0, "{r:#?}");
     }
 
+    /// Verifies that an extra layer directory on the filesystem (not in the registry)
+    /// is reported as a finding.
     #[test]
     fn validate_detects_extra_layer() {
         let dir = tempdir().unwrap();
@@ -761,6 +872,7 @@ contexts:
         assert!(r.iter().any(|f| f.message.contains("extra layer")));
     }
 
+    /// Verifies that an unknown relationship kind is reported as a finding.
     #[test]
     fn validate_detects_unknown_relationship_kind() {
         let dir = tempdir().unwrap();

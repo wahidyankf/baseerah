@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/license_audit.go`.
+//! License presence and SPDX-consistency audit.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/license_audit.go`.
 
 use std::collections::HashMap;
 use std::fs;
@@ -8,15 +10,31 @@ use std::path::Path;
 use anyhow::{Context, Error};
 use serde::Serialize;
 
+/// A single finding from the license audit.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct LicenseFinding {
+    /// Relative path of the directory or entry that triggered the finding.
     pub path: String,
+    /// Machine-readable category: `"missing-license"`, `"unreadable-license"`,
+    /// or `"spdx-mismatch"`.
     pub kind: String,
+    /// Human-readable description of the finding.
     pub message: String,
 }
 
+/// App directories that are intentionally exempt from the LICENSE requirement.
 const LICENSE_EXEMPT_APPS: &[&str] = &["rhino-cli"];
 
+/// Audits every required `apps/` and `libs/` subdirectory for a `LICENSE`
+/// file and cross-checks identified SPDX identifiers against
+/// `LICENSING-NOTICE.md`.
+///
+/// Findings are sorted by `path`, then by `kind`.
+///
+/// # Errors
+///
+/// Returns an error when the repository directory structure cannot be read or
+/// when `LICENSING-NOTICE.md` exists but cannot be parsed.
 pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding>, Error> {
     let mut findings = Vec::new();
     let dirs = required_license_dirs(repo_root)?;
@@ -89,6 +107,16 @@ pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding
     Ok(findings)
 }
 
+/// Returns a sorted list of relative directory paths that must contain a
+/// `LICENSE` file.
+///
+/// Includes non-exempt, non-`-e2e` subdirectories of `apps/`, all
+/// subdirectories of `libs/`, and the `specs/` directory when it exists.
+///
+/// # Errors
+///
+/// Returns an error when the `apps/` or `libs/` directories cannot be listed
+/// or when `specs/` metadata cannot be read.
 fn required_license_dirs(repo_root: &Path) -> std::result::Result<Vec<String>, Error> {
     let mut dirs = Vec::new();
     let apps = read_non_hidden_dirs(&repo_root.join("apps"))?;
@@ -118,6 +146,13 @@ fn required_license_dirs(repo_root: &Path) -> std::result::Result<Vec<String>, E
     Ok(dirs)
 }
 
+/// Returns the sorted names of non-hidden subdirectories inside `dir`.
+///
+/// Returns an empty `Vec` when `dir` does not exist.
+///
+/// # Errors
+///
+/// Returns an error when `dir` exists but cannot be read.
 fn read_non_hidden_dirs(dir: &Path) -> std::result::Result<Vec<String>, Error> {
     let entries = match fs::read_dir(dir) {
         Ok(e) => e,
@@ -139,6 +174,13 @@ fn read_non_hidden_dirs(dir: &Path) -> std::result::Result<Vec<String>, Error> {
     Ok(names)
 }
 
+/// Reads the first non-blank line of the `LICENSE` file at `path` and
+/// classifies it as an SPDX identifier string.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be opened, a line cannot be read, or
+/// the file is empty.
 fn extract_spdx(path: &Path) -> std::result::Result<String, Error> {
     let file = fs::File::open(path)?;
     let reader = BufReader::new(file);
@@ -156,6 +198,11 @@ fn extract_spdx(path: &Path) -> std::result::Result<String, Error> {
     )))
 }
 
+/// Maps the first line of a `LICENSE` file to a canonical SPDX identifier.
+///
+/// Recognises `SPDX-License-Identifier:` headers as well as common prose
+/// patterns for MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, MPL-2.0, and
+/// GPL.  Returns `line` unchanged when no pattern matches.
 fn classify_license_line(line: &str) -> String {
     if let Some(rest) = strip_prefix_fold(line, "SPDX-License-Identifier:") {
         return rest.trim().to_string();
@@ -185,6 +232,10 @@ fn classify_license_line(line: &str) -> String {
     line.to_string()
 }
 
+/// Case-insensitively strips `prefix` from the start of `s`.
+///
+/// Returns `Some(&s[prefix.len()..])` when `s` starts with `prefix`
+/// (ASCII-case-insensitive), or `None` otherwise.
 fn strip_prefix_fold<'a>(s: &'a str, prefix: &str) -> Option<&'a str> {
     if s.len() < prefix.len() {
         return None;
@@ -195,12 +246,22 @@ fn strip_prefix_fold<'a>(s: &'a str, prefix: &str) -> Option<&'a str> {
     Some(&s[prefix.len()..])
 }
 
+/// A single row parsed from the `LICENSING-NOTICE.md` table.
 #[derive(Debug, Clone)]
 struct LicenseClaim {
+    /// Relative directory path as it appears in the table.
     path: String,
+    /// SPDX identifier claimed in the table.
     license: String,
 }
 
+/// Parses `LICENSING-NOTICE.md` at `path` and extracts all `LicenseClaim`
+/// rows from GFM tables that have both a `Path`/`Directory` column and a
+/// `License` column.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be read.
 fn parse_licensing_notice(path: &Path) -> std::result::Result<Vec<LicenseClaim>, Error> {
     let data = fs::read_to_string(path)?;
     let lines: Vec<&str> = data.split('\n').collect();
@@ -262,6 +323,8 @@ fn parse_licensing_notice(path: &Path) -> std::result::Result<Vec<LicenseClaim>,
     Ok(claims)
 }
 
+/// Splits a GFM table row `line` into individual cell strings, respecting
+/// backslash-escaped pipe characters.
 fn split_markdown_row(line: &str) -> Vec<String> {
     let trimmed = line.trim();
     let trimmed = trimmed.strip_prefix('|').unwrap_or(trimmed);
@@ -290,6 +353,7 @@ fn split_markdown_row(line: &str) -> Vec<String> {
     cells
 }
 
+/// Returns `true` when `line` is a GFM table separator row (e.g., `| --- | :---: |`).
 fn is_markdown_table_separator(line: &str) -> bool {
     if !line.starts_with('|') {
         return false;
@@ -313,6 +377,11 @@ fn is_markdown_table_separator(line: &str) -> bool {
     true
 }
 
+/// Finds the column indices for the `path`/`directory` and `license` headers
+/// in a GFM table header row.
+///
+/// Returns `(path_col, license_col)` where each is `None` when the
+/// corresponding header is absent.
 fn find_columns(cells: &[String]) -> (Option<usize>, Option<usize>) {
     let mut path_col: Option<usize> = None;
     let mut license_col: Option<usize> = None;
@@ -331,6 +400,9 @@ fn find_columns(cells: &[String]) -> (Option<usize>, Option<usize>) {
     (path_col, license_col)
 }
 
+/// Normalises a raw path value from `LICENSING-NOTICE.md` by stripping
+/// surrounding whitespace, backticks, leading `./`, and trailing `/`, and
+/// converting backslashes to forward slashes.
 fn normalise_claim_path(raw: &str) -> String {
     let s = raw.trim();
     let s = s.trim_matches('`');
@@ -340,6 +412,8 @@ fn normalise_claim_path(raw: &str) -> String {
     s.replace('\\', "/")
 }
 
+/// Returns `true` when the path `p` falls within the scope of this audit
+/// (immediate children of `apps/` or `libs/`, or the `specs` root).
 fn owned_by_license_audit(p: &str) -> bool {
     if p == "specs" {
         return true;
@@ -358,6 +432,9 @@ fn owned_by_license_audit(p: &str) -> bool {
     false
 }
 
+/// Returns `true` when `identified` and `claim` refer to the same SPDX
+/// license, either by direct case-insensitive comparison or after normalising
+/// both through [`classify_license_line`].
 fn licenses_equal(identified: &str, claim: &str) -> bool {
     if identified.eq_ignore_ascii_case(claim) {
         return true;

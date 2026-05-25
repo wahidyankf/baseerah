@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/git_pre_commit.go`.
+//! `git pre-commit` — runs the rhino-cli pre-commit validation suite.
+//!
+//! Port of `apps/rhino-cli/cmd/git_pre_commit.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -7,9 +9,16 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::git::{Deps, run};
 
+/// CLI arguments for `git pre-commit` (none required).
 #[derive(Args, Debug)]
 pub struct PreCommitArgs {}
 
+/// Run the `git pre-commit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found or if any pre-commit
+/// check fails.
 pub fn run_cmd(_args: &PreCommitArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let git_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

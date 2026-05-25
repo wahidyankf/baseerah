@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/internal/testcoverage/exclude.go`.
+//! File-exclusion helpers using Go `filepath.Match` glob semantics.
+//!
+//! Port of `apps/rhino-cli/internal/testcoverage/exclude.go`.
 
 use std::path::Path;
 
@@ -59,13 +61,22 @@ pub fn matches_any_exclude_pattern(path: &str, patterns: &[String]) -> bool {
     false
 }
 
-/// Port of Go's path/filepath.Match. Single-segment globbing; `*` does not cross `/`.
+/// Port of Go's `path/filepath.Match`. Single-segment globbing; `*` does not cross `/`.
+///
+/// Supports `?` (any single non-`/` char), `*` (any sequence of non-`/` chars),
+/// `[…]` character classes with optional `^` negation and `lo-hi` ranges, and
+/// `\` escaping of literal metacharacters.
 fn go_filepath_match(pattern: &str, name: &str) -> bool {
     let p: Vec<char> = pattern.chars().collect();
     let n: Vec<char> = name.chars().collect();
     go_match_rec(&p, 0, &n, 0)
 }
 
+/// Recursive match engine backing `go_filepath_match`.
+///
+/// `pi` is the current index into the pattern slice `p`; `ni` is the current
+/// index into the name slice `n`. Returns `true` when the remaining pattern
+/// matches the remaining name characters.
 fn go_match_rec(p: &[char], mut pi: usize, n: &[char], mut ni: usize) -> bool {
     while pi < p.len() {
         match p[pi] {

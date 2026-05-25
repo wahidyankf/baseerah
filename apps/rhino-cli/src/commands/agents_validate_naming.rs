@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/agents_validate_naming.go`.
+//! `agents validate-naming` — checks that agent file names carry a valid role suffix.
+//!
+//! Port of `apps/rhino-cli/cmd/agents_validate_naming.go`.
 
 use std::fs;
 use std::path::Path;
@@ -12,11 +14,19 @@ use crate::internal::naming::{self, Violation};
 
 use crate::internal::naming::reporter::{format_json, format_markdown, format_text};
 
+/// Accepted role suffixes for agent file names.
 const AGENT_ROLES: &[&str] = &["maker", "checker", "fixer", "dev", "deployer", "manager"];
 
+/// CLI arguments for `agents validate-naming` (none required).
 #[derive(Args, Debug)]
 pub struct ValidateNamingArgs {}
 
+/// Run the `agents validate-naming` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, if agent files cannot be
+/// read, or if any naming violations are found.
 pub fn run(
     _args: &ValidateNamingArgs,
     output_format: OutputFormat,
@@ -37,6 +47,11 @@ pub fn run(
     Ok(())
 }
 
+/// Collect naming violations for agent files under `repo_root`.
+///
+/// # Errors
+///
+/// Returns an error if any agent file cannot be read.
 fn agents_validate_naming(repo_root: &str) -> std::result::Result<Vec<Violation>, Error> {
     let claude_dir = Path::new(repo_root).join(".claude").join("agents");
     let opencode_dir = Path::new(repo_root).join(".opencode").join("agents");
@@ -69,6 +84,7 @@ fn agents_validate_naming(repo_root: &str) -> std::result::Result<Vec<Violation>
     Ok(violations)
 }
 
+/// Return sorted paths of agent `.md` files in `dir`, excluding special files.
 fn list_agent_files(dir: &Path) -> Vec<String> {
     let Ok(entries) = fs::read_dir(dir) else {
         return Vec::new();

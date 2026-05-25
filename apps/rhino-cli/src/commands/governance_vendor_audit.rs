@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_vendor_audit.go`.
+//! `repo-governance vendor-audit` — checks that governance docs use vendor-neutral terminology.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_vendor_audit.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -11,27 +13,43 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::vendor_audit::{Finding, walk};
 
+/// CLI arguments for `repo-governance vendor-audit`.
 #[derive(Args, Debug)]
 pub struct VendorAuditArgs {
     /// Optional scan path (defaults to repo-governance/).
     pub path: Option<String>,
 }
 
+/// Single vendor term finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the file containing the term.
     path: &'a str,
+    /// Line number.
     line: usize,
+    /// Matched vendor term.
     r#match: &'a str,
+    /// Vendor-neutral replacement.
     replacement: &'a str,
 }
 
+/// JSON result wrapping the vendor audit findings (no outer schema envelope).
 #[derive(Serialize)]
 struct JsonResult<'a> {
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Total number of findings.
     count: usize,
+    /// Individual findings.
     findings: Vec<JsonFinding<'a>>,
 }
 
+/// Run the `repo-governance vendor-audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// vendor term violations are detected.
 pub fn run(args: &VendorAuditArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -55,6 +73,7 @@ pub fn run(args: &VendorAuditArgs, output_format: OutputFormat) -> std::result::
     Ok(())
 }
 
+/// Format vendor audit findings as human-readable text.
 fn format_text(findings: &[Finding]) -> String {
     if findings.is_empty() {
         return "GOVERNANCE VENDOR AUDIT PASSED: no violations found\n".to_string();
@@ -75,6 +94,11 @@ fn format_text(findings: &[Finding]) -> String {
     sb
 }
 
+/// Serialize vendor audit findings as a JSON string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[Finding]) -> std::result::Result<String, Error> {
     let status = if findings.is_empty() {
         "passed"
@@ -100,6 +124,7 @@ fn format_json(findings: &[Finding]) -> std::result::Result<String, Error> {
     Ok(s)
 }
 
+/// Format vendor audit findings as a Markdown table.
 fn format_markdown(findings: &[Finding]) -> String {
     if findings.is_empty() {
         return "## Governance Vendor Audit\n\n**PASSED**: no violations found\n".to_string();

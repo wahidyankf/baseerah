@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/test_coverage_merge.go`.
+//! `test-coverage merge` — merges multiple coverage files into one aggregate result.
+//!
+//! Port of `apps/rhino-cli/cmd/test_coverage_merge.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -10,6 +12,7 @@ use crate::internal::testcoverage::merge::{
 };
 use crate::internal::testcoverage::{exclude::matches_any_exclude_pattern, reporter};
 
+/// CLI arguments for `test-coverage merge`.
 #[derive(Args, Debug)]
 pub struct MergeArgs {
     /// Coverage files (minimum 2) relative to git repo root.
@@ -24,12 +27,20 @@ pub struct MergeArgs {
     /// Exclude files matching glob pattern (repeatable).
     #[arg(long = "exclude", value_name = "PATTERN")]
     pub exclude: Vec<String>,
+    /// Verbose output.
     #[arg(long, short = 'v')]
     pub verbose: bool,
+    /// Quiet output.
     #[arg(long, short = 'q')]
     pub quiet: bool,
 }
 
+/// Run the `test-coverage merge` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, a coverage file cannot be
+/// parsed, the output file cannot be written, or coverage is below the threshold.
 pub fn run(args: &MergeArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

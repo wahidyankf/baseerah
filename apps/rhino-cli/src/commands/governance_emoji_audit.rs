@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_emoji_audit.go`.
+//! `repo-governance emoji-audit` — detects emoji codepoints in forbidden file types.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_emoji_audit.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -11,8 +13,10 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::emoji_audit::{EmojiFinding, audit_emoji};
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/emoji-audit/v1";
 
+/// CLI arguments for `repo-governance emoji-audit`.
 #[derive(Args, Debug)]
 pub struct EmojiAuditArgs {
     /// Paths to scan (repeatable; relative to git root).
@@ -22,22 +26,38 @@ pub struct EmojiAuditArgs {
     pub positional: Vec<String>,
 }
 
+/// Single emoji finding in JSON output.
 #[derive(Serialize)]
 struct FindingJson<'a> {
+    /// Path of the file containing the emoji.
     file: &'a str,
+    /// Line number.
     line: usize,
+    /// Column number.
     column: usize,
+    /// Unicode codepoint string (e.g. `"U+2713"`).
     codepoint: &'a str,
+    /// Severity label.
     severity: &'a str,
 }
 
+/// JSON envelope wrapping the emoji audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Individual findings.
     result: Vec<FindingJson<'a>>,
 }
 
+/// Run the `repo-governance emoji-audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// emoji findings are detected.
 pub fn run(args: &EmojiAuditArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -75,6 +95,7 @@ pub fn run(args: &EmojiAuditArgs, output_format: OutputFormat) -> std::result::R
     Ok(())
 }
 
+/// Format emoji findings as human-readable text.
 fn format_text(findings: &[EmojiFinding]) -> String {
     if findings.is_empty() {
         return "EMOJI AUDIT PASSED: no emoji codepoints found in forbidden file types\n"
@@ -96,6 +117,11 @@ fn format_text(findings: &[EmojiFinding]) -> String {
     sb
 }
 
+/// Serialize emoji findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[EmojiFinding]) -> std::result::Result<String, Error> {
     let jf: Vec<FindingJson> = findings
         .iter()
@@ -122,6 +148,7 @@ fn format_json(findings: &[EmojiFinding]) -> std::result::Result<String, Error> 
     Ok(s)
 }
 
+/// Format emoji findings as a Markdown table.
 fn format_markdown(findings: &[EmojiFinding]) -> String {
     if findings.is_empty() {
         return "## Governance Emoji Audit\n\n**PASSED**: no emoji codepoints found in forbidden file types\n"

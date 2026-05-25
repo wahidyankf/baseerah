@@ -1,10 +1,11 @@
-// YAML formatting validator ported from
-// `apps/rhino-cli/internal/agents/yaml_formatting.go`.
+//! YAML formatting validator ported from
+//! `apps/rhino-cli/internal/agents/yaml_formatting.go`.
 //
 // Checks for missing spaces after colons in frontmatter key-value pairs.
 
 use super::types::ValidationCheck;
 
+/// Check that every key-value line in the frontmatter of `content` has a space after its colon.
 #[allow(clippy::collapsible_if)]
 pub fn validate_yaml_formatting_raw(check_name: &str, content: &[u8]) -> ValidationCheck {
     let s = String::from_utf8_lossy(content);

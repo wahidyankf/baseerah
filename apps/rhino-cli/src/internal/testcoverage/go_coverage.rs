@@ -1,12 +1,16 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/go_coverage.go`.
-// Algorithm steps (matching tech-docs §Coverage Validator Port):
-//   1. Parse cover.out blocks via regex.
-//   2. Group blocks by file.
-//   3. For each line in each file, collect ALL counts across all blocks covering that line.
-//   4. Look up the source-file line; skip blank / comment-only / brace-only lines.
-//   5. Classify: covered (all counts > 0), partial (mixed), missed (all counts == 0).
-//   6. pct = 100 * covered / (covered + partial + missed). Partial counts as missed in the denominator.
-//   7. passed = pct >= threshold.
+//! Go `cover.out` format parser and result computer.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/go_coverage.go`.
+//!
+//! Algorithm steps (matching tech-docs §Coverage Validator Port):
+//!
+//! 1. Parse `cover.out` blocks via regex.
+//! 2. Group blocks by file.
+//! 3. For each line in each file, collect **all** counts across all blocks covering that line.
+//! 4. Look up the source-file line; skip blank, comment-only, and brace-only lines.
+//! 5. Classify: covered (all counts > 0), partial (mixed), missed (all counts == 0).
+//! 6. `pct = 100 * covered / (covered + partial + missed)` — partial counts as missed.
+//! 7. `passed = pct >= threshold`.
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -19,6 +23,12 @@ use regex::Regex;
 
 use super::types::{FileResult, Format, Result as CoverageResult};
 
+/// Returns the compiled regex used to parse individual `cover.out` block lines.
+///
+/// Lazily compiled and cached in a `OnceLock`. Mirrors Go's `coverBlockRe` at
+/// `apps/rhino-cli/internal/testcoverage/go_coverage.go:13`.
+///
+/// Capture groups: `(filepath):(start_line).col,(end_line).col stmts count`.
 fn cover_block_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -84,11 +94,19 @@ pub(crate) fn is_go_code_line(content: &str) -> bool {
     true
 }
 
+/// A single coverage block parsed from a `cover.out` line.
+///
+/// Each block spans a contiguous range of lines (`start_line..=end_line`) in
+/// `filepath` and records how many times that range was executed (`count`).
 #[derive(Debug, Clone)]
 pub(crate) struct CoverBlock {
+    /// Module-qualified path to the source file (e.g. `github.com/org/repo/pkg/foo.go`).
     pub filepath: String,
+    /// First line of the coverage block (1-based, inclusive).
     pub start_line: usize,
+    /// Last line of the coverage block (1-based, inclusive).
     pub end_line: usize,
+    /// Execution count for the block (`0` means uncovered).
     pub count: usize,
 }
 
@@ -140,9 +158,13 @@ pub(crate) fn parse_cover_out(filename: &str) -> std::result::Result<Vec<CoverBl
     Ok(blocks)
 }
 
-/// Computes line coverage from a Go cover.out file using a standard
+/// Computes line coverage from a Go `cover.out` file using a standard
 /// line-based algorithm. Source files are resolved relative to the
-/// cover.out's directory (mirrors Python cwd behaviour).
+/// `cover.out`'s directory (mirrors Python cwd behaviour).
+///
+/// # Errors
+///
+/// Returns an error when `parse_cover_out` fails (file not found or I/O error).
 pub fn compute_go_result(
     filename: &str,
     threshold: f64,

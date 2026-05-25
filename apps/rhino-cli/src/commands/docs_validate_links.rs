@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/docs_validate_links.go`.
+//! `docs validate-links` — checks markdown files for broken internal links.
+//!
+//! Port of `apps/rhino-cli/cmd/docs_validate_links.go`.
 
 use anyhow::{Context, Error, anyhow};
 use clap::Args;
@@ -9,6 +11,7 @@ use crate::internal::docs::links::{
 };
 use crate::internal::git;
 
+/// CLI arguments for `docs validate-links`.
 #[derive(Args, Debug)]
 pub struct ValidateLinksArgs {
     /// Only validate staged files.
@@ -16,6 +19,12 @@ pub struct ValidateLinksArgs {
     pub staged_only: bool,
 }
 
+/// Run the `docs validate-links` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, if the scan fails, or if
+/// broken links are found.
 pub fn run(
     args: &ValidateLinksArgs,
     output_format: OutputFormat,

@@ -1,6 +1,8 @@
-// Port of `apps/rhino-cli/cmd/spec_coverage_validate.go`.
-// Same args (positional specs-dirs + final app-dir), same flags, same exit
-// codes, same byte-for-byte output.
+//! `spec-coverage validate` — checks that Gherkin spec steps are covered by test implementations.
+//!
+//! Port of `apps/rhino-cli/cmd/spec_coverage_validate.go`.
+//! Same args (positional specs-dirs + final app-dir), same flags, same exit
+//! codes, same byte-for-byte output.
 
 use std::path::PathBuf;
 
@@ -11,6 +13,7 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::speccoverage::{checker, reporter, types::ScanOptions};
 
+/// CLI arguments for `spec-coverage validate`.
 #[derive(Args, Debug)]
 pub struct ValidateArgs {
     /// Last positional arg is the app-dir; preceding args are specs-dirs.
@@ -25,6 +28,12 @@ pub struct ValidateArgs {
     pub exclude_dir: Vec<String>,
 }
 
+/// Run the `spec-coverage validate` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, fewer than 2 paths are
+/// supplied, the coverage check fails, or spec coverage gaps are found.
 pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

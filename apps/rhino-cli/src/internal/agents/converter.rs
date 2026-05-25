@@ -1,4 +1,4 @@
-// Converter ported from `apps/rhino-cli/internal/agents/converter.go`.
+//! Converter ported from `apps/rhino-cli/internal/agents/converter.go`.
 //
 // Implements:
 // - OpenCodeAgent struct (emit shape with omitempty parity)
@@ -17,41 +17,61 @@ use serde_yml::Value;
 
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 
+/// Relative path of the `OpenCode` agent directory (plural `agents/`).
 pub const OPENCODE_AGENT_DIR: &str = ".opencode/agents";
 
+/// A field that was dropped or translated during agent conversion.
 #[derive(Debug, Clone)]
 pub struct ConversionWarning {
+    /// Name of the agent (stem of the `.md` filename).
     pub agent_name: String,
+    /// YAML field key that triggered the warning.
     pub field: String,
+    /// Human-readable explanation of why the field was dropped or translated.
     pub reason: String,
 }
 
-/// OpenCodeAgent — emit shape matching Go's struct.
+/// `OpenCode` agent emit shape matching Go's struct.
 /// Field order: description, model, tools, color, steps, skills.
-/// omitempty fields: color (string), steps (0), skills ([]).
+/// `omitempty` fields: color (empty string), steps (0), skills (empty vec).
 #[derive(Debug, Clone, Default)]
 pub struct OpenCodeAgent {
+    /// Agent description (always emitted).
     pub description: String,
+    /// `OpenCode` model ID (always emitted).
     pub model: String,
+    /// Tool allow-map: lowercase tool name → true (always emitted, `{}` when empty).
     pub tools: BTreeMap<String, bool>,
+    /// `OpenCode` color token (omitted when empty).
     pub color: String,
+    /// Max agent turns (`steps` in `OpenCode`, omitted when 0).
     pub steps: i64,
+    /// Skill names (omitted when empty).
     pub skills: Vec<String>,
 }
 
+/// How a Claude frontmatter field should be handled during conversion.
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum FieldAction {
+    /// Copy to `OpenCode` output unchanged.
     Preserve,
+    /// Transform the value before writing to `OpenCode` output.
     Translate,
+    /// Silently discard the field.
     Drop,
+    /// Discard the field and emit a conversion warning.
     DropWarn,
 }
 
+/// Per-field conversion policy entry.
 struct FieldPolicy {
+    /// What to do with this field.
     action: FieldAction,
+    /// Human-readable reason, used in conversion warnings.
     reason: &'static str,
 }
 
+/// Static (field, action, reason) table powering `claude_agent_field_policy()`.
 const FIELD_POLICY_TABLE: &[(&str, FieldAction, &str)] = &[
     ("name", FieldAction::Drop, "filename carries name"),
     ("description", FieldAction::Preserve, ""),
@@ -83,6 +103,7 @@ const FIELD_POLICY_TABLE: &[(&str, FieldAction, &str)] = &[
     ("hooks", FieldAction::DropWarn, "no opencode equivalent"),
 ];
 
+/// Return the lazily-initialized field policy map built from `FIELD_POLICY_TABLE`.
 fn claude_agent_field_policy() -> &'static HashMap<&'static str, FieldPolicy> {
     static M: OnceLock<HashMap<&'static str, FieldPolicy>> = OnceLock::new();
     M.get_or_init(|| {
@@ -101,6 +122,7 @@ fn claude_agent_field_policy() -> &'static HashMap<&'static str, FieldPolicy> {
     })
 }
 
+/// Return the lazily-initialized Claude-to-OpenCode color token translation map.
 fn claude_to_opencode_color() -> &'static HashMap<&'static str, &'static str> {
     static M: OnceLock<HashMap<&'static str, &'static str>> = OnceLock::new();
     M.get_or_init(|| {
@@ -117,6 +139,8 @@ fn claude_to_opencode_color() -> &'static HashMap<&'static str, &'static str> {
     })
 }
 
+/// Translate a Claude named color to the corresponding `OpenCode` theme token.
+/// Returns the input unchanged if it is already an `OpenCode` token or unknown.
 pub fn convert_color(c: &str) -> String {
     if c.is_empty() {
         return String::new();
@@ -127,6 +151,7 @@ pub fn convert_color(c: &str) -> String {
     c.to_string()
 }
 
+/// Extract the agent name (filename stem without `.md`) from a path.
 fn agent_name_from_path(p: &Path) -> String {
     let base = p
         .file_name()
@@ -135,8 +160,13 @@ fn agent_name_from_path(p: &Path) -> String {
     base.strip_suffix(".md").unwrap_or(&base).to_string()
 }
 
-/// Convert a single Claude agent file to OpenCode format. Returns conversion
+/// Convert a single Claude agent file to `OpenCode` format. Returns conversion
 /// warnings; writes to `output_path` unless `dry_run` is true.
+///
+/// # Errors
+///
+/// Returns an error string if the file cannot be read, if the frontmatter
+/// cannot be extracted or parsed as YAML, or if writing the output file fails.
 pub fn convert_agent(
     input_path: &Path,
     output_path: &Path,
@@ -204,6 +234,7 @@ pub fn convert_agent(
     Ok(warnings)
 }
 
+/// Copy a `Preserve`-tagged field value directly into the `OpenCode` output.
 fn apply_preserve(out: &mut OpenCodeAgent, key: &str, value: &Value) {
     match key {
         "description" => {
@@ -223,6 +254,7 @@ fn apply_preserve(out: &mut OpenCodeAgent, key: &str, value: &Value) {
     }
 }
 
+/// Translate a `Translate`-tagged field and write the converted value to the `OpenCode` output.
 // maxTurns may arrive as f64 from YAML; cast to i64 is safe for small whole-number turn counts.
 #[allow(clippy::cast_possible_truncation)]
 fn apply_translate(out: &mut OpenCodeAgent, key: &str, value: &Value) {
@@ -251,7 +283,7 @@ fn apply_translate(out: &mut OpenCodeAgent, key: &str, value: &Value) {
     }
 }
 
-/// Emit OpenCodeAgent as YAML matching Go's gopkg.in/yaml.v3 output:
+/// Emit `OpenCodeAgent` as YAML matching Go's gopkg.in/yaml.v3 output:
 /// - 2-space indent
 /// - description, model, tools always emit
 /// - color, steps, skills are omitempty (skip when empty/0/empty-vec)
@@ -295,6 +327,7 @@ fn yaml_string(s: &str) -> String {
     }
 }
 
+/// Return true if `s` requires YAML double-quoting as a plain scalar.
 #[allow(clippy::collapsible_if, clippy::collapsible_match)]
 fn needs_quoting(s: &str) -> bool {
     if s.is_empty() {
@@ -344,7 +377,7 @@ fn needs_quoting(s: &str) -> bool {
     false
 }
 
-/// Converts a Claude tools array to an OpenCode tools map.
+/// Converts a Claude tools array to an `OpenCode` tools map.
 /// Lower-cases each entry; empty entries are dropped.
 pub fn convert_tools(claude_tools: &[String]) -> BTreeMap<String, bool> {
     let mut m = BTreeMap::new();
@@ -357,7 +390,7 @@ pub fn convert_tools(claude_tools: &[String]) -> BTreeMap<String, bool> {
     m
 }
 
-/// Converts a Claude model alias to the corresponding OpenCode model ID.
+/// Converts a Claude model alias to the corresponding `OpenCode` model ID.
 pub fn convert_model(claude_model: &str) -> String {
     let m = claude_model.trim();
     if m == "haiku" {
@@ -367,14 +400,24 @@ pub fn convert_model(claude_model: &str) -> String {
     }
 }
 
+/// Aggregate result of converting all agents in `.claude/agents/`.
 #[derive(Debug, Clone, Default)]
 pub struct ConvertAllResult {
+    /// Number of agents successfully converted.
     pub converted: usize,
+    /// Number of agents that failed to convert.
     pub failed: usize,
+    /// Filenames of agents that failed to convert.
     pub failed_files: Vec<String>,
+    /// Collected conversion warnings across all agents.
     pub warnings: Vec<ConversionWarning>,
 }
 
+/// Convert every `.md` agent in `.claude/agents/` to `OpenCode` format under `.opencode/agents/`.
+///
+/// # Errors
+///
+/// Returns an error if the `.claude/agents/` directory cannot be read.
 pub fn convert_all_agents(repo_root: &Path, dry_run: bool) -> Result<ConvertAllResult, String> {
     let claude_dir = repo_root.join(".claude").join("agents");
     let opencode_dir = repo_root.join(OPENCODE_AGENT_DIR);

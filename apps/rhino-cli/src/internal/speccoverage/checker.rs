@@ -1,6 +1,8 @@
-// Port of `apps/rhino-cli/internal/speccoverage/checker.go`.
-// Spec coverage scanner — walks .feature trees + source trees, matches step
-// definitions to Gherkin scenarios, returns gaps + orphan step impls.
+//! Spec-coverage scanner — walks `.feature` trees and source trees, matches
+//! step definitions to Gherkin scenarios, and returns gaps plus orphan step
+//! implementations.
+//!
+//! Port of `apps/rhino-cli/internal/speccoverage/checker.go`.
 
 use std::collections::HashSet;
 use std::fs;
@@ -22,6 +24,7 @@ use super::util::{first_non_empty, normalize_ws, unescape_string};
 // TS/JS extraction regexes (live inline in Go checker.go).
 // ============================================================
 
+/// Matches a TypeScript/JavaScript `Scenario("title", …)` call.
 fn scenario_def_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -30,6 +33,7 @@ fn scenario_def_re() -> &'static Regex {
     })
 }
 
+/// Matches a TypeScript/JavaScript `Given("…", …)` / `When(…)` / etc. step call.
 fn step_def_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -37,6 +41,7 @@ fn step_def_re() -> &'static Regex {
     })
 }
 
+/// Matches a TypeScript/JavaScript `Given(/^regex$/, …)` regex step call.
 fn ts_regex_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -45,11 +50,13 @@ fn ts_regex_step_re() -> &'static Regex {
     })
 }
 
+/// Matches a Go godog sc.Step call (godog step registration pattern).
 fn go_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\.Step\(`([^`]+)`").expect("valid regex"))
 }
 
+/// Matches a Go `// Scenario: Title` comment used to declare scenario coverage.
 fn go_scenario_comment_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"//\s*Scenario:\s*(.+?)\s*$").expect("valid regex"))
@@ -59,6 +66,10 @@ fn go_scenario_comment_re() -> &'static Regex {
 // Constants
 // ============================================================
 
+/// Returns the set of directory names that the walker skips unconditionally.
+///
+/// These directories are generated output or dependency caches that should
+/// never be scanned for step definitions.
 fn skip_dirs() -> &'static HashSet<&'static str> {
     static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
     SET.get_or_init(|| {
@@ -91,6 +102,16 @@ fn skip_dirs() -> &'static HashSet<&'static str> {
 // Public entry point
 // ============================================================
 
+/// Runs the spec-coverage scan described by `opts` and returns a
+/// [`CheckResult`].
+///
+/// If `opts.specs_dirs` is empty and `opts.specs_dir` is set, the single
+/// directory is used instead.  Selects either shared-step or 1-to-1 mode
+/// based on `opts.shared_steps`.
+///
+/// # Errors
+///
+/// Returns an error if any file I/O or directory walk fails.
 pub fn check_all(opts: &ScanOptions) -> std::result::Result<CheckResult, Error> {
     let mut effective = opts.clone();
     if effective.specs_dirs.is_empty() && !effective.specs_dir.as_os_str().is_empty() {
@@ -103,6 +124,13 @@ pub fn check_all(opts: &ScanOptions) -> std::result::Result<CheckResult, Error> 
     }
 }
 
+/// Collects all `.feature` files from the spec directories specified in `opts`.
+///
+/// Falls back to `opts.specs_dir` when `opts.specs_dirs` is empty.
+///
+/// # Errors
+///
+/// Returns an error if any directory walk fails.
 fn collect_feature_files(opts: &ScanOptions) -> std::result::Result<Vec<PathBuf>, Error> {
     let dirs: Vec<PathBuf> = if !opts.specs_dirs.is_empty() {
         opts.specs_dirs.clone()
@@ -118,6 +146,12 @@ fn collect_feature_files(opts: &ScanOptions) -> std::result::Result<Vec<PathBuf>
     Ok(all)
 }
 
+/// Runs the scan in shared-step mode: all step definitions are matched against
+/// all Gherkin steps without requiring a file-name correspondence.
+///
+/// # Errors
+///
+/// Returns an error if any file I/O or directory walk fails.
 fn check_shared_steps(opts: &ScanOptions) -> std::result::Result<CheckResult, Error> {
     let start = Instant::now();
     let spec_files = collect_feature_files(opts)?;
@@ -162,6 +196,12 @@ fn check_shared_steps(opts: &ScanOptions) -> std::result::Result<CheckResult, Er
     })
 }
 
+/// Runs the scan in 1-to-1 mode: each `.feature` file must have a
+/// corresponding test file whose stem matches the feature file's stem.
+///
+/// # Errors
+///
+/// Returns an error if any file I/O or directory walk fails.
 fn check_one_to_one(opts: &ScanOptions) -> std::result::Result<CheckResult, Error> {
     let start = Instant::now();
     let spec_files = collect_feature_files(opts)?;
@@ -251,6 +291,10 @@ fn check_one_to_one(opts: &ScanOptions) -> std::result::Result<CheckResult, Erro
 // Coverage helpers
 // ============================================================
 
+/// Returns `true` if `step` has at least one matching entry in `sm`.
+///
+/// For steps with no variants the primary `text` is checked directly.
+/// For steps with variants all variant texts must match.
 fn step_covered(sm: &StepMatcher, step: &ParsedStep) -> bool {
     if sm.matches(&step.text) {
         return true;
@@ -261,6 +305,11 @@ fn step_covered(sm: &StepMatcher, step: &ParsedStep) -> bool {
     step.variants.iter().all(|v| sm.matches(v))
 }
 
+/// Identifies step-definition entries in `sm` that match no step in
+/// `all_gherkin_steps` and returns them as [`OrphanStepImpl`] values.
+///
+/// `repo_root` is used to strip the absolute path prefix from the reported
+/// file paths.
 fn check_orphan_step_impls(
     sm: &StepMatcher,
     all_gherkin_steps: &[String],
@@ -318,10 +367,13 @@ fn check_orphan_step_impls(
     orphans
 }
 
-/// Approximates Go's `entries[i].Pattern` direct reference — counts how many
-/// pattern entries precede `i` in `entries`, returning that index into
-/// `patterns`. Safe because `add_pattern_with_origin` appends to both vectors
-/// in lockstep.
+/// Computes the index into `sm.patterns` that corresponds to the pattern entry
+/// at position `i` in `sm.entries`.
+///
+/// Counts the number of `Pattern` entries that precede `i` in `entries`.
+/// This is safe because [`StepMatcher::add_pattern_with_origin`] appends to
+/// both `entries` and `patterns` in lockstep, so the count equals the index
+/// into `patterns`.
 fn pattern_index_for_entry(sm: &StepMatcher, i: usize) -> usize {
     sm.entries
         .iter()
@@ -334,6 +386,14 @@ fn pattern_index_for_entry(sm: &StepMatcher, i: usize) -> usize {
 // Walking
 // ============================================================
 
+/// Recursively walks `dir` and returns all `.feature` files, skipping any
+/// directory whose name is in `exclude_dirs`.
+///
+/// Returns an empty `Vec` if `dir` does not exist.
+///
+/// # Errors
+///
+/// Returns an error if the directory walk encounters an I/O error.
 fn walk_feature_files(
     dir: &Path,
     exclude_dirs: &[String],
@@ -360,6 +420,10 @@ fn walk_feature_files(
     Ok(files)
 }
 
+/// Converts a kebab-case stem to `PascalCase`.
+///
+/// Each hyphen-separated segment has its first character uppercased.
+/// Empty segments (e.g. from leading or consecutive hyphens) are skipped.
 fn to_pascal_case(stem: &str) -> String {
     let mut b = String::new();
     for p in stem.split('-') {
@@ -377,6 +441,11 @@ fn to_pascal_case(stem: &str) -> String {
     b
 }
 
+/// Returns `true` if the file base name `base` is a plausible test file for
+/// the feature stem `stem`.
+///
+/// Checks multiple naming conventions: kebab-case, `snake_case`, `PascalCase`,
+/// and `test_<snake>` prefix.
 fn matches_stem(base: &str, stem: &str) -> bool {
     let snake = stem.replace('-', "_");
     let pascal = to_pascal_case(stem);
@@ -399,6 +468,8 @@ fn matches_stem(base: &str, stem: &str) -> bool {
     base == stem || base == snake
 }
 
+/// Returns `true` if `path` is a test/step file based on its extension and
+/// language-specific naming conventions.
 fn is_test_file(path: &Path) -> bool {
     let base = path.file_name().and_then(|s| s.to_str()).unwrap_or("");
     let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
@@ -429,11 +500,21 @@ fn is_test_file(path: &Path) -> bool {
     }
 }
 
+/// Returns `true` if any path component of `path` is named `test`, `tests`,
+/// or `Tests`.
 fn is_in_test_dir(path: &Path) -> bool {
     path.components()
         .any(|comp| matches!(comp.as_os_str().to_str(), Some("test" | "tests" | "Tests")))
 }
 
+/// Recursively walks `app_dir` and returns all test/step files whose base name
+/// matches `stem`, skipping directories listed in [`skip_dirs`].
+///
+/// Returns an empty `Vec` if `app_dir` does not exist.
+///
+/// # Errors
+///
+/// Returns an error if the directory walk encounters an I/O error.
 fn find_all_matching_test_files(
     app_dir: &Path,
     stem: &str,
@@ -467,6 +548,15 @@ fn find_all_matching_test_files(
 // Scenario title extraction (dispatch by ext)
 // ============================================================
 
+/// Dispatches to the appropriate scenario-title extractor based on the file
+/// extension of `test_file_path`.
+///
+/// Auto-bind frameworks (Elixir, F#, Clojure) return an empty set because
+/// their scenario matching is implicit.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 fn extract_scenario_titles(test_file_path: &Path) -> std::result::Result<HashSet<String>, Error> {
     let ext = test_file_path
         .extension()
@@ -480,6 +570,12 @@ fn extract_scenario_titles(test_file_path: &Path) -> std::result::Result<HashSet
     }
 }
 
+/// Extracts scenario titles from a TypeScript/JavaScript test file by scanning
+/// for `Scenario("…", …)` and `Scenario('…', …)` call patterns.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 fn extract_ts_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, Error> {
     let content = fs::read_to_string(p)?;
     let mut titles = HashSet::new();
@@ -494,6 +590,12 @@ fn extract_ts_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, 
     Ok(titles)
 }
 
+/// Extracts scenario titles from a Go (or other language) test file by
+/// scanning for `// Scenario: Title` comment markers.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 fn extract_go_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, Error> {
     let content = fs::read_to_string(p)?;
     let mut titles = HashSet::new();
@@ -513,6 +615,15 @@ fn extract_go_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, 
 // Whole-app step extraction (walks + per-ext dispatch)
 // ============================================================
 
+/// Walks `app_dir` recursively and extracts all step definitions from every
+/// recognised source file, aggregating them into a single [`StepMatcher`].
+///
+/// Skips directories in [`skip_dirs`]. Returns an empty matcher if `app_dir`
+/// does not exist.
+///
+/// # Errors
+///
+/// Returns an error if the directory walk encounters an I/O error.
 pub fn extract_all_step_texts(app_dir: &Path) -> std::result::Result<StepMatcher, Error> {
     let mut sm = StepMatcher::new();
     if !app_dir.exists() {
@@ -552,6 +663,14 @@ pub fn extract_all_step_texts(app_dir: &Path) -> std::result::Result<StepMatcher
     Ok(sm)
 }
 
+/// Extracts step definitions from a TypeScript/JavaScript source file.
+///
+/// Strips JS/TS comments first, then recognises both string-literal step
+/// calls and `/regex/` step calls.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 fn extract_ts_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Result<(), Error> {
     let content = fs::read_to_string(path)?;
     let src = strip_js_comments(&content);
@@ -575,6 +694,11 @@ fn extract_ts_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Resu
     Ok(())
 }
 
+/// Extracts step definitions from a Go godog source file by scanning for godog step registration calls.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 fn extract_go_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Result<(), Error> {
     let content = fs::read_to_string(path)?;
     let path_s = path.to_string_lossy();
@@ -592,10 +716,17 @@ fn extract_go_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Resu
     Ok(())
 }
 
-/// Strip JS/TS comments from source. UTF-8 safe (walks chars, not bytes).
-/// - `/* ... */` anywhere (multi-line aware).
-/// - `// ...` only when after whitespace at line start.
-/// - Preserves string/template literals verbatim.
+/// Strips JS/TS comments from `src`, returning the comment-free source.
+///
+/// Rules (UTF-8 safe — walks by `char`, not byte):
+///
+/// - `/* … */` block comments are removed (preserving embedded newlines as
+///   bare `\n` so line numbers stay consistent).
+/// - `// …` line comments are removed **only** when they start at the
+///   beginning of a line (i.e. after optional leading whitespace).  Inline
+///   `// …` after real code is preserved.
+/// - String and template literals (`"…"`, `'…'`, `` `…` ``) are passed
+///   through verbatim so comment-like text inside strings is not stripped.
 fn strip_js_comments(src: &str) -> String {
     let chars: Vec<char> = src.chars().collect();
     let n = chars.len();
@@ -663,6 +794,10 @@ fn strip_js_comments(src: &str) -> String {
 // Path helpers
 // ============================================================
 
+/// Returns `p` relative to `root`.
+///
+/// If `root` is empty or `p` does not start with `root`, returns the
+/// string representation of `p` unchanged.
 fn rel_to(root: &Path, p: &Path) -> String {
     if root.as_os_str().is_empty() {
         return p.to_string_lossy().to_string();

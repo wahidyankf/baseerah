@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/env_backup.go`.
+//! `env backup` — backs up `.env*` files to an external directory.
+//!
+//! Port of `apps/rhino-cli/cmd/env_backup.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -10,6 +12,7 @@ use crate::internal::envbackup::{
 };
 use crate::internal::git;
 
+/// CLI arguments for `env backup`.
 #[derive(Args, Debug)]
 pub struct EnvBackupArgs {
     /// Backup directory (default: ~/ose-open-env-backup).
@@ -32,6 +35,12 @@ pub struct EnvBackupArgs {
     pub quiet: bool,
 }
 
+/// Run the `env backup` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, worktree detection fails,
+/// or the backup operation fails.
 pub fn run(args: &EnvBackupArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

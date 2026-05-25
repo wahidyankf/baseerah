@@ -1,5 +1,10 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/mermaid/`.
-// Combined into a single file: types + extractor + parser + graph + validator + reporter.
+//! Byte-for-byte port of `apps/rhino-cli/internal/mermaid/`.
+//!
+//! Combined into a single file: types, extractor, parser, graph utilities,
+//! validator, and reporter for Mermaid flowchart diagrams embedded in Markdown.
+//!
+//! Primary entry points: [`extract_blocks`], [`validate_blocks`],
+//! [`format_text`], [`format_json`], [`format_markdown`].
 
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;
@@ -11,16 +16,25 @@ use serde::Serialize;
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
+/// Flow direction of a Mermaid flowchart diagram.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Direction {
+    /// Top-to-bottom (default).
     TB,
+    /// Top-down (alias for [`Direction::TB`]).
     TD,
+    /// Bottom-to-top.
     BT,
+    /// Left-to-right.
     LR,
+    /// Right-to-left.
     RL,
 }
 
 impl Direction {
+    /// Parses a direction string from a Mermaid `flowchart` / `graph` header.
+    ///
+    /// Unknown strings default to [`Direction::TB`].
     pub fn parse(s: &str) -> Self {
         match s {
             "TD" => Direction::TD,
@@ -32,14 +46,20 @@ impl Direction {
     }
 }
 
+/// Category of a validation violation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ViolationKind {
+    /// A node label exceeds the configured maximum character count.
     LabelTooLong,
+    /// The diagram width (nodes in the widest rank) exceeds the configured maximum.
     WidthExceeded,
+    /// A single code block contains more than one `flowchart` / `graph` header.
     MultipleDiagrams,
 }
 
 impl ViolationKind {
+    /// Returns the stable string code for this kind
+    /// (`"label_too_long"`, `"width_exceeded"`, or `"multiple_diagrams"`).
     pub fn code(&self) -> &'static str {
         match self {
             ViolationKind::LabelTooLong => "label_too_long",
@@ -49,13 +69,18 @@ impl ViolationKind {
     }
 }
 
+/// Category of a validation warning (non-blocking advisory).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WarningKind {
+    /// Both the width and depth limits are exceeded simultaneously.
     ComplexDiagram,
+    /// A subgraph contains more children than the configured maximum.
     SubgraphDense,
 }
 
 impl WarningKind {
+    /// Returns the stable string code for this kind
+    /// (`"complex_diagram"` or `"subgraph_density"`).
     pub fn code(&self) -> &'static str {
         match self {
             WarningKind::ComplexDiagram => "complex_diagram",
@@ -64,88 +89,147 @@ impl WarningKind {
     }
 }
 
+/// A raw Mermaid code block extracted from a Markdown file.
 #[derive(Debug, Clone)]
 pub struct MermaidBlock {
+    /// Path to the Markdown file containing this block.
     pub file_path: String,
+    /// Zero-based index of this block within the file.
     pub block_index: usize,
+    /// Raw source of the block (content between the fence markers).
     pub source: String,
+    /// 1-based line number of the first line inside the fence.
     pub start_line: usize,
 }
 
+/// A node in a parsed Mermaid flowchart.
 #[derive(Debug, Clone)]
 pub struct Node {
+    /// Node identifier as it appears in the source.
     pub id: String,
+    /// Display label (may be empty when the node has no explicit label).
     pub label: String,
 }
 
+/// A directed edge between two nodes.
 #[derive(Debug, Clone)]
 pub struct Edge {
+    /// Source node identifier.
     pub from: String,
+    /// Target node identifier.
     pub to: String,
 }
 
+/// A `subgraph` block parsed from a flowchart.
 #[derive(Debug, Clone)]
 pub struct Subgraph {
+    /// Subgraph identifier (may be empty when unnamed).
     pub id: String,
+    /// Display label from the `subgraph … [Label]` syntax.
     pub label: String,
+    /// Identifiers of nodes that appear inside this subgraph.
     pub node_ids: Vec<String>,
+    /// 1-based line number of the `subgraph` keyword within the block.
     pub start_line: usize,
 }
 
+/// A fully parsed Mermaid diagram with its structural metadata.
 pub struct ParsedDiagram {
+    /// The source block this diagram was parsed from.
     pub block: MermaidBlock,
+    /// Declared flow direction.
     pub direction: Direction,
+    /// All nodes in source order.
     pub nodes: Vec<Node>,
+    /// All directed edges.
     pub edges: Vec<Edge>,
+    /// All subgraph blocks.
     pub subgraphs: Vec<Subgraph>,
 }
 
+/// A single validation violation that blocks the check.
 #[derive(Debug, Clone)]
 pub struct Violation {
+    /// Category of the violation.
     pub kind: ViolationKind,
+    /// File path where the violation occurred.
     pub file_path: String,
+    /// Zero-based index of the block within the file.
     pub block_index: usize,
+    /// 1-based line number of the block's first line.
     pub start_line: usize,
+    /// Node identifier (set for `LabelTooLong`; empty otherwise).
     pub node_id: String,
+    /// Raw label text (set for `LabelTooLong`; empty otherwise).
     pub label_text: String,
+    /// Effective character count of the label.
     pub label_len: usize,
+    /// Configured maximum label length.
     pub max_label_len: usize,
+    /// Computed diagram width (set for `WidthExceeded`; zero otherwise).
     pub actual_width: usize,
+    /// Configured maximum width (set for `WidthExceeded`; zero otherwise).
     pub max_width: usize,
 }
 
+/// A non-blocking advisory about a diagram's complexity.
 #[derive(Debug, Clone)]
 pub struct Warning {
+    /// Category of the warning.
     pub kind: WarningKind,
+    /// File path where the warning occurred.
     pub file_path: String,
+    /// Zero-based index of the block within the file.
     pub block_index: usize,
+    /// 1-based line number of the block (or subgraph) start.
     pub start_line: usize,
+    /// Computed diagram width.
     pub actual_width: usize,
+    /// Computed diagram depth.
     pub actual_depth: usize,
+    /// Configured maximum width.
     pub max_width: usize,
+    /// Configured maximum depth.
     pub max_depth: usize,
+    /// Label of the dense subgraph (set for `SubgraphDense`; empty otherwise).
     pub subgraph_label: String,
+    /// Number of direct children in the dense subgraph.
     pub subgraph_node_count: usize,
+    /// Configured maximum subgraph child count.
     pub max_subgraph_nodes: usize,
 }
 
+/// Aggregated result of a [`validate_blocks`] call.
 pub struct ValidationResult {
+    /// Number of unique files that contained at least one Mermaid block.
     pub files_scanned: usize,
+    /// Total number of Mermaid blocks processed.
     pub blocks_scanned: usize,
+    /// All violations found across all blocks.
     pub violations: Vec<Violation>,
+    /// All non-blocking warnings found across all blocks.
     pub warnings: Vec<Warning>,
 }
 
+/// Tunable thresholds for Mermaid diagram validation.
 #[derive(Debug, Clone, Copy)]
 pub struct ValidateOptions {
+    /// Maximum allowed character count for a single node label line.
     pub max_label_len: usize,
+    /// Maximum allowed diagram width (nodes in the widest rank).
     pub max_width: usize,
+    /// Maximum allowed diagram depth (number of distinct ranks).
     pub max_depth: usize,
+    /// Maximum allowed number of direct children in any subgraph.
     pub max_subgraph_nodes: usize,
 }
 
 // ── Extractor ────────────────────────────────────────────────────────────
 
+/// Extracts all ` ```mermaid ` / `~~~mermaid` code blocks from `content`.
+///
+/// Returns one [`MermaidBlock`] per fenced block, in document order.
+/// Unclosed blocks at the end of the file are silently ignored.
 pub fn extract_blocks(file_path: &str, content: &str) -> Vec<MermaidBlock> {
     let mut blocks = Vec::new();
     let mut in_block = false;
@@ -178,6 +262,7 @@ pub fn extract_blocks(file_path: &str, content: &str) -> Vec<MermaidBlock> {
 
 // ── Parser ───────────────────────────────────────────────────────────────
 
+/// Returns the compiled regex that matches a `flowchart` or `graph` header line.
 fn flowchart_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -186,6 +271,7 @@ fn flowchart_re() -> &'static Regex {
     })
 }
 
+/// Returns the compiled regex that matches a `subgraph` header line.
 fn subgraph_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -194,21 +280,27 @@ fn subgraph_re() -> &'static Regex {
     })
 }
 
+/// Returns the compiled regex that matches Mermaid arrow / edge connectors.
 fn arrow_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"-->|---|-\.->|==>|--o|--x|<-->").expect("valid hardcoded regex"))
 }
 
+/// Returns the compiled regex that matches edge labels (`-- text -->`).
 fn link_text_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"--[^->\n]+?-->").expect("valid hardcoded regex"))
 }
 
+/// Returns the compiled regex that matches a bare node identifier (word characters only).
 fn node_id_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"^(\w+)$").expect("valid hardcoded regex"))
 }
 
+/// Returns compiled regexes for all Mermaid node shape syntaxes, in match-priority order.
+///
+/// Each regex captures `(id, label)` in groups 1 and 2.
 fn node_shape_patterns() -> &'static Vec<Regex> {
     static PATTERNS: OnceLock<Vec<Regex>> = OnceLock::new();
     PATTERNS.get_or_init(|| {
@@ -231,6 +323,11 @@ fn node_shape_patterns() -> &'static Vec<Regex> {
     })
 }
 
+/// Parses a [`MermaidBlock`] into a [`ParsedDiagram`] and the number of
+/// `flowchart` / `graph` headers found in the block.
+///
+/// A count of `0` means the block is not a flowchart (e.g. a sequence diagram).
+/// A count `> 1` indicates multiple diagrams packed into one block, which is a violation.
 #[allow(clippy::collapsible_if)]
 pub fn parse_diagram(block: MermaidBlock) -> (ParsedDiagram, usize) {
     let matches: Vec<_> = flowchart_re().captures_iter(&block.source).collect();
@@ -330,6 +427,10 @@ pub fn parse_diagram(block: MermaidBlock) -> (ParsedDiagram, usize) {
     )
 }
 
+/// Extracts `(id, label)` from a `subgraph` header line.
+///
+/// Falls back to an empty id and the trimmed remainder as label when the regex
+/// does not match.
 fn parse_subgraph_header(line: &str) -> (String, String) {
     if let Some(m) = subgraph_re().captures(line) {
         let id = m.get(1).map(|s| s.as_str().to_string()).unwrap_or_default();
@@ -341,6 +442,7 @@ fn parse_subgraph_header(line: &str) -> (String, String) {
     (String::new(), rest.to_string())
 }
 
+/// Returns `ids` with duplicates removed, preserving first-occurrence order.
 fn dedup_order(ids: &[String]) -> Vec<String> {
     let mut seen: HashSet<String> = HashSet::new();
     let mut out = Vec::new();
@@ -352,6 +454,8 @@ fn dedup_order(ids: &[String]) -> Vec<String> {
     out
 }
 
+/// Collects node identifiers from `source` in the order they first appear,
+/// filtered to only those present in `node_map`.
 fn collect_node_order(source: &str, node_map: &HashMap<String, usize>) -> Vec<String> {
     let mut seen: HashSet<String> = HashSet::new();
     let mut order = Vec::new();
@@ -377,6 +481,8 @@ fn collect_node_order(source: &str, node_map: &HashMap<String, usize>) -> Vec<St
     order
 }
 
+/// Extracts all node identifiers mentioned on `line`, handling both edge lines
+/// (splitting on arrows) and standalone node lines.
 fn extract_all_node_ids(line: &str) -> Vec<String> {
     let mut ids = Vec::new();
     if arrow_re().is_match(line) {
@@ -389,6 +495,7 @@ fn extract_all_node_ids(line: &str) -> Vec<String> {
     ids
 }
 
+/// Extracts node identifiers from a segment that may contain `&`-separated groups.
 fn extract_node_ids_from_segment(seg: &str) -> Vec<String> {
     seg.split('&')
         .filter_map(|sub| {
@@ -398,6 +505,9 @@ fn extract_node_ids_from_segment(seg: &str) -> Vec<String> {
         .collect()
 }
 
+/// Extracts the node identifier from a single (non-`&`) segment.
+///
+/// Returns an empty string when no known shape pattern or bare identifier is recognised.
 fn extract_node_id_from_segment(seg: &str) -> String {
     let seg = seg.trim();
     if seg.is_empty() {
@@ -414,6 +524,7 @@ fn extract_node_id_from_segment(seg: &str) -> String {
     String::new()
 }
 
+/// Parses a standalone node declaration line (no arrow) and upserts it into `node_map`.
 fn extract_standalone_node(
     line: &str,
     node_map: &mut Vec<(String, String)>,
@@ -434,6 +545,9 @@ fn extract_standalone_node(
     }
 }
 
+/// Inserts a new node or updates an existing node's label in `node_map`.
+///
+/// `node_index` maps identifiers to their position in `node_map`.
 fn upsert_node(
     node_map: &mut Vec<(String, String)>,
     node_index: &mut HashMap<String, usize>,
@@ -448,6 +562,8 @@ fn upsert_node(
     }
 }
 
+/// Parses an edge line (containing at least one arrow), upserts all referenced
+/// nodes, and appends cartesian-product edges for each `&`-group pair.
 fn extract_edge_line(
     line: &str,
     node_map: &mut Vec<(String, String)>,
@@ -478,6 +594,8 @@ fn extract_edge_line(
     }
 }
 
+/// Parses one arrow-separated segment (`part`) which may contain `&`-separated
+/// node references, upserts each node, and returns the list of identifiers.
 fn extract_node_group(
     part: &str,
     node_map: &mut Vec<(String, String)>,
@@ -495,6 +613,8 @@ fn extract_node_group(
         .collect()
 }
 
+/// Extracts a node identifier (and optional label) from `seg`, upserts it, and
+/// returns the identifier string.  Returns an empty string when unrecognised.
 fn extract_node_id_and_label(
     seg: &str,
     node_map: &mut Vec<(String, String)>,
@@ -515,6 +635,7 @@ fn extract_node_id_and_label(
     String::new()
 }
 
+/// Strips surrounding quote characters (`"`, `'`, or `` ` ``) from a label string.
 fn normalize_label(s: &str) -> String {
     let s = s.trim();
     if s.len() >= 2 {
@@ -531,6 +652,10 @@ fn normalize_label(s: &str) -> String {
     s.to_string()
 }
 
+/// Returns the effective display length of `label` after normalising line-break
+/// tokens (`<br/>`, `<BR/>`, `<br>`, `<BR>`, `\n`) to actual newlines.
+///
+/// The length is the maximum character count across all resulting lines.
 pub fn effective_label_len(label: &str) -> usize {
     if label.is_empty() {
         return 0;
@@ -550,6 +675,11 @@ pub fn effective_label_len(label: &str) -> usize {
 
 // ── Graph ────────────────────────────────────────────────────────────────
 
+/// Assigns a rank (depth level) to each node using a topological-sort-based
+/// longest-path algorithm.
+///
+/// Nodes not reachable from any root (cycle members or disconnected) are
+/// assigned rank `0`.  Returns an empty map when `nodes` is empty.
 fn rank_assign(nodes: &[Node], edges: &[Edge]) -> HashMap<String, i64> {
     if nodes.is_empty() {
         return HashMap::new();
@@ -602,6 +732,9 @@ fn rank_assign(nodes: &[Node], edges: &[Edge]) -> HashMap<String, i64> {
     rank
 }
 
+/// Returns the maximum number of nodes sharing the same rank (diagram width).
+///
+/// Returns `0` when there are no nodes.
 pub fn max_width(nodes: &[Node], edges: &[Edge]) -> usize {
     if nodes.is_empty() {
         return 0;
@@ -614,6 +747,9 @@ pub fn max_width(nodes: &[Node], edges: &[Edge]) -> usize {
     rank_count.values().copied().max().unwrap_or(0)
 }
 
+/// Returns the number of distinct rank levels in the diagram (diagram depth).
+///
+/// Returns `0` when there are no nodes.
 pub fn depth(nodes: &[Node], edges: &[Edge]) -> usize {
     if nodes.is_empty() {
         return 0;
@@ -624,6 +760,10 @@ pub fn depth(nodes: &[Node], edges: &[Edge]) -> usize {
 
 // ── Validator ────────────────────────────────────────────────────────────
 
+/// Returns the default validation options used by the CLI when no flags are specified.
+///
+/// Defaults: `max_label_len = 30`, `max_width = 4`,
+/// `max_depth = usize::MAX`, `max_subgraph_nodes = 6`.
 pub fn default_validate_options() -> ValidateOptions {
     ValidateOptions {
         max_label_len: 30,
@@ -633,6 +773,10 @@ pub fn default_validate_options() -> ValidateOptions {
     }
 }
 
+/// Validates all `blocks` against `opts` and returns an aggregated
+/// [`ValidationResult`].
+///
+/// Blocks from the same file are counted once in `files_scanned`.
 pub fn validate_blocks(blocks: Vec<MermaidBlock>, opts: ValidateOptions) -> ValidationResult {
     let mut files_seen: HashSet<String> = HashSet::new();
     let mut violations = Vec::new();
@@ -650,6 +794,8 @@ pub fn validate_blocks(blocks: Vec<MermaidBlock>, opts: ValidateOptions) -> Vali
     }
 }
 
+/// Validates a single [`MermaidBlock`] and appends any findings to the
+/// `violations` and `warnings` vectors.
 fn validate_one_block(
     block: MermaidBlock,
     opts: &ValidateOptions,
@@ -751,6 +897,7 @@ fn validate_one_block(
 
 // ── Reporter ─────────────────────────────────────────────────────────────
 
+/// Returns a human-readable description of a single [`Violation`].
 fn violation_detail(v: &Violation) -> String {
     match v.kind {
         ViolationKind::LabelTooLong => format!(
@@ -774,6 +921,7 @@ fn violation_detail(v: &Violation) -> String {
     }
 }
 
+/// Returns a human-readable description of a single [`Warning`].
 fn warning_detail(w: &Warning) -> String {
     match w.kind {
         WarningKind::SubgraphDense => {
@@ -800,6 +948,10 @@ fn warning_detail(w: &Warning) -> String {
     }
 }
 
+/// Formats a [`ValidationResult`] as human-readable text.
+///
+/// When `quiet` is `true` and there are no findings, returns an empty string.
+/// When `verbose` is `true` or there are findings, per-file details are included.
 pub fn format_text(result: &ValidationResult, verbose: bool, quiet: bool) -> String {
     let has_findings = !result.violations.is_empty() || !result.warnings.is_empty();
     if quiet && !has_findings {
@@ -873,69 +1025,103 @@ pub fn format_text(result: &ValidationResult, verbose: bool, quiet: bool) -> Str
     sb
 }
 
+/// JSON representation of a single violation.
 #[derive(Serialize)]
 struct JsonViolation<'a> {
+    /// Violation kind code string.
     kind: &'a str,
+    /// Path to the file containing the violation.
     #[serde(rename = "filePath")]
     file_path: &'a str,
+    /// Zero-based block index within the file.
     #[serde(rename = "blockIndex")]
     block_index: usize,
+    /// 1-based start line of the block.
     #[serde(rename = "startLine")]
     start_line: usize,
+    /// Node identifier (omitted when empty).
     #[serde(rename = "nodeId", skip_serializing_if = "str::is_empty")]
     node_id: &'a str,
+    /// Label text (omitted when empty).
     #[serde(rename = "labelText", skip_serializing_if = "str::is_empty")]
     label_text: &'a str,
+    /// Effective label character count (omitted when zero).
     #[serde(rename = "labelLen", skip_serializing_if = "is_zero_usize")]
     label_len: usize,
+    /// Configured maximum label length (omitted when zero).
     #[serde(rename = "maxLabelLen", skip_serializing_if = "is_zero_usize")]
     max_label_len: usize,
+    /// Computed diagram width (omitted when zero).
     #[serde(rename = "actualWidth", skip_serializing_if = "is_zero_usize")]
     actual_width: usize,
+    /// Configured maximum width (omitted when zero).
     #[serde(rename = "maxWidth", skip_serializing_if = "is_zero_usize")]
     max_width: usize,
 }
 
+/// JSON representation of a single warning.
 #[derive(Serialize)]
 struct JsonWarning<'a> {
+    /// Warning kind code string.
     kind: &'a str,
+    /// Path to the file containing the warning.
     #[serde(rename = "filePath")]
     file_path: &'a str,
+    /// Zero-based block index within the file.
     #[serde(rename = "blockIndex")]
     block_index: usize,
+    /// 1-based start line of the block or subgraph.
     #[serde(rename = "startLine")]
     start_line: usize,
+    /// Computed diagram width (omitted when zero).
     #[serde(rename = "actualWidth", skip_serializing_if = "is_zero_usize")]
     actual_width: usize,
+    /// Computed diagram depth (omitted when zero).
     #[serde(rename = "actualDepth", skip_serializing_if = "is_zero_usize")]
     actual_depth: usize,
+    /// Configured maximum width (omitted when zero).
     #[serde(rename = "maxWidth", skip_serializing_if = "is_zero_usize")]
     max_width: usize,
+    /// Configured maximum depth (omitted when zero).
     #[serde(rename = "maxDepth", skip_serializing_if = "is_zero_usize")]
     max_depth: usize,
+    /// Dense subgraph label (omitted when empty).
     #[serde(rename = "subgraphLabel", skip_serializing_if = "str::is_empty")]
     subgraph_label: &'a str,
+    /// Number of children in the dense subgraph (omitted when zero).
     #[serde(rename = "subgraphNodeCount", skip_serializing_if = "is_zero_usize")]
     subgraph_node_count: usize,
+    /// Configured maximum subgraph child count (omitted when zero).
     #[serde(rename = "maxSubgraphNodes", skip_serializing_if = "is_zero_usize")]
     max_subgraph_nodes: usize,
 }
 
+/// Returns `true` when `n` is zero; used to omit zero-valued fields from JSON output.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero_usize(n: &usize) -> bool {
     *n == 0
 }
 
+/// Top-level JSON document for the mermaid validation result.
 #[derive(Serialize)]
 struct JsonResult<'a> {
+    /// Number of unique files scanned.
     #[serde(rename = "filesScanned")]
     files_scanned: usize,
+    /// Total number of Mermaid blocks processed.
     #[serde(rename = "blocksScanned")]
     blocks_scanned: usize,
+    /// All violations found.
     violations: Vec<JsonViolation<'a>>,
+    /// All non-blocking warnings found.
     warnings: Vec<JsonWarning<'a>>,
 }
 
+/// Serialises the validation result to a pretty-printed JSON string.
+///
+/// # Errors
+///
+/// Returns an error when `serde_json` serialisation fails.
 pub fn format_json(result: &ValidationResult) -> std::result::Result<String, Error> {
     let violations: Vec<JsonViolation> = result
         .violations
@@ -979,6 +1165,9 @@ pub fn format_json(result: &ValidationResult) -> std::result::Result<String, Err
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
+/// Formats the validation result as a Markdown table.
+///
+/// Returns a single-line "all passed" message when there are no findings.
 pub fn format_markdown(result: &ValidationResult) -> String {
     if result.violations.is_empty() && result.warnings.is_empty() {
         return format!(
@@ -1196,6 +1385,7 @@ mod tests {
         assert_eq!(v["blocksScanned"], 3);
     }
 
+    /// Builds a sample `LabelTooLong` violation for tests.
     fn label_violation() -> Violation {
         Violation {
             kind: ViolationKind::LabelTooLong,
@@ -1211,6 +1401,7 @@ mod tests {
         }
     }
 
+    /// Builds a sample `WidthExceeded` violation for tests.
     fn width_violation() -> Violation {
         Violation {
             kind: ViolationKind::WidthExceeded,
@@ -1226,6 +1417,7 @@ mod tests {
         }
     }
 
+    /// Builds a sample `MultipleDiagrams` violation for tests.
     fn multi_violation() -> Violation {
         Violation {
             kind: ViolationKind::MultipleDiagrams,
@@ -1241,6 +1433,7 @@ mod tests {
         }
     }
 
+    /// Builds a sample `SubgraphDense` warning for tests.
     fn dense_warning() -> Warning {
         Warning {
             kind: WarningKind::SubgraphDense,
@@ -1257,6 +1450,7 @@ mod tests {
         }
     }
 
+    /// Builds a sample `ComplexDiagram` warning for tests.
     fn complex_warning() -> Warning {
         Warning {
             kind: WarningKind::ComplexDiagram,

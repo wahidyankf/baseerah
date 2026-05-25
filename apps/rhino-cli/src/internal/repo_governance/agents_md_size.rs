@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/agents_md_size.go`.
+//! Size auditing for the `AGENTS.md` root instruction file.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/agents_md_size.go`.
 
 use std::fs;
 
@@ -11,14 +13,26 @@ pub const AGENTS_MD_WARNING_SIZE: i64 = 35_000;
 /// Hard upper bound that fails the audit (40 KB).
 pub const AGENTS_MD_HARD_LIMIT_SIZE: i64 = 40_000;
 
+/// The result of a single `AGENTS.md` size check.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AgentsMdSizeFinding {
+    /// Absolute or relative path to the file that was inspected.
     pub file: String,
+    /// Measured file size in bytes.
     pub size: i64,
+    /// Outcome: `"ok"`, `"warn"`, or `"fail"`.
     pub severity: String,
+    /// Human-readable description of the finding.
     pub message: String,
 }
 
+/// Checks the byte size of the `AGENTS.md` file at `path` and classifies it
+/// against the three-tier thresholds.
+///
+/// # Errors
+///
+/// Returns an error when the file cannot be stat-ed (e.g., it does not exist or
+/// the process lacks permission).
 pub fn check_agents_md_size(path: &str) -> std::result::Result<AgentsMdSizeFinding, Error> {
     let meta = fs::metadata(path).context("stat AGENTS.md")?;
     let size = meta.len() as i64;
@@ -31,6 +45,8 @@ pub fn check_agents_md_size(path: &str) -> std::result::Result<AgentsMdSizeFindi
     })
 }
 
+/// Maps a byte `size` to a `(severity, message)` pair using the three-tier
+/// thresholds defined by the module constants.
 fn classify(size: i64) -> (&'static str, String) {
     if size <= AGENTS_MD_TARGET_SIZE {
         (

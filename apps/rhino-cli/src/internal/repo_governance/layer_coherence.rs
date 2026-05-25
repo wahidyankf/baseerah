@@ -1,4 +1,6 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/layer_coherence.go`.
+//! Layer coherence audit across governance documents.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/layer_coherence.go`.
 
 use std::collections::{BTreeSet, HashMap};
 use std::fs;
@@ -8,23 +10,40 @@ use std::sync::OnceLock;
 use anyhow::Error;
 use regex::Regex;
 
+/// A single finding emitted by the layer coherence audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LayerCoherenceFinding {
+    /// Path (or composite path `a+b`) of the offending file(s).
     pub file: String,
+    /// Severity; currently always `"fail"`.
     pub severity: String,
+    /// Machine-readable violation category (one of the `KIND_*` constants).
     pub kind: String,
+    /// Human-readable description of the violation.
     pub message: String,
 }
 
+/// Finding kind: the same layer number is declared with two different names
+/// within a single file.
 pub const KIND_INTRA_FILE_NAME_CONFLICT: &str = "intra-file-name-conflict";
+/// Finding kind: a layer number exists in one governance document but is absent
+/// from the other.
 pub const KIND_CROSS_FILE_NUMBER_MISMATCH: &str = "cross-file-number-mismatch";
+/// Finding kind: the same layer number has different names in the two documents.
 pub const KIND_CROSS_FILE_NAME_MISMATCH: &str = "cross-file-name-mismatch";
+/// Finding kind: an integer in the range `[0, max_layer]` is not declared in
+/// either document.
 pub const KIND_NUMBERING_GAP: &str = "numbering-gap";
+/// Finding kind: a required governance document does not exist on disk.
 pub const KIND_MISSING_DOC: &str = "missing-doc";
 
+/// Relative path to the repository governance architecture document.
 const ARCH_PATH: &str = "repo-governance/repository-governance-architecture.md";
+/// Relative path to the repo-governance README.
 const README_PATH: &str = "repo-governance/README.md";
 
+/// Returns a compiled `Regex` matching bold layer declarations such as
+/// `**Layer 0: Vision**`.
 fn bold_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -33,6 +52,8 @@ fn bold_re() -> &'static Regex {
     })
 }
 
+/// Returns a compiled `Regex` matching ATX heading layer declarations such as
+/// `## Layer 0: Vision (the why)`.
 fn head_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -41,6 +62,16 @@ fn head_re() -> &'static Regex {
     })
 }
 
+/// Audits that the governance layer declarations in
+/// `repo-governance/repository-governance-architecture.md` and
+/// `repo-governance/README.md` are mutually consistent and contiguous.
+///
+/// Findings are sorted by `file`, then by `kind`.
+///
+/// # Errors
+///
+/// Returns an error when either document cannot be read (other than
+/// `NotFound`, which is reported as a `KIND_MISSING_DOC` finding).
 pub fn audit_layer_coherence(
     repo_root: &Path,
 ) -> std::result::Result<Vec<LayerCoherenceFinding>, Error> {
@@ -64,9 +95,21 @@ pub fn audit_layer_coherence(
     Ok(findings)
 }
 
+/// Map from layer number to layer name extracted from a single document.
 type LayerMap = HashMap<i64, String>;
+/// Result type for [`read_layer_map`]: the optional map plus any intra-file
+/// findings.
 type LayerMapResult = std::result::Result<(Option<LayerMap>, Vec<LayerCoherenceFinding>), Error>;
 
+/// Reads the layer declarations from the Markdown document at `path` and
+/// returns a [`LayerMap`] together with any intra-file name-conflict findings.
+///
+/// Returns `(None, findings)` when the file does not exist (recorded as a
+/// `KIND_MISSING_DOC` finding).
+///
+/// # Errors
+///
+/// Returns an error when the file exists but cannot be read.
 fn read_layer_map(path: &str) -> LayerMapResult {
     let data = match fs::read_to_string(path) {
         Ok(d) => d,
@@ -122,6 +165,9 @@ fn read_layer_map(path: &str) -> LayerMapResult {
     Ok((Some(layers), findings))
 }
 
+/// Cross-checks `arch` and `readme` layer maps and emits
+/// `KIND_CROSS_FILE_NUMBER_MISMATCH` or `KIND_CROSS_FILE_NAME_MISMATCH`
+/// findings for any discrepancy.
 fn compare_layer_maps(
     arch: &HashMap<i64, String>,
     readme: &HashMap<i64, String>,
@@ -168,6 +214,13 @@ fn compare_layer_maps(
     findings
 }
 
+/// Emits `KIND_NUMBERING_GAP` findings for any integer in `[0, max]` that
+/// appears in neither `arch` nor `readme`.
+///
+/// # Panics
+///
+/// Panics if `seen` is somehow non-empty but has no maximum element — guarded
+/// by the preceding `is_empty()` check.
 fn check_numbering_gap(
     arch: &HashMap<i64, String>,
     readme: &HashMap<i64, String>,

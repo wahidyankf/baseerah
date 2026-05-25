@@ -1,6 +1,8 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/speccoverage/reporter.go`.
-// Text / JSON / Markdown output formats — same exact strings so shadow-diff
-// against the Go binary passes.
+//! Output formatters for spec-coverage results.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/speccoverage/reporter.go`.
+//! Produces text, JSON, and Markdown output — using the same exact strings as
+//! the Go binary so that shadow-diff tests pass.
 
 use std::collections::BTreeMap;
 use std::fmt::Write as _;
@@ -10,6 +12,10 @@ use serde::Serialize;
 
 use super::types::{CheckResult, StepGap};
 
+/// Formats a [`CheckResult`] as human-readable text.
+///
+/// When `quiet` is `true` and there are no gaps, returns an empty string.
+/// Otherwise a success banner or a structured gap report is returned.
 pub fn format_text(r: &CheckResult, _verbose: bool, quiet: bool) -> String {
     let has_gaps = !r.gaps.is_empty()
         || !r.scenario_gaps.is_empty()
@@ -102,51 +108,95 @@ pub fn format_text(r: &CheckResult, _verbose: bool, quiet: bool) -> String {
     out
 }
 
+/// JSON payload emitted by [`format_json`].
 #[derive(Serialize)]
 struct JsonOutput<'a> {
+    /// `"success"` or `"failure"`.
     status: &'static str,
+    /// ISO-8601 timestamp with timezone offset.
     timestamp: String,
+    /// Total number of `.feature` files scanned.
     total_specs: usize,
+    /// Total number of scenarios encountered.
     total_scenarios: usize,
+    /// Total number of steps encountered.
     total_steps: usize,
+    /// Number of feature files with no matching test file.
     gap_count: usize,
+    /// Number of scenarios missing from test files.
     scenario_gap_count: usize,
+    /// Number of steps missing from step definitions.
     step_gap_count: usize,
+    /// Number of step definitions that match no Gherkin step.
     orphan_step_impl_count: usize,
+    /// Scan duration in milliseconds.
     duration_ms: i64,
+    /// Detailed file-level coverage gaps.
     gaps: Vec<JsonGap<'a>>,
+    /// Detailed scenario-level coverage gaps.
     scenario_gaps: Vec<JsonScenGap<'a>>,
+    /// Detailed step-level coverage gaps.
     step_gaps: Vec<JsonStepGap<'a>>,
+    /// Orphan step-definition entries.
     orphan_step_impls: Vec<JsonOrphanImpl<'a>>,
 }
 
+/// File-level coverage gap in the JSON output.
 #[derive(Serialize)]
 struct JsonGap<'a> {
+    /// Repo-relative path to the `.feature` file.
     spec_file: &'a str,
+    /// File stem of the missing test file (e.g. `"user-login"`).
     stem: &'a str,
 }
 
+/// Scenario-level coverage gap in the JSON output.
 #[derive(Serialize)]
 struct JsonScenGap<'a> {
+    /// Repo-relative path to the `.feature` file.
     spec_file: &'a str,
+    /// Title of the scenario that has no matching test.
     scenario_title: &'a str,
 }
 
+/// Step-level coverage gap in the JSON output.
 #[derive(Serialize)]
 struct JsonStepGap<'a> {
+    /// Repo-relative path to the `.feature` file.
     spec_file: &'a str,
+    /// Title of the scenario containing the uncovered step.
     scenario_title: &'a str,
+    /// Gherkin keyword of the step (e.g. `"Given"`).
     keyword: &'a str,
+    /// Step text without the leading keyword.
     step_text: &'a str,
 }
 
+/// Orphan step-definition entry in the JSON output.
 #[derive(Serialize)]
 struct JsonOrphanImpl<'a> {
+    /// Repo-relative path to the file containing the orphan step definition.
     file: &'a str,
+    /// Match kind: `"exact"` or `"pattern"`.
     matcher_kind: &'a str,
+    /// The literal text or regex pattern of the orphan definition.
     matcher_text: &'a str,
 }
 
+/// Serialises a [`CheckResult`] to a pretty-printed JSON string.
+///
+/// The `status` field is `"success"` when there are no gaps of any kind, and
+/// `"failure"` otherwise.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialisation fails (in practice this should never
+/// happen for these types, but the `serde_json` API is fallible).
+///
+/// # Panics
+///
+/// Panics if the scan duration in milliseconds does not fit in an `i64` (in
+/// practice this cannot happen for any realistic scan duration).
 pub fn format_json(r: &CheckResult) -> std::result::Result<String, Error> {
     let status = if r.gaps.is_empty()
         && r.scenario_gaps.is_empty()
@@ -218,8 +268,10 @@ pub fn format_json(r: &CheckResult) -> std::result::Result<String, Error> {
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
-/// Markdown format intentionally delegates to text — the text format is
-/// already markdown-compatible. Mirrors Go's `FormatMarkdown`.
+/// Formats a [`CheckResult`] as Markdown.
+///
+/// Delegates to [`format_text`] because the text format is already
+/// Markdown-compatible, mirroring Go's `FormatMarkdown`.
 pub fn format_markdown(r: &CheckResult) -> String {
     format_text(r, false, false)
 }

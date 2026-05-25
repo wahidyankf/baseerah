@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_frontmatter_audit.go`.
+//! `repo-governance frontmatter-audit` — validates date metadata in governance and docs files.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_frontmatter_audit.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -11,8 +13,10 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::frontmatter_audit::{FrontmatterFinding, audit_frontmatter};
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/frontmatter-audit/v1";
 
+/// Default paths scanned when no arguments are supplied.
 const DEFAULT_PATHS: &[&str] = &[
     "repo-governance/",
     "docs/explanation/software-engineering/",
@@ -21,6 +25,7 @@ const DEFAULT_PATHS: &[&str] = &[
     "plans/",
 ];
 
+/// CLI arguments for `repo-governance frontmatter-audit`.
 #[derive(Args, Debug)]
 pub struct FrontmatterAuditArgs {
     /// Paths to scan (repeatable; relative to git root).
@@ -30,21 +35,36 @@ pub struct FrontmatterAuditArgs {
     pub positional: Vec<String>,
 }
 
+/// Single frontmatter finding in JSON output.
 #[derive(Serialize)]
 struct FindingJson<'a> {
+    /// Path of the file containing the finding.
     file: &'a str,
+    /// Line number of the offending frontmatter field.
     line: usize,
+    /// Severity label.
     severity: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// JSON envelope wrapping the frontmatter audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Individual findings.
     result: Vec<FindingJson<'a>>,
 }
 
+/// Run the `repo-governance frontmatter-audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// frontmatter findings are detected.
 pub fn run(
     args: &FrontmatterAuditArgs,
     output_format: OutputFormat,
@@ -88,6 +108,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format frontmatter findings as human-readable text.
 fn format_text(findings: &[FrontmatterFinding]) -> String {
     if findings.is_empty() {
         return "FRONTMATTER AUDIT PASSED: no date-metadata violations found\n".to_string();
@@ -108,6 +129,11 @@ fn format_text(findings: &[FrontmatterFinding]) -> String {
     sb
 }
 
+/// Serialize frontmatter findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[FrontmatterFinding]) -> std::result::Result<String, Error> {
     let jf: Vec<FindingJson> = findings
         .iter()
@@ -133,6 +159,7 @@ fn format_json(findings: &[FrontmatterFinding]) -> std::result::Result<String, E
     Ok(s)
 }
 
+/// Format frontmatter findings as a Markdown table.
 fn format_markdown(findings: &[FrontmatterFinding]) -> String {
     if findings.is_empty() {
         return "## Governance Frontmatter Audit\n\n**PASSED**: no date-metadata violations found\n"

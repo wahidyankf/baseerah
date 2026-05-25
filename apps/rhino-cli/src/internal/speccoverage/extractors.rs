@@ -1,10 +1,14 @@
-// Per-language step extractors. Ports `rust_steps.go`, `java_steps.go`,
-// `dart_steps.go`, `clojure_steps.go`, `elixir_steps.go`, `python_steps.go`,
-// `dotnet_steps.go` and the Go/TS extractors that live inside `checker.go`.
-//
-// Each function takes a path + StepMatcher and inserts entries via the
-// matcher helpers. Per-language nuance (verbatim strings, regex form, F#
-// backtick names, Python parsers.parse, etc.) is preserved verbatim.
+//! Per-language step-definition extractors.
+//!
+//! Ports `rust_steps.go`, `java_steps.go`, `dart_steps.go`,
+//! `clojure_steps.go`, `elixir_steps.go`, `python_steps.go`,
+//! `dotnet_steps.go`, and the Go/TS extractors that live inside
+//! `checker.go`.
+//!
+//! Each public function reads the file at `path` and inserts extracted step
+//! entries into `sm` via the [`super::matcher`] helpers. Per-language nuance
+//! (verbatim strings, regex form, F# backtick names, Python `parsers.parse`,
+//! etc.) is preserved verbatim from the Go original.
 
 use std::collections::HashSet;
 use std::fs;
@@ -23,6 +27,8 @@ use super::util::{first_non_empty, normalize_ws, unescape_string};
 // Regex registry — compiled lazily, mirrors Go package-level vars.
 // ============================================================
 
+/// Matches a Rust `#[given("…")]` / `#[when("…")]` / `#[then("…")]` literal
+/// step attribute.
 fn rs_step_literal_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -31,6 +37,7 @@ fn rs_step_literal_re() -> &'static Regex {
     })
 }
 
+/// Matches a Rust `#[given(expr = "…")]` Cucumber-expression step attribute.
 fn rs_step_expr_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -39,6 +46,7 @@ fn rs_step_expr_re() -> &'static Regex {
     })
 }
 
+/// Matches a Rust `#[given(regex = r#"…"#)]` regex step attribute.
 fn rs_step_regex_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -47,6 +55,8 @@ fn rs_step_regex_re() -> &'static Regex {
     })
 }
 
+/// Matches a JVM (Java/Kotlin) `@Given("…")` / `@When("…")` / `@Then("…")`
+/// / `@And("…")` / `@But("…")` annotation.
 fn jvm_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -55,6 +65,7 @@ fn jvm_step_re() -> &'static Regex {
     })
 }
 
+/// Matches a Dart `s.given("…", …)` / `s.when("…", …)` / etc. step call.
 fn dart_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -65,6 +76,7 @@ fn dart_step_re() -> &'static Regex {
     })
 }
 
+/// Matches a Clojure `(Given "…")` / `(When "…")` / etc. step form.
 fn clj_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -72,6 +84,7 @@ fn clj_step_re() -> &'static Regex {
     })
 }
 
+/// Matches an Elixir `defgiven ~r/…/` / `defwhen ~r/…/` / etc. step macro.
 fn ex_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -79,6 +92,8 @@ fn ex_step_re() -> &'static Regex {
     })
 }
 
+/// Matches a Python pytest-bdd `@given("…")` / `@when("…")` / etc. decorator,
+/// including the `parsers.parse(…)` and `parsers.cfparse(…)` wrappers.
 fn py_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -89,6 +104,7 @@ fn py_step_re() -> &'static Regex {
     })
 }
 
+/// Matches a Python `@scenario("feature.feature", "Title")` decorator.
 fn py_scenario_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -97,6 +113,7 @@ fn py_scenario_re() -> &'static Regex {
     })
 }
 
+/// Matches a C# verbatim-string `[Given(@"…")]` step attribute.
 fn cs_verbatim_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -105,6 +122,7 @@ fn cs_verbatim_step_re() -> &'static Regex {
     })
 }
 
+/// Matches a C# regular-string `[Given("…")]` step attribute.
 fn cs_regular_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -113,11 +131,13 @@ fn cs_regular_step_re() -> &'static Regex {
     })
 }
 
+/// Matches an F# `[<Given>]` / `[<When>]` / etc. step attribute marker line.
 fn fs_step_attr_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"\[<(?:Given|When|Then|And|But)>]").expect("valid regex"))
 }
 
+/// Matches an F# inline step: `let [<Given>] ``step text`` () =`.
 fn fs_step_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -126,6 +146,7 @@ fn fs_step_re() -> &'static Regex {
     })
 }
 
+/// Matches an F# `let ``backtick name`` …` binding used for multi-line step style.
 fn fs_let_backtick_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r"let\s+``((?:[^`]|`[^`])*)``").expect("valid regex"))
@@ -135,6 +156,22 @@ fn fs_let_backtick_re() -> &'static Regex {
 // Per-language extractors
 // ============================================================
 
+/// Extracts step definitions from a Rust source file.
+///
+/// Recognises three forms in priority order:
+///
+/// 1. `regex = r#"…"#` — raw regex (most specific).
+/// 2. `expr = "…"` — Cucumber expression.
+/// 3. `"literal"` — plain string (also accepts Cucumber expressions).
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_rust_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -176,6 +213,19 @@ pub fn extract_rust_step_texts(
     Ok(())
 }
 
+/// Extracts step definitions from a JVM (Java or Kotlin) source file.
+///
+/// Recognises `@Given("…")`, `@When("…")`, `@Then("…")`, `@And("…")`,
+/// and `@But("…")` annotations.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_jvm_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Result<(), Error> {
     let content = fs::read_to_string(path)?;
     let path_s = path.to_string_lossy();
@@ -193,6 +243,14 @@ pub fn extract_jvm_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result:
     Ok(())
 }
 
+/// Extracts step definitions from a Dart source file.
+///
+/// Recognises `s.given("…", …)` / `s.when("…", …)` / etc. call patterns
+/// with both double-quoted and single-quoted string literals.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 pub fn extract_dart_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -208,6 +266,19 @@ pub fn extract_dart_step_texts(
     Ok(())
 }
 
+/// Extracts step definitions from a Clojure source file.
+///
+/// Recognises `(Given "…")`, `(When "…")`, `(Then "…")`, `(And "…")`,
+/// and `(But "…")` step forms.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_clojure_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -228,6 +299,19 @@ pub fn extract_clojure_step_texts(
     Ok(())
 }
 
+/// Extracts step definitions from an Elixir source file.
+///
+/// Recognises `defgiven ~r/…/`, `defwhen ~r/…/`, `defthen ~r/…/`, etc.
+/// macros and compiles the sigil body as a regex pattern.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_elixir_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -248,6 +332,17 @@ pub fn extract_elixir_step_texts(
     Ok(())
 }
 
+/// Extracts step definitions from a Python (pytest-bdd) source file.
+///
+/// Recognises `@given(…)`, `@when(…)`, `@then(…)`, and `@step(…)` decorators,
+/// including the `parsers.parse(…)` and `parsers.cfparse(…)` wrappers.
+///
+/// Double braces `{{` / `}}` are collapsed to single braces before dispatching
+/// to the Python matcher helper.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
 pub fn extract_python_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -265,7 +360,17 @@ pub fn extract_python_step_texts(
     Ok(())
 }
 
-/// Extracts `@scenario("feature.feature", "Title")` titles from a Python test file.
+/// Extracts `@scenario("feature.feature", "Title")` scenario titles from a
+/// Python pytest-bdd test file.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_python_scenario_titles(
     test_file_path: &Path,
 ) -> std::result::Result<HashSet<String>, Error> {
@@ -283,6 +388,20 @@ pub fn extract_python_scenario_titles(
     Ok(titles)
 }
 
+/// Extracts step definitions from a C# `SpecFlow` source file.
+///
+/// Processes verbatim strings (`@"…"`) before regular strings (`"…"`) so that
+/// the more specific form takes priority.  Verbatim `""` escape sequences are
+/// collapsed to a single `"` character.
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_csharp_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -311,6 +430,27 @@ pub fn extract_csharp_step_texts(
     Ok(())
 }
 
+/// Extracts step definitions from an F# `TickSpec` source file.
+///
+/// Handles two layout styles:
+///
+/// 1. **Inline** — attribute and backtick name on the same line:
+///    `let [<Given>] ``step text`` () =`.
+/// 2. **Multi-line** — attribute on one line, `let ``step text`` () =` on the
+///    next.
+///
+/// The extracted name is normalised and wrapped in `^…$` anchors before
+/// compilation as a regex pattern (F# backtick names act as patterns in
+/// `TickSpec`).
+///
+/// # Errors
+///
+/// Returns an error if the file cannot be read.
+///
+/// # Panics
+///
+/// Panics if a regex capture group that is always present is absent (indicates
+/// a bug in the compiled regex).
 pub fn extract_fsharp_step_texts(
     path: &Path,
     sm: &mut StepMatcher,
@@ -351,6 +491,8 @@ pub fn extract_fsharp_step_texts(
     Ok(())
 }
 
+/// Normalises an F# backtick-quoted step name and registers it as a `^…$`
+/// anchored regex pattern in `sm`.
 fn add_fsharp_step_pattern(name: &str, path: &str, sm: &mut StepMatcher) {
     let text = normalize_ws(name);
     let pattern = format!("^{text}$");

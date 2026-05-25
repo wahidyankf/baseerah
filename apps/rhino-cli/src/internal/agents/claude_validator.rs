@@ -1,5 +1,5 @@
-// Claude validator entry point ported from
-// `apps/rhino-cli/internal/agents/claude_validator.go`.
+//! Claude validator entry point ported from
+//! `apps/rhino-cli/internal/agents/claude_validator.go`.
 
 use std::time::Instant;
 
@@ -7,6 +7,7 @@ use super::agent_validator::validate_all_agents;
 use super::skill_validator::validate_all_skills;
 use super::types::{ValidateClaudeOptions, ValidationResult};
 
+/// Run the full Claude binding validation (skills + agents) according to `opts`.
 pub fn validate_claude(opts: &ValidateClaudeOptions) -> ValidationResult {
     let start = Instant::now();
     let mut result = ValidationResult::default();

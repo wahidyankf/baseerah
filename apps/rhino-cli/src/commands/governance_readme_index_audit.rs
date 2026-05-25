@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/governance_readme_index_audit.go`.
+//! `repo-governance readme-index-audit` — checks that every file is indexed in its README.
+//!
+//! Port of `apps/rhino-cli/cmd/governance_readme_index_audit.go`.
 
 use std::fmt::Write as _;
 use std::path::Path;
@@ -13,8 +15,10 @@ use crate::internal::repo_governance::readme_index_audit::{
     ReadmeIndexFinding, audit_readme_index,
 };
 
+/// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/readme-index-audit/v1";
 
+/// Default paths scanned when no arguments are supplied.
 const DEFAULT_PATHS: &[&str] = &[
     "repo-governance/",
     ".claude/agents/",
@@ -22,6 +26,7 @@ const DEFAULT_PATHS: &[&str] = &[
     "docs/explanation/software-engineering/",
 ];
 
+/// CLI arguments for `repo-governance readme-index-audit`.
 #[derive(Args, Debug)]
 pub struct ReadmeIndexAuditArgs {
     /// Glob to exclude from audit (repeatable).
@@ -31,26 +36,43 @@ pub struct ReadmeIndexAuditArgs {
     pub positional: Vec<String>,
 }
 
+/// Single README index finding in JSON output.
 #[derive(Serialize)]
 struct JsonFinding<'a> {
+    /// Path of the file containing the finding.
     file: &'a str,
+    /// Severity label.
     severity: &'a str,
+    /// Finding category (e.g. `"orphan"`, `"ghost"`).
     kind: &'a str,
+    /// Human-readable description.
     message: &'a str,
 }
 
+/// Inner result payload in JSON output.
 #[derive(Serialize)]
 struct InnerResult<'a> {
+    /// Individual findings.
     findings: Vec<JsonFinding<'a>>,
 }
 
+/// JSON envelope wrapping the README index audit result.
 #[derive(Serialize)]
 struct Envelope<'a> {
+    /// Output schema identifier.
     schema: &'a str,
+    /// `"passed"` or `"failed"`.
     status: &'a str,
+    /// Detailed result.
     result: InnerResult<'a>,
 }
 
+/// Run the `repo-governance readme-index-audit` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, the audit fails, or
+/// README index findings are detected.
 pub fn run(
     args: &ReadmeIndexAuditArgs,
     output_format: OutputFormat,
@@ -91,6 +113,7 @@ pub fn run(
     Ok(())
 }
 
+/// Format README index findings as human-readable text.
 fn format_text(findings: &[ReadmeIndexFinding]) -> String {
     if findings.is_empty() {
         return "README INDEX AUDIT PASSED: no orphan or ghost references found\n".to_string();
@@ -111,6 +134,11 @@ fn format_text(findings: &[ReadmeIndexFinding]) -> String {
     sb
 }
 
+/// Serialize README index findings as a JSON envelope string.
+///
+/// # Errors
+///
+/// Returns an error if JSON serialization fails.
 fn format_json(findings: &[ReadmeIndexFinding]) -> std::result::Result<String, Error> {
     let jf: Vec<JsonFinding> = findings
         .iter()
@@ -136,6 +164,7 @@ fn format_json(findings: &[ReadmeIndexFinding]) -> std::result::Result<String, E
     Ok(s)
 }
 
+/// Format README index findings as a Markdown table.
 fn format_markdown(findings: &[ReadmeIndexFinding]) -> String {
     if findings.is_empty() {
         return "## README Index Audit\n\n**PASSED**: no orphan or ghost references found\n"

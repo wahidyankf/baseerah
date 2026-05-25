@@ -1,3 +1,4 @@
+//! `rhino-cli` binary entry point.
 #![forbid(unsafe_code)]
 
 fn main() {

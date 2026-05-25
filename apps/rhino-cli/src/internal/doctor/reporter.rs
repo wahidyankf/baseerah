@@ -1,4 +1,8 @@
-// Port of `apps/rhino-cli/internal/doctor/reporter.go`.
+//! Port of `apps/rhino-cli/internal/doctor/reporter.go`.
+//!
+//! Formats a [`DoctorResult`] as human-readable text, JSON, or Markdown.
+//! All three formatters are exposed as `pub` functions: [`format_text`],
+//! [`format_json`], and [`format_markdown`].
 
 use std::fmt::Write as _;
 
@@ -6,6 +10,7 @@ use serde::Serialize;
 
 use super::{DoctorResult, Scope, ToolCheck, ToolStatus};
 
+/// Returns the Unicode status symbol for `status`: `✓`, `⚠`, or `✗`.
 fn symbol_for(status: ToolStatus) -> &'static str {
     match status {
         ToolStatus::Ok => "\u{2713}",      // ✓
@@ -14,6 +19,10 @@ fn symbol_for(status: ToolStatus) -> &'static str {
     }
 }
 
+/// Returns a display-friendly version string for the check.
+///
+/// Returns `"not found"` for missing tools, `"(unknown)"` when the installed
+/// version is empty, or `"v<version>"` otherwise.
 fn display_version(c: &ToolCheck) -> String {
     if c.status == ToolStatus::Missing {
         return "not found".into();
@@ -24,6 +33,9 @@ fn display_version(c: &ToolCheck) -> String {
     format!("v{}", c.installed_version)
 }
 
+/// Returns the overall status code string for the run.
+///
+/// Priority: `"missing"` > `"warning"` > `"ok"`.
 fn overall_status(r: &DoctorResult) -> &'static str {
     if r.missing_count > 0 {
         "missing"
@@ -34,14 +46,24 @@ fn overall_status(r: &DoctorResult) -> &'static str {
     }
 }
 
-/// Mirror Go's time.Now().Format(time.RFC3339): local-zone, second precision, with offset.
+/// Returns the current local time formatted as RFC 3339 with second precision.
+///
+/// Mirrors Go's `time.Now().Format(time.RFC3339)`: local timezone with UTC offset.
 fn rfc3339_now() -> String {
     chrono::Local::now()
         .format("%Y-%m-%dT%H:%M:%S%:z")
         .to_string()
 }
 
-/// Mirror Go's `d.Round(time.Millisecond)` formatted with `%v`.
+/// Rounds `d` to the nearest millisecond and formats it using Go's `%v` duration style.
+///
+/// Mirrors Go's `d.Round(time.Millisecond)` + `fmt.Sprintf("%v", d)`.
+///
+/// # Panics
+///
+/// Panics if the total nanoseconds of `d` do not fit in `i128` or if the
+/// rounded nanosecond count does not fit in `u64` — both are impossible for
+/// any `Duration` representable in Rust.
 fn format_go_duration_ms_rounded(d: std::time::Duration) -> String {
     let nanos_total = i128::try_from(d.as_nanos()).expect("nanos fit in i128");
     // Banker-free half-up rounding to the nearest millisecond, like Go's time.Duration.Round.
@@ -52,7 +74,10 @@ fn format_go_duration_ms_rounded(d: std::time::Duration) -> String {
     crate::internal::agents::reporter::format_go_duration(rounded)
 }
 
-/// Human-readable text.
+/// Formats `result` as human-readable text.
+///
+/// When `quiet` is `true`, the `"Doctor Report"` header is suppressed.
+/// When `verbose` is `true`, the elapsed duration is appended.
 pub fn format_text(result: &DoctorResult, verbose: bool, quiet: bool) -> String {
     let mut sb = String::new();
 
@@ -89,35 +114,62 @@ pub fn format_text(result: &DoctorResult, verbose: bool, quiet: bool) -> String 
     sb
 }
 
+/// JSON representation of a single tool check result.
 #[derive(Serialize)]
 struct JsonToolItem<'a> {
+    /// Human-readable tool name.
     name: &'a str,
+    /// Binary name that is invoked.
     binary: &'a str,
+    /// Status code string (`"ok"`, `"warning"`, or `"missing"`).
     status: &'static str,
+    /// Installed version string (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty")]
     installed_version: &'a str,
+    /// Required version string (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty")]
     required_version: &'a str,
+    /// Config file providing the required version (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty")]
     source: &'a str,
+    /// Human-readable status explanation (omitted when empty).
     #[serde(skip_serializing_if = "str::is_empty")]
     note: &'a str,
 }
 
+/// Top-level JSON document for the doctor report.
 #[derive(Serialize)]
 struct JsonOutput<'a> {
+    /// Overall status code string.
     status: &'static str,
+    /// Scope code string (omitted when empty / `"full"` is the default).
     #[serde(skip_serializing_if = "str::is_empty")]
     scope: &'a str,
+    /// RFC 3339 timestamp of the report.
     timestamp: String,
+    /// Number of tools with `Ok` status.
     ok_count: usize,
+    /// Number of tools with `Warning` status.
     warn_count: usize,
+    /// Number of tools with `Missing` status.
     missing_count: usize,
+    /// Wall-clock duration of the check in milliseconds.
     duration_ms: u64,
+    /// Per-tool results.
     tools: Vec<JsonToolItem<'a>>,
 }
 
-/// JSON output. Returns serde error path through anyhow.
+/// Serialises `result` to a pretty-printed JSON string.
+///
+/// # Errors
+///
+/// Returns an error when `serde_json` fails to serialise the result
+/// (in practice this should not occur for this fixed schema).
+///
+/// # Panics
+///
+/// Panics if the elapsed duration in milliseconds does not fit in `u64`,
+/// which cannot happen for any `Duration` representable in Rust.
 pub fn format_json(result: &DoctorResult) -> anyhow::Result<String> {
     let tools: Vec<JsonToolItem> = result
         .checks
@@ -146,7 +198,7 @@ pub fn format_json(result: &DoctorResult) -> anyhow::Result<String> {
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
-/// Markdown report.
+/// Formats `result` as a Markdown report with a summary table and a per-tool table.
 pub fn format_markdown(result: &DoctorResult) -> String {
     let mut sb = String::new();
     sb.push_str("## Doctor Report\n\n");
@@ -190,6 +242,7 @@ mod tests {
     use super::*;
     use std::time::Duration;
 
+    /// Builds a sample [`DoctorResult`] with one `Ok`, one `Warning`, and one `Missing` check.
     fn sample() -> DoctorResult {
         DoctorResult {
             checks: vec![

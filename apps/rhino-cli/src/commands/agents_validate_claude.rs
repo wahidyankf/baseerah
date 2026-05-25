@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/agents_validate_claude.go`.
+//! `agents validate-claude` — validates `.claude/agents/` and `.claude/skills/` definitions.
+//!
+//! Port of `apps/rhino-cli/cmd/agents_validate_claude.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -11,6 +13,7 @@ use crate::internal::agents::types::ValidateClaudeOptions;
 use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
+/// CLI arguments for `agents validate-claude`.
 #[derive(Args, Debug)]
 pub struct ValidateClaudeArgs {
     /// Validate only agents (skip skills).
@@ -27,6 +30,12 @@ pub struct ValidateClaudeArgs {
     pub quiet: bool,
 }
 
+/// Run the `agents validate-claude` command.
+///
+/// # Errors
+///
+/// Returns an error if `--agents-only` and `--skills-only` are both set, if
+/// the git root cannot be found, or if any validation checks fail.
 pub fn run(
     args: &ValidateClaudeArgs,
     output_format: OutputFormat,

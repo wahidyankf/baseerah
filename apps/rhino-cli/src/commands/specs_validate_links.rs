@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/specs_validate_links.go`.
+//! `specs validate-links` — checks that links within spec files resolve correctly.
+//!
+//! Port of `apps/rhino-cli/cmd/specs_validate_links.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -8,14 +10,18 @@ use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::specs::validate_spec_links;
 
+/// CLI arguments for `specs validate-links`.
 #[derive(Args, Debug)]
 pub struct ValidateLinksArgs {
+    /// Optional single spec folder path.
     #[arg(value_name = "folder")]
     pub folder: Option<String>,
+    /// Comma-separated app names.
     #[arg(long = "apps", value_delimiter = ',')]
     pub apps: Vec<String>,
 }
 
+/// Resolve the list of folders to validate from positional and flag inputs.
 fn resolve_folders(positional: Option<&String>, flag: &[String]) -> Vec<String> {
     if let Some(p) = positional {
         return vec![p.clone()];
@@ -30,12 +36,22 @@ fn resolve_folders(positional: Option<&String>, flag: &[String]) -> Vec<String> 
         .collect()
 }
 
+/// Run the `specs validate-links` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found or broken links are found.
 pub fn run(args: &ValidateLinksArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     run_at_root(&repo_root, args, &mut std::io::stdout())
 }
 
+/// Run `specs validate-links` from a known `repo_root` (testable entry point).
+///
+/// # Errors
+///
+/// Returns an error if output cannot be written or findings are detected.
 pub fn run_at_root(
     repo_root: &std::path::Path,
     args: &ValidateLinksArgs,

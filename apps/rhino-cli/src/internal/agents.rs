@@ -1,5 +1,6 @@
-// Agents internal — port of `apps/rhino-cli/internal/agents/`.
-// Populated phase-by-phase as the Phase 4 port progresses.
+//! Agent validation, sync, conversion, and binding utilities.
+//!
+//! Port of `apps/rhino-cli/internal/agents/`.
 
 pub mod agent_validator;
 pub mod bindings;

@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/doctor.go`.
+//! `doctor` — checks and optionally installs required development tools.
+//!
+//! Port of `apps/rhino-cli/cmd/doctor.go`.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
@@ -10,6 +12,7 @@ use crate::internal::doctor::{
 };
 use crate::internal::git;
 
+/// CLI arguments for the `doctor` command.
 #[derive(Args, Debug)]
 pub struct DoctorArgs {
     /// Tool scope: full or minimal.
@@ -21,12 +24,20 @@ pub struct DoctorArgs {
     /// Preview what --fix would install (only effective with --fix).
     #[arg(long = "dry-run")]
     pub dry_run: bool,
+    /// Verbose output.
     #[arg(long, short = 'v')]
     pub verbose: bool,
+    /// Quiet output.
     #[arg(long, short = 'q')]
     pub quiet: bool,
 }
 
+/// Run the `doctor` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, if any tools fail to
+/// install (when `--fix` is set), or if missing tools are detected.
 pub fn run(args: &DoctorArgs, output: OutputFormat) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;

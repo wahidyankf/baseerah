@@ -1,4 +1,6 @@
-// Port of `apps/rhino-cli/cmd/docs_validate_mermaid.go`.
+//! `docs validate-mermaid` — validates Mermaid diagram blocks in markdown files.
+//!
+//! Port of `apps/rhino-cli/cmd/docs_validate_mermaid.go`.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -15,6 +17,7 @@ use crate::internal::mermaid::{
     validate_blocks,
 };
 
+/// CLI arguments for `docs validate-mermaid`.
 #[derive(Args, Debug)]
 pub struct ValidateMermaidArgs {
     /// Only validate staged files (pre-commit use).
@@ -39,8 +42,15 @@ pub struct ValidateMermaidArgs {
     pub positional: Vec<String>,
 }
 
+/// Directory names skipped during recursive markdown file collection.
 const SKIP_DIRS: &[&str] = &[".next", "node_modules", ".git"];
 
+/// Run the `docs validate-mermaid` command.
+///
+/// # Errors
+///
+/// Returns an error if the git root cannot be found, staged/changed file
+/// listing fails, or Mermaid violations are found.
 pub fn run(
     args: &ValidateMermaidArgs,
     output_format: OutputFormat,
@@ -97,6 +107,11 @@ pub fn run(
     Ok(())
 }
 
+/// Return paths of staged markdown files via `git diff --cached`.
+///
+/// # Errors
+///
+/// Returns an error if the `git` process cannot be spawned.
 fn get_staged_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error> {
     let out = Command::new("git")
         .args([
@@ -113,6 +128,11 @@ fn get_staged_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error
     Ok(filter_md_paths(repo_root, text.lines()))
 }
 
+/// Return paths of changed markdown files since upstream; falls back to full scan.
+///
+/// # Errors
+///
+/// Never returns an error — a git failure causes a fallback to the default scan.
 fn get_changed_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error> {
     let out = Command::new("git")
         .args([
@@ -135,6 +155,7 @@ fn get_changed_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Erro
     }
 }
 
+/// Filter an iterator of relative paths to those ending in `.md`.
 fn filter_md_paths<'a, I: IntoIterator<Item = &'a str>>(
     repo_root: &Path,
     paths: I,
@@ -146,6 +167,7 @@ fn filter_md_paths<'a, I: IntoIterator<Item = &'a str>>(
         .collect()
 }
 
+/// Collect markdown files from explicit `paths` (relative or absolute).
 fn collect_md_files(repo_root: &Path, paths: &[String]) -> Vec<PathBuf> {
     let mut files = Vec::new();
     for p in paths {
@@ -159,6 +181,7 @@ fn collect_md_files(repo_root: &Path, paths: &[String]) -> Vec<PathBuf> {
     files
 }
 
+/// Collect markdown files from the default scan directories.
 fn collect_md_default_dirs(repo_root: &Path) -> Vec<PathBuf> {
     let dirs = ["docs", "repo-governance", ".claude", "plans"];
     let mut files = Vec::new();
@@ -179,6 +202,7 @@ fn collect_md_default_dirs(repo_root: &Path) -> Vec<PathBuf> {
     files
 }
 
+/// Recursively walk `dir` and return paths of all `.md` files, skipping [`SKIP_DIRS`].
 fn walk_md_files(dir: &Path) -> Vec<PathBuf> {
     if !dir.exists() {
         return Vec::new();

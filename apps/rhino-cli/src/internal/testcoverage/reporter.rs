@@ -1,5 +1,7 @@
-// Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/reporter.go`.
-// Format strings match exactly so shadow-diff against the Go binary passes.
+//! Human-readable, JSON, and Markdown coverage report formatters.
+//!
+//! Byte-for-byte port of `apps/rhino-cli/internal/testcoverage/reporter.go`.
+//! Format strings match exactly so shadow-diff against the Go binary passes.
 
 use std::fmt::Write as _;
 
@@ -8,8 +10,10 @@ use serde::{Serialize, Serializer};
 
 use super::types::{FileResult, Result as CoverageResult};
 
-/// Serializes f64 the way Go's `encoding/json` does: whole-number floats render
-/// without trailing `.0` (so 90.0 → "90", but 86.08 → "86.08").
+/// Serialises an `f64` the way Go's `encoding/json` does.
+///
+/// Whole-number floats render without a trailing `.0`
+/// (e.g. `90.0` → `"90"`, but `86.08` → `"86.08"`).
 #[allow(clippy::trivially_copy_pass_by_ref, clippy::cast_possible_truncation)]
 fn serialize_f64_gostyle<S: Serializer>(value: &f64, s: S) -> Result<S::Ok, S::Error> {
     if value.fract() == 0.0 && value.is_finite() && value.abs() < 1e15 {
@@ -19,13 +23,20 @@ fn serialize_f64_gostyle<S: Serializer>(value: &f64, s: S) -> Result<S::Ok, S::E
     }
 }
 
+/// JSON-serialisable view of a `FileResult` using Go-style `f64` serialisation.
 #[derive(Serialize)]
 struct FileResultJson {
+    /// Source-file path as it appears in the coverage report.
     path: String,
+    /// Number of fully covered lines.
     covered: usize,
+    /// Number of partially covered lines.
     partial: usize,
+    /// Number of uncovered lines.
     missed: usize,
+    /// Total executable lines.
     total: usize,
+    /// Coverage percentage serialised without trailing `.0` for whole numbers.
     #[serde(serialize_with = "serialize_f64_gostyle")]
     pct: f64,
 }
@@ -62,6 +73,11 @@ pub fn format_text(r: &CoverageResult, _verbose: bool, _quiet: bool) -> String {
     out
 }
 
+/// Formats a per-file coverage table as plain text.
+///
+/// Only includes files whose coverage percentage is below `below_threshold`
+/// (all files are included when `below_threshold` is `0.0`). Files are sorted
+/// by ascending coverage percentage.
 pub fn format_text_per_file(r: &CoverageResult, below_threshold: f64) -> String {
     let files = filter_and_sort_files(&r.files, below_threshold);
     if files.is_empty() {
@@ -79,6 +95,8 @@ pub fn format_text_per_file(r: &CoverageResult, below_threshold: f64) -> String 
     out
 }
 
+/// Filters `files` to those whose `pct` is below `below_threshold`, then sorts
+/// them by ascending `pct`. When `below_threshold` is `0.0` no filtering is applied.
 pub(crate) fn filter_and_sort_files(files: &[FileResult], below_threshold: f64) -> Vec<FileResult> {
     let mut result: Vec<FileResult> = files
         .iter()
@@ -93,25 +111,47 @@ pub(crate) fn filter_and_sort_files(files: &[FileResult], below_threshold: f64) 
     result
 }
 
+/// Top-level JSON output structure mirroring Go's `reporter.go` JSON layout.
 #[derive(Serialize)]
 struct JsonOutput {
+    /// `"success"` or `"failure"`.
     status: String,
+    /// RFC 3339 timestamp with local timezone offset (second precision).
     timestamp: String,
+    /// Path to the coverage report file.
     file: String,
+    /// Coverage format code (e.g. `"go"`, `"lcov"`).
     format: String,
+    /// Total fully covered lines.
     covered: usize,
+    /// Total partially covered lines.
     partial: usize,
+    /// Total uncovered lines.
     missed: usize,
+    /// Total executable lines.
     total: usize,
+    /// Overall coverage percentage (Go-style serialisation).
     #[serde(serialize_with = "serialize_f64_gostyle")]
     pct: f64,
+    /// Coverage threshold (Go-style serialisation).
     #[serde(serialize_with = "serialize_f64_gostyle")]
     threshold: f64,
+    /// `true` when `pct >= threshold`.
     passed: bool,
+    /// Per-file breakdown; omitted from JSON when empty.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     files: Vec<FileResultJson>,
 }
 
+/// Formats `r` as a pretty-printed JSON string.
+///
+/// When `per_file` is `true` and `r.files` is non-empty, the output includes a
+/// per-file breakdown filtered to files below `below_threshold` (all files when
+/// `below_threshold` is `0.0`).
+///
+/// # Errors
+///
+/// Returns an error when JSON serialisation fails (should not happen in practice).
 pub fn format_json(
     r: &CoverageResult,
     per_file: bool,
@@ -147,6 +187,11 @@ pub fn format_json(
     Ok(serde_json::to_string_pretty(&out)?)
 }
 
+/// Formats `r` as a Markdown coverage report.
+///
+/// Always includes a summary metric table. When `per_file` is `true` and
+/// `r.files` is non-empty, appends a per-file breakdown table filtered to
+/// files below `below_threshold` (all files when `below_threshold` is `0.0`).
 pub fn format_markdown(r: &CoverageResult, per_file: bool, below_threshold: f64) -> String {
     let status = if r.passed { "PASS" } else { "FAIL" };
     let mut out = format!(
