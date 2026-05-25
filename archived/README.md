@@ -8,6 +8,7 @@ This directory contains previously active applications that have been superseded
 | --------------------- | ---------- | ------------------------------------- | ---------------------------------------------- |
 | `ayokoding-web-hugo/` | 2026-03-24 | Replaced by Next.js 16 implementation | [`apps/ayokoding-web`](../apps/ayokoding-web/) |
 | `rhino-cli/`          | 2026-05-23 | Go binary replaced by Rust rewrite    | [`apps/rhino-cli`](../apps/rhino-cli/)         |
+| `crane-cli/`          | 2026-05-26 | F# source replaced by Rust rewrite    | [`apps/crane-cli`](../apps/crane-cli/)         |
 
 ## Notes
 
