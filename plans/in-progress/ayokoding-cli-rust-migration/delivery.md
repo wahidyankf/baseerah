@@ -22,25 +22,44 @@ This is a hard gate — do not proceed to Phase 1 if the check fails.
 
 ### Environment Setup
 
-- [ ] Install dependencies in the repo root worktree: run `npm install` from the worktree root
+- [x] Install dependencies in the repo root worktree: run `npm install` from the worktree root
       (`worktrees/ayokoding-cli-rust-migration/` relative to the repo root) — exits 0.
-- [ ] Converge the full polyglot toolchain: run `npm run doctor -- --fix` from the same directory —
+  - **Date**: 2026-05-25
+  - **Notes**: Running in main checkout per user override. npm install already done (ose-cli plan setup).
+
+- [x] Converge the full polyglot toolchain: run `npm run doctor -- --fix` from the same directory —
       exits 0 (see [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)).
-- [ ] Verify the Rust toolchain is active: run
+  - **Date**: 2026-05-25
+  - **Notes**: doctor already run. All 20/20 tools OK.
+
+- [x] Verify the Rust toolchain is active: run
       `rustup show active-toolchain` from `apps/rhino-cli/` — output contains `1.95.0`.
-- [ ] Run existing ayokoding-cli tests to establish baseline: run
+  - **Date**: 2026-05-25
+  - **Notes**: Rust 1.95.0 toolchain confirmed (via rhino-cli and ose-cli builds in plan 1).
+
+- [x] Run existing ayokoding-cli tests to establish baseline: run
       `npx nx run ayokoding-cli:test:quick` from the repo root — note any preexisting failures.
+  - **Date**: 2026-05-25
+  - **Notes**: Baseline PASS — 90.91% coverage (40 covered, 3 missed). No preexisting failures.
 
 ### Prerequisite Check
 
-- [ ] Verify `libs/rust-commons/` exists: run
+- [x] Verify `libs/rust-commons/` exists: run
       `test -d libs/rust-commons && echo "OK" || echo "MISSING"` from the worktree root —
       output must be `OK`. If `MISSING`, stop execution and complete `ose-cli-rust-migration` first.
-- [ ] Read `libs/rust-commons/src/lib.rs` (or equivalent entry point) and note the exact public API:
+  - **Date**: 2026-05-25
+  - **Notes**: OK — libs/rust-commons/ exists (created in ose-cli-rust-migration Phase 0).
+
+- [x] Read `libs/rust-commons/src/lib.rs` (or equivalent entry point) and note the exact public API:
       module paths, function names, type names, and `OutputFormat` enum variants. The implementation in
       Phase 1 must use only documented public items from this crate.
-- [ ] Read `libs/rust-commons/Cargo.toml` and note the exact package name (used in the path
+  - **Date**: 2026-05-25
+  - **Notes**: Public API: `rust_commons::links::check_links(content_dir: &Path) -> anyhow::Result<CheckResult>`, `output_links_text(result, elapsed, quiet, verbose)`, `output_links_json(result, elapsed) -> anyhow::Result<String>`, `output_links_markdown(result, elapsed)`. Structs: BrokenLink, CheckResult.
+
+- [x] Read `libs/rust-commons/Cargo.toml` and note the exact package name (used in the path
       dependency declaration in Phase 1).
+  - **Date**: 2026-05-25
+  - **Notes**: Package name is `rust-commons`. Path dep: `rust-commons = { path = "../../libs/rust-commons" }`.
 
 ---
 
@@ -53,7 +72,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.1: Delete Go artifacts from apps/ayokoding-cli/
 
-- [ ] Delete Go build artifacts (not source — source is archived in Phase 2):
+- [x] Delete Go build artifacts (not source — source is archived in Phase 2):
       run from `apps/ayokoding-cli/`:
 
   ```bash
@@ -62,15 +81,18 @@ _Suggested executor: `swe-rust-dev`_
 
   Acceptance criterion: none of these files exist under `apps/ayokoding-cli/` afterward
   (verify with `ls apps/ayokoding-cli/`).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Artifacts removed. Only main.go, go.mod, go.sum, cmd/, project.json, README.md, LICENSE, .gitignore remain.
 
   _Note: Do not delete `go.mod`, `go.sum`, `main.go`, or `cmd/` yet — those are archived in Phase 2._
 
 ### Step 1.2: Create rust-toolchain.toml
 
-- [ ] RED: Verify no `apps/ayokoding-cli/rust-toolchain.toml` exists yet:
+- [x] RED: Verify no `apps/ayokoding-cli/rust-toolchain.toml` exists yet:
       `test -f apps/ayokoding-cli/rust-toolchain.toml && echo "EXISTS" || echo "MISSING"` — expect `MISSING`.
 
-- [ ] GREEN: Create `apps/ayokoding-cli/rust-toolchain.toml` (_New file_):
+- [x] GREEN: Create `apps/ayokoding-cli/rust-toolchain.toml` (_New file_):
 
   ```toml
   [toolchain]
@@ -80,12 +102,14 @@ _Suggested executor: `swe-rust-dev`_
   ```
 
   Acceptance criterion: `cargo +1.95.0 --version` exits 0 from `apps/ayokoding-cli/`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.3: Create deny.toml
 
-- [ ] GREEN: Create `apps/ayokoding-cli/deny.toml` (_New file_) with the same content as
+- [x] GREEN: Create `apps/ayokoding-cli/deny.toml` (_New file_) with the same content as
       `apps/rhino-cli/deny.toml` [Repo-grounded], updating the header comment to reference
       `ayokoding-cli`:
 
@@ -123,15 +147,17 @@ _Suggested executor: `swe-rust-dev`_
   ```
 
   Acceptance criterion: file exists at `apps/ayokoding-cli/deny.toml`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.4: Create Cargo.toml
 
-- [ ] RED: Verify no `apps/ayokoding-cli/Cargo.toml` exists:
+- [x] RED: Verify no `apps/ayokoding-cli/Cargo.toml` exists:
       `test -f apps/ayokoding-cli/Cargo.toml && echo "EXISTS" || echo "MISSING"` — expect `MISSING`.
 
-- [ ] GREEN: Create `apps/ayokoding-cli/Cargo.toml` (_New file_). Use the exact public package name
+- [x] GREEN: Create `apps/ayokoding-cli/Cargo.toml` (_New file_). Use the exact public package name
       of `libs/rust-commons/` read in Phase 0 Step 1 for the path dependency. Template:
 
   ```toml
@@ -198,16 +224,18 @@ _Suggested executor: `swe-rust-dev`_
 
   Acceptance criterion: `cargo check --manifest-path apps/ayokoding-cli/Cargo.toml` exits 0
   (after source files are created in subsequent steps).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.5: Create src/main.rs
 
-- [ ] RED: Create `apps/ayokoding-cli/src/main.rs` (_New file_) with a minimal stub that does not
+- [x] RED: Create `apps/ayokoding-cli/src/main.rs` (_New file_) with a minimal stub that does not
       compile (e.g., `fn main() { ayokoding_cli::run().unwrap(); }` — will fail until lib.rs exports
       `run`). Verify compilation fails: `cargo build --manifest-path apps/ayokoding-cli/Cargo.toml 2>&1 | grep error` — expect errors.
 
-- [ ] GREEN: Implement `apps/ayokoding-cli/src/main.rs`:
+- [x] GREEN: Implement `apps/ayokoding-cli/src/main.rs`:
 
   ```rust
   //! Binary entry point for ayokoding-cli.
@@ -224,12 +252,14 @@ _Suggested executor: `swe-rust-dev`_
   ```
 
   Acceptance criterion: compiles without error (gated on lib.rs existing; complete after Step 1.6).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.6: Create src/lib.rs
 
-- [ ] GREEN: Create `apps/ayokoding-cli/src/lib.rs` (_New file_):
+- [x] GREEN: Create `apps/ayokoding-cli/src/lib.rs` (_New file_):
 
   ```rust
   //! Library crate for ayokoding-cli.
@@ -267,20 +297,24 @@ _Suggested executor: `swe-rust-dev`_
 
   Acceptance criterion: `apps/ayokoding-cli/src/lib.rs` exists and contains the `run` function
   and `pub mod cli; pub mod commands;` declarations.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Verify compile after Steps 1.7 and 1.8 are complete: run
+- [x] Verify compile after Steps 1.7 and 1.8 are complete: run
       `cargo check --manifest-path apps/ayokoding-cli/Cargo.toml` — exits 0 with no errors.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.7: Create src/cli.rs
 
-- [ ] RED: Create `apps/ayokoding-cli/src/cli.rs` (_New file_) with a minimal stub that will
+- [x] RED: Create `apps/ayokoding-cli/src/cli.rs` (_New file_) with a minimal stub that will
       fail to compile (missing `Commands`, `LinksArgs`, `LinksCommands`, `LinksCheckArgs`).
 
-- [ ] GREEN: Implement `apps/ayokoding-cli/src/cli.rs` with full Clap derive structs:
+- [x] GREEN: Implement `apps/ayokoding-cli/src/cli.rs` with full Clap derive structs:
 
   ```rust
   //! CLI argument definitions for ayokoding-cli.
@@ -363,19 +397,21 @@ _Suggested executor: `swe-rust-dev`_
   ```
 
   Acceptance criterion: `cargo check --manifest-path apps/ayokoding-cli/Cargo.toml --lib` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.8: Create src/commands/mod.rs and src/commands/links.rs
 
-- [ ] RED: Write a failing unit test in `apps/ayokoding-cli/src/commands/links.rs` (_New file_) that
+- [x] RED: Write a failing unit test in `apps/ayokoding-cli/src/commands/links.rs` (_New file_) that
       asserts `execute_links_check` returns `Ok(())` for a mock that returns zero broken links. Verify
       compilation fails (no implementation yet). The test must use a dependency-injection pattern
       (function pointer or trait) analogous to the Go `checkLinksFn` variable.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] GREEN: Create `apps/ayokoding-cli/src/commands/mod.rs` (_New file_):
+- [x] GREEN: Create `apps/ayokoding-cli/src/commands/mod.rs` (_New file_):
 
   ```rust
   //! Command handlers for ayokoding-cli.
@@ -396,19 +432,25 @@ _Suggested executor: `swe-rust-dev`_
 
   Acceptance criterion: `cargo test --manifest-path apps/ayokoding-cli/Cargo.toml --lib` exits 0
   with all unit tests passing.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: 18 unit tests (9 in cli.rs, 9 in commands/links.rs). All pass.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] REFACTOR: Extract any repeated output-selection logic into a private helper; ensure all items
+- [x] REFACTOR: Extract any repeated output-selection logic into a private helper; ensure all items
       are documented; run `cargo fmt --manifest-path apps/ayokoding-cli/Cargo.toml`. Acceptance
       criterion: `cargo clippy --manifest-path apps/ayokoding-cli/Cargo.toml --all-targets -- -D warnings`
       exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: cargo clippy exits 0, no issues found.
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.9: Create tests/cli_smoke.rs
 
-- [ ] RED: Create `apps/ayokoding-cli/tests/cli_smoke.rs` (_New file_) with at least these smoke
+- [x] RED: Create `apps/ayokoding-cli/tests/cli_smoke.rs` (_New file_) with at least these smoke
       tests (use `assert_cmd::Command`):
   - `smoke_help_contains_flags`: runs `ayokoding-cli --help` and asserts stdout contains
     `--verbose`, `--quiet`, `--output`, `--no-color`, `links`.
@@ -421,16 +463,19 @@ _Suggested executor: `swe-rust-dev`_
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] GREEN: Build the binary and re-run integration tests:
+- [x] GREEN: Build the binary and re-run integration tests:
       `cargo build --manifest-path apps/ayokoding-cli/Cargo.toml --release` exits 0, then
       `cargo test --manifest-path apps/ayokoding-cli/Cargo.toml --tests` exits 0 with all smoke
       tests passing.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: 9 smoke tests pass.
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.10: Update project.json with Rust Nx targets
 
-- [ ] Replace `apps/ayokoding-cli/project.json` [Repo-grounded: file exists] with Rust targets
+- [x] Replace `apps/ayokoding-cli/project.json` [Repo-grounded: file exists] with Rust targets
       following the `apps/rhino-cli/project.json` pattern [Repo-grounded]:
 
   ```json
@@ -543,19 +588,23 @@ _Suggested executor: `swe-rust-dev`_
   ```
 
   Acceptance criterion: `npx nx run ayokoding-cli:typecheck` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: nx run ayokoding-cli:typecheck exits 0.
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.11: Run full Nx target suite to verify
 
-- [ ] Run `npx nx run ayokoding-cli:fmt` — exits 0.
-- [ ] Run `npx nx run ayokoding-cli:lint` — exits 0, no clippy warnings.
-- [ ] Run `npx nx run ayokoding-cli:test:unit` — exits 0, all unit tests pass.
-- [ ] Run `npx nx run ayokoding-cli:test:quick` — exits 0, line coverage ≥ 90%.
-- [ ] Run `npx nx run ayokoding-cli:test:integration` — exits 0, all smoke tests pass.
-- [ ] Run `npx nx run ayokoding-cli:deny:check` — exits 0, no denied licenses or advisories.
-- [ ] Run `npx nx run ayokoding-cli:check:msrv` — exits 0.
-- [ ] Run `npx nx run ayokoding-cli:build` — exits 0, binary at `apps/ayokoding-cli/dist/ayokoding-cli`.
+- [x] Run `npx nx run ayokoding-cli:fmt` — exits 0.
+- [x] Run `npx nx run ayokoding-cli:lint` — exits 0, no clippy warnings.
+- [x] Run `npx nx run ayokoding-cli:test:unit` — exits 0, all unit tests pass.
+- [x] Run `npx nx run ayokoding-cli:test:quick` — exits 0, line coverage ≥ 90%.
+  - **Notes**: 97.94% lib coverage.
+- [x] Run `npx nx run ayokoding-cli:test:integration` — exits 0, all smoke tests pass.
+- [x] Run `npx nx run ayokoding-cli:deny:check` — exits 0, no denied licenses or advisories.
+- [x] Run `npx nx run ayokoding-cli:check:msrv` — exits 0.
+- [x] Run `npx nx run ayokoding-cli:build` — exits 0, binary at `apps/ayokoding-cli/dist/ayokoding-cli`.
 
 ### Commit Guidelines (Phase 1)
 
@@ -564,8 +613,8 @@ _Suggested executor: `swe-rust-dev`_
   - Commit 2: `feat(ayokoding-cli): implement Rust CLI with links check subcommand`
   - Commit 3: `feat(ayokoding-cli): add cli smoke tests`
   - Commit 4: `chore(ayokoding-cli): update project.json to Rust Nx targets`
-- [ ] Follow Conventional Commits format for all commits.
-- [ ] Do NOT delete Go source in this phase — that is Phase 2.
+- [x] Follow Conventional Commits format for all commits.
+- [x] Do NOT delete Go source in this phase — that is Phase 2.
 
 ---
 
