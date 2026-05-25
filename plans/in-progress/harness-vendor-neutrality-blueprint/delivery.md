@@ -15,13 +15,14 @@ claude --worktree harness-vendor-neutrality-blueprint
 ```
 
 **See**: [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)
+and [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
 ## Phase 0: Environment Setup
 
 - [ ] Run `npm install` from repo root — must exit 0.
 - [ ] Run `npm run doctor -- --fix` — verify all required tools are present.
-- [ ] Run `npm run generate:bindings` once as a baseline — verify it exits 0 (confirms
-      rhino-cli buildable and both `agents sync` + `agents emit-bindings` run cleanly).
+- [ ] Run `npm run sync:claude-to-opencode` as a baseline check — must exit 0 (confirms
+      rhino-cli is buildable and `agents sync` runs cleanly before the rename).
 - [ ] Run `git diff --quiet .opencode/ .amazonq/` — must exit 0 (baseline is clean).
 
 ## Phase 1: package.json — Add generate:bindings and Remove Old Script
@@ -126,6 +127,13 @@ grep -r "sync:claude-to-opencode" \
 ```
 
 Expected: **zero matches**. Any match is a missed file — fix before committing.
+
+### Commit Guidelines
+
+Commit changes thematically using [Conventional Commits](https://www.conventionalcommits.org/)
+format: `<type>(<scope>): <description>`. The three commits below are pre-split by domain
+(package.json / governance+docs+scripts / agents+skills) — do not bundle them into a single
+commit.
 
 - [ ] Commit 1 (package.json first):
       `chore(package.json): add generate:bindings, remove sync:claude-to-opencode`

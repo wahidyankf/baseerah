@@ -2,7 +2,7 @@
 title: "Blueprint: Harness/Vendor Neutrality for the ose-* Ecosystem"
 status: In Progress
 project: apps/rhino-cli, package.json, repo-governance/, ose-primer, ose-infra
-confidence-labels: Repo-grounded, Verified, Partially Verified, Judgment call
+confidence-labels: Repo-grounded, Web-cited, Unverified, Judgment call
 ---
 
 # Blueprint: Harness/Vendor Neutrality for the ose-\* Ecosystem
@@ -45,13 +45,17 @@ instructions and configuration. Each harness reads a different set of binding fi
 
 **Confidence notes**:
 
-- **OpenAI Codex CLI**: VERIFIED — official OpenAI docs confirm `AGENTS.md` support; listed on
-  the [agents.md standard site](https://agents.md/) [Verified: 2026-05-25]
-- **Google Antigravity CLI**: PARTIALLY VERIFIED — real product (Antigravity 2.0, Google I/O
-  2026); reads a file named `AGENTS.md`; NOT currently listed on agents.md standard site
-  [Partially Verified: 2026-05-25]
-- **Pi**: PARTIALLY VERIFIED — real product; reads `AGENTS.md`; NOT currently listed on
-  agents.md standard site [Partially Verified: 2026-05-25]
+- **OpenAI Codex CLI**: `AGENTS.md` support confirmed. [Web-cited:
+  OpenAI Codex CLI docs (<https://developers.openai.com/codex/guides/agents-md>, accessed
+  2026-05-25) — "Starting at the project root... Codex walks down to your current working
+  directory. In each directory along the path, it checks for `AGENTS.override.md`, then
+  `AGENTS.md`"; also listed on [agents.md standard site](https://agents.md/) (accessed
+  2026-05-25) — "Codex from OpenAI"]
+- **Google Antigravity CLI**: real product (Antigravity 2.0, Google I/O 2026); reads a file
+  named `AGENTS.md`; NOT currently listed on agents.md standard site.
+  [Unverified — partially confirmed but not web-cited per agents.md standard]
+- **Pi**: real product; reads `AGENTS.md`; NOT currently listed on agents.md standard site.
+  [Unverified — partially confirmed but not web-cited per agents.md standard]
 
 **Tier model**:
 

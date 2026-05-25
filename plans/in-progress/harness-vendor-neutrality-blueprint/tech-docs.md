@@ -143,7 +143,7 @@ and reduces risk. [Judgment call]
 
 ### `repo-governance/development/agents/ai-agents.md` [MODIFY]
 
-Three locations reference `sync:claude-to-opencode`. All replace with `generate:bindings`.
+Five locations reference `sync:claude-to-opencode`. All replace with `generate:bindings`.
 
 ### `repo-governance/development/agents/model-selection.md` [MODIFY]
 
