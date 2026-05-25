@@ -622,10 +622,12 @@ _Suggested executor: `swe-rust-dev`_
 
 Move the Go source files to `archived/ayokoding-cli/` so the migration is reversible.
 
-- [ ] Create the archive directory: `mkdir -p archived/ayokoding-cli/cmd`
+- [x] Create the archive directory: `mkdir -p archived/ayokoding-cli/cmd`
       (verify parent `archived/` exists: `test -d archived && echo "OK"` from the repo root — [Repo-grounded: archived/ contains organiclever-web/ and rhino-cli/]).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
-- [ ] Archive Go files using `git mv` to preserve history:
+- [x] Archive Go files using `git mv` to preserve history:
 
   ```bash
   git mv apps/ayokoding-cli/main.go archived/ayokoding-cli/main.go
@@ -636,10 +638,15 @@ Move the Go source files to `archived/ayokoding-cli/` so the migration is revers
 
   Acceptance criterion: `ls apps/ayokoding-cli/` no longer shows `main.go`, `go.mod`, `go.sum`,
   or `cmd/`; `ls archived/ayokoding-cli/` shows `main.go`, `go.mod`, `go.sum`, `cmd/`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
-- [ ] Verify the Rust build is unaffected: `npx nx run ayokoding-cli:build` exits 0.
+- [x] Verify the Rust build is unaffected: `npx nx run ayokoding-cli:build` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Compiled in 8.57s. Binary confirmed at apps/ayokoding-cli/dist/ayokoding-cli.
 
-- [ ] Commit: `chore(ayokoding-cli): archive Go source to archived/ayokoding-cli/`
+- [x] Commit: `chore(ayokoding-cli): archive Go source to archived/ayokoding-cli/`
 
 ---
 
