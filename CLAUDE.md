@@ -35,7 +35,7 @@ Repo maintains **dual compatibility** with Claude Code and OpenCode:
 **Making changes:**
 
 1. Edit agents/skills in `.claude/` first
-2. Run sync: `npm run sync:claude-to-opencode`
+2. Run sync: `npm run generate:bindings`
 3. Both systems stay synced automatically
 
 **Format differences:**

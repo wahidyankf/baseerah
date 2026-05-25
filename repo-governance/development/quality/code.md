@@ -378,13 +378,13 @@ git push
 1. Identify which step failed:
    - Primary binding directory validation: Fix source files in `.claude/agents/` or `.claude/skills/`
    - Sync: Check rhino-cli output, may be a bug
-   - Secondary binding directory validation: Re-run `npm run sync:claude-to-opencode`
+   - Secondary binding directory validation: Re-run `npm run generate:bindings`
 
 2. Run validation manually to debug:
 
    ```bash
    npm run validate:claude      # Check .claude/ format
-   npm run sync:claude-to-opencode  # Sync to .opencode/
+   npm run generate:bindings  # Sync to .opencode/
    npm run validate:opencode    # Check .opencode/ output
    ```
 

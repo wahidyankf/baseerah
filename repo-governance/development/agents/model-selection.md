@@ -273,7 +273,7 @@ tier. The model IDs above are current as of April 2026.
 ## Platform Binding Equivalents
 
 Agents in the primary binding directory are auto-synced to the secondary binding directory by rhino-cli
-(`npm run sync:claude-to-opencode`). The sync translates primary binding model aliases to
+(`npm run generate:bindings`). The sync translates primary binding model aliases to
 secondary binding model IDs.
 
 ### Model ID Mapping
@@ -301,7 +301,7 @@ MiniMax M2.7 is adopted based on lab trajectory and model recency. Its predecess
 Verified at 80.2%. M2.7's SWE-Pro score (56.22%) is on a harder suite and not directly comparable to
 GLM-5.1 (58.4% SWE-Bench Pro). Available via the flat-rate secondary binding subscription; no per-token
 billing. If a stronger model joins the secondary binding's model roster, update only `ConvertModel()` in
-`apps/rhino-cli/src/internal/agents/converter.rs` and re-run `npm run sync:claude-to-opencode`.
+`apps/rhino-cli/src/internal/agents/converter.rs` and re-run `npm run generate:bindings`.
 
 ## Special Considerations
 

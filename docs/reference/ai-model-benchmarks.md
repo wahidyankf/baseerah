@@ -553,7 +553,7 @@ Check the live model list in the OpenCode TUI or at [opencode.ai/docs/go](https:
 ## Model Selection Mapping
 
 Cross-reference with [AI Agent Model Selection Convention](../../repo-governance/development/agents/model-selection.md)
-tier assignments. The Claude-to-OpenCode mapping reflects what `npm run sync:claude-to-opencode` produces
+tier assignments. The Claude-to-OpenCode mapping reflects what `npm run generate:bindings` produces
 for the current agent frontmatter aliases.
 
 | Claude Alias | Claude Model (2026)         | Pricing (in/out MTok) | SWE-bench Verified        | OpenCode Go ID             |

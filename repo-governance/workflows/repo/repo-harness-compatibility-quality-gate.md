@@ -147,7 +147,7 @@ external drift detection (Phase 1).
 
 1. Governance prose vendor-neutrality — runs `rhino-cli repo-governance vendor-audit repo-governance/`
 2. Root instruction surface vendor-neutrality — runs vendor-audit on `AGENTS.md` and `CLAUDE.md`
-3. Binding sync no-op — runs `npm run sync:claude-to-opencode && git diff --quiet .opencode/`
+3. Binding sync no-op — runs `npm run generate:bindings && git diff --quiet .opencode/ .amazonq/`
 4. Agent count parity — compares `ls .claude/agents/*.md | wc -l` vs `ls .opencode/agents/*.md | wc -l`
 5. Translation-map coverage — checks all distinct `color:` and `model:` frontmatter values
    appear in the color-translation table and tier map
@@ -204,7 +204,7 @@ Apply validated fixes from the audit report based on mode level.
 
 **Auto-fixable scope** (fixer applies at HIGH confidence):
 
-- **Parity Invariant 3**: binding sync drift — re-runs `npm run sync:claude-to-opencode`
+- **Parity Invariant 3**: binding sync drift — re-runs `npm run generate:bindings`
   and stages the changed `.opencode/agents/` files
 - Catalog field updates where web-research evidence is unambiguous (e.g., a harness ships
   native `AGENTS.md` support and the catalog still marks it Tier 2)
@@ -340,7 +340,7 @@ Scenario: Phase 0 parity invariants pass before external drift check
 Scenario: Phase 0 binding sync drift is auto-fixed
   Given Phase 0 detects Invariant 3 drift (sync produced changes in .opencode/)
   When repo-harness-compatibility-fixer processes the finding
-  Then it re-runs npm run sync:claude-to-opencode
+  Then it re-runs npm run generate:bindings
   And stages the updated .opencode/agents/ files
   And verifies the second sync run produces no further changes
 
@@ -438,7 +438,7 @@ Step 1: Initial validation (Phase 0)
   Invariant 3 → 1 finding (sync drift)
 
 Step 3: Apply fixes
-  Fixer runs npm run sync:claude-to-opencode → agents regenerated
+  Fixer runs npm run generate:bindings → agents regenerated
   Stages .opencode/agents/<changed>.md
 
 Step 4: Re-validate

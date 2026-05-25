@@ -127,7 +127,7 @@ by `rhino-cli agents validate-bindings`.
 ## Translation Artifacts
 
 Mechanical translations that platform bindings apply when generating output from upstream sources.
-All translations are performed by `rhino-cli agents sync` (`npm run sync:claude-to-opencode`).
+All translations are performed by `rhino-cli agents sync` (`npm run generate:bindings`).
 
 ### Color Translation (Claude Code → OpenCode)
 

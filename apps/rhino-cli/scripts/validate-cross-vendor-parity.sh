@@ -57,9 +57,9 @@ done
 
 # Invariant 3: binding sync no-op.
 print_invariant 3 "Binding sync no-op (.claude/ -> .opencode/)"
-SYNC_OUT=$(npm run sync:claude-to-opencode --silent 2>&1) || {
+SYNC_OUT=$(npm run generate:bindings --silent 2>&1) || {
   echo "${SYNC_OUT}"
-  fail "sync:claude-to-opencode exited non-zero"
+  fail "generate:bindings exited non-zero"
 }
 if git diff --quiet -- .opencode/agents/ 2>/dev/null; then
   pass "sync produced no changes in .opencode/agents/"
