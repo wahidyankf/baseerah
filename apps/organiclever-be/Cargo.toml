@@ -1,0 +1,67 @@
+[package]
+name = "organiclever-be"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+description = "OrganicLever backend REST API — Rust/Axum port"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "organiclever-be"
+path = "src/main.rs"
+
+[lib]
+name = "organiclever_be"
+path = "src/lib.rs"
+
+[[test]]
+name = "unit"
+path = "tests/unit/main.rs"
+
+[dependencies]
+axum = { version = "0.8.9", features = ["macros"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+sqlx = { version = "0.8", features = ["runtime-tokio", "postgres", "uuid", "chrono", "migrate"] }
+tower-http = { version = "0.6.11", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1.0.102"
+thiserror = "2"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+axum = { version = "0.8.9", features = ["macros"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "deny"
+
+[lints.rustdoc]
+private_intra_doc_links = "deny"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+struct_excessive_bools = "allow"
+cast_precision_loss = "allow"
+cast_possible_wrap = "allow"
+must_use_candidate = "allow"
+unnecessary_wraps = "allow"
+missing_errors_doc = "deny"
+missing_panics_doc = "deny"
+doc_markdown = "deny"
+missing_docs_in_private_items = "deny"
+unwrap_used = "deny"
+panic = "deny"
+undocumented_unsafe_blocks = "deny"
+indexing_slicing = "allow"
+arithmetic_side_effects = "allow"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
