@@ -44,6 +44,11 @@ Use this agent **every time** a LinkedIn post is created in `generated-socials/l
 
   If the result is > 3,000, trim and re-measure until under. Never finish over the limit.
 
+### No vanity metrics in the body
+
+- The post **body** (everything below the `Week NN / Phase P, Week W` title line) MUST NOT cite vanity/activity metrics — **no commit counts**, no lines-of-changed, no PR tallies, and similar. Describe what changed and why it matters, not how much churn it took.
+- The `Window:` metadata line **above** the `---` MAY carry a commit tally for internal bookkeeping only — it is never posted. Keep vanity numbers there, never in the body.
+
 ## File Format
 
 Filename: `YYYY-MM-DD__linkedin__ose-update-week-NNNN.md` (ISO date of posting; zero-padded 4-digit week number).
