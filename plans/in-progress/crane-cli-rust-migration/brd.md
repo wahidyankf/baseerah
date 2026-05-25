@@ -50,8 +50,8 @@ compiled-language toolchain (Rust) for all non-JavaScript/TypeScript apps.
 
 ## Business Risks
 
-| Risk                                                          | Mitigation                                                                                           |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| PDF text extraction fidelity differs between PdfPig and lopdf | Integration tests with the existing real PDF fixtures in `tests/integration/fixtures/` gate the port |
-| tesseract system lib unavailable in CI                        | Document the brew/apt install; CI doctor step verifies                                               |
-| F# source archived before all callers migrated                | Callers invoke `crane` binary, not F# source — no breakage                                           |
+| Risk                                                          | Mitigation                                                                                                          |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| PDF text extraction fidelity differs between PdfPig and lopdf | Integration tests with the existing real PDF fixtures in `apps/crane-cli/tests/integration/fixtures/` gate the port |
+| tesseract system lib unavailable in CI                        | Document the brew/apt install; CI doctor step verifies                                                              |
+| F# source archived before all callers migrated                | Callers invoke `crane` binary, not F# source — no breakage                                                          |

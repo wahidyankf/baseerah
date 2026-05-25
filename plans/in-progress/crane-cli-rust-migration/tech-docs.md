@@ -142,7 +142,7 @@ the F# `[<JsonPropertyName("...")>]` attributes exactly.
 
 ```toml
 [dependencies]
-clap = { version = "4.6.1", features = ["derive"] }       # [Web-cited] https://crates.io/crates/clap 2026-04-15 "v4.6.1 (2026-04-15)"
+clap = { version = "4.6.1", features = ["derive"] }       # [Repo-grounded] rhino-cli Cargo.toml
 serde = { version = "1.0.228", features = ["derive"] }    # [Repo-grounded] rhino-cli Cargo.toml
 serde_json = "1.0.150"                                     # [Repo-grounded] rhino-cli Cargo.toml
 lopdf = "0.40.0"                                           # [Web-cited] https://crates.io/crates/lopdf 2026-03-19 "v0.40.0 (2026-03-19)"
@@ -152,7 +152,7 @@ chrono = { version = "0.4.44", default-features = false, features = ["serde", "c
 regex = "1.12.3"                                           # [Repo-grounded] rhino-cli Cargo.toml
 anyhow = "1.0.102"                                         # [Repo-grounded] rhino-cli Cargo.toml
 thiserror = "2"                                            # [Repo-grounded] organiclever-be Cargo.toml
-tesseract = "0.15.2"                                       # [Web-cited — verify currency before execution] https://crates.io/crates/tesseract 2025-04-19 "v0.15.2 (2025-04-19)"
+tesseract = "0.15.2"                                       # [Web-cited] https://crates.io/crates/tesseract 2026-05-26 "v0.15.2 (2025-04-19, latest as of 2026-05-26)"
 
 [dev-dependencies]
 cucumber = "0.23.0"                                        # [Repo-grounded] organiclever-be Cargo.toml

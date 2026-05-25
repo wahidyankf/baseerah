@@ -588,23 +588,15 @@ return exit code). Port from `archived/crane-cli/Commands/`.
 
 ### 5.4 OcrCommands
 
-- [ ] **RED + GREEN + REFACTOR**: Create `apps/crane-cli/src/commands/ocr_commands.rs` (_New file_): - `pub fn run_quality(md_text: &str) -> i32` — calls `ocr_assessor::check_ocr_quality()`,
-      serializes findings JSON, exit 1 if non-empty. Fully unit-testable with `FakePdfAdapter`. - `pub fn run_extract(pdf_path: &str) -> i32` — shells out to `pdftoppm`:
-
-        ```rust
-        // 1. Create tempdir
-        // 2. std::process::Command::new("pdftoppm")
-        //      .args(["-r", "300", "-png", pdf_path, tmpdir.path().join("page").to_str()?])
-        //      .status()?
-        // 3. Enumerate tmpdir/*.png sorted
-        // 4. For each PNG: tesseract::ocr(png_path, "eng")?
-        // 5. Concatenate with "\n\n" and print
-        ```
-
-        This function is excluded from the coverage gate via `--ignore-filename-regex 'ocr_commands\.rs'`
-        since it requires real system tools and is tested in `test:integration`.
-      Add 2+ tests for `run_quality` only. Run passes. Clippy exits 0.
-
+- [ ] **RED + GREEN + REFACTOR**: Create `apps/crane-cli/src/commands/ocr_commands.rs` (_New file_)
+      with two functions. `pub fn run_quality(md_text: &str) -> i32` calls
+      `ocr_assessor::check_ocr_quality()`, serializes findings JSON, exits 1 if non-empty — fully
+      unit-testable with `FakePdfAdapter`. `pub fn run_extract(pdf_path: &str) -> i32` shells out to
+      `pdftoppm -r 300 -png <pdf> <tmpdir>/page`, enumerates the generated `page-NNN.png` files in
+      sorted order, calls `tesseract::ocr(path, "eng")` on each, concatenates results with `"\n\n"`,
+      and prints to stdout. This function is excluded from the unit coverage gate via
+      `--ignore-filename-regex 'ocr_commands\.rs'` since it requires real system tools and is tested in
+      `test:integration`. Add 2+ tests for `run_quality` only. Run passes. Clippy exits 0.
   - _Suggested executor: `swe-rust-dev`_
 
 ### 5.5 ReportCommands, SkiplistCommands
@@ -646,23 +638,13 @@ return exit code). Port from `archived/crane-cli/Commands/`.
   - _Suggested executor: `swe-rust-dev`_
 
 - [ ] **GREEN**: Rewrite `apps/crane-cli/src/main.rs` (_Modified file_) with the full clap derive
-      entry point. Mirror the F# `CraneArgs` / `Program.main` structure exactly:
-
-      ```rust
-      #![forbid(unsafe_code)]
-      //! crane-cli binary entry point.
-
-      use clap::{Parser, Subcommand, Args};
-      // ... derive structs for PdfArgs, TextArgs, HeadingArgs, NestingArgs,
-      //     TableArgs, FigureArgs, MermaidArgs, OcrArgs, ReportArgs, SkiplistArgs,
-      //     CheckAllArgs, and top-level CraneArgs with all subcommands
-      ```
-
-      The `CheckAllArgs` must accept `--cache-dir <dir>` flag (maps to `PdfExtractionCache::wrap`).
-      The `PdfArgs extract` must accept `--start-page`, `--end-page`, `--output` flags.
-      All subcommand dispatch calls the corresponding `commands::*::run_*` function.
-      Run `cargo test --test unit` — `test_crane_version_flag` passes.
-
+      entry point. Add `#![forbid(unsafe_code)]` at top. Use `#[derive(Parser)]` on the top-level
+      struct and `#[derive(Subcommand)]` on the `Commands` enum. Mirror all 11 F# subcommand variants:
+      `Pdf`, `Text`, `Heading`, `Nesting`, `Table`, `Figure`, `Mermaid`, `Ocr`, `Report`, `Skiplist`,
+      `CheckAll`. `CheckAll` accepts `--cache-dir <dir>` (maps to `PdfExtractionCache::wrap`). `Pdf
+extract` accepts `--start-page`, `--end-page`, `--output`. All variants dispatch to the
+      corresponding `commands::*::run_*` function. Run `cargo test --test unit` — `test_crane_version_flag`
+      passes.
   - _Suggested executor: `swe-rust-dev`_
 
 - [ ] **REFACTOR**: Clippy exits 0. Verify `crane --help` lists all 11 subcommands.
@@ -676,18 +658,19 @@ return exit code). Port from `archived/crane-cli/Commands/`.
 
 ## Phase 7: Integration Tests
 
-- [ ] Rewrite `apps/crane-cli/tests/integration/main.rs` (_Modified file_) with cucumber-rs
+- [ ] Rewrite `apps/crane-cli/tests/integration/main.rs` (_Modified file_) with a cucumber-rs
       harness (same pattern as `apps/organiclever-be/tests/integration/main.rs`). Register step
-      definitions for scenarios in: - `specs/apps/crane/behavior/cli/gherkin/pdf/pdf-commands.feature` - `specs/apps/crane/behavior/cli/gherkin/content/text-check.feature` - `specs/apps/crane/behavior/cli/gherkin/content/heading-check.feature` - `specs/apps/crane/behavior/cli/gherkin/content/nesting-check.feature` - `specs/apps/crane/behavior/cli/gherkin/media/table-check.feature` - `specs/apps/crane/behavior/cli/gherkin/media/figure-check.feature` - `specs/apps/crane/behavior/cli/gherkin/media/mermaid-validate.feature` - `specs/apps/crane/behavior/cli/gherkin/media/ocr-quality.feature` - `specs/apps/crane/behavior/cli/gherkin/reporting/report-management.feature` - `specs/apps/crane/behavior/cli/gherkin/reporting/skiplist-management.feature` - `specs/apps/crane/behavior/cli/gherkin/system/check-all.feature` - `specs/apps/crane/behavior/cli/gherkin/system/version.feature`
-
-      Use `apps/crane-cli/tests/integration/fixtures/sample-text.pdf` and
-      `tests/integration/fixtures/sample-text.md` as the real PDF/MD fixtures for PDF-dependent
-      scenarios. OCR extract scenarios require a separate image-only PDF fixture (create a
-      minimal 1-page image PDF or skip with `@skip` tag if not available).
-
-      Run `cargo test --manifest-path apps/crane-cli/Cargo.toml --test integration` — all
-      Gherkin scenarios pass (no undefined steps, no failing scenarios).
-
+      definitions for all 12 feature files under `specs/apps/crane/behavior/cli/gherkin/`:
+      `pdf/pdf-commands.feature`, `content/text-check.feature`, `content/heading-check.feature`,
+      `content/nesting-check.feature`, `media/table-check.feature`, `media/figure-check.feature`,
+      `media/mermaid-validate.feature`, `media/ocr-quality.feature`,
+      `reporting/report-management.feature`, `reporting/skiplist-management.feature`,
+      `system/check-all.feature`, `system/version.feature`. Use the fixtures at
+      `apps/crane-cli/tests/integration/fixtures/sample-text.pdf` and
+      `apps/crane-cli/tests/integration/fixtures/sample-text.md` for PDF-dependent scenarios. OCR extract scenarios
+      require a separate image-only PDF fixture (create a minimal 1-page image PDF or skip with
+      `@skip` tag if not available). Verify: `cargo test --manifest-path apps/crane-cli/Cargo.toml
+--test integration` exits 0 with all Gherkin scenarios passing (no undefined steps).
   - _Suggested executor: `swe-rust-dev`_
 
 - [ ] Run `npx nx run crane-cli:spec-coverage` — exits 0 (all Gherkin scenarios have

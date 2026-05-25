@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No active plans._
+- [crane-cli Rust Migration](crane-cli-rust-migration/README.md) — Port crane-cli from F# (.NET 10) to Rust; archive F# source; implement real tesseract OCR
 
 ## Instructions
 

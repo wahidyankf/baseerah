@@ -35,6 +35,9 @@ every subcommand, every flag, and every JSON output field.
 
 ## Acceptance Criteria (Gherkin)
 
+> **Note**: Fixture paths in Gherkin scenarios are relative to `apps/crane-cli/` (the project
+> root for `cargo test`). From the repo root, prefix with `apps/crane-cli/`.
+
 ```gherkin
 Feature: PDF subcommands parity
 
@@ -101,8 +104,8 @@ Feature: PDF subcommands parity
 
 ## Product Risks
 
-| Risk                                                                    | Mitigation                                              |
-| ----------------------------------------------------------------------- | ------------------------------------------------------- | -------- | ---------------------------------- |
-| lopdf text extraction produces different word ordering for complex PDFs | Integration test with real fixture PDF gates acceptance |
-| tesseract system library unavailable in dev environment                 | `npm run doctor` step verifies; install docs updated    |
-| Skip list SHA-256 key changes between F# and Rust implementations       | Port the exact same algorithm: SHA-256(UTF-8("basename  | category | description")), first 16 hex chars |
+| Risk                                                                    | Mitigation                                                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| lopdf text extraction produces different word ordering for complex PDFs | Integration test with real fixture PDF gates acceptance                                                |
+| tesseract system library unavailable in dev environment                 | `npm run doctor` step verifies; install docs updated                                                   |
+| Skip list SHA-256 key changes between F# and Rust implementations       | Port the exact same algorithm: `SHA-256(UTF-8("basename\|category\|description"))`, first 16 hex chars |
