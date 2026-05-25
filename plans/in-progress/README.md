@@ -4,9 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [harness-vendor-neutrality-blueprint](./harness-vendor-neutrality-blueprint/) — Blueprint
-  for harness/vendor neutrality across the ose-\* ecosystem; first deliverable: replace
-  vendor-locked `sync:claude-to-opencode` with `generate:bindings` covering OpenCode + Amazon Q
+_(none currently)_
 
 ## Instructions
 
