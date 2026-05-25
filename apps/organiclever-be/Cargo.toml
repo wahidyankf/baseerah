@@ -19,6 +19,11 @@ path = "src/lib.rs"
 name = "unit"
 path = "tests/unit/main.rs"
 
+[[test]]
+name = "integration"
+path = "tests/integration/main.rs"
+harness = false
+
 [dependencies]
 axum = { version = "0.8.9", features = ["macros"] }
 tokio = { version = "1", features = ["full"] }
@@ -34,6 +39,8 @@ thiserror = "2"
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 axum = { version = "0.8.9", features = ["macros"] }
+cucumber = "0.23.0"
+reqwest = { version = "0.13.3", features = ["json"] }
 
 [lints.rust]
 unsafe_code = "forbid"

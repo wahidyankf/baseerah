@@ -1,7 +1,41 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: organiclever
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ../..
+      dockerfile: apps/organiclever-be/Dockerfile.integration
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/organiclever
+      PORT: "8202"
+      CORS_ORIGINS: "*"
+    ports:
+      - "8202:8202"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   test-runner:
     build:
       context: ../..
       dockerfile: apps/organiclever-be/Dockerfile.integration
     volumes:
       - ../../specs:/specs:ro
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/organiclever
+      API_BASE_URL: http://app:8202
+    depends_on:
+      - app
+    command: ["cargo", "test", "--test", "integration"]

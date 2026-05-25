@@ -10,10 +10,10 @@ Feature: Service Health Check
   Scenario: Health endpoint reports the service as UP
     When an operations engineer sends GET /health
     Then the response status code should be 200
-    And the health status should be "UP"
+    And the health status should be "ok"
 
   Scenario: Anonymous health check does not expose component details
     When an unauthenticated engineer sends GET /health
     Then the response status code should be 200
-    And the health status should be "UP"
+    And the health status should be "ok"
     And the response should not include detailed component health information

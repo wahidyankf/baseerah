@@ -1,0 +1,17 @@
+# Stage 1: build the Rust binary
+FROM rust:1.95-slim AS builder
+WORKDIR /build
+COPY apps/organiclever-be/Cargo.toml apps/organiclever-be/Cargo.lock ./
+COPY apps/organiclever-be/src ./src
+COPY apps/organiclever-be/tests ./tests
+RUN cargo build --release --bin organiclever-be
+
+# Stage 2: minimal runtime image
+FROM debian:bookworm-slim
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /build/target/release/organiclever-be /usr/local/bin/organiclever-be
+ENV PORT=8202
+EXPOSE 8202
+CMD ["/usr/local/bin/organiclever-be"]
