@@ -16,37 +16,49 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Environment Setup
 
-- [ ] Install dependencies in the root worktree (run from repo root `worktrees/ose-cli-rust-migration/`):
+- [x] Install dependencies in the root worktree (run from repo root `worktrees/ose-cli-rust-migration/`):
 
   ```bash
   npm install
   ```
 
   Acceptance criterion: exits 0 with no errors.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: npm install exited 0, 1563 packages audited, up to date.
 
-- [ ] Converge the full polyglot toolchain:
+- [x] Converge the full polyglot toolchain:
 
   ```bash
   npm run doctor -- --fix
   ```
 
   Acceptance criterion: exits 0; Rust toolchain 1.95.0 confirmed present.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: All 20/20 tools OK, nothing to fix. Rust 1.94.0 default; 1.95.0 toolchain installed and available (confirmed via rustup toolchain list).
 
-- [ ] Verify the existing `rhino-cli` build still passes (confirms Rust toolchain is functional):
+- [x] Verify the existing `rhino-cli` build still passes (confirms Rust toolchain is functional):
 
   ```bash
   npx nx run rhino-cli:build
   ```
 
   Acceptance criterion: exits 0, binary appears at `apps/rhino-cli/dist/rhino-cli`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Build passed (from cache). Binary confirmed at apps/rhino-cli/dist/rhino-cli.
 
-- [ ] Run existing `ose-cli` Go tests to establish a baseline before any changes:
+- [x] Run existing `ose-cli` Go tests to establish a baseline before any changes:
 
   ```bash
   npx nx run ose-cli:test:unit
   ```
 
   Acceptance criterion: note any preexisting failures; do not proceed with changes until baseline is recorded.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Baseline PASS — ok cmd 0.665s, no preexisting failures.
 
 ---
 
@@ -54,15 +66,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Step 0.1: Scaffold libs/rust-commons/ directory and Cargo.toml
 
-- [ ] Create directory `libs/rust-commons/src/links/` (_New directory_):
+- [x] Create directory `libs/rust-commons/src/links/` (_New directory_):
 
   ```bash
   mkdir -p libs/rust-commons/src/links
   ```
 
   Acceptance criterion: directory exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
-- [ ] Create `libs/rust-commons/Cargo.toml` (_New file_) with the following content:
+- [x] Create `libs/rust-commons/Cargo.toml` (_New file_) with the following content:
 
   ```toml
   [package]
@@ -122,10 +136,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists and `cargo metadata --manifest-path libs/rust-commons/Cargo.toml` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Created. cargo metadata exits 0, package resolved successfully.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `libs/rust-commons/rust-toolchain.toml` (_New file_):
+- [x] Create `libs/rust-commons/rust-toolchain.toml` (_New file_):
 
   ```toml
   [toolchain]
@@ -135,20 +152,25 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
 ### Step 0.2: Add libs/rust-commons/ to the workspace Cargo.toml (if workspace-level Cargo.toml exists)
 
-- [ ] Check whether a workspace-level `Cargo.toml` exists at the repo root:
+- [x] Check whether a workspace-level `Cargo.toml` exists at the repo root:
 
   ```bash
   test -f Cargo.toml && echo "EXISTS" || echo "NOT_EXISTS"
   ```
 
   If `NOT_EXISTS`: no action needed (each Rust project has its own standalone manifest, same as `rhino-cli`). If `EXISTS`: add `"libs/rust-commons"` to the `[workspace] members` array. Acceptance criterion: `cargo metadata` resolves the crate.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: NOT_EXISTS — no workspace Cargo.toml. Each Rust crate is standalone, same as rhino-cli pattern. No action needed.
 
 ### Step 0.3: Write failing unit tests for libs/rust-commons (RED)
 
-- [ ] Create `libs/rust-commons/src/lib.rs` (_New file_) — declare the `links` module:
+- [x] Create `libs/rust-commons/src/lib.rs` (_New file_) — declare the `links` module:
 
   ```rust
   //! `rust-commons` — shared Rust utilities for `ose-public` CLI tools.
@@ -162,10 +184,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `libs/rust-commons/src/links/mod.rs` (_New file_) with the public API surface and failing test stubs. Write tests FIRST (Red phase). The file must define:
+- [x] Create `libs/rust-commons/src/links/mod.rs` (_New file_) with the public API surface and failing test stubs. Write tests FIRST (Red phase). The file must define:
   - `pub struct BrokenLink { source_file, line, text, target }` with `#[derive(Debug, Clone, serde::Serialize)]`
   - `pub struct CheckResult { checked_count, error_count, errors, broken_links }`
   - `pub fn check_links(content_dir: &Path) -> anyhow::Result<CheckResult>`
@@ -183,12 +207,15 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   Verify RED: `cargo test --manifest-path libs/rust-commons/Cargo.toml --lib` — all new tests fail to compile or fail at runtime (stubs return `todo!()`). This is the expected RED state.
 
   Acceptance criterion: `cargo check --manifest-path libs/rust-commons/Cargo.toml` succeeds (types compile); `cargo test --lib` reports failures or panics on the stubs.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: RED confirmed. cargo check exits 0 (19 crates compiled). cargo test --lib: 0 passed, 6 failed — all panic with "not yet implemented".
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 0.4: Implement libs/rust-commons link-checking logic (GREEN)
 
-- [ ] Implement the full body of `libs/rust-commons/src/links/mod.rs` (_Modify_), porting logic from `libs/golang-link-commons/links/checker.go` and `libs/golang-link-commons/links/output.go`. Port the following behaviors exactly:
+- [x] Implement the full body of `libs/rust-commons/src/links/mod.rs` (_Modify_), porting logic from `libs/golang-link-commons/links/checker.go` and `libs/golang-link-commons/links/output.go`. Port the following behaviors exactly:
   - Walk `.md` files recursively with `walkdir`
   - Extract markdown links with `regex` pattern `\[([^\]]*)\]\(([^)]+)\)`
   - Skip external links (`http://`, `https://`, `mailto:`, `//`) and same-page anchors (`#`)
@@ -202,36 +229,47 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   Verify GREEN: `cargo test --manifest-path libs/rust-commons/Cargo.toml --lib` — all tests in `test` block pass.
 
   Acceptance criterion: `cargo test --lib` exits 0 with all tests passing.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: All 6 unit tests pass. Added chrono dep for timestamps. Delegated to swe-rust-dev.
+  - **Files Changed**: `libs/rust-commons/src/links/mod.rs`, `libs/rust-commons/Cargo.toml` (added chrono)
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 0.5: Check coverage threshold (GREEN continued)
 
-- [ ] Run coverage check for `libs/rust-commons`:
+- [x] Run coverage check for `libs/rust-commons`:
 
   ```bash
   cargo llvm-cov --manifest-path libs/rust-commons/Cargo.toml --lib --fail-under-lines 90
   ```
 
   Acceptance criterion: exits 0 (90% line coverage met). If below threshold, add additional unit tests before proceeding.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Initial run was 73.82% (below threshold). Added 28 new tests (total 34). Final: 96.99% line coverage. Exits 0.
+  - **Files Changed**: `libs/rust-commons/src/links/mod.rs` (28 tests added)
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 0.6: Refactor libs/rust-commons (REFACTOR)
 
-- [ ] Review `libs/rust-commons/src/links/mod.rs` for clarity and idiomatic Rust style:
+- [x] Review `libs/rust-commons/src/links/mod.rs` for clarity and idiomatic Rust style:
   - Extract any long functions into private helpers if they exceed ~50 lines
   - Ensure all public items have doc comments (required by `missing_docs = "deny"`)
   - Ensure all `///` doc comments for fallible functions include `# Errors` section (required by `missing_errors_doc = "deny"`)
   - Run `cargo clippy --manifest-path libs/rust-commons/Cargo.toml --all-targets -- -D warnings` and fix all warnings
 
   Acceptance criterion: `cargo clippy --all-targets -- -D warnings` exits 0; `cargo test --lib` still passes.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: cargo clippy "No issues found". 34 tests pass.
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 0.7: Create libs/rust-commons project.json
 
-- [ ] Create `libs/rust-commons/project.json` (_New file_):
+- [x] Create `libs/rust-commons/project.json` (_New file_):
 
   ```json
   {
@@ -313,10 +351,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: `npx nx run rust-commons:typecheck` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Created. nx run rust-commons:typecheck exits 0.
 
 ### Step 0.8: Commit Phase 0
 
-- [ ] Format Rust source:
+- [x] Format Rust source:
 
   ```bash
   cargo fmt --manifest-path libs/rust-commons/Cargo.toml
@@ -324,8 +365,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
   Acceptance criterion: `cargo fmt --manifest-path libs/rust-commons/Cargo.toml -- --check` exits 0
   (no changes needed).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Formatted. -- --check exits 0.
 
-- [ ] Stage and commit:
+- [x] Stage and commit:
 
   ```bash
   git add libs/rust-commons/
@@ -333,6 +377,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: commit exists; `git log --oneline -1` shows the commit message.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Commit 994992bcb. 6 files changed, 1629 insertions.
 
 ---
 
@@ -340,7 +387,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Step 1.1: Scaffold Rust project files
 
-- [ ] Create `apps/ose-cli/rust-toolchain.toml` (_New file_):
+- [x] Create `apps/ose-cli/rust-toolchain.toml` (_New file_):
 
   ```toml
   [toolchain]
@@ -350,10 +397,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/ose-cli/deny.toml` (_New file_) with the same content as `apps/rhino-cli/deny.toml` [Repo-grounded]:
+- [x] Create `apps/ose-cli/deny.toml` (_New file_) with the same content as `apps/rhino-cli/deny.toml` [Repo-grounded]:
 
   ```toml
   # cargo-deny configuration for ose-cli.
@@ -389,10 +438,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Created matching rhino-cli/deny.toml content.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/ose-cli/Cargo.toml` (_New file_):
+- [x] Create `apps/ose-cli/Cargo.toml` (_New file_):
 
   ```toml
   [package]
@@ -457,12 +509,15 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: `cargo check --manifest-path apps/ose-cli/Cargo.toml` exits 0 (after source files are created in subsequent steps).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Created with clap 4.6.1, rust-commons path dep, strict lints matching rhino-cli.
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.2: Write failing smoke tests (RED)
 
-- [ ] Create `apps/ose-cli/tests/` directory and `apps/ose-cli/tests/cli_smoke.rs` (_New file_) with the following failing test stubs (tests will fail until binary is implemented):
+- [x] Create `apps/ose-cli/tests/` directory and `apps/ose-cli/tests/cli_smoke.rs` (_New file_) with the following failing test stubs (tests will fail until binary is implemented):
 
   ```rust
   //! Smoke tests for the `ose-cli` binary.
@@ -566,12 +621,15 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   Verify RED: `cargo test --manifest-path apps/ose-cli/Cargo.toml --tests` — tests fail to compile (binary does not exist yet). Expected RED state.
 
   Acceptance criterion: file exists; `cargo check --tests --manifest-path apps/ose-cli/Cargo.toml` (after creating src/ stubs) compiles.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Created tests/cli_smoke.rs with 9 smoke test stubs. Binary not built yet (RED state).
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.3: Implement Rust source files (GREEN)
 
-- [ ] Create `apps/ose-cli/src/` directory and `apps/ose-cli/src/main.rs` (_New file_):
+- [x] Create `apps/ose-cli/src/` directory and `apps/ose-cli/src/main.rs` (_New file_):
 
   ```rust
   //! `ose-cli` binary entry point.
@@ -584,10 +642,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/ose-cli/src/lib.rs` (_New file_):
+- [x] Create `apps/ose-cli/src/lib.rs` (_New file_):
 
   ```rust
   //! `ose-cli` library crate — CLI tools for `ose-web` site maintenance.
@@ -600,10 +660,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/ose-cli/src/commands/mod.rs` (_New file_):
+- [x] Create `apps/ose-cli/src/commands/mod.rs` (_New file_):
 
   ```rust
   //! Command dispatch modules for `ose-cli`.
@@ -611,79 +673,102 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: file exists.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/ose-cli/src/commands/links.rs` (_New file_). This module implements `LinksCheckArgs` (clap args struct) and `run_links_check(args, output_format)` calling `rust_commons::links::check_links()` and the appropriate output function. Mirror the Go `runLinksCheck` behavior from `apps/ose-cli/cmd/links_check.go` [Repo-grounded]:
+- [x] Create `apps/ose-cli/src/commands/links.rs` (_New file_). This module implements `LinksCheckArgs` (clap args struct) and `run_links_check(args, output_format)` calling `rust_commons::links::check_links()` and the appropriate output function. Mirror the Go `runLinksCheck` behavior from `apps/ose-cli/cmd/links_check.go` [Repo-grounded]:
   - Default `--content` value: `"apps/ose-web/content"`
   - Pass `quiet` and `verbose` flags through to `output_links_text`
   - Return `Err` if broken links found (causes non-zero exit)
   - Validate `output` flag: reject values other than `text`, `json`, `markdown`
 
   Acceptance criterion: `cargo check --manifest-path apps/ose-cli/Cargo.toml` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Create `apps/ose-cli/src/cli.rs` (_New file_). Implement the `Cli` struct using `#[derive(Parser)]` (clap 4.6.1) and the `run() -> i32` function that parses args and dispatches to `commands::links::run_links_check`. Include:
+- [x] Create `apps/ose-cli/src/cli.rs` (_New file_). Implement the `Cli` struct using `#[derive(Parser)]` (clap 4.6.1) and the `run() -> i32` function that parses args and dispatches to `commands::links::run_links_check`. Include:
   - Root flags: `--verbose`/`-v`, `--quiet`/`-q`, `--output`/`-o` (default `"text"`), `--no-color`
   - Subcommand: `links` → `check` (with `--content` flag, default `"apps/ose-web/content"`)
   - `run()` validates output format, dispatches subcommand, returns exit code 0/1/2 (same pattern as `rhino-cli` `cli.rs` [Repo-grounded])
 
   Acceptance criterion: `cargo test --manifest-path apps/ose-cli/Cargo.toml --tests` — all smoke tests pass (GREEN state).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: All 9 smoke tests pass. Used `global = true` clap flags to match cobra PersistentFlags behavior. Delegated to swe-rust-dev.
+  - **Files Changed**: `apps/ose-cli/src/main.rs`, `apps/ose-cli/src/lib.rs`, `apps/ose-cli/src/commands/mod.rs`, `apps/ose-cli/src/commands/links.rs`, `apps/ose-cli/src/cli.rs`
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.4: Run integration tests (GREEN verification)
 
-- [ ] Run the full smoke test suite:
+- [x] Run the full smoke test suite:
 
   ```bash
   cargo test --manifest-path apps/ose-cli/Cargo.toml --tests
   ```
 
   Acceptance criterion: exits 0; all tests in `tests/cli_smoke.rs` pass.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: 9 passed (3 suites, 0.21s).
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.5: Run against real ose-web content (integration smoke)
 
-- [ ] Run the Rust binary against the real content directory to confirm Go-parity:
+- [x] Run the Rust binary against the real content directory to confirm Go-parity:
 
   ```bash
   cargo run --manifest-path apps/ose-cli/Cargo.toml -- links check --content apps/ose-web/content
   ```
 
   Acceptance criterion: exits 0 (assuming the Go version also exits 0 on this directory at baseline); output contains `"Link Check Complete"`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Checked 3 links, 0 broken. Output contains "Link Check Complete" and "Broken: 0".
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.6: Refactor (REFACTOR)
 
-- [ ] Run `cargo clippy --manifest-path apps/ose-cli/Cargo.toml --all-targets -- -D warnings` and fix
+- [x] Run `cargo clippy --manifest-path apps/ose-cli/Cargo.toml --all-targets -- -D warnings` and fix
       all reported warnings.
 
   Acceptance criterion: `cargo clippy --manifest-path apps/ose-cli/Cargo.toml --all-targets -- -D warnings`
   exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Fixed unwrap_used in tests/cli_smoke.rs (replaced .unwrap() with .expect()). clippy "No issues found".
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Run `cargo fmt --manifest-path apps/ose-cli/Cargo.toml` to format all Rust source files.
+- [x] Run `cargo fmt --manifest-path apps/ose-cli/Cargo.toml` to format all Rust source files.
 
   Acceptance criterion: `cargo fmt --manifest-path apps/ose-cli/Cargo.toml -- --check` exits 0
   (no changes needed).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Formatted. -- --check exits 0.
 
   _Suggested executor: `swe-rust-dev`_
 
-- [ ] Verify all public items have doc comments (`missing_docs = "deny"` enforces this at compile time).
+- [x] Verify all public items have doc comments (`missing_docs = "deny"` enforces this at compile time).
 
   Acceptance criterion: `cargo check --manifest-path apps/ose-cli/Cargo.toml` exits 0 with no
   `missing_docs` errors; `cargo test --manifest-path apps/ose-cli/Cargo.toml --tests` still passes.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: cargo check exits 0, no missing_docs errors. 9 smoke tests pass.
 
   _Suggested executor: `swe-rust-dev`_
 
 ### Step 1.7: Update apps/ose-cli/project.json
 
-- [ ] Overwrite `apps/ose-cli/project.json` with Rust Nx targets (replacing Go targets). Use absolute manifest path pattern from `rhino-cli/project.json` [Repo-grounded]:
+- [x] Overwrite `apps/ose-cli/project.json` with Rust Nx targets (replacing Go targets). Use absolute manifest path pattern from `rhino-cli/project.json` [Repo-grounded]:
 
   ```json
   {
@@ -795,70 +880,93 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   Acceptance criterion: `npx nx run ose-cli:typecheck` exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: project.json overwritten with Rust targets. nx run ose-cli:typecheck exits 0.
 
 ### Step 1.8: Verify Nx targets work end-to-end
 
-- [ ] Build via Nx:
+- [x] Build via Nx:
 
   ```bash
   npx nx run ose-cli:build
   ```
 
   Acceptance criterion: exits 0; binary present at `apps/ose-cli/dist/ose-cli`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Compiled in 8.64s. Binary at apps/ose-cli/dist/ose-cli confirmed.
 
-- [ ] Test:unit via Nx:
+- [x] Test:unit via Nx:
 
   ```bash
   npx nx run ose-cli:test:unit
   ```
 
   Acceptance criterion: exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: 0 lib unit tests (all logic is in rust-commons). Exits 0.
 
-- [ ] Test:integration via Nx:
+- [x] Test:integration via Nx:
 
   ```bash
   npx nx run ose-cli:test:integration
   ```
 
   Acceptance criterion: exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: 9 smoke tests in tests/cli_smoke.rs pass. Exits 0.
 
-- [ ] Test:quick (coverage) via Nx:
+- [x] Test:quick (coverage) via Nx:
 
   ```bash
   npx nx run ose-cli:test:quick
   ```
 
   Acceptance criterion: exits 0 (90% line coverage met for lib).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Initial run failed (0 lib tests). Added 14 unit tests (7 in commands/links.rs, 7 in cli.rs via extracted dispatch fn). Final: 97.55% lib coverage. 14 passed.
 
-- [ ] Lint via Nx:
+- [x] Lint via Nx:
 
   ```bash
   npx nx run ose-cli:lint
   ```
 
   Acceptance criterion: exits 0.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Fixed formatting (cargo fmt) then nx run ose-cli:lint exits 0.
 
 ### Manual CLI Verification
 
 Verify all output formats and exit code semantics match the acceptance criteria before committing.
 
-- [ ] Build the release binary:
+- [x] Build the release binary:
 
   ```bash
   cargo build --manifest-path apps/ose-cli/Cargo.toml --release
   ```
 
   Acceptance criterion: exits 0; binary present at `apps/ose-cli/target/release/ose-cli`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 
-- [ ] Verify text output (AC-4):
+- [x] Verify text output (AC-4):
 
   ```bash
   cargo run --manifest-path apps/ose-cli/Cargo.toml -- links check --content apps/ose-web/content
   ```
 
   Acceptance criterion: exits 0; stdout contains `"Link Check Complete"` and `"Broken:   0"`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Exits 0. Output: "Link Check Complete", "Broken: 0 link(s)", Checked: 3 links.
 
-- [ ] Verify JSON output (AC-6):
+- [x] Verify JSON output (AC-6):
 
   ```bash
   cargo run --manifest-path apps/ose-cli/Cargo.toml -- links check --content apps/ose-web/content -o json | jq '{status, checked, broken, broken_links}'
@@ -866,34 +974,46 @@ Verify all output formats and exit code semantics match the acceptance criteria 
 
   Acceptance criterion: exits 0; output is valid JSON containing all four keys (`status`, `checked`,
   `broken`, `broken_links`).
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Exits 0. Valid JSON: `{"status":"success","checked":3,"broken":0,"broken_links":[]}`. All four keys present.
 
-- [ ] Verify markdown output (AC-7):
+- [x] Verify markdown output (AC-7):
 
   ```bash
   cargo run --manifest-path apps/ose-cli/Cargo.toml -- links check --content apps/ose-web/content -o markdown | head -10
   ```
 
   Acceptance criterion: exits 0; stdout starts with `# Link Check Report` and includes `## Summary`.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Exits 0. Output starts with `# Link Check Report` and includes `## Summary`.
 
-- [ ] Verify quiet mode suppresses stdout on success (AC-8):
+- [x] Verify quiet mode suppresses stdout on success (AC-8):
 
   ```bash
   cargo run --manifest-path apps/ose-cli/Cargo.toml -- links check --content apps/ose-web/content --quiet
   ```
 
   Acceptance criterion: exits 0; stdout is empty.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: Exits 0. stdout empty (stdout_len: 0).
 
-- [ ] Verify non-existent directory exits with code 1:
+- [x] Verify non-existent directory exits with code 1:
 
   ```bash
   cargo run --manifest-path apps/ose-cli/Cargo.toml -- links check --content /nonexistent 2>&1; echo "exit: $?"
   ```
 
   Acceptance criterion: output line `exit: 1` (or `exit: 2`) — non-zero exit on invalid content dir.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: exit: 1 confirmed.
 
 ### Step 1.9: Commit Phase 1
 
-- [ ] Stage and commit:
+- [x] Stage and commit:
 
   ```bash
   git add apps/ose-cli/src/ apps/ose-cli/tests/ apps/ose-cli/Cargo.toml apps/ose-cli/rust-toolchain.toml apps/ose-cli/deny.toml apps/ose-cli/project.json
