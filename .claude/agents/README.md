@@ -171,7 +171,7 @@ Three-stage quality workflow:
 **Making Changes**:
 
 1. Edit agents in `.claude/agents/` directory
-2. Run: `npm run sync:claude-to-opencode` (powered by `rhino-cli` for fast syncing)
+2. Run: `npm run generate:bindings` (powered by `rhino-cli` for fast syncing)
 3. Both systems stay synchronized
 
 **Implementation**: Sync powered by `rhino-cli agents sync` (~121ms, 25-60x faster than bash)

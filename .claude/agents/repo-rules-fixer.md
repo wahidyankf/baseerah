@@ -59,7 +59,7 @@ Fix repository-wide consistency issues including:
 
 ### File Operations in .claude/ and .opencode/
 
-Use the normal `Write` / `Edit` tools on files under `.claude/` and `.opencode/`. Both paths are pre-authorized in `.claude/settings.json`, so no approval prompts fire. `Bash` `sed` / `heredoc` remains useful for bulk mechanical substitutions across many files. After editing `.claude/` sources, run `npm run sync:claude-to-opencode` to regenerate the `.opencode/` mirrors.
+Use the normal `Write` / `Edit` tools on files under `.claude/` and `.opencode/`. Both paths are pre-authorized in `.claude/settings.json`, so no approval prompts fire. `Bash` `sed` / `heredoc` remains useful for bulk mechanical substitutions across many files. After editing `.claude/` sources, run `npm run generate:bindings` to regenerate the `.opencode/` mirrors.
 
 ### Post-Fix Verification (Mandatory)
 

@@ -105,7 +105,7 @@ web research.
 
 ### Invariant 3 — Binding sync no-op
 
-- **Tool**: `npm run sync:claude-to-opencode && git diff --quiet .opencode/`
+- **Tool**: `npm run generate:bindings && git diff --quiet .opencode/ .amazonq/`
 - **Pass**: sync exits 0 AND `git diff --quiet` exits 0 (no changes produced)
 - **Fail**: sync produced drift in `.opencode/` — report the changed files
 - **Default criticality**: MEDIUM (drift means upstream `.claude/` edits were not synced)

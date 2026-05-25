@@ -9,7 +9,7 @@ catalog and per-agent role descriptions live in the primary binding's README.
 - **Primary** (canonical): `.claude/agents/<name>.md`
 - **Secondary** (auto-synced): `.opencode/agents/<name>.md`
 
-Edit primary-binding files only. Run `npm run sync:claude-to-opencode` to
+Edit primary-binding files only. Run `npm run generate:bindings` to
 regenerate this directory. Any change made here will be overwritten on the next
 sync.
 

@@ -1,6 +1,6 @@
 ---
 name: repo-harness-compatibility-fixer
-description: Applies validated fixes from a repo-harness-compatibility-checker audit report. Auto-remediates Phase 0 parity sync drift (Invariant 3 via npm run sync:claude-to-opencode) and Phase 1 catalog/binding updates. Also updates specs/apps/rhino/ when harness changes alter documented CLI behavior. Flags all other findings for human resolution.
+description: Applies validated fixes from a repo-harness-compatibility-checker audit report. Auto-remediates Phase 0 parity sync drift (Invariant 3 via npm run generate:bindings) and Phase 1 catalog/binding updates. Also updates specs/apps/rhino/ when harness changes alter documented CLI behavior. Flags all other findings for human resolution.
 tools: Read, Edit, Write, Glob, Grep, Bash
 model: sonnet
 color: yellow
@@ -58,7 +58,7 @@ the agent downgrades confidence and skips the fix pending human review.
   harness surface has moved to a new path
 - **Glob**: Enumerate binding files by pattern across harness directories
 - **Grep**: Locate specific fields, keys, and catalog rows for targeted edits
-- **Bash**: Run `npm run sync:claude-to-opencode` after editing `.claude/agents/` or after
+- **Bash**: Run `npm run generate:bindings` after editing `.claude/agents/` or after
   fixing Invariant 3; run `rhino-cli` vendor audit and binding validation; generate UUIDs
   and UTC+7 timestamps; run `git diff --name-only HEAD` to capture changed files
 
@@ -103,9 +103,9 @@ order.
 
 ### Phase 0 Auto-Fixable: Invariant 3 — Binding sync drift
 
-When the checker reports drift in `.opencode/` after `npm run sync:claude-to-opencode`:
+When the checker reports drift in `.opencode/` after `npm run generate:bindings`:
 
-1. Run `npm run sync:claude-to-opencode` again to regenerate the secondary binding from
+1. Run `npm run generate:bindings` again to regenerate the secondary binding from
    the canonical `.claude/` source
 2. Stage the resulting `.opencode/` changes with `git add .opencode/agents/`
 3. Re-run sync to confirm idempotence (second run must produce no further changes)
@@ -160,7 +160,7 @@ directory
 1. Update catalog row
 2. For each committed agent definition file flagged in the D6 sub-finding: use Edit to add,
    remove, or rename frontmatter fields per the new schema
-3. After editing `.claude/agents/` files, run `npm run sync:claude-to-opencode`
+3. After editing `.claude/agents/` files, run `npm run generate:bindings`
 
 **Tool**: Edit, Bash
 
@@ -255,7 +255,7 @@ When a harness has removed a previously required frontmatter field:
 After any edit to `.claude/agents/` files:
 
 ```bash
-npm run sync:claude-to-opencode
+npm run generate:bindings
 ```
 
 This keeps the `.opencode/agents/` mirror aligned. Failure here is a blocker — do not mark
@@ -282,9 +282,9 @@ to the next finding.
    - Apply fix (HIGH confidence only) or skip with reason
    - Verify fix was applied
    - Write result progressively to fix report
-4. After all Phase 0 Invariant 3 fixes: confirm `npm run sync:claude-to-opencode` is
+4. After all Phase 0 Invariant 3 fixes: confirm `npm run generate:bindings` is
    idempotent (second run produces no changes)
-5. After all `.claude/agents/` edits: run `npm run sync:claude-to-opencode`
+5. After all `.claude/agents/` edits: run `npm run generate:bindings`
 6. Re-run binding validation:
 
    ```bash

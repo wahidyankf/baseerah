@@ -24,7 +24,7 @@ This applies to:
 - `.claude/skills/*/reference/*.md` — skill reference modules
 - `.opencode/agents/*.md` — OpenCode agent mirrors
 
-After editing `.claude/agents/` sources, run `npm run sync:claude-to-opencode` so the `.opencode/agents/` mirror stays aligned. The pre-commit hook validates both formats. Skills under `.claude/skills/` are not mirrored — restart any active OpenCode session to pick up edits.
+After editing `.claude/agents/` sources, run `npm run generate:bindings` so the `.opencode/agents/` mirror stays aligned. The pre-commit hook validates both formats. Skills under `.claude/skills/` are not mirrored — restart any active OpenCode session to pick up edits.
 
 ## References
 
