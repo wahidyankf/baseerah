@@ -65,7 +65,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 6: Sync `.claude` → `.opencode`
 
-- [ ] Run `npm run sync:claude-to-opencode` — output ends with `Status: ✓ SUCCESS` and `Agents: 72 converted` (or whatever the current correct count is at execution time per `Bash ls .claude/agents/*.md | grep -v README | wc -l`). Verify by running the command and reading the tail.
+- [ ] Run `npm run generate:bindings` — output ends with `Status: ✓ SUCCESS` and `Agents: 72 converted` (or whatever the current correct count is at execution time per `Bash ls .claude/agents/*.md | grep -v README | wc -l`). Verify by running the command and reading the tail.
   - _Suggested executor: direct execution_
 - [ ] Run `npx nx run rhino-cli:validate:cross-vendor-parity` — exits 0 with all 6 invariants passing.
   - _Suggested executor: direct execution_
@@ -121,6 +121,6 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - Phase 3 acceptance: `Bash grep -c "^## Step 8b Fix Recipes" .claude/agents/repo-rules-fixer.md` returns `1` and the fixer resolves the Phase 2 fixtures or escalates per design.
 - Phase 4 acceptance: workflow Scope Clarification advertises full `docs/` coverage (`Bash grep -c "Validates (full)" repo-governance/workflows/repo/repo-rules-quality-gate.md` returns `1`).
 - Phase 5 acceptance: all five quality gates (typecheck/lint/test:quick/spec-coverage/lint:md) exit 0.
-- Phase 6 acceptance: `npm run sync:claude-to-opencode` reports `Status: ✓ SUCCESS` and `validate:cross-vendor-parity` exits 0.
+- Phase 6 acceptance: `npm run generate:bindings` reports `Status: ✓ SUCCESS` and `validate:cross-vendor-parity` exits 0.
 - Phase 8 acceptance: all triggered GitHub Actions workflows reach `conclusion: success`.
 - Phase 9 acceptance: plan folder lives at `plans/done/2026-05-03__repo-rules-checker-docs-coverage/` and both index READMEs reflect the move.

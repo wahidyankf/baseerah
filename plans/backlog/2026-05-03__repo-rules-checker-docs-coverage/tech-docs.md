@@ -91,15 +91,15 @@ Mechanical drift only on first iteration. Semantic drift (capability claims, beh
 | --------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `.claude/agents/repo-rules-checker.md` [Repo-grounded]                      | EDIT | Insert new Step 8b "Cross-Documentation Rules Governance" after existing Step 8; add finding format for vendor-binding drift |
 | `.claude/agents/repo-rules-fixer.md` [Repo-grounded]                        | EDIT | Add fix recipes for the new finding categories; preserve existing recipes                                                    |
-| `.opencode/agents/repo-rules-checker.md` [Repo-grounded]                    | SYNC | Auto-generated from `.claude/agents/repo-rules-checker.md` via `npm run sync:claude-to-opencode`                             |
-| `.opencode/agents/repo-rules-fixer.md` [Repo-grounded]                      | SYNC | Auto-generated from `.claude/agents/repo-rules-fixer.md` via `npm run sync:claude-to-opencode`                               |
+| `.opencode/agents/repo-rules-checker.md` [Repo-grounded]                    | SYNC | Auto-generated from `.claude/agents/repo-rules-checker.md` via `npm run generate:bindings`                                   |
+| `.opencode/agents/repo-rules-fixer.md` [Repo-grounded]                      | SYNC | Auto-generated from `.claude/agents/repo-rules-fixer.md` via `npm run generate:bindings`                                     |
 | `repo-governance/workflows/repo/repo-rules-quality-gate.md` [Repo-grounded] | EDIT | Update Scope Clarification block to advertise full `docs/` coverage; remove the "Skips: rest of docs/" line                  |
 
 No new files. No deletions. No renames.
 
 ## Dependencies
 
-- `npm run sync:claude-to-opencode` [Repo-grounded — root `package.json` script] — produces `.opencode/` mirrors after agent edits.
+- `npm run generate:bindings` [Repo-grounded — root `package.json` script] — produces `.opencode/` mirrors after agent edits.
 - `npx nx run rhino-cli:validate:cross-vendor-parity` [Repo-grounded — `.husky/pre-push:30`] — validates parity invariants post-sync.
 - `npm run lint:md` [Repo-grounded — root `package.json` script] — markdown lint gate.
 - Existing `repo-rules-checker` infrastructure (UUID chain, progressive writing, false-positive skip list, criticality assessment, dual-label findings) — unchanged.
@@ -112,6 +112,6 @@ Single-step rollback if the new step misbehaves in production:
 git revert <commit-sha-of-the-step-8b-introduction>
 ```
 
-The change touches one agent body + one workflow doc + auto-synced mirror. Reverting the source commit and re-running `npm run sync:claude-to-opencode` restores the previous state. No data migration, no schema change, no external integration to roll back.
+The change touches one agent body + one workflow doc + auto-synced mirror. Reverting the source commit and re-running `npm run generate:bindings` restores the previous state. No data migration, no schema change, no external integration to roll back.
 
 If the maintainer wants to keep the step but disable just the vendor-binding drift sub-step, that sub-step lives in a self-contained subsection of the agent body and can be commented out via `<!-- DISABLED -->` markers without removing the rest of Step 8b.

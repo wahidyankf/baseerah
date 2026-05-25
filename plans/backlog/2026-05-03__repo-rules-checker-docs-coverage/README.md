@@ -12,7 +12,7 @@ This plan extends `repo-rules-checker` with a new validation step covering all o
 
 - `.claude/agents/repo-rules-checker.md` [Repo-grounded] — add a new validation step (provisional name "Step 8b: Cross-Documentation Rules Governance") covering the full `docs/` tree
 - `.claude/agents/repo-rules-fixer.md` [Repo-grounded] — add fix recipes for the new finding categories surfaced by Step 8b
-- `.opencode/agents/repo-rules-checker.md` [Repo-grounded] and `.opencode/agents/repo-rules-fixer.md` [Repo-grounded] — auto-synced from `.claude/` via `npm run sync:claude-to-opencode` per the dual-mode configuration in [`AGENTS.md`](../../../AGENTS.md)
+- `.opencode/agents/repo-rules-checker.md` [Repo-grounded] and `.opencode/agents/repo-rules-fixer.md` [Repo-grounded] — auto-synced from `.claude/` via `npm run generate:bindings` per the dual-mode configuration in [`AGENTS.md`](../../../AGENTS.md)
 - `repo-governance/workflows/repo/repo-rules-quality-gate.md` [Repo-grounded] — update the Scope Clarification block to reflect the expanded coverage (replace the current `Skips: rest of docs/` line with full `docs/` coverage)
 
 **Out of scope**:
