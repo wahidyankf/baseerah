@@ -608,11 +608,13 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Commit Guidelines (Phase 1)
 
-- [ ] Commit the Rust source files thematically:
+- [x] Commit the Rust source files thematically:
   - Commit 1: `feat(ayokoding-cli): add Rust scaffolding (Cargo.toml, toolchain, deny.toml)`
   - Commit 2: `feat(ayokoding-cli): implement Rust CLI with links check subcommand`
   - Commit 3: `feat(ayokoding-cli): add cli smoke tests`
   - Commit 4: `chore(ayokoding-cli): update project.json to Rust Nx targets`
+  - **Date**: 2026-05-25
+  - **Status**: Completed
 - [x] Follow Conventional Commits format for all commits.
 - [x] Do NOT delete Go source in this phase — that is Phase 2.
 
@@ -657,7 +659,7 @@ mandatory — do not skip it.
 
 ### Gate: Verify No Other Go Consumers
 
-- [ ] Run the consumer grep from the repo root:
+- [x] Run the consumer grep from the repo root:
 
   ```bash
   REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -670,6 +672,8 @@ mandatory — do not skip it.
   Expected: output is empty (zero matches). If any path appears that is NOT under
   `apps/ayokoding-cli/` or `apps/ose-cli/`, STOP — do not proceed with deletion; investigate and
   resolve the additional consumer first.
+  - **Date**: 2026-05-25
+  - **Notes**: Only self-references within the libs themselves. No external consumers. Gate satisfied.
 
   Also verify ose-cli migration is complete:
 
@@ -678,10 +682,11 @@ mandatory — do not skip it.
   ```
 
   If `ose-cli NOT migrated`, do not delete the Go libs — they are still needed.
+  - **Notes**: "ose-cli migrated" confirmed.
 
 ### Delete libs/golang-link-commons/
 
-- [ ] Remove the directory from version control:
+- [x] Remove the directory from version control:
 
   ```bash
   git rm -r libs/golang-link-commons/
@@ -691,17 +696,20 @@ mandatory — do not skip it.
 
 ### Delete libs/golang-commons/
 
-- [ ] Remove the directory from version control:
+- [x] Remove the directory from version control:
 
   ```bash
   git rm -r libs/golang-commons/
   ```
 
   Acceptance criterion: `ls libs/golang-commons/ 2>&1 | grep "No such file"` — directory is gone.
+  - **Date**: 2026-05-25
+  - **Status**: Completed
+  - **Notes**: git rm staged all 13 tracked files; rm -rf removed untracked .out files.
 
 ### Verify Nx Graph Is Clean
 
-- [ ] Run `npx nx graph --file /tmp/nx-graph.json` and inspect output — neither `golang-link-commons`
+- [x] Run `npx nx graph --file /tmp/nx-graph.json` and inspect output — neither `golang-link-commons`
       nor `golang-commons` should appear as nodes or dependencies. Alternatively run:
 
   ```bash
@@ -709,9 +717,13 @@ mandatory — do not skip it.
   ```
 
   Expected: empty output.
+  - **Date**: 2026-05-25
+  - **Notes**: `npx nx show projects | grep golang` → empty output. Graph is clean.
 
-- [ ] Run `npx nx run ayokoding-cli:build` — exits 0, confirming the Rust build does not reference
+- [x] Run `npx nx run ayokoding-cli:build` — exits 0, confirming the Rust build does not reference
       the deleted libs.
+  - **Date**: 2026-05-25
+  - **Notes**: Build exits 0 (from cache). No references to deleted Go libs.
 
 ### Commit Guidelines (Phase 3)
 
