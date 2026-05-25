@@ -17,7 +17,7 @@ Highlights: the ose-projects parent repo is gone — ose-public, ose-primer, and
 
 🌳 ose-public
 
-rhino-cli was the bulk — ~80 commits porting every command to Rust behind verified parity. ayokoding-web got a large learn-tree reorg: a new procedural architecture track, 4 security by-example tracks (~340 examples), plus coding-agents and Rust CLI tutorials. Governance: a uniform five-folder spec tree, the rust-governance audit closed out, and a new grill-me planning skill.
+rhino-cli was the bulk of the work — porting every command to Rust behind verified parity. ayokoding-web got a large learn-tree reorg: a new procedural architecture track, 4 security by-example tracks (~340 examples), plus coding-agents and Rust CLI tutorials. Governance: a uniform five-folder spec tree, the rust-governance audit closed out, and a new grill-me planning skill.
 
 🏗️ ose-infra
 
