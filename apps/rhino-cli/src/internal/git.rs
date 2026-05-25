@@ -118,7 +118,7 @@ pub fn get_staged_files(git_root: &Path) -> Result<Vec<String>, Error> {
 /// Runs the full 8-step pre-commit pipeline.
 ///
 /// Steps are executed sequentially.  Each step is guarded by
-/// [`run_with_step_timeout`] so that a slow step does not block the commit
+/// `run_with_step_timeout` so that a slow step does not block the commit
 /// indefinitely.
 ///
 /// # Errors

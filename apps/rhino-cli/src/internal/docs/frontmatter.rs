@@ -80,8 +80,8 @@ enum DocArea {
 
 /// Validates the YAML frontmatter of every markdown file reachable from `paths`.
 ///
-/// Files outside the recognised documentation areas ([`SOFTWARE_DOC_PREFIX`],
-/// [`GOVERNANCE_DOC_PREFIXES`]) are silently skipped.  The returned list is
+/// Files outside the recognised documentation areas (`SOFTWARE_DOC_PREFIX`,
+/// `GOVERNANCE_DOC_PREFIXES`) are silently skipped.  The returned list is
 /// sorted by file path, then by finding kind.
 ///
 /// # Errors

@@ -52,7 +52,7 @@ fn inline_date_annotation_re() -> &'static Regex {
 /// Audits each directory in `paths` for YAML frontmatter violations and
 /// forbidden body-level date annotations.
 ///
-/// Skips files under any of the [`WEBSITE_APP_PREFIXES`] paths.  Findings are
+/// Skips files under any of the `WEBSITE_APP_PREFIXES` paths.  Findings are
 /// sorted by `file`, then by `line`.
 ///
 /// # Errors

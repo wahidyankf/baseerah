@@ -618,7 +618,7 @@ fn extract_go_scenario_titles(p: &Path) -> std::result::Result<HashSet<String>, 
 /// Walks `app_dir` recursively and extracts all step definitions from every
 /// recognised source file, aggregating them into a single [`StepMatcher`].
 ///
-/// Skips directories in [`skip_dirs`]. Returns an empty matcher if `app_dir`
+/// Skips directories in `skip_dirs`. Returns an empty matcher if `app_dir`
 /// does not exist.
 ///
 /// # Errors

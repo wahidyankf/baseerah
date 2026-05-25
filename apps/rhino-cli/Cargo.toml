@@ -41,6 +41,9 @@ tempfile = "3.27.0"
 unsafe_code = "forbid"
 missing_docs = "deny"
 
+[lints.rustdoc]
+private_intra_doc_links = "deny"
+
 [lints.clippy]
 # Enable pedantic group at low priority — individual allows below override via priority 0
 pedantic = { level = "warn", priority = -1 }

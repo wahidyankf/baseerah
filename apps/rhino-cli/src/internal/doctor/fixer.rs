@@ -2,7 +2,7 @@
 //!
 //! Attempts to auto-install missing tools using the install commands defined
 //! in each [`ToolDef`].  The main entry points are [`fix_all`] (high-level,
-//! rebuilds defs automatically) and [`fix`] (lower-level, accepts pre-built
+//! rebuilds defs automatically) and `fix` (lower-level, accepts pre-built
 //! defs for testing).
 
 use std::process::Command;
@@ -146,11 +146,11 @@ where
     fr
 }
 
-/// Builds tool definitions from `opts` and then delegates to [`fix`].
+/// Builds tool definitions from `opts` and then delegates to `fix`.
 ///
 /// This is the high-level entry point used by the CLI.  It re-creates the
 /// full tool list from the repo root recorded in `opts`, applies the scope
-/// filter, and passes everything to [`fix`].
+/// filter, and passes everything to `fix`.
 pub fn fix_all<F>(
     result: &DoctorResult,
     opts: &CheckOptions<'_>,
