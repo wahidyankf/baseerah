@@ -1,6 +1,4 @@
 target/
-*.class
-.mvn/
 generated-contracts/src/
 *.db
 .DS_Store
