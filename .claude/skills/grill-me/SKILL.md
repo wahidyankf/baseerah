@@ -26,18 +26,25 @@ Activate when:
 Interview the user about every aspect of the plan until shared understanding is reached. Walk
 down each branch of the decision tree, resolving dependencies one-by-one.
 
-**Rules:**
+**Rules (HARD — no exceptions):**
 
 1. Ask questions **one at a time** — never bundle multiple questions in one message
-2. Present **2-4 concrete options** with trade-off descriptions per question
+2. **EVERY question MUST present 2-4 concrete options** with trade-off descriptions — open-ended
+   questions without options are FORBIDDEN. If you cannot enumerate options, read the codebase
+   first (Rule 4) and synthesize them before asking.
 3. **Mark the recommended option** clearly, e.g. `**(Recommended)**`
 4. **Explore the codebase first** — if a question can be answered by reading existing files,
    read them instead of asking
 5. Continue until all branches are resolved
 
-## Question format
+**Tool preference**: When operating in a Claude Code context, use the `AskUserQuestion` tool for
+each question. The interactive multi-choice UI shows the user exactly which options are available
+and lets them select with a single click. Fall back to the markdown format below only when
+`AskUserQuestion` is unavailable.
 
-Structure each question like this:
+## Question format (markdown fallback)
+
+When `AskUserQuestion` is not available, structure each question like this:
 
 > **[Question]**
 >

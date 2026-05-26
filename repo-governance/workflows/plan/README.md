@@ -1,6 +1,6 @@
 ---
 title: "Plan Workflows"
-description: ""
+description: "Orchestrated workflows for plan creation, quality validation, and execution — from idea to archived delivery."
 category: explanation
 subcategory: workflows
 tags: []
@@ -51,3 +51,5 @@ validation at the end.
 - [Plans Organization Convention](../../conventions/structure/plans.md) - Plan structure standards
 - [Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md) - Core workflow pattern
 - [Repository Architecture](../../repository-governance-architecture.md) - Six-layer governance model
+- [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) - Every
+  grill question must present 2-4 concrete options; open-ended questions are forbidden

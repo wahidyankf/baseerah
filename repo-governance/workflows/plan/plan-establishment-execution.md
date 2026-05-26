@@ -91,7 +91,13 @@ Invoke the `grill-me` Skill to resolve all open design decisions before research
 **Orchestrator action**:
 
 Invoke the `grill-me` Skill (`.claude/skills/grill-me/SKILL.md`). Present Step 0 findings.
-Resolve ALL of the following:
+
+**Multiple-options requirement (HARD RULE)**: Every question in this grill session MUST present
+2-4 concrete options with trade-off descriptions. Use the `AskUserQuestion` tool (preferred in
+Claude Code) or the markdown question format from `grill-me`. Open-ended questions without
+options are FORBIDDEN. Ground options in what Step 0 repo exploration already established.
+
+Resolve ALL of the following (each as a structured multiple-choice question):
 
 1. **Scope**: What is the exact behavior to adopt? What is explicitly out-of-scope?
 2. **Affected files**: Which governance files, agents, or workflows will change?
@@ -156,8 +162,11 @@ Present research findings and grill again to validate direction and close new br
 **Orchestrator action**:
 
 1. Summarize research findings from Step 2 (or confirm skipped)
-2. Invoke the `grill-me` Skill. Cover:
-   - Do the research findings change any decision from Step 1?
+2. Invoke the `grill-me` Skill. **Multiple-options requirement (HARD RULE)**: Every question
+   MUST present 2-4 concrete options grounded in the research findings. Use `AskUserQuestion`
+   tool (preferred) or markdown question format. Cover:
+   - Do the research findings change any decision from Step 1? (options: yes — which decision /
+     no — proceed as agreed / partial — one or more decisions need refinement)
    - Are there new constraints or trade-offs surfaced by the research?
    - Does the proposed approach still hold after authoritative sources?
    - Are there risks the user wants to explicitly accept or mitigate in the plan?

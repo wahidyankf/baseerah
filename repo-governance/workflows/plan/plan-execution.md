@@ -43,8 +43,12 @@ outputs:
 - For plans that require iterative refinement to meet all requirements
 - When you need automated archival of completed plans to done/ folder
 - For systematic plan completion with zero-findings quality standard
-- Before executing, invoke the `grill-me` skill (`.claude/skills/grill-me/SKILL.md`) to
-  stress-test any unresolved design decisions in the plan
+
+> **Pre-Execution Requirement**: Before executing, invoke the `grill-me` skill
+> (`.claude/skills/grill-me/SKILL.md`) to stress-test any unresolved design decisions in
+> the plan. Every question must present 2-4 concrete options (use `AskUserQuestion` tool in
+> Claude Code, or the markdown question format). See
+> [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md).
 
 ## Execution Mode
 

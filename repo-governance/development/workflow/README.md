@@ -1,6 +1,6 @@
 ---
 title: "Workflow Development"
-description: ""
+description: "Development workflow conventions governing how contributors and agents execute work — TDD, commits, branching, environment reproducibility, grilling, and CI."
 category: explanation
 subcategory: development
 tags: []
@@ -47,6 +47,7 @@ These standards define **HOW to execute development workflows**, covering the th
 - [Test-Driven Development Convention](./test-driven-development.md) - Mandates TDD (Red→Green→Refactor) as the required practice for all code changes; defines TDD across all test levels (unit, integration, E2E), the TDD Shape for Delivery Checklists (explicit RED/GREEN/REFACTOR three-substep template with file path, verbatim command, and acceptance criterion per substep), plan-checker enforcement of TDD-shaped delivery checklist items, and the chain from Gherkin acceptance criteria to first failing test
 - [CI Monitoring Convention](./ci-monitoring.md) - Standards for monitoring GitHub Actions CI runs without exhausting the GitHub API rate limit — required tooling, poll intervals, trigger discipline, and recovery procedures
 - [Git Identity From Global Config Convention](./git-identity-from-global-config.md) - Prohibits `[user]` overrides in any subrepo's `.git/config`; git author identity must come exclusively from the developer's global `~/.gitconfig`. Enforced by `scripts/git-identity-check.sh` invoked as the first step of the Husky pre-commit hook
+- [Grilling-With-Options Convention](./grilling-with-options.md) - Every grill question (in plan creation, plan establishment, and plan execution contexts) MUST present 2-4 concrete options with trade-off descriptions; open-ended questions without options are FORBIDDEN; `AskUserQuestion` tool preferred in Claude Code; one option marked as recommended
 
 ## Companion Documents
 

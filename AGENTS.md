@@ -361,9 +361,10 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 
 **Fixing**: docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, apps-ayokoding-web-general-fixer, apps-ayokoding-web-by-example-fixer, apps-ayokoding-web-in-the-field-fixer, apps-ayokoding-web-facts-fixer, apps-ayokoding-web-link-fixer, apps-ose-web-content-fixer, docs-file-manager, swe-ui-fixer, ci-fixer, repo-rules-fixer, repo-workflow-fixer, repo-harness-compatibility-fixer
 
-**Planning**: plan-maker (mandates grilling user before and after plan creation; delivery
-checklists must begin with Phase 0), plan-checker, plan-execution-checker, plan-fixer,
-repo-setup-manager (executes Phase 0 environment setup and baseline in every plan) (see
+**Planning**: plan-maker (grills user before and after plan creation using multiple-choice
+options per [Grilling-With-Options Convention](./repo-governance/development/workflow/grilling-with-options.md);
+delivery checklists must begin with Phase 0), plan-checker, plan-execution-checker, plan-fixer,
+repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 [plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md) and
 [plan-establishment workflow](./repo-governance/workflows/plan/plan-establishment-execution.md))
 
