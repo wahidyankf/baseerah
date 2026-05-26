@@ -7,6 +7,9 @@ contexts:
       accessibility wiring. Pure presentation; no domain entities or data
       access.
     layers:
+      - domain
+      - application
+      - infrastructure
       - presentation
     code:
       - apps/wahidyankf-web/src/contexts/app-shell
@@ -19,6 +22,9 @@ contexts:
       Landing page at / — intro hero, featured top skills and languages,
       contact links. Pure presentation; data supplied by cv context.
     layers:
+      - domain
+      - application
+      - infrastructure
       - presentation
     code:
       - apps/wahidyankf-web/src/contexts/home
@@ -38,7 +44,9 @@ contexts:
       projection helpers (application layer) plus rendering (presentation
       layer).
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/wahidyankf-web/src/contexts/cv
@@ -55,7 +63,9 @@ contexts:
       tech tags. Application layer owns the project records and filter logic;
       presentation layer owns the UI.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/wahidyankf-web/src/contexts/personal-projects
@@ -74,7 +84,9 @@ contexts:
       Cross-area search — indexes home, cv, and personal-projects content;
       ranks results; renders the search-input and results UI.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/wahidyankf-web/src/contexts/search
