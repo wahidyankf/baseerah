@@ -1,7 +1,7 @@
 //! Table integrity checker — verifies tables are present and correctly structured.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::Finding;
+use crate::domain::Finding;
 use regex::Regex;
 use std::sync::OnceLock;
 

@@ -1,7 +1,7 @@
 //! Table subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::table_checker::{check_tables, detect_tables};
+use crate::domain::table_checker::{check_tables, detect_tables};
 use std::io::Write;
 
 /// Runs the `crane table detect` command, writing JSON table specs to `writer`.

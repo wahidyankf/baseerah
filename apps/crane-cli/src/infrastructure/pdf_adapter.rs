@@ -1,6 +1,6 @@
 //! PDF adapter trait and implementations for crane-cli.
 
-use crate::models::PdfMetadata;
+use crate::domain::PdfMetadata;
 
 /// PDF adapter trait for reading PDF documents.
 ///

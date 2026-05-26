@@ -4,7 +4,7 @@
 //! excluded from unit test coverage. Only `run_quality` is unit-tested.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::ocr_assessor::check_ocr_quality;
+use crate::domain::ocr_assessor::check_ocr_quality;
 use std::io::Write;
 
 /// Runs the `crane ocr quality` command, writing JSON findings to `writer`.

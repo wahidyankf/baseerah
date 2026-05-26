@@ -1,7 +1,7 @@
 //! Figure subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::figure_checker::{check_figures, detect_figures};
+use crate::domain::figure_checker::{check_figures, detect_figures};
 use std::io::Write;
 
 /// Runs the `crane figure detect` command, writing JSON figure refs to `writer`.

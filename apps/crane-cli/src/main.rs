@@ -4,12 +4,12 @@
 #![allow(clippy::too_many_lines)]
 
 use clap::{Args, Parser, Subcommand};
-use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
 use crane_cli::commands::{
     check_all_commands, figure_commands, heading_commands, mermaid_commands, nesting_commands,
     ocr_commands, pdf_commands, report_commands, skiplist_commands, table_commands, text_commands,
 };
-use crane_cli::core::pdf_extraction_cache;
+use crane_cli::domain::pdf_extraction_cache;
+use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
 use std::sync::Arc;
 
 /// Content Retrieval And Normalization Engine — PDF-to-Markdown validation tool.

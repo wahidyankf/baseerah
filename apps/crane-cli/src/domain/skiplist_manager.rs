@@ -1,7 +1,7 @@
 //! Skip list manager — manages known false positives for crane checks.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::SkipListEntry;
+use crate::domain::SkipListEntry;
 use anyhow::{Context, Result};
 use sha2::{Digest, Sha256};
 use std::io::Write;

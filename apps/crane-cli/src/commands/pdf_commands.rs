@@ -1,7 +1,7 @@
 //! PDF subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::adapters::PdfAdapter;
+use crate::infrastructure::PdfAdapter;
 use std::io::Write;
 
 /// Serializes a value to JSON and writes it to the given writer.

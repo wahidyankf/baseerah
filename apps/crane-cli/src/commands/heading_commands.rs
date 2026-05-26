@@ -1,7 +1,7 @@
 //! Heading subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::heading_checker::{check_headings, infer_depth_from_numbering};
+use crate::domain::heading_checker::{check_headings, infer_depth_from_numbering};
 use std::io::Write;
 
 /// Runs the `crane heading infer` command, writing `{"depth": N, "confidence": "..."}` to `writer`.

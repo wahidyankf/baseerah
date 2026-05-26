@@ -1,7 +1,7 @@
 //! Figure coverage checker — verifies figure references are represented in Markdown.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::Finding;
+use crate::domain::Finding;
 use regex::Regex;
 use std::sync::OnceLock;
 

@@ -1,7 +1,7 @@
 //! Report management subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::report_manager::{finalize_report, init_report};
+use crate::domain::report_manager::{finalize_report, init_report};
 use std::io::Write;
 
 /// Runs the `crane report init` command, writing `{"path": "..."}` JSON to `writer`.

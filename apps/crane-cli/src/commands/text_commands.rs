@@ -1,8 +1,8 @@
 //! Text completeness subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::adapters::PdfAdapter;
-use crate::core::text_checker::{check_text, compute_similarity, segment_is_present};
+use crate::domain::text_checker::{check_text, compute_similarity, segment_is_present};
+use crate::infrastructure::PdfAdapter;
 use std::io::Write;
 
 /// Runs the `crane text check` command, writing JSON findings to `writer`.

@@ -1,7 +1,7 @@
 //! Heading depth accuracy checker — verifies heading levels match PDF numbering.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::Finding;
+use crate::domain::Finding;
 use regex::Regex;
 use std::sync::OnceLock;
 

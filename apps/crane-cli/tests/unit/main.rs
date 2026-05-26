@@ -6,7 +6,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::redundant_closure)]
 
-use crane_cli::models::{Criticality, Finding, PdfMetadata, SkipListEntry};
+use crane_cli::domain::{Criticality, Finding, PdfMetadata, SkipListEntry};
 
 // ============================================================
 // Model tests
@@ -98,7 +98,7 @@ fn test_skip_list_entry_round_trip() {
 
 #[test]
 fn test_fake_adapter_get_metadata_returns_pages() {
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     let adapter = FakePdfAdapter::new("some text", 5, 1024);
     let meta = adapter.get_metadata("test.pdf").expect("get metadata");
     assert_eq!(meta.pages, 5);
@@ -109,7 +109,7 @@ fn test_fake_adapter_get_metadata_returns_pages() {
 
 #[test]
 fn test_fake_adapter_sample_text_returns_text() {
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     let adapter = FakePdfAdapter::new("hello world", 2, 512);
     let text = adapter.sample_text("test.pdf", 1).expect("sample text");
     assert_eq!(text, "hello world");
@@ -117,7 +117,7 @@ fn test_fake_adapter_sample_text_returns_text() {
 
 #[test]
 fn test_fake_adapter_extract_pages_returns_text() {
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     let adapter = FakePdfAdapter::new("page content", 3, 2048);
     let text = adapter
         .extract_pages("test.pdf", 1, 2)
@@ -139,21 +139,21 @@ fn test_criticality_display() {
 
 #[test]
 fn test_normalize_collapses_whitespace() {
-    use crane_cli::core::text_checker::normalize;
+    use crane_cli::domain::text_checker::normalize;
     assert_eq!(normalize("  hello   world  "), "hello world");
     assert_eq!(normalize("foo\t\tbar\nbaz"), "foo bar baz");
 }
 
 #[test]
 fn test_segment_is_present_exact_match() {
-    use crane_cli::core::text_checker::segment_is_present;
+    use crane_cli::domain::text_checker::segment_is_present;
     assert!(segment_is_present("hello world", "The hello world is here"));
     assert!(!segment_is_present("missing text", "The document is here"));
 }
 
 #[test]
 fn test_segment_is_present_fuzzy_match_above_threshold() {
-    use crane_cli::core::text_checker::segment_is_present;
+    use crane_cli::domain::text_checker::segment_is_present;
     // "Organisation" vs "organization" — single word fuzzy match
     assert!(segment_is_present(
         "organisation",
@@ -163,7 +163,7 @@ fn test_segment_is_present_fuzzy_match_above_threshold() {
 
 #[test]
 fn test_check_text_returns_finding_for_missing_chunk() {
-    use crane_cli::core::text_checker::check_text;
+    use crane_cli::domain::text_checker::check_text;
     // 41 chars — less than 50 threshold, so HIGH (short missing fragment)
     let chunks = vec!["This section is missing from the markdown"];
     let md_text = "# Introduction\n\nSome other content here.";
@@ -178,7 +178,7 @@ fn test_check_text_returns_finding_for_missing_chunk() {
 
 #[test]
 fn test_check_text_long_chunk_is_critical() {
-    use crane_cli::core::text_checker::check_text;
+    use crane_cli::domain::text_checker::check_text;
     // >= 50 chars — substantial missing content → CRITICAL
     let chunk = "This is a long section that is missing from the markdown document text";
     assert!(chunk.len() >= 50, "chunk must be >= 50 chars for CRITICAL");
@@ -189,7 +189,7 @@ fn test_check_text_long_chunk_is_critical() {
 
 #[test]
 fn test_check_text_short_chunk_is_high() {
-    use crane_cli::core::text_checker::check_text;
+    use crane_cli::domain::text_checker::check_text;
     let chunks = vec!["short text"]; // < 50 chars → HIGH
     let findings = check_text(&chunks, "# Different content");
     assert!(!findings.is_empty());
@@ -198,7 +198,7 @@ fn test_check_text_short_chunk_is_high() {
 
 #[test]
 fn test_check_text_present_chunk_produces_no_finding() {
-    use crane_cli::core::text_checker::check_text;
+    use crane_cli::domain::text_checker::check_text;
     let chunks = vec!["hello world present text"];
     let findings = check_text(&chunks, "hello world present text in document");
     assert!(findings.is_empty());
@@ -210,7 +210,7 @@ fn test_check_text_present_chunk_produces_no_finding() {
 
 #[test]
 fn test_infer_depth_section_1_dot_2() {
-    use crane_cli::core::heading_checker::infer_depth_from_numbering;
+    use crane_cli::domain::heading_checker::infer_depth_from_numbering;
     // "1.2 Title" → 1 dot + 2 = depth 3 (no trailing dot)
     let result = infer_depth_from_numbering("1.2 Title");
     assert!(result.is_some());
@@ -221,7 +221,7 @@ fn test_infer_depth_section_1_dot_2() {
 
 #[test]
 fn test_infer_depth_section_3() {
-    use crane_cli::core::heading_checker::infer_depth_from_numbering;
+    use crane_cli::domain::heading_checker::infer_depth_from_numbering;
     // "3. Title" → trailing dot → dots=1 → depth = 1+1 = 2, but min(5,2)=2
     let result = infer_depth_from_numbering("3. Title");
     assert!(result.is_some());
@@ -231,7 +231,7 @@ fn test_infer_depth_section_3() {
 
 #[test]
 fn test_infer_depth_section_3_1_2() {
-    use crane_cli::core::heading_checker::infer_depth_from_numbering;
+    use crane_cli::domain::heading_checker::infer_depth_from_numbering;
     // "3.1.2 Details" → 2 dots, no trailing → depth = 2+2 = 4
     let result = infer_depth_from_numbering("3.1.2 Details");
     assert!(result.is_some());
@@ -241,7 +241,7 @@ fn test_infer_depth_section_3_1_2() {
 
 #[test]
 fn test_check_headings_mismatch_returns_finding() {
-    use crane_cli::core::heading_checker::check_headings;
+    use crane_cli::domain::heading_checker::check_headings;
     // PDF has "2.3.1 Title" → inferred depth 4
     // MD has "### Title" → H3
     let pdf_text = "2.3.1 Title";
@@ -257,7 +257,7 @@ fn test_check_headings_mismatch_returns_finding() {
 
 #[test]
 fn test_extract_nesting_level_1() {
-    use crane_cli::core::nesting_checker::extract_nesting_levels;
+    use crane_cli::domain::nesting_checker::extract_nesting_levels;
     let text = "- Item at level 1";
     let items = extract_nesting_levels(text);
     assert_eq!(items.len(), 1);
@@ -266,7 +266,7 @@ fn test_extract_nesting_level_1() {
 
 #[test]
 fn test_extract_nesting_level_2() {
-    use crane_cli::core::nesting_checker::extract_nesting_levels;
+    use crane_cli::domain::nesting_checker::extract_nesting_levels;
     let text = "  - Item at level 2";
     let items = extract_nesting_levels(text);
     assert_eq!(items.len(), 1);
@@ -275,7 +275,7 @@ fn test_extract_nesting_level_2() {
 
 #[test]
 fn test_check_nesting_mismatch_returns_finding() {
-    use crane_cli::core::nesting_checker::check_nesting;
+    use crane_cli::domain::nesting_checker::check_nesting;
     let pdf_text = "  - SubItem"; // level 2
     let md_text = "- SubItem"; // level 1 (inverted → HIGH)
     let findings = check_nesting(pdf_text, md_text);
@@ -289,7 +289,7 @@ fn test_check_nesting_mismatch_returns_finding() {
 
 #[test]
 fn test_detect_table_finds_pipe_table() {
-    use crane_cli::core::table_checker::detect_tables;
+    use crane_cli::domain::table_checker::detect_tables;
     let text = "| Col1 | Col2 | Col3 |\n|------|------|------|\n| A | B | C |\n| D | E | F |";
     let tables = detect_tables(text);
     assert_eq!(tables.len(), 1);
@@ -299,7 +299,7 @@ fn test_detect_table_finds_pipe_table() {
 
 #[test]
 fn test_detect_no_table_on_plain_text() {
-    use crane_cli::core::table_checker::detect_tables;
+    use crane_cli::domain::table_checker::detect_tables;
     let text = "Just some plain text\nNo tables here";
     let tables = detect_tables(text);
     assert!(tables.is_empty());
@@ -307,7 +307,7 @@ fn test_detect_no_table_on_plain_text() {
 
 #[test]
 fn test_check_tables_missing_table_is_critical() {
-    use crane_cli::core::table_checker::check_tables;
+    use crane_cli::domain::table_checker::check_tables;
     let pdf_text = "| Col1 | Col2 | Col3 |\n|------|------|------|\n| A | B | C |";
     let md_text = "# No table here\nJust text.";
     let findings = check_tables(pdf_text, md_text);
@@ -321,7 +321,7 @@ fn test_check_tables_missing_table_is_critical() {
 
 #[test]
 fn test_detect_figures_finds_figure_1() {
-    use crane_cli::core::figure_checker::detect_figures;
+    use crane_cli::domain::figure_checker::detect_figures;
     let text = "See Figure 1 for details and Figure 2 for more.";
     let figures = detect_figures(text);
     assert_eq!(figures.len(), 2);
@@ -331,7 +331,7 @@ fn test_detect_figures_finds_figure_1() {
 
 #[test]
 fn test_figure_covered_by_mermaid() {
-    use crane_cli::core::figure_checker::check_figures;
+    use crane_cli::domain::figure_checker::check_figures;
     let pdf_text = "See Figure 1 for the architecture.";
     let md_text = "# Section\n\n```mermaid\ngraph TD\nA-->B\n```\n";
     let findings = check_figures(pdf_text, md_text);
@@ -340,7 +340,7 @@ fn test_figure_covered_by_mermaid() {
 
 #[test]
 fn test_figure_not_covered_returns_high_finding() {
-    use crane_cli::core::figure_checker::check_figures;
+    use crane_cli::domain::figure_checker::check_figures;
     let pdf_text = "See Figure 3 for details.";
     let md_text = "# Section\n\nNo figures here.";
     let findings = check_figures(pdf_text, md_text);
@@ -355,14 +355,14 @@ fn test_figure_not_covered_returns_high_finding() {
 
 #[test]
 fn test_valid_flowchart_ok() {
-    use crane_cli::core::mermaid_validator::validate_block;
+    use crane_cli::domain::mermaid_validator::validate_block;
     let content = "flowchart TD\nA --> B\n";
     assert!(validate_block(content).is_ok());
 }
 
 #[test]
 fn test_unknown_type_error() {
-    use crane_cli::core::mermaid_validator::validate_block;
+    use crane_cli::domain::mermaid_validator::validate_block;
     let content = "xyz\nA --> B\n";
     let result = validate_block(content);
     assert!(result.is_err());
@@ -375,7 +375,7 @@ fn test_unknown_type_error() {
 
 #[test]
 fn test_unmatched_brackets_error() {
-    use crane_cli::core::mermaid_validator::validate_block;
+    use crane_cli::domain::mermaid_validator::validate_block;
     let content = "graph TD\nA[Start --> B\n";
     let result = validate_block(content);
     assert!(result.is_err());
@@ -388,14 +388,14 @@ fn test_unmatched_brackets_error() {
 
 #[test]
 fn test_clean_text_zero_error_rate() {
-    use crane_cli::core::ocr_assessor::estimate_ocr_error_rate;
+    use crane_cli::domain::ocr_assessor::estimate_ocr_error_rate;
     let rate = estimate_ocr_error_rate("This is clean text with normal words.");
     assert!(rate < 0.01, "Clean text should have near-zero error rate");
 }
 
 #[test]
 fn test_high_error_rate_above_threshold() {
-    use crane_cli::core::ocr_assessor::estimate_ocr_error_rate;
+    use crane_cli::domain::ocr_assessor::estimate_ocr_error_rate;
     // Long alpha run (≥30 chars) triggers error pattern
     let garbled = "abcdefghijklmnopqrstuvwxyzabcdefghij"; // 36 chars
     let rate = estimate_ocr_error_rate(garbled);
@@ -404,7 +404,7 @@ fn test_high_error_rate_above_threshold() {
 
 #[test]
 fn test_extract_ocr_sections_from_md() {
-    use crane_cli::core::ocr_assessor::extract_ocr_sections;
+    use crane_cli::domain::ocr_assessor::extract_ocr_sections;
     let md = "# Doc\n\n<!-- OCR: some extracted text here -->\n\nNormal text";
     let sections = extract_ocr_sections(md);
     assert_eq!(sections.len(), 1);
@@ -418,7 +418,7 @@ fn test_extract_ocr_sections_from_md() {
 
 #[test]
 fn test_utc7_timestamp_format() {
-    use crane_cli::core::report_manager::utc7_timestamp;
+    use crane_cli::domain::report_manager::utc7_timestamp;
     let ts = utc7_timestamp();
     let re = regex::Regex::new(r"^\d{4}-\d{2}-\d{2}--\d{2}-\d{2}$").expect("regex");
     assert!(re.is_match(&ts), "Timestamp '{ts}' should match pattern");
@@ -426,7 +426,7 @@ fn test_utc7_timestamp_format() {
 
 #[test]
 fn test_init_report_creates_file() {
-    use crane_cli::core::report_manager::init_report_in;
+    use crane_cli::domain::report_manager::init_report_in;
     let dir = tempfile::tempdir().expect("tempdir");
     let report_dir = dir.path().to_str().expect("path str");
     let path =
@@ -442,7 +442,7 @@ fn test_init_report_creates_file() {
 
 #[test]
 fn test_finalize_report_updates_status() {
-    use crane_cli::core::report_manager::{finalize_report, init_report_in};
+    use crane_cli::domain::report_manager::{finalize_report, init_report_in};
     let dir = tempfile::tempdir().expect("tempdir");
     let report_dir = dir.path().to_str().expect("path str");
     let path = init_report_in("finalize-scope", "a.pdf", "b.md", report_dir).expect("init report");
@@ -458,7 +458,7 @@ fn test_finalize_report_updates_status() {
 
 #[test]
 fn test_stable_key_is_deterministic() {
-    use crane_cli::core::skiplist_manager::stable_key;
+    use crane_cli::domain::skiplist_manager::stable_key;
     let k1 = stable_key("doc.md", "text-completeness", "Missing section");
     let k2 = stable_key("doc.md", "text-completeness", "Missing section");
     assert_eq!(k1, k2);
@@ -466,7 +466,7 @@ fn test_stable_key_is_deterministic() {
 
 #[test]
 fn test_stable_key_differs_for_different_inputs() {
-    use crane_cli::core::skiplist_manager::stable_key;
+    use crane_cli::domain::skiplist_manager::stable_key;
     let k1 = stable_key("doc.md", "text-completeness", "Missing section");
     let k2 = stable_key("doc.md", "text-completeness", "Other section");
     assert_ne!(k1, k2);
@@ -474,7 +474,7 @@ fn test_stable_key_differs_for_different_inputs() {
 
 #[test]
 fn test_stable_key_is_16_hex_chars() {
-    use crane_cli::core::skiplist_manager::stable_key;
+    use crane_cli::domain::skiplist_manager::stable_key;
     let k = stable_key("a", "b", "c");
     assert_eq!(k.len(), 16);
     assert!(k.chars().all(|c| c.is_ascii_hexdigit()));
@@ -482,7 +482,7 @@ fn test_stable_key_is_16_hex_chars() {
 
 #[test]
 fn test_add_returns_true_for_new_entry() {
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist.md");
     let path_str = path.to_str().expect("path");
@@ -498,7 +498,7 @@ fn test_add_returns_true_for_new_entry() {
 
 #[test]
 fn test_add_returns_false_for_duplicate() {
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist-dup.md");
     let path_str = path.to_str().expect("path");
@@ -510,7 +510,7 @@ fn test_add_returns_false_for_duplicate() {
 
 #[test]
 fn test_check_finds_existing_entry() {
-    use crane_cli::core::skiplist_manager::{add_to, check_in};
+    use crane_cli::domain::skiplist_manager::{add_to, check_in};
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist-check.md");
     let path_str = path.to_str().expect("path");
@@ -529,8 +529,8 @@ fn test_check_finds_existing_entry() {
 
 #[test]
 fn test_cache_miss_calls_inner_and_stores() {
-    use crane_cli::adapters::FakePdfAdapter;
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::FakePdfAdapter;
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -546,8 +546,8 @@ fn test_cache_miss_calls_inner_and_stores() {
 
 #[test]
 fn test_cache_hit_returns_stored_text() {
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     // Use the real sample-text.pdf fixture so SHA can be computed
@@ -728,7 +728,7 @@ fn test_run_skiplist_add_creates_entry() {
     // run_add_inner uses CRANE_SKIPLIST_PATH env; set it via the core add_to directly.
     // Instead, we call run_add_inner and let it use whatever CRANE_SKIPLIST_PATH is set to.
     // For test isolation, test via core add_to:
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist-add-test.md");
     let path_str = path.to_str().expect("path");
@@ -757,7 +757,7 @@ fn test_run_skiplist_add_creates_entry() {
 
 #[test]
 fn test_run_skiplist_add_dedup() {
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist-dedup.md");
     let path_str = path.to_str().expect("path");
@@ -770,7 +770,7 @@ fn test_run_skiplist_add_dedup() {
 #[test]
 fn test_run_skiplist_check_found_via_command() {
     use crane_cli::commands::skiplist_commands::run_check_inner;
-    use crane_cli::core::skiplist_manager::{add_to, check_in};
+    use crane_cli::domain::skiplist_manager::{add_to, check_in};
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist-check.md");
     let path_str = path.to_str().expect("path");
@@ -791,11 +791,11 @@ fn test_run_skiplist_check_found_via_command() {
 #[test]
 fn test_run_skiplist_list_outputs_json() {
     use crane_cli::commands::skiplist_commands::run_list_inner;
-    use crane_cli::core::skiplist_manager::list_from;
+    use crane_cli::domain::skiplist_manager::list_from;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("skiplist-list.md");
     let path_str = path.to_str().expect("path");
-    crane_cli::core::skiplist_manager::add_to(
+    crane_cli::domain::skiplist_manager::add_to(
         "list.md",
         "table-integrity",
         "missing table",
@@ -821,7 +821,7 @@ fn test_run_report_finalize_updates_status() {
     let report_dir = dir.path().to_str().expect("path");
 
     // Init a report and finalize it
-    let exit = crane_cli::core::report_manager::init_report_in(
+    let exit = crane_cli::domain::report_manager::init_report_in(
         "finalize-scope",
         "a.pdf",
         "b.md",
@@ -857,8 +857,8 @@ fn test_run_report_finalize_updates_status() {
 
 #[test]
 fn test_run_info_outputs_valid_json() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::pdf_commands::run_info_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("hello world", 3, 1024);
     let mut buf = Vec::new();
     let exit = run_info_inner(&adapter, "test.pdf", &mut buf);
@@ -871,8 +871,8 @@ fn test_run_info_outputs_valid_json() {
 
 #[test]
 fn test_run_type_text_exits_0() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::pdf_commands::run_type_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     // > 10 words
     let text = "one two three four five six seven eight nine ten eleven";
     let adapter = FakePdfAdapter::new(text, 1, 512);
@@ -885,8 +885,8 @@ fn test_run_type_text_exits_0() {
 
 #[test]
 fn test_run_type_image_exits_1() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::pdf_commands::run_type_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     // ≤ 10 words
     let adapter = FakePdfAdapter::new("one two three", 1, 512);
     let mut buf = Vec::new();
@@ -898,8 +898,8 @@ fn test_run_type_image_exits_1() {
 
 #[test]
 fn test_run_extract_to_stdout() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::pdf_commands::run_extract_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("extracted content here", 2, 512);
     let mut buf = Vec::new();
     let exit = run_extract_inner(&adapter, "test.pdf", 1, 2, None, &mut buf);
@@ -910,8 +910,8 @@ fn test_run_extract_to_stdout() {
 
 #[test]
 fn test_run_text_check_empty_for_matching() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::text_commands::run_check_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("hello world content", 1, 100);
     let md_text = "hello world content";
     let mut buf = Vec::new();
@@ -987,7 +987,7 @@ fn test_run_ocr_quality_no_sections_exits_0() {
 #[test]
 fn test_run_report_init_creates_file() {
     use crane_cli::commands::report_commands::run_init_inner;
-    use crane_cli::core::report_manager::init_report_in;
+    use crane_cli::domain::report_manager::init_report_in;
     let dir = tempfile::tempdir().expect("tempdir");
     let report_dir = dir.path().to_str().expect("path");
     // Use init_report_in to use custom dir, then test run_finalize_inner separately
@@ -1010,8 +1010,8 @@ fn test_run_report_init_creates_file() {
 
 #[test]
 fn test_run_check_all_empty_for_matching() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::check_all_commands::run_check_all_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("hello world content", 1, 100);
     let md_text = "hello world content";
     let mut buf = Vec::new();
@@ -1023,8 +1023,8 @@ fn test_run_check_all_empty_for_matching() {
 
 #[test]
 fn test_run_check_all_finds_missing_content() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::check_all_commands::run_check_all_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new(
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ missing section text here",
         1,
@@ -1043,8 +1043,8 @@ fn test_run_check_all_finds_missing_content() {
 /// A PDF adapter that always returns errors, for testing error-handling paths.
 struct ErrorPdfAdapter;
 
-impl crane_cli::adapters::PdfAdapter for ErrorPdfAdapter {
-    fn get_metadata(&self, _path: &str) -> Result<crane_cli::models::PdfMetadata, String> {
+impl crane_cli::infrastructure::PdfAdapter for ErrorPdfAdapter {
+    fn get_metadata(&self, _path: &str) -> Result<crane_cli::domain::PdfMetadata, String> {
         Err("simulated metadata error".to_string())
     }
 
@@ -1095,8 +1095,8 @@ fn test_run_extract_error_adapter_returns_1() {
 
 #[test]
 fn test_run_extract_to_file_succeeds() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::pdf_commands::run_extract_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("file output text content", 1, 100);
     let dir = tempfile::tempdir().expect("tempdir");
     let out_path = dir.path().join("output.txt");
@@ -1110,8 +1110,8 @@ fn test_run_extract_to_file_succeeds() {
 
 #[test]
 fn test_run_extract_to_invalid_file_returns_1() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::pdf_commands::run_extract_inner;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("some text", 1, 100);
     let mut buf = Vec::new();
     // Write to a path that cannot exist (directory component missing)
@@ -1202,7 +1202,7 @@ fn test_run_heading_infer_no_numbering_returns_null_depth() {
 
 #[test]
 fn test_check_ocr_quality_no_sections_returns_empty() {
-    use crane_cli::core::ocr_assessor::check_ocr_quality;
+    use crane_cli::domain::ocr_assessor::check_ocr_quality;
     let md = "# Normal doc\n\nNo OCR tags here.";
     let findings = check_ocr_quality(md);
     assert!(findings.is_empty());
@@ -1210,7 +1210,7 @@ fn test_check_ocr_quality_no_sections_returns_empty() {
 
 #[test]
 fn test_check_ocr_quality_clean_section_returns_empty() {
-    use crane_cli::core::ocr_assessor::check_ocr_quality;
+    use crane_cli::domain::ocr_assessor::check_ocr_quality;
     let md = "<!-- OCR: The quick brown fox jumps over the lazy dog -->";
     let findings = check_ocr_quality(md);
     assert!(findings.is_empty(), "Clean text should have no findings");
@@ -1218,7 +1218,7 @@ fn test_check_ocr_quality_clean_section_returns_empty() {
 
 #[test]
 fn test_check_ocr_quality_critical_above_10_percent() {
-    use crane_cli::core::ocr_assessor::check_ocr_quality;
+    use crane_cli::domain::ocr_assessor::check_ocr_quality;
     // Long alpha run (30+ chars) to trigger high error rate > 10%
     // The string is 36 non-space chars; pattern matches 36 chars → rate = 36/36 = 1.0 > 0.10
     let md = "<!-- OCR: abcdefghijklmnopqrstuvwxyzabcd -->";
@@ -1233,7 +1233,7 @@ fn test_check_ocr_quality_critical_above_10_percent() {
 
 #[test]
 fn test_check_ocr_quality_medium_between_2_and_5_percent() {
-    use crane_cli::core::ocr_assessor::check_ocr_quality;
+    use crane_cli::domain::ocr_assessor::check_ocr_quality;
     // Use 5-char lI1 run ("lllll") + 200 short-word normal chars (no 30+ alpha run).
     // Normal part: "ok " repeated — each segment is 2 chars, spaces stripped for total.
     // 67 repetitions of "ok " = 67*2=134 non-space chars + "lllll"=5 → total=139, errors=5
@@ -1250,7 +1250,7 @@ fn test_check_ocr_quality_medium_between_2_and_5_percent() {
 
 #[test]
 fn test_check_ocr_quality_high_between_5_and_10_percent() {
-    use crane_cli::core::ocr_assessor::check_ocr_quality;
+    use crane_cli::domain::ocr_assessor::check_ocr_quality;
     // 5-char lI1 run + short normal words → rate between 5% and 10%.
     // "ok " * 12 = 24 non-space chars + "lllll" = 29 total; rate = 5/29 ≈ 17.2% → CRITICAL
     // Need rate 5–10%: 5 error chars needs 50–100 total non-space.
@@ -1268,7 +1268,7 @@ fn test_check_ocr_quality_high_between_5_and_10_percent() {
 
 #[test]
 fn test_estimate_ocr_error_rate_empty_text() {
-    use crane_cli::core::ocr_assessor::estimate_ocr_error_rate;
+    use crane_cli::domain::ocr_assessor::estimate_ocr_error_rate;
     let rate = estimate_ocr_error_rate("");
     assert!(
         rate == 0.0,
@@ -1278,14 +1278,14 @@ fn test_estimate_ocr_error_rate_empty_text() {
 
 #[test]
 fn test_extract_ocr_sections_no_tags_returns_empty() {
-    use crane_cli::core::ocr_assessor::extract_ocr_sections;
+    use crane_cli::domain::ocr_assessor::extract_ocr_sections;
     let sections = extract_ocr_sections("# No OCR tags\n\nJust normal text.");
     assert!(sections.is_empty());
 }
 
 #[test]
 fn test_extract_ocr_sections_multiple_tags() {
-    use crane_cli::core::ocr_assessor::extract_ocr_sections;
+    use crane_cli::domain::ocr_assessor::extract_ocr_sections;
     let md = "<!-- OCR: first section --> some text <!-- OCR: second section -->";
     let sections = extract_ocr_sections(md);
     assert_eq!(sections.len(), 2);
@@ -1299,7 +1299,7 @@ fn test_extract_ocr_sections_multiple_tags() {
 
 #[test]
 fn test_detect_table_with_equals_separator() {
-    use crane_cli::core::table_checker::detect_tables;
+    use crane_cli::domain::table_checker::detect_tables;
     let text = "| A | B |\n|===|===|\n| 1 | 2 |\n";
     let tables = detect_tables(text);
     assert_eq!(tables.len(), 1);
@@ -1308,7 +1308,7 @@ fn test_detect_table_with_equals_separator() {
 
 #[test]
 fn test_check_tables_row_count_mismatch_is_medium() {
-    use crane_cli::core::table_checker::check_tables;
+    use crane_cli::domain::table_checker::check_tables;
     // PDF table: 3 cols, 3 rows (header + 2 data); MD table: 3 cols, 1 row (header only)
     let pdf_text = "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |\n| 4 | 5 | 6 |\n";
     let md_text = "| A | B | C |\n|---|---|---|\n";
@@ -1322,7 +1322,7 @@ fn test_check_tables_row_count_mismatch_is_medium() {
 
 #[test]
 fn test_detect_tables_header_only_no_data_rows() {
-    use crane_cli::core::table_checker::detect_tables;
+    use crane_cli::domain::table_checker::detect_tables;
     // Header + separator but no data rows
     let text = "| A | B |\n|---|---|\n";
     let tables = detect_tables(text);
@@ -1336,7 +1336,7 @@ fn test_detect_tables_header_only_no_data_rows() {
 
 #[test]
 fn test_parse_entries_malformed_heading_is_skipped() {
-    use crane_cli::core::skiplist_manager::{add_to, list_from};
+    use crane_cli::domain::skiplist_manager::{add_to, list_from};
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("malformed.md");
     let path_str = path.to_str().expect("path");
@@ -1365,7 +1365,7 @@ fn test_parse_entries_malformed_heading_is_skipped() {
 
 #[test]
 fn test_append_to_existing_file_without_blank_line() {
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("existing.md");
     let path_str = path.to_str().expect("path");
@@ -1387,7 +1387,7 @@ fn test_append_to_existing_file_without_blank_line() {
 
 #[test]
 fn test_list_from_filters_by_basename() {
-    use crane_cli::core::skiplist_manager::{add_to, list_from};
+    use crane_cli::domain::skiplist_manager::{add_to, list_from};
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("filter-test.md");
     let path_str = path.to_str().expect("path");
@@ -1410,7 +1410,7 @@ fn test_list_from_filters_by_basename() {
 
 #[test]
 fn test_init_report_in_twice_in_succession_extends_chain() {
-    use crane_cli::core::report_manager::init_report_in;
+    use crane_cli::domain::report_manager::init_report_in;
     // Two rapid calls to init_report_in (same scope, same process cwd) should
     // produce paths that share a common chain prefix (the second extends the first).
     // This exercises the get_or_extend_chain "fresh chain extend" path.
@@ -1429,7 +1429,7 @@ fn test_init_report_in_twice_in_succession_extends_chain() {
 
 #[test]
 fn test_finalize_nonexistent_report_returns_error() {
-    use crane_cli::core::report_manager::finalize_report;
+    use crane_cli::domain::report_manager::finalize_report;
     let result = finalize_report("/nonexistent/path/audit.md", "PASS");
     assert!(result.is_err(), "Finalizing nonexistent report should fail");
 }
@@ -1440,7 +1440,7 @@ fn test_finalize_nonexistent_report_returns_error() {
 
 #[test]
 fn test_resolve_skiplist_path_uses_default() {
-    use crane_cli::core::skiplist_manager::resolve_skiplist_path;
+    use crane_cli::domain::skiplist_manager::resolve_skiplist_path;
     // When env var is not set, should return default path
     // (We can't unset env vars safely in parallel tests, so just verify it doesn't panic)
     let path = resolve_skiplist_path();
@@ -1453,7 +1453,7 @@ fn test_resolve_skiplist_path_uses_default() {
 
 #[test]
 fn test_public_wrappers_execute_without_panic() {
-    use crane_cli::adapters::FakePdfAdapter;
+    use crane_cli::infrastructure::FakePdfAdapter;
 
     // nesting
     crane_cli::commands::nesting_commands::run_infer("- Item");
@@ -1514,14 +1514,14 @@ fn test_public_wrappers_execute_without_panic() {
 
 #[test]
 fn test_compute_similarity_identical_returns_1() {
-    use crane_cli::core::text_checker::compute_similarity;
+    use crane_cli::domain::text_checker::compute_similarity;
     let s = compute_similarity("hello world", "hello world");
     assert!((s - 1.0).abs() < f64::EPSILON);
 }
 
 #[test]
 fn test_compute_similarity_different_returns_less_than_1() {
-    use crane_cli::core::text_checker::compute_similarity;
+    use crane_cli::domain::text_checker::compute_similarity;
     let s = compute_similarity("hello world", "goodbye universe");
     assert!(s < 1.0);
 }
@@ -1533,7 +1533,7 @@ fn test_compute_similarity_different_returns_less_than_1() {
 #[test]
 fn test_run_skiplist_check_found_returns_0() {
     use crane_cli::commands::skiplist_commands::run_check_inner;
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("check-found.md");
     let path_str = path.to_str().expect("path");
@@ -1557,7 +1557,7 @@ fn test_run_skiplist_check_found_returns_0() {
 
 #[test]
 fn test_validate_block_empty_content_returns_error() {
-    use crane_cli::core::mermaid_validator::validate_block;
+    use crane_cli::domain::mermaid_validator::validate_block;
     let result = validate_block("   \n  \n");
     assert!(result.is_err());
     assert!(
@@ -1569,7 +1569,7 @@ fn test_validate_block_empty_content_returns_error() {
 
 #[test]
 fn test_validate_block_unmatched_parens_returns_error() {
-    use crane_cli::core::mermaid_validator::validate_block;
+    use crane_cli::domain::mermaid_validator::validate_block;
     let content = "graph TD\nA(Start --> B\n";
     let result = validate_block(content);
     assert!(result.is_err());
@@ -1582,7 +1582,7 @@ fn test_validate_block_unmatched_parens_returns_error() {
 
 #[test]
 fn test_check_nesting_none_match_produces_no_finding() {
-    use crane_cli::core::nesting_checker::check_nesting;
+    use crane_cli::domain::nesting_checker::check_nesting;
     // PDF has "- SubItem" but MD has completely different text → no item match → None
     let pdf_text = "- UniquePdfOnlyItem";
     let md_text = "- TotallyDifferentMdItem";
@@ -1600,7 +1600,7 @@ fn test_check_nesting_none_match_produces_no_finding() {
 
 #[test]
 fn test_figure_covered_by_placeholder_with_number() {
-    use crane_cli::core::figure_checker::check_figures;
+    use crane_cli::domain::figure_checker::check_figures;
     // PDF mentions "Figure 2"; MD has [Figure 2] placeholder — covered by placeholder pattern
     let pdf_text = "See Figure 2 for details.";
     let md_text = "# Section\n\n[Figure 2: Architecture diagram placeholder]\n";
@@ -1617,7 +1617,7 @@ fn test_figure_covered_by_placeholder_with_number() {
 
 #[test]
 fn test_check_headings_no_match_produces_no_finding() {
-    use crane_cli::core::heading_checker::check_headings;
+    use crane_cli::domain::heading_checker::check_headings;
     // PDF has numbered heading but MD has no heading with matching text → no finding emitted
     let pdf_text = "2.3 Overview";
     let md_text = "## Completely Different Section\n\nContent.\n";
@@ -1636,7 +1636,7 @@ fn test_check_headings_no_match_produces_no_finding() {
 
 #[test]
 fn test_add_to_path_with_nonexistent_parent_creates_dir() {
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     // Use a nested path that doesn't exist yet
     let nested = dir.path().join("subdir").join("nested").join("skiplist.md");
@@ -1662,7 +1662,7 @@ fn test_lopdf_adapter_get_metadata_real_pdf() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     let meta = adapter.get_metadata(FIXTURE_PDF).expect("get metadata");
     assert!(meta.pages > 0, "Should have at least one page");
@@ -1675,7 +1675,7 @@ fn test_lopdf_adapter_sample_text_real_pdf() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     let text = adapter.sample_text(FIXTURE_PDF, 1).expect("sample text");
     // sample-text.pdf contains text content
@@ -1687,7 +1687,7 @@ fn test_lopdf_adapter_extract_pages_real_pdf() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     let text = adapter
         .extract_pages(FIXTURE_PDF, 1, 1)
@@ -1703,7 +1703,7 @@ fn test_lopdf_adapter_sample_text_0_pages_returns_empty() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     // page_count = 0 → no pages selected → empty string
     let text = adapter.sample_text(FIXTURE_PDF, 0).expect("sample 0 pages");
@@ -1715,7 +1715,7 @@ fn test_lopdf_adapter_extract_pages_out_of_range() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     // Pages 999-1000 — far beyond the fixture's page count → empty
     let text = adapter
@@ -1726,7 +1726,7 @@ fn test_lopdf_adapter_extract_pages_out_of_range() {
 
 #[test]
 fn test_lopdf_adapter_get_metadata_nonexistent_returns_error() {
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     let result = adapter.get_metadata("nonexistent.pdf");
     assert!(result.is_err(), "Nonexistent PDF should return error");
@@ -1734,7 +1734,7 @@ fn test_lopdf_adapter_get_metadata_nonexistent_returns_error() {
 
 #[test]
 fn test_lopdf_adapter_sample_text_nonexistent_returns_error() {
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     let result = adapter.sample_text("nonexistent.pdf", 1);
     assert!(result.is_err(), "Nonexistent PDF should return error");
@@ -1742,7 +1742,7 @@ fn test_lopdf_adapter_sample_text_nonexistent_returns_error() {
 
 #[test]
 fn test_lopdf_adapter_extract_pages_nonexistent_returns_error() {
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     let adapter = LopdfAdapter::new();
     let result = adapter.extract_pages("nonexistent.pdf", 1, 1);
     assert!(result.is_err(), "Nonexistent PDF should return error");
@@ -1750,14 +1750,14 @@ fn test_lopdf_adapter_extract_pages_nonexistent_returns_error() {
 
 #[test]
 fn test_lopdf_adapter_default() {
-    use crane_cli::adapters::LopdfAdapter;
+    use crane_cli::infrastructure::LopdfAdapter;
     let _adapter = LopdfAdapter::default();
     // Just verify it can be constructed
 }
 
 #[test]
 fn test_lopdf_adapter_get_metadata_with_info_dict() {
-    use crane_cli::adapters::{LopdfAdapter, PdfAdapter};
+    use crane_cli::infrastructure::{LopdfAdapter, PdfAdapter};
     #[allow(unused_imports)]
     use lopdf::dictionary;
     use lopdf::{Dictionary, Document, Object, Stream};
@@ -1827,8 +1827,8 @@ fn test_cache_sample_text_miss_then_hit_with_real_pdf() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -1850,8 +1850,8 @@ fn test_cache_extract_pages_miss_then_hit_with_real_pdf() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -1873,8 +1873,8 @@ fn test_cache_get_metadata_passes_through() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -1890,7 +1890,7 @@ fn test_cache_get_metadata_passes_through() {
 
 #[test]
 fn test_default_cache_dir_returns_nonempty() {
-    use crane_cli::core::pdf_extraction_cache::default_cache_dir;
+    use crane_cli::domain::pdf_extraction_cache::default_cache_dir;
     let dir = default_cache_dir();
     assert!(!dir.is_empty(), "default cache dir should not be empty");
     assert!(dir.contains("crane"), "should contain 'crane' in path");
@@ -1898,7 +1898,7 @@ fn test_default_cache_dir_returns_nonempty() {
 
 #[test]
 fn test_default_cache_dir_uses_xdg_when_set() {
-    use crane_cli::core::pdf_extraction_cache::default_cache_dir;
+    use crane_cli::domain::pdf_extraction_cache::default_cache_dir;
     // We cannot set env vars safely in parallel tests, so just verify
     // the function returns something reasonable
     let dir = default_cache_dir();
@@ -1910,8 +1910,8 @@ fn test_cache_sample_text_different_page_counts_use_different_keys() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -1931,8 +1931,8 @@ fn test_cache_extract_pages_different_ranges_are_independent() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -1967,7 +1967,7 @@ fn test_run_check_all_with_error_adapter_returns_1_coverage() {
 
 #[test]
 fn test_report_manager_get_or_extend_chain_fresh() {
-    use crane_cli::core::report_manager::init_report_in;
+    use crane_cli::domain::report_manager::init_report_in;
     let dir = tempfile::tempdir().expect("tempdir");
     let report_dir = dir.path().to_str().expect("path str");
     // Fresh scope — creates a new chain
@@ -1979,7 +1979,7 @@ fn test_report_manager_get_or_extend_chain_fresh() {
 
 #[test]
 fn test_report_manager_chain_scope_cleanup() {
-    use crane_cli::core::report_manager::{finalize_report, init_report_in};
+    use crane_cli::domain::report_manager::{finalize_report, init_report_in};
     let dir = tempfile::tempdir().expect("tempdir");
     let report_dir = dir.path().to_str().expect("path str");
     let scope = "cleanup-scope-test";
@@ -1997,7 +1997,7 @@ fn test_report_manager_chain_scope_cleanup() {
 
 #[test]
 fn test_get_or_extend_chain_stale_chain_starts_fresh() {
-    use crane_cli::core::report_manager::get_or_extend_chain;
+    use crane_cli::domain::report_manager::get_or_extend_chain;
 
     // Scope for this test — use a name that won't conflict with other tests
     let scope = "stale-chain-unit-test";
@@ -2031,7 +2031,7 @@ fn test_get_or_extend_chain_stale_chain_starts_fresh() {
 
 #[test]
 fn test_check_headings_depth_matches_no_finding() {
-    use crane_cli::core::heading_checker::check_headings;
+    use crane_cli::domain::heading_checker::check_headings;
     // "3. Title" → depth 2; "## Title" → H2 — they match
     let pdf_text = "3. My Heading";
     let md_text = "## My Heading\n\nContent.\n";
@@ -2048,7 +2048,7 @@ fn test_check_headings_depth_matches_no_finding() {
 
 #[test]
 fn test_figure_covered_by_fig_label_in_md() {
-    use crane_cli::core::figure_checker::check_figures;
+    use crane_cli::domain::figure_checker::check_figures;
     // PDF mentions "Figure 5"; MD also mentions "Figure 5" (no mermaid/placeholder)
     let pdf_text = "See Figure 5 for the architecture.";
     let md_text = "# Section\n\nSee Figure 5 for details.\n";
@@ -2065,7 +2065,7 @@ fn test_figure_covered_by_fig_label_in_md() {
 
 #[test]
 fn test_estimate_ocr_error_rate_with_00000_pattern() {
-    use crane_cli::core::ocr_assessor::estimate_ocr_error_rate;
+    use crane_cli::domain::ocr_assessor::estimate_ocr_error_rate;
     // "OOOOO" triggers the 0Oo pattern (5+ chars)
     let text = "OOOOO";
     let rate = estimate_ocr_error_rate(text);
@@ -2074,7 +2074,7 @@ fn test_estimate_ocr_error_rate_with_00000_pattern() {
 
 #[test]
 fn test_estimate_ocr_error_rate_with_lI1_pattern() {
-    use crane_cli::core::ocr_assessor::estimate_ocr_error_rate;
+    use crane_cli::domain::ocr_assessor::estimate_ocr_error_rate;
     // "IIIII" (5 I chars) triggers the lI1 pattern
     let text = "IIIII";
     let rate = estimate_ocr_error_rate(text);
@@ -2087,7 +2087,7 @@ fn test_estimate_ocr_error_rate_with_lI1_pattern() {
 
 #[test]
 fn test_all_valid_mermaid_types_are_accepted() {
-    use crane_cli::core::mermaid_validator::validate_block;
+    use crane_cli::domain::mermaid_validator::validate_block;
     let valid_types = [
         "graph TD\nA --> B",
         "flowchart TD\nA --> B",
@@ -2123,7 +2123,7 @@ fn test_all_valid_mermaid_types_are_accepted() {
 
 #[test]
 fn test_segment_is_present_multiword_not_found_returns_false() {
-    use crane_cli::core::text_checker::segment_is_present;
+    use crane_cli::domain::text_checker::segment_is_present;
     // Multi-word missing segment: no substring match, and multi-word → no fuzzy fallback
     assert!(!segment_is_present(
         "complex missing multi-word segment",
@@ -2140,8 +2140,8 @@ fn test_cache_write_atomic_creates_json_file() {
     if !fixture_available() {
         return;
     }
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -2188,7 +2188,7 @@ fn test_run_report_finalize_outputs_status_json() {
     let report_dir = dir.path().to_str().expect("path str");
 
     // Create a report using core
-    let path = crane_cli::core::report_manager::init_report_in(
+    let path = crane_cli::domain::report_manager::init_report_in(
         "finalize-json-scope",
         "f.pdf",
         "g.md",
@@ -2216,7 +2216,7 @@ fn test_run_report_finalize_outputs_status_json() {
 
 #[test]
 fn test_check_nesting_medium_when_md_level_greater() {
-    use crane_cli::core::nesting_checker::check_nesting;
+    use crane_cli::domain::nesting_checker::check_nesting;
     // PDF has item at level 1; MD has it at level 2 (not inverted) → MEDIUM
     let pdf_text = "- Item";
     let md_text = "  - Item";
@@ -2231,7 +2231,7 @@ fn test_check_nesting_medium_when_md_level_greater() {
 
 #[test]
 fn test_check_tables_exact_match_no_finding() {
-    use crane_cli::core::table_checker::check_tables;
+    use crane_cli::domain::table_checker::check_tables;
     let text = "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |\n";
     let findings = check_tables(text, text);
     assert!(findings.is_empty(), "Exact match should produce no finding");
@@ -2243,8 +2243,8 @@ fn test_check_tables_exact_match_no_finding() {
 
 #[test]
 fn test_run_check_all_public_wrapper_matches() {
-    use crane_cli::adapters::FakePdfAdapter;
     use crane_cli::commands::check_all_commands::run_check_all;
+    use crane_cli::infrastructure::FakePdfAdapter;
     let adapter = FakePdfAdapter::new("matching content for all", 1, 100);
     let exit = run_check_all(&adapter, "t.pdf", "matching content for all");
     assert_eq!(exit, 0);
@@ -2256,7 +2256,7 @@ fn test_run_check_all_public_wrapper_matches() {
 
 #[test]
 fn test_skiplist_entry_rendered_contains_all_fields() {
-    use crane_cli::core::skiplist_manager::add_to;
+    use crane_cli::domain::skiplist_manager::add_to;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("render-test.md");
     let path_str = path.to_str().expect("path");
@@ -2289,7 +2289,7 @@ fn test_skiplist_entry_rendered_contains_all_fields() {
 
 #[test]
 fn test_extract_md_headings_various_depths() {
-    use crane_cli::core::heading_checker::extract_md_headings;
+    use crane_cli::domain::heading_checker::extract_md_headings;
     let md = "# H1\n## H2\n### H3\n#### H4\n##### H5";
     let headings = extract_md_headings(md);
     assert_eq!(headings.len(), 5);
@@ -2306,7 +2306,7 @@ fn test_extract_md_headings_various_depths() {
 
 #[test]
 fn test_extract_blocks_multiple_mermaid_blocks() {
-    use crane_cli::core::mermaid_validator::extract_blocks;
+    use crane_cli::domain::mermaid_validator::extract_blocks;
     let md =
         "```mermaid\ngraph TD\nA-->B\n```\n\nSome text.\n\n```mermaid\nflowchart LR\nX-->Y\n```\n";
     let blocks = extract_blocks(md);
@@ -2317,7 +2317,7 @@ fn test_extract_blocks_multiple_mermaid_blocks() {
 
 #[test]
 fn test_extract_blocks_empty_md_returns_empty() {
-    use crane_cli::core::mermaid_validator::extract_blocks;
+    use crane_cli::domain::mermaid_validator::extract_blocks;
     let blocks = extract_blocks("# No mermaid blocks here");
     assert!(blocks.is_empty());
 }
@@ -2328,7 +2328,7 @@ fn test_extract_blocks_empty_md_returns_empty() {
 
 #[test]
 fn test_check_in_returns_false_for_empty_skiplist() {
-    use crane_cli::core::skiplist_manager::check_in;
+    use crane_cli::domain::skiplist_manager::check_in;
     let dir = tempfile::tempdir().expect("tempdir");
     let path = dir.path().join("empty-check.md");
     let path_str = path.to_str().expect("path");
@@ -2343,8 +2343,8 @@ fn test_check_in_returns_false_for_empty_skiplist() {
 
 #[test]
 fn test_cache_nonexistent_pdf_falls_through_to_inner() {
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");
@@ -2363,8 +2363,8 @@ fn test_cache_nonexistent_pdf_falls_through_to_inner() {
 
 #[test]
 fn test_cache_extract_pages_nonexistent_falls_through() {
-    use crane_cli::adapters::{FakePdfAdapter, PdfAdapter};
-    use crane_cli::core::pdf_extraction_cache::wrap;
+    use crane_cli::domain::pdf_extraction_cache::wrap;
+    use crane_cli::infrastructure::{FakePdfAdapter, PdfAdapter};
     use std::sync::Arc;
 
     let dir = tempfile::tempdir().expect("tempdir");

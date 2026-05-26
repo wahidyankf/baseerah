@@ -2,8 +2,8 @@
 #![allow(clippy::missing_docs_in_private_items)]
 use std::fmt::Write as FmtWrite;
 
-use crate::adapters::PdfAdapter;
-use crate::models::PdfMetadata;
+use crate::domain::PdfMetadata;
+use crate::infrastructure::PdfAdapter;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::sync::Arc;

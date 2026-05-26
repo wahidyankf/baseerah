@@ -1,7 +1,7 @@
 //! Mermaid diagram syntax validator — validates Mermaid blocks in Markdown.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::Finding;
+use crate::domain::Finding;
 use std::collections::HashSet;
 use std::sync::OnceLock;
 

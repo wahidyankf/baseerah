@@ -1,7 +1,7 @@
 //! List nesting depth checker — verifies nesting levels match PDF layout.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::Finding;
+use crate::domain::Finding;
 
 /// A list nesting item extracted from text.
 #[derive(Debug, Clone, PartialEq)]

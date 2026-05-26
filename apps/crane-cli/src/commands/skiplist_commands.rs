@@ -1,7 +1,7 @@
 //! Skip list management subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::skiplist_manager::{add, check, list};
+use crate::domain::skiplist_manager::{add, check, list};
 use std::io::Write;
 
 /// Runs the `crane skiplist add` command, writing `{"added": bool}` JSON to `writer`.

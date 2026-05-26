@@ -1,13 +1,13 @@
 //! Check-all aggregator command for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::adapters::PdfAdapter;
-use crate::core::figure_checker::check_figures;
-use crate::core::heading_checker::check_headings;
-use crate::core::mermaid_validator::validate_md;
-use crate::core::nesting_checker::check_nesting;
-use crate::core::table_checker::check_tables;
-use crate::core::text_checker::check_text;
+use crate::domain::figure_checker::check_figures;
+use crate::domain::heading_checker::check_headings;
+use crate::domain::mermaid_validator::validate_md;
+use crate::domain::nesting_checker::check_nesting;
+use crate::domain::table_checker::check_tables;
+use crate::domain::text_checker::check_text;
+use crate::infrastructure::PdfAdapter;
 use std::io::Write;
 
 /// Runs all check dimensions on a PDF+MD pair, writing JSON findings to `writer`.

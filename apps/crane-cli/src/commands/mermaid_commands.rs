@@ -1,7 +1,7 @@
 //! Mermaid validation subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::mermaid_validator::validate_md;
+use crate::domain::mermaid_validator::validate_md;
 use std::io::Write;
 
 /// Runs the `crane mermaid validate` command, writing JSON findings to `writer`.

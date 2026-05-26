@@ -1,7 +1,7 @@
 //! Nesting subcommands for crane-cli.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::core::nesting_checker::{check_nesting, extract_nesting_levels};
+use crate::domain::nesting_checker::{check_nesting, extract_nesting_levels};
 use std::io::Write;
 
 /// Runs the `crane nesting infer` command, writing JSON nesting items to `writer`.

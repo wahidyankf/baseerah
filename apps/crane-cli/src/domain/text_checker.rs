@@ -1,7 +1,7 @@
 //! Text completeness checker — verifies PDF text exists in Markdown.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::models::{Criticality, Finding};
+use crate::domain::{Criticality, Finding};
 use regex::Regex;
 use std::sync::OnceLock;
 
