@@ -31,6 +31,7 @@ services:
     build:
       context: ../..
       dockerfile: apps/organiclever-be/Dockerfile.integration
+      target: builder
     volumes:
       - ../../specs:/specs:ro
     environment:
