@@ -4,6 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
+- [planning-system-overhaul](./planning-system-overhaul/README.md) — Seven-gap planning system overhaul: worktree auto-provisioning, RED/GREEN/REFACTOR hard rule, mandatory grill before+after plan creation, plan-establishment workflow, markdown archive exclusions, harness-neutrality awareness, and Phase 0 mandate via repo-setup-manager
+
 ## Instructions
 
 **Quick Idea Capture**: For 1-3 liner ideas not ready for formal planning, use `../ideas.md`.
