@@ -7,7 +7,7 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx @hey-api/openapi-ts -i specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml -o apps/organiclever-web/src/generated-contracts -s"
+        "command": "npx @hey-api/openapi-ts -i specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml -o apps/organiclever-web/src/generated-contracts -s && git diff --exit-code -- apps/organiclever-web/src/generated-contracts/"
       },
       "dependsOn": ["organiclever-contracts:bundle"],
       "cache": true,

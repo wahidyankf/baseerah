@@ -7,7 +7,7 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx @hey-api/openapi-ts -i specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml -o apps/ose-app-web/src/generated-contracts -s"
+        "command": "npx @hey-api/openapi-ts -i specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml -o apps/ose-app-web/src/generated-contracts -s && git diff --exit-code -- apps/ose-app-web/src/generated-contracts/"
       },
       "dependsOn": ["ose-app-contracts:bundle"],
       "cache": true,

@@ -7,7 +7,7 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/ose-app-be/generated-contracts --model-package OseAppBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
+        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/ose-app-be/generated-contracts --model-package OseAppBe.Contracts --global-property=models,modelDocs=false,apiDocs=false && git diff --exit-code -- apps/ose-app-be/generated-contracts/"
       },
       "dependsOn": ["ose-app-contracts:bundle"],
       "cache": true,
