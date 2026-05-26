@@ -1,7 +1,8 @@
 services:
   organiclever-be:
     environment:
-      ASPNETCORE_URLS: "http://+:8202"
+      PORT: "8202"
+      CORS_ORIGINS: "*"
 
   organiclever-web:
     environment:
