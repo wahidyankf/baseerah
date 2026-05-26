@@ -7,7 +7,9 @@ contexts:
       breakpoints, accessibility wiring. Owns the root tRPC router that stitches
       per-BC routers.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/ose-web/src/contexts/app-shell
@@ -18,6 +20,9 @@ contexts:
   - name: landing
     summary: Marketing landing surface at / — hero + sections + calls-to-action.
     layers:
+      - domain
+      - application
+      - infrastructure
       - presentation
     code:
       - apps/ose-web/src/contexts/landing
@@ -31,6 +36,7 @@ contexts:
       DTOs; infrastructure owns the filesystem/content-source adapters;
       presentation owns the rendering components.
     layers:
+      - domain
       - application
       - infrastructure
       - presentation
@@ -55,6 +61,7 @@ contexts:
       results; infrastructure owns the index implementation; presentation
       renders the input + results dropdown.
     layers:
+      - domain
       - application
       - infrastructure
       - presentation
@@ -70,7 +77,10 @@ contexts:
   - name: rss-feed
     summary: RSS feed generation route handler. Aggregates published articles into a feed.
     layers:
+      - domain
       - application
+      - infrastructure
+      - presentation
     code:
       - apps/ose-web/src/contexts/rss-feed
     glossary: specs/apps/ose-platform/ddd/ubiquitous-language/rss-feed.md
@@ -85,7 +95,9 @@ contexts:
       SEO metadata + sitemap generation. Application computes per-route
       metadata; presentation injects metadata via Next.js generateMetadata.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/ose-web/src/contexts/seo
@@ -99,7 +111,9 @@ contexts:
   - name: health
     summary: Health probe (tRPC) + system-status diagnostic page.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/ose-web/src/contexts/health
