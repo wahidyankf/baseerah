@@ -7,7 +7,7 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'TODO: update openapi-generator-cli to -g rust once generator is validated' && exit 0"
+        "command": "echo 'TODO: update openapi-generator-cli to -g rust once generator is validated' && git diff --exit-code -- apps/organiclever-be/generated-contracts/"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml"],

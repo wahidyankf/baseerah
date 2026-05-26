@@ -1,22 +1,20 @@
-//! HTTP API layer for the health bounded context.
-//!
-//! Provides the Axum handler and route registration for the health endpoint.
+/// Wire-format contract types for the health HTTP API (hand-written from OpenAPI spec).
+pub mod contracts;
 
 use axum::{Json, Router, http::StatusCode, routing::get};
-use serde_json::{Value, json};
+use contracts::HealthResponse;
 
 use crate::contexts::health::application;
 
 /// Axum handler for `GET /health`.
-///
-/// Delegates to the application use case and serialises the result as JSON.
-///
-/// # Errors
-///
-/// This handler never returns an error; the return type satisfies the Axum handler trait.
-pub async fn get_health_handler() -> (StatusCode, Json<Value>) {
+pub async fn get_health_handler() -> (StatusCode, Json<HealthResponse>) {
     let status = application::get_health();
-    (StatusCode::OK, Json(json!({"status": status.status})))
+    (
+        StatusCode::OK,
+        Json(HealthResponse {
+            status: status.status,
+        }),
+    )
 }
 
 /// Returns the Axum sub-router for the health context.
