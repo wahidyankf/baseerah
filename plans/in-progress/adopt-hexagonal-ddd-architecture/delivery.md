@@ -20,20 +20,22 @@ and
 
 > _Executor: `repo-setup-manager`_
 
-- [ ] Install dependencies in the root worktree (repo root):
+- [x] Install dependencies in the root worktree (repo root):
       `npm install`
       — acceptance: exits 0, `node_modules/` synchronized.
 
-- [ ] Converge the full polyglot toolchain in the root worktree:
+- [x] Converge the full polyglot toolchain in the root worktree:
       `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
 
-- [ ] Run the full affected baseline to record pass/fail counts before any changes:
+- [x] Run the full affected baseline to record pass/fail counts before any changes:
       `npx nx affected -t test:quick`
       — acceptance: baseline pass/fail count recorded; all preexisting failures documented.
+      — **Result**: 22 projects passing, 0 failures. Baseline clean.
 
-- [ ] Resolve all preexisting failures before proceeding to Phase 1.
+- [x] Resolve all preexisting failures before proceeding to Phase 1.
       — acceptance: `npx nx affected -t test:quick` exits 0 with no failures.
+      — **Result**: No preexisting failures found.
 
 ---
 
@@ -44,11 +46,11 @@ and
 
 ### 1.1 — Core hexagonal architecture document
 
-- [ ] **RED**: Verify the file does not exist:
+- [x] **RED**: Verify the file does not exist:
       `test -f repo-governance/development/pattern/hexagonal-architecture.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
-- [ ] **GREEN**: Create
+- [x] **GREEN**: Create
       `repo-governance/development/pattern/hexagonal-architecture.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture`
@@ -66,17 +68,17 @@ and
   Run `npm run lint:md` after writing.
   — acceptance: `npm run lint:md` exits 0; file exists at the path above.
 
-- [ ] **REFACTOR**: Run `npm run format:md` and re-read the file to confirm no formatting
+- [x] **REFACTOR**: Run `npm run format:md` and re-read the file to confirm no formatting
       drift was introduced.
       — acceptance: `npm run format:md:check` exits 0.
 
 ### 1.2 — CLI hexagonal architecture document
 
-- [ ] **RED**: Verify the file does not exist:
+- [x] **RED**: Verify the file does not exist:
       `test -f repo-governance/development/pattern/hexagonal-architecture-cli.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
-- [ ] **GREEN**: Create
+- [x] **GREEN**: Create
       `repo-governance/development/pattern/hexagonal-architecture-cli.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture — CLI Apps`
@@ -91,15 +93,15 @@ and
   Run `npm run lint:md` after writing.
   — acceptance: `npm run lint:md` exits 0; file exists.
 
-- [ ] **REFACTOR**: `npm run format:md:check` exits 0.
+- [x] **REFACTOR**: `npm run format:md:check` exits 0.
 
 ### 1.3 — Web hexagonal architecture document
 
-- [ ] **RED**: Verify the file does not exist:
+- [x] **RED**: Verify the file does not exist:
       `test -f repo-governance/development/pattern/hexagonal-architecture-web.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
-- [ ] **GREEN**: Create
+- [x] **GREEN**: Create
       `repo-governance/development/pattern/hexagonal-architecture-web.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture — Web Apps`
@@ -119,15 +121,15 @@ and
   Run `npm run lint:md` after writing.
   — acceptance: `npm run lint:md` exits 0; file exists.
 
-- [ ] **REFACTOR**: `npm run format:md:check` exits 0.
+- [x] **REFACTOR**: `npm run format:md:check` exits 0.
 
 ### 1.4 — BE hexagonal + DDD architecture document
 
-- [ ] **RED**: Verify the file does not exist:
+- [x] **RED**: Verify the file does not exist:
       `test -f repo-governance/development/pattern/hexagonal-architecture-be.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
-- [ ] **GREEN**: Create
+- [x] **GREEN**: Create
       `repo-governance/development/pattern/hexagonal-architecture-be.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture + DDD — Backend Apps`
@@ -149,15 +151,15 @@ and
   Run `npm run lint:md` after writing.
   — acceptance: `npm run lint:md` exits 0; file exists.
 
-- [ ] **REFACTOR**: `npm run format:md:check` exits 0.
+- [x] **REFACTOR**: `npm run format:md:check` exits 0.
 
 ### 1.5 — OpenAPI contract-first document
 
-- [ ] **RED**: Verify the file does not exist:
+- [x] **RED**: Verify the file does not exist:
       `test -f repo-governance/development/pattern/openapi-contract-first.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
-- [ ] **GREEN**: Create
+- [x] **GREEN**: Create
       `repo-governance/development/pattern/openapi-contract-first.md`
       (_New file_) with the following mandatory sections:
   - H1: `# OpenAPI Contract-First Development`
@@ -178,11 +180,11 @@ src/generated-contracts/`; fail build if diff is non-empty
   Run `npm run lint:md` after writing.
   — acceptance: `npm run lint:md` exits 0; file exists.
 
-- [ ] **REFACTOR**: `npm run format:md:check` exits 0.
+- [x] **REFACTOR**: `npm run format:md:check` exits 0.
 
 ### 1.6 — Update pattern README index
 
-- [ ] Edit
+- [x] Edit
       `repo-governance/development/pattern/README.md`
       [Repo-grounded]: add entries for all five new documents in the file listing.
       — acceptance: `npm run lint:md` exits 0; all five new file names appear in README.md.
