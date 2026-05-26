@@ -46,8 +46,8 @@ outputs:
 
 > **Pre-Execution Requirement**: Before executing, invoke the `grill-me` skill
 > (`.claude/skills/grill-me/SKILL.md`) to stress-test any unresolved design decisions in
-> the plan. Every question must present 2-4 concrete options (use `AskUserQuestion` tool in
-> Claude Code, or the markdown question format). See
+> the plan. Every question must present 2-4 concrete options (use an interactive
+> multiple-choice tool when available, or the markdown question format). See
 > [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md).
 
 ## Execution Mode

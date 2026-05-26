@@ -54,10 +54,10 @@ user from facing a forced binary choice while still keeping the list bounded.
 
 ### Tool Preference
 
-When operating in a Claude Code context, use the `AskUserQuestion` tool for each question. The
-interactive multi-choice UI shows the user exactly which options are available and lets them select
-with a single click. Fall back to the markdown format (see Examples) only when `AskUserQuestion` is
-unavailable.
+When the coding agent provides an interactive multiple-choice UI (e.g., via the `AskUserQuestion`
+tool), use it for each question. The interactive UI shows the user exactly which options are
+available and lets them select with a single click. Fall back to the markdown format (see Examples)
+only when no interactive selection tool is available.
 
 ### One Question at a Time
 
@@ -114,10 +114,10 @@ This convention governs the `grill-me` skill and any context that invokes it:
 
 No options presented. The user must generate the answer from scratch. This pattern is forbidden.
 
-### Correct: AskUserQuestion (Claude Code context, preferred)
+### Correct: Interactive Multiple-Choice Tool (preferred when available)
 
-Use the `AskUserQuestion` tool with `type: select` and 2-4 `options` entries. The platform renders
-the choices as a single-click selection UI.
+When the coding agent supports interactive selection (e.g., via an `AskUserQuestion`-style tool),
+use it with 2-4 `options` entries. The platform renders the choices as a single-click selection UI.
 
 ## Validation
 
@@ -128,7 +128,7 @@ A grill question is valid when ALL of the following hold:
 - [ ] One option is marked **(Recommended)**
 - [ ] The question addresses exactly one decision
 - [ ] Options are grounded in codebase reality (not invented)
-- [ ] `AskUserQuestion` tool is used when Claude Code context is available
+- [ ] An interactive multiple-choice tool is used when the coding agent supports it
 
 A grill question is invalid when ANY of the following hold:
 

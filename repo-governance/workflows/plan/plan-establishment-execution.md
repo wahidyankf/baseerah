@@ -93,9 +93,10 @@ Invoke the `grill-me` Skill to resolve all open design decisions before research
 Invoke the `grill-me` Skill (`.claude/skills/grill-me/SKILL.md`). Present Step 0 findings.
 
 **Multiple-options requirement (HARD RULE)**: Every question in this grill session MUST present
-2-4 concrete options with trade-off descriptions. Use the `AskUserQuestion` tool (preferred in
-Claude Code) or the markdown question format from `grill-me`. Open-ended questions without
-options are FORBIDDEN. Ground options in what Step 0 repo exploration already established.
+2-4 concrete options with trade-off descriptions. Use an interactive multiple-choice tool when
+available (e.g., `AskUserQuestion`) or the markdown question format from `grill-me`. Open-ended
+questions without options are FORBIDDEN. Ground options in what Step 0 repo exploration already
+established.
 
 Resolve ALL of the following (each as a structured multiple-choice question):
 
