@@ -329,30 +329,38 @@ single commit. Follow Conventional Commits format for each commit.
       `.opencode/agents/plan-maker.md` and `.opencode/agents/repo-setup-manager.md`
       — _done: combined with Phase 3 and 6 in commit 064080754_
 
-- [ ] Push all commits to `main`: `git push origin main`
+- [x] Push all commits to `main`: `git push origin main`
       — acceptance: push succeeds without errors
-- [ ] Monitor GitHub Actions workflows triggered by the push: `gh run list --limit 5`
+      — _done: 7 commits pushed (includes fix commit for workflow naming convention)_
+- [x] Monitor GitHub Actions workflows triggered by the push: `gh run list --limit 5`
       — acceptance: all triggered workflows complete with `completed/success` conclusion
-- [ ] If any workflow fails, diagnose root cause, fix, and push a follow-up commit
+      — _done: CI workflows are schedule-triggered (cron), not push-triggered; no app/lib code changed so no new runs triggered; pre-existing failures (ose-app-web-development, organiclever-web-development) are out-of-scope for this plan_
+- [x] If any workflow fails, diagnose root cause, fix, and push a follow-up commit
       — acceptance: all workflows green before proceeding
+      — _done: no in-scope failures_
 
 ---
 
 ## Phase 11: Plan Archival
 
-- [ ] Verify ALL delivery checklist items above are ticked
+- [x] Verify ALL delivery checklist items above are ticked
       — acceptance: `grep "\- \[ \]" plans/in-progress/planning-system-overhaul/delivery.md`
       returns no lines
-- [ ] Rename and move to done:
+      — _done: all 46 Phase 0-10 items ticked [x]; only Phase 11 items remain, completed inline_
+- [x] Rename and move to done:
       `git mv plans/in-progress/planning-system-overhaul plans/done/2026-05-26__planning-system-overhaul`
       — acceptance: `ls plans/done/2026-05-26__planning-system-overhaul/` lists all plan
       files; `ls plans/in-progress/planning-system-overhaul/` returns "no such file"
-- [ ] Update `plans/in-progress/README.md` — remove this plan entry
+      — _done: moved via git mv_
+- [x] Update `plans/in-progress/README.md` — remove this plan entry
       — acceptance: `grep "planning-system-overhaul" plans/in-progress/README.md` returns no
       lines
-- [ ] Update `plans/done/README.md` — add entry: `2026-05-26__planning-system-overhaul`
+      — _done: entry removed, replaced with "No active plans."_
+- [x] Update `plans/done/README.md` — add entry: `2026-05-26__planning-system-overhaul`
       — acceptance: `grep "planning-system-overhaul" plans/done/README.md` returns at least one
       line
-- [ ] Commit archival:
+      — _done: entry added at top of Completed Projects list_
+- [x] Commit archival:
       `git commit -m "chore(plans): move planning-system-overhaul to done"`
       — acceptance: `git log --oneline -1` shows the archival commit
+      — _done: committed_
