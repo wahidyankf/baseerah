@@ -131,11 +131,12 @@ and
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture + DDD — Backend Apps`
   - `## Overview` — DDD bounded contexts + hexagonal layers; `contexts/<name>/` as the unit
-  - `## Directory Layout` — tables for Rust/Axum (`contexts/<n>/{domain,application,infrastructure,http}`)
-    and F#/Giraffe (`contexts/<n>/{Domain,Application,Infrastructure,Http}`)
+  - `## Directory Layout` — tables for Rust/Axum (`contexts/<n>/{domain,application,infrastructure,api/http}`)
+    and F#/Giraffe (`contexts/<n>/{Domain,Application,Infrastructure,Api/Http}`); note that
+    `api/` groups all inbound transports (graphql/, mcp/ alongside http/ when added)
   - `## Rust-Specific` — traits as ports; `#[async_trait]` for dyn dispatch; native async fn
-    for static dispatch; `From<DomainError> for ApiError` at the http/ boundary; domain errors
-    must not contain HTTP status codes
+    for static dispatch; `From<DomainError> for ApiError` at the `api/http/` boundary; domain
+    errors must not contain HTTP status codes
   - `## F#-Specific` — compilation-order constraint (domain types first, `Program.fs` last);
     railway-oriented programming (`Result<'T,'TError>`); pure adapter functions; `Program.fs`
     as composition root
@@ -678,8 +679,10 @@ src/
 │       ├── domain/mod.rs       ← HealthStatus type
 │       ├── application/mod.rs  ← get_health use case (pure, no Axum)
 │       ├── infrastructure/mod.rs ← .gitkeep equivalent (empty initially)
-│       └── http/mod.rs         ← Axum handler, routes() fn
-├── app.rs                      ← router: nests contexts/health/http::routes()
+│       └── api/                ← inbound adapters (REST; graphql/, mcp/ when added)
+│           ├── mod.rs
+│           └── http/mod.rs     ← Axum handler, routes() fn
+├── app.rs                      ← router: nests contexts/health/api/http::routes()
 ├── config.rs                   ← unchanged
 ├── errors.rs                   ← AppError (HTTP-layer error type)
 ├── lib.rs                      ← pub mod app, config, errors, contexts
@@ -693,11 +696,13 @@ src/
   - `mkdir -p apps/organiclever-be/src/contexts/health/domain`
   - `mkdir -p apps/organiclever-be/src/contexts/health/application`
   - `mkdir -p apps/organiclever-be/src/contexts/health/infrastructure`
-  - `mkdir -p apps/organiclever-be/src/contexts/health/http`
+  - `mkdir -p apps/organiclever-be/src/contexts/health/api/http`
   - Create `apps/organiclever-be/src/contexts/mod.rs` (_New file_):
     `pub mod health;`
   - Create `apps/organiclever-be/src/contexts/health/mod.rs` (_New file_):
-    `pub mod domain; pub mod application; pub mod infrastructure; pub mod http;`
+    `pub mod domain; pub mod application; pub mod infrastructure; pub mod api;`
+  - Create `apps/organiclever-be/src/contexts/health/api/mod.rs` (_New file_):
+    `pub mod http;`
   - Create `apps/organiclever-be/src/contexts/health/infrastructure/mod.rs` (_New file_):
     `// No infrastructure adapters for health context currently.`
   - Edit `apps/organiclever-be/src/lib.rs` [Repo-grounded]: add `pub mod contexts;`.
@@ -714,12 +719,12 @@ src/
     define `pub fn get_health() -> domain::HealthStatus` (pure function, no Axum imports).
   - Run `npx nx run organiclever-be:typecheck` — exits 0.
 
-- [ ] **GREEN — move HTTP handler to contexts/health/http/**:
-  - Create `apps/organiclever-be/src/contexts/health/http/mod.rs` (_New file_):
+- [ ] **GREEN — move HTTP handler to contexts/health/api/http/**:
+  - Create `apps/organiclever-be/src/contexts/health/api/http/mod.rs` (_New file_):
     move the Axum handler logic from `src/health/mod.rs` here; define `pub fn routes() -> Router`;
     handler calls `application::get_health()` and serializes to `Json<Value>`.
   - Edit `apps/organiclever-be/src/app.rs` [Repo-grounded]: replace `use crate::health;` with
-    `use crate::contexts::health::http as health_http;`; update `api_router()` to call
+    `use crate::contexts::health::api::http as health_http;`; update `api_router()` to call
     `health_http::routes()`.
   - Run `npx nx run organiclever-be:typecheck` — exits 0.
 
@@ -728,8 +733,8 @@ src/
   - Edit `apps/organiclever-be/src/lib.rs` [Repo-grounded]: remove `pub mod health;`.
   - Run `npx nx run organiclever-be:typecheck` — exits 0.
   - Run `npx nx run organiclever-be:test:unit` — exits 0; same test count as baseline.
-    — acceptance: `src/health/` no longer exists; `src/contexts/health/` has all four layers;
-    typecheck and tests pass.
+    — acceptance: `src/health/` no longer exists; `src/contexts/health/` has all four layers
+    (`domain/`, `application/`, `infrastructure/`, `api/http/`); typecheck and tests pass.
 
 - [ ] **REFACTOR**: Run `npx nx run organiclever-be:lint` — exits 0; run `npx nx run organiclever-be:test:quick` — exits 0; check coverage still meets ≥90% threshold.
 
@@ -760,7 +765,7 @@ The other four context subdirs exist but are empty; their F# logic lives in the 
 
 Note: `contexts/<name>/` subdirs already exist but are empty; the actual F# logic lives in
 the flat `Domain/`, `Infrastructure/`, `Handlers/` directories. This phase migrates the
-existing F# files into the per-context structure and adds the `Http/` layer.
+existing F# files into the per-context structure and adds the `Api/Http/` layer.
 
 - [ ] **RED**: Run `npx nx run ose-app-be:test:unit` and `npx nx run ose-app-be:build`
       to record the baseline.
@@ -787,22 +792,22 @@ existing F# files into the per-context structure and adds the `Http/` layer.
   git rm -r --ignore-unmatch "apps/ose-app-be/src/OseAppBe/contexts/gap-analysis/presentation"
   ```
 
-  Create Pascal-case dirs + Http/ for the four pre-existing contexts:
+  Create Pascal-case dirs + Api/Http/ for the four pre-existing contexts:
 
   ```bash
   for ctx in regulatory-source gap-analysis internal-policy ai-orchestration; do
-    mkdir -p "apps/ose-app-be/src/OseAppBe/contexts/${ctx}"/{Domain,Application,Infrastructure,Http}
+    mkdir -p "apps/ose-app-be/src/OseAppBe/contexts/${ctx}"/{Domain,Application,Infrastructure,Api/Http}
   done
   ```
 
   Create health context directory tree from scratch (health does not pre-exist):
 
   ```bash
-  mkdir -p apps/ose-app-be/src/OseAppBe/contexts/health/{Domain,Application,Infrastructure,Http}
+  mkdir -p apps/ose-app-be/src/OseAppBe/contexts/health/{Domain,Application,Infrastructure,Api/Http}
   ```
 
   — acceptance: `ls apps/ose-app-be/src/OseAppBe/contexts/gap-analysis/` shows only
-  `Application/  Domain/  Http/  Infrastructure/` (all Pascal-case, no lowercase dirs).
+  `Api/  Application/  Domain/  Infrastructure/` (all Pascal-case, no lowercase dirs).
 
 - [ ] **GREEN — create health context F# files**:
   - Create `apps/ose-app-be/src/OseAppBe/contexts/health/Domain/Types.fs` (_New file_):
@@ -810,8 +815,8 @@ existing F# files into the per-context structure and adds the `Http/` layer.
   - Create `apps/ose-app-be/src/OseAppBe/contexts/health/Application/UseCases.fs` (_New file_):
     `module OseAppBe.Contexts.Health.Application.UseCases` with `getHealth` function returning
     `Result<HealthStatus, string>`.
-  - Create `apps/ose-app-be/src/OseAppBe/contexts/health/Http/Handlers.fs` (_New file_):
-    `module OseAppBe.Contexts.Health.Http.Handlers` with a Giraffe `healthHandler` that calls
+  - Create `apps/ose-app-be/src/OseAppBe/contexts/health/Api/Http/Handlers.fs` (_New file_):
+    `module OseAppBe.Contexts.Health.Api.Http.Handlers` with a Giraffe `healthHandler` that calls
     `UseCases.getHealth()` and maps the result to `json`.
   - Add `.gitkeep` to
     `apps/ose-app-be/src/OseAppBe/contexts/health/Infrastructure/` (no adapters needed for
@@ -825,7 +830,7 @@ existing F# files into the per-context structure and adds the `Http/` layer.
     `contexts/<context-name>/Domain/Types.fs` (_New file_ per context).
   - Create empty `contexts/<context-name>/Application/UseCases.fs` (_New file_): stub module.
   - Create empty `contexts/<context-name>/Infrastructure/Adapters.fs` (_New file_): stub module.
-  - Create empty `contexts/<context-name>/Http/Handlers.fs` (_New file_): stub module.
+  - Create empty `contexts/<context-name>/Api/Http/Handlers.fs` (_New file_): stub module.
   - Run `npx nx run ose-app-be:build` after each context migration — exits 0.
 
 - [ ] **GREEN — migrate Infrastructure files**:
@@ -844,8 +849,8 @@ existing F# files into the per-context structure and adds the `Http/` layer.
 
 - [ ] **GREEN — migrate Handlers**:
   - Move `Handlers/HealthHandler.fs` content into
-    `contexts/health/Http/Handlers.fs` (already created above; merge or replace).
-  - Update `Program.fs` [Repo-grounded] to reference `OseAppBe.Contexts.Health.Http.Handlers`.
+    `contexts/health/Api/Http/Handlers.fs` (already created above; merge or replace).
+  - Update `Program.fs` [Repo-grounded] to reference `OseAppBe.Contexts.Health.Api.Http.Handlers`.
   - Run `npx nx run ose-app-be:build` — exits 0.
 
 - [ ] **GREEN — reorder OseAppBe.fsproj**:
@@ -855,7 +860,7 @@ existing F# files into the per-context structure and adds the `Http/` layer.
   - Generated contracts first (unchanged)
   - `Contracts/ContractWrappers.fs`
   - For each context in order: `Domain/Types.fs`, `Application/UseCases.fs`,
-    `Infrastructure/Adapters.fs`, `Http/Handlers.fs`
+    `Infrastructure/Adapters.fs`, `Api/Http/Handlers.fs`
   - `Program.fs` last
 
   Run `npx nx run ose-app-be:build` — exits 0.
@@ -927,7 +932,7 @@ existing F# files into the per-context structure and adds the `Http/` layer.
     in `apps/organiclever-be/src/generated_contracts/` or equivalent path defined in
     `project.json`.
   - If output quality is insufficient: create hand-written type aliases in
-    `apps/organiclever-be/src/contexts/health/http/contracts.rs` (_New file_) that mirror the
+    `apps/organiclever-be/src/contexts/health/api/http/contracts.rs` (_New file_) that mirror the
     OpenAPI schema shapes; annotate this file with `// [Judgment call]: openapi-generator
 rust-axum output was insufficient; types hand-written from spec`.
   - Run `npx nx run organiclever-be:build` — exits 0.

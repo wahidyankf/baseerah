@@ -247,7 +247,8 @@ Scenario: organiclever-be adopts DDD bounded-context module layout
   Given the plan has been executed
   When I list apps/organiclever-be/src/
   Then I see a contexts/ directory
-  And each subdirectory under contexts/ contains domain/, application/, infrastructure/, and http/ modules
+  And each subdirectory under contexts/ contains domain/, application/, infrastructure/, and api/ modules
+  And each api/ module contains http/ as the REST inbound adapter
   And the top-level src/ no longer contains health/mod.rs, app.rs, or errors.rs as domain files
   When I run nx run organiclever-be:test:quick
   Then the command exits 0 with no new failures
@@ -259,8 +260,9 @@ Scenario: organiclever-be adopts DDD bounded-context module layout
 Scenario: ose-app-be adopts per-context subdirectory layout
   Given the plan has been executed
   When I list apps/ose-app-be/src/OseAppBe/contexts/
-  Then each context subdirectory contains Domain/, Application/, Infrastructure/, and Http/ subdirectories
-  And the OseAppBe.fsproj <Compile Include> entries are ordered domain-first, http-last for each context
+  Then each context subdirectory contains Domain/, Application/, Infrastructure/, and Api/ subdirectories
+  And each Api/ subdirectory contains Http/ as the REST inbound adapter
+  And the OseAppBe.fsproj <Compile Include> entries are ordered domain-first, api/http-last for each context
   When I run nx run ose-app-be:test:quick
   Then the command exits 0 with no new failures
 ```

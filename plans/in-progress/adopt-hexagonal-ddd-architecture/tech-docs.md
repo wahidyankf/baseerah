@@ -19,7 +19,7 @@ flowchart LR
   D[domain]:::inner
   AP[application]:::app
   IN[infrastructure]:::infra
-  OUT[commands / presentation / http]:::outer
+  OUT[commands / presentation / api]:::outer
 
   OUT -->|depends on| IN
   OUT -->|depends on| AP
@@ -41,13 +41,13 @@ flowchart TD
       D1[domain]:::layer
       AP1[application]:::layer
       IN1[infrastructure]:::layer
-      H1[http]:::layer
+      H1[api/http]:::layer
     end
     subgraph C2["contexts/workout (future)"]
       D2[domain]:::layer
       AP2[application]:::layer
       IN2[infrastructure]:::layer
-      H2[http]:::layer
+      H2[api/http]:::layer
     end
   end
 ```
@@ -99,12 +99,21 @@ or `infrastructure/`. Server Components and Server Actions are inbound adapters.
 **Forbidden imports in presentation/:** direct domain types (use application barrel instead),
 direct infrastructure adapters.
 
-### http/ (BE inbound adapter — BE apps only)
+### api/ (BE inbound adapter — BE apps only)
 
-Contains Axum route handlers (Rust) or Giraffe HTTP handlers (F#). Maps HTTP request shapes
-to application-layer calls and maps application results to HTTP responses. In Rust, the
-`From<DomainError> for ApiError` conversion lives here. Domain errors must not contain HTTP
-status codes.
+Groups all inbound transport adapters. Expands as new transports are added:
+
+```
+api/
+  http/       ← REST (Axum / Giraffe) — present now
+  graphql/    ← GraphQL — future
+  mcp/        ← MCP — future
+```
+
+`api/http/` contains Axum route handlers (Rust) or Giraffe HTTP handlers (F#). Maps HTTP
+request shapes to application-layer calls and maps application results to HTTP responses. In
+Rust, the `From<DomainError> for ApiError` conversion lives in `api/http/`. Domain errors
+must not contain HTTP status codes.
 
 ## Design Decisions
 
@@ -138,13 +147,13 @@ suffices. `async-trait` is reserved for cases requiring `Box<dyn Trait>`.
 **Decision:** `main.rs` imports only a top-level `start_server` function from an `http` or
 `app` module. `main.rs` never imports `axum::Router` directly.
 
-**Rationale:** Keeps the composition root minimal. Axum types are confined to the `http/`
+**Rationale:** Keeps the composition root minimal. Axum types are confined to the `api/http/`
 layer of each context plus a top-level `app.rs` router composer.
 
 ### DD-4: F# fsproj compilation order is the dependency-enforcement mechanism
 
 **Decision:** F# files in `OseAppBe.fsproj` are ordered strictly: domain types first,
-application next, infrastructure, http handlers, `Program.fs` last. This is the F#
+application next, infrastructure, api/http handlers, `Program.fs` last. This is the F#
 compiler's natural constraint — a file may only reference files listed earlier.
 
 **Rationale:** F# has no runtime DI container; the composition root is `Program.fs`. Adapter
@@ -158,7 +167,7 @@ contexts/<name>/Domain/Types.fs
 contexts/<name>/Domain/Logic.fs       (if needed)
 contexts/<name>/Application/UseCases.fs
 contexts/<name>/Infrastructure/Adapters.fs
-contexts/<name>/Http/Handlers.fs
+contexts/<name>/Api/Http/Handlers.fs
 ```
 
 ### DD-5: TypeScript port pattern — Effect.ts Context.Tag
@@ -287,9 +296,11 @@ apps/organiclever-be/src/
 │       │   └── mod.rs
 │       ├── infrastructure/ ← port implementations (if any; may be .gitkeep-only initially)
 │       │   └── mod.rs
-│       └── http/           ← Axum handler, From<DomainError> for ApiError
-│           └── mod.rs
-├── app.rs                  ← Router composition: routes health::http::routes()
+│       └── api/            ← inbound adapters (REST, GraphQL, MCP when added)
+│           ├── mod.rs
+│           └── http/       ← Axum handler, From<DomainError> for ApiError
+│               └── mod.rs
+├── app.rs                  ← Router composition: routes health::api::http::routes()
 ├── config.rs               ← Config struct
 ├── errors.rs               ← Top-level AppError (HTTP-layer errors)
 ├── lib.rs                  ← pub mod app, config, errors, contexts
@@ -308,16 +319,17 @@ apps/ose-app-be/src/OseAppBe/
 │   │   │   └── UseCases.fs     ← getHealth : unit -> Result<HealthStatus, AppError>
 │   │   ├── Infrastructure/
 │   │   │   └── .gitkeep        ← (health has no I/O adapters)
-│   │   └── Http/
-│   │       └── Handlers.fs     ← Giraffe handler, maps Result to HttpHandler
+│   │   └── Api/
+│   │       └── Http/
+│   │           └── Handlers.fs ← Giraffe handler, maps Result to HttpHandler
 │   ├── regulatory-source/
 │   │   ├── Domain/Types.fs
 │   │   ├── Application/UseCases.fs
 │   │   ├── Infrastructure/Adapters.fs
-│   │   └── Http/Handlers.fs
-│   ├── gap-analysis/   (same four subdirs)
-│   ├── internal-policy/ (same four subdirs)
-│   └── ai-orchestration/ (same four subdirs)
+│   │   └── Api/Http/Handlers.fs
+│   ├── gap-analysis/   (same structure)
+│   ├── internal-policy/ (same structure)
+│   └── ai-orchestration/ (same structure)
 ├── Contracts/
 │   └── ContractWrappers.fs     ← unchanged
 └── Program.fs                  ← composition root; lists <Compile> in domain-first order
@@ -332,12 +344,12 @@ apps/ose-app-be/src/OseAppBe/
 <!-- Health context -->
 <Compile Include="contexts/health/Domain/Types.fs" />
 <Compile Include="contexts/health/Application/UseCases.fs" />
-<Compile Include="contexts/health/Http/Handlers.fs" />
+<Compile Include="contexts/health/Api/Http/Handlers.fs" />
 <!-- RegulatorySource context -->
 <Compile Include="contexts/regulatory-source/Domain/Types.fs" />
 <Compile Include="contexts/regulatory-source/Application/UseCases.fs" />
 <Compile Include="contexts/regulatory-source/Infrastructure/Adapters.fs" />
-<Compile Include="contexts/regulatory-source/Http/Handlers.fs" />
+<Compile Include="contexts/regulatory-source/Api/Http/Handlers.fs" />
 <!-- ... repeat for gap-analysis, internal-policy, ai-orchestration -->
 <!-- Entry point -->
 <Compile Include="Program.fs" />
@@ -414,9 +426,9 @@ via `test:quick`.
 
 ### Modified files (BE apps)
 
-- `apps/organiclever-be/src/` — create `contexts/health/{domain,application,infrastructure,http}/`,
+- `apps/organiclever-be/src/` — create `contexts/health/{domain,application,infrastructure,api/http}/`,
   move logic from `health/mod.rs`, update `lib.rs`, update `app.rs` router
-- `apps/ose-app-be/src/OseAppBe/` — create `contexts/<name>/{Domain,Application,Infrastructure,Http}/`,
+- `apps/ose-app-be/src/OseAppBe/` — create `contexts/<name>/{Domain,Application,Infrastructure,Api/Http}/`,
   migrate existing F# files, reorder `OseAppBe.fsproj`
 
 ### Modified files (OpenAPI contracts)
