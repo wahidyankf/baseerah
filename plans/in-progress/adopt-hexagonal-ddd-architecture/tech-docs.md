@@ -27,9 +27,13 @@ flowchart LR
   AP -->|uses domain types| D
 ```
 
+**DDD applies only to BE apps.** CLI and web/FE apps use hexagonal layering only — no DDD
+bounded context isolation, no strict cross-context communication rules.
+
 For BE apps, DDD bounded contexts wrap this layer stack. Each context has its own isolated
 domain model; contexts communicate through well-defined integration interfaces, not by sharing
-domain types.
+domain types. Web apps use `contexts/` as a feature module naming convention (driven by
+Effect.ts `Context.Tag`), not as DDD bounded contexts.
 
 ```mermaid
 flowchart TD
@@ -182,12 +186,12 @@ compile-time safe dependency injection without a separate DI container.
 
 ### DD-6: Application layer barrel for TypeScript
 
-**Decision:** Each bounded context's `application/` layer exposes an `index.ts` barrel that
-is the sole public API surface. `presentation/` and cross-context callers import only from
-`contexts/<name>/application/index.ts`.
+**Decision:** Each web context module's `application/` layer exposes an `index.ts` barrel
+that is the sole public API surface. `presentation/` and cross-context callers import only
+from `contexts/<name>/application/index.ts`.
 
 **Rationale:** Prevents domain type leakage into presentation and avoids tight coupling
-between contexts. `organiclever-web` implements this; all other web apps will follow.
+between context modules. `organiclever-web` implements this; all other web apps will follow.
 
 ### DD-7: OpenAPI codegen tooling choices
 
@@ -259,7 +263,7 @@ existing modules. `src/commands/` remains unchanged.
 | `src/adapters/` | `src/infrastructure/`       |
 | `src/commands/` | `src/commands/` (unchanged) |
 
-### TypeScript Web App (per bounded context)
+### TypeScript Web App (per context module)
 
 ```
 apps/<name>/src/contexts/<context-name>/

@@ -103,7 +103,8 @@ and
       `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-web.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture — Web Apps`
-  - `## Overview` — Next.js context; bounded contexts as the organizational unit
+  - `## Overview` — Next.js context; feature context modules as the organizational unit (not
+    DDD bounded contexts — DDD applies only to BE apps)
   - `## Directory Layout` — table showing `contexts/<name>/{domain,application,infrastructure,presentation}/`
   - `## Layer Responsibilities` — domain, application (barrel rule), infrastructure, presentation
   - `## Port Pattern` — Effect.ts `Context.Tag` as port definition; `Layer` as adapter
