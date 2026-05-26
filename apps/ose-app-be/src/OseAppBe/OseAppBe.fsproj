@@ -19,17 +19,33 @@
     <Compile Include="..\..\generated-contracts\OpenAPI\src\OseAppBe.Contracts\HealthResponse.fs" Condition="Exists('..\..\generated-contracts\OpenAPI\src\OseAppBe.Contracts\HealthResponse.fs')" />
     <!-- CLIMutable request/response wrappers -->
     <Compile Include="Contracts/ContractWrappers.fs" />
-    <!-- Domain types and bounded contexts -->
-    <Compile Include="Domain/Types.fs" />
-    <Compile Include="Domain/RegulatorySource.fs" />
-    <Compile Include="Domain/InternalPolicy.fs" />
-    <Compile Include="Domain/GapAnalysis.fs" />
-    <Compile Include="Domain/AiOrchestration.fs" />
-    <!-- Infrastructure -->
-    <Compile Include="Infrastructure/AppDbContext.fs" />
-    <Compile Include="Infrastructure/Migrations.fs" />
-    <!-- Handlers -->
-    <Compile Include="Handlers/HealthHandler.fs" />
+    <!-- Shared cross-context infrastructure -->
+    <Compile Include="contexts/shared/Infrastructure/AppDbContext.fs" />
+    <Compile Include="contexts/shared/Infrastructure/Migrations.fs" />
+    <!-- Health context: domain → application → api/http (no infra) -->
+    <Compile Include="contexts/health/Domain/Types.fs" />
+    <Compile Include="contexts/health/Application/UseCases.fs" />
+    <Compile Include="contexts/health/Api/Http/Handlers.fs" />
+    <!-- RegulatorySource context -->
+    <Compile Include="contexts/regulatory-source/Domain/Types.fs" />
+    <Compile Include="contexts/regulatory-source/Application/UseCases.fs" />
+    <Compile Include="contexts/regulatory-source/Infrastructure/Adapters.fs" />
+    <Compile Include="contexts/regulatory-source/Api/Http/Handlers.fs" />
+    <!-- GapAnalysis context -->
+    <Compile Include="contexts/gap-analysis/Domain/Types.fs" />
+    <Compile Include="contexts/gap-analysis/Application/UseCases.fs" />
+    <Compile Include="contexts/gap-analysis/Infrastructure/Adapters.fs" />
+    <Compile Include="contexts/gap-analysis/Api/Http/Handlers.fs" />
+    <!-- InternalPolicy context -->
+    <Compile Include="contexts/internal-policy/Domain/Types.fs" />
+    <Compile Include="contexts/internal-policy/Application/UseCases.fs" />
+    <Compile Include="contexts/internal-policy/Infrastructure/Adapters.fs" />
+    <Compile Include="contexts/internal-policy/Api/Http/Handlers.fs" />
+    <!-- AiOrchestration context -->
+    <Compile Include="contexts/ai-orchestration/Domain/Types.fs" />
+    <Compile Include="contexts/ai-orchestration/Application/UseCases.fs" />
+    <Compile Include="contexts/ai-orchestration/Infrastructure/Adapters.fs" />
+    <Compile Include="contexts/ai-orchestration/Api/Http/Handlers.fs" />
     <!-- Entry point -->
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -3,7 +3,7 @@ module OseAppBe.Tests.TestFixture
 open Microsoft.AspNetCore.Mvc.Testing
 open Microsoft.EntityFrameworkCore
 open Microsoft.Extensions.DependencyInjection
-open OseAppBe.Infrastructure.AppDbContext
+open OseAppBe.Contexts.Shared.Infrastructure.AppDbContext
 
 type OseAppBeFactory() =
     inherit WebApplicationFactory<OseAppBe.Program.Marker>()

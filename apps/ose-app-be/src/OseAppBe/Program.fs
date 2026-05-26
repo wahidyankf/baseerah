@@ -7,14 +7,16 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Configuration
 open Giraffe
-open OseAppBe.Infrastructure.AppDbContext
+open OseAppBe.Contexts.Shared.Infrastructure.AppDbContext
 
 // Marker type for WebApplicationFactory<> in tests — must be accessible from test assembly.
 type Marker = class end
 
 let webApp: HttpHandler =
     choose
-        [ GET >=> route "/api/v1/health" >=> Handlers.HealthHandler.handle
+        [ GET
+          >=> route "/api/v1/health"
+          >=> OseAppBe.Contexts.Health.Api.Http.Handlers.handle
           RequestErrors.NOT_FOUND "Not Found" ]
 
 [<EntryPoint>]
@@ -22,7 +24,7 @@ let main _ =
     let builder = WebApplication.CreateBuilder()
 
     // OpenRouter options
-    builder.Services.Configure<OseAppBe.Domain.AiOrchestration.OpenRouterSettings>(
+    builder.Services.Configure<OseAppBe.Contexts.AiOrchestration.Domain.Types.OpenRouterSettings>(
         builder.Configuration.GetSection("OpenRouter")
     )
     |> ignore
@@ -48,7 +50,8 @@ let main _ =
 
     // DbUp migrations at startup (skip if no DB connection available)
     try
-        let result = OseAppBe.Infrastructure.Migrations.upgrade connectionString
+        let result =
+            OseAppBe.Contexts.Shared.Infrastructure.Migrations.upgrade connectionString
 
         if not result.Successful then
             eprintfn "DbUp migration failed: %s" result.Error.Message
