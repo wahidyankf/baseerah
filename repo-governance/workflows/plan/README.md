@@ -13,7 +13,13 @@ Orchestrated workflows for project planning quality validation and systematic ex
 
 ## Purpose
 
-These workflows define **WHEN and HOW to validate and execute plans**. The plan-quality-gate workflow orchestrates `plan-checker` and `plan-fixer` for authoring-time validation. The plan-execution workflow is orchestrated directly by the calling context (which delegates per-item work to specialized agents) and invokes `plan-execution-checker` for independent validation at the end.
+These workflows define **WHEN and HOW to establish, validate, and execute plans**. The
+plan-establishment workflow orchestrates the full prompt-to-pushed-plan lifecycle (repo
+exploration → grill → research → plan-maker → quality gate → push). The plan-quality-gate
+workflow orchestrates `plan-checker` and `plan-fixer` for authoring-time validation. The
+plan-execution workflow is orchestrated directly by the calling context (which delegates
+per-item work to specialized agents) and invokes `plan-execution-checker` for independent
+validation at the end.
 
 ## Scope
 
@@ -33,6 +39,9 @@ These workflows define **WHEN and HOW to validate and execute plans**. The plan-
 
 ## Workflows
 
+- [Plan Establishment](./plan-establishment.md) - Orchestrate the full prompt-to-pushed-plan
+  lifecycle: repo exploration → grill → web research → grill → plan-maker → plan-quality-gate →
+  push. Use when turning a behavioral prompt into a production-ready plan.
 - [Plan Execution](./plan-execution.md) - Execute plan tasks systematically with validation and completion tracking; orchestrated directly by the calling context, validated by `plan-execution-checker`
 - [Plan Quality Gate](./plan-quality-gate.md) - Validate plan completeness and accuracy, apply fixes iteratively until ZERO findings using plan-checker and plan-fixer
 
