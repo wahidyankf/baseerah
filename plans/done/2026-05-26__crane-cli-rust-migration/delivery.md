@@ -912,30 +912,49 @@ errors encountered during work.
 
 ### Post-Push Verification
 
-- [ ] Push all commits to `main`: `git push origin main`.
-- [ ] Open GitHub Actions and monitor the CI run triggered by the push:
+- [x] Push all commits to `main`: `git push origin main`.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+- [x] Open GitHub Actions and monitor the CI run triggered by the push:
       `gh run list --branch main --limit 5`.
-- [ ] Verify all CI checks pass: `gh run view <run-id> --json status,conclusion`.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: CI run 26424739295 (crane-cli integration) triggered.
+- [x] Verify all CI checks pass: `gh run view <run-id> --json status,conclusion`.
       Repeat every 3 minutes until conclusion is `success`.
-- [ ] If any CI check fails: investigate root cause, fix locally, push a follow-up commit.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: Run 26424739295 — conclusion: success. All 6 steps passed (checkout, setup-node, setup-dotnet, tesseract install, test:integration, post-cleanup).
+- [x] If any CI check fails: investigate root cause, fix locally, push a follow-up commit.
       Do NOT proceed until CI is green.
-- [ ] Run `npx nx run crane-cli:build` after CI green — binary at
+  - **Date**: 2026-05-26
+  - **Status**: Completed (no failures — CI passed first time)
+- [x] Run `npx nx run crane-cli:build` after CI green — binary at
       `apps/crane-cli/target/release/crane` works end-to-end: `./apps/crane-cli/target/release/crane --version` prints the version string.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: `./apps/crane-cli/target/release/crane --version` outputs `crane 0.1.0`.
 
 ---
 
 ## Phase 11: Plan Archival
 
-- [ ] Verify ALL delivery checklist items in Phases 0–10 are ticked. Run
+- [x] Verify ALL delivery checklist items in Phases 0–10 are ticked. Run
       `grep -c '^\- \[ \]' plans/in-progress/crane-cli-rust-migration/delivery.md` — must return 0
       (no unchecked boxes outside Phase 11 itself).
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: grep returned 6 — all in Phase 11 itself. Phases 0–10 fully ticked.
 
-- [ ] Verify ALL quality gates pass (local + CI): `npx nx run crane-cli:lint`,
+- [x] Verify ALL quality gates pass (local + CI): `npx nx run crane-cli:lint`,
       `npx nx run crane-cli:test:quick`, and `npx nx run crane-cli:spec-coverage` all exit 0.
       CI run on `origin main` must show green for all checks via
       `gh run view --json status,conclusion`.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: lint, test:quick (95.80% line coverage), spec-coverage (12 specs/37 scenarios/141 steps) all exit 0. CI run 26424739295 conclusion: success.
 
-- [ ] Move this plan to done:
+- [x] Move this plan to done:
 
   ```bash
   git mv plans/in-progress/crane-cli-rust-migration plans/done/2026-$(date +%m-%d)__crane-cli-rust-migration
@@ -943,12 +962,22 @@ errors encountered during work.
 
   Verify: `ls plans/done/` shows the plan with the completion date prefix and
   `ls plans/in-progress/` no longer shows `crane-cli-rust-migration`.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
 
-- [ ] Update `plans/in-progress/README.md` (_Modified file_): remove the entry for
+- [x] Update `plans/in-progress/README.md` (_Modified file_): remove the entry for
       `crane-cli-rust-migration`. Verify with `grep -c "crane-cli-rust-migration" plans/in-progress/README.md` — returns 0.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: Entry removed; grep returns 0.
 
-- [ ] Update `plans/done/README.md` (_Modified file_): add entry for
+- [x] Update `plans/done/README.md` (_Modified file_): add entry for
       `YYYY-MM-DD__crane-cli-rust-migration` with completion date and one-line description.
       Verify with `grep -c "crane-cli-rust-migration" plans/done/README.md` — returns 1.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
+  - **Notes**: Entry added at top of Completed Projects list; grep returns 1.
 
-- [ ] Commit: `chore(plans): move crane-cli-rust-migration to done`.
+- [x] Commit: `chore(plans): move crane-cli-rust-migration to done`.
+  - **Date**: 2026-05-26
+  - **Status**: Completed
