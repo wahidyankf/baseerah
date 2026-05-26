@@ -36,6 +36,12 @@ without options are forbidden.
 
 - **[Convention Writing Convention](../../conventions/writing/conventions.md)**: This document follows
   the standard Purpose / Standards / Examples / Validation structure.
+- **[Plans Organization Convention](../../conventions/structure/plans.md)**: This convention serves
+  the plan creation lifecycle described there — grilling is the first gate before any plan files
+  are written.
+- **[Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)**:
+  All tool references in this document use vendor-neutral language; platform-specific tooling
+  (e.g., `AskUserQuestion`) is referenced only in skill and agent files under `.claude/`.
 
 ## Standards
 

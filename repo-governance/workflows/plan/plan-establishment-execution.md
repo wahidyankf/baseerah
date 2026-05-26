@@ -164,8 +164,8 @@ Present research findings and grill again to validate direction and close new br
 
 1. Summarize research findings from Step 2 (or confirm skipped)
 2. Invoke the `grill-me` Skill. **Multiple-options requirement (HARD RULE)**: Every question
-   MUST present 2-4 concrete options grounded in the research findings. Use `AskUserQuestion`
-   tool (preferred) or markdown question format. Cover:
+   MUST present 2-4 concrete options grounded in the research findings. Use an interactive
+   multiple-choice tool when available, or the markdown question format. Cover:
    - Do the research findings change any decision from Step 1? (options: yes — which decision /
      no — proceed as agreed / partial — one or more decisions need refinement)
    - Are there new constraints or trade-offs surfaced by the research?
