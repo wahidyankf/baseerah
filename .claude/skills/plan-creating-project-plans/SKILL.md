@@ -18,6 +18,38 @@ This Skill provides comprehensive guidance for creating **structured project pla
 - Structuring multi-phase projects
 - Moving plans through workflow stages
 
+## Mandatory Pre-Write and Post-Write Grilling
+
+Before writing any plan file, and again after all files are written, invoke the `grill-me` skill
+to resolve all open design decisions with the user.
+
+**HARD RULE**: Every grill question MUST present **2-4 concrete options** with trade-off
+descriptions. Open-ended questions without options are FORBIDDEN. Use the `AskUserQuestion` tool
+(preferred when available) or the markdown multiple-choice format from `grill-me`. Ground options
+in codebase reality — read relevant files before asking.
+
+**Pre-write grill covers** (each as a structured multiple-choice question):
+
+- What problem is this solving? What specific pain point?
+- What are the acceptance criteria? How will we know it is done?
+- What is the scope? What is explicitly out of scope?
+- What are the constraints (performance, harness-neutrality, backwards compatibility)?
+- Are there design decision forks where the user has a preference?
+
+**Post-write grill covers** (each as a structured multiple-choice question):
+
+- Does the plan structure match the user's intent? Are all acceptance criteria captured?
+- Is Gherkin completeness sufficient (every acceptance criterion has a scenario)?
+- Is checklist granularity correct (each item is one concrete action; TDD substeps separate)?
+- Is the `## Worktree` section present?
+- Is Phase 0 (Environment Setup and Baseline) the first phase in `delivery.md`?
+
+**Do NOT proceed to writing until all pre-write branches are resolved.** Unresolved design
+decisions force expensive rewrites.
+
+See [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md)
+for the authoritative rule, validation checklist, and examples. Invoke via the `grill-me` skill.
+
 ## Plans Folder Structure
 
 ```
@@ -558,6 +590,7 @@ Every delivery plan MUST end with a plan archival section:
 **Related Conventions**:
 
 - [Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation
+- [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md) - Every grill question MUST present 2-4 concrete options; open-ended questions are FORBIDDEN; one option marked recommended; interactive multiple-choice tool preferred
 - [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md) - Git workflow (default = direct push to main regardless of execution context; branch + draft PR is opt-in only when explicitly requested)
 - [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) - Explicit approval required, all quality gates must pass
 - [Feature Change Completeness](../../../repo-governance/development/quality/feature-change-completeness.md) - Specs, contracts, and tests must update with every feature change
@@ -568,6 +601,7 @@ Every delivery plan MUST end with a plan archival section:
 
 **Related Skills**:
 
+- `grill-me` - Mandatory pre-write and post-write grilling; every question presents 2-4 concrete options
 - `plan-writing-gherkin-criteria` - Detailed Gherkin guidance
 - `repo-practicing-trunk-based-development` - Git workflow
 - `docs-applying-content-quality` - Universal content standards

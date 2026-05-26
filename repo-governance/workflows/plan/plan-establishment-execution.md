@@ -289,6 +289,9 @@ resolution.
   Commits format in Step 7
 - **[CI Post-Push Verification Convention](../../development/workflow/ci-post-push-verification.md)**:
   Step 7 monitors GitHub Actions after push
+- **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)**:
+  Steps 1 and 3 grill sessions MUST present 2-4 concrete options per question; open-ended
+  questions without options are FORBIDDEN
 
 ## Related Workflows
 
@@ -300,6 +303,7 @@ resolution.
 - [Plans Organization Convention](../../conventions/structure/plans.md)
 - [Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)
 - [grill-me Skill](../../../.claude/skills/grill-me/SKILL.md) — Steps 1 and 3
+- [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) — governs all grill sessions in Steps 1 and 3
 - [plan-maker Agent](../../../.claude/agents/plan-maker.md) — Step 4
 - [web-research-maker Agent](../../../.claude/agents/web-research-maker.md) — Step 2
 - [repo-setup-manager Agent](../../../.claude/agents/repo-setup-manager.md) — Phase 0 of plans

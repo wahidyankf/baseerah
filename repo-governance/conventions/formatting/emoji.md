@@ -93,6 +93,19 @@ Enforce these soft limits; exceeding them is a governance finding:
 - **Zero emojis in config files and source code.** This is a hard ban, not a soft cap (see Usage Rules FAIL list).
 - **Zero emojis in YAML frontmatter and file names.**
 
+**Known exceptions to the source-code ban** (documented per accepted false positives in
+`generated-reports/.known-false-positives.md`):
+
+- CLI tools using emoji for terminal output formatting (e.g., `apps/rhino-cli/src/`,
+  `apps/rhino-cli/internal/`, `apps/rhino-cli/cmd/` — status indicators ✓ ✗ ✅ ❌)
+- Web UI component code where emoji is part of rendered UI content (e.g., React TSX components
+  in `apps/*/src/` for ayokoding-web, organiclever-web, ose-web, and `libs/web-ui/src/`)
+- Third-party agent skill scripts outside repo-governance scope (e.g.,
+  `.agents/skills/caveman-compress/`)
+
+These exceptions apply when emoji appears in user-visible output layers (terminal UI, rendered
+HTML), not in business logic or configuration.
+
 ### Good vs Bad Examples
 
 ✅ **Good — one emoji marks a section, one status indicator inside an example:**
@@ -834,8 +847,3 @@ If unsure whether to use an emoji:
 2. If decoration → skip it
 3. If semantic → check if it's in the vocabulary
 4. If not in vocabulary → consider if it should be added (propose via PR/issue)
-
----
-
-**Last Updated:** 2026-03-04
-**Status:** 🆕 New Convention

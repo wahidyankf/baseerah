@@ -25,6 +25,13 @@ Each framework follows a consistent tutorial structure:
 
 Choose a framework based on your project requirements, team expertise, and technical constraints.
 
+## Framework Documentation
+
+- **[Elixir Phoenix](elixir-phoenix/README.md)** - Phoenix web framework patterns, channels, contexts, and best practices
+- **[Next.js (Frontend)](fe-nextjs/README.md)** - Next.js App Router, API routes, accessibility, and best practices
+- **[React (Frontend)](fe-react/README.md)** - React component architecture, state management, and best practices
+- **[JVM Spring Boot](jvm-spring-boot/README.md)** - Spring Boot REST APIs, data access, security, and best practices
+
 ## Related Documentation
 
 - **[Explanation Documentation](/docs/explanation/software-engineering/platform-web/tools)** - In-depth framework patterns and best practices

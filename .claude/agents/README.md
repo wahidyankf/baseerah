@@ -40,6 +40,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[pdf-to-md-checker](pdf-to-md-checker.md)** - PDF-to-Markdown fidelity validation (text completeness, tables, figures, Mermaid, OCR quality)
 - **[plan-checker](plan-checker.md)** - Project plan validation
 - **[plan-execution-checker](plan-execution-checker.md)** - Plan execution validation
+- **[repo-setup-manager](repo-setup-manager.md)** - Phase 0 environment setup and baseline for every plan delivery (installs dependencies, converges polyglot toolchain, resolves preexisting failures)
 - **[repo-rules-checker](repo-rules-checker.md)** - Governance compliance validation
 - **[repo-workflow-checker](repo-workflow-checker.md)** - Workflow documentation validation
 - **[repo-harness-compatibility-checker](repo-harness-compatibility-checker.md)** - Validates cross-vendor parity invariants (Phase 0, deterministic) and detects external harness drift (Phase 1, web-research-backed)
