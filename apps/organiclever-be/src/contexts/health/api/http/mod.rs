@@ -1,4 +1,4 @@
-/// Wire-format contract types for the health HTTP API (hand-written from OpenAPI spec).
+/// Wire-format contract types for the health HTTP API (hand-written from `OpenAPI` spec).
 pub mod contracts;
 
 use axum::{Json, Router, http::StatusCode, routing::get};
