@@ -65,7 +65,23 @@ See [Plans Organization Convention](../../repo-governance/conventions/structure/
 
 ## Planning Workflow
 
-### Step 1: Gather Requirements
+### Step 1: Grill the User (Mandatory — Pre-Write)
+
+Before reading the codebase or creating any files, invoke the `grill-me` skill
+(`.claude/skills/grill-me/SKILL.md`) to resolve all open design decisions with the user.
+
+Ask about:
+
+- What problem is this solving? What specific pain is it addressing?
+- What are the acceptance criteria? How will we know it is done?
+- What is the scope? What is explicitly out of scope?
+- What are the constraints (performance, compatibility, harness-neutrality, etc.)?
+- Are there design decision forks where the user has a preference?
+
+Do NOT proceed to Step 2 until all open branches are resolved. Unresolved design decisions
+discovered during writing force expensive rewrites — resolve them now.
+
+### Step 2: Gather Requirements
 
 Read and understand user requirements:
 
@@ -83,7 +99,7 @@ Clarify with user if needed:
 - What's the scope?
 - What are the constraints?
 
-### Step 2: Create Plan Folder
+### Step 3: Create Plan Folder
 
 New plans start in `backlog/` with a creation-date prefix, then move to `in-progress/` WITHOUT
 the date prefix when work begins.
@@ -96,7 +112,7 @@ mkdir -p plans/backlog/YYYY-MM-DD__project-identifier
 git mv plans/backlog/YYYY-MM-DD__project-identifier plans/in-progress/project-identifier
 ```
 
-### Step 3: Write Requirements (BRD + PRD)
+### Step 4: Write Requirements (BRD + PRD)
 
 Document intent and specification in two separate files, per the [Content-Placement Rules](../../repo-governance/conventions/structure/plans.md#content-placement-rules-brdmd-vs-prdmd):
 
@@ -120,7 +136,7 @@ Document intent and specification in two separate files, per the [Content-Placem
 
 **Cross-cutting concerns**: For content that spans both, place the **factual claim or judgment** in `brd.md` and the **testable scenario** in `prd.md`, cross-linking between them. Do not duplicate the full content.
 
-### Step 4: Write Technical Documentation
+### Step 5: Write Technical Documentation
 
 Document how to build it:
 
@@ -134,7 +150,7 @@ tests are written BEFORE implementation. Gherkin acceptance criteria in `prd.md`
 source of first failing tests. Document which test level (unit/integration/E2E) covers each
 acceptance criterion.
 
-### Step 5: Create Delivery Checklist
+### Step 6: Create Delivery Checklist
 
 Break work into executable steps:
 
@@ -143,7 +159,7 @@ Break work into executable steps:
 **Validation Checklists**: How to verify each phase
 **Acceptance Criteria**: Final verification steps
 
-### Step 6: Add Git Workflow
+### Step 7: Add Git Workflow
 
 Specify branch strategy:
 
@@ -152,6 +168,30 @@ Specify branch strategy:
 **Other exception**: Plain feature branch (non-worktree) requires justification.
 
 See [Trunk Based Development Convention](../../repo-governance/development/workflow/trunk-based-development.md) and especially the [Default Push and Worktree Execution](../../repo-governance/development/workflow/trunk-based-development.md#default-push-and-worktree-execution) section for workflow details.
+
+### Step 8: Grill the User (Mandatory — Post-Write)
+
+After all plan files are written, invoke the `grill-me` skill again to validate the plan with
+the user before signaling done.
+
+Cover:
+
+- Does the plan structure match the user's intent? Are all acceptance criteria captured?
+- Are there open questions that surfaced during writing?
+- Is Gherkin completeness sufficient (every acceptance criterion has a scenario)?
+- Is checklist granularity correct (each item is one concrete action; RED/GREEN/REFACTOR are
+  separate checkboxes per the HARD RULE in
+  [test-driven-development.md](../../repo-governance/development/workflow/test-driven-development.md))?
+- Is the `## Worktree` section present in `delivery.md`?
+- Is Phase 0 (Environment Setup and Baseline) the first phase in `delivery.md`, with
+  `repo-setup-manager` as the designated executor?
+- **Harness-neutrality**: If the plan scope includes `.claude/agents/`, `.opencode/agents/`,
+  or `repo-governance/` paths, confirm that no vendor-specific content was introduced into
+  governance files. Reference the
+  [Governance Vendor-Independence Convention](../../repo-governance/conventions/structure/governance-vendor-independence.md).
+
+Revise files as needed based on user feedback. Signal done only after the user confirms the
+plan is complete and correct.
 
 ## Plan Quality Standards
 
@@ -351,19 +391,26 @@ Every delivery plan MUST include these sections. Plans without them will be flag
 
 ### Required Delivery Sections
 
-When writing the delivery checklist (Step 5), ALWAYS include ALL of the following sections. These are non-negotiable.
+When writing the delivery checklist (Step 6), ALWAYS include ALL of the following sections.
+These are non-negotiable.
 
-**1. Environment Setup** (at the beginning of the delivery checklist):
+**1. Phase 0: Environment Setup and Baseline** (the FIRST phase of every delivery checklist,
+delegated to `repo-setup-manager`):
 
 ```markdown
-### Environment Setup
+## Phase 0: Environment Setup and Baseline
+
+> _Executor: repo-setup-manager_
 
 - [ ] Install dependencies in the root worktree: `npm install`
-- [ ] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix` (required — the `postinstall` hook runs `doctor || true` and silently tolerates drift; see [Worktree Toolchain Initialization](../../repo-governance/development/workflow/worktree-setup.md))
+      — acceptance: exits 0, `node_modules/` synchronized
+- [ ] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
+      — acceptance: exits 0 with no unresolved drift
 - [ ] [Project-specific setup: env vars, DB, Docker, etc.]
-- [ ] Verify dev server starts: `nx dev [project-name]`
 - [ ] Run existing tests to establish baseline: `nx run [project-name]:test:quick`
-- [ ] Note any preexisting failures for fixing during execution
+      — acceptance: baseline pass/fail count recorded; all preexisting failures documented
+- [ ] Resolve all preexisting failures before proceeding
+      — acceptance: no preexisting failures remain unresolved
 ```
 
 **2. Local Quality Gates** (before any push step in each phase):
