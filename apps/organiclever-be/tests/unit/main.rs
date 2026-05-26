@@ -81,11 +81,11 @@ mod error_tests {
 
 mod health_tests {
     use axum::http::StatusCode;
-    use organiclever_be::health;
+    use organiclever_be::contexts::health::api::http;
 
     #[tokio::test]
     async fn test_health_returns_ok() {
-        let resp = health::get_health().await;
+        let resp = http::get_health_handler().await;
         assert_eq!(resp.0, StatusCode::OK);
     }
 }

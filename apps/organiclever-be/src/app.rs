@@ -1,9 +1,9 @@
 //! Axum router and middleware configuration.
 
-use axum::{Router, routing::get};
+use axum::Router;
 use tower_http::cors::CorsLayer;
 
-use crate::health;
+use crate::contexts::health::api::http as health_http;
 
 /// Build and return the application router with CORS middleware.
 pub fn router() -> Router {
@@ -14,5 +14,5 @@ pub fn router() -> Router {
 
 /// Build the versioned API sub-router.
 fn api_router() -> Router {
-    Router::new().route("/health", get(health::get_health))
+    health_http::routes()
 }
