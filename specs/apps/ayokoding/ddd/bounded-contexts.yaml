@@ -7,7 +7,9 @@ contexts:
       plus the tRPC root router stitching that composes per-BC sub-routers
       into the single tRPC API surface served at /api/trpc.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/ayokoding-web/src/contexts/app-shell
@@ -21,6 +23,7 @@ contexts:
       infrastructure owns filesystem/frontmatter adapters; presentation owns
       article + content-list rendering.
     layers:
+      - domain
       - application
       - infrastructure
       - presentation
@@ -47,6 +50,7 @@ contexts:
       results; infrastructure owns the index; presentation renders the input +
       results dropdown.
     layers:
+      - domain
       - application
       - infrastructure
       - presentation
@@ -68,11 +72,12 @@ contexts:
     summary: >-
       Locale switching + tRPC i18n-api + Next.js middleware. Application owns
       locale negotiation, the middleware function, and translation lookup tables;
-      presentation owns the locale switcher UI. No infrastructure layer today —
-      translation tables are static (no loader/adapter); will add when i18n grows
-      filesystem or remote translation sources.
+      presentation owns the locale switcher UI. Infrastructure layer scaffold
+      added for future filesystem or remote translation sources.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/ayokoding-web/src/contexts/i18n
@@ -93,7 +98,9 @@ contexts:
       Top-level navigation + tRPC navigation-api. Application produces the nav
       tree; presentation renders the menu.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/ayokoding-web/src/contexts/navigation
@@ -109,7 +116,10 @@ contexts:
   - name: health
     summary: Health-check tRPC procedure. No UI surface today.
     layers:
+      - domain
       - application
+      - infrastructure
+      - presentation
     code:
       - apps/ayokoding-web/src/contexts/health
     glossary: specs/apps/ayokoding/ddd/ubiquitous-language/health.md
