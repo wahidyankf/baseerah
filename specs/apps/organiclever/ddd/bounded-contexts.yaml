@@ -31,6 +31,7 @@ contexts:
     layers:
       - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/organiclever-web/src/contexts/workout-session
@@ -71,6 +72,7 @@ contexts:
     layers:
       - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/organiclever-web/src/contexts/stats
@@ -103,7 +105,9 @@ contexts:
       navigation skeleton, error boundaries, app loggers, and the UI shell
       xstate machine. Shared kernel; owns no domain entities.
     layers:
+      - domain
       - application
+      - infrastructure
       - presentation
     code:
       - apps/organiclever-web/src/contexts/app-shell
@@ -117,7 +121,10 @@ contexts:
       Reads ORGANICLEVER_BE_URL, probes GET /health, and renders an
       UP / DOWN / Not configured tile.
     layers:
+      - domain
+      - application
       - infrastructure
+      - presentation
     code:
       - apps/organiclever-web/src/contexts/health
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/health.md
@@ -129,6 +136,9 @@ contexts:
       Marketing landing surface at / — hero, features, principles, rhythm demo,
       footer. No domain logic; pure presentational content.
     layers:
+      - domain
+      - application
+      - infrastructure
       - presentation
     code:
       - apps/organiclever-web/src/contexts/landing
@@ -142,6 +152,9 @@ contexts:
       exist only as 404 stubs to communicate "feature not yet available"
       without leaking placeholders into other contexts.
     layers:
+      - domain
+      - application
+      - infrastructure
       - presentation
     code:
       - apps/organiclever-web/src/contexts/routing
