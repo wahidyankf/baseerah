@@ -4,10 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [adopt-hexagonal-ddd-architecture](./adopt-hexagonal-ddd-architecture/README.md) — Adopt
-  hexagonal architecture across all CLI and client-facing apps, and DDD + hexagonal
-  architecture for all BE apps. Five governance convention documents + structural refactoring
-  of all in-scope apps + OpenAPI codegen infrastructure for BE↔client pairs.
+_No active plans._
 
 ## Instructions
 

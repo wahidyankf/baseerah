@@ -1,6 +1,6 @@
 # Adopt Hexagonal Architecture (All Apps) + DDD (BE Apps)
 
-**Status**: In Progress
+**Status**: Done
 **Plan identifier**: `adopt-hexagonal-ddd-architecture`
 **Worktree path**: `worktrees/adopt-hexagonal-ddd-architecture/`
 
