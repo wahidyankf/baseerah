@@ -198,8 +198,8 @@ between context modules. `organiclever-web` implements this; all other web apps 
 **TypeScript client:** `hey-api/openapi-ts` (production-grade, active maintenance, used by
 Vercel). Generates TypeScript types + fetch client from OpenAPI 3.1 spec. Output lands in
 `apps/<name>/src/generated-contracts/`. [Web-cited: https://github.com/hey-api/openapi-ts,
-accessed 2026-05-26 — "The successor to openapi-typescript-codegen. Used in production by
-Vercel, OpenCode, PayPal and others."]
+accessed 2026-05-26 — "The OpenAPI to TypeScript code generator used by Vercel, OpenCode, and
+PayPal."]
 
 **Rust server:** `openapi-generator` with `rust-axum` generator target. Quality note: the
 Rust/Axum server generator is community-maintained and its output quality varies by spec
@@ -316,6 +316,10 @@ apps/organiclever-be/src/
 ```
 apps/ose-app-be/src/OseAppBe/
 ├── contexts/
+│   ├── shared/
+│   │   └── Infrastructure/
+│   │       ├── AppDbContext.fs  ← shared EF Core DbContext (no per-context DbSets yet)
+│   │       └── Migrations.fs   ← DbUp runner, assembly-scoped; shared across all contexts
 │   ├── health/
 │   │   ├── Domain/
 │   │   │   └── Types.fs        ← HealthStatus DU
@@ -339,12 +343,21 @@ apps/ose-app-be/src/OseAppBe/
 └── Program.fs                  ← composition root; lists <Compile> in domain-first order
 ```
 
+> **Design note (shared context)**: `AppDbContext.fs` and `Migrations.fs` are cross-cutting
+> infrastructure adapters that belong to no single bounded context. They live in
+> `contexts/shared/Infrastructure/` — the canonical home for cross-context infrastructure in
+> this app. `Program.fs` opens `OseAppBe.Contexts.Shared.Infrastructure.*` to wire them at
+> the composition root. No bounded-context-specific code lives in `shared/`.
+
 **fsproj compilation order after refactor (template):**
 
 ```xml
 <!-- Generated contracts (unchanged) -->
 <Compile Include="..\..\generated-contracts\OpenAPI\src\OseAppBe.Contracts\HealthResponse.fs" ... />
 <Compile Include="Contracts/ContractWrappers.fs" />
+<!-- Shared cross-context infrastructure (compiled before any bounded context) -->
+<Compile Include="contexts/shared/Infrastructure/AppDbContext.fs" />
+<Compile Include="contexts/shared/Infrastructure/Migrations.fs" />
 <!-- Health context -->
 <Compile Include="contexts/health/Domain/Types.fs" />
 <Compile Include="contexts/health/Application/UseCases.fs" />

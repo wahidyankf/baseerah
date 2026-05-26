@@ -54,13 +54,14 @@ itself complete.
 ### Backend apps
 
 **US-7**: As an app developer, I want `organiclever-be` reorganized into
-`src/contexts/<name>/{domain,application,infrastructure,http}/` modules so that each bounded
-context has its own isolated domain model and the Axum router is confined to the `http/` layer.
+`src/contexts/<name>/{domain,application,infrastructure,api}/` modules so that each bounded
+context has its own isolated domain model and the Axum router is confined to the `api/http/`
+sub-layer.
 
 **US-8**: As an app developer, I want `ose-app-be` reorganized into per-context subdirectory
-structure inside `src/OseAppBe/contexts/<name>/{Domain,Application,Infrastructure,Http}/`
-with F# compilation order enforcing the dependency rule (domain types compiled before http)
-so that F# module loading never violates the dependency direction.
+structure inside `src/OseAppBe/contexts/<name>/{Domain,Application,Infrastructure,Api}/`
+with F# compilation order enforcing the dependency rule (domain types compiled before
+`Api/Http/`) so that F# module loading never violates the dependency direction.
 
 ### OpenAPI contracts
 
@@ -119,7 +120,7 @@ Scenario: Web hexagonal architecture document exists and is complete
 Scenario: BE hexagonal + DDD architecture document exists and is complete
   Given the plan has been executed
   When I read repo-governance/development/pattern/hexagonal-architecture-be.md
-  Then the document specifies contexts/<name>/{domain,application,infrastructure,http}/ layout
+  Then the document specifies contexts/<name>/{domain,application,infrastructure,api}/ layout with api/http/ as the REST inbound-adapter sub-layer
   And it covers Rust trait-as-port pattern
   And it covers F# compilation-order constraint and railway-oriented programming
   And markdownlint reports zero violations
@@ -274,7 +275,7 @@ Scenario: organiclever codegen targets generate types from spec
   Given the plan has been executed
   When I run nx run organiclever-be:codegen
   Then the command exits 0
-  And Rust type files are generated in apps/organiclever-be/src/generated_contracts/ or equivalent
+  And Rust type files are generated in apps/organiclever-be/generated-contracts/ or equivalent path defined in project.json
   When I run nx run organiclever-contracts:lint
   Then the command exits 0
 ```

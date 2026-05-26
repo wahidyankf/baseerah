@@ -14,8 +14,8 @@ no infrastructure bleed into domain logic.
 - **Mixed concerns**: Domain logic currently sits alongside Axum handler code in
   `apps/organiclever-be/src/health/` (a single `mod.rs` contains the HTTP handler, not just
   domain logic). [Repo-grounded: verified via `Read apps/organiclever-be/src/health/mod.rs`]
-- **Incomplete layers in web apps**: Five of nine web contexts in `organiclever-web` lack at
-  least one of the four required layers. All five `ose-app-web` contexts have no inner layers
+- **Incomplete layers in web apps**: Six of nine web contexts in `organiclever-web` lack at
+  least one of the four required layers. All four `ose-app-web` contexts have no inner layers
   at all — only a `README.md`. [Repo-grounded: verified via context directory audits]
 - **Flat CLI structure**: `ose-cli` has only `commands/` and no `domain/`, `application/`, or
   `infrastructure/` modules. `crane-cli` uses non-canonical names (`core/` instead of

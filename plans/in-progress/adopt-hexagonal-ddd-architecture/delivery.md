@@ -20,7 +20,7 @@ and
 
 > _Executor: `repo-setup-manager`_
 
-- [ ] Install dependencies in the root worktree from `/Users/wkf/ose-projects/ose-public/`:
+- [ ] Install dependencies in the root worktree (repo root):
       `npm install`
       — acceptance: exits 0, `node_modules/` synchronized.
 
@@ -45,11 +45,11 @@ and
 ### 1.1 — Core hexagonal architecture document
 
 - [ ] **RED**: Verify the file does not exist:
-      `test -f /Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture.md && echo EXISTS || echo MISSING`
+      `test -f repo-governance/development/pattern/hexagonal-architecture.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
 - [ ] **GREEN**: Create
-      `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture.md`
+      `repo-governance/development/pattern/hexagonal-architecture.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture`
   - `## Overview` — define ports, adapters, domain, application, infrastructure layers; state
@@ -73,11 +73,11 @@ and
 ### 1.2 — CLI hexagonal architecture document
 
 - [ ] **RED**: Verify the file does not exist:
-      `test -f /Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-cli.md && echo EXISTS || echo MISSING`
+      `test -f repo-governance/development/pattern/hexagonal-architecture-cli.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
 - [ ] **GREEN**: Create
-      `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-cli.md`
+      `repo-governance/development/pattern/hexagonal-architecture-cli.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture — CLI Apps`
   - `## Overview` — CLI-specific context; `commands/` is the inbound adapter for CLI args
@@ -96,11 +96,11 @@ and
 ### 1.3 — Web hexagonal architecture document
 
 - [ ] **RED**: Verify the file does not exist:
-      `test -f /Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-web.md && echo EXISTS || echo MISSING`
+      `test -f repo-governance/development/pattern/hexagonal-architecture-web.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
 - [ ] **GREEN**: Create
-      `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-web.md`
+      `repo-governance/development/pattern/hexagonal-architecture-web.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture — Web Apps`
   - `## Overview` — Next.js context; feature context modules as the organizational unit (not
@@ -124,11 +124,11 @@ and
 ### 1.4 — BE hexagonal + DDD architecture document
 
 - [ ] **RED**: Verify the file does not exist:
-      `test -f /Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-be.md && echo EXISTS || echo MISSING`
+      `test -f repo-governance/development/pattern/hexagonal-architecture-be.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
 - [ ] **GREEN**: Create
-      `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/hexagonal-architecture-be.md`
+      `repo-governance/development/pattern/hexagonal-architecture-be.md`
       (_New file_) with the following mandatory sections:
   - H1: `# Hexagonal Architecture + DDD — Backend Apps`
   - `## Overview` — DDD bounded contexts + hexagonal layers; `contexts/<name>/` as the unit
@@ -154,11 +154,11 @@ and
 ### 1.5 — OpenAPI contract-first document
 
 - [ ] **RED**: Verify the file does not exist:
-      `test -f /Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/openapi-contract-first.md && echo EXISTS || echo MISSING`
+      `test -f repo-governance/development/pattern/openapi-contract-first.md && echo EXISTS || echo MISSING`
       — acceptance: prints `MISSING`.
 
 - [ ] **GREEN**: Create
-      `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/openapi-contract-first.md`
+      `repo-governance/development/pattern/openapi-contract-first.md`
       (_New file_) with the following mandatory sections:
   - H1: `# OpenAPI Contract-First Development`
   - `## Overview` — spec-first: the OpenAPI YAML is the single source of truth; code is
@@ -183,14 +183,24 @@ src/generated-contracts/`; fail build if diff is non-empty
 ### 1.6 — Update pattern README index
 
 - [ ] Edit
-      `/Users/wkf/ose-projects/ose-public/repo-governance/development/pattern/README.md`
+      `repo-governance/development/pattern/README.md`
       [Repo-grounded]: add entries for all five new documents in the file listing.
       — acceptance: `npm run lint:md` exits 0; all five new file names appear in README.md.
 
 ### Phase 1 Quality Gates
 
 - [ ] Run `npm run lint:md` — exits 0 across all markdown files.
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — exits 0; no regressions.
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; no regressions.
+
+> **Important**: Fix ALL failures found during quality gates, not just those caused by these
+> changes. This follows the root-cause orientation principle — proactively fix preexisting
+> errors encountered during work. Commit preexisting fixes separately.
+
+### Phase 1 Commit Guidelines
+
+- [ ] Commit changes thematically — group related changes into logically cohesive commits.
+- [ ] Follow Conventional Commits format: `<type>(<scope>): <description>`.
+- [ ] Do NOT bundle unrelated changes into a single commit.
 
 ### Phase 1 Commit
 
@@ -211,7 +221,7 @@ src/generated-contracts/`; fail build if diff is non-empty
       — acceptance: exits 0; baseline test count recorded.
 
 - [ ] **GREEN — create directories**:
-      In `/Users/wkf/ose-projects/ose-public/apps/rhino-cli/src/internal/`:
+      In `apps/rhino-cli/src/internal/`:
   - `mkdir -p domain application infrastructure`
   - Create `domain/mod.rs` (_New file_): `//! Domain types and port definitions for rhino-cli.`
   - Create `application/mod.rs` (_New file_): `//! Application use cases for rhino-cli.`
@@ -242,7 +252,7 @@ src/generated-contracts/`; fail build if diff is non-empty
       — acceptance: exits 0; baseline test count recorded.
 
 - [ ] **GREEN — rename core/ to domain/**:
-  - `git mv /Users/wkf/ose-projects/ose-public/apps/crane-cli/src/core /Users/wkf/ose-projects/ose-public/apps/crane-cli/src/domain`
+  - `git mv apps/crane-cli/src/core apps/crane-cli/src/domain`
   - Edit `apps/crane-cli/src/lib.rs` [Repo-grounded]: replace `pub mod core;` with
     `pub mod domain;`.
   - Update all `use crane_cli::core::` imports throughout `src/commands/` to
@@ -251,7 +261,7 @@ src/generated-contracts/`; fail build if diff is non-empty
   - Run `npx nx run crane-cli:typecheck` — exits 0.
 
 - [ ] **GREEN — rename adapters/ to infrastructure/**:
-  - `git mv /Users/wkf/ose-projects/ose-public/apps/crane-cli/src/adapters /Users/wkf/ose-projects/ose-public/apps/crane-cli/src/infrastructure`
+  - `git mv apps/crane-cli/src/adapters apps/crane-cli/src/infrastructure`
   - Edit `apps/crane-cli/src/lib.rs` [Repo-grounded]: replace `pub mod adapters;` with
     `pub mod infrastructure;`.
   - Update all `use crane_cli::adapters::` imports to `use crane_cli::infrastructure::` —
@@ -273,7 +283,7 @@ src/generated-contracts/`; fail build if diff is non-empty
     `src/infrastructure/` exist; typecheck and tests pass.
 
 - [ ] **GREEN — add empty application/ layer**:
-  - `mkdir -p /Users/wkf/ose-projects/ose-public/apps/crane-cli/src/application`
+  - `mkdir -p apps/crane-cli/src/application`
   - Create `apps/crane-cli/src/application/mod.rs` (_New file_):
     `//! Application use cases for crane-cli.`
   - Edit `apps/crane-cli/src/lib.rs` [Repo-grounded]: add `pub mod application;`.
@@ -291,7 +301,7 @@ src/generated-contracts/`; fail build if diff is non-empty
       — acceptance: exits 0; baseline test count recorded.
 
 - [ ] **GREEN — create domain/, application/, infrastructure/**:
-      In `/Users/wkf/ose-projects/ose-public/apps/ose-cli/src/`:
+      In `apps/ose-cli/src/`:
   - `mkdir -p domain application infrastructure`
   - Create `domain/mod.rs` (_New file_): `//! Domain types and port definitions for ose-cli.`
   - Create `application/mod.rs` (_New file_): `//! Application use cases for ose-cli.`
@@ -315,7 +325,7 @@ src/generated-contracts/`; fail build if diff is non-empty
       — acceptance: exits 0; baseline test count recorded.
 
 - [ ] **GREEN — create domain/, application/, infrastructure/**:
-      In `/Users/wkf/ose-projects/ose-public/apps/ayokoding-cli/src/`:
+      In `apps/ayokoding-cli/src/`:
   - `mkdir -p domain application infrastructure`
   - Create `domain/mod.rs` (_New file_):
     `//! Domain types and port definitions for ayokoding-cli.`
@@ -335,8 +345,19 @@ src/generated-contracts/`; fail build if diff is non-empty
 
 ### Phase 2 Quality Gates
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — exits 0; all four CLIs green.
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; all four CLIs green.
 - [ ] Run `npx nx run rhino-cli:validate:specs-tree` — exits 0; DDD tree validator still passes.
+
+> **Important**: Fix ALL failures found during quality gates, not just those caused by these
+> changes. This follows the root-cause orientation principle — proactively fix preexisting
+> errors encountered during work. Commit preexisting fixes separately.
+
+### Phase 2 Commit Guidelines
+
+- [ ] Commit changes thematically — one commit per CLI app (`rhino-cli`, `crane-cli`,
+      `ose-cli`, `ayokoding-cli` are separate commits).
+- [ ] Follow Conventional Commits format: `refactor(<scope>): <description>`.
+- [ ] Do NOT bundle unrelated changes into a single commit.
 
 ### Post-Phase 2 CI Verification
 
@@ -369,6 +390,10 @@ src/generated-contracts/`; fail build if diff is non-empty
 | `routing`         | `domain/`, `application/`, `infrastructure/` |
 | `stats`           | `infrastructure/`                            |
 | `workout-session` | `infrastructure/`                            |
+
+> **Note**: `organiclever-web` has nine contexts total. The three omitted from this table
+> (`journal`, `routine`, `settings`) already have all four layers
+> (`domain/`, `application/`, `infrastructure/`, `presentation/`) and require no changes.
 
 - [ ] **RED**: Run `npx nx run organiclever-web:test:unit` to record the baseline.
       — acceptance: exits 0; baseline test count recorded.
@@ -645,9 +670,37 @@ src/generated-contracts/`; fail build if diff is non-empty
 
 ### Phase 3 Quality Gates
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — exits 0; all five web apps green.
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; all five web apps green.
 - [ ] Run `npx nx run rhino-cli:validate:specs-tree` — exits 0.
 - [ ] Run `npx nx run rhino-cli:validate:specs-adoption` — exits 0.
+
+> **Important**: Fix ALL failures found during quality gates, not just those caused by these
+> changes. This follows the root-cause orientation principle — proactively fix preexisting
+> errors encountered during work. Commit preexisting fixes separately.
+
+### Phase 3 Commit Guidelines
+
+- [ ] Commit changes thematically — one commit per web app.
+- [ ] Follow Conventional Commits format: `refactor(<scope>): <description>`.
+- [ ] Do NOT bundle unrelated changes into a single commit.
+
+### Manual UI Smoke Test — Web Apps (after Phase 3)
+
+The changes in Phase 3 add empty stub files to five web apps. Verify that no stub file
+introduces a build or runtime error:
+
+- [ ] Start each affected dev server in turn (or run `npx nx affected -t dev` in separate
+      terminals):
+  - `organiclever-web`: `npx nx run organiclever-web:dev` (localhost:3200)
+  - `ose-app-web`: `npx nx run ose-app-web:dev` (localhost:3300)
+  - `wahidyankf-web`: `npx nx run wahidyankf-web:dev` (localhost:3201)
+  - `ayokoding-web`: `npx nx run ayokoding-web:dev` (localhost:3101)
+  - `ose-web`: `npx nx run ose-web:dev` (localhost:3100)
+- [ ] For each running app: use `browser_navigate` to navigate to the home page.
+- [ ] Use `browser_snapshot` to inspect the DOM — confirm the home page renders without
+      errors.
+- [ ] Use `browser_console_messages` — confirm zero JS errors logged.
+- [ ] Stop all dev servers.
 
 ### Post-Phase 3 CI Verification
 
@@ -881,15 +934,18 @@ existing F# files into the per-context structure and adds the `Api/Http/` layer.
 
 ### Manual API Verification — ose-app-be (after 4.2)
 
-- [ ] Start the backend dev server: `npx nx run ose-app-be:dev`
+- [ ] Start the backend server (use `start` target which explicitly binds port 8302):
+      `npx nx run ose-app-be:start`
+      [Repo-grounded: `project.json` `start` target uses `--urls http://localhost:8302`; `dev`
+      target runs `dotnet watch` without `--urls` and may bind a different port]
 - [ ] Verify health endpoint: `curl -s http://localhost:8302/api/v1/health | jq .`
       (port 8302; route `/api/v1/health` from `Program.fs` [Repo-grounded])
       — acceptance: returns health response with HTTP 200.
-- [ ] Stop the dev server.
+- [ ] Stop the server.
 
 ### Phase 4 Quality Gates
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — exits 0; both BE apps green.
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; both BE apps green.
 - [ ] Run `npx nx run organiclever-be:test:integration` — exits 0.
 - [ ] Run `npx nx run ose-app-be:test:integration` — exits 0.
 
@@ -930,8 +986,8 @@ existing F# files into the per-context structure and adds the `Api/Http/` layer.
 - [ ] **GREEN — evaluate Rust server codegen quality**:
       Review the generated output from `npx nx run organiclever-be:codegen`.
   - If `openapi-generator` rust-axum output is usable: proceed with it; generated types land
-    in `apps/organiclever-be/src/generated_contracts/` or equivalent path defined in
-    `project.json`.
+    in `apps/organiclever-be/generated-contracts/` (per `project.json` `codegen` target
+    `outputs: ["{projectRoot}/generated-contracts"]` [Repo-grounded]).
   - If output quality is insufficient: create hand-written type aliases in
     `apps/organiclever-be/src/contexts/health/api/http/contracts.rs` (_New file_) that mirror the
     OpenAPI schema shapes; annotate this file with `// [Judgment call]: openapi-generator
@@ -1013,12 +1069,16 @@ rust-axum output was insufficient; types hand-written from spec`.
 
 ### Phase 5 Quality Gates
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — exits 0.
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0.
 - [ ] Run `npx nx run organiclever-contracts:lint` — exits 0.
 - [ ] Run `npx nx run organiclever-be:codegen` followed by `git diff --exit-code` — exits 0
       (no drift).
 - [ ] Run `npx nx run organiclever-web:codegen` followed by `git diff --exit-code` — exits 0.
 - [ ] Run `npx nx run ose-app-web:codegen` followed by `git diff --exit-code` — exits 0.
+
+> **Important**: Fix ALL failures found during quality gates, not just those caused by these
+> changes. This follows the root-cause orientation principle — proactively fix preexisting
+> errors encountered during work. Commit preexisting fixes separately.
 
 ### Post-Phase 5 CI Verification
 
@@ -1026,6 +1086,12 @@ rust-axum output was insufficient; types hand-written from spec`.
 - [ ] Monitor GitHub Actions workflows triggered by the push.
 - [ ] Verify all CI checks pass — no exceptions.
 - [ ] If any CI check fails, fix immediately and push a follow-up commit.
+
+### Phase 5 Commit Guidelines
+
+- [ ] Commit changes thematically — organiclever and ose-app codegen are separate commits.
+- [ ] Follow Conventional Commits format: `feat(<scope>): <description>`.
+- [ ] Do NOT bundle unrelated changes into a single commit.
 
 ---
 
