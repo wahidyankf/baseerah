@@ -191,8 +191,9 @@ src/generated-contracts/`; fail build if diff is non-empty
 
 ### Phase 1 Quality Gates
 
-- [ ] Run `npm run lint:md` — exits 0 across all markdown files.
-- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; no regressions.
+- [x] Run `npm run lint:md` — exits 0 across all markdown files.
+- [x] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; no regressions.
+      — **Result**: 25 projects passing, 0 failures.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by these
 > changes. This follows the root-cause orientation principle — proactively fix preexisting
@@ -200,13 +201,14 @@ src/generated-contracts/`; fail build if diff is non-empty
 
 ### Phase 1 Commit Guidelines
 
-- [ ] Commit changes thematically — group related changes into logically cohesive commits.
-- [ ] Follow Conventional Commits format: `<type>(<scope>): <description>`.
-- [ ] Do NOT bundle unrelated changes into a single commit.
+- [x] Commit changes thematically — group related changes into logically cohesive commits.
+- [x] Follow Conventional Commits format: `<type>(<scope>): <description>`.
+- [x] Do NOT bundle unrelated changes into a single commit.
 
 ### Phase 1 Commit
 
-- [ ] Commit: `docs(governance): add hexagonal architecture and openapi-contract-first conventions`
+- [x] Commit: `docs(governance): add hexagonal architecture and openapi-contract-first conventions`
+      — **Also committed**: `chore(crane-cli): gitignore execution-chain test artifacts` (preexisting fix)
 
 ---
 
@@ -219,10 +221,11 @@ src/generated-contracts/`; fail build if diff is non-empty
 
 > _Suggested executor: `swe-rust-dev`_
 
-- [ ] **RED**: Run `npx nx run rhino-cli:test:unit` to record the baseline.
+- [x] **RED**: Run `npx nx run rhino-cli:test:unit` to record the baseline.
       — acceptance: exits 0; baseline test count recorded.
+      — **Result**: 777 tests passing.
 
-- [ ] **GREEN — create directories**:
+- [x] **GREEN — create directories**:
       In `apps/rhino-cli/src/internal/`:
   - `mkdir -p domain application infrastructure`
   - Create `domain/mod.rs` (_New file_): `//! Domain types and port definitions for rhino-cli.`
@@ -242,18 +245,19 @@ src/generated-contracts/`; fail build if diff is non-empty
   Run `npx nx run rhino-cli:test:unit` — exits 0; same test count as baseline.
   — acceptance: three new module directories exist under `src/internal/`; typecheck clean.
 
-- [ ] **REFACTOR**: Run `npx nx run rhino-cli:lint` — exits 0; no new lint warnings.
+- [x] **REFACTOR**: Run `npx nx run rhino-cli:lint` — exits 0; no new lint warnings.
 
-- [ ] Commit: `refactor(rhino-cli): add hexagonal inner layers under src/internal/`
+- [x] Commit: `refactor(rhino-cli): add hexagonal inner layers under src/internal/`
 
 ### 2.2 — crane-cli: rename core/ → domain/, adapters/ → infrastructure/, merge models/
 
 > _Suggested executor: `swe-rust-dev`_
 
-- [ ] **RED**: Run `npx nx run crane-cli:test:unit` to record the baseline.
+- [x] **RED**: Run `npx nx run crane-cli:test:unit` to record the baseline.
       — acceptance: exits 0; baseline test count recorded.
+      — **Result**: 152 tests passing.
 
-- [ ] **GREEN — rename core/ to domain/**:
+- [x] **GREEN — rename core/ to domain/**:
   - `git mv apps/crane-cli/src/core apps/crane-cli/src/domain`
   - Edit `apps/crane-cli/src/lib.rs` [Repo-grounded]: replace `pub mod core;` with
     `pub mod domain;`.
@@ -262,7 +266,7 @@ src/generated-contracts/`; fail build if diff is non-empty
     all occurrences, then update each file.
   - Run `npx nx run crane-cli:typecheck` — exits 0.
 
-- [ ] **GREEN — rename adapters/ to infrastructure/**:
+- [x] **GREEN — rename adapters/ to infrastructure/**:
   - `git mv apps/crane-cli/src/adapters apps/crane-cli/src/infrastructure`
   - Edit `apps/crane-cli/src/lib.rs` [Repo-grounded]: replace `pub mod adapters;` with
     `pub mod infrastructure;`.
@@ -270,7 +274,7 @@ src/generated-contracts/`; fail build if diff is non-empty
     use `grep -r "crane_cli::adapters" apps/crane-cli/src/` to find all occurrences.
   - Run `npx nx run crane-cli:typecheck` — exits 0.
 
-- [ ] **GREEN — merge models/ into domain/**:
+- [x] **GREEN — merge models/ into domain/**:
   - Move all `.rs` files from `apps/crane-cli/src/models/` into
     `apps/crane-cli/src/domain/` using `git mv`.
   - Edit `apps/crane-cli/src/domain/mod.rs` [Repo-grounded]: add `pub mod` declarations for
@@ -284,25 +288,26 @@ src/generated-contracts/`; fail build if diff is non-empty
     — acceptance: `src/core/`, `src/adapters/`, `src/models/` no longer exist; `src/domain/`,
     `src/infrastructure/` exist; typecheck and tests pass.
 
-- [ ] **GREEN — add empty application/ layer**:
+- [x] **GREEN — add empty application/ layer**:
   - `mkdir -p apps/crane-cli/src/application`
   - Create `apps/crane-cli/src/application/mod.rs` (_New file_):
     `//! Application use cases for crane-cli.`
   - Edit `apps/crane-cli/src/lib.rs` [Repo-grounded]: add `pub mod application;`.
   - Run `npx nx run crane-cli:typecheck` — exits 0.
 
-- [ ] **REFACTOR**: Run `npx nx run crane-cli:lint` — exits 0; run `npx nx run crane-cli:test:quick` — exits 0.
+- [x] **REFACTOR**: Run `npx nx run crane-cli:lint` — exits 0; run `npx nx run crane-cli:test:quick` — exits 0.
 
-- [ ] Commit: `refactor(crane-cli): rename core→domain, adapters→infrastructure, merge models into domain`
+- [x] Commit: `refactor(crane-cli): rename core→domain, adapters→infrastructure, merge models into domain`
 
 ### 2.3 — ose-cli: add missing inner layers
 
 > _Suggested executor: `swe-rust-dev`_
 
-- [ ] **RED**: Run `npx nx run ose-cli:test:unit` to record the baseline.
+- [x] **RED**: Run `npx nx run ose-cli:test:unit` to record the baseline.
       — acceptance: exits 0; baseline test count recorded.
+      — **Result**: 14 tests passing.
 
-- [ ] **GREEN — create domain/, application/, infrastructure/**:
+- [x] **GREEN — create domain/, application/, infrastructure/**:
       In `apps/ose-cli/src/`:
   - `mkdir -p domain application infrastructure`
   - Create `domain/mod.rs` (_New file_): `//! Domain types and port definitions for ose-cli.`
@@ -315,18 +320,19 @@ src/generated-contracts/`; fail build if diff is non-empty
   - Run `npx nx run ose-cli:test:unit` — exits 0; same test count as baseline.
     — acceptance: three new directories exist under `src/`; typecheck clean.
 
-- [ ] **REFACTOR**: Run `npx nx run ose-cli:lint` — exits 0; run `npx nx run ose-cli:test:quick` — exits 0.
+- [x] **REFACTOR**: Run `npx nx run ose-cli:lint` — exits 0; run `npx nx run ose-cli:test:quick` — exits 0.
 
-- [ ] Commit: `refactor(ose-cli): add hexagonal inner layers (domain, application, infrastructure)`
+- [x] Commit: `refactor(ose-cli): add hexagonal inner layers (domain, application, infrastructure)`
 
 ### 2.4 — ayokoding-cli: add missing inner layers
 
 > _Suggested executor: `swe-rust-dev`_
 
-- [ ] **RED**: Run `npx nx run ayokoding-cli:test:unit` to record the baseline.
+- [x] **RED**: Run `npx nx run ayokoding-cli:test:unit` to record the baseline.
       — acceptance: exits 0; baseline test count recorded.
+      — **Result**: 18 tests passing.
 
-- [ ] **GREEN — create domain/, application/, infrastructure/**:
+- [x] **GREEN — create domain/, application/, infrastructure/**:
       In `apps/ayokoding-cli/src/`:
   - `mkdir -p domain application infrastructure`
   - Create `domain/mod.rs` (_New file_):
@@ -341,14 +347,15 @@ src/generated-contracts/`; fail build if diff is non-empty
   - Run `npx nx run ayokoding-cli:test:unit` — exits 0; same test count as baseline.
     — acceptance: three new directories exist under `src/`; typecheck clean.
 
-- [ ] **REFACTOR**: Run `npx nx run ayokoding-cli:lint` — exits 0; run `npx nx run ayokoding-cli:test:quick` — exits 0.
+- [x] **REFACTOR**: Run `npx nx run ayokoding-cli:lint` — exits 0; run `npx nx run ayokoding-cli:test:quick` — exits 0.
 
-- [ ] Commit: `refactor(ayokoding-cli): add hexagonal inner layers (domain, application, infrastructure)`
+- [x] Commit: `refactor(ayokoding-cli): add hexagonal inner layers (domain, application, infrastructure)`
 
 ### Phase 2 Quality Gates
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; all four CLIs green.
-- [ ] Run `npx nx run rhino-cli:validate:specs-tree` — exits 0; DDD tree validator still passes.
+- [x] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0; all four CLIs green.
+      — **Result**: All 25 projects passing (run-many), validate:specs-tree exits 0.
+- [x] Run `npx nx run rhino-cli:validate:specs-tree` — exits 0; DDD tree validator still passes.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by these
 > changes. This follows the root-cause orientation principle — proactively fix preexisting
@@ -356,10 +363,10 @@ src/generated-contracts/`; fail build if diff is non-empty
 
 ### Phase 2 Commit Guidelines
 
-- [ ] Commit changes thematically — one commit per CLI app (`rhino-cli`, `crane-cli`,
+- [x] Commit changes thematically — one commit per CLI app (`rhino-cli`, `crane-cli`,
       `ose-cli`, `ayokoding-cli` are separate commits).
-- [ ] Follow Conventional Commits format: `refactor(<scope>): <description>`.
-- [ ] Do NOT bundle unrelated changes into a single commit.
+- [x] Follow Conventional Commits format: `refactor(<scope>): <description>`.
+- [x] Do NOT bundle unrelated changes into a single commit.
 
 ### Post-Phase 2 CI Verification
 
