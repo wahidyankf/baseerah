@@ -1,6 +1,6 @@
 ---
-name: plan-establishment
-title: "plan-establishment"
+name: plan-establishment-execution
+title: "plan-establishment-execution"
 goal: >
   Create a well-researched, grill-validated project plan in plans/in-progress/ from a user prompt
   describing a desired behavior or change, then push it to the confirmed target
