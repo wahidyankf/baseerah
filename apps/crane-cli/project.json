@@ -7,98 +7,85 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo build --release --manifest-path apps/crane-cli/Cargo.toml && mkdir -p apps/crane-cli/dist && cp apps/crane-cli/target/release/crane apps/crane-cli/dist/crane"
+        "command": "dotnet publish apps/crane-cli/crane-cli.fsproj -c Release -o apps/crane-cli/dist"
       },
-      "outputs": ["{projectRoot}/dist", "{projectRoot}/target"],
+      "outputs": ["{projectRoot}/dist"],
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{projectRoot}/Cargo.toml"]
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/crane-cli.fsproj"]
     },
-    "install": {
+    "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo fetch --manifest-path apps/crane-cli/Cargo.toml"
-      }
+        "command": "dotnet build apps/crane-cli/crane-cli.fsproj --no-restore"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/crane-cli.fsproj"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["fantomas --check apps/crane-cli/src", "dotnet fsharplint lint apps/crane-cli/crane-cli.fsproj"],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/crane-cli.fsproj"]
     },
     "fmt": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo fmt --manifest-path apps/crane-cli/Cargo.toml"
+        "command": "fantomas apps/crane-cli/src"
       }
     },
     "fmt:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo fmt --manifest-path apps/crane-cli/Cargo.toml -- --check"
+        "command": "fantomas --check apps/crane-cli/src"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs"]
-    },
-    "typecheck": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo check --manifest-path apps/crane-cli/Cargo.toml --all-targets"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{projectRoot}/Cargo.toml"]
-    },
-    "lint": {
-      "executor": "nx:run-commands",
-      "options": {
-        "commands": [
-          "cargo fmt --manifest-path apps/crane-cli/Cargo.toml -- --check",
-          "cargo clippy --manifest-path apps/crane-cli/Cargo.toml --all-targets -- -D warnings"
-        ],
-        "parallel": false
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{projectRoot}/Cargo.toml"]
-    },
-    "deny:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo deny --manifest-path apps/crane-cli/Cargo.toml check"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/deny.toml"]
+      "inputs": ["{projectRoot}/src/**/*.fs"]
     },
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --manifest-path apps/crane-cli/Cargo.toml --"
+        "command": "dotnet run --project apps/crane-cli/crane-cli.fsproj --"
       }
     },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --manifest-path apps/crane-cli/Cargo.toml -- --help"
+        "command": "dotnet run --project apps/crane-cli/crane-cli.fsproj -- --help"
       }
     },
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo test --manifest-path apps/crane-cli/Cargo.toml --test unit"
+        "command": "dotnet test apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{projectRoot}/tests/unit/**/*.rs", "{projectRoot}/Cargo.toml"]
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/unit/**/*.fs",
+        "{projectRoot}/crane-cli.fsproj",
+        "{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature"
+      ]
     },
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo llvm-cov --manifest-path apps/crane-cli/Cargo.toml --test unit --ignore-filename-regex 'main\\.rs|ocr_commands\\.rs|pdf_adapter\\.rs|pdf_extraction_cache\\.rs' --fail-under-lines 95"
+        "command": "dotnet test apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line"
       },
       "cache": true,
       "inputs": [
-        "{projectRoot}/src/**/*.rs",
-        "{projectRoot}/tests/unit/**/*.rs",
-        "{projectRoot}/Cargo.toml",
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/unit/**/*.fs",
+        "{projectRoot}/crane-cli.fsproj",
         "{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature"
-      ],
-      "outputs": ["{projectRoot}/target"]
+      ]
     },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo test --manifest-path apps/crane-cli/Cargo.toml --test integration"
+        "command": "dotnet test apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj"
       },
       "cache": false
     },
@@ -108,9 +95,9 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/crane/behavior/cli/gherkin apps/crane-cli"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature", "{projectRoot}/src/**/*.rs"]
+      "inputs": ["{workspaceRoot}/specs/apps/crane/behavior/cli/gherkin/**/*.feature", "{projectRoot}/src/**/*.fs"]
     }
   },
-  "tags": ["type:app", "platform:cli", "lang:rust", "domain:crane"],
+  "tags": ["type:app", "platform:cli", "lang:dotnet", "domain:crane"],
   "implicitDependencies": []
 }

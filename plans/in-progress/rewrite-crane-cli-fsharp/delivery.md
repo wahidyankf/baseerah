@@ -20,18 +20,36 @@ and
 
 > _Executor: repo-setup-manager_
 
-- [ ] Install dependencies in the root worktree: `npm install`
+- [x] Install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized
-- [ ] Converge the full polyglot toolchain: `npm run doctor -- --fix`
+  - **Implementation Notes**: `npm install` ran in worktree `worktrees/rewrite-crane-cli-fsharp/`, exited 0. Audit found 0 vulnerabilities.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Converge the full polyglot toolchain: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift; dotnet 10 SDK present
-- [ ] Verify dotnet SDK is available: `dotnet --version`
+  - **Implementation Notes**: All 20 tools OK, 0 warnings, 0 missing. dotnet 10.0.300 present.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Verify dotnet SDK is available: `dotnet --version`
       — acceptance: output starts with `10.`
-- [ ] Run existing baseline tests for crane-cli: `npx nx run crane-cli:test:quick`
+  - **Implementation Notes**: Output: `10.0.300`
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Run existing baseline tests for crane-cli: `npx nx run crane-cli:test:quick`
       — acceptance: baseline pass/fail count recorded; all preexisting failures documented
-- [ ] Run existing integration baseline: `npx nx run crane-cli:test:integration`
+  - **Implementation Notes**: 152 passed, 0 failed (Rust unit tests). Coverage ≥95% line. No failures.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Run existing integration baseline: `npx nx run crane-cli:test:integration`
       — acceptance: baseline pass/fail count recorded
-- [ ] Resolve all preexisting failures before proceeding
+  - **Implementation Notes**: 12 features, 37 scenarios, 141 steps — all passed. No failures.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved
+  - **Implementation Notes**: No preexisting failures. Baseline clean: 152 unit + 37 integration scenarios all green.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ---
 
@@ -39,11 +57,14 @@ and
 
 ### 1a: Amend remove-inactive-tech-stack-remnants plan
 
-- [ ] Read `plans/in-progress/remove-inactive-tech-stack-remnants/delivery.md` [Repo-grounded]
+- [x] Read `plans/in-progress/remove-inactive-tech-stack-remnants/delivery.md` [Repo-grounded]
       to confirm Phase 1 (Dotnet cleanup) is still present and not yet executed.
       — acceptance: Phase 1 checkboxes are all unchecked (`- [ ]`)
   - _Suggested executor: `docs-maker`_
-- [ ] Replace the entire `## Phase 1: Dotnet (F# / C#) Cleanup` section in
+  - **Implementation Notes**: Confirmed — all Phase 1 checkboxes unchecked. Phase 1 Dotnet (F# / C#) Cleanup section found at line 33.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Replace the entire `## Phase 1: Dotnet (F# / C#) Cleanup` section in
       `plans/in-progress/remove-inactive-tech-stack-remnants/delivery.md` with the following
       content (verbatim):
 
@@ -76,21 +97,33 @@ and
   — acceptance: `grep "Phase 1: Dotnet" plans/in-progress/remove-inactive-tech-stack-remnants/delivery.md`
   returns the DEFERRED heading; no unchecked Phase 1 items remain
   - _Suggested executor: `docs-maker`_
+  - **Implementation Notes**: Replaced Phase 1 section with DEFERRED block. `grep` returns `Dotnet (F# / C#) Cleanup — DEFERRED`.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Also amend `plans/in-progress/remove-inactive-tech-stack-remnants/brd.md`: in the
+- [x] Also amend `plans/in-progress/remove-inactive-tech-stack-remnants/brd.md`: in the
       **Business Goal** paragraph, replace "Retain only what serves the three active stacks:
       TypeScript, Go, and Rust." with "Retain only what serves the active stacks: TypeScript,
       Go, Rust, and F# (crane-cli)." — acceptance: `grep "F#" plans/in-progress/remove-inactive-tech-stack-remnants/brd.md`
       returns a non-empty result
   - _Suggested executor: `docs-maker`_
-- [ ] Commit: `chore(plans): defer dotnet phase in remove-inactive plan — crane-cli reverts to F#`
+  - **Implementation Notes**: Updated brd.md Business Goal paragraph. `grep "crane-cli" brd.md` confirms `TypeScript, Go, Rust, and F# (crane-cli).`
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Commit: `chore(plans): defer dotnet phase in remove-inactive plan — crane-cli reverts to F#`
       — acceptance: `git log --oneline -1` shows the commit message
+  - **Implementation Notes**: Committed 627b5a102. 2 files changed.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1b: Archive Rust source
 
-- [ ] Create the archive destination: `mkdir -p archived/crane-cli-rust`
+- [x] Create the archive destination: `mkdir -p archived/crane-cli-rust`
       — acceptance: `test -d archived/crane-cli-rust` exits 0
-- [ ] Archive Rust-specific files via git mv:
+  - **Implementation Notes**: Directory created.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Archive Rust-specific files via git mv:
       `bash
 git mv apps/crane-cli/Cargo.toml archived/crane-cli-rust/Cargo.toml
 git mv apps/crane-cli/Cargo.lock archived/crane-cli-rust/Cargo.lock
@@ -101,10 +134,16 @@ git mv apps/crane-cli/tests archived/crane-cli-rust/tests
 `
       — acceptance: `test -f archived/crane-cli-rust/Cargo.toml` exits 0;
       `test -d apps/crane-cli/src` exits 1; `test -d apps/crane-cli/tests` exits 1
-- [ ] Move hidden execution chain files out of the way (if they conflict):
+  - **Implementation Notes**: Cargo.toml, Cargo.lock, rust-toolchain.toml, deny.toml, src/, tests/ moved to archived/crane-cli-rust/. All acceptance checks passed.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Move hidden execution chain files out of the way (if they conflict):
       `mv apps/crane-cli/.execution-chain-* archived/crane-cli-rust/ 2>/dev/null || true`
       — acceptance: no `.execution-chain-*` files remain in `apps/crane-cli/`
-- [ ] Create `archived/crane-cli-rust/README.md` with content:
+  - **Implementation Notes**: Files already moved (were in apps/crane-cli before git mv). None remain in apps/crane-cli/.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Create `archived/crane-cli-rust/README.md` with content:
 
   ```markdown
   # archived/crane-cli-rust
@@ -118,16 +157,25 @@ git mv apps/crane-cli/tests archived/crane-cli-rust/tests
 
   — acceptance: `test -f archived/crane-cli-rust/README.md` exits 0
   - _Suggested executor: `docs-maker`_
+  - **Implementation Notes**: Created archived/crane-cli-rust/README.md.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Copy tessdata from original F# archive (needed in new implementation):
+- [x] Copy tessdata from original F# archive (needed in new implementation):
       `mkdir -p apps/crane-cli/tessdata && cp archived/crane-cli/tessdata/eng.traineddata apps/crane-cli/tessdata/eng.traineddata`
       — acceptance: `test -f apps/crane-cli/tessdata/eng.traineddata` exits 0
-- [ ] Commit: `chore(crane-cli): archive Rust source to archived/crane-cli-rust/`
+  - **Implementation Notes**: eng.traineddata copied to apps/crane-cli/tessdata/.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Commit: `chore(crane-cli): archive Rust source to archived/crane-cli-rust/`
       — acceptance: `git log --oneline -1` shows the commit message
+  - **Implementation Notes**: Committed bc2c05a76. 42 files changed.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1c: Create F# project scaffold
 
-- [ ] Create `apps/crane-cli/crane-cli.fsproj` (_New file_) with content:
+- [x] Create `apps/crane-cli/crane-cli.fsproj` (_New file_) with content:
 
   ```xml
   <Project Sdk="Microsoft.NET.Sdk">
@@ -179,8 +227,11 @@ git mv apps/crane-cli/tests archived/crane-cli-rust/tests
 
   — acceptance: `test -f apps/crane-cli/crane-cli.fsproj` exits 0
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: Created crane-cli.fsproj with net10.0 target, Argu/PdfPig/TesseractOCR/FSharp.SystemTextJson/F23.StringSimilarity dependencies.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Create all required source directories:
+- [x] Create all required source directories:
       `bash
 mkdir -p apps/crane-cli/src/Core/Domain
 mkdir -p apps/crane-cli/src/Core/Logic
@@ -192,8 +243,11 @@ mkdir -p apps/crane-cli/tests/integration/Steps
 `
       — acceptance: `test -d apps/crane-cli/src/Adapters/Out` exits 0;
       `test -d apps/crane-cli/tests/integration/Steps` exits 0
+  - **Implementation Notes**: All 7 directories created.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Create stub `src/Program.fs` (_New file_) at `apps/crane-cli/src/Program.fs`:
+- [x] Create stub `src/Program.fs` (_New file_) at `apps/crane-cli/src/Program.fs`:
 
   ```fsharp
   module CraneCli.Program
@@ -204,8 +258,11 @@ mkdir -p apps/crane-cli/tests/integration/Steps
 
   — acceptance: `test -f apps/crane-cli/src/Program.fs` exits 0
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: Created stub Program.fs with EntryPoint returning 0.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Create stub files for all 17 source modules (each containing only the module declaration):
+- [x] Create stub files for all 17 source modules (each containing only the module declaration):
   - `apps/crane-cli/src/Core/Domain/Finding.fs` — `module CraneCli.Core.Domain.Finding`
   - `apps/crane-cli/src/Core/Domain/PdfMetadata.fs` — `module CraneCli.Core.Domain.PdfMetadata`
   - `apps/crane-cli/src/Core/Domain/Report.fs` — `module CraneCli.Core.Domain.Report`
@@ -226,10 +283,13 @@ mkdir -p apps/crane-cli/tests/integration/Steps
 
   — acceptance: `dotnet build apps/crane-cli/crane-cli.fsproj` exits 0 (empty stubs compile)
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: All 17 stubs created. `dotnet build` exits 0 — 1 project, 0 errors, 0 warnings.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1d: Create unit test project scaffold
 
-- [ ] Create `apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` (_New file_):
+- [x] Create `apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` (_New file_):
 
   ```xml
   <Project Sdk="Microsoft.NET.Sdk">
@@ -290,8 +350,11 @@ mkdir -p apps/crane-cli/tests/integration/Steps
 
   — acceptance: `test -f apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` exits 0
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: Created unit test .fsproj with TickSpec 2.0.5, xUnit 2.9.2, Microsoft.NET.Test.Sdk 17.11.1.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Create `apps/crane-cli/tests/unit/xunit.runner.json` (_New file_):
+- [x] Create `apps/crane-cli/tests/unit/xunit.runner.json` (_New file_):
 
   ```json
   {
@@ -300,15 +363,21 @@ mkdir -p apps/crane-cli/tests/integration/Steps
   ```
 
   — acceptance: `test -f apps/crane-cli/tests/unit/xunit.runner.json` exits 0
+  - **Implementation Notes**: Created xunit.runner.json with maxParallelThreads:1.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Create stub `apps/crane-cli/tests/unit/Suite.fs` (_New file_) modelled on the archived
+- [x] Create stub `apps/crane-cli/tests/unit/Suite.fs` (_New file_) modelled on the archived
       source at `archived/crane-cli/tests/Suite-unit.fs` [Repo-grounded] — references the
       `GHERKIN_ROOT` env var to locate `specs/apps/crane/behavior/cli/gherkin/` and loads all
       `.feature` files. See `archived/crane-cli/tests/Suite-unit.fs` for exact content.
       — acceptance: `test -f apps/crane-cli/tests/unit/Suite.fs` exits 0
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: Copied from archived/crane-cli/tests/Suite-unit.fs verbatim.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Create minimal stub files for all 13 Steps modules and 10 Tests modules (each containing
+- [x] Create minimal stub files for all 13 Steps modules and 10 Tests modules (each containing
       only the module declaration) so the test project compiles. Steps file list:
       `BddState.fs`, `PdfSteps.fs`, `TextSteps.fs`, `HeadingSteps.fs`, `NestingSteps.fs`,
       `TableSteps.fs`, `FigureSteps.fs`, `MermaidSteps.fs`, `OcrSteps.fs`, `ReportSteps.fs`,
@@ -319,6 +388,9 @@ mkdir -p apps/crane-cli/tests/integration/Steps
       `PdfExtractionCacheTests.fs`.
       — acceptance: `dotnet build apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` exits 0
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: 13 Steps + 10 Tests stubs created. `dotnet build` exits 0 — 2 projects, 0 errors.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1e: Create integration test project scaffold
 
@@ -358,17 +430,20 @@ mkdir -p apps/crane-cli/tests/integration/Steps
   exits 0
   - _Suggested executor: `swe-fsharp-dev`_
 
-- [ ] Create stub Step files: `apps/crane-cli/tests/integration/Steps/PdfSteps.fs` and
+- [x] Create stub Step files: `apps/crane-cli/tests/integration/Steps/PdfSteps.fs` and
       `apps/crane-cli/tests/integration/Steps/OcrSteps.fs` (module declarations only).
       Create stub `apps/crane-cli/tests/integration/Suite.fs` modelled on archived
       `archived/crane-cli/tests/Suite-integration.fs` [Repo-grounded].
       — acceptance: `dotnet build apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj`
       exits 0
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: PdfSteps.fs, OcrSteps.fs, Suite.fs created. `dotnet build` exits 0 — 2 projects, 0 errors.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1f: Update Nx project.json
 
-- [ ] Overwrite `apps/crane-cli/project.json` with updated Nx targets using `dotnet` commands
+- [x] Overwrite `apps/crane-cli/project.json` with updated Nx targets using `dotnet` commands
       (replacing all `cargo` commands). Key targets:
   - `build`: `dotnet publish apps/crane-cli/crane-cli.fsproj -c Release -o apps/crane-cli/dist`
   - `typecheck`: `dotnet build apps/crane-cli/crane-cli.fsproj --no-restore`
@@ -386,10 +461,13 @@ mkdir -p apps/crane-cli/tests/integration/Steps
 
   — acceptance: `npx nx run crane-cli:typecheck` exits 0 (empty stub project builds)
   - _Suggested executor: `swe-fsharp-dev`_
+  - **Implementation Notes**: project.json rewritten with all dotnet targets, `lang:dotnet` tag. `npx nx run crane-cli:typecheck` exits 0.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1g: Update hexagonal-architecture-cli.md governance doc
 
-- [ ] Edit `repo-governance/development/pattern/hexagonal-architecture-cli.md` [Repo-grounded]:
+- [x] Edit `repo-governance/development/pattern/hexagonal-architecture-cli.md` [Repo-grounded]:
       add a new row for crane-cli F# to the layer map table showing `src/Core/Domain/`,
       `src/Core/Logic/`, `src/Adapters/In/`, `src/Adapters/Out/`, `src/Program.fs`. Add a
       brief note below the table explaining F# departs from the flat `src/commands/` layout
@@ -397,13 +475,25 @@ mkdir -p apps/crane-cli/tests/integration/Steps
       — acceptance: `grep "Adapters/In" repo-governance/development/pattern/hexagonal-architecture-cli.md`
       returns a non-empty result
   - _Suggested executor: `docs-maker`_
+  - **Implementation Notes**: Updated table column from crane-cli (Rust) to crane-cli (F#) with new paths. Added F# layout explanation note.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 1h: Phase 1 quality gate + commit
 
-- [ ] Run markdown lint: `npm run lint:md` — exits 0
-- [ ] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
-- [ ] Fix ALL failures found — including preexisting issues not caused by your changes.
+- [x] Run markdown lint: `npm run lint:md` — exits 0
+  - **Implementation Notes**: 3915 files linted, 0 errors.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Run affected typecheck: `npx nx affected -t typecheck` — exits 0
+  - **Implementation Notes**: crane-cli:typecheck exits 0, 0 warnings, 0 errors. Updated AGENTS.md crane-cli description to F#.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Fix ALL failures found — including preexisting issues not caused by your changes.
       Follow root cause orientation: fix properly, never bypass or suppress.
+  - **Implementation Notes**: No failures found. All lint and typecheck targets clean.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 - [ ] Commit: `chore(crane-cli): scaffold F# hex project structure; archive Rust source`
 
 ### Post-Phase-1 CI Verification
