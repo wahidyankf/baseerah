@@ -186,15 +186,23 @@ apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj` — exits 0
 
 ### 3a: Delete Elixir, Clojure, Dart, Python files
 
-- [ ] Delete Elixir docs:
+- [x] Delete Elixir docs:
       `rm -rf docs/explanation/software-engineering/programming-languages/elixir/` — directory gone
-- [ ] Delete Clojure docs:
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Delete Clojure docs:
       `rm -rf docs/explanation/software-engineering/programming-languages/clojure/` — directory gone
-- [ ] Delete Dart docs:
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Delete Dart docs:
       `rm -rf docs/explanation/software-engineering/programming-languages/dart/` — directory gone
-- [ ] Delete Python docs:
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Delete Python docs:
       `rm -rf docs/explanation/software-engineering/programming-languages/python/` — directory gone
-- [ ] Delete Elixir/Clojure/Dart/Python agent + opencode mirror files:
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Delete Elixir/Clojure/Dart/Python agent + opencode mirror files:
 
   ```bash
   rm .claude/agents/swe-elixir-dev.md .opencode/agents/swe-elixir-dev.md
@@ -204,8 +212,10 @@ apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj` — exits 0
   ```
 
   Verify: `ls .claude/agents/ | grep -E "elixir|clojure|dart|python"` returns nothing
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Delete skill directories:
+- [x] Delete skill directories:
 
   ```bash
   rm -rf .claude/skills/swe-programming-elixir/
@@ -215,20 +225,28 @@ apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj` — exits 0
   ```
 
   Verify: `ls .claude/skills/ | grep -E "elixir|clojure|dart|python"` returns nothing
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
-- [ ] Delete `libs/clojure-openapi-codegen/` (source already removed; remaining tracked file
+- [x] Delete `libs/clojure-openapi-codegen/` (source already removed; remaining tracked file
       is `LICENSE` plus gitignored build artifacts):
       `rm -rf libs/clojure-openapi-codegen/` — directory gone.
       Verify: `ls libs/ | grep clojure` returns nothing.
-- [ ] Edit `libs/README.md`: remove the `clojure-openapi-codegen/` line from the libs listing.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
+- [x] Edit `libs/README.md`: remove the `clojure-openapi-codegen/` line from the libs listing.
       Verify: `grep clojure libs/README.md` returns nothing.
-- [ ] Edit `.gitignore`: remove the `# Clojure classpath cache` comment line and the
+  - **Date**: 2026-05-27
+  - **Status**: Completed — also cleaned all inactive lang refs from libs/README.md
+- [x] Edit `.gitignore`: remove the `# Clojure classpath cache` comment line and the
       `.cpcache/` entry below it (no Clojure code remains after this cleanup).
       Verify: `grep cpcache .gitignore` returns nothing.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### 3b: Modify pr-quality-gate.yml for remaining langs
 
-- [ ] Edit `.github/workflows/pr-quality-gate.yml` — remove Python gate + vestigial detection:
+- [x] Edit `.github/workflows/pr-quality-gate.yml` — remove Python gate + vestigial detection:
   - Remove `has-python: ${{ steps.detect.outputs.has-python }}` from `outputs:`
   - Remove `has-elixir: ${{ steps.detect.outputs.has-elixir }}` from `outputs:`
   - Remove `has-clojure: ${{ steps.detect.outputs.has-clojure }}` from `outputs:`
@@ -248,22 +266,32 @@ apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj` — exits 0
   - Remove `python` from the `for job in ...` loop in `quality-gate`
   - Verify: `grep -iE "lang:(python|elixir|clojure|dart)" .github/workflows/pr-quality-gate.yml`
     returns nothing
-- [ ] Edit `AGENTS.md`: remove `swe-elixir-dev, swe-dart-dev, swe-clojure-dev, swe-python-dev`
+  - **Date**: 2026-05-27
+  - **Status**: Completed — rewrote entire file; all vestigial lang detection removed
+- [x] Edit `AGENTS.md`: remove `swe-elixir-dev, swe-dart-dev, swe-clojure-dev, swe-python-dev`
       from Development agents list. Verify:
       `grep -E "swe-(elixir|clojure|dart|python)-dev" AGENTS.md` returns nothing.
+  - **Date**: 2026-05-27
+  - **Status**: Completed — removed all 6 inactive agents in one edit during Phase 2b
 
 ### 3c: Sync OpenCode bindings
 
-- [ ] Run `npm run generate:bindings` — exits 0. Verify:
+- [x] Run `npm run generate:bindings` — exits 0. Verify:
       `ls .opencode/agents/ | grep -E "java|kotlin|elixir|clojure|dart|python"`
       returns nothing. (csharp and fsharp mirrors are retained and will be present — do not
       include them in this check.)
+  - **Date**: 2026-05-27
+  - **Status**: Completed — 69 agents converted; all inactive lang mirrors gone
 
 ### 3d: Quality gate + commit
 
-- [ ] Run `npm run lint:md` — exits 0
-- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0
-- [ ] Commit: `chore(cleanup): remove ose-primer lang (Elixir/Clojure/Dart/Python) remnants`
+- [x] Run `npm run lint:md` — exits 0
+  - **Date**: 2026-05-27
+  - **Status**: Completed — 3796 files, 0 errors
+- [x] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0
+  - **Date**: 2026-05-27
+  - **Status**: Completed — no affected Nx projects, exits 0
+- [x] Commit: `chore(cleanup): remove ose-primer lang (Elixir/Clojure/Dart/Python) remnants`
 
 ---
 

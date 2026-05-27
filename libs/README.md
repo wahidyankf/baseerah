@@ -10,9 +10,9 @@ The `libs/` directory contains **reusable library packages** that can be shared 
 
 ```
 libs/
-├── clojure-openapi-codegen/   # Clojure OpenAPI codegen utilities
 ├── golang-commons/            # Shared Go utilities (output, common helpers)
 ├── golang-link-commons/       # Shared Go link-checking utilities
+├── rust-commons/              # Shared Rust utilities (link-checking, HTTP)
 ├── ts-ui/                     # TypeScript UI component library
 ├── web-ui/                    # Web UI component library
 └── web-ui-token/              # Web UI design token library
@@ -26,11 +26,9 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 
 ### Language Prefixes
 
-- **`ts-*`** - TypeScript libraries (future)
-- **`go-*`** - Go libraries (current implementation — `golang-commons` uses full name for clarity)
-- **`java-*`** - Java libraries (future)
-- **`kt-*`** - Kotlin libraries (future)
-- **`py-*`** - Python libraries (future)
+- **`ts-*`** - TypeScript libraries
+- **`go-*`** / **`golang-*`** - Go libraries (`golang-commons` uses full name for clarity)
+- **`rust-*`** - Rust libraries
 
 ### Examples
 
@@ -45,14 +43,9 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 
 - `golang-commons` - Shared Go utilities (links checker, output)
 
-**Future polyglot examples**:
+**Rust libraries** (current):
 
-- `java-services` - Java backend services
-- `java-utils` - Java utility libraries
-- `kt-android` - Kotlin Android libraries
-- `kt-backend` - Kotlin backend services
-- `py-ml` - Python machine learning models
-- `py-data` - Python data processing
+- `rust-commons` - Shared Rust utilities (link-checking, HTTP)
 
 ## Current Implementation
 
@@ -63,7 +56,7 @@ checker, output formatting).
 
 ## Library Characteristics
 
-- **Polyglot-Ready** - Designed to support multiple languages (TypeScript now, Java/Kotlin/Python future)
+- **Polyglot-Ready** - Designed to support multiple languages (TypeScript, Go, Rust active)
 - **Flat Structure** - All libs at same level (no nested scopes)
 - **Language-Specific** - Each language uses its own conventions and tools
 - **Reusable** - Libs are designed to be imported by apps and other libs
@@ -147,7 +140,7 @@ Each library must have a `project.json` file:
 1. **Apps can import from any lib** - Applications are consumers
 2. **Libs can import from other libs** - Cross-library dependencies allowed
 3. **No circular dependencies** - Strictly prohibited (A → B → A not allowed)
-4. **Language boundaries** - TypeScript libs can't directly import Go/Python/Rust libs (use APIs or IPC)
+4. **Language boundaries** - TypeScript libs can't directly import Go/Rust libs (use APIs or IPC)
 5. **Keep dependencies minimal** - Each lib should have clear, focused dependencies
 
 ### Monitoring Dependencies
@@ -205,12 +198,12 @@ nx run-many -t build
 
 **See**: [Nx Target Standards](../repo-governance/development/infra/nx-targets.md) for canonical target names and mandatory targets per project type.
 
-## Future Language Support
+## Active Language Support
 
-While the current implementation focuses on TypeScript, the structure is designed to support:
+Current active languages with lib support:
 
-- **Java**: Using Maven or Gradle, standard Java project structure
-- **Kotlin**: Using Gradle, Kotlin project conventions
-- **Python**: Using pip/poetry, standard Python package structure
+- **TypeScript**: Standard TS project structure with `tsconfig.json`
+- **Go**: Module-based with `go.mod`, consumed via Go workspace (`go.work`)
+- **Rust**: Cargo workspace member, shared via `[workspace]` in root `Cargo.toml`
 
-Each language will use its own build tools via `nx:run-commands` executor, maintaining the vanilla Nx approach.
+Each language uses its own build tools via `nx:run-commands` executor, maintaining the vanilla Nx approach.

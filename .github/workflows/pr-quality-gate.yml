@@ -15,11 +15,7 @@ jobs:
       has-ts: ${{ steps.detect.outputs.has-ts }}
       has-golang: ${{ steps.detect.outputs.has-golang }}
       has-dotnet: ${{ steps.detect.outputs.has-dotnet }}
-      has-python: ${{ steps.detect.outputs.has-python }}
       has-rust: ${{ steps.detect.outputs.has-rust }}
-      has-elixir: ${{ steps.detect.outputs.has-elixir }}
-      has-clojure: ${{ steps.detect.outputs.has-clojure }}
-      has-dart: ${{ steps.detect.outputs.has-dart }}
       has-markdown: ${{ steps.detect.outputs.has-markdown }}
     env:
       NX_BASE: origin/${{ github.base_ref }}
@@ -36,11 +32,7 @@ jobs:
           echo "has-ts=false" >> "$GITHUB_OUTPUT"
           echo "has-golang=false" >> "$GITHUB_OUTPUT"
           echo "has-dotnet=false" >> "$GITHUB_OUTPUT"
-          echo "has-python=false" >> "$GITHUB_OUTPUT"
           echo "has-rust=false" >> "$GITHUB_OUTPUT"
-          echo "has-elixir=false" >> "$GITHUB_OUTPUT"
-          echo "has-clojure=false" >> "$GITHUB_OUTPUT"
-          echo "has-dart=false" >> "$GITHUB_OUTPUT"
           echo "has-markdown=false" >> "$GITHUB_OUTPUT"
 
           for project in $AFFECTED; do
@@ -50,11 +42,7 @@ jobs:
                 lang:ts) echo "has-ts=true" >> "$GITHUB_OUTPUT" ;;
                 lang:golang) echo "has-golang=true" >> "$GITHUB_OUTPUT" ;;
                 lang:fsharp|lang:csharp) echo "has-dotnet=true" >> "$GITHUB_OUTPUT" ;;
-                lang:python) echo "has-python=true" >> "$GITHUB_OUTPUT" ;;
                 lang:rust) echo "has-rust=true" >> "$GITHUB_OUTPUT" ;;
-                lang:elixir) echo "has-elixir=true" >> "$GITHUB_OUTPUT" ;;
-                lang:clojure) echo "has-clojure=true" >> "$GITHUB_OUTPUT" ;;
-                lang:dart) echo "has-dart=true" >> "$GITHUB_OUTPUT" ;;
               esac
             done
           done
@@ -86,7 +74,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
-      - run: npx nx affected -t typecheck lint test:quick spec-coverage --exclude='tag:lang:golang,tag:lang:fsharp,tag:lang:csharp,tag:lang:python,tag:lang:rust,tag:lang:elixir,tag:lang:clojure,tag:lang:dart'
+      - run: npx nx affected -t typecheck lint test:quick spec-coverage --exclude='tag:lang:golang,tag:lang:fsharp,tag:lang:csharp,tag:lang:rust'
 
   golang:
     name: Go quality gate
@@ -119,22 +107,6 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-dotnet
       - run: npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:fsharp,tag:lang:csharp'
-
-  python:
-    name: Python quality gate
-    needs: detect
-    if: needs.detect.outputs.has-python == 'true'
-    runs-on: ubuntu-latest
-    env:
-      NX_BASE: origin/${{ github.base_ref }}
-      NX_HEAD: ${{ github.sha }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-python
-      - run: npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:python'
 
   rust:
     name: Rust quality gate
@@ -186,7 +158,7 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    needs: [detect, format, typescript, golang, dotnet, python, rust, markdown, naming, specs-gate]
+    needs: [detect, format, typescript, golang, dotnet, rust, markdown, naming, specs-gate]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -194,7 +166,7 @@ jobs:
         run: |
           echo "Checking quality gate results..."
           FAILED=false
-          for job in typescript golang dotnet python rust markdown naming specs-gate; do
+          for job in typescript golang dotnet rust markdown naming specs-gate; do
             RESULT="${{ toJSON(needs) }}"
             # A skipped job is OK (language not affected). Only failure blocks.
           done
