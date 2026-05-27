@@ -494,7 +494,10 @@ mkdir -p apps/crane-cli/tests/integration/Steps
   - **Implementation Notes**: No failures found. All lint and typecheck targets clean.
   - **Date**: 2026-05-27
   - **Status**: Completed
-- [ ] Commit: `chore(crane-cli): scaffold F# hex project structure; archive Rust source`
+- [x] Commit: `chore(crane-cli): scaffold F# hex project structure; archive Rust source`
+  - **Implementation Notes**: Committed 732c73dbf. 51 files changed, 425 insertions, 84 deletions.
+  - **Date**: 2026-05-27
+  - **Status**: Completed
 
 ### Post-Phase-1 CI Verification
 
