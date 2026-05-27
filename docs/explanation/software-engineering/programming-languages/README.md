@@ -36,24 +36,23 @@ Multiple domain-focused standards files covering specific areas (testing, securi
 
 ## Quick Decision: Which Language for My Task?
 
-| Task                                     | Recommended Language   | Start With                               |
-| ---------------------------------------- | ---------------------- | ---------------------------------------- |
-| Complex domain logic with DDD            | Java                   | [Java Idioms](./java/README.md)          |
-| REST API with business rules             | Java                   | [Java Best Practices](./java/README.md)  |
-| Frontend web application                 | TypeScript             | TypeScript docs (planned)                |
-| CLI tool for repository automation       | Rust/Go                | See rhino-cli (Rust), ayokoding-cli (Go) |
-| Data processing and analytics            | Python                 | Python docs (planned)                    |
-| Microservice with high concurrency       | Java (Virtual Threads) | [Java Concurrency](./java/README.md)     |
-| Infrastructure tooling                   | Go                     | See existing CLI tools                   |
-| Real-time updates and WebSocket handling | TypeScript             | TypeScript docs (planned)                |
+| Task                                     | Recommended Language | Start With                                     |
+| ---------------------------------------- | -------------------- | ---------------------------------------------- |
+| REST API backend (current ose-public)    | Rust/Axum            | See organiclever-be, ose-app-be                |
+| Frontend web application                 | TypeScript           | [TypeScript Standards](./typescript/README.md) |
+| CLI tool for repository automation       | Rust/Go              | See rhino-cli (Rust), ayokoding-cli (Go)       |
+| Data processing and analytics            | Python               | Python docs (planned)                          |
+| Infrastructure tooling                   | Go                   | See existing CLI tools                         |
+| Real-time updates and WebSocket handling | TypeScript           | [TypeScript Standards](./typescript/README.md) |
+| Complex domain logic with DDD (future)   | Java/Kotlin/F#       | See language-specific README files             |
 
 **Platform Guidance**:
 
-- **Java**: Primary language for domain models, aggregates, and business logic
-- **TypeScript**: Future frontend applications and Node.js services
+- **TypeScript**: Active for all frontend applications (Next.js) and tRPC backends
 - **Go**: Active for CLI tools (ayokoding-cli, ose-cli)
-- **Rust**: Active for CLI tools (rhino-cli — repository management)
+- **Rust**: Active for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, crane-cli)
 - **Python**: Planned for data processing and AI/ML integration
+- **Other languages** (Java, Kotlin, C#, F#, Elixir, Clojure, Dart): Standards available; see [ose-primer](https://github.com/wahidyankf/ose-primer) for polyglot demo apps
 
 ## Purpose
 
@@ -151,7 +150,7 @@ Each language directory contains a README.md (language overview and version info
 
 **C# development with ASP.NET Core, Entity Framework Core, and functional patterns**
 
-C# is a versatile, type-safe language on the .NET ecosystem. OSE Platform uses C# for enterprise backend services with ASP.NET Core, applying functional patterns through records, pattern matching, and nullable reference types.
+C# is a versatile, type-safe language on the .NET ecosystem. These standards guide C# development with ASP.NET Core, applying functional patterns through records, pattern matching, and nullable reference types.
 
 **Use C# when you need:**
 
@@ -164,7 +163,7 @@ C# is a versatile, type-safe language on the .NET ecosystem. OSE Platform uses C
 
 **Clojure development with functional programming, REPL-driven development, and Ring/Reitit**
 
-Clojure is a functional Lisp running on the JVM with immutable persistent data structures at its core. OSE Platform leverages Clojure for data transformation pipelines, financial rule engines, and services where functional purity is paramount.
+Clojure is a functional Lisp running on the JVM with immutable persistent data structures at its core. These standards guide Clojure development for data transformation pipelines, financial rule engines, and services where functional purity is paramount.
 
 **Use Clojure when you need:**
 
@@ -189,7 +188,7 @@ Dart is used for building cross-platform mobile and web applications with the Fl
 
 **F# development with functional-first programming, railway-oriented error handling, and Giraffe**
 
-F# is a functional-first .NET language where immutability is the default and discriminated unions enable type-driven domain modeling. OSE Platform uses F# for financial computation engines where the type system prevents invalid business states at compile time.
+F# is a functional-first .NET language where immutability is the default and discriminated unions enable type-driven domain modeling. These standards guide F# development for functional computation engines where the type system prevents invalid business states at compile time.
 
 **Use F# when you need:**
 
@@ -202,7 +201,7 @@ F# is a functional-first .NET language where immutability is the default and dis
 
 **Elixir development with Phoenix framework and functional programming patterns**
 
-Elixir is used for building highly concurrent, fault-tolerant backend services. The platform leverages Elixir's functional programming model and the Phoenix framework for real-time features via Phoenix LiveView.
+Elixir is a language for building highly concurrent, fault-tolerant backend services. These standards guide Elixir development with the Phoenix framework for real-time features via Phoenix LiveView.
 
 **Use Elixir when you need:**
 
@@ -215,7 +214,7 @@ Elixir is used for building highly concurrent, fault-tolerant backend services. 
 
 **Kotlin development with coroutines, Ktor, and Spring Boot**
 
-Kotlin is a modern, concise JVM language with null safety, coroutines for structured concurrency, and seamless Java interop. OSE Platform uses Kotlin for backend services where coroutines and sealed class hierarchies improve over Java's verbosity.
+Kotlin is a modern, concise JVM language with null safety, coroutines for structured concurrency, and seamless Java interop. These standards guide Kotlin backend development where coroutines and sealed class hierarchies improve over Java's verbosity.
 
 **Use Kotlin when you need:**
 
@@ -241,7 +240,7 @@ Go is used for CLI tools and infrastructure services in the repository. The plat
 
 **Modern Java development with records, pattern matching, and virtual threads**
 
-Java is a primary language for backend services, particularly for domain-driven design and enterprise features. The platform uses modern Java (17+) with emphasis on functional programming, immutability, and structured concurrency.
+Java is a mature language for backend services with strong support for domain-driven design and enterprise features. These standards guide modern Java (17+) development with emphasis on functional programming, immutability, and structured concurrency.
 
 **Key Documentation:**
 
@@ -324,32 +323,32 @@ Languages in this documentation are chosen based on:
 
 ### Current Language Usage
 
-| Language       | Primary Use Cases                               | Status                             |
-| -------------- | ----------------------------------------------- | ---------------------------------- |
-| **Clojure**    | Functional microservices, data pipelines        | 📋 Planned - Future integration    |
-| **C#**         | Enterprise APIs, ASP.NET Core services          | 📋 Planned - Future integration    |
-| **Dart**       | Flutter mobile and web applications             | 📋 Planned - Future integration    |
-| **Elixir**     | Phoenix backend, real-time features             | ✅ Active - Phoenix services       |
-| **F#**         | Functional computation, financial engines       | 📋 Planned - Future integration    |
-| **Go**         | CLI tools, infrastructure services              | ✅ Active - ayokoding-cli, ose-cli |
-| **Java** ☕    | Backend services, domain models, business logic | ✅ Active - In production          |
-| **Kotlin**     | Coroutine-based services, Ktor APIs             | 📋 Planned - Future integration    |
-| **Python**     | Data processing, AI/ML integration              | 📋 Planned - Future integration    |
-| **Rust**       | CLI tools, repository management                | ✅ Active - rhino-cli              |
-| **TypeScript** | Frontend applications, Node.js services         | ✅ Active - organiclever-web       |
+| Language       | Primary Use Cases                               | Status                                                        |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------- |
+| **Clojure**    | Functional microservices, data pipelines        | 📋 Planned - Future integration                               |
+| **C#**         | Enterprise APIs, ASP.NET Core services          | 📋 Planned - Future integration                               |
+| **Dart**       | Flutter mobile and web applications             | 📋 Planned - Future integration                               |
+| **Elixir**     | Phoenix backend, real-time features             | 📋 Planned - Future integration                               |
+| **F#**         | Functional computation, financial engines       | 📋 Planned - Future integration                               |
+| **Go**         | CLI tools, infrastructure services              | ✅ Active - ayokoding-cli, ose-cli                            |
+| **Java** ☕    | Backend services, domain models, business logic | 📋 Planned - Future integration                               |
+| **Kotlin**     | Coroutine-based services, Ktor APIs             | 📋 Planned - Future integration                               |
+| **Python**     | Data processing, AI/ML integration              | 📋 Planned - Future integration                               |
+| **Rust**       | Backend APIs, CLI tools, infrastructure         | ✅ Active - organiclever-be, ose-app-be, rhino-cli, crane-cli |
+| **TypeScript** | Frontend applications, tRPC backends            | ✅ Active - all Next.js apps                                  |
 
-**Legend**: ✅ Active (in use) | 📋 Planned (documentation ready, not yet implemented)
+**Legend**: ✅ Active (in use in ose-public) | 📋 Planned (docs ready; see [ose-primer](https://github.com/wahidyankf/ose-primer) for polyglot demos)
 
 ### For Backend Developers
 
-1. **Learn Java fundamentals** - [AyoKoding Java By Example](../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/by-example/_index.md)
-2. **Apply OSE standards** - [Java Coding Standards](./java/README.md)
-3. **Study best practices** - [Java In Practice](../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/in-the-field/_index.md)
-4. **Integrate with DDD** - [DDD Standards](./java/ddd-standards.md)
+1. **Rust backends** - See [organiclever-be](../../../../apps/organiclever-be/README.md) and [ose-app-be](../../../../apps/ose-app-be/README.md) for active examples
+2. **Apply Rust standards** - [Rust Standards](./rust/README.md)
+3. **Hexagonal DDD** - [DDD + Hexagonal In Practice](../architecture/ddd-hexagonal-in-practice/README.md)
+4. **For Java/Kotlin/F# standards** - See language-specific README files; [ose-primer](https://github.com/wahidyankf/ose-primer) for polyglot demos
 
 ### For Full-Stack Developers
 
-1. Learn both backend (Java) and frontend (TypeScript) idioms
+1. Learn backend (Rust) and frontend (TypeScript) idioms
 2. Understand language-specific testing approaches
 3. Apply consistent patterns across languages
 4. Practice polyglot development

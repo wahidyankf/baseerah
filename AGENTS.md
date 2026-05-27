@@ -218,7 +218,7 @@ Husky + lint-staged enforce quality:
 
 - **Pre-commit**:
   - Validates agent definition files and auto-syncs platform bindings when changed in staged files
-  - Formats staged files with Prettier (JS/TS/JSON/YAML/CSS/MD), gofmt (Go), and mix format (Elixir)
+  - Formats staged files with Prettier (JS/TS/JSON/YAML/CSS/MD), gofmt (Go), and rustfmt (Rust)
   - Validates markdown links in staged files
   - Validates all markdown files (markdownlint)
   - Auto-stages changes
