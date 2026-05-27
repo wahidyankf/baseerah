@@ -4,11 +4,13 @@ This directory contains previously active applications that have been superseded
 
 ## Contents
 
-| Directory             | Archived   | Reason                                | Successor                                      |
-| --------------------- | ---------- | ------------------------------------- | ---------------------------------------------- |
-| `ayokoding-web-hugo/` | 2026-03-24 | Replaced by Next.js 16 implementation | [`apps/ayokoding-web`](../apps/ayokoding-web/) |
-| `rhino-cli/`          | 2026-05-23 | Go binary replaced by Rust rewrite    | [`apps/rhino-cli`](../apps/rhino-cli/)         |
-| `crane-cli/`          | 2026-05-26 | F# source replaced by Rust rewrite    | [`apps/crane-cli`](../apps/crane-cli/)         |
+| Directory             | Archived   | Reason                                       | Successor                                          |
+| --------------------- | ---------- | -------------------------------------------- | -------------------------------------------------- |
+| `organiclever-web/`   | 2026-03-29 | Replaced by fullstack rebuild                | [`apps/organiclever-web`](../apps/organiclever-web/) |
+| `rhino-cli/`          | 2026-05-23 | Go binary replaced by Rust rewrite           | [`apps/rhino-cli`](../apps/rhino-cli/)             |
+| `ayokoding-cli/`      | 2026-05-25 | Go binary replaced by Rust rewrite           | [`apps/ayokoding-cli`](../apps/ayokoding-cli/)     |
+| `ose-cli/`            | 2026-05-25 | Go binary replaced by Rust rewrite           | [`apps/ose-cli`](../apps/ose-cli/)                 |
+| `crane-cli/`          | 2026-05-26 | F# source replaced by Rust rewrite           | [`apps/crane-cli`](../apps/crane-cli/)             |
 
 ## Notes
 
