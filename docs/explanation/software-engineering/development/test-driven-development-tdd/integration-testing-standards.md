@@ -419,5 +419,4 @@ class MemberRepositoryIntegrationTest {
 
 - [Three-Tier Testing Model](./three-tier-testing.md) — authoritative tier definitions and the mocking boundary
 - [Test Doubles Standards](./test-doubles-standards.md) — in-memory implementations vs. mocks
-- [Java Testing Standards](../../programming-languages/java/testing-standards.md) — Java-specific integration patterns
 - [TypeScript Testing](../../programming-languages/typescript/testing.md) — TypeScript-specific integration patterns

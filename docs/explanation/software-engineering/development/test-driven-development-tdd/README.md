@@ -261,7 +261,6 @@ Before merging code, verify:
 
 - **[Domain-Driven Design Standards](../../architecture/domain-driven-design-ddd/README.md)** - Testing DDD tactical patterns
 - **[BDD Standards](../behavior-driven-development-bdd/README.md)** - Acceptance testing with Gherkin
-- **[Java Coding Standards](../../programming-languages/java/README.md)** - Java testing conventions
 - **[TypeScript Coding Standards](../../programming-languages/typescript/README.md)** - TypeScript testing conventions
 
 ## Principles Implemented

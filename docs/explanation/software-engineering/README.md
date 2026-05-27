@@ -48,14 +48,8 @@ Comprehensive documentation on software development practices:
 Language-specific idioms, best practices, and antipatterns:
 
 - **[C#](./programming-languages/c-sharp/README.md)** - C# development for .NET applications and enterprise services
-- **[Clojure](./programming-languages/clojure/README.md)** - Clojure development with functional programming and JVM interoperability
-- **[Dart](./programming-languages/dart/README.md)** - Dart development for Flutter mobile and web applications
-- **[Elixir](./programming-languages/elixir/README.md)** - Elixir development with Phoenix framework and functional programming patterns
 - **[F#](./programming-languages/f-sharp/README.md)** - F# development for .NET applications with functional-first programming
 - **[Go](./programming-languages/golang/README.md)** - Go development for CLI tools and infrastructure services
-- **[Java](./programming-languages/java/README.md)** - Modern Java development (Java 17+) with records, pattern matching, and virtual threads
-- **[Kotlin](./programming-languages/kotlin/README.md)** - Kotlin development for JVM services and Android applications
-- **[Python](./programming-languages/python/README.md)** - Python development for data processing and AI/ML integration
 - **[Rust](./programming-languages/rust/README.md)** - Rust development for systems programming and high-performance services
 - **[TypeScript](./programming-languages/typescript/README.md)** - TypeScript development for frontend applications and Node.js services
 
@@ -63,11 +57,8 @@ Language-specific idioms, best practices, and antipatterns:
 
 Platform-specific documentation for web frameworks used in the enterprise platform:
 
-- **[Elixir Phoenix](./platform-web/tools/elixir-phoenix/README.md)** - Phoenix web framework for Elixir backend services
 - **[Next.js (Frontend)](./platform-web/tools/fe-nextjs/README.md)** - Next.js React framework for frontend applications
 - **[React (Frontend)](./platform-web/tools/fe-react/README.md)** - React library patterns and best practices
-- **[Spring Framework](./platform-web/tools/jvm-spring/README.md)** - Spring framework for JVM-based services
-- **[Spring Boot](./platform-web/tools/jvm-spring-boot/README.md)** - Spring Boot for opinionated JVM application development
 
 ### 🤖 [Automation Testing](./automation-testing/README.md)
 

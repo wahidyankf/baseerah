@@ -63,11 +63,8 @@ Each language directory contains:
 
 Languages covered:
 
-- **[Java](./programming-languages/java/README.md)** - Modern Java (17+)
 - **[TypeScript](./programming-languages/typescript/README.md)** - Frontend and Node.js
 - **[Go](./programming-languages/golang/README.md)** - CLI tools and infrastructure
-- **[Python](./programming-languages/python/README.md)** - Data processing and AI/ML
-- **[Elixir](./programming-languages/elixir/README.md)** - Real-time systems
 
 ### Framework-Specific Standards
 
@@ -75,9 +72,8 @@ Languages covered:
 
 Frameworks covered:
 
-- **[Spring Boot (JVM)](./platform-web/tools/jvm-spring-boot/README.md)** - REST APIs and microservices
-- **[Phoenix (Elixir)](./platform-web/tools/elixir-phoenix/README.md)** - Real-time applications
 - **[React (TypeScript)](./platform-web/tools/fe-react/README.md)** - Interactive UIs
+- **[Next.js (TypeScript)](./platform-web/tools/fe-nextjs/README.md)** - Full-stack web applications
 
 ## Separation of Concerns
 
@@ -128,13 +124,9 @@ Software design documentation in `docs/explanation/software-engineering/` contai
 
 The following `docs/explanation/` content assumes readers have completed the corresponding AyoKoding learning paths:
 
-| Advanced Reference (docs/explanation/)                                       | Prerequisite Learning (ayokoding-web)                                                                                                                                    |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [programming-languages/java/](./programming-languages/java/)                 | [learn/software-engineering/programming-languages/java/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/)                  |
-| [programming-languages/golang/](./programming-languages/golang/)             | [learn/software-engineering/programming-languages/golang/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)              |
-| [programming-languages/elixir/](./programming-languages/elixir/)             | [learn/software-engineering/programming-languages/elixir/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/elixir/)              |
-| [platform-web/tools/jvm-spring/](./platform-web/tools/jvm-spring/)           | [learn/software-engineering/platform-web/tools/jvm-spring/](../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/)           |
-| [platform-web/tools/jvm-spring-boot/](./platform-web/tools/jvm-spring-boot/) | [learn/software-engineering/platform-web/tools/jvm-spring-boot/](../../../apps/ayokoding-web/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) |
+| Advanced Reference (docs/explanation/)                           | Prerequisite Learning (ayokoding-web)                                                                                                                       |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [programming-languages/golang/](./programming-languages/golang/) | [learn/software-engineering/programming-languages/golang/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/) |
 
 ### Content Types and Scope
 
@@ -178,11 +170,8 @@ When writing code or making architectural decisions:
 
 Skills available for quick reference:
 
-- `swe-programming-java` - Java coding standards
 - `swe-programming-typescript` - TypeScript coding standards
 - `swe-programming-golang` - Go coding standards
-- `swe-programming-python` - Python coding standards
-- `swe-programming-elixir` - Elixir coding standards
 
 ## Validation
 

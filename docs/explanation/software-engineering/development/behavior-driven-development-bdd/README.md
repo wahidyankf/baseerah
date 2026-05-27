@@ -244,7 +244,6 @@ Before merging feature files, verify:
 
 - **[Test-Driven Development Standards](../test-driven-development-tdd/README.md)** - Unit testing with TDD
 - **[Domain-Driven Design Standards](../../architecture/domain-driven-design-ddd/README.md)** - Ubiquitous language, bounded contexts
-- **[Java Coding Standards](../../programming-languages/java/README.md)** - Java step definition conventions
 - **[TypeScript Coding Standards](../../programming-languages/typescript/README.md)** - TypeScript step definition conventions
 
 ## Principles Implemented

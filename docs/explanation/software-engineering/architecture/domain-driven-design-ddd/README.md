@@ -450,7 +450,6 @@ public sealed record ZakatCalculated(
 
 - **[C4 Architecture Model](../c4-architecture-model/README.md)** - Visualizing bounded contexts
 - **[FSM Standards](../finite-state-machine-fsm/README.md)** - Entity lifecycle state machines
-- **[Java DDD Standards](../../programming-languages/java/ddd-standards.md)** - Java-specific tactical patterns
 
 ## Principles Implemented/Respected
 

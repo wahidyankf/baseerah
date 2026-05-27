@@ -18,19 +18,19 @@ created: 2026-01-20
 
 ## Overview
 
-**The Polyglot Confusion**: Every language has its own idioms, conventions, and gotchas. Developers switch between Java streams, TypeScript promises, Go goroutines, and Python list comprehensions. What's idiomatic in one language is an antipattern in another. Copy-pasting patterns across languages leads to awkward, non-idiomatic code.
+**The Polyglot Confusion**: Every language has its own idioms, conventions, and gotchas. Developers switch between TypeScript promises, Go goroutines, Rust ownership semantics, and F# discriminated unions. What's idiomatic in one language is an antipattern in another. Copy-pasting patterns across languages leads to awkward, non-idiomatic code.
 
-**Curated Language Guidance**: We provide language-specific documentation that captures idioms, best practices, and antipatterns for each language in the platform. Learn how to write code that feels native to the language, not awkwardly translated from another one.
+**Curated Language Guidance**: We provide language-specific documentation that captures idioms, best practices, and antipatterns for each active language in the platform. Learn how to write code that feels native to the language, not awkwardly translated from another one.
 
-This directory contains comprehensive documentation on programming languages used throughout the platform. Languages use one of two documentation patterns:
+This directory contains comprehensive documentation on programming languages used throughout the platform. Active languages use one of two documentation patterns:
 
-**Three-Document Pattern** (TypeScript, Python):
+**Three-Document Pattern** (TypeScript):
 
 1. **Idioms** - Language-specific patterns, conventions, and idiomatic code styles
 2. **Best Practices** - Proven approaches for writing clean, maintainable code
 3. **Antipatterns** - Common mistakes and pitfalls to avoid
 
-**Domain-Specific Standards Pattern** (Java, Go, Elixir, Dart, Kotlin, Rust, Clojure, F#, C#):
+**Domain-Specific Standards Pattern** (Go, Rust, F#, C#):
 
 Multiple domain-focused standards files covering specific areas (testing, security, concurrency, etc.) as separate documents rather than three consolidated files. See each language's README for their specific document structure.
 
@@ -41,18 +41,18 @@ Multiple domain-focused standards files covering specific areas (testing, securi
 | REST API backend (current ose-public)    | Rust/Axum            | See organiclever-be, ose-app-be                |
 | Frontend web application                 | TypeScript           | [TypeScript Standards](./typescript/README.md) |
 | CLI tool for repository automation       | Rust/Go              | See rhino-cli (Rust), ayokoding-cli (Go)       |
-| Data processing and analytics            | Python               | Python docs (planned)                          |
 | Infrastructure tooling                   | Go                   | See existing CLI tools                         |
 | Real-time updates and WebSocket handling | TypeScript           | [TypeScript Standards](./typescript/README.md) |
-| Complex domain logic with DDD (future)   | Java/Kotlin/F#       | See language-specific README files             |
+| Complex domain logic with DDD            | F#/Rust              | See language-specific README files             |
+| Enterprise API with .NET interop         | C#/F#                | See c-sharp/ and f-sharp/ README files         |
 
 **Platform Guidance**:
 
 - **TypeScript**: Active for all frontend applications (Next.js) and tRPC backends
 - **Go**: Active for CLI tools (ayokoding-cli, ose-cli)
 - **Rust**: Active for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, crane-cli)
-- **Python**: Planned for data processing and AI/ML integration
-- **Other languages** (Java, Kotlin, C#, F#, Elixir, Clojure, Dart): Standards available; see [ose-primer](https://github.com/wahidyankf/ose-primer) for polyglot demo apps
+- **F#**: Active for content pipeline tooling (crane-cli — Content Retrieval And Normalization Engine)
+- **C#**: Retained for potential .NET interop with F#
 
 ## Purpose
 
@@ -80,17 +80,11 @@ All code written in the languages documented here MUST follow the standards, pat
 
 **Skills Available**:
 
-- `swe-programming-java` - Java standards quick reference
 - `swe-programming-typescript` - TypeScript standards quick reference
 - `swe-programming-golang` - Go standards quick reference
-- `swe-programming-python` - Python standards quick reference
-- `swe-programming-elixir` - Elixir standards quick reference
-- `swe-programming-dart` - Dart standards quick reference
-- `swe-programming-kotlin` - Kotlin standards quick reference
-- `swe-programming-csharp` - C# standards quick reference
-- `swe-programming-fsharp` - F# standards quick reference
-- `swe-programming-clojure` - Clojure standards quick reference
 - `swe-programming-rust` - Rust standards quick reference
+- `swe-programming-fsharp` - F# standards quick reference
+- `swe-programming-csharp` - C# standards quick reference
 
 <!-- TODO: Software Design Reference - Create governance documentation for software design principles -->
 
@@ -98,7 +92,7 @@ All code written in the languages documented here MUST follow the standards, pat
 
 Each language directory contains a README.md (language overview and version info) plus either:
 
-**Three-Document Pattern** (TypeScript, Python):
+**Three-Document Pattern** (TypeScript):
 
 ```
 [language-name]/
@@ -108,7 +102,7 @@ Each language directory contains a README.md (language overview and version info
 └── antipatterns.md        # Common antipatterns
 ```
 
-**Domain-Specific Standards Pattern** (Java, Go, Elixir, Dart, Kotlin, Rust, Clojure, F#, C#):
+**Domain-Specific Standards Pattern** (Go, Rust, F#, C#):
 
 ```
 [language-name]/
@@ -158,76 +152,27 @@ C# is a versatile, type-safe language on the .NET ecosystem. These standards gui
 - Database-driven applications (Entity Framework Core)
 - High-performance services with async/await and Channels
 - Domain modeling with records and sealed class hierarchies
-
-### 🟣 [Clojure](./clojure/README.md)
-
-**Clojure development with functional programming, REPL-driven development, and Ring/Reitit**
-
-Clojure is a functional Lisp running on the JVM with immutable persistent data structures at its core. These standards guide Clojure development for data transformation pipelines, financial rule engines, and services where functional purity is paramount.
-
-**Use Clojure when you need:**
-
-- Data transformation pipelines with immutable data
-- Financial rule engines with pure functions
-- REPL-driven exploratory development
-- JVM ecosystem with functional programming paradigm
-
-### 🎯 [Dart](./dart/README.md)
-
-**Dart development for Flutter mobile and web applications**
-
-Dart is used for building cross-platform mobile and web applications with the Flutter framework.
-
-**Use Dart when you need:**
-
-- Cross-platform mobile applications (Android, iOS)
-- Flutter web applications
-- Reactive UI with widget-based architecture
+- .NET interop with F# components
 
 ### 🔷 [F#](./f-sharp/README.md)
 
 **F# development with functional-first programming, railway-oriented error handling, and Giraffe**
 
-F# is a functional-first .NET language where immutability is the default and discriminated unions enable type-driven domain modeling. These standards guide F# development for functional computation engines where the type system prevents invalid business states at compile time.
+F# is a functional-first .NET language where immutability is the default and discriminated unions enable type-driven domain modeling. crane-cli (Content Retrieval And Normalization Engine) is built in F#.
 
 **Use F# when you need:**
 
 - Making invalid domain states unrepresentable via the type system
 - Railway-oriented programming with Result types
 - Functional microservices with Giraffe or Saturn
-- Pure financial calculation engines with units of measure
-
-### 💜 [Elixir](./elixir/README.md)
-
-**Elixir development with Phoenix framework and functional programming patterns**
-
-Elixir is a language for building highly concurrent, fault-tolerant backend services. These standards guide Elixir development with the Phoenix framework for real-time features via Phoenix LiveView.
-
-**Use Elixir when you need:**
-
-- High-concurrency distributed systems
-- Real-time features (WebSockets, LiveView)
-- Fault-tolerant actor model architecture
-- Functional programming with pattern matching
-
-### 🟠 [Kotlin](./kotlin/README.md)
-
-**Kotlin development with coroutines, Ktor, and Spring Boot**
-
-Kotlin is a modern, concise JVM language with null safety, coroutines for structured concurrency, and seamless Java interop. These standards guide Kotlin backend development where coroutines and sealed class hierarchies improve over Java's verbosity.
-
-**Use Kotlin when you need:**
-
-- Coroutine-based concurrent backend services (Ktor)
-- Spring Boot services with Kotlin idioms
-- Android mobile applications
-- Expressive domain modeling with sealed classes and data classes
+- Pure computation engines with units of measure
+- Content pipeline tooling (PDF-to-Markdown conversion, crane-cli)
 
 ### 🐹 [Go](./golang/README.md)
 
 **Go development for CLI tools and infrastructure services**
 
-Go is used for CLI tools and infrastructure services in the repository. The platform uses Go for ayokoding-cli (content automation) and ose-cli (site maintenance). rhino-cli was ported from Go to Rust on 2026-05-23.
+Go is used for CLI tools and infrastructure services in the repository. The platform uses Go for ayokoding-cli (content automation) and ose-cli (site maintenance).
 
 **Use Go when you need:**
 
@@ -236,58 +181,24 @@ Go is used for CLI tools and infrastructure services in the repository. The plat
 - Static binaries with minimal dependencies
 - Concurrent systems with goroutines
 
-### ☕ [Java](./java/README.md)
-
-**Modern Java development with records, pattern matching, and virtual threads**
-
-Java is a mature language for backend services with strong support for domain-driven design and enterprise features. These standards guide modern Java (17+) development with emphasis on functional programming, immutability, and structured concurrency.
-
-**Key Documentation:**
-
-- [Java OSE Standards](./java/README.md) - Authoritative coding standards for OSE Platform
-- [Java Learning Path](../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/_index.md) - Complete Java tutorials and examples
-- [Java By Example](../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/by-example/_index.md) - 157+ annotated code examples
-- [Java In Practice](../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/in-the-field/_index.md) - Best practices, anti-patterns, TDD, BDD, DDD
-
-**Use Java when you need:**
-
-- Strong type safety and compile-time guarantees
-- Enterprise integration (Jakarta EE, Spring ecosystem)
-- High-performance concurrent processing
-- Complex domain models (DDD tactical patterns)
-- Mature tooling and ecosystem
-
 ### 🦀 [Rust](./rust/README.md)
 
 **Rust development with ownership-based memory safety, zero-cost abstractions, and Axum**
 
-Rust guarantees memory safety and fearless concurrency without a garbage collector, making it ideal for high-performance, security-critical systems. OSE Platform uses Rust for performance-critical financial computation, WebAssembly targets, and infrastructure tooling.
+Rust guarantees memory safety and fearless concurrency without a garbage collector, making it ideal for high-performance, security-critical systems. OSE Platform uses Rust for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, crane-cli).
 
 **Use Rust when you need:**
 
-- Memory-safe, high-performance financial computation
+- Memory-safe, high-performance backend services
 - WebAssembly targets for browser-based computation
 - System-level services with no GC pauses
 - Infrastructure tooling with single binary distribution
-
-### 🐍 [Python](./python/README.md)
-
-**Python development for data processing and AI/ML integration**
-
-Python is planned for data processing pipelines and AI/ML integration in the platform. Python's extensive data science ecosystem and readability make it ideal for analytical workloads.
-
-**Use Python when you need:**
-
-- Data processing and analytics pipelines
-- AI/ML model training and inference
-- Scientific computing and data visualization
-- Scripting and automation workflows
 
 ### 💙 [TypeScript](./typescript/README.md)
 
 **TypeScript development for frontend applications and Node.js services**
 
-TypeScript is used for frontend web applications (Next.js) and planned for Node.js services. TypeScript's type system brings safety to JavaScript ecosystem development.
+TypeScript is used for frontend web applications (Next.js) and tRPC backends. TypeScript's type system brings safety to JavaScript ecosystem development.
 
 **Use TypeScript when you need:**
 
@@ -323,28 +234,22 @@ Languages in this documentation are chosen based on:
 
 ### Current Language Usage
 
-| Language       | Primary Use Cases                               | Status                                                        |
-| -------------- | ----------------------------------------------- | ------------------------------------------------------------- |
-| **Clojure**    | Functional microservices, data pipelines        | 📋 Planned - Future integration                               |
-| **C#**         | Enterprise APIs, ASP.NET Core services          | 📋 Planned - Future integration                               |
-| **Dart**       | Flutter mobile and web applications             | 📋 Planned - Future integration                               |
-| **Elixir**     | Phoenix backend, real-time features             | 📋 Planned - Future integration                               |
-| **F#**         | Functional computation, financial engines       | 📋 Planned - Future integration                               |
-| **Go**         | CLI tools, infrastructure services              | ✅ Active - ayokoding-cli, ose-cli                            |
-| **Java** ☕    | Backend services, domain models, business logic | 📋 Planned - Future integration                               |
-| **Kotlin**     | Coroutine-based services, Ktor APIs             | 📋 Planned - Future integration                               |
-| **Python**     | Data processing, AI/ML integration              | 📋 Planned - Future integration                               |
-| **Rust**       | Backend APIs, CLI tools, infrastructure         | ✅ Active - organiclever-be, ose-app-be, rhino-cli, crane-cli |
-| **TypeScript** | Frontend applications, tRPC backends            | ✅ Active - all Next.js apps                                  |
+| Language       | Primary Use Cases                       | Status                                                        |
+| -------------- | --------------------------------------- | ------------------------------------------------------------- |
+| **C#**         | Enterprise APIs, .NET interop with F#   | 📋 Retained — .NET interop                                    |
+| **F#**         | Content pipeline tooling (crane-cli)    | ✅ Active — crane-cli                                         |
+| **Go**         | CLI tools, infrastructure services      | ✅ Active — ayokoding-cli, ose-cli                            |
+| **Rust**       | Backend APIs, CLI tools, infrastructure | ✅ Active — organiclever-be, ose-app-be, rhino-cli, crane-cli |
+| **TypeScript** | Frontend applications, tRPC backends    | ✅ Active — all Next.js apps                                  |
 
-**Legend**: ✅ Active (in use in ose-public) | 📋 Planned (docs ready; see [ose-primer](https://github.com/wahidyankf/ose-primer) for polyglot demos)
+**Legend**: ✅ Active (in use in ose-public) | 📋 Retained (standards documented; not yet used in active apps)
 
 ### For Backend Developers
 
 1. **Rust backends** - See [organiclever-be](../../../../apps/organiclever-be/README.md) and [ose-app-be](../../../../apps/ose-app-be/README.md) for active examples
 2. **Apply Rust standards** - [Rust Standards](./rust/README.md)
 3. **Hexagonal DDD** - [DDD + Hexagonal In Practice](../architecture/ddd-hexagonal-in-practice/README.md)
-4. **For Java/Kotlin/F# standards** - See language-specific README files; [ose-primer](https://github.com/wahidyankf/ose-primer) for polyglot demos
+4. **For F#/C# standards** - See language-specific README files
 
 ### For Full-Stack Developers
 

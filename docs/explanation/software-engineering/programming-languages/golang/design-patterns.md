@@ -4050,8 +4050,6 @@ Both patterns are valid. Prefer sealed interface when variants are likely to evo
 
 **Cross-Language Comparisons:**
 
-- [Java Finite State Machines](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/by-example/advanced.md) - Comparison with Java approach
-
 **Governance Principles:**
 
 - [Functional Programming Principle](../../../../../repo-governance/development/pattern/functional-programming.md) - Project-wide FP standards
