@@ -24,7 +24,10 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["fantomas --check apps/crane-cli/src", "dotnet fsharplint lint apps/crane-cli/crane-cli.fsproj"],
+        "commands": [
+          "fantomas --check apps/crane-cli/src",
+          "dotnet fsharplint lint apps/crane-cli/crane-cli.fsproj --lint-config apps/crane-cli/fsharplint.json"
+        ],
         "parallel": false
       },
       "cache": true,
