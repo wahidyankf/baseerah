@@ -4,7 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No active plans._
+| Plan                                                                                   | Description                                                                                                                                                    |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [remove-inactive-tech-stack-remnants](./remove-inactive-tech-stack-remnants/README.md) | Remove docs, agents, skills, CI gates, and toolchain artifacts for F#, C#, Java, Kotlin, Elixir, Clojure, Dart, Python — stacks no longer active in ose-public |
 
 ## Instructions
 
