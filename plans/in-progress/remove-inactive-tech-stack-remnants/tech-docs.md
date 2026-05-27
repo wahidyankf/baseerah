@@ -67,24 +67,32 @@ All paths verified [Repo-grounded] via `ls`/`find` at 2026-05-27.
 
 #### Delete entirely
 
-| Path                                                                   | Type            |
-| ---------------------------------------------------------------------- | --------------- |
-| `docs/explanation/software-engineering/programming-languages/elixir/`  | Elixir docs     |
-| `docs/explanation/software-engineering/programming-languages/clojure/` | Clojure docs    |
-| `docs/explanation/software-engineering/programming-languages/dart/`    | Dart docs       |
-| `docs/explanation/software-engineering/programming-languages/python/`  | Python docs     |
-| `.claude/agents/swe-elixir-dev.md`                                     | Elixir agent    |
-| `.claude/agents/swe-clojure-dev.md`                                    | Clojure agent   |
-| `.claude/agents/swe-dart-dev.md`                                       | Dart agent      |
-| `.claude/agents/swe-python-dev.md`                                     | Python agent    |
-| `.opencode/agents/swe-elixir-dev.md`                                   | OpenCode mirror |
-| `.opencode/agents/swe-clojure-dev.md`                                  | OpenCode mirror |
-| `.opencode/agents/swe-dart-dev.md`                                     | OpenCode mirror |
-| `.opencode/agents/swe-python-dev.md`                                   | OpenCode mirror |
-| `.claude/skills/swe-programming-elixir/`                               | Elixir skill    |
-| `.claude/skills/swe-programming-clojure/`                              | Clojure skill   |
-| `.claude/skills/swe-programming-dart/`                                 | Dart skill      |
-| `.claude/skills/swe-programming-python/`                               | Python skill    |
+| Path                                                                   | Type                                                                                                                                                                        |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/explanation/software-engineering/programming-languages/elixir/`  | Elixir docs                                                                                                                                                                 |
+| `docs/explanation/software-engineering/programming-languages/clojure/` | Clojure docs                                                                                                                                                                |
+| `docs/explanation/software-engineering/programming-languages/dart/`    | Dart docs                                                                                                                                                                   |
+| `docs/explanation/software-engineering/programming-languages/python/`  | Python docs                                                                                                                                                                 |
+| `.claude/agents/swe-elixir-dev.md`                                     | Elixir agent                                                                                                                                                                |
+| `.claude/agents/swe-clojure-dev.md`                                    | Clojure agent                                                                                                                                                               |
+| `.claude/agents/swe-dart-dev.md`                                       | Dart agent                                                                                                                                                                  |
+| `.claude/agents/swe-python-dev.md`                                     | Python agent                                                                                                                                                                |
+| `.opencode/agents/swe-elixir-dev.md`                                   | OpenCode mirror                                                                                                                                                             |
+| `.opencode/agents/swe-clojure-dev.md`                                  | OpenCode mirror                                                                                                                                                             |
+| `.opencode/agents/swe-dart-dev.md`                                     | OpenCode mirror                                                                                                                                                             |
+| `.opencode/agents/swe-python-dev.md`                                   | OpenCode mirror                                                                                                                                                             |
+| `.claude/skills/swe-programming-elixir/`                               | Elixir skill                                                                                                                                                                |
+| `.claude/skills/swe-programming-clojure/`                              | Clojure skill                                                                                                                                                               |
+| `.claude/skills/swe-programming-dart/`                                 | Dart skill                                                                                                                                                                  |
+| `.claude/skills/swe-programming-python/`                               | Python skill                                                                                                                                                                |
+| `libs/clojure-openapi-codegen/`                                        | Clojure lib — source already removed; only `LICENSE` tracked + gitignored artifacts (`.cpcache/`, `classes/`, `coverage/`) remain. Not in Nx workspace (no `project.json`). |
+
+#### Modify
+
+| Path             | Change                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `.gitignore`     | Remove line `# Clojure classpath cache` + `.cpcache/` (Clojure-specific; no Clojure code remains after this plan) |
+| `libs/README.md` | Remove `clojure-openapi-codegen/` entry from the libs listing                                                     |
 
 #### Modify
 

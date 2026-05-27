@@ -113,7 +113,17 @@ Then the base image is rust:1.95-slim (not dotnet SDK)
 And infra/dev/ose-app/docker-compose.ci.yml contains no ASPNETCORE_URLS
 ```
 
-### Scenario 8: OpenCode bindings synced
+### Scenario 8: Clojure lib removed
+
+```gherkin
+Given the repo has been cleaned up per this plan
+When I run: ls libs/
+Then clojure-openapi-codegen/ is not present
+And: grep clojure libs/README.md returns nothing
+And: grep cpcache .gitignore returns nothing
+```
+
+### Scenario 9: OpenCode bindings synced
 
 ```gherkin
 Given agent files have been removed from .claude/agents/
@@ -122,7 +132,7 @@ Then .opencode/agents/ contains no mirrors for the 8 removed agents
 And no diff remains between .claude/agents/ and .opencode/agents/ (aside from format translation)
 ```
 
-### Scenario 9: All local quality gates pass
+### Scenario 10: All local quality gates pass
 
 ```gherkin
 Given all cleanup changes are applied
@@ -131,7 +141,7 @@ Then all targets exit 0 with no errors
 And: npm run lint:md exits 0 (no broken markdown links from removed doc dirs)
 ```
 
-### Scenario 10: CI passes after push
+### Scenario 11: CI passes after push
 
 ```gherkin
 Given the cleanup changes are pushed to origin main

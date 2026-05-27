@@ -175,6 +175,16 @@ and
 
   Verify: `ls .claude/skills/ | grep -E "elixir|clojure|dart|python"` returns nothing
 
+- [ ] Delete `libs/clojure-openapi-codegen/` (source already removed; remaining tracked file
+      is `LICENSE` plus gitignored build artifacts):
+      `rm -rf libs/clojure-openapi-codegen/` — directory gone.
+      Verify: `ls libs/ | grep clojure` returns nothing.
+- [ ] Edit `libs/README.md`: remove the `clojure-openapi-codegen/` line from the libs listing.
+      Verify: `grep clojure libs/README.md` returns nothing.
+- [ ] Edit `.gitignore`: remove the `# Clojure classpath cache` comment line and the
+      `.cpcache/` entry below it (no Clojure code remains after this cleanup).
+      Verify: `grep cpcache .gitignore` returns nothing.
+
 ### 3b: Modify pr-quality-gate.yml for remaining langs
 
 - [ ] Edit `.github/workflows/pr-quality-gate.yml` — remove Python gate + vestigial detection:
