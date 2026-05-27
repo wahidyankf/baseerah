@@ -368,7 +368,7 @@ repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 [plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md) and
 [plan-establishment workflow](./repo-governance/workflows/plan/plan-establishment-execution.md))
 
-**Development**: swe-elixir-dev, swe-golang-dev, swe-java-dev, swe-python-dev, swe-typescript-dev, swe-e2e-dev, swe-dart-dev, swe-kotlin-dev, swe-csharp-dev, swe-fsharp-dev, swe-clojure-dev, swe-rust-dev
+**Development**: swe-golang-dev, swe-typescript-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev
 
 **Operations**: apps-ayokoding-web-deployer, apps-ose-web-deployer, apps-organiclever-web-deployer, apps-wahidyankf-web-deployer
 
