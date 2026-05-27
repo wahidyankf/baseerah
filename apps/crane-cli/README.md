@@ -1,7 +1,8 @@
 # crane-cli
 
-Content Retrieval And Normalization Engine — a Rust CLI that provides reliable, deterministic
-operations for the PDF-to-Markdown conversion pipeline.
+Content Retrieval And Normalization Engine — an F# CLI that provides reliable, deterministic
+operations for the PDF-to-Markdown conversion pipeline. Built with a hexagonal ports-and-adapters
+architecture using Giraffe-style functional patterns.
 
 ## System Dependencies
 
@@ -18,13 +19,13 @@ on macOS Homebrew).
 ## Usage
 
 ```bash
-cargo run --manifest-path apps/crane-cli/Cargo.toml -- --help
+dotnet run --project apps/crane-cli/crane-cli.fsproj -- --help
 ```
 
-Or after `cargo build --release`:
+Or after publishing:
 
 ```bash
-apps/crane-cli/target/release/crane --help
+apps/crane-cli/dist/crane --help
 ```
 
 ## Subcommands
@@ -45,26 +46,51 @@ apps/crane-cli/target/release/crane --help
 
 ```bash
 # Build
-cargo build --release --manifest-path apps/crane-cli/Cargo.toml
+dotnet publish apps/crane-cli/crane-cli.fsproj -c Release -o apps/crane-cli/dist
 
-# Unit tests (152 tests, ≥95% coverage)
-cargo test --manifest-path apps/crane-cli/Cargo.toml --test unit
+# Unit tests (116 tests, ≥95% line coverage)
+dotnet test apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj
 
-# Integration tests (37 Gherkin scenarios)
-cargo test --manifest-path apps/crane-cli/Cargo.toml --test integration
+# Integration tests (37 Gherkin scenarios via TickSpec)
+dotnet test apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj
 
-# Lint and format check
-cargo fmt --manifest-path apps/crane-cli/Cargo.toml -- --check
-cargo clippy --manifest-path apps/crane-cli/Cargo.toml --all-targets -- -D warnings
+# Format check
+fantomas --check apps/crane-cli/src
+
+# Format
+fantomas apps/crane-cli/src
 ```
 
 ## Nx Targets
 
 ```bash
-npx nx run crane-cli:build           # Release build
-npx nx run crane-cli:lint            # fmt check + clippy
-npx nx run crane-cli:typecheck       # cargo check
-npx nx run crane-cli:test:quick      # Unit tests + ≥95% coverage
-npx nx run crane-cli:test:integration # Cucumber-rs integration tests
-npx nx run crane-cli:spec-coverage   # Gherkin spec coverage validation
+npx nx run crane-cli:build            # Release build (publish)
+npx nx run crane-cli:typecheck        # dotnet build (type check)
+npx nx run crane-cli:lint             # fantomas check + fsharplint
+npx nx run crane-cli:fmt              # fantomas format
+npx nx run crane-cli:test:quick       # Unit tests + ≥95% line coverage
+npx nx run crane-cli:test:integration # TickSpec integration tests
+npx nx run crane-cli:spec-coverage    # Gherkin spec coverage validation
+```
+
+## Architecture
+
+Hexagonal ports-and-adapters layout:
+
+```
+src/
+  Core/
+    Domain/       # Finding, PdfMetadata, Report record types
+    Ports.fs      # IPdfPort, IOcrPort interface definitions
+    Logic/        # Pure functions: TextChecker, HeadingChecker, …
+  Adapters/
+    In/
+      CliAdapter.fs  # Argu CLI argument parsing + command dispatch
+    Out/
+      PdfAdapter.fs  # PdfPig real adapter + FakePdfAdapter for tests
+      OcrAdapter.fs  # TesseractOCR real adapter
+  Program.fs        # Composition root — wires adapters into CLI
+tests/
+  unit/             # xUnit + Coverlet (≥95% line coverage)
+  integration/      # TickSpec BDD (37 Gherkin scenarios)
 ```

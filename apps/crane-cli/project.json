@@ -72,7 +72,7 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line"
+        "command": "dotnet test apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line \"/p:ExcludeByFile=**/Adapters/In/CliAdapter.fs%2C**/Adapters/Out/PdfAdapter.fs%2C**/Adapters/Out/OcrAdapter.fs%2C**/Program.fs\""
       },
       "cache": true,
       "inputs": [

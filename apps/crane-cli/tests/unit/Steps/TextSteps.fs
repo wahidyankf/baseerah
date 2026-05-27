@@ -2,6 +2,9 @@ module CraneCli.Tests.Unit.Steps.TextSteps
 
 open TickSpec
 open Xunit
+open CraneCli.Core.Ports
+open CraneCli.Adapters.Out.PdfAdapter
+open CraneCli.Core.Logic.TextChecker
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----
@@ -11,35 +14,83 @@ let mutable private mdText: string = ""
 // ---- BDD Given steps ----
 
 [<Given>]
-let ``a PDF fixture and its complete Markdown pair`` () = ()
+let ``a PDF fixture and its complete Markdown pair`` () =
+    pdfText <- "Hello world this is section one content here and more text"
+    mdText <- "Hello world this is section one content here and more text"
 
 [<Given>]
-let ``a PDF fixture and a Markdown missing one section`` () = ()
+let ``a PDF fixture and a Markdown missing one section`` () =
+    pdfText <- "Missing section here"
+    mdText <- "completely different content with no overlap at all"
 
 [<Given>]
-let ``a PDF with multiple consecutive spaces and its normalized Markdown`` () = ()
+let ``a PDF with multiple consecutive spaces and its normalized Markdown`` () =
+    pdfText <- "hello   world   text   content"
+    mdText <- "hello world text content"
 
 [<Given>]
-let ``a PDF with "Organisation" and a Markdown with "Organization"`` () = ()
+let ``a PDF with "Organisation" and a Markdown with "Organization"`` () =
+    pdfText <- "Organisation"
+    mdText <- "Organization"
 
 // ---- BDD When steps ----
 
 [<When>]
-let ``I run "crane text check" on the pair`` () = ()
+let ``I run "crane text check" on the pair`` () =
+    let fakeAdapter = FakePdfAdapter(pdfText, 1, 1024L) :> IPdfPort
+
+    RunWithWriter(fun w ->
+        match fakeAdapter.SampleText("fake.pdf", 999) with
+        | Ok sampleText ->
+            let chunks =
+                sampleText.Split([| '\n' |], System.StringSplitOptions.RemoveEmptyEntries)
+                |> Array.filter (fun s -> s.Trim().Length > 10)
+                |> Array.toList
+
+            let findings = checkText chunks mdText
+            let opts = System.Text.Json.JsonSerializerOptions()
+            opts.DefaultIgnoreCondition <- System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            w.WriteLine(System.Text.Json.JsonSerializer.Serialize(findings, opts))
+            if findings.IsEmpty then 0 else 1
+        | Error msg ->
+            eprintfn "Error: %s" msg
+            1)
 
 // ---- BDD Then steps ----
 
 [<Then>]
-let ``the JSON output is an empty array`` () = ()
+let ``the JSON output is an empty array`` () =
+    let doc = System.Text.Json.JsonDocument.Parse(LastOutput)
+    Assert.Equal(System.Text.Json.JsonValueKind.Array, doc.RootElement.ValueKind)
+    Assert.Equal(0, doc.RootElement.GetArrayLength())
 
 [<Then>]
-let ``the JSON output contains a finding`` () = ()
+let ``the JSON output contains a finding`` () =
+    let doc = System.Text.Json.JsonDocument.Parse(LastOutput)
+    Assert.Equal(System.Text.Json.JsonValueKind.Array, doc.RootElement.ValueKind)
+    Assert.True(doc.RootElement.GetArrayLength() > 0)
 
 [<Then>]
-let ``the finding criticality is "([^"]*)"`` (expected: string) = ()
+let ``the finding criticality is "([^"]*)"`` (expected: string) =
+    let doc = System.Text.Json.JsonDocument.Parse(LastOutput)
+    let first = doc.RootElement.EnumerateArray() |> Seq.head
+    Assert.Equal(expected, first.GetProperty("criticality").GetString())
 
 [<Then>]
-let ``the finding category is "([^"]*)"`` (expected: string) = ()
+let ``the finding category is "([^"]*)"`` (expected: string) =
+    let doc = System.Text.Json.JsonDocument.Parse(LastOutput)
+    let first = doc.RootElement.EnumerateArray() |> Seq.head
+    Assert.Equal(expected, first.GetProperty("category").GetString())
 
 [<Then>]
-let ``no CRITICAL or HIGH finding is raised for that word`` () = ()
+let ``no CRITICAL or HIGH finding is raised for that word`` () =
+    let doc = System.Text.Json.JsonDocument.Parse(LastOutput)
+    let findings = doc.RootElement.EnumerateArray() |> Seq.toList
+
+    let hasCriticalOrHigh =
+        findings
+        |> List.exists (fun f ->
+            let crit = f.GetProperty("criticality").GetString()
+            crit = "CRITICAL" || crit = "HIGH")
+
+    Assert.False(hasCriticalOrHigh)
