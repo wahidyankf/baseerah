@@ -30,73 +30,29 @@ and
 
 ---
 
-## Phase 1: Dotnet (F# / C#) Cleanup
+## Phase 1: Dotnet (F# / C#) Cleanup — DEFERRED
 
-### 1a: Delete dotnet files
-
-- [ ] Delete `open-sharia-enterprise.sln`: `rm open-sharia-enterprise.sln` — file gone, `ls
-*.sln` returns nothing
-- [ ] Delete `.github/actions/setup-dotnet/` directory:
-      `rm -rf .github/actions/setup-dotnet/` — directory gone
-- [ ] Delete `scripts/format-csharp.sh`: `rm scripts/format-csharp.sh` — file gone
-- [ ] Delete C# docs: `rm -rf docs/explanation/software-engineering/programming-languages/c-sharp/`
-      — directory gone
-- [ ] Delete F# docs: `rm -rf docs/explanation/software-engineering/programming-languages/f-sharp/`
-      — directory gone
-- [ ] Delete `.claude/agents/swe-csharp-dev.md` and `.opencode/agents/swe-csharp-dev.md`:
-      `rm .claude/agents/swe-csharp-dev.md .opencode/agents/swe-csharp-dev.md` — both gone
-- [ ] Delete `.claude/agents/swe-fsharp-dev.md` and `.opencode/agents/swe-fsharp-dev.md`:
-      `rm .claude/agents/swe-fsharp-dev.md .opencode/agents/swe-fsharp-dev.md` — both gone
-- [ ] Delete `.claude/skills/swe-programming-csharp/`:
-      `rm -rf .claude/skills/swe-programming-csharp/` — directory gone
-- [ ] Delete `.claude/skills/swe-programming-fsharp/`:
-      `rm -rf .claude/skills/swe-programming-fsharp/` — directory gone
-
-### 1b: Replace Dockerfile.be.dev with Rust image
-
-- [ ] Overwrite `infra/dev/ose-app/Dockerfile.be.dev` with content:
-
-  ```
-  FROM rust:1.95-slim
-  ```
-
-  Verify: `head -1 infra/dev/ose-app/Dockerfile.be.dev` outputs `FROM rust:1.95-slim`
-
-### 1c: Modify config and workflow files
-
-- [ ] Edit `package.json`: remove `"*.cs": "scripts/format-csharp.sh"` from the
-      `lint-staged` object. Verify: `grep '"*.cs"' package.json` returns nothing.
-- [ ] Edit `infra/dev/ose-app/docker-compose.ci.yml`: remove the `ASPNETCORE_URLS`
-      environment variable entry under `ose-app-be`. Verify:
-      `grep ASPNETCORE infra/dev/ose-app/docker-compose.ci.yml` returns nothing.
-- [ ] Edit `infra/dev/ose-app/README.md`: change "F#/Giraffe REST API backend" to
-      "Rust/Axum REST API backend" in the Services table. Verify: `grep "F#" infra/dev/ose-app/README.md`
-      returns nothing.
-- [ ] Edit `.github/workflows/crane-cli-integration.yml`: remove the line
-      `- uses: ./.github/actions/setup-dotnet`. Verify:
-      `grep setup-dotnet .github/workflows/crane-cli-integration.yml` returns nothing.
-- [ ] Edit `.github/workflows/pr-quality-gate.yml` — remove dotnet detection and gate:
-  - Remove `has-dotnet: ${{ steps.detect.outputs.has-dotnet }}` from `outputs:`
-  - Remove `echo "has-dotnet=false" >> "$GITHUB_OUTPUT"` from detect step
-  - Remove `lang:fsharp|lang:csharp) echo "has-dotnet=true" ...` case from detect step
-  - Remove `tag:lang:fsharp,tag:lang:csharp` from the TypeScript `--exclude=` list
-  - Remove the entire `dotnet:` job block (name through final step)
-  - Remove `dotnet` from the `quality-gate` job's `needs:` list
-  - Remove `dotnet` from the `for job in ...` loop in `quality-gate`
-  - Verify: `grep -i "dotnet\|fsharp\|csharp" .github/workflows/pr-quality-gate.yml`
-    returns nothing
-- [ ] Edit `AGENTS.md`: remove `swe-csharp-dev, swe-fsharp-dev` from the **Development**
-      agents list (line ~371). Verify: `grep "swe-csharp-dev\|swe-fsharp-dev" AGENTS.md`
-      returns nothing.
-
-### 1d: Quality gate + commit
-
-- [ ] Run `npm run lint:md` — exits 0 (no broken links from removed C#/F# doc dirs)
-- [ ] Run `npx nx affected -t typecheck lint spec-coverage` — exits 0
-- [ ] Run `npm run generate:bindings` — exits 0; `.opencode/agents/` no longer has
-      `swe-csharp-dev.md` or `swe-fsharp-dev.md` (already deleted manually in 1a; this
-      validates sync state)
-- [ ] Commit: `chore(cleanup): remove dotnet (F#/C#) remnants from ose-public`
+> **Deferred**: F# is active in `apps/crane-cli/` (see
+> `plans/in-progress/rewrite-crane-cli-fsharp/`). Phase 1 dotnet cleanup is blocked until
+> that plan completes or is cancelled. When unblocked, re-evaluate which items below are
+> still applicable (crane-cli may keep `.github/actions/setup-dotnet/`,
+> `swe-fsharp-dev` agents, and F# skills active).
+>
+> Items that remain safe to remove independently (C#-only, no F# dependency):
+>
+> - `scripts/format-csharp.sh`
+> - `.claude/agents/swe-csharp-dev.md` + `.opencode/agents/swe-csharp-dev.md`
+> - `.claude/skills/swe-programming-csharp/`
+> - `"*.cs"` entry in `package.json` lint-staged block
+> - C# docs: `docs/explanation/software-engineering/programming-languages/c-sharp/`
+>
+> Items that must NOT be removed while crane-cli is F#:
+>
+> - `.github/actions/setup-dotnet/` (used by crane-cli-integration CI)
+> - `.claude/agents/swe-fsharp-dev.md` + `.opencode/agents/swe-fsharp-dev.md`
+> - `.claude/skills/swe-programming-fsharp/`
+> - F# docs: `docs/explanation/software-engineering/programming-languages/f-sharp/`
+> - `lang:fsharp` detection in `.github/workflows/pr-quality-gate.yml`
 
 ---
 

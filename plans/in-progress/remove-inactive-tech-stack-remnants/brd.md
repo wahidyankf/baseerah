@@ -3,8 +3,7 @@
 ## Business Goal
 
 Remove all remnant artifacts (docs, agents, skills, CI jobs, toolchain scripts, config entries)
-for tech stacks no longer active in `ose-public`. Retain only what serves the three active stacks:
-TypeScript, Go, and Rust.
+for tech stacks no longer active in `ose-public`. Retain only what serves the active stacks: TypeScript, Go, Rust, and F# (crane-cli).
 
 ## Problem
 
