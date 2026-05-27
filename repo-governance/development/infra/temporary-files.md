@@ -157,17 +157,16 @@ To enable accurate parent-child hierarchy tracking across concurrent workflow ru
 
 **Scope Definitions**:
 
-| Workflow/Agent            | Scope           | Tracking File                    |
-| ------------------------- | --------------- | -------------------------------- |
-| repo-rules-checker        | `repo-rules`    | `.execution-chain-repo-rules`    |
-| docs-checker              | `docs`          | `.execution-chain-docs`          |
-| docs-tutorial-checker     | `docs-tutorial` | `.execution-chain-docs-tutorial` |
-| readme-checker            | `readme`        | `.execution-chain-readme`        |
-| plan-checker              | `plan`          | `.execution-chain-plan`          |
-| docs-link-checker         | `docs-link`     | `.execution-chain-docs-link`     |
-| ayokoding-web-\* (golang) | `golang`        | `.execution-chain-golang`        |
-| ayokoding-web-\* (elixir) | `elixir`        | `.execution-chain-elixir`        |
-| ose-web-\*                | `ose-platform`  | `.execution-chain-ose-platform`  |
+| Workflow/Agent        | Scope           | Tracking File                    |
+| --------------------- | --------------- | -------------------------------- |
+| repo-rules-checker    | `repo-rules`    | `.execution-chain-repo-rules`    |
+| docs-checker          | `docs`          | `.execution-chain-docs`          |
+| docs-tutorial-checker | `docs-tutorial` | `.execution-chain-docs-tutorial` |
+| readme-checker        | `readme`        | `.execution-chain-readme`        |
+| plan-checker          | `plan`          | `.execution-chain-plan`          |
+| docs-link-checker     | `docs-link`     | `.execution-chain-docs-link`     |
+| ayokoding-web-\* (ts) | `ayokoding`     | `.execution-chain-ayokoding`     |
+| ose-web-\*            | `ose-platform`  | `.execution-chain-ose-platform`  |
 
 **Tracking File Format**: `{unix-timestamp} {uuid-chain}`
 
@@ -241,17 +240,17 @@ This prevents race conditions when multiple children run in parallel.
 Scope-based tracking enables correct parent tracking for concurrent workflows:
 
 ```
-T0: golang-workflow writes .execution-chain-golang = "aaa111"
-T1: elixir-workflow writes .execution-chain-elixir = "bbb222"
-T2: golang-checker reads .execution-chain-golang → "aaa111"
-T3: elixir-checker reads .execution-chain-elixir → "bbb222"
+T0: ayokoding-workflow writes .execution-chain-ayokoding = "aaa111"
+T1: ose-platform-workflow writes .execution-chain-ose-platform = "bbb222"
+T2: ayokoding-checker reads .execution-chain-ayokoding → "aaa111"
+T3: ose-platform-checker reads .execution-chain-ose-platform → "bbb222"
 ```
 
 Each workflow scope is isolated, preventing cross-contamination.
 
 ### Documented Limitation
 
-> **Edge case:** If the same workflow with the same scope runs concurrently (e.g., two golang by-example validations simultaneously), parent tracking may be imperfect within that scope. This is expected behavior for concurrent operations on the same resource. The unique UUID still ensures no file collisions.
+> **Edge case:** If the same workflow with the same scope runs concurrently (e.g., two ayokoding by-example validations simultaneously), parent tracking may be imperfect within that scope. This is expected behavior for concurrent operations on the same resource. The unique UUID still ensures no file collisions.
 
 ### Backward Compatibility
 

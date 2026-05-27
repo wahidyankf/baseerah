@@ -161,11 +161,10 @@ Run the check:
 rhino-cli spec-coverage validate specs/apps/rhino apps/rhino-cli
 ```
 
-**Scope**: Spec-coverage enforcement is currently active for **CLI apps only** (Go + Godog naming
+**Scope**: Spec-coverage enforcement is currently active for **CLI apps only** (Rust + cucumber-rs naming
 conventions). Enforcement for demo-be backends is **planned but deferred** — the tool needs
-enhancement to support demo-be test file naming conventions (e.g., `health_steps_test.go` for Go,
-`HealthSteps.java` for Java) which differ from the CLI app naming patterns the tool currently
-expects. This will be addressed in a follow-up plan.
+enhancement to support demo-be test file naming conventions (e.g., `health_steps.rs` for Rust)
+which differ from the CLI app naming patterns the tool currently expects. This will be addressed in a follow-up plan.
 
 ## Adding a New Command
 

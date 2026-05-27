@@ -783,8 +783,7 @@ As the repository grows, additional layers might be considered:
 
 **As project matures**:
 
-- **New languages**: Java, Kotlin, Python development conventions
-- **New domains**: Islamic finance-specific patterns and rules
+- **New domains**: Additional Islamic finance domain patterns as ose-app-be grows
 - **Enhanced validation**: More sophisticated checker/fixer agents
 - **Performance conventions**: Optimization and scalability standards
 

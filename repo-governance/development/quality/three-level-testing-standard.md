@@ -275,7 +275,7 @@ The tool is invoked as the `spec-coverage` Nx target and is enforced by the pre-
 **`--shared-steps`**: All projects use this flag. It validates steps across ALL source files in the
 supplied directories rather than requiring a 1:1 match between each feature file and a
 corresponding step file. This accommodates shared step libraries and the varying naming conventions
-across languages (e.g., `health_steps_test.go`, `UserSteps.java`, `user_steps.ex`).
+across languages (e.g., `health_steps.rs` for Rust, `health_steps.ts` for TypeScript).
 
 **`--exclude-dir test-support`**: API backends and FE apps use this flag. It excludes
 E2E-only `test-support` API spec files from validation. These specs exist only to support E2E

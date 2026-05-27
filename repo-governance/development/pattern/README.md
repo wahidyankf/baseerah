@@ -32,7 +32,7 @@ These patterns define **HOW to structure development workflows and code**, cover
 
 ## Documents
 
-- [Database Audit Trail Pattern](./database-audit-trail.md) - Required 6-column audit trail (created_at/by, updated_at/by, deleted_at/by) for every database table. Covers the migration tool used by each of the 12 demo backends, language-agnostic migration requirements, Java/Spring Boot guidance (Liquibase changelogs, JPA Auditing, `@NullMarked`), and soft-delete discipline
+- [Database Audit Trail Pattern](./database-audit-trail.md) - Required 6-column audit trail (created_at/by, updated_at/by, deleted_at/by) for every database table. Covers language-agnostic migration requirements, Rust/SQLx patterns (embedded migrations, `FromRow` derive), and soft-delete discipline
 - [Functional Programming Practices](./functional-programming.md) - Guidelines for applying functional programming principles in TypeScript/JavaScript (immutability patterns, pure functions, function composition)
 - [Hexagonal Architecture](./hexagonal-architecture.md) - Core ports-and-adapters pattern: dependency rule, layer definitions (domain, application, infrastructure, inbound adapters), and links to app-type specializations
 - [Hexagonal Architecture — CLI Apps](./hexagonal-architecture-cli.md) - CLI specialization: `commands/` as inbound adapter, canonical directory layouts for rhino-cli/crane-cli/ose-cli/ayokoding-cli, layer responsibilities, and forbidden imports

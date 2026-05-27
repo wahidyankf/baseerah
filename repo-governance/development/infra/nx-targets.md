@@ -97,25 +97,25 @@ flowchart TD
 
 Use these canonical names. Aliases (`serve`, `start:dev`, `unit-test`) are anti-patterns.
 
-| Target             | Purpose                                                                                                                  | When Required                     |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------- |
-| `build`            | Produce deployable or runnable artifacts                                                                                 | Compiled and bundled projects     |
-| `typecheck`        | Verify type correctness without producing artifacts                                                                      | Statically typed languages        |
-| `lint`             | Static analysis, code style checks, and static a11y checks (oxlint jsx-a11y for TS UI projects, `dart analyze` for Dart) | All projects                      |
-| `test:quick`       | Fast quality gate for pre-push and PR merge; composed of fast checks                                                     | All projects                      |
-| `spec-coverage`    | Validate that every Gherkin step has a matching step definition; uses `rhino-cli spec-coverage validate`                 | All apps and E2E runners          |
-| `test:unit`        | Isolated unit tests with mocked dependencies; must consume Gherkin specs (demo-be backends and Go CLI apps)              | Projects with unit tests          |
-| `test:integration` | Demo-be: real PostgreSQL via docker-compose, direct code calls (no HTTP). Others: existing patterns (MSW, Godog)         | Projects with integration tests   |
-| `test:e2e`         | Run E2E tests headlessly against a running app; must consume Gherkin specs (demo-be backends) via Playwright             | E2E test projects (`*-e2e`)       |
-| `test:e2e:ui`      | Run E2E tests with interactive Playwright UI                                                                             | E2E test projects                 |
-| `test:e2e:report`  | Open the last E2E HTML report                                                                                            | E2E test projects                 |
-| `dev`              | Start local development server with hot-reload                                                                           | Apps with dev servers             |
-| `start`            | Start server in production mode                                                                                          | Apps with production server mode  |
-| `run`              | Execute the application directly                                                                                         | CLI applications                  |
-| `codegen`          | Generate code from OpenAPI contract spec into `generated-contracts/`                                                     | Demo apps with contract types     |
-| `docs`             | Generate browsable API documentation from contract spec                                                                  | Contract spec projects            |
-| `install`          | Install project-local dependencies                                                                                       | E2E suites, Go CLIs               |
-| `clean`            | Remove build artifacts and caches                                                                                        | Projects with large build outputs |
+| Target             | Purpose                                                                                                          | When Required                     |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `build`            | Produce deployable or runnable artifacts                                                                         | Compiled and bundled projects     |
+| `typecheck`        | Verify type correctness without producing artifacts                                                              | Statically typed languages        |
+| `lint`             | Static analysis, code style checks, and static a11y checks (oxlint jsx-a11y for TS UI projects)                  | All projects                      |
+| `test:quick`       | Fast quality gate for pre-push and PR merge; composed of fast checks                                             | All projects                      |
+| `spec-coverage`    | Validate that every Gherkin step has a matching step definition; uses `rhino-cli spec-coverage validate`         | All apps and E2E runners          |
+| `test:unit`        | Isolated unit tests with mocked dependencies; must consume Gherkin specs (demo-be backends and Go CLI apps)      | Projects with unit tests          |
+| `test:integration` | Demo-be: real PostgreSQL via docker-compose, direct code calls (no HTTP). Others: existing patterns (MSW, Godog) | Projects with integration tests   |
+| `test:e2e`         | Run E2E tests headlessly against a running app; must consume Gherkin specs (demo-be backends) via Playwright     | E2E test projects (`*-e2e`)       |
+| `test:e2e:ui`      | Run E2E tests with interactive Playwright UI                                                                     | E2E test projects                 |
+| `test:e2e:report`  | Open the last E2E HTML report                                                                                    | E2E test projects                 |
+| `dev`              | Start local development server with hot-reload                                                                   | Apps with dev servers             |
+| `start`            | Start server in production mode                                                                                  | Apps with production server mode  |
+| `run`              | Execute the application directly                                                                                 | CLI applications                  |
+| `codegen`          | Generate code from OpenAPI contract spec into `generated-contracts/`                                             | Demo apps with contract types     |
+| `docs`             | Generate browsable API documentation from contract spec                                                          | Contract spec projects            |
+| `install`          | Install project-local dependencies                                                                               | E2E suites, Go CLIs               |
+| `clean`            | Remove build artifacts and caches                                                                                | Projects with large build outputs |
 
 ### Naming Rules
 
@@ -133,16 +133,16 @@ Tags are the standard mechanism for attaching structured metadata to projects in
 
 Every project declares tags along four dimensions. Each dimension uses a fixed prefix and a controlled vocabulary.
 
-| Dimension | Prefix      | Allowed Values                                                                                     | Required                       | Purpose                                                       |
-| --------- | ----------- | -------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Type      | `type:`     | `app`, `lib`, `e2e`                                                                                | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
-| Platform  | `platform:` | `cli`, `nextjs`, `spring-boot`, `phoenix`, `gin`, `fastapi`, `axum`, `ktor`, `vertx`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
-| Language  | `lang:`     | `golang`, `ts`, `java`, `elixir`, `python`, `rust`, `kotlin`, `dart`                               | Projects with application code | Primary language of source code                               |
-| Domain    | `domain:`   | `ayokoding`, `ose-platform`, `ose-app`, `organiclever`, `wahidyankf`, `tooling`                    | Always                         | Business or product domain                                    |
+| Dimension | Prefix      | Allowed Values                                                                                 | Required                       | Purpose                                                       |
+| --------- | ----------- | ---------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Type      | `type:`     | `app`, `lib`, `e2e`                                                                            | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
+| Platform  | `platform:` | `cli`, `nextjs`, `axum`, `playwright`                                                          | Apps and e2e projects          | Framework or runtime environment                              |
+| Language  | `lang:`     | `ts`, `rust`, `dotnet`                                                                         | Projects with application code | Primary language of source code                               |
+| Domain    | `domain:`   | `ayokoding`, `crane`, `ose-platform`, `ose-app`, `organiclever`, `wahidyankf`, `tooling`, `ui` | Always                         | Business or product domain                                    |
 
 ### Special Rules
 
-**Go libs omit `platform:`**: A Go library has no framework or runtime boundary — only a primary language. Declare `type:lib` and `lang:golang`; omit `platform:`.
+**Rust libs omit `platform:`**: A Rust library has no framework or runtime boundary — only a primary language. Declare `type:lib` and `lang:rust`; omit `platform:`.
 
 **Use `domain:tooling` for general-purpose utilities**: Projects that are not tied to a specific product domain (e.g., `rhino-cli`) use `domain:tooling`. Use a product domain tag only when the project belongs exclusively to that product.
 
@@ -213,7 +213,7 @@ Derived from three rules: (1) All apps+libs → unit tests, (2) All apps → int
 | ----------------- | --------------------------------------------------------------------------- |
 | `organiclever-be` | `cargo check --manifest-path apps/organiclever-be/Cargo.toml --all-targets` |
 
-> For polyglot backend `typecheck` patterns (Go, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, Clojure, F#), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
+> For polyglot backend `typecheck` patterns (Go, F#, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, Clojure), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
 \* E2E tests live in dedicated `*-e2e` runner projects, not in the backend/frontend project itself.
 
@@ -232,14 +232,13 @@ Every project in `apps/` and `libs/` must expose:
 
 **`test:quick` composition** — each project decides which fast checks form its gate. The target runs its checks directly (calling the underlying tools, not other Nx targets) to avoid double execution when `lint` or `typecheck` are also run standalone by the pre-push hook. Common compositions:
 
-| Project type       | Typical `test:quick` composition                                                                                                                                                                                                               |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TypeScript app     | unit tests via vitest (typecheck and lint run separately in pre-push); coverage from unit tests only via `rhino-cli test-coverage validate` ≥90%                                                                                               |
-| Go app             | `go test -coverprofile=cover.out ./... && rhino-cli test-coverage validate <project>/cover.out 90` — compiles and runs unit tests (excluding `//go:build integration` files), then enforces ≥90% line coverage (standard line-based algorithm) |
-| Rust app           | `cargo llvm-cov --test unit --ignore-filename-regex 'main\.rs' --fail-under-lines 90` — line coverage via cargo-llvm-cov, main.rs excluded                                                                                                     |
-| Playwright `*-e2e` | run the linter directly (no unit tests to add beyond linting)                                                                                                                                                                                  |
+| Project type       | Typical `test:quick` composition                                                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| TypeScript app     | unit tests via vitest (typecheck and lint run separately in pre-push); coverage from unit tests only via `rhino-cli test-coverage validate` ≥90% |
+| Rust app           | `cargo llvm-cov --test unit --ignore-filename-regex 'main\.rs' --fail-under-lines 90` — line coverage via cargo-llvm-cov, main.rs excluded       |
+| Playwright `*-e2e` | run the linter directly (no unit tests to add beyond linting)                                                                                    |
 
-> For polyglot `test:quick` composition patterns (Java, Kotlin, Python, Rust, Elixir, TypeScript backend, C#, Clojure, Dart/Flutter), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
+> For polyglot `test:quick` composition patterns (Go, Java, Kotlin, Python, Rust, Elixir, TypeScript backend, C#, Clojure, Dart/Flutter, F#), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
 The rule: include only checks that complete fast. If `test:unit` is slow for a project, exclude it from `test:quick` and run it separately. **The target must always exist** — even if it only runs the type checker — so the pre-push hook covers every project.
 
@@ -257,21 +256,21 @@ TypeScript and other statically typed projects:
 compilation already enforces types and `build` covers it — except when an additional static
 analysis pass is warranted.
 
-> For polyglot `typecheck` patterns in Go, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, and Clojure backends, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
+> For polyglot `typecheck` patterns in Go, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, F#, and Clojure backends, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
 ### Compiled and Bundled Projects
 
-Projects that produce artifacts from a compilation or bundling step (Go, Java, Next.js):
+Projects that produce artifacts from a compilation or bundling step (Rust, .NET, Next.js):
 
 | Target  | Requirement                                                          |
 | ------- | -------------------------------------------------------------------- |
 | `build` | Produce production-ready artifacts; declare `outputs` for Nx caching |
 
-**Not required for interpreted languages** (Python, Ruby, plain Node.js scripts) where the source is the deployable artifact.
+**Not required for interpreted languages** (plain Node.js scripts) where the source is the deployable artifact.
 
 ### Apps with Development Servers
 
-Next.js, Spring Boot, Python web apps:
+Next.js and Axum apps:
 
 | Target | Requirement                                       |
 | ------ | ------------------------------------------------- |
@@ -279,7 +278,7 @@ Next.js, Spring Boot, Python web apps:
 
 ### Apps with Production Server Mode
 
-Spring Boot, Next.js, Python web apps:
+Next.js and Axum apps:
 
 | Target  | Requirement                |
 | ------- | -------------------------- |
@@ -287,7 +286,7 @@ Spring Boot, Next.js, Python web apps:
 
 ### Projects with Unit Tests
 
-Spring Boot, Python apps, TypeScript apps:
+Rust, .NET, TypeScript apps:
 
 | Target      | Requirement                                                          |
 | ----------- | -------------------------------------------------------------------- |
@@ -534,7 +533,7 @@ language:
 | -------- | ---------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------- |
 | Rust     | `{projectRoot}/src/**/*.rs`, `{projectRoot}/tests/**/*.rs` | `{projectRoot}/generated-contracts/**/*` | `{workspaceRoot}/specs/apps/<app-name>/**/*.feature` |
 
-> For canonical inputs patterns across Go, Java, Kotlin, TypeScript, Python, Elixir, C#, Clojure, and Dart, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
+> For canonical inputs patterns across Go, Java, Kotlin, TypeScript, Python, Elixir, C#, F#, Clojure, and Dart, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
 **Rust CLI app** (`rhino-cli`) also consumes Gherkin specs in `test:unit`. Its `test:unit` and `test:quick` inputs must include the CLI's own spec files:
 
@@ -600,8 +599,7 @@ Both `typecheck` and `build` declare `dependsOn: ["codegen"]` in their `project.
 ensures generated contract types are always present before type-checking or building begins.
 
 **`test:unit` and `test:quick` do NOT directly depend on `codegen`** — they depend on source
-files being correct, which is already enforced by `typecheck` and `build`. Some build systems
-(Rust, Dart/Flutter) require generated code at compile time and therefore keep
+files being correct, which is already enforced by `typecheck` and `build`. Some build systems (Rust) require generated code at compile time and therefore keep
 `dependsOn: ["codegen"]` in `test:unit` / `test:quick`.
 
 **Rationale**: Making `codegen` a dependency of `typecheck` and `build` (rather than of test
@@ -618,8 +616,8 @@ runs when artifacts already exist from a prior `build` or `typecheck` execution.
 - **Using a real database in unit tests**: Unit tests must use mocked repositories or in-memory implementations — never a real database. Real databases belong in integration tests (API backends via docker-compose) or E2E tests
 - **Using HTTP dispatch in integration tests**: Integration tests for API backends must call service/repository functions directly — not through HTTP dispatch mechanisms. HTTP contract verification belongs in E2E tests. See [Three-Level Testing Standard](../quality/three-level-testing-standard.md) for the full level boundaries
 - **Enabling cache on `test:integration` with Docker**: Integration tests that use real PostgreSQL via docker-compose must have `cache: false` — stale results when database state matters. Only in-process-mocking integration tests (MSW, Godog) may enable caching
-- **`build` on interpreted-language projects**: Adding a no-op `build` to Python or Ruby just to appear consistent — if there is no compile step, there is no `build` target
-- **`typecheck` on compile-enforced languages without additional analysis**: Go and plain Java enforce types through `build`; a separate `typecheck` that only re-runs the compiler is redundant. **Exception**: Java with JSpecify + NullAway warrants `typecheck` because NullAway is a distinct null-safety pass not included in `build`
+- **`build` on interpreted-language projects**: Adding a no-op `build` to plain Node.js scripts just to appear consistent — if there is no compile step, there is no `build` target
+- **`typecheck` on compile-enforced languages without additional analysis**: Rust enforces types through `build`; a separate `typecheck` that only re-runs the compiler may be redundant for simple projects
 - **Undeclared outputs**: Omitting `outputs` on `build` disables caching and forces full rebuilds on every run
 - **Apps-only targets on libs**: Libs do not expose `dev` or `start`; those are app-specific concepts
 - **Creating a `test:full` wrapper**: Adding a `test:full` that just chains other targets adds indirection without value — run `test:unit`, `test:integration`, and `test:e2e` directly or via CI matrix steps

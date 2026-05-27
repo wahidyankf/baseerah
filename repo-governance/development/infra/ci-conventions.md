@@ -77,13 +77,8 @@ order:
 | Language / File Type                              | Formatter       |
 | ------------------------------------------------- | --------------- |
 | JavaScript, TypeScript, JSON, YAML, CSS, Markdown | Prettier        |
-| Go                                                | `gofmt`         |
-| Elixir                                            | `mix format`    |
-| Python                                            | `ruff format`   |
 | Rust                                              | `rustfmt`       |
-| C#                                                | `dotnet format` |
-| Clojure                                           | `cljfmt`        |
-| Dart                                              | `dart format`   |
+| F# / C#                                           | `dotnet format` |
 
 ### commit-msg
 
@@ -300,7 +295,7 @@ Broad exclusion prevents accidentally including large directories (e.g., `node_m
 
 | Artifact                  | Path                                          | Purpose                                                          |
 | ------------------------- | --------------------------------------------- | ---------------------------------------------------------------- |
-| Composite action          | `.github/actions/{name}/action.yml`           | One per language/tool setup (e.g., `setup-golang`, `setup-java`) |
+| Composite action          | `.github/actions/{name}/action.yml`           | One per language/tool setup (e.g., `setup-dotnet`, `setup-node`) |
 | Reusable workflow         | `.github/workflows/_reusable-{purpose}.yml`   | Shared job logic called by per-variant workflows                 |
 | Per-variant test workflow | `.github/workflows/test-{app-name}.yml`       | ~40-line file that calls reusable workflows                      |
 | PR quality gate           | `.github/workflows/pr-{purpose}.yml`          | Runs `nx affected` checks on pull requests                       |
@@ -314,7 +309,7 @@ infrastructure from top-level entry-point workflows in the GitHub Actions UI.
 Each language or tool that requires non-trivial setup lives in its own composite action under
 `.github/actions/{name}/action.yml`. A composite action encapsulates:
 
-- Tool version pinning (via Volta, `setup-go`, `setup-java`, etc.)
+- Tool version pinning (via Volta, `setup-dotnet`, etc.)
 - Dependency caching configuration
 - Any post-setup verification steps
 
@@ -324,10 +319,9 @@ the language into any workflow.
 **Examples**:
 
 ```
-.github/actions/setup-golang/action.yml
-.github/actions/setup-java/action.yml
+.github/actions/setup-dotnet/action.yml
 .github/actions/setup-node/action.yml
-.github/actions/setup-python/action.yml
+.github/actions/setup-rust/action.yml
 ```
 
 ### Reusable Workflows

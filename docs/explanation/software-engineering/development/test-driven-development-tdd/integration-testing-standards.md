@@ -1,6 +1,6 @@
 ---
 title: "Integration Testing Standards"
-description: OSE Platform standards for integration testing — mocked external I/O, in-memory repositories, MSW, and WireMock patterns
+description: OSE Platform standards for integration testing — mocked external I/O, in-memory repositories, MSW, and mockito patterns
 category: explanation
 subcategory: development
 tags:
@@ -113,62 +113,64 @@ describe("MemberService (Integration)", () => {
 });
 ```
 
-### Java — In-Memory Repository
+### Rust — In-Memory Repository
 
-```java
-// Production interface
-public interface MemberRepository {
-    List<Member> findAll();
-    Optional<Member> findById(MemberId id);
-    void save(Member member);
-    void delete(MemberId id);
+```rust
+use std::collections::HashMap;
+
+// Production trait
+trait MemberRepository: Send + Sync {
+    fn find_all(&self) -> Vec<Member>;
+    fn find_by_id(&self, id: &MemberId) -> Option<Member>;
+    fn save(&mut self, member: Member);
+    fn delete(&mut self, id: &MemberId);
 }
 
 // In-memory implementation for integration tests
-public class InMemoryMemberRepository implements MemberRepository {
-    private final Map<MemberId, Member> store = new HashMap<>();
+struct InMemoryMemberRepository {
+    store: HashMap<MemberId, Member>,
+}
 
-    @Override
-    public List<Member> findAll() {
-        return new ArrayList<>(store.values());
+impl InMemoryMemberRepository {
+    fn new() -> Self {
+        Self { store: HashMap::new() }
+    }
+}
+
+impl MemberRepository for InMemoryMemberRepository {
+    fn find_all(&self) -> Vec<Member> {
+        self.store.values().cloned().collect()
     }
 
-    @Override
-    public Optional<Member> findById(MemberId id) {
-        return Optional.ofNullable(store.get(id));
+    fn find_by_id(&self, id: &MemberId) -> Option<Member> {
+        self.store.get(id).cloned()
     }
 
-    @Override
-    public void save(Member member) {
-        store.put(member.getId(), member);
+    fn save(&mut self, member: Member) {
+        self.store.insert(member.id.clone(), member);
     }
 
-    @Override
-    public void delete(MemberId id) {
-        store.remove(id);
+    fn delete(&mut self, id: &MemberId) {
+        self.store.remove(id);
     }
 }
 
 // Integration test usage
-class MemberServiceIntegrationTest {
-    private MemberRepository repository;
-    private MemberService service;
+#[cfg(test)]
+mod member_service_integration_tests {
+    use super::*;
 
-    @BeforeEach
-    void setUp() {
-        repository = new InMemoryMemberRepository();
-        service = new MemberService(repository);
-    }
+    #[test]
+    fn should_list_all_members() {
+        let mut repository = InMemoryMemberRepository::new();
+        repository.save(Member::create(MemberId::generate(), "Alice Johnson", Role::Admin));
+        repository.save(Member::create(MemberId::generate(), "Bob Smith", Role::Viewer));
 
-    @Test
-    void shouldListAllMembers() {
-        repository.save(Member.create(MemberId.generate(), "Alice Johnson", Role.ADMIN));
-        repository.save(Member.create(MemberId.generate(), "Bob Smith", Role.VIEWER));
+        let service = MemberService::new(repository);
+        let members = service.list_members();
 
-        List<Member> members = service.listMembers();
-
-        assertThat(members).hasSize(2);
-        assertThat(members).extracting(Member::getName).contains("Alice Johnson");
+        assert_eq!(members.len(), 2);
+        assert!(members.iter().any(|m| m.name == "Alice Johnson"));
     }
 }
 ```
@@ -227,58 +229,64 @@ it("should show error when API returns 500", async () => {
 });
 ```
 
-### Java — WireMock
+### Rust — `mockito` HTTP Mock Server
 
-WireMock stubs external HTTP endpoints. Configure it per-test class to control what the application
-receives when it calls external services.
+`mockito` starts an in-process HTTP server on a dynamic port. Configure it per-test to control
+what the application receives when it calls external services.
 
-```java
-@ExtendWith(WireMockExtension.class)
-class NotificationServiceIntegrationTest {
+```rust
+use mockito::{Server, Matcher};
 
-    @RegisterExtension
-    static WireMockExtension wireMock = WireMockExtension.newInstance()
-        .options(wireMockConfig().dynamicPort())
-        .build();
+#[tokio::test]
+async fn should_send_notification_successfully() {
+    let mut server = Server::new_async().await;
 
-    private NotificationService service;
+    let mock = server
+        .mock("POST", "/notifications")
+        .with_status(200)
+        .with_body(r#"{"status": "sent"}"#)
+        .expect(1)
+        .create_async()
+        .await;
 
-    @BeforeEach
-    void setUp() {
-        String baseUrl = wireMock.baseUrl();
-        service = new NotificationService(new HttpNotificationClient(baseUrl));
-    }
+    let client = HttpNotificationClient::new(server.url());
+    let service = NotificationService::new(client);
 
-    @Test
-    void shouldSendNotificationSuccessfully() {
-        wireMock.stubFor(post(urlEqualTo("/notifications"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withBody("{\"status\": \"sent\"}")));
+    service
+        .notify(MemberId::of("1"), "Welcome to OSE Platform")
+        .await
+        .expect("notification should succeed");
 
-        service.notify(MemberId.of("1"), "Welcome to OSE Platform");
+    mock.assert_async().await;
+}
 
-        wireMock.verify(postRequestedFor(urlEqualTo("/notifications"))
-            .withRequestBody(containing("Welcome to OSE Platform")));
-    }
+#[tokio::test]
+async fn should_retry_when_notification_fails() {
+    let mut server = Server::new_async().await;
 
-    @Test
-    void shouldRetryWhenNotificationFails() {
-        wireMock.stubFor(post(urlEqualTo("/notifications"))
-            .inScenario("retry")
-            .whenScenarioStateIs(STARTED)
-            .willReturn(aResponse().withStatus(503))
-            .willSetStateTo("second-attempt"));
+    // First attempt fails
+    let fail_mock = server
+        .mock("POST", "/notifications")
+        .with_status(503)
+        .expect(1)
+        .create_async()
+        .await;
 
-        wireMock.stubFor(post(urlEqualTo("/notifications"))
-            .inScenario("retry")
-            .whenScenarioStateIs("second-attempt")
-            .willReturn(aResponse().withStatus(200).withBody("{\"status\": \"sent\"}")));
+    // Second attempt succeeds
+    let ok_mock = server
+        .mock("POST", "/notifications")
+        .with_status(200)
+        .with_body(r#"{"status": "sent"}"#)
+        .expect(1)
+        .create_async()
+        .await;
 
-        service.notify(MemberId.of("1"), "Welcome");
+    let client = HttpNotificationClient::new(server.url());
+    let service = NotificationService::new(client);
+    service.notify(MemberId::of("1"), "Welcome").await.expect("should succeed on retry");
 
-        wireMock.verify(2, postRequestedFor(urlEqualTo("/notifications")));
-    }
+    fail_mock.assert_async().await;
+    ok_mock.assert_async().await;
 }
 ```
 
@@ -288,13 +296,13 @@ class NotificationServiceIntegrationTest {
 
 ```
 src/
-  test/
+  tests/
     unit/
-      MemberServiceTest.java          # Pure unit tests — all dependencies mocked
-      ZakatCalculatorTest.java
+      member_service_test.rs          # Pure unit tests — all dependencies mocked
+      zakat_calculator_test.rs
     integration/
-      MemberListIntegrationTest.java  # Multiple layers wired + in-memory infra
-      UserLoginIntegrationTest.java
+      member_list_integration_test.rs # Multiple layers wired + in-memory infra
+      user_login_integration_test.rs
 ```
 
 **TypeScript** (organiclever-web pattern):
@@ -353,33 +361,34 @@ describeFeature(feature, ({ Scenario }) => {
 });
 ```
 
-### Java — Cucumber JVM + MockMvc
+### Rust — `cucumber` crate + in-memory router
 
-```java
-// Integration test — Spring context loaded, but real DB replaced with in-memory repo
-@SpringBootTest
-@AutoConfigureMockMvc
-class MemberListIntegrationTest {
+```rust
+// tests/integration/member_list_integration_test.rs
+// Integration test — Axum router loaded, real DB replaced with in-memory repository
+use axum::http::StatusCode;
+use axum_test::TestServer;
+use serde_json::json;
 
-    @Autowired
-    private MockMvc mockMvc;
+#[tokio::test]
+async fn should_return_member_list() {
+    // Build router with in-memory repository (no real DB)
+    let mut repository = InMemoryMemberRepository::new();
+    repository.save(Member::create(MemberId::generate(), "Alice Johnson", Role::Admin));
+    repository.save(Member::create(MemberId::generate(), "Bob Smith", Role::Viewer));
 
-    @MockBean  // Replaces real PostgreSQL-backed repository with a mock
-    private MemberRepository memberRepository;
+    let app = build_router(repository);
+    let server = TestServer::new(app).expect("failed to create test server");
 
-    @Test
-    void shouldReturnMemberList() throws Exception {
-        when(memberRepository.findAll()).thenReturn(List.of(
-            Member.create(MemberId.generate(), "Alice Johnson", Role.ADMIN),
-            Member.create(MemberId.generate(), "Bob Smith", Role.VIEWER)
-        ));
+    let response = server
+        .get("/api/members")
+        .add_header("Authorization", "Bearer test-token")
+        .await;
 
-        mockMvc.perform(get("/api/members")
-                .header("Authorization", "Bearer test-token"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(2)))
-            .andExpect(jsonPath("$[0].name", is("Alice Johnson")));
-    }
+    assert_eq!(response.status_code(), StatusCode::OK);
+    let body: Vec<serde_json::Value> = response.json();
+    assert_eq!(body.len(), 2);
+    assert_eq!(body[0]["name"], json!("Alice Johnson"));
 }
 ```
 
@@ -390,17 +399,15 @@ Integration tests must not leave state between test cases.
 **TypeScript**: Reset MSW handlers after each test. Use `beforeEach` to reinitialize in-memory
 repositories.
 
-**Java**: Use `@Transactional` on tests that write to in-memory state if using a shared Spring
-context, or reinitialize the in-memory repository in `@BeforeEach`.
+**Rust**: Reinitialize the in-memory repository at the start of each test function. Because each
+`#[tokio::test]` is an independent async task with its own stack, state never leaks between tests
+when the repository is constructed locally inside the function.
 
-```java
-class MemberRepositoryIntegrationTest {
-    private InMemoryMemberRepository repository;
-
-    @BeforeEach
-    void setUp() {
-        repository = new InMemoryMemberRepository(); // Fresh state per test
-    }
+```rust
+#[tokio::test]
+async fn member_repository_integration_test() {
+    let repository = InMemoryMemberRepository::new(); // Fresh state per test
+    // … test body …
 }
 ```
 

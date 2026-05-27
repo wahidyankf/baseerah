@@ -274,7 +274,7 @@ done
 ### Practice 8: Enable Lint-Staged for Incremental Quality
 
 **Principle**: Format and lint only staged files in pre-commit. For languages that require project
-context (e.g. Go, Elixir), use dedicated hook steps rather than lint-staged.
+context (e.g. Rust, .NET), use dedicated hook steps rather than lint-staged.
 
 **Good Example:**
 

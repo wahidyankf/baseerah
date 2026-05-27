@@ -1,6 +1,6 @@
 ---
 title: "Dependency Bump Stability & Safety Policy"
-description: Three-path decision tree (LTS, 60-day soak, security waiver) governing every dependency bump across the polyglot monorepo — npm, Go, Maven, .NET, Dockerfile, GitHub Actions
+description: Three-path decision tree (LTS, 60-day soak, security waiver) governing every dependency bump across the polyglot monorepo — npm, Cargo, .NET, Dockerfile, GitHub Actions
 category: explanation
 subcategory: development
 tags:
@@ -43,10 +43,8 @@ This practice respects the following conventions:
 ### What This Policy Covers
 
 - All `package.json` `dependencies`, `devDependencies`, `peerDependencies`, `optionalDependencies` (npm)
-- All `go.mod` `require` directives (Go)
-- All `pom.xml` `<version>` properties and `<parent><version>` (Maven / Java / Spring Boot)
-- All `global.json` `sdk.version` (.NET)
-- All `.tool-versions` entries (Erlang, Elixir, and other asdf-managed runtimes)
+- All `Cargo.toml` `[dependencies]` version entries (Rust)
+- All `global.json` `sdk.version` and `*.csproj`/`*.fsproj` `<PackageReference>` (.NET)
 - All `package.json` `volta` block (Node.js, npm)
 - All `Dockerfile` `FROM` lines (base images)
 - All GitHub Actions `uses:` references and inline version pins (CI workflow files)
@@ -69,11 +67,8 @@ If the package or runtime has an officially designated LTS line, **use the lates
 LTS-track packages and runtimes (non-exhaustive examples):
 
 - Node.js (LTS lines: 22 "Jod", 24 "Krypton", etc.)
-- Java / Eclipse Temurin (LTS releases: 8, 11, 17, 21, 25)
 - .NET (even-numbered major versions: 6, 8, 10 are LTS)
 - PostgreSQL (5-year support model — every major is effectively LTS)
-- Spring Boot (3-year OSS support — current minor is LTS-equivalent)
-- Erlang/OTP (each major has 2-year support — current major is LTS-equivalent)
 - React (de facto LTS treatment for major versions)
 
 Rationale: LTS lines have a soak and curation process built in by the upstream maintainer. Recent LTS patches inherit that soak.
@@ -113,10 +108,8 @@ All version specifications MUST be exact strings. No caret (`^`), no tilde (`~`)
 | `package.json` deps / devDeps                           | Exact string                                       | `"react": "19.2.6"` (NOT `"^19.2.6"`)                                  |
 | `package.json` `volta` block                            | Exact (Volta enforces this)                        | `"node": "24.15.0"`                                                    |
 | `package.json` `optionalDependencies` (native binaries) | Exact                                              | `"@next/swc-linux-x64-gnu": "16.2.6"`                                  |
-| `go.mod` `require`                                      | Exact pseudo-version (Go enforces this)            | `golang.org/x/image v0.39.0`                                           |
-| `pom.xml` `<parent><version>` and `<*.version>`         | Exact                                              | `<spring-boot.version>4.0.6</spring-boot.version>`                     |
+| `Cargo.toml` `[dependencies]`                           | Exact (no caret/tilde)                             | `axum = "0.8.4"` (NOT `axum = "^0.8"`)                                 |
 | `global.json` `sdk.version`                             | Exact (`rollForward` allowed per upstream pattern) | `"version": "10.0.300"`                                                |
-| `.tool-versions`                                        | Exact                                              | `erlang 27.3.4.11` (NOT `erlang 27.3`)                                 |
 | Dockerfile `FROM`                                       | Exact tag (digest preferred for production)        | `FROM node:24.15.0-alpine3.23` (NOT `FROM node:24-alpine`)             |
 | GitHub Actions `uses:`                                  | Pinned major OR exact SHA                          | `uses: actions/setup-node@v4` (acceptable for first-party) or `@<sha>` |
 | Composite action input defaults                         | Exact                                              | `default: "1.26.3"` (NOT `default: "1.26"`)                            |

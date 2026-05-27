@@ -45,29 +45,26 @@ OSE Platform domain event standards for event-driven architecture.
 
 **REQUIRED**: All events MUST be immutable.
 
-#### `Java`
+#### `Rust`
 
-```java
-public record ZakatCalculated(
-    AssessmentId assessmentId,
-    UserId userId,
-    Money zakatAmount,
-    Instant occurredAt
-) implements DomainEvent {
-    // No setters - immutable
+```rust
+use chrono::{DateTime, Utc};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ZakatCalculated {
+    pub assessment_id: AssessmentId,
+    pub user_id: UserId,
+    pub zakat_amount: Money,
+    pub occurred_at: DateTime<Utc>,
 }
-```
 
-#### `Kotlin`
-
-```kotlin
-data class ZakatCalculated(
-    val assessmentId: AssessmentId,
-    val userId: UserId,
-    val zakatAmount: Money,
-    val occurredAt: Instant,
-) : DomainEvent
-// No setters - immutable data class
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ZakatDomainEvent {
+    ZakatCalculated(ZakatCalculated),
+    MurabahaContractSigned { contract_id: ContractId, occurred_at: DateTime<Utc> },
+    ZakatPaid { assessment_id: AssessmentId, amount: Money, occurred_at: DateTime<Utc> },
+}
+// No setters — enum variants and struct fields are immutable by default
 ```
 
 #### `C#`

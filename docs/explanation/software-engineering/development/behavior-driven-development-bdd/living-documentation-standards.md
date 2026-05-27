@@ -80,7 +80,7 @@ Scenario: Wealth exceeds Nisab
 **Tools:**
 
 - **Cucumber HTML Reporter** (TypeScript)
-- **Serenity BDD** (Java)
+- **cucumber** crate report output (Rust)
 
 **Dashboard MUST show:**
 

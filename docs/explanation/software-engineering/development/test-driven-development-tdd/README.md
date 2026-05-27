@@ -24,11 +24,9 @@ All code developed for the OSE Platform MUST follow the TDD methodology and stan
 
 **REQUIRED Testing Frameworks:**
 
-- **Java**: JUnit 5 (Jupiter), Mockito, AssertJ
 - **TypeScript**: Vitest (NOT Jest), Testing Library
-- **Go**: Built-in `testing` package, testify/assert
-- **Python**: pytest, pytest-mock
-- **Elixir**: ExUnit (built-in)
+- **Rust**: Built-in `#[test]` + `cargo-llvm-cov`, `cucumber` crate for Gherkin
+- **.NET/F#**: xUnit, FsUnit, FsCheck
 
 **REQUIRED Test Runner:**
 
@@ -37,7 +35,6 @@ All code developed for the OSE Platform MUST follow the TDD methodology and stan
 **PROHIBITED:**
 
 - Jest (use Vitest for TypeScript)
-- JUnit 4 (use JUnit 5)
 - Mocha/Chai (use Vitest)
 
 ## Prerequisite Knowledge
@@ -108,7 +105,7 @@ TDD standards in OSE Platform align with core software engineering principles:
 **[Integration Testing Standards](./integration-testing-standards.md)**
 
 - REQUIRED: Use in-memory repository implementations (NOT Testcontainers)
-- REQUIRED: Use MSW (TypeScript) or WireMock (Java) for outbound HTTP
+- REQUIRED: Use MSW (TypeScript) or `wiremock-rs` / `mockito` (Rust) for outbound HTTP
 - REQUIRED: Separate unit tests from integration tests
 - PROHIBITED: Real databases, real network calls in integration tests
 
@@ -124,37 +121,35 @@ TDD standards in OSE Platform align with core software engineering principles:
 
 ### Zakat Assessment Aggregate Testing
 
-```java
-@Test
-void shouldCalculateZakatWhenWealthExceedsNisab() {
+```rust
+#[test]
+fn should_calculate_zakat_when_wealth_exceeds_nisab() {
     // Arrange
-    ZakatAssessment assessment = ZakatAssessment.create(
-        UserId.generate(),
-        Money.usd(100000),
-        NisabThreshold.goldEquivalent(Money.fromGold(87.48))
+    let assessment = ZakatAssessment::create(
+        UserId::generate(),
+        Money::usd(100_000),
+        NisabThreshold::gold_equivalent(Money::from_gold(87.48)),
     );
 
     // Act
-    assessment.calculate();
+    let result = assessment.calculate();
 
     // Assert
-    assertThat(assessment.getZakatDue())
-        .isEqualTo(Money.usd(2500)); // 2.5% of wealth
+    assert_eq!(result.unwrap().zakat_due, Money::usd(2_500)); // 2.5% of wealth
 }
 
-@Test
-void shouldRejectCalculationWhenBelowNisab() {
+#[test]
+fn should_reject_calculation_when_below_nisab() {
     // Arrange
-    ZakatAssessment assessment = ZakatAssessment.create(
-        UserId.generate(),
-        Money.usd(1000), // Below Nisab
-        NisabThreshold.goldEquivalent(Money.fromGold(87.48))
+    let assessment = ZakatAssessment::create(
+        UserId::generate(),
+        Money::usd(1_000), // Below Nisab
+        NisabThreshold::gold_equivalent(Money::from_gold(87.48)),
     );
 
     // Act & Assert
-    assertThatThrownBy(() -> assessment.calculate())
-        .isInstanceOf(BelowNisabException.class)
-        .hasMessage("Wealth below Nisab threshold");
+    let err = assessment.calculate().unwrap_err();
+    assert!(matches!(err, ZakatError::BelowNisab));
 }
 ```
 
@@ -188,23 +183,23 @@ describe("Money Value Object", () => {
 
 ### Domain Event Testing
 
-```java
-@Test
-void shouldEmitDonationReceivedEventOnConfirmation() {
+```rust
+#[test]
+fn should_emit_donation_received_event_on_confirmation() {
     // Arrange
-    Donation donation = Donation.create(
-        DonationId.generate(),
-        CampaignId.of("CAMPAIGN-001"),
-        Money.usd(500)
+    let mut donation = Donation::create(
+        DonationId::generate(),
+        CampaignId::new("CAMPAIGN-001"),
+        Money::usd(500),
     );
 
     // Act
     donation.confirm();
 
     // Assert
-    List<DomainEvent> events = donation.getDomainEvents();
-    assertThat(events).hasSize(1);
-    assertThat(events.get(0)).isInstanceOf(DonationReceived.class);
+    let events = donation.domain_events();
+    assert_eq!(events.len(), 1);
+    assert!(matches!(events[0], DomainEvent::DonationReceived(_)));
 }
 ```
 
@@ -224,9 +219,9 @@ apps/
 
 **REQUIRED Test Naming:**
 
-- Unit tests: `*.spec.ts` (TypeScript), `*Test.java` (Java), `*_test.go` (Go)
-- Integration tests: `*.integration.spec.ts`, `*IntegrationTest.java`
-- E2E tests: `*.e2e.spec.ts`, `*E2ETest.java`
+- Unit tests: `*.spec.ts` (TypeScript), `*_test.rs` in `#[cfg(test)]` modules (Rust), `*Tests.fs` (F#)
+- Integration tests: `*.integration.spec.ts`, `*_integration_tests.rs` (Rust)
+- E2E tests: `*.e2e.spec.ts` (TypeScript Playwright)
 
 ## Coverage Requirements
 

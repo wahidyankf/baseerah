@@ -14,7 +14,7 @@ created: 2026-04-04
 
 # Native-First Toolchain Management
 
-This document records the architectural decision to use native toolchain management (`rhino-cli doctor` and package managers) instead of infrastructure-as-code tools (Terraform, Ansible, Docker Dev Containers) for development environment setup. The open-sharia-enterprise monorepo spans 18 toolchains across 11 languages (Node.js, Go, Java, Rust, Elixir, Python, .NET, Dart, Clojure, Kotlin, C#), making toolchain management a significant architectural concern.
+This document records the architectural decision to use native toolchain management (`rhino-cli doctor` and package managers) instead of infrastructure-as-code tools (Terraform, Ansible, Docker Dev Containers) for development environment setup. The open-sharia-enterprise monorepo spans multiple toolchains (Node.js, Rust, .NET/F#), making toolchain management a significant architectural concern.
 
 ## Principles Implemented/Respected
 
@@ -22,7 +22,7 @@ This practice implements/respects the following core principles:
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Native package managers (`brew install`, `volta install`, `cargo install`) provide idempotent tool installation without requiring external state files, DSLs, or convergence engines. Adding Terraform, Ansible, or Docker Dev Containers introduces infrastructure complexity that solves fleet management problems this project does not have.
 
-- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Version pinning via declarative config files (`package.json`, `go.mod`, `.tool-versions`, `Cargo.toml`, `pubspec.yaml`) combined with `rhino-cli doctor` verification ensures every developer machine converges to the same toolchain state. The check-diff-apply pattern provides the same guarantees as IaC tools without the overhead.
+- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Version pinning via declarative config files (`package.json`, `Cargo.toml`, `.csproj`) combined with `rhino-cli doctor` verification ensures every developer machine converges to the same toolchain state. The check-diff-apply pattern provides the same guarantees as IaC tools without the overhead.
 
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: `rhino-cli doctor --fix` automates the entire toolchain installation and verification process. Developers run a single command to detect drift and converge to the desired state, eliminating manual setup steps and reducing onboarding friction.
 
@@ -32,11 +32,11 @@ This practice implements/respects the following core principles:
 
 This practice implements/respects the following conventions:
 
-- **[Reproducible Environments](./reproducible-environments.md)**: This decision extends the reproducible environments convention from Node.js/npm (Volta pinning, lockfiles) to the full 19-toolchain stack. `rhino-cli doctor` serves as the unified verification layer across all language ecosystems.
+- **[Reproducible Environments](./reproducible-environments.md)**: This decision extends the reproducible environments convention from Node.js/npm (Volta pinning, lockfiles) to the full toolchain stack. `rhino-cli doctor` serves as the unified verification layer across all language ecosystems.
 
 ## Context
 
-The monorepo requires developers to install and maintain toolchains for Node.js, Go, Java (Maven + SDKMAN), Rust, Elixir (Mix), Python (pyenv), .NET, Dart (Flutter), Clojure (Leiningen), Kotlin, and C#. The question was evaluated: should Docker Dev Containers, Terraform, or Ansible manage this development environment?
+The monorepo requires developers to install and maintain toolchains for Node.js, Rust, and .NET/F#. The question was evaluated: should Docker Dev Containers, Terraform, or Ansible manage this development environment?
 
 ## Decision
 
@@ -92,17 +92,15 @@ The `doctor` command maps directly to familiar IaC concepts:
 Config files serve as the desired state declarations:
 
 - `package.json` (volta field) declares Node.js and npm versions
-- `go.mod` declares Go version
-- `.tool-versions` declares asdf-managed tool versions
-- `Cargo.toml` declares Rust edition
-- `pubspec.yaml` declares Dart/Flutter SDK constraints
+- `Cargo.toml` declares Rust edition and crate dependencies
+- `global.json` declares .NET SDK version
 
 ## Guidance for Future Decisions
 
 ### DO
 
 - Use `rhino-cli doctor` for toolchain verification and auto-install
-- Use version managers (Volta, SDKMAN, asdf, pyenv, rustup) for language version pinning
+- Use version managers (Volta, rustup, dotnet-install) for language version pinning
 - Use `Brewfile` for declarative Homebrew dependencies
 - Use Docker for integration tests (PostgreSQL via docker-compose) and CI pipelines
 
@@ -119,8 +117,8 @@ Config files serve as the desired state declarations:
 Install commands differ per platform:
 
 - **macOS**: Homebrew (`brew install`), Homebrew casks (`brew install --cask`)
-- **Ubuntu**: apt (`sudo apt-get install`), snap (`sudo snap install --classic`), curl scripts (Volta, SDKMAN, rustup, pyenv, Clojure)
-- **Cross-platform**: Volta, SDKMAN, rustup, asdf, cargo — same install commands on both platforms
+- **Ubuntu**: apt (`sudo apt-get install`), curl scripts (Volta, rustup, dotnet-install)
+- **Cross-platform**: Volta, rustup, dotnet-install, cargo — same install commands on both platforms
 
 Ubuntu requires system build dependencies before compiling some toolchains:
 

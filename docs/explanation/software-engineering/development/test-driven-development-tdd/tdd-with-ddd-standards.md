@@ -27,30 +27,33 @@ OSE Platform standards for testing DDD tactical patterns.
 
 **REQUIRED**: All aggregate invariants MUST be tested.
 
-```java
-@Test
-void shouldEnforceMarkupLimit() {
+```rust
+#[test]
+fn should_enforce_markup_limit() {
     // Arrange & Act & Assert
-    assertThatThrownBy(() ->
-        Contract.create(
-            Money.usd(10000),
-            Money.usd(1100)  // 11% markup - exceeds 10% limit
-        )
-    )
-    .isInstanceOf(InvalidMarkupException.class)
-    .hasMessage("Markup cannot exceed 10% of asset price");
-}
-
-@Test
-void shouldAllowValidMarkup() {
-    // Arrange & Act
-    Contract contract = Contract.create(
-        Money.usd(10000),
-        Money.usd(1000)  // 10% markup - valid
+    let result = Contract::create(
+        Money::usd(10_000),
+        Money::usd(1_100), // 11% markup — exceeds 10% limit
     );
 
+    assert!(matches!(result, Err(ContractError::InvalidMarkup(_))));
+    assert_eq!(
+        result.unwrap_err().to_string(),
+        "Markup cannot exceed 10% of asset price"
+    );
+}
+
+#[test]
+fn should_allow_valid_markup() {
+    // Arrange & Act
+    let contract = Contract::create(
+        Money::usd(10_000),
+        Money::usd(1_000), // 10% markup — valid
+    )
+    .expect("should create contract with valid markup");
+
     // Assert
-    assertThat(contract.getMarkup()).isEqualTo(Money.usd(1000));
+    assert_eq!(contract.markup(), Money::usd(1_000));
 }
 ```
 
@@ -79,16 +82,17 @@ describe("Money Value Object", () => {
 
 **REQUIRED**: Value objects MUST test equality by value.
 
-```java
-@Test
-void shouldBeEqualWhenValuesMatch() {
+```rust
+#[test]
+fn should_be_equal_when_values_match() {
     // Arrange
-    Money money1 = Money.usd(100);
-    Money money2 = Money.usd(100);
+    let money1 = Money::usd(100);
+    let money2 = Money::usd(100);
 
-    // Assert
-    assertThat(money1.equals(money2)).isTrue();
-    assertThat(money1).isNotSameAs(money2); // Different instances
+    // Assert — value equality via PartialEq derive
+    assert_eq!(money1, money2);
+    // Rust value types are copied/cloned, not reference-compared,
+    // so structural equality is the natural semantic here.
 }
 ```
 
@@ -139,17 +143,17 @@ describe("ZakatAssessment - Domain Events", () => {
 
 **REQUIRED**: Entities MUST test identity-based equality.
 
-```java
-@Test
-void shouldBeEqualByIdentity() {
-    // Arrange
-    DonationId id = DonationId.generate();
-    Donation donation1 = new Donation(id, Money.usd(100));
-    Donation donation2 = new Donation(id, Money.usd(200));
+```rust
+#[test]
+fn should_be_equal_by_identity() {
+    // Arrange — same ID, different amounts
+    let id = DonationId::generate();
+    let donation1 = Donation::new(id.clone(), Money::usd(100));
+    let donation2 = Donation::new(id.clone(), Money::usd(200));
 
-    // Assert
-    assertThat(donation1.equals(donation2)).isTrue(); // Same ID
-    assertThat(donation1.getAmount()).isNotEqualTo(donation2.getAmount()); // Different amounts
+    // Assert — entities compare by ID only
+    assert_eq!(donation1.id(), donation2.id()); // Same ID
+    assert_ne!(donation1.amount(), donation2.amount()); // Different amounts
 }
 ```
 
@@ -157,39 +161,40 @@ void shouldBeEqualByIdentity() {
 
 ### Testing Zakat Aggregate
 
-```java
-class ZakatAssessmentTest {
-    @Test
-    void shouldCalculateZakatWhenAboveNisab() {
+```rust
+#[cfg(test)]
+mod zakat_assessment_tests {
+    use super::*;
+
+    #[test]
+    fn should_calculate_zakat_when_above_nisab() {
         // Arrange
-        ZakatAssessment assessment = ZakatAssessment.create(
-            UserId.generate(),
-            Money.usd(100000),
-            NisabThreshold.goldEquivalent(Money.fromGold(87.48))
+        let mut assessment = ZakatAssessment::create(
+            UserId::generate(),
+            Money::usd(100_000),
+            NisabThreshold::gold_equivalent(Money::from_gold(87.48)),
         );
 
         // Act
-        assessment.calculate();
+        assessment.calculate().expect("calculation should succeed");
 
         // Assert
-        assertThat(assessment.getZakatDue())
-            .isEqualTo(Money.usd(2500)); // 2.5% of wealth
-        assertThat(assessment.getStatus())
-            .isEqualTo(AssessmentStatus.CALCULATED);
+        assert_eq!(assessment.zakat_due(), Money::usd(2_500)); // 2.5% of wealth
+        assert_eq!(assessment.status(), AssessmentStatus::Calculated);
     }
 
-    @Test
-    void shouldRejectCalculationBelowNisab() {
+    #[test]
+    fn should_reject_calculation_below_nisab() {
         // Arrange
-        ZakatAssessment assessment = ZakatAssessment.create(
-            UserId.generate(),
-            Money.usd(1000), // Below Nisab
-            NisabThreshold.goldEquivalent(Money.fromGold(87.48))
+        let mut assessment = ZakatAssessment::create(
+            UserId::generate(),
+            Money::usd(1_000), // Below Nisab
+            NisabThreshold::gold_equivalent(Money::from_gold(87.48)),
         );
 
         // Act & Assert
-        assertThatThrownBy(() -> assessment.calculate())
-            .isInstanceOf(BelowNisabException.class);
+        let result = assessment.calculate();
+        assert!(matches!(result, Err(ZakatError::BelowNisab)));
     }
 }
 ```

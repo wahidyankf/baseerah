@@ -1136,197 +1136,234 @@ func processTransactions(transactions []Transaction) []Result {
 - **TypeScript**: Web applications, full-stack JavaScript, rapid prototyping, extensive npm ecosystem
 - **Golang**: CLI tools, high-concurrency services, system programming, microservices
 
-### TypeScript vs Java
+### TypeScript vs Rust
 
-**Object-Oriented Programming**:
+**Type System and Safety**:
 
-| Feature          | TypeScript                            | Java                               |
-| ---------------- | ------------------------------------- | ---------------------------------- |
-| Classes          | ✅ ES6 classes                        | ✅ Full OOP support                |
-| Interfaces       | ✅ Structural typing                  | ✅ Nominal typing                  |
-| Inheritance      | ✅ Single inheritance + mixins        | ✅ Single inheritance + interfaces |
-| Abstract Classes | ✅ Supported                          | ✅ Supported                       |
-| Access Modifiers | ✅ public/private/protected (TS only) | ✅ Runtime enforced                |
-| Generics         | ✅ Variance annotations (TS 4.7+)     | ✅ Type erasure                    |
-
-**Example - Class Hierarchy**:
-
-```typescript
-// TypeScript
-abstract class Account {
-  constructor(protected balance: number) {}
-
-  abstract calculateProfit(): number;
-
-  deposit(amount: number): void {
-    this.balance += amount;
-  }
-}
-
-class MurabahaAccount extends Account {
-  constructor(
-    balance: number,
-    private profitRate: number,
-  ) {
-    super(balance);
-  }
-
-  calculateProfit(): number {
-    return this.balance * this.profitRate;
-  }
-}
-```
-
-```java
-// Java
-abstract class Account {
-    protected double balance;
-
-    public Account(double balance) {
-        this.balance = balance;
-    }
-
-    abstract double calculateProfit();
-
-    public void deposit(double amount) {
-        this.balance += amount;
-    }
-}
-
-class MurabahaAccount extends Account {
-    private double profitRate;
-
-    public MurabahaAccount(double balance, double profitRate) {
-        super(balance);
-        this.profitRate = profitRate;
-    }
-
-    @Override
-    double calculateProfit() {
-        return balance * profitRate;
-    }
-}
-```
-
-**Ecosystem Maturity**:
-
-| Aspect              | TypeScript                          | Java                             |
-| ------------------- | ----------------------------------- | -------------------------------- |
-| Package Manager     | npm (11M+ packages)                 | Maven/Gradle (500K+ packages)    |
-| Enterprise Adoption | Growing (Microsoft, Google, Airbnb) | Dominant (banks, enterprises)    |
-| Learning Curve      | Moderate (JavaScript + types)       | Moderate (verbose syntax)        |
-| Build Tooling       | Fast (esbuild, Vite, swc)           | Slower (Maven, Gradle)           |
-| Runtime Performance | V8 JIT (fast for single-threaded)   | JVM (excellent for long-running) |
-
-**When to Choose**:
-
-- **TypeScript**: Web frontends, Node.js backends, modern startups, JavaScript ecosystem integration
-- **Java**: Legacy enterprise systems, Android development, Spring Boot applications, long-running services
-
-### TypeScript vs Python
-
-**Typing Philosophies**:
-
-| Feature        | TypeScript                | Python                             |
-| -------------- | ------------------------- | ---------------------------------- |
-| Type System    | Mandatory at compile time | Optional (type hints)              |
-| Runtime Checks | ❌ Types erased           | ❌ Types ignored (mypy for static) |
-| Type Inference | ✅ Sophisticated          | ✅ Basic (PEP 484)                 |
-| Duck Typing    | ✅ Structural typing      | ✅ Native duck typing              |
-| Dynamic Typing | ❌ (only with `any`)      | ✅ Default behavior                |
-
-**Example - Optional Typing**:
-
-```typescript
-// TypeScript: Types required (with strict mode)
-function calculateZakat(wealth: number, nisab: number): number {
-  return wealth >= nisab ? wealth * 0.025 : 0;
-}
-
-calculateZakat(10000, 5000); // ✅ OK
-calculateZakat("10000", 5000); // ❌ Compile error
-```
-
-```python
-# Python: Types optional (runtime behavior unchanged)
-def calculate_zakat(wealth: float, nisab: float) -> float:
-    return wealth * 0.025 if wealth >= nisab else 0
-
-calculate_zakat(10000, 5000)  # ✅ OK
-calculate_zakat("10000", 5000)  # ✅ Runs (fails at runtime), mypy catches
-```
-
-**Runtime Characteristics**:
-
-| Aspect                | TypeScript (Node.js)         | Python                    |
-| --------------------- | ---------------------------- | ------------------------- |
-| Startup Time          | Fast (JIT compilation)       | Moderate (interpreted)    |
-| Memory Usage          | Moderate (V8 heap)           | Higher (dynamic types)    |
-| Concurrency           | Event loop (single-threaded) | GIL (limited parallelism) |
-| CPU-Bound Performance | Good (V8 optimizations)      | Slower (use NumPy/Cython) |
-| I/O-Bound Performance | Excellent (async/await)      | Good (asyncio)            |
-
-**When to Choose**:
-
-- **TypeScript**: Web applications, real-time systems, event-driven architectures, type-safe APIs
-- **Python**: Data science, machine learning, scripting, scientific computing, rapid prototyping
-
-### TypeScript vs Elixir
-
-**Concurrency & Fault Tolerance**:
-
-| Feature             | TypeScript                    | Elixir                          |
-| ------------------- | ----------------------------- | ------------------------------- |
-| Concurrency Model   | Event loop (cooperative)      | Actor model (preemptive)        |
-| Process Isolation   | ❌ Shared memory              | ✅ Isolated processes           |
-| Fault Tolerance     | Manual error handling         | Supervisor trees (let it crash) |
-| Hot Code Swapping   | ❌ Requires restart           | ✅ Native support (OTP)         |
-| Distributed Systems | Manual (clustering libraries) | ✅ Built-in (Erlang VM)         |
+| Feature            | TypeScript                        | Rust                                   |
+| ------------------ | --------------------------------- | -------------------------------------- |
+| Type System        | Structural, compile-time          | Nominal, compile-time                  |
+| Null Safety        | `strictNullChecks` (opt-in)       | ✅ `Option<T>` enforced by compiler    |
+| Memory Safety      | GC (V8)                           | ✅ Ownership/borrow checker, no GC     |
+| Error Handling     | `try/catch` or union types        | ✅ `Result<T, E>` enforced by compiler |
+| Generics           | ✅ Variance annotations (TS 4.7+) | ✅ Monomorphised, zero-cost            |
+| Concurrency Safety | Single-threaded event loop        | ✅ Send/Sync enforced at compile time  |
 
 **Example - Error Handling**:
 
 ```typescript
-// TypeScript: Explicit error handling
-async function fetchDonation(id: string): Promise<Result<Donation, Error>> {
-  try {
-    const response = await fetch(`/api/donations/${id}`);
-    if (!response.ok) {
-      return err(new Error(`HTTP ${response.status}`));
+// TypeScript: tRPC handler calculating zakat obligation
+import { z } from "zod";
+
+const zakatInput = z.object({ wealth: z.number(), nisab: z.number() });
+
+function calculateZakat(input: z.infer<typeof zakatInput>): number {
+  if (input.wealth < input.nisab) return 0;
+  return input.wealth * 0.025;
+}
+```
+
+```rust
+// Rust: CLI validation with compile-time Result propagation (organiclever-be style)
+use std::fmt;
+
+#[derive(Debug)]
+enum ZakatError {
+    NegativeWealth(f64),
+    InvalidNisab(f64),
+}
+
+impl fmt::Display for ZakatError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ZakatError::NegativeWealth(w) => write!(f, "wealth cannot be negative: {w}"),
+            ZakatError::InvalidNisab(n) => write!(f, "nisab must be positive: {n}"),
+        }
     }
-    const data = await response.json();
-    return ok(data);
-  } catch (error) {
-    return err(error as Error);
+}
+
+fn calculate_zakat(wealth: f64, nisab: f64) -> Result<f64, ZakatError> {
+    if wealth < 0.0 { return Err(ZakatError::NegativeWealth(wealth)); }
+    if nisab <= 0.0 { return Err(ZakatError::InvalidNisab(nisab)); }
+    Ok(if wealth >= nisab { wealth * 0.025 } else { 0.0 })
+}
+```
+
+**Performance and Runtime**:
+
+| Aspect              | TypeScript (Node.js)           | Rust                                 |
+| ------------------- | ------------------------------ | ------------------------------------ |
+| Startup Time        | Moderate (V8 JIT warm-up)      | Near-instant (no runtime)            |
+| Memory Usage        | Higher (V8 heap + GC pressure) | Minimal (stack/heap, manual control) |
+| Throughput          | Good (I/O-bound async)         | Excellent (CPU-bound + async)        |
+| Binary Distribution | Requires Node.js runtime       | ✅ Single static binary              |
+| Build Tooling       | Fast (esbuild, swc, Vite)      | Cargo (incremental, parallel)        |
+| Ecosystem           | npm (huge, web-centric)        | crates.io (growing, systems-centric) |
+
+**OSE Platform Usage**:
+
+- **TypeScript**: `ose-web`, `ayokoding-web`, `organiclever-web`, `ose-app-web` — all web frontends and tRPC backends
+- **Rust**: `rhino-cli` (repo management), `organiclever-be` (REST API), `ose-app-be` (REST API), `crane-cli` (PDF pipeline)
+
+**When to Choose**:
+
+- **TypeScript**: Web frontends, Node.js tRPC backends, rapid iteration, npm ecosystem integration
+- **Rust**: CLI tools requiring single-binary distribution, performance-critical backend services, memory-constrained environments
+
+### TypeScript vs F\#
+
+**Type System Philosophies**:
+
+| Feature              | TypeScript                      | F#                                     |
+| -------------------- | ------------------------------- | -------------------------------------- |
+| Type System          | Structural, OOP-first           | Nominal, functional-first              |
+| Null Safety          | `strictNullChecks` (opt-in)     | ✅ `Option<'T>` enforced by compiler   |
+| Discriminated Unions | Union types (`A \| B`)          | ✅ First-class `type DU = A \| B of T` |
+| Pattern Matching     | Limited (`switch`, type guards) | ✅ Exhaustive `match` expressions      |
+| Immutability         | Opt-in (`readonly`, `const`)    | ✅ Immutable by default (`let`)        |
+| Side Effects         | Unrestricted                    | Tracked via computation expressions    |
+
+**Example - Domain Modelling**:
+
+```typescript
+// TypeScript: murabaha transaction modelled with discriminated union
+type MurabahaStatus =
+  | { kind: "pending"; requestedAt: Date }
+  | { kind: "approved"; profitRate: number; approvedAt: Date }
+  | { kind: "rejected"; reason: string };
+
+function describeStatus(status: MurabahaStatus): string {
+  switch (status.kind) {
+    case "pending":
+      return `Pending since ${status.requestedAt.toISOString()}`;
+    case "approved":
+      return `Approved at ${(status.profitRate * 100).toFixed(2)}% profit`;
+    case "rejected":
+      return `Rejected: ${status.reason}`;
   }
 }
 ```
 
-```elixir
-# Elixir: Let it crash philosophy
-def fetch_donation(id) do
-  case HTTPoison.get("/api/donations/#{id}") do
-    {:ok, %{status_code: 200, body: body}} ->
-      Jason.decode!(body)
-    {:error, reason} ->
-      raise "Failed to fetch donation: #{reason}"
-  end
-end
+```fsharp
+// F#: same domain model — crane-cli style, exhaustive match enforced at compile time
+type MurabahaStatus =
+    | Pending of RequestedAt: DateTimeOffset
+    | Approved of ProfitRate: decimal * ApprovedAt: DateTimeOffset
+    | Rejected of Reason: string
 
-# Supervisor restarts process on crash
+let describeStatus status =
+    match status with
+    | Pending requestedAt -> $"Pending since {requestedAt:O}"
+    | Approved (profitRate, _) -> $"Approved at {profitRate * 100m:F2}%% profit"
+    | Rejected reason -> $"Rejected: {reason}"
+// Compiler error if a case is missing — no runtime surprises
 ```
+
+**Ecosystem and Tooling**:
+
+| Aspect           | TypeScript                     | F#                                         |
+| ---------------- | ------------------------------ | ------------------------------------------ |
+| Runtime          | Node.js / browser (V8)         | .NET 8+ (CoreCLR)                          |
+| Package Manager  | npm (huge, web-centric)        | NuGet (.NET ecosystem)                     |
+| Build Tooling    | esbuild, swc, Vite (very fast) | `dotnet build` (incremental)               |
+| Interop          | JavaScript (native)            | C# / .NET (first-class)                    |
+| Functional Style | Optional (lodash, fp-ts)       | ✅ Built-in (pipelines, computation exprs) |
+| Learning Curve   | Moderate (JS + types)          | Steeper (FP paradigm shift)                |
+
+**OSE Platform Usage**:
+
+- **TypeScript**: All web apps and tRPC backends — web-first, npm ecosystem integration
+- **F#**: `crane-cli` — PDF-to-Markdown pipeline; hexagonal ports-and-adapters architecture where exhaustive pattern matching and discriminated unions model pipeline stages cleanly
 
 **When to Choose**:
 
-- **TypeScript**: Web applications, Node.js ecosystem, JavaScript team expertise, gradual adoption
-- **Elixir**: Real-time systems (Phoenix LiveView), high-availability services, distributed systems, fault-tolerant applications
+- **TypeScript**: Web frontends, Node.js backends, tRPC APIs, teams with JavaScript background
+- **F#**: Data transformation pipelines, document processing, domain-rich backends where exhaustive modelling of states matters and .NET interop is available
+
+### TypeScript vs C\#
+
+**Language Characteristics**:
+
+| Feature          | TypeScript                       | C#                                         |
+| ---------------- | -------------------------------- | ------------------------------------------ |
+| Type System      | Structural, gradual              | Nominal, static                            |
+| Null Safety      | `strictNullChecks` (opt-in)      | ✅ Nullable reference types (C# 8+)        |
+| Runtime          | Node.js / browser (V8)           | .NET 8+ (CoreCLR)                          |
+| Async Model      | `Promise` / `async-await`        | `Task<T>` / `async-await` (same concept)   |
+| OOP Support      | ✅ Classes, interfaces, generics | ✅ Full OOP (classes, records, interfaces) |
+| Functional Style | Optional (fp-ts, native methods) | Partial (LINQ, records, pattern matching)  |
+| Interop          | JavaScript (native)              | F# / .NET (first-class, same CLR)          |
+
+**Example - Donation Processing**:
+
+```typescript
+// TypeScript: tRPC mutation for donation submission
+import { z } from "zod";
+import { publicProcedure } from "../trpc";
+
+const donationSchema = z.object({
+  campaignId: z.string().uuid(),
+  amount: z.number().positive(),
+  donorName: z.string().min(1),
+});
+
+export const submitDonation = publicProcedure.input(donationSchema).mutation(async ({ input, ctx }) => {
+  const donation = await ctx.db.donation.create({ data: input });
+  return { id: donation.id, status: "received" };
+});
+```
+
+```csharp
+// C#: ASP.NET Core minimal API endpoint for the same operation
+// Typical in .NET interop scenarios or enterprise backend integration
+app.MapPost("/donations", async (DonationRequest req, AppDbContext db) =>
+{
+    if (req.Amount <= 0)
+        return Results.BadRequest("Amount must be positive");
+
+    var donation = new Donation
+    {
+        CampaignId = req.CampaignId,
+        Amount = req.Amount,
+        DonorName = req.DonorName,
+        ReceivedAt = DateTimeOffset.UtcNow,
+    };
+
+    db.Donations.Add(donation);
+    await db.SaveChangesAsync();
+    return Results.Ok(new { donation.Id, Status = "received" });
+});
+
+record DonationRequest(Guid CampaignId, decimal Amount, string DonorName);
+```
+
+**Ecosystem and Deployment**:
+
+| Aspect          | TypeScript                     | C#                                        |
+| --------------- | ------------------------------ | ----------------------------------------- |
+| Package Manager | npm (huge ecosystem)           | NuGet (.NET ecosystem)                    |
+| Deploy Target   | Vercel, Node.js, edge runtimes | Azure, AWS, Kubernetes, IIS               |
+| Startup Time    | Fast (V8 JIT)                  | Moderate (CLR warm-up, improving in .NET) |
+| Tooling         | VSCode, esbuild, swc           | Visual Studio, Rider, `dotnet` CLI        |
+| Enterprise Fit  | Modern web stacks              | Legacy enterprise and .NET shops          |
+
+**OSE Platform Usage**:
+
+- **TypeScript**: All web frontends and tRPC backends — the primary application language for web-facing surfaces
+- **C# / .NET**: Dotnet interop layer when integrating with existing enterprise .NET systems; shares the CLR with `crane-cli`'s F# runtime, enabling smooth library sharing across the .NET stack
+
+**When to Choose**:
+
+- **TypeScript**: Web frontends, Node.js tRPC APIs, Vercel-hosted applications, npm ecosystem integration
+- **C#**: Enterprise .NET backend integration, existing ASP.NET Core services, scenarios where the full .NET SDK is already in the stack via F# tooling
 
 ### Decision Matrix
 
 **Choose TypeScript when**:
 
-- Building web frontends (React, Vue, Angular)
+- Building web frontends (React, Next.js)
 - Full-stack JavaScript development (Node.js + browser)
-- Team has JavaScript expertise
+- Authoring tRPC APIs for OSE Platform web apps
 - Rapid development with npm ecosystem
 - Type safety without runtime overhead
 
@@ -1337,26 +1374,25 @@ end
 - Microservices with low memory footprint
 - Simple deployment (single binary)
 
-**Choose Java when**:
+**Choose Rust when**:
 
-- Enterprise applications with Spring ecosystem
-- Android development
-- Legacy system integration
-- Long-running services with JVM optimizations
+- Building performance-critical CLI tools (`rhino-cli`, `crane-cli`)
+- REST API backends where memory safety and throughput matter (`organiclever-be`, `ose-app-be`)
+- Single-binary distribution with no runtime dependency
+- Systems-level code where zero-cost abstractions are required
 
-**Choose Python when**:
+**Choose F# when**:
 
-- Data science and machine learning
-- Scripting and automation
-- Scientific computing
-- Rapid prototyping
+- Building document-processing or data-transformation pipelines (`crane-cli`)
+- Domain modelling that benefits from exhaustive discriminated unions and pattern matching
+- Functional-first design within the .NET ecosystem
+- Interop with C# libraries is needed alongside a functional style
 
-**Choose Elixir when**:
+**Choose C# when**:
 
-- Real-time web applications
-- Distributed, fault-tolerant systems
-- High-availability requirements
-- Erlang ecosystem integration
+- Integrating with existing enterprise .NET services
+- Building ASP.NET Core endpoints that share CLR with F# components
+- The team's existing codebase is .NET-first and TypeScript adoption is not yet feasible
 
 ## Learning Paths
 
@@ -1499,9 +1535,9 @@ async function processDonation(data: DonationInput): Promise<Result<Donation, Er
 ### Related Stack Documentation
 
 - [Golang Documentation](../golang/README.md)
-- [Java Documentation](../java/README.md)
-- [Elixir Documentation](../elixir/README.md)
-- [Python Documentation](../python/README.md)
+- [Rust Documentation](../rust/README.md)
+- [F# Documentation](../f-sharp/README.md)
+- [C# Documentation](../c-sharp/README.md)
 
 ---
 

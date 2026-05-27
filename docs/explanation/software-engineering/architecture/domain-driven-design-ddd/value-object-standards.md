@@ -29,9 +29,9 @@ OSE Platform value object standards for domain primitives.
 
 **Implementation**:
 
-- **Java**: Use `record` (Java 17+)
+- **Rust**: Use struct with `PartialEq`/`Eq` derive
 - **TypeScript**: Use `readonly` properties
-- **Go**: Use immutable structs
+- **F#**: Use discriminated union or record with private setters
 
 ## OSE Platform Value Objects
 
@@ -39,42 +39,33 @@ OSE Platform value object standards for domain primitives.
 
 **REQUIRED for all financial amounts**:
 
-#### `Java`
+#### `Rust`
 
-```java
-public record Money(BigDecimal amount, Currency currency) {
-    public Money {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Amount cannot be negative");
-        }
-    }
+```rust
+use rust_decimal::Decimal;
 
-    public Money add(Money other) {
-        assertSameCurrency(other);
-        return new Money(amount.add(other.amount), currency);
-    }
-
-    public Money multiply(double factor) {
-        return new Money(amount.multiply(BigDecimal.valueOf(factor)), currency);
-    }
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Money {
+    amount: Decimal,
+    currency: String,
 }
-```
 
-#### `Kotlin`
-
-```kotlin
-data class Money(val amount: BigDecimal, val currency: Currency) {
-    init {
-        require(amount >= BigDecimal.ZERO) { "Amount cannot be negative" }
+impl Money {
+    pub fn new(amount: Decimal, currency: String) -> Result<Self, &'static str> {
+        if amount < Decimal::ZERO {
+            return Err("Amount cannot be negative");
+        }
+        Ok(Self { amount, currency })
     }
 
-    fun add(other: Money): Money {
-        assertSameCurrency(other)
-        return copy(amount = amount.add(other.amount))
+    pub fn add(&self, other: &Money) -> Result<Money, &'static str> {
+        self.assert_same_currency(other)?;
+        Money::new(self.amount + other.amount, self.currency.clone())
     }
 
-    operator fun times(factor: Double): Money =
-        copy(amount = amount.multiply(BigDecimal.valueOf(factor)))
+    pub fn multiply(&self, factor: Decimal) -> Result<Money, &'static str> {
+        Money::new(self.amount * factor, self.currency.clone())
+    }
 }
 ```
 
@@ -105,23 +96,21 @@ public sealed record Money(decimal Amount, string Currency)
 
 **REQUIRED for Zakat calculations (Islamic calendar)**:
 
-#### `Java`
+#### `Rust`
 
-```java
-public record FiscalDate(int hijriYear, int hijriMonth, int hijriDay) {
-    // Validation, conversion methods
+```rust
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FiscalDate {
+    pub hijri_year: u32,
+    pub hijri_month: u8,
+    pub hijri_day: u8,
 }
-```
 
-#### `Kotlin`
-
-```kotlin
-data class FiscalDate(
-    val hijriYear: Int,
-    val hijriMonth: Int,
-    val hijriDay: Int,
-) {
-    // Validation, conversion methods
+impl FiscalDate {
+    pub fn new(hijri_year: u32, hijri_month: u8, hijri_day: u8) -> Result<Self, &'static str> {
+        // Validation, conversion methods
+        Ok(Self { hijri_year, hijri_month, hijri_day })
+    }
 }
 ```
 
@@ -140,26 +129,26 @@ public sealed record FiscalDate(int HijriYear, int HijriMonth, int HijriDay)
 
 **REQUIRED for Zakat obligation checks**:
 
-#### `Java`
+#### `Rust`
 
-```java
-public record NisabThreshold(Money goldEquivalent) {
-    private static final BigDecimal GOLD_GRAMS = BigDecimal.valueOf(87.48);
+```rust
+use rust_decimal::Decimal;
+use rust_decimal_macros::dec;
 
-    public boolean exceeds(Money wealth) {
-        return wealth.isGreaterThan(goldEquivalent);
-    }
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NisabThreshold {
+    gold_equivalent: Money,
 }
-```
 
-#### `Kotlin`
+impl NisabThreshold {
+    const GOLD_GRAMS: Decimal = dec!(87.48);
 
-```kotlin
-data class NisabThreshold(val goldEquivalent: Money) {
-    fun exceeds(wealth: Money): Boolean = wealth.isGreaterThan(goldEquivalent)
+    pub fn new(gold_equivalent: Money) -> Self {
+        Self { gold_equivalent }
+    }
 
-    companion object {
-        val GOLD_GRAMS: BigDecimal = BigDecimal.valueOf(87.48)
+    pub fn exceeds(&self, wealth: &Money) -> bool {
+        wealth.is_greater_than(&self.gold_equivalent)
     }
 }
 ```

@@ -98,39 +98,46 @@ class ZakatCalculator {
 
 ### Contract Activation Workflow
 
-```java
+```rust
 // RED: Test contract activation
-@Test
-void shouldActivateContractWhenPendingAndValid() {
+#[test]
+fn should_activate_contract_when_pending_and_valid() {
     // Arrange
-    Contract contract = Contract.create(
-        ContractId.generate(),
-        Money.usd(10000),
-        Money.usd(500) // 5% markup
+    let contract = Contract::create(
+        ContractId::generate(),
+        Money::usd(10_000),
+        Money::usd(500), // 5% markup
     );
 
     // Act
-    contract.activate();
+    let result = contract.activate();
 
     // Assert
-    assertThat(contract.getStatus()).isEqualTo(ContractStatus.ACTIVE);
+    assert_eq!(contract.status(), ContractStatus::Active);
 }
 
 // Test fails ❌: activate() method doesn't exist
 
 // GREEN: Implement activation
-public void activate() {
-    this.status = ContractStatus.ACTIVE;
+impl Contract {
+    pub fn activate(&mut self) {
+        self.status = ContractStatus::Active;
+    }
 }
 
 // Test passes ✅
 
 // REFACTOR: Add validation
-public void activate() {
-    if (this.status != ContractStatus.PENDING) {
-        throw new IllegalStateException("Cannot activate non-pending contract");
+impl Contract {
+    pub fn activate(&mut self) -> Result<(), ContractError> {
+        if self.status != ContractStatus::Pending {
+            return Err(ContractError::InvalidStateTransition(
+                "Cannot activate non-pending contract".into(),
+            ));
+        }
+        self.status = ContractStatus::Active;
+        Ok(())
     }
-    this.status = ContractStatus.ACTIVE;
 }
 
 // Tests still pass ✅

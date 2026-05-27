@@ -97,9 +97,9 @@ Frameworks covered:
 
 **Examples**:
 
-- Java record usage vs traditional classes
+- Rust ownership patterns for domain aggregates
 - TypeScript type narrowing patterns
-- Spring Boot auto-configuration best practices
+- F# discriminated union usage vs class hierarchies
 - React hook usage patterns
 - DDD aggregate boundaries
 

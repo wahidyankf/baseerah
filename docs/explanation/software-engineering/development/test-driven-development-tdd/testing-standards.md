@@ -38,18 +38,18 @@ OSE Platform testing standards for test structure and organization.
 
 **REQUIRED**: All tests MUST use Arrange-Act-Assert pattern.
 
-```java
-@Test
-void shouldCalculateZakatForWealthAboveNisab() {
+```rust
+#[test]
+fn should_calculate_zakat_for_wealth_above_nisab() {
     // ARRANGE: Set up test data
-    Money wealth = Money.usd(100000);
-    NisabThreshold nisab = NisabThreshold.goldEquivalent(Money.fromGold(87.48));
+    let wealth = Money::usd(100_000);
+    let nisab = NisabThreshold::gold_equivalent(Money::from_gold(87.48));
 
     // ACT: Execute behavior
-    Money zakat = ZakatCalculator.calculate(wealth, nisab);
+    let zakat = ZakatCalculator::calculate(wealth, nisab);
 
     // ASSERT: Verify outcome
-    assertThat(zakat).isEqualTo(Money.usd(2500));
+    assert_eq!(zakat, Money::usd(2_500));
 }
 ```
 
@@ -99,20 +99,23 @@ it("should handle donation", () => {
 
 **Good** (independent tests):
 
-```java
-@BeforeEach
-void setUp() {
-    // Fresh repository for each test
-    repository = new InMemoryDonationRepository();
-}
+```rust
+mod tests {
+    use super::*;
 
-@Test
-void shouldSaveDonation() {
-    Donation donation = buildDonation();
-    repository.save(donation);
+    fn make_repository() -> InMemoryDonationRepository {
+        // Fresh repository for each test — call this in every test function
+        InMemoryDonationRepository::new()
+    }
 
-    assertThat(repository.findById(donation.getId()))
-        .isPresent();
+    #[test]
+    fn should_save_donation() {
+        let mut repository = make_repository();
+        let donation = build_donation();
+        repository.save(donation.clone());
+
+        assert!(repository.find_by_id(&donation.id).is_some());
+    }
 }
 ```
 
@@ -122,11 +125,11 @@ void shouldSaveDonation() {
 
 **REQUIRED**: E2E tests MUST NOT mock anything.
 
-| Tier        | External I/O | DB                      | Outbound HTTP  |
-| ----------- | ------------ | ----------------------- | -------------- |
-| Unit        | Mocked       | Mocked / in-memory impl | Mocked         |
-| Integration | Mocked       | In-memory impl          | MSW / WireMock |
-| E2E         | Real         | Real                    | Real           |
+| Tier        | External I/O | DB                      | Outbound HTTP |
+| ----------- | ------------ | ----------------------- | ------------- |
+| Unit        | Mocked       | Mocked / in-memory impl | Mocked        |
+| Integration | Mocked       | In-memory impl          | MSW / mockito |
+| E2E         | Real         | Real                    | Real          |
 
 **See**: [Three-Tier Testing Model](./three-tier-testing.md) for full definitions and examples.
 
@@ -144,6 +147,6 @@ src/
 
 **File Naming:**
 
-- Unit: `ZakatCalculatorTest.java`, `ZakatCalculator.unit.test.ts`
-- Integration: `MemberListIntegrationTest.java`, `member-list.integration.test.tsx`
+- Unit: `zakat_calculator_test.rs` (Rust `#[cfg(test)]` module), `ZakatCalculator.unit.test.ts`
+- Integration: `member_list_integration_test.rs`, `member-list.integration.test.tsx`
 - E2E: `*.feature` + step definitions (Gherkin-driven via Playwright / Cucumber)

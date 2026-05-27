@@ -20,7 +20,7 @@ skills:
 **Model Selection Justification**: This agent uses `model: sonnet` because it requires:
 
 - Advanced reasoning to cross-reference project configuration against multi-language standards
-- Pattern recognition across Go, TypeScript, and Java codebases
+- Pattern recognition across TypeScript, Rust, and .NET/F# codebases
 - Complex decision-making for criticality assessment of deviations
 - Multi-dimensional validation (infrastructure, language idioms, testing, coverage)
 
@@ -122,7 +122,7 @@ All Go project targets (`build`, `test:quick`, `test:unit`, `test:integration`, 
 
 - Go projects: `test:quick` must include `rhino-cli test-coverage validate <path>/cover.out 95`
 - TypeScript projects: `test:quick` must include `rhino-cli test-coverage validate <path>/lcov.info 95`
-- Java projects: JaCoCo threshold in `pom.xml` must be `0.95`
+- Rust projects: `cargo-llvm-cov` line coverage must be ≥90% (enforced via `rhino-cli test-coverage validate`)
 
 ### Step 3: Go-Specific Standards
 
@@ -199,28 +199,28 @@ For each TypeScript project:
 - No per-project linter overrides that weaken rules
 - **Criticality**: MEDIUM (quality consistency)
 
-### Step 5: Java-Specific Standards
+### Step 5: Rust-Specific Standards
 
-**Reference**: `docs/explanation/software-engineering/programming-languages/java/`
+**Reference**: `docs/explanation/software-engineering/programming-languages/rust/README.md`
 
-For each Java project:
+For each Rust project:
 
-#### 5.1 JaCoCo Threshold
+#### 5.1 Coverage Threshold
 
-- `pom.xml` integration profile must set `0.95` line coverage minimum
+- `cargo-llvm-cov` line coverage ≥90%; enforced via `rhino-cli test-coverage validate`
 - **Criticality**: HIGH (coverage enforcement)
 
-#### 5.2 Null Safety
+#### 5.2 Error Handling
 
-- `@NullMarked` annotation on packages
-- Proper null handling patterns
-- **Criticality**: MEDIUM (type safety)
+- Use `Result<T, E>` for fallible operations; no `.unwrap()` in production code paths
+- Domain errors use typed enums, not `anyhow::Error` at domain boundaries
+- **Criticality**: HIGH (type safety)
 
-#### 5.3 Spring Boot Patterns (If Applicable)
+#### 5.3 Axum Patterns (If Applicable)
 
-- Constructor injection (not field injection)
-- Proper use of `@RestController`, `@Service`, `@Repository`
-- Integration tests with MockMvc
+- Handlers return `impl IntoResponse`; no panics in handlers
+- State injection via `Extension<Arc<T>>` or `State<T>`, not global statics
+- Integration tests call service functions directly, not through HTTP layer
 - **Criticality**: MEDIUM (framework best practices)
 
 ### Step 6: Cross-Project Consistency
@@ -301,14 +301,14 @@ Update report status to "Complete", add summary statistics:
 ## Summary
 
 **Projects Analyzed**: [N]
-**Languages**: [Go: N, TypeScript: N, Java: N]
+**Languages**: [TypeScript: N, Rust: N, .NET/F#: N]
 
 **Findings by Step**:
 
 - Nx Infrastructure: X findings (C:N, H:N, M:N, L:N)
 - Go Standards: X findings (C:N, H:N, M:N, L:N)
 - TypeScript Standards: X findings (C:N, H:N, M:N, L:N)
-- Java Standards: X findings (C:N, H:N, M:N, L:N)
+- Rust Standards: X findings (C:N, H:N, M:N, L:N)
 - Cross-Project: X findings (C:N, H:N, M:N, L:N)
 
 **Total Findings**: X (CRITICAL: N, HIGH: N, MEDIUM: N, LOW: N)
@@ -350,13 +350,15 @@ Each finding follows the standard format:
 
 - [Go Standards](../../docs/explanation/software-engineering/programming-languages/golang/README.md)
 - [TypeScript Standards](../../docs/explanation/software-engineering/programming-languages/typescript/README.md)
-- [Java Standards](../../docs/explanation/software-engineering/programming-languages/java/README.md)
+- [Rust Standards](../../docs/explanation/software-engineering/programming-languages/rust/README.md)
+- [F# Standards](../../docs/explanation/software-engineering/programming-languages/f-sharp/README.md)
 
 **Related Agents**:
 
 - `swe-golang-dev` - Go development (implements standards this agent checks)
 - `swe-typescript-dev` - TypeScript development
-- `swe-java-dev` - Java development
+- `swe-rust-dev` - Rust development
+- `swe-fsharp-dev` - F# development
 - `repo-rules-checker` - Repository-wide governance validation
 
 **Skills**:

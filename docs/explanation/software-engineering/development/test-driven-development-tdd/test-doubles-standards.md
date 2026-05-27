@@ -30,45 +30,56 @@ OSE Platform standards for using test doubles (mocks, stubs, fakes).
 
 **Good** (in-memory implementation):
 
-```java
-class InMemoryDonationRepository implements DonationRepository {
-    private Map<DonationId, Donation> donations = new HashMap<>();
+```rust
+use std::collections::HashMap;
 
-    @Override
-    public void save(Donation donation) {
-        donations.put(donation.getId(), donation);
-    }
+struct InMemoryDonationRepository {
+    donations: HashMap<DonationId, Donation>,
+}
 
-    @Override
-    public Optional<Donation> findById(DonationId id) {
-        return Optional.ofNullable(donations.get(id));
+impl InMemoryDonationRepository {
+    fn new() -> Self {
+        Self { donations: HashMap::new() }
     }
 }
 
-@Test
-void shouldSaveAndRetrieveDonation() {
+impl DonationRepository for InMemoryDonationRepository {
+    fn save(&mut self, donation: Donation) {
+        self.donations.insert(donation.id.clone(), donation);
+    }
+
+    fn find_by_id(&self, id: &DonationId) -> Option<&Donation> {
+        self.donations.get(id)
+    }
+}
+
+#[test]
+fn should_save_and_retrieve_donation() {
     // No mocking framework needed
-    DonationRepository repository = new InMemoryDonationRepository();
-    Donation donation = buildDonation();
+    let mut repository = InMemoryDonationRepository::new();
+    let donation = build_donation();
 
-    repository.save(donation);
-    Optional<Donation> retrieved = repository.findById(donation.getId());
+    repository.save(donation.clone());
+    let retrieved = repository.find_by_id(&donation.id);
 
-    assertThat(retrieved).isPresent();
+    assert!(retrieved.is_some());
 }
 ```
 
 **Avoid** (excessive mocking):
 
-```java
-@Test
-void shouldSaveDonation() {
-    // Overly complex mocking
-    DonationRepository repository = mock(DonationRepository.class);
-    when(repository.save(any())).thenReturn(/* complex setup */);
-
-    // Test becomes brittle and coupled to implementation
+```rust
+// DON'T wire up a full mock for simple state-holding behavior —
+// the in-memory struct above is simpler and more realistic.
+// mockall::mock! can replace a trait, but that's overkill here:
+mock! {
+    DonationRepository {}
+    impl DonationRepositoryTrait for DonationRepository {
+        fn save(&mut self, donation: Donation);
+        fn find_by_id(&self, id: &DonationId) -> Option<&Donation>;
+    }
 }
+// Test becomes brittle and coupled to implementation details
 ```
 
 ## When to Use Test Doubles
@@ -101,16 +112,28 @@ describe("DonationService", () => {
 
 **OPTIONAL**: Use spies when verifying behavior matters.
 
-```java
-@Test
-void shouldPublishEventAfterCalculation() {
-    // Spy to verify event publishing
-    EventPublisher publisher = spy(new InMemoryEventPublisher());
-    ZakatService service = new ZakatService(publisher);
+```rust
+use mockall::predicate::*;
+use mockall::mock;
 
-    service.calculateZakat(Money.usd(100000));
+mock! {
+    pub EventPublisher {}
+    impl EventPublisherTrait for EventPublisher {
+        fn publish(&self, event: ZakatCalculated);
+    }
+}
 
-    verify(publisher).publish(any(ZakatCalculated.class));
+#[test]
+fn should_publish_event_after_calculation() {
+    let mut publisher = MockEventPublisher::new();
+    // Expect publish to be called exactly once
+    publisher
+        .expect_publish()
+        .times(1)
+        .returning(|_| ());
+
+    let service = ZakatService::new(publisher);
+    service.calculate_zakat(Money::usd(100_000));
 }
 ```
 
@@ -120,27 +143,28 @@ void shouldPublishEventAfterCalculation() {
 
 **Bad** (mocking domain):
 
-```java
-@Test
-void shouldCalculateZakat() {
-    // DON'T mock domain objects
-    Money wealth = mock(Money.class);
-    when(wealth.multiply(0.025)).thenReturn(Money.usd(2500));
-
-    // Test becomes meaningless - testing mock, not real logic
+```rust
+// DON'T mock domain value objects — use the real structs.
+// Mocking a Money struct is always the wrong approach:
+mock! {
+    pub Money {}
+    impl MoneyOps for Money {
+        fn multiply(&self, rate: f64) -> Money;
+    }
 }
+// Test becomes meaningless — testing the mock, not real logic
 ```
 
 **Good** (use real domain objects):
 
-```java
-@Test
-void shouldCalculateZakat() {
+```rust
+#[test]
+fn should_calculate_zakat() {
     // Use real value objects
-    Money wealth = Money.usd(100000);
-    Money zakat = ZakatCalculator.calculate(wealth);
+    let wealth = Money::usd(100_000);
+    let zakat = ZakatCalculator::calculate(wealth);
 
-    assertThat(zakat).isEqualTo(Money.usd(2500));
+    assert_eq!(zakat, Money::usd(2_500));
 }
 ```
 

@@ -178,7 +178,7 @@ $ git commit -m "feat: add new feature"
 🔍 Validating .claude/ and .opencode/ configuration...
 ✅ Configuration validation passed
 ⏭️  Skipping docker-compose validation (no docker-compose.yml changes in staged files)
-⏭️  Skipping Elixir formatting (no .ex/.exs files staged)
+⏭️  Skipping dotnet formatting (no .cs/.fs files staged)
 ⏭️  Skipping docs naming validation (no docs/ changes in staged files)
 [main abc1234] feat: add new feature
 ```
@@ -232,11 +232,11 @@ $ git commit -m "added new feature"
 
 **What It Validates**:
 
-- **Type correctness** (`typecheck`): Catches type errors in TypeScript, Dart/Flutter, and other
+- **Type correctness** (`typecheck`): Catches type errors in TypeScript, Rust, .NET/F#, and other
   statically typed projects. Projects without a `typecheck` target are silently skipped by Nx.
 - **Code quality** (`lint`): Static analysis across all projects (includes static a11y checks via
-  oxlint jsx-a11y plugin for TypeScript UI projects and `dart analyze` for Dart projects). Also
-  enforced remotely in the PR quality gate and in all scheduled Test CI workflows.
+  oxlint jsx-a11y plugin for TypeScript UI projects). Also enforced remotely in the PR quality gate
+  and in all scheduled Test CI workflows.
 - **Fast quality gate** (`test:quick`): Unit tests, build smoke tests, or other fast checks
   defined per project. Also enforced remotely as a required GitHub Actions status check before PR
   merge.
@@ -410,12 +410,12 @@ To add Prettier formatting for new file types:
 3. Test with a sample file
 4. Commit the configuration change
 
-**Example** (adding Python files):
+**Example** (adding a new file type):
 
 ```json
 {
   "lint-staged": {
-    "*.py": ["prettier --write"]
+    "*.toml": ["prettier --write"]
   }
 }
 ```
@@ -541,14 +541,13 @@ cargo clippy --manifest-path apps/ayokoding-cli/Cargo.toml --all-targets -- -D w
 
 The following language-specific formatters run automatically as part of the pre-commit hook or CI pipeline:
 
-| Language | Tool          | Trigger                  |
-| -------- | ------------- | ------------------------ |
-| Go       | `gofmt`       | Pre-commit (lint-staged) |
-| Python   | `ruff format` | Pre-commit (lint-staged) |
-| Rust     | `rustfmt`     | Pre-commit (lint-staged) |
+| Language  | Tool            | Trigger                  |
+| --------- | --------------- | ------------------------ |
+| Rust      | `rustfmt`       | Pre-commit (lint-staged) |
+| F\# / C\# | `dotnet format` | Pre-commit hook step     |
 
 Each formatter uses its language's standard style conventions. No custom configuration is applied
-unless a project-specific config file exists (e.g., `rustfmt.toml`, `pyproject.toml`).
+unless a project-specific config file exists (e.g., `rustfmt.toml`, `.editorconfig`).
 
 ## Best Practices
 

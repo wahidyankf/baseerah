@@ -53,7 +53,7 @@ HTTP clients stubbed. File system mocked. Clock frozen. No real network. No real
 
 **What they prove**: The logic of a unit is correct given controlled inputs.
 
-**Java tools**: JUnit 5 (Jupiter) + Mockito + AssertJ
+**Rust tools**: Built-in `#[test]` / `#[tokio::test]` + `mockall` crate + `assert_eq!` / `assert!`
 
 **TypeScript tools**: Vitest + `vi.fn()` / `vi.mock()` + Testing Library
 
@@ -70,8 +70,8 @@ services, email, payment gateways) are replaced with mocks or in-memory implemen
 
 **Mocking rule**: Same as unit tests — no real network, no real DB. Differences from unit:
 in-memory repository implementations (instead of mocks) are preferred because they behave more
-realistically. HTTP calls to external services are intercepted by MSW (TypeScript) or WireMock
-(Java).
+realistically. HTTP calls to external services are intercepted by MSW (TypeScript) or `mockito`
+(Rust).
 
 **Speed**: Seconds per test. Dozens run in under a minute.
 
@@ -85,8 +85,8 @@ realistically. HTTP calls to external services are intercepted by MSW (TypeScrip
 **What they prove**: The internal layers are correctly wired and behave as specified — without
 depending on external infrastructure.
 
-**Java tools**: JUnit 5 + Cucumber JVM + MockMvc (in-process HTTP) + WireMock + in-memory
-repository implementations
+**Rust tools**: `#[tokio::test]` + `cucumber` crate + `axum-test` (in-process HTTP) + `mockito` +
+in-memory repository implementations
 
 **TypeScript tools**: Vitest + `@amiceli/vitest-cucumber` + MSW (Mock Service Worker) + in-memory
 state + Testing Library
@@ -101,7 +101,7 @@ real browser (if applicable) — with no mocking of any kind.
 **Scope**: The full system from the user's point of view. Clicks a button → HTTP request →
 real server → real DB → real response → UI updates.
 
-**Mocking rule**: **Zero mocking.** No MSW. No WireMock. No in-memory implementations. Every
+**Mocking rule**: **Zero mocking.** No MSW. No mockito. No in-memory implementations. Every
 layer is real.
 
 **Speed**: Seconds to minutes per test. Run in scheduled CI pipelines, not on every commit.
@@ -115,8 +115,8 @@ layer is real.
 
 **What they prove**: The system as deployed works correctly for real users.
 
-**Java tools**: Playwright (TypeScript) + Testcontainers (real PostgreSQL) for backend REST API
-E2E testing
+**Rust tools**: Playwright (TypeScript) + real PostgreSQL via Docker for backend REST API E2E
+testing
 
 **TypeScript tools**: Playwright + `playwright-bdd` (Gherkin-driven browser automation, no mocking)
 
@@ -124,17 +124,17 @@ E2E testing
 
 ## Tier Comparison
 
-| Property        | Unit                    | Integration                                 | E2E                         |
-| --------------- | ----------------------- | ------------------------------------------- | --------------------------- |
-| Scope           | 1 class/function        | Internal layers                             | Full system                 |
-| External I/O    | Mocked                  | Mocked                                      | Real                        |
-| DB              | Mocked / in-memory impl | In-memory impl                              | Real (Testcontainers)       |
-| HTTP (outbound) | Mocked                  | MSW / WireMock                              | Real                        |
-| Browser         | N/A                     | N/A                                         | Real (Playwright)           |
-| Speed           | ms                      | seconds                                     | minutes                     |
-| Run frequency   | Every commit            | Pre-push                                    | Scheduled CI                |
-| Java tools      | JUnit 5 + Mockito       | JUnit 5 + Cucumber JVM + MockMvc + WireMock | Playwright + Testcontainers |
-| TS tools        | Vitest + vi.fn          | Vitest + vitest-cucumber + MSW              | Playwright + playwright-bdd |
+| Property        | Unit                    | Integration                                       | E2E                            |
+| --------------- | ----------------------- | ------------------------------------------------- | ------------------------------ |
+| Scope           | 1 class/function        | Internal layers                                   | Full system                    |
+| External I/O    | Mocked                  | Mocked                                            | Real                           |
+| DB              | Mocked / in-memory impl | In-memory impl                                    | Real (Docker PostgreSQL)       |
+| HTTP (outbound) | Mocked                  | MSW / mockito                                     | Real                           |
+| Browser         | N/A                     | N/A                                               | Real (Playwright)              |
+| Speed           | ms                      | seconds                                           | minutes                        |
+| Run frequency   | Every commit            | Pre-push                                          | Scheduled CI                   |
+| Rust tools      | `#[test]` + mockall     | `#[tokio::test]` + cucumber + axum-test + mockito | Playwright + Docker PostgreSQL |
+| TS tools        | Vitest + vi.fn          | Vitest + vitest-cucumber + MSW                    | Playwright + playwright-bdd    |
 
 ## Test Pyramid
 
@@ -142,8 +142,8 @@ E2E testing
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0173B2','primaryTextColor':'#fff','primaryBorderColor':'#0173B2','lineColor':'#DE8F05','secondaryColor':'#029E73','tertiaryColor':'#CC78BC','fontSize':'16px'}}}%%
 flowchart TD
     E2E["E2E Tests\nNo mocking — real system\nPlaywright + real DB\nSlow · Scheduled CI"]
-    INT["Integration Tests\nAll external I/O mocked\nMSW / WireMock / in-memory\nMedium · Pre-push"]
-    UNIT["Unit Tests\nAll collaborators mocked\nJUnit / Vitest + mock\nFast · Every commit"]
+    INT["Integration Tests\nAll external I/O mocked\nMSW / mockito / in-memory\nMedium · Pre-push"]
+    UNIT["Unit Tests\nAll collaborators mocked\nmockall / Vitest + mock\nFast · Every commit"]
 
     E2E --> INT
     INT --> UNIT
@@ -168,11 +168,11 @@ src/
 
 **REQUIRED** naming conventions:
 
-| Tier        | Java                             | TypeScript                         |
-| ----------- | -------------------------------- | ---------------------------------- |
-| Unit        | `ZakatCalculatorTest.java`       | `ZakatCalculator.unit.test.ts`     |
-| Integration | `MemberListIntegrationTest.java` | `member-list.integration.test.tsx` |
-| E2E         | `*.feature` + step definitions   | `*.feature` + step definitions     |
+| Tier        | Rust                              | TypeScript                         |
+| ----------- | --------------------------------- | ---------------------------------- |
+| Unit        | `zakat_calculator_test.rs`        | `ZakatCalculator.unit.test.ts`     |
+| Integration | `member_list_integration_test.rs` | `member-list.integration.test.tsx` |
+| E2E         | `*.feature` + step definitions    | `*.feature` + step definitions     |
 
 ## Common Mistakes
 
@@ -196,17 +196,19 @@ it("should load member list", async () => {
 
 ### Using Testcontainers in integration tests
 
-```java
-// WRONG — Testcontainers = real DB = belongs in E2E
-@Testcontainers
-class MemberRepositoryIntegrationTest { // ❌ this is E2E-level, not integration-level
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
+```rust
+// WRONG — real Docker PostgreSQL = belongs in E2E, not integration
+// (sqlx::test with a live database is E2E-level)
+#[sqlx::test]
+async fn member_repository_integration_test(pool: PgPool) { // ❌ real DB = E2E tier
+    // …
 }
 
 // CORRECT — in-memory repository for integration tests
-class MemberRepositoryIntegrationTest {
-    private MemberRepository repository = new InMemoryMemberRepository(); // ✅
+#[tokio::test]
+async fn member_repository_integration_test() {
+    let repository = InMemoryMemberRepository::new(); // ✅ no real DB
+    // …
 }
 ```
 
@@ -229,6 +231,6 @@ test("user can log in", async ({ page }) => {
 ## Related Standards
 
 - [Testing Standards](./testing-standards.md) — FIRST principles, AAA pattern, test naming
-- [Integration Testing Standards](./integration-testing-standards.md) — in-memory repos, MSW, WireMock patterns
+- [Integration Testing Standards](./integration-testing-standards.md) — in-memory repos, MSW, mockito patterns
 - [Test Doubles Standards](./test-doubles-standards.md) — mocks, stubs, in-memory implementations
 - [TypeScript Testing](../../programming-languages/typescript/testing.md) — TypeScript-specific tools and patterns

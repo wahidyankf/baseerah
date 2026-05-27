@@ -169,7 +169,7 @@ Uses **Nx** to manage apps and libs:
   - Apps import libs but never export
   - Each app independently deployable
   - Apps never import other apps
-- **`libs/`** — Reusable libraries (naming: `ts-[name]`, future: `java-*`, `py-*`)
+- **`libs/`** — Reusable libraries (naming: `ts-[name]`, `rust-[name]`)
   - Flat structure, no nesting
   - Import via `@open-sharia-enterprise/ts-[lib-name]`
   - Libs can import other libs (no circular deps)

@@ -22,13 +22,13 @@ After creating or entering a git worktree in this repository, always initialize 
 1. Run `npm install` in the root repository worktree.
 2. Run `npm run doctor -- --fix` in the root repository worktree.
 
-Both steps are required. The first ensures the Nx workspace and its Node/TypeScript dependencies remain functional; the second actively converges the 18+ polyglot toolchains (Go, Java, Rust, Elixir, Python, .NET, Dart, Clojure, Kotlin, C#, Node) managed by `rhino-cli doctor` so that any language task the worktree's work touches resolves against a healthy toolchain.
+Both steps are required. The first ensures the Nx workspace and its Node/TypeScript dependencies remain functional; the second actively converges the polyglot toolchains (Rust, .NET/F#, TypeScript/Node) managed by `rhino-cli doctor` so that any language task the worktree's work touches resolves against a healthy toolchain.
 
 ## Principles Implemented/Respected
 
 This practice respects the following core principles:
 
-- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Every worktree operates with a consistent, verified toolchain state across all 11 languages. Running both `npm install` and `npm run doctor -- --fix` eliminates divergence between the root worktree's `node_modules/`, the current `package-lock.json`, and the installed native toolchain — making builds deterministic regardless of which worktree is active.
+- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Every worktree operates with a consistent, verified toolchain state. Running both `npm install` and `npm run doctor -- --fix` eliminates divergence between the root worktree's `node_modules/`, the current `package-lock.json`, and the installed native toolchain — making builds deterministic regardless of which worktree is active.
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The toolchain init is an explicit, required two-step action rather than an assumed side effect of worktree creation. The `postinstall` hook in `package.json` does run `npm run doctor || true`, but the trailing `|| true` deliberately swallows doctor failures so `npm install` can complete even when the polyglot toolchain is broken. That tolerance is the right default for `npm install`, but it means the explicit `npm run doctor -- --fix` invocation is the only thing that guarantees convergence. Developers and agents must perform the second step deliberately.
 
@@ -51,8 +51,7 @@ cd /path/to/root/open-sharia-enterprise
 # Step 1: Node/Nx workspace dependencies (node_modules/)
 npm install
 
-# Step 2: Full polyglot toolchain convergence (Go, Java, Rust, Elixir, Python,
-# .NET, Dart, Clojure, Kotlin, C#, Node — all languages managed by rhino-cli)
+# Step 2: Toolchain convergence (Rust, .NET/F#, TypeScript/Node — all managed by rhino-cli)
 npm run doctor -- --fix
 ```
 
@@ -75,7 +74,7 @@ Skipping either step leaves the other layer vulnerable. Doing only `npm install`
 
 ### The `postinstall` Hook Silently Tolerates Drift
 
-`package.json` defines a `postinstall` hook that runs `npm run doctor || true`. The `|| true` is deliberate — it prevents `npm install` from failing when the polyglot toolchain is drifted, which is the right default for `npm install` to remain usable as a dependency-sync command. But the consequence is that **`npm install` can complete "successfully" while the polyglot toolchain is actually broken**. A human developer or AI agent then tries to run a Go, Java, Rust, Elixir, Python, .NET, Dart, Clojure, Kotlin, or C# task in the new worktree and hits cryptic errors that aren't traceable to a missing or drifted toolchain.
+`package.json` defines a `postinstall` hook that runs `npm run doctor || true`. The `|| true` is deliberate — it prevents `npm install` from failing when the polyglot toolchain is drifted, which is the right default for `npm install` to remain usable as a dependency-sync command. But the consequence is that **`npm install` can complete "successfully" while the polyglot toolchain is actually broken**. A human developer or AI agent then tries to run a Rust, .NET, or TypeScript task in the new worktree and hits cryptic errors that aren't traceable to a missing or drifted toolchain.
 
 The explicit `npm run doctor -- --fix` call is the only mechanism that forces active convergence at the moment the worktree session begins.
 
@@ -99,8 +98,8 @@ Per [Native-First Toolchain Management](./native-first-toolchain.md), every pack
 
 Without running both steps after worktree creation or entry, these failures can occur:
 
-- **Build failures**: A dependency that a new worktree's code requires may be absent or at the wrong version, or a native compiler (javac, rustc, ghc, `dotnet`) may be missing entirely.
-- **Test failures**: Test runners (Vitest, Jest, Playwright, Gradle, Cargo, Mix, pytest, `dotnet test`, Godog) may resolve the wrong module versions or fail to launch at all.
+- **Build failures**: A dependency that a new worktree's code requires may be absent or at the wrong version, or a native compiler (`rustc`, `dotnet`) may be missing entirely.
+- **Test failures**: Test runners (Vitest, Playwright, Cargo, `dotnet test`) may resolve the wrong module versions or fail to launch at all.
 - **Lint failures**: Linters may behave differently when versions mismatch, or may not be installed at all for the language a new file uses.
 - **Nx cache invalidation**: Nx computes cache keys based on inputs including resolved module versions. A stale `node_modules/` causes cache misses or incorrect cache hits.
 - **Cryptic errors**: Dependency and toolchain mismatches often surface as obscure runtime errors rather than clear "missing module" or "missing tool" messages, making them harder to diagnose.

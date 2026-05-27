@@ -7,8 +7,7 @@ tags:
   - database
   - audit-trail
   - soft-delete
-  - jpa
-  - liquibase
+  - sqlx
   - migrations
 created: 2026-03-09
 ---
@@ -23,9 +22,9 @@ This pattern implements the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: All audit metadata is stored in dedicated, named columns with mandatory types and nullability. There is no implicit or hidden tracking; every change is visible in the schema.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Spring Data JPA Auditing populates `created_at`, `created_by`, `updated_at`, and `updated_by` automatically via `@EntityListeners`. Manual annotation in service code is only required for soft-delete columns.
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: SQLx's `sqlx::migrate!()` macro embeds and applies migrations automatically at startup. Manual service code is only required for soft-delete columns (`deleted_at`, `deleted_by`).
 
-- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Migration tool changelogs with environment qualifiers ensure the schema is reproducible across PostgreSQL (dev/staging/prod) and in-process test databases without divergence.
+- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: SQLx embeds migration files at compile time, ensuring the schema is reproducible across PostgreSQL environments (dev/staging/prod) and Dockerised test databases without divergence.
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: This pattern documents the required columns, types, and implementation approach before any table is created, ensuring teams follow a consistent and verifiable standard.
 
@@ -70,7 +69,7 @@ graph TD
 | `deleted_at` | `TIMESTAMPTZ`  | NULL     | —          | When the row was soft-deleted (UTC) |
 | `deleted_by` | `VARCHAR(255)` | NULL     | —          | Who or what soft-deleted the row    |
 
-Blue columns (required) are always non-null and managed by JPA Auditing. Green columns (optional by value) are always present in the schema but null for active rows.
+Blue columns (required) are always non-null and populated by the database default or the calling service. Green columns (optional by value) are always present in the schema but null for active rows.
 
 ## Why This Pattern Exists
 
@@ -107,198 +106,139 @@ Regardless of the tool used, migrations must satisfy:
 - `deleted_at` and `deleted_by` are nullable with no default — `NULL` is the active-row state
 - Each migration is reversible (rollback support where the tool provides it)
 
-### Java / Spring Boot: Liquibase
+### Rust / SQLx: `sqlx::migrate!`
 
-Use a SQL-formatted Liquibase changeset. The `dbms` qualifier selects the correct SQL for each environment. Both PostgreSQL and H2 variants live in the same file.
+Use plain `.sql` files under `migrations/`. SQLx embeds them at compile time via the `sqlx::migrate!()` macro and applies them in filename order at startup.
 
-The following example shows the `users` table as the reference implementation. Apply the same pattern to every new table.
+The following example shows the `members` table as the reference implementation. Apply the same pattern to every new table.
 
 ```sql
--- liquibase formatted sql
-
--- changeset author:create-table-name dbms:postgresql
-CREATE TABLE table_name (
-    id          UUID            NOT NULL DEFAULT gen_random_uuid(),
-    -- ... domain columns ...
-
-    created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-    created_by  VARCHAR(255)    NOT NULL DEFAULT 'system',
-    updated_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-    updated_by  VARCHAR(255)    NOT NULL DEFAULT 'system',
-    deleted_at  TIMESTAMPTZ,
-    deleted_by  VARCHAR(255),
-
-    CONSTRAINT pk_table_name PRIMARY KEY (id)
+-- migrations/20240101000001_create_members.sql
+CREATE TABLE members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    -- audit columns
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by UUID NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_by UUID NOT NULL,
+    deleted_at TIMESTAMPTZ,
+    deleted_by UUID
 );
--- rollback DROP TABLE table_name;
-
--- changeset author:create-table-name-h2 dbms:h2
-CREATE TABLE table_name (
-    id          UUID            NOT NULL DEFAULT RANDOM_UUID(),
-    -- ... domain columns ...
-
-    created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-    created_by  VARCHAR(255)    NOT NULL DEFAULT 'system',
-    updated_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-    updated_by  VARCHAR(255)    NOT NULL DEFAULT 'system',
-    deleted_at  TIMESTAMPTZ,
-    deleted_by  VARCHAR(255),
-
-    CONSTRAINT pk_table_name PRIMARY KEY (id)
-);
--- rollback DROP TABLE table_name;
 ```
 
 Key points:
 
-- `TIMESTAMPTZ` is used for both PostgreSQL and H2. H2 in PostgreSQL compatibility mode (`MODE=PostgreSQL`) recognises `TIMESTAMPTZ` as an alias for `TIMESTAMP WITH TIME ZONE`.
-- `DEFAULT NOW()` provides a safe fallback when JPA Auditing is not active (e.g., raw SQL inserts in migrations).
-- `DEFAULT 'system'` for `_by` columns provides a traceable actor for migrations and system operations.
-- `deleted_at` and `deleted_by` have no default because `NULL` is the intended initial state.
+- Migration files are named `{timestamp}_{description}.sql` so SQLx applies them in deterministic order.
+- `DEFAULT now()` provides a safe fallback for raw SQL inserts (migrations, seeds, background jobs).
+- `created_by` and `updated_by` are `UUID` referencing the actor; use `TEXT NOT NULL DEFAULT 'system'` when the actor is a string identifier rather than a UUID.
+- `deleted_at` and `deleted_by` are nullable with no default — `NULL` is the active-row state.
+- SQLx does not have a built-in rollback concept for embedded migrations; provide a separate `_down.sql` file or manage rollbacks manually if required.
 
-## JPA Entity Implementation
+## Rust Entity Implementation
 
-### Entity Class
+### Struct Definition
 
-Annotate every entity with `@EntityListeners(AuditingEntityListener.class)`. Use JPA Auditing annotations for the first four columns. Set `deleted_at` and `deleted_by` manually in the service layer.
+Derive `sqlx::FromRow` on every domain struct that maps to an audited table. Use `time::OffsetDateTime` for timestamp columns and `uuid::Uuid` for UUID columns.
 
-```java
-@NullMarked
-package com.ademobejasb.auth.model;
+```rust
+// src/domain/member.rs
+use sqlx::FromRow;
+use time::OffsetDateTime;
+use uuid::Uuid;
 
-import jakarta.persistence.*;
-import org.jspecify.annotations.Nullable;
-import org.springframework.data.annotation.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.Instant;
-import java.util.UUID;
-
-@Entity
-@Table(name = "table_name")
-@EntityListeners(AuditingEntityListener.class)
-@Where(clause = "deleted_at IS NULL")
-public class DomainEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    // --- Audit columns ---
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @CreatedBy
-    @Column(name = "created_by", nullable = false, updatable = false, length = 255)
-    private String createdBy;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
-
-    @LastModifiedBy
-    @Column(name = "updated_by", nullable = false, length = 255)
-    private String updatedBy;
-
-    @Nullable
-    @Column(name = "deleted_at")
-    private Instant deletedAt;
-
-    @Nullable
-    @Column(name = "deleted_by", length = 255)
-    private String deletedBy;
-
-    // ... constructors, getters, no public setters ...
+#[derive(Debug, FromRow)]
+pub struct Member {
+    pub id: Uuid,
+    pub name: String,
+    // audit columns
+    pub created_at: OffsetDateTime,
+    pub created_by: Uuid,
+    pub updated_at: OffsetDateTime,
+    pub updated_by: Uuid,
+    pub deleted_at: Option<OffsetDateTime>,
+    pub deleted_by: Option<Uuid>,
 }
 ```
 
-### Enable JPA Auditing
+### Run Migrations at Startup
 
-Add `@EnableJpaAuditing` to a `@Configuration` class and provide an `AuditorAware<String>` bean. The bean reads the authenticated principal from the Spring Security context, falling back to `"system"` when no authenticated user exists (background jobs, migrations, system operations).
+Call `sqlx::migrate!()` in `main` (or in the application builder) before the HTTP server starts accepting requests.
 
-```java
-@Configuration
-@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
-public class JpaAuditingConfig {
-
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        return () -> {
-            Authentication auth =
-                SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null || !auth.isAuthenticated()
-                    || "anonymousUser".equals(auth.getPrincipal())) {
-                return Optional.of("system");
-            }
-            return Optional.of(auth.getName());
-        };
-    }
-}
+```rust
+// src/main.rs (excerpt)
+let pool = sqlx::PgPool::connect(&database_url).await?;
+sqlx::migrate!("./migrations").run(&pool).await?;
 ```
 
-### Soft-Delete in the Service Layer
+### Soft-Delete in the Repository Layer
 
-`deleted_at` and `deleted_by` are NOT managed by JPA Auditing. The service layer sets them explicitly before saving. Never call `repository.delete()` on audited entities; always use soft-delete.
+`deleted_at` and `deleted_by` are set explicitly in the repository layer. Never issue a `DELETE` statement on audited tables; always use a soft-delete `UPDATE`.
 
-```java
-// UserNotFoundException is a checked exception (extends Exception), not RuntimeException.
-// Project convention requires checked exceptions so error paths are visible in signatures.
-public void deleteUser(UUID userId) throws UserNotFoundException {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId));
-
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String actor = (auth != null && auth.isAuthenticated()
-            && !"anonymousUser".equals(auth.getPrincipal()))
-        ? auth.getName() : "system";
-
-    user.setDeletedAt(Instant.now());
-    user.setDeletedBy(actor);
-    userRepository.save(user);
+```rust
+// src/repository/member_repository.rs (excerpt)
+pub async fn soft_delete_member(
+    pool: &PgPool,
+    id: Uuid,
+    actor: Uuid,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        r#"
+        UPDATE members
+        SET deleted_at = now(),
+            deleted_by = $1
+        WHERE id = $2
+          AND deleted_at IS NULL
+        "#,
+        actor,
+        id,
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
 }
 ```
 
 ## Soft-Delete Query Discipline
 
-The `@Where(clause = "deleted_at IS NULL")` annotation on the entity automatically filters soft-deleted rows for all Spring Data JPA queries, JPQL, and Criteria API queries generated by that repository. This means:
+All queries against audited tables MUST include `WHERE deleted_at IS NULL` unless the endpoint is an explicit admin or audit endpoint.
 
-- `findAll()` returns only active rows.
-- `findById(id)` returns `Optional.empty()` for soft-deleted rows.
-- Custom `@Query` methods using JPQL inherit the `@Where` filter automatically.
+**PASS: active-row query — soft-deleted rows excluded**:
 
-**PASS: correct query — soft-deleted rows excluded automatically**:
-
-```java
-// @Where on entity handles filtering; no manual WHERE clause needed
-List<User> activeUsers = userRepository.findAll();
+```rust
+sqlx::query_as!(
+    Member,
+    "SELECT * FROM members WHERE deleted_at IS NULL"
+)
+.fetch_all(pool)
+.await?
 ```
 
-**FAIL: never bypass soft-delete with native SQL that ignores `deleted_at`**:
+**FAIL: never omit the `deleted_at` filter without explicit justification**:
 
-```java
-// This returns soft-deleted rows — only acceptable for admin/audit screens
-@Query(value = "SELECT * FROM users", nativeQuery = true)
-List<User> findAllIncludingDeleted();
+```rust
+// Returns soft-deleted rows — only acceptable for admin/audit endpoints
+sqlx::query_as!(Member, "SELECT * FROM members")
+    .fetch_all(pool)
+    .await?
 ```
 
-When a native query or admin endpoint legitimately needs to access soft-deleted rows (e.g., audit log screen, data recovery), name the method clearly (e.g., `findAllIncludingDeleted`) and restrict access to admin roles.
+When an admin or audit endpoint legitimately needs soft-deleted rows, name the function clearly (e.g., `fetch_all_including_deleted`) and restrict the route to admin roles.
 
-## `@NullMarked` Compatibility
+## Rust Nullability Convention
 
-All packages use `@NullMarked` (JSpecify). The audit field nullability must match:
+Rust's type system encodes nullability directly. The audit field mapping is:
 
-| Field       | Java type | Annotation    | Rationale                                    |
-| ----------- | --------- | ------------- | -------------------------------------------- |
-| `createdAt` | `Instant` | (none needed) | Non-null; JPA Auditing always populates it   |
-| `createdBy` | `String`  | (none needed) | Non-null; fallback `"system"` always present |
-| `updatedAt` | `Instant` | (none needed) | Non-null; JPA Auditing always populates it   |
-| `updatedBy` | `String`  | (none needed) | Non-null; fallback `"system"` always present |
-| `deletedAt` | `Instant` | `@Nullable`   | Null means active row                        |
-| `deletedBy` | `String`  | `@Nullable`   | Null means active row                        |
+| Column       | Rust type                | Rationale                          |
+| ------------ | ------------------------ | ---------------------------------- |
+| `created_at` | `OffsetDateTime`         | Non-null; database `DEFAULT now()` |
+| `created_by` | `Uuid`                   | Non-null; caller must supply actor |
+| `updated_at` | `OffsetDateTime`         | Non-null; database `DEFAULT now()` |
+| `updated_by` | `Uuid`                   | Non-null; caller must supply actor |
+| `deleted_at` | `Option<OffsetDateTime>` | `None` means active row            |
+| `deleted_by` | `Option<Uuid>`           | `None` means active row            |
 
-Under `@NullMarked`, all types are non-null by default. Only `deletedAt` and `deletedBy` require an explicit `@Nullable` annotation.
+`Option<T>` maps directly to nullable SQL columns via SQLx's `FromRow` derive.
 
 ## Compliance Checklist
 
@@ -312,45 +252,35 @@ Use this checklist when adding a new table or reviewing an existing one.
 - [ ] `deleted_at` and `deleted_by` are nullable with no default
 - [ ] Migration is reversible (rollback or down migration provided where the tool supports it)
 
-**Java / Spring Boot (Liquibase) additional checks:**
+**Rust / SQLx additional checks:**
 
-- [ ] Separate `-- changeset` blocks use `dbms:postgresql` and `dbms:h2` qualifiers
-- [ ] Rollback statement present in each changeset
+- [ ] Migration file name follows `{timestamp}_{description}.sql` format
+- [ ] `sqlx::migrate!("./migrations").run(&pool).await?` is called before the server starts accepting requests
 
-### Entity (Java)
+### Struct (Rust / SQLx)
 
-- [ ] Entity class is annotated with `@EntityListeners(AuditingEntityListener.class)`
-- [ ] Entity class is annotated with `@Where(clause = "deleted_at IS NULL")`
-- [ ] `createdAt` uses `@CreatedDate` and `updatable = false`
-- [ ] `createdBy` uses `@CreatedBy` and `updatable = false`
-- [ ] `updatedAt` uses `@LastModifiedDate`
-- [ ] `updatedBy` uses `@LastModifiedBy`
-- [ ] `deletedAt` and `deletedBy` are annotated `@Nullable`
-- [ ] Package-level `@NullMarked` annotation is present
+- [ ] Struct derives `sqlx::FromRow`
+- [ ] `created_at` and `updated_at` fields use `time::OffsetDateTime` (non-`Option`)
+- [ ] `created_by` and `updated_by` fields use `Uuid` (non-`Option`)
+- [ ] `deleted_at` and `deleted_by` fields use `Option<OffsetDateTime>` and `Option<Uuid>` respectively
 
-### Configuration
+### Repository Layer (Rust / SQLx)
 
-- [ ] `@EnableJpaAuditing` is present on a `@Configuration` class
-- [ ] `AuditorAware<String>` bean is registered
-- [ ] `AuditorAware` bean falls back to `"system"` when no authenticated user exists
-
-### Service Layer
-
-- [ ] No call to `repository.delete()` or `repository.deleteById()` on audited entities
-- [ ] Soft-delete sets both `deletedAt` and `deletedBy` before calling `save()`
-- [ ] Actor for soft-delete comes from `SecurityContextHolder` with `"system"` fallback
+- [ ] No `DELETE` statement issued against audited tables
+- [ ] Soft-delete issues an `UPDATE` setting both `deleted_at = now()` and `deleted_by = $actor`
+- [ ] Soft-delete query includes `AND deleted_at IS NULL` to guard against double-deletes
 
 ### Queries
 
-- [ ] No native SQL queries bypass `deleted_at IS NULL` filtering without explicit justification
-- [ ] Admin/audit queries that intentionally include soft-deleted rows are named clearly and access-restricted
+- [ ] All `SELECT` queries include `WHERE deleted_at IS NULL` unless the endpoint is explicitly an admin/audit endpoint
+- [ ] Functions that intentionally return soft-deleted rows are named clearly (e.g., `fetch_all_including_deleted`) and the route is restricted to admin roles
 
 ## Related Documentation
 
 - [Acceptance Criteria Convention](../infra/acceptance-criteria.md) - Writing testable criteria for features involving audited entities
 - [Functional Programming Practices](./functional-programming.md) - Pure functions for business logic separate from audit side effects
-- [Reproducible Environments Convention](../workflow/reproducible-environments.md) - Why H2/PostgreSQL parity matters for test reliability
-- [Licensing Decisions](../../../docs/explanation/software-engineering/licensing/licensing-decisions.md) - License analysis for migration tools (Liquibase FSL-1.1-ALv2, Hibernate LGPL-2.1, and others)
+- [Reproducible Environments Convention](../workflow/reproducible-environments.md) - Why consistent PostgreSQL environments across dev/staging/prod matter for test reliability
+- [Licensing Decisions](../../../docs/explanation/software-engineering/licensing/licensing-decisions.md) - License analysis for migration tools (Liquibase FSL-1.1-ALv2 and others)
 
 ## References
 
@@ -358,22 +288,18 @@ Use this checklist when adding a new table or reviewing an existing one.
 
 - [Auth Register/Login Tech Docs](../../../plans/done/2026-04-22__auth-register-login/tech-docs.md) - Reference implementation of the `users` table applying this pattern
 
-**External (Java / Spring Boot):**
+**External (Rust / SQLx):**
 
-- [Spring Data JPA Auditing Reference](https://docs.spring.io/spring-data/jpa/reference/auditing.html)
-- [Liquibase SQL Format Changelogs](https://docs.liquibase.com/concepts/changelogs/sql-format.html)
-- [JSpecify `@NullMarked`](https://jspecify.dev/docs/user-guide/)
+- [SQLx `migrate!` macro](https://docs.rs/sqlx/latest/sqlx/macro.migrate.html)
+- [SQLx `Migrate` trait](https://docs.rs/sqlx/latest/sqlx/migrate/trait.Migrate.html)
+- [time crate `OffsetDateTime`](https://docs.rs/time/latest/time/struct.OffsetDateTime.html)
+- [uuid crate](https://docs.rs/uuid/latest/uuid/)
 
-**External (Other Ecosystems):**
+**External (Other Active Ecosystems):**
 
 - [goose migrations (Go)](https://github.com/pressly/goose)
-- [Alembic migrations (Python)](https://alembic.sqlalchemy.org/)
-- [SQLx migrations (Rust)](https://docs.rs/sqlx/latest/sqlx/macro.migrate.html)
-- [Ecto migrations (Elixir)](https://hexdocs.pm/ecto_sql/Ecto.Migration.html)
 - [DbUp migrations (F#/.NET)](https://dbup.readthedocs.io/)
 - [EF Core Migrations (C#/.NET)](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
-- [Flyway Community (Kotlin/JVM)](https://documentation.red-gate.com/flyway/flyway-cli-and-api)
-- [Migratus (Clojure)](https://github.com/yogthos/migratus)
 - [@effect/sql Migrator (TypeScript)](https://effect.website/docs/sql/sql-migrator)
 - [Drizzle migrations (TypeScript)](https://orm.drizzle.team/docs/migrations)
 

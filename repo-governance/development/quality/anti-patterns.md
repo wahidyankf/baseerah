@@ -378,25 +378,25 @@ git add .           # Stages unintended changes!
 
 **Bad Example:**
 
-```java
-// Integration test using MockMvc (HTTP layer — wrong for integration level)
-@Test
-void createProduct() {
-    mockMvc.perform(post("/api/products")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(json))
-        .andExpect(status().isCreated()); // HTTP dispatch — belongs in E2E!
+```rust
+// Integration test using HTTP dispatch (wrong for integration level)
+#[tokio::test]
+async fn create_product() {
+    let response = app.oneshot(
+        Request::builder().method("POST").uri("/api/products").body(body).unwrap()
+    ).await.unwrap();
+    assert_eq!(response.status(), StatusCode::CREATED); // HTTP dispatch — belongs in E2E!
 }
 ```
 
 **Solution:**
 
-```java
-// Integration test calling service directly with real database (correct)
-@Test
-void createProduct() {
-    var result = productService.create(productData, realRepo); // direct call
-    assertThat(result.isSuccess()).isTrue();
+```rust
+// Integration test calling service directly (correct)
+#[tokio::test]
+async fn create_product() {
+    let result = product_service.create(product_data, &real_repo).await;
+    assert!(result.is_ok()); // direct call, no HTTP layer
 }
 ```
 
