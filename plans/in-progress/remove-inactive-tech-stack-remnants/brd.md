@@ -3,18 +3,21 @@
 ## Business Goal
 
 Remove all remnant artifacts (docs, agents, skills, CI jobs, toolchain scripts, config entries)
-for tech stacks no longer active in `ose-public`. Retain only what serves the active stacks: TypeScript, Go, Rust, and F# (crane-cli).
+for tech stacks no longer active in `ose-public`. Retain what serves active stacks: TypeScript,
+Go, Rust, and F#/C# (.NET — crane-cli is F#; C# retained for potential dotnet interop).
 
-## Problem
+## Business Impact
 
-After several migrations — .NET → Rust for `ose-app-be`, F# → Rust for `crane-cli`, and the
-polyglot demo extraction to `ose-primer` — inactive stacks left behind:
+After migrations — .NET → Rust for `ose-app-be`, and the polyglot demo extraction to
+`ose-primer` — inactive stacks left behind:
 
-- **124 documentation files** [Repo-grounded] across 8 language directories, describing stacks with no active apps
-- **8 agent files + 8 skill directories** [Repo-grounded] for languages never used by ose-public's production code
-- **CI gate jobs** (dotnet, JVM, Python) that always skip but add workflow complexity
-- **Toolchain scripts and config** (`.sln`, `format-csharp.sh`, lint-staged C# entry)
-- **Broken infra** (`Dockerfile.be.dev` still uses dotnet SDK for an app now on Rust)
+- **Documentation files** across 6 language directories (Java, Kotlin, Elixir, Clojure, Dart,
+  Python), describing stacks with no active apps
+- **6 agent files + 6 skill directories** for languages with no active apps in ose-public
+- **CI gate jobs** (JVM, Python) that always skip but add workflow complexity
+- **Broken infra** (`infra/dev/ose-app/Dockerfile.be.dev` still references old dotnet SDK for
+  `ose-app-be`, which is now Rust/Axum)
+- **Stale solution file** (`open-sharia-enterprise.sln`) has no project references
 
 This creates:
 
@@ -33,11 +36,14 @@ This creates:
 
 [Judgment call] After completion:
 
-- `grep -r "lang:fsharp\|lang:csharp\|lang:java\|lang:kotlin\|lang:elixir\|lang:clojure\|lang:dart\|lang:python" .github/` returns zero results outside of archived/ and plans/done/
-- `ls .claude/agents/ | grep "swe-"` shows only active-stack agents (golang, typescript, rust, e2e)
-- `ls docs/explanation/software-engineering/programming-languages/` shows only: golang/, rust/,
-  typescript/, README.md — and no directory for c-sharp, f-sharp, java, kotlin, elixir, clojure,
+- `grep -r "lang:java\|lang:kotlin\|lang:elixir\|lang:clojure\|lang:dart\|lang:python" .github/`
+  returns zero results outside of `archived/` and `plans/done/`
+- `ls .claude/agents/ | grep "swe-"` shows only: golang, typescript, rust, e2e, csharp, fsharp
+- `ls docs/explanation/software-engineering/programming-languages/` shows: c-sharp/, f-sharp/,
+  golang/, rust/, typescript/, README.md — and no directory for java, kotlin, elixir, clojure,
   dart, or python
+- `grep "F#\|Giraffe\|dotnet" infra/dev/ose-app/Dockerfile.be.dev` returns nothing
+- `dotnet sln open-sharia-enterprise.sln list` shows crane-cli project references
 
 ## Business Non-Goals
 
@@ -48,9 +54,9 @@ This creates:
 
 ## Business Risks
 
-| Risk                                                                          | Mitigation                                                             |
-| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Removing agent/skill needed for content creation tasks                        | Verify: no active apps use these agents; ose-primer owns them          |
-| Breaking `infra/dev/ose-app/docker-compose.yml` by changing Dockerfile.be.dev | Replacement Dockerfile uses same Rust image pattern as organiclever-be |
-| CI workflow syntax errors after job removal                                   | Local `act` or post-push CI verification catches this                  |
-| Broken internal links after doc removal                                       | `npm run lint:md` and the docs-link-checker catch dead references      |
+| Risk                                                                          | Mitigation                                                                    |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Removing agent/skill needed for content creation tasks                        | N/A — C#/F# agents and skills are retained; only JVM/ose-primer langs removed |
+| Breaking `infra/dev/ose-app/docker-compose.yml` by changing Dockerfile.be.dev | Replacement Dockerfile uses same Rust image pattern as organiclever-be        |
+| CI workflow syntax errors after job removal                                   | Local `act` or post-push CI verification catches this                         |
+| Broken internal links after doc removal                                       | `npm run lint:md` and the docs-link-checker catch dead references             |

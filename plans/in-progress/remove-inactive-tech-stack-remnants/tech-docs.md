@@ -1,26 +1,43 @@
 # Technical Documentation
 
+## Architecture
+
+This plan introduces no new architectural components. It is a pure cleanup sweep: delete
+inactive-lang docs, agents, skills, and CI jobs; correct stale infra references; and update the
+VS solution file to include the active F# project. No source code, application structure, or
+runtime behaviour changes.
+
 ## Complete File Inventory
 
 All paths verified [Repo-grounded] via `ls`/`find` at 2026-05-27.
 
-### Phase 1: Dotnet (F# / C#) Artifacts
+### Phase 1: .NET Artifacts — Retain C#/F#; Correct ose-app Infra
 
-#### Delete entirely
+> **Decision**: C# and F# artifacts are **retained**. `crane-cli` is active F#; C# retained for
+> potential dotnet interop. Only `infra/dev/ose-app/` infra files and `open-sharia-enterprise.sln`
+> need action.
 
-| Path                                                                   | Type                                          |
-| ---------------------------------------------------------------------- | --------------------------------------------- |
-| `open-sharia-enterprise.sln`                                           | Empty VS solution file                        |
-| `.github/actions/setup-dotnet/action.yml` (+ dir)                      | CI action for dotnet toolchain                |
-| `scripts/format-csharp.sh`                                             | C# formatter wrapper script                   |
-| `docs/explanation/software-engineering/programming-languages/c-sharp/` | 14 files (13 standards + templates/README.md) |
-| `docs/explanation/software-engineering/programming-languages/f-sharp/` | 14 files (13 standards + templates/README.md) |
-| `.claude/agents/swe-csharp-dev.md`                                     | C# agent definition                           |
-| `.claude/agents/swe-fsharp-dev.md`                                     | F# agent definition                           |
-| `.opencode/agents/swe-csharp-dev.md`                                   | OpenCode mirror                               |
-| `.opencode/agents/swe-fsharp-dev.md`                                   | OpenCode mirror                               |
-| `.claude/skills/swe-programming-csharp/`                               | C# skill directory                            |
-| `.claude/skills/swe-programming-fsharp/`                               | F# skill directory                            |
+#### Keep (no change)
+
+| Path                                                                   | Reason                                 |
+| ---------------------------------------------------------------------- | -------------------------------------- |
+| `.github/actions/setup-dotnet/action.yml` (+ dir)                      | crane-cli CI dependency                |
+| `scripts/format-csharp.sh`                                             | C# tooling retained for dotnet interop |
+| `docs/explanation/software-engineering/programming-languages/c-sharp/` | C# retained                            |
+| `docs/explanation/software-engineering/programming-languages/f-sharp/` | crane-cli is F#                        |
+| `.claude/agents/swe-csharp-dev.md` + `.opencode/agents/`               | C# retained                            |
+| `.claude/agents/swe-fsharp-dev.md` + `.opencode/agents/`               | crane-cli is F#                        |
+| `.claude/skills/swe-programming-csharp/`                               | C# retained                            |
+| `.claude/skills/swe-programming-fsharp/`                               | crane-cli is F#                        |
+| `package.json` `"*.cs"` lint-staged entry                              | C# retained                            |
+| `lang:fsharp\|lang:csharp` detect + dotnet job in pr-quality-gate.yml  | dotnet gate needed for crane-cli       |
+| `setup-dotnet` step in `crane-cli-integration.yml`                     | crane-cli CI                           |
+
+#### Update
+
+| Path                         | Change                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| `open-sharia-enterprise.sln` | Add crane-cli project references via `dotnet sln add` (see delivery.md Phase 1a for command) |
 
 #### Replace
 
@@ -30,15 +47,10 @@ All paths verified [Repo-grounded] via `ls`/`find` at 2026-05-27.
 
 #### Modify
 
-| Path                                                                    | Change                                                                                                                                                                                               |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `package.json`                                                          | Remove `"*.cs": "scripts/format-csharp.sh"` from lint-staged                                                                                                                                         |
-| `.github/workflows/pr-quality-gate.yml`                                 | Remove: `has-dotnet` output, `lang:fsharp\|lang:csharp` detect case, dotnet job block, `dotnet` from quality-gate needs + for-loop, `tag:lang:fsharp,tag:lang:csharp` from TypeScript exclusion list |
-| `.github/workflows/crane-cli-integration.yml`                           | Remove `- uses: ./.github/actions/setup-dotnet` step                                                                                                                                                 |
-| `infra/dev/ose-app/docker-compose.ci.yml`                               | Remove `ASPNETCORE_URLS: "http://+:8302"`                                                                                                                                                            |
-| `infra/dev/ose-app/README.md`                                           | Change "F#/Giraffe REST API backend" → "Rust/Axum REST API backend"                                                                                                                                  |
-| `AGENTS.md`                                                             | Remove `swe-csharp-dev, swe-fsharp-dev` from Development agents list                                                                                                                                 |
-| `docs/explanation/software-engineering/programming-languages/README.md` | Remove C# and F# sections (see Phase 4 for full README rewrite)                                                                                                                                      |
+| Path                                      | Change                                                                        |
+| ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `infra/dev/ose-app/docker-compose.ci.yml` | Remove `ASPNETCORE_URLS: "http://+:8302"` (line 4)                            |
+| `infra/dev/ose-app/README.md`             | Change "F#/Giraffe REST API backend" → "Rust/Axum REST API backend" (line 10) |
 
 ### Phase 2: JVM (Java / Kotlin) Artifacts
 
@@ -106,18 +118,18 @@ All paths verified [Repo-grounded] via `ls`/`find` at 2026-05-27.
 
 | Path                                                                    | Change                                                                                                                                                                                                                               |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `docs/explanation/software-engineering/programming-languages/README.md` | Remove all sections for the 8 removed langs. Update "Skills Available" list, "Quick Decision" table, "Current Language Usage" table, "Domain-Specific Standards Pattern" example list. Active langs remaining: Go, Rust, TypeScript. |
-| `AGENTS.md`                                                             | Final pass — confirm all 8 removed agents are gone from **Development** list. Update skill references in the AI Agents section if any.                                                                                               |
+| `docs/explanation/software-engineering/programming-languages/README.md` | Remove all sections for the 6 removed langs (Java, Kotlin, Elixir, Clojure, Dart, Python). Update "Skills Available" list, "Quick Decision" table, "Current Language Usage" table. Active langs: Go, Rust, TypeScript, F#/C# (.NET). |
+| `AGENTS.md`                                                             | Final pass — confirm all 6 removed agents are gone from **Development** list. Verify C#/F# agents still present. Update skill references in AI Agents section if any.                                                                |
 
-#### Run generate:bindings (two calls — see D2)
+#### Run generate:bindings (Phase 3c — see D2)
 
 ```bash
 npm run generate:bindings
 ```
 
-This syncs `.opencode/agents/` from `.claude/agents/`. Run after Phase 1 deletions to validate
-dotnet agent removal, and again after Phase 3 deletions to catch all remaining removals in one
-pass.
+This syncs `.opencode/agents/` from `.claude/agents/`. Run after Phase 3 deletions as the
+authoritative sync — verifies all 6 inactive lang agents are removed from `.opencode/agents/`
+while C#/F# mirrors remain.
 
 ## Design Decisions
 
@@ -128,21 +140,18 @@ instructions (the docker-compose `volumes` mount mounts the workspace at `/works
 ose-app-be docker-compose uses the same volumes pattern, so the same minimal Dockerfile works.
 [Repo-grounded]
 
-### D2: Two generate:bindings calls — Phase 1d and Phase 3c
+### D2: Single generate:bindings call — Phase 3c only
 
-Phase 1d runs `npm run generate:bindings` as a parity-validation check after manual C#/F# agent
-deletion. Phase 3c runs it as the authoritative sync after all 8 agent deletions. Running it
-twice is intentional: Phase 1d catches any sync gap early (immediately after the highest-volume
-deletion), while Phase 3c provides the definitive verification that all 8 inactive agents are
-removed from `.opencode/agents/`. [Judgment call — generate:bindings in Phase 3c provides
-explicit verification regardless of pre-commit hook behavior]
+C#/F# agents are retained (no Phase 1 agent deletion). Phase 3c runs `npm run generate:bindings`
+as the authoritative sync after all 6 inactive lang agent deletions. This verifies all 6 inactive
+agents are removed from `.opencode/agents/` while C#/F# mirrors remain intact. [Judgment call —
+single call sufficient since Phase 1 makes no agent changes]
 
 ### D3: TypeScript exclusion list in pr-quality-gate.yml
 
 The TypeScript gate excludes other lang tags to avoid double-running on polyglot projects:
-`--exclude='tag:lang:golang,...'`. After cleanup, only `tag:lang:golang` and `tag:lang:rust`
-remain valid exclusions (TS projects won't have other tags anyway, but keep golang + rust for
-correctness).
+`--exclude='tag:lang:golang,...'`. After cleanup, `tag:lang:golang`, `tag:lang:rust`, and
+`tag:lang:fsharp`/`tag:lang:csharp` remain valid exclusions (dotnet gate kept for crane-cli).
 
 ### D4: Python detection removal
 
@@ -153,6 +162,13 @@ Remove entirely. If Python is ever added, the gate can be re-added at that time.
 
 These had `has-X` outputs and detect cases but no corresponding `X:` job blocks and were not in
 the quality-gate needs list. They are purely vestigial — remove from detect step only.
+
+### D6: C# retained for dotnet interop
+
+C# has no active apps in ose-public, but `crane-cli` is F# and .NET interop between F# and C#
+is zero-cost (same runtime). Retaining C# agents, skills, docs, `format-csharp.sh`, and the
+lint-staged `*.cs` entry costs nothing and avoids a painful re-add if C# interop is ever needed.
+[Judgment call — retention cost near-zero; removal cost non-trivial if reversed]
 
 ## Rollback
 

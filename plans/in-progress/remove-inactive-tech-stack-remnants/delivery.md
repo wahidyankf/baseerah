@@ -30,29 +30,69 @@ and
 
 ---
 
-## Phase 1: Dotnet (F# / C#) Cleanup — DEFERRED
+## Phase 1: .NET Artifacts — Retain C#/F#; Correct ose-app Infra
 
-> **Deferred**: F# is active in `apps/crane-cli/` (see
-> `plans/in-progress/rewrite-crane-cli-fsharp/`). Phase 1 dotnet cleanup is blocked until
-> that plan completes or is cancelled. When unblocked, re-evaluate which items below are
-> still applicable (crane-cli may keep `.github/actions/setup-dotnet/`,
-> `swe-fsharp-dev` agents, and F# skills active).
+> **Decision**: C# and F# artifacts are **retained**. `crane-cli` is active F#; C# is kept for
+> potential dotnet interop. All C#/F# agents, skills, docs, toolchain scripts, and CI detection
+> remain unchanged.
 >
-> Items that remain safe to remove independently (C#-only, no F# dependency):
+> Only two things require action: `infra/dev/ose-app/` files (which still reference the old
+> F#/Giraffe ose-app-be backend — now Rust/Axum) and `open-sharia-enterprise.sln` (which needs
+> crane-cli project references to be useful).
 >
-> - `scripts/format-csharp.sh`
-> - `.claude/agents/swe-csharp-dev.md` + `.opencode/agents/swe-csharp-dev.md`
-> - `.claude/skills/swe-programming-csharp/`
-> - `"*.cs"` entry in `package.json` lint-staged block
-> - C# docs: `docs/explanation/software-engineering/programming-languages/c-sharp/`
+> Items explicitly **kept** (no action needed):
 >
-> Items that must NOT be removed while crane-cli is F#:
->
-> - `.github/actions/setup-dotnet/` (used by crane-cli-integration CI)
-> - `.claude/agents/swe-fsharp-dev.md` + `.opencode/agents/swe-fsharp-dev.md`
-> - `.claude/skills/swe-programming-fsharp/`
-> - F# docs: `docs/explanation/software-engineering/programming-languages/f-sharp/`
-> - `lang:fsharp` detection in `.github/workflows/pr-quality-gate.yml`
+> - `.github/actions/setup-dotnet/` — crane-cli CI dependency
+> - `scripts/format-csharp.sh` — C# tooling retained for dotnet interop
+> - `.claude/agents/swe-csharp-dev.md` + `.opencode/agents/swe-csharp-dev.md` — C# retained
+> - `.claude/agents/swe-fsharp-dev.md` + `.opencode/agents/swe-fsharp-dev.md` — crane-cli is F#
+> - `.claude/skills/swe-programming-csharp/` — C# retained
+> - `.claude/skills/swe-programming-fsharp/` — crane-cli is F#
+> - `docs/explanation/software-engineering/programming-languages/c-sharp/` — C# retained
+> - `docs/explanation/software-engineering/programming-languages/f-sharp/` — crane-cli is F#
+> - `"*.cs"` entry in `package.json` lint-staged — C# retained
+> - `lang:fsharp|lang:csharp` detection in `.github/workflows/pr-quality-gate.yml` — dotnet gate
+>   needed for crane-cli
+> - `setup-dotnet` step in `.github/workflows/crane-cli-integration.yml` — crane-cli CI
+
+### 1a: Update open-sharia-enterprise.sln
+
+- [ ] Run: `dotnet sln open-sharia-enterprise.sln add apps/crane-cli/crane-cli.fsproj
+apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj
+apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj` — exits 0.
+      Verify: `dotnet sln open-sharia-enterprise.sln list` shows all three projects.
+  - _Suggested executor: `swe-fsharp-dev`_
+
+### 1b: Correct ose-app infra to Rust
+
+- [ ] Edit `infra/dev/ose-app/Dockerfile.be.dev` [Repo-grounded]: replace entire file content
+      with the `rust:1.95-slim` pattern matching `infra/dev/organiclever/Dockerfile.be.dev`:
+
+  ```dockerfile
+  FROM rust:1.95-slim
+
+  RUN apt-get update && apt-get install -y pkg-config libssl-dev && rm -rf /var/lib/apt/lists/*
+
+  WORKDIR /workspace
+
+  CMD ["cargo", "run"]
+  ```
+
+  Verify: `grep dotnet infra/dev/ose-app/Dockerfile.be.dev` returns nothing.
+
+- [ ] Edit `infra/dev/ose-app/docker-compose.ci.yml` [Repo-grounded] (line 4): remove the line
+      `ASPNETCORE_URLS: "http://+:8302"`.
+      Verify: `grep ASPNETCORE infra/dev/ose-app/docker-compose.ci.yml` returns nothing.
+
+- [ ] Edit `infra/dev/ose-app/README.md` [Repo-grounded] (line 10): change
+      `F#/Giraffe REST API backend` → `Rust/Axum REST API backend`.
+      Verify: `grep "F#\|Giraffe" infra/dev/ose-app/README.md` returns nothing.
+
+### 1c: Quality gate + commit
+
+- [ ] Run `npm run lint:md` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0
+- [ ] Commit: `chore(cleanup): update ose-app infra to Rust, add crane-cli to solution file`
 
 ---
 
@@ -91,7 +131,7 @@ and
 ### 2c: Quality gate + commit
 
 - [ ] Run `npm run lint:md` — exits 0
-- [ ] Run `npx nx affected -t typecheck lint spec-coverage` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0
 - [ ] Commit: `chore(cleanup): remove JVM (Java/Kotlin) remnants from ose-public`
 
 ---
@@ -169,13 +209,14 @@ and
 ### 3c: Sync OpenCode bindings
 
 - [ ] Run `npm run generate:bindings` — exits 0. Verify:
-      `ls .opencode/agents/ | grep -E "csharp|fsharp|java|kotlin|elixir|clojure|dart|python"`
-      returns nothing.
+      `ls .opencode/agents/ | grep -E "java|kotlin|elixir|clojure|dart|python"`
+      returns nothing. (csharp and fsharp mirrors are retained and will be present — do not
+      include them in this check.)
 
 ### 3d: Quality gate + commit
 
 - [ ] Run `npm run lint:md` — exits 0
-- [ ] Run `npx nx affected -t typecheck lint spec-coverage` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0
 - [ ] Commit: `chore(cleanup): remove ose-primer lang (Elixir/Clojure/Dart/Python) remnants`
 
 ---
@@ -186,27 +227,27 @@ and
 
 - [ ] Edit
       `docs/explanation/software-engineering/programming-languages/README.md`:
-  - Remove **Skills Available** entries for all 8 removed langs
-    (`swe-programming-csharp`, `swe-programming-fsharp`, `swe-programming-java`,
-    `swe-programming-kotlin`, `swe-programming-elixir`, `swe-programming-clojure`,
-    `swe-programming-dart`, `swe-programming-python`)
-  - Remove the 💠 C#, 🔷 F#, ☕ Java, 🟠 Kotlin, 💜 Elixir, 🎯 Dart, 🐍 Python, and
-    🎸 Clojure language sections
-  - Remove C#, F#, Java, Kotlin, Elixir, Clojure, Dart, Python rows from the
-    "Current Language Usage" table
-  - Remove C#, F# from the "Domain-Specific Standards Pattern" example language list
-  - Update the "Quick Decision" table: remove "Complex domain logic with DDD (future) → Java/Kotlin/F#"
-    row or update to reflect active stacks only
+  - Remove **Skills Available** entries for all 6 removed langs
+    (`swe-programming-java`, `swe-programming-kotlin`, `swe-programming-elixir`,
+    `swe-programming-clojure`, `swe-programming-dart`, `swe-programming-python`)
+  - Remove the ☕ Java, 🟠 Kotlin, 💜 Elixir, 🎯 Dart, 🐍 Python, and 🎸 Clojure
+    language sections (C# and F# sections are **retained**)
+  - Remove Java, Kotlin, Elixir, Clojure, Dart, Python rows from the
+    "Current Language Usage" table (C# and F# rows are **retained**)
+  - Update the "Quick Decision" table: remove "Complex domain logic with DDD (future) → Java/Kotlin"
+    row or update to reflect active stacks only (F# row is **retained**)
   - Update "Platform Guidance" bullets to list only active langs
-  - Verify: `grep -iE "c-sharp|f-sharp|java|kotlin|elixir|clojure|dart|python"
+  - Verify: `grep -iE "java|kotlin|elixir|clojure|dart|python"
 docs/explanation/software-engineering/programming-languages/README.md` returns nothing
-    (except cross-links to ose-primer if any are kept)
+    (except cross-links to ose-primer if any are kept; C# and F# references are expected
+    to remain)
   - _Suggested executor: `docs-maker`_
 
 ### 4b: Final AGENTS.md verification
 
-- [ ] Run: `grep -E "swe-(csharp|fsharp|java|kotlin|elixir|clojure|dart|python)-dev" AGENTS.md`
-      — must return nothing. If any remain, remove them.
+- [ ] Run: `grep -E "swe-(java|kotlin|elixir|clojure|dart|python)-dev" AGENTS.md`
+      — must return nothing. If any remain, remove them. (swe-csharp-dev and swe-fsharp-dev
+      are retained and will appear — do not include them in this check.)
 - [ ] Verify active dev agents present: `grep -E "swe-(golang|typescript|rust|e2e)-dev" AGENTS.md`
       — must show results.
 

@@ -3,7 +3,7 @@
 ## Product Overview
 
 A one-time cleanup sweep that removes inactive-tech-stack remnants from `ose-public`. The
-deliverable is a clean repo where only the three active stacks (TypeScript, Go, Rust) have
+deliverable is a clean repo where only active stacks (TypeScript, Go, Rust, F#/C# .NET) have
 agents, skills, CI gates, docs, and toolchain support.
 
 ## Personas
@@ -49,8 +49,8 @@ All artifacts listed in `README.md §Scope Out-of-Scope`.
 ```gherkin
 Given the repo has been cleaned up per this plan
 When I run: ls docs/explanation/software-engineering/programming-languages/
-Then I see only: golang/, rust/, typescript/, README.md
-And no directories for c-sharp, f-sharp, java, kotlin, elixir, clojure, dart, or python
+Then I see only: c-sharp/, f-sharp/, golang/, rust/, typescript/, README.md
+And no directories for java, kotlin, elixir, clojure, dart, or python
 ```
 
 ### Scenario 2: Inactive agent files removed
@@ -58,9 +58,10 @@ And no directories for c-sharp, f-sharp, java, kotlin, elixir, clojure, dart, or
 ```gherkin
 Given the repo has been cleaned up per this plan
 When I run: ls .claude/agents/ | grep swe-
-Then I see only: swe-e2e-dev.md, swe-golang-dev.md, swe-rust-dev.md, swe-typescript-dev.md
-And no swe-csharp-dev, swe-fsharp-dev, swe-java-dev, swe-kotlin-dev,
-    swe-elixir-dev, swe-clojure-dev, swe-dart-dev, or swe-python-dev files
+Then I see only: swe-csharp-dev.md, swe-e2e-dev.md, swe-fsharp-dev.md,
+    swe-golang-dev.md, swe-rust-dev.md, swe-typescript-dev.md
+And no swe-java-dev, swe-kotlin-dev, swe-elixir-dev, swe-clojure-dev,
+    swe-dart-dev, or swe-python-dev files
 ```
 
 ### Scenario 3: Inactive skill directories removed
@@ -68,40 +69,44 @@ And no swe-csharp-dev, swe-fsharp-dev, swe-java-dev, swe-kotlin-dev,
 ```gherkin
 Given the repo has been cleaned up per this plan
 When I run: ls .claude/skills/ | grep swe-programming-
-Then I see only: swe-programming-golang/, swe-programming-rust/, swe-programming-typescript/
-And no swe-programming-csharp, swe-programming-fsharp, swe-programming-java,
-    swe-programming-kotlin, swe-programming-elixir, swe-programming-clojure,
-    swe-programming-dart, or swe-programming-python directories
+Then I see only: swe-programming-csharp/, swe-programming-fsharp/, swe-programming-golang/,
+    swe-programming-rust/, swe-programming-typescript/
+And no swe-programming-java, swe-programming-kotlin, swe-programming-elixir,
+    swe-programming-clojure, swe-programming-dart, or swe-programming-python directories
 ```
 
-### Scenario 4: CI quality gate has no dotnet/JVM/Python/inactive-lang jobs
+### Scenario 4: CI quality gate has no JVM/Python/inactive-lang jobs
 
 ```gherkin
 Given the repo has been cleaned up per this plan
 When I read .github/workflows/pr-quality-gate.yml
-Then there are no jobs named: dotnet, jvm, python
-And there are no detect outputs for: has-dotnet, has-jvm, has-python, has-elixir, has-clojure, has-dart
-And the quality-gate needs list references only: typescript, golang, rust
+Then there are no jobs named: jvm, python
+And there are no detect outputs for: has-jvm, has-python, has-elixir, has-clojure, has-dart
+And the dotnet job is still present (crane-cli is F#)
+And the quality-gate needs list includes: typescript, golang, rust, dotnet
   (plus format, markdown, naming, specs-gate, detect)
 ```
 
-### Scenario 5: .github/actions/setup-dotnet removed
+### Scenario 5: ose-app infra corrected to Rust
 
 ```gherkin
 Given the repo has been cleaned up per this plan
-When I run: ls .github/actions/
-Then setup-dotnet/ is not present
-And crane-cli-integration.yml does not reference setup-dotnet
+When I read infra/dev/ose-app/Dockerfile.be.dev
+Then the base image is rust:1.95-slim (not dotnet SDK)
+And infra/dev/ose-app/docker-compose.ci.yml contains no ASPNETCORE_URLS
+And infra/dev/ose-app/README.md says "Rust/Axum" not "F#/Giraffe"
+And .github/actions/setup-dotnet/ is still present (crane-cli CI dependency)
+And crane-cli-integration.yml still references setup-dotnet
 ```
 
-### Scenario 6: Dotnet toolchain scripts and config removed
+### Scenario 6: Dotnet toolchain retained; .sln updated for crane-cli
 
 ```gherkin
 Given the repo has been cleaned up per this plan
 When I run: ls scripts/ | grep csharp
-Then no results
-And: grep '"*.cs"' package.json returns no results
-And: ls | grep '.sln' returns no results
+Then format-csharp.sh is present (C# tooling retained for dotnet interop)
+And: grep '"*.cs"' package.json returns the entry (retained)
+And: dotnet sln list on open-sharia-enterprise.sln shows crane-cli project references
 ```
 
 ### Scenario 7: ose-app Dockerfile uses Rust image
