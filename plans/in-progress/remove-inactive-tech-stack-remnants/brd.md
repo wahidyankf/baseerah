@@ -11,8 +11,8 @@ TypeScript, Go, and Rust.
 After several migrations — .NET → Rust for `ose-app-be`, F# → Rust for `crane-cli`, and the
 polyglot demo extraction to `ose-primer` — inactive stacks left behind:
 
-- **25+ documentation files** across 8 language directories, describing stacks with no active apps
-- **8 agent files + 8 skill directories** for languages never used by ose-public's production code
+- **124 documentation files** [Repo-grounded] across 8 language directories, describing stacks with no active apps
+- **8 agent files + 8 skill directories** [Repo-grounded] for languages never used by ose-public's production code
 - **CI gate jobs** (dotnet, JVM, Python) that always skip but add workflow complexity
 - **Toolchain scripts and config** (`.sln`, `format-csharp.sh`, lint-staged C# entry)
 - **Broken infra** (`Dockerfile.be.dev` still uses dotnet SDK for an app now on Rust)
@@ -36,9 +36,9 @@ This creates:
 
 - `grep -r "lang:fsharp\|lang:csharp\|lang:java\|lang:kotlin\|lang:elixir\|lang:clojure\|lang:dart\|lang:python" .github/` returns zero results outside of archived/ and plans/done/
 - `ls .claude/agents/ | grep "swe-"` shows only active-stack agents (golang, typescript, rust, e2e)
-- `ls docs/explanation/software-engineering/programming-languages/` shows only: golang, rust, typescript, python (if kept), README.md
-
-Wait — Python: the user confirmed Python is in scope. After cleanup, only golang, rust, typescript.
+- `ls docs/explanation/software-engineering/programming-languages/` shows only: golang/, rust/,
+  typescript/, README.md — and no directory for c-sharp, f-sharp, java, kotlin, elixir, clojure,
+  dart, or python
 
 ## Business Non-Goals
 

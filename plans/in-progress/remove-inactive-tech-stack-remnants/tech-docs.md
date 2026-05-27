@@ -21,7 +21,6 @@ All paths verified [Repo-grounded] via `ls`/`find` at 2026-05-27.
 | `.opencode/agents/swe-fsharp-dev.md`                                   | OpenCode mirror                               |
 | `.claude/skills/swe-programming-csharp/`                               | C# skill directory                            |
 | `.claude/skills/swe-programming-fsharp/`                               | F# skill directory                            |
-| `apps/organiclever-be/generated-contracts/OpenAPI/`                    | Stale F# generated contracts                  |
 
 #### Replace
 
@@ -110,14 +109,15 @@ All paths verified [Repo-grounded] via `ls`/`find` at 2026-05-27.
 | `docs/explanation/software-engineering/programming-languages/README.md` | Remove all sections for the 8 removed langs. Update "Skills Available" list, "Quick Decision" table, "Current Language Usage" table, "Domain-Specific Standards Pattern" example list. Active langs remaining: Go, Rust, TypeScript. |
 | `AGENTS.md`                                                             | Final pass — confirm all 8 removed agents are gone from **Development** list. Update skill references in the AI Agents section if any.                                                                                               |
 
-#### Run after all agent deletions
+#### Run generate:bindings (two calls — see D2)
 
 ```bash
 npm run generate:bindings
 ```
 
-This syncs `.opencode/agents/` from `.claude/agents/`. Run once after Phase 3 deletions to catch
-all 8 agent removals in one pass (rather than after each phase).
+This syncs `.opencode/agents/` from `.claude/agents/`. Run after Phase 1 deletions to validate
+dotnet agent removal, and again after Phase 3 deletions to catch all remaining removals in one
+pass.
 
 ## Design Decisions
 
@@ -128,11 +128,14 @@ instructions (the docker-compose `volumes` mount mounts the workspace at `/works
 ose-app-be docker-compose uses the same volumes pattern, so the same minimal Dockerfile works.
 [Repo-grounded]
 
-### D2: One generate:bindings call after Phase 3
+### D2: Two generate:bindings calls — Phase 1d and Phase 3c
 
-Running `npm run generate:bindings` once after all agent deletions (end of Phase 3) is more
-efficient than running it after each phase. Pre-push hook validates agent parity anyway.
-[Repo-grounded — pre-commit hook handles parity validation per `.husky/pre-commit`]
+Phase 1d runs `npm run generate:bindings` as a parity-validation check after manual C#/F# agent
+deletion. Phase 3c runs it as the authoritative sync after all 8 agent deletions. Running it
+twice is intentional: Phase 1d catches any sync gap early (immediately after the highest-volume
+deletion), while Phase 3c provides the definitive verification that all 8 inactive agents are
+removed from `.opencode/agents/`. [Judgment call — generate:bindings in Phase 3c provides
+explicit verification regardless of pre-commit hook behavior]
 
 ### D3: TypeScript exclusion list in pr-quality-gate.yml
 

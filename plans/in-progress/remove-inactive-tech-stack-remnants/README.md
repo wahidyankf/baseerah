@@ -29,7 +29,6 @@ remain in the repo, creating noise, longer CI runtimes, and confusing signals fo
 - Delete `open-sharia-enterprise.sln`
 - Delete `scripts/format-csharp.sh`
 - Remove `"*.cs"` entry from `package.json` lint-staged
-- Remove F# generated contracts from `apps/organiclever-be/generated-contracts/OpenAPI/`
 - Replace `infra/dev/ose-app/Dockerfile.be.dev` dotnet image with Rust equivalent
 - Remove `ASPNETCORE_URLS` from `infra/dev/ose-app/docker-compose.ci.yml`
 - Remove `setup-dotnet` step from `.github/workflows/crane-cli-integration.yml`

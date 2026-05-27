@@ -22,10 +22,11 @@ and
       `worktrees/remove-inactive-tech-stack-remnants/` in repo root)
 - [ ] Initialize toolchain: `npm install && npm run doctor -- --fix` — exits 0, all tools
       present
-- [ ] Verify baseline tests pass: `npx nx affected -t typecheck lint test:quick` — exits 0
-      before any changes
+- [ ] Verify baseline tests pass: `npx nx affected -t typecheck lint test:quick spec-coverage` —
+      exits 0 before any changes
 - [ ] Verify markdown clean: `npm run lint:md` — exits 0 before any changes
-- [ ] Fix any preexisting failures before proceeding (root cause, not bypass)
+- [ ] Fix ALL failures found during quality gates — not just those caused by your changes.
+      Follow root cause orientation: fix properly, never bypass or suppress.
 
 ---
 
@@ -42,8 +43,6 @@ and
       — directory gone
 - [ ] Delete F# docs: `rm -rf docs/explanation/software-engineering/programming-languages/f-sharp/`
       — directory gone
-- [ ] Delete F# generated contracts:
-      `rm -rf apps/organiclever-be/generated-contracts/OpenAPI/` — directory gone
 - [ ] Delete `.claude/agents/swe-csharp-dev.md` and `.opencode/agents/swe-csharp-dev.md`:
       `rm .claude/agents/swe-csharp-dev.md .opencode/agents/swe-csharp-dev.md` — both gone
 - [ ] Delete `.claude/agents/swe-fsharp-dev.md` and `.opencode/agents/swe-fsharp-dev.md`:
@@ -93,7 +92,7 @@ and
 ### 1d: Quality gate + commit
 
 - [ ] Run `npm run lint:md` — exits 0 (no broken links from removed C#/F# doc dirs)
-- [ ] Run `npx nx affected -t typecheck lint` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint spec-coverage` — exits 0
 - [ ] Run `npm run generate:bindings` — exits 0; `.opencode/agents/` no longer has
       `swe-csharp-dev.md` or `swe-fsharp-dev.md` (already deleted manually in 1a; this
       validates sync state)
@@ -136,7 +135,7 @@ and
 ### 2c: Quality gate + commit
 
 - [ ] Run `npm run lint:md` — exits 0
-- [ ] Run `npx nx affected -t typecheck lint` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint spec-coverage` — exits 0
 - [ ] Commit: `chore(cleanup): remove JVM (Java/Kotlin) remnants from ose-public`
 
 ---
@@ -220,7 +219,7 @@ and
 ### 3d: Quality gate + commit
 
 - [ ] Run `npm run lint:md` — exits 0
-- [ ] Run `npx nx affected -t typecheck lint` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint spec-coverage` — exits 0
 - [ ] Commit: `chore(cleanup): remove ose-primer lang (Elixir/Clojure/Dart/Python) remnants`
 
 ---
@@ -263,9 +262,18 @@ docs/explanation/software-engineering/programming-languages/README.md` returns n
 
 ### 4d: Quality gate + commit
 
-- [ ] Run `npx nx affected -t typecheck lint test:quick` — exits 0
+- [ ] Run `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0
 - [ ] Run `npm run lint:md` — exits 0
 - [ ] Commit: `chore(cleanup): rewrite programming-languages README, final cross-cutting cleanup`
+
+---
+
+### Commit Guidelines
+
+- Commit changes thematically — each cleanup phase gets its own commit
+- Follow Conventional Commits format: `<type>(<scope>): <description>` (imperative mood, no period)
+- Do NOT bundle multiple phases into a single commit
+- If quality gate fixes span multiple concerns, split into separate commits per concern
 
 ---
 
