@@ -8,7 +8,7 @@ dist/
 build/
 *.tsbuildinfo
 .next/
-out/
+apps/*/out/
 cover.out
 coverage.html
 /static/
