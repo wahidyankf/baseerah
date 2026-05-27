@@ -1,6 +1,22 @@
 version: 2
 app: ose-app
 contexts:
+  - name: health
+    summary: >-
+      Liveness endpoint — advertises service health to orchestrators and
+      monitoring systems. Stateless, no DB dependency.
+    layers:
+      - domain
+      - application
+      - infrastructure
+      - api
+    code:
+      - apps/ose-app-be/src/contexts/health
+    code_lang:
+      - rs
+    glossary: specs/apps/ose-app/ddd/ubiquitous-language/health.md
+    gherkin: specs/apps/ose-app/behavior/be/gherkin/health
+
   - name: regulatory-source
     summary: >-
       Ingests and stores regulator-published rule documents (PDFs, circulars)
@@ -10,10 +26,11 @@ contexts:
       - domain
       - application
       - infrastructure
+      - api
     code:
-      - apps/ose-app-be/src/OseAppBe/contexts/regulatory-source
+      - apps/ose-app-be/src/contexts/regulatory-source
     code_lang:
-      - fs
+      - rs
     glossary: specs/apps/ose-app/ddd/ubiquitous-language/regulatory-source.md
     gherkin: specs/apps/ose-app/behavior/be/gherkin/regulatory-source
     relationships:
@@ -30,10 +47,11 @@ contexts:
       - domain
       - application
       - infrastructure
+      - api
     code:
-      - apps/ose-app-be/src/OseAppBe/contexts/internal-policy
+      - apps/ose-app-be/src/contexts/internal-policy
     code_lang:
-      - fs
+      - rs
     glossary: specs/apps/ose-app/ddd/ubiquitous-language/internal-policy.md
     gherkin: specs/apps/ose-app/behavior/be/gherkin/internal-policy
     relationships:
@@ -50,11 +68,11 @@ contexts:
       - domain
       - application
       - infrastructure
-      - presentation
+      - api
     code:
-      - apps/ose-app-be/src/OseAppBe/contexts/gap-analysis
+      - apps/ose-app-be/src/contexts/gap-analysis
     code_lang:
-      - fs
+      - rs
     glossary: specs/apps/ose-app/ddd/ubiquitous-language/gap-analysis.md
     gherkin: specs/apps/ose-app/behavior/be/gherkin/gap-analysis
     relationships:
@@ -77,10 +95,11 @@ contexts:
       - domain
       - application
       - infrastructure
+      - api
     code:
-      - apps/ose-app-be/src/OseAppBe/contexts/ai-orchestration
+      - apps/ose-app-be/src/contexts/ai-orchestration
     code_lang:
-      - fs
+      - rs
     glossary: specs/apps/ose-app/ddd/ubiquitous-language/ai-orchestration.md
     gherkin: specs/apps/ose-app/behavior/be/gherkin/ai-orchestration
     relationships:
