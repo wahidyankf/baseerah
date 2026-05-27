@@ -1,5 +1,24 @@
 # Delivery Checklist
 
+**Status: COMPLETED — 2026-05-27**
+
+All phases executed. Key outcomes:
+
+- 116 xUnit tests, 96.24% line coverage (threshold: 95%), 100% method coverage
+- spec-coverage: 12 specs, 37 scenarios, 141 steps — all covered
+- typecheck: 0 errors, lint: 0 warnings
+- CLI verified: `crane --help`, `crane --version`, all 11 subcommands
+- Pushed to `origin/main`; crane-cli-integration CI triggered
+
+Commits (in push order):
+
+- `48450ab0a` — scaffold fix: stub step defs + graceful Suite fallback
+- `a50d30ea5` — Core/Domain types + Ports module (Phase 2)
+- `ab3361860` — gitignore fix: `out/` → `apps/*/out/`
+- `1c2f60cb0` — integration Suite.fs no-op placeholder
+- `e941bdef3` — F# hex architecture phases 2-6 (all logic + adapters + CLI + tests)
+- `c09f80e4d` — FSharpLint config for Argu underscore DU names
+
 ## Worktree
 
 Worktree path: `worktrees/rewrite-crane-cli-fsharp/`
