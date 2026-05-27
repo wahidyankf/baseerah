@@ -363,13 +363,24 @@ docs/explanation/software-engineering/programming-languages/README.md` returns n
 
 ## Phase 5: Post-Push CI Verification
 
-- [ ] Push to `origin main`: `git push origin main`
-- [ ] Monitor GitHub Actions: `gh run list --limit 5` — check status every 3 minutes
-- [ ] Verify `PR - Quality Gate` workflow (if triggered) completes with success or skip for
+- [x] Push to `origin main`: `git push origin main`
+  - **Date**: 2026-05-27
+  - **Status**: Completed — pushed successfully
+- [x] Monitor GitHub Actions: `gh run list --limit 5` — check status every 3 minutes
+  - **Date**: 2026-05-27
+  - **Status**: Completed — no new CI runs triggered by this push (all workflows are scheduled or
+    PR-only; `crane-cli-integration` only triggers on `apps/crane-cli/**` changes)
+- [x] Verify `PR - Quality Gate` workflow (if triggered) completes with success or skip for
       all jobs — particularly confirm no `dotnet`, `jvm`, `python` jobs appear
-- [ ] Verify `crane-cli-integration` workflow (if triggered) completes without setup-dotnet
+  - **Date**: 2026-05-27
+  - **Status**: N/A — direct push to main, PR Quality Gate only triggers on PRs
+- [x] Verify `crane-cli-integration` workflow (if triggered) completes without setup-dotnet
       errors
-- [ ] If any CI job fails: diagnose root cause, fix, push follow-up commit, re-monitor
+  - **Date**: 2026-05-27
+  - **Status**: N/A — not triggered (no crane-cli source changes)
+- [x] If any CI job fails: diagnose root cause, fix, push follow-up commit, re-monitor
+  - **Date**: 2026-05-27
+  - **Status**: N/A — no failures from this push
 
 ---
 

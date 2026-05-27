@@ -4,10 +4,10 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                                   | Description                                                                                                                                                          |
-| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [remove-inactive-tech-stack-remnants](./remove-inactive-tech-stack-remnants/README.md) | Remove docs, agents, skills, CI gates, and toolchain artifacts for F#, C#, Java, Kotlin, Elixir, Clojure, Dart, Python — stacks no longer active in ose-public       |
-| [rewrite-crane-cli-fsharp](./rewrite-crane-cli-fsharp/README.md)                       | Rewrite `apps/crane-cli/` from Rust to F# with strict hexagonal (ports-and-adapters) architecture; Impureim Sandwich pattern; TickSpec 2.0.5 + xUnit 2.9.2 BDD tests |
+| Plan | Description |
+| ---- | ----------- |
+
+_(No active plans — all plans completed or in backlog)_
 
 ## Instructions
 
