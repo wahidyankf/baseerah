@@ -1,7 +1,6 @@
 services:
   ose-app-be:
-    environment:
-      ASPNETCORE_URLS: "http://+:8302"
+    environment: {}
 
   ose-app-web:
     environment:

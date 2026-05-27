@@ -4,11 +4,11 @@ Docker Compose setup for running the full OSE Application stack locally.
 
 ## Services
 
-| Service     | Port | Description                 |
-| ----------- | ---- | --------------------------- |
-| postgres    | 5432 | PostgreSQL 17 database      |
-| ose-app-be  | 8302 | F#/Giraffe REST API backend |
-| ose-app-web | 3300 | Next.js 16 frontend         |
+| Service     | Port | Description                |
+| ----------- | ---- | -------------------------- |
+| postgres    | 5432 | PostgreSQL 17 database     |
+| ose-app-be  | 8302 | Rust/Axum REST API backend |
+| ose-app-web | 3300 | Next.js 16 frontend        |
 
 ## Quick Start
 
