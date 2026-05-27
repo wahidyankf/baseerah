@@ -134,7 +134,7 @@ When using an abbreviation, update this table so the mapping remains documented 
 
 ### Language/framework identifiers in parentheses
 
-The pattern `(Language/Framework)` in a name maps to `language-framework` in the filename: parentheses are removed, the `/` is removed, a hyphen separates language from framework, and the whole segment is lowercased. For example, `(F#/Giraffe)` → `fsharp-giraffe`.
+The pattern `(Language/Framework)` in a name maps to `language-framework` in the filename: parentheses are removed, the `/` is removed, a hyphen separates language from framework, and the whole segment is lowercased. For example, `(Rust/Axum)` → `rust-axum`.
 
 ### Version Alignment Policy
 

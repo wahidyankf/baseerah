@@ -108,15 +108,27 @@ The platform consists of the following applications across its technology stacks
 
 #### organiclever-be
 
-- **Purpose**: REST API backend for OrganicLever (F#/Giraffe implementation)
-- **Technology**: F# + Giraffe + .NET
+- **Purpose**: REST API backend for OrganicLever (Rust/Axum implementation)
+- **Technology**: Rust + Axum (edition 2024, rust-version 1.88)
 - **Build Command**: `nx build organiclever-be`
 - **Dev Command**: `nx dev organiclever-be`
 - **Location**: `apps/organiclever-be/`
 - **Features**:
-  - AltCover code coverage enforcement (>=90%)
+  - cargo-llvm-cov code coverage enforcement (>=90%)
   - Production Dockerfile with multi-stage build
   - OpenAPI 3.1 contract-first development
+
+#### ose-app-be
+
+- **Purpose**: REST API backend for OSE Application platform (api.oseplatform.com)
+- **Technology**: Rust + Axum (edition 2024, rust-version 1.88)
+- **Build Command**: `nx build ose-app-be`
+- **Dev Command**: `nx dev ose-app-be`
+- **Location**: `apps/ose-app-be/`
+- **Features**:
+  - cargo-llvm-cov code coverage enforcement (>=90%)
+  - Hexagonal DDD architecture with 5 bounded contexts
+  - OpenAPI 3.1 contract-first development (planned)
 
 ### E2E Test Suites (Playwright)
 

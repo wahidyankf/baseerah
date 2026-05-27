@@ -40,7 +40,7 @@ Partial lines count as NOT covered.
 | Format       | Detection                                                                | Used By             |
 | ------------ | ------------------------------------------------------------------------ | ------------------- |
 | Go cover.out | Default (no other match)                                                 | Go projects         |
-| LCOV (.info) | Filename ends in `.info` or contains `lcov`                              | TypeScript, F#      |
+| LCOV (.info) | Filename ends in `.info` or contains `lcov`                              | TypeScript, Rust    |
 | JaCoCo XML   | Filename ends in `.xml` containing `jacoco`, or XML with `<report>` root | (none in this repo) |
 
 ## Thresholds
@@ -81,14 +81,15 @@ Partial lines count as NOT covered.
 | ose-web          | 80%       | None       |
 | wahidyankf-web   | 80%       | None       |
 
-### F# Projects
+### Rust Projects
 
-**Tool**: AltCover with `--linecover`
-**Format**: LCOV at `coverage/altcov.info`
+**Tool**: cargo-llvm-cov with `--test unit --ignore-filename-regex 'main\.rs'`
+**Format**: LCOV via `rhino-cli test-coverage validate`
 
-| Project         | Threshold | Notes                                                                                                |
-| --------------- | --------- | ---------------------------------------------------------------------------------------------------- |
-| organiclever-be | 90%       | Uses AltCover instead of XPlat Code Coverage to avoid F# `task{}` async state machine BRDA inflation |
+| Project         | Threshold | Notes                                              |
+| --------------- | --------- | -------------------------------------------------- |
+| organiclever-be | 90%       | Line coverage via cargo-llvm-cov                   |
+| ose-app-be      | 90%       | Line coverage via cargo-llvm-cov; main.rs excluded |
 
 ## CI Integration
 

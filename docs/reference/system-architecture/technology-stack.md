@@ -27,13 +27,13 @@ Technology stack summary, quality tools, and future architecture considerations 
 
 ### Backend
 
-**REST API** (F#/Giraffe):
+**REST API** (Rust/Axum):
 
-- **Framework**: Giraffe
-- **Language**: F#
-- **Build**: .NET
-- **Testing**: AltCover (>=90% coverage)
-- **Applications**: organiclever-be
+- **Framework**: Axum
+- **Language**: Rust (edition 2024, rust-version 1.88)
+- **Build**: Cargo via Nx
+- **Testing**: cargo-llvm-cov (>=90% coverage)
+- **Applications**: organiclever-be, ose-app-be
 
 ### CLI Tools
 
@@ -49,7 +49,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **Language**: Rust (edition 2024, rust-version 1.88)
 - **Build**: Cargo via Nx
 - **Distribution**: Local binaries
-- **Applications**: rhino-cli (Repository Hygiene & INtegration Orchestrator)
+- **Applications**: rhino-cli (Repository Hygiene & INtegration Orchestrator), crane-cli (Content Retrieval And Normalization Engine)
 
 ### Infrastructure
 

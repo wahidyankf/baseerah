@@ -538,62 +538,15 @@ nx lint organiclever-be
 cargo clippy --manifest-path apps/ayokoding-cli/Cargo.toml --all-targets -- -D warnings
 ```
 
-## Elixir Formatting
-
-**Purpose**: Auto-format Elixir source files to maintain consistent style across the three Elixir
-projects: `apps/organiclever-be-exph`, `libs/elixir-gherkin`, and `libs/elixir-cabbage`.
-
-**Tool**: `mix format`
-
-**Why a Separate Hook Step (Not lint-staged)**:
-
-`organiclever-be-exph`'s `.formatter.exs` uses `import_deps: [:ecto, :ecto_sql, :phoenix]`, which
-loads `locals_without_parens` rules from those dependencies (e.g. Phoenix route macros, Ecto schema
-macros). `mix format` must run from the project root where `mix.exs` and `_build/` are present.
-Running from the repository root (no `mix.exs`) would silently apply incorrect formatting —
-removing parentheses that Phoenix/Ecto expect to be omitted.
-
-lint-staged changes the working directory per file glob, which breaks the project-root requirement.
-A dedicated hook step groups staged files by their nearest Mix project root and runs `mix format`
-from each one.
-
-**Implementation**: `apps/rhino-cli/src/` (`step6_elixir_format`). The logic runs as part of `rhino-cli git pre-commit` (step 6).
-
-**How It Works**:
-
-1. Collect staged `.ex`/`.exs` files (excluding `deps/` and `_build/`)
-2. If none staged: skip with message
-3. If `mix` not installed: skip with warning (graceful degradation)
-4. Walk up from each file's directory to find the nearest `mix.exs` (the project root)
-5. For each unique project root, run `mix format <relative-file-paths>`
-6. Re-stage all formatted files
-
-**Configuration**: Each project's `.formatter.exs` governs formatting rules — no global config.
-
-**Manual Formatting**:
-
-```bash
-# From a project root (e.g. apps/organiclever-be-exph)
-mix format
-
-# Format specific file
-mix format lib/my_module.ex
-```
-
 ## Language-Specific Auto-Formatters
 
-In addition to Prettier (JS/TS/JSON/YAML/CSS/MD) and `mix format` (Elixir), the following
-language-specific formatters run automatically as part of the pre-commit hook or CI pipeline:
+The following language-specific formatters run automatically as part of the pre-commit hook or CI pipeline:
 
-| Language | Tool            | Trigger                                 |
-| -------- | --------------- | --------------------------------------- |
-| Go       | `gofmt`         | Pre-commit (lint-staged)                |
-| Elixir   | `mix format`    | Pre-commit (step 6, project-root aware) |
-| Python   | `ruff format`   | Pre-commit (lint-staged)                |
-| Rust     | `rustfmt`       | Pre-commit (lint-staged)                |
-| C#       | `dotnet format` | Pre-commit (lint-staged)                |
-| Clojure  | `cljfmt`        | Pre-commit (lint-staged)                |
-| Dart     | `dart format`   | Pre-commit (lint-staged)                |
+| Language | Tool          | Trigger                  |
+| -------- | ------------- | ------------------------ |
+| Go       | `gofmt`       | Pre-commit (lint-staged) |
+| Python   | `ruff format` | Pre-commit (lint-staged) |
+| Rust     | `rustfmt`     | Pre-commit (lint-staged) |
 
 Each formatter uses its language's standard style conventions. No custom configuration is applied
 unless a project-specific config file exists (e.g., `rustfmt.toml`, `pyproject.toml`).

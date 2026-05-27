@@ -88,7 +88,8 @@ Each backend uses the idiomatic migration tool for its language and framework ec
 
 | App             | Migration Tool | License |
 | --------------- | -------------- | ------- |
-| organiclever-be | DbUp (F#)      | MIT     |
+| organiclever-be | SQLx migrate   | MIT     |
+| ose-app-be      | SQLx migrate   | MIT     |
 
 > For polyglot migration tool patterns (Liquibase, Ecto, Alembic, goose, Flyway, EF Core, Migratus, @effect/sql, SQLx, Drizzle), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -400,12 +401,10 @@ replaced) and replicate its types exactly.
 
 ### Coverage tool configuration
 
-When adding new NuGet packages (DbUp), Go modules (goose), or Python packages (Alembic):
+When adding new Cargo crates (SQLx migrate), Go modules (goose), or Python packages (Alembic):
 
-- **AltCover (.NET)**: Third-party assemblies with source-link debug symbols inflate coverage.
-  Add the package name to `--assemblyFilter` (case-sensitive — `dbup`, not `DbUp`).
-- **Coverlet (.NET)**: EF Core generated migration files (`Migrations/*.cs`) inflate the
-  denominator. Add `**/Migrations/**/*.cs` to `ExcludeByFile` in `.runsettings`.
+- **cargo-llvm-cov (Rust)**: Migration SQL files do not inflate coverage. Ensure `migrations/`
+  is listed in Nx `inputs` so cache invalidates when migration files change.
 - **Nx inputs**: For Go apps using `embed.FS`, add the migrations directory to `inputs` in
   `project.json` so Nx cache invalidates when migration files change.
 
@@ -424,11 +423,11 @@ thousands separator (e.g., `id_ID`), `50.5` parses as `505.0`. Fix by adding
 
 ### Docker environment differences
 
-Integration tests (built inside `Dockerfile.integration`) and E2E tests (`dotnet run` / `uv run`
+Integration tests (built inside `Dockerfile.integration`) and E2E tests (`cargo run` / `uv run`
 with volume mount) may behave differently:
 
-- **Embedded resources**: `dotnet run` recompiles with embedded resources from volume mount. Verify
-  `.fsproj` / `.csproj` includes `<EmbeddedResource>` globs correctly.
+- **Rust migrations**: SQLx `sqlx::migrate!` embeds migration SQL at compile time. When using
+  volume mounts, ensure `migrations/` is present in the container build context.
 - **Go version**: Keep `Dockerfile`, `Dockerfile.integration`, AND `Dockerfile.be.dev` in sync with
   `go.mod`'s Go version requirement.
 - **Python Alembic**: The `Dockerfile.integration` needs explicit `COPY alembic/ alembic/` and

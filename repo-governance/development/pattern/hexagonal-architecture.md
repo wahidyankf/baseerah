@@ -100,7 +100,7 @@ frameworks, databases, or network libraries. It must compile and run in isolatio
 
 **Forbidden:**
 
-- Framework imports (Axum, Giraffe, Next.js, Clap, Tokio I/O)
+- Framework imports (Axum, Next.js, Clap, Tokio I/O)
 - Database imports (SQLx, Diesel, Entity Framework, Dapper)
 - HTTP client imports
 - Logging frameworks (use return values or domain events instead)
@@ -187,7 +187,7 @@ idioms:
 
 - **[CLI Apps](./hexagonal-architecture-cli.md)** — `commands/` as inbound adapter; Rust and Go CLIs
 - **[Web Apps](./hexagonal-architecture-web.md)** — `contexts/<name>/` feature modules; Next.js with Effect.ts
-- **[Backend Apps](./hexagonal-architecture-be.md)** — DDD bounded contexts + hexagonal layers; Rust/Axum and F#/Giraffe
+- **[Backend Apps](./hexagonal-architecture-be.md)** — DDD bounded contexts + hexagonal layers; Rust/Axum
 
 ## Related
 

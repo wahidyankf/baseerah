@@ -32,8 +32,8 @@ but they all share the same Nx build system and git hooks.
 
 - **Minimal** — Node.js + Go + Docker + jq. Covers git hooks, TypeScript/Go projects, and
   basic E2E tests.
-- **Full** — All tools checked by doctor. Required if you also work on `organiclever-be`
-  (F#/Giraffe) which needs the .NET SDK.
+- **Full** — All tools checked by doctor. Required for working on Rust backend apps
+  (`organiclever-be`, `ose-app-be`) and Go CLI tools.
 - **Automated** — Run `npm run doctor -- --fix` to auto-install missing tools. Use
   `npm run doctor -- --fix --dry-run` to preview what would be installed.
 

@@ -32,7 +32,7 @@
   - `organiclever-web-e2e` — Playwright FE E2E tests for organiclever-web
   - `organiclever-be-e2e` — Playwright BE E2E tests for organiclever-be
   - `organiclever-contracts` — OpenAPI 3.1 API contract spec (in `specs/apps/organiclever/containers/contracts/`); generates types + encoders/decoders for organiclever apps via `codegen` Nx target
-  - `ose-app-be` — F#/Giraffe REST API backend for OSE Application platform (api.oseplatform.com)
+  - `ose-app-be` — Rust/Axum REST API backend for OSE Application platform (api.oseplatform.com)
   - `ose-app-be-e2e` — Playwright BE E2E tests for ose-app-be
   - `ose-app-web` — Next.js 16 OSE Application frontend (app.oseplatform.com)
   - `ose-app-web-e2e` — Playwright FE E2E tests for ose-app-web
@@ -60,7 +60,7 @@ ose-public/
 │   ├── organiclever-be/      # OrganicLever Rust/Axum REST API backend
 │   ├── organiclever-web-e2e/ # Playwright FE E2E tests for organiclever-web
 │   ├── organiclever-be-e2e/  # Playwright BE E2E tests for organiclever-be
-│   ├── ose-app-be/               # OSE Application F#/Giraffe REST API (api.oseplatform.com)
+│   ├── ose-app-be/               # OSE Application Rust/Axum REST API (api.oseplatform.com)
 │   ├── ose-app-be-e2e/           # Playwright BE E2E tests for ose-app-be
 │   ├── ose-app-web/              # OSE Application Next.js 16 frontend (app.oseplatform.com, port 3300)
 │   ├── ose-app-web-e2e/          # Playwright FE E2E tests for ose-app-web

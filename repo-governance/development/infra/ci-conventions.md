@@ -78,7 +78,6 @@ order:
 | ------------------------------------------------- | --------------- |
 | JavaScript, TypeScript, JSON, YAML, CSS, Markdown | Prettier        |
 | Go                                                | `gofmt`         |
-| F#                                                | `fantomas`      |
 | Elixir                                            | `mix format`    |
 | Python                                            | `ruff format`   |
 | Rust                                              | `rustfmt`       |

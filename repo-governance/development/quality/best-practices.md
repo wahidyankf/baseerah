@@ -293,11 +293,8 @@ context (e.g. Go, Elixir), use dedicated hook steps rather than lint-staged.
 # gofmt: no project context required, safe in lint-staged or hook
 gofmt -w staged_go_files
 
-# mix format: MUST run from project root (import_deps in .formatter.exs)
-# Groups staged .ex/.exs files by Mix project root and runs mix format per root
-for project_dir in $project_roots; do
-  (cd "$project_dir" && mix format $project_files)
-done
+# rustfmt: safe in lint-staged (no project context required)
+rustfmt staged_rs_files
 ```
 
 **Bad Example:**
@@ -306,17 +303,15 @@ done
 # Format entire repo on every commit (DO NOT DO THIS)
 prettier --write .  # SLOW!
 
-# Running mix format from repo root (DO NOT DO THIS)
-# Silently applies wrong formatting — import_deps rules are missing
-mix format apps/organiclever-be-exph/lib/my_module.ex
+# Running cargo fmt from repo root without --manifest-path (DO NOT DO THIS)
+# Formats entire workspace, not just staged files
+cargo fmt
 ```
 
 **Rationale:**
 
 - Fast pre-commit hooks — only affects changed files
-- Language-native formatters (gofmt, mix format) enforce language-specific style
-- `mix format` requires project root for `import_deps` (Phoenix/Ecto macros); running from repo
-  root silently strips required parentheses for route/schema macros
+- Language-native formatters (gofmt, rustfmt) enforce language-specific style
 - Gradual quality improvement; developer-friendly
 
 ### Practice 9: Document Validation Rules and Rationale

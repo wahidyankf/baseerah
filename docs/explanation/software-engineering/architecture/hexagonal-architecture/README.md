@@ -27,7 +27,7 @@ All hexagonal architecture implementations in OSE Platform MUST comply with the 
 - **[Hexagonal Architecture By Example in FP](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-fp-by-example/overview.md)** — Ports as function type aliases, adapters as record literals, partial application DI
 - **[Hexagonal Architecture By Example in OOP](../../../../../apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-oop-by-example/overview.md)** — Ports as interfaces, adapters as implementing classes, constructor DI
 
-**What this documentation covers**: OSE Platform-specific port naming, adapter package placement, composition root wiring in Spring Boot and F#/Giraffe, Nx target integration, OrganicLever bounded context wiring, and hexagonal-specific testing conventions.
+**What this documentation covers**: OSE Platform-specific port naming, adapter package placement, composition root wiring in Rust/Axum, Nx target integration, OrganicLever bounded context wiring, and hexagonal-specific testing conventions.
 
 **What this documentation does NOT cover**: hexagonal architecture concepts, port/adapter theory, general DI patterns (those are in ayokoding-web).
 
@@ -39,7 +39,7 @@ All hexagonal architecture implementations in OSE Platform MUST comply with the 
 
 1. **[Port Standards](./port-standards.md)** — Port (interface) naming, ownership, package placement, and OrganicLever port catalog
 2. **[Adapter Standards](./adapter-standards.md)** — Adapter (implementation) naming, package placement, forbidden imports, and polyglot conventions
-3. **[Composition Root Standards](./composition-root-standards.md)** — DI wiring conventions for Spring Boot (Java) and Giraffe (F#), Nx-aware startup
+3. **[Composition Root Standards](./composition-root-standards.md)** — DI wiring conventions for Rust/Axum, Nx-aware startup
 4. **[Testing Standards](./testing-standards.md)** — Port contract tests, in-memory adapter swap, integration boundary rules, Nx target mapping
 
 ## OrganicLever Bounded Context Overview

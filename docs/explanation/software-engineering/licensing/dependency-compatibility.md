@@ -36,13 +36,13 @@ scoped to FSL-1.1-MIT; now MIT throughout.
 | `ayokoding-web`    | npm       | All permissive after LGPL removal (see below) |
 | `ose-web`          | npm       | All permissive after LGPL removal (see below) |
 | `organiclever-web` | npm       | All permissive after LGPL removal (see below) |
-| `organiclever-be`  | .NET/F#   | All permissive (MIT, Apache-2.0, PostgreSQL)  |
+| `organiclever-be`  | Rust      | All permissive (MIT, Apache-2.0, PostgreSQL)  |
+| `ose-app-be`       | Rust      | All permissive (MIT, Apache-2.0, PostgreSQL)  |
+| `crane-cli`        | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
 | `rhino-cli`        | Rust      | MIT (Cargo dependencies — all permissive)     |
 | `ayokoding-cli`    | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
 | `ose-cli`          | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
 | `rust-commons`     | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
-| `elixir-cabbage`   | Elixir    | All permissive (MIT, Apache-2.0)              |
-| `elixir-gherkin`   | Elixir    | All permissive (MIT, Apache-2.0)              |
 
 ## LGPL-3.0 Elimination: `@img/sharp-libvips`
 

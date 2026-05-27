@@ -1,6 +1,6 @@
 ---
 title: Hexagonal Architecture + DDD — Backend Apps
-description: Hexagonal architecture with DDD bounded contexts for backend apps — Rust/Axum and F#/Giraffe directory layouts, language-specific idioms, and inter-context isolation rules
+description: Hexagonal architecture with DDD bounded contexts for backend apps — Rust/Axum directory layouts, language-specific idioms, and inter-context isolation rules
 category: explanation
 subcategory: development
 tags:
@@ -8,7 +8,6 @@ tags:
   - hexagonal
   - ddd
   - rust
-  - fsharp
   - backend
 created: 2026-05-26
 ---
@@ -77,32 +76,6 @@ src/
 | Infrastructure  | `contexts/<n>/infrastructure/`    | `SqlxTaskRepository`, external HTTP clients                   |
 | Inbound adapter | `contexts/<n>/api/http/`          | Axum handlers, `From<DomainError> for ApiError`, request DTOs |
 | Shared infra    | `contexts/shared/infrastructure/` | DB pool, migration runner, shared middleware                  |
-
-### F#/Giraffe — `ose-app-be`
-
-F# uses Pascal-case for modules and directories, matching F# idiomatic style.
-
-```
-src/
-├── Contexts/
-│   ├── <Name>/
-│   │   ├── Domain/            # Types first — F# compilation order requires this
-│   │   ├── Application/       # Use-cases, port interfaces
-│   │   ├── Infrastructure/    # Outbound adapter implementations
-│   │   └── Api/
-│   │       └── Http/          # Giraffe handlers, DTO types, error mapping
-│   └── Shared/
-│       └── Infrastructure/    # AppDbContext, Migrations, shared middleware
-└── Program.fs                 # Composition root — last in compilation order
-```
-
-| Layer           | Path                              | Contents                                                  |
-| --------------- | --------------------------------- | --------------------------------------------------------- |
-| Domain          | `Contexts/<N>/Domain/`            | Record types, discriminated unions, pure validation       |
-| Application     | `Contexts/<N>/Application/`       | Use-case functions, port interfaces                       |
-| Infrastructure  | `Contexts/<N>/Infrastructure/`    | EF Core / Dapper repositories, HTTP clients               |
-| Inbound adapter | `Contexts/<N>/Api/Http/`          | Giraffe `HttpHandler` functions, DTO types, error mapping |
-| Shared infra    | `Contexts/Shared/Infrastructure/` | `AppDbContext`, `Migrations/`, shared helpers             |
 
 ## Rust-Specific
 
@@ -177,55 +150,6 @@ impl IntoResponse for ApiError {
 }
 ```
 
-## F#-Specific
-
-### Compilation Order Constraint
-
-F# compiles files in the order they appear in the `.fsproj` file. Domain types must appear before Application, which
-must appear before Infrastructure, which must appear before Api/Http. `Program.fs` is always last.
-
-```xml
-<!-- ose-app-be.fsproj — compilation order (domain types first) -->
-<Compile Include="Contexts/Tasks/Domain/Task.fs" />
-<Compile Include="Contexts/Tasks/Domain/DomainError.fs" />
-<Compile Include="Contexts/Tasks/Application/Ports.fs" />
-<Compile Include="Contexts/Tasks/Application/UseCases.fs" />
-<Compile Include="Contexts/Tasks/Infrastructure/TaskRepository.fs" />
-<Compile Include="Contexts/Tasks/Api/Http/Handlers.fs" />
-<Compile Include="Contexts/Shared/Infrastructure/AppDbContext.fs" />
-<Compile Include="Program.fs" />
-```
-
-### Railway-Oriented Programming
-
-Use `Result<'T, 'TError>` for use-case return types. Compose with `Result.bind` or computation expressions.
-
-```fsharp
-// Contexts/Tasks/Application/UseCases.fs
-module CreateTask =
-
-    let execute (repo: ITaskRepository) (input: CreateTaskInput) : Result<Task, AppError> =
-        input
-        |> validate           // Result<ValidatedInput, AppError>
-        |> Result.bind (buildTask >> Ok)
-        |> Result.bind (repo.Save)
-```
-
-### Pure Adapter Functions
-
-Infrastructure functions are pure adapters between F# domain types and the persistence layer. They must not contain
-business logic.
-
-```fsharp
-// Contexts/Tasks/Infrastructure/TaskRepository.fs
-let toDbRecord (task: Task) : TaskDbRecord = { (* mapping *) }
-let toDomain (record: TaskDbRecord) : Result<Task, InfraError> = (* mapping *)
-```
-
-### `Program.fs` as Composition Root
-
-`Program.fs` is the only place that instantiates concrete infrastructure types and wires the dependency graph.
-
 ## DDD Integration
 
 ### Bounded Context Isolation
@@ -241,8 +165,7 @@ FAIL: ContextA.Domain.Order references ContextB.Domain.InventoryItem
 ### Shared Infrastructure
 
 Cross-context infrastructure (database connection pool, migration runner, shared middleware) lives in
-`contexts/shared/infrastructure/` (Rust) or `Contexts/Shared/Infrastructure/` (F#). Shared infrastructure must not
-contain business logic.
+`contexts/shared/infrastructure/`. Shared infrastructure must not contain business logic.
 
 ### Anti-Corruption Layer
 
@@ -252,23 +175,12 @@ the boundary.
 
 ## Forbidden Imports
 
-### Rust
-
 | Layer             | Forbidden                                                                                  |
 | ----------------- | ------------------------------------------------------------------------------------------ |
 | `domain/`         | `axum`, `sqlx`, `reqwest`, `tokio::fs`, HTTP status types, `serde_json` (HTTP-specific)    |
 | `application/`    | `axum`, `sqlx`, concrete infrastructure structs, HTTP types                                |
 | `infrastructure/` | `axum`, HTTP response types, business logic                                                |
 | `api/http/`       | Direct DB driver calls (must go through outbound port), other context's `domain/` directly |
-
-### F
-
-| Layer             | Forbidden                                                                          |
-| ----------------- | ---------------------------------------------------------------------------------- |
-| `Domain/`         | Giraffe, EF Core, `System.Net.Http`, HTTP status types                             |
-| `Application/`    | Giraffe, EF Core, concrete infrastructure types                                    |
-| `Infrastructure/` | Giraffe, HTTP response types, business logic                                       |
-| `Api/Http/`       | Direct DB context calls (must go through port), other context's `Domain/` directly |
 
 ## Related
 

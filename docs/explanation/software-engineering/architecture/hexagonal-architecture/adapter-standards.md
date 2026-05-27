@@ -20,7 +20,7 @@ created: 2026-05-17
 
 ## Purpose
 
-OSE Platform standards for implementing, naming, and placing adapters across the Java/Spring Boot and F#/Giraffe stacks. Adapters are the only layer permitted to import infrastructure libraries, framework APIs, and external clients.
+OSE Platform standards for implementing, naming, and placing adapters. Adapters are the only layer permitted to import infrastructure libraries, framework APIs, and external clients.
 
 ## Standard 1: Adapter Naming — Java
 

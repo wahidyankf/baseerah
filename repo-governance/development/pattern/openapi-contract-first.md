@@ -44,7 +44,7 @@ the code.
 ## Overview
 
 Each BE↔client pair maintains an OpenAPI 3.1 YAML spec. Codegen tooling reads that spec and emits typed client code
-(TypeScript) and server scaffolding (Rust, F#). CI runs codegen on every push and fails the build if the generated
+(TypeScript) and server scaffolding (Rust). CI runs codegen on every push and fails the build if the generated
 output differs from the committed output. This makes spec drift a hard CI failure rather than a silent runtime
 divergence.
 
@@ -70,11 +70,11 @@ The spec file is the only artefact that humans edit. Generated files are never e
 
 ## Codegen Tooling
 
-| Target                                                | Tool                                               | Output Path                | Notes                                         |
-| ----------------------------------------------------- | -------------------------------------------------- | -------------------------- | --------------------------------------------- |
-| TypeScript client (`organiclever-web`, `ose-app-web`) | `@hey-api/openapi-ts`                              | `src/generated-contracts/` | Emits typed fetch client + schema types       |
-| Rust server (`organiclever-be`)                       | `openapi-generator` (rust-axum target)             | `generated-contracts/`     | Emits Axum handler skeletons + model types    |
-| F# server (`ose-app-be`)                              | NuGet-based codegen (existing `codegen` Nx target) | `generated-contracts/`     | Emits F# record types + serialisation helpers |
+| Target                                                | Tool                                   | Output Path                | Notes                                      |
+| ----------------------------------------------------- | -------------------------------------- | -------------------------- | ------------------------------------------ |
+| TypeScript client (`organiclever-web`, `ose-app-web`) | `@hey-api/openapi-ts`                  | `src/generated-contracts/` | Emits typed fetch client + schema types    |
+| Rust server (`organiclever-be`)                       | `openapi-generator` (rust-axum target) | `generated-contracts/`     | Emits Axum handler skeletons + model types |
+| Rust server (`ose-app-be`)                            | `openapi-generator` (rust-axum target) | `generated-contracts/`     | Emits Axum handler skeletons + model types |
 
 Generated directories are committed to the repository. The CI drift check (see below) compares the freshly generated
 output against the committed files and fails if they differ.
@@ -88,7 +88,7 @@ Each app that participates in contract-first development exposes these Nx target
 | `codegen` | `organiclever-web`       | Runs `@hey-api/openapi-ts` against the contracts spec        |
 | `codegen` | `organiclever-be`        | Runs `openapi-generator` rust-axum target                    |
 | `codegen` | `ose-app-web`            | Runs `@hey-api/openapi-ts` against the contracts spec        |
-| `codegen` | `ose-app-be`             | Runs the NuGet-based F# codegen                              |
+| `codegen` | `ose-app-be`             | Runs `openapi-generator` rust-axum target                    |
 | `lint`    | `organiclever-contracts` | Validates and bundles the OpenAPI spec (Redocly or Spectral) |
 | `docs`    | `organiclever-contracts` | Generates browsable API documentation                        |
 
@@ -120,7 +120,7 @@ nx run <app>:codegen
 
 # 2. Fail if generated output differs from committed files
 git diff --exit-code src/generated-contracts/
-# (Rust/F# apps use generated-contracts/ without the src/ prefix)
+# (Rust apps use generated-contracts/ without the src/ prefix)
 ```
 
 A non-zero exit code from `git diff --exit-code` means the spec was updated but codegen was not re-run before commit,

@@ -278,7 +278,7 @@ Development: AI Agents Convention — agent colors use accessible palette
 
 **Scope**:
 
-- **Source code** (TypeScript, Go, Java, Kotlin, Python, Elixir, F#, Rust, C#, Clojure, Dart)
+- **Source code** (TypeScript, Go, Rust, and more via ose-primer)
 - **Build systems** (Nx, npm, Volta)
 - **AI agents** (primary binding agents directory)
 - **Git workflows** (commits, branches, hooks)

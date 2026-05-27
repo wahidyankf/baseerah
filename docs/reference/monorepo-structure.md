@@ -134,15 +134,16 @@ apps/organiclever-web/
 └── README.md                  # App documentation
 ```
 
-### App Structure (F#/Giraffe Application)
+### App Structure (Rust/Axum Application)
 
 ```
 apps/organiclever-be/
 ├── src/                       # Source code
-├── tests/                     # Test projects
+├── tests/                     # Test suites (unit/, integration/)
+├── migrations/                # SQLx database migrations
 ├── Dockerfile                 # Production multi-stage build
 ├── .dockerignore              # Docker build context exclusions
-├── organiclever-be.fsproj     # F# project file
+├── Cargo.toml                 # Rust package manifest
 ├── project.json               # Nx project configuration
 └── README.md                  # App documentation
 ```

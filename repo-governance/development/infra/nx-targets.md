@@ -133,12 +133,12 @@ Tags are the standard mechanism for attaching structured metadata to projects in
 
 Every project declares tags along four dimensions. Each dimension uses a fixed prefix and a controlled vocabulary.
 
-| Dimension | Prefix      | Allowed Values                                                                                                | Required                       | Purpose                                                       |
-| --------- | ----------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Type      | `type:`     | `app`, `lib`, `e2e`                                                                                           | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
-| Platform  | `platform:` | `cli`, `nextjs`, `spring-boot`, `phoenix`, `giraffe`, `gin`, `fastapi`, `axum`, `ktor`, `vertx`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
-| Language  | `lang:`     | `golang`, `ts`, `java`, `elixir`, `fsharp`, `python`, `rust`, `kotlin`, `dart`                                | Projects with application code | Primary language of source code                               |
-| Domain    | `domain:`   | `ayokoding`, `ose-platform`, `organiclever`, `wahidyankf`, `demo-be`, `demo-fe`, `tooling`                    | Always                         | Business or product domain                                    |
+| Dimension | Prefix      | Allowed Values                                                                                     | Required                       | Purpose                                                       |
+| --------- | ----------- | -------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Type      | `type:`     | `app`, `lib`, `e2e`                                                                                | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
+| Platform  | `platform:` | `cli`, `nextjs`, `spring-boot`, `phoenix`, `gin`, `fastapi`, `axum`, `ktor`, `vertx`, `playwright` | Apps and e2e projects          | Framework or runtime environment                              |
+| Language  | `lang:`     | `golang`, `ts`, `java`, `elixir`, `python`, `rust`, `kotlin`, `dart`                               | Projects with application code | Primary language of source code                               |
+| Domain    | `domain:`   | `ayokoding`, `ose-platform`, `ose-app`, `organiclever`, `wahidyankf`, `tooling`                    | Always                         | Business or product domain                                    |
 
 ### Special Rules
 
@@ -236,7 +236,7 @@ Every project in `apps/` and `libs/` must expose:
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | TypeScript app     | unit tests via vitest (typecheck and lint run separately in pre-push); coverage from unit tests only via `rhino-cli test-coverage validate` ≥90%                                                                                               |
 | Go app             | `go test -coverprofile=cover.out ./... && rhino-cli test-coverage validate <project>/cover.out 90` — compiles and runs unit tests (excluding `//go:build integration` files), then enforces ≥90% line coverage (standard line-based algorithm) |
-| F#/Giraffe         | unit tests via xUnit + AltCover LCOV → `rhino-cli test-coverage validate` ≥90%                                                                                                                                                                 |
+| Rust app           | `cargo llvm-cov --test unit --ignore-filename-regex 'main\.rs' --fail-under-lines 90` — line coverage via cargo-llvm-cov, main.rs excluded                                                                                                     |
 | Playwright `*-e2e` | run the linter directly (no unit tests to add beyond linting)                                                                                                                                                                                  |
 
 > For polyglot `test:quick` composition patterns (Java, Kotlin, Python, Rust, Elixir, TypeScript backend, C#, Clojure, Dart/Flutter), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
@@ -245,13 +245,13 @@ The rule: include only checks that complete fast. If `test:unit` is slow for a p
 
 ### Statically Typed Projects
 
-TypeScript, F#, and other statically typed projects:
+TypeScript and other statically typed projects:
 
 | Target      | Requirement                                                                |
 | ----------- | -------------------------------------------------------------------------- |
 | `typecheck` | Run the type checker without emitting artifacts (`tsc --noEmit`, `mypy .`) |
 
-**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. The `organiclever-be` example: `dotnet build .fsproj /p:TreatWarningsAsErrors=true --no-restore`.
+**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. The `ose-app-be` example: `cargo check --manifest-path apps/ose-app-be/Cargo.toml`.
 
 **Not required for dynamically typed languages** (plain JavaScript, Ruby) or languages where
 compilation already enforces types and `build` covers it — except when an additional static
@@ -394,7 +394,7 @@ files as inputs so the cache invalidates when specs or step definitions change:
   "cache": true,
   "inputs": [
     "{workspaceRoot}/specs/apps/organiclever-be/**/*.feature",
-    "{projectRoot}/src/**/*.fs"
+    "{projectRoot}/src/**/*.rs"
   ],
   "options": {
     "command": "rhino-cli spec-coverage validate specs/apps/organiclever-be --shared-steps --exclude-dir test-support apps/organiclever-be/src"
@@ -532,9 +532,9 @@ language:
 
 | Language | Source files                                               | Generated contracts                      | Gherkin specs                                        |
 | -------- | ---------------------------------------------------------- | ---------------------------------------- | ---------------------------------------------------- |
-| F#       | `{projectRoot}/src/**/*.fs`, `{projectRoot}/tests/**/*.fs` | `{projectRoot}/generated-contracts/**/*` | `{workspaceRoot}/specs/apps/<app-name>/**/*.feature` |
+| Rust     | `{projectRoot}/src/**/*.rs`, `{projectRoot}/tests/**/*.rs` | `{projectRoot}/generated-contracts/**/*` | `{workspaceRoot}/specs/apps/<app-name>/**/*.feature` |
 
-> For canonical inputs patterns across Go, Java, Kotlin, Rust, TypeScript, Python, Elixir, C#, Clojure, and Dart, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
+> For canonical inputs patterns across Go, Java, Kotlin, TypeScript, Python, Elixir, C#, Clojure, and Dart, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
 **Rust CLI app** (`rhino-cli`) also consumes Gherkin specs in `test:unit`. Its `test:unit` and `test:quick` inputs must include the CLI's own spec files:
 

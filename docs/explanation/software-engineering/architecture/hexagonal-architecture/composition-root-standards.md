@@ -1,6 +1,6 @@
 ---
 title: Composition Root Standards
-description: OSE Platform standards for composition root design and dependency injection wiring in Spring Boot (Java) and Giraffe (F#) hexagonal architecture implementations
+description: OSE Platform standards for composition root design and dependency injection wiring in hexagonal architecture implementations
 category: explanation
 subcategory: architecture
 tags:

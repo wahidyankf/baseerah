@@ -20,7 +20,7 @@ created: 2026-05-17
 
 ## Purpose
 
-OSE Platform standards for designing, naming, and placing port interfaces across the polyglot stack (Java/Spring Boot and F#/Giraffe). Ports are the boundary contracts that make the hexagon replaceable and testable.
+OSE Platform standards for designing, naming, and placing port interfaces. Ports are the boundary contracts that make the hexagon replaceable and testable.
 
 ## Standard 1: Port Ownership
 
