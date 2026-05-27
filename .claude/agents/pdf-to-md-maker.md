@@ -56,7 +56,7 @@ PDF_TYPE=$(crane pdf --type "$PDF_FILE" | jq -r .type)
 
 - If output is `"text"` (exit 0): text-based PDF → proceed with crane extraction
 - If output is `"image"` (exit 1): image-only PDF → use OCR path
-- If `crane` not found: `dotnet run --project apps/crane-cli/crane-cli.fsproj -- pdf --type "$PDF_FILE" | jq -r .type`
+- If `crane` not found: `cargo run --manifest-path apps/crane-cli/Cargo.toml -- pdf --type "$PDF_FILE" | jq -r .type`
 
 ### Step 2a: Text-Based PDF Extraction
 
@@ -188,7 +188,7 @@ Write the assembled Markdown to `md-file`. If file exists, overwrite.
 
 | Tool Missing                      | Behavior                                                                                            |
 | --------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `crane` not found                 | Use `dotnet run --project apps/crane-cli/crane-cli.fsproj --` as prefix instead of `crane`          |
+| `crane` not found                 | Use `cargo run --manifest-path apps/crane-cli/Cargo.toml --` as prefix instead of `crane`           |
 | `tesseract` not found (image PDF) | Fail with: `ERROR: tesseract required for image-only PDFs. Install: brew install tesseract`         |
 | `jq` not found                    | Parse JSON output manually; `crane pdf --info` returns `{"pages":N,...}` — extract with grep or cut |
 | `pdftoppm` not found              | Try `convert` (ImageMagick) as fallback for image extraction                                        |

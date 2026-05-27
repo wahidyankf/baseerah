@@ -131,10 +131,9 @@ npx prettier --write [file-path]
 | 3    | always                            | `nx affected -t run-pre-commit --skip-nx-cache`                            | warn only  |
 | 4    | always                            | `git add apps/ayokoding-web/content/`                                      | ignored    |
 | 5    | always                            | `npx lint-staged`                                                          | exit 1     |
-| 6    | `.ex`/`.exs` staged, `mix` found  | `mix format <files>` per project root, then `git add`                      | exit 1     |
-| 7    | `docs/` staged                    | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/` | exit 1     |
-| 8    | always                            | Validate markdown links (staged only)                                      | exit 1     |
-| 9    | always                            | `npm run lint:md`                                                          | exit 1     |
+| 6    | `docs/` staged                    | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/` | exit 1     |
+| 7    | always                            | Validate markdown links (staged only)                                      | exit 1     |
+| 8    | always                            | `npm run lint:md`                                                          | exit 1     |
 
 1. Commit proceeds if no errors
 
