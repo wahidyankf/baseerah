@@ -181,27 +181,33 @@ spec:
 
 **Output** (from container logs):
 
-```
-=== Testing RBAC Permissions ===
-Test 1: kubectl get pods
-NAME READY STATUS RESTARTS AGE
-rbac-pod 1/1 Running 0 10s
+```bash
+# === Testing RBAC Permissions ===
+# Test 1: kubectl get pods
+# NAME      READY   STATUS    RESTARTS   AGE
+# rbac-pod  1/1     Running   0          10s
+# => SUCCESS: "list" verb on "pods" resource allowed by Role
 
-Test 2: kubectl get pod rbac-pod
-NAME READY STATUS RESTARTS AGE
-rbac-pod 1/1 Running 0 10s
+# Test 2: kubectl get pod rbac-pod
+# NAME      READY   STATUS    RESTARTS   AGE
+# rbac-pod  1/1     Running   0          10s
+# => SUCCESS: "get" verb on "pods" resource allowed by Role
 
-Test 3: kubectl get services
-Error from server (Forbidden): services is forbidden: User "system:serviceaccount:default:pod-reader-sa" cannot list resource "services" in API group "" in the namespace "default"
-DENIED: services not in Role
+# Test 3: kubectl get services
+# Error from server (Forbidden): services is forbidden
+# DENIED: services not in Role
+# => EXPECTED FAILURE: Role rules only cover "pods", not "services"
 
-Test 4: kubectl delete pod rbac-pod --dry-run=client
-Error from server (Forbidden): pods "rbac-pod" is forbidden: User "system:serviceaccount:default:pod-reader-sa" cannot delete resource "pods" in API group "" in the namespace "default"
-DENIED: delete not permitted
+# Test 4: kubectl delete pod rbac-pod --dry-run=client
+# Error from server (Forbidden): pods "rbac-pod" is forbidden
+# DENIED: delete not permitted
+# => EXPECTED FAILURE: "delete" verb not included in Role rules
 
-Test 5: kubectl run test --image=nginx --dry-run=client
-Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:default:pod-reader-sa" cannot create resource "pods" in API group "" in the namespace "default"
-DENIED: create not permitted
+# Test 5: kubectl run test --image=nginx --dry-run=client
+# Error from server (Forbidden): pods is forbidden
+# DENIED: create not permitted
+# => EXPECTED FAILURE: "create" verb not included in Role rules
+# => Confirms principle of least privilege: only get/list/watch granted
 ```
 
 **RBAC verification commands** (from outside cluster):
@@ -414,7 +420,7 @@ kubectl describe clusterrolebinding read-nodes-global
 
 ### Example 60: Aggregated ClusterRoles
 
-Aggregated ClusterRoles combine permissions from multiple ClusterRoles using label selectors, enabling modular permission management and extending built-in roles.
+Aggregated ClusterRoles combine permissions from multiple ClusterRoles using label selectors, enabling modular permission management and extending built-in roles. The aggregation controller automatically merges rules from all matching ClusterRoles into the parent, so new permissions take effect without modifying the parent ClusterRole or existing bindings.
 
 ```yaml
 # Parent ClusterRole (aggregates permissions from multiple child ClusterRoles)
@@ -621,7 +627,7 @@ kubectl label clusterrole monitoring-services rbac.example.com/aggregate-to-moni
 
 ### Example 61: SecurityContext and Pod Security
 
-SecurityContext controls security settings at Pod and container level, including user/group IDs, privilege escalation, filesystem access, and capabilities.
+SecurityContext controls security settings at Pod and container level, including user/group IDs, privilege escalation, filesystem access, and capabilities. Applying these settings hardens containers against privilege escalation attacks and limits the blast radius of a compromised workload by removing unnecessary Linux capabilities.
 
 ```yaml
 apiVersion: v1 # => Core Kubernetes API
@@ -647,7 +653,7 @@ spec: # => Pod specification
  containers: # => Container list
  - name: secure-app # => Container name
  image:
- nginx:1.24 # => Container image
+ nginx:1.30 # => Container image
  # => Image may define default user
  securityContext: # => Container-level (overrides Pod-level)
  allowPrivilegeEscalation:
@@ -1357,9 +1363,11 @@ kubectl label namespace development environment=dev        # => Dev isolated fro
 
 **Why It Matters**: Namespace isolation prevents cross-environment contamination where development workloads access production databases — a leading cause of data leaks in clusters without proper segmentation. This pattern enables multi-tenancy where different teams share a cluster while maintaining security boundaries between regulated financial workloads and general engineering services. Namespace-based NetworkPolicies also enforce compliance segmentation (separating PCI workloads from non-PCI, HIPAA from non-HIPAA) required by auditors, reducing the scope of compliance certifications and associated costs.
 
+---
+
 ### Example 67: Egress to External Services
 
-NetworkPolicies can control egress traffic to external IP addresses and DNS names, restricting outbound connections to approved services.
+NetworkPolicies can control egress traffic to external IP addresses and DNS names, restricting outbound connections to approved services. Egress controls prevent compromised Pods from exfiltrating data to attacker-controlled servers and enforce network segmentation required by compliance frameworks like PCI-DSS.
 
 ```yaml
 apiVersion:
@@ -1475,7 +1483,7 @@ spec:
 
 ### Example 68: NetworkPolicy with Multiple Selectors
 
-NetworkPolicies support complex rules combining podSelector, namespaceSelector, and ipBlock for fine-grained traffic control.
+NetworkPolicies support complex rules combining podSelector, namespaceSelector, and ipBlock for fine-grained traffic control. Combining selectors enables micro-segmentation where traffic is allowed only from specific Pods in specific namespaces or specific external IP ranges, supporting zero-trust network architectures.
 
 ```yaml
 apiVersion:
@@ -1613,7 +1621,9 @@ spec:
 
 **Key Takeaway**: Combine multiple selectors for complex traffic rules; understand OR (multiple from/to items) vs AND (multiple selectors in same item) semantics; test policies thoroughly in non-production before applying to production.
 
-**Why It Matters**: Micro-segmentation with complex NetworkPolicies enables zero-trust architecture at scale, isolating payment processing, trading systems, and customer data to meet regulatory requirements (PCI-DSS, SOX, GDPR). This pattern reduces breach impact radius compared to flat networks — lateral movement exploits that compromise entire clusters are prevented when workloads can only communicate through explicitly allowed paths. ---
+**Why It Matters**: Micro-segmentation with complex NetworkPolicies enables zero-trust architecture at scale, isolating payment processing, trading systems, and customer data to meet regulatory requirements (PCI-DSS, SOX, GDPR). This pattern reduces breach impact radius compared to flat networks — lateral movement exploits that compromise entire clusters are prevented when workloads can only communicate through explicitly allowed paths.
+
+---
 
 ## Custom Resources & Operators (Examples 69-73)
 
@@ -1938,7 +1948,7 @@ EOF
 
 ### Example 70: Custom Resource with Subresources
 
-CRDs support subresources like status and scale, enabling kubectl commands and standard Kubernetes patterns.
+CRDs support subresources like status and scale, enabling kubectl commands and standard Kubernetes patterns. The status subresource separates user-managed spec from controller-managed status, preventing controllers from accidentally overwriting user intent during reconciliation loops.
 
 ```yaml
 apiVersion:
@@ -2072,41 +2082,32 @@ graph TD
 ```
 
 ```bash
-# Watch all custom resources of type Database
 kubectl get databases -w                                  # => Streams Database resource changes
                                                           # => Shows NAME, ENGINE, VERSION, REPLICAS, READY, PHASE columns
 
-# View operator logs (reconciliation loop output)
 kubectl logs -n operators deploy/database-operator -f    # => Follow operator log stream
                                                           # => Logs show reconciliation events and state diffs
 
-# Trigger reconciliation by changing spec (operator acts automatically)
 kubectl patch database production-db --type=merge -p '{"spec":{"replicas":5}}'
 # => database.example.com/production-db patched
-# => Operator detects change via watch → reconcile loop runs
+# => Operator detects spec change via watch → reconcile loop runs
 
-# Check StatefulSet created by operator
 kubectl get statefulset -l managed-by=database-operator  # => Lists operator-managed StatefulSets
                                                           # => Shows production-db with READY and AGE columns
 
-# View operator-managed status (updated by operator)
 kubectl get database production-db -o jsonpath='{.status}' # => Shows operator-populated status
 # => {"phase":"Running","readyReplicas":5}
 
-# Scaffold new operator with Operator SDK
 operator-sdk init --domain example.com --repo github.com/example/database-operator
 # => Creates operator project structure: main.go, go.mod, Makefile, config/
 
-# Generate CRD scaffold
 operator-sdk create api --group databases --version v1 --kind Database --resource --controller
 # => Generates api/v1/database_types.go and controllers/database_controller.go
 
-# Build and push operator image
 make docker-build docker-push IMG=myregistry/database-operator:v1.0.0
 # => Builds operator Docker image and pushes to registry
 
-# Deploy operator to cluster
-kubectl apply -f deploy/                                 # => Apply all operator manifests
+kubectl apply -f deploy/                                 # => Applies all operator manifests
 # => serviceaccount/database-operator created
 ```
 
@@ -2712,7 +2713,7 @@ spec: # => Deployment specification (desired state)
 
 ### Example 76: Helm Chart Dependencies
 
-Helm charts can depend on other charts, enabling composition of complex applications from reusable components.
+Helm charts can depend on other charts, enabling composition of complex applications from reusable components. Dependencies are declared in Chart.yaml and downloaded to the charts/ directory via `helm dependency update`, keeping application and its infrastructure components versioned together in a single Helm release.
 
 ```yaml
 # Chart.yaml
@@ -2775,7 +2776,7 @@ dependencies:
 
 ### Example 77: Helm Hooks
 
-Helm hooks run Jobs at specific points in release lifecycle, enabling pre/post-install tasks like database migrations or cleanup.
+Helm hooks run Jobs at specific points in release lifecycle, enabling pre/post-install tasks like database migrations or cleanup. Hook weights control execution order when multiple hooks fire at the same lifecycle point, and delete policies determine whether completed hook resources are retained for debugging or removed automatically.
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
@@ -3087,7 +3088,7 @@ spec: # => Application specification
 
 ### Example 81: ArgoCD Sync Strategies
 
-ArgoCD supports multiple sync strategies controlling how and when applications synchronize from Git to cluster.
+ArgoCD supports multiple sync strategies controlling how and when applications synchronize from Git to cluster. Auto-sync with self-heal keeps clusters continuously aligned with Git, while manual sync with sync windows restricts changes to low-traffic maintenance periods for risk-sensitive production environments.
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
@@ -3342,7 +3343,7 @@ spec: # => Application specification
 
 ### Example 83: ArgoCD ApplicationSets
 
-ApplicationSets generate multiple Applications from templates, enabling fleet management and multi-cluster deployments from single definition.
+ApplicationSets generate multiple Applications from templates, enabling fleet management and multi-cluster deployments from single definition. Generators (list, cluster, git) drive template expansion — a single ApplicationSet definition can automatically deploy an application to dozens of clusters when new clusters register with ArgoCD.
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
@@ -3670,7 +3671,7 @@ kubectl top nodes                               # => CPU and memory utilization 
 
 **Key Takeaway**: Production readiness requires comprehensive setup across security, reliability, monitoring, and operations; use this checklist to validate cluster readiness; automate validation using admission controllers and policy engines like OPA/Kyverno.
 
-**Why It Matters**: Production Kubernetes readiness is not binary — it is a set of practices accumulated across years of real outages and postmortems. This checklist codifies patterns from the Kubernetes community, SRE practices, and the CNCF ecosystem. Automated policy enforcement (OPA Gatekeeper, Kyverno) makes compliance a CI gate rather than a code review checklist — preventing misconfigured workloads from reaching production regardless of who writes the YAML. The SRE principles embedded here (error budgets, SLOs, chaos engineering) operationalize reliability, enabling higher deployment velocity while reducing incident frequency. Production readiness is not optional — it is the difference between experimental clusters and platforms running critical business workloads.
+**Why It Matters**: Production Kubernetes readiness is not binary — it is a set of practices accumulated across years of real outages and postmortems. This checklist codifies patterns from the Kubernetes community, SRE practices, and the CNCF ecosystem. Automated policy enforcement (OPA Gatekeeper, Kyverno) makes compliance a CI gate rather than a code review checklist — preventing misconfigured workloads from reaching production regardless of who writes the YAML. The SRE principles embedded here (error budgets, SLOs, chaos engineering) operationalize reliability, enabling higher deployment velocity while reducing incident frequency. Production readiness separates experimental clusters from platforms running critical business workloads.
 
 ---
 

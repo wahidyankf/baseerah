@@ -51,6 +51,18 @@ Advanced systems language with ownership model for memory safety without garbage
 
 **Why Rust fifth?** Unique ownership system (requires strong fundamentals), compile-time memory safety (prevents entire bug classes), zero-cost abstractions, fearless concurrency, ideal for performance-critical systems.
 
+## Additional Languages
+
+Beyond the core path, these languages have full By Example tutorials. Pick them up when a specific paradigm, platform, or ecosystem calls for it:
+
+- **[TypeScript](/en/learn/software-engineering/programming-languages/typescript)** - Typed JavaScript for web, Node.js, and full-stack development; the default language of the modern web.
+- **[C#](/en/learn/software-engineering/programming-languages/c-sharp)** - Versatile, statically typed .NET language for web, desktop, games (Unity), and cloud services.
+- **[F#](/en/learn/software-engineering/programming-languages/f-sharp)** - Functional-first .NET language emphasizing immutability, type inference, and concise expressive code.
+- **[Elixir](/en/learn/software-engineering/programming-languages/elixir)** - Functional, concurrent language on the Erlang VM, built for fault-tolerant, highly scalable systems.
+- **[Clojure](/en/learn/software-engineering/programming-languages/clojure)** - Modern Lisp on the JVM with immutable data structures and a strong functional core.
+- **[Dart](/en/learn/software-engineering/programming-languages/dart)** - Client-optimized language powering Flutter for cross-platform mobile, web, and desktop apps.
+- **[WebAssembly](/en/learn/software-engineering/programming-languages/webassembly)** - Portable binary instruction format for running near-native-speed code in the browser and beyond.
+
 ## Tutorial Structure
 
 Each language follows a consistent learning path:

@@ -72,6 +72,11 @@ We provide progressive content organized by the Diataxis framework:
 - **Glossary**: Elixir/OTP/Phoenix terminology
 - **Resources**: Official docs, books, community links
 
+### Production & Release Tracks
+
+- **[In the Field](/en/learn/software-engineering/programming-languages/elixir/in-the-field)**: Production-grade implementation guides for real-world Elixir systems
+- **[Release Highlights](/en/learn/software-engineering/programming-languages/elixir/release-highlights)**: What changed in recent Elixir releases and why it matters
+
 ## What Makes Elixir Special?
 
 ### 1. The BEAM VM

@@ -9,7 +9,7 @@ tags: ["k3s", "kubernetes", "infrastructure", "by-example", "containers", "devop
 
 This series teaches K3s — the lightweight Kubernetes distribution by Rancher — through heavily annotated, self-contained examples. Each example focuses on a single K3s or Kubernetes concept and includes inline annotations explaining what each command or manifest directive does, why it matters, and what cluster state results from it.
 
-K3s packages a full Kubernetes control plane into a single ~70 MB binary. It uses containerd instead of Docker, embeds Traefik as an ingress controller, ships local-path-provisioner for storage, and bundles CoreDNS, Flannel CNI, and Klipper load balancer — all with zero external dependencies for a single-node install. This series covers K3s v1.35.4+k3s1 running Kubernetes v1.35.4.
+K3s packages a full Kubernetes control plane into a single ~70 MB binary. It uses containerd instead of Docker, embeds Traefik as an ingress controller, ships local-path-provisioner for storage, and bundles CoreDNS, Flannel CNI, and Klipper load balancer — all with zero external dependencies for a single-node install. This series covers K3s v1.36.1+k3s1 running Kubernetes v1.36.1.
 
 ## Series Structure
 
@@ -122,7 +122,7 @@ progressively, so reading sequentially within a level gives the fullest understa
 - [Example 59: Flux Kustomization — Sync a Git Repository](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-59-flux-kustomization--sync-a-git-repository)
 - [Example 60: Flux HelmRelease — Manage Helm Releases via Git](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-60-flux-helmrelease--manage-helm-releases-via-git)
 - [Example 61: Flux Image Automation — Auto-Update Deployments](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-61-flux-image-automation--auto-update-deployments)
-- [Example 62: Multi-Cluster Management with Rancher v2.10](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-62-multi-cluster-management-with-rancher-v210)
+- [Example 62: Multi-Cluster Management with Rancher v2.14.2](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-62-multi-cluster-management-with-rancher-v2142)
 - [Example 63: Rancher Projects and Namespaces — Tenant Isolation](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-63-rancher-projects-and-namespaces--tenant-isolation)
 - [Example 64: Rancher Apps and Marketplace — Deploy Catalog Applications](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-64-rancher-apps-and-marketplace--deploy-catalog-applications)
 - [Example 65: OPA Gatekeeper for Policy Enforcement](/en/learn/software-engineering/infrastructure/tools/k3s/by-example/advanced#example-65-opa-gatekeeper-for-policy-enforcement)

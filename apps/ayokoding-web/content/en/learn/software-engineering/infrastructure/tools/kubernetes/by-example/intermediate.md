@@ -175,7 +175,7 @@ spec:
 
 **Key Takeaway**: Use StatefulSets for databases, message queues, and applications requiring stable network identities and persistent storage; StatefulSets guarantee ordered deployment/scaling and maintain PVC associations across Pod restarts.
 
-**Why It Matters**: StatefulSets solve the stateful workload problem in Kubernetes, enabling databases and clustered applications to run reliably with persistent identity. Without StatefulSets, operators would manually manage database node identities and storage mappings, the kind of operational burden that made running stateful workloads in containers impractical before Kubernetes 1.9.
+**Why It Matters**: StatefulSets solve the stateful workload problem in Kubernetes, enabling databases and clustered applications to run reliably with persistent identity. Without StatefulSets, operators would manually manage database node identities and storage mappings, the kind of operational burden that made running stateful workloads in containers impractical before Kubernetes 1.9. Tools like CloudNativePG and the MongoDB Community Operator build on StatefulSets to deliver fully-automated database lifecycle management, including backups, failover, and schema migrations.
 
 ---
 
@@ -235,8 +235,8 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => Current version
- # => Update to nginx:1.25 to trigger rolling update
+ nginx:1.30 # => Current version
+ # => Change to a newer version (e.g., nginx:1.31) to trigger rolling update
  # => Pod 3 updates first, then Pod 2
  # => Controlled by partition value
  ports:
@@ -246,7 +246,7 @@ spec:
  # => Standard HTTP port
 
 # Update behavior with partition=2:
-# => kubectl set image statefulset/web-stateful nginx=nginx:1.25
+# => kubectl set image statefulset/web-stateful nginx=nginx:1.31
 
 # Partition use cases:
 # => Canary deployments: test new version on subset
@@ -458,7 +458,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => Nginx web server
+ nginx:1.30 # => Nginx web server
  # => Version-pinned
 
 # OrderedReady (default):
@@ -473,7 +473,7 @@ spec:
 
 **Key Takeaway**: Use Parallel podManagementPolicy for faster scaling when Pod ordering is not critical; keep OrderedReady (default) for databases and applications requiring sequential initialization.
 
-**Why It Matters**: Parallel Pod management dramatically reduces StatefulSet scaling time for applications without initialization dependencies. This 95% time reduction (from 40+ minutes with OrderedReady) enables rapid response to traffic spikes. However, databases requiring leader election or sequential cluster bootstrap must use OrderedReady to prevent split-brain scenarios or data corruption during initialization.
+**Why It Matters**: Parallel Pod management dramatically reduces StatefulSet scaling time for applications without initialization dependencies. This 95% time reduction (from 40+ minutes with OrderedReady) enables rapid response to traffic spikes. However, databases requiring leader election or sequential cluster bootstrap must use OrderedReady to prevent split-brain scenarios or data corruption during initialization. Choosing the correct policy is a critical design decision: the wrong choice causes either dangerously slow scaling or catastrophic data corruption in clustered database workloads.
 
 ---
 
@@ -530,7 +530,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => Nginx web server
+ nginx:1.30 # => Nginx web server
  # => Version-pinned
  volumeMounts:
  # => Volume mounts
@@ -711,7 +711,7 @@ spec:
 
 ### Example 35: DaemonSet with Node Selector
 
-DaemonSets can target specific nodes using nodeSelector or node affinity, enabling specialized Pods on GPU nodes, SSD-equipped nodes, or region-specific nodes.
+DaemonSets can target specific nodes using nodeSelector or node affinity, enabling specialized Pods on GPU nodes, SSD-equipped nodes, or region-specific nodes. This is useful when workloads like GPU monitoring or hardware-specific drivers must run only where relevant hardware is available, not on every node in the cluster.
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
@@ -1275,7 +1275,7 @@ spec:
 # => https://secure.example.com → TLS termination at Ingress Controller
 
 # cert-manager integration (automated certificates):
-# => Install cert-manager: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+# => Install cert-manager: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.20.2/cert-manager.yaml
 ```
 
 **Key Takeaway**: Use TLS Ingress for production HTTPS; obtain certificates from Let's Encrypt via cert-manager for automated certificate management and renewal; TLS terminates at Ingress Controller, not backend Services.
@@ -1651,7 +1651,7 @@ metadata:
 spec:
  containers:
  - name: app # => Container name
- image: nginx:1.24 # => Nginx web server
+ image: nginx:1.30 # => Nginx web server
  volumeMounts:
  - name: storage # => References volume defined below
  # => Volume name must match volumes[].name
@@ -1747,7 +1747,7 @@ kubectl get pv                        # => Shows automatically provisioned PV wi
 
 **Key Takeaway**: Use StorageClasses for production storage with dynamic provisioning; configure WaitForFirstConsumer for multi-zone clusters to ensure PV and Pod are in the same availability zone.
 
-**Why It Matters**: Dynamic provisioning through StorageClasses eliminates storage operations bottlenecks by allowing developers to request storage declaratively. WaitForFirstConsumer prevents cross-zone attachment failures (AWS EBS volumes can't attach to nodes in different zones), a gotcha that plagued early Kubernetes adopters with mysterious "volume attachment timeout" errors costing hours of debugging.
+**Why It Matters**: Dynamic provisioning through StorageClasses eliminates storage operations bottlenecks by allowing developers to request storage declaratively. WaitForFirstConsumer prevents cross-zone attachment failures (AWS EBS volumes can't attach to nodes in different zones), a gotcha that plagued early Kubernetes adopters with mysterious "volume attachment timeout" errors costing hours of debugging. StorageClasses also enable tiered storage strategies — fast NVMe SSDs for databases, cost-effective magnetic storage for archives — with developers selecting the right tier via a single `storageClassName` field rather than managing cloud-provider storage APIs directly.
 
 ---
 
@@ -2035,7 +2035,7 @@ metadata:
 spec:
  containers:
  - name: app # => Container name
- image: nginx:1.24 # => Nginx web server
+ image: nginx:1.30 # => Nginx web server
  resources:
  requests:
  cpu: 500m # => requests.cpu = limits.cpu (Guaranteed requirement)
@@ -2055,7 +2055,7 @@ metadata:
 spec:
  containers:
  - name: app # => Container name
- image: nginx:1.24 # => Nginx web server
+ image: nginx:1.30 # => Nginx web server
  resources:
  requests:
  cpu: 250m # => Requests less than limits → Burstable QoS
@@ -2077,7 +2077,7 @@ spec:
  containers:
  - name: app # => Container name
  image:
- nginx:1.24 # => No requests or limits → BestEffort QoS
+ nginx:1.30 # => No requests or limits → BestEffort QoS
  # => Gets no resource guarantees
  # => Uses whatever CPU/memory is available
  # => First evicted during resource pressure
@@ -2100,7 +2100,7 @@ spec:
 
 ### Example 50: Pod Priority and Preemption
 
-PriorityClasses assign priority values to Pods, enabling preemption where higher-priority Pods can evict lower-priority Pods when cluster resources are scarce.
+PriorityClasses assign priority values to Pods, enabling preemption where higher-priority Pods can evict lower-priority Pods when cluster resources are scarce. This allows clusters to run at higher utilization by scheduling batch workloads that automatically yield resources to critical services when needed.
 
 ```yaml
 apiVersion: scheduling.k8s.io/v1 # => Scheduling API group
@@ -2138,7 +2138,7 @@ spec:
   # => Will preempt low-priority Pods if needed
   containers:
     - name: nginx # => Container name
-  image: nginx:1.24 # => Nginx web server
+  image: nginx:1.30 # => Nginx web server
 
 
 # Preemption behavior:
@@ -2151,7 +2151,7 @@ spec:
 
 **Key Takeaway**: Use PriorityClasses to ensure critical workloads schedule before less important ones; preemption allows cluster to prioritize essential services during resource contention; avoid too many priority levels for simplicity.
 
-**Why It Matters**: Pod preemption enables oversubscription strategies where clusters run at 80-90% utilization by scheduling low-priority batch work that yields to critical services. This capacity optimization reduces infrastructure costs by 40% compared to maintaining headroom for peak traffic, as low-priority workloads utilize otherwise idle resources while automatically yielding when needed.
+**Why It Matters**: Pod preemption enables oversubscription strategies where clusters run at 80-90% utilization by scheduling low-priority batch work that yields to critical services. This capacity optimization reduces infrastructure costs by 40% compared to maintaining headroom for peak traffic, as low-priority workloads utilize otherwise idle resources while automatically yielding when needed. Defining explicit PriorityClasses for critical infrastructure, user-facing APIs, and background batch jobs gives the scheduler clear signals for eviction ordering during node pressure events, preventing ad-hoc decisions that could take down production traffic.
 
 ---
 
@@ -2362,7 +2362,7 @@ metadata:
 spec:
  containers:
  - name: nginx # => Container name
- image: nginx:1.24 # => Nginx web server
+ image: nginx:1.30 # => Nginx web server
  ports:
  - containerPort: 80 # => HTTP port
  readinessProbe: # => Checks if Pod ready to receive traffic
@@ -2570,7 +2570,7 @@ spec:
  containers:
  # HTTP GET probe (most common)
  - name: web-app # => Container name
- image: nginx:1.24 # => Nginx web server
+ image: nginx:1.30 # => Nginx web server
  livenessProbe:
  httpGet:
  path:

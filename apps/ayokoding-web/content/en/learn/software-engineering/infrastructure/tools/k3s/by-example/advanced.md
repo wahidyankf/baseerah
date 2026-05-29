@@ -48,7 +48,7 @@ curl -s https://fluxcd.io/install.sh | sudo bash
 # Pre-check: verify the K3s cluster is ready for Flux
 flux check --pre
 # => ► checking prerequisites
-# => ✔ Kubernetes 1.35.4+k3s1 >=1.28.0-0
+# => ✔ Kubernetes 1.36.1+k3s1 >=1.28.0-0
 # => ✔ prerequisites checks passed
 # => All checks must pass before bootstrapping
 
@@ -165,7 +165,7 @@ flux reconcile kustomization myapp --with-source
 # => ✔ Kustomization reconciliation completed
 ```
 
-**Key Takeaway**: Flux `Kustomization` combines a `GitRepository` source with a path and sync interval. Set `prune: true` to delete resources removed from Git. Use `flux reconcile` to trigger immediate sync after a push.
+**Key Takeaway**: Flux `Kustomization` combines a `GitRepository` source with a path and sync interval — set `prune: true` to delete resources removed from Git, and use `flux reconcile` to trigger immediate sync after a push.
 
 **Why It Matters**: Continuous reconciliation means the cluster self-heals from drift — if someone runs `kubectl delete deployment myapp` manually, Flux re-creates it within `interval` seconds. This eliminates configuration drift between environments, ensures staging and production match their respective Git branches, and provides an automatic rollback mechanism: reverting a Git commit causes Flux to undo the corresponding cluster change.
 
@@ -258,7 +258,7 @@ flux get helmreleases -n podinfo
 # => REVISION: the currently installed chart version
 ```
 
-**Key Takeaway**: Flux `HelmRelease` manages Helm chart installations via Git-committed YAML. Version constraints enable automatic minor/patch upgrades. `upgrade.remediation.remediateLastFailure: true` auto-rolls back failed upgrades.
+**Key Takeaway**: Flux `HelmRelease` manages Helm chart installations via Git-committed YAML, with version constraints enabling automatic minor/patch upgrades and `upgrade.remediation.remediateLastFailure: true` providing auto-rollback on failure.
 
 **Why It Matters**: `helm upgrade` run from CI pipelines requires kubeconfig access and fails if the CI runner is unavailable. Flux HelmRelease runs the upgrade from inside the cluster, retrying on failure and rolling back on error — without any external CI involvement. Committing the HelmRelease to Git provides a complete history of chart version upgrades, values changes, and rollbacks in the audit log.
 
@@ -266,7 +266,7 @@ flux get helmreleases -n podinfo
 
 ### Example 61: Flux Image Automation — Auto-Update Deployments
 
-Flux's image automation controllers watch container registries for new tags and automatically update the Git repository when a new image matching a policy is found, triggering a cluster update.
+Flux's image automation controllers watch container registries for new tags and automatically update the Git repository when a new image matching a policy is found, triggering a cluster update. Three CRDs work together: `ImageRepository` polls the registry, `ImagePolicy` selects which tags to track, and `ImageUpdateAutomation` commits the updated tag to Git. This closes the GitOps loop — a new image push results in an automatic, auditable Git commit and deployment.
 
 **Code**:
 
@@ -385,9 +385,31 @@ EOF
 
 ## Multi-Cluster and Policy
 
-### Example 62: Multi-Cluster Management with Rancher v2.10
+### Example 62: Multi-Cluster Management with Rancher v2.14.2
 
 Rancher provides a web UI and API for managing multiple K3s and Kubernetes clusters. Import an existing K3s cluster into Rancher to enable centralized access control, monitoring, and application deployment.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    RANCHER["Rancher Management Cluster<br/>rancher.example.com"]
+    CL1["K3s Cluster A<br/>Production"]
+    CL2["K3s Cluster B<br/>Staging"]
+    CL3["K3s Cluster C<br/>Edge"]
+    AGENT["cattle-cluster-agent<br/>(outbound WebSocket)"]
+
+    RANCHER -->|manages| CL1
+    RANCHER -->|manages| CL2
+    RANCHER -->|manages| CL3
+    CL1 -->|"agent connects out"| AGENT
+    AGENT -->|"WebSocket to"| RANCHER
+
+    style RANCHER fill:#0173B2,stroke:#000,color:#fff
+    style CL1 fill:#029E73,stroke:#000,color:#fff
+    style CL2 fill:#029E73,stroke:#000,color:#fff
+    style CL3 fill:#029E73,stroke:#000,color:#fff
+    style AGENT fill:#DE8F05,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -411,7 +433,7 @@ spec:
   # => repo: Helm chart repository URL
   chart: rancher
   # => chart: Helm chart name to install
-  version: "2.10.3"
+  version: "2.14.2"
   # => version: pin the Helm chart to this exact release
   targetNamespace: cattle-system
   # => targetNamespace: install chart resources into this namespace
@@ -563,7 +585,7 @@ curl -u "admin:password" \
 
 ### Example 64: Rancher Apps and Marketplace — Deploy Catalog Applications
 
-Rancher's Apps & Marketplace provides a curated catalog of Helm charts deployable through the UI with guided forms, reducing the need to understand Helm values files directly.
+Rancher's Apps & Marketplace provides a curated catalog of Helm charts deployable through the UI with guided forms, reducing the need to understand Helm values files directly. Charts are organized into `ClusterRepo` CRDs pointing at Helm repositories that Rancher periodically syncs. Users select a chart version, fill in the UI form, and Rancher runs the equivalent of `helm upgrade --install` against the target cluster.
 
 **Code**:
 
@@ -619,7 +641,7 @@ kubectl get pods -n cattle-monitoring-system
 # => Rancher monitoring stack running and integrated with Rancher UI dashboards
 ```
 
-**Key Takeaway**: Rancher's catalog (ClusterRepo CRD) aggregates Helm repositories into the Apps & Marketplace UI. Deploy apps via the UI or the `catalog.cattle.io` API. Rancher's own apps (monitoring, logging, backups) are available as pre-tested charts.
+**Key Takeaway**: Rancher's catalog (ClusterRepo CRD) aggregates Helm repositories into the Apps & Marketplace UI — deploy apps via the UI or the `catalog.cattle.io` API, with Rancher's own pre-tested charts covering monitoring, logging, and backups.
 
 **Why It Matters**: Helm's values files require Kubernetes expertise to configure correctly. Rancher's Apps UI provides guided forms with descriptions, defaults, and validation — making chart deployment accessible to developers who know what they want to deploy but not the specific Helm values that achieve it. Rancher-maintained charts are tested with K3s versions, reducing compatibility failures that occur with community charts.
 
@@ -628,6 +650,28 @@ kubectl get pods -n cattle-monitoring-system
 ### Example 65: OPA Gatekeeper for Policy Enforcement
 
 OPA (Open Policy Agent) Gatekeeper enforces custom admission policies using the Rego policy language. Policies are defined as `ConstraintTemplate` (the rule logic) and `Constraint` (applying the rule to specific resources).
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    REQ["kubectl apply Pod"]
+    API["Kubernetes API Server"]
+    GK["Gatekeeper<br/>ValidatingWebhook"]
+    CT["ConstraintTemplate<br/>(Rego logic)"]
+    C["Constraint<br/>(scope + params)"]
+
+    REQ -->|admission request| API
+    API -->|webhook call| GK
+    GK -->|evaluates against| CT
+    CT -->|scoped by| C
+    GK -->|"allow / deny"| API
+
+    style REQ fill:#CA9161,stroke:#000,color:#fff
+    style API fill:#0173B2,stroke:#000,color:#fff
+    style GK fill:#DE8F05,stroke:#000,color:#000
+    style CT fill:#029E73,stroke:#000,color:#fff
+    style C fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -747,7 +791,7 @@ kubectl create namespace compliant-ns --labels team=platform,env=production
 
 ### Example 66: Falco for Runtime Security Monitoring
 
-Falco monitors system calls at the kernel level to detect anomalous container behavior: unexpected shell spawns, network connections from sensitive containers, privilege escalation attempts, and file access violations.
+Falco monitors system calls at the kernel level to detect anomalous container behavior: unexpected shell spawns, network connections from sensitive containers, privilege escalation attempts, and file access violations. It installs as a DaemonSet so one Falco pod runs on every K3s node, capturing syscall events via the `modern_ebpf` driver without kernel module compilation. Alerts are structured as JSON and can be forwarded to Slack, PagerDuty, or a SIEM via the Falcosidekick sidecar.
 
 **Code**:
 
@@ -806,7 +850,7 @@ kubectl logs -n falco daemonset/falco | grep "Notice\|Warning\|Critical" | head 
 # => Alerts include: container name, pod name, namespace, command, user, process tree
 ```
 
-**Key Takeaway**: Falco uses eBPF syscall tracing to detect anomalous container behavior at runtime. Install via HelmChart DaemonSet with `modern_ebpf` driver. Alerts appear in Falco pod logs as JSON and can be forwarded to Slack, PagerDuty, or SIEM systems.
+**Key Takeaway**: Falco uses eBPF syscall tracing to detect anomalous container behavior at runtime via HelmChart DaemonSet with the `modern_ebpf` driver — alerts appear in pod logs as JSON and can be forwarded to Slack, PagerDuty, or SIEM systems.
 
 **Why It Matters**: Container image scanning and admission policies prevent known-bad images and configurations. Falco catches what happens after a container starts — zero-day exploits, supply chain compromises, and insider threats that bypass static checks. Detecting a shell spawn inside an nginx container (which should never need a shell in production) is an early indicator of compromise. Falco's runtime context (pod name, namespace, user) makes alerts actionable without chasing raw syscall logs.
 
@@ -817,6 +861,24 @@ kubectl logs -n falco daemonset/falco | grep "Notice\|Warning\|Critical" | head 
 ### Example 67: Velero for Cluster Backup and Restore
 
 Velero backs up Kubernetes resources (YAML) and persistent volume data to object storage. It enables workload migration between clusters and disaster recovery from cluster-wide failures.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    K3S["K3s Cluster<br/>Deployments + PVCs"]
+    VC["Velero Controller<br/>+ node-agent DaemonSet"]
+    S3["S3 Bucket<br/>backup storage"]
+    REST["Target Cluster<br/>(restore destination)"]
+
+    K3S -->|"velero backup create"| VC
+    VC -->|"serializes YAML + PV snapshots"| S3
+    S3 -->|"velero restore create"| REST
+
+    style K3S fill:#0173B2,stroke:#000,color:#fff
+    style VC fill:#DE8F05,stroke:#000,color:#000
+    style S3 fill:#029E73,stroke:#000,color:#fff
+    style REST fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -869,7 +931,7 @@ velero backup get
 # => production-backup   Completed  0        0          2m        29d       45 MB
 ```
 
-**Key Takeaway**: Velero installs a controller + node agent, then backs up Kubernetes resources and PV data to S3. Use `velero backup create --include-namespaces` for namespace-scoped backups. Backups include all resource YAML and PV data snapshots.
+**Key Takeaway**: Velero installs a controller + node agent to back up Kubernetes resources and PV data to S3 — use `velero backup create --include-namespaces` for namespace-scoped backups that include all resource YAML and PV data snapshots.
 
 **Why It Matters**: K3s etcd backups (Example 78) restore the cluster's control plane state. Velero complements etcd backups by providing application-level backup and restore — you can restore a single namespace or a specific deployment without restoring the entire cluster. It also enables workload migration: back up from one K3s cluster and restore onto another running a different K3s version.
 
@@ -918,7 +980,7 @@ velero restore create --from-backup daily-backup-20260429020000 \
 # => PVs are recreated and populated from S3 backup via Velero node agent
 ```
 
-**Key Takeaway**: `velero schedule create` automates recurring backups with TTL-based retention. `velero restore create --from-backup` restores specific namespaces from any stored backup. TTL controls how long backups are retained before automatic deletion.
+**Key Takeaway**: `velero schedule create` automates recurring backups with TTL-based retention, while `velero restore create --from-backup` restores specific namespaces from any stored backup — TTL controls automatic deletion timing.
 
 **Why It Matters**: Manual backups are forgotten during high-tempo development periods, precisely when schema migrations and deployments create the highest risk. Scheduled backups with automatic TTL-based retention implement a hands-off backup policy: create the schedule once and Velero produces daily (or hourly) recovery points automatically, deleting old backups to control storage costs. The backup-to-restore workflow takes minutes — crucial for minimizing recovery time during production incidents.
 
@@ -928,7 +990,28 @@ velero restore create --from-backup daily-backup-20260429020000 \
 
 ### Example 69: Prometheus and Grafana Stack via Helm
 
-The kube-prometheus-stack Helm chart deploys Prometheus, Alertmanager, Grafana, and a set of pre-built dashboards and alerts specifically for Kubernetes clusters.
+The kube-prometheus-stack Helm chart deploys Prometheus, Alertmanager, Grafana, and a set of pre-built dashboards and alerts specifically for Kubernetes clusters. It includes ServiceMonitors for common Kubernetes components (etcd, kube-scheduler, coredns) and Grafana dashboards for node, pod, and namespace resource usage. Installing via K3s HelmChart CRD makes the entire observability stack part of the cluster's declarative state.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    PODS["Pods / Nodes<br/>(metrics endpoints)"]
+    PROM["Prometheus<br/>scrapes via ServiceMonitor"]
+    AM["Alertmanager<br/>routes alerts"]
+    GRAF["Grafana<br/>dashboards"]
+    SLACK["Slack / PagerDuty<br/>(notifications)"]
+
+    PODS -->|"/metrics"| PROM
+    PROM -->|"firing rules"| AM
+    PROM -->|"data source"| GRAF
+    AM -->|"webhook"| SLACK
+
+    style PODS fill:#CA9161,stroke:#000,color:#fff
+    style PROM fill:#0173B2,stroke:#000,color:#fff
+    style AM fill:#DE8F05,stroke:#000,color:#000
+    style GRAF fill:#029E73,stroke:#000,color:#fff
+    style SLACK fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -1133,7 +1216,7 @@ EOF
 # => alertmanagerconfig.monitoring.coreos.com/slack-config created
 ```
 
-**Key Takeaway**: `PrometheusRule` defines alert conditions in PromQL. `AlertmanagerConfig` routes firing alerts to notification channels with grouping and deduplication. Both are managed declaratively alongside other cluster resources.
+**Key Takeaway**: `PrometheusRule` defines alert conditions in PromQL, while `AlertmanagerConfig` routes firing alerts to notification channels with grouping and deduplication — both managed declaratively alongside other cluster resources.
 
 **Why It Matters**: Dashboards require someone to watch them. Alerts notify the right person at the right time without passive monitoring. Well-crafted alert rules with `for` durations prevent alert fatigue from transient spikes. Alertmanager's grouping ensures a cascade of 50 alerts from a single root cause generates one Slack message, not 50, keeping on-call engineers focused on the underlying problem rather than notification volume.
 
@@ -1228,7 +1311,7 @@ curl "http://loki.monitoring.svc:3100/loki/api/v1/query_range" \
 # => Returns JSON with matching log streams from the last hour
 ```
 
-**Key Takeaway**: Loki stores logs indexed by labels (namespace, pod, node). Promtail DaemonSet scrapes container logs and adds Kubernetes metadata labels. Query in Grafana using LogQL (`{namespace="production"} |= "error"`).
+**Key Takeaway**: Loki stores logs indexed by labels (namespace, pod, node) — Promtail DaemonSet scrapes container logs with Kubernetes metadata, enabling Grafana queries via LogQL (`{namespace="production"} |= "error"`).
 
 **Why It Matters**: `kubectl logs` shows one pod's logs at a time and loses history when pods restart. Loki aggregates logs from all pods across all nodes, retains them for configurable periods, and enables cross-pod and cross-namespace searches. Finding all instances of a specific error across a Deployment's 10 replicas takes one LogQL query instead of 10 `kubectl logs` commands — critical when tracing a bug that manifests on only some pods.
 
@@ -1237,6 +1320,24 @@ curl "http://loki.monitoring.svc:3100/loki/api/v1/query_range" \
 ### Example 72: Distributed Tracing with Tempo and Grafana
 
 Grafana Tempo stores distributed traces and integrates with Grafana for trace visualization. Combined with Prometheus metrics and Loki logs, it completes the three pillars of observability on K3s.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    APP["Instrumented App<br/>(OTEL SDK)"]
+    OTELCOL["OpenTelemetry Collector<br/>(DaemonSet)"]
+    TEMPO["Grafana Tempo<br/>trace storage"]
+    GRAF["Grafana<br/>trace viewer"]
+
+    APP -->|"OTLP spans"| OTELCOL
+    OTELCOL -->|"batch export"| TEMPO
+    TEMPO -->|"data source"| GRAF
+
+    style APP fill:#CA9161,stroke:#000,color:#fff
+    style OTELCOL fill:#DE8F05,stroke:#000,color:#000
+    style TEMPO fill:#0173B2,stroke:#000,color:#fff
+    style GRAF fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -1383,7 +1484,7 @@ vcluster connect team-alpha --namespace team-alpha-vc
 
 # Verify the virtual cluster has its own node view
 kubectl get nodes
-# => fake-node       Ready    <none>   1m    v1.35.4+k3s1
+# => fake-node       Ready    <none>   1m    v1.36.1+k3s1
 # => Virtual cluster presents a "fake" node to its tenants
 # => Workloads actually run on host K3s nodes, synced via vcluster controllers
 
@@ -1402,7 +1503,7 @@ kubectl get pods -n team-alpha-vc
 # => Pod names are prefixed/suffixed by vcluster to avoid collisions with host workloads
 ```
 
-**Key Takeaway**: vcluster creates isolated Kubernetes clusters inside K3s namespaces using resource quotas for isolation. Each virtual cluster has its own API server and admin credentials. Workloads run on the host K3s nodes but appear within the virtual cluster's namespace.
+**Key Takeaway**: vcluster creates isolated Kubernetes clusters inside K3s namespaces — each virtual cluster has its own API server and admin credentials, while workloads run on host K3s nodes but appear within the virtual cluster's namespace.
 
 **Why It Matters**: Namespace isolation is insufficient for true multi-tenancy — a sophisticated user with namespace access can list ClusterRoles, read Secrets via cross-namespace service account tokens, or escalate privileges. vcluster provides full API-level isolation: each tenant has their own Kubernetes API with their own RBAC, CRDs, and admin access, while the platform team retains host cluster control. This enables self-service Kubernetes for development teams without the operational overhead of separate physical clusters.
 
@@ -1410,7 +1511,25 @@ kubectl get pods -n team-alpha-vc
 
 ### Example 74: KEDA — Event-Driven Autoscaling
 
-KEDA (Kubernetes Event-Driven Autoscaler) scales Deployments based on external event sources — message queue depth, HTTP request rate, Prometheus metrics, cron schedules, and more.
+KEDA (Kubernetes Event-Driven Autoscaler) scales Deployments based on external event sources — message queue depth, HTTP request rate, Prometheus metrics, cron schedules, and more. Unlike HPA which uses lagging CPU/memory metrics, KEDA reads leading indicators directly from the event source before the workload is overwhelmed. It installs as a lightweight operator and introduces the `ScaledObject` and `ScaledJob` CRDs to configure scaling triggers declaratively.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    SRC["Event Source<br/>(SQS / Kafka / Redis)"]
+    KEDA["KEDA Operator<br/>reads queue depth"]
+    SO["ScaledObject<br/>triggers + min/max replicas"]
+    DEPLOY["Deployment<br/>scales 0 → N pods"]
+
+    SRC -->|"metric: queue depth"| KEDA
+    KEDA -->|"evaluates"| SO
+    SO -->|"adjusts replicas"| DEPLOY
+
+    style SRC fill:#CA9161,stroke:#000,color:#fff
+    style KEDA fill:#0173B2,stroke:#000,color:#fff
+    style SO fill:#DE8F05,stroke:#000,color:#000
+    style DEPLOY fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -1506,7 +1625,7 @@ kubectl get scaledobject web-scaledobject
 # => web-scaledobject   apps/Deployment   web               1     20    prometheus,cron  True
 ```
 
-**Key Takeaway**: KEDA `ScaledObject` drives Deployment scaling from external event sources. Multiple triggers combine — KEDA uses the highest replica count from all active triggers. Set `minReplicaCount: 0` to scale to zero when completely idle.
+**Key Takeaway**: KEDA `ScaledObject` drives Deployment scaling from external event sources — multiple triggers combine using the highest replica count, and `minReplicaCount: 0` enables true scale-to-zero when completely idle.
 
 **Why It Matters**: HPA scales on CPU/memory, which are lagging indicators — CPU spikes after requests are already queuing. KEDA scales on leading indicators: queue depth before workers are overwhelmed, or HTTP request rate before CPU rises. `minReplicaCount: 0` enables true scale-to-zero for batch workloads that sit idle for hours — reducing K3s node resource consumption to near-zero during off-hours and cutting infrastructure costs significantly for workloads with bursty traffic patterns.
 
@@ -1580,7 +1699,7 @@ kubectl describe vpa web-vpa
 # => Target: the recommended requests.cpu and requests.memory values
 ```
 
-**Key Takeaway**: VPA in `Off` mode provides resource recommendations without modifying pods. Switch to `Auto` mode to apply recommendations automatically (with pod restarts). Use `minAllowed` and `maxAllowed` to bound recommendations.
+**Key Takeaway**: VPA in `Off` mode provides resource recommendations without modifying pods — switch to `Auto` mode to apply recommendations automatically (with pod restarts), using `minAllowed` and `maxAllowed` to bound them.
 
 **Why It Matters**: Over-provisioning resource requests wastes cluster capacity — the scheduler reserves resources that pods never use. Under-provisioning causes CPU throttling and OOMKills. VPA observes actual usage patterns and recommends (or applies) right-sized requests, improving bin-packing efficiency on K3s nodes. For clusters with many microservices, VPA recommendations reduce the manual work of right-sizing from weeks of observation to a one-time configuration task.
 
@@ -1654,6 +1773,24 @@ kubectl logs -n spegel daemonset/spegel | grep "serving layer"
 
 The system-upgrade-controller (SUC) manages in-place K3s upgrades using `Plan` custom resources. It drains nodes one by one and upgrades them without manual SSH and K3s reinstall commands.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    PLAN["Plan CRD<br/>version: v1.36.1+k3s1<br/>concurrency: 1"]
+    SUC["system-upgrade-controller"]
+    N1["Node 1<br/>drain → upgrade → uncordon"]
+    N2["Node 2<br/>drain → upgrade → uncordon"]
+
+    PLAN -->|"triggers"| SUC
+    SUC -->|"Job on node 1 first"| N1
+    N1 -->|"complete → next"| N2
+
+    style PLAN fill:#DE8F05,stroke:#000,color:#000
+    style SUC fill:#0173B2,stroke:#000,color:#fff
+    style N1 fill:#029E73,stroke:#000,color:#fff
+    style N2 fill:#CC78BC,stroke:#000,color:#000
+```
+
 **Code**:
 
 ```bash
@@ -1713,7 +1850,7 @@ kubectl get jobs -n system-upgrade
 # => Job created for each upgraded node; Completion means that node is upgraded
 ```
 
-**Key Takeaway**: system-upgrade-controller `Plan` upgrades K3s nodes automatically. Set `concurrency: 1` for server nodes to maintain etcd quorum. Specify `drain: true` to safely evict workloads before upgrading each node.
+**Key Takeaway**: system-upgrade-controller `Plan` upgrades K3s nodes automatically — set `concurrency: 1` for server nodes to maintain etcd quorum, and `drain: true` to safely evict workloads before upgrading each node.
 
 **Why It Matters**: Manual K3s upgrades require SSH access to each node, stopping K3s, replacing the binary, and restarting — a tedious and error-prone process for large clusters. system-upgrade-controller orchestrates this entire sequence: drain node, run upgrade container to replace the binary, uncordon, move to next node. For clusters with rolling PodDisruptionBudgets and proper readiness probes, the upgrade is entirely transparent to end users.
 
@@ -1722,6 +1859,24 @@ kubectl get jobs -n system-upgrade
 ### Example 78: K3s Backup and Restore — etcd Snapshot
 
 K3s automatically takes etcd snapshots every 12 hours by default, storing them locally. You can also take manual snapshots and restore the cluster to any snapshot point.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    ETCD["K3s etcd<br/>(embedded)"]
+    SNAP["etcd snapshot<br/>/var/lib/rancher/k3s/server/db/snapshots/"]
+    S3["S3 / NFS<br/>(off-node copy)"]
+    RESTORE["k3s server<br/>--cluster-reset<br/>--cluster-reset-restore-path"]
+
+    ETCD -->|"every 12h auto<br/>or manual save"| SNAP
+    SNAP -->|"copy off-node"| S3
+    S3 -->|"disaster recovery"| RESTORE
+
+    style ETCD fill:#0173B2,stroke:#000,color:#fff
+    style SNAP fill:#DE8F05,stroke:#000,color:#000
+    style S3 fill:#029E73,stroke:#000,color:#fff
+    style RESTORE fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -1763,7 +1918,7 @@ sudo systemctl start k3s
 # Follow Example 29 procedure to rejoin server nodes
 ```
 
-**Key Takeaway**: `k3s etcd-snapshot save` takes manual snapshots. Restore with `k3s server --cluster-reset --cluster-reset-restore-path=<snapshot>` on a stopped K3s server. Always copy snapshots off-node to S3 or NFS for true disaster recovery.
+**Key Takeaway**: `k3s etcd-snapshot save` takes manual snapshots — restore with `k3s server --cluster-reset --cluster-reset-restore-path=<snapshot>` on a stopped K3s server, and always copy snapshots off-node to S3 or NFS for true disaster recovery.
 
 **Why It Matters**: etcd contains the entire cluster state — every Deployment, Secret, Service, and PVC definition. If etcd is corrupted or the server disk fails without a snapshot, the cluster cannot be rebuilt without redeploying every workload from scratch. Regular snapshots, especially before `kubectl delete` on critical resources or cluster upgrades, provide a safety net that makes risky operations reversible. The 12-hour automatic snapshot interval is a reasonable default; production clusters should increase frequency for high-churn environments.
 
@@ -1772,6 +1927,31 @@ sudo systemctl start k3s
 ### Example 79: HA Node Replacement in K3s Cluster
 
 Replacing a failed HA server node requires removing the failed node from etcd, then joining a new node. This example covers the safe procedure for maintaining etcd quorum during node replacement.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    S1["Server 1<br/>(healthy)"]
+    S2["Server 2<br/>(FAILED)"]
+    S3["Server 3<br/>(healthy)"]
+    NEW["New Node<br/>(replacement)"]
+    STEP1["Step 1: kubectl delete node server-2"]
+    STEP2["Step 2: etcdctl member remove server-2"]
+    STEP3["Step 3: join new node with --server"]
+
+    S2 -->|triggers| STEP1
+    STEP1 -->|then| STEP2
+    STEP2 -->|then| STEP3
+    STEP3 -->|"joins as etcd member"| NEW
+
+    style S1 fill:#029E73,stroke:#000,color:#fff
+    style S2 fill:#DE8F05,stroke:#000,color:#000
+    style S3 fill:#029E73,stroke:#000,color:#fff
+    style NEW fill:#0173B2,stroke:#000,color:#fff
+    style STEP1 fill:#CC78BC,stroke:#000,color:#000
+    style STEP2 fill:#CC78BC,stroke:#000,color:#000
+    style STEP3 fill:#CA9161,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -1821,7 +2001,7 @@ kubectl get nodes
 # => server-4   Ready    control-plane,etcd,master   5m   ← replacement
 ```
 
-**Key Takeaway**: Remove a failed node from Kubernetes with `kubectl delete node`, then remove it from etcd with `etcdctl member remove`, then join a replacement node with `--server` pointing to a healthy server. etcd replicates state to the new member automatically.
+**Key Takeaway**: Remove a failed node from Kubernetes with `kubectl delete node`, then remove it from etcd with `etcdctl member remove`, and join a replacement node with `--server` pointing to a healthy server — etcd replicates state to the new member automatically.
 
 **Why It Matters**: Incorrectly replacing a failed etcd member can permanently corrupt the cluster. The sequence matters: remove from Kubernetes → remove from etcd → add replacement. Skipping the etcd member remove leaves a ghost member that prevents new members from joining and can tip etcd into a quorum-loss situation. Understanding this procedure is the difference between a 10-minute node replacement and a full cluster rebuild from backups.
 
@@ -1943,7 +2123,7 @@ EOF
 # => validatingwebhookconfiguration.admissionregistration.k8s.io/require-resource-requests created
 ```
 
-**Key Takeaway**: Admission webhooks intercept API requests via `ValidatingWebhookConfiguration` or `MutatingWebhookConfiguration`. The webhook server returns an `AdmissionReview` response allowing or denying the request. TLS is mandatory.
+**Key Takeaway**: Admission webhooks intercept API requests via `ValidatingWebhookConfiguration` or `MutatingWebhookConfiguration` — the webhook server returns an `AdmissionReview` response allowing or denying the request, and TLS is mandatory.
 
 **Why It Matters**: OPA Gatekeeper (Example 65) is the recommended policy engine for most use cases, but direct admission webhooks offer lower latency and full programmatic flexibility. Use webhooks when you need to modify resources (mutation), call external services (e.g., Vault for secret injection), or implement logic too complex for Rego. Webhooks are how managed Kubernetes services add their own cluster-level policy enforcement — understanding them is essential for extending K3s with organizational guardrails.
 
@@ -1952,6 +2132,24 @@ EOF
 ### Example 81: Custom Resource Definitions — Write a Simple Operator
 
 CRDs extend the Kubernetes API with custom resource types. An operator implements control loop logic to reconcile custom resources to desired state using the controller-runtime library.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    USER["kubectl apply WebApp"]
+    API["K3s API Server<br/>(stores WebApp CR)"]
+    OP["Operator controller<br/>(watches WebApp CRD)"]
+    DEPLOY["Deployment<br/>+ Service created"]
+
+    USER -->|"CR written"| API
+    API -->|"watch event"| OP
+    OP -->|"reconcile → creates"| DEPLOY
+
+    style USER fill:#CA9161,stroke:#000,color:#fff
+    style API fill:#0173B2,stroke:#000,color:#fff
+    style OP fill:#DE8F05,stroke:#000,color:#000
+    style DEPLOY fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -2046,7 +2244,7 @@ kubectl get webapp my-webapp
 # => kubectl get works for custom resources just like built-in types
 ```
 
-**Key Takeaway**: CRDs define new API types. Operators watch CRD instances and reconcile cluster state to match the spec. The pattern: `kubectl apply WebApp` → operator detects change → creates/updates Deployment + Service. Operators are written with controller-runtime (Go) or operator-sdk.
+**Key Takeaway**: CRDs define new API types and operators watch CRD instances to reconcile cluster state to match the spec — for example, `kubectl apply WebApp` triggers the operator to create/update a Deployment and Service. Operators are written with controller-runtime (Go) or operator-sdk.
 
 **Why It Matters**: CRDs and operators encode operational knowledge into the cluster itself. Instead of runbooks ("to deploy a WebApp, create a Deployment, Service, ConfigMap, and HPA"), an operator automates the entire procedure from a single `WebApp` resource declaration. Popular K3s ecosystem projects (Longhorn, cert-manager, Flux) are all operators — understanding the operator pattern explains why adding one CRD installs an entire operational system.
 
@@ -2143,7 +2341,7 @@ kubectl logs -f kaniko-build
 # => INFO[0010] Pushed image registry.example.com/myapp:latest
 ```
 
-**Key Takeaway**: Kaniko builds Docker images from within K3s pods using a ConfigMap-provided Dockerfile and ConfigMap or PVC for build context. Push credentials are mounted from a Secret. No Docker daemon or privileged pod security context is required.
+**Key Takeaway**: Kaniko builds Docker images from within K3s pods using a ConfigMap-provided Dockerfile and PVC for build context — push credentials are mounted from a Secret, and no Docker daemon or privileged pod security context is required.
 
 **Why It Matters**: Traditional CI systems build images on dedicated Docker-daemon hosts outside the Kubernetes cluster, requiring privileged access and separate infrastructure. Kaniko enables build-inside-cluster workflows where K3s itself provides the build environment. Combined with Tekton pipelines (Example 83), Kaniko creates fully in-cluster CI/CD that builds, tests, and deploys applications without external CI infrastructure — ideal for K3s edge clusters with limited external connectivity.
 
@@ -2316,7 +2514,7 @@ kubectl get pipelineruns build-run-001
 # => Succeeded: all tasks completed successfully
 ```
 
-**Key Takeaway**: Tekton `Task` defines steps, `Pipeline` sequences Tasks, `PipelineRun` executes a Pipeline with specific parameters. Each TaskRun creates pods in K3s; workspace PVCs share data between Tasks. Tekton Catalog provides ready-made Tasks for Git, Kaniko, kubectl, and more.
+**Key Takeaway**: Tekton `Task` defines steps, `Pipeline` sequences Tasks, and `PipelineRun` executes a Pipeline with specific parameters — each TaskRun creates pods in K3s, workspace PVCs share data between Tasks, and Tekton Catalog provides ready-made Tasks for Git, Kaniko, and kubectl.
 
 **Why It Matters**: Tekton brings CI/CD inside K3s, eliminating the external CI runner as a dependency. Builds and tests run in the same cluster as the target workload, using the same network and storage infrastructure. For air-gapped K3s deployments or edge clusters with limited external connectivity, Tekton is the only practical CI/CD system — it requires no outbound connections and stores pipeline definitions as Kubernetes resources in the cluster's Git repository.
 
@@ -2327,6 +2525,24 @@ kubectl get pipelineruns build-run-001
 ### Example 84: K3s Security Hardening — CIS Kubernetes Benchmark
 
 The CIS Kubernetes Benchmark provides security configuration recommendations. K3s includes a hardening guide and a CIS mode that applies many benchmark controls automatically.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    KBENCH["kube-bench<br/>CIS compliance scanner"]
+    API["API Server hardening<br/>--audit-log-path<br/>--anonymous-auth=false"]
+    KUBELET["Kubelet hardening<br/>--protect-kernel-defaults<br/>--read-only-port=0"]
+    ETCD["etcd hardening<br/>--client-cert-auth<br/>--auto-tls=false"]
+
+    KBENCH -->|"validates"| API
+    KBENCH -->|"validates"| KUBELET
+    KBENCH -->|"validates"| ETCD
+
+    style KBENCH fill:#0173B2,stroke:#000,color:#fff
+    style API fill:#DE8F05,stroke:#000,color:#000
+    style KUBELET fill:#029E73,stroke:#000,color:#fff
+    style ETCD fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -2394,7 +2610,7 @@ kubectl logs -l app=kube-bench
 # => Review WARN and FAIL items and remediate according to K3s hardening guide
 ```
 
-**Key Takeaway**: Pass CIS hardening flags to K3s server at install time via `--kube-apiserver-arg` and `--kubelet-arg`. Enable audit logging for Secret access and pod creation. Validate with kube-bench against the CIS Kubernetes Benchmark controls.
+**Key Takeaway**: Pass CIS hardening flags to K3s server at install time via `--kube-apiserver-arg` and `--kubelet-arg`, enable audit logging for Secret access and pod creation, and validate with kube-bench against the CIS Kubernetes Benchmark controls.
 
 **Why It Matters**: K3s defaults optimize for ease of use, not maximum security. The CIS Kubernetes Benchmark provides a vendor-neutral, community-reviewed checklist for hardening. Audit logging creates the forensic trail required by SOC 2 and PCI DSS compliance audits — who accessed which Secret, when, from which identity. `kube-bench` automates the benchmark check, producing a compliance score and prioritized remediation list that transforms a vague security requirement into a concrete task list.
 
@@ -2402,7 +2618,7 @@ kubectl logs -l app=kube-bench
 
 ### Example 85: Production Readiness Checklist
 
-A production-ready K3s cluster requires HA control plane, data persistence, observability, RBAC, network security, TLS, backup strategy, and upgrade procedures in place before serving real workloads.
+A production-ready K3s cluster requires HA control plane, data persistence, observability, RBAC, network security, TLS, backup strategy, and upgrade procedures in place before serving real workloads. This checklist validates ten key areas using shell commands that return measurable pass/fail results rather than subjective assessments. Each check corresponds to a specific failure mode documented in earlier examples — passing all ten confirms the cluster meets the minimum bar for production traffic.
 
 **Code**:
 

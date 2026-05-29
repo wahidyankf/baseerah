@@ -20,7 +20,7 @@ Claude Code is a command-line tool that brings Claude AI's capabilities directly
 - **Web search** - Looks up current documentation and best practices
 - **Context awareness** - Remembers conversation history for multi-step tasks
 
-**Model**: Powered by Claude 3.7 Sonnet (claude-sonnet-4-5-20250929), Anthropic's most capable AI model for coding tasks.
+**Model**: Powered by Anthropic's Claude models — the Claude 4 family (Opus, Sonnet, and Haiku) — with the specific model selectable per task to balance capability, speed, and cost.
 
 ## How Claude Code Works
 

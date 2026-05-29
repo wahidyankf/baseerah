@@ -3,73 +3,42 @@ title: Overview
 weight: 100000
 date: 2025-12-23T00:00:00+07:00
 draft: false
-description: Master data access patterns with Spring Data JPA and Elixir Ecto ORM frameworks
+description: Master database migration and data-access tools across languages — schema versioning, ORMs, and type-safe query libraries
 ---
 
-Data tools provide practical frameworks for accessing and manipulating database data from application code. This section covers object-relational mapping (ORM) tools that bridge the gap between your application's object model and relational databases.
+Data tools manage how applications evolve and access their databases. This section covers two complementary families: **schema migration tools** that version-control your database structure over time, and **data-access libraries** (ORMs and query DSLs) that bridge your application's object or data model and relational databases. Each tool has a By Example tutorial in its language's idiom.
 
-## What You'll Learn
+## Schema Migration Tools
 
-- **Spring Data JPA** - Java persistence with JPA and Hibernate
-- **Elixir Ecto** - Elixir database wrapper and query DSL
+Migration tools apply ordered, reversible changes to your database schema so it evolves safely alongside your code:
 
-## Available Tools
+- **[Liquibase](/en/learn/software-engineering/data/tools/java-liquibase)** (Java) - Changelog-based migrations in SQL, XML, YAML, or JSON with rollback support.
+- **[Flyway](/en/learn/software-engineering/data/tools/kotlin-flyway)** (Kotlin) - Version-based, SQL-first migrations with a simple, convention-driven workflow.
+- **[Alembic](/en/learn/software-engineering/data/tools/python-alembic)** (Python) - SQLAlchemy's migration engine with autogeneration and branching.
+- **[Goose](/en/learn/software-engineering/data/tools/golang-goose)** (Go) - Lightweight migrations in SQL or Go functions.
+- **[Migratus](/en/learn/software-engineering/data/tools/clojure-migratus)** (Clojure) - Data-driven SQL migrations for the JVM.
+- **[DbUp](/en/learn/software-engineering/data/tools/fsharp-dbup)** (F#) - Script-based .NET migrations that track applied changes.
 
-### Spring Data JPA - Java Database Access
+## Data Access & ORMs
 
-**[Spring Data JPA](/en/learn/software-engineering/data/tools/spring-data-jpa)** provides elegant database access for Java applications:
+Data-access tools map between application code and relational data:
 
-- **Entity Mapping** - Map Java classes to database tables with annotations
-- **Repository Pattern** - Interface-based data access with automatic implementation
-- **Query Methods** - Generate SQL from method names automatically
-- **JPQL Queries** - Write database-agnostic queries in Java
-- **Transaction Management** - Declarative transaction control with @Transactional
-- **Spring Boot Integration** - Auto-configuration and minimal setup
-
-### Elixir Ecto - Functional Database Access
-
-**[Elixir Ecto](/en/learn/software-engineering/data/tools/elixir-ecto)** brings functional programming patterns to database access:
-
-- **Schema Definitions** - Define data structures with changesets for validation
-- **Composable Queries** - Build queries functionally with Ecto.Query
-- **Migrations** - Version control your database schema
-- **Multi-Database Support** - PostgreSQL, MySQL, SQLite adapters
-- **Associations** - Define relationships between schemas
-- **Repo Pattern** - Centralized database operations
+- **[Spring Data JPA](/en/learn/software-engineering/data/tools/spring-data-jpa)** (Java) - JPA/Hibernate persistence with the repository pattern and query-method generation.
+- **[EF Core](/en/learn/software-engineering/data/tools/csharp-ef-core)** (C#) - Entity Framework Core ORM with LINQ queries and built-in migrations.
+- **[Ecto](/en/learn/software-engineering/data/tools/elixir-ecto)** (Elixir) - Functional database wrapper with composable queries and changeset validation.
+- **[SQLx](/en/learn/software-engineering/data/tools/rust-sqlx)** (Rust) - Async, compile-time-checked SQL without a heavyweight ORM.
+- **[Effect SQL](/en/learn/software-engineering/data/tools/typescript-effect-sql)** (TypeScript) - Type-safe SQL access built on the Effect runtime.
 
 ## Learning Approach
 
-Each tool provides **By Example** tutorials with practical code:
+Each tool provides a **By Example** tutorial with practical, annotated, runnable code:
 
-- **Beginner** - Core concepts, basic CRUD operations, query fundamentals
-- **Intermediate** - Complex queries, relationships, transactions
+- **Beginner** - Core concepts, basic CRUD or first migrations, fundamentals
+- **Intermediate** - Complex queries, relationships, transactions, environments
 - **Advanced** - Performance optimization, custom queries, advanced patterns
-
-All examples are annotated and immediately runnable.
 
 ## Choosing Your Tool
 
-**Use Spring Data JPA when**:
-
-- Building Java applications with Spring Boot
-- Need JPA standard compliance
-- Working with complex object hierarchies
-- Want automatic SQL generation from method names
-- Require enterprise features (caching, auditing)
-
-**Use Elixir Ecto when**:
-
-- Building Elixir/Phoenix applications
-- Prefer explicit, composable queries
-- Want functional programming patterns
-- Need changesets for data validation
-- Require strong compile-time guarantees
-
-## Getting Started
-
-Choose the tool matching your language ecosystem:
-
-- **Java developers** → [Spring Data JPA](/en/learn/software-engineering/data/tools/spring-data-jpa)
-- **Elixir developers** → [Elixir Ecto](/en/learn/software-engineering/data/tools/elixir-ecto)
-
-Both tools assume basic SQL knowledge. Complete the [SQL](/en/learn/software-engineering/data/databases/sql) tutorial first if you're new to relational databases.
+- **Pick by ecosystem first** - use the migration or data-access tool idiomatic to your language and framework.
+- **Migration vs. ORM** - migration tools manage schema _structure_ over time; ORMs and query libraries manage _runtime data access_. Most production systems use both: a migration tool to evolve the schema and a data-access library to read and write rows.
+- **SQL knowledge helps** - all of these assume basic SQL. Complete the [SQL](/en/learn/software-engineering/data/databases/sql) tutorial first if you're new to relational databases.

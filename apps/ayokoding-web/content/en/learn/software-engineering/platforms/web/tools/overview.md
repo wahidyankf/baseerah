@@ -3,37 +3,57 @@ title: "Overview"
 date: 2026-02-02T00:00:00+07:00
 draft: false
 weight: 100000
-description: "Web development frameworks and tools for building modern web applications"
+description: "Web development frameworks and tools — frontend, backend, styling, TypeScript libraries, and API contracts for building modern web applications"
 tags: ["web-development", "frameworks", "tools"]
 ---
 
-This section covers web development frameworks and tools organized by technology stack. Each framework includes comprehensive tutorials, code examples, and best practices for building modern web applications.
+This section covers web development frameworks and tools organized by role in the stack. Each tool includes annotated, runnable By Example tutorials; many also include an overview, initial setup, and quick start.
 
-## Available Frameworks
+## Frontend Frameworks
 
-### Frontend Frameworks
+- **[React](/en/learn/software-engineering/platforms/web/tools/fe-react)** - Component-based UI library with a virtual DOM.
+- **[Next.js](/en/learn/software-engineering/platforms/web/tools/fe-nextjs)** - React framework with server-side rendering, static generation, and full-stack capabilities.
+- **[TanStack Start](/en/learn/software-engineering/platforms/web/tools/fe-tanstack-start/by-example)** - Full-stack, type-safe React framework built on TanStack Router.
 
-**React** - JavaScript library for building user interfaces with component-based architecture and virtual DOM.
+## Styling & UI
 
-**Next.js** - React framework with server-side rendering, static site generation, and full-stack capabilities.
+- **[Tailwind CSS](/en/learn/software-engineering/platforms/web/tools/fe-tailwindcss)** - Utility-first CSS framework for rapid, consistent styling.
+- **[Radix UI](/en/learn/software-engineering/platforms/web/tools/fe-radix-ui)** - Unstyled, accessible component primitives for design systems.
 
-### Backend Frameworks
+## TypeScript Toolkit
 
-**Elixir Phoenix** - Productive web framework built on Elixir and Erlang VM for highly concurrent, fault-tolerant applications.
+- **[tRPC](/en/learn/software-engineering/platforms/web/tools/ts-trpc)** - End-to-end type-safe APIs without code generation.
+- **[Zod](/en/learn/software-engineering/platforms/web/tools/ts-zod)** - Schema declaration and runtime validation with static type inference.
+- **[Effect](/en/learn/software-engineering/platforms/web/tools/ts-effect/by-example)** - Typed effect system for composable, robust TypeScript.
+- **[XState](/en/learn/software-engineering/platforms/web/tools/ts-xstate/by-example)** - State machines and statecharts for predictable app logic.
 
-**Phoenix LiveView** - Real-time, server-rendered web applications without JavaScript frameworks using Phoenix.
+## Backend Frameworks
 
-**Spring Framework** - Comprehensive Java framework for enterprise applications with dependency injection and aspect-oriented programming.
+- **[Spring](/en/learn/software-engineering/platforms/web/tools/jvm-spring)** & **[Spring Boot](/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot)** (Java) - Comprehensive enterprise framework and its opinionated, production-ready configuration.
+- **[Phoenix](/en/learn/software-engineering/platforms/web/tools/elixir-phoenix)** & **[Phoenix LiveView](/en/learn/software-engineering/platforms/web/tools/elixir-phoenix-liveview)** (Elixir) - Productive, fault-tolerant framework and real-time server-rendered UIs.
+- **[FastAPI](/en/learn/software-engineering/platforms/web/tools/python-fastapi/by-example)** (Python) - Async, type-hinted API framework with automatic OpenAPI docs.
+- **[Axum](/en/learn/software-engineering/platforms/web/tools/rust-axum/by-example)** (Rust) - Ergonomic, Tokio-based web framework.
+- **[Gin](/en/learn/software-engineering/platforms/web/tools/golang-gin/by-example)** (Go) - Fast, minimalist HTTP web framework.
+- **[Ktor](/en/learn/software-engineering/platforms/web/tools/kotlin-ktor/by-example)** (Kotlin) - Coroutine-based asynchronous framework.
+- **[ASP.NET Core](/en/learn/software-engineering/platforms/web/tools/csharp-aspnetcore/by-example)** (C#) - Cross-platform .NET web framework.
+- **[Giraffe](/en/learn/software-engineering/platforms/web/tools/fsharp-giraffe/by-example)** (F#) - Functional web framework on ASP.NET Core.
+- **[Vert.x](/en/learn/software-engineering/platforms/web/tools/jvm-vertx/by-example)** (JVM) - Reactive, event-driven toolkit.
+- **[Pedestal](/en/learn/software-engineering/platforms/web/tools/clojure-pedestal/by-example)** (Clojure) - Composable, data-driven backend services.
 
-**Spring Boot** - Opinionated Spring configuration for building production-ready applications quickly.
+## API Contracts & Specialized
+
+- **[OpenAPI](/en/learn/software-engineering/platforms/web/tools/openapi/by-example)** - Design-first API contracts and code generation.
+- **[Progressive Web Apps](/en/learn/software-engineering/platforms/web/tools/progressive-web-apps)** - Installable, offline-capable web apps.
+- **[AI-Powered Apps](/en/learn/software-engineering/platforms/web/tools/ai-powered-apps)** - Building web applications backed by LLMs and AI services.
+- **[Flutter Web](/en/learn/software-engineering/platforms/web/tools/dart-flutter-web/by-example)** (Dart) - Cross-platform UI rendered to the web.
 
 ## Learning Path
 
-Each framework follows a consistent learning structure:
+Most tools follow a consistent structure:
 
 1. **Overview** - Introduction, key features, when to use, comparison with alternatives
-2. **Initial Setup** - Installation, project setup, first application (0-5% coverage)
-3. **Quick Start** - Complete working example with walkthrough (5-30% coverage)
-4. **By Example** - 75-90 annotated code examples for 95% coverage (where available)
+2. **Initial Setup** - Installation, project setup, first application
+3. **Quick Start** - A complete working example with walkthrough
+4. **By Example** - Heavily annotated code examples (where available)
 
-Choose a framework based on your project requirements, team expertise, and technical constraints.
+Choose a tool based on your project requirements, team expertise, and technical constraints.

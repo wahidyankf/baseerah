@@ -23,5 +23,9 @@ industry-standard tools, and four specialized by-example tracks.
 - **CISO by Example** - Security leadership — risk management, governance, compliance frameworks,
   and board communication through annotated decision scenarios
 
+The Red Team, Blue Team, and CISO tracks are organized under
+[Roles](/en/learn/information-security/roles), grouping the by-example content by the security
+role you're stepping into.
+
 Each topic follows the Diátaxis framework with tutorials (learning-oriented), how-to guides
 (problem-solving), reference (technical lookup), and explanations (conceptual understanding).

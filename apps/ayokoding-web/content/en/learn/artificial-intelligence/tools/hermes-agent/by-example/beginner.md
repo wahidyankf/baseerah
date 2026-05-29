@@ -37,22 +37,16 @@ graph LR
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
-                                        # => Downloads and runs official install script
-                                        # => Only prerequisite: Git must be installed
-                                        # => Auto-installs: Python 3.11, Node.js v22
-                                        # => Auto-installs: uv (Python package manager)
-                                        # => Auto-installs: ripgrep (fast file search)
-                                        # => Auto-installs: ffmpeg (media processing)
+                                        # => Only prerequisite: Git pre-installed
+                                        # => Auto-installs: Python 3.11, Node.js v22, uv, ripgrep, ffmpeg
 
-source ~/.bashrc                        # => Reloads shell environment
-                                        # => Makes `hermes` command available in PATH
+source ~/.bashrc                        # => Makes `hermes` command available in PATH
 
-hermes --version                        # => Output: hermes-agent 0.9.0
+hermes --version                        # => Output: hermes-agent v0.15.2
                                         # => Confirms successful installation
 
 hermes doctor                           # => Runs post-install health check
-                                        # => Validates all dependencies installed
-                                        # => Output: pass/fail for each component
+                                        # => Validates all dependencies; shows pass/fail per component
 ```
 
 **Key Takeaway**: Install Hermes Agent with `curl | bash`. The installer handles all dependencies — you only need Git pre-installed.
@@ -63,32 +57,40 @@ hermes doctor                           # => Runs post-install health check
 
 The `hermes setup` command launches an interactive wizard that configures your model provider, API keys, and creates the `~/.hermes/` directory structure. This is the recommended first step after installation.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    A["hermes setup<br/>(interactive wizard)"]
+    B["Step 1: Provider<br/>(anthropic, openrouter, ...)"]
+    C["Step 2: API Key<br/>(validated live)"]
+    D["Step 3: Default Model"]
+    E["~/.hermes/<br/>config.yaml + .env"]
+
+    A --> B --> C --> D --> E
+
+    style A fill:#0173B2,stroke:#000,color:#fff
+    style B fill:#DE8F05,stroke:#000,color:#fff
+    style C fill:#029E73,stroke:#000,color:#fff
+    style D fill:#CC78BC,stroke:#000,color:#fff
+    style E fill:#CA9161,stroke:#000,color:#fff
+```
+
 ```bash
 hermes setup                            # => Launches interactive setup wizard
-                                        # => Step 1: Select model provider
-                                        # =>   Options: anthropic, openrouter, nous,
-                                        # =>            openai, copilot, custom
-                                        # => Step 2: Enter API key for chosen provider
-                                        # => Step 3: Select default model
-                                        # => Creates ~/.hermes/ directory structure
-                                        # => Creates ~/.hermes/config.yaml
-                                        # => Creates ~/.hermes/.env (API keys)
-                                        # => Output: "Setup complete! Run `hermes` to start."
+                                        # => Steps: provider → API key → default model
+                                        # => Creates ~/.hermes/ with config.yaml + .env
 
-ls ~/.hermes/                           # => Output:
-                                        # =>   config.yaml     — Main configuration
-                                        # =>   .env            — API keys and secrets
-                                        # =>   auth.json       — OAuth tokens (if used)
-                                        # =>   memories/       — Persistent agent memory
-                                        # =>   SOUL.md         — Agent personality definition
+ls ~/.hermes/                           # => config.yaml (settings), .env (secrets),
+                                        # =>   memories/ (MEMORY.md, USER.md), SOUL.md
 
 hermes model                            # => Shows current model selection
                                         # => Output: "Current model: anthropic/claude-sonnet-4-6"
-                                        # => Use to switch models after initial setup
-                                        # => Prompts for new provider and model selection
+
+hermes model anthropic/claude-opus-4    # => Switches to a different model immediately
+                                        # => Takes effect for the current session
 ```
 
-**Key Takeaway**: Run `hermes setup` immediately after installation. It creates `~/.hermes/` with config, API keys, and memory directories. Use `hermes model` to change models later.
+**Key Takeaway**: Run `hermes setup` immediately after installation. It creates `~/.hermes/` with config, API keys, and memory directories — use `hermes model` to change models later.
 
 **Why It Matters**: The setup wizard prevents the most common failure mode: manually editing YAML config with a typo that silently breaks the agent. The wizard validates your API key against the provider before saving, catches permission issues with `~/.hermes/`, and ensures the directory structure matches what the agent expects. Teams rolling out Hermes across developer machines use `hermes setup` to guarantee consistent baseline configuration without writing deployment scripts or distributing config templates.
 
@@ -97,57 +99,48 @@ hermes model                            # => Shows current model selection
 Running `hermes` or `hermes chat` launches the terminal user interface (TUI) for interactive conversations. The TUI supports multiline editing, autocomplete, streaming output, and live token/cost tracking.
 
 ```bash
-hermes                                  # => Launches interactive TUI session
-                                        # => Same as: hermes chat
-                                        # => Multiline editing enabled by default
-                                        # => Tab autocomplete for slash commands
-                                        # => Streaming output renders as LLM generates
+hermes                                  # => Launches interactive TUI session (= hermes chat)
+                                        # => Multiline editing, tab autocomplete, streaming
+                                        # => Press Ctrl+D to quit cleanly
 
-hermes chat                             # => Explicit command, identical to `hermes`
-                                        # => Status bar shows: token count, session cost
-                                        # => Ctrl+C to interrupt current generation
-                                        # => /new to reset conversation (fresh context)
-                                        # => /exit or Ctrl+D to quit session
+hermes chat                             # => Identical to bare `hermes`
+                                        # => Status bar: token count + session cost
+                                        # => Ctrl+C interrupt, /new reset, Ctrl+D quit
 
-# Inside the TUI:
-# > What is Rust?                       # => Type prompt and press Enter
-#                                       # => LLM streams response in real-time
-#                                       # => Status bar updates token count
-#                                       # => Status bar updates running cost
+# Inside the TUI — type prompts and press Enter:
+> What is Rust?                         # => LLM streams response token-by-token in real-time
+> Explain ownership in Rust             # => Status bar updates tokens + cost per turn
+                                        # => Each turn adds to cumulative session cost
+> /new                                  # => Resets context; reloads MEMORY.md and USER.md
+> /usage                                # => Output: "Input: 1,204 tokens | Session cost: $0.012"
 ```
 
-**Key Takeaway**: Run `hermes` to start an interactive session. Use `Ctrl+C` to interrupt, `/new` to reset context, and `Ctrl+D` to exit. The status bar tracks tokens and cost in real-time.
+**Key Takeaway**: Run `hermes` to start an interactive session. Use `Ctrl+C` to interrupt, `/new` to reset context, `Ctrl+D` to exit, and the status bar tracks tokens and cost in real-time.
 
 **Why It Matters**: The TUI is where most development work happens — exploring codebases, debugging issues, and iterating on solutions. Real-time token and cost tracking prevents budget surprises that are common with web-based AI interfaces where usage is invisible until the monthly bill arrives. The `/new` command is critical for context management: when a conversation drifts off-topic or the context window fills with irrelevant history, resetting gives the LLM a fresh start without restarting the entire application.
 
 ### Example 4: One-Shot Messages
 
-The `-q` flag sends a single query and exits after the response, making Hermes Agent scriptable for automation pipelines, shell scripts, and CI/CD integrations.
+The `-q` flag sends a single query and exits after the response, making Hermes Agent scriptable for automation pipelines, shell scripts, and CI/CD integrations. Unlike the interactive TUI, one-shot mode prints the response to stdout and returns to the shell, so it composes naturally with pipes and redirections.
 
 ```bash
 hermes chat -q "What is Rust?"          # => Sends single query to configured LLM
-                                        # => Prints response to stdout
                                         # => Exits automatically after response
-                                        # => Non-interactive: no TUI launched
 
 hermes chat -q "Summarize this" < README.md
                                         # => Pipes file content as stdin context
                                         # => LLM receives file + prompt together
-                                        # => Useful for processing files in scripts
 
 hermes chat --toolsets "web" -q "search for Rust async runtimes"
                                         # => Restricts available tools to web only
-                                        # => Agent can search the web but not run terminal
-                                        # => Limits scope for safer scripted usage
                                         # => Other toolsets: terminal, file, vision
 
 echo "explain: $(cat error.log)" | hermes chat -q -
                                         # => Reads prompt from stdin via dash flag
-                                        # => Useful in pipeline chains
                                         # => Combines shell interpolation with AI
 ```
 
-**Key Takeaway**: Use `hermes chat -q "prompt"` for one-shot AI queries. Combine with `--toolsets` to restrict tool access. Supports stdin piping for shell integration.
+**Key Takeaway**: Use `hermes chat -q "prompt"` for one-shot AI queries; combine with `--toolsets` to restrict tool access and stdin piping for shell integration.
 
 **Why It Matters**: One-shot mode transforms Hermes Agent from an interactive tool into a composable UNIX utility. CI/CD pipelines use it for automated code review (`git diff | hermes chat -q "review this diff"`), shell aliases make AI queries instant (`alias ask='hermes chat -q'`), and cron jobs can generate daily reports. The `--toolsets` restriction is essential for scripted usage — you want the agent to answer questions but not accidentally run destructive terminal commands when processing untrusted input from logs or user data.
 
@@ -157,36 +150,24 @@ The `--reasoning-effort` flag controls how deeply the LLM reasons before respond
 
 ```bash
 hermes chat -q "What is 2+2?" --reasoning-effort none
-                                        # => No chain-of-thought reasoning
-                                        # => Fastest response, lowest token usage
-                                        # => Output: "4"
-                                        # => Best for: trivial lookups, simple facts
+                                        # => No chain-of-thought; fastest + cheapest
+                                        # => Output: "4" — best for trivial lookups
 
 hermes chat -q "Explain mutex vs semaphore" --reasoning-effort minimal
-                                        # => Minimal internal reasoning
-                                        # => Brief but accurate answer
-                                        # => Output: short comparison paragraph
+                                        # => Minimal reasoning; brief accurate answer
 
 hermes chat -q "Debug this null pointer" --reasoning-effort low
-                                        # => Light reasoning pass
-                                        # => Catches obvious issues
-                                        # => Output: identifies likely cause
+                                        # => Light reasoning; catches obvious issues
 
 hermes chat -q "Design a cache layer" --reasoning-effort medium
-                                        # => Moderate reasoning depth
-                                        # => Considers trade-offs and alternatives
-                                        # => Output: structured design with pros/cons
+                                        # => Moderate depth; considers trade-offs
                                         # => Good default for general development tasks
 
 hermes chat -q "Architect a payment system" --reasoning-effort high
-                                        # => Extended reasoning, edge case analysis
-                                        # => Output: comprehensive design document
-                                        # => Covers: security, scaling, failure modes
+                                        # => Extended reasoning; covers security + scaling
 
 hermes chat -q "Find the race condition" --reasoning-effort xhigh
-                                        # => Maximum reasoning depth
-                                        # => Exhaustive analysis of all code paths
-                                        # => Output: detailed trace with fix
+                                        # => Maximum depth; exhaustive code path analysis
                                         # => Highest token usage and latency
 ```
 
@@ -198,30 +179,46 @@ hermes chat -q "Find the race condition" --reasoning-effort xhigh
 
 The `hermes doctor` command validates your entire installation — checking dependencies, config syntax, API key validity, and tool availability. The `hermes status` and `hermes update` commands round out the diagnostics toolkit.
 
-```bash
-hermes doctor                           # => Runs full diagnostic suite
-                                        # => Checks: Python 3.11 installed
-                                        # => Checks: Node.js v22 installed
-                                        # => Checks: uv package manager present
-                                        # => Checks: ripgrep available
-                                        # => Checks: ffmpeg available
-                                        # => Checks: ~/.hermes/config.yaml valid
-                                        # => Checks: API key authenticates
-                                        # => Output: pass/fail for each check
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["hermes doctor"]
+    B["Python 3.11"]
+    C["Node.js v22"]
+    D["uv / ripgrep / ffmpeg"]
+    E["~/.hermes/config.yaml"]
+    F["API key auth"]
+    G{"All pass?"}
+    H["Ready"]
+    I["Fix reported check"]
 
-hermes status                           # => Shows current configuration state
-                                        # => Output: active model provider
-                                        # => Output: configured API keys (masked)
-                                        # => Output: enabled toolsets
-                                        # => Output: memory file sizes
+    A --> B & C & D & E & F --> G
+    G -->|"yes"| H
+    G -->|"no"| I
 
-hermes update                           # => Updates Hermes Agent to latest version
-                                        # => Downloads and replaces current install
-                                        # => Preserves ~/.hermes/ config and memories
-                                        # => Output: "Updated to hermes-agent 0.9.1"
+    style A fill:#0173B2,stroke:#000,color:#fff
+    style G fill:#DE8F05,stroke:#000,color:#fff
+    style H fill:#029E73,stroke:#000,color:#fff
+    style I fill:#CC78BC,stroke:#000,color:#fff
 ```
 
-**Key Takeaway**: Run `hermes doctor` when anything breaks. Use `hermes status` to inspect current config. Use `hermes update` to get the latest version without losing your configuration.
+```bash
+hermes doctor                           # => Runs full diagnostic suite
+                                        # => Checks Python, Node.js, uv, ripgrep, ffmpeg,
+                                        # =>   config.yaml syntax, and API key auth
+                                        # => Output: pass/fail for each check
+
+hermes status                           # => Shows active provider, masked API keys,
+                                        # =>   enabled toolsets, memory file sizes
+
+hermes update                           # => Updates to latest version
+                                        # => Preserves ~/.hermes/ config and memories
+
+hermes --version                        # => Output: hermes-agent v0.15.2
+hermes doctor --fix                     # => Auto-remediate fixable dependency issues
+```
+
+**Key Takeaway**: Run `hermes doctor` when anything breaks and `hermes status` to inspect current config. Use `hermes update` to get the latest version without losing your configuration.
 
 **Why It Matters**: Hermes Agent depends on six external tools (Python, Node.js, uv, ripgrep, ffmpeg, Git) plus network connectivity to LLM providers. Any of these failing produces different symptoms — from silent response drops to cryptic Python errors. `doctor` eliminates guesswork by testing each dependency systematically. The `update` command preserves your `~/.hermes/` directory, so upgrading never wipes your memories, API keys, or custom personality. This separation of binary from config is a deliberate design choice enabling fearless updates.
 
@@ -258,18 +255,17 @@ graph TD
 **Directory structure**:
 
 ```bash
-ls -la ~/.hermes/                       # => Output:
-                                        # =>   config.yaml   — Main YAML configuration
-                                        # =>   .env          — API keys (never commit)
-                                        # =>   auth.json     — OAuth tokens (auto-managed)
-                                        # =>   SOUL.md       — Agent personality definition
-                                        # =>   memories/     — Persistent memory files
-                                        # =>     MEMORY.md   — Agent's learned notes
-                                        # =>     USER.md     — User profile info
+ls -la ~/.hermes/                       # => config.yaml (settings), .env (secrets),
+                                        # =>   auth.json (OAuth), SOUL.md (personality),
+                                        # =>   memories/ (MEMORY.md + USER.md)
 
-cat ~/.hermes/config.yaml               # => YAML format: human-readable, comment-friendly
-                                        # => All non-secret settings live here
+cat ~/.hermes/config.yaml               # => YAML format; all non-secret settings
                                         # => Changes take effect on next session start
+                                        # => Do not store secrets here — use .env instead
+
+cat ~/.hermes/.env                      # => API keys (one KEY=value per line)
+                                        # => File permissions: chmod 600 ~/.hermes/.env
+cat ~/.hermes/SOUL.md                   # => Agent personality definition file
 ```
 
 **Key Takeaway**: All Hermes Agent configuration lives in `~/.hermes/`. Secrets go in `.env`, behavior in `config.yaml`, personality in `SOUL.md`, and learned context in `memories/`.
@@ -308,9 +304,10 @@ model:
     model:
       openai/gpt-4o # => Fallback model selection
       # => Activated on: rate limit, timeout, API error
+      # => Hermes retries once on primary before switching
 ```
 
-**Key Takeaway**: Set `model.provider` and `model.model` for your primary LLM. Configure `fallback` for automatic failover. Use `${VAR}` syntax to reference API keys from `.env`.
+**Key Takeaway**: Set `model.provider` and `model.model` for your primary LLM, and configure `fallback` for automatic failover. Use `${VAR}` syntax to reference API keys from `.env`.
 
 **Why It Matters**: Model fallback chains prevent outages — when Anthropic has an incident, Hermes Agent automatically routes to OpenRouter without human intervention. The `${VAR}` substitution keeps API keys in `.env` rather than hardcoded in YAML, so you can safely share config files and version-control them. The provider abstraction means switching from Anthropic to OpenAI is a one-line change, not a code migration — essential for teams evaluating different LLMs or needing to rotate providers for cost optimization.
 
@@ -319,86 +316,85 @@ model:
 The `~/.hermes/.env` file stores all API keys and sensitive credentials. Hermes Agent loads this file at session start and resolves `${VAR}` references in `config.yaml`.
 
 ```bash
-# ~/.hermes/.env
-# => One key-value pair per line
-# => Loaded at session start
-# => Referenced via ${VAR} in config.yaml
-
-ANTHROPIC_API_KEY=sk-ant-api03-xxxxx    # => Anthropic Claude API key
-                                        # => Get from: console.anthropic.com
-
-OPENROUTER_API_KEY=sk-or-v1-xxxxx       # => OpenRouter API key
-                                        # => Get from: openrouter.ai/keys
-                                        # => Provides access to 200+ models
-
-OPENAI_API_KEY=sk-proj-xxxxx            # => OpenAI API key
-                                        # => Get from: platform.openai.com
-
-NOUS_API_KEY=nk-xxxxx                   # => Nous Research API key
-                                        # => Get from: inference.nous.ai
+# ~/.hermes/.env — one KEY=value per line; loaded at session start
+# => chmod 600 ~/.hermes/.env to restrict read access to your user only
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxx    # => Anthropic Claude key (console.anthropic.com)
+                                        # => Required when provider: anthropic in config.yaml
+OPENROUTER_API_KEY=sk-or-v1-xxxxx       # => OpenRouter key — access 200+ models (openrouter.ai/keys)
+OPENAI_API_KEY=sk-proj-xxxxx            # => OpenAI key (platform.openai.com)
+NOUS_API_KEY=nk-xxxxx                   # => Nous Research key (inference.nous.ai)
 ```
 
 ```yaml
 # ~/.hermes/config.yaml
-# => Precedence order for configuration values:
-# =>   1. CLI arguments (highest priority)
-# =>   2. config.yaml values
-# =>   3. .env file variables
-# =>   4. Built-in defaults (lowest priority)
+# => Precedence: CLI args > config.yaml > .env vars > built-in defaults
 
 model:
   api_key:
-    "${ANTHROPIC_API_KEY}" # => Resolved from .env at runtime
-    # => Clear error if variable is unset
+    "${ANTHROPIC_API_KEY}" # => ${VAR} resolved from .env at runtime
+    # => Clear error message if variable is unset
+    # => Supports any environment variable name you define
 ```
 
-**Key Takeaway**: Store all API keys in `~/.hermes/.env`. Reference them in `config.yaml` with `${VAR}` syntax. CLI arguments override config which overrides `.env` which overrides defaults.
+**Key Takeaway**: Store all API keys in `~/.hermes/.env` and reference them in `config.yaml` with `${VAR}` syntax. CLI arguments override config, which overrides `.env`, which overrides defaults.
 
 **Why It Matters**: Keeping secrets in `.env` rather than `config.yaml` follows security best practices — you can share, version-control, or post your config file without exposing credentials. The four-level precedence chain (CLI > config > env > defaults) enables flexible overrides: set a default model in config, override it per-session with `--model`, or let CI pipelines inject keys via environment variables without touching config files. This pattern is familiar to anyone who has used Docker, Kubernetes, or twelve-factor apps.
 
 ### Example 10: Display and Output Settings
 
-The `display` and `streaming` sections control how Hermes Agent renders responses — progress indicators, streaming behavior, reasoning visibility, cost display, and visual skin.
+The `display` and `streaming` sections control how Hermes Agent renders responses — progress indicators, streaming behavior, reasoning visibility, cost display, and visual skin. Tuning these settings shapes the developer experience for both interactive sessions and scripted automation.
 
 ```yaml
 # ~/.hermes/config.yaml
 
 display:
+  # => Controls all visual output settings in the TUI
   tool_progress:
     true # => Show tool execution progress bars
     # => Displays: "Running terminal..." with spinner
+    # => false: hides progress; useful for scripted output
   streaming:
     true # => Stream tokens as LLM generates them
-    # => false: wait for complete response
+    # => false: wait for complete response before display
+    # => Streaming requires SSE-compatible terminal
   show_reasoning:
     true # => Display chain-of-thought reasoning
-    # => Shows the LLM's thinking process
+    # => Shows the LLM's thinking process before final answer
+    # => Disable to reduce output length in automated pipelines
   show_cost:
     true # => Display cost per message and session total
     # => Output: "$0.003 (session: $0.15)"
+    # => Helps catch expensive prompts before they add up
   skin:
     default # => Visual theme for TUI
     # => Options: default, minimal, colorful
+    # => minimal: no colors, good for terminal recording
   personality:
     default # => Display personality name in status bar
     # => Shows which SOUL.md persona is active
+    # => Useful when switching personalities mid-session
   compact:
     false # => Compact mode reduces whitespace
     # => true: denser output, less scrolling
+    # => Recommended for small terminal windows
 
 streaming:
   enabled:
     true # => Master switch for streaming
     # => false: all responses arrive as complete blocks
+    # => Set false when piping output to another tool
   transport:
     sse # => Streaming protocol
     # => Options: sse (Server-Sent Events), websocket
+    # => sse is default; websocket available for some providers
   edit_interval:
     100 # => Milliseconds between display updates
-    # => Lower = smoother but higher CPU
+    # => Lower = smoother but higher CPU usage
+    # => 100ms is a good default for most terminals
   cursor:
     true # => Show blinking cursor during generation
     # => Visual indicator that LLM is still working
+    # => false: no cursor; cleaner for non-interactive output
 ```
 
 **Key Takeaway**: Control visual output with `display` settings. Enable `show_cost` to track spending, `show_reasoning` to see the LLM's thought process, and adjust `streaming` for response rendering.
@@ -407,7 +403,7 @@ streaming:
 
 ### Example 11: Agent Behavior Configuration
 
-The `agent` section controls core runtime behavior — maximum conversation turns, reasoning effort defaults, tool use enforcement, and context compression settings.
+The `agent` section controls core runtime behavior — maximum conversation turns, reasoning effort defaults, tool use enforcement, and context compression settings. Getting these right prevents runaway sessions, manages LLM costs, and ensures long conversations stay coherent.
 
 ```yaml
 # ~/.hermes/config.yaml
@@ -445,6 +441,7 @@ compression:
     5 # => Protect last N messages from compression
     # => Keeps recent context intact
     # => Older messages get summarized
+    # => Increase if recent context is often compressed away
 ```
 
 **Key Takeaway**: Set `max_turns` to prevent runaway sessions, `reasoning_effort` for default depth, and `compression` to manage long conversations automatically.
@@ -453,37 +450,33 @@ compression:
 
 ### Example 12: Human Delay Settings
 
-The `human_delay` section adds configurable pauses between agent actions, making the agent appear more natural in messaging platforms where instant responses feel robotic.
+The `human_delay` section adds configurable pauses between agent actions, making the agent appear more natural in messaging platforms where instant responses feel robotic. Three modes — `off`, `natural`, and `custom` — let you trade response speed for conversation realism.
 
 ```yaml
 # ~/.hermes/config.yaml
 
 human_delay:
   mode:
-    "off" # => Delay mode selection
-    # => off: no artificial delays (fastest)
-    # => natural: randomized human-like pauses
-    # => custom: use min_ms and max_ms values
-
+    "off" # => off: no delays (fastest); natural: randomized; custom: use min/max_ms
+    # => Change mode without restarting — edit config.yaml and restart session
   min_ms:
-    500 # => Minimum delay in milliseconds
-    # => Only used when mode: custom
-    # => Adds at least 500ms between actions
-
+    500 # => Minimum pause in milliseconds (custom mode only)
+    # => Values below 200ms are too fast to feel human
   max_ms:
-    2000 # => Maximum delay in milliseconds
-    # => Only used when mode: custom
-    # => Random delay between min_ms and max_ms
-    # => Simulates human typing speed variation
+    2000 # => Maximum pause; random delay in [min_ms, max_ms] simulates typing speed
+    # => 2000ms upper bound matches average human typing speed for short messages
 ```
 
 ```bash
-# Example: mode set to "natural"
-# Agent receives message at 10:00:00.000
-# => Pauses 800ms (randomized)          # => Simulates reading the message
-# Agent starts typing at 10:00:00.800
-# => Pauses 1200ms (randomized)         # => Simulates composing response
-# Agent sends response at 10:00:02.000
+# Switch delay mode without restarting (edit config.yaml, then restart session):
+# => Edit config.yaml, save it, then kill and relaunch hermes
+hermes chat                             # => mode: off — responds instantly (development)
+                                        # => Best for CI/CD pipelines and scripted use
+hermes chat                             # => mode: natural — pauses ~800ms read + ~1200ms compose
+                                        # => Best for Slack/Telegram channels; feels human
+hermes chat                             # => mode: custom — random delay in [min_ms, max_ms]
+                                        # => Best when natural feels too slow or too fast
+# Natural mode timeline: receive at t=0 → pause 800ms → type → pause 1200ms → send at t=2s
 ```
 
 **Key Takeaway**: Use `mode: off` for development speed, `mode: natural` for messaging platforms where human-like pacing matters, and `mode: custom` for precise delay control.
@@ -611,32 +604,20 @@ graph LR
 
 ```bash
 # In hermes TUI session:
-> Read the contents of package.json
+> Read the contents of package.json     # => Agent: read_file("package.json")
+                                        # => Returns full file contents to agent context
 
-# => Agent uses: read_file("package.json")
-# => Returns: full file contents to agent context
-# => Agent analyzes and reports key information
-
-> Create a .gitignore file for a Node.js project
-
-# => Agent uses: write_file(".gitignore", "node_modules/\ndist/\n.env\n...")
-# => Creates file with standard Node.js ignore patterns
-# => Output: "Created .gitignore with 12 patterns"
+> Create a .gitignore for a Node.js project
+                                        # => Agent: write_file(".gitignore", "node_modules/\ndist/\n...")
+                                        # => Output: "Created .gitignore with 12 patterns"
 
 > Change the port from 3000 to 8080 in server.ts
-
-# => Agent uses: patch("server.ts",
-# =>   old_string="port: 3000",
-# =>   new_string="port: 8080")
-# => Targeted edit — only changes matched text
-# => Output: "Updated port from 3000 to 8080 in server.ts"
+                                        # => Agent: patch("server.ts", old="port: 3000", new="port: 8080")
+                                        # => Targeted edit — only the matched text changes
 
 > Find all files importing the auth module
-
-# => Agent uses: search_files("from.*auth", "src/")
-# => Uses ripgrep under the hood for fast search
-# => Returns: matching files with line numbers
-# => Output: "Found 5 files importing auth module"
+                                        # => Agent: search_files("from.*auth", "src/") via ripgrep
+                                        # => Output: "Found 5 files importing auth module"
 ```
 
 **Key Takeaway**: Use `read_file` to inspect, `write_file` to create, `patch` for targeted edits (old_string to new_string), and `search_files` to locate content across your project.
@@ -651,30 +632,22 @@ The web tools let Hermes Agent search the internet and extract content from web 
 # ~/.hermes/config.yaml
 
 web:
-  backend:
-    firecrawl # => Web search/extraction backend
-    # => Options: firecrawl, tavily, exa, parallel
-    # => firecrawl: best for page extraction
-    # => tavily: optimized for search relevance
-    # => parallel: queries multiple engines
+  backend: firecrawl # => Options: firecrawl (extraction), tavily (search), exa, parallel
 ```
 
 ```bash
 # In hermes TUI session:
 > Search for the latest Rust release notes
-
-# => Agent uses: web_search("Rust programming language latest release")
-# => Queries configured backend (firecrawl/tavily/exa)
-# => Returns: top search results with titles and snippets
-# => Agent summarizes: "Rust 1.82 was released on..."
+                                        # => web_search("Rust programming language latest release")
+                                        # => Returns top results; agent summarizes: "Rust 1.82 was released on..."
 
 > Extract the content from https://doc.rust-lang.org/book/ch04-01.html
+                                        # => web_extract(url) fetches page and strips navigation/ads
+                                        # => Returns clean structured text for agent to analyze
 
-# => Agent uses: web_extract("https://doc.rust-lang.org/book/ch04-01.html")
-# => Fetches page and converts to clean text
-# => Strips navigation, ads, boilerplate
-# => Returns: main content as structured text
-# => Agent analyzes and answers based on extracted content
+> What does the Axum 0.8 changelog say about breaking changes?
+                                        # => Agent searches + extracts relevant docs automatically
+                                        # => Combines web_search and web_extract in one turn
 ```
 
 **Key Takeaway**: `web_search` queries the internet for information, `web_extract` fetches and cleans web page content. Configure `web.backend` in `config.yaml` to choose the search engine.
@@ -688,27 +661,18 @@ The process tool lets Hermes Agent start, monitor, and stop long-running process
 ```bash
 # In hermes TUI session:
 > Start a development server in the background
+                                        # => process.start("npm run dev") — PID 12345 returned
+                                        # => Agent continues conversation while server runs in background
 
-# => Agent uses: process.start("npm run dev")
-# => Launches process in background
-# => Returns: process ID (PID) and status
-# => Output: "Started process 12345: npm run dev"
-# => Agent continues conversation while server runs
+> Also start the TypeScript watcher     # => process.start("tsc --watch") — PID 12389 returned
 
 > Check the status of running processes
+                                        # => process.status() output:
+                                        # =>   PID 12345 | running | npm run dev  (2m 15s)
+                                        # =>   PID 12389 | running | tsc --watch  (1m 30s)
 
-# => Agent uses: process.status()
-# => Lists all agent-managed background processes
-# => Output:
-# =>   PID 12345 | running | npm run dev (2m 15s)
-# =>   PID 12389 | running | tsc --watch  (1m 30s)
-
-> Stop the development server
-
-# => Agent uses: process.kill(12345)
-# => Sends SIGTERM to process
-# => Waits for graceful shutdown
-# => Output: "Stopped process 12345: npm run dev"
+> Stop the development server           # => process.kill(12345) — SIGTERM → graceful shutdown
+                                        # => Output: "Stopped process 12345: npm run dev"
 ```
 
 **Key Takeaway**: Use process management to run development servers, file watchers, and build tools in the background. The agent tracks PIDs and can check status or kill processes on demand.
@@ -719,31 +683,39 @@ The process tool lets Hermes Agent start, monitor, and stop long-running process
 
 The todo tool gives Hermes Agent an internal task tracker for managing multi-step work within a session. The agent creates, updates, and completes todos as it works through complex tasks.
 
+**Trigger todo creation with a multi-step task**:
+
 ```bash
-# In hermes TUI session:
-> Refactor the auth module to use JWT tokens
+hermes chat -q "Refactor the auth module in src/ to use JWT tokens"
+                                        # => Agent breaks task into 7 tracked steps automatically
+                                        # =>   [ ] Read auth, [ ] Find dependents, [ ] Install jwt, [ ] Create utils, [ ] Update handler/middleware/tests
+hermes chat -q "List your current todos"
+                                        # => Agent prints todo list with status markers
+                                        # => [x] = done, [ ] = pending, → = in progress
+hermes chat -q "Mark the JWT utils step done and continue"
+                                        # => Agent updates: [x] Create JWT utility functions
+                                        # => Resumes from current step if context was reset
+```
 
-# => Agent creates internal todo list:
-# => [ ] Read current auth implementation
-# => [ ] Identify all auth-dependent files
-# => [ ] Install jsonwebtoken package
-# => [ ] Create JWT utility functions
-# => [ ] Update login handler
-# => [ ] Update middleware
-# => [ ] Run tests
+**Check and advance progress**:
 
-# As agent works through tasks:
-# => [x] Read current auth implementation
-# => [x] Identify all auth-dependent files (found 8 files)
-# => [x] Install jsonwebtoken package
-# => [ ] Create JWT utility functions         <- current
-# => [ ] Update login handler
-# => [ ] Update middleware
-# => [ ] Run tests
+```bash
+hermes                                  # => Opens TUI; ask: "What are you working on?"
+                                        # => Agent reports live todo status with step counts:
+                                        # =>   [x] Read current auth implementation
+                                        # =>   [x] Identify dependents (found 8 files)
+                                        # =>   [x] Install jsonwebtoken
+                                        # =>   [ ] Create JWT utility functions  ← current
+                                        # =>   [ ] Update login handler, middleware, tests
 
-# => Todo list visible in session context
-# => Agent tracks progress autonomously
-# => Picks up where it left off if interrupted
+hermes chat -q "Show only pending todos"
+                                        # => Agent filters: [ ] Create JWT utils, [ ] Update handler
+hermes chat -q "Skip the middleware step and go straight to tests"
+                                        # => Agent removes skipped step and advances todo cursor
+hermes chat -q "Mark all remaining todos done"
+                                        # => Agent marks all [ ] as [x]; task complete
+hermes chat -q "Summarize what was accomplished"
+                                        # => Agent reads completed todos and writes a summary
 ```
 
 **Key Takeaway**: The todo tool helps the agent break complex tasks into tracked steps. Todos are created, updated, and completed automatically as the agent works through multi-step operations.
@@ -753,6 +725,27 @@ The todo tool gives Hermes Agent an internal task tracker for managing multi-ste
 ### Example 19: Vision and Image Analysis
 
 The vision tools let Hermes Agent analyze images and generate new ones. Vision analysis examines screenshots, diagrams, and photos. Image generation creates visuals via fal.ai integration.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    A["Image / Screenshot<br/>(user provides)"]
+    B["vision_analyze<br/>(via model's native vision)"]
+    C["Text description<br/>(text prompt)"]
+    D["image_generate<br/>(via fal.ai)"]
+    E["Analysis result<br/>(error, layout, content)"]
+    F["Generated image<br/>(saved locally)"]
+
+    A --> B --> E
+    C --> D --> F
+
+    style A fill:#0173B2,stroke:#000,color:#fff
+    style B fill:#DE8F05,stroke:#000,color:#fff
+    style C fill:#0173B2,stroke:#000,color:#fff
+    style D fill:#029E73,stroke:#000,color:#fff
+    style E fill:#CC78BC,stroke:#000,color:#fff
+    style F fill:#CA9161,stroke:#000,color:#fff
+```
 
 ```yaml
 # ~/.hermes/config.yaml
@@ -803,27 +796,24 @@ auxiliary:
 Hermes Agent groups tools into toolsets that can be enabled or disabled as a unit. The `hermes tools` command, `--toolsets` CLI flag, and `/tools` slash command provide three ways to manage tool access.
 
 ```bash
-hermes tools                            # => Interactive tool management
-                                        # => Shows all available toolsets
-                                        # => Toggle enable/disable per toolset
-                                        # => Output:
-                                        # =>   [x] terminal    — Shell command execution
-                                        # =>   [x] file        — File read/write/patch/search
-                                        # =>   [x] web         — Web search and extraction
-                                        # =>   [ ] process     — Background process management
-                                        # =>   [ ] vision      — Image analysis and generation
-                                        # =>   [x] todo        — Task tracking
-                                        # =>   [x] memory      — Persistent memory operations
+hermes tools                            # => Interactive toggle — shows all toolsets:
+                                        # =>   [x] terminal, [x] file, [x] web, [x] todo, [x] memory
+                                        # =>   [ ] process, [ ] vision (disabled by default)
 
-hermes chat --toolsets "web,file"        # => Restrict tools for this session only
-                                        # => Only web and file tools available
-                                        # => Terminal, process, vision disabled
-                                        # => Useful for limiting agent capabilities
+hermes chat --toolsets "web,file"       # => Session-scoped: only web + file tools active
+                                        # => Terminal and process tools disabled for safety
+
+hermes chat --toolsets "terminal,file,todo"
+                                        # => Full coding session: terminal + file + task tracking
+
+hermes chat --toolsets ""               # => Disable all tools; LLM-only mode (no tool calls)
+
+hermes chat -q "review this code" --toolsets "file"
+                                        # => Code review with file access but no execution
 
 # Inside TUI session:
-/tools                                  # => Shows tool status in current session
-                                        # => Toggle tools without restarting
-                                        # => Changes apply immediately
+/tools                                  # => Toggle individual tools without restarting session
+                                        # => Changes apply immediately to current context
 ```
 
 **Key Takeaway**: Manage tools with `hermes tools` (interactive), `--toolsets "list"` (per-session), or `/tools` (in-session toggle). Group tools by capability for easier access control.
@@ -841,35 +831,44 @@ cat ~/.hermes/memories/MEMORY.md        # => Agent's persistent memory file
                                         # => 2,200 character limit (~800 tokens)
                                         # => Injected at session start (read-only snapshot)
                                         # => Agent updates via memory tool (takes effect next session)
+
+wc -c ~/.hermes/memories/MEMORY.md     # => Check character count against 2,200 limit
+                                        # => Agent prioritizes most useful facts if near limit
 ```
 
 ```markdown
-<!-- ~/.hermes/memories/MEMORY.md -->
+<!-- ~/.hermes/memories/MEMORY.md — example with agent-written content -->
 <!-- => Written and maintained by the agent autonomously -->
-<!-- => 2,200 character limit (~800 tokens) -->
+<!-- => 2,200 character limit (~800 tokens): agent prunes low-value facts first -->
 
 ## Environment
 
-- OS: macOS 14.5 (Apple Silicon M2)
-- Shell: zsh with oh-my-zsh
+<!-- => Discovered from shell, file paths, and package manager commands -->
+
+- OS: macOS 14.5 (Apple Silicon M2) <!-- => Affects file paths, binary names, toolchain -->
+- Shell: zsh with oh-my-zsh <!-- => Agent uses zsh-compatible shell syntax -->
 - Default editor: neovim
-- Package manager: Homebrew
+- Package manager: Homebrew <!-- => Affects install commands (brew, not apt) -->
 
 ## Project Conventions
 
+<!-- => Learned from CONTRIBUTING.md, code review feedback, CI config -->
+
 - Uses conventional commits (feat/fix/docs/chore)
-- Tests required before merge
+- Tests required before merge <!-- => Agent always runs tests before suggesting commit -->
 - TypeScript strict mode enabled
 - Prettier + ESLint for formatting
 
 ## Lessons Learned
 
-- User prefers functional style over OOP
+<!-- => Agent writes here after user corrections or repeated patterns -->
+
+- User prefers functional style over OOP <!-- => Agent avoids class hierarchies in suggestions -->
 - Always check .env.example before suggesting env vars
 - Project uses pnpm, not npm (lock file: pnpm-lock.yaml)
 ```
 
-**Key Takeaway**: `MEMORY.md` stores up to 2,200 characters of persistent agent knowledge. The agent updates it autonomously. Content loads as a frozen snapshot at session start.
+**Key Takeaway**: `MEMORY.md` stores up to 2,200 characters of persistent agent knowledge, updated autonomously by the agent and injected as a frozen snapshot at each session start.
 
 **Why It Matters**: Without persistent memory, every session starts from zero — the agent rediscovers your OS, your coding style, your project conventions, and your preferences. `MEMORY.md` eliminates this repeated discovery cost. The 2,200 character limit forces prioritization: only the most useful facts survive, preventing memory bloat that would waste context tokens on rarely-relevant details. The frozen snapshot design means memory changes take effect next session, preventing mid-conversation confusion from memory mutations.
 
@@ -877,34 +876,35 @@ cat ~/.hermes/memories/MEMORY.md        # => Agent's persistent memory file
 
 The `~/.hermes/memories/USER.md` file stores information about you — your name, role, timezone, communication style, and preferences. The agent updates this file autonomously as it learns about you through conversation.
 
+```bash
+cat ~/.hermes/memories/USER.md          # => View current user profile
+                                        # => 1,375 character limit (~500 tokens)
+                                        # => Updated autonomously by agent
+                                        # => Injected as frozen snapshot at session start
+                                        # => Separate from MEMORY.md — stable identity data
+
+wc -c ~/.hermes/memories/USER.md        # => Check character count against 1,375 limit
+                                        # => If over limit, agent trims during next update
+```
+
 ```markdown
-<!-- ~/.hermes/memories/USER.md -->
-<!-- => Agent's knowledge about the user -->
-<!-- => 1,375 character limit (~500 tokens) -->
-<!-- => Updated autonomously by agent -->
-<!-- => Injected at session start -->
+<!-- ~/.hermes/memories/USER.md — example populated after a few sessions -->
 
 ## Identity
 
-- Name: Alex Chen
-- Role: Senior Backend Engineer
-- Team: Platform Infrastructure
-- Timezone: UTC+7 (Bangkok)
+- Name: Alex Chen <!-- => Agent learned from "I'm Alex" in conversation -->
+- Role: Senior Backend Engineer <!-- => Inferred from task types and codebase context -->
+- Timezone: UTC+7 (Bangkok) <!-- => Learned when user mentioned scheduling -->
 
 ## Communication Style
 
-- Prefers concise answers over verbose explanations
-- Likes code examples over prose descriptions
-- Appreciates when assumptions are stated explicitly
-- Dislikes: emojis in code comments, unnecessary preamble
+- Prefers concise answers <!-- => Agent noticed user trimmed verbose responses -->
+- Likes code examples over prose <!-- => User said "show me code, not explanation" -->
 
 ## Technical Preferences
 
-- Languages: Rust (primary), Go, TypeScript
-- Editor: Neovim with LSP
-- OS: Arch Linux
-- Deployment: Kubernetes + ArgoCD
-- Testing: property-based testing when applicable
+- Languages: Rust (primary), Go, TypeScript <!-- => From actual files user works with -->
+- Deployment: Kubernetes + ArgoCD <!-- => From deployment tasks the agent helped with -->
 ```
 
 **Key Takeaway**: `USER.md` stores up to 1,375 characters about you. The agent learns your preferences through conversation and updates this file autonomously, creating a personalized experience across sessions.
@@ -915,31 +915,41 @@ The `~/.hermes/memories/USER.md` file stores information about you — your name
 
 The memory tool provides three actions — `add`, `replace`, and `remove` — for modifying persistent memory. There is no `read` action because memory is automatically injected at session start. Changes persist to disk but take effect in the next session.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Session Starts<br/>(snapshot injected)"]
+    B["memory.add(text)<br/>Append new fact"]
+    C["memory.replace(old, new)<br/>Substring match + update"]
+    D["memory.remove(text)<br/>Delete matched text"]
+    E["MEMORY.md updated<br/>on disk"]
+    F["Next Session<br/>Loads updated snapshot"]
+
+    A --> B & C & D --> E --> F
+
+    style A fill:#0173B2,stroke:#000,color:#fff
+    style B fill:#029E73,stroke:#000,color:#fff
+    style C fill:#DE8F05,stroke:#000,color:#fff
+    style D fill:#CC78BC,stroke:#000,color:#fff
+    style E fill:#CA9161,stroke:#000,color:#fff
+    style F fill:#0173B2,stroke:#000,color:#fff
+```
+
 ```bash
 # In hermes TUI session:
-
 > Remember that this project uses PostgreSQL 16
-
-# => Agent uses: memory.add("- Database: PostgreSQL 16")
-# => Appends to ~/.hermes/memories/MEMORY.md
-# => Output: "Added to memory: Database: PostgreSQL 16"
-# => Takes effect: next session start
+                                        # => memory.add("- Database: PostgreSQL 16")
+                                        # => Appends to MEMORY.md; takes effect next session
 
 > Update the database version from PostgreSQL 16 to 17
+                                        # => memory.replace(old="PostgreSQL 16", new="PostgreSQL 17")
+                                        # => Substring match finds and updates the line in-place
 
-# => Agent uses: memory.replace(
-# =>   old="- Database: PostgreSQL 16",
-# =>   new="- Database: PostgreSQL 17")
-# => Substring matching finds the line
-# => Replaces in-place in MEMORY.md
-# => Output: "Updated memory: PostgreSQL 16 → 17"
+> Forget the note about PostgreSQL      # => memory.remove("- Database: PostgreSQL 17")
+                                        # => Deletes matched text; frees character budget
 
-> Forget the note about PostgreSQL
-
-# => Agent uses: memory.remove("- Database: PostgreSQL 17")
-# => Removes matched substring from MEMORY.md
-# => Output: "Removed from memory: Database: PostgreSQL 17"
-# => Frees character budget for other facts
+> What is in your memory right now?     # => No memory.read tool exists — memory is already in context
+                                        # => Agent reads the injected snapshot directly
 ```
 
 **Key Takeaway**: Use `add` to store new facts, `replace` to update existing ones (substring matching), and `remove` to delete outdated information. No `read` action exists — memory is injected automatically.
@@ -951,43 +961,44 @@ The memory tool provides three actions — `add`, `replace`, and `remove` — fo
 A `.hermes.md` file in your project directory provides project-specific instructions to the agent. Hermes Agent reads this file automatically when you start a session in that directory, with a priority chain for compatibility with other AI tools.
 
 ```markdown
-<!-- /path/to/project/.hermes.md -->
-<!-- => Project-specific agent instructions -->
-<!-- => Max 20,000 characters per file -->
-<!-- => Loaded automatically when session starts in this directory -->
+<!-- /path/to/project/.hermes.md — place in project root -->
+<!-- => Max 20,000 characters; auto-loaded when session starts in this directory -->
 
-# Project: MyAPI
+# Project: MyAPI <!-- => Gives agent a project name to reference -->
 
-## Tech Stack
+## Tech Stack <!-- => Agent uses this to choose correct syntax and tools -->
 
-- Language: Rust (edition 2024)
-- Framework: Axum 0.8
-- Database: PostgreSQL 17 via sqlx
-- Testing: cargo-nextest + proptest
+- Language: Rust (edition 2024) <!-- => Agent writes Rust 2024, not 2021 -->
+- Framework: Axum 0.8 <!-- => Agent uses Axum 0.8 API, not older versions -->
+- Database: PostgreSQL 17 via sqlx <!-- => Agent prefers sqlx::query_as! over raw SQL -->
+- Testing: cargo-nextest + proptest <!-- => Agent generates nextest and proptest code -->
 
-## Conventions
+## Conventions <!-- => Prevents agent from using wrong patterns -->
 
 - All handlers must return Result<Json<T>, AppError>
 - Database queries use sqlx::query_as! macro (compile-time checked)
 - Error types defined in src/error.rs
-- Tests go in tests/ directory (integration) and inline #[cfg(test)] (unit)
+- Tests go in tests/ (integration) and inline #[cfg(test)] (unit)
 
-## Important Notes
+## Important Notes <!-- => High-priority rules agent always follows -->
 
 - Never use unwrap() in production code — use ? operator
 - All new endpoints need OpenAPI documentation in docs/api/
 ```
 
 ```bash
-# Priority chain for context files:
-# => 1. .hermes.md         (highest priority, Hermes-native)
-# => 2. AGENTS.md          (cross-tool compatible)
-# => 3. CLAUDE.md          (Claude Code compatible)
-# => 4. .cursorrules       (Cursor compatible, lowest priority)
-# => First found file wins — does not merge multiple files
+# Priority chain — first file found wins (no merging):
+# => Only the highest-priority file is loaded — files are NOT merged
+ls .hermes.md AGENTS.md CLAUDE.md .cursorrules 2>/dev/null
+                                        # => Check which context file exists in current project
+                                        # => .hermes.md (highest) → AGENTS.md → CLAUDE.md → .cursorrules
+
+hermes chat                             # => Loads .hermes.md automatically from working directory
+                                        # => Agent reads project context before first response
+                                        # => No flag needed — detection is automatic by directory
 ```
 
-**Key Takeaway**: Create `.hermes.md` in your project root for project-specific agent instructions. Maximum 20,000 characters. Hermes Agent also reads `AGENTS.md`, `CLAUDE.md`, and `.cursorrules` as fallbacks.
+**Key Takeaway**: Create `.hermes.md` in your project root for project-specific agent instructions (max 20,000 characters). Hermes Agent also reads `AGENTS.md`, `CLAUDE.md`, and `.cursorrules` as lower-priority fallbacks.
 
 **Why It Matters**: Context files transform a general-purpose AI into a project-aware assistant. Without `.hermes.md`, the agent guesses your tech stack, coding conventions, and project structure — often incorrectly. With it, the agent knows to use `sqlx::query_as!` instead of raw SQL, to never use `unwrap()`, and to add OpenAPI docs for new endpoints. The cross-tool compatibility chain means you do not need separate instruction files for each AI tool — a single `AGENTS.md` works with Hermes, Claude Code, and Cursor, reducing maintenance burden for teams using multiple AI tools.
 
@@ -1045,39 +1056,32 @@ Hermes Agent includes built-in slash commands for session management, model swit
 
 ```bash
 # Session Management
-/new                                    # => Reset conversation to fresh context
-                                        # => Clears all message history
-                                        # => Reloads MEMORY.md and USER.md
-/reset                                  # => Alias for /new
-                                        # => Same behavior, alternative name
+/new                                    # => Resets context; clears history; reloads MEMORY.md + USER.md
+                                        # => Use when conversation has drifted or context is full
+/reset                                  # => Alias for /new (same behavior)
 
 # Model Control
-/model anthropic:claude-sonnet-4-6    # => Switch LLM model mid-session
-                                        # => Format: provider:model-name
-                                        # => Takes effect immediately
+/model anthropic:claude-sonnet-4-6      # => Switches LLM mid-session (format: provider:model)
+                                        # => Model switch takes effect on the very next message
 /model                                  # => Without args: shows current model
 
 # Conversation Control
-/retry                                  # => Regenerate the last agent response
-                                        # => Uses same prompt, may get different answer
-/undo                                   # => Remove the last user-agent turn pair
-                                        # => Rolls back one exchange
+/retry                                  # => Regenerates last response (same prompt, new reasoning)
+                                        # => Useful when the agent took a wrong approach
+/undo                                   # => Removes last user-agent turn pair from context
+                                        # => Prevents a bad turn from influencing future responses
 
 # Context Management
-/compress                               # => Manually trigger context compression
-                                        # => Summarizes older messages
-                                        # => Frees token budget for new messages
-/usage                                  # => Show token usage for current session
-                                        # => Output: input/output tokens, cost
+/compress                               # => Summarizes older messages; frees token budget
+                                        # => Keeps recent context while compressing older history
+/usage                                  # => Shows input/output token count and session cost
 
 # Personality and Skills
-/personality scientist                  # => Switch to built-in persona (session only)
-/skills                                 # => Browse available skills
-                                        # => Shows installed skill names and descriptions
+/personality scientist                  # => Switches to built-in persona (session only; resets on /new)
+/skills                                 # => Lists installed skills with names and descriptions
 
 # Platform Status
-/platforms                              # => Show connected platform status
-                                        # => Lists: active channels, connection health
+/platforms                              # => Shows connected platforms and channel health
 ```
 
 **Key Takeaway**: Slash commands provide zero-token session control. Use `/new` to reset, `/model` to switch LLMs, `/compress` to manage context, and `/retry` to regenerate responses.
@@ -1106,38 +1110,29 @@ graph LR
 **Commands**:
 
 ```bash
-hermes claw migrate --dry-run           # => Preview migration without writing files
-                                        # => Shows: what would be created/converted
-                                        # => Shows: config format changes (JSON5 → YAML)
-                                        # => Shows: directory mapping
-                                        # => Safe to run repeatedly
+hermes claw migrate --dry-run           # => Preview-only: shows files to create/convert
+                                        # => Displays JSON5 → YAML changes and directory mapping
 
-hermes claw migrate --preset full       # => Full migration: config, memories, skills, auth
-                                        # => Converts: openclaw.json → config.yaml
-                                        # => Copies: memories/ → memories/
-                                        # => Converts: skills/ → skills/
-                                        # => Migrates: auth tokens and OAuth state
+hermes claw migrate --preset full       # => Migrates config, memories, skills, and auth tokens
                                         # => Output: "Migrated 12 files, 3 skills"
 
-hermes claw migrate --preset user-data  # => Migrate memories and preferences only
-                                        # => Skips: API keys and auth tokens
-                                        # => Skips: skill configurations
-                                        # => Useful when re-entering credentials manually
+hermes claw migrate --preset user-data  # => Memories and preferences only; skips API keys
                                         # => Output: "Migrated 4 files (user-data only)"
 ```
 
 ```bash
-# Directory mapping (OpenClaw → Hermes):
-# ~/.openclaw/openclaw.json       → ~/.hermes/config.yaml
-#                                 # => JSON5 converted to YAML format
-# ~/.openclaw/memories/MEMORY.md  → ~/.hermes/memories/MEMORY.md
-#                                 # => Content preserved, no format change
-# ~/.openclaw/memories/USER.md    → ~/.hermes/memories/USER.md
-#                                 # => Content preserved, no format change
-# ~/.openclaw/workspace/skills/   → ~/.hermes/skills/
-#                                 # => SKILL.md files preserved
-# ~/.openclaw/auth.json           → ~/.hermes/auth.json
-#                                 # => OAuth tokens migrated
+# Verify migration result — check each migrated file:
+# => Run these checks immediately after migration completes
+ls ~/.hermes/                           # => config.yaml, .env, SOUL.md, memories/, skills/
+                                        # => All files should be present; missing files = failed step
+cat ~/.hermes/config.yaml               # => Confirm JSON5 → YAML conversion succeeded
+                                        # => YAML syntax errors here mean migration partially failed
+cat ~/.hermes/memories/MEMORY.md        # => Confirm memories preserved from ~/.openclaw/
+cat ~/.hermes/memories/USER.md          # => Confirm user profile migrated intact
+ls ~/.hermes/skills/                    # => Confirm SKILL.md files migrated from workspace/skills/
+                                        # => Skills directory should match count from "Migrated N skills"
+hermes doctor                           # => Validate full Hermes setup after migration
+                                        # => All checks must pass before using Hermes in production
 ```
 
 **Key Takeaway**: Use `hermes claw migrate --dry-run` to preview, `--preset full` for complete migration, or `--preset user-data` to migrate only memories and preferences without secrets.

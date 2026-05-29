@@ -9,4 +9,5 @@ Learn about infrastructure management, cloud computing platforms, virtual machin
 
 ## Available Topics
 
-- [Tools](/en/learn/software-engineering/infrastructure/tools) - Infrastructure management tools and practical guides
+- [Tools](/en/learn/software-engineering/infrastructure/tools) - Infrastructure management tools and practical guides (Terraform, Ansible, Docker, Kubernetes, K3s, Proxmox VE)
+- [Infrastructure as Code](/en/learn/software-engineering/infrastructure/infrastructure-as-code) - Declarative, version-controlled infrastructure provisioning concepts and patterns

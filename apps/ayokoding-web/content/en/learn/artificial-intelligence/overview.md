@@ -9,6 +9,7 @@ Learning-oriented guides for building AI and machine learning systems. These tut
 
 ## 📋 Available Tutorials
 
+- [**Tools**](/en/learn/artificial-intelligence/tools) - AI coding agent tools with By Example and By Concept tracks: Claude Code, Hermes Agent, OpenClaw, and Pi Coding Agent
 - [**Chat with PDF**](/en/learn/artificial-intelligence/chat-with-pdf) - Understanding how PDF chat applications work
 
 ## 🎯 Target Audience

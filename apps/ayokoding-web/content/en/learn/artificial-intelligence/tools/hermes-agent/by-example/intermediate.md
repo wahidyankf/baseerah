@@ -41,33 +41,36 @@ flowchart TB
 ```
 
 ```bash
-# Progressive disclosure in action
-# Level 0 — injected into every session automatically
-hermes tools list skills                # => Shows skills_list tool
-                                        # => Agent sees ~3k token summary of all skills
-                                        # => Enough to know WHAT skills exist
+# Level 0 — injected into every session automatically (~3k tokens)
+hermes tools list skills                # => Lists all skills with name + description + version
+                                        # => Agent uses this to find relevant skills by name
+                                        # => Example output line: deploy-docker: "Deploy via Compose" (v1.2)
 
-# Level 1 — agent calls when it needs a skill
-# skills_list() output (injected at session start):
-# => deploy-docker: "Deploy apps via Docker Compose" (v1.2)
-# => fix-linting: "Auto-fix ESLint and Prettier issues" (v1.0)
-# => ...30 more skills, each one line
+# Level 1 — agent loads full skill when needed
+hermes chat -q "view skill deploy-docker"
+                                        # => Agent calls: skill_view("deploy-docker")
+                                        # => Returns: complete SKILL.md + file listing
 
-# Level 2 — agent drills into specific file
-# skill_view("deploy-docker", "references/compose-patterns.md")
-# => Returns only the specific reference file content
-# => Minimal token cost for targeted knowledge
+# Level 2 — agent fetches specific reference file
+hermes chat -q "show compose patterns from deploy-docker"
+                                        # => Agent calls: skill_view("deploy-docker", "references/compose-patterns.md")
+                                        # => Returns only that file — minimal token cost
+                                        # => Avoids loading full skill when only one file needed
 ```
 
 ```yaml
 # ~/.hermes/skills/ directory structure
 # => Top-level categories organize skills by domain
+# => Hermes scans this directory at session start
+# => Add new skills by creating subdirectories here
 skills/
   devops/                               # => Category directory
     deploy-docker/                      # => Individual skill directory
       SKILL.md                          # => Skill definition (required)
+                                        # => skills_list() reads this for metadata
       references/                       # => Supporting reference docs
         compose-patterns.md             # => Loaded via skill_view(name, path)
+                                        # => Level 2 fetch: minimal token cost
       templates/                        # => Reusable templates
         docker-compose.yml              # => Template files for the skill
       scripts/                          # => Executable scripts
@@ -86,41 +89,27 @@ skills/
 The `/skills` slash command in a Hermes session displays available skills interactively. Programmatically, the agent uses `skills_list()` for metadata and `skill_view()` for full content. These tools form the read path of the skills system.
 
 ```bash
-# Interactive skill browsing in a Hermes session
+# Interactive skill browsing
 hermes                                  # => Start a session
-# Type /skills in the session:
-/skills                                 # => Lists all installed skills
-                                        # => Shows: name, description, version
-                                        # => Grouped by category
+/skills                                 # => Lists all installed skills: name, description, version
+                                        # => Output grouped by category (devops, coding, etc.)
+hermes tools list skills                # => CLI equivalent of /skills (non-interactive)
 
-# Programmatic access (what the agent calls internally):
-# skills_list() returns JSON metadata for all skills
-# => [
-# =>   {
-# =>     "name": "deploy-docker",
-# =>     "description": "Deploy apps via Docker Compose",
-# =>     "version": "1.2",
-# =>     "platforms": ["linux", "macos"],
-# =>     "category": "devops"
-# =>   },
-# =>   {
-# =>     "name": "fix-linting",
-# =>     "description": "Auto-fix ESLint and Prettier issues",
-# =>     "version": "1.0",
-# =>     "platforms": ["linux", "macos", "windows"],
-# =>     "category": "coding"
-# =>   }
-# => ]
+# Programmatic: list all skills (agent calls at session start)
+hermes chat -q "list available skills"
+                                        # => Agent calls: skills_list()
+                                        # => Returns JSON: [{name, description, version, platforms, category}, ...]
+                                        # => Example entry: {name: "deploy-docker", version: "1.2", category: "devops"}
 
-# skill_view(name) returns the full SKILL.md content
-# skill_view("deploy-docker")
-# => Returns complete SKILL.md with frontmatter + body
-# => Plus listing of all files in the skill directory
+# Programmatic: view full skill content
+hermes chat -q "show me the deploy-docker skill"
+                                        # => Agent calls: skill_view("deploy-docker")
+                                        # => Returns: complete SKILL.md + file listing
 
-# skill_view(name, path) returns a specific file
-# skill_view("deploy-docker", "references/compose-patterns.md")
-# => Returns only that file's content
-# => Targeted retrieval — minimal token cost
+# Programmatic: fetch specific reference file
+hermes chat -q "show compose patterns for docker deployments"
+                                        # => Agent calls: skill_view("deploy-docker", "references/compose-patterns.md")
+                                        # => Returns only that file — targeted, minimal token cost
 ```
 
 **Key Takeaway**: Use `/skills` for interactive browsing and `skills_list()` / `skill_view()` for programmatic access. The agent automatically calls these tools when it needs skill knowledge.
@@ -133,8 +122,10 @@ Every skill is defined by a `SKILL.md` file containing YAML frontmatter (metadat
 
 ```yaml
 # ~/.hermes/skills/devops/deploy-docker/SKILL.md
----
+# => File path: category/skill-name/SKILL.md
+---                                     # => YAML frontmatter delimiter
 # YAML frontmatter — parsed by skills_list()
+# => All fields below are machine-readable
 name: deploy-docker                     # => Unique skill identifier
                                         # => Used in skill_view("deploy-docker")
 description: >-                         # => Short description for Level 0 listing
@@ -142,58 +133,72 @@ description: >-                         # => Short description for Level 0 listi
   Compose with health checks            # => Keep under 80 chars
 version: "1.2"                          # => Semantic version for tracking changes
                                         # => Agent sees this in skill list
+                                        # => Bump version when procedure changes
 
 platforms:                              # => OS restrictions
   - linux                               # => Skill only loads on these platforms
   - macos                               # => Omit for cross-platform skills
+                                        # => Empty list [] means all platforms
 
-metadata:
-  hermes:
+metadata:                               # => Hermes-specific extension block
+  hermes:                               # => Namespace for activation rules
     fallback_for_toolsets: []           # => Conditional activation (see Example 33)
     requires_toolsets: []               # => Conditional activation (see Example 33)
+                                        # => Both empty: always eligible
 
-config:
-  compose_version: "3.8"               # => Skill-specific configuration
-                                        # => Accessible in skill body as variables
+config:                                 # => Skill-specific key-value store
+  compose_version: "3.8"               # => Accessible in skill body as variables
   default_timeout: 300                  # => Custom config for this skill
+                                        # => Agent reads these at runtime
 
-required_environment_variables:
-  - DOCKER_HOST                         # => Agent warns if these are missing
-  - REGISTRY_URL                        # => Before attempting the skill procedure
----
+required_environment_variables:        # => Agent validates these before proceeding
+  - DOCKER_HOST                         # => Agent warns if this is missing
+  - REGISTRY_URL                        # => Skill cannot run without registry access
+---                                     # => End of YAML frontmatter
 
-## When to Use
+## When to Use                          # => Agent reads this section to judge relevance
 
 # => Section: conditions that trigger this skill
 # => Agent reads this to decide relevance
 Deploy this skill when the user asks to containerize an application,
+# => Matches: "containerize", "docker compose", "container debug"
 set up Docker Compose, or troubleshoot container deployments.
+# => Not for: bare Docker commands, Kubernetes, or bare-metal deploys
 
-## Procedure
+## Procedure                            # => Ordered steps the agent executes in sequence
 
 # => Section: step-by-step instructions
 # => Agent follows these as a recipe
-1. Check Docker daemon is running: `docker info`
-2. Validate compose file: `docker compose config`
-3. Build images: `docker compose build`
-4. Start services: `docker compose up -d`
-5. Verify health: `docker compose ps`
+1. Check Docker daemon is running: `docker info`   # => Fails fast if daemon down
+                                        # => Exit code 0 means daemon ready
+2. Validate compose file: `docker compose config`  # => Catches YAML syntax errors
+                                        # => Shows merged/resolved config on success
+3. Build images: `docker compose build`            # => Builds all service images
+                                        # => Uses layer cache; unchanged layers skip
+4. Start services: `docker compose up -d`          # => Detached mode; returns prompt
+                                        # => -d means background; logs stream separately
+5. Verify health: `docker compose ps`              # => Shows status of each service
+                                        # => All should show "running (healthy)" state
 
-## Pitfalls
+## Pitfalls                             # => Known failure modes; agent pre-checks these
 
 # => Section: common failure modes
 # => Agent checks these proactively
-- Port conflicts: check `lsof -i :PORT` before starting
+- Port conflicts: check `lsof -i :PORT` before starting  # => Prevents bind errors
+                                        # => Common: port 80/443/5432 already in use
 - Volume permissions: ensure host directories exist with correct ownership
+                                        # => Run: ls -la /path before starting
 - Network isolation: services in different compose files need explicit networks
+                                        # => Fix: add named network in each compose file
 
-## Verification
+## Verification                          # => Agent runs these checks after procedure completes
 
 # => Section: how to confirm success
 # => Agent runs these after completing procedure
-- All containers show "healthy" in `docker compose ps`
-- Application responds on expected port
-- Logs show no error-level entries
+- All containers show "healthy" in `docker compose ps`  # => State: healthy vs starting
+                                        # => "starting" means health check not yet passed
+- Application responds on expected port                  # => curl check confirms routing
+- Logs show no error-level entries                       # => docker compose logs --tail=20
 ```
 
 **Key Takeaway**: SKILL.md combines machine-parseable YAML frontmatter with human-readable markdown procedure documentation. The four body sections (When to Use, Procedure, Pitfalls, Verification) give the agent a complete decision-and-execution framework.
@@ -212,39 +217,52 @@ mkdir -p ~/.hermes/skills/coding/format-code
                                         # => Directory is the skill boundary
 
 # Write the SKILL.md file
+# => cat > file << 'HEREDOC' ... HEREDOC: writes multi-line content directly to file
+# => Single-quoted 'SKILL' delimiter: prevents shell variable expansion inside body
+# => Destination: ~/.hermes/skills/coding/format-code/SKILL.md (created or overwritten)
 cat > ~/.hermes/skills/coding/format-code/SKILL.md << 'SKILL'
+# => YAML frontmatter starts here (parsed by skills_list() for metadata)
+# => Fields: name, description, version, platforms, required_environment_variables
 ---
+# => name: unique identifier used in skill_view("format-code") and skills_list()
 name: format-code
+# => description: short text shown at Level 0; keep under 80 chars
 description: "Format source code using project-specific formatters"
+# => version: bump when procedure changes so agent knows skill was updated
 version: "1.0"
 platforms:
   - linux
   - macos
 required_environment_variables: []
 ---
-
+# => End of YAML frontmatter — markdown body begins below
+# => "When to Use" section: agent reads this to decide skill relevance
 ## When to Use
-
+# => Body text: free-form description of when this skill applies
 Apply when the user asks to format code, fix style issues,
 or prepare files for a commit with consistent formatting.
 
+# => "Procedure" section: ordered steps the agent executes in sequence
 ## Procedure
-
+# => Numbered list: agent follows these steps in order, one per tool call
 1. Detect project type from config files (package.json, pyproject.toml, etc.)
 2. Run the appropriate formatter (prettier, black, gofmt, rustfmt)
 3. Report files changed
 
+# => "Pitfalls" section: known failure modes; agent pre-checks these proactively
 ## Pitfalls
 
 - Check for .editorconfig and respect its settings
 - Some formatters modify files in-place — warn before bulk formatting
 
+# => "Verification" section: how agent confirms the procedure succeeded
 ## Verification
 
 - Run formatter in check mode to confirm no remaining changes
 SKILL
-                                        # => SKILL.md written
-                                        # => Skill is immediately available
+                                        # => SKILL.md written to ~/.hermes/skills/coding/format-code/
+                                        # => Skill is immediately available in the next session
+                                        # => skills_list() returns it under category: coding
 
 # Add supporting files
 mkdir -p ~/.hermes/skills/coding/format-code/references
@@ -329,40 +347,30 @@ flowchart LR
     Improve -->|"Next use"| Persist
 ```
 
+**Trigger autonomous skill creation** (runnable — first-time deployment generates 7+ tool calls):
+
 ```bash
-# Scenario: You ask the agent to deploy a Next.js app to Vercel
-# The agent performs these steps (first time):
-# => 1. Check for vercel.json
-# => 2. Validate build command
-# => 3. Set environment variables
-# => 4. Run vercel deploy --prod
-# => 5. Verify deployment URL
-# => 6. Check build logs for errors
-# => 7. Confirm DNS resolution
+# Step 1: Trigger autonomous skill creation with a complex task
+hermes chat -q "Deploy this Next.js app to Vercel and verify it is live"
+                                        # => Agent performs 7+ tool calls (> threshold of 5):
+                                        # =>   checks vercel.json, validates build, deploys, verifies
+                                        # => Threshold crossed: agent writes deploy-vercel SKILL.md
 
-# After completing the task (7 tool calls > threshold of 5):
-# Agent internally reasons:
-# => "This was a non-trivial workflow with 7 steps."
-# => "I should persist this as a skill for future use."
-# => "Creating skill: deploy-vercel"
+# Step 2: Verify the skill was created
+ls ~/.hermes/skills/devops/deploy-vercel/
+                                        # => Output: SKILL.md (agent-authored procedure)
+cat ~/.hermes/skills/devops/deploy-vercel/SKILL.md
+                                        # => Shows: procedure, pitfalls, verification steps
+hermes tools list skills | grep deploy  # => deploy-vercel: "Deploy Next.js to Vercel" (v1.0)
 
-# Agent calls:
-# skill_manage(action="create", name="deploy-vercel", category="devops")
-# => Writes SKILL.md with the procedure it just executed
-# => Includes the pitfalls it encountered
-# => Adds verification steps it used
-
-# Next time you ask "deploy to Vercel":
-# => Agent loads deploy-vercel skill (Level 1)
-# => Follows the persisted procedure
-# => Skips trial-and-error from first attempt
-
-# Self-improvement: if the agent encounters a new pitfall
-# (e.g., monorepo root detection), it patches the skill:
-# skill_manage(action="patch", name="deploy-vercel",
-#              section="Pitfalls",
-#              content="- Monorepo: set rootDirectory in vercel.json")
-# => Skill gets better with each use
+# Step 3: Trigger self-improvement with a new edge case
+hermes chat -q "Deploy the monorepo's frontend package to Vercel"
+                                        # => Agent loads existing deploy-vercel skill
+                                        # => Discovers: monorepo root detection needed
+                                        # => Patches SKILL.md Pitfalls section automatically
+cat ~/.hermes/skills/devops/deploy-vercel/SKILL.md | grep -A2 "Pitfalls"
+                                        # => Updated pitfall: "Monorepo: set rootDirectory in vercel.json"
+                                        # => Skill version bumped to v1.1 — each use improves it
 ```
 
 **Key Takeaway**: The agent autonomously creates skills after complex tasks (5+ tool calls, error recovery, user corrections) and refines them during subsequent use, building an ever-improving procedural knowledge base.
@@ -375,66 +383,81 @@ Skills can be conditionally shown or hidden based on available toolsets and plat
 
 ```yaml
 # ~/.hermes/skills/devops/manual-deploy/SKILL.md
----
-name: manual-deploy
+--- # => YAML frontmatter start
+name: manual-deploy # => Skill identifier
 description: "Step-by-step manual deployment when CI/CD is unavailable"
-version: "1.0"
+# => Shown in skills_list() Level 0 output to help agent decide relevance
+# => Keep description under 80 chars for readable list output
+version: "1.0" # => Version tracked; bump when procedure changes
 
-metadata:
-  hermes:
-    fallback_for_toolsets:
+metadata: # => Hermes-specific activation config
+  hermes: # => Namespace for conditional activation rules
+    fallback_for_toolsets: # => List of toolsets that suppress this skill when present
       - terminal # => This skill is HIDDEN when terminal
         # =>   toolset is available
         # => Shown only when terminal is disabled
         # => Use case: fallback instructions when
         # =>   agent can't run commands directly
 
-    requires_toolsets: [] # => No toolset requirements
+    requires_toolsets: [] # => List of toolsets this skill requires # => No toolset requirements
       # => (skill works without tools)
+      # => Skill eligible regardless of toolsets
+      # => Works in read-only and restricted modes
 
-platforms:
+platforms: # => OS filter; empty = all platforms
   - linux # => Only shown on Linux
   - macos # => Only shown on macOS
     # => Hidden on Windows/other
----
+--- # => YAML frontmatter end
 ```
 
 ```yaml
 # ~/.hermes/skills/devops/docker-deploy/SKILL.md
----
-name: docker-deploy
+--- # => YAML frontmatter start
+name: docker-deploy # => Skill identifier
 description: "Deploy via Docker Compose with health checks"
-version: "1.0"
+# => Shown in skills_list() output; keep under 80 chars for readability
+# => Agent uses this description to decide skill relevance at Level 0
+version: "1.0" # => Bump when procedure changes
 
-metadata:
-  hermes:
-    fallback_for_toolsets: [] # => Not a fallback — always eligible
+metadata: # => Hermes-specific activation config
+  hermes: # => Namespace for conditional activation rules
+    fallback_for_toolsets: [] # => Empty: not a fallback skill # => Not a fallback — always eligible
+      # => Shown whenever requires_toolsets satisfied
 
-    requires_toolsets:
+    requires_toolsets: # => All listed toolsets must be present
       - terminal # => HIDDEN when terminal toolset is absent
         # => Agent needs shell access for this skill
       - file # => Also requires file toolset
         # => Needs to read/write compose files
+        # => Both toolsets required simultaneously
 
-platforms: [] # => Empty = all platforms
+platforms: [] # => No platform restriction # => Empty = all platforms
   # => No OS restriction
----
+  # => Available on Linux, macOS, Windows equally
+--- # => YAML frontmatter end
 ```
 
 ```bash
-# How conditional activation works at runtime:
+# Scenario 1: Agent has terminal + file toolsets enabled (normal mode)
+hermes chat -q "Deploy the app"         # => manual-deploy: HIDDEN (fallback_for_toolsets: terminal)
+                                        # => docker-deploy: SHOWN (requires_toolsets satisfied)
+                                        # => Agent uses docker-deploy skill for this request
 
-# Scenario 1: Agent has terminal + file toolsets enabled
-# => manual-deploy: HIDDEN (fallback_for_toolsets includes "terminal")
-# => docker-deploy: SHOWN (requires_toolsets satisfied)
-
-# Scenario 2: Agent has no terminal toolset (restricted mode)
-# => manual-deploy: SHOWN (fallback activated — terminal absent)
-# => docker-deploy: HIDDEN (requires terminal, which is absent)
+# Scenario 2: Agent has no terminal toolset (read-only / restricted mode)
+hermes chat --toolset file -q "Deploy the app"
+                                        # => manual-deploy: SHOWN (fallback activated — terminal absent)
+                                        # => docker-deploy: HIDDEN (requires terminal, which is absent)
+                                        # => Agent uses manual-deploy for step-by-step instructions
 
 # Scenario 3: Agent on Windows with terminal toolset
-# => manual-deploy: HIDDEN (platform restriction — not in [linux, macos])
-# => docker-deploy: SHOWN (no platform restriction, toolsets satisfied)
+hermes chat -q "Deploy the app"         # => manual-deploy: HIDDEN (platform: linux/macos only)
+                                        # => docker-deploy: SHOWN (platforms: [], no restriction)
+                                        # => Platform check runs before toolset check
+
+# Verify which skills are visible in current context
+hermes tools list skills                # => Shows only skills eligible for current toolset + platform
+                                        # => Hidden skills not shown (conditional filtering applied)
 ```
 
 **Key Takeaway**: Use `fallback_for_toolsets` for skills that should only appear when the agent is restricted, and `requires_toolsets` for skills that need specific capabilities. Platform restrictions add OS-level filtering.
@@ -554,22 +577,15 @@ flowchart TB
 
 ```bash
 # Gateway lifecycle commands
-hermes gateway start                    # => Starts the gateway process
-                                        # => Connects to all enabled channels
-                                        # => Runs as foreground process (Ctrl+C to stop)
+hermes gateway start                    # => Starts gateway; connects all enabled channels
                                         # => Output: "Gateway started. Channels: telegram, slack"
 
 hermes gateway start --daemon           # => Runs in background (detached)
-                                        # => PID stored in ~/.hermes/gateway.pid
                                         # => Logs to ~/.hermes/logs/gateway.log
 
-hermes gateway stop                     # => Stops the background gateway
-                                        # => Gracefully disconnects all channels
-                                        # => Output: "Gateway stopped"
+hermes gateway stop                     # => Gracefully disconnects all channels
 
-hermes gateway status                   # => Shows gateway health
-                                        # => Output: "Running (PID 12345)"
-                                        # => Lists connected channels and uptime
+hermes gateway status                   # => Shows gateway health: PID, channels, uptime
                                         # => Shows message counts per channel
 
 hermes gateway restart                  # => Stop + start (reloads config)
@@ -584,53 +600,28 @@ hermes gateway restart                  # => Stop + start (reloads config)
 
 Telegram is the most popular channel for Hermes Agent. Setup requires a bot token from BotFather, user whitelisting via Telegram user IDs, and a DM pairing policy. The interactive `hermes gateway setup` wizard can guide you through configuration.
 
-```bash
-# Step 1: Create a Telegram bot via BotFather
-# Open Telegram, message @BotFather
-# /newbot → choose name → receive token
-# Token format: "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
-
-# Step 2: Get your Telegram user ID
-# Message @userinfobot on Telegram
-# It replies with your numeric user ID
-```
-
 ```yaml
 # ~/.hermes/config.yaml — Telegram channel configuration
+# Get bot token from @BotFather; get your user ID from @userinfobot
 channels:
   telegram:
-    enabled:
-      true # => Activates Telegram channel
-      # => Gateway connects on start
+    enabled: true # => Activates Telegram channel; gateway connects on start
 
-# .env — Telegram credentials
+
+# .env — Telegram credentials (never commit this file)
 # TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
-#                                       # => From @BotFather
-#                                       # => Never commit to version control
 
 # TELEGRAM_ALLOWED_USERS=123456789,987654321
 #                                       # => Comma-separated Telegram user IDs
-#                                       # => Only these users can interact
 #                                       # => Empty = no one can use the bot
 ```
 
 ```bash
-# Alternative: interactive setup wizard
-hermes gateway setup                    # => Walks through channel configuration
-                                        # => Prompts for bot token
-                                        # => Prompts for allowed users
+hermes gateway setup                    # => Interactive wizard: prompts for token and user IDs
                                         # => Writes config and .env automatically
 
-# DM pairing policy
-# When an unknown user messages the bot:
-# => "pair" mode: bot sends pairing request to admin
-# =>   Admin approves/denies new users interactively
-# => "ignore" mode: bot silently ignores unknown users
-
-# Start gateway with Telegram
 hermes gateway start                    # => Output: "Telegram channel connected"
-                                        # => Bot appears online in Telegram
-                                        # => Responds to allowed users only
+                                        # => Unknown users: "pair" prompts admin, "ignore" drops silently
 ```
 
 **Key Takeaway**: Telegram setup requires a BotFather token, user IDs in `TELEGRAM_ALLOWED_USERS`, and gateway restart. The DM pairing policy controls how unknown users are handled.
@@ -663,7 +654,6 @@ channels:
       - "ai-sandbox" # => Channels where bot responds to ALL messages
       - "bot-testing" # => No @mention required in these channels
         # => Useful for dedicated bot interaction spaces
-
 # .env — Discord credentials
 # DISCORD_BOT_TOKEN=MTIzNDU2Nzg5.Abc123.xyz789
 #                                       # => From Discord Developer Portal
@@ -676,20 +666,14 @@ channels:
 ```
 
 ```bash
-# Discord bot setup steps:
-# 1. Go to discord.com/developers/applications
-# 2. New Application → name it
-# 3. Bot section → Reset Token → copy token
-# 4. Enable MESSAGE CONTENT intent (required)
-# 5. OAuth2 > URL Generator:
-#    Scopes: bot, applications.commands
-#    Permissions: Send Messages, Read Message History,
-#                 Create Public Threads, Manage Threads
-# 6. Copy invite URL → open in browser → select server
+# Portal setup: discord.com/developers/applications
+# New Application → Bot → Reset Token → enable MESSAGE_CONTENT intent
+# OAuth2 URL Generator: scopes (bot, applications.commands) + Send/Read/Thread perms
+# Invite bot to server via generated URL
 
 hermes gateway start                    # => Output: "Discord channel connected"
-                                        # => Bot appears online in Discord server
-                                        # => Responds to @mentions from allowed users
+                                        # => Bot appears online; responds to @mentions
+                                        # =>   from users in DISCORD_ALLOWED_USERS
 ```
 
 **Key Takeaway**: Discord requires a bot token with MESSAGE_CONTENT intent, user whitelist via `DISCORD_ALLOWED_USERS`, and supports `auto_thread` for organized conversations and `free_response_channels` for dedicated bot spaces.
@@ -704,10 +688,10 @@ Slack integration uses Socket Mode for secure, tunnel-free communication. Two to
 # ~/.hermes/config.yaml — Slack channel configuration
 channels:
   slack:
-    enabled:
-      true # => Activates Slack channel
-      # => Uses Socket Mode (WebSocket)
-
+    enabled: true # => Activates Slack channel
+    socket_mode: true # => Uses Socket Mode (WebSocket; requires xapp- token)
+    require_mention: true # => Bot only responds when @mentioned
+    auto_thread: true # => Creates a thread for each conversation
 # .env — Slack credentials
 # SLACK_BOT_TOKEN=xoxb-YOUR-BOT-TOKEN-HERE
 #                                       # => From Slack App > OAuth & Permissions
@@ -730,19 +714,21 @@ channels:
 ```
 
 ```bash
-# Slack app setup steps:
-# 1. Go to api.slack.com/apps → Create New App
-# 2. From scratch → name + workspace
-# 3. Socket Mode → Enable (generates xapp- token)
-# 4. Event Subscriptions → Enable
-#    Subscribe to bot events: app_mention, message.im
-# 5. OAuth & Permissions → Add bot scopes listed above
-# 6. Install App to Workspace → copy xoxb- token
+# Portal setup: api.slack.com/apps → Create New App → From Scratch
+hermes gateway setup                    # => Interactive wizard guides Slack configuration
+                                        # => Prompts for bot token and app token
 
-hermes gateway start                    # => Output: "Slack channel connected (Socket Mode)"
-                                        # => Bot appears online in Slack workspace
-                                        # => No public URL or tunnel required
-                                        # => Responds to @mentions and DMs from allowed users
+# Manually set credentials in .env
+echo "SLACK_BOT_TOKEN=xoxb-..." >> ~/.hermes/.env
+echo "SLACK_APP_TOKEN=xapp-..." >> ~/.hermes/.env
+echo "SLACK_ALLOWED_USERS=U1234567890" >> ~/.hermes/.env
+                                        # => Bot token: from OAuth & Permissions page
+                                        # => App token: from Basic Information > App-Level Tokens
+                                        # => Allowed users: Slack member IDs (format: UXXXXXXXXXX)
+
+hermes gateway start                    # => "Slack channel connected (Socket Mode)"
+                                        # => Outbound WebSocket: no public URL needed
+hermes gateway status                   # => Shows: slack: connected, uptime, message count
 ```
 
 **Key Takeaway**: Slack requires two tokens — `SLACK_BOT_TOKEN` (xoxb-) for messaging and `SLACK_APP_TOKEN` (xapp-) for Socket Mode. Socket Mode eliminates the need for public URLs, making local development seamless.
@@ -761,7 +747,6 @@ channels:
       true # => Activates WhatsApp channel
       # => Uses Baileys library (unofficial API)
       # => Requires Node.js installed
-
 # .env — WhatsApp credentials
 # WHATSAPP_ALLOWED_USERS=1234567890,0987654321
 #                                       # => Phone numbers without "+" prefix
@@ -770,27 +755,28 @@ channels:
 ```
 
 ```bash
+# Prerequisites: ensure Node.js is installed (Baileys is a Node.js library)
+node --version                          # => Output: v20.x.x (Node.js required for Baileys)
+echo "WHATSAPP_ALLOWED_USERS=1234567890" >> ~/.hermes/.env
+                                        # => Phone numbers without "+" prefix
+                                        # => Country code included (e.g., 1234567890 for US)
+
 # WhatsApp setup process:
 hermes gateway start                    # => Starts gateway with WhatsApp enabled
                                         # => Displays QR code in terminal
-                                        # => Scan QR code with WhatsApp mobile app:
-                                        # =>   Settings > Linked Devices > Link a Device
+                                        # => Scan with WhatsApp: Settings > Linked Devices > Link a Device
+                                        # => After scan: "WhatsApp channel connected"
 
-# After QR scan:
-# => Output: "WhatsApp channel connected"
-# => Session persisted in ~/.hermes/whatsapp-session/
-# => Subsequent starts skip QR code (session cached)
-# => Re-scan required if session expires (~14 days)
+# Verify session persisted
+ls ~/.hermes/whatsapp-session/          # => Session files cached here
+                                        # => Subsequent starts skip QR code (session cached)
+                                        # => Re-scan required if session expires (~14 days)
 
-# Important considerations:
-# => Uses your personal WhatsApp number (not a business API)
-# => One WhatsApp account per gateway instance
-# => Node.js required (Baileys is a Node.js library)
-# => Unofficial API — may break with WhatsApp updates
-# => Not recommended for production/business use
+hermes gateway status                   # => Shows: whatsapp: connected, uptime, message count
+                                        # => One WhatsApp account per gateway instance
 ```
 
-**Key Takeaway**: WhatsApp uses QR code pairing via Baileys (requires Node.js). Sessions are cached locally but require periodic re-authentication. This is an unofficial integration — use for personal convenience, not production.
+**Key Takeaway**: WhatsApp uses QR code pairing via Baileys (requires Node.js), with sessions cached locally but requiring periodic re-authentication — this is an unofficial integration suitable for personal convenience, not production.
 
 **Why It Matters**: WhatsApp is the dominant messaging platform globally (2+ billion users), and many users find it the most convenient way to interact with AI from their phone. The Baileys integration makes this possible without WhatsApp Business API costs or Meta developer account requirements. However, the unofficial nature means WhatsApp can break compatibility at any time. The practical value is personal productivity — message your agent from your phone to check server status, trigger deployments, or ask questions while away from your desk.
 
@@ -805,7 +791,6 @@ channels:
     enabled:
       true # => Activates Signal channel
       # => Uses signal-cli (Java-based)
-
 # .env — Signal credentials
 # SIGNAL_ACCOUNT=+1234567890
 #                                       # => Your Signal phone number
@@ -826,7 +811,6 @@ channels:
     enabled:
       true # => Activates Email channel
       # => Uses SMTP for sending, IMAP for receiving
-
 # .env — Email credentials
 # EMAIL_SMTP_HOST=smtp.gmail.com
 # EMAIL_SMTP_PORT=587
@@ -847,21 +831,30 @@ channels:
 ```
 
 ```bash
-# Signal setup requires signal-cli:
-# Install: https://github.com/AsamK/signal-cli
-# Register your number, verify, start daemon
+# Signal: register and start signal-cli daemon before starting Hermes
+signal-cli -a +1234567890 register      # => Sends SMS verification code to phone number
+signal-cli -a +1234567890 verify CODE   # => Verifies registration with received code
+signal-cli -a +1234567890 daemon --http localhost:8080 &
+                                        # => Starts signal-cli REST API on port 8080
+                                        # => Hermes connects to this HTTP endpoint
 
-hermes gateway start                    # => Connects to signal-cli HTTP API
-                                        # => Output: "Signal channel connected"
+echo "SIGNAL_ACCOUNT=+1234567890" >> ~/.hermes/.env
+echo "SIGNAL_HTTP_URL=http://localhost:8080" >> ~/.hermes/.env
+hermes gateway start                    # => "Signal channel connected" (via signal-cli HTTP)
+                                        # => End-to-end encrypted messaging enabled
 
-# Email setup:
-hermes gateway start                    # => Connects to SMTP and IMAP servers
-                                        # => Polls IMAP inbox for new messages
-                                        # => Replies via SMTP
-                                        # => Output: "Email channel connected"
+# Email: configure SMTP/IMAP credentials then start gateway
+echo "EMAIL_SMTP_HOST=smtp.gmail.com" >> ~/.hermes/.env
+echo "EMAIL_SMTP_PORT=587" >> ~/.hermes/.env
+echo "EMAIL_ALLOWED_SENDERS=user@example.com" >> ~/.hermes/.env
+hermes gateway start                    # => "Email channel connected"
+                                        # => Polls IMAP inbox every 60 seconds
+                                        # => Replies via SMTP to allowed senders only
+
+hermes gateway status                   # => Shows: signal: connected, email: connected
 ```
 
-**Key Takeaway**: Signal requires `signal-cli` running as a daemon with HTTP API. Email uses standard SMTP/IMAP with sender whitelisting. Both are configured via environment variables in `.env`.
+**Key Takeaway**: Signal requires `signal-cli` running as a daemon with HTTP API, while Email uses standard SMTP/IMAP with sender whitelisting — both configured via environment variables in `.env`.
 
 **Why It Matters**: Signal provides the highest-security option for agent communication — end-to-end encrypted messages that not even Nous Research can read. This matters for teams handling sensitive data (healthcare, finance, legal) where Telegram or Slack may not meet compliance requirements. Email, while less interactive, enables asynchronous workflows: schedule a cron job to email a daily report, or forward alerts to the agent's inbox for automated triage. The sender whitelist prevents the agent from processing spam or phishing emails as legitimate requests.
 
@@ -869,54 +862,58 @@ hermes gateway start                    # => Connects to SMTP and IMAP servers
 
 The `send_message` tool lets the agent proactively deliver messages to any configured platform. Combined with cron jobs, this enables scheduled reports, alerts, and notifications delivered to whichever platform the user prefers.
 
+**Start the gateway and trigger multi-platform delivery**:
+
 ```bash
-# The agent uses send_message tool internally:
-# send_message(platform="telegram", user_id="123456789",
-#              message="Build completed successfully")
-# => Delivers to specific Telegram user
-# => Platform must be configured and connected
+# Ensure the gateway is running with at least Telegram + Slack configured
+hermes gateway start                    # => Connects all enabled channels
+                                        # => Output: "Gateway started. Channels: telegram, slack"
 
-# send_message(platform="slack", channel="#dev-ops",
-#              message="Deployment to production complete")
-# => Sends to a Slack channel
-# => Bot must be invited to the channel
+# Verify connected channels
+hermes gateway status                   # => Shows: connected channels, uptime, message counts
+                                        # => Output: "telegram: connected, slack: connected"
+```
 
-# send_message(platform="discord", channel_id="1234567890",
-#              message="CI pipeline failed — check logs")
-# => Sends to a Discord channel by ID
-# => Bot must have Send Messages permission
+**Trigger cross-platform message delivery from a session**:
 
-# Cross-platform delivery from a cron job:
-# "Every morning at 9am, send server status to Telegram and Slack"
-# => Agent creates cron job (see Example 47)
-# => Cron job runs: checks server status
-# => Calls send_message twice:
-# =>   1. send_message(platform="telegram", ...)
-# =>   2. send_message(platform="slack", ...)
-# => Same report, two platforms
+```bash
+# Ask the agent to send the same report to multiple platforms
+hermes chat -q "Check server disk usage and send a summary to both Telegram and Slack"
+                                        # => Agent runs: df -h /
+                                        # => Agent calls send_message for Telegram + Slack
+                                        # => Same content delivered to both channels
+
+# Send a targeted message to a specific platform directly
+hermes chat -q "Send today's deployment status to Slack #ops-alerts"
+                                        # => Agent calls send_message: platform=slack, channel=#ops-alerts
+hermes chat -q "Message me on Telegram with the current CPU load"
+                                        # => Agent runs: uptime; sends result to Telegram
 ```
 
 ````yaml
-# Platform-specific formatting considerations:
-# Telegram:
-# => Supports Markdown formatting (bold, italic, code blocks)
-# => Max message length: 4096 characters
-# => Long messages auto-split into multiple sends
-
-# Slack:
-# => Uses mrkdwn format (different from standard Markdown)
-# => *bold* _italic_ `code` ```code block```
-# => Supports Block Kit for rich layouts
-
-# Discord:
-# => Standard Markdown (bold, italic, code, spoilers)
-# => Max message length: 2000 characters
-# => Embeds available for structured data
-
-# Email:
-# => HTML or plain text body
-# => Subject line auto-generated from first line
-# => Attachments supported via file paths
+# Platform formatting reference — gateway handles conversion automatically
+# => Gateway auto-converts agent output to each platform's native format
+# => Agent uses uniform send_message(); gateway handles platform differences
+gateway:
+  platforms:
+    telegram:
+      max_length: 4096 # => Long messages auto-split into multiple sends
+      format:
+        markdown # => Supports bold, italic, inline code
+        # => Use *bold*, _italic_, `code`, ```block```
+    slack:
+      max_length: 3000 # => Block Kit available for structured layouts
+      format:
+        mrkdwn # => *bold* _italic_ `code` (different from Markdown)
+        # => NOT standard Markdown — Slack uses its own format
+    discord:
+      max_length: 2000 # => Standard Markdown; Embeds for structured data
+      format: markdown # => Bold, italic, code, spoilers supported
+    email:
+      format: html # => HTML or plain text body; subject auto-generated
+      attachments:
+        true # => File paths supported for attachments
+        # => Agent passes file path; gateway reads and attaches
 ````
 
 **Key Takeaway**: The `send_message` tool provides a uniform interface for delivering messages to any configured platform. Platform-specific formatting differences are handled automatically by the gateway.
@@ -967,7 +964,6 @@ gateway:
     # =>   Memory and conversation history isolated
     # => false: all users share one session
     # =>   Suitable for team channels
-
 # Per-platform allowlists (in .env):
 # TELEGRAM_ALLOWED_USERS=123,456       # => Telegram user IDs
 # DISCORD_ALLOWED_USERS=789,012        # => Discord user IDs
@@ -977,35 +973,44 @@ gateway:
 ```
 
 ```bash
-# Access control in action:
+# Configure access control before starting gateway
+hermes gateway setup                    # => Interactive wizard sets unauthorized_dm_behavior
+                                        # => Choose "pair" (admin approval) or "ignore" (silent drop)
+hermes config set gateway.unauthorized_dm_behavior pair
+                                        # => Directly set to "pair" mode
+hermes config set gateway.group_sessions_per_user true
+                                        # => Isolate each user's session context
 
-# Unknown user messages bot on Telegram:
-# With unauthorized_dm_behavior: pair
-# => Bot replies: "I don't recognize you. Sending pairing request..."
-# => Admin receives: "User 555666777 wants to pair. /approve or /deny"
-# => Admin types: /approve
-# => User added to allowlist, can now interact
+# Start gateway and test pair flow
+hermes gateway start                    # => Gateway running with pair mode enabled
+                                        # => Unknown user 555666777 messages Telegram bot
+                                        # => Bot replies: "Sending pairing request to admin..."
+                                        # => Admin receives: "User 555666777 wants to pair. /approve or /deny"
 
-# With unauthorized_dm_behavior: ignore
-# => No response sent
-# => No notification to admin
-# => User's message silently discarded
+# Admin approval command (typed in Telegram to the bot)
+hermes gateway pair-approve 555666777   # => CLI equivalent of /approve in Telegram
+                                        # => User 555666777 added to TELEGRAM_ALLOWED_USERS
+                                        # => User can now interact with the agent
 
-# Per-user sessions:
-# With group_sessions_per_user: true
-# => User A asks: "Remember my name is Alice"
-# => User B asks: "What's my name?"
-# => Agent to B: "I don't know your name yet."
-# => Contexts are isolated — A's data invisible to B
+# Check and update current allowlists
+cat ~/.hermes/.env | grep ALLOWED       # => TELEGRAM_ALLOWED_USERS=123456789,555666777
+echo "TELEGRAM_ALLOWED_USERS=123456789,555666777" >> ~/.hermes/.env
+                                        # => Manually add user if not using pair flow
 
-# With group_sessions_per_user: false
-# => All users share context in group channels
-# => User A's statements visible to User B's session
+# Switch to ignore mode for stricter security
+hermes config set gateway.unauthorized_dm_behavior ignore
+hermes gateway restart                  # => Reload config; unknown users now silently dropped
+                                        # => No response, no admin notification
+
+# Verify session isolation is working
+hermes gateway status                   # => Shows: group_sessions_per_user: true
+                                        # => Each user gets own isolated context
+                                        # => User A's memory invisible to User B
 ```
 
 **Key Takeaway**: Layer access control with platform allowlists, DM policies (pair/ignore), and per-user session isolation. The pairing flow enables controlled onboarding without sharing user IDs out-of-band.
 
-**Why It Matters**: Every messaging channel is a potential attack surface — an unprotected bot on Telegram can be discovered and abused by anyone, consuming your API tokens (at your cost) or executing commands on your system. The three-layer defense (platform allowlist + DM policy + session isolation) provides defense-in-depth. The pairing flow is particularly useful for teams: instead of collecting Telegram user IDs manually, the admin approves incoming requests interactively. Session isolation ensures that in a multi-user setup, one user cannot access another user's conversation history or memory — critical for shared bots serving multiple team members.
+**Why It Matters**: Every messaging channel is a potential attack surface — an unprotected Telegram bot can be abused by anyone, consuming your API tokens or executing commands on your system. The three-layer defense (platform allowlist + DM policy + session isolation) provides defense-in-depth. The pairing flow lets admins approve new users interactively instead of collecting IDs manually. Session isolation ensures one user cannot access another's conversation history or memory — critical for shared bots serving multiple team members.
 
 ## Delegation and Scheduling (Examples 43-48)
 
@@ -1043,40 +1048,27 @@ flowchart TB
 ```
 
 ```bash
-# Parent agent delegates a task:
-# delegate_task(
-#   goal="Review the Python files in src/ for security vulnerabilities",
-#   context="Focus on SQL injection, XSS, and path traversal. Check all .py files.",
-#   toolsets=["file", "terminal"]
-# )
-#                                       # => Spawns isolated child agent
-#                                       # => Child has its own context window
-#                                       # => Child can use file + terminal tools only
-#                                       # => Child CANNOT delegate further (depth limit)
-#                                       # => Child CANNOT ask user questions (no clarify)
-#                                       # => Child CANNOT access parent's memory
-#                                       # => Child CANNOT send messages to platforms
+# Trigger delegation by asking the agent to perform a complex focused task
+hermes chat -q "Review all Python files in src/ for security vulnerabilities"
+                                        # => Agent uses delegate_task internally
+                                        # => Spawns isolated child: toolsets=["file", "terminal"]
+                                        # => Child CANNOT delegate further (depth limit = 2)
 
-# Child agent executes autonomously:
-# => Reads Python files using file tools
-# => Searches for vulnerability patterns
-# => Runs static analysis via terminal
-# => Returns structured result to parent
+# Child executes autonomously; parent receives result summary:
+hermes session stats                    # => Shows child token usage: input=15000, output=3000
+                                        # => tool_trace: read_file x5, terminal x2
+                                        # => Result: "Found 3 issues: SQL injection db.py:42, XSS views.py:87"
 
-# Parent receives JSON result:
-# {
-#   "status": "completed",              # => "completed", "failed", or "timeout"
-#   "summary": "Found 3 potential issues...",
-#   "token_usage": { "input": 15000, "output": 3000 },
-#   "tool_trace": ["read_file x5", "terminal x2"]
-# }
-#                                       # => Parent integrates result into its response
-#                                       # => Zero context pollution — child's full
-#                                       # =>   conversation stays in child
+# Verify delegation configuration
+hermes config get delegation            # => Shows: max_concurrent=3, max_depth=2, timeout=120s
+hermes config set delegation.max_concurrent 2
+                                        # => Reduce concurrent children (lower resource usage)
+hermes config set delegation.timeout 60 # => Shorter timeout (60s) for quick tasks
+                                        # => Child killed and returns "timeout" status if exceeded
 
-# Concurrency: up to 3 simultaneous children
-# Depth: parent → child → (no further delegation)
-# Depth limit of 2 prevents infinite delegation chains
+# View delegation activity in current session
+hermes session show --delegation        # => Shows parent-child relationship tree
+                                        # => Each child listed with status and token usage
 ```
 
 **Key Takeaway**: `delegate_task` spawns isolated child agents with restricted tools (no delegation, clarify, memory, send_message, or execute_code). Up to 3 concurrent children with depth limit 2 prevent runaway delegation.
@@ -1088,67 +1080,27 @@ flowchart TB
 Batch mode sends multiple delegation tasks simultaneously, running up to 3 in parallel. Each task returns a structured JSON result with status, summary, token usage, and tool trace. Use batch delegation for parallel workstreams that are independent of each other.
 
 ```bash
-# Parent delegates a batch of tasks:
-# The agent internally manages parallel execution:
+# Trigger batch delegation with a broad code review request
+hermes chat -q "Do a full code review: check frontend accessibility, API validation, and npm dependencies"
+                                        # => Agent spawns 3 children in parallel (max_concurrent=3)
+                                        # => Completes in ~30s vs 70s sequential
 
-# Task 1: Analyze frontend code
-# delegate_task(
-#   goal="Analyze React components in src/components/ for accessibility issues",
-#   context="Check ARIA attributes, alt text, keyboard navigation, color contrast",
-#   toolsets=["file", "terminal"]
-# )
+# After all children finish, view token usage breakdown
+hermes session stats                    # => Per-child: frontend=12000, API=8000, deps=5000 tokens
+hermes session show --last              # => Parent's unified report from all 3 children
+hermes session show --delegation        # => Full parent-child delegation tree with statuses
 
-# Task 2: Analyze backend code (runs in parallel with Task 1)
-# delegate_task(
-#   goal="Review API routes in src/api/ for input validation",
-#   context="Check request body parsing, query param validation, header checks",
-#   toolsets=["file", "terminal"]
-# )
+# Configure and verify batch settings
+hermes config get delegation.max_concurrent
+                                        # => Shows: 3 (current concurrent child limit)
+hermes config set delegation.max_concurrent 3
+                                        # => Ensures maximum parallelism for batch tasks
+hermes config get delegation.timeout    # => Shows: 120 (seconds per child before timeout)
 
-# Task 3: Check dependencies (runs in parallel with Tasks 1 and 2)
-# delegate_task(
-#   goal="Audit package.json dependencies for known vulnerabilities",
-#   context="Run npm audit, check for outdated packages, review lock file",
-#   toolsets=["terminal"]
-# )
-
-# All 3 tasks execute concurrently:
-# => Child 1: reading React files, checking ARIA attrs
-# => Child 2: reading API routes, checking validation
-# => Child 3: running npm audit, checking versions
-
-# Results returned as structured JSON:
-# [
-#   {
-#     "task": "frontend accessibility",
-#     "status": "completed",            # => Task finished successfully
-#     "summary": "Found 5 missing ARIA labels, 2 low-contrast issues",
-#     "token_usage": {
-#       "input": 12000,                 # => Tokens consumed by this child
-#       "output": 2500
-#     },
-#     "tool_trace": [
-#       "read_file x8",                 # => Tools the child used
-#       "search_files x3"
-#     ]
-#   },
-#   {
-#     "task": "API validation",
-#     "status": "completed",
-#     "summary": "3 routes missing input validation, 1 SQL injection risk",
-#     "token_usage": { "input": 8000, "output": 1800 },
-#     "tool_trace": ["read_file x6", "terminal x1"]
-#   },
-#   {
-#     "task": "dependency audit",
-#     "status": "completed",
-#     "summary": "2 high-severity vulnerabilities, 8 outdated packages",
-#     "token_usage": { "input": 5000, "output": 1200 },
-#     "tool_trace": ["terminal x3"]
-#   }
-# ]
-#                                       # => Parent synthesizes all results
-#                                       # => Presents unified report to user
+# Run focused batch for a specific directory
+hermes chat -q "Review the src/api/ directory: check validation, error handling, and test coverage"
+                                        # => Agent splits into 3 focused subtasks automatically
+                                        # => Each child handles one concern; parent synthesizes
 ```
 
 **Key Takeaway**: Batch delegation runs up to 3 independent tasks in parallel, each returning structured JSON with status, summary, token usage, and tool trace. The parent synthesizes results into a unified response.
@@ -1227,47 +1179,42 @@ delegation:
 The `cronjob` tool lets the agent schedule tasks for future execution. Scheduling supports duration shortcuts (`30m`, `1h`, `2d`), standard cron syntax (`0 9 * * *`), and ISO timestamps. Cron jobs run persistently even after the session ends.
 
 ```bash
-# Agent creates cron jobs via the cronjob tool:
+# Duration shortcuts — schedule one-time tasks relative to now
+hermes chat -q "Check if the CI build finished in 30 minutes"
+                                        # => Agent creates: cronjob(schedule="30m", task="Check CI build")
+                                        # => Shorthand: m=minutes, h=hours, d=days
 
-# Duration shortcuts — relative to now
-# cronjob(schedule="30m", task="Check if the build finished")
-#                                       # => Runs once, 30 minutes from now
-#                                       # => Shorthand: m=minutes, h=hours, d=days
+hermes chat -q "Remind me to review PRs in 1 hour"
+                                        # => Agent creates: cronjob(schedule="1h", task="Review PRs reminder")
 
-# cronjob(schedule="1h", task="Send me a reminder to review PRs")
-#                                       # => Runs once, 1 hour from now
+hermes chat -q "Follow up on the deployment in 2 days"
+                                        # => Agent creates: cronjob(schedule="2d", task="Deployment follow-up")
 
-# cronjob(schedule="2d", task="Follow up on the deployment")
-#                                       # => Runs once, 2 days from now
+# Cron syntax — schedule recurring tasks
+hermes chat -q "Send me a daily server health report at 9am every day"
+                                        # => Agent creates: cronjob(schedule="0 9 * * *", ...)
+                                        # => Standard cron: minute hour day month weekday
+                                        # => "0 9 * * 1-5" for weekdays only
 
-# Cron syntax — recurring schedules
-# cronjob(schedule="0 9 * * *", task="Send daily server health report")
-#                                       # => Standard cron: minute hour day month weekday
-#                                       # => This runs at 9:00 AM every day
-#                                       # => "0 9 * * 1-5" for weekdays only
+hermes chat -q "Check disk space every 30 minutes"
+                                        # => Agent creates: cronjob(schedule="*/30 * * * *", ...)
+                                        # => Monitors resource usage continuously
 
-# cronjob(schedule="*/30 * * * *", task="Check disk space")
-#                                       # => Every 30 minutes
-#                                       # => Monitors resource usage continuously
+# ISO timestamp — schedule exact one-time execution
+hermes chat -q "Deploy release v2.1 at 2026-04-15T14:00:00+07:00"
+                                        # => Agent creates: cronjob(schedule="2026-04-15T14:00:00+07:00", ...)
+                                        # => Timezone-aware; runs at exact date/time
 
-# ISO timestamps — exact time
-# cronjob(schedule="2026-04-15T14:00:00+07:00", task="Deploy release v2.1")
-#                                       # => Runs at exact date/time
-#                                       # => Timezone-aware (UTC+7 in this example)
-
-# Managing cron jobs:
+# Managing cron jobs
 hermes cron list                        # => Lists all scheduled jobs
-                                        # => Shows: ID, schedule, task, next run
-                                        # => Output:
-                                        # => ID   | Schedule      | Task
-                                        # => c01  | 0 9 * * *     | Daily health report
-                                        # => c02  | */30 * * * *  | Check disk space
+                                        # => Shows: ID, schedule, task, next run time
+                                        # => Output: c01 | 0 9 * * * | Daily health report
 
-hermes cron delete c01                  # => Removes job by ID
+hermes cron delete c01                  # => Removes job c01 by ID
                                         # => Output: "Deleted cron job c01"
 
-hermes cron logs c02                    # => Shows execution history for a job
-                                        # => Output: last run, status, output summary
+hermes cron logs c02                    # => Shows execution history for job c02
+                                        # => Output: last run time, status, output summary
 ```
 
 **Key Takeaway**: Schedule tasks with duration shortcuts (`30m`), cron syntax (`0 9 * * *`), or ISO timestamps. Jobs persist across sessions and can be listed, inspected, and deleted via `hermes cron`.
@@ -1279,44 +1226,32 @@ hermes cron logs c02                    # => Shows execution history for a job
 Cron jobs can deliver results to any configured messaging platform. Combine scheduling with `send_message` and skill attachment to create automated workflows that generate reports and distribute them across platforms.
 
 ```bash
-# Natural language scheduling with platform delivery:
-# User: "Every weekday at 9am, check our server status and send
-#        the report to Telegram and the #ops channel on Slack"
+# Schedule a recurring cron job with multi-platform delivery
+hermes chat -q "Every weekday at 9am, check server status and report to Telegram and Slack #ops-alerts"
+                                        # => Agent creates: cronjob(schedule="0 9 * * 1-5", ...)
+                                        # => Each run: checks CPU, memory, disk, uptime
+                                        # => Calls send_message to Telegram + Slack
 
-# Agent creates:
-# cronjob(
-#   schedule="0 9 * * 1-5",
-#   task="Check server status (CPU, memory, disk, uptime).
-#         Send report to Telegram user 123456789
-#         and Slack channel #ops-alerts."
-# )
-#                                       # => Runs Monday through Friday at 9:00 AM
-#                                       # => Agent executes: checks system resources
-#                                       # => Calls send_message to Telegram
-#                                       # => Calls send_message to Slack
-#                                       # => Each platform gets formatted report
+# Verify the cron job was created and inspect it
+hermes cron list                        # => Output: c01 | 0 9 * * 1-5 | Server status report
+hermes cron show c01                    # => Shows full task definition, skills, target platforms
+                                        # => Confirms schedule and delivery targets are correct
 
-# Skill attachment to cron jobs:
-# cronjob(
-#   schedule="0 8 * * *",
-#   task="Run the deploy-status skill and send results to Discord",
-#   skills=["deploy-status"]
-# )
-#                                       # => Cron job loads specified skill
-#                                       # => Skill provides procedure for checking deployments
-#                                       # => Agent follows skill procedure
-#                                       # => Results delivered to Discord
+# Schedule a cron job with skill attachment
+hermes chat -q "Every morning at 8am, run the deploy-status skill and send results to Discord"
+                                        # => Agent creates: cronjob(schedule="0 8 * * *", skills=["deploy-status"])
+                                        # => Cron job loads deploy-status skill each run
+                                        # => Results formatted and delivered to Discord
+hermes cron list                        # => Output: c02 | 0 8 * * * | Deploy status (skill: deploy-status)
 
-# Example cron job output delivered to Telegram:
-# => "Daily Server Report - 2026-04-14"
-# => "CPU: 23% | Memory: 4.2/8 GB (52%) | Disk: 120/500 GB (24%)"
-# => "Uptime: 47 days | Load: 0.82, 0.65, 0.71"
-# => "Status: All systems healthy"
+# View output from a past run
+hermes cron logs c01                    # => Execution history for the weekday report
+                                        # => 2026-04-14 09:00 | completed | Telegram: sent, Slack: sent
+                                        # => "CPU: 23% | Memory: 52% | Disk: 24% | Status: Healthy"
 
-# Example delivered to Slack (mrkdwn format):
-# => *Daily Server Report - 2026-04-14*
-# => `CPU: 23%` | `Memory: 52%` | `Disk: 24%`
-# => Uptime: 47 days | Status: :white_check_mark: Healthy
+# Update or remove a cron job
+hermes cron delete c02                  # => Removes the deploy-status cron job
+                                        # => Output: "Deleted cron job c02"
 ```
 
 **Key Takeaway**: Attach skills and delivery targets to cron jobs for automated workflows. The agent generates content once and distributes to multiple platforms with platform-specific formatting.
@@ -1328,48 +1263,32 @@ Cron jobs can deliver results to any configured messaging platform. Combine sche
 The `session_search` tool performs full-text search (FTS5) across all past conversations stored in Hermes Agent's SQLite database. Results are deduplicated, summarized by the LLM, and exclude the current session to avoid circular references.
 
 ```bash
-# Agent uses session_search internally:
-# session_search(query="kubernetes deployment error")
-#                                       # => Searches all past sessions
-#                                       # => Uses SQLite FTS5 (fast full-text search)
-#                                       # => Returns matching conversation fragments
-#                                       # => LLM summarizes relevant findings
-#                                       # => Current session excluded from results
+# Search past sessions by asking the agent directly
+hermes chat -q "What error did I get with the kubernetes deployment last week?"
+                                        # => Agent calls session_search(query="kubernetes deployment error")
+                                        # => SQLite FTS5 full-text search; BM25 ranking applied
+                                        # => LLM summarizes relevant fragments — not raw transcript
 
-# session_search(query="how did I fix the SSL certificate issue")
-#                                       # => Finds past sessions where SSL was discussed
-#                                       # => Extracts the resolution steps
-#                                       # => Presents summarized answer
+hermes chat -q "How did I fix the SSL certificate issue?"
+                                        # => Agent finds past session; extracts resolution steps
 
-# How FTS5 search works:
-# 1. Query tokenized into search terms
-#    "kubernetes deployment error"
-#    => tokens: "kubernetes", "deployment", "error"
-#                                       # => FTS5 matches any session containing
-#                                       # =>   all three terms (AND logic)
+# Search directly from CLI (non-interactive)
+hermes session search "auth service deployment"
+                                        # => Summarized matches from past sessions
+                                        # => Current session excluded; lineage deduplication applied
+                                        # => Output: "3 days ago: docker-compose + blue-green swap + vault"
 
-# 2. Results ranked by relevance
-#    => BM25 ranking algorithm
-#    => More specific matches rank higher
-#    => Recent sessions weighted slightly more
+# List and inspect sessions
+hermes session list                     # => Lists sessions: ID, date, summary, token count
+hermes session list --limit 10          # => Show only 10 most recent sessions
+hermes session show SESSION_ID          # => Full transcript of a specific session
+hermes session show --last              # => Most recent completed session transcript
 
-# 3. Lineage deduplication
-#    => If Session A spawned Session B (via delegation),
-#    =>   overlapping content deduplicated
-#    => Prevents seeing same content twice
-
-# 4. LLM summarization
-#    => Raw matches passed to LLM
-#    => LLM extracts relevant portions
-#    => Returns concise summary, not raw fragments
-
-# Example: searching for past deployment procedure
-# User: "How did we deploy the auth service last time?"
-# Agent: session_search(query="auth service deployment")
-# => Finds session from 3 days ago where deployment was discussed
-# => Extracts: "Used docker-compose with health checks,
-# =>   env vars from vault, and blue-green swap via nginx"
-# => Presents summarized procedure to user
+# Search with filters
+hermes session search --days 7 "nginx config"
+                                        # => Search only sessions from last 7 days
+hermes session search --tag deployment "rollback"
+                                        # => Search sessions tagged as deployment-related
 ```
 
 **Key Takeaway**: `session_search` provides FTS5 full-text search across all past sessions with BM25 ranking, lineage deduplication, and LLM summarization. The current session is excluded to prevent circular references.
@@ -1409,26 +1328,21 @@ flowchart LR
 ```
 
 ```bash
-# Agent navigates to a URL:
-# browser_navigate(url="https://example.com")
-#                                       # => Opens URL in headless browser
-#                                       # => Page fully loads (waits for network idle)
-#                                       # => Returns page title and URL
+# Enable browser toolset and navigate to a URL
+hermes chat -q "Open https://example.com and tell me what's on the page"
+                                        # => Agent calls: browser_navigate(url="https://example.com")
+                                        # => Page fully loads (waits for network idle)
+                                        # => Then calls: browser_snapshot()
+                                        # => Returns accessibility tree (not raw HTML)
 
-# Agent captures DOM state:
-# browser_snapshot()
-#                                       # => Returns accessibility tree (not raw HTML)
-#                                       # => Structured representation of page elements
-#                                       # => Includes: buttons, links, inputs, text
-#                                       # => Each element has a ref number for interaction
-
-# Example snapshot output:
+# Example snapshot output the agent receives:
 # [1] heading "Welcome to Example.com"
 # [2] paragraph "This domain is for use in examples..."
 # [3] link "More information..." href="https://iana.org/..."
 # [4] button "Accept Cookies"
 #                                       # => Ref numbers [1]-[4] used in click/type tools
-#                                       # => Agent reads this to understand page structure
+                                        # => Agent reads this to understand page structure
+                                        # => Compact semantic view vs. thousands of raw HTML lines
 ```
 
 ```yaml
@@ -1465,51 +1379,55 @@ tools:
 Once a page is loaded, the agent interacts with elements using their ref numbers from `browser_snapshot`. Tools include `browser_click`, `browser_type`, `browser_scroll`, `browser_press` (keyboard keys), and `browser_back` (navigation history).
 
 ```bash
-# Step 1: Navigate and snapshot
-# browser_navigate(url="https://github.com/login")
-# browser_snapshot()
-# => [1] heading "Sign in to GitHub"
-# => [2] label "Username or email address"
-# => [3] textbox ref=3
-# => [4] label "Password"
-# => [5] textbox ref=5 type="password"
-# => [6] button "Sign in"
-# => [7] link "Forgot password?"
+# Step 1: Ask agent to perform multi-step browser login workflow
+hermes chat -q "Log into GitHub at https://github.com/login using my credentials"
+                                        # => Agent calls browser_navigate(url="https://github.com/login")
+                                        # => Agent calls browser_snapshot() to see page elements
 
-# Step 2: Type into username field
-# browser_type(ref=3, text="user@example.com")
-#                                       # => Types text into element with ref 3
-#                                       # => Simulates real keyboard input
-#                                       # => Triggers input events (onChange, etc.)
+# Step 2: Agent reads snapshot and types into username field
+hermes chat -q "Type 'user@example.com' into the username field"
+                                        # => Agent calls browser_type(ref=3, text="user@example.com")
+                                        # => ref=3 is the username textbox from snapshot
+                                        # => Simulates real keyboard input; triggers onChange events
 
 # Step 3: Type into password field
-# browser_type(ref=5, text="secret-password")
-#                                       # => Types into password field
-#                                       # => Characters masked in the field
+hermes chat -q "Type the password into the password field"
+                                        # => Agent calls browser_type(ref=5, text="***")
+                                        # => ref=5 is the password field (type="password")
 
-# Step 4: Click sign in button
-# browser_click(ref=6)
-#                                       # => Clicks element with ref 6
-#                                       # => Waits for navigation/response
-#                                       # => Page updates after click
+# Step 4: Click the submit button
+hermes chat -q "Click the Sign In button"
+                                        # => Agent calls browser_click(ref=6)
+                                        # => Waits for navigation/page update after click
 
-# Step 5: Scroll down on a long page
-# browser_scroll(direction="down", amount=3)
-#                                       # => Scrolls down 3 "pages"
-#                                       # => "up" scrolls toward top
-#                                       # => amount: number of viewport heights
+# Step 5: Take snapshot to see page after login
+hermes chat -q "What's on the page now after logging in?"
+                                        # => Agent calls browser_snapshot() after navigation
+                                        # => Returns new accessibility tree of dashboard page
 
-# Step 6: Press keyboard key
-# browser_press(key="Enter")
-#                                       # => Simulates keyboard press
-#                                       # => Common keys: Enter, Tab, Escape, ArrowDown
-#                                       # => Modifiers: Control+A, Shift+Tab
+# Step 6: Scroll to find more content
+hermes chat -q "Scroll down to find the repository list"
+                                        # => Agent calls browser_scroll(direction="down", amount=3)
+                                        # => amount=3: 3 viewport heights; "up" scrolls toward top
 
-# Step 7: Navigate back
-# browser_back()
-#                                       # => Browser back button equivalent
-#                                       # => Returns to previous page
-#                                       # => Useful for multi-page workflows
+# Step 7: Use keyboard shortcut or navigate back
+hermes chat -q "Press Enter to submit the search form"
+                                        # => Agent calls browser_press(key="Enter")
+hermes chat -q "Go back to the previous page"
+                                        # => Agent calls browser_back()
+                                        # => Returns to previous page in browser history
+
+# Step 8: Verify the workflow completed successfully
+hermes chat -q "Take a snapshot and confirm I'm now logged into GitHub"
+                                        # => Agent calls browser_snapshot(); reads page state
+hermes chat -q "Search for 'hermes-agent' in the GitHub search box"
+                                        # => Agent: browser_click search field + browser_type + browser_press(Enter)
+hermes chat -q "Click on the first search result"
+                                        # => Agent calls browser_click(ref=N) where N is first result ref
+hermes chat -q "Scroll to the bottom of the README and take a screenshot"
+                                        # => Agent: browser_scroll(direction=down) + browser_vision
+hermes chat -q "Open a new tab and navigate to https://docs.github.com"
+                                        # => Agent navigates to docs page; browser persists across calls
 ```
 
 **Key Takeaway**: Browser interaction uses ref numbers from `browser_snapshot` for precise element targeting. The five interaction tools (click, type, scroll, press, back) cover all common web automation patterns.
@@ -1521,57 +1439,46 @@ Once a page is loaded, the agent interacts with elements using their ref numbers
 The browser vision tools enable visual analysis of web pages. `browser_vision` sends a screenshot to the LLM for visual reasoning, `browser_get_images` extracts image URLs, and `browser_console` captures JavaScript console output. Session recording saves browsing as video.
 
 ```bash
-# Visual page analysis:
-# browser_vision(prompt="Describe the layout and identify any broken elements")
-#                                       # => Captures screenshot of current page
-#                                       # => Sends to LLM with vision capability
-#                                       # => LLM analyzes visual layout, colors, spacing
-#                                       # => Returns description + identified issues
-#                                       # => Useful for: UI testing, design review,
-#                                       # =>   accessibility audit, visual regression
+# Visual analysis: describe and check a page visually
+hermes chat -q "Open https://myapp.com and check for visual layout problems"
+                                        # => Agent: browser_navigate + browser_vision
+                                        # => Screenshot sent to LLM; LLM analyzes layout, colors, spacing
 
-# browser_vision(prompt="Is the login form properly aligned?")
-#                                       # => Targeted visual question
-#                                       # => Agent sees the page as a user would
-#                                       # => Can identify visual bugs invisible to DOM
+hermes chat -q "Is the login form on this page properly aligned?"
+                                        # => Agent: browser_vision with targeted question
+                                        # => Sees page as user would; catches bugs invisible to DOM
 
-# Extract images from page:
-# browser_get_images()
-#                                       # => Returns list of image URLs on current page
-#                                       # => Includes: <img> src, CSS background images
-#                                       # => Useful for: content auditing, asset extraction
-#                                       # => Output:
-#                                       # => [
-#                                       # =>   "https://example.com/logo.png",
-#                                       # =>   "https://example.com/hero.jpg",
-#                                       # =>   "https://cdn.example.com/banner.webp"
-#                                       # => ]
+# Extract all images from the current page
+hermes chat -q "List all images on this page"
+                                        # => Agent calls: browser_get_images()
+                                        # => Returns: all <img> src + CSS background image URLs
+hermes chat -q "Download all hero images from this marketing page"
+                                        # => Agent: browser_get_images() + write_file for each URL
 
-# Read browser console output:
-# browser_console()
-#                                       # => Returns JavaScript console messages
-#                                       # => Includes: log, warn, error, info
-#                                       # => Captures: runtime errors, failed fetches,
-#                                       # =>   deprecation warnings, custom logs
-#                                       # => Useful for debugging JS-heavy applications
-#                                       # => Output:
-#                                       # => [ERROR] Uncaught TypeError: Cannot read
-#                                       # =>   property 'map' of undefined (app.js:42)
-#                                       # => [WARN] Deprecated API: use fetch() instead
+# Capture JavaScript console output for debugging
+hermes chat -q "Check for JavaScript errors on this page"
+                                        # => Agent calls: browser_console()
+                                        # => Returns: [ERROR] TypeError, [WARN] deprecated API, etc.
+hermes chat -q "Why is the dashboard loading slowly? Check the browser console"
+                                        # => Agent: browser_navigate + browser_console
+                                        # => Finds: failed network requests, slow resource loads
+
+# View session recording after automation run
+ls ~/.hermes/recordings/                # => Lists WebM video files of browser sessions
+                                        # => Format: session-{id}-{timestamp}.webm
 ```
 
 ```yaml
 # ~/.hermes/config.yaml — recording configuration
 tools:
   browser:
+    enabled: true # => Activates browser toolset
+    headless: true # => Run without visible window (false for debugging)
     record:
       true # => Records browser sessions as video
-      # => Saved to ~/.hermes/recordings/
-      # => Format: WebM video
-      # => File: session-{id}-{timestamp}.webm
-      # => Useful for: debugging automation failures,
-      # =>   audit trails, demo generation
+      # => Saved to ~/.hermes/recordings/ as WebM
       # => Set to false in production (disk usage)
+    command_timeout: 30 # => Seconds before a browser command times out
 ```
 
 **Key Takeaway**: `browser_vision` sends screenshots to the LLM for visual analysis, `browser_get_images` extracts image URLs, and `browser_console` captures JavaScript logs. Session recording saves automation as video for debugging.
@@ -1609,40 +1516,31 @@ flowchart TB
 ```
 
 ```bash
-# Agent calls execute_code with a Python script:
-# execute_code(script="""
-# import json
-#
-# # RPC tools are available as functions
-# # Read all Python files in src/
-# files = search_files(pattern="*.py", path="src/")
-#
-# results = []
-# for f in files:
-#     content = read_file(f)              # RPC call: reads file
-#     line_count = len(content.split('\n'))
-#     if line_count > 200:
-#         results.append({
-#             'file': f,
-#             'lines': line_count
-#         })
-#
-# # Only stdout goes back to agent context
-# print(json.dumps(results, indent=2))
-# """)
-#                                       # => Script runs in isolated Python process
-#                                       # => RPC tools called via function syntax
-#                                       # => read_file, search_files work like agent tools
-#                                       # => Only print() output returns to agent
-#                                       # => Intermediate tool results stay in sandbox
-#                                       # => Zero context cost for processing logic
+# Trigger execute_code by asking the agent to process a batch of files
+hermes chat -q "Find all Python files in src/ that are longer than 200 lines"
+                                        # => Agent writes and executes a Python script internally:
+                                        # =>   files = search_files(pattern="*.py", path="src/")
+                                        # =>   for f in files: count lines, filter > 200
+                                        # =>   print(json.dumps(results))  # only stdout returns
+                                        # => Script runs in isolated process — zero context cost
+                                        # => Only the JSON summary enters the agent context
 
-# Why zero context cost:
-# => Without execute_code: agent reads 50 files,
-# =>   all 50 file contents enter context window (~100k tokens)
-# => With execute_code: Python script reads 50 files,
-# =>   only the summary (200 tokens) enters context
-# => Savings: 99.8% fewer tokens consumed
+hermes chat -q "Count lines in each file in src/ and output a sorted report"
+                                        # => Agent executes Python: search_files + read_file x N
+                                        # => N file reads stay in sandbox — not in context window
+                                        # => Only final print() output (~200 tokens) returned
+
+# Configure code execution settings
+hermes config get tools.execute_code    # => Shows: enabled=true, timeout=300, max_tool_calls=100
+                                        # => timeout: max seconds before script is killed
+                                        # => max_tool_calls: safety cap on RPC calls per script
+
+# Cost comparison demonstration
+hermes chat -q "How many tokens does execute_code save vs. reading 50 files directly?"
+                                        # => Agent calculates:
+                                        # =>   Direct: 50 files × ~2000 tokens = ~100k tokens
+                                        # =>   execute_code: ~200 tokens (just the summary)
+                                        # =>   Savings: 99.8% fewer context tokens consumed
 ```
 
 ```yaml
@@ -1669,59 +1567,47 @@ tools:
 The `clarify` tool lets the agent ask the user for information when it cannot proceed without additional input. The tool has a configurable timeout (default 120 seconds) after which the agent proceeds with its best guess or reports that it cannot continue.
 
 ```bash
-# Agent encounters ambiguity and asks for clarification:
-# clarify(question="You asked to deploy the app. Which environment?
-#                   Options: staging, production, or both?")
-#                                       # => Pauses agent execution
-#                                       # => Sends question to user
-#                                       # => Waits for user response
-#                                       # => Timeout: 120 seconds (configurable)
-#                                       # => User responds: "staging"
-#                                       # => Agent continues with answer
+# Trigger the clarify tool by giving the agent an ambiguous request
+hermes chat -q "Deploy the app"         # => Agent has no environment specified
+                                        # => Calls: clarify("Which environment? Options: staging, production, or both?")
+                                        # => Pauses agent execution; sends question to user
 
-# Common clarify scenarios:
-# clarify(question="I found 3 config files. Which one should I edit?
-#                   1. config/dev.yaml
-#                   2. config/staging.yaml
-#                   3. config/prod.yaml")
-#                                       # => Agent presents options
-#                                       # => User selects by number or name
+# You respond in the terminal/chat:
+staging                                 # => User responds with "staging"
+                                        # => Agent resumes with: deploy to staging environment
+                                        # => Timeout: 120 seconds before proceeding with safest default
 
-# clarify(question="The test is failing with a permission error.
-#                   Should I: (a) fix the permissions, or
-#                   (b) skip the test and continue?")
-#                                       # => Agent requests decision
-#                                       # => Avoids making risky choices autonomously
+# Trigger with file selection ambiguity
+hermes chat -q "Edit the config file for this project"
+                                        # => Agent finds 3 config files; calls clarify with options:
+                                        # =>   "1. config/dev.yaml  2. config/staging.yaml  3. config/prod.yaml"
 
-# Timeout behavior:
-# If user doesn't respond within timeout:
-# => Agent logs: "Clarification timed out after 120s"
-# => Agent either:
-#    - Proceeds with safest default option
-#    - Reports: "I need your input to continue. Please re-ask."
-#    - Depends on task criticality
+# Trigger with destructive action decision
+hermes chat -q "Fix the failing test"   # => Agent finds permission error
+                                        # => Calls: clarify("Fix permissions (a) or skip test (b)?")
+                                        # => Avoids risky autonomous decisions
 ```
 
 ```yaml
-# ~/.hermes/config.yaml — clarify configuration
+# ~/.hermes/config.yaml — clarify timeout configuration
 tools:
   clarify:
     timeout:
       120 # => Seconds to wait for user response
       # => Default: 120 (2 minutes)
-      # => 0: wait indefinitely (not recommended)
-      # => Short timeout for automated workflows
-      # => Long timeout for interactive sessions
+      # => 0: wait indefinitely (not recommended for automation)
+    on_timeout:
+      "default" # => "default": proceed with safest option
+      # => "abort": report cannot continue; user must re-ask
 ```
 
 ```bash
-# Important restriction:
-# clarify is NOT available to child agents (via delegation)
-# => Children cannot ask the user questions
-# => This is intentional — clarify would block parallel execution
-# => Parent must provide complete context in delegate_task()
-# => If child needs clarification, it fails and returns to parent
-# => Parent can then clarify with user and re-delegate
+# Important: clarify is NOT available to child agents (via delegate_task)
+hermes config get delegation            # => Shows: child_tools excludes "clarify"
+                                        # => Children cannot pause to ask user questions
+                                        # => Reason: clarify would block parallel execution
+                                        # => Parent must provide complete context upfront
+                                        # => If child truly needs input, it fails; parent clarifies and re-delegates
 ```
 
 **Key Takeaway**: The `clarify` tool pauses execution to ask the user a question, with a configurable timeout. It is restricted from child agents to prevent blocking parallel delegation.

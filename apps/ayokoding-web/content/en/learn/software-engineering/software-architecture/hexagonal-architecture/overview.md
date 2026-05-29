@@ -106,6 +106,8 @@ Both tutorials use the same shared **procurement-platform-be Procure-to-Pay doma
 
 - **[Hexagonal Architecture By Example in OOP](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-oop-by-example/overview)**: 75 examples across Java (canonical, 21+), Kotlin, C#, and TypeScript. Ports become interfaces. Adapters become classes implementing those interfaces. Application services orchestrate domain objects through ports. Dependency injection wires adapters into application services at startup.
 
+- **[Hexagonal Architecture By Example in Procedural](/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-procedural-by-example/overview)**: the same Procure-to-Pay domain expressed with procedural code — ports as explicit function tables and adapters as plain functions — showing how the hexagonal boundary holds without OOP or FP machinery.
+
 ## Production Wiring
 
 Once the by-example tracks above are clear, the cases tutorials show ports and adapters wired around real DDD aggregates in production code:

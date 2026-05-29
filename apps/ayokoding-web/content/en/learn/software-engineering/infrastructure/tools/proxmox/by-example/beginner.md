@@ -11,33 +11,28 @@ Learn Proxmox VE fundamentals through 28 annotated examples. Each example is sel
 
 ## Group 1: Installation
 
-### Example 1: Download and Verify the Proxmox VE 9.1 ISO
+### Example 1: Download and Verify the Proxmox VE 9.2 ISO
 
 Before installing Proxmox VE, download the official ISO and verify its integrity with SHA256. Verification prevents installing corrupted or tampered images—a critical security step for hypervisor infrastructure.
 
 **Code**:
 
 ```bash
-# Download the Proxmox VE 9.1 ISO from the official CDN
-# => File size: ~1.2 GB; uses standard HTTPS transfer
-wget https://enterprise.proxmox.com/iso/proxmox-ve_9.1-1.iso
-# => Saving to: proxmox-ve_9.1-1.iso
-# => Connecting to enterprise.proxmox.com...
-# => HTTP request sent, awaiting response... 200 OK
-# => 2026-04-29 07:00:00 (8.50 MB/s) - 'proxmox-ve_9.1-1.iso' saved
+# Download the Proxmox VE 9.2 ISO from the official CDN (~1.2 GB)
+wget https://enterprise.proxmox.com/iso/proxmox-ve_9.2-1.iso
+# => proxmox-ve_9.2-1.iso saved [~1.2 GB]
 
-# Download the SHA256 checksum file published alongside the ISO
-wget https://enterprise.proxmox.com/iso/proxmox-ve_9.1-1.iso.sha256sum
-# => Saving to: proxmox-ve_9.1-1.iso.sha256sum
+# Download the SHA256 checksum file to verify integrity
+wget https://enterprise.proxmox.com/iso/proxmox-ve_9.2-1.iso.sha256sum
+# => proxmox-ve_9.2-1.iso.sha256sum saved
 
-# Verify integrity: sha256sum computes hash, grep confirms it matches
-sha256sum --check proxmox-ve_9.1-1.iso.sha256sum
-# => proxmox-ve_9.1-1.iso: OK
-# => If output shows "FAILED", the file is corrupt; delete and re-download
+# Verify integrity: sha256sum computes and compares hash
+sha256sum --check proxmox-ve_9.2-1.iso.sha256sum
+# => proxmox-ve_9.2-1.iso: OK  (FAILED = file corrupt, re-download)
 
-# Alternatively, compute hash manually and compare visually
-sha256sum proxmox-ve_9.1-1.iso
-# => a3f7b2c1... proxmox-ve_9.1-1.iso  (64 hex chars matching the .sha256sum file)
+# Or compute hash manually and compare visually with .sha256sum contents
+sha256sum proxmox-ve_9.2-1.iso
+# => a3f7b2c1... proxmox-ve_9.2-1.iso  (64 hex chars)
 ```
 
 **Key Takeaway**: Always verify ISO checksums before writing to physical media—a corrupted installer can cause silent data loss or failed installations that appear to succeed.
@@ -53,35 +48,23 @@ Proxmox VE ISO uses a hybrid format that boots from both CD/DVD and USB. The `dd
 **Code**:
 
 ```bash
-# Identify the USB device before writing (critical: wrong device = data loss)
+# Identify the USB device before writing (wrong device = data loss)
 lsblk
-# => NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
-# => sda      8:0    0   500G  0 disk /
-# => sdb      8:16   1    16G  0 disk        <- USB drive (16G, removable)
+# => sda 500G disk (OS disk) | sdb 16G disk (removable USB drive)
 
 # Unmount any auto-mounted partitions on the USB device
 umount /dev/sdb1 2>/dev/null || true
-# => umount: /dev/sdb1: not mounted  (safe to continue even if not mounted)
+# => safe even if not mounted; 2>/dev/null suppresses "not mounted" error
 
-# Write the ISO to the USB device using dd (Disk Duplicator)
-# bs=1M: block size 1 megabyte for fast sequential writes
-# status=progress: show real-time write progress
-# conv=fsync: flush buffers to physical disk before returning
-sudo dd if=proxmox-ve_9.1-1.iso of=/dev/sdb bs=1M status=progress conv=fsync
-# => 1048576000 bytes (1.0 GB, 1000 MiB) copied, 120 s, 8.7 MB/s
-# => 1024+0 records in
-# => 1024+0 records out
-# => 1048576000 bytes (1.0 GB, 1000 MiB) copied, 120.002 s, 8.7 MB/s
+# Write ISO to USB: bs=1M (fast sequential), conv=fsync (flush before return)
+sudo dd if=proxmox-ve_9.2-1.iso of=/dev/sdb bs=1M status=progress conv=fsync
+# => 1.0 GB copied in ~120s at ~8.7 MB/s
 
-# Verify the write completed successfully by checking the exit code
+# Verify write success (exit code 0 = success, non-zero = error)
 echo $?
-# => 0  (zero means success; non-zero means write error)
+# => 0  (dd exited cleanly; USB ready to boot)
 
-# On macOS, use diskutil to find the device and dd with rdisk for raw access
-# diskutil list                        # => Find disk identifier (e.g., disk2)
-# diskutil unmountDisk /dev/disk2      # => Unmount before writing
-# sudo dd if=proxmox-ve_9.1-1.iso of=/dev/rdisk2 bs=1m status=progress
-# => /dev/rdisk2 bypasses buffer cache for faster writes on macOS
+# macOS alternative: diskutil list && sudo dd if=proxmox-ve_9.2-1.iso of=/dev/rdisk2 bs=1m
 ```
 
 **Key Takeaway**: Use `lsblk` to identify the USB device before running `dd`—writing to the wrong device destroys data on that disk with no undo.
@@ -122,36 +105,19 @@ graph TD
 
 # Check PVE version (confirms successful installation)
 pveversion
-# => pve-manager/9.1-1/... (running kernel: 6.17.2-1-pve)
+# => pve-manager/9.2-1/... running kernel: 7.0-1-pve
 
 # Verify web UI is listening on port 8006 (HTTPS)
 ss -tlnp | grep 8006
-# => LISTEN 0 128 0.0.0.0:8006 0.0.0.0:* users:(("pveproxy",pid=1234,fd=5))
-# => pveproxy is the Proxmox web proxy process
+# => LISTEN 0.0.0.0:8006 users:(("pveproxy",pid=1234))
 
 # Check Proxmox storage configuration written by installer
 cat /etc/pve/storage.cfg
-# => dir: local
-# =>     path /var/lib/vz
-# =>     content iso,vztmpl,backup
-# => lvmthin: local-lvm
-# =>     thinpool data
-# =>     vgname pve
-# =>     content rootdir,images
+# => dir: local | lvmthin: local-lvm  (two default backends)
 
 # Verify network configuration applied by installer
 cat /etc/network/interfaces
-# => auto lo
-# => iface lo inet loopback
-# => auto eno1
-# => iface eno1 inet manual
-# => auto vmbr0
-# => iface vmbr0 inet static
-# =>     address 192.168.1.100/24   (IP set during installer)
-# =>     gateway 192.168.1.1
-# =>     bridge-ports eno1
-# =>     bridge-stp off
-# =>     bridge-fd 0
+# => auto vmbr0; iface vmbr0 inet static; address 192.168.1.100/24
 ```
 
 **Key Takeaway**: The graphical installer configures ZFS/LVM partitioning, network bridges, and the Corosync cluster framework in one pass—document your choices because the configuration files drive all subsequent operations.
@@ -173,6 +139,9 @@ For headless servers without video output, Proxmox provides a terminal-based ins
 # => Both serial and VGA output simultaneously
 
 # Create an unattended answer file using proxmox-auto-install-assistant:
+# Note: proxmox-auto-install-assistant is Proxmox's own official tool for this feature,
+# available in the Proxmox APT repository (not a third-party dependency).
+# It is covered here because it is the only supported mechanism for unattended installs.
 # Install the tool on a separate Linux machine
 apt install proxmox-auto-install-assistant
 # => Reading package lists... Done
@@ -195,18 +164,20 @@ root_password = "SecurePass123!"
 [disk-setup]
 filesystem = "ext4"
 disk_list = ["sda"]
+# => ext4 chosen for simplicity; zfs enables snapshots + replication at higher complexity
 
 [network]
 source = "from-dhcp"
+# => from-dhcp: installer gets IP via DHCP; use "from-answer" for static IP
 EOF
 # => answer.toml written; each field corresponds to an installer screen
 
 # Inject answer file into ISO for zero-touch deployment
-proxmox-auto-install-assistant prepare-iso proxmox-ve_9.1-1.iso \
+proxmox-auto-install-assistant prepare-iso proxmox-ve_9.2-1.iso \
   --fetch-from iso \
   --answer-file answer.toml \
-  --output proxmox-ve_9.1-1-auto.iso
-# => Created proxmox-ve_9.1-1-auto.iso with embedded answer file
+  --output proxmox-ve_9.2-1-auto.iso
+# => Created proxmox-ve_9.2-1-auto.iso with embedded answer file
 # => Boot from this ISO; installer reads answer.toml and proceeds without prompts
 ```
 
@@ -226,37 +197,21 @@ The Proxmox web UI at `https://<host>:8006` provides full cluster management thr
 # Access the web UI from a browser on the same network:
 # URL: https://192.168.1.100:8006
 # => Accept self-signed TLS certificate (replace with real cert later)
-# => Username: root
-# => Realm: PAM (Linux PAM authentication against /etc/passwd)
-# => Password: <set during installation>
+# => Username: root | Realm: PAM | Password: set during installation
 
-# Equivalent API call to verify authentication works from CLI:
-# Get a ticket (session token) using curl
+# Get a ticket (session token) using curl — same as web UI login
 curl -s -k -X POST https://192.168.1.100:8006/api2/json/access/ticket \
   -d 'username=root@pam&password=SecurePass123!' | python3 -m json.tool
-# => {
-# =>   "data": {
-# =>     "ticket": "PVE:root@pam:...",      (session ticket for Cookie header)
-# =>     "CSRFPreventionToken": "...",       (required for write operations)
-# =>     "username": "root@pam"
-# =>   }
-# => }
+# => {"data": {"ticket": "PVE:root@pam:...", "CSRFPreventionToken": "..."}}
 
-# Query node summary (same data shown in web UI Summary tab)
 # Store ticket in variable for reuse
 TICKET=$(curl -s -k -X POST https://192.168.1.100:8006/api2/json/access/ticket \
   -d 'username=root@pam&password=SecurePass123!' | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['ticket'])")
 
+# Query node summary (same data shown in web UI Summary tab)
 curl -s -k -H "Cookie: PVEAuthCookie=$TICKET" \
   https://192.168.1.100:8006/api2/json/nodes/pve01/status | python3 -m json.tool
-# => {
-# =>   "data": {
-# =>     "cpuinfo": { "cores": 8, "sockets": 1, "model": "Intel Core i9-..." },
-# =>     "memory": { "total": 34359738368, "used": 2147483648, "free": 32212254720 },
-# =>     "uptime": 3600,
-# =>     "kversion": "Linux 6.17.2-1-pve"
-# =>   }
-# => }
+# => {"data": {"cpuinfo": {"cores": 8}, "memory": {"total": 34359738368}, "kversion": "Linux 7.0-1-pve"}}
 ```
 
 **Key Takeaway**: Every action in the Proxmox web UI calls the REST API—learning the API alongside the UI enables automation and troubleshooting when the UI is unavailable.
@@ -322,30 +277,21 @@ VMs boot from ISO images stored on Proxmox local storage. The web UI provides a 
 # ISO storage path: /var/lib/vz/template/iso/ (for 'local' storage)
 wget -P /var/lib/vz/template/iso/ \
   https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso
-# => Saving to: /var/lib/vz/template/iso/ubuntu-24.04.2-live-server-amd64.iso
-# => 2024-04-01 12:00:00 (15.0 MB/s) - saved
+# => ISO saved to /var/lib/vz/template/iso/ at ~15 MB/s
 
 # Alternatively, use pvesh to trigger download via API (shows in web UI task log)
 pvesh create /nodes/pve01/storage/local/download-url \
   --url https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso \
   --filename ubuntu-24.04.2-live-server-amd64.iso \
   --content iso
-# => UPID:pve01:000012AB:00ABCDEF:...:download:local:  (task ID to track progress)
+# => UPID:pve01:...:download:local:  (task ID to track progress in web UI)
 
 # List available ISOs in local storage
 pvesh get /nodes/pve01/storage/local/content --content iso
-# => [
-# =>   {
-# =>     "volid": "local:iso/ubuntu-24.04.2-live-server-amd64.iso",
-# =>     "content": "iso",
-# =>     "size": 2130706432,
-# =>     "format": "iso"
-# =>   }
-# => ]
+# => [{"volid": "local:iso/ubuntu-24.04.2-live-server-amd64.iso", "size": 2130706432}]
 
 # Verify file exists on disk
 ls -lh /var/lib/vz/template/iso/
-# => total 2.0G
 # => -rw-r--r-- 1 root root 2.0G Apr 29 12:00 ubuntu-24.04.2-live-server-amd64.iso
 ```
 
@@ -361,46 +307,46 @@ ls -lh /var/lib/vz/template/iso/
 
 The `qm create` command creates a VM with specified hardware configuration. This example creates a minimal Ubuntu VM using CLI; the web UI wizard generates equivalent `qm` calls internally.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Guest OS<br/>(Ubuntu 24.04)"] --> B["VirtIO Drivers<br/>NIC + SCSI + Balloon"]
+    B --> C["QEMU/KVM Layer<br/>CPU & Memory Emulation"]
+    C --> D["Linux Host Kernel<br/>KVM Module"]
+    D --> E["Physical Hardware<br/>CPU / RAM / Disk / NIC"]
+
+    style A fill:#0173B2,color:#fff,stroke:#000
+    style B fill:#DE8F05,color:#000,stroke:#000
+    style C fill:#029E73,color:#fff,stroke:#000
+    style D fill:#CC78BC,color:#000,stroke:#000
+    style E fill:#CA9161,color:#000,stroke:#000
+```
+
 **Code**:
 
 ```bash
-# Create VM with VMID 100 (IDs 100-999 for VMs, recommended range)
+# Create VM with VMID 100 (virtio NIC + SCSI controller for paravirtualized performance)
+# --memory/--cores: RAM and vCPU count; --net0 virtio: paravirtualized NIC (near-native speed)
+# --scsihw virtio-scsi-pci: VirtIO-SCSI controller; --scsi0 local-lvm:32: 32 GB thin-provisioned disk
+# --ide2 ... media=cdrom: attach ISO as CD-ROM boot device; --ostype l26: Linux 2.6+ guest type
 qm create 100 \
   --name ubuntu-24-server \
-  --memory 2048 \
-  --cores 2 \
+  --memory 2048 --cores 2 \
   --net0 virtio,bridge=vmbr0 \
-  --scsihw virtio-scsi-pci \
-  --scsi0 local-lvm:32 \
+  --scsihw virtio-scsi-pci --scsi0 local-lvm:32 \
   --ide2 local:iso/ubuntu-24.04.2-live-server-amd64.iso,media=cdrom \
-  --boot order=ide2 \
-  --ostype l26
-# => Creating new VM 100 'ubuntu-24-server'
-# => --memory 2048: 2 GB RAM allocated (balloon driver adjusts dynamically)
-# => --cores 2: 2 vCPUs; --sockets defaults to 1
-# => --net0 virtio: VirtIO NIC (paravirtualized, best performance) on bridge vmbr0
-# => --scsihw virtio-scsi-pci: VirtIO SCSI controller (paravirtualized)
-# => --scsi0 local-lvm:32: 32 GB disk on local-lvm thin pool
-# => --ide2: CD-ROM drive with Ubuntu ISO attached
-# => --boot order=ide2: boot from CD-ROM first
-# => --ostype l26: Linux 2.6+/5.x/6.x kernel type (enables guest optimizations)
+  --boot order=ide2 --ostype l26
+# => VM 100 created (stopped); config at /etc/pve/qemu-server/100.conf
+# => ostype l26 enables KVM paravirt optimizations for Linux guests
 
-# Verify VM configuration was written to cluster filesystem
+# Verify VM configuration
 cat /etc/pve/qemu-server/100.conf
-# => boot: order=ide2
-# => cores: 2
-# => ide2: local:iso/ubuntu-24.04.2-live-server-amd64.iso,media=cdrom
-# => memory: 2048
-# => name: ubuntu-24-server
-# => net0: virtio=AA:BB:CC:DD:EE:FF,bridge=vmbr0
-# => ostype: l26
-# => scsi0: local-lvm:vm-100-disk-0,size=32G
-# => scsihw: virtio-scsi-pci
+# => cores: 2 | memory: 2048 | scsi0: local-lvm:vm-100-disk-0,size=32G
 
 # List all VMs on this node
 qm list
-# => VMID  NAME              STATUS     MEM(MB)    BOOTDISK(GB)  PID
-# => 100   ubuntu-24-server  stopped    2048/2048  32.00         0
+# => VMID  NAME              STATUS   MEM(MB)  BOOTDISK(GB)
+# => 100   ubuntu-24-server  stopped  2048     32.00
 ```
 
 **Key Takeaway**: `qm create` parameters map directly to VM hardware configuration stored in `/etc/pve/qemu-server/<vmid>.conf`—every setting is human-readable and version-controllable.
@@ -413,26 +359,40 @@ qm list
 
 VM lifecycle management uses `qm start`, `qm stop`, and `qm reset`. Each has different behavior regarding guest OS shutdown signals.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+stateDiagram-v2
+    [*] --> stopped : qm create
+    stopped --> running : qm start
+    running --> stopped : qm shutdown (ACPI graceful)
+    running --> stopped : qm stop (force kill)
+    running --> suspended : qm suspend
+    suspended --> running : qm resume
+    running --> running : qm reset (hard reboot)
+
+    classDef blueState fill:#0173B2,color:#fff,stroke:#000
+    classDef greenState fill:#029E73,color:#fff,stroke:#000
+    classDef orangeState fill:#DE8F05,color:#000,stroke:#000
+
+    class stopped blueState
+    class running greenState
+    class suspended orangeState
+```
+
 **Code**:
 
 ```bash
 # Start VM 100 (powers on the virtual machine)
 qm start 100
-# => Starting VM 100...
 # => QEMU process starts; VM boots from configured boot device
-# => VM status transitions: stopped -> running
 
 # Check VM status
 qm status 100
-# => status: running
-# => pid: 2345  (QEMU process ID on the host)
+# => status: running | pid: 2345
 
-# Graceful shutdown (sends ACPI power-off signal to guest OS)
-# Guest OS runs shutdown hooks, syncs filesystems, then powers off
+# Graceful shutdown: sends ACPI power-off signal so guest OS can sync filesystems
 qm shutdown 100
-# => Sending ACPI shutdown signal to VM 100...
-# => VM gracefully powers off (may take 30-60 seconds for guest shutdown)
-# => status: stopped  (once complete)
+# => ACPI shutdown signal sent; VM stops cleanly in 30-60 seconds
 
 # Start VM again for next examples
 qm start 100
@@ -441,23 +401,18 @@ qm start 100
 # Stop VM immediately (equivalent to pulling the power cable)
 # Use only when guest is unresponsive; risks filesystem corruption
 qm stop 100
-# => Stopping VM 100 immediately (no ACPI signal)
-# => QEMU process terminated
-# => status: stopped
+# => QEMU process terminated immediately (no ACPI signal) | status: stopped
 
 # Reset VM (hard reset, like pressing reset button)
 qm reset 100
-# => Sending reset signal to VM 100
 # => VM reboots without clean shutdown
 
 # Suspend VM to RAM (saves CPU state, keeps RAM allocated)
 qm suspend 100
-# => VM 100 suspended to RAM
 # => status: suspended  (RAM still consumed, CPU released)
 
 # Resume suspended VM
 qm resume 100
-# => VM 100 resumed from suspended state
 # => status: running
 ```
 
@@ -478,27 +433,15 @@ Proxmox provides three console protocols: noVNC (browser WebSocket), SPICE (nati
 pvesh create /nodes/pve01/qemu/100/vncproxy \
   --websocket 1 \
   --generate-password 1
-# => {
-# =>   "data": {
-# =>     "ticket": "PVEVNC:...",
-# =>     "port": 5900,
-# =>     "cert": "...",
-# =>     "upid": "..."
-# =>   }
-# => }
-# => noVNC proxy connects to this port on the Proxmox node
+# => {"ticket": "PVEVNC:...", "port": 5900}  (noVNC proxy connects to this port)
 
-# Open a terminal directly in the VM via the QEMU guest agent (requires agent installed)
-# First, verify guest agent is running inside the VM
+# Verify guest agent is running inside the VM
 qm agent 100 ping
 # => {"ping":"pong"}  (guest agent responding)
 
 # Execute command inside VM via guest agent (no SSH needed)
 qm agent 100 exec -- bash -c "hostname && uptime"
-# => {
-# =>   "out-data": "ubuntu-24-server\n 12:00:00 up 1:30,  1 user,  load average: 0.10, 0.05, 0.01\n",
-# =>   "exitcode": 0
-# => }
+# => "out-data": "ubuntu-24-server\n up 1:30 load 0.10"  exitcode: 0
 
 # Send CTRL+ALT+DEL key sequence to VM console (useful for Windows login screen)
 qm sendkey 100 ctrl-alt-delete
@@ -506,8 +449,7 @@ qm sendkey 100 ctrl-alt-delete
 
 # For xterm.js serial console, VM needs serial port configured:
 qm set 100 --serial0 socket --vga serial0
-# => Adding serial port 0 (socket mode) as primary VGA output
-# => Guest kernel needs: console=ttyS0,115200n8 in GRUB_CMDLINE_LINUX
+# => serial port 0 added; guest needs console=ttyS0,115200n8 in GRUB_CMDLINE_LINUX
 ```
 
 **Key Takeaway**: The QEMU guest agent enables out-of-band VM management without SSH—execute commands, retrieve file contents, and manage the VM even when networking is broken.
@@ -524,33 +466,22 @@ VirtIO is the paravirtualized I/O framework that gives VMs near-native disk and 
 
 ```bash
 # For Linux VMs: VirtIO drivers are built into the kernel (no extra steps)
-# Verify VirtIO disk driver loaded in running Linux guest:
+# Verify VirtIO drivers loaded in running Linux guest:
 qm agent 100 exec -- bash -c "lsmod | grep virtio"
-# => virtio_scsi            24576  4           (SCSI driver for paravirtualized disks)
-# => virtio_net             57344  0           (network driver)
-# => virtio_blk             20480  0           (block device driver)
-# => virtio_pci             32768  0           (PCI bus driver)
+# => virtio_scsi | virtio_net | virtio_blk | virtio_pci (all loaded)
 
-# For Windows VMs: Download VirtIO ISO and attach as second CD-ROM
-# Download Windows VirtIO driver ISO to local storage
+# For Windows VMs: download VirtIO ISO and attach as second CD-ROM
 wget -P /var/lib/vz/template/iso/ \
   https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso
-# => Saved: /var/lib/vz/template/iso/virtio-win.iso
+# => virtio-win.iso saved to local ISO storage
 
 # Attach VirtIO ISO as second CD-ROM to Windows VM (VMID 200)
 qm set 200 --ide3 local:iso/virtio-win.iso,media=cdrom
-# => Updated VM 200 configuration: ide3 added with VirtIO ISO
-
-# Inside Windows guest during installation:
-# => When "Where do you want to install Windows?" screen appears,
-# => Click "Load driver" -> Browse to D:\vioscsi\w11\amd64\ (for Windows 11)
-# => Install VirtIO SCSI driver -> disk becomes visible
-# => After installation, run virtio-win-guest-tools.exe from D:\ for all drivers
+# => ide3 added; during Windows install click "Load driver" -> D:\vioscsi\w11\amd64\
 
 # Enable QEMU Guest Agent in VM config (requires agent installed in guest)
 qm set 100 --agent enabled=1,fstrim_cloned_disks=1
-# => enabled=1: enables guest agent communication channel
-# => fstrim_cloned_disks=1: runs fstrim on clone to reclaim thin-provisioned space
+# => enabled=1: opens agent channel; fstrim_cloned_disks=1: reclaims thin-pool space on clone
 ```
 
 **Key Takeaway**: VirtIO drivers are mandatory for production VMs—without them, Windows VMs use emulated IDE/E1000 which is 3-5x slower and consumes significantly more host CPU.
@@ -562,6 +493,19 @@ qm set 100 --agent enabled=1,fstrim_cloned_disks=1
 ### Example 12: Resize a VM Disk
 
 VM disks can grow but cannot shrink without risk. `qm disk resize` extends the block device; in-guest tools then extend the partition and filesystem.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    A["Step 1: Hypervisor<br/>qm disk resize +20G<br/>(block device grows)"] --> B["Step 2: Guest<br/>growpart /dev/sda 3<br/>(partition extends)"]
+    B --> C["Step 3: Guest<br/>pvresize + lvextend<br/>(LVM expands)"]
+    C --> D["Step 4: Guest<br/>resize2fs<br/>(filesystem fills LV)"]
+
+    style A fill:#0173B2,color:#fff,stroke:#000
+    style B fill:#DE8F05,color:#000,stroke:#000
+    style C fill:#029E73,color:#fff,stroke:#000
+    style D fill:#CC78BC,color:#000,stroke:#000
+```
 
 **Code**:
 
@@ -584,31 +528,26 @@ qm config 100 | grep scsi0
 qm agent 100 exec -- bash -c "
   # Show current partition layout
   lsblk /dev/sda
-  # => NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
-  # => sda      8:0    0   52G  0 disk
-  # => |-sda1   8:1    0    1M  0 part          (BIOS boot partition)
-  # => |-sda2   8:2    0    2G  0 part /boot
-  # => |-sda3   8:3    0   30G  0 part           (extended from 32G minus boot)
+  # => sda 52G disk | sda1 1M (BIOS boot) | sda2 2G /boot | sda3 30G (data)
 
   # Extend partition 3 to fill available space using growpart
   growpart /dev/sda 3
-  # => CHANGED: partition=3 start=4395008 old: size=62912512,end=67307520 new: size=104852447,end=...
+  # => CHANGED: partition=3 extended to fill disk
 
   # Resize the physical volume (for LVM-based systems)
   pvresize /dev/sda3
-  # => Physical volume '/dev/sda3' changed  (new size: 50.00 GiB)
+  # => Physical volume '/dev/sda3' changed (new size: 50.00 GiB)
 
   # Extend logical volume to use all available space
   lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
-  # => Size of logical volume ubuntu-vg/ubuntu-lv changed from 30.00 GiB to 50.00 GiB
+  # => LV changed from 30.00 GiB to 50.00 GiB
 
   # Resize the filesystem online (no unmount required for ext4)
   resize2fs /dev/ubuntu-vg/ubuntu-lv
-  # => Filesystem at /dev/ubuntu-vg/ubuntu-lv is now 13107200 (4k) blocks long.
+  # => Filesystem extended to fill logical volume
 
   df -h /
-  # => Filesystem            Size  Used Avail Use% Mounted on
-  # => /dev/mapper/ubuntu--vg-ubuntu--lv   49G  5.0G   43G  11% /
+  # => /dev/mapper/ubuntu--vg-ubuntu--lv   49G  5.0G  43G  11% /
 "
 ```
 
@@ -626,39 +565,27 @@ Snapshots capture VM state (disk + RAM + CPU registers) at a point in time. They
 
 ```bash
 # Take a snapshot with RAM state (saves running memory contents)
-# Requires VM to be running; adds 20-60 seconds pause for RAM save
+# --vmstate 1: includes running RAM; adds 20-60s pause for save
 qm snapshot 100 pre-upgrade \
   --description "Before Ubuntu 24.04 -> 24.10 upgrade" \
   --vmstate 1
-# => Creating snapshot 'pre-upgrade' on VM 100
-# => Saving VM RAM state (2048 MB)...
-# => Snapshot created successfully
-# => --vmstate 1: includes running RAM in snapshot (enables full state restore)
+# => Snapshot 'pre-upgrade' created (disk + 2048 MB RAM state)
 
 # List all snapshots for VM 100
 qm listsnapshot 100
-# => Name              VMState  Running  Description
-# => NOW                                 You are here
-# => pre-upgrade        yes      no       Before Ubuntu 24.04 -> 24.10 upgrade
+# => NOW (current) | pre-upgrade vmstate=yes  Before Ubuntu 24.04 -> 24.10 upgrade
 
 # After a failed upgrade, rollback to the pre-upgrade snapshot
 qm rollback 100 pre-upgrade
-# => Rolling back VM 100 to snapshot 'pre-upgrade'...
-# => Restoring disk state...
-# => Restoring RAM state (vmstate)...
-# => VM rolled back and started in pre-upgrade state
-# => VM 100 is now running as it was when snapshot was taken
+# => VM rolled back and restarted in pre-upgrade state (disk + RAM restored)
 
 # Delete a snapshot when no longer needed (frees space)
 qm delsnapshot 100 pre-upgrade
-# => Deleting snapshot 'pre-upgrade' from VM 100...
 # => Freed 2.3 GB (disk delta + RAM state)
 
-# Check disk format (snapshots require qcow2 or ZFS, not raw)
+# Check disk format (snapshots require qcow2 or ZFS; local-lvm uses LVM-thin COW)
 qm config 100 | grep scsi0
-# => scsi0: local-lvm:vm-100-disk-0,size=52G
-# => Note: local-lvm uses raw format; snapshot disk deltas use COW within LVM thin pool
-# => For qcow2 format: use 'local' directory storage, not 'local-lvm'
+# => scsi0: local-lvm:vm-100-disk-0,size=52G  (LVM thin pool supports disk-only snapshots)
 ```
 
 **Key Takeaway**: Always take a snapshot before major changes (OS upgrades, application deployments)—rollback takes seconds and eliminates the need for complex application-level rollback procedures.
@@ -678,47 +605,27 @@ LXC containers share the host kernel and start in seconds. Proxmox provides pre-
 ```bash
 # Update the template list from Proxmox CDN
 pveam update
-# => Downloading template list from 'https://download.proxmox.com/images/system/'...
 # => 47 templates available
 
 # List available Ubuntu templates
 pveam available | grep ubuntu
-# => system  ubuntu-24.04-standard_24.04-2_amd64.tar.zst
-# => system  ubuntu-22.04-standard_22.04-1_amd64.tar.zst
-# => system  ubuntu-20.04-standard_20.04-1_amd64.tar.zst
+# => ubuntu-24.04-standard_24.04-2_amd64.tar.zst (latest LTS)
 
 # Download the Ubuntu 24.04 template to local storage
 pveam download local ubuntu-24.04-standard_24.04-2_amd64.tar.zst
-# => Downloading 'ubuntu-24.04-standard_24.04-2_amd64.tar.zst' to local storage...
-# => Saved: /var/lib/vz/template/cache/ubuntu-24.04-standard_24.04-2_amd64.tar.zst
+# => Saved to /var/lib/vz/template/cache/ubuntu-24.04-standard_...tar.zst
 
-# Create LXC container (CTID 200) from the downloaded template
+# Create unprivileged LXC container (CTID 200) with DHCP networking
 pct create 200 local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst \
-  --hostname web-server-01 \
-  --memory 512 \
-  --swap 512 \
-  --cores 1 \
+  --hostname web-server-01 --memory 512 --swap 512 --cores 1 \
   --net0 name=eth0,bridge=vmbr0,ip=dhcp \
-  --rootfs local-lvm:8 \
-  --password SecureContainerPass! \
-  --unprivileged 1
-# => Creating CT 200...
-# => --hostname: container hostname visible inside and in PVE UI
-# => --memory 512: 512 MB RAM hard limit (cgroup v2 enforced)
-# => --unprivileged 1: uid/gid mapping; container root cannot escape to host root
-# => --rootfs local-lvm:8: 8 GB root filesystem on thin-provisioned LVM
+  --rootfs local-lvm:8 --password SecureContainerPass! --unprivileged 1
+# => CT 200 created; --unprivileged 1: uid/gid remapped (container root ≠ host root)
 
 # Verify container configuration
 pct config 200
-# => arch: amd64
-# => cores: 1
-# => hostname: web-server-01
-# => memory: 512
-# => net0: name=eth0,bridge=vmbr0,ip=dhcp
-# => ostype: ubuntu
-# => rootfs: local-lvm:vm-200-disk-0,size=8G
-# => swap: 512
-# => unprivileged: 1
+# => hostname: web-server-01 | memory: 512 | cores: 1 | unprivileged: 1
+# => rootfs: local-lvm:vm-200-disk-0,size=8G | net0: eth0,bridge=vmbr0,ip=dhcp
 ```
 
 **Key Takeaway**: LXC containers start in 1-3 seconds (vs 30-60 seconds for VMs) and use 90% less memory overhead—ideal for microservices, web apps, and development environments that don't require a full kernel.
@@ -736,8 +643,7 @@ LXC containers have their own lifecycle commands (`pct`) parallel to VM commands
 ```bash
 # Start the container
 pct start 200
-# => Starting CT 200...
-# => Container starts in ~1-3 seconds (kernel already running on host)
+# => CT 200 started in ~1-3 seconds (host kernel already running)
 
 # Check container status
 pct status 200
@@ -745,9 +651,7 @@ pct status 200
 
 # Enter the container shell directly (no SSH required)
 pct enter 200
-# => root@web-server-01:/# (now inside container)
-# => Container has isolated filesystem, network, and process namespace
-# => Host processes are NOT visible; container processes ARE visible to host
+# => root@web-server-01:/#  (isolated filesystem, network, process namespace)
 
 # Exit the container shell
 exit
@@ -755,24 +659,19 @@ exit
 
 # Execute a command inside the container without entering interactive shell
 pct exec 200 -- bash -c "apt update && apt install -y nginx"
-# => Get:1 http://archive.ubuntu.com/ubuntu noble InRelease
-# => Processing triggers for nginx...
 # => nginx installed inside CT 200
 
 # Verify nginx is running inside the container
 pct exec 200 -- systemctl status nginx
-# => ● nginx.service - A high performance web server
-# =>      Active: active (running) since...
+# => ● nginx.service  Active: active (running)
 
 # Stop the container gracefully
 pct shutdown 200
-# => Sending shutdown signal to CT 200...
-# => Container stopped
+# => CT 200 stopped
 
 # Force-stop unresponsive container (equivalent to qm stop)
 pct stop 200
-# => Stopping CT 200 immediately
-# => status: stopped
+# => CT 200 stopped immediately | status: stopped
 ```
 
 **Key Takeaway**: `pct enter` provides instant shell access to containers without requiring SSH—invaluable for debugging network issues that break connectivity.
@@ -783,13 +682,19 @@ pct stop 200
 
 ### Example 16: Create an LXC Container from an OCI Registry Image
 
-New in Proxmox VE 9.1: LXC containers can be created directly from OCI (Docker/container) registry images, enabling use of Docker Hub, GitHub Container Registry, and private registries without converting images.
+New in Proxmox VE 9.2: LXC containers can be created directly from OCI (Docker/container) registry images, enabling use of Docker Hub, GitHub Container Registry, and private registries without converting images.
 
 **Code**:
 
 ```bash
-# Create LXC container from Docker Hub OCI image (new in PVE 9.1)
-# OCI image format: docker://registry/image:tag
+# Create LXC container from Docker Hub OCI image (new in PVE 9.x)
+# OCI image format: docker://registry/image:tag (proxmox pulls and converts to LXC rootfs)
+# --arch amd64: target CPU architecture matching the OCI image platform
+# --hostname: container hostname visible inside the container namespace
+# --memory 512: 512 MB RAM; LXC uses much less overhead than a full VM
+# --rootfs local-lvm:8: 8 GB root filesystem on LVM thin pool
+# --net0 name=eth0,bridge=vmbr0,ip=dhcp: NIC named eth0 on vmbr0, DHCP for IP
+# --unprivileged 1: uid/gid remapped (container root ≠ host root; mandatory for safety)
 pct create 201 \
   'docker://docker.io/library/ubuntu:24.04' \
   --arch amd64 \
@@ -798,13 +703,11 @@ pct create 201 \
   --rootfs local-lvm:8 \
   --net0 name=eth0,bridge=vmbr0,ip=dhcp \
   --unprivileged 1
-# => Pulling OCI image: docker.io/library/ubuntu:24.04
-# => Fetching manifest from registry.hub.docker.com...
-# => Downloading layer sha256:abc123... (29.5 MB)
-# => Converting OCI layers to LXC rootfs...
-# => CT 201 created from OCI image ubuntu:24.04
+# => CT 201 created from OCI image ubuntu:24.04 (pulled and converted to LXC rootfs)
 
-# Create container from GitHub Container Registry (private image with auth)
+# Create container from GitHub Container Registry with feature flags
+# --features keyctl=1: enables Linux keyring syscall required by some apps
+# --features nesting=1: allows running Docker or nested containers inside LXC
 pct create 202 \
   'docker://ghcr.io/myorg/myapp:v2.1.0' \
   --rootfs local-lvm:10 \
@@ -812,8 +715,7 @@ pct create 202 \
   --net0 name=eth0,bridge=vmbr0,ip=dhcp \
   --unprivileged 1 \
   --features keyctl=1,nesting=1
-# => --features keyctl=1: enables keyctl syscall (needed for some apps)
-# => --features nesting=1: enables nested LXC (for Docker-in-LXC use cases)
+# => keyctl=1: enables keyring syscall; nesting=1: allows Docker-in-LXC
 
 # List downloaded OCI image templates
 pveam list local | grep docker
@@ -821,13 +723,12 @@ pveam list local | grep docker
 
 # Start and verify the OCI-based container
 pct start 201
+# => CT 201 starts from OCI-derived rootfs in ~1-3 seconds
 pct exec 201 -- cat /etc/os-release
-# => NAME="Ubuntu"
-# => VERSION="24.04.2 LTS (Noble Numbat)"
-# => ID=ubuntu
+# => NAME="Ubuntu" | VERSION="24.04.2 LTS (Noble Numbat)"
 ```
 
-**Key Takeaway**: OCI image support in PVE 9.1 bridges the gap between Docker workflows and LXC containers—teams can use standard container registries and Docker build pipelines to produce images that run as privileged-free LXC containers.
+**Key Takeaway**: OCI image support in PVE 9.x bridges the gap between Docker workflows and LXC containers—teams can use standard container registries and Docker build pipelines to produce images that run as privileged-free LXC containers.
 
 **Why It Matters**: Organizations with existing Docker container build pipelines can now run those containers as LXC on Proxmox without maintaining a separate Kubernetes cluster or Docker Swarm. The LXC runtime provides better kernel-level isolation guarantees than rootless Docker, while the OCI import path preserves the familiar image-based workflow. This is particularly valuable for teams migrating from Docker-on-VM to native hypervisor workloads.
 
@@ -844,50 +745,33 @@ Proxmox uses a role-based access control (RBAC) system. Roles are collections of
 ```bash
 # List all users in the Proxmox user database
 pvesh get /access/users
-# => [
-# =>   { "userid": "root@pam", "enable": 1, "expire": 0 },
-# =>   { "userid": "admin@pve", "enable": 1, "expire": 0 }
-# => ]
+# => root@pam (enable:1), admin@pve (enable:1)
 
-# Create a new PVE realm user (stored in Proxmox database, not Linux PAM)
+# Create a PVE realm user (@pve = Proxmox-only, no Linux system account)
 pvesh create /access/users \
-  --userid devops@pve \
-  --password 'DevOpsPass123!' \
-  --firstname "DevOps" \
-  --lastname "Engineer" \
-  --email "devops@company.com"
-# => User devops@pve created in Proxmox user database
-# => @pve realm: Proxmox-only account (no Linux system account)
-# => @pam realm: maps to Linux PAM (uses /etc/passwd + /etc/shadow)
+  --userid devops@pve --password 'DevOpsPass123!' \
+  --firstname "DevOps" --lastname "Engineer" --email "devops@company.com"
+# => devops@pve created; @pam realm would map to Linux PAM (/etc/passwd)
 
-# List available roles and their privileges
+# List available roles and their privilege sets
 pvesh get /access/roles
-# => Administrator: all privileges
-# => PVEVMAdmin: VM create, delete, migrate, configure
-# => PVEVMUser: VM console, start, stop (no config changes)
-# => PVEDatastoreAdmin: storage management
-# => PVEDatastoreUser: storage read access (allocate VM disks)
-# => PVEAuditor: read-only access to everything
+# => PVEVMAdmin: VM create/delete/migrate/configure
+# => PVEVMUser: VM console/start/stop (no config changes)
+# => PVEAuditor: read-only everything
 
-# Grant devops@pve PVEVMAdmin role at datacenter level (all nodes and VMs)
+# Grant PVEVMAdmin at datacenter root (inherits to all child paths)
 pvesh create /access/acl \
-  --path / \
-  --users devops@pve \
-  --roles PVEVMAdmin \
-  --propagate 1
-# => ACL added: devops@pve has PVEVMAdmin at / (datacenter root)
-# => --propagate 1: permission inherits to all child paths (nodes, VMs, storage)
+  --path / --users devops@pve --roles PVEVMAdmin --propagate 1
+# => devops@pve: PVEVMAdmin at / (propagate=1: all nodes, VMs, storage)
 
-# Grant devops@pve access to specific VM only (path /vms/100)
+# Restrict to specific VM only (path /vms/100)
 pvesh create /access/acl \
-  --path /vms/100 \
-  --users devops@pve \
-  --roles PVEVMUser
-# => devops@pve can now console/start/stop VM 100 only
+  --path /vms/100 --users devops@pve --roles PVEVMUser
+# => devops@pve: console/start/stop VM 100 only; no other VMs
 
 # Verify ACL assignments
 pvesh get /access/acl
-# => [ { "path": "/", "ugid": "devops@pve", "roleid": "PVEVMAdmin", "propagate": 1 }, ... ]
+# => [{"path":"/","ugid":"devops@pve","roleid":"PVEVMAdmin","propagate":1}, ...]
 ```
 
 **Key Takeaway**: Proxmox RBAC path-based permissions enable least-privilege access: developers get VM console access, operations get VM management, and only admins get cluster configuration rights.
@@ -903,47 +787,29 @@ API tokens provide credential separation for automation tools. Unlike user passw
 **Code**:
 
 ```bash
-# Create an API token for the devops@pve user
-# Token format after creation: devops@pve!terraform=<UUID>
+# Create an API token (privsep=1: token has independent ACL; can be scoped below user's rights)
 pvesh create /access/users/devops@pve/token/terraform \
-  --privsep 1 \
-  --expire 0 \
-  --comment "Terraform automation token"
-# => {
-# =>   "info": {
-# =>     "privsep": 1,            (token has separate, potentially reduced privileges)
-# =>     "comment": "Terraform automation token",
-# =>     "tokenid": "terraform",
-# =>     "expire": 0             (0 = never expires)
-# =>   },
-# =>   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"  (UUID — save this now; shown once)
-# => }
-# => CRITICAL: Copy the token value immediately; Proxmox does not store it in plaintext
+  --privsep 1 --expire 0 --comment "Terraform automation token"
+# => value: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" — COPY NOW (shown only once, never again)
+# => format after creation: devops@pve!terraform=<UUID>
 
-# The full token string used in API calls:
-# Authorization header: PVEAPIToken=devops@pve!terraform=<UUID>
-
-# Grant the token specific privileges (--privsep 1 means token can have subset of user perms)
+# Grant token cluster-wide VM admin access
 pvesh create /access/acl \
-  --path / \
-  --tokens 'devops@pve!terraform' \
-  --roles PVEVMAdmin \
-  --propagate 1
-# => Token 'devops@pve!terraform' granted PVEVMAdmin at datacenter root
+  --path / --tokens 'devops@pve!terraform' --roles PVEVMAdmin --propagate 1
+# => devops@pve!terraform: PVEVMAdmin at / (full cluster access for Terraform)
 
-# Test the token with an API call
+# Test token authentication (store in env vars; never embed in scripts)
 TOKEN_ID="devops@pve!terraform"
+# => format: user@realm!tokenid
 TOKEN_SECRET="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-
-curl -s -k \
-  -H "Authorization: PVEAPIToken=${TOKEN_ID}=${TOKEN_SECRET}" \
+# => UUID secret from token creation output
+curl -s -k -H "Authorization: PVEAPIToken=${TOKEN_ID}=${TOKEN_SECRET}" \
   https://192.168.1.100:8006/api2/json/nodes | python3 -m json.tool
-# => { "data": [ { "node": "pve01", "status": "online", ... } ] }
+# => {"data": [{"node": "pve01", "status": "online", ...}]}
 
-# Revoke a token when no longer needed
+# Revoke token (existing API calls immediately get 401 Unauthorized)
 pvesh delete /access/users/devops@pve/token/terraform
-# => Token 'devops@pve!terraform' deleted
-# => Existing API clients using this token receive 401 Unauthorized immediately
+# => token deleted; devops@pve user login credentials unaffected
 ```
 
 **Key Takeaway**: API tokens with `--privsep 1` decouple automation tool credentials from human user accounts—revoking a compromised token does not affect the user's own access.
@@ -961,45 +827,40 @@ Proxmox supports multiple authentication realms simultaneously. Enterprise deplo
 ```bash
 # List configured authentication realms
 pvesh get /access/domains
-# => [
-# =>   { "realm": "pam", "type": "pam", "comment": "Linux PAM standard authentication" },
-# =>   { "realm": "pve", "type": "pve", "comment": "Proxmox VE authentication server" }
-# => ]
+# => pam (Linux PAM) | pve (Proxmox VE built-in) — default realms after install
 
 # Add LDAP realm for Active Directory authentication
+# --realm corp: realm name; users login as jdoe@corp
+# --server1: AD domain controller hostname or IP
+# --base_dn: LDAP search root for user lookup
+# --user_attr sAMAccountName: AD attribute used as Proxmox username (login name)
+# --bind_dn/--bind_password: service account credentials for LDAP queries
 pvesh create /access/domains \
-  --realm corp \
-  --type ldap \
-  --server1 dc01.corp.example.com \
-  --port 389 \
-  --base_dn "dc=corp,dc=example,dc=com" \
-  --user_attr sAMAccountName \
+  --realm corp --type ldap \
+  --server1 dc01.corp.example.com --port 389 \
+  --base_dn "dc=corp,dc=example,dc=com" --user_attr sAMAccountName \
   --bind_dn "cn=proxmox-bind,ou=service-accounts,dc=corp,dc=example,dc=com" \
-  --bind_password 'BindPassword123!' \
-  --comment "Corporate Active Directory"
-# => LDAP realm 'corp' created
-# => Users can now log in as: jdoe@corp (maps to sAMAccountName=jdoe in AD)
+  --bind_password 'BindPassword123!'
+# => LDAP realm 'corp' created; users log in as: jdoe@corp (maps to sAMAccountName)
 
-# Add OpenID Connect realm for SSO (e.g., Keycloak, Okta, Google)
+# Add OpenID Connect realm for SSO (Keycloak, Okta, Google)
+# --issuer-url: OIDC provider discovery endpoint (exposes .well-known/openid-configuration)
+# --client-id/--client-key: OAuth2 client credentials registered in identity provider
+# --username-claim: OIDC token claim to use as Proxmox username (preferred_username = login name)
+# --autocreate 1: Proxmox user record created automatically on first successful OIDC login
 pvesh create /access/domains \
-  --realm sso \
-  --type openid \
+  --realm sso --type openid \
   --issuer-url "https://keycloak.corp.example.com/realms/proxmox" \
-  --client-id "proxmox-pve" \
-  --client-key "oidc-client-secret-here" \
-  --username-claim "preferred_username" \
-  --autocreate 1 \
-  --comment "Keycloak SSO"
-# => OpenID realm 'sso' created
-# => --autocreate 1: auto-creates Proxmox user on first OIDC login
-# => Users log in via Keycloak redirect; Proxmox receives JWT token
+  --client-id "proxmox-pve" --client-key "oidc-client-secret-here" \
+  --username-claim "preferred_username" --autocreate 1
+# => OIDC realm 'sso' created; --autocreate 1: Proxmox user created on first login
 
-# Test LDAP authentication for a specific user
+# Sync users from LDAP to Proxmox user database
+# --scope users: sync user accounts (use 'both' to also sync groups)
+# --remove-vanished none: keep Proxmox users even if removed from LDAP
 pvesh create /access/domains/corp/sync \
-  --scope users \
-  --remove-vanished none
-# => Syncing users from LDAP realm 'corp'...
-# => Added: 45 users synchronized from Active Directory
+  --scope users --remove-vanished none
+# => 45 users synchronized from Active Directory
 ```
 
 **Key Takeaway**: OpenID Connect with `--autocreate 1` enables zero-provisioning SSO—users authenticate via your existing identity provider and Proxmox accounts are created automatically on first login.
@@ -1014,51 +875,46 @@ pvesh create /access/domains/corp/sync \
 
 Proxmox supports multiple storage backends simultaneously. This example configures the three most common local storage types.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Proxmox VE Storage Layer"] --> B["local (Dir)<br/>ISO, Templates, Backups<br/>/var/lib/vz"]
+    A --> C["local-lvm (LVMthin)<br/>VM Disks, CT Rootfs<br/>Thin provisioned"]
+    A --> D["tank-zfs (ZFSpool)<br/>VM Images, CT Rootfs<br/>Snapshots + Checksums"]
+
+    style A fill:#0173B2,color:#fff,stroke:#000
+    style B fill:#DE8F05,color:#000,stroke:#000
+    style C fill:#029E73,color:#fff,stroke:#000
+    style D fill:#CC78BC,color:#000,stroke:#000
+```
+
 **Code**:
 
 ```bash
 # View current storage configuration
 pvesh get /storage
-# => [
-# =>   { "storage": "local", "type": "dir", "path": "/var/lib/vz", "content": "iso,vztmpl,backup" },
-# =>   { "storage": "local-lvm", "type": "lvmthin", "vgname": "pve", "thinpool": "data" }
-# => ]
+# => local (dir /var/lib/vz; content iso,vztmpl,backup)
+# => local-lvm (lvmthin pve/data; content rootdir,images)
 
-# Add a directory-type storage (useful for NFS mounts, external disks)
+# Add directory-type storage for NFS mounts or extra disks
 pvesh create /storage \
-  --storage extra-disk \
-  --type dir \
-  --path /mnt/extra \
-  --content images,backup \
-  --maxfiles 3
-# => Storage 'extra-disk' added: directory at /mnt/extra
-# => content=images: stores VM disk images (qcow2, raw)
-# => content=backup: stores vzdump backup archives
-# => maxfiles=3: keep 3 backup files per VM
+  --storage extra-disk --type dir --path /mnt/extra \
+  --content images,backup --maxfiles 3
+# => extra-disk: dir at /mnt/extra; stores VM images + backups; keeps 3 per VM
 
-# Create a ZFS pool from an additional disk (e.g., /dev/sdb)
-# CAUTION: this destroys all data on /dev/sdb
+# Create ZFS pool (CAUTION: destroys all data on /dev/sdb)
 zpool create -f tank /dev/sdb
-# => Creating ZFS pool 'tank' as single disk (no redundancy)
-# => For production: use mirror or raidz
+# => ZFS pool 'tank' created; for production use mirror or raidz for redundancy
 
-# Add the ZFS pool to Proxmox storage configuration
+# Register ZFS pool as Proxmox storage backend
 pvesh create /storage \
-  --storage tank-zfs \
-  --type zfspool \
-  --pool tank \
-  --content images,rootdir \
-  --sparse 1
-# => ZFS pool 'tank' registered as storage 'tank-zfs'
-# => content=rootdir: enables LXC container rootfs storage
-# => sparse=1: enables thin provisioning (ZFS native)
+  --storage tank-zfs --type zfspool --pool tank \
+  --content images,rootdir --sparse 1
+# => tank-zfs registered; sparse=1 enables ZFS thin provisioning
 
 # Verify all storage backends
 pvesh get /nodes/pve01/storage --enabled 1
-# => local: dir, /var/lib/vz (iso, templates, backups)
-# => local-lvm: lvmthin, pve/data (VM images, container rootfs)
-# => extra-disk: dir, /mnt/extra (images, backups)
-# => tank-zfs: zfspool, tank (images, container rootfs)
+# => local | local-lvm | extra-disk | tank-zfs — all active
 ```
 
 **Key Takeaway**: Different storage backends serve different purposes—directory for ISO/backup files, LVM thin for VM disks with fast snapshots, ZFS for enterprise features like compression, deduplication, and replication.
@@ -1072,6 +928,24 @@ pvesh get /nodes/pve01/storage --enabled 1
 ### Example 21: Configure Network Bridges
 
 Proxmox uses Linux bridges to connect VMs and containers to physical networks. The bridge `vmbr0` is created by the installer; additional bridges enable network segmentation.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Physical NIC eno1<br/>(no IP, manual mode)"] --> B["vmbr0 (public bridge)<br/>192.168.1.100/24<br/>bridge-ports eno1"]
+    B --> C["VM 100 tap<br/>public network"]
+    B --> D["VM 101 tap<br/>public network"]
+    E["vmbr1 (private bridge)<br/>10.0.1.1/24<br/>bridge-ports none + NAT"] --> F["VM 102 tap<br/>isolated + NAT"]
+    E --> G["VM 103 tap<br/>isolated + NAT"]
+
+    style A fill:#CA9161,color:#000,stroke:#000
+    style B fill:#0173B2,color:#fff,stroke:#000
+    style C fill:#029E73,color:#fff,stroke:#000
+    style D fill:#029E73,color:#fff,stroke:#000
+    style E fill:#DE8F05,color:#000,stroke:#000
+    style F fill:#CC78BC,color:#000,stroke:#000
+    style G fill:#CC78BC,color:#000,stroke:#000
+```
 
 **Code**:
 
@@ -1146,7 +1020,7 @@ pvesh get /nodes/pve01/status
 # =>   "rootfs": { "total": 107374182400, "used": 5368709120, "avail": 101100, "avail_str": "94.0 GiB" },
 # =>   "uptime": 86400,
 # =>   "loadavg": ["0.25", "0.18", "0.15"],
-# =>   "kversion": "Linux 6.17.2-1-pve"
+# =>   "kversion": "Linux 7.0-1-pve"
 # => }
 
 # Get real-time CPU and memory usage per VM
@@ -1181,10 +1055,27 @@ pvesh get /nodes/pve01/tasks --limit 10
 
 Proxmox provides a zone-based iptables firewall with rules at datacenter, host, and VM/container levels. Rules are managed through the web UI and stored in the cluster filesystem.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Datacenter Firewall<br/>Global rules all nodes"] --> B["Host Firewall<br/>Node-level rules<br/>(port 8006, SSH)"]
+    B --> C["VM/CT Firewall<br/>Per-workload rules<br/>(port 80, 443)"]
+    A --> D["IP Sets<br/>management-nets<br/>192.168.1.0/24"]
+    D --> A
+
+    style A fill:#0173B2,color:#fff,stroke:#000
+    style B fill:#DE8F05,color:#000,stroke:#000
+    style C fill:#029E73,color:#fff,stroke:#000
+    style D fill:#CC78BC,color:#000,stroke:#000
+```
+
 **Code**:
 
 ```bash
 # Enable firewall at datacenter level (applies to all nodes)
+# --enable 1: activates the Proxmox firewall iptables chain on all cluster members
+# --ebtables 1: also enables Ethernet-level (layer 2) bridge filtering for VM traffic
+# --log_ratelimit "1/second:15": max 1 log entry/sec with burst of 15; prevents log disk fill
 pvesh set /cluster/firewall/options \
   --enable 1 \
   --ebtables 1 \
@@ -1194,20 +1085,27 @@ pvesh set /cluster/firewall/options \
 # => log_ratelimit: limit firewall log entries to prevent disk fill
 
 # Create an IP Set for trusted management networks
+# IP sets allow referencing a named group of CIDRs in firewall rules (use +name syntax)
 pvesh create /cluster/firewall/ipset \
   --name management-nets \
   --comment "Trusted management subnets"
 # => IP set 'management-nets' created
 
+# Add LAN management subnet to the IP set
 pvesh create /cluster/firewall/ipset/management-nets \
   --cidr 192.168.1.0/24
-# => 192.168.1.0/24 added to management-nets
+# => 192.168.1.0/24 added to management-nets (LAN management subnet)
 
+# Add VPN/private address range to the same IP set
 pvesh create /cluster/firewall/ipset/management-nets \
   --cidr 10.0.0.0/8
-# => 10.0.0.0/8 added to management-nets
+# => 10.0.0.0/8 added to management-nets (VPN/private address range)
 
 # Add datacenter-level rules (apply to all nodes and VMs)
+# --type in: inbound traffic rule (use 'out' for egress rules)
+# --action ACCEPT: allow matching traffic (alternatives: DROP, REJECT)
+# --source '+management-nets': match packets from IP set (+ prefix = IP set reference)
+# --dport 8006: Proxmox web UI port; --proto tcp: TCP only
 pvesh create /cluster/firewall/rules \
   --type in \
   --action ACCEPT \
@@ -1219,6 +1117,7 @@ pvesh create /cluster/firewall/rules \
 # => Rule added: allow TCP 8006 from management-nets
 
 # Enable firewall on a specific VM and add VM-level rules
+# --enable 1: activate per-VM firewall (independent from datacenter-level enable)
 pvesh set /nodes/pve01/qemu/100/firewall/options \
   --enable 1 \
   --dhcp 1 \
@@ -1227,6 +1126,8 @@ pvesh set /nodes/pve01/qemu/100/firewall/options \
 # => dhcp=1: allow DHCP traffic through firewall
 # => ipfilter=1: prevent IP spoofing (drop traffic from VMs using wrong source IP)
 
+# Add VM-level inbound rule to allow web traffic
+# --dport 80,443: comma-separated port list for HTTP and HTTPS
 pvesh create /nodes/pve01/qemu/100/firewall/rules \
   --type in \
   --action ACCEPT \
@@ -1250,48 +1151,47 @@ pvesh get /nodes/pve01/firewall/rules
 
 Proxmox backup uses `vzdump` internally to create consistent backups of VMs and containers. Scheduled jobs run on the Cron system; backup modes balance consistency vs downtime.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Cron Schedule<br/>02:00 daily"] --> B{"Backup Mode"}
+    B -->|snapshot| C["Disk Snapshot<br/>VM stays running<br/>(zero downtime)"]
+    B -->|stop| D["VM Shutdown<br/>Backup<br/>VM Restart"]
+    C --> E["vzdump Archive<br/>.vma.zst<br/>Local Storage"]
+    D --> E
+    E --> F["Retention Pruning<br/>7 daily, 4 weekly<br/>3 monthly"]
+
+    style A fill:#0173B2,color:#fff,stroke:#000
+    style B fill:#DE8F05,color:#000,stroke:#000
+    style C fill:#029E73,color:#fff,stroke:#000
+    style D fill:#CC78BC,color:#000,stroke:#000
+    style E fill:#CA9161,color:#000,stroke:#000
+    style F fill:#0173B2,color:#fff,stroke:#000
+```
+
 **Code**:
 
 ```bash
 # View current backup jobs
 pvesh get /cluster/backup
-# => [] (no scheduled jobs configured yet)
+# => [] (none configured yet)
 
-# Create a daily backup job for all VMs/containers
+# Create daily backup job: snapshot mode (no downtime), zstd compression, all VMs
 pvesh create /cluster/backup \
-  --storage local \
-  --schedule "0 2 * * *" \
-  --mode snapshot \
-  --compress zstd \
-  --mailnotification failure \
-  --mailto admin@company.com \
-  --maxfiles 7 \
-  --prune-backups 'keep-daily=7,keep-weekly=4,keep-monthly=3' \
-  --vmid all
-# => Backup job created with ID: backup-1234abcd
-# => --schedule "0 2 * * *": daily at 02:00 (cron format)
-# => --mode snapshot: uses VM snapshot for zero-downtime backup (requires qcow2 or ZFS)
-# =>   alternatives: 'stop' (safest, shuts down VM), 'suspend' (pauses VM)
-# => --compress zstd: fast compression with good ratio (~40-60% size reduction)
-# => --prune-backups: retention policy (7 daily, 4 weekly, 3 monthly)
-# => --vmid all: backs up all VMs and containers on all nodes
+  --storage local --schedule "0 2 * * *" --mode snapshot \
+  --compress zstd --mailnotification failure --mailto admin@company.com \
+  --prune-backups 'keep-daily=7,keep-weekly=4,keep-monthly=3' --vmid all
+# => Backup job created (ID: backup-1234abcd); runs daily at 02:00 via cron
+# => mode=snapshot: VM stays running; disk snapshot taken for consistency
 
 # Run a manual backup immediately for VM 100
-vzdump 100 \
-  --storage local \
-  --mode snapshot \
-  --compress zstd \
+vzdump 100 --storage local --mode snapshot --compress zstd \
   --notes-template "Manual backup before upgrade on {{guestname}}"
-# => INFO: starting new backup job: vzdump 100
-# => INFO: VM Name: ubuntu-24-server
-# => INFO: creating snapshot for consistent backup...
-# => INFO: backup archive: /var/lib/vz/dump/vzdump-qemu-100-2026_04_29-02_00_00.vma.zst
-# => INFO: archive file size: 3.2G
-# => INFO: Finished Backup of VM 100 (00:02:15)
+# => Backup archive: vzdump-qemu-100-2026_04_29-02_00_00.vma.zst (3.2 GB in 2m15s)
 
 # List backup files for VM 100
 pvesh get /nodes/pve01/storage/local/content --vmid 100 --content backup
-# => Returns list of backup archives with timestamps, sizes, and volume IDs
+# => Returns backup archive list with timestamps, sizes, and volume IDs
 ```
 
 **Key Takeaway**: The `snapshot` backup mode creates consistent backups without VM downtime by using disk snapshots—prefer it over `stop` mode for production VMs where availability matters.
@@ -1309,43 +1209,35 @@ Backup files are only useful if restores work. This example demonstrates restori
 ```bash
 # List available backups for VM 100
 ls -lh /var/lib/vz/dump/ | grep "qemu-100"
-# => -rw-r--r-- 1 root root 3.2G Apr 29 02:00 vzdump-qemu-100-2026_04_29-02_00_00.vma.zst
-# => -rw-r--r-- 1 root root 3.1G Apr 28 02:00 vzdump-qemu-100-2026_04_28-02_00_00.vma.zst
+# => 3.2G Apr 29 vzdump-qemu-100-2026_04_29-02_00_00.vma.zst
+# => 3.1G Apr 28 vzdump-qemu-100-2026_04_28-02_00_00.vma.zst
 
-# Restore backup to a new VM with different VMID (non-destructive)
+# Restore backup to a new VMID (non-destructive; --unique 1 = new MAC addresses)
 qmrestore /var/lib/vz/dump/vzdump-qemu-100-2026_04_29-02_00_00.vma.zst 101 \
   --storage local-lvm \
   --unique 1
-# => Restoring QEMU VM 100 from backup to VMID 101...
-# => --storage local-lvm: restore disk to local-lvm storage
-# => --unique 1: generate new MAC addresses (avoids MAC conflict with original VM)
-# => Extracting VM metadata...
-# => Restoring disk: scsi0 -> local-lvm:vm-101-disk-0 (32 GB)
-# => Finished restoring QEMU VM 101
+# => VM 101 restored from backup (new MAC assigned to avoid network conflict)
 
 # Start the restored VM and verify it works before removing original
 qm start 101
 qm status 101
-# => status: running
+# => status: running  (verify app before touching VM 100)
 
-# Restore, overwriting an existing VM (destructive — VM 100 is replaced)
-# First stop the existing VM
+# Stop original and restore overwriting it (--force 1 is irreversible)
 qm stop 100
 # => VM 100 stopped
 
 qmrestore /var/lib/vz/dump/vzdump-qemu-100-2026_04_28-02_00_00.vma.zst 100 \
   --storage local-lvm \
   --force 1
-# => --force 1: overwrite existing VMID 100 (deletes current VM 100 config and disks)
-# => Restoring VM 100 from yesterday's backup...
-# => VM 100 restored to April 28 state
+# => VM 100 restored to April 28 state (existing config and disks deleted first)
 
-# For LXC containers, use pct restore
+# For LXC containers, use pct restore (equivalent of qmrestore for VMs)
+# --unprivileged 1: restore as unprivileged; must match original container security setting
 pct restore 200 /var/lib/vz/dump/vzdump-lxc-200-2026_04_29-02_00_00.tar.zst \
   --storage local-lvm \
   --unprivileged 1
-# => Restoring LXC container 200 from backup...
-# => Finished restoring CT 200
+# => CT 200 restored from backup
 ```
 
 **Key Takeaway**: Always restore to a new VMID first (`--unique 1`) to verify backup integrity before overwriting the production VM—`--force 1` is irreversible.
@@ -1358,34 +1250,40 @@ pct restore 200 /var/lib/vz/dump/vzdump-lxc-200-2026_04_29-02_00_00.tar.zst \
 
 VM cloning creates new VMs from existing templates or running VMs. Full clones are independent; linked clones share the base disk and use copy-on-write for modified blocks.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    A["Template VM 100<br/>(read-only base disk)"] -->|Full Clone| B["VM 110<br/>Full independent copy<br/>32 GB copied"]
+    A -->|Linked Clone| C["VM 111<br/>Shared base disk<br/>+ COW delta layer"]
+    A -->|Linked Clone| D["VM 112<br/>Shared base disk<br/>+ COW delta layer"]
+
+    style A fill:#0173B2,color:#fff,stroke:#000
+    style B fill:#029E73,color:#fff,stroke:#000
+    style C fill:#DE8F05,color:#000,stroke:#000
+    style D fill:#DE8F05,color:#000,stroke:#000
+```
+
 **Code**:
 
 ```bash
-# Full clone: creates completely independent copy of VM 100
-# All disk data copied; clone works even if original is deleted
+# Full clone: all disk data copied; independent of original (takes 2-5 min)
+# --full 1: copy all disk data (omit for linked clone on LVM-thin); mandatory on dir storage
 qm clone 100 110 \
   --name ubuntu-dev-01 \
   --full 1 \
   --storage local-lvm \
   --description "Full clone of ubuntu-24-server for development"
-# => Cloning VM 100 to VM 110 (full clone)...
-# => Copying disk scsi0 (32 GB)... (time: 2-5 minutes for full copy)
-# => VM 110 created: fully independent copy
-# => --full 1: mandatory on directory storage; optional on ZFS/LVM-thin
+# => VM 110 created as fully independent copy (--full 1 mandatory on dir storage)
 
-# Linked clone: shares base disk with parent (saves space, faster creation)
-# Requires template VM (see Example 27) or qcow2/ZFS storage
-# First convert VM 100 to template (one-way operation)
+# Convert VM 100 to template before creating linked clones (one-way operation)
 qm template 100
-# => VM 100 converted to template (read-only)
+# => VM 100 is now read-only template
 
-# Create linked clone from template (fast: only metadata copied initially)
+# Linked clone: only metadata copied initially; shared COW base disk (~5 seconds)
 qm clone 100 111 \
   --name ubuntu-app-01 \
   --storage local-lvm
-# => Creating linked clone of template 100 to VM 111...
-# => Created in ~5 seconds (only metadata; disk is shared COW reference)
-# => Disk writes go to a per-VM delta layer on local-lvm thin pool
+# => VM 111 created; writes go to per-VM delta layer on LVM-thin pool
 
 # Verify linked clone disk size (shows only delta, not full disk)
 pvesh get /nodes/pve01/storage/local-lvm/content | grep vm-111
@@ -1393,7 +1291,7 @@ pvesh get /nodes/pve01/storage/local-lvm/content | grep vm-111
 
 # Set unique MAC address for cloned VM (prevents network conflicts)
 qm set 111 --net0 virtio,bridge=vmbr0
-# => New random MAC auto-assigned during clone; this resets if needed
+# => New random MAC assigned to VM 111
 ```
 
 **Key Takeaway**: Linked clones from templates reduce provisioning time from minutes to seconds and reduce storage consumption by 70-90% for identical base OS deployments.

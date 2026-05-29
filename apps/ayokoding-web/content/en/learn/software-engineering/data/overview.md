@@ -10,8 +10,9 @@ Data is a fundamental pillar of modern software engineering. This section covers
 
 ## What You'll Learn
 
-- **Databases** - SQL fundamentals and PostgreSQL database management
-- **Data Tools** - Object-relational mapping with Spring Data JPA and Elixir Ecto
+- **Databases** - SQL fundamentals, PostgreSQL, and Datomic
+- **Data Tools** - Database migration and data-access tools across languages (Liquibase, Flyway, Alembic, Goose, EF Core, Ecto, SQLx, and more)
+- **Analytics** - Data analytics fundamentals through annotated examples
 
 ## Available Content
 
@@ -33,23 +34,23 @@ Data is a fundamental pillar of modern software engineering. This section covers
 - Performance tuning and optimization
 - Backup, recovery, and replication
 
-### Data Access Tools
+**[Datomic](/en/learn/software-engineering/data/databases/datomic)** - Immutable, time-aware database with Datalog queries
 
-**[Spring Data JPA](/en/learn/software-engineering/data/tools/spring-data-jpa)** - Java persistence framework
+- Immutable facts and point-in-time queries
+- Datalog query model
+- Separation of reads, writes, and storage
 
-- Entity mapping and relationships
-- Repository pattern for data access
-- Query methods and JPQL
-- Transaction management
-- Integration with Spring Boot
+### Data Tools
 
-**[Elixir Ecto](/en/learn/software-engineering/data/tools/elixir-ecto)** - Elixir database wrapper and query generator
+**[Data Tools](/en/learn/software-engineering/data/tools)** - Schema migration and data-access libraries across languages
 
-- Schema definitions and changesets
-- Composable queries with Ecto.Query
-- Migrations and schema evolution
-- Multi-database support
-- Association handling
+- Migration tools: Liquibase, Flyway, Alembic, Goose, Migratus, DbUp
+- Data access & ORMs: Spring Data JPA, EF Core, Ecto, SQLx, Effect SQL
+- Version your schema and access data idiomatically per language
+
+### Analytics
+
+**[Analytics](/en/learn/software-engineering/data/analytics)** - Data analytics fundamentals through annotated, runnable examples
 
 ## Learning Approach
 
@@ -65,4 +66,4 @@ Start with SQL fundamentals, then explore database-specific features and ORM too
 
 1. **[SQL Fundamentals](/en/learn/software-engineering/data/databases/sql)** - Start here to learn database querying
 2. **[PostgreSQL](/en/learn/software-engineering/data/databases/postgresql)** - Explore advanced features
-3. **Choose your ORM**: [Spring Data JPA](/en/learn/software-engineering/data/tools/spring-data-jpa) for Java or [Elixir Ecto](/en/learn/software-engineering/data/tools/elixir-ecto) for Elixir
+3. **Pick a data tool**: browse [Data Tools](/en/learn/software-engineering/data/tools) for the migration or data-access library that fits your language stack

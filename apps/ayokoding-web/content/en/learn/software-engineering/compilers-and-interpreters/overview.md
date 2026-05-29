@@ -32,6 +32,13 @@ A multi-part series building a Scheme dialect interpreter from scratch using F#.
 | 5    | Derived Forms and the REPL  | Syntactic sugar, macro expansion as transformation             |
 | 6    | Tail-Call Optimization      | Tail position, TCO, trampolining, continuation-passing style   |
 
+### [Building a Lisp Interpreter in Go](/en/learn/software-engineering/compilers-and-interpreters/lisp-interpreter-in-golang)
+
+A parallel series building a Scheme dialect interpreter from scratch in Go. It covers the same core CS theory — lexical analysis, parsing, the environment model, closures, and tail-call optimization — through Go's idioms, so you can compare a functional (F#) and an imperative (Go) implementation of the same interpreter.
+
+**Dialect**: Scheme (R5RS subset)
+**Prerequisites**: Familiarity with any programming language; Go syntax exposure helpful but not required
+
 ## Adding New Content
 
 New series or articles go in a subdirectory named for the concept (not the implementation language). The implementation language belongs in the article title and frontmatter tags, not the directory name.

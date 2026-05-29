@@ -75,6 +75,10 @@ Learn Pi Coding Agent through 80 self-contained, heavily annotated examples:
 - **[Intermediate](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/intermediate)** (Examples 28-54) — Skills, prompt templates, multi-mode usage (print/RPC/SDK), session branching, extension installation (40-75% coverage)
 - **[Advanced](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-example/advanced)** (Examples 55-80) — Authoring TypeScript extensions, embedding via SDK, custom tools, security hardening, production patterns (75-95% coverage)
 
+### [By Concept](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept)
+
+Prefer narrative explanations? The **[By Concept](/en/learn/artificial-intelligence/tools/pi-coding-agent/by-concept)** track covers the same material through mental models and concept-driven walkthroughs, with annotated code along the way.
+
 ## Why Pi Coding Agent Matters
 
 Pi inverts the assumption behind most AI coding agents. Where others ship a fixed feature set and ask you to fit your workflow around it, Pi ships a thin core and asks you to extend it for the workflow you actually have. The trade-off is honest: a basic Pi install does less than a basic install of comparable tools. The pay-off is that anything you bolt on lives in your own code or a known extension package — not buried in someone else's release notes.

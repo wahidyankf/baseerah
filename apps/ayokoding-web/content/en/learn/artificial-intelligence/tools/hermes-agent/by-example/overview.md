@@ -3,11 +3,11 @@ title: "Overview"
 date: 2026-04-14T00:00:00+07:00
 draft: false
 weight: 10000000
-description: "Learn Hermes Agent through 80 heavily annotated examples: CLI basics, YAML configuration, memory, skills, messaging, delegation, security, and production patterns (95% coverage)"
+description: "Learn Hermes Agent through 84 heavily annotated examples: CLI basics, YAML configuration, memory, skills, messaging, delegation, security, and production patterns (95% coverage)"
 tags: ["hermes-agent", "by-example", "tutorial", "ai-agent", "automation", "nous-research"]
 ---
 
-**Learn the Hermes Agent AI platform by doing.** This by-example tutorial teaches Hermes Agent — the open-source, self-improving AI agent by Nous Research — through 80 heavily annotated, self-contained examples achieving 95% coverage. Master CLI usage, YAML configuration, persistent memory, skill authoring, messaging gateway integration, subagent delegation, security hardening, and production deployment patterns.
+**Learn the Hermes Agent AI platform by doing.** This by-example tutorial teaches Hermes Agent — the open-source, self-improving AI agent by Nous Research — through 84 heavily annotated, self-contained examples achieving 95% coverage. Master CLI usage, YAML configuration, persistent memory, skill authoring, messaging gateway integration, subagent delegation, security hardening, and production deployment patterns.
 
 ## What is By Example?
 
@@ -25,7 +25,7 @@ Hermes Agent is a **free, open-source, self-improving AI agent** built by Nous R
 
 - **CLI**: Python-based terminal UI (`hermes`) with multiline editing, autocomplete, streaming, and token/cost tracking
 - **Gateway**: Multi-platform messaging server connecting Telegram, Discord, Slack, WhatsApp, Signal, Email, and more
-- **Tools**: 70+ built-in capabilities organized into pluggable toolsets (terminal, file, browser, web, vision, delegation, memory, cron, and more)
+- **Tools**: 60+ built-in capabilities organized into pluggable toolsets (terminal, file, browser, web, vision, delegation, memory, cron, and more)
 - **Memory**: Persistent MEMORY.md and USER.md files injected into every session, with FTS5 session search
 - **Skills**: Self-improving procedural memory (SKILL.md format) — agent autonomously creates and refines skills after complex tasks
 - **Delegation**: Spawn isolated subagents for parallel workstreams (up to 3 concurrent, depth limit 2)
@@ -37,7 +37,7 @@ Hermes Agent is a **free, open-source, self-improving AI agent** built by Nous R
 
 - **[Beginner](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/beginner)** (Examples 1-27): Installation, CLI commands, YAML configuration, basic tools, memory fundamentals — 0-40% coverage
 - **[Intermediate](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/intermediate)** (Examples 28-54): Skills system, messaging channels, delegation, scheduling, browser automation, code execution — 40-75% coverage
-- **[Advanced](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/advanced)** (Examples 55-80 plus four deep-dive hardening patterns): Terminal backends, security hardening (OWASP LLM Top 10 threat model, indirect prompt-injection defense, MCP supply-chain vetting, link-preview exfiltration prevention, network egress isolation), MCP integration, voice mode, production deployment, scaling — 75-95% coverage
+- **[Advanced](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/advanced)** (Examples 55–80, including sub-examples 67.1–67.4: 30 examples total): Terminal backends, security hardening (OWASP LLM Top 10 threat model, indirect prompt-injection defense, MCP supply-chain vetting, link-preview exfiltration prevention, network egress isolation), MCP integration, voice mode, production deployment, scaling — 75-95% coverage
 
 ### Example Format
 
@@ -103,7 +103,7 @@ model:
 
 | Aspect       | By Example (this tutorial)           | By Concept (narrative)                              |
 | ------------ | ------------------------------------ | --------------------------------------------------- |
-| **Approach** | Code-first, 80 annotated examples    | Explanation-first, conceptual chapters              |
+| **Approach** | Code-first, 84 annotated examples    | Explanation-first, conceptual chapters              |
 | **Pace**     | Fast — copy, run, modify             | Moderate — read, understand, apply                  |
 | **Best for** | Experienced devs switching to Hermes | Developers wanting deep architectural understanding |
 | **Coverage** | 95% through working examples         | 95% through conceptual explanations                 |

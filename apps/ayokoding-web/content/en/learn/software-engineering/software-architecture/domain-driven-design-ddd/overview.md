@@ -380,6 +380,14 @@ DDD typically uses layered architecture to separate concerns:
 - [**System Design Cases**](/en/learn/software-engineering/system-design/by-example/cases) - See DDD principles in real-world system designs
 - [**Finite State Machine**](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm) - Useful for modeling entity state transitions
 
+## By Example Tracks
+
+Learn the DDD building blocks through heavily annotated code in three paradigms:
+
+- [**In FP**](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-fp-by-example) — DDD with functional programming (immutability, pure functions, composition).
+- [**In OOP**](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-oop-by-example) — DDD with object-oriented programming (entities, value objects, aggregates as classes).
+- [**In Procedural**](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd/in-procedural-by-example) — DDD with procedural code (explicit data and functions, no class machinery).
+
 ## Production Wiring
 
 Once the by-example tracks above are clear, the cases tutorials show DDD aggregates flowing through real production code with hexagonal isolation:

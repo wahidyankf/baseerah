@@ -14,6 +14,8 @@ Infrastructure tools automate the deployment, configuration, and management of s
 - **Configuration Management** - Ansible for automating system configuration
 - **Containerization** - Docker for application packaging and deployment
 - **Orchestration** - Kubernetes for container management at scale
+- **Lightweight Orchestration** - K3s for edge, IoT, and resource-constrained Kubernetes
+- **Virtualization** - Proxmox VE for VMs, containers, and homelab/datacenter hosting
 
 ## Tool Categories
 
@@ -56,6 +58,26 @@ Infrastructure tools automate the deployment, configuration, and management of s
 - Service discovery and load balancing
 - Storage orchestration and configuration management
 - Declarative configuration with YAML manifests
+
+### Lightweight Orchestration
+
+**[K3s](/en/learn/software-engineering/infrastructure/tools/k3s)** - Certified, lightweight Kubernetes distribution (single &lt;60 MB binary)
+
+- Full Kubernetes API in a fraction of the footprint
+- Ideal for edge, IoT, CI, and resource-constrained nodes
+- Embedded etcd for high availability without external dependencies
+- Bundled essentials (Traefik ingress, ServiceLB, local-path storage)
+- Simple single-command install and upgrades
+
+### Virtualization
+
+**[Proxmox VE](/en/learn/software-engineering/infrastructure/tools/proxmox)** - Open-source virtualization platform for VMs and containers
+
+- KVM virtual machines and LXC system containers on one host
+- Web UI, REST API, and CLI (`pct`, `qm`, `pvesh`) management
+- Clustering, live migration, and high-availability failover
+- Software-defined storage and networking, including Ceph
+- Integrated backup/restore via Proxmox Backup Server
 
 ## Learning Approach
 
@@ -108,6 +130,20 @@ These tools work together in modern infrastructure:
 - Managing complex multi-container applications
 - Require service discovery and load balancing
 
+**Use K3s when**:
+
+- Running Kubernetes on edge, IoT, or resource-constrained hardware
+- Want the full Kubernetes API with a minimal footprint
+- Building lightweight CI, homelab, or single-node clusters
+- Need fast, single-binary install and upgrades
+
+**Use Proxmox VE when**:
+
+- Hosting virtual machines and system containers on your own hardware
+- Building a homelab or on-premises datacenter
+- Need clustering, live migration, and high-availability failover
+- Want integrated backup, software-defined storage (Ceph), and networking
+
 ## Getting Started
 
 Start with the tool that matches your immediate need:
@@ -116,5 +152,7 @@ Start with the tool that matches your immediate need:
 - **System configuration** → [Ansible](/en/learn/software-engineering/infrastructure/tools/ansible)
 - **Application packaging** → [Docker](/en/learn/software-engineering/infrastructure/tools/docker)
 - **Container orchestration** → [Kubernetes](/en/learn/software-engineering/infrastructure/tools/kubernetes)
+- **Lightweight Kubernetes** → [K3s](/en/learn/software-engineering/infrastructure/tools/k3s)
+- **Virtualization & homelab** → [Proxmox VE](/en/learn/software-engineering/infrastructure/tools/proxmox)
 
 Each tool includes comprehensive By Example tutorials with practical, runnable code.

@@ -375,6 +375,14 @@ fsm.Event("confirm") // Transition to confirmed
 - [**Domain-Driven Design**](/en/learn/software-engineering/software-architecture/domain-driven-design-ddd) - FSMs often model entity lifecycles in DDD
 - [**System Design Cases**](/en/learn/software-engineering/system-design/by-example/cases) - See FSMs in real-world system workflows
 
+## By Example Tracks
+
+Learn finite state machines through heavily annotated code in three paradigms:
+
+- [**In FP**](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-fp-by-example) — FSMs with functional programming (transition functions, immutable state, pattern matching).
+- [**In OOP**](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-oop-by-example) — FSMs with object-oriented programming (state classes, the State pattern).
+- [**In Procedural**](/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/in-procedural-by-example) — FSMs with procedural code (transition tables and explicit dispatch).
+
 ## Production Wiring
 
 Once the by-example tracks are clear, the cases tutorials show FSM aggregate lifecycles wired into real production code across both paradigm families:

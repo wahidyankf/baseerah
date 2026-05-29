@@ -3,261 +3,48 @@ title: "Overview"
 date: 2026-02-02T00:00:00+07:00
 draft: false
 weight: 10000
-description: "Comprehensive guide to automation tools that accelerate software development workflows"
-tags: ["automation", "tools", "productivity", "cli", "ai", "development"]
+description: "Command-line automation tools — version control, CI/CD, and text/JSON processing for streamlined development workflows"
+tags: ["automation", "tools", "productivity", "cli", "git", "development"]
 ---
 
-**Automation tools transform repetitive development tasks into streamlined workflows.** This section covers modern automation tools that boost developer productivity, reduce errors, and enable teams to focus on high-value work instead of manual operations.
+**Automation tools turn repetitive command-line work into fast, repeatable workflows.** This section covers the essential CLI tools for version control, continuous integration, and text and data processing — the building blocks of everyday developer automation.
 
-## What Are Automation Tools?
+## Tools in This Section
 
-Automation tools are software applications that execute repetitive tasks automatically, replacing manual effort with programmatic execution. In software engineering, these tools span:
+### Version Control & Collaboration
 
-- **Code generation** - AI-powered assistants that write code, tests, and documentation
-- **Build automation** - Tools that compile, test, and package applications
-- **Deployment automation** - Systems that deploy applications to production environments
-- **Infrastructure automation** - Tools that provision and configure servers
-- **Testing automation** - Frameworks that execute test suites automatically
+- **[Git](/en/learn/software-engineering/automation-tools/git)** - The distributed version-control system: branching, merging, rebasing, history rewriting, and recovery.
+- **[GitHub CLI (`gh`)](/en/learn/software-engineering/automation-tools/gh-cli)** - Drive GitHub from the terminal: pull requests, issues, releases, and workflow runs.
 
-## Why Automation Tools Matter
+### Continuous Integration
 
-**Manual tasks cost time and introduce errors.** Every minute spent on repetitive work is a minute not spent solving complex problems or building features. Automation tools provide:
+- **[GitHub Actions](/en/learn/software-engineering/automation-tools/github-actions)** - Cloud-native CI/CD: workflows, jobs, matrix builds, caching, secrets, and reusable actions.
 
-1. **Consistency** - Automated processes execute the same way every time, eliminating human error
-2. **Speed** - Tools complete tasks in seconds that would take humans minutes or hours
-3. **Scalability** - One automation script can handle 10 or 10,000 operations
-4. **Documentation** - Automation code serves as executable documentation of processes
-5. **Developer experience** - Removing drudgery makes development more enjoyable
+### Text & Data Processing
 
-## Categories of Automation Tools
+- **[awk](/en/learn/software-engineering/automation-tools/awk)** - Pattern-scanning and field-oriented text processing for reports and transformations.
+- **[sed](/en/learn/software-engineering/automation-tools/sed)** - Stream editor for find-and-replace and line-based text manipulation.
+- **[jq](/en/learn/software-engineering/automation-tools/jq)** - Command-line JSON processor for filtering, transforming, and querying structured data.
 
-### AI-Powered Code Assistants
+## Why These Tools Matter
 
-Modern AI tools understand natural language and codebases to generate code, explain implementations, and suggest improvements:
+1. **Consistency** - Scripted commands run the same way every time, eliminating manual error.
+2. **Speed** - Tasks that take minutes by hand finish in seconds.
+3. **Composability** - These tools pipe together: `gh` fetches data, `jq` reshapes it, `awk`/`sed` format it.
+4. **Documentation** - Automation scripts are executable, version-controlled documentation of your processes.
 
-- **Claude Code** - Anthropic's AI-powered coding assistant with deep codebase understanding
-- **Hermes Agent** - Nous Research's self-improving open-source AI agent with built-in learning loop
-- **OpenClaw** - Free, open-source, local-first AI agent platform with tool-chaining and JSON5 configuration
-- **Pi Coding Agent** - Mario Zechner / Earendil Inc.'s minimal terminal coding harness with multi-provider LLM support and a TypeScript extension model (pi.dev)
-- **GitHub Copilot** - AI pair programmer suggesting code completions
-- **Cursor** - AI-first code editor with context-aware assistance
+## Learning Approach
 
-**Use cases**: Writing boilerplate, explaining complex code, refactoring, test generation, multi-platform automation, persistent knowledge retention
+Each tool provides a **By Example** tutorial with annotated, runnable commands:
 
-### Build and Task Runners
+- **Beginner** - Core commands and everyday usage
+- **Intermediate** - Real workflows, scripting, and integration
+- **Advanced** - Complex pipelines, optimization, and edge cases
 
-Tools that automate compilation, testing, and packaging:
+## Getting Started
 
-- **Make** - Classic Unix build automation tool
-- **Gradle** - Modern build automation for JVM projects
-- **npm scripts** - JavaScript task automation
-- **Nx** - Monorepo build orchestration
+- **New to version control?** → start with [Git](/en/learn/software-engineering/automation-tools/git)
+- **Automating GitHub work?** → [GitHub CLI](/en/learn/software-engineering/automation-tools/gh-cli) and [GitHub Actions](/en/learn/software-engineering/automation-tools/github-actions)
+- **Wrangling text or JSON?** → [awk](/en/learn/software-engineering/automation-tools/awk), [sed](/en/learn/software-engineering/automation-tools/sed), and [jq](/en/learn/software-engineering/automation-tools/jq)
 
-**Use cases**: Building projects, running tests, linting code, generating documentation
-
-### CI/CD Platforms
-
-Continuous Integration and Continuous Deployment tools that automate the entire software delivery pipeline:
-
-- **GitHub Actions** - Cloud-native CI/CD integrated with GitHub
-- **GitLab CI/CD** - Integrated DevOps platform
-- **Jenkins** - Open-source automation server
-- **CircleCI** - Cloud-based CI/CD platform
-
-**Use cases**: Running tests on every commit, deploying to staging/production, security scanning
-
-### Infrastructure Automation
-
-Tools that treat infrastructure as code:
-
-- **Terraform** - Infrastructure provisioning using declarative configuration
-- **Ansible** - Configuration management and application deployment
-- **Docker** - Container automation for consistent environments
-- **Kubernetes** - Container orchestration at scale
-
-**Use cases**: Provisioning cloud resources, configuring servers, deploying containerized applications
-
-### Testing Automation
-
-Frameworks that automate software testing:
-
-- **Playwright** - Browser automation for end-to-end testing
-- **Selenium** - Web application testing framework
-- **JUnit/pytest/Jest** - Unit testing frameworks
-- **k6** - Performance testing tool
-
-**Use cases**: Regression testing, load testing, UI testing, API testing
-
-## Learning Path
-
-```mermaid
-%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
-graph TD
-    A["Understand Manual<br/>Workflows"]
-    B["Identify Repetitive<br/>Tasks"]
-    C["Choose Appropriate<br/>Tool"]
-    D["Automate One<br/>Task"]
-    E["Integrate into<br/>Workflow"]
-    F["Expand Automation<br/>Coverage"]
-
-    A --> B
-    B --> C
-    C --> D
-    D --> E
-    E --> F
-
-    style A fill:#0173B2,stroke:#000,color:#fff
-    style B fill:#DE8F05,stroke:#000,color:#fff
-    style C fill:#029E73,stroke:#000,color:#fff
-    style D fill:#CC78BC,stroke:#000,color:#fff
-    style E fill:#CA9161,stroke:#000,color:#fff
-    style F fill:#0173B2,stroke:#000,color:#fff
-```
-
-## What You'll Learn
-
-This section provides comprehensive tutorials on automation tools used in modern software development:
-
-### Claude Code
-
-AI-powered coding assistant that understands entire codebases:
-
-- Initial setup and authentication
-- Writing code with AI assistance
-- Explaining existing implementations
-- Refactoring and optimization
-- Generating tests and documentation
-
-**Coverage**: Installation, basic commands, advanced workflows, best practices
-
-### Hermes Agent
-
-Self-improving AI agent with built-in learning loop by Nous Research:
-
-- Installation and YAML configuration
-- Persistent memory (`MEMORY.md`, `USER.md`) and FTS5 session search
-- Skill system with autonomous creation and progressive disclosure
-- Messaging gateway (Telegram, Discord, Slack, WhatsApp, Signal, Email)
-- Subagent delegation and parallel workstreams
-- 6 terminal backends (local, Docker, SSH, Modal, Daytona, Singularity)
-
-**Coverage**: 80 heavily annotated examples covering 95% of production use cases
-
-### OpenClaw
-
-Free, open-source, local-first AI agent platform by Peter Steinberger:
-
-- Installation, JSON5 configuration, CLI commands
-- Built-in tools (exec, browser, web_search, cron, canvas)
-- Skill authoring and ClawHub plugin ecosystem
-- Multi-channel messaging (WhatsApp, Telegram, Slack, Discord)
-- Lobster workflow engine for typed automation pipelines
-- Plugin development and production deployment
-
-**Coverage**: 80 heavily annotated examples covering 95% of production use cases
-
-### Pi Coding Agent
-
-Minimal, extensible terminal coding harness by Mario Zechner / Earendil Inc. (pi.dev):
-
-- Installation, CLI commands, provider configuration
-- 15+ LLM providers (Anthropic, OpenAI, Google, Azure, Bedrock, Mistral, Groq, Cerebras, xAI, Hugging Face, OpenRouter, Ollama, and more)
-- Four operating modes: interactive TUI, print/JSON, RPC, SDK
-- TypeScript extension model (sub-agents, plan modes, tools)
-- Tree-structured session history; share via GitHub gist
-- Embedding via SDK and production patterns
-
-**Coverage**: 80 heavily annotated examples covering 95% of production use cases
-
-### Coming Soon
-
-Additional automation tools planned for this section:
-
-- **GitHub Actions** - CI/CD workflow automation
-- **Nx** - Monorepo task orchestration
-- **Playwright** - Browser automation (cross-referenced from automation-testing)
-- **Docker** - Container automation (cross-referenced from infrastructure)
-
-## Prerequisites
-
-**General automation knowledge**:
-
-- Basic command line skills (running commands, understanding file paths)
-- Understanding of software development workflows (build, test, deploy)
-- Familiarity with your development environment (terminal, code editor)
-
-**Tool-specific prerequisites** are listed in each tool's overview page.
-
-## How to Use This Section
-
-### If You're New to Automation
-
-Start with **Claude Code** to experience AI-powered automation firsthand. Modern AI assistants provide the fastest path to understanding automation benefits.
-
-### If You Know Some Automation
-
-Jump directly to specific tools based on your needs:
-
-- Need AI assistance for coding? → **Claude Code**
-- Want a self-improving autonomous agent? → **Hermes Agent**
-- Need a local-first AI agent platform? → **OpenClaw**
-- Want a minimal, extensible coding harness? → **Pi Coding Agent**
-- Automating deployments? → **GitHub Actions** (coming soon)
-- Managing monorepos? → **Nx** (coming soon)
-
-### As a Reference
-
-Use tool-specific pages to find setup instructions, common commands, and best practices when integrating tools into your workflow.
-
-## Comparison: Manual vs. Automated Workflows
-
-| Aspect             | Manual Workflow        | Automated Workflow              |
-| ------------------ | ---------------------- | ------------------------------- |
-| **Speed**          | Minutes to hours       | Seconds to minutes              |
-| **Consistency**    | Varies by execution    | Identical every time            |
-| **Error Rate**     | Human mistakes occur   | Only errors in automation code  |
-| **Scalability**    | Linear effort increase | Handles 10x or 100x same effort |
-| **Documentation**  | Often outdated/missing | Code serves as executable docs  |
-| **Developer Time** | High ongoing cost      | Upfront cost, then nearly free  |
-
-**Both approaches have value.** Manual workflows work for rarely-executed tasks. Automate anything you do more than 3 times.
-
-## Key Principles
-
-1. **Automate repetitive tasks** - If you do it more than 3 times, automate it
-2. **Start small** - Automate one task at a time, build momentum
-3. **Make it robust** - Add error handling, logging, and validation
-4. **Document automation** - Future you will thank present you
-5. **Iterate and improve** - Automation code needs maintenance like any code
-
-## Why Start with Claude Code?
-
-**AI-powered tools lower the automation barrier.** Traditional automation requires:
-
-1. Identifying the task to automate
-2. Learning the automation tool syntax
-3. Writing the automation script
-4. Debugging when it fails
-5. Maintaining the script over time
-
-**Claude Code simplifies this**:
-
-1. Describe what you want in natural language
-2. AI generates the code or performs the task
-3. Iterate with conversational feedback
-
-This makes automation accessible to developers at all skill levels.
-
-## What's Next?
-
-Ready to start automating? Choose your first tool:
-
-- **AI coding assistants** → see [Artificial Intelligence → Tools](/en/learn/artificial-intelligence/tools) (Claude Code, Hermes Agent, OpenClaw, Pi Coding Agent)
-- **Need to automate deployments?** → Coming soon (GitHub Actions)
-- **Managing complex builds?** → Coming soon (Nx)
-
-## Feedback and Improvements
-
-Automation tools evolve rapidly. Content is continuously updated based on new tool releases and learner feedback.
-
-**Let's automate!** Choose a tool and start eliminating repetitive tasks from your workflow.
+For AI-powered coding assistants (Claude Code, Hermes Agent, OpenClaw, Pi Coding Agent), see [Artificial Intelligence → Tools](/en/learn/artificial-intelligence/tools).

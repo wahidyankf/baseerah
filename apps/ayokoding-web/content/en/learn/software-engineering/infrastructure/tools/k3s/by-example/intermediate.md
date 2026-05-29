@@ -72,9 +72,9 @@ curl -sfL https://get.k3s.io | sh -s - server \
 # === Verify HA cluster from any server node ===
 kubectl get nodes
 # => NAME       STATUS   ROLES                       AGE   VERSION
-# => server-1   Ready    control-plane,etcd,master   5m    v1.35.4+k3s1
-# => server-2   Ready    control-plane,etcd,master   3m    v1.35.4+k3s1
-# => server-3   Ready    control-plane,etcd,master   2m    v1.35.4+k3s1
+# => server-1   Ready    control-plane,etcd,master   5m    v1.36.1+k3s1
+# => server-2   Ready    control-plane,etcd,master   3m    v1.36.1+k3s1
+# => server-3   Ready    control-plane,etcd,master   2m    v1.36.1+k3s1
 # => All three nodes show ROLES: control-plane,etcd,master
 
 # Verify etcd cluster health
@@ -91,7 +91,7 @@ kubectl get nodes
 # => server-3   Ready
 ```
 
-**Key Takeaway**: Use `--cluster-init` on the first server node and `--server` on subsequent ones. Three server nodes provide etcd quorum, allowing one node failure without downtime. All server nodes share the same join token.
+**Key Takeaway**: Use `--cluster-init` on the first server node and `--server` on subsequent ones — three server nodes provide etcd quorum, tolerating one node failure without downtime. All server nodes share the same join token.
 
 **Why It Matters**: A single-node K3s server is a single point of failure — if the node crashes or reboots, the entire cluster is unavailable. Embedded etcd HA with three nodes tolerates one node failure without downtime. For production deployments where uptime requirements exceed what a single VM can provide, HA mode is the prerequisite for everything else in this section.
 
@@ -100,6 +100,21 @@ kubectl get nodes
 ### Example 30: HA K3s with External PostgreSQL Datastore
 
 Instead of embedded etcd, K3s can use an external PostgreSQL or MySQL database as the cluster datastore. This simplifies HA setup (no etcd quorum management) but requires a separate database HA solution.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    S1["K3s Server 1<br/>--datastore-endpoint"]
+    S2["K3s Server 2<br/>--datastore-endpoint"]
+    PG["PostgreSQL HA<br/>db.example.com:5432<br/>(Patroni / RDS)"]
+
+    S1 -->|reads/writes cluster state| PG
+    S2 -->|reads/writes cluster state| PG
+
+    style S1 fill:#0173B2,stroke:#000,color:#fff
+    style S2 fill:#0173B2,stroke:#000,color:#fff
+    style PG fill:#DE8F05,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -132,8 +147,8 @@ sudo journalctl -u k3s --since "2 minutes ago" | grep -E "datastore|postgres"
 # => K3s redacts the password in logs for security
 
 kubectl get nodes
-# => server-1   Ready    control-plane,master   5m    v1.35.4+k3s1
-# => server-2   Ready    control-plane,master   2m    v1.35.4+k3s1
+# => server-1   Ready    control-plane,master   5m    v1.36.1+k3s1
+# => server-2   Ready    control-plane,master   2m    v1.36.1+k3s1
 # => Nodes show no "etcd" role (external datastore does not use embedded etcd)
 
 # Note: MySQL is also supported
@@ -190,7 +205,7 @@ sudo systemctl restart k3s
 # => The Traefik HelmChart manifest appears in /var/lib/rancher/k3s/server/manifests/
 ```
 
-**Key Takeaway**: `--disable <component>` removes a built-in K3s component. Components: `traefik`, `servicelb`, `local-storage`, `metrics-server`, `coredns`. Disabling is reversible — remove the flag and restart K3s.
+**Key Takeaway**: `--disable <component>` removes built-in K3s components (`traefik`, `servicelb`, `local-storage`, `metrics-server`, `coredns`) and is reversible — remove the flag and restart K3s to re-enable.
 
 **Why It Matters**: K3s's defaults are excellent for getting started, but production clusters often need replacements. A security team may mandate Nginx Ingress with specific WAF annotations instead of Traefik. A storage team may require Longhorn's replicated storage instead of single-node local-path. Disabling built-ins before installing alternatives prevents conflicts between competing controllers that both try to manage the same Ingress or LoadBalancer resources.
 
@@ -199,6 +214,25 @@ sudo systemctl restart k3s
 ### Example 32: Replace Flannel with Calico CNI
 
 K3s uses Flannel for pod networking by default. Calico provides network policy enforcement at the kernel level, BGP routing capabilities, and eBPF dataplane options that Flannel lacks.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    subgraph Flannel["Flannel (default)"]
+        F1["Pod A"] -->|VXLAN overlay| F2["Pod B"]
+    end
+    subgraph Calico["Calico (replacement)"]
+        C1["Pod A"] -->|eBPF / BGP| C2["Pod B"]
+        NP["NetworkPolicy<br/>enforcement"] -.->|enforces| C1
+        NP -.->|enforces| C2
+    end
+
+    style F1 fill:#CA9161,stroke:#000,color:#fff
+    style F2 fill:#CA9161,stroke:#000,color:#fff
+    style C1 fill:#0173B2,stroke:#000,color:#fff
+    style C2 fill:#0173B2,stroke:#000,color:#fff
+    style NP fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -217,7 +251,7 @@ curl -sfL https://get.k3s.io | sh -s - server \
 # Verify node is NotReady (no CNI = no pod networking)
 kubectl get nodes
 # => NAME       STATUS     ROLES                  AGE   VERSION
-# => server-1   NotReady   control-plane,master   1m    v1.35.4+k3s1
+# => server-1   NotReady   control-plane,master   1m    v1.36.1+k3s1
 # => NotReady: expected — no CNI plugin means no pod network
 
 # Install Calico using the operator method
@@ -254,7 +288,7 @@ kubectl wait --for=condition=Ready pods -n calico-system --all --timeout=120s
 # Node should now be Ready
 kubectl get nodes
 # => NAME       STATUS   ROLES                  AGE   VERSION
-# => server-1   Ready    control-plane,master   5m    v1.35.4+k3s1
+# => server-1   Ready    control-plane,master   5m    v1.36.1+k3s1
 ```
 
 **Key Takeaway**: Replace Flannel by starting K3s with `--flannel-backend=none --disable-network-policy`, then installing Calico. The pod CIDR (`--cluster-cidr`) must match Calico's `IPPool.cidr` exactly.
@@ -307,7 +341,7 @@ cilium status --wait
 # Verify node is Ready with Cilium as CNI
 kubectl get nodes
 # => NAME       STATUS   ROLES                  AGE   VERSION
-# => server-1   Ready    control-plane,master   5m    v1.35.4+k3s1
+# => server-1   Ready    control-plane,master   5m    v1.36.1+k3s1
 
 # Run Cilium's connectivity test
 cilium connectivity test
@@ -317,7 +351,7 @@ cilium connectivity test
 
 **Key Takeaway**: Install K3s with `--flannel-backend=none`, then install Cilium via the `cilium` CLI. Set `k8sServiceHost` and `k8sServicePort` to point Cilium agents at the K3s API server, and enable `kubeProxyReplacement` for full eBPF networking.
 
-**Why It Matters**: Cilium's eBPF dataplane bypasses the kernel's iptables layer entirely, reducing network latency by 20-30% and CPU overhead for high-traffic services. Its Hubble observability component provides per-flow network traffic visualization without modifying applications. For K3s clusters running microservices with high east-west traffic, Cilium's performance advantage compounds with scale.
+**Why It Matters**: Cilium's eBPF dataplane bypasses the kernel's iptables layer entirely, reducing network latency by 20-30% and CPU overhead for high-traffic services. Its Hubble observability component provides per-flow network traffic visualization without modifying applications or adding sidecars. For K3s clusters running microservices with high east-west traffic, Cilium's performance advantage compounds with scale, making it the preferred CNI for latency-sensitive workloads.
 
 ---
 
@@ -355,7 +389,7 @@ kubectl get services -A | grep -v "^NAMESPACE"
 echo "Pod CIDR: $(kubectl get node -o jsonpath='{.items[0].spec.podCIDR}')"
 ```
 
-**Key Takeaway**: Set `--cluster-cidr` and `--service-cidr` at install time when defaults conflict with your network. The `--cluster-dns` IP must fall within the service CIDR. These cannot be changed post-installation.
+**Key Takeaway**: Set `--cluster-cidr` and `--service-cidr` at install time when defaults conflict with your network — `--cluster-dns` must fall within the service CIDR, and these values cannot be changed post-installation.
 
 **Why It Matters**: Default K3s CIDRs (10.42.x.x, 10.43.x.x) conflict with many corporate VPNs and on-premises networks that use the 10.x.x.x range. Choosing non-conflicting CIDRs at install time is critical — attempting to change them after the cluster has workloads requires a full cluster rebuild. Document your CIDR choices in infrastructure code alongside the K3s installation parameters.
 
@@ -566,6 +600,25 @@ kubectl get pods -n cert-manager
 
 A `ClusterIssuer` configures how cert-manager obtains certificates from a CA (Let's Encrypt, internal CA, self-signed). A `Certificate` resource requests a specific certificate for a domain.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    CERT["Certificate resource<br/>example.com"]
+    CI["ClusterIssuer<br/>letsencrypt-prod<br/>(HTTP-01 via Traefik)"]
+    LE["Let's Encrypt ACME<br/>acme-v02.api.letsencrypt.org"]
+    SEC["Secret: example-tls<br/>tls.crt + tls.key"]
+
+    CERT -->|"requests via"| CI
+    CI -->|"HTTP-01 challenge"| LE
+    LE -->|"issues cert"| CI
+    CI -->|"stores in"| SEC
+
+    style CERT fill:#DE8F05,stroke:#000,color:#000
+    style CI fill:#0173B2,stroke:#000,color:#fff
+    style LE fill:#CA9161,stroke:#000,color:#fff
+    style SEC fill:#029E73,stroke:#000,color:#fff
+```
+
 **Code**:
 
 ```bash
@@ -647,7 +700,7 @@ kubectl get certificate myapp-tls
 # => READY True: certificate issued and stored in myapp-tls-secret
 ```
 
-**Key Takeaway**: `ClusterIssuer` configures the ACME endpoint and challenge solver. `Certificate` requests a specific cert, and cert-manager stores it in the named Secret. Use `http01` solver with Traefik for Let's Encrypt HTTP challenge.
+**Key Takeaway**: `ClusterIssuer` configures the ACME endpoint and challenge solver; `Certificate` requests a specific cert and cert-manager stores it in the named Secret. Use the `http01` solver with Traefik for Let's Encrypt HTTP challenges.
 
 **Why It Matters**: cert-manager certificates auto-renew 30 days before expiry. Without it, certificate expiry causes production outages that are embarrassing, avoidable, and unfortunately common. The Certificate resource provides a declarative, self-healing TLS lifecycle — create the Certificate once and cert-manager handles renewal forever, placing fresh certs in the same Secret so Traefik or Nginx pick them up automatically.
 
@@ -655,7 +708,7 @@ kubectl get certificate myapp-tls
 
 ### Example 39: Traefik IngressRoute with TLS Termination
 
-Combine cert-manager certificates with Traefik's IngressRoute to serve HTTPS traffic with automatic certificate management.
+Combine cert-manager certificates with Traefik's IngressRoute to serve HTTPS traffic with automatic certificate management. Traefik reads the TLS Secret provisioned by cert-manager and terminates TLS at the ingress layer, forwarding decrypted HTTP to backend services. This is the standard pattern for securing K3s services with Let's Encrypt certificates.
 
 **Code**:
 
@@ -869,7 +922,7 @@ EOF
 # => ingressroute.traefik.io/secured-app created
 ```
 
-**Key Takeaway**: Traefik Middlewares declaratively modify traffic. Chain multiple middlewares in an IngressRoute's `middlewares` list — they apply in order. Common security middlewares (headers, rate limiting) protect all backend services without touching application code.
+**Key Takeaway**: Traefik Middlewares declaratively modify traffic — chain multiple middlewares in an IngressRoute's `middlewares` list and they apply in order, protecting all backend services with security headers and rate limiting without touching application code.
 
 **Why It Matters**: Security headers (HSTS, X-Frame-Options, CSP) are required by security audits and PCI DSS. Implementing them in Traefik centrally ensures all services get them — no need to configure each application individually. Rate limiting at the ingress layer protects against DDoS and brute-force attacks before requests reach application pods, reducing compute costs during attack traffic spikes.
 
@@ -880,6 +933,24 @@ EOF
 ### Example 41: MetalLB for LoadBalancer Services on Bare Metal
 
 K3s on bare metal cannot provision cloud LoadBalancers. MetalLB fills this gap by announcing Service LoadBalancer IPs via Layer 2 (ARP) or BGP, giving pods real external IPs.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    CLI["External Client"]
+    POOL["MetalLB IPAddressPool<br/>192.168.1.200-210"]
+    SVC["Service type: LoadBalancer<br/>EXTERNAL-IP: 192.168.1.200"]
+    POD["Backend Pods"]
+
+    CLI -->|"ARP → 192.168.1.200"| POOL
+    POOL -->|"routes via L2Advertisement"| SVC
+    SVC -->|"iptables DNAT"| POD
+
+    style CLI fill:#CA9161,stroke:#000,color:#fff
+    style POOL fill:#0173B2,stroke:#000,color:#fff
+    style SVC fill:#DE8F05,stroke:#000,color:#000
+    style POD fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -1030,7 +1101,7 @@ kubectl run private-app --image=registry.example.com/myapp:v1.0
 # => No imagePullSecret needed in the pod spec when using registries.yaml
 ```
 
-**Key Takeaway**: `/etc/rancher/k3s/registries.yaml` configures containerd registry mirrors and credentials cluster-wide. After changes, restart K3s. This eliminates the need for `imagePullSecrets` in every pod spec for private registries.
+**Key Takeaway**: `/etc/rancher/k3s/registries.yaml` configures containerd registry mirrors and credentials cluster-wide — restart K3s after changes to eliminate the need for `imagePullSecrets` in every pod spec.
 
 **Why It Matters**: Managing `imagePullSecrets` in every namespace and pod spec is error-prone — deployments fail with `ImagePullBackOff` when the secret is missing. Centralized registry credentials in `registries.yaml` apply to all containerd image pulls on the node, regardless of namespace or pod spec. Registry mirrors reduce dependency on Docker Hub rate limits and external network reliability, which is critical for edge deployments with limited or unreliable internet connectivity.
 
@@ -1044,7 +1115,7 @@ Airgap environments have no internet access. K3s supports offline installation b
 
 ```bash
 # === On a machine with internet access: download K3s assets ===
-K3S_VERSION="v1.35.4+k3s1"
+K3S_VERSION="v1.36.1+k3s1"
 
 # Download the K3s binary
 curl -LO "https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s"
@@ -1190,6 +1261,25 @@ kubectl auth can-i delete pods --as=system:serviceaccount:monitoring:monitoring-
 
 NetworkPolicies are Kubernetes API objects that use CNI plugins (Calico, Cilium) to enforce firewall rules between pods. They control which pods can communicate with which other pods and external services.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    FE["Frontend pod<br/>app=frontend"]
+    BE["Backend pod<br/>app=backend"]
+    DB["Database pod<br/>app=database"]
+    EXT["External / other pods"]
+
+    FE -->|"allowed: port 8080"| BE
+    BE -->|"allowed: port 5432"| DB
+    EXT -->|"DENIED by default-deny"| BE
+    EXT -->|"DENIED by default-deny"| DB
+
+    style FE fill:#029E73,stroke:#000,color:#fff
+    style BE fill:#0173B2,stroke:#000,color:#fff
+    style DB fill:#CC78BC,stroke:#000,color:#000
+    style EXT fill:#CA9161,stroke:#000,color:#fff
+```
+
 **Code**:
 
 ```bash
@@ -1295,7 +1385,7 @@ EOF
 # => networkpolicy.networking.k8s.io/allow-frontend-to-backend created
 ```
 
-**Key Takeaway**: Start with a default-deny NetworkPolicy and add explicit allow rules. `podSelector: {}` selects all pods in the namespace. NetworkPolicies require Calico or Cilium — Flannel does not enforce them.
+**Key Takeaway**: Start with a default-deny NetworkPolicy and add explicit allow rules — `podSelector: {}` selects all pods in the namespace, and NetworkPolicy enforcement requires Calico or Cilium (Flannel does not enforce them).
 
 **Why It Matters**: In a flat Kubernetes network without NetworkPolicies, any pod can reach any other pod regardless of namespace or application tier. A compromised frontend pod could directly query the database, bypassing the backend entirely. NetworkPolicies implement zero-trust networking within the cluster — each tier can only communicate with explicitly permitted peers, limiting lateral movement after a breach.
 
@@ -1303,7 +1393,7 @@ EOF
 
 ### Example 46: PodDisruptionBudget — Availability During Maintenance
 
-A PodDisruptionBudget (PDB) prevents `kubectl drain` and voluntary evictions from removing too many pods at once, ensuring a minimum number of replicas remain available during node maintenance.
+A PodDisruptionBudget (PDB) prevents `kubectl drain` and voluntary evictions from removing too many pods at once, ensuring a minimum number of replicas remain available during node maintenance. PDBs enforce these constraints by blocking the eviction request until enough pods are running again. They are essential for zero-downtime node upgrades in production K3s clusters.
 
 **Code**:
 
@@ -1431,7 +1521,7 @@ kubectl get hpa web-hpa --watch
 # => web-hpa  Deployment/web  62%/70%, 58%/80%  2  10  4   (stabilized)
 ```
 
-**Key Takeaway**: HPA autoscales Deployments between `minReplicas` and `maxReplicas` based on CPU and/or memory utilization. Pods must have `resources.requests` set for resource metrics to work. metrics-server must be running (K3s installs it by default).
+**Key Takeaway**: HPA autoscales Deployments between `minReplicas` and `maxReplicas` based on CPU and/or memory utilization — pods must have `resources.requests` set, and metrics-server must be running (K3s installs it by default).
 
 **Why It Matters**: Fixed replica counts waste resources during low-traffic periods and cause overload during peaks. HPA makes K3s clusters elastic — a news article goes viral and the HPA scales the web tier from 2 to 10 pods within minutes; traffic subsides and it scales back down, reducing node resource consumption. This elasticity is what makes K3s competitive with cloud managed services for variable-load workloads.
 
@@ -1466,7 +1556,7 @@ kubectl top pods -n default --sort-by=cpu
 kubectl top pods --containers -n default
 ```
 
-**Key Takeaway**: `kubectl top nodes` and `kubectl top pods` show real-time resource usage via metrics-server. K3s installs metrics-server by default. Metrics are rolling averages (not instantaneous) with ~15-second resolution.
+**Key Takeaway**: `kubectl top nodes` and `kubectl top pods` show real-time resource usage via metrics-server, which K3s installs by default — metrics are rolling averages with ~15-second resolution, not instantaneous readings.
 
 **Why It Matters**: `kubectl top` is the fastest way to identify which pod is consuming unexpected CPU or memory during an incident. It provides immediate visibility without requiring a full Prometheus stack. When HPA is not scaling as expected, `kubectl top pods` confirms whether metrics-server is delivering metrics and what the actual utilization is — distinguishing between an HPA configuration problem and a metrics-server problem.
 
@@ -1475,6 +1565,27 @@ kubectl top pods --containers -n default
 ### Example 49: Longhorn Distributed Block Storage — Install and StorageClass
 
 Longhorn provides distributed block storage for K3s clusters. Unlike local-path (node-bound, no replication), Longhorn replicates volume data across nodes — a volume can survive a node failure.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    PVC["PVC: my-vol<br/>StorageClass: longhorn<br/>replicas: 2"]
+    LM["Longhorn Manager<br/>(DaemonSet)"]
+    R1["Replica 1<br/>Node A disk"]
+    R2["Replica 2<br/>Node B disk"]
+    POD["Pod<br/>reads/writes"]
+
+    PVC -->|"provisions"| LM
+    LM -->|"syncs data"| R1
+    LM -->|"syncs data"| R2
+    POD -->|"mounts PVC"| LM
+
+    style PVC fill:#DE8F05,stroke:#000,color:#000
+    style LM fill:#0173B2,stroke:#000,color:#fff
+    style R1 fill:#029E73,stroke:#000,color:#fff
+    style R2 fill:#029E73,stroke:#000,color:#fff
+    style POD fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -1735,7 +1846,7 @@ kubectl get pvc longhorn-pvc-restored
 # => Bound: new volume created from snapshot, contains point-in-time data
 ```
 
-**Key Takeaway**: Use `VolumeSnapshot` to capture point-in-time copies of Longhorn PVCs. Restore by creating a new PVC with `dataSource` referencing the snapshot. The restored PVC contains the data as of the snapshot time.
+**Key Takeaway**: Use `VolumeSnapshot` to capture point-in-time copies of Longhorn PVCs — restore by creating a new PVC with `dataSource` referencing the snapshot, which will contain data as of the snapshot time.
 
 **Why It Matters**: Database migrations, schema changes, and configuration updates can corrupt data. Snapshots enable a "checkpoint before change" workflow — take a snapshot, apply the risky change, and roll back by restoring from the snapshot if something goes wrong. This is dramatically faster than restoring from an S3 backup because the snapshot data is already on local nodes, avoiding the network transfer overhead of a full remote restore.
 
@@ -1744,6 +1855,27 @@ kubectl get pvc longhorn-pvc-restored
 ### Example 52: kube-vip for HA LoadBalancer on Bare Metal
 
 kube-vip provides a floating VIP (virtual IP) that moves between K3s server nodes in HA setups. It replaces the need for an external hardware load balancer for the API server and for LoadBalancer Services.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    VIP["VIP: 192.168.1.100:6443<br/>(ARP leader election)"]
+    S1["Server 1<br/>kube-vip leader<br/>(owns VIP)"]
+    S2["Server 2<br/>kube-vip follower"]
+    S3["Server 3<br/>kube-vip follower"]
+    CLI["kubectl / workers<br/>connect to VIP"]
+
+    CLI -->|"API requests"| VIP
+    VIP -->|"currently assigned to"| S1
+    S1 <-->|"leader election"| S2
+    S1 <-->|"leader election"| S3
+
+    style VIP fill:#CA9161,stroke:#000,color:#fff
+    style S1 fill:#0173B2,stroke:#000,color:#fff
+    style S2 fill:#029E73,stroke:#000,color:#fff
+    style S3 fill:#029E73,stroke:#000,color:#fff
+    style CLI fill:#DE8F05,stroke:#000,color:#000
+```
 
 **Code**:
 
@@ -1800,7 +1932,7 @@ ping 192.168.1.100
 
 ### Example 53: kube-vip LoadBalancer for Services
 
-Beyond the API server VIP, kube-vip can also provide LoadBalancer IPs for Services — an alternative to MetalLB with a smaller footprint, since kube-vip is already running for the control plane VIP.
+Beyond the API server VIP, kube-vip can also provide LoadBalancer IPs for Services — an alternative to MetalLB with a smaller footprint, since kube-vip is already running for the control plane VIP. Enabling the `--services` flag on the kube-vip DaemonSet allows it to watch for Services of type LoadBalancer and announce their IPs via ARP. This consolidates the HA and load balancing functions into a single component.
 
 **Code**:
 
@@ -2011,6 +2143,24 @@ EOF
 ### Example 56: Node Taints and Tolerations for Workload Placement
 
 Taints repel pods from nodes unless the pod has a matching toleration. They are used to reserve nodes for specific workloads (GPU nodes, bare-metal nodes, database nodes) or to mark nodes as temporarily unschedulable.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    N1["Node: db-node<br/>taint: workload=db:NoSchedule"]
+    N2["Node: app-node<br/>(no taint)"]
+    P1["DB Pod<br/>toleration: workload=db"]
+    P2["App Pod<br/>(no toleration)"]
+
+    P1 -->|"toleration matches → scheduled"| N1
+    P2 -->|"no toleration → REJECTED"| N1
+    P2 -->|"schedules normally"| N2
+
+    style N1 fill:#DE8F05,stroke:#000,color:#000
+    style N2 fill:#029E73,stroke:#000,color:#fff
+    style P1 fill:#0173B2,stroke:#000,color:#fff
+    style P2 fill:#CC78BC,stroke:#000,color:#000
+```
 
 **Code**:
 

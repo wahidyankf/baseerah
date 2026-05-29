@@ -158,7 +158,7 @@ metadata:
 spec:
   containers:
     - name: nginx # => Container name "nginx"
-      image: nginx:1.24 # => Uses nginx version 1.24 image
+      image: nginx:1.30 # => Uses nginx version 1.30 image
       ports:
         - containerPort: 80 # => Exposes port 80 inside container
 ```
@@ -263,7 +263,7 @@ spec:
     spec:
       containers:
         - name: nginx
-          image: nginx:1.24 # => Uses nginx 1.24 image from Docker Hub
+          image: nginx:1.30 # => Uses nginx 1.30 image from Docker Hub
           resources:
             requests:
               cpu: 100m # => Requests 100 millicores (0.1 CPU)

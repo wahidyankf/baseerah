@@ -98,7 +98,7 @@ kubectl cluster-info
 
 **Key Takeaway**: K3s stores kubeconfig at `/etc/rancher/k3s/k3s.yaml`. Copy it to `~/.kube/config` with correct ownership to use standard `kubectl` commands without `sudo`.
 
-**Why It Matters**: Hardcoding `sudo` for every kubectl invocation is error-prone and prevents scripts from running as non-root service accounts. Copying the kubeconfig once and setting correct permissions lets your normal user, CI runners, and automation scripts all use `kubectl` transparently, matching the workflow expected by most Kubernetes tooling.
+**Why It Matters**: Hardcoding `sudo` for every kubectl invocation is error-prone and prevents scripts from running as non-root service accounts. Copying the kubeconfig once and setting correct permissions lets your normal user, CI runners, and automation scripts all use `kubectl` transparently — matching the workflow expected by most Kubernetes tooling and third-party integrations like Helm, Flux, and kubectl plugins.
 
 ---
 
@@ -111,7 +111,7 @@ After installation, verify that the node reports `Ready` status and that the bui
 ```bash
 # Check node status — should show Ready within 30-60 seconds of install
 kubectl get nodes
-# => my-host    Ready    control-plane,master   2m    v1.35.4+k3s1
+# => my-host    Ready    control-plane,master   2m    v1.36.1+k3s1
 
 # Get detailed node information including resource capacity
 kubectl get nodes -o wide
@@ -128,12 +128,12 @@ kubectl get --raw /healthz
 
 # View the current cluster version info
 kubectl version --short 2>/dev/null || kubectl version
-# => Server Version: v1.35.4+k3s1 — the +k3s1 suffix identifies the K3s build
+# => Server Version: v1.36.1+k3s1 — the +k3s1 suffix identifies the K3s build
 ```
 
 **Key Takeaway**: After K3s installation, `kubectl get nodes` should show `Ready` and `kubectl get pods -n kube-system` should show all system components running. The `+k3s1` server version suffix identifies the K3s build.
 
-**Why It Matters**: Verifying installation before deploying workloads catches networking misconfiguration, resource exhaustion, or failed downloads early. A node stuck in `NotReady` usually indicates a CNI issue or insufficient disk space. Checking system pods confirms that the ingress controller (Traefik), DNS (CoreDNS), and storage provisioner are available before your first workload deploys.
+**Why It Matters**: Verifying installation before deploying workloads catches networking misconfiguration, resource exhaustion, or failed downloads early. A node stuck in `NotReady` usually indicates a CNI issue or insufficient disk space, while a pod in `CrashLoopBackOff` in kube-system points to a specific component failure. Checking system pods confirms that the ingress controller (Traefik), DNS (CoreDNS), and storage provisioner are all available before your first workload deploys.
 
 ---
 
@@ -172,6 +172,27 @@ kubectl delete pod nginx-test
 
 A Deployment manages a ReplicaSet that maintains a desired number of identical pod replicas. It handles pod scheduling, restarts on failure, and rolling updates. Deployments are the standard way to run stateless applications.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    D["Deployment<br/>desired: 3 replicas"]
+    RS["ReplicaSet<br/>selector: app=web"]
+    P1["Pod 1<br/>app=web"]
+    P2["Pod 2<br/>app=web"]
+    P3["Pod 3<br/>app=web"]
+
+    D -->|owns| RS
+    RS -->|creates + watches| P1
+    RS -->|creates + watches| P2
+    RS -->|creates + watches| P3
+
+    style D fill:#0173B2,stroke:#000,color:#fff
+    style RS fill:#DE8F05,stroke:#000,color:#000
+    style P1 fill:#029E73,stroke:#000,color:#fff
+    style P2 fill:#029E73,stroke:#000,color:#fff
+    style P3 fill:#029E73,stroke:#000,color:#fff
+```
+
 **Code**:
 
 ```bash
@@ -207,6 +228,24 @@ kubectl scale deployment web --replicas=2
 
 A Service provides a stable network identity (IP + DNS name) for a set of pods. Pods are ephemeral and their IPs change on restart; Services give consumers a fixed endpoint. K3s bundles Klipper for NodePort/LoadBalancer services on bare metal.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    C["Client"]
+    SVC["Service ClusterIP<br/>10.43.45.123:80<br/>selector: app=web"]
+    P1["Pod 1<br/>10.42.0.5:80"]
+    P2["Pod 2<br/>10.42.0.6:80"]
+
+    C -->|stable IP| SVC
+    SVC -->|iptables DNAT| P1
+    SVC -->|iptables DNAT| P2
+
+    style C fill:#CA9161,stroke:#000,color:#fff
+    style SVC fill:#0173B2,stroke:#000,color:#fff
+    style P1 fill:#029E73,stroke:#000,color:#fff
+    style P2 fill:#029E73,stroke:#000,color:#fff
+```
+
 **Code**:
 
 ```bash
@@ -232,7 +271,7 @@ curl http://$(hostname -I | awk '{print $1}'):31234
 # => Returns nginx welcome page; traffic: node:31234 → iptables → pod:80
 ```
 
-**Key Takeaway**: Services decouple consumers from pod lifecycle. ClusterIP exposes pods inside the cluster; NodePort exposes them on every node's IP at a high port. Both use label selectors to find target pods dynamically.
+**Key Takeaway**: Services decouple consumers from pod lifecycle by providing a stable virtual IP. ClusterIP exposes pods inside the cluster; NodePort exposes them on every node's IP at a high port — both use label selectors to find target pods dynamically.
 
 **Why It Matters**: Pod IPs change every time a pod restarts or reschedules. Without a Service, every client would need to discover the new pod IP after each restart. Services maintain a stable virtual IP backed by iptables or ipvs rules that automatically update when pods come and go. This decoupling is what makes rolling updates transparent to downstream services.
 
@@ -434,7 +473,7 @@ kubectl logs config-test
 # => APP_ENV=production LOG_LEVEL=info
 ```
 
-**Key Takeaway**: ConfigMaps decouple config from images. `--from-literal` inlines values; `--from-file` loads file content. Pods consume ConfigMaps via `envFrom` (all keys as env vars) or volume mounts (keys as files).
+**Key Takeaway**: ConfigMaps decouple config from images — `--from-literal` inlines values and `--from-file` loads file content. Pods consume ConfigMaps via `envFrom` (all keys as env vars) or volume mounts (keys as files).
 
 **Why It Matters**: Hard-coding configuration inside container images means rebuilding and redeploying on every config change. ConfigMaps let you modify `LOG_LEVEL`, database URLs, or feature flags by updating the ConfigMap and restarting pods — often without a new image build. In K3s clusters where image builds are infrequent (edge deployments), this is especially important for day-two operations.
 
@@ -514,7 +553,7 @@ kubectl logs secret-test
 # => Secret value injected as plain text environment variable inside container
 ```
 
-**Key Takeaway**: Create Secrets with `kubectl create secret generic`. Reference individual keys in pods via `secretKeyRef`. The container receives the decoded value as a plain-text environment variable.
+**Key Takeaway**: Create Secrets with `kubectl create secret generic` and reference individual keys in pods via `secretKeyRef`. The container receives the decoded value as a plain-text environment variable.
 
 **Why It Matters**: Storing passwords in ConfigMaps or container images risks exposure through log aggregation, image scanning, or accidental git commits. Secrets provide a dedicated API object with distinct RBAC controls — you can grant a pod's ServiceAccount access to one specific Secret without granting it ConfigMap access. Kubernetes audit logs also track Secret reads separately, making compliance reporting easier.
 
@@ -602,7 +641,7 @@ kubectl delete -f /tmp/deployment.yaml
 # => Deletes all resources that the manifest file declares
 ```
 
-**Key Takeaway**: `kubectl apply -f <file>` creates or updates resources declaratively. Re-applying the same manifest is idempotent — if nothing changed, nothing is modified. Use `kubectl delete -f <file>` to remove resources defined in the same file.
+**Key Takeaway**: `kubectl apply -f <file>` creates or updates resources declaratively — re-applying the same manifest is idempotent, so nothing changes if the spec matches the cluster state. Use `kubectl delete -f <file>` to remove resources defined in the same file.
 
 **Why It Matters**: Imperative commands like `kubectl create` fail if the resource already exists. Declarative `kubectl apply` is idempotent — the same manifest can be applied by CI/CD on every commit without error. This enables GitOps patterns where your Git repository is the source of truth and any push triggers `kubectl apply` to reconcile cluster state to the declared state.
 
@@ -653,6 +692,22 @@ sudo stat /var/lib/rancher/k3s/server/node-token
 
 Joining a worker node to an existing K3s cluster requires the server's URL and node token. The install script detects these environment variables and starts `k3s agent` instead of `k3s server`.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    W["Worker Node<br/>K3S_URL + K3S_TOKEN"]
+    S["K3s Server<br/>API :6443<br/>node-token"]
+    K["k3s-agent.service<br/>starts on worker"]
+
+    W -->|"curl install script"| K
+    K -->|"authenticate with token"| S
+    S -->|"register node"| K
+
+    style W fill:#CC78BC,stroke:#000,color:#000
+    style S fill:#0173B2,stroke:#000,color:#fff
+    style K fill:#029E73,stroke:#000,color:#fff
+```
+
 **Code**:
 
 ```bash
@@ -674,7 +729,7 @@ K3S_TOKEN="K1078a1234567890abcdef::server:abcdef1234" \
 
 # === Run on the SERVER to verify the worker joined ===
 kubectl get nodes
-# => server-1    Ready    control-plane,master   2h     v1.35.4+k3s1
+# => server-1    Ready    control-plane,master   2h     v1.36.1+k3s1
 # => worker-1    Ready    <none>                 45s    (ROLES: <none> — workers have no control-plane role)
 
 # Verify the worker node details
@@ -686,7 +741,7 @@ kubectl describe node worker-1
 sudo systemctl status k3s-agent
 ```
 
-**Key Takeaway**: Set `K3S_URL` and `K3S_TOKEN` environment variables before running the install script on a worker node. The script automatically starts `k3s-agent` instead of `k3s server`. Verify with `kubectl get nodes` on the server.
+**Key Takeaway**: Set `K3S_URL` and `K3S_TOKEN` environment variables before running the install script on a worker node; the script automatically starts `k3s-agent` instead of `k3s server`. Verify the join with `kubectl get nodes` on the server.
 
 **Why It Matters**: Horizontal scaling in K3s is as simple as running the install script on additional Linux hosts with two environment variables. This simplicity enables infrastructure-as-code workflows where Terraform or Ansible provisions VMs and immediately joins them to the cluster — without manual kubeadm join commands, certificate distribution, or control plane bootstrapping steps.
 
@@ -695,6 +750,24 @@ sudo systemctl status k3s-agent
 ### Example 15: Port-Forward to a Pod or Service
 
 `kubectl port-forward` creates a tunnel from localhost to a pod or service port. It is the simplest way to access a workload without exposing it externally, bypassing the need for Ingress or NodePort during development.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    CURL["curl localhost:8080"]
+    KCF["kubectl port-forward<br/>(local process)"]
+    API["K3s API Server<br/>:6443"]
+    POD["Pod<br/>port 80"]
+
+    CURL -->|"TCP :8080"| KCF
+    KCF -->|"tunnel via kubeconfig"| API
+    API -->|"kubelet proxy"| POD
+
+    style CURL fill:#CA9161,stroke:#000,color:#fff
+    style KCF fill:#0173B2,stroke:#000,color:#fff
+    style API fill:#DE8F05,stroke:#000,color:#000
+    style POD fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -826,6 +899,27 @@ kubectl describe node $(kubectl get nodes -o name | head -1)
 
 K3s ships Traefik as the default ingress controller. A standard Kubernetes `Ingress` resource (API version `networking.k8s.io/v1`) routes HTTP/HTTPS traffic from Traefik to backend Services based on hostname or path rules.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph LR
+    CLI["curl client<br/>Host: hello.example.com"]
+    TR["Traefik<br/>Node port 80"]
+    ING["Ingress rule<br/>hello.example.com → hello-svc"]
+    SVC["Service: hello-svc<br/>port 80"]
+    POD["Pod: hello-app<br/>port 5678"]
+
+    CLI -->|HTTP :80| TR
+    TR -->|matches Ingress rule| ING
+    ING -->|routes to| SVC
+    SVC -->|forwards to| POD
+
+    style CLI fill:#CA9161,stroke:#000,color:#fff
+    style TR fill:#0173B2,stroke:#000,color:#fff
+    style ING fill:#DE8F05,stroke:#000,color:#000
+    style SVC fill:#CC78BC,stroke:#000,color:#000
+    style POD fill:#029E73,stroke:#000,color:#fff
+```
+
 **Code**:
 
 ```bash
@@ -906,7 +1000,7 @@ curl -H "Host: hello.example.com" http://$(hostname -I | awk '{print $1}')
 # => Traefik matched the Host header, routed to hello-svc, which forwarded to the pod
 ```
 
-**Key Takeaway**: K3s includes Traefik. Use `apiVersion: networking.k8s.io/v1` Ingress with `ingressClassName: traefik` for standard HTTP routing. Traefik's service runs on the host's port 80/443.
+**Key Takeaway**: K3s includes Traefik — use `apiVersion: networking.k8s.io/v1` Ingress with `ingressClassName: traefik` for standard HTTP routing on the host's port 80/443.
 
 **Why It Matters**: Without Ingress, every service needs its own NodePort on a non-standard port. Traefik consolidates all HTTP/HTTPS traffic through ports 80/443, routing to backends based on hostname and path rules. This is how production K3s clusters serve multiple applications on a single IP — each app gets its own hostname, and Traefik handles the virtual hosting.
 
@@ -973,7 +1067,7 @@ kubectl get crd | grep traefik
 # => All Traefik CRDs use the traefik.io group in K3s 1.32+
 ```
 
-**Key Takeaway**: For K3s v1.32+ (Traefik v3), IngressRoute CRDs use `apiVersion: traefik.io/v1alpha1`. The old `traefik.containo.us/v1alpha1` group was removed. IngressRoute provides richer routing rules than standard Ingress.
+**Key Takeaway**: For K3s v1.32+ (Traefik v3), IngressRoute CRDs use `apiVersion: traefik.io/v1alpha1` — the old `traefik.containo.us/v1alpha1` group was removed. IngressRoute provides richer routing rules than standard Ingress, supporting Go template matchers for host, path, header, and method.
 
 **Why It Matters**: Many tutorials and Stack Overflow answers still use `traefik.containo.us/v1alpha1` which silently fails in K3s 1.32+. IngressRoute's Go template syntax supports complex routing logic — combining hostname, path, header, and method matchers in a single rule — that standard Ingress cannot express. For production K3s setups with diverse routing requirements, IngressRoute is the native and most capable routing primitive.
 
@@ -1046,6 +1140,28 @@ curl -H "Host: traefik.internal.example.com" \
 ### Example 20: local-path-provisioner — PVC and Pod Volume
 
 K3s bundles `local-path-provisioner` which dynamically provisions `hostPath`-backed PersistentVolumes. It is the default StorageClass and enables stateful workloads without external storage systems on single-node or development clusters.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    PVC["PVC: data-pvc<br/>StorageClass: local-path<br/>Status: Pending"]
+    POD["Pod: storage-test<br/>mounts /data"]
+    PROV["local-path-provisioner<br/>watches PVCs"]
+    PV["PV: hostPath<br/>/opt/local-path-provisioner/..."]
+    HOST["Node Disk<br/>(actual storage)"]
+
+    PVC -->|pod claims| POD
+    POD -->|triggers binding| PROV
+    PROV -->|creates| PV
+    PV -->|maps to| HOST
+    PV -->|bound to| PVC
+
+    style PVC fill:#DE8F05,stroke:#000,color:#000
+    style POD fill:#0173B2,stroke:#000,color:#fff
+    style PROV fill:#CC78BC,stroke:#000,color:#000
+    style PV fill:#029E73,stroke:#000,color:#fff
+    style HOST fill:#CA9161,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -1269,6 +1385,27 @@ kubectl get pvc
 
 Kubernetes health probes control pod lifecycle. Liveness probes restart containers that are stuck. Readiness probes remove pods from Service load balancing when they are not ready. Startup probes give slow-starting containers extra time before other probes run.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    START["Container starts"]
+    SP["startupProbe<br/>fails → wait<br/>passes → done"]
+    LP["livenessProbe<br/>fails 3× → restart container"]
+    RP["readinessProbe<br/>fails → remove from Service endpoints<br/>passes → add to Service endpoints"]
+    RUN["Container running"]
+
+    START -->|runs first| SP
+    SP -->|passes once| RUN
+    RUN -->|ongoing check| LP
+    RUN -->|ongoing check| RP
+
+    style START fill:#0173B2,stroke:#000,color:#fff
+    style SP fill:#CA9161,stroke:#000,color:#fff
+    style LP fill:#DE8F05,stroke:#000,color:#000
+    style RP fill:#029E73,stroke:#000,color:#fff
+    style RUN fill:#CC78BC,stroke:#000,color:#000
+```
+
 **Code**:
 
 ```bash
@@ -1412,7 +1549,7 @@ kubectl rollout undo deployment/web
 kubectl rollout status deployment/web
 ```
 
-**Key Takeaway**: `kubectl set image` triggers a rolling update. `kubectl rollout status` monitors progress. `kubectl rollout undo` instantly reverts to the previous ReplicaSet if the update fails.
+**Key Takeaway**: `kubectl set image` triggers a rolling update that you can monitor with `kubectl rollout status`. If the update fails, `kubectl rollout undo` instantly reverts to the previous ReplicaSet.
 
 **Why It Matters**: Zero-downtime deployments require that at least some pods keep serving traffic during the update. Kubernetes' rolling update strategy ensures that old pods are only removed as new ones become ready (pass readiness probes). When a new image fails to start, `kubectl rollout undo` is faster than any alternative — it simply scales the previous ReplicaSet back up rather than pulling and starting the old image again.
 
@@ -1421,6 +1558,24 @@ kubectl rollout status deployment/web
 ### Example 24: DaemonSet for Per-Node Agents
 
 A DaemonSet runs exactly one pod on every node (or every node matching a selector). It is the correct resource for log collectors, monitoring agents, network plugins, and any per-node system service.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
+graph TD
+    DS["DaemonSet: log-collector<br/>tolerates: control-plane NoSchedule"]
+    N1["Node: server-1<br/>log-collector pod"]
+    N2["Node: worker-1<br/>log-collector pod"]
+    N3["Node: worker-2<br/>log-collector pod"]
+
+    DS -->|"1 pod per node"| N1
+    DS -->|"1 pod per node"| N2
+    DS -->|"1 pod per node"| N3
+
+    style DS fill:#0173B2,stroke:#000,color:#fff
+    style N1 fill:#029E73,stroke:#000,color:#fff
+    style N2 fill:#029E73,stroke:#000,color:#fff
+    style N3 fill:#029E73,stroke:#000,color:#fff
+```
 
 **Code**:
 
@@ -1507,7 +1662,7 @@ kubectl get pods -n kube-system -l app=log-collector -o wide
 # => Exactly one pod appears for each node in the cluster
 ```
 
-**Key Takeaway**: DaemonSets guarantee one pod per eligible node. Use `tolerations` to allow pods on tainted control-plane nodes. Use `fieldRef: spec.nodeName` to inject the node name as an environment variable for per-node identification in logs.
+**Key Takeaway**: DaemonSets guarantee one pod per eligible node — use `tolerations` to allow pods on tainted control-plane nodes, and `fieldRef: spec.nodeName` to inject the node name for per-node log identification.
 
 **Why It Matters**: Monitoring agents like Prometheus node-exporter, log shippers like Fluentbit or Promtail, and network plugins like Cilium all need to run on every node to collect local metrics or manage local networking. DaemonSets automate pod placement — when a new node joins the cluster, the DaemonSet controller immediately schedules the agent pod on it without any manual action.
 
@@ -1714,7 +1869,7 @@ sudo journalctl -u k3s --since "1 minute ago" | grep -E "disable|tls-san|cidr"
 # => Shows K3s log lines confirming the config options were applied
 ```
 
-**Key Takeaway**: `/etc/rancher/k3s/config.yaml` is the declarative way to configure K3s server options. YAML keys map directly to CLI flags without the `--` prefix. The file is read at startup.
+**Key Takeaway**: `/etc/rancher/k3s/config.yaml` is the declarative way to configure K3s server options, where YAML keys map directly to CLI flags without the `--` prefix and the file is read at startup.
 
 **Why It Matters**: Using the config file instead of environment variables or systemd drop-in files makes K3s configuration auditable in Git. Infrastructure-as-code tools (Ansible, Terraform) can template this file before starting K3s, ensuring every server node starts with the same configuration. Changes require a K3s restart, so place the config before first startup whenever possible.
 

@@ -27,6 +27,8 @@ challenges. Each example stands alone and can be studied independently.
   Moderate complexity covering common real-world patterns
 - [Advanced](/en/learn/software-engineering/system-design/by-example/advanced) -
   Complex distributed systems and large-scale architectures
+- [Cases](/en/learn/software-engineering/system-design/by-example/cases) -
+  End-to-end worked design cases that combine the patterns above into complete systems
 
 ## Structure of Each Example
 

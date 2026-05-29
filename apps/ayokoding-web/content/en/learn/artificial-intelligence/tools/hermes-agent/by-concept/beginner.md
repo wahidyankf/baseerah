@@ -27,7 +27,7 @@ are refined whenever new evidence arrives.
 
 The agent is not Meta's Hermes JavaScript engine, nor is it a programming language runtime.
 It is an autonomous AI agent with a Python-based terminal interface, a messaging gateway
-that bridges 20+ communication platforms, and a tool system covering 70+ capabilities
+that bridges 20+ communication platforms, and a tool system covering 60+ capabilities
 organized into 19 pluggable toolsets.
 
 ```mermaid
@@ -37,7 +37,7 @@ organized into 19 pluggable toolsets.
 graph TD
     USER["You<br/>(task, correction, question)"]:::teal
     HERMES["Hermes Agent<br/>(LLM + closed learning loop)"]:::blue
-    TOOLS["70+ Tools<br/>(19 pluggable toolsets)"]:::orange
+    TOOLS["60+ Tools<br/>(19 pluggable toolsets)"]:::orange
     MEMORY["Persistent Memory<br/>(MEMORY.md + USER.md)"]:::purple
     SKILLS["Self-Improving Skills<br/>(procedural knowledge)"]:::brown
     LLM["Any LLM<br/>(Claude, GPT, Gemini, 200+ via OpenRouter)"]:::blue
@@ -402,7 +402,7 @@ every action is visible as it occurs.
 
 ## Section 7: Tools Overview
 
-Hermes Agent ships with 70+ tools organized into 19 named toolsets. A toolset is a logical
+Hermes Agent ships with 60+ tools organized into 19 named toolsets. A toolset is a logical
 grouping of related tools that can be enabled or disabled as a unit in `config.yml`. This
 design lets you give Hermes exactly the capabilities a context requires and nothing more.
 
@@ -451,7 +451,7 @@ Disabling a toolset is not just about cost or performance — it is also a secur
 An LLM that cannot see the `browser` toolset cannot be tricked by a prompt injection attack
 into browsing to an attacker-controlled URL.
 
-**Key Takeaway:** Hermes's 70+ tools are organized into 19 named toolsets; you enable exactly
+**Key Takeaway:** Hermes's 60+ tools are organized into 19 named toolsets; you enable exactly
 what you need and the rest is invisible to the LLM, providing both focused capability and
 a clean security boundary.
 

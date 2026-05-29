@@ -58,6 +58,13 @@ In addition to the sequential path, use this reference for specific patterns:
 
 - Generics patterns, concurrency recipes, error handling, design patterns, web development
 
+## Production & Release Tracks
+
+Beyond the core tutorials, two additional tracks deepen your Go knowledge:
+
+- **[In the Field](/en/learn/software-engineering/programming-languages/golang/in-the-field)** - Production-grade implementation guides applying Go to real-world concerns.
+- **[Release Highlights](/en/learn/software-engineering/programming-languages/golang/release-highlights)** - What changed in recent Go releases and why it matters.
+
 ## How to Choose Your Starting Point
 
 **Choose based on your experience level:**

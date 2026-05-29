@@ -33,9 +33,9 @@ Unlike narrative tutorials that build understanding through explanation and stor
 - **Clustering** — Multi-node Corosync-based cluster with shared storage
 - **High Availability** — Automatic VM/container failover across cluster nodes
 - **Software-Defined Networking** — VXLAN, BGP-EVPN, VLAN-aware bridges
-- **Ceph integration** — Built-in distributed storage using Ceph Squid 19.2.3
+- **Ceph integration** — Built-in distributed storage using Ceph Squid 19.2.3 / Tentacle 20.2.1
 
-**Proxmox VE 9.1** (November 2025) is based on Debian 13.2 "Trixie", kernel 6.17.2, QEMU 10.1.2, and LXC 6.0.5. New in 9.1: OCI image support for LXC containers, vTPM in qcow2 enabling snapshots with Windows Secure Boot/BitLocker, per-vCPU nested virtualization control.
+**Proxmox VE 9.2** (May 2026) is based on Debian 13 "Trixie", kernel 7.0, QEMU 11.0, LXC 7.0, and ZFS 2.4. New in 9.x: OCI image support for LXC containers, vTPM in qcow2 enabling snapshots with Windows Secure Boot/BitLocker, per-vCPU nested virtualization control.
 
 ## Learning Path
 
@@ -74,7 +74,7 @@ This by-example guide provides **comprehensive coverage of Proxmox VE operations
 
 ### What's NOT Covered
 
-- **Proxmox Backup Server deep-dive** — PBS 4.0 is covered as a PVE storage target; standalone PBS administration is a separate topic
+- **Proxmox Backup Server deep-dive** — PBS 4.2 is covered as a PVE storage target; standalone PBS administration is a separate topic
 - **Proxmox Mail Gateway** — Separate product
 - **Windows guest optimization** — VirtIO driver installation covered briefly; deep Windows tuning out of scope
 - **All Terraform/Ansible modules** — Focus on most common patterns; provider documentation covers edge cases
@@ -120,7 +120,7 @@ Install requirements and verify access before starting examples:
 
 # Verify PVE version from command line:
 pveversion
-# => pve-manager/9.1/... (running kernel: 6.17.2-1-pve)
+# => pve-manager/9.2/... (running kernel: 7.0-1-pve)
 
 # Check node status:
 pvesh get /nodes/$(hostname)/status --output-format json | python3 -m json.tool
@@ -133,7 +133,7 @@ Set up your bare-metal or nested-virtualization test environment, then proceed t
 
 ### Beginner (Examples 1–28)
 
-- [Example 1: Download and Verify the Proxmox VE 9.1 ISO](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/beginner#example-1-download-and-verify-the-proxmox-ve-91-iso)
+- [Example 1: Download and Verify the Proxmox VE 9.2 ISO](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/beginner#example-1-download-and-verify-the-proxmox-ve-92-iso)
 - [Example 2: Create a Bootable USB Drive](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/beginner#example-2-create-a-bootable-usb-drive)
 - [Example 3: Run the Graphical PVE Installer](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/beginner#example-3-run-the-graphical-pve-installer)
 - [Example 4: Run the Text-Based TUI Installer](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/beginner#example-4-run-the-text-based-tui-installer)
@@ -183,7 +183,7 @@ Set up your bare-metal or nested-virtualization test environment, then proceed t
 - [Example 45: Configure BGP-EVPN Zone for Routed L3 SDN](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-45-configure-bgp-evpn-zone-for-routed-l3-sdn)
 - [Example 46: Configure a Fabric for SDN (New in PVE 9.0)](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-46-configure-a-fabric-for-sdn-new-in-pve-90)
 - [Example 47: Configure Distributed Firewall with Security Groups](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-47-configure-distributed-firewall-with-security-groups)
-- [Example 48: Integrate Proxmox Backup Server (PBS 4.0)](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-48-integrate-proxmox-backup-server-pbs-40)
+- [Example 48: Integrate Proxmox Backup Server (PBS 4.2)](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-48-integrate-proxmox-backup-server-pbs-42)
 - [Example 49: Use vzdump for Manual Backup and Schedule Backup Jobs](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-49-use-vzdump-for-manual-backup-and-schedule-backup-jobs)
 - [Example 50: Restore a VM Backup with Live-Restore from PBS](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-50-restore-a-vm-backup-with-live-restore-from-pbs)
 - [Example 51: Configure Backup Encryption and Pruning in PBS](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/intermediate#example-51-configure-backup-encryption-and-pruning-in-pbs)
@@ -220,7 +220,7 @@ Set up your bare-metal or nested-virtualization test environment, then proceed t
 - [Example 79: Monitor and Manage Storage Replication Jobs](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-79-monitor-and-manage-storage-replication-jobs)
 - [Example 80: Set Up Ceph RBD Mirroring for Cross-Cluster Disaster Recovery](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-80-set-up-ceph-rbd-mirroring-for-cross-cluster-disaster-recovery)
 - [Example 81: Tune ZFS ARC Size and Configure ZFS Datasets](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-81-tune-zfs-arc-size-and-configure-zfs-datasets)
-- [Example 82: Configure S3-Compatible Backup Target in PBS 4.0](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-82-configure-s3-compatible-backup-target-in-pbs-40)
+- [Example 82: Configure S3-Compatible Backup Target in PBS 4.2](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-82-configure-s3-compatible-backup-target-in-pbs-42)
 - [Example 83: Implement Full Backup Rotation Strategy with PBS](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-83-implement-full-backup-rotation-strategy-with-pbs)
 - [Example 84: Configure SDN with DHCP IP Management](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-84-configure-sdn-with-dhcp-ip-management)
 - [Example 85: Benchmark and Tune VM Disk I/O with VirtIO-BLK and Cache Modes](/en/learn/software-engineering/infrastructure/tools/proxmox/by-example/advanced#example-85-benchmark-and-tune-vm-disk-io-with-virtio-blk-and-cache-modes)

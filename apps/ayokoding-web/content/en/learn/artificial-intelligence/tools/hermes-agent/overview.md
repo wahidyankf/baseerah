@@ -11,7 +11,7 @@ tags: ["hermes-agent", "overview", "ai-agent", "nous-research", "automation"]
 
 ## What is Hermes Agent?
 
-Hermes Agent is a **free, open-source, self-improving AI agent** that connects large language models (Claude, GPT, Gemini, DeepSeek, Llama, and 200+ models via OpenRouter) to messaging platforms (Telegram, Discord, Slack, WhatsApp, Signal, Email, and more) and enables AI to take real actions through 70+ built-in tools organized into pluggable toolsets.
+Hermes Agent is a **free, open-source, self-improving AI agent** that connects large language models (Claude, GPT, Gemini, DeepSeek, Llama, and 200+ models via OpenRouter) to messaging platforms (Telegram, Discord, Slack, WhatsApp, Signal, Email, and more) and enables AI to take real actions through 60+ built-in tools organized into pluggable toolsets.
 
 **Key differentiator**: Hermes Agent has a built-in closed learning loop:
 
@@ -27,7 +27,7 @@ Hermes Agent is a **free, open-source, self-improving AI agent** that connects l
 
 - **Full TUI terminal interface**: Multiline editing, slash-command autocomplete, streaming output, token/cost tracking
 - **Multi-platform messaging gateway**: 20+ platforms (CLI, Telegram, Discord, Slack, WhatsApp, Signal, Email, SMS, Home Assistant, Matrix, Mattermost, DingTalk, Feishu, WeCom, Weixin, QQ Bot, Yuanbao, BlueBubbles, Microsoft Teams, Google Chat)
-- **70+ built-in tools**: Web search/extract, terminal/files, browser automation, vision/image generation, memory, session search, cron scheduling, delegation, code execution, MCP, Home Assistant, RL training
+- **60+ built-in tools**: Web search/extract, terminal/files, browser automation, vision/image generation, memory, session search, cron scheduling, delegation, code execution, MCP, Home Assistant, RL training
 - **6 terminal backends**: local, Docker, SSH, Daytona, Singularity, Modal — from laptop to serverless cloud
 - **Subagent delegation**: Spawn isolated child agents for parallel workstreams (up to 3 concurrent by default, configurable)
 - **Smart model routing**: Automatic routing between primary and cheap models based on message complexity
@@ -41,7 +41,7 @@ Hermes Agent is a **free, open-source, self-improving AI agent** that connects l
 
 - **CLI (`hermes`)**: Python-based terminal UI with prompt_toolkit multiline editing
 - **Gateway**: Messaging server connecting 17+ platforms from single process
-- **Tools**: 47 capabilities organized into 19 toolsets (enable/disable per context)
+- **Tools**: 60+ capabilities organized into 19 toolsets (enable/disable per context)
 - **Memory**: Persistent `MEMORY.md` + `USER.md`, FTS5 session search in SQLite
 - **Skills**: Self-improving procedural memory with progressive disclosure (3 levels)
 - **Delegation**: Isolated subagent spawning with restricted toolsets
@@ -82,6 +82,10 @@ Learn Hermes Agent through 80 self-contained, heavily annotated examples:
 - **[Beginner](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/beginner)** (Examples 1-27) — Installation, CLI, YAML configuration, tools, memory basics (0-40% coverage)
 - **[Intermediate](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/intermediate)** (Examples 28-54) — Skills, messaging channels, delegation, scheduling, browser, code execution (40-75% coverage)
 - **[Advanced](/en/learn/artificial-intelligence/tools/hermes-agent/by-example/advanced)** (Examples 55-80 plus four deep-dive hardening patterns) — Terminal backends, security (OWASP LLM Top 10 threat model, indirect prompt-injection defense, MCP supply-chain vetting, link-preview exfiltration prevention, network egress isolation), MCP, voice, production deployment (75-95% coverage)
+
+### [By Concept](/en/learn/artificial-intelligence/tools/hermes-agent/by-concept)
+
+Prefer narrative explanations? The **[By Concept](/en/learn/artificial-intelligence/tools/hermes-agent/by-concept)** track teaches the same material through mental models and concept-driven walkthroughs — the learning loop, memory model, toolsets, and security boundaries — with annotated code along the way.
 
 ## Why Hermes Agent Matters
 

@@ -3,83 +3,38 @@ title: "Overview"
 weight: 100000
 date: 2025-12-29T00:00:00+07:00
 draft: false
-description: "Explore popular workflow automation and integration platforms including Zapier, Make, and other tools for building automated workflows"
-tags: ["automation", "workflow", "integration", "tools", "zapier", "make"]
+description: "Testing tools and frameworks — Playwright for end-to-end tests, Testing Library for component tests, and Vitest for unit tests"
+tags: ["testing", "automation-testing", "playwright", "testing-library", "vitest"]
 ---
 
-## Automation Tools Landscape
+This section covers the tools that automate software testing across the pyramid — from fast unit tests to full end-to-end browser tests. Each tool includes annotated, runnable By Example tutorials.
 
-Workflow automation tools enable connecting applications, moving data between systems, and triggering actions based on events—all without extensive coding. These platforms have evolved from simple task automation to sophisticated integration ecosystems.
+## Tools in This Section
 
-## Tool Categories
+- **[Playwright](/en/learn/software-engineering/automation-testing/tools/playwright)** - End-to-end browser automation and testing across Chromium, Firefox, and WebKit, with auto-waiting, tracing, and parallel execution. Includes both By Example and In-the-Field production guides.
+- **[Testing Library](/en/learn/software-engineering/automation-testing/tools/testing-library)** - User-centric component and DOM testing that queries the UI the way users do, encouraging accessible, behavior-focused tests.
+- **[Vitest](/en/learn/software-engineering/automation-testing/tools/vitest)** - Fast, Vite-native unit test runner with a Jest-compatible API, watch mode, and built-in coverage.
 
-### Open-Source Platforms
+## The Testing Pyramid
 
-**Advantages**:
+These tools map onto the classic testing pyramid:
 
-- Self-hosted control over data and infrastructure
-- No per-execution pricing limits
-- Customizable and extensible
-- Community-driven development
+- **Unit tests (most numerous)** → **Vitest** — fast, isolated tests of individual functions and modules.
+- **Component / integration tests** → **Testing Library** — verify rendered UI behavior and component interaction.
+- **End-to-end tests (fewest)** → **Playwright** — exercise the whole application through a real browser.
 
-**Examples**:
+## Learning Approach
 
-- **Huginn** - Agent-based automation for monitoring and data processing
-- **Node-RED** - Flow-based development for IoT and integration
-- **Windmill** - Developer-centric workflow engine with script execution
+Each tool provides a **By Example** tutorial with annotated, runnable code:
 
-### Cloud-Based SaaS Platforms
-
-**Advantages**:
-
-- No infrastructure management required
-- Extensive pre-built integrations
-- Managed scalability and reliability
-- User-friendly interfaces
-
-**Examples**:
-
-- **Zapier** - Popular automation platform with 5,000+ app integrations
-- **Make** (formerly Integromat) - Visual automation with advanced features
-- **Tray.io** - Enterprise-grade integration platform
-
-### Hybrid Approaches
-
-Some platforms offer both self-hosted and cloud options, combining control with convenience.
-
-## Tools Covered
-
-Additional automation tools will be added to this section in the future.
-
-## Choosing an Automation Tool
-
-**Consider open-source tools if**:
-
-- Data privacy and self-hosting are priorities
-- Need unlimited workflow executions without per-task pricing
-- Want to extend functionality with custom integrations
-- Building automations for technical teams
-
-**Consider cloud SaaS platforms if**:
-
-- Want minimal setup and infrastructure management
-- Need extensive pre-built app integrations
-- Prefer vendor-managed reliability and scaling
-- Building automations for non-technical teams
-
-Many organizations use both: cloud platforms for standard integrations, open-source tools for sensitive data or high-volume workflows.
-
-## Common Use Cases
-
-Automation tools excel at:
-
-- **Data Synchronization**: Keep customer data in sync between CRM, email marketing, and analytics
-- **Notifications**: Send alerts to Slack, email, or SMS when events occur
-- **File Processing**: Move, transform, and organize files across cloud storage
-- **Lead Management**: Route leads from forms to CRM, trigger follow-up sequences
-- **Reporting**: Aggregate data from multiple sources into reports and dashboards
-- **API Integration**: Connect applications that don't have native integrations
+- **Beginner** - Core concepts, first tests, basic assertions
+- **Intermediate** - Realistic suites, fixtures, mocking, and async testing
+- **Advanced** - Complex scenarios, optimization, CI integration, and production patterns
 
 ## Getting Started
 
-Choose an automation tool that aligns with your requirements for control, scalability, and integration needs. Core automation concepts learned with one platform translate well to others.
+- **Testing units and functions?** → [Vitest](/en/learn/software-engineering/automation-testing/tools/vitest)
+- **Testing UI components?** → [Testing Library](/en/learn/software-engineering/automation-testing/tools/testing-library)
+- **Testing full user flows in a browser?** → [Playwright](/en/learn/software-engineering/automation-testing/tools/playwright)
+
+A healthy suite uses all three: many Vitest unit tests, fewer Testing Library component tests, and a focused set of Playwright end-to-end tests.

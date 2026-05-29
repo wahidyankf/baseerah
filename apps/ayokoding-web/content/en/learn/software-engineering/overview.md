@@ -10,17 +10,18 @@ Build your software engineering expertise with structured learning paths coverin
 
 ## What You'll Learn
 
-- **Programming Languages** - Deep dives into Python, Golang, Java, Kotlin, Rust, and Elixir with tutorials from basics to advanced topics
-- **Data** - Master data concepts and tools including databases, data structures, and processing frameworks
-- **Automation Testing** - Learn test automation with Playwright and other modern testing frameworks
-- **Automation Tools** - Master development automation tools like Claude Code for enhanced productivity
-- **Infrastructure** - Learn infrastructure concepts and tools including Ansible, Terraform, Docker, and Kubernetes
-- **Networking** - Master computer networking fundamentals, protocols, and distributed systems
+- **Programming Languages** - Deep dives into Python, Go, Java, Kotlin, Rust, TypeScript, C#, F#, and more, with tutorials from basics to advanced topics
+- **Algorithms & Data Structures** - Core algorithmic thinking and data-structure fundamentals through annotated examples
+- **Platforms** - Linux (shell and tooling), Web (frontend and backend frameworks), and Mobile (React Native)
+- **Data** - Databases, SQL, and data-access/migration tools across languages
+- **Automation Testing** - Test automation with Playwright, Vitest, and Testing Library
+- **Automation Tools** - Developer automation with Git, GitHub Actions, the GitHub CLI, and text tools (awk, sed, jq)
+- **Infrastructure** - Infrastructure concepts and tools including Terraform, Ansible, Docker, Kubernetes, K3s, and Proxmox VE
+- **Networking** - Computer networking fundamentals, protocols, and distributed-systems communication
 - **System Design** - Distributed-systems patterns (load balancing, sharding, CAP, microservices, multi-region) across multiple services and scale levels
-- **Platform Linux** - Master Linux platform tools and shell scripting for development
-- **Platform Web** - Master web frameworks including Phoenix LiveView, Spring Boot, React, and Next.js
 - **Architecture** - Single-application structure patterns (SOLID, layered, hexagonal, DDD, FSM, design patterns) inside one app
-- **Development** - Master development methodologies including TDD and BDD
+- **Compilers & Interpreters** - Build working interpreters from scratch (Lisp in F# and in Go)
+- **Development** - Development methodologies including TDD and BDD
 
 ## Architecture vs. System Design — Two Different Layers
 

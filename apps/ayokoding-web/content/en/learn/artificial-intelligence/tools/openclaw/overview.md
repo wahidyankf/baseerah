@@ -71,6 +71,10 @@ Learn OpenClaw through 80 self-contained, heavily annotated examples:
 - **[Intermediate](/en/learn/artificial-intelligence/tools/openclaw/by-example/intermediate)** (Examples 28-54) — Channel integration, advanced skills, Lobster workflows, multi-agent patterns (40-75% coverage)
 - **[Advanced](/en/learn/artificial-intelligence/tools/openclaw/by-example/advanced)** (Examples 55-80) — Plugin development, security hardening, production deployment, scaling (75-95% coverage)
 
+### [By Concept](/en/learn/artificial-intelligence/tools/openclaw/by-concept)
+
+Prefer narrative explanations? The **[By Concept](/en/learn/artificial-intelligence/tools/openclaw/by-concept)** track covers the same material through mental models and concept-driven walkthroughs, with annotated code along the way.
+
 ## Why OpenClaw Matters
 
 OpenClaw's local-first architecture eliminates vendor lock-in and data privacy concerns that plague hosted AI agent platforms. Organizations handling sensitive data (healthcare, finance, legal) can deploy AI agents without sending conversations through third-party servers.

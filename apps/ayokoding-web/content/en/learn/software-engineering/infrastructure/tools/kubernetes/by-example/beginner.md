@@ -57,7 +57,7 @@ spec: # => Pod specification (desired state)
  containers:
  - name: nginx # => Container name (used in logs and exec)
  image:
- nginx:1.24 # => nginx 1.24 from Docker Hub
+ nginx:1.30 # => nginx 1.30 from Docker Hub
  # => Pin version to prevent unexpected updates
  ports:
  - containerPort:
@@ -95,7 +95,7 @@ kubectl get pods -n kube-system    # => Shows control plane pods: etcd, schedule
 kubectl version --client           # => Shows client version for compatibility verification
 
 # Create and inspect a test Pod
-kubectl run test-pod --image=nginx:1.24 --restart=Never
+kubectl run test-pod --image=nginx:1.30 --restart=Never
 # => Pod "test-pod" created
 
 kubectl get pods                   # => NAME       READY   STATUS    RESTARTS   AGE
@@ -145,7 +145,7 @@ metadata:
 spec:
  containers:
  - name: nginx # => Main application container
- image: nginx:1.24 # => Serves content from shared volume
+ image: nginx:1.30 # => Serves content from shared volume
  ports:
  - containerPort: 80 # => HTTP port (shared network with busybox)
  # => Both containers share same localhost:80
@@ -192,7 +192,7 @@ spec:
 
 **Key Takeaway**: Multi-container Pods share localhost networking and volumes, enabling sidecar patterns for logging, monitoring, or data processing without container modifications.
 
-**Why It Matters**: Service mesh implementations like Istio inject sidecar proxies into Pods to handle traffic management, security, and observability without changing application code. This separation of concerns allows developers to focus on business logic while infrastructure concerns are handled by specialized sidecar containers—a pattern impossible with traditional monolithic deployments.
+**Why It Matters**: Service mesh implementations like Istio inject sidecar proxies into Pods to handle traffic management, security, and observability without changing application code. This separation of concerns allows developers to focus on business logic while infrastructure concerns are handled by specialized sidecar containers—a pattern impossible with traditional monolithic deployments. Multi-container Pods also enable log collection agents, metric scrapers, and config reloaders to run alongside application containers, simplifying day-two operations without coupling these concerns into the application image itself.
 
 ---
 
@@ -251,7 +251,7 @@ metadata:
 spec:
  containers:
  - name: nginx
- image: nginx:1.24 # => Stable production image
+ image: nginx:1.30 # => Stable production image
  resources:
  requests: # => Minimum guaranteed resources (scheduling)
  cpu: 100m # => 0.1 CPU core guaranteed (1000m = 1 core)
@@ -277,6 +277,8 @@ spec:
 **Key Takeaway**: Always set resource requests for predictable scheduling and limits to prevent resource starvation; memory limit violations kill Pods (OOMKilled) while CPU limits throttle performance.
 
 **Why It Matters**: Resource management prevents the "noisy neighbor" problem where one application monopolizes cluster resources, impacting others. Multi-tenancy allows multiple teams to safely share the same Kubernetes cluster — far more cost-efficient than dedicated per-team clusters. Resource quotas and limits make this safe by bounding the maximum resource consumption of any tenant, ensuring predictable performance while maximizing hardware utilization and operational efficiency.
+
+---
 
 ### Example 6: Pod Environment Variables
 
@@ -357,7 +359,7 @@ spec:
 
 **Key Takeaway**: Use direct values for static config, ConfigMap/Secret references for sensitive data, and fieldRef for Pod metadata like name and IP; avoid hardcoding environment-specific values in images.
 
-**Why It Matters**: Environment variable injection enables the same container image to run across dev, staging, and production without rebuilding—following the Twelve-Factor App methodology. This immutable infrastructure pattern reduces deployment bugs that arise from environment-specific builds and enables instant rollbacks, since the same tested artifact runs everywhere without modification.
+**Why It Matters**: Environment variable injection enables the same container image to run across dev, staging, and production without rebuilding—following the Twelve-Factor App methodology. This immutable infrastructure pattern reduces deployment bugs that arise from environment-specific builds and enables instant rollbacks, since the same tested artifact runs everywhere without modification. Referencing ConfigMaps and Secrets rather than hardcoding values also centralizes configuration management, allowing operators to update settings without touching the application codebase or triggering new image builds.
 
 ---
 
@@ -461,7 +463,7 @@ spec:
  nginx # => App container starts after both inits succeed
  # => Web server serving prepared content
  image:
- nginx:1.24 # => nginx web server
+ nginx:1.30 # => nginx web server
  # => Production-ready image
  volumeMounts:
  # => Volume mount list for app container
@@ -559,7 +561,7 @@ spec:
  # => Container list for Pods
  - name: nginx # => Container name
  # => Single container per Pod
- image: nginx:1.24 # => nginx image version
+ image: nginx:1.30 # => nginx image version
  # => Pulled from Docker Hub
  ports:
  # => Port definitions
@@ -626,7 +628,7 @@ spec:
  # => Container list
  - name: nginx # => Container definition
  # => Single container per Pod
- image: nginx:1.24 # => nginx image
+ image: nginx:1.30 # => nginx image
  # => Same image for all replicas
  resources:
  # => Resource constraints per Pod
@@ -728,15 +730,15 @@ spec:
  - name: nginx # => Container name
  # => Referenced in kubectl set image
  image:
- nginx:1.24 # => Update to nginx:1.25 to trigger rolling update
- # => kubectl set image deployment/rolling-app nginx=nginx:1.25
+ nginx:1.30 # => Change to a newer version (e.g., nginx:1.31) to trigger rolling update
+ # => kubectl set image deployment/rolling-app nginx=nginx:1.31
  ports:
  # => Port definitions
  - containerPort: 80 # => HTTP port
  # => Service routes traffic here
 
 # Update and rollback commands:
-# => kubectl set image deployment/rolling-app nginx=nginx:1.25
+# => kubectl set image deployment/rolling-app nginx=nginx:1.31
 ```
 
 **Key Takeaway**: Configure maxSurge and maxUnavailable to balance update speed and availability; use maxSurge=1, maxUnavailable=0 for critical services requiring zero downtime, or increase both for faster updates with acceptable brief unavailability.
@@ -850,7 +852,7 @@ spec:
  # => Container list
  - name: nginx # => nginx container
  # => Serves as health check target
- image: nginx:1.24 # => nginx image
+ image: nginx:1.30 # => nginx image
  # => Responds to HTTP health checks
  ports:
  # => Port definitions
@@ -1155,7 +1157,7 @@ spec:
  # => Container list
  - name: nginx # => Container definition
  # => Application container
- image: nginx:1.24 # => nginx image
+ image: nginx:1.30 # => nginx image
  # => Version-pinned for stability
 
 # Pod DNS names:
@@ -1379,7 +1381,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => nginx version 1.24
+ nginx:1.30 # => nginx version 1.30
  # => Production nginx image
  volumeMounts:
  # => Volume mount configuration
@@ -1556,7 +1558,7 @@ spec:
  nginx # => Container name
  # => nginx web server with TLS
  image:
- nginx:1.24 # => nginx version 1.24
+ nginx:1.30 # => nginx version 1.30
  # => Production web server
  volumeMounts:
  # => Volume mount configuration
@@ -1709,7 +1711,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => nginx version
+ nginx:1.30 # => nginx version
  # => Production image
 
 # Namespace commands:
@@ -1777,7 +1779,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => nginx version
+ nginx:1.30 # => nginx version
  # => Production image
 
 ---
@@ -1872,7 +1874,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => nginx version
+ nginx:1.30 # => nginx version
  # => Version from change-cause annotation
 
 # Annotations vs Labels:
@@ -1927,7 +1929,7 @@ spec:
  nginx # => Container name
  # => nginx web server
  image:
- nginx:1.24 # => nginx version
+ nginx:1.30 # => nginx version
  # => Production image
 
 # Node selection commands:
