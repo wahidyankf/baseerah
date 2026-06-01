@@ -578,6 +578,15 @@ Use the verification tip from the [Linking Convention](../formatting/linking.md#
 
 ## Best Practices
 
+### Never Put Secrets in Plans
+
+Plans are committed to git, so the [No Secrets in Git](../security/no-secrets-in-git.md) hard iron
+rule applies in full. Never paste system secrets (SSH/private keys, passwords, API tokens, privileged
+usernames, certificates, connection strings, and similar) into any plan document. When a plan must
+reference a secret, name the environment variable (e.g. `DATABASE_URL`) or use a placeholder
+(`<API_TOKEN>`); the real value lives in an uncommitted `.env*` file (except `.env.example`) or
+another gitignored file.
+
 ### Keep Plans Focused
 
 - One plan per project or major feature

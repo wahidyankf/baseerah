@@ -148,6 +148,7 @@ Tutorial creation, structure, naming, and content standards applying to **all tu
 
 Security conventions governing how agents and contributors interact with sensitive repository artifacts.
 
+- [No Secrets in Git](./security/no-secrets-in-git.md) - The hard iron rule: no system secret (SSH/private keys, passwords, API tokens, privileged usernames, certificates, connection strings, and similar) may ever be committed to any git-tracked file. Real secret values belong in uncommitted `.env*` files (except `.env.example`) or other gitignored files. The broad governing rule that `guard-env-file-access` partially enforces. **Agents**: repo-rules-checker, repo-rules-fixer
 - [Environment File Access](./security/env-file-access.md) - The `guard-env-file-access` policy. AI agents must not directly read, write, edit, or commit any `.env*` file except `.env.example`. Covers the script carve-out, trust boundary, git-commit prevention (gitignore + pre-commit guard), cross-platform enforcement paths, and known gaps with accepted compensating controls. **Agents**: repo-rules-checker, repo-rules-fixer
 
 ## Related Documentation

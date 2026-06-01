@@ -335,7 +335,9 @@ API_KEY=sk_test_local
 
 **Rationale:**
 
-- No secrets in code
+- No secrets in code — see
+  [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md) for the full hard
+  iron rule governing all git-tracked files, not just source code
 - Environment-specific config
 - Safe local development
 - 12-factor app compliance
@@ -502,6 +504,8 @@ git pull origin main  # Always rebases for main branch
 - [Implementation Workflow Convention](./implementation.md) - Three-stage methodology
 - [Reproducible Environments Convention](./reproducible-environments.md) - Environment practices
 - [Best Practices](./best-practices.md) - Recommended patterns
+- [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md) - Hard iron rule
+  governing Anti-Pattern 9 and all committed files: no system secret may ever enter git history
 
 ## Conclusion
 

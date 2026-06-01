@@ -229,6 +229,11 @@ git commit -m "chore: update dependencies"
 
 **Pattern**: Committed example, gitignored actual config.
 
+**Hard iron rule**: Real secret values never enter git. Per the
+[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md), `.env.example` (the
+committed template) contains placeholders only; real secrets live exclusively in uncommitted `.env*`
+files (except `.env.example`) or other gitignored files.
+
 **.env.example** (committed to git):
 
 ```bash

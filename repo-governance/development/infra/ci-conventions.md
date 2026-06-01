@@ -431,7 +431,9 @@ Every app with runtime configuration must satisfy these requirements:
   etc.) must never be committed. The root `.gitignore` must include `**/.env*.local`.
 - **No hardcoded secrets in CI workflows**: GitHub Actions workflows must reference secrets via
   `${{ secrets.SECRET_NAME }}`. Plain-text credentials must never appear in workflow YAML files,
-  even in non-production environments.
+  even in non-production environments. This is one enforcement point of the broader
+  [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md), which is the
+  hard iron rule governing all git-tracked files in this repository.
 
 When a new variable is added to an app, the developer must update `.env.example` in the same
 commit. CI will fail if the app starts without the variable, surfacing the omission early.

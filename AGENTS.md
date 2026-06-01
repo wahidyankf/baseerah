@@ -328,6 +328,8 @@ Write the failing test first, then make it pass, then refactor — Red → Green
 
 Volta for Node.js/npm pinning, package-lock.json, .env.example.
 
+**Hard iron rule — no secrets in git**: Never commit system secrets (keys, passwords, tokens, privileged usernames, certificates, connection strings, and similar) to ANY git-tracked file; git history is permanent. Real values go in uncommitted `.env*` files (except `.env.example`) or other gitignored files; committed files use placeholders or env-var references only. Binds agents and humans alike. See [No Secrets in Git convention](./repo-governance/conventions/security/no-secrets-in-git.md).
+
 **Guardrail**: Agents must not directly read, write, edit, or commit real `.env*` files — only `.env.example` is permitted directly; project scripts under `apps/`/`libs/`/`scripts/` are exempt. See [guard-env-file-access convention](./repo-governance/conventions/security/env-file-access.md).
 
 **See**: [repo-governance/development/workflow/reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md)
@@ -574,6 +576,7 @@ Project planning in `plans/` folder:
 
 ## Important Notes
 
+- **Never commit secrets** (hard iron rule): No system secret goes into any git-tracked file; real values belong in uncommitted `.env*` files (except `.env.example`) or other gitignored files. See [No Secrets in Git convention](./repo-governance/conventions/security/no-secrets-in-git.md).
 - **Do NOT stage or commit** unless explicitly instructed. Per-request commits one-time only.
 - **License**: MIT. See [LICENSING-NOTICE.md](./LICENSING-NOTICE.md)
 - **Agent invocation**: Use natural language to invoke agents/workflows

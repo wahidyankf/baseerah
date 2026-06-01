@@ -21,6 +21,11 @@ commits of sensitive files, and related security events.
 
 ## Conventions
 
+- [No Secrets in Git](./no-secrets-in-git.md) — The hard iron rule that no system secret (SSH/private
+  keys, passwords, API tokens, privileged usernames, certificates, connection strings, and similar)
+  may ever be committed to any git-tracked file in this repository. Real secret values belong in
+  uncommitted `.env*` files (except `.env.example`) or other gitignored files. The broad governing
+  rule that `guard-env-file-access` partially enforces.
 - [Environment File Access](./env-file-access.md) — The `guard-env-file-access` policy. AI agents
   must not directly read, write, edit, or commit any `.env*` file except `.env.example`. Covers the
   script carve-out, trust boundary, git-commit prevention (gitignore + pre-commit guard), cross-platform
