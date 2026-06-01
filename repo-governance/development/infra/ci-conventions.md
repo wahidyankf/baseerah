@@ -50,6 +50,10 @@ level definitions, coverage thresholds, Docker patterns, GitHub Actions structur
   definitions (unit, integration, E2E) and the isolation rules enforced here derive from the
   authoritative three-level testing standard.
 
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The
+  no-hardcoded-secrets rule for CI workflows is one enforcement point of the broader hard iron rule
+  that no system secret may ever be committed to any git-tracked file.
+
 ## Git Hooks Standard
 
 All developer machines run three Husky hooks. Hook logic is implemented via `rhino-cli` subcommands

@@ -37,6 +37,8 @@ This practice implements/respects the following conventions:
 
 - **[Trunk Based Development](./trunk-based-development.md)**: Reproducible CI/CD environments ensure consistent validation of commits to main branch. No environment-specific failures.
 
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The `.env.example` template carries placeholders only; real secret values stay in uncommitted `.env*` files, keeping secrets out of version control while configuration shape remains reproducible.
+
 ## Overview
 
 Reproducible environments require:

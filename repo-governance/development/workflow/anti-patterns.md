@@ -536,3 +536,4 @@ When implementing workflows, ask: **Am I adding collaboration or friction?** If 
 - **[Content Quality Principles](../../conventions/writing/quality.md)**: Active voice, clear problem/solution format in documentation
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Workflow documents follow standardized kebab-case naming
 - **[Linking Convention](../../conventions/formatting/linking.md)**: GitHub-compatible links to related workflow documentation
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The hard iron rule governing Anti-Pattern 9 — no system secret may ever enter git history

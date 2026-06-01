@@ -33,6 +33,8 @@ This practice implements/respects the following conventions:
 
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Configuration template files follow the standard naming pattern (e.g., `.env.example`) so they are discoverable and version-controlled without exposing real values.
 
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The credential/secret subset of machine-specific information is governed by the hard iron rule — no system secret may ever be committed; real values stay in uncommitted `.env*` files.
+
 ## Overview
 
 Every developer works on a different machine. Absolute paths, usernames, local IP addresses, and environment-specific configuration reflect one person's setup. When these values enter the git history, they cause two classes of harm:
