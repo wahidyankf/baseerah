@@ -87,6 +87,7 @@ Validate that completed plan implementation:
 - All implementation steps checked and documented
 - All per-phase validation completed
 - All phase acceptance criteria verified
+- Each `### Phase N Gate` passed before the next phase's work began; `[HUMAN]` steps show genuine human-confirmation evidence (see Step 5g)
 - Progress tracking is comprehensive
 
 ### 4. Code Quality
@@ -411,3 +412,41 @@ For every relative cross-link in plan files:
 - Library upgrades during execution may have outdated cited versions.
 
 Both gates exist for a reason; do not skip Step 5f under time pressure.
+
+### 11. Verify Executor Tags and Phase Gates Were Honored (Step 5g — MANDATORY)
+
+After post-execution anti-hallucination (Step 5f), verify the executor respected the executor-tag
+and phase-gate structure from
+[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and [§Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
+
+#### What to Validate
+
+1. **`[HUMAN]` items were genuinely handed off, not auto-faked**
+   - For each `[HUMAN]` (or `[AI+HUMAN]`) checkbox in `delivery.md`, the implementation notes MUST
+     show a human confirmation (operator note, timestamp, or explicit "confirmed by user"), not an
+     agent-fabricated completion. An `[HUMAN]` item ticked with only generic agent prose and no
+     human-confirmation evidence: **HIGH** finding per occurrence (the agent likely faked a step it
+     could not perform).
+   - If a physical or out-of-band action was clearly impossible for an agent yet shows tool-based
+     completion: **CRITICAL** finding (fabricated execution of a human-only step).
+
+2. **Phase gates were satisfied before the next phase began**
+   - Each phase MUST have its `### Phase N Gate` checkboxes all ticked before any phase N+1 work
+     item was ticked. Use git history (`git log --follow -p delivery.md` or commit ordering) to
+     confirm gate items closed before next-phase items. Out-of-order completion (phase N+1 started
+     while phase N's gate was red): **HIGH** finding per occurrence.
+   - A gate whose checkboxes are ticked but whose verification commands now fail when re-run:
+     **HIGH** finding (gate was ticked without actually passing).
+
+3. **Pause Safety notes present**
+   - Each phase gate is followed by a `> **Pause Safety**:` note. Missing: **MEDIUM** per phase
+     (structural; should have been caught by `plan-checker`, but verify at archival too).
+
+#### Finding Severity
+
+- Fabricated completion of a human-only step: **CRITICAL**
+- `[HUMAN]` item ticked without human-confirmation evidence: **HIGH** per occurrence
+- Phase N+1 started before phase N's gate was green: **HIGH** per occurrence
+- Gate ticked but verification command re-run fails: **HIGH** per occurrence
+- Missing Pause Safety note: **MEDIUM** per phase

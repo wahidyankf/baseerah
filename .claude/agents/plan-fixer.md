@@ -500,6 +500,72 @@ For each offending checkbox, derive the missing elements:
 
 After rewriting, re-read the checkbox and confirm a sonnet-tier agent could execute it without consulting any other section of the plan. If the rewrite still requires lookups, repeat until the checkbox is self-contained.
 
+## Executor-Tagging and Phase-Gate Fixes (Step 5h Findings)
+
+When `plan-checker` reports executor-tag or phase-gate findings per
+[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and [§Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule),
+apply these fixes.
+
+### 1. Missing Executor Legend
+
+**HIGH confidence** — insert the canonical Legend as the first lines of `delivery.md` (before
+`## Worktree`), or at the top of the Delivery Checklist section of a single-file plan:
+
+```markdown
+> **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
+> `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
+> privileged-credential handling). `[AI+HUMAN]`: agent prepares, human approves or finishes.
+```
+
+### 2. Human-Only Step Tagged [AI]
+
+**HIGH confidence** when the action is unambiguously human-only (physical action, out-of-band
+approval, real-credential handling outside a sanctioned `[AI]` channel): prepend `[HUMAN]` to the
+checkbox and ensure its acceptance criterion is phrased as a human confirmation. **MEDIUM** (manual
+review) when it is unclear whether a sanctioned `[AI]` channel exists — do not guess; flag it.
+
+### 3. Over-Tagged [HUMAN] Mechanical Step
+
+**HIGH confidence** when a file edit, shell command, or grep is tagged `[HUMAN]` with no
+justification: retag `[AI]`. **FALSE_POSITIVE** when the plan documents a real reason the agent must
+not perform it (e.g., a sanctioned-channel exception explicitly declined).
+
+### 4. Missing `### Phase N Gate`
+
+**HIGH confidence** — append a gate to the offending phase, derived from that phase's work items:
+each gate checkbox re-asserts the observable acceptance criterion of the phase's key items as a
+verbatim verification command. Template:
+
+```markdown
+### Phase N Gate
+
+> All checks below must pass before starting Phase N+1.
+
+- [ ] [AI] `<verification command derived from a phase work item>` — <acceptance>
+
+> **Pause Safety**: <coherent state after this phase>. Safe to stop. To resume: `<re-verify command>`.
+```
+
+If the phase's work items lack concrete acceptance criteria to derive gate checks from, classify
+**MEDIUM** (manual review) rather than inventing verification commands.
+
+### 5. Missing Pause Safety Note
+
+**HIGH confidence** when a `### Phase N Gate` exists but has no following `> **Pause Safety**:`
+blockquote: add one stating the safe-to-stop state and the single resume/re-verify command, derived
+from the phase's effect. If the phase's coherent end-state cannot be summarized confidently,
+classify **MEDIUM**.
+
+### Confidence Assessment
+
+- **HIGH**: missing legend, missing gate, missing Pause Safety note, unambiguous human-only step
+  mis-tagged `[AI]`, unjustified `[HUMAN]` on a mechanical step — all mechanically derivable.
+- **MEDIUM**: sanctioned-channel ambiguity, or a gate/Pause-Safety note that cannot be derived
+  without authoring judgment — skip auto-apply, write to `## Manual Review Required`.
+- **FALSE_POSITIVE**: a documented sanctioned-channel exception, or a legend/gate that exists under
+  slightly different wording — document per the Skip-List protocol.
+
 ## Anti-Hallucination Fixes (Step 5f Findings)
 
 When `plan-checker` reports Anti-Pattern Catalog violations (AP-1 through AP-10) per the

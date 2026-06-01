@@ -170,7 +170,7 @@ If a task is `completed` but the checkbox is `- [ ]`, OR a checkbox is `- [x]` b
 These rules govern ALL execution steps. No exception. No shortcut.
 
 1. **Granular Task Tracking (1:1 with delivery.md) — NON-NEGOTIABLE**: The harness task list IS the user's primary observability surface (see [Harness Task List as Primary Observability Surface](#harness-task-list-as-primary-observability-surface) above). Exactly ONE `TaskCreate` per delivery checklist item, including every nested `- [ ]` sub-bullet — sub-bullets are NEVER rolled into their parent. Task `subject` MUST short-form the checkbox text (drop articles, keep verb + object, ≤80 chars). At most ONE task in `in_progress` at any moment. Mark `in_progress` BEFORE any tool call advancing that item. Mark `completed` ONLY after the checkbox is ticked on disk AND the implementation-notes block is persisted under the ticked checkbox. FORBIDDEN: coarse tasks ("Execute Phase 2", "Apply fixes"), bulk creation ("one task per phase"), silent batch-completion (multiple checkboxes ticked in one `Edit` while one `TaskUpdate` closes), speculative completion (closing a task before disk reflects done state), title rewriting (renaming a task to summarize multiple items). Violations corrupt the user's view of execution and MUST trigger immediate rollback + reconciliation (disk wins).
-2. **Never Stop Before All Done**: Execute ALL items from first to last without stopping. No pauses between phases. No skipping items. The only acceptable stop is a hard technical blocker.
+2. **Never Stop Before All Done (except [HUMAN] gates)**: Execute ALL `[AI]` items from first to last without stopping. No pauses between phases for `[AI]` work. No skipping items. The acceptable stops are: a hard technical blocker, OR a `[HUMAN]` / `[AI+HUMAN]` checkbox (including a `[HUMAN]` phase gate). At a `[HUMAN]` item the orchestrator STOPS, surfaces the item to the user with its acceptance criterion, and waits for the human to confirm completion before resuming — this is a legitimate, expected stop per [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule). Unmarked checkboxes are treated as `[AI]`.
 3. **Fix ALL Issues — Including Preexisting**: When ANY test, lint, typecheck, or quality gate fails — fix it. Even if it existed before your changes. Do NOT defer. Do NOT skip. Commit preexisting fixes separately.
 4. **Delivery.md Is Sacred — Atomic Sync Ritual**: After each item's work is done, run the three-step ritual before touching the next item: (a) `Edit` checkbox `- [ ]` → `- [x]` for THIS one item (no `replace_all`), (b) `Edit` implementation-notes block under the ticked checkbox (Date, Status, Files Changed, brief notes), (c) `TaskUpdate completed`. All three MUST land before moving on. If any step fails, roll back the others and leave the task in `in_progress`. Ticking multiple checkboxes in one Edit or deferring notes to end-of-phase is forbidden.
 5. **Local Quality Gates Before Push**: Run `npx nx affected -t typecheck lint test:quick spec-coverage` before every push. Fix ALL failures. Do NOT push with any failing check.
@@ -265,6 +265,7 @@ Execute all delivery checklist items sequentially, delegating each to the approp
 For each checklist item in reading order (phase by phase, item by item, including nested sub-bullets):
 
 1. **`TaskUpdate in_progress`** on the matching task. At most ONE `in_progress` at a time.
+   1a. **Executor-tag check (HARD GATE — [AI] vs [HUMAN])**: read the checkbox's leading tag. If it is `[HUMAN]` (or the human portion of an `[AI+HUMAN]` item), STOP autonomous execution: surface the item to the user verbatim with its acceptance criterion and any context they need, and wait for the user to confirm it is done before ticking the checkbox and continuing. Do NOT fabricate completion of a human-only step. For `[AI+HUMAN]`, perform the agent-preparable portion first, then hand off the human portion. `[AI]` (or unmarked) items proceed normally. See [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
 2. **Pre-Item Repo-Grounding (HARD GATE — Anti-Hallucination)**: before delegating, repo-ground every claim in the checkbox per the [Plan Anti-Hallucination Convention §Repo-Grounding Rule](../../development/quality/plan-anti-hallucination.md#repo-grounding-rule-hard):
    - For each cited file path: `Bash test -f <path>`. If missing AND not marked `_New file_`: HALT the item, escalate to user with the failing path (do not invent a substitute).
    - For each cited Nx target: `jq -r '.targets | keys[]' apps/<project>/project.json | grep -qx '<target>'`. If missing AND not marked `_New target_`: HALT the item.
@@ -294,14 +295,23 @@ Nested sub-checkboxes iterate the same loop. A parent `- [ ]` can only be ticked
 
 - Stop ONLY if a task fails and CANNOT be resolved after retry.
 - Stop ONLY if a critical decision requires user input that cannot be inferred.
+- Stop at a `[HUMAN]` / `[AI+HUMAN]` item (including a `[HUMAN]` phase gate) — hand off to the user, wait for confirmation, then resume. This is the one expected mid-execution pause.
 - Stop ONLY when ALL items are complete.
-- NEVER stop between phases.
+- NEVER stop between phases for `[AI]` work (a `[HUMAN]` gate is the sole exception).
 - NEVER batch-tick checkboxes, batch-complete tasks, or defer implementation notes.
 - NEVER skip an item — if genuinely not applicable, add a note explaining why and tick it.
 
 ### 2b. Per-Phase Quality Gate (Sequential, After Each Phase)
 
-After completing all items in a delivery phase, run quality gates before proceeding.
+After completing all items in a delivery phase, satisfy that phase's gate before proceeding.
+
+**Phase gate is on-disk**: each phase in `delivery.md` ends with a `### Phase N Gate` (a must-pass
+verification checklist) followed by a `> **Pause Safety**:` note, per [Plans Organization Convention §Phases as Natural Pauses With Clear Gates](../../conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
+Execute each gate checkbox like any other item (it is part of the 1:1 task mapping), confirm every
+gate check passes, and only then start phase N+1. A gate item tagged `[HUMAN]` is a hand-off — stop
+and wait for the user (Iron Rule 2). The phase boundary is a natural pause point: after the gate is
+green the tree is coherent and execution could safely stop and resume later. The Nx commands below
+are the standard verification a code phase's gate asserts.
 
 **Orchestrator action**:
 

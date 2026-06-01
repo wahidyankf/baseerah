@@ -189,6 +189,11 @@ Cover (each as a structured multiple-choice question):
 - Is the `## Worktree` section present in `delivery.md`?
 - Is Phase 0 (Environment Setup and Baseline) the first phase in `delivery.md`, with
   `repo-setup-manager` as the designated executor?
+- Does `delivery.md` open with the `[AI]`/`[HUMAN]` executor legend, and is every step that
+  only a human can perform (physical action, out-of-band approval, real-credential handling)
+  tagged `[HUMAN]` rather than `[AI]`?
+- Does every phase end with a `### Phase N Gate` (must-pass verification checklist) followed by
+  a `> **Pause Safety**:` note, so each phase boundary is a safe stopping point?
 - **Harness-neutrality**: If the plan scope includes `.claude/agents/`, `.opencode/agents/`,
   or `repo-governance/` paths, confirm that no vendor-specific content was introduced into
   governance files. Reference the
@@ -243,6 +248,27 @@ When plan content (any of `README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `deli
   [Plans Organization Convention §Execution-Grade Clarity](../../repo-governance/conventions/structure/plans.md#execution-grade-clarity-hard-rule)
   for the rule, examples, and the bad/good pair. `plan-checker` flags violations as HIGH findings;
   `plan-fixer` rewrites offending items with maximum detail.
+- **Executor tagging — [AI] vs [HUMAN] (HARD RULE)**: every delivery checkbox MUST make clear who
+  can execute it. Tag the START of each checkbox (right after `- [ ]`) with `[AI]` (an agent can
+  fully perform it — the default; unmarked is treated as `[AI]`), `[HUMAN]` (only a human can do
+  it — physical action like unplugging a power cable, out-of-band approval like approving a prod
+  deploy, real-secret or privileged-credential handling, or real-world legal/financial/safety
+  authority), or `[AI+HUMAN]` (agent prepares, human approves/finishes). Open `delivery.md` (or the
+  single-file Delivery Checklist section) with a Legend defining the tags and stating that unmarked
+  steps are `[AI]`. Prefer `[AI]` for anything mechanically doable; reserve `[HUMAN]` for what is
+  genuinely impossible or unsafe for AI (document any sanctioned channel that keeps a seemingly
+  human-only step `[AI]`). `plan-checker` flags an `[AI]`/unmarked checkbox that no agent can
+  perform as HIGH, and a missing legend as MEDIUM. See
+  [Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
+- **Phases as natural pauses with clear gates (HARD RULE)**: structure `delivery.md` so every phase
+  is a natural pause point — at each phase boundary the tree is coherent (compiles, tests pass,
+  nothing half-applied). End every phase with a `### Phase N Gate` subsection: a must-pass
+  verification checklist of `[AI]` commands with concrete acceptance criteria, immediately followed
+  by a `> **Pause Safety**:` blockquote naming the safe-to-stop state and the single resume/re-verify
+  command. Phase N+1 must not begin while any gate check is failing; order phases so each builds on
+  a green predecessor. A gate MAY be a `[HUMAN]` approval, making the boundary an explicit hand-off.
+  `plan-checker` flags any phase missing a gate as HIGH. See
+  [Plans Organization Convention §Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
 - **Suggested executor annotation**: when a delivery checkbox names a domain that maps cleanly
   to a specialized agent (a specific language file extension, a specific app context, a content
   domain, a governance concern), add a `_Suggested executor: <agent-name>_` annotation under the
@@ -398,23 +424,48 @@ Every delivery plan MUST include these sections. Plans without them will be flag
 When writing the delivery checklist (Step 6), ALWAYS include ALL of the following sections.
 These are non-negotiable.
 
+**0. Executor Legend** (the FIRST lines of `delivery.md`, before `## Worktree`):
+
+```markdown
+> **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
+> `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
+> privileged-credential handling). `[AI+HUMAN]`: agent prepares, human approves or finishes.
+>
+> **Phase Gate** — every phase ends with a `### Phase N Gate` (must-pass verification) plus a
+> `> **Pause Safety**:` note (the safe-to-stop state and the single command to resume). A phase
+> is not complete until its gate is green; do not start phase N+1 while any gate check fails.
+```
+
 **1. Phase 0: Environment Setup and Baseline** (the FIRST phase of every delivery checklist,
-delegated to `repo-setup-manager`):
+delegated to `repo-setup-manager`; note the per-checkbox `[AI]` tags and the closing gate +
+Pause Safety note — the same shape every phase must follow):
 
 ```markdown
 ## Phase 0: Environment Setup and Baseline
 
 > _Executor: repo-setup-manager_
 
-- [ ] Install dependencies in the root worktree: `npm install`
+- [ ] [AI] Install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized
-- [ ] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
+- [ ] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift
-- [ ] [Project-specific setup: env vars, DB, Docker, etc.]
-- [ ] Run existing tests to establish baseline: `nx run [project-name]:test:quick`
+- [ ] [AI] [Project-specific setup: env vars, DB, Docker, etc.]
+- [ ] [AI] Run existing tests to establish baseline: `nx run [project-name]:test:quick`
       — acceptance: baseline pass/fail count recorded; all preexisting failures documented
-- [ ] Resolve all preexisting failures before proceeding
+- [ ] [AI] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved
+
+### Phase 0 Gate
+
+> All checks below must pass before starting Phase 1.
+
+- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` baseline recorded and
+      every preexisting failure resolved (zero unresolved)
+
+> **Pause Safety**: only the local toolchain was verified and the baseline recorded — no feature
+> work exists yet. Safe to stop indefinitely. To resume: re-run the baseline command and confirm
+> it is still clean.
 ```
 
 **2. Local Quality Gates** (before any push step in each phase):

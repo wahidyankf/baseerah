@@ -220,7 +220,9 @@ Read the created plan files and verify structural completeness before the qualit
 4. Verify Gherkin acceptance criteria present in `prd.md` (multi-file) or condensed PRD
 5. Verify the worktree path in the plan matches `<identifier>` confirmed in Step 1
 6. Verify delivery checklist starts with **Phase 0: Environment Setup and Baseline**
-7. If structural gaps found: provide a focused prompt to `plan-maker` or fix trivially via `Edit`
+7. Verify `delivery.md` opens with the `[AI]`/`[HUMAN]` executor legend and that every step only a human can perform is tagged `[HUMAN]`
+8. Verify every phase ends with a `### Phase N Gate` (must-pass verification) followed by a `> **Pause Safety**:` note
+9. If structural gaps found: provide a focused prompt to `plan-maker` or fix trivially via `Edit`
 
 **Output**: Plan structurally complete. Ready for quality gate.
 

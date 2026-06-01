@@ -43,6 +43,8 @@ in codebase reality — read relevant files before asking.
 - Is checklist granularity correct (each item is one concrete action; TDD substeps separate)?
 - Is the `## Worktree` section present?
 - Is Phase 0 (Environment Setup and Baseline) the first phase in `delivery.md`?
+- Does `delivery.md` open with the `[AI]`/`[HUMAN]` executor legend, and is every step that only a human can do tagged `[HUMAN]`?
+- Does every phase end with a `### Phase N Gate` (must-pass verification) followed by a Pause Safety note?
 
 **Do NOT proceed to writing until all pre-write branches are resolved.** Unresolved design
 decisions force expensive rewrites.
@@ -101,7 +103,7 @@ plans/in-progress/complex-feature/
 - **`brd.md`** — WHY: business goal, impact, affected roles, business-level success metrics, business-scope Non-Goals, business risks. Solo-maintainer repo — no sign-off / sponsor / stakeholder ceremony language.
 - **`prd.md`** — WHAT: product overview, personas, user stories, Gherkin acceptance criteria, product scope (in + out), product risks.
 - **`tech-docs.md`** — HOW: architecture, design decisions with rationale, file-impact, dependencies, rollback.
-- **`delivery.md`** — DO: sequential `- [ ]` checklist organized by phase; one concrete action per checkbox.
+- **`delivery.md`** — DO: sequential `- [ ]` checklist organized by phase; one concrete action per checkbox. Opens with the `[AI]`/`[HUMAN]` executor legend; each phase ends with a `### Phase N Gate` (must-pass verification) followed by a Pause Safety note.
 
 **Benefits**: narrow PR diff per concern (business PRs touch brd.md only; product PRs touch prd.md only), sharper agent validation (plan-checker asserts placement per file), industry-norm alignment (BRD + PRD are recognized doc types).
 
@@ -121,7 +123,7 @@ plans/in-progress/simple-feature/
 3. **Business Rationale (condensed BRD)** — why + affected roles + success metrics (gut-based reasoning OK when logic supports it; fabricated KPIs forbidden)
 4. **Product Requirements (condensed PRD)** — user stories + Gherkin acceptance criteria + product scope
 5. **Technical Approach** — architecture, design decisions
-6. **Delivery Checklist** — phased `- [ ]` items
+6. **Delivery Checklist** — phased `- [ ]` items; opens with the `[AI]`/`[HUMAN]` executor legend; every phase ends with a `### Phase N Gate` and a Pause Safety note
 7. **Quality Gates** — local + CI gates
 8. **Verification** — how to confirm done
 
@@ -214,6 +216,55 @@ Plans are executed by **execution-grade (sonnet-tier)** agents, not planning-gra
 ```
 
 See [Plans Organization Convention §Execution-Grade Clarity](../../../repo-governance/conventions/structure/plans.md#execution-grade-clarity-hard-rule) for the authoritative rule.
+
+## Executor Tagging — [AI] vs [HUMAN] (HARD RULE)
+
+Every delivery checklist item MUST make clear **who can execute it**. Some work cannot be done by an AI agent at all — physical actions (unplug a power cable, swap a drive), out-of-band approvals (approve a production deploy, accept a contract), or actions needing real credentials or authority the agent must not hold. Tagging up front lets the executor hand off to the human cleanly instead of fabricating a completion.
+
+**Tags** (placed at the START of the checkbox, right after `- [ ]`):
+
+- **`[AI]`** — an agent can fully perform the step. **Default**: an unmarked checkbox is treated as `[AI]`.
+- **`[HUMAN]`** — only a human can do it (physical action, out-of-band approval/sign-off, real-secret or privileged-credential handling, real-world authority).
+- **`[AI+HUMAN]`** (optional) — agent prepares/drafts; human reviews, approves, or performs the irreversible final action.
+
+**Required legend** — open `delivery.md` (or a single-file plan's Delivery Checklist section) with:
+
+```markdown
+> **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
+> `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
+> privileged-credential handling). `[AI+HUMAN]`: agent prepares, human approves or finishes.
+```
+
+**Default bias**: prefer `[AI]` for anything an agent can mechanically do; reserve `[HUMAN]` for what is genuinely impossible or unsafe for AI. A sanctioned channel that lets an agent do something seemingly human-only (e.g. copying a real secret via an `[AI]`-authored script through the `guard-env-file-access` path) stays `[AI]` — document the channel inline.
+
+**Execution semantics**: the [plan-execution workflow](../../../repo-governance/workflows/plan/plan-execution.md) STOPS at a `[HUMAN]` item, surfaces it with the acceptance criterion, and waits for the human to confirm before continuing. This is a legitimate stop that overrides "never stop between phases".
+
+## Phases as Natural Pauses With Clear Gates (HARD RULE)
+
+Every phase MUST be a **natural pause point** that ends with a **clear gate**. A reader (human or AI) must be able to stop after any phase and find the repository coherent — code compiles, tests pass, nothing half-applied, no known-red build carried forward.
+
+- **Clear gate**: every phase ends with a `### Phase N Gate` subsection — a must-pass verification checklist naming exact commands and observable acceptance criteria. Phase N+1 MUST NOT begin while any gate check is failing.
+- **Pause Safety note**: immediately after the gate, add a `> **Pause Safety**:` blockquote stating the safe-to-stop state and the single command to resume/re-verify.
+
+**Template**:
+
+```markdown
+## Phase N: <name>
+
+- [ ] [AI] <work item> — acceptance: <observable outcome>
+
+### Phase N Gate
+
+> All checks below must pass before starting Phase N+1.
+
+- [ ] [AI] `<verification command>` — <acceptance>
+
+> **Pause Safety**: <coherent state after this phase>. Safe to stop. To resume: `<re-verify command>`.
+```
+
+Phase 0 (Environment Setup and Baseline) already follows this shape — its gate is the recorded clean baseline. A gate MAY be a `[HUMAN]` approval, making the boundary an explicit hand-off point.
+
+See [Plans Organization Convention §Executor Tagging](../../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) and [§Phases as Natural Pauses With Clear Gates](../../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule) for the authoritative rules.
 
 ## Pre-Write Verification (Anti-Hallucination — HARD)
 

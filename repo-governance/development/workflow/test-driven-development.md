@@ -238,6 +238,11 @@ independent checkbox. `plan-checker` flags combined items as HIGH findings.
 `plan-checker` flags delivery checklist items that reference code changes without this
 three-substep structure as a HIGH finding.
 
+These RED/GREEN/REFACTOR substeps are `[AI]` work — each checkbox also carries the `[AI]`/`[HUMAN]`
+executor tag, and the phase they belong to ends with a `### Phase N Gate` plus a Pause Safety note,
+per [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and [§Phases as Natural Pauses With Clear Gates](../../conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
+
 ## Enforcement
 
 The pre-push hook runs `test:quick` for affected projects before every push. A code change with

@@ -110,6 +110,8 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - Git workflow is specified
 - **TDD-shaped steps**: Any checklist item that ships code MUST have a corresponding test-first step (Red→Green→Refactor structure). Flag as **HIGH** any code delivery item that does not include a failing-test step before the implementation step. See [Test-Driven Development Convention](../../repo-governance/development/workflow/test-driven-development.md) for required TDD step shapes.
 - **Execution-grade clarity (HARD RULE)**: every checkbox MUST name explicit file path(s) (or maximum-possible-detail target when path is unknowable), verbatim shell command(s) when applicable, and a concrete acceptance criterion. Flag as **HIGH** any checkbox whose action is not unambiguously executable by a sonnet-tier agent without consulting additional context — bare "implement X", "set up Y", "configure Z", "add caching" are violations. See [Plans Organization Convention §Execution-Grade Clarity](../../repo-governance/conventions/structure/plans.md#execution-grade-clarity-hard-rule).
+- **Executor tagging (HARD RULE)**: `delivery.md` MUST open with the `[AI]`/`[HUMAN]` legend, and any step only a human can perform (physical action, out-of-band approval, real-credential handling) MUST be tagged `[HUMAN]`, not `[AI]`/unmarked. See Step 5h below and [Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
+- **Phases as natural pauses with clear gates (HARD RULE)**: every phase MUST end with a `### Phase N Gate` (must-pass verification) followed by a `> **Pause Safety**:` note. See Step 5h below and [Plans Organization Convention §Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
 
 #### PR Step Authorization Check (per [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md))
 
@@ -550,3 +552,46 @@ Reports CRITICAL if a plan skips this check when in scope.
 - Skill body contains harness-specific syntax: **HIGH**
 - Manual OpenCode skill mirror: **HIGH**
 - Governance change placed under vendor-specific heading: **MEDIUM**
+
+### 14. Executor Tagging and Phase-Gate Validation (Step 5h — MANDATORY HARD RULE)
+
+After the harness-neutrality scan (Step 5g), validate two delivery-checklist structural rules from
+[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and [§Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
+Applies to ALL plans with a delivery checklist.
+
+#### A. Executor Tagging ([AI] vs [HUMAN])
+
+1. **Legend present**: `delivery.md` (or the single-file Delivery Checklist section) MUST open with
+   a Legend defining `[AI]`/`[HUMAN]` (and `[AI+HUMAN]` if used) and stating that unmarked steps are
+   `[AI]`. Missing legend: **MEDIUM**.
+2. **Human-only steps correctly tagged**: scan every checkbox for actions no agent can perform — a
+   physical-world action (unplug/replug hardware, swap a drive, press a physical button), an
+   out-of-band approval or sign-off (approve a production deploy, accept terms with a third party),
+   real-secret or privileged-credential handling outside a sanctioned `[AI]` channel, or a decision
+   requiring real-world legal/financial/safety authority. Any such step tagged `[AI]` or left
+   unmarked: **HIGH** per occurrence (it would force the executor to fabricate a completion).
+3. **Over-tagging**: a purely mechanical step (file edit, shell command, grep) tagged `[HUMAN]`
+   without justification needlessly halts autonomous execution: **MEDIUM** per occurrence.
+
+#### B. Phase Gates and Pause Safety
+
+1. **Every phase ends with a gate**: each `## Phase N` section MUST contain a `### Phase N Gate`
+   subsection as its last block before the next phase. Missing gate: **HIGH** per phase.
+2. **Gate items are concrete**: each gate checkbox MUST name a verbatim verification command and an
+   observable acceptance criterion (same execution-grade bar as Step 5e). Vague gate items
+   ("verify it works"): **MEDIUM** per gate.
+3. **Pause Safety note present**: each gate MUST be immediately followed by a `> **Pause Safety**:`
+   blockquote stating the safe-to-stop state and the single resume/re-verify command. Missing note:
+   **MEDIUM** per phase.
+4. **Natural-pause coherence**: flag **MEDIUM** any phase that visibly ends in a knowingly-broken
+   state (e.g., the last work item introduces a failing build with no in-phase fix and the gate does
+   not assert green) — phases must leave the tree coherent.
+
+#### Finding Severity
+
+- Human-only action tagged `[AI]`/unmarked: **HIGH** per occurrence
+- Phase missing a `### Phase N Gate`: **HIGH** per phase
+- Missing executor legend: **MEDIUM**
+- Over-tagged `[HUMAN]` mechanical step: **MEDIUM** per occurrence
+- Vague gate item / missing Pause Safety note / incoherent phase end: **MEDIUM**
