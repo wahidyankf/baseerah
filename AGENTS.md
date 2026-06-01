@@ -365,9 +365,7 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 
 **Planning**: plan-maker (grills user before and after plan creation using multiple-choice
 options per [Grilling-With-Options Convention](./repo-governance/development/workflow/grilling-with-options.md);
-delivery checklists must begin with Phase 0, tag every step `[AI]` or `[HUMAN]`, and end every
-phase with a `### Phase N Gate` plus a Pause Safety note —
-see [Plans Organization Convention](./repo-governance/conventions/structure/plans.md)),
+delivery checklists: Phase 0 first, tag steps `[AI]`/`[HUMAN]`, gate each phase),
 plan-checker, plan-execution-checker, plan-fixer,
 repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 [plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md) and
