@@ -7,7 +7,7 @@
 > **Phase Gate** — every phase ends with a `### Phase N Gate` (must-pass verification) plus a
 > `> **Pause Safety**:` note (the safe-to-stop state and the single command to resume). A phase
 > is not complete until its gate is green; do not start phase N+1 while any gate check fails.
-
+>
 > **Fix-all-issues**: Fix ALL failures found during quality gates, not just those caused by your
 > changes. This follows the root-cause-orientation principle — proactively fix preexisting errors
 > encountered during work. Commit preexisting fixes separately with appropriate Conventional
