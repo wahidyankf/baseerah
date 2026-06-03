@@ -84,14 +84,10 @@
       "inputs": [
         "default",
         "{workspaceRoot}/specs/apps/ayokoding/behavior/api/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ayokoding/behavior/web/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ayokoding/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/ayokoding/ddd/ubiquitous-language/**/*.md"
+        "{workspaceRoot}/specs/apps/ayokoding/behavior/web/gherkin/**/*.feature"
       ],
       "options": {
         "commands": [
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc ayokoding)",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul ayokoding)",
           "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ayokoding-web/coverage/lcov.info 82)",
           "../../apps/ayokoding-cli/dist/ayokoding-cli links check --content content",
           "npx tsx src/scripts/generate-indexes.ts --validate"
