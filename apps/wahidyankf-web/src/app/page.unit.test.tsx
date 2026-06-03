@@ -1,18 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import Home from "./page";
+import { HomeContent } from "@/features/home/HomeContent";
 import { filterItems } from "@/features/search/search";
 
 // Mock the next/navigation module
 const mockPush = vi.fn();
-const mockGet = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
-  }),
-  useSearchParams: () => ({
-    get: mockGet,
   }),
 }));
 
@@ -82,12 +78,11 @@ vi.mock("@/features/cv/data", () => ({
 
 describe("Home component", () => {
   beforeEach(() => {
-    mockGet.mockReturnValue("");
     vi.clearAllMocks();
   });
 
   it("renders the main sections", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByText("Welcome to My Portfolio")).toBeInTheDocument();
     expect(screen.getByText("About Me")).toBeInTheDocument();
     expect(screen.getByText("Skills & Expertise")).toBeInTheDocument();
@@ -96,49 +91,49 @@ describe("Home component", () => {
   });
 
   it("renders the Navigation component", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByTestId("navigation")).toBeInTheDocument();
   });
 
   it("renders the SearchComponent", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByTestId("search-component")).toBeInTheDocument();
   });
 
   it("renders the about me section", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByText("Test about me")).toBeInTheDocument();
   });
 
   it("renders skills, languages, and frameworks", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByText("Software Engineering")).toBeInTheDocument();
     expect(screen.getByText("JavaScript")).toBeInTheDocument();
     expect(screen.getAllByText("React")).toHaveLength(2);
   });
 
   it("renders quick links", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByText("View My CV")).toBeInTheDocument();
     expect(screen.getByText("Browse My Personal Projects")).toBeInTheDocument();
   });
 
   it("renders connect with me links", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     expect(screen.getByText("Github")).toBeInTheDocument();
     expect(screen.getByText("Linkedin")).toBeInTheDocument();
     expect(screen.getByText("Email")).toBeInTheDocument();
   });
 
   it("updates search term when typing in the search component", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const searchInput = screen.getByTestId("search-component") as HTMLInputElement;
     fireEvent.change(searchInput, { target: { value: "React" } });
     expect(searchInput.value).toBe("React");
   });
 
   it("filters content based on search term", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const searchInput = screen.getByTestId("search-component");
     fireEvent.change(searchInput, { target: { value: "React" } });
 
@@ -146,35 +141,35 @@ describe("Home component", () => {
   });
 
   it("handles item click and navigates to CV page", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const skillButtons = screen.getAllByText("React");
     fireEvent.click(skillButtons[0]);
     expect(mockPush).toHaveBeenCalledWith("/cv?search=React&scrollTop=true");
   });
 
   it("handles language button click and navigates to CV page", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const languageButton = screen.getByText("JavaScript");
     fireEvent.click(languageButton);
     expect(mockPush).toHaveBeenCalledWith("/cv?search=JavaScript&scrollTop=true");
   });
 
   it("handles framework button click and navigates to CV page", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const frameworkButton = screen.getByText("Next.js");
     fireEvent.click(frameworkButton);
     expect(mockPush).toHaveBeenCalledWith("/cv?search=Next.js&scrollTop=true");
   });
 
   it("updates URL when typing in search", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const searchInput = screen.getByTestId("search-component") as HTMLInputElement;
     fireEvent.change(searchInput, { target: { value: "TypeScript" } });
     expect(mockPush).toHaveBeenCalledWith("/?search=TypeScript", { scroll: false });
   });
 
   it("handles TypeScript skill pill click navigates with scrollTop", () => {
-    render(<Home />);
+    render(<HomeContent initialSearchTerm="" />);
     const languageButton = screen.getByText("TypeScript");
     fireEvent.click(languageButton);
     expect(mockPush).toHaveBeenCalledWith("/cv?search=TypeScript&scrollTop=true");

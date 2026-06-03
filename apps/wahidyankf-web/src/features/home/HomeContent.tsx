@@ -2,7 +2,7 @@
 
 import { Briefcase, FolderOpen, Github, Linkedin, Mail, Star, Code, Package } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   cvData,
   getTopSkillsLastFiveYears,
@@ -26,10 +26,8 @@ export type FeaturedSkill = {
   duration: number;
 };
 
-export function HomeContent() {
+export function HomeContent({ initialSearchTerm }: { initialSearchTerm: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialSearchTerm = searchParams.get("search") || "";
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   const aboutMe = cvData.find((entry) => entry.type === "about");

@@ -1,10 +1,6 @@
-import { Suspense } from "react";
 import { HomeContent } from "@/features/home/HomeContent";
 
-export default function Home() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <HomeContent />
-    </Suspense>
-  );
+export default async function Home({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
+  const { search } = await searchParams;
+  return <HomeContent initialSearchTerm={search ?? ""} />;
 }
