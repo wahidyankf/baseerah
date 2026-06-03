@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { HomeContent } from "@/contexts/home/presentation/HomeContent";
+import { HomeContent } from "@/features/home/HomeContent";
 
 export default function Home() {
   return (
