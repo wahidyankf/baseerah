@@ -2,6 +2,8 @@
 @import "tailwindcss";
 @source "../../src/**/*.{ts,tsx}";
 @source "../../../../libs/web-ui/src/**/*.{ts,tsx}";
+/* Exclude markdown content files — prose text is not Tailwind utility source */
+@source not "../../content/**";
 @plugin "@tailwindcss/typography";
 
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
