@@ -6,7 +6,6 @@
 //! `ddd/bounded-contexts.yaml` registry belongs here, regardless of whether
 //! all declared BCs have Gherkin coverage yet.
 //!   - organiclever: bounded-contexts.yaml + feature files present
-//!   - wahidyankf:   bounded-contexts.yaml + feature files present
 //!   - ose-app:      bounded-contexts.yaml present (4 BCs declared); features pending
 
 /// Returns the list of application identifiers that maintain a DDD
@@ -15,7 +14,7 @@
 /// This list drives DDD validation: only apps present here are checked for
 /// context coverage, glossary completeness, and Gherkin alignment.
 pub fn apps_with_ddd() -> &'static [&'static str] {
-    &["organiclever", "wahidyankf", "ose-app"]
+    &["organiclever", "ose-app"]
 }
 
 #[cfg(test)]
@@ -27,7 +26,7 @@ mod tests {
     #[test]
     fn membership() {
         let v = apps_with_ddd();
-        assert_eq!(v.len(), 3);
+        assert_eq!(v.len(), 2);
         assert!(v.contains(&"organiclever"));
         assert!(v.contains(&"ose-app"));
     }

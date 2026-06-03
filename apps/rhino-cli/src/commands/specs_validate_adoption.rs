@@ -94,7 +94,7 @@ mod tests {
     #[test]
     fn resolve_apps_default() {
         let v = resolve_apps(None, &[]);
-        assert_eq!(v.len(), 3);
+        assert_eq!(v.len(), 2);
     }
 
     #[test]

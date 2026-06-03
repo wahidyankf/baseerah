@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn resolve_folders_default() {
         let v = resolve_folders(None, &[]);
-        assert_eq!(v.len(), 3);
+        assert_eq!(v.len(), 2);
         assert!(v[0].starts_with("specs/apps/"));
     }
 
