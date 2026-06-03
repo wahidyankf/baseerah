@@ -20,7 +20,7 @@ import {
   Package,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   CVEntry,
   cvData,
@@ -474,10 +474,8 @@ const WorkExperienceSection = ({
 };
 
 // In the main CV component, update the type of topSkills
-export function CvContent() {
+export function CvContent({ initialSearchTerm, scrollTop }: { initialSearchTerm: string; scrollTop: boolean }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialSearchTerm = searchParams.get("search") || "";
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [showRecentOnly, setShowRecentOnly] = useState(false);
 
@@ -486,15 +484,13 @@ export function CvContent() {
   }, [initialSearchTerm]);
 
   useEffect(() => {
-    const shouldScrollTop = searchParams.get("scrollTop") === "true";
-    if (shouldScrollTop) {
+    if (scrollTop) {
       window.scrollTo(0, 0);
-      // Remove the scrollTop parameter from the URL
       const newURL = new URL(window.location.href);
       newURL.searchParams.delete("scrollTop");
       router.replace(newURL.toString(), { scroll: false });
     }
-  }, [searchParams, router]);
+  }, []);
 
   const updateURL = (term: string) => {
     const newURL = term ? `/cv?search=${encodeURIComponent(term)}` : "/cv";
