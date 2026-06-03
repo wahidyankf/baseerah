@@ -6,7 +6,6 @@ Active project plans currently being worked on.
 
 | Plan                                                                                           | Description                                                                                                                                                                                    |
 | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [ose-web-remove-ddd](./ose-web-remove-ddd/README.md)                                           | Remove DDD scaffolding from `ose-web` (keep hexagonal feature modules); de-DDD `rhino-cli` allowlist.                                                                                          |
 | [wahidyankf-web-remove-ddd-and-hexagonal](./wahidyankf-web-remove-ddd-and-hexagonal/README.md) | Remove DDD **and** hexagonal layout from `wahidyankf-web` (flatten `contexts/` to `features/`); add static-site opt-out clause to the hexagonal-web pattern doc; de-DDD `rhino-cli` allowlist. |
 
 ## Instructions

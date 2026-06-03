@@ -4,6 +4,7 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-06-03: ose-web-remove-ddd](./2026-06-03__ose-web-remove-ddd/README.md) — Remove DDD scaffolding from `ose-web` (keep hexagonal feature modules); de-register from `rhino-cli` DDD allowlist; drop empty `domain/` stubs; align README with `hexagonal-architecture-web.md`. Completed 2026-06-03.
 - [2026-06-03: ayokoding-web-remove-ddd](./2026-06-03__ayokoding-web-remove-ddd/README.md) — Remove DDD scaffolding from `ayokoding-web` (keep hexagonal feature modules); de-register from `rhino-cli` DDD allowlist; drop empty `domain/` stubs; align README with `hexagonal-architecture-web.md`. Preexisting fix: Tailwind v4 content-scan exclusion. Completed 2026-06-03.
 - [2026-05-27: rewrite-crane-cli-fsharp](./2026-05-27__rewrite-crane-cli-fsharp/README.md) — Rewrote `apps/crane-cli/` from Rust back to F# with strict hexagonal (ports-and-adapters) architecture; Impureim Sandwich pattern; TickSpec 2.0.5 + xUnit 2.9.2 BDD tests. Completed 2026-05-27.
 - [2026-05-27: remove-inactive-tech-stack-remnants](./2026-05-27__remove-inactive-tech-stack-remnants/README.md) — Swept Java, Kotlin, Elixir, Clojure, Dart, Python remnants from ose-public: deleted docs, agent files, skill dirs, CI gate jobs, and stale cross-links; removed libs/clojure-openapi-codegen/ and jvm-spring/elixir-phoenix platform-web tool dirs; corrected ose-app infra from F#/dotnet to Rust/Axum; added crane-cli F# projects to open-sharia-enterprise.sln; retained C#/F# (.NET) stack for dotnet interop. Completed 2026-05-27.
