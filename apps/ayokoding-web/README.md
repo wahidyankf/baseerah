@@ -66,9 +66,7 @@ git push origin main:prod-ayokoding-web
 | `navigation` | `[application, presentation]`                 | tRPC `content.getTree` (owned by navigation BC) + sidebar/breadcrumb/toc  |
 | `health`     | `[application]`                               | tRPC `meta.health` liveness probe                                         |
 
-The DDD registry (`specs/apps/ayokoding/ddd/bounded-contexts.yaml`) is the source of truth.
-`rhino-cli ddd bc ayokoding` and `rhino-cli ddd ul ayokoding` enforce the structure on every
-`test:quick` run.
+Each bounded context exposes its public surface through its own `index.ts` barrel in `application/`, `infrastructure/`, and `presentation/` subfolders as applicable.
 
 ## Specs
 
