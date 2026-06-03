@@ -4,9 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                         | Description                                                                                                     |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| [wahidyankf-web-ssr-seo](./wahidyankf-web-ssr-seo/README.md) | Refactor wahidyankf-web pages to SSR via searchParams prop for full-HTML crawlability and per-page SEO metadata |
+| Plan | Description |
+| ---- | ----------- |
 
 ## Instructions
 

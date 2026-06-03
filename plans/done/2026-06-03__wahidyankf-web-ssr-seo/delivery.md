@@ -25,30 +25,38 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 
 > _Executor: `repo-setup-manager`_
 
-- [ ] [AI] Install dependencies from repo root worktree: `npm install`
+- [x] [AI] Install dependencies from repo root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized with `package-lock.json`
-- [ ] [AI] Converge the full polyglot toolchain: `npm run doctor -- --fix`
+  > Date: 2026-06-03 | Status: DONE | Files: none | npm install exited 0; all 20 tools verified by postinstall doctor
+- [x] [AI] Converge the full polyglot toolchain: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift reported
-- [ ] [AI] Run existing unit tests to establish baseline:
+  > Date: 2026-06-03 | Status: DONE | Files: none | All 20 required tools healthy, zero drift
+- [x] [AI] Run existing unit tests to establish baseline:
       `npx nx run wahidyankf-web:test:quick`
       — acceptance: all tests pass (or baseline pass/fail count recorded; every pre-existing
       failure documented before proceeding)
-- [ ] [AI] Run existing E2E typecheck/lint baseline:
+  > Date: 2026-06-03 | Status: DONE | Files: none | 66 tests passed, 9 test files, 80.54% line coverage. No pre-existing failures.
+- [x] [AI] Run existing E2E typecheck/lint baseline:
       `npx nx run wahidyankf-web-fe-e2e:test:quick`
       — acceptance: exits 0
-- [ ] [AI] Resolve all pre-existing failures before proceeding:
+  > Date: 2026-06-03 | Status: DONE | Files: none | TypeScript check passed, exits 0
+- [x] [AI] Resolve all pre-existing failures before proceeding:
       `npx nx run wahidyankf-web:test:quick 2>&1 | tail -20`
       — acceptance: zero test failures remain; any pre-existing failure either fixed or documented
       with its error message before moving on
+  > Date: 2026-06-03 | Status: DONE | Files: none | Zero pre-existing failures — baseline clean
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npx nx run wahidyankf-web:test:quick` exits 0 (or all pre-existing failures are
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+  > Date: 2026-06-03 | Status: DONE | All gates confirmed by repo-setup-manager
+- [x] [AI] `npx nx run wahidyankf-web:test:quick` exits 0 (or all pre-existing failures are
       documented and resolved)
-- [ ] [AI] `npx nx run wahidyankf-web-fe-e2e:test:quick` exits 0
+  > Date: 2026-06-03 | Status: DONE | 66/66 tests passed
+- [x] [AI] `npx nx run wahidyankf-web-fe-e2e:test:quick` exits 0
+  > Date: 2026-06-03 | Status: DONE | TypeScript check passed
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no feature
 > work exists yet. Safe to stop indefinitely. To resume: re-run
@@ -65,33 +73,41 @@ no test update required; TDD exception applies.
 
 ### Step 1.1 — Navigation.tsx: add `"use client"`
 
-- [ ] [AI] Pre-condition: confirm `Navigation.tsx` has no `"use client"` directive yet:
+- [x] [AI] Pre-condition: confirm `Navigation.tsx` has no `"use client"` directive yet:
       `head -1 apps/wahidyankf-web/src/features/app-shell/Navigation.tsx`
       — acceptance: output does NOT contain `"use client"`
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Edit `apps/wahidyankf-web/src/features/app-shell/Navigation.tsx`:
+    > Date: 2026-06-03 | Status: DONE | Output: `import Link from "next/link";` — confirmed no directive
+- [x] [AI] Edit `apps/wahidyankf-web/src/features/app-shell/Navigation.tsx`:
       insert `"use client";` as the very first line (before all imports).
       Verify: `head -1 apps/wahidyankf-web/src/features/app-shell/Navigation.tsx` outputs
       `"use client";`
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Run `npx nx run wahidyankf-web:typecheck`
+    > Date: 2026-06-03 | Status: DONE | Files: apps/wahidyankf-web/src/features/app-shell/Navigation.tsx | Added "use client"; as first line
+- [x] [AI] Run `npx nx run wahidyankf-web:typecheck`
       — acceptance: exits 0 with no TypeScript errors
+  > Date: 2026-06-03 | Status: DONE | typecheck exits 0
 
 ### Commit Guidelines (Phase 1)
 
-- [ ] [AI] Commit Navigation.tsx change:
+- [x] [AI] Commit Navigation.tsx change:
       `git commit -m "refactor(wahidyankf-web): add explicit use client to Navigation.tsx"`
+  > Date: 2026-06-03 | Status: DONE | Commit: e27fe4a34
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `npx nx run wahidyankf-web:typecheck` exits 0
-- [ ] [AI] `npx nx run wahidyankf-web:lint` exits 0
-- [ ] [AI] `npx nx run wahidyankf-web:test:quick` exits 0 — all tests green (Navigation.tsx
+- [x] [AI] `npx nx run wahidyankf-web:typecheck` exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
+- [x] [AI] `npx nx run wahidyankf-web:lint` exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0 (3 pre-existing a11y warnings in test files, not from this change)
+- [x] [AI] `npx nx run wahidyankf-web:test:quick` exits 0 — all tests green (Navigation.tsx
       change introduces no test failures)
-- [ ] [AI] `head -1 apps/wahidyankf-web/src/features/app-shell/Navigation.tsx` outputs
+  > Date: 2026-06-03 | Status: DONE | 66/66 tests pass, 80.63% coverage
+- [x] [AI] `head -1 apps/wahidyankf-web/src/features/app-shell/Navigation.tsx` outputs
       `"use client";`
+  > Date: 2026-06-03 | Status: DONE | Confirmed
 
 > **Pause Safety**: `Navigation.tsx` has an explicit `"use client"` directive; all other files
 > are unchanged. The repo compiles cleanly and all tests are green. Safe to stop. To resume: run
@@ -112,7 +128,7 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
 ### Step 2.1 — `HomeContent` + `page.tsx` (Red → Green → Refactor)
 
-- [ ] [AI] **RED** — Edit `apps/wahidyankf-web/src/app/page.unit.test.tsx`:
+- [x] [AI] **RED** — Edit `apps/wahidyankf-web/src/app/page.unit.test.tsx`:
   - Remove the `useSearchParams` mock (the `mockGet` variable and the `useSearchParams` entry
     in the `vi.mock("next/navigation", ...)` factory).
   - Remove the `Suspense` import if present.
@@ -125,7 +141,8 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
     with a prop-type or import error (confirms RED state: `HomeContent` does not yet accept
     `initialSearchTerm`).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN** — Edit `apps/wahidyankf-web/src/features/home/HomeContent.tsx`:
+    > Date: 2026-06-03 | Status: DONE | Files: apps/wahidyankf-web/src/app/page.unit.test.tsx | Removed mockGet+useSearchParams mock, render HomeContent directly — confirmed RED failure
+- [x] [AI] **GREEN** — Edit `apps/wahidyankf-web/src/features/home/HomeContent.tsx`:
   - Remove `useSearchParams` from the import: delete `, useSearchParams` from the
     `"next/navigation"` import line.
   - Change the `HomeContent` function signature from `export function HomeContent()` to
@@ -153,13 +170,15 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
   - Verify: `npx nx run wahidyankf-web:typecheck` — exits 0 (both files compile together)
   - _Suggested executor: `swe-typescript-dev`_
+    > Date: 2026-06-03 | Status: DONE | Files: HomeContent.tsx, page.tsx | Removed useSearchParams, added initialSearchTerm prop, rewrote page.tsx with async searchParams
 
-- [ ] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:test:quick`
+- [x] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:test:quick`
       — acceptance: all `HomeContent`-related tests pass; coverage thresholds met
+  > Date: 2026-06-03 | Status: DONE | 67 tests pass, 80.37% coverage
 
 ### Step 2.2 — `CvContent` + `cv/page.tsx` (Red → Green → Refactor)
 
-- [ ] [AI] **RED** — Edit `apps/wahidyankf-web/src/app/cv/page.unit.test.tsx`:
+- [x] [AI] **RED** — Edit `apps/wahidyankf-web/src/app/cv/page.unit.test.tsx`:
   - Remove the `useSearchParams` mock (`mockGet` + `useSearchParams` in the navigation mock).
   - Add `mockReplace = vi.fn()` and include `replace: mockReplace` in the `useRouter` mock.
   - Replace page-level render calls with direct content-component rendering:
@@ -170,7 +189,8 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
     with a prop-type error (confirms RED state: `CvContent` does not yet accept
     `initialSearchTerm` / `scrollTop`).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN** — Edit `apps/wahidyankf-web/src/features/cv/CvContent.tsx`:
+    > Date: 2026-06-03 | Status: DONE | cv/page.unit.test.tsx updated — confirmed RED failure
+- [x] [AI] **GREEN** — Edit `apps/wahidyankf-web/src/features/cv/CvContent.tsx`:
   - Remove `useSearchParams` from the `"next/navigation"` import.
   - Change the `CvContent` function signature to:
 
@@ -225,13 +245,15 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
   - Verify: `npx nx run wahidyankf-web:typecheck` — exits 0 (both files compile together)
   - _Suggested executor: `swe-typescript-dev`_
+    > Date: 2026-06-03 | Status: DONE | Files: CvContent.tsx, cv/page.tsx | Removed useSearchParams, added initialSearchTerm+scrollTop props, scrollTop useEffect uses [], added export const metadata
 
-- [ ] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:test:quick`
+- [x] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:test:quick`
       — acceptance: all `CvContent`-related tests pass; `window.scrollTo` mock assertions pass
+  > Date: 2026-06-03 | Status: DONE | 67 tests pass, 82.33% coverage
 
 ### Step 2.3 — `PersonalProjectsContent` + `personal-projects/page.tsx` (Red → Green → Refactor)
 
-- [ ] [AI] **RED** — Edit
+- [x] [AI] **RED** — Edit
       `apps/wahidyankf-web/src/app/personal-projects/page.unit.test.tsx`:
   - Remove the `useSearchParams` mock.
   - Replace page-level render calls with direct content-component rendering:
@@ -294,17 +316,23 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
   - Verify: `npx nx run wahidyankf-web:typecheck` — exits 0 (both files compile together)
   - _Suggested executor: `swe-typescript-dev`_
+    > Date: 2026-06-03 | Status: DONE | Files: PersonalProjectsContent.tsx, personal-projects/page.tsx | Removed Suspense+useSearchParams, added initialSearchTerm prop, added export const metadata
 
-- [ ] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:test:quick`
+- [x] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:test:quick`
       — acceptance: all tests pass including personal-projects tests; overall coverage ≥ 80%
       lines/functions/statements, ≥ 75% branches
+  > Date: 2026-06-03 | Status: DONE | 67 tests pass, 82.08% coverage
 
 ### Local Quality Gates (Phase 2)
 
-- [ ] [AI] Run `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] Run `npx nx affected -t lint` — exits 0
-- [ ] [AI] Run `npx nx affected -t test:quick` — exits 0 with all tests green
-- [ ] [AI] Run `npx nx affected -t spec-coverage` — exits 0
+- [x] [AI] Run `npx nx affected -t typecheck` — exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
+- [x] [AI] Run `npx nx affected -t lint` — exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
+- [x] [AI] Run `npx nx affected -t test:quick` — exits 0 with all tests green
+  > Date: 2026-06-03 | Status: DONE | 67/67 tests pass, 82.08% coverage
+- [x] [AI] Run `npx nx affected -t spec-coverage` — exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your
 > changes. This follows the root cause orientation principle — proactively fix pre-existing
@@ -313,21 +341,27 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
 ### Commit Guidelines (Phase 2)
 
-- [ ] [AI] Commit each content-component + page.tsx pair separately for clean diffs:
+- [x] [AI] Commit each content-component + page.tsx pair separately for clean diffs:
   - `git commit -m "refactor(wahidyankf-web): remove useSearchParams from HomeContent, pass initialSearchTerm prop"`
   - `git commit -m "refactor(wahidyankf-web): remove useSearchParams from CvContent, add scrollTop prop, add export const metadata"`
   - `git commit -m "refactor(wahidyankf-web): remove useSearchParams from PersonalProjectsContent, remove internal Suspense, add export const metadata"`
+    > Date: 2026-06-03 | Status: DONE | Commits: 0ea028ed2, f3802d55b, b2bd78b67 (message shortened to fit 100-char limit)
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `npx nx run wahidyankf-web:test:quick` exits 0 — ALL tests green, coverage ≥ 80%
-- [ ] [AI] `npx nx run wahidyankf-web:typecheck` exits 0
-- [ ] [AI] `npx nx run wahidyankf-web:lint` exits 0
-- [ ] [AI] `npx nx run wahidyankf-web-fe-e2e:test:quick` exits 0
-- [ ] [AI] `grep -r "useSearchParams" apps/wahidyankf-web/src/features/` prints nothing —
+- [x] [AI] `npx nx run wahidyankf-web:test:quick` exits 0 — ALL tests green, coverage ≥ 80%
+  > Date: 2026-06-03 | Status: DONE | 67/67 pass, 82.08% coverage
+- [x] [AI] `npx nx run wahidyankf-web:typecheck` exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
+- [x] [AI] `npx nx run wahidyankf-web:lint` exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
+- [x] [AI] `npx nx run wahidyankf-web-fe-e2e:test:quick` exits 0
+  > Date: 2026-06-03 | Status: DONE | exits 0
+- [x] [AI] `grep -r "useSearchParams" apps/wahidyankf-web/src/features/` prints nothing —
       confirms `useSearchParams` fully removed from all content components
+  > Date: 2026-06-03 | Status: DONE | grep returns nothing — CLEAN
 
 > **Pause Safety**: all three content components accept props, all `page.tsx` files pass props
 > correctly, all unit tests are green, `useSearchParams` is fully absent from content components.
@@ -342,10 +376,10 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
 ### Step 3.1 — Remove `output: "standalone"` from `next.config.ts`
 
-- [ ] [AI] Pre-condition: confirm `output: "standalone"` is present:
+- [x] [AI] Pre-condition: confirm `output: "standalone"` is present:
       `grep -n "standalone" apps/wahidyankf-web/next.config.ts`
       — acceptance: line number printed
-- [ ] [AI] Edit `apps/wahidyankf-web/next.config.ts`: remove the `output: "standalone",`
+- [x] [AI] Edit `apps/wahidyankf-web/next.config.ts`: remove the `output: "standalone",`
       line. The file should become:
 
   ```ts
@@ -363,15 +397,15 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
   Verify: `grep "standalone" apps/wahidyankf-web/next.config.ts` prints nothing.
 
-- [ ] [AI] Run `npx nx run wahidyankf-web:typecheck`
+- [x] [AI] Run `npx nx run wahidyankf-web:typecheck`
       — acceptance: exits 0
 
 ### Step 3.2 — Update Dockerfile to use `next start`
 
-- [ ] [AI] Pre-condition: confirm the Dockerfile copies from `.next/standalone/`:
+- [x] [AI] Pre-condition: confirm the Dockerfile copies from `.next/standalone/`:
       `grep -n "standalone" apps/wahidyankf-web/Dockerfile`
       — acceptance: line numbers printed
-- [ ] [AI] Edit `apps/wahidyankf-web/Dockerfile`: replace the final stage with a
+- [x] [AI] Edit `apps/wahidyankf-web/Dockerfile`: replace the final stage with a
       standard `next start` approach. The full updated Dockerfile:
 
   ```dockerfile
@@ -425,90 +459,90 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
   Verify: `grep "standalone" apps/wahidyankf-web/Dockerfile` prints nothing.
 
-- [ ] [AI] Confirm the build stage still works by running the Nx build:
+- [x] [AI] Confirm the build stage still works by running the Nx build:
       `npx nx run wahidyankf-web:build`
       — acceptance: `apps/wahidyankf-web/.next/` is populated; `.next/standalone/` directory
       is NOT created (confirms `output: "standalone"` was removed)
 
 ### Manual Verification — Docker Build + Start
 
-- [ ] [AI] Build the Docker image from repo root:
+- [x] [AI] Build the Docker image from repo root:
       `docker build -f apps/wahidyankf-web/Dockerfile -t wahidyankf-web-test:local .`
       — acceptance: build completes without error; image `wahidyankf-web-test:local` is listed
       in `docker images`
-- [ ] [AI] Run the Docker image:
+- [x] [AI] Run the Docker image:
       `docker run --rm -d -p 3201:3201 --name wahidyankf-web-test wahidyankf-web-test:local`
       — acceptance: container starts; `docker ps` shows it running
-- [ ] [AI] Verify full HTML is served (no `Loading...`):
+- [x] [AI] Verify full HTML is served (no `Loading...`):
       `curl -s http://localhost:3201/ | grep -c "Loading..."`
       — acceptance: output is `0` (no `Loading...` in response)
-- [ ] [AI] Verify Home page content is in HTML:
+- [x] [AI] Verify Home page content is in HTML:
       `curl -s http://localhost:3201/ | grep -c "Welcome to My Portfolio"`
       — acceptance: output is `1` or greater
-- [ ] [AI] Verify CV page content is in HTML:
+- [x] [AI] Verify CV page content is in HTML:
       `curl -s http://localhost:3201/cv | grep -c "Curriculum Vitae"`
       — acceptance: output is `1` or greater
-- [ ] [AI] Verify Personal Projects page content is in HTML:
+- [x] [AI] Verify Personal Projects page content is in HTML:
       `curl -s http://localhost:3201/personal-projects | grep -c "Personal Projects"`
       — acceptance: output is `1` or greater
-- [ ] [AI] Stop and remove the test container:
+- [x] [AI] Stop and remove the test container:
       `docker stop wahidyankf-web-test`
       — acceptance: container is removed
 
 ### Manual UI Verification (Playwright MCP)
 
-- [ ] [AI] Start dev server: `npx nx run wahidyankf-web:dev` (runs on port 3201)
-- [ ] [AI] Navigate to `http://localhost:3201/` via `browser_navigate`
+- [x] [AI] Start dev server: `npx nx run wahidyankf-web:dev` (runs on port 3201)
+- [x] [AI] Navigate to `http://localhost:3201/` via `browser_navigate`
       — acceptance: page renders with "Welcome to My Portfolio" heading visible; no "Loading..."
       text present in DOM snapshot
-- [ ] [AI] Navigate to `http://localhost:3201/cv?search=TypeScript` via `browser_navigate`
+- [x] [AI] Navigate to `http://localhost:3201/cv?search=TypeScript` via `browser_navigate`
       — acceptance: search input contains "TypeScript"; CV entries visible; no "Loading..."
-- [ ] [AI] Navigate to `http://localhost:3201/personal-projects` via `browser_navigate`
+- [x] [AI] Navigate to `http://localhost:3201/personal-projects` via `browser_navigate`
       — acceptance: projects list visible; no "Loading..."
-- [ ] [AI] Verify cross-page navigation: on Home page, click a skill pill
+- [x] [AI] Verify cross-page navigation: on Home page, click a skill pill
       — acceptance: browser navigates to `/cv?search=<skill>&scrollTop=true`; CV page loads with
       search pre-applied; `scrollTop` param removed from URL after landing
-- [ ] [AI] Check for JS console errors via `browser_console_messages`
+- [x] [AI] Check for JS console errors via `browser_console_messages`
       — acceptance: zero errors in console
-- [ ] [AI] Take screenshots via `browser_take_screenshot` to document visual state
+- [x] [AI] Take screenshots via `browser_take_screenshot` to document visual state
       — acceptance: screenshots captured and reviewed; layout matches expected terminal-style UI
-- [ ] [AI] Stop dev server
+- [x] [AI] Stop dev server
 
 ### Local Quality Gates (Phase 3)
 
-- [ ] [AI] Run `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] Run `npx nx affected -t lint` — exits 0
-- [ ] [AI] Run `npx nx affected -t test:quick` — exits 0
-- [ ] [AI] Run `npx nx affected -t spec-coverage` — exits 0
+- [x] [AI] Run `npx nx affected -t typecheck` — exits 0
+- [x] [AI] Run `npx nx affected -t lint` — exits 0
+- [x] [AI] Run `npx nx affected -t test:quick` — exits 0
+- [x] [AI] Run `npx nx affected -t spec-coverage` — exits 0
 
 ### Commit Guidelines (Phase 3)
 
-- [ ] [AI] Commit infrastructure changes:
+- [x] [AI] Commit infrastructure changes:
   - `git commit -m "refactor(wahidyankf-web): remove output standalone from next.config.ts"`
   - `git commit -m "refactor(wahidyankf-web): update Dockerfile to use next start instead of standalone server.js"`
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push all commits to `main`: `git push origin main`
-- [ ] [AI] Monitor all GitHub Actions workflows triggered by the push
+- [x] [AI] Push all commits to `main`: `git push origin main`
+- [x] [AI] Monitor all GitHub Actions workflows triggered by the push
       — check every 3 minutes via `gh run list --limit 10` then
       `gh run view <run-id> --json status,conclusion`
-- [ ] [AI] Verify ALL CI checks pass — no exceptions
-- [ ] [AI] If any CI check fails, fix immediately and push a follow-up commit
-- [ ] [AI] Repeat until ALL GitHub Actions pass with zero failures
-- [ ] [AI] Do NOT proceed to Phase 4 until CI is fully green
+- [x] [AI] Verify ALL CI checks pass — no exceptions
+- [x] [AI] If any CI check fails, fix immediately and push a follow-up commit
+- [x] [AI] Repeat until ALL GitHub Actions pass with zero failures
+- [x] [AI] Do NOT proceed to Phase 4 until CI is fully green
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `npx nx run wahidyankf-web:build` exits 0 and `.next/standalone/` does NOT exist
-- [ ] [AI] Docker image builds without error (`docker build ...` exits 0)
-- [ ] [AI] `curl -s http://localhost:3201/ | grep -c "Loading..."` returns `0`
-- [ ] [AI] `curl -s http://localhost:3201/ | grep -c "Welcome to My Portfolio"` returns ≥ 1
-- [ ] [AI] `curl -s http://localhost:3201/cv | grep -c "Curriculum Vitae"` returns ≥ 1
-- [ ] [AI] `curl -s http://localhost:3201/personal-projects | grep -c "Personal Projects"` returns ≥ 1
-- [ ] [AI] All GitHub Actions CI checks are green
+- [x] [AI] `npx nx run wahidyankf-web:build` exits 0 and `.next/standalone/` does NOT exist
+- [x] [AI] Docker image builds without error (`docker build ...` exits 0)
+- [x] [AI] `curl -s http://localhost:3201/ | grep -c "Loading..."` returns `0`
+- [x] [AI] `curl -s http://localhost:3201/ | grep -c "Welcome to My Portfolio"` returns ≥ 1
+- [x] [AI] `curl -s http://localhost:3201/cv | grep -c "Curriculum Vitae"` returns ≥ 1
+- [x] [AI] `curl -s http://localhost:3201/personal-projects | grep -c "Personal Projects"` returns ≥ 1
+- [x] [AI] All GitHub Actions CI checks are green
 
 > **Pause Safety**: all code changes are committed and pushed; Docker image produces full HTML
 > without `Loading...`; CI is green. The full refactor is functionally complete. Safe to stop.
@@ -520,46 +554,49 @@ files change together so TypeScript is satisfied), REFACTOR = typecheck + lint +
 
 ### Full Acceptance Criteria Verification
 
-- [ ] [AI] Run full unit test suite one final time:
+- [x] [AI] Run full unit test suite one final time:
       `npx nx run wahidyankf-web:test:quick`
       — acceptance: exits 0; all tests green; coverage ≥ 80% lines/functions/statements
-- [ ] [AI] Run E2E typecheck/lint gate:
+- [x] [AI] Run E2E typecheck/lint gate:
       `npx nx run wahidyankf-web-fe-e2e:test:quick`
       — acceptance: exits 0
-- [ ] [AI] Verify `useSearchParams` is absent from all content components (final check):
+- [x] [AI] Verify `useSearchParams` is absent from all content components (final check):
       `grep -r "useSearchParams" apps/wahidyankf-web/src/features/`
       — acceptance: no output
-- [ ] [AI] Verify `Suspense` is absent from all three `page.tsx` files:
+- [x] [AI] Verify `Suspense` is absent from all three `page.tsx` files:
       `grep "Suspense" apps/wahidyankf-web/src/app/page.tsx apps/wahidyankf-web/src/app/cv/page.tsx apps/wahidyankf-web/src/app/personal-projects/page.tsx`
       — acceptance: no output
-- [ ] [AI] Verify `output: "standalone"` is absent from `next.config.ts`:
+- [x] [AI] Verify `output: "standalone"` is absent from `next.config.ts`:
       `grep "standalone" apps/wahidyankf-web/next.config.ts`
       — acceptance: no output
-- [ ] [AI] Verify `export const metadata` is present in both sub-page route files:
+- [x] [AI] Verify `export const metadata` is present in both sub-page route files:
       `grep -l "export const metadata" apps/wahidyankf-web/src/app/cv/page.tsx apps/wahidyankf-web/src/app/personal-projects/page.tsx`
       — acceptance: both files listed
 
 ### Manual Final Curl Check
 
-- [ ] [AI] Build production once more: `npx nx run wahidyankf-web:build`
+- [x] [AI] Build production once more: `npx nx run wahidyankf-web:build`
       — acceptance: exits 0
-- [ ] [AI] Start production server in a subshell for final verification:
+- [x] [AI] Start production server in a subshell for final verification:
       `cd apps/wahidyankf-web && npx next start -p 3201 &`
-- [ ] [AI] Wait for the production server to be ready:
+- [x] [AI] Wait for the production server to be ready:
       `until curl -sf http://localhost:3201/ > /dev/null; do sleep 1; done`
       — acceptance: command exits (server is accepting connections)
-- [ ] [AI] `curl -s http://localhost:3201/ | grep -c "Loading..."` — acceptance: `0`
-- [ ] [AI] `curl -s http://localhost:3201/cv | grep -F "CV | Wahidyan"` — acceptance: title tag present
-- [ ] [AI] `curl -s http://localhost:3201/personal-projects | grep -F "Personal Projects | Wahidyan"` — acceptance: title tag present
-- [ ] [AI] Kill the background Next.js process after verification:
+- [x] [AI] `curl -s http://localhost:3201/ | grep -c "Loading..."` — acceptance: `0`
+- [x] [AI] `curl -s http://localhost:3201/cv | grep -F "CV | Wahidyan"` — acceptance: title tag present
+- [x] [AI] `curl -s http://localhost:3201/personal-projects | grep -F "Personal Projects | Wahidyan"` — acceptance: title tag present
+- [x] [AI] Kill the background Next.js process after verification:
       `pkill -f "next start" || true`
       — acceptance: command exits 0; process is stopped
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items above are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI)
-- [ ] [AI] Verify ALL manual assertions pass (Docker curl + Playwright MCP)
+- [x] [AI] Verify ALL delivery checklist items above are ticked
+  > Date: 2026-06-03 | Status: DONE | All 106 Phase 0-4 checkboxes ticked
+- [x] [AI] Verify ALL quality gates pass (local + CI)
+  > Date: 2026-06-03 | Status: DONE | test:quick 67/67, typecheck, lint, spec-coverage all pass; CI run 26892513005 success
+- [x] [AI] Verify ALL manual assertions pass (Docker curl + Playwright MCP)
+  > Date: 2026-06-03 | Status: DONE | Docker: Loading...=0, Welcome/CV/Projects content present. Playwright: all 3 pages verified, cross-page nav works, no JS errors from wahidyankf-web
 - [ ] [AI] Move plan to done:
       `git mv plans/in-progress/wahidyankf-web-ssr-seo/ plans/done/2026-06-03__wahidyankf-web-ssr-seo/`
       (replace `2026-06-03` with the actual completion date)
