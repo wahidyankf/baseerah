@@ -35,7 +35,7 @@ nx run wahidyankf-web:lint
 # Unit tests (Vitest 4, jsdom)
 nx run wahidyankf-web:test:unit
 
-# Fast pre-push gate: ddd bc → ddd ul → unit tests + coverage ≥80%
+# Fast pre-push gate: unit tests + coverage ≥80%
 nx run wahidyankf-web:test:quick
 
 # Integration tests (node environment; empty at adoption time)
@@ -63,19 +63,22 @@ using Playwright-BDD and `@axe-core/playwright` for WCAG 2.1 AA smoke.
 Platform-agnostic specifications for this app live at
 [`specs/apps/wahidyankf/`](../../specs/apps/wahidyankf/README.md):
 
-- **Five-folder C4 + DDD tree**: `product/`, `system-context/`, `containers/`,
+- **Five-folder C4 tree**: `product/`, `system-context/`, `containers/`,
   `components/`, `behavior/`
-- **DDD registry**: [`specs/apps/wahidyankf/ddd/bounded-contexts.yaml`](../../specs/apps/wahidyankf/ddd/bounded-contexts.yaml) —
-  five bounded contexts (`app-shell`, `home`, `cv`, `personal-projects`, `search`)
-- **Ubiquitous-language glossaries**:
-  [`specs/apps/wahidyankf/ddd/ubiquitous-language/`](../../specs/apps/wahidyankf/ddd/ubiquitous-language/README.md)
 - **Gherkin features**:
   [`specs/apps/wahidyankf/behavior/web/gherkin/`](../../specs/apps/wahidyankf/behavior/web/gherkin/README.md) —
-  7 feature files organized per bounded context
+  7 feature files organized per feature module
 
-`rhino-cli ddd bc wahidyankf` and `rhino-cli ddd ul wahidyankf` run as the first
-two commands in `test:quick` to enforce structural and vocabulary invariants before
-unit tests run.
+## Architecture
+
+This app uses a flat feature-module layout (`src/features/<name>/`) rather than the full
+hexagonal `contexts/<name>/{domain,application,infrastructure,presentation}/` layout. It
+qualifies for this exemption — defined in
+[`repo-governance/development/pattern/hexagonal-architecture-web.md`](../../repo-governance/development/pattern/hexagonal-architecture-web.md#exemptions)
+— because it renders static content with no IO ports and no business invariants to guard.
+
+Each feature directory is self-contained and imports only from sibling features or shared
+libraries.
 
 ## Deployment
 
@@ -90,25 +93,19 @@ apps/wahidyankf-web/
 ├── public/                   # Static assets (favicon, fonts)
 ├── src/
 │   ├── app/                  # Next.js App Router routing shell (thin wrappers)
-│   │   ├── cv/page.tsx       # Routes to CvContent from cv context
+│   │   ├── cv/page.tsx       # Routes to CvContent from cv feature
 │   │   ├── personal-projects/page.tsx
 │   │   ├── fonts/            # GeistVF, GeistMonoVF woff
 │   │   ├── layout.tsx
 │   │   ├── head.tsx
-│   │   ├── page.tsx          # Routes to HomeContent from home context
+│   │   ├── page.tsx          # Routes to HomeContent from home feature
 │   │   └── globals.css       # Tailwind 4 entry
-│   ├── contexts/             # DDD bounded contexts
-│   │   ├── app-shell/presentation/   # Navigation, style utility
-│   │   ├── cv/
-│   │   │   ├── application/  # data.ts (CVEntry, cvData, helpers), markdown.tsx
-│   │   │   └── presentation/ # CvContent.tsx
-│   │   ├── home/presentation/        # HomeContent.tsx
-│   │   ├── personal-projects/
-│   │   │   ├── application/  # projects.ts (Project, filterProjects)
-│   │   │   └── presentation/ # PersonalProjectsContent.tsx
-│   │   └── search/
-│   │       ├── application/  # search.ts (filterItems, SearchTerm, SearchResult)
-│   │       └── presentation/ # SearchSection.tsx (placeholder)
+│   ├── features/             # Flat feature modules
+│   │   ├── app-shell/        # Navigation, style utility
+│   │   ├── cv/               # data.ts (CVEntry, cvData, helpers), markdown.tsx, CvContent.tsx
+│   │   ├── home/             # HomeContent.tsx
+│   │   ├── personal-projects/ # projects.ts (Project, filterProjects), PersonalProjectsContent.tsx
+│   │   └── search/           # search.ts (filterItems, SearchTerm, SearchResult), SearchSection.tsx
 │   └── test/setup.ts         # Vitest + Testing Library setup
 └── test/unit/steps/          # Gherkin step implementations
 ```
