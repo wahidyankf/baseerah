@@ -8,7 +8,6 @@
 //!   - organiclever: bounded-contexts.yaml + feature files present
 //!   - wahidyankf:   bounded-contexts.yaml + feature files present
 //!   - ose-platform: bounded-contexts.yaml + feature files present
-//!   - ayokoding:    bounded-contexts.yaml + feature files present
 //!   - ose-app:      bounded-contexts.yaml present (4 BCs declared); features pending
 
 /// Returns the list of application identifiers that maintain a DDD
@@ -17,13 +16,7 @@
 /// This list drives DDD validation: only apps present here are checked for
 /// context coverage, glossary completeness, and Gherkin alignment.
 pub fn apps_with_ddd() -> &'static [&'static str] {
-    &[
-        "organiclever",
-        "wahidyankf",
-        "ose-platform",
-        "ayokoding",
-        "ose-app",
-    ]
+    &["organiclever", "wahidyankf", "ose-platform", "ose-app"]
 }
 
 #[cfg(test)]
@@ -35,9 +28,8 @@ mod tests {
     #[test]
     fn membership() {
         let v = apps_with_ddd();
-        assert_eq!(v.len(), 5);
+        assert_eq!(v.len(), 4);
         assert!(v.contains(&"organiclever"));
-        assert!(v.contains(&"ayokoding"));
         assert!(v.contains(&"ose-app"));
     }
 }
