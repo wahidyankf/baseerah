@@ -52,7 +52,7 @@ type ProjectItem = {
   links: Record<string, string>;
 };
 
-vi.mock("@/contexts/search/application/search", () => ({
+vi.mock("@/features/search/search", () => ({
   filterItems: vi.fn((items: ProjectItem[], searchTerm: string) =>
     items.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase())),
   ),

@@ -42,7 +42,7 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
   HighlightText: ({ text }: { text: string }) => <span>{text}</span>,
 }));
 
-vi.mock("@/contexts/search/application/search", () => ({
+vi.mock("@/features/search/search", () => ({
   filterItems: vi.fn((items) => items),
 }));
 

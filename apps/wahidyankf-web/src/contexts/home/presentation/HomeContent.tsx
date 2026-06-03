@@ -12,7 +12,7 @@ import {
 } from "@/contexts/cv/application/data";
 import { Navigation } from "@/features/app-shell/Navigation";
 import { useState, useEffect } from "react";
-import { filterItems } from "@/contexts/search/application/search";
+import { filterItems } from "@/features/search/search";
 import { SearchComponent, HighlightText } from "@open-sharia-enterprise/web-ui";
 import { parseMarkdownLinks } from "@/contexts/cv/application/markdown";
 

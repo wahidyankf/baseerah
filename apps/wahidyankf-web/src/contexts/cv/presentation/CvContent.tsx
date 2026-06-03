@@ -1,7 +1,7 @@
 "use client";
 
 import { Navigation } from "@/features/app-shell/Navigation";
-import { filterItems } from "@/contexts/search/application/search";
+import { filterItems } from "@/features/search/search";
 import {
   Award,
   Briefcase,

@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import Home from "./page";
-import { filterItems } from "@/contexts/search/application/search";
+import { filterItems } from "@/features/search/search";
 
 // Mock the next/navigation module
 const mockPush = vi.fn();
@@ -47,7 +47,7 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
 }));
 
 // Mock the filterItems function
-vi.mock("@/contexts/search/application/search", () => ({
+vi.mock("@/features/search/search", () => ({
   filterItems: vi.fn((items) => items),
 }));
 
