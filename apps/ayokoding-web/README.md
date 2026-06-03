@@ -52,21 +52,30 @@ Deployed to Vercel via production branch `prod-ayokoding-web`.
 git push origin main:prod-ayokoding-web
 ```
 
-## Source Layout (BC-organized)
+## Source Layout
 
-`src/` is organized by **bounded context** (per-BC `application/`, `infrastructure/`,
-`presentation/` subfolders) rather than by technical layer. The 6 bounded contexts:
+`src/` is organized by **hexagonal feature module** under `src/contexts/`. Each module owns
+three layers — `application/`, `infrastructure/`, and `presentation/` — rather than grouping
+code by technical layer across the whole app. The `domain/` layer was removed; domain logic
+lives directly in `application/` for this app. The `contexts/` directory name follows the
+Effect.ts `Context.Tag` convention, not a domain-modeling concept.
 
-| BC           | Layers present                                | Owns                                                                      |
-| ------------ | --------------------------------------------- | ------------------------------------------------------------------------- |
-| `app-shell`  | `[application, presentation]`                 | tRPC root router stitching + chrome (header, footer, theme toggle, ui/)   |
-| `content`    | `[application, infrastructure, presentation]` | tRPC `content.*` procedures + filesystem reader + markdown rendering      |
-| `search`     | `[application, infrastructure, presentation]` | tRPC `search.query` + FlexSearch index (in content infra) + search dialog |
-| `i18n`       | `[application, presentation]`                 | Locale schema + `meta.languages` + middleware + locale switcher           |
-| `navigation` | `[application, presentation]`                 | tRPC `content.getTree` (owned by navigation BC) + sidebar/breadcrumb/toc  |
-| `health`     | `[application]`                               | tRPC `meta.health` liveness probe                                         |
+See [Hexagonal Architecture — Web Apps](../../repo-governance/development/pattern/hexagonal-architecture-web.md)
+for the structural authority on layer rules, barrel imports, and forbidden cross-layer imports.
 
-Each bounded context exposes its public surface through its own `index.ts` barrel in `application/`, `infrastructure/`, and `presentation/` subfolders as applicable.
+| Feature module | Layers present                                | Owns                                                                      |
+| -------------- | --------------------------------------------- | ------------------------------------------------------------------------- |
+| `app-shell`    | `[application, presentation]`                 | tRPC root router stitching + chrome (header, footer, theme toggle, ui/)   |
+| `content`      | `[application, infrastructure, presentation]` | tRPC `content.*` procedures + filesystem reader + markdown rendering      |
+| `search`       | `[application, infrastructure, presentation]` | tRPC `search.query` + FlexSearch index (in content infra) + search dialog |
+| `i18n`         | `[application, presentation]`                 | Locale schema + `meta.languages` + middleware + locale switcher           |
+| `navigation`   | `[application, presentation]`                 | tRPC `content.getTree` (navigation-owned) + sidebar/breadcrumb/toc        |
+| `health`       | `[application]`                               | tRPC `meta.health` liveness probe                                         |
+
+Each feature module exposes its public surface through an `index.ts` barrel in `application/`
+(and `infrastructure/` or `presentation/` where applicable). Other modules and presentation
+code import only from the `application/index.ts` barrel — never from `domain/` or
+`infrastructure/` directly.
 
 ## Specs
 
@@ -85,7 +94,7 @@ rename `be` → `api` reflects this (the `organiclever` peer keeps `be` because
 ## i18n middleware ownership
 
 The Next.js middleware lives at the conventional path `src/middleware.ts` but is reduced to
-a one-line re-export from the `i18n` BC's application layer:
+a one-line re-export from the `i18n` feature module's application layer:
 
 ```ts
 export { middleware, config } from "./contexts/i18n/application/middleware";
@@ -94,10 +103,10 @@ export { middleware, config } from "./contexts/i18n/application/middleware";
 The actual implementation (locale negotiation, `/` redirect to `/<DEFAULT_LOCALE>`) lives in
 `src/contexts/i18n/application/middleware.ts`. This keeps `next dev` and `next build` happy
 (they find the middleware where Next.js expects it) while putting all i18n code under the
-i18n BC's ownership.
+`i18n` feature module's ownership.
 
 ## Related
 
 - [ayokoding-web-be-e2e](../ayokoding-web-be-e2e/) - Backend E2E tests (consumes `behavior/api/gherkin/`)
 - [ayokoding-web-fe-e2e](../ayokoding-web-fe-e2e/) - Frontend E2E tests (consumes `behavior/web/gherkin/`)
-- [specs/apps/ayokoding/](../../specs/apps/ayokoding/) - C4 + DDD + Gherkin specifications
+- [specs/apps/ayokoding/](../../specs/apps/ayokoding/) - C4 + Gherkin specifications
