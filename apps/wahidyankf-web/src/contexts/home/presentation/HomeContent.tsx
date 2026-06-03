@@ -9,12 +9,12 @@ import {
   getTopLanguagesLastFiveYears,
   getTopFrameworksLastFiveYears,
   formatDuration,
-} from "@/contexts/cv/application/data";
+} from "@/features/cv/data";
 import { Navigation } from "@/features/app-shell/Navigation";
 import { useState, useEffect } from "react";
 import { filterItems } from "@/features/search/search";
 import { SearchComponent, HighlightText } from "@open-sharia-enterprise/web-ui";
-import { parseMarkdownLinks } from "@/contexts/cv/application/markdown";
+import { parseMarkdownLinks } from "@/features/cv/markdown";
 
 export type Portfolio = {
   aboutMe: string[];

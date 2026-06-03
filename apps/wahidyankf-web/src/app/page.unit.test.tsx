@@ -52,7 +52,7 @@ vi.mock("@/features/search/search", () => ({
 }));
 
 // Mock the data and utility functions
-vi.mock("@/contexts/cv/application/data", () => ({
+vi.mock("@/features/cv/data", () => ({
   cvData: [
     {
       type: "about",

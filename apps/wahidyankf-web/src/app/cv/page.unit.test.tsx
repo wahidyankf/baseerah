@@ -80,7 +80,7 @@ describe("CV component", () => {
     ];
 
     // Use vi.doMock for the data module
-    vi.doMock("@/contexts/cv/application/data", () => ({
+    vi.doMock("@/features/cv/data", () => ({
       cvData: mockCvData,
       getTopSkillsLastFiveYears: () => [{ name: "React", duration: 60 }],
       getTopLanguagesLastFiveYears: () => [{ name: "JavaScript", duration: 60 }],

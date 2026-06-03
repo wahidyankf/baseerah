@@ -31,9 +31,9 @@ import {
   getTopSkillsLastFiveYears,
   getTopLanguagesLastFiveYears,
   getTopFrameworksLastFiveYears,
-} from "@/contexts/cv/application/data";
+} from "@/features/cv/data";
 import { SearchComponent, HighlightText } from "@open-sharia-enterprise/web-ui";
-import { parseMarkdownLinks } from "@/contexts/cv/application/markdown";
+import { parseMarkdownLinks } from "@/features/cv/markdown";
 
 // Update the type definition for topSkills, topLanguages, and topFrameworks
 type TopItem = { name: string; duration: number };

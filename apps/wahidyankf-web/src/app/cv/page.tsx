@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { CvContent } from "@/contexts/cv/presentation/CvContent";
+import { CvContent } from "@/features/cv/CvContent";
 
 export default function CV() {
   return (
