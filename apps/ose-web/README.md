@@ -19,8 +19,16 @@ community informed as we build with radical transparency.
 - **Styling**: Tailwind CSS v4 + shadcn/ui
 - **Search**: FlexSearch for full-text search
 - **Diagrams**: Mermaid diagram support
-- **Testing**: Vitest (unit + integration), 80% line coverage enforced via rhino-cli
-- **DDD**: Per-BC layout under `src/contexts/<bc>/{application,infrastructure,presentation}/`
+- **Testing**: Vitest (unit + integration), 86% line coverage enforced via rhino-cli
+- **Structure**: Hexagonal feature modules under `src/contexts/<feature>/` with three layers
+
+The codebase follows the
+[hexagonal architecture for web applications](../../repo-governance/development/pattern/hexagonal-architecture-web.md)
+pattern, organized into three layers per feature module:
+
+- **application** — use cases, business logic, and ports (interfaces to the outside world)
+- **infrastructure** — adapters implementing the ports (file system, HTTP, database)
+- **presentation** — UI components and tRPC route handlers that face the client
 
 ## Quick Start
 
@@ -37,7 +45,7 @@ nx run ose-web:typecheck
 # Lint (oxlint)
 nx run ose-web:lint
 
-# Unit tests + DDD validators + coverage + links
+# Unit tests + coverage + links
 nx run ose-web:test:quick
 
 # Integration tests
@@ -53,7 +61,7 @@ nx run ose-web:spec-coverage
 ose-web/
 ├── src/
 │   ├── app/            # Next.js App Router routes (thin glue, imports from contexts/)
-│   ├── contexts/       # DDD bounded contexts (one folder per BC)
+│   ├── contexts/       # Feature modules (one folder per feature)
 │   │   ├── app-shell/  # Site chrome + root tRPC router
 │   │   ├── landing/    # Marketing landing page
 │   │   ├── content/    # Content retrieval + rendering
@@ -69,35 +77,20 @@ ose-web/
 
 ## Specs
 
-This project follows the canonical C4 + DDD spec layout introduced in the
-`ose-web-ddd-and-specs-format` plan. Spec tree: `specs/apps/ose-platform/`.
+Spec tree: `specs/apps/ose-platform/`.
 
-| Section                                                                              | What it contains                                        |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------- |
-| [system-context/](../../specs/apps/ose-platform/system-context/)                     | C4 L1 — actors, external systems                        |
-| [containers/](../../specs/apps/ose-platform/containers/)                             | C4 L2 — single `web` container + slug-vs-container note |
-| [components/web/](../../specs/apps/ose-platform/components/web/)                     | C4 L3 — UI perspective                                  |
-| [components/api/](../../specs/apps/ose-platform/components/api/)                     | C4 L3 — tRPC HTTP perspective (`api` slug, not `be`)    |
-| [ddd/bounded-contexts.yaml](../../specs/apps/ose-platform/ddd/bounded-contexts.yaml) | DDD registry (7 BCs, schema v2)                         |
-| [ddd/ubiquitous-language/](../../specs/apps/ose-platform/ddd/ubiquitous-language/)   | Per-BC glossaries                                       |
-| [behavior/web/gherkin/](../../specs/apps/ose-platform/behavior/web/gherkin/)         | UI-semantic Gherkin (web perspective)                   |
-| [behavior/api/gherkin/](../../specs/apps/ose-platform/behavior/api/gherkin/)         | tRPC HTTP-semantic Gherkin (api perspective)            |
+| Section                                                                      | What it contains                                        |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [system-context/](../../specs/apps/ose-platform/system-context/)             | C4 L1 — actors, external systems                        |
+| [containers/](../../specs/apps/ose-platform/containers/)                     | C4 L2 — single `web` container + slug-vs-container note |
+| [components/web/](../../specs/apps/ose-platform/components/web/)             | C4 L3 — UI perspective                                  |
+| [components/api/](../../specs/apps/ose-platform/components/api/)             | C4 L3 — tRPC HTTP perspective (`api` slug, not `be`)    |
+| [behavior/web/gherkin/](../../specs/apps/ose-platform/behavior/web/gherkin/) | UI-semantic Gherkin (web perspective)                   |
+| [behavior/api/gherkin/](../../specs/apps/ose-platform/behavior/api/gherkin/) | tRPC HTTP-semantic Gherkin (api perspective)            |
 
 > **Slug note**: The tRPC perspective slug is `api`, not `be`. The tRPC server runs **inside**
 > the same Next.js process — there is no separate backend container. This is a deliberate
 > deviation from `organiclever` where `be` maps to a real separate deployable.
-
-## Bounded Contexts
-
-| BC          | Layers                                    | Gherkin perspective |
-| ----------- | ----------------------------------------- | ------------------- |
-| `app-shell` | application, presentation                 | `web`               |
-| `landing`   | presentation                              | `web`               |
-| `content`   | application, infrastructure, presentation | `api`               |
-| `search`    | application, infrastructure, presentation | `api`               |
-| `rss-feed`  | application                               | `api`               |
-| `seo`       | application, presentation                 | `api`               |
-| `health`    | application, presentation                 | `api`               |
 
 ## Deployment
 
