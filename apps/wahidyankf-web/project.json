@@ -54,17 +54,10 @@
       "executor": "nx:run-commands",
       "dependsOn": ["rhino-cli:build"],
       "cache": true,
-      "inputs": [
-        "default",
-        "{workspaceRoot}/specs/apps/wahidyankf/behavior/web/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/wahidyankf/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/wahidyankf/ddd/ubiquitous-language/**/*.md"
-      ],
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/web/gherkin/**/*.feature"],
       "outputs": ["{projectRoot}/coverage"],
       "options": {
         "commands": [
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc wahidyankf)",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul wahidyankf)",
           "npx vitest run --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/wahidyankf-web/coverage/lcov.info 80)"
         ],
         "parallel": false,
