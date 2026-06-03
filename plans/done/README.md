@@ -4,6 +4,7 @@ Archived plans and completed project planning documents.
 
 ## Completed Projects
 
+- [2026-06-03: wahidyankf-web-remove-ddd-and-hexagonal](./2026-06-03__wahidyankf-web-remove-ddd-and-hexagonal/README.md) — Remove DDD accretion and flatten hexagonal `contexts/` to flat `src/features/` in `wahidyankf-web`; add static-site opt-out exemption to `hexagonal-architecture-web.md`; de-register from `rhino-cli` DDD allowlist. Completed 2026-06-03.
 - [2026-06-03: ose-web-remove-ddd](./2026-06-03__ose-web-remove-ddd/README.md) — Remove DDD scaffolding from `ose-web` (keep hexagonal feature modules); de-register from `rhino-cli` DDD allowlist; drop empty `domain/` stubs; align README with `hexagonal-architecture-web.md`. Completed 2026-06-03.
 - [2026-06-03: ayokoding-web-remove-ddd](./2026-06-03__ayokoding-web-remove-ddd/README.md) — Remove DDD scaffolding from `ayokoding-web` (keep hexagonal feature modules); de-register from `rhino-cli` DDD allowlist; drop empty `domain/` stubs; align README with `hexagonal-architecture-web.md`. Preexisting fix: Tailwind v4 content-scan exclusion. Completed 2026-06-03.
 - [2026-05-27: rewrite-crane-cli-fsharp](./2026-05-27__rewrite-crane-cli-fsharp/README.md) — Rewrote `apps/crane-cli/` from Rust back to F# with strict hexagonal (ports-and-adapters) architecture; Impureim Sandwich pattern; TickSpec 2.0.5 + xUnit 2.9.2 BDD tests. Completed 2026-05-27.

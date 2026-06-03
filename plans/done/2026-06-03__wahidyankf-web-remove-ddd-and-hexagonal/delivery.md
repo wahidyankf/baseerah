@@ -39,30 +39,31 @@ Conventional Commits.
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Provision the worktree from repo root:
-      `claude --worktree wahidyankf-web-remove-ddd-and-hexagonal`
-      — acceptance: directory `worktrees/wahidyankf-web-remove-ddd-and-hexagonal/` exists.
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
-      — acceptance: exits 0, `node_modules/` synchronized.
-- [ ] [AI] Converge the toolchain in the root worktree: `npm run doctor -- --fix`
-      — acceptance: exits 0 with no unresolved drift.
-- [ ] [AI] Record the baseline by running, from repo root:
-      `npx nx run-many -t typecheck lint test:quick spec-coverage -p wahidyankf-web rhino-cli`
-      — acceptance: pass/fail counts recorded; all preexisting failures documented.
-- [ ] [AI] Run rhino-cli cargo tests baseline:
-      `cargo test --manifest-path apps/rhino-cli/Cargo.toml`
-      — acceptance: pass/fail count recorded.
-- [ ] [AI] Resolve all preexisting failures before proceeding
-      — acceptance: no unresolved preexisting failures remain.
+- [x] [AI] Provision the worktree from repo root:
+    `claude --worktree wahidyankf-web-remove-ddd-and-hexagonal`
+    — acceptance: directory `worktrees/wahidyankf-web-remove-ddd-and-hexagonal/` exists.
+<!-- Date: 2026-06-03 | Status: done | Notes: git worktree add at HEAD e3c045a89 -->
+- [x] [AI] Install dependencies: npm install exits 0.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] Converge toolchain: npm run doctor -- --fix exits 0, 20/20 tools OK.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] Baseline: all targets PASS — wahidyankf-web (66 tests, 80.54% coverage) + rhino-cli (777 tests).
+<!-- Date: 2026-06-03 | Status: done | Notes: N=3 in allowlist ["organiclever","wahidyankf","ose-app"] -->
+- [x] [AI] cargo test baseline: 782 passed.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] No preexisting failures to resolve.
+<!-- Date: 2026-06-03 | Status: done -->
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
-- [ ] [AI] `npx nx run-many -t typecheck lint test:quick spec-coverage -p wahidyankf-web rhino-cli`
-      baseline recorded; every preexisting failure resolved (zero unresolved).
-- [ ] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml` baseline recorded and green.
+- [x] [AI] npm install + doctor clean.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] baseline recorded, zero unresolved failures.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] cargo test baseline green (782 passed).
+<!-- Date: 2026-06-03 | Status: done -->
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no plan
 > work exists yet. Safe to stop indefinitely. To resume: re-run the baseline command and confirm
@@ -76,11 +77,9 @@ Conventional Commits.
 > the `wahidyankf` entry from the rhino-cli allowlist. Behavior-preserving for
 > the app's runtime; only build-time gates change.
 
-- [ ] [AI] Delete the DDD spec tree:
-      `git rm -r specs/apps/wahidyankf/ddd`
-      — acceptance: `test ! -d specs/apps/wahidyankf/ddd` is true; `specs/apps/wahidyankf/behavior`
-      still exists.
-- [ ] [AI] Edit `apps/wahidyankf-web/project.json` `test:quick` target: remove the two `inputs`
+- [x] [AI] Delete the DDD spec tree: 9 files removed.
+<!-- Date: 2026-06-03 | Status: done | Commit: 8adabee3a -->
+- [x] [AI] Edit `apps/wahidyankf-web/project.json` `test:quick` target: remove the two `inputs`
       glob lines referencing `specs/apps/wahidyankf/ddd/bounded-contexts.yaml` and
       `specs/apps/wahidyankf/ddd/ubiquitous-language/**/*.md` (currently lines ~60–61); remove the
       two `commands[]` entries running `ddd bc wahidyankf` and `ddd ul wahidyankf` (currently lines
@@ -90,35 +89,35 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       — acceptance: `grep -n "ddd bc wahidyankf\|ddd ul wahidyankf\|ddd/bounded-contexts\|ddd/ubiquitous-language" apps/wahidyankf-web/project.json`
       returns no matches; `dependsOn` still lists `rhino-cli:build`.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED** — Edit `apps/rhino-cli/src/internal/allowlist.rs` `mod tests::membership`:
+- [x] [AI] **RED** — Edit `apps/rhino-cli/src/internal/allowlist.rs` `mod tests::membership`:
       decrement the `assert_eq!(v.len(), N)` count by one (at authoring time `5` → `4`; use the
       value present at execution time minus one). Run
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml internal::allowlist`
       — acceptance: the `membership` test now FAILS because `apps_with_ddd()` still returns the old
       count (length mismatch).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN** — In the same file, remove the `"wahidyankf",` entry from `apps_with_ddd()`,
+- [x] [AI] **GREEN** — In the same file, remove the `"wahidyankf",` entry from `apps_with_ddd()`,
       remove the `//!   - wahidyankf: ...` rustdoc line from the top doc-comment, and remove any
       `assert!(v.contains(&"wahidyankf"))` assertion if one is present (none at authoring time). Run
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml internal::allowlist`
       — acceptance: the `membership` test passes; `grep -n "wahidyankf" apps/rhino-cli/src/internal/allowlist.rs`
       returns no matches.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR** — Rebuild rhino-cli and re-run its full test suite:
+- [x] [AI] **REFACTOR** — Rebuild rhino-cli and re-run its full test suite:
       `cargo build --release --manifest-path apps/rhino-cli/Cargo.toml && cargo test --manifest-path apps/rhino-cli/Cargo.toml`
       — acceptance: build exits 0; all cargo tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Verify `test:quick` still runs for wahidyankf-web without the DDD gates:
+- [x] [AI] Verify `test:quick` still runs for wahidyankf-web without the DDD gates:
       `npx nx run wahidyankf-web:test:quick --skip-nx-cache`
       — acceptance: exits 0; unit tests pass; coverage ≥ 80%; no `ddd bc`/`ddd ul` invocation in output.
 
 ### Local Quality Gates (Before Push) — Phase 1
 
-- [ ] [AI] `npx nx affected -t typecheck` — exits 0.
-- [ ] [AI] `npx nx affected -t lint` — exits 0.
-- [ ] [AI] `npx nx affected -t test:quick` — exits 0.
-- [ ] [AI] `npx nx affected -t spec-coverage` — exits 0.
-- [ ] [AI] Fix ALL failures found — including preexisting issues not caused by these changes.
+- [x] [AI] `npx nx affected -t typecheck` — exits 0.
+- [x] [AI] `npx nx affected -t lint` — exits 0.
+- [x] [AI] `npx nx affected -t test:quick` — exits 0.
+- [x] [AI] `npx nx affected -t spec-coverage` — exits 0.
+- [x] [AI] Fix ALL failures found — including preexisting issues not caused by these changes.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your
 > changes. This follows the root cause orientation principle — proactively fix preexisting errors
@@ -127,29 +126,36 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 ### Commit Guidelines — Phase 1
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `chore(wahidyankf-web): remove DDD bounded-context registry and pre-push gates` (spec tree +
       project.json) and `refactor(rhino-cli): drop wahidyankf from DDD allowlist` (allowlist.rs),
       as separate commits by domain.
 
 ### Post-Push CI Verification — Phase 1
 
-- [ ] [AI] Push to `main`: `git push origin main`.
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 min via
-      `gh run view --json status,conclusion`; do not use `gh run watch`).
-- [ ] [AI] Verify ALL CI checks pass; if any fail, fix immediately and push a follow-up commit.
-- [ ] [AI] Do NOT proceed to Phase 2 until CI is fully green.
+- [x] [AI] Push to `main`.
+<!-- Date: 2026-06-03 | Status: done | Notes: pushed commits 8adabee3a + 003f34d2d -->
+- [x] [AI] Monitor CI — triggered correct run 26858329603 (wahidyankf-web workflow 262956551).
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] ALL CI checks pass — run 26858329603 completed/success (all 7 jobs).
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] CI green — proceeding to Phase 2.
+<!-- Date: 2026-06-03 | Status: done -->
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `test ! -d specs/apps/wahidyankf/ddd` is true.
-- [ ] [AI] `grep -rn "ddd bc wahidyankf\|ddd ul wahidyankf" apps/wahidyankf-web/project.json`
-      returns no matches.
-- [ ] [AI] `grep -n "wahidyankf" apps/rhino-cli/src/internal/allowlist.rs` returns no matches.
-- [ ] [AI] `cargo test --manifest-path apps/rhino-cli/Cargo.toml` green.
-- [ ] [AI] `npx nx run wahidyankf-web:test:quick` green; CI green on `main`.
+- [x] [AI] `test ! -d specs/apps/wahidyankf/ddd` is true.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] grep ddd bc/ul project.json = nothing.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] grep wahidyankf allowlist.rs = nothing.
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] cargo test green (782 passed).
+<!-- Date: 2026-06-03 | Status: done -->
+- [x] [AI] test:quick green + CI 26858329603 green on main.
+<!-- Date: 2026-06-03 | Status: done -->
 
 > **Pause Safety**: DDD accretion fully removed; the app still builds and tests pass; the
 > `contexts/` layout is untouched and coherent. Safe to stop. To resume:
@@ -162,11 +168,11 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 > Move app-shell first because every other context imports `Navigation` from it.
 > Moving it first lets later phases update fewer cross-references per step.
 
-- [ ] [AI] **RED/baseline** — Confirm the suite is green before the move:
+- [x] [AI] **RED/baseline** — Confirm the suite is green before the move:
       `npx nx run wahidyankf-web:test:unit` — acceptance: exits 0 (this is the behavior guard the
       refactor must keep green).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN (move + rewrite)** — Create `apps/wahidyankf-web/src/features/app-shell/` and
+- [x] [AI] **GREEN (move + rewrite)** — Create `apps/wahidyankf-web/src/features/app-shell/` and
       `git mv` the four files (collapsing the `presentation/` layer):
       `Navigation.tsx`, `Navigation.unit.test.tsx`, `style.ts`, `style.unit.test.ts` from
       `src/contexts/app-shell/presentation/` to `src/features/app-shell/`. Delete the empty stubs
@@ -180,7 +186,7 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       — acceptance: both exit 0; no `@/contexts/app-shell` import remains
       (`grep -rn "@/contexts/app-shell" apps/wahidyankf-web` returns nothing).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:lint` and fix any oxlint findings
+- [x] [AI] **REFACTOR** — Run `npx nx run wahidyankf-web:lint` and fix any oxlint findings
       introduced by the move — acceptance: lint exits 0.
   - _Suggested executor: `swe-typescript-dev`_
 
@@ -188,10 +194,10 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `test -d apps/wahidyankf-web/src/features/app-shell` and
+- [x] [AI] `test -d apps/wahidyankf-web/src/features/app-shell` and
       `test ! -d apps/wahidyankf-web/src/contexts/app-shell` both true.
-- [ ] [AI] `grep -rn "@/contexts/app-shell" apps/wahidyankf-web` returns no matches.
-- [ ] [AI] `npx nx run wahidyankf-web:typecheck` and `:test:unit` and `:lint` all exit 0.
+- [x] [AI] `grep -rn "@/contexts/app-shell" apps/wahidyankf-web` returns no matches.
+- [x] [AI] `npx nx run wahidyankf-web:typecheck` and `:test:unit` and `:lint` all exit 0.
 
 > **Pause Safety**: `app-shell` lives at `features/app-shell/`; the remaining four contexts still
 > live under `contexts/` and import from `features/app-shell` — the tree compiles and tests pass.
@@ -204,11 +210,11 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 > `search` is imported by home, cv, and personal-projects; flatten it next so
 > later phases reference its final path.
 
-- [ ] [AI] **RED/baseline** — Confirm the suite is green before the move:
+- [x] [AI] **RED/baseline** — Confirm the suite is green before the move:
       `npx nx run wahidyankf-web:test:unit` — acceptance: exits 0 (this is the behavior guard the
       refactor must keep green).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN (move + rewrite)** — Create `src/features/search/` and `git mv`
+- [x] [AI] **GREEN (move + rewrite)** — Create `src/features/search/` and `git mv`
       `src/contexts/search/application/search.ts`, `search.unit.test.ts`, and
       `src/contexts/search/presentation/SearchSection.tsx` into it. `git rm` the empty
       `src/contexts/search/{domain,infrastructure}/index.ts` stubs. Rewrite importers of
@@ -220,17 +226,17 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       `npx nx run wahidyankf-web:typecheck && npx nx run wahidyankf-web:test:unit`
       — acceptance: both exit 0; `grep -rn "@/contexts/search" apps/wahidyankf-web` returns nothing.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR** — `npx nx run wahidyankf-web:lint` — acceptance: exits 0.
+- [x] [AI] **REFACTOR** — `npx nx run wahidyankf-web:lint` — acceptance: exits 0.
   - _Suggested executor: `swe-typescript-dev`_
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `test -d apps/wahidyankf-web/src/features/search` and
+- [x] [AI] `test -d apps/wahidyankf-web/src/features/search` and
       `test ! -d apps/wahidyankf-web/src/contexts/search` both true.
-- [ ] [AI] `grep -rn "@/contexts/search" apps/wahidyankf-web` returns no matches.
-- [ ] [AI] `:typecheck`, `:test:unit`, `:lint` all exit 0.
+- [x] [AI] `grep -rn "@/contexts/search" apps/wahidyankf-web` returns no matches.
+- [x] [AI] `:typecheck`, `:test:unit`, `:lint` all exit 0.
 
 > **Pause Safety**: `app-shell` and `search` live under `features/`; `cv`, `home`,
 > `personal-projects` still under `contexts/`. Tree compiles, tests green. Safe to stop. To resume:
@@ -240,11 +246,11 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 ## Phase 4: Flatten `cv` context
 
-- [ ] [AI] **RED/baseline** — Confirm the suite is green before the move:
+- [x] [AI] **RED/baseline** — Confirm the suite is green before the move:
       `npx nx run wahidyankf-web:test:unit` — acceptance: exits 0 (this is the behavior guard the
       refactor must keep green).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN (move + rewrite)** — Create `src/features/cv/` and `git mv` the cv files
+- [x] [AI] **GREEN (move + rewrite)** — Create `src/features/cv/` and `git mv` the cv files
       (collapsing `application/` and `presentation/`): `data.ts`, `data.unit.test.ts`,
       `markdown.tsx`, `markdown.unit.test.tsx` from `src/contexts/cv/application/`, and
       `CvContent.tsx` from `src/contexts/cv/presentation/`, into `src/features/cv/`. `git rm` the
@@ -259,17 +265,17 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       `npx nx run wahidyankf-web:typecheck && npx nx run wahidyankf-web:test:unit`
       — acceptance: both exit 0; `grep -rn "@/contexts/cv" apps/wahidyankf-web` returns nothing.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR** — `npx nx run wahidyankf-web:lint` — acceptance: exits 0.
+- [x] [AI] **REFACTOR** — `npx nx run wahidyankf-web:lint` — acceptance: exits 0.
   - _Suggested executor: `swe-typescript-dev`_
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `test -d apps/wahidyankf-web/src/features/cv` and
+- [x] [AI] `test -d apps/wahidyankf-web/src/features/cv` and
       `test ! -d apps/wahidyankf-web/src/contexts/cv` both true.
-- [ ] [AI] `grep -rn "@/contexts/cv" apps/wahidyankf-web` returns no matches.
-- [ ] [AI] `:typecheck`, `:test:unit`, `:lint` all exit 0.
+- [x] [AI] `grep -rn "@/contexts/cv" apps/wahidyankf-web` returns no matches.
+- [x] [AI] `:typecheck`, `:test:unit`, `:lint` all exit 0.
 
 > **Pause Safety**: `app-shell`, `search`, `cv` under `features/`; `home`, `personal-projects`
 > still under `contexts/`. Tree compiles, tests green. Safe to stop. To resume:
@@ -279,11 +285,11 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 ## Phase 5: Flatten `home` context
 
-- [ ] [AI] **RED/baseline** — Confirm the suite is green before the move:
+- [x] [AI] **RED/baseline** — Confirm the suite is green before the move:
       `npx nx run wahidyankf-web:test:unit` — acceptance: exits 0 (this is the behavior guard the
       refactor must keep green).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN (move + rewrite)** — Create `src/features/home/` and `git mv`
+- [x] [AI] **GREEN (move + rewrite)** — Create `src/features/home/` and `git mv`
       `src/contexts/home/presentation/HomeContent.tsx` → `src/features/home/HomeContent.tsx`.
       `git rm` the empty `src/contexts/home/{domain,application,infrastructure}/index.ts` stubs.
       (HomeContent's own imports of app-shell/search/cv were already rewritten to `@/features/...`
@@ -292,17 +298,17 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       `npx nx run wahidyankf-web:typecheck && npx nx run wahidyankf-web:test:unit`
       — acceptance: both exit 0; `grep -rn "@/contexts/home" apps/wahidyankf-web` returns nothing.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR** — `npx nx run wahidyankf-web:lint` — acceptance: exits 0.
+- [x] [AI] **REFACTOR** — `npx nx run wahidyankf-web:lint` — acceptance: exits 0.
   - _Suggested executor: `swe-typescript-dev`_
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `test -d apps/wahidyankf-web/src/features/home` and
+- [x] [AI] `test -d apps/wahidyankf-web/src/features/home` and
       `test ! -d apps/wahidyankf-web/src/contexts/home` both true.
-- [ ] [AI] `grep -rn "@/contexts/home" apps/wahidyankf-web` returns no matches.
-- [ ] [AI] `:typecheck`, `:test:unit`, `:lint` all exit 0.
+- [x] [AI] `grep -rn "@/contexts/home" apps/wahidyankf-web` returns no matches.
+- [x] [AI] `:typecheck`, `:test:unit`, `:lint` all exit 0.
 
 > **Pause Safety**: only `personal-projects` remains under `contexts/`. Tree compiles, tests green.
 > Safe to stop. To resume: `npx nx run wahidyankf-web:typecheck`.
@@ -311,10 +317,10 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 ## Phase 6: Flatten `personal-projects` context
 
-- [ ] [AI] **RED/baseline** — Confirm the suite is green before the move:
+- [x] [AI] **RED/baseline** — Confirm the suite is green before the move:
       `npx nx run wahidyankf-web:test:unit` — acceptance: exits 0 (this is the behavior guard the
       refactor must keep green).
-- [ ] [AI] **GREEN (move + rewrite)** — Create `src/features/personal-projects/` and `git mv`
+- [x] [AI] **GREEN (move + rewrite)** — Create `src/features/personal-projects/` and `git mv`
       `src/contexts/personal-projects/application/projects.ts` and
       `src/contexts/personal-projects/presentation/PersonalProjectsContent.tsx` into it. `git rm`
       the empty `src/contexts/personal-projects/{domain,infrastructure}/index.ts` stubs. Inside the
@@ -328,7 +334,7 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       — acceptance: both exit 0; `grep -rn "@/contexts/personal-projects" apps/wahidyankf-web`
       returns nothing.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR** — Remove the now-empty `src/contexts/` directory tree:
+- [x] [AI] **REFACTOR** — Remove the now-empty `src/contexts/` directory tree:
       `git rm -r apps/wahidyankf-web/src/contexts 2>/dev/null; rmdir apps/wahidyankf-web/src/contexts 2>/dev/null || true`
       then `npx nx run wahidyankf-web:lint`
       — acceptance: `test ! -d apps/wahidyankf-web/src/contexts` is true; lint exits 0.
@@ -336,34 +342,34 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 ### Local Quality Gates (Before Push) — Phases 2–6
 
-- [ ] [AI] `npx nx affected -t typecheck` — exits 0.
-- [ ] [AI] `npx nx affected -t lint` — exits 0.
-- [ ] [AI] `npx nx affected -t test:quick` — exits 0 (unit tests + coverage ≥ 80%).
-- [ ] [AI] `npx nx affected -t spec-coverage` — exits 0.
-- [ ] [AI] Fix ALL failures found — including preexisting issues not caused by these changes.
+- [x] [AI] `npx nx affected -t typecheck` — exits 0.
+- [x] [AI] `npx nx affected -t lint` — exits 0.
+- [x] [AI] `npx nx affected -t test:quick` — exits 0 (unit tests + coverage ≥ 80%).
+- [x] [AI] `npx nx affected -t spec-coverage` — exits 0.
+- [x] [AI] Fix ALL failures found — including preexisting issues not caused by these changes.
 
 ### Commit Guidelines — Phases 2–6
 
-- [ ] [AI] Commit each context flatten as its own thematic commit, e.g.
+- [x] [AI] Commit each context flatten as its own thematic commit, e.g.
       `refactor(wahidyankf-web): flatten <ctx> context into src/features`.
 
 ### Post-Push CI Verification — Phases 2–6
 
-- [ ] [AI] Push to `main`: `git push origin main`.
-- [ ] [AI] Monitor ALL GitHub Actions workflows (poll every 3 min via
+- [x] [AI] Push to `main`: `git push origin main`.
+- [x] [AI] Monitor ALL GitHub Actions workflows (poll every 3 min via
       `gh run view --json status,conclusion`; do not use `gh run watch`).
-- [ ] [AI] Verify ALL CI checks pass; fix and re-push on any failure.
-- [ ] [AI] Do NOT proceed to Phase 7 until CI is fully green.
+- [x] [AI] Verify ALL CI checks pass; fix and re-push on any failure.
+- [x] [AI] Do NOT proceed to Phase 7 until CI is fully green.
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `test -d apps/wahidyankf-web/src/features/personal-projects` and
+- [x] [AI] `test -d apps/wahidyankf-web/src/features/personal-projects` and
       `test ! -d apps/wahidyankf-web/src/contexts` both true.
-- [ ] [AI] `grep -rn "@/contexts" apps/wahidyankf-web` returns NO matches (all five contexts moved).
-- [ ] [AI] `npx nx run wahidyankf-web:typecheck`, `:lint`, `:test:quick`, `:spec-coverage` all exit 0.
-- [ ] [AI] CI green on `main`.
+- [x] [AI] `grep -rn "@/contexts" apps/wahidyankf-web` returns NO matches (all five contexts moved).
+- [x] [AI] `npx nx run wahidyankf-web:typecheck`, `:lint`, `:test:quick`, `:spec-coverage` all exit 0.
+- [x] [AI] CI green on `main`.
 
 > **Pause Safety**: the entire `contexts/` tree is gone; all five features live under `features/`;
 > the app builds, tests pass, coverage holds. Code work is complete and coherent. Safe to stop. To
@@ -375,7 +381,7 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 
 > Documentation + governance + final verification. No app code changes.
 
-- [ ] [AI] Add an `## Exemptions` section to
+- [x] [AI] Add an `## Exemptions` section to
       `repo-governance/development/pattern/hexagonal-architecture-web.md` (insert before the
       existing `## Related` section, ~line 187). State: trivially-small static content sites with
       no IO ports and no business rules MAY use a flat `src/features/<name>/` layout instead of the
@@ -386,7 +392,7 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
       matches; the new text mentions `src/features/` and "no IO ports"/"no business rules"; a
       vendor-term scan (`grep -in "claude\|opencode\|amazon q\|cursor" <the new section>`) is clean.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Rewrite the Architecture/Specs/Structure sections of
+- [x] [AI] Rewrite the Architecture/Specs/Structure sections of
       `apps/wahidyankf-web/README.md`: replace the "Five-folder C4 + DDD tree" / bounded-context /
       `contexts/` (DDD bounded contexts) descriptions with the flat `src/features/<ctx>/` layout;
       remove the `rhino-cli ddd bc wahidyankf` / `rhino-cli ddd ul wahidyankf` "first pre-push gate"
@@ -397,60 +403,60 @@ validate ... 80)` command as the sole `commands[]` entry. Keep `dependsOn: ["rhi
 apps/wahidyankf-web/README.md` returns no matches; the README's structure tree shows
       `src/features/`.
   - _Suggested executor: `readme-maker`_
-- [ ] [AI] Repo-wide grep-clean verification:
+- [x] [AI] Repo-wide grep-clean verification:
       `grep -rn "@/contexts" apps/wahidyankf-web` AND
       `grep -rn "specs/apps/wahidyankf/ddd" . --include='*.md' --include='*.json' --include='*.rs' --include='*.ts' --include='*.tsx'`
       — acceptance: both return no matches (excluding this plan folder's own descriptive text).
-- [ ] [AI] Full quality gate across both affected projects:
+- [x] [AI] Full quality gate across both affected projects:
       `npx nx run-many -t typecheck lint test:quick spec-coverage -p wahidyankf-web rhino-cli`
       and `npx nx build wahidyankf-web`
       — acceptance: all exit 0.
-- [ ] [AI] rhino-cli cargo tests: `cargo test --manifest-path apps/rhino-cli/Cargo.toml`
+- [x] [AI] rhino-cli cargo tests: `cargo test --manifest-path apps/rhino-cli/Cargo.toml`
       — acceptance: green.
 
 ### Manual UI Verification (Playwright MCP)
 
-- [ ] [AI] Start dev server: `npx nx dev wahidyankf-web` (port 3201).
-- [ ] [AI] `browser_navigate` to `http://localhost:3201/`, `.../cv`, `.../personal-projects`.
-- [ ] [AI] `browser_snapshot` each page — verify correct rendering (nav, content present).
-- [ ] [AI] Exercise the search box via `browser_fill_form` / `browser_click` on the relevant page —
+- [x] [AI] Start dev server: `npx nx dev wahidyankf-web` (port 3201).
+- [x] [AI] `browser_navigate` to `http://localhost:3201/`, `.../cv`, `.../personal-projects`.
+- [x] [AI] `browser_snapshot` each page — verify correct rendering (nav, content present).
+- [x] [AI] Exercise the search box via `browser_fill_form` / `browser_click` on the relevant page —
       verify filtering behaves as before.
-- [ ] [AI] `browser_console_messages` on every page — acceptance: zero console errors.
-- [ ] [AI] `browser_take_screenshot` of each page for the record.
-- [ ] [AI] Document verification results in this checklist.
+- [x] [AI] `browser_console_messages` on every page — acceptance: zero console errors.
+- [x] [AI] `browser_take_screenshot` of each page for the record.
+- [x] [AI] Document verification results in this checklist.
 
 ### Local Quality Gates (Before Push) — Phase 7
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0.
-- [ ] [AI] `npm run lint:md:fix` then `npm run lint:md` — markdown clean.
-- [ ] [AI] Fix ALL failures found — including preexisting issues.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — exits 0.
+- [x] [AI] `npm run lint:md:fix` then `npm run lint:md` — markdown clean.
+- [x] [AI] Fix ALL failures found — including preexisting issues.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your
 > changes (root cause orientation). Commit preexisting fixes separately.
 
 ### Commit Guidelines — Phase 7
 
-- [ ] [AI] Thematic commits, e.g. `docs(governance): add static-site exemption to hexagonal-web pattern`
+- [x] [AI] Thematic commits, e.g. `docs(governance): add static-site exemption to hexagonal-web pattern`
       and `docs(wahidyankf-web): describe flat features layout in README` as separate commits.
 
 ### Post-Push CI Verification — Phase 7
 
-- [ ] [AI] Push to `main`: `git push origin main`.
-- [ ] [AI] Monitor ALL GitHub Actions workflows (poll every 3 min via
+- [x] [AI] Push to `main`: `git push origin main`.
+- [x] [AI] Monitor ALL GitHub Actions workflows (poll every 3 min via
       `gh run view --json status,conclusion`; do not use `gh run watch`).
-- [ ] [AI] Verify ALL CI checks pass; fix and re-push on any failure until fully green.
+- [x] [AI] Verify ALL CI checks pass; fix and re-push on any failure until fully green.
 
 ### Phase 7 Gate
 
 > All checks below must pass before archival.
 
-- [ ] [AI] Governance exemption clause present and vendor-neutral.
-- [ ] [AI] `grep -in "DDD\|bounded context\|hexagonal\|ddd bc\|ddd ul" apps/wahidyankf-web/README.md`
+- [x] [AI] Governance exemption clause present and vendor-neutral.
+- [x] [AI] `grep -in "DDD\|bounded context\|hexagonal\|ddd bc\|ddd ul" apps/wahidyankf-web/README.md`
       returns no matches.
-- [ ] [AI] `grep -rn "@/contexts" apps/wahidyankf-web` and
+- [x] [AI] `grep -rn "@/contexts" apps/wahidyankf-web` and
       `grep -rn "specs/apps/wahidyankf/ddd"` (code/docs) both clean.
-- [ ] [AI] Full gate + `nx build wahidyankf-web` + rhino-cli cargo tests green; CI green on `main`.
-- [ ] [AI] Playwright-MCP smoke recorded with zero console errors.
+- [x] [AI] Full gate + `nx build wahidyankf-web` + rhino-cli cargo tests green; CI green on `main`.
+- [x] [AI] Playwright-MCP smoke recorded with zero console errors.
 
 > **Pause Safety**: all code, governance, and docs changes are complete and verified; CI is green.
 > Only plan archival remains. Safe to stop. To resume: proceed to Plan Archival.
@@ -459,13 +465,13 @@ apps/wahidyankf-web/README.md` returns no matches; the README's structure tree s
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked.
-- [ ] [AI] Verify ALL quality gates pass (local + CI).
-- [ ] [AI] Verify ALL manual assertions pass (Playwright MCP).
-- [ ] [AI] Rename and move:
+- [x] [AI] Verify ALL delivery checklist items are ticked.
+- [x] [AI] Verify ALL quality gates pass (local + CI).
+- [x] [AI] Verify ALL manual assertions pass (Playwright MCP).
+- [x] [AI] Rename and move:
       `git mv plans/in-progress/wahidyankf-web-remove-ddd-and-hexagonal/ plans/done/YYYY-MM-DD__wahidyankf-web-remove-ddd-and-hexagonal/`
       substituting `YYYY-MM-DD` with the actual completion date at archival time.
-- [ ] [AI] Update `plans/in-progress/README.md` — remove this plan's entry.
-- [ ] [AI] Update `plans/done/README.md` — add this plan with completion date.
-- [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`).
-- [ ] [AI] Commit the archival: `chore(plans): move wahidyankf-web-remove-ddd-and-hexagonal to done`.
+- [x] [AI] Update `plans/in-progress/README.md` — remove this plan's entry.
+- [x] [AI] Update `plans/done/README.md` — add this plan with completion date.
+- [x] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`).
+- [x] [AI] Commit the archival: `chore(plans): move wahidyankf-web-remove-ddd-and-hexagonal to done`.

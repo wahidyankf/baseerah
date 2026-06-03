@@ -4,9 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                                           | Description                                                                                                                                                                                    |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [wahidyankf-web-remove-ddd-and-hexagonal](./wahidyankf-web-remove-ddd-and-hexagonal/README.md) | Remove DDD **and** hexagonal layout from `wahidyankf-web` (flatten `contexts/` to `features/`); add static-site opt-out clause to the hexagonal-web pattern doc; de-DDD `rhino-cli` allowlist. |
+| Plan | Description |
+| ---- | ----------- |
 
 ## Instructions
 
