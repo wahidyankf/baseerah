@@ -184,6 +184,24 @@ barrel so that business logic is testable without a Next.js runtime.
 `organiclever-web` is the canonical reference implementation of this pattern in the monorepo. Its `contexts/`
 directory demonstrates the barrel rule, Effect.ts port definitions, and Server Action adapter placement.
 
+## Exemptions
+
+Trivially-small static content sites with no IO ports, no business rules, and no
+framework-level service dependencies MAY use a flat `src/features/<name>/` layout
+instead of the hexagonal `contexts/<name>/{domain,application,infrastructure,presentation}/`
+layout. This exemption applies when:
+
+- The site renders static or near-static content with no data-mutation flows.
+- No outbound port interfaces are needed (no repositories, no API clients).
+- No business invariants need guarding.
+
+When using the flat layout, each feature directory (`src/features/<name>/`) should be
+self-contained and import only from sibling features or shared libraries — never from
+`src/contexts/`.
+
+**Documented example**: `apps/wahidyankf-web/` (personal portfolio) uses `src/features/`
+because it has no IO ports and no business rules.
+
 ## Related
 
 - **[Hexagonal Architecture](./hexagonal-architecture.md)** — Core pattern, dependency rule, and layer definitions
