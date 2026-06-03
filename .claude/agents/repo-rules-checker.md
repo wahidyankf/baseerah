@@ -733,7 +733,27 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
    - Verify CLAUDE.md, README.md, and ose-web about.md license descriptions are consistent with LICENSING-NOTICE.md
    - **Criticality**: Missing LICENSE = CRITICAL; wrong license type = HIGH; cross-doc inconsistency = MEDIUM
 
-8. **Write findings progressively** using report format above
+8. **Dependency Bump Policy Compliance** (see [Dependency Bump Stability & Safety Policy](../../repo-governance/development/workflow/dependency-bump-policy.md)):
+
+   Scan every plan in `plans/` (backlog, in-progress, done) that introduces or modifies dependency versions and validate policy compliance:
+
+   a. **Three-path classification** — `tech-docs.md` MUST classify every bumped package as Path A (LTS), Path B (60-day soak), or Path C (security waiver). Unclassified bumps are a HIGH finding.
+
+   b. **Rule 5a / Recency** — The version pinned MUST be the most recent eligible version for its path (latest LTS patch for A; latest pre-cutoff CVE-clean version for B; most recent CVE-patched version for C). Pinning an older eligible version without explanation is a HIGH finding.
+
+   c. **Rule 5b / Functional Stability** — The clearance status for each package MUST be one of: `CLEAR`, `CLEAR (patch-of)`, `WAIVER`, or `FUNCTIONAL-HOLD`. Any version that is yanked, deprecated, or carries an open release-blocker MUST record `FUNCTIONAL-HOLD` with the skipped version, chosen fallback, and reason. Missing or incorrect clearance status is a HIGH finding; `FUNCTIONAL-HOLD` recorded without skipped-version and reason is a MEDIUM finding.
+
+   d. **Security Clearance Status section** — `tech-docs.md` MUST contain a Security Clearance Status table. Absence is a HIGH finding.
+
+   e. **Exact pinning** — No caret (`^`) or tilde (`~`) in version specs (use the grep verification: `grep -E '"\^|"~' <file>`). Violations are CRITICAL findings.
+
+   f. **Path C register** — Every Path C waiver MUST be propagated to `docs/reference/security-waivers.md`. Missing register entry is a HIGH finding.
+
+   g. **FUNCTIONAL-HOLD register** — Every `FUNCTIONAL-HOLD` clearance status MUST be propagated to the FUNCTIONAL-HOLD table in `docs/reference/security-waivers.md`. Missing register entry is a HIGH finding.
+
+   **Scope note**: For plans in `plans/done/`, flag only CRITICAL and HIGH violations (historical accuracy). For plans in `plans/in-progress/` or `plans/backlog/`, flag all severity levels (actionable before execution).
+
+9. **Write findings progressively** using report format above
 
 ### Step 8: Software Documentation Validation
 

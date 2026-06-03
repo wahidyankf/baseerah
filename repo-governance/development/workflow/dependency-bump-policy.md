@@ -1,6 +1,6 @@
 ---
 title: "Dependency Bump Stability & Safety Policy"
-description: Three-path decision tree (LTS, 60-day soak, security waiver) governing every dependency bump across the polyglot monorepo — npm, Cargo, .NET, Dockerfile, GitHub Actions
+description: Three-path decision tree (LTS, 60-day soak, security waiver) governing every dependency bump across the polyglot monorepo — npm, Cargo, .NET, Dockerfile, GitHub Actions. Within each path, select the most recent eligible version and reject versions with known fatal functional defects (yanked / release-blocker)
 category: explanation
 subcategory: development
 tags:
@@ -58,7 +58,7 @@ This practice respects the following conventions:
 
 ## Three-Path Decision Tree
 
-For every version bump, classify the package and apply the corresponding path.
+For every version bump, classify the package and apply the corresponding path. Then, within whichever path applies, narrow to a single version using the two selection rules below.
 
 ### Path A — LTS Path (use latest LTS-line patch)
 
@@ -99,6 +99,28 @@ The waiver MUST include:
 
 Waivers are documented in the plan that introduces the bump (in `tech-docs.md` under a "Security Waivers" subsection) and propagated to a long-lived `docs/reference/security-waivers.md` file (create if missing).
 
+## Selection Rules Within Every Path
+
+Once a path is chosen, two rules narrow the eligible set to the single version to pin. Both apply on top of paths A, B, and C — they never override the 60-day, CVE, or LTS constraints.
+
+### Rule 5a — Recency (prefer the most recent eligible version)
+
+Among ALL versions that satisfy the chosen path's constraints (latest LTS patch for Path A; released ≥ 60 days ago AND CVE-clean for Path B; CVE-patched for Path C), always select the **most recent eligible** version. Never pin an older eligible version when a newer eligible one exists.
+
+Rationale: staying as current as the constraints allow minimizes the upgrade gap and accumulated drift, while rules 1–4 still bound how new "current" is allowed to be.
+
+### Rule 5b — Functional Stability (reject versions with known fatal defects)
+
+The selected version MUST be free of known **fatal functional defects** for the capability it provides. Reject a candidate version — even when it is CVE-clean and older than 60 days — if any of the following hold:
+
+- It is **yanked or deprecated** on its registry (`npm view <pkg> deprecated`, crates.io yank flag, NuGet unlisted, etc.)
+- It carries an **open release-blocker / regression advisory** from the upstream maintainer
+- It has a **widely-reported broken-build, data-loss, or crash bug** affecting its primary function
+
+When the newest eligible version fails this gate, fall back to the most recent eligible version that passes, and record the skip and reason (see the `FUNCTIONAL-HOLD` clearance status below).
+
+Sources to check: the project's GitHub releases/issues page ("do not use" notices, yanked tags), the package registry deprecation flag, and the changelog/release notes known-issue callouts.
+
 ## Pinning Policy (Hard Rule)
 
 All version specifications MUST be exact strings. No caret (`^`), no tilde (`~`), no `latest`, no `*` (except npm workspace-internal references).
@@ -129,11 +151,12 @@ For every version selected (Path A, B, or C), verify CVE status against all four
 3. **Snyk DB** ([security.snyk.io](https://security.snyk.io))
 4. **Project security page** (vendor-specific: `nodejs.org/en/blog/vulnerability`, `spring.io/security`, `pkg.go.dev/vuln`, dotnet release notes, etc.)
 
-The result for every package MUST be one of:
+The clearance status for every package records BOTH its security and its functional standing. It MUST be one of:
 
-- **CLEAR** — No known CVEs as of the bump date
+- **CLEAR** — No known CVEs as of the bump date, and no known fatal functional defect (Rule 5b passes)
 - **CLEAR (patch-of)** — Pinned version IS the patched release for one or more known CVEs (document the CVE IDs)
 - **WAIVER** — Path C applied (document waiver per the template above)
+- **FUNCTIONAL-HOLD** — A newer eligible version was skipped due to a known fatal functional defect (Rule 5b); pinned to an older eligible version instead (document the skipped version, the chosen version, and the reason)
 
 Audit findings go into the plan's `tech-docs.md` Security Clearance Status table, or for ad-hoc bumps outside a plan, into the PR description.
 
@@ -176,11 +199,13 @@ When proposing or executing a dependency bump, follow these steps in order:
 3. For Path A: identify the latest LTS patch and verify CVE clearance
 4. For Path B: identify the latest version released on or before the cutoff and verify CVE clearance
 5. For Path C: document the waiver per the template above
-6. Convert all version specs to exact pins (remove carets and tildes)
-7. Run lockfile updates: `npm install`, `go mod tidy`, `mvn versions:resolve-ranges`
-8. Run security re-audit: `npm audit --audit-level=moderate`, `govulncheck ./...`, optionally `mvn org.owasp:dependency-check-maven:check`
-9. Document the audit results and any waivers in the plan's `tech-docs.md`
-10. Run quality gates for affected projects: typecheck, lint, test:quick, spec-coverage
+6. Apply Rule 5a (recency): confirm the chosen version is the most recent eligible one for its path
+7. Apply Rule 5b (functional stability): confirm the chosen version is not yanked/deprecated and has no open release-blocker for its primary function — if it fails, fall back to the most recent eligible version that passes and record a `FUNCTIONAL-HOLD`
+8. Convert all version specs to exact pins (remove carets and tildes)
+9. Run lockfile updates: `npm install`, `go mod tidy`, `mvn versions:resolve-ranges`
+10. Run security re-audit: `npm audit --audit-level=moderate`, `govulncheck ./...`, optionally `mvn org.owasp:dependency-check-maven:check`
+11. Document the audit results and any waivers in the plan's `tech-docs.md`
+12. Run quality gates for affected projects: typecheck, lint, test:quick, spec-coverage
 
 ## Tools and Automation
 

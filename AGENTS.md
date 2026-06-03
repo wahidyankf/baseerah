@@ -336,7 +336,7 @@ Volta for Node.js/npm pinning, package-lock.json, .env.example.
 
 ### Dependency Bump Stability & Safety Policy
 
-Three-path decision tree governing every dependency bump: Path A (LTS latest patch), Path B (60-day soak + CVE-clean), Path C (security-override waiver). All versions must be exact pins (no caret/tilde). CVE clearance required via NVD, GitHub Advisories, Snyk DB, and vendor security pages. Cutoff dates computed and recorded in writing. Waivers documented in the introducing plan's `tech-docs.md` and `docs/reference/security-waivers.md`.
+Three-path decision tree governing every dependency bump: Path A (LTS latest patch), Path B (60-day soak + CVE-clean), Path C (security-override waiver). Within the chosen path, select the most recent eligible version (Rule 5a) and reject versions with known fatal functional defects — yanked, deprecated, or open release-blocker (Rule 5b). All versions must be exact pins (no caret/tilde). CVE clearance required via NVD, GitHub Advisories, Snyk DB, and vendor security pages. Cutoff dates computed and recorded in writing. Waivers documented in the introducing plan's `tech-docs.md` and `docs/reference/security-waivers.md`.
 
 **See**: [repo-governance/development/workflow/dependency-bump-policy.md](./repo-governance/development/workflow/dependency-bump-policy.md)
 

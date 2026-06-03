@@ -1,6 +1,6 @@
 ---
-title: "Security Waivers"
-description: Persistent register of Path C (security-override) dependency waivers granted across the workspace
+title: "Security Waivers and Functional Holds"
+description: Persistent register of Path C (security-override) dependency waivers and FUNCTIONAL-HOLD (Rule 5b functional-defect skips) granted across the workspace
 category: reference
 tags:
   - reference
@@ -8,14 +8,18 @@ tags:
   - dependency
   - waiver
   - cve
+  - functional-hold
 created: 2026-05-16
 ---
 
-# Security Waivers
+# Security Waivers and Functional Holds
 
-Persistent register of **Path C** (security-override) waivers granted under the [Dependency Bump Stability & Safety Policy](../../repo-governance/development/workflow/dependency-bump-policy.md). Path C applies when no CVE-clean version exists outside the policy's 60-day soak window — the team waives the soak requirement to pull in the security patch.
+Persistent register of two clearance exceptions granted under the [Dependency Bump Stability & Safety Policy](../../repo-governance/development/workflow/dependency-bump-policy.md):
 
-> **Append, do not redefine.** Future plans must append waivers to this register rather than re-declaring them in their own `tech-docs.md`. Each entry records the plan that introduced (or last revalidated) the waiver, the package, the pinned version, the CVE(s) being addressed, the severity, the citation, and the sign-off.
+- **Path C waivers** — applies when no CVE-clean version exists outside the policy's 60-day soak window; the team waives the soak requirement to pull in the security patch.
+- **FUNCTIONAL-HOLD entries** — applies when the newest eligible version is skipped due to a known fatal functional defect (Rule 5b: yanked/deprecated, open release-blocker, or widely-reported broken-build/data-loss/crash bug); the team pins to the most recent eligible version that passes instead.
+
+> **Append, do not redefine.** Future plans must append entries to this register rather than re-declaring them in their own `tech-docs.md`. Each entry records the plan that introduced (or last revalidated) it, the package, the pinned version, the reason, the citation, and the sign-off.
 
 ## Active Waivers
 
@@ -30,19 +34,40 @@ Persistent register of **Path C** (security-override) waivers granted under the 
 | `eclipse-temurin:25.0.3+9-jdk` (Ubuntu base; replaces alpine base) | image swap     | 2026-04-22   | Avoid 2 unfixed High binutils CVEs (CVE-2025-69649, CVE-2025-69650; CVSS 7.5) in the Alpine layer. Ubuntu base has 0 High/Critical. | High            | [sliplane.io eclipse-temurin alpine CVE](https://sliplane.io/tools/cve/library/eclipse-temurin:25-alpine)          | [`stack-update` (2026-05-15)](../../plans/done/2026-05-15__stack-update/) | plan-author                            |
 | `mermaid`                                                          | **11.15.0**    | 2026-05-11   | CVE-2026-41148/41150/41159 (CSS injection High 7.1; Gantt DoS) plus 3 other CVEs; all 6 unpatched in any pre-cutoff version.        | High → Medium   | [mermaid GHSA](https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm+mermaid)                        | [`stack-update` (2026-05-15)](../../plans/done/2026-05-15__stack-update/) | plan-author                            |
 
-## Process
+## Process — Path C Waivers
 
 1. **Trigger** — A dependency bump's CVE clearance step finds no pre-cutoff CVE-clean version.
 2. **Justify** — The introducing plan's `tech-docs.md` documents the waiver with the CVE list, severity, and citation.
 3. **Sign-off** — `plan-author` records the waiver here; `plan-quality-gate` reviews during the quality-gate workflow for Critical/High waivers.
-4. **Append** — When the waiver is introduced (or revalidated by a later plan), add or update the entry in the table above with the introducing plan's link.
-5. **Retire** — When a normally-eligible (Path A or Path B) version supersedes the waivered pin, move the entry to the "Retired" section below with the retirement date and the plan that retired it.
+4. **Append** — When the waiver is introduced (or revalidated by a later plan), add or update the entry in the Active Waivers table with the introducing plan's link.
+5. **Retire** — When a normally-eligible (Path A or Path B) version supersedes the waivered pin, move the entry to the "Retired Waivers" section with the retirement date and the plan that retired it.
+
+## Active FUNCTIONAL-HOLD Entries
+
+_None yet._
+
+FUNCTIONAL-HOLD entries track cases where the most recent eligible version was skipped because it had a known fatal functional defect (Rule 5b), and the team pinned to an older eligible version that passed instead.
+
+| Package | Skipped Version | Reason | Pinned Version | Source | Introduced By | Sign-off |
+| ------- | --------------- | ------ | -------------- | ------ | ------------- | -------- |
+
+## Process — FUNCTIONAL-HOLD Entries
+
+1. **Trigger** — Rule 5b check finds the newest eligible version is yanked/deprecated, carries an open release-blocker, or has a widely-reported broken-build/data-loss/crash bug.
+2. **Justify** — The introducing plan's `tech-docs.md` documents the skipped version, the defect evidence (registry deprecation flag, upstream GitHub issue, changelog known-issues callout), and the chosen fallback version.
+3. **Sign-off** — `plan-author` records the entry here.
+4. **Append** — Add the entry to the Active FUNCTIONAL-HOLD Entries table with the introducing plan's link.
+5. **Retire** — When the defect is resolved and a passing version supersedes the pinned version, move the entry to "Retired FUNCTIONAL-HOLD Entries" with the resolution date and the plan that retired it.
 
 ## Retired Waivers
 
 _None yet._
 
+## Retired FUNCTIONAL-HOLD Entries
+
+_None yet._
+
 ## See Also
 
-- [Dependency Bump Stability & Safety Policy](../../repo-governance/development/workflow/dependency-bump-policy.md) — the three-path decision tree (A/B/C) governing every dependency bump.
-- [`stack-update` plan (2026-05-15)](../../plans/done/2026-05-15__stack-update/) — first plan to populate this register; introduced all 8 active waivers above.
+- [Dependency Bump Stability & Safety Policy](../../repo-governance/development/workflow/dependency-bump-policy.md) — the three-path decision tree (A/B/C) governing every dependency bump, plus Rule 5a (recency) and Rule 5b (functional stability / FUNCTIONAL-HOLD).
+- [`stack-update` plan (2026-05-15)](../../plans/done/2026-05-15__stack-update/) — first plan to populate this register; introduced all 8 active Path C waivers above.
