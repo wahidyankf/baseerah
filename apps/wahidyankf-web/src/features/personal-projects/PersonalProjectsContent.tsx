@@ -3,8 +3,8 @@
 import { Navigation } from "@/features/app-shell/Navigation";
 import { projects, filterProjects } from "@/features/personal-projects/projects";
 import { Github, Globe, Youtube } from "lucide-react";
-import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { SearchComponent, HighlightText } from "@open-sharia-enterprise/web-ui";
 
 const LinkIcon = ({ type }: { type: string }) => {
@@ -18,10 +18,8 @@ const LinkIcon = ({ type }: { type: string }) => {
   }
 };
 
-function ProjectsContent() {
+function ProjectsContent({ initialSearchTerm }: { initialSearchTerm: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialSearchTerm = searchParams.get("search") || "";
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
 
   useEffect(() => {
@@ -85,14 +83,12 @@ function ProjectsContent() {
   );
 }
 
-export function PersonalProjectsContent() {
+export function PersonalProjectsContent({ initialSearchTerm }: { initialSearchTerm: string }) {
   return (
     <main className="flex min-h-screen flex-col bg-gray-900 p-4 pb-20 text-green-400 sm:p-8 md:p-12 lg:ml-80 lg:p-16 lg:pb-0">
       <Navigation />
       <div className="mx-auto w-full max-w-4xl flex-grow">
-        <Suspense fallback={<div>Loading...</div>}>
-          <ProjectsContent />
-        </Suspense>
+        <ProjectsContent initialSearchTerm={initialSearchTerm} />
       </div>
     </main>
   );

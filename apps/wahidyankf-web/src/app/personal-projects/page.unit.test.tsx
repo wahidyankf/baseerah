@@ -1,17 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { PersonalProjectsContent } from "@/features/personal-projects/PersonalProjectsContent";
 
 // Mock declarations
 const mockPush = vi.fn();
-const mockGet = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
-  }),
-  useSearchParams: () => ({
-    get: mockGet,
   }),
 }));
 
@@ -60,21 +57,18 @@ vi.mock("@/features/search/search", () => ({
 
 describe("Personal Projects component", () => {
   beforeEach(() => {
-    mockGet.mockReturnValue("");
     vi.clearAllMocks();
   });
 
-  it("renders the main sections", async () => {
-    const Projects = (await import("./page")).default;
-    render(<Projects />);
+  it("renders the main sections", () => {
+    render(<PersonalProjectsContent initialSearchTerm="" />);
     expect(screen.getByText("Personal Projects")).toBeInTheDocument();
     expect(screen.getByTestId("search-component")).toBeInTheDocument();
     expect(screen.getByTestId("navigation")).toBeInTheDocument();
   });
 
-  it("renders all projects initially", async () => {
-    const Projects = (await import("./page")).default;
-    render(<Projects />);
+  it("renders all projects initially", () => {
+    render(<PersonalProjectsContent initialSearchTerm="" />);
     expect(screen.getByText("Open Sharia Enterprise (OSE)")).toBeInTheDocument();
     expect(screen.getByText("AyoKoding")).toBeInTheDocument();
     expect(screen.getByText("Organic Lever")).toBeInTheDocument();
@@ -82,8 +76,7 @@ describe("Personal Projects component", () => {
   });
 
   it("filters projects based on search term", async () => {
-    const Projects = (await import("./page")).default;
-    render(<Projects />);
+    render(<PersonalProjectsContent initialSearchTerm="" />);
     const searchInput = screen.getByTestId("search-component");
     fireEvent.change(searchInput, { target: { value: "AyoKoding" } });
 
@@ -95,8 +88,7 @@ describe("Personal Projects component", () => {
   });
 
   it("displays 'No projects found' message when no matches", async () => {
-    const Projects = (await import("./page")).default;
-    render(<Projects />);
+    render(<PersonalProjectsContent initialSearchTerm="" />);
     const searchInput = screen.getByTestId("search-component");
     fireEvent.change(searchInput, { target: { value: "NonexistentProject" } });
 
@@ -106,8 +98,7 @@ describe("Personal Projects component", () => {
   });
 
   it("updates URL when searching", async () => {
-    const Projects = (await import("./page")).default;
-    render(<Projects />);
+    render(<PersonalProjectsContent initialSearchTerm="" />);
     const searchInput = screen.getByTestId("search-component");
     fireEvent.change(searchInput, { target: { value: "AyoKoding" } });
 
@@ -116,9 +107,8 @@ describe("Personal Projects component", () => {
     });
   });
 
-  it("renders project links correctly", async () => {
-    const Projects = (await import("./page")).default;
-    render(<Projects />);
+  it("renders project links correctly", () => {
+    render(<PersonalProjectsContent initialSearchTerm="" />);
 
     const repositoryLinks = screen.getAllByRole("link", {
       name: /Repository/i,
