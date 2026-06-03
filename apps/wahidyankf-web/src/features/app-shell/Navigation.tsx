@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { File, Folder } from "lucide-react";
 import React from "react";
