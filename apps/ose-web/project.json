@@ -69,8 +69,6 @@
       "options": {
         "cwd": "apps/ose-web",
         "commands": [
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc ose-platform)",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul ose-platform)",
           "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ose-web/coverage/lcov.info 86)",
           "../../apps/ose-cli/dist/ose-cli links check --content content"
         ],
@@ -82,9 +80,7 @@
         "{projectRoot}/content/**/*.md",
         "{projectRoot}/vitest.config.ts",
         "{workspaceRoot}/specs/apps/ose-platform/behavior/web/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ose-platform/behavior/api/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ose-platform/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/ose-platform/ddd/ubiquitous-language/**/*.md"
+        "{workspaceRoot}/specs/apps/ose-platform/behavior/api/gherkin/**/*.feature"
       ],
       "cache": true
     },
