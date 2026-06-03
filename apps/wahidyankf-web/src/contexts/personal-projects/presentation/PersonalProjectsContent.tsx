@@ -1,6 +1,6 @@
 "use client";
 
-import { Navigation } from "@/contexts/app-shell/presentation/Navigation";
+import { Navigation } from "@/features/app-shell/Navigation";
 import { projects, filterProjects } from "@/contexts/personal-projects/application/projects";
 import { Github, Globe, Youtube } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";

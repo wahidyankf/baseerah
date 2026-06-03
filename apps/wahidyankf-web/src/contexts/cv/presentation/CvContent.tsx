@@ -1,6 +1,6 @@
 "use client";
 
-import { Navigation } from "@/contexts/app-shell/presentation/Navigation";
+import { Navigation } from "@/features/app-shell/Navigation";
 import { filterItems } from "@/contexts/search/application/search";
 import {
   Award,

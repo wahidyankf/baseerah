@@ -10,7 +10,7 @@ import {
   getTopFrameworksLastFiveYears,
   formatDuration,
 } from "@/contexts/cv/application/data";
-import { Navigation } from "@/contexts/app-shell/presentation/Navigation";
+import { Navigation } from "@/features/app-shell/Navigation";
 import { useState, useEffect } from "react";
 import { filterItems } from "@/contexts/search/application/search";
 import { SearchComponent, HighlightText } from "@open-sharia-enterprise/web-ui";

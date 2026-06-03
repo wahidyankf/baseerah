@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock the components imported from other files
-vi.mock("@/contexts/app-shell/presentation/Navigation", () => ({
+vi.mock("@/features/app-shell/Navigation", () => ({
   Navigation: () => <div data-testid="navigation">Navigation</div>,
 }));
 
