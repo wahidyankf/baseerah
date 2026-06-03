@@ -33,12 +33,14 @@ LABEL org.opencontainers.image.description="Wahidyan Kresna Fridayoka personal p
 
 RUN addgroup -S app && adduser -S app -G app
 WORKDIR /app
-COPY --from=build --chown=app:app /app/.next/standalone ./
-COPY --from=build --chown=app:app /app/.next/static ./.next/static
+COPY --from=build --chown=app:app /app/.next ./.next
+COPY --from=build --chown=app:app /app/public ./public
+COPY --from=build --chown=app:app /app/node_modules ./node_modules
+COPY --from=build --chown=app:app /app/package.json ./package.json
 USER app
 EXPOSE 3201
 ENV PORT=3201 HOSTNAME="0.0.0.0" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3201/ || exit 1
 
-CMD ["node", "server.js"]
+CMD ["node_modules/.bin/next", "start", "-p", "3201", "-H", "0.0.0.0"]
