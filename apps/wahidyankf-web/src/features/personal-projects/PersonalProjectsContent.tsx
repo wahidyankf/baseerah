@@ -1,7 +1,7 @@
 "use client";
 
 import { Navigation } from "@/features/app-shell/Navigation";
-import { projects, filterProjects } from "@/contexts/personal-projects/application/projects";
+import { projects, filterProjects } from "@/features/personal-projects/projects";
 import { Github, Globe, Youtube } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";

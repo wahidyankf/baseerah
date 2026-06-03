@@ -1,4 +1,4 @@
-import { PersonalProjectsContent } from "@/contexts/personal-projects/presentation/PersonalProjectsContent";
+import { PersonalProjectsContent } from "@/features/personal-projects/PersonalProjectsContent";
 
 export default function Projects() {
   return <PersonalProjectsContent />;
