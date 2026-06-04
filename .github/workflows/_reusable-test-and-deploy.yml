@@ -25,7 +25,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - run: npx nx run ${{ inputs.app-name }}:lint
 
@@ -33,7 +33,7 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - run: npx nx run ${{ inputs.app-name }}:test:quick
 
@@ -41,7 +41,7 @@ jobs:
     name: Spec coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-golang
       - name: Run spec-coverage for app and E2E runners
@@ -59,7 +59,7 @@ jobs:
     name: Integration tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - run: npx nx run ${{ inputs.app-name }}:test:integration
 
@@ -67,7 +67,7 @@ jobs:
     name: E2E tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-docker-cache
       - uses: ./.github/actions/setup-playwright
@@ -94,7 +94,7 @@ jobs:
     name: Specs gate (BDD+DDD validators)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --projects=rhino-cli
@@ -105,7 +105,7 @@ jobs:
     outputs:
       has-changes: ${{ steps.check.outputs.has-changes }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
       - id: check
@@ -123,7 +123,7 @@ jobs:
     if: needs.detect-changes.outputs.has-changes == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - run: |

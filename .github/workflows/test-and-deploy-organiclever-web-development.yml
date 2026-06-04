@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-golang
       - name: Run spec-coverage for all OrganicLever projects
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - run: npx nx run organiclever-web:lint
 
@@ -39,7 +39,7 @@ jobs:
     environment: organiclever-web-development
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
 
       - name: Generate contract types for backend
@@ -62,7 +62,7 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
 
       - name: Generate contract types
@@ -81,7 +81,7 @@ jobs:
     environment: organiclever-web-development
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
 
       - name: Generate contract types
@@ -132,7 +132,7 @@ jobs:
 
       - name: Upload BE E2E report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-organiclever-be
           path: apps/organiclever-be-e2e/playwright-report/
@@ -145,7 +145,7 @@ jobs:
 
       - name: Upload FE E2E report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-organiclever-web
           path: apps/organiclever-web-e2e/playwright-report/
@@ -160,7 +160,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --projects=rhino-cli
@@ -170,7 +170,7 @@ jobs:
     needs: [spec-coverage, fe-lint, be-integration, fe-integration, e2e, specs-gate]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       # Vercel listens to `stag-organiclever-web` and starts a build on every

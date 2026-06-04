@@ -21,7 +21,7 @@ jobs:
       NX_BASE: origin/${{ github.base_ref }}
       NX_HEAD: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
@@ -57,7 +57,7 @@ jobs:
     name: Format check (Prettier)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - run: npx prettier --check .
 
@@ -70,7 +70,7 @@ jobs:
       NX_BASE: origin/${{ github.base_ref }}
       NX_HEAD: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
@@ -85,7 +85,7 @@ jobs:
       NX_BASE: origin/${{ github.base_ref }}
       NX_HEAD: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
@@ -101,7 +101,7 @@ jobs:
       NX_BASE: origin/${{ github.base_ref }}
       NX_HEAD: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
@@ -117,7 +117,7 @@ jobs:
       NX_BASE: origin/${{ github.base_ref }}
       NX_HEAD: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
@@ -133,7 +133,7 @@ jobs:
     if: needs.detect.outputs.has-markdown == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - run: npm run lint:md
 
@@ -141,7 +141,7 @@ jobs:
     name: Naming validators (agents + workflows)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run rhino-cli:validate:naming-agents
@@ -151,7 +151,7 @@ jobs:
     name: Specs gate (BDD+DDD validators)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --projects=rhino-cli
