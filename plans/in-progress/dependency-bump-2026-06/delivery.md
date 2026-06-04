@@ -31,25 +31,32 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Provision/verify the worktree `worktrees/dependency-bump-2026-06/` exists
-      — acceptance: directory present.
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
-      — acceptance: exits 0, `node_modules/` synchronized.
-- [ ] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
-      — acceptance: exits 0 with no unresolved drift.
-- [ ] [AI] Establish baseline for affected projects:
-      `npx nx run-many -t test:quick -p rhino-cli organiclever-be ose-app-be crane-cli`
-      — acceptance: baseline pass/fail count recorded; all preexisting failures documented.
-- [ ] [AI] Resolve all preexisting failures before proceeding
-      — acceptance: no preexisting failures remain unresolved.
+- [x] [AI] Provision/verify the worktree `worktrees/dependency-bump-2026-06/` exists
+    — acceptance: directory present.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: worktrees/dependency-bump-2026-06/ (git worktree add) | Notes: Provisioned with `git worktree add worktrees/dependency-bump-2026-06 HEAD`; directory confirmed present. -->
+- [x] [AI] Install dependencies in the root worktree: `npm install`
+    — acceptance: exits 0, `node_modules/` synchronized.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: node_modules/ | Notes: npm install exited 0; node_modules synchronized. -->
+- [x] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
+    — acceptance: exits 0 with no unresolved drift.
+<!-- Date: 2026-06-04 | Status: done | Notes: doctor --fix exited 0; all 20 tools verified, no unresolved drift. -->
+- [x] [AI] Establish baseline for affected projects:
+    `npx nx run-many -t test:quick -p rhino-cli organiclever-be ose-app-be crane-cli`
+    — acceptance: baseline pass/fail count recorded; all preexisting failures documented.
+<!-- Date: 2026-06-04 | Status: done | Notes: Baseline: rhino-cli 778/778, crane-cli 116/116, organiclever-be 11/11, ose-app-be 13/13. Total 918/918 passed. Zero failures. -->
+- [x] [AI] Resolve all preexisting failures before proceeding
+    — acceptance: no preexisting failures remain unresolved.
+<!-- Date: 2026-06-04 | Status: done | Notes: No preexisting failures found; baseline was 918/918 passing. Nothing to resolve. -->
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` baseline recorded and every
-      preexisting failure resolved (zero unresolved).
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
+<!-- Date: 2026-06-04 | Status: done | Notes: Both confirmed passing in Phase 0 execution. -->
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` baseline recorded and every
+    preexisting failure resolved (zero unresolved).
+<!-- Date: 2026-06-04 | Status: done | Notes: No affected changes at baseline; 918/918 tests clean. Zero preexisting failures. Gate PASSED. -->
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no dependency
 > change exists yet. Safe to stop indefinitely. To resume: re-run the baseline command and confirm
@@ -61,50 +68,65 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **RED** — Add `serde_norway = "<latest soak-eligible>"` to `apps/rhino-cli/Cargo.toml`
-      and remove `serde_yml = "0.0.12"` (line 22). Run `nx run rhino-cli:test:unit`
-      — acceptance: build/test FAILS because `use serde_yml` call sites no longer resolve (this is
-      the expected RED state proving the dependency is gone).
-- [ ] [AI] **GREEN** — Update all `serde_yml` call sites to the `serde_norway` API (serde_yaml-
-      compatible) in: `apps/rhino-cli/src/internal/repo_governance/frontmatter_audit.rs`,
-      `apps/rhino-cli/src/internal/bcregistry.rs`,
-      `apps/rhino-cli/src/internal/agents/converter.rs`,
-      `apps/rhino-cli/src/internal/agents/skill_validator.rs`,
-      `apps/rhino-cli/src/internal/agents/sync_validator.rs`,
-      `apps/rhino-cli/src/internal/agents/frontmatter.rs`,
-      `apps/rhino-cli/src/internal/agents/agent_validator.rs`,
-      `apps/rhino-cli/src/internal/docs/frontmatter.rs`. Run `nx run rhino-cli:test:quick`
-      — acceptance: all existing YAML-parsing unit tests pass (regression guard green).
-- [ ] [AI] **REFACTOR** — Tidy imports/aliasing for the new crate; run
-      `grep -r serde_yml apps/rhino-cli/src` — acceptance: returns no matches; `cargo build`
-      (rhino-cli) exits 0.
-- [ ] [AI] Verify advisory cleared: `cargo deny check advisories` (from repo root / Rust workspace)
-      — acceptance: RUSTSEC-2025-0068 no longer reported.
-- [ ] [AI] Confirm bindings byte-stability after the rhino-cli code change:
-      `npm run generate:bindings` — acceptance: `git status` shows no diff in `.opencode/` or
-      `.amazonq/`.
-- [ ] [AI] Commit thematically: `fix(rhino-cli): migrate YAML handling off unmaintained serde_yml`.
+- [x] [AI] **RED** — Add `serde_norway = "<latest soak-eligible>"` to `apps/rhino-cli/Cargo.toml`
+    and remove `serde_yml = "0.0.12"` (line 22). Run `nx run rhino-cli:test:unit`
+    — acceptance: build/test FAILS because `use serde_yml` call sites no longer resolve (this is
+    the expected RED state proving the dependency is gone).
+<!-- Date: 2026-06-04 | Status: done | Files Changed: apps/rhino-cli/Cargo.toml | Notes: serde_norway = "0.9.42" added, serde_yml removed; build failed as expected (RED confirmed). -->
+- [x] [AI] **GREEN** — Update all `serde_yml` call sites to the `serde_norway` API (serde_yaml-
+    compatible) in: `apps/rhino-cli/src/internal/repo_governance/frontmatter_audit.rs`,
+    `apps/rhino-cli/src/internal/bcregistry.rs`,
+    `apps/rhino-cli/src/internal/agents/converter.rs`,
+    `apps/rhino-cli/src/internal/agents/skill_validator.rs`,
+    `apps/rhino-cli/src/internal/agents/sync_validator.rs`,
+    `apps/rhino-cli/src/internal/agents/frontmatter.rs`,
+    `apps/rhino-cli/src/internal/agents/agent_validator.rs`,
+    `apps/rhino-cli/src/internal/docs/frontmatter.rs`. Run `nx run rhino-cli:test:quick`
+    — acceptance: all existing YAML-parsing unit tests pass (regression guard green).
+<!-- Date: 2026-06-04 | Status: done | Files Changed: 8 rhino-cli src files | Notes: All serde_yml → serde_norway; nx run rhino-cli:test:quick: 778/778 passed. -->
+- [x] [AI] **REFACTOR** — Tidy imports/aliasing for the new crate; run
+    `grep -r serde_yml apps/rhino-cli/src` — acceptance: returns no matches; `cargo build`
+    (rhino-cli) exits 0.
+<!-- Date: 2026-06-04 | Status: done | Notes: grep returns no matches; cargo build exits 0. -->
+- [x] [AI] Verify advisory cleared: `cargo deny check advisories` (from repo root / Rust workspace)
+    — acceptance: RUSTSEC-2025-0068 no longer reported.
+<!-- Date: 2026-06-04 | Status: done | Notes: cargo deny check advisories reports "advisories ok"; RUSTSEC-2025-0068 resolved. -->
+- [x] [AI] Confirm bindings byte-stability after the rhino-cli code change:
+    `npm run generate:bindings` — acceptance: `git status` shows no diff in `.opencode/` or
+    `.amazonq/`.
+<!-- Date: 2026-06-04 | Status: done | Notes: npm run generate:bindings clean; no diff in .opencode/ or .amazonq/. -->
+- [x] [AI] Commit thematically: `fix(rhino-cli): migrate YAML handling off unmaintained serde_yml`.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: apps/rhino-cli/Cargo.toml, Cargo.lock, 8 src files | Notes: Committed as 87a52b6e1. -->
 
 ### 1b. tokio lockfile floor (organiclever-be, ose-app-be)
 
 _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] Inspect current resolution: `cargo tree -p tokio` (or `grep -A1 'name = "tokio"'
+- [x] [AI] Inspect current resolution: `cargo tree -p tokio` (or `grep -A1 'name = "tokio"'
 Cargo.lock`) — acceptance: current resolved tokio version recorded.
-- [ ] [AI] If resolved tokio < 1.51.0, run `cargo update -p tokio --precise 1.51.0`; otherwise note
-      "already satisfied" — acceptance: `Cargo.lock` resolves tokio ≥ 1.51.0 for both backends.
-- [ ] [AI] Re-audit: `cargo deny check advisories` — acceptance: no tokio broadcast-channel
-      advisory (RUSTSEC-2025-0023) reported.
-- [ ] [AI] Commit if the lockfile changed: `chore(deps): floor tokio to 1.51.0 in Cargo.lock`.
+  <!-- Date: 2026-06-04 | Status: done | Notes: apps/organiclever-be/Cargo.lock: tokio 1.52.3; apps/ose-app-be/Cargo.lock: tokio 1.52.3. Both > 1.51.0. -->
+- [x] [AI] If resolved tokio < 1.51.0, run `cargo update -p tokio --precise 1.51.0`; otherwise note
+    "already satisfied" — acceptance: `Cargo.lock` resolves tokio ≥ 1.51.0 for both backends.
+<!-- Date: 2026-06-04 | Status: done | Notes: Already satisfied — tokio 1.52.3 in both Cargo.lock files. No update needed. -->
+- [x] [AI] Re-audit: `cargo deny check advisories` — acceptance: no tokio broadcast-channel
+    advisory (RUSTSEC-2025-0023) reported.
+<!-- Date: 2026-06-04 | Status: done | Notes: rhino-cli, organiclever-be, ose-app-be all report "advisories ok". No RUSTSEC-2025-0023. -->
+- [x] [AI] Commit if the lockfile changed: `chore(deps): floor tokio to 1.51.0 in Cargo.lock`.
+<!-- Date: 2026-06-04 | Status: done | Notes: Lockfile unchanged — tokio 1.52.3 already satisfied >= 1.51.0. No commit needed. -->
 
 ### Local Quality Gates (Before Push) — Phase 1
 
-- [ ] [AI] `npx nx affected -t typecheck` — exits 0.
-- [ ] [AI] `npx nx affected -t lint` — exits 0.
-- [ ] [AI] `npx nx affected -t test:quick` — exits 0.
-- [ ] [AI] `npx nx affected -t spec-coverage` — exits 0.
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by these changes. Re-run to
-      confirm resolution.
+- [x] [AI] `npx nx affected -t typecheck` — exits 0.
+<!-- Date: 2026-06-04 | Status: done | Notes: nx run rhino-cli:typecheck passed (only affected project). cargo check clean. -->
+- [x] [AI] `npx nx affected -t lint` — exits 0.
+<!-- Date: 2026-06-04 | Status: done | Notes: nx run rhino-cli:lint passed; cargo fmt + clippy clean. -->
+- [x] [AI] `npx nx affected -t test:quick` — exits 0.
+<!-- Date: 2026-06-04 | Status: done | Notes: nx run rhino-cli:test:quick: 778/778 passed. -->
+- [x] [AI] `npx nx affected -t spec-coverage` — exits 0.
+<!-- Date: 2026-06-04 | Status: done | Notes: nx run rhino-cli:spec-coverage passed (stubbed target). -->
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by these changes. Re-run to
+    confirm resolution.
+<!-- Date: 2026-06-04 | Status: done | Notes: No failures to fix — all gates clean. Zero failures across typecheck/lint/test:quick/spec-coverage. -->
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your
 > changes. This follows the root cause orientation principle — proactively fix preexisting errors
