@@ -2,11 +2,12 @@
 name: plan-establishment-execution
 title: "plan-establishment-execution"
 goal: >
-  Create a well-researched, grill-validated project plan in plans/in-progress/ from a user prompt
+  Create a well-researched, grill-validated project plan in the resolved target stage
+  (plans/in-progress/ by default, or plans/backlog/ when target-stage=backlog) from a user prompt
   describing a desired behavior or change, then push it to the confirmed target
 termination: >
-  Plan exists in plans/in-progress/, passes plan-quality-gate at strict mode, and is pushed to
-  the confirmed target
+  Plan exists in the resolved target-stage directory, passes plan-quality-gate at strict mode, and
+  is pushed to the confirmed target
 inputs:
   - name: prompt
     type: string
@@ -17,10 +18,21 @@ inputs:
     description: "Git push destination (e.g., 'origin main'). Confirmed in the Step 1 grill if not provided."
     required: false
     default: "origin main"
+  - name: target-stage
+    type: enum
+    values: [in-progress, backlog]
+    description: >
+      Which plans/ stage the finished plan lands in. `in-progress` (default) creates an immediately
+      active plan at plans/in-progress/<identifier>/ (no date prefix). `backlog` creates a
+      proposed-but-not-yet-scheduled plan at plans/backlog/YYYY-MM-DD__<identifier>/ (creation-date
+      prefix per the Plans Organization Convention). Both stages stop at plan creation — neither
+      executes the plan.
+    required: false
+    default: in-progress
 outputs:
   - name: plan-path
     type: string
-    description: Path to the created plan in plans/in-progress/<identifier>/
+    description: Path to the created plan in the resolved target-stage directory
   - name: final-status
     type: enum
     values: [pass, partial, fail]
@@ -34,8 +46,24 @@ outputs:
 # Plan Establishment Workflow
 
 **Purpose**: Transform a user prompt describing a desired behavior or change into a
-production-ready plan in `plans/in-progress/`, validated by `plan-quality-gate` and pushed to
+production-ready plan in the resolved target stage (`plans/in-progress/` by default, or
+`plans/backlog/` when `target-stage=backlog`), validated by `plan-quality-gate` and pushed to
 the confirmed target.
+
+## Stage Resolution
+
+This workflow places the finished plan according to the `target-stage` input. Throughout the
+steps below, `<plan-dir>` resolves as:
+
+- **`target-stage=in-progress`** (default): `plans/in-progress/<identifier>/` — no date prefix;
+  the plan is immediately active.
+- **`target-stage=backlog`**: `plans/backlog/<YYYY-MM-DD>__<identifier>/` — creation-date prefix
+  per the [Plans Organization Convention](../../conventions/structure/plans.md); the plan is a
+  proposal awaiting promotion. `<YYYY-MM-DD>` is the date the plan is created.
+
+Both stages stop at plan creation. **Neither stage executes the plan** — execution is a separate
+concern handled later by the [Plan Execution workflow](./plan-execution.md) after a backlog plan
+is promoted to `in-progress/` (date prefix stripped on promotion).
 
 **When to use**:
 
@@ -43,6 +71,8 @@ the confirmed target.
 - When a vague idea needs to become a structured, executable plan
 - When research is needed before writing a plan (library versions, best practices, prior art)
 - When the user wants the full plan-creation lifecycle orchestrated automatically
+- When a parent workflow needs a validated plan produced into a specific stage — e.g.
+  `repo-dependency-bump-planning` calls this with `target-stage=backlog`
 
 ## Execution Mode
 
@@ -110,22 +140,27 @@ Resolve ALL of the following (each as a structured multiple-choice question):
    [Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)),
    tool dependencies
 5. **Plan identifier**: What slug should the plan folder use (e.g., `add-foo-convention`)?
-6. **Push target**: Confirm where the finished plan should be pushed (default: `origin main`).
+6. **Target stage**: Confirm `target-stage` (default `in-progress`). If `backlog`, the plan lands
+   at `plans/backlog/<YYYY-MM-DD>__<identifier>/`; if `in-progress`, at
+   `plans/in-progress/<identifier>/`. Skip this question if the caller already passed
+   `target-stage` explicitly (e.g., a parent workflow). Record — resolves `<plan-dir>` for all
+   later steps.
+7. **Push target**: Confirm where the finished plan should be pushed (default: `origin main`).
    Record — used verbatim in Step 7 without re-asking.
-7. **PR vs. direct push**: Is a PR needed, or direct push to `main`?
-8. **Definition of done**: What must the finished plan contain for the user to consider it ready?
-9. **Research needed**: Are there external claims (library versions, third-party best practices,
-   API behavior) that require verification before writing?
+8. **PR vs. direct push**: Is a PR needed, or direct push to `main`?
+9. **Definition of done**: What must the finished plan contain for the user to consider it ready?
+10. **Research needed**: Are there external claims (library versions, third-party best practices,
+    API behavior) that require verification before writing?
 
 **Do NOT proceed to Step 2** until:
 
 - All design-decision branches are resolved
-- Push target and plan identifier are explicitly confirmed
+- Push target, target stage, and plan identifier are explicitly confirmed
 - Definition of done is agreed upon
 - Whether research is needed is established (determines Step 2 skip condition)
 
-**Output**: Push target confirmed. Plan identifier confirmed. All decisions resolved.
-Research-needed flag set.
+**Output**: Push target confirmed. Target stage confirmed (`<plan-dir>` resolved). Plan identifier
+confirmed. All decisions resolved. Research-needed flag set.
 
 **On failure to resolve**: Do not proceed. Remain in grill until resolved or user cancels.
 
@@ -184,7 +219,7 @@ Present research findings and grill again to validate direction and close new br
 
 ### 4. Plan Creation (Sequential)
 
-Invoke `plan-maker` to write the plan in `plans/in-progress/`.
+Invoke `plan-maker` to write the plan in the resolved `<plan-dir>` (see [Stage Resolution](#stage-resolution)).
 
 **Agent**: `plan-maker`
 
@@ -193,18 +228,20 @@ Delegate via the Agent tool. Provide a self-contained handoff prompt containing 
 1. Original user prompt (verbatim)
 2. Resolved design decisions from Steps 1 and 3 (numbered decision list)
 3. Research findings from Step 2 (cited) — or note that research was skipped
-4. Confirmed plan identifier (target folder: `plans/in-progress/<identifier>/`)
+4. Confirmed plan identifier and resolved `<plan-dir>` (the exact target folder)
 5. Confirmed push target
 6. Definition of done (from Step 1)
-7. **Explicit instruction**: write the plan directly to `plans/in-progress/<identifier>/` — do
-   NOT create in `backlog/`. This workflow places plans in `in-progress/` immediately.
+7. **Explicit instruction**: write the plan directly to the resolved `<plan-dir>`. For
+   `target-stage=in-progress` this is `plans/in-progress/<identifier>/` (no date prefix); for
+   `target-stage=backlog` this is `plans/backlog/<YYYY-MM-DD>__<identifier>/` (creation-date
+   prefix). Do NOT place an `in-progress` plan under `backlog/` or vice versa.
 
 **Note on plan-maker's own grill protocol**: `plan-maker` mandates a pre-write grill (Step 1) and
 a post-write grill (Step 8). When invoked by `plan-establishment`, these become
 **validation passes** — macro-decisions are already resolved. Micro-decisions (exact Gherkin
 phrasing, section ordering, step granularity) are still resolved by plan-maker's grills.
 
-**Output**: Plan files created in `plans/in-progress/<identifier>/`.
+**Output**: Plan files created in the resolved `<plan-dir>`.
 
 **On failure**: Terminate with status `fail`. Surface the error.
 
@@ -214,11 +251,13 @@ Read the created plan files and verify structural completeness before the qualit
 
 **Orchestrator action**:
 
-1. Read all plan files in `plans/in-progress/<identifier>/`
+1. Read all plan files in the resolved `<plan-dir>`
 2. Verify `## Worktree` section exists in `delivery.md` (multi-file) or `README.md` (single-file)
 3. Verify delivery checklist has at least one `- [ ]` checkbox
 4. Verify Gherkin acceptance criteria present in `prd.md` (multi-file) or condensed PRD
-5. Verify the worktree path in the plan matches `<identifier>` confirmed in Step 1
+5. Verify the worktree path in the plan matches `<identifier>` confirmed in Step 1, and that the
+   plan folder lives under the correct stage (`backlog/` with a `<YYYY-MM-DD>__` prefix, or
+   `in-progress/` with no date prefix) per the confirmed `target-stage`
 6. Verify delivery checklist starts with **Phase 0: Environment Setup and Baseline**
 7. Verify `delivery.md` opens with the `[AI]`/`[HUMAN]` executor legend and that every step only a human can perform is tagged `[HUMAN]`
 8. Verify every phase ends with a `### Phase N Gate` (must-pass verification) followed by a `> **Pause Safety**:` note
@@ -234,7 +273,7 @@ Run the `plan-quality-gate` workflow at `strict` mode.
 
 Follow the [plan-quality-gate workflow](./plan-quality-gate.md) with:
 
-- **Input** `scope`: `plans/in-progress/<identifier>/`
+- **Input** `scope`: the resolved `<plan-dir>`
 - **Input** `mode`: `strict`
 - **Output**: `final-status`, `final-report`
 
@@ -251,8 +290,9 @@ Commit and push the plan to the confirmed target.
 
 **Orchestrator action**:
 
-1. Stage all plan files: `git add plans/in-progress/<identifier>/`
-2. Commit: `chore(plans): establish <identifier> plan`
+1. Stage all plan files: `git add <plan-dir>`
+2. Commit: `chore(plans): establish <identifier> plan` (for `target-stage=backlog`, use
+   `chore(plans): add <identifier> to backlog`)
 3. Push to the confirmed target from Step 1: `git push <confirmed-target>`
 4. Monitor GitHub Actions: `gh run list --limit 5` — verify all triggered workflows complete
    with `completed/success` conclusion
