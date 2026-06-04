@@ -741,7 +741,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
    b. **Rule 5a / Recency** — The version pinned MUST be the most recent eligible version for its path (latest LTS patch for A; latest pre-cutoff CVE-clean version for B; most recent CVE-patched version for C). Pinning an older eligible version without explanation is a HIGH finding.
 
-   c. **Rule 5b / Functional Stability** — The clearance status for each package MUST be one of: `CLEAR`, `CLEAR (patch-of)`, `WAIVER`, or `FUNCTIONAL-HOLD`. Any version that is yanked, deprecated, or carries an open release-blocker MUST record `FUNCTIONAL-HOLD` with the skipped version, chosen fallback, and reason. Missing or incorrect clearance status is a HIGH finding; `FUNCTIONAL-HOLD` recorded without skipped-version and reason is a MEDIUM finding.
+   c. **Rule 5b / Functional Stability** — The clearance status for each package MUST be one of: `CLEAR`, `CLEAR (patch-of)`, `WAIVER`, or `FUNCTIONAL-HOLD`. Any status MAY carry the `(KEV-listed)` suffix when the CVE was confirmed actively exploited at time of bump (examples: `CLEAR (patch-of, KEV-listed)`, `WAIVER (KEV-listed)`). Any version that is yanked, deprecated, or carries an open release-blocker MUST record `FUNCTIONAL-HOLD` with the skipped version, chosen fallback, and reason. Missing or incorrect clearance status is a HIGH finding; `FUNCTIONAL-HOLD` recorded without skipped-version and reason is a MEDIUM finding.
 
    d. **Security Clearance Status section** — `tech-docs.md` MUST contain a Security Clearance Status table. Absence is a HIGH finding.
 
@@ -750,6 +750,10 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
    f. **Path C register** — Every Path C waiver MUST be propagated to `docs/reference/security-waivers.md`. Missing register entry is a HIGH finding.
 
    g. **FUNCTIONAL-HOLD register** — Every `FUNCTIONAL-HOLD` clearance status MUST be propagated to the FUNCTIONAL-HOLD table in `docs/reference/security-waivers.md`. Missing register entry is a HIGH finding.
+
+   h. **KEV-listed register** — Every clearance status carrying the `(KEV-listed)` suffix MUST be reflected in `docs/reference/security-waivers.md` with the KEV `dateAdded` and `knownRansomwareCampaignUse` field. Missing KEV column entries are a HIGH finding.
+
+   i. **EPSS record** — For any CVE with CVSS ≥ 7.0, the clearance table MUST record the EPSS score and percentile. Missing EPSS data when CVSS ≥ 7.0 is a MEDIUM finding. When EPSS score ≥ 0.5 the bump MUST be treated as Path C urgency (EPSS Escalation); applying a lower-urgency path without waiver justification is a HIGH finding.
 
    **Scope note**: For plans in `plans/done/`, flag only CRITICAL and HIGH violations (historical accuracy). For plans in `plans/in-progress/` or `plans/backlog/`, flag all severity levels (actionable before execution).
 
