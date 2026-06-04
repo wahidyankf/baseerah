@@ -1,6 +1,6 @@
 # Dependency Bump — June 2026 Sweep
 
-> **Stage**: backlog (creation date `2026-06-04`) · **Plan identifier**: `dependency-bump-2026-06`
+> **Stage**: in-progress (promoted `2026-06-04`; created `2026-06-04`) · **Plan identifier**: `dependency-bump-2026-06`
 > **Push target**: `origin main` (Trunk Based Development — direct push, no PR)
 
 ## Context

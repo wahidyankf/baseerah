@@ -4,8 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan | Description |
-| ---- | ----------- |
+| Plan                                                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [dependency-bump-2026-06](./dependency-bump-2026-06/) | Pre-approved dependency bump across four tiers per the Dependency Bump Stability & Safety Policy: migrate `rhino-cli` off the unmaintained `serde_yml` crate (RUSTSEC-2025-0068), floor tokio ≥ 1.51.0, refresh Node LTS (24.16.0) and the backend Debian runtime base (trixie-slim), migrate the `crane-cli` test stack to xunit.v3 + coverlet 8, remove deprecated `@hey-api/client-fetch`, and confirm-then-bump GitHub Actions major tags. Snapshot as of 2026-06-04; re-verify eligibility before execution. |
 
 ## Instructions
 
