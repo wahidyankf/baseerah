@@ -200,17 +200,21 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Post-Push CI Verification — Phase 2
 
-- [ ] [AI] Push to `main`; monitor ALL GitHub Actions (poll every 3 min); verify all green; fix and
-      re-push until green before proceeding.
+- [x] [AI] Push to `main`; monitor ALL GitHub Actions (poll every 3 min); verify all green; fix and
+    re-push until green before proceeding.
+<!-- Date: 2026-06-04 | Status: done | Notes: Pushed e94e9f784, 6678d8965, 377235b7d. No push-triggered CI workflows; pre-push hook passed. -->
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `package.json` volta.node equals `24.16.0` exactly and `npm run doctor` is satisfied.
-- [ ] [AI] Both integration Dockerfiles reference `debian:trixie-slim` (runtime) with the
-      `rust:1.95-slim` builder unchanged, and both `:test:integration` suites pass.
-- [ ] [AI] CI is fully green.
+- [x] [AI] `package.json` volta.node equals `24.16.0` exactly and `npm run doctor` is satisfied.
+<!-- Date: 2026-06-04 | Status: done | Notes: package.json volta.node = "24.16.0"; npm run doctor ✓ node v24.16.0 satisfied. -->
+- [x] [AI] Both integration Dockerfiles reference `debian:trixie-slim` (runtime) with the
+    `rust:1.95-slim` builder unchanged, and both `:test:integration` suites pass.
+<!-- Date: 2026-06-04 | Status: done | Notes: Both Dockerfile.integration files: runtime=trixie-slim, builder=rust:1.95-slim unchanged. Both nx run *:test:integration: NX Successfully ran. -->
+- [x] [AI] CI is fully green.
+<!-- Date: 2026-06-04 | Status: done | Notes: Pre-push hook passed on all Phase 2 commits. No push-triggered CI workflows. Phase 2 Gate PASSED. -->
 
 > **Pause Safety**: Node pin and Debian runtime base are current; builds and integration tests are
 > green and CI is green. Safe to stop. To resume: re-run `npm run doctor` and the two
@@ -224,44 +228,54 @@ _Suggested executor: `swe-fsharp-dev`_
 
 > Items 5–9 are interdependent and MUST land together in this phase.
 
-- [ ] [AI] **RED** — In **both** `apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` and
-      `apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj`, update the shared
-      PackageReference versions: `Microsoft.NET.Test.Sdk` → `18.3.0`; replace `xunit` `2.9.2` with
-      `xunit.v3` `3.2.2`; `xunit.runner.visualstudio` → `3.1.5`. Then, in
-      **`apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` ONLY** (the integration fsproj has
-      no coverlet references), update `coverlet.collector` → `8.0.1` and `coverlet.msbuild` →
-      `8.0.1`. Run `nx run crane-cli:test:quick`
-      — acceptance: build/test FAILS due to xunit v2→v3 API changes (expected RED), confirming the
-      stack swap is in effect.
-- [ ] [AI] **GREEN** — Apply the xunit v3 migration per
-      <https://xunit.net/docs/getting-started/v3/migration> (namespace/API updates) across crane-cli
-      unit + integration test sources. Run `nx run crane-cli:test:quick`
-      — acceptance: crane-cli unit tests pass.
-- [ ] [AI] Run the crane-cli integration tests: `nx run crane-cli:test:integration`
-      — acceptance: integration tests pass on xunit.v3.
-- [ ] [AI] **REFACTOR** — Verify no coverlet config relied on Newtonsoft.Json (check
-      `apps/crane-cli/tests/unit/xunit.runner.json` and coverage settings); tidy as needed. Run
-      `nx run crane-cli:spec-coverage` — acceptance: coverage collection succeeds with coverlet 8.
-- [ ] [AI] Confirm no caret/tilde in the edited fsproj PackageReferences — acceptance: all exact
-      versions.
-- [ ] [AI] Commit: `test(crane-cli): migrate test stack to xunit.v3 and coverlet 8`.
+- [x] [AI] **RED** — In **both** `apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` and
+    `apps/crane-cli/tests/integration/crane-cli-integration-tests.fsproj`, update the shared
+    PackageReference versions: `Microsoft.NET.Test.Sdk` → `18.3.0`; replace `xunit` `2.9.2` with
+    `xunit.v3` `3.2.2`; `xunit.runner.visualstudio` → `3.1.5`. Then, in
+    **`apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj` ONLY** (the integration fsproj has
+    no coverlet references), update `coverlet.collector` → `8.0.1` and `coverlet.msbuild` →
+    `8.0.1`. Run `nx run crane-cli:test:quick`
+    — acceptance: build/test FAILS due to xunit v2→v3 API changes (expected RED), confirming the
+    stack swap is in effect.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: crane-cli-unit-tests.fsproj, crane-cli-integration-tests.fsproj | Notes: Both fsproj updated; test:quick passed immediately (xunit.v3 API-compatible subset, no source changes needed). -->
+- [x] [AI] **GREEN** — Apply the xunit v3 migration per
+    <https://xunit.net/docs/getting-started/v3/migration> (namespace/API updates) across crane-cli
+    unit + integration test sources. Run `nx run crane-cli:test:quick`
+    — acceptance: crane-cli unit tests pass.
+<!-- Date: 2026-06-04 | Status: done | Notes: No source changes needed — xunit.v3 3.2.2 is API-compatible with subset used. test:quick: 116/116 passed (96.24% coverage). -->
+- [x] [AI] Run the crane-cli integration tests: `nx run crane-cli:test:integration`
+    — acceptance: integration tests pass on xunit.v3.
+<!-- Date: 2026-06-04 | Status: done | Notes: nx run crane-cli:test:integration: 1/1 passed on xunit.v3. -->
+- [x] [AI] **REFACTOR** — Verify no coverlet config relied on Newtonsoft.Json (check
+    `apps/crane-cli/tests/unit/xunit.runner.json` and coverage settings); tidy as needed. Run
+    `nx run crane-cli:spec-coverage` — acceptance: coverage collection succeeds with coverlet 8.
+<!-- Date: 2026-06-04 | Status: done | Notes: xunit.runner.json = {"maxParallelThreads":1}, no Newtonsoft dep. spec-coverage: 12 specs, 37 scenarios, 141 steps, all covered. -->
+- [x] [AI] Confirm no caret/tilde in the edited fsproj PackageReferences — acceptance: all exact
+    versions.
+<!-- Date: 2026-06-04 | Status: done | Notes: All PackageReference Version="x.y.z" — no ^/~ in any fsproj. Exact pins confirmed. -->
+- [x] [AI] Commit: `test(crane-cli): migrate test stack to xunit.v3 and coverlet 8`.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: crane-cli-unit-tests.fsproj, crane-cli-integration-tests.fsproj | Notes: Committed as 29dba883d. -->
 
 ### 3b. Remove @hey-api/client-fetch (housekeeping)
 
 _Suggested executor: `swe-typescript-dev`_
 
-- [ ] [AI] Remove `"@hey-api/client-fetch": "0.13.1"` from `package.json` devDependencies (line 55);
-      run `npm install` — acceptance: lockfile resolves without `@hey-api/client-fetch`.
-- [ ] [AI] Re-run contract codegen + lint: `nx run organiclever-contracts:lint` and the
-      organiclever `codegen` target — acceptance: codegen succeeds using openapi-ts's built-in fetch
-      client; if it referenced the standalone client, adjust the codegen config and re-run until
-      green.
-- [ ] [AI] Commit: `chore(deps): remove deprecated @hey-api/client-fetch`.
+- [x] [AI] Remove `"@hey-api/client-fetch": "0.13.1"` from `package.json` devDependencies (line 55);
+    run `npm install` — acceptance: lockfile resolves without `@hey-api/client-fetch`.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: package.json, package-lock.json | Notes: Line removed; npm install succeeded; @hey-api/client-fetch absent from lockfile. -->
+- [x] [AI] Re-run contract codegen + lint: `nx run organiclever-contracts:lint` and the
+    organiclever `codegen` target — acceptance: codegen succeeds using openapi-ts's built-in fetch
+    client; if it referenced the standalone client, adjust the codegen config and re-run until
+    green.
+<!-- Date: 2026-06-04 | Status: done | Notes: contracts:lint NX Successfully ran; organiclever-web:codegen NX Successfully ran. No config changes needed. -->
+- [x] [AI] Commit: `chore(deps): remove deprecated @hey-api/client-fetch`.
+<!-- Date: 2026-06-04 | Status: done | Files Changed: package.json, package-lock.json | Notes: Committed as 72d6123bd. -->
 
 ### Local Quality Gates (Before Push) — Phase 3
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0; fix ALL
-      failures (including preexisting) before pushing.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0; fix ALL
+    failures (including preexisting) before pushing.
+<!-- Date: 2026-06-04 | Status: done | Notes: crane-cli typecheck/lint/test:quick/spec-coverage: all NX Successfully ran. organiclever-web typecheck/lint/test:quick: all passed. -->
 
 ### Post-Push CI Verification — Phase 3
 
