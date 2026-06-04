@@ -100,6 +100,31 @@ The waiver MUST include:
 
 Waivers are documented in the plan that introduces the bump (in `tech-docs.md` under a "Security Waivers" subsection) and propagated to a long-lived `docs/reference/security-waivers.md` file (create if missing).
 
+### KEV Fast-Track — Bypass 60-Day Soak for Actively Exploited CVEs
+
+If any unpatched CVE affecting the **currently pinned** version appears in the CISA KEV catalog,
+the 60-day soak window (Path B) is **bypassed** and the bump is automatically escalated to
+**Path C** (Security-Override Waiver), regardless of whether a pre-cutoff version would otherwise
+have been eligible.
+
+**Rationale**: CISA KEV membership confirms the CVE is weaponized in the wild. Waiting 60 days
+for community soak is unacceptable when active exploitation is ongoing.
+
+**Procedure when KEV Fast-Track triggers**:
+
+1. Look up the CVE IDs affecting the current pin in the CISA KEV JSON feed.
+2. If any match: treat the bump as Path C immediately.
+3. Complete the Path C waiver template; additionally record the KEV `dateAdded` field, the EPSS
+   score, and the `knownRansomwareCampaignUse` value (`"Known"` or `"Unknown"`).
+4. Append `(KEV-listed)` to the clearance status in all tables and registers.
+
+### EPSS Escalation — Soft Urgency Signal
+
+If the EPSS score for an unpatched CVE is **≥ 0.5** (top ~10% by exploitation likelihood within
+30 days), treat the bump with Path C urgency and flag it for expedited scheduling — even if the
+CVE has not yet been added to KEV. Record the EPSS score and percentile in the clearance table
+and in `tech-docs.md`.
+
 ## Selection Rules Within Every Path
 
 Once a path is chosen, two rules narrow the eligible set to the single version to pin. Both apply on top of paths A, B, and C — they never override the 60-day, CVE, or LTS constraints.
@@ -145,12 +170,15 @@ grep -E '"\^|"~' <changed-file> && echo "FAIL: caret/tilde found" || echo "OK: a
 
 ## CVE Clearance Process (Mandatory for Every Bump)
 
-For every version selected (Path A, B, or C), verify CVE status against all four sources:
+For every version selected (Path A, B, or C), verify CVE status against all five sources:
 
 1. **NVD** ([nvd.nist.gov](https://nvd.nist.gov)) — National Vulnerability Database
 2. **GitHub Security Advisories** ([github.com/advisories](https://github.com/advisories))
 3. **Snyk DB** ([security.snyk.io](https://security.snyk.io))
 4. **Project security page** (vendor-specific: `nodejs.org/en/blog/vulnerability`, `spring.io/security`, `pkg.go.dev/vuln`, dotnet release notes, etc.)
+5. **CISA KEV** ([CISA KEV JSON feed](https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json)) — Machine-readable catalog (~1,600 entries, updated daily) of CVEs with **confirmed active exploitation in the wild**. KEV membership is a harder real-world signal than CVSS severity alone: a CVE listed here is already being weaponized. Cross-reference every CVE found in sources 1–4 against this feed using `jq '.vulnerabilities[] | select(.cveID=="CVE-YYYY-NNNNN")'`.
+
+Additionally, record the **EPSS score** for any CVE with CVSS ≥ 7.0 using the [FIRST.org EPSS API](https://api.first.org/data/v1/epss?cve=CVE-YYYY-NNNNN) (ML-predicted probability of exploitation within 30 days, updated daily). EPSS is an informational prioritization signal, not a pass/fail gate — but see [KEV Fast-Track and EPSS Escalation](#kev-fast-track--bypass-60-day-soak-for-actively-exploited-cves) below for when it affects path classification.
 
 The clearance status for every package records BOTH its security and its functional standing. It MUST be one of:
 
@@ -158,6 +186,11 @@ The clearance status for every package records BOTH its security and its functio
 - **CLEAR (patch-of)** — Pinned version IS the patched release for one or more known CVEs (document the CVE IDs)
 - **WAIVER** — Path C applied (document waiver per the template above)
 - **FUNCTIONAL-HOLD** — A newer eligible version was skipped due to a known fatal functional defect (Rule 5b); pinned to an older eligible version instead (document the skipped version, the chosen version, and the reason)
+
+Any status MAY carry the `(KEV-listed)` suffix when the CVE was confirmed actively exploited at
+time of the bump (i.e., it appeared in the CISA KEV catalog). Examples:
+`CLEAR (patch-of, KEV-listed)`, `WAIVER (KEV-listed)`. KEV-listed entries must also record the
+KEV `dateAdded` and `knownRansomwareCampaignUse` field value in the clearance table.
 
 Audit findings go into the plan's `tech-docs.md` Security Clearance Status table, or for ad-hoc bumps outside a plan, into the PR description.
 
@@ -205,6 +238,14 @@ When proposing or executing a dependency bump, follow these steps in order:
 8. Convert all version specs to exact pins (remove carets and tildes)
 9. Run lockfile updates: `npm install`, `go mod tidy`, `mvn versions:resolve-ranges`
 10. Run security re-audit: `npm audit --audit-level=moderate`, `govulncheck ./...`, optionally `mvn org.owasp:dependency-check-maven:check`
+    10a. Cross-reference every CVE from steps 3–5 against the CISA KEV feed:
+    `curl -s https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json | jq '.vulnerabilities[] | select(.cveID=="CVE-YYYY-NNNNN")'`.
+    Record `dateAdded` and `knownRansomwareCampaignUse` for any matches; append `(KEV-listed)` to
+    the clearance status in the plan's `tech-docs.md`.
+    10b. Query EPSS for any CVE with CVSS ≥ 7.0:
+    `curl -s "https://api.first.org/data/v1/epss?cve=CVE-YYYY-NNNNN"`.
+    Record the score and percentile in the clearance table. If score ≥ 0.5, flag for expedited
+    scheduling (EPSS Escalation applies).
 11. Document the audit results and any waivers in the plan's `tech-docs.md`
 12. Run quality gates for affected projects: typecheck, lint, test:quick, spec-coverage
 
@@ -215,6 +256,11 @@ When proposing or executing a dependency bump, follow these steps in order:
 - `govulncheck ./...` — mandatory post-update security scan for Go modules
 - `grep -E '"\^|"~'` — pin verification after any `package.json` edit
 - Renovate / Dependabot — if configured, surface bump PRs but require human application of the three-path classification before merge
+- **CISA KEV JSON feed** — `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json` —
+  daily-updated catalog of CVEs with confirmed active exploitation; cross-reference with
+  `jq '.vulnerabilities[] | select(.cveID=="CVE-YYYY-NNNNN")'`
+- **FIRST.org EPSS API** — `https://api.first.org/data/v1/epss?cve=CVE-YYYY-NNNNN` — daily ML
+  exploitation-probability score (0–1) for any given CVE; supports comma-separated batch lookups
 
 ## References
 
@@ -238,6 +284,10 @@ When proposing or executing a dependency bump, follow these steps in order:
 - [Snyk DB](https://security.snyk.io) — Snyk vulnerability database
 - [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) — Go vulnerability scanner
 - [npm audit](https://docs.npmjs.com/cli/v10/commands/npm-audit) — npm vulnerability scanner
+- [CISA KEV catalog](https://www.cisa.gov/known-exploited-vulnerabilities) — Authoritative list of CVEs with confirmed active exploitation; JSON feed updated daily
+- [CISA KEV JSON feed](https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json) — Machine-readable daily feed; use for automated cross-referencing
+- [FIRST.org EPSS](https://www.first.org/epss) — Exploit Prediction Scoring System; ML-predicted exploitation probability within 30 days
+- [EPSS API](https://api.first.org/data/v1/epss) — Programmatic EPSS score lookup by CVE ID
 
 **Long-Lived Registers:**
 

@@ -165,8 +165,16 @@ Each research batch must return, per package:
 - Latest version and its release date; whether an LTS line exists (→ **Path A**) and the latest
   LTS patch.
 - For non-LTS packages, the latest version released on or before the **cutoff** (→ **Path B**).
-- CVE status across all four policy sources (NVD, GitHub Security Advisories, Snyk DB, vendor
-  security page). If no version satisfies both the 60-day rule and CVE-cleanness → **Path C**.
+- CVE status across all five policy sources (NVD, GitHub Security Advisories, Snyk DB, vendor
+  security page, **CISA KEV**). If no version satisfies both the 60-day rule and CVE-cleanness →
+  **Path C**.
+- **CISA KEV check**: cross-reference every CVE against the [CISA KEV JSON feed](https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json).
+  If any unpatched CVE affecting the current pin is KEV-listed, **KEV Fast-Track** applies —
+  escalate immediately to Path C regardless of soak eligibility. Record `dateAdded` and
+  `knownRansomwareCampaignUse` for each match.
+- **EPSS score**: for any CVE with CVSS ≥ 7.0, query `https://api.first.org/data/v1/epss?cve=CVE-YYYY-NNNNN`
+  and record the score (0–1) and percentile. If score ≥ 0.5, flag for expedited scheduling
+  (EPSS Escalation rule).
 - **Rule 5a (recency)**: the most recent eligible version for the chosen path.
 - **Rule 5b (functional stability)**: whether the chosen version is yanked/deprecated, carries an
   open release-blocker, or has a widely-reported fatal functional bug — and if so, the most recent
@@ -181,8 +189,13 @@ status.
 
 Assemble the results into the policy's **Security & Functional Clearance Status** for every
 package, using one of: `CLEAR`, `CLEAR (patch-of)`, `WAIVER`, `FUNCTIONAL-HOLD` (per the policy).
-Build the proposed bump table (project → package → current → proposed → path → clearance) and
-record the cutoff computation from Phase 0.
+Append the `(KEV-listed)` suffix to any status where the CVE appears in CISA KEV.
+
+Build the proposed bump table with columns:
+**project → package → current → proposed → path → KEV-listed → EPSS score → clearance**
+
+Record the cutoff computation from Phase 0. Mark any KEV Fast-Track escalations prominently
+(e.g., `Path B → Path C (KEV Fast-Track)`) so the human checkpoint can review them first.
 
 Write all of this progressively to
 `generated-reports/repo-dependency-bump-planning__<uuid>__<YYYY-MM-DD--HH-MM>__report.md`
@@ -192,8 +205,9 @@ Write all of this progressively to
 
 ### 4. Human Checkpoint (Sequential, Hard Gate)
 
-Present the proposed bump table, the clearance statuses, and — prominently — any `WAIVER` or
-`FUNCTIONAL-HOLD` rows. Use `AskUserQuestion` to:
+Present the proposed bump table, the clearance statuses, and — prominently — any `WAIVER`,
+`FUNCTIONAL-HOLD`, or `(KEV-listed)` rows. KEV Fast-Track escalations and EPSS ≥ 0.5 flags
+MUST appear at the top of the summary before other rows. Use `AskUserQuestion` to:
 
 1. Confirm the plan identifier (default `dependency-bump`).
 2. Confirm the scope is correct (any packages to exclude/hold).
@@ -216,7 +230,8 @@ Invoke the [plan-establishment-execution workflow](../plan/plan-establishment-ex
   - Every in-scope manifest is pinned (exact, no `^`/`~`) to its approved target version.
   - Lockfiles regenerated (`npm install`, `cargo update -p`, `go mod tidy`, etc.).
   - Post-bump re-audit clean (`npm audit --audit-level=moderate`, `govulncheck ./...`).
-  - All `WAIVER`/`FUNCTIONAL-HOLD` entries propagated to `docs/reference/security-waivers.md`.
+  - Post-bump CISA KEV cross-reference clean (no remaining KEV-listed CVEs in pinned versions).
+  - All `WAIVER`/`FUNCTIONAL-HOLD`/`KEV-listed` entries propagated to `docs/reference/security-waivers.md` with KEV and EPSS columns populated.
   - Affected-project quality gates pass (typecheck, lint, test:quick, spec-coverage).
   - The delivery checklist mirrors the policy's [Application Workflow](../../development/workflow/dependency-bump-policy.md)
     steps 8–12, grouped per ecosystem, TDD-shaped where code changes are required.
@@ -262,11 +277,13 @@ Scenario: User declines at the checkpoint
 
 ## Related Documents
 
-- [Dependency Bump Stability & Safety Policy](../../development/workflow/dependency-bump-policy.md) — the authority this workflow operationalizes (three-path tree, Rule 5a/5b, clearance statuses).
+- [Dependency Bump Stability & Safety Policy](../../development/workflow/dependency-bump-policy.md) — the authority this workflow operationalizes (three-path tree, Rule 5a/5b, KEV Fast-Track, EPSS Escalation, clearance statuses).
 - [plan-establishment-execution workflow](../plan/plan-establishment-execution.md) — invoked in Phase 5 with `target-stage=backlog`.
 - [Plan Execution workflow](../plan/plan-execution.md) — runs the plan later, after promotion to `in-progress/`.
-- [web-research-maker Agent](../../../.claude/agents/web-research-maker.md) — Phase 2 version/CVE/yank research.
-- [security-waivers register](../../../docs/reference/security-waivers.md) — destination for WAIVER / FUNCTIONAL-HOLD entries.
+- [web-research-maker Agent](../../../.claude/agents/web-research-maker.md) — Phase 2 version/CVE/KEV/EPSS research.
+- [security-waivers register](../../../docs/reference/security-waivers.md) — destination for WAIVER / FUNCTIONAL-HOLD / KEV-listed entries.
+- [CISA KEV JSON feed](https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json) — daily feed of CVEs with confirmed active exploitation.
+- [FIRST.org EPSS API](https://api.first.org/data/v1/epss) — ML exploitation-probability scores by CVE ID.
 
 ## Principles Implemented/Respected
 
