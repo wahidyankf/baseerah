@@ -7,7 +7,7 @@ COPY apps/organiclever-be/tests ./tests
 RUN cargo build --release --bin organiclever-be
 
 # Stage 2: minimal runtime image
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates \
   && rm -rf /var/lib/apt/lists/*
