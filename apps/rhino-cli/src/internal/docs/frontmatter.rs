@@ -179,7 +179,7 @@ fn scan_frontmatter_file(
             message: "file has no YAML frontmatter (delimited by `---` fences)".to_string(),
         }]);
     };
-    let parsed: serde_yml::Value = match serde_yml::from_str(&frontmatter) {
+    let parsed: serde_norway::Value = match serde_norway::from_str(&frontmatter) {
         Ok(v) => v,
         Err(e) => {
             return Ok(vec![DocsFrontmatterFinding {
@@ -217,7 +217,7 @@ fn extract_frontmatter(content: &str) -> Option<String> {
 ///
 /// Required fields: `title`, `description`, `category` (one of
 /// [`VALID_CATEGORIES`]), `subcategory`, `tags` (non-empty list).
-fn validate_software_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFrontmatterFinding> {
+fn validate_software_schema(path: &str, fm: &serde_norway::Value) -> Vec<DocsFrontmatterFinding> {
     let mut findings = Vec::new();
     if !has_non_empty_string(fm, "title") {
         findings.push(mk_fail(
@@ -281,7 +281,7 @@ fn validate_software_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFrontm
 /// Validates the lighter governance-document frontmatter schema.
 ///
 /// `title` is required (fail); `description` is recommended (warn).
-fn validate_governance_schema(path: &str, fm: &serde_yml::Value) -> Vec<DocsFrontmatterFinding> {
+fn validate_governance_schema(path: &str, fm: &serde_norway::Value) -> Vec<DocsFrontmatterFinding> {
     let mut findings = Vec::new();
     if !has_non_empty_string(fm, "title") {
         findings.push(mk_fail(
@@ -312,7 +312,7 @@ fn mk_fail(path: &str, kind: &str, message: &str) -> DocsFrontmatterFinding {
 }
 
 /// Returns `true` when `fm[key]` is a non-empty, non-whitespace-only string.
-fn has_non_empty_string(fm: &serde_yml::Value, key: &str) -> bool {
+fn has_non_empty_string(fm: &serde_norway::Value, key: &str) -> bool {
     let v = fm.get(key);
     let s = string_value(v);
     !s.trim().is_empty()
@@ -321,13 +321,13 @@ fn has_non_empty_string(fm: &serde_yml::Value, key: &str) -> bool {
 /// Coerces a YAML value to a `String` for display and comparison purposes.
 ///
 /// `None` and `Null` map to an empty string.
-fn string_value(v: Option<&serde_yml::Value>) -> String {
+fn string_value(v: Option<&serde_norway::Value>) -> String {
     match v {
-        None | Some(serde_yml::Value::Null) => String::new(),
-        Some(serde_yml::Value::String(s)) => s.clone(),
-        Some(serde_yml::Value::Bool(b)) => b.to_string(),
-        Some(serde_yml::Value::Number(n)) => n.to_string(),
-        Some(other) => serde_yml::to_string(other)
+        None | Some(serde_norway::Value::Null) => String::new(),
+        Some(serde_norway::Value::String(s)) => s.clone(),
+        Some(serde_norway::Value::Bool(b)) => b.to_string(),
+        Some(serde_norway::Value::Number(n)) => n.to_string(),
+        Some(other) => serde_norway::to_string(other)
             .unwrap_or_default()
             .trim()
             .to_string(),
@@ -335,9 +335,9 @@ fn string_value(v: Option<&serde_yml::Value>) -> String {
 }
 
 /// Returns `true` when `fm[key]` is a YAML sequence with at least one element.
-fn has_non_empty_list(fm: &serde_yml::Value, key: &str) -> bool {
+fn has_non_empty_list(fm: &serde_norway::Value, key: &str) -> bool {
     match fm.get(key) {
-        Some(serde_yml::Value::Sequence(list)) => !list.is_empty(),
+        Some(serde_norway::Value::Sequence(list)) => !list.is_empty(),
         _ => false,
     }
 }

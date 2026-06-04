@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
-use serde_yml::Value;
+use serde_norway::Value;
 
 use super::frontmatter::extract_frontmatter;
 use super::types::{
@@ -147,7 +147,7 @@ fn validate_skill_fields(
     ));
 
     #[allow(clippy::collapsible_if)]
-    if let Ok(Value::Mapping(m)) = serde_yml::from_str::<Value>(frontmatter_str) {
+    if let Ok(Value::Mapping(m)) = serde_norway::from_str::<Value>(frontmatter_str) {
         let allow = valid_claude_skill_fields();
         for (k, _) in m {
             if let Some(key) = k.as_str() {
@@ -171,7 +171,7 @@ fn validate_skill_fields(
 /// Parse a YAML frontmatter string into a `ClaudeSkill`.
 fn parse_skill_yaml(frontmatter: &str) -> Result<ClaudeSkill, String> {
     let v: Value =
-        serde_yml::from_str(frontmatter).map_err(|e| format!("yaml parse error: {e}"))?;
+        serde_norway::from_str(frontmatter).map_err(|e| format!("yaml parse error: {e}"))?;
     let mut skill = ClaudeSkill::default();
     if let Value::Mapping(m) = v {
         for (k, val) in m {

@@ -6,7 +6,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use serde_yml::Value;
+use serde_norway::Value;
 
 use super::converter::{OPENCODE_AGENT_DIR, convert_model, convert_tools};
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
@@ -185,7 +185,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
     let claude_str = String::from_utf8_lossy(&claude_front).into_owned();
     let opencode_str = String::from_utf8_lossy(&opencode_front).into_owned();
 
-    let claude_yaml: Value = match serde_yml::from_str(&claude_str) {
+    let claude_yaml: Value = match serde_norway::from_str(&claude_str) {
         Ok(v) => v,
         Err(e) => {
             return ValidationCheck::failed_msg(
@@ -194,7 +194,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
             );
         }
     };
-    let opencode_yaml: Value = match serde_yml::from_str(&opencode_str) {
+    let opencode_yaml: Value = match serde_norway::from_str(&opencode_str) {
         Ok(v) => v,
         Err(e) => {
             return ValidationCheck::failed_msg(

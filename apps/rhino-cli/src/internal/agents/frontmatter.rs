@@ -4,7 +4,7 @@
 use std::sync::OnceLock;
 
 use regex::Regex;
-use serde_yml::Value;
+use serde_norway::Value;
 
 /// Pattern: word/hyphen colon non-whitespace — matches "name:value" without
 /// space-after-colon. Replaces with "name: value".
@@ -115,21 +115,21 @@ mod tests {
 
     #[test]
     fn parse_claude_tools_from_string() {
-        let v: Value = serde_yml::from_str("Read, Write, Edit").unwrap();
+        let v: Value = serde_norway::from_str("Read, Write, Edit").unwrap();
         let tools = parse_claude_tools(&v);
         assert_eq!(tools, vec!["Read", "Write", "Edit"]);
     }
 
     #[test]
     fn parse_claude_tools_from_sequence() {
-        let v: Value = serde_yml::from_str("[Read, Write, Bash]").unwrap();
+        let v: Value = serde_norway::from_str("[Read, Write, Bash]").unwrap();
         let tools = parse_claude_tools(&v);
         assert_eq!(tools, vec!["Read", "Write", "Bash"]);
     }
 
     #[test]
     fn parse_claude_tools_empty_string() {
-        let v: Value = serde_yml::from_str("\"\"").unwrap();
+        let v: Value = serde_norway::from_str("\"\"").unwrap();
         let tools = parse_claude_tools(&v);
         assert!(tools.is_empty());
     }
