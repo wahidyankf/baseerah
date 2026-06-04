@@ -34,7 +34,7 @@ This practice implements/respects the following core principles:
 
 This practice respects the following conventions:
 
-- **[Reproducible Environments Convention](./reproducible-environments.md)**: Exact version pinning in `package.json`, Volta block, `go.mod`, `global.json`, `.tool-versions`, and Dockerfiles directly implements the reproducibility standards established there.
+- **[Reproducible Environments Convention](./reproducible-environments.md)**: Exact version pinning in `package.json`, Volta block, `go.mod`, `global.json`, `rust-toolchain.toml`, `.tool-versions`, and Dockerfiles directly implements the reproducibility standards established there.
 
 - **[Commit Message Convention](./commit-messages.md)**: Dependency bump commits use `chore(deps): bump <package> to <version>` or `fix(deps): patch CVE-YYYY-NNNNN in <package>` per Conventional Commits format.
 
@@ -44,9 +44,10 @@ This practice respects the following conventions:
 
 - All `package.json` `dependencies`, `devDependencies`, `peerDependencies`, `optionalDependencies` (npm)
 - All `Cargo.toml` `[dependencies]` version entries (Rust)
+- All `rust-toolchain.toml` compiler-channel pins (Rust toolchain)
 - All `global.json` `sdk.version` and `*.csproj`/`*.fsproj` `<PackageReference>` (.NET)
 - All `package.json` `volta` block (Node.js, npm)
-- All `Dockerfile` `FROM` lines (base images)
+- All `Dockerfile` `FROM` lines and `docker-compose*.yml` `image:` references (base images)
 - All GitHub Actions `uses:` references and inline version pins (CI workflow files)
 - All composite-action input defaults (`.github/actions/*/action.yml`)
 

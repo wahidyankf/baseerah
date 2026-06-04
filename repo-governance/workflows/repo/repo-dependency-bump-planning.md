@@ -2,10 +2,11 @@
 name: repo-dependency-bump-planning
 title: "repo-dependency-bump-planning"
 goal: >
-  Survey every dependency manifest across apps/ and libs/ (and workspace-root language pins),
-  classify each candidate bump per the Dependency Bump Stability & Safety Policy, and produce a
-  validated backlog plan that — when later executed — updates those dependencies. The deliverable
-  is the plan, never the dependency edits.
+  Survey every dependency manifest across the whole monorepo — apps/ and libs/, workspace-root
+  language pins, infra/ container definitions, and the CI toolchain pins under .github/ — classify
+  each candidate bump per the Dependency Bump Stability & Safety Policy, and produce a validated
+  backlog plan that — when later executed — updates those dependencies. The deliverable is the
+  plan, never the dependency edits.
 termination: >
   A grill-validated plan exists at plans/backlog/<YYYY-MM-DD>__<identifier>/, passes
   plan-quality-gate at strict mode, and a dependency clearance report is written to
@@ -15,14 +16,17 @@ inputs:
     type: string
     description: >
       Optional comma-separated glob filter limiting which projects/manifests are inventoried.
-      Default is "all manifests under apps/ and libs/, plus the workspace-root language pins
-      (root package.json volta block)".
+      Default is "all dependency-bearing manifests in the monorepo": apps/ and libs/ project
+      manifests, the workspace-root language pins (root package.json volta block), the .opencode/
+      binding manifest, per-project rust-toolchain.toml channel pins, infra/ Dockerfiles and
+      docker-compose files, and the CI toolchain pins under .github/ (composite-action input
+      defaults, inline workflow version pins, plus third-party `uses:` references).
     required: false
   - name: ecosystems
     type: string
     description: >
-      Optional comma-separated filter of ecosystems to consider (npm, cargo, dotnet, go, docker).
-      Default is all ecosystems present in the inventory.
+      Optional comma-separated filter of ecosystems to consider (npm, cargo, dotnet, go, docker,
+      github-actions). Default is all ecosystems present in the inventory.
     required: false
   - name: as-of-date
     type: string
@@ -57,8 +61,9 @@ outputs:
 # Repository Dependency Bump Planning Workflow
 
 **Purpose**: Turn the [Dependency Bump Stability & Safety Policy](../../development/workflow/dependency-bump-policy.md)
-into a concrete, validated **backlog plan** for updating dependencies across all of `apps/` and
-`libs/`. This workflow performs the policy's survey-and-classify work (Application Workflow steps
+into a concrete, validated **backlog plan** for updating dependencies across the whole monorepo
+(`apps/`, `libs/`, workspace-root pins, `.opencode/`, `infra/`, and the CI toolchain pins under
+`.github/`). This workflow performs the policy's survey-and-classify work (Application Workflow steps
 1–7: inventory → path classification → recency → functional stability → clearance) and hands the
 results to `plan-establishment-execution` to author the plan.
 
@@ -96,8 +101,10 @@ authoring.
 - Resolve `as-of-date` (input, else current date). Compute and record the Path B cutoff:
   `cutoff = as-of-date − 60 days`. This is written verbatim into the clearance report per the
   policy's [Cutoff Date Computation](../../development/workflow/dependency-bump-policy.md) section.
-- Resolve `scope-filter` and `ecosystems`. Default scope = manifests under `apps/` and `libs/`
-  plus the workspace-root language pins.
+- Resolve `scope-filter` and `ecosystems`. Default scope = every dependency-bearing manifest in
+  the monorepo: `apps/` and `libs/` project manifests, the workspace-root language pins,
+  `.opencode/package.json`, per-project `rust-toolchain.toml`, `infra/` container definitions, and
+  the CI toolchain pins under `.github/`.
 
 **Output**: Cutoff date computed. Scope resolved.
 
@@ -109,22 +116,41 @@ Enumerate every in-scope dependency manifest and capture its currently-pinned ve
 governed by the policy (intersected with `scope-filter`/`ecosystems`):
 
 - **npm**: workspace-root `package.json` (`volta` block = Node/npm language pins; `dependencies`,
-  `devDependencies`, `optionalDependencies`), plus `apps/*/package.json` and `libs/*/package.json`.
+  `devDependencies`, `optionalDependencies`), `apps/*/package.json`, `libs/*/package.json`, and the
+  `.opencode/package.json` binding manifest.
 - **Cargo**: `apps/*/Cargo.toml` and `libs/*/Cargo.toml` `[dependencies]` (e.g. `organiclever-be`,
-  `ose-app-be`, `rhino-cli`, `rust-commons`).
-- **.NET**: `apps/*/global.json` `sdk.version` and `*.fsproj`/`*.csproj` `<PackageReference>`
-  (e.g. `crane-cli`).
-- **Go**: `apps/*/go.mod` Go version + module requirements (e.g. `ayokoding-cli`, `ose-cli`).
-- **Docker**: `apps/*/Dockerfile` `FROM` base-image tags.
+  `ose-app-be`, `rhino-cli`, `rust-commons`), plus per-project `rust-toolchain.toml`
+  compiler-channel pins (every Rust app **and** `libs/rust-commons`).
+- **.NET**: `apps/*/*.fsproj`/`*.csproj` `<PackageReference>` (e.g. `crane-cli`). The .NET SDK
+  version is **not** pinned via a per-app `global.json` here — it lives in the
+  `.github/actions/setup-dotnet` composite-action default (see GitHub Actions below). Inventory a
+  `global.json` only if one exists.
+- **Go**: `apps/*/go.mod` Go version + module requirements **if any exist**. The active tree
+  currently has no Go modules (former Go CLIs `ayokoding-cli` and `ose-cli` are now Rust/Cargo);
+  treat Go as empty unless a `go.mod` is found.
+- **Docker**: `FROM` base-image tags in **all** Dockerfiles (`apps/*/Dockerfile*` including
+  `Dockerfile.integration`, and `infra/**/Dockerfile*`) plus the `image:` references in
+  `apps/*/docker-compose*.yml` and `infra/**/docker-compose*.yml`.
+- **GitHub Actions**: three pin classes under `.github/`, all governed by the policy —
+  (1) **composite-action input defaults** that pin language/toolchain versions
+  (`.github/actions/setup-*/action.yml` defaults for node, dotnet, go, golangci-lint, python, jvm,
+  and the rust cargo-tooling versions); (2) **inline version pins** set directly in workflow YAML
+  (e.g. `node-version: "24"`, `go-version: "1.25.8"` in `.github/workflows/_reusable-*.yml`); and
+  (3) **third-party action `uses:` references** in `.github/workflows/*.yml` and
+  `.github/actions/*/action.yml` (e.g. `actions/checkout@v4`, `volta-cli/action@v4`,
+  `Swatinem/rust-cache@v2`).
 
 Use the `nx-workspace` skill / `nx graph` to enumerate projects, then `Grep`/`Glob` for the
-manifests. Record a table: project → ecosystem → package → current pinned version.
+manifests (including `.github/`, `infra/`, and root config files). Record a table: source →
+ecosystem → package → current pinned version.
 
 **Output**: Full inventory of in-scope dependencies with current versions.
 
-**Note**: GitHub Actions `uses:` pins live in `.github/` (repo-wide, outside `apps/`/`libs/`) and
-are out of this workflow's default scope; include them only if `scope-filter` explicitly selects
-`.github/`.
+**Note**: This scope mirrors the policy's [What This Policy
+Covers](../../development/workflow/dependency-bump-policy.md) list, which already governs all
+Dockerfile `FROM` lines, GitHub Actions `uses:` references, and composite-action input defaults.
+Lockfiles (`package-lock.json`, `Cargo.lock`, `go.sum`) and workspace-internal `*` references stay
+out of scope per that same policy section.
 
 ### 2. Candidate Discovery & Classification (Parallel, delegated)
 
@@ -219,7 +245,7 @@ Scenario: Planning sweep produces a backlog plan without touching manifests
   Then a clearance report appears under generated-reports/repo-dependency-bump-planning__*__report.md
   And a plan exists at plans/backlog/<YYYY-MM-DD>__dependency-bump/
   And the backlog plan passes plan-quality-gate at strict mode
-  And no package.json, Cargo.toml, go.mod, *.fsproj, Dockerfile, or lockfile is modified
+  And no package.json, Cargo.toml, rust-toolchain.toml, go.mod, *.fsproj, Dockerfile, docker-compose*.yml, .github/ action.yml/workflow, or lockfile is modified
 
 Scenario: Functional-hold is surfaced before authoring
   Given a candidate version is yanked or carries an open release-blocker
