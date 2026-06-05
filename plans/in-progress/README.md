@@ -4,9 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan     | Description |
-| -------- | ----------- |
-| _(none)_ |             |
+| Plan                                                                             | Description                                                                                                                                                                     |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit. |
 
 ## Instructions
 
