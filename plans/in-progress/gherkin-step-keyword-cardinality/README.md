@@ -52,7 +52,7 @@ that violate it.
 ## Approach Summary
 
 ```mermaid
-flowchart LR
+flowchart TB
   P0[Phase 0: Setup and Baseline] --> P1[Phase 1: Author HARD rule -- via repo-rules-maker]
   P1 --> P2[Phase 2: Broad governance sweep -- via repo-rules-maker]
   P2 --> P3[Phase 3: Manual skill propagation -- without repo-rules-maker]
