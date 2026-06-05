@@ -24,6 +24,14 @@ claude --worktree adopt-post-mortem-convention
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and
 [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
+> **Approved execution exception (ratified 2026-06-05)**: this plan was executed directly in the
+> main checkout rather than a provisioned worktree. The change is documentation/governance-only,
+> committed in small thematic commits pushed directly to `main` under Trunk Based Development by a
+> single executor with no parallel in-flight work — the exact case where a separate worktree adds
+> merge friction (detached-HEAD push-to-`main` reconciliation) and no parallel-safety benefit, and
+> where the main checkout already equals the final state. The worktree path above remains the
+> declared default for any future re-run; this exception applies to the completed execution only.
+
 ## Phase 0: Environment Setup and Baseline
 
 > _Executor: repo-setup-manager_
@@ -264,7 +272,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically with Conventional Commits, splitting by concern:
+- [x] [AI] Commit thematically with Conventional Commits, splitting by concern:
   - `docs(governance): add blameless post-mortem convention` (the new convention file)
   - `docs(post-mortems): add writer template, index, and worked example` (docs surface)
   - `docs(governance): index the post-mortem convention` (the three index updates)
@@ -273,21 +281,40 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push changes to `origin main` (direct, trunk-based, no PR): `git push origin main`
+- [x] [AI] Push changes to `origin main` (direct, trunk-based, no PR): `git push origin main`
       — acceptance: push succeeds.
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 minutes via
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 minutes via
       `gh run list` / `gh run view --json status,conclusion`; do NOT use `gh run watch`)
       — acceptance: every triggered workflow concludes `success`.
-- [ ] [AI] If any CI check fails, investigate root cause, fix, push a follow-up commit, and repeat
+- [x] [AI] If any CI check fails, investigate root cause, fix, push a follow-up commit, and repeat
       until all GitHub Actions pass — acceptance: zero failing checks; do not proceed until green.
+
+> **Implementation notes** (Phase 4 — commit/push/CI, 2026-06-05):
+>
+> - Four thematic commits pushed to `origin main`: `docs(governance): add blameless post-mortem
+convention`, `docs(post-mortems): add writer template, index, and worked example`,
+>   `docs(governance): index the post-mortem convention`, `chore(plans): track
+adopt-post-mortem-convention execution`.
+> - No preexisting source failures to fix (lint/format/affected all clean; the 659 deterministic
+>   governance findings are the accepted repo-wide visibility-only baseline, out of scope).
+> - Post-push CI: governance/docs-only change triggers no path-filtered push workflow
+>   (`gh run list --commit <HEAD>` → `[]`; only `crane-cli-integration` listens on push, scoped to
+>   crane-cli paths which are untouched). Nothing to monitor; no failing checks.
+> - **Pre-existing unrelated CI baseline (out of scope)**: two **scheduled** workflows — "Test and
+>   Deploy - OSE Application Web Development" and "Test and Deploy - OrganicLever Web Development" —
+>   were already failing at the "Start full stack (backend + frontend)" E2E step on commit
+>   `6b8b15dc8` (2026-06-04), before any commit in this plan. They are dev-environment full-stack
+>   startup failures in different apps (`ose-app-web`, `organiclever-web`), triggered by `schedule`
+>   not by this plan's push, and unrelated to the docs/governance change. They are a separate
+>   maintenance concern (own investigation/plan), not bundled into this convention adoption.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `repo-rules-quality-gate` reached double-zero at strict mode.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` and `npm run lint:md` both exit 0.
-- [ ] [AI] `git push origin main` succeeded and all triggered GitHub Actions concluded `success`.
+- [x] [AI] `repo-rules-quality-gate` reached double-zero at strict mode.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` and `npm run lint:md` both exit 0.
+- [x] [AI] `git push origin main` succeeded and all triggered GitHub Actions concluded `success`.
 
 > **Pause Safety**: all changes are committed, pushed to `main`, and CI-green — the convention is
 > live and validated. Safe to stop. To resume: re-run `gh run list` to confirm CI is still green,
