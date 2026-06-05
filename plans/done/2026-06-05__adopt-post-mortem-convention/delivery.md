@@ -322,26 +322,33 @@ adopt-post-mortem-convention execution`.
 
 ## Phase 5: Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items above are ticked and all gates passed.
-- [ ] [AI] Move the plan to done with today's completion date:
+- [x] [AI] Verify ALL delivery checklist items above are ticked and all gates passed.
+- [x] [AI] Move the plan to done with today's completion date:
       `git mv plans/in-progress/adopt-post-mortem-convention plans/done/$(date +%Y-%m-%d)__adopt-post-mortem-convention`
       — acceptance: folder now under `plans/done/` with a `YYYY-MM-DD__` prefix.
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry (return Active Plans to
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry (return Active Plans to
       `_(none)_` if it was the only one) — acceptance: no reference to this plan remains.
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date — acceptance:
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date — acceptance:
       entry present.
-- [ ] [AI] Commit the archival: `chore(plans): move adopt-post-mortem-convention to done`
+- [x] [AI] Commit the archival: `chore(plans): move adopt-post-mortem-convention to done`
       — acceptance: commit created.
-- [ ] [AI] Push archival and verify CI: `git push origin main`; monitor GitHub Actions to green
+- [x] [AI] Push archival and verify CI: `git push origin main`; monitor GitHub Actions to green
       — acceptance: push succeeds; all workflows conclude `success`.
+
+> **Implementation notes** (Phase 5, 2026-06-05):
+>
+> - Status: Done. Plan archived to `plans/done/2026-06-05__adopt-post-mortem-convention/` via
+>   `git mv` (history preserved). `plans/in-progress/README.md` Active Plans returned to `_(none)_`;
+>   `plans/done/README.md` gained the completion entry. Archival committed and pushed to `origin
+main`; governance/docs change triggers no push CI workflow (nothing to monitor).
 
 ### Phase 5 Gate
 
 > Final gate — plan complete when all pass.
 
-- [ ] [AI] Plan folder lives under `plans/done/YYYY-MM-DD__adopt-post-mortem-convention/`.
-- [ ] [AI] Both `plans/in-progress/README.md` and `plans/done/README.md` are consistent.
-- [ ] [AI] Archival commit pushed; CI green.
+- [x] [AI] Plan folder lives under `plans/done/YYYY-MM-DD__adopt-post-mortem-convention/`.
+- [x] [AI] Both `plans/in-progress/README.md` and `plans/done/README.md` are consistent.
+- [x] [AI] Archival commit pushed; CI green.
 
 > **Pause Safety**: the plan is fully delivered, archived, pushed, and CI-green. This is the terminal
 > safe state — nothing left to resume.

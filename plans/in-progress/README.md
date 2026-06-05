@@ -4,9 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                         | Description                                                                               |
-| ---------------------------- | ----------------------------------------------------------------------------------------- |
-| adopt-post-mortem-convention | Adopt blameless post-mortem convention from ose-infra into ose-public (software-flavored) |
+| Plan     | Description |
+| -------- | ----------- |
+| _(none)_ |             |
 
 ## Instructions
 
