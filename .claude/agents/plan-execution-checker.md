@@ -173,6 +173,11 @@ Update status to "Complete", add summary and recommendation (approve/revise).
 - [plan-execution workflow](../../repo-governance/workflows/plan/plan-execution.md) - Execute plans (calling context orchestrates; no dedicated subagent)
 - `plan-fixer` - Fixes plan issues
 
+**Related Conventions:**
+
+- [Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) - `[AI]`/`[HUMAN]` marker rules, legend, handoff/resume signal requirement (validated in Step 5f-gates)
+- [Plans Organization Convention §Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule) - Phase gate barrier rule, Pause Safety requirement (validated in Step 5f-gates)
+
 **Remember**: This is the final quality gate. Be thorough, independent, and uncompromising on quality.
 
 ### 6. Verify Operational Readiness Execution (Step 5b — MANDATORY)
@@ -333,9 +338,42 @@ After verifying archival (Step 5d), verify that execution actually happened insi
 - Wrong worktree-path format in plan: **HIGH**
 - No worktree evidence in git history: **MEDIUM**
 
-### 10. Anti-Hallucination Post-Execution Validation (Step 5f — MANDATORY HARD RULE)
+### 10. Phase Gate and Execution Marker Post-Execution Validation (Step 5f-gates — MANDATORY)
 
-After verifying worktree usage (Step 5e), verify that every factual claim in `delivery.md` (file paths, Nx targets, package versions, function names, agent names, test names, behavior claims) still holds against the post-execution repo state. Hallucinated claims that survived authoring may have been silently fabricated by the executor — this step catches them.
+After verifying worktree usage (Step 5e), validate that execution respected the phase gate barrier rule and surfaced every `[HUMAN]` step. These conventions are defined at
+[Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and [§Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
+
+#### What to Validate
+
+1. **Every `### Phase N Gate` was satisfied before phase N+1 started**
+   - Read `delivery.md`. For each phase, confirm its gate checklist items are ticked (or documented as verified) before the first step of the next phase is ticked.
+   - Check git history for the order in which delivery.md was updated; gate checks should appear in commits before the next phase's steps.
+   - Evidence missing: **HIGH** finding per phase boundary where ordering cannot be confirmed.
+   - Gate items explicitly skipped or commented out without resolution: **CRITICAL** per item.
+
+2. **`[HUMAN]` steps were surfaced — not silently auto-executed or skipped**
+   - Identify every `[HUMAN]` marker in `delivery.md`.
+   - Confirm in git history or implementation notes that execution paused at each `[HUMAN]` step and resumed only after operator confirmation.
+   - A `[HUMAN]` step ticked with no implementation note (Date, Status, confirmation evidence): **HIGH** finding per step.
+   - Evidence that an agent attempted to perform a `[HUMAN]` step autonomously: **CRITICAL** finding.
+
+3. **Each phase reached its Pause-Safety state**
+   - For each phase, locate its `> **Pause Safety**:` blockquote. Confirm the described safe-to-stop state is verifiable against the post-execution repo (e.g., files exist, commands exit 0).
+   - Run the resume command stated in the Pause Safety note and confirm it exits cleanly.
+   - Pause Safety state not reached (files missing, commands failing): **HIGH** finding per phase.
+
+#### Finding Severity
+
+- Gate items skipped/bypassed without resolution: **CRITICAL**
+- Agent auto-executed a `[HUMAN]` step: **CRITICAL**
+- Phase gate ordering not confirmed (next phase started before gate was green): **HIGH**
+- `[HUMAN]` step ticked without operator confirmation evidence: **HIGH**
+- Pause Safety state not verifiable: **HIGH**
+
+### 11. Anti-Hallucination Post-Execution Validation (Step 5f — MANDATORY HARD RULE)
+
+After verifying phase gates and execution markers (Step 5f-gates), verify that every factual claim in `delivery.md` (file paths, Nx targets, package versions, function names, agent names, test names, behavior claims) still holds against the post-execution repo state. Hallucinated claims that survived authoring may have been silently fabricated by the executor — this step catches them.
 
 #### What to Validate
 
@@ -412,41 +450,3 @@ For every relative cross-link in plan files:
 - Library upgrades during execution may have outdated cited versions.
 
 Both gates exist for a reason; do not skip Step 5f under time pressure.
-
-### 11. Verify Executor Tags and Phase Gates Were Honored (Step 5g — MANDATORY)
-
-After post-execution anti-hallucination (Step 5f), verify the executor respected the executor-tag
-and phase-gate structure from
-[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
-and [§Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
-
-#### What to Validate
-
-1. **`[HUMAN]` items were genuinely handed off, not auto-faked**
-   - For each `[HUMAN]` (or `[AI+HUMAN]`) checkbox in `delivery.md`, the implementation notes MUST
-     show a human confirmation (operator note, timestamp, or explicit "confirmed by user"), not an
-     agent-fabricated completion. An `[HUMAN]` item ticked with only generic agent prose and no
-     human-confirmation evidence: **HIGH** finding per occurrence (the agent likely faked a step it
-     could not perform).
-   - If a physical or out-of-band action was clearly impossible for an agent yet shows tool-based
-     completion: **CRITICAL** finding (fabricated execution of a human-only step).
-
-2. **Phase gates were satisfied before the next phase began**
-   - Each phase MUST have its `### Phase N Gate` checkboxes all ticked before any phase N+1 work
-     item was ticked. Use git history (`git log --follow -p delivery.md` or commit ordering) to
-     confirm gate items closed before next-phase items. Out-of-order completion (phase N+1 started
-     while phase N's gate was red): **HIGH** finding per occurrence.
-   - A gate whose checkboxes are ticked but whose verification commands now fail when re-run:
-     **HIGH** finding (gate was ticked without actually passing).
-
-3. **Pause Safety notes present**
-   - Each phase gate is followed by a `> **Pause Safety**:` note. Missing: **MEDIUM** per phase
-     (structural; should have been caught by `plan-checker`, but verify at archival too).
-
-#### Finding Severity
-
-- Fabricated completion of a human-only step: **CRITICAL**
-- `[HUMAN]` item ticked without human-confirmation evidence: **HIGH** per occurrence
-- Phase N+1 started before phase N's gate was green: **HIGH** per occurrence
-- Gate ticked but verification command re-run fails: **HIGH** per occurrence
-- Missing Pause Safety note: **MEDIUM** per phase
