@@ -4,9 +4,10 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                             | Description                                                                                                                                                                     |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit. |
+| Plan                                                                             | Description                                                                                                                                                                                                         |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit.                                     |
+| [mermaid-gate-coverage-expansion](./mermaid-gate-coverage-expansion/README.md)   | Expand the rhino-cli Mermaid gate to the full repo, add inline exemptions + color-palette/structural/correctness checks (flowchart-only), promote warnings to blocking, and enforce across pre-push + PR + push CI. |
 
 ## Instructions
 
