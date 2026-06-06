@@ -1,0 +1,4 @@
+# OSE Platform bounded context registry
+# Consumed by: rhino-cli ddd bc ose-platform
+# Schema: see specs/apps/organiclever/ddd/bounded-contexts.yaml for reference
+contexts: []
