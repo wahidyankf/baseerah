@@ -152,11 +152,12 @@ _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **RED** — Create the audit module
       `apps/rhino-cli/src/internal/repo_governance/gherkin_keyword_cardinality_audit.rs`
       (sibling pattern: `emoji_audit.rs`) with a failing unit test
-      `flags_scenario_with_multiple_when_lines` asserting a scenario with two primary `When` lines
-      yields one finding. Run `npx nx run rhino-cli:test:unit` — acceptance: the new test FAILS to
-      compile or fails the assertion (red).
-- [ ] [AI] **RED** — Add failing tests `exempts_background_block`,
-      `exempts_scenario_outline_examples`, and `ignores_keyword_words_in_docstrings_and_comments`
+      _New test_ `flags_scenario_with_multiple_when_lines` asserting a scenario with two primary
+      `When` lines yields one finding. Run `npx nx run rhino-cli:test:unit` — acceptance: the new
+      test FAILS to compile or fails the assertion (red).
+- [ ] [AI] **RED** — Add failing tests _New test_ `exempts_background_block`,
+      _New test_ `exempts_scenario_outline_examples`, and
+      _New test_ `ignores_keyword_words_in_docstrings_and_comments`
       in the same module. Run `npx nx run rhino-cli:test:unit` — acceptance: the three new tests
       fail (red).
 - [ ] [AI] **GREEN** — Implement the audit: parse each `.feature` file, group lines by `Scenario`,
@@ -172,10 +173,12 @@ _Suggested executor: `swe-rust-dev`_
       (sibling pattern: `governance_emoji_audit.rs`) exposing
       `repo-governance gherkin-keyword-cardinality` that scans `specs/**/*.feature` by default.
       — acceptance: `npx nx run rhino-cli:build` exits 0 and
-      `./apps/rhino-cli/target/release/rhino repo-governance gherkin-keyword-cardinality --help`
-      prints usage (path may differ — use the built binary path).
+      `./apps/rhino-cli/dist/rhino-cli repo-governance gherkin-keyword-cardinality --help`
+      prints usage (the build target copies the release binary to `apps/rhino-cli/dist/rhino-cli`).
 - [ ] [AI] Register the command module in the rhino-cli command registry
-      (`apps/rhino-cli/src/commands/mod.rs` or equivalent — confirm via
+      (`apps/rhino-cli/src/commands.rs` — flat module file confirmed present via
+      `test -f apps/rhino-cli/src/commands.rs` [Repo-grounded]; secondary wiring in
+      `apps/rhino-cli/src/cli.rs` — cross-check via
       `grep -rn "governance_emoji_audit" apps/rhino-cli/src/`).
       — acceptance: the command is dispatchable from the CLI.
 - [ ] [AI] Wire the category into
@@ -224,13 +227,16 @@ _Suggested executor: `swe-rust-dev`_
 _Suggested executor: `swe-rust-dev`_
 
 - [ ] [AI] Run the linter scoped to rhino specs:
-      `<built-rhino> repo-governance gherkin-keyword-cardinality --path specs/apps/rhino`
+      `./apps/rhino-cli/dist/rhino-cli repo-governance gherkin-keyword-cardinality --path specs/apps/rhino`
       (use the path flag if supported; otherwise grep the full-run output for `specs/apps/rhino`).
       — acceptance: offender list for `specs/apps/rhino` recorded.
 - [ ] [AI] For each offender, replace repeated primary `Given`/`When`/`Then` lines with `And`/`But`
-      in the `.feature` file, and update matching cucumber-rs step definitions in
-      `apps/rhino-cli/src/commands/*_test.rs` / `apps/rhino-cli/tests/*_integration_test.rs` so step
-      text still binds.
+      in the `.feature` file. Note: the cucumber-rs step harness for rhino-cli is not yet
+      implemented (spec-coverage is stubbed per `project.json`; `apps/rhino-cli/tests/` contains
+      only `cli_smoke.rs`). Only `apps/rhino-cli/tests/cli_smoke.rs` needs a grep check to confirm
+      no matching step text breaks — run:
+      `grep -n "<step phrase>" apps/rhino-cli/tests/cli_smoke.rs`
+      If no match, no step-def update is needed; the `.feature` normalization alone is sufficient.
       — acceptance: linter reports zero violations for `specs/apps/rhino`.
 
 ### Phase 5 Gate
@@ -266,7 +272,7 @@ _Suggested executor: `swe-rust-dev` (be) / `swe-typescript-dev` (web)_
 
 ## Phase 7: Retrofit `specs/apps/ayokoding` (ayokoding-cli + ayokoding-web)
 
-_Suggested executor: `swe-golang-dev` (cli) / `swe-typescript-dev` (web)_
+_Suggested executor: `swe-rust-dev` (cli) / `swe-typescript-dev` (web)_
 
 - [ ] [AI] Run the linter scoped to `specs/apps/ayokoding`; record offenders.
 - [ ] [AI] Normalize offending `.feature` files and update step defs in lockstep.
@@ -310,7 +316,7 @@ _Suggested executor: `swe-rust-dev`_
 
 ## Phase 9: Retrofit `specs/apps/ose-platform` (ose-web + ose-cli)
 
-_Suggested executor: `swe-golang-dev` (cli) / `swe-typescript-dev` (web)_
+_Suggested executor: `swe-rust-dev` (cli) / `swe-typescript-dev` (web)_
 
 - [ ] [AI] Run the linter scoped to `specs/apps/ose-platform`; record offenders.
 - [ ] [AI] Normalize offending `.feature` files and update step defs in lockstep.
@@ -420,7 +426,7 @@ _Suggested executor: `swe-typescript-dev`_
 ## Phase 14: Strict repo-rules-quality-gate (double-zero)
 
 - [ ] [AI] Run the full-corpus linter once to confirm zero offenders repo-wide:
-      `<built-rhino> repo-governance gherkin-keyword-cardinality`
+      `./apps/rhino-cli/dist/rhino-cli repo-governance gherkin-keyword-cardinality`
       — acceptance: zero findings across all of `specs/**/*.feature`.
 - [ ] [AI] Execute the `repo-rules-quality-gate` workflow at **strict** mode per
       `repo-governance/workflows/repo/repo-rules-quality-gate.md` (pin `RHINO_AUDIT_NOW=<RFC3339>`
@@ -474,13 +480,15 @@ _Suggested executor: `swe-typescript-dev`_
 
 - [ ] [AI] Push changes to `main` (direct push, Trunk Based Development — no PR):
       `git push origin main`
-- [ ] [AI] Check whether any push-triggered GitHub Actions workflows fired:
+- [ ] [AI] Check which push-triggered GitHub Actions workflows fired:
       `gh run list --branch main --limit 5 --json name,status,conclusion`
-      — the affected paths (`apps/rhino-cli/`, `repo-governance/`, `.claude/`, `specs/`) do NOT
-      match the path filters of `crane-cli-integration.yml` (the only push-triggered workflow in
-      `.github/workflows/`); `pr-quality-gate.yml` and `pr-validate-links.yml` fire on PRs only
-      (Trunk Based Development — no PR is created); scheduled workflows fire independently.
-      If the run list shows any triggered workflows, poll each to completion (every 3 minutes;
+      — `validate-markdown.yml` (push to `main`, no path filter) WILL fire and validates
+      mermaid + links + heading-hierarchy across the repo; the affected paths
+      (`apps/rhino-cli/`, `repo-governance/`, `.claude/`, `specs/`) do NOT match the path
+      filters of `crane-cli-integration.yml` (the only other push-triggered workflow in
+      `.github/workflows/`); `pr-quality-gate.yml` fires on PRs only (Trunk Based
+      Development — no PR is created); scheduled workflows fire independently.
+      Poll each triggered run to completion (every 3 minutes;
       one `gh run view --json status,conclusion` per wakeup; never `gh run watch`).
 - [ ] [AI] Verify ALL CI checks pass — no exceptions
 - [ ] [AI] If any CI check fails, fix the root cause immediately and push a follow-up commit

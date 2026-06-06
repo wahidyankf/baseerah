@@ -94,8 +94,8 @@ offenders via the linter rather than from fabricated counts.
   category registration]
 - `apps/rhino-cli/src/commands/governance_audit.rs` — wire the new category into the
   orchestrator command. [Repo-grounded]
-- `apps/rhino-cli/src/commands/mod.rs` (or equivalent command registry) — register the new
-  command module. _Verify exact registry file at execution via `Grep`._
+- `apps/rhino-cli/src/commands.rs` (command registry — flat module file at repo root of the
+  `commands/` directory, confirmed via `test -f apps/rhino-cli/src/commands.rs`). [Repo-grounded]
 - `repo-governance/workflows/repo/repo-rules-quality-gate.md` — add the new category to
   the Step 0.5 deterministic preflight enumeration. [Repo-grounded — preflight defined at
   Step 0.5, lines ~111–130]
