@@ -664,14 +664,15 @@ three `--exclude` named exclusions.
 
 ### Repo-Rules Quality Gate (strict, double-zero)
 
-- [ ] [AI] Run the strict repo-rules quality gate to confirm governance changes are consistent and
+- [x] [AI] Run the strict repo-rules quality gate to confirm governance changes are consistent and
       propagated, requiring a **double-zero** pass (zero checker findings AND zero fixer changes on
       a clean re-run): invoke `repo-rules-quality-gate` (strict) over the changed governance
       surface (`diagrams.md`, `quality.md`, `linking.md`, check-inventory docs, and any `.claude/`
       bindings) — acceptance: the checker reports zero findings and a follow-up fixer pass produces
       zero changes.
   - _Suggested executor: `repo-rules-checker` then `repo-rules-fixer` (double-zero), per the
-    `repo-rules-quality-gate`._
+  `repo-rules-quality-gate`._
+  <!-- 2026-06-06 | Status: DONE | Notes: 5 findings fixed (docs-tutorial-maker: removed updated-field instruction + fixed TD default; quality.md: style→classDef + TD justification comments; code.md: added description frontmatter). Double-zero confirmed after fixes. -->
 
 ### Local Quality Gates (Before Push)
 
@@ -715,45 +716,62 @@ three `--exclude` named exclusions.
 
 ### Push and Post-Push CI Verification
 
-- [ ] [AI] Push directly to `main`: `git push origin main`
-      — acceptance: push succeeds (pre-commit hook green for the staged set; pre-push green).
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 minutes; one
-      `gh run view --json status,conclusion` per wakeup; do NOT use `gh run watch`)
-      — acceptance: every workflow run observed to completion, INCLUDING the new `validate-markdown`
-      workflow (Layer 3 fires on this `push` to `main`).
-- [ ] [AI] Verify the `validate-markdown` workflow run passes and ALL other CI checks pass
-      — acceptance: zero failures; the `validate-markdown` run is green.
-- [ ] [AI] If any CI check fails, investigate root cause, fix, and push a follow-up commit; repeat
-      until ALL GitHub Actions are green — acceptance: full CI green.
+- [x] [AI] Push directly to `main`: `git push origin main`
+    — acceptance: push succeeds (pre-commit hook green for the staged set; pre-push green).
+<!-- 2026-06-06 | Status: DONE | push succeeded; pre-push hook green. -->
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 minutes; one
+    `gh run view --json status,conclusion` per wakeup; do NOT use `gh run watch`)
+    — acceptance: every workflow run observed to completion, INCLUDING the new `validate-markdown`
+    workflow (Layer 3 fires on this `push` to `main`).
+<!-- 2026-06-06 | Status: DONE | CI run #27055312503 monitored to completion. -->
+- [x] [AI] Verify the `validate-markdown` workflow run passes and ALL other CI checks pass
+    — acceptance: zero failures; the `validate-markdown` run is green.
+<!-- 2026-06-06 | Status: DONE | CI run #27055312503 conclusion=success; all three validators green. -->
+- [x] [AI] If any CI check fails, investigate root cause, fix, and push a follow-up commit; repeat
+    until ALL GitHub Actions are green — acceptance: full CI green.
+<!-- 2026-06-06 | Status: DONE (N/A) | CI passed on first push; no follow-up needed. -->
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked.
-- [ ] [AI] Verify ALL quality gates pass (local + CI).
-- [ ] [AI] Verify all three markdown gates report zero findings within scope.
-- [ ] [AI] Move:
-      `git mv plans/in-progress/markdown-gate-coverage-expansion plans/done/2026-06-06__markdown-gate-coverage-expansion`
-      (use the actual completion date, NOT the creation date).
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the `markdown-gate-coverage-expansion`
-      entry (note: the current row still uses the old `mermaid-gate-coverage-expansion` label and
-      link — replace or remove it).
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
-- [ ] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`).
-- [ ] [AI] Commit the archival: `chore(plans): move markdown-gate-coverage-expansion to done`, then
-      push to `origin main`.
+- [x] [AI] Verify ALL delivery checklist items are ticked.
+<!-- 2026-06-06 | Status: DONE | All phases 0–11 checkboxes ticked. -->
+- [x] [AI] Verify ALL quality gates pass (local + CI).
+<!-- 2026-06-06 | Status: DONE | Local gates all green; CI run #27055312503 success. -->
+- [x] [AI] Verify all three markdown gates report zero findings within scope.
+<!-- 2026-06-06 | Status: DONE | validate:mermaid 0, validate:links 0, validate:heading-hierarchy 0. -->
+- [x] [AI] Move:
+    `git mv plans/in-progress/markdown-gate-coverage-expansion plans/done/2026-06-06__markdown-gate-coverage-expansion`
+    (use the actual completion date, NOT the creation date).
+<!-- 2026-06-06 | Status: DONE | moved to plans/done/2026-06-06__markdown-gate-coverage-expansion. -->
+- [x] [AI] Update `plans/in-progress/README.md` — remove the `markdown-gate-coverage-expansion`
+    entry (note: the current row still uses the old `mermaid-gate-coverage-expansion` label and
+    link — replace or remove it).
+<!-- 2026-06-06 | Status: DONE | row removed from in-progress/README.md. -->
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
+<!-- 2026-06-06 | Status: DONE | entry added to done/README.md. -->
+- [x] [AI] Update any other READMEs that reference this plan (e.g. `plans/README.md`).
+<!-- 2026-06-06 | Status: DONE | no other READMEs reference this plan. -->
+- [x] [AI] Commit the archival: `chore(plans): move markdown-gate-coverage-expansion to done`, then
+    push to `origin main`.
+<!-- 2026-06-06 | Status: DONE | archival committed and pushed. -->
 
 ### Phase 11 Gate
 
 > All checks below must pass — this is the final gate.
 
-- [ ] [AI] `npx nx run rhino-cli:validate:mermaid`, `:validate:links`, and
-      `:validate:heading-hierarchy` all exit 0 (full repo clean within scope).
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` exits 0 and
-      `npm run lint:md` passes.
-- [ ] [AI] The `repo-rules-quality-gate` double-zero pass is clean.
-- [ ] [AI] All GitHub Actions for the push are green, including the new `validate-markdown`
-      workflow run (push-to-main trigger).
-- [ ] [AI] Plan archived to `plans/done/` and READMEs updated.
+- [x] [AI] `npx nx run rhino-cli:validate:mermaid`, `:validate:links`, and
+    `:validate:heading-hierarchy` all exit 0 (full repo clean within scope).
+<!-- 2026-06-06 | Status: DONE | all three validators exit 0. -->
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` exits 0 and
+    `npm run lint:md` passes.
+<!-- 2026-06-06 | Status: DONE | all targets green; lint:md 0 errors. -->
+- [x] [AI] The `repo-rules-quality-gate` double-zero pass is clean.
+<!-- 2026-06-06 | Status: DONE | double-zero confirmed after 5 findings fixed. -->
+- [x] [AI] All GitHub Actions for the push are green, including the new `validate-markdown`
+    workflow run (push-to-main trigger).
+<!-- 2026-06-06 | Status: DONE | CI run #27055312503 conclusion=success. -->
+- [x] [AI] Plan archived to `plans/done/` and READMEs updated.
+<!-- 2026-06-06 | Status: DONE | archived to plans/done/2026-06-06__markdown-gate-coverage-expansion. -->
 
 > **Pause Safety**: work is complete, pushed, CI green, plan archived. This is the terminal state.
 > To re-verify at any later time: run the three markdown validators full-scan.

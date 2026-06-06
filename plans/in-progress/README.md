@@ -4,10 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                             | Description                                                                                                                                                                                                                                                                                                      |
-| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit.                                                                                                                                  |
-| [markdown-gate-coverage-expansion](./markdown-gate-coverage-expansion/README.md) | Unify the rhino-cli Markdown gate across three validators — Mermaid (flowchart-only, full repo), relative links (full repo + anchor validation), and heading-hierarchy (prose-allowlist only, never breaking agent/skill files) — with path exclusions, and move local enforcement to pre-commit + PR + push CI. |
+| Plan                                                                             | Description                                                                                                                                                                     |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit. |
 
 ## Instructions
 
