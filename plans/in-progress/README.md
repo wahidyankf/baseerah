@@ -4,10 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                             | Description                                                                                                                                                                                |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit.            |
-| [plan-domain-parity](./plan-domain-parity/README.md)                             | Align plan workflows, agents, and skills across ose-public, ose-primer, and ose-infra via 3-way best-of merges, harness binding modernization, and a recorded cross-repo deviation matrix. |
+| Plan                                                                             | Description                                                                                                                                                                     |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [gherkin-step-keyword-cardinality](./gherkin-step-keyword-cardinality/README.md) | Add a HARD Gherkin convention rule (one Given/one When/one Then per scenario, extras via And/But), propagate it repo-wide, and enforce it with a deterministic rhino-cli audit. |
 
 ## Instructions
 

@@ -26,7 +26,7 @@ multi-harness binding surface. All 26 deviation-matrix rows were resolved in a
 grilled session with the invoker on 2026-06-06 before any implementation began.
 
 The full resolved matrix lives in
-[`plans/in-progress/plan-domain-parity/tech-docs.md`](../../plans/in-progress/plan-domain-parity/tech-docs.md)
+[`plans/done/2026-06-06__plan-domain-parity/tech-docs.md`](../../plans/done/2026-06-06__plan-domain-parity/tech-docs.md)
 and the source matrix in `local-temp/plan-domain-parity-matrix.md`.
 
 ## Background
@@ -384,10 +384,10 @@ All web research performed by web-research-maker on 2026-06-05 to 2026-06-06:
 
 ## Relation to Other Documents
 
-- [Technical Documentation (tech-docs.md)](../../plans/in-progress/plan-domain-parity/tech-docs.md) —
+- [Technical Documentation (tech-docs.md)](../../plans/done/2026-06-06__plan-domain-parity/tech-docs.md) —
   full embedded matrix, design decisions D1–D7, file impact table, testing
   strategy, and rollback plan
-- [Plan README](../../plans/in-progress/plan-domain-parity/README.md) — delivery
+- [Plan README](../../plans/done/2026-06-06__plan-domain-parity/README.md) — delivery
   checklist and phase structure
 - [Worktree Toolchain Initialization](../../repo-governance/development/workflow/worktree-setup.md) —
   provisioning sequence referenced by row 3
