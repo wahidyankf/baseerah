@@ -62,6 +62,10 @@ The repository follows a **six-layer governance architecture** (Vision → Princ
 - **[C4 Architecture Model](./software-engineering/architecture/c4-architecture-model/README.md)** - Visualizing software architecture through hierarchical abstraction levels
 - **[Domain-Driven Design (DDD)](./software-engineering/architecture/domain-driven-design-ddd/README.md)** - Strategic and tactical patterns for modeling complex business domains
 
+### Decision Logs
+
+- **[Plan Domain Parity — Design Decisions (2026-06-06)](./plan-domain-parity-decisions.md)** - All 26 decisions from the 2026-06-06 cross-repo parity effort: what was resolved, why, and what was rejected across ose-public, ose-primer, and ose-infra
+
 ### Post-Mortems
 
 - **[Post-Mortems](./post-mortems/README.md)** - Blameless incident retrospectives (CI/CD failures, Vercel outages, dependency-bump and parity-guard regressions). Writer-facing template and index; governed by the [Post-Mortem Convention](../../repo-governance/conventions/structure/post-mortems.md)
