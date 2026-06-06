@@ -453,7 +453,11 @@ fn step_validate_mermaid(git_root: &Path, staged: &[String], deps: &mut Deps) ->
     if candidates.is_empty() {
         return Ok(());
     }
-    let opts = default_validate_options();
+    // Standardized gate invocation: --max-depth=4 (matches the validate:mermaid
+    // Nx target and CI), so wide+deep diagrams demote to warnings identically
+    // across all enforcement layers.
+    let mut opts = default_validate_options();
+    opts.max_depth = 4;
     let mut all_blocks = Vec::new();
     for rel in &candidates {
         let abs = git_root.join(rel);
@@ -779,6 +783,43 @@ mod tests {
         let staged = vec![".claude/skills/my-skill/SKILL.md".to_string()];
         let r = step_validate_heading_hierarchy(dir.path(), &staged, &mut deps);
         assert!(r.is_ok(), "SKILL.md must not be blocked by heading step");
+    }
+
+    /// The staged mermaid step uses the standardized `--max-depth=4` gate
+    /// threshold: a wide+deep diagram (span > 4 AND depth > 4) demotes to a
+    /// non-blocking complex-diagram warning, exactly as in the CI Nx target.
+    #[test]
+    fn step_validate_mermaid_uses_standardized_max_depth() {
+        use std::fmt::Write as _;
+        let dir = tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("docs")).unwrap();
+        // 5 parallel branches (span 5) each 5 levels deep (depth 6) — a CI
+        // warning under --max-depth=4, must NOT block the staged step.
+        let mut src = String::from("# T\n\n```mermaid\nflowchart TB\n");
+        for b in 0..5 {
+            let _ = writeln!(src, "R --> A{b}");
+            for l in 0..4 {
+                let _ = writeln!(
+                    src,
+                    "{}{b} --> {}{b}",
+                    (b'A' + l) as char,
+                    (b'B' + l) as char
+                );
+            }
+        }
+        src.push_str("```\n");
+        std::fs::write(dir.path().join("docs/wide-deep.md"), src).unwrap();
+        let mut deps = Deps {
+            git_root: dir.path().to_path_buf(),
+            stdout: Box::new(Vec::<u8>::new()),
+            stderr: Box::new(Vec::<u8>::new()),
+        };
+        let staged = vec!["docs/wide-deep.md".to_string()];
+        let r = step_validate_mermaid(dir.path(), &staged, &mut deps);
+        assert!(
+            r.is_ok(),
+            "wide+deep diagram must be a warning (not a violation) at the staged step: {r:?}"
+        );
     }
 
     /// (d) Existing link step excludes staged `plans/done/` broken link (the 3
