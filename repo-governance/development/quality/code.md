@@ -1,5 +1,7 @@
 ---
 title: Code Quality Convention
+description: Automated code quality tools (Prettier, Husky, lint-staged, Commitlint) and git hooks
+  for consistent formatting and commit message standards
 tags:
   - development
   - code-quality

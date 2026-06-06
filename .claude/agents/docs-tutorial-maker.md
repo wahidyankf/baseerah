@@ -85,7 +85,8 @@ See [Diagrams Convention](../../repo-governance/conventions/formatting/diagrams.
 
 **Diagram orientation**:
 
-- **Flowcharts**: TD (Top-Down) for sequential processes, LR (Left-Right) for wide diagrams
+- **Flowcharts**: LR (Left-Right) by default; TD only when top-down direction is semantically required,
+  with `%% TD required: [reason]` justification comment on the immediately preceding line
 - **Sequence diagrams**: Automatic left-to-right layout
 - **State diagrams**: LR (Left-Right) for state transitions
 - **Class diagrams**: Automatic layout
@@ -443,7 +444,6 @@ Additional quality requirements beyond general content quality:
    - Add missing sections
    - Improve clarity and examples
    - Fix broken links
-   - Update frontmatter `updated` field
 
 3. **Maintain consistency**
    - Keep existing structure unless restructuring is needed

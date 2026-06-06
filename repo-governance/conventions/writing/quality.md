@@ -39,6 +39,8 @@ These principles apply to markdown content in:
 
 **Universal Application**: Every markdown file in this repository should follow these quality principles, regardless of location or purpose.
 
+%% TD required: concept hierarchy flows top-down from root principle to sub-principles
+
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161 %%
 graph TD
@@ -55,10 +57,15 @@ graph TD
     C2 --> C3[Descriptive Headings]
     C3 --> C4[Semantic Structure]
 
-    style A fill:#0173B2,stroke:#000,color:#fff
-    style B fill:#DE8F05,stroke:#000,color:#000
-    style C fill:#029E73,stroke:#000,color:#fff
+    classDef blueNode fill:#0173B2,stroke:#000,color:#fff
+    classDef orangeNode fill:#DE8F05,stroke:#000,color:#000
+    classDef tealNode fill:#029E73,stroke:#000,color:#fff
+    class A blueNode
+    class B orangeNode
+    class C tealNode
 ```
+
+%% TD required: concept hierarchy flows top-down from root principle to sub-principles
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161 %%
@@ -79,9 +86,12 @@ graph TD
     E4 --> E5[Table Formatting]
     E5 --> E6[Line Length Guidelines]
 
-    style A fill:#0173B2,stroke:#000,color:#fff
-    style D fill:#CC78BC,stroke:#000,color:#000
-    style E fill:#CA9161,stroke:#000,color:#000
+    classDef blueNode fill:#0173B2,stroke:#000,color:#fff
+    classDef purpleNode fill:#CC78BC,stroke:#000,color:#000
+    classDef brownNode fill:#CA9161,stroke:#000,color:#000
+    class A blueNode
+    class D purpleNode
+    class E brownNode
 ```
 
 ## Writing Style and Tone
