@@ -9,14 +9,14 @@ the authority; the spec retrofit brings the corpus into compliance.
 ```mermaid
 flowchart TB
   subgraph Authority
-    AC[acceptance-criteria.md HARD rule]
+    AC[acceptance-criteria HARD rule]
   end
   subgraph Propagation
-    SWEEP[repo-governance docs + agent prompts] --- SKILLS[two skill packages]
+    SWEEP[governance docs + prompts] --- SKILLS[two skill packages]
   end
   subgraph Enforcement
-    LINT[gherkin-keyword-cardinality audit] --> ORCH[audit_orchestrator]
-    ORCH --> PRE[repo-rules-quality-gate preflight]
+    LINT[gherkin-cardinality audit] --> ORCH[audit_orchestrator]
+    ORCH --> PRE[quality-gate preflight]
     PRE --> CI[CI]
   end
   subgraph Corpus

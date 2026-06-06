@@ -53,13 +53,13 @@ that violate it.
 
 ```mermaid
 flowchart TB
-  P0[Phase 0: Setup and Baseline] --> P1[Phase 1: Author HARD rule -- via repo-rules-maker]
-  P1 --> P2[Phase 2: Broad governance sweep -- via repo-rules-maker]
-  P2 --> P3[Phase 3: Manual skill propagation -- without repo-rules-maker]
-  P3 --> P4[Phase 4: Build deterministic linter -- TDD]
-  P4 --> P5[Phase 5-13: Per-app/lib spec retrofit -- gated]
-  P5 --> P14[Phase 14: repo-rules-quality-gate strict]
-  P14 --> P15[Phase 15: Quality gates, commit, push, CI]
+  P0[Phase 0: Setup and Baseline] --> P1[Phase 1: HARD rule authoring]
+  P1 --> P2[Phase 2: Governance sweep]
+  P2 --> P3[Phase 3: Skill propagation]
+  P3 --> P4[Phase 4: Build linter TDD]
+  P4 --> P5[Phase 5-13: Spec retrofit]
+  P5 --> P14[Phase 14: Quality gate strict]
+  P14 --> P15[Phase 15: Gates commit push]
 
   %% color-blind-friendly palette
   style P0 fill:#0072B2,color:#ffffff

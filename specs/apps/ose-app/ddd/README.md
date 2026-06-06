@@ -24,4 +24,4 @@ specs/apps/ose-app/ddd/
 ## Related
 
 - [bounded-context-map.md](./bounded-context-map.md) — Visual bounded-context map
-- [rhino-cli ddd commands](../../../../apps/rhino-cli/README.md#ddd-enforcement)
+- [rhino-cli ddd commands](../../../../apps/rhino-cli/README.md#quick-start)

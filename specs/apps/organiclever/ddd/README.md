@@ -40,4 +40,4 @@ for full details on what each command checks.
 ## Related
 
 - [bounded-context-map.md](./bounded-context-map.md) — Visual bounded-context map with Mermaid
-- [rhino-cli ddd commands](../../../../apps/rhino-cli/README.md#ddd-enforcement)
+- [rhino-cli ddd commands](../../../../apps/rhino-cli/README.md#quick-start)
