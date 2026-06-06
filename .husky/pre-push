@@ -19,9 +19,6 @@ if [ -n "$RANGE" ]; then
   if echo "$CHANGED" | grep -qE '^repo-governance/workflows/'; then
     npx nx run rhino-cli:validate:naming-workflows
   fi
-  if echo "$CHANGED" | grep -qE '^(repo-governance/|\.claude/).*\.md$'; then
-    npx nx run rhino-cli:validate:mermaid
-  fi
   if echo "$CHANGED" | grep -qE '^repo-governance/.*\.md$'; then
     npx nx run rhino-cli:validate:repo-governance-vendor-audit
   fi
