@@ -252,7 +252,7 @@ fn strip_inline_code_spans(line: &str) -> String {
                 i += 1;
             }
             if found {
-                for b in out[start..i].iter_mut() {
+                for b in &mut out[start..i] {
                     *b = b' ';
                 }
             }
