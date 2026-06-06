@@ -1,12 +1,12 @@
 ---
 description: Validates that application and library projects conform to platform coding standards, Nx target conventions, and language-specific best practices. Outputs to generated-reports/ with progressive streaming.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: success
 skills:
   - repo-generating-validation-reports

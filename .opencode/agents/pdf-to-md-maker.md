@@ -1,13 +1,13 @@
 ---
 description: Converts PDF files to verbatim Markdown representations. Handles text-based PDFs via pdftotext, image-only PDFs via OCR (tesseract), converts diagrams to Mermaid format, and processes arbitrarily large files in 50-page chunks. By default outputs to same directory and filename as PDF with .md extension. Use when converting a PDF to Markdown for cross-referencing or archival.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - repo-applying-maker-checker-fixer

@@ -1,14 +1,14 @@
 ---
 description: Validates factual accuracy of ayokoding-web content using WebSearch/WebFetch. Verifies command syntax, versions, code examples, external references with confidence classification.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

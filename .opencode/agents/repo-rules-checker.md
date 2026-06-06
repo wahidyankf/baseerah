@@ -1,12 +1,12 @@
 ---
 description: Validates repository-wide consistency including file naming, linking, emoji usage, convention compliance, agent-to-agent duplication, agent-Skill duplication, Skill-to-Skill consolidation opportunities, and rules governance (contradictions, inaccuracies, inconsistencies). Outputs to generated-reports/ with progressive streaming.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

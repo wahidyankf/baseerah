@@ -1,13 +1,13 @@
 ---
 description: Creates In-the-Field production implementation guides for ayokoding-web with 20-40 guides following standard library first principle. Ensures production-ready code with framework integration.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - docs-creating-in-the-field-tutorials

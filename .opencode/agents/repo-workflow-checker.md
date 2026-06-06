@@ -1,12 +1,12 @@
 ---
 description: Validates workflow documentation quality and compliance with workflow pattern convention.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

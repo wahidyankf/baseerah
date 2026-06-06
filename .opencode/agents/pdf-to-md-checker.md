@@ -1,12 +1,12 @@
 ---
 description: Validates that a Markdown file is a verbatim, complete representation of its source PDF. Checks for missing sections, incorrect text, table integrity, OCR quality, Mermaid validity, and figure coverage. Use when verifying PDF-to-Markdown conversion fidelity before cross-referencing.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: success
 skills:
   - repo-generating-validation-reports

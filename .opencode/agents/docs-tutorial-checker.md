@@ -1,14 +1,14 @@
 ---
 description: Validates tutorial quality focusing on pedagogical structure, narrative flow, visual completeness, hands-on elements, and tutorial type compliance. Complements docs-checker (accuracy) and docs-link-checker (links).
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

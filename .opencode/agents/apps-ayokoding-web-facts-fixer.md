@@ -1,15 +1,15 @@
 ---
 description: Applies validated fixes from facts-checker audit reports. Re-validates factual findings before applying changes.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
+  write: allow
 color: warning
 skills:
   - docs-applying-content-quality

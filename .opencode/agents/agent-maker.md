@@ -1,12 +1,12 @@
 ---
 description: Creates new AI agent files in .claude/agents/ following AI Agents Convention. Changes are then synced to .opencode/agents/ via npm run generate:bindings. Ensures proper structure, skills integration, and documentation.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - docs-applying-content-quality

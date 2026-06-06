@@ -1,15 +1,15 @@
 ---
 description: Validates both external and internal links in documentation files to ensure they are not broken. Maintains a cache of verified external links in docs/metadata/external-links-status.yaml (the ONLY cache file) with automatic pruning and mandatory lastFullScan updates on every run. HARD REQUIREMENT - cache file usage is mandatory regardless of how this agent is invoked (spawned by other agents, processes, or direct invocation). Use when checking for dead links, verifying URL accessibility, validating internal references, or auditing documentation link health.
 model: opencode-go/glm-5
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

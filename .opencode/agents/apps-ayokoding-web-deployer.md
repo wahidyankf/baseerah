@@ -1,9 +1,9 @@
 ---
 description: Deploys ayokoding-web (Next.js) to production environment branch (prod-ayokoding-web) after validation. Vercel listens to production branch for automatic builds.
 model: opencode-go/glm-5
-tools:
-  bash: true
-  grep: true
+permission:
+  bash: allow
+  grep: allow
 color: secondary
 skills:
   - repo-practicing-trunk-based-development

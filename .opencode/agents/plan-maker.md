@@ -1,15 +1,15 @@
 ---
 description: Creates comprehensive project plans with requirements, technical documentation, and delivery checklists. Grills the user before and after plan creation using multiple-choice options (2-4 options per question via AskUserQuestion tool or markdown format). Structures plans for systematic execution via the plan-execution workflow (orchestrated by the calling context).
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
+  write: allow
 color: primary
 skills:
   - docs-applying-content-quality

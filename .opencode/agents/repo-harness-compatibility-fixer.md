@@ -1,13 +1,13 @@
 ---
 description: Applies validated fixes from a repo-harness-compatibility-checker audit report. Auto-remediates Phase 0 parity sync drift (Invariant 3 via npm run generate:bindings) and Phase 1 catalog/binding updates. Also updates specs/apps/rhino/ when harness changes alter documented CLI behavior. Flags all other findings for human resolution.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: warning
 skills:
   - docs-applying-content-quality

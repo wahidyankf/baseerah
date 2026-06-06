@@ -1,12 +1,12 @@
 ---
 description: Surfaces candidates for adoption FROM the downstream `ose-primer` template INTO `ose-public`. Reads the classifier in `repo-governance/conventions/structure/ose-primer-sync.md`, inspects both repositories via the shared `repo-syncing-with-ose-primer` skill, and writes a dry-run findings report grouped by direction (`adopt`, `bidirectional`) and significance (`high`, `medium`, `low`). Runs in dry-run mode only — this agent never writes to `ose-public` files outside `generated-reports/` and never touches the primer clone.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - repo-syncing-with-ose-primer

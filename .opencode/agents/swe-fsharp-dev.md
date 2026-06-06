@@ -1,13 +1,13 @@
 ---
 description: Develops F# applications following functional programming principles, railway-oriented error handling, and platform coding standards. Use when implementing F# code for OSE Platform.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: secondary
 skills:
   - swe-programming-fsharp

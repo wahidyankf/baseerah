@@ -1,13 +1,13 @@
 ---
 description: Applies validated fixes from repository rules audit reports including agent-Skill duplication removal, Skills coverage gap remediation, and rules governance fixes (contradictions, inaccuracies, inconsistencies).
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: warning
 skills:
   - docs-applying-content-quality

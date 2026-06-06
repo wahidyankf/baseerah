@@ -1,12 +1,12 @@
 ---
 description: Expert at managing files and directories in docs/ directory. Use for renaming, moving, or deleting files/directories while maintaining kebab-case conventions, fixing links, and preserving git history.
 model: opencode-go/glm-5
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
 color: warning
 skills:
   - repo-practicing-trunk-based-development

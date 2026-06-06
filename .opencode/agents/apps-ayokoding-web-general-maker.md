@@ -1,13 +1,13 @@
 ---
 description: Creates general ayokoding-web content (by-concept tutorials, guides, references). Ensures bilingual completeness and content quality compliance.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - docs-applying-content-quality

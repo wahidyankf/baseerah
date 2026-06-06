@@ -1,12 +1,12 @@
 ---
 description: Researches current, verifiable information from the web in an isolated context. Use when you need facts beyond training data cutoff, latest API or library docs, current best practices, or verification of uncertain claims. Returns cited, structured findings without bloating main conversation context.
 model: opencode-go/minimax-m2.7
-tools:
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
+permission:
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
 color: success
 skills:
   - docs-validating-factual-accuracy

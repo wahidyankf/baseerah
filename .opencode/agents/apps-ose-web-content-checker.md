@@ -1,12 +1,12 @@
 ---
 description: Validates ose-web content quality including Next.js content layer compliance and landing page standards.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

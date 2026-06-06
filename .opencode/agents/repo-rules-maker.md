@@ -1,12 +1,12 @@
 ---
 description: Creates repository rules and conventions in repo-governance/ directories. Documents standards, patterns, and quality requirements.
 model: opencode-go/minimax-m2.7
-tools:
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - docs-applying-content-quality

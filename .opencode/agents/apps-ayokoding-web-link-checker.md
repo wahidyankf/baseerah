@@ -1,15 +1,15 @@
 ---
 description: Validates links in ayokoding-web content. Checks internal and external links for correctness and accessibility.
 model: opencode-go/glm-5
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  webfetch: true
-  websearch: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  webfetch: allow
+  websearch: allow
+  write: allow
 color: success
 skills:
   - docs-applying-content-quality

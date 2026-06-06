@@ -1,13 +1,13 @@
 ---
 description: Applies validated fixes from pdf-to-md-checker audit reports. Re-validates each finding before applying. Fixes missing sections (re-extracts from PDF), incorrect text, wrong table data, invalid Mermaid syntax, and missing figure placeholders. Use after reviewing pdf-to-md-checker output.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: warning
 skills:
   - repo-assessing-criticality-confidence

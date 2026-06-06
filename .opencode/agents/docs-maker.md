@@ -1,12 +1,12 @@
 ---
 description: Expert documentation writer specializing in GitHub-compatible markdown and Diátaxis framework. Use when creating, editing, or organizing project documentation.
 model: opencode-go/minimax-m2.7
-tools:
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: primary
 skills:
   - docs-creating-accessible-diagrams

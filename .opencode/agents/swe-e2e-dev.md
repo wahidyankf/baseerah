@@ -1,13 +1,13 @@
 ---
 description: Develops end-to-end tests using Playwright following OSE Platform testing patterns and standards. Use when implementing E2E tests for OSE Platform applications.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: secondary
 skills:
   - swe-developing-e2e-test-with-playwright

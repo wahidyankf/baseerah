@@ -1,13 +1,13 @@
 ---
 description: Develops Rust applications following ownership principles, zero-cost abstraction patterns, and platform coding standards. Use when implementing Rust code for OSE Platform.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: secondary
 skills:
   - swe-programming-rust

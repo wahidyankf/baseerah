@@ -1,13 +1,13 @@
 ---
 description: Applies validated fixes from apps-ayokoding-web-by-example-checker audit reports. Re-validates By Example findings before applying changes. Use after reviewing checker output.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: warning
 skills:
   - docs-applying-content-quality

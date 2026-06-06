@@ -1,13 +1,13 @@
 ---
 description: Applies validated fixes from workflow-checker audit reports. Re-validates before applying changes.
 model: opencode-go/minimax-m2.7
-tools:
-  bash: true
-  edit: true
-  glob: true
-  grep: true
-  read: true
-  write: true
+permission:
+  bash: allow
+  edit: allow
+  glob: allow
+  grep: allow
+  read: allow
+  write: allow
 color: warning
 skills:
   - docs-applying-content-quality
