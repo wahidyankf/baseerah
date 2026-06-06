@@ -437,6 +437,8 @@ cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs va
 
 Run without flags to validate all `docs/`, `repo-governance/`, and platform binding directories (e.g., `.claude/`) markdown files using defaults (MaxWidth=4, unlimited depth).
 
+**Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit hook and in the `validate-markdown.yml` CI workflow (`push`/`pull_request` → `main`) via `npx nx run rhino-cli:validate:mermaid`. Does NOT run at pre-push.
+
 ### Width Violation Fix Strategy Guide
 
 When `rhino-cli docs validate-mermaid` reports a `width_exceeded` violation, select the simplest fix strategy that works:

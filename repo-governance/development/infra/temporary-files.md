@@ -110,6 +110,8 @@ All checker agents MUST follow the universal naming pattern:
 - `{YYYY-MM-DD--HH-MM}`: Timestamp in UTC+7 (double dash between date and time)
 - `{type}`: Report type suffix (`audit`, `validation`, `fix`)
 
+## UUID Chain Generation
+
 **UUID Chain Examples**:
 
 - `a1b2c3` - Root execution (no parent)

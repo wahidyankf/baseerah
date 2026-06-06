@@ -483,12 +483,46 @@ grep "^$escaped:" frontmatter.txt
 grep -F "^$field:" frontmatter.txt
 ```
 
+## Markdown Quality Gates
+
+Three automated markdown validators run on every commit and in CI via the `validate-markdown.yml` workflow:
+
+### 1. Mermaid Diagram Validation
+
+**Command**: `npx nx run rhino-cli:validate:mermaid`
+
+Validates all Mermaid diagrams in `docs/`, `repo-governance/`, and platform binding directories (`.claude/`, `.opencode/`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax.
+
+**Gate locations**: Pre-commit (staged `.md` files only) + `validate-markdown.yml` CI. Not at pre-push.
+
+### 2. Markdown Link Validation
+
+**Command**: `npx nx run rhino-cli:validate:links`
+
+Full-repo link scan. Validates all relative `[text](path.md)` links resolve to existing files. Also validates `#fragment` anchor references using the GitHub slug algorithm — a fragment with no matching heading emits a `broken-anchor` finding. Excludes: `plans/done/`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`.
+
+**Gate locations**: Pre-commit (staged `.md` files only, link step) + `validate-markdown.yml` CI. Not at pre-push.
+
+### 3. Heading Hierarchy Validation
+
+**Command**: `npx nx run rhino-cli:validate:heading-hierarchy`
+
+Validates heading nesting on a prose allowlist: `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), root `*.md`. Skips `.claude/**`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`.
+
+**Gate locations**: Pre-commit (staged `.md` files within the prose allowlist) + `validate-markdown.yml` CI. Not at pre-push.
+
+### CI Workflow
+
+All three validators run in `.github/workflows/validate-markdown.yml` on every `push` and `pull_request` targeting `main`.
+
 ## Related Conventions
 
 - [AI Agents Convention](../agents/ai-agents.md) - Agents that use these validation methods
 - [File Naming Convention](../../conventions/structure/file-naming.md) - What we validate (naming patterns)
 - [Linking Convention](../../conventions/formatting/linking.md) - What we validate (link formats)
 - [Temporary Files Convention](../infra/temporary-files.md) - Where validation reports are stored
+- [Diagram and Schema Convention](../../conventions/formatting/diagrams.md) - Mermaid enforcement details
+- [Content Quality Principles](../../conventions/writing/quality.md) - Heading hierarchy enforcement details
 
 ## Maintenance Notes
 

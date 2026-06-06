@@ -379,7 +379,7 @@ Go development in OSE Platform follows the software engineering principles:
 4. **[Pure Functions Over Side Effects](../../principles/software-engineering/pure-functions.md)** - Go supports through functional core architecture
 5. **[Reproducibility First](../../principles/software-engineering/reproducibility.md)** - Go enables through go.mod, go.sum, reproducible builds
 
-See [Golang README](./README.md#software-engineering-principles) for detailed examples.
+See [Golang README](./README.md#purpose) for detailed examples.
 ```
 
 ## Examples

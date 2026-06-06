@@ -42,14 +42,6 @@ These principles define **WHY we value specific approaches to software developme
 
 Each principle is demonstrated across the platform's technology stack:
 
-### Java Examples
-
-- **[Java Coding Standards](../../../docs/explanation/software-engineering/programming-languages/java/coding-standards.md)** - Records (Immutability), Pattern Matching (Explicit), Try-with-resources (Automation)
-- **[Java Concurrency Standards](../../../docs/explanation/software-engineering/programming-languages/java/concurrency-standards.md)** - Immutability for thread-safety, Virtual threads
-- **[Java DDD Standards](../../../docs/explanation/software-engineering/programming-languages/java/ddd-standards.md)** - Value Objects (Immutability), Domain Services (Pure Functions)
-- **[Java Testing Standards](../../../docs/explanation/software-engineering/programming-languages/java/testing-standards.md)** - Automation, Reproducible tests
-- **[Java Build Configuration](../../../docs/explanation/software-engineering/programming-languages/java/build-configuration.md)** - Build automation, Reproducible development
-
 ### Principle-Specific Examples
 
 - **Automation Over Manual**: Java records auto-generate boilerplate, static analysis catches bugs, TestContainers automate infrastructure

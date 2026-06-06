@@ -310,6 +310,8 @@ For linking to headings within the same document:
 [Jump to Key Rules](#key-rules)
 ```
 
+**Anchor validation**: `rhino-cli docs validate-links` validates `#fragment` references. A `#fragment` with no matching heading in the target file (or in the source file for pure `#fragment` links) is reported as a `broken-anchor` finding. The validator uses the GitHub slug algorithm (lowercase, strip non-alnum except hyphen, spaces → hyphens) to resolve heading anchors.
+
 ## Image Links
 
 For embedding images:

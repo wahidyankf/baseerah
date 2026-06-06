@@ -148,10 +148,19 @@ npm run doctor -- --scope minimal # Check only core tools (git, volta, node, npm
 
 ## Markdown Quality
 
-All markdown files auto-linted and formatted:
+All markdown files auto-linted and formatted through a three-gate system:
 
 - **Prettier** (v3.6.2): Formatting (runs on pre-commit)
 - **markdownlint-cli2** (v0.20.0): Linting (runs on pre-push)
+- **validate:mermaid** (`npx nx run rhino-cli:validate:mermaid`): Mermaid diagram
+  validation — width, label length, syntax (runs at pre-commit on staged `.md` files +
+  `validate-markdown.yml` CI; does NOT run at pre-push)
+- **validate:links** (`npx nx run rhino-cli:validate:links`): Full-repo link scan
+  including `#fragment` anchor validation (runs at pre-commit + CI; does NOT run at
+  pre-push)
+- **validate:heading-hierarchy** (`npx nx run rhino-cli:validate:heading-hierarchy`):
+  Heading nesting on prose allowlist (`docs/`, `repo-governance/`, `plans/` excl.
+  `done/`, root `*.md`) (runs at pre-commit + CI; does NOT run at pre-push)
 
 **Quick Fix**: If pre-push hook blocks push due to markdown violations:
 
@@ -159,7 +168,9 @@ All markdown files auto-linted and formatted:
 npm run lint:md:fix
 ```
 
-**See**: [repo-governance/development/quality/markdown.md](./repo-governance/development/quality/markdown.md)
+**See**: [repo-governance/development/quality/markdown.md](./repo-governance/development/quality/markdown.md),
+[repo-governance/development/quality/repository-validation.md](./repo-governance/development/quality/repository-validation.md)
+(Markdown Quality Gates section)
 
 ## Monorepo Architecture
 

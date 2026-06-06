@@ -127,18 +127,21 @@ npx prettier --write [file-path]
 
 1. You run `git commit`
 2. Pre-commit hook triggers (`.husky/pre-commit` — a single `go run` line)
-3. `rhino-cli git pre-commit` orchestrates all 9 steps in order, failing fast:
+3. `rhino-cli git pre-commit` orchestrates all steps in order, failing fast:
 
-| Step | Trigger                           | Action                                                                     | On failure |
-| ---- | --------------------------------- | -------------------------------------------------------------------------- | ---------- |
-| 1    | `.claude/` or `.opencode/` staged | Validate → Sync → Validate-sync                                            | exit 1     |
-| 2    | `docker-compose.ya?ml` staged     | `docker compose -f <file> config` per file                                 | exit 1     |
-| 3    | always                            | `nx affected -t run-pre-commit --skip-nx-cache`                            | warn only  |
-| 4    | always                            | `git add apps/ayokoding-web/content/`                                      | ignored    |
-| 5    | always                            | `npx lint-staged`                                                          | exit 1     |
-| 6    | `docs/` staged                    | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/` | exit 1     |
-| 7    | always                            | Validate markdown links (staged only)                                      | exit 1     |
-| 8    | always                            | `npm run lint:md`                                                          | exit 1     |
+| Step | Trigger                                | Action                                                                     | On failure |
+| ---- | -------------------------------------- | -------------------------------------------------------------------------- | ---------- |
+| 1    | `.claude/` or `.opencode/` staged      | Validate → Sync → Validate-sync                                            | exit 1     |
+| 2    | `docker-compose.ya?ml` staged          | `docker compose -f <file> config` per file                                 | exit 1     |
+| 3    | always                                 | `nx affected -t run-pre-commit --skip-nx-cache`                            | warn only  |
+| 4    | always                                 | `git add apps/ayokoding-web/content/`                                      | ignored    |
+| 5    | always                                 | `npx lint-staged`                                                          | exit 1     |
+| 5b   | `apps/<app>/package.json` staged       | Regenerate + stage `apps/<app>/package-lock.json`                          | exit 1     |
+| 6    | `docs/` staged                         | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/` | exit 1     |
+| 6m   | staged `.md` files (skip 3 exclusions) | `validate:mermaid` — diagram width, label length, syntax (staged-only)     | exit 1     |
+| 6h   | staged `.md` in prose allowlist        | `validate:heading-hierarchy` — single H1, no skipped levels (staged-only)  | exit 1     |
+| 7    | always                                 | Validate markdown links + `#fragment` anchors (staged only)                | exit 1     |
+| 8    | always                                 | `npm run lint:md`                                                          | exit 1     |
 
 1. Commit proceeds if no errors
 
@@ -167,8 +170,10 @@ Validates primary and secondary platform binding directory consistency before co
 
 **Markdown:**
 
-- Validates markdown links in staged files only (fast, targeted)
-- Validates all markdown files meet linting standards (comprehensive)
+- Validates Mermaid diagrams in staged `.md` files (width, label length, syntax) — step 6m
+- Validates heading hierarchy in staged prose-allowlist `.md` files (single H1, no skipped levels) — step 6h
+- Validates markdown links + `#fragment` anchors in staged files only (fast, targeted) — step 7
+- Validates all markdown files meet linting standards (comprehensive) — step 8
 
 **What Happens on Failure**:
 

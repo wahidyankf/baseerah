@@ -116,7 +116,7 @@ Development practices in this directory fall into several categories:
 
 - [Code Quality Convention](./quality/code.md) - Automated code quality tools and git hooks (Prettier, Husky, lint-staged) for consistent formatting and commit validation
 - [Content Preservation Convention](./quality/content-preservation.md) - Principles and processes for preserving knowledge when condensing files and extracting duplications. Covers the MOVE NOT DELETE principle and offload decision tree
-- [Repository Validation Methodology Convention](./quality/repository-validation.md) - Standard validation methods and patterns for repository consistency checking. Covers frontmatter extraction, validation checks, and best practices
+- [Repository Validation Methodology Convention](./quality/repository-validation.md) - Standard validation methods and patterns for repository consistency checking. Covers frontmatter extraction, validation checks, best practices, and the three-gate Markdown Quality Gates system (validate:mermaid, validate:links, validate:heading-hierarchy) with their gate locations and CI workflow
 - [Criticality Levels Convention](./quality/criticality-levels.md) - Universal criticality level system for categorizing validation findings by importance and urgency (CRITICAL/HIGH/MEDIUM/LOW)
 - [Fixer Confidence Levels Convention](./quality/fixer-confidence-levels.md) - Universal confidence level system for fixer agents to assess and apply validated fixes (HIGH/MEDIUM/FALSE_POSITIVE)
 - [Markdown Quality Convention](./quality/markdown.md) - Standards for markdown linting and formatting using markdownlint-cli2 and Prettier for consistent markdown quality

@@ -341,6 +341,24 @@ This is important content.
 More content continues here...
 ```
 
+### Machine Enforcement
+
+Heading hierarchy is mechanically enforced on a **prose allowlist** of paths:
+
+- `docs/` — all documentation
+- `repo-governance/` — all governance docs
+- `plans/` (excluding `plans/done/`) — active and backlog plans
+- Root `*.md` files (no directory separator in path)
+
+**Exempt paths** (default-deny; heading validator skips these):
+
+- `.claude/**` — agent definition and skill files
+- `apps/ayokoding-web/content/` — educational content
+- `apps/ose-web/content/` — site content
+- `plans/done/` — frozen archived plans
+
+**Gate locations**: Runs at **pre-commit (staged `.md` files within the prose allowlist)** and in the `validate-markdown.yml` CI workflow via `npx nx run rhino-cli:validate:heading-hierarchy`. Does NOT run at pre-push.
+
 ## Accessibility Standards
 
 ### Alt Text for Images

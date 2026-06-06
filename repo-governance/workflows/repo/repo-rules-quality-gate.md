@@ -119,7 +119,7 @@ mkdir -p generated-reports
 
 The binary must be built first via `nx build rhino-cli`; the prebuilt path is `apps/rhino-cli/dist/rhino-cli`.
 
-> **Recommendation**: Pin `RHINO_AUDIT_NOW=<RFC3339>` per workflow run to enable the SHA-256 hash-reuse optimization (the `ran_at` field is derived from this env var; without it the timestamp defaults to `time.Now()` and the hash always changes). See [`apps/rhino-cli/README.md`](../../../apps/rhino-cli/README.md#environment-variables) for details.
+> **Recommendation**: Pin `RHINO_AUDIT_NOW=<RFC3339>` per workflow run to enable the SHA-256 hash-reuse optimization (the `ran_at` field is derived from this env var; without it the timestamp defaults to `time.Now()` and the hash always changes). See [`apps/rhino-cli/README.md`](../../../apps/rhino-cli/README.md#global-flags) for details.
 
 - **Output**: `{preflight-report}` — JSON envelope at the captured path; schema `rhino-cli/repo-governance-audit/v1`
 - **Exit handling**:
