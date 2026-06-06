@@ -12,8 +12,10 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8202/api/v1/health"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 120s
+      retries: 5
+      # The dev container compiles the backend on boot (cargo run over a bind
+      # mount); a cold CI build has no cargo cache, so allow a long warm-up.
+      start_period: 600s
 
   organiclever-web:
     build:

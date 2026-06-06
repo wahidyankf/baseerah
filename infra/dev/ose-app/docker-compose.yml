@@ -25,7 +25,7 @@ services:
       OPENROUTER_API_KEY: "${OPENROUTER_API_KEY:-}"
       OPENROUTER_MODEL: "${OPENROUTER_MODEL:-openrouter/auto}"
       OPENROUTER_BASE_URL: "${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}"
-      ASPNETCORE_URLS: "http://+:8302"
+      PORT: "8302"
     volumes:
       - ../../../apps/ose-app-be:/workspace:rw
       - ../../../specs/apps/ose-app/behavior/be/gherkin:/specs/apps/ose-app/behavior/be/gherkin:ro
@@ -37,7 +37,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 120s
+      # The dev container compiles the backend on boot (cargo run over a bind
+      # mount); a cold CI build has no cargo cache, so allow a long warm-up.
+      start_period: 600s
 
   ose-app-web:
     build:
