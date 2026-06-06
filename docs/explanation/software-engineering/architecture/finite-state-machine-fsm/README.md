@@ -263,7 +263,7 @@ public sealed class PurchaseOrderStateMachineConfig
 }
 ```
 
-**See**: [Framework Standards](./framework-standards.md#spring-state-machine)
+**See**: [Framework Standards](./framework-standards.md#spring-state-machine-java)
 
 ### XState (TypeScript/JavaScript)
 
@@ -302,7 +302,7 @@ const purchaseOrderMachine = createMachine({
 });
 ```
 
-**See**: [Framework Standards](./framework-standards.md#xstate)
+**See**: [Framework Standards](./framework-standards.md#xstate-typescript)
 
 ## Integration with DDD Aggregates
 

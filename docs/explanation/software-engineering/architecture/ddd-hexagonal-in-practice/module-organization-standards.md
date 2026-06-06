@@ -89,7 +89,7 @@ com.organicleverbe.purchasing.PurchaseOrderRepo      // is this a port or an ada
 
 **REQUIRED**: The `domain` package MUST be subdivided by DDD tactical pattern, not by aggregate name.
 
-#### `Java`
+### `Java`
 
 ```
 com.organicleverbe.purchasing.domain.
@@ -111,7 +111,7 @@ com.organicleverbe.purchasing.domain.
 
 **PROHIBITED**: Naming the aggregate package after the aggregate root when multiple aggregates share the context (`model/` is preferred over `purchaseorder/` + `purchaserequisition/` sibling packages at the same level as `domain`).
 
-#### `F#`
+### `F#`
 
 In F#, domain types are defined in a single `Domain.fs` file per context, ordered so that types are declared before their dependents (F# requires top-to-bottom declaration order):
 
@@ -138,7 +138,7 @@ let approve (approver: ApproverId) (order: PurchaseOrder) : Result<PurchaseOrder
 
 **REQUIRED**: The `application` package MUST separate ports from use case implementations.
 
-#### `Java`
+### `Java`
 
 ```
 com.organicleverbe.purchasing.application.
@@ -174,7 +174,7 @@ OrganicLeverBe/Purchasing/Application/
 
 **REQUIRED**: The `adapter` package MUST split into `in/` (driving adapters) and `out/` (driven adapters), with technology sub-packages under `out/`.
 
-#### `Java`
+### `Java`
 
 ```
 com.organicleverbe.purchasing.adapter.

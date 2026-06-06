@@ -52,7 +52,7 @@ com.organicleverbe.
           KafkaSupplierNotifierAdapter.java
 ```
 
-#### `Java`
+### `Java`
 
 ```java
 // Output adapter — persistence
@@ -98,7 +98,7 @@ OrganicLeverBe/
       InMemoryPurchaseOrderRepository.fs   ← Test adapter
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 // Output adapter — PostgreSQL
@@ -151,7 +151,7 @@ let makePort (connectionString: string) : PurchaseOrderRepositoryPort = {
 - Direct calls to output ports (bypassing the application layer)
 - Domain object construction beyond mapping
 
-#### `Java`
+### `Java`
 
 ```java
 // Input adapter — Spring MVC controller
@@ -222,7 +222,7 @@ In-memory adapters MUST implement the full port contract and be the only persist
 
 **REQUIRED**: Mapping logic between domain objects and infrastructure representations MUST live in the adapter package — never in the domain or application layer.
 
-#### `Java`
+### `Java`
 
 ```java
 // Mapper lives alongside the adapter, not in domain/application

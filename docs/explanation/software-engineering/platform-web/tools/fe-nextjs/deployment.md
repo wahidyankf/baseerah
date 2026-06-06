@@ -892,7 +892,7 @@ docker-compose up -d
 **Performance**:
 
 - [Performance](performance.md) - Optimization strategies
-- [Caching](rendering.md#caching) - Cache configuration
+- [Caching](rendering.md#incremental-static-regeneration-isr) - Cache configuration
 
 **Security**:
 

@@ -64,7 +64,7 @@ This document defines **authoritative design pattern standards** for Go developm
 
 ---
 
-## Overview
+## Part 1: Functional Programming Patterns
 
 Functional Programming (FP) is a programming paradigm that treats computation as the evaluation of mathematical functions and avoids changing state and mutable data. While Go is primarily an imperative language with object-oriented features, it supports several functional programming concepts through first-class functions, closures, and higher-order functions.
 
@@ -1469,7 +1469,7 @@ func SumIterative(nums []int) int {
 
 ---
 
-## Overview
+## Part 2: Finite State Machine Patterns
 
 Finite State Machines (FSMs) are fundamental design patterns for managing complex state transitions in enterprise software. In Go, FSMs leverage the language's unique strengths - type safety through interfaces, explicit error handling, and goroutine-safe concurrency - to build robust, maintainable state management systems for financial and business-critical applications.
 
@@ -2916,7 +2916,7 @@ func TestSafePayment_ConcurrentTransitions(t *testing.T) {
 
 ---
 
-## Overview
+## Part 3: Interfaces and Composition Patterns
 
 Go uses interfaces and composition instead of class-based inheritance. This section covers interface design, struct embedding, and composition patterns that enable polymorphism without traditional OOP inheritance.
 

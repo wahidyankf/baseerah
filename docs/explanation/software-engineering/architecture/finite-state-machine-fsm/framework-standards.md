@@ -30,7 +30,7 @@ created: 2026-02-09
 
 **Example**:
 
-#### `Java`
+### `Java`
 
 ```java
 @Configuration
@@ -41,7 +41,7 @@ public class PurchaseOrderStateMachineConfig extends StateMachineConfigurerAdapt
 }
 ```
 
-#### `Kotlin`
+### `Kotlin`
 
 ```kotlin
 @Configuration
@@ -51,7 +51,7 @@ class PurchaseOrderStateMachineConfig : StateMachineConfigurerAdapter<PurchaseOr
 }
 ```
 
-#### `C#`
+### `C#`
 
 ```csharp
 // C# uses Stateless or custom FSM — no direct Spring State Machine equivalent.

@@ -42,6 +42,8 @@ Go is a statically typed language with a strong emphasis on type safety. The typ
 - [Error Handling](./error-handling-standards.md)
 - [Best Practices](./coding-standards.md#part-2-naming--organization-best-practices)
 
+## Type System Fundamentals
+
 ### Type Hierarchy in Go
 
 ```mermaid
@@ -135,6 +137,8 @@ func CalculateTotal(items []Item) float64 {
     return total
 }
 ```
+
+## Basic Types
 
 ### Numeric Types
 
@@ -277,6 +281,8 @@ func main() {
     fmt.Printf("Bytes: %d, Runes: %d\n", len(bytes), len(runes))
 }
 ```
+
+## Composite Types
 
 ### Array Types
 
@@ -499,6 +505,8 @@ func main() {
 }
 ```
 
+## Type Declarations
+
 ### Named Types
 
 Create new types with specific names:
@@ -596,6 +604,8 @@ func main() {
     // raw.ToFahrenheit()  // raw.ToFahrenheit undefined
 }
 ```
+
+## Interface Types
 
 ### Interface Basics
 
@@ -794,6 +804,8 @@ func main() {
 }
 ```
 
+## Type Assertions
+
 ### Type Assertion Flow
 
 ```mermaid
@@ -941,6 +953,8 @@ func main() {
     s = i.(string)  // Now safe if i != nil
 }
 ```
+
+## Type Switches
 
 ### Type Switch Pattern Matching
 
@@ -1092,6 +1106,8 @@ func main() {
 }
 ```
 
+## Type Conversions
+
 ### Explicit Conversions
 
 Convert between compatible types:
@@ -1218,6 +1234,8 @@ func main() {
     fmt.Println("Formatted:", s)
 }
 ```
+
+## Generics (Go 1.18+)
 
 ### Generic Functions
 
@@ -1383,6 +1401,8 @@ func main() {
     fmt.Println(p2)  // (30, age)
 }
 ```
+
+## Type Constraints
 
 ### Built-in Constraints
 
@@ -1609,6 +1629,8 @@ func main() {
 }
 ```
 
+## Type Parameters
+
 ### Type Parameter Lists
 
 Syntax for declaring type parameters:
@@ -1696,6 +1718,8 @@ func main() {
     fmt.Println(strBox.Get())  // "num100"
 }
 ```
+
+## Type Inference
 
 ### Type Parameter Inference
 
@@ -1828,6 +1852,8 @@ func main() {
     fmt.Println(ids)
 }
 ```
+
+## Zero Values
 
 ### Zero Value Behavior
 
@@ -1963,6 +1989,8 @@ func main() {
     fmt.Println(*p)                 // 0
 }
 ```
+
+## Type Safety Patterns
 
 ### Option Type Pattern
 
@@ -2291,6 +2319,8 @@ func main() {
 }
 ```
 
+## Type Safety Best Practices
+
 ### Use Named Types for Domain Concepts
 
 Create distinct types for domain concepts:
@@ -2562,6 +2592,8 @@ func main() {
     fmt.Println(err)  // email must contain @
 }
 ```
+
+## Common Type Safety Pitfalls
 
 ### Pitfall: Nil Interface Values
 

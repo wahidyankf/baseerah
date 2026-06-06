@@ -149,7 +149,7 @@ See DDD and C4 Integration for comprehensive examples and guidance.
 
 ### For Developers
 
-1. **Quick visualization start** - Follow [C4 5-Minute Quick Start](./c4-architecture-model/README.md#-5-minute-quick-start-why-c4-matters)
+1. **Quick visualization start** - Follow [C4 5-Minute Quick Start](./c4-architecture-model/README.md#ose-platform-c4-standards-authoritative)
 
 ## Related Documentation
 

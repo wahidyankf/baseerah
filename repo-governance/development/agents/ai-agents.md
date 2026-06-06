@@ -1251,7 +1251,7 @@ Task(Explore, "find authentication code")
 
 ### Required Section: Reference Documentation
 
-**Every agent MUST include a "Reference Documentation" section** at the end. See the [Agent Creation Template](#agent-creation-template) below for the complete format.
+**Every agent MUST include a "Reference Documentation" section** at the end. See the [Document Structure](#document-structure) section below for the complete format.
 
 ### Reference Categories
 

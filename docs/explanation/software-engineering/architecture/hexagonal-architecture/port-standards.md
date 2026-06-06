@@ -64,7 +64,7 @@ com.organicleverbe.
 - `PurchaseOrderRepository` without `Port` suffix (ambiguous — could be an adapter)
 - `PurchaseOrderService` as a port name (use `UseCase` suffix for input ports)
 
-#### `Java`
+### `Java`
 
 ```java
 // Input port — defined in application layer
@@ -101,7 +101,7 @@ OrganicLeverBe/
       Ports.fs          ← All input and output ports for the context
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 // Ports.fs — application layer owns all port type aliases
@@ -152,7 +152,7 @@ ApprovalEmailPort             // email notification only
 
 Query-only contexts declare only query methods. Write-only contexts declare only write methods. This is the Interface Segregation Principle enforced at the port boundary.
 
-#### `Java`
+### `Java`
 
 ```java
 // Approved: narrow port for read-model query

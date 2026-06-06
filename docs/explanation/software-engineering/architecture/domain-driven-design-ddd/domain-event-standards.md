@@ -45,7 +45,7 @@ OSE Platform domain event standards for event-driven architecture.
 
 **REQUIRED**: All events MUST be immutable.
 
-#### `Rust`
+### `Rust`
 
 ```rust
 use chrono::{DateTime, Utc};
@@ -67,7 +67,7 @@ pub enum ZakatDomainEvent {
 // No setters — enum variants and struct fields are immutable by default
 ```
 
-#### `C#`
+### `C#`
 
 ```csharp
 namespace Ose.Zakat.Domain.Events;

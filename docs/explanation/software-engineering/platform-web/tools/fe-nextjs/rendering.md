@@ -870,7 +870,7 @@ export async function GET(request: Request) {
 - [Server Components](server-components.md) - Component rendering
 - [Data Fetching](data-fetching.md) - Data strategies
 - [Performance](performance.md) - Optimization
-- [Caching](performance.md#caching) - Cache strategies
+- [Caching](performance.md#caching-strategies) - Cache strategies
 
 **Configuration**:
 

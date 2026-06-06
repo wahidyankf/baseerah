@@ -71,12 +71,12 @@ The trigger is distinct from the root cause: an `Edit` call running Prettier is 
 %% Color palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Brown #CA9161, Gray #808080
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 graph TD
-    Edit["Agent issues Edit or Write call"]:::blue
-    Hook["PostToolUse hook fires<br/>runs Prettier over staged files"]:::blue
-    Rewrite["Prettier reformats .amazonq/ artifacts<br/>#40;trailing newlines, line-length#41;"]:::orange
+    Edit["Agent issues Edit/Write call"]:::blue
+    Hook["PostToolUse hook fires<br/>runs Prettier on staged files"]:::blue
+    Rewrite["Prettier reformats<br/>.amazonq/ artifacts"]:::orange
     Bytes["Bytes on disk diverge from<br/>rhino-cli emitter output"]:::orange
     Guard["validate:cross-vendor-parity<br/>byte-compare runs"]:::gray
-    Fail["Guard fails — bytes do not match<br/>CI / pre-commit red"]:::brown
+    Fail["Guard fails: bytes mismatch<br/>CI / pre-commit red"]:::brown
 
     Edit --> Hook
     Hook --> Rewrite

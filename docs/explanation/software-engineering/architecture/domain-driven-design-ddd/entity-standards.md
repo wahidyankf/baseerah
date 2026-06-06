@@ -26,7 +26,7 @@ OSE Platform entity standards for identity and lifecycle management.
 
 **REQUIRED**: Entities MUST be compared by identity, not by attributes.
 
-#### `Java`
+### `Java`
 
 ```java
 public class ZakatAssessment {
@@ -46,7 +46,7 @@ public class ZakatAssessment {
 }
 ```
 
-#### `Kotlin`
+### `Kotlin`
 
 ```kotlin
 class ZakatAssessment(
@@ -60,7 +60,7 @@ class ZakatAssessment(
 }
 ```
 
-#### `C#`
+### `C#`
 
 ```csharp
 namespace Ose.Zakat.Domain;
@@ -90,21 +90,21 @@ public class ZakatAssessment : IEquatable<ZakatAssessment>
 
 **Good**:
 
-#### `Java`
+### `Java`
 
 ```java
 public record AssessmentId(UUID value) {}
 public record DonationId(UUID value) {}
 ```
 
-#### `Kotlin`
+### `Kotlin`
 
 ```kotlin
 @JvmInline value class AssessmentId(val value: UUID)
 @JvmInline value class DonationId(val value: UUID)
 ```
 
-#### `C#`
+### `C#`
 
 ```csharp
 namespace Ose.Zakat.Domain;
@@ -115,21 +115,21 @@ public readonly record struct DonationId(Guid Value);
 
 **Bad** (primitive obsession):
 
-#### `Java`
+### `Java`
 
 ```java
 UUID assessmentId;  // Not type-safe
 String donationId;  // Can be confused with other strings
 ```
 
-#### `Kotlin`
+### `Kotlin`
 
 ```kotlin
 val assessmentId: UUID  // Not type-safe
 val donationId: String  // Can be confused with other strings
 ```
 
-#### `C#`
+### `C#`
 
 ```csharp
 Guid assessmentId;    // Not type-safe

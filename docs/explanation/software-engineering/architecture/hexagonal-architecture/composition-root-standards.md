@@ -52,7 +52,7 @@ com.organicleverbe.
 
 **PROHIBITED**: Scattering `@Bean` declarations across `@Service` classes or `@RestController` classes. All adapter wiring belongs in the `@Configuration` class.
 
-#### `Java`
+### `Java`
 
 ```java
 package com.organicleverbe.purchasing.configuration;
@@ -106,7 +106,7 @@ OrganicLeverBe/
   CompositionRoot.fs        ← Assembles context roots into the full application
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 module OrganicLeverBe.CompositionRoot

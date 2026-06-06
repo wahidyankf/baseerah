@@ -25,9 +25,9 @@ Migrating Next.js applications requires careful planning whether upgrading versi
 
 - [Pages Router to App Router](#-pages-router-to-app-router) - Complete migration guide
 - [Next.js 13 to 14](#-nextjs-13-to-14) - Version upgrade guide
-- [Next.js 16 to 15](#-nextjs-14-to-15) - Latest version migration
+- [Next.js 14 to 15](#-nextjs-14-to-15) - Latest version migration
 - [React 18 to 19](#-react-18-to-19) - React version upgrade
-- [Breaking Changes](#-breaking-changes) - Version-specific breaking changes
+- [Common Issues](#-common-issues) - Version-specific breaking changes
 - [Codemods](#-codemods) - Automated migration tools
 - [Migration Strategies](#-migration-strategies) - Incremental vs full migration
 - [Testing Migration](#-testing-migration) - Validation strategies
@@ -519,7 +519,7 @@ export async function calculateZakat(formData: FormData) {
 }
 ```
 
-## ⬆️ Next.js 16 to 15
+## ⬆️ Next.js 14 to 15
 
 Next.js 15 brings React 19 support and enhanced stability.
 

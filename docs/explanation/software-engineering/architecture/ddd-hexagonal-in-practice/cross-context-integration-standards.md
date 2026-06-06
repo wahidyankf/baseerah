@@ -67,7 +67,7 @@ public class ApprovePurchaseOrderService implements ApprovePurchaseOrderUseCase 
 
 **REQUIRED**: Application service calls an event publisher output port:
 
-#### `Java`
+### `Java`
 
 ```java
 // CORRECT — output port abstracts the broker
@@ -85,7 +85,7 @@ public class ApprovePurchaseOrderService implements ApprovePurchaseOrderUseCase 
 }
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 // CORRECT — output port abstracts the broker
@@ -129,7 +129,7 @@ public record GoodsReceiptNote(
 
 **REQUIRED**: The ACL adapter translates before the domain sees the data:
 
-#### `Java`
+### `Java`
 
 ```java
 // ACL adapter in Receiving context — translates Purchasing model to Receiving model

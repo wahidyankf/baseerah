@@ -42,7 +42,7 @@ OSE Platform standards for testing hexagonal architecture implementations. The h
 
 Domain tests prove that business invariants hold regardless of infrastructure. They run without Spring context, without Docker, and without any port implementation.
 
-#### `Java`
+### `Java`
 
 ```java
 // Domain unit test — no Spring context, no adapters
@@ -63,7 +63,7 @@ class PurchaseOrderTest {
 }
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 // Domain unit test — pure function, no adapters
@@ -173,7 +173,7 @@ let ``Postgres satisfies repository port contract`` () =
 
 **PROHIBITED**: Application layer unit tests that start a Spring context (`@SpringBootTest`). Use `@ExtendWith(MockitoExtension.class)` or plain constructor injection with in-memory adapters.
 
-#### `Java`
+### `Java`
 
 ```java
 // Application unit test — in-memory adapters, no Spring context

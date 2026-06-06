@@ -517,7 +517,7 @@ describe("DonationService Integration", () => {
 For Next.js API routes or Express handlers, test them with the real handler code but mock
 all outbound HTTP using MSW. Never call a real external service.
 
-````typescript
+```typescript
 import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
 
@@ -558,7 +558,8 @@ describe("Donation API route", () => {
 
     expect(response.status).toBe(400);
   });
-})
+});
+```
 
 ## Property-Based Testing
 
@@ -624,7 +625,7 @@ describe("Money properties", () => {
     );
   });
 });
-````
+```
 
 ## Mocking Strategies
 

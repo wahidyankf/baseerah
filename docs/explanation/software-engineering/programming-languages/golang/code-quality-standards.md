@@ -1264,6 +1264,16 @@ func (StatusOK) Code() string { return "ok" }
 - Interface marker methods (`isScope() {}`)
 - `String()` — recognized as `fmt.Stringer` implementation; doc optional
 
+## Required Linters
+
+- **errcheck**: All errors must be checked
+- **govet**: All suspicious constructs fixed
+- **staticcheck**: All issues resolved
+- **errorlint**: Use `errors.Is`/`errors.As`; `%w` for wrapping in `fmt.Errorf`
+- **gochecksumtype**: Exhaustive type switches on sealed interfaces
+- **godot**: All doc comments on declarations must end with a period
+- **revive**: All exported identifiers must have doc comments
+
 ## Disabled Linters
 
 - **exhaustivestruct**: Too strict for DTO/config structs
@@ -1274,8 +1284,6 @@ func (StatusOK) Code() string { return "ok" }
 - Test files: Disable complexity checks
 - Generated code: Disable all linters
 
-````
-
 ## Common Issues and Fixes
 
 ### Unchecked Errors
@@ -1284,7 +1292,7 @@ func (StatusOK) Code() string { return "ok" }
 
 ```go
 file, _ := os.Open("file.txt") // errcheck: error return value not checked
-````
+```
 
 **Fix**:
 

@@ -48,7 +48,7 @@ OSE Platform standards for aligning DDD aggregates with hexagonal port/adapter b
 
 **PROHIBITED**: A repository port declaring methods not called by any application service. Unused port methods indicate the port is sized by data model (CRUD) rather than by use-case need (Interface Segregation Principle).
 
-#### `Java`
+### `Java`
 
 ```java
 // CORRECT — narrow port scoped to actual use-case needs
@@ -67,7 +67,7 @@ public interface PurchaseOrderRepositoryPort {
 }
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 // CORRECT — narrow port scoped to actual use-case needs
@@ -102,7 +102,7 @@ public class JpaPurchaseOrderRepositoryAdapter implements PurchaseOrderRepositor
 
 **REQUIRED**: The invariant belongs in the aggregate:
 
-#### `Java`
+### `Java`
 
 ```java
 // CORRECT — invariant in aggregate root
@@ -116,7 +116,7 @@ public PurchaseOrder approve(ApproverId approver) {
 }
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 // CORRECT — invariant in domain function
@@ -142,7 +142,7 @@ Read models bypass the aggregate entirely. They fetch projection data directly f
 
 **PROHIBITED**: Loading a full aggregate just to display a list summary. Aggregate loading triggers invariant enforcement and consistency checks — unnecessary overhead for read-only projections.
 
-#### `Java`
+### `Java`
 
 ```java
 // Query port — no aggregate, projection only
@@ -152,7 +152,7 @@ public interface PurchaseOrderSummaryQueryPort {
 }
 ```
 
-#### `F#`
+### `F#`
 
 ```fsharp
 type PurchaseOrderSummaryQueryPort = {

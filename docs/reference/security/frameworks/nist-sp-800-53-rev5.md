@@ -1071,7 +1071,7 @@ potential loss or reduction of auditing capability.
 Related Controls: AU-2, AU-5, AU-6, AU-7, AU-9, AU-11, AU-12, AU-14, SI-4.
 Control Enhancements:
 
-##### (1) AUDIT STORAGE CAPACITY | TRANSFER TO ALTERNATE STORAGE
+#### (1) AUDIT STORAGE CAPACITY | TRANSFER TO ALTERNATE STORAGE
 
 Organization-defined Parameter
 Off-load audit records [Assignment: organization-defined frequency] onto a different

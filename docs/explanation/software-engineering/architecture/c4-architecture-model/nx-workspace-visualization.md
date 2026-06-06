@@ -50,8 +50,8 @@ apps/
 
 ```mermaid
 graph TD
-    OseWeb["OSE Platform Web<br/>[Container: Next.js 16 (App Router)]<br/>Landing page"]:::blue
-    AyoWeb["AyoKoding Web<br/>[Container: Next.js 16 (App Router, TypeScript, tRPC)]<br/>Educational content"]:::blue
+    OseWeb["OSE Platform Web<br/>[Next.js 16 App Router]<br/>Landing page"]:::blue
+    AyoWeb["AyoKoding Web<br/>[Next.js 16, tRPC]<br/>Educational content"]:::blue
     AyoCLI["AyoKoding CLI<br/>[Container: Go]<br/>Content link validation"]:::blue
     RhinoCLI["Rhino CLI<br/>[Container: Rust]<br/>Repository management"]:::blue
 
@@ -109,8 +109,8 @@ If `ayokoding-cli` has an Nx dependency on `ayokoding-web` (builds it), show thi
 
 ```mermaid
 graph LR
-    OseWeb["OSE Platform Web<br/>[Container: Next.js 16 (App Router)]<br/>Landing page"]:::blue
-    AyoWeb["AyoKoding Web<br/>[Container: Next.js 16 (App Router, TypeScript, tRPC)]<br/>Educational content"]:::blue
+    OseWeb["OSE Platform Web<br/>[Next.js 16 App Router]<br/>Landing page"]:::blue
+    AyoWeb["AyoKoding Web<br/>[Next.js 16, tRPC]<br/>Educational content"]:::blue
     AyoCLI["AyoKoding CLI<br/>[Container: Go]<br/>Content link validation"]:::blue
     RhinoCLI["Rhino CLI<br/>[Container: Rust]<br/>Repository management"]:::blue
     Vercel["Vercel<br/>[Platform]<br/>Next.js hosting"]:::teal

@@ -53,7 +53,7 @@ This document defines **authoritative testing standards** for Go development in 
 
 **Quick Reference**: [Part 1: TDD Standards](#part-1-test-driven-development-tdd-standards) | [Part 2: BDD Standards](#part-2-behaviour-driven-development-bdd-standards) | [Alignment with Principles](#alignment-with-software-engineering-principles)
 
-## ⚙️ Alignment with Software Engineering Principles
+## Alignment with Software Engineering Principles
 
 These testing standards directly support OSE Platform's [Software Engineering Principles](../../../../../repo-governance/principles/README.md):
 

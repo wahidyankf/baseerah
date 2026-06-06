@@ -28,7 +28,7 @@ TypeScript/JavaScript uses a single-threaded event loop with asynchronous operat
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
-graph LR
+graph TD
     Start["Start"]:::blue
     Timers["Timers<br/>#40;setTimeout/setInterval#41;"]:::orange
     Poll["Poll<br/>#40;I/O events#41;"]:::teal

@@ -22,7 +22,7 @@ created: 2026-02-09
 
 **REQUIRED**: FSM state MUST be part of aggregate root.
 
-#### `Java`
+### `Java`
 
 ```java
 public class PurchaseOrder {
@@ -39,7 +39,7 @@ public class PurchaseOrder {
 }
 ```
 
-#### `Kotlin`
+### `Kotlin`
 
 ```kotlin
 class PurchaseOrder(
@@ -60,7 +60,7 @@ class PurchaseOrder(
 }
 ```
 
-#### `C#`
+### `C#`
 
 ```csharp
 namespace Purchasing.Domain.Aggregates;

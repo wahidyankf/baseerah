@@ -209,7 +209,7 @@ The open-sharia-enterprise project applies both C4 and DDD principles:
 
 ### For Developers
 
-1. **Quick visualization start** - Follow [C4 5-Minute Quick Start](./architecture/c4-architecture-model/README.md#-5-minute-quick-start-why-c4-matters)
+1. **Quick visualization start** - Follow [C4 5-Minute Quick Start](./architecture/c4-architecture-model/README.md#ose-platform-c4-standards-authoritative)
 2. **Understand tactical patterns** - Read [DDD Aggregates](./architecture/domain-driven-design-ddd/aggregate-standards.md) and [Value Objects](./architecture/domain-driven-design-ddd/value-object-standards.md)
 3. **Functional programming focus** - Read [DDD and Functional Programming](./architecture/domain-driven-design-ddd/README.md)
 4. **Decision frameworks** - Use [DDD Decision Trees](./architecture/domain-driven-design-ddd/README.md)
