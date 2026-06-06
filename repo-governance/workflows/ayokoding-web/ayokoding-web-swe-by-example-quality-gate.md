@@ -275,13 +275,20 @@ graph TD
     D -->|HIGH confidence only| E[Run Fixer with HIGH only]
     D -->|HIGH + MEDIUM| F[Run Fixer with both]
 
-    C --> G[Major rework needed]
+    style A fill:#DE8F05,color:#fff
+    style B fill:#029E73,color:#fff
+    style C fill:#CA9161,color:#fff
+```
+
+When the status is FAILING, the return-to-maker rework path is:
+
+```mermaid
+graph TD
+    C[Return to Maker] --> G[Major rework needed]
     G --> H[Add missing coverage areas]
     G --> I[Restructure examples]
     G --> J[Rewrite annotations]
 
-    style A fill:#DE8F05,color:#fff
-    style B fill:#029E73,color:#fff
     style C fill:#CA9161,color:#fff
 ```
 

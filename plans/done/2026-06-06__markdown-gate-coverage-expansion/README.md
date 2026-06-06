@@ -1,7 +1,23 @@
 # Markdown Gate Coverage Expansion
 
 > **Plan type**: Multi-file (five canonical documents). This README is the navigation hub.
-> **Status**: In progress (authoring complete; execution pending — do NOT execute from this doc).
+> **Status**: Done (executed 2026-06-06; see Post-Completion Amendment below).
+>
+> **Post-Completion Amendment (2026-06-06, cross-repo alignment)**: After this plan
+> completed, a three-repo alignment pass (ose-public / ose-infra / ose-primer) amended the
+> implementation by direct change in this repo: (1) `github_slug` now KEEPS underscores
+> per the verified `github-slugger` v2 reference (the algorithm shipped by this plan
+> stripped them — wrong vs GitHub); (2) `docs validate-mermaid` gained the repeatable
+> `--exclude` flag this plan's execution logged as a wart, its default scan went
+> repo-wide minus the standardized noise-skip set, and the `validate:mermaid` Nx target
+> now runs repo-wide with `--max-depth=4` + the three named exclusions; (3) the mermaid
+> flowchart parser now handles pipe-labeled edges (`A -->|x| B`) and ranks cyclic
+> diagrams via back-edge removal; (4) the heading-hierarchy prose allowlist expanded to
+> add `specs/`, `apps/*/README.md`, `libs/*/README.md`, `apps/*/docs/**`, and
+> `libs/*/docs/**`; (5) the links/mermaid walkers share a standardized cross-repo
+> noise-skip set (added `worktrees`, `.terraform`, `generated-contracts`, `.nx`). The
+> sibling repos adopt the same end state via their own in-progress
+> `markdown-gate-coverage-expansion` plans.
 
 ## Context
 

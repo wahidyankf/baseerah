@@ -353,19 +353,25 @@ More content continues here...
 
 ### Machine Enforcement
 
-Heading hierarchy is mechanically enforced on a **prose allowlist** of paths:
+Heading hierarchy is mechanically enforced on a **prose allowlist** (default-deny) of paths:
 
 - `docs/` — all documentation
 - `repo-governance/` — all governance docs
 - `plans/` (excluding `plans/done/`) — active and backlog plans
+- `specs/` — specification files
 - Root `*.md` files (no directory separator in path)
+- `apps/*/README.md` — per-app README files
+- `libs/*/README.md` — per-lib README files
+- `apps/*/docs/**` — per-app docs directories
+- `libs/*/docs/**` — per-lib docs directories
 
-**Exempt paths** (default-deny; heading validator skips these):
+**Exempt paths** (skipped by the heading validator):
 
 - `.claude/**` — agent definition and skill files
 - `apps/ayokoding-web/content/` — educational content
 - `apps/ose-web/content/` — site content
 - `plans/done/` — frozen archived plans
+- All other paths not in the allowlist above
 
 **Gate locations**: Runs at **pre-commit (staged `.md` files within the prose allowlist)** and in the `validate-markdown.yml` CI workflow via `npx nx run rhino-cli:validate:heading-hierarchy`. Does NOT run at pre-push.
 

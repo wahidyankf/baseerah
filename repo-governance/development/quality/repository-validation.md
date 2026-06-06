@@ -491,7 +491,7 @@ Three automated markdown validators run on every commit and in CI via the `valid
 
 **Command**: `npx nx run rhino-cli:validate:mermaid`
 
-Validates all Mermaid diagrams in `docs/`, `repo-governance/`, and platform binding directories (`.claude/`, `.opencode/`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax.
+Repo-wide scan: the Nx target runs `docs validate-mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content` (plus the standardized noise-skip set: `node_modules`, `dist`, `target`, `.next`, `coverage`, `generated-reports`, `local-temp`, `archived`, `apps-labs`, `worktrees`, `.terraform`, `generated-contracts`, `.nx`, `.git`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax. The `--exclude` flag is repeatable; pass additional prefixes to suppress noise in project-specific runs.
 
 **Gate locations**: Pre-commit (staged `.md` files only) + `validate-markdown.yml` CI. Not at pre-push.
 
@@ -499,7 +499,7 @@ Validates all Mermaid diagrams in `docs/`, `repo-governance/`, and platform bind
 
 **Command**: `npx nx run rhino-cli:validate:links`
 
-Full-repo link scan. Validates all relative `[text](path.md)` links resolve to existing files. Also validates `#fragment` anchor references using the GitHub slug algorithm — a fragment with no matching heading emits a `broken-anchor` finding. Excludes: `plans/done/`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`.
+Full-repo link scan (same standardized noise-skip set as validate:mermaid). Validates all relative `[text](path.md)` links resolve to existing files. Also validates `#fragment` anchor references using the GitHub slug algorithm — underscores and Unicode letters/digits are kept, spaces map to hyphens, duplicates receive `-1`, `-2`, … suffixes (verified against the `github-slugger` v2 reference implementation). A fragment with no matching heading emits a `broken-anchor` finding.
 
 **Gate locations**: Pre-commit (staged `.md` files only, link step) + `validate-markdown.yml` CI. Not at pre-push.
 
@@ -507,7 +507,7 @@ Full-repo link scan. Validates all relative `[text](path.md)` links resolve to e
 
 **Command**: `npx nx run rhino-cli:validate:heading-hierarchy`
 
-Validates heading nesting on a prose allowlist: `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), root `*.md`. Skips `.claude/**`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`.
+Validates heading nesting on a prose allowlist (default-deny): `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), `specs/`, root `*.md`, `apps/*/README.md`, `libs/*/README.md`, `apps/*/docs/**`, `libs/*/docs/**`. All other paths (including `.claude/**`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`, `plans/done/`) are skipped.
 
 **Gate locations**: Pre-commit (staged `.md` files within the prose allowlist) + `validate-markdown.yml` CI. Not at pre-push.
 
