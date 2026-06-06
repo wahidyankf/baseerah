@@ -1465,7 +1465,7 @@ flowchart TD
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0173B2','primaryTextColor':'#000','primaryBorderColor':'#0173B2','lineColor':'#DE8F05','secondaryColor':'#029E73','tertiaryColor':'#CC78BC','fontSize':'16px'}}}%%
-flowchart LR
+flowchart TD
     F[Unit Tests] --> G[Integration Tests]
     G --> H{All Pass?}
     H -->|Yes| I[Build]

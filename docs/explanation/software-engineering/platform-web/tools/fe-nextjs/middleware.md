@@ -83,7 +83,7 @@ export const config = {
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     A["Client Request"]:::blue
     B["Middleware<br/>#40;Edge Runtime#41;"]:::orange
     C{"Decision"}:::orange

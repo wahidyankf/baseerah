@@ -1588,7 +1588,7 @@ flowchart LR
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0173B2','primaryTextColor':'#000','primaryBorderColor':'#0173B2','lineColor':'#DE8F05','secondaryColor':'#029E73','tertiaryColor':'#CC78BC','fontSize':'16px'}}}%%
-flowchart LR
+flowchart TD
     A[.ts Files] --> B[TypeScript Compiler<br/>tsc]
     B --> C[Type Checking]
     C --> D{Types Valid?}

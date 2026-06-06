@@ -53,14 +53,6 @@ graph TD
         SEARCH["Search Index<br/>──────────────────<br/>FlexSearch<br/><br/>In-memory index<br/>Per-locale<br/>Title + body"]:::search
     end
 
-    subgraph CICD["CI Pipelines"]
-        MAIN_CI["Main CI<br/>──────────────────<br/>typecheck, lint, test:quick<br/>On push to main"]:::ci
-
-        BE_E2E["BE E2E CI<br/>──────────────────<br/>Playwright<br/>tRPC API tests<br/>Scheduled"]:::ci
-
-        FE_E2E["FE E2E CI<br/>──────────────────<br/>Playwright<br/>Browser UI tests<br/>Scheduled"]:::ci
-    end
-
     VERCEL["Vercel CDN<br/>──────────────────<br/>Edge Network<br/>Static pages<br/>Standalone output"]:::infra
 
     LEARNER -->|"browser"| CLIENT
@@ -75,10 +67,6 @@ graph TD
     SSR -->|"standalone deploy"| VERCEL
     VERCEL -->|"serve static pages"| LEARNER
 
-    MAIN_CI -->|"test"| SSR
-    BE_E2E -->|"tRPC tests"| SSR
-    FE_E2E -->|"browser tests"| CLIENT
-
     classDef actor fill:#DE8F05,stroke:#000000,color:#000000,stroke-width:2px
     classDef actor_author fill:#CA9161,stroke:#000000,color:#000000,stroke-width:2px
     classDef container_be fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
@@ -86,6 +74,33 @@ graph TD
     classDef datastore fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef search fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
     classDef infra fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
+CI pipelines exercise both tiers of the `web` container:
+
+```mermaid
+%% Color Palette: Blue #0173B2 | Orange #DE8F05 | Teal #029E73 | Purple #CC78BC | Brown #CA9161 | Gray #808080
+graph TD
+    subgraph CICD["CI Pipelines"]
+        MAIN_CI["Main CI<br/>──────────────────<br/>typecheck, lint, test:quick<br/>On push to main"]:::ci
+
+        BE_E2E["BE E2E CI<br/>──────────────────<br/>Playwright<br/>tRPC API tests<br/>Scheduled"]:::ci
+
+        FE_E2E["FE E2E CI<br/>──────────────────<br/>Playwright<br/>Browser UI tests<br/>Scheduled"]:::ci
+    end
+
+    subgraph WEB_CONTAINER["web container — Next.js 16"]
+        SSR["Server Tier<br/>──────────────────<br/>App Router + tRPC"]:::container_be
+
+        CLIENT["Client Tier<br/>──────────────────<br/>Browser SPA"]:::container_fe
+    end
+
+    MAIN_CI -->|"test"| SSR
+    BE_E2E -->|"tRPC tests"| SSR
+    FE_E2E -->|"browser tests"| CLIENT
+
+    classDef container_be fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef container_fe fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef ci fill:#CC78BC,stroke:#000000,color:#000000,stroke-width:2px
 ```
 

@@ -778,7 +778,7 @@ type DomainEventUnion = DonationReceivedEvent | ZakatCalculatedEvent | CampaignG
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     subgraph Aggregate["Aggregate"]
         Agg["Donation<br/>Campaign"]:::blue
         Events["Event List<br/>(private)"]:::blue
@@ -916,7 +916,7 @@ Repositories abstract persistence for aggregates.
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     subgraph Domain["Domain Layer"]
         Agg["Aggregate Root<br/>(DonationCampaign)"]:::blue
         RepIntf["Repository Interface<br/>(CampaignRepository)"]:::blue

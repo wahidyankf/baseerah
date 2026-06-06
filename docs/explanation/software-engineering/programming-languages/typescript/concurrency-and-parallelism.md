@@ -471,7 +471,7 @@ setTimeout(() => controller.abort(), 5000);
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     A["Promise Created"]:::blue --> B{"Promise<br/>Resolution"}:::orange
 
     B -->|"Success"| C[".then() handler"]:::teal

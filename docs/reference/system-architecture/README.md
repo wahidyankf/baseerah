@@ -35,36 +35,53 @@ The system architecture is documented using the C4 model (Context, Container, Co
 
 Shows how the Open Sharia Enterprise platform fits into the world, including users and external systems.
 
+**Contribution flow:**
+
 ```mermaid
 graph LR
     subgraph "External Users"
         DEVS[Developers<br/>Building enterprise apps]
         AUTHORS[Content Authors<br/>Writing educational content]
+    end
+
+    subgraph "External Systems"
+        GITHUB[GitHub<br/>Source control & CI/CD]
+    end
+
+    OSE_PLATFORM[OSE Platform<br/>Monorepo - 9 apps<br/>Nx workspace]
+
+    DEVS -->|Clone, commit, push| GITHUB
+    AUTHORS -->|Write markdown content| GITHUB
+    GITHUB -->|Webhook triggers| OSE_PLATFORM
+
+    style OSE_PLATFORM fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
+    style DEVS fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style AUTHORS fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style GITHUB fill:#6a4c93,stroke:#22223b,color:#ffffff
+```
+
+**Content delivery flow:**
+
+```mermaid
+graph LR
+    subgraph "External Users"
         LEARNERS[Learners<br/>Studying prog/AI/security]
     end
 
     OSE_PLATFORM[OSE Platform<br/>Monorepo - 9 apps<br/>Nx workspace]
 
     subgraph "External Systems"
-        GITHUB[GitHub<br/>Source control & CI/CD]
         VERCEL[Vercel<br/>Static site hosting]
         DNS[DNS/CDN<br/>Domain management]
     end
 
-    DEVS -->|Clone, commit, push| GITHUB
-    AUTHORS -->|Write markdown content| GITHUB
     LEARNERS -->|Read tutorials & guides| OSE_PLATFORM
-
-    GITHUB -->|Webhook triggers| OSE_PLATFORM
     OSE_PLATFORM -->|Deploy static sites| VERCEL
     VERCEL -->|Serve websites| LEARNERS
     DNS -->|Route traffic| VERCEL
 
     style OSE_PLATFORM fill:#0077b6,stroke:#03045e,color:#ffffff,stroke-width:3px
-    style DEVS fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style AUTHORS fill:#2a9d8f,stroke:#264653,color:#ffffff
     style LEARNERS fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style GITHUB fill:#6a4c93,stroke:#22223b,color:#ffffff
     style VERCEL fill:#6a4c93,stroke:#22223b,color:#ffffff
     style DNS fill:#6a4c93,stroke:#22223b,color:#ffffff
 ```

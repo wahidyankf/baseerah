@@ -797,7 +797,7 @@ func (s *PricingService) CalculatePrice(order *Order) (Money, error) {
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     subgraph Presentation["Presentation Layer"]
         Handler["HTTP Handler<br/>(Gin/Echo/net/http)"]:::orange
     end

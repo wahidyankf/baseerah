@@ -199,7 +199,7 @@ app.use(errorHandler);
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
-graph LR
+graph TD
     Request["Incoming Request"]:::blue
     Logger["Logger Middleware<br/>Log request details"]:::orange
     Auth["Auth Middleware<br/>Verify JWT token"]:::orange

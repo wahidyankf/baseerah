@@ -265,7 +265,7 @@ graph TD
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
-graph LR
+graph TD
     Import["import { X } from 'module'"]:::blue
     Relative{"Relative path<br/>#40;./ or ../#41;?"}:::orange
     Builtin{"Built-in<br/>module?"}:::orange
@@ -389,7 +389,7 @@ flowchart LR
 
 ```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#0173B2','primaryTextColor':'#000','primaryBorderColor':'#0173B2','lineColor':'#DE8F05','secondaryColor':'#029E73','tertiaryColor':'#CC78BC','fontSize':'16px'}}}%%
-flowchart LR
+flowchart TD
     A[package.json] --> B[npm install]
     B --> C[Resolve Dependencies]
     C --> D{Conflicts?}

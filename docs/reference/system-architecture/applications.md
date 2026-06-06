@@ -197,23 +197,15 @@ graph LR
 
     subgraph "CLI Tools"
         AYOCLI[ayokoding-cli<br/>Go CLI]
-        RHINO[rhino-cli<br/>Rust CLI]
         OSECLI[ose-cli<br/>Go CLI]
     end
 
     subgraph "Shared Infrastructure"
-        NX[Nx Workspace<br/>Build Orchestration]
         LIBS[Shared Libraries<br/>rust-commons]
     end
 
     AYOCLI -->|Validates links| AYO
-    RHINO -->|Repository automation| NX
     OSECLI -->|Validates links| OSE
-    NX -.->|Manages| OSE
-    NX -.->|Manages| AYO
-    NX -.->|Manages| WKF
-    NX -.->|Manages| AYOCLI
-    NX -.->|Manages| RHINO
     OSE -.->|May import| LIBS
     AYO -.->|May import| LIBS
 
@@ -221,10 +213,42 @@ graph LR
     style AYO fill:#0077b6,stroke:#03045e,color:#ffffff
     style WKF fill:#0077b6,stroke:#03045e,color:#ffffff
     style AYOCLI fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style RHINO fill:#2a9d8f,stroke:#264653,color:#ffffff
     style OSECLI fill:#2a9d8f,stroke:#264653,color:#ffffff
-    style NX fill:#6a4c93,stroke:#22223b,color:#ffffff
     style LIBS fill:#457b9d,stroke:#1d3557,color:#ffffff
+```
+
+**Nx workspace orchestration:**
+
+```mermaid
+graph LR
+    subgraph "CLI Tools"
+        RHINO[rhino-cli<br/>Rust CLI]
+        AYOCLI[ayokoding-cli<br/>Go CLI]
+    end
+
+    subgraph "Marketing & Education"
+        OSE[ose-web<br/>Next.js App]
+        AYO[ayokoding-web<br/>Next.js App]
+        WKF[wahidyankf-web<br/>Next.js App]
+    end
+
+    subgraph "Shared Infrastructure"
+        NX[Nx Workspace<br/>Build Orchestration]
+    end
+
+    RHINO -->|Repository automation| NX
+    NX -.->|Manages| OSE
+    NX -.->|Manages| AYO
+    NX -.->|Manages| WKF
+    NX -.->|Manages| AYOCLI
+    NX -.->|Manages| RHINO
+
+    style OSE fill:#0077b6,stroke:#03045e,color:#ffffff
+    style AYO fill:#0077b6,stroke:#03045e,color:#ffffff
+    style WKF fill:#0077b6,stroke:#03045e,color:#ffffff
+    style AYOCLI fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style RHINO fill:#2a9d8f,stroke:#264653,color:#ffffff
+    style NX fill:#6a4c93,stroke:#22223b,color:#ffffff
 ```
 
 **OrganicLever platform applications:**

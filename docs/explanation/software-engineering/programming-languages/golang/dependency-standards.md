@@ -156,7 +156,7 @@ import "example.com/myapp/pkg/database"
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     A["go get<br/>package"]:::blue --> B["Resolve Version<br/>#40;MVS Algorithm#41;"]:::purple
     B --> C{In go.sum?}:::orange
     C -->|Yes| D["Use Cached"]:::teal
@@ -401,7 +401,7 @@ go mod verify
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     A["New Release"]:::blue --> B{Breaking<br/>Changes?}:::purple
     B -->|Yes| C["Increment MAJOR<br/>#40;v2.0.0#41;"]:::orange
     B -->|No| D{New<br/>Features?}:::purple

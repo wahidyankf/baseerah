@@ -151,7 +151,7 @@ graph TD
     G --> H{More Steps?}
 
     H -->|Yes| D
-    H -->|No| I[Integration: BDD Scenario GREEN]
+    H -->|No| I[Integration: BDD GREEN]
     I --> J[Refactor: All Layers]
     J --> K[Living Documentation]
 

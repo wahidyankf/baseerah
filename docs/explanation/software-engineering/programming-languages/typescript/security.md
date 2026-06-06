@@ -140,7 +140,7 @@ async function handleDonationCreate(req: Request, res: Response) {
 The following diagram illustrates the defense-in-depth approach to input validation in TypeScript financial applications:
 
 ```mermaid
-graph LR
+graph TD
     CLIENT[Client Request]:::blue
     L1["Layer 1: Controller<br/>Structure check + Sanitize"]:::teal
     L2["Layer 2: Schema Validation<br/>Zod + Business Rules"]:::purple

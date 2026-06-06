@@ -193,7 +193,7 @@ Type guards allow TypeScript to narrow types at runtime, providing type safety f
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     A["Need Runtime<br/>Type Check?"]:::blue --> B{"Type of<br/>Value?"}:::orange
 
     B -->|"Primitive"| C["✅ Use typeof<br/>(string, number, boolean)"]:::teal

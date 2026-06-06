@@ -65,7 +65,7 @@ When should you use type assertions vs validation? This decision tree helps you 
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
-graph LR
+graph TD
     Start["Data Source"]:::blue
     Internal{"Internal<br/>source?"}:::orange
     TrustSource{"Can trust<br/>structure?"}:::orange
@@ -966,7 +966,7 @@ interface DonationFilters {
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
 %% All colors are color-blind friendly and meet WCAG AA contrast standards
 
-graph LR
+graph TD
     A["Error Occurs"]:::blue --> B{"Can You<br/>Recover?"}:::orange
 
     B -->|"Yes"| C["Handle Gracefully<br/>(retry, default value)"]:::teal
@@ -1917,7 +1917,7 @@ Abstraction is powerful but can be harmful when overdone. This flowchart helps d
 
 ```mermaid
 %% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Brown #CA9161
-graph LR
+graph TD
     Start["Adding Abstraction"]:::blue
     Q1{"More than<br/>2 use cases?"}:::orange
     Q2{"Reduces<br/>duplication?"}:::orange
