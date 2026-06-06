@@ -292,6 +292,16 @@ fn link_text_re() -> &'static Regex {
     RE.get_or_init(|| Regex::new(r"--[^->\n]+?-->").expect("valid hardcoded regex"))
 }
 
+/// Returns the compiled regex that matches a pipe-delimited edge label
+/// immediately following an arrow (`-->|text|`).
+fn pipe_label_re() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(r"(-->|---|-\.->|==>|--o|--x|<-->)\s*\|[^|\n]*\|")
+            .expect("valid hardcoded regex")
+    })
+}
+
 /// Returns the compiled regex that matches a bare node identifier (word characters only).
 fn node_id_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
@@ -571,6 +581,7 @@ fn extract_edge_line(
     edges: &mut Vec<Edge>,
 ) {
     let line = link_text_re().replace_all(line, "-->");
+    let line = pipe_label_re().replace_all(&line, "$1");
     let parts: Vec<&str> = arrow_re().split(&line).collect();
     if parts.len() < 2 {
         return;
@@ -678,23 +689,68 @@ pub fn effective_label_len(label: &str) -> usize {
 /// Assigns a rank (depth level) to each node using a topological-sort-based
 /// longest-path algorithm.
 ///
-/// Nodes not reachable from any root (cycle members or disconnected) are
-/// assigned rank `0`.  Returns an empty map when `nodes` is empty.
+/// Cycles are handled by first removing back edges (detected via an iterative
+/// DFS in node-declaration order), then ranking the remaining DAG — mirroring
+/// how Mermaid itself lays out cyclic flowcharts. Disconnected nodes are
+/// assigned rank `0`. Returns an empty map when `nodes` is empty.
 fn rank_assign(nodes: &[Node], edges: &[Edge]) -> HashMap<String, i64> {
     if nodes.is_empty() {
         return HashMap::new();
     }
     let node_set: HashSet<&str> = nodes.iter().map(|n| n.id.as_str()).collect();
     let mut adj: HashMap<String, Vec<String>> = HashMap::new();
-    let mut in_degree: HashMap<String, usize> = HashMap::new();
     for n in nodes {
         adj.insert(n.id.clone(), Vec::new());
-        in_degree.insert(n.id.clone(), 0);
     }
     for e in edges {
         if node_set.contains(e.from.as_str()) && node_set.contains(e.to.as_str()) {
             adj.entry(e.from.clone()).or_default().push(e.to.clone());
-            *in_degree.entry(e.to.clone()).or_insert(0) += 1;
+        }
+    }
+
+    // Pass 1: detect back edges via iterative DFS (gray = on stack, black = done),
+    // visiting unvisited nodes in declaration order so the result is deterministic.
+    let mut color: HashMap<String, u8> = HashMap::new(); // 0/absent=white, 1=gray, 2=black
+    let mut back_edges: HashSet<(String, String)> = HashSet::new();
+    for start in nodes {
+        if color.get(&start.id).copied().unwrap_or(0) != 0 {
+            continue;
+        }
+        // Stack of (node, next-neighbor-index).
+        let mut stack: Vec<(String, usize)> = vec![(start.id.clone(), 0)];
+        color.insert(start.id.clone(), 1);
+        while let Some((cur, idx)) = stack.pop() {
+            let neighbors = adj.get(&cur).cloned().unwrap_or_default();
+            if idx < neighbors.len() {
+                let next = neighbors[idx].clone();
+                stack.push((cur.clone(), idx + 1));
+                match color.get(&next).copied().unwrap_or(0) {
+                    1 => {
+                        back_edges.insert((cur, next));
+                    }
+                    0 => {
+                        color.insert(next.clone(), 1);
+                        stack.push((next, 0));
+                    }
+                    _ => {}
+                }
+            } else {
+                color.insert(cur, 2);
+            }
+        }
+    }
+
+    // Pass 2: Kahn's longest-path ranking on the DAG that remains after
+    // dropping the back edges.
+    let mut in_degree: HashMap<String, usize> = HashMap::new();
+    for n in nodes {
+        in_degree.insert(n.id.clone(), 0);
+    }
+    for (from, tos) in &adj {
+        for to in tos {
+            if !back_edges.contains(&(from.clone(), to.clone())) {
+                *in_degree.entry(to.clone()).or_insert(0) += 1;
+            }
         }
     }
     let mut rank: HashMap<String, i64> = HashMap::new();
@@ -712,6 +768,9 @@ fn rank_assign(nodes: &[Node], edges: &[Edge]) -> HashMap<String, i64> {
         let cur_rank = *rank.get(&cur).unwrap_or(&0);
         let neighbors = adj.get(&cur).cloned().unwrap_or_default();
         for next in neighbors {
+            if back_edges.contains(&(cur.clone(), next.clone())) {
+                continue;
+            }
             let existing = *rank.get(&next).unwrap_or(&0);
             if cur_rank + 1 > existing {
                 rank.insert(next.clone(), cur_rank + 1);
@@ -726,7 +785,7 @@ fn rank_assign(nodes: &[Node], edges: &[Edge]) -> HashMap<String, i64> {
     }
     for n in nodes {
         if !visited.contains(&n.id) {
-            rank.insert(n.id.clone(), 0);
+            rank.entry(n.id.clone()).or_insert(0);
         }
     }
     rank
@@ -1236,6 +1295,58 @@ mod tests {
         assert_eq!(count, 1);
         assert_eq!(d.nodes.len(), 3);
         assert_eq!(d.edges.len(), 2);
+    }
+
+    #[test]
+    fn parse_flowchart_handles_pipe_labeled_edges() {
+        // Standard Mermaid pipe-label syntax `A -->|text| B` must parse as an
+        // edge — previously the `|text|` segment broke target-node extraction,
+        // leaving all nodes at rank 0 and inflating the measured span.
+        let block = MermaidBlock {
+            file_path: "a.md".to_string(),
+            block_index: 0,
+            source: "graph TD\nA -->|\"browse and search\"| B\nB -->|deploy| C\n".to_string(),
+            start_line: 1,
+        };
+        let (d, count) = parse_diagram(block);
+        assert_eq!(count, 1);
+        assert_eq!(d.nodes.len(), 3, "nodes: {:?}", d.nodes);
+        assert_eq!(d.edges.len(), 2, "edges: {:?}", d.edges);
+        // A → B → C chain: span 1, depth 3.
+        assert_eq!(max_width(&d.nodes, &d.edges), 1);
+        assert_eq!(depth(&d.nodes, &d.edges), 3);
+    }
+
+    #[test]
+    fn rank_assign_handles_cycles_via_back_edge_removal() {
+        // A → B → C → A is a cycle. Previously NO node had in-degree 0, Kahn's
+        // queue started empty, and every node fell back to rank 0 — inflating
+        // the measured span to the full node count. With back-edge removal the
+        // chain ranks 0,1,2: span 1, depth 3.
+        let block = MermaidBlock {
+            file_path: "a.md".to_string(),
+            block_index: 0,
+            source: "graph TD\nA --> B\nB --> C\nC --> A\n".to_string(),
+            start_line: 1,
+        };
+        let (d, _) = parse_diagram(block);
+        assert_eq!(max_width(&d.nodes, &d.edges), 1, "cycle must rank as chain");
+        assert_eq!(depth(&d.nodes, &d.edges), 3);
+    }
+
+    #[test]
+    fn rank_assign_handles_back_edge_into_rooted_chain() {
+        // Rooted chain with a feedback edge (the forms.md shape):
+        // A → B → C → D plus D → B. Back edge must not zero out the ranking.
+        let block = MermaidBlock {
+            file_path: "a.md".to_string(),
+            block_index: 0,
+            source: "graph TD\nA --> B\nB --> C\nC --> D\nD --> B\n".to_string(),
+            start_line: 1,
+        };
+        let (d, _) = parse_diagram(block);
+        assert_eq!(max_width(&d.nodes, &d.edges), 1);
+        assert_eq!(depth(&d.nodes, &d.edges), 4);
     }
 
     #[test]

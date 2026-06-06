@@ -20,6 +20,9 @@ use regex::Regex;
 use walkdir::WalkDir;
 
 /// Directories skipped by the full-repo walker.
+///
+/// This is the standardized cross-repo noise-skip set shared by the markdown
+/// gate validators (mermaid, links, heading-hierarchy).
 const FULL_REPO_SKIP_DIRS: &[&str] = &[
     "node_modules",
     "dist",
@@ -30,6 +33,10 @@ const FULL_REPO_SKIP_DIRS: &[&str] = &[
     "local-temp",
     "archived",
     "apps-labs",
+    "worktrees",
+    ".terraform",
+    "generated-contracts",
+    ".nx",
     ".git",
 ];
 
@@ -309,14 +316,16 @@ fn extract_links(path: &Path) -> std::result::Result<Vec<LinkInfo>, Error> {
 
 /// Converts a heading title string to a GitHub-flavoured markdown anchor slug.
 ///
-/// Rules: lowercase, remove all chars that are not alphanumeric, space, or hyphen,
-/// then replace spaces with hyphens.
+/// Rules: lowercase, remove all chars that are not alphanumeric, underscore,
+/// space, or hyphen, then replace spaces with hyphens (no collapsing).
+/// Verified against the `github-slugger` v2 reference implementation —
+/// underscores (`U+005F`) and Unicode letters/digits are KEPT.
 pub fn github_slug(title: &str) -> String {
     title
         .to_lowercase()
         .chars()
         .map(|c| {
-            if c.is_alphanumeric() || c == '-' {
+            if c.is_alphanumeric() || c == '-' || c == '_' {
                 c
             } else if c == ' ' {
                 '-'
@@ -1151,6 +1160,17 @@ mod tests {
         // Non-emoji headings must not regress.
         assert_eq!(github_slug("WCAG Standards"), "wcag-standards");
         assert_eq!(github_slug("Setup"), "setup");
+    }
+
+    /// (d3) Underscores are KEPT by GitHub's slugger (`U+005F` is not in the
+    /// removal set — verified against `github-slugger` v2: `foo_bar baz` →
+    /// `foo_bar-baz`). Our slug must match.
+    #[test]
+    fn github_slug_keeps_underscores() {
+        assert_eq!(github_slug("foo_bar baz"), "foo_bar-baz");
+        assert_eq!(github_slug("snake_case"), "snake_case");
+        // Multi-space: each space becomes a hyphen, no collapsing (github-slugger: `a  b` → `a--b`).
+        assert_eq!(github_slug("a  b"), "a--b");
     }
 
     /// (e) The slug helper maps duplicate `Setup` headings to `setup` and `setup-1`.

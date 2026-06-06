@@ -59,3 +59,9 @@ Feature: Markdown Internal Link Validation
     When the developer runs docs validate-links
     Then the command exits with a failure code
     And the output identifies the broken same-file anchor
+
+  Scenario: anchor slugs keep underscores per the GitHub reference algorithm
+    Given a markdown file that links to the anchor "#snake_case" of a file whose heading is "snake_case"
+    When the developer runs docs validate-links
+    Then the command exits successfully
+    And the output reports no broken links found

@@ -38,12 +38,34 @@ pub struct ValidateMermaidArgs {
     /// Max direct child nodes per subgraph.
     #[arg(long = "max-subgraph-nodes", default_value_t = 6)]
     pub max_subgraph_nodes: usize,
+    /// Repository-relative path prefixes to exclude from scanning.
+    /// May be specified multiple times.
+    #[arg(long = "exclude")]
+    pub exclude: Vec<String>,
     /// Optional positional paths to scan.
     pub positional: Vec<String>,
 }
 
 /// Directory names skipped during recursive markdown file collection.
-const SKIP_DIRS: &[&str] = &[".next", "node_modules", ".git"];
+///
+/// This is the standardized cross-repo noise-skip set shared by the markdown
+/// gate validators (mermaid, links, heading-hierarchy).
+const SKIP_DIRS: &[&str] = &[
+    "node_modules",
+    "dist",
+    "target",
+    ".next",
+    "coverage",
+    "generated-reports",
+    "local-temp",
+    "archived",
+    "apps-labs",
+    "worktrees",
+    ".terraform",
+    "generated-contracts",
+    ".nx",
+    ".git",
+];
 
 /// Run the `docs validate-mermaid` command.
 ///
@@ -65,8 +87,9 @@ pub fn run(
     } else if !args.positional.is_empty() {
         collect_md_files(&repo_root, &args.positional)
     } else {
-        collect_md_default_dirs(&repo_root)
+        collect_md_repo_wide(&repo_root)
     };
+    let md_files = apply_excludes(&repo_root, md_files, &args.exclude);
 
     let mut all_blocks: Vec<MermaidBlock> = Vec::new();
     let mut file_set: std::collections::HashSet<String> = std::collections::HashSet::new();
@@ -145,14 +168,36 @@ fn get_changed_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Erro
         .output();
     let text = match out {
         Ok(o) => String::from_utf8_lossy(&o.stdout).to_string(),
-        Err(_) => return Ok(collect_md_default_dirs(repo_root)),
+        Err(_) => return Ok(collect_md_repo_wide(repo_root)),
     };
     let files = filter_md_paths(repo_root, text.lines());
     if files.is_empty() {
-        Ok(collect_md_default_dirs(repo_root))
+        Ok(collect_md_repo_wide(repo_root))
     } else {
         Ok(files)
     }
+}
+
+/// Filters `files` to those whose repository-relative path does not start with
+/// any of the `exclude` prefixes. An empty `exclude` list is a no-op.
+fn apply_excludes(repo_root: &Path, files: Vec<PathBuf>, exclude: &[String]) -> Vec<PathBuf> {
+    if exclude.is_empty() {
+        return files;
+    }
+    files
+        .into_iter()
+        .filter(|f| {
+            let rel = f
+                .strip_prefix(repo_root)
+                .unwrap_or(f)
+                .to_string_lossy()
+                .replace('\\', "/");
+            !exclude.iter().any(|e| {
+                let prefix = e.trim_end_matches('/');
+                rel == prefix || rel.starts_with(&format!("{prefix}/"))
+            })
+        })
+        .collect()
 }
 
 /// Filter an iterator of relative paths to those ending in `.md`.
@@ -181,25 +226,9 @@ fn collect_md_files(repo_root: &Path, paths: &[String]) -> Vec<PathBuf> {
     files
 }
 
-/// Collect markdown files from the default scan directories.
-fn collect_md_default_dirs(repo_root: &Path) -> Vec<PathBuf> {
-    let dirs = ["docs", "repo-governance", ".claude", "plans"];
-    let mut files = Vec::new();
-    for d in &dirs {
-        let dp = repo_root.join(d);
-        if dp.exists() {
-            files.extend(walk_md_files(&dp));
-        }
-    }
-    if let Ok(entries) = fs::read_dir(repo_root) {
-        for entry in entries.flatten() {
-            let p = entry.path();
-            if p.is_file() && p.extension().is_some_and(|e| e == "md") {
-                files.push(p);
-            }
-        }
-    }
-    files
+/// Collect markdown files repo-wide, skipping the standardized noise-skip set.
+fn collect_md_repo_wide(repo_root: &Path) -> Vec<PathBuf> {
+    walk_md_files(repo_root)
 }
 
 /// Recursively walk `dir` and return paths of all `.md` files, skipping [`SKIP_DIRS`].
@@ -248,6 +277,48 @@ mod tests {
         let files = walk_md_files(tmp.path());
         assert_eq!(files.len(), 1);
         assert!(files[0].to_string_lossy().ends_with("kept.md"));
+    }
+
+    #[test]
+    fn collect_md_repo_wide_walks_all_dirs() {
+        let tmp = TempDir::new().unwrap();
+        std::fs::create_dir_all(tmp.path().join("specs/apps")).unwrap();
+        std::fs::create_dir_all(tmp.path().join("apps/foo")).unwrap();
+        std::fs::create_dir_all(tmp.path().join("node_modules")).unwrap();
+        std::fs::write(tmp.path().join("specs/apps/a.md"), "x").unwrap();
+        std::fs::write(tmp.path().join("apps/foo/b.md"), "x").unwrap();
+        std::fs::write(tmp.path().join("root.md"), "x").unwrap();
+        std::fs::write(tmp.path().join("node_modules/skip.md"), "x").unwrap();
+        let files = collect_md_repo_wide(tmp.path());
+        let names: Vec<String> = files
+            .iter()
+            .map(|p| p.to_string_lossy().to_string())
+            .collect();
+        assert_eq!(files.len(), 3, "got: {names:?}");
+    }
+
+    #[test]
+    fn apply_excludes_filters_by_repo_relative_prefix() {
+        let tmp = TempDir::new().unwrap();
+        let files = vec![
+            tmp.path().join("plans/done/x.md"),
+            tmp.path().join("plans/in-progress/y.md"),
+            tmp.path().join("docs/z.md"),
+        ];
+        let kept = apply_excludes(tmp.path(), files, &["plans/done".to_string()]);
+        assert_eq!(kept.len(), 2);
+        assert!(
+            kept.iter()
+                .all(|p| !p.to_string_lossy().contains("plans/done"))
+        );
+    }
+
+    #[test]
+    fn apply_excludes_noop_when_empty() {
+        let tmp = TempDir::new().unwrap();
+        let files = vec![tmp.path().join("docs/z.md")];
+        let kept = apply_excludes(tmp.path(), files, &[]);
+        assert_eq!(kept.len(), 1);
     }
 
     #[test]

@@ -60,10 +60,13 @@ pub fn validate_docs_heading_hierarchy(
 /// - `docs/`
 /// - `repo-governance/`
 /// - `plans/` **except** `plans/done/`
+/// - `specs/`
 /// - Root-level `*.md` files (no directory component)
+/// - `apps/<name>/README.md` and `libs/<name>/README.md` (project-root READMEs only)
+/// - `apps/<name>/docs/**` and `libs/<name>/docs/**` (project docs subtrees)
 ///
-/// Everything else — including `.claude/`, `.opencode/`, `apps/`, `libs/`,
-/// `plans/done/`, and noise directories — is **default-deny**.
+/// Everything else — including `.claude/`, `.opencode/`, deep `apps/`/`libs/`
+/// internals, `plans/done/`, and noise directories — is **default-deny**.
 pub fn is_prose_allowlisted(repo_rel: &str) -> bool {
     // Normalise path separators to forward slash for consistent matching.
     let r = repo_rel.replace('\\', "/");
@@ -71,12 +74,22 @@ pub fn is_prose_allowlisted(repo_rel: &str) -> bool {
     if r.starts_with("plans/done/") || r == "plans/done" {
         return false;
     }
-    if r.starts_with("docs/") || r.starts_with("repo-governance/") || r.starts_with("plans/") {
+    if r.starts_with("docs/")
+        || r.starts_with("repo-governance/")
+        || r.starts_with("plans/")
+        || r.starts_with("specs/")
+    {
         return true;
     }
     // Root-level *.md (no slash present at all)
     if !r.contains('/') && r.ends_with(".md") {
         return true;
+    }
+    // apps/<name>/README.md, libs/<name>/README.md, apps/<name>/docs/**, libs/<name>/docs/**
+    if let Some(rest) = r.strip_prefix("apps/").or_else(|| r.strip_prefix("libs/"))
+        && let Some((_project, tail)) = rest.split_once('/')
+    {
+        return tail == "README.md" || tail.starts_with("docs/");
     }
     false
 }
@@ -550,17 +563,76 @@ mod tests {
         );
     }
 
-    /// (f) An `apps/example/README.md` with a skipped level yields NO finding (`apps` excluded).
+    /// (f) An `apps/example/README.md` with a skipped level yields a finding
+    /// (app/lib top-level READMEs are in the prose allowlist).
     #[test]
-    fn apps_dir_is_default_deny() {
+    fn apps_readme_is_allowlisted() {
         let tmp = TempDir::new().unwrap();
         let app_dir = tmp.path().join("apps/example");
         fs::create_dir_all(&app_dir).unwrap();
         fs::write(app_dir.join("README.md"), "# App\n\n### Skip\n").unwrap();
         let findings = validate_docs_heading_hierarchy_allowlisted(tmp.path(), &[]).unwrap();
         assert!(
+            findings.iter().any(|f| f.kind == "skipped-level"),
+            "apps/*/README.md must be in the prose allowlist"
+        );
+    }
+
+    /// (f2) A deep `apps/example/src/notes.md` file yields NO finding (apps internals
+    /// stay default-deny; only top-level READMEs and docs/ subtrees are allowlisted).
+    #[test]
+    fn apps_internals_stay_default_deny() {
+        let tmp = TempDir::new().unwrap();
+        let src_dir = tmp.path().join("apps/example/src");
+        fs::create_dir_all(&src_dir).unwrap();
+        fs::write(src_dir.join("notes.md"), "## No H1\n").unwrap();
+        // A nested README is also NOT allowlisted — only the app-root README is.
+        fs::write(src_dir.join("README.md"), "## No H1\n").unwrap();
+        let findings = validate_docs_heading_hierarchy_allowlisted(tmp.path(), &[]).unwrap();
+        assert!(
             findings.is_empty(),
-            "apps/ must be default-deny (no findings expected)"
+            "apps/*/src/** must be default-deny (no findings expected)"
+        );
+    }
+
+    /// (f3) A `specs/` prose file with two H1s yields a finding (specs/ is allowlisted).
+    #[test]
+    fn specs_dir_is_allowlisted() {
+        let tmp = TempDir::new().unwrap();
+        let specs_dir = tmp.path().join("specs/apps/foo");
+        fs::create_dir_all(&specs_dir).unwrap();
+        fs::write(specs_dir.join("overview.md"), "# A\n\n# B\n").unwrap();
+        let findings = validate_docs_heading_hierarchy_allowlisted(tmp.path(), &[]).unwrap();
+        assert!(
+            findings.iter().any(|f| f.kind == "duplicate-h1"),
+            "specs/ must be in the prose allowlist"
+        );
+    }
+
+    /// (f4) A `libs/example/README.md` and `libs/example/docs/**` file yield findings
+    /// (lib READMEs + docs subtrees are allowlisted); `apps/*/docs/**` likewise.
+    #[test]
+    fn lib_readme_and_docs_subtrees_are_allowlisted() {
+        let tmp = TempDir::new().unwrap();
+        let lib_dir = tmp.path().join("libs/example");
+        fs::create_dir_all(lib_dir.join("docs/deep")).unwrap();
+        fs::write(lib_dir.join("README.md"), "# Lib\n\n### Skip\n").unwrap();
+        fs::write(lib_dir.join("docs/deep/guide.md"), "# A\n\n# B\n").unwrap();
+        let app_docs = tmp.path().join("apps/example/docs");
+        fs::create_dir_all(&app_docs).unwrap();
+        fs::write(app_docs.join("usage.md"), "## No H1\n").unwrap();
+        let findings = validate_docs_heading_hierarchy_allowlisted(tmp.path(), &[]).unwrap();
+        assert!(
+            findings.iter().any(|f| f.kind == "skipped-level"),
+            "libs/*/README.md must be allowlisted"
+        );
+        assert!(
+            findings.iter().any(|f| f.kind == "duplicate-h1"),
+            "libs/*/docs/** must be allowlisted"
+        );
+        assert!(
+            findings.iter().any(|f| f.kind == "missing-h1"),
+            "apps/*/docs/** must be allowlisted"
         );
     }
 

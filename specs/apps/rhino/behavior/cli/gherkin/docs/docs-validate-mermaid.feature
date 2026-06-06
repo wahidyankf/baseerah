@@ -178,3 +178,29 @@ Feature: Mermaid Flowchart Structural Validation
     When the developer runs docs validate-mermaid
     Then the command exits successfully
     And the output reports no new violations or warnings introduced by these fixes
+
+  Scenario: exclude flag skips the named subtree
+    Given a markdown file under plans/done containing a flowchart with a width violation
+    And a markdown file under docs containing a flowchart with a different width violation
+    When the developer runs docs validate-mermaid with --exclude plans/done
+    Then the command exits with a failure code
+    And the output does not mention the plans/done file
+    But the output does mention the docs file
+
+  Scenario: repo-wide default scan finds violation outside the legacy default directories
+    Given a markdown file under specs/ containing a flowchart with a width violation
+    When the developer runs docs validate-mermaid without path arguments
+    Then the command exits with a failure code
+    And the output identifies the file under specs/
+
+  Scenario: A pipe-labeled edge is parsed as an edge
+    Given a markdown file with a flowchart line "A -->|yes| B"
+    When the parser processes the file
+    Then one edge is produced: A->B
+    And node B is ranked one level below node A
+
+  Scenario: A cyclic flowchart ranks as its underlying chain
+    Given a markdown file with a flowchart forming the cycle A --> B --> C --> A
+    When the developer runs docs validate-mermaid
+    Then the command exits successfully
+    And no width violation is reported for the cycle members

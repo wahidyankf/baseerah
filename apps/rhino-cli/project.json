@@ -167,14 +167,10 @@
     "validate:mermaid": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid --max-depth=4 repo-governance/ .claude/"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content"
       },
       "cache": true,
-      "inputs": [
-        "{projectRoot}/src/**/*.rs",
-        "{workspaceRoot}/repo-governance/**/*.md",
-        "{workspaceRoot}/.claude/**/*.md"
-      ]
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
     },
     "validate:links": {
       "executor": "nx:run-commands",
