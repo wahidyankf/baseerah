@@ -675,22 +675,29 @@ three `--exclude` named exclusions.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] Run all three markdown gates full-scan:
-      `npx nx run rhino-cli:validate:mermaid` ;
-      `npx nx run rhino-cli:validate:links` ;
-      `npx nx run rhino-cli:validate:heading-hierarchy`
-      — acceptance: all three exit 0 (zero findings within scope).
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` — acceptance: exits 0.
-- [ ] [AI] Run affected linting: `npx nx affected -t lint` — acceptance: exits 0.
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` — acceptance: exits 0.
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage` — acceptance: exits 0.
-- [ ] [AI] Run markdown lint: `npm run lint:md` — acceptance: exits 0.
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by these changes — and re-run
-      the failing checks to confirm resolution. Verify zero failures before pushing.
+- [x] [AI] Run all three markdown gates full-scan:
+    `npx nx run rhino-cli:validate:mermaid` ;
+    `npx nx run rhino-cli:validate:links` ;
+    `npx nx run rhino-cli:validate:heading-hierarchy`
+    — acceptance: all three exit 0 (zero findings within scope).
+<!-- 2026-06-06 | Status: DONE | mermaid: 0 violations, links: 0 broken, heading-hierarchy: 0 violations -->
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck` — acceptance: exits 0.
+<!-- 2026-06-06 | Status: DONE | cargo check exit 0 -->
+- [x] [AI] Run affected linting: `npx nx affected -t lint` — acceptance: exits 0.
+<!-- 2026-06-06 | Status: DONE | cargo clippy exit 0 (fixed explicit_iter_loop in links.rs) -->
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick` — acceptance: exits 0.
+<!-- 2026-06-06 | Status: DONE | 799 tests pass -->
+- [x] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage` — acceptance: exits 0.
+<!-- 2026-06-06 | Status: DONE | spec-coverage exit 0 -->
+- [x] [AI] Run markdown lint: `npm run lint:md` — acceptance: exits 0.
+<!-- 2026-06-06 | Status: DONE | 0 errors in 3754 files -->
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by these changes — and re-run
+    the failing checks to confirm resolution. Verify zero failures before pushing.
+<!-- 2026-06-06 | Status: DONE | clippy explicit_iter_loop fixed and committed -->
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically (Conventional Commits `<type>(<scope>): <description>`),
+- [x] [AI] Commit changes thematically (Conventional Commits `<type>(<scope>): <description>`),
       split by concern, for example:
   - `feat(rhino-cli): add --exclude flag and repo-wide scan to validate-links`
   - `feat(rhino-cli): validate markdown anchors against target headings`
