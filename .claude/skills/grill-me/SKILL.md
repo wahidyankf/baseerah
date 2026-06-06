@@ -26,33 +26,57 @@ Activate when:
 Interview the user about every aspect of the plan until shared understanding is reached. Walk
 down each branch of the decision tree, resolving dependencies one-by-one.
 
+This skill is the canonical implementation of the
+[Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md) —
+that convention is the normative source for the format, mechanism, and scope below. Keep them in
+sync.
+
 **Rules (HARD — no exceptions):**
 
-1. Ask questions **one at a time** — never bundle multiple questions in one message
-2. **EVERY question MUST present 2-4 concrete options** with trade-off descriptions — open-ended
+1. **Explore the codebase first** — if a question can be answered by reading existing files,
+   read them instead of asking. Never ask what a file read can answer.
+2. Present **2-4 concrete, mutually-exclusive options** per question, each with a one-sentence
+   trade-off specific to this decision (no generic "this is simpler" filler) — open-ended
    questions without options are FORBIDDEN. If you cannot enumerate options, read the codebase
-   first (Rule 4) and synthesize them before asking.
-3. **Mark the recommended option** clearly, e.g. `**(Recommended)**`
-4. **Explore the codebase first** — if a question can be answered by reading existing files,
-   read them instead of asking
-5. Continue until all branches are resolved
+   first (Rule 1) and synthesize them before asking.
+3. **Mark exactly one option Recommended** with a one-line rationale grounded in the repo state
+   and the user's stated constraints. More than one Recommended is forbidden.
+4. **One decision per question.** Tightly-coupled decisions (where one answer constrains the
+   other) MAY be batched in a single multi-question prompt; unrelated decisions MUST NOT be
+   bundled.
+5. The user can always supply an **unlisted write-in answer** — options are a starting point, not
+   a cage. Treat a write-in with the same weight as a listed option; if it opens a new branch,
+   grill on that branch.
+6. Continue until all branches are resolved — do not stop early.
 
-**Tool preference**: When operating in a Claude Code context, use the `AskUserQuestion` tool for
-each question. The interactive multi-choice UI shows the user exactly which options are available
-and lets them select with a single click. Fall back to the markdown format below only when
-`AskUserQuestion` is unavailable.
+**Violation of Rule 2 (asking without options) is the most common failure mode.** If you catch
+yourself writing a question without listing concrete options, rewrite it with options before
+sending.
 
-## Question format (markdown fallback)
+## Mechanism — use the AskUserQuestion tool
 
-When `AskUserQuestion` is not available, structure each question like this:
+Grilling MUST use the **`AskUserQuestion` tool** (the harness's native interactive
+multiple-choice mechanism), not free-text prose questions. It renders options as selectable
+choices and returns a structured answer — eliminating parse ambiguity — and always offers a
+free-form "Other" path.
+
+- One `AskUserQuestion` call carries 1–4 questions; use multiple questions only for
+  tightly-coupled decision clusters (Rule 4).
+- Each question carries 2–4 options (Rule 2); put the Recommended one first and append
+  `(Recommended)` to its label with the rationale in its description (Rule 3).
+
+**Fallback only when `AskUserQuestion` is unavailable** (non-interactive harness): use inline
+markdown options instead, still satisfying Rules 2–5:
 
 > **[Question]**
 >
-> - **Option A**: [description] — [trade-off]
-> - **Option B**: [description] — [trade-off] **(Recommended)**
+> - **Option A**: [description] — [trade-off] **(Recommended — [rationale])**
+> - **Option B**: [description] — [trade-off]
 > - **Option C**: [description] — [trade-off]
->
-> **Recommendation**: Option B because [specific reason grounded in this context].
+> - **Other**: write in your own approach.
+
+No bare "What do you think about X?" questions. No yes/no questions without an options list.
+Present the choices; let the user pick or override.
 
 ## After the grilling
 

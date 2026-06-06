@@ -1,6 +1,6 @@
 ---
 name: plan-creating-project-plans
-description: Comprehensive project planning standards for plans/ directory including folder structure (ideas.md, backlog/, in-progress/, done/), stage-aware naming convention (backlog/done use YYYY-MM-DD__identifier/, in-progress uses identifier/ with no date prefix), five-document file organization (README.md, brd.md, prd.md, tech-docs.md, delivery.md for multi-file default; single README.md for trivially-small single-file exception), BRD/PRD content-placement rules, and Gherkin acceptance criteria. Essential for creating structured, executable project plans.
+description: Comprehensive project planning standards for plans/ directory including folder structure (ideas.md, backlog/, in-progress/, done/), stage-aware naming convention (backlog/done use YYYY-MM-DD__identifier/, in-progress uses identifier/ with no date prefix), five-document file organization (README.md, brd.md, prd.md, tech-docs.md, delivery.md for multi-file default; single README.md for trivially-small single-file exception), BRD/PRD content-placement rules, Gherkin acceptance criteria, and the mandatory structured multiple-choice grilling gates (pre-write and post-write) for resolving design decisions with the user. Essential for creating structured, executable project plans.
 ---
 
 # Creating Project Plans
@@ -20,13 +20,22 @@ This Skill provides comprehensive guidance for creating **structured project pla
 
 ## Mandatory Pre-Write and Post-Write Grilling
 
-Before writing any plan file, and again after all files are written, invoke the `grill-me` skill
-to resolve all open design decisions with the user.
+Before writing any plan content, resolve all open design decisions with the user via structured
+multiple-choice grilling (pre-write grill). After writing the plan, validate and stress-test it
+with the user the same way (post-write grill). Neither gate is optional.
 
-**HARD RULE**: Every grill question MUST present **2-4 concrete options** with trade-off
-descriptions. Open-ended questions without options are FORBIDDEN. Use the `AskUserQuestion` tool
-(preferred when available) or the markdown multiple-choice format from `grill-me`. Ground options
-in codebase reality — read relevant files before asking.
+**HARD RULE — 2-4 options required**: Every grilling question MUST present **2-4 concrete,
+mutually exclusive options**. Each option MUST state its trade-off in one sentence. Exactly one
+option MUST be marked `(Recommended)` with a one-sentence rationale. Open-ended questions without
+options are FORBIDDEN. Resolve one decision per question; tightly coupled decisions may be batched
+in a single multi-question prompt.
+
+**Mechanism**: use the `AskUserQuestion` tool (or the harness's native interactive multiple-choice
+tool) first when available; fall back to inline markdown options when it is not.
+
+**Explore before asking**: read the relevant repo artifacts before composing any question. Never
+ask the user something a file read can answer — the repo is the ground truth; the user is the
+tiebreaker for genuinely ambiguous decisions.
 
 **Pre-write grill covers** (each as a structured multiple-choice question):
 
@@ -420,6 +429,9 @@ And their session is created with correct permissions
 
 ### 2. Planning (backlog/)
 
+**Gate**: Resolve all open design decisions with the user via pre-write grilling before writing
+any plan content. See [Mandatory Pre-Write and Post-Write Grilling](#mandatory-pre-write-and-post-write-grilling).
+
 **Actions**:
 
 - Create folder with date\_\_identifier
@@ -442,6 +454,9 @@ And their session is created with correct permissions
 
 ### 4. Completion (done/)
 
+**Gate**: Validate the finished plan with the user via post-write grilling before archiving. See
+[Mandatory Pre-Write and Post-Write Grilling](#mandatory-pre-write-and-post-write-grilling).
+
 **Actions**:
 
 - Validate all acceptance criteria met
@@ -453,16 +468,55 @@ And their session is created with correct permissions
 
 ## Delivery Plan Structure
 
-### Implementation Steps
+### Implementation Steps (TDD Shape — MANDATORY for code-touching items)
 
-Use checkbox format:
+Every delivery checklist item that touches production code MUST be expressed as a
+Red→Green→Refactor cycle. Do not write "implement X, then write tests."
+
+**TDD-shaped format** (each phase is its own checkbox):
 
 ```markdown
-- [ ] Step 1: Description
-  - [ ] Substep 1.1
-  - [ ] Substep 1.2
-- [ ] Step 2: Description
+- [ ] [AI] **RED**: Write failing test for `[specific behavior]` in `[test file path]`
+      — command: `nx run [project]:test:unit`
+      — acceptance: test fails with `[expected error message]`
+  - _Suggested executor: `swe-[lang]-dev`_
+- [ ] [AI] **GREEN**: Implement `[function/component]` in `[file path]`
+      — command: `nx run [project]:test:unit`
+      — acceptance: test passes, no other tests broken
+- [ ] [AI] **REFACTOR**: Clean up `[specific concern]` in `[file path]`
+      — command: `nx run [project]:test:unit`
+      — acceptance: all tests still pass, code is cleaner
 ```
+
+**Multi-cycle format** (when a feature spans multiple mini-cycles):
+
+```markdown
+- [ ] [AI] TDD cycle: [feature name]
+  - [ ] [AI] **RED**: write failing test for happy path
+        — command: `nx run [project]:test:unit`
+        — acceptance: test fails with `[expected error]`
+  - [ ] [AI] **GREEN**: implement minimum code to pass
+        — command: `nx run [project]:test:unit`
+        — acceptance: test passes
+  - [ ] [AI] **RED**: write failing test for error path
+        — command: `nx run [project]:test:unit`
+        — acceptance: test fails with `[expected error]`
+  - [ ] [AI] **GREEN**: implement error handling
+        — command: `nx run [project]:test:unit`
+        — acceptance: both tests pass
+  - [ ] [AI] **REFACTOR**: clean up, remove duplication
+        — command: `nx run [project]:test:unit`
+        — acceptance: all tests still pass
+```
+
+**HARD RULE**: Never combine RED, GREEN, and REFACTOR into a single checkbox. Each phase is its
+own `- [ ]` item. `plan-checker` flags combined items (e.g., `- [ ] Implement X with TDD`) as
+HIGH findings.
+
+Non-code steps (doc edits, config, file creation) do NOT require Red→Green→Refactor. Use a
+direct action + acceptance criterion instead.
+
+**See**: [Test-Driven Development Convention](../../../repo-governance/development/workflow/test-driven-development.md) for the authoritative mandate, including how Gherkin scenarios map to first failing tests.
 
 **Update after completion**:
 
@@ -483,7 +537,8 @@ After implementation steps, add validation:
 ```markdown
 ### Validation Checklist
 
-- [ ] All tests pass
+- [ ] All TDD cycles complete (RED→GREEN→REFACTOR for every code change)
+- [ ] All tests pass (`nx affected -t test:quick`)
 - [ ] Code meets quality standards
 - [ ] Documentation updated
 - [ ] Acceptance criteria verified
@@ -614,25 +669,49 @@ Every delivery plan MUST end with a plan archival section:
 
 ## Common Mistakes
 
-### ❌ Mistake 1: Missing acceptance criteria
+### Mistake 1: Missing acceptance criteria
 
 **Wrong**: Plan without Gherkin scenarios
 **Right**: Every plan has concrete acceptance criteria
 
-### ❌ Mistake 2: Vague requirements
+### Mistake 2: Vague requirements
 
 **Wrong**: "Improve system performance"
 **Right**: "Reduce API response time to <200ms for 95th percentile"
 
-### ❌ Mistake 3: No progress tracking
+### Mistake 3: No progress tracking
 
 **Wrong**: Never updating delivery checklist
 **Right**: Mark items complete with implementation notes
 
-### ❌ Mistake 4: Wrong folder placement
+### Mistake 4: Wrong folder placement
 
 **Wrong**: Active work in backlog/
 **Right**: Move to in-progress/ when starting work
+
+### Mistake 5: Code delivery items without TDD shape
+
+**Wrong**: Combining implementation and test into one checkbox
+
+```markdown
+- [ ] Implement email validation with tests
+```
+
+**Right**: Separate RED, GREEN, REFACTOR phases as independent checkboxes
+
+```markdown
+- [ ] **RED**: Write failing test for email validation in `libs/ts-utils/src/validation.test.ts`
+      — command: `nx run ts-utils:test:unit`
+      — acceptance: test fails with "validateEmail is not defined"
+- [ ] **GREEN**: Implement `validateEmail` in `libs/ts-utils/src/validation.ts`
+      — command: `nx run ts-utils:test:unit`
+      — acceptance: test passes, no other tests broken
+- [ ] **REFACTOR**: Extract regex constant, improve naming
+      — command: `nx run ts-utils:test:unit`
+      — acceptance: all tests still pass
+```
+
+`plan-checker` flags combined TDD items as HIGH severity findings.
 
 ## References
 
@@ -641,8 +720,9 @@ Every delivery plan MUST end with a plan archival section:
 **Related Conventions**:
 
 - [No Secrets in Git Convention](../../../repo-governance/conventions/security/no-secrets-in-git.md) - Hard iron rule: no system secret (keys, passwords, tokens, connection strings, etc.) may appear in any committed plan file. Use placeholders or env-var references instead.
-- [Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation
 - [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md) - Every grill question MUST present 2-4 concrete options; open-ended questions are FORBIDDEN; one option marked recommended; interactive multiple-choice tool preferred
+- [Test-Driven Development Convention](../../../repo-governance/development/workflow/test-driven-development.md) - Mandates TDD (Red→Green→Refactor) for all code changes; defines the required RED/GREEN/REFACTOR three-substep shape for delivery checklists; includes HARD RULE against combining phases into one checkbox
+- [Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation
 - [Trunk Based Development](../../../repo-governance/development/workflow/trunk-based-development.md) - Git workflow (default = direct push to main regardless of execution context; branch + draft PR is opt-in only when explicitly requested)
 - [PR Merge Protocol](../../../repo-governance/development/workflow/pr-merge-protocol.md) - Explicit approval required, all quality gates must pass
 - [Feature Change Completeness](../../../repo-governance/development/quality/feature-change-completeness.md) - Specs, contracts, and tests must update with every feature change

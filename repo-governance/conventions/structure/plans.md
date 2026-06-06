@@ -64,6 +64,8 @@ The `plans/` folder serves as the workspace for project planning activities:
 
 **Key Distinction**: Plans are temporary working documents that eventually move to `done/` and may be archived, while `docs/` contains permanent documentation that evolves over time.
 
+**No secrets in plans**: Plan documents are committed to git — including `done/` history, which is permanent. Never put a secret value (credentials, SSH keys, tokens, API keys, sensitive usernames, or connection strings with real credentials) in any plan. Name the variable and state where the value lives, never the value itself. This is a hard iron rule — see [No Secrets in Git](../security/no-secrets-in-git.md).
+
 ## ️ Folder Structure
 
 The `plans/` folder is organized into four main components:
@@ -203,6 +205,12 @@ archiving from `in-progress/`, add the completion date prefix.
 - `2025-11-24__init_monorepo/` (underscores in identifier)
 
 ## Plan Contents
+
+> **No secrets (HARD RULE)**: Plan documents are committed to git. NEVER place system secrets
+> — SSH keys, passwords, sensitive usernames, API keys, tokens, or connection strings with real
+> credentials — in any plan file. Reference secrets by variable name and location only (e.g.
+> "set `DEPLOY_TOKEN` in `.env`"); real values belong in uncommitted files. See the
+> [No Secrets in Git convention](../security/no-secrets-in-git.md).
 
 Plans can use either **single-file** or **multi-file** structure depending on size and complexity.
 
@@ -414,6 +422,12 @@ Order phases so each builds on a green predecessor. Phase 0 (Environment Setup a
 
 **Enforcement**: `plan-checker` flags any phase lacking a `### Phase N Gate` as **HIGH**, and flags a gate lacking concrete verification commands or criteria, or a missing Pause Safety note, as **MEDIUM**. `plan-execution-checker` verifies each phase gate was satisfied before the next phase's work began (via git history). `plan-fixer` adds missing gates and Pause Safety notes.
 
+### Applicability (Execution Markers + Phase Gates)
+
+Both HARD RULES above — Executor Tagging and Phases as Natural Pauses With Clear Gates — apply to **net-new plans at authoring time**: a plan created after this convention landed MUST comply from creation, and `plan-checker` flags missing markers or gates as HIGH on those plans.
+
+**In-progress plans authored before this convention are grandfathered and retrofitted lazily**: a plan already under `plans/in-progress/` when the convention landed is not retroactively invalid. Each phase gains its `[AI]`/`[HUMAN]` markers and its `### Phase N Gate` + **Pause Safety** note the next time that phase is touched during execution (the executor adds them as it works the phase). Do NOT bulk-fabricate gate checks for unstarted phases of a pre-existing plan — fabricated, ungroundable acceptance checks violate the anti-hallucination rule. `plan-checker` does not raise HIGH findings against grandfathered in-progress plans solely for missing markers/gates; it flags them only on the phases being newly added or edited. New plans get no such grace.
+
 ### Worktree Specification
 
 Every plan MUST declare the worktree path in its content so the executor can verify the execution environment before reading the delivery checklist.
@@ -479,8 +493,13 @@ Plans differ from `docs/` in several important ways:
 2. **Formalize when ready**: Create plan folder in `backlog/` when idea is mature
 3. **Follow naming convention**: Use `YYYY-MM-DD__[project-identifier]/` format with the creation date
 4. **Choose structure**: Default to the five-document multi-file layout (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md`). Collapse to single-file only when all four exception criteria in the Structure Decision section are met simultaneously.
-5. **Create content**: Write overview, requirements, tech docs, and delivery sections
-6. **Update index**: Add plan to `backlog/README.md`
+5. **Resolve design decisions via structured grilling**: Before writing plan content, resolve all
+   open design decisions using the
+   [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) — structured
+   multiple-choice questions with 2-4 concrete options, explicit trade-offs, and exactly one Recommended
+   option. Never ask open-ended "what approach?" questions without offering structured options.
+6. **Create content**: Write overview, requirements, tech docs, and delivery sections
+7. **Update index**: Add plan to `backlog/README.md`
 
 ### Starting Work
 
@@ -636,6 +655,7 @@ Use the verification tip from the [Linking Convention](../formatting/linking.md#
 - [Worktree Path Convention](./worktree-path.md) - Worktree routing to `worktrees/<name>/` (referenced by the Worktree Specification rule above)
 - [Plan Anti-Hallucination Convention](../../development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation; consumed by the Execution-Grade Clarity rule above and by the four plan agents
 - [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) - Every grill question during plan creation (pre-write, post-write) MUST present 2-4 concrete options with trade-off descriptions; open-ended questions without options are FORBIDDEN; consumed by plan-maker Steps 1 and 8
+- [No Secrets in Git Convention](../security/no-secrets-in-git.md) - Hard iron rule prohibiting secret values in any committed file, including plans and their permanent `done/` history
 
 **Development Guides**:
 
