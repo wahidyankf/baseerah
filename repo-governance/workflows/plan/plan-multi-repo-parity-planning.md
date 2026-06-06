@@ -2,7 +2,7 @@
 name: plan-multi-repo-parity-planning
 title: "plan-multi-repo-parity-planning"
 goal: Author aligned-but-deliberately-divergent plans across multiple sibling repositories for a shared objective, with every cross-repo deviation grilled, decided, and durably documented
-termination: "One plan per target repo exists, each passes plan-quality-gate (double-zero), every deviation-matrix cell carries a recorded decision, and delivery completed per the selected mode"
+termination: "One plan per target repo exists, each passes plan-quality-gate (double-zero), every deviation-matrix cell carries a recorded decision, research findings are incorporated or skipped with justification, and delivery completed per the selected mode"
 inputs:
   - name: objective
     type: string
@@ -77,8 +77,8 @@ documenting why it differed — demonstrated the pattern this workflow formalize
 
 ## Execution Mode
 
-**Preferred Mode**: Agent Delegation — invoke `plan-maker` for authoring each plan (Steps 4) and
-delegate `plan-quality-gate` for each gated plan (Step 5) via the Agent tool with `subagent_type`.
+**Preferred Mode**: Agent Delegation — invoke `plan-maker` for authoring each plan (Step 6) and
+delegate `plan-quality-gate` for each gated plan (Step 7) via the Agent tool with `subagent_type`.
 `plan-maker`, `plan-checker`, and `plan-fixer` run as delegated agents; file changes persist to the
 actual filesystem. See [Workflow Execution Modes Convention](../meta/execution-modes.md).
 
@@ -96,10 +96,13 @@ The orchestrator:
 
 1. Surveys each target repo's current state relative to the objective
 2. Builds and presents the deviation matrix
-3. Grills the invoker until every matrix cell has a recorded decision
-4. Delegates plan authoring to `plan-maker` per repo
-5. Runs `plan-quality-gate` per plan until double-zero
-6. Delivers per the selected mode
+3. Grills the invoker until every matrix cell has a recorded decision; establishes the
+   research-needed flag
+4. Delegates external research to `web-research-maker` (conditional on research-needed flag)
+5. Grills the invoker again with research findings to validate and close any new decision branches
+6. Delegates plan authoring to `plan-maker` per repo
+7. Runs `plan-quality-gate` per plan until double-zero
+8. Delivers per the selected mode and reports outcomes
 
 ## Invocation Point
 
@@ -222,7 +225,7 @@ repo, and candidate resolutions. No row is decided yet — decisions happen in S
 
 **On failure**: Return to Step 1 and extend the survey for the missing dimension.
 
-### Step 3 — Relentless Grilling (Iterative, Blocking)
+### Step 3 — First Grill (Iterative, Blocking, Hard Gate)
 
 Present the deviation matrix to the invoker. Grill every matrix row to a recorded decision.
 
@@ -245,8 +248,13 @@ Present the deviation matrix to the invoker. Grill every matrix row to a recorde
 **Iterative**: Answers in round N may open new rows. Grill again. Continue until every row is
 resolved and no new rows remain.
 
-**Hard gate**: The workflow MUST NOT proceed to Step 4 while any matrix cell lacks a recorded
+**Hard gate**: The workflow MUST NOT proceed to Step 6 while any matrix cell lacks a recorded
 decision. "We didn't discuss it" is a workflow failure.
+
+**Research-needed flag**: Before closing this grill, establish whether external research is
+required before authoring. Ask explicitly: are there harness or vendor conventions, library or
+tool behavior claims, or cross-repo prior art that need verification? Record the invoker's answer
+as the research-needed flag (yes / no). This flag governs whether Step 4 runs or is skipped.
 
 **Mandatory meta-questions** (surface these explicitly regardless of mode):
 
@@ -257,15 +265,81 @@ decision. "We didn't discuss it" is a workflow failure.
 2. Rationale doc location per repo (where does `<objective-slug>-parity-decisions.md` live in
    each repo?).
 3. Any repo-specific constraint flagged in Step 2 that forces a deviation.
+4. Research-needed flag: are there external claims (harness/vendor conventions, library/tool
+   behavior, prior art) that require verification before authoring the plans?
 
 **Output**: A fully resolved deviation matrix. Every row has a recorded decision and — for
-deviations — a recorded justification. This matrix is the source of truth for all authoring
-in Step 4.
+deviations — a recorded justification. Research-needed flag recorded. This matrix is the source
+of truth for all authoring in Step 6.
 
 **On invoker abandonment**: Terminate workflow with status `fail`. Partial grilling produces no
 value; do not author plans with unresolved matrix rows.
 
-### Step 4 — Plan Authoring (One Plan Per Repo)
+### Step 4 — Web Research (Sequential, Conditional)
+
+Delegate external research to `web-research-maker` to verify claims and gather authoritative
+sources before plan authoring begins.
+
+**Skip condition**: Skip if ALL hold:
+
+1. The objective is a purely internal governance or structural change with no external claims
+2. No harness/vendor conventions, library versions, tool behavior, or cross-repo prior art need
+   verification
+3. The invoker confirmed in Step 3 that no research is needed (research-needed flag = no)
+
+If skipping: emit `Step 4 skipped — no external research needed (confirmed in Step 3).`
+
+**If NOT skipping**:
+
+Invoke `web-research-maker` via the Agent tool. Provide a focused research prompt covering:
+
+- Vendor or harness conventions the objective touches (e.g., CI runner behavior, tool API
+  contracts, platform-specific constraints)
+- Prior art: has anyone formalized this cross-repo alignment pattern? Known failure modes?
+- Library or tool behavior referenced in the objective (versions, API signatures, caveats)
+- Risks or caveats not surfaced in the Step 1 inventories
+
+**Agent**: `web-research-maker`
+
+**Output**: Cited, structured research findings. Passed to Step 5 grill and included in the
+`plan-maker` handoffs in Step 6. If skipped, the skip line is included in Step 6 handoffs
+in place of research findings.
+
+### Step 5 — Second Grill (Post-Research, Sequential)
+
+Present research findings and grill again to validate direction and close any new decision
+branches opened by the research.
+
+**Orchestrator action**:
+
+1. Summarize research findings from Step 4 (or confirm skipped)
+2. Invoke the grilling protocol. Every question MUST follow the
+   [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md):
+   2-4 concrete options, explicit trade-offs, exactly one Recommended, native interactive tool
+   when available. Cover:
+   - Do the research findings change any decision from Step 3? (options: yes — which decision /
+     no — proceed as agreed / partial — one or more decisions need refinement)
+   - Are there new constraints or trade-offs surfaced by the research that apply to one or more
+     repos differently?
+   - Does the proposed cross-repo alignment approach still hold after checking authoritative
+     sources?
+   - Are there risks the invoker wants to explicitly accept or mitigate in the plans?
+3. Matrix rows may be added or updated based on findings — every new or changed row requires a
+   recorded decision before proceeding
+4. Confirm the updated direction before proceeding to Step 6
+
+**Do NOT proceed to Step 6** until all branches from this grill are resolved and mutual
+understanding is confirmed incorporating research.
+
+**Notes**:
+
+- If research was skipped in Step 4, this is a brief confirmation pass, not a full grill session
+- All new branches must be resolved before invoking `plan-maker`
+
+**Output**: Final direction confirmed. Research findings integrated into the deviation matrix.
+Every matrix row (original and new) carries a recorded decision.
+
+### Step 6 — Plan Authoring (One Plan Per Repo)
 
 Author a five-document plan (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md`)
 in each target repo per the
@@ -281,17 +355,19 @@ in each target repo per the
 Provide a self-contained handoff prompt per repo covering:
 
 1. Objective (verbatim from input)
-2. Resolved decisions from Step 3 (the full deviation matrix with recorded decisions)
-3. This repo's specific deviations and their justifications
-4. Confirmed plan folder path (per stage above)
-5. Cross-links to the sibling plans in the other repos (even if those plans are not yet
+2. Resolved decisions from Steps 3 and 5 (the full deviation matrix with recorded decisions)
+3. Research findings from Step 4 (cited) — or note that research was skipped
+4. This repo's specific deviations and their justifications
+5. Confirmed plan folder path (per stage above)
+6. Cross-links to the sibling plans in the other repos (even if those plans are not yet
    authored — use the expected paths)
-6. Delivery mode (from `mode` input)
+7. Delivery mode (from `mode` input)
 
 Each plan MUST include:
 
-**(a) Full deviation matrix** with justifications in `tech-docs.md`. Every row from the Step 3
-output appears verbatim, including the chosen resolution and justification for any deviation.
+**(a) Full deviation matrix** with justifications in `tech-docs.md`. Every row from the Steps 3
+and 5 output appears verbatim, including the chosen resolution and justification for any
+deviation.
 
 **(b) Cross-links to sibling plans** in each of the other target repos. Use the expected paths
 at the agreed stage. Example (from a plan at `plans/in-progress/foo/README.md`):
@@ -322,10 +398,10 @@ the [plan-execution workflow](./plan-execution.md).
 
 **Success criteria**: Five-document plan exists at the resolved path in each target repo.
 
-**On failure**: Surface the error. Do not proceed to Step 5 for the failing repo until the plan
+**On failure**: Surface the error. Do not proceed to Step 7 for the failing repo until the plan
 is authored.
 
-### Step 5 — Quality Gate (Per Plan, Nested Workflow)
+### Step 7 — Quality Gate (Per Plan, Nested Workflow)
 
 Run [plan-quality-gate](./plan-quality-gate.md) for each created plan in its own repo.
 
@@ -344,7 +420,9 @@ issue — surface it to the invoker before proceeding with delivery of the passi
 
 **Success criteria**: Every plan in the parity set reaches `pass`.
 
-### Step 6 — Delivery (Per Mode)
+### Step 8 — Delivery and Finalization (Per Mode)
+
+#### Part A — Delivery
 
 Commit and deliver per the selected mode.
 
@@ -373,7 +451,7 @@ docs(explanation): add <objective-slug> parity decisions rationale
 **On push failure**: Surface the error. Do not retry automatically — conflicts require invoker
 resolution.
 
-### Step 7 — Finalization
+#### Part B — Finalization
 
 Report outcomes.
 
@@ -403,8 +481,8 @@ deviations and zero silent deviations has done exactly what this workflow exists
 
 **Failure** (`fail`):
 
-- Technical errors that prevent step completion, or the invoker abandons grilling (Step 3)
-  before all matrix rows are resolved — partial grilling produces no valid plans
+- Technical errors that prevent step completion, or the invoker abandons grilling (Step 3 or
+  Step 5) before all matrix rows are resolved — partial grilling produces no valid plans
 
 ## Grilling Contract
 
@@ -440,9 +518,10 @@ User: "Run plan-multi-repo-parity-planning for objective: standardize markdown g
        ose-public, ose-primer, and ose-infra"
 ```
 
-The orchestrator surveys each repo, builds the deviation matrix, grills the invoker, authors
-three plans (one per repo) in `plans/in-progress/standardize-markdown-gates/`, gates each
-plan, and pushes each plan to its repo's `origin main` via worktrees.
+The orchestrator surveys each repo, builds the deviation matrix, grills the invoker (Step 3),
+optionally delegates research to `web-research-maker` (Step 4), grills again post-research
+(Step 5), authors three plans (one per repo) in `plans/in-progress/standardize-markdown-gates/`,
+gates each plan, and pushes each plan to its repo's `origin main` via worktrees.
 
 ### worktree-to-pr with backlog stage
 
@@ -492,7 +571,7 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
 
 ## Related Workflows
 
-- [Plan Quality Gate](./plan-quality-gate.md) — nested workflow called in Step 5 for each plan
+- [Plan Quality Gate](./plan-quality-gate.md) — nested workflow called in Step 7 for each plan
 - [Plan Establishment](./plan-establishment-execution.md) — single-repo sibling; this workflow
   is its multi-repo analogue (one plan per repo, one grill session across all repos)
 - [Plan Execution](./plan-execution.md) — downstream workflow that executes the plans this
@@ -504,14 +583,14 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
   Every cross-repo deviation is explicitly surfaced, decided, and recorded. No implicit alignment
   is permitted.
 - **[Deliberate Problem-Solving](../../principles/general/deliberate-problem-solving.md)**:
-  Relentless grilling before authoring ensures plans are built on verified, negotiated decisions
-  rather than assumptions about what other repos need.
+  Two grill sessions and an optional research step before authoring ensure plans are built on
+  verified, negotiated decisions rather than assumptions about what other repos need.
 - **[Documentation First](../../principles/content/documentation-first.md)**:
   Plans are the terminal deliverable. The rationale doc in each repo's `docs/explanation/` tree
   makes every decision inspectable by future contributors.
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**:
-  Survey, matrix construction, plan authoring, and quality gating are all orchestrated steps, not
-  manual handoffs.
+  Survey, matrix construction, research, plan authoring, and quality gating are all orchestrated
+  steps, not manual handoffs.
 - **[No Time Estimates](../../principles/content/no-time-estimates.md)**: Workflow describes
   what is produced and what decisions are required, never how long each step takes.
 
@@ -526,8 +605,8 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
 - **[Worktree Path Convention](../../conventions/structure/worktree-path.md)**: Worktrees land
   at `worktrees/<objective-slug>/` in the repo root.
 - **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)**:
-  Step 3 grill presents 2-4 concrete options per question; one option is marked Recommended;
-  open-ended questions without options are forbidden.
+  Steps 3 and 5 grill sessions present 2-4 concrete options per question; one option is marked
+  Recommended; open-ended questions without options are forbidden.
 - **[Commit Messages Convention](../../development/workflow/commit-messages.md)**: Conventional
   Commits format; thematic splits; imperative mood; no period at end.
 - **[Linking Convention](../../conventions/formatting/linking.md)**: All cross-references use
@@ -539,3 +618,6 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
   default is surfaced in grilling and requires explicit invoker approval.
 - **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: No
   system secret enters any plan file or rationale doc created by this workflow.
+- **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:
+  External research delegated to `web-research-maker` in Step 4 when the research-needed flag
+  is set.

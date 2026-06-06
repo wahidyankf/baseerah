@@ -44,10 +44,10 @@ Invoke specialized agents via the Agent tool with `subagent_type` when the workf
 
 #### When to Use Agent Delegation
 
-- PASS: Workflow step references a named agent (e.g., `plan-checker`, `repo-rules-fixer`)
-- PASS: That agent exists as a defined delegated agent type in the primary binding directory (e.g., `.claude/agents/`)
-- PASS: The step requires persistent file changes (audit reports, fixes)
-- PASS: You want the agent's full specialized validation/fixing logic applied
+- Workflow step references a named agent (e.g., `plan-checker`, `repo-rules-fixer`)
+- That agent exists as a defined delegated agent type in the primary binding directory (e.g., `.claude/agents/`)
+- The step requires persistent file changes (audit reports, fixes)
+- You want the agent's full specialized validation/fixing logic applied
 
 #### Example Usage
 
@@ -103,10 +103,10 @@ User or AI assistant follows workflow steps directly using tools in main context
 
 #### When to Use Manual Orchestration
 
-- PASS: Workflow agents are not available as defined delegated agent types
-- PASS: You want step-by-step visibility and granular control
-- PASS: You want to review changes between each step
-- PASS: Agent delegation is unavailable or fails
+- Workflow agents are not available as defined delegated agent types
+- You want step-by-step visibility and granular control
+- You want to review changes between each step
+- Agent delegation is unavailable or fails
 
 #### Example Usage
 
@@ -124,10 +124,10 @@ AI: [Executes workflow steps directly]
 
 #### Use Task Tool (Isolated) When
 
-- PASS: Agent only reads and analyzes (no file modifications needed)
-- PASS: Exploratory research and recommendations
-- PASS: Information gathering without side effects
-- PASS: Analysis that doesn't require persisting results
+- Agent only reads and analyzes (no file modifications needed)
+- Exploratory research and recommendations
+- Information gathering without side effects
+- Analysis that doesn't require persisting results
 
 **Examples**:
 
@@ -208,9 +208,9 @@ If findings > 0 AND (no max-iterations OR iterations < max-iterations):
 
 ```markdown
 1. Report final status:
-   - PASS: Success (zero findings)
+   - Success (zero findings)
    - Partial (findings remain after max-iterations)
-   - FAIL: Failure (errors during execution)
+   - Failure (errors during execution)
 2. Show git status (modified files)
 3. Wait for user commit approval
 ```
@@ -272,23 +272,23 @@ In the future, a workflow runner could be developed to automate workflow executi
 
 **Agent Invocation**:
 
-- PASS: Use the Agent tool with `subagent_type` matching the workflow's named agent
-- PASS: Pass the relevant scope, report paths, and mode parameters in the prompt
-- PASS: File operations performed by the delegated agent persist to the actual filesystem
-- PASS: Collect delegated agent outputs (report paths) to pass to subsequent steps
+- Use the Agent tool with `subagent_type` matching the workflow's named agent
+- Pass the relevant scope, report paths, and mode parameters in the prompt
+- File operations performed by the delegated agent persist to the actual filesystem
+- Collect delegated agent outputs (report paths) to pass to subsequent steps
 
 ### For AI Assistant in Manual Mode
 
 **File Operations** (when executing workflow logic directly):
 
-- PASS: Use Write tool for creating new files (audit reports, fix reports)
-- PASS: Use Edit tool for modifying existing files (applying fixes)
-- PASS: Use Bash tool for UUID generation, timestamps
-- PASS: All operations persist to actual filesystem
+- Use Write tool for creating new files (audit reports, fix reports)
+- Use Edit tool for modifying existing files (applying fixes)
+- Use Bash tool for UUID generation, timestamps
+- All operations persist to actual filesystem
 
 ## Common Pitfalls
 
-### FAIL: Pitfall 1: Confusing Agent tool and Task tool
+### Pitfall 1: Confusing Agent tool and Task tool
 
 **Important distinction**:
 
@@ -303,7 +303,7 @@ Task tool (wrong for workflows requiring persistence):
   Task(plan-checker) → isolated context → audit report does NOT persist
 ```
 
-### FAIL: Pitfall 2: Using Manual Orchestration when Agent Delegation is available
+### Pitfall 2: Using Manual Orchestration when Agent Delegation is available
 
 **Wrong**:
 
@@ -319,13 +319,13 @@ Agent tool invokes plan-checker subagent → audit report persists
 Agent tool invokes plan-fixer subagent → fixes persist
 ```
 
-### FAIL: Pitfall 3: Expecting automated iteration in manual mode
+### Pitfall 3: Expecting automated iteration in manual mode
 
 **Wrong**: Assume workflow will iterate automatically until zero findings
 
 **Right**: Manually control iteration, review between cycles
 
-### FAIL: Pitfall 4: Not checking git status after workflow
+### Pitfall 4: Not checking git status after workflow
 
 **Wrong**: Assume changes didn't happen because no visual feedback
 
@@ -333,17 +333,17 @@ Agent tool invokes plan-fixer subagent → fixes persist
 
 ## Principles Implemented/Respected
 
-- PASS: **Explicit Over Implicit**: Clear description of execution mode behavior
-- PASS: **Simplicity Over Complexity**: Two clearly defined modes with explicit decision flow
-- PASS: **Documentation First**: Document current reality, not ideal future state
-- PASS: **No Time Estimates**: Focus on what to do, not how long it takes
-- PASS: **Automation Over Manual**: Agent Delegation preferred over manual execution
+- **Explicit Over Implicit**: Clear description of execution mode behavior
+- **Simplicity Over Complexity**: Two clearly defined modes with explicit decision flow
+- **Documentation First**: Document current reality, not ideal future state
+- **No Time Estimates**: Focus on what to do, not how long it takes
+- **Automation Over Manual**: Agent Delegation preferred over manual execution
 
 ## Conventions Implemented/Respected
 
-- PASS: **Workflow Pattern Convention**: Defines execution mode for workflows
-- PASS: **AI Agents Convention**: Explains agent invocation patterns
-- PASS: **Temporary Files Convention**: Audit/fix reports in generated-reports/
+- **Workflow Pattern Convention**: Defines execution mode for workflows
+- **AI Agents Convention**: Explains agent invocation patterns
+- **Temporary Files Convention**: Audit/fix reports in generated-reports/
 
 ## Related Documentation
 
@@ -351,3 +351,5 @@ Agent tool invokes plan-fixer subagent → fixes persist
 - [Plan Quality Gate Workflow](../plan/plan-quality-gate.md) - Example workflow using agent delegation
 - [AI Agents Convention](../../development/agents/ai-agents.md) - Agent invocation patterns
 - [Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md) - Validation workflow pattern
+
+---

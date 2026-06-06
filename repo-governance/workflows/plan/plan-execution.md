@@ -89,13 +89,13 @@ The orchestrator selects the best agent for each delivery checklist item using t
 
 0. **Suggested-executor annotation (HIGHEST priority)**: If the checkbox carries a `_Suggested executor: <agent-name>_` annotation per [Plan Anti-Hallucination Convention §Specialized-Agent Delegation](../../development/quality/plan-anti-hallucination.md#specialized-agent-delegation-hallucination-reduction), verify the agent file exists at `.claude/agents/<name>.md` and use that agent. The annotation is the plan author's explicit choice — it overrides heuristics 1–4 below. If the annotated agent does not exist, terminate the item with status `fail` and surface the missing-agent error to the user (do not silently fall back).
 
-1. **Match by project/app name**: If the checklist item names a specific app (e.g., `organiclever-be`), use the agent for that app's language (e.g., `swe-fsharp-dev`). Refer to [CLAUDE.md](../../../CLAUDE.md) for the full app list and their tech stacks.
+1. **Match by project/app name**: If the checklist item names a specific app (e.g., `organiclever-be`), use the agent for that app's language (e.g., `swe-rust-dev`). Refer to [CLAUDE.md](../../../CLAUDE.md) for the full app list and their tech stacks.
 
-2. **Match by file extension**: If the item references files with a recognizable extension (`.ts`/`.tsx` → `swe-typescript-dev`, `.go` → `swe-golang-dev`, `.rs` → `swe-rust-dev`, `.fs`/`.fsproj` → `swe-fsharp-dev`, `.cs`/`.csproj` → `swe-csharp-dev`), use the corresponding `swe-{language}-dev` agent.
+2. **Match by file extension**: If the item references files with a recognizable extension (`.ts`, `.java`, `.py`, `.go`, `.kt`, `.fs`, `.cs`, `.clj`, `.ex`, `.rs`, `.dart`), use the corresponding `swe-{language}-dev` agent.
 
 3. **Match by content type**: If the item involves documentation (`docs/`, `README.md`), governance (`repo-governance/`), specs (`specs/`), or E2E tests (`*-e2e`, Playwright), use the appropriate content agent (`docs-maker`, `repo-rules-maker`, `readme-maker`, `specs-maker`, `swe-e2e-dev`).
 
-4. **Match by framework/tool keywords**: If the item mentions a framework (Axum, Next.js, Giraffe), use the agent for that framework's language.
+4. **Match by framework/tool keywords**: If the item mentions a framework (Spring Boot, Ktor, FastAPI, Gin, Phoenix, Giraffe, Axum, Pedestal, Next.js, Flutter), use the agent for that framework's language.
 
 5. **Fallback (direct execution)**: If no specialized agent cleanly matches — e.g., a one-line edit to a governance doc, a grep or file-move operation, an `npm` command — the orchestrator executes the item directly via `Edit` / `Bash` without delegating. Direct execution is only for trivial, context-bounded work; substantive changes always route through an agent.
 
@@ -265,7 +265,6 @@ Execute all delivery checklist items sequentially, delegating each to the approp
 For each checklist item in reading order (phase by phase, item by item, including nested sub-bullets):
 
 1. **`TaskUpdate in_progress`** on the matching task. At most ONE `in_progress` at a time.
-   1a. **Executor-tag check (HARD GATE — [AI] vs [HUMAN])**: read the checkbox's leading tag. If it is `[HUMAN]` (or the human portion of an `[AI+HUMAN]` item), STOP autonomous execution: surface the item to the user verbatim with its acceptance criterion and any context they need, and wait for the user to confirm it is done before ticking the checkbox and continuing. Do NOT fabricate completion of a human-only step. For `[AI+HUMAN]`, perform the agent-preparable portion first, then hand off the human portion. `[AI]` (or unmarked) items proceed normally. See [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
 2. **Pre-Item Repo-Grounding (HARD GATE — Anti-Hallucination)**: before delegating, repo-ground every claim in the checkbox per the [Plan Anti-Hallucination Convention §Repo-Grounding Rule](../../development/quality/plan-anti-hallucination.md#repo-grounding-rule-hard):
    - For each cited file path: `Bash test -f <path>`. If missing AND not marked `_New file_`: HALT the item, escalate to user with the failing path (do not invent a substitute).
    - For each cited Nx target: `jq -r '.targets | keys[]' apps/<project>/project.json | grep -qx '<target>'`. If missing AND not marked `_New target_`: HALT the item.
@@ -273,15 +272,16 @@ For each checklist item in reading order (phase by phase, item by item, includin
    - For each cited symbol: `Grep` for evidence. Missing AND not marked `_New symbol_`: HALT.
    - **Refuse-on-uncertainty**: if a cited fact cannot be grounded and the checkbox does not mark it as new, the orchestrator MUST escalate rather than guess. Surface the failure to the user with the specific claim and the missing artifact.
 3. **Analyze the item** to determine whether to delegate to a specialized agent (see Agent Selection) or execute directly. If the checkbox carries a `_Suggested executor:_` annotation, use that agent (Priority 0). If the checklist text is otherwise ambiguous, the orchestrator MAY consult the plan's `brd.md` / `prd.md` / `tech-docs.md` for additional context — business intent lives in `brd.md`, product scope and Gherkin acceptance criteria in `prd.md`, architecture decisions in `tech-docs.md`.
-4. **Execute the item** — delegate to that agent via the Agent tool, or perform the edit/command directly. Only for THIS one checkbox.
-5. **Verify the work succeeded** — read the produced file, run the command, check the agent's output. The verification MUST match the acceptance criterion stated in the checkbox (Execution-Grade Clarity rule from the plans convention).
-6. **Atomic Sync Ritual** — all three steps before any next-item work:
+4. **Execution-marker check (`[AI]`/`[HUMAN]`)** — read the checkbox's execution marker (per [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)). `[AI]` or unmarked → execute normally (next bullet). `[HUMAN]` (or the human portion of an `[AI+HUMAN]` item) → the orchestrator MUST NOT attempt it: surface the item to the user verbatim with its acceptance criterion and any context they need, then STOP and wait for the user to confirm it is done before ticking the checkbox and continuing. For `[AI+HUMAN]`, perform the agent-preparable portion first, then hand off the human portion. This is a sanctioned stop (see Stopping rules) — not a violation of "never stop between phases."
+5. **Execute the item** — delegate to that agent via the Agent tool, or perform the edit/command directly. Only for THIS one checkbox.
+6. **Verify the work succeeded** — read the produced file, run the command, check the agent's output. The verification MUST match the acceptance criterion stated in the checkbox (Execution-Grade Clarity rule from the plans convention).
+7. **Atomic Sync Ritual** — all three steps before any next-item work:
    a. `Edit` delivery.md to change `- [ ]` → `- [x]` for THIS one item (context-unique `old_string`; never `replace_all`; never tick multiple items in one Edit call).
    b. `Edit` delivery.md to add the implementation-notes block (Date, Status, Files Changed, brief notes) under the ticked checkbox. Notes MUST themselves be repo-grounded — only state files actually modified, only quote commands actually run.
    c. `TaskUpdate completed` on the matching task.
-7. Proceed IMMEDIATELY to the next item — no pausing, no waiting for approval, no deferring notes.
+8. Proceed IMMEDIATELY to the next item — no pausing, no waiting for approval, no deferring notes.
 
-Nested sub-checkboxes iterate the same loop. A parent `- [ ]` can only be ticked after all its sub-`- [ ]` items have each completed steps 1–5 of the loop.
+Nested sub-checkboxes iterate the same loop. A parent `- [ ]` can only be ticked after all its sub-`- [ ]` items have each completed steps 1–6 of the loop.
 
 **Progress streaming**: keep the live Task list fresh by executing the ritual after every item. Never queue up two or three item's worth of `completed` updates. After each phase boundary, emit a one-line user-visible status (phase, items ticked / total, files changed, preexisting fixes).
 
@@ -295,26 +295,19 @@ Nested sub-checkboxes iterate the same loop. A parent `- [ ]` can only be ticked
 
 - Stop ONLY if a task fails and CANNOT be resolved after retry.
 - Stop ONLY if a critical decision requires user input that cannot be inferred.
-- Stop at a `[HUMAN]` / `[AI+HUMAN]` item (including a `[HUMAN]` phase gate) — hand off to the user, wait for confirmation, then resume. This is the one expected mid-execution pause.
+- Stop at a `[HUMAN]` step (sanctioned) — surface the action to the user and resume on confirmation per the Execution-marker check above. This is the one routine non-technical stop and does NOT violate "never stop between phases."
 - Stop ONLY when ALL items are complete.
-- NEVER stop between phases for `[AI]` work (a `[HUMAN]` gate is the sole exception).
+- NEVER stop between phases for approval — but DO verify the phase's `### Phase N Gate` is green before starting the next phase (a self-run verification checkpoint, not a wait-for-user pause); fix any failing gate check within the current phase first.
 - NEVER batch-tick checkboxes, batch-complete tasks, or defer implementation notes.
 - NEVER skip an item — if genuinely not applicable, add a note explaining why and tick it.
 
 ### 2b. Per-Phase Quality Gate (Sequential, After Each Phase)
 
-After completing all items in a delivery phase, satisfy that phase's gate before proceeding.
-
-**Phase gate is on-disk**: each phase in `delivery.md` ends with a `### Phase N Gate` (a must-pass
-verification checklist) followed by a `> **Pause Safety**:` note, per [Plans Organization Convention §Phases as Natural Pauses With Clear Gates](../../conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
-Execute each gate checkbox like any other item (it is part of the 1:1 task mapping), confirm every
-gate check passes, and only then start phase N+1. A gate item tagged `[HUMAN]` is a hand-off — stop
-and wait for the user (Iron Rule 2). The phase boundary is a natural pause point: after the gate is
-green the tree is coherent and execution could safely stop and resume later. The Nx commands below
-are the standard verification a code phase's gate asserts.
+After completing all items in a delivery phase, verify the phase's authored gate and run quality gates before proceeding.
 
 **Orchestrator action**:
 
+0. **Verify the phase's `### Phase N Gate` (barrier)**: run every check listed under the phase's `### Phase N Gate` heading and confirm each passes its stated acceptance. A phase is **not complete until its gate is green** — do NOT start phase N+1 while any gate check is failing; fix it within the current phase first. If the gate carries a **Pause Safety** note, the post-gate state is a sanctioned safe-to-stop point. (Gate checks assert on patterns/placeholders, never a real secret literal.) See [Plans Organization Convention §Phases as Natural Pauses With Clear Gates](../../conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
 1. Run local quality gates:
 
    ```bash

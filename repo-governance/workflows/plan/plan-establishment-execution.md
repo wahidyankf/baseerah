@@ -32,7 +32,9 @@ inputs:
 outputs:
   - name: plan-path
     type: string
-    description: Path to the created plan in the resolved target-stage directory
+    description: >
+      Path to the created plan in the resolved target stage (plans/in-progress/<identifier>/ or
+      plans/backlog/<YYYY-MM-DD>__<identifier>/)
   - name: final-status
     type: enum
     values: [pass, partial, fail]
@@ -84,6 +86,24 @@ via the `grill-me` Skill, delegating research to `web-research-maker` and plan w
 Grill sessions run in the calling context (not delegated) so the user's conversation is preserved
 across all turns.
 
+**Worktree default**: All plan authoring happens inside a dedicated worktree at
+`worktrees/<identifier>/`. If the worktree does not already exist, provision it before Step 4:
+
+```bash
+git worktree add -b <identifier> worktrees/<identifier> main
+cd worktrees/<identifier>
+npm install
+npm run doctor -- --fix
+```
+
+All subsequent file operations — including the plan files written by `plan-maker` — are relative
+to the worktree root. The resolved `<plan-dir>` (e.g., `plans/in-progress/<identifier>/`) is a
+path within that worktree. See the
+[Worktree Path Convention](../../conventions/structure/worktree-path.md) for the canonical
+worktree location and the
+[Worktree Toolchain Initialization guide](../../development/workflow/worktree-setup.md) for the
+full post-provisioning setup sequence.
+
 ```
 User: "Establish a plan to [describe desired change]"
 ```
@@ -121,14 +141,13 @@ Invoke the `grill-me` Skill to resolve all open design decisions before research
 **Orchestrator action**:
 
 Invoke the `grill-me` Skill (`.claude/skills/grill-me/SKILL.md`). Present Step 0 findings.
+Every question in this grill MUST follow the
+[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md): present
+2-4 concrete, mutually exclusive options with explicit trade-offs, mark exactly one option
+Recommended, and use the harness's native interactive multiple-choice tool when available
+(markdown fallback otherwise). Open-ended questions without options are FORBIDDEN.
 
-**Multiple-options requirement (HARD RULE)**: Every question in this grill session MUST present
-2-4 concrete options with trade-off descriptions. Use an interactive multiple-choice tool when
-available (e.g., `AskUserQuestion`) or the markdown question format from `grill-me`. Open-ended
-questions without options are FORBIDDEN. Ground options in what Step 0 repo exploration already
-established.
-
-Resolve ALL of the following (each as a structured multiple-choice question):
+Resolve ALL of the following:
 
 1. **Scope**: What is the exact behavior to adopt? What is explicitly out-of-scope?
 2. **Affected files**: Which governance files, agents, or workflows will change?
@@ -198,9 +217,10 @@ Present research findings and grill again to validate direction and close new br
 **Orchestrator action**:
 
 1. Summarize research findings from Step 2 (or confirm skipped)
-2. Invoke the `grill-me` Skill. **Multiple-options requirement (HARD RULE)**: Every question
-   MUST present 2-4 concrete options grounded in the research findings. Use an interactive
-   multiple-choice tool when available, or the markdown question format. Cover:
+2. Invoke the `grill-me` Skill. Every question MUST follow the
+   [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md):
+   2-4 concrete options, explicit trade-offs, exactly one Recommended, native interactive tool
+   when available. Cover:
    - Do the research findings change any decision from Step 1? (options: yes — which decision /
      no — proceed as agreed / partial — one or more decisions need refinement)
    - Are there new constraints or trade-offs surfaced by the research?
@@ -228,13 +248,15 @@ Delegate via the Agent tool. Provide a self-contained handoff prompt containing 
 1. Original user prompt (verbatim)
 2. Resolved design decisions from Steps 1 and 3 (numbered decision list)
 3. Research findings from Step 2 (cited) — or note that research was skipped
-4. Confirmed plan identifier and resolved `<plan-dir>` (the exact target folder)
+4. Confirmed plan identifier and resolved `<plan-dir>` (the exact target folder, relative to the
+   worktree root at `worktrees/<identifier>/`)
 5. Confirmed push target
 6. Definition of done (from Step 1)
-7. **Explicit instruction**: write the plan directly to the resolved `<plan-dir>`. For
-   `target-stage=in-progress` this is `plans/in-progress/<identifier>/` (no date prefix); for
-   `target-stage=backlog` this is `plans/backlog/<YYYY-MM-DD>__<identifier>/` (creation-date
-   prefix). Do NOT place an `in-progress` plan under `backlog/` or vice versa.
+7. **Explicit instruction**: write the plan directly to the resolved `<plan-dir>` inside the
+   worktree at `worktrees/<identifier>/`. For `target-stage=in-progress` this is
+   `plans/in-progress/<identifier>/` (no date prefix); for `target-stage=backlog` this is
+   `plans/backlog/<YYYY-MM-DD>__<identifier>/` (creation-date prefix). Do NOT place an
+   `in-progress` plan under `backlog/` or vice versa.
 
 **Note on plan-maker's own grill protocol**: `plan-maker` mandates a pre-write grill (Step 1) and
 a post-write grill (Step 8). When invoked by `plan-establishment`, these become
@@ -286,18 +308,27 @@ consecutive checks).
 
 ### 7. Push and Verify (Sequential)
 
-Commit and push the plan to the confirmed target.
+Commit and push the plan to the confirmed target, then remove the worktree.
 
 **Orchestrator action**:
 
-1. Stage all plan files: `git add <plan-dir>`
-2. Commit: `chore(plans): establish <identifier> plan` (for `target-stage=backlog`, use
-   `chore(plans): add <identifier> to backlog`)
-3. Push to the confirmed target from Step 1: `git push <confirmed-target>`
+1. From inside the worktree (`worktrees/<identifier>/`), stage all plan files:
+   `git add <plan-dir>`
+2. Commit inside the worktree: `chore(plans): establish <identifier> plan` (for
+   `target-stage=backlog`, use `chore(plans): add <identifier> to backlog`)
+3. Push from the worktree to the confirmed target (default `origin main`):
+   `git push <confirmed-target> HEAD:main`
 4. Monitor GitHub Actions: `gh run list --limit 5` — verify all triggered workflows complete
    with `completed/success` conclusion
 5. If a CI workflow fails: diagnose root cause, fix, push a follow-up commit, re-monitor
-6. Emit a user-visible summary: plan path, quality gate status, push target, CI status
+6. After CI passes, remove the worktree from the repo root:
+
+   ```bash
+   git worktree remove worktrees/<identifier>
+   git branch -d <identifier>
+   ```
+
+7. Emit a user-visible summary: plan path, quality gate status, push target, CI status
 
 **Output**: `plan-path`, `final-status`, `final-report`.
 
@@ -321,7 +352,8 @@ resolution.
 ## Conventions Implemented/Respected
 
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: Creates plans in
-  `plans/in-progress/` with correct identifier format and worktree specification
+  `plans/in-progress/` (default) or `plans/backlog/<YYYY-MM-DD>__<identifier>/` (when
+  `target-stage=backlog`) with correct identifier format and worktree specification
 - **[Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)**:
   Step 1 grill includes an explicit harness-neutrality checkpoint for plans touching agents,
   skills, or `repo-governance/` paths
@@ -332,8 +364,8 @@ resolution.
 - **[CI Post-Push Verification Convention](../../development/workflow/ci-post-push-verification.md)**:
   Step 7 monitors GitHub Actions after push
 - **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)**:
-  Steps 1 and 3 grill sessions MUST present 2-4 concrete options per question; open-ended
-  questions without options are FORBIDDEN
+  Steps 1 and 3 grill sessions MUST present 2-4 concrete options with trade-offs, exactly one
+  Recommended option, and use the harness's native interactive multiple-choice tool when available
 
 ## Related Workflows
 
@@ -343,9 +375,10 @@ resolution.
 ## Related Documentation
 
 - [Plans Organization Convention](../../conventions/structure/plans.md)
+- [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) — format
+  and mechanism for Steps 1 and 3 grill sessions
 - [Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)
 - [grill-me Skill](../../../.claude/skills/grill-me/SKILL.md) — Steps 1 and 3
-- [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) — governs all grill sessions in Steps 1 and 3
 - [plan-maker Agent](../../../.claude/agents/plan-maker.md) — Step 4
 - [web-research-maker Agent](../../../.claude/agents/web-research-maker.md) — Step 2
 - [repo-setup-manager Agent](../../../.claude/agents/repo-setup-manager.md) — Phase 0 of plans
