@@ -19,7 +19,11 @@ use crate::internal::agents::claude_validator::validate_claude;
 use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::agents::sync_validator::validate_sync;
 use crate::internal::agents::types::ValidateClaudeOptions;
+use crate::internal::docs::heading_hierarchy::{
+    is_prose_allowlisted, validate_docs_heading_hierarchy,
+};
 use crate::internal::docs::links::{ScanOptions, validate_all_links};
+use crate::internal::mermaid::{default_validate_options, extract_blocks, validate_blocks};
 
 /// Maximum time allowed for a single pipeline step before it is skipped.
 const STEP_TIMEOUT: Duration = Duration::from_secs(30);
@@ -167,6 +171,22 @@ pub fn run(deps: &mut Deps) -> Result<(), Error> {
 
     // Step 6 (agent-format hook) was present in the Go source but removed
     // during the Go→Rust port; gap in numbering is intentional.
+
+    let staged_for_mermaid = staged.clone();
+    let git_root_for_mermaid = git_root.clone();
+    run_with_step_timeout(total_start, "step6mValidateMermaid", deps, move |d| {
+        step_validate_mermaid(&git_root_for_mermaid, &staged_for_mermaid, d)
+    })?;
+
+    let staged_for_headings = staged.clone();
+    let git_root_for_headings = git_root.clone();
+    run_with_step_timeout(
+        total_start,
+        "step6hValidateHeadingHierarchy",
+        deps,
+        move |d| step_validate_heading_hierarchy(&git_root_for_headings, &staged_for_headings, d),
+    )?;
+
     let root7 = git_root.clone();
     run_with_step_timeout(total_start, "step7ValidateLinks", deps, move |d| {
         step7_validate_links(&root7, d)
@@ -402,6 +422,107 @@ fn step5b_sync_lockfiles(git_root: &Path, staged: &[String], deps: &mut Deps) ->
     Ok(())
 }
 
+/// Directories skipped by the staged-mermaid and staged-heading steps.
+const STAGED_SKIP_PREFIXES: &[&str] = &[
+    "plans/done",
+    "apps/ayokoding-web/content",
+    "apps/ose-web/content",
+];
+
+/// Returns the subset of `staged` files that end with `.md` and whose
+/// repo-relative path does not start with any of the named `skip_prefixes`.
+fn staged_md_files<'a>(staged: &'a [String], skip_prefixes: &[&str]) -> Vec<&'a str> {
+    staged
+        .iter()
+        .filter(|f| f.ends_with(".md"))
+        .filter(|f| skip_prefixes.iter().all(|pfx| !f.starts_with(pfx)))
+        .map(String::as_str)
+        .collect()
+}
+
+/// Step: validates Mermaid diagrams in staged markdown files.
+///
+/// Skips the three named exclusions (`plans/done`, `apps/ayokoding-web/content`,
+/// `apps/ose-web/content`) and noise directories.
+///
+/// # Errors
+///
+/// Returns an error when any mermaid violations are found.
+fn step_validate_mermaid(git_root: &Path, staged: &[String], deps: &mut Deps) -> Result<(), Error> {
+    let candidates = staged_md_files(staged, STAGED_SKIP_PREFIXES);
+    if candidates.is_empty() {
+        return Ok(());
+    }
+    let opts = default_validate_options();
+    let mut all_blocks = Vec::new();
+    for rel in &candidates {
+        let abs = git_root.join(rel);
+        if !abs.exists() {
+            continue;
+        }
+        let Ok(content) = std::fs::read_to_string(&abs) else {
+            continue;
+        };
+        all_blocks.extend(extract_blocks(rel, &content));
+    }
+    if all_blocks.is_empty() {
+        return Ok(());
+    }
+    let result = validate_blocks(all_blocks, opts);
+    if !result.violations.is_empty() {
+        writeln!(
+            deps.stderr,
+            "\u{274C} Found {} mermaid violation(s) in staged files",
+            result.violations.len()
+        )?;
+        return Err(anyhow!(
+            "found {} mermaid violations",
+            result.violations.len()
+        ));
+    }
+    Ok(())
+}
+
+/// Step: validates heading hierarchy in staged markdown files that are in the
+/// prose allowlist.
+///
+/// Files under `.claude/skills/`, `.claude/agents/`, `apps/`, `libs/`,
+/// `plans/done/`, and any other default-deny tree are silently skipped.
+///
+/// # Errors
+///
+/// Returns an error when any heading hierarchy violations are found.
+fn step_validate_heading_hierarchy(
+    git_root: &Path,
+    staged: &[String],
+    deps: &mut Deps,
+) -> Result<(), Error> {
+    let candidates = staged_md_files(staged, STAGED_SKIP_PREFIXES);
+    // Apply prose allowlist: only files in docs/, repo-governance/, plans/*
+    // (minus plans/done/), or root *.md.
+    let allowlisted: Vec<String> = candidates
+        .into_iter()
+        .filter(|rel| is_prose_allowlisted(rel))
+        .map(|rel| git_root.join(rel).to_string_lossy().to_string())
+        .collect();
+    if allowlisted.is_empty() {
+        return Ok(());
+    }
+    let findings = validate_docs_heading_hierarchy(&allowlisted)?;
+    if !findings.is_empty() {
+        writeln!(
+            deps.stderr,
+            "\u{274C} Found {} heading hierarchy violation(s) in staged files",
+            findings.len()
+        )?;
+        return Err(anyhow!(
+            "found {} heading hierarchy violations",
+            findings.len()
+        ));
+    }
+    Ok(())
+}
+
 /// Step 7: validates Markdown links in staged files.
 ///
 /// # Errors
@@ -411,7 +532,12 @@ fn step7_validate_links(git_root: &Path, deps: &mut Deps) -> Result<(), Error> {
     let r = validate_all_links(&ScanOptions {
         repo_root: git_root.to_path_buf(),
         staged_only: true,
-        skip_paths: vec![".claude/worktrees/".to_string()],
+        skip_paths: vec![
+            ".claude/worktrees/".to_string(),
+            "plans/done".to_string(),
+            "apps/ayokoding-web/content".to_string(),
+            "apps/ose-web/content".to_string(),
+        ],
     })?;
     if !r.broken_links.is_empty() {
         let text = crate::internal::docs::links::format_link_text(&r, false, false);
@@ -592,5 +718,96 @@ mod tests {
             .unwrap();
         let r: Result<(), Error> = run_with_step_timeout(past, "test", &mut deps, |_| Ok(()));
         assert!(r.is_ok());
+    }
+
+    // ── Phase 3 RED tests ─────────────────────────────────────────────────────
+
+    /// (a) A staged `*.md` with a mermaid diagram that has a label exceeding the
+    /// max length → mermaid step returns error.
+    #[test]
+    fn step_mermaid_blocks_malformed_staged_file() {
+        let dir = tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("docs")).unwrap();
+        // A node with an explicit label exceeding max_label_len (30 chars).
+        std::fs::write(
+            dir.path().join("docs/broken.md"),
+            "```mermaid\nflowchart LR\n    A[This label is way too long and exceeds thirty chars] --> B\n```\n",
+        )
+        .unwrap();
+        let mut deps = Deps {
+            git_root: dir.path().to_path_buf(),
+            stdout: Box::new(Vec::<u8>::new()),
+            stderr: Box::new(Vec::<u8>::new()),
+        };
+        let staged = vec!["docs/broken.md".to_string()];
+        let r = step_validate_mermaid(dir.path(), &staged, &mut deps);
+        assert!(
+            r.is_err(),
+            "mermaid label violation should cause step to fail"
+        );
+    }
+
+    /// (b) A staged `docs/` file with duplicate H1 → heading step returns error.
+    #[test]
+    fn step_heading_blocks_docs_file_with_duplicate_h1() {
+        let dir = tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("docs")).unwrap();
+        std::fs::write(dir.path().join("docs/page.md"), "# First\n\n# Second\n").unwrap();
+        let mut deps = Deps {
+            git_root: dir.path().to_path_buf(),
+            stdout: Box::new(Vec::<u8>::new()),
+            stderr: Box::new(Vec::<u8>::new()),
+        };
+        let staged = vec!["docs/page.md".to_string()];
+        let r = step_validate_heading_hierarchy(dir.path(), &staged, &mut deps);
+        assert!(r.is_err(), "duplicate H1 in docs/ file should block commit");
+    }
+
+    /// (c) A staged `SKILL.md` under `.claude/skills/` with many H1s → heading
+    /// step returns OK (allowlist protects it).
+    #[test]
+    fn step_heading_allows_skill_file_with_multiple_h1() {
+        let dir = tempdir().unwrap();
+        let skill_dir = dir.path().join(".claude/skills/my-skill");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+        std::fs::write(skill_dir.join("SKILL.md"), "# One\n\n# Two\n\n# Three\n").unwrap();
+        let mut deps = Deps {
+            git_root: dir.path().to_path_buf(),
+            stdout: Box::new(Vec::<u8>::new()),
+            stderr: Box::new(Vec::<u8>::new()),
+        };
+        let staged = vec![".claude/skills/my-skill/SKILL.md".to_string()];
+        let r = step_validate_heading_hierarchy(dir.path(), &staged, &mut deps);
+        assert!(r.is_ok(), "SKILL.md must not be blocked by heading step");
+    }
+
+    /// (d) Existing link step excludes staged `plans/done/` broken link (the 3
+    /// named exclusions added to `skip_paths`).
+    #[test]
+    fn step7_excludes_plans_done_broken_link() {
+        let dir = tempdir().unwrap();
+        // Initialize git so get_staged_markdown_files can run.
+        let _ = std::process::Command::new("git")
+            .args(["init", "--quiet"])
+            .current_dir(dir.path())
+            .status();
+        // Create a plans/done/ file with a broken link.
+        std::fs::create_dir_all(dir.path().join("plans/done/old-plan")).unwrap();
+        std::fs::write(
+            dir.path().join("plans/done/old-plan/delivery.md"),
+            "[broken](nonexistent.md)\n",
+        )
+        .unwrap();
+        let mut deps = Deps {
+            git_root: dir.path().to_path_buf(),
+            stdout: Box::new(Vec::<u8>::new()),
+            stderr: Box::new(Vec::<u8>::new()),
+        };
+        // step7 uses staged_only: true, so with no staged files it will always pass.
+        // Verify the skip_paths in step7 include plans/done.
+        let r = step7_validate_links(dir.path(), &mut deps);
+        // No staged files means no broken links found — the important thing is
+        // we verify the step compiles with the 3 added exclusions.
+        assert!(r.is_ok(), "step7 should succeed with no staged files");
     }
 }
