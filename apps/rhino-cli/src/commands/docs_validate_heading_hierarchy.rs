@@ -12,20 +12,22 @@ use serde::Serialize;
 use crate::internal::cliout::OutputFormat;
 use crate::internal::docs::heading_hierarchy::{
     DocsHeadingFinding, validate_docs_heading_hierarchy,
+    validate_docs_heading_hierarchy_allowlisted,
 };
 use crate::internal::git;
 
 /// JSON output schema identifier for this command.
 const SCHEMA: &str = "rhino-cli/docs-validate-heading-hierarchy/v1";
 
-/// Default paths scanned when no positional arguments are supplied.
-const DEFAULT_PATHS: &[&str] = &["docs/", "repo-governance/"];
-
 /// CLI arguments for `docs validate-heading-hierarchy`.
 #[derive(Args, Debug)]
 pub struct ValidateHeadingHierarchyArgs {
     /// Optional positional paths (override defaults).
     pub positional: Vec<String>,
+    /// Repository-relative path prefixes to exclude from scanning.
+    /// May be specified multiple times.
+    #[arg(long = "exclude")]
+    pub exclude: Vec<String>,
 }
 
 /// Single heading hierarchy finding in JSON output.
@@ -66,27 +68,26 @@ pub fn run(
 ) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
-    let rel_paths: Vec<String> = if args.positional.is_empty() {
-        DEFAULT_PATHS
-            .iter()
-            .map(std::string::ToString::to_string)
-            .collect()
-    } else {
-        args.positional.clone()
-    };
-    let full_paths: Vec<String> = rel_paths
-        .iter()
-        .map(|p| {
-            if Path::new(p).is_absolute() {
-                p.clone()
-            } else {
-                repo_root.join(p).to_string_lossy().to_string()
-            }
-        })
-        .collect();
 
-    let findings = validate_docs_heading_hierarchy(&full_paths)
-        .context("docs validate-heading-hierarchy failed")?;
+    let findings = if args.positional.is_empty() {
+        // Use the allowlisted full-repo scan when no explicit paths are given.
+        validate_docs_heading_hierarchy_allowlisted(&repo_root, &args.exclude)
+            .context("docs validate-heading-hierarchy failed")?
+    } else {
+        let full_paths: Vec<String> = args
+            .positional
+            .iter()
+            .map(|p| {
+                if Path::new(p).is_absolute() {
+                    p.clone()
+                } else {
+                    repo_root.join(p).to_string_lossy().to_string()
+                }
+            })
+            .collect();
+        validate_docs_heading_hierarchy(&full_paths)
+            .context("docs validate-heading-hierarchy failed")?
+    };
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),
@@ -232,5 +233,18 @@ mod tests {
         let s = format_markdown(&[sample()]);
         assert!(s.contains("**FAILED**: 1"));
         assert!(s.contains("| a.md | 2 | high | missing-h1 | msg |"));
+    }
+
+    // ── Phase 2 RED: --exclude argument present on ValidateHeadingHierarchyArgs ──
+
+    /// Verifies that the `--exclude` flag can be set on args.
+    #[test]
+    fn args_has_exclude_field() {
+        let args = ValidateHeadingHierarchyArgs {
+            positional: Vec::new(),
+            exclude: vec!["docs".to_string()],
+        };
+        assert_eq!(args.exclude.len(), 1);
+        assert_eq!(args.exclude[0], "docs");
     }
 }

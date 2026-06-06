@@ -30,3 +30,29 @@ Feature: Docs Markdown Heading Hierarchy Validation
     When the developer runs docs validate-heading-hierarchy
     Then the command exits successfully
     And the output reports zero docs heading hierarchy findings
+
+  Scenario: prose-allowlist-runs — docs file triggers a heading finding
+    Given a docs directory containing a markdown file with two H1 headings
+    When the developer runs docs validate-heading-hierarchy
+    Then the command exits with a failure code
+    And the output identifies the duplicate H1 violation in the docs file
+
+  Scenario: agent-skill-file-exempt — no finding for agent or skill files
+    Given a .claude/agents directory containing a markdown file with no H1 heading
+    When the developer runs docs validate-heading-hierarchy
+    Then the command exits successfully
+    And the output reports zero docs heading hierarchy findings
+
+  Scenario: plans-done-excluded — no finding for plans/done files
+    Given a plans/done directory containing a markdown file with a skipped heading level
+    When the developer runs docs validate-heading-hierarchy
+    Then the command exits successfully
+    And the output reports zero docs heading hierarchy findings
+
+  Scenario: exclude-flag-suppresses-tree — --exclude docs suppresses docs findings
+    Given a docs directory containing a markdown file with two H1 headings
+    And a repo-governance directory containing a markdown file with two H1 headings
+    When the developer runs docs validate-heading-hierarchy with --exclude docs
+    Then the command exits with a failure code
+    And the output does not mention the docs file
+    But the output identifies the repo-governance file
