@@ -176,6 +176,22 @@
         "{workspaceRoot}/.claude/**/*.md"
       ]
     },
+    "validate:links": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-links --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
+    },
+    "validate:heading-hierarchy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-heading-hierarchy"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
+    },
     "validate:repo-governance-vendor-audit": {
       "executor": "nx:run-commands",
       "options": {
