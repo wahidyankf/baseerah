@@ -113,7 +113,7 @@ Validate tutorial documents to ensure they are **learning-oriented, well-narrate
 
 ## Validation Criteria
 
-This agent validates using criteria from [Tutorial Convention - Validation Criteria](../../repo-governance/conventions/tutorials/general.md#-validation-criteria).
+This agent validates using criteria from [Tutorial Convention - Validation Criteria](../../repo-governance/conventions/tutorials/general.md#pass-validation-criteria).
 
 **Validation Categories:**
 
@@ -128,7 +128,7 @@ See convention for complete checklist and pass/fail criteria.
 
 ### Quick Reference - Key Checks
 
-All validation criteria are defined in [Tutorial Convention - Validation Criteria](../../repo-governance/conventions/tutorials/general.md#-validation-criteria).
+All validation criteria are defined in [Tutorial Convention - Validation Criteria](../../repo-governance/conventions/tutorials/general.md#pass-validation-criteria).
 
 **Six Validation Categories:**
 
@@ -393,7 +393,7 @@ See `repo-generating-validation-reports` Skill for complete report template stru
 
 ## Anti-Patterns to Check For
 
-Validate against common mistakes defined in [Tutorial Convention - Anti-Patterns](../../repo-governance/conventions/tutorials/general.md#-anti-patterns).
+Validate against common mistakes defined in [Tutorial Convention - Anti-Patterns](../../repo-governance/conventions/tutorials/general.md#fail-anti-patterns).
 
 **Key anti-patterns include:**
 

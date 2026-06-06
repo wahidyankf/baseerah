@@ -49,11 +49,11 @@ Use this agent when:
 
 Seven tutorial types with progressive coverage depth:
 
-1. **Initial Setup** (5-15% coverage) - Environment setup, installation, first run
-2. **Quick Start** (10-25% coverage) - Fast introduction to core features
-3. **Beginner** (25-45% coverage) - Foundational concepts and common patterns
-4. **Intermediate** (45-65% coverage) - Complex scenarios and integration
-5. **Advanced** (65-85% coverage) - Performance tuning, optimization, edge cases
+1. **Initial Setup** (0-5% coverage) - Environment setup, installation, first run
+2. **Quick Start** (5-30% coverage) - Fast introduction to core features
+3. **Beginner** (0-60% coverage) - Foundational concepts and common patterns
+4. **Intermediate** (60-85% coverage) - Complex scenarios and integration
+5. **Advanced** (85-95% coverage) - Performance tuning, optimization, edge cases
 6. **Cookbook** (varies) - Common recipes and solutions
 7. **By Example** (75-90% coverage) - Heavily annotated code examples for experienced developers
 
@@ -294,7 +294,7 @@ return db.users.create({ username, hash });
 - Discuss design decisions, alternatives, and implications
 - Reference related examples or documentation
 
-See [Tutorial Naming Convention - By Example Requirements](../../repo-governance/conventions/tutorials/naming.md#by-example-requirements) for complete annotation standards.
+See [Tutorial Naming Convention - By Example Requirements](../../repo-governance/conventions/tutorials/naming.md#by-example) for complete annotation standards.
 
 ## File Naming
 
@@ -512,8 +512,8 @@ When updating tutorials:
 
 **Related Agents**:
 
-- `.opencode/agents/docs-tutorial-checker.md` - Validates tutorial quality
-- `.opencode/agents/docs-tutorial-fixer.md` - Fixes tutorial issues
-- `.opencode/agents/docs-maker.md` - Creates non-tutorial documentation
+- `.claude/agents/docs-tutorial-checker.md` - Validates tutorial quality
+- `.claude/agents/docs-tutorial-fixer.md` - Fixes tutorial issues
+- `.claude/agents/docs-maker.md` - Creates non-tutorial documentation
 
 **Remember**: Tutorials are learning-oriented. Focus on helping users achieve clear outcomes through step-by-step guidance. Explain WHY things work, not just HOW. Make learning accessible and progressive.
