@@ -214,6 +214,8 @@ The `repo-assessing-criticality-confidence` Skill provides complete confidence l
 - [Maker-Checker-Fixer Pattern Convention](../../repo-governance/development/pattern/maker-checker-fixer.md) - Three-stage workflow
 - [Test-Driven Development Convention §TDD Shape for Delivery Checklists](../../repo-governance/development/workflow/test-driven-development.md#tdd-shape-for-delivery-checklists) - Required three-substep template (RED/GREEN/REFACTOR) for rewriting TDD-shape violations flagged by plan-checker
 - [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) - Rules applied during harness-neutrality scan fixes (Step 5g findings)
+- [Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) - `[AI]`/`[HUMAN]` marker rules, legend, handoff/resume signal requirement (Step 5h fixes)
+- [Plans Organization Convention §Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule) - Phase gate scaffold, Pause Safety note, barrier rule (Step 5h fixes)
 
 You validate thoroughly, apply fixes confidently (for objective issues only), and report transparently. Your goal is to improve plan quality while avoiding false positives.
 
@@ -510,8 +512,8 @@ After rewriting, re-read the checkbox and confirm a sonnet-tier agent could exec
 ## Executor-Tagging and Phase-Gate Fixes (Step 5h Findings)
 
 When `plan-checker` reports executor-tag or phase-gate findings per
-[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
-and [§Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule),
+[Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and [§Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule),
 apply these fixes.
 
 ### 1. Missing Executor Legend
@@ -563,6 +565,45 @@ If the phase's work items lack concrete acceptance criteria to derive gate check
 blockquote: add one stating the safe-to-stop state and the single resume/re-verify command, derived
 from the phase's effect. If the phase's coherent end-state cannot be summarized confidently,
 classify **MEDIUM**.
+
+### 6. Add Missing Handoff / Resume Signal to a `[HUMAN]` Step
+
+Every `[HUMAN]` step MUST contain:
+
+- **(a) What the human does** — described unambiguously.
+- **(b) The observable signal the agent checks to resume** — a concrete, runnable verification (e.g., a shell command).
+
+Template to append when the signal is missing:
+
+```markdown
+- [ ] [HUMAN] <existing step description>. Observable resume signal: <describe signal>;
+      verify with `<runnable command>`.
+```
+
+Example:
+
+```markdown
+- [ ] [HUMAN] Pay the cloud-provider invoice at https://billing.example.com/pay.
+      Observable resume signal: invoice status changes to "Paid"; verify with
+      `curl -s https://billing.example.com/api/status | jq .status` returning `"paid"`.
+```
+
+### 7. Add Missing Legend When `[HUMAN]` Markers Are Present
+
+When any `[HUMAN]` marker exists in `delivery.md` (or the single-file delivery section) and no legend is present near the top, insert the following blockquote immediately after the `# Delivery…` heading (or after the `## Worktree` section if present):
+
+```markdown
+> **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
+> `[HUMAN]`: reserved for steps only a human can perform — physical/hardware actions,
+> out-of-band approvals (sign a contract, pay an invoice), or interactive credential/SSO gates
+> an agent cannot script. Every `[HUMAN]` step states what the human does and the observable
+> signal the agent checks to resume.
+>
+> **Phase Gate** — every phase ends with a `### Phase N Gate`: a must-pass verification
+> checklist plus a **Pause Safety** note (the safe-to-stop state after the phase and the
+> single command to resume). A phase is **not complete until its gate is green**; do not start
+> phase N+1 while any check in phase N's gate is failing.
+```
 
 ### Confidence Assessment
 

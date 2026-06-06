@@ -98,12 +98,7 @@ Glob docs/**/*.md
 Grep "relevant topics"
 ```
 
-Clarify with user if needed:
-
-- What problem are we solving?
-- What are the acceptance criteria?
-- What's the scope?
-- What are the constraints?
+All open questions should already be resolved by the Step 1 grill — do not re-ask them here.
 
 ### Step 3: Create Plan Folder
 
@@ -160,10 +155,30 @@ acceptance criterion.
 
 Break work into executable steps:
 
-**Implementation Phases**: Logical groupings of work
-**Implementation Steps**: Checkboxes for each task
-**Validation Checklists**: How to verify each phase
+**Implementation Phases**: Logical groupings of work — each phase is a **natural pause** (a cohesive
+unit ending in an independently verifiable, safe-to-stop state)
+**Implementation Steps**: Checkboxes for each task, each carrying an execution marker (`[AI]` default /
+`[HUMAN]` for steps only a human can do)
+**Phase Gates**: Every phase closes with a `### Phase N Gate` (must-pass checks) + a **Pause Safety**
+note (safe-to-stop state + resume command)
 **Acceptance Criteria**: Final verification steps
+
+**Execution markers** — prefix each checkbox (after `- [ ]`) with `[AI]` or `[HUMAN]`. `[AI]` is the
+default (unmarked = `[AI]`). Use `[HUMAN]` ONLY for steps an agent genuinely cannot do — physical/hardware
+actions (unplug a cable, swap a drive), out-of-band approvals (sign a contract, pay an invoice), or
+interactive credential/SSO gates. Prefer engineering an `[AI]` path (e.g., a sanctioned `scripts/` action)
+before resorting to `[HUMAN]`. Any plan using `[HUMAN]` MUST carry a legend defining both markers near the
+top of `delivery.md`, and every `[HUMAN]` step MUST state what the human does plus the observable signal
+the agent checks to resume.
+
+**Phase gates and natural pauses (HARD RULE)** — every phase (including Phase 0) MUST end with a
+`### Phase N Gate` containing must-pass, independently verifiable checks (each with its `[AI]`/`[HUMAN]`
+marker), followed by a **Pause Safety** blockquote stating the safe-to-stop state and the single
+command/sequence to resume. A phase is not complete until its gate is green; do not author phases that
+bleed unrelated work across a boundary with no safe stop point. See
+[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)
+and
+[§Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
 
 ### Step 7: Add Git Workflow
 
@@ -196,11 +211,12 @@ Cover (each as a structured multiple-choice question):
 - Is the `## Worktree` section present in `delivery.md`?
 - Is Phase 0 (Environment Setup and Baseline) the first phase in `delivery.md`, with
   `repo-setup-manager` as the designated executor?
+- Does every phase (including Phase 0) end with a `### Phase N Gate` and a **Pause Safety** note,
+  and is each phase a natural pause (cohesive, safe-to-stop, clean resume)?
+- Are execution markers correct — `[AI]` default, `[HUMAN]` only for genuinely human-only steps,
+  each `[HUMAN]` step with its handoff/resume signal and a legend present if any `[HUMAN]` is used?
 - Does `delivery.md` open with the `[AI]`/`[HUMAN]` executor legend, and is every step that
-  only a human can perform (physical action, out-of-band approval, real-credential handling)
-  tagged `[HUMAN]` rather than `[AI]`?
-- Does every phase end with a `### Phase N Gate` (must-pass verification checklist) followed by
-  a `> **Pause Safety**:` note, so each phase boundary is a safe stopping point?
+  only a human can perform tagged `[HUMAN]` rather than `[AI]`?
 - **Harness-neutrality**: If the plan scope includes `.claude/agents/`, `.opencode/agents/`,
   or `repo-governance/` paths, confirm that no vendor-specific content was introduced into
   governance files. Reference the
@@ -255,26 +271,19 @@ When plan content (any of `README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `deli
   [Plans Organization Convention §Execution-Grade Clarity](../../repo-governance/conventions/structure/plans.md#execution-grade-clarity-hard-rule)
   for the rule, examples, and the bad/good pair. `plan-checker` flags violations as HIGH findings;
   `plan-fixer` rewrites offending items with maximum detail.
-- **Executor tagging — [AI] vs [HUMAN] (HARD RULE)**: every delivery checkbox MUST make clear who
-  can execute it. Tag the START of each checkbox (right after `- [ ]`) with `[AI]` (an agent can
-  fully perform it — the default; unmarked is treated as `[AI]`), `[HUMAN]` (only a human can do
-  it — physical action like unplugging a power cable, out-of-band approval like approving a prod
-  deploy, real-secret or privileged-credential handling, or real-world legal/financial/safety
-  authority), or `[AI+HUMAN]` (agent prepares, human approves/finishes). Open `delivery.md` (or the
-  single-file Delivery Checklist section) with a Legend defining the tags and stating that unmarked
-  steps are `[AI]`. Prefer `[AI]` for anything mechanically doable; reserve `[HUMAN]` for what is
-  genuinely impossible or unsafe for AI (document any sanctioned channel that keeps a seemingly
-  human-only step `[AI]`). `plan-checker` flags an `[AI]`/unmarked checkbox that no agent can
-  perform as HIGH, and a missing legend as MEDIUM. See
+- **Execution markers (`[AI]`/`[HUMAN]`)**: every checkbox carries an executor marker; `[AI]` is
+  the default (unmarked = `[AI]`). `[HUMAN]` is reserved for steps only a human can do (physical/
+  hardware actions, out-of-band approvals, interactive credential gates). Prefer an engineered
+  `[AI]` path before resorting to `[HUMAN]`. Plans using `[HUMAN]` carry a legend; every `[HUMAN]`
+  step states the action and the observable resume signal. `plan-checker` flags mis-marked steps
+  and missing handoff signals as HIGH. See
   [Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
-- **Phases as natural pauses with clear gates (HARD RULE)**: structure `delivery.md` so every phase
-  is a natural pause point — at each phase boundary the tree is coherent (compiles, tests pass,
-  nothing half-applied). End every phase with a `### Phase N Gate` subsection: a must-pass
-  verification checklist of `[AI]` commands with concrete acceptance criteria, immediately followed
-  by a `> **Pause Safety**:` blockquote naming the safe-to-stop state and the single resume/re-verify
-  command. Phase N+1 must not begin while any gate check is failing; order phases so each builds on
-  a green predecessor. A gate MAY be a `[HUMAN]` approval, making the boundary an explicit hand-off.
-  `plan-checker` flags any phase missing a gate as HIGH. See
+- **Phase gates and natural pauses (HARD RULE)**: every phase ends in a natural pause and closes
+  with a `### Phase N Gate` (must-pass, independently verifiable checks, each marked `[AI]`/
+  `[HUMAN]`) plus a **Pause Safety** note (safe-to-stop state + resume command). A phase is not
+  complete until its gate is green; execution never starts phase N+1 while phase N's gate is
+  failing. `plan-checker` flags a missing gate, missing Pause Safety note, non-verifiable gate
+  items, or a non-cohesive phase as HIGH. See
   [Plans Organization Convention §Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule).
 - **Suggested executor annotation**: when a delivery checkbox names a domain that maps cleanly
   to a specialized agent (a specific language file extension, a specific app context, a content
@@ -524,6 +533,28 @@ Add `test:integration` and `test:e2e` if relevant to the plan scope.
 - [ ] Preexisting fixes get their own commits, separate from plan work
 - [ ] Do NOT bundle unrelated changes into a single commit
 ```
+
+**6. Phase Gate Template** (every phase MUST end with one — see
+[Plans Convention §Phases as Natural Pauses With Clear Gates](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule)).
+A phase MUST end at a **natural pause** (clean, safe-to-stop-indefinitely git state) and close with an
+explicit gate. If two adjacent phases cannot each stand alone as a safe stop, MERGE them — never invent
+a pause that is not real:
+
+```markdown
+### Phase N Gate
+
+> All checks below must pass before starting Phase N+1. If any check fails, fix it in Phase N
+> before proceeding.
+
+- [ ] [AI] `<verbatim command>` — expected: `<observable result>`
+- [ ] [HUMAN] `<physical/external check only a human can confirm>` — expected: `<result>`
+
+> **Pause Safety**: `<self-consistent state reached by this phase>`. Safe to stop. To resume:
+> `<single re-verify command>`.
+```
+
+Phase 0 and the final verification phase are legitimate gate-bearing phases even though they produce
+no commit.
 
 ### Adapting to Plan Context
 
