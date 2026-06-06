@@ -6,7 +6,7 @@
 //! exists on the filesystem.  External URLs, anchor-only links, and a
 //! curated set of known placeholder patterns are silently skipped.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -18,6 +18,20 @@ use anyhow::{Context, Error};
 use chrono::Local;
 use regex::Regex;
 use walkdir::WalkDir;
+
+/// Directories skipped by the full-repo walker.
+const FULL_REPO_SKIP_DIRS: &[&str] = &[
+    "node_modules",
+    "dist",
+    "target",
+    ".next",
+    "coverage",
+    "generated-reports",
+    "local-temp",
+    "archived",
+    "apps-labs",
+    ".git",
+];
 
 /// A relative markdown link that could not be resolved to an existing file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -159,34 +173,27 @@ fn get_staged_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBu
         .collect())
 }
 
-/// Returns all `.md` files inside the `repo-governance/`, `docs/`, and `.claude/`
-/// directories, plus any `.md` files at the repository root.
+/// Returns all `.md` files in the repository via a full recursive walk, skipping
+/// known noise directories (`node_modules`, `dist`, `target`, `.next`, `coverage`,
+/// `generated-reports`, `local-temp`, `archived`, `apps-labs`, `.git`).
 ///
 /// # Errors
 ///
 /// This function currently never returns an error (filesystem errors are silently
 /// swallowed), but the signature is kept for future extensibility.
 fn get_all_markdown_files(repo_root: &Path) -> std::result::Result<Vec<PathBuf>, Error> {
-    let dirs = ["repo-governance", "docs", ".claude"];
     let mut files = Vec::new();
-    for dir in &dirs {
-        let dir_path = repo_root.join(dir);
-        if !dir_path.exists() {
-            continue;
+    let walker = WalkDir::new(repo_root).into_iter().filter_entry(|e| {
+        if e.file_type().is_dir() {
+            let name = e.file_name().to_string_lossy().to_string();
+            !FULL_REPO_SKIP_DIRS.contains(&name.as_str())
+        } else {
+            true
         }
-        for entry in WalkDir::new(&dir_path).into_iter().flatten() {
-            if entry.file_type().is_file() && entry.path().extension().is_some_and(|e| e == "md") {
-                files.push(entry.path().to_path_buf());
-            }
-        }
-    }
-    // Root-level *.md
-    if let Ok(entries) = fs::read_dir(repo_root) {
-        for entry in entries.flatten() {
-            let path = entry.path();
-            if path.is_file() && path.extension().is_some_and(|e| e == "md") {
-                files.push(path);
-            }
+    });
+    for entry in walker.flatten() {
+        if entry.file_type().is_file() && entry.path().extension().is_some_and(|e| e == "md") {
+            files.push(entry.path().to_path_buf());
         }
     }
     Ok(files)
@@ -215,8 +222,49 @@ fn filter_skip_paths(files: Vec<PathBuf>, repo_root: &Path, skip_paths: &[String
         .collect()
 }
 
+/// Replaces inline code spans (`` `...` `` and ` ``...`` `) with spaces,
+/// preserving byte positions so regex match offsets remain valid.
+fn strip_inline_code_spans(line: &str) -> String {
+    let bytes = line.as_bytes();
+    let len = bytes.len();
+    let mut out: Vec<u8> = bytes.to_vec();
+    let mut i = 0;
+    while i < len {
+        if bytes[i] == b'`' {
+            let tick_count = if i + 1 < len && bytes[i + 1] == b'`' {
+                2
+            } else {
+                1
+            };
+            let start = i;
+            i += tick_count;
+            let mut found = false;
+            while i < len {
+                if tick_count == 2 && i + 1 < len && bytes[i] == b'`' && bytes[i + 1] == b'`' {
+                    i += 2;
+                    found = true;
+                    break;
+                } else if tick_count == 1 && bytes[i] == b'`' {
+                    i += 1;
+                    found = true;
+                    break;
+                }
+                i += 1;
+            }
+            if found {
+                for b in out[start..i].iter_mut() {
+                    *b = b' ';
+                }
+            }
+        } else {
+            i += 1;
+        }
+    }
+    String::from_utf8(out).unwrap_or_else(|_| line.to_string())
+}
+
 /// Extracts all relative links from `path`, skipping lines inside fenced code blocks
-/// and discarding external URLs, anchor-only links, and placeholder patterns.
+/// and inline code spans, discarding external URLs and placeholder patterns.
 ///
 /// # Errors
 ///
@@ -234,7 +282,8 @@ fn extract_links(path: &Path) -> std::result::Result<Vec<LinkInfo>, Error> {
         if in_code_block {
             continue;
         }
-        for cap in link_re().captures_iter(line) {
+        let stripped = strip_inline_code_spans(line);
+        for cap in link_re().captures_iter(&stripped) {
             let mut url = cap[2].to_string();
             url = url
                 .trim_start_matches('<')
@@ -242,7 +291,6 @@ fn extract_links(path: &Path) -> std::result::Result<Vec<LinkInfo>, Error> {
                 .to_string();
             if url.starts_with("http://")
                 || url.starts_with("https://")
-                || url.starts_with('#')
                 || url.starts_with("mailto:")
             {
                 continue;
@@ -257,6 +305,87 @@ fn extract_links(path: &Path) -> std::result::Result<Vec<LinkInfo>, Error> {
         }
     }
     Ok(links)
+}
+
+/// Converts a heading title string to a GitHub-flavoured markdown anchor slug.
+///
+/// Rules: lowercase, remove all chars that are not alphanumeric, space, or hyphen,
+/// then replace spaces with hyphens.
+pub fn github_slug(title: &str) -> String {
+    title
+        .to_lowercase()
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '-' {
+                c
+            } else if c == ' ' {
+                '-'
+            } else {
+                '\0'
+            }
+        })
+        .filter(|&c| c != '\0')
+        .collect()
+}
+
+/// Collects all ATX heading titles from `content` (fence-aware) as
+/// `(line, level, title)` tuples.  Shares the same fence-aware logic as
+/// `heading_hierarchy::collect_headings`.
+pub(crate) fn collect_atx_headings(content: &str) -> Vec<(usize, usize, String)> {
+    use super::heading_hierarchy::{parse_fence_open_pub, parse_heading_level_pub};
+    let mut out = Vec::new();
+    let mut in_fence = false;
+    let mut fence_char: char = ' ';
+    let mut fence_len: usize = 0;
+    for (i, line) in content.split('\n').enumerate() {
+        let line_num = i + 1;
+        let trimmed = line.trim_start_matches([' ', '\t']);
+        if let Some((ch, length)) = parse_fence_open_pub(trimmed) {
+            if !in_fence {
+                in_fence = true;
+                fence_char = ch;
+                fence_len = length;
+            } else if ch == fence_char && length >= fence_len {
+                in_fence = false;
+                fence_char = ' ';
+                fence_len = 0;
+            }
+            continue;
+        }
+        if in_fence {
+            continue;
+        }
+        if let Some(level) = parse_heading_level_pub(trimmed) {
+            // Extract the title text (after `#`s and the mandatory space/tab)
+            let bytes = trimmed.as_bytes();
+            let title = trimmed[level + 1..].trim().to_string();
+            if !title.is_empty() {
+                let _ = bytes; // suppress unused-variable warning
+                out.push((line_num, level, title));
+            }
+        }
+    }
+    out
+}
+
+/// Builds a [`HashSet`] of all GitHub-slugified anchor names (with duplicate
+/// collision suffixes applied) for `content`.
+pub(crate) fn slugs_from_content(content: &str) -> HashSet<String> {
+    let headings = collect_atx_headings(content);
+    let mut slug_counts: HashMap<String, usize> = HashMap::new();
+    let mut result = HashSet::new();
+    for (_, _, title) in &headings {
+        let base = github_slug(title);
+        let count = slug_counts.entry(base.clone()).or_insert(0);
+        let slug = if *count == 0 {
+            base.clone()
+        } else {
+            format!("{base}-{count}")
+        };
+        *count += 1;
+        result.insert(slug);
+    }
+    result
 }
 
 /// Returns `true` when `link` matches a known placeholder or example pattern that
@@ -325,6 +454,8 @@ pub fn should_skip_link(link: &str) -> bool {
 /// Validates each link in `links` against the filesystem, relative to `file_path`.
 ///
 /// Skill files (paths containing `.claude/skills/`) are unconditionally skipped.
+/// After checking file existence, anchor fragments are validated against the
+/// headings of the target file (or the source file for pure `#fragment` links).
 ///
 /// # Errors
 ///
@@ -342,12 +473,40 @@ fn validate_file(
     }
     let mut broken = Vec::new();
     for link in links {
-        let target = resolve_link(file_path, &link.url);
+        let rel = file_path.strip_prefix(&opts.repo_root).map_or_else(
+            |_| file_path.to_string_lossy().to_string(),
+            |p| p.to_string_lossy().to_string(),
+        );
+
+        // Split URL into path-part and optional anchor fragment.
+        let (path_part, fragment) = if let Some(hash_pos) = link.url.find('#') {
+            (&link.url[..hash_pos], Some(&link.url[hash_pos + 1..]))
+        } else {
+            (link.url.as_str(), None)
+        };
+
+        if path_part.is_empty() {
+            // Pure same-file anchor: `[text](#fragment)` — validate against source file.
+            if let (Some(frag), Ok(content)) = (
+                fragment.filter(|f| !f.is_empty()),
+                fs::read_to_string(file_path),
+            ) {
+                let slugs = slugs_from_content(&content);
+                if !slugs.contains(frag) {
+                    broken.push(BrokenLink {
+                        line_number: link.line_number,
+                        source_file: rel,
+                        link_text: link.url.clone(),
+                        target_path: format!("{}#{frag}", file_path.to_string_lossy()),
+                        category: "broken-anchor".to_string(),
+                    });
+                }
+            }
+            continue;
+        }
+
+        let target = resolve_link(file_path, path_part);
         if !target.exists() {
-            let rel = file_path.strip_prefix(&opts.repo_root).map_or_else(
-                |_| file_path.to_string_lossy().to_string(),
-                |p| p.to_string_lossy().to_string(),
-            );
             let category = categorize_broken_link(&link.url);
             broken.push(BrokenLink {
                 line_number: link.line_number,
@@ -356,6 +515,20 @@ fn validate_file(
                 target_path: target.to_string_lossy().to_string(),
                 category,
             });
+        } else if let Some(frag) = fragment.filter(|f| !f.is_empty()) {
+            // File exists — validate the anchor against the target's headings.
+            if let Ok(content) = fs::read_to_string(&target) {
+                let slugs = slugs_from_content(&content);
+                if !slugs.contains(frag) {
+                    broken.push(BrokenLink {
+                        line_number: link.line_number,
+                        source_file: rel,
+                        link_text: link.url.clone(),
+                        target_path: format!("{}#{frag}", target.to_string_lossy()),
+                        category: "broken-anchor".to_string(),
+                    });
+                }
+            }
         }
     }
     Ok(broken)
@@ -633,7 +806,8 @@ mod tests {
         assert_eq!(links[0].url, "y.md");
     }
 
-    /// Verifies that external URLs, anchor-only links, and mailto links are skipped.
+    /// Verifies that external URLs and mailto links are skipped; same-file anchor
+    /// links (`#fragment`) are now extracted for anchor validation.
     #[test]
     fn extract_links_skips_external_urls() {
         let tmp = TempDir::new().unwrap();
@@ -644,8 +818,10 @@ mod tests {
         )
         .unwrap();
         let links = extract_links(&p).unwrap();
-        assert_eq!(links.len(), 1);
-        assert_eq!(links[0].url, "real.md");
+        // https, http, mailto are skipped; #anchor and real.md are extracted
+        assert_eq!(links.len(), 2);
+        assert!(links.iter().any(|l| l.url == "#anchor"));
+        assert!(links.iter().any(|l| l.url == "real.md"));
     }
 
     /// Verifies that [`validate_all_links`] detects broken links in the `docs/` directory.
@@ -812,5 +988,239 @@ mod tests {
         let v: serde_json::Value = serde_json::from_str(&s).unwrap();
         assert_eq!(v["status"], "success");
         assert_eq!(v["total_files"], 5);
+    }
+
+    // ── Phase 1 RED tests ─────────────────────────────────────────────────────
+
+    /// (a) `--exclude plans/done` removes a broken link under `plans/done` from
+    /// results while a broken link elsewhere is still reported.
+    #[test]
+    fn exclude_suppresses_subtree_but_not_others() {
+        let tmp = TempDir::new().unwrap();
+        // plans/done/ subtree — should be excluded
+        fs::create_dir_all(tmp.path().join("plans/done")).unwrap();
+        fs::write(
+            tmp.path().join("plans/done/a.md"),
+            "[bad](nonexistent.md)\n",
+        )
+        .unwrap();
+        // docs/ subtree — should NOT be excluded
+        fs::create_dir_all(tmp.path().join("docs")).unwrap();
+        fs::write(tmp.path().join("docs/b.md"), "[bad](also_nonexistent.md)\n").unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            staged_only: false,
+            skip_paths: vec!["plans/done".to_string()],
+        };
+        let result = validate_all_links(&opts).unwrap();
+        // plans/done/a.md must not appear in broken links
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .all(|b| !b.source_file.contains("plans/done")),
+            "plans/done broken link should be excluded"
+        );
+        // docs/b.md must appear
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .any(|b| b.source_file.contains("docs/b.md")),
+            "docs/b.md broken link should still be reported"
+        );
+    }
+
+    /// (b) A repo-wide scan finds a broken link under `libs/` (outside the
+    /// original 3-dir set) and automatically skips files under `node_modules/`.
+    #[test]
+    fn repo_wide_scan_finds_libs_and_skips_node_modules() {
+        let tmp = TempDir::new().unwrap();
+        // libs/ — should be scanned in full-repo mode
+        fs::create_dir_all(tmp.path().join("libs/rust-commons")).unwrap();
+        fs::write(
+            tmp.path().join("libs/rust-commons/README.md"),
+            "[bad](nonexistent_lib.md)\n",
+        )
+        .unwrap();
+        // node_modules/ — should always be skipped by the full-repo walker
+        fs::create_dir_all(tmp.path().join("node_modules/some-pkg")).unwrap();
+        fs::write(
+            tmp.path().join("node_modules/some-pkg/README.md"),
+            "[bad](nm_nonexistent.md)\n",
+        )
+        .unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            staged_only: false,
+            skip_paths: Vec::new(),
+        };
+        let result = validate_all_links(&opts).unwrap();
+        // libs/rust-commons/README.md broken link must be found
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .any(|b| b.source_file.contains("libs/rust-commons")),
+            "libs/ broken link should be found by full-repo walk"
+        );
+        // node_modules must not appear
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .all(|b| !b.source_file.contains("node_modules")),
+            "node_modules/ should be skipped by full-repo walk"
+        );
+    }
+
+    /// (c) A cross-file anchor link `[X](./concepts.md#missing-section)` where
+    /// `concepts.md` exists but has no heading that slugifies to `missing-section`
+    /// yields a `broken-anchor` finding.
+    #[test]
+    fn broken_cross_file_anchor_yields_finding() {
+        let tmp = TempDir::new().unwrap();
+        fs::create_dir_all(tmp.path().join("docs")).unwrap();
+        // source file linking to a specific anchor
+        fs::write(
+            tmp.path().join("docs/source.md"),
+            "[link](./concepts.md#missing-section)\n",
+        )
+        .unwrap();
+        // concepts.md exists but does NOT have `## Missing Section`
+        fs::write(
+            tmp.path().join("docs/concepts.md"),
+            "# Concepts\n\n## Other\n",
+        )
+        .unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            staged_only: false,
+            skip_paths: Vec::new(),
+        };
+        let result = validate_all_links(&opts).unwrap();
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .any(|b| b.category == "broken-anchor"),
+            "expected a broken-anchor finding but got: {:?}",
+            result.broken_links
+        );
+    }
+
+    /// (d) A cross-file anchor link `[X](./concepts.md#real-section)` where
+    /// `concepts.md` has `## Real Section` yields NO anchor finding.
+    #[test]
+    fn valid_cross_file_anchor_yields_no_finding() {
+        let tmp = TempDir::new().unwrap();
+        fs::create_dir_all(tmp.path().join("docs")).unwrap();
+        fs::write(
+            tmp.path().join("docs/source.md"),
+            "[link](./concepts.md#real-section)\n",
+        )
+        .unwrap();
+        fs::write(
+            tmp.path().join("docs/concepts.md"),
+            "# Concepts\n\n## Real Section\n",
+        )
+        .unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            staged_only: false,
+            skip_paths: Vec::new(),
+        };
+        let result = validate_all_links(&opts).unwrap();
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .all(|b| b.category != "broken-anchor"),
+            "should not report broken-anchor for a valid anchor"
+        );
+    }
+
+    /// (d2) Emoji heading: slug preserves leading hyphen that results from emoji stripping,
+    /// matching GitHub's actual behavior (e.g. `## 📜 WCAG Standards` → `-wcag-standards`).
+    #[test]
+    fn github_slug_emoji_heading_preserves_leading_hyphen() {
+        // GitHub strips the emoji (non-alphanumeric/space/hyphen) leaving a leading space,
+        // which becomes a leading hyphen. GitHub keeps it; our slug must match.
+        assert_eq!(github_slug("📜 WCAG Standards"), "-wcag-standards");
+        assert_eq!(github_slug("🔒 Security"), "-security");
+        // Non-emoji headings must not regress.
+        assert_eq!(github_slug("WCAG Standards"), "wcag-standards");
+        assert_eq!(github_slug("Setup"), "setup");
+    }
+
+    /// (e) The slug helper maps duplicate `Setup` headings to `setup` and `setup-1`.
+    #[test]
+    fn github_slug_handles_duplicate_headings() {
+        let content = "# Setup\n\n## Setup\n";
+        let headings = collect_atx_headings(content);
+        let slugs: Vec<String> = headings.iter().map(|(_, _, t)| github_slug(t)).collect();
+        // The raw slugs from both will be "setup"; collision handling is done
+        // at the call site. Here we just verify the slug helper itself is correct.
+        assert_eq!(slugs[0], "setup");
+        assert_eq!(slugs[1], "setup");
+        // Verify the dedup logic via the anchor-finding helper
+        let slugset = slugs_from_content(content);
+        assert!(slugset.contains("setup"), "first Setup → 'setup'");
+        assert!(slugset.contains("setup-1"), "second Setup → 'setup-1'");
+    }
+
+    /// (f) A same-file anchor `[Y](#own-section)` with no matching heading in the
+    /// source file yields a `broken-anchor` finding.
+    #[test]
+    fn broken_same_file_anchor_yields_finding() {
+        let tmp = TempDir::new().unwrap();
+        fs::create_dir_all(tmp.path().join("docs")).unwrap();
+        fs::write(
+            tmp.path().join("docs/a.md"),
+            "# Title\n\n[broken](#no-such-section)\n",
+        )
+        .unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            staged_only: false,
+            skip_paths: Vec::new(),
+        };
+        let result = validate_all_links(&opts).unwrap();
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .any(|b| b.category == "broken-anchor"),
+            "expected broken-anchor for same-file link with no matching heading"
+        );
+    }
+
+    /// (g) Links inside inline code spans must NOT be reported as broken anchors.
+    /// Covers false positives like `[text](#fragment)` appearing in prose descriptions
+    /// of link syntax (e.g., plan documentation, technical specs).
+    #[test]
+    fn inline_code_span_links_not_reported_as_broken() {
+        let tmp = TempDir::new().unwrap();
+        fs::create_dir_all(tmp.path().join("docs")).unwrap();
+        // File contains backtick-enclosed examples that look like broken anchors
+        // but are NOT real links — they are inline code spans.
+        fs::write(
+            tmp.path().join("docs/spec.md"),
+            "# Spec\n\nUse `[text](#fragment)` syntax and `[X](#frag)` form.\n\nAlso `[Y](#own-section)` for same-file.\n",
+        )
+        .unwrap();
+        let opts = ScanOptions {
+            repo_root: tmp.path().to_path_buf(),
+            staged_only: false,
+            skip_paths: Vec::new(),
+        };
+        let result = validate_all_links(&opts).unwrap();
+        assert!(
+            result
+                .broken_links
+                .iter()
+                .all(|b| b.category != "broken-anchor"),
+            "links inside inline code spans must not produce broken-anchor findings"
+        );
     }
 }

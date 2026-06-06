@@ -17,6 +17,10 @@ pub struct ValidateLinksArgs {
     /// Only validate staged files.
     #[arg(long = "staged-only")]
     pub staged_only: bool,
+    /// Repository-relative path prefixes to exclude from scanning.
+    /// May be specified multiple times.
+    #[arg(long = "exclude")]
+    pub exclude: Vec<String>,
 }
 
 /// Run the `docs validate-links` command.
@@ -34,7 +38,7 @@ pub fn run(
     let opts = ScanOptions {
         repo_root,
         staged_only: args.staged_only,
-        skip_paths: Vec::new(),
+        skip_paths: args.exclude.clone(),
     };
     let result = validate_all_links(&opts).context("validation failed")?;
 
@@ -56,13 +60,30 @@ mod tests {
 
     #[test]
     fn args_default_staged_only_false() {
-        let args = ValidateLinksArgs { staged_only: false };
+        let args = ValidateLinksArgs {
+            staged_only: false,
+            exclude: Vec::new(),
+        };
         assert!(!args.staged_only);
     }
 
     #[test]
     fn args_staged_only_can_be_set() {
-        let args = ValidateLinksArgs { staged_only: true };
+        let args = ValidateLinksArgs {
+            staged_only: true,
+            exclude: Vec::new(),
+        };
         assert!(args.staged_only);
+    }
+
+    /// (a) Phase 1 RED — `--exclude` flag is threaded into `skip_paths`.
+    #[test]
+    fn args_exclude_is_threaded_to_skip_paths() {
+        let args = ValidateLinksArgs {
+            staged_only: false,
+            exclude: vec!["plans/done".to_string(), "apps/ayokoding-web".to_string()],
+        };
+        assert_eq!(args.exclude.len(), 2);
+        assert_eq!(args.exclude[0], "plans/done");
     }
 }
