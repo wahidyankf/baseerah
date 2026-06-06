@@ -70,7 +70,8 @@ Claude Code (.claude/agents/) — PRIMARY:
   - Model selection: sonnet, haiku, or omit (inherits)
 
 OpenCode (.opencode/agents/) — SECONDARY:
-  - Tool format: boolean flags { read: true, write: true }
+  - Tool format: permission object { read: allow, write: allow }
+    (boolean flags { read: true, write: true } are deprecated/legacy)
   - Model selection: opencode-go/minimax-m2.7 or opencode-go/glm-5
 ```
 
@@ -2561,14 +2562,16 @@ Claude Code (.claude/agents/) — PRIMARY:
   (array format with capitalized tool names)
 
 OpenCode (.opencode/agents/) — SECONDARY:
-  tools:
-    read: true
-    write: true
-    edit: true
-    glob: true
-    grep: true
-    bash: true
-  (boolean flags format, nested YAML)
+  permission:
+    read: allow
+    write: allow
+    edit: allow
+    glob: allow
+    grep: allow
+    bash: allow
+  (permission object, nested YAML — current OpenCode convention;
+  the historical boolean flags format `tools: { read: true, … }` is
+  deprecated/legacy and no longer emitted)
 ```
 
 #### Model References
@@ -2616,7 +2619,7 @@ Agent skills are **not mirrored** — the secondary harness reads `.claude/skill
 
 **Conversion Logic**:
 
-- **Agents**: Primary format → secondary format (tool arrays → boolean flags, model mapping)
+- **Agents**: Primary format → secondary format (tool arrays → permission object, model mapping; boolean flags output is deprecated/legacy)
 - **Agent skills**: No mirror — secondary harness reads `.claude/skills/` natively (no copy or conversion)
 - **Validation**: Confirms both directories are semantically equivalent
 

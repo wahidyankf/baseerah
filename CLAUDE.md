@@ -41,7 +41,7 @@ Repo maintains **multi-harness compatibility** with Claude Code, OpenCode, and A
 
 **Format differences:**
 
-- **Tools**: Claude Code uses arrays `[Read, Write]`, OpenCode uses boolean flags `{ read: true, write: true }`
+- **Tools**: Claude Code uses arrays `[Read, Write]`; OpenCode uses a `permission` object `{ read: allow, write: allow }` (current convention per [opencode.ai/docs/agents](https://opencode.ai/docs/agents/)). The older boolean flags form `{ read: true, write: true }` is deprecated/legacy — still accepted by OpenCode but no longer emitted by `rhino-cli agents sync`.
 - **Models**: Claude Code uses `sonnet`/`opus`/`haiku` (or omits for budget-adaptive opus-inherit — intentional, not legacy); OpenCode uses `opencode-go/minimax-m2.7` (opus/sonnet/omitted) and `opencode-go/glm-5` (haiku). See [model-selection.md](./repo-governance/development/agents/model-selection.md) for full capability-tier mapping.
 - **Skills**: NOT mirrored — OpenCode reads `.claude/skills/{name}/SKILL.md` natively per [opencode.ai/docs/skills](https://opencode.ai/docs/skills/). The validate:sync `No Synced Skill Mirror` check fails if a stale `.opencode/skill/` or `.opencode/skills/<claude-name>` mirror reappears.
 - **Permissions**: Claude Code uses `settings.json` permissions, OpenCode uses `opencode.json` permission block (both configured with equivalent access)
