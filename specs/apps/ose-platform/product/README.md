@@ -17,4 +17,4 @@ system context. Read this first if you are new to ose-web.
 - [`../containers/`](../containers/README.md) — C4 L2 single container (`web`)
 - [`../components/`](../components/README.md) — C4 L3 components (per-perspective internals)
 - [`../behavior/`](../behavior/README.md) — Gherkin scenarios that exercise the product
-- [`../ddd/`](../ddd/README.md) — DDD bounded-context registry, ubiquitous-language glossaries, BC map
+- `../ddd/` — DDD bounded-context registry, ubiquitous-language glossaries, BC map

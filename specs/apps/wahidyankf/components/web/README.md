@@ -23,5 +23,5 @@ relationships. Each bounded context maps to a folder under
 
 ## Related
 
-- [`../../ddd/`](../../ddd/README.md) — DDD registry and ubiquitous-language glossaries
+- `../../ddd/` — DDD registry and ubiquitous-language glossaries
 - [`../../behavior/web/gherkin/`](../../behavior/web/gherkin/README.md) — Gherkin features per BC

@@ -5,7 +5,7 @@ Audience: Engineers, Technical Product/Project Managers
 Component-level specifications for `ose-web` — what lives inside the single `web`
 container, sliced by **perspective** (UI vs tRPC HTTP). DDD bounded-context registry,
 ubiquitous-language glossaries, and bounded-context map live one level above at
-[`../ddd/`](../ddd/README.md) because the ubiquitous language belongs to the bounded context,
+`../ddd/` because the ubiquitous language belongs to the bounded context,
 not to one perspective.
 
 ## Children
@@ -19,7 +19,7 @@ not to one perspective.
 
 ## Related
 
-- [`../ddd/`](../ddd/README.md) — DDD artifacts (registry + glossaries + map) consumed by `rhino-cli ddd`
+- `../ddd/` — DDD artifacts (registry + glossaries + map) consumed by `rhino-cli ddd`
 - [`../system-context/`](../system-context/README.md) — C4 L1
 - [`../containers/`](../containers/README.md) — C4 L2 (single `web` container; slug-vs-container note)
 - [`../behavior/`](../behavior/README.md) — Gherkin scenarios that exercise the components

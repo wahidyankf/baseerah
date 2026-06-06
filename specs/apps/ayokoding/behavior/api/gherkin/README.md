@@ -2,7 +2,7 @@
 
 Gherkin feature files for the AyoKoding tRPC API surface, organized by bounded context.
 Each folder maps to one bounded context from the
-[bounded-context map](../../../ddd/bounded-context-map.md).
+bounded-context map.
 
 The slug `api` is a **perspective slug**, not a container. There is no separate API
 container — tRPC procedures execute inside the same `web` container's Next.js server.
@@ -28,7 +28,7 @@ specs/apps/ayokoding/behavior/api/gherkin/
 ## Ubiquitous Language
 
 Every domain term used in step text is defined in
-[ubiquitous-language/](../../../ddd/ubiquitous-language/README.md). Gherkin steps use only
+ubiquitous-language/. Gherkin steps use only
 glossary terms; code identifiers (procedure names, schema fields) match the
 `Code identifier(s)` column verbatim.
 
@@ -54,7 +54,7 @@ same `web` Next.js container; the split is a slug, not a container boundary.
 
 ## Related
 
-- **Ubiquitous language**: [ubiquitous-language/](../../../ddd/ubiquitous-language/README.md)
-- **Bounded-context map**: [bounded-context-map.md](../../../ddd/bounded-context-map.md)
+- **Ubiquitous language**: ubiquitous-language/
+- **Bounded-context map**: bounded-context-map.md
 - **Web counterpart**: [web gherkin specs](../../web/gherkin/README.md)
 - **Parent**: [api component specs](../../../components/api/README.md)

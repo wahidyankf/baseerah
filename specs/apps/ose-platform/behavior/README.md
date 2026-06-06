@@ -35,7 +35,7 @@ caller). See [`../containers/container.md`](../containers/container.md) for the 
 ### `web/gherkin/`
 
 Organized per bounded context (one folder per BC, matching the
-[DDD registry](../ddd/bounded-contexts.yaml)).
+DDD registry).
 
 | Bounded Context | Features                                             | Count |
 | --------------- | ---------------------------------------------------- | ----- |
@@ -59,5 +59,5 @@ Organized per bounded context.
 ## Related
 
 - [`../components/`](../components/README.md) — C4 L3 components that the scenarios exercise
-- [`../ddd/`](../ddd/README.md) — DDD bounded-context registry, glossaries, BC map
+- `../ddd/` — DDD bounded-context registry, glossaries, BC map
 - [`../containers/`](../containers/README.md) — single `web` container, slug-vs-container note

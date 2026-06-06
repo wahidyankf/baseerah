@@ -93,4 +93,4 @@ canonical input pattern in `project.json`:
 
 - **Parent**: [ayokoding specs](../../README.md)
 - **Web counterpart**: [components/web/](../web/README.md) — UI-semantic web specs
-- **Ubiquitous Language**: [`ddd/ubiquitous-language/`](../../ddd/ubiquitous-language/README.md)
+- **Ubiquitous Language**: `ddd/ubiquitous-language/`

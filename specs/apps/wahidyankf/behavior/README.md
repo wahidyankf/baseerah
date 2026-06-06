@@ -9,7 +9,7 @@ rendering layer or API is added later, a `behavior/api/gherkin/` folder would be
 ## Children
 
 - `web/` — Frontend Gherkin scenarios (UI semantic). Each sub-folder maps to one bounded
-  context from the [DDD registry](../ddd/bounded-contexts.yaml).
+  context from the DDD registry.
 
 ## Containers
 
@@ -33,4 +33,4 @@ rendering layer or API is added later, a `behavior/api/gherkin/` folder would be
 ## Related
 
 - [`../components/`](../components/README.md) — C4 L3 components that the scenarios exercise
-- [`../ddd/`](../ddd/README.md) — Ubiquitous language governing scenario vocabulary
+- `../ddd/` — Ubiquitous language governing scenario vocabulary

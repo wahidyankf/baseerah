@@ -11,7 +11,7 @@ exists so component-level diagrams can describe the UI surface and the tRPC API 
 without conflating them.
 
 DDD bounded-context registry, ubiquitous-language glossaries, and bounded-context map live one
-level above at [`../ddd/`](../ddd/README.md) because the ubiquitous language belongs to the
+level above at `../ddd/` because the ubiquitous language belongs to the
 bounded context, not to one perspective surface.
 
 ## Children
@@ -25,7 +25,7 @@ bounded context, not to one perspective surface.
 
 ## Related
 
-- [`../ddd/`](../ddd/README.md) — DDD artifacts (registry + glossaries + map) consumed by `rhino-cli ddd`
+- `../ddd/` — DDD artifacts (registry + glossaries + map) consumed by `rhino-cli ddd`
 - [`../system-context/`](../system-context/README.md) — C4 L1
 - [`../containers/`](../containers/README.md) — C4 L2
 - [`../behavior/`](../behavior/README.md) — Gherkin scenarios that exercise the components

@@ -4,7 +4,7 @@ Audience: Engineers, Technical Product/Project Managers
 
 UI-semantic Gherkin feature files for `wahidyankf-web`, organized by bounded context. Each
 subfolder maps to one bounded context from the
-[bounded-context registry](../../../ddd/bounded-contexts.yaml).
+bounded-context registry.
 
 ## Structure
 
@@ -43,5 +43,5 @@ specs/apps/wahidyankf/behavior/web/gherkin/
 
 ## Related
 
-- [`../../../ddd/bounded-context-map.md`](../../../ddd/bounded-context-map.md) — context relationships
-- [`../../../ddd/ubiquitous-language/`](../../../ddd/ubiquitous-language/README.md) — vocabulary
+- `../../../ddd/bounded-context-map.md` — context relationships
+- `../../../ddd/ubiquitous-language/` — vocabulary

@@ -34,5 +34,5 @@ organized per bounded context.
 
 - **Container diagram**: [`../../containers/container.md`](../../containers/container.md)
 - **web perspective**: [`../web/`](../web/README.md)
-- **DDD registry**: [`../../ddd/bounded-contexts.yaml`](../../ddd/bounded-contexts.yaml)
+- **DDD registry**: `../../ddd/bounded-contexts.yaml`
 - **Parent**: [`../README.md`](../README.md)

@@ -15,7 +15,7 @@ belongs to the bounded context, not to one implementation surface.
 
 ## Related
 
-- [`../ddd/`](../ddd/README.md) — DDD artifacts (registry + glossaries + map)
+- `../ddd/` — DDD artifacts (registry + glossaries + map)
 - [`../system-context/`](../system-context/README.md) — C4 L1
 - [`../containers/`](../containers/README.md) — C4 L2
 - [`../behavior/`](../behavior/README.md) — Gherkin scenarios that exercise the components

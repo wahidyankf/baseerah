@@ -2,7 +2,7 @@
 
 Gherkin feature files for the AyoKoding browser UI surface, organized by bounded context.
 Each folder maps to one bounded context from the
-[bounded-context map](../../../ddd/bounded-context-map.md).
+bounded-context map.
 
 ## Structure
 
@@ -24,7 +24,7 @@ specs/apps/ayokoding/behavior/web/gherkin/
 ## Ubiquitous Language
 
 Every domain term used in step text is defined in
-[ubiquitous-language/](../../../ddd/ubiquitous-language/README.md). Gherkin steps use only
+ubiquitous-language/. Gherkin steps use only
 glossary terms; code identifiers match the `Code identifier(s)` column verbatim.
 
 ## Conventions
@@ -49,7 +49,7 @@ same `web` Next.js container; the split is a slug, not a container boundary.
 
 ## Related
 
-- **Ubiquitous language**: [ubiquitous-language/](../../../ddd/ubiquitous-language/README.md)
-- **Bounded-context map**: [bounded-context-map.md](../../../ddd/bounded-context-map.md)
+- **Ubiquitous language**: ubiquitous-language/
+- **Bounded-context map**: bounded-context-map.md
 - **API counterpart**: [api gherkin specs](../../api/gherkin/README.md)
 - **Parent**: [web component specs](../../../components/web/README.md)

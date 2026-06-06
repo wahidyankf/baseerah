@@ -23,6 +23,6 @@ This means a dev server (`nx dev wahidyankf-web`) is up at `localhost:3201`.
 
 ## Related
 
-- [`../../ddd/`](../../ddd/README.md) — Ubiquitous language governing step vocabulary
+- `../../ddd/` — Ubiquitous language governing step vocabulary
 - [`../../components/web/`](../../components/web/README.md) — C4 L3 component view
 - [`../README.md`](../README.md) — Behavior root (coverage tables)

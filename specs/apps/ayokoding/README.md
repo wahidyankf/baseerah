@@ -77,10 +77,6 @@ Counts are Gherkin features per perspective. `--` means no features in that pers
 
 ## Spec Artifacts
 
-- **[ddd/](./ddd/README.md)** — DDD artifacts:
-  [bounded-contexts.yaml](./ddd/bounded-contexts.yaml) (registry) and
-  [ubiquitous-language/](./ddd/ubiquitous-language/README.md) (glossaries);
-  consumed by `rhino-cli ddd bc` and `rhino-cli ddd ul`
 - **[system-context/](./system-context/README.md)**, **[containers/](./containers/README.md)**,
   **[components/](./components/README.md)** — C4 architecture diagrams (L1/L2/L3)
 - **[components/api/](./components/api/README.md)** — API (tRPC HTTP-semantic) component specs

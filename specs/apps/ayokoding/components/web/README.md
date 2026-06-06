@@ -65,12 +65,12 @@ specs/apps/ayokoding/behavior/web/gherkin/
 ## Ubiquitous Language
 
 Every term used in scenario titles, `Background` clauses, and step text is owned by one bounded
-context and documented in [`ddd/ubiquitous-language/`](../../ddd/ubiquitous-language/README.md).
-See the [bounded-context map](../../ddd/bounded-context-map.md) for context responsibilities and
+context and documented in `ddd/ubiquitous-language/`.
+See the bounded-context map for context responsibilities and
 relationships.
 
 ## Related
 
 - **Parent**: [ayokoding specs](../../README.md)
 - **API counterpart**: [components/api/](../api/README.md) — HTTP-semantic API specs
-- **Ubiquitous Language**: [`ddd/ubiquitous-language/`](../../ddd/ubiquitous-language/README.md)
+- **Ubiquitous Language**: `ddd/ubiquitous-language/`

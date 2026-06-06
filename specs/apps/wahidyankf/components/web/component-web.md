@@ -33,5 +33,5 @@ graph LR
 
 ## Related
 
-- [DDD registry](../../ddd/bounded-contexts.yaml) — authoritative BC declarations
-- [Bounded-context map](../../ddd/bounded-context-map.md) — relationship diagram
+- DDD registry — authoritative BC declarations
+- Bounded-context map — relationship diagram

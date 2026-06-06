@@ -133,8 +133,6 @@ Reads the registry to locate every `glossary:` file, then validates each:
 
 ## Spec artifacts
 
-- **[ddd/](./ddd/README.md)** — DDD artifacts ([bounded-contexts.yaml](./ddd/bounded-contexts.yaml),
-  [ubiquitous-language/](./ddd/ubiquitous-language/README.md)); consumed by `rhino-cli ddd bc` and `rhino-cli ddd ul`
 - **[system-context/](./system-context/README.md)**, **[containers/](./containers/README.md)**,
   **[components/](./components/README.md)** — C4 architecture diagrams (L1/L2/L3)
 - **[components/api/](./components/api/README.md)** — tRPC HTTP perspective component specs

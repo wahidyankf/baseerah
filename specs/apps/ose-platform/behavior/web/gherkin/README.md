@@ -5,7 +5,7 @@ UI-semantic Gherkin scenarios for `ose-web`. Step style: `clicks`, `types`, `see
 (Playwright).
 
 Organized per bounded context (one folder per BC, matching
-[`../../../ddd/bounded-contexts.yaml`](../../../ddd/bounded-contexts.yaml)).
+`../../../ddd/bounded-contexts.yaml`).
 
 ## Coverage
 
@@ -32,4 +32,4 @@ names.
 
 - **Parent**: [`../../README.md`](../../README.md)
 - **api perspective counterpart**: [`../../api/gherkin/`](../../api/gherkin/README.md)
-- **DDD registry**: [`../../../ddd/bounded-contexts.yaml`](../../../ddd/bounded-contexts.yaml)
+- **DDD registry**: `../../../ddd/bounded-contexts.yaml`

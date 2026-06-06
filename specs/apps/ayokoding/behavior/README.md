@@ -43,7 +43,7 @@ a real F#/Giraffe container; ayokoding does not have one.
 ### `web/gherkin/` — UI perspective
 
 Organized by bounded context (one folder per BC, matching the
-[DDD registry](../ddd/bounded-contexts.yaml)).
+DDD registry).
 
 | Bounded Context | Features                      | Count |
 | --------------- | ----------------------------- | ----- |
@@ -68,4 +68,4 @@ Organized by bounded context (one folder per BC, matching the
 ## Related
 
 - [`../components/`](../components/README.md) — C4 L3 components that the scenarios exercise
-- [`../ddd/`](../ddd/README.md) — DDD registry + glossaries that own the vocabulary
+- `../ddd/` — DDD registry + glossaries that own the vocabulary
