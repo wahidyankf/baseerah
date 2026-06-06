@@ -119,6 +119,8 @@ pub fn validate_bindings(repo_root: &Path) -> ValidationResult {
         result.tally(validate_catalog_coverage(repo_root, dir));
     }
 
+    result.tally(validate_no_codex_agents_dir(repo_root));
+
     result.duration = start.elapsed();
     result
 }
@@ -199,6 +201,31 @@ fn validate_catalog_coverage(repo_root: &Path, dir: &str) -> ValidationCheck {
             format!(
                 "binding dir {dir} exists but is not referenced in {PLATFORM_BINDINGS_CATALOG}; add a catalog row"
             ),
+        )
+    }
+}
+
+/// Check that the non-standard `.codex/agents/` directory does not exist.
+/// Codex CLI configures agents via `agents.<name>` sub-tables in
+/// `.codex/config.toml`, not via a directory of agent files.
+fn validate_no_codex_agents_dir(repo_root: &Path) -> ValidationCheck {
+    let check_name = "No Codex Agents Dir: .codex/agents".to_string();
+    let dir_path = join_rel(repo_root, ".codex/agents");
+
+    if dir_path.exists() {
+        ValidationCheck::failed(
+            check_name,
+            ".codex/agents absent",
+            ".codex/agents present on disk",
+            ".codex/agents/ is not an official Codex CLI convention; define agents as \
+             `agents.<name>` sub-tables in .codex/config.toml and delete the directory"
+                .to_string(),
+        )
+    } else {
+        ValidationCheck::passed(
+            check_name,
+            ".codex/agents absent; Codex CLI agents configured via config.toml sub-tables"
+                .to_string(),
         )
     }
 }
@@ -371,6 +398,34 @@ mod tests {
 
         let result = validate_bindings(root);
         assert_eq!(result.failed_checks, 0, "result: {result:#?}");
+    }
+
+    #[test]
+    fn validate_fails_when_codex_agents_dir_exists() {
+        let dir = tempdir().unwrap();
+        let root = dir.path();
+        emit_bindings(root).unwrap();
+        // Materialize several known binding dirs, catalog covers all of them.
+        std::fs::create_dir_all(root.join(".github")).unwrap();
+        std::fs::create_dir_all(root.join(".codex")).unwrap();
+        write(&root.join(PLATFORM_BINDINGS_CATALOG), &full_catalog());
+
+        // `.codex/agents/` is NOT an official Codex CLI convention (the
+        // official mechanism is `agents.<name>` sub-tables in config.toml);
+        // its presence must fail validation as a regression guard.
+        std::fs::create_dir_all(root.join(".codex/agents")).unwrap();
+
+        let result = validate_bindings(root);
+        let failed_codex_agents_check = result.checks.iter().find(|c| {
+            c.status == "failed"
+                && c.message.contains("config.toml")
+                && (c.message.contains("sub-table") || c.message.contains("agents.<name>"))
+        });
+        assert!(
+            failed_codex_agents_check.is_some(),
+            "expected a failed check whose advice points to config.toml \
+             `agents.<name>` sub-tables when .codex/agents exists; result: {result:#?}"
+        );
     }
 
     #[test]
