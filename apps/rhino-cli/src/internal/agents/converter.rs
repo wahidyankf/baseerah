@@ -3,7 +3,7 @@
 // Implements:
 // - OpenCodeAgent struct (emit shape with omitempty parity)
 // - ConversionWarning struct
-// - ConvertModel, ConvertTools, ConvertColor
+// - ConvertModel, ConvertPermission, ConvertColor
 // - ConvertAgent: reads a Claude .md, writes the OpenCode equivalent
 // - ConvertAllAgents: iterates .claude/agents/ and writes .opencode/agents/
 
@@ -32,7 +32,7 @@ pub struct ConversionWarning {
 }
 
 /// `OpenCode` agent emit shape matching Go's struct.
-/// Field order: description, model, tools, color, steps, skills.
+/// Field order: description, model, permission, color, steps, skills.
 /// `omitempty` fields: color (empty string), steps (0), skills (empty vec).
 #[derive(Debug, Clone, Default)]
 pub struct OpenCodeAgent {
@@ -40,8 +40,8 @@ pub struct OpenCodeAgent {
     pub description: String,
     /// `OpenCode` model ID (always emitted).
     pub model: String,
-    /// Tool allow-map: lowercase tool name → true (always emitted, `{}` when empty).
-    pub tools: BTreeMap<String, bool>,
+    /// Permission map: lowercase tool name → "allow" (always emitted, `{}` when empty).
+    pub permission: BTreeMap<String, String>,
     /// `OpenCode` color token (omitted when empty).
     pub color: String,
     /// Max agent turns (`steps` in `OpenCode`, omitted when 0).
@@ -261,7 +261,7 @@ fn apply_translate(out: &mut OpenCodeAgent, key: &str, value: &Value) {
     match key {
         "tools" => {
             let tools = parse_claude_tools(value);
-            out.tools = convert_tools(&tools);
+            out.permission = convert_permission(&tools);
         }
         "model" => {
             let s = value.as_str().unwrap_or("");
@@ -285,19 +285,19 @@ fn apply_translate(out: &mut OpenCodeAgent, key: &str, value: &Value) {
 
 /// Emit `OpenCodeAgent` as YAML matching Go's gopkg.in/yaml.v3 output:
 /// - 2-space indent
-/// - description, model, tools always emit
+/// - description, model, permission always emit
 /// - color, steps, skills are omitempty (skip when empty/0/empty-vec)
-/// - tools is a map (each entry on own line)
+/// - permission is a map (each entry on own line, value is the action string)
 /// - skills is a sequence (each entry on own line, "- skill-name")
 fn encode_opencode_agent(a: &OpenCodeAgent) -> String {
     let mut s = String::new();
     let _ = writeln!(s, "description: {}", yaml_string(&a.description));
     let _ = writeln!(s, "model: {}", yaml_string(&a.model));
-    if a.tools.is_empty() {
-        s.push_str("tools: {}\n");
+    if a.permission.is_empty() {
+        s.push_str("permission: {}\n");
     } else {
-        s.push_str("tools:\n");
-        for (k, v) in &a.tools {
+        s.push_str("permission:\n");
+        for (k, v) in &a.permission {
             let _ = writeln!(s, "  {k}: {v}");
         }
     }
@@ -377,17 +377,16 @@ fn needs_quoting(s: &str) -> bool {
     false
 }
 
-/// Converts a Claude tools array to an `OpenCode` tools map.
-/// Lower-cases each entry; empty entries are dropped.
-pub fn convert_tools(claude_tools: &[String]) -> BTreeMap<String, bool> {
-    let mut m = BTreeMap::new();
-    for t in claude_tools {
-        let lower = t.trim().to_lowercase();
-        if !lower.is_empty() {
-            m.insert(lower, true);
-        }
-    }
-    m
+/// Converts a Claude tools array to an `OpenCode` permission map.
+/// Lower-cases each entry and maps it to `"allow"`; empty entries are dropped.
+/// Tools not listed in the Claude array are omitted from the map.
+pub fn convert_permission(claude_tools: &[String]) -> BTreeMap<String, String> {
+    claude_tools
+        .iter()
+        .map(|t| t.trim().to_lowercase())
+        .filter(|t| !t.is_empty())
+        .map(|t| (t, "allow".to_string()))
+        .collect()
 }
 
 /// Converts a Claude model alias to the corresponding `OpenCode` model ID.
@@ -506,8 +505,9 @@ mod tests {
         assert!(content.starts_with("---\n"));
         assert!(content.contains("description: desc"));
         assert!(content.contains("model: opencode-go/minimax-m2.7"));
-        assert!(content.contains("read: true"));
-        assert!(content.contains("write: true"));
+        assert!(content.contains("permission:"));
+        assert!(content.contains("read: allow"));
+        assert!(content.contains("write: allow"));
         assert!(content.contains("color: primary"));
         assert!(content.contains("- my-skill"));
         assert!(content.ends_with("Body text\n"));
@@ -579,18 +579,18 @@ mod tests {
     }
 
     #[test]
-    fn convert_tools_lowercases() {
+    fn convert_permission_lowercases() {
         let in_tools = vec!["Read".to_string(), "Write".to_string(), "BASH".to_string()];
-        let out = convert_tools(&in_tools);
-        assert_eq!(out.get("read"), Some(&true));
-        assert_eq!(out.get("write"), Some(&true));
-        assert_eq!(out.get("bash"), Some(&true));
+        let out = convert_permission(&in_tools);
+        assert_eq!(out.get("read").map(String::as_str), Some("allow"));
+        assert_eq!(out.get("write").map(String::as_str), Some("allow"));
+        assert_eq!(out.get("bash").map(String::as_str), Some("allow"));
     }
 
     #[test]
-    fn convert_tools_skips_empty() {
+    fn convert_permission_skips_empty() {
         let in_tools = vec![String::new(), "  ".to_string(), "Read".to_string()];
-        let out = convert_tools(&in_tools);
+        let out = convert_permission(&in_tools);
         assert_eq!(out.len(), 1);
     }
 
@@ -604,5 +604,43 @@ mod tests {
         assert_eq!(convert_model("sonnet"), "opencode-go/minimax-m2.7");
         assert_eq!(convert_model(""), "opencode-go/minimax-m2.7");
         assert_eq!(convert_model("inherit"), "opencode-go/minimax-m2.7");
+    }
+
+    #[test]
+    fn convert_permission_maps_tools_to_allow() {
+        let in_tools = vec!["Read".to_string(), "Write".to_string()];
+        let out: BTreeMap<String, String> = convert_permission(&in_tools);
+        let expected: BTreeMap<String, String> = BTreeMap::from([
+            ("read".to_string(), "allow".to_string()),
+            ("write".to_string(), "allow".to_string()),
+        ]);
+        assert_eq!(out, expected);
+    }
+
+    #[test]
+    fn encode_emits_permission_block_not_tools() {
+        let agent = OpenCodeAgent {
+            description: "desc".to_string(),
+            model: "opencode-go/minimax-m2.7".to_string(),
+            permission: convert_permission(&["Read".to_string()]),
+            ..Default::default()
+        };
+        let yaml = encode_opencode_agent(&agent);
+        assert!(
+            yaml.contains("permission:\n"),
+            "expected a permission: block, got:\n{yaml}"
+        );
+        assert!(
+            yaml.contains("  read: allow\n"),
+            "expected read: allow under permission, got:\n{yaml}"
+        );
+        assert!(
+            !yaml.contains("tools:"),
+            "boolean tools: map must not be emitted, got:\n{yaml}"
+        );
+        assert!(
+            !yaml.contains("read: true"),
+            "boolean tool flags must not be emitted, got:\n{yaml}"
+        );
     }
 }

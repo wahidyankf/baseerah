@@ -8,7 +8,7 @@ use std::time::Instant;
 
 use serde_norway::Value;
 
-use super::converter::{OPENCODE_AGENT_DIR, convert_model, convert_tools};
+use super::converter::{OPENCODE_AGENT_DIR, convert_model, convert_permission};
 use super::frontmatter::{extract_frontmatter, parse_claude_tools};
 use super::types::{ValidationCheck, ValidationResult};
 
@@ -213,7 +213,7 @@ fn validate_agent_file(name: &str, claude_path: &Path, opencode_path: &Path) -> 
     )
 }
 
-/// Check description, model, tools, skills, and body parity between the two YAML trees.
+/// Check description, model, permission, skills, and body parity between the two YAML trees.
 fn validate_agent_yaml(
     check_name: &str,
     claude_yaml: &Value,
@@ -260,20 +260,20 @@ fn validate_agent_yaml(
         Some(v) => parse_claude_tools(v),
         None => Vec::new(),
     };
-    let expected_tools = convert_tools(&claude_tools);
-    let opencode_tools = parse_opencode_tools(opencode_yaml.get("tools"));
-    if !tools_match(&expected_tools, &opencode_tools) {
+    let expected_permission = convert_permission(&claude_tools);
+    let opencode_permission = parse_opencode_permission(opencode_yaml.get("permission"));
+    if !permission_match(&expected_permission, &opencode_permission) {
         return ValidationCheck::failed(
             check_name,
             format!(
-                "Tools: {}",
-                format_string_slice_owned(&sorted_keys(&expected_tools))
+                "Permission: {}",
+                format_string_slice_owned(&sorted_keys(&expected_permission))
             ),
             format!(
-                "Tools: {}",
-                format_string_slice_owned(&sorted_keys(&opencode_tools))
+                "Permission: {}",
+                format_string_slice_owned(&sorted_keys(&opencode_permission))
             ),
-            "Tools mismatch",
+            "Permission mismatch",
         );
     }
 
@@ -300,14 +300,13 @@ fn validate_agent_yaml(
     ValidationCheck::passed(check_name, "Agent is semantically equivalent")
 }
 
-/// Parse an `OpenCode` tools YAML mapping into a `BTreeMap<tool, enabled>`.
-fn parse_opencode_tools(v: Option<&Value>) -> BTreeMap<String, bool> {
+/// Parse an `OpenCode` permission YAML mapping into a `BTreeMap<tool, action>`.
+fn parse_opencode_permission(v: Option<&Value>) -> BTreeMap<String, String> {
     let mut out = BTreeMap::new();
     if let Some(Value::Mapping(m)) = v {
         for (k, val) in m {
-            if let Some(key) = k.as_str() {
-                let b = val.as_bool().unwrap_or(false);
-                out.insert(key.to_string(), b);
+            if let (Some(key), Some(action)) = (k.as_str(), val.as_str()) {
+                out.insert(key.to_string(), action.to_string());
             }
         }
     }
@@ -399,17 +398,9 @@ fn count_markdown_files(dir: &Path) -> usize {
     count
 }
 
-/// Return true if two tool maps are identical (same keys and values).
-fn tools_match(a: &BTreeMap<String, bool>, b: &BTreeMap<String, bool>) -> bool {
-    if a.len() != b.len() {
-        return false;
-    }
-    for (k, v) in a {
-        if b.get(k) != Some(v) {
-            return false;
-        }
-    }
-    true
+/// Return true if two permission maps are identical (same keys and values).
+fn permission_match(a: &BTreeMap<String, String>, b: &BTreeMap<String, String>) -> bool {
+    a == b
 }
 
 /// Return true if both skill sequences are identical (order-sensitive).
@@ -418,7 +409,7 @@ fn skills_match(a: &[String], b: &[String]) -> bool {
 }
 
 /// Return the keys of `m` in sorted order for deterministic display.
-fn sorted_keys(m: &BTreeMap<String, bool>) -> Vec<String> {
+fn sorted_keys(m: &BTreeMap<String, String>) -> Vec<String> {
     m.keys().cloned().collect()
 }
 
@@ -453,7 +444,7 @@ mod tests {
         );
         write(
             &opencode.join("foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         dir
     }
@@ -511,7 +502,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: NOPE\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: NOPE\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -526,7 +517,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/wrong\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/wrong\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -537,17 +528,17 @@ mod tests {
     }
 
     #[test]
-    fn validate_agent_equivalence_fails_on_tools_mismatch() {
+    fn validate_agent_equivalence_fails_on_permission_mismatch() {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\nskills:\n  - my-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\nskills:\n  - my-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
             checks
                 .iter()
-                .any(|c| c.status == "failed" && c.message == "Tools mismatch")
+                .any(|c| c.status == "failed" && c.message == "Permission mismatch")
         );
     }
 
@@ -556,7 +547,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - other-skill\n---\nBody\n",
+            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - other-skill\n---\nBody\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -571,7 +562,7 @@ mod tests {
         let dir = setup();
         write(
             &dir.path().join(".opencode/agents/foo.md"),
-            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\ntools:\n  read: true\n  write: true\nskills:\n  - my-skill\n---\nDifferent Body\n",
+            "---\ndescription: desc\nmodel: opencode-go/minimax-m2.7\npermission:\n  read: allow\n  write: allow\nskills:\n  - my-skill\n---\nDifferent Body\n",
         );
         let checks = validate_agent_equivalence(dir.path());
         assert!(
@@ -633,14 +624,14 @@ mod tests {
     }
 
     #[test]
-    fn tools_match_basic() {
+    fn permission_match_basic() {
         let mut a = BTreeMap::new();
-        a.insert("read".to_string(), true);
+        a.insert("read".to_string(), "allow".to_string());
         let mut b = BTreeMap::new();
-        b.insert("read".to_string(), true);
-        assert!(tools_match(&a, &b));
-        b.insert("write".to_string(), true);
-        assert!(!tools_match(&a, &b));
+        b.insert("read".to_string(), "allow".to_string());
+        assert!(permission_match(&a, &b));
+        b.insert("write".to_string(), "allow".to_string());
+        assert!(!permission_match(&a, &b));
     }
 
     #[test]
