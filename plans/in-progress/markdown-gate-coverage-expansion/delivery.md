@@ -34,8 +34,11 @@ and
   `.husky/pre-push`; `pr-validate-links.yml` is deleted and migrated; all existing `links.rs` /
   `heading_hierarchy.rs` / `mermaid.rs` unit tests stay green; new behavior (link `--exclude`,
   repo-wide scan, `broken-anchor` anchor validation, shared heading parser, heading prose allowlist
-  - `--exclude`, staged-only pre-commit steps) is fully tested; `diagrams.md` / `quality.md` /
-    `linking.md` / check-inventory docs are accurate; this plan's own diagrams, links, anchors, and
+  - `--exclude`, staged-only pre-commit steps) is fully tested; the rhino-cli BDD specs under
+    `specs/apps/rhino/` are updated in lockstep (link / heading / git-pre-commit `.feature` files +
+    `component-cli.md`) and the `spec-coverage` gate is green; `diagrams.md` / `quality.md` /
+    `linking.md` / check-inventory docs are accurate and propagated **via `repo-rules-maker`** with a
+    strict `repo-rules-quality-gate` **double-zero**; this plan's own diagrams, links, anchors, and
     prose headings pass; the plan is archived to `plans/done/`.
 
 > **Important (fix-all-issues)**: Fix ALL failures found during quality gates, not just those
@@ -147,6 +150,13 @@ local-temp, archived, apps-labs`, `.git`);
 - [ ] [AI] **REFACTOR** — Consolidate the slug + anchor + walk helpers; keep the shared heading
       parser in one place. Run `npx nx run rhino-cli:lint && npx nx run rhino-cli:test:quick`
       — acceptance: both exit 0; no clippy warnings introduced.
+- [ ] [AI] **SPEC** — Add matching scenarios to
+      `specs/apps/rhino/behavior/cli/gherkin/docs/docs-validate-links.feature` (one `--exclude`,
+      one repo-wide-scan, one valid-anchor, one `broken-anchor`, one same-file-anchor — each obeying
+      the one-`Given`/one-`When`/one-`Then` keyword cardinality norm) and document the `--exclude`
+      flag in `specs/apps/rhino/components/cli/component-cli.md`. Run
+      `npx nx run rhino-cli:spec-coverage` — acceptance: exits 0; the new link/anchor behavior is
+      covered by `.feature` scenarios.
 
 ### Phase 1 Gate
 
@@ -196,6 +206,11 @@ repeatable `--exclude` flag.
 - [ ] [AI] **REFACTOR** — Keep the allowlist + exclude logic in one cohesive place; align doc
       comments with module style. Run `npx nx run rhino-cli:lint && npx nx run rhino-cli:test:quick`
       — acceptance: both exit 0; no clippy warnings introduced.
+- [ ] [AI] **SPEC** — Add matching scenarios to
+      `specs/apps/rhino/behavior/cli/gherkin/docs/docs-validate-heading-hierarchy.feature` (one
+      prose-allowlist-runs, one agent/skill-file-exempt, one `plans/done`-excluded, one `--exclude`
+      — each obeying the keyword-cardinality norm). Run `npx nx run rhino-cli:spec-coverage`
+      — acceptance: exits 0; the allowlist + `--exclude` behavior is covered by `.feature` scenarios.
 
 ### Phase 2 Gate
 
@@ -245,6 +260,11 @@ three `--exclude` named exclusions.
 - [ ] [AI] **REFACTOR** — Factor staged-file collection shared by the three steps; align step
       numbering/comments. Run `npx nx run rhino-cli:lint && npx nx run rhino-cli:test:quick`
       — acceptance: both exit 0; no clippy warnings introduced.
+- [ ] [AI] **SPEC** — Add matching scenarios to
+      `specs/apps/rhino/behavior/cli/gherkin/git/git-pre-commit.feature` (one staged-mermaid-blocks,
+      one staged-prose-heading-blocks, one staged-skill-file-exempt, one link-step-honors-exclusions
+      — each obeying the keyword-cardinality norm). Run `npx nx run rhino-cli:spec-coverage`
+      — acceptance: exits 0; the new staged steps are covered by `.feature` scenarios.
 
 ### Phase 3 Gate
 
@@ -517,9 +537,14 @@ three `--exclude` named exclusions.
 
 ---
 
-## Phase 10: Update Governance Docs (convention accuracy)
+## Phase 10: Update Governance Docs + Propagate via `repo-rules-maker`
 
-> _Suggested executor: `repo-rules-maker` (governance conventions)._
+> _Executor: `repo-rules-maker` (governance propagation sweep)._
+>
+> Update all related governance `.md` files, then propagate the change **through `repo-rules-maker`**
+> so the sweep reaches every governance surface (conventions, check-inventory, indexes, and any
+> agent/skill text) — not only the obvious files. Hand-editing just the three named conventions is
+> NOT sufficient; the maker performs the broad sweep.
 
 - [ ] [AI] Edit `repo-governance/conventions/formatting/diagrams.md`: update the mermaid-enforcement
       description to state the gate runs at **pre-commit staged-only** + the consolidated CI
@@ -536,6 +561,11 @@ three `--exclude` named exclusions.
 - [ ] [AI] Update the check-inventory / `repo-governance/development/quality/repository-validation.md`
       doc(s) to list the three markdown gates and the consolidated `validate-markdown.yml` workflow
       — acceptance: the three gates and the workflow are listed.
+- [ ] [AI] **Propagate via `repo-rules-maker`** — run the governance propagation sweep so the new
+      enforcement is reflected across every related surface (conventions, check-inventory, governance
+      indexes, and any agent/skill prompt text that references the old enforcement), not just the
+      named files above — acceptance: `repo-rules-maker` reports the sweep complete; no related
+      surface still describes the stale pre-push-only / no-anchor / no-heading-enforcement state.
 - [ ] [AI] If any `.claude/` agent/skill text changed as part of governance propagation, run
       `npm run generate:bindings` to re-sync the secondary bindings — acceptance: `git status`
       shows the generated `.opencode/`/`.amazonq/` mirrors updated in lockstep (or no `.claude/`

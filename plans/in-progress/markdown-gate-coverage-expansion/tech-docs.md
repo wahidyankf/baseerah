@@ -249,6 +249,32 @@ let CI invoke them via `nx`. If added, the CI workflow and pre-commit reference 
 invokes `cargo run` directly as `pr-validate-links.yml` does today. The plan implements targets
 (cleaner CI + caching). Each target's command passes the three `--exclude` flags (link/mermaid).
 
+### DD-10 — BDD spec parity (`specs/apps/rhino/`)
+
+The repo enforces `spec-coverage` (a pre-push + CI Nx target) that maps `.feature` scenarios to
+validator code. New validator behavior therefore MUST land with matching spec scenarios or the gate
+fails. Per the repo TDD convention, Gherkin acceptance criteria are the natural source of the first
+failing tests, so the spec edits are authored in the SAME phase as the code (lockstep), not deferred
+to a doc phase:
+
+- Link work (Phase 1) updates `docs/docs-validate-links.feature` (`--exclude`, repo-wide,
+  `broken-anchor`).
+- Heading work (Phase 2) updates `docs/docs-validate-heading-hierarchy.feature` (prose allowlist,
+  agent/skill exemption, `--exclude`).
+- Pre-commit work (Phase 3) updates `git/git-pre-commit.feature` (staged mermaid + heading steps).
+- `components/cli/component-cli.md` gains the new flags. The mermaid `.feature` changes only if it
+  references pre-push (the mermaid CLI behavior itself is unchanged — only its enforcement layer
+  moves, which is hook wiring, not CLI semantics).
+
+### DD-11 — Governance propagation via `repo-rules-maker` + quality gate
+
+The convention `.md` updates (DD's doc rows) are not hand-edited in isolation. Phase 10 runs the
+broad governance propagation **through `repo-rules-maker`** so every related surface (conventions,
+check-inventory, any agent/skill text) is swept consistently, then `npm run generate:bindings`
+re-syncs the secondary bindings. Phase 11 validates the result with `repo-rules-quality-gate`
+(strict) to a **double-zero** (zero checker findings AND zero fixer changes on a clean re-run)
+before push. [Repo-grounded — `repo-governance/workflows/repo/repo-rules-quality-gate.md`]
+
 ## Validator Behavior Matrix (after this plan)
 
 | Validator                    | Scope                                           | New behavior                                                         |
@@ -259,22 +285,27 @@ invokes `cargo run` directly as `pr-validate-links.yml` does today. The plan imp
 
 ## File Impact
 
-| File                                                             | Change                                                                                                     | Executor                |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `.husky/pre-push`                                                | Remove the mermaid trigger block (DD-1)                                                                    | `swe-rust-dev`          |
-| `apps/rhino-cli/src/internal/git.rs`                             | Add staged-only mermaid + heading-hierarchy pre-commit steps (DD-7); heading step applies prose allowlist  | `swe-rust-dev`          |
-| `apps/rhino-cli/src/commands/docs_validate_links.rs`             | Add repeatable `--exclude` arg; thread into `ScanOptions.skip_paths` (DD-2)                                | `swe-rust-dev`          |
-| `apps/rhino-cli/src/internal/docs/links.rs`                      | Repo-wide walk minus noise dirs (DD-3); `broken-anchor` category + GitHub-slugify anchor validation (DD-4) | `swe-rust-dev`          |
-| `apps/rhino-cli/src/internal/docs/heading_hierarchy.rs`          | Factor shared fence-aware heading parser (DD-5); add prose-allowlist predicate (DD-6)                      | `swe-rust-dev`          |
-| `apps/rhino-cli/src/commands/docs_validate_heading_hierarchy.rs` | Add repeatable `--exclude` arg; apply allowlist on top of defaults (DD-6)                                  | `swe-rust-dev`          |
-| `apps/rhino-cli/project.json`                                    | Add `validate:links` + `validate:heading-hierarchy` Nx targets; pass `--exclude` flags (DD-9)              | `swe-rust-dev`          |
-| `.github/workflows/validate-markdown.yml`                        | **NEW FILE** — dual `pull_request`/`push` to `main`; runs all three gates (DD-8)                           | `swe-rust-dev`          |
-| `.github/workflows/pr-validate-links.yml`                        | **DELETE** — migrated into `validate-markdown.yml` (DD-8)                                                  | `swe-rust-dev`          |
-| `repo-governance/conventions/formatting/diagrams.md`             | Update mermaid-enforcement description (pre-commit + CI, no pre-push)                                      | `repo-rules-maker`      |
-| `repo-governance/conventions/writing/quality.md`                 | Note single-H1 / heading-nesting now enforced for prose via rhino-cli                                      | `repo-rules-maker`      |
-| `repo-governance/conventions/formatting/linking.md`              | Note `#fragment` anchor validation is now enforced                                                         | `repo-rules-maker`      |
-| Check-inventory / repository-validation docs                     | Add the three markdown gates and the consolidated workflow                                                 | `repo-rules-maker`      |
-| Markdown across covered trees                                    | Per-tree fix-all (mermaid findings, broken links/anchors, prose headings)                                  | per-tree (see delivery) |
+| File                                                                                 | Change                                                                                                     | Executor                |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `.husky/pre-push`                                                                    | Remove the mermaid trigger block (DD-1)                                                                    | `swe-rust-dev`          |
+| `apps/rhino-cli/src/internal/git.rs`                                                 | Add staged-only mermaid + heading-hierarchy pre-commit steps (DD-7); heading step applies prose allowlist  | `swe-rust-dev`          |
+| `apps/rhino-cli/src/commands/docs_validate_links.rs`                                 | Add repeatable `--exclude` arg; thread into `ScanOptions.skip_paths` (DD-2)                                | `swe-rust-dev`          |
+| `apps/rhino-cli/src/internal/docs/links.rs`                                          | Repo-wide walk minus noise dirs (DD-3); `broken-anchor` category + GitHub-slugify anchor validation (DD-4) | `swe-rust-dev`          |
+| `apps/rhino-cli/src/internal/docs/heading_hierarchy.rs`                              | Factor shared fence-aware heading parser (DD-5); add prose-allowlist predicate (DD-6)                      | `swe-rust-dev`          |
+| `apps/rhino-cli/src/commands/docs_validate_heading_hierarchy.rs`                     | Add repeatable `--exclude` arg; apply allowlist on top of defaults (DD-6)                                  | `swe-rust-dev`          |
+| `apps/rhino-cli/project.json`                                                        | Add `validate:links` + `validate:heading-hierarchy` Nx targets; pass `--exclude` flags (DD-9)              | `swe-rust-dev`          |
+| `.github/workflows/validate-markdown.yml`                                            | **NEW FILE** — dual `pull_request`/`push` to `main`; runs all three gates (DD-8)                           | `swe-rust-dev`          |
+| `.github/workflows/pr-validate-links.yml`                                            | **DELETE** — migrated into `validate-markdown.yml` (DD-8)                                                  | `swe-rust-dev`          |
+| `repo-governance/conventions/formatting/diagrams.md`                                 | Update mermaid-enforcement description (pre-commit + CI, no pre-push)                                      | `repo-rules-maker`      |
+| `repo-governance/conventions/writing/quality.md`                                     | Note single-H1 / heading-nesting now enforced for prose via rhino-cli                                      | `repo-rules-maker`      |
+| `repo-governance/conventions/formatting/linking.md`                                  | Note `#fragment` anchor validation is now enforced                                                         | `repo-rules-maker`      |
+| Check-inventory / repository-validation docs                                         | Add the three markdown gates and the consolidated workflow                                                 | `repo-rules-maker`      |
+| `specs/apps/rhino/behavior/cli/gherkin/docs/docs-validate-links.feature`             | Add scenarios: `--exclude`, repo-wide scan, `broken-anchor` (DD-2/3/4)                                     | `swe-rust-dev`          |
+| `specs/apps/rhino/behavior/cli/gherkin/docs/docs-validate-heading-hierarchy.feature` | Add scenarios: prose allowlist, agent/skill exemption, `--exclude` (DD-6)                                  | `swe-rust-dev`          |
+| `specs/apps/rhino/behavior/cli/gherkin/git/git-pre-commit.feature`                   | Add scenarios: staged mermaid + heading steps; link step honors the 3 exclusions (DD-7)                    | `swe-rust-dev`          |
+| `specs/apps/rhino/components/cli/component-cli.md`                                   | Document the new `--exclude` flags + heading-hierarchy wiring; update any stale flag list                  | `swe-rust-dev`          |
+| `specs/apps/rhino/behavior/cli/gherkin/docs/docs-validate-mermaid.feature`           | Only if it references pre-push — restate enforcement as pre-commit + CI (CLI behavior unchanged)           | `swe-rust-dev`          |
+| Markdown across covered trees                                                        | Per-tree fix-all (mermaid findings, broken links/anchors, prose headings)                                  | per-tree (see delivery) |
 
 ## Dependencies
 

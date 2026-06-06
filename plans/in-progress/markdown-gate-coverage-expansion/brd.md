@@ -67,6 +67,10 @@ constraint of the plan — breaking an agent or skill file is unacceptable. [Jud
   enforced for prose, while agent/skill artifacts are provably exempt.
 - **Unskippable CI** — PR and push-to-`main` CI both run all three gates; `--no-verify` only skips
   the local pre-commit layer.
+- **Spec + governance parity** — the rhino-cli BDD specs (`specs/apps/rhino/`) gain scenarios for the
+  new behavior so the `spec-coverage` gate stays green, and the convention change is propagated via
+  `repo-rules-maker` and validated by a strict `repo-rules-quality-gate` double-zero, so no
+  governance surface is left describing the old enforcement.
 
 ## Affected Roles
 

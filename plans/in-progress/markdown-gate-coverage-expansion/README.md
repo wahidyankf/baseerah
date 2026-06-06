@@ -85,9 +85,18 @@ archived, apps-labs`); keep the existing `.claude/skills/` hard-skip.
   `pr-validate-links.yml` into it.
 - **Per-tree fix-all** of any existing violations the newly-wired gates surface (mermaid findings,
   broken links, broken anchors, prose-doc heading violations), each phase gated.
-- **Doc updates**: `diagrams.md` (mermaid enforcement description), `quality.md` (single-H1 /
-  heading-nesting now enforced-for-prose), `linking.md` (anchor validation), and check-inventory
-  docs.
+- **BDD spec updates** (`specs/apps/rhino/`): keep the rhino-cli behavior specs in lockstep with the
+  new validator behavior — add scenarios to `behavior/cli/gherkin/docs/docs-validate-links.feature`
+  (`--exclude`, repo-wide scan, `broken-anchor`), `behavior/cli/gherkin/docs/docs-validate-heading-hierarchy.feature`
+  (prose allowlist, `--exclude`), and `behavior/cli/gherkin/git/git-pre-commit.feature` (staged
+  mermaid + heading steps); update `components/cli/component-cli.md` flags. Required, not optional:
+  the `spec-coverage` Nx gate maps `.feature` scenarios to code, so new behavior without matching
+  spec scenarios fails the gate.
+- **Governance propagation**: update all related governance `.md` files (`diagrams.md`, `quality.md`,
+  `linking.md`, check-inventory docs) and propagate the changes **via `repo-rules-maker`** (broad
+  governance sweep, not hand-editing only the obvious files), re-sync secondary bindings
+  (`npm run generate:bindings`), then validate consistency with the **`repo-rules-quality-gate`**
+  (strict, double-zero).
 
 ### Out of scope (deferred)
 

@@ -49,6 +49,13 @@ surfaces.
   parser from `heading_hierarchy.rs`, so heading parsing is not duplicated across two modules.
 - **US-10** — As a maintainer, I want `diagrams.md`, `quality.md`, and `linking.md` to accurately
   describe the new enforcement, so governance docs match the tooling.
+- **US-11** — As a tooling maintainer, I want the rhino-cli BDD specs under `specs/apps/rhino/` to
+  gain scenarios for the new validator behavior (link `--exclude`/repo-wide/anchors, heading prose
+  allowlist/`--exclude`, staged pre-commit mermaid+heading steps), so the `spec-coverage` gate stays
+  green and the specs remain the source of the first failing tests.
+- **US-12** — As a governance maintainer, I want the related convention `.md` updates propagated via
+  `repo-rules-maker` and validated by `repo-rules-quality-gate` (strict, double-zero), so the rule
+  change reaches every governance surface, not just the obvious files.
 
 ## Acceptance Criteria (Gherkin)
 
@@ -242,6 +249,25 @@ Scenario: This plan passes its own gates
   And zero blocking findings are reported for this plan
 ```
 
+### Spec parity and governance propagation
+
+```gherkin
+Scenario: The rhino-cli BDD specs cover the new validator behavior
+  Given the spec files under specs/apps/rhino/behavior/cli/gherkin
+  When the spec-coverage gate maps scenarios to validator code
+  Then docs-validate-links.feature has scenarios for --exclude, repo-wide scan, and broken-anchor
+  And docs-validate-heading-hierarchy.feature has scenarios for the prose allowlist and --exclude
+  And git-pre-commit.feature has scenarios for the staged mermaid and heading steps
+```
+
+```gherkin
+Scenario: The convention change is propagated and gate-validated
+  Given the related governance docs updated for the new enforcement
+  When repo-rules-maker performs the governance propagation sweep
+  Then every related surface (diagrams, quality, linking, check-inventory) reflects the change
+  And a strict repo-rules-quality-gate run reaches double-zero
+```
+
 ## Product Scope
 
 ### In scope (features)
@@ -260,6 +286,10 @@ Scenario: This plan passes its own gates
 - Per-tree fix-all of surfaced violations (mermaid, broken links, broken anchors, prose headings),
   gated.
 - Doc updates: `diagrams.md`, `quality.md`, `linking.md`, check-inventory docs.
+- BDD spec updates under `specs/apps/rhino/` (link/heading/git-pre-commit `.feature` files +
+  `component-cli.md`) in lockstep with the code, keeping the `spec-coverage` gate green.
+- Governance propagation via `repo-rules-maker` (broad sweep), `npm run generate:bindings` re-sync,
+  and a strict `repo-rules-quality-gate` double-zero validation.
 
 ### Out of scope (features)
 
