@@ -576,6 +576,9 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
   is its multi-repo analogue (one plan per repo, one grill session across all repos)
 - [Plan Execution](./plan-execution.md) — downstream workflow that executes the plans this
   workflow creates; runs after plans are established and promoted to `in-progress/`
+- [Plan Multi-Repo Parity Planning and Execution](./plan-multi-repo-parity-planning-and-execution.md) —
+  end-to-end composite that runs this workflow as its planning phase and continues directly into
+  plan-execution for every resulting plan
 
 ## Principles Implemented/Respected
 

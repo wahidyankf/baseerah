@@ -761,6 +761,7 @@ The plan-execution-checker validates:
 This workflow can be composed with:
 
 - **plan-quality-gate**: Validate plan quality before executing (recommended pre-step)
+- **[plan-multi-repo-parity-planning-and-execution](./plan-multi-repo-parity-planning-and-execution.md)**: composite that nests this workflow per repo after a multi-repo parity planning phase
 - Content creation workflows: Execute content-focused plans
 - Release workflows: Execute release plans with deployment
 - **repo-rules-quality-gate**: Validate repository consistency after plan execution
