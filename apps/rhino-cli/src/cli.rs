@@ -8,11 +8,11 @@ use crate::commands::{
     docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
     docs_validate_mermaid, docs_validate_naming, doctor, env_backup, env_init, env_restore,
     git_pre_commit, governance_agents_md_size, governance_audit, governance_emoji_audit,
-    governance_frontmatter_audit, governance_layer_coherence, governance_license_audit,
-    governance_readme_index_audit, governance_traceability_audit, governance_vendor_audit,
-    spec_coverage_validate, specs_validate_adoption, specs_validate_counts, specs_validate_links,
-    specs_validate_tree, test_coverage_diff, test_coverage_merge, test_coverage_validate,
-    workflows_validate_naming,
+    governance_frontmatter_audit, governance_gherkin_keyword_cardinality_audit,
+    governance_layer_coherence, governance_license_audit, governance_readme_index_audit,
+    governance_traceability_audit, governance_vendor_audit, spec_coverage_validate,
+    specs_validate_adoption, specs_validate_counts, specs_validate_links, specs_validate_tree,
+    test_coverage_diff, test_coverage_merge, test_coverage_validate, workflows_validate_naming,
 };
 use crate::internal::cliout::OutputFormat;
 
@@ -219,7 +219,7 @@ pub enum RepoGovernanceCommands {
     /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
     #[command(name = "agents-md-size")]
     AgentsMdSize(governance_agents_md_size::AgentsMdSizeArgs),
-    /// Run all 11 deterministic governance audits and emit a JSON envelope.
+    /// Run all deterministic governance audits and emit a JSON envelope.
     #[command(name = "audit")]
     Audit(governance_audit::AuditArgs),
     /// Audit forbidden file types for emoji codepoints.
@@ -228,6 +228,11 @@ pub enum RepoGovernanceCommands {
     /// Audit markdown files for forbidden manual date metadata.
     #[command(name = "frontmatter-audit")]
     FrontmatterAudit(governance_frontmatter_audit::FrontmatterAuditArgs),
+    /// Audit `.feature` scenarios for repeated primary Given/When/Then keywords.
+    #[command(name = "gherkin-keyword-cardinality")]
+    GherkinKeywordCardinality(
+        governance_gherkin_keyword_cardinality_audit::GherkinKeywordCardinalityArgs,
+    ),
     /// Audit governance docs for layer numbering/naming coherence.
     #[command(name = "layer-coherence")]
     LayerCoherence(governance_layer_coherence::LayerCoherenceArgs),
@@ -331,6 +336,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             }
             RepoGovernanceCommands::FrontmatterAudit(args) => {
                 governance_frontmatter_audit::run(args, output_format)
+            }
+            RepoGovernanceCommands::GherkinKeywordCardinality(args) => {
+                governance_gherkin_keyword_cardinality_audit::run(args, output_format)
             }
             RepoGovernanceCommands::LayerCoherence(args) => {
                 governance_layer_coherence::run(args, output_format)

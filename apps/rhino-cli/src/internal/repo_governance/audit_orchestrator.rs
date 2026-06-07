@@ -2,7 +2,7 @@
 //!
 //! Ported from `apps/rhino-cli/internal/repo-governance/audit_orchestrator.go`.
 //!
-//! Runs the 11 deterministic governance audits in fixed order, normalises
+//! Runs the deterministic governance audits in fixed order, normalises
 //! per-category findings to [`AuditFinding`], and aggregates them into an
 //! [`AuditEnvelope`].
 
@@ -20,6 +20,7 @@ use sha2::{Digest, Sha256};
 use super::agents_md_size::check_agents_md_size;
 use super::emoji_audit::audit_emoji;
 use super::frontmatter_audit::audit_frontmatter;
+use super::gherkin_keyword_cardinality_audit::audit_gherkin_keyword_cardinality;
 use super::layer_coherence::audit_layer_coherence;
 use super::license_audit::audit_license;
 use super::readme_index_audit::audit_readme_index;
@@ -52,6 +53,7 @@ pub fn audit_category_order() -> &'static [&'static str] {
         "docs-validate-frontmatter",
         "docs-validate-heading-hierarchy",
         "agents-detect-duplication",
+        "gherkin-keyword-cardinality",
     ]
 }
 
@@ -66,6 +68,7 @@ fn audit_category_command(name: &str) -> &'static str {
         "license-audit" => "repo-governance license-audit",
         "readme-index-audit" => "repo-governance readme-index-audit",
         "emoji-audit" => "repo-governance emoji-audit",
+        "gherkin-keyword-cardinality" => "repo-governance gherkin-keyword-cardinality",
         "layer-coherence" => "repo-governance layer-coherence",
         "docs-validate-naming" => "docs validate-naming",
         "docs-validate-frontmatter" => "docs validate-frontmatter",
@@ -96,6 +99,10 @@ fn default_readme_index_paths() -> &'static [&'static str] {
 }
 /// Default directory roots scanned by the `emoji-audit` category.
 fn default_emoji_paths() -> &'static [&'static str] {
+    &["."]
+}
+/// Default directory roots scanned by the `gherkin-keyword-cardinality` category.
+fn default_gherkin_keyword_cardinality_paths() -> &'static [&'static str] {
     &["."]
 }
 /// Default directory roots scanned by the `docs-validate-naming` category.
@@ -134,6 +141,8 @@ pub struct AuditOptions {
     pub readme_index_audit_paths: Vec<String>,
     /// Override search roots for the `emoji-audit` category.
     pub emoji_audit_paths: Vec<String>,
+    /// Override search roots for the `gherkin-keyword-cardinality` category.
+    pub gherkin_keyword_cardinality_paths: Vec<String>,
     /// Override search roots for the `docs-validate-naming` category.
     pub docs_validate_naming_paths: Vec<String>,
     /// Override search roots for the `docs-validate-frontmatter` category.
@@ -293,10 +302,14 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
 /// runner propagates an IO or parse error.
 fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<AuditFinding>, Error> {
     match name {
-        "agents-md-size" | "frontmatter-audit" | "traceability-audit" | "license-audit"
-        | "readme-index-audit" | "emoji-audit" | "layer-coherence" => {
-            run_category_governance(name, opts)
-        }
+        "agents-md-size"
+        | "frontmatter-audit"
+        | "traceability-audit"
+        | "license-audit"
+        | "readme-index-audit"
+        | "emoji-audit"
+        | "gherkin-keyword-cardinality"
+        | "layer-coherence" => run_category_governance(name, opts),
         "docs-validate-naming"
         | "docs-validate-frontmatter"
         | "docs-validate-heading-hierarchy"
@@ -305,7 +318,7 @@ fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<Audi
     }
 }
 
-/// Executes one of the seven governance-specific audit categories and returns
+/// Executes one of the governance-specific audit categories and returns
 /// normalised [`AuditFinding`]s.
 ///
 /// # Errors
@@ -390,6 +403,7 @@ fn run_category_governance(
                 })
                 .collect())
         }
+        "gherkin-keyword-cardinality" => run_gherkin_keyword_cardinality(name, opts),
         "layer-coherence" => {
             let findings = audit_layer_coherence(&opts.repo_root)?;
             Ok(findings
@@ -399,6 +413,34 @@ fn run_category_governance(
         }
         _ => Err(anyhow::anyhow!("unknown category {name}")),
     }
+}
+
+/// Runs the `gherkin-keyword-cardinality` audit and normalises its findings
+/// to [`AuditFinding`]s.
+///
+/// # Errors
+///
+/// Returns an error when the delegated audit reports an IO failure.
+fn run_gherkin_keyword_cardinality(
+    name: &str,
+    opts: &AuditOptions,
+) -> std::result::Result<Vec<AuditFinding>, Error> {
+    let paths = resolve_paths(
+        &opts.repo_root,
+        &opts.gherkin_keyword_cardinality_paths,
+        default_gherkin_keyword_cardinality_paths(),
+    );
+    let findings = audit_gherkin_keyword_cardinality(&paths)?;
+    Ok(findings
+        .into_iter()
+        .map(|f| {
+            let msg = format!(
+                "scenario '{}' uses primary keyword '{}' {} times (expected exactly one; chain extras with And/But)",
+                f.scenario, f.keyword, f.count
+            );
+            new_audit_finding(name, &f.file, f.line, &msg)
+        })
+        .collect())
 }
 
 /// Executes one of the four docs/agents audit categories and returns normalised
@@ -885,15 +927,20 @@ mod tests {
             audit_category_command("agents-detect-duplication"),
             "agents detect-duplication"
         );
+        assert_eq!(
+            audit_category_command("gherkin-keyword-cardinality"),
+            "repo-governance gherkin-keyword-cardinality"
+        );
         assert_eq!(audit_category_command("unknown"), "");
     }
 
     #[test]
     fn audit_category_order_is_fixed() {
         let o = audit_category_order();
-        assert_eq!(o.len(), 11);
+        assert_eq!(o.len(), 12);
         assert_eq!(o[0], "agents-md-size");
         assert_eq!(o[10], "agents-detect-duplication");
+        assert_eq!(o[11], "gherkin-keyword-cardinality");
     }
 
     #[test]
@@ -901,6 +948,7 @@ mod tests {
         assert!(!default_frontmatter_paths().is_empty());
         assert!(!default_readme_index_paths().is_empty());
         assert!(!default_emoji_paths().is_empty());
+        assert!(!default_gherkin_keyword_cardinality_paths().is_empty());
         assert!(!default_docs_validate_naming_paths().is_empty());
         assert!(!default_docs_validate_frontmatter_paths().is_empty());
         assert!(!default_docs_validate_heading_hierarchy_paths().is_empty());

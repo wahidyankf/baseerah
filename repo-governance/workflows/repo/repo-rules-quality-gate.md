@@ -106,7 +106,7 @@ context — use this when agent delegation is unavailable.
 
 ### 0.5. Deterministic Preflight (Sequential)
 
-Run the `rhino-cli` orchestrator to harvest all deterministic governance findings before invoking the AI checker. Deterministic categories (file naming, frontmatter shape, license presence, README index integrity, emoji codepoints, layer-coherence, doc heading hierarchy, agent-skill verbatim duplication) execute in milliseconds and cache via Nx; the AI checker then runs only the AI-only categories (paraphrased duplication, semantic contradictions, terminology alignment, principle-appropriateness judgement).
+Run the `rhino-cli` orchestrator to harvest all deterministic governance findings before invoking the AI checker. Deterministic categories (file naming, frontmatter shape, license presence, README index integrity, emoji codepoints, layer-coherence, doc heading hierarchy, agent-skill verbatim duplication, gherkin-keyword-cardinality) execute in milliseconds and cache via Nx; the AI checker then runs only the AI-only categories (paraphrased duplication, semantic contradictions, terminology alignment, principle-appropriateness judgement).
 
 **Why Step 0.5 (and not Step 1, renumbering everything down)**: This step was inserted between the pre-existing Step 1 (Initial Validation) and the workflow start. Decimal numbering preserves the existing Step 1-6 references in the checker/fixer prompts that pre-date the preflight. The [Workflow Identifier Convention](../../../repo-governance/workflows/meta/workflow-identifier.md) explicitly allows sub-step decimals for non-disruptive insertions.
 

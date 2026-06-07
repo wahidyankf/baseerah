@@ -22,6 +22,7 @@ pub mod governance_agents_md_size;
 pub mod governance_audit;
 pub mod governance_emoji_audit;
 pub mod governance_frontmatter_audit;
+pub mod governance_gherkin_keyword_cardinality_audit;
 pub mod governance_layer_coherence;
 pub mod governance_license_audit;
 pub mod governance_readme_index_audit;

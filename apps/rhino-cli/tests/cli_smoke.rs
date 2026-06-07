@@ -37,3 +37,12 @@ fn invalid_output_format_exits_failure() {
 fn unknown_subcommand_exits_failure() {
     cmd().arg("not-a-real-command").assert().failure();
 }
+
+#[test]
+fn gherkin_keyword_cardinality_subcommand_exists() {
+    cmd()
+        .args(["repo-governance", "gherkin-keyword-cardinality", "--help"])
+        .assert()
+        .success()
+        .stdout(contains("Usage"));
+}
