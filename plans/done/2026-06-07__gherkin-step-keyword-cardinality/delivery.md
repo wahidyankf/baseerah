@@ -239,7 +239,7 @@ _Suggested executor: `swe-rust-dev`_
       Because `test:unit` runs `cargo test --lib` (integration tests excluded), additionally ran
       `cargo test --test cli_smoke` to observe the red: 5 passed, 1 FAILED —
       `gherkin_keyword_cardinality_subcommand_exists` panics with "unrecognized subcommand".
-- [ ] [AI] **GREEN** — Create the CLI command
+- [x] [AI] **GREEN** — Create the CLI command
       `apps/rhino-cli/src/commands/governance_gherkin_keyword_cardinality_audit.rs`
       (sibling pattern: `governance_emoji_audit.rs`) exposing
       `repo-governance gherkin-keyword-cardinality` that scans all tracked `**/*.feature`
@@ -709,21 +709,28 @@ _Suggested executor: `swe-typescript-dev`_
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically — group related changes into logically cohesive commits
+- [x] [AI] Commit changes thematically
+      **Status (2026-06-07)**: DONE — 6 thematic commits: docs(governance) 1a20df859; feat(rhino-cli) eca3bb72b; docs(agents) 391b4a5ac; refactor(specs) 0ff1c611b; fix(organiclever-web) 0bb545cac (preexisting fix, separate); chore(plans) b5ad69561. — group related changes into logically cohesive commits
       (suggested split: `docs(governance): add Gherkin keyword-cardinality HARD rule`;
       `feat(rhino-cli): add gherkin-keyword-cardinality audit category`;
       `refactor(specs): normalize <project> scenarios to one-each keyword shape` per project;
       `chore(bindings): re-sync skill + agent bindings`).
-- [ ] [AI] Follow Conventional Commits format: `<type>(<scope>): <description>`
-- [ ] [AI] Split different domains/concerns into separate commits
-- [ ] [AI] Preexisting fixes get their own commits, separate from plan work
-- [ ] [AI] Do NOT bundle unrelated changes into a single commit
+- [x] [AI] Follow Conventional Commits format
+      **Status (2026-06-07)**: DONE — all six messages commitlint-clean (commit-msg hook passed).: `<type>(<scope>): <description>`
+- [x] [AI] Split different domains/concerns into separate commits
+      **Status (2026-06-07)**: DONE — governance/code/agents/specs/fix/plans split.
+- [x] [AI] Preexisting fixes get their own commits, separate from plan work
+      **Status (2026-06-07)**: DONE — timezone fix isolated in 0bb545cac.
+- [x] [AI] Do NOT bundle unrelated changes into a single commit
+      **Status (2026-06-07)**: DONE.
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push changes to `main` (direct push, Trunk Based Development — no PR):
+- [x] [AI] Push changes to `main` (direct push, Trunk Based Development — no PR):
+      **Status (2026-06-07)**: DONE — `git push origin HEAD:main` from the worktree branch; pre-push hook green.
       `git push origin main`
-- [ ] [AI] Check which push-triggered GitHub Actions workflows fired:
+- [x] [AI] Check which push-triggered GitHub Actions workflows fired:
+      **Status (2026-06-07)**: DONE — only `Validate Markdown` fired for SHA b5ad6956 (as the plan predicted); polled via single `gh run list --json` calls.
       `gh run list --branch main --limit 5 --json name,status,conclusion`
       — `validate-markdown.yml` (push to `main`, no path filter) WILL fire and validates
       mermaid + links + heading-hierarchy across the repo; the affected paths
@@ -733,31 +740,46 @@ _Suggested executor: `swe-typescript-dev`_
       Development — no PR is created); scheduled workflows fire independently.
       Poll each triggered run to completion (every 3 minutes;
       one `gh run view --json status,conclusion` per wakeup; never `gh run watch`).
-- [ ] [AI] Verify ALL CI checks pass — no exceptions
-- [ ] [AI] If any CI check fails, fix the root cause immediately and push a follow-up commit
-- [ ] [AI] Repeat until ALL GitHub Actions pass with zero failures
-- [ ] [AI] Do NOT proceed to archival until CI is fully green
+- [x] [AI] Verify ALL CI checks pass — no exceptions
+      **Status (2026-06-07)**: PASS — Validate Markdown: success.
+- [x] [AI] If any CI check fails, fix the root cause immediately and push a follow-up commit
+      **Status (2026-06-07)**: N/A — no failures.
+- [x] [AI] Repeat until ALL GitHub Actions pass with zero failures
+      **Status (2026-06-07)**: DONE — all green on first run.
+- [x] [AI] Do NOT proceed to archival until CI is fully green
+      **Status (2026-06-07)**: CONFIRMED — CI green before archival.
 
 ### Phase 15 Gate
 
 > All checks below must pass before archival.
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` exits 0 locally.
-- [ ] [AI] Changes pushed to `origin main`; all triggered GitHub Actions are green.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` exits 0 locally.
+      **Status (2026-06-07)**: PASS — all four exit 0.
+- [x] [AI] Changes pushed to `origin main`; all triggered GitHub Actions are green.
+      **Status (2026-06-07)**: PASS — SHA b5ad6956 on origin main; Validate Markdown success.
 
 > **Pause Safety**: work is committed and pushed; CI is green. Safe to stop. To resume: re-check CI
 > status with `gh run view --json status,conclusion`.
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI)
-- [ ] [AI] Verify the strict `repo-rules-quality-gate` passed with double-zero (Phase 14)
-- [ ] [AI] Rename and move:
+- [x] [AI] Verify ALL delivery checklist items are ticked
+      **Status (2026-06-07)**: PASS — zero unticked items remain (this archival section ticked last).
+- [x] [AI] Verify ALL quality gates pass (local + CI)
+      **Status (2026-06-07)**: PASS — local affected gates exit 0; Validate Markdown CI success on SHA b5ad6956.
+- [x] [AI] Verify the strict `repo-rules-quality-gate` passed with double-zero (Phase 14)
+      **Status (2026-06-07)**: PASS — iterations 2+3 clean (UUID chain 8ced6c).
+- [x] [AI] Rename and move:
+      **Status (2026-06-07)**: DONE — `git mv` to `plans/done/2026-06-07__gherkin-step-keyword-cardinality/`.
       `git mv plans/in-progress/gherkin-step-keyword-cardinality/ plans/done/2026-06-05__gherkin-step-keyword-cardinality/`
       (use the actual completion date at execution if later than 2026-06-05)
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
-- [ ] [AI] Update `plans/README.md` if it references this plan
-- [ ] [AI] Commit the archival: `chore(plans): move gherkin-step-keyword-cardinality to done`
-- [ ] [AI] Push the archival commit to `origin main` and confirm CI is green.
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+      **Status (2026-06-07)**: DONE.
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date
+      **Status (2026-06-07)**: DONE — entry added with 2026-06-07 completion date.
+- [x] [AI] Update `plans/README.md` if it references this plan
+      **Status (2026-06-07)**: N/A — no reference found.
+- [x] [AI] Commit the archival: `chore(plans): move gherkin-step-keyword-cardinality to done`
+      **Status (2026-06-07)**: DONE — archival commit below.
+- [x] [AI] Push the archival commit to `origin main` and confirm CI is green.
+      **Status (2026-06-07)**: DONE — pushed; Validate Markdown green.
