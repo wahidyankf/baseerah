@@ -181,9 +181,12 @@ This is a deliberate pragmatic trade-off, not a lack of awareness of the sibling
 
 When removing a worktree:
 
-1. Remove the worktree directory: `rm -rf worktrees/<name>/`
-2. Prune the git worktree reference: `git worktree prune`
-3. Optionally remove the branch: `git branch -D worktree/<name>`
+1. Verify nothing is uncommitted or unpushed: `git -C worktrees/<name> status --porcelain` must be empty, and the worktree HEAD must be an ancestor of `origin/main`
+2. Remove the worktree: `git worktree remove worktrees/<name>` (preferred over `rm -rf`, which leaves a stale registration)
+3. Prune any stale references: `git worktree prune`
+4. Optionally remove the branch: `git branch -d <name>` (safe delete; only succeeds when fully merged)
+
+For plan worktrees, the [plan-execution workflow](../../workflows/plan/plan-execution.md) performs this cleanup automatically after a plan is archived and pushed — but ALWAYS prompts the user for confirmation first. Worktrees are never deleted silently.
 
 ### Multiple Worktrees
 

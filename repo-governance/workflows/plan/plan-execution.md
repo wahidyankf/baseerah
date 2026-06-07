@@ -66,7 +66,7 @@ User: "Execute plan plans/in-progress/new-feature/plan.md"
 
 The calling context will:
 
-1. **Verify worktree gate** (Step 0): refuse to start if the plan lacks a `## Worktree` section or if the working directory is not the declared worktree path
+1. **Enter the designated worktree** (Step 0): refuse to start if the plan lacks a `## Worktree` section; otherwise go to the declared worktree (provisioning it from `origin/main` if it does not exist) and sync it with the latest `origin/main` before any implementation
 2. Read the delivery checklist from the plan's `delivery.md` to understand all items
 3. Create granular tasks using `TaskCreate` — one per remaining checkbox (including nested sub-bullets)
 4. For each item: mark `in_progress`, **repo-ground its file paths and commands** (refuse-on-uncertainty if grounding fails), analyze it, **prefer the `_Suggested executor:_` annotation** if present (else fall back to Agent Selection heuristics), delegate to the chosen agent (or execute directly for trivial edits), verify the result
@@ -76,6 +76,7 @@ The calling context will:
 8. Move plan folder to plans/done/ using git mv
 9. Show git status with modified files
 10. Wait for user commit approval
+11. After the archival is pushed to `origin main`, prompt the user to delete the plan's worktree (Step 8 worktree cleanup — never deletes without explicit confirmation)
 
 ## Orchestration Model
 
@@ -182,9 +183,9 @@ These rules govern ALL execution steps. No exception. No shortcut.
 
 ## Steps
 
-### 0. Verify Worktree Specification (Sequential, Hard Gate)
+### 0. Enter the Designated Worktree (Sequential, Hard Gate)
 
-Before reading the delivery checklist, verify that the plan declares a worktree and that execution is happening inside it. If the declared worktree path does not exist or the working directory does not match, the executor auto-provisions the worktree before continuing.
+Plan execution ALWAYS happens inside the plan's designated worktree, synced to the latest `origin/main`. Before reading the delivery checklist, the executor goes to the declared worktree — provisioning it if it does not exist — and brings it up to date with `origin/main`. Executing a plan from the main checkout, or from a stale worktree, is forbidden.
 
 **Orchestrator action**:
 
@@ -193,22 +194,35 @@ Before reading the delivery checklist, verify that the plan declares a worktree 
    - **Single-file plans**: in `README.md` (top-level `## Worktree` heading, before `## Delivery Checklist`).
 2. **If the section is missing**: terminate immediately with status `fail`. Emit a single user-visible line: `Worktree specification missing — add a "## Worktree" section to <delivery.md|README.md> per repo-governance/conventions/structure/plans.md#worktree-specification before re-invoking plan execution.`
 3. **Parse the declared worktree path** (format: `worktrees/<plan-identifier>/`).
-4. **Verify the current working directory** matches the declared path:
-   - Run `pwd` (or read the orchestrator's `workingDirectory`).
-   - Resolve the expected absolute path: `<repo-root>/worktrees/<plan-identifier>`.
-   - **If matched**: log a one-line confirmation (`Worktree gate: passed (<expected-path>)`) and proceed to Step 5.
-   - **If mismatched**: auto-provision the worktree:
+4. **Go to the designated worktree — navigate or provision** (default behavior; no user prompt needed):
+   - Check whether the worktree is already registered: `git worktree list --porcelain` from the repo root, and confirm the directory `<repo-root>/worktrees/<plan-identifier>` exists.
+   - **If it exists**: make it the execution root. If the current working directory is not already inside it, switch to it (e.g., `cd <repo-root>/worktrees/<plan-identifier>` or the harness's worktree-entry tool). Emit: `Worktree gate: entering existing worktree at worktrees/<plan-identifier>/`.
+   - **If it does not exist**: auto-provision it from the latest `origin/main`:
      1. Emit a user-visible line: `Auto-provisioning worktree at worktrees/<plan-identifier>/…`
-     2. Run `git worktree add worktrees/<plan-identifier> HEAD` from the repo root.
-     3. If `git worktree add` fails (e.g., path already exists as a stale entry), terminate with status `fail` and emit the error output verbatim.
-     4. Run `npm install && npm run doctor -- --fix` in the root worktree to initialize the new worktree's toolchain.
-     5. Emit a user-visible line: `Worktree provisioned at <expected-path> — continuing execution.`
-     6. Continue execution from the worktree path.
-5. **Confirm gate passed** and proceed to Step 1.
+     2. From the repo root run:
 
-**Output**: Worktree existence and identity confirmed (provisioned if needed).
+        ```bash
+        git fetch origin
+        git worktree add -b <plan-identifier> worktrees/<plan-identifier> origin/main
+        ```
 
-**Why this is a hard gate**: The missing `## Worktree` section is a hard-fail because there is no declared path to provision — the plan is incomplete and must be fixed by the author before execution can proceed. A CWD mismatch, by contrast, is recoverable: the executor knows the target path and can provision the worktree automatically. Running outside a worktree without a declared path would pollute the main checkout with in-flight work, break the parallel-safety guarantee, and risk dirty-gitlink hazards in any subrepo context.
+        If the branch `<plan-identifier>` already exists (e.g., a prior worktree was removed but its branch kept), reuse it instead: `git worktree add worktrees/<plan-identifier> <plan-identifier>`.
+
+     3. If `git worktree add` fails (e.g., path already exists as a stale entry), run `git worktree prune` and retry once; if it still fails, terminate with status `fail` and emit the error output verbatim.
+     4. Run `npm install && npm run doctor -- --fix` in the root repository worktree to initialize the toolchain, per [Worktree Toolchain Initialization](../../development/workflow/worktree-setup.md).
+     5. Emit a user-visible line: `Worktree provisioned at worktrees/<plan-identifier>/ — continuing execution.`
+
+5. **Freshness gate — sync with latest `origin/main` (MANDATORY)**: before ANY implementation work, bring the worktree up to date:
+   1. `git fetch origin` (from inside the worktree).
+   2. If the worktree has uncommitted changes (`git status --porcelain` non-empty): do NOT auto-stash or discard. Surface the dirty state to the user and STOP until they decide (commit, stash, or discard explicitly).
+   3. If the worktree has no local commits ahead of `origin/main`: `git merge --ff-only origin/main`.
+   4. If the worktree has local commits not yet on `origin/main` (a resumed plan): `git rebase origin/main`. On conflict: `git rebase --abort`, surface the conflicting files to the user, and STOP — never auto-resolve.
+   5. Verify sync: `git merge-base --is-ancestor origin/main HEAD` must succeed.
+6. **Confirm gate passed**: emit `Worktree gate: passed (worktrees/<plan-identifier>/ @ <short-sha>, up to date with origin/main)` and proceed to Step 1. All subsequent steps run with the worktree as the execution root.
+
+**Output**: Execution running inside the designated worktree, up to date with the latest `origin/main` (provisioned if needed).
+
+**Why this is a hard gate**: The missing `## Worktree` section is a hard-fail because there is no declared path to provision — the plan is incomplete and must be fixed by the author before execution can proceed. A CWD mismatch, by contrast, is recoverable: the executor knows the target path and navigates to or provisions the worktree automatically. Running outside a worktree without a declared path would pollute the main checkout with in-flight work, break the parallel-safety guarantee, and risk dirty-gitlink hazards in any subrepo context. The freshness sync is equally mandatory: implementing against a stale base invites merge conflicts at push time and validates the plan against code that no longer matches `origin/main`.
 
 ### 1. Load Delivery Checklist and Materialize Task List (Sequential)
 
@@ -536,7 +550,31 @@ Report final status, archive plan if successful, and update all related READMEs.
      chore(plans): move [plan-identifier] to done
      ```
 
-- If status is `partial` or `fail`: Leave plan in current location, do NOT archive
+  7. **Worktree cleanup — prompted (after archival pushed)**: once the archival commit is pushed to `origin main` and CI is green, offer to delete the plan's worktree so worktrees do not accumulate:
+     1. **Verify nothing unpushed** (safety precondition — both checks MUST pass before offering deletion):
+
+        ```bash
+        git -C worktrees/<plan-identifier> status --porcelain   # must be empty
+        git fetch origin
+        git merge-base --is-ancestor "$(git -C worktrees/<plan-identifier> rev-parse HEAD)" origin/main   # must succeed
+        ```
+
+        If either check fails, do NOT offer deletion — surface what is uncommitted or unpushed and keep the worktree.
+
+     2. **Prompt the user** (interactive question — this is a sanctioned stop): `Plan complete and pushed to origin main. Delete worktree worktrees/<plan-identifier>/ and its local branch?` NEVER delete the worktree without explicit user confirmation.
+     3. **On approval**, from the repo root:
+
+        ```bash
+        git worktree remove worktrees/<plan-identifier>
+        git worktree prune
+        git branch -d <plan-identifier> 2>/dev/null || true   # safe delete; only succeeds when fully merged
+        ```
+
+        If `git worktree remove` refuses (unexpected dirty state), do NOT force — re-run the safety precondition and escalate to the user.
+
+     4. **On decline**: keep the worktree and emit one line: `Worktree retained at worktrees/<plan-identifier>/ per user choice.`
+
+- If status is `partial` or `fail`: Leave plan in current location, do NOT archive, and do NOT delete the worktree — in-flight work stays available for the next execution attempt
 
 **Output**: `{final-status}`, `{iterations-completed}`, `{final-report}`
 
@@ -691,6 +729,13 @@ Result: SUCCESS → Plan moved to plans/done/
 - Only moves plan to done/ on complete success (zero findings)
 - Partial completion keeps plan in current location for manual review
 - Uses git mv to preserve commit history when archiving
+
+**Worktree Lifecycle**:
+
+- Execution always enters the plan's designated worktree (Step 0) — navigating to it when it exists, provisioning it from the latest `origin/main` when it does not
+- The worktree is synced with `origin/main` (ff-merge or rebase) before any implementation; dirty state or rebase conflicts stop execution for user decision
+- On `pass`, after the archival commit is pushed, the orchestrator prompts the user before deleting the worktree (Step 8 cleanup) — worktrees never accumulate silently, and are never deleted without explicit confirmation
+- On `partial` or `fail`, the worktree is always retained for the next execution attempt
 
 ## Plan-Specific Validation
 

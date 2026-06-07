@@ -416,11 +416,13 @@ When plan-checker reports a missing or malformed `## Worktree` section (Step 5d 
 
 Worktree path: `worktrees/<plan-identifier>/`
 
-Provision before execution (run from repo root):
+Optional manual pre-provisioning (run from repo root):
 
 ```bash
 claude --worktree <plan-identifier>
 ```
+
+The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting the worktree after the plan is archived and pushed.
 
 See [Worktree Path Convention](../../repo-governance/conventions/structure/worktree-path.md) and [Plans Organization Convention §Worktree Specification](../../repo-governance/conventions/structure/plans.md#worktree-specification).
 ````

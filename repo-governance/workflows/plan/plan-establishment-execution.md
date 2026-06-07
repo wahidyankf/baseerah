@@ -87,10 +87,12 @@ Grill sessions run in the calling context (not delegated) so the user's conversa
 across all turns.
 
 **Worktree default**: All plan authoring happens inside a dedicated worktree at
-`worktrees/<identifier>/`. If the worktree does not already exist, provision it before Step 4:
+`worktrees/<identifier>/`. If the worktree does not already exist, provision it from the latest
+`origin/main` before Step 4; if it exists, enter it and sync it with `origin/main` first:
 
 ```bash
-git worktree add -b <identifier> worktrees/<identifier> main
+git fetch origin
+git worktree add -b <identifier> worktrees/<identifier> origin/main
 cd worktrees/<identifier>
 npm install
 npm run doctor -- --fix

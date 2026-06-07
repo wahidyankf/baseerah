@@ -443,11 +443,19 @@ Every plan MUST declare the worktree path in its content so the executor can ver
 - `in-progress/auth-rewrite/` → worktree path `worktrees/auth-rewrite/` (no prefix to strip)
 - `backlog/2026-03-01__add-user-search/` → worktree path `worktrees/add-user-search/`
 
-**Provisioning command** (run from repo root before invoking plan execution):
+**Provisioning command** (optional manual pre-provisioning, run from repo root):
 
 ```bash
 claude --worktree <plan-identifier>
 ```
+
+Manual pre-provisioning is OPTIONAL: the [plan-execution workflow Step 0 gate](../../workflows/plan/plan-execution.md#0-enter-the-designated-worktree-sequential-hard-gate) enters the declared worktree by default — navigating to it when it already exists, and auto-provisioning it from the latest `origin/main` when it does not.
+
+**Executor lifecycle** (enforced by the plan-execution workflow):
+
+1. **Enter or provision**: execution always happens inside the declared worktree. The executor navigates to it if it exists, or provisions it from the latest `origin/main` (`git fetch origin && git worktree add -b <plan-identifier> worktrees/<plan-identifier> origin/main`) if it does not.
+2. **Freshness sync**: before any implementation, the worktree is synced with the latest `origin/main` (ff-merge, or rebase when the worktree carries local commits). Dirty state or rebase conflicts stop execution for an explicit user decision.
+3. **Prompted cleanup**: when the plan completes (`pass`), is archived, and all work is pushed to `origin main`, the executor verifies nothing is uncommitted or unpushed and then PROMPTS the user before deleting the worktree and its local branch. Worktrees are never deleted without explicit confirmation, and never deleted on `partial`/`fail`.
 
 **This requirement applies to ALL plans regardless of size** — pure-docs, single-file, and trivial plans included. No exceptions.
 
@@ -460,11 +468,13 @@ See [Worktree Path Convention](./worktree-path.md) for the full routing and dire
 
 Worktree path: `worktrees/auth-rewrite/`
 
-Provision before execution:
+Optional manual pre-provisioning (run from repo root):
 
 \```bash
 claude --worktree auth-rewrite
 \```
+
+The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting the worktree after the plan is archived and pushed.
 ````
 
 ### Important Note on File Naming
@@ -503,7 +513,7 @@ Plans differ from `docs/` in several important ways:
 
 ### Starting Work
 
-1. **Provision worktree**: Run `claude --worktree <plan-identifier>` from the repo root — this creates `worktrees/<plan-identifier>/` in the repo root (not `.claude/worktrees/`). See [Worktree Path Convention](./worktree-path.md).
+1. **Provision worktree** (optional — the plan-execution Step 0 gate auto-provisions from the latest `origin/main` when missing): Run `claude --worktree <plan-identifier>` from the repo root — this creates `worktrees/<plan-identifier>/` in the repo root (not `.claude/worktrees/`). See [Worktree Path Convention](./worktree-path.md).
 2. **Initialize toolchain**: In the root worktree, run `npm install && npm run doctor -- --fix`. See [Worktree Toolchain Initialization](../../development/workflow/worktree-setup.md).
 3. **Move and rename folder**: Move plan folder from `backlog/YYYY-MM-DD__[identifier]/` to `in-progress/[identifier]/` — strip the date prefix when moving to `in-progress/`.
 4. **Update index**: Update both `backlog/README.md` and `in-progress/README.md`

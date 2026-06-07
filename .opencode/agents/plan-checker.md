@@ -411,7 +411,7 @@ After validating manual assertions (Step 5c), verify the plan declares a worktre
    - Wrong format (e.g., `.claude/worktrees/...`, missing `worktrees/` prefix, identifier mismatch with folder name): **HIGH** finding.
 
 3. **Provisioning command present**
-   - The section MUST show the `claude --worktree <plan-identifier>` command verbatim so the user knows how to provision the worktree before invoking plan execution.
+   - The section MUST show the `claude --worktree <plan-identifier>` command verbatim as the optional manual pre-provisioning path (the plan-execution Step 0 gate auto-provisions from the latest `origin/main` by default, but the manual command must still be documented).
    - Missing or wrong command: **MEDIUM** finding.
 
 4. **Cross-reference**

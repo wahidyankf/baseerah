@@ -140,7 +140,7 @@ If the plan grows past 1000 lines or authoring feels crowded, promote to the fiv
 
 ## Worktree Specification (Mandatory — Applies to ALL Plans)
 
-Every plan MUST declare its worktree path before the delivery checklist begins. This is enforced by `plan-checker` (HIGH finding when missing) and the [plan-execution workflow Step 0 hard gate](../../../repo-governance/workflows/plan/plan-execution.md) — execution refuses to start if the section is absent.
+Every plan MUST declare its worktree path before the delivery checklist begins. This is enforced by `plan-checker` (HIGH finding when missing) and the [plan-execution workflow Step 0 hard gate](../../../repo-governance/workflows/plan/plan-execution.md) — execution refuses to start if the section is absent. When the section is present, the executor enters the declared worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts the user before deleting the worktree after the plan is archived and pushed.
 
 **Where to declare**:
 
@@ -159,11 +159,13 @@ Every plan MUST declare its worktree path before the delivery checklist begins. 
 
 Worktree path: `worktrees/<plan-identifier>/`
 
-Provision before execution (run from repo root):
+Optional manual pre-provisioning (run from repo root):
 
 ```bash
 claude --worktree <plan-identifier>
 ```
+
+The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting the worktree after the plan is archived and pushed.
 
 See [Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md) and [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 ````

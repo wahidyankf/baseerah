@@ -407,8 +407,8 @@ catalog in the `plan-creating-project-plans` skill and
 ## Mandatory Worktree Specification (Top-Level Section)
 
 Every plan MUST declare its worktree path before the delivery checklist begins. This is a structural requirement enforced by both `plan-checker` (HIGH finding when missing) and the
-[plan-execution workflow Step 0 hard gate](../../repo-governance/workflows/plan/plan-execution.md#0-verify-worktree-specification-sequential-hard-gate)
-(execution refuses to start if the section is absent).
+[plan-execution workflow Step 0 hard gate](../../repo-governance/workflows/plan/plan-execution.md#0-enter-the-designated-worktree-sequential-hard-gate)
+(execution refuses to start if the section is absent; otherwise it enters the declared worktree by default — provisioning it from the latest `origin/main` when missing, syncing it with `origin/main` before implementing, and prompting the user to delete it after the plan is archived and pushed).
 
 **Where to write it**:
 
@@ -424,11 +424,13 @@ Every plan MUST declare its worktree path before the delivery checklist begins. 
 
 Worktree path: `worktrees/<plan-identifier>/`
 
-Provision before execution (run from repo root):
+Optional manual pre-provisioning (run from repo root):
 
 ```bash
 claude --worktree <plan-identifier>
 ```
+
+The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting the worktree after the plan is archived and pushed.
 ````
 
 **This applies to ALL plans regardless of size** — pure-docs, single-file, and trivial plans included. No exceptions. See
