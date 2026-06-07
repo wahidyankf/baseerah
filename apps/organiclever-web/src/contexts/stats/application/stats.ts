@@ -76,9 +76,31 @@ interface RawWorkoutPayload {
 // getLast7Days
 // ---------------------------------------------------------------------------
 
+/**
+ * Formats a `Date` as `YYYY-MM-DD` using its **local** calendar components.
+ *
+ * `toISOString().slice(0, 10)` is wrong here: it converts to UTC first, so in
+ * any UTC+ timezone a local just-after-midnight date shifts back one day.
+ * The 7-day window must be anchored on the user's local "today", matching
+ * what the UI (and tests) compute via `new Date()` + `setHours(0, 0, 0, 0)`.
+ */
+function localDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function getLast7Days(): Effect.Effect<ReadonlyArray<DayEntry>, StorageUnavailable, PgliteService> {
   return Effect.gen(function* () {
     const { db } = yield* PgliteService;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // Anchor on the JS-local date, NOT the database session's CURRENT_DATE:
+    // PGlite sessions run in UTC, so CURRENT_DATE lags the local calendar day
+    // whenever local time is ahead of UTC (e.g. 00:00-07:00 in UTC+7).
+    const todayStr = localDateStr(today);
 
     // Attempt server-side generate_series; fall back to client-side if it throws
     const result = yield* Effect.tryPromise({
@@ -91,22 +113,20 @@ export function getLast7Days(): Effect.Effect<ReadonlyArray<DayEntry>, StorageUn
                ELSE 0 END), 0) AS duration_mins,
              COUNT(je.id) AS sessions
            FROM generate_series(
-             (CURRENT_DATE - INTERVAL '6 days'),
-             CURRENT_DATE,
+             ($1::date - INTERVAL '6 days'),
+             $1::date,
              INTERVAL '1 day'
            ) AS gs(day)
            LEFT JOIN journal_entries je
              ON je.started_at::date = gs.day::date
            GROUP BY gs.day
            ORDER BY gs.day ASC`,
+          [todayStr],
         );
         return rows.rows;
       },
       catch: (_cause): StorageUnavailable => new StorageUnavailable({ cause: _cause }),
     });
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
     // If generate_series not supported, fall back to client-side 7-day array
     const rows: DayStatsRow[] = result.length === 7 ? result : yield* buildClientSide7Days(db);
@@ -137,7 +157,7 @@ function buildClientSide7Days(db: {
       for (let i = 6; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
-        const iso = d.toISOString().slice(0, 10);
+        const iso = localDateStr(d);
 
         const res = await db.query<{ duration_mins: string; sessions: string }>(
           `SELECT
