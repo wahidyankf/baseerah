@@ -393,6 +393,8 @@ Then they are redirected to the dashboard
 And their session is created with correct permissions
 ```
 
+**Step-Keyword Cardinality (HARD Rule)**: Every `Scenario` MUST use exactly one primary `Given` line, exactly one primary `When` line, and exactly one primary `Then` line — chain every additional precondition, action, or outcome with `And`/`But`, never a repeated primary keyword. `Background` blocks and `Scenario Outline` `Examples` tables are exempt. See [Acceptance Criteria Convention §Step-Keyword Cardinality (HARD Rule)](../../../repo-governance/development/infra/acceptance-criteria.md#step-keyword-cardinality-hard-rule).
+
 **Best Practices**:
 
 - Use concrete, testable conditions
@@ -400,6 +402,7 @@ And their session is created with correct permissions
 - One scenario per user story
 - Make scenarios independent
 - Use consistent language
+- Exactly one primary `Given`/`When`/`Then` per scenario; extras chained with `And`/`But` (see HARD rule above)
 
 ## Git Workflow in Plans
 

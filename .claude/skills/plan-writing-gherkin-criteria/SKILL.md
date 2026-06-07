@@ -57,6 +57,38 @@ Scenario: User logs in with valid credentials
   And session token should be stored in cookies
 ```
 
+## Step-Keyword Cardinality (HARD Rule)
+
+> **HARD rule — one primary keyword each**: Every `Scenario` MUST use exactly **one** primary `Given` line, exactly **one** primary `When` line, and exactly **one** primary `Then` line. Every additional precondition, action, or outcome MUST be chained with `And` or `But` — never a repeated `Given` / `When` / `Then` keyword. This reinforces the "one action / one behavior per scenario" norm.
+>
+> **Exemptions**: `Background` blocks and `Scenario Outline` `Examples` tables are exempt from the one-each constraint.
+
+**Conforming example**:
+
+```gherkin
+Scenario: Login succeeds
+  Given a registered user
+  And the login page is open
+  When the user submits valid credentials
+  Then the dashboard is shown
+  And a session token is set
+```
+
+**Non-conforming example** (violates — two primary `When` keyword lines):
+
+```gherkin
+# Deliberate non-conforming example — repeats the primary When keyword
+Scenario: Login succeeds
+  Given a registered user
+  When the user opens the login page
+  When the user submits valid credentials
+  Then the dashboard is shown
+```
+
+(The fix replaces the second `When` with `And`.)
+
+**Canonical convention**: [Acceptance Criteria Convention §Step-Keyword Cardinality (HARD Rule)](../../../repo-governance/development/infra/acceptance-criteria.md#step-keyword-cardinality-hard-rule) — the deterministic `rhino-cli repo-governance gherkin-keyword-cardinality` audit enforces this rule on `.feature` files, and `plan-checker` / `repo-rules-checker` apply it to Gherkin fences in plan markdown.
+
 ## Basic Scenario Patterns
 
 ### Pattern 1: Simple Success Path
@@ -452,7 +484,9 @@ Scenario: Complete checkout with valid payment
 # ❌ Bad - Asserts internal state
 Then user object should have "lastLoginTimestamp" property
 And "sessions" database table should have new row
+```
 
+```gherkin
 # ✅ Good - Asserts observable behavior
 Then user should be logged in
 And user session should be active
@@ -465,7 +499,9 @@ And user session should be active
 ```gherkin
 # ❌ Ambiguous
 Then the system should respond quickly
+```
 
+```gherkin
 # ✅ Specific
 Then the response should be received within 200ms
 ```
@@ -476,6 +512,9 @@ Then the response should be received within 200ms
 
 ```gherkin
 # ❌ Bad - Multiple behaviors
+# Deliberate non-conforming example — the repeated primary Then is the violation
+# being illustrated (multiple behaviors = multiple primary keywords; see
+# Step-Keyword Cardinality HARD rule)
 Scenario: User management and article creation
   Given I create user "Alice"
   Then user "Alice" should exist

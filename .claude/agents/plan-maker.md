@@ -198,6 +198,8 @@ Cover (each as a structured multiple-choice question):
 - Does the plan structure match the user's intent? Are all acceptance criteria captured?
 - Are there open questions that surfaced during writing?
 - Is Gherkin completeness sufficient (every acceptance criterion has a scenario)?
+- Do all Gherkin scenarios follow the **step-keyword cardinality HARD rule** — exactly one
+  primary `Given`, one `When`, one `Then` per scenario, extras chained via `And`/`But`?
 - Is checklist granularity correct (each item is one concrete action; RED/GREEN/REFACTOR are
   separate checkboxes per the HARD RULE in
   [test-driven-development.md](../../repo-governance/development/workflow/test-driven-development.md))?
@@ -223,7 +225,10 @@ plan is complete and correct.
 ### Requirements Quality
 
 - User stories follow Gherkin format
-- Acceptance criteria are testable
+- Acceptance criteria are testable and follow the **step-keyword cardinality HARD rule**:
+  every `Scenario` uses exactly one primary `Given`, one `When`, and one `Then`; all extras
+  chain with `And`/`But`. `Background` blocks and `Scenario Outline` `Examples` tables are
+  exempt. See [Acceptance Criteria Convention §Step-Keyword Cardinality](../../repo-governance/development/infra/acceptance-criteria.md#step-keyword-cardinality-hard-rule).
 - Scope is clearly defined
 - Constraints are documented
 
