@@ -72,6 +72,20 @@ version claims are involved, so web research was **skipped** — all factual cla
 this plan carry `[Repo-grounded]` or `[Judgment call]` confidence labels; there are no
 `[Web-cited]` claims.
 
+## Sibling Plans
+
+This plan is part of a three-repo parity set created by the
+[plan-multi-repo-parity-planning workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md).
+See the sibling plans for context (paths are repo-relative in each sibling repository):
+
+- `ose-infra`: `plans/in-progress/gherkin-step-keyword-cardinality/README.md`
+- `ose-primer`: `plans/in-progress/gherkin-step-keyword-cardinality/README.md`
+
+The full cross-repo deviation matrix (13 rows, 4 deliberate deviations) lives in
+[`tech-docs.md`](./tech-docs.md) §"Cross-Repo Parity: Deviation Matrix", and the
+plain-language rationale is delivered to
+`docs/explanation/gherkin-step-keyword-cardinality-parity-decisions.md` in each repo.
+
 ## Plan Documents
 
 - [`brd.md`](./brd.md) — Business Requirements (WHY).

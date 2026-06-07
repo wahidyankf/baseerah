@@ -32,6 +32,7 @@ Scenario: Login succeeds
 **Non-conforming example** (violates — two primary `When` keyword lines):
 
 ```gherkin
+# NON-CONFORMING EXAMPLE — deliberate illustration of the violation
 Scenario: Login succeeds
   Given a registered user
   When the user opens the login page
