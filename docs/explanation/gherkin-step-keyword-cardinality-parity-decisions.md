@@ -20,12 +20,12 @@ This document records every decision in the cross-repo deviation matrix for the
 HARD Gherkin convention rule — one primary `Given`, one `When`, one `Then` per
 `Scenario` — across three sibling repositories: ose-public (this repo), ose-infra,
 and ose-primer. The full matrix lives in
-[`plans/in-progress/gherkin-step-keyword-cardinality/tech-docs.md`](../../plans/in-progress/gherkin-step-keyword-cardinality/tech-docs.md).
+[`plans/done/2026-06-07__gherkin-step-keyword-cardinality/tech-docs.md`](../../plans/done/2026-06-07__gherkin-step-keyword-cardinality/tech-docs.md).
 
 Sibling plans:
 
-- `ose-infra`: `plans/in-progress/gherkin-step-keyword-cardinality/` (private repo)
-- `ose-primer`: `plans/in-progress/gherkin-step-keyword-cardinality/` (public template repo)
+- `ose-infra`: `plans/done/2026-06-07__gherkin-step-keyword-cardinality/` (private repo)
+- `ose-primer`: `plans/done/2026-06-07__gherkin-step-keyword-cardinality/` (public template repo)
 
 ## Background
 
@@ -183,5 +183,5 @@ reason.
 - [Acceptance Criteria Convention](../../repo-governance/development/infra/acceptance-criteria.md) — canonical rule text
 - [BDD Spec-to-Test Mapping Convention](../../repo-governance/development/infra/bdd-spec-test-mapping.md) — how specs are consumed
 - [Plan Domain Parity — Design Decisions (2026-06-06)](./plan-domain-parity-decisions.md) — precedent doc this follows
-- [Plan Delivery Checklist](../../plans/in-progress/gherkin-step-keyword-cardinality/delivery.md) — full phased execution plan
-- [Technical Documentation](../../plans/in-progress/gherkin-step-keyword-cardinality/tech-docs.md) — deviation matrix source
+- [Plan Delivery Checklist](../../plans/done/2026-06-07__gherkin-step-keyword-cardinality/delivery.md) — full phased execution plan
+- [Technical Documentation](../../plans/done/2026-06-07__gherkin-step-keyword-cardinality/tech-docs.md) — deviation matrix source
