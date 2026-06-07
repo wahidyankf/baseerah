@@ -31,7 +31,7 @@ This practice respects the following core principles:
 
 ## Conventions Implemented/Respected
 
-- **[Acceptance Criteria Convention](./acceptance-criteria.md)**: Feature files follow Gherkin standards defined there.
+- **[Acceptance Criteria Convention](./acceptance-criteria.md)**: Feature files follow Gherkin standards defined there, including the **step-keyword cardinality HARD rule** — every `Scenario` uses exactly one primary `Given`, one `When`, and one `Then`; additional steps chain with `And`/`But`. `Background` blocks and `Scenario Outline` `Examples` tables are exempt.
 
 ## CLI Apps: Command-to-Spec Mapping
 

@@ -213,7 +213,44 @@ FIX="generated-reports/docs__${UUID}__${TIMESTAMP}__fix.md"
 - Complicates debugging
 - Same UUID+timestamp enables exact pairing
 
-### Anti-Pattern 7: Vague Acceptance Criteria
+### Anti-Pattern 7: Multiple Primary `When`/`Then` Keywords in One Scenario
+
+**Problem**: Using more than one primary `When` or `Then` keyword in the same `Scenario` block
+instead of chaining with `And`/`But`. This violates the
+[step-keyword cardinality HARD rule](./acceptance-criteria.md#step-keyword-cardinality-hard-rule)
+and obscures the "one action / one behavior" boundary.
+
+**Bad Example:**
+
+```gherkin
+# NON-CONFORMING EXAMPLE — deliberate illustration of the violation
+Scenario: User login flow
+  Given a registered user
+  When the user navigates to the login page
+  When the user submits valid credentials
+  Then the dashboard is shown
+  Then a session token is set
+```
+
+**Solution:**
+
+```gherkin
+Scenario: User login flow
+  Given a registered user
+  And the login page is open
+  When the user submits valid credentials
+  Then the dashboard is shown
+  And a session token is set
+```
+
+**Rationale:**
+
+- Multiple primary keywords blur where the scenario's single action starts and ends
+- Deterministic linter (`rhino-cli repo-governance gherkin-keyword-cardinality`) flags violations
+- `plan-checker` and `repo-rules-checker` enforce the rule on Gherkin fences in plan markdown
+- Note: `Background` blocks and `Scenario Outline` `Examples` tables are exempt
+
+### Anti-Pattern 8: Vague Acceptance Criteria
 
 **Problem**: Writing ambiguous, non-testable acceptance criteria.
 
@@ -336,18 +373,19 @@ local-temp/temp-backup-v2.tar.gz
 
 ## Summary of Anti-Patterns
 
-| Anti-Pattern                  | Problem                | Solution                           |
-| ----------------------------- | ---------------------- | ---------------------------------- |
-| **Scattered Temporary Files** | Repository clutter     | Use designated directories         |
-| **Placeholder UUIDs**         | Defeats audit trail    | Generate real UUIDs and timestamps |
-| **Buffering Reports**         | Lost during compaction | Write progressively                |
-| **Missing Tools**             | Can't generate reports | Add Write and Bash tools           |
-| **Global Tracking**           | Race conditions        | Scope-based tracking               |
-| **Mismatched Reports**        | Breaks audit trail     | Use same UUID and timestamp        |
-| **Vague Criteria**            | Not testable           | Use Gherkin format                 |
-| **Never Cleaning Up**         | Directory bloat        | Periodic cleanup                   |
-| **Conversation-Only Output**  | Lost during compaction | Write report files                 |
-| **Undocumented Temp Files**   | Purpose unclear        | Add README documentation           |
+| Anti-Pattern                            | Problem                   | Solution                           |
+| --------------------------------------- | ------------------------- | ---------------------------------- |
+| **Scattered Temporary Files**           | Repository clutter        | Use designated directories         |
+| **Placeholder UUIDs**                   | Defeats audit trail       | Generate real UUIDs and timestamps |
+| **Buffering Reports**                   | Lost during compaction    | Write progressively                |
+| **Missing Tools**                       | Can't generate reports    | Add Write and Bash tools           |
+| **Global Tracking**                     | Race conditions           | Scope-based tracking               |
+| **Mismatched Reports**                  | Breaks audit trail        | Use same UUID and timestamp        |
+| **Multiple Primary When/Then Keywords** | Violates cardinality rule | Chain extras with `And`/`But`      |
+| **Vague Criteria**                      | Not testable              | Use Gherkin format                 |
+| **Never Cleaning Up**                   | Directory bloat           | Periodic cleanup                   |
+| **Conversation-Only Output**            | Lost during compaction    | Write report files                 |
+| **Undocumented Temp Files**             | Purpose unclear           | Add README documentation           |
 
 ## Related Documentation
 

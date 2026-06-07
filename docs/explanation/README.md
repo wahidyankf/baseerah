@@ -65,6 +65,7 @@ The repository follows a **six-layer governance architecture** (Vision → Princ
 ### Decision Logs
 
 - **[Plan Domain Parity — Design Decisions (2026-06-06)](./plan-domain-parity-decisions.md)** - All 26 decisions from the 2026-06-06 cross-repo parity effort: what was resolved, why, and what was rejected across ose-public, ose-primer, and ose-infra
+- **[Gherkin Step-Keyword Cardinality — Parity Decisions (2026-06-07)](./gherkin-step-keyword-cardinality-parity-decisions.md)** - All 13 decisions from the 2026-06-07 cross-repo parity effort: canonical rule, four deliberate deviations (primer dual-CLI, sibling Step 0.5 preflight port, per-repo CI wiring, primer main-push), and aligned decisions across ose-public, ose-primer, and ose-infra
 
 ### Post-Mortems
 
