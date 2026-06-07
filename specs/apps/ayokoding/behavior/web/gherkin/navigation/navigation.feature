@@ -11,8 +11,8 @@ Feature: Site Navigation
     When a visitor opens a content page that has child sections
     Then the sidebar should display the section tree
     And parent nodes should be expandable and collapsible
-    When the visitor clicks a collapsed parent node
-    Then its child items should become visible
+    And the visitor clicks a collapsed parent node
+    And its child items should become visible
 
   Scenario: Breadcrumb shows ancestor path hierarchy without current page
     When a visitor opens a nested content page
@@ -32,8 +32,8 @@ Feature: Site Navigation
     When a visitor is on a content page that has sibling pages
     Then a previous link should point to the preceding sibling page
     And a next link should point to the following sibling page
-    When the visitor clicks the next link
-    Then they should be taken to the next sibling page
+    And the visitor clicks the next link
+    And they should be taken to the next sibling page
 
   Scenario: Active page is highlighted in the sidebar
     When a visitor is on a specific content page

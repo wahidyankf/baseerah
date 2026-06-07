@@ -86,7 +86,7 @@ describeFeature(feature, ({ Scenario }) => {
     });
   });
 
-  Scenario("Open entry detail sheet", ({ Given, When, Then }) => {
+  Scenario("Open entry detail sheet", ({ Given, When, Then, And }) => {
     Given("the home screen shows an entry", () => {
       entries = [makeEntry("focus")];
       selectedEntry = null;
@@ -103,11 +103,11 @@ describeFeature(feature, ({ Scenario }) => {
       expect(String(selectedEntry?.name)).toBe("focus");
     });
 
-    When("the user closes the sheet", () => {
+    And("the user closes the sheet", () => {
       selectedEntry = null;
     });
 
-    Then("the entry detail sheet is closed", () => {
+    And("the entry detail sheet is closed", () => {
       expect(selectedEntry).toBeNull();
     });
   });

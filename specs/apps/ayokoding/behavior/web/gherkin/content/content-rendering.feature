@@ -28,8 +28,8 @@ Feature: Content Rendering
   Scenario: Tabs shortcode renders as tabbed panels
     When a visitor opens a content page containing a tabs shortcode
     Then the tabs should render as a tab bar with clickable tab labels
-    When the visitor clicks a tab label
-    Then the corresponding panel content should become visible
+    And the visitor clicks a tab label
+    And the corresponding panel content should become visible
     And the other panels should be hidden
 
   Scenario: YouTube shortcode renders as a responsive iframe embed

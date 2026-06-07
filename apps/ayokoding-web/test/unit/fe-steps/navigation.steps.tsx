@@ -30,11 +30,11 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(true).toBe(true);
     });
 
-    When("the visitor clicks a collapsed parent node", () => {
+    And("the visitor clicks a collapsed parent node", () => {
       expect(true).toBe(true);
     });
 
-    Then("its child items should become visible", () => {
+    And("its child items should become visible", () => {
       // Interactive collapse/expand is tested at E2E level
       expect(true).toBe(true);
     });
@@ -134,11 +134,11 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(screen.getByText("Advanced Topics")).toBeTruthy();
     });
 
-    When("the visitor clicks the next link", () => {
+    And("the visitor clicks the next link", () => {
       // Navigation click is tested at E2E level
     });
 
-    Then("they should be taken to the next sibling page", () => {
+    And("they should be taken to the next sibling page", () => {
       const links = screen.getAllByRole("link");
       const nextLink = links.find((l) => l.getAttribute("href")?.includes("advanced"));
       expect(nextLink).toBeTruthy();

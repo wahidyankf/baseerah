@@ -103,7 +103,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline }) => {
     });
   });
 
-  Scenario("Open and close Add Entry sheet", ({ Given, When, Then }) => {
+  Scenario("Open and close Add Entry sheet", ({ Given, When, Then, And }) => {
     Given("the app shell is visible", () => {
       overlayActor = makeOverlayActor();
     });
@@ -116,11 +116,11 @@ describeFeature(feature, ({ Scenario, ScenarioOutline }) => {
       expect(overlayActor.getSnapshot().value).toBe("addEntry");
     });
 
-    When("the user closes the Add Entry sheet", () => {
+    And("the user closes the Add Entry sheet", () => {
       overlayActor.send({ type: "CLOSE_ADD_ENTRY" });
     });
 
-    Then("the Add Entry sheet is closed", () => {
+    And("the Add Entry sheet is closed", () => {
       expect(overlayActor.getSnapshot().value).toBe("none");
     });
   });

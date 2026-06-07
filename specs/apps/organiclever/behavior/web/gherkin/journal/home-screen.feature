@@ -12,5 +12,5 @@ Feature: Home Screen
     Given the home screen shows an entry
     When the user taps the entry
     Then the entry detail sheet opens
-    When the user closes the sheet
-    Then the entry detail sheet is closed
+    And the user closes the sheet
+    And the entry detail sheet is closed

@@ -16,10 +16,10 @@ Feature: Generic journal entry mechanism on /app
   Scenario: Adding a single entry
     When I press the "Add entry" button
     Then a form sheet opens with one draft containing a "Name" input and a "Payload" textarea
-    When I type "workout" into the "Name" input of draft 1
+    And I type "workout" into the "Name" input of draft 1
     And I type "{\"reps\": 12, \"weight\": 20}" into the "Payload" textarea of draft 1
     And I press the "Save" button
-    Then the form sheet closes
+    And the form sheet closes
     And the list shows one entry with name "workout"
     And the list entry shows a relative timestamp "just now"
     And the list entry does not show an "edited" line
@@ -118,9 +118,9 @@ Feature: Generic journal entry mechanism on /app
     And the newest entry in the list is "reading"
     When I press the "Edit" button on the "reading" entry
     Then the form sheet opens seeded with name "reading" and payload "{\"title\": \"Sapiens\"}"
-    When I change the payload to "{\"title\": \"Sapiens\", \"pages\": 320}"
+    And I change the payload to "{\"title\": \"Sapiens\", \"pages\": 320}"
     And I press the "Save" button
-    Then the form sheet closes
+    And the form sheet closes
     And the "reading" entry still appears first in the list
     And the "reading" entry shows an "edited just now" line
     And the "reading" entry's "createdAt" is unchanged
@@ -130,11 +130,11 @@ Feature: Generic journal entry mechanism on /app
     Given the list shows two entries with names "workout" and "reading"
     When I press the "Delete" button on the "reading" entry
     Then I see an inline confirm "Delete this entry? Yes / Cancel"
-    When I press the "Cancel" confirm button
-    Then the list still shows two entries
-    When I press the "Delete" button on the "reading" entry
+    And I press the "Cancel" confirm button
+    And the list still shows two entries
+    And I press the "Delete" button on the "reading" entry
     And I press the "Yes" confirm button
-    Then the list shows one entry with name "workout"
+    And the list shows one entry with name "workout"
     And PGlite database "ol_journal_v1" (IndexedDB) contains exactly one entry with name "workout"
 
   Scenario: Bumping (bring to top) mutates createdAt and reorders

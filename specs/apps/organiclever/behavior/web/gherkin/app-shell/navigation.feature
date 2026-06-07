@@ -24,8 +24,8 @@ Feature: App Shell Navigation
     Given the app shell is visible
     When the user taps the FAB button
     Then the Add Entry sheet is open
-    When the user closes the Add Entry sheet
-    Then the Add Entry sheet is closed
+    And the user closes the Add Entry sheet
+    And the Add Entry sheet is closed
 
   Scenario Outline: URL persists across page refresh on each tab
     Given the user is on "<path>"

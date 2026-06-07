@@ -89,11 +89,11 @@ describeFeature(feature, ({ Scenario, Background }) => {
       expect(screen.getByText("Tab1")).toBeTruthy();
     });
 
-    When("the visitor clicks a tab label", () => {
+    And("the visitor clicks a tab label", () => {
       // Tab interaction is tested at E2E level
     });
 
-    Then("the corresponding panel content should become visible", () => {
+    And("the corresponding panel content should become visible", () => {
       expect(screen.getByText("Panel 1")).toBeTruthy();
     });
 
