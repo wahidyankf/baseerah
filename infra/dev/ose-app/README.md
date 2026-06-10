@@ -14,7 +14,7 @@ Docker Compose setup for running the full OSE Application stack locally.
 
 ```bash
 # Copy env (edit OPENROUTER_API_KEY if needed)
-cp infra/dev/ose-app/.env.example infra/dev/ose-app/.env
+cp apps/ose-app-be/.env.example infra/dev/ose-app/.env
 
 # Start all services
 docker compose -f infra/dev/ose-app/docker-compose.yml up --build -d

@@ -44,11 +44,10 @@ The gaps are concrete in this repo today:
   prefix, but `CONTENT_DIR` and `SHOW_DRAFTS` (read by `ose-web` and `ayokoding-web`) do not
   [Repo-grounded]. There is no rule that says which is correct.
 - **Duplicated `.env.example` layout.** Two of the four `infra/dev/<group>/.env.example` files
-  duplicate variables that also live in `apps/<app>/.env.example`
-  ([`infra/dev/ose-app/.env.example`](../../../infra/dev/ose-app/.env.example) repeats
-  `DATABASE_URL`/`OPENROUTER_*` from
-  [`apps/ose-app-be/.env.example`](../../../apps/ose-app-be/.env.example)) [Repo-grounded] — a
-  contributor must reconcile two sources of truth.
+  duplicated variables that also live in `apps/<app>/.env.example` — the `ose-app` infra template
+  (removed in Phase 3) repeated `DATABASE_URL`/`OPENROUTER_*` from
+  [`apps/ose-app-be/.env.example`](../../../apps/ose-app-be/.env.example) [Repo-grounded] — a
+  contributor had to reconcile two sources of truth.
 - **Backup misses non-`.env` secrets.** `rhino-cli env backup` both skips every hidden directory
   (so the gitignored `.secrets/` dir is invisible) and matches only basenames starting with `.env`
   (so it silently skips `secrets.json`)

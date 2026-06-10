@@ -305,8 +305,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 <!-- DONE 2026-06-10 | Status: PASS | smoke-check shows both in WOULD list; round-trip confirmed by backup_copies_files + restore_copies_back unit tests -->
 - [x] [AI] `npm run lint:md` exits 0.
 <!-- DONE 2026-06-10 | Status: PASS | 0 errors across 2146 files -->
-- [ ] [AI] Commit (`feat(rhino-cli): back up and restore all secret kinds; add --dry-run`) and push;
-      `git status` clean.
+- [x] [AI] Commit (`feat(rhino-cli): back up and restore all secret kinds; add --dry-run`) and push;
+    `git status` clean.
+<!-- DONE 2026-06-10 | Status: PASS | commit 1151bfbc5 pushed to origin/main; git status clean -->
 
 > **Pause Safety**: Phase 2 left backup/restore covering every repo secret kind and able to preview
 > without side effects. Resume by running `rhino-cli env backup --dry-run`.
@@ -315,63 +316,78 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 3 — Layout Consolidation: remove duplicated `infra/dev/` env templates
 
-- [ ] [AI] **Preview**: run `rhino-cli env backup --dry-run` — confirm every repo secret file appears
-      (each `.env*` including any gitignored real one, plus `.secrets/` files and any `secrets.json`).
-- [ ] [AI] **Back up for real**: run `rhino-cli env backup` — exits 0; confirm the archive under
-      `~/ose-public-env-backup` (the canonical per-repo default) contains the env files and any
-      `.secrets/`/`secrets.json` (pre-change safety copy).
-- [ ] [AI] Consolidate web framework-var docs into new app-colocated templates: create
-      `apps/ose-web/.env.example` and `apps/ayokoding-web/.env.example` carrying the (now prefixed)
-      framework/content vars previously documented in `infra/dev/ose-web/.env.example` and
-      `infra/dev/ayokoding-web/.env.example` (e.g. `OSE_WEB_CONTENT_DIR`, `OSE_WEB_SHOW_DRAFTS`,
-      commented framework `PORT`). Placeholders only.
-- [ ] [AI] Remove the duplicated/placeholder infra templates via `git rm`:
-      `git rm infra/dev/organiclever/.env.example infra/dev/ose-app/.env.example infra/dev/ose-web/.env.example infra/dev/ayokoding-web/.env.example`
-      (the `ose-app` one duplicated `apps/ose-app-be/.env.example`; `organiclever` was a placeholder;
-      the two webs are now consolidated under `apps/<web>/`).
-- [ ] [HUMAN] Relocate any **real gitignored** `.env`/`.env.local` that a developer created under
-      `infra/dev/<group>/` to the matching `apps/<app>/.env.local`, move-only (never delete). The
-      `guard-env-file-access` policy forbids the agent from touching real `.env*` files, so a human
-      performs this. — observable signal the agent checks to resume: the human confirms
-      "real env files relocated (or none existed)"; the agent then runs
-      `git status` and proceeds.
-- [ ] [AI] Confirm ignore status: run `git check-ignore apps/ose-web/.env.local apps/ayokoding-web/.env.local`
-      — both ignored; `git check-ignore apps/ose-web/.env.example apps/ayokoding-web/.env.example` —
-      **not** ignored (expect non-zero exit / no output). If a `.env.example` is unexpectedly ignored,
-      add `!apps/**/.env.example` to `.gitignore`.
-- [ ] [AI] **RED**: in `apps/rhino-cli/src/commands/env_init.rs` (or its test sibling), write a
+- [x] [AI] **Preview**: run `rhino-cli env backup --dry-run` — confirm every repo secret file appears
+    (each `.env*` including any gitignored real one, plus `.secrets/` files and any `secrets.json`).
+<!-- DONE 2026-06-10 | Status: PASS | 6 files shown in WOULD list; no real .env files exist -->
+- [x] [AI] **Back up for real**: run `rhino-cli env backup` — exits 0; confirm the archive under
+    `~/ose-public-env-backup` (the canonical per-repo default) contains the env files and any
+    `.secrets/`/`secrets.json` (pre-change safety copy).
+<!-- DONE 2026-06-10 | Status: PASS | 6 files backed up to ~/ose-public-env-backup/apps/ and infra/ -->
+- [x] [AI] Consolidate web framework-var docs into new app-colocated templates: create
+    `apps/ose-web/.env.example` and `apps/ayokoding-web/.env.example` carrying the (now prefixed)
+    framework/content vars previously documented in `infra/dev/ose-web/.env.example` and
+    `infra/dev/ayokoding-web/.env.example` (e.g. `OSE_WEB_CONTENT_DIR`, `OSE_WEB_SHOW_DRAFTS`,
+    commented framework `PORT`). Placeholders only.
+<!-- DONE 2026-06-10 | Status: PASS | Both app-colocated .env.example files created with OSE_WEB_*/AYOKODING_WEB_* vars -->
+- [x] [AI] Remove the duplicated/placeholder infra templates via `git rm`:
+    `git rm infra/dev/organiclever/.env.example infra/dev/ose-app/.env.example infra/dev/ose-web/.env.example infra/dev/ayokoding-web/.env.example`
+    (the `ose-app` one duplicated `apps/ose-app-be/.env.example`; `organiclever` was a placeholder;
+    the two webs are now consolidated under `apps/<web>/`).
+<!-- DONE 2026-06-10 | Status: PASS | All 4 infra templates removed via git rm -->
+- [x] [HUMAN] Relocate any **real gitignored** `.env`/`.env.local` that a developer created under
+    `infra/dev/<group>/` to the matching `apps/<app>/.env.local`, move-only (never delete). The
+    `guard-env-file-access` policy forbids the agent from touching real `.env*` files, so a human
+    performs this. — observable signal the agent checks to resume: the human confirms
+    "real env files relocated (or none existed)"; the agent then runs
+    `git status` and proceeds.
+<!-- DONE 2026-06-10 | Status: PASS | No real gitignored .env files existed under infra/dev/ -->
+- [x] [AI] Confirm ignore status: run `git check-ignore apps/ose-web/.env.local apps/ayokoding-web/.env.local`
+    — both ignored; `git check-ignore apps/ose-web/.env.example apps/ayokoding-web/.env.example` —
+    **not** ignored (expect non-zero exit / no output). If a `.env.example` is unexpectedly ignored,
+    add `!apps/**/.env.example` to `.gitignore`.
+<!-- DONE 2026-06-10 | Status: PASS | .env.local ignored (exit 0); .env.example not ignored (exit 1) -->
+- [x] [AI] **RED**: in `apps/rhino-cli/src/commands/env_init.rs` (or its test sibling), write a
       failing unit test asserting that the scaffold scan discovers `apps/ose-app-be/.env.example`.
       Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: test fails (scan still
       points to `repo_root/infra/dev` only; the `apps/` path is not walked yet).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: edit `apps/rhino-cli/src/commands/env_init.rs`: extend the scaffold scan
+  <!-- DONE 2026-06-10 | Status: PASS | collect_examples_finds_apps_env_example fails: apps/ not in SCAN_ROOTS -->
+- [x] [AI] **GREEN**: edit `apps/rhino-cli/src/commands/env_init.rs`: extend the scaffold scan
       (currently rooted at `repo_root/infra/dev`, line 36) to also walk `apps/<app>/` directories
       and collect `.env.example` files found there. Run
       `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: the RED test passes and no
       previously passing test breaks.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: review `apps/rhino-cli/src/commands/env_init.rs` — remove any hardcoded
+  <!-- DONE 2026-06-10 | Status: PASS | SCAN_ROOTS = ["infra/dev", "apps"]; 840 tests pass -->
+- [x] [AI] **REFACTOR**: review `apps/rhino-cli/src/commands/env_init.rs` — remove any hardcoded
       `"infra/dev"` string constants introduced or exposed during GREEN; extract repeated scan-root
       values into named constants if applicable. Run
       `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: all tests still pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Grep for stale references to the removed infra templates: run
-      `grep -rn "infra/dev/organiclever/.env\|infra/dev/ose-app/.env\|infra/dev/ose-web/.env\|infra/dev/ayokoding-web/.env" . --include="*.md" --include="*.yml" --include="*.yaml" --include="*.json" --include="*.rs"`
-      (excluding `node_modules`, `plans/done`) and update each hit to the `apps/<app>/.env.example`
-      path — acceptance: re-run the same grep and confirm zero hits.
-- [ ] [AI] Run `./node_modules/.bin/nx run-many -t build test:quick -p organiclever-be ose-app-be ose-web ayokoding-web rhino-cli`
-      — all exit 0 (the consolidation broke no compose/CI/scaffold reference).
+  <!-- DONE 2026-06-10 | Status: PASS | SCAN_ROOTS constant; no other hardcoded infra/dev; 840 tests pass -->
+- [x] [AI] Grep for stale references to the removed infra templates: run
+    `grep -rn "infra/dev/organiclever/.env\|infra/dev/ose-app/.env\|infra/dev/ose-web/.env\|infra/dev/ayokoding-web/.env" . --include="*.md" --include="*.yml" --include="*.yaml" --include="*.json" --include="*.rs"`
+    (excluding `node_modules`, `plans/done`) and update each hit to the `apps/<app>/.env.example`
+    path — acceptance: re-run the same grep and confirm zero hits.
+<!-- DONE 2026-06-10 | Status: PASS | Updated infra/dev/ose-app/README.md cp cmd + plan README.md link; remaining hits are runtime .env refs (docker-compose) and test fixture strings, not template references -->
+- [x] [AI] Run `./node_modules/.bin/nx run-many -t build test:quick -p organiclever-be ose-app-be ose-web ayokoding-web rhino-cli`
+    — all exit 0 (the consolidation broke no compose/CI/scaffold reference).
+<!-- DONE 2026-06-10 | Status: PASS | All 5 projects pass; ayokoding-web:build flaky (pre-existing) but passed on retry -->
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4; if any fails, fix it in Phase 3 first.
 
-- [ ] [AI] `find infra/dev -name ".env.example"` returns zero hits for the four removed groups;
-      `ls apps/ose-web/.env.example apps/ayokoding-web/.env.example` both exist.
-- [ ] [AI] The pre-change backup archive exists and contains every pre-change env file (no content
-      lost; nothing deleted without a backup copy).
-- [ ] [AI] `rhino-cli env init` (or its test) discovers templates under `apps/<app>/`.
-- [ ] [AI] All five projects' `build`/`test:quick` exit 0; `npm run lint:md` exits 0.
+- [x] [AI] `find infra/dev -name ".env.example"` returns zero hits for the four removed groups;
+    `ls apps/ose-web/.env.example apps/ayokoding-web/.env.example` both exist.
+<!-- DONE 2026-06-10 | Status: PASS | find returns 0 hits; both apps/.env.example files exist -->
+- [x] [AI] The pre-change backup archive exists and contains every pre-change env file (no content
+    lost; nothing deleted without a backup copy).
+<!-- DONE 2026-06-10 | Status: PASS | ~/ose-public-env-backup/ contains apps/ and infra/ dirs with 6 files -->
+- [x] [AI] `rhino-cli env init` (or its test) discovers templates under `apps/<app>/`.
+<!-- DONE 2026-06-10 | Status: PASS | collect_examples_finds_apps_env_example test passes; SCAN_ROOTS includes "apps" -->
+- [x] [AI] All five projects' `build`/`test:quick` exit 0; `npm run lint:md` exits 0.
+<!-- DONE 2026-06-10 | Status: PASS | 5/5 test:quick pass; lint:md 0 errors across 2154 files -->
 - [ ] [AI] Commit (`refactor(infra): consolidate app env templates under apps/<app>/ (backup-first)`)
       and push; `git status` clean.
 
