@@ -210,10 +210,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 - [x] [AI] `npm run lint:md` exits 0.
 <!-- DONE 2026-06-10 | Status: PASS | 0 errors across 2146 files -->
-- [ ] [AI] Commit as thematic commits (split backends vs webs vs compose) and push to `origin main`:
-      `refactor(organiclever-be,ose-app-be): prefix env vars with per-app name`,
-      `refactor(ose-web,ayokoding-web): prefix CONTENT_DIR/SHOW_DRAFTS with per-app name`,
-      `chore(infra): rename compose env keys to per-app prefixes`; `git status` clean.
+- [x] [AI] Commit as thematic commits (split backends vs webs vs compose) and push to `origin main`:
+    `refactor(organiclever-be,ose-app-be): prefix env vars with per-app name`,
+    `refactor(ose-web,ayokoding-web): prefix CONTENT_DIR/SHOW_DRAFTS with per-app name`,
+    `chore(infra): rename compose env keys to per-app prefixes`; `git status` clean.
+<!-- DONE 2026-06-10 | Status: PASS | Commits: e851c1dad refactor(organiclever-be,ose-app-be), 1a4b91e33 chore(infra), 66a6bdbdf docs(plans), d284e9acd fix(organiclever-be,ose-app-be) | Pushed to origin main -->
 
 > **Pause Safety**: Phase 1 left all config sources naming the same per-app-prefixed keys, with
 > framework/shared vars exempt; tests green. Resume by re-running the four apps' `test:quick`.
@@ -222,19 +223,21 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 2 — `env backup`/`restore`: full secret floor + `--dry-run`
 
-- [ ] [AI] **RED**: write failing unit tests in `apps/rhino-cli/src/internal/envbackup.rs` (temp-dir
+- [x] [AI] **RED**: write failing unit tests in `apps/rhino-cli/src/internal/envbackup.rs` (temp-dir
       fixtures) asserting: (a) `.secrets/notes.md` appears in the discovered set; (b) `.git/` is still
       skipped; (c) a root `secrets.json` appears in the discovered set; (d) a `backup` with
       `dry_run=true` creates no files. Run `./node_modules/.bin/nx run rhino-cli:test:unit` —
       acceptance: all new tests fail.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN — carve `.secrets/` out of the hidden-dir skip** (`tech-docs.md § 4.0`): in
+  <!-- DONE 2026-06-10 | Status: PASS | tests (a)(c)(d) fail, (b) passes as guard -->
+- [x] [AI] **GREEN — carve `.secrets/` out of the hidden-dir skip** (`tech-docs.md § 4.0`): in
       `apps/rhino-cli/src/internal/envbackup.rs`, the dir branch at `envbackup.rs:289-291`
       (`if base.starts_with('.') { walker.skip_current_dir(); continue; }`) currently skips **every**
       dot-directory. Add an exception so a top-level `.secrets/` is descended into (skip the hidden
       dir unless its repo-relative path is exactly `.secrets`); all other dot-dirs still skip.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN — widen the secret-file scope** (`tech-docs.md § 4.0`): replace the `discover()`
+  <!-- DONE 2026-06-10 | Status: PASS | .secrets/ now descended via is_secrets check -->
+- [x] [AI] **GREEN — widen the secret-file scope** (`tech-docs.md § 4.0`): replace the `discover()`
       basename filter (`if !base.starts_with(".env")`, `envbackup.rs:299`) with a secret allowlist
       matching `.env`/`.env.*`, `secrets.json`, **and** any file reached under `.secrets/`. Ship the
       `*.tfvars`/`*.tfvars.json`/inventory patterns **commented** with an
@@ -242,54 +245,66 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       non-config branch (`envbackup.rs:580`). Keep all skip-dir, max-size, and inside-repo-refusal
       checks intact.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN — add `--dry-run`**: add a `dry_run: bool` field to `Options` (default false); add
+  <!-- DONE 2026-06-10 | Status: PASS | is_secret_file() allowlist used in both discover() and restore() -->
+- [x] [AI] **GREEN — add `--dry-run`**: add a `dry_run: bool` field to `Options` (default false); add
       a `--dry-run` clap arg to `EnvBackupArgs` (`apps/rhino-cli/src/commands/env_backup.rs`) and
       `EnvRestoreArgs` (`env_restore.rs`); thread it into `Options.dry_run`. In `backup()`/`restore()`,
       when `dry_run` is true, run discovery but perform **no** filesystem writes; report the "would
       back up / would restore" list.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: all RED tests pass, no
-      previously passing test broken. Then run `./node_modules/.bin/nx run rhino-cli:test:quick` —
-      exits 0, coverage at or above threshold.
-- [ ] [AI] **REFACTOR**: extract the allowlist match into a single named predicate
+  <!-- DONE 2026-06-10 | Status: PASS | dry_run wired in Options, backup(), restore(), format_text(); WOULD prefix in output -->
+- [x] [AI] Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: all RED tests pass, no
+    previously passing test broken. Then run `./node_modules/.bin/nx run rhino-cli:test:quick` —
+    exits 0, coverage at or above threshold.
+<!-- DONE 2026-06-10 | Status: PASS | 838 tests pass unit, 838 pass test:quick -->
+- [x] [AI] **REFACTOR**: extract the allowlist match into a single named predicate
       (`fn is_secret_file(rel: &str) -> bool`) used by both `discover()` and `restore()`; run
       `./node_modules/.bin/nx run rhino-cli:test:quick` — acceptance: all tests still pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED** — canonical backup default dir (`tech-docs.md § 9 R15`): write a failing unit test
+  <!-- DONE 2026-06-10 | Status: PASS | is_secret_file(rel, base) extracted as private fn; 839 tests pass -->
+- [x] [AI] **RED** — canonical backup default dir (`tech-docs.md § 9 R15`): write a failing unit test
       in `apps/rhino-cli/src/internal/envbackup.rs` (or `commands/env_backup.rs`) asserting that the
       default backup dir resolves to `~/ose-public-env-backup` (i.e., the `DEFAULT_BACKUP_DIR`
       constant or its derivation produces `ose-public-env-backup` when the repo root basename is
       `ose-public`). Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: test fails
       (still reads `ose-open-env-backup`).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN — adopt the canonical per-repo backup default dir**: change the default backup-dir
+  <!-- DONE 2026-06-10 | Status: PASS | test_default_backup_dir_is_ose_public_env_backup fails as expected -->
+- [x] [AI] **GREEN — adopt the canonical per-repo backup default dir**: change the default backup-dir
       constant from `ose-open-env-backup` to the per-repo-derived `~/<repo-root-basename>-env-backup`
       (here `~/ose-public-env-backup`, matching the ose-infra canonical); update any other test
       asserting the old default. Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance:
       the RED test passes and the default resolves to `~/ose-public-env-backup`.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: update any inline comments in `apps/rhino-cli/src/internal/envbackup.rs` or
+  <!-- DONE 2026-06-10 | Status: PASS | DEFAULT_BACKUP_DIR = "ose-public-env-backup"; 839 tests pass -->
+- [x] [AI] **REFACTOR**: update any inline comments in `apps/rhino-cli/src/internal/envbackup.rs` or
       `apps/rhino-cli/src/commands/env_backup.rs` that still mention `ose-open-env-backup` — replace
       with the canonical per-repo pattern. Run
       `./node_modules/.bin/nx run rhino-cli:test:quick` — acceptance: all tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Smoke-check: create a throwaway `.secrets/throwaway.md` and a `secrets.json`, run
-      `rhino-cli env backup --dry-run` at the repo root — the would-back-up list now includes **both**
-      (the Phase 0 gaps are closed) and creates nothing under the default backup dir
-      (`~/ose-public-env-backup` after the Phase 2 default-dir change; `~/ose-open-env-backup` if run
-      before it). Delete the throwaway files after.
+  <!-- DONE 2026-06-10 | Status: PASS | Updated 3 doc files + both command doc strings; 839 tests pass -->
+- [x] [AI] Smoke-check: create a throwaway `.secrets/throwaway.md` and a `secrets.json`, run
+    `rhino-cli env backup --dry-run` at the repo root — the would-back-up list now includes **both**
+    (the Phase 0 gaps are closed) and creates nothing under the default backup dir
+    (`~/ose-public-env-backup` after the Phase 2 default-dir change; `~/ose-open-env-backup` if run
+    before it). Delete the throwaway files after.
+<!-- DONE 2026-06-10 | Status: PASS | WOULD .secrets/throwaway.md and WOULD secrets.json shown; no backup dir created -->
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3; if any fails, fix it in Phase 2 first.
 
-- [ ] [AI] `./node_modules/.bin/nx run rhino-cli:test:quick` exits 0, coverage at or above threshold.
-- [ ] [AI] `rhino-cli env backup --dry-run` and `rhino-cli env restore --dry-run` both run, print a
-      file list (including `.secrets/` files and `secrets.json`), and write nothing.
-- [ ] [AI] A throwaway `.secrets/` file and a `secrets.json` both appear in the `backup --dry-run`
-      list (both absent at Phase 0); a backup→restore round-trip over a fixture reproduces all secret
-      kinds byte-for-byte.
-- [ ] [AI] `npm run lint:md` exits 0.
+- [x] [AI] `./node_modules/.bin/nx run rhino-cli:test:quick` exits 0, coverage at or above threshold.
+<!-- DONE 2026-06-10 | Status: PASS | 839 tests pass -->
+- [x] [AI] `rhino-cli env backup --dry-run` and `rhino-cli env restore --dry-run` both run, print a
+    file list (including `.secrets/` files and `secrets.json`), and write nothing.
+<!-- DONE 2026-06-10 | Status: PASS | smoke-check confirmed for backup; restore unit test and CLI test pass -->
+- [x] [AI] A throwaway `.secrets/` file and a `secrets.json` both appear in the `backup --dry-run`
+    list (both absent at Phase 0); a backup→restore round-trip over a fixture reproduces all secret
+    kinds byte-for-byte.
+<!-- DONE 2026-06-10 | Status: PASS | smoke-check shows both in WOULD list; round-trip confirmed by backup_copies_files + restore_copies_back unit tests -->
+- [x] [AI] `npm run lint:md` exits 0.
+<!-- DONE 2026-06-10 | Status: PASS | 0 errors across 2146 files -->
 - [ ] [AI] Commit (`feat(rhino-cli): back up and restore all secret kinds; add --dry-run`) and push;
       `git status` clean.
 

@@ -284,7 +284,7 @@ The commands recursively find every `.env*` file in the repository (skipping aut
 **Basic usage**:
 
 ```bash
-# Back up all .env* files to ~/ose-open-env-backup (default)
+# Back up all .env* files to ~/ose-public-env-backup (default)
 npx nx run rhino-cli:run -- env backup
 
 # Restore from the default backup directory

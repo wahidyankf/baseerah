@@ -200,7 +200,7 @@ npm install
 restore them:
 
 ```bash
-# Restore .env files from default backup location (~/ose-open-env-backup)
+# Restore .env files from default backup location (~/ose-public-env-backup)
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env restore --force
 
 # Also restore uncommitted config files (AI tool settings, Docker overrides, etc.)

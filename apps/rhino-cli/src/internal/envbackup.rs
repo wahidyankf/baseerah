@@ -18,7 +18,7 @@ use walkdir::WalkDir;
 pub const DEFAULT_MAX_SIZE: i64 = 1024 * 1024;
 
 /// Default name of the backup directory placed outside the repository.
-pub const DEFAULT_BACKUP_DIR: &str = "ose-open-env-backup";
+pub const DEFAULT_BACKUP_DIR: &str = "ose-public-env-backup";
 
 /// Returns the default list of directory names that the walker skips.
 ///
@@ -166,6 +166,8 @@ pub struct Options {
     pub force: bool,
     /// When `true`, also back up / restore the config files from [`default_config_patterns`].
     pub include_config: bool,
+    /// When `true`, run discovery but perform no filesystem writes.
+    pub dry_run: bool,
 }
 
 /// A single file discovered during a scan, along with its copy outcome.
@@ -216,6 +218,8 @@ pub struct Result {
     pub worktree_name: String,
     /// When `true`, the user cancelled the operation before it started.
     pub cancelled: bool,
+    /// When `true`, no filesystem writes were performed (dry-run mode).
+    pub dry_run: bool,
 }
 
 /// Expands a leading `~` in `path` to the value of the `HOME` environment variable.
@@ -244,6 +248,22 @@ pub fn expand_tilde(path: &str) -> std::result::Result<PathBuf, Error> {
 /// Returns `true` when `backup_dir` is a subdirectory of (or equal to) `repo_root`.
 fn is_inside_repo(backup_dir: &Path, repo_root: &Path) -> bool {
     backup_dir.strip_prefix(repo_root).is_ok()
+}
+
+/// Returns `true` for files that belong in a secret backup.
+///
+/// Matched patterns:
+/// - `.env` / `.env.*` (any file whose basename starts with `.env`)
+/// - `secrets.json` (exact basename)
+/// - Any file under `.secrets/` (repo-relative path starts with `.secrets/`)
+///
+/// Patterns for future activation (IaC):
+/// ```text
+/// // activate when IaC is added
+/// // rel.ends_with(".tfvars") || rel.ends_with(".tfvars.json")
+/// ```
+fn is_secret_file(rel: &str, base: &str) -> bool {
+    base.starts_with(".env") || base == "secrets.json" || rel.starts_with(".secrets/")
 }
 
 /// Walks the repo root and returns all `.env*` files found.
@@ -285,9 +305,15 @@ pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
             if path == opts.repo_root {
                 continue;
             }
-            // hidden dirs starting with "."
+            // Hidden dirs are skipped, except `.secrets/` which is descended.
             if base.starts_with('.') {
-                walker.skip_current_dir();
+                let is_secrets = path
+                    .strip_prefix(&opts.repo_root)
+                    .map(|r| r == std::path::Path::new(".secrets"))
+                    .unwrap_or(false);
+                if !is_secrets {
+                    walker.skip_current_dir();
+                }
                 continue;
             }
             if skip_set.contains(base.as_str()) {
@@ -296,13 +322,13 @@ pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
             }
             continue;
         }
-        if !base.starts_with(".env") {
-            continue;
-        }
         let rel = match path.strip_prefix(&opts.repo_root) {
             Ok(r) => r.to_string_lossy().into_owned(),
             Err(_) => continue,
         };
+        if !is_secret_file(&rel, &base) {
+            continue;
+        }
         let Ok(meta) = fs::symlink_metadata(&path) else {
             continue;
         };
@@ -485,15 +511,22 @@ pub fn backup(opts: &mut Options) -> std::result::Result<Result, Error> {
         opts.backup_dir.clone()
     };
 
-    fs::create_dir_all(&dest_root).with_context(|| "create backup dir")?;
+    if !opts.dry_run {
+        fs::create_dir_all(&dest_root).with_context(|| "create backup dir")?;
+    }
 
     let mut result = Result {
         direction: "backup".to_string(),
         dir: opts.backup_dir.to_string_lossy().into_owned(),
         files: entries.clone(),
         worktree_name: opts.worktree_name.clone(),
+        dry_run: opts.dry_run,
         ..Default::default()
     };
+
+    if opts.dry_run {
+        return Ok(result);
+    }
 
     for e in &entries {
         if e.skipped {
@@ -569,6 +602,7 @@ pub fn restore(opts: &mut Options) -> std::result::Result<Result, Error> {
         direction: "restore".to_string(),
         dir: opts.backup_dir.to_string_lossy().into_owned(),
         worktree_name: opts.worktree_name.clone(),
+        dry_run: opts.dry_run,
         ..Default::default()
     };
 
@@ -577,12 +611,14 @@ pub fn restore(opts: &mut Options) -> std::result::Result<Result, Error> {
             .file_name()
             .map(|s| s.to_string_lossy().into_owned())
             .unwrap_or_default();
-        if e.source != "config" && !base.starts_with(".env") {
+        if e.source != "config" && !is_secret_file(&e.rel_path, &base) {
             continue;
         }
         result.files.push(e.clone());
-        if e.skipped {
-            result.skipped += 1;
+        if e.skipped || opts.dry_run {
+            if e.skipped {
+                result.skipped += 1;
+            }
             continue;
         }
         let dst = opts.repo_root.join(&e.rel_path);
@@ -672,6 +708,11 @@ pub fn format_text(r: &Result, verbose: bool, quiet: bool) -> String {
         return sb;
     }
     if !quiet {
+        let action = if r.dry_run {
+            "WOULD".to_string()
+        } else {
+            r.direction.to_uppercase()
+        };
         for f in &r.files {
             if f.skipped {
                 if verbose {
@@ -684,7 +725,7 @@ pub fn format_text(r: &Result, verbose: bool, quiet: bool) -> String {
             } else {
                 ""
             };
-            let _ = writeln!(sb, "  {}  {}{tag}", r.direction.to_uppercase(), f.rel_path);
+            let _ = writeln!(sb, "  {action}  {}{tag}", f.rel_path);
         }
         for e in &r.errors {
             let _ = writeln!(sb, "  WARNING  {e}");
@@ -695,14 +736,25 @@ pub fn format_text(r: &Result, verbose: bool, quiet: bool) -> String {
     } else {
         r.direction.clone()
     };
-    let _ = write!(
-        sb,
-        "{} complete: {} file(s) {}d, {} skipped",
-        capitalize(&label),
-        r.copied,
-        label,
-        r.skipped
-    );
+    if r.dry_run {
+        let _ = write!(
+            sb,
+            "Dry-run {}: {} file(s) would be {}d, {} skipped",
+            label,
+            r.files.iter().filter(|f| !f.skipped).count(),
+            label,
+            r.skipped
+        );
+    } else {
+        let _ = write!(
+            sb,
+            "{} complete: {} file(s) {}d, {} skipped",
+            capitalize(&label),
+            r.copied,
+            label,
+            r.skipped
+        );
+    }
     let config_count = r
         .files
         .iter()
@@ -1167,5 +1219,105 @@ mod tests {
     fn capitalize_basic() {
         assert_eq!(capitalize("backup"), "Backup");
         assert_eq!(capitalize(""), "");
+    }
+
+    // Phase 2 RED tests — (a)/(c)/(d) fail until GREEN lands.
+
+    #[test]
+    fn discover_finds_secrets_dir_file() {
+        let dir = tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".secrets")).unwrap();
+        std::fs::write(dir.path().join(".secrets/notes.md"), "secret").unwrap();
+        let opts = Options {
+            repo_root: dir.path().to_path_buf(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
+            max_size: DEFAULT_MAX_SIZE,
+            ..Default::default()
+        };
+        let e = discover(&opts).unwrap();
+        assert!(
+            e.iter().any(|f| f.rel_path == ".secrets/notes.md"),
+            "expected .secrets/notes.md in discover result, got: {e:?}"
+        );
+    }
+
+    #[test]
+    fn discover_still_skips_git_dir() {
+        let dir = tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".git")).unwrap();
+        std::fs::write(dir.path().join(".git/config"), "gitconfig").unwrap();
+        std::fs::write(dir.path().join(".env"), "k=v").unwrap();
+        let opts = Options {
+            repo_root: dir.path().to_path_buf(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
+            max_size: DEFAULT_MAX_SIZE,
+            ..Default::default()
+        };
+        let e = discover(&opts).unwrap();
+        assert!(
+            e.iter().all(|f| !f.rel_path.starts_with(".git/")),
+            "expected .git/ to be skipped, got: {e:?}"
+        );
+    }
+
+    #[test]
+    fn discover_finds_secrets_json() {
+        let dir = tempdir().unwrap();
+        std::fs::write(dir.path().join("secrets.json"), r#"{"key":"val"}"#).unwrap();
+        let opts = Options {
+            repo_root: dir.path().to_path_buf(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
+            max_size: DEFAULT_MAX_SIZE,
+            ..Default::default()
+        };
+        let e = discover(&opts).unwrap();
+        assert!(
+            e.iter().any(|f| f.rel_path == "secrets.json"),
+            "expected secrets.json in discover result, got: {e:?}"
+        );
+    }
+
+    #[test]
+    fn backup_dry_run_writes_nothing() {
+        let repo = tempdir().unwrap();
+        let dest = tempdir().unwrap();
+        std::fs::write(repo.path().join(".env"), "k=v").unwrap();
+        let mut opts = Options {
+            repo_root: repo.path().to_path_buf(),
+            backup_dir: dest.path().to_path_buf(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
+            max_size: DEFAULT_MAX_SIZE,
+            force: true,
+            dry_run: true,
+            ..Default::default()
+        };
+        let r = backup(&mut opts).unwrap();
+        assert_eq!(r.copied, 0, "dry_run backup must copy no files");
+        assert!(
+            !dest.path().join(".env").exists(),
+            "dry_run backup must write no files to disk"
+        );
+    }
+
+    // Phase 2 RED2: canonical backup default dir.
+    // Fails until DEFAULT_BACKUP_DIR is changed to "ose-public-env-backup".
+    #[test]
+    fn default_backup_dir_is_ose_public_env_backup() {
+        assert_eq!(
+            DEFAULT_BACKUP_DIR, "ose-public-env-backup",
+            "expected ose-public-env-backup but got {DEFAULT_BACKUP_DIR}"
+        );
     }
 }

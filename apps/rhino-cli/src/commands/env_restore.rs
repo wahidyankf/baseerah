@@ -15,7 +15,7 @@ use crate::internal::git;
 /// CLI arguments for `env restore`.
 #[derive(Args, Debug)]
 pub struct EnvRestoreArgs {
-    /// Backup directory (default: ~/ose-open-env-backup).
+    /// Backup directory (default: `~/ose-public-env-backup`).
     #[arg(long = "dir", default_value = "")]
     pub dir: String,
     /// Namespace restore by worktree/repo directory name.
@@ -27,6 +27,9 @@ pub struct EnvRestoreArgs {
     /// Also restore known uncommitted config files.
     #[arg(long = "include-config")]
     pub include_config: bool,
+    /// Preview what would be restored without writing any files.
+    #[arg(long = "dry-run")]
+    pub dry_run: bool,
     /// Verbose output.
     #[arg(long, short = 'v')]
     pub verbose: bool,
@@ -61,6 +64,7 @@ pub fn run(args: &EnvRestoreArgs, output: OutputFormat) -> std::result::Result<(
         worktree_aware: args.worktree_aware,
         force,
         include_config: args.include_config,
+        dry_run: args.dry_run,
         ..Default::default()
     };
     if args.worktree_aware {
@@ -90,6 +94,7 @@ mod tests {
             worktree_aware: false,
             force: true,
             include_config: false,
+            dry_run: false,
             verbose: false,
             quiet: false,
         };
