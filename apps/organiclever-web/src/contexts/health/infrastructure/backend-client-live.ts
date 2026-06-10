@@ -1,8 +1,9 @@
 import { Effect, Layer } from "effect";
 import { BackendClient } from "./backend-client";
 import { NetworkError } from "./errors";
+import { env } from "../../../env";
 
-const BACKEND_URL = process.env["ORGANICLEVER_BE_URL"] ?? "http://localhost:8202";
+const BACKEND_URL = env.ORGANICLEVER_BE_URL ?? "http://localhost:8202";
 
 async function fetchJson(url: string, init?: RequestInit): Promise<unknown> {
   const response = await fetch(url, init);

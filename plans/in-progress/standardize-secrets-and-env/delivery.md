@@ -388,8 +388,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 <!-- DONE 2026-06-10 | Status: PASS | collect_examples_finds_apps_env_example test passes; SCAN_ROOTS includes "apps" -->
 - [x] [AI] All five projects' `build`/`test:quick` exit 0; `npm run lint:md` exits 0.
 <!-- DONE 2026-06-10 | Status: PASS | 5/5 test:quick pass; lint:md 0 errors across 2154 files -->
-- [ ] [AI] Commit (`refactor(infra): consolidate app env templates under apps/<app>/ (backup-first)`)
-      and push; `git status` clean.
+- [x] [AI] Commit (`refactor(infra): consolidate app env templates under apps/<app>/ (backup-first)`)
+    and push; `git status` clean.
+<!-- DONE 2026-06-10 | Status: PASS | commit a46f16998 pushed to origin/main; git status clean -->
 
 > **Pause Safety**: Phase 3 left one env template per app under `apps/<app>/`, the duplicated infra
 > templates removed, `env init` repointed, and any real files relocated (not deleted) with a backup

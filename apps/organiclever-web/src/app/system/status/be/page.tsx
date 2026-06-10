@@ -1,3 +1,5 @@
+import { env } from "../../../../env";
+
 export const dynamic = "force-dynamic";
 
 type Probe =
@@ -6,7 +8,7 @@ type Probe =
   | { kind: "down"; url: string; reason: string };
 
 async function probeBackend(): Promise<Probe> {
-  const url = process.env["ORGANICLEVER_BE_URL"];
+  const url = env.ORGANICLEVER_BE_URL;
   if (!url) return { kind: "unset" };
   const started = performance.now();
   try {

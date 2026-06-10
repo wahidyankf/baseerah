@@ -573,12 +573,15 @@ This plan introduces four runtime dependencies, governed by the
 None has an LTS line → **all are Path B** (latest version released ≥ 60 days before the bump date AND
 CVE-clean). `zod` is a canonical Path-B example.
 
-| Dependency           | Manifest(s)                                                     | Path | Target line                | Clearance (verify at execution) |
-| -------------------- | --------------------------------------------------------------- | ---- | -------------------------- | ------------------------------- |
-| `dotenvy`            | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | `0.15.7` (exact)           | TBD at execution                |
-| `envy`               | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | `0.4.2` (exact, **stale**) | TBD at execution                |
-| `@t3-oss/env-nextjs` | each `apps/*-web/package.json`                                  | B    | `0.13.x` latest            | TBD at execution                |
-| `zod`                | each `apps/*-web/package.json`                                  | B    | `4.x` (v4 default export)  | TBD at execution                |
+**Cutoff computed 2026-06-10**: today − 60 days = **2026-04-11**. Eligible = released on/before
+2026-04-11.
+
+| Dependency           | Manifest(s)                                                     | Path | Pinned version | Release date | Clearance                                                                                                                                                                                                   |
+| -------------------- | --------------------------------------------------------------- | ---- | -------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dotenvy`            | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | `0.15.7`       | 2023-03-22   | CLEAR — no CVE/RustSec/NVD; absolute latest version; not yanked                                                                                                                                             |
+| `envy`               | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | `0.4.2`        | 2021-01-04   | CLEAR — stale (no releases since 2021) but no CVE/RustSec advisory; functionally complete; not yanked                                                                                                       |
+| `@t3-oss/env-nextjs` | each `apps/*-web/package.json`                                  | B    | `0.13.11`      | 2026-03-22   | CLEAR — no CVE/NVD/Snyk; latest 0.13.x; not deprecated                                                                                                                                                      |
+| `zod`                | each `apps/*-web/package.json`                                  | B    | `4.3.6`        | 2026-01-22   | HAS_CVE: CVE-2026-6991 (CVSS 6.3 Medium, EPSS 0.00008, not in CISA KEV); fix in 4.4.0 (2026-04-29, post-cutoff); EPSS < 0.5 → no Path C escalation; accepted risk; see `docs/reference/security-waivers.md` |
 
 Per-dependency notes:
 

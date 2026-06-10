@@ -4,6 +4,7 @@ import type { ContentRepository } from "../infrastructure/repository";
 import type { ContentMeta, Heading, PageLink, SearchResult } from "./types";
 import { parseMarkdown } from "../infrastructure/parser";
 import { stripMarkdown } from "../infrastructure/reader";
+import { env } from "../../../env";
 
 export interface SearchDoc {
   id: string;
@@ -115,7 +116,7 @@ export class ContentService {
   }
 
   private getUpdatesFromMap(contentMap: Map<string, ContentMeta>): ContentMeta[] {
-    const showDrafts = process.env["OSE_WEB_SHOW_DRAFTS"] === "true";
+    const showDrafts = env.OSE_WEB_SHOW_DRAFTS === "true";
     return [...contentMap.values()]
       .filter((m) => m.category === "updates" && !m.isSection && (!m.draft || showDrafts))
       .sort((a, b) => {

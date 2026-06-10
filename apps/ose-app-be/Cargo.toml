@@ -35,6 +35,11 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = "1.0.102"
 thiserror = "2"
+dotenvy = "0.15.7"
+# envy 0.4.2 is the latest release (Jan 2021); stale but advisory-clean and
+# functionally complete. Re-evaluate if a RustSec advisory (cf. RUSTSEC-2021-0141)
+# is ever filed against envy.
+envy = "0.4.2"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

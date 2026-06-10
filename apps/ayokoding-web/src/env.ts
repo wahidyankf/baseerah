@@ -1,0 +1,10 @@
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+export const env = createEnv({
+  server: {
+    AYOKODING_WEB_CONTENT_DIR: z.string().optional(),
+    AYOKODING_WEB_SHOW_DRAFTS: z.enum(["true", "false"]).optional(),
+  },
+  experimental__runtimeEnv: {},
+});

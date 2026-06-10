@@ -3,7 +3,15 @@
  * RED: fails before renaming process.env.SHOW_DRAFTS → process.env.OSE_WEB_SHOW_DRAFTS
  * GREEN: passes after the rename in service.ts
  */
-import { describe, it, expect, afterEach } from "vitest";
+import { vi, describe, it, expect, afterEach } from "vitest";
+
+// createEnv snapshots process.env at module load time; mock it with a live Proxy
+// so that per-test process.env mutations are visible to the service.
+vi.mock("@/env", () => ({
+  env: new Proxy({} as Record<string, string | undefined>, {
+    get: (_, key: string) => process.env[key],
+  }),
+}));
 import { InMemoryContentRepository } from "@/contexts/content/infrastructure/repository-memory";
 import { ContentService } from "@/contexts/content/application/service";
 

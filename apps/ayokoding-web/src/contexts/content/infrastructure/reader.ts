@@ -3,8 +3,9 @@ import fs from "node:fs/promises";
 import matter from "gray-matter";
 import { frontmatterSchema } from "@/contexts/content/application/schemas";
 import type { ContentMeta } from "./types";
+import { env } from "../../../env";
 
-const CONTENT_DIR = process.env.AYOKODING_WEB_CONTENT_DIR ?? path.resolve(process.cwd(), "content");
+const CONTENT_DIR = env.AYOKODING_WEB_CONTENT_DIR ?? path.resolve(process.cwd(), "content");
 
 export function getContentDir(): string {
   return CONTENT_DIR;
@@ -56,7 +57,7 @@ export async function readAllContent(contentDir?: string): Promise<ContentMeta[]
       }
 
       const frontmatter = parsed.data;
-      if (frontmatter.draft && process.env.AYOKODING_WEB_SHOW_DRAFTS !== "true") {
+      if (frontmatter.draft && env.AYOKODING_WEB_SHOW_DRAFTS !== "true") {
         continue;
       }
 

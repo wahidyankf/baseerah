@@ -10,6 +10,15 @@ import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { render, screen, cleanup } from "@testing-library/react";
 import { vi, expect } from "vitest";
+
+// createEnv snapshots process.env at module load time; mock it with a live Proxy
+// so that per-scenario vi.stubEnv mutations are visible to the page component.
+vi.mock("@/env", () => ({
+  env: new Proxy({} as Record<string, string | undefined>, {
+    get: (_, key: string) => process.env[key],
+  }),
+}));
+
 import BeStatusPage from "@/app/system/status/be/page";
 
 const feature = await loadFeature(

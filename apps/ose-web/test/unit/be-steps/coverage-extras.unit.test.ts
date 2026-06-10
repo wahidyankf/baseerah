@@ -1,7 +1,15 @@
 /**
  * Additional unit tests to reach 80% coverage on uncovered code paths.
  */
-import { describe, it, expect } from "vitest";
+import { vi, describe, it, expect } from "vitest";
+
+// createEnv snapshots process.env at module load time; mock it with a live Proxy
+// so that per-test process.env mutations are visible to the service.
+vi.mock("@/env", () => ({
+  env: new Proxy({} as Record<string, string | undefined>, {
+    get: (_, key: string) => process.env[key],
+  }),
+}));
 import { writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { cn } from "@/lib/utils";

@@ -9,7 +9,7 @@ export const frontmatterSchema = z.object({
   tags: z.array(z.string()).default([]),
   layout: z.string().optional(),
   type: z.string().optional(),
-  cascade: z.record(z.unknown()).optional(),
+  cascade: z.record(z.string(), z.unknown()).optional(),
   breadcrumbs: z.boolean().optional(),
   bookCollapseSection: z.boolean().optional(),
   bookFlatSection: z.boolean().optional(),

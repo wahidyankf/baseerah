@@ -4,8 +4,9 @@ import matter from "gray-matter";
 import { frontmatterSchema } from "@/contexts/content/application/schemas";
 import type { ContentMeta } from "./types";
 import type { ContentRepository } from "./repository";
+import { env } from "../../../env";
 
-const DEFAULT_CONTENT_DIR = process.env.AYOKODING_WEB_CONTENT_DIR ?? path.resolve(process.cwd(), "content");
+const DEFAULT_CONTENT_DIR = env.AYOKODING_WEB_CONTENT_DIR ?? path.resolve(process.cwd(), "content");
 
 export class FileSystemContentRepository implements ContentRepository {
   private readonly contentDir: string;
@@ -29,7 +30,7 @@ export class FileSystemContentRepository implements ContentRepository {
         }
 
         const frontmatter = parsed.data;
-        if (frontmatter.draft && process.env.AYOKODING_WEB_SHOW_DRAFTS !== "true") {
+        if (frontmatter.draft && env.AYOKODING_WEB_SHOW_DRAFTS !== "true") {
           continue;
         }
 

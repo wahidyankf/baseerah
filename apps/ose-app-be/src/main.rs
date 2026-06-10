@@ -16,10 +16,10 @@ async fn main() {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    let config = Config::from_env();
+    let config = Config::load().expect("failed to load configuration from environment");
     let router = app::router();
 
-    let addr = format!("0.0.0.0:{}", config.port);
+    let addr = format!("0.0.0.0:{}", config.ose_app_be_port);
     let listener = tokio::net::TcpListener::bind(&addr)
         .await
         .expect("failed to bind port");
