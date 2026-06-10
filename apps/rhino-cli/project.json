@@ -211,6 +211,20 @@
         "{workspaceRoot}/.claude/agents/**/*.md",
         "{workspaceRoot}/.opencode/agents/**/*.md"
       ]
+    },
+    "validate:env": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/env-contract.yaml",
+        "{workspaceRoot}/apps/**/.env.example",
+        "{workspaceRoot}/apps/*/src/env.ts",
+        "{workspaceRoot}/apps/*/src/**/*.rs"
+      ]
     }
   }
 }

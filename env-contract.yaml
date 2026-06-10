@@ -1,0 +1,66 @@
+# env-contract.yaml — surface registry for rhino-cli env validate
+#
+# Each surface entry carries:
+#   root      — path relative to repo root
+#   kind      — "app" (active); "terraform"/"ansible" are forward-scaffold
+#   lang      — "rust" or "typescript" (app kind only)
+#   allowlist — keys exempt from drift detection (framework-injected, test-only, etc.)
+#
+# Terraform and Ansible surfaces are commented forward-scaffold.
+# Uncomment and fill in `root` when IaC is added.
+
+surfaces:
+  - root: apps/organiclever-be
+    kind: app
+    lang: rust
+    allowlist: []
+
+  - root: apps/ose-app-be
+    kind: app
+    lang: rust
+    allowlist: []
+
+  - root: apps/ose-web
+    kind: app
+    lang: typescript
+    allowlist:
+      - PORT # framework-reserved Next.js dev-server port
+      - HOSTNAME # framework-reserved Next.js dev-server hostname
+
+  - root: apps/ayokoding-web
+    kind: app
+    lang: typescript
+    allowlist:
+      - PORT
+      - HOSTNAME
+
+  - root: apps/organiclever-web
+    kind: app
+    lang: typescript
+    allowlist:
+      - PORT
+      - HOSTNAME
+
+  - root: apps/ose-app-web
+    kind: app
+    lang: typescript
+    allowlist:
+      - PORT
+      - HOSTNAME
+
+  - root: apps/wahidyankf-web
+    kind: app
+    lang: typescript
+    allowlist:
+      - PORT
+      - HOSTNAME
+
+# Terraform surfaces — activate when IaC is added
+# - root: infra/terraform/organiclever
+#   kind: terraform  # activate when IaC is added
+#   allowlist: []
+
+# Ansible surfaces — activate when IaC is added
+# - root: infra/ansible/organiclever
+#   kind: ansible  # activate when IaC is added
+#   allowlist: []

@@ -7,6 +7,7 @@ set -e
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
 npx nx affected -t typecheck lint test:quick spec-coverage validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --parallel="$PARALLEL"
 npm run lint:md
+npx nx run rhino-cli:validate:env
 
 # Naming validators — scoped to pushes that touch the relevant trees.
 # Upstream may be missing on first push of a branch; default to empty range in that case.

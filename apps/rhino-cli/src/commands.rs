@@ -17,6 +17,7 @@ pub mod doctor;
 pub mod env_backup;
 pub mod env_init;
 pub mod env_restore;
+pub mod env_validate;
 pub mod git_pre_commit;
 pub mod governance_agents_md_size;
 pub mod governance_audit;
