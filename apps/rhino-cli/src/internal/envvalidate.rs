@@ -126,6 +126,10 @@ fn is_env_var_name(s: &str) -> bool {
 ///   (`field_name` → `FIELD_NAME`).
 /// - `std::env::var("KEY")` / `env::var("KEY")` string literals.
 ///
+/// # Panics
+///
+/// Panics if the internal static regexes fail to compile (compile-time invariant).
+///
 /// # Errors
 ///
 /// Returns an error when a source file cannot be read.
@@ -146,8 +150,7 @@ pub fn scan_rust_reads(root: &Path) -> Result<Vec<String>, Error> {
         let path = entry.path();
         if !path
             .file_name()
-            .map(|n| n.to_string_lossy().ends_with(".rs"))
-            .unwrap_or(false)
+            .is_some_and(|n| n.to_string_lossy().ends_with(".rs"))
         {
             continue;
         }
@@ -178,10 +181,11 @@ pub fn scan_rust_reads(root: &Path) -> Result<Vec<String>, Error> {
                         _ => {}
                     }
                 }
-                if in_config_struct && brace_depth > 0 {
-                    if let Some(cap) = pub_field_re.captures(line) {
-                        keys.insert(cap[1].to_ascii_uppercase());
-                    }
+                if in_config_struct
+                    && brace_depth > 0
+                    && let Some(cap) = pub_field_re.captures(line)
+                {
+                    keys.insert(cap[1].to_ascii_uppercase());
                 }
             }
         }
@@ -195,6 +199,10 @@ pub fn scan_rust_reads(root: &Path) -> Result<Vec<String>, Error> {
 /// Detects:
 /// - Keys declared in `createEnv` schema blocks in `env.ts` (`UPPER_CASE_KEY:` lines).
 /// - `env.KEY` property accesses in any `.ts` / `.tsx` file.
+///
+/// # Panics
+///
+/// Panics if the internal static regexes fail to compile (compile-time invariant).
 ///
 /// # Errors
 ///
@@ -382,13 +390,13 @@ mod tests {
         write(
             &tmp,
             "src/config.rs",
-            r#"use serde::Deserialize;
+            r"use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct Config {
     pub database_url: String,
     pub app_port: u16,
 }
-"#,
+",
         );
         let mut keys = scan_rust_reads(tmp.path()).unwrap();
         keys.sort();
@@ -484,8 +492,8 @@ const url = env.ORGANICLEVER_BE_URL ?? "default";
         write(
             &tmp,
             "apps/myapp/src/env.ts",
-            r#"export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });
-"#,
+            r"export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });
+",
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
@@ -527,8 +535,8 @@ const url = env.ORGANICLEVER_BE_URL ?? "default";
         write(
             &tmp,
             "apps/myapp/src/env.ts",
-            r#"export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });
-"#,
+            r"export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });
+",
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
@@ -554,13 +562,13 @@ const url = env.ORGANICLEVER_BE_URL ?? "default";
         write(
             &tmp,
             "apps/myapp/src/config.rs",
-            r#"use serde::Deserialize;
+            r"use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct Config {
     pub database_url: String,
     pub app_port: u16,
 }
-"#,
+",
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
