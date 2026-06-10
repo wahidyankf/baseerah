@@ -20,7 +20,7 @@ This document records every cross-repo parity decision from the `standardize-sec
 (2026-06-10). The plan ships naming convention, `.env.example` layout, startup validation, the
 `rhino-cli env` toolchain, and the drift guard (`env-contract.yaml`) to ose-public. The full
 technical design lives in
-[`plans/in-progress/standardize-secrets-and-env/tech-docs.md`](../../plans/in-progress/standardize-secrets-and-env/tech-docs.md).
+[`plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md`](../../plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md).
 
 Sibling repo plans: the ose-infra and ose-primer repositories carry equivalent plans; this document
 records only the ose-public decisions and deviations.

@@ -747,37 +747,44 @@ repo-governance/conventions/security/no-secrets-in-committed-files.md repo-gover
 
 ## Phase 8 — Final Quality Gate + Commit + Push
 
-- [ ] [AI] Run the full affected gate:
-      `./node_modules/.bin/nx affected -t typecheck lint test:quick spec-coverage` across `main` —
-      all exit 0.
-- [ ] [AI] Run `rhino-cli env validate` — exits 0 across all app surfaces.
-- [ ] [AI] Run `npm run lint:md` and `npm run format:md:check` — exit 0.
-- [ ] [AI] Re-verify every BRD success criterion: per-app naming applied with zero residue; both
-      backends validate startup; every web validates at build time; the drift guard is wired and
-      bites; the hub doc exists, `no-secrets-in-committed-files.md` is renamed to `no-secrets-in-committed-files.md`
-      with the three stubs + all inbound links rewritten + `security/README.md` repoint; layout
-      consolidated; backup covers `.env*`/`.secrets/`/`secrets.json` with `--dry-run` and the canonical
-      `~/ose-public-env-backup` default dir; deps exact-pinned + cleared (zod on 4.x, envy staleness
-      comment present); the rationale doc exists.
-- [ ] [AI] Confirm all per-phase commits landed on `origin main`:
-      `git log --oneline origin/main -15` shows the Phase 1–7 commits; `git status` clean, nothing
-      unpushed.
+- [x] [AI] Run the full affected gate:
+    `./node_modules/.bin/nx affected -t typecheck lint test:quick spec-coverage` across `main` —
+    all exit 0.
+<!-- DONE 2026-06-10 | Status: PASS | 88 tasks, 87 from cache, all passed -->
+- [x] [AI] Run `rhino-cli env validate` — exits 0 across all app surfaces.
+<!-- DONE 2026-06-10 | Status: PASS | "no drift detected across all surfaces" -->
+- [x] [AI] Run `npm run lint:md` and `npm run format:md:check` — exit 0.
+<!-- DONE 2026-06-10 | Status: PASS | 0 errors, Prettier clean -->
+- [x] [AI] Re-verify every BRD success criterion: per-app naming applied with zero residue; both
+    backends validate startup; every web validates at build time; the drift guard is wired and
+    bites; the hub doc exists, `no-secrets-in-committed-files.md` is renamed to `no-secrets-in-committed-files.md`
+    with the three stubs + all inbound links rewritten + `security/README.md` repoint; layout
+    consolidated; backup covers `.env*`/`.secrets/`/`secrets.json` with `--dry-run` and the canonical
+    `~/ose-public-env-backup` default dir; deps exact-pinned + cleared (zod on 4.x, envy staleness
+    comment present); the rationale doc exists.
+<!-- DONE 2026-06-10 | Status: PASS | All 8 BRD success criteria verified -->
+- [x] [AI] Confirm all per-phase commits landed on `origin main`:
+    `git log --oneline origin/main -15` shows the Phase 1–7 commits; `git status` clean, nothing
+    unpushed.
+<!-- DONE 2026-06-10 | Status: PASS | All 7 phase commits + 1 fix commit on origin/main -->
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Monitor the GitHub Actions workflows triggered by the pushes (including the new
-      `validate-env` workflow on any PR path).
-- [ ] [AI] Verify all CI checks pass — no exceptions. If any fails, fix at root cause and push a
-      follow-up commit; repeat until green. Do NOT archive while CI is red.
+- [x] [AI] Monitor the GitHub Actions workflows triggered by the pushes (including the new
+    `validate-env` workflow on any PR path).
+<!-- DONE 2026-06-10 | Status: PASS | Validate Env + Validate Markdown both green -->
+- [x] [AI] Verify all CI checks pass — no exceptions. If any fails, fix at root cause and push a
+    follow-up commit; repeat until green. Do NOT archive while CI is red.
+<!-- DONE 2026-06-10 | Status: PASS | All CI green as of 11:08 UTC -->
 
 ### Phase 8 Gate
 
 > All checks below must pass before archiving this plan; if any fails, fix it in Phase 8 first.
 
-- [ ] [AI] `./node_modules/.bin/nx affected -t typecheck lint test:quick spec-coverage` exits 0.
-- [ ] [AI] `rhino-cli env validate` exits 0; `npm run lint:md` exits 0.
-- [ ] [AI] Every BRD success criterion verified true.
-- [ ] [AI] Working tree clean; all phase commits pushed to `origin main`; CI green.
+- [x] [AI] `./node_modules/.bin/nx affected -t typecheck lint test:quick spec-coverage` exits 0.
+- [x] [AI] `rhino-cli env validate` exits 0; `npm run lint:md` exits 0.
+- [x] [AI] Every BRD success criterion verified true.
+- [x] [AI] Working tree clean; all phase commits pushed to `origin main`; CI green.
 
 > **Pause Safety**: Phase 8 is terminal — the standard is live and self-enforcing. The plan is ready
 > for archival.
@@ -786,13 +793,13 @@ repo-governance/conventions/security/no-secrets-in-committed-files.md repo-gover
 
 ## Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked.
-- [ ] [AI] Verify ALL quality gates pass (local + CI).
-- [ ] [AI] Verify ALL manual assertions pass (Playwright MCP for webs / curl for backends).
-- [ ] [AI] Rename and move:
+- [x] [AI] Verify ALL delivery checklist items are ticked.
+- [x] [AI] Verify ALL quality gates pass (local + CI).
+- [x] [AI] Verify ALL manual assertions pass (Playwright MCP for webs / curl for backends).
+- [x] [AI] Rename and move:
       `git mv plans/in-progress/standardize-secrets-and-env/ plans/done/2026-MM-DD__standardize-secrets-and-env/`
       using today's completion date (NOT the creation date).
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
-- [ ] [AI] Update any other READMEs that reference this plan.
-- [ ] [AI] Commit the archival: `chore(plans): move standardize-secrets-and-env to done`.
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry.
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date.
+- [x] [AI] Update any other READMEs that reference this plan.
+- [x] [AI] Commit the archival: `chore(plans): move standardize-secrets-and-env to done`.
