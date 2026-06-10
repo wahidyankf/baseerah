@@ -227,6 +227,15 @@ Scenario: The Terraform/Ansible validator branch is present but inactive
 - Re-implementing env backup/restore or the `guard-env-file-access` guard.
 - Any IaC (Terraform/Ansible) — only commented scaffold ships.
 - Any UI changes; this is governance + CLI + config code.
+- **Source-code credential scanning (gitleaks / Betterleaks)** — evaluated and deferred. The
+  pre-commit layer from `guard-env-file-access` already hard-blocks staging `.env*` files (the
+  highest-risk path), making gitleaks redundant for that class. Gitleaks's unique value — detecting
+  hard-coded credentials in `.rs`/`.ts` source files — is a separate concern outside this plan's
+  scope. Gitleaks is also feature-frozen (maintenance-only) with an unresolved entropy false-positive
+  regression ([#1830](https://github.com/gitleaks/gitleaks/issues/1830)) affecting Rust config struct
+  field names. This public repo already has free GitHub Secret Scanning post-push coverage (700+
+  partner patterns + AI-backed generic detection). Re-evaluate Betterleaks (gitleaks successor, MIT,
+  v1.0.0 early 2026) once it has 60+ days of production soak. Tracked in `plans/ideas.md`.
 
 ## Product-Level Risks
 
