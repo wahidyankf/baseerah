@@ -164,10 +164,11 @@ note (safe-to-stop state + resume command)
 **Acceptance Criteria**: Final verification steps
 
 **Execution markers** — prefix each checkbox (after `- [ ]`) with `[AI]` or `[HUMAN]`. `[AI]` is the
-default (unmarked = `[AI]`). Use `[HUMAN]` ONLY for steps an agent genuinely cannot do — physical/hardware
-actions (unplug a cable, swap a drive), out-of-band approvals (sign a contract, pay an invoice), or
-interactive credential/SSO gates. Prefer engineering an `[AI]` path (e.g., a sanctioned `scripts/` action)
-before resorting to `[HUMAN]`. Any plan using `[HUMAN]` MUST carry a legend defining both markers near the
+default (unmarked = `[AI]`). Use `[AI]` as much as possible and `[HUMAN]` as little as possible: tag
+`[HUMAN]` ONLY for steps an agent genuinely cannot do — physical/hardware actions (unplug a cable, swap a
+drive), out-of-band approvals (sign a contract, pay an invoice), or interactive credential/SSO gates — or
+steps the user explicitly asks to keep `[HUMAN]`. Before resorting to `[HUMAN]`, first try to engineer a
+sanctioned `[AI]` path (e.g., a sanctioned `scripts/` action). Any plan using `[HUMAN]` MUST carry a legend defining both markers near the
 top of `delivery.md`, and every `[HUMAN]` step MUST state what the human does plus the observable signal
 the agent checks to resume.
 
