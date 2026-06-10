@@ -1,16 +1,18 @@
 //! Application configuration loaded from environment variables via `envy`.
 //!
 //! `dotenvy::dotenv().ok()` loads `.env.local` for local runs (no-op in CI).
-//! `envy::from_env` deserializes into [`Config`] using the SCREAMING_SNAKE ↔
+//! `envy::from_env` deserializes into [`Config`] using the `SCREAMING_SNAKE` ↔
 //! field-name mapping. Required fields (`database_url`) fail fast when absent;
 //! optional fields use typed `#[serde(default)]` helpers.
 
 use serde::Deserialize;
 
+/// Default TCP port for the server.
 fn default_port() -> u16 {
     8202
 }
 
+/// Default CORS origins (allow all).
 fn default_cors_origins() -> String {
     "*".to_owned()
 }
