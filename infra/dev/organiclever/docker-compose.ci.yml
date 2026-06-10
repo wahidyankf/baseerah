@@ -1,8 +1,8 @@
 services:
   organiclever-be:
     environment:
-      PORT: "8202"
-      CORS_ORIGINS: "*"
+      ORGANICLEVER_BE_PORT: "8202"
+      ORGANICLEVER_BE_CORS_ORIGINS: "*"
 
   organiclever-web:
     environment:
