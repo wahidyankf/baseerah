@@ -32,6 +32,12 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 - .env backup scripts for rhino-cli
 - simplify ayokoding-cli and ose-cli
 - libraries update
+- **Source-code credential scanning** — evaluate Betterleaks (gitleaks successor, MIT, v1.0.0 early 2026) for pre-commit + CI detection of hard-coded credentials in `.rs`/`.ts`/`.tf` source files once
+  it reaches stable production use. This public repo already has free GitHub Secret Scanning
+  post-push coverage (700+ partner patterns + AI-backed generic detection). Gitleaks itself is
+  feature-frozen with an unresolved entropy false-positive regression
+  ([#1830](https://github.com/gitleaks/gitleaks/issues/1830)) affecting Rust config struct field
+  names. Re-evaluate after Betterleaks has 60+ days of production soak.
 - Split mermaid diagrams in `plans/done/2026-04-26__organiclever-ci-staging-split/tech-docs.md` to satisfy validator rules (surfaced 2026-04-26 by `rhino-cli-mermaid-fixes`): 7 label_too_long + 2 width_exceeded violations across blocks 0 (line 7) and 1 (line 40), plus 2 subgraph_density warnings on 7-child WF subgraphs. Follow-up to `2026-04-26__rhino-cli-mermaid-fixes`.
 
 ### Stack Update Deferrals (added 2026-05-16 by stack-update plan)
