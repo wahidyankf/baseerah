@@ -13,7 +13,8 @@ description: "Consolidate ose-public's secrets/env governance into one hub conve
 ## Context
 
 `ose-public` already enforces a strong **"no secrets in git"** hard iron rule
-([no-secrets-in-git.md](../../../repo-governance/conventions/security/no-secrets-in-git.md))
+([no-secrets-in-git.md](../../../repo-governance/conventions/security/no-secrets-in-git.md), renamed
+to `no-secrets-in-committed-files.md` by this plan to match the ose-infra canonical name)
 [Repo-grounded], the `.env.example` committed / `.env*` gitignored pattern
 ([`.gitignore:24-31`](../../../.gitignore)) [Repo-grounded], a working `rhino-cli env`
 backup/restore/init command family
@@ -62,9 +63,10 @@ backup`/`restore` to cover every secret kind (`.env*`, `.secrets/`, `secrets.jso
 hook and CI.
 
 > **No secrets in this plan.** Per the
-> [No Secrets in Git](../../../repo-governance/conventions/security/no-secrets-in-git.md) hard iron
-> rule, this plan names variables and describes where their values live — never a real value. The
-> `.env.example` files this plan touches carry only obviously-dev placeholders.
+> [No Secrets in Committed Files](../../../repo-governance/conventions/security/no-secrets-in-git.md)
+> (renamed from `no-secrets-in-git.md` to `no-secrets-in-committed-files.md` by this plan) hard
+> iron rule, this plan names variables and describes where their values live — never a real value.
+> The `.env.example` files this plan touches carry only obviously-dev placeholders.
 
 ### How this differs from the ose-infra reference
 
@@ -82,8 +84,11 @@ key tuning points:
   them.
 - **Larger naming surface, every app** — full adoption across two Rust backends and five Next.js
   webs, versus the reference's single backend + single frontend.
-- **Doc-name deviation** — public's hard-iron-rule doc is `no-secrets-in-git.md` (the reference's is
-  `no-secrets-in-committed-files.md`); the existing name is preserved as the stub.
+- **Doc canonicalization (this repo acts)** — public's hard-iron-rule doc is currently
+  `no-secrets-in-git.md`; this plan **renames** it to `no-secrets-in-committed-files.md` to match the
+  ose-infra canonical name, then folds it (with `env-file-access.md` and
+  `reproducible-environments.md`) into the hub, leaving the old paths as stubs and rewriting every
+  inbound link.
 - **Layout already partly migrated** — backends already have `apps/<app>/.env.example`; this plan
   removes the duplicated `infra/dev/<group>/.env.example` files.
 
@@ -93,8 +98,10 @@ key tuning points:
 
 - **One hub convention** — `repo-governance/conventions/security/secrets-and-env-standards.md`
   absorbing the substantive content of the three existing docs (naming, layout,
-  registry/annotation, validation, storage-tier ladder). The three existing docs become short
-  **stub redirects** preserving inbound links; `security/README.md` repoints to the hub.
+  registry/annotation, validation, storage-tier ladder). `no-secrets-in-git.md` is first **renamed**
+  to `no-secrets-in-committed-files.md` (matching the ose-infra canonical name); the three docs then
+  become short **stub redirects** preserving inbound links, and **every inbound link is rewritten**
+  to the renamed/folded targets; `security/README.md` repoints to the hub.
 - **Naming standard** — `SCREAMING_SNAKE_CASE`; per-app prefix (`ORGANICLEVER_BE_*`, `OSE_APP_BE_*`,
   `OSE_WEB_*`, `AYOKODING_WEB_*`, …) for app-defined vars; framework-reserved names (`NEXT_PUBLIC_*`,
   Next.js `PORT`) kept as the framework demands; shared service vars (`DATABASE_URL`) unprefixed; no

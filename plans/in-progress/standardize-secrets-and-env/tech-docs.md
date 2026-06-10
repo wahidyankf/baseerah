@@ -19,6 +19,20 @@ The per-app prefix is the app's Nx project name upcased with `_` separators (`os
 `OSE_APP_BE_`, `ose-web` → `OSE_WEB_`). It prevents collisions when one process loads multiple apps'
 vars and makes a variable's owner obvious at a glance.
 
+**On 12-factor authority (precise framing).** The Twelve-Factor App is **silent on naming
+structure**: it mandates config-in-environment and per-deploy values, but prescribes nothing about
+prefixes or casing. So 12-factor **authorizes** a per-app prefix without **prescribing** it; the
+prefix is a **practitioner-consensus** convention for shared environments where many services' vars
+coexist, not a 12-factor requirement. Distinct from app-defined names is a **framework-reserved /
+exempt class** that this standard never prefixes:
+
+| Reserved/exempt name | Why exempt                                           |
+| -------------------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_*`      | Framework-required (Next.js browser-exposure prefix) |
+| `PORT`               | Platform convention (host/PaaS injects it)           |
+| `NODE_ENV`           | Node reserved                                        |
+| `DATABASE_URL`       | Cross-ecosystem convention, intentionally unprefixed |
+
 ### Per-app rename map (full surface) [Repo-grounded]
 
 Derived from the live env-read survey (§ 6). `DATABASE_URL`, framework `PORT`, and `NEXT_PUBLIC_*`
@@ -67,7 +81,9 @@ shared name, not an oversight.
 
 > Source: [The Twelve-Factor App — Config](https://12factor.net/config) (accessed 2026-06-09):
 > "store config in environment variables"; keys identical across deploys, only values differ — hence
-> no environment tier in the name. [Web-cited]
+> no environment tier in the name. 12-factor is silent on prefix/casing structure; it authorizes but
+> does not prescribe per-app prefixes (those are practitioner consensus, not a 12-factor mandate).
+> [Web-cited]
 
 <!-- separates adjacent blockquotes (markdownlint MD028) -->
 
@@ -112,6 +128,26 @@ variants **globally** and force-unignores `.env.example`
 ([`.gitignore:24-31`](../../../.gitignore)). Backends already sit at `apps/<app>/.env.example`
 tracked, so colocating the web templates needs **no new ignore rule**. Phase 3 verifies this with
 `git check-ignore` rather than adding rules, and adds `!apps/**/.env.example` only if a check fails.
+
+### Next.js / Nx `.env` loading — why colocation under `apps/<app>/` is correct
+
+The layout consolidation (removing duplicated `infra/dev/<app>/.env.example` and keeping one template
+per app under `apps/<app>/`) is exactly what the framework loading rules want:
+
+- **`.env.local` belongs at the Next.js app ROOT** — the directory holding `next.config.*`
+  (`apps/ose-web/.env.local`), **not** under `src/`. Next.js loads env files from the app root only;
+  a `src/.env.local` is never read. (The validated `src/env.ts` boundary is a TypeScript module, not
+  an env file — it is imported, not auto-loaded.)
+- **`.env.example` is NEVER auto-loaded** by Next.js or Nx — it is a committed documentation/template
+  file only. Only `.env` / `.env.local` (and `.env.<mode>` variants) are read at runtime/build.
+- **Nx loads from the workspace root AND the project root**, with **project root taking priority**.
+  Colocating the env files under `apps/<app>/` is precisely what lets both `nx dev`/`nx build` and the
+  underlying `next dev`/`next build` auto-load each app's values without extra wiring — reinforcing
+  the removal of the duplicate `infra/dev/<app>/.env.example` files.
+
+> Source: [Next.js Environment Variables](https://nextjs.org/docs/app/guides/environment-variables)
+> (accessed 2026-06-09): env files are loaded from the app root (where `next.config.*` lives);
+> `.env.example` is a template and is not auto-loaded. [Web-cited]
 
 ### `rhino-cli env init` scaffold-path note [Repo-grounded]
 
@@ -171,6 +207,15 @@ impl Config {
   today's soft-default behavior for non-secret values while making the structural one fail fast).
 - New crate deps: `dotenvy`, `envy` (serde is already present). The unmaintained `dotenv` crate is
   **not** used. Exact pins chosen at execution per § 8.
+- **`envy` staleness caveat.** `envy`'s last crates.io release is `0.4.2` (Jan 2021, ~5 years stale).
+  It carries **no** RustSec/CVE advisory and is functionally complete for its narrow scope
+  (deserialize env vars into a serde struct), so it stays a Path-B candidate — but the staleness is
+  recorded explicitly in § 8 and each backend's `Cargo.toml` carries a comment noting a re-evaluation
+  trigger: if a RustSec advisory analogous to RUSTSEC-2021-0141 (the `dotenv` unmaintained flag) is
+  ever filed against `envy`, revisit the choice.
+- **`dotenvy` note.** `dotenvy` is the accepted successor to the unmaintained `dotenv`
+  (RUSTSEC-2021-0141). Its last release is `0.15.7` (Mar 2023; the `0.16` branch is unpublished), so
+  it is **stable-but-not-recently-released** — advisory-clean, pinned `"0.15"` (§ 8).
 - **Edition-2024 note**: the existing tests use `from_env_with(...)` constructors to avoid `unsafe`
   `set_var`/`remove_var` (config.rs comments confirm) [Repo-grounded]. The new `load()` is tested via
   `envy::from_iter` over an explicit key/value vector so the missing-required-var test needs no
@@ -178,12 +223,13 @@ impl Config {
 
 > Source: [envy — docs.rs](https://docs.rs/envy) (accessed 2026-06-09): field `foo_bar` ↔ `FOO_BAR`;
 > non-`Option` fields fail fast when absent; `from_iter` deserializes from an explicit pair list.
-> [Web-cited]
+> Last release `0.4.2` (Jan 2021); no RustSec advisory. [Web-cited]
 
 <!-- separates adjacent blockquotes (markdownlint MD028) -->
 
 > Source: [dotenvy — crates.io](https://crates.io/crates/dotenvy) (accessed 2026-06-09): maintained
-> successor to the unmaintained `dotenv` crate. [Web-cited]
+> successor to the unmaintained `dotenv` crate (RUSTSEC-2021-0141). Last release `0.15.7` (Mar 2023);
+> `0.16` unpublished. [Web-cited]
 
 ### Next.js webs — `@t3-oss/env-nextjs` + `zod`
 
@@ -217,8 +263,25 @@ export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });
   ose-public's webs currently read **server-side** vars only (no `NEXT_PUBLIC_*` runtime read found,
   § 6), so the schemas use the `server` block; when a web later adds a browser-exposed var it goes in
   `client` under `NEXT_PUBLIC_*`.
-- New deps: `@t3-oss/env-nextjs`, `zod` (added once at the workspace/web boundary). Exact pins per
-  § 8.
+- **`zod` v4 API form (HARD).** The default `zod` export is v4 (since Jul 2025; v3 now lives at
+  `zod/v3`). Of the 5 Next.js webs, **two** (`ose-web`, `ayokoding-web`) are currently on
+  `zod` 3.25.76 and **migrate to v4** under this plan; the remaining three (`organiclever-web`,
+  `ose-app-web`, `wahidyankf-web`) have no `zod` dependency today and **receive v4 fresh**.
+  In v4 the string-format helpers moved to top-level functions: `z.string().email()` / `.uuid()` /
+  `.ip()` became `z.email()` / `z.uuid()` / `z.ipv4()`. The env schemas MUST use the new top-level
+  form (e.g. `z.url()`, not `z.string().url()`); the `.string()` / `.enum()` / `.optional()` helpers
+  used above are unchanged across the bump. The hub doc's annotation/validation section records this
+  so future env schemas do not regress to the v3 form.
+- **`zod` is an OPTIONAL peer of `t3-env`, not a hard requirement.** `@t3-oss/env-nextjs` (0.13.x)
+  accepts any Standard-Schema-v1 validator (Valibot, ArkType, …); `zod` is needed only because we
+  author zod-based schemas. The dependency on `zod` is ours, not transitively forced by t3-env —
+  relevant when reasoning about the dependency surface in § 8.
+- **Next.js standalone caveat.** A standalone Next.js build must list `@t3-oss/env-nextjs` and
+  `@t3-oss/env-core` in `transpilePackages` (`next.config.ts`) so the validator is bundled. The webs
+  here run Next.js 16, which is compatible (t3-env requires Next ≥ 13.4.4). Each of the five webs gets
+  its own `src/env.ts` boundary.
+- New deps: `@t3-oss/env-nextjs`, `zod` (each web's `package.json`). Exact pins per § 8 (`zod` on the
+  4.x line — see § 8).
 - **Effect-TS / tRPC interaction**: `t3-env` is scoped to the env boundary only. Where a web reads
   `process.env.X` today (e.g.
   [`apps/organiclever-web/src/contexts/health/infrastructure/backend-client-live.ts:5`](../../../apps/organiclever-web/src/contexts/health/infrastructure/backend-client-live.ts))
@@ -227,7 +290,10 @@ export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });
 
 > Source: [T3 Env — Next.js](https://env.t3.gg/docs/nextjs) (accessed 2026-06-09): import `env.ts`
 > into `next.config.ts` for build-time validation; `experimental__runtimeEnv` lists client/runtime
-> vars; client vars must carry `NEXT_PUBLIC_`; `server` block validates server-only vars. [Web-cited]
+> vars; client vars must carry `NEXT_PUBLIC_`; `server` block validates server-only vars;
+> `createEnv({ server, client, runtimeEnv })` is current (0.13.x); `zod` is an optional
+> Standard-Schema-v1 peer (any Standard-Schema-v1 validator works); Next ≥ 13.4.4; standalone builds
+> need `@t3-oss/env-nextjs` + `@t3-oss/env-core` in `transpilePackages`. [Web-cited]
 
 <!-- separates adjacent blockquotes (markdownlint MD028) -->
 
@@ -349,6 +415,28 @@ surface.
 The Ansible validator (diff `.env.example` keys against playbook `lookup('ansible.builtin.env', 'X')`
 keys) ships the same way — a commented-out branch, documented in the hub doc.
 
+#### Regex extractor failure modes (known, deliberate)
+
+Because the extractors are line-oriented regex with **no HCL/YAML parser dependency**, they have
+known false-positive/negative modes. ose-public has **no IaC surfaces today** (the Terraform/Ansible
+branches are commented forward-scaffold), but these modes are documented openly now so the active
+app-surface validator and the future-activated IaC branches both inherit them — the per-surface
+allowlist + the required-comment rule **surface** (not silence) any case the regex cannot handle:
+
+- **Terraform** — heredoc values (`<<EOT` / `<<-EOT`), `#`-comment lines, multi-line object/map
+  `default` blocks, dynamic/computed defaults (data-source lookups), and the literal word `variable`
+  appearing inside a comment or string can all confuse the line-oriented matcher.
+- **Ansible** — multi-line YAML `lookup(...)` calls, dynamic env-key interpolation
+  (`lookup('ansible.builtin.env', var)` where the key is itself a variable), the short form
+  `lookup('env', ...)` versus the FQCN `lookup('ansible.builtin.env', ...)`, and Jinja2 filter forms
+  such as `{{ lookup('env','X') | default(...) }}`.
+
+Mature tools (tflint, checkov) use full parsers; the regex here is a **deliberate lightweight
+first-approximation**, not a general HCL/YAML analyzer. Any construct the regex cannot resolve
+statically MUST be allowlisted with a comment, so the unsupported case is visible in the contract
+rather than silently mis-scanned. The extractors are unit-tested to keep the approximation honest
+(§ 4.4).
+
 #### Configuration & escape hatches
 
 - A single `env-contract.yaml` (parsed with the YAML support already used by rhino-cli's other
@@ -435,33 +523,33 @@ Env-read survey (basis for the rename map and the per-web schemas) [Repo-grounde
 | `ose-app-web`      | none in `src/` (compose injects `OSE_APP_BE_URL`)                           |
 | `wahidyankf-web`   | none                                                                        |
 
-| File / area                                                                           | Change                                                                                                                                                                                                  | Phase |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `apps/organiclever-be/src/config.rs`                                                  | Rename vars; switch to `dotenvy` + `envy` fail-fast loader                                                                                                                                              | 1, 4  |
-| `apps/ose-app-be/src/config.rs`                                                       | Rename vars (incl. `OPENROUTER_*`); switch to `dotenvy` + `envy`                                                                                                                                        | 1, 4  |
-| `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml`                       | Add `dotenvy`, `envy` (exact pins per § 8)                                                                                                                                                              | 4     |
-| `apps/organiclever-be/.env.example`, `apps/ose-app-be/.env.example`                   | Rename keys → annotate                                                                                                                                                                                  | 1, 5  |
-| `apps/ose-web/.env.example`, `apps/ayokoding-web/.env.example` (new)                  | Create as single source of truth; annotate                                                                                                                                                              | 3, 5  |
-| `apps/ose-web/src/...`, `apps/ayokoding-web/src/...`                                  | Rename `CONTENT_DIR`/`SHOW_DRAFTS` → prefixed; read via `env.ts`                                                                                                                                        | 1, 4  |
-| `apps/*-web/src/env.ts` (new, per web)                                                | `t3-env` + `zod` validated env (schema scoped to that web's reads)                                                                                                                                      | 4     |
-| `apps/*-web/next.config.ts`                                                           | `import "./src/env.ts"` for build-time validation                                                                                                                                                       | 4     |
-| `apps/*-web/package.json`                                                             | Add `@t3-oss/env-nextjs`, `zod` (exact pins)                                                                                                                                                            | 4     |
-| `infra/dev/organiclever/.env.example`, `infra/dev/ose-app/.env.example`               | Remove (duplicate/placeholder)                                                                                                                                                                          | 3     |
-| `infra/dev/ose-web/.env.example`, `infra/dev/ayokoding-web/.env.example`              | Consolidate into `apps/<web>/.env.example` then remove                                                                                                                                                  | 3     |
-| `infra/dev/organiclever/docker-compose*.yml`, `infra/dev/ose-app/docker-compose*.yml` | Rename env keys in `environment:` blocks                                                                                                                                                                | 1     |
-| `apps/rhino-cli/src/commands/env_backup.rs`, `env_restore.rs`                         | Add `--dry-run` arg                                                                                                                                                                                     | 2     |
-| `apps/rhino-cli/src/internal/envbackup.rs`                                            | Carve `.secrets/` out of the `:289` hidden-dir skip; widen `discover()`/`restore()` filter to `.env*`/`.secrets/**`/`secrets.json` (tfvars/inventory commented); thread `dry_run`; no-write path; tests | 2     |
-| `apps/rhino-cli/src/commands/env_init.rs`                                             | Scan `apps/<app>/` for templates (in addition to `infra/dev`)                                                                                                                                           | 3     |
-| `apps/rhino-cli/` (`env validate` cmd + tests + `cli.rs` registration)                | New `env validate` subcommand (app validator active; Terraform/Ansible commented) + unit/integration tests                                                                                              | 6     |
-| `.husky/pre-push`                                                                     | Invoke `rhino-cli env validate`                                                                                                                                                                         | 6     |
-| `.github/workflows/` (new or existing)                                                | Invoke `rhino-cli env validate` on PRs                                                                                                                                                                  | 6     |
-| `repo-governance/conventions/security/secrets-and-env-standards.md` (new)             | Hub convention                                                                                                                                                                                          | 7     |
-| `repo-governance/conventions/security/no-secrets-in-git.md`                           | Reduce to stub redirect (preserve hard-iron-rule summary + inbound links)                                                                                                                               | 7     |
-| `repo-governance/conventions/security/env-file-access.md`                             | Reduce to stub redirect (preserve `guard-env-file-access` summary)                                                                                                                                      | 7     |
-| `repo-governance/development/workflow/reproducible-environments.md`                   | Reduce to stub redirect (preserve `.env.example` pattern summary)                                                                                                                                       | 7     |
-| `repo-governance/conventions/security/README.md`                                      | Repoint to the hub doc                                                                                                                                                                                  | 7     |
-| `docs/explanation/standardize-secrets-and-env-parity-decisions.md` (new)              | Cross-repo parity rationale (esp. deviations)                                                                                                                                                           | 7     |
-| Active inbound links (CLAUDE.md, AGENTS.md, docs/, indexes, skills, agents)           | Repoint to hub doc; `done/` plan links left on stubs                                                                                                                                                    | 7     |
+| File / area                                                                                      | Change                                                                                                                                                                                                  | Phase |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `apps/organiclever-be/src/config.rs`                                                             | Rename vars; switch to `dotenvy` + `envy` fail-fast loader                                                                                                                                              | 1, 4  |
+| `apps/ose-app-be/src/config.rs`                                                                  | Rename vars (incl. `OPENROUTER_*`); switch to `dotenvy` + `envy`                                                                                                                                        | 1, 4  |
+| `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml`                                  | Add `dotenvy`, `envy` (exact pins per § 8)                                                                                                                                                              | 4     |
+| `apps/organiclever-be/.env.example`, `apps/ose-app-be/.env.example`                              | Rename keys → annotate                                                                                                                                                                                  | 1, 5  |
+| `apps/ose-web/.env.example`, `apps/ayokoding-web/.env.example` (new)                             | Create as single source of truth; annotate                                                                                                                                                              | 3, 5  |
+| `apps/ose-web/src/...`, `apps/ayokoding-web/src/...`                                             | Rename `CONTENT_DIR`/`SHOW_DRAFTS` → prefixed; read via `env.ts`                                                                                                                                        | 1, 4  |
+| `apps/*-web/src/env.ts` (new, per web)                                                           | `t3-env` + `zod` validated env (schema scoped to that web's reads)                                                                                                                                      | 4     |
+| `apps/*-web/next.config.ts`                                                                      | `import "./src/env.ts"` for build-time validation                                                                                                                                                       | 4     |
+| `apps/*-web/package.json`                                                                        | Add `@t3-oss/env-nextjs`, `zod` (exact pins)                                                                                                                                                            | 4     |
+| `infra/dev/organiclever/.env.example`, `infra/dev/ose-app/.env.example`                          | Remove (duplicate/placeholder)                                                                                                                                                                          | 3     |
+| `infra/dev/ose-web/.env.example`, `infra/dev/ayokoding-web/.env.example`                         | Consolidate into `apps/<web>/.env.example` then remove                                                                                                                                                  | 3     |
+| `infra/dev/organiclever/docker-compose*.yml`, `infra/dev/ose-app/docker-compose*.yml`            | Rename env keys in `environment:` blocks                                                                                                                                                                | 1     |
+| `apps/rhino-cli/src/commands/env_backup.rs`, `env_restore.rs`                                    | Add `--dry-run` arg                                                                                                                                                                                     | 2     |
+| `apps/rhino-cli/src/internal/envbackup.rs`                                                       | Carve `.secrets/` out of the `:289` hidden-dir skip; widen `discover()`/`restore()` filter to `.env*`/`.secrets/**`/`secrets.json` (tfvars/inventory commented); thread `dry_run`; no-write path; tests | 2     |
+| `apps/rhino-cli/src/commands/env_init.rs`                                                        | Scan `apps/<app>/` for templates (in addition to `infra/dev`)                                                                                                                                           | 3     |
+| `apps/rhino-cli/` (`env validate` cmd + tests + `cli.rs` registration)                           | New `env validate` subcommand (app validator active; Terraform/Ansible commented) + unit/integration tests                                                                                              | 6     |
+| `.husky/pre-push`                                                                                | Invoke `rhino-cli env validate`                                                                                                                                                                         | 6     |
+| `.github/workflows/` (new or existing)                                                           | Invoke `rhino-cli env validate` on PRs                                                                                                                                                                  | 6     |
+| `repo-governance/conventions/security/secrets-and-env-standards.md` (new)                        | Hub convention                                                                                                                                                                                          | 7     |
+| `repo-governance/conventions/security/no-secrets-in-git.md` → `no-secrets-in-committed-files.md` | **Rename** (`git mv`) to the canonical name, then reduce to stub redirect (preserve hard-iron-rule summary); rewrite all inbound links                                                                  | 7     |
+| `repo-governance/conventions/security/env-file-access.md`                                        | Reduce to stub redirect (preserve `guard-env-file-access` summary)                                                                                                                                      | 7     |
+| `repo-governance/development/workflow/reproducible-environments.md`                              | Reduce to stub redirect (preserve `.env.example` pattern summary)                                                                                                                                       | 7     |
+| `repo-governance/conventions/security/README.md`                                                 | Repoint to the hub doc                                                                                                                                                                                  | 7     |
+| `docs/explanation/standardize-secrets-and-env-parity-decisions.md` (new)                         | Cross-repo parity rationale (esp. deviations)                                                                                                                                                           | 7     |
+| Active inbound links (CLAUDE.md, AGENTS.md, docs/, indexes, skills, agents)                      | Repoint to hub doc; `done/` plan links left on stubs                                                                                                                                                    | 7     |
 
 ## 7. Risks & Rollback
 
@@ -485,12 +573,39 @@ This plan introduces four runtime dependencies, governed by the
 None has an LTS line → **all are Path B** (latest version released ≥ 60 days before the bump date AND
 CVE-clean). `zod` is a canonical Path-B example.
 
-| Dependency           | Manifest(s)                                                     | Path | Clearance (verify at execution) |
-| -------------------- | --------------------------------------------------------------- | ---- | ------------------------------- |
-| `dotenvy`            | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | TBD at execution                |
-| `envy`               | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | TBD at execution                |
-| `@t3-oss/env-nextjs` | each `apps/*-web/package.json`                                  | B    | TBD at execution                |
-| `zod`                | each `apps/*-web/package.json`                                  | B    | TBD at execution                |
+| Dependency           | Manifest(s)                                                     | Path | Target line                | Clearance (verify at execution) |
+| -------------------- | --------------------------------------------------------------- | ---- | -------------------------- | ------------------------------- |
+| `dotenvy`            | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | `0.15.7` (exact)           | TBD at execution                |
+| `envy`               | `apps/organiclever-be/Cargo.toml`, `apps/ose-app-be/Cargo.toml` | B    | `0.4.2` (exact, **stale**) | TBD at execution                |
+| `@t3-oss/env-nextjs` | each `apps/*-web/package.json`                                  | B    | `0.13.x` latest            | TBD at execution                |
+| `zod`                | each `apps/*-web/package.json`                                  | B    | `4.x` (v4 default export)  | TBD at execution                |
+
+Per-dependency notes:
+
+- **`zod` — 4.x line, exact pin.** Since Jul 2025 the default `zod` export is v4 (v3 now lives at
+  `zod/v3`). Two webs (`ose-web`, `ayokoding-web`) are on `zod` 3.25.76 today and **migrate to v4**;
+  three webs (`organiclever-web`, `ose-app-web`, `wahidyankf-web`) have no `zod` today and
+  **receive v4 fresh** (see § 3 for the `z.email()`/`z.uuid()`/`z.ipv4()` top-level-helper change).
+  The Dependency Bump Policy requires an **exact** pin (no caret/tilde — brd § 8):
+  `"zod": "X.Y.Z"` resolved at execution to the most recent eligible 4.x.
+- **`@t3-oss/env-nextjs` — 0.13.x.** `createEnv({ server, client, runtimeEnv })` is current. `zod` is
+  an **optional** Standard-Schema-v1 peer (t3-env accepts Valibot/ArkType/etc.); our `zod` dependency
+  is ours, not transitively forced. Standalone Next.js builds need `@t3-oss/env-nextjs` +
+  `@t3-oss/env-core` in `transpilePackages`; Next.js 16 is compatible (≥ 13.4.4).
+- **`dotenvy` — 0.15.7.** Pin `"0.15.7"` (Mar 2023; `0.16` unpublished). No CVE; the accepted
+  successor to the unmaintained `dotenv` (RUSTSEC-2021-0141). Stable-but-not-recently-released.
+- **`envy` — 0.4.2 (STALENESS CAVEAT).** Last release `0.4.2` (Jan 2021, ~5 years stale); **no**
+  CVE/RustSec advisory; functionally complete for its narrow deserialize-env-into-struct scope. It
+  stays Path B, but each backend's `Cargo.toml` carries a comment recording the staleness and the
+  **re-evaluation trigger**: revisit if a RustSec advisory analogous to RUSTSEC-2021-0141 is ever
+  filed against `envy`. Example pin + comment:
+
+  ```toml
+  # envy 0.4.2 is the latest release (Jan 2021); stale but advisory-clean and
+  # functionally complete. Re-evaluate if a RustSec advisory (cf. RUSTSEC-2021-0141)
+  # is ever filed against envy.
+  envy = "0.4.2"
+  ```
 
 ### Execution-time obligations (HARD)
 
@@ -520,31 +635,35 @@ verify at execution stands regardless.
 
 ## 9. Resolved Cross-Repo Deviation Matrix (verbatim, with public's column)
 
-The full 14-decision matrix governing all three sibling plans (source: the parity workflow's resolved
+The 15-decision matrix governing all three sibling plans (source: the parity workflow's resolved
 matrix). public's specific column and justification follow each decision.
 
-| #   | Dimension                | Decision (cross-repo)                                                                                                                                       | public's column / justification                                                                                                                 |
-| --- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| R1  | Parity set               | Author primer + public; infra = reference (adjustable for parity links/matrix)                                                                              | **public is authored here.** Mirrors infra's rigor; encodes public deviations, not a copy.                                                      |
-| R2  | Delivery mode            | infra `main-to-main`; primer + public `worktree-to-main`                                                                                                    | **worktree-to-main** — direct push to `origin main` from `worktrees/standardize-secrets-and-env/`, no PR.                                       |
-| R3  | IaC surfaces             | Forward-looking scaffold — IaC validators + `*.tfvars`/inventory backup patterns shipped commented/gated "when IaC is added"                                | **public has no IaC (docker-compose only).** Terraform/Ansible `env validate` branches + tfvars/inventory backup patterns ship **commented**.   |
-| R4  | Research                 | Ran (Step 4) — findings inform validator choices                                                                                                            | Adopted: `dotenvy`+`envy` (Rust), `@t3-oss/env-nextjs`+`zod` (Next build-time + `NEXT_PUBLIC_`).                                                |
-| R5  | primer PR override       | DEVIATION ACCEPTED: primer `worktree-to-main` despite its PR-only invariant                                                                                 | N/A to public (public has no PR-only invariant; worktree-to-main is its normal Trunk-Based mode).                                               |
-| R6  | primer rhino-cli tooling | primer spec-first dual-impl (Go canonical + Rust twin)                                                                                                      | N/A — **public's rhino-cli is Rust single.** Widen Rust `backup`/`restore` + add Rust `env validate`.                                           |
-| R7  | Startup validation       | Full adoption in every app, both repos                                                                                                                      | **Full adoption:** both Rust backends (`dotenvy`+`envy`) + all five Next.js webs (`@t3-oss/env-nextjs`+`zod`).                                  |
-| R8  | primer polyglot reach    | All 11 primer backends — validator-per-language table                                                                                                       | N/A — public's backends are Rust only; webs are Next.js only.                                                                                   |
-| R9  | Naming prefix            | Full per-app prefix rename across all existing vars, both repos                                                                                             | **Full rename** across backends (`PORT`/`CORS_ORIGINS`/`OPENROUTER_*`) and webs (`CONTENT_DIR`/`SHOW_DRAFTS`); `DATABASE_URL`/framework exempt. |
-| R10 | Hub doc                  | New `secrets-and-env-standards.md` hub; fold 3 existing docs to stubs; `security/README.md` → hub                                                           | **Same.** Note the doc-name deviation below; `security/README.md` repointed.                                                                    |
-| R11 | Backup allowlist         | Per-repo real floor + IaC gated scaffold: all = `.env*` + `.secrets/`; public also `secrets.json`. `*.tfvars`/inventory commented. Hybrid floor ∪ registry. | **public floor = `.env*` + `.secrets/` + `secrets.json`** ([`.gitignore:104-105`](../../../.gitignore)); tfvars/inventory commented scaffold.   |
-| R12 | Layout                   | public consolidates `.env.example` to `apps/<app>/` (remove `infra/dev/<app>/` dup). Real gitignored-file relocations = [HUMAN]                             | **Same.** Backends already at `apps/<app>/`; remove duplicated/placeholder `infra/dev/<group>/.env.example`; real-file moves are [HUMAN].       |
-| R13 | Rationale doc            | `docs/explanation/standardize-secrets-and-env-parity-decisions.md` in each repo                                                                             | **Authored** (Phase 7); aligns with existing `*-parity-decisions.md` precedents in `docs/explanation/`.                                         |
-| R14 | Drift `APP_PORT` fix     | DROP for primer + public                                                                                                                                    | **Dropped** — public has no `APP_PORT` drift (no such read exists).                                                                             |
+| #   | Dimension                | Decision (cross-repo)                                                                                                                                       | public's column / justification                                                                                                                                                                                                                  |
+| --- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| R1  | Parity set               | Author primer + public; infra = reference (adjustable for parity links/matrix)                                                                              | **public is authored here.** Mirrors infra's rigor; encodes public deviations, not a copy.                                                                                                                                                       |
+| R2  | Delivery mode            | infra `main-to-main`; primer + public `worktree-to-main`                                                                                                    | **worktree-to-main** — direct push to `origin main` from `worktrees/standardize-secrets-and-env/`, no PR.                                                                                                                                        |
+| R3  | IaC surfaces             | Forward-looking scaffold — IaC validators + `*.tfvars`/inventory backup patterns shipped commented/gated "when IaC is added"                                | **public has no IaC (docker-compose only).** Terraform/Ansible `env validate` branches + tfvars/inventory backup patterns ship **commented**.                                                                                                    |
+| R4  | Research                 | Ran (Step 4) — findings inform validator choices                                                                                                            | Adopted: `dotenvy`+`envy` (Rust), `@t3-oss/env-nextjs`+`zod` (Next build-time + `NEXT_PUBLIC_`).                                                                                                                                                 |
+| R5  | primer PR override       | DEVIATION ACCEPTED: primer `worktree-to-main` despite its PR-only invariant                                                                                 | N/A to public (public has no PR-only invariant; worktree-to-main is its normal Trunk-Based mode).                                                                                                                                                |
+| R6  | primer rhino-cli tooling | primer spec-first dual-impl (Go canonical + Rust twin)                                                                                                      | N/A — **public's rhino-cli is Rust single.** Widen Rust `backup`/`restore` + add Rust `env validate`.                                                                                                                                            |
+| R7  | Startup validation       | Full adoption in every app, both repos                                                                                                                      | **Full adoption:** both Rust backends (`dotenvy`+`envy`) + all five Next.js webs (`@t3-oss/env-nextjs`+`zod`).                                                                                                                                   |
+| R8  | primer polyglot reach    | All 11 primer backends — validator-per-language table                                                                                                       | N/A — public's backends are Rust only; webs are Next.js only.                                                                                                                                                                                    |
+| R9  | Naming prefix            | Full per-app prefix rename across all existing vars, both repos                                                                                             | **Full rename** across backends (`PORT`/`CORS_ORIGINS`/`OPENROUTER_*`) and webs (`CONTENT_DIR`/`SHOW_DRAFTS`); `DATABASE_URL`/framework exempt.                                                                                                  |
+| R10 | Hub doc                  | New `secrets-and-env-standards.md` hub; fold 3 existing docs to stubs; `security/README.md` → hub                                                           | **Same + this repo acts on doc canonicalization:** rename `no-secrets-in-git.md` → `no-secrets-in-committed-files.md` (match infra canonical), fold all 3 into the hub as stubs, **rewrite every inbound link**; `security/README.md` repointed. |
+| R11 | Backup allowlist         | Per-repo real floor + IaC gated scaffold: all = `.env*` + `.secrets/`; public also `secrets.json`. `*.tfvars`/inventory commented. Hybrid floor ∪ registry. | **public floor = `.env*` + `.secrets/` + `secrets.json`** ([`.gitignore:104-105`](../../../.gitignore)); tfvars/inventory commented scaffold.                                                                                                    |
+| R12 | Layout                   | public consolidates `.env.example` to `apps/<app>/` (remove `infra/dev/<app>/` dup). Real gitignored-file relocations = [HUMAN]                             | **Same.** Backends already at `apps/<app>/`; remove duplicated/placeholder `infra/dev/<group>/.env.example`; real-file moves are [HUMAN].                                                                                                        |
+| R13 | Rationale doc            | `docs/explanation/standardize-secrets-and-env-parity-decisions.md` in each repo                                                                             | **Authored** (Phase 7); aligns with existing `*-parity-decisions.md` precedents in `docs/explanation/`.                                                                                                                                          |
+| R14 | Drift `APP_PORT` fix     | DROP for primer + public                                                                                                                                    | **Dropped** — public has no `APP_PORT` drift (no such read exists).                                                                                                                                                                              |
+| R15 | Backup default dir       | Canonical per-repo-derived default `~/<repo-root-basename>-env-backup` (ose-infra canonical); **all-three-align**                                           | **all-three-align, ose-infra canonical.** Adopt `~/<repo-root-basename>-env-backup` (here `~/ose-public-env-backup`), replacing the current `ose-open-env-backup` constant. Single Rust rhino-cli (no go twin) — landed once.                    |
 
 ### Recorded public-specific deviations (called out explicitly)
 
-1. **Doc name** — public's hard-iron-rule doc is `no-secrets-in-git.md` (NOT
-   `no-secrets-in-committed-files.md` as in infra/primer) [Repo-grounded]. The existing name is
-   preserved as the stub; the hub doc notes the cross-repo naming difference.
+1. **Doc canonicalization (this repo acts)** — public's hard-iron-rule doc is currently
+   `no-secrets-in-git.md` [Repo-grounded]. This plan **renames** it to
+   `no-secrets-in-committed-files.md` to match the ose-infra canonical name (R10), folds it with
+   `env-file-access.md` and `reproducible-environments.md` into the hub, leaves the old paths as
+   stubs, and **rewrites every inbound link** to the renamed/folded targets (link-check gated). The
+   hub doc records the now-aligned cross-repo doc name.
 2. **No IaC** — Terraform/Ansible validators and `*.tfvars`/inventory backup patterns ship commented,
    inactive, as forward-scaffold. No live IaC drift fix exists (vs the reference's `terraform.tfvars`
    fix).
@@ -558,7 +677,7 @@ matrix). public's specific column and justification follow each decision.
    prefix (backends) or kept as the Next.js framework var (webs); there is no dead-config drift bug to
    fix.
 
-Deviation count: **14 recorded decisions, 0 silent deviations.**
+Deviation count: **15 recorded decisions, 0 silent deviations.**
 
 ## 10. Rollback Strategy
 

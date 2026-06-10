@@ -30,16 +30,16 @@ to learn the rules.
 
 ## Business Impact
 
-| Pain point today                                                                     | After this plan                                                                           |
-| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| Missing/mistyped env value defaults silently at runtime (both backends)              | `dotenvy` + `envy` abort backend startup with a named-variable error                      |
-| No build-time env validation in any Next.js web                                      | `@t3-oss/env-nextjs` + `zod` fail the build on a missing/invalid public or server var     |
-| Code and config can disagree silently                                                | `rhino-cli env validate` fails pre-push/CI on any code↔config key mismatch                |
-| No naming rule; prefixed and unprefixed vars coexist arbitrarily                     | One per-app-prefix standard with documented framework exemptions                          |
-| `infra/dev/<group>/.env.example` duplicates `apps/<app>/.env.example` keys           | One source of truth per app under `apps/<app>/` (Nx-native)                               |
-| `env backup` skips `.secrets/` (hidden-dir) and `secrets.json` (non-`.env` basename) | One `env backup` captures every secret kind (`.env*`, `.secrets/`, `secrets.json`)        |
-| `.env.example` files give no type/required hints                                     | Every variable annotated (required/optional, type, format)                                |
-| Three docs, no hub; rules must be reassembled by the reader                          | One hub convention; the three become stub redirects and `security/README.md` points to it |
+| Pain point today                                                                     | After this plan                                                                                                                                                                   |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Missing/mistyped env value defaults silently at runtime (both backends)              | `dotenvy` + `envy` abort backend startup with a named-variable error                                                                                                              |
+| No build-time env validation in any Next.js web                                      | `@t3-oss/env-nextjs` + `zod` (v4) fail the build on a missing/invalid public or server var                                                                                        |
+| Code and config can disagree silently                                                | `rhino-cli env validate` fails pre-push/CI on any code↔config key mismatch                                                                                                        |
+| No naming rule; prefixed and unprefixed vars coexist arbitrarily                     | One per-app-prefix standard with documented framework exemptions                                                                                                                  |
+| `infra/dev/<group>/.env.example` duplicates `apps/<app>/.env.example` keys           | One source of truth per app under `apps/<app>/` (Nx-native)                                                                                                                       |
+| `env backup` skips `.secrets/` (hidden-dir) and `secrets.json` (non-`.env` basename) | One `env backup` captures every secret kind (`.env*`, `.secrets/`, `secrets.json`)                                                                                                |
+| `.env.example` files give no type/required hints                                     | Every variable annotated (required/optional, type, format)                                                                                                                        |
+| Three docs, no hub; rules must be reassembled by the reader                          | One hub convention; `no-secrets-in-git.md` is renamed to the canonical `no-secrets-in-committed-files.md`, the three become stub redirects, and `security/README.md` points to it |
 
 ## Affected Roles
 
@@ -74,10 +74,13 @@ apps/ayokoding-web` shows only prefixed keys; `DATABASE_URL`, framework `PORT`, 
 4. **Drift guard wired and biting**: `rhino-cli env validate` exits 0 on the clean repo; a deliberate
    key mismatch in any app's `.env.example` vs its code reads makes it exit non-zero naming the key,
    and both the pre-push hook and a CI workflow invoke the same command.
-5. **Single hub doc exists**: `repo-governance/conventions/security/secrets-and-env-standards.md`
-   exists; the three prior docs (`no-secrets-in-git.md`, `env-file-access.md`,
-   `reproducible-environments.md`) are stubs pointing to it; `security/README.md` repoints to the hub;
-   no inbound link is broken (`npm run lint:md` link check passes).
+5. **Single hub doc exists; doc canonicalized**:
+   `repo-governance/conventions/security/secrets-and-env-standards.md` exists;
+   `no-secrets-in-git.md` is **renamed** to `no-secrets-in-committed-files.md` (matching the ose-infra
+   canonical name); the three prior docs (`no-secrets-in-committed-files.md`, `env-file-access.md`,
+   `reproducible-environments.md`) are stubs pointing to the hub; every inbound link is rewritten to
+   the renamed/folded targets; `security/README.md` repoints to the hub; no inbound link is broken
+   (`npm run lint:md` link check passes).
 6. **Layout consolidated**: no `.env.example` remains under `infra/dev/` for an app whose template now
    lives under `apps/<app>/`; each backend's `apps/<app>/.env.example` is the single source of truth.
    Verify: `find infra/dev -name ".env.example"` returns zero hits (or only files with no
@@ -86,15 +89,22 @@ apps/ayokoding-web` shows only prefixed keys; `DATABASE_URL`, framework `PORT`, 
    every file under `.secrets/`, and `secrets.json`; `--dry-run` on backup and restore previews the
    file list without writing. Verify: place a throwaway `.secrets/throwaway.md` and a throwaway
    `secrets.json`, run `rhino-cli env backup --dry-run`, confirm both appear and nothing is written.
-8. **Dependency policy satisfied**: every new dependency (`dotenvy`, `envy`, `@t3-oss/env-nextjs`,
-   `zod`) is pinned exactly (no caret/tilde), classified Path B, and CVE-cleared per the
+8. **Dependency policy satisfied**: every new dependency (`dotenvy` `"0.15"`, `envy` `"0.4"`,
+   `@t3-oss/env-nextjs` (latest eligible `0.13.x`, exact pin resolved at execution per
+   `tech-docs.md § 8`), `zod` (latest eligible `4.x`, exact pin resolved at execution per
+   `tech-docs.md § 8`)) is pinned exactly (no caret/tilde),
+   classified Path B, and CVE-cleared per the
    [Dependency Bump Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md);
+   two webs (`ose-web`, `ayokoding-web`) migrate off `zod` 3.25.76 to v4; three webs
+   (`organiclever-web`, `ose-app-web`, `wahidyankf-web`) receive `zod` v4 fresh (top-level
+   `z.email()`/`z.uuid()`/`z.ipv4()`);
    `tech-docs.md` § 8 carries the Security Clearance table. Verify: `grep -E '"\^|"~'
 apps/*-web/package.json` returns nothing for the new keys and the `Cargo.toml` deps are exact
    strings.
 9. **Rationale recorded**: `docs/explanation/standardize-secrets-and-env-parity-decisions.md` exists
-   and explains each cross-repo decision, especially public's deviations (no IaC, doc-name, building on
-   prior work, layout consolidation).
+   and explains each cross-repo decision, especially public's deviations (no IaC / forward-scaffold,
+   doc canonicalization rename, single Rust rhino-cli, building on prior work, layout consolidation,
+   backup default dir).
 
 ## Non-Goals (Business Scope)
 

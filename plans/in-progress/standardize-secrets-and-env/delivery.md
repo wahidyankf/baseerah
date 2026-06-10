@@ -96,6 +96,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       Keep the existing loader shape for now (the `envy` switch is Phase 4). Run
       `./node_modules/.bin/nx run organiclever-be:test:unit` — acceptance: the port test passes.
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: review `apps/organiclever-be/src/config.rs` — verify no inline magic strings
+      for the old keys (`"PORT"`, `"CORS_ORIGINS"`) remain; extract any repeated env-var name into a
+      named constant if introduced during GREEN. Run
+      `./node_modules/.bin/nx run organiclever-be:test:quick` — acceptance: all tests pass.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **RED**: in `apps/ose-app-be/src/config.rs`, write a failing test asserting
       `OSE_APP_BE_PORT=8399` resolves to `port == 8399`. Run
       `./node_modules/.bin/nx run ose-app-be:test:unit` — acceptance: fails.
@@ -106,6 +111,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `OPENROUTER_BASE_URL` → `OSE_APP_BE_OPENROUTER_BASE_URL` (leave `DATABASE_URL`). Run
       `./node_modules/.bin/nx run ose-app-be:test:unit` — acceptance: the port test passes.
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: review `apps/ose-app-be/src/config.rs` — verify no inline magic strings for
+      the old keys (`"PORT"`, `"CORS_ORIGINS"`, `"OPENROUTER_API_KEY"`, `"OPENROUTER_MODEL"`,
+      `"OPENROUTER_BASE_URL"`) remain; extract any repeated env-var name into a named constant if
+      introduced during GREEN. Run `./node_modules/.bin/nx run ose-app-be:test:quick` — acceptance:
+      all tests pass.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Edit `apps/organiclever-be/.env.example` and `apps/ose-app-be/.env.example`: rename the
       same keys; placeholders stay obviously-dev (`OSE_APP_BE_OPENROUTER_API_KEY=` blank as today).
 - [ ] [AI] **RED**: in `apps/ose-web/`, write a failing test asserting the content reader reads
@@ -113,18 +124,35 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `./node_modules/.bin/nx run ose-web:test:unit` — acceptance: fails.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] **GREEN**: edit `apps/ose-web/src/` reads — `CONTENT_DIR` → `OSE_WEB_CONTENT_DIR`,
-      `SHOW_DRAFTS` → `OSE_WEB_SHOW_DRAFTS` (in `repository-fs.ts` and `service.ts`); leave framework
+      `SHOW_DRAFTS` → `OSE_WEB_SHOW_DRAFTS` (in
+      `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts` and
+      `apps/ose-web/src/contexts/content/application/service.ts`); leave framework
       `PORT` in `lib/trpc/client.ts` untouched. Run
       `./node_modules/.bin/nx run ose-web:test:unit` — acceptance: the rename test passes.
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **REFACTOR**: review `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts`
+      and `apps/ose-web/src/contexts/content/application/service.ts`
+      — verify no leftover `process.env.CONTENT_DIR` or `process.env.SHOW_DRAFTS` magic strings remain;
+      extract any repeated env-var name into a named constant if introduced during GREEN. Run
+      `./node_modules/.bin/nx run ose-web:test:quick` — acceptance: all tests pass.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] **RED**: in `apps/ayokoding-web/`, write a failing test asserting the reader reads
       `AYOKODING_WEB_CONTENT_DIR`. Run `./node_modules/.bin/nx run ayokoding-web:test:unit` —
       acceptance: fails.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] **GREEN**: edit `apps/ayokoding-web/src/` reads — `CONTENT_DIR` →
-      `AYOKODING_WEB_CONTENT_DIR`, `SHOW_DRAFTS` → `AYOKODING_WEB_SHOW_DRAFTS` (in `reader.ts` and
-      `repository-fs.ts`); leave framework `PORT` untouched. Run
+      `AYOKODING_WEB_CONTENT_DIR`, `SHOW_DRAFTS` → `AYOKODING_WEB_SHOW_DRAFTS` (in
+      `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts` and
+      `apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts`); leave framework
+      `PORT` untouched. Run
       `./node_modules/.bin/nx run ayokoding-web:test:unit` — acceptance: passes.
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **REFACTOR**: review `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts`
+      and `apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts` — verify no
+      leftover `process.env.CONTENT_DIR` or
+      `process.env.SHOW_DRAFTS` magic strings remain; extract any repeated env-var name into a named
+      constant if introduced during GREEN. Run
+      `./node_modules/.bin/nx run ayokoding-web:test:quick` — acceptance: all tests pass.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Confirm `organiclever-web` (`ORGANICLEVER_BE_URL`) and `ose-app-web`/`wahidyankf-web`
       (already prefixed / no app vars) need no rename: run
@@ -196,10 +224,29 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       (`fn is_secret_file(rel: &str) -> bool`) used by both `discover()` and `restore()`; run
       `./node_modules/.bin/nx run rhino-cli:test:quick` — acceptance: all tests still pass.
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **RED** — canonical backup default dir (`tech-docs.md § 9 R15`): write a failing unit test
+      in `apps/rhino-cli/src/internal/envbackup.rs` (or `commands/env_backup.rs`) asserting that the
+      default backup dir resolves to `~/ose-public-env-backup` (i.e., the `DEFAULT_BACKUP_DIR`
+      constant or its derivation produces `ose-public-env-backup` when the repo root basename is
+      `ose-public`). Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: test fails
+      (still reads `ose-open-env-backup`).
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN — adopt the canonical per-repo backup default dir**: change the default backup-dir
+      constant from `ose-open-env-backup` to the per-repo-derived `~/<repo-root-basename>-env-backup`
+      (here `~/ose-public-env-backup`, matching the ose-infra canonical); update any other test
+      asserting the old default. Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance:
+      the RED test passes and the default resolves to `~/ose-public-env-backup`.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: update any inline comments in `apps/rhino-cli/src/internal/envbackup.rs` or
+      `apps/rhino-cli/src/commands/env_backup.rs` that still mention `ose-open-env-backup` — replace
+      with the canonical per-repo pattern. Run
+      `./node_modules/.bin/nx run rhino-cli:test:quick` — acceptance: all tests pass.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Smoke-check: create a throwaway `.secrets/throwaway.md` and a `secrets.json`, run
       `rhino-cli env backup --dry-run` at the repo root — the would-back-up list now includes **both**
-      (the Phase 0 gaps are closed) and creates nothing under `~/ose-open-env-backup`. Delete the
-      throwaway files after.
+      (the Phase 0 gaps are closed) and creates nothing under the default backup dir
+      (`~/ose-public-env-backup` after the Phase 2 default-dir change; `~/ose-open-env-backup` if run
+      before it). Delete the throwaway files after.
 
 ### Phase 2 Gate
 
@@ -225,8 +272,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] **Preview**: run `rhino-cli env backup --dry-run` — confirm every repo secret file appears
       (each `.env*` including any gitignored real one, plus `.secrets/` files and any `secrets.json`).
 - [ ] [AI] **Back up for real**: run `rhino-cli env backup` — exits 0; confirm the archive under
-      `~/ose-open-env-backup` contains the env files and any `.secrets/`/`secrets.json` (pre-change
-      safety copy).
+      `~/ose-public-env-backup` (the canonical per-repo default) contains the env files and any
+      `.secrets/`/`secrets.json` (pre-change safety copy).
 - [ ] [AI] Consolidate web framework-var docs into new app-colocated templates: create
       `apps/ose-web/.env.example` and `apps/ayokoding-web/.env.example` carrying the (now prefixed)
       framework/content vars previously documented in `infra/dev/ose-web/.env.example` and
@@ -246,10 +293,21 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — both ignored; `git check-ignore apps/ose-web/.env.example apps/ayokoding-web/.env.example` —
       **not** ignored (expect non-zero exit / no output). If a `.env.example` is unexpectedly ignored,
       add `!apps/**/.env.example` to `.gitignore`.
-- [ ] [AI] Update `apps/rhino-cli/src/commands/env_init.rs`: extend the scaffold scan (currently
-      `repo_root/infra/dev`, line 36) to also walk `apps/<app>/` for `.env.example` templates. Update
-      its tests to assert it discovers `apps/ose-app-be/.env.example`. Run
-      `./node_modules/.bin/nx run rhino-cli:test:quick` — exits 0.
+- [ ] [AI] **RED**: in `apps/rhino-cli/src/commands/env_init.rs` (or its test sibling), write a
+      failing unit test asserting that the scaffold scan discovers `apps/ose-app-be/.env.example`.
+      Run `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: test fails (scan still
+      points to `repo_root/infra/dev` only; the `apps/` path is not walked yet).
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: edit `apps/rhino-cli/src/commands/env_init.rs`: extend the scaffold scan
+      (currently rooted at `repo_root/infra/dev`, line 36) to also walk `apps/<app>/` directories
+      and collect `.env.example` files found there. Run
+      `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: the RED test passes and no
+      previously passing test breaks.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: review `apps/rhino-cli/src/commands/env_init.rs` — remove any hardcoded
+      `"infra/dev"` string constants introduced or exposed during GREEN; extract repeated scan-root
+      values into named constants if applicable. Run
+      `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: all tests still pass.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Grep for stale references to the removed infra templates: run
       `grep -rn "infra/dev/organiclever/.env\|infra/dev/ose-app/.env\|infra/dev/ose-web/.env\|infra/dev/ayokoding-web/.env" . --include="*.md" --include="*.yml" --include="*.yaml" --include="*.json" --include="*.rs"`
@@ -284,8 +342,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `envy`, `@t3-oss/env-nextjs`, `zod`, confirm none is yanked / has an open release-blocker, and
       CVE-clear each against NVD / GitHub Advisories / Snyk / project page / CISA KEV. Record results
       in the `tech-docs.md § 8` clearance table.
-- [ ] [AI] Add `dotenvy`, `envy` to `apps/organiclever-be/Cargo.toml` and `apps/ose-app-be/Cargo.toml`
-      as **exact pins** (`dotenvy = "X.Y.Z"`, `envy = "X.Y.Z"`); run
+- [ ] [AI] Add `dotenvy` (`"0.15.7"`) and `envy` (`"0.4.2"`) to `apps/organiclever-be/Cargo.toml`
+      and `apps/ose-app-be/Cargo.toml` as **exact three-part pins**
+      (e.g. `dotenvy = "0.15.7"`, `envy = "0.4.2"` — no caret/tilde, no two-part shorthand); add the `envy` **staleness re-evaluation
+      comment** above the `envy` line in each manifest (per `tech-docs.md § 8`: "stale but
+      advisory-clean; re-evaluate if a RustSec advisory cf. RUSTSEC-2021-0141 is filed"); run
       `cargo build -p organiclever-be -p ose-app-be` — compiles; run `cargo audit` — clean.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **RED**: write a failing unit test in `apps/organiclever-be/src/config.rs` asserting
@@ -300,6 +361,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       Run `./node_modules/.bin/nx run organiclever-be:test:unit` — acceptance: the RED test passes and
       a fully-set env resolves correctly.
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: clean up `apps/organiclever-be/src/config.rs` — ensure `fn default_port()`
+      (or equivalent) helper is consistently named, remove any unused `use std::env` imports that
+      `envy` replaced, and update any doc comments that still mention the old `env::var` loading
+      approach. Run `./node_modules/.bin/nx run organiclever-be:test:quick` — acceptance: all tests
+      pass.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **RED**: write a failing unit test in `apps/ose-app-be/src/config.rs` asserting
       `Config::load()` returns an error naming the field when `DATABASE_URL` is unset (test via
       `envy::from_iter` over an explicit pair list, no process-env mutation). Run
@@ -312,33 +379,92 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `./node_modules/.bin/nx run ose-app-be:test:unit` — acceptance: the RED test passes and a
       fully-set env resolves correctly.
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: clean up `apps/ose-app-be/src/config.rs` — ensure default helper functions
+      are consistently named, remove any unused `use std::env` imports that `envy` replaced, and
+      update any doc comments that still mention the old `env::var` loading approach. Run
+      `./node_modules/.bin/nx run ose-app-be:test:quick` — acceptance: all tests pass.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Run `./node_modules/.bin/nx run-many -t test:quick -p organiclever-be ose-app-be` — exits
       0, coverage at or above threshold.
-- [ ] [AI] Add `@t3-oss/env-nextjs` and `zod` to each web `package.json`
-      (`apps/organiclever-web`, `apps/ose-web`, `apps/ayokoding-web`, `apps/ose-app-web`,
-      `apps/wahidyankf-web`) as **exact pins** (no caret/tilde); run `npm install` from root; run
-      `npm audit --audit-level=moderate` — clean; verify
-      `grep -E '"\^|"~' apps/*-web/package.json` returns nothing for these two keys.
+- [ ] [AI] Add `@t3-oss/env-nextjs` (0.13.x) and `zod` (**4.x line** — migrate the five webs off the
+      current `zod` 3.25.76) to each web `package.json` (`apps/organiclever-web`, `apps/ose-web`,
+      `apps/ayokoding-web`, `apps/ose-app-web`, `apps/wahidyankf-web`) as **exact pins** (no
+      caret/tilde); run `npm install` from root; run `npm audit --audit-level=moderate` — clean;
+      verify `grep -E '"\^|"~' apps/*-web/package.json` returns nothing for these two keys. If a
+      standalone Next.js build is used, add `@t3-oss/env-nextjs` + `@t3-oss/env-core` to
+      `transpilePackages` in the relevant `next.config.ts`.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] **RED**: write a failing test in `apps/ose-web/` asserting `createEnv` validates
       `OSE_WEB_SHOW_DRAFTS` as the documented enum (or that `env.ts` exports the validated object).
       Run `./node_modules/.bin/nx run ose-web:test:quick` — acceptance: fails (env.ts not created).
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] **GREEN**: create `apps/ose-web/src/env.ts` (`tech-docs.md § 3`) validating
-      `OSE_WEB_CONTENT_DIR`/`OSE_WEB_SHOW_DRAFTS` in the `server` block; create the analogous
-      `apps/ayokoding-web/src/env.ts` (`AYOKODING_WEB_*`), `apps/organiclever-web/src/env.ts`
-      (`ORGANICLEVER_BE_URL`), and a **minimal empty-schema** `src/env.ts` for `ose-app-web` and
-      `wahidyankf-web` (they read no app env var — AC-06). Run
+      `OSE_WEB_CONTENT_DIR`/`OSE_WEB_SHOW_DRAFTS` in the `server` block, using the **zod v4** API
+      (top-level `z.email()`/`z.uuid()`/`z.ipv4()`/`z.url()` where format helpers are needed — not the
+      v3 `z.string().email()` chain); create the analogous `apps/ayokoding-web/src/env.ts`
+      (`AYOKODING_WEB_*`), `apps/organiclever-web/src/env.ts` (`ORGANICLEVER_BE_URL`), and a **minimal
+      empty-schema** `src/env.ts` for `ose-app-web` and `wahidyankf-web` (they read no app env var —
+      AC-06). Run
       `./node_modules/.bin/nx run-many -t test:quick -p ose-web ayokoding-web organiclever-web ose-app-web wahidyankf-web`
       — acceptance: all pass.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Edit each web's `apps/<web>/next.config.ts` to `import "./src/env.ts"` so validation runs
-      at build time.
+- [ ] [AI] **REFACTOR**: review all five `apps/*-web/src/env.ts` files for structural consistency —
+      confirm matching import style (`import { createEnv } from "@t3-oss/env-nextjs"`), clean
+      empty-schema objects for `ose-app-web`/`wahidyankf-web` (no duplicate schema entries, no
+      leftover placeholder blocks), and consistent `experimental__runtimeEnv` block. Run
+      `./node_modules/.bin/nx run-many -t typecheck test:quick -p organiclever-web ose-web ayokoding-web ose-app-web wahidyankf-web`
+      — acceptance: all pass.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Repoint each web's `process.env.X` reads to `env.X` from `src/env.ts` (e.g.
-      `apps/organiclever-web/src/contexts/health/infrastructure/backend-client-live.ts` and
-      `apps/ose-web`/`apps/ayokoding-web` content readers); leave framework `process.env.PORT` reads as
-      framework vars. Run `./node_modules/.bin/nx run-many -t typecheck -p organiclever-web ose-web ayokoding-web ose-app-web wahidyankf-web`
+- [ ] [AI] **RED**: write a failing test asserting that `apps/ose-web/next.config.ts` (and the
+      analogous file in each web) already imports `./src/env.ts` (or that a build of `ose-web`
+      triggers env validation). Run
+      `./node_modules/.bin/nx run-many -t test:unit -p ose-web ayokoding-web organiclever-web ose-app-web wahidyankf-web`
+      — acceptance: test fails (no import present yet).
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **GREEN**: edit each web's `apps/<web>/next.config.ts` to add `import "./src/env.ts"` at
+      the top so validation runs at build time. Run
+      `./node_modules/.bin/nx run-many -t test:unit -p ose-web ayokoding-web organiclever-web ose-app-web wahidyankf-web`
+      — acceptance: the RED test passes for all five webs.
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **REFACTOR**: verify each web's `next.config.ts` import is placed consistently (top of
+      file, before other imports) and carries no leftover draft or placeholder comment. Run
+      `./node_modules/.bin/nx run-many -t typecheck -p ose-web ayokoding-web organiclever-web ose-app-web wahidyankf-web`
+      — acceptance: all exit 0.
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **RED**: write failing tests asserting that each `process.env.X` read site has been
+      switched to `env.X` from `src/env.ts`:
+      (a) `apps/organiclever-web/src/contexts/health/infrastructure/backend-client-live.ts` reads
+      `env.ORGANICLEVER_BE_URL`;
+      (b) `apps/organiclever-web/src/app/system/status/be/page.tsx` reads `env.ORGANICLEVER_BE_URL`;
+      (c) `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts` reads
+      `env.OSE_WEB_CONTENT_DIR` / `env.OSE_WEB_SHOW_DRAFTS`;
+      (d) `apps/ose-web/src/contexts/content/application/service.ts` reads `env.OSE_WEB_CONTENT_DIR` /
+      `env.OSE_WEB_SHOW_DRAFTS`;
+      (e) `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts` reads
+      `env.AYOKODING_WEB_CONTENT_DIR` / `env.AYOKODING_WEB_SHOW_DRAFTS`;
+      (f) `apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts` reads
+      `env.AYOKODING_WEB_CONTENT_DIR` / `env.AYOKODING_WEB_SHOW_DRAFTS`.
+      Run `./node_modules/.bin/nx run-many -t test:unit -p organiclever-web ose-web ayokoding-web` —
+      acceptance: all new tests fail (reads still use `process.env.X`).
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **GREEN**: repoint each web's `process.env.X` reads to `env.X` from `src/env.ts` in:
+      `apps/organiclever-web/src/contexts/health/infrastructure/backend-client-live.ts`,
+      `apps/organiclever-web/src/app/system/status/be/page.tsx`,
+      `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts`,
+      `apps/ose-web/src/contexts/content/application/service.ts`,
+      `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts`, and
+      `apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts`; leave framework
+      `process.env.PORT` reads as framework vars. Run
+      `./node_modules/.bin/nx run-many -t test:unit -p organiclever-web ose-web ayokoding-web` —
+      acceptance: all RED tests pass.
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] **REFACTOR**: verify zero residual `process.env.ORGANICLEVER_BE_URL`,
+      `process.env.OSE_WEB_CONTENT_DIR`, `process.env.OSE_WEB_SHOW_DRAFTS`,
+      `process.env.AYOKODING_WEB_CONTENT_DIR`, `process.env.AYOKODING_WEB_SHOW_DRAFTS` reads in the
+      affected files — run
+      `grep -rn "process\.env\.\(ORGANICLEVER_BE_URL\|OSE_WEB_\|AYOKODING_WEB_\)" apps/organiclever-web/src apps/ose-web/src apps/ayokoding-web/src`
+      — acceptance: zero hits. Then run
+      `./node_modules/.bin/nx run-many -t typecheck test:quick -p organiclever-web ose-web ayokoding-web ose-app-web wahidyankf-web`
       — all exit 0.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Prove web build-time validation on one app: temporarily set an invalid value for a
@@ -438,6 +564,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       validator branches **commented** with an `// activate when IaC is added` marker. Run
       `./node_modules/.bin/nx run rhino-cli:test:unit` — acceptance: app-validator RED tests pass.
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: review `apps/rhino-cli/src/commands/env_validate.rs` and any new
+      `apps/rhino-cli/src/internal/` extractor code from the GREEN pass — extract repeated scanner
+      logic into named helpers (`parse_declared_keys`, `scan_rust_reads`, `scan_ts_reads`), collapse
+      the allowlist lookup to a single named function, and delete any dead code left from the
+      minimum-viable implementation. Run `./node_modules/.bin/nx run rhino-cli:test:quick` —
+      acceptance: all tests still pass, coverage at or above threshold.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Write integration tests (`cargo test --tests`) with temp-dir fixtures: an app with a seeded
       mismatch (non-zero + key named); a matching app (exit 0). Run
       `./node_modules/.bin/nx run rhino-cli:test:quick` — exits 0, coverage at or above threshold.
@@ -486,12 +619,21 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — `apps/<app>/.env.local`, `.secrets/`, `secrets.json` (active), and `*.tfvars`/inventory
       (commented forward-scaffold) — each with its path, consuming tool, and whether it is backed up
       and/or validated. Document the **hybrid backup** source-of-truth (hardcoded floor ∪
-      `env-contract.yaml` `backup_globs`) and note the cross-repo doc-name difference
-      (`no-secrets-in-git.md` here vs `no-secrets-in-committed-files.md` in siblings).
+      `env-contract.yaml` `backup_globs`) and note the now-aligned cross-repo doc name
+      (`no-secrets-in-committed-files.md`, renamed from `no-secrets-in-git.md` by this plan to match
+      the siblings).
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] Reduce `repo-governance/conventions/security/no-secrets-in-git.md` to a stub: keep its
-      title + a one-paragraph summary of the hard iron rule (so the rule stays greppable) and link to
-      the hub doc as the authoritative source.
+- [ ] [AI] **Canonicalize the doc name (this repo acts)** (`tech-docs.md § 9 R10`): `git mv
+repo-governance/conventions/security/no-secrets-in-git.md repo-governance/conventions/security/no-secrets-in-committed-files.md`
+      to match the ose-infra canonical name. Then reduce the renamed file to a stub: keep its title +
+      a one-paragraph summary of the hard iron rule (so the rule stays greppable) and link to the hub
+      doc as the authoritative source.
+- [ ] [AI] **Rewrite all inbound links to the renamed doc**: run
+      `grep -rln "no-secrets-in-git" --include="*.md" . | grep -v node_modules | grep -v plans/done`
+      and rewrite every active hit (CLAUDE.md, AGENTS.md, indexes, `docs/`, `.claude/` agents/skills,
+      this plan's own cross-refs) from `no-secrets-in-git.md` to `no-secrets-in-committed-files.md`
+      (or to the hub where the link is a content reference, not the hard-iron-rule anchor) — acceptance:
+      re-run the grep; remaining active hits are only historical `plans/done/**` (left untouched).
 - [ ] [AI] Reduce `repo-governance/conventions/security/env-file-access.md` to a stub redirecting to
       the hub (preserve the `guard-env-file-access` policy summary so enforcement rationale stays
       discoverable).
@@ -500,9 +642,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Repoint `repo-governance/conventions/security/README.md` to the hub doc as the primary
       secrets/env reference (update the two existing convention bullets to mention the hub).
 - [ ] [AI] Write `docs/explanation/standardize-secrets-and-env-parity-decisions.md` explaining each
-      cross-repo decision (the full 14-decision matrix from `tech-docs.md § 9`), emphasizing public's
-      deviations: no IaC (commented scaffold), the `no-secrets-in-git.md` doc-name, building on prior
-      env-backup/guard work, and the layout consolidation. Cross-link the sibling plans
+      cross-repo decision (the full 15-decision matrix from `tech-docs.md § 9`), emphasizing public's
+      deviations and parity actions: no IaC (forward-scaffold/commented), the doc canonicalization
+      rename (`no-secrets-in-git.md` → `no-secrets-in-committed-files.md`), single Rust rhino-cli (no
+      go twin), the canonical backup default dir (`~/<repo-root-basename>-env-backup`), building on
+      prior env-backup/guard work, and the layout consolidation. Cross-link the sibling plans
       (`tech-docs.md § 9` / README "Sibling Plans"). Match the structure of the existing
       `docs/explanation/plan-domain-parity-decisions.md` precedent.
   - _Suggested executor: `docs-maker`_
@@ -512,10 +656,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `plans/done/**` links on the stubs (historical, must not be rewritten).
 - [ ] [AI] Run `npm run generate:bindings` if any `.claude/` agent/skill text changed, to resync
       `.opencode/`.
-- [ ] [AI] Run `npm run lint:md` — exits 0 (no broken links from the fold). Then run the inbound-link
-      verification:
-      `grep -rl "no-secrets-in-git\|env-file-access\|reproducible-environments" --include="*.md" . | grep -v node_modules | grep -v plans/done`
-      — every remaining active hit either is a stub file itself or also links the hub doc.
+- [ ] [AI] Run `npm run lint:md` — exits 0 (no broken links from the fold/rename). Then run the
+      inbound-link verification:
+      `grep -rl "no-secrets-in-committed-files\|env-file-access\|reproducible-environments" --include="*.md" . | grep -v node_modules | grep -v plans/done`
+      — every remaining active hit either is a stub file itself or also links the hub doc. Separately
+      confirm the old name is gone from active files:
+      `grep -rl "no-secrets-in-git" --include="*.md" . | grep -v node_modules | grep -v plans/done`
+      returns nothing.
 
 ### Phase 7 Gate
 
@@ -544,9 +691,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Run `npm run lint:md` and `npm run format:md:check` — exit 0.
 - [ ] [AI] Re-verify every BRD success criterion: per-app naming applied with zero residue; both
       backends validate startup; every web validates at build time; the drift guard is wired and
-      bites; the hub doc exists with the three stubs + `security/README.md` repoint; layout
-      consolidated; backup covers `.env*`/`.secrets/`/`secrets.json` with `--dry-run`; deps
-      exact-pinned + cleared; the rationale doc exists.
+      bites; the hub doc exists, `no-secrets-in-git.md` is renamed to `no-secrets-in-committed-files.md`
+      with the three stubs + all inbound links rewritten + `security/README.md` repoint; layout
+      consolidated; backup covers `.env*`/`.secrets/`/`secrets.json` with `--dry-run` and the canonical
+      `~/ose-public-env-backup` default dir; deps exact-pinned + cleared (zod on 4.x, envy staleness
+      comment present); the rationale doc exists.
 - [ ] [AI] Confirm all per-phase commits landed on `origin main`:
       `git log --oneline origin/main -15` shows the Phase 1–7 commits; `git status` clean, nothing
       unpushed.
