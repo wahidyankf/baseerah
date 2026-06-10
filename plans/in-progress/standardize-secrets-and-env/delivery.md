@@ -45,36 +45,46 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > This follows the root cause orientation principle — proactively fix preexisting errors encountered
 > during work.
 
-- [ ] [AI] From the worktree root, run `npm install` — exits 0 and `node_modules/` is present.
-- [ ] [AI] Converge the toolchain: `npm run doctor -- --fix` — exits 0, no unresolved drift (Rust,
-      Node, cargo-llvm-cov, jq present).
-- [ ] [AI] Capture the backend baseline: run
-      `./node_modules/.bin/nx run organiclever-be:test:quick` and
-      `./node_modules/.bin/nx run ose-app-be:test:quick` — both exit 0 (record coverage %).
-- [ ] [AI] Capture the web baseline: run
-      `./node_modules/.bin/nx run-many -t test:quick -p organiclever-web ose-web ayokoding-web ose-app-web wahidyankf-web`
-      — all exit 0.
-- [ ] [AI] Capture the rhino-cli baseline: run `./node_modules/.bin/nx run rhino-cli:test:quick` —
-      exits 0 (record coverage %).
-- [ ] [AI] Record the rename baseline: run
-      `grep -rn "env::var(\"PORT\")\|env::var(\"CORS_ORIGINS\")\|env::var(\"OPENROUTER_" apps/organiclever-be apps/ose-app-be`
-      and `grep -rn "process.env.CONTENT_DIR\|process.env.SHOW_DRAFTS\|process.env\[\"SHOW_DRAFTS\"\]" apps/ose-web apps/ayokoding-web`
-      — save the hit lists; Phase 1 eliminates exactly these unprefixed reads.
-- [ ] [AI] Confirm the env-file inventory: run `find apps infra -name ".env.example"` — note the two
-      backend templates under `apps/`, and the four `infra/dev/<group>/.env.example` files (Phase 3
-      consolidates these).
-- [ ] [AI] Confirm the secret-backup gaps (no `--dry-run` exists yet — that lands in Phase 2): create
-      a throwaway `.secrets/throwaway.md` and a throwaway `secrets.json` at the repo root, run
-      `rhino-cli env backup --dir "$(mktemp -d)"`, and confirm **both** are **absent** from the
-      archive (the hidden-dir skip at `envbackup.rs:289` and the `.env`-prefix filter at `:299`).
-      Delete the throwaway files and dir after. Phase 2 makes both appear.
+- [x] [AI] From the worktree root, run `npm install` — exits 0 and `node_modules/` is present.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | npm install successful in worktree; all deps installed -->
+- [x] [AI] Converge the toolchain: `npm run doctor -- --fix` — exits 0, no unresolved drift (Rust,
+    Node, cargo-llvm-cov, jq present).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | 20/20 tools OK, no drift -->
+- [x] [AI] Capture the backend baseline: run
+    `./node_modules/.bin/nx run organiclever-be:test:quick` and
+    `./node_modules/.bin/nx run ose-app-be:test:quick` — both exit 0 (record coverage %).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | organiclever-be 98.44% line, ose-app-be 98.89% line -->
+- [x] [AI] Capture the web baseline: run
+    `./node_modules/.bin/nx run-many -t test:quick -p organiclever-web ose-web ayokoding-web ose-app-web wahidyankf-web`
+    — all exit 0.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | all 5 webs pass, 78.36% line coverage (threshold ≥74%) -->
+- [x] [AI] Capture the rhino-cli baseline: run `./node_modules/.bin/nx run rhino-cli:test:quick` —
+    exits 0 (record coverage %).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | 834 tests pass -->
+- [x] [AI] Record the rename baseline: run
+    `grep -rn "env::var(\"PORT\")\|env::var(\"CORS_ORIGINS\")\|env::var(\"OPENROUTER_" apps/organiclever-be apps/ose-app-be`
+    and `grep -rn "process.env.CONTENT_DIR\|process.env.SHOW_DRAFTS\|process.env\[\"SHOW_DRAFTS\"\]" apps/ose-web apps/ayokoding-web`
+    — save the hit lists; Phase 1 eliminates exactly these unprefixed reads.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | 7 unprefixed reads found: PORT/CORS_ORIGINS in organiclever-be, PORT/CORS_ORIGINS/OPENROUTER_* in ose-app-be, CONTENT_DIR/SHOW_DRAFTS in ose-web and ayokoding-web -->
+- [x] [AI] Confirm the env-file inventory: run `find apps infra -name ".env.example"` — note the two
+    backend templates under `apps/`, and the four `infra/dev/<group>/.env.example` files (Phase 3
+    consolidates these).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | 6 templates: apps/organiclever-be, apps/ose-app-be, infra/dev/ayokoding-web, infra/dev/organiclever, infra/dev/ose-app, infra/dev/ose-web -->
+- [x] [AI] Confirm the secret-backup gaps (no `--dry-run` exists yet — that lands in Phase 2): create
+    a throwaway `.secrets/throwaway.md` and a throwaway `secrets.json` at the repo root, run
+    `rhino-cli env backup --dir "$(mktemp -d)"`, and confirm **both** are **absent** from the
+    archive (the hidden-dir skip at `envbackup.rs:289` and the `.env`-prefix filter at `:299`).
+    Delete the throwaway files and dir after. Phase 2 makes both appear.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | Confirmed: .secrets/throwaway.md and secrets.json both absent from backup archive; throwaway files deleted -->
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1; if any fails, fix it in Phase 0 first.
 
-- [ ] [AI] All backend, web, and rhino-cli `test:quick` targets above exit 0 (clean baseline).
-- [ ] [AI] Run `git status` — working tree clean (no changes yet).
+- [x] [AI] All backend, web, and rhino-cli `test:quick` targets above exit 0 (clean baseline).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | All baselines confirmed green -->
+- [x] [AI] Run `git status` — working tree clean (no changes yet).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | git status: clean, nothing to commit -->
 
 > **Pause Safety**: Phase 0 made no code changes; the repo is at a clean, green baseline. Resume by
 > re-running the `test:quick` targets to reconfirm before starting Phase 1.
@@ -86,99 +96,120 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > Per the rename map in `tech-docs.md § 1`. `DATABASE_URL`, framework `PORT`, and `NEXT_PUBLIC_*`
 > are exempt. Do code + `.env.example` + compose for each app together so sources never disagree.
 
-- [ ] [AI] **RED**: in `apps/organiclever-be/src/config.rs`, write a failing unit test asserting that
+- [x] [AI] **RED**: in `apps/organiclever-be/src/config.rs`, write a failing unit test asserting that
       `ORGANICLEVER_BE_PORT=8299` resolves to `port == 8299` (using the existing `from_env_with`-style
       seam or `envy::from_iter` over an explicit pair list — do not mutate process env). Run
       `./node_modules/.bin/nx run organiclever-be:test:unit` — acceptance: fails (still reads `PORT`).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: edit `apps/organiclever-be/src/config.rs`: rename read keys `PORT` →
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/organiclever-be/src/config.rs, apps/organiclever-be/tests/unit/main.rs | Added from_env_fn seam and failing test prefixed_port_key_resolves_to_port_value -->
+- [x] [AI] **GREEN**: edit `apps/organiclever-be/src/config.rs`: rename read keys `PORT` →
       `ORGANICLEVER_BE_PORT`, `CORS_ORIGINS` → `ORGANICLEVER_BE_CORS_ORIGINS` (leave `DATABASE_URL`).
       Keep the existing loader shape for now (the `envy` switch is Phase 4). Run
       `./node_modules/.bin/nx run organiclever-be:test:unit` — acceptance: the port test passes.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: review `apps/organiclever-be/src/config.rs` — verify no inline magic strings
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/organiclever-be/src/config.rs | ENV_PORT="ORGANICLEVER_BE_PORT", ENV_CORS_ORIGINS="ORGANICLEVER_BE_CORS_ORIGINS"; 13 tests pass -->
+- [x] [AI] **REFACTOR**: review `apps/organiclever-be/src/config.rs` — verify no inline magic strings
       for the old keys (`"PORT"`, `"CORS_ORIGINS"`) remain; extract any repeated env-var name into a
       named constant if introduced during GREEN. Run
       `./node_modules/.bin/nx run organiclever-be:test:quick` — acceptance: all tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED**: in `apps/ose-app-be/src/config.rs`, write a failing test asserting
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/organiclever-be/src/config.rs | Extracted ENV_PORT/ENV_CORS_ORIGINS constants; no magic strings remain; 13 tests pass -->
+- [x] [AI] **RED**: in `apps/ose-app-be/src/config.rs`, write a failing test asserting
       `OSE_APP_BE_PORT=8399` resolves to `port == 8399`. Run
       `./node_modules/.bin/nx run ose-app-be:test:unit` — acceptance: fails.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: edit `apps/ose-app-be/src/config.rs`: rename `PORT` → `OSE_APP_BE_PORT`,
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ose-app-be/src/config.rs, apps/ose-app-be/tests/unit/main.rs | Added from_env_fn seam and 5 failing tests for all renamed keys -->
+- [x] [AI] **GREEN**: edit `apps/ose-app-be/src/config.rs`: rename `PORT` → `OSE_APP_BE_PORT`,
       `CORS_ORIGINS` → `OSE_APP_BE_CORS_ORIGINS`, `OPENROUTER_API_KEY` →
       `OSE_APP_BE_OPENROUTER_API_KEY`, `OPENROUTER_MODEL` → `OSE_APP_BE_OPENROUTER_MODEL`,
       `OPENROUTER_BASE_URL` → `OSE_APP_BE_OPENROUTER_BASE_URL` (leave `DATABASE_URL`). Run
       `./node_modules/.bin/nx run ose-app-be:test:unit` — acceptance: the port test passes.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: review `apps/ose-app-be/src/config.rs` — verify no inline magic strings for
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ose-app-be/src/config.rs | All 5 keys renamed; 18 tests pass -->
+- [x] [AI] **REFACTOR**: review `apps/ose-app-be/src/config.rs` — verify no inline magic strings for
       the old keys (`"PORT"`, `"CORS_ORIGINS"`, `"OPENROUTER_API_KEY"`, `"OPENROUTER_MODEL"`,
       `"OPENROUTER_BASE_URL"`) remain; extract any repeated env-var name into a named constant if
       introduced during GREEN. Run `./node_modules/.bin/nx run ose-app-be:test:quick` — acceptance:
       all tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Edit `apps/organiclever-be/.env.example` and `apps/ose-app-be/.env.example`: rename the
-      same keys; placeholders stay obviously-dev (`OSE_APP_BE_OPENROUTER_API_KEY=` blank as today).
-- [ ] [AI] **RED**: in `apps/ose-web/`, write a failing test asserting the content reader reads
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ose-app-be/src/config.rs | Extracted 5 ENV_* constants; no magic strings remain; 18 tests pass -->
+- [x] [AI] Edit `apps/organiclever-be/.env.example` and `apps/ose-app-be/.env.example`: rename the
+    same keys; placeholders stay obviously-dev (`OSE_APP_BE_OPENROUTER_API_KEY=` blank as today).
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/organiclever-be/.env.example, apps/ose-app-be/.env.example | All keys renamed to prefixed forms -->
+- [x] [AI] **RED**: in `apps/ose-web/`, write a failing test asserting the content reader reads
       `OSE_WEB_CONTENT_DIR` (not `CONTENT_DIR`). Run
       `./node_modules/.bin/nx run ose-web:test:unit` — acceptance: fails.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: edit `apps/ose-web/src/` reads — `CONTENT_DIR` → `OSE_WEB_CONTENT_DIR`,
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ose-web/test/unit/be-steps/env-prefix.unit.test.ts | Failing test written for OSE_WEB_CONTENT_DIR and OSE_WEB_SHOW_DRAFTS -->
+- [x] [AI] **GREEN**: edit `apps/ose-web/src/` reads — `CONTENT_DIR` → `OSE_WEB_CONTENT_DIR`,
       `SHOW_DRAFTS` → `OSE_WEB_SHOW_DRAFTS` (in
       `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts` and
       `apps/ose-web/src/contexts/content/application/service.ts`); leave framework
       `PORT` in `lib/trpc/client.ts` untouched. Run
       `./node_modules/.bin/nx run ose-web:test:unit` — acceptance: the rename test passes.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR**: review `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts`
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts, apps/ose-web/src/contexts/content/application/service.ts | All env-var reads renamed; 76 tests pass -->
+- [x] [AI] **REFACTOR**: review `apps/ose-web/src/contexts/content/infrastructure/repository-fs.ts`
       and `apps/ose-web/src/contexts/content/application/service.ts`
       — verify no leftover `process.env.CONTENT_DIR` or `process.env.SHOW_DRAFTS` magic strings remain;
       extract any repeated env-var name into a named constant if introduced during GREEN. Run
       `./node_modules/.bin/nx run ose-web:test:quick` — acceptance: all tests pass.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: in `apps/ayokoding-web/`, write a failing test asserting the reader reads
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: none (constants already extracted in GREEN) | test:quick 76 tests pass, no magic strings remain -->
+- [x] [AI] **RED**: in `apps/ayokoding-web/`, write a failing test asserting the reader reads
       `AYOKODING_WEB_CONTENT_DIR`. Run `./node_modules/.bin/nx run ayokoding-web:test:unit` —
       acceptance: fails.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: edit `apps/ayokoding-web/src/` reads — `CONTENT_DIR` →
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ayokoding-web/test/unit/be-steps/env-prefix.unit.test.ts | Failing test written for AYOKODING_WEB_CONTENT_DIR and AYOKODING_WEB_SHOW_DRAFTS -->
+- [x] [AI] **GREEN**: edit `apps/ayokoding-web/src/` reads — `CONTENT_DIR` →
       `AYOKODING_WEB_CONTENT_DIR`, `SHOW_DRAFTS` → `AYOKODING_WEB_SHOW_DRAFTS` (in
       `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts` and
       `apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts`); leave framework
       `PORT` untouched. Run
       `./node_modules/.bin/nx run ayokoding-web:test:unit` — acceptance: passes.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR**: review `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts`
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts, apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts | All env-var reads renamed; 343 tests pass -->
+- [x] [AI] **REFACTOR**: review `apps/ayokoding-web/src/contexts/content/infrastructure/reader.ts`
       and `apps/ayokoding-web/src/contexts/content/infrastructure/repository-fs.ts` — verify no
       leftover `process.env.CONTENT_DIR` or
       `process.env.SHOW_DRAFTS` magic strings remain; extract any repeated env-var name into a named
       constant if introduced during GREEN. Run
       `./node_modules/.bin/nx run ayokoding-web:test:quick` — acceptance: all tests pass.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Confirm `organiclever-web` (`ORGANICLEVER_BE_URL`) and `ose-app-web`/`wahidyankf-web`
-      (already prefixed / no app vars) need no rename: run
-      `grep -rn "process.env" apps/organiclever-web/src apps/ose-app-web/src apps/wahidyankf-web/src`
-      — only `ORGANICLEVER_BE_URL` appears; no unprefixed app var. Document this in the commit message.
-- [ ] [AI] Edit the compose `environment:` blocks to the new keys: in
-      `infra/dev/ose-app/docker-compose.yml` and `docker-compose.ci.yml` rename
-      `OPENROUTER_*`/`PORT` → `OSE_APP_BE_OPENROUTER_*`/`OSE_APP_BE_PORT` (keep `DATABASE_URL`); in
-      `infra/dev/organiclever/docker-compose.yml` confirm only `ORGANICLEVER_BE_URL` is set (already
-      conforming). Run `grep -rn "OPENROUTER_API_KEY:\|\bPORT:\|CORS_ORIGINS:" infra/dev/ose-app infra/dev/organiclever`
-      — acceptance: only prefixed keys appear.
-- [ ] [AI] Verify zero residue: run
-      `grep -rn "env::var(\"PORT\")\|env::var(\"CORS_ORIGINS\")\|env::var(\"OPENROUTER_" apps/organiclever-be apps/ose-app-be`
-      and `grep -rn "process.env.CONTENT_DIR\|process.env\[\"CONTENT_DIR\"\]\|SHOW_DRAFTS" apps/ose-web apps/ayokoding-web | grep -v "OSE_WEB_\|AYOKODING_WEB_"`
-      — both return zero hits.
-- [ ] [AI] Run `./node_modules/.bin/nx run-many -t test:quick -p organiclever-be ose-app-be ose-web ayokoding-web`
-      — all exit 0, coverage ≥ baseline.
+  <!-- DONE 2026-06-10 | Status: PASS | Files Changed: none (constants already extracted in GREEN) | test:quick 343 tests pass, no magic strings remain -->
+- [x] [AI] Confirm `organiclever-web` (`ORGANICLEVER_BE_URL`) and `ose-app-web`/`wahidyankf-web`
+    (already prefixed / no app vars) need no rename: run
+    `grep -rn "process.env" apps/organiclever-web/src apps/ose-app-web/src apps/wahidyankf-web/src`
+    — only `ORGANICLEVER_BE_URL` appears; no unprefixed app var. Document this in the commit message.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | grep confirms: organiclever-web has only ORGANICLEVER_BE_URL; ose-app-web and wahidyankf-web have no unprefixed app vars; no rename needed -->
+- [x] [AI] Edit the compose `environment:` blocks to the new keys: in
+    `infra/dev/ose-app/docker-compose.yml` and `docker-compose.ci.yml` rename
+    `OPENROUTER_*`/`PORT` → `OSE_APP_BE_OPENROUTER_*`/`OSE_APP_BE_PORT` (keep `DATABASE_URL`); in
+    `infra/dev/organiclever/docker-compose.yml` confirm only `ORGANICLEVER_BE_URL` is set (already
+    conforming). Run `grep -rn "OPENROUTER_API_KEY:\|\bPORT:\|CORS_ORIGINS:" infra/dev/ose-app infra/dev/organiclever`
+    — acceptance: only prefixed keys appear.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: infra/dev/ose-app/docker-compose.yml, infra/dev/organiclever/docker-compose.ci.yml | OPENROUTER_*/PORT → OSE_APP_BE_*; PORT/CORS_ORIGINS → ORGANICLEVER_BE_*; residue grep exit 1 -->
+- [x] [AI] Verify zero residue: run
+    `grep -rn "env::var(\"PORT\")\|env::var(\"CORS_ORIGINS\")\|env::var(\"OPENROUTER_" apps/organiclever-be apps/ose-app-be`
+    and `grep -rn "process.env.CONTENT_DIR\|process.env\[\"CONTENT_DIR\"\]\|SHOW_DRAFTS" apps/ose-web apps/ayokoding-web | grep -v "OSE_WEB_\|AYOKODING_WEB_"`
+    — both return zero hits.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: test files (content-retrieval.steps.ts x2, env-prefix.unit.test.ts x2, specs feature file) | All three residue greps exit 1 (zero hits) -->
+- [x] [AI] Run `./node_modules/.bin/nx run-many -t test:quick -p organiclever-be ose-app-be ose-web ayokoding-web`
+    — all exit 0, coverage ≥ baseline.
+<!-- DONE 2026-06-10 | Status: PASS | Files Changed: none | All 4 projects test:quick pass; from cache -->
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2; if any fails, fix it in Phase 1 first.
 
-- [ ] [AI] The two residue greps above return zero hits.
-- [ ] [AI] `./node_modules/.bin/nx run-many -t test:quick -p organiclever-be ose-app-be ose-web ayokoding-web`
-      exits 0 with coverage at or above each project's threshold.
-- [ ] [AI] `npm run lint:md` exits 0.
+- [x] [AI] The two residue greps above return zero hits.
+<!-- DONE 2026-06-10 | Status: PASS | Both Rust and TS residue greps: exit 1 (zero hits) -->
+- [x] [AI] `./node_modules/.bin/nx run-many -t test:quick -p organiclever-be ose-app-be ose-web ayokoding-web`
+    exits 0 with coverage at or above each project's threshold.
+<!-- DONE 2026-06-10 | Status: PASS | All 4 pass from cache -->
+
+- [x] [AI] `npm run lint:md` exits 0.
+<!-- DONE 2026-06-10 | Status: PASS | 0 errors across 2146 files -->
 - [ ] [AI] Commit as thematic commits (split backends vs webs vs compose) and push to `origin main`:
       `refactor(organiclever-be,ose-app-be): prefix env vars with per-app name`,
       `refactor(ose-web,ayokoding-web): prefix CONTENT_DIR/SHOW_DRAFTS with per-app name`,
