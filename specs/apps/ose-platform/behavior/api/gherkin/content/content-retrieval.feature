@@ -21,7 +21,7 @@ Feature: Content Retrieval
 
   Scenario: Draft pages are excluded from listings
     Given the content repository contains a draft page
-    And the SHOW_DRAFTS environment variable is not set
+    And the OSE_WEB_SHOW_DRAFTS environment variable is not set
     When the content service lists all updates
     Then the draft page is not included in the results
 

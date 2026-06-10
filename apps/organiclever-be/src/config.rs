@@ -2,6 +2,14 @@
 
 use std::env;
 
+const DEFAULT_DATABASE_URL: &str = "postgres://postgres:postgres@localhost:5432/organiclever";
+const DEFAULT_PORT: u16 = 8202_u16;
+const DEFAULT_CORS_ORIGINS: &str = "*";
+
+const ENV_DATABASE_URL: &str = "DATABASE_URL";
+const ENV_PORT: &str = "ORGANICLEVER_BE_PORT";
+const ENV_CORS_ORIGINS: &str = "ORGANICLEVER_BE_CORS_ORIGINS";
+
 /// Runtime configuration for the organiclever-be server.
 pub struct Config {
     /// `PostgreSQL` connection URL.
@@ -19,14 +27,28 @@ impl Config {
     /// always succeeds.
     #[must_use]
     pub fn from_env() -> Self {
-        let database_url = env::var("DATABASE_URL").unwrap_or_else(|_| {
-            "postgres://postgres:postgres@localhost:5432/organiclever".to_owned()
-        });
-        let port = env::var("PORT")
+        Self::from_env_fn(|key| env::var(key))
+    }
+
+    /// Load configuration using a custom env-var lookup function.
+    ///
+    /// This seam exists so unit tests can supply a mock lookup without
+    /// mutating the process environment (which requires `unsafe` in edition
+    /// 2024).
+    ///
+    /// Production code must use [`Config::from_env`] instead.
+    pub fn from_env_fn<F>(lookup: F) -> Self
+    where
+        F: Fn(&str) -> Result<String, env::VarError>,
+    {
+        let database_url =
+            lookup(ENV_DATABASE_URL).unwrap_or_else(|_| DEFAULT_DATABASE_URL.to_owned());
+        let port = lookup(ENV_PORT)
             .ok()
             .and_then(|p| p.parse().ok())
-            .unwrap_or(8202_u16);
-        let cors_origins = env::var("CORS_ORIGINS").unwrap_or_else(|_| "*".to_owned());
+            .unwrap_or(DEFAULT_PORT);
+        let cors_origins =
+            lookup(ENV_CORS_ORIGINS).unwrap_or_else(|_| DEFAULT_CORS_ORIGINS.to_owned());
         Self {
             database_url,
             port,
@@ -49,13 +71,13 @@ impl Config {
     #[must_use]
     pub fn from_env_with(database_url: &str, port: &str, cors_origins: &str) -> Self {
         let database_url = if database_url.is_empty() {
-            "postgres://postgres:postgres@localhost:5432/organiclever".to_owned()
+            DEFAULT_DATABASE_URL.to_owned()
         } else {
             database_url.to_owned()
         };
-        let port: u16 = port.parse().unwrap_or(8202_u16);
+        let port: u16 = port.parse().unwrap_or(DEFAULT_PORT);
         let cors_origins = if cors_origins.is_empty() {
-            "*".to_owned()
+            DEFAULT_CORS_ORIGINS.to_owned()
         } else {
             cors_origins.to_owned()
         };

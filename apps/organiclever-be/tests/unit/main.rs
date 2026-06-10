@@ -1,7 +1,41 @@
 //! Unit tests for organiclever-be library.
 
 mod config_tests {
+    use std::env;
+
     use organiclever_be::config::Config;
+
+    /// Helper: build a mock env-var lookup from a static list of key-value pairs.
+    fn mock_env(
+        pairs: &'static [(&'static str, &'static str)],
+    ) -> impl Fn(&str) -> Result<String, env::VarError> {
+        |key: &str| {
+            pairs
+                .iter()
+                .find(|(k, _)| *k == key)
+                .map(|(_, v)| v.to_string())
+                .ok_or(env::VarError::NotPresent)
+        }
+    }
+
+    // RED: Config must read ORGANICLEVER_BE_PORT, not PORT.
+    // Fails until the ENV_PORT constant is renamed to "ORGANICLEVER_BE_PORT".
+    #[test]
+    fn prefixed_port_key_resolves_to_port_value() {
+        let config = Config::from_env_fn(mock_env(&[("ORGANICLEVER_BE_PORT", "8299")]));
+        assert_eq!(config.port, 8299_u16);
+    }
+
+    // RED: Config must read ORGANICLEVER_BE_CORS_ORIGINS, not CORS_ORIGINS.
+    // Fails until the ENV_CORS_ORIGINS constant is renamed to "ORGANICLEVER_BE_CORS_ORIGINS".
+    #[test]
+    fn prefixed_cors_origins_key_resolves_to_cors_value() {
+        let config = Config::from_env_fn(mock_env(&[(
+            "ORGANICLEVER_BE_CORS_ORIGINS",
+            "https://example.com",
+        )]));
+        assert_eq!(config.cors_origins, "https://example.com");
+    }
 
     #[test]
     fn test_default_port() {

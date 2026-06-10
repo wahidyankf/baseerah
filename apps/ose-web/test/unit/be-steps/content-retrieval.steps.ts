@@ -85,8 +85,8 @@ describeFeature(feature, ({ Scenario, Background }) => {
       // testContentServiceWithDraft has a draft page included
     });
 
-    And("the SHOW_DRAFTS environment variable is not set", () => {
-      delete process.env["SHOW_DRAFTS"];
+    And("the OSE_WEB_SHOW_DRAFTS environment variable is not set", () => {
+      delete process.env["OSE_WEB_SHOW_DRAFTS"];
     });
 
     When("the content service lists all updates", async () => {

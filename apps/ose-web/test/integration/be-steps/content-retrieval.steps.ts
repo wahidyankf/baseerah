@@ -78,8 +78,8 @@ describeFeature(feature, ({ Scenario, Background }) => {
       // real content/ directory may or may not have drafts; draft filtering is tested via env var
     });
 
-    And("the SHOW_DRAFTS environment variable is not set", () => {
-      delete process.env["SHOW_DRAFTS"];
+    And("the OSE_WEB_SHOW_DRAFTS environment variable is not set", () => {
+      delete process.env["OSE_WEB_SHOW_DRAFTS"];
     });
 
     When("the content service lists all updates", async () => {

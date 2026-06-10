@@ -115,7 +115,7 @@ export class ContentService {
   }
 
   private getUpdatesFromMap(contentMap: Map<string, ContentMeta>): ContentMeta[] {
-    const showDrafts = process.env["SHOW_DRAFTS"] === "true";
+    const showDrafts = process.env["OSE_WEB_SHOW_DRAFTS"] === "true";
     return [...contentMap.values()]
       .filter((m) => m.category === "updates" && !m.isSection && (!m.draft || showDrafts))
       .sort((a, b) => {

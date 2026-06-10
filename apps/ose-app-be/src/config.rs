@@ -2,6 +2,19 @@
 
 use std::env;
 
+const DEFAULT_DATABASE_URL: &str = "postgres://ose_app:ose_app@localhost:5432/ose_app";
+const DEFAULT_PORT: u16 = 8302_u16;
+const DEFAULT_CORS_ORIGINS: &str = "*";
+const DEFAULT_OPENROUTER_MODEL: &str = "openrouter/auto";
+const DEFAULT_OPENROUTER_BASE_URL: &str = "https://openrouter.ai/api/v1";
+
+const ENV_DATABASE_URL: &str = "DATABASE_URL";
+const ENV_PORT: &str = "OSE_APP_BE_PORT";
+const ENV_CORS_ORIGINS: &str = "OSE_APP_BE_CORS_ORIGINS";
+const ENV_OPENROUTER_API_KEY: &str = "OSE_APP_BE_OPENROUTER_API_KEY";
+const ENV_OPENROUTER_MODEL: &str = "OSE_APP_BE_OPENROUTER_MODEL";
+const ENV_OPENROUTER_BASE_URL: &str = "OSE_APP_BE_OPENROUTER_BASE_URL";
+
 /// Runtime configuration for the `ose-app-be` server.
 pub struct Config {
     /// `PostgreSQL` connection URL.
@@ -25,18 +38,33 @@ impl Config {
     /// always succeeds.
     #[must_use]
     pub fn from_env() -> Self {
-        let database_url = env::var("DATABASE_URL")
-            .unwrap_or_else(|_| "postgres://ose_app:ose_app@localhost:5432/ose_app".to_owned());
-        let port = env::var("PORT")
+        Self::from_env_fn(|key| env::var(key))
+    }
+
+    /// Load configuration using a custom env-var lookup function.
+    ///
+    /// This seam exists so unit tests can supply a mock lookup without
+    /// mutating the process environment (which requires `unsafe` in edition
+    /// 2024).
+    ///
+    /// Production code must use [`Config::from_env`] instead.
+    pub fn from_env_fn<F>(lookup: F) -> Self
+    where
+        F: Fn(&str) -> Result<String, env::VarError>,
+    {
+        let database_url =
+            lookup(ENV_DATABASE_URL).unwrap_or_else(|_| DEFAULT_DATABASE_URL.to_owned());
+        let port = lookup(ENV_PORT)
             .ok()
             .and_then(|p| p.parse().ok())
-            .unwrap_or(8302_u16);
-        let cors_origins = env::var("CORS_ORIGINS").unwrap_or_else(|_| "*".to_owned());
-        let openrouter_api_key = env::var("OPENROUTER_API_KEY").unwrap_or_default();
+            .unwrap_or(DEFAULT_PORT);
+        let cors_origins =
+            lookup(ENV_CORS_ORIGINS).unwrap_or_else(|_| DEFAULT_CORS_ORIGINS.to_owned());
+        let openrouter_api_key = lookup(ENV_OPENROUTER_API_KEY).unwrap_or_default();
         let openrouter_model =
-            env::var("OPENROUTER_MODEL").unwrap_or_else(|_| "openrouter/auto".to_owned());
-        let openrouter_base_url = env::var("OPENROUTER_BASE_URL")
-            .unwrap_or_else(|_| "https://openrouter.ai/api/v1".to_owned());
+            lookup(ENV_OPENROUTER_MODEL).unwrap_or_else(|_| DEFAULT_OPENROUTER_MODEL.to_owned());
+        let openrouter_base_url = lookup(ENV_OPENROUTER_BASE_URL)
+            .unwrap_or_else(|_| DEFAULT_OPENROUTER_BASE_URL.to_owned());
         Self {
             database_url,
             port,
@@ -72,24 +100,24 @@ impl Config {
         openrouter_base_url: &str,
     ) -> Self {
         let database_url = if database_url.is_empty() {
-            "postgres://ose_app:ose_app@localhost:5432/ose_app".to_owned()
+            DEFAULT_DATABASE_URL.to_owned()
         } else {
             database_url.to_owned()
         };
-        let port: u16 = port.parse().unwrap_or(8302_u16);
+        let port: u16 = port.parse().unwrap_or(DEFAULT_PORT);
         let cors_origins = if cors_origins.is_empty() {
-            "*".to_owned()
+            DEFAULT_CORS_ORIGINS.to_owned()
         } else {
             cors_origins.to_owned()
         };
         let openrouter_api_key = openrouter_api_key.to_owned();
         let openrouter_model = if openrouter_model.is_empty() {
-            "openrouter/auto".to_owned()
+            DEFAULT_OPENROUTER_MODEL.to_owned()
         } else {
             openrouter_model.to_owned()
         };
         let openrouter_base_url = if openrouter_base_url.is_empty() {
-            "https://openrouter.ai/api/v1".to_owned()
+            DEFAULT_OPENROUTER_BASE_URL.to_owned()
         } else {
             openrouter_base_url.to_owned()
         };

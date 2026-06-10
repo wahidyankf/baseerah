@@ -261,9 +261,9 @@ describe("ContentService getBySlug prev/next navigation", () => {
   });
 });
 
-// --- service.ts: SHOW_DRAFTS=true path ---
+// --- service.ts: OSE_WEB_SHOW_DRAFTS=true path ---
 describe("ContentService draft visibility", () => {
-  it("includes draft posts when SHOW_DRAFTS is true", async () => {
+  it("includes draft posts when OSE_WEB_SHOW_DRAFTS is true", async () => {
     const repo = new InMemoryContentRepository([
       {
         meta: {
@@ -284,10 +284,10 @@ describe("ContentService draft visibility", () => {
     ]);
     const service = new ContentService(repo);
 
-    process.env["SHOW_DRAFTS"] = "true";
+    process.env["OSE_WEB_SHOW_DRAFTS"] = "true";
     const updates = await service.listUpdates();
     expect(updates.some((u) => u.draft)).toBe(true);
 
-    delete process.env["SHOW_DRAFTS"];
+    delete process.env["OSE_WEB_SHOW_DRAFTS"];
   });
 });
