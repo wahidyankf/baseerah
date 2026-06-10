@@ -2,17 +2,28 @@
 
 use std::env;
 
+/// Default database connection URL used when `DATABASE_URL` is not set.
 const DEFAULT_DATABASE_URL: &str = "postgres://ose_app:ose_app@localhost:5432/ose_app";
+/// Default TCP port when `OSE_APP_BE_PORT` is not set.
 const DEFAULT_PORT: u16 = 8302_u16;
+/// Default allowed CORS origins when `OSE_APP_BE_CORS_ORIGINS` is not set.
 const DEFAULT_CORS_ORIGINS: &str = "*";
+/// Default `OpenRouter` model when `OSE_APP_BE_OPENROUTER_MODEL` is not set.
 const DEFAULT_OPENROUTER_MODEL: &str = "openrouter/auto";
+/// Default `OpenRouter` base URL when `OSE_APP_BE_OPENROUTER_BASE_URL` is not set.
 const DEFAULT_OPENROUTER_BASE_URL: &str = "https://openrouter.ai/api/v1";
 
+/// Environment variable name for the database connection URL.
 const ENV_DATABASE_URL: &str = "DATABASE_URL";
+/// Environment variable name for the server port.
 const ENV_PORT: &str = "OSE_APP_BE_PORT";
+/// Environment variable name for allowed CORS origins.
 const ENV_CORS_ORIGINS: &str = "OSE_APP_BE_CORS_ORIGINS";
+/// Environment variable name for the `OpenRouter` API key.
 const ENV_OPENROUTER_API_KEY: &str = "OSE_APP_BE_OPENROUTER_API_KEY";
+/// Environment variable name for the `OpenRouter` model identifier.
 const ENV_OPENROUTER_MODEL: &str = "OSE_APP_BE_OPENROUTER_MODEL";
+/// Environment variable name for the `OpenRouter` base URL.
 const ENV_OPENROUTER_BASE_URL: &str = "OSE_APP_BE_OPENROUTER_BASE_URL";
 
 /// Runtime configuration for the `ose-app-be` server.

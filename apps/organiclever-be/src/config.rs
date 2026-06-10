@@ -2,12 +2,18 @@
 
 use std::env;
 
+/// Default database connection URL used when `DATABASE_URL` is not set.
 const DEFAULT_DATABASE_URL: &str = "postgres://postgres:postgres@localhost:5432/organiclever";
+/// Default TCP port when `ORGANICLEVER_BE_PORT` is not set.
 const DEFAULT_PORT: u16 = 8202_u16;
+/// Default allowed CORS origins when `ORGANICLEVER_BE_CORS_ORIGINS` is not set.
 const DEFAULT_CORS_ORIGINS: &str = "*";
 
+/// Environment variable name for the database connection URL.
 const ENV_DATABASE_URL: &str = "DATABASE_URL";
+/// Environment variable name for the server port.
 const ENV_PORT: &str = "ORGANICLEVER_BE_PORT";
+/// Environment variable name for allowed CORS origins.
 const ENV_CORS_ORIGINS: &str = "ORGANICLEVER_BE_CORS_ORIGINS";
 
 /// Runtime configuration for the organiclever-be server.
