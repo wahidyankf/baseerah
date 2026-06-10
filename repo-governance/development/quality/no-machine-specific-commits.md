@@ -33,7 +33,7 @@ This practice implements/respects the following conventions:
 
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Configuration template files follow the standard naming pattern (e.g., `.env.example`) so they are discoverable and version-controlled without exposing real values.
 
-- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The credential/secret subset of machine-specific information is governed by the hard iron rule — no system secret may ever be committed; real values stay in uncommitted `.env*` files.
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: The credential/secret subset of machine-specific information is governed by the hard iron rule — no system secret may ever be committed; real values stay in uncommitted `.env*` files.
 
 ## Overview
 
@@ -210,7 +210,7 @@ If machine-specific information has already been committed:
 2. Commit the corrected version.
 3. If the value was sensitive (a credential or API key), rotate the credential immediately — git
    history is permanent and the value is considered exposed even after removal from HEAD. See the
-   [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md) for the complete
+   [No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md) for the complete
    remediation procedure and the full definition of what counts as a system secret.
 
 For non-sensitive path leaks (e.g., a developer's home directory appeared in a test), a simple corrective commit is sufficient.

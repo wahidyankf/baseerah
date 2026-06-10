@@ -38,7 +38,7 @@ This practice implements/respects the following conventions:
 
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Pre-commit hook formats all files matching the repository's file naming patterns without altering the naming structure.
 
-- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The hard iron
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: The hard iron
   rule that no system secret may ever be committed applies to every file touched by this practice —
   source code, config files, hook scripts, and staged content alike. Real secrets belong in
   gitignored `.env*` files; committed files use only placeholders or env-var references.

@@ -346,7 +346,7 @@ Use the format `Sev-N — Label` in the metadata table, e.g., `Sev-3 — Moderat
 ### No Secrets Rule
 
 Post-mortems are committed to git and become permanent record. Apply the
-[No Secrets in Git](../security/no-secrets-in-git.md) rule without exception.
+[No Secrets in Git](../security/no-secrets-in-committed-files.md) rule without exception.
 
 Use placeholders for any sensitive identifier that appears in timelines, log excerpts, or
 configuration references:
@@ -425,7 +425,7 @@ A post-mortem is complete when:
 **In-repo**:
 
 - [`docs/explanation/post-mortems/README.md`](../../../docs/explanation/post-mortems/README.md) — Writer-facing template and index
-- [No Secrets in Git](../security/no-secrets-in-git.md) — Hard iron rule; applies in full to post-mortems
+- [No Secrets in Git](../security/no-secrets-in-committed-files.md) — Hard iron rule; applies in full to post-mortems
 - [Diagrams Convention](../formatting/diagrams.md) — Mermaid syntax and accessibility rules
 - [Color Accessibility Convention](../formatting/color-accessibility.md) — Verified WCAG AA palette
 - [Timestamp Format](../formatting/timestamp.md) — UTC+7 WIB standard used in timelines

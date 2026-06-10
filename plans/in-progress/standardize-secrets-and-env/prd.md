@@ -62,7 +62,7 @@ Scenario: Contributor finds one authoritative secrets/env document
   Given the repository governance under repo-governance/conventions/security/
   When a contributor opens secrets-and-env-standards.md
   Then it documents naming, layout, annotation, validation, and the storage-tier ladder
-  And no-secrets-in-git.md has been renamed to no-secrets-in-committed-files.md (canonical name)
+  And no-secrets-in-committed-files.md has been renamed to no-secrets-in-committed-files.md (canonical name)
   And no-secrets-in-committed-files.md, env-file-access.md, and reproducible-environments.md each contain a stub pointing to it
   And every inbound link is rewritten to the renamed/folded targets
   And security/README.md links the hub as the authoritative source
@@ -205,7 +205,7 @@ Scenario: The Terraform/Ansible validator branch is present but inactive
 
 ### In Scope (Product)
 
-- Hub convention document; the `no-secrets-in-git.md` → `no-secrets-in-committed-files.md` rename to
+- Hub convention document; the `no-secrets-in-committed-files.md` → `no-secrets-in-committed-files.md` rename to
   the canonical name; the three stub redirects with all inbound links rewritten; the
   `security/README.md` repoint.
 - Per-app naming standard applied across both Rust backends and the five Next.js webs (rename), and

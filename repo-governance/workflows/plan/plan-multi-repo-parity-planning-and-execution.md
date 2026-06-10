@@ -349,7 +349,7 @@ Plans and executes only the two listed repos; the pre-execution grill confirms w
   chose continue-on-failure in the pre-execution grill
 - **No PR-mode execution**: plans awaiting review are never executed by this composite
 - **Hook compliance and secrets rule**: every commit in every repo passes that repo's hooks; the
-  [No Secrets in Git convention](../../conventions/security/no-secrets-in-git.md) applies in full
+  [No Secrets in Git convention](../../conventions/security/no-secrets-in-committed-files.md) applies in full
 
 ## Related Workflows
 

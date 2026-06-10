@@ -130,7 +130,7 @@ Never paste secrets or credential material — see no-secrets rule. -->
 - **Layout**: flat directory — no subdirectories inside `docs/explanation/post-mortems/`. Revisit folder grouping (e.g., by year) only if volume grows.
 - **Timing**: write promptly while details are fresh (within a few days of the incident).
 - **`doc_status`**: `draft` → `reviewed` → `closed`. Advance to `closed` only once all P0 action items resolve. This is the document lifecycle, distinct from the incident `Status` field in the metadata table.
-- **No secrets**: never commit real tokens, passwords, API keys, connection strings, or other sensitive values to any git-tracked file. Use placeholders per the [No Secrets in Git](../../../repo-governance/conventions/security/no-secrets-in-git.md) convention, and state where the real value lives. This applies without exception to timelines, log excerpts, and configuration references in post-mortems.
+- **No secrets**: never commit real tokens, passwords, API keys, connection strings, or other sensitive values to any git-tracked file. Use placeholders per the [No Secrets in Git](../../../repo-governance/conventions/security/no-secrets-in-committed-files.md) convention, and state where the real value lives. This applies without exception to timelines, log excerpts, and configuration references in post-mortems.
 - **Blameless tone**: describe systems, conditions, and decisions — not individuals. See the blameless principle in the [Post-Mortem Convention](../../../repo-governance/conventions/structure/post-mortems.md).
 
 ## Index

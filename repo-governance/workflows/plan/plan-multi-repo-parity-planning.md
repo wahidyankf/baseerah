@@ -563,7 +563,7 @@ config changes. Execution of the objective happens downstream via the
 repo. No hook bypassing; no `--no-verify`.
 
 **Secrets rule**: The
-[No Secrets in Git convention](../../conventions/security/no-secrets-in-git.md) applies in full.
+[No Secrets in Git convention](../../conventions/security/no-secrets-in-committed-files.md) applies in full.
 No system secret (key, password, API token, connection string) enters any plan file.
 
 **PR mode for review**: When the invoker wants formal review of plans before they go active,
@@ -619,7 +619,7 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
 - **[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md)**: When
   ose-primer is in the parity set and mode is a main-push mode, the deviation from the PR-only
   default is surfaced in grilling and requires explicit invoker approval.
-- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: No
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: No
   system secret enters any plan file or rationale doc created by this workflow.
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:
   External research delegated to `web-research-maker` in Step 4 when the research-needed flag

@@ -21,15 +21,14 @@ commits of sensitive files, and related security events.
 
 ## Conventions
 
-- [No Secrets in Git](./no-secrets-in-git.md) — The hard iron rule that no system secret (SSH/private
-  keys, passwords, API tokens, privileged usernames, certificates, connection strings, and similar)
-  may ever be committed to any git-tracked file in this repository. Real secret values belong in
-  uncommitted `.env*` files (except `.env.example`) or other gitignored files. The broad governing
-  rule that `guard-env-file-access` partially enforces.
-- [Environment File Access](./env-file-access.md) — The `guard-env-file-access` policy. AI agents
-  must not directly read, write, edit, or commit any `.env*` file except `.env.example`. Covers the
-  script carve-out, trust boundary, git-commit prevention (gitignore + pre-commit guard), cross-platform
-  enforcement paths, and known gaps with accepted compensating controls.
+- [Secrets and Env Standards](./secrets-and-env-standards.md) — **Hub doc.** The authoritative
+  reference for naming convention, `.env.example` layout, annotation format, startup validation,
+  `rhino-cli env` toolchain, storage-tier ladder, drift guard (`env-contract.yaml`), and
+  `guard-env-file-access` policy.
+- [No Secrets in Committed Files](./no-secrets-in-committed-files.md) — Hard iron rule stub.
+  No system secret may enter any git-tracked file. Full details in the hub doc.
+- [Environment File Access](./env-file-access.md) — `guard-env-file-access` policy stub.
+  AI agents must not directly access `.env*` files except `.env.example`. Full details in the hub doc.
 
 ## Related Documentation
 

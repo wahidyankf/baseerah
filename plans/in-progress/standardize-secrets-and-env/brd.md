@@ -30,16 +30,16 @@ to learn the rules.
 
 ## Business Impact
 
-| Pain point today                                                                     | After this plan                                                                                                                                                                   |
-| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Missing/mistyped env value defaults silently at runtime (both backends)              | `dotenvy` + `envy` abort backend startup with a named-variable error                                                                                                              |
-| No build-time env validation in any Next.js web                                      | `@t3-oss/env-nextjs` + `zod` (v4) fail the build on a missing/invalid public or server var                                                                                        |
-| Code and config can disagree silently                                                | `rhino-cli env validate` fails pre-push/CI on any code↔config key mismatch                                                                                                        |
-| No naming rule; prefixed and unprefixed vars coexist arbitrarily                     | One per-app-prefix standard with documented framework exemptions                                                                                                                  |
-| `infra/dev/<group>/.env.example` duplicates `apps/<app>/.env.example` keys           | One source of truth per app under `apps/<app>/` (Nx-native)                                                                                                                       |
-| `env backup` skips `.secrets/` (hidden-dir) and `secrets.json` (non-`.env` basename) | One `env backup` captures every secret kind (`.env*`, `.secrets/`, `secrets.json`)                                                                                                |
-| `.env.example` files give no type/required hints                                     | Every variable annotated (required/optional, type, format)                                                                                                                        |
-| Three docs, no hub; rules must be reassembled by the reader                          | One hub convention; `no-secrets-in-git.md` is renamed to the canonical `no-secrets-in-committed-files.md`, the three become stub redirects, and `security/README.md` points to it |
+| Pain point today                                                                     | After this plan                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Missing/mistyped env value defaults silently at runtime (both backends)              | `dotenvy` + `envy` abort backend startup with a named-variable error                                                                                                                          |
+| No build-time env validation in any Next.js web                                      | `@t3-oss/env-nextjs` + `zod` (v4) fail the build on a missing/invalid public or server var                                                                                                    |
+| Code and config can disagree silently                                                | `rhino-cli env validate` fails pre-push/CI on any code↔config key mismatch                                                                                                                    |
+| No naming rule; prefixed and unprefixed vars coexist arbitrarily                     | One per-app-prefix standard with documented framework exemptions                                                                                                                              |
+| `infra/dev/<group>/.env.example` duplicates `apps/<app>/.env.example` keys           | One source of truth per app under `apps/<app>/` (Nx-native)                                                                                                                                   |
+| `env backup` skips `.secrets/` (hidden-dir) and `secrets.json` (non-`.env` basename) | One `env backup` captures every secret kind (`.env*`, `.secrets/`, `secrets.json`)                                                                                                            |
+| `.env.example` files give no type/required hints                                     | Every variable annotated (required/optional, type, format)                                                                                                                                    |
+| Three docs, no hub; rules must be reassembled by the reader                          | One hub convention; `no-secrets-in-committed-files.md` is renamed to the canonical `no-secrets-in-committed-files.md`, the three become stub redirects, and `security/README.md` points to it |
 
 ## Affected Roles
 
@@ -76,7 +76,7 @@ apps/ayokoding-web` shows only prefixed keys; `DATABASE_URL`, framework `PORT`, 
    and both the pre-push hook and a CI workflow invoke the same command.
 5. **Single hub doc exists; doc canonicalized**:
    `repo-governance/conventions/security/secrets-and-env-standards.md` exists;
-   `no-secrets-in-git.md` is **renamed** to `no-secrets-in-committed-files.md` (matching the ose-infra
+   `no-secrets-in-committed-files.md` is **renamed** to `no-secrets-in-committed-files.md` (matching the ose-infra
    canonical name); the three prior docs (`no-secrets-in-committed-files.md`, `env-file-access.md`,
    `reproducible-environments.md`) are stubs pointing to the hub; every inbound link is rewritten to
    the renamed/folded targets; `security/README.md` repoints to the hub; no inbound link is broken

@@ -50,7 +50,7 @@ level definitions, coverage thresholds, Docker patterns, GitHub Actions structur
   definitions (unit, integration, E2E) and the isolation rules enforced here derive from the
   authoritative three-level testing standard.
 
-- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: The
   no-hardcoded-secrets rule for CI workflows is one enforcement point of the broader hard iron rule
   that no system secret may ever be committed to any git-tracked file.
 
@@ -436,7 +436,7 @@ Every app with runtime configuration must satisfy these requirements:
 - **No hardcoded secrets in CI workflows**: GitHub Actions workflows must reference secrets via
   `${{ secrets.SECRET_NAME }}`. Plain-text credentials must never appear in workflow YAML files,
   even in non-production environments. This is one enforcement point of the broader
-  [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md), which is the
+  [No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md), which is the
   hard iron rule governing all git-tracked files in this repository.
 
 When a new variable is added to an app, the developer must update `.env.example` in the same

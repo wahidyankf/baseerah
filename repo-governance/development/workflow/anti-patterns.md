@@ -336,7 +336,7 @@ API_KEY=sk_test_local
 **Rationale:**
 
 - No secrets in code — see
-  [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md) for the full hard
+  [No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md) for the full hard
   iron rule governing all git-tracked files, not just source code
 - Environment-specific config
 - Safe local development
@@ -504,7 +504,7 @@ git pull origin main  # Always rebases for main branch
 - [Implementation Workflow Convention](./implementation.md) - Three-stage methodology
 - [Reproducible Environments Convention](./reproducible-environments.md) - Environment practices
 - [Best Practices](./best-practices.md) - Recommended patterns
-- [No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md) - Hard iron rule
+- [No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md) - Hard iron rule
   governing Anti-Pattern 9 and all committed files: no system secret may ever enter git history
 
 ## Conclusion
@@ -536,4 +536,4 @@ When implementing workflows, ask: **Am I adding collaboration or friction?** If 
 - **[Content Quality Principles](../../conventions/writing/quality.md)**: Active voice, clear problem/solution format in documentation
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Workflow documents follow standardized kebab-case naming
 - **[Linking Convention](../../conventions/formatting/linking.md)**: GitHub-compatible links to related workflow documentation
-- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The hard iron rule governing Anti-Pattern 9 — no system secret may ever enter git history
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: The hard iron rule governing Anti-Pattern 9 — no system secret may ever enter git history

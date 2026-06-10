@@ -138,7 +138,7 @@ graph TD
 ## References
 
 - [Post-Mortem Convention](../../../repo-governance/conventions/structure/post-mortems.md) — authoritative rules governing this document
-- [No Secrets in Git](../../../repo-governance/conventions/security/no-secrets-in-git.md) — hard iron rule; this incident has no secrets, but the rule applies to all post-mortems
+- [No Secrets in Git](../../../repo-governance/conventions/security/no-secrets-in-committed-files.md) — hard iron rule; this incident has no secrets, but the rule applies to all post-mortems
 - `.prettierignore` — root-level Prettier ignore file where the fix was applied
 - `validate:cross-vendor-parity` Nx target — the parity guard that detected the byte drift (defined in `nx.json` / project config)
 - [Multi-Harness Binding Convention](../../../repo-governance/conventions/structure/multi-harness-binding.md) — defines the cross-vendor parity guard and the emitter-generated bindings (`.amazonq/`) involved in this incident

@@ -683,18 +683,18 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       (commented forward-scaffold) — each with its path, consuming tool, and whether it is backed up
       and/or validated. Document the **hybrid backup** source-of-truth (hardcoded floor ∪
       `env-contract.yaml` `backup_globs`) and note the now-aligned cross-repo doc name
-      (`no-secrets-in-committed-files.md`, renamed from `no-secrets-in-git.md` by this plan to match
+      (`no-secrets-in-committed-files.md`, renamed from `no-secrets-in-committed-files.md` by this plan to match
       the siblings).
   - _Suggested executor: `docs-maker`_
 - [ ] [AI] **Canonicalize the doc name (this repo acts)** (`tech-docs.md § 9 R10`): `git mv
-repo-governance/conventions/security/no-secrets-in-git.md repo-governance/conventions/security/no-secrets-in-committed-files.md`
+repo-governance/conventions/security/no-secrets-in-committed-files.md repo-governance/conventions/security/no-secrets-in-committed-files.md`
       to match the ose-infra canonical name. Then reduce the renamed file to a stub: keep its title +
       a one-paragraph summary of the hard iron rule (so the rule stays greppable) and link to the hub
       doc as the authoritative source.
 - [ ] [AI] **Rewrite all inbound links to the renamed doc**: run
       `grep -rln "no-secrets-in-git" --include="*.md" . | grep -v node_modules | grep -v plans/done`
       and rewrite every active hit (CLAUDE.md, AGENTS.md, indexes, `docs/`, `.claude/` agents/skills,
-      this plan's own cross-refs) from `no-secrets-in-git.md` to `no-secrets-in-committed-files.md`
+      this plan's own cross-refs) from `no-secrets-in-committed-files.md` to `no-secrets-in-committed-files.md`
       (or to the hub where the link is a content reference, not the hard-iron-rule anchor) — acceptance:
       re-run the grep; remaining active hits are only historical `plans/done/**` (left untouched).
 - [ ] [AI] Reduce `repo-governance/conventions/security/env-file-access.md` to a stub redirecting to
@@ -707,7 +707,7 @@ repo-governance/conventions/security/no-secrets-in-git.md repo-governance/conven
 - [ ] [AI] Write `docs/explanation/standardize-secrets-and-env-parity-decisions.md` explaining each
       cross-repo decision (the full 15-decision matrix from `tech-docs.md § 9`), emphasizing public's
       deviations and parity actions: no IaC (forward-scaffold/commented), the doc canonicalization
-      rename (`no-secrets-in-git.md` → `no-secrets-in-committed-files.md`), single Rust rhino-cli (no
+      rename (`no-secrets-in-committed-files.md` → `no-secrets-in-committed-files.md`), single Rust rhino-cli (no
       go twin), the canonical backup default dir (`~/<repo-root-basename>-env-backup`), building on
       prior env-backup/guard work, and the layout consolidation. Cross-link the sibling plans
       (`tech-docs.md § 9` / README "Sibling Plans"). Match the structure of the existing
@@ -754,7 +754,7 @@ repo-governance/conventions/security/no-secrets-in-git.md repo-governance/conven
 - [ ] [AI] Run `npm run lint:md` and `npm run format:md:check` — exit 0.
 - [ ] [AI] Re-verify every BRD success criterion: per-app naming applied with zero residue; both
       backends validate startup; every web validates at build time; the drift guard is wired and
-      bites; the hub doc exists, `no-secrets-in-git.md` is renamed to `no-secrets-in-committed-files.md`
+      bites; the hub doc exists, `no-secrets-in-committed-files.md` is renamed to `no-secrets-in-committed-files.md`
       with the three stubs + all inbound links rewritten + `security/README.md` repoint; layout
       consolidated; backup covers `.env*`/`.secrets/`/`secrets.json` with `--dry-run` and the canonical
       `~/ose-public-env-backup` default dir; deps exact-pinned + cleared (zod on 4.x, envy staleness

@@ -724,7 +724,7 @@ Every delivery plan MUST end with a plan archival section:
 
 **Related Conventions**:
 
-- [No Secrets in Git Convention](../../../repo-governance/conventions/security/no-secrets-in-git.md) - Hard iron rule: no system secret (keys, passwords, tokens, connection strings, etc.) may appear in any committed plan file. Use placeholders or env-var references instead.
+- [No Secrets in Git Convention](../../../repo-governance/conventions/security/no-secrets-in-committed-files.md) - Hard iron rule: no system secret (keys, passwords, tokens, connection strings, etc.) may appear in any committed plan file. Use placeholders or env-var references instead.
 - [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md) - Every grill question MUST present 2-4 concrete options; open-ended questions are FORBIDDEN; one option marked recommended; interactive multiple-choice tool preferred
 - [Test-Driven Development Convention](../../../repo-governance/development/workflow/test-driven-development.md) - Mandates TDD (Red→Green→Refactor) for all code changes; defines the required RED/GREEN/REFACTOR three-substep shape for delivery checklists; includes HARD RULE against combining phases into one checkbox
 - [Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation

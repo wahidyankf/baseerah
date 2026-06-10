@@ -37,7 +37,7 @@ This practice implements/respects the following conventions:
 
 - **[Trunk Based Development](./trunk-based-development.md)**: Reproducible CI/CD environments ensure consistent validation of commits to main branch. No environment-specific failures.
 
-- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md)**: The `.env.example` template carries placeholders only; real secret values stay in uncommitted `.env*` files, keeping secrets out of version control while configuration shape remains reproducible.
+- **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: The `.env.example` template carries placeholders only; real secret values stay in uncommitted `.env*` files, keeping secrets out of version control while configuration shape remains reproducible.
 
 ## Overview
 
@@ -227,135 +227,20 @@ git commit -m "chore: update dependencies"
 
 ## Environment Configuration
 
-### .env Files
+> **Stub.** The full env/secrets standards — naming convention, annotation format, `.env.example`
+> layout, startup validation, `rhino-cli env` toolchain, and drift guard — live in
+> [`secrets-and-env-standards.md`](../../conventions/security/secrets-and-env-standards.md).
 
-**Pattern**: Committed example, gitignored actual config.
+### .env Files (summary)
 
-**Hard iron rule**: Real secret values never enter git. Per the
-[No Secrets in Git Convention](../../conventions/security/no-secrets-in-git.md), `.env.example` (the
-committed template) contains placeholders only; real secrets live exclusively in uncommitted `.env*`
-files (except `.env.example`) or other gitignored files.
+**Pattern**: Committed template (`apps/<app>/.env.example`), gitignored real file (`.env.local`).
 
-**.env.example** (committed to git):
+**Hard iron rule**: Real secret values never enter git. `.env.example` (committed template) contains
+placeholders only. See:
+[`secrets-and-env-standards.md` § 1](../../conventions/security/secrets-and-env-standards.md#1-hard-iron-rule--no-secrets-in-committed-files).
 
-```bash
-# Database
-DATABASE_URL=postgresql://localhost:5432/ose_dev
-DATABASE_USER=developer
-DATABASE_PASSWORD=dev_password
-
-# API
-API_PORT=3000
-API_BASE_URL=http://localhost:3000
-
-# External Services
-PAYMENT_GATEWAY_URL=https://sandbox.payment.example.com
-PAYMENT_API_KEY=your_api_key_here
-
-# Feature Flags
-ENABLE_EXPERIMENTAL_FEATURES=false
-```
-
-**.env** (gitignored, created by developers):
-
-```bash
-# Copy from .env.example
-cp .env.example .env
-
-# Edit with actual values
-DATABASE_PASSWORD=actual_secure_password
-PAYMENT_API_KEY=actual_api_key
-```
-
-**.gitignore**:
-
-```
-.env
-.env.local
-.env.*.local
-```
-
-### Backing Up and Restoring .env Files
-
-**`rhino-cli env backup/restore` is the recommended tool** for safely copying `.env*` files across machines, worktrees, or after fresh clones.
-
-The commands recursively find every `.env*` file in the repository (skipping auto-generated directories such as `node_modules`, `dist`, and `build`), copy them to a backup directory while preserving relative paths, and restore them back to their original locations on demand.
-
-**Basic usage**:
-
-```bash
-# Back up all .env* files to ~/ose-public-env-backup (default)
-npx nx run rhino-cli:run -- env backup
-
-# Restore from the default backup directory
-npx nx run rhino-cli:run -- env restore
-
-# Use a custom backup directory
-npx nx run rhino-cli:run -- env backup --dir /tmp/my-backup
-npx nx run rhino-cli:run -- env restore --dir /tmp/my-backup
-```
-
-**Worktree-aware backup** (namespaces by repo/worktree name, recommended when using git worktrees):
-
-```bash
-npx nx run rhino-cli:run -- env backup --worktree-aware
-npx nx run rhino-cli:run -- env restore --worktree-aware
-```
-
-**Safety constraints**:
-
-- Rejects backup directories that are inside the repository (prevents accidental commits of secrets)
-- Skips symlinks and files larger than 1 MB
-- Supports `--output json/markdown` for scripting and `--verbose`/`--quiet` for output control
-
-**Typical workflow** for setting up a new machine or worktree:
-
-1. On the source machine, run `npx nx run rhino-cli:run -- env backup` to capture current `.env*` files.
-2. Transfer the backup directory to the target machine (e.g., via a secure channel or shared network path).
-3. On the target machine, run `npx nx run rhino-cli:run -- env restore` to place `.env*` files back at their original repository paths.
-
-### Loading Environment Variables
-
-**Using dotenv**:
-
-```typescript
-// src/config/environment.ts
-import dotenv from "dotenv";
-
-dotenv.config();
-
-export const config = {
-  database: {
-    url: process.env.DATABASE_URL,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWORD,
-  },
-  api: {
-    port: parseInt(process.env.API_PORT || "3000", 10),
-    baseUrl: process.env.API_BASE_URL,
-  },
-};
-```
-
-### Validation
-
-**Validate required environment variables at startup**:
-
-```typescript
-// src/config/validate.ts
-const requiredEnvVars = ["DATABASE_URL", "DATABASE_USER", "DATABASE_PASSWORD", "API_PORT", "PAYMENT_GATEWAY_URL"];
-
-export function validateEnvironment(): void {
-  const missing = requiredEnvVars.filter((key) => !process.env[key]);
-
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(", ")}`);
-  }
-}
-
-// Call at application startup
-validateEnvironment();
-```
+**Backup and restore**: Use `rhino-cli env backup / restore`. See:
+[`secrets-and-env-standards.md` § 6](../../conventions/security/secrets-and-env-standards.md#6-rhino-cli-env-toolchain).
 
 ## Containerization for Complex Environments
 
