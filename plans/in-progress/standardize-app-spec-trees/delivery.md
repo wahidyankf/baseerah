@@ -424,6 +424,13 @@ worktrees/standardize-app-spec-trees--<family> -b spec-trees/<family> origin/mai
       (L71–177) and the example path (L58) to emit flat product-surface behavior dirs. Then
       `npm run generate:bindings`. Verify: `npm run validate:sync` passes.
   - _Suggested executor: `agent-maker`_
+- [ ] [AI] Update `.claude/agents/specs-fixer.md`: rewrite the bare-surface examples at L46
+      (`behavior/be/gherkin/`, `behavior/web/gherkin/`, `behavior/cli/gherkin/`) to the flat
+      product-surface form and update the fix report example path at L127 from
+      `specs/apps/organiclever/behavior/be/README.md` to
+      `specs/apps/organiclever/behavior/organiclever-be/README.md`. Then
+      `npm run generate:bindings`. Verify: `npm run validate:sync` passes.
+  - _Suggested executor: `agent-maker`_
 - [ ] [AI] Write the rationale doc
       `docs/explanation/standardize-app-spec-trees-parity-decisions.md` (new file; sibling pattern:
       `docs/explanation/plan-domain-parity-decisions.md` and

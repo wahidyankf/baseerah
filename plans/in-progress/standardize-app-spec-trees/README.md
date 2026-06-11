@@ -106,9 +106,9 @@ This plan is one of three parallel parity plans (one per repo in the
 each restructures its own families. `[Repo-grounded]` (this repo) /
 `[Unverified]` (sibling-repo paths — they live in separate repositories not checked out here).
 
-- **ose-primer** — `plans/in-progress/standardize-app-spec-trees/README.md`
+- **ose-primer** — `plans/done/2026-06-11__standardize-app-spec-trees/README.md`
   (restructures `crud`, `rhino`; convention text byte-identical to this plan's amendment).
-- **ose-infra** — `plans/in-progress/standardize-app-spec-trees/README.md`
+- **ose-infra** — `plans/done/2026-06-11__standardize-app-spec-trees/README.md`
   (restructures `coralpolyp`, `rhino`; convention text adapted, outside the sync loop).
 
 ## Navigation

@@ -255,6 +255,7 @@ flat product-surface form. Located via `Grep` across `repo-governance/`, `docs/`
 | `docs/explanation/software-engineering/automation-testing/tools/playwright/bdd.md` | organiclever L87–88, L295                                                                                                              |
 | `.claude/agents/specs-checker.md`                                                  | example paths L63, L182 (also rule additions — see Phase G)                                                                            |
 | `.claude/agents/specs-maker.md`                                                    | example path L58 + profile templates (see Phase G)                                                                                     |
+| `.claude/agents/specs-fixer.md`                                                    | L46 bare-surface examples in "Missing top-level README.md" fix category; L127 fix report example path `behavior/be/README.md`          |
 
 > Some governance docs (e.g. `specs-application-sync.md` L170) describe ayokoding with a
 > `behavior/be/gherkin` path that does not exist on disk today (ayokoding uses `api`). The sweep
