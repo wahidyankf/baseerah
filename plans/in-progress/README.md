@@ -4,9 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan | Description                     |
-| ---- | ------------------------------- |
-| —    | No plans currently in progress. |
+| Plan                                                                                         | Description                                                                     |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [bootstrap-be-messaging-and-crane-media](./bootstrap-be-messaging-and-crane-media/README.md) | Bootstrap BE messaging (NATS), crane-be F# media service, GHCR publish workflow |
 
 ## Instructions
 
