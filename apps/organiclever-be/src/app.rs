@@ -5,7 +5,7 @@ use tower_http::cors::CorsLayer;
 
 use crate::contexts::health::api::http as health_http;
 use crate::contexts::media::api::http as media_http;
-use crate::messaging::status::SharedMessagingStatus;
+use crate::contexts::messaging::status::SharedMessagingStatus;
 
 /// Application state shared across all handlers.
 #[derive(Clone)]

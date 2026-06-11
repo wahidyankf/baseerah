@@ -173,7 +173,7 @@ mod router_tests {
 }
 
 mod messaging_status_tests {
-    use organiclever_be::messaging::status;
+    use organiclever_be::contexts::messaging::status;
 
     #[test]
     fn new_shared_creates_default_status() {
@@ -207,7 +207,7 @@ mod messaging_status_handler_tests {
         http::{Request, StatusCode},
     };
     use organiclever_be::app::{AppState, router};
-    use organiclever_be::messaging::status as messaging_status;
+    use organiclever_be::contexts::messaging::status as messaging_status;
     use tower::ServiceExt as _;
 
     /// Build a test `AppState` with no NATS client and the given demo outcome.

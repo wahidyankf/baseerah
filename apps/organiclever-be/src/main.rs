@@ -6,7 +6,7 @@ use organiclever_be::{
     app::{self, AppState},
     config::Config,
     contexts::db,
-    messaging::{client as nats_client, jetstream_demo, status as messaging_status},
+    contexts::messaging::{client as nats_client, jetstream_demo, status as messaging_status},
 };
 use tracing_subscriber::EnvFilter;
 

@@ -6,7 +6,7 @@
 use cucumber::{World, given, then, when};
 use ose_app_be::app::{self, AppState};
 use ose_app_be::contexts::db;
-use ose_app_be::messaging::status as messaging_status;
+use ose_app_be::contexts::messaging::status as messaging_status;
 
 /// World context shared across all cucumber step implementations.
 #[derive(Debug, Default, World)]

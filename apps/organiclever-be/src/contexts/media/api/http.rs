@@ -5,7 +5,7 @@ use axum::{
 };
 
 use crate::app::AppState;
-use crate::messaging::crane_client;
+use crate::contexts::messaging::crane_client;
 
 /// `POST /api/v1/media/convert` — convert PDF via crane NATS request/reply.
 ///

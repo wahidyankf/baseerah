@@ -9,5 +9,6 @@ pub mod health;
 #[path = "internal-policy/mod.rs"]
 pub mod internal_policy;
 pub mod media;
+pub mod messaging;
 #[path = "regulatory-source/mod.rs"]
 pub mod regulatory_source;

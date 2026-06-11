@@ -6,7 +6,7 @@
 use cucumber::{World, given, then, when};
 use organiclever_be::app::{self, AppState};
 use organiclever_be::contexts::db;
-use organiclever_be::messaging::status as messaging_status;
+use organiclever_be::contexts::messaging::status as messaging_status;
 
 /// World context shared across all cucumber step implementations.
 #[derive(Debug, Default, World)]

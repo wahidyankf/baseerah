@@ -219,7 +219,7 @@ mod router_tests {
         http::{Request, StatusCode},
     };
     use ose_app_be::app::{self, AppState};
-    use ose_app_be::messaging::status;
+    use ose_app_be::contexts::messaging::status;
     use tower::ServiceExt as _;
 
     fn make_state() -> AppState {
@@ -289,7 +289,7 @@ mod router_tests {
 }
 
 mod messaging_status_tests {
-    use ose_app_be::messaging::status;
+    use ose_app_be::contexts::messaging::status;
 
     #[tokio::test]
     async fn new_shared_has_none_jetstream_demo() {

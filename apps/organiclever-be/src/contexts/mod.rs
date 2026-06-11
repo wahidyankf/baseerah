@@ -3,3 +3,4 @@
 pub mod db;
 pub mod health;
 pub mod media;
+pub mod messaging;
