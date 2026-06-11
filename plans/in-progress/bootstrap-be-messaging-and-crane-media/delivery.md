@@ -616,7 +616,7 @@ and
 - [ ] [AI] Add a `messaging` bounded context spec set to `specs/apps/organiclever/` (DDD +
       ubiquitous-language + behavior features covering NATS connect, JetStream demo, crane RPC)
       — acceptance: files present; features mirror prd.md scenarios
-- [ ] [AI] Add a `messaging` bounded context spec set to `specs/apps/ose-app/`
+- [ ] [AI] Add a `messaging` bounded context spec set to `specs/apps/ose/`
       — acceptance: files present; features mirror prd.md scenarios
 - [ ] [AI] Ensure each app/lib has matching step definitions so `spec-coverage` passes:
       `npx nx affected -t spec-coverage`

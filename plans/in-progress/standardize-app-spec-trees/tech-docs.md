@@ -256,6 +256,15 @@ flat product-surface form. Located via `Grep` across `repo-governance/`, `docs/`
 | `.claude/agents/specs-checker.md`                                                  | example paths L63, L182 (also rule additions — see Phase G)                                                                            |
 | `.claude/agents/specs-maker.md`                                                    | example path L58 + profile templates (see Phase G)                                                                                     |
 | `.claude/agents/specs-fixer.md`                                                    | L46 bare-surface examples in "Missing top-level README.md" fix category; L127 fix report example path `behavior/be/README.md`          |
+| `docs/reference/monorepo-structure.md`                                             | L50 tree diagram `behavior/cli/gherkin/` example → flat product-surface example (e.g. `behavior/rhino-cli/gherkin/`)                   |
+| `docs/reference/project-dependency-graph.md`                                       | L200 `specs/apps/ose-platform/` → `specs/apps/ose/`                                                                                    |
+| `docs/how-to/add-new-app.md`                                                       | L336 `behavior/be/gherkin/**/*.feature` template → flat product-surface example                                                        |
+| `repo-governance/conventions/structure/ose-primer-sync.md`                         | L106 `specs/apps/ose-platform/**` → `specs/apps/ose/**`                                                                                |
+| `repo-governance/development/infra/nx-targets.md`                                  | L561 `ose-cli` target glob `specs/apps/ose-platform/**/*.feature` → `specs/apps/ose/**/*.feature`                                      |
+| `repo-governance/development/pattern/openapi-contract-first.md`                    | L67, L137 `specs/apps/ose-app/` → `specs/apps/ose/`                                                                                    |
+| `.claude/skills/apps-organiclever-web-developing-content/SKILL.md`                 | L103, L399 `behavior/web/gherkin` → `behavior/organiclever-web/gherkin`                                                                |
+| `.claude/skills/repo-syncing-with-ose-primer/reference/transforms.md`              | L27 `specs/apps/ose-platform/` → `specs/apps/ose/` in product-paths no-propagation list                                                |
+| `.claude/agents/repo-ose-primer-propagation-maker.md`                              | L93 `specs/apps/ose-platform/` → `specs/apps/ose/` in no-neither-propagation safety invariant                                          |
 
 > Some governance docs (e.g. `specs-application-sync.md` L170) describe ayokoding with a
 > `behavior/be/gherkin` path that does not exist on disk today (ayokoding uses `api`). The sweep

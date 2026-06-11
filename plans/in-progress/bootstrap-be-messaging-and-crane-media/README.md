@@ -50,7 +50,7 @@ must honor that standard or the drift guard fails at pre-push and CI. See
   **two** independent NATS connections (one per backend's server) and subscribes with the same
   queue group on each.
 - Spec-first DDD spec sets: a new `messaging` bounded context added to both
-  `specs/apps/organiclever/` and `specs/apps/ose-app/`, and a `crane-be` service spec set under
+  `specs/apps/organiclever/` and `specs/apps/ose/`, and a `crane-be` service spec set under
   the existing `specs/apps/crane/`.
 - Production Dockerfiles for `organiclever-be`, `ose-app-be`, and `crane-be` (separate from the
   existing `Dockerfile.integration`); run-on-boot `sqlx::migrate!` in both Rust backends; an
@@ -76,7 +76,7 @@ must honor that standard or the drift guard fails at pre-push and CI. See
 - `apps/organiclever-be/`, `apps/ose-app-be/` (messaging context, env, Dockerfile, migrate)
 - `apps/crane-be/` (new app)
 - `libs/fsharp-crane-core/` (new library)
-- `specs/apps/crane/`, `specs/apps/organiclever/`, `specs/apps/ose-app/`
+- `specs/apps/crane/`, `specs/apps/organiclever/`, `specs/apps/ose/`
 - `env-contract.yaml`
 - `.github/workflows/` (new GHCR publish workflow)
 - `docs/reference/monorepo-structure.md` (lib-naming token)
