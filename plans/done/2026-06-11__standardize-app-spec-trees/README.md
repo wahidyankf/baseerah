@@ -1,7 +1,7 @@
 # Standardize App Spec Trees (Flat Product-Surface Parity)
 
-**Status**: Not Started
-**Stage**: in-progress
+**Status**: Done
+**Stage**: done
 **Type**: Multi-file plan (BRD + PRD + tech-docs + delivery)
 
 ## Context
