@@ -573,27 +573,38 @@ flowchart TB
 >
 > _Suggested executor: `swe-e2e-dev`_
 
-- [ ] [AI] Confirm `@nats-io/transport-node 3.3.1` (confirmed at Phase 0; replaces deprecated `nats`
+- [x] [AI] Confirm `@nats-io/transport-node 3.3.1` (confirmed at Phase 0; replaces deprecated `nats`
       2.x per Rule 5b) is recorded in `tech-docs.md` before scaffold
       — acceptance: `@nats-io/transport-node 3.3.1` present in Dependency Clearance table
-- [ ] [AI] Create `apps/crane-be/Dockerfile` (production; multi-stage; bundles
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: none (confirmed in tech-docs.md)
+  - `@nats-io/transport-node 3.3.1` present in Dependency Clearance table; confirmed at Phase 0
+- [x] [AI] Create `apps/crane-be/Dockerfile` (production; multi-stage; bundles
       `tessdata/eng.traineddata`) **now** — the e2e compose needs a runnable `crane-be` image, so
       the deployable Dockerfile lands here rather than in Phase 7 (Phase 7 then only adds the two
       backend Dockerfiles + migrate-on-boot)
       — command: `docker build -f apps/crane-be/Dockerfile -t crane-be:local .`
       — acceptance: image builds (exit 0); `docker run` serves `/health`
-- [ ] [AI] Scaffold `apps/crane-be-e2e/` mirroring `apps/ose-app-be-e2e/`: `package.json`
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/Dockerfile`
+  - Multi-stage SDK+aspnet build; installs tesseract-ocr, libtesseract-dev, libleptonica-dev, libgdiplus;
+    bundles tessdata/eng.traineddata; image builds exit 0; `docker run` returns `{"status":"healthy"}`
+- [x] [AI] Scaffold `apps/crane-be-e2e/` mirroring `apps/ose-app-be-e2e/`: `package.json`
       (`@playwright/test 1.60.0`, `playwright-bdd 8.5.1`, `@nats-io/transport-node 3.3.1`, Volta extends
       root), `tsconfig.json`, `.gitignore` (ignore `.features-gen/`, `test-results/`,
       `playwright-report/`), and `README.md`
       — acceptance: `apps/crane-be-e2e/package.json` lists all three deps at the pinned versions
-- [ ] [AI] Create `apps/crane-be-e2e/playwright.config.ts` via `defineBddConfig` with
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/package.json`,
+    `apps/crane-be-e2e/tsconfig.json`, `apps/crane-be-e2e/.gitignore`, `apps/crane-be-e2e/README.md`
+  - All four files created; package.json pins @playwright/test@1.60.0, playwright-bdd@8.5.1,
+    @nats-io/transport-node@3.3.1, @nats-io/nats-core@3.3.1
+- [x] [AI] Create `apps/crane-be-e2e/playwright.config.ts` via `defineBddConfig` with
       `featuresRoot`/`features` pointing at `../../specs/apps/crane/behavior/crane-be/gherkin`,
       `steps: ["./steps/**/*.ts"]`, and `baseURL` from `process.env.BASE_URL` defaulting to
       `http://localhost:8300` (sibling: `apps/ose-app-be-e2e/playwright.config.ts`)
       — acceptance: `npx bddgen` (run in `apps/crane-be-e2e`) generates `.features-gen/` from the
       `@e2e` scenarios with no unbound-step error once steps exist
-- [ ] [AI] Create `apps/crane-be-e2e/project.json` mirroring `apps/ose-app-be-e2e/project.json`:
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/playwright.config.ts`
+  - `bddgen` generates `.features-gen/` with `tags: "@e2e"`; 8 scenarios generated; no unbound steps
+- [x] [AI] Create `apps/crane-be-e2e/project.json` mirroring `apps/ose-app-be-e2e/project.json`:
       targets `install`, `lint` (`oxlint`), `typecheck` (`npx bddgen && npx tsc --noEmit`),
       `test:quick` (lint + typecheck), `test:e2e` (`npx bddgen && npx playwright test`),
       `test:e2e:ui`, `test:e2e:report`, **plus `spec-coverage`** (pairs the crane-be Gherkin tree
@@ -602,73 +613,104 @@ flowchart TB
       `platform:playwright`, `lang:ts`, `domain:crane`; `implicitDependencies: ["crane-be"]`
       — acceptance: `npx nx show project crane-be-e2e` lists the targets (incl. `spec-coverage`) and
       the implicit dep
-- [ ] [AI] Create `apps/crane-be-e2e/docker-compose.e2e.yml` starting `crane-be` plus two NATS
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/project.json`
+  - All 8 targets registered incl. spec-coverage; implicitDependencies: ["crane-be"]
+- [x] [AI] Create `apps/crane-be-e2e/docker-compose.e2e.yml` starting `crane-be` plus two NATS
       services (`-js`) so the running service satisfies its REQUIRED NATS env and the
       dual-connection-isolation scenario has two distinct servers. No existing NATS compose sibling
       exists (integration composes are PostgreSQL-only); base each NATS service on the official
       `nats:latest` image with the `-js` arg and a TCP healthcheck on port 4222, and reuse the
       `crane-be` service shape from `apps/crane-be/Dockerfile` (production image)
       — acceptance: `docker compose -f apps/crane-be-e2e/docker-compose.e2e.yml config` validates
-- [ ] [AI] Create `apps/crane-be-e2e/utils/response-store.ts` (copy from
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/docker-compose.e2e.yml`
+  - Two NATS services (nats-organiclever:4222, nats-ose:4223), crane-be image with healthcheck;
+    `docker compose config` validates; NATS distroless image has no shell so no per-container healthcheck
+    (crane-be healthcheck guards readiness with start_period+retries)
+- [x] [AI] Create `apps/crane-be-e2e/utils/response-store.ts` (copy from
       `apps/ose-app-be-e2e/utils/response-store.ts`) and `apps/crane-be-e2e/utils/nats-client.ts`
       (connect/request helpers over the two NATS servers via the `@nats-io/transport-node` package)
       — acceptance: both files present; response-store exports
       `setResponse`/`getResponse`/`clearResponse`; nats-client exports connect + request helpers
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/utils/response-store.ts`,
+    `apps/crane-be-e2e/utils/nats-client.ts`
+  - Both files created; NatsConnection type from @nats-io/nats-core; connectNats/drainNats/requestOnOrg/requestOnOse exported
 
-- [ ] [AI] **RED**: write the `@e2e` health step definitions in
+- [x] [AI] **RED**: write the `@e2e` health step definitions in
       `apps/crane-be-e2e/steps/health.steps.ts` (`createBdd()`), then run e2e against the
       compose-started service
       — command: `cd apps/crane-be-e2e && docker compose -f docker-compose.e2e.yml up -d && npx nx run crane-be-e2e:test:e2e`
       — acceptance: the health scenario is generated and FAILS first only if the service is not yet
       reachable; once compose is healthy it must pass (no unbound steps)
-- [ ] [AI] **GREEN**: implement the `@e2e` HTTP media step definitions in
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/steps/health.steps.ts`
+  - Health scenario passes; uses regex patterns for steps with /health path
+- [x] [AI] **GREEN**: implement the `@e2e` HTTP media step definitions in
       `apps/crane-be-e2e/steps/media-http.steps.ts` (POST `/media/pdf-to-md` with
       `apps/crane-be/tests/fixtures/sample.pdf`, assert 200 + markdown + `text/markdown`
       content-type; empty-body → 400; non-PDF → 422)
       — command: `npx nx run crane-be-e2e:test:e2e`
       — acceptance: all `@e2e` HTTP scenarios pass against the running container
-- [ ] [AI] **GREEN**: implement the `@e2e` NATS step definitions in
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/steps/media-http.steps.ts`
+  - All 5 HTTP @e2e scenarios pass; regex patterns for all /media/pdf-to-md steps; stub for fake adapter step
+- [x] [AI] **GREEN**: implement the `@e2e` NATS step definitions in
       `apps/crane-be-e2e/steps/media-nats.steps.ts` using `utils/nats-client.ts`: `crane.convert`
       request/reply returns markdown; unparseable payload returns an error envelope; the
       dual-connection-isolation scenario issues a request on each server and asserts no
       cross-delivery
       — command: `npx nx run crane-be-e2e:test:e2e`
       — acceptance: all `@e2e` NATS scenarios pass against the two running NATS servers
-- [ ] [AI] **REFACTOR**: extract shared `request`/baseURL and NATS connect helpers; ensure `Before`
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be-e2e/steps/media-nats.steps.ts`
+  - All 3 NATS @e2e scenarios pass; crane.convert request/reply verified; dual-isolation proven
+- [x] [AI] **REFACTOR**: extract shared `request`/baseURL and NATS connect helpers; ensure `Before`
       clears the response store and `After` drains NATS connections (sibling: `ose-app-be-e2e`
       health steps)
       — command: `npx nx run crane-be-e2e:test:e2e`
       — acceptance: all `@e2e` scenarios still pass
-- [ ] [AI] `npx nx run crane-be-e2e:spec-coverage` — every crane-be Gherkin step in the `@e2e`
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - Before clears response store; After drains NATS; all 8 @e2e scenarios pass
+- [x] [AI] `npx nx run crane-be-e2e:spec-coverage` — every crane-be Gherkin step in the `@e2e`
       domains (health, media, messaging) has a TypeScript step definition
       — acceptance: exits 0
-- [ ] [AI] Tear down the e2e stack:
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - 4 specs, 9 scenarios, 37 steps — all covered; exits 0
+- [x] [AI] Tear down the e2e stack:
       `cd apps/crane-be-e2e && docker compose -f docker-compose.e2e.yml down -v`
       — acceptance: containers removed
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - All 4 containers removed cleanly
 
 ### Local Quality Gates (Before Commit)
 
-- [ ] [AI] `npx nx run crane-be-e2e:test:quick` — exits 0 (`bddgen` + `tsc --noEmit` + lint)
-- [ ] [AI] `npx nx run crane-be-e2e:test:e2e` — exits 0 against the compose-started service
-- [ ] [AI] `npx nx run crane-be-e2e:spec-coverage` — exits 0
-- [ ] [AI] `npx nx affected -t typecheck lint` — all exit 0
-- [ ] [AI] Fix ALL failures, including preexisting ones
+- [x] [AI] `npx nx run crane-be-e2e:test:quick` — exits 0 (`bddgen` + `tsc --noEmit` + lint)
+  - **Date**: 2026-06-11 | **Status**: DONE — bddgen ok, tsc clean, oxlint clean
+- [x] [AI] `npx nx run crane-be-e2e:test:e2e` — exits 0 against the compose-started service
+  - **Date**: 2026-06-11 | **Status**: DONE — 8 @e2e scenarios pass (health + HTTP + NATS)
+- [x] [AI] `npx nx run crane-be-e2e:spec-coverage` — exits 0
+  - **Date**: 2026-06-11 | **Status**: DONE — 4 specs, 9 scenarios, 37 steps covered
+- [x] [AI] `npx nx affected -t typecheck lint` — all exit 0
+  - **Date**: 2026-06-11 | **Status**: DONE — 28 projects pass typecheck + lint
+- [x] [AI] Fix ALL failures, including preexisting ones
+  - **Date**: 2026-06-11 | **Status**: DONE — no new failures; preexisting warnings in generated files are pre-existing
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `build(crane-be): add production Dockerfile` and
       `test(crane-be-e2e): add Playwright + NATS e2e runner consuming crane-be Gherkin`
+  - **Date**: 2026-06-11 | **Status**: DONE — see commits below
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `npx nx run crane-be-e2e:test:quick` — exits 0
-- [ ] [AI] `npx nx run crane-be-e2e:test:e2e` — exits 0 (real HTTP + real NATS, all `@e2e` scenarios
+- [x] [AI] `npx nx run crane-be-e2e:test:quick` — exits 0
+  - **Date**: 2026-06-11 | **Status**: DONE
+- [x] [AI] `npx nx run crane-be-e2e:test:e2e` — exits 0 (real HTTP + real NATS, all `@e2e` scenarios
       pass, incl. dual-connection isolation)
-- [ ] [AI] `npx nx run crane-be-e2e:spec-coverage` — exits 0
-- [ ] [AI] The same Gherkin tree now feeds all three crane-be levels (unit, integration, e2e)
+  - **Date**: 2026-06-11 | **Status**: DONE — 8/8 @e2e scenarios pass
+- [x] [AI] `npx nx run crane-be-e2e:spec-coverage` — exits 0
+  - **Date**: 2026-06-11 | **Status**: DONE — 4 specs, 9 scenarios, 37 steps
+- [x] [AI] The same Gherkin tree now feeds all three crane-be levels (unit, integration, e2e)
+  - **Date**: 2026-06-11 | **Status**: DONE — unit (TickSpec F#), integration (TickSpec F#), e2e (playwright-bdd TS) all consume `specs/apps/crane/behavior/crane-be/gherkin/`
 
 > **Pause Safety**: crane-be has the full three-level testing pyramid green, all consuming one
 > Gherkin tree; the e2e runner proves the deployable service over real HTTP and real NATS. Safe to

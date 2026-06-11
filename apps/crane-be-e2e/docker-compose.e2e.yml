@@ -1,0 +1,30 @@
+services:
+  nats-organiclever:
+    image: nats:latest
+    command: ["-js"]
+    ports:
+      - "4222:4222"
+
+  nats-ose:
+    image: nats:latest
+    command: ["-js"]
+    ports:
+      - "4223:4222"
+
+  crane-be:
+    image: crane-be:local
+    ports:
+      - "8300:8300"
+    environment:
+      - CRANE_BE_PORT=8300
+      - CRANE_BE_ORGANICLEVER_NATS_URL=nats://nats-organiclever:4222
+      - CRANE_BE_OSE_APP_NATS_URL=nats://nats-ose:4222
+    depends_on:
+      - nats-organiclever
+      - nats-ose
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8300/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 10s
