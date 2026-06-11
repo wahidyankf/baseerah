@@ -1003,46 +1003,46 @@ flowchart TB
 >
 > _Suggested executor: `swe-rust-dev` (backends)_
 
-- [ ] [AI] **RED**: write a failing integration test asserting a fresh-DB boot applies pending
+- [x] [AI] **RED**: write a failing integration test asserting a fresh-DB boot applies pending
       migrations, in `apps/organiclever-be/tests/`
       — command: `npx nx run organiclever-be:test:integration`
       — acceptance: test fails (migrate-on-boot not yet wired)
-- [ ] [AI] **GREEN**: add `sqlx::migrate!` on boot (before serving) in
+- [x] [AI] **GREEN**: add `sqlx::migrate!` on boot (before serving) in
       `apps/organiclever-be/src/main.rs`
       — command: `npx nx run organiclever-be:test:integration`
       — acceptance: migrate-on-boot test passes; backend healthy after migrations
-- [ ] [AI] **REFACTOR**: extract a `run_migrations` helper
+- [x] [AI] **REFACTOR**: extract a `run_migrations` helper
       — command: `npx nx run organiclever-be:test:integration`
       — acceptance: all integration tests still pass
-- [ ] [AI] **RED**: write a failing integration test asserting a fresh-DB boot applies pending
+- [x] [AI] **RED**: write a failing integration test asserting a fresh-DB boot applies pending
       migrations, in `apps/ose-app-be/tests/`
       — command: `npx nx run ose-app-be:test:integration`
       — acceptance: test fails (migrate-on-boot not yet wired)
-- [ ] [AI] **GREEN**: add `sqlx::migrate!` on boot (before serving) in
+- [x] [AI] **GREEN**: add `sqlx::migrate!` on boot (before serving) in
       `apps/ose-app-be/src/main.rs`
       — command: `npx nx run ose-app-be:test:integration`
       — acceptance: migrate-on-boot test passes; backend healthy after migrations
-- [ ] [AI] **REFACTOR**: extract a `run_migrations` helper in `apps/ose-app-be/src/`
+- [x] [AI] **REFACTOR**: extract a `run_migrations` helper in `apps/ose-app-be/src/`
       — command: `npx nx run ose-app-be:test:integration`
       — acceptance: all integration tests still pass
 
-- [ ] [AI] Create `apps/organiclever-be/Dockerfile` (production, distinct from
+- [x] [AI] Create `apps/organiclever-be/Dockerfile` (production, distinct from
       `Dockerfile.integration`; sibling reference: `apps/organiclever-be/Dockerfile.integration`)
       — acceptance: `docker build -f apps/organiclever-be/Dockerfile -t organiclever-be:local .`
       builds successfully
-- [ ] [AI] Create `apps/ose-app-be/Dockerfile` (production)
+- [x] [AI] Create `apps/ose-app-be/Dockerfile` (production)
       — acceptance: `docker build -f apps/ose-app-be/Dockerfile -t ose-app-be:local .` builds
       successfully
-- [ ] [AI] Confirm `apps/crane-be/Dockerfile` (created in Phase 4 for the e2e compose) still builds
+- [x] [AI] Confirm `apps/crane-be/Dockerfile` (created in Phase 4 for the e2e compose) still builds
       — acceptance: `docker build -f apps/crane-be/Dockerfile -t crane-be:local .` builds
       successfully
 
 ### Local Quality Gates (Before Commit)
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
-- [ ] [AI] All three `docker build` commands exit 0
-- [ ] [AI] `npx nx run crane-be:test:integration` — exits 0 (image features intact)
-- [ ] [AI] Fix ALL failures, including preexisting ones
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
+- [x] [AI] All three `docker build` commands exit 0
+- [x] [AI] `npx nx run crane-be:test:integration` — exits 0 (image features intact)
+- [x] [AI] Fix ALL failures, including preexisting ones
 
 ### Commit Guidelines
 
@@ -1054,8 +1054,8 @@ flowchart TB
 
 > All checks below must pass before starting Phase 8.
 
-- [ ] [AI] All three production images build locally (exit 0)
-- [ ] [AI] `npx nx run organiclever-be:test:integration`,
+- [x] [AI] All three production images build locally (exit 0)
+- [x] [AI] `npx nx run organiclever-be:test:integration`,
       `npx nx run ose-app-be:test:integration`, and `npx nx run crane-be:test:integration`
       — all exit 0 (migrate-on-boot verified; crane-be image features intact)
 
