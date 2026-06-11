@@ -168,11 +168,13 @@ and
       `domain:crane`, `type:app`
       — acceptance: `npx nx show project crane-be` lists `build`, `typecheck`, `lint`, `fmt`,
       `fmt:check`, `test:unit`, `test:quick`, `test:integration`, `spec-coverage`, `dev`, `run`
-- [ ] [AI] Read `apps/rhino-cli/src/` to determine valid `lang` values accepted by
-      `rhino-cli env validate`
-      — acceptance: valid `lang` values documented in a comment on the crane-be surface entry in
-      `env-contract.yaml`; either `fsharp` is valid or the entry uses `lang: rust` with a note, or
-      `lang` is omitted with allowlist-only — resolve BEFORE writing the surface entry below
+- [ ] [AI] Grep `apps/rhino-cli/src/` for `lang` parsing to identify the source file(s) that
+      enumerate valid `lang` values:
+      `grep -rn '"lang"\|lang.*rust\|lang.*typescript' apps/rhino-cli/src/`
+      — acceptance: specific source file(s) identified; valid `lang` values documented in a comment
+      on the crane-be surface entry in `env-contract.yaml`; either `fsharp` is valid or the entry
+      uses `lang: rust` with a note, or `lang` is omitted with allowlist-only — resolve BEFORE
+      writing the surface entry below
 - [ ] [AI] Create `apps/crane-be/.env.example` annotating `CRANE_BE_PORT` (OPTIONAL | u16, default
       `8300`), `CRANE_BE_ORGANICLEVER_NATS_URL` (REQUIRED | string),
       `CRANE_BE_OSE_APP_NATS_URL` (REQUIRED | string) per the secrets-and-env annotation format
@@ -607,17 +609,39 @@ and
 >
 > _Suggested executor: `specs-maker` (specs), `repo-rules-maker` / `docs-maker` (conventions)_
 
-- [ ] [AI] Add a `crane-be` service spec set under `specs/apps/crane/` mirroring the structure of
-      `specs/apps/organiclever/` (DDD `bounded-contexts.yaml` + `bounded-context-map.md` +
-      `ubiquitous-language/` + `system-context/` + `containers/` + `behavior/` Gherkin features
-      covering health, HTTP convert, NATS convert)
-      — acceptance: files present following the sibling structure; `.feature` files mirror the
-      prd.md scenarios
-- [ ] [AI] Add a `messaging` bounded context spec set to `specs/apps/organiclever/` (DDD +
-      ubiquitous-language + behavior features covering NATS connect, JetStream demo, crane RPC)
-      — acceptance: files present; features mirror prd.md scenarios
-- [ ] [AI] Add a `messaging` bounded context spec set to `specs/apps/ose/`
-      — acceptance: files present; features mirror prd.md scenarios
+- [ ] [AI] Add a `crane-be` surface to `specs/apps/crane/`: new
+      `specs/apps/crane/behavior/crane-be/gherkin/` directory with domain subdirs covering health
+      (`health/health.feature`), HTTP convert (`media/pdf-to-md-http.feature`), and NATS convert
+      (`media/pdf-to-md-nats.feature`); add `specs/apps/crane/components/be/` component docs
+      following `specs/apps/crane/components/cli/` as sibling. Do NOT add DDD artifacts — crane
+      is not in the `AppsWithDDD` allowlist `[Repo-grounded:
+apps/rhino-cli/src/internal/allowlist.rs]`. Surface slug follows the flat
+      `<product>-<surface>` convention established by the `standardize-app-spec-trees` plan
+      (2026-06-11) `[Repo-grounded: repo-governance/conventions/structure/specs-directory-structure.md]`.
+      — acceptance: files present; `.feature` files mirror prd.md scenarios; no `ddd/` dir
+      created under `specs/apps/crane/`
+- [ ] [AI] Add a `messaging` bounded context to
+      `specs/apps/organiclever/ddd/bounded-contexts.yaml` (new entry with
+      `gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging`
+      `[Repo-grounded: bounded-contexts.yaml gherkin field format]`) plus ubiquitous-language doc
+      `specs/apps/organiclever/ddd/ubiquitous-language/messaging.md`; add
+      `specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging/` domain subdirectory
+      with Gherkin features covering NATS connect, JetStream demo, crane RPC. The `organiclever-be`
+      surface slug is the flat product-surface name for the organiclever backend
+      `[Repo-grounded: specs/apps/organiclever/behavior/organiclever-be/]`.
+      — acceptance: files present; features mirror prd.md scenarios; `gherkin:` field points to
+      `behavior/organiclever-be/gherkin/messaging`
+- [ ] [AI] Add a `messaging` bounded context to `specs/apps/ose/ddd/bounded-contexts.yaml`
+      (new entry with `gherkin: specs/apps/ose/behavior/app-be/gherkin/messaging`
+      `[Repo-grounded: ose bounded-contexts.yaml — app-be is the ose-app-be surface slug from
+standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
+      `specs/apps/ose/ddd/ubiquitous-language/messaging.md`; add
+      `specs/apps/ose/behavior/app-be/gherkin/messaging/` domain subdirectory with Gherkin
+      features covering NATS connect, JetStream demo, crane RPC. The `app-be` surface slug maps
+      to the `ose-app-be` Nx project after the standardize-app-spec-trees consolidation
+      `[Repo-grounded: specs/apps/ose/behavior/app-be/]`.
+      — acceptance: files present; features mirror prd.md scenarios; `gherkin:` field points to
+      `behavior/app-be/gherkin/messaging`
 - [ ] [AI] Ensure each app/lib has matching step definitions so `spec-coverage` passes:
       `npx nx affected -t spec-coverage`
       — acceptance: exits 0 for all touched projects

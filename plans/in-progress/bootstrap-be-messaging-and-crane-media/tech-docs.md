@@ -67,7 +67,7 @@ flowchart TB
 ## Shared F# Library: libs/fsharp-crane-core
 
 `[Repo-grounded]` `apps/crane-cli/src/Core/` currently holds `Domain/` (`Finding.fs`,
-`PdfMetadata.fs`, `Report.fs`), `Ports.fs`, and `Logic/` (eleven checker/manager modules). The
+`PdfMetadata.fs`, `Report.fs`), `Ports.fs`, and `Logic/` (ten checker/manager modules). The
 PDF→Markdown extraction path lives in `Adapters/Out/PdfAdapter.fs` and `Adapters/Out/OcrAdapter.fs`
 using `PdfPig` and `TesseractOCR`.
 
@@ -152,7 +152,9 @@ existing tokio runtime.
 ### Subject and queue-group naming
 
 - Media RPC subject: `crane.convert` (core NATS request/reply; lowest latency; reply via auto
-  `_INBOX`). Core request/reply suits tightly-coupled service RPC
+  `_INBOX`). Core request/reply suits tightly-coupled service RPC — "Request-Reply is a common
+  pattern in modern distributed systems. A request is sent, and the application either waits on
+  the response with a certain timeout, or receives a response asynchronously."
   `[Web-cited: NATS docs — Request-Reply — https://docs.nats.io/nats-concepts/core-nats/reqreply — accessed 2026-06-11]`.
 - Queue group (crane-be subscribers): `crane.workers` (same name on both connections).
 - JetStream demo subjects: `<domain>.<service>.<action>` style, e.g.
@@ -169,14 +171,14 @@ caret/tilde. CVE sources checked for each: NVD, GitHub Advisories, Snyk DB, vend
 security pages, and the CISA KEV feed. Cutoff = execution date minus 60 days; the chosen version's
 release date must precede the cutoff.
 
-| Package        | Version                        | Ecosystem    | Release date                                        | Path | 60-day cutoff basis                                | Notes                                                                                                                                                           |
-| -------------- | ------------------------------ | ------------ | --------------------------------------------------- | ---- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `async-nats`   | `0.47.0`                       | Rust (Cargo) | 2026-03-31 `[Unverified — confirm at Phase 0]`      | B    | release date ≥ 60d before exec date                | RUSTSEC-2023-0027 patched since 0.29.0; MSRV 1.88 matches both backends `[Repo-grounded: Cargo.toml rust-version 1.88]`. Do NOT use 0.48.x/0.49.x (inside soak) |
-| `NATS.Net`     | latest Path-B-eligible `2.7.x` | .NET (NuGet) | `_Unknown — confirm exact 2.7.x + date at Phase 0_` | B    | must be ≥ 60d old + CVE-clean at exec              | Do NOT pin 2.8.0/2.8.1 (inside soak). Recorded as a Phase 0 verification step                                                                                   |
-| `Giraffe`      | `8.2.0`                        | .NET (NuGet) | 2025-11-12 `[Unverified — confirm at Phase 0]`      | B    | well past 60d                                      | ASP.NET Core; HttpHandler composes with hexagonal ports                                                                                                         |
-| `PdfPig`       | `0.1.14`                       | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]` | consumed via shared lib                                                                                                                                         |
-| `TesseractOCR` | `5.5.2`                        | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]` | consumed via shared lib                                                                                                                                         |
-| Runtime        | `.NET 10` (`net10.0`) + F# 10  | .NET         | matches crane-cli                                   | n/a  | n/a                                                | `[Repo-grounded: crane-cli.fsproj TargetFramework net10.0]`                                                                                                     |
+| Package        | Version                        | Ecosystem    | Release date                                        | Path | 60-day cutoff basis                                | Notes                                                                                                                                                                                                    |
+| -------------- | ------------------------------ | ------------ | --------------------------------------------------- | ---- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `async-nats`   | `0.47.0`                       | Rust (Cargo) | 2026-03-31 `[Unverified — confirm at Phase 0]`      | B    | release date ≥ 60d before exec date                | RUSTSEC-2023-0027 patched since 0.29.0; MSRV 1.88 matches both backends `[Repo-grounded: Cargo.toml rust-version 1.88]` `[Unverified — confirm MSRV at Phase 0]`. Do NOT use 0.48.x/0.49.x (inside soak) |
+| `NATS.Net`     | latest Path-B-eligible `2.7.x` | .NET (NuGet) | `_Unknown — confirm exact 2.7.x + date at Phase 0_` | B    | must be ≥ 60d old + CVE-clean at exec              | Do NOT pin 2.8.0/2.8.1 (inside soak). Recorded as a Phase 0 verification step                                                                                                                            |
+| `Giraffe`      | `8.2.0`                        | .NET (NuGet) | 2025-11-12 `[Unverified — confirm at Phase 0]`      | B    | well past 60d                                      | ASP.NET Core; HttpHandler composes with hexagonal ports                                                                                                                                                  |
+| `PdfPig`       | `0.1.14`                       | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]` | consumed via shared lib                                                                                                                                                                                  |
+| `TesseractOCR` | `5.5.2`                        | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]` | consumed via shared lib                                                                                                                                                                                  |
+| Runtime        | `.NET 10` (`net10.0`) + F# 10  | .NET         | matches crane-cli                                   | n/a  | n/a                                                | `[Repo-grounded: crane-cli.fsproj TargetFramework net10.0]`                                                                                                                                              |
 
 > **Phase 0 hard requirement**: confirm the exact `NATS.Net` 2.7.x version and its release date are
 > ≥ 60 days old and CVE-clean before any .NET NATS code is written. Record the confirmed version

@@ -167,8 +167,8 @@ the three public GHCR images, migration wiring, and the publish workflow all exi
 
 ## Git Workflow
 
-- **Worktree**: all work happens in `worktrees/bootstrap-be-messaging-and-crane-media/` on branch
-  `bootstrap-be-messaging-and-crane-media` (see [delivery.md](./delivery.md) `## Worktree`).
+- **Worktree**: all work happens in `worktrees/bootstrap-be-messaging-and-crane-media/` (see
+  [delivery.md](./delivery.md) `## Worktree`).
 - **Branching**: Trunk Based Development — direct push to `origin main`, no PR.
 - **Commits**: thematic, Conventional Commits format, split by domain/concern, one or more
   commits per phase.
