@@ -49,7 +49,7 @@ nx run wahidyankf-web:spec-coverage
 
 - **Vitest 4** + `@vitejs/plugin-react` + `jsdom` for unit tests
 - **`@amiceli/vitest-cucumber`** for Gherkin acceptance specs at the unit
-  level (feature files under `specs/apps/wahidyankf/behavior/web/gherkin/`)
+  level (feature files under `specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/`)
 - **`@testing-library/react`** + **`@testing-library/jest-dom`** for
   component interaction
 - Coverage enforced at ≥80% via `rhino-cli test-coverage validate` —
@@ -66,7 +66,7 @@ Platform-agnostic specifications for this app live at
 - **Five-folder C4 tree**: `product/`, `system-context/`, `containers/`,
   `components/`, `behavior/`
 - **Gherkin features**:
-  [`specs/apps/wahidyankf/behavior/web/gherkin/`](../../specs/apps/wahidyankf/behavior/web/gherkin/README.md) —
+  [`specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/`](../../specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/README.md) —
   7 feature files organized per feature module
 
 ## Architecture

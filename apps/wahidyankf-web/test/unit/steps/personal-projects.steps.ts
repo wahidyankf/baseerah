@@ -4,7 +4,7 @@ import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 const feature = await loadFeature(
   path.resolve(
     process.cwd(),
-    "../../specs/apps/wahidyankf/behavior/web/gherkin/personal-projects/personal-projects.feature",
+    "../../specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/personal-projects/personal-projects.feature",
   ),
 );
 

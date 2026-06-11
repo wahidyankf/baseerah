@@ -47,3 +47,12 @@ let ``checkTables returns CRITICAL finding for missing table`` () =
     let result = checkTables pdfText mdText
     Assert.NotEmpty(result)
     Assert.Equal("CRITICAL", result.[0].Criticality)
+
+[<Fact>]
+let ``checkTables returns MEDIUM finding for row count mismatch`` () =
+    let pdfText = makeTable 3 3
+    let mdText = makeTable 3 1
+    let result = checkTables pdfText mdText
+    Assert.NotEmpty(result)
+    Assert.Equal("MEDIUM", result.[0].Criticality)
+    Assert.Equal("table-integrity", result.[0].Category)

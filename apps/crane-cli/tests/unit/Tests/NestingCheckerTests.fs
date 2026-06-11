@@ -37,3 +37,10 @@ let ``checkNesting returns empty when items match at same level`` () =
     let mdText = "  - nested item"
     let result = checkNesting pdfText mdText
     Assert.Empty(result)
+
+[<Fact>]
+let ``checkNesting returns empty when pdf item not found in md`` () =
+    let pdfText = "- unique item not in markdown"
+    let mdText = "- completely different content"
+    let result = checkNesting pdfText mdText
+    Assert.Empty(result)

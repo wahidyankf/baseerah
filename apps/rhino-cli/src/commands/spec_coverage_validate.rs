@@ -143,7 +143,7 @@ mod tests {
     fn run_returns_err_with_gaps_when_specs_missing_test_files() {
         let args = ValidateArgs {
             paths: vec![
-                "specs/apps/rhino/behavior/cli/gherkin".to_string(),
+                "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),
                 "apps/rhino-cli/scripts".to_string(), // wrong dir → 0 step matchers → step gaps
             ],
             shared_steps: true,
@@ -157,7 +157,7 @@ mod tests {
     fn run_returns_err_with_json_output_format() {
         let args = ValidateArgs {
             paths: vec![
-                "specs/apps/rhino/behavior/cli/gherkin".to_string(),
+                "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),
                 "apps/rhino-cli/scripts".to_string(),
             ],
             shared_steps: true,
@@ -174,7 +174,7 @@ mod tests {
         // both apps/rhino-cli (Rust) and archived/rhino-cli (Go) step defs.
         let args = ValidateArgs {
             paths: vec![
-                "specs/apps/rhino/behavior/cli/gherkin".to_string(),
+                "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),
                 "apps/rhino-cli".to_string(),
                 "archived/rhino-cli".to_string(),
             ],

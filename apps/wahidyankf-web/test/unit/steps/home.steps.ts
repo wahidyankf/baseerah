@@ -2,7 +2,7 @@ import path from "node:path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/wahidyankf/behavior/web/gherkin/home/home.feature"),
+  path.resolve(process.cwd(), "../../specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/home/home.feature"),
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {

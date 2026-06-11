@@ -28,3 +28,17 @@ let ``checkFigures returns HIGH finding when figure not covered`` () =
     let result = checkFigures pdfText mdText
     Assert.NotEmpty(result)
     Assert.Equal("HIGH", result.[0].Criticality)
+
+[<Fact>]
+let ``checkFigures returns empty when figure covered by placeholder`` () =
+    let pdfText = "This document contains Figure 1"
+    let mdText = "[FIGURE 1: Architecture diagram showing components]"
+    let result = checkFigures pdfText mdText
+    Assert.Empty(result)
+
+[<Fact>]
+let ``checkFigures returns empty when figure covered by figure label in MD`` () =
+    let pdfText = "See Figure 2 for details"
+    let mdText = "Figure 2 shows the system architecture diagram"
+    let result = checkFigures pdfText mdText
+    Assert.Empty(result)

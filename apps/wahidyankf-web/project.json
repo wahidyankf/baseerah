@@ -44,7 +44,7 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/web/gherkin/**/*.feature"],
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/**/*.feature"],
       "options": {
         "command": "npx vitest run --project unit-fe",
         "cwd": "{projectRoot}"
@@ -54,7 +54,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["rhino-cli:build"],
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/web/gherkin/**/*.feature"],
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/**/*.feature"],
       "outputs": ["{projectRoot}/coverage"],
       "options": {
         "commands": [
@@ -67,17 +67,17 @@
     "test:integration": {
       "executor": "nx:run-commands",
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/web/gherkin/**/*.feature"],
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/**/*.feature"],
       "options": {
         "command": "npx vitest run --project integration",
         "cwd": "{projectRoot}"
       }
     },
     "spec-coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/wahidyankf/behavior/web/gherkin apps/wahidyankf-web",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin apps/wahidyankf-web",
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/specs/apps/wahidyankf/behavior/web/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-web/gherkin/**/*.feature",
         "{projectRoot}/**/*.{ts,tsx}"
       ]
     }

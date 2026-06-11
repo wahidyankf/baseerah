@@ -6,7 +6,7 @@ Command-line tools for repository management and automation. The canonical imple
 
 ## What is rhino-cli?
 
-A Rust CLI binary delivering the same observable contract as the original Go implementation — same commands, same flags, same exit codes, same output formats (text / json / markdown). Built with `clap` (derive macros) and consuming the Gherkin specs in [`specs/apps/rhino/behavior/cli/gherkin/`](../../specs/apps/rhino/behavior/cli/gherkin/).
+A Rust CLI binary delivering the same observable contract as the original Go implementation — same commands, same flags, same exit codes, same output formats (text / json / markdown). Built with `clap` (derive macros) and consuming the Gherkin specs in [`specs/apps/rhino/behavior/rhino-cli/gherkin/`](../../specs/apps/rhino/behavior/rhino-cli/gherkin/).
 
 ## Status
 
@@ -83,4 +83,4 @@ Reviewed 2026-05-23. Policy paths per [Dependency Bump Stability & Safety Policy
 
 - Go implementation (archived at cutover): [`archived/rhino-cli/README.md`](../../archived/rhino-cli/README.md)
 - Migration plan (completed 2026-05-23): [`plans/done/2026-05-23__rhino-cli-rust-rewrite/`](../../plans/done/2026-05-23__rhino-cli-rust-rewrite/README.md)
-- Gherkin specs (shared with Go binary): [`specs/apps/rhino/behavior/cli/gherkin/`](../../specs/apps/rhino/behavior/cli/gherkin/)
+- Gherkin specs (shared with Go binary): [`specs/apps/rhino/behavior/rhino-cli/gherkin/`](../../specs/apps/rhino/behavior/rhino-cli/gherkin/)

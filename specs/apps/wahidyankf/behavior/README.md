@@ -4,7 +4,7 @@ Audience: Engineers, Technical Product/Project Managers
 
 Behavior specifications for wahidyankf-web — Gherkin scenarios that exercise the product
 through the frontend UI surface. There is no backend API perspective today; if a server-side
-rendering layer or API is added later, a `behavior/api/gherkin/` folder would be added here.
+rendering layer or API is added later, a `behavior/wahidyankf-be/gherkin/` folder would be added here.
 
 ## Children
 

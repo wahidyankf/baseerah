@@ -20,7 +20,7 @@ specs/apps/crane/
 ├── system-context/README.md           — C4 L1 actors and external systems
 ├── containers/README.md               — C4 L2 deployable units
 ├── components/cli/README.md           — C4 L3 CLI internals
-└── behavior/cli/gherkin/
+└── behavior/crane-cli/gherkin/
     ├── README.md                      — Feature file inventory
     ├── pdf/
     │   └── pdf-commands.feature       — crane pdf info/type/extract

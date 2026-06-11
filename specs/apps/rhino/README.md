@@ -13,7 +13,7 @@ the contract between the CLI implementation and its consumers.
 
 ## Structure
 
-Feature files live under `behavior/cli/gherkin/`, organized into domain subdirs:
+Feature files live under `behavior/rhino-cli/gherkin/`, organized into domain subdirs:
 
 ```
 specs/apps/rhino/
@@ -39,7 +39,7 @@ specs/apps/rhino/
             └── workflows/        # workflows subcommand family (1 feature)
 ```
 
-See [behavior/cli/gherkin/README.md](./behavior/cli/gherkin/README.md) for the full file inventory.
+See [behavior/rhino-cli/gherkin/README.md](./behavior/rhino-cli/gherkin/README.md) for the full file inventory.
 
 ## Running the Tests
 
@@ -68,7 +68,7 @@ cache-invalidated when spec files change.
 
 ## Adding New Specs
 
-1. Create `specs/apps/rhino/behavior/cli/gherkin/<domain>/<domain>-<action>.feature`
+1. Create `specs/apps/rhino/behavior/rhino-cli/gherkin/<domain>/<domain>-<action>.feature`
 2. Add unit coverage inside the relevant module in `apps/rhino-cli/src/`:
    - Add a `#[cfg(test)]` block to the module under test
    - Include a doc-comment citing the Gherkin scenario name on each `#[test]` function
