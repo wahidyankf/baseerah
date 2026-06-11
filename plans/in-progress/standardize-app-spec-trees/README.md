@@ -1,4 +1,4 @@
-# Standardize App Spec Trees (Consolidate OSE Specs)
+# Standardize App Spec Trees (Flat Product-Surface Parity)
 
 **Status**: Not Started
 **Stage**: in-progress
@@ -6,81 +6,117 @@
 
 ## Context
 
-Every app family in this repo owns exactly one spec tree under `specs/apps/<family>/`
-([`specs-directory-structure.md`][conv]). `organiclever-*` apps consume
-`specs/apps/organiclever/`; `ayokoding-*`, `wahidyankf-*`, `crane-*`, `rhino-*` follow the same
-one-family-one-tree shape.
+Every app family in this repo owns spec content under `specs/apps/<family>/`
+([`specs-directory-structure.md`][conv]). Today two problems coexist:
 
-**OSE is the lone outlier.** The `apps/ose-*` family is served by **two** spec trees:
+1. **OSE spans two trees.** The `apps/ose-*` family is served by `specs/apps/ose-app/` (the GRC
+   application) **and** `specs/apps/ose-platform/` (the marketing site + `ose-cli`), violating the
+   one-family-one-tree rule that every other family follows. `[Repo-grounded]`
+2. **Behavior surface names are bare and inconsistent.** The current convention names behavior
+   dirs by perspective only — `behavior/be/gherkin/`, `behavior/web/gherkin/`, `behavior/cli/gherkin/`
+   ([`specs-directory-structure.md` L168][conv]) — and two families still use a non-standard `api`
+   perspective: `specs/apps/ose-platform/behavior/api/` and `specs/apps/ayokoding/behavior/api/`.
+   `[Repo-grounded]`
 
-- `specs/apps/ose-app/` — the GRC **application** (`app.oseplatform.com` / `api.oseplatform.com`):
-  rich DDD with four bounded contexts (`regulatory-source`, `internal-policy`, `gap-analysis`,
-  `ai-orchestration`), consumed by `ose-app-be`, `ose-app-web`, and their e2e suites.
-- `specs/apps/ose-platform/` — the **marketing/updates site** (`oseplatform.com`) plus the
-  `ose-cli` link validator, consumed by `ose-web`, `ose-web-fe-e2e`, `ose-web-be-e2e`, `ose-cli`.
+This plan adopts a single **flat product-surface naming scheme** for behavior dirs across every
+ose-public family, consolidates OSE into one `specs/apps/ose/` tree, renames every `api` surface to
+`be`, codifies the scheme as the enforced standard (convention + `specs-checker` + `specs-maker`),
+and writes a rationale doc. It is a **planning deliverable** — no migration is executed here.
 
-This plan **consolidates both trees into a single `specs/apps/ose/`** so every `apps/ose-*`
-project points at one OSE spec tree — matching the rest of the repo — and **promotes the
-resulting shape to a repo-wide standard** by amending the specs convention to cover families
-that ship multiple deployables under one brand.
+### Flat product-surface naming scheme (LOCKED)
+
+Behavior dirs become `specs/apps/<family>/behavior/<product>-<surface>/gherkin/`:
+
+- **Multi-product family (OSE)** — product tokens distinguish products:
+  `app-be`, `app-web`, `platform-be`, `platform-web`, `cli` (`cli` stays bare because the
+  product's own name _is_ "cli": `ose-cli`).
+- **Single-product multi-surface family** — the family name is the product token:
+  `organiclever-be`, `organiclever-web`; `ayokoding-be`, `ayokoding-web`, `ayokoding-cli`,
+  `ayokoding-build-tools`.
+- **Single-surface family (echo, uniform)** — `crane-cli`, `rhino-cli`, `wahidyankf-web`.
+
+This **replaces** the prior "two-tier" framing entirely.
 
 ## Scope
 
-**In scope:**
+**In scope (active remediation, planned — every ose-public family):**
 
-- Merge `specs/apps/ose-app/` + `specs/apps/ose-platform/` → `specs/apps/ose/` (flat layout,
-  surface-disambiguated `behavior/` subtrees).
-- Rewrite every consumer reference (`project.json`, `playwright.config.ts`, step-file comments,
-  app READMEs, codegen paths, `specs/README.md`).
-- Rename the contracts Nx project `ose-app-contracts` → `ose-contracts` and move it to
-  `specs/apps/ose/containers/contracts/`.
-- Unify the backend-HTTP behavior perspective name from `api` (platform) to `be`.
-- Normalize the `ose-cli` Gherkin into a single canonical `behavior/cli/gherkin/`.
-- Amend [`specs-directory-structure.md`][conv] to standardize the **multi-deployable family**
-  layout and the `be` perspective name; wire enforcement into `specs-checker`.
-- Conformance audit: confirm all other `apps/` families already satisfy the standard.
+- **ose** — consolidate `specs/apps/ose-app/` + `specs/apps/ose-platform/` → `specs/apps/ose/`;
+  behavior surfaces `app-be`, `app-web`, `platform-be` (from platform `api`), `platform-web`, `cli`;
+  contracts Nx project `ose-app-contracts` → `ose-contracts`.
+- **organiclever** — `behavior/be/` → `behavior/organiclever-be/`; `behavior/web/` →
+  `behavior/organiclever-web/`.
+- **ayokoding** — `behavior/api/` → `behavior/ayokoding-be/`; `behavior/web/` →
+  `behavior/ayokoding-web/`; `behavior/cli/` → `behavior/ayokoding-cli/`; `behavior/build-tools/` →
+  `behavior/ayokoding-build-tools/`.
+- **crane** — `behavior/cli/` → `behavior/crane-cli/`.
+- **rhino** — `behavior/cli/` → `behavior/rhino-cli/` (includes Rust source-default fixes).
+- **wahidyankf** — `behavior/web/` → `behavior/wahidyankf-web/`.
+- Rewrite every consumer reference for each family (`project.json` spec-coverage commands + inputs,
+  `codegen -i`, e2e feature globs, `playwright.config.ts`, `steps/*.ts` `Covers:` comments, app and
+  spec READMEs, governance/docs cross-refs, regenerated playwright-bdd artifacts).
+- Amend [`specs-directory-structure.md`][conv] with the flat product-surface rule + `be`-over-`api`
+  rule + worked examples (multi-product OSE; single-product organiclever).
+- Update `.claude/agents/specs-checker.md` + `.claude/agents/specs-maker.md`; re-sync bindings
+  (`npm run generate:bindings`).
+- Write the rationale doc `docs/explanation/standardize-app-spec-trees-parity-decisions.md`.
 
 **Out of scope:**
 
-- Renaming any `apps/ose-*` project (apps keep their names; only specs move).
-- Splitting/merging `apps/ose-*` deployables themselves.
-- Authoring new Gherkin scenarios or product features (move + restructure only).
-- Executing the migration — **this plan is a planning deliverable only** (see Approach).
+- Renaming any `apps/*` Nx project (apps keep their names; only specs move). Exception: the
+  contracts spec project `ose-app-contracts` → `ose-contracts`, which lives under `specs/`.
+- Splitting/merging app deployables; authoring new Gherkin scenarios or product features.
+- Executing the migration — **this plan is a planning deliverable only**.
+- The sibling repos' own restructuring (each has its own plan — see Sibling Plans).
 
 ## Approach Summary
 
-Phased, each phase green before the next ([per grilling decision](#design-decisions)):
+Phased, each phase green before the next. Families are grouped so each phase is a natural pause:
 
-- **Phase 0** — Environment setup + recorded clean baseline.
-- **Phase A** — Migrate `ose-app` → `specs/apps/ose/` app surfaces (`app-be`, `app-web`) +
-  contracts project rename; rewrite `ose-app-*` consumers; green.
-- **Phase B** — Migrate `ose-platform` → `specs/apps/ose/` platform surfaces (`platform-be`,
-  `platform-web`, `cli`), `api`→`be` rename, cli normalize; rewrite `ose-web*`/`ose-cli`
-  consumers; green.
-- **Phase C** — Merge C4 framing (`product`, `system-context`, `containers`, `components`,
-  `ddd`, `README`) into unified OSE docs; update `specs/README.md`; green.
-- **Phase D** — Promote to standard: amend the specs convention for multi-deployable families,
-  update `specs-checker`, run conformance audit, sweep `AGENTS.md` + docs cross-refs.
+- **Phase 0** — Environment setup + recorded clean baseline + reference-inventory reconciliation.
+- **Phase A** — OSE consolidation (`ose-app` → app surfaces + contracts rename).
+- **Phase B** — OSE platform surfaces (`platform-be` from `api`, `platform-web`, `cli`).
+- **Phase C** — OSE C4/DDD framing merge + index; old trees removed.
+- **Phase D** — organiclever flat product-surface rename.
+- **Phase E** — ayokoding flat product-surface rename (incl. `api`→`ayokoding-be`).
+- **Phase F** — echo + single-surface families (crane, rhino, wahidyankf), incl. rhino Rust
+  source-default TDD.
+- **Phase G** — Promote to standard: convention amendment, `specs-checker`/`specs-maker`, bindings
+  re-sync, rationale doc, governance/docs sweep, conformance audit.
 
 ## Design Decisions
 
-Resolved via pre-write grilling (2026-06-11):
+Resolved by the shared decisions brief (2026-06-11) — see
+[tech-docs §Cross-Repo Deviation Matrix](./tech-docs.md#cross-repo-deviation-matrix):
 
-| Decision            | Choice                                                                                |
-| ------------------- | ------------------------------------------------------------------------------------- |
-| Consolidation model | **Flat merge, disambiguate** — single `specs/apps/ose/`, surface-prefixed `behavior/` |
-| Deliverable         | **Plan only** — write the plan, commit + push; migration executed later               |
-| Perspective naming  | **Unify to `be`** — platform `api` → `be`                                             |
-| `ose-cli` layout    | **Normalize** — fold into single canonical `behavior/cli/gherkin/`                    |
-| C4 framing dirs     | **Unified single docs** — merge two C4/DDD models into one framing set                |
-| Contracts project   | **Move + rename** — `ose-app-contracts` → `ose-contracts`                             |
-| Sequencing          | **Phased** — app first, then platform                                                 |
+| Decision              | Choice                                                                                 |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| Surface naming scheme | **Flat product-surface** — `behavior/<product>-<surface>/gherkin/` across all families |
+| Backend perspective   | **`be`, never `api`** — rename ose-platform `api` + ayokoding `api`                    |
+| Blast radius          | **All ose-public families** restructure to conform (planning only)                     |
+| OSE consolidation     | **Flat merge** — single `specs/apps/ose/`, surface-prefixed `behavior/`                |
+| Contracts project     | **Move + rename** — `ose-app-contracts` → `ose-contracts`                              |
+| Deliverable           | **Plan only** — write the plan, commit + push; migration executed later                |
+| Delivery mode         | **main-to-main** — direct push to `origin/main` (docs-only, low risk)                  |
+
+## Sibling Plans
+
+This plan is one of three parallel parity plans (one per repo in the
+`open-sharia-enterprise` ecosystem). All three adopt the identical flat product-surface rule;
+each restructures its own families. `[Repo-grounded]` (this repo) /
+`[Unverified]` (sibling-repo paths — they live in separate repositories not checked out here).
+
+- **ose-primer** — `plans/in-progress/standardize-app-spec-trees/README.md`
+  (restructures `crud`, `rhino`; convention text byte-identical to this plan's amendment).
+- **ose-infra** — `plans/in-progress/standardize-app-spec-trees/README.md`
+  (restructures `coralpolyp`, `rhino`; convention text adapted, outside the sync loop).
 
 ## Navigation
 
 - [brd.md](./brd.md) — business rationale (WHY)
 - [prd.md](./prd.md) — product requirements + Gherkin acceptance criteria (WHAT)
-- [tech-docs.md](./tech-docs.md) — target layout, migration map, file impact, rollback (HOW)
+- [tech-docs.md](./tech-docs.md) — target layout, migration maps, full consumer impact, deviation
+  matrix, rollback (HOW)
 - [delivery.md](./delivery.md) — phased delivery checklist (DO)
 
 [conv]: ../../../repo-governance/conventions/structure/specs-directory-structure.md
