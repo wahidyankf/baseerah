@@ -1,9 +1,11 @@
 //! Integration tests for `organiclever-be` — cucumber-rs BDD harness.
 //!
-//! Covers `specs/apps/organiclever/behavior/organiclever-be/gherkin/health/health-check.feature`.
+//! Covers the gherkin features in
+//! `specs/apps/organiclever/behavior/organiclever-be/gherkin/`.
 
 use cucumber::{World, given, then, when};
 use organiclever_be::app::{self, AppState};
+use organiclever_be::contexts::db;
 use organiclever_be::messaging::status as messaging_status;
 
 /// World context shared across all cucumber step implementations.
@@ -15,7 +17,11 @@ pub struct ApiWorld {
     pub last_status: u16,
     /// Response body from the most recent request.
     pub last_body: String,
+    /// Count of applied migrations recorded after running migrations.
+    pub migration_count: i64,
 }
+
+// ── HTTP health step definitions ──────────────────────────────────────────────
 
 /// Send GET `/api/v1/health` and store the response status and body in world.
 async fn send_get_health(world: &mut ApiWorld) {
@@ -86,9 +92,58 @@ fn no_component_health_details(world: &mut ApiWorld) {
     );
 }
 
+// ── Migration step definitions ─────────────────────────────────────────────────
+
+/// Drop any existing `_sqlx_migrations` tracking data so the scenario starts fresh.
+#[given("the database has no applied migrations")]
+async fn database_has_no_applied_migrations(_world: &mut ApiWorld) {
+    let database_url =
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set for integration tests");
+    let pool = sqlx::PgPool::connect(&database_url)
+        .await
+        .expect("connect to database");
+    // Drop the sqlx migrations tracking table if it exists so we can verify
+    // that run_migrations creates it and records entries.
+    sqlx::query("DROP TABLE IF EXISTS _sqlx_migrations")
+        .execute(&pool)
+        .await
+        .expect("drop _sqlx_migrations");
+}
+
+/// Run the `db::run_migrations` helper directly (the same helper called on boot).
+#[when("the backend runs its migration routine")]
+async fn backend_runs_migration_routine(world: &mut ApiWorld) {
+    let database_url =
+        std::env::var("DATABASE_URL").expect("DATABASE_URL must be set for integration tests");
+    let pool = sqlx::PgPool::connect(&database_url)
+        .await
+        .expect("connect to database");
+    db::run_migrations(&pool)
+        .await
+        .expect("migrations must run without error");
+
+    // Count rows to confirm migrations were recorded.
+    let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM _sqlx_migrations")
+        .fetch_one(&pool)
+        .await
+        .expect("query _sqlx_migrations count");
+    world.migration_count = count;
+}
+
+/// Assert at least one migration was recorded.
+#[then("the migrations table records at least one applied migration")]
+fn migrations_table_has_entries(world: &mut ApiWorld) {
+    assert!(
+        world.migration_count > 0,
+        "expected at least one row in _sqlx_migrations, got {}",
+        world.migration_count
+    );
+}
+
+// ── Entry point ────────────────────────────────────────────────────────────────
+
 /// Entry point for the cucumber-rs test runner.
 #[tokio::main]
 async fn main() {
-    ApiWorld::run("../../specs/apps/organiclever/behavior/organiclever-be/gherkin/health/health-check.feature")
-        .await;
+    ApiWorld::run("../../specs/apps/organiclever/behavior/organiclever-be/gherkin").await;
 }

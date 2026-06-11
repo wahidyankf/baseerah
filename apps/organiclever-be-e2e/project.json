@@ -59,7 +59,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be-e2e"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir db specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be-e2e"
       },
       "cache": true,
       "inputs": [

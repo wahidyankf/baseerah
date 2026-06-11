@@ -84,7 +84,12 @@
         "command": "cargo check --manifest-path apps/organiclever-be/Cargo.toml --all-targets"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**", "{projectRoot}/tests/**", "{projectRoot}/Cargo.toml"]
+      "inputs": [
+        "{projectRoot}/src/**",
+        "{projectRoot}/tests/**",
+        "{projectRoot}/migrations/**",
+        "{projectRoot}/Cargo.toml"
+      ]
     },
     "test:unit": {
       "executor": "nx:run-commands",
@@ -100,7 +105,7 @@
         "commands": [
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc organiclever",
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul organiclever",
-          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --ignore-filename-regex '(main|messaging/(client|crane_client|jetstream_demo))\\.rs' --fail-under-lines 90"
+          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --ignore-filename-regex '(main|db/infrastructure/mod|messaging/(client|crane_client|jetstream_demo))\\.rs' --fail-under-lines 90"
         ],
         "parallel": false
       },

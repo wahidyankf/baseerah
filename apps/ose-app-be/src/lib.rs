@@ -1,6 +1,7 @@
 //! `ose-app-be` library crate — OSE Application backend REST API.
 //!
-//! Exposes the [`app`], [`config`], [`contexts`], [`errors`], and [`messaging`] modules.
+//! Exposes the [`app`], [`config`], [`contexts`], [`errors`], and
+//! [`messaging`] modules. Database lifecycle lives in [`contexts::db`].
 
 #![forbid(unsafe_code)]
 

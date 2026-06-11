@@ -5,16 +5,18 @@
 use ose_app_be::{
     app::{self, AppState},
     config::Config,
+    contexts::db,
     messaging::{client as nats_client, jetstream_demo, status as messaging_status},
 };
 use tracing_subscriber::EnvFilter;
 
 /// Start the `ose-app-be` backend HTTP server.
 ///
-/// Reads configuration from environment variables, connects to NATS in a
-/// background task (so the HTTP server starts even if NATS is temporarily
-/// unavailable), then binds to the configured port. Panics on listener bind
-/// failure or server error — both are fatal startup conditions.
+/// Reads configuration from environment variables, connects to the database
+/// and applies any pending migrations, connects to NATS in a background task
+/// (so the HTTP server starts even if NATS is temporarily unavailable), then
+/// binds to the configured port. Panics on listener bind failure or server
+/// error — both are fatal startup conditions.
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
@@ -22,6 +24,14 @@ async fn main() {
         .init();
 
     let config = Config::load().expect("failed to load configuration from environment");
+
+    // Connect to the database and run all pending migrations before serving.
+    let pool = sqlx::PgPool::connect(&config.database_url)
+        .await
+        .expect("failed to connect to PostgreSQL");
+    db::run_migrations(&pool)
+        .await
+        .expect("database migration failed");
 
     // Connect to NATS in a background task so the HTTP server starts even when
     // NATS is temporarily unreachable (e.g. integration tests run PostgreSQL-only).

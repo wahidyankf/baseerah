@@ -120,3 +120,17 @@ contexts:
       - rs
     glossary: specs/apps/ose/ddd/ubiquitous-language/media.md
     gherkin: specs/apps/ose/behavior/app-be/gherkin/messaging
+
+  - name: db
+    summary: >-
+      Database schema lifecycle — applies pending sqlx migrations on boot before
+      the HTTP server starts. Ensures the schema is always up-to-date without
+      manual intervention. Cross-cutting infrastructure concern.
+    layers:
+      - infrastructure
+    code:
+      - apps/ose-app-be/src/contexts/db
+    code_lang:
+      - rs
+    glossary: specs/apps/ose/ddd/ubiquitous-language/db.md
+    gherkin: specs/apps/ose/behavior/app-be/gherkin/db

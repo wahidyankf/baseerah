@@ -5,9 +5,10 @@ const testDir = defineBddConfig({
   featuresRoot: "../../specs/apps/organiclever/behavior/organiclever-be/gherkin",
   features: "../../specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature",
   steps: ["./steps/**/*.ts"],
-  // Exclude @unit scenarios — those are covered by Rust unit tests (cargo test).
+  // Exclude @unit scenarios (Rust unit tests) and @integration scenarios
+  // (Rust integration tests with real DB, no HTTP server).
   // All other scenarios (including @e2e and untagged) run here via Playwright.
-  tags: "not @unit",
+  tags: "not @unit and not @integration",
 });
 
 export default defineConfig({

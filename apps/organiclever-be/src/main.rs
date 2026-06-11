@@ -5,14 +5,16 @@
 use organiclever_be::{
     app::{self, AppState},
     config::Config,
+    contexts::db,
     messaging::{client as nats_client, jetstream_demo, status as messaging_status},
 };
 use tracing_subscriber::EnvFilter;
 
 /// Start the `OrganicLever` backend HTTP server.
 ///
-/// Reads configuration from environment variables, connects to NATS, runs the
-/// `JetStream` demo, then binds the HTTP server to the configured port.
+/// Reads configuration from environment variables, connects to the database
+/// and applies any pending migrations, connects to NATS, runs the `JetStream`
+/// demo, then binds the HTTP server to the configured port.
 /// Panics on listener bind failure or server error — both are fatal startup
 /// conditions with no meaningful recovery path.
 #[tokio::main]
@@ -22,6 +24,14 @@ async fn main() {
         .init();
 
     let config = Config::load().expect("failed to load configuration from environment");
+
+    // Connect to the database and run all pending migrations before serving.
+    let pool = sqlx::PgPool::connect(&config.database_url)
+        .await
+        .expect("failed to connect to PostgreSQL");
+    db::run_migrations(&pool)
+        .await
+        .expect("database migration failed");
 
     // Connect to NATS (fail-fast if unreachable).
     let nats = nats_client::connect(&config.organiclever_be_nats_url)

@@ -4,6 +4,7 @@ WORKDIR /build
 COPY apps/organiclever-be/Cargo.toml apps/organiclever-be/Cargo.lock ./
 COPY apps/organiclever-be/src ./src
 COPY apps/organiclever-be/tests ./tests
+COPY apps/organiclever-be/migrations ./migrations
 RUN cargo build --release --bin organiclever-be
 
 # Stage 2: runtime image (uses the builder image which is already available locally
