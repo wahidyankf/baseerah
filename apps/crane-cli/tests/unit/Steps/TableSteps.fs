@@ -2,7 +2,7 @@ module CraneCli.Tests.Unit.Steps.TableSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Logic.TableChecker
+open CraneCore.Logic.TableChecker
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

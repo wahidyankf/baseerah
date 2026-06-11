@@ -2,7 +2,7 @@ module CraneCli.Tests.Unit.Steps.OcrSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Logic.OcrAssessor
+open CraneCore.Logic.OcrAssessor
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

@@ -5,8 +5,8 @@ open System.IO
 open System.Text.Json
 open System.Text.Json.Serialization
 open Argu
-open CraneCli.Core.Ports
-open CraneCli.Core.Logic
+open CraneCore.Ports
+open CraneCore.Logic
 
 let private jsonOptions =
     let opts = JsonSerializerOptions()

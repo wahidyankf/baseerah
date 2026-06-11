@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Steps.FigureSteps
 
 open TickSpec
-open CraneCli.Core.Logic.FigureChecker
+open CraneCore.Logic.FigureChecker
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

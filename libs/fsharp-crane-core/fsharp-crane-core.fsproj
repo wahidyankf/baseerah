@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>CraneCore</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src/Core/Domain/Finding.fs" />
+    <Compile Include="src/Core/Domain/PdfMetadata.fs" />
+    <Compile Include="src/Core/Domain/Report.fs" />
+    <Compile Include="src/Core/Ports.fs" />
+    <Compile Include="src/Core/Logic/TextChecker.fs" />
+    <Compile Include="src/Core/Logic/HeadingChecker.fs" />
+    <Compile Include="src/Core/Logic/NestingChecker.fs" />
+    <Compile Include="src/Core/Logic/TableChecker.fs" />
+    <Compile Include="src/Core/Logic/FigureChecker.fs" />
+    <Compile Include="src/Core/Logic/MermaidValidator.fs" />
+    <Compile Include="src/Core/Logic/OcrAssessor.fs" />
+    <Compile Include="src/Core/Logic/ReportManager.fs" />
+    <Compile Include="src/Core/Logic/SkiplistManager.fs" />
+    <Compile Include="src/Core/Logic/PdfExtractionCache.fs" />
+    <Compile Include="src/Adapters/Out/PdfAdapter.fs" />
+    <Compile Include="src/Adapters/Out/OcrAdapter.fs" />
+    <Compile Include="src/Convert.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PdfPig" Version="0.1.14" />
+    <PackageReference Include="TesseractOCR" Version="5.5.2" />
+    <PackageReference Include="F23.StringSimilarity" Version="7.0.1" />
+    <PackageReference Include="FSharp.SystemTextJson" Version="1.4.36" />
+  </ItemGroup>
+</Project>

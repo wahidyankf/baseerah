@@ -3,9 +3,9 @@ module CraneCli.Tests.Unit.Tests.PdfExtractionCacheTests
 open System
 open System.IO
 open Xunit
-open CraneCli.Core.Ports
-open CraneCli.Core.Logic.PdfExtractionCache
-open CraneCli.Core.Domain.PdfMetadata
+open CraneCore.Ports
+open CraneCore.Logic.PdfExtractionCache
+open CraneCore.Domain.PdfMetadata
 
 type FakePdfPort(text: string, pages: int, sizeBytes: int64) =
     interface IPdfPort with

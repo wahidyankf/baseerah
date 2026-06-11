@@ -2,9 +2,9 @@ module CraneCli.Tests.Unit.Steps.CheckAllSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Ports
-open CraneCli.Adapters.Out.PdfAdapter
-open CraneCli.Core.Logic
+open CraneCore.Ports
+open CraneCore.Adapters.Out.PdfAdapter
+open CraneCore.Logic
 open CraneCli.Tests.Unit.Steps.BddState
 
 let mutable private pdfText: string = ""

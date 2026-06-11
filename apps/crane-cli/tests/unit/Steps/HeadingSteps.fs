@@ -2,7 +2,7 @@ module CraneCli.Tests.Unit.Steps.HeadingSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Logic.HeadingChecker
+open CraneCore.Logic.HeadingChecker
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

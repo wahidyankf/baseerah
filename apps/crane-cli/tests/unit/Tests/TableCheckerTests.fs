@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Tests.TableCheckerTests
 
 open Xunit
-open CraneCli.Core.Logic.TableChecker
+open CraneCore.Logic.TableChecker
 
 let private makeTable (cols: int) (dataRows: int) =
     let header =

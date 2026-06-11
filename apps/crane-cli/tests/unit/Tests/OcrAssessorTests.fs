@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Tests.OcrAssessorTests
 
 open Xunit
-open CraneCli.Core.Logic.OcrAssessor
+open CraneCore.Logic.OcrAssessor
 
 [<Fact>]
 let ``estimateOCRErrorRate returns 0 for empty text`` () =

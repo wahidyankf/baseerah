@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>CraneCore.Tests.Unit</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Tests/ConvertTests.fs" />
+    <Compile Include="Tests/DomainTests.fs" />
+    <Compile Include="Tests/TextCheckerTests.fs" />
+    <Compile Include="Tests/HeadingCheckerTests.fs" />
+    <Compile Include="Tests/NestingCheckerTests.fs" />
+    <Compile Include="Tests/TableCheckerTests.fs" />
+    <Compile Include="Tests/FigureCheckerTests.fs" />
+    <Compile Include="Tests/MermaidValidatorTests.fs" />
+    <Compile Include="Tests/OcrAssessorTests.fs" />
+    <Compile Include="Tests/ReportManagerTests.fs" />
+    <Compile Include="Tests/SkiplistManagerTests.fs" />
+    <Compile Include="Tests/PdfExtractionCacheTests.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="8.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="8.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../fsharp-crane-core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

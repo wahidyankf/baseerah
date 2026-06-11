@@ -2,8 +2,8 @@ module CraneCli.Tests.Unit.Steps.PdfSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Ports
-open CraneCli.Adapters.Out.PdfAdapter
+open CraneCore.Ports
+open CraneCore.Adapters.Out.PdfAdapter
 open CraneCli.Adapters.In.CliAdapter
 open CraneCli.Tests.Unit.Steps.BddState
 

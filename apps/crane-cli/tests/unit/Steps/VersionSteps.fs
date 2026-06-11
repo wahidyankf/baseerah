@@ -8,7 +8,7 @@ let mutable private versionString: string = ""
 
 [<When>]
 let ``I read the assembly version`` () =
-    let asm = Assembly.GetAssembly(typeof<CraneCli.Core.Domain.Finding.Finding>)
+    let asm = Assembly.GetAssembly(typeof<CraneCore.Domain.Finding.Finding>)
     let v = asm.GetName().Version
     versionString <- if isNull v then "0.0.0" else v.ToString()
 

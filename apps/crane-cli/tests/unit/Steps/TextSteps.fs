@@ -2,9 +2,9 @@ module CraneCli.Tests.Unit.Steps.TextSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Ports
-open CraneCli.Adapters.Out.PdfAdapter
-open CraneCli.Core.Logic.TextChecker
+open CraneCore.Ports
+open CraneCore.Adapters.Out.PdfAdapter
+open CraneCore.Logic.TextChecker
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

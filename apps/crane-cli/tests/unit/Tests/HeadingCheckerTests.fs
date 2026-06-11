@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Tests.HeadingCheckerTests
 
 open Xunit
-open CraneCli.Core.Logic.HeadingChecker
+open CraneCore.Logic.HeadingChecker
 
 [<Fact>]
 let ``inferDepthFromNumbering returns None for non-numbered line`` () =

@@ -1,0 +1,84 @@
+{
+  "name": "fsharp-crane-core",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/fsharp-crane-core/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet build libs/fsharp-crane-core/fsharp-crane-core.fsproj"
+      },
+      "outputs": ["{projectRoot}/bin", "{projectRoot}/obj"],
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/fsharp-crane-core.fsproj"]
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet build libs/fsharp-crane-core/fsharp-crane-core.fsproj --no-restore"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/fsharp-crane-core.fsproj"]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "fantomas --check libs/fsharp-crane-core/src",
+          "dotnet fsharplint lint libs/fsharp-crane-core/fsharp-crane-core.fsproj --lint-config libs/fsharp-crane-core/fsharplint.json"
+        ],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/fsharp-crane-core.fsproj"]
+    },
+    "fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "fantomas libs/fsharp-crane-core/src"
+      }
+    },
+    "fmt:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "fantomas --check libs/fsharp-crane-core/src"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs"]
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet test libs/fsharp-crane-core/tests/unit/fsharp-crane-core-unit-tests.fsproj"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/unit/**/*.fs",
+        "{projectRoot}/fsharp-crane-core.fsproj"
+      ]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet test libs/fsharp-crane-core/tests/unit/fsharp-crane-core-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line \"/p:ExcludeByFile=**/Adapters/Out/PdfAdapter.fs%2C**/Adapters/Out/OcrAdapter.fs\""
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/unit/**/*.fs",
+        "{projectRoot}/fsharp-crane-core.fsproj"
+      ]
+    },
+    "spec-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'spec-coverage: not applicable for a library'"
+      },
+      "cache": true
+    }
+  },
+  "tags": ["type:lib", "domain:crane", "lang:dotnet"],
+  "implicitDependencies": []
+}

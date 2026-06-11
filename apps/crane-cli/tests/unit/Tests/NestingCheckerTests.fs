@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Tests.NestingCheckerTests
 
 open Xunit
-open CraneCli.Core.Logic.NestingChecker
+open CraneCore.Logic.NestingChecker
 
 [<Fact>]
 let ``extractNestingLevels returns empty for plain text`` () =

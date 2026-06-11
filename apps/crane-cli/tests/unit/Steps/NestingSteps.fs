@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Steps.NestingSteps
 
 open TickSpec
-open CraneCli.Core.Logic.NestingChecker
+open CraneCore.Logic.NestingChecker
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

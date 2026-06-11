@@ -2,7 +2,7 @@ module CraneCli.Tests.Unit.Steps.MermaidSteps
 
 open TickSpec
 open Xunit
-open CraneCli.Core.Logic.MermaidValidator
+open CraneCore.Logic.MermaidValidator
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

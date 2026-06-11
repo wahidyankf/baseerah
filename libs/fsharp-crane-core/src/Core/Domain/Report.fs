@@ -1,0 +1,17 @@
+module CraneCore.Domain.Report
+
+open System.Text.Json.Serialization
+
+type SkipListEntry =
+    { [<JsonPropertyName("md_basename")>]
+      MdBasename: string
+      [<JsonPropertyName("category")>]
+      Category: string
+      [<JsonPropertyName("description")>]
+      Description: string
+      [<JsonPropertyName("key")>]
+      Key: string
+      [<JsonPropertyName("accepted")>]
+      Accepted: string
+      [<JsonPropertyName("reason")>]
+      Reason: string }

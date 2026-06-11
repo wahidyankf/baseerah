@@ -1,8 +1,8 @@
 module CraneCli.Tests.Unit.Tests.TextCheckerTests
 
 open Xunit
-open CraneCli.Core.Domain.Finding
-open CraneCli.Core.Logic.TextChecker
+open CraneCore.Domain.Finding
+open CraneCore.Logic.TextChecker
 
 [<Fact>]
 let ``Finding type has category field`` () =

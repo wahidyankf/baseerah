@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Tests.MermaidValidatorTests
 
 open Xunit
-open CraneCli.Core.Logic.MermaidValidator
+open CraneCore.Logic.MermaidValidator
 
 [<Fact>]
 let ``validateBlock returns Ok for valid graph block`` () =

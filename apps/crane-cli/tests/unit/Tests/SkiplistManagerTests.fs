@@ -3,7 +3,7 @@ module CraneCli.Tests.Unit.Tests.SkiplistManagerTests
 open System
 open System.IO
 open Xunit
-open CraneCli.Core.Logic.SkiplistManager
+open CraneCore.Logic.SkiplistManager
 
 let private withTempPath (f: unit -> unit) =
     let tempPath =

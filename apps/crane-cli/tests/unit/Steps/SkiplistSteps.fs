@@ -4,7 +4,7 @@ open System
 open System.IO
 open TickSpec
 open Xunit
-open CraneCli.Core.Logic.SkiplistManager
+open CraneCore.Logic.SkiplistManager
 open CraneCli.Tests.Unit.Steps.BddState
 
 // ---- BDD shared state ----

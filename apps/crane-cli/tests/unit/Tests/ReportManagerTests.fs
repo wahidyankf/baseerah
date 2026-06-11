@@ -2,9 +2,9 @@ module CraneCli.Tests.Unit.Tests.ReportManagerTests
 
 open System.IO
 open Xunit
-open CraneCli.Core.Domain.PdfMetadata
-open CraneCli.Core.Domain.Report
-open CraneCli.Core.Logic.ReportManager
+open CraneCore.Domain.PdfMetadata
+open CraneCore.Domain.Report
+open CraneCore.Logic.ReportManager
 
 [<Fact>]
 let ``PdfMetadata type has pages field`` () =

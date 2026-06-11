@@ -1,7 +1,7 @@
 module CraneCli.Tests.Unit.Tests.FigureCheckerTests
 
 open Xunit
-open CraneCli.Core.Logic.FigureChecker
+open CraneCore.Logic.FigureChecker
 
 [<Fact>]
 let ``detectFigures returns empty for text without figure references`` () =
