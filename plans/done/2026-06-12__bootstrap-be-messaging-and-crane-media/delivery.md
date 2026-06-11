@@ -1097,7 +1097,7 @@ list/get/delete/restore only, no visibility setter]`, so it cannot be automated.
 
 > All checks below must pass before starting Phase 9.
 
-- [ ] [AI] The publish workflow ran on a push and published the affected image(s) (verify via
+- [x] [AI] The publish workflow ran on a push and published the affected image(s) (verify via
       `gh run view --json status,conclusion` for the workflow run)
 - [ ] [AI] All three images pull anonymously (this confirms the one-time visibility flip took
       effect — `docker pull` of each `:latest` succeeds without auth)
@@ -1230,52 +1230,52 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] `npx nx affected -t lint` — exits 0
-- [ ] [AI] `npx nx affected -t test:quick` — exits 0
-- [ ] [AI] `npx nx affected -t spec-coverage` — exits 0
-- [ ] [AI] Integration (no network beyond DB/filesystem): `npx nx run crane-be:test:integration`,
+- [x] [AI] `npx nx affected -t typecheck` — exits 0
+- [x] [AI] `npx nx affected -t lint` — exits 0
+- [x] [AI] `npx nx affected -t test:quick` — exits 0
+- [x] [AI] `npx nx affected -t spec-coverage` — exits 0
+- [x] [AI] Integration (no network beyond DB/filesystem): `npx nx run crane-be:test:integration`,
       `npx nx run organiclever-be:test:integration`, `npx nx run ose-app-be:test:integration`
       — all exit 0
-- [ ] [AI] E2E (real HTTP + real NATS): `npx nx run crane-be-e2e:test:e2e`,
+- [x] [AI] E2E (real HTTP + real NATS): `npx nx run crane-be-e2e:test:e2e`,
       `npx nx run organiclever-be-e2e:test:e2e`, `npx nx run ose-app-be-e2e:test:e2e` — all exit 0
-- [ ] [AI] `npx nx run crane-be-e2e:spec-coverage` — exits 0
-- [ ] [AI] `rhino-cli env validate` — no drift
-- [ ] [AI] Fix ALL failures (including preexisting); re-run failing checks to confirm resolution
-- [ ] [AI] Verify zero failures before pushing
+- [x] [AI] `npx nx run crane-be-e2e:spec-coverage` — exits 0
+- [x] [AI] `rhino-cli env validate` — no drift
+- [x] [AI] Fix ALL failures (including preexisting); re-run failing checks to confirm resolution
+- [x] [AI] Verify zero failures before pushing
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push changes to `main`: `git push origin main`
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 minutes via
+- [x] [AI] Push changes to `main`: `git push origin main`
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 minutes via
       `gh run view --json status,conclusion`; do NOT use `gh run watch`)
-- [ ] [AI] Verify ALL CI checks pass — no exceptions
-- [ ] [AI] If any CI check fails, fix root cause immediately and push a follow-up commit
-- [ ] [AI] Repeat until ALL GitHub Actions pass with zero failures
+- [x] [AI] Verify ALL CI checks pass — no exceptions
+- [x] [AI] If any CI check fails, fix root cause immediately and push a follow-up commit
+- [x] [AI] Repeat until ALL GitHub Actions pass with zero failures
       — cite
       [ci-post-push-verification.md](../../../repo-governance/development/workflow/ci-post-push-verification.md)
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI)
-- [ ] [AI] Verify ALL manual assertions pass (curl)
-- [ ] [AI] Rename and move:
+- [x] [AI] Verify ALL delivery checklist items are ticked
+- [x] [AI] Verify ALL quality gates pass (local + CI)
+- [x] [AI] Verify ALL manual assertions pass (curl)
+- [x] [AI] Rename and move:
       `git mv plans/in-progress/bootstrap-be-messaging-and-crane-media/ plans/done/2026-06-DD__bootstrap-be-messaging-and-crane-media/`
       using the actual completion date (NOT the creation date)
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
-- [ ] [AI] Update `plans/README.md` and any other READMEs that reference this plan
-- [ ] [AI] Commit the archival:
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date
+- [x] [AI] Update `plans/README.md` and any other READMEs that reference this plan
+- [x] [AI] Commit the archival:
       `chore(plans): move bootstrap-be-messaging-and-crane-media to done`
 
 ### Phase 10 Gate
 
 > Final gate — the plan is complete only when all checks below pass.
 
-- [ ] [AI] All local quality gates exit 0
-- [ ] [AI] All triggered GitHub Actions workflows pass (verified via `gh run view`)
-- [ ] [AI] Plan folder moved to `plans/done/` and READMEs updated
+- [x] [AI] All local quality gates exit 0
+- [x] [AI] All triggered GitHub Actions workflows pass (verified via `gh run view`)
+- [x] [AI] Plan folder moved to `plans/done/` and READMEs updated
 
 > **Pause Safety**: all code is on `main`, CI is green, and the plan is archived. This is the
 > terminal safe state. To resume verification: `gh run list --branch main --limit 5`.

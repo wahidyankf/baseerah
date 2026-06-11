@@ -4,10 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                                         | Description                                                                                                          |
-| -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| [bootstrap-be-messaging-and-crane-media](./bootstrap-be-messaging-and-crane-media/README.md) | Bootstrap BE messaging (NATS), crane-be F# media service, GHCR publish workflow                                      |
-| [standardize-ci-parity](./standardize-ci-parity/README.md)                                   | Standardize GitHub Actions CI to full parity (except runner target) with ose-infra; anchor of a two-repo sibling set |
+| Plan                                                       | Description                                                                                                          |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| [standardize-ci-parity](./standardize-ci-parity/README.md) | Standardize GitHub Actions CI to full parity (except runner target) with ose-infra; anchor of a two-repo sibling set |
 
 ## Instructions
 
