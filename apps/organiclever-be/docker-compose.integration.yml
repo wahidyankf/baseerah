@@ -13,20 +13,6 @@ services:
       timeout: 5s
       retries: 5
 
-  app:
-    build:
-      context: ../..
-      dockerfile: apps/organiclever-be/Dockerfile.integration
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/organiclever
-      PORT: "8202"
-      CORS_ORIGINS: "*"
-    ports:
-      - "8202:8202"
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   test-runner:
     build:
       context: ../..
@@ -36,7 +22,10 @@ services:
       - ../../specs:/specs:ro
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/organiclever
-      API_BASE_URL: http://app:8202
+      API_BASE_URL: http://localhost:8202
+      ORGANICLEVER_BE_NATS_URL: nats://dummy:4222
+      ORGANICLEVER_BE_CRANE_URL: http://dummy:8300
     depends_on:
-      - app
+      postgres:
+        condition: service_healthy
     command: ["cargo", "test", "--test", "integration"]

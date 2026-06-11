@@ -3,7 +3,8 @@
 //! Covers `specs/apps/organiclever/behavior/organiclever-be/gherkin/health/health-check.feature`.
 
 use cucumber::{World, given, then, when};
-use organiclever_be::app;
+use organiclever_be::app::{self, AppState};
+use organiclever_be::messaging::status as messaging_status;
 
 /// World context shared across all cucumber step implementations.
 #[derive(Debug, Default, World)]
@@ -29,7 +30,12 @@ async fn send_get_health(world: &mut ApiWorld) {
 /// Spin up the Axum server on an ephemeral port and record the base URL in world.
 #[given("the API is running")]
 async fn the_api_is_running(world: &mut ApiWorld) {
-    let router = app::router();
+    // Integration tests are PostgreSQL-only — NATS is not available.
+    let app_state = AppState {
+        nats: None,
+        messaging_status: messaging_status::new_shared(),
+    };
+    let router = app::router(app_state);
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
         .await
         .expect("bind ephemeral port");

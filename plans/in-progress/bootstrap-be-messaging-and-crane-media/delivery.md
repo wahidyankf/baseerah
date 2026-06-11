@@ -727,15 +727,15 @@ flowchart TB
 >
 > _Suggested executor: `swe-rust-dev` (backend), `swe-e2e-dev` (e2e runner)_
 
-- [ ] [AI] Add `async-nats = "0.47.0"` to `apps/organiclever-be/Cargo.toml`
+- [x] [AI] Add `async-nats = "0.47.0"` to `apps/organiclever-be/Cargo.toml`
       — acceptance: `npx nx run organiclever-be:typecheck` exits 0
-- [ ] [AI] Annotate `ORGANICLEVER_BE_NATS_URL` (REQUIRED | string) and
+- [x] [AI] Annotate `ORGANICLEVER_BE_NATS_URL` (REQUIRED | string) and
       `ORGANICLEVER_BE_CRANE_URL` (REQUIRED | string) in `apps/organiclever-be/.env.example`
       — acceptance: matches the existing annotation style in that file
-- [ ] [AI] Register both new vars in the `apps/organiclever-be` surface in `env-contract.yaml`
+- [x] [AI] Register both new vars in the `apps/organiclever-be` surface in `env-contract.yaml`
       (or its allowlist as appropriate)
       — acceptance: `npx nx run rhino-cli:build` then `rhino-cli env validate` reports no drift
-- [ ] [AI] Confirm the autonomous path needs no real `.env.local`: the integration suite is
+- [x] [AI] Confirm the autonomous path needs no real `.env.local`: the integration suite is
       PostgreSQL-only and the e2e stack gets its NATS/crane URLs from `docker-compose.e2e.yml`
       (committed, non-secret values). Agents must not touch real `.env*` files; a human may set
       local env by hand for non-docker runs, but that is NOT a plan step.
@@ -744,16 +744,16 @@ flowchart TB
 
 ### Unit: config fail-fast (mocked env, no network)
 
-- [ ] [AI] **RED**: author the `@unit` `messaging` Gherkin (config fail-fast on missing NATS URL)
+- [x] [AI] **RED**: author the `@unit` `messaging` Gherkin (config fail-fast on missing NATS URL)
       under `specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging/`, then write a
       failing unit step/test for NATS-URL config read + fail-fast in `apps/organiclever-be/src/`
       — command: `npx nx run organiclever-be:test:unit`
       — acceptance: test fails (config field not yet present)
-- [ ] [AI] **GREEN**: add the NATS URL + crane URL fields to the backend config with fail-fast
+- [x] [AI] **GREEN**: add the NATS URL + crane URL fields to the backend config with fail-fast
       validation (dotenvy+envy pattern)
       — command: `npx nx run organiclever-be:test:unit`
       — acceptance: config test passes
-- [ ] [AI] **REFACTOR**: group messaging config into a `messaging` submodule
+- [x] [AI] **REFACTOR**: group messaging config into a `messaging` submodule
       — command: `npx nx run organiclever-be:test:unit`
       — acceptance: all tests still pass
 
@@ -762,36 +762,36 @@ flowchart TB
 > These are implemented as production code and verified at e2e below — NOT at integration (NATS is
 > network I/O). Guard each with `typecheck` + `lint` while building.
 
-- [ ] [AI] Implement `apps/organiclever-be/src/messaging/` with the NATS client (connect at startup,
+- [x] [AI] Implement `apps/organiclever-be/src/messaging/` with the NATS client (connect at startup,
       fail-fast), the crane HTTP client (`POST {CRANE_URL}/media/pdf-to-md`), and the crane NATS
       request/reply client to `crane.convert`
       — command: `npx nx run organiclever-be:typecheck` and `:lint`
       — acceptance: typecheck + lint exit 0
-- [ ] [AI] Implement the JetStream durable stream + consumer + publish/ack demo on
+- [x] [AI] Implement the JetStream durable stream + consumer + publish/ack demo on
       `organiclever.messaging.demo` (durable `organiclever-messaging-demo`), run at startup, with
       its outcome exposed on a messaging status route (e.g. `GET /system/status/messaging`)
       — command: `npx nx run organiclever-be:typecheck` and `:lint`
       — acceptance: typecheck + lint exit 0
-- [ ] [AI] Implement an HTTP media-convert endpoint that drives the crane NATS request/reply path
+- [x] [AI] Implement an HTTP media-convert endpoint that drives the crane NATS request/reply path
       and returns the markdown (the over-the-wire surface the e2e run asserts)
       — command: `npx nx run organiclever-be:typecheck` and `:lint`
       — acceptance: typecheck + lint exit 0
 
 ### Integration stays PostgreSQL-only (strict no-network)
 
-- [ ] [AI] Do NOT add a `nats` service to `apps/organiclever-be/docker-compose.integration.yml`;
+- [x] [AI] Do NOT add a `nats` service to `apps/organiclever-be/docker-compose.integration.yml`;
       confirm integration still passes against PostgreSQL only
       — command: `npx nx run organiclever-be:test:integration`
       — acceptance: exits 0; no NATS service present in the integration compose
 
 ### e2e: prove the messaging chain over the wire (organiclever-be-e2e)
 
-- [ ] [AI] Author the `@e2e` `messaging` Gherkin scenarios (NATS connect/health, JetStream demo via
+- [x] [AI] Author the `@e2e` `messaging` Gherkin scenarios (NATS connect/health, JetStream demo via
       status route, crane RPC over NATS via the HTTP convert endpoint) under
       `specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging/`, transcribed from
       `prd.md`
       — acceptance: `.feature` files mirror prd.md; scenarios carry `@e2e`
-- [ ] [AI] Create `apps/organiclever-be/docker-compose.e2e.yml` bringing up the **dependencies only**
+- [x] [AI] Create `apps/organiclever-be/docker-compose.e2e.yml` bringing up the **dependencies only**
       — PostgreSQL + a NATS server (`-js`) + `crane-be` (PostgreSQL service shape from the existing
       `apps/organiclever-be/docker-compose.integration.yml`; NATS from the official `nats:latest -js`
       image with a port-4222 healthcheck; `crane-be` from its production `apps/crane-be/Dockerfile`,
@@ -799,12 +799,12 @@ flowchart TB
       existing `ose-app-be-e2e` pattern), so no backend production Dockerfile is needed before
       Phase 7.
       — acceptance: `docker compose -f apps/organiclever-be/docker-compose.e2e.yml config` validates
-- [ ] [AI] **RED**: add the messaging Gherkin glob to the `organiclever-be-e2e`
+- [x] [AI] **RED**: add the messaging Gherkin glob to the `organiclever-be-e2e`
       `typecheck`/`test:quick` `inputs`, bring up the dependency stack, start the backend on the host
       with inline non-secret env (no real `.env*`), then run e2e with no messaging step defs yet
       — command: `docker compose -f apps/organiclever-be/docker-compose.e2e.yml up -d && ORGANICLEVER_BE_NATS_URL=nats://localhost:4222 ORGANICLEVER_BE_CRANE_URL=http://localhost:8300 npx nx run organiclever-be:dev & npx nx run organiclever-be-e2e:test:e2e`
       — acceptance: `bddgen` reports the messaging scenarios as unbound (RED)
-- [ ] [AI] **GREEN**: implement the `@e2e` messaging step definitions in
+- [x] [AI] **GREEN**: implement the `@e2e` messaging step definitions in
       `apps/organiclever-be-e2e/steps/messaging.steps.ts` (POST the media-convert endpoint; assert
       markdown; assert the messaging status route reports the JetStream demo delivered+acked)
       — command: `npx nx run organiclever-be-e2e:test:e2e`
@@ -812,11 +812,11 @@ flowchart TB
 
 ### Local Quality Gates (Before Commit)
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
-- [ ] [AI] `npx nx run organiclever-be:test:integration` — exits 0 (PostgreSQL only)
-- [ ] [AI] `npx nx run organiclever-be-e2e:test:e2e` — exits 0 (messaging over the wire)
-- [ ] [AI] `rhino-cli env validate` — reports no drift
-- [ ] [AI] Fix ALL failures, including preexisting ones
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
+- [x] [AI] `npx nx run organiclever-be:test:integration` — exits 0 (PostgreSQL only)
+- [x] [AI] `npx nx run organiclever-be-e2e:test:e2e` — exits 0 (messaging over the wire)
+- [x] [AI] `rhino-cli env validate` — reports no drift
+- [x] [AI] Fix ALL failures, including preexisting ones
 
 ### Commit Guidelines
 
@@ -828,11 +828,11 @@ flowchart TB
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `npx nx run organiclever-be:test:quick` — exits 0 (coverage ≥ 90)
-- [ ] [AI] `npx nx run organiclever-be:test:integration` — exits 0 (PostgreSQL only; no NATS)
-- [ ] [AI] `npx nx run organiclever-be-e2e:test:e2e` — exits 0 (NATS connect, crane RPC over NATS,
+- [x] [AI] `npx nx run organiclever-be:test:quick` — exits 0 (coverage ≥ 90)
+- [x] [AI] `npx nx run organiclever-be:test:integration` — exits 0 (PostgreSQL only; no NATS)
+- [x] [AI] `npx nx run organiclever-be-e2e:test:e2e` — exits 0 (NATS connect, crane RPC over NATS,
       JetStream demo all proven over the wire)
-- [ ] [AI] `rhino-cli env validate` — no drift
+- [x] [AI] `rhino-cli env validate` — no drift
 
 > **Pause Safety**: organiclever-be connects to NATS, calls crane-be both ways, and proves its
 > JetStream — all verified at e2e over the wire; integration stays PostgreSQL-only and env guard is

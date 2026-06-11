@@ -2,8 +2,8 @@
 //!
 //! `dotenvy::dotenv().ok()` loads `.env.local` for local runs (no-op in CI).
 //! `envy::from_env` deserializes into [`Config`] using the `SCREAMING_SNAKE` ↔
-//! field-name mapping. Required fields (`database_url`) fail fast when absent;
-//! optional fields use typed `#[serde(default)]` helpers.
+//! field-name mapping. Required fields (`database_url`, messaging URLs) fail fast
+//! when absent; optional fields use typed `#[serde(default)]` helpers.
 
 use serde::Deserialize;
 
@@ -28,6 +28,12 @@ pub struct Config {
     /// Allowed CORS origins (comma-separated or `"*"`).
     #[serde(default = "default_cors_origins")]
     pub organiclever_be_cors_origins: String,
+
+    // ── Messaging ──────────────────────────────────────────────────────────
+    /// NATS server URL (required — no default).
+    pub organiclever_be_nats_url: String,
+    /// crane-be base URL for PDF-to-Markdown conversion (required — no default).
+    pub organiclever_be_crane_url: String,
 }
 
 impl Config {

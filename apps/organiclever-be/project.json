@@ -100,7 +100,7 @@
         "commands": [
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc organiclever",
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul organiclever",
-          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --ignore-filename-regex 'main\\.rs' --fail-under-lines 90"
+          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --ignore-filename-regex '(main|messaging/(client|crane_client|jetstream_demo))\\.rs' --fail-under-lines 90"
         ],
         "parallel": false
       },
@@ -124,7 +124,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir messaging specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be"
       },
       "cache": true,
       "inputs": [

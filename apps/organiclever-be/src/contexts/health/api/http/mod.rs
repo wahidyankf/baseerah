@@ -18,6 +18,12 @@ pub async fn get_health_handler() -> (StatusCode, Json<HealthResponse>) {
 }
 
 /// Returns the Axum sub-router for the health context.
-pub fn routes() -> Router {
+///
+/// Generic over `S` so it can be merged into any typed `Router<S>` without
+/// requiring a state conversion. The handler itself is stateless.
+pub fn routes<S>() -> Router<S>
+where
+    S: Clone + Send + Sync + 'static,
+{
     Router::new().route("/health", get(get_health_handler))
 }
