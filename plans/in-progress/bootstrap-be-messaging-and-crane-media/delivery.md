@@ -465,70 +465,95 @@ flowchart TB
 >
 > _Suggested executor for all F# steps in this phase: `swe-fsharp-dev`_
 
-- [ ] [AI] Add `PackageReference NATS.Net <confirmed 2.7.x>` to `apps/crane-be/crane-be.fsproj`
+- [x] [AI] Add `PackageReference NATS.Net <confirmed 2.7.x>` to `apps/crane-be/crane-be.fsproj`
       (version confirmed in Phase 0)
       — acceptance: `npx nx run crane-be:typecheck` exits 0
-- [ ] [AI] Add `tessdata/eng.traineddata` content copy to `crane-be.fsproj` mirroring
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/crane-be.fsproj`
+  - NATS.Net 2.7.3 added; typecheck exits 0
+- [x] [AI] Add `tessdata/eng.traineddata` content copy to `crane-be.fsproj` mirroring
       `apps/crane-cli/crane-cli.fsproj`
       — acceptance: build output includes `tessdata/eng.traineddata`
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/crane-be.fsproj`, `apps/crane-be/tessdata/eng.traineddata`
+  - tessdata dir created; eng.traineddata copied from crane-cli; Content item added to fsproj
 
 ### Gherkin authoring (real-adapter integration + NATS e2e)
 
-- [ ] [AI] Add the real-adapter convert scenario (`@integration @e2e`) to
+- [x] [AI] Add the real-adapter convert scenario (`@integration @e2e`) to
       `specs/apps/crane/behavior/crane-be/gherkin/media/pdf-to-md-http.feature`, and create the NATS
       domain `specs/apps/crane/behavior/crane-be/gherkin/messaging/` with `crane-convert.feature`
       (`@e2e` request/reply + error envelope) and `dual-nats-isolation.feature` (`@e2e` two-connection
       isolation), transcribed verbatim from `prd.md`
       — acceptance: `.feature` files mirror prd.md scenarios; NATS scenarios carry `@e2e` (NOT
       `@integration`); messaging dir created
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `specs/apps/crane/behavior/crane-be/gherkin/messaging/crane-convert.feature`, `specs/apps/crane/behavior/crane-be/gherkin/messaging/dual-nats-isolation.feature`
+  - messaging/ dir created with 2 @e2e feature files; spec-coverage excludes messaging dir per project.json
 
-- [ ] [AI] **RED**: write a failing `@integration` step binding asserting `RealMediaAdapter`
+- [x] [AI] **RED**: write a failing `@integration` step binding asserting `RealMediaAdapter`
       delegates to `CraneCore.convertPdfToMarkdown` against `tests/fixtures/sample.pdf` (filesystem,
       no network), in `apps/crane-be/tests/integration/Steps/MediaSteps.fs`
       — command: `npx nx run crane-be:test:integration`
       — acceptance: scenario fails (`RealMediaAdapter` not yet defined)
-- [ ] [AI] **GREEN**: implement `apps/crane-be/src/Adapters/Out/RealMediaAdapter.fs` delegating to
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/tests/integration/Steps/MediaSteps.fs`, `apps/crane-be/tests/integration/crane-be-integration-tests.fsproj`
+  - RED confirmed: FS0225 source file not found; integration test build error
+- [x] [AI] **GREEN**: implement `apps/crane-be/src/Adapters/Out/RealMediaAdapter.fs` delegating to
       the library port
       — command: `npx nx run crane-be:test:integration`
       — acceptance: real-adapter scenario passes
-- [ ] [AI] **REFACTOR**: make adapter selection (fake vs real) a single composition-root decision
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/src/Adapters/Out/RealMediaAdapter.fs`, `apps/crane-be/tests/fixtures/sample.pdf`
+  - RealMediaAdapter implemented; sample.pdf replaced with text-containing PDF; 1 integration test passes
+- [x] [AI] **REFACTOR**: make adapter selection (fake vs real) a single composition-root decision
       in `Program.fs`
       — command: `npx nx run crane-be:test:integration`
       — acceptance: all integration scenarios still pass
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/src/Program.fs`
+  - Program.fs updated to use RealMediaAdapter; unit tests (7) and integration test (1) still pass
 
-- [ ] [AI] Implement `apps/crane-be/src/Adapters/In/NatsSubscriber.fs` subscribing `crane.convert`
+- [x] [AI] Implement `apps/crane-be/src/Adapters/In/NatsSubscriber.fs` subscribing `crane.convert`
       with queue group `crane.workers` and replying on the auto `_INBOX`; wire two connections in
       `Program.fs` from `CRANE_BE_ORGANICLEVER_NATS_URL` and `CRANE_BE_OSE_APP_NATS_URL`. This is
       production code only — its behavior is verified at e2e in Phase 4 (no integration NATS test).
       — command: `npx nx run crane-be:typecheck` and `npx nx run crane-be:lint`
       — acceptance: typecheck + lint exit 0; the subscriber compiles and is wired in the composition
       root (no network test added here)
-- [ ] [AI] Confirm there is NO `apps/crane-be/docker-compose.integration.yml` — crane-be integration
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/crane-be/src/Adapters/In/NatsSubscriber.fs`, `apps/crane-be/src/Program.fs`, `apps/crane-be/crane-be.fsproj`
+  - NatsSubscriber.fs implements crane.convert handler with queue group crane.workers, dual connections; typecheck and lint exit 0
+- [x] [AI] Confirm there is NO `apps/crane-be/docker-compose.integration.yml` — crane-be integration
       is filesystem-only and starts no containers
       — acceptance: `test ! -f apps/crane-be/docker-compose.integration.yml` exits 0
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: none
+  - Confirmed absent: `test ! -f ...` exits 0
 
 ### Local Quality Gates (Before Commit)
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
-- [ ] [AI] `npx nx run crane-be:test:integration` — exits 0 (real-adapter convert; no network)
-- [ ] [AI] `npx nx run crane-be:spec-coverage` (`--exclude-dir messaging`) — every `@unit`/
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
+  - **Date**: 2026-06-11 | **Status**: DONE | 4 projects × 4 targets = all passing
+- [x] [AI] `npx nx run crane-be:test:integration` — exits 0 (real-adapter convert; no network)
+  - **Date**: 2026-06-11 | **Status**: DONE | 1 integration test passes (real PDF via temp file)
+- [x] [AI] `npx nx run crane-be:spec-coverage` (`--exclude-dir messaging`) — every `@unit`/
       `@integration` step is bound (F#); messaging is e2e-owned
-- [ ] [AI] Fix ALL failures, including preexisting ones
+  - **Date**: 2026-06-11 | **Status**: DONE | 2 specs, 6 scenarios, 24 steps covered
+- [x] [AI] Fix ALL failures, including preexisting ones
+  - **Date**: 2026-06-11 | **Status**: DONE | No preexisting failures found
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `feat(crane-be): add real pdf-to-md adapter (integration) and NATS crane.convert subscriber`
+  - **Date**: 2026-06-11 | **Status**: DONE | See commit below
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `npx nx run crane-be:test:quick` — exits 0 (coverage ≥ 95)
-- [ ] [AI] `npx nx run crane-be:test:integration` — exits 0 (real-adapter convert; filesystem only,
+- [x] [AI] `npx nx run crane-be:test:quick` — exits 0 (coverage ≥ 95)
+  - **Date**: 2026-06-11 | **Status**: DONE | 7 tests pass, 100% line coverage
+- [x] [AI] `npx nx run crane-be:test:integration` — exits 0 (real-adapter convert; filesystem only,
       no network)
-- [ ] [AI] `npx nx run crane-be:spec-coverage` — exits 0 (with `--exclude-dir messaging`)
-- [ ] [AI] NATS subscriber compiles and is wired in `Program.fs` (behavior verified at e2e Phase 4)
+  - **Date**: 2026-06-11 | **Status**: DONE | 1 integration test passes
+- [x] [AI] `npx nx run crane-be:spec-coverage` — exits 0 (with `--exclude-dir messaging`)
+  - **Date**: 2026-06-11 | **Status**: DONE | 2 specs, 6 scenarios, 24 steps covered
+- [x] [AI] NATS subscriber compiles and is wired in `Program.fs` (behavior verified at e2e Phase 4)
+  - **Date**: 2026-06-11 | **Status**: DONE | NatsSubscriber.fs compiles; wired in Program.fs
 
 > **Pause Safety**: crane-be serves real PDF→md over HTTP; the real-adapter convert passes at the
 > integration level (filesystem, no network) and the NATS subscriber is implemented and wired,

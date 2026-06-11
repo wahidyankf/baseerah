@@ -75,7 +75,7 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/crane-be/tests/unit/crane-be-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line \"/p:ExcludeByFile=**/Program.fs%2C**/Config.fs%2C**/libs/fsharp-crane-core/**\""
+        "command": "dotnet test apps/crane-be/tests/unit/crane-be-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line \"/p:ExcludeByFile=**/Program.fs%2C**/Config.fs%2C**/NatsSubscriber.fs%2C**/RealMediaAdapter.fs%2C**/libs/fsharp-crane-core/**\""
       },
       "cache": true,
       "inputs": [

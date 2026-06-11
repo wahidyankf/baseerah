@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="Steps/BddState.fs" />
+    <Compile Include="Steps/MediaSteps.fs" />
     <Compile Include="Suite.fs" />
   </ItemGroup>
 

@@ -12,16 +12,26 @@
     <Compile Include="src/Core/Ports.fs" />
     <Compile Include="src/Application/MediaService.fs" />
     <Compile Include="src/Adapters/Out/FakeMediaAdapter.fs" />
+    <Compile Include="src/Adapters/Out/RealMediaAdapter.fs" />
     <Compile Include="src/Adapters/In/HttpHandlers.fs" />
+    <Compile Include="src/Adapters/In/NatsSubscriber.fs" />
     <Compile Include="src/Config.fs" />
     <Compile Include="src/Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Giraffe" Version="8.2.0" />
+    <PackageReference Include="NATS.Net" Version="2.7.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../../libs/fsharp-crane-core/fsharp-crane-core.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tessdata/eng.traineddata">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 </Project>
