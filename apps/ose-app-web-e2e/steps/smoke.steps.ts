@@ -1,7 +1,7 @@
 /**
  * Step definitions for the OSE Application Web smoke feature.
  *
- * Covers: specs/apps/ose-app/behavior/web/gherkin/smoke/smoke.feature
+ * Covers: specs/apps/ose/behavior/app-web/gherkin/smoke/smoke.feature
  */
 import { createBdd } from "playwright-bdd";
 import { expect } from "@playwright/test";

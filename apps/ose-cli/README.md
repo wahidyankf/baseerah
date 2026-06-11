@@ -59,7 +59,7 @@ ose-cli links check -v
 
 ## Testing
 
-Two test tiers consume the same Gherkin specs from `specs/apps/ose-platform/cli/` via
+Two test tiers consume the same Gherkin specs from `specs/apps/ose/behavior/ose-cli/gherkin/` via
 [godog](https://github.com/cucumber/godog) — only the step implementations differ:
 
 | Level       | Test File Pattern                   | Step Implementation                             | Nx Target          |
@@ -97,12 +97,12 @@ go test -v -tags=integration -run TestIntegrationLinksCheck ./cmd/...
 Integration tests use godog to drive commands in-process via `cmd.RunE()` against controlled
 `/tmp` filesystem fixtures.
 
-| Test function               | Feature file                                                             | Scenarios |
-| --------------------------- | ------------------------------------------------------------------------ | --------- |
-| `TestIntegrationLinksCheck` | `specs/apps/ose-platform/behavior/cli/gherkin/links/links-check.feature` | 4         |
+| Test function               | Feature file                                                        | Scenarios |
+| --------------------------- | ------------------------------------------------------------------- | --------- |
+| `TestIntegrationLinksCheck` | `specs/apps/ose/behavior/ose-cli/gherkin/links/links-check.feature` | 4         |
 
 The `test:integration` target is cached — it only re-runs when `cmd/**/*.go` or
-`specs/apps/ose-platform/**/*.feature` files change.
+`specs/apps/ose/**/*.feature` files change.
 
 ## Development
 

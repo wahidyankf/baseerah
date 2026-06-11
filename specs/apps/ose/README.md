@@ -1,0 +1,99 @@
+# OSE Family Specs
+
+Platform-agnostic specifications for all OSE-family deployables. Two distinct products share this
+tree:
+
+- **OSE Application** (`ose-app-*`) — AI-assisted GRC platform (app.oseplatform.com).
+  Rust/Axum backend + Next.js 16 frontend.
+- **OSE Platform Web** (`ose-web`, `ose-cli`) — Marketing and updates site
+  (oseplatform.com). Next.js 16 + tRPC, single container.
+
+## Structure
+
+```
+specs/apps/ose/
+├── README.md                   # This file
+├── product/                    # Product framing (above C4) — both products
+├── system-context/             # C4 L1 — actors and external systems
+├── containers/                 # C4 L2 — deployable units (+ contracts/)
+│   └── contracts/              # OpenAPI 3.1 contract spec (ose-app only)
+├── components/                 # C4 L3 — per-container internals
+│   ├── app-be/                 # ose-app-be (Rust/Axum) component specs
+│   ├── platform-be/            # ose-web tRPC HTTP perspective
+│   └── platform-web/           # ose-web UI perspective
+├── ddd/                        # DDD artifacts (ose-app)
+│   ├── bounded-contexts.yaml   # Machine-readable context registry
+│   ├── bounded-context-map.md  # Visual context map
+│   └── ubiquitous-language/    # Per-context glossaries
+└── behavior/                   # Gherkin scenarios
+    ├── app-be/gherkin/         # ose-app-be HTTP-semantic scenarios
+    ├── app-web/gherkin/        # ose-app-web UI-semantic scenarios
+    ├── platform-be/gherkin/    # ose-web tRPC HTTP-semantic scenarios
+    ├── platform-web/gherkin/   # ose-web UI-semantic scenarios
+    └── cli/gherkin/            # ose-cli link-check scenarios
+```
+
+## OSE Application (`ose-app-*`)
+
+GRC fullstack: AI-assisted gap analysis between regulatory documents and internal policies.
+
+### Behavior Surfaces
+
+| Surface   | Perspective                             | Background                 | Consumers                                   |
+| --------- | --------------------------------------- | -------------------------- | ------------------------------------------- |
+| `app-be`  | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/ose-app-be` (Rust/Axum, TickSpec)     |
+| `app-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/ose-app-web` (Next.js 16, Playwright) |
+
+### Bounded Contexts (ose-app)
+
+| Bounded Context     | `app-be` features | Description                                                             |
+| ------------------- | :---------------: | ----------------------------------------------------------------------- |
+| `health`            |         1         | Liveness endpoint — service health to orchestrators                     |
+| `regulatory-source` |         —         | Ingests regulator-published rule documents with provenance metadata     |
+| `internal-policy`   |         —         | Ingests company-internal documents (SOPs, manuals, procedures)          |
+| `gap-analysis`      |         —         | Compares regulatory corpus against policy corpus; emits GapItem records |
+| `ai-orchestration`  |         —         | Wraps LLM calls (OpenRouter), prompt management, retry/backoff          |
+
+## OSE Platform Web (`ose-web`, `ose-cli`)
+
+Content and marketing site for the OSE Platform.
+
+### Behavior Surfaces
+
+| Surface        | Perspective                             | Background                 | Consumers                  |
+| -------------- | --------------------------------------- | -------------------------- | -------------------------- |
+| `platform-be`  | tRPC HTTP-semantic (procedures, routes) | `Given the API is running` | `apps/ose-web-be-e2e`      |
+| `platform-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/ose-web-fe-e2e`      |
+| `cli`          | CLI invocation (link validation)        | N/A                        | `apps/ose-cli` (Go, godog) |
+
+### Bounded Contexts (ose-web/ose-cli)
+
+| Bounded Context | `platform-web` features | `platform-be` features | Description                                                           |
+| --------------- | :---------------------: | :--------------------: | --------------------------------------------------------------------- |
+| `app-shell`     |            4            |           —            | Header, footer, theme toggle, navigation, responsive, accessibility   |
+| `landing`       |            1            |           —            | Marketing landing page at `/`                                         |
+| `content`       |            —            |           1            | Content retrieval (tRPC procedures + filesystem adapters + rendering) |
+| `search`        |            —            |           1            | Search backend (tRPC + index) + UI                                    |
+| `rss-feed`      |            —            |           1            | RSS 2.0 feed generation route handler                                 |
+| `seo`           |            —            |           1            | Sitemap, robots, per-route metadata                                   |
+| `health`        |            —            |           1            | Health probe (tRPC) + system-status diagnostic page                   |
+| `links`         |           N/A           |          N/A           | ose-cli internal link validation (godog BDD)                          |
+
+## Spec Artifacts
+
+- **[ddd/](./ddd/README.md)** — DDD artifacts (ose-app): bounded-contexts.yaml registry,
+  ubiquitous-language glossaries; consumed by `rhino-cli ddd bc` and `rhino-cli ddd ul`
+- **[containers/](./containers/README.md)** — C4 architecture diagrams (L2)
+- **[containers/contracts/](./containers/contracts/README.md)** — OpenAPI 3.1 contract spec
+  (ose-app only); generates types for ose-app-be and ose-app-web via `codegen` Nx target
+- **[components/](./components/README.md)** — C4 component diagrams (L3) per surface
+- **[behavior/](./behavior/README.md)** — Gherkin acceptance criteria
+
+## Related
+
+- [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md)
+- [BDD Spec-Test Mapping](../../../repo-governance/development/infra/bdd-spec-test-mapping.md)
+- [apps/ose-app-be/](../../../apps/ose-app-be/README.md)
+- [apps/ose-app-web/](../../../apps/ose-app-web/README.md)
+- [apps/ose-web/](../../../apps/ose-web/README.md)
+- [apps/ose-cli/](../../../apps/ose-cli/README.md)

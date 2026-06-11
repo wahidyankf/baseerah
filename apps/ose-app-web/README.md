@@ -35,4 +35,4 @@ Next.js 16 frontend for OSE Application (Governance, Risk, and Compliance) platf
 - [ose-app-be](../ose-app-be/) — F#/Giraffe backend API
 - [ose-app-be-e2e](../ose-app-be-e2e/) — BE E2E tests
 - [ose-app-web-e2e](../ose-app-web-e2e/) — FE E2E tests
-- [specs/apps/ose-app](../../specs/apps/ose-app/) — DDD specs and behavior
+- [specs/apps/ose](../../specs/apps/ose/) — DDD specs and behavior

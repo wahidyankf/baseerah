@@ -6,7 +6,7 @@ const workspaceRoot = path.resolve(__dirname, "../..");
 
 const testDir = defineBddConfig({
   featuresRoot: workspaceRoot,
-  features: path.join(workspaceRoot, "specs/apps/ose-platform/behavior/api/gherkin/**/*.feature"),
+  features: path.join(workspaceRoot, "specs/apps/ose/behavior/platform-be/gherkin/**/*.feature"),
   steps: "./src/steps/**/*.steps.ts",
 });
 

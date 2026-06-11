@@ -29,8 +29,7 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 - **[ayokoding](./apps/ayokoding/README.md)** — AyoKoding educational website specifications (Next.js 16, multilingual programming, AI, and security tutorials)
 - **[crane](./apps/crane/README.md)** — crane-cli specifications (Content Retrieval And Normalization Engine CLI, Python/pytest-bdd)
 - **[organiclever](./apps/organiclever/README.md)** — OrganicLever fullstack specifications (F#/Giraffe backend REST API + Next.js 16 frontend)
-- **[ose-app](./apps/ose-app/README.md)** — OSE Application specifications (GRC platform, F#/Giraffe backend + Next.js 16 frontend)
-- **[ose-platform](./apps/ose-platform/README.md)** — OSE Platform web specifications (Next.js 16 + tRPC marketing and updates site)
+- **[ose](./apps/ose/README.md)** — OSE family specifications (ose-app-be/web GRC platform + ose-web platform site, unified under one spec tree)
 - **[rhino](./apps/rhino/README.md)** — rhino-cli specifications (Repository Hygiene and INtegration Orchestrator CLI, Rust)
 - **[wahidyankf](./apps/wahidyankf/README.md)** — wahidyankf-web specifications (personal portfolio site, Next.js 16, static)
 
@@ -58,22 +57,27 @@ specs/apps/{domain}/
 │   └── contracts/          # OpenAPI 3.1 contract spec (bundled + source files)
 ├── components/             # C4 L3 — per-container or per-perspective internals
 └── behavior/               # Gherkin acceptance scenarios
-    └── <surface>/
+    └── <product>-<surface>/
         └── gherkin/
             └── <domain>/   # Domain subdirectory (required — no flat feature files)
                 └── <feature>.feature
 ```
 
-The `<surface>` segment identifies the execution context for the scenarios. Valid values are:
+The `<product>-<surface>` segment uniquely identifies the deployable and execution
+perspective. The format is `<product>-<surface>` where:
 
-- `be` — HTTP-semantic backend surface (REST API, GraphQL, etc.)
-- `web` — UI-semantic browser surface (Next.js, Flutter web, etc.)
-- `cli` — command-line tool surface (Go, Rust, etc.)
-- `api` — tRPC or other in-process API perspective (used when no separate backend container exists)
-- `build-tools` — build-time tooling or index-generation scripts
+- `<product>` — short identifier for the deployable (e.g. `organiclever`, `ayokoding`,
+  `platform`, `app`, `crane`, `rhino`, `wahidyankf`)
+- `<surface>` — execution context: `be` (HTTP backend), `web` (browser UI), `cli`
+  (command-line), `build-tools` (build-time tooling)
 
-Domain subdirectories are required under `behavior/<surface>/gherkin/`. Feature files must
-not sit directly under the `gherkin/` directory.
+Examples: `organiclever-be`, `platform-web`, `app-be`, `crane-cli`, `rhino-cli`.
+
+**Deprecated slugs** (do not use in new spec trees): bare `be`, bare `web`, bare `cli`,
+`api`. All existing spec trees were migrated to the flat `<product>-<surface>` scheme.
+
+Domain subdirectories are required under `behavior/<product>-<surface>/gherkin/`. Feature
+files must not sit directly under the `gherkin/` directory.
 
 **Contracts** live at `specs/apps/{domain}/containers/contracts/` and are the source of truth
 for API contracts shared between frontend and backend. The `{domain}-contracts` Nx project

@@ -77,20 +77,16 @@ ose-web/
 
 ## Specs
 
-Spec tree: `specs/apps/ose-platform/`.
+Spec tree: `specs/apps/ose/`.
 
-| Section                                                                      | What it contains                                        |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------- |
-| [system-context/](../../specs/apps/ose-platform/system-context/)             | C4 L1 — actors, external systems                        |
-| [containers/](../../specs/apps/ose-platform/containers/)                     | C4 L2 — single `web` container + slug-vs-container note |
-| [components/web/](../../specs/apps/ose-platform/components/web/)             | C4 L3 — UI perspective                                  |
-| [components/api/](../../specs/apps/ose-platform/components/api/)             | C4 L3 — tRPC HTTP perspective (`api` slug, not `be`)    |
-| [behavior/web/gherkin/](../../specs/apps/ose-platform/behavior/web/gherkin/) | UI-semantic Gherkin (web perspective)                   |
-| [behavior/api/gherkin/](../../specs/apps/ose-platform/behavior/api/gherkin/) | tRPC HTTP-semantic Gherkin (api perspective)            |
-
-> **Slug note**: The tRPC perspective slug is `api`, not `be`. The tRPC server runs **inside**
-> the same Next.js process — there is no separate backend container. This is a deliberate
-> deviation from `organiclever` where `be` maps to a real separate deployable.
+| Section                                                                               | What it contains                                 |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| [system-context/](../../specs/apps/ose/system-context/)                               | C4 L1 — actors, external systems                 |
+| [containers/](../../specs/apps/ose/containers/)                                       | C4 L2 — single `web` container                   |
+| [components/web/](../../specs/apps/ose/components/platform-web/)                      | C4 L3 — UI perspective                           |
+| [components/api/](../../specs/apps/ose/components/platform-be/)                       | C4 L3 — tRPC HTTP perspective                    |
+| [behavior/platform-web/gherkin/](../../specs/apps/ose/behavior/platform-web/gherkin/) | UI-semantic Gherkin (web perspective)            |
+| [behavior/platform-be/gherkin/](../../specs/apps/ose/behavior/platform-be/gherkin/)   | tRPC HTTP-semantic Gherkin (backend perspective) |
 
 ## Deployment
 
@@ -105,6 +101,6 @@ git push origin main:prod-ose-web
 
 ## Related
 
-- [Specs root](../../specs/apps/ose-platform/README.md)
+- [Specs root](../../specs/apps/ose/README.md)
 - [Main Repository](https://github.com/wahidyankf/ose-public)
 - [apps-ose-web-deployer](../../.claude/agents/) — AI agent for deployments

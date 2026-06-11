@@ -5,7 +5,7 @@ import type { ContentMeta } from "@/contexts/content/application/types";
 import { integrationCaller } from "./helpers/test-caller";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ose-platform/behavior/api/gherkin/content/content-retrieval.feature"),
+  path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-be/gherkin/content/content-retrieval.feature"),
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {

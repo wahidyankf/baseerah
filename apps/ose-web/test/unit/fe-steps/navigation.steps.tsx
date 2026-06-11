@@ -63,7 +63,7 @@ import { Breadcrumb } from "@/contexts/content/presentation/breadcrumb";
 import { PrevNext } from "@/contexts/content/presentation/prev-next";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ose-platform/behavior/web/gherkin/app-shell/navigation.feature"),
+  path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-web/gherkin/app-shell/navigation.feature"),
 );
 
 describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {

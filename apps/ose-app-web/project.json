@@ -7,11 +7,11 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx @hey-api/openapi-ts -i specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml -o apps/ose-app-web/src/generated-contracts -s && git diff --exit-code -- apps/ose-app-web/src/generated-contracts/"
+        "command": "npx @hey-api/openapi-ts -i specs/apps/ose/containers/contracts/generated/openapi-bundled.yaml -o apps/ose-app-web/src/generated-contracts -s && git diff --exit-code -- apps/ose-app-web/src/generated-contracts/"
       },
-      "dependsOn": ["ose-app-contracts:bundle"],
+      "dependsOn": ["ose-contracts:bundle"],
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml"],
+      "inputs": ["{workspaceRoot}/specs/apps/ose/containers/contracts/generated/openapi-bundled.yaml"],
       "outputs": ["{projectRoot}/src/generated-contracts"]
     },
     "dev": {
@@ -105,14 +105,14 @@
       "outputs": ["{projectRoot}/storybook-static"]
     },
     "spec-coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ose-app/behavior/web/gherkin apps/ose-app-web-e2e",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ose/behavior/app-web/gherkin apps/ose-app-web-e2e",
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/specs/apps/ose-app/behavior/web/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/ose/behavior/app-web/gherkin/**/*.feature",
         "{workspaceRoot}/apps/ose-app-web-e2e/**/*.ts"
       ]
     }
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose-app"],
-  "implicitDependencies": ["ose-app-contracts", "web-ui", "web-ui-token"]
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose"],
+  "implicitDependencies": ["ose-contracts", "web-ui", "web-ui-token"]
 }

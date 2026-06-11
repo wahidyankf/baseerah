@@ -2,7 +2,7 @@
   "name": "ose-cli",
   "sourceRoot": "apps/ose-cli",
   "projectType": "application",
-  "tags": ["type:app", "platform:cli", "lang:rust", "domain:ose-platform"],
+  "tags": ["type:app", "platform:cli", "lang:rust", "domain:ose"],
   "implicitDependencies": ["rust-commons"],
   "targets": {
     "build": {

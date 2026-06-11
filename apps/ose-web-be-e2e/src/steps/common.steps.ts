@@ -9,7 +9,7 @@ Given("the API is running", async () => {});
 Given("the content repository contains a page with slug {string}", async ({}, _slug: string) => {});
 Given("the content repository contains multiple update posts", async () => {});
 Given("the content repository contains a draft page", async () => {});
-Given("the SHOW_DRAFTS environment variable is not set", async () => {});
+Given("the OSE_WEB_SHOW_DRAFTS environment variable is not set", async () => {});
 Given("the content repository contains no page with slug {string}", async ({}, _slug: string) => {});
 
 // Search fixtures (no-op)

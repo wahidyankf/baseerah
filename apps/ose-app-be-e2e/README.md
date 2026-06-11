@@ -16,4 +16,4 @@ Playwright-BDD backend E2E tests for ose-app-be.
 
 ## Feature Files
 
-- [health.feature](../../specs/apps/ose-app/behavior/be/gherkin/health/health.feature)
+- [health.feature](../../specs/apps/ose/behavior/app-be/gherkin/health/health.feature)

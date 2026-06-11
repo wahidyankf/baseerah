@@ -10,7 +10,7 @@
         "command": "echo 'TODO: update openapi-generator-cli to -g rust once generator is validated' && git diff --exit-code -- apps/ose-app-be/generated-contracts/"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml"],
+      "inputs": ["{workspaceRoot}/specs/apps/ose/containers/contracts/generated/openapi-bundled.yaml"],
       "outputs": ["{projectRoot}/generated-contracts"]
     },
     "install": {
@@ -98,8 +98,8 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc ose-app",
-          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul ose-app",
+          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc ose",
+          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul ose",
           "cargo llvm-cov --manifest-path apps/ose-app-be/Cargo.toml --test unit --ignore-filename-regex 'main\\.rs' --fail-under-lines 90"
         ],
         "parallel": false
@@ -109,9 +109,9 @@
         "{projectRoot}/src/**",
         "{projectRoot}/tests/unit/**",
         "{projectRoot}/Cargo.toml",
-        "{workspaceRoot}/specs/apps/ose-app/behavior/be/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ose-app/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/ose-app/ddd/ubiquitous-language/**/*.md"
+        "{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature",
+        "{workspaceRoot}/specs/apps/ose/ddd/bounded-contexts.yaml",
+        "{workspaceRoot}/specs/apps/ose/ddd/ubiquitous-language/**/*.md"
       ]
     },
     "test:integration": {
@@ -124,12 +124,12 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration specs/apps/ose-app/behavior/be/gherkin apps/ose-app-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/ose-app/behavior/be/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
+      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
     }
   },
-  "tags": ["type:app", "platform:axum", "lang:rust", "domain:ose-app"],
-  "implicitDependencies": ["ose-app-contracts"]
+  "tags": ["type:app", "platform:axum", "lang:rust", "domain:ose"],
+  "implicitDependencies": ["ose-contracts"]
 }

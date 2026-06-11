@@ -24,25 +24,16 @@
         "command": "npx bddgen && npx tsc --noEmit",
         "cwd": "apps/ose-app-be-e2e"
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/specs/apps/ose-app/behavior/be/gherkin/**/*.feature"
-      ]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature"]
     },
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "npx oxlint@latest .",
-          "npx bddgen && npx tsc --noEmit"
-        ],
+        "commands": ["npx oxlint@latest .", "npx bddgen && npx tsc --noEmit"],
         "parallel": true,
         "cwd": "apps/ose-app-be-e2e"
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/specs/apps/ose-app/behavior/be/gherkin/**/*.feature"
-      ]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",
@@ -66,13 +57,6 @@
       }
     }
   },
-  "tags": [
-    "type:e2e",
-    "platform:playwright",
-    "lang:ts",
-    "domain:ose-app"
-  ],
-  "implicitDependencies": [
-    "ose-app-be"
-  ]
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
+  "implicitDependencies": ["ose-app-be"]
 }

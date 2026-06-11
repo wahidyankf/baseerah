@@ -67,11 +67,11 @@ Five DDD bounded contexts (hexagonal layout):
 - **`ai-orchestration`** — stub (feature plan pending; uses OpenRouter)
 
 > **Note**: The four stub contexts (`regulatory-source`, `internal-policy`, `gap-analysis`,
-> `ai-orchestration`) are tracked in `specs/apps/ose-app/ddd/bounded-contexts.yaml`. The
+> `ai-orchestration`) are tracked in `specs/apps/ose/ddd/bounded-contexts.yaml`. The
 > `health` context is code-only and has no YAML entry.
 
 ## Related
 
-- **Specs**: `specs/apps/ose-app/`
-- **Contracts**: `specs/apps/ose-app/containers/contracts/` (OpenAPI 3.1)
+- **Specs**: `specs/apps/ose/`
+- **Contracts**: `specs/apps/ose/containers/contracts/` (OpenAPI 3.1)
 - **E2E tests**: `apps/ose-app-be-e2e/`

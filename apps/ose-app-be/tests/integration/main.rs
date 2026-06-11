@@ -1,6 +1,6 @@
 //! Integration tests for `ose-app-be` — cucumber-rs BDD harness.
 //!
-//! Covers `specs/apps/ose-app/behavior/be/gherkin/health/health.feature`.
+//! Covers `specs/apps/ose/behavior/app-be/gherkin/health/health.feature`.
 
 use cucumber::{World, given, then, when};
 use ose_app_be::app;
@@ -67,5 +67,5 @@ fn response_body_field_equals(world: &mut ApiWorld, field: String, expected: Str
 /// Entry point for the cucumber-rs test runner.
 #[tokio::main]
 async fn main() {
-    ApiWorld::run("../../specs/apps/ose-app/behavior/be/gherkin/health/health.feature").await;
+    ApiWorld::run("../../specs/apps/ose/behavior/app-be/gherkin/health/health.feature").await;
 }

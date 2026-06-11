@@ -6,7 +6,7 @@ import { InMemoryContentRepository } from "@/contexts/content/infrastructure/rep
 import { ContentService } from "@/contexts/content/application/service";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ose-platform/behavior/api/gherkin/rss-feed/rss-feed.feature"),
+  path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-be/gherkin/rss-feed/rss-feed.feature"),
 );
 
 const SITE_URL = "https://oseplatform.com";
