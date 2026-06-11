@@ -55,6 +55,14 @@
         "command": "npx playwright show-report",
         "cwd": "apps/ose-app-be-e2e"
       }
+    },
+    "spec-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be-e2e"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/steps/**/*.ts"]
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
