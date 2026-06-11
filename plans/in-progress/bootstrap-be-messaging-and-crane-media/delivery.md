@@ -27,6 +27,40 @@ See
 and
 [Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
+## Phase Dependency Overview
+
+```mermaid
+%% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, purple #CC78BC, grey #808080
+flowchart TB
+  P0["P0 Baseline"]
+  P1["P1 fsharp-crane-core"]
+  P2["P2 crane-be skeleton<br/>unit + integration"]
+  P3["P3 real adapter + NATS"]
+  P4["P4 crane-be-e2e"]
+  P5["P5 organiclever-be msg"]
+  P6["P6 ose-app-be msg"]
+  P7["P7 Dockerfiles + migrate"]
+  P8["P8 GHCR publish"]
+  P9["P9 specs + docs"]
+  P10["P10 Final gate + CI"]
+
+  P0 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10
+
+  linkStyle default stroke:#808080,stroke-width:1px
+
+  style P0 fill:#808080,stroke:#000000,color:#FFFFFF
+  style P1 fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style P2 fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style P3 fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style P4 fill:#CC78BC,stroke:#000000,color:#000000
+  style P5 fill:#029E73,stroke:#000000,color:#000000
+  style P6 fill:#029E73,stroke:#000000,color:#000000
+  style P7 fill:#DE8F05,stroke:#000000,color:#000000
+  style P8 fill:#DE8F05,stroke:#000000,color:#000000
+  style P9 fill:#808080,stroke:#000000,color:#FFFFFF
+  style P10 fill:#808080,stroke:#000000,color:#FFFFFF
+```
+
 ---
 
 ## Phase 0: Environment Setup and Baseline
@@ -151,10 +185,14 @@ and
 
 ---
 
-## Phase 2: crane-be Skeleton (health + HTTP + hexagonal + fake adapter)
+## Phase 2: crane-be Skeleton + Gherkin + Unit/Integration (fake adapter)
 
 > Stand up the deployable F# service with Giraffe HTTP, hexagonal layout, and the fake media
-> adapter. TDD throughout.
+> adapter. Author the crane-be Gherkin tree and wire BOTH the unit (`test:unit`, TickSpec + mocks)
+> and integration (`test:integration`, TickSpec) suites so each consumes the same Gherkin from the
+> first failing test. TDD throughout. Per the
+> [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md),
+> all test levels consume the shared Gherkin tree — only step implementations differ.
 >
 > _Suggested executor for all F# steps in this phase: `swe-fsharp-dev`_
 
@@ -165,7 +203,10 @@ and
       — acceptance: `dotnet build apps/crane-be/crane-be.fsproj` compiles
 - [ ] [AI] Create `apps/crane-be/project.json` mirroring `apps/crane-cli/project.json` targets plus
       a long-running `dev`/`run` (`dotnet run --project apps/crane-be/crane-be.fsproj`), tags
-      `domain:crane`, `type:app`
+      `domain:crane`, `type:app`. `test:unit`/`test:quick` MUST include
+      `{workspaceRoot}/specs/apps/crane/behavior/crane-be/gherkin/**/*.feature` in `inputs`
+      (sibling: crane-cli) so Gherkin edits invalidate cache. `spec-coverage` pairs the crane-be
+      Gherkin tree with `apps/crane-be`.
       — acceptance: `npx nx show project crane-be` lists `build`, `typecheck`, `lint`, `fmt`,
       `fmt:check`, `test:unit`, `test:quick`, `test:integration`, `spec-coverage`, `dev`, `run`
 - [ ] [AI] Grep `apps/rhino-cli/src/` for `lang` parsing to identify the source file(s) that
@@ -187,44 +228,75 @@ and
       and add a minimal valid PDF)
       — acceptance: `test -f apps/crane-be/tests/fixtures/sample.pdf` exits 0
 
-- [ ] [AI] **RED**: write a failing unit test for the `/health` handler returning 200 healthy, in
-      `apps/crane-be/tests/unit/Suite.fs`
+### Gherkin authoring (shared by all test levels)
+
+- [ ] [AI] Create the crane-be Gherkin tree
+      `specs/apps/crane/behavior/crane-be/gherkin/` with domain subdirs and `@unit`/`@integration`/
+      `@e2e` level tags transcribed from `prd.md`: `health/health.feature` and
+      `media/pdf-to-md-http.feature` (the fake-adapter, real-adapter, empty-body, non-PDF, and
+      content-type scenarios). Surface slug follows the flat `<product>-<surface>` convention
+      `[Repo-grounded: repo-governance/conventions/structure/specs-directory-structure.md]`.
+      — acceptance: `.feature` files mirror prd.md scenarios verbatim including tags; one primary
+      Given/When/Then per scenario
+
+### Unit + integration harness scaffolding (TickSpec, consume Gherkin)
+
+- [ ] [AI] Create `apps/crane-be/tests/unit/` (`crane-be-unit-tests.fsproj` with `TickSpec 2.0.5`,
+      `xunit.v3`, `coverlet`; `Steps/BddState.fs`, `Suite.fs` loading the crane-be Gherkin via
+      `GHERKIN_ROOT` default — sibling: `apps/crane-cli/tests/unit/Suite.fs`) and
+      `apps/crane-be/tests/integration/` (`crane-be-integration-tests.fsproj` with `TickSpec`;
+      `Steps/`, `Suite.fs` over the same Gherkin tree)
+      — acceptance: `npx nx run crane-be:test:unit` and `:test:integration` both run (no-op
+      placeholder green) and load `*.feature` files from the crane-be Gherkin path
+
+- [ ] [AI] **RED**: write a failing `@unit` step binding for the `/health` scenario (asserts the
+      `/health` handler returns 200 healthy), in `apps/crane-be/tests/unit/Steps/HealthSteps.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: test fails (handler not yet defined)
+      — acceptance: scenario fails (handler not yet defined)
 - [ ] [AI] **GREEN**: implement the `/health` Giraffe `HttpHandler` in
       `apps/crane-be/src/Adapters/In/HttpHandlers.fs` and wire it in
       `apps/crane-be/src/Program.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: health test passes
+      — acceptance: health scenario passes
 - [ ] [AI] **REFACTOR**: extract a `webApp` route composition in `HttpHandlers.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: all tests still pass
+      — acceptance: all scenarios still pass
 
-- [ ] [AI] **RED**: write a failing unit test for `MediaService.convert` returning the fake
-      canned markdown, in `apps/crane-be/tests/unit/Suite.fs`
+- [ ] [AI] **RED**: write a failing `@unit` step binding for `MediaService.convert` returning the
+      fake canned markdown, in `apps/crane-be/tests/unit/Steps/MediaSteps.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: test fails (`MediaService` / `FakeMediaAdapter` not yet defined)
+      — acceptance: scenario fails (`MediaService` / `FakeMediaAdapter` not yet defined)
 - [ ] [AI] **GREEN**: implement the out-port in `apps/crane-be/src/Core/Ports.fs`, the
       `FakeMediaAdapter` in `apps/crane-be/src/Adapters/Out/FakeMediaAdapter.fs`, and
       `MediaService.convert` in `apps/crane-be/src/Application/MediaService.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: fake-convert test passes
+      — acceptance: fake-convert scenario passes
 - [ ] [AI] **REFACTOR**: clean up the port signature naming
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: all tests still pass
+      — acceptance: all scenarios still pass
 
-- [ ] [AI] **RED**: write a failing unit test for `POST /media/pdf-to-md` returning 200 with the
-      fake markdown body, in `apps/crane-be/tests/unit/Suite.fs`
+- [ ] [AI] **RED**: write failing `@unit` step bindings for `POST /media/pdf-to-md` (200 fake body)
+      plus the `@unit` error scenarios (empty body → 400, non-PDF → 422) in
+      `apps/crane-be/tests/unit/Steps/MediaSteps.fs`; add non-BDD edge tests for config fail-fast in
+      `apps/crane-be/tests/unit/Tests/ConfigTests.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: test fails (route not yet wired)
+      — acceptance: scenarios + edge tests fail (route + config not yet wired)
 - [ ] [AI] **GREEN**: implement the `POST /media/pdf-to-md` handler in `HttpHandlers.fs` delegating
-      to `MediaService.convert` with the fake adapter, and wire fail-fast config read in
-      `apps/crane-be/src/Config.fs`
+      to `MediaService.convert` with the fake adapter, with empty-body and non-PDF guards, and wire
+      fail-fast config read in `apps/crane-be/src/Config.fs`
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: route test passes; coverage meets `Threshold=95`
+      — acceptance: route + error scenarios pass; coverage meets `Threshold=95`
 - [ ] [AI] **REFACTOR**: deduplicate request-body reading
       — command: `npx nx run crane-be:test:unit`
-      — acceptance: all tests still pass
+      — acceptance: all scenarios still pass
+- [ ] [AI] Bind the `@integration` `/health` scenario in `apps/crane-be/tests/integration/Steps/`
+      against the in-process service (real config), keeping the suite green for the
+      already-implemented surface
+      — command: `npx nx run crane-be:test:integration`
+      — acceptance: health integration scenario passes (real-NATS scenarios arrive in Phase 3)
+- [ ] [AI] `npx nx run crane-be:spec-coverage` — every authored crane-be step has a definition
+      — acceptance: exits 0 (any not-yet-bound `@integration` scenario is added in Phase 3; if it
+      blocks, scope spec-coverage to the authored features this phase and complete in Phase 3)
 
 ### Manual API Verification (curl)
 
@@ -242,25 +314,31 @@ and
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g. `feat(crane-be): scaffold service with health + fake pdf-to-md`
+- [ ] [AI] Commit thematically, e.g.
+      `feat(crane-be): scaffold service with health + fake pdf-to-md` and
+      `test(crane-be): add Gherkin tree consumed by unit + integration suites`
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
 - [ ] [AI] `npx nx run crane-be:test:quick` — exits 0 (coverage ≥ 95)
+- [ ] [AI] `npx nx run crane-be:test:unit` and `:test:integration` both load and pass the authored
+      crane-be Gherkin scenarios (unit binds `@unit`, integration binds `@integration` health)
 - [ ] [AI] `curl` health + fake-convert checks both return 200 with expected bodies
 
 > **Pause Safety**: crane-be is a deployable skeleton serving health + fake PDF→md over HTTP; the
-> repo compiles and all crane-be tests pass. Safe to stop. To resume: `npx nx run crane-be:dev`
-> then re-run the curl checks.
+> Gherkin tree exists and is consumed by both the unit and integration suites. Safe to stop. To
+> resume: `npx nx run crane-be:dev` then re-run the curl checks.
 
 ---
 
 ## Phase 3: crane-be Real PDF→md Adapter + NATS Subscriber
 
 > Wire the real PdfPig/Tesseract adapter (via the shared lib) and the NATS `crane.convert`
-> request/reply subscriber.
+> request/reply subscriber. The `@integration` scenarios (real-adapter convert, NATS request/reply,
+> NATS error envelope, dual-connection isolation) become the first failing integration tests,
+> consuming the same Gherkin tree authored in Phase 2.
 >
 > _Suggested executor for all F# steps in this phase: `swe-fsharp-dev`_
 
@@ -271,32 +349,49 @@ and
       `apps/crane-cli/crane-cli.fsproj`
       — acceptance: build output includes `tessdata/eng.traineddata`
 
-- [ ] [AI] **RED**: write a failing unit test asserting `RealMediaAdapter` delegates to
-      `CraneCore.convertPdfToMarkdown`, in `apps/crane-be/tests/unit/Suite.fs`
-      — command: `npx nx run crane-be:test:unit`
-      — acceptance: test fails (`RealMediaAdapter` not yet defined)
+### Gherkin authoring (integration + NATS scenarios)
+
+- [ ] [AI] Add `media/pdf-to-md-nats.feature` (the `@integration` NATS request/reply + NATS error
+      envelope scenarios) and `media/dual-nats-isolation.feature` (the `@integration`
+      two-connection isolation scenario) to
+      `specs/apps/crane/behavior/crane-be/gherkin/media/`, transcribed verbatim from `prd.md`
+      — acceptance: `.feature` files mirror prd.md scenarios including `@integration` tags
+
+- [ ] [AI] **RED**: write a failing `@integration` step binding asserting `RealMediaAdapter`
+      delegates to `CraneCore.convertPdfToMarkdown` (real-adapter convert scenario), in
+      `apps/crane-be/tests/integration/Steps/MediaSteps.fs`
+      — command: `npx nx run crane-be:test:integration`
+      — acceptance: scenario fails (`RealMediaAdapter` not yet defined)
 - [ ] [AI] **GREEN**: implement `apps/crane-be/src/Adapters/Out/RealMediaAdapter.fs` delegating to
       the library port
-      — command: `npx nx run crane-be:test:unit`
-      — acceptance: adapter test passes
+      — command: `npx nx run crane-be:test:integration`
+      — acceptance: real-adapter scenario passes
 - [ ] [AI] **REFACTOR**: make adapter selection (fake vs real) a single composition-root decision
       in `Program.fs`
-      — command: `npx nx run crane-be:test:unit`
-      — acceptance: all tests still pass
-
-- [ ] [AI] **RED**: write a failing integration test (real NATS) asserting a `crane.convert`
-      request gets a markdown reply, in `apps/crane-be/tests/integration/Suite.fs`
       — command: `npx nx run crane-be:test:integration`
-      — acceptance: test fails (subscriber not yet wired)
+      — acceptance: all scenarios still pass
+
+- [ ] [AI] **RED**: bind the `@integration` `crane.convert` request/reply scenario (real NATS) plus
+      the NATS error-envelope scenario, in `apps/crane-be/tests/integration/Steps/NatsSteps.fs`
+      — command: `npx nx run crane-be:test:integration`
+      — acceptance: scenarios fail (subscriber not yet wired)
 - [ ] [AI] **GREEN**: implement `apps/crane-be/src/Adapters/In/NatsSubscriber.fs` subscribing
       `crane.convert` with queue group `crane.workers` and replying on the auto `_INBOX`; wire two
       connections in `Program.fs` from `CRANE_BE_ORGANICLEVER_NATS_URL` and
       `CRANE_BE_OSE_APP_NATS_URL`
       — command: `npx nx run crane-be:test:integration`
-      — acceptance: request/reply integration test passes
+      — acceptance: request/reply + error-envelope scenarios pass
+- [ ] [AI] **RED**: bind the `@integration` dual-connection isolation scenario (same queue group on
+      both servers, no cross-delivery), in `apps/crane-be/tests/integration/Steps/NatsSteps.fs`
+      — command: `npx nx run crane-be:test:integration`
+      — acceptance: scenario fails (second connection / isolation assertion not yet wired)
+- [ ] [AI] **GREEN**: complete the two-connection wiring so each backend's request is answered only
+      on its own server
+      — command: `npx nx run crane-be:test:integration`
+      — acceptance: isolation scenario passes
 - [ ] [AI] **REFACTOR**: extract connection setup into a reusable helper
       — command: `npx nx run crane-be:test:integration`
-      — acceptance: all integration tests still pass
+      — acceptance: all integration scenarios still pass
 
 - [ ] [AI] Create `apps/crane-be/docker-compose.integration.yml` with a `nats` service (`-js`) and
       the `crane-be` service (siblings reference:
@@ -308,6 +403,7 @@ and
 
 - [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
 - [ ] [AI] `npx nx run crane-be:test:integration` — exits 0
+- [ ] [AI] `npx nx run crane-be:spec-coverage` — every crane-be Gherkin step is bound (F# steps)
 - [ ] [AI] Fix ALL failures, including preexisting ones
 
 ### Commit Guidelines
@@ -320,15 +416,98 @@ and
 > All checks below must pass before starting Phase 4.
 
 - [ ] [AI] `npx nx run crane-be:test:quick` — exits 0 (coverage ≥ 95)
-- [ ] [AI] `npx nx run crane-be:test:integration` — exits 0 (real NATS request/reply works)
+- [ ] [AI] `npx nx run crane-be:test:integration` — exits 0 (real NATS request/reply, error
+      envelope, and dual-connection isolation all pass)
+- [ ] [AI] `npx nx run crane-be:spec-coverage` — exits 0
 
 > **Pause Safety**: crane-be serves real PDF→md over HTTP and NATS request/reply with two
-> connections; integration tests pass against a real NATS container. Safe to stop. To resume:
-> `npx nx run crane-be:test:integration`.
+> connections; integration tests pass against a real NATS container and consume the shared Gherkin.
+> Safe to stop. To resume: `npx nx run crane-be:test:integration`.
 
 ---
 
-## Phase 4: organiclever-be Messaging Context
+## Phase 4: crane-be-e2e (Playwright-BDD Black-Box Runner)
+
+> Create the paired e2e runner `apps/crane-be-e2e/` that drives a running containerized `crane-be`
+> over real HTTP, asserting the `@e2e` Gherkin scenarios. This is the third test level for
+> `crane-be` and consumes the SAME Gherkin tree as unit and integration — only the step
+> implementations differ (Playwright over the wire). Mirrors `apps/ose-app-be-e2e/`
+> `[Repo-grounded: apps/ose-app-be-e2e/]`.
+>
+> _Suggested executor: `swe-e2e-dev`_
+
+- [ ] [AI] Scaffold `apps/crane-be-e2e/` mirroring `apps/ose-app-be-e2e/`: `package.json`
+      (`@playwright/test 1.60.0`, `playwright-bdd 8.5.1`, Volta extends root), `tsconfig.json`,
+      `.gitignore` (ignore `.features-gen/`, `test-results/`, `playwright-report/`), and `README.md`
+      — acceptance: `apps/crane-be-e2e/package.json` lists both deps at the pinned versions
+- [ ] [AI] Create `apps/crane-be-e2e/playwright.config.ts` via `defineBddConfig` with
+      `featuresRoot`/`features` pointing at `../../specs/apps/crane/behavior/crane-be/gherkin`,
+      `steps: ["./steps/**/*.ts"]`, and `baseURL` from `process.env.BASE_URL` defaulting to
+      `http://localhost:8300` (sibling: `apps/ose-app-be-e2e/playwright.config.ts`)
+      — acceptance: `npx bddgen` (run in `apps/crane-be-e2e`) generates `.features-gen/` from the
+      `@e2e` scenarios with no unbound-step error once steps exist
+- [ ] [AI] Create `apps/crane-be-e2e/project.json` mirroring `apps/ose-app-be-e2e/project.json`:
+      targets `install`, `lint` (`oxlint`), `typecheck` (`npx bddgen && npx tsc --noEmit`),
+      `test:quick` (lint + typecheck), `test:e2e` (`npx bddgen && npx playwright test`),
+      `test:e2e:ui`, `test:e2e:report`; `typecheck`/`test:quick` `inputs` include
+      `{workspaceRoot}/specs/apps/crane/behavior/crane-be/gherkin/**/*.feature`; tags `type:e2e`,
+      `platform:playwright`, `lang:ts`, `domain:crane`; `implicitDependencies: ["crane-be"]`
+      — acceptance: `npx nx show project crane-be-e2e` lists the targets and the implicit dep
+- [ ] [AI] Create `apps/crane-be-e2e/docker-compose.e2e.yml` starting `crane-be` plus two NATS
+      services (`-js`) so the running service satisfies its REQUIRED NATS env (sibling reference:
+      `apps/crane-be/docker-compose.integration.yml`)
+      — acceptance: `docker compose -f apps/crane-be-e2e/docker-compose.e2e.yml config` validates
+- [ ] [AI] Create `apps/crane-be-e2e/utils/response-store.ts` (copy from
+      `apps/ose-app-be-e2e/utils/response-store.ts`)
+      — acceptance: file present; exports `setResponse`/`getResponse`/`clearResponse`
+
+- [ ] [AI] **RED**: write the `@e2e` health step definitions in
+      `apps/crane-be-e2e/steps/health.steps.ts` (`createBdd()`), then run e2e against the
+      compose-started service
+      — command: `cd apps/crane-be-e2e && docker compose -f docker-compose.e2e.yml up -d && npx nx run crane-be-e2e:test:e2e`
+      — acceptance: the health scenario is generated and FAILS first only if the service is not yet
+      reachable; once compose is healthy it must pass (no unbound steps)
+- [ ] [AI] **GREEN**: implement the `@e2e` media step definitions in
+      `apps/crane-be-e2e/steps/media.steps.ts` (POST `/media/pdf-to-md` with
+      `apps/crane-be/tests/fixtures/sample.pdf`, assert 200 + markdown + `text/markdown`
+      content-type)
+      — command: `npx nx run crane-be-e2e:test:e2e`
+      — acceptance: all `@e2e` scenarios pass against the running container
+- [ ] [AI] **REFACTOR**: extract a shared `request`/baseURL helper and ensure `Before` clears the
+      response store (sibling: `ose-app-be-e2e` health steps)
+      — command: `npx nx run crane-be-e2e:test:e2e`
+      — acceptance: all `@e2e` scenarios still pass
+- [ ] [AI] Tear down the e2e stack:
+      `cd apps/crane-be-e2e && docker compose -f docker-compose.e2e.yml down -v`
+      — acceptance: containers removed
+
+### Local Quality Gates (Before Commit)
+
+- [ ] [AI] `npx nx run crane-be-e2e:test:quick` — exits 0 (`bddgen` + `tsc --noEmit` + lint)
+- [ ] [AI] `npx nx run crane-be-e2e:test:e2e` — exits 0 against the compose-started service
+- [ ] [AI] `npx nx affected -t typecheck lint` — all exit 0
+- [ ] [AI] Fix ALL failures, including preexisting ones
+
+### Commit Guidelines
+
+- [ ] [AI] Commit thematically, e.g.
+      `test(crane-be-e2e): add Playwright-BDD e2e runner consuming crane-be Gherkin`
+
+### Phase 4 Gate
+
+> All checks below must pass before starting Phase 5.
+
+- [ ] [AI] `npx nx run crane-be-e2e:test:quick` — exits 0
+- [ ] [AI] `npx nx run crane-be-e2e:test:e2e` — exits 0 (real HTTP black-box, `@e2e` scenarios pass)
+- [ ] [AI] The same Gherkin tree now feeds all three crane-be levels (unit, integration, e2e)
+
+> **Pause Safety**: crane-be has the full three-level testing pyramid green, all consuming one
+> Gherkin tree; the e2e runner proves the deployable service over real HTTP. Safe to stop. To
+> resume: bring up `docker-compose.e2e.yml` and run `npx nx run crane-be-e2e:test:e2e`.
+
+---
+
+## Phase 5: organiclever-be Messaging Context
 
 > Add NATS client, crane HTTP + NATS clients, JetStream durable demo, and env vars + drift guard
 > to `organiclever-be`.
@@ -403,9 +582,9 @@ and
 - [ ] [AI] Commit thematically, e.g.
       `feat(organiclever-be): add NATS messaging context, crane clients, and JetStream demo`
 
-### Phase 4 Gate
+### Phase 5 Gate
 
-> All checks below must pass before starting Phase 5.
+> All checks below must pass before starting Phase 6.
 
 - [ ] [AI] `npx nx run organiclever-be:test:quick` — exits 0 (coverage ≥ 90)
 - [ ] [AI] `npx nx run organiclever-be:test:integration` — exits 0 (NATS connect, crane RPC,
@@ -418,9 +597,9 @@ and
 
 ---
 
-## Phase 5: ose-app-be Messaging Context
+## Phase 6: ose-app-be Messaging Context
 
-> Same as Phase 4, for `ose-app-be`.
+> Same as Phase 5, for `ose-app-be`.
 >
 > _Suggested executor for all Rust steps in this phase: `swe-rust-dev`_
 
@@ -487,9 +666,9 @@ and
 - [ ] [AI] Commit thematically, e.g.
       `feat(ose-app-be): add NATS messaging context, crane clients, and JetStream demo`
 
-### Phase 5 Gate
+### Phase 6 Gate
 
-> All checks below must pass before starting Phase 6.
+> All checks below must pass before starting Phase 7.
 
 - [ ] [AI] `npx nx run ose-app-be:test:quick` — exits 0 (coverage ≥ 90)
 - [ ] [AI] `npx nx run ose-app-be:test:integration` — exits 0 (NATS connect, crane RPC, JetStream
@@ -501,7 +680,7 @@ and
 
 ---
 
-## Phase 6: Production Dockerfiles + sqlx::migrate! + Compose NATS
+## Phase 7: Production Dockerfiles + sqlx::migrate! + Compose NATS
 
 > Ship production Dockerfiles for all three services and run-on-boot migrations for both backends.
 >
@@ -555,9 +734,9 @@ and
       `feat(organiclever-be): run sqlx migrations on boot` and
       `build(crane-be): add production Dockerfile`
 
-### Phase 6 Gate
+### Phase 7 Gate
 
-> All checks below must pass before starting Phase 7.
+> All checks below must pass before starting Phase 8.
 
 - [ ] [AI] All three production images build locally (exit 0)
 - [ ] [AI] `npx nx run organiclever-be:test:integration`,
@@ -569,7 +748,7 @@ and
 
 ---
 
-## Phase 7: GHCR Affected-Aware Publish Workflow
+## Phase 8: GHCR Affected-Aware Publish Workflow
 
 > Add a GitHub Actions workflow that builds and publishes only changed images to public GHCR.
 
@@ -588,9 +767,9 @@ and
       `docker pull ghcr.io/wahidyankf/organiclever-be:latest && docker pull ghcr.io/wahidyankf/ose-app-be:latest && docker pull ghcr.io/wahidyankf/crane-be:latest`
       — acceptance: all three pulls succeed without authentication
 
-### Phase 7 Gate
+### Phase 8 Gate
 
-> All checks below must pass before starting Phase 8.
+> All checks below must pass before starting Phase 9.
 
 - [ ] [AI] The publish workflow ran on a push and published the affected image(s) (verify via
       `gh run view --json status,conclusion` for the workflow run)
@@ -603,23 +782,29 @@ and
 
 ---
 
-## Phase 8: Specs Completeness + spec-coverage + Docs
+## Phase 9: Specs Completeness + spec-coverage + Docs
 
-> Add the DDD spec sets and Gherkin features, update conventions and architecture docs.
+> Add the DDD spec sets and Gherkin features, update conventions and architecture docs. The
+> `crane-be` Gherkin tree was authored across Phases 2–3; this phase rounds out the remaining
+> spec-tree artifacts (component docs, README updates, the backend `messaging` contexts) and
+> verifies repo-wide spec coverage and docs quality.
 >
 > _Suggested executor: `specs-maker` (specs), `repo-rules-maker` / `docs-maker` (conventions)_
 
-- [ ] [AI] Add a `crane-be` surface to `specs/apps/crane/`: new
-      `specs/apps/crane/behavior/crane-be/gherkin/` directory with domain subdirs covering health
-      (`health/health.feature`), HTTP convert (`media/pdf-to-md-http.feature`), and NATS convert
-      (`media/pdf-to-md-nats.feature`); add `specs/apps/crane/components/be/` component docs
-      following `specs/apps/crane/components/cli/` as sibling. Do NOT add DDD artifacts — crane
-      is not in the `AppsWithDDD` allowlist `[Repo-grounded:
-apps/rhino-cli/src/internal/allowlist.rs]`. Surface slug follows the flat
+- [ ] [AI] Finalize the `crane-be` surface under `specs/apps/crane/`: confirm
+      `specs/apps/crane/behavior/crane-be/gherkin/` (authored in Phases 2–3) covers health, HTTP
+      convert, NATS convert, and dual-connection isolation; add a
+      `specs/apps/crane/behavior/crane-be/gherkin/README.md`; add
+      `specs/apps/crane/components/be/` component docs following
+      `specs/apps/crane/components/cli/` as sibling; and update
+      `specs/apps/crane/behavior/README.md` to list both the `crane-cli` and `crane-be` surfaces.
+      Do NOT add DDD artifacts — crane is not in the `AppsWithDDD` allowlist
+      `[Repo-grounded: apps/rhino-cli/src/internal/allowlist.rs]`. Surface slug follows the flat
       `<product>-<surface>` convention established by the `standardize-app-spec-trees` plan
-      (2026-06-11) `[Repo-grounded: repo-governance/conventions/structure/specs-directory-structure.md]`.
-      — acceptance: files present; `.feature` files mirror prd.md scenarios; no `ddd/` dir
-      created under `specs/apps/crane/`
+      (2026-06-11)
+      `[Repo-grounded: repo-governance/conventions/structure/specs-directory-structure.md]`.
+      — acceptance: behavior `.feature` files mirror prd.md scenarios; `components/be/` present;
+      `behavior/README.md` lists both surfaces; no `ddd/` dir created under `specs/apps/crane/`
 - [ ] [AI] Add a `messaging` bounded context to
       `specs/apps/organiclever/ddd/bounded-contexts.yaml` (new entry with
       `gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging`
@@ -643,17 +828,20 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
       — acceptance: files present; features mirror prd.md scenarios; `gherkin:` field points to
       `behavior/app-be/gherkin/messaging`
 - [ ] [AI] Ensure each app/lib has matching step definitions so `spec-coverage` passes:
-      `npx nx affected -t spec-coverage`
+      `npx nx affected -t spec-coverage`. The `crane-be` Gherkin is owned by `apps/crane-be` (F#
+      steps); `crane-be-e2e` consumes the same tree via playwright-bdd and carries no spec-coverage
+      target (matching `ose-app-be-e2e`).
       — acceptance: exits 0 for all touched projects
 - [ ] [AI] Register the `fsharp-` lib-naming token in `docs/reference/monorepo-structure.md`
       (alongside `ts-`/`rust-` at lines listing the prefixes) and in any AGENTS.md / monorepo
       lib-naming note that restates the list
   - _Suggested executor: `repo-rules-maker`_
     — acceptance: `fsharp-` appears in the prefix list; example references `fsharp-crane-core`
-- [ ] [AI] Add `apps/crane-be/README.md` and update `AGENTS.md` Current Apps list to include
-      `crane-be` and `libs/fsharp-crane-core`
+- [ ] [AI] Add `apps/crane-be/README.md` and `apps/crane-be-e2e/README.md`, and update `AGENTS.md`
+      Current Apps list + Project Structure tree to include `crane-be`, `crane-be-e2e`, and
+      `libs/fsharp-crane-core`
   - _Suggested executor: `readme-maker`_
-    — acceptance: README follows repo README conventions; AGENTS.md lists both
+    — acceptance: READMEs follow repo README conventions; AGENTS.md lists all three
 
 ### Local Quality Gates (Before Commit)
 
@@ -668,20 +856,20 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
       `docs(specs): add crane-be and messaging bounded-context spec sets` and
       `docs(conventions): register fsharp- lib-naming token`
 
-### Phase 8 Gate
+### Phase 9 Gate
 
-> All checks below must pass before starting Phase 9.
+> All checks below must pass before starting Phase 10.
 
 - [ ] [AI] `npx nx affected -t spec-coverage` — exits 0
 - [ ] [AI] `npm run lint:md` — exits 0
-- [ ] [AI] `fsharp-` token registered and crane-be documented
+- [ ] [AI] `fsharp-` token registered; crane-be + crane-be-e2e documented
 
 > **Pause Safety**: specs, conventions, and docs are complete and consistent with the code. Safe
 > to stop. To resume: `npx nx affected -t spec-coverage`.
 
 ---
 
-## Phase 9: Final Quality Gate + Commit + Push + CI Verify
+## Phase 10: Final Quality Gate + Commit + Push + CI Verify
 
 > Final repo-wide gate, push to main, and CI verification.
 
@@ -699,6 +887,7 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
 - [ ] [AI] `npx nx affected -t test:quick` — exits 0
 - [ ] [AI] `npx nx affected -t spec-coverage` — exits 0
 - [ ] [AI] `npx nx run crane-be:test:integration`,
+      `npx nx run crane-be-e2e:test:e2e`,
       `npx nx run organiclever-be:test:integration`,
       `npx nx run ose-app-be:test:integration` — all exit 0
 - [ ] [AI] `rhino-cli env validate` — no drift
@@ -730,7 +919,7 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
 - [ ] [AI] Commit the archival:
       `chore(plans): move bootstrap-be-messaging-and-crane-media to done`
 
-### Phase 9 Gate
+### Phase 10 Gate
 
 > Final gate — the plan is complete only when all checks below pass.
 

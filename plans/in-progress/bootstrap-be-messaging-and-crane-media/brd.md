@@ -1,5 +1,25 @@
 # Business Requirements: Bootstrap BE Messaging and Crane Media Service
 
+## Deliverable Handoff At A Glance
+
+```mermaid
+%% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, purple #CC78BC, grey #808080
+flowchart LR
+  THIS["ose-public (this plan)<br/>images, migrate, crane-be"]
+  INFRA["ose-infra Phase 0.5<br/>deploy-twin-k3s-clusters"]
+  GHCR["public GHCR images x3"]
+
+  THIS --> GHCR
+  GHCR --> INFRA
+  THIS -->|messaging proven| INFRA
+
+  linkStyle default stroke:#808080,stroke-width:1px
+
+  style THIS fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style GHCR fill:#DE8F05,stroke:#000000,color:#000000
+  style INFRA fill:#029E73,stroke:#000000,color:#000000
+```
+
 ## Business Goal
 
 Deliver the application-side artifacts the `ose-infra` `deploy-twin-k3s-clusters` plan depends
@@ -53,6 +73,13 @@ All criteria are observable facts checkable by command or inspection — no fabr
   `docker-compose.integration.yml`.
 - **Media path works both ways** (observable): `crane-be` returns markdown for a sample PDF over
   both `POST /media/pdf-to-md` (HTTP) and the `crane.convert` NATS request/reply subject.
+- **Three-level testing, Gherkin-everywhere** (observable): `crane-be` passes `test:unit`,
+  `test:integration`, and (via `crane-be-e2e`) `test:e2e`, with all three levels consuming the
+  shared Gherkin tree `specs/apps/crane/behavior/crane-be/gherkin/`; `spec-coverage` reports every
+  step bound. This satisfies the
+  [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md).
+- **Black-box e2e proven** (observable): `apps/crane-be-e2e/` (Playwright-BDD) exercises a running
+  containerized `crane-be` over real HTTP and the run passes.
 - **No regression** (observable): `crane-cli`'s existing unit + integration tests stay green
   after the library extraction.
 - **Drift guard clean** (observable): `rhino-cli env validate` passes with all new env vars
@@ -77,3 +104,5 @@ All criteria are observable facts checkable by command or inspection — no fabr
 | Agents touch real `.env*` files                                 | Secrets guardrail violation          | All real-env relocation steps tagged `[HUMAN]`; agents only edit `.env.example`                                                                     |
 | crane-be cannot reach both NATS servers (federation assumption) | Broken media async path              | Design uses two independent connections + same queue group, confirmed by research; no federation assumed                                            |
 | GHCR package visibility defaults to private                     | Infra cannot pull images             | Package-visibility flip tagged `[HUMAN]` as an out-of-band GitHub setting                                                                           |
+| Same Gherkin scenario diverges across the three step layers     | Silent behavioral gap                | One Gherkin tree is the single contract; `spec-coverage` enforces every step is bound; integration/e2e steps stick to Gherkin exactly (no extras)   |
+| crane-be e2e flakiness (HTTP + two NATS conns in one container) | Unreliable e2e gate                  | e2e runs against a docker-compose-started service with a healthcheck wait; `test:e2e` stays non-cacheable; retries configured in Playwright         |
