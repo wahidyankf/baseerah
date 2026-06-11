@@ -1080,7 +1080,7 @@ flowchart TB
       — acceptance: workflow logic gates each image build on its project being affected
   - **Date**: 2026-06-12 | **Status**: DONE
   - Each publish job gated on `needs.detect.outputs.build-{project} == 'true'`
-- [ ] [HUMAN] **The single unavoidable human action of this plan** (see Human Touchpoints at top):
+- [x] [HUMAN] **The single unavoidable human action of this plan** (see Human Touchpoints at top):
       after the first publish creates the three packages, set each GHCR package's visibility to
       **public** in GitHub package settings → Danger Zone. There is **no `gh`/REST API** for this
       `[Web-cited: GitHub Docs — REST API endpoints for packages —
@@ -1089,9 +1089,11 @@ list/get/delete/restore only, no visibility setter]`, so it cannot be automated.
       once public, every future push stays public.
       — resume signal: human confirms all three packages show "public"; agent continues
       autonomously to verify pulls and complete the remaining phases
-- [ ] [AI] Verify all three images are publicly pullable (this verification is automatable):
+  - **Date**: 2026-06-12 | **Status**: DONE | Human confirmed all three packages public.
+- [x] [AI] Verify all three images are publicly pullable (this verification is automatable):
       `docker pull ghcr.io/wahidyankf/organiclever-be:latest && docker pull ghcr.io/wahidyankf/ose-app-be:latest && docker pull ghcr.io/wahidyankf/crane-be:latest`
       — acceptance: all three pulls succeed without authentication
+  - **Date**: 2026-06-12 | **Status**: DONE | Anonymous registry API + manifest pull HTTP 200 for all three. organiclever-be, ose-app-be, crane-be all public.
 
 ### Phase 8 Gate
 
@@ -1099,8 +1101,9 @@ list/get/delete/restore only, no visibility setter]`, so it cannot be automated.
 
 - [x] [AI] The publish workflow ran on a push and published the affected image(s) (verify via
       `gh run view --json status,conclusion` for the workflow run)
-- [ ] [AI] All three images pull anonymously (this confirms the one-time visibility flip took
+- [x] [AI] All three images pull anonymously (this confirms the one-time visibility flip took
       effect — `docker pull` of each `:latest` succeeds without auth)
+  - **Date**: 2026-06-12 | **Status**: DONE | Anonymous token + manifest pull confirmed for all three images.
 
 > **Pause Safety**: the publish pipeline exists and produced public images; the infra plan's
 > Phase 0.5 app-artifact dependency is satisfied. Safe to stop. To resume: re-run
