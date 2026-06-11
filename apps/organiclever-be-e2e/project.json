@@ -55,6 +55,17 @@
         "command": "npx playwright show-report",
         "cwd": "apps/organiclever-be-e2e"
       }
+    },
+    "spec-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be-e2e"
+      },
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature",
+        "{projectRoot}/steps/**/*.ts"
+      ]
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"],
