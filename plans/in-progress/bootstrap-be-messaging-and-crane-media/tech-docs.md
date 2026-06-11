@@ -96,8 +96,7 @@ apps/crane-be/
   crane-be.fsproj            # OutputType=Exe, net10.0, ProjectReference to fsharp-crane-core
   project.json               # Nx targets (see below)
   fsharplint.json            # mirrors crane-cli lint config
-  Dockerfile                 # production image (Phase 6)
-  docker-compose.integration.yml  # NATS + crane-be (Phase 6)
+  Dockerfile                 # production image (Phase 4 — e2e compose needs it)
   .env.example               # CRANE_BE_* vars (Phase 2)
   src/
     Core/                    # thin app-level wiring over fsharp-crane-core ports
@@ -118,27 +117,34 @@ apps/crane-be/
       Steps/                 # BddState.fs + *Steps.fs (unit-level step defs)
       Tests/                 # non-BDD edge cases (config fail-fast, error paths)
       Suite.fs               # TickSpec runner: loads crane-be Gherkin via GHERKIN_ROOT
-    integration/             # TickSpec; real adapter + real NATS; non-cacheable
-      Steps/                 # integration-level step defs (real adapter / NATS)
-      Suite.fs               # TickSpec runner: same Gherkin tree, integration steps
+    integration/             # TickSpec; real adapter + filesystem; NO network; non-cacheable
+      Steps/                 # integration step defs (real PdfPig/Tesseract over sample.pdf)
+      Suite.fs               # TickSpec runner: same Gherkin tree, @integration steps
     fixtures/
       sample.pdf             # real PDF fixture shared by integration + e2e
 ```
+
+> `crane-be` integration is **filesystem-only** — it calls `MediaService.convert` with the real
+> PdfPig/Tesseract adapter against `tests/fixtures/sample.pdf`. No HTTP server starts and no NATS
+> connection opens, so there is no `docker-compose.integration.yml` for `crane-be`. All NATS proof
+> lives at the e2e layer.
 
 The paired e2e runner lives in its own Nx project (apps never import apps):
 
 ```
 apps/crane-be-e2e/
-  project.json               # type:e2e, platform:playwright, lang:ts, domain:crane
-  package.json               # @playwright/test 1.60.0 + playwright-bdd 8.5.1
+  project.json               # type:e2e, platform:playwright, lang:ts, domain:crane; spec-coverage
+  package.json               # @playwright/test 1.60.0 + playwright-bdd 8.5.1 + nats (NATS.js)
   tsconfig.json
   playwright.config.ts       # defineBddConfig -> crane-be Gherkin; baseURL crane-be
   docker-compose.e2e.yml     # crane-be + 2 NATS servers, for black-box runs
   steps/
-    health.steps.ts          # GET /health step defs
-    media.steps.ts           # POST /media/pdf-to-md step defs
+    health.steps.ts          # GET /health step defs (Playwright HTTP)
+    media-http.steps.ts      # POST /media/pdf-to-md step defs (Playwright HTTP)
+    media-nats.steps.ts      # crane.convert req/reply + dual-conn isolation (nats client)
   utils/
     response-store.ts        # mirrors ose-app-be-e2e response store
+    nats-client.ts           # connect/request helpers over the two NATS servers
 ```
 
 - **Ports (driving / In)**: HTTP handler and NATS subscriber both call the same
@@ -162,10 +168,15 @@ accepts PDF bytes (request body) and returns `text/markdown`.
 [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md)
 applies in full: `test:unit`, `test:integration`, and `test:e2e` are all mandatory, and **all three
 levels consume the same Gherkin tree** `specs/apps/crane/behavior/crane-be/gherkin/`. Only the step
-implementations differ — the standard's "Gherkin-Everywhere Mandate". `crane-be` is not a
-PostgreSQL-backed CRUD service; its single real backing dependency at the integration level is the
-**filesystem (real PDF) + a real NATS broker** (the messaging analogue of "one real dependency"),
-and the real PdfPig/Tesseract adapter. E2E adds real HTTP via Playwright.
+implementations differ — the standard's "Gherkin-Everywhere Mandate".
+
+The standard's **"No Network in Integration Tests"** rule is applied strictly. `crane-be` is not a
+PostgreSQL-backed CRUD service; its single real dependency at the integration level is the
+**filesystem** — the real PdfPig/Tesseract adapter reading `tests/fixtures/sample.pdf`, exactly the
+"one real dependency = filesystem" pattern the standard prescribes for CLI-style apps. **NATS is
+real network I/O, so no NATS scenario runs at the integration level.** All NATS request/reply,
+error-envelope, and dual-connection-isolation scenarios are `@e2e`, exercised against a running
+service. E2E adds real HTTP (Playwright) and real NATS (a `nats` client in the step definitions).
 
 ```mermaid
 %% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, purple #CC78BC, grey #808080
@@ -178,11 +189,11 @@ flowchart LR
   end
   subgraph INT["test:integration (crane-be)"]
     IS["TickSpec steps"]
-    IR["real adapter + real NATS"]
+    IR["real adapter + filesystem<br/>no network"]
   end
   subgraph E2E["test:e2e (crane-be-e2e)"]
-    ES["Playwright-BDD steps"]
-    EH["real HTTP -> running svc"]
+    ES["Playwright + nats steps"]
+    EH["real HTTP + real NATS"]
   end
 
   G --> US
@@ -208,19 +219,21 @@ flowchart LR
 
 ### Level mapping
 
-| Level              | Project        | Harness                     | What is real                              | Cacheable |
-| ------------------ | -------------- | --------------------------- | ----------------------------------------- | --------- |
-| `test:unit`        | `crane-be`     | xUnit v3 + TickSpec         | Nothing — fake adapter, mocked NATS port  | yes       |
-| `test:integration` | `crane-be`     | xUnit v3 + TickSpec         | Real PdfPig/Tesseract adapter + real NATS | no        |
-| `test:e2e`         | `crane-be-e2e` | Playwright + playwright-bdd | Real HTTP against a running container     | no        |
+| Level              | Project        | Harness                            | What is real                               | Cacheable |
+| ------------------ | -------------- | ---------------------------------- | ------------------------------------------ | --------- |
+| `test:unit`        | `crane-be`     | xUnit v3 + TickSpec                | Nothing — fake adapter, mocked ports       | yes       |
+| `test:integration` | `crane-be`     | xUnit v3 + TickSpec                | Real PdfPig/Tesseract adapter + filesystem | no        |
+| `test:e2e`         | `crane-be-e2e` | Playwright + playwright-bdd + nats | Real HTTP + real NATS, running container   | no        |
 
 - **Unit is a superset**: it binds every Gherkin scenario it can verify with mocks (`@unit`) PLUS
   non-BDD edge tests (config fail-fast, missing/invalid payloads) in `tests/unit/Tests/`. Coverage
   is measured here at `Threshold=95` (matching crane-cli), exceeding the ≥90% backend floor.
-- **Integration sticks to Gherkin exactly**: `@integration` scenarios only — the NATS
-  request/reply, the real-adapter convert, and the two-connection isolation. No extra non-BDD tests.
-- **E2E sticks to Gherkin exactly**: `@e2e` scenarios only, driven over real HTTP from
-  `crane-be-e2e`.
+- **Integration sticks to Gherkin exactly**: `@integration` scenarios only — the real-adapter
+  convert against a real PDF on the filesystem. **No network, so no NATS here.** No extra non-BDD
+  tests.
+- **E2E sticks to Gherkin exactly**: `@e2e` scenarios — health + HTTP convert (Playwright over real
+  HTTP) and the NATS request/reply, error-envelope, and dual-connection-isolation scenarios (a
+  `nats` client driving the running service over two real NATS servers).
 
 ### How F# consumes Gherkin (TickSpec)
 
@@ -236,26 +249,44 @@ different `Steps/` sets against the same feature files.
 `crane-be-e2e` follows the existing `ose-app-be-e2e` mechanism `[Repo-grounded:
 apps/ose-app-be-e2e/playwright.config.ts]`: `defineBddConfig({ featuresRoot, features, steps })`
 points at the crane-be Gherkin tree; `npx bddgen` generates `.features-gen/` Playwright specs from
-the `@e2e`-tagged scenarios, and `steps/*.steps.ts` bind them via `createBdd()`. `bddgen` fails if
-a generated scenario has an unbound step, so the runner self-guards coverage for what it executes.
+the `@e2e`-tagged scenarios, and `steps/*.steps.ts` bind them via `createBdd()`. HTTP steps use
+Playwright's `request` fixture; the NATS steps (`media-nats.steps.ts`) open real connections to the
+two NATS servers via the `nats` (NATS.js) client and issue `crane.convert` request/reply. `bddgen`
+fails if a generated scenario has an unbound step, so the runner self-guards coverage for what it
+executes — and its `spec-coverage` target enforces the full `@e2e` set has bindings.
 
-### spec-coverage ownership
+### spec-coverage ownership (dual owner)
 
-`spec-coverage` ownership for the crane-be Gherkin tree sits with **`apps/crane-be`** (its F# steps
-cover every scenario), mirroring how `apps/ose-app-be` — not `ose-app-be-e2e` — owns the `app-be`
-gherkin `spec-coverage` target `[Repo-grounded: apps/ose-app-be/project.json,
-apps/ose-app-be-e2e/project.json has no spec-coverage target]`. The command:
+Per the "follow the standard" decision, **both** `apps/crane-be` (F#) **and** `apps/crane-be-e2e`
+(TypeScript) carry a `spec-coverage` target over the crane-be Gherkin tree. The standard states
+spec-coverage is "compulsory for all apps **and E2E runners**", and that E2E runners implement the
+steps they run rather than excluding them
+`[Repo-grounded: three-level-testing-standard.md §Spec-Coverage Validation]`.
 
 ```bash
+# apps/crane-be (F#) — owns @unit + @integration domains (filesystem; no NATS)
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- \
+  spec-coverage validate --shared-steps --exclude-dir messaging \
+  specs/apps/crane/behavior/crane-be/gherkin apps/crane-be
+
+# apps/crane-be-e2e (TS) — owns the @e2e domains incl. the NATS messaging dir
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- \
   spec-coverage validate --shared-steps \
-  specs/apps/crane/behavior/crane-be/gherkin apps/crane-be
+  specs/apps/crane/behavior/crane-be/gherkin apps/crane-be-e2e
 ```
 
-`rhino-cli spec-coverage` supports F# TickSpec, Rust, and TypeScript step extraction `[Repo-grounded:
-apps/rhino-cli/src/internal/speccoverage/extractors.rs]`, so the F# steps register correctly. The
-`crane-be-e2e` runner consumes the same Gherkin via `playwright-bdd` and does not carry its own
-`spec-coverage` target, matching the established sibling e2e projects.
+`rhino-cli spec-coverage` supports F# TickSpec, Rust, and TypeScript step extraction
+`[Repo-grounded: apps/rhino-cli/src/internal/speccoverage/extractors.rs]`. The crane-be Gherkin is
+organized into domain subdirs (`health/`, `media/`, `messaging/`) so the F# owner can
+`--exclude-dir messaging` (the NATS-only, network-bound domain it cannot run under the no-network
+integration rule), while the e2e owner covers every domain — including `messaging/` via its `nats`
+client steps. Exact `--exclude-dir` flags are finalized in Phase 9 against the real step sets.
+
+> **Standard-vs-practice note** `[Repo-grounded: ose-app-be-e2e/project.json has no spec-coverage
+target]`: existing e2e runners (`ose-app-be-e2e`, `organiclever-be-e2e`) do **not** carry a
+> spec-coverage target, so adding one to `crane-be-e2e` makes it the first conformant e2e runner.
+> This divergence is intentional; a follow-up `repo-rules-checker` pass should reconcile the
+> repo-wide gap (either backfill the siblings or amend the standard) rather than leave it silent.
 
 ## crane-be-e2e Project
 
@@ -264,17 +295,23 @@ A new Nx project `apps/crane-be-e2e/`, the black-box counterpart to `crane-be`, 
 
 - **Tags**: `type:e2e`, `platform:playwright`, `lang:ts`, `domain:crane`.
 - **`implicitDependencies`**: `["crane-be"]`.
-- **Targets** (mirroring `ose-app-be-e2e`): `install`, `lint` (`oxlint`), `typecheck`
-  (`npx bddgen && npx tsc --noEmit`), `test:quick` (lint + typecheck), `test:e2e`
-  (`npx bddgen && npx playwright test`), `test:e2e:ui`, `test:e2e:report`. `typecheck`/`test:quick`
-  declare the crane-be Gherkin glob in `inputs` so bddgen output invalidates correctly.
+- **Dependencies**: `@playwright/test`, `playwright-bdd`, and **`nats`** (NATS.js) for the
+  request/reply and dual-connection-isolation step definitions.
+- **Targets** (mirroring `ose-app-be-e2e`, plus a `spec-coverage` target per the decision):
+  `install`, `lint` (`oxlint`), `typecheck` (`npx bddgen && npx tsc --noEmit`), `test:quick`
+  (lint + typecheck), `test:e2e` (`npx bddgen && npx playwright test`), `test:e2e:ui`,
+  `test:e2e:report`, and `spec-coverage` (pairs the crane-be Gherkin tree with `apps/crane-be-e2e`).
+  `typecheck`/`test:quick`/`spec-coverage` declare the crane-be Gherkin glob in `inputs` so bddgen
+  output and step changes invalidate correctly.
 - **`playwright.config.ts`**: `defineBddConfig` `featuresRoot`/`features` point at
   `../../specs/apps/crane/behavior/crane-be/gherkin`; `steps: ["./steps/**/*.ts"]`; `baseURL` from
-  `process.env.BASE_URL` defaulting to the crane-be dev URL (`http://localhost:8300`).
+  `process.env.BASE_URL` defaulting to the crane-be dev URL (`http://localhost:8300`). The NATS URLs
+  for the `nats`-client steps come from env set by the e2e compose.
 - **`docker-compose.e2e.yml`**: starts `crane-be` plus two NATS servers (`-js`) so the running
   service satisfies its REQUIRED env (`CRANE_BE_ORGANICLEVER_NATS_URL`, `CRANE_BE_OSE_APP_NATS_URL`)
-  before Playwright drives it over HTTP. `test:e2e` brings the stack up, waits on the `/health`
-  endpoint, runs Playwright, and tears down. Non-cacheable per nx-targets.
+  and so the dual-connection-isolation scenario has two distinct servers to assert against.
+  `test:e2e` brings the stack up, waits on the `/health` endpoint, runs Playwright (HTTP) + the
+  `nats`-client steps, and tears down. Non-cacheable per nx-targets.
 
 ### End-to-end black-box flow
 
@@ -292,6 +329,23 @@ sequenceDiagram
   CB-->>PW: 200 text/markdown
 ```
 
+The same runner also drives the NATS path with a `nats` client (no Playwright needed):
+
+```mermaid
+%% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, purple #CC78BC, grey #808080
+sequenceDiagram
+  participant NC as e2e nats client
+  participant N as NATS server
+  participant CB as crane-be subscriber
+  participant CORE as fsharp-crane-core
+  NC->>N: request crane.convert (sample.pdf)
+  N->>CB: deliver (queue crane.workers)
+  CB->>CORE: convertPdfToMarkdown
+  CORE-->>CB: markdown
+  CB-->>N: reply on _INBOX
+  N-->>NC: markdown reply
+```
+
 ## Messaging Bounded Context (both Rust backends)
 
 Each backend gains a `messaging` module (Rust) implementing:
@@ -303,10 +357,30 @@ Each backend gains a `messaging` module (Rust) implementing:
 - **crane NATS client**: core request/reply to `crane.convert` (reply via auto `_INBOX`).
 - **JetStream demo**: a durable stream + durable consumer on one demo subject per backend; publish
   → consume → ack, exercising the provisioned JetStream.
+- **HTTP media-convert endpoint** (new, for e2e observability): a route that accepts a PDF and
+  internally drives the crane NATS request/reply path, returning the markdown. This gives the
+  Playwright e2e runner an over-the-wire surface to assert the messaging chain without a broker
+  client. The JetStream demo result is likewise surfaced on a messaging status route the e2e run
+  asserts.
 
 Rust NATS crate: `async-nats = "0.47.0"` (see Dependency Clearance). The existing backends already
 use `tokio` full and `axum` `[Repo-grounded: Cargo.toml]`, so `async-nats` integrates into the
 existing tokio runtime.
+
+### Backend messaging test-level placement (strict)
+
+Applying the "No Network in Integration Tests" rule repo-wide, the backends' NATS code is **not**
+exercised at the integration level:
+
+| Concern                         | Level              | How                                                                                                                                                 |
+| ------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Missing/invalid NATS-URL config | `test:unit`        | config fail-fast with mocked env (no network)                                                                                                       |
+| Crane RPC over NATS, JetStream  | `test:e2e`         | HTTP media-convert endpoint + status route, asserted by the paired `*-be-e2e` Playwright runner against a running stack (backend + NATS + crane-be) |
+| DB persistence, migrate-on-boot | `test:integration` | real PostgreSQL only — unchanged; NATS is **not** added to `docker-compose.integration.yml`                                                         |
+
+The `messaging` Gherkin therefore carries `@unit` (config fail-fast) and `@e2e` (everything
+network-bound) scenarios; it has no `@integration` scenarios. Each backend's `docker-compose.e2e.yml`
+(new) brings up PostgreSQL + NATS + `crane-be` alongside the backend for the e2e run.
 
 ### Subject and queue-group naming
 
@@ -314,7 +388,7 @@ existing tokio runtime.
   `_INBOX`). Core request/reply suits tightly-coupled service RPC — "Request-Reply is a common
   pattern in modern distributed systems. A request is sent, and the application either waits on
   the response with a certain timeout, or receives a response asynchronously."
-  `[Web-cited: NATS docs — Request-Reply — https://docs.nats.io/nats-concepts/core-nats/reqreply — accessed 2026-06-11]`.
+  `[Web-cited: NATS docs — Request-Reply — https://docs.nats.io/nats-concepts/core-nats/reqreply — accessed 2026-06-11 — "Request-Reply is a common pattern in modern distributed systems. A request is sent, and the application either waits on the response with a certain timeout, or receives a response asynchronously."]`.
 - Queue group (crane-be subscribers): `crane.workers` (same name on both connections).
 - JetStream demo subjects: `<domain>.<service>.<action>` style, e.g.
   `organiclever.messaging.demo` and `ose-app.messaging.demo` — dot-separated, alphanumeric plus
@@ -330,23 +404,24 @@ caret/tilde. CVE sources checked for each: NVD, GitHub Advisories, Snyk DB, vend
 security pages, and the CISA KEV feed. Cutoff = execution date minus 60 days; the chosen version's
 release date must precede the cutoff.
 
-| Package            | Version                        | Ecosystem    | Release date                                        | Path | 60-day cutoff basis                                                 | Notes                                                                                                                                                                                                    |
-| ------------------ | ------------------------------ | ------------ | --------------------------------------------------- | ---- | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `async-nats`       | `0.47.0`                       | Rust (Cargo) | 2026-03-31 `[Unverified — confirm at Phase 0]`      | B    | release date ≥ 60d before exec date                                 | RUSTSEC-2023-0027 patched since 0.29.0; MSRV 1.88 matches both backends `[Repo-grounded: Cargo.toml rust-version 1.88]` `[Unverified — confirm MSRV at Phase 0]`. Do NOT use 0.48.x/0.49.x (inside soak) |
-| `NATS.Net`         | latest Path-B-eligible `2.7.x` | .NET (NuGet) | `_Unknown — confirm exact 2.7.x + date at Phase 0_` | B    | must be ≥ 60d old + CVE-clean at exec                               | Do NOT pin 2.8.0/2.8.1 (inside soak). Recorded as a Phase 0 verification step                                                                                                                            |
-| `Giraffe`          | `8.2.0`                        | .NET (NuGet) | 2025-11-12 `[Unverified — confirm at Phase 0]`      | B    | well past 60d                                                       | ASP.NET Core; HttpHandler composes with hexagonal ports                                                                                                                                                  |
-| `PdfPig`           | `0.1.14`                       | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]`                  | consumed via shared lib                                                                                                                                                                                  |
-| `TesseractOCR`     | `5.5.2`                        | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]`                  | consumed via shared lib                                                                                                                                                                                  |
-| Runtime            | `.NET 10` (`net10.0`) + F# 10  | .NET         | matches crane-cli                                   | n/a  | n/a                                                                 | `[Repo-grounded: crane-cli.fsproj TargetFramework net10.0]`                                                                                                                                              |
-| `TickSpec`         | `2.0.5`                        | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli unit/integration fsproj]` | F# Gherkin runner for crane-be unit + integration                                                                                                                                                        |
-| `@playwright/test` | `1.60.0`                       | npm          | reused                                              | B    | already pinned `[Repo-grounded: ose-app-be-e2e/package.json]`       | crane-be-e2e test runner                                                                                                                                                                                 |
-| `playwright-bdd`   | `8.5.1`                        | npm          | reused                                              | B    | already pinned `[Repo-grounded: ose-app-be-e2e/package.json]`       | Gherkin → Playwright spec generation (`bddgen`)                                                                                                                                                          |
+| Package            | Version                        | Ecosystem    | Release date                                        | Path | 60-day cutoff basis                                                 | Notes                                                                                                                                                                                                                                                                                                                                   |
+| ------------------ | ------------------------------ | ------------ | --------------------------------------------------- | ---- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `async-nats`       | `0.47.0`                       | Rust (Cargo) | 2026-03-31 `[Unverified — confirm at Phase 0]`      | B    | release date ≥ 60d before exec date                                 | RUSTSEC-2023-0027 reported fixed in 0.29.0 `[Unverified — confirm advisory + fixed-version at Phase 0 against https://rustsec.org/advisories/RUSTSEC-2023-0027.html]`; MSRV 1.88 matches both backends `[Repo-grounded: Cargo.toml rust-version 1.88]` `[Unverified — confirm MSRV at Phase 0]`. Do NOT use 0.48.x/0.49.x (inside soak) |
+| `NATS.Net`         | latest Path-B-eligible `2.7.x` | .NET (NuGet) | `_Unknown — confirm exact 2.7.x + date at Phase 0_` | B    | must be ≥ 60d old + CVE-clean at exec                               | Do NOT pin 2.8.0/2.8.1 (inside soak). Recorded as a Phase 0 verification step                                                                                                                                                                                                                                                           |
+| `Giraffe`          | `8.2.0`                        | .NET (NuGet) | 2025-11-12 `[Unverified — confirm at Phase 0]`      | B    | well past 60d                                                       | ASP.NET Core; HttpHandler composes with hexagonal ports                                                                                                                                                                                                                                                                                 |
+| `PdfPig`           | `0.1.14`                       | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]`                  | consumed via shared lib                                                                                                                                                                                                                                                                                                                 |
+| `TesseractOCR`     | `5.5.2`                        | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli.fsproj]`                  | consumed via shared lib                                                                                                                                                                                                                                                                                                                 |
+| Runtime            | `.NET 10` (`net10.0`) + F# 10  | .NET         | matches crane-cli                                   | n/a  | n/a                                                                 | `[Repo-grounded: crane-cli.fsproj TargetFramework net10.0]`                                                                                                                                                                                                                                                                             |
+| `TickSpec`         | `2.0.5`                        | .NET (NuGet) | reused                                              | B    | already pinned `[Repo-grounded: crane-cli unit/integration fsproj]` | F# Gherkin runner for crane-be unit + integration                                                                                                                                                                                                                                                                                       |
+| `@playwright/test` | `1.60.0`                       | npm          | reused                                              | B    | already pinned `[Repo-grounded: ose-app-be-e2e/package.json]`       | crane-be-e2e test runner                                                                                                                                                                                                                                                                                                                |
+| `playwright-bdd`   | `8.5.1`                        | npm          | reused                                              | B    | already pinned `[Repo-grounded: ose-app-be-e2e/package.json]`       | Gherkin → Playwright spec generation (`bddgen`)                                                                                                                                                                                                                                                                                         |
+| `nats` (NATS.js)   | latest Path-B-eligible `2.x`   | npm          | `_Unknown — confirm exact 2.x + date at Phase 0_`   | B    | must be ≥ 60d old + CVE-clean at exec                               | NEW dep — crane-be-e2e NATS request/reply steps. First repo use of NATS.js; confirm exact version + date in Phase 0 `[Unverified]`                                                                                                                                                                                                      |
 
-> **Phase 0 hard requirement**: confirm the exact `NATS.Net` 2.7.x version and its release date are
-> ≥ 60 days old and CVE-clean before any .NET NATS code is written. Record the confirmed version
-> and date back into this table. Re-confirm `async-nats 0.47.0` and `Giraffe 8.2.0` release dates
-> against the computed cutoff. Dates above are marked `[Unverified — confirm at Phase 0]` rather
-> than asserted at authoring time.
+> **Phase 0 hard requirement**: confirm the exact `NATS.Net` 2.7.x version AND the exact `nats`
+> (NATS.js) 2.x version, with release dates ≥ 60 days old and CVE-clean, before any NATS code is
+> written. Record the confirmed versions and dates back into this table. Re-confirm `async-nats
+0.47.0` and `Giraffe 8.2.0` release dates against the computed cutoff. Dates marked
+> `[Unverified — confirm at Phase 0]` are not asserted at authoring time.
 
 All waivers: none. If any unpatched CVE for a chosen version appears in the CISA KEV catalog, the
 60-day soak is bypassed and the bump escalates to Path C — in that case stop and re-grill before
@@ -371,27 +446,35 @@ app's `.env.example` with the required/optional + type + format format, and (b) 
 | crane-be        | `CRANE_BE_OSE_APP_NATS_URL`      | REQUIRED | string | ose-app NATS URL (connection 2)              |
 
 `env-contract.yaml` gets a new surface entry for `apps/crane-be` (`kind: app`). The `lang` field
-currently only documents `rust`/`typescript` `[Repo-grounded: env-contract.yaml header]`; Phase 8
-extends the validator/contract to accept an F# app surface (or registers crane-be with an
-allowlist-only entry if `lang` must stay rust/typescript — resolve against the validator
-implementation in Phase 8, treat as `[Unverified]` until then). crane-be reads env with a
-dotenvy-equivalent for .NET and validates fail-fast at startup, mirroring the Rust intent.
+currently only documents `rust`/`typescript` `[Repo-grounded: env-contract.yaml header]`; **Phase 2
+resolves** whether `fsharp` is a valid `lang` value (extending the validator/contract) or whether
+crane-be registers with `lang: rust` plus a note / an allowlist-only entry — the delivery checklist
+has the grep-and-resolve step before the surface entry is written (treat as `[Unverified]` until
+resolved). crane-be reads env with a dotenvy-equivalent for .NET and validates fail-fast at startup,
+mirroring the Rust intent.
 
 > **Agent guardrail** `[Repo-grounded: secrets-and-env-standards guard-env-file-access]`: agents
-> must never read, write, edit, or commit real `.env*` files — only `.env.example`. Any real-env
-> relocation is a `[HUMAN]` step in delivery.md.
+> must never read, write, edit, or commit real `.env*` files — only `.env.example`. This plan's
+> autonomous path needs no real `.env*` — all test env is supplied by committed, non-secret
+> `docker-compose` files.
 
 ## Docker, Image, and Migration Design
 
 - **Integration compose** `[Repo-grounded: docker-compose.integration.yml currently postgres-only]`:
-  add a `nats` service (`-js` for JetStream) to each backend's
-  `docker-compose.integration.yml`. crane-be gets its own `docker-compose.integration.yml` with a
-  `nats` service plus the crane-be service so the media path is reachable in integration tests.
-  Integration tests remain non-cacheable per nx-targets.
-- **E2E compose** (new): `apps/crane-be-e2e/docker-compose.e2e.yml` starts a fully built `crane-be`
-  plus two NATS servers (`-js`) so `crane-be-e2e` (Playwright-BDD) drives the running service over
-  real HTTP. `test:e2e` brings the stack up, waits on `/health`, runs Playwright, tears it down.
-  Non-cacheable.
+  the backends' `docker-compose.integration.yml` stays **PostgreSQL-only** — under the strict
+  no-network rule, NATS is NOT added at the integration level. `crane-be` has **no**
+  `docker-compose.integration.yml` at all: its integration is filesystem-only (real PdfPig/Tesseract
+  over `sample.pdf`), so no containers are needed. Integration tests remain non-cacheable.
+- **E2E composes** (new): NATS lives at the e2e level.
+  - `apps/crane-be-e2e/docker-compose.e2e.yml` starts a fully built `crane-be` plus **two** NATS
+    servers (`-js`) so the runner drives real HTTP (Playwright) and real NATS (`nats` client), and
+    the dual-connection-isolation scenario has two distinct servers.
+  - `apps/organiclever-be/docker-compose.e2e.yml` and `apps/ose-app-be/docker-compose.e2e.yml`
+    (next to each backend's existing `docker-compose.integration.yml`) each start the dependencies —
+    PostgreSQL + a NATS server + `crane-be`; the backend-under-test runs on the host via `nx dev`,
+    so the e2e run proves the crane NATS path and JetStream demo over the wire.
+  - Each `test:e2e` brings its stack up, waits on `/health`, runs the suite, and tears down.
+    Non-cacheable.
 - **Production Dockerfiles**: new `apps/<backend>/Dockerfile` (distinct from the existing
   `Dockerfile.integration` `[Repo-grounded: both backends have Dockerfile.integration]`) for
   `organiclever-be`, `ose-app-be`, and `crane-be`. Multi-stage; crane-be image bundles
@@ -410,12 +493,14 @@ Include tessdata]`.
 test:quick, test:integration, spec-coverage]` plus a long-running `dev`/`run` for the service and
   a production image build target. `test:unit`/`test:quick` declare the crane-be Gherkin glob in
   `inputs`, matching crane-cli. The `spec-coverage` target pairs the crane-be Gherkin tree with
-  `apps/crane-be` (see spec-coverage ownership above). Tags: `domain:crane`, `type:app`.
+  `apps/crane-be` and `--exclude-dir messaging` (NATS domain is e2e-only). Tags: `domain:crane`,
+  `type:app`.
 - **`apps/crane-be-e2e/project.json`** mirrors `apps/ose-app-be-e2e/project.json`
   `[Repo-grounded]`: targets `install`, `lint`, `typecheck`, `test:quick`, `test:e2e`,
-  `test:e2e:ui`, `test:e2e:report`; tags `type:e2e`, `platform:playwright`, `lang:ts`,
-  `domain:crane`; `implicitDependencies: ["crane-be"]`. No `spec-coverage` target (consumes Gherkin
-  via playwright-bdd; ownership stays with `apps/crane-be`).
+  `test:e2e:ui`, `test:e2e:report`, **plus `spec-coverage`** (pairs the crane-be Gherkin tree with
+  `apps/crane-be-e2e`, covering the `@e2e` domains incl. `messaging/`); tags `type:e2e`,
+  `platform:playwright`, `lang:ts`, `domain:crane`; `implicitDependencies: ["crane-be"]`. Adds the
+  `nats` dep for the NATS step definitions.
 - **`libs/fsharp-crane-core/project.json`** as described above; tags `domain:crane`, `type:lib`.
 - Apps never import apps — that is the reason the lib exists, and why `crane-be-e2e` is a separate
   Nx project depending on `crane-be` only via `implicitDependencies`.
@@ -423,7 +508,7 @@ test:quick, test:integration, spec-coverage]` plus a long-running `dev`/`run` fo
 ## fsharp- Lib-Naming Convention Addition
 
 `[Repo-grounded: docs/reference/monorepo-structure.md lines 179-180 list only ts- and rust-]` The
-lib-naming token list documents `ts-` and `rust-`. Phase 8 registers `fsharp-` alongside them in
+lib-naming token list documents `ts-` and `rust-`. Phase 9 registers `fsharp-` alongside them in
 `docs/reference/monorepo-structure.md` (and the AGENTS.md / monorepo lib-naming note if it
 restates the list), so `libs/fsharp-crane-core/` is convention-compliant.
 

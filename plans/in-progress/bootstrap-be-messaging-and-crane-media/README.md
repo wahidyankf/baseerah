@@ -43,15 +43,21 @@ must honor that standard or the drift guard fails at pre-push and CI. See
   ports-and-adapters) exposing the first media op, PDF→Markdown, over **both** an internal HTTP
   API (`POST /media/pdf-to-md`) and NATS core request/reply (subject `crane.convert`).
 - Full three-level testing for `crane-be` per the
-  [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md):
-  `test:unit` (xUnit + TickSpec, mocked ports), `test:integration` (TickSpec, real PdfPig/Tesseract
-  adapter + real NATS broker), and `test:e2e` in a new paired Playwright-BDD runner
-  `apps/crane-be-e2e/` (real HTTP against a running containerized service). **All three levels
-  consume the same Gherkin tree** at `specs/apps/crane/behavior/crane-be/gherkin/` — only the step
-  implementations differ.
-- New e2e runner `apps/crane-be-e2e/` (TypeScript, `playwright-bdd` + `@playwright/test`), the
-  black-box counterpart to `crane-be`, mirroring the existing `ose-app-be-e2e` /
-  `organiclever-be-e2e` pattern.
+  [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md),
+  applied strictly (**no network in integration tests**): `test:unit` (xUnit + TickSpec, mocked
+  ports, no I/O), `test:integration` (TickSpec, real PdfPig/Tesseract adapter reading a real PDF
+  from the filesystem — **no network**), and `test:e2e` in a new paired runner `apps/crane-be-e2e/`
+  exercising a running containerized service over **real HTTP (Playwright) and real NATS (`nats`
+  client)**. **All three levels consume the same Gherkin tree** at
+  `specs/apps/crane/behavior/crane-be/gherkin/` — only the step implementations differ. Because NATS
+  is real network I/O, every NATS scenario is `@e2e`, never `@integration`.
+- New e2e runner `apps/crane-be-e2e/` (TypeScript, `playwright-bdd` + `@playwright/test` + `nats`),
+  the black-box counterpart to `crane-be`, mirroring the existing `ose-app-be-e2e` /
+  `organiclever-be-e2e` pattern, and carrying its own `spec-coverage` target.
+- Backend messaging proven end-to-end: `organiclever-be` and `ose-app-be` each gain an HTTP
+  media-convert endpoint that drives the crane NATS request/reply path; the paired
+  `organiclever-be-e2e` / `ose-app-be-e2e` runners assert it over the wire. Backend NATS stays out
+  of integration tests (strict no-network rule).
 - Real NATS client wiring in **both** Rust backends: a NATS client, an HTTP client and a NATS
   request/reply client to `crane-be`, plus a JetStream durable publish+consume+ack demo (one
   demo subject per backend) that exercises the JetStream the infra provisions.
@@ -84,8 +90,11 @@ must honor that standard or the drift guard fails at pre-push and CI. See
 
 - `apps/crane-cli/` (refactor to consume library)
 - `apps/organiclever-be/`, `apps/ose-app-be/` (messaging context, env, Dockerfile, migrate)
-- `apps/crane-be/` (new app — unit + integration tests, both consuming Gherkin)
-- `apps/crane-be-e2e/` (new Playwright-BDD e2e runner — consumes the same Gherkin)
+- `apps/crane-be/` (new app — unit + integration tests, both consuming Gherkin; integration is
+  filesystem-only, no network)
+- `apps/crane-be-e2e/` (new Playwright-BDD + `nats` e2e runner — consumes the same Gherkin; owns a
+  `spec-coverage` target)
+- `apps/organiclever-be-e2e/`, `apps/ose-app-be-e2e/` (new `@e2e` messaging scenarios + step defs)
 - `libs/fsharp-crane-core/` (new library)
 - `specs/apps/crane/` (new `crane-be` behavior surface + `components/be/`),
   `specs/apps/organiclever/`, `specs/apps/ose/` (new `messaging` bounded context each)
@@ -153,8 +162,8 @@ flowchart TB
 
   subgraph LEVELS["Step implementations (one per level)"]
     U["test:unit<br/>TickSpec + mocks"]
-    I["test:integration<br/>TickSpec + real adapter/NATS"]
-    E["test:e2e<br/>Playwright-BDD over HTTP"]
+    I["test:integration<br/>real adapter, no network"]
+    E["test:e2e<br/>HTTP + NATS, running svc"]
   end
 
   COV["spec-coverage<br/>every step bound"]
@@ -199,19 +208,19 @@ the three public GHCR images, migration wiring, and the publish workflow all exi
 
 ## Delivery Phases At A Glance
 
-| Phase | Name                                                   | Outcome                                                                         |
-| ----- | ------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| 0     | Environment Setup and Baseline                         | Toolchain converged; baseline recorded; NATS.Net 2.7.x Path-B version confirmed |
-| 1     | Shared library extraction + crane-cli migration        | `libs/fsharp-crane-core/` created; crane-cli consumes it; tests green           |
-| 2     | crane-be skeleton + Gherkin + unit/integration (fake)  | Deployable service; health + fake PDF→md; unit + integration consume Gherkin    |
-| 3     | crane-be real PDF→md adapter + NATS subscriber         | Real PdfPig/Tesseract adapter via lib; NATS request/reply; integration Gherkin  |
-| 4     | crane-be-e2e (Playwright-BDD black-box runner)         | `apps/crane-be-e2e/` runs the same Gherkin over real HTTP against the service   |
-| 5     | organiclever-be messaging context                      | NATS client, crane clients, JetStream demo, env + drift guard, Gherkin          |
-| 6     | ose-app-be messaging context                           | Same as Phase 5 for ose-app-be                                                  |
-| 7     | Production Dockerfiles + sqlx::migrate! + compose NATS | Three prod Dockerfiles; migrate on boot; NATS in compose                        |
-| 8     | GHCR affected-aware publish workflow                   | Public images for all three backends/services                                   |
-| 9     | Specs completeness + spec-coverage + docs              | Spec sets complete; conventions and architecture docs updated                   |
-| 10    | Final Quality Gate + Commit + Push + CI verify         | All gates green locally and in CI                                               |
+| Phase | Name                                                         | Outcome                                                                         |
+| ----- | ------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| 0     | Environment Setup and Baseline                               | Toolchain converged; baseline recorded; NATS.Net 2.7.x Path-B version confirmed |
+| 1     | Shared library extraction + crane-cli migration              | `libs/fsharp-crane-core/` created; crane-cli consumes it; tests green           |
+| 2     | crane-be skeleton + Gherkin + unit/integration (fake)        | Deployable service; health + fake PDF→md; unit + integration consume Gherkin    |
+| 3     | crane-be real PDF→md adapter (integration) + NATS subscriber | Real adapter integration test (filesystem, no network); NATS subscriber wired   |
+| 4     | crane-be-e2e (Playwright + NATS black-box runner)            | `apps/crane-be-e2e/` runs `@e2e` Gherkin over real HTTP + real NATS; spec-cov   |
+| 5     | organiclever-be messaging + e2e                              | NATS/crane clients, JetStream demo, HTTP convert endpoint; `@e2e` in -be-e2e    |
+| 6     | ose-app-be messaging + e2e                                   | Same as Phase 5 for ose-app-be                                                  |
+| 7     | Production Dockerfiles + sqlx::migrate!                      | Two backend Dockerfiles (crane-be's lands in Phase 4); migrate on boot          |
+| 8     | GHCR affected-aware publish workflow                         | Public images for all three backends/services                                   |
+| 9     | Specs completeness + spec-coverage + docs                    | Spec sets complete; conventions and architecture docs updated                   |
+| 10    | Final Quality Gate + Commit + Push + CI verify               | All gates green locally and in CI                                               |
 
 ## Git Workflow
 

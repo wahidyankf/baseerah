@@ -22,9 +22,9 @@ real adapter/NATS → real HTTP via Playwright).
 %% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, purple #CC78BC, grey #808080
 flowchart TB
   G["crane-be Gherkin<br/>(.feature files)"]
-  U["Unit (xUnit + TickSpec)<br/>mocked ports"]
-  I["Integration (TickSpec)<br/>real adapter + NATS"]
-  E["E2E (Playwright-BDD)<br/>real HTTP, running svc"]
+  U["Unit (xUnit + TickSpec)<br/>mocked ports, no I/O"]
+  I["Integration (TickSpec)<br/>real adapter, no network"]
+  E["E2E (Playwright + NATS)<br/>real HTTP + real NATS"]
 
   G --> U
   G --> I
@@ -50,9 +50,9 @@ output.
 - **Calling backend service** — `organiclever-be` / `ose-app-be` acting as clients of `crane-be`
   over HTTP and NATS.
 - **Media service (`crane-be`)** — subscribes to each backend's NATS and serves HTTP requests.
-- **E2E runner (`crane-be-e2e`)** — a Playwright-BDD black-box client that drives a running
-  `crane-be` over real HTTP, asserting the same Gherkin scenarios the unit and integration layers
-  verify in-process.
+- **E2E runners (`crane-be-e2e`, `organiclever-be-e2e`, `ose-app-be-e2e`)** — Playwright-BDD
+  black-box clients that drive a running service over real HTTP (and, for `crane-be-e2e`, real
+  NATS), asserting the same Gherkin scenarios the unit and integration layers verify in-process.
 
 ## User Stories
 
@@ -83,9 +83,13 @@ output.
 > **Level tags**: `crane-be` scenarios carry `@unit`, `@integration`, and/or `@e2e` tags marking
 > which test level(s) implement each scenario. Per the
 > [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md)
-> the unit layer is a superset (it binds every scenario it can plus edge cases), integration binds
-> the real-dependency scenarios, and e2e binds the black-box HTTP scenarios. The Gherkin file is
-> the single shared contract; `spec-coverage` enforces that every step is bound somewhere.
+> the unit layer is a superset (it binds every scenario it can plus edge cases), and **integration
+> introduces exactly one real dependency with NO network** — for `crane-be` that is the real
+> PdfPig/Tesseract adapter reading a real PDF from the filesystem. **All NATS scenarios (real
+> network) are therefore `@e2e`, not `@integration`** — they run against a running service with
+> real NATS. This honors the standard's "No Network in Integration Tests" rule strictly. The
+> Gherkin file is the single shared contract; `spec-coverage` enforces that every step is bound
+> somewhere (F# steps for `@unit`/`@integration`; TypeScript steps in `crane-be-e2e` for `@e2e`).
 
 The two media request paths `crane-be` exposes:
 
@@ -125,7 +129,7 @@ Scenario: crane-cli consumes the extracted Core library and stays green
 ### crane-be health
 
 ```gherkin
-@unit @integration @e2e
+@unit @e2e
 Scenario: crane-be reports healthy over HTTP
   Given the crane-be service is running on its configured port
   When a client sends GET to /health
@@ -182,8 +186,11 @@ Scenario: crane-be returns markdown with the text/markdown content type
 
 ### Media PDF to Markdown over NATS request/reply
 
+> NATS is real network I/O, so these are `@e2e` scenarios run against a running `crane-be` (the
+> `crane-be-e2e` runner issues the requests via a NATS client). They are NOT integration-level.
+
 ```gherkin
-@integration
+@e2e
 Scenario: crane-be answers a NATS core request/reply on crane.convert
   Given crane-be has subscribed to subject crane.convert on a backend NATS server
   When a backend publishes a request to crane.convert with sample PDF bytes
@@ -192,7 +199,7 @@ Scenario: crane-be answers a NATS core request/reply on crane.convert
 ```
 
 ```gherkin
-@integration
+@e2e
 Scenario: crane-be replies with an error envelope for an unparseable NATS payload
   Given crane-be has subscribed to subject crane.convert on a backend NATS server
   When a backend publishes a request to crane.convert with bytes that are not a PDF
@@ -202,23 +209,49 @@ Scenario: crane-be replies with an error envelope for an unparseable NATS payloa
 
 ### NATS connect and health per backend
 
+> Establishing a real NATS connection is network I/O, so the connect scenarios are `@e2e` (proven
+> against a running backend + NATS stack). The missing/invalid-URL fail-fast is pure config logic
+> and is additionally covered at `@unit` (no network).
+
 ```gherkin
+@unit
+Scenario: organiclever-be fails fast when its NATS URL is missing
+  Given ORGANICLEVER_BE_NATS_URL is unset
+  When organiclever-be reads its messaging configuration
+  Then startup aborts with a clear missing-variable error
+```
+
+```gherkin
+@e2e
 Scenario: organiclever-be connects to its NATS server at startup
   Given ORGANICLEVER_BE_NATS_URL points to a running NATS server with JetStream enabled
   When organiclever-be starts up
   Then the NATS connection is established
-  And startup fails fast if the NATS URL is missing or unreachable
+  And the backend reports healthy after connecting
 ```
 
 ```gherkin
+@unit
+Scenario: ose-app-be fails fast when its NATS URL is missing
+  Given OSE_APP_BE_NATS_URL is unset
+  When ose-app-be reads its messaging configuration
+  Then startup aborts with a clear missing-variable error
+```
+
+```gherkin
+@e2e
 Scenario: ose-app-be connects to its NATS server at startup
   Given OSE_APP_BE_NATS_URL points to a running NATS server with JetStream enabled
   When ose-app-be starts up
   Then the NATS connection is established
-  And startup fails fast if the NATS URL is missing or unreachable
+  And the backend reports healthy after connecting
 ```
 
 ### JetStream durable publish + consume + ack demo per backend
+
+> JetStream is real network I/O, so these are `@e2e` scenarios. Each backend runs the demo at
+> startup against a running JetStream and exposes the outcome on a status surface the e2e runner
+> asserts over HTTP (no internal-state assertion required from outside the process).
 
 ```mermaid
 %% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, purple #CC78BC, grey #808080
@@ -234,27 +267,54 @@ sequenceDiagram
 ```
 
 ```gherkin
+@e2e
 Scenario: organiclever-be publishes and durably consumes its demo subject with ack
   Given organiclever-be has a JetStream durable stream and consumer for its demo subject
   When organiclever-be publishes a demo message to that subject
   Then the durable consumer receives the message
   And the message is acknowledged
-  And the stream reports the message as delivered and acked
+  And the messaging status surface reports the demo delivered and acked
 ```
 
 ```gherkin
+@e2e
 Scenario: ose-app-be publishes and durably consumes its demo subject with ack
   Given ose-app-be has a JetStream durable stream and consumer for its demo subject
   When ose-app-be publishes a demo message to that subject
   Then the durable consumer receives the message
   And the message is acknowledged
-  And the stream reports the message as delivered and acked
+  And the messaging status surface reports the demo delivered and acked
+```
+
+### Backend messaging over the wire (e2e)
+
+> Per the "Add backend messaging e2e" decision, each backend exposes an HTTP endpoint that drives
+> the crane PDF→Markdown conversion via the NATS `crane.convert` request/reply path. The paired
+> Playwright runner (`organiclever-be-e2e` / `ose-app-be-e2e`) asserts the full chain
+> (HTTP → backend → NATS → crane-be → reply → HTTP) over the wire against a running stack.
+
+```gherkin
+@e2e
+Scenario: organiclever-be converts a PDF via the crane NATS path over HTTP
+  Given a running stack of organiclever-be, its NATS server, and crane-be
+  When a client sends POST to the organiclever-be media-convert endpoint with a sample PDF
+  Then the response status is 200
+  And the response body contains markdown produced by crane-be
+```
+
+```gherkin
+@e2e
+Scenario: ose-app-be converts a PDF via the crane NATS path over HTTP
+  Given a running stack of ose-app-be, its NATS server, and crane-be
+  When a client sends POST to the ose-app-be media-convert endpoint with a sample PDF
+  Then the response status is 200
+  And the response body contains markdown produced by crane-be
 ```
 
 ### Shared single crane-be against two NATS servers
 
 ```gherkin
-@integration
+@e2e
 Scenario: the single crane-be serves both backends over independent NATS connections
   Given crane-be has opened one NATS connection to each backend's NATS server
   And each subscription uses the same queue group crane.workers
@@ -265,9 +325,11 @@ Scenario: the single crane-be serves both backends over independent NATS connect
 
 ### crane-be e2e (black-box over real HTTP)
 
-> These `@e2e` scenarios run from `apps/crane-be-e2e/` (Playwright-BDD) against a running
-> containerized `crane-be` started via its `docker-compose.e2e.yml` (service + two NATS servers).
-> They consume the same Gherkin files as the unit and integration layers.
+> The `@e2e` scenarios run from `apps/crane-be-e2e/` against a running containerized `crane-be`
+> started via `docker-compose.e2e.yml` (service + two NATS servers). HTTP scenarios use Playwright;
+> the NATS request/reply, error-envelope, and dual-connection-isolation scenarios use a NATS client
+> (`nats` npm package) inside the BDD step definitions. All `@e2e` scenarios consume the same
+> Gherkin files as the unit and integration layers.
 
 ```gherkin
 @e2e
@@ -335,11 +397,16 @@ Scenario: the affected-aware GHCR workflow publishes only changed images
 - Shared F# media Core library and crane-cli migration to it.
 - `crane-be` service: `/health`, `POST /media/pdf-to-md`, NATS `crane.convert` request/reply, fake
   - real adapters.
-- `crane-be` three-level tests: `test:unit` (xUnit + TickSpec, mocked ports), `test:integration`
-  (TickSpec, real adapter + real NATS), all consuming the shared Gherkin tree.
-- `crane-be-e2e` runner: a new Playwright-BDD project running the same Gherkin (`@e2e` scenarios)
-  black-box over real HTTP against a containerized `crane-be`.
-- Both backends: NATS client, HTTP + NATS clients to `crane-be`, JetStream durable demo.
+- `crane-be` three-level tests: `test:unit` (xUnit + TickSpec, mocked ports, no I/O),
+  `test:integration` (TickSpec, real PdfPig/Tesseract adapter + filesystem, NO network), all
+  consuming the shared Gherkin tree.
+- `crane-be-e2e` runner: a new Playwright-BDD project running the `@e2e` Gherkin against a
+  containerized `crane-be` — HTTP via Playwright and NATS request/reply via a `nats` client; owns
+  its own `spec-coverage` target.
+- Both backends: NATS client, HTTP + NATS clients to `crane-be`, JetStream durable demo, plus an
+  HTTP media-convert endpoint that drives the crane NATS path; backend messaging is proven at
+  `@e2e` in the paired `organiclever-be-e2e` / `ose-app-be-e2e` runners (NATS stays out of
+  integration).
 - Production Dockerfiles (x3), run-on-boot migrations (x2), affected-aware GHCR publish workflow.
 - Spec sets and Gherkin features for the new messaging context and `crane-be` (behavior surface +
   `components/be/`).
@@ -357,7 +424,8 @@ Scenario: the affected-aware GHCR workflow publishes only changed images
 
 - **Adapter parity**: the real adapter must produce markdown comparable to `crane-cli`'s existing
   PDF path; mitigated by reusing the same PdfPig/Tesseract logic via the shared library.
-- **NATS test flakiness**: JetStream integration tests depend on a real NATS container; mitigated
-  by keeping integration tests non-cacheable and gated behind a healthcheck.
+- **NATS test flakiness**: the JetStream and request/reply `@e2e` scenarios depend on a real NATS
+  container; mitigated by keeping `test:e2e` non-cacheable and gating the runner behind a `/health`
+  healthcheck wait (NATS is exercised at e2e only, never at the integration level).
 - **Queue-group semantics**: same queue group on two servers must not cross-deliver; mitigated by
   the two-independent-connections design and an explicit isolation scenario above.
