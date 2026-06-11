@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>CraneBe</RootNamespace>
+    <AssemblyName>crane-be</AssemblyName>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- fsproj compile order matters: ports → services → adapters → program -->
+    <Compile Include="src/Core/Ports.fs" />
+    <Compile Include="src/Application/MediaService.fs" />
+    <Compile Include="src/Adapters/Out/FakeMediaAdapter.fs" />
+    <Compile Include="src/Adapters/In/HttpHandlers.fs" />
+    <Compile Include="src/Config.fs" />
+    <Compile Include="src/Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Giraffe" Version="8.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../libs/fsharp-crane-core/fsharp-crane-core.fsproj" />
+  </ItemGroup>
+</Project>

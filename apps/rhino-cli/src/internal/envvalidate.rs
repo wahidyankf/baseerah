@@ -249,6 +249,49 @@ pub fn scan_ts_reads(root: &Path) -> Result<Vec<String>, Error> {
     Ok(keys.into_iter().collect())
 }
 
+/// Scan F# source for environment variable keys consumed by the code.
+///
+/// Detects:
+/// - `Environment.GetEnvironmentVariable("VAR_NAME")` calls
+/// - `System.Environment.GetEnvironmentVariable("VAR_NAME")` calls
+///
+/// # Panics
+///
+/// Panics if the internal static regexes fail to compile (compile-time invariant).
+///
+/// # Errors
+///
+/// Returns an error when a source file cannot be read.
+pub fn scan_fsharp_reads(root: &Path) -> Result<Vec<String>, Error> {
+    let mut keys: HashSet<String> = HashSet::new();
+
+    let env_var_re = Regex::new(
+        r#"(?:System\.)?Environment\.GetEnvironmentVariable\s*\(\s*"([A-Z][A-Z0-9_]*)"\s*\)"#,
+    )
+    .expect("static regex");
+
+    let src_dir = root.join("src");
+    for entry in WalkDir::new(&src_dir).into_iter().flatten() {
+        if entry.file_type().is_dir() {
+            continue;
+        }
+        let path = entry.path();
+        if !path
+            .file_name()
+            .is_some_and(|n| n.to_string_lossy().ends_with(".fs"))
+        {
+            continue;
+        }
+        let content =
+            fs::read_to_string(path).with_context(|| format!("cannot read {}", path.display()))?;
+        for cap in env_var_re.captures_iter(&content) {
+            keys.insert(cap[1].to_string());
+        }
+    }
+
+    Ok(keys.into_iter().collect())
+}
+
 /// Validate a single `app`-kind surface against its `.env.example`.
 ///
 /// Returns zero or more drift findings.
@@ -268,6 +311,7 @@ pub fn validate_app_surface(
     let read: HashSet<String> = match surface.lang.as_str() {
         "rust" => scan_rust_reads(&root)?.into_iter().collect(),
         "typescript" => scan_ts_reads(&root)?.into_iter().collect(),
+        "fsharp" => scan_fsharp_reads(&root)?.into_iter().collect(),
         other => return Err(anyhow::anyhow!("unsupported lang: {other}")),
     };
 
@@ -458,6 +502,34 @@ const url = env.ORGANICLEVER_BE_URL ?? "default";
         assert!(
             keys.contains(&"ORGANICLEVER_BE_URL".to_string()),
             "got {keys:?}"
+        );
+    }
+
+    // ── scan_fsharp_reads ────────────────────────────────────────────────────
+
+    #[test]
+    fn scan_fsharp_finds_env_var_literals() {
+        let dir = tempfile::tempdir().unwrap();
+        let src_dir = dir.path().join("src");
+        fs::create_dir_all(&src_dir).unwrap();
+        fs::write(
+            src_dir.join("Config.fs"),
+            r#"module Config
+let load () =
+    let port = Environment.GetEnvironmentVariable("CRANE_BE_PORT")
+    let url = System.Environment.GetEnvironmentVariable("CRANE_BE_NATS_URL")
+    (port, url)
+"#,
+        )
+        .unwrap();
+        let keys = scan_fsharp_reads(dir.path()).unwrap();
+        assert!(
+            keys.contains(&"CRANE_BE_PORT".to_string()),
+            "expected CRANE_BE_PORT; got {keys:?}"
+        );
+        assert!(
+            keys.contains(&"CRANE_BE_NATS_URL".to_string()),
+            "expected CRANE_BE_NATS_URL; got {keys:?}"
         );
     }
 
