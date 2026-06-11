@@ -13,14 +13,13 @@ conversion through a crane NATS request/reply client.
 
 ## Term index
 
-| Term                     | Code identifier(s)                             | Used in features                   |
-| ------------------------ | ---------------------------------------------- | ---------------------------------- |
-| `NATS subject`           | `organiclever.messaging.demo` (stream subject) | `messaging/nats-connect.feature`   |
-| `JetStream`              | `async_nats::jetstream`                        | `messaging/jetstream-demo.feature` |
-| `durable consumer`       | `organiclever-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
-| `crane-convert`          | `crane.convert` (NATS subject)                 | `messaging/crane-convert.feature`  |
-| `media-convert endpoint` | `POST /api/v1/media/convert`                   | `messaging/crane-convert.feature`  |
-| `messaging status`       | `GET /api/v1/system/status/messaging`          | `messaging/jetstream-demo.feature` |
+| Term               | Code identifier(s)                             | Used in features                   |
+| ------------------ | ---------------------------------------------- | ---------------------------------- |
+| `NATS subject`     | `organiclever.messaging.demo` (stream subject) | `messaging/nats-connect.feature`   |
+| `JetStream`        | `async_nats::jetstream`                        | `messaging/jetstream-demo.feature` |
+| `durable consumer` | `organiclever-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
+| `crane-convert`    | `crane.convert` (NATS subject)                 | `messaging/crane-convert.feature`  |
+| `messaging status` | `SharedMessagingStatus`                        | `messaging/jetstream-demo.feature` |
 
 ## Terms in detail
 
@@ -78,29 +77,12 @@ kind); "subscription" (core NATS term, not JetStream).
 The NATS request/reply subject (`crane.convert`) to which crane-be subscribes under
 queue group `crane.workers`. A caller sends a PDF payload as the request body and
 receives the converted Markdown text in the reply. The organiclever-be messaging
-context uses this subject indirectly via the `media-convert endpoint`.
+context exposes this subject via the `crane_client` module in `contexts/messaging/`.
 
 **Code identifier(s)**: `CRANE_CONVERT_SUBJECT` (Rust constant in
 `apps/organiclever-be/src/messaging/crane_client.rs`).
 
 **Used in features**: `messaging/crane-convert.feature`
-
-**Related**: `media-convert endpoint`
-
----
-
-### Term: `media-convert endpoint`
-
-The HTTP endpoint `POST /api/v1/media/convert` exposed by organiclever-be. Accepts a
-PDF file upload, drives the crane NATS request/reply (`crane.convert`) path, and
-returns the resulting Markdown to the caller. Stateless — organiclever-be does not
-persist the conversion result.
-
-**Code identifier(s)**: `apps/organiclever-be/src/contexts/media/api/http.rs`.
-
-**Used in features**: `messaging/crane-convert.feature`
-
-**Related**: `crane-convert`
 
 ---
 

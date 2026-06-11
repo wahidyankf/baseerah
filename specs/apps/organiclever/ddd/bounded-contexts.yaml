@@ -162,18 +162,59 @@ contexts:
     gherkin: specs/apps/organiclever/behavior/organiclever-web/gherkin/routing
     relationships: []
 
-  - name: messaging
+  - name: be-db
     summary: >-
-      NATS client, JetStream durable stream demo, crane HTTP + NATS request/reply
-      client, and the HTTP media-convert endpoint. Connects to NATS at startup
-      (fail-fast on missing URL), publishes and acks on organiclever.messaging.demo,
-      and delegates PDF-to-Markdown conversion to crane-be via crane.convert.
+      Database schema lifecycle — applies pending sqlx migrations on boot before
+      the HTTP server starts. Ensures the schema is always up-to-date without
+      manual intervention. Cross-cutting infrastructure concern.
     layers:
+      - infrastructure
+    code:
+      - apps/organiclever-be/src/contexts/db
+    code_lang:
+      - rs
+    glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-db.md
+    gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/db
+
+  - name: be-health
+    summary: >-
+      Liveness endpoint — advertises service health to orchestrators and
+      monitoring systems.
+    layers:
+      - domain
+      - application
       - infrastructure
       - api
     code:
-      - apps/organiclever-be/src/messaging
+      - apps/organiclever-be/src/contexts/health
+    code_lang:
+      - rs
+    glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-health.md
+    gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/health
+
+  - name: messaging
+    summary: >-
+      NATS client, JetStream durable stream demo, and crane NATS request/reply
+      client. Connects to NATS at startup (fail-fast on missing URL), publishes
+      and acks on organiclever.messaging.demo, and exposes the crane_client used
+      by the media context for PDF-to-Markdown conversion.
+    code:
+      - apps/organiclever-be/src/contexts/messaging
     code_lang:
       - rs
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/messaging.md
+    gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging
+
+  - name: be-media
+    summary: >-
+      HTTP media-convert endpoint — thin wrapper over the crane NATS request/reply
+      path in the messaging context. Delegates PDF-to-Markdown conversion to
+      crane-be via crane.convert.
+    layers:
+      - api
+    code:
+      - apps/organiclever-be/src/contexts/media
+    code_lang:
+      - rs
+    glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-media.md
     gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging

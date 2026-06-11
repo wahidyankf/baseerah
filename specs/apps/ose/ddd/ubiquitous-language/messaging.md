@@ -19,8 +19,8 @@ conversion through a crane NATS request/reply client.
 | `JetStream`              | `async_nats::jetstream`                   | `messaging/jetstream-demo.feature` |
 | `durable consumer`       | `ose-app-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
 | `crane-convert`          | `crane.convert` (NATS subject)            | `messaging/crane-convert.feature`  |
-| `media-convert endpoint` | `POST /api/v1/media/convert`              | `messaging/crane-convert.feature`  |
-| `messaging status`       | `GET /api/v1/system/status/messaging`     | `messaging/jetstream-demo.feature` |
+| `media-convert endpoint` | `convert_via_nats`                        | `messaging/crane-convert.feature`  |
+| `messaging status`       | `SharedMessagingStatus`                   | `messaging/jetstream-demo.feature` |
 
 ## Terms in detail
 

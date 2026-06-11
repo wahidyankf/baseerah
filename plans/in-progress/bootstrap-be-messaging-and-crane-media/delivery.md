@@ -1200,8 +1200,9 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `docs(specs): add crane-be spec surface, messaging DDD registrations, and READMEs`
+  - **Date**: 2026-06-12 | **Status**: DONE | commit `490606b`
 
 ### Phase 9 Gate
 
