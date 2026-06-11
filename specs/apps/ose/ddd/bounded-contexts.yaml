@@ -134,3 +134,19 @@ contexts:
       - rs
     glossary: specs/apps/ose/ddd/ubiquitous-language/db.md
     gherkin: specs/apps/ose/behavior/app-be/gherkin/db
+
+  - name: messaging
+    summary: >-
+      NATS client, JetStream durable stream demo, crane HTTP + NATS request/reply
+      client, and the HTTP media-convert endpoint. Connects to NATS at startup
+      (fail-fast on missing URL), publishes and acks on ose-app.messaging.demo,
+      and delegates PDF-to-Markdown conversion to crane-be via crane.convert.
+    layers:
+      - infrastructure
+      - api
+    code:
+      - apps/ose-app-be/src/messaging
+    code_lang:
+      - rs
+    glossary: specs/apps/ose/ddd/ubiquitous-language/messaging.md
+    gherkin: specs/apps/ose/behavior/app-be/gherkin/messaging

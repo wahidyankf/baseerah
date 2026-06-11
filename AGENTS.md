@@ -27,6 +27,8 @@
   - `rhino-cli` — Rust CLI tool for repository management (Repository Hygiene & INtegration Orchestrator). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
   - `ose-cli` — Go CLI tool for OSE Platform site maintenance (link validation)
   - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture. Original F# source at `archived/crane-cli/`; Rust port 2026-05-26 preserved at `archived/crane-cli-rust/`.
+  - `crane-be` — F# / Giraffe / ASP.NET 10 HTTP + NATS backend for PDF-to-Markdown conversion (crane-be service). Hexagonal architecture consuming `libs/fsharp-crane-core`. Dev port 8300.
+  - `crane-be-e2e` — Playwright-BDD + @nats-io/transport-node E2E tests for crane-be (real HTTP + real NATS)
   - `organiclever-web` — Next.js 16 landing and promotional website (www.organiclever.com)
   - `organiclever-be` — Rust/Axum REST API backend for OrganicLever
   - `organiclever-web-e2e` — Playwright FE E2E tests for organiclever-web
@@ -56,6 +58,8 @@ ose-public/
 │   ├── rhino-cli/            # Repository management CLI
 │   ├── ose-cli/      # OSE Platform site CLI
 │   ├── crane-cli/    # PDF-to-Markdown pipeline CLI (F#)
+│   ├── crane-be/     # PDF-to-Markdown HTTP + NATS backend (F#/Giraffe, port 8300)
+│   ├── crane-be-e2e/ # Playwright + NATS E2E tests for crane-be
 │   ├── organiclever-web/     # OrganicLever landing website (Next.js)
 │   ├── organiclever-be/      # OrganicLever Rust/Axum REST API backend
 │   ├── organiclever-web-e2e/ # Playwright FE E2E tests for organiclever-web
@@ -69,7 +73,8 @@ ose-public/
 ├── archived/                 # Archived applications (no longer active)
 ├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
-│   └── rust-commons/         # Shared Rust utilities (link-checking, HTTP)
+│   ├── rust-commons/         # Shared Rust utilities (link-checking, HTTP)
+│   └── fsharp-crane-core/    # Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
 ├── docs/                     # Documentation (Diátaxis framework)
 │   ├── tutorials/            # Learning-oriented
 │   ├── how-to/               # Problem-solving
@@ -183,7 +188,7 @@ Uses **Nx** to manage apps and libs:
   - Apps import libs but never export
   - Each app independently deployable
   - Apps never import other apps
-- **`libs/`** — Reusable libraries (naming: `ts-[name]`, `rust-[name]`)
+- **`libs/`** — Reusable libraries (naming: `ts-[name]`, `rust-[name]`, `fsharp-[name]`)
   - Flat structure, no nesting
   - Import via `@open-sharia-enterprise/ts-[lib-name]`
   - Libs can import other libs (no circular deps)

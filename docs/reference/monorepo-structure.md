@@ -178,6 +178,7 @@ Contains reusable library packages.
 
 - `ts-` - TypeScript (future)
 - `rust-` - Rust (e.g., `rust-commons`)
+- `fsharp-` - F# (e.g., `fsharp-crane-core`)
 - `java-` - Java (future)
 - `kt-` - Kotlin (future)
 - `py-` - Python (future)
@@ -185,6 +186,7 @@ Contains reusable library packages.
 **Current Libraries**:
 
 - `rust-commons` - Shared Rust utilities (link-checking, HTTP)
+- `fsharp-crane-core` - Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
 
 **Examples** (planned):
 
@@ -225,7 +227,7 @@ libs/ts-utils/
 
 ### Current Scope
 
-Rust (`rust-commons`) and future TypeScript, Java, Kotlin, Python libraries.
+Rust (`rust-commons`), F# (`fsharp-crane-core`), and future TypeScript, Java, Kotlin, Python libraries.
 
 ## Experimental Projects vs Monorepo Projects
 

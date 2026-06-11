@@ -1118,7 +1118,7 @@ list/get/delete/restore only, no visibility setter]`, so it cannot be automated.
 >
 > _Suggested executor: `specs-maker` (specs), `repo-rules-maker` / `docs-maker` (conventions)_
 
-- [ ] [AI] Finalize the `crane-be` surface under `specs/apps/crane/`: confirm
+- [x] [AI] Finalize the `crane-be` surface under `specs/apps/crane/`: confirm
       `specs/apps/crane/behavior/crane-be/gherkin/` (authored in Phases 2–4) covers health, HTTP
       convert, and the `messaging/` NATS domain (request/reply, error envelope, dual-connection
       isolation); add a `specs/apps/crane/behavior/crane-be/gherkin/README.md`; add
@@ -1133,7 +1133,9 @@ list/get/delete/restore only, no visibility setter]`, so it cannot be automated.
       — acceptance: behavior `.feature` files mirror prd.md scenarios; `messaging/` domain present;
       `components/be/` present; `behavior/README.md` lists both surfaces; no `ddd/` dir created
       under `specs/apps/crane/`
-- [ ] [AI] Register the `messaging` bounded context in
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: `specs/apps/crane/behavior/crane-be/gherkin/README.md`, `specs/apps/crane/components/be/README.md`, `specs/apps/crane/components/be/component-be.md`, `specs/apps/crane/behavior/README.md`
+  - Gherkin README added; components/be/ created (README + component-be.md); behavior/README.md updated to list both surfaces; no ddd/ created
+- [x] [AI] Register the `messaging` bounded context in
       `specs/apps/organiclever/ddd/bounded-contexts.yaml` (new entry with
       `gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging`
       `[Repo-grounded: bounded-contexts.yaml gherkin field format]`) plus ubiquitous-language doc
@@ -1143,7 +1145,9 @@ list/get/delete/restore only, no visibility setter]`, so it cannot be automated.
       `[Repo-grounded: specs/apps/organiclever/behavior/organiclever-be/]`.
       — acceptance: bounded-context entry + glossary present; `gherkin:` field points to
       `behavior/organiclever-be/gherkin/messaging`
-- [ ] [AI] Register the `messaging` bounded context in `specs/apps/ose/ddd/bounded-contexts.yaml`
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: `specs/apps/organiclever/ddd/bounded-contexts.yaml`, `specs/apps/organiclever/ddd/ubiquitous-language/messaging.md`
+  - messaging context registered with layers infrastructure+api, code_lang rs, correct gherkin path; ubiquitous-language glossary created
+- [x] [AI] Register the `messaging` bounded context in `specs/apps/ose/ddd/bounded-contexts.yaml`
       (new entry with `gherkin: specs/apps/ose/behavior/app-be/gherkin/messaging`
       `[Repo-grounded: ose bounded-contexts.yaml — app-be is the ose-app-be surface slug from
 standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
@@ -1153,50 +1157,59 @@ standardize-app-spec-trees]` and `code_lang: [rs]`) plus ubiquitous-language doc
       `[Repo-grounded: specs/apps/ose/behavior/app-be/]`.
       — acceptance: bounded-context entry + glossary present; `gherkin:` field points to
       `behavior/app-be/gherkin/messaging`
-- [ ] [AI] Ensure every app/e2e project has matching step definitions so `spec-coverage` passes:
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: `specs/apps/ose/ddd/bounded-contexts.yaml`, `specs/apps/ose/ddd/ubiquitous-language/messaging.md`
+  - messaging context registered with layers infrastructure+api, code_lang rs, correct gherkin path; ubiquitous-language glossary created
+- [x] [AI] Ensure every app/e2e project has matching step definitions so `spec-coverage` passes:
       `npx nx affected -t spec-coverage`. The `crane-be` Gherkin is owned by **both** `apps/crane-be`
       (F#, `--exclude-dir messaging`) and `apps/crane-be-e2e` (TS, all `@e2e` domains incl.
       `messaging/`). Finalize the exact `--exclude-dir` flags against the real step sets.
       — acceptance: exits 0 for all touched projects (crane-be, crane-be-e2e, organiclever-be,
       ose-app-be, and the backend e2e runners)
-- [ ] [AI] Flag the standard-vs-practice gap: the Three-Level Testing Standard says `spec-coverage`
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: none (verified existing targets)
+  - crane-be uses --exclude-dir messaging; crane-be-e2e covers all domains including messaging; organiclever-be-e2e and ose-app-be-e2e already have spec-coverage targets from Phase 5/6
+- [x] [AI] Flag the standard-vs-practice gap: the Three-Level Testing Standard says `spec-coverage`
       is compulsory for E2E runners, but `ose-app-be-e2e` / `organiclever-be-e2e` carry no such
       target. File a follow-up note for `repo-rules-checker` to reconcile repo-wide (backfill the
       siblings or amend the standard) — do not silently leave the divergence.
   - _Suggested executor: `repo-rules-checker`_
     — acceptance: a tracked follow-up exists (plan note or `repo-rules-checker` finding); not left
     undocumented
-- [ ] [AI] Register the `fsharp-` lib-naming token in `docs/reference/monorepo-structure.md`
+  - **Date**: 2026-06-12 | **Status**: DONE — gap already closed: both `organiclever-be-e2e` and `ose-app-be-e2e` have `spec-coverage` targets in their `project.json` files (added during Phases 5–6). No follow-up action needed; Three-Level Testing Standard is already satisfied.
+- [x] [AI] Register the `fsharp-` lib-naming token in `docs/reference/monorepo-structure.md`
       (alongside `ts-`/`rust-` at lines listing the prefixes) and in any AGENTS.md / monorepo
       lib-naming note that restates the list
   - _Suggested executor: `repo-rules-maker`_
     — acceptance: `fsharp-` appears in the prefix list; example references `fsharp-crane-core`
-- [ ] [AI] Add `apps/crane-be/README.md` and `apps/crane-be-e2e/README.md`, and update `AGENTS.md`
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: `docs/reference/monorepo-structure.md`, `AGENTS.md`
+  - `fsharp-` added to Language Prefixes list with `fsharp-crane-core` example; Current Libraries updated; AGENTS.md Monorepo Architecture libs naming updated to include `fsharp-[name]`
+- [x] [AI] Add `apps/crane-be/README.md` and `apps/crane-be-e2e/README.md`, and update `AGENTS.md`
       Current Apps list + Project Structure tree to include `crane-be`, `crane-be-e2e`, and
       `libs/fsharp-crane-core`
   - _Suggested executor: `readme-maker`_
     — acceptance: READMEs follow repo README conventions; AGENTS.md lists all three
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: `apps/crane-be/README.md`, `apps/crane-be-e2e/README.md`, `AGENTS.md`
+  - crane-be README with commands table, architecture, env vars, tech stack, spec links; crane-be-e2e README expanded with stack, commands, coverage; AGENTS.md Current Apps + Project Structure + libs updated
 
 ### Local Quality Gates (Before Commit)
 
-- [ ] [AI] `npx nx affected -t spec-coverage` — exits 0
-- [ ] [AI] `npm run lint:md` — exits 0 (fix with `npm run lint:md:fix` if needed)
-- [ ] [AI] `npx nx run rhino-cli:validate:links` and `:validate:mermaid` — exit 0
-- [ ] [AI] Fix ALL failures, including preexisting ones
+- [x] [AI] `npx nx affected -t spec-coverage` — exits 0
+- [x] [AI] `npm run lint:md` — exits 0 (fix with `npm run lint:md:fix` if needed)
+- [x] [AI] `npx nx run rhino-cli:validate:links` and `:validate:mermaid` — exit 0
+- [x] [AI] Fix ALL failures, including preexisting ones
+  - **Date**: 2026-06-12 | **Status**: DONE — spec-coverage 17 projects passed; lint:md 0 errors; validate:links 0 broken; validate:mermaid 0 violations
 
 ### Commit Guidelines
 
 - [ ] [AI] Commit thematically, e.g.
-      `docs(specs): add crane-be and messaging bounded-context spec sets` and
-      `docs(conventions): register fsharp- lib-naming token`
+      `docs(specs): add crane-be spec surface, messaging DDD registrations, and READMEs`
 
 ### Phase 9 Gate
 
 > All checks below must pass before starting Phase 10.
 
-- [ ] [AI] `npx nx affected -t spec-coverage` — exits 0
-- [ ] [AI] `npm run lint:md` — exits 0
-- [ ] [AI] `fsharp-` token registered; crane-be + crane-be-e2e documented
+- [x] [AI] `npx nx affected -t spec-coverage` — exits 0
+- [x] [AI] `npm run lint:md` — exits 0
+- [x] [AI] `fsharp-` token registered; crane-be + crane-be-e2e documented
 
 > **Pause Safety**: specs, conventions, and docs are complete and consistent with the code. Safe
 > to stop. To resume: `npx nx affected -t spec-coverage`.

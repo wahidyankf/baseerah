@@ -161,3 +161,19 @@ contexts:
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/routing.md
     gherkin: specs/apps/organiclever/behavior/organiclever-web/gherkin/routing
     relationships: []
+
+  - name: messaging
+    summary: >-
+      NATS client, JetStream durable stream demo, crane HTTP + NATS request/reply
+      client, and the HTTP media-convert endpoint. Connects to NATS at startup
+      (fail-fast on missing URL), publishes and acks on organiclever.messaging.demo,
+      and delegates PDF-to-Markdown conversion to crane-be via crane.convert.
+    layers:
+      - infrastructure
+      - api
+    code:
+      - apps/organiclever-be/src/messaging
+    code_lang:
+      - rs
+    glossary: specs/apps/organiclever/ddd/ubiquitous-language/messaging.md
+    gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging
