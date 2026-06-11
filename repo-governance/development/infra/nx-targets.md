@@ -133,12 +133,12 @@ Tags are the standard mechanism for attaching structured metadata to projects in
 
 Every project declares tags along four dimensions. Each dimension uses a fixed prefix and a controlled vocabulary.
 
-| Dimension | Prefix      | Allowed Values                                                                                 | Required                       | Purpose                                                       |
-| --------- | ----------- | ---------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Type      | `type:`     | `app`, `lib`, `e2e`                                                                            | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
-| Platform  | `platform:` | `cli`, `nextjs`, `axum`, `playwright`                                                          | Apps and e2e projects          | Framework or runtime environment                              |
-| Language  | `lang:`     | `ts`, `rust`, `dotnet`                                                                         | Projects with application code | Primary language of source code                               |
-| Domain    | `domain:`   | `ayokoding`, `crane`, `ose-platform`, `ose-app`, `organiclever`, `wahidyankf`, `tooling`, `ui` | Always                         | Business or product domain                                    |
+| Dimension | Prefix      | Allowed Values                                                             | Required                       | Purpose                                                       |
+| --------- | ----------- | -------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Type      | `type:`     | `app`, `lib`, `e2e`                                                        | Always                         | Distinguishes deployable apps, reusable libs, and test suites |
+| Platform  | `platform:` | `cli`, `nextjs`, `axum`, `playwright`                                      | Apps and e2e projects          | Framework or runtime environment                              |
+| Language  | `lang:`     | `ts`, `rust`, `dotnet`                                                     | Projects with application code | Primary language of source code                               |
+| Domain    | `domain:`   | `ayokoding`, `crane`, `ose`, `organiclever`, `wahidyankf`, `tooling`, `ui` | Always                         | Business or product domain                                    |
 
 ### Special Rules
 
@@ -157,8 +157,8 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 | `organiclever-be`       | `["type:app", "platform:axum", "lang:rust", "domain:organiclever"]`     |
 | `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]` |
 | `organiclever-be-e2e`   | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]` |
-| `ose-cli`               | `["type:app", "platform:cli", "lang:rust", "domain:ose-platform"]`      |
-| `ose-web`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose-platform"]`     |
+| `ose-cli`               | `["type:app", "platform:cli", "lang:rust", "domain:ose"]`               |
+| `ose-web`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose"]`              |
 | `wahidyankf-web`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`       |
 | `wahidyankf-web-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`   |
 | `rust-commons`          | `["type:lib", "lang:rust"]`                                             |
@@ -555,10 +555,10 @@ Example for `rhino-cli` `test:unit` inputs:
 
 **Go CLI apps** (`ayokoding-cli`, `ose-cli`) also consume Gherkin specs in `test:unit` (godog unit step definitions run without a build tag). Their `test:unit` and `test:quick` inputs must include the CLI's own spec files:
 
-| CLI App         | Gherkin specs input                                    |
-| --------------- | ------------------------------------------------------ |
-| `ayokoding-cli` | `{workspaceRoot}/specs/apps/ayokoding/**/*.feature`    |
-| `ose-cli`       | `{workspaceRoot}/specs/apps/ose-platform/**/*.feature` |
+| CLI App         | Gherkin specs input                                 |
+| --------------- | --------------------------------------------------- |
+| `ayokoding-cli` | `{workspaceRoot}/specs/apps/ayokoding/**/*.feature` |
+| `ose-cli`       | `{workspaceRoot}/specs/apps/ose/**/*.feature`       |
 
 Example for `ayokoding-cli` `test:unit` inputs:
 

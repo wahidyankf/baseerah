@@ -771,7 +771,7 @@ termination: Content passes all quality checks
 inputs:
   - name: content-type
     type: enum
-    values: [docs, ayokoding, ose-platform, readme]
+    values: [docs, ayokoding, ose, readme]
     required: true
   - name: scope
     type: string

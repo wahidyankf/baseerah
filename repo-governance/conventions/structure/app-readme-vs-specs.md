@@ -44,7 +44,7 @@ This convention governs THREE interrelated decisions:
 
 A fourth rule covers adoption expectations for BDD, DDD, and API contracts.
 
-The convention applies to all apps and infra directories in the monorepo. Its OrganicLever application is the reference pilot. Rollout to `ayokoding`, `ose-platform`, `wahidyankf`, and `rhino` follows the same rules.
+The convention applies to all apps and infra directories in the monorepo. Its OrganicLever application is the reference pilot. Rollout to `ayokoding`, `ose`, `wahidyankf`, and `rhino` follows the same rules.
 
 ## Scope
 
@@ -218,12 +218,12 @@ specs/apps/<app-family>/
 
 #### Per-surface variant table
 
-| Surface profile                   | Folders populated                                                                                                                            | Folders absent or empty                                 |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| Full-stack (e.g., `organiclever`) | All five top-level folders; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/be/gherkin/` + `behavior/web/gherkin/` | None — full tree                                        |
-| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/web/gherkin/`                                                     | `containers/contracts/` (no API), `components/be/`      |
-| CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/cli/gherkin/`                                                     | `components/{be,web}/`, `containers/contracts/`         |
-| Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, with `components/cli/` + `behavior/cli/gherkin/` alongside web layers if applicable                                        | Nothing additional omitted — same shape, more populated |
+| Surface profile                   | Folders populated                                                                                                                                                      | Folders absent or empty                                 |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Full-stack (e.g., `organiclever`) | All five top-level folders; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/organiclever-be/gherkin/` + `behavior/organiclever-web/gherkin/` | None — full tree                                        |
+| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-web/gherkin/`                                                                    | `containers/contracts/` (no API), `components/be/`      |
+| CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                                         | `components/{be,web}/`, `containers/contracts/`         |
+| Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, with `components/cli/` + `behavior/ayokoding-cli/gherkin/` alongside web layers if applicable                                                        | Nothing additional omitted — same shape, more populated |
 
 #### Creation rules
 
@@ -334,9 +334,8 @@ This standard defines adoption expectations per app type and rollout timeline. "
 | App            | BDD              | DDD                          | Contracts       |
 | -------------- | ---------------- | ---------------------------- | --------------- |
 | `organiclever` | Adopted (pilot)  | Adopted (pilot)              | Adopted (pilot) |
-| `ose-app`      | SHOULD — backlog | SHOULD — backlog             | SHOULD          |
+| `ose`          | SHOULD — backlog | SHOULD — backlog             | SHOULD          |
 | `ayokoding`    | Adopted          | Deferred (multi-CLI profile) | NOT APPLICABLE  |
-| `ose-platform` | Adopted          | SHOULD — backlog             | NOT APPLICABLE  |
 | `wahidyankf`   | SHOULD — backlog | SHOULD — backlog             | NOT APPLICABLE  |
 | `rhino`        | Adopted          | Deferred (CLI)               | NOT APPLICABLE  |
 
@@ -452,7 +451,13 @@ specs/apps/organiclever/
 **Migration checklist**:
 
 1. Create five top-level folders with `README.md` placeholders.
-2. In one atomic `git mv` commit: move `be/gherkin/` → `behavior/be/gherkin/`, `web/gherkin/` → `behavior/web/gherkin/`, `cli/gherkin/` → `behavior/cli/gherkin/`, `c4/*.md` files → their new positions, `contracts/` → `containers/contracts/`. `ddd/` stays at the app root (do not relocate it under `components/web/`; the ubiquitous language is per bounded context, not per surface). CLI feature files must be nested under a domain subdir — e.g., `behavior/cli/gherkin/<domain>/<feature>.feature`.
+2. In one atomic `git mv` commit: move `be/gherkin/` → `behavior/<product>-be/gherkin/`,
+   `web/gherkin/` → `behavior/<product>-web/gherkin/`,
+   `cli/gherkin/` → `behavior/<product>-cli/gherkin/`, `c4/*.md` files → their new positions,
+   `contracts/` → `containers/contracts/`. `ddd/` stays at the app root (do not relocate it
+   under `components/web/`; the ubiquitous language is per bounded context, not per surface).
+   Feature files must be nested under a domain subdir — e.g.,
+   `behavior/<product>-cli/gherkin/<domain>/<feature>.feature`.
 3. In the same commit: update rhino-cli path constants, Nx `project.json` `inputs`, step file references, and governance cross-links.
 4. Run `rhino-cli specs validate-tree <app>` to verify.
 
@@ -491,10 +496,11 @@ A README exceeding its line-count cap is a HIGH finding regardless of content.
 
 ## Refinement log
 
-| Date       | Entry                                                                                                                                                                                                                                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-05-09 | CLI DDD adoption deferred; revisit if a CLI grows past ~10 commands or shows aggregate-shaped state.                                                                                                                                                                           |
-| 2026-05-23 | CLI-flat exception retired. All CLI surfaces now use domain subdirs under `behavior/cli/gherkin/<domain>/` (same rule as BE and web). `build-tools` surface retired; features inlined into `cli`. `ose-app` added to the `AppsWithDDD` allowlist and rollout adoption mapping. |
+| Date       | Entry                                                                                                                                                                                                                                                                             |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-09 | CLI DDD adoption deferred; revisit if a CLI grows past ~10 commands or shows aggregate-shaped state.                                                                                                                                                                              |
+| 2026-05-23 | CLI-flat exception retired. All CLI surfaces now use domain subdirs (same rule as BE and web). `ose-app` added to the `AppsWithDDD` allowlist.                                                                                                                                    |
+| 2026-06-11 | Flat `<surface>` slugs renamed to `<product>-<surface>` compound form (e.g., `be/` → `organiclever-be/`, `cli/` → `rhino-cli/`). `build-tools` renamed to `ayokoding-build-tools` (kept active). `ose-app` + `ose-platform` merged into `ose` family; allowlist updated to `ose`. |
 
 ## Related
 

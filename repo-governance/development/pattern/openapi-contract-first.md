@@ -64,7 +64,7 @@ specs/
 | BE App            | Spec Path                                                   |
 | ----------------- | ----------------------------------------------------------- |
 | `organiclever-be` | `specs/apps/organiclever/containers/contracts/openapi.yaml` |
-| `ose-app-be`      | `specs/apps/ose-app/containers/contracts/openapi.yaml`      |
+| `ose-app-be`      | `specs/apps/ose/containers/contracts/openapi.yaml`          |
 
 The spec file is the only artefact that humans edit. Generated files are never edited by hand.
 
@@ -134,7 +134,7 @@ Contract-first development covers these BE↔client pairs:
 | Backend           | Client             | Spec                                                        |
 | ----------------- | ------------------ | ----------------------------------------------------------- |
 | `organiclever-be` | `organiclever-web` | `specs/apps/organiclever/containers/contracts/openapi.yaml` |
-| `ose-app-be`      | `ose-app-web`      | `specs/apps/ose-app/containers/contracts/openapi.yaml`      |
+| `ose-app-be`      | `ose-app-web`      | `specs/apps/ose/containers/contracts/openapi.yaml`          |
 
 Apps outside this table (CLI tools, content-only web apps such as `ayokoding-web` and `ose-web`) do not participate
 in contract-first codegen.

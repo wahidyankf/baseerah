@@ -168,7 +168,7 @@ To enable accurate parent-child hierarchy tracking across concurrent workflow ru
 | plan-checker          | `plan`          | `.execution-chain-plan`          |
 | docs-link-checker     | `docs-link`     | `.execution-chain-docs-link`     |
 | ayokoding-web-\* (ts) | `ayokoding`     | `.execution-chain-ayokoding`     |
-| ose-web-\*            | `ose-platform`  | `.execution-chain-ose-platform`  |
+| ose-web-\*            | `ose`           | `.execution-chain-ose`           |
 
 **Tracking File Format**: `{unix-timestamp} {uuid-chain}`
 
@@ -243,9 +243,9 @@ Scope-based tracking enables correct parent tracking for concurrent workflows:
 
 ```
 T0: ayokoding-workflow writes .execution-chain-ayokoding = "aaa111"
-T1: ose-platform-workflow writes .execution-chain-ose-platform = "bbb222"
+T1: ose-workflow writes .execution-chain-ose = "bbb222"
 T2: ayokoding-checker reads .execution-chain-ayokoding → "aaa111"
-T3: ose-platform-checker reads .execution-chain-ose-platform → "bbb222"
+T3: ose-checker reads .execution-chain-ose → "bbb222"
 ```
 
 Each workflow scope is isolated, preventing cross-contamination.

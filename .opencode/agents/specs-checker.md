@@ -64,9 +64,10 @@ Every directory within the listed folders must have a `README.md`. This includes
 - All five top-level folders at `specs/apps/<app-family>/` (`product/`, `system-context/`,
   `containers/`, `components/`, `behavior/`)
 - Per-surface subfolders (`components/be/`, `components/web/`, `components/cli/`,
-  `behavior/be/gherkin/`, `behavior/web/gherkin/`, `behavior/cli/gherkin/`)
-- All domain subdirectories within `behavior/<surface>/gherkin/<domain>/` — domain subdirs
-  are required for every surface (BE, web, CLI)
+  `behavior/<product>-be/gherkin/`, `behavior/<product>-web/gherkin/`,
+  `behavior/<product>-cli/gherkin/`)
+- All domain subdirectories within `behavior/<product>-<surface>/gherkin/<domain>/` — domain
+  subdirs are required for every surface (BE, web, CLI)
 - DDD subdirectories (`ddd/`, `ddd/ubiquitous-language/`)
 - `containers/contracts/` (when present)
 
@@ -219,7 +220,7 @@ Note: Adoption gap findings are always `[Adoption Gap]` tagged in the report and
 Before completing validation of any listed `specs/apps/<app-family>/` folder, run the four
 allowlist-driven `rhino-cli specs validate-*` Nx targets via `nx run rhino-cli:validate:specs-{adoption,tree,counts,links}`.
 Each target accepts a `--apps <csv>` flag for explicit scoping; absent any flag, it defaults to the
-`AppsWithDDD` allowlist (`organiclever`, `wahidyankf`, `ose-platform`, `ayokoding`, `ose-app`).
+`AppsWithDDD` allowlist (`organiclever`, `ose`).
 
 | Target                    | What it checks                                                        | Finding level |
 | ------------------------- | --------------------------------------------------------------------- | ------------- |

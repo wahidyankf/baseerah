@@ -156,8 +156,8 @@ Use this table when uncertain whether a change requires a spec update:
 - `specs/apps/organiclever/system-context/` — C4 L1 context diagram for OrganicLever
 - `specs/apps/organiclever/containers/` — C4 L2 container diagram and deployment topology
 - `specs/apps/organiclever/components/` — C4 L3 component diagrams (be/, web/)
-- `specs/apps/organiclever/behavior/be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
-- `specs/apps/organiclever/behavior/web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
+- `specs/apps/organiclever/behavior/organiclever-be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
+- `specs/apps/organiclever/behavior/organiclever-web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
 - `specs/apps/organiclever/containers/contracts/` — OpenAPI 3.1 contract spec that both backend and frontend implement
 
 When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, both the corresponding Gherkin scenarios and the C4 component diagram must be updated to reflect the new behavior and component.
@@ -167,7 +167,7 @@ When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, bo
 `specs/apps/ayokoding/` maintains C4 diagrams and Gherkin scenarios for the Next.js 16 fullstack platform:
 
 - `specs/apps/ayokoding/system-context/`, `containers/`, `components/` — C4 diagrams kept current with the Next.js App Router structure and tRPC routers
-- `specs/apps/ayokoding/behavior/be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-web-be-e2e`
+- `specs/apps/ayokoding/behavior/organiclever-be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-web-be-e2e`
 
 When a new tRPC router is added to `apps/ayokoding-web/`, a new component entry appears in the C4 component diagram and new scenarios are added to the Gherkin directory.
 
@@ -191,7 +191,7 @@ They:
 
 1. Update `specs/apps/organiclever/containers/contracts/` (OpenAPI spec) with the new endpoint definition
 2. Run `nx run organiclever-contracts:codegen` and related codegen targets
-3. Add a Gherkin scenario to `specs/apps/organiclever/behavior/be/gherkin/products/get-product.feature`
+3. Add a Gherkin scenario to `specs/apps/organiclever/behavior/organiclever-be/gherkin/products/get-product.feature`
 4. Update the C4 component diagram in `specs/apps/organiclever/system-context/` if the endpoint belongs to a new component
 5. Implement the endpoint in `apps/organiclever-be/`
 

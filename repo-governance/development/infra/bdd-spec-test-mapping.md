@@ -94,9 +94,9 @@ Feature: Agent Configuration Synchronisation
 Alternatively, a command with its own distinct domain gets its own feature file:
 
 ```
-specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature                       <- single @doctor tag
-specs/apps/rhino/behavior/cli/gherkin/agents/agents-sync.feature                  <- @agents-sync + @agents-validate-sync
-specs/apps/rhino/behavior/cli/gherkin/agents/agents-validate-claude.feature       <- single @agents-validate-claude tag
+specs/apps/rhino/behavior/rhino-cli/gherkin/system/doctor.feature                       <- single @doctor tag
+specs/apps/rhino/behavior/rhino-cli/gherkin/agents/agents-sync.feature                  <- @agents-sync + @agents-validate-sync
+specs/apps/rhino/behavior/rhino-cli/gherkin/agents/agents-validate-claude.feature       <- single @agents-validate-claude tag
 ```
 
 ### 3. Unit & Integration Test to Tag (mandatory)
@@ -135,13 +135,13 @@ func TestIntegrationValidateSync(t *testing.T) {
 
 ## File Naming Convention
 
-| Artifact         | Pattern                                                       | Example                                                       |
-| ---------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
-| Parent cmd       | `{domain}.go`                                                 | `agents.go`                                                   |
-| Command file     | `{domain}_{action}.go`                                        | `agents_validate_sync.go`                                     |
-| Unit test        | `{domain}_{action}_test.go`                                   | `agents_validate_sync_test.go`                                |
-| Integration test | `{domain}_{action}.integration_test.go`                       | `agents_validate_sync.integration_test.go`                    |
-| Feature file     | `specs/{app}/behavior/cli/gherkin/{domain}/{command}.feature` | `specs/apps/rhino/behavior/cli/gherkin/system/doctor.feature` |
+| Artifact         | Pattern                                                                 | Example                                                             |
+| ---------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Parent cmd       | `{domain}.go`                                                           | `agents.go`                                                         |
+| Command file     | `{domain}_{action}.go`                                                  | `agents_validate_sync.go`                                           |
+| Unit test        | `{domain}_{action}_test.go`                                             | `agents_validate_sync_test.go`                                      |
+| Integration test | `{domain}_{action}.integration_test.go`                                 | `agents_validate_sync.integration_test.go`                          |
+| Feature file     | `specs/{app}/behavior/<product>-cli/gherkin/{domain}/{command}.feature` | `specs/apps/rhino/behavior/rhino-cli/gherkin/system/doctor.feature` |
 
 **Unit test files** (`{domain}_{action}_test.go`) serve dual purpose: they contain both godog BDD step definitions (consuming Gherkin specs via `TestUnit*` functions) and any non-BDD pure function tests for edge cases not covered by the Gherkin scenarios. The godog step definitions in unit test files use mocked I/O function variables instead of real filesystem access.
 
@@ -171,7 +171,7 @@ which differ from the CLI app naming patterns the tool currently expects. This w
 ### Go CLI apps (ayokoding-cli, ose-cli)
 
 1. Create the parent command file `apps/{app}/cmd/{domain}.go` if the domain is new
-2. Create the feature file `specs/apps/{app}/behavior/cli/gherkin/{domain}/{domain}-{action}.feature`
+2. Create the feature file `specs/apps/{app}/behavior/<product>-cli/gherkin/{domain}/{domain}-{action}.feature`
 3. Create `apps/{app}/cmd/{domain}_{action}.go` with the Cobra command (register with parent)
 4. Create `apps/{app}/cmd/{domain}_{action}_test.go` with godog unit step definitions — use package-level function variables to mock all I/O, no build tag (runs in `test:quick`)
 5. Create `apps/{app}/cmd/{domain}_{action}.integration_test.go` with godog integration steps — add `//go:build integration`, drive via `cmd.RunE()` against real `/tmp` fixtures
@@ -179,7 +179,7 @@ which differ from the CLI app naming patterns the tool currently expects. This w
 
 ### Rust CLI app (rhino-cli)
 
-1. Create the feature file `specs/apps/rhino/behavior/cli/gherkin/{domain}/{domain}-{action}.feature`
+1. Create the feature file `specs/apps/rhino/behavior/rhino-cli/gherkin/{domain}/{domain}-{action}.feature`
 2. Create `apps/rhino-cli/src/commands/{domain}_{action}.rs` with the Clap subcommand (register in `main.rs`)
 3. Create `apps/rhino-cli/src/commands/{domain}_{action}_test.rs` (or inline `#[cfg(test)]` module) with unit step definitions — mock I/O via injected function types, no special build tag
 4. Create `apps/rhino-cli/tests/{domain}_{action}_integration_test.rs` with integration steps — drive via process invocation against real `/tmp` fixtures
@@ -220,21 +220,21 @@ Integration steps drive commands in-process via `cmd.RunE()` against controlled 
 The `@agents-validate-sync` tag lives inside `agents-sync.feature` (shared feature file) and is consumed at both levels:
 
 ```
-specs/apps/rhino/behavior/cli/gherkin/agents/agents-sync.feature  (contains @agents-sync + @agents-validate-sync)
+specs/apps/rhino/behavior/rhino-cli/gherkin/agents/agents-sync.feature  (contains @agents-sync + @agents-validate-sync)
   -> Unit steps in:       apps/rhino-cli/src/commands/agents_validate_sync_test.rs
   -> Integration steps in: apps/rhino-cli/tests/agents_validate_sync_integration_test.rs
 ```
 
 ## API Backend: Three-Level Spec Consumption
 
-API backends consume shared Gherkin scenarios from their own `specs/apps/<backend-name>/behavior/be/gherkin/`
+API backends consume shared Gherkin scenarios from their own `specs/apps/<backend-name>/behavior/<product>-be/gherkin/`
 directory at three test levels. The feature files are the shared contract — only the step
 implementations change per level.
 
 ### Shared Specs
 
 ```
-specs/apps/<backend-name>/behavior/be/gherkin/
+specs/apps/<backend-name>/behavior/<product>-be/gherkin/
 ├── auth/
 │   ├── login.feature
 │   ├── register.feature

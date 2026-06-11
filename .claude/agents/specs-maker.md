@@ -55,7 +55,7 @@ target: specs/apps/rhino
 surface-profile: cli-only
 
 # Create a missing README in an existing directory
-target: specs/apps/organiclever/behavior/web/gherkin/health
+target: specs/apps/organiclever/behavior/organiclever-web/gherkin/health
 
 # Scaffold a specific subfolder within an existing spec area
 target: specs/apps/organiclever/ddd
@@ -100,12 +100,12 @@ appropriate for the `surface-profile` are created — empty folders are never pr
 │       └── routes-and-screens.md
 └── behavior/
     ├── README.md
-    ├── be/
+    ├── {product}-be/
     │   └── gherkin/
     │       ├── README.md
     │       └── health/
     │           └── health-check.feature
-    └── web/
+    └── {product}-web/
         └── gherkin/
             ├── README.md
             └── {domain}/
@@ -137,7 +137,7 @@ appropriate for the `surface-profile` are created — empty folders are never pr
 │       └── routes-and-screens.md
 └── behavior/
     ├── README.md
-    └── web/
+    └── {product}-web/
         └── gherkin/
             ├── README.md
             └── {domain}/
@@ -166,7 +166,7 @@ appropriate for the `surface-profile` are created — empty folders are never pr
 │       └── component-cli.md
 └── behavior/
     ├── README.md
-    └── cli/
+    └── {product}-cli/
         └── gherkin/
             ├── README.md
             └── {domain}/           # domain subdir required (same rule as be/web)
@@ -174,7 +174,7 @@ appropriate for the `surface-profile` are created — empty folders are never pr
 ```
 
 **Multi-CLI profile** (`surface-profile: multi-cli`): same as CLI-only, with additional
-`components/web/` and `behavior/web/gherkin/` if the app also has a web surface.
+`components/web/` and `behavior/organiclever-web/gherkin/` if the app also has a web surface.
 Use `surface-profile: full-stack` if the app has both web and backend surfaces.
 
 ### 2. Create Missing READMEs
@@ -194,8 +194,8 @@ Create new `.feature` files following conventions:
 - `Background:` with standard context step (surface-appropriate)
 - `Scenario:` blocks with Given/When/Then steps
 - UI-semantic steps for web specs, HTTP-semantic for BE specs, shell-semantic for CLI specs
-- BE/web/CLI: placed in domain subdirectory under `behavior/<surface>/gherkin/<domain>/`
-  (build-time CLI features also belong under `behavior/cli/gherkin/<domain>/`)
+- BE/web/CLI: placed in domain subdirectory under `behavior/<product>-<surface>/gherkin/<domain>/`
+  (e.g., `ayokoding-build-tools` for ayokoding build-time features)
 
 ### 4. Create C4 Diagrams
 

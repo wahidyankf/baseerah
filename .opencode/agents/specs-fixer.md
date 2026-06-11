@@ -48,8 +48,8 @@ the validated scope.
 3. **Missing top-level README.md** — Generate from directory contents using standard template,
    for all five canonical folders (`product/`, `system-context/`, `containers/`, `components/`,
    `behavior/`) and per-surface subfolders (`components/be/`, `components/web/`,
-   `behavior/be/gherkin/`, `behavior/web/gherkin/`, `behavior/cli/gherkin/`,
-   `ddd/`, `ddd/ubiquitous-language/`)
+   `behavior/organiclever-be/gherkin/`, `behavior/organiclever-web/gherkin/`,
+   `behavior/rhino-cli/gherkin/`, `ddd/`, `ddd/ubiquitous-language/`)
 4. **Missing per-surface subfolder README.md** — Generate from directory contents using
    standard template; scaffold all required README files within the validated scope
 5. **Broken cross-references** — Fix relative paths based on actual file locations
@@ -129,7 +129,7 @@ the validated scope.
 
 **Finding**: [CRITICAL] {original finding}
 **Action**: Updated scenario count in README from 76 to 78
-**File**: `specs/apps/organiclever/behavior/be/README.md`
+**File**: `specs/apps/organiclever/behavior/organiclever-be/README.md`
 **Verified**: Yes — count now matches actual feature files
 
 ## Requires Review
