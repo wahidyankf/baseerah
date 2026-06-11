@@ -197,7 +197,7 @@ All Gherkin specs and API contracts live under `specs/` and are consumed via
 | `specs/apps/organiclever-web/`                  | organiclever-web, organiclever-web-e2e | test:integration, typecheck, test:quick |
 | `specs/apps/rhino/`                             | rhino-cli                              | test:integration                        |
 | `specs/apps/ayokoding/`                         | ayokoding-cli, ayokoding-web           | test:integration                        |
-| `specs/apps/ose-platform/`                      | ose-cli, ose-web                       | test:integration                        |
+| `specs/apps/ose/`                               | ose-cli, ose-web                       | test:integration                        |
 
 ## Related Documentation
 

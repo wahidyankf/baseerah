@@ -53,7 +53,7 @@ glossary terms; code identifiers match the `Code identifier(s)` column verbatim.
 ## Relationship to organiclever-be
 
 These specs are the **frontend counterpart** to
-[be/gherkin/](../../be/gherkin/README.md). The two trees cover different domains:
+[be/gherkin/](../../organiclever-be/gherkin/README.md). The two trees cover different domains:
 
 - **be**: HTTP-semantic (GET, POST, status codes, response bodies)
 - **fe**: UI-semantic (clicks, types, sees, navigates, form submissions)
@@ -65,5 +65,5 @@ definitions in `apps/organiclever-web/test/unit/steps/`.
 
 - **Ubiquitous language**: [ubiquitous-language/](../../../ddd/ubiquitous-language/README.md)
 - **Bounded-context map**: [bounded-context-map.md](../../../ddd/bounded-context-map.md)
-- **Backend counterpart**: [be gherkin specs](../../be/gherkin/README.md)
+- **Backend counterpart**: [be gherkin specs](../../organiclever-be/gherkin/README.md)
 - **Parent**: [web component specs](../../../components/web/README.md)

@@ -333,7 +333,7 @@ See [Specs Directory Structure Convention](../../repo-governance/conventions/str
 **Canonical inputs for cache invalidation** (add to `test:unit` and `test:quick`):
 
 - Include `{projectRoot}/generated-contracts/**/*`
-- Include `{workspaceRoot}/specs/apps/[domain]/behavior/be/gherkin/**/*.feature` for backends
+- Include `{workspaceRoot}/specs/apps/[domain]/behavior/<product>-be/gherkin/**/*.feature` for backends
 - Include language-specific source file globs (see `repo-governance/development/infra/nx-targets.md` for per-language patterns)
 
 **See**: [Nx Target Standards](../../repo-governance/development/infra/nx-targets.md) for canonical target names, caching rules, and per-language input patterns.

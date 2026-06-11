@@ -44,5 +44,5 @@ docker compose -f infra/dev/ose-app/docker-compose.yml down -v
 
 ## Behavior & Architecture
 
-See [specs/apps/ose-app/containers/deployment.md](../../../specs/apps/ose-app/containers/deployment.md)
+See [specs/apps/ose/containers/deployment.md](../../../specs/apps/ose/containers/deployment.md)
 for environments, Docker images, and deployment details.

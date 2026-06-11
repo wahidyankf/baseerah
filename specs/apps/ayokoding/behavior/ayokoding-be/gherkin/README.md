@@ -44,7 +44,7 @@ glossary terms; code identifiers (procedure names, schema fields) match the
 ## Relationship to the web perspective
 
 These specs are the **HTTP counterpart** to
-[behavior/ayokoding-web/gherkin/](../../web/gherkin/README.md). Both perspectives execute inside the
+[behavior/ayokoding-web/gherkin/](../../ayokoding-web/gherkin/README.md). Both perspectives execute inside the
 same `web` Next.js container; the split is a slug, not a container boundary.
 
 - **api**: HTTP-semantic (the client calls, response shape, status codes)
@@ -56,5 +56,5 @@ same `web` Next.js container; the split is a slug, not a container boundary.
 
 - **Ubiquitous language**: ubiquitous-language/
 - **Bounded-context map**: bounded-context-map.md
-- **Web counterpart**: [web gherkin specs](../../web/gherkin/README.md)
+- **Web counterpart**: [web gherkin specs](../../ayokoding-web/gherkin/README.md)
 - **Parent**: [api component specs](../../../components/api/README.md)

@@ -291,7 +291,7 @@ Per-project:
       }
     }
   },
-  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose-platform"]
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose"]
 }
 ```
 
@@ -349,12 +349,12 @@ Per-project:
 
 All projects use a standard four-dimension tag scheme:
 
-| Dimension   | Values                                                  | Required                 | Purpose                 |
-| ----------- | ------------------------------------------------------- | ------------------------ | ----------------------- |
-| `type:`     | `app`, `lib`, `e2e`                                     | Yes                      | Project kind            |
-| `platform:` | `cli`, `nextjs`, `flutter`, `spring-boot`, `playwright` | For apps/e2e             | Framework/runtime       |
-| `lang:`     | `golang`, `ts`, `java`, `dart`                          | Where source code exists | Primary language        |
-| `domain:`   | `ayokoding`, `ose-platform`, `organiclever`, `tooling`  | Yes                      | Business/product domain |
+| Dimension   | Values                                                      | Required                 | Purpose                 |
+| ----------- | ----------------------------------------------------------- | ------------------------ | ----------------------- |
+| `type:`     | `app`, `lib`, `e2e`                                         | Yes                      | Project kind            |
+| `platform:` | `cli`, `nextjs`, `flutter`, `spring-boot`, `playwright`     | For apps/e2e             | Framework/runtime       |
+| `lang:`     | `golang`, `ts`, `java`, `dart`                              | Where source code exists | Primary language        |
+| `domain:`   | `ayokoding`, `ose`, `organiclever`, `wahidyankf`, `tooling` | Yes                      | Business/product domain |
 
 **Notes**:
 
