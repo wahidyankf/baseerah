@@ -23,12 +23,12 @@ applications **do** consume NATS for the media path plus a JetStream durable dem
 provisioned infrastructure works rather than assuming it.
 
 This plan also builds on the just-completed
-[`standardize-secrets-and-env`](../../../../../plans/done/2026-06-10__standardize-secrets-and-env/README.md)
+[`standardize-secrets-and-env`](../../../plans/done/2026-06-10__standardize-secrets-and-env/README.md)
 plan (done 2026-06-10), which introduced per-app `SCREAMING_SNAKE` env naming with app-prefix,
 fail-fast startup validation, `.env.example` annotation format, and the `rhino-cli env validate`
 drift guard backed by `env-contract.yaml` at the repo root. Every new env var this plan adds
 must honor that standard or the drift guard fails at pre-push and CI. See
-[Secrets and Env Standards](../../../../../repo-governance/conventions/security/secrets-and-env-standards.md).
+[Secrets and Env Standards](../../../repo-governance/conventions/security/secrets-and-env-standards.md).
 
 ## Scope
 
@@ -173,4 +173,4 @@ the three public GHCR images, migration wiring, and the publish workflow all exi
 - **Commits**: thematic, Conventional Commits format, split by domain/concern, one or more
   commits per phase.
 - See
-  [Trunk Based Development Convention](../../../../../repo-governance/development/workflow/trunk-based-development.md).
+  [Trunk Based Development Convention](../../../repo-governance/development/workflow/trunk-based-development.md).

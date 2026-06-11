@@ -163,7 +163,7 @@ existing tokio runtime.
 ## Dependency Clearance
 
 Per the
-[Dependency Bump Stability & Safety Policy](../../../../../repo-governance/development/workflow/dependency-bump-policy.md),
+[Dependency Bump Stability & Safety Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md),
 all bumps follow **Path B** (60-day soak + CVE-clean), no waivers. Exact pins only; no
 caret/tilde. CVE sources checked for each: NVD, GitHub Advisories, Snyk DB, vendor/RustSec
 security pages, and the CISA KEV feed. Cutoff = execution date minus 60 days; the chosen version's

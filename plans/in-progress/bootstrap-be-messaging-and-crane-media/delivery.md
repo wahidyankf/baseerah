@@ -23,9 +23,9 @@ The plan-execution Step 0 gate enters this worktree by default: it auto-provisio
 deleting the worktree after the plan is archived and pushed.
 
 See
-[Worktree Path Convention](../../../../../repo-governance/conventions/structure/worktree-path.md)
+[Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)
 and
-[Plans Organization Convention §Worktree Specification](../../../../../repo-governance/conventions/structure/plans.md#worktree-specification).
+[Plans Organization Convention §Worktree Specification](../../../repo-governance/conventions/structure/plans.md#worktree-specification).
 
 ---
 
@@ -690,7 +690,7 @@ and
 - [ ] [AI] If any CI check fails, fix root cause immediately and push a follow-up commit
 - [ ] [AI] Repeat until ALL GitHub Actions pass with zero failures
       — cite
-      [ci-post-push-verification.md](../../../../../repo-governance/development/workflow/ci-post-push-verification.md)
+      [ci-post-push-verification.md](../../../repo-governance/development/workflow/ci-post-push-verification.md)
 
 ### Plan Archival
 
