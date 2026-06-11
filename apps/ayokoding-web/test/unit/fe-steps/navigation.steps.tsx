@@ -8,7 +8,10 @@ import { TableOfContents } from "@/contexts/navigation/presentation/toc";
 import { PrevNext } from "@/contexts/navigation/presentation/prev-next";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/web/gherkin/navigation/navigation.feature"),
+  path.resolve(
+    process.cwd(),
+    "../../specs/apps/ayokoding/behavior/ayokoding-web/gherkin/navigation/navigation.feature",
+  ),
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {

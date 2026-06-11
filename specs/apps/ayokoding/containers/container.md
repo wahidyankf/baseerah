@@ -13,8 +13,8 @@ not two containers — because they ship as one Vercel deployment unit.
 
 The Gherkin behavior tree splits along **API perspective**, not deployable-container boundary:
 
-- `behavior/web/gherkin/` — UI-semantic scenarios (DOM, navigation, accessibility, locale switcher).
-- `behavior/api/gherkin/` — tRPC HTTP-semantic scenarios (procedure shapes, error codes,
+- `behavior/ayokoding-web/gherkin/` — UI-semantic scenarios (DOM, navigation, accessibility, locale switcher).
+- `behavior/ayokoding-be/gherkin/` — tRPC HTTP-semantic scenarios (procedure shapes, error codes,
   locale-scoped responses).
 
 The slug `api` is a **perspective slug**, not a container. There is no separate API container —

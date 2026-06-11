@@ -12,7 +12,7 @@ container; ayokoding renamed `be` → `api` because it has no separate backend s
 ## Structure
 
 ```
-specs/apps/ayokoding/behavior/api/gherkin/
+specs/apps/ayokoding/behavior/ayokoding-be/gherkin/
 ├── content/                # tRPC content procedures
 │   └── content-api.feature
 ├── search/                 # tRPC search procedure
@@ -44,7 +44,7 @@ glossary terms; code identifiers (procedure names, schema fields) match the
 ## Relationship to the web perspective
 
 These specs are the **HTTP counterpart** to
-[behavior/web/gherkin/](../../web/gherkin/README.md). Both perspectives execute inside the
+[behavior/ayokoding-web/gherkin/](../../web/gherkin/README.md). Both perspectives execute inside the
 same `web` Next.js container; the split is a slug, not a container boundary.
 
 - **api**: HTTP-semantic (the client calls, response shape, status codes)

@@ -7,43 +7,41 @@ two perspectives: the tRPC HTTP API surface (`api`) and the browser UI surface (
 Sliced by perspective so each test runner can wire its step implementations against the
 right glob.
 
-## Slug-vs-container distinction
+## Product-surface distinction
 
-AyoKoding ships **one deployable container**: `web` (Next.js 16). The Gherkin behavior tree
-splits along **API perspective**, not deployable-container boundary:
+AyoKoding ships **one deployable container**: `web` (Next.js 16). The behavior tree splits
+along **perspective**, not deployable-container boundary:
 
-- `web/` — UI-semantic scenarios (DOM, navigation, accessibility, locale switcher).
-- `api/` — tRPC HTTP-semantic scenarios (procedure shapes, error codes, locale-scoped
-  responses).
+- `ayokoding-web/` — UI-semantic scenarios (DOM, navigation, accessibility, locale).
+- `ayokoding-be/` — tRPC HTTP-semantic scenarios (procedure shapes, error codes, locale).
+- `ayokoding-cli/` — CLI-semantic scenarios for `ayokoding-cli`.
+- `ayokoding-build-tools/` — build-time tooling (index generation, etc.).
 
-The slug `api` is a **perspective slug**, not a container. There is no separate API
-container — tRPC procedures execute inside the same `web` container's Next.js server. The
-slug exists so specs can talk about API contract behavior without conflating it with UI
-behavior. The `organiclever` peer keeps the legacy slug `be` because `organiclever-be` is
-a real F#/Giraffe container; ayokoding does not have one.
+The `ayokoding-be` slug is a **perspective slug**, not a container. tRPC procedures run
+inside the same `web` container's Next.js server. The surface exists so specs can talk
+about API contract behavior without conflating it with UI behavior.
 
 ## Children
 
-- `web/gherkin/` — Browser UI Gherkin scenarios (UI semantic). Moved here from legacy
-  flat-root `web/gherkin/`.
-- `api/gherkin/` — tRPC API Gherkin scenarios (HTTP semantic). Moved here from legacy
-  flat-root `be/gherkin/` (slug rename `be` → `api`).
-- `cli/` — CLI-semantic scenarios for `ayokoding-cli`. Covers the `links check` command.
+- `ayokoding-web/gherkin/` — Browser UI Gherkin scenarios.
+- `ayokoding-be/gherkin/` — tRPC API Gherkin scenarios (HTTP semantic).
+- `ayokoding-cli/` — CLI-semantic scenarios for `ayokoding-cli`.
+- `ayokoding-build-tools/` — Build-time tooling scenarios.
 
-## Perspectives
+## Surfaces
 
-| Perspective | Background                          | Step style                                     | Consumed by                                            |
-| ----------- | ----------------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
-| `web`       | `Given the app is running`          | `clicks`, `types`, `sees`, `navigates`         | `apps/ayokoding-web-fe-e2e` (Playwright)               |
-| `api`       | `Given the API is running`          | `the client calls`, response shape, error code | `apps/ayokoding-web-be-e2e` (Playwright)               |
-| `cli`       | `Given the CLI binary is available` | `runs`, exit code, output assertions           | `apps/ayokoding-cli` (Go test + godog, `cli/gherkin/`) |
+| Surface                 | Background                          | Step style                                     | Consumed by                              |
+| ----------------------- | ----------------------------------- | ---------------------------------------------- | ---------------------------------------- |
+| `ayokoding-web`         | `Given the app is running`          | `clicks`, `types`, `sees`, `navigates`         | `apps/ayokoding-web-fe-e2e` (Playwright) |
+| `ayokoding-be`          | `Given the API is running`          | `the client calls`, response shape, error code | `apps/ayokoding-web-be-e2e` (Playwright) |
+| `ayokoding-cli`         | `Given the CLI binary is available` | `runs`, exit code, output assertions           | `apps/ayokoding-cli` (Go test + godog)   |
+| `ayokoding-build-tools` | build-time                          | index generation assertions                    | `apps/ayokoding-web` (unit tests)        |
 
 ## Gherkin coverage
 
-### `web/gherkin/` — UI perspective
+### `ayokoding-web/gherkin/` — UI perspective
 
-Organized by bounded context (one folder per BC, matching the
-DDD registry).
+Organized by bounded context (one folder per BC, matching the DDD registry).
 
 | Bounded Context | Features                      | Count |
 | --------------- | ----------------------------- | ----- |
@@ -54,7 +52,7 @@ DDD registry).
 | navigation      | `navigation`                  | 1     |
 | **Total**       |                               | **6** |
 
-### `api/gherkin/` — tRPC API perspective
+### `ayokoding-be/gherkin/` — tRPC API perspective
 
 | Bounded Context | Features         | Count |
 | --------------- | ---------------- | ----- |

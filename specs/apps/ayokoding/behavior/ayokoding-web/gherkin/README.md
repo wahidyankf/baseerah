@@ -7,7 +7,7 @@ bounded-context map.
 ## Structure
 
 ```
-specs/apps/ayokoding/behavior/web/gherkin/
+specs/apps/ayokoding/behavior/ayokoding-web/gherkin/
 ├── app-shell/             # Responsive layout + accessibility chrome
 │   ├── responsive.feature
 │   └── accessibility.feature
@@ -39,7 +39,7 @@ glossary terms; code identifiers match the `Code identifier(s)` column verbatim.
 ## Relationship to the API perspective
 
 These specs are the **UI counterpart** to
-[behavior/api/gherkin/](../../api/gherkin/README.md). Both perspectives execute inside the
+[behavior/ayokoding-be/gherkin/](../../api/gherkin/README.md). Both perspectives execute inside the
 same `web` Next.js container; the split is a slug, not a container boundary.
 
 - **api**: HTTP-semantic (the client calls, response shape, status codes)

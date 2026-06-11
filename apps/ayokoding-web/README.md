@@ -81,9 +81,9 @@ code import only from the `application/index.ts` barrel — never from `domain/`
 
 Gherkin acceptance specs live at `specs/apps/ayokoding/` organized by **API perspective**:
 
-- `behavior/web/gherkin/` — UI-semantic scenarios (clicks, sees, navigates), consumed by
+- `behavior/ayokoding-web/gherkin/` — UI-semantic scenarios (clicks, sees, navigates), consumed by
   `ayokoding-web-fe-e2e`.
-- `behavior/api/gherkin/` — tRPC HTTP-semantic scenarios (the client calls, response shape),
+- `behavior/ayokoding-be/gherkin/` — tRPC HTTP-semantic scenarios (the client calls, response shape),
   consumed by `ayokoding-web-be-e2e`.
 
 The slug `api` is a **perspective slug**, not a container — there is no separate API
@@ -107,6 +107,6 @@ The actual implementation (locale negotiation, `/` redirect to `/<DEFAULT_LOCALE
 
 ## Related
 
-- [ayokoding-web-be-e2e](../ayokoding-web-be-e2e/) - Backend E2E tests (consumes `behavior/api/gherkin/`)
-- [ayokoding-web-fe-e2e](../ayokoding-web-fe-e2e/) - Frontend E2E tests (consumes `behavior/web/gherkin/`)
+- [ayokoding-web-be-e2e](../ayokoding-web-be-e2e/) - Backend E2E tests (consumes `behavior/ayokoding-be/gherkin/`)
+- [ayokoding-web-fe-e2e](../ayokoding-web-fe-e2e/) - Frontend E2E tests (consumes `behavior/ayokoding-web/gherkin/`)
 - [specs/apps/ayokoding/](../../specs/apps/ayokoding/) - C4 + Gherkin specifications

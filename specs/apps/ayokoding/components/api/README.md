@@ -45,7 +45,7 @@ The `web` container's tRPC API surface is exercised at two levels:
 ## Feature File Organization
 
 ```
-specs/apps/ayokoding/behavior/api/gherkin/
+specs/apps/ayokoding/behavior/ayokoding-be/gherkin/
 ├── README.md
 ├── content/
 │   └── content-api.feature
@@ -77,13 +77,13 @@ Gherkin spec paths are explicit Nx cache inputs for `test:quick` and `spec-cover
 canonical input pattern in `project.json`:
 
 ```text
-"{workspaceRoot}/specs/apps/ayokoding/behavior/api/gherkin/**/*.feature"
+"{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-be/gherkin/**/*.feature"
 ```
 
 ## Adding a Feature File
 
 1. Identify the bounded context (e.g., `content`, `search`, `health`)
-2. Create the folder if it does not exist: `specs/apps/ayokoding/behavior/api/gherkin/[bc]/`
+2. Create the folder if it does not exist: `specs/apps/ayokoding/behavior/ayokoding-be/gherkin/[bc]/`
 3. Create the `.feature` file: `[domain-capability].feature`
 4. Open with `Feature:` then a user story block (`As a … / I want … / So that …`)
 5. Use `Given the API is running` as the first Background step

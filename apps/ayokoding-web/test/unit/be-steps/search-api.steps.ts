@@ -5,7 +5,7 @@ import { testCaller } from "./helpers/test-caller";
 import type { SearchResult } from "@/contexts/content/infrastructure/types";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/api/gherkin/search/search-api.feature"),
+  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/ayokoding-be/gherkin/search/search-api.feature"),
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {

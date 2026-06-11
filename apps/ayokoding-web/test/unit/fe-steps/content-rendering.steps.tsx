@@ -6,7 +6,10 @@ import "./helpers/test-setup";
 import { MarkdownRenderer } from "@/contexts/content/presentation/markdown-renderer";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/web/gherkin/content/content-rendering.feature"),
+  path.resolve(
+    process.cwd(),
+    "../../specs/apps/ayokoding/behavior/ayokoding-web/gherkin/content/content-rendering.feature",
+  ),
 );
 
 const sampleHtml = `<h2 id="intro">Introduction</h2><p>Body text paragraph.</p><h3 id="sub">Subsection</h3><p>More text.</p>`;

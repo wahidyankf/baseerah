@@ -6,7 +6,7 @@ import "./helpers/test-setup";
 const feature = await loadFeature(
   path.resolve(
     process.cwd(),
-    "../../specs/apps/ayokoding/behavior/web/gherkin/navigation/architecture-cases-routes.feature",
+    "../../specs/apps/ayokoding/behavior/ayokoding-web/gherkin/navigation/architecture-cases-routes.feature",
   ),
 );
 

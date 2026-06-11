@@ -5,7 +5,7 @@ import "./helpers/test-setup";
 import { t } from "@/contexts/i18n/application/translations";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/web/gherkin/i18n/i18n.feature"),
+  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/ayokoding-web/gherkin/i18n/i18n.feature"),
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {

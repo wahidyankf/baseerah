@@ -5,7 +5,10 @@ import { testCaller } from "./helpers/test-caller";
 import type { TreeNode } from "@/contexts/content/infrastructure/types";
 
 const feature = await loadFeature(
-  path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/api/gherkin/navigation/navigation-api.feature"),
+  path.resolve(
+    process.cwd(),
+    "../../specs/apps/ayokoding/behavior/ayokoding-be/gherkin/navigation/navigation-api.feature",
+  ),
 );
 
 describeFeature(feature, ({ Scenario, Background }) => {

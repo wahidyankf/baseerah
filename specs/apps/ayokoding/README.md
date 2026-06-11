@@ -51,10 +51,10 @@ AyoKoding ships **one deployable container**: `web` (Next.js 16). The Gherkin be
 splits along **API perspective** — `web` (UI-semantic) vs `api` (tRPC HTTP-semantic) — not
 along container boundaries. Both perspectives execute inside the same `web` container.
 
-| Perspective | Background                 | Scenarios                                                 | Domains covered                                                          | Consumed by                              |
-| ----------- | -------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------- |
-| `web`       | `Given the app is running` | [behavior/web/gherkin/](./behavior/web/gherkin/README.md) | app-shell (responsive, accessibility), content, search, i18n, navigation | `apps/ayokoding-web` (Playwright FE E2E) |
-| `api`       | `Given the API is running` | [behavior/api/gherkin/](./behavior/api/gherkin/README.md) | content, search, navigation, i18n, health                                | `apps/ayokoding-web` (Playwright BE E2E) |
+| Perspective | Background                 | Scenarios                                                                     | Domains covered                                                          | Consumed by                              |
+| ----------- | -------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------- |
+| `web`       | `Given the app is running` | [behavior/ayokoding-web/gherkin/](./behavior/ayokoding-web/gherkin/README.md) | app-shell (responsive, accessibility), content, search, i18n, navigation | `apps/ayokoding-web` (Playwright FE E2E) |
+| `api`       | `Given the API is running` | [behavior/ayokoding-be/gherkin/](./behavior/ayokoding-be/gherkin/README.md)   | content, search, navigation, i18n, health                                | `apps/ayokoding-web` (Playwright BE E2E) |
 
 The slug `api` is a **perspective slug**, not a container. There is no separate API
 container — tRPC procedures execute inside the same `web` container's Next.js server. The
@@ -80,9 +80,9 @@ Counts are Gherkin features per perspective. `--` means no features in that pers
 - **[system-context/](./system-context/README.md)**, **[containers/](./containers/README.md)**,
   **[components/](./components/README.md)** — C4 architecture diagrams (L1/L2/L3)
 - **[components/api/](./components/api/README.md)** — API (tRPC HTTP-semantic) component specs
-  ([Gherkin features](./behavior/api/gherkin/README.md))
+  ([Gherkin features](./behavior/ayokoding-be/gherkin/README.md))
 - **[components/web/](./components/web/README.md)** — Web (UI-semantic) component specs
-  ([Gherkin features](./behavior/web/gherkin/README.md))
+  ([Gherkin features](./behavior/ayokoding-web/gherkin/README.md))
 
 ## DDD Registry (`bounded-contexts.yaml`)
 
@@ -149,7 +149,7 @@ Reads the registry to locate every `glossary:` file, then validates each:
    `apps/ayokoding-web/src/contexts/<bc>/`.
 3. Create the glossary file at `ddd/ubiquitous-language/<bc>.md`.
 4. Create the gherkin directory and add at least one `.feature` file under
-   `behavior/web/gherkin/<bc>/` (and optionally `behavior/api/gherkin/<bc>/`).
+   `behavior/ayokoding-web/gherkin/<bc>/` (and optionally `behavior/ayokoding-be/gherkin/<bc>/`).
 5. Run `nx run ayokoding-web:test:quick` — `ddd bc` and `ddd ul` confirm
    the registry matches the filesystem before any unit tests run.
 
