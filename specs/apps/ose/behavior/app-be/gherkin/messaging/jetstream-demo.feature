@@ -1,0 +1,9 @@
+Feature: ose-app-be JetStream durable demo
+
+  @e2e
+  Scenario: ose-app-be publishes and durably consumes its demo subject with ack
+    Given ose-app-be has a JetStream durable stream and consumer for its demo subject
+    When ose-app-be publishes a demo message to that subject
+    Then the durable consumer receives the message
+    And the message is acknowledged
+    And the messaging status surface reports the demo delivered and acked

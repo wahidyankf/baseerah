@@ -40,12 +40,19 @@ dotenvy = "0.15.7"
 # functionally complete. Re-evaluate if a RustSec advisory (cf. RUSTSEC-2021-0141)
 # is ever filed against envy.
 envy = "0.4.2"
+# async-nats 0.47.0 released 2026-03-31 (72 days; cutoff 2026-04-12); CVE-clean; Path-B eligible
+async-nats = "0.47.0"
+# reqwest 0.13.3: HTTP client for crane-be HTTP fallback path
+reqwest = { version = "0.13.3", features = ["json"] }
+# futures for JetStream StreamExt
+futures = "0.3"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
 axum = { version = "0.8.9", features = ["macros"] }
 cucumber = "0.23.0"
 reqwest = { version = "0.13.3", features = ["json"] }
+tower = { version = "0.5", features = ["util"] }
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -106,3 +106,17 @@ contexts:
       - to: gap-analysis
         kind: customer-supplier
         role: supplier
+
+  - name: media
+    summary: >-
+      Converts uploaded PDF files to Markdown via crane-be (Content Retrieval And
+      Normalization Engine) using NATS request/reply. Stateless — does not persist
+      conversion results.
+    layers:
+      - api
+    code:
+      - apps/ose-app-be/src/contexts/media
+    code_lang:
+      - rs
+    glossary: specs/apps/ose/ddd/ubiquitous-language/media.md
+    gherkin: specs/apps/ose/behavior/app-be/gherkin/messaging

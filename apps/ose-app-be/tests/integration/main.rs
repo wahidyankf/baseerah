@@ -3,7 +3,8 @@
 //! Covers `specs/apps/ose/behavior/app-be/gherkin/health/health.feature`.
 
 use cucumber::{World, given, then, when};
-use ose_app_be::app;
+use ose_app_be::app::{self, AppState};
+use ose_app_be::messaging::status as messaging_status;
 
 /// World context shared across all cucumber step implementations.
 #[derive(Debug, Default, World)]
@@ -29,7 +30,11 @@ async fn send_get_health(world: &mut ApiWorld) {
 /// Spin up the Axum server on an ephemeral port and record the base URL in world.
 #[given("the ose-app-be service is running")]
 async fn the_service_is_running(world: &mut ApiWorld) {
-    let router = app::router();
+    let app_state = AppState {
+        nats: None,
+        messaging_status: messaging_status::new_shared(),
+    };
+    let router = app::router(app_state);
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
         .await
         .expect("bind ephemeral port");

@@ -7,5 +7,6 @@ pub mod gap_analysis;
 pub mod health;
 #[path = "internal-policy/mod.rs"]
 pub mod internal_policy;
+pub mod media;
 #[path = "regulatory-source/mod.rs"]
 pub mod regulatory_source;

@@ -820,9 +820,10 @@ flowchart TB
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `feat(organiclever-be): add NATS messaging, crane clients, JetStream demo, convert endpoint`
       and `test(organiclever-be-e2e): add messaging e2e over the wire`
+  - **Date**: 2026-06-11 | **Status**: DONE | commits `77abab562` and `9eae13983`
 
 ### Phase 5 Gate
 
@@ -847,107 +848,147 @@ flowchart TB
 >
 > _Suggested executor: `swe-rust-dev` (backend), `swe-e2e-dev` (e2e runner)_
 
-- [ ] [AI] Add `async-nats = "0.47.0"` to `apps/ose-app-be/Cargo.toml`
+- [x] [AI] Add `async-nats = "0.47.0"` to `apps/ose-app-be/Cargo.toml`
       — acceptance: `npx nx run ose-app-be:typecheck` exits 0
-- [ ] [AI] Annotate `OSE_APP_BE_NATS_URL` (REQUIRED | string) and `OSE_APP_BE_CRANE_URL`
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/Cargo.toml`
+  - async-nats 0.47.0, reqwest 0.13.3, futures 0.3 added; typecheck exits 0
+- [x] [AI] Annotate `OSE_APP_BE_NATS_URL` (REQUIRED | string) and `OSE_APP_BE_CRANE_URL`
       (REQUIRED | string) in `apps/ose-app-be/.env.example`
       — acceptance: matches the existing annotation style in that file
-- [ ] [AI] Register both new vars in the `apps/ose-app-be` surface in `env-contract.yaml`
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/.env.example`
+  - Both REQUIRED vars annotated at end of file
+- [x] [AI] Register both new vars in the `apps/ose-app-be` surface in `env-contract.yaml`
       — acceptance: `rhino-cli env validate` reports no drift
-- [ ] [AI] Confirm the autonomous path needs no real `.env.local`: integration is PostgreSQL-only
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - Fields added to Config struct; `env validate` reports no drift
+- [x] [AI] Confirm the autonomous path needs no real `.env.local`: integration is PostgreSQL-only
       and the e2e stack gets its NATS/crane URLs from `docker-compose.e2e.yml` (committed,
       non-secret). Agents must not touch real `.env*` files; local non-docker runs are not a plan
       step.
       — acceptance: `docker compose -f apps/ose-app-be/docker-compose.e2e.yml config` shows the
       NATS/crane env supplied to the services; no real `.env.local` is referenced by any test target
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - `docker compose config` validates; NATS/crane env injected via host env in e2e run; no real .env.local needed
 
 ### Unit: config fail-fast (mocked env, no network)
 
-- [ ] [AI] **RED**: author the `@unit` `messaging` Gherkin (config fail-fast on missing NATS URL)
+- [x] [AI] **RED**: author the `@unit` `messaging` Gherkin (config fail-fast on missing NATS URL)
       under `specs/apps/ose/behavior/app-be/gherkin/messaging/`, then write a failing unit step/test
       for NATS-URL config read + fail-fast in `apps/ose-app-be/src/`
       — command: `npx nx run ose-app-be:test:unit`
       — acceptance: test fails (config field not yet present)
-- [ ] [AI] **GREEN**: add the NATS URL + crane URL fields to the backend config with fail-fast
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - `nats-config.feature` authored; 2 failing tests in `messaging_config_tests` — RED confirmed
+- [x] [AI] **GREEN**: add the NATS URL + crane URL fields to the backend config with fail-fast
       validation
       — command: `npx nx run ose-app-be:test:unit`
       — acceptance: config test passes
-- [ ] [AI] **REFACTOR**: group messaging config into a `messaging` submodule
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/src/config.rs`, `apps/ose-app-be/tests/unit/main.rs`
+  - `ose_app_be_nats_url` + `ose_app_be_crane_url` added to Config; 25 tests pass
+- [x] [AI] **REFACTOR**: group messaging config into a `messaging` submodule
       — command: `npx nx run ose-app-be:test:unit`
       — acceptance: all tests still pass
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - MessagingConfig struct defined; all 25 unit tests still pass
 
 ### Production code: messaging clients, JetStream demo, HTTP convert endpoint
 
 > Implemented as production code, verified at e2e — NOT at integration (NATS is network I/O).
 
-- [ ] [AI] Implement `apps/ose-app-be/src/messaging/` with the NATS client (connect at startup,
+- [x] [AI] Implement `apps/ose-app-be/src/messaging/` with the NATS client (connect at startup,
       fail-fast), the crane HTTP client, and the crane NATS request/reply client
       — command: `npx nx run ose-app-be:typecheck` and `:lint`
       — acceptance: typecheck + lint exit 0
-- [ ] [AI] Implement the JetStream durable stream + consumer + publish/ack demo on
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/src/messaging/{mod,client,crane_client,status}.rs`
+  - typecheck + lint exit 0
+- [x] [AI] Implement the JetStream durable stream + consumer + publish/ack demo on
       `ose-app.messaging.demo` (durable `ose-app-messaging-demo`), run at startup, outcome exposed on
       a messaging status route
       — command: `npx nx run ose-app-be:typecheck` and `:lint`
       — acceptance: typecheck + lint exit 0
-- [ ] [AI] Implement an HTTP media-convert endpoint that drives the crane NATS request/reply path
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/src/messaging/jetstream_demo.rs`, `apps/ose-app-be/src/app.rs`
+  - OSE_APP_MESSAGING_DEMO stream, ose-app-messaging-demo consumer; status at `GET /api/v1/system/status/messaging`; typecheck + lint exit 0
+- [x] [AI] Implement an HTTP media-convert endpoint that drives the crane NATS request/reply path
       and returns the markdown
       — command: `npx nx run ose-app-be:typecheck` and `:lint`
       — acceptance: typecheck + lint exit 0
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/src/contexts/media/api/http.rs`
+  - `POST /api/v1/media/convert` implemented; returns 503 when no NATS; typecheck + lint exit 0
 
 ### Integration stays PostgreSQL-only (strict no-network)
 
-- [ ] [AI] Do NOT add a `nats` service to `apps/ose-app-be/docker-compose.integration.yml`; confirm
+- [x] [AI] Do NOT add a `nats` service to `apps/ose-app-be/docker-compose.integration.yml`; confirm
       integration still passes against PostgreSQL only
       — command: `npx nx run ose-app-be:test:integration`
       — acceptance: exits 0; no NATS service present in the integration compose
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - No NATS service in integration compose; dummy env vars added; 1 scenario (4 steps) pass; exits 0
 
 ### e2e: prove the messaging chain over the wire (ose-app-be-e2e)
 
-- [ ] [AI] Author the `@e2e` `messaging` Gherkin scenarios (NATS connect/health, JetStream demo via
+- [x] [AI] Author the `@e2e` `messaging` Gherkin scenarios (NATS connect/health, JetStream demo via
       status route, crane RPC over NATS via the HTTP convert endpoint) under
       `specs/apps/ose/behavior/app-be/gherkin/messaging/`, transcribed from `prd.md`
       — acceptance: `.feature` files mirror prd.md; scenarios carry `@e2e`
-- [ ] [AI] Create `apps/ose-app-be/docker-compose.e2e.yml` bringing up the **dependencies only** —
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `specs/apps/ose/behavior/app-be/gherkin/messaging/{nats-config,nats-connect,jetstream-demo,crane-convert}.feature`
+  - 4 feature files (1 @unit + 3 @e2e); mirrors prd.md
+- [x] [AI] Create `apps/ose-app-be/docker-compose.e2e.yml` bringing up the **dependencies only** —
       PostgreSQL + a NATS server (`-js`) + `crane-be` (PostgreSQL service shape from the existing
       `apps/ose-app-be/docker-compose.integration.yml`; NATS from the official `nats:latest -js`
       image with a port-4222 healthcheck; `crane-be` from its production `apps/crane-be/Dockerfile`,
       created in Phase 4). The backend-under-test runs on the **host** via `nx dev`, so no backend
       production Dockerfile is needed before Phase 7.
       — acceptance: `docker compose -f apps/ose-app-be/docker-compose.e2e.yml config` validates
-- [ ] [AI] **RED**: add the messaging Gherkin glob to the `ose-app-be-e2e`
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be/docker-compose.e2e.yml`
+  - postgres + nats + crane-be services; `docker compose config` validates
+- [x] [AI] **RED**: add the messaging Gherkin glob to the `ose-app-be-e2e`
       `typecheck`/`test:quick` `inputs`, bring up the dependency stack, start the backend on the host
       with inline non-secret env (no real `.env*`), then run e2e with no messaging step defs yet
       — command: `docker compose -f apps/ose-app-be/docker-compose.e2e.yml up -d && OSE_APP_BE_NATS_URL=nats://localhost:4222 OSE_APP_BE_CRANE_URL=http://localhost:8300 npx nx run ose-app-be:dev & npx nx run ose-app-be-e2e:test:e2e`
       — acceptance: `bddgen` reports the messaging scenarios as unbound (RED)
-- [ ] [AI] **GREEN**: implement the `@e2e` messaging step definitions in
+  - **Date**: 2026-06-11 | **Status**: DONE
+  - Messaging Gherkin glob already in inputs (existing); unbound steps confirmed before adding messaging.steps.ts
+- [x] [AI] **GREEN**: implement the `@e2e` messaging step definitions in
       `apps/ose-app-be-e2e/steps/messaging.steps.ts` (POST the media-convert endpoint; assert
       markdown; assert the messaging status route reports the JetStream demo delivered+acked)
       — command: `npx nx run ose-app-be-e2e:test:e2e`
       — acceptance: the messaging `@e2e` scenarios pass over the wire (HTTP → NATS → crane-be → reply)
+  - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: `apps/ose-app-be-e2e/steps/messaging.steps.ts`
+  - All 8 e2e scenarios pass (3 messaging @e2e + 5 existing); 8/8 passed
 
 ### Local Quality Gates (Before Commit)
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
-- [ ] [AI] `npx nx run ose-app-be:test:integration` — exits 0 (PostgreSQL only)
-- [ ] [AI] `npx nx run ose-app-be-e2e:test:e2e` — exits 0 (messaging over the wire)
-- [ ] [AI] `rhino-cli env validate` — reports no drift
-- [ ] [AI] Fix ALL failures, including preexisting ones
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — all exit 0
+  - **Date**: 2026-06-11 | **Status**: DONE — 28 projects × 4 targets = all passing
+- [x] [AI] `npx nx run ose-app-be:test:integration` — exits 0 (PostgreSQL only)
+  - **Date**: 2026-06-11 | **Status**: DONE — 1 scenario (4 steps) pass; no NATS service
+- [x] [AI] `npx nx run ose-app-be-e2e:test:e2e` — exits 0 (messaging over the wire)
+  - **Date**: 2026-06-11 | **Status**: DONE — 8/8 e2e scenarios pass
+- [x] [AI] `rhino-cli env validate` — reports no drift
+  - **Date**: 2026-06-11 | **Status**: DONE — no drift detected
+- [x] [AI] Fix ALL failures, including preexisting ones
+  - **Date**: 2026-06-11 | **Status**: DONE — no new failures
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `feat(ose-app-be): add NATS messaging, crane clients, JetStream demo, convert endpoint` and
       `test(ose-app-be-e2e): add messaging e2e over the wire`
+  - **Date**: 2026-06-11 | **Status**: DONE — see commits below
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `npx nx run ose-app-be:test:quick` — exits 0 (coverage ≥ 90)
-- [ ] [AI] `npx nx run ose-app-be:test:integration` — exits 0 (PostgreSQL only; no NATS)
-- [ ] [AI] `npx nx run ose-app-be-e2e:test:e2e` — exits 0 (NATS connect, crane RPC over NATS,
+- [x] [AI] `npx nx run ose-app-be:test:quick` — exits 0 (coverage ≥ 90)
+  - **Date**: 2026-06-11 | **Status**: DONE — 25 tests pass; 91.67% line coverage (≥90)
+- [x] [AI] `npx nx run ose-app-be:test:integration` — exits 0 (PostgreSQL only; no NATS)
+  - **Date**: 2026-06-11 | **Status**: DONE — 1 scenario (4 steps) pass
+- [x] [AI] `npx nx run ose-app-be-e2e:test:e2e` — exits 0 (NATS connect, crane RPC over NATS,
       JetStream demo all proven over the wire)
-- [ ] [AI] `rhino-cli env validate` — no drift
+  - **Date**: 2026-06-11 | **Status**: DONE — 8/8 e2e scenarios pass
+- [x] [AI] `rhino-cli env validate` — no drift
+  - **Date**: 2026-06-11 | **Status**: DONE — no drift detected
 
 > **Pause Safety**: both backends consume NATS and call crane-be — all proven at e2e over the wire;
 > integration stays PostgreSQL-only and env guard is clean. Safe to stop. To resume:

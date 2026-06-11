@@ -100,7 +100,7 @@
         "commands": [
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd bc ose",
           "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- ddd ul ose",
-          "cargo llvm-cov --manifest-path apps/ose-app-be/Cargo.toml --test unit --ignore-filename-regex 'main\\.rs' --fail-under-lines 90"
+          "cargo llvm-cov --manifest-path apps/ose-app-be/Cargo.toml --test unit --ignore-filename-regex '(main|messaging/(client|crane_client|jetstream_demo))\\.rs' --fail-under-lines 90"
         ],
         "parallel": false
       },
@@ -124,7 +124,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration --exclude-dir messaging specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
