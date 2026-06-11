@@ -1,6 +1,6 @@
 //! Integration tests for `organiclever-be` — cucumber-rs BDD harness.
 //!
-//! Covers `specs/apps/organiclever/behavior/be/gherkin/health/health-check.feature`.
+//! Covers `specs/apps/organiclever/behavior/organiclever-be/gherkin/health/health-check.feature`.
 
 use cucumber::{World, given, then, when};
 use organiclever_be::app;
@@ -83,6 +83,6 @@ fn no_component_health_details(world: &mut ApiWorld) {
 /// Entry point for the cucumber-rs test runner.
 #[tokio::main]
 async fn main() {
-    ApiWorld::run("../../specs/apps/organiclever/behavior/be/gherkin/health/health-check.feature")
+    ApiWorld::run("../../specs/apps/organiclever/behavior/organiclever-be/gherkin/health/health-check.feature")
         .await;
 }

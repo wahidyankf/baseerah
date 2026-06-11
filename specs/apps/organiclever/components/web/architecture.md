@@ -93,5 +93,5 @@ they are not dead code, just dormant:
 - [Bounded-context map](../../ddd/bounded-context-map.md) — strategic patterns between
   contexts, ADR, ESLint config
 - [Ubiquitous language](../../ddd/ubiquitous-language/README.md) — per-context glossaries
-- [Behavior specs](../../behavior/web/gherkin/README.md) — Gherkin acceptance criteria
+- [Behavior specs](../../behavior/organiclever-web/gherkin/README.md) — Gherkin acceptance criteria
 - [Routes and screens](./routes-and-screens.md) — URL routing and screen inventory

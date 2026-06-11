@@ -7,7 +7,7 @@ import RootPage from "@/app/page";
 const feature = await loadFeature(
   path.resolve(
     __dirname,
-    "../../../../../../specs/apps/organiclever/behavior/web/gherkin/app-shell/accessibility.feature",
+    "../../../../../../specs/apps/organiclever/behavior/organiclever-web/gherkin/app-shell/accessibility.feature",
   ),
 );
 

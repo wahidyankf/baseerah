@@ -53,11 +53,11 @@ See `.env.example` for a local template.
 
 ## Behavior & Architecture
 
-| Artifact      | Location                                                                                    |
-| ------------- | ------------------------------------------------------------------------------------------- |
-| API reference | [specs/…/components/be/api.md](../../specs/apps/organiclever/components/be/api.md)          |
-| Gherkin specs | [specs/…/behavior/be/gherkin/](../../specs/apps/organiclever/behavior/be/gherkin/README.md) |
-| Deployment    | [specs/…/containers/deployment.md](../../specs/apps/organiclever/containers/deployment.md)  |
+| Artifact      | Location                                                                                                              |
+| ------------- | --------------------------------------------------------------------------------------------------------------------- |
+| API reference | [specs/…/components/be/api.md](../../specs/apps/organiclever/components/be/api.md)                                    |
+| Gherkin specs | [specs/…/behavior/organiclever-be/gherkin/](../../specs/apps/organiclever/behavior/organiclever-be/gherkin/README.md) |
+| Deployment    | [specs/…/containers/deployment.md](../../specs/apps/organiclever/containers/deployment.md)                            |
 
 ## Related
 

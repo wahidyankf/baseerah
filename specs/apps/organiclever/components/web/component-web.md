@@ -113,7 +113,7 @@ graph TD
 ## Gherkin Coverage by Bounded Context
 
 Each bounded context owns its Gherkin features under
-[`specs/apps/organiclever/behavior/web/gherkin/<bc>/`](../../behavior/web/gherkin/README.md):
+[`specs/apps/organiclever/behavior/organiclever-web/gherkin/<bc>/`](../../behavior/organiclever-web/gherkin/README.md):
 
 | Bounded Context | Features                                       | Count  |
 | --------------- | ---------------------------------------------- | ------ |
@@ -155,5 +155,5 @@ Source of truth: [`specs/apps/organiclever/ddd/bounded-contexts.yaml`](../../ddd
 - **Backend component diagram**: [component-be.md](../be/component-be.md)
 - **Frontend bounded-context map**: [`ddd/bounded-context-map.md`](../../ddd/bounded-context-map.md)
 - **DDD registry**: [`ddd/`](../../ddd/README.md)
-- **Frontend gherkin specs**: [`behavior/web/gherkin/`](../../behavior/web/gherkin/README.md)
+- **Frontend gherkin specs**: [`behavior/organiclever-web/gherkin/`](../../behavior/organiclever-web/gherkin/README.md)
 - **Parent**: [organiclever specs](../../README.md)

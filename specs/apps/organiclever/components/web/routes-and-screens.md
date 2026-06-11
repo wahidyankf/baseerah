@@ -66,5 +66,5 @@ All failure paths return HTTP 200; the error state is shown inside the page body
 
 - [Architecture](./architecture.md) — bounded-context layout and layer rules
 - [Design system](./design-system.md) — palette, typography, dark mode, components
-- [Behavior specs](../../behavior/web/gherkin/README.md) — Gherkin acceptance criteria
+- [Behavior specs](../../behavior/organiclever-web/gherkin/README.md) — Gherkin acceptance criteria
   per bounded context

@@ -31,7 +31,7 @@ The bounded-context map and the strategic-pattern relationships between these co
 
 ## How this folder is consumed
 
-- **`organiclever-web` Gherkin features** under [`behavior/web/gherkin/`](../../behavior/web/gherkin/README.md) — every term in scenario titles and step text comes from here.
+- **`organiclever-web` Gherkin features** under [`behavior/organiclever-web/gherkin/`](../../behavior/organiclever-web/gherkin/README.md) — every term in scenario titles and step text comes from here.
 - **`organiclever-web` source** under [`apps/organiclever-web/src/`](../../../../../apps/organiclever-web/src/) — type names, function names, and event names match the `Code identifier(s)` column.
 - **C4 component diagrams** under `components/` — labels match owned-term names.
 - **Future `organiclever-be` source** under [`apps/organiclever-be/`](../../../../../apps/organiclever-be/) — when DDD adoption reaches the backend, the same glossary governs F# record names and route handlers.

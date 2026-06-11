@@ -57,13 +57,13 @@ apps/organiclever-be/
 ## BDD test coverage
 
 All tests consume Gherkin specs from
-`specs/apps/organiclever/behavior/be/gherkin/`. The same `.feature` files drive:
+`specs/apps/organiclever/behavior/organiclever-be/gherkin/`. The same `.feature` files drive:
 
 - **Unit tests** (`test:unit`) — in-process via `WebApplicationFactory`
 - **Coverage gate** (`test:quick`) — unit tests + AltCover 90% threshold
 
 ## Related
 
-- [Behavior specs](../../behavior/be/gherkin/README.md) — Gherkin acceptance criteria
+- [Behavior specs](../../behavior/organiclever-be/gherkin/README.md) — Gherkin acceptance criteria
 - [Container diagram](../../containers/container.md) — where this service fits
 - [Deployment](../../containers/deployment.md) — environments and Docker images

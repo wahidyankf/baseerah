@@ -17,10 +17,7 @@
         "command": "tsc --noEmit",
         "cwd": "{projectRoot}"
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/specs/apps/organiclever/behavior/web/gherkin/**/*.feature"
-      ]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-web/gherkin/**/*.feature"]
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -32,17 +29,11 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "tsc --noEmit",
-          "npx oxlint@latest ."
-        ],
+        "commands": ["tsc --noEmit", "npx oxlint@latest ."],
         "parallel": true,
         "cwd": "{projectRoot}"
       },
-      "inputs": [
-        "default",
-        "{workspaceRoot}/specs/apps/organiclever/behavior/web/gherkin/**/*.feature"
-      ]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-web/gherkin/**/*.feature"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",
@@ -66,14 +57,6 @@
       }
     }
   },
-  "tags": [
-    "type:e2e",
-    "platform:playwright",
-    "lang:ts",
-    "domain:organiclever"
-  ],
-  "implicitDependencies": [
-    "organiclever-web",
-    "organiclever-be"
-  ]
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"],
+  "implicitDependencies": ["organiclever-web", "organiclever-be"]
 }

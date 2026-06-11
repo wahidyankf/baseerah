@@ -171,7 +171,7 @@ Every file currently under `src/lib/`, `src/services/`, `src/layers/`, `src/comp
 
 ## Spec reorganization decisions
 
-The Gherkin folder layout under `specs/apps/organiclever/behavior/web/gherkin/` is reorganized from per-route to per-bounded-context. The mapping below is the authority that Phase 9 executes mechanically.
+The Gherkin folder layout under `specs/apps/organiclever/behavior/organiclever-web/gherkin/` is reorganized from per-route to per-bounded-context. The mapping below is the authority that Phase 9 executes mechanically.
 
 | Current folder | Target folder                                          | Rationale                                                                                                 |
 | -------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
@@ -194,7 +194,7 @@ The Gherkin folder layout under `specs/apps/organiclever/behavior/web/gherkin/` 
 After Phase 9 the target tree is:
 
 ```text
-specs/apps/organiclever/behavior/web/gherkin/
+specs/apps/organiclever/behavior/organiclever-web/gherkin/
 ├── README.md
 ├── app-shell/         # accessibility, i18n, layout, loggers
 ├── health/            # backend-health diagnostic page (absorbs old system/)

@@ -1,7 +1,7 @@
 /**
  * Step definitions for the BE Status Page feature.
  *
- * Covers: specs/apps/organiclever/behavior/web/gherkin/health/system-status-be.feature
+ * Covers: specs/apps/organiclever/behavior/organiclever-web/gherkin/health/system-status-be.feature
  *
  * Tests BeStatusPage directly as an async server component rendered in jsdom.
  * Mocks fetch via vi.stubGlobal and env vars via vi.stubEnv.
@@ -24,7 +24,7 @@ import BeStatusPage from "@/app/system/status/be/page";
 const feature = await loadFeature(
   path.resolve(
     __dirname,
-    "../../../../../../specs/apps/organiclever/behavior/web/gherkin/health/system-status-be.feature",
+    "../../../../../../specs/apps/organiclever/behavior/organiclever-web/gherkin/health/system-status-be.feature",
   ),
 );
 

@@ -4,7 +4,7 @@ End-to-end tests for the [OrganicLever frontend](../organiclever-web/README.md),
 using playwright-bdd to drive a real browser from Gherkin feature files.
 
 **Behavior specs** (source of truth):
-[`specs/apps/organiclever/behavior/web/gherkin/`](../../specs/apps/organiclever/behavior/web/gherkin/)
+[`specs/apps/organiclever/behavior/organiclever-web/gherkin/`](../../specs/apps/organiclever/behavior/organiclever-web/gherkin/)
 
 ## Prerequisites
 
@@ -56,5 +56,5 @@ apps/organiclever-web-e2e/
 
 ## Related
 
-- [Gherkin specs](../../specs/apps/organiclever/behavior/web/gherkin/) — feature files (source of truth)
+- [Gherkin specs](../../specs/apps/organiclever/behavior/organiclever-web/gherkin/) — feature files (source of truth)
 - [organiclever-web](../organiclever-web/README.md) — frontend under test

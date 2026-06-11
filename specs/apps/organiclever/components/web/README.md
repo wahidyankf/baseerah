@@ -17,13 +17,13 @@ the backend health endpoint), accessibility compliance, and 404 guards on `/logi
 
 ## Relationship to organiclever-be
 
-| Aspect      | organiclever-be                                        | organiclever-web                                         |
-| ----------- | ------------------------------------------------------ | -------------------------------------------------------- |
-| Perspective | Backend API — HTTP-semantic                            | Frontend UI — user interaction-semantic                  |
-| Steps       | `sends GET/POST`, `status code`, `response body`       | `clicks`, `types`, `sees`, `navigates`                   |
-| Background  | `Given the API is running`                             | `Given the app is running`                               |
-| Scenarios   | See [be/gherkin/](../../behavior/be/gherkin/README.md) | See [web/gherkin/](../../behavior/web/gherkin/README.md) |
-| Domains     | health                                                 | landing, system, layout, routing, events                 |
+| Aspect      | organiclever-be                                                     | organiclever-web                                                      |
+| ----------- | ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Perspective | Backend API — HTTP-semantic                                         | Frontend UI — user interaction-semantic                               |
+| Steps       | `sends GET/POST`, `status code`, `response body`                    | `clicks`, `types`, `sees`, `navigates`                                |
+| Background  | `Given the API is running`                                          | `Given the app is running`                                            |
+| Scenarios   | See [be/gherkin/](../../behavior/organiclever-be/gherkin/README.md) | See [web/gherkin/](../../behavior/organiclever-web/gherkin/README.md) |
+| Domains     | health                                                              | landing, system, layout, routing, events                              |
 
 The frontend's system-status page consumes the backend's health endpoint. Otherwise the
 frontend is local-first today — productivity-tracking features live in the user's browser. The
@@ -62,7 +62,7 @@ feature files are the shared contract — only the step implementations differ p
 ## Feature File Organization
 
 ```
-specs/apps/organiclever/behavior/web/gherkin/
+specs/apps/organiclever/behavior/organiclever-web/gherkin/
 ├── README.md
 ├── landing/
 │   └── landing.feature
@@ -81,7 +81,7 @@ specs/apps/organiclever/behavior/web/gherkin/
 ## Adding a Feature File
 
 1. Identify the domain (e.g., `landing`, `layout`, `routing`)
-2. Create the folder if it does not exist: `specs/apps/organiclever/behavior/web/gherkin/[domain]/`
+2. Create the folder if it does not exist: `specs/apps/organiclever/behavior/organiclever-web/gherkin/[domain]/`
 3. Create the `.feature` file: `[domain-capability].feature`
 4. Open with `Feature:` then a user story block (`As a … / I want … / So that …`)
 5. Use `Given the app is running` as the first Background step

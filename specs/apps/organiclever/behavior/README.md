@@ -8,31 +8,28 @@ each project can wire its step implementations against the right glob.
 
 ## Children
 
-- `be/` — Backend Gherkin scenarios (HTTP semantic). Moved here from legacy
-  flat-root `be/gherkin/` in Phase 2A.
-- `web/` — Frontend Gherkin scenarios (UI semantic). Moved here from legacy
-  flat-root `web/gherkin/` in Phase 2A.
+- `organiclever-be/` — Backend Gherkin scenarios (HTTP semantic).
+- `organiclever-web/` — Frontend Gherkin scenarios (UI semantic).
 
-## Containers
+## Surfaces
 
-One row per deployable container (C4 L2). Container slug indexes
-`components/<slug>/` and `behavior/<slug>/gherkin/`. Adding a future container
-(`mobile`, `desktop`, a second backend) means adding a row, not changing the schema.
+One row per product-surface. Each surface dir named `<product>-<perspective>` per the
+flat product-surface convention.
 
-| Container | Perspective                             | Background                 | Consumed by                          |
-| --------- | --------------------------------------- | -------------------------- | ------------------------------------ |
-| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/organiclever-be` (F#/Giraffe)  |
-| `web`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/organiclever-web` (Next.js 16) |
+| Surface            | Perspective                             | Background                 | Consumed by                          |
+| ------------------ | --------------------------------------- | -------------------------- | ------------------------------------ |
+| `organiclever-be`  | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/organiclever-be` (Rust/Axum)   |
+| `organiclever-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/organiclever-web` (Next.js 16) |
 
 ## Gherkin coverage
 
-### `be/gherkin/`
+### `organiclever-be/gherkin/`
 
 | Domain | Feature                       | Scenarios |
 | ------ | ----------------------------- | --------- |
 | health | `health/health-check.feature` | 2         |
 
-### `web/gherkin/`
+### `organiclever-web/gherkin/`
 
 Organized by bounded context (one folder per context, matching the
 [DDD registry](../ddd/bounded-contexts.yaml)).

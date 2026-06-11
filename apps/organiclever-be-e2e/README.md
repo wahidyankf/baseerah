@@ -4,7 +4,7 @@ End-to-end tests for the OrganicLever backend API using playwright-bdd
 and Playwright's `APIRequestContext` (no browser required).
 
 **Behavior specs** (source of truth):
-[`specs/apps/organiclever/behavior/be/gherkin/`](../../specs/apps/organiclever/behavior/be/gherkin/)
+[`specs/apps/organiclever/behavior/organiclever-be/gherkin/`](../../specs/apps/organiclever/behavior/organiclever-be/gherkin/)
 
 ## Prerequisites
 
@@ -58,5 +58,5 @@ apps/organiclever-be-e2e/
 
 ## Related
 
-- [Gherkin specs](../../specs/apps/organiclever/behavior/be/gherkin/) — feature files (source of truth)
+- [Gherkin specs](../../specs/apps/organiclever/behavior/organiclever-be/gherkin/) — feature files (source of truth)
 - [organiclever-be](../organiclever-be/README.md) — backend under test

@@ -44,9 +44,9 @@ graph TD
 The Gherkin specs and CI pipelines are not rendered in this diagram (each container is exercised
 by both, so adding them would clutter the rank without adding signal). Their wiring:
 
-- **Backend Gherkin** (`specs/apps/organiclever/behavior/be/gherkin/`) feeds `organiclever-be`
+- **Backend Gherkin** (`specs/apps/organiclever/behavior/organiclever-be/gherkin/`) feeds `organiclever-be`
   BDD scenarios at the `test:unit` and `test:integration` levels.
-- **Frontend Gherkin** (`specs/apps/organiclever/behavior/web/gherkin/`) feeds `organiclever-web`
+- **Frontend Gherkin** (`specs/apps/organiclever/behavior/organiclever-web/gherkin/`) feeds `organiclever-web`
   BDD scenarios at the `test:unit` level (organized by bounded context, with `vitest-cucumber`)
   and `organiclever-web-e2e` Playwright scenarios at the `test:e2e` level.
 - **DDD enforcement** (`specs/apps/organiclever/ddd/`) is validated by

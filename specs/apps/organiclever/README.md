@@ -49,10 +49,10 @@ One row per deployable container (C4 L2). Container slug is canonical: it indexe
 glob. Adding a future container (e.g. `mobile`, `desktop`, a second backend) means adding
 a row here, not changing the schema.
 
-| Container | Perspective                             | Background                 | Scenarios                                                 | Domains                          | Consumed by                                   |
-| --------- | --------------------------------------- | -------------------------- | --------------------------------------------------------- | -------------------------------- | --------------------------------------------- |
-| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | [behavior/be/gherkin/](./behavior/be/gherkin/README.md)   | health                           | `apps/organiclever-be` (F#/Giraffe, TickSpec) |
-| `web`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/web/gherkin/](./behavior/web/gherkin/README.md) | landing, system, layout, routing | `apps/organiclever-web` (Next.js 16)          |
+| Container | Perspective                             | Background                 | Scenarios                                                                           | Domains                          | Consumed by                                   |
+| --------- | --------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------- |
+| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | [behavior/organiclever-be/gherkin/](./behavior/organiclever-be/gherkin/README.md)   | health                           | `apps/organiclever-be` (F#/Giraffe, TickSpec) |
+| `web`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/organiclever-web/gherkin/](./behavior/organiclever-web/gherkin/README.md) | landing, system, layout, routing | `apps/organiclever-web` (Next.js 16)          |
 
 The `web` container's system-status page consumes the `be` container's health endpoint.
 Otherwise `web` is local-first today.
@@ -82,9 +82,9 @@ Counts are Gherkin features per container. `--` means no features in that contai
 - **[system-context/](./system-context/README.md)**, **[containers/](./containers/README.md)**,
   **[components/](./components/README.md)** — C4 architecture diagrams (L1/L2/L3)
 - **[components/be/](./components/be/README.md)** — Backend API component specs
-  ([Gherkin features](./behavior/be/gherkin/README.md))
+  ([Gherkin features](./behavior/organiclever-be/gherkin/README.md))
 - **[components/web/](./components/web/README.md)** — Frontend component specs
-  ([Gherkin features](./behavior/web/gherkin/README.md))
+  ([Gherkin features](./behavior/organiclever-web/gherkin/README.md))
 
 ## DDD Registry (`bounded-contexts.yaml`)
 
