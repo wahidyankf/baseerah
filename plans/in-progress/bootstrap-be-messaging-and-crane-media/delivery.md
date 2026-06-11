@@ -1046,9 +1046,10 @@ flowchart TB
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically, e.g.
+- [x] [AI] Commit thematically, e.g.
       `feat(organiclever-be): run sqlx migrations on boot` and
       `build(ose-app-be): add production Dockerfile`
+  - **Date**: 2026-06-12 | **Status**: DONE | commits `09e116f4b` and `13e948a8c`
 
 ### Phase 7 Gate
 
@@ -1068,13 +1069,17 @@ flowchart TB
 
 > Add a GitHub Actions workflow that builds and publishes only changed images to public GHCR.
 
-- [ ] [AI] Create `.github/workflows/publish-images.yml` (sibling reference: existing workflows in
+- [x] [AI] Create `.github/workflows/publish-images.yml` (sibling reference: existing workflows in
       `.github/workflows/`) that detects affected projects and builds/pushes only changed images
       to `ghcr.io/wahidyankf/{organiclever-be,ose-app-be,crane-be}:latest`
       — acceptance: `npx nx run rhino-cli:validate:mermaid` is unaffected; workflow YAML is valid
       (`actionlint` or equivalent if available)
-- [ ] [AI] Add a workflow job condition so unchanged images are not republished
+  - **Date**: 2026-06-12 | **Status**: DONE | **Files Changed**: `.github/workflows/publish-images.yml`
+  - 4-job workflow: detect (Nx affected) + 3 image publish jobs with GHCR docker/login-action@v3
+- [x] [AI] Add a workflow job condition so unchanged images are not republished
       — acceptance: workflow logic gates each image build on its project being affected
+  - **Date**: 2026-06-12 | **Status**: DONE
+  - Each publish job gated on `needs.detect.outputs.build-{project} == 'true'`
 - [ ] [HUMAN] **The single unavoidable human action of this plan** (see Human Touchpoints at top):
       after the first publish creates the three packages, set each GHCR package's visibility to
       **public** in GitHub package settings → Danger Zone. There is **no `gh`/REST API** for this

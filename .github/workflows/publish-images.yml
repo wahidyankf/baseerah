@@ -1,0 +1,108 @@
+name: Publish Container Images
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  detect:
+    name: Detect affected images
+    runs-on: ubuntu-latest
+    outputs:
+      build-organiclever-be: ${{ steps.detect.outputs.build-organiclever-be }}
+      build-ose-app-be: ${{ steps.detect.outputs.build-ose-app-be }}
+      build-crane-be: ${{ steps.detect.outputs.build-crane-be }}
+    env:
+      NX_BASE: ${{ github.event.before }}
+      NX_HEAD: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - id: detect
+        run: |
+          # Fall back to HEAD~1 when before is the null SHA (first push / force-push)
+          BASE="${{ github.event.before }}"
+          if [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE=$(git rev-parse HEAD~1 2>/dev/null || git rev-parse HEAD)
+          fi
+          export NX_BASE="$BASE"
+          AFFECTED=$(npx nx show projects --affected 2>/dev/null || echo "")
+          echo "build-organiclever-be=false" >> "$GITHUB_OUTPUT"
+          echo "build-ose-app-be=false" >> "$GITHUB_OUTPUT"
+          echo "build-crane-be=false" >> "$GITHUB_OUTPUT"
+          for project in $AFFECTED; do
+            case "$project" in
+              organiclever-be) echo "build-organiclever-be=true" >> "$GITHUB_OUTPUT" ;;
+              ose-app-be) echo "build-ose-app-be=true" >> "$GITHUB_OUTPUT" ;;
+              crane-be) echo "build-crane-be=true" >> "$GITHUB_OUTPUT" ;;
+            esac
+          done
+
+  publish-organiclever-be:
+    name: Publish organiclever-be
+    needs: detect
+    if: needs.detect.outputs.build-organiclever-be == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push organiclever-be
+        run: |
+          docker build -f apps/organiclever-be/Dockerfile \
+            -t ghcr.io/wahidyankf/organiclever-be:latest \
+            -t ghcr.io/wahidyankf/organiclever-be:${{ github.sha }} \
+            .
+          docker push ghcr.io/wahidyankf/organiclever-be:latest
+          docker push ghcr.io/wahidyankf/organiclever-be:${{ github.sha }}
+
+  publish-ose-app-be:
+    name: Publish ose-app-be
+    needs: detect
+    if: needs.detect.outputs.build-ose-app-be == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push ose-app-be
+        run: |
+          docker build -f apps/ose-app-be/Dockerfile \
+            -t ghcr.io/wahidyankf/ose-app-be:latest \
+            -t ghcr.io/wahidyankf/ose-app-be:${{ github.sha }} \
+            .
+          docker push ghcr.io/wahidyankf/ose-app-be:latest
+          docker push ghcr.io/wahidyankf/ose-app-be:${{ github.sha }}
+
+  publish-crane-be:
+    name: Publish crane-be
+    needs: detect
+    if: needs.detect.outputs.build-crane-be == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push crane-be
+        run: |
+          docker build -f apps/crane-be/Dockerfile \
+            -t ghcr.io/wahidyankf/crane-be:latest \
+            -t ghcr.io/wahidyankf/crane-be:${{ github.sha }} \
+            .
+          docker push ghcr.io/wahidyankf/crane-be:latest
+          docker push ghcr.io/wahidyankf/crane-be:${{ github.sha }}
