@@ -3,6 +3,9 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>CraneCli.Tests.Integration</RootNamespace>
     <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- 3261/3264: F# nullness interop noise in test data. -->
+    <OtherFlags>--nowarn:3261 --nowarn:3264</OtherFlags>
   </PropertyGroup>
 
   <ItemGroup>
