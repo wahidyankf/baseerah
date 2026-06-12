@@ -89,12 +89,21 @@ behavior-freezes the rhino-cli migration (Phases 7–8).
 > indefinitely. To resume: re-run the baseline command, the three prerequisite greps, and the
 > golden-master replay harness; confirm all still clean.
 
-## Phase 1: CI — PR-gate test semantics `nx run-many` → `nx affected`
+## Phase 1: CI — PR-gate `nx affected` Convergence + Go-Strip + Workflow Naming
 
-Replace `nx run-many` with `nx affected` for the Go, .NET, and Rust per-language jobs in
+Three concerns land in this phase: (1) replace `nx run-many` with `nx affected` for the per-language
+jobs; (2) **strip Go from ose-public** (it has no Go code — see
+[tech-docs.md Go-removal note](./tech-docs.md#ose-public-specific-reading-of-the-convergence-table)); and
+(3) bring workflow **file names**, `name:` fields, and **job ids** onto the canonical
+[BLOCK 1-A naming scheme](./tech-docs.md#a--ci-workflows) (see also
+[§ D14](./tech-docs.md#d14--canonical-workflow--actions-name-scheme)).
+
+Replace `nx run-many` with `nx affected` for the **.NET and Rust** per-language jobs in
 `pr-quality-gate.yml`, keeping the identical target list and project-tag scoping. The TypeScript job
 (already `nx affected`) and the single-project `specs-gate` `run-many` are left intact (see
 [tech-docs.md § D1](./tech-docs.md#d1--converge-to-nx-affected-for-all-per-language-pr-gate-jobs)).
+The **Go job is removed, not converted** — ose-public has no Go
+([Repo-grounded: `git ls-files '*.go' ':!:archived/**'` → 0; `ayokoding-cli`/`ose-cli` are Rust]).
 
 This phase applies the **affected-first PR-gate principle**: the PR gate runs `nx affected` for
 **everything that is affected-computable** (per-language typecheck/lint/test/coverage and project-scoped
@@ -109,8 +118,23 @@ _Suggested executor: `ci-fixer`_
       `grep -n "nx run-many -t typecheck lint test:quick spec-coverage" .github/workflows/pr-quality-gate.yml`
       — acceptance: matches the Go, .NET, and Rust job lines (3 hits ~133/149/165). The
       single-project `specs-gate` `run-many` (~197) is separate and intentionally kept.
-- [ ] [AI] **GREEN**: change the Go job command from `nx run-many` to `nx affected`
-      (`--projects='tag:lang:golang'`, target list unchanged) — acceptance: the Go job uses `affected`.
+- [ ] [AI] **GREEN — strip the Go job entirely**: remove the `golang:` job, its
+      `if: needs.detect.outputs.has-golang == 'true'` guard, the `./.github/actions/setup-golang` step,
+      the `has-golang` output + the `lang:golang) ... has-golang=true` detection arm in the `detect`
+      job, and the `golang` entry from `quality-gate.needs` in
+      `.github/workflows/pr-quality-gate.yml`
+      — acceptance: `grep -nE 'golang|has-golang|setup-golang|lang:golang' .github/workflows/pr-quality-gate.yml`
+      returns nothing.
+  - _Suggested executor: `ci-fixer`_
+- [ ] [AI] **GREEN — drop Go from `rhino-cli doctor` (ose-public scope)**: remove Go from ose-public's
+      required-tool scope in the doctor toolchain manifest / env-contract (the file the doctor reads for
+      this repo's required tools — confirm exact path via
+      `rtk grep -rln 'golang\|go.*toolchain\|"go"' apps/rhino-cli/ .tool-versions`), leaving Go in the
+      shared doctor **binary** for infra/primer. Do NOT remove the Go capability from the doctor code
+      itself — only ose-public's required-tool list
+      — acceptance: `npm run doctor` no longer reports Go as required/missing for ose-public; infra/primer
+      doctor scope is untouched.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **GREEN**: change the .NET job (`--projects='tag:lang:fsharp,tag:lang:csharp'`) to
       `nx affected` — acceptance: the .NET job uses `affected`.
 - [ ] [AI] **GREEN**: change the Rust job (`--projects='tag:lang:rust'`) to `nx affected`; leave the
@@ -131,6 +155,36 @@ _Suggested executor: `ci-fixer`_
       [tech-docs.md § D13](./tech-docs.md#d13--affected-first-pr-gate-whole-repo-only-by-exception)
       — acceptance: each remaining whole-repo check matches a justified row in the D13 scope table; no
       safely-affected check is left running whole-repo.
+- [ ] [AI] **GREEN — workflow file / `name:` / job-id naming (BLOCK 1-A scheme)**: audit every
+      `.github/workflows/*.yml` against the canonical scheme — **file** = kebab-case
+      `<verb>-<noun>[-<qualifier>].yml`, **`name:`** = Title Case matching the file, **job ids** =
+      kebab-case (`rtk grep -nE '^name:|^  [a-zA-Z0-9_-]+:' .github/workflows/*.yml`); `git mv` any
+      non-conforming file name and update its `name:` field + any kebab-case-violating job id. The
+      PR-gate aggregate job **keeps the branch-protection-required name `Quality gate`** (do NOT rename
+      it — see the `[HUMAN]` step below)
+      — acceptance: every workflow file is kebab-case `<verb>-<noun>`, every `name:` is Title Case
+      matching the file, every job id is kebab-case, and `Quality gate` is unchanged.
+  - _Suggested executor: `ci-fixer`_
+- [ ] [AI] **GREEN — update workflow cross-references after any `git mv`**: if a workflow file was
+      renamed, update every reference to its old filename (reusable-workflow `uses:` paths, badge URLs
+      in READMEs, branch-protection notes in docs) —
+      `rtk grep -rn '<old-workflow-filename>' .github docs repo-governance AGENTS.md`
+      — acceptance: no reference to a renamed workflow's old filename remains.
+- [ ] [HUMAN] **Branch-protection sync (only if a required-check job was renamed)**: if — and only if
+      — any branch-protection **required-check** job (e.g. the `Quality gate` aggregate) was renamed in
+      the step above, a human MUST update the required-check list in GitHub repo settings (Settings →
+      Branches → `main` → required status checks) to the new job name; GitHub keys required checks by
+      job name, so a renamed-but-green job silently stops satisfying the gate. The standing decision is
+      to **keep `Quality gate` unchanged**, so this step is normally a no-op
+      — handoff: the agent reports whether any required-check job name changed; the human confirms
+      "branch-protection required checks updated to <new name>" (or "no required-check rename — no
+      action") — observable resume signal: the human's confirmation message; the agent then re-checks
+      that a test PR's `Quality gate` check still reports.
+
+> **Note**: `[HUMAN]` because editing GitHub branch-protection settings is an out-of-band,
+> privileged-authority action an agent cannot perform. It is normally a no-op (the required-check job
+> is intentionally not renamed).
+
 - [ ] [AI] Lint: `actionlint .github/workflows/pr-quality-gate.yml` if available, else
       `npx prettier --check .github/workflows/pr-quality-gate.yml` — acceptance: exits 0.
 
@@ -139,14 +193,24 @@ _Suggested executor: `ci-fixer`_
 > All checks below must pass before starting Phase 2.
 
 - [ ] [AI] `grep -c "nx affected -t typecheck lint test:quick spec-coverage" .github/workflows/pr-quality-gate.yml`
-      — expected: at least 4 (TypeScript + Go + .NET + Rust).
+      — expected: at least 3 (TypeScript + .NET + Rust; **no Go job**).
+- [ ] [AI] `grep -nE 'golang|has-golang|setup-golang|lang:golang' .github/workflows/pr-quality-gate.yml`
+      — expected: empty (Go fully stripped).
 - [ ] [AI] `grep "nx run-many" .github/workflows/pr-quality-gate.yml` — expected: only the
       `specs-gate` `--projects=rhino-cli` line remains.
+- [ ] [AI] Every workflow file name is kebab-case `<verb>-<noun>`, every `name:` Title Case, every job
+      id kebab-case; `Quality gate` aggregate name unchanged — expected: BLOCK 1-A scheme satisfied.
+- [ ] [AI] `npm run doctor` no longer flags Go as required/missing for ose-public — expected: Go absent
+      from ose-public's required-tool scope.
 - [ ] [AI] Workflow lints clean — expected: exits 0.
-- [ ] [AI] Commit thematically: `rtk git commit -m "ci(pr-gate): converge non-TS jobs to nx affected"`.
+- [ ] [AI] Commit thematically (split the affected convergence, the Go-strip, and the workflow rename
+      into separate commits): e.g. `rtk git commit -m "ci(pr-gate): converge non-TS jobs to nx affected"`,
+      `rtk git commit -m "ci(pr-gate): strip Go from ose-public (no Go code)"`,
+      `rtk git commit -m "ci(workflows): normalize workflow file/name/job-id naming"`.
 
-> **Pause Safety**: `pr-quality-gate.yml` is self-consistent, lints clean, and the change is
-> committed. Safe to stop. To resume: re-run the two grep checks and confirm the commit is present.
+> **Pause Safety**: `pr-quality-gate.yml` is self-consistent (non-TS jobs on `nx affected`, Go fully
+> stripped, workflow names canonical), all workflows lint clean, and the changes are committed. Safe to
+> stop. To resume: re-run the affected-count, Go-strip, and naming grep checks and confirm the commits.
 
 ## Phase 2: CI — Canonical Concurrency Across All Workflows
 
@@ -294,6 +358,13 @@ The push-to-main gate carries the **same affected-first discipline** as the PR g
 ([tech-docs.md § D13](./tech-docs.md#d13--affected-first-pr-gate-whole-repo-only-by-exception)):
 affected-computable checks run via `nx affected` (base resolved from the prior successful `main` SHA per
 D2), and only the justified repo-wide checks run whole-repo.
+
+> **Image-publishing (recorded deviation, not a convergence gap).** ose-public **keeps** its
+> `publish-images.yml` → GHCR workflow — confirm it carries the canonical concurrency block (Phase 2)
+> and the BLOCK 1-A naming (Phase 1). **ose-primer carries NO image-publishing workflow** — it is a
+> demo/showcase template that ships no deployable images, so the absence is a recorded
+> [Deviation Matrix](./tech-docs.md#deviation-matrix) entry, not a gap this plan or the primer sibling
+> plan must close. Do not add an image-publishing workflow to ose-primer.
 
 _Suggested executor: `ci-fixer`_
 
@@ -663,13 +734,15 @@ _Suggested executor: `swe-rust-dev`_
 > (still `validate:mermaid` until Phase 10). Safe to stop. To resume: `npx nx run rhino-cli:test:unit`
 > and `npx nx run rhino-cli:validate:mermaid`, confirm the Phase 8 commits.
 
-## Phase 9: rhino-cli Union Commands — Rationalize Surface, then Add `Java` + `Contracts`
+## Phase 9: rhino-cli Union Commands — Rationalize Surface, Verb-First Rename, then Add `Java` + `Contracts`
 
-> **REFERENCE WORKSTREAM D.** Two parts: **9a** rationalizes the existing surface (merge overlaps,
-> delete unused subcommands per the catalogued dispositions), then **9b** ports the `Java` and
-> `Contracts` subcommands from the infra/primer reference implementations **into the hexagonal
-> layout** (after Phase 7), so the CLI surface is the **rationalized** union superset
-> (see [tech-docs.md § D8](./tech-docs.md#d8--union-command-surface-add-java--contracts)).
+> **REFERENCE WORKSTREAM D.** Three parts: **9a** rationalizes the existing surface (merge overlaps,
+> delete unused subcommands per the catalogued dispositions); **9b** renames every subcommand to the
+> **verb-first git-style** scheme (BLOCK 11) and updates all callers + the golden-master corpus; then
+> **9c** ports the `Java` and `Contracts` subcommands from the infra/primer reference implementations
+> **into the hexagonal layout** (after Phase 7), so the CLI surface is the **rationalized + verb-first**
+> union superset (see [tech-docs.md § D8](./tech-docs.md#d8--union-command-surface-add-java--contracts)
+> and [§ (a-ter) verb-first rename](./tech-docs.md#a-ter-rhino-cli-verb-first-subcommand-rename-beforeafter)).
 
 _Suggested executor: `swe-rust-dev`_
 
@@ -682,17 +755,19 @@ _Suggested executor: `swe-rust-dev`_
 > mirror. Any surface change (merge that renames a subcommand, or a deletion) is a **deliberate
 > golden-master update** — update the frozen corpus entry in the same step and note it in the commit.
 
-- [ ] [AI] **Usage check (delete-candidates)**: confirm no hook, CI workflow, Nx target,
-      `package.json` script, or doc invokes `env init` / `env backup` / `env restore`, and whether
-      `test-coverage diff` / `test-coverage merge` have a live caller —
-      `rtk grep -rn 'env (init|backup|restore)|test-coverage (diff|merge)' .github .husky package.json apps/*/project.json repo-governance docs`
-      — acceptance: a written keep/delete verdict per candidate, with the grep evidence.
-- [ ] [AI] **Delete** the confirmed-unused subcommands (e.g. `env init`/`backup`/`restore` if the
-      usage check found no caller): remove the CLI variants + dispatch arms + their command modules +
-      tests, and **drop their golden-master entries** (deliberate surface reduction)
-      — acceptance: `rhino-cli env --help` lists only the kept subcommands; `:test:unit`/`:lint` GREEN;
-      golden-master replay clean against the reduced surface. (If the check found a caller, record
-      "kept — caller at <path>" and skip.)
+- [ ] [AI] **`env init`/`backup`/`restore` — KEEP verdict (no longer delete-candidates)**: these
+      manage `.env` secret files (create from `.env.example`, back up, restore) and are **KEPT** per
+      [tech-docs.md § (a-bis)](./tech-docs.md#a-bis-command-surface-rationalization--overlap--deletion-candidates)
+      and [§ D8](./tech-docs.md#d8--union-command-surface-add-java--contracts). Do **not** remove them
+      — record the KEEP rationale ("manage `.env` secret files") in the rationalization notes
+      — acceptance: `rhino-cli env --help` still lists `init`/`backup`/`restore`/`validate`; no env
+      subcommand removed; golden-master `env` entries unchanged.
+- [ ] [AI] **Usage check (residual delete-candidate)**: confirm whether `test-coverage diff` /
+      `test-coverage merge` have a live caller (Nx may handle coverage merge natively) —
+      `rtk grep -rn 'test-coverage (diff|merge)' .github .husky package.json apps/*/project.json repo-governance docs`
+      — acceptance: a written keep/delete verdict for `diff`/`merge` with the grep evidence (this is
+      the only remaining evaluate; if no caller, delete the CLI variants + dispatch arms + modules +
+      tests and drop their golden-master entries; if a caller exists, record "kept — caller at <path>").
 - [ ] [AI] **Merge — link engine**: make `specs validate-links` and the `links:validation` target
       reuse the `docs validate-links` resolver (one link-resolution core; no duplicated logic)
       — acceptance: behavior unchanged (golden-master + corpus identical); the duplicate logic is gone.
@@ -718,7 +793,57 @@ _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Commit the rationalization separately:
       `rtk git commit -m "refactor(rhino-cli): rationalize command surface (merge overlaps, drop unused env utils)"`.
 
-### Phase 9b — Port the union additions (`Java` + `Contracts`)
+### Phase 9b — Verb-first git-style subcommand rename (BLOCK 11)
+
+> Rename every subcommand to the **verb-first git-style** `<group> <verb> [<object>]` scheme per
+> [tech-docs.md § (a-ter) BLOCK 11](./tech-docs.md#a-ter-rhino-cli-verb-first-subcommand-rename-beforeafter)
+> (e.g. `docs validate-mermaid` → `docs validate mermaid`, `repo-governance vendor-audit` →
+> `repo-governance audit vendor`, `agents sync` → `agents sync opencode`, `agents emit-bindings` →
+> `agents emit amazonq`, `specs validate-tree` → `specs validate tree`). Top-level groups are
+> **unchanged**. `env init`/`backup`/`restore`/`validate` and `git pre-commit` are already verb-first
+> (unchanged). This is a **deliberate divergence** from the object-verb `{domain}:{work}` Nx target
+> scheme — the CLI optimizes for natural typing, the targets for namespaced grouping. The subcommand
+> surface change is a **deliberate golden-master corpus update** (re-capture the renamed invocations).
+> Reference-first: ose-public renames; infra/primer mirror the identical surface.
+
+- [ ] [AI] **RED**: add/extend a CLI-surface test asserting the **new** verb-first invocations resolve
+      (e.g. parse `docs validate mermaid`, `repo-governance audit vendor`, `agents sync opencode`) and
+      the old hyphenated forms (`docs validate-mermaid`, `repo-governance vendor-audit`, `agents sync`)
+      no longer parse. Run `npx nx run rhino-cli:test:unit`
+      — acceptance: test FAILS (the clap command tree still uses the old hyphenated subcommands).
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN — rename the clap command tree**: in `apps/rhino-cli/src/commands/` (post-Phase-7
+      hexagonal layout) rename every `*Commands` enum variant + its clap attributes to the verb-first
+      scheme per the BLOCK 11 table — `docs`, `agents`, `workflows`, `specs`, `ddd`, `repo-governance`,
+      `java`, `contracts` groups; `git`/`env`/`doctor` unchanged. Run `npx nx run rhino-cli:test:unit`
+      — acceptance: the new-invocation parse test passes; old forms rejected.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN — update ALL callers**: re-point every invocation of a renamed subcommand in Nx
+      `project.json` target `options.command` strings (`apps/*/project.json`, `libs/*/project.json`),
+      `.husky/*` hooks (note: `rhino-cli git pre-commit` is unchanged, but any renamed invocation in a
+      hook changes), `package.json` scripts, and docs that show the old command form —
+      `rtk grep -rn 'docs validate-|agents sync|agents emit-bindings|vendor-audit|validate-tree|validate-naming|validate-counts|validate-adoption|validate-annotations|java-clean-imports|dart-scaffold' .husky .github package.json apps/*/project.json libs/*/project.json repo-governance docs AGENTS.md`
+      then rewrite each hit to the verb-first form
+      — acceptance: the grep returns no old-form invocation in any caller (docs prose examples updated too).
+- [ ] [AI] **GREEN — update the golden-master corpus**: re-capture the renamed subcommand invocations
+      into the golden-master corpus (the surface change is a **deliberate** corpus update, not drift) —
+      record the old→new mapping in the commit body
+      — acceptance: the corpus replay is GREEN against the renamed surface; every renamed invocation has
+      a corpus entry; no **unrenamed** entry silently changed.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: confirm the controlled verb vocabulary (`validate`, `audit`, `detect`, `sync`,
+      `emit`, `clean`, `scaffold`, `diff`, `merge`, `init`, `backup`, `restore`, `pre-commit`, `doctor`)
+      is the complete set after rename; `cargo fmt`; run `npx nx run rhino-cli:lint && npx nx run rhino-cli:test:unit`
+      — acceptance: lint exits 0 (clippy `-D warnings`); all tests pass; no stray verb outside the vocabulary.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] Commit the rename separately:
+      `rtk git commit -m "refactor(rhino-cli)!: rename subcommands to verb-first git-style surface"`.
+
+### Phase 9c — Port the union additions (`Java` + `Contracts`)
+
+> The two new groups land in the **already-renamed verb-first surface** (Phase 9b ran first), so
+> `Java` is added as `java validate annotations` and `Contracts` as `contracts clean java-imports`
+> and `contracts scaffold dart` (per the BLOCK 11 after-column), not the old hyphenated forms.
 
 - [ ] [AI] **RED**: assert the subcommands are absent:
       `cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- --help | grep -Ei 'java|contracts'`
@@ -728,10 +853,12 @@ _Suggested executor: `swe-rust-dev`_
       BLOCK 1-D — acceptance: the expected subcommand surface (args, output) is recorded.
 - [ ] [AI] **GREEN — `Java`**: add the `Java` subcommand in the hexagonal layout
       (`domain/java/` + `application/java/` ports + `infrastructure/java/` adapters +
-      `commands/java_*`), behavior matching the reference — acceptance: `rhino-cli java --help` works;
-      on ose-public (no JVM project) detection is a documented no-op.
-- [ ] [AI] **GREEN — `Contracts`**: add the `Contracts` subcommand similarly
-      — acceptance: `rhino-cli contracts --help` works.
+      `commands/java_*`) with the verb-first surface `java validate annotations`, behavior matching the
+      reference — acceptance: `rhino-cli java validate annotations --help` works; on ose-public (no JVM
+      project) detection is a documented no-op.
+- [ ] [AI] **GREEN — `Contracts`**: add the `Contracts` subcommand similarly with the verb-first
+      surface `contracts clean java-imports` + `contracts scaffold dart`
+      — acceptance: `rhino-cli contracts --help` lists `clean` and `scaffold`.
 - [ ] [AI] **GREEN — extend golden-master**: capture the new subcommands into the golden-master corpus
       (this is an additive corpus extension, not a change to existing entries)
       — acceptance: existing corpus entries unchanged; new `java`/`contracts` entries recorded.
@@ -744,20 +871,27 @@ _Suggested executor: `swe-rust-dev`_
 > All checks below must pass before starting Phase 10.
 
 - [ ] [AI] **Rationalization (9a) resolved**: a written keep/merge/delete verdict exists for every
-      shortlist item; each delete-candidate has a usage-check verdict; merges leave one shared engine
-      with unchanged outputs — expected: the rationalization commit is present.
-- [ ] [AI] `rhino-cli --help` lists `java` and `contracts` and the kept (rationalized) subcommand set
-      — expected: union groups present (TestCoverage, SpecCoverage, RepoGovernance, Docs, Agents,
-      Workflows, Specs, Ddd, Git, Env, Java, Contracts); any deleted subcommands (e.g. unused `env`
-      utilities) absent in all three repos.
-- [ ] [AI] Golden-master replay — expected: kept entries byte-identical; deliberately
-      merged/deleted/added entries match the updated corpus (no accidental drift).
+      shortlist item; `env init`/`backup`/`restore` recorded **KEPT** (`.env` secret management);
+      `test-coverage diff`/`merge` carry a usage-check verdict; merges leave one shared engine with
+      unchanged outputs — expected: the rationalization commit is present.
+- [ ] [AI] **Verb-first rename (9b) applied**: every subcommand uses the verb-first git-style scheme
+      (BLOCK 11); no old hyphenated invocation remains in any caller —
+      `rtk grep -rn 'docs validate-|agents sync$|agents emit-bindings|vendor-audit|validate-tree|validate-naming|validate-annotations|java-clean-imports|dart-scaffold' .husky .github package.json apps/*/project.json libs/*/project.json repo-governance docs AGENTS.md`
+      returns nothing — expected: the verb-first rename commit is present and the golden-master corpus
+      was deliberately re-captured for the renamed surface.
+- [ ] [AI] `rhino-cli --help` lists `java` and `contracts` (verb-first surface) and the kept
+      (rationalized) subcommand set — expected: union groups present (TestCoverage, SpecCoverage,
+      RepoGovernance, Docs, Agents, Workflows, Specs, Ddd, Git, Env, Java, Contracts); `env`
+      init/backup/restore/validate all present; any deleted subcommand absent in all three repos.
+- [ ] [AI] Golden-master replay — expected: **unrenamed** entries byte-identical; deliberately
+      renamed/merged/deleted/added entries match the updated corpus (no accidental drift).
 - [ ] [AI] `:test:unit` and `:lint` GREEN; coverage met.
-- [ ] [AI] Commit present.
+- [ ] [AI] All three sub-phase commits (9a rationalization, 9b verb-first rename, 9c union port) present.
 
-> **Pause Safety**: the union command surface is complete in the hexagonal layout, golden-master
-> covers it, tests/coverage GREEN, and the change is committed. Safe to stop. To resume: re-run
-> `--help`, the golden-master replay, and `:test:unit`; confirm the commit.
+> **Pause Safety**: the command surface is rationalized, renamed verb-first, and the union additions
+> are complete in the hexagonal layout; the golden-master corpus matches the deliberately changed
+> surface and tests/coverage are GREEN. Safe to stop. To resume: re-run `--help`, the golden-master
+> replay, and `:test:unit`; confirm the three sub-phase commits.
 
 ## Phase 10: Target Rename `{domain}:{work}` + `spec-coverage`→`spec:coverage` + Callers
 

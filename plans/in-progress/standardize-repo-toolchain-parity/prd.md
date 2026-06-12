@@ -44,6 +44,12 @@ Solo-maintainer repo — hats the maintainer wears plus consuming agents:
   runs and CI minutes are not wasted.
 - **US-3 (A)** — As a CI maintainer, I want the lint-gate jobs renamed to the tool-named scheme so
   that the lint job graph reads identically to the siblings'.
+- **US-3b (A)** — As a CI maintainer, I want Go stripped from ose-public's CI matrix, doctor scope, and
+  AGENTS.md so that the toolchain matches the repo's real (Go-free) portfolio.
+- **US-3c (A)** — As a CI maintainer, I want every workflow file name, `name:` field, and job id on the
+  canonical BLOCK 1-A scheme so that the workflow graph reads identically across repos — with the
+  `Quality gate` required-check name kept (any required-check rename paired with a branch-protection
+  update).
 - **US-4 (A)** — As a CI maintainer, I want the Gherkin keyword-cardinality validator running in CI
   so that the rule is enforced evenly across the family.
 - **US-5 (A)** — As a CI maintainer, I want the full quality gate to also run on `push` to `main` so
@@ -110,6 +116,16 @@ Scenario: Lint-gate jobs renamed to the tool-named scheme
 ```
 
 ```gherkin
+Scenario: Go is stripped from ose-public CI and the workflow naming is canonical
+  Given pr-quality-gate.yml carries a golang job and ad-hoc workflow file or job names
+  When the Go-strip and BLOCK 1-A naming convergence is applied
+  Then pr-quality-gate.yml contains no golang job, setup-golang step, or has-golang detection
+  And every workflow file is kebab-case with a Title-Case name and kebab-case job ids
+  And the Quality gate required-check job name is unchanged
+  But infra and primer keep their Go language rows untouched
+```
+
+```gherkin
 Scenario: Gherkin keyword-cardinality validator runs in CI under the canonical name
   Given the rhino-cli repo-governance gherkin-keyword-cardinality command already exists
   When a gherkin:keyword-cardinality-validation Nx target is created and wired into validate-markdown.yml
@@ -141,6 +157,16 @@ Scenario: rhino-cli migrates to hexagonal architecture with behavior frozen
   Then rhino-cli has src/domain, src/application, src/infrastructure, and src/commands layers
   And the golden-master CLI corpus is byte-identical to the Phase 0 baseline
   And ose-public stands as the reference layout the siblings port from
+```
+
+```gherkin
+Scenario: rhino-cli subcommands are renamed to the verb-first git-style scheme
+  Given rhino-cli subcommands use hyphenated forms like docs validate-mermaid and agents emit-bindings
+  When the Phase 9b verb-first rename is applied
+  Then every subcommand reads verb-first like docs validate mermaid and agents emit amazonq
+  And no caller (project.json, hooks, package.json, docs) invokes an old hyphenated subcommand
+  And the golden-master corpus is re-captured for the renamed surface
+  But env init/backup/restore/validate and git pre-commit stay unchanged
 ```
 
 ```gherkin
@@ -276,9 +302,12 @@ Feature: Legacy v1 state diagram header is recognized
 
 ### In Scope
 
-- **A** — `pr-quality-gate.yml` (run-many→affected; concurrency; lint-job rename + `needs`;
-  push-to-main full gate); `validate-markdown.yml` (gherkin target step; concurrency);
-  `validate-env.yml` + `test-and-deploy-*.yml` (concurrency; scheduler cadence).
+- **A** — `pr-quality-gate.yml` (run-many→affected; **strip Go** — `golang` job + `setup-golang` +
+  `has-golang` detection removed; concurrency; lint-job rename + `needs`; push-to-main full gate);
+  workflow file/`name:`/job-id naming onto the BLOCK 1-A scheme across all workflows (`Quality gate`
+  kept); `rhino-cli doctor` Go-scope drop (ose-public); `validate-markdown.yml` (gherkin target step;
+  concurrency); `validate-env.yml` + `test-and-deploy-*.yml` (concurrency; scheduler cadence).
+  ose-public **keeps** `publish-images.yml` → GHCR (recorded deviation; ose-primer carries none).
 - **B** — `.husky/commit-msg`, `.husky/pre-commit`, `.husky/pre-push` converge to BLOCK 1-B.
 - **C** — migrate `apps/rhino-cli/src/` to the hexagonal layout, golden-master-frozen.
 - **D** — add `Java` + `Contracts` subcommands to rhino-cli.
@@ -316,3 +345,7 @@ Feature: Legacy v1 state diagram header is recognized
 - **State note free-text misparse (G)** — a note's free text could be parsed as a state, producing a
   false `label_too_long`; mitigated by a fixture with a long multiline note that must produce zero
   violations.
+- **Branch-protection required-check rename (A)** — renaming a required-check job (e.g. `Quality gate`)
+  silently breaks the merge gate because GitHub keys required checks by job name; mitigated by keeping
+  `Quality gate` unchanged and pairing any required-check rename with a `[HUMAN]` branch-protection
+  settings update (Phase 1) before the gate is relied upon.

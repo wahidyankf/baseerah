@@ -24,9 +24,15 @@ reference that authors first, and the siblings port from it.
 Toolchain drift between sibling repos is a slow, compounding tax across six surfaces:
 
 - **CI cognitive load (A)** — every divergence (`run-many` here, `affected` there; `@v6` here,
-  `@v4` there; `shell`/`dockerfile`/`actions` here, `shellcheck`/`hadolint`/`actionlint` there; a
-  gate that runs on PR here but also on push-to-main there) is a thing a maintainer must hold in
-  their head per repo. This repo is solo-maintained, so the load lands on one person. [Judgment call]
+  `@v4` there; `shell`/`dockerfile`/`actions` here, `shellcheck`/`hadolint`/`actionlint` there; ad-hoc
+  workflow file names + `name:` fields + job ids; a gate that runs on PR here but also on push-to-main
+  there) is a thing a maintainer must hold in their head per repo. This repo is solo-maintained, so the
+  load lands on one person. [Judgment call]
+- **Stale Go surface (A/F)** — ose-public carries a `golang` CI job, `setup-golang` composite, and an
+  `AGENTS.md` Tech Stack that calls `ayokoding-cli`/`ose-cli` "Go CLI" tools, yet the repo has **no Go
+  code** — both CLIs are Rust. The dormant Go scaffolding and the wrong docs mislead any reader about
+  the real portfolio. [Repo-grounded: `git ls-files '*.go' ':!:archived/**'` → 0;
+  `apps/ayokoding-cli/Cargo.toml` + `apps/ose-cli/Cargo.toml` present, no `go.mod`]
 - **Inconsistent gate strength (A)** — ose-public's PR gate runs `nx run-many` for non-TS languages
   (whole tagged set regardless of change) while siblings run `nx affected`; ose-public gates only on
   `pull_request` while the converged target also gates `push` to `main`. Direct worktree-to-main
@@ -102,10 +108,13 @@ consume the outputs**:
 
 ## Business-Level Success Metrics (per workstream)
 
-- **A — CI parity met**: every per-language PR-gate job uses `nx affected`; every workflow declares a
-  concurrency block; lint jobs are tool-named; the `gherkin:keyword-cardinality-validation` target
-  runs in CI; the **full quality gate runs on `push` to `main`**; scheduler cadence is 2× WIB.
-  [Observable — grep/diff the workflows against the CI/toolchain Parity Checklist]
+- **A — CI parity met**: every per-language PR-gate job uses `nx affected`; **Go is fully stripped**
+  from ose-public (no `golang` job, `setup-golang`, or `has-golang` detection); every workflow file is
+  kebab-case `<verb>-<noun>` with a Title-Case `name:` and kebab-case job ids (`Quality gate` kept);
+  every workflow declares a concurrency block; lint jobs are tool-named; the
+  `gherkin:keyword-cardinality-validation` target runs in CI; the **full quality gate runs on `push`
+  to `main`**; scheduler cadence is 2× WIB. [Observable — grep/diff the workflows against the
+  CI/toolchain Parity Checklist]
 - **B — Hook parity met**: `commit-msg`/`pre-commit`/`pre-push` match the BLOCK 1-B canonical
   lifecycle and reference the renamed targets. [Observable — diff the `.husky/*` hooks against
   BLOCK 1-B]
@@ -139,14 +148,16 @@ consume the outputs**:
 
 ## Business Risks and Mitigations
 
-| Risk                                                                | Likelihood | Impact | Mitigation                                                                                                                                             |
-| ------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Prerequisite (bootstrap-be) not done, .NET surface missing          | Medium     | High   | Phase 0 gate hard-verifies `crane-be`, GHCR workflow, and `.NET` detection before any work begins                                                      |
-| Hexagonal migration silently changes rhino-cli output               | Medium     | High   | Golden-master CLI suite captured in Phase 0 byte-verifies the output surface at every feature group and phase gate                                     |
-| `nx affected` misses a project the old `run-many` would have caught | Low        | Medium | PR-only gate has `github.base_ref` defined; full gate on push-to-main covers the merge-time picture                                                    |
-| Target rename leaves a caller pointing at a non-existent target     | Medium     | High   | Phase 10 caller-sweep checklist + Phase 6/10 sequencing so hooks never reference an unrenamed target between phases                                    |
-| New gherkin validator surfaces preexisting cardinality violations   | Medium     | Low    | Root-cause orientation — fix flagged violations in-plan rather than disabling the validator                                                            |
-| Sibling C/D port diverges from public's reference                   | Low        | Medium | ose-public is the single reference crate structure; siblings copy it; the deviation matrix records only true diffs                                     |
-| Governance docs drift from the toolchain after edits                | Low        | Medium | Phase 11 runs `repo-rules-maker` + the `repo-rules-quality-gate` workflow as a hard gate before the plan can finish                                    |
-| State front-end (G) silently changes flowchart behavior             | Low        | Medium | State support is a second front-end on the already-migrated, golden-frozen Mermaid slice; every flowchart test stays green before any state code lands |
-| Aggressive D-CLEAN touches `plans/done/` history                    | Low        | Low    | Explicit recorded D-CLEAN choice for maximum hygiene; edits are diagram-only and reviewed in the cleanup phase                                         |
+| Risk                                                                           | Likelihood | Impact | Mitigation                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------------------ | ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prerequisite (bootstrap-be) not done, .NET surface missing                     | Medium     | High   | Phase 0 gate hard-verifies `crane-be`, GHCR workflow, and `.NET` detection before any work begins                                                                                                                                  |
+| Hexagonal migration silently changes rhino-cli output                          | Medium     | High   | Golden-master CLI suite captured in Phase 0 byte-verifies the output surface at every feature group and phase gate                                                                                                                 |
+| `nx affected` misses a project the old `run-many` would have caught            | Low        | Medium | PR-only gate has `github.base_ref` defined; full gate on push-to-main covers the merge-time picture                                                                                                                                |
+| Target rename leaves a caller pointing at a non-existent target                | Medium     | High   | Phase 10 caller-sweep checklist + Phase 6/10 sequencing so hooks never reference an unrenamed target between phases                                                                                                                |
+| New gherkin validator surfaces preexisting cardinality violations              | Medium     | Low    | Root-cause orientation — fix flagged violations in-plan rather than disabling the validator                                                                                                                                        |
+| Sibling C/D port diverges from public's reference                              | Low        | Medium | ose-public is the single reference crate structure; siblings copy it; the deviation matrix records only true diffs                                                                                                                 |
+| Governance docs drift from the toolchain after edits                           | Low        | Medium | Phase 11 runs `repo-rules-maker` + the `repo-rules-quality-gate` workflow as a hard gate before the plan can finish                                                                                                                |
+| State front-end (G) silently changes flowchart behavior                        | Low        | Medium | State support is a second front-end on the already-migrated, golden-frozen Mermaid slice; every flowchart test stays green before any state code lands                                                                             |
+| Aggressive D-CLEAN touches `plans/done/` history                               | Low        | Low    | Explicit recorded D-CLEAN choice for maximum hygiene; edits are diagram-only and reviewed in the cleanup phase                                                                                                                     |
+| Renaming a branch-protection required-check job silently breaks the merge gate | Low        | High   | GitHub keys required checks by job name; the standing decision **keeps `Quality gate` unchanged**, and any required-check rename is paired with a `[HUMAN]` branch-protection settings update (Phase 1) before relying on the gate |
+| Go-strip removes a job ose-public still needs                                  | Low        | Low    | ose-public has **no Go code** (`git ls-files '*.go' ':!:archived/**'` → 0; `ayokoding-cli`/`ose-cli` are Rust); the `golang` job already never fires (`has-golang=false`); infra/primer keep Go untouched                          |

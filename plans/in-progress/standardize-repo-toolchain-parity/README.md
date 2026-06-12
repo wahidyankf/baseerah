@@ -24,15 +24,15 @@ part of the fold.
 
 The work is organized into **seven workstreams (A–G)**:
 
-| Workstream                           | Scope                                                                                                                         | Anchor model                                        |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| A — CI workflows                     | action majors, `nx affected`, concurrency, tool-named lint jobs, gherkin target, full gate on push-to-main, scheduler cadence | No single anchor (parallel-safe)                    |
-| B — Git hooks                        | canonical commit-msg / pre-commit / pre-push lifecycle                                                                        | No single anchor (parallel-safe)                    |
-| C — rhino-cli architecture           | flat layout → hexagonal (domain/application/infrastructure/commands)                                                          | **`ose-public` is the reference** (authors first)   |
-| D — rhino-cli command surface        | union superset (public adds `Java` + `Contracts`)                                                                             | **`ose-public` is the reference** for its additions |
-| E — Nx target naming                 | `{domain}:{work}` rename + `spec-coverage`→`spec:coverage`                                                                    | No single anchor (parallel-safe)                    |
-| F — Governance docs                  | converged conventions + repo-rules quality gate                                                                               | No single anchor (parallel-safe)                    |
-| G — Mermaid state-diagram validation | `state.rs` front-end + width/label rules + shared golden corpus + repo-wide cleanup                                           | **`ose-public` is the reference** (depends on C)    |
+| Workstream                           | Scope                                                                                                                                                                                     | Anchor model                                        |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| A — CI workflows                     | action majors, `nx affected`, Go-strip (ose-public), workflow file/`name:`/job-id naming, concurrency, tool-named lint jobs, gherkin target, full gate on push-to-main, scheduler cadence | No single anchor (parallel-safe)                    |
+| B — Git hooks                        | canonical commit-msg / pre-commit / pre-push lifecycle                                                                                                                                    | No single anchor (parallel-safe)                    |
+| C — rhino-cli architecture           | flat layout → hexagonal (domain/application/infrastructure/commands)                                                                                                                      | **`ose-public` is the reference** (authors first)   |
+| D — rhino-cli command surface        | union superset (public adds `Java` + `Contracts`)                                                                                                                                         | **`ose-public` is the reference** for its additions |
+| E — Nx target naming                 | `{domain}:{work}` rename + `spec-coverage`→`spec:coverage`                                                                                                                                | No single anchor (parallel-safe)                    |
+| F — Governance docs                  | converged conventions + repo-rules quality gate                                                                                                                                           | No single anchor (parallel-safe)                    |
+| G — Mermaid state-diagram validation | `state.rs` front-end + width/label rules + shared golden corpus + repo-wide cleanup                                                                                                       | **`ose-public` is the reference** (depends on C)    |
 
 There is **no single anchor repo** for A/B/E/F — each repo leads on some dimensions and trails on
 others, and the genuine per-repo deviations (runner choice, language matrix, self-hosted Docker, the
@@ -117,10 +117,15 @@ ordering:
 
 ### What this plan changes in ose-public
 
-1. **CI (A)** — `run-many`→`nx affected` (Go/.NET/Rust jobs); canonical concurrency on every
-   workflow; lint jobs `shell`/`dockerfile`/`actions`→`shellcheck`/`hadolint`/`actionlint`; new
-   `gherkin:keyword-cardinality-validation` target wired into `validate-markdown.yml`; the **full
-   quality gate also running on `push` to `main`**; scheduler cadence confirm/align 2× WIB.
+1. **CI (A)** — `run-many`→`nx affected` (.NET/Rust jobs); **strip Go** (ose-public has no Go code —
+   the `golang` job, `setup-golang`, and `has-golang` detection are removed); workflow file/`name:`/
+   job-id naming brought onto the canonical BLOCK 1-A scheme (the `Quality gate` required-check name is
+   kept; any required-check rename is paired with a `[HUMAN]` branch-protection update); canonical
+   concurrency on every workflow; lint jobs `shell`/`dockerfile`/`actions`→`shellcheck`/`hadolint`/
+   `actionlint`; new `gherkin:keyword-cardinality-validation` target wired into `validate-markdown.yml`;
+   the **full quality gate also running on `push` to `main`**; scheduler cadence confirm/align 2× WIB.
+   ose-public **keeps** its `publish-images.yml` → GHCR workflow (a recorded deviation — ose-primer
+   carries none).
 2. **Hooks (B)** — converge `commit-msg`/`pre-commit`/`pre-push` to the canonical BLOCK 1-B lifecycle
    and the renamed targets.
 3. **rhino-cli architecture (C — REFERENCE)** — migrate the flat `src/commands/` + `src/internal/`
@@ -249,7 +254,7 @@ C/D/G are **reference-first** (ose-public leads). Per-repo deviations are record
 
 | Repo                | Plan path                                                       | Role in this set                                                                                    |
 | ------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `ose-public` (this) | `plans/in-progress/standardize-repo-toolchain-parity/README.md` | A/B/E/F sibling + **C/D/G reference** (TS + Rust + Go + F#/.NET; `ubuntu-latest`)                   |
+| `ose-public` (this) | `plans/in-progress/standardize-repo-toolchain-parity/README.md` | A/B/E/F sibling + **C/D/G reference** (TS + Rust + F#/.NET, **no Go**; `ubuntu-latest`)             |
 | `ose-infra`         | `plans/in-progress/standardize-repo-toolchain-parity/README.md` | Sibling; **ports C/D/G from public** (TS + Go + Rust; self-hosted `ose-infra-runner`; IaC)          |
 | `ose-primer`        | `plans/in-progress/standardize-repo-toolchain-parity/README.md` | Sibling; **ports C/D/G from public** (full polyglot template; `ubuntu-latest`; reference lint jobs) |
 
@@ -273,21 +278,27 @@ Both standalone plans are deleted as part of the fold.
 
 ## Delivery Phases at a Glance
 
-| Phase | Title                                                                                                  | Workstream    | Mode |
-| ----- | ------------------------------------------------------------------------------------------------------ | ------------- | ---- |
-| 0     | Setup + baseline + prerequisite verify + **golden-master CLI capture**                                 | —             | AI   |
-| 1     | CI — `nx run-many` → `nx affected` (Go/.NET/Rust)                                                      | A             | AI   |
-| 2     | CI — canonical concurrency on all workflows                                                            | A             | AI   |
-| 3     | CI — lint jobs → tool-named `shellcheck`/`hadolint`/`actionlint`                                       | A             | AI   |
-| 4     | CI — `gherkin:keyword-cardinality-validation` target + wiring                                          | A             | AI   |
-| 5     | CI — full quality gate on push-to-main + scheduler cadence                                             | A             | AI   |
-| 6     | Git hooks — converge to BLOCK 1-B canonical                                                            | B             | AI   |
-| 7     | **rhino-cli hexagonal migration (REFERENCE)** — sub-phased, golden-frozen; Mermaid slice migrated here | C (+ G slice) | AI   |
-| 8     | **Mermaid state-diagram validation (REFERENCE)** — `state.rs` + corpus + D-CLEAN cleanup               | G             | AI   |
-| 9     | **rhino-cli union commands** — add `Java` + `Contracts`                                                | D             | AI   |
-| 10    | Target rename `{domain}:{work}` + `spec-coverage`→`spec:coverage` + callers                            | E             | AI   |
-| 11    | Governance docs → `repo-rules-maker` → repo-rules quality gate (hard gate)                             | F             | AI   |
-| 12    | Final quality gate + push + CI verify + archival                                                       | —             | AI   |
+| Phase | Title                                                                                                        | Workstream    | Mode |
+| ----- | ------------------------------------------------------------------------------------------------------------ | ------------- | ---- |
+| 0     | Setup + baseline + prerequisite verify + **golden-master CLI capture** (_repo-setup-manager_)                | —             | AI   |
+| 1     | CI — `nx affected` (.NET/Rust) + **strip Go** + workflow file/`name:`/job-id naming                          | A             | AI   |
+| 2     | CI — canonical concurrency on all workflows                                                                  | A             | AI   |
+| 3     | CI — lint jobs → tool-named `shellcheck`/`hadolint`/`actionlint`                                             | A             | AI   |
+| 4     | CI — `gherkin:keyword-cardinality-validation` target + wiring                                                | A             | AI   |
+| 5     | CI — full quality gate on push-to-main + scheduler cadence                                                   | A             | AI   |
+| 6     | Git hooks — converge to BLOCK 1-B canonical                                                                  | B             | AI   |
+| 7     | **rhino-cli hexagonal migration (REFERENCE)** — sub-phased, golden-frozen; Mermaid slice migrated here       | C (+ G slice) | AI   |
+| 8     | **Mermaid state-diagram validation (REFERENCE)** — `state.rs` + corpus + D-CLEAN cleanup                     | G             | AI   |
+| 9     | **rhino-cli command surface** — 9a rationalize · 9b verb-first rename (BLOCK 11) · 9c add `Java`+`Contracts` | D             | AI   |
+| 10    | Target rename `{domain}:{work}` + `spec-coverage`→`spec:coverage` + callers                                  | E             | AI   |
+| 11    | Governance docs → `repo-rules-maker` → repo-rules quality gate (hard gate)                                   | F             | AI   |
+| 12    | Final quality gate + push + CI verify + archival                                                             | —             | AI   |
+
+**Phase 0 ownership.** Across **all three sibling plans** (`ose-public`, `ose-infra`, `ose-primer`),
+Phase 0 (Environment Setup, Baseline, Prerequisite Verify, and Golden-Master Capture) is owned by the
+**`repo-setup-manager`** agent — it installs dependencies, runs `npm run doctor -- --fix`, records the
+baseline, resolves preexisting failures, and captures the golden-master CLI corpus before any plan work
+begins.
 
 Each phase ends with a `### Phase N Gate` (must-pass checks before the next phase) and a **Pause
 Safety** note describing the stable resumable state. The diagram below shows the Phase 0–12 flow with
@@ -308,21 +319,6 @@ flowchart LR
   style G1 fill:#DE8F05,stroke:#000000,color:#000000
   style G2 fill:#CC78BC,stroke:#000000,color:#000000
   style G3 fill:#029E73,stroke:#000000,color:#000000
-
-  linkStyle default stroke:#808080,stroke-width:1px
-  style P0 fill:#808080,stroke:#000000,color:#FFFFFF
-  style P1 fill:#0173B2,stroke:#000000,color:#FFFFFF
-  style P2 fill:#0173B2,stroke:#000000,color:#FFFFFF
-  style P3 fill:#0173B2,stroke:#000000,color:#FFFFFF
-  style P4 fill:#0173B2,stroke:#000000,color:#FFFFFF
-  style P5 fill:#0173B2,stroke:#000000,color:#FFFFFF
-  style P6 fill:#CC78BC,stroke:#000000,color:#000000
-  style P7 fill:#DE8F05,stroke:#000000,color:#000000
-  style P8 fill:#DE8F05,stroke:#000000,color:#000000
-  style P9 fill:#DE8F05,stroke:#000000,color:#000000
-  style P10 fill:#CA9161,stroke:#000000,color:#000000
-  style P11 fill:#029E73,stroke:#000000,color:#000000
-  style P12 fill:#029E73,stroke:#000000,color:#000000
 ```
 
 ## Git Workflow
