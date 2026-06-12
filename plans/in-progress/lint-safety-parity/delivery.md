@@ -383,16 +383,16 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [x] [AI] Re-sync platform bindings if any agent/governance surface changed:
       `npm run generate:bindings`
       — acceptance: `npm run validate:harness-bindings` passes (no binding drift) - _Done 2026-06-12: ran `generate:bindings` (idempotent — `.amazonq/` bridge wraps AGENTS.md without embedding it, so no drift); `validate:harness-bindings` → 8 passed, 0 failed._
-- [ ] [AI] Commit thematically: `git commit -m "docs(lint): add lint-safety-parity rationale + cross-language strictness convention"`
+- [x] [AI] Commit thematically: `git commit -m "docs(lint): add lint-safety-parity rationale + cross-language strictness convention"` - _Done 2026-06-12: commit `2a70a3b` (6 files: 2 new docs + 2 index updates + AGENTS.md + delivery)._
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `test -f docs/explanation/lint-safety-parity-decisions.md` — expected: exits 0
-- [ ] [AI] `npm run lint:md` — expected: exits 0
-- [ ] [AI] `npx nx run rhino-cli:validate:repo-governance-vendor-audit` — expected: exits 0
-- [ ] [AI] `npm run validate:harness-bindings` — expected: exits 0
+- [x] [AI] `test -f docs/explanation/lint-safety-parity-decisions.md` — expected: exits 0
+- [x] [AI] `npm run lint:md` — expected: exits 0 — _Verified: 2161 files, 0 errors._
+- [x] [AI] `npx nx run rhino-cli:validate:repo-governance-vendor-audit` — expected: exits 0 — _Verified: no violations._
+- [x] [AI] `npm run validate:harness-bindings` — expected: exits 0 — _Verified: 8 passed, 0 failed._
 
 > **Pause Safety**: all docs and governance reflect the new standard and links/bindings validate.
 > Safe to stop. To resume: `npm run lint:md`.
@@ -403,28 +403,29 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck`
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck`
       — acceptance: exits 0
-- [ ] [AI] Run affected linting: `npx nx affected -t lint`
+- [x] [AI] Run affected linting: `npx nx affected -t lint`
       — acceptance: exits 0
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick`
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick`
       — acceptance: exits 0
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage`
+- [x] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage`
       — acceptance: exits 0
-- [ ] [AI] Run shellcheck gate: `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh`
+- [x] [AI] Run shellcheck gate: `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh`
       — acceptance: exits 0
-- [ ] [AI] Run hadolint gate: `hadolint --failure-threshold warning $(find apps -name 'Dockerfile*' -not -path '*/archived/*')`
+- [x] [AI] Run hadolint gate: `hadolint --failure-threshold warning $(find apps -name 'Dockerfile*' -not -path '*/archived/*')`
       — acceptance: exits 0
-- [ ] [AI] Run actionlint gate: `actionlint`
+- [x] [AI] Run actionlint gate: `actionlint`
       — acceptance: exits 0
-- [ ] [AI] Run markdown lint: `npm run lint:md`
+- [x] [AI] Run markdown lint: `npm run lint:md`
       — acceptance: exits 0
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by these changes
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by these changes
       — acceptance: all gates green
-- [ ] [AI] Re-run failing checks to confirm resolution
+- [x] [AI] Re-run failing checks to confirm resolution
       — acceptance: re-run exits 0
-- [ ] [AI] Verify zero failures before pushing
+- [x] [AI] Verify zero failures before pushing
       — acceptance: zero failures across all gates
+  - _Done 2026-06-12: `nx affected -t typecheck lint test:quick spec-coverage --base=origin/main` → success (7 projects + deps, link check 0 broken). shellcheck/hadolint/actionlint all exit 0; `lint:md` 0 errors over 2161 files. One preexisting fix made earlier (envbackup clippy, `b630ef5`). Zero failures._
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by these
 > changes. This follows the root cause orientation principle — proactively fix preexisting errors
@@ -433,10 +434,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically — group related changes into logically cohesive commits
-- [ ] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`
-- [ ] [AI] Split different domains/concerns into separate commits (D10 / D7 / D6 / D8 / D2 / docs)
-- [ ] [AI] Preexisting fixes get their own commits, separate from plan work
+- [x] [AI] Commit changes thematically — group related changes into logically cohesive commits
+- [x] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`
+- [x] [AI] Split different domains/concerns into separate commits (D10 / D7 / D6 / D8 / D2 / docs)
+- [x] [AI] Preexisting fixes get their own commits, separate from plan work
+  - _Done 2026-06-12: 7 thematic commits — `5e664db` D10, `83f4525` D7, `181b8e1` D6, `ded9453` D8, `21ba478` D2, `2a70a3b` docs, plus the preexisting fix `b630ef5` split out separately._
 
 ### Post-Push CI Verification
 
