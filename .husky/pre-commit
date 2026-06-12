@@ -1,3 +1,16 @@
 ./scripts/git-identity-check.sh
 ./scripts/check-no-env-staged.sh
+
+# ShellCheck staged shell scripts (warning threshold). CI's `shell` job is the
+# hard gate; locally we lint when shellcheck is installed and skip with a hint
+# otherwise so a fresh checkout can still commit before `doctor --fix` runs.
+staged_sh=$(git diff --cached --name-only --diff-filter=ACM | grep '\.sh$' | grep -v 'husky/_/' | grep -v '^archived/' || true)
+if [ -n "$staged_sh" ]; then
+  if command -v shellcheck >/dev/null 2>&1; then
+    echo "$staged_sh" | xargs shellcheck --severity=warning
+  else
+    echo "shellcheck not found — skipping local shell lint (run: npm run doctor -- --fix). CI will enforce."
+  fi
+fi
+
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- git pre-commit

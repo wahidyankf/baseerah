@@ -61,6 +61,18 @@ jobs:
       - uses: ./.github/actions/setup-node
       - run: npx prettier --check .
 
+  shell:
+    name: Shell lint (ShellCheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: ShellCheck (warning threshold)
+        run: |
+          shellcheck --version
+          files=$(git ls-files '*.sh' | grep -v 'husky/_/' | grep -v '^archived/')
+          # shellcheck disable=SC2086 # word-splitting the file list is intentional
+          shellcheck --severity=warning $files
+
   typescript:
     name: TypeScript quality gate
     needs: detect
@@ -158,7 +170,7 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    needs: [detect, format, typescript, golang, dotnet, rust, markdown, naming, specs-gate]
+    needs: [detect, format, shell, typescript, golang, dotnet, rust, markdown, naming, specs-gate]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -166,7 +178,7 @@ jobs:
         run: |
           echo "Checking quality gate results..."
           FAILED=false
-          for job in typescript golang dotnet rust markdown naming specs-gate; do
+          for job in shell typescript golang dotnet rust markdown naming specs-gate; do
             RESULT="${{ toJSON(needs) }}"
             # A skipped job is OK (language not affected). Only failure blocks.
           done

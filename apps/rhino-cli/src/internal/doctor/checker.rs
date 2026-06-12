@@ -334,6 +334,15 @@ pub(super) fn parse_golangci_lint_version(out: &str) -> String {
     parse_line_word(out, "golangci-lint", 3, "")
 }
 
+/// Extracts the `shellcheck` version from `shellcheck --version` output
+/// (the `version: 0.11.0` line).
+pub(super) fn parse_shellcheck_version(out: &str) -> String {
+    out.lines()
+        .find_map(|l| l.trim().strip_prefix("version:"))
+        .map(|v| v.trim().to_string())
+        .unwrap_or_default()
+}
+
 /// Extracts the `jq` version from `jq --version` output
 /// (e.g. `"jq-1.8.1"` → `"1.8.1"`).
 pub(super) fn parse_jq_version(out: &str) -> String {

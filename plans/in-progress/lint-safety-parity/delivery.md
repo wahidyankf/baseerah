@@ -91,16 +91,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [x] [AI] Run the affected gate to confirm nothing depended on it:
       `npx nx affected -t typecheck lint test:quick spec-coverage`
       — acceptance: exits 0; no job referenced the removed file - _Done 2026-06-12: `nx affected --base=origin/main` → "No tasks were run". `.golangci.yml` is not an Nx project input; nothing depended on it._
-- [ ] [AI] Commit thematically: `git commit -m "chore(lint): remove dead .golangci.yml (no active Go)"`
-      — acceptance: commit created with Conventional Commits format
+- [x] [AI] Commit thematically: `git commit -m "chore(lint): remove dead .golangci.yml (no active Go)"`
+      — acceptance: commit created with Conventional Commits format - _Done 2026-06-12: commit `5e664db` "chore(lint): remove dead .golangci.yml (no active Go)" (2 files: deletion + delivery bookkeeping). Pre-commit hooks passed._
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `test -f .golangci.yml` — expected: non-zero (file removed)
-- [ ] [AI] `grep -rn 'golangci' .github .husky scripts nx.json` — expected: no active references
-- [ ] [AI] `npx nx affected -t lint` — expected: exits 0
+- [x] [AI] `test -f .golangci.yml` — expected: non-zero (file removed)
+- [x] [AI] `grep -rn 'golangci' .github .husky scripts nx.json` — expected: no active references
+      — _Verified 2026-06-12: zero references to the `.golangci.yml` config; only the `setup-golang` action's binary-install lines match (still needed for oapi-codegen), which are not config references._
+- [x] [AI] `npx nx affected -t lint` — expected: exits 0
 
 > **Pause Safety**: the dead config is gone and nothing referenced it; the repo lints clean. Safe
 > to stop. To resume: `npx nx affected -t lint`.
@@ -111,32 +112,35 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > 14 `.sh` files (excluding `.husky/_/husky.sh` vendored + `archived/**`). Clean-then-gate.
 
-- [ ] [AI] **RED**: run shellcheck across tracked shell scripts to surface the existing backlog:
+- [x] [AI] **RED**: run shellcheck across tracked shell scripts to surface the existing backlog:
       `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh`
       — acceptance: command exits non-zero OR exits 0; record every finding as the cleanup backlog
       (this is the failing-gate state — the gate is not yet wired on)
   - _Suggested executor: `ci-checker`_
-- [ ] [AI] **GREEN**: fix every shellcheck `severity=warning` finding in the affected `.sh` files
+  - _Done 2026-06-12: scanned all 14 tracked `.sh` (excl. `husky/_/`vendored +`archived/`) at `--severity=warning` → **exit 0, zero findings**. Backlog is empty — scripts already clean. (shellcheck 0.11.0.)\_
+- [x] [AI] **GREEN**: fix every shellcheck `severity=warning` finding in the affected `.sh` files
       (quote variables, fix `SC2086`/`SC2046`-class issues, add justified `# shellcheck disable=`
       with inline rationale only where genuinely needed)
       — command: `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh`
       — acceptance: exits 0 (no warning-or-above findings remain)
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] Create `.shellcheckrc` at repo root with `shell=bash`, `external-sources=true`, and any
+  - _Done 2026-06-12: no fixes needed — RED scan already exits 0. GREEN satisfied vacuously._
+- [x] [AI] Create `.shellcheckrc` at repo root with `shell=bash`, `external-sources=true`, and any
       justified repo-wide disables (each with an inline `# rationale:` comment)
-      — acceptance: `test -f .shellcheckrc` returns 0; file documents every disable
-- [ ] [AI] **REFACTOR (flip-on)**: wire the shellcheck gate into CI — add a `shell` job to
+      — acceptance: `test -f .shellcheckrc` returns 0; file documents every disable - _Done 2026-06-12: created root `.shellcheckrc` with `shell=bash`, `external-sources=true`, and a documented no-disables rationale (script set clean at warning threshold; severity applied at call site)._
+- [x] [AI] **REFACTOR (flip-on)**: wire the shellcheck gate into CI — add a `shell` job to
       `.github/workflows/pr-quality-gate.yml` running
       `shellcheck --severity=warning` over the tracked script set, and register `shell` in the
       `quality-gate` job's `needs:` list and failure-check loop
       — acceptance: workflow YAML parses; the new job is listed in `quality-gate.needs`
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] **REFACTOR (flip-on, local)**: add the shellcheck invocation to `.husky/pre-commit` (or
+  - _Done 2026-06-12: added always-run `shell` job (ShellCheck, warning threshold) to `pr-quality-gate.yml` after `format`; scans `git ls-files '*.sh'` minus vendored/archived. Registered `shell` in `quality-gate.needs` and the failure-check loop. (actionlint validation in Phase 4.)_
+- [x] [AI] **REFACTOR (flip-on, local)**: add the shellcheck invocation to `.husky/pre-commit` (or
       `pre-push`) scoped to staged/changed `.sh` files
-      — acceptance: hook file runs shellcheck; `git commit` on a clean tree succeeds
-- [ ] [AI] Add `shellcheck` to the toolchain converger so `npm run doctor -- --fix` installs it
+      — acceptance: hook file runs shellcheck; `git commit` on a clean tree succeeds - _Done 2026-06-12: added staged-`.sh` shellcheck snippet to `.husky/pre-commit` (between env-staged check and `rhino-cli git pre-commit`); runs `--severity=warning` on staged scripts when present, skips with a doctor hint otherwise (CI is the hard gate)._
+- [x] [AI] Add `shellcheck` to the toolchain converger so `npm run doctor -- --fix` installs it
       (follow the existing doctor pattern; confirm the doctor config path before editing)
-      — acceptance: `npm run doctor` reports shellcheck present
+      — acceptance: `npm run doctor` reports shellcheck present - _Done 2026-06-12: added `parse_shellcheck_version` (checker.rs), `install_shellcheck` (brew/apt, tools.rs), and a `shellcheck` ToolDef in `tool_defs_infra()` (no version req, compare_exact). Updated the count test 20→21 (renamed `build_returns_all_known_tools`, asserts shellcheck present). Fixed a preexisting clippy `map().unwrap_or(false)` warning in `envbackup.rs` (→ `is_ok_and`) to keep `rhino-cli:lint -D warnings` green. `npm run doctor` → 21/21 OK incl. shellcheck v0.11.0._
 - [ ] [AI] Commit thematically: `git commit -m "ci(lint): add shellcheck gate (warning threshold)"`
 
 ### Phase 2 Gate
