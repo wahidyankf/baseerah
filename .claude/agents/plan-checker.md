@@ -103,6 +103,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 
 - **Flag MEDIUM** when a plan contains ASCII art that depicts component interactions, data flows, sequences, state machines, or decision branches — a Mermaid diagram would be more appropriate.
 - **Acceptable ASCII** exception: simple directory-tree listings (e.g., `apps/foo/bar.ts`) are not diagrams and do not require flagging.
+- **Flag MEDIUM (under-diagrammed plan)** when a non-trivial plan covers one or more diagram-warranting concerns but provides no diagram for that concern. The diagram-warranting concerns are: component interactions, sequence or flow between agents or systems, state transitions, decision branches, dependency position (upstream/downstream plan or system dependencies), and phase/delivery flow. Trivial/linear plans (single-file config bumps, renames, doc fixes, dependency bumps with no behavioural change) are exempt from this check. For all other plans, each identified concern without a diagram is a separate MEDIUM finding.
 - **Reference**: [repo-governance/conventions/structure/plans.md §Diagrams in Plans](../../repo-governance/conventions/structure/plans.md) and [repo-governance/conventions/formatting/diagrams.md](../../repo-governance/conventions/formatting/diagrams.md).
 
 ### 4. Delivery Checklist Validation

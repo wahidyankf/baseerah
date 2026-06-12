@@ -245,9 +245,20 @@ plan is complete and correct.
 
 When plan content (any of `README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md`) requires a visualisation, ALWAYS prefer Mermaid over ASCII art:
 
-- **Use Mermaid** (`flowchart LR`, `sequenceDiagram`, `stateDiagram-v2`, `erDiagram`, `classDiagram`, etc.) for all non-trivial visualisations — component interactions, data flows, sequences, state machines, decision branches.
+- **Use Mermaid** (`flowchart LR`, `sequenceDiagram`, `stateDiagram-v2`, `erDiagram`, `classDiagram`, etc.) for all non-trivial visualisations.
 - **Use ASCII art only** for simple directory trees or rare edge cases where Mermaid is genuinely not the right fit (e.g., table-like comparisons that render poorly in Mermaid).
 - Follow full Mermaid syntax rules in [repo-governance/conventions/formatting/diagrams.md](../../repo-governance/conventions/formatting/diagrams.md): `LR` orientation default, colour-blind-friendly palette, `%%` comment syntax.
+
+**Extensive diagrams, not a token diagram**: for every distinct architectural concern the plan touches, add a dedicated diagram — one per concern. Do not produce one overloaded diagram and consider the requirement met. The concerns that warrant their own diagram when present:
+
+- **Component interactions** — service/agent/library call graph (flowchart)
+- **Sequence or flow between agents or systems** — order-of-operations across processes (sequenceDiagram)
+- **State transitions** — entity lifecycle with named states and triggers (stateDiagram-v2)
+- **Decision branches** — conditional logic with multiple outcomes (flowchart with labelled edges)
+- **Dependency position** — upstream/downstream plan or system dependencies (flowchart)
+- **Phase/delivery flow** — phased delivery progression with gates and transition conditions (flowchart or stateDiagram-v2)
+
+**Exception**: genuinely trivial/linear plans (single-file config bumps, renames, doc fixes, dependency bumps with no behavioural change) may skip diagrams entirely. For all other plans the extensive-where-appropriate rule applies.
 
 ### Delivery Checklist Quality
 

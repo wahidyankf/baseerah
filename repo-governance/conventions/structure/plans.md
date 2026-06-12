@@ -560,22 +560,30 @@ Files in `plans/` folder MUST use **Mermaid diagrams** as the primary format (sa
 
 ### When a Plan MUST Include a Diagram
 
-A plan MUST include at least one Mermaid diagram when the plan covers any of the following concerns and a reader would otherwise have to reconstruct the picture mentally from prose:
+A plan MUST include extensive Mermaid diagrams where appropriate: every distinct architectural concern the plan touches that a reader would otherwise have to reconstruct mentally from prose SHOULD receive its own dedicated diagram. This means one diagram per concern, not one diagram total.
+
+The concerns that warrant their own diagram when present in a plan:
 
 - **Component interactions** — which services, agents, apps, or libraries call which, and through what contract (flowchart or C4-style diagram)
 - **Sequence or flow between agents or systems** — order-of-operations across processes, including async hand-offs and timeouts (sequenceDiagram)
 - **State transitions** — lifecycle of an entity (plan folder, request, deployment, entitlement) with named states and triggered transitions (stateDiagram-v2)
 - **Decision branches** — non-trivial conditional logic with more than two outcomes or nested decisions (flowchart with labelled edges)
+- **Dependency position** — upstream and downstream plan or system dependencies showing where this plan sits relative to sibling plans, services, or libraries it depends on or that depend on it (flowchart)
+- **Phase/delivery flow** — the phased delivery progression with gates, showing how phases sequence and what conditions govern transitions (flowchart or stateDiagram-v2)
 
-If unsure whether a diagram is warranted, add it. A redundant diagram costs less than a missed architectural ambiguity.
+**Prefer multiple focused diagrams over one overloaded diagram.** A plan covering N distinct architectural concerns should generally carry N diagrams — one per concern — rather than forcing all concerns into a single crowded chart.
+
+If unsure whether a diagram is warranted for a given concern, add it. A redundant diagram costs less than a missed architectural ambiguity.
 
 ### When a Plan MAY Skip Diagrams
 
-Text-only is acceptable only when the plan is genuinely linear and trivially small:
+This section defines the "where appropriate" escape hatch for the extensive-diagram requirement above. Text-only is acceptable only when the plan is genuinely linear and trivially small — it touches no distinct architectural concern that a diagram would clarify:
 
 - Single-file README-only plans touching one file or one config value
 - Renames, copy edits, documentation fixes
 - Dependency bumps with no behavioural change
+
+For any plan that goes beyond these cases, the extensive-where-appropriate rule applies and each diagram-warranting concern listed above should have its own diagram.
 
 ### Accessibility and Palette Requirements
 

@@ -364,15 +364,19 @@ Add to the delivery checklist:
 
 ## Diagram Format Fixes
 
+This section covers two finding types emitted by plan-checker's Diagram Format Check: (1) ASCII art that should be Mermaid, and (2) under-diagrammed plans missing a diagram for a diagram-warranting concern.
+
+### Finding Type 1: ASCII Art Should Be Mermaid
+
 When plan-checker reports a MEDIUM finding for ASCII art in plan files where Mermaid would be more appropriate, apply these fixes:
 
-### Confidence Assessment
+#### Confidence Assessment
 
 - **HIGH Confidence**: ASCII art clearly depicts a flow, sequence, state machine, or component interaction — the Mermaid equivalent is unambiguous. Auto-convert.
 - **MEDIUM Confidence**: ASCII art is ambiguous (e.g., a hybrid table/diagram). Flag for manual review.
 - **FALSE_POSITIVE**: ASCII art is a simple directory tree or file listing. These are explicitly exempted — do not convert.
 
-### How to Convert ASCII Art to Mermaid
+#### How to Convert ASCII Art to Mermaid
 
 Follow [repo-governance/conventions/formatting/diagrams.md](../../repo-governance/conventions/formatting/diagrams.md) for full syntax rules. Key standards:
 
@@ -386,10 +390,33 @@ Follow [repo-governance/conventions/formatting/diagrams.md](../../repo-governanc
 
 3–5. Follow the color-blind-friendly palette, `%%` comment syntax, and common syntax pitfalls documented in the `docs-creating-accessible-diagrams` Skill and [repo-governance/conventions/formatting/diagrams.md](../../repo-governance/conventions/formatting/diagrams.md).
 
-### Exception: Do Not Convert
+#### Exception: Do Not Convert
 
 - Simple directory trees (`├── src/`, file listings) — acceptable ASCII, leave unchanged.
 - Tables or matrices where Mermaid would reduce readability — classify as FALSE_POSITIVE.
+
+### Finding Type 2: Under-Diagrammed Plan (Missing Diagram for a Concern)
+
+When plan-checker reports a MEDIUM finding for a non-trivial plan that covers a diagram-warranting concern but provides no diagram for it, add the missing Mermaid diagram.
+
+#### Confidence Assessment
+
+- **HIGH Confidence**: The concern is unambiguous from plan prose and the diagram type is deterministic (e.g., the plan describes a sequence of API calls → `sequenceDiagram`). Auto-add.
+- **MEDIUM Confidence**: The concern is present but the plan prose is too sparse to derive a correct diagram without invention. Flag for manual review — do not fabricate nodes or edges.
+- **FALSE_POSITIVE**: The plan is genuinely trivial/linear (single-file config bump, rename, doc fix, dependency bump with no behavioural change). These are exempt; report as FALSE_POSITIVE.
+
+#### How to Add a Missing Diagram
+
+1. **Identify the concern** from the plan-checker finding (component interactions, sequence/flow, state transitions, decision branches, dependency position, or phase/delivery flow).
+2. **Choose the diagram type**:
+   - Component interactions, dependency position, decision branches → `flowchart LR`
+   - Sequence or flow between agents/systems → `sequenceDiagram`
+   - State transitions or phase/delivery flow → `stateDiagram-v2` or `flowchart LR`
+3. **Derive nodes and edges from plan prose** — do not invent relationships not stated in the plan.
+4. **Apply the color-blind-friendly palette** per the `docs-creating-accessible-diagrams` Skill: verified hex codes, black borders (`stroke:#000000`), white text on dark fills.
+5. **Place the diagram** in the plan file where the concern is first described (e.g., a component interaction diagram in `tech-docs.md`; a phase/delivery flow diagram at the top of `delivery.md`).
+
+After adding, re-read the containing file section and confirm the diagram nodes match the entities named in the surrounding prose.
 
 ## Worktree Specification Fixes
 
