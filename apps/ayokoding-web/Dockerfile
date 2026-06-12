@@ -20,7 +20,8 @@ COPY libs/web-ui/package.json ./node_modules/@open-sharia-enterprise/web-ui/
 COPY libs/web-ui-token/src/ ./node_modules/@open-sharia-enterprise/web-ui-token/src/
 COPY libs/web-ui-token/package.json ./node_modules/@open-sharia-enterprise/web-ui-token/
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN cd apps/ayokoding-web && npm run build
+WORKDIR /workspace/apps/ayokoding-web
+RUN npm run build
 
 FROM node:24-alpine AS runner
 

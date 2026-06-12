@@ -13,4 +13,16 @@ if [ -n "$staged_sh" ]; then
   fi
 fi
 
+# hadolint changed Dockerfiles (warning threshold). CI's `dockerfile` job is the
+# hard gate; locally we lint when hadolint is installed and skip with a hint
+# otherwise so a fresh checkout can still commit before `doctor --fix` runs.
+staged_df=$(git diff --cached --name-only --diff-filter=ACM | grep -iE 'Dockerfile' | grep -v '^archived/' || true)
+if [ -n "$staged_df" ]; then
+  if command -v hadolint >/dev/null 2>&1; then
+    echo "$staged_df" | xargs hadolint --failure-threshold warning
+  else
+    echo "hadolint not found — skipping local Dockerfile lint (run: npm run doctor -- --fix). CI will enforce."
+  fi
+fi
+
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- git pre-commit

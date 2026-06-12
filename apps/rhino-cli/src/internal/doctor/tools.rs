@@ -11,11 +11,11 @@ use super::checker::{
     compare_exact, compare_gte, compare_major, compare_major_gte, compare_playwright,
     parse_cargo_llvm_cov, parse_clojure_version, parse_dart_version, parse_docker_version,
     parse_dotnet_version, parse_elixir_version, parse_erlang_version, parse_flutter_version,
-    parse_golangci_lint_version, parse_java_version, parse_jq_version, parse_line_word,
-    parse_playwright_version, parse_python_version, parse_rust_version, parse_shellcheck_version,
-    parse_trim_version, read_dart_sdk_version, read_dotnet_version, read_flutter_version,
-    read_go_version, read_java_version, read_node_version, read_npm_version, read_python_version,
-    read_rust_version, read_tool_versions_entry,
+    parse_golangci_lint_version, parse_hadolint_version, parse_java_version, parse_jq_version,
+    parse_line_word, parse_playwright_version, parse_python_version, parse_rust_version,
+    parse_shellcheck_version, parse_trim_version, read_dart_sdk_version, read_dotnet_version,
+    read_flutter_version, read_go_version, read_java_version, read_node_version, read_npm_version,
+    read_python_version, read_rust_version, read_tool_versions_entry,
 };
 
 /// A single step in an auto-install sequence.
@@ -541,6 +541,37 @@ fn install_shellcheck(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for `hadolint` (Homebrew on macOS; pinned binary
+/// download on Linux, where no apt package is published).
+fn install_hadolint(_req: &str, platform: &str) -> Vec<InstallStep> {
+    if platform == "darwin" {
+        vec![InstallStep {
+            description: "Install hadolint via Homebrew".into(),
+            command: "brew".into(),
+            args: vec!["install".into(), "hadolint".into()],
+        }]
+    } else {
+        vec![
+            InstallStep {
+                description: "Download hadolint binary".into(),
+                command: "sudo".into(),
+                args: vec![
+                    "curl".into(),
+                    "-sSL".into(),
+                    "-o".into(),
+                    "/usr/local/bin/hadolint".into(),
+                    "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-Linux-x86_64".into(),
+                ],
+            },
+            InstallStep {
+                description: "Make hadolint executable".into(),
+                command: "sudo".into(),
+                args: vec!["chmod".into(), "+x".into(), "/usr/local/bin/hadolint".into()],
+            },
+        ]
+    }
+}
+
 /// Returns install steps for `golangci-lint` via `go install`.
 fn install_golangci_lint(req: &str, _platform: &str) -> Vec<InstallStep> {
     vec![InstallStep {
@@ -798,7 +829,7 @@ fn tool_defs_dotnet_and_mobile() -> Vec<ToolDef> {
 }
 
 /// Returns tool definitions for infrastructure: `docker`, `jq`, `golangci-lint`,
-/// `shellcheck`, `playwright`.
+/// `shellcheck`, `hadolint`, `playwright`.
 fn tool_defs_infra() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -846,6 +877,17 @@ fn tool_defs_infra() -> Vec<ToolDef> {
             install_cmd: Some(install_shellcheck),
         },
         ToolDef {
+            name: "hadolint".into(),
+            binary: "hadolint".into(),
+            source: "(no config file)".into(),
+            args: vec!["--version".into()],
+            use_stderr: false,
+            parse_ver: parse_hadolint_version,
+            compare: compare_exact,
+            read_req: no_req,
+            install_cmd: Some(install_hadolint),
+        },
+        ToolDef {
             name: "playwright".into(),
             binary: "npx".into(),
             source: "node_modules (npx playwright)".into(),
@@ -868,10 +910,11 @@ mod tests {
     fn build_returns_all_known_tools() {
         let dir = tempfile::tempdir().unwrap();
         let defs = build_tool_defs(dir.path());
-        assert_eq!(defs.len(), 21);
+        assert_eq!(defs.len(), 22);
         assert_eq!(defs[0].name, "git");
         assert_eq!(defs.last().unwrap().name, "playwright");
         assert!(defs.iter().any(|d| d.name == "shellcheck"));
+        assert!(defs.iter().any(|d| d.name == "hadolint"));
     }
 
     #[test]

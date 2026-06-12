@@ -9,7 +9,9 @@ COPY go.work go.work.sum ./
 COPY apps/rhino-cli/go.mod apps/rhino-cli/go.sum apps/rhino-cli/
 COPY libs/golang-commons/go.mod libs/golang-commons/go.sum libs/golang-commons/
 
-RUN cd apps/rhino-cli && go mod download
+WORKDIR /app/apps/rhino-cli
+RUN go mod download
+WORKDIR /app
 
 COPY . .
 

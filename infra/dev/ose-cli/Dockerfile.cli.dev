@@ -10,7 +10,9 @@ COPY apps/ose-cli/go.mod apps/ose-cli/go.sum apps/ose-cli/
 COPY libs/golang-commons/go.mod libs/golang-commons/go.sum libs/golang-commons/
 COPY libs/hugo-commons/go.mod libs/hugo-commons/go.sum libs/hugo-commons/
 
-RUN cd apps/ose-cli && go mod download
+WORKDIR /app/apps/ose-cli
+RUN go mod download
+WORKDIR /app
 
 COPY . .
 

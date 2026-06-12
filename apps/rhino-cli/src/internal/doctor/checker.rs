@@ -343,6 +343,12 @@ pub(super) fn parse_shellcheck_version(out: &str) -> String {
         .unwrap_or_default()
 }
 
+/// Extracts the `hadolint` version from `hadolint --version` output
+/// (e.g. `"Haskell Dockerfile Linter 2.14.0"`).
+pub(super) fn parse_hadolint_version(out: &str) -> String {
+    parse_line_word(out, "Haskell Dockerfile Linter", 3, "")
+}
+
 /// Extracts the `jq` version from `jq --version` output
 /// (e.g. `"jq-1.8.1"` → `"1.8.1"`).
 pub(super) fn parse_jq_version(out: &str) -> String {

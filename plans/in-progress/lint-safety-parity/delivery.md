@@ -141,17 +141,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [x] [AI] Add `shellcheck` to the toolchain converger so `npm run doctor -- --fix` installs it
       (follow the existing doctor pattern; confirm the doctor config path before editing)
       — acceptance: `npm run doctor` reports shellcheck present - _Done 2026-06-12: added `parse_shellcheck_version` (checker.rs), `install_shellcheck` (brew/apt, tools.rs), and a `shellcheck` ToolDef in `tool_defs_infra()` (no version req, compare_exact). Updated the count test 20→21 (renamed `build_returns_all_known_tools`, asserts shellcheck present). Fixed a preexisting clippy `map().unwrap_or(false)` warning in `envbackup.rs` (→ `is_ok_and`) to keep `rhino-cli:lint -D warnings` green. `npm run doctor` → 21/21 OK incl. shellcheck v0.11.0._
-- [ ] [AI] Commit thematically: `git commit -m "ci(lint): add shellcheck gate (warning threshold)"`
+- [x] [AI] Commit thematically: `git commit -m "ci(lint): add shellcheck gate (warning threshold)"` - _Done 2026-06-12: commit `83f4525` (gate work + delivery); preexisting clippy fix split into `b630ef5`._
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh`
-      — expected: exits 0
-- [ ] [AI] `test -f .shellcheckrc` — expected: exits 0
-- [ ] [AI] `grep -q 'shell' .github/workflows/pr-quality-gate.yml` and the `shell` job is in
-      `quality-gate.needs` — expected: present
+- [x] [AI] `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh`
+      — expected: exits 0 — _Verified: exit 0 over all 14 tracked scripts._
+- [x] [AI] `test -f .shellcheckrc` — expected: exits 0
+- [x] [AI] `grep -q 'shell' .github/workflows/pr-quality-gate.yml` and the `shell` job is in
+      `quality-gate.needs` — expected: present — _Verified: `shell` in `needs: [detect, format, shell, ...]`._
 
 > **Pause Safety**: shell scripts are clean and the shellcheck gate is live in CI + hooks. Safe to
 > stop. To resume: re-run the shellcheck command above.
@@ -163,30 +163,33 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > 10 app Dockerfiles under `apps/*/` (incl. 2 `Dockerfile.integration`); exclude `archived/**`.
 > Executor confirms whether to also gate `infra/dev/**`. Clean-then-gate.
 
-- [ ] [AI] **RED**: run hadolint across app Dockerfiles to surface the backlog:
+- [x] [AI] **RED**: run hadolint across app Dockerfiles to surface the backlog:
       `hadolint --failure-threshold warning apps/*/Dockerfile apps/*/Dockerfile.integration`
       — acceptance: record every finding as the cleanup backlog (failing-gate state, gate not wired)
   - _Suggested executor: `ci-checker`_
-- [ ] [AI] **GREEN**: fix every warning-or-above hadolint finding across the Dockerfiles (pin apt
+  - _Done 2026-06-12 (hadolint 2.14.0; scope = 10 apps/\* + 7 infra/dev/\*\* Dockerfiles — infra included for max hygiene). Warning-level backlog: **DL3003** (cd→WORKDIR) ×4 (ayokoding-web, infra ayokoding-cli/ose-cli/rhino-cli cli.dev); **DL3008** (pin apt) ×7 (crane-be, organiclever-be ×2, ose-app-be ×2 + integration, infra organiclever/ose-app be.dev); **DL3018** (pin apk) ×3 (infra cli.dev). Info-level DL3059/DL3015 don't fail at warning threshold. Plan: fix DL3003; ignore version-pinning DL3008/DL3018._
+- [x] [AI] **GREEN**: fix every warning-or-above hadolint finding across the Dockerfiles (pin apt
       versions where feasible, fix `DL`-class issues; defer only truly-justified rules to the
       ignore list in the next step)
       — command: `hadolint --failure-threshold warning apps/*/Dockerfile apps/*/Dockerfile.integration`
       — acceptance: exits 0
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] Create `.hadolint.yaml` at repo root with `failure-threshold: warning`,
+  - _Done 2026-06-12: fixed all 4 DL3003 (`cd`→`WORKDIR`) in ayokoding-web/Dockerfile + infra/dev ayokoding-cli/ose-cli/rhino-cli cli.dev (restore `WORKDIR /app` after the scoped `go mod download`). DL3008/DL3018 ignored via config (next step). hadolint over all 17 apps+infra Dockerfiles → **exit 0** (only info-level DL3059/DL3015 remain, below warning threshold)._
+- [x] [AI] Create `.hadolint.yaml` at repo root with `failure-threshold: warning`,
       `trustedRegistries: [docker.io, ghcr.io]`, and justified per-rule `ignore` entries (e.g.
       `DL3008` for dev images), each with an inline rationale comment
-      — acceptance: `test -f .hadolint.yaml` returns 0
-- [ ] [AI] **REFACTOR (flip-on, CI)**: add a `dockerfile` job to
+      — acceptance: `test -f .hadolint.yaml` returns 0 - _Done 2026-06-12: created `.hadolint.yaml` — `failure-threshold: warning`; `trustedRegistries: [docker.io, mcr.microsoft.com, ghcr.io]` (added mcr for crane-be .NET base images, else DL3026 errors); `ignored: [DL3008, DL3018]` with version-pinning-brittleness rationale._
+- [x] [AI] **REFACTOR (flip-on, CI)**: add a `dockerfile` job to
       `.github/workflows/pr-quality-gate.yml` running hadolint over the app Dockerfile set, and
       register `dockerfile` in `quality-gate.needs` + the failure-check loop
       — acceptance: workflow parses; job listed in `quality-gate.needs`
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] **REFACTOR (flip-on, local)**: add the hadolint invocation to `.husky/pre-commit` scoped
+  - _Done 2026-06-12: added always-run `dockerfile` job (pins hadolint v2.14.0 binary, auto-discovers `.hadolint.yaml`) after `shell`; lints `git ls-files | grep -i Dockerfile` minus archived. Registered `dockerfile` in `quality-gate.needs` + failure loop. (actionlint parse-check in Phase 4.)_
+- [x] [AI] **REFACTOR (flip-on, local)**: add the hadolint invocation to `.husky/pre-commit` scoped
       to changed Dockerfiles
-      — acceptance: hook runs hadolint; clean commit succeeds
-- [ ] [AI] Add `hadolint` to the toolchain converger (doctor `--fix` installs it)
-      — acceptance: `npm run doctor` reports hadolint present
+      — acceptance: hook runs hadolint; clean commit succeeds - _Done 2026-06-12: added staged-Dockerfile hadolint snippet to `.husky/pre-commit` (after the shellcheck snippet); runs `--failure-threshold warning` when hadolint present, skips with a doctor hint otherwise._
+- [x] [AI] Add `hadolint` to the toolchain converger (doctor `--fix` installs it)
+      — acceptance: `npm run doctor` reports hadolint present - _Done 2026-06-12: added `parse_hadolint_version` (checker.rs), `install_hadolint` (brew on macOS, pinned v2.14.0 binary download on Linux), and a `hadolint` ToolDef. Count test 21→22 (+hadolint assertion). `npm run doctor` → 22/22 OK incl. hadolint v2.14.0._
 - [ ] [AI] Commit thematically: `git commit -m "ci(lint): add hadolint gate (warning threshold)"`
 
 ### Phase 3 Gate
