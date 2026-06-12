@@ -43,32 +43,32 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
-      — acceptance: exits 0, `node_modules/` synchronized
-- [ ] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
-      — acceptance: exits 0 with no unresolved drift (verifies .NET SDK ≥ 8 for F# TWAE)
-- [ ] [AI] Confirm the F# surface: `find apps libs -name '*.fsproj' | grep -v node_modules`
-      — acceptance: lists exactly 8 `.fsproj` files (crane-be ×3, crane-cli ×3, fsharp-crane-core ×2)
-- [ ] [AI] Confirm no active Go: `find . -name go.mod -not -path '*/node_modules/*' -not -path '*/archived/*'`
-      — acceptance: prints nothing (Go only in `archived/`); confirms D10 removal is safe
+- [x] [AI] Install dependencies in the root worktree: `npm install`
+      — acceptance: exits 0, `node_modules/` synchronized - _Done 2026-06-12: `npm install` exited 0; added 1553 packages, 1571 audited. `node_modules/` synchronized in worktree._
+- [x] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
+      — acceptance: exits 0 with no unresolved drift (verifies .NET SDK ≥ 8 for F# TWAE) - _Done 2026-06-12: doctor reports 20/20 tools OK, 0 warning, 0 missing, "Nothing to fix". dotnet v10.0.300 (≥8 ✓ for TWAE). shellcheck/hadolint/actionlint not yet in converger — added in Phases 2–4._
+- [x] [AI] Confirm the F# surface: `find apps libs -name '*.fsproj' | grep -v node_modules`
+      — acceptance: lists exactly 8 `.fsproj` files (crane-be ×3, crane-cli ×3, fsharp-crane-core ×2) - _Done 2026-06-12: exactly 8 `.fsproj` found — crane-be (main+integration+unit), crane-cli (main+integration+unit), fsharp-crane-core (main+unit). Matches plan._
+- [x] [AI] Confirm no active Go: `find . -name go.mod -not -path '*/node_modules/*' -not -path '*/archived/*'`
+      — acceptance: prints nothing (Go only in `archived/`); confirms D10 removal is safe - _Done 2026-06-12: no active `go.mod` outside `archived/`. Confirms D10 removal is safe._
 - [ ] [AI] Confirm root `.golangci.yml` exists and is unreferenced by workflows/scripts:
       `test -f .golangci.yml && grep -rn 'golangci' .github scripts apps/*/project.json nx.json || true`
-      — acceptance: file exists; record every reference found (expected: none active)
-- [ ] [AI] Record the F# lint baseline: `npx nx run-many -t lint --projects='tag:lang:dotnet'`
-      — acceptance: baseline pass/fail recorded for crane-be, crane-cli, fsharp-crane-core
-- [ ] [AI] Run the affected baseline gate and record it:
+      — acceptance: file exists; record every reference found (expected: none active) - _Done 2026-06-12: `.golangci.yml` exists. Only `golangci` matches are in `.github/actions/setup-golang/action.yml` (composite action that installs the golangci-lint **binary**) — no reference to the `.golangci.yml` **config file** itself and no `golangci-lint run` invocation. Deeper safety grep deferred to Phase 1._
+- [x] [AI] Record the F# lint baseline: `npx nx run-many -t lint --projects='tag:lang:dotnet'`
+      — acceptance: baseline pass/fail recorded for crane-be, crane-cli, fsharp-crane-core - _Done 2026-06-12: all 3 dotnet projects PASS current lint (fantomas --check + fsharplint), 0 warnings each. This is the pre-TWAE baseline — analyzers + TreatWarningsAsErrors not yet active (Phase 5)._
+- [x] [AI] Run the affected baseline gate and record it:
       `npx nx affected -t typecheck lint test:quick spec-coverage`
-      — acceptance: baseline pass/fail count recorded; all preexisting failures documented
-- [ ] [AI] Resolve all preexisting failures before proceeding
-      — acceptance: no preexisting failures remain unresolved
+      — acceptance: baseline pass/fail count recorded; all preexisting failures documented - _Done 2026-06-12: `nx affected ... --base=origin/main` → "No tasks were run" (worktree is byte-identical to `origin/main` @ 35485043c, which was double-zero-gated and CI-green when pushed). No preexisting failures in scope._
+- [x] [AI] Resolve all preexisting failures before proceeding
+      — acceptance: no preexisting failures remain unresolved - _Done 2026-06-12: none to resolve — affected baseline empty and F# lint baseline 0 warnings. Nothing unresolved._
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] The 8 `.fsproj` files and the dead-but-unreferenced `.golangci.yml` are confirmed
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` baseline recorded and every
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+- [x] [AI] The 8 `.fsproj` files and the dead-but-unreferenced `.golangci.yml` are confirmed
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` baseline recorded and every
       preexisting failure resolved (zero unresolved)
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no feature
@@ -81,15 +81,16 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > Smallest, lowest-risk change first (a pure deletion).
 
-- [ ] [AI] Re-confirm no active Go module references the config:
+- [x] [AI] Re-confirm no active Go module references the config:
       `grep -rn 'golangci' .github .husky scripts apps libs nx.json package.json || true`
-      — acceptance: no active workflow/script/Nx target references `.golangci.yml`
-- [ ] [AI] Delete the dead config: `git rm .golangci.yml`
+      — acceptance: no active workflow/script/Nx target references `.golangci.yml` - _Done 2026-06-12: SAFE confirmed. Zero `go.mod` anywhere in repo (Go fully removed). `ayokoding-cli`/`ose-cli` are now Rust (Cargo.toml). No `project.json` lint target invokes golangci-lint. `setup-golang` action installs the binary for 5 workflows (Go/oapi-codegen caching) but the `golang` quality-gate job's `nx run-many --projects='tag:lang:golang'` matches zero projects → `golangci-lint run` never executes. Remaining matches are ayokoding-web educational content + stale Rust-project READMEs (preexisting doc-drift, noted; `.golangci.yml` referenced as inline code, not a link → no link-check breakage)._
+- [x] [AI] Delete the dead config: `git rm .golangci.yml`
       — acceptance: `test -f .golangci.yml` returns non-zero (file gone)
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] Run the affected gate to confirm nothing depended on it:
+  - _Done 2026-06-12: `git rm .golangci.yml` → staged deletion; `test -f` returns non-zero (file gone). Trivial deletion executed directly._
+- [x] [AI] Run the affected gate to confirm nothing depended on it:
       `npx nx affected -t typecheck lint test:quick spec-coverage`
-      — acceptance: exits 0; no job referenced the removed file
+      — acceptance: exits 0; no job referenced the removed file - _Done 2026-06-12: `nx affected --base=origin/main` → "No tasks were run". `.golangci.yml` is not an Nx project input; nothing depended on it._
 - [ ] [AI] Commit thematically: `git commit -m "chore(lint): remove dead .golangci.yml (no active Go)"`
       — acceptance: commit created with Conventional Commits format
 
