@@ -180,6 +180,21 @@ npm run lint:md:fix
 [repo-governance/development/quality/repository-validation.md](./repo-governance/development/quality/repository-validation.md)
 (Markdown Quality Gates section)
 
+## Cross-Language Lint Gates
+
+Beyond markdown, the repo gates shell scripts, Dockerfiles, GitHub Actions
+workflows, and F# at a uniform **warning-and-above** threshold, enforced in both
+CI (`.github/workflows/pr-quality-gate.yml`) and the local Husky hooks:
+
+- **shellcheck** (`--severity=warning`, root `.shellcheckrc`) — all tracked `.sh` files (CI `shell` job)
+- **hadolint** (`--failure-threshold warning`, root `.hadolint.yaml`) — all Dockerfiles (CI `dockerfile` job)
+- **actionlint** — all `.github/workflows/*.yml` (CI `actions` job)
+- **F# strict** — `TreatWarningsAsErrors` on every `.fsproj` + G-Research.FSharp.Analyzers + `fantomas --check`, riding the `dotnet` job's Nx `lint`/`typecheck` targets
+
+All three new linters are installed by `npm run doctor -- --fix`.
+
+**See**: [repo-governance/development/quality/cross-language-lint-strictness.md](./repo-governance/development/quality/cross-language-lint-strictness.md)
+
 ## Monorepo Architecture
 
 Uses **Nx** to manage apps and libs:
@@ -240,6 +255,7 @@ Husky + lint-staged enforce quality:
   - Formats staged files with Prettier (JS/TS/JSON/YAML/CSS/MD), gofmt (Go), and rustfmt (Rust)
   - Validates markdown links in staged files
   - Validates all markdown files (markdownlint)
+  - Lints staged shell scripts (shellcheck), Dockerfiles (hadolint), and workflow files (actionlint) at the warning threshold
   - Auto-stages changes
 - **Commit-msg**: Validates Conventional Commits format (Commitlint)
 - **Pre-push**: Runs `typecheck`, `lint`, `test:quick`, and `spec-coverage` for affected projects (parallelism: cores-1)

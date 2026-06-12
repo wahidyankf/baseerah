@@ -329,20 +329,20 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — acceptance: all F# unit tests pass
   - _Suggested executor: `swe-fsharp-dev`_
   - _Done 2026-06-12: `nx run-many -t test:quick --projects=tag:lang:dotnet` → exit 0, 183 F# tests pass, coverage avg 97.55%/90.45%/99.18% (≥ thresholds)._
-- [ ] [AI] Commit thematically (split cleanup vs flip-on):
-      `git commit` for cleanup, then `git commit -m "build(fsharp): enable TreatWarningsAsErrors + pin G-Research analyzers"`
+- [x] [AI] Commit thematically (split cleanup vs flip-on):
+      `git commit` for cleanup, then `git commit -m "build(fsharp): enable TreatWarningsAsErrors + pin G-Research analyzers"` - _Done 2026-06-12: single commit `21ba478` — source needed no cleanup (already clean), so there is no separate cleanup commit; all 13 files (8 fsproj + 3 project.json + .config + delivery) are the flip-on._
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `npx nx run-many -t typecheck --projects='tag:lang:dotnet'` — expected: all 3 build with
-      TWAE active, exit 0
-- [ ] [AI] `npx nx run-many -t lint --projects='tag:lang:dotnet'` — expected: analyzers + fantomas +
-      fsharplint all pass, exit 0
-- [ ] [AI] `npx nx run-many -t test:quick --projects='tag:lang:dotnet'` — expected: exit 0
-- [ ] [AI] Every `.fsproj` (8 total) contains TWAE OR inherits it from a committed
-      `Directory.Build.props` — expected: confirmed
+- [x] [AI] `npx nx run-many -t typecheck --projects='tag:lang:dotnet'` — expected: all 3 build with
+      TWAE active, exit 0 — _Verified: 3 projects, exit 0._
+- [x] [AI] `npx nx run-many -t lint --projects='tag:lang:dotnet'` — expected: analyzers + fantomas +
+      fsharplint all pass, exit 0 — _Verified: 3 projects, exit 0; analyzers ran._
+- [x] [AI] `npx nx run-many -t test:quick --projects='tag:lang:dotnet'` — expected: exit 0 — _Verified: 183 tests pass._
+- [x] [AI] Every `.fsproj` (8 total) contains TWAE OR inherits it from a committed
+      `Directory.Build.props` — expected: confirmed — _Verified: 8/8 contain `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>`._
 
 > **Pause Safety**: F# is clean, strict, and green under TWAE + pinned analyzers. Safe to stop. To
 > resume: `npx nx run-many -t typecheck lint test:quick --projects='tag:lang:dotnet'`.
@@ -353,7 +353,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > _Suggested executor: `repo-rules-maker` (governance) / `docs-maker` (rationale doc)._
 
-- [ ] [AI] Write `docs/explanation/lint-safety-parity-decisions.md` (plain-language rationale)
+- [x] [AI] Write `docs/explanation/lint-safety-parity-decisions.md` (plain-language rationale)
       following the sibling precedent
       `docs/explanation/gherkin-step-keyword-cardinality-parity-decisions.md`. It MUST cover:
       every ose-public dimension (D2/D6/D7/D8/D10) with its rationale; the documented Rust
@@ -363,23 +363,26 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — acceptance: `test -f docs/explanation/lint-safety-parity-decisions.md` returns 0; doc names
       all five executed dimensions + the D5 deferral + the exemption philosophy
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] Add the rationale doc to `docs/explanation/README.md` index (if it enumerates entries)
-      — acceptance: index links the new doc; `npm run lint:md` passes
-- [ ] [AI] Create or update a governance convention documenting the **shared cross-language
+  - _Done 2026-06-12: created the rationale doc covering D2/D6/D7/D8/D10 + D1/D1b reference status + D5 deferral + exemption philosophy + sibling-plan cross-links. (Plan links point to `plans/in-progress/` — Phase 7 archival rewrites them to `plans/done/`.)_
+- [x] [AI] Add the rationale doc to `docs/explanation/README.md` index (if it enumerates entries)
+      — acceptance: index links the new doc; `npm run lint:md` passes - _Done 2026-06-12: added index entry under the parity decision-log list; lint:md passes (0 errors)._
+- [x] [AI] Create or update a governance convention documenting the **shared cross-language
       strictness standard** (the warning-and-above error threshold across F#/Docker/shell/CI, plus
       the new Nx lint-target additions). Place under `repo-governance/development/quality/` following
       the sibling pattern of `markdown.md` / `repository-validation.md`
       — acceptance: new/updated convention names hadolint, shellcheck, actionlint, and F# TWAE as
       gated standards; `npx nx run rhino-cli:validate:repo-governance-vendor-audit` passes
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Update `AGENTS.md` "Markdown Quality" / Quality-Gates style lists and the
+  - _Done 2026-06-12: created `repo-governance/development/quality/cross-language-lint-strictness.md` (names shellcheck/hadolint/actionlint/F# TWAE + analyzers + fantomas as gated standards, with the warning-threshold policy, config files, and CI/hook enforcement). Linked from the quality README index. vendor-audit passes._
+- [x] [AI] Update `AGENTS.md` "Markdown Quality" / Quality-Gates style lists and the
       Build/Test/Lint commands section to mention the new gates (hadolint/shellcheck/actionlint)
       and any new Nx lint targets
       — acceptance: AGENTS.md lists the three new gates; `npm run lint:md` passes
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Re-sync platform bindings if any agent/governance surface changed:
+  - _Done 2026-06-12: added a "Cross-Language Lint Gates" section to AGENTS.md (shellcheck/hadolint/actionlint/F# strict, doctor install, link to the convention) + a pre-commit bullet. lint:md passes._
+- [x] [AI] Re-sync platform bindings if any agent/governance surface changed:
       `npm run generate:bindings`
-      — acceptance: `npm run validate:harness-bindings` passes (no binding drift)
+      — acceptance: `npm run validate:harness-bindings` passes (no binding drift) - _Done 2026-06-12: ran `generate:bindings` (idempotent — `.amazonq/` bridge wraps AGENTS.md without embedding it, so no drift); `validate:harness-bindings` → 8 passed, 0 failed._
 - [ ] [AI] Commit thematically: `git commit -m "docs(lint): add lint-safety-parity rationale + cross-language strictness convention"`
 
 ### Phase 6 Gate

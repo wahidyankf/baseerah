@@ -35,6 +35,7 @@ These standards define **HOW to maintain and validate quality**, covering automa
 
 - [Code Quality Convention](./code.md) - Automated code quality tools and git hooks (Prettier, Husky, lint-staged) for consistent formatting and commit validation
 - [Markdown Quality Convention](./markdown.md) - Standards for markdown linting and formatting using markdownlint-cli2 and Prettier for consistent markdown quality
+- [Cross-Language Lint Strictness](./cross-language-lint-strictness.md) - The uniform warning-and-above strictness threshold across shell (shellcheck), Dockerfiles (hadolint), GitHub Actions (actionlint), and F# (TreatWarningsAsErrors + G-Research analyzers + fantomas), enforced in both CI and local hooks
 - [Three-Level Testing Standard](./three-level-testing-standard.md) - Mandatory three-level testing architecture (unit/integration/E2E) for all projects: unit (all mocks + Gherkin specs for demo-be), integration (real PostgreSQL, no HTTP for demo-be; in-process mocking for others), E2E (full stack + Gherkin specs via Playwright)
 - [Content Preservation Convention](./content-preservation.md) - Principles and processes for preserving knowledge when condensing files and extracting duplications
 - [Criticality Levels Convention](./criticality-levels.md) - Universal criticality level system for categorizing validation findings (CRITICAL/HIGH/MEDIUM/LOW)
