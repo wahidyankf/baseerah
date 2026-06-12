@@ -33,9 +33,11 @@ jobs:
           fi
           export NX_BASE="$BASE"
           AFFECTED=$(npx nx show projects --affected 2>/dev/null || echo "")
-          echo "build-organiclever-be=false" >> "$GITHUB_OUTPUT"
-          echo "build-ose-app-be=false" >> "$GITHUB_OUTPUT"
-          echo "build-crane-be=false" >> "$GITHUB_OUTPUT"
+          {
+            echo "build-organiclever-be=false"
+            echo "build-ose-app-be=false"
+            echo "build-crane-be=false"
+          } >> "$GITHUB_OUTPUT"
           for project in $AFFECTED; do
             case "$project" in
               organiclever-be) echo "build-organiclever-be=true" >> "$GITHUB_OUTPUT" ;;

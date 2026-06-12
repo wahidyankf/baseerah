@@ -29,11 +29,13 @@ jobs:
         run: |
           AFFECTED=$(npx nx show projects --affected 2>/dev/null || echo "")
           # Check language tags for affected projects
-          echo "has-ts=false" >> "$GITHUB_OUTPUT"
-          echo "has-golang=false" >> "$GITHUB_OUTPUT"
-          echo "has-dotnet=false" >> "$GITHUB_OUTPUT"
-          echo "has-rust=false" >> "$GITHUB_OUTPUT"
-          echo "has-markdown=false" >> "$GITHUB_OUTPUT"
+          {
+            echo "has-ts=false"
+            echo "has-golang=false"
+            echo "has-dotnet=false"
+            echo "has-rust=false"
+            echo "has-markdown=false"
+          } >> "$GITHUB_OUTPUT"
 
           for project in $AFFECTED; do
             TAGS=$(npx nx show project "$project" --json 2>/dev/null | jq -r '.tags[]' 2>/dev/null || echo "")
@@ -86,6 +88,18 @@ jobs:
           files=$(git ls-files | grep -iE 'Dockerfile' | grep -vE '^archived/')
           # shellcheck disable=SC2086 # word-splitting the file list is intentional
           hadolint --failure-threshold warning $files
+
+  actions:
+    name: GitHub Actions lint (actionlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: actionlint
+        run: |
+          curl -sSL -o download-actionlint.bash \
+            https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash
+          bash download-actionlint.bash 1.7.12
+          ./actionlint -color
 
   typescript:
     name: TypeScript quality gate
@@ -184,18 +198,14 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    needs: [detect, format, shell, dockerfile, typescript, golang, dotnet, rust, markdown, naming, specs-gate]
+    needs: [detect, format, shell, dockerfile, actions, typescript, golang, dotnet, rust, markdown, naming, specs-gate]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check all gates
         run: |
           echo "Checking quality gate results..."
-          FAILED=false
-          for job in shell dockerfile typescript golang dotnet rust markdown naming specs-gate; do
-            RESULT="${{ toJSON(needs) }}"
-            # A skipped job is OK (language not affected). Only failure blocks.
-          done
+          # A skipped job is OK (language not affected). Only an actual failure blocks.
           if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ]; then
             echo "One or more quality gate jobs failed"
             exit 1

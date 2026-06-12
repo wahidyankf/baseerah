@@ -349,6 +349,12 @@ pub(super) fn parse_hadolint_version(out: &str) -> String {
     parse_line_word(out, "Haskell Dockerfile Linter", 3, "")
 }
 
+/// Extracts the `actionlint` version from `actionlint --version` output
+/// (the version is the first line, e.g. `"1.7.12"`).
+pub(super) fn parse_actionlint_version(out: &str) -> String {
+    out.lines().next().unwrap_or("").trim().to_string()
+}
+
 /// Extracts the `jq` version from `jq --version` output
 /// (e.g. `"jq-1.8.1"` → `"1.8.1"`).
 pub(super) fn parse_jq_version(out: &str) -> String {

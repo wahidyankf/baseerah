@@ -190,16 +190,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — acceptance: hook runs hadolint; clean commit succeeds - _Done 2026-06-12: added staged-Dockerfile hadolint snippet to `.husky/pre-commit` (after the shellcheck snippet); runs `--failure-threshold warning` when hadolint present, skips with a doctor hint otherwise._
 - [x] [AI] Add `hadolint` to the toolchain converger (doctor `--fix` installs it)
       — acceptance: `npm run doctor` reports hadolint present - _Done 2026-06-12: added `parse_hadolint_version` (checker.rs), `install_hadolint` (brew on macOS, pinned v2.14.0 binary download on Linux), and a `hadolint` ToolDef. Count test 21→22 (+hadolint assertion). `npm run doctor` → 22/22 OK incl. hadolint v2.14.0._
-- [ ] [AI] Commit thematically: `git commit -m "ci(lint): add hadolint gate (warning threshold)"`
+- [x] [AI] Commit thematically: `git commit -m "ci(lint): add hadolint gate (warning threshold)"` - _Done 2026-06-12: commit `181b8e1` (10 files: 4 Dockerfile fixes + .hadolint.yaml + CI job + hook + doctor + delivery)._
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `hadolint --failure-threshold warning apps/*/Dockerfile apps/*/Dockerfile.integration`
-      — expected: exits 0
-- [ ] [AI] `test -f .hadolint.yaml` — expected: exits 0
-- [ ] [AI] `dockerfile` job present in `.github/workflows/pr-quality-gate.yml` `quality-gate.needs`
+- [x] [AI] `hadolint --failure-threshold warning apps/*/Dockerfile apps/*/Dockerfile.integration`
+      — expected: exits 0 — _Verified: exit 0 over all 17 apps+infra Dockerfiles (only info-level findings remain)._
+- [x] [AI] `test -f .hadolint.yaml` — expected: exits 0
+- [x] [AI] `dockerfile` job present in `.github/workflows/pr-quality-gate.yml` `quality-gate.needs`
+      — _Verified: `needs: [..., shell, dockerfile, ...]`._
 
 > **Pause Safety**: Dockerfiles are clean and the hadolint gate is live in CI + hooks. Safe to
 > stop. To resume: re-run the hadolint command above.
@@ -211,30 +212,33 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > 22 files under `.github/workflows/*.yml`. GitHub-hosted runners → runner-label config optional.
 > Clean-then-gate.
 
-- [ ] [AI] **RED**: run actionlint across all workflows to surface the backlog:
+- [x] [AI] **RED**: run actionlint across all workflows to surface the backlog:
       `actionlint`
       — acceptance: run from repo root; record every finding as the cleanup backlog (failing-gate
       state, gate not yet wired)
   - _Suggested executor: `ci-checker`_
-- [ ] [AI] **GREEN**: fix every actionlint finding in `.github/workflows/*.yml` (invalid
+  - _Done 2026-06-12 (actionlint 1.7.12, 22 workflow files). Backlog — all embedded-shellcheck findings, preexisting: SC2163 (export "$line") in \_reusable-backend-e2e; SC2034 unused `i` in \_reusable-test-and-deploy; SC2034 ×3 dead-code (FAILED/job/RESULT) in pr-quality-gate quality-gate job; SC2129 (grouped redirects) in pr-quality-gate detect + publish-images. No expression/syntax errors. My new `shell`/`dockerfile` jobs parse clean._
+- [x] [AI] **GREEN**: fix every actionlint finding in `.github/workflows/*.yml` (invalid
       expressions, shell quoting in `run:` steps, deprecated syntax)
       — command: `actionlint`
       — acceptance: exits 0
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] (Optional) Create `.github/actionlint.yaml` only if self-hosted runner labels or
+  - _Done 2026-06-12: SC2163 → inline `# shellcheck disable` w/ rationale (intentional KEY=value export); SC2034 unused `i` → `for _`; SC2034 ×3 → removed dead-code loop in pr-quality-gate quality-gate job (kept the real `contains(needs.\*.result,'failure')`check); SC2129 ×2 → grouped`{ … } >> "$GITHUB*OUTPUT"`. `actionlint` → **exit 0**.*
+- [x] [AI] (Optional) Create `.github/actionlint.yaml` only if self-hosted runner labels or
       config-variables need declaring; for `ose-public` (GitHub-hosted) this is likely unnecessary
       — acceptance: either the file is created with documented labels, OR the step is recorded as
-      "not needed for ose-public (GitHub-hosted runners)"
-- [ ] [AI] **REFACTOR (flip-on, CI)**: add an `actions` job to
+      "not needed for ose-public (GitHub-hosted runners)" - _Done 2026-06-12: NOT NEEDED — ose-public CI runs entirely on GitHub-hosted `ubuntu-latest`; no self-hosted runner labels or config-variables to declare. `actionlint` passes with zero config._
+- [x] [AI] **REFACTOR (flip-on, CI)**: add an `actions` job to
       `.github/workflows/pr-quality-gate.yml` running `actionlint`, and register `actions` in
       `quality-gate.needs` + the failure-check loop
       — acceptance: workflow parses; job listed in `quality-gate.needs`
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] **REFACTOR (flip-on, local)**: add the actionlint invocation to `.husky/pre-commit`
+  - _Done 2026-06-12: added `actions` job (pins actionlint 1.7.12 via the official `download-actionlint.bash`) after `dockerfile`; registered `actions` in `quality-gate.needs`. (The legacy dead-code `for job` loop was removed during GREEN; the real gate check is `contains(needs.*.result,'failure')`, which covers `actions` automatically.) `actionlint` exits 0 including the new job._
+- [x] [AI] **REFACTOR (flip-on, local)**: add the actionlint invocation to `.husky/pre-commit`
       scoped to changed workflow files
-      — acceptance: hook runs actionlint; clean commit succeeds
-- [ ] [AI] Add `actionlint` to the toolchain converger (doctor `--fix` installs it)
-      — acceptance: `npm run doctor` reports actionlint present
+      — acceptance: hook runs actionlint; clean commit succeeds - _Done 2026-06-12: added staged-workflow actionlint snippet to `.husky/pre-commit` (after the hadolint snippet); lints staged `.github/workflows/*.ya?ml` when actionlint present, skips with a doctor hint otherwise._
+- [x] [AI] Add `actionlint` to the toolchain converger (doctor `--fix` installs it)
+      — acceptance: `npm run doctor` reports actionlint present - _Done 2026-06-12: added `parse_actionlint_version` (checker.rs), `install_actionlint` (brew on macOS, pinned 1.7.12 download script on Linux), and an `actionlint` ToolDef. Count test 22→23 (+actionlint assertion). `npm run doctor` → 23/23 OK incl. actionlint v1.7.12._
 - [ ] [AI] Commit thematically: `git commit -m "ci(lint): add actionlint gate"`
 
 ### Phase 4 Gate

@@ -79,7 +79,7 @@ jobs:
           if [ -z "$HEALTH_URL" ]; then
             HEALTH_URL="http://localhost:3100"
           fi
-          for i in $(seq 1 $(( ${{ inputs.health-timeout }} / 5 ))); do
+          for _ in $(seq 1 $(( ${{ inputs.health-timeout }} / 5 ))); do
             if curl -s "$HEALTH_URL" > /dev/null 2>&1; then break; fi
             sleep 5
           done

@@ -9,13 +9,14 @@ use std::path::{Path, PathBuf};
 use super::ToolStatus;
 use super::checker::{
     compare_exact, compare_gte, compare_major, compare_major_gte, compare_playwright,
-    parse_cargo_llvm_cov, parse_clojure_version, parse_dart_version, parse_docker_version,
-    parse_dotnet_version, parse_elixir_version, parse_erlang_version, parse_flutter_version,
-    parse_golangci_lint_version, parse_hadolint_version, parse_java_version, parse_jq_version,
-    parse_line_word, parse_playwright_version, parse_python_version, parse_rust_version,
-    parse_shellcheck_version, parse_trim_version, read_dart_sdk_version, read_dotnet_version,
-    read_flutter_version, read_go_version, read_java_version, read_node_version, read_npm_version,
-    read_python_version, read_rust_version, read_tool_versions_entry,
+    parse_actionlint_version, parse_cargo_llvm_cov, parse_clojure_version, parse_dart_version,
+    parse_docker_version, parse_dotnet_version, parse_elixir_version, parse_erlang_version,
+    parse_flutter_version, parse_golangci_lint_version, parse_hadolint_version, parse_java_version,
+    parse_jq_version, parse_line_word, parse_playwright_version, parse_python_version,
+    parse_rust_version, parse_shellcheck_version, parse_trim_version, read_dart_sdk_version,
+    read_dotnet_version, read_flutter_version, read_go_version, read_java_version,
+    read_node_version, read_npm_version, read_python_version, read_rust_version,
+    read_tool_versions_entry,
 };
 
 /// A single step in an auto-install sequence.
@@ -541,6 +542,28 @@ fn install_shellcheck(_req: &str, platform: &str) -> Vec<InstallStep> {
     }
 }
 
+/// Returns install steps for `actionlint` (Homebrew on macOS; pinned download
+/// script on Linux, where no apt package is published).
+fn install_actionlint(_req: &str, platform: &str) -> Vec<InstallStep> {
+    if platform == "darwin" {
+        vec![InstallStep {
+            description: "Install actionlint via Homebrew".into(),
+            command: "brew".into(),
+            args: vec!["install".into(), "actionlint".into()],
+        }]
+    } else {
+        vec![InstallStep {
+            description: "Install actionlint via the official download script".into(),
+            command: "sudo".into(),
+            args: vec![
+                "bash".into(),
+                "-c".into(),
+                "curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash | bash -s -- 1.7.12 /usr/local/bin".into(),
+            ],
+        }]
+    }
+}
+
 /// Returns install steps for `hadolint` (Homebrew on macOS; pinned binary
 /// download on Linux, where no apt package is published).
 fn install_hadolint(_req: &str, platform: &str) -> Vec<InstallStep> {
@@ -829,7 +852,7 @@ fn tool_defs_dotnet_and_mobile() -> Vec<ToolDef> {
 }
 
 /// Returns tool definitions for infrastructure: `docker`, `jq`, `golangci-lint`,
-/// `shellcheck`, `hadolint`, `playwright`.
+/// `shellcheck`, `hadolint`, `actionlint`, `playwright`.
 fn tool_defs_infra() -> Vec<ToolDef> {
     vec![
         ToolDef {
@@ -888,6 +911,17 @@ fn tool_defs_infra() -> Vec<ToolDef> {
             install_cmd: Some(install_hadolint),
         },
         ToolDef {
+            name: "actionlint".into(),
+            binary: "actionlint".into(),
+            source: "(no config file)".into(),
+            args: vec!["--version".into()],
+            use_stderr: false,
+            parse_ver: parse_actionlint_version,
+            compare: compare_exact,
+            read_req: no_req,
+            install_cmd: Some(install_actionlint),
+        },
+        ToolDef {
             name: "playwright".into(),
             binary: "npx".into(),
             source: "node_modules (npx playwright)".into(),
@@ -910,11 +944,12 @@ mod tests {
     fn build_returns_all_known_tools() {
         let dir = tempfile::tempdir().unwrap();
         let defs = build_tool_defs(dir.path());
-        assert_eq!(defs.len(), 22);
+        assert_eq!(defs.len(), 23);
         assert_eq!(defs[0].name, "git");
         assert_eq!(defs.last().unwrap().name, "playwright");
         assert!(defs.iter().any(|d| d.name == "shellcheck"));
         assert!(defs.iter().any(|d| d.name == "hadolint"));
+        assert!(defs.iter().any(|d| d.name == "actionlint"));
     }
 
     #[test]

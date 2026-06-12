@@ -25,4 +25,16 @@ if [ -n "$staged_df" ]; then
   fi
 fi
 
+# actionlint changed GitHub Actions workflows. CI's `actions` job is the hard
+# gate; locally we lint when actionlint is installed and skip with a hint
+# otherwise so a fresh checkout can still commit before `doctor --fix` runs.
+staged_wf=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^\.github/workflows/.*\.ya?ml$' || true)
+if [ -n "$staged_wf" ]; then
+  if command -v actionlint >/dev/null 2>&1; then
+    echo "$staged_wf" | xargs actionlint
+  else
+    echo "actionlint not found — skipping local workflow lint (run: npm run doctor -- --fix). CI will enforce."
+  fi
+fi
+
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- git pre-commit
