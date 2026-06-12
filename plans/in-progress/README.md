@@ -4,9 +4,10 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                       | Description                                                                                                          |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| [standardize-ci-parity](./standardize-ci-parity/README.md) | Standardize GitHub Actions CI to full parity (except runner target) with ose-infra; anchor of a two-repo sibling set |
+| Plan                                                       | Description                                                                                                                                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [standardize-ci-parity](./standardize-ci-parity/README.md) | Standardize GitHub Actions CI to full parity (except runner target) with ose-infra; anchor of a two-repo sibling set                                                                 |
+| [lint-safety-parity](./lint-safety-parity/README.md)       | Lint/safety strictness parity across ose-public/ose-primer/ose-infra; ose-public covers F# strict (D2), hadolint (D6), shellcheck (D7), actionlint (D8), dead-golangci removal (D10) |
 
 ## Instructions
 
