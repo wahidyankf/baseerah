@@ -4,10 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                             | Description                                                                                                                                                         |
-| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [standardize-ci-parity](./standardize-ci-parity/README.md)                       | Standardize GitHub Actions CI to full parity (except runner target) with ose-infra; anchor of a two-repo sibling set                                                |
-| [mermaid-state-diagram-validation](./mermaid-state-diagram-validation/README.md) | Extend rhino-cli validate-mermaid width/label rules to state diagrams; unify the validator onto a fresh shared module design across ose-public/ose-primer/ose-infra |
+| Plan                                                                               | Description                                                                                                                                                                                                                                                                    |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [standardize-repo-toolchain-parity](./standardize-repo-toolchain-parity/README.md) | Converge the whole repo toolchain (CI, git hooks, rhino-cli hexagonal arch + union commands, `{domain}:{work}` targets, Mermaid state-diagram validation, governance docs) across ose-public/ose-infra/ose-primer; A/B/E/F parallel-safe, C/D/G reference-first (public leads) |
 
 ## Instructions
 
