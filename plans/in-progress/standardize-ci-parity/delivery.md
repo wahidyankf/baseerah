@@ -1,4 +1,4 @@
-# Delivery — Standardize CI Parity (ose-public anchor)
+# Delivery — Standardize CI Parity (ose-public)
 
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
@@ -8,9 +8,12 @@
 > `> **Pause Safety**:` note (the safe-to-stop state and the single command to resume). A phase
 > is not complete until its gate is green; do not start phase N+1 while any gate check fails.
 
-This checklist delivers **only ose-public's** convergence changes. The action-version bumps,
-reusable-workflow adoption, and `nx affected` migration on the **ose-infra** side belong to the
-sibling plan and are referenced, not executed here. See
+This checklist delivers **only ose-public's** convergence changes. This plan is **independently
+runnable and parallel-safe** with its two sibling plans (`ose-infra`, `ose-primer`): the
+[Converged CI Target](./tech-docs.md#converged-ci-target-shared-across-the-three-repo-sibling-set)
+is a fixed static spec, so no sibling plan must finish first. The siblings' own gaps (ose-infra's
+action-version bumps, reusable-workflow extraction, `infra-lint` split; ose-primer's `specs-gate`
+addition) belong to their own repos and are referenced, not executed here. See
 [tech-docs.md § Deviation Matrix](./tech-docs.md#deviation-matrix).
 
 ## Worktree
@@ -82,7 +85,9 @@ _Suggested executor: `ci-fixer`_
 
 - [ ] [AI] **RED**: assert `run-many` still present in the per-language jobs:
       `grep -n "nx run-many -t typecheck lint test:quick spec-coverage" .github/workflows/pr-quality-gate.yml`
-      — acceptance: matches the Go, .NET, and Rust job lines (3 hits at lines ~93/109/125).
+      — acceptance: matches the Go, F#/.NET, and Rust job lines (3 hits at lines ~133 (golang),
+      ~149 (fsharp,csharp), ~165 (rust)). The single-project `specs-gate` `validate:specs-*`
+      `run-many` at line ~197 is a separate, intentionally-kept match and is NOT one of these three.
 - [ ] [AI] **GREEN**: in `.github/workflows/pr-quality-gate.yml`, change the Go job command from
       `npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:golang'`
       to `npx nx affected -t typecheck lint test:quick spec-coverage --projects='tag:lang:golang'`
@@ -176,7 +181,64 @@ concurrency:
 > and the change is committed. Safe to stop. To resume: re-run the `grep -l "concurrency:"` count
 > and confirm the commit is present.
 
-## Phase 3: Validator-set parity — `validate:gherkin-keyword-cardinality`
+## Phase 3: Lint-gate job rename to the tool-named scheme
+
+Rename ose-public's three category-named lint-gate jobs — `shell`, `dockerfile`, `actions` — to the
+converged **tool-named** scheme `shellcheck`, `hadolint`, `actionlint` (the scheme `ose-primer`
+already ships, canonical across the three-repo set). This is a **pure rename**: the same three
+linters run at the same warning-and-above thresholds against the same file sets; only the job
+identifiers change. Every reference must move with the rename — `quality-gate.needs` in
+`pr-quality-gate.yml` and the "CI job" column of `cross-language-lint-strictness.md` (see
+[tech-docs.md § D6](./tech-docs.md#d6--lint-gate-job-rename-to-the-tool-named-scheme)).
+
+_Suggested executor: `ci-fixer`_
+
+- [ ] [AI] **RED**: assert the category-named lint jobs still exist:
+      `grep -nE '^  (shell|dockerfile|actions):' .github/workflows/pr-quality-gate.yml`
+      — acceptance: matches the three job keys `shell:` (~L66), `dockerfile:` (~L78),
+      `actions:` (~L92).
+- [ ] [AI] **GREEN**: in `.github/workflows/pr-quality-gate.yml`, rename the three job keys:
+      `shell:` → `shellcheck:`, `dockerfile:` → `hadolint:`, `actions:` → `actionlint:`
+      — acceptance: the three new job keys are present; the three old keys are gone.
+- [ ] [AI] **GREEN — update `quality-gate.needs`**: in the same file, change the `needs:` list of
+      the `quality-gate` job from `[detect, format, shell, dockerfile, actions, typescript, golang, dotnet, rust, markdown, naming, specs-gate]`
+      to `[detect, format, shellcheck, hadolint, actionlint, typescript, golang, dotnet, rust, markdown, naming, specs-gate]`
+      — acceptance: `grep -n "shell\|dockerfile\|actions" pr-quality-gate.yml` no longer matches the
+      old job names anywhere (job keys or `needs`); only the new tool names appear.
+- [ ] [AI] **GREEN — update the governance doc's "CI job" column**: in
+      `repo-governance/development/quality/cross-language-lint-strictness.md`, change the `shell` /
+      `dockerfile` / `actions` job-name references in the "CI job" column to `shellcheck` /
+      `hadolint` / `actionlint`
+      — acceptance: `grep -nE 'shellcheck|hadolint|actionlint' cross-language-lint-strictness.md`
+      matches the updated column; the old category names no longer appear as CI-job references.
+- [ ] [AI] **REFACTOR**: confirm no dangling references to the old job names remain repo-wide in CI
+      surfaces: `grep -rnE '\b(shell|dockerfile|actions):' .github/workflows/` returns no
+      lint-gate-job match, and `actionlint .github/workflows/pr-quality-gate.yml` (if available)
+      reports the `needs` graph as consistent (every name in `needs` is a declared job)
+      — acceptance: actionlint clean (or `prettier --check` clean fallback) and no stale references.
+- [ ] [AI] Lint the workflow: `actionlint .github/workflows/pr-quality-gate.yml` if available, else
+      `npx prettier --check .github/workflows/pr-quality-gate.yml` — acceptance: exits 0.
+
+### Phase 3 Gate
+
+> All checks below must pass before starting Phase 4.
+
+- [ ] [AI] `grep -nE '^  (shellcheck|hadolint|actionlint):' .github/workflows/pr-quality-gate.yml`
+      — expected: all three new job keys present.
+- [ ] [AI] `grep -n "needs:" .github/workflows/pr-quality-gate.yml` for the `quality-gate` job lists
+      `shellcheck, hadolint, actionlint` and no longer lists `shell, dockerfile, actions`
+      — expected: `needs` is consistent with the renamed jobs.
+- [ ] [AI] `grep -nE 'shellcheck|hadolint|actionlint' repo-governance/development/quality/cross-language-lint-strictness.md`
+      — expected: the "CI job" column now uses the tool-named jobs.
+- [ ] [AI] Workflow lints clean (`actionlint` or `prettier --check`) — expected: exits 0.
+- [ ] [AI] Commit thematically:
+      `rtk git commit -m "ci(pr-gate): rename lint jobs to tool-named scheme (shellcheck/hadolint/actionlint)"`.
+
+> **Pause Safety**: the three lint-gate jobs are renamed, `quality-gate.needs` and the governance
+> doc reference them by their new tool names, the workflow lints clean, and the change is committed.
+> Safe to stop. To resume: re-run the three grep checks above and confirm the commit is present.
+
+## Phase 4: Validator-set parity — `validate:gherkin-keyword-cardinality`
 
 Create the `validate:gherkin-keyword-cardinality` Nx target wrapping the already-shipped
 `rhino-cli repo-governance gherkin-keyword-cardinality` command, then wire it into
@@ -213,9 +275,9 @@ _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Lint the workflow: `actionlint .github/workflows/validate-markdown.yml` if available,
       else `npx prettier --check .github/workflows/validate-markdown.yml` — acceptance: exits 0.
 
-### Phase 3 Gate
+### Phase 4 Gate
 
-> All checks below must pass before starting Phase 4.
+> All checks below must pass before starting Phase 5.
 
 - [ ] [AI] `npx nx run rhino-cli:validate:gherkin-keyword-cardinality` — expected: exits 0 (green
       on the current tree).
@@ -228,7 +290,7 @@ _Suggested executor: `swe-rust-dev`_
 > `validate-markdown.yml`; the change is committed. Safe to stop. To resume: re-run the target and
 > confirm green, then confirm the commit is present.
 
-## Phase 4: Governance — `ci-conventions.md` converged + CI Parity Checklist
+## Phase 5: Governance — `ci-conventions.md` converged + CI Parity Checklist
 
 Bring `ci-conventions.md` into sync with the converged standard and add a **CI Parity Checklist**
 section (see [tech-docs.md § D5](./tech-docs.md#d5--governance-alignment--ci-parity-checklist)).
@@ -252,10 +314,15 @@ _Suggested executor: `repo-rules-maker`_
       — acceptance: the canonical YAML block is present in the doc.
 - [ ] [AI] Add a new `## CI Parity Checklist` section to
       `ci-conventions.md` enumerating the parity invariants (all per-language PR-gate jobs use
-      `nx affected`; every PR/validator/scheduled workflow declares a concurrency group; both repos
-      run the same validator set including `gherkin-keyword-cardinality`; action majors are current)
-      AND recording the accepted deviations (runner target, .NET detection, npm flag, setup-docker)
-      with their rationale — acceptance: the section lists invariants and deviations.
+      `nx affected`; every PR/validator/scheduled workflow declares a concurrency group; the
+      lint-gate jobs use the **tool-named** scheme `shellcheck`/`hadolint`/`actionlint` — cross-
+      reference
+      [`cross-language-lint-strictness.md`](../../../repo-governance/development/quality/cross-language-lint-strictness.md)
+      whose "CI job" column must match these names; all three repos run the same validator set
+      including `gherkin-keyword-cardinality`; action majors are current) AND recording the accepted
+      deviations (runner target, language matrix, npm flag, setup-docker, Rust toolchain action,
+      infra-only `iac-lint`) with their rationale — acceptance: the section lists the invariants
+      (including the lint-gate-job-name dimension with the cross-reference) and the deviations.
 - [ ] [AI] Evaluate `.claude/agents/ci-checker.md` for parity checks (e.g., "concurrency group
       present", "no per-language `run-many`"). If they
       fit the agent's deterministic-check shape, add them to the Validation Checks list; otherwise
@@ -268,14 +335,16 @@ _Suggested executor: `repo-rules-maker`_
       — acceptance: exits 0; `.opencode/` / `.amazonq/` mirrors regenerated with no parity-guard
       failure.
 
-### Phase 4 Gate
+### Phase 5 Gate
 
-> All checks below must pass before starting Phase 5.
+> All checks below must pass before starting Phase 6.
 
 - [ ] [AI] `grep -n "nx affected" repo-governance/development/infra/ci-conventions.md` — expected:
       the per-language PR-gate standard now reads `nx affected`.
 - [ ] [AI] `grep -n "CI Parity Checklist" repo-governance/development/infra/ci-conventions.md` —
       expected: the new section heading is present.
+- [ ] [AI] `grep -nE 'shellcheck|hadolint|actionlint' repo-governance/development/infra/ci-conventions.md`
+      — expected: the CI Parity Checklist enumerates the tool-named lint-gate dimension.
 - [ ] [AI] `npx nx run rhino-cli:validate:links` and `:validate:heading-hierarchy` and
       `:validate:mermaid` — expected: all exit 0.
 - [ ] [AI] If bindings changed: `npm run generate:bindings` exits 0 with no parity-guard failure.
@@ -288,7 +357,7 @@ _Suggested executor: `repo-rules-maker`_
 > Checklist, doc validators pass, bindings are in sync, and the changes are committed. Safe to stop.
 > To resume: re-run the doc validators and confirm the commits are present.
 
-## Phase 5: Final Quality Gate + Commit + Push + CI Verify + Archival
+## Phase 6: Final Quality Gate + Commit + Push + CI Verify + Archival
 
 ### Local Quality Gates (Before Push)
 
@@ -341,7 +410,7 @@ _Suggested executor: `repo-rules-maker`_
 - [ ] [AI] Commit the archival: `rtk git commit -m "chore(plans): move standardize-ci-parity to done"`
       and push to `origin main`.
 
-### Phase 5 Gate
+### Phase 6 Gate
 
 > All checks below must pass to consider the plan complete.
 
@@ -349,7 +418,8 @@ _Suggested executor: `repo-rules-maker`_
 - [ ] [AI] Full validator set runs green locally (gherkin-keyword-cardinality, links, mermaid,
       heading-hierarchy, env) — expected: all exit 0.
 - [ ] [AI] `gh run view --json status,conclusion` on the latest `main` runs — expected: all
-      `conclusion: success`.
+      `conclusion: success`; confirm the renamed lint jobs (`shellcheck`/`hadolint`/`actionlint`)
+      and the new `gherkin-keyword-cardinality` step all ran and are green.
 - [ ] [AI] Plan folder moved under `plans/done/<completion-date>__standardize-ci-parity/`
       (`ls plans/done/ | grep standardize-ci-parity` returns exactly one dated entry) and the index
       READMEs are updated — expected: `git status` clean after the archival commit is pushed.

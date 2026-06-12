@@ -1,4 +1,4 @@
-# Tech Docs — Standardize CI Parity (ose-public anchor)
+# Tech Docs — Standardize CI Parity (ose-public)
 
 This document explains **how** the convergence is built. The **why** lives in [brd.md](./brd.md);
 the **what** lives in [prd.md](./prd.md). All claims are labeled with confidence; `[Repo-grounded]`
@@ -17,68 +17,82 @@ claims were verified against the current worktree, `[Web-cited]` against externa
 - `ci-checker` agent: [.claude/agents/ci-checker.md](../../../.claude/agents/ci-checker.md)
 - `ci-fixer` agent: [.claude/agents/ci-fixer.md](../../../.claude/agents/ci-fixer.md)
 
-## Current-State Divergences
+## Converged CI Target (shared across the three-repo sibling set)
 
-The complete divergence table across both repos, with the converged target end-state. The
-**Owner** column states which plan delivers the change (anchor = this plan; sibling = ose-infra's
-plan; neither = recorded deviation). All `now` values for ose-public are `[Repo-grounded]`; the
-ose-infra `now` values are stated from the user-provided current-state inventory and tagged
-`[Provided — verify in sibling]`.
+This is the **fixed end-state** every sibling plan converges to. It is a **static
+specification** — not a moving target produced by another plan — so **no plan depends on
+another finishing first**. Each repo converges independently and **all three plans are safe
+to execute in parallel**. The three plans embed this same target verbatim; per-repo
+differences are recorded in the [Deviation Matrix](#deviation-matrix).
 
-| Dimension                  | ose-public (now)                       | ose-infra (now)                              | Target end-state                                          | Owner                |
-| -------------------------- | -------------------------------------- | -------------------------------------------- | --------------------------------------------------------- | -------------------- |
-| Runners                    | all `ubuntu-latest`                    | all `[self-hosted, linux, ose-infra-runner]` | KEEP per-repo (accepted deviation)                        | Neither              |
-| Reusable workflows         | 7 `_reusable-*.yml`                    | none (monolithic test workflow)              | ose-infra adopts reusable-workflow pattern                | Sibling              |
-| Non-TS test invocation     | `nx run-many --projects=tag:lang:*`    | `nx affected --projects=tag:lang:*`          | BOTH use `nx affected`                                    | Anchor               |
-| PR-gate extra jobs         | has `naming` + `specs-gate`            | absent                                       | ose-infra adds equivalents where applicable               | Sibling              |
-| Validator set              | no `gherkin-keyword-cardinality` in CI | has it                                       | both run the same validator set                           | Anchor               |
-| GH Actions action versions | current majors (`@v6`/`@v5`)           | `@v4` (2 majors behind)                      | ose-infra bumps to current majors                         | Sibling              |
-| Concurrency groups         | none                                   | present (cancel-in-progress)                 | both use the canonical pattern                            | Anchor (public side) |
-| .NET language detection    | present (TS/Go/.NET/Rust)              | absent (TS/Go/Rust — no .NET)                | RECORDED deviation: detection matrix differs by portfolio | Neither              |
-| npm install flag           | `npm ci`                               | `npm ci --ignore-scripts`                    | accepted self-hosted deviation (see below)                | Neither              |
-| setup-docker composite     | absent (ubuntu has docker)             | present (self-hosted needs it)               | accepted deviation tied to runner choice                  | Neither              |
-| Scheduled cadence          | 2x daily (06:00/18:00 WIB)             | 1x daily                                     | align ose-infra to 2x WIB                                 | Sibling              |
+There is **no single anchor repo**. The target is the best-of-breed union across the three
+pipelines as of 2026-06-12: `ose-primer` already ships the tool-named lint jobs and the
+gherkin target; `ose-public` already ships current action majors; `ose-infra` already runs
+`nx affected`. Each repo leads on some dimensions and trails on others.
 
-`[Repo-grounded]` evidence for ose-public `now` values: `pr-quality-gate.yml:93,109,125`
-(run-many), absence of any `concurrency:` line across `.github/workflows/`, absence of a
-`validate:gherkin-keyword-cardinality` target in `apps/rhino-cli/project.json`, presence of
-`actions/checkout@v6` / `setup-dotnet@v5` throughout, and `setup-node` composite action running
-plain `npm ci`.
+Sibling plans (same slug in each repo):
+
+- `ose-public` — `plans/in-progress/standardize-ci-parity/`
+  (<https://github.com/wahidyankf/ose-public/tree/main/plans/in-progress/standardize-ci-parity>)
+- `ose-infra` (private) — `plans/in-progress/standardize-ci-parity/`
+- `ose-primer` — `plans/in-progress/standardize-ci-parity/`
+  (<https://github.com/wahidyankf/ose-primer/tree/main/plans/in-progress/standardize-ci-parity>)
+
+| Dimension                              | Converged target end-state                                                                                                                             |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `actions/checkout` major               | `@v6`                                                                                                                                                  |
+| Non-TS PR-gate test semantics          | `nx affected` (single-project governance gates such as `specs-gate` may keep `run-many`)                                                               |
+| `validate:gherkin-keyword-cardinality` | Nx target present **and** wired into the markdown validator workflow                                                                                   |
+| Reusable-workflow pattern              | adopted (`_reusable-*.yml` + thin callers)                                                                                                             |
+| Concurrency                            | canonical block on every workflow: `group: ${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: ${{ github.event_name == 'pull_request' }}` |
+| Lint-gate jobs                         | three **tool-named** jobs: `shellcheck`, `hadolint`, `actionlint`                                                                                      |
+| Governance jobs                        | `naming` (where `.claude/agents/` exists) + `specs-gate` (where `specs/` exists)                                                                       |
+| Scheduled cadence                      | twice-daily WIB — `0 23 * * *` (06:00 WIB) and `0 11 * * *` (18:00 WIB) — for scheduled test/deploy workflows                                          |
+| `ci-conventions.md`                    | carries a `## CI Parity Checklist` enumerating the invariants above and recording the deviations                                                       |
+
+### Convergence status per repo (baseline 2026-06-12)
+
+| Dimension                              | ose-public                                  | ose-infra                           | ose-primer                           |
+| -------------------------------------- | ------------------------------------------- | ----------------------------------- | ------------------------------------ |
+| `checkout@v6`                          | done                                        | gap — `@v4` → bump                  | done                                 |
+| Non-TS `nx affected`                   | gap — `run-many` → affected                 | done                                | done                                 |
+| `gherkin-keyword-cardinality` target   | gap — add + wire                            | done                                | done                                 |
+| Reusable workflows                     | done                                        | gap — extract monolith              | done                                 |
+| Concurrency (canonical, all workflows) | gap — add (0 today)                         | gap — add pr-gate + align 3 drifted | gap — add (0 today)                  |
+| Lint jobs tool-named                   | gap — rename `shell`/`dockerfile`/`actions` | gap — split `infra-lint`            | done — reference scheme              |
+| `naming` + `specs-gate`                | done — both                                 | gap — add both                      | gap — has `naming`; add `specs-gate` |
+| Scheduled cadence 2× WIB               | done                                        | gap — align 1× → 2×                 | confirm/align per-language workflows |
+
+Legend: _done_ = already at target (confirm only) · _gap_ = closed by this repo's plan.
 
 ## Deviation Matrix
 
-These divergences are **intentionally not converged**. Each respects a genuine per-repo
-constraint. They are recorded so a reader knows they are decisions, not drift.
+Intentional per-repo differences — **recorded, not converged**. Each respects a genuine
+per-repo constraint.
 
-| Deviation               | ose-public                | ose-infra                                | Rationale                                                                                                                      |
-| ----------------------- | ------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Runner target           | `ubuntu-latest`           | `[self-hosted, linux, ose-infra-runner]` | public wants ephemeral, no-infra-dependency runners; infra needs warm Docker/Terraform/Ansible tooling + on-prem network reach |
-| .NET language detection | present (TS/Go/.NET/Rust) | absent (TS/Go/Rust)                      | detection matrix follows each repo's actual language portfolio; infra has no .NET surface                                      |
-| npm install flag        | `npm ci`                  | `npm ci --ignore-scripts`                | self-hosted runners harden against arbitrary lifecycle scripts; ephemeral ubuntu does not need it                              |
-| setup-docker composite  | absent                    | present                                  | ubuntu-latest ships Docker; self-hosted runner must install/warm it                                                            |
-
-**Self-hosted + fork-PR note** [Web-cited — GitHub security-hardening docs,
-<https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions>,
-accessed 2026-06-11; excerpt: "Self-hosted runners should almost never be used for public
-repositories ... any user can open pull requests against the repository and compromise the
-environment"]:
-GitHub warns that self-hosted runners should almost never run untrusted fork-PR code, recommending
-ephemeral runners for public repos. `ose-infra` is **private**, so the fork-PR risk is materially
-lower, but the sibling plan should record the ephemeral-runner guidance as a note. This anchor
-(public) repo uses `ubuntu-latest`, so the concern does not apply here.
+| Deviation                                             | ose-public                                  | ose-infra                                | ose-primer                                                             | Rationale                                                                                             |
+| ----------------------------------------------------- | ------------------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Runner target                                         | `ubuntu-latest`                             | `[self-hosted, linux, ose-infra-runner]` | `ubuntu-latest`                                                        | infra needs warm Docker/Terraform/Ansible + on-prem reach; public/primer use ephemeral hosted runners |
+| Language matrix                                       | TS + Go + F#/.NET + Rust                    | TS + Go + Rust                           | full polyglot (TS, Go, JVM, .NET, Python, Rust, Elixir, Clojure, Dart) | detection follows each repo's real portfolio; primer is the polyglot template                         |
+| `npm` install flag                                    | `npm ci`                                    | `npm ci --ignore-scripts`                | `npm ci`                                                               | self-hosted hardening on the persistent infra runner                                                  |
+| `setup-docker` composite                              | absent                                      | present                                  | absent                                                                 | hosted runners ship Docker; self-hosted must warm it                                                  |
+| Rust toolchain action                                 | `actions-rust-lang/setup-rust-toolchain@v1` | `dtolnay/rust-toolchain@stable`          | `actions-rust-lang/setup-rust-toolchain@v1`                            | existing infra composite; kept to avoid churn                                                         |
+| IaC lint job (`iac-lint`: terraform/ansible/yamllint) | absent                                      | present                                  | absent                                                                 | infra-only — terraform/ansible/yaml surface exists only in ose-infra                                  |
 
 ## Design Decisions
 
 ### D1 — Converge to `nx affected` for all per-language PR-gate jobs
 
-ose-public's PR gate already uses `nx affected` for TypeScript [Repo-grounded —
-`pr-quality-gate.yml:77`] but `nx run-many --projects=tag:lang:*` for Go, .NET, and Rust
-[Repo-grounded — lines 93/109/125]. The convergence replaces `run-many` with `affected` on those
-three jobs, keeping the identical target list (`typecheck lint test:quick spec-coverage`) and the
-identical project-tag scoping via the affected graph.
+ose-public's PR gate already uses `nx affected` for TypeScript but
+`nx run-many --projects=tag:lang:*` for Go, F#/.NET, and Rust [Repo-grounded — the three
+per-language `run-many` jobs at lines ~133 (golang), ~149 (fsharp,csharp), ~165 (rust)]. The
+convergence replaces `run-many` with `affected` on those three jobs, keeping the identical target
+list (`typecheck lint test:quick spec-coverage`) and the identical project-tag scoping via the
+affected graph.
 
-The `specs-gate` job's `nx run-many ... --projects=rhino-cli` [Repo-grounded —
-`pr-quality-gate.yml:157`] is a **single-project deterministic governance gate**, not a
+The `specs-gate` job's `nx run-many ... --projects=rhino-cli` (the kept `validate:specs-*`
+single-project `run-many` at line ~197) [Repo-grounded] is a **single-project deterministic
+governance gate**, not a
 per-language affected job, and is **left intact** — "all per-language PR-gate jobs" does not include
 the single-project rhino-cli specs gate.
 
@@ -148,31 +162,54 @@ step alongside the existing mermaid/links/heading-hierarchy steps.
 
 ### D5 — Governance alignment + CI Parity Checklist
 
-`ci-conventions.md` is the standard both repos align to. This plan updates it so the PR-gate
-per-language semantics read `nx affected` (not `run-many`), documents the canonical concurrency
-pattern, and adds a new **CI Parity Checklist** section enumerating the parity invariants. The
-checklist explicitly records the runner / .NET-detection / npm-flag / setup-docker deviations so
-they read as decisions. The `ci-checker` agent is evaluated for new parity checks (e.g., "every PR
+`ci-conventions.md` is the standard all three sibling repos align to. This plan updates it so the
+PR-gate per-language semantics read `nx affected` (not `run-many`), documents the canonical
+concurrency pattern, documents the tool-named lint-gate jobs (cross-referencing
+`cross-language-lint-strictness.md`), and adds a new **CI Parity Checklist** section enumerating the
+parity invariants. The checklist explicitly records the runner / language-matrix / npm-flag /
+setup-docker / Rust-toolchain / infra-only `iac-lint` deviations so they read as decisions. The `ci-checker` agent is evaluated for new parity checks (e.g., "every PR
 workflow declares a concurrency group", "no per-language PR-gate job uses `run-many`"); additions
 are made only if they fit the agent's existing deterministic-check shape.
 
+### D6 — Lint-gate job rename to the tool-named scheme
+
+ose-public's three lint-gate jobs are **category-named**: `shell` (L66), `dockerfile` (L78), and
+`actions` (L92) [Repo-grounded]. The converged target uses the **tool-named** scheme —
+`shellcheck`, `hadolint`, `actionlint` — which is the scheme `ose-primer` already ships, adopted as
+the canonical naming across the three-repo set. This plan renames the three jobs and updates every
+reference to them:
+
+- `quality-gate.needs` lists `shell, dockerfile, actions` today; these become
+  `shellcheck, hadolint, actionlint`.
+- The "CI job" column of
+  [`cross-language-lint-strictness.md`](../../../repo-governance/development/quality/cross-language-lint-strictness.md)
+  currently references the `shell`/`dockerfile`/`actions` job names; it is updated to the tool-named
+  jobs.
+
+This is a **pure rename — no behavior change**: the same three linters (`shellcheck`, `hadolint`,
+`actionlint`) run at the same warning-and-above thresholds against the same file sets; only the job
+identifiers change so the three sibling pipelines read identically.
+
 ## File Impact
 
-| File                                                          | Change                                                         | Phase |
-| ------------------------------------------------------------- | -------------------------------------------------------------- | ----- |
-| `.github/workflows/pr-quality-gate.yml`                       | run-many → affected (Go/.NET/Rust jobs); add concurrency block | 1, 2  |
-| `.github/workflows/validate-markdown.yml`                     | add gherkin-keyword-cardinality step; add concurrency block    | 2, 3  |
-| `.github/workflows/validate-env.yml`                          | add concurrency block                                          | 2     |
-| `.github/workflows/test-and-deploy-*.yml` (scheduled quartet) | add concurrency block                                          | 2     |
-| `apps/rhino-cli/project.json`                                 | new `validate:gherkin-keyword-cardinality` target              | 3     |
-| `repo-governance/development/infra/ci-conventions.md`         | converged standard text + new CI Parity Checklist section      | 4     |
-| `.claude/agents/ci-checker.md`                                | parity-check additions (if warranted)                          | 4     |
+| File                                                                    | Change                                                                                                                                                                               | Phase   |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `.github/workflows/pr-quality-gate.yml`                                 | run-many → affected (Go/.NET/Rust jobs); add concurrency block; rename lint jobs `shell`/`dockerfile`/`actions` → `shellcheck`/`hadolint`/`actionlint` + update `quality-gate.needs` | 1, 2, 3 |
+| `.github/workflows/validate-markdown.yml`                               | add gherkin-keyword-cardinality step; add concurrency block                                                                                                                          | 2, 4    |
+| `.github/workflows/validate-env.yml`                                    | add concurrency block                                                                                                                                                                | 2       |
+| `.github/workflows/test-and-deploy-*.yml` (scheduled quartet)           | add concurrency block                                                                                                                                                                | 2       |
+| `apps/rhino-cli/project.json`                                           | new `validate:gherkin-keyword-cardinality` target                                                                                                                                    | 4       |
+| `repo-governance/development/quality/cross-language-lint-strictness.md` | update the "CI job" column from `shell`/`dockerfile`/`actions` to `shellcheck`/`hadolint`/`actionlint`                                                                               | 3       |
+| `repo-governance/development/infra/ci-conventions.md`                   | converged standard text + new CI Parity Checklist section                                                                                                                            | 5       |
+| `.claude/agents/ci-checker.md`                                          | parity-check additions (if warranted)                                                                                                                                                | 5       |
 
-## Action-Version Reference (sibling-facing — recorded for the converged target)
+## Action-Version Reference (recorded for the converged target)
 
 ose-public is **already** on these majors [Repo-grounded for the ones present in ose-public;
 `[Web-cited — accessed 2026-06-11]` for "current major" status — sources in the note below the
-table]. The bump work is the sibling's; this table is the shared target both plans converge to.
+table]. This dimension is a _done_ for ose-public (confirm only); the bump work falls to whichever
+sibling plan still trails (`ose-infra`). This table is the shared target all three plans converge
+to.
 
 | Action                                   | Current major | Notes                                                             |
 | ---------------------------------------- | ------------- | ----------------------------------------------------------------- |
@@ -221,9 +258,10 @@ phase gate check.
 | Prerequisite verified                     | structural (Bash)  | Phase 0 gate |
 | Non-TS jobs use `nx affected`             | grep / actionlint  | Phase 1 gate |
 | Concurrency block added                   | grep / actionlint  | Phase 2 gate |
-| Gherkin validator runs + passes           | Nx target run      | Phase 3 gate |
-| `ci-conventions.md` converged + checklist | grep / link check  | Phase 4 gate |
-| Full pipeline green                       | CI status          | Phase 5 gate |
+| Lint jobs renamed to tool-named scheme    | grep / actionlint  | Phase 3 gate |
+| Gherkin validator runs + passes           | Nx target run      | Phase 4 gate |
+| `ci-conventions.md` converged + checklist | grep / link check  | Phase 5 gate |
+| Full pipeline green                       | CI status          | Phase 6 gate |
 
 ## Rollback
 
