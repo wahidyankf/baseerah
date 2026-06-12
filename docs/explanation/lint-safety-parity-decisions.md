@@ -23,7 +23,7 @@ and unsafe-code posture to an **equal** standard across three sibling
 repositories — ose-public (this repo), ose-primer, and ose-infra — so the shared
 scaffolding layer stops drifting. The full per-row deviation matrix lives in the
 plan's
-[`tech-docs.md`](../../plans/in-progress/lint-safety-parity/tech-docs.md).
+[`tech-docs.md`](../../plans/done/2026-06-12__lint-safety-parity/tech-docs.md).
 
 Sibling plans:
 
@@ -170,6 +170,6 @@ inline at the point of suppression.
 
 ## Related
 
-- Plan: [`plans/in-progress/lint-safety-parity/`](../../plans/in-progress/lint-safety-parity/README.md)
+- Plan: [`plans/done/2026-06-12__lint-safety-parity/`](../../plans/done/2026-06-12__lint-safety-parity/README.md)
 - Convention: [Cross-Language Lint Strictness](../../repo-governance/development/quality/cross-language-lint-strictness.md)
 - Sibling precedent: [Gherkin Step-Keyword Cardinality — Parity Decisions](./gherkin-step-keyword-cardinality-parity-decisions.md)

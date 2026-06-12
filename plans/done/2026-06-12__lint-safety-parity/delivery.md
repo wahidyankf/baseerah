@@ -51,7 +51,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — acceptance: lists exactly 8 `.fsproj` files (crane-be ×3, crane-cli ×3, fsharp-crane-core ×2) - _Done 2026-06-12: exactly 8 `.fsproj` found — crane-be (main+integration+unit), crane-cli (main+integration+unit), fsharp-crane-core (main+unit). Matches plan._
 - [x] [AI] Confirm no active Go: `find . -name go.mod -not -path '*/node_modules/*' -not -path '*/archived/*'`
       — acceptance: prints nothing (Go only in `archived/`); confirms D10 removal is safe - _Done 2026-06-12: no active `go.mod` outside `archived/`. Confirms D10 removal is safe._
-- [ ] [AI] Confirm root `.golangci.yml` exists and is unreferenced by workflows/scripts:
+- [x] [AI] Confirm root `.golangci.yml` exists and is unreferenced by workflows/scripts:
       `test -f .golangci.yml && grep -rn 'golangci' .github scripts apps/*/project.json nx.json || true`
       — acceptance: file exists; record every reference found (expected: none active) - _Done 2026-06-12: `.golangci.yml` exists. Only `golangci` matches are in `.github/actions/setup-golang/action.yml` (composite action that installs the golangci-lint **binary**) — no reference to the `.golangci.yml` **config file** itself and no `golangci-lint run` invocation. Deeper safety grep deferred to Phase 1._
 - [x] [AI] Record the F# lint baseline: `npx nx run-many -t lint --projects='tag:lang:dotnet'`
@@ -304,7 +304,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       — acceptance: build exits 0 with TWAE active (warnings now break the build)
   - _Suggested executor: `swe-fsharp-dev`_
   - _Done 2026-06-12: per-fsproj TWAE on all 8 (no Directory.Build.props). Source also gets `--warnon:1182 --nowarn:3261 --nowarn:3264 --nowarn:3511` + `NoWarn $(NoWarn);NU1605` (primer reference). Verified 8/8 contain TWAE; scratch FS1182 unused-binding → build error (TWAE provably blocks warnings), reverted._
-- [ ] [AI] **REFACTOR (flip-on)**: add a **version-pinned** G-Research.FSharp.Analyzers
+- [x] [AI] **REFACTOR (flip-on)**: add a **version-pinned** G-Research.FSharp.Analyzers
       `PackageReference` (e.g. `Version="0.17.0"` — confirm the latest stable pin via the analyzer
       release page before committing) to the source `.fsproj` files, and add a
       `dotnet fsharp-analyzers` invocation to each F# project's `lint` target in `project.json`
@@ -442,37 +442,38 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push changes to `main`: `git push origin main`
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 min; do NOT use
+- [x] [AI] Push changes to `main`: `git push origin main` - _Done 2026-06-12: rebased 8 commits onto latest `origin/main` (which had advanced by one unrelated docs commit, clean rebase) and pushed `963b48026..07272cbe9`. Pre-push hook green (cross-vendor parity + harness-bindings + affected gates)._
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 min; do NOT use
       `gh run watch`): `gh run view --json status,conclusion`
-- [ ] [AI] Verify ALL CI checks pass — including the newly-added `shell`, `dockerfile`, `actions`
+- [x] [AI] Verify ALL CI checks pass — including the newly-added `shell`, `dockerfile`, `actions`
       jobs and the stricter `dotnet` job — no exceptions
-- [ ] [AI] If any CI check fails, fix immediately and push a follow-up commit
-- [ ] [AI] Repeat until ALL GitHub Actions pass with zero failures
-- [ ] [AI] Do NOT proceed to archival until CI is fully green
+- [x] [AI] If any CI check fails, fix immediately and push a follow-up commit
+- [x] [AI] Repeat until ALL GitHub Actions pass with zero failures
+- [x] [AI] Do NOT proceed to archival until CI is fully green
+  - _Done 2026-06-12: all 4 push-triggered workflows for `07272cbe9` completed **success** — Validate Env, Validate Markdown, crane-cli integration, Publish Container Images. The `shell`/`dockerfile`/`actions` PR-gate jobs do not run on a direct main push (main-to-main by design; verified locally instead). No failures._
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI)
-- [ ] [AI] Rename and move:
+- [x] [AI] Verify ALL delivery checklist items are ticked
+- [x] [AI] Verify ALL quality gates pass (local + CI)
+- [x] [AI] Rename and move:
       `git mv plans/in-progress/lint-safety-parity/ plans/done/YYYY-MM-DD__lint-safety-parity/`
-      using today's date as the completion date (NOT the creation date)
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
-- [ ] [AI] Update any other READMEs that reference this plan (e.g., `plans/README.md`)
-- [ ] [AI] Commit the archival: `git commit -m "chore(plans): move lint-safety-parity to done"`
+      using today's date as the completion date (NOT the creation date) - _Done 2026-06-12: moved to `plans/done/2026-06-12__lint-safety-parity/`._
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date
+- [x] [AI] Update any other READMEs that reference this plan (e.g., `plans/README.md`) - _Done 2026-06-12: `plans/README.md` had no reference; also rewrote the rationale doc's forward links from `plans/in-progress/` → `plans/done/2026-06-12__lint-safety-parity/`._
+- [x] [AI] Commit the archival: `git commit -m "chore(plans): move lint-safety-parity to done"`
 
 ### Phase 7 Gate
 
 > Terminal gate — the plan is complete only when every check below is green.
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — expected: exits 0
-- [ ] [AI] `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh` — expected: exits 0
-- [ ] [AI] `hadolint --failure-threshold warning $(find apps -name 'Dockerfile*' -not -path '*/archived/*')` — expected: exits 0
-- [ ] [AI] `actionlint` — expected: exits 0
-- [ ] [AI] All GitHub Actions workflows for the push — expected: all green
-- [ ] [AI] Plan folder lives under `plans/done/YYYY-MM-DD__lint-safety-parity/` — expected: confirmed
+- [x] [AI] `npx nx affected -t typecheck lint test:quick spec-coverage` — expected: exits 0
+- [x] [AI] `shellcheck --severity=warning scripts/*.sh .claude/hooks/*.sh apps/rhino-cli/scripts/*.sh` — expected: exits 0
+- [x] [AI] `hadolint --failure-threshold warning $(find apps -name 'Dockerfile*' -not -path '*/archived/*')` — expected: exits 0
+- [x] [AI] `actionlint` — expected: exits 0
+- [x] [AI] All GitHub Actions workflows for the push — expected: all green
+- [x] [AI] Plan folder lives under `plans/done/YYYY-MM-DD__lint-safety-parity/` — expected: confirmed
 
 > **Pause Safety**: the plan is fully executed, pushed, CI-green, and archived. Terminal state —
 > nothing remains. To re-verify: `npx nx affected -t lint` on `main`.
@@ -481,8 +482,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Validation Checklist
 
-- [ ] [AI] All TDD cycles complete (RED→GREEN→REFACTOR for each lint gate: D7, D6, D8, D2)
-- [ ] [AI] All acceptance criteria from `prd.md` verified
-- [ ] [AI] Rationale doc + governance/convention/AGENTS.md updates complete
-- [ ] [AI] D10 dead config removed; D1/D1b documented as reference (not executed)
-- [ ] [AI] CI green on `main` after push
+- [x] [AI] All TDD cycles complete (RED→GREEN→REFACTOR for each lint gate: D7, D6, D8, D2)
+- [x] [AI] All acceptance criteria from `prd.md` verified
+- [x] [AI] Rationale doc + governance/convention/AGENTS.md updates complete
+- [x] [AI] D10 dead config removed; D1/D1b documented as reference (not executed)
+- [x] [AI] CI green on `main` after push
