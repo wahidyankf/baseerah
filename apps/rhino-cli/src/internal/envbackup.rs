@@ -309,8 +309,7 @@ pub fn discover(opts: &Options) -> std::result::Result<Vec<FileEntry>, Error> {
             if base.starts_with('.') {
                 let is_secrets = path
                     .strip_prefix(&opts.repo_root)
-                    .map(|r| r == std::path::Path::new(".secrets"))
-                    .unwrap_or(false);
+                    .is_ok_and(|r| r == std::path::Path::new(".secrets"));
                 if !is_secrets {
                     walker.skip_current_dir();
                 }
