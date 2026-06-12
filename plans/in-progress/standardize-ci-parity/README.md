@@ -45,8 +45,8 @@ verifies the upstream prerequisite landed before any work begins.
 
 ### Hard prerequisite (upstream) — must be DONE first
 
-[`plans/in-progress/bootstrap-be-messaging-and-crane-media/`](../bootstrap-be-messaging-and-crane-media/README.md)
-must be **complete** before this plan executes. That plan adds the F#/.NET surface
+[`plans/done/2026-06-12__bootstrap-be-messaging-and-crane-media/`](../../done/2026-06-12__bootstrap-be-messaging-and-crane-media/README.md)
+must be **complete** before this plan executes (now **DONE** — archived 2026-06-12). That plan adds the F#/.NET surface
 (`apps/crane-be/` + `libs/fsharp-crane-core/`) and the affected-aware GHCR image-publish workflow
 to ose-public CI. This plan standardizes the CI that **includes** that new .NET surface and publish
 workflow, so it must come after. Phase 0's gate verifies the prerequisite landed: `apps/crane-be/`
