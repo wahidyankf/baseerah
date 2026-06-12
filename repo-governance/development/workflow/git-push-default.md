@@ -130,7 +130,7 @@ This standard covers all worktree execution patterns:
 
 - An AI agent using `isolation: "worktree"` in the Agent tool.
 - An agent or developer session started inside a path created by `git worktree add`.
-- Any working directory under `.claude/worktrees/` or any other `git worktree add` target.
+- Any working directory under `worktrees/` or any other `git worktree add` target.
 
 Branch + PR from a worktree is opt-in. It is triggered only by:
 
