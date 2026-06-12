@@ -30,7 +30,7 @@ The work is organized into **seven workstreams (A–G)**:
 | B — Git hooks                        | canonical commit-msg / pre-commit / pre-push lifecycle                                                                                                                                    | No single anchor (parallel-safe)                    |
 | C — rhino-cli architecture           | flat layout → hexagonal (domain/application/infrastructure/commands)                                                                                                                      | **`ose-public` is the reference** (authors first)   |
 | D — rhino-cli command surface        | union superset (public adds `Java` + `Contracts`)                                                                                                                                         | **`ose-public` is the reference** for its additions |
-| E — Nx target naming                 | `{domain}:{work}` rename + `spec-coverage`→`spec:coverage`                                                                                                                                | No single anchor (parallel-safe)                    |
+| E — Nx target naming                 | `{domain}:{work}` rename + `spec-coverage`→`specs:coverage`                                                                                                                               | No single anchor (parallel-safe)                    |
 | F — Governance docs                  | converged conventions + repo-rules quality gate                                                                                                                                           | No single anchor (parallel-safe)                    |
 | G — Mermaid state-diagram validation | `state.rs` front-end + width/label rules + shared golden corpus + repo-wide cleanup                                                                                                       | **`ose-public` is the reference** (depends on C)    |
 
@@ -134,7 +134,7 @@ ordering:
 4. **rhino-cli commands (D — REFERENCE for its additions)** — add the missing `Java` and `Contracts`
    subcommands so the CLI surface is the union superset.
 5. **Target naming (E)** — rename every governance/validation/lint/check target to `{domain}:{work}`
-   and `spec-coverage`→`spec:coverage` repo-wide, updating every caller (hooks, workflows,
+   and `spec-coverage`→`specs:coverage` repo-wide, updating every caller (hooks, workflows,
    `package.json`).
 6. **Governance (F)** — update all related docs, run `repo-rules-maker`, then run the
    `repo-rules-quality-gate` workflow until clean (a hard gate before done).
@@ -211,7 +211,7 @@ to the siblings** (solid reference arrows), reflecting the reference-first model
 - **B — Hooks**: converge `commit-msg`/`pre-commit`/`pre-push` to BLOCK 1-B canonical.
 - **C — rhino-cli architecture (REFERENCE)**: full hexagonal migration, golden-master-frozen.
 - **D — rhino-cli commands (REFERENCE for additions)**: add `Java` + `Contracts`.
-- **E — Target naming**: `{domain}:{work}` rename + `spec-coverage`→`spec:coverage` repo-wide + all
+- **E — Target naming**: `{domain}:{work}` rename + `spec-coverage`→`specs:coverage` repo-wide + all
   callers.
 - **F — Governance**: update all BLOCK 6 docs; `repo-rules-maker`; `repo-rules-quality-gate` until
   clean.
@@ -237,7 +237,7 @@ to the siblings** (solid reference arrows), reflecting the reference-first model
 - `.husky/commit-msg`, `.husky/pre-commit`, `.husky/pre-push`
 - `apps/rhino-cli/src/{domain,application,infrastructure,commands}/` and `apps/rhino-cli/project.json`
 - `apps/rhino-cli/src/domain/mermaid/state.rs` (new) + `apps/rhino-cli/tests/` (state golden corpus)
-- every app/lib `project.json` (`spec-coverage`→`spec:coverage`); `package.json` callers
+- every app/lib `project.json` (`spec-coverage`→`specs:coverage`); `package.json` callers
 - all governance docs in [tech-docs.md § File Impact](./tech-docs.md#file-impact) (incl.
   `diagrams.md`, `markdown.md`/`repository-validation.md` for the state-diagram rule)
 - repo-wide `*.md` violating state diagrams (incl. `plans/done/`, gate-excluded paths) — D-CLEAN
@@ -290,7 +290,7 @@ Both standalone plans are deleted as part of the fold.
 | 7     | **rhino-cli hexagonal migration (REFERENCE)** — sub-phased, golden-frozen; Mermaid slice migrated here       | C (+ G slice) | AI   |
 | 8     | **Mermaid state-diagram validation (REFERENCE)** — `state.rs` + corpus + D-CLEAN cleanup                     | G             | AI   |
 | 9     | **rhino-cli command surface** — 9a rationalize · 9b verb-first rename (BLOCK 11) · 9c add `Java`+`Contracts` | D             | AI   |
-| 10    | Target rename `{domain}:{work}` + `spec-coverage`→`spec:coverage` + callers                                  | E             | AI   |
+| 10    | Target rename `{domain}:{work}` + `spec-coverage`→`specs:coverage` + callers                                 | E             | AI   |
 | 11    | Governance docs → `repo-rules-maker` → repo-rules quality gate (hard gate)                                   | F             | AI   |
 | 12    | Final quality gate + push + CI verify + archival                                                             | —             | AI   |
 

@@ -50,7 +50,7 @@ behavior-freezes the rhino-cli migration (Phases 7–8).
       — acceptance: exits 0 with no unresolved drift.
 - [ ] [AI] Record the affected baseline: `npx nx affected -t typecheck lint test:quick spec-coverage`
       — acceptance: pass/fail count recorded; every preexisting failure documented.
-      (Note: target is still `spec-coverage` until Phase 10 renames it to `spec:coverage`.)
+      (Note: target is still `spec-coverage` until Phase 10 renames it to `specs:coverage`.)
 - [ ] [AI] Resolve all preexisting failures before proceeding (root-cause orientation)
       — acceptance: no preexisting failures remain unresolved.
 - [ ] [AI] **Prerequisite — `crane-be` exists**: `test -d apps/crane-be && echo OK`
@@ -406,7 +406,7 @@ _Suggested executor: `ci-fixer`_
 Converge `commit-msg`/`pre-commit`/`pre-push` to the canonical BLOCK 1-B lifecycle (see
 [tech-docs.md § B](./tech-docs.md#b--git-hooks-canonical-identical-behavior) and
 [§ D11](./tech-docs.md#d11--git-hook-convergence)). This phase introduces the **canonical hook
-shape**; the pre-push target list is written to reference the renamed `{domain}:{work}` + `spec:coverage`
+shape**; the pre-push target list is written to reference the renamed `{domain}:{work}` + `specs:coverage`
 targets, which become real in Phase 10. To avoid the hook ever pointing at a non-existent target,
 **keep the current target names in the hook here and re-point them in Phase 10** — see the gate note.
 
@@ -693,7 +693,7 @@ _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick`
       — acceptance: rhino-cli library coverage stays `≥90`.
 - [ ] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage`
-      (target still `spec-coverage` until Phase 10 renames it to `spec:coverage`).
+      (target still `spec-coverage` until Phase 10 renames it to `specs:coverage`).
 - [ ] [AI] Run `npm run lint:md` — acceptance: exits 0, no markdownlint violations in edited files.
 - [ ] [AI] Run `npx nx run rhino-cli:validate:links` — acceptance: exits 0, no broken links introduced
       by the cleanup edits.
@@ -768,6 +768,13 @@ _Suggested executor: `swe-rust-dev`_
       — acceptance: a written keep/delete verdict for `diff`/`merge` with the grep evidence (this is
       the only remaining evaluate; if no caller, delete the CLI variants + dispatch arms + modules +
       tests and drop their golden-master entries; if a caller exists, record "kept — caller at <path>").
+- [ ] [AI] **Fold — `SpecCoverage` → `Specs`**: move the `spec-coverage validate` command into the
+      `specs` group as `specs validate coverage` (verb-first form lands in 9b); remove the
+      `SpecCoverage` top-level group + its `*Commands` enum + dispatch arm; the per-project Nx target
+      `spec-coverage` renames to `specs:coverage` in Phase 10 (callers updated there). Update the
+      golden-master entry for the moved command
+      — acceptance: `rhino-cli specs --help` lists `coverage`; `rhino-cli spec-coverage` no longer
+      exists; behavior of the coverage check is unchanged; golden-master updated for the move.
 - [ ] [AI] **Merge — link engine**: make `specs validate-links` and the `links:validation` target
       reuse the `docs validate-links` resolver (one link-resolution core; no duplicated logic)
       — acceptance: behavior unchanged (golden-master + corpus identical); the duplicate logic is gone.
@@ -880,9 +887,10 @@ _Suggested executor: `swe-rust-dev`_
       returns nothing — expected: the verb-first rename commit is present and the golden-master corpus
       was deliberately re-captured for the renamed surface.
 - [ ] [AI] `rhino-cli --help` lists `java` and `contracts` (verb-first surface) and the kept
-      (rationalized) subcommand set — expected: union groups present (TestCoverage, SpecCoverage,
-      RepoGovernance, Docs, Agents, Workflows, Specs, Ddd, Git, Env, Java, Contracts); `env`
-      init/backup/restore/validate all present; any deleted subcommand absent in all three repos.
+      (rationalized) subcommand set — expected: union groups present (TestCoverage,
+      RepoGovernance, Docs, Agents, Workflows, Specs [incl. folded `coverage`], Ddd, Git, Env, Java,
+      Contracts; `SpecCoverage` folded into `Specs`); `env` init/backup/restore/validate all present;
+      any deleted subcommand absent in all three repos.
 - [ ] [AI] Golden-master replay — expected: **unrenamed** entries byte-identical; deliberately
       renamed/merged/deleted/added entries match the updated corpus (no accidental drift).
 - [ ] [AI] `:test:unit` and `:lint` GREEN; coverage met.
@@ -893,14 +901,14 @@ _Suggested executor: `swe-rust-dev`_
 > surface and tests/coverage are GREEN. Safe to stop. To resume: re-run `--help`, the golden-master
 > replay, and `:test:unit`; confirm the three sub-phase commits.
 
-## Phase 10: Target Rename `{domain}:{work}` + `spec-coverage`→`spec:coverage` + Callers
+## Phase 10: Target Rename `{domain}:{work}` + `spec-coverage`→`specs:coverage` + Callers
 
 Rename every governance/validation/lint/check target per
 [tech-docs.md § Nx Target Rename Map](./tech-docs.md#domainwork-nx-target-rename-map) and rename
-`spec-coverage`→`spec:coverage` **repo-wide** (every app/lib `project.json`), then update **every
+`spec-coverage`→`specs:coverage` **repo-wide** (every app/lib `project.json`), then update **every
 caller** atomically — the pre-push hook (re-pointing the Phase 6 lifecycle to the canonical names),
 `pr-quality-gate.yml`, any `package.json` script, and docs. This is the highest-blast-radius phase
-(see [tech-docs.md § D9](./tech-docs.md#d9--domainwork-target-naming--spec-coveragespeccoverage)).
+(see [tech-docs.md § D9](./tech-docs.md#d9--domainwork-target-naming--spec-coveragespecscoverage)).
 
 _Suggested executor: `ci-fixer`_
 
@@ -914,24 +922,24 @@ _Suggested executor: `ci-fixer`_
       `gherkin:keyword-cardinality-validation` already canonical from Phase 4)
       — acceptance: `grep -oE '"[a-z-]+:[a-z-]+"' apps/rhino-cli/project.json` shows only canonical
       `{domain}:{work}` names; no `validate:*`/`fmt:check`/`check:msrv` remain.
-- [ ] [AI] **GREEN — `spec-coverage`→`spec:coverage` repo-wide**: rename the target key in **every**
+- [ ] [AI] **GREEN — `spec-coverage`→`specs:coverage` repo-wide**: rename the target key in **every**
       app/lib `project.json`
-      — acceptance: `grep -rn '"spec-coverage"' apps/ libs/` returns nothing; `grep -rn '"spec:coverage"' apps/ libs/`
+      — acceptance: `grep -rn '"spec-coverage"' apps/ libs/` returns nothing; `grep -rn '"specs:coverage"' apps/ libs/`
       lists every project that previously had it.
 - [ ] [AI] **GREEN — update callers (atomic with the renames)**:
   - pre-push hook: re-point the Phase 6 lifecycle target list to the canonical names
-    (`spec:coverage`, `specs:*-validation`, `env:validation`, `naming:*-validation`,
+    (`specs:coverage`, `specs:*-validation`, `env:validation`, `naming:*-validation`,
     `governance:vendor-audit-validation`, `cross-vendor:parity-validation`,
     `harness:bindings-validation`, `markdown:lint`).
   - `pr-quality-gate.yml` (and any other workflow): replace `spec-coverage` in the affected target
-    lists with `spec:coverage`; replace `rhino-cli:fmt:check`/`check:msrv` with
+    lists with `specs:coverage`; replace `rhino-cli:fmt:check`/`check:msrv` with
     `rhino-cli:format:check`/`msrv:check`.
   - `package.json`: replace any script referencing an old target name.
     — acceptance: `grep -rn 'spec-coverage\|fmt:check\|check:msrv\|validate:env\|validate:specs' .husky/ .github/workflows/ package.json`
     returns nothing.
 - [ ] [AI] **REFACTOR — live-run the renamed targets**:
       `npx nx run rhino-cli:env:validation` and a representative `:specs:tree-validation`,
-      `:format:check`, and `npx nx affected -t spec:coverage`
+      `:format:check`, and `npx nx affected -t specs:coverage`
       — acceptance: each resolves and runs (no "target not found"); the pre-push dry-run is clean.
 - [ ] [AI] Lint all edited workflows + `shellcheck .husky/*` — acceptance: exits 0.
 
@@ -946,7 +954,7 @@ _Suggested executor: `ci-fixer`_
 - [ ] [AI] `npx nx run rhino-cli:env:validation` resolves and runs; pre-push dry-run clean.
 - [ ] [AI] Workflows + hooks lint clean — expected: exits 0.
 - [ ] [AI] Commit thematically (split project.json renames from caller updates if cleaner):
-      `rtk git commit -m "refactor(nx): rename governance targets to {domain}:{work} and spec:coverage"`.
+      `rtk git commit -m "refactor(nx): rename governance targets to {domain}:{work} and specs:coverage"`.
 
 > **Pause Safety**: every target uses the canonical name and every caller is re-pointed; the renamed
 > targets run and the pre-push dry-run is clean. Safe to stop. To resume: re-run the two grep sweeps
@@ -967,6 +975,11 @@ _Suggested executor: `repo-rules-maker`_
 > _These are governance-doc + agent-definition edits (non-code) — direct-action + acceptance criteria,
 > not RED/GREEN/REFACTOR (per the TDD convention's non-code carve-out)._
 
+- [ ] [AI] **Enumerate every related `.md` first** — grep the repo for every doc that references a
+      changed surface so none is missed, then update each in the steps below:
+      `grep -rIl -E 'validate:(env|specs|naming|links|mermaid|heading|cross-vendor|repo-governance)|spec-coverage|fmt:check|check:msrv|lint:(md|shell|dockerfiles|actions)|spec-coverage|rhino-cli (docs|specs|agents|repo-governance|env|spec-coverage)|setup-golang|tag:lang:golang|run-many' --include='*.md' . | grep -vE '^\./(plans/done|archived|node_modules)'`
+      — acceptance: the printed list is reconciled against the per-doc steps below; every hit is
+      either updated or explicitly noted as not-applicable (e.g. historical plan text).
 - [ ] [AI] Update `repo-governance/development/infra/ci-conventions.md`: converged standard
       (`nx affected` per-language; canonical concurrency; tool-named lint jobs; full-gate-on-push-to-main) + a new `## CI/toolchain Parity Checklist` enumerating the A–G invariants and recording the
       deviations. The checklist MUST embed the **affected-first PR-gate principle + scope table**
@@ -976,7 +989,7 @@ _Suggested executor: `repo-rules-maker`_
       validation invariant), the deviations, and the affected-first principle with its scope table
       (every whole-repo check justified).
 - [ ] [AI] Update `repo-governance/development/infra/nx-targets.md`: `{domain}:{work}` naming +
-      `spec:coverage` — acceptance: the doc describes the canonical scheme.
+      `specs:coverage` — acceptance: the doc describes the canonical scheme.
 - [ ] [AI] Confirm/extend `repo-governance/development/pattern/hexagonal-architecture-cli.md` (this
       convention **already exists**): add the rhino-cli reference layout, the shared-kernel (2+
       consumers) rule, the maximal-port-depth trade-off, and the golden-master enforcement note from
@@ -1054,7 +1067,7 @@ _Suggested executor: `repo-rules-maker`_
 - [ ] [AI] `npx nx affected -t typecheck` — exits 0.
 - [ ] [AI] `npx nx affected -t lint` — exits 0.
 - [ ] [AI] `npx nx affected -t test:quick` — exits 0.
-- [ ] [AI] `npx nx affected -t spec:coverage` — exits 0 (canonical name post-Phase-10).
+- [ ] [AI] `npx nx affected -t specs:coverage` — exits 0 (canonical name post-Phase-10).
 - [ ] [AI] Full validator set locally (canonical names):
       `npx nx run rhino-cli:gherkin:keyword-cardinality-validation`,
       `:links:validation`, `:mermaid:validation` (now covers state diagrams),
@@ -1104,7 +1117,7 @@ _Suggested executor: `repo-rules-maker`_
 
 > All checks below must pass to consider the plan complete.
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick spec:coverage` — expected: exits 0.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — expected: exits 0.
 - [ ] [AI] Full validator set + golden-master replay run green locally — expected: all exit 0.
 - [ ] [AI] `gh run view --json status,conclusion` on the latest `main` runs — expected: all
       `conclusion: success`; renamed lint jobs, the gherkin step, and the push-to-main gate all green.

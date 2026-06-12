@@ -83,7 +83,7 @@ Toolchain drift between sibling repos is a slow, compounding tax across six surf
   - push-to-main full gate).
 - **Identical, testable rhino-cli** — same hexagonal architecture and same union command surface
   everywhere.
-- **Canonical target names** (`{domain}:{work}`, `spec:coverage`) across the family.
+- **Canonical target names** (`{domain}:{work}`, `specs:coverage`) across the family.
 - **Self-healing governance** — docs propagated and quality-gated so they stay in sync.
 - **State diagrams held to the same render-width discipline as flowcharts** — the readability
   benefit the flowchart rule already earns transfers directly to state diagrams. _Judgment call:
@@ -124,7 +124,7 @@ consume the outputs**:
 - **D — Union command surface met**: `rhino-cli` exposes the full superset including `Java` and
   `Contracts`. [Observable — `rhino-cli --help` lists all union subcommands]
 - **E — Target naming met**: every governance/validation/lint/check target uses `{domain}:{work}`
-  and `spec:coverage` repo-wide; no caller references an old name. [Observable — grep the project.json
+  and `specs:coverage` repo-wide; no caller references an old name. [Observable — grep the project.json
   files, hooks, workflows, package.json]
 - **F — Governance gate clean**: all related docs updated, `repo-rules-maker` propagated, and the
   `repo-rules-quality-gate` workflow reports clean. [Observable — the workflow's terminal report]

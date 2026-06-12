@@ -6,7 +6,7 @@ are the source of the first failing verification assertions in [delivery.md](./d
 
 ## Product Overview
 
-A set of verifiable changes across **six workstreams** that close ose-public's gaps against the fixed
+A set of verifiable changes across **seven workstreams (A–G)** that close ose-public's gaps against the fixed
 **Converged Toolchain Target** shared with `ose-infra` and `ose-primer`, except the recorded per-repo
 deviations. A/B/E/F are parallel-safe (no single anchor); C/D are reference-first (ose-public leads):
 
@@ -18,7 +18,7 @@ deviations. A/B/E/F are parallel-safe (no single anchor); C/D are reference-firs
 3. **C — rhino-cli architecture (REFERENCE)**: flat layout → hexagonal, behavior-frozen by a
    golden-master CLI suite.
 4. **D — rhino-cli commands (REFERENCE for additions)**: add `Java` + `Contracts`.
-5. **E — Target naming**: `{domain}:{work}` rename + `spec-coverage`→`spec:coverage` repo-wide.
+5. **E — Target naming**: `{domain}:{work}` rename + `spec-coverage`→`specs:coverage` repo-wide.
 6. **F — Governance**: update all related docs, run `repo-rules-maker`, then `repo-rules-quality-gate`
    until clean.
 7. **G — Mermaid state-diagram validation (REFERENCE)**: add the `state.rs` front-end + width/label
@@ -61,7 +61,7 @@ Solo-maintainer repo — hats the maintainer wears plus consuming agents:
 - **US-8 (D)** — As a toolchain maintainer, I want the `Java` and `Contracts` subcommands added so
   that the CLI is the union superset and drop-in across repos.
 - **US-9 (E)** — As a toolchain maintainer, I want every governance target renamed to `{domain}:{work}`
-  and `spec-coverage`→`spec:coverage` so that target names are canonical everywhere.
+  and `spec-coverage`→`specs:coverage` so that target names are canonical everywhere.
 - **US-10 (F)** — As a governance maintainer, I want all related docs updated, propagated by
   `repo-rules-maker`, and passed through the `repo-rules-quality-gate` so that the docs never drift
   from the toolchain.
@@ -89,9 +89,9 @@ Scenario: Prerequisite verified and golden-master captured before work begins
 
 ```gherkin
 Scenario: Non-TS PR-gate jobs use nx affected
-  Given pr-quality-gate.yml currently runs nx run-many for the Go, .NET, and Rust jobs
+  Given pr-quality-gate.yml currently runs nx run-many for the .NET and Rust jobs
   When the test-semantics convergence is applied
-  Then each of the Go, .NET, and Rust jobs runs nx affected with the same target list
+  Then each of the .NET and Rust jobs runs nx affected with the same target list
   And no per-language PR-gate job invokes nx run-many
   And the inline NX_BASE/NX_HEAD env vars remain set on each affected job
   But the single-project specs-gate run-many is left intact
@@ -182,7 +182,7 @@ Scenario: Governance targets renamed to the canonical scheme
   Given the governance targets use ad-hoc validate/lint/fmt names and spec-coverage
   When the {domain}:{work} rename is applied repo-wide
   Then every governance, validation, lint, and check target uses the {domain}:{work} scheme
-  And spec-coverage is renamed to spec:coverage in every project.json
+  And spec-coverage is renamed to specs:coverage in every project.json
   And every caller (hooks, workflows, package.json) references only the new names
 ```
 
@@ -311,7 +311,7 @@ Feature: Legacy v1 state diagram header is recognized
 - **B** — `.husky/commit-msg`, `.husky/pre-commit`, `.husky/pre-push` converge to BLOCK 1-B.
 - **C** — migrate `apps/rhino-cli/src/` to the hexagonal layout, golden-master-frozen.
 - **D** — add `Java` + `Contracts` subcommands to rhino-cli.
-- **E** — `{domain}:{work}` rename in `apps/rhino-cli/project.json`; `spec-coverage`→`spec:coverage`
+- **E** — `{domain}:{work}` rename in `apps/rhino-cli/project.json`; `spec-coverage`→`specs:coverage`
   in every app/lib `project.json`; update all callers.
 - **F** — update all BLOCK 6 governance docs; run `repo-rules-maker`; run `repo-rules-quality-gate`.
 - **G** — add the `state.rs` front-end to the migrated Mermaid slice (`stateDiagram-v2` +
