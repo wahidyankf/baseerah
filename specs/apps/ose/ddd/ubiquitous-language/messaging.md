@@ -7,20 +7,17 @@
 
 ## One-line summary
 
-NATS-backed integration layer that connects ose-app-be to the NATS broker and to
-crane-be, proving message delivery via JetStream and exposing PDF-to-Markdown
-conversion through a crane NATS request/reply client.
+NATS-backed integration layer that connects ose-app-be to the NATS broker, proving
+message delivery via JetStream durable consumers at startup.
 
 ## Term index
 
-| Term                     | Code identifier(s)                        | Used in features                   |
-| ------------------------ | ----------------------------------------- | ---------------------------------- |
-| `NATS subject`           | `ose-app.messaging.demo` (stream subject) | `messaging/nats-connect.feature`   |
-| `JetStream`              | `async_nats::jetstream`                   | `messaging/jetstream-demo.feature` |
-| `durable consumer`       | `ose-app-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
-| `crane-convert`          | `crane.convert` (NATS subject)            | `messaging/crane-convert.feature`  |
-| `media-convert endpoint` | `convert_via_nats`                        | `messaging/crane-convert.feature`  |
-| `messaging status`       | `SharedMessagingStatus`                   | `messaging/jetstream-demo.feature` |
+| Term               | Code identifier(s)                        | Used in features                   |
+| ------------------ | ----------------------------------------- | ---------------------------------- |
+| `NATS subject`     | `ose-app.messaging.demo` (stream subject) | `messaging/nats-connect.feature`   |
+| `JetStream`        | `async_nats::jetstream`                   | `messaging/jetstream-demo.feature` |
+| `durable consumer` | `ose-app-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
+| `messaging status` | `SharedMessagingStatus`                   | `messaging/jetstream-demo.feature` |
 
 ## Terms in detail
 
@@ -28,8 +25,7 @@ conversion through a crane NATS request/reply client.
 
 A string channel identifier on the NATS broker to which publishers send messages and
 subscribers listen. In this bounded context the primary subject is
-`ose-app.messaging.demo`, used for the JetStream stream demonstration. The
-`crane.convert` subject is a separate request/reply channel owned by crane-be.
+`ose-app.messaging.demo`, used for the JetStream stream demonstration.
 
 **Code identifier(s)**: `OSE_APP_MESSAGING_DEMO` (Rust constant in
 `apps/ose-app-be/src/messaging/`).
@@ -70,37 +66,6 @@ on the `OSE_APP_MESSAGING_DEMO` stream at startup.
 kind); "subscription" (core NATS term, not JetStream).
 
 **Related**: `JetStream`
-
----
-
-### Term: `crane-convert`
-
-The NATS request/reply subject (`crane.convert`) to which crane-be subscribes under
-queue group `crane.workers`. A caller sends a PDF payload as the request body and
-receives the converted Markdown text in the reply. The ose-app-be messaging context
-uses this subject indirectly via the `media-convert endpoint`.
-
-**Code identifier(s)**: `CRANE_CONVERT_SUBJECT` (Rust constant in
-`apps/ose-app-be/src/messaging/crane_client.rs`).
-
-**Used in features**: `messaging/crane-convert.feature`
-
-**Related**: `media-convert endpoint`
-
----
-
-### Term: `media-convert endpoint`
-
-The HTTP endpoint `POST /api/v1/media/convert` exposed by ose-app-be. Accepts a PDF
-file upload, drives the crane NATS request/reply (`crane.convert`) path, and returns
-the resulting Markdown to the caller. Stateless — ose-app-be does not persist the
-conversion result.
-
-**Code identifier(s)**: `apps/ose-app-be/src/contexts/media/api/http.rs`.
-
-**Used in features**: `messaging/crane-convert.feature`
-
-**Related**: `crane-convert`
 
 ---
 

@@ -1,31 +1,36 @@
-# Production multi-stage Dockerfile for organiclever-be.
+# Production multi-stage Dockerfile for organiclever-be (F# / Giraffe on .NET 10).
 # Build context: repo root (e.g. `docker build -f apps/organiclever-be/Dockerfile .`).
 #
-# Stage 1: compile the release binary with all migration files embedded.
-FROM rust:1.88-slim AS builder
-WORKDIR /build
+# NOTE: the fsproj references generated OpenAPI contract types under
+# apps/organiclever-be/generated-contracts/ (gitignored). Run
+# `nx run organiclever-be:codegen` before building this image so the generated
+# sources are present in the build context.
 
-# Install build-time dependencies for reqwest TLS (OpenSSL) and pkg-config.
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends pkg-config libssl-dev \
-  && rm -rf /var/lib/apt/lists/*
+# Stage 1: restore + publish the release build with migrations embedded.
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
 
-COPY apps/organiclever-be/Cargo.toml apps/organiclever-be/Cargo.lock ./
-COPY apps/organiclever-be/src ./src
-COPY apps/organiclever-be/migrations ./migrations
+# Copy the project file first for restore-layer caching.
+COPY apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj apps/organiclever-be/src/OrganicleverBe/
+COPY apps/organiclever-be/generated-contracts apps/organiclever-be/generated-contracts/
+COPY apps/organiclever-be/db apps/organiclever-be/db/
 
-RUN cargo build --release --bin organiclever-be
+RUN dotnet restore apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj
 
-# Stage 2: minimal runtime image.
-FROM debian:bookworm-slim AS runtime
+# Copy the remaining sources and publish.
+COPY apps/organiclever-be/src apps/organiclever-be/src/
 
-# ca-certificates: TLS trust store for outbound HTTPS (reqwest).
-# libssl3: OpenSSL shared library required by the dynamically linked binary.
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates libssl3 \
-  && rm -rf /var/lib/apt/lists/*
+RUN dotnet publish apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj \
+  -c Release -o /app/publish --no-restore
 
-COPY --from=builder /build/target/release/organiclever-be /usr/local/bin/organiclever-be
+# Stage 2: minimal ASP.NET runtime image.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
 
+COPY --from=build /app/publish .
+
+# Default port — override at runtime via ORGANICLEVER_BE_PORT.
+ENV ORGANICLEVER_BE_PORT=8202
 EXPOSE 8202
-CMD ["/usr/local/bin/organiclever-be"]
+
+ENTRYPOINT ["dotnet", "OrganicleverBe.dll"]

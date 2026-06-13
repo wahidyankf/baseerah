@@ -194,27 +194,11 @@ contexts:
 
   - name: messaging
     summary: >-
-      NATS client, JetStream durable stream demo, and crane NATS request/reply
-      client. Connects to NATS at startup (fail-fast on missing URL), publishes
-      and acks on organiclever.messaging.demo, and exposes the crane_client used
-      by the media context for PDF-to-Markdown conversion.
+      NATS client and JetStream durable stream demo. Connects to NATS at startup
+      (fail-fast on missing URL), publishes and acks on organiclever.messaging.demo.
     code:
       - apps/organiclever-be/src/contexts/messaging
     code_lang:
       - rs
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/messaging.md
-    gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging
-
-  - name: be-media
-    summary: >-
-      HTTP media-convert endpoint — thin wrapper over the crane NATS request/reply
-      path in the messaging context. Delegates PDF-to-Markdown conversion to
-      crane-be via crane.convert.
-    layers:
-      - api
-    code:
-      - apps/organiclever-be/src/contexts/media
-    code_lang:
-      - rs
-    glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-media.md
     gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging

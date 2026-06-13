@@ -247,10 +247,10 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 
 > _Suggested executor: swe-rust-dev (Rust-side removal) + ci-fixer (workflow)_
 
-- [ ] [AI] Delete `apps/crane-be/` and `apps/crane-be-e2e/` (`git rm -r`).
-- [ ] [AI] Remove any media/crane references from both backends (routes, `*_CRANE_URL` env vars,
-      `crane.convert`) — most absent after Phase 1's empty scaffold; sweep to zero.
-- [ ] [AI] **Specs — crane/media removal** (per tech-docs Specs Restructure): delete
+- [x] [AI] Delete `apps/crane-be/` and `apps/crane-be-e2e/` (`git rm -r`). _(Done 2026-06-14)_
+- [x] [AI] Remove any media/crane references from both backends (routes, `*_CRANE_URL` env vars,
+      `crane.convert`) — most absent after Phase 1's empty scaffold; sweep to zero. _(Done 2026-06-14: backend src already clean; removed dead crane-be service from both docker-compose.e2e.yml)_
+- [x] [AI] **Specs — crane/media removal** (per tech-docs Specs Restructure): delete
       `specs/apps/ose/behavior/app-be/gherkin/messaging/crane-convert.feature`,
       `specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging/crane-convert.feature`; remove
       crane/media terms from `specs/apps/ose/ddd/ubiquitous-language/messaging.md`; remove/repurpose
@@ -260,23 +260,23 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
       `specs/apps/crane/behavior/crane-be/` + `specs/apps/crane/components/be/` (keep crane-cli); update
       `specs/apps/crane/README.md` + containers/product/system-context to crane-cli-only — acceptance:
       `grep -rE 'crane[_.]|/media/pdf-to-md|crane\.convert' apps/ specs/ --exclude-dir=crane-cli --exclude-dir=fsharp-crane-core`
-      returns zero.
-- [ ] [AI] Update `.github/workflows/publish-images.yml`: drop `build-crane-be` + `publish-crane-be`
+      returns zero. _(Done 2026-06-14: features/media docs deleted, bounded-contexts + messaging cleaned; grep returns zero. The two `*-be-e2e/steps/messaging.steps.ts` crane refs are Phase 8 scope.)_
+- [x] [AI] Update `.github/workflows/publish-images.yml`: drop `build-crane-be` + `publish-crane-be`
       (3 → 2); keep affected-aware `detect`; keep the two **backend** outputs `organiclever-be` and
       `ose-app-be` (the `ose-app-be` → `ose-be` job/output rename lands atomically in Phase 3 with the
       backend rename). **No web tier gets an image job** (web deploys via Vercel) — acceptance:
-      `grep -cE 'publish-' .github/workflows/publish-images.yml` shows exactly two publish jobs.
-- [ ] [AI] Replace each backend's Rust Dockerfile with a .NET multi-stage Dockerfile (sdk:10.0 →
-      aspnet:10.0) at `apps/ose-app-be/Dockerfile` and `apps/organiclever-be/Dockerfile`.
-- [ ] [AI] Remove crane env vars from `apps/ose-app-be/.env.example` and
+      `grep -cE 'publish-' .github/workflows/publish-images.yml` shows exactly two publish jobs. _(Done 2026-06-14: publish- count=2, crane-be=0, actionlint pass)_
+- [x] [AI] Replace each backend's Rust Dockerfile with a .NET multi-stage Dockerfile (sdk:10.0 →
+      aspnet:10.0) at `apps/ose-app-be/Dockerfile` and `apps/organiclever-be/Dockerfile`. _(Done 2026-06-14: modeled on crane-be; hadolint pass; also added `**/obj`,`**/bin`,`**/target` to root .dockerignore so host build artifacts don't clobber the container restore)_
+- [x] [AI] Remove crane env vars from `apps/ose-app-be/.env.example` and
       `apps/organiclever-be/.env.example`; also remove the crane-be `root:` entry from
       `env-contract.yaml` — acceptance: `rhino-cli env validate` exits 0;
       `grep -rE 'OSE_APP_BE_CRANE_URL|ORGANICLEVER_BE_CRANE_URL' apps/ose-app-be/.env.example apps/organiclever-be/.env.example`
-      returns zero.
-- [ ] [AI] Confirm `libs/fsharp-crane-core` + `libs/rust-commons` still exist and dependents build:
-      `nx build crane-cli ayokoding-cli ose-cli`.
-- [ ] [AI] Build both backends as .NET Docker images locally (`docker build -f apps/<be>/Dockerfile …`)
-      — acceptance: both exit 0.
+      returns zero. _(Done 2026-06-14: crane vars + crane-be root entry removed; also fixed preexisting Phase-1 drift — both backends retagged lang:rust→fsharp in env-contract; env validate exits 0)_
+- [x] [AI] Confirm `libs/fsharp-crane-core` + `libs/rust-commons` still exist and dependents build:
+      `nx build crane-cli ayokoding-cli ose-cli`. _(Done 2026-06-14: all present; build exits 0)_
+- [x] [AI] Build both backends as .NET Docker images locally (`docker build -f apps/<be>/Dockerfile …`)
+      — acceptance: both exit 0. _(Done 2026-06-14 via podman socket — Docker Desktop down; both images reach runtime stage successfully after the .dockerignore fix)_
 - [ ] [AI] Push to `origin main` to trigger `publish-images.yml` (already wired to push); verify via
       `gh run list --workflow=publish-images.yml` that a run appears and succeeds — acceptance:
       `gh run list --workflow=publish-images.yml` shows a completed successful run publishing both
@@ -287,12 +287,12 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 
 ### Phase 2 Gate
 
-- [ ] [AI] `test ! -d apps/crane-be && test ! -d apps/crane-be-e2e` — exits 0.
-- [ ] [AI] `grep -rE 'crane[_.]|/media/pdf-to-md|crane\.convert' apps/ specs/ --exclude-dir=crane-cli --exclude-dir=fsharp-crane-core` — zero.
-- [ ] [AI] `grep -rE 'crane-be' specs/apps/crane/` — zero (crane-cli refs only remain).
-- [ ] [AI] `rhino-cli env validate` — exits 0; no crane env vars.
-- [ ] [AI] `grep 'crane-be' .github/workflows/publish-images.yml` — zero.
-- [ ] [AI] `nx build crane-cli ayokoding-cli ose-cli` — exits 0.
+- [x] [AI] `test ! -d apps/crane-be && test ! -d apps/crane-be-e2e` — exits 0.
+- [x] [AI] `grep -rE 'crane[_.]|/media/pdf-to-md|crane\.convert' apps/ specs/ --exclude-dir=crane-cli --exclude-dir=fsharp-crane-core` — zero.
+- [x] [AI] `grep -rE 'crane-be' specs/apps/crane/` — zero (crane-cli refs only remain).
+- [x] [AI] `rhino-cli env validate` — exits 0; no crane env vars.
+- [x] [AI] `grep 'crane-be' .github/workflows/publish-images.yml` — zero.
+- [x] [AI] `nx build crane-cli ayokoding-cli ose-cli` — exits 0.
 - [ ] [HUMAN] Both backend images anonymously pullable → **ose-infra Phase 0.5 unblocked.**
 
 > **Pause Safety**: media fully removed; two bootable images public; infra unblocked. Resume:

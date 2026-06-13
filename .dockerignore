@@ -5,6 +5,12 @@ coverage
 *.log
 .DS_Store
 .idea
+# .NET build artifacts — must be excluded so host obj/ (with host-path
+# project.assets.json) does not clobber the container's restore in
+# multi-stage backend image builds.
+**/obj
+**/bin
+**/target
 apps/organiclever-be/target
 apps/ayokoding-cli
 archived

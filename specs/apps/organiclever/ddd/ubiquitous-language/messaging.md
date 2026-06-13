@@ -7,9 +7,8 @@
 
 ## One-line summary
 
-NATS-backed integration layer that connects organiclever-be to the NATS broker and
-to crane-be, proving message delivery via JetStream and exposing PDF-to-Markdown
-conversion through a crane NATS request/reply client.
+NATS-backed integration layer that connects organiclever-be to the NATS broker,
+proving message delivery via JetStream durable consumers at startup.
 
 ## Term index
 
@@ -18,7 +17,6 @@ conversion through a crane NATS request/reply client.
 | `NATS subject`     | `organiclever.messaging.demo` (stream subject) | `messaging/nats-connect.feature`   |
 | `JetStream`        | `async_nats::jetstream`                        | `messaging/jetstream-demo.feature` |
 | `durable consumer` | `organiclever-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
-| `crane-convert`    | `crane.convert` (NATS subject)                 | `messaging/crane-convert.feature`  |
 | `messaging status` | `SharedMessagingStatus`                        | `messaging/jetstream-demo.feature` |
 
 ## Terms in detail
@@ -27,8 +25,7 @@ conversion through a crane NATS request/reply client.
 
 A string channel identifier on the NATS broker to which publishers send messages and
 subscribers listen. In this bounded context the primary subject is
-`organiclever.messaging.demo`, used for the JetStream stream demonstration. The
-`crane.convert` subject is a separate request/reply channel owned by crane-be.
+`organiclever.messaging.demo`, used for the JetStream stream demonstration.
 
 **Code identifier(s)**: `ORGANICLEVER_MESSAGING_DEMO` (Rust constant in
 `apps/organiclever-be/src/messaging/`).
@@ -69,20 +66,6 @@ ID. The organiclever-be messaging context creates a durable consumer
 kind); "subscription" (core NATS term, not JetStream).
 
 **Related**: `JetStream`
-
----
-
-### Term: `crane-convert`
-
-The NATS request/reply subject (`crane.convert`) to which crane-be subscribes under
-queue group `crane.workers`. A caller sends a PDF payload as the request body and
-receives the converted Markdown text in the reply. The organiclever-be messaging
-context exposes this subject via the `crane_client` module in `contexts/messaging/`.
-
-**Code identifier(s)**: `CRANE_CONVERT_SUBJECT` (Rust constant in
-`apps/organiclever-be/src/messaging/crane_client.rs`).
-
-**Used in features**: `messaging/crane-convert.feature`
 
 ---
 

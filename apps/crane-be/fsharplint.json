@@ -1,9 +1,0 @@
-{
-  "rules": {
-    "naming": {
-      "unionCasesNames": {
-        "enabled": false
-      }
-    }
-  }
-}

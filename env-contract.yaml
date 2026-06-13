@@ -10,20 +10,26 @@
 # Uncomment and fill in `root` when IaC is added.
 
 surfaces:
-  - root: apps/crane-be
-    kind: app
-    lang: fsharp
-    allowlist: []
-
   - root: apps/organiclever-be
     kind: app
-    lang: rust
-    allowlist: []
+    lang: fsharp
+    allowlist:
+      # Forward-declared config not yet consumed by the Phase 1 F# shell
+      # (wired in later phases); declared in .env.example ahead of use.
+      - ORGANICLEVER_BE_PORT
+      - ORGANICLEVER_BE_CORS_ORIGINS
 
   - root: apps/ose-app-be
     kind: app
-    lang: rust
-    allowlist: []
+    lang: fsharp
+    allowlist:
+      # Forward-declared config not yet consumed by the Phase 1 F# shell
+      # (port/CORS + OpenRouter wired in later phases); declared ahead of use.
+      - OSE_APP_BE_PORT
+      - OSE_APP_BE_CORS_ORIGINS
+      - OSE_APP_BE_OPENROUTER_API_KEY
+      - OSE_APP_BE_OPENROUTER_MODEL
+      - OSE_APP_BE_OPENROUTER_BASE_URL
 
   - root: apps/ose-web
     kind: app
