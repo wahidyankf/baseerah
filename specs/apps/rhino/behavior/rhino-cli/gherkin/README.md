@@ -66,17 +66,17 @@ behavior/rhino-cli/gherkin/
 
 ### repo-governance
 
-| File                                         | Command(s)                           | Scenarios |
-| -------------------------------------------- | ------------------------------------ | --------- |
-| `repo-governance-agents-md-size.feature`     | `repo-governance agents-md-size`     | 3         |
-| `repo-governance-audit.feature`              | `repo-governance audit`              | 5         |
-| `repo-governance-emoji-audit.feature`        | `repo-governance emoji-audit`        | 4         |
-| `repo-governance-frontmatter-audit.feature`  | `repo-governance frontmatter-audit`  | 5         |
-| `repo-governance-layer-coherence.feature`    | `repo-governance layer-coherence`    | 3         |
-| `repo-governance-license-audit.feature`      | `repo-governance license-audit`      | 4         |
-| `repo-governance-readme-index-audit.feature` | `repo-governance readme-index-audit` | 4         |
-| `repo-governance-traceability-audit.feature` | `repo-governance traceability-audit` | 5         |
-| `repo-governance-vendor-audit.feature`       | `repo-governance vendor-audit`       | 7         |
+| File                                         | Command(s)                                 | Scenarios |
+| -------------------------------------------- | ------------------------------------------ | --------- |
+| `repo-governance-agents-md-size.feature`     | `convention validate agents-md-size`       | 3         |
+| `repo-governance-audit.feature`              | `repo-governance audit`                    | 5         |
+| `repo-governance-emoji-audit.feature`        | `convention validate emoji`                | 4         |
+| `repo-governance-frontmatter-audit.feature`  | `md validate frontmatter`                  | 5         |
+| `repo-governance-layer-coherence.feature`    | `repo-governance validate layer-coherence` | 3         |
+| `repo-governance-license-audit.feature`      | `convention validate license`              | 4         |
+| `repo-governance-readme-index-audit.feature` | `md readme-index`                          | 4         |
+| `repo-governance-traceability-audit.feature` | `repo-governance validate traceability`    | 5         |
+| `repo-governance-vendor-audit.feature`       | `repo-governance validate vendor`          | 7         |
 
 ### spec-coverage
 
