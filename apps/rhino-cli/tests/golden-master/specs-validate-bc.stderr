@@ -1,4 +1,4 @@
 error: the following required arguments were not provided:
   <app>
 
-Usage: rhino-cli specs ul --help <app>
+Usage: rhino-cli specs validate bc --help <app>

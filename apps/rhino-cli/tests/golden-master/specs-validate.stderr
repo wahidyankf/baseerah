@@ -1,0 +1,6 @@
+error: 'rhino-cli specs validate' requires a subcommand but one was not provided
+  [subcommands: adoption, counts, links, tree, coverage, bc, ul, gherkin-cardinality, help]
+
+Usage: rhino-cli specs validate [OPTIONS] <COMMAND>
+
+For more information, try 'help'.

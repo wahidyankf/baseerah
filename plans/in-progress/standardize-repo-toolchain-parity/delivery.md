@@ -975,40 +975,40 @@ pre-commit` are already conformant. This is a **deliberate divergence** from the
 > `{domain}:{work}` Nx target scheme. The surface change is a **deliberate golden-master corpus update**.
 > Reference-first: ose-public renames; infra/primer mirror the identical surface.
 
-- [ ] [AI] **RED**: add/extend a CLI-surface test asserting the **new** uniform invocations resolve
+- [x] [AI] **RED**: add/extend a CLI-surface test asserting the **new** uniform invocations resolve
       (e.g. parse `md validate mermaid`, `repo-governance validate vendor`, `convention validate emoji`,
       `harness sync opencode`, `specs validate gherkin-cardinality`) and the old hyphenated forms
       (`docs validate-mermaid`, `repo-governance vendor-audit`, `agents detect-duplication`) no longer
       parse. Run `npx nx run rhino-cli:test:unit`
       — acceptance: test FAILS (the clap command tree still uses the old groups/hyphenated subcommands).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN — rename the clap command tree**: in `apps/rhino-cli/src/commands/` (post-Phase-7
+- [x] [AI] **GREEN — rename the clap command tree**: in `apps/rhino-cli/src/commands/` (post-Phase-7
       hexagonal layout) rename every `*Commands` enum variant + its clap attributes to the uniform
       grammar per the BLOCK 11 table across the regrouped groups — `md`, `repo-governance`, `convention`,
       `specs`, `harness`, `workflows`, `lang`; `git`/`env`/`doctor` unchanged; `docs` reserved. Add the
       bare `<group> audit` aggregate where ≥2 `validate`s exist. Run `npx nx run rhino-cli:test:unit`
       — acceptance: the new-invocation parse test passes; old forms rejected.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN — update ALL callers**: re-point every invocation of a renamed subcommand in Nx
+- [x] [AI] **GREEN — update ALL callers**: re-point every invocation of a renamed subcommand in Nx
       `project.json` target `options.command` strings (`apps/*/project.json`, `libs/*/project.json`),
       `.husky/*` hooks (note: `rhino-cli git pre-commit` is unchanged, but any renamed invocation in a
       hook changes), `package.json` scripts, and docs that show the old command form —
       `rtk grep -rn 'docs validate-|agents (sync|emit|validate|detect)|repo-governance (vendor-audit|emoji-audit|frontmatter-audit|readme-index-audit|license-audit|agents-md-size|gherkin)|ddd (bc|ul)|java validate-annotations|contracts (java-clean-imports|dart-scaffold)|spec-coverage validate' .husky .github package.json apps/*/project.json libs/*/project.json repo-governance docs AGENTS.md`
       then rewrite each hit to the uniform form in its new group
       — acceptance: the grep returns no old-form invocation in any caller (docs prose examples updated too).
-- [ ] [AI] **GREEN — update the golden-master corpus**: re-capture the renamed/regrouped subcommand
+- [x] [AI] **GREEN — update the golden-master corpus**: re-capture the renamed/regrouped subcommand
       invocations into the golden-master corpus (the surface change is a **deliberate** corpus update,
       not drift) — record the old→new mapping in the commit body
       — acceptance: the corpus replay is GREEN against the renamed surface; every renamed invocation has
       a corpus entry; no **unmoved** entry silently changed.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: confirm the controlled verb vocabulary (`validate`, `audit` [group run-all only],
+- [x] [AI] **REFACTOR**: confirm the controlled verb vocabulary (`validate`, `audit` [group run-all only],
       `sync`, `emit`, `clean`, `scaffold`, `diff`, `merge`, `init`, `backup`, `restore`, `pre-commit`,
       `doctor`) is the complete set after rename — **no `detect` or `*-audit` per-check verb remains**;
       `cargo fmt`; run `npx nx run rhino-cli:lint && npx nx run rhino-cli:test:unit`
       — acceptance: lint exits 0 (clippy `-D warnings`); all tests pass; no stray verb outside the vocabulary.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Commit the rename separately:
+- [x] [AI] Commit the rename separately:
       `rtk git commit -m "refactor(rhino-cli)!: regroup by scope + uniform verb-first subcommand surface"`.
 
 ### Phase 9c — Port the JVM/contract commands (`lang` + `specs` codegen)

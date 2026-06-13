@@ -40,9 +40,9 @@ pub fn audit_category_order() -> &'static [&'static str] {
 /// Returns an empty string for unrecognised names.
 fn audit_category_command(name: &str) -> &'static str {
     match name {
-        "layer-coherence" => "repo-governance layer-coherence",
-        "traceability-audit" => "repo-governance traceability-audit",
-        "vendor-audit" => "repo-governance vendor-audit",
+        "layer-coherence" => "repo-governance validate layer-coherence",
+        "traceability-audit" => "repo-governance validate traceability",
+        "vendor-audit" => "repo-governance validate vendor",
         _ => "",
     }
 }
@@ -652,15 +652,15 @@ mod tests {
     fn audit_category_command_returns_expected() {
         assert_eq!(
             audit_category_command("layer-coherence"),
-            "repo-governance layer-coherence"
+            "repo-governance validate layer-coherence"
         );
         assert_eq!(
             audit_category_command("traceability-audit"),
-            "repo-governance traceability-audit"
+            "repo-governance validate traceability"
         );
         assert_eq!(
             audit_category_command("vendor-audit"),
-            "repo-governance vendor-audit"
+            "repo-governance validate vendor"
         );
         assert_eq!(audit_category_command("unknown"), "");
     }

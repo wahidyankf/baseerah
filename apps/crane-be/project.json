@@ -96,7 +96,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs coverage --shared-steps --exclude-dir messaging specs/apps/crane/behavior/crane-be/gherkin apps/crane-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir messaging specs/apps/crane/behavior/crane-be/gherkin apps/crane-be"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/crane/behavior/crane-be/gherkin/**/*.feature", "{projectRoot}/src/**/*.fs"]
