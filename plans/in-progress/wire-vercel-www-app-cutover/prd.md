@@ -93,6 +93,7 @@ Feature: Obsolete branches and references are retired
 ```gherkin
 Feature: Deployer agents reference the new branches
 
+  # Target state — agent created in Phase 1b of this plan
   Scenario: ose-www deployer pushes to the renamed branch
     Given the apps-ose-www-deployer agent definition exists
     When its deployment workflow section is read

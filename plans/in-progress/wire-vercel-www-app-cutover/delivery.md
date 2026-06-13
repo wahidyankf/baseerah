@@ -25,9 +25,29 @@ the worktree after the plan is archived and pushed.
 
 ---
 
+## Commit Guidelines
+
+- Use Conventional Commits format: `<type>(<scope>): <description>`
+- Split commits by domain/concern: wiring edits, branch creation, docs updates are separate commits
+- Imperative mood, no period at end
+- Never bundle unrelated fixes into a commit
+- Fix ALL pre-commit hook failures before retrying — do not use `--no-verify`
+
+**See**: [Commit Messages Convention](../../../repo-governance/development/workflow/commit-messages.md)
+
+---
+
 ## Phase 0: Prerequisite Verification
 
 > All Phase 0 checks confirm that the upstream restructure landed before any wiring edit begins.
+
+- [ ] [AI] Provision worktree:
+
+  ```bash
+  claude --worktree wire-vercel-www-app-cutover
+  ```
+
+  Acceptance criterion: `worktrees/wire-vercel-www-app-cutover/` exists and `git status` is clean.
 
 - [ ] [AI] Run `ls apps/ose-www apps/ayokoding-www apps/organiclever-www apps/wahidyankf-www apps/organiclever-app-web apps/ose-app-web` — acceptance: all six directories exist (restructure merged).
 - [ ] [AI] Run `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web' apps/ .claude/ .github/ AGENTS.md docs/ --count` to record starting stale-reference count — acceptance: output logged for comparison in Phase 4.
@@ -59,6 +79,9 @@ the worktree after the plan is archived and pushed.
 - [ ] [AI] Create `apps/organiclever-app-web/vercel.json` (model on `apps/wahidyankf-www/vercel.json`): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-organiclever-app-web" ]` — acceptance: file exists and grep confirms branch name.
 - [ ] [AI] Create `apps/ose-app-web/vercel.json` (model on `apps/wahidyankf-www/vercel.json`): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ose-app-web" ]` — acceptance: file exists and grep confirms branch name.
 
+> These paths exist only after `restructure-fsharp-be-and-web-app-tiers` has merged — Phase 0 gate
+> verifies their presence.
+
 ### 1b — Rename and update deployer agents
 
 - [ ] [AI] In `.claude/agents/`: rename `apps-ose-web-deployer.md` → `apps-ose-www-deployer.md`; update `name: apps-ose-www-deployer`, `description`, and every occurrence of `prod-ose-web` → `prod-ose-www` inside the file — acceptance: `grep 'prod-ose-web' .claude/agents/apps-ose-www-deployer.md` returns nothing.
@@ -71,7 +94,7 @@ the worktree after the plan is archived and pushed.
 
 ### 1c — Update GitHub Actions deploy workflows
 
-- [ ] [AI] Edit `.github/workflows/test-and-deploy-ose-web.yml`: rename workflow, update `push.branches` filter `prod-ose-web` → `prod-ose-www`, update `paths` filter `apps/ose-web/**` → `apps/ose-www/**`, update the force-push command target — acceptance: `grep 'prod-ose-web' .github/workflows/test-and-deploy-ose-web.yml` returns nothing; file can also be renamed to `test-and-deploy-ose-www.yml`.
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-ose-web.yml`: update `push.branches` filter `prod-ose-web` → `prod-ose-www`, update `paths` filter `apps/ose-web/**` → `apps/ose-www/**`, update the force-push command target — acceptance: `grep 'prod-ose-web' .github/workflows/test-and-deploy-ose-web.yml` returns nothing. Do NOT rename the workflow file — keep existing filename `test-and-deploy-ose-web.yml` to preserve CI history. Only update the branch references and affected-path filters inside the file.
 - [ ] [AI] Edit `.github/workflows/test-and-deploy-ayokoding-web.yml`: same pattern → `prod-ayokoding-www`, `apps/ayokoding-www/**` — acceptance: no stale branch name.
 - [ ] [AI] Edit `.github/workflows/test-and-deploy-wahidyankf-web.yml` (if exists): `prod-wahidyankf-web` → `prod-wahidyankf-www`, `apps/wahidyankf-web/**` → `apps/wahidyankf-www/**` — acceptance: no stale branch name.
 - [ ] [AI] Edit `.github/workflows/deploy-organiclever-web-to-production.yml`: update staging branch `stag-organiclever-web` → `stag-organiclever-app-web`, production branch `prod-organiclever-web` → `prod-organiclever-app-web`, path filter `apps/organiclever-web/**` → `apps/organiclever-app-web/**` — acceptance: no stale names remain.
@@ -125,7 +148,14 @@ the worktree after the plan is archived and pushed.
 - [ ] [AI] Run `git push origin origin/main:refs/heads/prod-organiclever-app-web` — acceptance: branch listed in remote.
 - [ ] [AI] Run `git push origin origin/main:refs/heads/stag-ose-app-web` — acceptance: branch listed in remote.
 - [ ] [AI] Run `git push origin origin/main:refs/heads/prod-ose-app-web` — acceptance: branch listed in remote.
+- [ ] [AI] Run quality gates: `npx nx affected -t typecheck lint && npm run lint:md && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:mermaid:validation`
+  - Acceptance criterion: zero errors
+  - Fix ALL failures found, not just those caused by current changes
 - [ ] [AI] Push wiring commit to origin main: `git push origin HEAD:main` — acceptance: `git log origin/main --oneline -1` matches local HEAD.
+- [ ] [AI] Verify GitHub Actions CI passes: `gh run list --branch main --limit 5` then `gh run view <run-id> --json status,conclusion`
+  - Poll every 3 minutes until status=completed
+  - Acceptance criterion: conclusion=success for all affected workflows
+  - If any fail: investigate root cause, fix, re-push — never skip or bypass
 
 ### Phase 2 Gate
 
@@ -188,3 +218,19 @@ the worktree after the plan is archived and pushed.
 
 > **Pause Safety**: All production domains live on new branches; old branches deleted; zero stale
 > references in repo. Plan complete. To resume verification: re-run the Phase 4 gate commands.
+
+---
+
+## Plan Archival
+
+- [ ] [AI] Move plan to `done/`:
+
+  ```bash
+  git mv plans/in-progress/wire-vercel-www-app-cutover/ plans/done/YYYY-MM-DD__wire-vercel-www-app-cutover/
+  ```
+
+  Replace `YYYY-MM-DD` with actual completion date. Acceptance criterion: folder exists under `plans/done/`.
+
+- [ ] [AI] Remove this plan's row from `plans/in-progress/README.md`
+- [ ] [AI] Update `plans/done/README.md` to add an entry for this plan
+- [ ] [AI] Commit: `chore(plans): move wire-vercel-www-app-cutover to done`
