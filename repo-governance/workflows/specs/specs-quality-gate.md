@@ -63,7 +63,7 @@ coverage gaps, terminology drift).
 This workflow validates **specification files only** in listed folders. It does NOT validate:
 
 - Implementation code in `apps/` (that's per-language developer agents and CI)
-- Test code or step definitions (that's `rhino-cli spec-coverage validate`)
+- Test code or step definitions (that's `rhino-cli specs coverage`)
 - Governance docs (that's `repo-rules-checker`)
 - Spec folders NOT in the explicit list
 

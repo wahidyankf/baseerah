@@ -489,23 +489,23 @@ Three automated markdown validators run on every commit and in CI via the `valid
 
 ### 1. Mermaid Diagram Validation
 
-**Command**: `npx nx run rhino-cli:validate:mermaid`
+**Command**: `npx nx run rhino-cli:mermaid:validation`
 
-Repo-wide scan: the Nx target runs `docs validate-mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content` (plus the standardized noise-skip set: `node_modules`, `dist`, `target`, `.next`, `coverage`, `generated-reports`, `local-temp`, `archived`, `apps-labs`, `worktrees`, `.terraform`, `generated-contracts`, `.nx`, `.git`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax. The `--exclude` flag is repeatable; pass additional prefixes to suppress noise in project-specific runs.
+Repo-wide scan: the Nx target runs `md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content` (plus the standardized noise-skip set: `node_modules`, `dist`, `target`, `.next`, `coverage`, `generated-reports`, `local-temp`, `archived`, `apps-labs`, `worktrees`, `.terraform`, `generated-contracts`, `.nx`, `.git`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax. Diagram types covered: `flowchart`/`graph` (all directions) and `stateDiagram-v2`/`stateDiagram` (v1) — state node count contributes to width; state display names and transition edge labels are subject to the ≤ 30-char limit. The `--exclude` flag is repeatable; pass additional prefixes to suppress noise in project-specific runs.
 
 **Gate locations**: Pre-commit (staged `.md` files only) + `validate-markdown.yml` CI. Not at pre-push.
 
 ### 2. Markdown Link Validation
 
-**Command**: `npx nx run rhino-cli:validate:links`
+**Command**: `npx nx run rhino-cli:links:validation`
 
-Full-repo link scan (same standardized noise-skip set as validate:mermaid). Validates all relative `[text](path.md)` links resolve to existing files. Also validates `#fragment` anchor references using the GitHub slug algorithm — underscores and Unicode letters/digits are kept, spaces map to hyphens, duplicates receive `-1`, `-2`, … suffixes (verified against the `github-slugger` v2 reference implementation). A fragment with no matching heading emits a `broken-anchor` finding.
+Full-repo link scan (same standardized noise-skip set as `mermaid:validation`). Validates all relative `[text](path.md)` links resolve to existing files. Also validates `#fragment` anchor references using the GitHub slug algorithm — underscores and Unicode letters/digits are kept, spaces map to hyphens, duplicates receive `-1`, `-2`, … suffixes (verified against the `github-slugger` v2 reference implementation). A fragment with no matching heading emits a `broken-anchor` finding.
 
 **Gate locations**: Pre-commit (staged `.md` files only, link step) + `validate-markdown.yml` CI. Not at pre-push.
 
 ### 3. Heading Hierarchy Validation
 
-**Command**: `npx nx run rhino-cli:validate:heading-hierarchy`
+**Command**: `npx nx run rhino-cli:headings:hierarchy-validation`
 
 Validates heading nesting on a prose allowlist (default-deny): `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), `specs/`, root `*.md`, `apps/*/README.md`, `libs/*/README.md`, `apps/*/docs/**`, `libs/*/docs/**`. All other paths (including `.claude/**`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`, `plans/done/`) are skipped.
 

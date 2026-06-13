@@ -27,7 +27,7 @@ This practice respects the following core principles:
 
 - **[Root Cause Orientation](../../principles/general/root-cause-orientation.md)**: Stale specs, outdated contracts, and missing tests are symptoms of treating artifact updates as separate, deferrable tasks. The root cause is a workflow that permits code changes without companion artifact updates. This convention addresses the root cause by making completeness a requirement, not a suggestion.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Where completeness can be enforced automatically -- Nx cache inputs that include Gherkin specs, codegen targets that fail on stale contracts, spec-coverage validation for CLI apps -- automation is preferred. Manual checking is reserved for documentation and architectural changes that require human judgment.
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Where completeness can be enforced automatically -- Nx cache inputs that include Gherkin specs, codegen targets that fail on stale contracts, specs:coverage validation for CLI apps -- automation is preferred. Manual checking is reserved for documentation and architectural changes that require human judgment.
 
 ## Conventions Implemented/Respected
 
@@ -37,7 +37,7 @@ This practice implements/respects the following conventions:
 
 - **[Three-Level Testing Standard](./three-level-testing-standard.md)**: All three test levels consume shared artifacts (Gherkin specs, contracts). When a feature changes, the tests at all affected levels must be updated.
 
-- **[Code Quality Convention](./code.md)**: Quality gates (typecheck, lint, test:quick, spec-coverage) catch many forms of incompleteness automatically. This convention defines the complete set of artifacts that constitute a "done" change.
+- **[Code Quality Convention](./code.md)**: Quality gates (typecheck, lint, test:quick, specs:coverage) catch many forms of incompleteness automatically. This convention defines the complete set of artifacts that constitute a "done" change.
 
 ## The Rule
 
@@ -65,7 +65,7 @@ A feature change is not complete until all four categories are addressed.
 - Removing an endpoint, procedure, or command -- remove or archive scenarios
 - Changing authentication or authorization requirements -- update scenarios
 
-**Automated enforcement**: `rhino-cli spec-coverage validate` catches missing step definitions. Nx cache inputs include Gherkin specs so stale specs invalidate test caches.
+**Automated enforcement**: `rhino-cli specs coverage` catches missing step definitions. Nx cache inputs include Gherkin specs so stale specs invalidate test caches.
 
 ### 2. Contracts (OpenAPI Specs)
 
@@ -90,7 +90,7 @@ A feature change is not complete until all four categories are addressed.
 - **E2E tests**: Changes to user-facing flows, API contracts, or full-stack behavior require updated E2E tests.
 - **Accessibility tests**: UI changes require accessibility verification (static analysis via oxlint jsx-a11y plugin, manual WCAG AA checks).
 
-**Automated enforcement**: Coverage thresholds in `test:quick` catch missing unit tests. `spec-coverage` catches missing step definitions.
+**Automated enforcement**: Coverage thresholds in `test:quick` catch missing unit tests. `specs:coverage` catches missing step definitions.
 
 ### 4. Documentation
 
@@ -150,7 +150,7 @@ They update, in the same commit or PR:
 
 ### FAIL: Code without specs
 
-A developer adds the endpoint but does not add Gherkin scenarios or update the OpenAPI contract. `spec-coverage` fails. `codegen` produces stale types. The change is incomplete.
+A developer adds the endpoint but does not add Gherkin scenarios or update the OpenAPI contract. `specs:coverage` fails. `codegen` produces stale types. The change is incomplete.
 
 ### FAIL: Code and specs without tests
 
@@ -190,7 +190,7 @@ It does not apply to:
 
 ## Tools and Automation
 
-- **`rhino-cli spec-coverage validate`**: Enforces Gherkin spec-to-test mapping. Integrated into `test:quick`.
+- **`rhino-cli specs coverage`**: Enforces Gherkin spec-to-test mapping. Integrated into `test:quick`.
 - **`codegen` Nx target**: Generates types from OpenAPI specs. Stale contracts cause `typecheck` to fail.
 - **Coverage thresholds**: `rhino-cli test-coverage validate` enforces minimum line coverage per project.
 - **Nx cache inputs**: Gherkin specs are declared as inputs for test targets, invalidating caches when specs change.

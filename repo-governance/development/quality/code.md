@@ -131,19 +131,19 @@ npx prettier --write [file-path]
 2. Pre-commit hook triggers (`.husky/pre-commit` — a single `go run` line)
 3. `rhino-cli git pre-commit` orchestrates all steps in order, failing fast:
 
-| Step | Trigger                                | Action                                                                     | On failure |
-| ---- | -------------------------------------- | -------------------------------------------------------------------------- | ---------- |
-| 1    | `.claude/` or `.opencode/` staged      | Validate → Sync → Validate-sync                                            | exit 1     |
-| 2    | `docker-compose.ya?ml` staged          | `docker compose -f <file> config` per file                                 | exit 1     |
-| 3    | always                                 | `nx affected -t run-pre-commit --skip-nx-cache`                            | warn only  |
-| 4    | always                                 | `git add apps/ayokoding-web/content/`                                      | ignored    |
-| 5    | always                                 | `npx lint-staged`                                                          | exit 1     |
-| 5b   | `apps/<app>/package.json` staged       | Regenerate + stage `apps/<app>/package-lock.json`                          | exit 1     |
-| 6    | `docs/` staged                         | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/` | exit 1     |
-| 6m   | staged `.md` files (skip 3 exclusions) | `validate:mermaid` — diagram width, label length, syntax (staged-only)     | exit 1     |
-| 6h   | staged `.md` in prose allowlist        | `validate:heading-hierarchy` — single H1, no skipped levels (staged-only)  | exit 1     |
-| 7    | always                                 | Validate markdown links + `#fragment` anchors (staged only)                | exit 1     |
-| 8    | always                                 | `npm run lint:md`                                                          | exit 1     |
+| Step | Trigger                                | Action                                                                       | On failure |
+| ---- | -------------------------------------- | ---------------------------------------------------------------------------- | ---------- |
+| 1    | `.claude/` or `.opencode/` staged      | Validate → Sync → Validate-sync                                              | exit 1     |
+| 2    | `docker-compose.ya?ml` staged          | `docker compose -f <file> config` per file                                   | exit 1     |
+| 3    | always                                 | `nx affected -t run-pre-commit --skip-nx-cache`                              | warn only  |
+| 4    | always                                 | `git add apps/ayokoding-web/content/`                                        | ignored    |
+| 5    | always                                 | `npx lint-staged`                                                            | exit 1     |
+| 5b   | `apps/<app>/package.json` staged       | Regenerate + stage `apps/<app>/package-lock.json`                            | exit 1     |
+| 6    | `docs/` staged                         | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/`   | exit 1     |
+| 6m   | staged `.md` files (skip 3 exclusions) | `mermaid:validation` — diagram width, label length, syntax (staged-only)     | exit 1     |
+| 6h   | staged `.md` in prose allowlist        | `headings:hierarchy-validation` — single H1, no skipped levels (staged-only) | exit 1     |
+| 7    | always                                 | Validate markdown links + `#fragment` anchors (staged only)                  | exit 1     |
+| 8    | always                                 | `npm run lint:md`                                                            | exit 1     |
 
 1. Commit proceeds if no errors
 
@@ -239,7 +239,7 @@ $ git commit -m "added new feature"
 4. `typecheck` runs for each affected project that declares it
 5. `lint` runs for each affected project
 6. `test:quick` runs for each affected project
-7. `spec-coverage` runs for each affected project that declares it
+7. `specs:coverage` runs for each affected project that declares it
 8. Push proceeds if all four gates pass
 
 **What It Validates**:
@@ -252,9 +252,9 @@ $ git commit -m "added new feature"
 - **Fast quality gate** (`test:quick`): Unit tests, build smoke tests, or other fast checks
   defined per project. Also enforced remotely as a required GitHub Actions status check before PR
   merge.
-- **Spec coverage** (`spec-coverage`): Validates that every Gherkin step in feature files has a
+- **Spec coverage** (`specs:coverage`): Validates that every Gherkin step in feature files has a
   matching step definition in source code. Compulsory for all apps and E2E runners. Uses
-  `rhino-cli spec-coverage validate`.
+  `rhino-cli specs coverage`.
 
 **What Happens on Failure**:
 
@@ -285,9 +285,9 @@ $ git push origin main
    organiclever-web
  All checks passed
 
-> nx affected -t spec-coverage
+> nx affected -t specs:coverage
 
- Running target spec-coverage for affected projects...
+ Running target specs:coverage for affected projects...
    organiclever-web
  All checks passed
 
@@ -360,13 +360,13 @@ Bypassing hooks regularly defeats the purpose of automated quality checks.
 
 ```bash
 # Run all four targets first (this warms the cache)
-npx nx affected -t typecheck lint test:quick spec-coverage
+npx nx affected -t typecheck lint test:quick specs:coverage
 
 # Now push — the hook replays from cache (near-instant)
 git push
 ```
 
-**Why this works**: `typecheck`, `lint`, `test:quick`, and `spec-coverage` are all cacheable Nx targets (`cache: true` in `nx.json`). Running them manually stores results in the local Nx cache. When the pre-push hook runs the same targets, Nx replays from cache instead of re-executing — making the hook near-instant regardless of how many projects are affected.
+**Why this works**: `typecheck`, `lint`, `test:quick`, and `specs:coverage` are all cacheable Nx targets (`cache: true` in `nx.json`). Running them manually stores results in the local Nx cache. When the pre-push hook runs the same targets, Nx replays from cache instead of re-executing — making the hook near-instant regardless of how many projects are affected.
 
 ### Tests Fail on Pre-push
 

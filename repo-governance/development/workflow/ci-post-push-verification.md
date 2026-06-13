@@ -112,7 +112,7 @@ This convention does not apply to pushes that exclusively touch:
 - `generated-socials/` — social content only
 - `.claude/agents/`, `.claude/skills/` — agent/skill definitions only, no app code impact
 
-The pre-push hook (typecheck, lint, test:quick, spec-coverage) already validates these changes sufficiently.
+The pre-push hook (typecheck, lint, test:quick, specs:coverage) already validates these changes sufficiently.
 
 ## What the Pre-Push Hook Covers vs. What This Convention Covers
 
@@ -177,7 +177,7 @@ No CI verification was performed. This is wrong — the pre-push hook passing is
 ### FAIL: Skipping CI because pre-push passed
 
 ```
-Agent: Pre-push hook passed (typecheck, lint, test:quick, spec-coverage).
+Agent: Pre-push hook passed (typecheck, lint, test:quick, specs:coverage).
        CI verification skipped — local gates passed.
 
 Work is complete.

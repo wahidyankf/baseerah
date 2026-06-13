@@ -72,7 +72,7 @@ npx playwright install  # Installs test browsers
 npm run doctor
 ```
 
-If doctor shows all green, you are ready. Run `npx nx affected -t typecheck lint test:quick spec-coverage`
+If doctor shows all green, you are ready. Run `npx nx affected -t typecheck lint test:quick specs:coverage`
 to verify the full pre-push pipeline.
 
 ## Full Setup
@@ -253,11 +253,11 @@ git commit --allow-empty -m "test: verify pre-commit hook"
 git reset HEAD~1
 ```
 
-**Pre-push** (runs on every push — typecheck, lint, test:quick, spec-coverage):
+**Pre-push** (runs on every push — typecheck, lint, test:quick, specs:coverage):
 
 ```bash
 # Dry-run: execute the same targets pre-push would
-npx nx affected -t typecheck lint test:quick spec-coverage
+npx nx affected -t typecheck lint test:quick specs:coverage
 ```
 
 This also warms the Nx cache, making subsequent pushes fast.
@@ -281,11 +281,11 @@ the matching step above.
 
 ### Pre-push hook times out
 
-The pre-push hook runs `typecheck`, `lint`, `test:quick`, and `spec-coverage` for affected
+The pre-push hook runs `typecheck`, `lint`, `test:quick`, and `specs:coverage` for affected
 projects. On first run with a cold cache, this takes several minutes. Warm the cache first:
 
 ```bash
-npx nx affected -t typecheck lint test:quick spec-coverage
+npx nx affected -t typecheck lint test:quick specs:coverage
 ```
 
 Subsequent pushes reuse cached results and complete in seconds.

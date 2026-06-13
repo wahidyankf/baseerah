@@ -513,7 +513,7 @@ git checkout README.md
 
 ```bash
 # Run the same targets pre-push would run, for affected projects
-npx nx affected -t typecheck lint test:quick spec-coverage
+npx nx affected -t typecheck lint test:quick specs:coverage
 ```
 
 **Success criteria**: All affected targets pass. This also warms the Nx cache so subsequent
@@ -551,7 +551,7 @@ kill %1
 
 ## Termination Criteria
 
-- **Success**: `npm run doctor` shows all tools OK, `nx affected -t typecheck lint test:quick spec-coverage`
+- **Success**: `npm run doctor` shows all tools OK, `nx affected -t typecheck lint test:quick specs:coverage`
   passes, at least one integration test and one E2E test pass
 - **Partial**: Doctor shows all tools OK but some tests fail (likely a project-specific issue,
   not a toolchain issue)

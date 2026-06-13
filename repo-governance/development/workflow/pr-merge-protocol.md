@@ -26,13 +26,13 @@ This practice respects the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Merge approval must be an explicit, visible action from the user. Implicit approval -- "the user asked me to create a PR, so merging is also implied" -- is the silent assumption this convention forbids.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Quality gates (typecheck, lint, test:quick, spec-coverage, CI workflows) run automatically. The automation validates; the human decides. This division is deliberate: machines check, humans approve.
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Quality gates (typecheck, lint, test:quick, specs:coverage, CI workflows) run automatically. The automation validates; the human decides. This division is deliberate: machines check, humans approve.
 
 ## Conventions Implemented/Respected
 
 This practice implements/respects the following conventions:
 
-- **[Code Quality Convention](../quality/code.md)**: The quality gates enforced by this protocol (typecheck, lint, test:quick, spec-coverage) are the same gates enforced by the pre-push hook. This convention extends the same standard to the PR merge boundary.
+- **[Code Quality Convention](../quality/code.md)**: The quality gates enforced by this protocol (typecheck, lint, test:quick, specs:coverage) are the same gates enforced by the pre-push hook. This convention extends the same standard to the PR merge boundary.
 
 - **[Trunk Based Development Convention](./trunk-based-development.md)**: PRs exist in TBD only for short-lived branches (worktree mode, code review, external contributions). This protocol governs the merge step of that workflow.
 
@@ -55,13 +55,13 @@ For every PR merge -- without exception -- the agent must:
 
 All of the following quality gates must pass before a PR is eligible for merge:
 
-| Gate              | Tool           | What It Validates                                  |
-| ----------------- | -------------- | -------------------------------------------------- |
-| **typecheck**     | Nx affected    | Type correctness across affected projects          |
-| **lint**          | Nx affected    | Static analysis, formatting, accessibility         |
-| **test:quick**    | Nx affected    | Unit tests, build smoke tests, coverage thresholds |
-| **spec-coverage** | Nx affected    | Gherkin step definitions match feature files       |
-| **CI workflows**  | GitHub Actions | All configured CI checks for the repository        |
+| Gate               | Tool           | What It Validates                                  |
+| ------------------ | -------------- | -------------------------------------------------- |
+| **typecheck**      | Nx affected    | Type correctness across affected projects          |
+| **lint**           | Nx affected    | Static analysis, formatting, accessibility         |
+| **test:quick**     | Nx affected    | Unit tests, build smoke tests, coverage thresholds |
+| **specs:coverage** | Nx affected    | Gherkin step definitions match feature files       |
+| **CI workflows**   | GitHub Actions | All configured CI checks for the repository        |
 
 ### No Bypass Without Explicit Permission
 
@@ -124,7 +124,7 @@ Quality gates:
   typecheck:     PASSED
   lint:          PASSED
   test:quick:    PASSED
-  spec-coverage: PASSED
+  specs:coverage: PASSED
   CI workflows:  PASSED
 
 No unresolved review comments.
@@ -150,7 +150,7 @@ Quality gates:
   typecheck:     PASSED
   lint:          FAILED (3 errors in auth-validator.ts)
   test:quick:    PASSED
-  spec-coverage: PASSED
+  specs:coverage: PASSED
 
 I will investigate and fix the lint errors before asking to merge.
 ```
@@ -165,7 +165,7 @@ Agent: All quality gates have passed for PR #42. Here is the summary:
   typecheck:     PASSED
   lint:          PASSED
   test:quick:    PASSED
-  spec-coverage: PASSED
+  specs:coverage: PASSED
   CI workflows:  PASSED
 
 Do you want me to merge this PR?
@@ -200,14 +200,14 @@ Agent: [later, different PR] Reusing your earlier approval to merge PR #43.
 ### PASS: User explicitly bypasses a gate
 
 ```
-Agent: PR #42 has all gates passing except spec-coverage, which
+Agent: PR #42 has all gates passing except specs:coverage, which
        failed because the new endpoint's Gherkin scenario is still
        being drafted in a follow-up task.
 
 User: Merge it anyway, I will add the Gherkin scenario in the next commit.
 
 Agent: Understood. Merging PR #42 with your explicit approval to
-       bypass the spec-coverage gate for this instance.
+       bypass the specs:coverage gate for this instance.
 ```
 
 ## Scope

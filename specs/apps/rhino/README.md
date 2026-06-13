@@ -94,7 +94,7 @@ scenarios are identical:
 | ----------- | ------------------------------------ | ------------------------------------------- | ------------------ |
 | Unit        | `src/**/*.rs` (`#[cfg(test)]` block) | In-source mocks via pure functions          | `test:quick`       |
 | Integration | `tests/cli/<domain>_<action>.rs`     | Real binary via `assert_cmd` + `predicates` | `test:integration` |
-| Cucumber    | `tests/cucumber/` (harness deferred) | cucumber-rs step definitions (future)       | `spec-coverage`    |
+| Cucumber    | `tests/cucumber/` (harness deferred) | cucumber-rs step definitions (future)       | `specs:coverage`   |
 
 Coverage is measured at the unit level only (≥90% line coverage via `cargo llvm-cov`).
 

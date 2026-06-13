@@ -27,7 +27,7 @@ This practice respects the following core principles:
 
 - **[Root Cause Orientation](../../principles/general/root-cause-orientation.md)**: Stale specs are a symptom of treating spec updates as optional. This convention addresses the root cause by making synchronization a mandatory part of every relevant change, not a periodic cleanup task.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Where synchronization can be enforced automatically — such as Nx cache inputs that include Gherkin specs, or `rhino-cli spec-coverage validate` for CLI apps — automation is preferred. Manual checking is reserved for architectural changes that require human judgment.
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Where synchronization can be enforced automatically — such as Nx cache inputs that include Gherkin specs, or `rhino-cli specs coverage` for CLI apps — automation is preferred. Manual checking is reserved for architectural changes that require human judgment.
 
 ## Conventions Implemented/Respected
 
@@ -105,7 +105,7 @@ Check and update specs in the same commit as the application change for:
 - Adding or removing a major UI page or route
 - Introducing a new data store or removing an existing one
 - Adding or removing an external integration that appears in the C4 context or container diagram
-- Adding or removing a CLI command (covered by mandatory `rhino-cli spec-coverage validate`)
+- Adding or removing a CLI command (covered by mandatory `rhino-cli specs coverage`)
 - Changing deployment target in a way that creates a new architectural boundary
 
 Do **not** update specs for:
@@ -176,7 +176,7 @@ When a new tRPC router is added to `apps/ayokoding-web/`, a new component entry 
 CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`) use the automated enforcement path:
 
 - Each Cobra command file maps to a `@tag` in a Gherkin feature file
-- `rhino-cli spec-coverage validate` enforces the 1:1 mapping automatically
+- `rhino-cli specs coverage` enforces the 1:1 mapping automatically
 - Adding a command without a spec causes `test:quick` to fail
 
 See [BDD Spec-to-Test Mapping](../infra/bdd-spec-test-mapping.md) for the full CLI mapping rules.
@@ -253,7 +253,7 @@ It does not apply to:
 
 ## Tools and Automation
 
-- **`rhino-cli spec-coverage validate`**: Enforces spec-to-test mapping for CLI apps. Integrated into `test:quick`. Violations cause CI to fail.
+- **`rhino-cli specs coverage`**: Enforces spec-to-test mapping for CLI apps. Integrated into `test:quick`. Violations cause CI to fail.
 - **Nx cache inputs**: `test:unit` and `test:quick` targets for API backends declare the project's Gherkin specs as inputs, so Nx invalidates cached results when Gherkin specs change.
 - **Contract codegen target**: Generates types from the OpenAPI spec. Declared as a dependency of `typecheck` and `build`, so stale contracts are caught in CI before merge.
 - **`repo-rules-checker`**: Validates that specs folders exist for apps that require them. Flags missing or misnamed spec folders.

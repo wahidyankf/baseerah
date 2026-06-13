@@ -309,7 +309,7 @@ This section clarifies the default push behavior and how git worktrees relate to
 - **Commit directly to `main`**. No branch. No PR.
 - **Push directly to `main`**. No merge request.
 - **No review step** unless explicitly requested by the user.
-- Quality gates run via the pre-push hook (typecheck, lint, test:quick, spec-coverage).
+- Quality gates run via the pre-push hook (typecheck, lint, test:quick, specs:coverage).
 
 This applies to all routine development: features, bug fixes, refactors, documentation, governance changes, and work executed inside a git worktree.
 

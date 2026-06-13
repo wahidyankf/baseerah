@@ -27,7 +27,7 @@ These workflows define **WHEN and HOW to validate specifications**, orchestratin
 **Not Included:**
 
 - Implementation code validation (that's per-language developer agents and CI)
-- Test step definitions (that's `rhino-cli spec-coverage validate`)
+- Test step definitions (that's `rhino-cli specs coverage`)
 - Repository governance (that's repository/)
 - Documentation quality (that's docs/)
 

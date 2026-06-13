@@ -380,18 +380,18 @@ The legacy `ORGANICLEVER_RHINO_DDD_SEVERITY` env var was removed without a depre
 
 #### Reverse-direction step orphan check (Fix #15)
 
-Every `spec-coverage` invocation enforces both directions:
+Every `rhino-cli specs coverage` invocation enforces both directions:
 
 - **Forward**: every Gherkin step has a matching impl.
 - **Reverse**: every impl matcher has at least one matching Gherkin step.
 
-Orphan impls fail the gate non-zero. There is no `--allow-orphan-steps` flag and no env var escape hatch — any orphan is either real drift or an extractor bug that must be fixed at source. The pre-flight audit ran across all 15 spec-coverage-wired projects in worktree as part of this plan and reached `FAIL=0` before merge.
+Orphan impls fail the gate non-zero. There is no `--allow-orphan-steps` flag and no env var escape hatch — any orphan is either real drift or an extractor bug that must be fixed at source. The pre-flight audit ran across all 15 specs:coverage-wired projects in worktree as part of this plan and reached `FAIL=0` before merge.
 
 The validator handles Scenario Outline forms in both directions: outline steps are emitted with `<placeholder>` tokens intact for forward matching against vitest-cucumber per-scenario impls, and Examples-table-expanded variants feed both directions so playwright-bdd regex-pattern impls binding expanded values count as covered. Comments in `.ts/.tsx` source are stripped before extraction (line comments only when at line start to preserve regex literals; block comments anywhere; strings preserved verbatim) so commented-out placeholder doc lines do not become false-positive orphan matches.
 
 #### Combined gherkin scopes per app
 
-`spec-coverage validate` accepts a variadic specs-dirs list (`validate <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-web has web + api; ayokoding-web has web + api + cli) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
+`rhino-cli specs coverage` accepts a variadic specs-dirs list (`specs coverage <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-web has web + api; ayokoding-web has web + api + cli) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
 
 #### Expanded relationship symmetry (DDD validators)
 

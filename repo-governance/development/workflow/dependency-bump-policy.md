@@ -247,7 +247,7 @@ When proposing or executing a dependency bump, follow these steps in order:
     Record the score and percentile in the clearance table. If score ≥ 0.5, flag for expedited
     scheduling (EPSS Escalation applies).
 11. Document the audit results and any waivers in the plan's `tech-docs.md`
-12. Run quality gates for affected projects: typecheck, lint, test:quick, spec-coverage
+12. Run quality gates for affected projects: typecheck, lint, test:quick, specs:coverage
 
 ## Tools and Automation
 

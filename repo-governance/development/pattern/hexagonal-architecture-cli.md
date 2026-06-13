@@ -44,22 +44,21 @@ implementations satisfy those ports.
 
 ## Directory Layout
 
-The table below shows the canonical layout for all four CLI apps. `rhino-cli` has a structural exception: its Rust
-source has an existing `src/internal.rs` module file that forces inner layers to live under `src/internal/` rather
-than directly under `src/`.
+The table below shows the canonical layout for all four CLI apps.
 
-| Layer              | rhino-cli (Rust, exception)    | crane-cli (F#)      | ose-cli (Go)      | ayokoding-cli (Go) |
-| ------------------ | ------------------------------ | ------------------- | ----------------- | ------------------ |
-| Inbound adapter    | `src/commands/`                | `src/Adapters/In/`  | `commands/`       | `commands/`        |
-| Application        | `src/internal/application/`    | `src/Core/Logic/`   | `application/`    | `application/`     |
-| Domain             | `src/internal/domain/`         | `src/Core/Domain/`  | `domain/`         | `domain/`          |
-| Outbound adapters  | `src/internal/infrastructure/` | `src/Adapters/Out/` | `infrastructure/` | `infrastructure/`  |
-| I/O port contracts | —                              | `src/Core/Ports.fs` | —                 | —                  |
-| Binary entry point | `src/main.rs`                  | `src/Program.fs`    | `main.go`         | `main.go`          |
+| Layer              | rhino-cli (Rust)      | crane-cli (F#)      | ose-cli (Go)      | ayokoding-cli (Go) |
+| ------------------ | --------------------- | ------------------- | ----------------- | ------------------ |
+| Inbound adapter    | `src/commands/`       | `src/Adapters/In/`  | `commands/`       | `commands/`        |
+| Application        | `src/application/`    | `src/Core/Logic/`   | `application/`    | `application/`     |
+| Domain             | `src/domain/`         | `src/Core/Domain/`  | `domain/`         | `domain/`          |
+| Outbound adapters  | `src/infrastructure/` | `src/Adapters/Out/` | `infrastructure/` | `infrastructure/`  |
+| I/O port contracts | —                     | `src/Core/Ports.fs` | —                 | —                  |
+| Binary entry point | `src/main.rs`         | `src/Program.fs`    | `main.go`         | `main.go`          |
 
-The `rhino-cli` exception is structural — the `src/internal.rs` module file already exists and Rust's module system
-requires child modules of `internal` to live under `src/internal/`. New CLI apps in Rust follow a flat `src/commands/`
-layout (no `internal/` wrapper).
+**`src/internal/` backward-compatibility shim**: `rhino-cli` retains a `src/internal/` directory containing
+thin re-export modules (e.g., `pub use crate::application::agents::*;`). These exist solely for callers that
+were written before the hexagonal migration (P7, 2026-05-23). No new code should import from `src/internal/`;
+import from `src/domain/`, `src/application/`, or `src/infrastructure/` directly.
 
 **crane-cli F# layout note**: crane-cli's F# implementation departs from the flat `src/commands/` layout because F#
 compile order is explicit — all files must be declared in the `.fsproj` in dependency order. Grouped subdirectories

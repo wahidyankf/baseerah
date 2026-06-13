@@ -114,7 +114,7 @@ Today's `bcregistry/Context.Gherkin` is a single string. Four ayokoding BCs span
 perspectives (`content`, `search`, `i18n`, `navigation`). The registry can only point at
 one path per BC, so each multi-perspective BC registers its **web-side** path. The api-side
 features (`content-api.feature`, `search-api.feature`, `i18n-api.feature`,
-`navigation-api.feature`) are still validated by the `spec-coverage` target (which runs
+`navigation-api.feature`) are still validated by the `specs:coverage` target (which runs
 against both perspectives independently), but are not walked by `ddd bc` for that BC's
 `gherkin:` field. This limitation is tracked in the `bdd-ddd-tooling-gap-fill` plan
 (fix #11: `gherkin: []string` schema extension).

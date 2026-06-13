@@ -33,7 +33,7 @@ This practice respects the following core principles:
 
 This practice implements/respects the following conventions:
 
-- **[Code Quality Convention](./code.md)**: The quality gates (typecheck, lint, test:quick, spec-coverage) are the CI boundary this convention protects. Bypassing those gates with `--no-verify` or test skipping is the specific action this convention forbids.
+- **[Code Quality Convention](./code.md)**: The quality gates (typecheck, lint, test:quick, specs:coverage) are the CI boundary this convention protects. Bypassing those gates with `--no-verify` or test skipping is the specific action this convention forbids.
 
 - **[Git Push Safety Convention](../workflow/git-push-safety.md)**: Both conventions share the stance that `--no-verify` is not a routine shortcut. This convention extends the principle to the broader case of any CI bypass mechanism.
 
@@ -78,7 +78,7 @@ Determine which projects are affected:
 
 ```bash
 # See which projects are affected by your changes
-npx nx affected -t typecheck lint test:quick spec-coverage --dry-run
+npx nx affected -t typecheck lint test:quick specs:coverage --dry-run
 ```
 
 If a project you did not modify is failing, it is a preexisting issue. Your changes did not cause it, but you are responsible for fixing it because you discovered it.
@@ -92,7 +92,7 @@ Reproduce the failure in isolation to confirm it is preexisting:
 npx nx run <project>:typecheck
 npx nx run <project>:lint
 npx nx run <project>:test:quick
-npx nx run <project>:spec-coverage
+npx nx run <project>:specs:coverage
 ```
 
 ### Step 4: Trace to Root Cause
@@ -128,7 +128,7 @@ git commit -m "fix(project-name): resolve preexisting typecheck failure in share
 Re-run the quality gates to confirm the fix resolves the failure:
 
 ```bash
-npx nx affected -t typecheck lint test:quick spec-coverage
+npx nx affected -t typecheck lint test:quick specs:coverage
 ```
 
 ## Commit Separation
@@ -204,7 +204,7 @@ Action:
 
 This convention applies to:
 
-- All CI quality gates: typecheck, lint, test:quick, spec-coverage
+- All CI quality gates: typecheck, lint, test:quick, specs:coverage
 - All projects in the Nx workspace
 - All contributors: human developers and AI agents
 - All branches: main, worktree branches, and PR branches

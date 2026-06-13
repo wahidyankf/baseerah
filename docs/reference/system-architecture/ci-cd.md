@@ -134,7 +134,7 @@ graph LR
 1. Checkout PR branch
 2. Setup language runtimes (Node.js, Go, .NET, Python)
 3. Install dependencies
-4. Run typecheck, lint, test:quick, spec-coverage for affected projects
+4. Run typecheck, lint, test:quick, specs:coverage for affected projects
 5. Validate agent naming and workflow naming conventions
 
 **Purpose**: Full quality gate on every PR — typecheck, lint, unit tests, coverage, naming validation
@@ -149,7 +149,7 @@ graph LR
 
 1. Checkout PR branch
 2. Setup Go 1.26.0
-3. Run link validation (`rhino-cli docs validate-links`)
+3. Run link validation (`rhino-cli md validate links`)
 4. Fail PR if broken links detected
 
 **Purpose**: Prevent merging PRs with broken markdown links
@@ -202,7 +202,7 @@ graph LR
 
 **Steps:**
 
-1. Run `spec-coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-web`, `organiclever-be-e2e`, `organiclever-web-e2e`)
+1. Run `specs:coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-web`, `organiclever-be-e2e`, `organiclever-web-e2e`)
 2. Run `fe-lint` for `organiclever-web`
 3. Run `be-integration` tests with docker-compose (real PostgreSQL) under `organiclever-web-development` env
 4. Run `fe-integration` tests (MSW-mocked)

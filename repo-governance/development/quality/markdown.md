@@ -313,12 +313,12 @@ Configuration has been tuned to disable overly strict rules. If you still see ma
   enforcement (prose allowlist + gate locations)
 - [Indentation Convention](../../conventions/formatting/indentation.md)
 - [Linking Convention](../../conventions/formatting/linking.md) — anchor (`#fragment`)
-  validation via `rhino-cli docs validate-links`
+  validation via `rhino-cli md validate links`
 - [Diagram and Schema Convention](../../conventions/formatting/diagrams.md) — Mermaid
   validation gate location (pre-commit + CI; not pre-push)
 - [Repository Validation Methodology Convention](./repository-validation.md) — canonical
-  reference for all three Markdown Quality Gates (validate:mermaid, validate:links,
-  validate:heading-hierarchy), their commands, exclusions, gate locations, and the
+  reference for all three Markdown Quality Gates (mermaid:validation, links:validation,
+  headings:hierarchy-validation), their commands, exclusions, gate locations, and the
   `validate-markdown.yml` CI workflow
 - [Code Quality Convention](./code.md)
 

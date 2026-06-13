@@ -61,7 +61,7 @@ The workflow exists so that:
 - Invoke the pre-flight procedure from `.claude/skills/repo-syncing-with-ose-primer/reference/clone-management.md` against the primer clone.
 - Confirm `ose-public` working tree is clean.
 - Confirm `ose-public` is on `main` at `origin/main` (no in-flight changes).
-- Confirm the baseline quality gate passes: `npx nx affected -t typecheck lint test:quick spec-coverage` returns zero failures.
+- Confirm the baseline quality gate passes: `npx nx affected -t typecheck lint test:quick specs:coverage` returns zero failures.
 
 **On failure**: Abort; record the failed precondition in a pre-flight-abort report; do not proceed.
 
@@ -124,7 +124,7 @@ After Commit J:
 - `ls .github/workflows/test-a-demo-*.yml` returns empty.
 - `ls specs/apps/a-demo 2>/dev/null` returns empty.
 - `nx graph` shows no `a-demo-*` project nodes.
-- `npx nx affected -t typecheck lint test:quick spec-coverage` passes.
+- `npx nx affected -t typecheck lint test:quick specs:coverage` passes.
 - Product E2E suites (`ayokoding-web-*-e2e`, `organiclever-*-e2e`, `ose-web-*-e2e`) pass.
 
 ### 6. Close-out (Sequential)

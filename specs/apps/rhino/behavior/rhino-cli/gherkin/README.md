@@ -15,7 +15,7 @@ behavior/rhino-cli/gherkin/
 ├── env/              # env subcommand family
 ├── git/              # git subcommand family
 ├── repo-governance/  # repo-governance subcommand family
-├── spec-coverage/    # spec-coverage subcommand family
+├── spec-coverage/    # specs coverage command (folded from old spec-coverage subcommand)
 ├── specs/            # specs subcommand family
 ├── system/           # system commands (doctor)
 ├── test-coverage/    # test-coverage subcommand family
@@ -80,9 +80,9 @@ behavior/rhino-cli/gherkin/
 
 ### spec-coverage
 
-| File                             | Command(s)               | Scenarios |
-| -------------------------------- | ------------------------ | --------- |
-| `spec-coverage-validate.feature` | `spec-coverage validate` | 6         |
+| File                             | Command(s)       | Scenarios |
+| -------------------------------- | ---------------- | --------- |
+| `spec-coverage-validate.feature` | `specs coverage` | 6         |
 
 ### specs
 

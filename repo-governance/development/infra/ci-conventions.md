@@ -100,19 +100,19 @@ with a period.
 The pre-push hook runs two commands in sequence:
 
 ```bash
-nx affected -t typecheck lint test:quick spec-coverage --parallel=cores-1
+nx affected -t typecheck lint test:quick specs:coverage --parallel=cores-1
 npm run lint:md
 ```
 
 `nx affected` computes which projects changed since the merge base and runs only those projects.
 `--parallel=cores-1` reserves one core for system responsiveness. `lint:md` runs
-`markdownlint-cli2` over all markdown files as a final gate. `spec-coverage` validates that every
+`markdownlint-cli2` over all markdown files as a final gate. `specs:coverage` validates that every
 Gherkin step has a matching step definition and is compulsory for all apps and E2E runners.
 
 If the pre-push hook times out, warm the Nx cache first:
 
 ```bash
-npx nx affected -t typecheck lint test:quick spec-coverage
+npx nx affected -t typecheck lint test:quick specs:coverage
 ```
 
 Then push again — the cached results make the second run fast.
@@ -120,8 +120,8 @@ Then push again — the cached results make the second run fast.
 After the baseline gate, the hook conditionally runs the naming validators when the push range
 touches the relevant trees:
 
-- `nx run rhino-cli:validate:naming-agents` — fires when `.claude/agents/**` or `.opencode/agents/**` changed
-- `nx run rhino-cli:validate:naming-workflows` — fires when `repo-governance/workflows/**` changed
+- `nx run rhino-cli:naming:harness-validation` — fires when `.claude/agents/**` or `.opencode/agents/**` changed
+- `nx run rhino-cli:naming:workflows-validation` — fires when `repo-governance/workflows/**` changed
 
 Both are cacheable, so no-op pushes pay near-zero cost. The CI quality-gate workflow also runs
 both targets unconditionally on every PR against `main` to catch drift from hand-edited files
@@ -362,7 +362,7 @@ Each scheduled test run executes five parallel tracks:
 | 1     | `lint`                          | Static analysis across all affected projects (includes static a11y for UI projects) |
 | 2     | `typecheck`                     | Type verification                                                                   |
 | 3     | `test:quick`                    | Unit tests + coverage validation                                                    |
-| 4     | `spec-coverage`                 | Validates Gherkin step coverage for all apps and E2E runners                        |
+| 4     | `specs:coverage`                | Validates Gherkin step coverage for all apps and E2E runners                        |
 | 5     | `test:integration` → `test:e2e` | Sequential: integration then E2E per service                                        |
 
 Tracks 1–4 run in parallel. Track 5 sequences integration before E2E within each service but
@@ -441,3 +441,138 @@ Every app with runtime configuration must satisfy these requirements:
 
 When a new variable is added to an app, the developer must update `.env.example` in the same
 commit. CI will fail if the app starts without the variable, surfacing the omission early.
+
+## CI/toolchain Parity Checklist
+
+Seven workstream invariants define the converged toolchain across all repositories. Any deviation
+must be recorded here with a justification; undocumented deviations are always bugs.
+
+### Invariant A — CI Workflow Shape
+
+| Requirement                                                                                                                                                              | Enforced by                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| All `checkout` steps use `actions/checkout@v6`                                                                                                                           | `actionlint` + PR quality gate           |
+| Workflow filenames follow `{purpose}.yml` or `test-and-deploy-{app}-{env}.yml`                                                                                           | `rhino-cli:naming:workflows-validation`  |
+| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                                    | `pr-quality-gate.yml` structure          |
+| Per-variant test workflows call reusable workflows (thin callers, ≤40 lines each)                                                                                        | Code review; reusable workflow structure |
+| All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                                        | `actionlint`; PR quality gate            |
+| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                                       | `pr-quality-gate.yml` job keys           |
+| Specs-gate job runs `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation` and `specs:gherkin-cardinality-validation` | `pr-quality-gate.yml` specs-gate job     |
+| Full quality gate runs on every push to `main` (thin caller `run-quality-gate-on-push.yml`)                                                                              | `run-quality-gate-on-push.yml` trigger   |
+| Scheduled workflows run at 2× WIB cadence (06:00 WIB = 23:00 UTC, 18:00 WIB = 11:00 UTC)                                                                                 | `test-and-deploy-*.yml` CRON expressions |
+
+### Invariant B — Git Hook Lifecycle
+
+Three Husky hooks, each with a fixed shape:
+
+| Hook         | Required steps (in order)                                                                                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commit-msg` | `commitlint --edit "$1"` — enforces Conventional Commits format                                                                                                     |
+| `pre-commit` | `npx nx run rhino-cli:env:validation` → `rhino-cli git pre-commit` (validate configs, format staged, validate links, lint markdown, shellcheck/hadolint/actionlint) |
+| `pre-push`   | `npx nx affected -t typecheck lint test:quick specs:coverage --parallel=<cores-1>` → `npm run lint:md` → conditional naming validators (harness + workflows)        |
+
+Conditional pre-push naming validators:
+
+- `nx run rhino-cli:naming:harness-validation` — fires when `.claude/agents/**` or `.opencode/agents/**` changed
+- `nx run rhino-cli:naming:workflows-validation` — fires when `repo-governance/workflows/**` changed
+
+### Invariant C — rhino-cli Hexagonal Architecture
+
+Source tree layout:
+
+| Layer                     | Path                  | Constraint                                      |
+| ------------------------- | --------------------- | ----------------------------------------------- |
+| Domain (pure)             | `src/domain/`         | No I/O; no `std::fs`, no HTTP, no env reads     |
+| Application (use cases)   | `src/application/`    | Calls domain; injects infrastructure via trait  |
+| Infrastructure (adapters) | `src/infrastructure/` | All I/O lives here (filesystem, network, env)   |
+| CLI (inbound adapter)     | `src/commands/`       | Parses CLI args; delegates to application layer |
+
+No file in `src/domain/` may import from `src/infrastructure/`. Violations fail `clippy`.
+
+### Invariant D — rhino-cli Command Surface (Union Superset)
+
+All callers (pre-push hook, CI workflows, `package.json` scripts) must use the canonical command
+form `rhino {group} {verb} [{noun}]`. The `validate:*` prefix used before P10 is abolished.
+
+Deprecated prefix→canonical mapping reference:
+
+| Old (abolished)                            | Canonical                            |
+| ------------------------------------------ | ------------------------------------ |
+| `validate:env`                             | `env:validation`                     |
+| `validate:links`                           | `links:validation`                   |
+| `validate:mermaid`                         | `mermaid:validation`                 |
+| `validate:heading-hierarchy`               | `headings:hierarchy-validation`      |
+| `validate:specs-tree`                      | `specs:tree-validation`              |
+| `validate:specs-links`                     | `specs:links-validation`             |
+| `validate:specs-counts`                    | `specs:counts-validation`            |
+| `validate:specs-adoption`                  | `specs:adoption-validation`          |
+| `validate:naming-agents`                   | `naming:harness-validation`          |
+| `validate:naming-workflows`                | `naming:workflows-validation`        |
+| `validate:repo-governance-vendor-audit`    | `governance:vendor-audit-validation` |
+| `validate:cross-vendor-parity`             | `cross-vendor:parity-validation`     |
+| `validate:harness-bindings` (package.json) | `harness:bindings-validation`        |
+
+### Invariant E — Nx Target Naming (`{domain}:{work}`)
+
+Governance, validation, lint, and format targets use the `{domain}:{work}` scheme.
+`spec-coverage` is renamed `specs:coverage` repo-wide.
+
+Rust-specific renames applied to all Rust `project.json` files:
+
+| Old name     | New name       |
+| ------------ | -------------- |
+| `fmt:check`  | `format:check` |
+| `check:msrv` | `msrv:check`   |
+
+The full naming rationale and complete target catalog are documented in
+[Nx Target Standards](./nx-targets.md).
+
+### Invariant F — Governance Documentation Currency
+
+All documentation in `repo-governance/` must reflect the converged toolchain. After any P10-class
+rename or command-surface change, update:
+
+1. `repo-governance/development/infra/ci-conventions.md` (this file) — pre-push section + checklist
+2. `repo-governance/development/infra/nx-targets.md` — target name tables + `{domain}:{work}` naming section
+3. `AGENTS.md` — Cross-Language Lint Gates section + rhino-cli command surface
+4. `apps/rhino-cli/README.md` — command surface table + hexagonal layout diagram
+5. Any index READMEs that reference renamed targets
+
+Stale `validate:*` or `spec-coverage` references in any of the above are bugs caught by
+`rhino-cli:links:validation` fragment checks and by the Parity Checklist gate in the plan delivery
+process.
+
+### Invariant G — Mermaid State Diagram Validation
+
+`stateDiagram-v2` and `stateDiagram` (v1) diagrams are subject to the same width and label rules
+as flowchart diagrams:
+
+- **Width**: State node count contributes to the diagram width calculation. Diagrams exceeding
+  the width limit must be split or redesigned.
+- **Label length**: State display names and transition edge labels are limited to 30 characters.
+  Use abbreviations or split composite states when labels exceed this limit.
+
+Both rules are enforced by `rhino-cli:mermaid:validation`, which scans the entire repo (excluding
+`plans/done/`, `apps/ayokoding-web/content/`, and the standard noise-skip set).
+
+### Affected-First PR-Gate Principle
+
+The PR quality gate runs `nx affected` for all per-project checks so only changed projects pay
+the cost of typecheck, lint, test, and coverage on each PR. Whole-repo checks that cannot be
+scoped to affected projects are an explicit exception and must be justified.
+
+| Check                       | Target / Command                               | Why whole-repo                                                           |
+| --------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| Markdown linting            | `npm run lint:md`                              | Links reference cross-project paths; partial scans miss broken links     |
+| Mermaid validation          | `rhino-cli:mermaid:validation`                 | Width rules apply across all `.md` files; a fix in one breaks another    |
+| Link validation             | `rhino-cli:links:validation`                   | Cross-project and external links must resolve globally                   |
+| Heading hierarchy           | `rhino-cli:headings:hierarchy-validation`      | Cross-file anchor references cannot be validated in isolation            |
+| Harness naming              | `rhino-cli:naming:harness-validation`          | Agent catalog is a global registry; partial scan misses naming conflicts |
+| Workflow naming             | `rhino-cli:naming:workflows-validation`        | Workflow registry is global                                              |
+| Governance vendor audit     | `rhino-cli:governance:vendor-audit-validation` | Scans `repo-governance/` globally for vendor-specific content leakage    |
+| Cross-vendor parity         | `rhino-cli:cross-vendor:parity-validation`     | All three harness binding trees are compared; scoping breaks the diff    |
+| Harness bindings validation | `npm run harness:bindings-validation`          | Binding parity is a whole-repo property; partial sync leaves gaps        |
+| Env validation              | `rhino-cli:env:validation`                     | All `.env.example` files checked against a global schema                 |
+
+Any new whole-repo check added to CI or pre-push must be listed here with its justification before
+it lands.

@@ -73,7 +73,7 @@ nx run ayokoding-web-be-e2e:test:e2e
 
 ## Nx Cache Inputs
 
-Gherkin spec paths are explicit Nx cache inputs for `test:quick` and `spec-coverage`. The
+Gherkin spec paths are explicit Nx cache inputs for `test:quick` and `specs:coverage`. The
 canonical input pattern in `project.json`:
 
 ```text

@@ -537,7 +537,7 @@ invoker wants a formal review before plans are active.
 ### Subset of Two Repos
 
 ```
-User: "Run plan-multi-repo-parity-planning for objective: add spec-coverage gate
+User: "Run plan-multi-repo-parity-planning for objective: add specs:coverage gate
        repos: ose-public, ose-primer"
 ```
 

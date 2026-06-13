@@ -7,7 +7,7 @@ tags:
   - bdd
   - gherkin
   - integration-testing
-  - spec-coverage
+  - specs:coverage
   - demo-be
 created: 2026-03-06
 ---
@@ -25,7 +25,7 @@ This practice respects the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Every command's behavior is explicitly specified in Gherkin before implementation. No undocumented commands.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: `spec-coverage validate` automatically enforces the mapping at file, scenario, and step levels.
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: `rhino-cli specs coverage` automatically enforces the mapping at file, scenario, and step levels.
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: Specs are written alongside or before the command implementation, serving as living documentation.
 
@@ -70,7 +70,6 @@ The `@tag` is derived from the Go filename: replace underscores with hyphens.
 | `agents_validate_sync.go`   | `agents validate-sync`   | `@agents-validate-sync`   |
 | `agents_validate_claude.go` | `agents validate-claude` | `@agents-validate-claude` |
 | `docs_validate_links.go`    | `docs validate-links`    | `@docs-validate-links`    |
-| `spec_coverage_validate.go` | `spec-coverage validate` | `@spec-coverage-validate` |
 | `doctor.go`                 | `doctor`                 | `@doctor`                 |
 
 ### 2. Tag to Feature File (flexible)
@@ -145,11 +144,11 @@ func TestIntegrationValidateSync(t *testing.T) {
 
 **Unit test files** (`{domain}_{action}_test.go`) serve dual purpose: they contain both godog BDD step definitions (consuming Gherkin specs via `TestUnit*` functions) and any non-BDD pure function tests for edge cases not covered by the Gherkin scenarios. The godog step definitions in unit test files use mocked I/O function variables instead of real filesystem access.
 
-**The universal rule**: All Go CLI files (command, unit test, integration test) use underscores. Feature files and `@tag`s use hyphens. The `spec-coverage validate` tool normalises hyphens to underscores when matching feature stems to Go test files.
+**The universal rule**: All Go CLI files (command, unit test, integration test) use underscores. Feature files and `@tag`s use hyphens. The `rhino-cli specs coverage` tool normalises hyphens to underscores when matching feature stems to Go test files.
 
 ## Coverage Enforcement
 
-The `spec-coverage validate` command enforces this mapping at three levels:
+The `rhino-cli specs coverage` command enforces this mapping at three levels:
 
 1. **File-level**: Every `.feature` file must have a matching `*_test.*` file
 2. **Scenario-level**: Every `Scenario:` in the feature must appear as `// Scenario:` comment or `Scenario(...)` call in test code
@@ -158,7 +157,7 @@ The `spec-coverage validate` command enforces this mapping at three levels:
 Run the check:
 
 ```bash
-rhino-cli spec-coverage validate specs/apps/rhino apps/rhino-cli
+rhino-cli specs coverage specs/apps/rhino apps/rhino-cli
 ```
 
 **Scope**: Spec-coverage enforcement is currently active for **CLI apps only** (Rust + cucumber-rs naming
@@ -175,7 +174,7 @@ which differ from the CLI app naming patterns the tool currently expects. This w
 3. Create `apps/{app}/cmd/{domain}_{action}.go` with the Cobra command (register with parent)
 4. Create `apps/{app}/cmd/{domain}_{action}_test.go` with godog unit step definitions — use package-level function variables to mock all I/O, no build tag (runs in `test:quick`)
 5. Create `apps/{app}/cmd/{domain}_{action}.integration_test.go` with godog integration steps — add `//go:build integration`, drive via `cmd.RunE()` against real `/tmp` fixtures
-6. Verify: `rhino-cli spec-coverage validate specs/{app} apps/{app}`
+6. Verify: `rhino-cli specs coverage specs/{app} apps/{app}`
 
 ### Rust CLI app (rhino-cli)
 
@@ -183,7 +182,7 @@ which differ from the CLI app naming patterns the tool currently expects. This w
 2. Create `apps/rhino-cli/src/commands/{domain}_{action}.rs` with the Clap subcommand (register in `main.rs`)
 3. Create `apps/rhino-cli/src/commands/{domain}_{action}_test.rs` (or inline `#[cfg(test)]` module) with unit step definitions — mock I/O via injected function types, no special build tag
 4. Create `apps/rhino-cli/tests/{domain}_{action}_integration_test.rs` with integration steps — drive via process invocation against real `/tmp` fixtures
-5. Verify: `rhino-cli spec-coverage validate specs/apps/rhino apps/rhino-cli`
+5. Verify: `rhino-cli specs coverage specs/apps/rhino apps/rhino-cli`
 
 ## CLI Apps: Dual-Level Spec Consumption
 

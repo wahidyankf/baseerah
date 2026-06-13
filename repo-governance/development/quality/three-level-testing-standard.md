@@ -157,8 +157,8 @@ Frontend apps include generated contracts in `inputs` but may use a separate spe
 
 See [Nx Target Standards](../infra/nx-targets.md) for the full canonical inputs table per language.
 
-**Spec-coverage enforcement**: `spec-coverage` is compulsory for all apps and E2E runners.
-`rhino-cli spec-coverage validate` runs as the dedicated `spec-coverage` Nx target and is enforced
+**Spec-coverage enforcement**: `specs:coverage` is compulsory for all apps and E2E runners.
+`rhino-cli specs coverage` runs as the dedicated `specs:coverage` Nx target and is enforced
 by the pre-push hook and all scheduled Test CI workflows. Projects with genuine step gaps have the
 target deferred temporarily until step implementations are complete. See [Nx Target
 Standards](../infra/nx-targets.md) for the full project-by-project status and command flags.
@@ -254,20 +254,20 @@ The `typecheck` and `build` Nx targets depend on `codegen`. This means contract 
 
 The following table maps GitHub Actions workflows to the test levels they execute:
 
-| Workflow                | lint | test:unit        | spec-coverage | test:integration | test:e2e | When          |
-| ----------------------- | ---- | ---------------- | ------------- | ---------------- | -------- | ------------- |
-| Pre-push hook           | Yes  | Via `test:quick` | Yes           | No               | No       | Every push    |
-| PR quality gate         | Yes  | Via `test:quick` | No            | No               | No       | Every PR      |
-| `test-and-deploy-*.yml` | Yes  | Via `test:quick` | Yes           | Yes              | Yes      | CRON 2x daily |
+| Workflow                | lint | test:unit        | specs:coverage | test:integration | test:e2e | When          |
+| ----------------------- | ---- | ---------------- | -------------- | ---------------- | -------- | ------------- |
+| Pre-push hook           | Yes  | Via `test:quick` | Yes            | No               | No       | Every push    |
+| PR quality gate         | Yes  | Via `test:quick` | No             | No               | No       | Every PR      |
+| `test-and-deploy-*.yml` | Yes  | Via `test:quick` | Yes            | Yes              | Yes      | CRON 2x daily |
 
-`lint` (including static a11y checks via oxlint jsx-a11y plugin for TypeScript UI projects) runs in all three enforcement gates: the pre-push hook, the PR quality gate, and Test CI workflows. `spec-coverage` runs in the pre-push hook and all Test CI workflows, ensuring every Gherkin step has a matching step definition. The pre-push hook intentionally omits integration and E2E tests. These tests require Docker infrastructure (PostgreSQL, running servers) and are too slow and environment-dependent to run on every push. The PR quality gate omits `spec-coverage` because it targets only the fast `test:quick` path used for merge checks. The scheduled `test-and-deploy-*.yml` workflows cover integration, E2E, and spec-coverage on a regular cadence for production apps.
+`lint` (including static a11y checks via oxlint jsx-a11y plugin for TypeScript UI projects) runs in all three enforcement gates: the pre-push hook, the PR quality gate, and Test CI workflows. `specs:coverage` runs in the pre-push hook and all Test CI workflows, ensuring every Gherkin step has a matching step definition. The pre-push hook intentionally omits integration and E2E tests. These tests require Docker infrastructure (PostgreSQL, running servers) and are too slow and environment-dependent to run on every push. The PR quality gate omits `specs:coverage` because it targets only the fast `test:quick` path used for merge checks. The scheduled `test-and-deploy-*.yml` workflows cover integration, E2E, and specs:coverage on a regular cadence for production apps.
 
 ## Spec-Coverage Validation
 
-`rhino-cli spec-coverage validate` ensures every Gherkin step has a matching step definition. This
+`rhino-cli specs coverage` ensures every Gherkin step has a matching step definition. This
 prevents scenarios from silently having no implementation.
 
-The tool is invoked as the `spec-coverage` Nx target and is enforced by the pre-push hook alongside
+The tool is invoked as the `specs:coverage` Nx target and is enforced by the pre-push hook alongside
 `typecheck`, `lint`, and `test:quick`. All four targets are cacheable.
 
 ### Flags
@@ -284,20 +284,20 @@ testing infrastructure and are not implemented at the unit or integration level.
 
 ### Project Coverage Status
 
-19 projects currently have `spec-coverage` enforced. 11 projects have it temporarily deferred
+19 projects currently have `specs:coverage` enforced. 11 projects have it temporarily deferred
 pending step implementation. The project-by-project breakdown is maintained in
 [Nx Target Standards](../infra/nx-targets.md).
 
 ### Relationship to the Three Test Levels
 
-All three test levels (unit, integration, E2E) consume the same Gherkin specs. `spec-coverage`
+All three test levels (unit, integration, E2E) consume the same Gherkin specs. `specs:coverage`
 enforces that every step referenced in the feature files has at least one step definition
 somewhere in the project's source tree. It does not verify which test level implements each step —
 it verifies that no step is silently unimplemented across all levels combined.
 
 ```
 Gherkin feature file
-  -> spec-coverage validates: every step has a matching step definition
+  -> specs:coverage validates: every step has a matching step definition
   -> test:unit runs: unit-level step definitions (mocked dependencies)
   -> test:integration runs: integration-level step definitions (real DB, no HTTP)
   -> test:e2e runs: E2E-level step definitions (real HTTP + real DB)
@@ -345,7 +345,7 @@ The following gaps are known and tracked for future resolution:
 
 - **FE unit tests lack Gherkin**: `organiclever-web` does not yet consume Gherkin specs at the unit level. A BDD runner compatible with Vitest-based unit tests needs to be selected.
 - **Content platform Gherkin pending**: `ayokoding-web` and `ose-web` do not yet consume Gherkin specs at any test level. Gherkin consumption for content platforms is planned as part of the same standardization effort.
-- **Spec-coverage deferred for some projects**: Some projects have `spec-coverage` temporarily deferred until step implementations are complete. See "Spec-Coverage Validation" above and [Nx Target Standards](../infra/nx-targets.md) for the deferred project list.
+- **specs:coverage deferred for some projects**: Some projects have `specs:coverage` temporarily deferred until step implementations are complete. See "Spec-Coverage Validation" above and [Nx Target Standards](../infra/nx-targets.md) for the deferred project list.
 
 ## Per-Backend Implementation Pattern
 
