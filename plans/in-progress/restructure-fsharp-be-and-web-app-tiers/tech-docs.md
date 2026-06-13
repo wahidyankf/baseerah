@@ -153,11 +153,19 @@ Both backends adopt the primer's source layout under `apps/<backend>/src/<AppNam
 
 ### ose-be (F#, renamed from ose-app-be)
 
-Carries **five** non-media bounded contexts to preserve
+Carries **six** non-media bounded contexts to preserve
 `[Repo-grounded: apps/ose-app-be/src/contexts/]`: `health`, `ai-orchestration`, `gap-analysis`,
-`internal-policy`, `regulatory-source` — plus `messaging` (status + JetStream demo). The `media/`
-slice and `messaging/crane_client.rs` are **dropped**.
+`internal-policy`, `regulatory-source`, `db` — plus `messaging` (status + JetStream demo). The
+`media/` slice and `messaging/crane_client.rs` are **dropped**.
 
+> **`db` context (decision #24)**: The Rust `db/` context handles migration orchestration. In the
+> F# port this responsibility is absorbed by **DbUp embedded migrations** (`db/migrations/*.sql`
+> as `<EmbeddedResource>`). The Rust `db/` context module is therefore **not ported as a
+> bounded context**; instead its behavior spec
+> (`specs/apps/ose/behavior/app-be/gherkin/db/migrations.feature`) is preserved and re-bound
+> under the DbUp infrastructure. The Phase 3 gate assertion "all contexts bound" includes the
+> `db/migrations.feature` step binding.
+>
 > **OpenRouter LLM integration is core and preserved**: `ose-be` is an AI/LLM backend — its
 > `gap-analysis` (and `ai-orchestration`) contexts call **OpenRouter** for LLM completions. The F#
 > port MUST carry the OpenRouter integration forward (it is **core, not media**). The
@@ -470,7 +478,7 @@ Media removal:
 
 `spec-coverage` (post-parity: `specs:coverage`) for each backend points at its behavior dir;
 `messaging` stays `--exclude-dir` (e2e-only) as today
-`[Repo-grounded: organiclever-be project.json spec-coverage --exclude-dir messaging]`. For `ose-be` the
+`[Repo-grounded: organiclever-be project.json specs:coverage --exclude-dir messaging]`. For `ose-be` the
 binding points at the renamed `behavior/be/`; for `organiclever-be` the binding is unchanged (name
 kept). The Phase 8 gate asserts every non-messaging step (incl. journal CRUD for `organiclever-be`) is
 bound.

@@ -85,7 +85,7 @@ This solo-maintainer repo's personas are the hats worn and the agents/services t
 ## User Stories
 
 - As the **backend maintainer**, I want `ose-app-be` renamed to `ose-be` and rewritten to F# with all
-  five non-media bounded contexts intact (including the OpenRouter LLM integration) so that no
+  six non-media bounded contexts intact (including the OpenRouter LLM integration) so that no
   functionality is lost and its contract is preserved.
 - As the **backend maintainer**, I want `organiclever-be` rewritten in place (name kept) and given
   real `journal` CRUD so that it is a genuine backend, not an empty skeleton.
@@ -169,10 +169,11 @@ Scenario: the ose-be OpenAPI contract still validates after media removal
 ```
 
 ```gherkin
-Scenario: all five ose-be bounded contexts are preserved
+Scenario: all six ose-be bounded contexts are preserved
   Given ose-be has been renamed from ose-app-be and ported to F#
   When the spec-coverage target runs over its behavior specs
   Then health, ai-orchestration, gap-analysis, internal-policy, and regulatory-source steps are all bound
+  And the db migrations.feature steps are bound via DbUp infrastructure
   And no bounded context is missing
 ```
 
@@ -367,7 +368,7 @@ Scenario: env drift guard passes with renamed/F# vars and without crane vars
 ### In Scope (Product Features)
 
 - `ose-be` (renamed from `ose-app-be`) rewritten to F#, preserving `/health`, all non-media paths, its
-  messaging status surface + JetStream demo, its five bounded contexts, and its OpenRouter LLM
+  messaging status surface + JetStream demo, its six bounded contexts, and its OpenRouter LLM
   integration (gap-analysis; core).
 - `organiclever-be` (in-place rewrite, name kept) as a real F# backend: `health`, minimal `journal`
   CRUD (PGlite-schema mirror), messaging status + JetStream demo.

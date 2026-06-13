@@ -51,7 +51,7 @@ into a **platform-tier restructure**:
    data access, **DbUp** for run-on-boot migrations (replacing `sqlx::migrate!`), and **NATS.Net**
    for messaging (replacing `async-nats`).
    - `ose-app-be` is a **rename + port**: it is renamed `ose-app-be` → **`ose-be`** (generic) and
-     ported Rust → F#. It has a real consumer (`ose-app-web` via generated contracts) and five
+     ported Rust → F#. It has a real consumer (`ose-app-web` via generated contracts) and six
      non-media bounded contexts; its OpenAPI contract is **preserved** (minus media). It is an
      **AI/LLM backend** (gap-analysis via OpenRouter); the F# port **preserves the OpenRouter
      integration** (core, not media).
@@ -142,6 +142,7 @@ author it.
 | 21  | backend naming (generic)     | **Generic `<product>-be`** (cost-driven, self-hosted k8s, one backend per product). `organiclever-app-be` REVERTED → in-place F# rewrite of `organiclever-be` (NO `git mv`); `ose-app-be` → **`ose-be`** (`git mv`, own atomic unit). `*-app-web` clients call the generic `<product>-be`                                                                                                    |
 | 22  | ayokoding joins `-www`       | `ayokoding-web` → **`ayokoding-www`** (mechanical rename; KEEPS structure + tRPC, NOT a `ts-ui` consumer; `-www` = deployment role)                                                                                                                                                                                                                                                          |
 | 23  | container images             | **Only the two generic backends** get GHCR images: `ghcr.io/wahidyankf/organiclever-be`, `ghcr.io/wahidyankf/ose-be`. Web tiers deploy via Vercel — **no** container images                                                                                                                                                                                                                  |
+| 24  | `db` context in `ose-app-be` | The Rust `db/` context handles migration orchestration. In the F# port this is **absorbed by DbUp embedded migrations** (`db/migrations/*.sql` as `<EmbeddedResource>`) — not ported as a separate bounded context. The `db/migrations.feature` behavior spec is preserved and re-bound under DbUp infrastructure; it counts toward the Phase 3 gate spec-coverage assertion.                |
 
 ### Default mechanical mappings
 
@@ -214,7 +215,7 @@ flowchart TB
 ### In Scope
 
 - Rewrite + rename `apps/ose-app-be` → `apps/ose-be` from Rust to F# (Giraffe / EF Core 10 / DbUp /
-  NATS.Net), preserving its OpenAPI contract minus media, including its five non-media bounded
+  NATS.Net), preserving its OpenAPI contract minus media, including its six non-media bounded
   contexts (`health`, `ai-orchestration`, `gap-analysis`, `internal-policy`, `regulatory-source`) and
   its **OpenRouter LLM integration** (gap-analysis; core, preserved).
 - **In-place F# rewrite** of `apps/organiclever-be` (name kept — NO `git mv`), with **minimal

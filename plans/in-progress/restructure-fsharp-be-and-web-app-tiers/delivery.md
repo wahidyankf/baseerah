@@ -39,7 +39,13 @@ This plan runs in its **own git worktree** so it executes in **parallel** with o
 blocking `main`. **All delivery phases below execute inside this worktree**; pushes go to `origin main`
 per the per-gate cadence.
 
-Manual provisioning (run from repo root) — per the
+Optional manual pre-provisioning (run from repo root):
+
+```bash
+claude --worktree restructure-fsharp-be-and-web-app-tiers
+```
+
+Alternatively, provision manually — per the
 [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)
 convention, after `git worktree add` run **both** `npm install` AND `npm run doctor -- --fix` inside
 the new worktree:
@@ -50,9 +56,6 @@ cd worktrees/restructure-fsharp-be-and-web-app-tiers
 npm install
 npm run doctor -- --fix
 ```
-
-(The repo-local `WorktreeCreate` hook also accepts `claude --worktree
-restructure-fsharp-be-and-web-app-tiers` and routes the worktree to `worktrees/<name>/`.)
 
 The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest
 `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting
@@ -291,9 +294,9 @@ permanently (in-place rewrite — its `OrganicleverBe` namespace is the final na
       (never committed) — acceptance: `nx run ose-app-be:test:unit` + `:test:integration` pass.
 - [ ] [AI] **REFACTOR**: Extract `Infrastructure/NatsClient.fs`; each context independent (no
       cross-context imports except shared Domain) — acceptance: `typecheck` exits 0.
-- [ ] [AI] **Spec adaptation**: bind F# TickSpec steps for all five contexts; remove media from
+- [ ] [AI] **Spec adaptation**: bind F# TickSpec steps for all six contexts; remove media from
       `specs/apps/ose/` behavior/contract; regenerate via `nx run ose-app-be:codegen` — acceptance:
-      `nx run ose-app-be:spec-coverage` exits 0 (messaging excluded); no media in generated types.
+      `nx run ose-app-be:specs:coverage` exits 0 (messaging excluded); no media in generated types.
 
 ### 3b — Atomic rename `ose-app-be` → `ose-be`
 
@@ -326,10 +329,10 @@ permanently (in-place rewrite — its `OrganicleverBe` namespace is the final na
 ### Phase 3 Gate
 
 - [ ] [AI] `nx show projects` — `ose-be`, `ose-be-e2e` exist; old `ose-app-be`/`ose-app-be-e2e` gone.
-- [ ] [AI] `nx affected -t typecheck lint test:quick spec-coverage --base=origin/main` — exits 0 for
+- [ ] [AI] `nx affected -t typecheck lint test:quick specs:coverage --base=origin/main` — exits 0 for
       ose-be.
 - [ ] [AI] `nx run ose-be:test:quick` — exits 0; coverage ≥90%.
-- [ ] [AI] `nx run ose-be:spec-coverage` — exits 0; all five contexts bound.
+- [ ] [AI] `nx run ose-be:specs:coverage` — exits 0; all six contexts bound (incl. db/migrations.feature via DbUp binding; decision #24).
 - [ ] [AI] `nx run ose-be:codegen` — exits 0; contract validates minus media.
 - [ ] [AI] `grep -r 'OSE_BE_OPENROUTER' apps/ose-be/src/OseBe/` — ≥1 match (OpenRouter integration kept).
 - [ ] [AI] `grep -rnE '\bose-app-be\b|OSE_APP_BE_' apps/ specs/ .github/ env-contract.yaml` — zero
@@ -397,7 +400,7 @@ permanently (in-place rewrite — its `OrganicleverBe` namespace is the final na
 - [ ] [AI] `npx nx run-many -t build --projects=tag:scope:organiclever` (or full affected build) —
       exits 0; no dangling old-name references.
 - [ ] [AI] `nx run organiclever-be:test:quick` — exits 0; coverage ≥90%.
-- [ ] [AI] `nx run organiclever-be:spec-coverage` — exits 0; journal steps bound.
+- [ ] [AI] `nx run organiclever-be:specs:coverage` — exits 0; journal steps bound.
 - [ ] [AI] `rhino-cli env validate` — exits 0; `ORGANICLEVER_BE_*` still registered, no crane vars.
 - [ ] [AI] `grep -rnE '\borganiclever-web\b' apps/ specs/ .github/ env-contract.yaml` — zero (web tier
       fully renamed; `organiclever-be` correctly still present).
@@ -622,7 +625,7 @@ ose-www:typecheck` exit 0.
       `nx run ayokoding-www-be-e2e:test:e2e`, `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: all
       exit 0; JetStream demo (delivered + acked) asserted.
 - [ ] [AI] Full affected quality gate:
-      `npx nx affected -t typecheck lint test:quick test:integration spec-coverage --base=origin/main`
+      `npx nx affected -t typecheck lint test:quick test:integration specs:coverage --base=origin/main`
       — acceptance: exits 0.
 - [ ] [AI] If any target failed: root-cause + fix-forward (no `--skip-nx-cache` / bypass), re-run —
       acceptance: exits 0.
@@ -655,7 +658,7 @@ http://localhost:3200` — acceptance: page loads without errors.
 
 - [ ] [AI] All e2e runs exit 0; no media scenarios executed.
 - [ ] [AI] `nx run ose-be:test:quick && nx run organiclever-be:test:quick` — coverage ≥90%.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick test:integration spec-coverage --base=origin/main`
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick test:integration specs:coverage --base=origin/main`
       — exits 0.
 - [ ] [AI] `curl` /health on both backends — 200 confirmed.
 
