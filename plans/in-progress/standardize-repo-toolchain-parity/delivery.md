@@ -317,7 +317,8 @@ _Suggested executor: `ci-fixer`_
 - [x] [AI] `grep -nE 'shellcheck|hadolint|actionlint' repo-governance/development/quality/cross-language-lint-strictness.md`
       — expected: the "CI job" column uses the tool-named jobs. — result: ✓
 - [x] [AI] Workflow lints clean — expected: exits 0. — result: ✓
-- [ ] [AI] Commit: `rtk git commit -m "ci(pr-gate): rename lint jobs to tool-named scheme"`.
+- [x] [AI] Commit: `rtk git commit -m "ci(pr-gate): rename lint jobs to tool-named scheme"`.
+      — implementation: e694deb
 
 > **Pause Safety**: the three lint-gate jobs are renamed, `needs` and the governance doc reference
 > them by tool name, the workflow lints clean, and the change is committed. Safe to stop. To resume:
@@ -336,35 +337,42 @@ Authoring it under the canonical name now means **no later rename in Phase 10**.
 
 _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **RED — target absent**: `npx nx run rhino-cli:specs:gherkin-cardinality-validation`
+- [x] [AI] **RED — target absent**: `npx nx run rhino-cli:specs:gherkin-cardinality-validation`
       — acceptance: fails with "target not found" / "cannot find configuration".
-- [ ] [AI] Pre-implementation research — confirm subcommand path + args:
+      — done: confirmed absent; `nx run rhino-cli:specs:gherkin-cardinality-validation` failed with "target not found".
+- [x] [AI] Pre-implementation research — confirm subcommand path + args:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance gherkin-keyword-cardinality --help`
       — acceptance: help prints; record the exact subcommand path + required args for the target
       command string.
-- [ ] [AI] **GREEN**: add `specs:gherkin-cardinality-validation` to `apps/rhino-cli/project.json`,
+      — done: confirmed subcommand path `repo-governance gherkin-keyword-cardinality`; no additional required args.
+- [x] [AI] **GREEN**: add `specs:gherkin-cardinality-validation` to `apps/rhino-cli/project.json`,
       mirroring the existing `validate:specs-links` target shape (executor, `options.command`,
       `cache`, `inputs` keyed to the relevant `.feature`/`.md` globs)
       — acceptance: `npx nx run rhino-cli:specs:gherkin-cardinality-validation` now runs the audit.
-- [ ] [AI] **GREEN — passes on current tree**: re-run the target
+      — done: target added with `inputs: ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/**/*.feature"]`.
+- [x] [AI] **GREEN — passes on current tree**: re-run the target
       — acceptance: exits 0. If it surfaces preexisting cardinality violations, fix them at the source
       (root-cause orientation); do NOT disable the validator.
-- [ ] [AI] **GREEN — wire into CI**: add the `specs:gherkin-cardinality-validation` run to the
+      — done: exits 0, "GHERKIN KEYWORD CARDINALITY AUDIT PASSED".
+- [x] [AI] **GREEN — wire into CI**: add the `specs:gherkin-cardinality-validation` run to the
       **`specs-gate`** job in `.github/workflows/pr-quality-gate.yml` (the specs-family validator job),
       alongside the existing `specs:adoption/tree/counts/links-validation` runs
       — acceptance: the `specs-gate` job invokes `npx nx run rhino-cli:specs:gherkin-cardinality-validation`.
-- [ ] [AI] **REFACTOR**: confirm `inputs` scoping (correct caching) and step ordering
+      — done: added as separate step after the `run-many` line in `specs-gate` job.
+- [x] [AI] **REFACTOR**: confirm `inputs` scoping (correct caching) and step ordering
       — acceptance: a no-op re-run is a cache hit.
-- [ ] [AI] Lint the workflow — acceptance: exits 0.
+      — done: inputs scoped to `{workspaceRoot}/specs/**/*.feature` — re-run is a cache hit on unchanged tree.
+- [x] [AI] Lint the workflow — acceptance: exits 0.
+      — done: actionlint clean.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `npx nx run rhino-cli:specs:gherkin-cardinality-validation` — expected: exits 0.
-- [ ] [AI] `grep "specs:gherkin-cardinality-validation" .github/workflows/pr-quality-gate.yml`
+- [x] [AI] `npx nx run rhino-cli:specs:gherkin-cardinality-validation` — expected: exits 0.
+- [x] [AI] `grep "specs:gherkin-cardinality-validation" .github/workflows/pr-quality-gate.yml`
       — expected: the `specs-gate` job runs it.
-- [ ] [AI] Workflow lints clean — expected: exits 0.
+- [x] [AI] Workflow lints clean — expected: exits 0.
 - [ ] [AI] Commit: `rtk git commit -m "ci(validators): add gherkin cardinality target to specs-gate"`.
 
 > **Pause Safety**: the canonical-named target exists, passes on the current tree, and runs in the

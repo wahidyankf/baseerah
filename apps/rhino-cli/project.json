@@ -145,6 +145,14 @@
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.md"]
     },
+    "specs:gherkin-cardinality-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance gherkin-keyword-cardinality"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/**/*.feature"]
+    },
     "validate:naming-agents": {
       "executor": "nx:run-commands",
       "options": {
