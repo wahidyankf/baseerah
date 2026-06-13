@@ -1,5 +1,16 @@
 //! Core domain types for Mermaid diagram validation.
 
+/// Category of a Mermaid diagram block.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiagramKind {
+    /// A `flowchart` or `graph` block.
+    Flowchart,
+    /// A `stateDiagram-v2` or `stateDiagram` block.
+    State,
+    /// Any other diagram type (sequence, pie, class, etc.).
+    Other,
+}
+
 /// Flow direction of a Mermaid flowchart diagram.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Direction {
@@ -102,6 +113,8 @@ pub struct Edge {
     pub from: String,
     /// Target node identifier.
     pub to: String,
+    /// Optional edge label (state transition text after ` : `; empty for flowcharts).
+    pub label: String,
 }
 
 /// A `subgraph` block parsed from a flowchart.

@@ -139,23 +139,33 @@ pub fn format_text(result: &ValidationResult, verbose: bool, quiet: bool) -> Str
 /// JSON representation of a single violation.
 #[derive(Serialize)]
 struct JsonViolation<'a> {
+    /// Violation kind string (e.g., `"label_too_long"`).
     kind: &'a str,
+    /// File path containing the diagram.
     #[serde(rename = "filePath")]
     file_path: &'a str,
+    /// Zero-based index of the block within the file.
     #[serde(rename = "blockIndex")]
     block_index: usize,
+    /// One-based line number where the block starts.
     #[serde(rename = "startLine")]
     start_line: usize,
+    /// ID of the violating node (empty for width violations).
     #[serde(rename = "nodeId", skip_serializing_if = "str::is_empty")]
     node_id: &'a str,
+    /// Full label text of the violating node (empty for width violations).
     #[serde(rename = "labelText", skip_serializing_if = "str::is_empty")]
     label_text: &'a str,
+    /// Computed character length of the label.
     #[serde(rename = "labelLen", skip_serializing_if = "is_zero_usize")]
     label_len: usize,
+    /// Configured maximum allowed label length.
     #[serde(rename = "maxLabelLen", skip_serializing_if = "is_zero_usize")]
     max_label_len: usize,
+    /// Computed diagram width (nodes at widest rank).
     #[serde(rename = "actualWidth", skip_serializing_if = "is_zero_usize")]
     actual_width: usize,
+    /// Configured maximum allowed diagram width.
     #[serde(rename = "maxWidth", skip_serializing_if = "is_zero_usize")]
     max_width: usize,
 }
@@ -163,25 +173,36 @@ struct JsonViolation<'a> {
 /// JSON representation of a single warning.
 #[derive(Serialize)]
 struct JsonWarning<'a> {
+    /// Warning kind string.
     kind: &'a str,
+    /// File path containing the diagram.
     #[serde(rename = "filePath")]
     file_path: &'a str,
+    /// Zero-based index of the block within the file.
     #[serde(rename = "blockIndex")]
     block_index: usize,
+    /// One-based line number where the block starts.
     #[serde(rename = "startLine")]
     start_line: usize,
+    /// Computed horizontal span of the diagram.
     #[serde(rename = "actualWidth", skip_serializing_if = "is_zero_usize")]
     actual_width: usize,
+    /// Computed vertical depth of the diagram.
     #[serde(rename = "actualDepth", skip_serializing_if = "is_zero_usize")]
     actual_depth: usize,
+    /// Configured maximum allowed width.
     #[serde(rename = "maxWidth", skip_serializing_if = "is_zero_usize")]
     max_width: usize,
+    /// Configured maximum allowed depth.
     #[serde(rename = "maxDepth", skip_serializing_if = "is_zero_usize")]
     max_depth: usize,
+    /// Label of the dense subgraph (for subgraph density warnings).
     #[serde(rename = "subgraphLabel", skip_serializing_if = "str::is_empty")]
     subgraph_label: &'a str,
+    /// Number of nodes in the dense subgraph.
     #[serde(rename = "subgraphNodeCount", skip_serializing_if = "is_zero_usize")]
     subgraph_node_count: usize,
+    /// Configured maximum nodes per subgraph.
     #[serde(rename = "maxSubgraphNodes", skip_serializing_if = "is_zero_usize")]
     max_subgraph_nodes: usize,
 }
@@ -195,11 +216,15 @@ fn is_zero_usize(n: &usize) -> bool {
 /// Top-level JSON document for the mermaid validation result.
 #[derive(Serialize)]
 struct JsonResult<'a> {
+    /// Total number of distinct files scanned.
     #[serde(rename = "filesScanned")]
     files_scanned: usize,
+    /// Total number of diagram blocks scanned.
     #[serde(rename = "blocksScanned")]
     blocks_scanned: usize,
+    /// All violations found across scanned blocks.
     violations: Vec<JsonViolation<'a>>,
+    /// All warnings found across scanned blocks.
     warnings: Vec<JsonWarning<'a>>,
 }
 

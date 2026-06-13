@@ -1,5 +1,7 @@
 //! Pure Mermaid diagram domain model — types, graph metrics, parsers, validator.
 
+/// Diagram kind detection utilities.
+pub mod diagram;
 /// Flowchart block extractor and parser.
 pub mod flowchart;
 /// Graph metric utilities: rank assignment, width, depth.
@@ -11,10 +13,11 @@ pub mod types;
 /// Diagram validation rules.
 pub mod validator;
 
+pub use diagram::detect_kind;
 pub use flowchart::{extract_blocks, parse_diagram};
 pub use graph::{depth, effective_label_len, max_width};
 pub use types::{
-    Direction, Edge, MermaidBlock, Node, ParsedDiagram, Subgraph, ValidateOptions,
+    DiagramKind, Direction, Edge, MermaidBlock, Node, ParsedDiagram, Subgraph, ValidateOptions,
     ValidationResult, Violation, ViolationKind, Warning, WarningKind,
 };
 pub use validator::{default_validate_options, validate_blocks};
@@ -162,6 +165,196 @@ mod tests {
     }
 
     #[test]
+    fn validate_state_11_node_lr_chain_width_exceeded() {
+        // 11-state LR chain: depth = 11 ranks, which maps to horizontal on LR.
+        // width_exceeded expected with actual_width == 11 (> max_width 4).
+        // RED: validate_blocks currently skips state diagrams → no violations.
+        let source = "stateDiagram-v2\n  direction LR\n  A --> B\n  B --> C\n  C --> D\n  D --> E\n  E --> F\n  F --> G\n  G --> H\n  H --> I\n  I --> J\n  J --> K\n";
+        let block = MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let result = validate_blocks(vec![block], default_validate_options());
+        let w_exceeded = result
+            .violations
+            .iter()
+            .find(|v| v.kind == ViolationKind::WidthExceeded);
+        assert!(
+            w_exceeded.is_some(),
+            "expected WidthExceeded violation, got none"
+        );
+        assert_eq!(
+            w_exceeded.unwrap().actual_width,
+            11,
+            "expected width 11, got {}",
+            w_exceeded.map_or(0, |v| v.actual_width)
+        );
+    }
+
+    #[test]
+    fn validate_state_long_display_label_emits_label_too_long() {
+        // state "desc" as id — desc > 30 chars must yield label_too_long.
+        // RED: state display labels not yet checked by validator.
+        let source = "stateDiagram-v2\n  state \"ThisLabelIsLongerThan30CharsAndFails\" as S1\n  S1 --> S2\n";
+        let block = MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let result = validate_blocks(vec![block], default_validate_options());
+        assert!(
+            result
+                .violations
+                .iter()
+                .any(|v| v.kind == ViolationKind::LabelTooLong),
+            "expected LabelTooLong for long state display label, got {:?}",
+            result.violations
+        );
+    }
+
+    #[test]
+    fn validate_state_long_transition_label_emits_label_too_long() {
+        // Transition labels `A --> B : long-text` checked against max_label_len.
+        // RED: transition labels not yet stored or checked.
+        let source =
+            "stateDiagram-v2\n  A --> B : ThisTransitionLabelIsLongerThan30CharsAndFails\n";
+        let block = MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let result = validate_blocks(vec![block], default_validate_options());
+        assert!(
+            result
+                .violations
+                .iter()
+                .any(|v| v.kind == ViolationKind::LabelTooLong),
+            "expected LabelTooLong for long transition label, got {:?}",
+            result.violations
+        );
+    }
+
+    #[test]
+    fn validate_state_short_colon_label_no_violation() {
+        // Short transition label must not emit label_too_long.
+        let source = "stateDiagram-v2\n  A --> B : ok\n";
+        let block = MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let result = validate_blocks(vec![block], default_validate_options());
+        assert!(
+            !result
+                .violations
+                .iter()
+                .any(|v| v.kind == ViolationKind::LabelTooLong),
+            "expected no LabelTooLong for short transition label, got {:?}",
+            result.violations
+        );
+    }
+
+    #[test]
+    fn validate_state_pseudostates_count_toward_width() {
+        // A single rank with [*], <<choice>>, <<fork>>, <<join>>, plus one more = 5 nodes.
+        // With max_width=4, this must yield width_exceeded (actual_width >= 5).
+        // RED: parse_state doesn't yet parse standalone stereotype node declarations.
+        let source = "stateDiagram-v2\n  direction LR\n  [*] --> <<choice>>\n  <<choice>> --> <<fork>>\n  <<fork>> --> <<join>>\n  <<join>> --> Extra\n  Extra --> [*]\n";
+        let block = MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let result = validate_blocks(vec![block], default_validate_options());
+        let w = result
+            .violations
+            .iter()
+            .find(|v| v.kind == ViolationKind::WidthExceeded);
+        assert!(
+            w.is_some(),
+            "expected WidthExceeded for 5-node pseudostate rank, got none"
+        );
+        assert!(
+            w.unwrap().actual_width >= 5,
+            "expected actual_width >= 5, got {}",
+            w.map_or(0, |v| v.actual_width)
+        );
+    }
+
+    #[test]
+    fn parse_state_composite_recorded_as_subgraph() {
+        // `state Outer { Inner1 --> Inner2 }` — Outer is a Subgraph.
+        // RED: parse_state doesn't yet handle composite blocks.
+        use crate::domain::mermaid::state::parse_state;
+        let source = "stateDiagram-v2\n  state Outer {\n    Inner1 --> Inner2\n  }\n";
+        let block = MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let d = parse_state(block);
+        assert_eq!(
+            d.subgraphs.len(),
+            1,
+            "expected 1 subgraph for Outer composite"
+        );
+        assert_eq!(d.subgraphs[0].id, "Outer");
+        assert!(
+            d.subgraphs[0].node_ids.contains(&"Inner1".to_string()),
+            "Outer subgraph must contain Inner1"
+        );
+        assert!(
+            d.subgraphs[0].node_ids.contains(&"Inner2".to_string()),
+            "Outer subgraph must contain Inner2"
+        );
+    }
+
+    #[test]
+    fn parse_state_skips_notes_comments_and_separator() {
+        // Multiline note, %% comment, and -- separator must not produce spurious nodes.
+        // RED: parse_state doesn't yet skip multiline notes.
+        use crate::domain::mermaid::state::parse_state;
+        let source = concat!(
+            "stateDiagram-v2\n",
+            "  A --> B\n",
+            "  note right of A\n",
+            "    Some free text that should not parse as a node or edge\n",
+            "  end note\n",
+            "  %% this is a comment\n",
+            "  --\n",
+        );
+        let make_block = || MermaidBlock {
+            file_path: "test.md".to_string(),
+            block_index: 0,
+            source: source.to_string(),
+            start_line: 1,
+        };
+        let d = parse_state(make_block());
+        // Only A and B should be nodes; note text must not become nodes.
+        assert_eq!(
+            d.nodes.len(),
+            2,
+            "expected 2 nodes (A, B), got {:?}",
+            d.nodes
+        );
+        assert_eq!(d.edges.len(), 1, "expected 1 edge");
+        // Also verify via validate_blocks: 2-node TB chain (depth 2, width 1) = no violations.
+        let result = validate_blocks(vec![make_block()], default_validate_options());
+        assert!(
+            result.violations.is_empty(),
+            "expected no violations, got {:?}",
+            result.violations
+        );
+    }
+
+    #[test]
     fn validate_clean_diagram_no_findings() {
         let block = MermaidBlock {
             file_path: "a.md".to_string(),
@@ -194,10 +387,12 @@ mod tests {
             Edge {
                 from: "A".into(),
                 to: "B".into(),
+                label: String::new(),
             },
             Edge {
                 from: "A".into(),
                 to: "C".into(),
+                label: String::new(),
             },
         ];
         assert_eq!(max_width(&nodes, &edges), 2);

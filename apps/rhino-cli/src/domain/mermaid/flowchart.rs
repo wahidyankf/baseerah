@@ -378,6 +378,7 @@ fn extract_edge_line(
                 edges.push(Edge {
                     from: from.clone(),
                     to: to.clone(),
+                    label: String::new(),
                 });
             }
         }

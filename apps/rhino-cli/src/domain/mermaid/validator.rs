@@ -2,11 +2,13 @@
 
 use std::collections::HashSet;
 
+use super::diagram::detect_kind;
 use super::flowchart::parse_diagram;
 use super::graph::{depth, effective_label_len, max_width};
+use super::state::parse_state;
 use super::types::{
-    Direction, MermaidBlock, ValidateOptions, ValidationResult, Violation, ViolationKind, Warning,
-    WarningKind,
+    DiagramKind, Direction, MermaidBlock, ParsedDiagram, ValidateOptions, ValidationResult,
+    Violation, ViolationKind, Warning, WarningKind,
 };
 
 /// Returns the default validation options used by the CLI when no flags are specified.
@@ -54,41 +56,35 @@ fn validate_one_block(
     let fp = block.file_path.clone();
     let bi = block.block_index;
     let sl = block.start_line;
-    let (diagram, count) = parse_diagram(block);
-    if count > 1 {
-        violations.push(Violation {
-            kind: ViolationKind::MultipleDiagrams,
-            file_path: fp.clone(),
-            block_index: bi,
-            start_line: sl,
-            node_id: String::new(),
-            label_text: String::new(),
-            label_len: 0,
-            max_label_len: 0,
-            actual_width: 0,
-            max_width: 0,
-        });
-    }
-    if count == 0 {
-        return;
-    }
-    for node in &diagram.nodes {
-        let label_len = effective_label_len(&node.label);
-        if label_len > opts.max_label_len {
-            violations.push(Violation {
-                kind: ViolationKind::LabelTooLong,
-                file_path: fp.clone(),
-                block_index: bi,
-                start_line: sl,
-                node_id: node.id.clone(),
-                label_text: node.label.clone(),
-                label_len,
-                max_label_len: opts.max_label_len,
-                actual_width: 0,
-                max_width: 0,
-            });
+
+    let kind = detect_kind(&block.source);
+    let diagram: ParsedDiagram = match kind {
+        DiagramKind::Flowchart => {
+            let (d, count) = parse_diagram(block);
+            if count > 1 {
+                violations.push(Violation {
+                    kind: ViolationKind::MultipleDiagrams,
+                    file_path: fp.clone(),
+                    block_index: bi,
+                    start_line: sl,
+                    node_id: String::new(),
+                    label_text: String::new(),
+                    label_len: 0,
+                    max_label_len: 0,
+                    actual_width: 0,
+                    max_width: 0,
+                });
+            }
+            if count == 0 {
+                return;
+            }
+            d
         }
-    }
+        DiagramKind::State => parse_state(block),
+        DiagramKind::Other => return,
+    };
+
+    check_labels(&diagram, opts, &fp, bi, sl, violations);
     let span = max_width(&diagram.nodes, &diagram.edges);
     let dep = depth(&diagram.nodes, &diagram.edges);
     let (horizontal, vertical) = match diagram.direction {
@@ -140,6 +136,54 @@ fn validate_one_block(
                     max_subgraph_nodes: opts.max_subgraph_nodes,
                 });
             }
+        }
+    }
+}
+
+/// Checks node and edge labels for length violations, appending to `violations`.
+fn check_labels(
+    diagram: &ParsedDiagram,
+    opts: &ValidateOptions,
+    fp: &str,
+    bi: usize,
+    sl: usize,
+    violations: &mut Vec<Violation>,
+) {
+    for node in &diagram.nodes {
+        let label_len = effective_label_len(&node.label);
+        if label_len > opts.max_label_len {
+            violations.push(Violation {
+                kind: ViolationKind::LabelTooLong,
+                file_path: fp.to_string(),
+                block_index: bi,
+                start_line: sl,
+                node_id: node.id.clone(),
+                label_text: node.label.clone(),
+                label_len,
+                max_label_len: opts.max_label_len,
+                actual_width: 0,
+                max_width: 0,
+            });
+        }
+    }
+    for edge in &diagram.edges {
+        if edge.label.is_empty() {
+            continue;
+        }
+        let label_len = effective_label_len(&edge.label);
+        if label_len > opts.max_label_len {
+            violations.push(Violation {
+                kind: ViolationKind::LabelTooLong,
+                file_path: fp.to_string(),
+                block_index: bi,
+                start_line: sl,
+                node_id: format!("{}-->{}", edge.from, edge.to),
+                label_text: edge.label.clone(),
+                label_len,
+                max_label_len: opts.max_label_len,
+                actual_width: 0,
+                max_width: 0,
+            });
         }
     }
 }

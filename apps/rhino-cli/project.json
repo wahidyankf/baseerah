@@ -176,7 +176,7 @@
     "validate:mermaid": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content --exclude apps/rhino-cli/tests/fixtures"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
