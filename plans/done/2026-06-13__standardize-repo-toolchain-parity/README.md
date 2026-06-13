@@ -1,7 +1,7 @@
 # Standardize Repo Toolchain Parity (ose-public)
 
-> **Status**: In progress — authored 2026-06-11 as `standardize-ci-parity`; rescoped and renamed
-> `standardize-repo-toolchain-parity` 2026-06-12. Execution not started.
+> **Status**: Done — authored 2026-06-11 as `standardize-ci-parity`; rescoped and renamed
+> `standardize-repo-toolchain-parity` 2026-06-12. Executed and completed 2026-06-13.
 
 ## Context
 
