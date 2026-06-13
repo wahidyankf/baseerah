@@ -8,12 +8,12 @@ use crate::commands::{
     git_pre_commit, governance_audit, governance_layer_coherence, governance_traceability_audit,
     governance_vendor_audit, harness_audit, harness_emit_bindings, harness_generate_bindings,
     harness_sync, harness_validate_bindings, harness_validate_claude, harness_validate_duplication,
-    harness_validate_naming, harness_validate_sync, md_audit, md_validate_frontmatter,
-    md_validate_frontmatter_dates, md_validate_heading_hierarchy, md_validate_links,
-    md_validate_mermaid, md_validate_naming, md_validate_readme_index, specs_audit, specs_bc,
-    specs_coverage, specs_gherkin_cardinality, specs_ul, specs_validate_adoption,
-    specs_validate_counts, specs_validate_links, specs_validate_tree, test_coverage_validate,
-    workflows_validate_naming,
+    harness_validate_naming, harness_validate_sync, lang_java_validate_null_safety, md_audit,
+    md_validate_frontmatter, md_validate_frontmatter_dates, md_validate_heading_hierarchy,
+    md_validate_links, md_validate_mermaid, md_validate_naming, md_validate_readme_index,
+    specs_audit, specs_bc, specs_clean_java_imports, specs_coverage, specs_gherkin_cardinality,
+    specs_scaffold_dart, specs_ul, specs_validate_adoption, specs_validate_counts,
+    specs_validate_links, specs_validate_tree, test_coverage_validate, workflows_validate_naming,
 };
 use crate::domain::cliout::OutputFormat;
 
@@ -93,9 +93,12 @@ pub enum Commands {
     /// Workflow file validators.
     #[command(name = "workflows", subcommand)]
     Workflows(WorkflowsCommands),
-    /// Spec tree validators (adoption, counts, links, tree, coverage, bc, ul, gherkin-cardinality).
+    /// Spec tree validators and contract codegen helpers.
     #[command(name = "specs", subcommand)]
     Specs(SpecsCommands),
+    /// Language-source correctness checks, nested by language.
+    #[command(name = "lang", subcommand)]
+    Lang(LangCommands),
     /// Git hook helpers (pre-commit).
     #[command(name = "git", subcommand)]
     Git(GitCommands),
@@ -142,9 +145,31 @@ pub enum SpecsCommands {
     /// Run spec validation rules.
     #[command(name = "validate", subcommand)]
     Validate(SpecsValidateCommands),
+    /// Clean generated contract files (e.g. strip unused Java imports).
+    #[command(name = "clean", subcommand)]
+    Clean(SpecsCleanCommands),
+    /// Scaffold generated contract package structure (e.g. Dart pubspec).
+    #[command(name = "scaffold", subcommand)]
+    Scaffold(SpecsScaffoldCommands),
     /// Run all specs validators in sequence and aggregate findings.
     #[command(name = "audit")]
     Audit(specs_audit::AuditArgs),
+}
+
+/// Specs clean subcommands.
+#[derive(Subcommand, Debug)]
+pub enum SpecsCleanCommands {
+    /// Strip unused/same-package imports from generated Java contract files (dormant in ose-public).
+    #[command(name = "java-imports")]
+    JavaImports(specs_clean_java_imports::CleanJavaImportsArgs),
+}
+
+/// Specs scaffold subcommands.
+#[derive(Subcommand, Debug)]
+pub enum SpecsScaffoldCommands {
+    /// Generate Dart package scaffolding around generated contract types (dormant in ose-public).
+    #[command(name = "dart")]
+    Dart(specs_scaffold_dart::ScaffoldDartArgs),
 }
 
 /// Spec tree validate subcommands.
@@ -370,6 +395,34 @@ pub enum RepoGovernanceValidateCommands {
 }
 
 // ---------------------------------------------------------------------------
+// lang
+// ---------------------------------------------------------------------------
+
+/// Language-source correctness subcommands, nested by language.
+#[derive(Subcommand, Debug)]
+pub enum LangCommands {
+    /// Java language checks.
+    #[command(name = "java", subcommand)]
+    Java(LangJavaCommands),
+}
+
+/// Java language subcommands.
+#[derive(Subcommand, Debug)]
+pub enum LangJavaCommands {
+    /// Validate Java source correctness.
+    #[command(name = "validate", subcommand)]
+    Validate(LangJavaValidateCommands),
+}
+
+/// Java validate subcommands.
+#[derive(Subcommand, Debug)]
+pub enum LangJavaValidateCommands {
+    /// Check Java packages carry required null-safety annotations (dormant in ose-public).
+    #[command(name = "null-safety-annotations")]
+    NullSafetyAnnotations(lang_java_validate_null_safety::ValidateNullSafetyArgs),
+}
+
+// ---------------------------------------------------------------------------
 // test-coverage
 // ---------------------------------------------------------------------------
 
@@ -473,6 +526,7 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             },
         },
         Commands::Specs(sc) => dispatch_specs(sc, output_format),
+        Commands::Lang(lc) => dispatch_lang(lc, output_format),
         Commands::Git(gc) => match gc {
             GitCommands::PreCommit(args) => git_pre_commit::run_cmd(args, output_format),
         },
@@ -592,7 +646,35 @@ fn dispatch_specs(
                 specs_gherkin_cardinality::run(args, output_format)
             }
         },
+        SpecsCommands::Clean(cc) => match cc {
+            SpecsCleanCommands::JavaImports(args) => {
+                specs_clean_java_imports::run(args, output_format)
+            }
+        },
+        SpecsCommands::Scaffold(sc) => match sc {
+            SpecsScaffoldCommands::Dart(args) => specs_scaffold_dart::run(args, output_format),
+        },
         SpecsCommands::Audit(args) => specs_audit::run(args, output_format),
+    }
+}
+
+/// Route a [`LangCommands`] variant to its handler.
+///
+/// # Errors
+///
+/// Propagates any error returned by the selected lang subcommand.
+fn dispatch_lang(
+    lc: &LangCommands,
+    output_format: OutputFormat,
+) -> std::result::Result<(), anyhow::Error> {
+    match lc {
+        LangCommands::Java(jc) => match jc {
+            LangJavaCommands::Validate(vc) => match vc {
+                LangJavaValidateCommands::NullSafetyAnnotations(args) => {
+                    lang_java_validate_null_safety::run(args, output_format)
+                }
+            },
+        },
     }
 }
 

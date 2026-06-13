@@ -10,8 +10,8 @@ Commands:
   convention       Convention validators (emoji, license, agents-md-size)
   harness          Harness (agent binding) validators
   workflows        Workflow file validators
-  specs            Spec tree validators (adoption, counts, links, tree, coverage, bc, ul,
-                   gherkin-cardinality)
+  specs            Spec tree validators and contract codegen helpers
+  lang             Language-source correctness checks, nested by language
   git              Git hook helpers (pre-commit)
   env              Environment file helpers (init, backup, restore)
   doctor           Check required tool versions are installed and correct
