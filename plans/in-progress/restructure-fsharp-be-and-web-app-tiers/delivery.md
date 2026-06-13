@@ -106,39 +106,49 @@ flowchart TB
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Install dependencies in the root worktree: `npm install` — acceptance: exits 0.
-- [ ] [AI] Converge the polyglot toolchain: `npm run doctor -- --fix` — acceptance: exits 0; .NET 10
+- [x] [AI] Install dependencies in the root worktree: `npm install` — acceptance: exits 0.
+- [x] [AI] Converge the polyglot toolchain: `npm run doctor -- --fix` — acceptance: exits 0; .NET 10
       SDK, Rust, Docker, Node, jq present.
-- [ ] [AI] **Prerequisite hard-stop**: confirm `standardize-repo-toolchain-parity` is DONE — verify the
+- [x] [AI] **Prerequisite hard-stop**: confirm `standardize-repo-toolchain-parity` is DONE — verify the
       converged F#/.NET Nx targets exist, `npm run doctor` reports the .NET SDK, and the F# coverage
       tooling resolves. If any is missing, **stop** and surface it.
-- [ ] [AI] Grep `env-contract.yaml` to confirm `lang: fsharp` is an accepted value. If not, record the
+- [x] [AI] Grep `env-contract.yaml` to confirm `lang: fsharp` is an accepted value. If not, record the
       resolution path before retagging surfaces.
-- [ ] [AI] Record the affected-projects baseline:
+- [x] [AI] Record the affected-projects baseline:
       `npx nx affected -t typecheck lint test:quick specs:coverage --base=origin/main` — acceptance:
       pass/fail counts recorded; every preexisting failure documented and resolved. Fix ALL failures
       found — including preexisting issues not caused by your changes. This follows the root cause
       orientation principle.
-- [ ] [AI] **Dependency clearance (Path B)**: re-confirm each F# pin (Giraffe 8.x, EF Core 10, Npgsql,
+- [x] [AI] **Dependency clearance (Path B)**: re-confirm each F# pin (Giraffe 8.x, EF Core 10, Npgsql,
       EFCore.NamingConventions, dbup-core/postgresql, FSharp.SystemTextJson, NATS.Net, analyzers,
       altcover) **and** the new frontend deps for `ts-ui` (shadcn/Radix/CVA) against release dates;
       cutoff = exec date minus 60 days; CVE-clean. Resolve the exact Giraffe 8.x pin. — acceptance:
       confirmed versions + dates written back into `tech-docs.md`; none inside the soak.
       _Suggested executor: web-research-maker._
-- [ ] [AI] Verify the dependency-graph baseline: `apps/crane-cli` → `libs/fsharp-crane-core`, and
+- [x] [AI] Verify the dependency-graph baseline: `apps/crane-cli` → `libs/fsharp-crane-core`, and
       `apps/ayokoding-cli` + `apps/ose-cli` → `libs/rust-commons`. — acceptance: `nx graph` confirms.
 
 ### Phase 0 Gate
 
-- [ ] [AI] `npm run doctor` — exits 0; .NET 10 SDK, Rust, Docker, Node, jq present.
-- [ ] [AI] `standardize-repo-toolchain-parity` present in `plans/done/`.
-- [ ] [AI] `grep -r 'lang: fsharp' env-contract.yaml` — at least one match.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage --base=origin/main` — no
+- [x] [AI] `npm run doctor` — exits 0; .NET 10 SDK, Rust, Docker, Node, jq present.
+- [x] [AI] `standardize-repo-toolchain-parity` present in `plans/done/`.
+- [x] [AI] `grep -r 'lang: fsharp' env-contract.yaml` — at least one match.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage --base=origin/main` — no
       unresolved failures.
-- [ ] [AI] `nx graph` shows the three preserved dependency edges.
-- [ ] [AI] F# + ts-ui pins written back to `tech-docs.md` with Path-B soak dates.
+- [x] [AI] `nx graph` shows the three preserved dependency edges.
+- [x] [AI] F# + ts-ui pins written back to `tech-docs.md` with Path-B soak dates.
 
 > **Pause Safety**: clean tree, no source changes. Resume: re-run the baseline command.
+>
+> **Phase 0 implementation notes** (2026-06-14): `npm install` exit 0; `doctor --fix` 22/22 tools OK
+> (.NET 10.0.300, Rust 1.94.0, Docker 29.4.0, Node 24.16.0, jq 1.8.1); prerequisite hard-stop satisfied
+> (`standardize-repo-toolchain-parity` in `plans/done/2026-06-13__…`, F# Nx targets present on crane-be,
+> .NET SDK reported); `lang: fsharp` accepted (1 match in `env-contract.yaml`); baseline
+> `nx affected -t typecheck lint test:quick specs:coverage` = 0 failures (coverage 78.28% ≥ threshold);
+> Path-B clearance researched + 15 pins written to `tech-docs.md` (Giraffe 8.2.0 resolved; EF Core 10.0.6
+> with documented runtime-CVE note — no waiver needed, no cookie auth); dependency edges confirmed
+> (crane-cli→fsharp-crane-core via fsproj; ayokoding-cli + ose-cli→rust-commons via Cargo.toml). NOTE:
+> a `web-ui` lib already exists — Phase 5 must reconcile the planned `ts-ui` name against it.
 
 ---
 

@@ -81,8 +81,45 @@ re-confirms.
 
 > **Giraffe version note** `[Judgment call]`: the locked decision states Giraffe 8.x; the primer fsproj
 > currently pins `7.0.2` while `apps/crane-be` already pins `Giraffe 8.2.0`
-> `[Repo-grounded: crane-be.fsproj]`. Phase 0 resolves the exact 8.x pin (reuse crane-be's `8.2.0` if
-> still Path-B-eligible) and applies it to both backends; do not silently inherit the primer's 7.x.
+> `[Repo-grounded: crane-be.fsproj]`. **Phase 0 resolution (2026-06-14): pin `Giraffe 8.2.0`** (reuse
+> crane-be's pin; Path-B-eligible, released 2025-11-12, CVE-clean) and apply it to both backends; do not
+> inherit the primer's 7.x.
+
+### Dependency Clearance (Path B — confirmed Phase 0, 2026-06-14)
+
+Soak cutoff = **2026-04-15** (exec date 2026-06-14 minus 60 days). Each pin below is the most recent
+stable released on/before the cutoff, CVE-clean across NVD, GitHub Advisories, Snyk, vendor pages, and
+the CISA KEV feed (zero KEV entries for any package). These **confirmed** pins supersede the
+primer-baseline column above where they differ.
+
+| Package                                 | Confirmed pin | Release date | CVE-clean | Notes                              |
+| --------------------------------------- | ------------- | ------------ | --------- | ---------------------------------- |
+| `Giraffe`                               | `8.2.0`       | 2025-11-12   | Y         | reuse crane-be pin                 |
+| `Microsoft.EntityFrameworkCore`         | `10.0.6`      | 2026-04-14   | Y         | see runtime CVE note below         |
+| `Npgsql.EntityFrameworkCore.PostgreSQL` | `10.0.1`      | 2026-03-12   | Y         | 10.0.2 inside soak                 |
+| `Npgsql`                                | `10.0.2`      | 2026-03-12   | Y         | CVE-2024-32655 N/A to 10.x         |
+| `EFCore.NamingConventions`              | `10.0.1`      | 2026-01-22   | Y         | snake_case                         |
+| `dbup-core`                             | `6.1.1`       | 2026-02-23   | Y         |                                    |
+| `dbup-postgresql`                       | `7.0.1`       | 2026-02-23   | Y         |                                    |
+| `FSharp.SystemTextJson`                 | `1.4.36`      | 2025-06-13   | Y         | STJ runtime CVEs patched in net10  |
+| `NATS.Net`                              | `2.7.3`       | 2026-03-13   | Y         | 2.8.x inside soak; server CVEs N/A |
+| `G-Research.FSharp.Analyzers`           | `0.22.0`      | 2026-03-02   | Y         |                                    |
+| `altcover`                              | `9.0.102`     | 2025-11-12   | Y         |                                    |
+| `class-variance-authority`              | `0.7.1`       | 2024-11-26   | Y         | ts-ui                              |
+| `@radix-ui/react-slot`                  | `1.2.4`       | ~2025-11     | Y         | ts-ui; 1.2.5 inside soak           |
+| `tailwindcss`                           | `4.2.2`       | 2026-03-18   | Y         | ts-ui; 4.2.3 inside soak           |
+| `shadcn` (CLI)                          | last ≤cutoff  | pre-04-15    | Y         | rolling release; pin at scaffold   |
+
+> **EF Core 10.0.6 runtime advisory** `[Path-C candidate]`: CVE-2026-40372 (ASP.NET Core Data
+> Protection cookie forgery) is patched in the .NET **10.0.7** runtime (2026-04-21, inside soak). The
+> `Microsoft.EntityFrameworkCore` ORM package itself is unaffected. Only relevant if a backend uses
+> ASP.NET Core Data Protection cookie auth — neither `ose-be` nor `organiclever-be` does (NATS + EF +
+> OpenRouter, no cookie auth), so no waiver is required. If cookie auth is later added, escalate to a
+> Path-C waiver per the Dependency Bump Policy.
+>
+> **shadcn pin** `[resolve at Phase 5 scaffold]`: shadcn uses a rolling-release model with no
+> machine-readable per-version date calendar. At ts-ui scaffold time, pin the highest version published
+> on/before 2026-04-15 via `npm view shadcn time --json` and record it here.
 
 ### Frontend stack (web tier)
 
