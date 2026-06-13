@@ -70,23 +70,23 @@ This avoids extra job-to-job artifact passing for simple `nx affected` commands.
 flowchart LR
     PR["PR Opened/Updated"] --> DETECT["Detect Job:<br/>nx show projects --affected<br/>→ determine language families"]
 
-    DETECT --> |"has TS projects"| TS["TypeScript Job<br/>setup-node<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:ts"]
+    DETECT --> |"has TS projects"| TS["TypeScript Job<br/>setup-node"]
 
-    DETECT --> |"has Go projects"| GO["Go Job<br/>setup-node + setup-golang<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:golang"]
+    DETECT --> |"has Go projects"| GO["Go Job<br/>setup-node + golang"]
 
-    DETECT --> |"has Java projects"| JVM["JVM Job<br/>setup-node + setup-jvm<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:java,tag:language:kotlin"]
+    DETECT --> |"has Java projects"| JVM["JVM Job<br/>setup-node + jvm"]
 
-    DETECT --> |"has .NET projects"| NET[".NET Job<br/>setup-node + setup-dotnet<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:fsharp,tag:language:csharp"]
+    DETECT --> |"has .NET projects"| NET[".NET Job<br/>setup-node + dotnet"]
 
-    DETECT --> |"has Python projects"| PY["Python Job<br/>setup-node + setup-python<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:python"]
+    DETECT --> |"has Python projects"| PY["Python Job<br/>setup-node + python"]
 
-    DETECT --> |"has Rust projects"| RS["Rust Job<br/>setup-node + setup-rust<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:rust"]
+    DETECT --> |"has Rust projects"| RS["Rust Job<br/>setup-node + rust"]
 
-    DETECT --> |"has Elixir projects"| EX["Elixir Job<br/>setup-node + setup-elixir<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:elixir"]
+    DETECT --> |"has Elixir projects"| EX["Elixir Job<br/>setup-node + elixir"]
 
-    DETECT --> |"has Clojure projects"| CLJ["Clojure Job<br/>setup-node + setup-clojure<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:clojure"]
+    DETECT --> |"has Clojure projects"| CLJ["Clojure Job<br/>setup-node + clojure"]
 
-    DETECT --> |"has Dart projects"| DART["Dart Job<br/>setup-node + setup-flutter<br/>nx affected -t typecheck lint test:quick spec-coverage<br/>--projects=tag:language:dart"]
+    DETECT --> |"has Dart projects"| DART["Dart Job<br/>setup-node + flutter"]
 
     DETECT --> MD["Markdown Job<br/>markdownlint-cli2"]
 

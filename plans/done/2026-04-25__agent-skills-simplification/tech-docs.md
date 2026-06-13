@@ -7,7 +7,7 @@
 The repository follows a six-layer governance architecture with Skills as delivery infrastructure (not a governance layer):
 
 ```mermaid
-graph LR
+graph TD
     subgraph Gov["Governance (top-down)"]
         direction TB
         L0[L0: Vision]
@@ -97,7 +97,7 @@ graph LR
 Before simplification, some agents may duplicate Skill content:
 
 ```mermaid
-graph TD
+graph LR
     subgraph "Problem: Duplication"
         A1[Agent File] -->|contains| D1[Task Instructions]
         A1 -->|contains| D2[Convention Details<br/>DUPLICATED]
@@ -145,7 +145,7 @@ graph TD
 After simplification, agents reference Skills instead of duplicating:
 
 ```mermaid
-graph TD
+graph LR
     subgraph "Solution: Single Source"
         A2[Agent File] -->|contains| T1[Task Instructions]
         A2 -->|references| R1[skills: skill-name<br/>in frontmatter]

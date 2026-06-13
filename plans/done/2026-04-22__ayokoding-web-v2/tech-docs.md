@@ -25,7 +25,7 @@ flowchart TD
     Crawler["Search Engine\nCrawler"]
     Browser["Browser"]
     RSC["React Server Components\n(server-side HTML rendering)"]
-    TRPC_S["tRPC Server Caller\n(direct function call, no HTTP)"]
+    TRPC_S["tRPC Server Caller\n(direct call, no HTTP)"]
     TRPC_H["tRPC HTTP Endpoint\n(/api/trpc/*)"]
     FS["Filesystem\napps/ayokoding-web/content/\n(933 markdown files)"]
     Index["In-Memory Index\n(FlexSearch + content map)"]

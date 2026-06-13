@@ -696,7 +696,7 @@ stateDiagram-v2
 
     state ready {
         [*] --> idle
-        idle --> mutating : ADD_BATCH / EDIT / DELETE / BUMP / CLEAR
+        idle --> mutating : ADD_BATCH/EDIT/DELETE/BUMP
         mutating --> idle : onDone — assign entries\nonError — assign mutationError
     }
 ```

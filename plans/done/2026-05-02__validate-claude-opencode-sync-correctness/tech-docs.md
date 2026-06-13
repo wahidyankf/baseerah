@@ -22,7 +22,7 @@ flowchart TD
     A[".claude/agents/<n>.md"] --> B["agents.ConvertAgent()"]
     B --> C{Field policy}
     C -->|preserve| D["frontmatter.set"]
-    C -->|translate| E["ConvertModel / ConvertTools / steps"]
+    C -->|translate| E["ConvertModel / ConvertTools"]
     C -->|drop+warn| F["WarningCollector"]
     D --> G["yaml.Encode"]
     E --> G

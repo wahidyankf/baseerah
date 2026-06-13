@@ -75,7 +75,7 @@ flowchart LR
     end
 
     subgraph tier1["Tier-1 harnesses (read AGENTS.md natively — no conversion needed)"]
-        T1["Codex CLI · GitHub Copilot · Cursor\nWindsurf · JetBrains Junie\nGoogle Antigravity CLI · Pi"]
+        T1["Codex · GH Copilot · Cursor\nWindsurf · Junie\nAntigravity · Pi"]
     end
 
     P -->|"npm run generate:bindings\n(agents sync)"| OC
@@ -334,8 +334,8 @@ npm run sync:claude-to-opencode && git diff --quiet .opencode/
 This tool string only checks OpenCode drift — a correctness gap revealed by the merge.
 
 ```mermaid
-flowchart LR
-    A["repo-parity-checker\nrepo-parity-fixer\n(Invariant 3: sync:claude-to-opencode\nonly checks .opencode/)"]
+flowchart TD
+    A["repo-parity-checker\nrepo-parity-fixer\n(Inv3: sync:claude-to-opencode\nonly checks .opencode/)"]
     B["Merge into\nrepo-harness-compatibility-*\n(Phase 0 + Phase 1)"]
     C["Gap revealed:\nInvariant 3 still uses\nsync:claude-to-opencode\n.amazonq/ NOT checked"]
     D["This plan:\nadd generate:bindings\n= agents sync +\nagents emit-bindings"]
@@ -375,8 +375,8 @@ ships AI agent bindings and uses `rhino-cli` for secondary binding generation.
 ```mermaid
 flowchart LR
     PUB["ose-public\nUpstream source of truth\n75 agents · 18 workflows\n.claude/ .opencode/ .amazonq/"]
-    PRIMER["ose-primer\nDownstream public template\nPackages scaffolding layer\n(agents · skills · conventions · CI harness)"]
-    INFRA["ose-infra\nPrivate infra repo\nGitHub Actions runner · coralpolyp\nown governance"]
+    PRIMER["ose-primer\nDownstream public template\nPackages scaffolding layer\n(agents · skills · CI harness)"]
+    INFRA["ose-infra\nPrivate infra repo\nGH Actions · coralpolyp\nown governance"]
 
     PUB -->|"repo-ose-primer-propagation-maker\n(PR-based, one-way push)"| PRIMER
     PRIMER -.->|"repo-ose-primer-adoption-maker\n(selective pull back)"| PUB

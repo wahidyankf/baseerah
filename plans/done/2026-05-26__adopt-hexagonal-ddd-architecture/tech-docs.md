@@ -36,7 +36,7 @@ domain types. Web apps use `contexts/` as a feature module naming convention (dr
 Effect.ts `Context.Tag`), not as DDD bounded contexts.
 
 ```mermaid
-flowchart TD
+flowchart LR
   classDef ctx fill:#4E9AF1,stroke:#2563EB,color:#fff
   classDef layer fill:#34A853,stroke:#1E7E34,color:#fff
 

@@ -7,9 +7,9 @@ library calls to PDF/OCR tools.
 
 ```mermaid
 flowchart TD
-    CLI["CLI Layer\nCommands/\nArgu argument types, JSON output, exit codes"]
-    Core["Core Layer\nCore/\nPure business logic, deterministic analysis\nNo I/O; accepts string/Path args only"]
-    Adapter["Adapter Layer\nAdapters/\nPdfPig wrapper (text PDFs), TesseractOCR wrapper\nReturns Error on tool not found"]
+    CLI["CLI Layer\nCommands/\nArgu types, JSON, exit codes"]
+    Core["Core Layer\nCore/\nPure business logic, no I/O\naccepts string/Path args only"]
+    Adapter["Adapter Layer\nAdapters/\nPdfPig + TesseractOCR wrappers\nError if tool not found"]
 
     CLI --> Core
     CLI --> Adapter

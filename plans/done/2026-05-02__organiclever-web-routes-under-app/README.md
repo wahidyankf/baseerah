@@ -61,12 +61,12 @@ flowchart LR
 
     R --> A
     A --> H
+    A --> W
     H --> HI
     H --> P
     H --> S
-    H --> W
-    W --> WF
     H --> RE
+    W --> WF
 
     classDef landing fill:#0173B2,stroke:#000,color:#FFF
     classDef tab fill:#029E73,stroke:#000,color:#FFF
@@ -78,15 +78,15 @@ flowchart LR
 ### Migration phasing
 
 ```mermaid
-flowchart LR
+flowchart TD
     P0[Phase 0 — Plan + Specs] --> P1
-    P1[Phase 1 — app/ layout + tab pages] --> P2
-    P2[Phase 2 — Link-based nav chrome] --> P3
-    P3[Phase 3 — Workout + EditRoutine routes] --> P4
-    P4[Phase 4 — Landing CTA + cleanup] --> P5
-    P5[Phase 5 — Trim appMachine + delete use-hash] --> P6
+    P1[Phase 1 — app/ layout + tabs] --> P2
+    P2[Phase 2 — Link-based nav] --> P3
+    P3[Phase 3 — Workout routes] --> P4
+    P4[Phase 4 — Landing + cleanup] --> P5
+    P5[Phase 5 — Trim appMachine] --> P6
     P6[Phase 6 — E2E + Specs + Docs] --> P7
-    P7[Phase 7 — Quality gate + manual verify]
+    P7[Phase 7 — QA + manual verify]
 
     style P0 fill:#0173B2,stroke:#000,color:#FFF
     style P1 fill:#0173B2,stroke:#000,color:#FFF

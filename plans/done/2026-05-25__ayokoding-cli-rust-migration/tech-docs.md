@@ -7,7 +7,7 @@ with a `[[bin]]` and a `[lib]` target. The binary entry point delegates immediat
 keeping `main.rs` untestable-by-design and excluded from coverage.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["main.rs\n(bin entry)"] --> B["lib.rs\nmod commands\nmod cli"]
     B --> C["cli.rs\nClap CLI struct\nroot flags + links subcommand"]
     B --> D["commands/mod.rs\ncommands module"]

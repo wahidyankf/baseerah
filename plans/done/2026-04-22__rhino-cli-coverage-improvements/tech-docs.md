@@ -14,7 +14,7 @@ graph LR
     B --> E["jacoco_coverage.go"]
     B --> F["cobertura_coverage.go (NEW)"]
 
-    A --> G["reporter.go (text/json/markdown)"]
+    A --> G["reporter.go (text/json/md)"]
     A --> H["per_file.go (NEW)"]
     A --> I["exclude.go (NEW)"]
 
@@ -27,7 +27,7 @@ graph LR
     N --> O["git diff parser"]
 
     P["spec-coverage validate"] --> Q["checker.go (MODIFIED)"]
-    Q --> R["Multi-language matcher (ENHANCED)"]
+    Q --> R["Multi-lang matcher (ENHANCED)"]
     P --> S["shared_steps.go (NEW)"]
 
     style F fill:#0173B2,color:#fff

@@ -5,13 +5,9 @@
 This plan does not introduce new architecture — it calibrates and hardens the existing rhino-cli + workflow + agent + skill system. The system shape after this plan is identical to before; the noise floor drops to zero.
 
 ```mermaid
-flowchart LR
+flowchart TD
   subgraph rhinoCLI["apps/rhino-cli (Go binary)"]
-    orch["repo-governance audit<br/>(orchestrator)"] --> emoji["emoji_audit.go"]
-    orch --> fm["frontmatter.go"]
-    orch --> hh["heading_hierarchy.go"]
-    orch --> other["8 other audit categories"]
-    orch --> dedup["agents_detect_duplication.go"]
+    orch["repo-governance audit<br/>(orchestrator)"] --> cats["11 audit<br/>categories"]
   end
 
   subgraph workflows["repo-governance/workflows/"]
@@ -20,13 +16,13 @@ flowchart LR
   end
 
   subgraph reports["generated-reports/"]
-    env["<uuid>.json envelope<br/>(rhino-cli/repo-governance-audit/v1)"]
-    skip["<i>.known-false-positives.md</i>"]
+    env["<uuid>.json envelope<br/>(repo-governance-audit/v1)"]
+    skip[".known-false-positives.md"]
   end
 
   subgraph agents[".claude/agents/ + .claude/skills/"]
     a["repo-rules-checker / fixer<br/>plan-checker / fixer / maker<br/>web-research-maker"]
-    s["existing skills + new parameterized skills"]
+    s["existing + new param skills"]
   end
 
   orch -->|writes| env
@@ -81,7 +77,7 @@ stateDiagram-v2
   readFrontmatter --> parseYAML: present
   parseYAML --> invalidYAML: parse error
   parseYAML --> classify: parsed
-  classify --> softwareSchema: docs/explanation/software-engineering/
+  classify --> softwareSchema: docs/explanation/sw-eng/
   classify --> governanceSchema: repo-governance/...
   classify --> [*]: out of scope
   softwareSchema --> checkCategory
@@ -323,16 +319,16 @@ Most surgical phase. CONSERVATIVE PARAMETERIZATION: skills accept variation as a
 
 ```mermaid
 flowchart TD
-  start["agents-detect-duplication cluster"]
+  start["agents-dedup cluster"]
   start --> count{Agents involved?}
   count -->|≥3| extract[Design parameterized skill]
   count -->|2| identical{Bodies byte-identical?}
   identical -->|yes| extract
   identical -->|no| preserve[Preserve as parallel evolution]
   extract --> param[Identify variable portions]
-  param --> skill[Author SKILL.md with placeholders]
+  param --> skill[Author SKILL.md w/params]
   skill --> migrate[Migrate agents one batch ≤ 5]
-  migrate --> golden[Compare pre/post rendered bodies]
+  migrate --> golden[Compare rendered bodies]
   golden -->|equivalent| commit[Checkpoint commit per batch]
   golden -->|drift| rollback[Rollback batch]
   commit --> next{More clusters?}
