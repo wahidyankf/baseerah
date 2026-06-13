@@ -189,7 +189,7 @@ After assessing code quality (Step 5), verify that the executor followed ALL ope
 1. **Local Quality Gates Were Executed**
    - Check git log for evidence that quality gates were run before each push
    - Verify no lint, typecheck, or test failures remain in the affected projects
-   - Run `npx nx affected -t typecheck lint test:quick spec-coverage` and confirm zero failures
+   - Run `npx nx affected -t typecheck lint test:quick specs:coverage` and confirm zero failures
    - If ANY failure exists, report as CRITICAL finding
 
 2. **Post-Push CI Passed**

@@ -33,7 +33,7 @@ For each project in `apps/` and `libs/`:
 3. **Docker setup** - Verify `infra/dev/{app}/` exists with docker-compose.yml, docker-compose.ci.yml, .env.example
 4. **Gherkin specs** - Verify specs directory exists with `.feature` files per [Specs Directory Structure Convention](../../repo-governance/conventions/structure/specs-directory-structure.md)
 5. **Unit test Gherkin consumption** - Verify BDD runner is configured in unit tests
-6. **spec-coverage target** - Verify `spec-coverage` Nx target exists for testable projects
+6. **specs:coverage target** - Verify `specs:coverage` Nx target exists for testable projects
 7. **Workflow file** - Verify `test-{app-name}.yml` exists calling reusable workflows
 8. **E2E pairing** - Verify BE variants pair with default FE, FE variants with default BE
 9. **No hardcoded credentials** - Verify no secrets in workflow files
@@ -47,5 +47,5 @@ Progressive audit report in `generated-reports/` following the standard pattern.
 
 - **CRITICAL**: Missing mandatory Nx targets, wrong coverage threshold
 - **HIGH**: Missing Docker setup, missing Gherkin specs, missing workflow file
-- **MEDIUM**: Missing .env.example, missing spec-coverage target, incomplete tags
+- **MEDIUM**: Missing .env.example, missing specs:coverage target, incomplete tags
 - **LOW**: Missing OCI labels in Dockerfiles, missing .dockerignore
