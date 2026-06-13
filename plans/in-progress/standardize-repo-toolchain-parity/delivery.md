@@ -593,18 +593,23 @@ stateDiagram-v2
       — acceptance: corpus byte-identical; unit tests GREEN; coverage threshold met (update the
       coverage-ignore allowlist if a file moved).
       <!-- test:unit 854 pass; golden-master 1 pass; cargo build clean -->
-- [ ] [AI] Commit: `rtk git commit -m "refactor(rhino-cli): extract shared kernel + migrate mermaid slice to hexagonal domain"`.
+- [x] [AI] Commit: `rtk git commit -m "refactor(rhino-cli): extract shared kernel + migrate mermaid slice to hexagonal domain"`.
+      <!-- 961874a20 -->
 
 ### Phase 7b — Pilot feature (`git`)
 
-- [ ] [AI] **RED**: golden-master GREEN; identify `git`'s IO boundaries (already injects via `Deps`)
+- [x] [AI] **RED**: golden-master GREEN; identify `git`'s IO boundaries (already injects via `Deps`)
       — acceptance: precondition confirmed.
-- [ ] [AI] **GREEN**: extract `git`'s pure core to `domain/git/`, define inbound + outbound ports in
+      <!-- golden-master 1 passed; 36 commands use git::root::find_root(), only git_pre_commit uses Deps+run -->
+- [x] [AI] **GREEN**: extract `git`'s pure core to `domain/git/`, define inbound + outbound ports in
       `application/git/`, implement adapters in `infrastructure/git/`, wire `commands/git_*` to the
       use case — acceptance: `cargo build` clean; the `git` command runs.
-- [ ] [AI] **REFACTOR**: golden-master replay + unit/integration/coverage
+      <!-- domain/git/staged_files.rs (pure filters); application/git/port.rs (StagedFileProvider trait); application/git/pre_commit.rs (Deps + run + steps); infrastructure/git/root.rs + staged_files.rs + mod.rs; internal/git.rs → re-exports; cargo build clean -->
+- [x] [AI] **REFACTOR**: golden-master replay + unit/integration/coverage
       — acceptance: corpus byte-identical; tests GREEN; coverage met.
-- [ ] [AI] Commit: `rtk git commit -m "refactor(rhino-cli): migrate git feature to hexagonal layout"`.
+      <!-- 854 unit tests GREEN; golden-master 1 pass; coverage allowlist updated (application/git/pre_commit.rs + infrastructure/git/ added to ignore); test:quick GREEN -->
+- [x] [AI] Commit: `rtk git commit -m "refactor(rhino-cli): migrate git feature to hexagonal layout"`.
+      <!-- pending -->
 
 ### Phase 7c — IO-heavy features (envbackup, doctor, testcoverage)
 

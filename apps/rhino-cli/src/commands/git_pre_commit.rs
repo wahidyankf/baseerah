@@ -5,9 +5,9 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
+use crate::application::git::pre_commit::run;
 use crate::domain::cliout::OutputFormat;
-use crate::internal::git;
-use crate::internal::git::{Deps, run};
+use crate::infrastructure::git::{make_default_deps, root::find_root};
 
 /// CLI arguments for `git pre-commit` (none required).
 #[derive(Args, Debug)]
@@ -20,9 +20,8 @@ pub struct PreCommitArgs {}
 /// Returns an error if the git root cannot be found or if any pre-commit
 /// check fails.
 pub fn run_cmd(_args: &PreCommitArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
-    let git_root =
-        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
-    let mut deps = Deps::default_for(git_root);
+    let git_root = find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+    let mut deps = make_default_deps(git_root);
     run(&mut deps)
 }
 
