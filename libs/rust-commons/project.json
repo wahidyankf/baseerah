@@ -24,7 +24,7 @@
         "command": "cargo fmt --manifest-path libs/rust-commons/Cargo.toml"
       }
     },
-    "fmt:check": {
+    "format:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo fmt --manifest-path libs/rust-commons/Cargo.toml -- --check"
@@ -64,10 +64,10 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'spec-coverage not applicable for library crate rust-commons'"
+        "command": "echo 'specs:coverage not applicable for library crate rust-commons'"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs"]

@@ -38,7 +38,7 @@
     "validate:claude": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness validate claude",
     "validate:opencode": "npm run validate:sync",
     "validate:config": "npm run validate:claude && npm run generate:bindings && npm run validate:opencode",
-    "validate:harness-bindings": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness validate bindings",
+    "harness:bindings-validation": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness validate bindings",
     "doctor": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- doctor"
   },
   "keywords": [],

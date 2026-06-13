@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 jobs:
-  spec-coverage:
+  specs-coverage:
     name: Spec coverage ${{ inputs.backend-name }}
     runs-on: ubuntu-latest
     steps:
@@ -31,4 +31,4 @@ jobs:
       - name: Generate contract types
         run: |
           npx nx run ${{ inputs.backend-name }}:codegen
-      - run: npx nx run ${{ inputs.backend-name }}:spec-coverage
+      - run: npx nx run ${{ inputs.backend-name }}:specs:coverage

@@ -56,7 +56,7 @@
         "cwd": "apps/ose-app-be-e2e"
       }
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir db specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be-e2e"

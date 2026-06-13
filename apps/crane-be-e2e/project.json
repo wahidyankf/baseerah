@@ -56,7 +56,7 @@
         "cwd": "apps/crane-be-e2e"
       }
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps specs/apps/crane/behavior/crane-be/gherkin apps/crane-be-e2e"

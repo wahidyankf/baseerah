@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  spec-coverage:
+  specs-coverage:
     name: Spec coverage
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -26,10 +26,10 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-golang
-      - name: Run spec-coverage for all OrganicLever projects
+      - name: Run specs:coverage for all OrganicLever projects
         run: |
-          npx nx run organiclever-be:spec-coverage
-          npx nx run organiclever-web:spec-coverage
+          npx nx run organiclever-be:specs:coverage
+          npx nx run organiclever-web:specs:coverage
 
   fe-lint:
     name: FE lint
@@ -171,11 +171,11 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
-      - run: npx nx run-many -t validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --projects=rhino-cli
+      - run: npx nx run-many -t specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --projects=rhino-cli
 
   deploy:
     name: Deploy to staging
-    needs: [spec-coverage, fe-lint, be-integration, fe-integration, e2e, specs-gate]
+    needs: [specs-coverage, fe-lint, be-integration, fe-integration, e2e, specs-gate]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

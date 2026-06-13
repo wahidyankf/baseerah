@@ -24,7 +24,7 @@
         "command": "cargo fmt --manifest-path apps/ose-cli/Cargo.toml"
       }
     },
-    "fmt:check": {
+    "format:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo fmt --manifest-path apps/ose-cli/Cargo.toml -- --check"
@@ -50,7 +50,7 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/Cargo.lock", "{projectRoot}/deny.toml"]
     },
-    "check:msrv": {
+    "msrv:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo hack --manifest-path apps/ose-cli/Cargo.toml check --rust-version"
@@ -94,10 +94,10 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs", "{projectRoot}/tests/**/*.rs"]
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — spec-coverage stubbed; cucumber harness is future work'"
+        "command": "echo 'Phase 0 — specs:coverage stubbed; cucumber harness is future work'"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs"]

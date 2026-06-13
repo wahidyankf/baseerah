@@ -40,7 +40,7 @@
         "command": "fantomas libs/fsharp-crane-core/src"
       }
     },
-    "fmt:check": {
+    "format:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "fantomas --check libs/fsharp-crane-core/src"
@@ -72,10 +72,10 @@
         "{projectRoot}/fsharp-crane-core.fsproj"
       ]
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'spec-coverage: not applicable for a library'"
+        "command": "echo 'specs:coverage: not applicable for a library'"
       },
       "cache": true
     },

@@ -36,7 +36,7 @@
         "command": "cargo fmt --manifest-path apps/ose-app-be/Cargo.toml"
       }
     },
-    "fmt:check": {
+    "format:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo fmt --check --manifest-path apps/ose-app-be/Cargo.toml"
@@ -60,7 +60,7 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/deny.toml"]
     },
-    "check:msrv": {
+    "msrv:check": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo +1.88 check --manifest-path apps/ose-app-be/Cargo.toml"
@@ -126,7 +126,7 @@
       },
       "cache": false
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration --exclude-dir messaging specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be"

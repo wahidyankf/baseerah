@@ -31,4 +31,4 @@ jobs:
         uses: ./.github/actions/setup-rust
 
       - name: Validate env contract
-        run: npx nx run rhino-cli:validate:env
+        run: npx nx run rhino-cli:env:validation

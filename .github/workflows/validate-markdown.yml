@@ -31,10 +31,10 @@ jobs:
         uses: ./.github/actions/setup-rust
 
       - name: Validate mermaid diagrams
-        run: npx nx run rhino-cli:validate:mermaid
+        run: npx nx run rhino-cli:mermaid:validation
 
       - name: Validate markdown links
-        run: npx nx run rhino-cli:validate:links
+        run: npx nx run rhino-cli:links:validation
 
       - name: Validate heading hierarchy
-        run: npx nx run rhino-cli:validate:heading-hierarchy
+        run: npx nx run rhino-cli:headings:hierarchy-validation

@@ -7,9 +7,9 @@ set -e
 # test:integration/test:e2e are CRON-only — NOT here.
 # If pre-push times out, run the nx commands below manually to warm cache, then push again.
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
-npx nx affected -t spec-coverage test-coverage validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --parallel="$PARALLEL"
+npx nx affected -t specs:coverage test-coverage specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --parallel="$PARALLEL"
 npm run lint:md
-npx nx run rhino-cli:validate:env
+npx nx run rhino-cli:env:validation
 
 # Naming validators — scoped to pushes that touch the relevant trees.
 # Upstream may be missing on first push of a branch; default to empty range in that case.
@@ -17,20 +17,20 @@ RANGE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 &
 if [ -n "$RANGE" ]; then
   CHANGED=$(git diff --name-only "$RANGE" 2>/dev/null || echo "")
   if echo "$CHANGED" | grep -qE '^(\.claude/agents/|\.opencode/agent/)'; then
-    npx nx run rhino-cli:validate:naming-agents
+    npx nx run rhino-cli:naming:harness-validation
   fi
   if echo "$CHANGED" | grep -qE '^repo-governance/workflows/'; then
-    npx nx run rhino-cli:validate:naming-workflows
+    npx nx run rhino-cli:naming:workflows-validation
   fi
   if echo "$CHANGED" | grep -qE '^repo-governance/.*\.md$'; then
-    npx nx run rhino-cli:validate:repo-governance-vendor-audit
+    npx nx run rhino-cli:governance:vendor-audit-validation
   fi
   # Cross-vendor behavioral-parity gate: run when any of the parity-relevant surfaces change.
   if echo "$CHANGED" | grep -qE '^(repo-governance/.*\.md$|AGENTS\.md$|CLAUDE\.md$|\.claude/agents/|\.opencode/agents/)'; then
-    npx nx run rhino-cli:validate:cross-vendor-parity
+    npx nx run rhino-cli:cross-vendor:parity-validation
   fi
   # Harness binding-parity guard (deterministic, no agent): run when binding surfaces change.
   if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|docs/reference/platform-bindings\.md$|\.claude/|\.opencode/|\.codex/|\.github/)'; then
-    npm run validate:harness-bindings
+    npm run harness:bindings-validation
   fi
 fi

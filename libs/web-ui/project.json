@@ -68,7 +68,7 @@
       },
       "cache": true
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'no-op: target not applicable for this project'"
