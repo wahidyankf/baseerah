@@ -122,7 +122,7 @@ Scenario: Sync to .opencode/ produces no drift
   Given .claude/agents/repo-rules-checker.md and .claude/agents/repo-rules-fixer.md have been edited
   When npm run generate:bindings runs
   Then the .opencode/agents/ mirrors are regenerated
-  And npx nx run rhino-cli:validate:cross-vendor-parity exits 0
+  And npx nx run rhino-cli:cross-vendor:parity-validation exits 0
 ```
 
 ## Product Scope

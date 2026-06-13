@@ -18,7 +18,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   - _Suggested executor: direct execution (one-shot bash command)_
 - [ ] Inside the root worktree (not the new worktree per [Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)), run `npm install && npm run doctor -- --fix`. Verify by running `npm run doctor -- --scope minimal` — exits 0 with no FAIL rows.
   - _Suggested executor: direct execution (mechanical npm command)_
-- [ ] In the new worktree, run `npx nx affected -t typecheck lint test:quick spec-coverage` to establish a baseline. Note any preexisting failures in this checkbox's implementation-notes block — they MUST be fixed during this plan per Iron Rule 3 (Fix ALL Issues — Including Preexisting).
+- [ ] In the new worktree, run `npx nx affected -t typecheck lint test:quick specs:coverage` to establish a baseline. Note any preexisting failures in this checkbox's implementation-notes block — they MUST be fixed during this plan per Iron Rule 3 (Fix ALL Issues — Including Preexisting).
   - _Suggested executor: direct execution_
 
 ## Phase 2: Extend `repo-rules-checker` with Step 8b
@@ -56,7 +56,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   - _Suggested executor: direct execution_
 - [ ] Run `npx nx affected -t test:quick` — exits 0 with no failed tests.
   - _Suggested executor: direct execution_
-- [ ] Run `npx nx affected -t spec-coverage` — exits 0; coverage thresholds (≥90% Go / ≥90% F# / ≥90% TypeScript (Next.js) / ≥74% organiclever-web per [nx-targets.md](../../../repo-governance/development/infra/nx-targets.md) and project.json [Repo-grounded]) hold for all affected projects.
+- [ ] Run `npx nx affected -t specs:coverage` — exits 0; coverage thresholds (≥90% Go / ≥90% F# / ≥90% TypeScript (Next.js) / ≥74% organiclever-web per [nx-targets.md](../../../repo-governance/development/infra/nx-targets.md) and project.json [Repo-grounded]) hold for all affected projects.
   - _Suggested executor: direct execution_
 - [ ] Run `npm run lint:md` — exits 0 with `Summary: 0 error(s)`.
   - _Suggested executor: direct execution_
@@ -67,7 +67,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 - [ ] Run `npm run generate:bindings` — output ends with `Status: ✓ SUCCESS` and `Agents: 72 converted` (or whatever the current correct count is at execution time per `Bash ls .claude/agents/*.md | grep -v README | wc -l`). Verify by running the command and reading the tail.
   - _Suggested executor: direct execution_
-- [ ] Run `npx nx run rhino-cli:validate:cross-vendor-parity` — exits 0 with all 6 invariants passing.
+- [ ] Run `npx nx run rhino-cli:cross-vendor:parity-validation` — exits 0 with all 6 invariants passing.
   - _Suggested executor: direct execution_
 - [ ] Verify the `.opencode/agents/repo-rules-checker.md` and `.opencode/agents/repo-rules-fixer.md` mirrors carry the new Step 8b content by running `Bash grep -c "Step 8b" .opencode/agents/repo-rules-checker.md .opencode/agents/repo-rules-fixer.md` — each returns at least `1`.
   - _Suggested executor: direct execution_
@@ -109,9 +109,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Quality Gates (summary — already enforced inline above)
 
-- Local: `npx nx affected -t typecheck lint test:quick spec-coverage` (Phase 5)
+- Local: `npx nx affected -t typecheck lint test:quick specs:coverage` (Phase 5)
 - Markdown: `npm run lint:md` (Phase 5)
-- Cross-vendor parity: `npx nx run rhino-cli:validate:cross-vendor-parity` (Phase 6)
+- Cross-vendor parity: `npx nx run rhino-cli:cross-vendor:parity-validation` (Phase 6)
 - CI: all GitHub Actions workflows green (Phase 8)
 - Archival: plan moved to `plans/done/` with index updates (Phase 9)
 
@@ -120,7 +120,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - Phase 2 acceptance: `Bash grep -c "^### Step 8b:" .claude/agents/repo-rules-checker.md` returns `1` and the agent passes the Phase 2 fixtures (TDD Red→Green).
 - Phase 3 acceptance: `Bash grep -c "^## Step 8b Fix Recipes" .claude/agents/repo-rules-fixer.md` returns `1` and the fixer resolves the Phase 2 fixtures or escalates per design.
 - Phase 4 acceptance: workflow Scope Clarification advertises full `docs/` coverage (`Bash grep -c "Validates (full)" repo-governance/workflows/repo/repo-rules-quality-gate.md` returns `1`).
-- Phase 5 acceptance: all five quality gates (typecheck/lint/test:quick/spec-coverage/lint:md) exit 0.
-- Phase 6 acceptance: `npm run generate:bindings` reports `Status: ✓ SUCCESS` and `validate:cross-vendor-parity` exits 0.
+- Phase 5 acceptance: all five quality gates (typecheck/lint/test:quick/specs:coverage/lint:md) exit 0.
+- Phase 6 acceptance: `npm run generate:bindings` reports `Status: ✓ SUCCESS` and `cross-vendor:parity-validation` exits 0.
 - Phase 8 acceptance: all triggered GitHub Actions workflows reach `conclusion: success`.
 - Phase 9 acceptance: plan folder lives at `plans/done/2026-05-03__repo-rules-checker-docs-coverage/` and both index READMEs reflect the move.

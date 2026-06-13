@@ -100,7 +100,7 @@ No new files. No deletions. No renames.
 ## Dependencies
 
 - `npm run generate:bindings` [Repo-grounded — root `package.json` script] — produces `.opencode/` mirrors after agent edits.
-- `npx nx run rhino-cli:validate:cross-vendor-parity` [Repo-grounded — `.husky/pre-push:30`] — validates parity invariants post-sync.
+- `npx nx run rhino-cli:cross-vendor:parity-validation` [Repo-grounded — `.husky/pre-push:30`] — validates parity invariants post-sync.
 - `npm run lint:md` [Repo-grounded — root `package.json` script] — markdown lint gate.
 - Existing `repo-rules-checker` infrastructure (UUID chain, progressive writing, false-positive skip list, criticality assessment, dual-label findings) — unchanged.
 
