@@ -203,6 +203,24 @@ flowchart LR
   style PRD fill:#029E73,stroke:#000000,color:#000000
 ```
 
+## Execution Order (Dependency Chain)
+
+This plan is part of a four-step cross-repo delivery chain; execute in this order:
+
+1. **[standardize-repo-toolchain-parity](../standardize-repo-toolchain-parity/README.md)** (all three
+   repos: ose-public, ose-infra, ose-primer) — converged toolchain baseline; no upstream prerequisite.
+2. **This plan — `rewrite-be-fsharp-drop-crane`** (ose-public) **and**
+   **`deploy-proxmox-datacenter-manager`** (ose-infra,
+   `plans/in-progress/deploy-proxmox-datacenter-manager/`) — independent of each other (parallel-safe);
+   both require step 1.
+3. **`deploy-k3s-cluster-staging`** (ose-infra, `plans/in-progress/deploy-k3s-cluster-staging/`) —
+   requires steps 1 and 2 (this plan delivers the two public F# GHCR images its Phase 0.5 gate verifies).
+4. **`deploy-k3s-cluster-prod`** (ose-infra, `plans/in-progress/deploy-k3s-cluster-prod/`) — requires
+   steps 1, 2, and 3.
+
+**This plan is step 2** — parallel-safe with `deploy-proxmox-datacenter-manager`; both require step 1,
+and both precede the step-3/4 k3s cluster plans.
+
 ## Plan Navigation
 
 | Document                       | Purpose                                                               |
