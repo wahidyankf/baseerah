@@ -25,7 +25,7 @@
     "test:e2e": {
       "cache": false
     },
-    "spec-coverage": {
+    "specs:coverage": {
       "cache": true
     },
     "test-coverage": {

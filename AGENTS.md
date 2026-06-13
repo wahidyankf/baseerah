@@ -157,14 +157,15 @@ All markdown files auto-linted and formatted through a three-gate system:
 
 - **Prettier** (v3.6.2): Formatting (runs on pre-commit)
 - **markdownlint-cli2** (v0.20.0): Linting (runs on pre-push)
-- **validate:mermaid** (`npx nx run rhino-cli:validate:mermaid`): Mermaid diagram
-  validation — width, label length, syntax — repo-wide scan (excludes `plans/done`,
+- **mermaid:validation** (`npx nx run rhino-cli:mermaid:validation`): Mermaid diagram
+  validation — width, label length, syntax — repo-wide scan covering `flowchart`/`graph`
+  and `stateDiagram-v2`/`stateDiagram` (v1); excludes `plans/done`,
   `apps/ayokoding-web/content`, and the standard noise-skip set; runs at pre-commit on
   staged `.md` files + `validate-markdown.yml` CI; does NOT run at pre-push)
-- **validate:links** (`npx nx run rhino-cli:validate:links`): Full-repo link scan
+- **links:validation** (`npx nx run rhino-cli:links:validation`): Full-repo link scan
   including `#fragment` anchor validation (runs at pre-commit + CI; does NOT run at
   pre-push)
-- **validate:heading-hierarchy** (`npx nx run rhino-cli:validate:heading-hierarchy`):
+- **headings:hierarchy-validation** (`npx nx run rhino-cli:headings:hierarchy-validation`):
   Heading nesting on prose allowlist (`docs/`, `repo-governance/`, `plans/` excl.
   `done/`, `specs/`, root `*.md`, `apps/*/README.md`, `libs/*/README.md`,
   `apps/*/docs/**`, `libs/*/docs/**`) (runs at pre-commit + CI; does NOT run at
@@ -258,9 +259,9 @@ Husky + lint-staged enforce quality:
   - Lints staged shell scripts (shellcheck), Dockerfiles (hadolint), and workflow files (actionlint) at the warning threshold
   - Auto-stages changes
 - **Commit-msg**: Validates Conventional Commits format (Commitlint)
-- **Pre-push**: Runs `typecheck`, `lint`, `test:quick`, and `spec-coverage` for affected projects (parallelism: cores-1)
+- **Pre-push**: Runs `typecheck`, `lint`, `test:quick`, and `specs:coverage` for affected projects (parallelism: cores-1)
   - Runs markdown linting
-  - All four Nx targets cacheable — if pre-push times out, run `npx nx affected -t typecheck lint test:quick spec-coverage` first to warm cache, then push again
+  - All four Nx targets cacheable — if pre-push times out, run `npx nx affected -t typecheck lint test:quick specs:coverage` first to warm cache, then push again
 
 **See**: [repo-governance/development/quality/code.md](./repo-governance/development/quality/code.md)
 
@@ -462,17 +463,6 @@ Six-layer governance hierarchy:
 - **Dev port**: 3100
 - **E2E tests**: `ose-web-be-e2e`, `ose-web-fe-e2e`
 
-**Commands**:
-
-```bash
-nx dev ose-web                           # Development server (localhost:3100)
-nx build ose-web                         # Production build
-nx run ose-web:test:quick                # Unit tests + coverage + link validation
-nx run ose-web:test:integration          # Integration tests
-nx run ose-web-be-e2e:test:e2e           # Backend E2E tests
-nx run ose-web-fe-e2e:test:e2e           # Frontend E2E tests
-```
-
 **See**: [apps/ose-web/README.md](./apps/ose-web/README.md)
 
 ### ayokoding-web
@@ -484,16 +474,6 @@ nx run ose-web-fe-e2e:test:e2e           # Frontend E2E tests
 - **Deployment**: Vercel
 - **Content**: Educational platform (programming, AI, security)
 - **E2E tests**: `ayokoding-web-be-e2e`, `ayokoding-web-fe-e2e`
-
-**Commands**:
-
-```bash
-nx dev ayokoding-web                           # Development server (localhost:3101)
-nx build ayokoding-web                         # Production build
-nx run ayokoding-web:test:quick                # Unit tests + coverage + link validation
-nx run ayokoding-web-be-e2e:test:e2e           # Backend E2E tests
-nx run ayokoding-web-fe-e2e:test:e2e           # Frontend E2E tests
-```
 
 **See**: [apps/ayokoding-web/README.md](./apps/ayokoding-web/README.md)
 
@@ -507,15 +487,6 @@ nx run ayokoding-web-fe-e2e:test:e2e           # Frontend E2E tests
 - **E2E tests**: `organiclever-web-e2e`
 - **Dev port**: 3200
 
-**Commands**:
-
-```bash
-nx dev organiclever-web                     # Development server (localhost:3200)
-nx build organiclever-web                   # Production build
-nx run organiclever-web-e2e:test:e2e        # Run FE E2E tests headlessly
-nx run organiclever-web-e2e:test:e2e:ui     # Run FE E2E tests with Playwright UI
-```
-
 **See**: [apps/organiclever-web/README.md](./apps/organiclever-web/README.md)
 
 ### wahidyankf-web
@@ -527,16 +498,6 @@ nx run organiclever-web-e2e:test:e2e:ui     # Run FE E2E tests with Playwright U
 - **Content**: Personal portfolio (Home, CV, Personal Projects)
 - **E2E tests**: `wahidyankf-web-fe-e2e`
 - **Dev port**: 3201
-
-**Commands**:
-
-```bash
-nx dev wahidyankf-web                          # Development server (localhost:3201)
-nx build wahidyankf-web                        # Production build
-nx run wahidyankf-web:test:quick               # Unit tests + coverage + spec-coverage
-nx run wahidyankf-web-fe-e2e:test:e2e          # Run FE E2E tests headlessly
-nx run wahidyankf-web-fe-e2e:test:e2e:ui       # Run FE E2E tests with Playwright UI
-```
 
 **See**: [apps/wahidyankf-web/README.md](./apps/wahidyankf-web/README.md)
 
@@ -552,15 +513,6 @@ nx run wahidyankf-web-fe-e2e:test:e2e:ui       # Run FE E2E tests with Playwrigh
 - **E2E tests**: `ose-app-web-e2e`
 - **Dev port**: 3300
 
-**Commands**:
-
-```bash
-nx dev ose-app-web                          # Development server (localhost:3300)
-nx build ose-app-web                        # Production build
-nx run ose-app-web:test:quick               # Unit tests + coverage
-nx run ose-app-web-e2e:test:e2e             # Frontend E2E tests
-```
-
 **See**: [apps/ose-app-web/README.md](./apps/ose-app-web/README.md)
 
 ### organiclever-be
@@ -571,16 +523,6 @@ nx run ose-app-web-e2e:test:e2e             # Frontend E2E tests
 - **E2E tests**: `organiclever-be-e2e`
 - **Dev port**: 8202
 - **Contract**: OpenAPI 3.1 spec at `specs/apps/organiclever/containers/contracts/`
-
-**Commands**:
-
-```bash
-nx dev organiclever-be                     # Development server (localhost:8202)
-nx build organiclever-be                   # Production build
-nx run organiclever-be:test:quick          # Unit tests + coverage validation (≥90%)
-nx run organiclever-be:test:integration    # Integration tests with real DB
-nx run organiclever-be-e2e:test:e2e        # Run BE E2E tests headlessly
-```
 
 ## Temporary Files for AI Agents
 
@@ -695,56 +637,3 @@ See [docs/reference/platform-bindings.md](./docs/reference/platform-bindings.md)
 ### Concrete Vendor Model IDs
 
 Concrete vendor model IDs live in each platform binding's agent definition files (e.g., `.claude/agents/<name>.md` frontmatter for the primary platform binding).
-
-<!-- rtk-instructions v2 -->
-
-### RTK (Rust Token Killer) — Token-Optimized Commands
-
-RTK is a CLI wrapper that reduces token usage by filtering AI output. See [github.com/rtk-ai/rtk](https://github.com/rtk-ai/rtk) for full details.
-
-#### Golden Rule
-
-**Always prefix commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, passes through unchanged. RTK is always safe to use.
-
-Even in command chains with `&&`, use `rtk`:
-
-```bash
-# Wrong
-git add . && git commit -m "msg" && git push
-
-# Correct
-rtk git add . && rtk git commit -m "msg" && rtk git push
-```
-
-#### Meta Commands
-
-```bash
-rtk gain              # Show token savings analytics
-rtk gain --history    # Show command usage history with savings
-rtk discover          # Analyze Claude Code history for missed opportunities
-rtk proxy <cmd>       # Execute raw command without filtering (for debugging)
-```
-
-<!-- /rtk-instructions -->
-
-### caveman — Token Compression
-
-**caveman** compresses agent output by ~75% via terse caveman-speak. Works with OpenCode via skill injection. Stacks with RTK (output filtering) for compounded savings. MIT licensed. Installed 2026-05-03.
-
-**Usage**: In OpenCode, type `/caveman` in chat. Modes: `lite`, `full` (default), `ultra`.
-
-**Commands**:
-
-- `/caveman` — toggle on/off
-- `/caveman lite|full|ultra` — set mode
-- `/caveman-stats` — show token savings
-- `/caveman-commit` — generate terse commit message
-- `/caveman-review` — one-line PR comments
-
-**Skills installed**: 8 skills in `.agents/skills/caveman-*`. Auto-loads when mentioned or triggered.
-
-**Stack with RTK**: RTK filters CLI output (git/npm commands); caveman compresses agent prose output. Both run simultaneously for compounded savings.
-
-**Verification**: `opencode stats` shows token usage per session.
-
-<!-- /caveman-instructions -->

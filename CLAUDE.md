@@ -67,8 +67,37 @@ The Nx tooling guidelines, generator usage, and `nx_docs` policy are documented 
 
 <!-- rtk-instructions v2 -->
 
-### RTK and caveman (Claude-Code binding)
+### RTK (Rust Token Killer) — Token-Optimized Commands (Claude-Code binding)
 
-The RTK CLI proxy and caveman token-compression skill are documented in [`AGENTS.md`](./AGENTS.md#platform-binding-examples) under the Platform Binding Examples section, and apply identically here. The `<!-- rtk-instructions -->` markers above are preserved so the RTK auto-injection tool can refresh content if needed.
+RTK is a CLI wrapper that reduces token usage by filtering AI output. See [github.com/rtk-ai/rtk](https://github.com/rtk-ai/rtk) for full details. The `<!-- rtk-instructions -->` markers are preserved so the RTK auto-injection tool can refresh content if needed.
+
+**Always prefix commands with `rtk`**. If RTK has a dedicated filter, it uses it. If not, passes through unchanged. RTK is always safe to use.
+
+```bash
+rtk gain              # Show token savings analytics
+rtk gain --history    # Show command usage history with savings
+rtk discover          # Analyze Claude Code history for missed opportunities
+rtk proxy <cmd>       # Execute raw command without filtering (for debugging)
+```
 
 <!-- /rtk-instructions -->
+
+### caveman — Token Compression (Claude-Code binding)
+
+**caveman** compresses agent output by ~75% via terse caveman-speak. Works with OpenCode via skill injection. Stacks with RTK (output filtering) for compounded savings. MIT licensed. Installed 2026-05-03.
+
+**Usage**: In OpenCode, type `/caveman` in chat. Modes: `lite`, `full` (default), `ultra`.
+
+**Commands**:
+
+- `/caveman` — toggle on/off
+- `/caveman lite|full|ultra` — set mode
+- `/caveman-stats` — show token savings
+- `/caveman-commit` — generate terse commit message
+- `/caveman-review` — one-line PR comments
+
+**Skills installed**: 8 skills in `.agents/skills/caveman-*`. Auto-loads when mentioned or triggered.
+
+**Stack with RTK**: RTK filters CLI output (git/npm commands); caveman compresses agent prose output. Both run simultaneously for compounded savings.
+
+**Verification**: `opencode stats` shows token usage per session.
