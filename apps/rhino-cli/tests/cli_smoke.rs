@@ -41,7 +41,7 @@ fn unknown_subcommand_exits_failure() {
 #[test]
 fn gherkin_keyword_cardinality_subcommand_exists() {
     cmd()
-        .args(["repo-governance", "gherkin-keyword-cardinality", "--help"])
+        .args(["specs", "gherkin-cardinality", "--help"])
         .assert()
         .success()
         .stdout(contains("Usage"));

@@ -59,7 +59,7 @@
     "spec-coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps --exclude-dir db specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be-e2e"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs coverage --shared-steps --exclude-dir db specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be-e2e"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/steps/**/*.ts"]

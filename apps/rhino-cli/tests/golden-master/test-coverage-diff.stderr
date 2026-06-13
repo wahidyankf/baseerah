@@ -1,4 +1,0 @@
-error: the following required arguments were not provided:
-  <COVERAGE_FILE>
-
-Usage: rhino-cli test-coverage diff --help <COVERAGE_FILE>

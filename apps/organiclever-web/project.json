@@ -71,8 +71,8 @@
       "outputs": ["{projectRoot}/coverage"],
       "options": {
         "commands": [
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd bc organiclever)",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- ddd ul organiclever)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- specs bc organiclever)",
+          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- specs ul organiclever)",
           "node scripts/gen-migrations.mjs && npx vitest run --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/organiclever-web/coverage/lcov.info 74)"
         ],
         "parallel": false,
@@ -119,7 +119,7 @@
       "outputs": ["{projectRoot}/storybook-static"]
     },
     "spec-coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- spec-coverage validate --shared-steps specs/apps/organiclever/behavior/organiclever-web/gherkin apps/organiclever-web",
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs coverage --shared-steps specs/apps/organiclever/behavior/organiclever-web/gherkin apps/organiclever-web",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-web/gherkin/**/*.feature",

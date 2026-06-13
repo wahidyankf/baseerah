@@ -3,17 +3,17 @@
 use clap::{Parser, Subcommand};
 
 use crate::commands::{
-    agents_detect_duplication, agents_emit_bindings, agents_sync, agents_validate_bindings,
-    agents_validate_claude, agents_validate_naming, agents_validate_sync, ddd_bc, ddd_ul,
-    docs_validate_frontmatter, docs_validate_heading_hierarchy, docs_validate_links,
-    docs_validate_mermaid, docs_validate_naming, doctor, env_backup, env_init, env_restore,
-    env_validate, git_pre_commit, governance_agents_md_size, governance_audit,
-    governance_emoji_audit, governance_frontmatter_audit,
-    governance_gherkin_keyword_cardinality_audit, governance_layer_coherence,
-    governance_license_audit, governance_readme_index_audit, governance_traceability_audit,
-    governance_vendor_audit, spec_coverage_validate, specs_validate_adoption,
-    specs_validate_counts, specs_validate_links, specs_validate_tree, test_coverage_diff,
-    test_coverage_merge, test_coverage_validate, workflows_validate_naming,
+    convention_audit, convention_validate_agents_md_size, convention_validate_emoji,
+    convention_validate_license, doctor, env_backup, env_init, env_restore, env_validate,
+    git_pre_commit, governance_audit, governance_layer_coherence, governance_traceability_audit,
+    governance_vendor_audit, harness_audit, harness_emit_bindings, harness_generate_bindings,
+    harness_sync, harness_validate_bindings, harness_validate_claude, harness_validate_duplication,
+    harness_validate_naming, harness_validate_sync, md_audit, md_validate_frontmatter,
+    md_validate_frontmatter_dates, md_validate_heading_hierarchy, md_validate_links,
+    md_validate_mermaid, md_validate_naming, md_validate_readme_index, specs_audit, specs_bc,
+    specs_coverage, specs_gherkin_cardinality, specs_ul, specs_validate_adoption,
+    specs_validate_counts, specs_validate_links, specs_validate_tree, test_coverage_validate,
+    workflows_validate_naming,
 };
 use crate::domain::cliout::OutputFormat;
 
@@ -75,30 +75,27 @@ pub struct Cli {
 /// Top-level CLI subcommands dispatched by the root `Cli` parser.
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Test coverage commands (validate, diff, merge).
+    /// Test coverage commands (validate only).
     #[command(name = "test-coverage", subcommand)]
     TestCoverage(TestCoverageCommands),
-    /// BDD spec coverage commands.
-    #[command(name = "spec-coverage", subcommand)]
-    SpecCoverage(SpecCoverageCommands),
     /// Repository governance audits.
     #[command(name = "repo-governance", subcommand)]
     RepoGovernance(RepoGovernanceCommands),
-    /// Documentation validators.
-    #[command(name = "docs", subcommand)]
-    Docs(DocsCommands),
-    /// Agent definition validators.
-    #[command(name = "agents", subcommand)]
-    Agents(AgentsCommands),
+    /// Markdown validators (naming, frontmatter, heading-hierarchy, links, mermaid, frontmatter-dates, readme-index).
+    #[command(name = "md", subcommand)]
+    Md(MdCommands),
+    /// Convention validators (emoji, license, agents-md-size).
+    #[command(name = "convention", subcommand)]
+    Convention(ConventionCommands),
+    /// Harness (agent binding) validators.
+    #[command(name = "harness", subcommand)]
+    Harness(HarnessCommands),
     /// Workflow file validators.
     #[command(name = "workflows", subcommand)]
     Workflows(WorkflowsCommands),
-    /// Spec tree validators (adoption, counts, links, tree).
+    /// Spec tree validators (adoption, counts, links, tree, coverage, bc, ul, gherkin-cardinality).
     #[command(name = "specs", subcommand)]
     Specs(SpecsCommands),
-    /// DDD validators (bounded-context, ubiquitous-language).
-    #[command(name = "ddd", subcommand)]
-    Ddd(DddCommands),
     /// Git hook helpers (pre-commit).
     #[command(name = "git", subcommand)]
     Git(GitCommands),
@@ -135,7 +132,7 @@ pub enum EnvCommands {
     Validate(env_validate::EnvValidateArgs),
 }
 
-/// Spec tree subcommands (`validate-adoption`, `validate-counts`, `validate-links`, `validate-tree`).
+/// Spec tree subcommands.
 #[derive(Subcommand, Debug)]
 pub enum SpecsCommands {
     /// Verify an app has adopted BDD and DDD practices.
@@ -150,43 +147,53 @@ pub enum SpecsCommands {
     /// Validate canonical C4-aware five-folder spec tree.
     #[command(name = "validate-tree")]
     ValidateTree(specs_validate_tree::ValidateTreeArgs),
-}
-
-/// DDD subcommands (`bc`, `ul`).
-#[derive(Subcommand, Debug)]
-pub enum DddCommands {
+    /// Validate that all BDD spec files have matching test implementations.
+    #[command(name = "coverage")]
+    Coverage(specs_coverage::ValidateArgs),
     /// Validate bounded-context structural parity against the registry.
     #[command(name = "bc")]
-    Bc(ddd_bc::DddBcArgs),
+    Bc(specs_bc::DddBcArgs),
     /// Validate ubiquitous-language glossary parity against the registry.
     #[command(name = "ul")]
-    Ul(ddd_ul::DddUlArgs),
+    Ul(specs_ul::DddUlArgs),
+    /// Audit `.feature` scenarios for repeated primary Given/When/Then keywords.
+    #[command(name = "gherkin-cardinality")]
+    GherkinCardinality(specs_gherkin_cardinality::GherkinKeywordCardinalityArgs),
+    /// Run all specs validators in sequence and aggregate findings.
+    #[command(name = "audit")]
+    Audit(specs_audit::AuditArgs),
 }
 
-/// Agent definition subcommands.
+/// Harness (agent binding) subcommands.
 #[derive(Subcommand, Debug)]
-pub enum AgentsCommands {
+pub enum HarnessCommands {
     /// Validate agent filename suffixes and mirror parity.
     #[command(name = "validate-naming")]
-    ValidateNaming(agents_validate_naming::ValidateNamingArgs),
+    ValidateNaming(harness_validate_naming::ValidateNamingArgs),
     /// Detect verbatim duplication across agent and skill files.
     #[command(name = "detect-duplication")]
-    DetectDuplication(agents_detect_duplication::DetectDuplicationArgs),
+    DetectDuplication(harness_validate_duplication::DetectDuplicationArgs),
     /// Validate Claude Code agent and skill format in .claude/ directory.
     #[command(name = "validate-claude")]
-    ValidateClaude(agents_validate_claude::ValidateClaudeArgs),
+    ValidateClaude(harness_validate_claude::ValidateClaudeArgs),
     /// Validate that .claude/ and .opencode/ are in sync.
     #[command(name = "validate-sync")]
-    ValidateSync(agents_validate_sync::ValidateSyncArgs),
+    ValidateSync(harness_validate_sync::ValidateSyncArgs),
     /// Sync Claude Code agents to `OpenCode` format.
     #[command(name = "sync")]
-    Sync(agents_sync::SyncArgs),
+    Sync(harness_sync::SyncArgs),
     /// Emit the Amazon Q Developer binding bridge files (idempotent).
     #[command(name = "emit-bindings")]
-    EmitBindings(agents_emit_bindings::EmitBindingsArgs),
+    EmitBindings(harness_emit_bindings::EmitBindingsArgs),
     /// Validate the Amazon Q binding bridge files and catalog coverage.
     #[command(name = "validate-bindings")]
-    ValidateBindings(agents_validate_bindings::ValidateBindingsArgs),
+    ValidateBindings(harness_validate_bindings::ValidateBindingsArgs),
+    /// Generate all platform bindings: sync `OpenCode` agents and emit Amazon Q bridge files.
+    #[command(name = "generate-bindings")]
+    GenerateBindings(harness_generate_bindings::GenerateBindingsArgs),
+    /// Run all harness validators in sequence and aggregate findings.
+    #[command(name = "audit")]
+    Audit(harness_audit::AuditArgs),
 }
 
 /// Workflow file subcommands.
@@ -197,55 +204,61 @@ pub enum WorkflowsCommands {
     ValidateNaming(workflows_validate_naming::ValidateNamingArgs),
 }
 
-/// Documentation validator subcommands.
+/// Markdown validator subcommands.
 #[derive(Subcommand, Debug)]
-pub enum DocsCommands {
+pub enum MdCommands {
     /// Validate markdown filenames against the lowercase-kebab-case rule.
     #[command(name = "validate-naming")]
-    ValidateNaming(docs_validate_naming::ValidateNamingArgs),
+    ValidateNaming(md_validate_naming::ValidateNamingArgs),
     /// Validate documentation YAML frontmatter against area-specific schemas.
     #[command(name = "validate-frontmatter")]
-    ValidateFrontmatter(docs_validate_frontmatter::ValidateFrontmatterArgs),
+    ValidateFrontmatter(md_validate_frontmatter::ValidateFrontmatterArgs),
     /// Validate markdown heading hierarchy (one H1, no skipped levels).
     #[command(name = "validate-heading-hierarchy")]
-    ValidateHeadingHierarchy(docs_validate_heading_hierarchy::ValidateHeadingHierarchyArgs),
+    ValidateHeadingHierarchy(md_validate_heading_hierarchy::ValidateHeadingHierarchyArgs),
     /// Validate markdown links (relative paths exist on disk).
     #[command(name = "validate-links")]
-    ValidateLinks(docs_validate_links::ValidateLinksArgs),
+    ValidateLinks(md_validate_links::ValidateLinksArgs),
     /// Validate Mermaid flowchart diagrams (label length, span, single-diagram).
     #[command(name = "validate-mermaid")]
-    ValidateMermaid(docs_validate_mermaid::ValidateMermaidArgs),
+    ValidateMermaid(md_validate_mermaid::ValidateMermaidArgs),
+    /// Audit markdown files for forbidden manual date metadata.
+    #[command(name = "frontmatter-dates")]
+    FrontmatterDates(md_validate_frontmatter_dates::FrontmatterAuditArgs),
+    /// Audit directory README.md indexes against sibling markdown files.
+    #[command(name = "readme-index")]
+    ReadmeIndex(md_validate_readme_index::ReadmeIndexAuditArgs),
+    /// Run all md validators in sequence and aggregate findings.
+    #[command(name = "audit")]
+    Audit(md_audit::AuditArgs),
 }
 
-/// Repository governance subcommands.
+/// Convention validator subcommands.
 #[derive(Subcommand, Debug)]
-pub enum RepoGovernanceCommands {
+pub enum ConventionCommands {
+    /// Audit forbidden file types for emoji codepoints.
+    #[command(name = "emoji")]
+    Emoji(convention_validate_emoji::EmojiAuditArgs),
+    /// Verify per-directory LICENSE files match the licensing convention.
+    #[command(name = "license")]
+    License(convention_validate_license::LicenseAuditArgs),
     /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
     #[command(name = "agents-md-size")]
-    AgentsMdSize(governance_agents_md_size::AgentsMdSizeArgs),
+    AgentsMdSize(convention_validate_agents_md_size::AgentsMdSizeArgs),
+    /// Run all convention validators in sequence and aggregate findings.
+    #[command(name = "audit")]
+    Audit(convention_audit::AuditArgs),
+}
+
+/// Repository governance subcommands (trimmed to governance-specific audits).
+#[derive(Subcommand, Debug)]
+pub enum RepoGovernanceCommands {
     /// Run all deterministic governance audits and emit a JSON envelope.
     #[command(name = "audit")]
     Audit(governance_audit::AuditArgs),
-    /// Audit forbidden file types for emoji codepoints.
-    #[command(name = "emoji-audit")]
-    EmojiAudit(governance_emoji_audit::EmojiAuditArgs),
-    /// Audit markdown files for forbidden manual date metadata.
-    #[command(name = "frontmatter-audit")]
-    FrontmatterAudit(governance_frontmatter_audit::FrontmatterAuditArgs),
-    /// Audit `.feature` scenarios for repeated primary Given/When/Then keywords.
-    #[command(name = "gherkin-keyword-cardinality")]
-    GherkinKeywordCardinality(
-        governance_gherkin_keyword_cardinality_audit::GherkinKeywordCardinalityArgs,
-    ),
     /// Audit governance docs for layer numbering/naming coherence.
     #[command(name = "layer-coherence")]
     LayerCoherence(governance_layer_coherence::LayerCoherenceArgs),
-    /// Verify per-directory LICENSE files match the licensing convention.
-    #[command(name = "license-audit")]
-    LicenseAudit(governance_license_audit::LicenseAuditArgs),
-    /// Audit directory README.md indexes against sibling markdown files.
-    #[command(name = "readme-index-audit")]
-    ReadmeIndexAudit(governance_readme_index_audit::ReadmeIndexAuditArgs),
     /// Audit governance documents for required traceability sections.
     #[command(name = "traceability-audit")]
     TraceabilityAudit(governance_traceability_audit::TraceabilityAuditArgs),
@@ -254,22 +267,11 @@ pub enum RepoGovernanceCommands {
     VendorAudit(governance_vendor_audit::VendorAuditArgs),
 }
 
-/// Test coverage subcommands (`validate`, `diff`, `merge`).
+/// Test coverage subcommands (`validate` only).
 #[derive(Subcommand, Debug)]
 pub enum TestCoverageCommands {
     /// Check test coverage against a threshold (standard line-based algorithm).
     Validate(test_coverage_validate::ValidateArgs),
-    /// Show coverage for changed lines only (diff coverage).
-    Diff(test_coverage_diff::DiffArgs),
-    /// Merge multiple coverage files into one LCOV output.
-    Merge(test_coverage_merge::MergeArgs),
-}
-
-/// BDD spec coverage subcommands.
-#[derive(Subcommand, Debug)]
-pub enum SpecCoverageCommands {
-    /// Validate that all BDD spec files have matching test implementations.
-    Validate(spec_coverage_validate::ValidateArgs),
 }
 
 /// Parse CLI arguments and dispatch to the appropriate subcommand.
@@ -322,36 +324,11 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             TestCoverageCommands::Validate(args) => {
                 test_coverage_validate::run(args, output_format)
             }
-            TestCoverageCommands::Diff(args) => test_coverage_diff::run(args, output_format),
-            TestCoverageCommands::Merge(args) => test_coverage_merge::run(args, output_format),
-        },
-        Commands::SpecCoverage(sc) => match sc {
-            SpecCoverageCommands::Validate(args) => {
-                spec_coverage_validate::run(args, output_format)
-            }
         },
         Commands::RepoGovernance(rg) => match rg {
-            RepoGovernanceCommands::AgentsMdSize(args) => {
-                governance_agents_md_size::run(args, output_format)
-            }
             RepoGovernanceCommands::Audit(args) => governance_audit::run(args, output_format),
-            RepoGovernanceCommands::EmojiAudit(args) => {
-                governance_emoji_audit::run(args, output_format)
-            }
-            RepoGovernanceCommands::FrontmatterAudit(args) => {
-                governance_frontmatter_audit::run(args, output_format)
-            }
-            RepoGovernanceCommands::GherkinKeywordCardinality(args) => {
-                governance_gherkin_keyword_cardinality_audit::run(args, output_format)
-            }
             RepoGovernanceCommands::LayerCoherence(args) => {
                 governance_layer_coherence::run(args, output_format)
-            }
-            RepoGovernanceCommands::LicenseAudit(args) => {
-                governance_license_audit::run(args, output_format)
-            }
-            RepoGovernanceCommands::ReadmeIndexAudit(args) => {
-                governance_readme_index_audit::run(args, output_format)
             }
             RepoGovernanceCommands::TraceabilityAudit(args) => {
                 governance_traceability_audit::run(args, output_format)
@@ -360,18 +337,33 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
                 governance_vendor_audit::run(args, output_format)
             }
         },
-        Commands::Docs(dc) => match dc {
-            DocsCommands::ValidateNaming(args) => docs_validate_naming::run(args, output_format),
-            DocsCommands::ValidateFrontmatter(args) => {
-                docs_validate_frontmatter::run(args, output_format)
+        Commands::Md(mc) => match mc {
+            MdCommands::ValidateNaming(args) => md_validate_naming::run(args, output_format),
+            MdCommands::ValidateFrontmatter(args) => {
+                md_validate_frontmatter::run(args, output_format)
             }
-            DocsCommands::ValidateHeadingHierarchy(args) => {
-                docs_validate_heading_hierarchy::run(args, output_format)
+            MdCommands::ValidateHeadingHierarchy(args) => {
+                md_validate_heading_hierarchy::run(args, output_format)
             }
-            DocsCommands::ValidateLinks(args) => docs_validate_links::run(args, output_format),
-            DocsCommands::ValidateMermaid(args) => docs_validate_mermaid::run(args, output_format),
+            MdCommands::ValidateLinks(args) => md_validate_links::run(args, output_format),
+            MdCommands::ValidateMermaid(args) => md_validate_mermaid::run(args, output_format),
+            MdCommands::FrontmatterDates(args) => {
+                md_validate_frontmatter_dates::run(args, output_format)
+            }
+            MdCommands::ReadmeIndex(args) => md_validate_readme_index::run(args, output_format),
+            MdCommands::Audit(args) => md_audit::run(args, output_format),
         },
-        Commands::Agents(ac) => dispatch_agents(ac, output_format),
+        Commands::Convention(cc) => match cc {
+            ConventionCommands::Emoji(args) => convention_validate_emoji::run(args, output_format),
+            ConventionCommands::License(args) => {
+                convention_validate_license::run(args, output_format)
+            }
+            ConventionCommands::AgentsMdSize(args) => {
+                convention_validate_agents_md_size::run(args, output_format)
+            }
+            ConventionCommands::Audit(args) => convention_audit::run(args, output_format),
+        },
+        Commands::Harness(hc) => dispatch_harness(hc, output_format),
         Commands::Workflows(wc) => match wc {
             WorkflowsCommands::ValidateNaming(args) => {
                 workflows_validate_naming::run(args, output_format)
@@ -384,10 +376,13 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             SpecsCommands::ValidateCounts(args) => specs_validate_counts::run(args, output_format),
             SpecsCommands::ValidateLinks(args) => specs_validate_links::run(args, output_format),
             SpecsCommands::ValidateTree(args) => specs_validate_tree::run(args, output_format),
-        },
-        Commands::Ddd(dc) => match dc {
-            DddCommands::Bc(args) => ddd_bc::run(args, output_format),
-            DddCommands::Ul(args) => ddd_ul::run(args, output_format),
+            SpecsCommands::Coverage(args) => specs_coverage::run(args, output_format),
+            SpecsCommands::Bc(args) => specs_bc::run(args, output_format),
+            SpecsCommands::Ul(args) => specs_ul::run(args, output_format),
+            SpecsCommands::GherkinCardinality(args) => {
+                specs_gherkin_cardinality::run(args, output_format)
+            }
+            SpecsCommands::Audit(args) => specs_audit::run(args, output_format),
         },
         Commands::Git(gc) => match gc {
             GitCommands::PreCommit(args) => git_pre_commit::run_cmd(args, output_format),
@@ -409,27 +404,31 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
     }
 }
 
-/// Route an [`AgentsCommands`] variant to its handler.
+/// Route a [`HarnessCommands`] variant to its handler.
 ///
 /// # Errors
 ///
-/// Propagates any error returned by the selected agent subcommand.
-fn dispatch_agents(
-    ac: &AgentsCommands,
+/// Propagates any error returned by the selected harness subcommand.
+fn dispatch_harness(
+    hc: &HarnessCommands,
     output_format: OutputFormat,
 ) -> std::result::Result<(), anyhow::Error> {
-    match ac {
-        AgentsCommands::ValidateNaming(args) => agents_validate_naming::run(args, output_format),
-        AgentsCommands::DetectDuplication(args) => {
-            agents_detect_duplication::run(args, output_format)
+    match hc {
+        HarnessCommands::ValidateNaming(args) => harness_validate_naming::run(args, output_format),
+        HarnessCommands::DetectDuplication(args) => {
+            harness_validate_duplication::run(args, output_format)
         }
-        AgentsCommands::ValidateClaude(args) => agents_validate_claude::run(args, output_format),
-        AgentsCommands::ValidateSync(args) => agents_validate_sync::run(args, output_format),
-        AgentsCommands::Sync(args) => agents_sync::run(args, output_format),
-        AgentsCommands::EmitBindings(args) => agents_emit_bindings::run(args, output_format),
-        AgentsCommands::ValidateBindings(args) => {
-            agents_validate_bindings::run(args, output_format)
+        HarnessCommands::ValidateClaude(args) => harness_validate_claude::run(args, output_format),
+        HarnessCommands::ValidateSync(args) => harness_validate_sync::run(args, output_format),
+        HarnessCommands::Sync(args) => harness_sync::run(args, output_format),
+        HarnessCommands::EmitBindings(args) => harness_emit_bindings::run(args, output_format),
+        HarnessCommands::ValidateBindings(args) => {
+            harness_validate_bindings::run(args, output_format)
         }
+        HarnessCommands::GenerateBindings(args) => {
+            harness_generate_bindings::run(args, output_format)
+        }
+        HarnessCommands::Audit(args) => harness_audit::run(args, output_format),
     }
 }
 

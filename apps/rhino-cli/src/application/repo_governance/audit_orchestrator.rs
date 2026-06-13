@@ -17,18 +17,9 @@ use regex::Regex;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
-use super::agents_md_size::check_agents_md_size;
-use super::emoji_audit::audit_emoji;
-use super::frontmatter_audit::audit_frontmatter;
-use super::gherkin_keyword_cardinality_audit::audit_gherkin_keyword_cardinality;
 use super::layer_coherence::audit_layer_coherence;
-use super::license_audit::audit_license;
-use super::readme_index_audit::audit_readme_index;
 use super::traceability_audit::audit_traceability;
-use crate::internal::agents::detect_duplication::detect_duplication;
-use crate::internal::docs::frontmatter::validate_docs_frontmatter;
-use crate::internal::docs::heading_hierarchy::validate_docs_heading_hierarchy;
-use crate::internal::docs::naming::validate_docs_naming;
+use super::vendor_audit::walk as audit_vendor_walk;
 
 /// JSON schema identifier embedded in every [`AuditEnvelope`].
 pub const AUDIT_ENVELOPE_SCHEMA: &str = "rhino-cli/repo-governance-audit/v1";
@@ -41,20 +32,7 @@ const AUDIT_CRITICALITY_HIGH: &str = "HIGH";
 ///
 /// Categories are executed in this order by [`run_audit`].
 pub fn audit_category_order() -> &'static [&'static str] {
-    &[
-        "agents-md-size",
-        "frontmatter-audit",
-        "traceability-audit",
-        "license-audit",
-        "readme-index-audit",
-        "emoji-audit",
-        "layer-coherence",
-        "docs-validate-naming",
-        "docs-validate-frontmatter",
-        "docs-validate-heading-hierarchy",
-        "agents-detect-duplication",
-        "gherkin-keyword-cardinality",
-    ]
+    &["layer-coherence", "traceability-audit", "vendor-audit"]
 }
 
 /// Maps an audit category `name` to the CLI sub-command that runs it.
@@ -62,66 +40,11 @@ pub fn audit_category_order() -> &'static [&'static str] {
 /// Returns an empty string for unrecognised names.
 fn audit_category_command(name: &str) -> &'static str {
     match name {
-        "agents-md-size" => "repo-governance agents-md-size",
-        "frontmatter-audit" => "repo-governance frontmatter-audit",
-        "traceability-audit" => "repo-governance traceability-audit",
-        "license-audit" => "repo-governance license-audit",
-        "readme-index-audit" => "repo-governance readme-index-audit",
-        "emoji-audit" => "repo-governance emoji-audit",
-        "gherkin-keyword-cardinality" => "repo-governance gherkin-keyword-cardinality",
         "layer-coherence" => "repo-governance layer-coherence",
-        "docs-validate-naming" => "docs validate-naming",
-        "docs-validate-frontmatter" => "docs validate-frontmatter",
-        "docs-validate-heading-hierarchy" => "docs validate-heading-hierarchy",
-        "agents-detect-duplication" => "agents detect-duplication",
+        "traceability-audit" => "repo-governance traceability-audit",
+        "vendor-audit" => "repo-governance vendor-audit",
         _ => "",
     }
-}
-
-/// Default directory roots scanned by the `frontmatter-audit` category.
-fn default_frontmatter_paths() -> &'static [&'static str] {
-    &[
-        "repo-governance/",
-        "docs/explanation/software-engineering/",
-        ".claude/agents/",
-        ".claude/skills/",
-        "plans/",
-    ]
-}
-/// Default directory roots scanned by the `readme-index-audit` category.
-fn default_readme_index_paths() -> &'static [&'static str] {
-    &[
-        "repo-governance/",
-        ".claude/agents/",
-        ".claude/skills/",
-        "docs/explanation/software-engineering/",
-    ]
-}
-/// Default directory roots scanned by the `emoji-audit` category.
-fn default_emoji_paths() -> &'static [&'static str] {
-    &["."]
-}
-/// Default directory roots scanned by the `gherkin-keyword-cardinality` category.
-fn default_gherkin_keyword_cardinality_paths() -> &'static [&'static str] {
-    &["."]
-}
-/// Default directory roots scanned by the `docs-validate-naming` category.
-fn default_docs_validate_naming_paths() -> &'static [&'static str] {
-    &["docs/", "repo-governance/"]
-}
-/// Default directory roots scanned by the `docs-validate-frontmatter` category.
-fn default_docs_validate_frontmatter_paths() -> &'static [&'static str] {
-    &[
-        "docs/explanation/software-engineering/",
-        "repo-governance/conventions/",
-        "repo-governance/principles/",
-        "repo-governance/development/",
-        "repo-governance/workflows/",
-    ]
-}
-/// Default directory roots scanned by the `docs-validate-heading-hierarchy` category.
-fn default_docs_validate_heading_hierarchy_paths() -> &'static [&'static str] {
-    &["docs/", "repo-governance/"]
 }
 
 /// Configuration options for a single [`run_audit`] invocation.
@@ -135,20 +58,6 @@ pub struct AuditOptions {
     pub include_only: Vec<String>,
     /// Override for the `ran_at` timestamp (RFC 3339). `None` defaults to `Utc::now()`.
     pub now: Option<String>,
-    /// Override search roots for the `frontmatter-audit` category.
-    pub frontmatter_audit_paths: Vec<String>,
-    /// Override search roots for the `readme-index-audit` category.
-    pub readme_index_audit_paths: Vec<String>,
-    /// Override search roots for the `emoji-audit` category.
-    pub emoji_audit_paths: Vec<String>,
-    /// Override search roots for the `gherkin-keyword-cardinality` category.
-    pub gherkin_keyword_cardinality_paths: Vec<String>,
-    /// Override search roots for the `docs-validate-naming` category.
-    pub docs_validate_naming_paths: Vec<String>,
-    /// Override search roots for the `docs-validate-frontmatter` category.
-    pub docs_validate_frontmatter_paths: Vec<String>,
-    /// Override search roots for the `docs-validate-heading-hierarchy` category.
-    pub docs_validate_heading_hierarchy_paths: Vec<String>,
     /// Path to a known-false-positives Markdown file. Defaults to
     /// `generated-reports/.known-false-positives.md` under `repo_root`.
     pub known_false_positives_path: Option<PathBuf>,
@@ -302,61 +211,11 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
 /// runner propagates an IO or parse error.
 fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<AuditFinding>, Error> {
     match name {
-        "agents-md-size"
-        | "frontmatter-audit"
-        | "traceability-audit"
-        | "license-audit"
-        | "readme-index-audit"
-        | "emoji-audit"
-        | "gherkin-keyword-cardinality"
-        | "layer-coherence" => run_category_governance(name, opts),
-        "docs-validate-naming"
-        | "docs-validate-frontmatter"
-        | "docs-validate-heading-hierarchy"
-        | "agents-detect-duplication" => run_category_docs(name, opts),
-        _ => Err(anyhow::anyhow!("unknown category {name}")),
-    }
-}
-
-/// Executes one of the governance-specific audit categories and returns
-/// normalised [`AuditFinding`]s.
-///
-/// # Errors
-///
-/// Returns an error for unrecognised category names or IO failures within the
-/// delegated audit function.
-fn run_category_governance(
-    name: &str,
-    opts: &AuditOptions,
-) -> std::result::Result<Vec<AuditFinding>, Error> {
-    match name {
-        "agents-md-size" => {
-            let p = opts.repo_root.join("AGENTS.md");
-            if !p.exists() {
-                return Ok(vec![new_audit_finding(
-                    name,
-                    &p.to_string_lossy(),
-                    0,
-                    "AGENTS.md is missing",
-                )]);
-            }
-            let f = check_agents_md_size(&p.to_string_lossy())?;
-            if f.severity == "fail" {
-                Ok(vec![new_audit_finding(name, &f.file, 0, &f.message)])
-            } else {
-                Ok(Vec::new())
-            }
-        }
-        "frontmatter-audit" => {
-            let paths = resolve_paths(
-                &opts.repo_root,
-                &opts.frontmatter_audit_paths,
-                default_frontmatter_paths(),
-            );
-            let findings = audit_frontmatter(&paths)?;
+        "layer-coherence" => {
+            let findings = audit_layer_coherence(&opts.repo_root)?;
             Ok(findings
                 .into_iter()
-                .map(|f| new_audit_finding(name, &f.file, f.line, &f.message))
+                .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
                 .collect())
         }
         "traceability-audit" => {
@@ -366,144 +225,13 @@ fn run_category_governance(
                 .map(|f| new_audit_finding(name, &f.path, f.line, &f.message))
                 .collect())
         }
-        "license-audit" => {
-            let findings = audit_license(&opts.repo_root)?;
-            Ok(findings
-                .into_iter()
-                .map(|f| new_audit_finding(name, &f.path, 0, &f.message))
-                .collect())
-        }
-        "readme-index-audit" => {
-            let paths = resolve_paths(
-                &opts.repo_root,
-                &opts.readme_index_audit_paths,
-                default_readme_index_paths(),
-            );
-            let findings = audit_readme_index(&paths, &[])?;
-            Ok(findings
-                .into_iter()
-                .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
-                .collect())
-        }
-        "emoji-audit" => {
-            let paths = resolve_paths(
-                &opts.repo_root,
-                &opts.emoji_audit_paths,
-                default_emoji_paths(),
-            );
-            let findings = audit_emoji(&paths)?;
+        "vendor-audit" => {
+            let findings = audit_vendor_walk(&opts.repo_root)?;
             Ok(findings
                 .into_iter()
                 .map(|f| {
-                    let msg = format!(
-                        "forbidden emoji codepoint {} at column {}",
-                        f.codepoint, f.column
-                    );
-                    new_audit_finding(name, &f.file, f.line, &msg)
-                })
-                .collect())
-        }
-        "gherkin-keyword-cardinality" => run_gherkin_keyword_cardinality(name, opts),
-        "layer-coherence" => {
-            let findings = audit_layer_coherence(&opts.repo_root)?;
-            Ok(findings
-                .into_iter()
-                .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
-                .collect())
-        }
-        _ => Err(anyhow::anyhow!("unknown category {name}")),
-    }
-}
-
-/// Runs the `gherkin-keyword-cardinality` audit and normalises its findings
-/// to [`AuditFinding`]s.
-///
-/// # Errors
-///
-/// Returns an error when the delegated audit reports an IO failure.
-fn run_gherkin_keyword_cardinality(
-    name: &str,
-    opts: &AuditOptions,
-) -> std::result::Result<Vec<AuditFinding>, Error> {
-    let paths = resolve_paths(
-        &opts.repo_root,
-        &opts.gherkin_keyword_cardinality_paths,
-        default_gherkin_keyword_cardinality_paths(),
-    );
-    let findings = audit_gherkin_keyword_cardinality(&paths)?;
-    Ok(findings
-        .into_iter()
-        .map(|f| {
-            let msg = format!(
-                "scenario '{}' uses primary keyword '{}' {} times (expected exactly one; chain extras with And/But)",
-                f.scenario, f.keyword, f.count
-            );
-            new_audit_finding(name, &f.file, f.line, &msg)
-        })
-        .collect())
-}
-
-/// Executes one of the four docs/agents audit categories and returns normalised
-/// [`AuditFinding`]s.
-///
-/// # Errors
-///
-/// Returns an error for unrecognised category names or IO failures within the
-/// delegated audit function.
-fn run_category_docs(
-    name: &str,
-    opts: &AuditOptions,
-) -> std::result::Result<Vec<AuditFinding>, Error> {
-    match name {
-        "docs-validate-naming" => {
-            let paths = resolve_paths(
-                &opts.repo_root,
-                &opts.docs_validate_naming_paths,
-                default_docs_validate_naming_paths(),
-            );
-            let findings = validate_docs_naming(&paths, &[])?;
-            Ok(findings
-                .into_iter()
-                .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
-                .collect())
-        }
-        "docs-validate-frontmatter" => {
-            let paths = resolve_paths(
-                &opts.repo_root,
-                &opts.docs_validate_frontmatter_paths,
-                default_docs_validate_frontmatter_paths(),
-            );
-            let findings = validate_docs_frontmatter(&paths)?;
-            Ok(findings
-                .into_iter()
-                .filter(|f| f.severity == "fail")
-                .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
-                .collect())
-        }
-        "docs-validate-heading-hierarchy" => {
-            let paths = resolve_paths(
-                &opts.repo_root,
-                &opts.docs_validate_heading_hierarchy_paths,
-                default_docs_validate_heading_hierarchy_paths(),
-            );
-            let findings = validate_docs_heading_hierarchy(&paths)?;
-            Ok(findings
-                .into_iter()
-                .map(|f| new_audit_finding(name, &f.file, f.line, &f.message))
-                .collect())
-        }
-        "agents-detect-duplication" => {
-            let findings = detect_duplication(&opts.repo_root)?;
-            Ok(findings
-                .into_iter()
-                .map(|f| {
-                    let file = f.files.first().cloned().unwrap_or_default();
-                    let line = f.start_lines.first().copied().unwrap_or(0);
-                    let mut msg = f.message.clone();
-                    if f.files.len() > 1 {
-                        msg = format!("{} (files: {})", f.message, f.files.join(", "));
-                    }
-                    new_audit_finding(name, &file, line, &msg)
+                    let msg = format!("forbidden term '{}' → use '{}'", f.r#match, f.replacement);
+                    new_audit_finding(name, &f.path, f.line, &msg)
                 })
                 .collect())
         }
@@ -516,6 +244,7 @@ fn run_category_docs(
 /// When `override_paths` is non-empty those paths are used; otherwise
 /// `defaults` are used.  Relative paths are joined to `repo_root`; absolute
 /// paths are kept as-is.
+#[cfg(test)]
 fn resolve_paths(repo_root: &Path, override_paths: &[String], defaults: &[&str]) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     let push_resolved = |out: &mut Vec<String>, p: &str| {
@@ -539,6 +268,7 @@ fn resolve_paths(repo_root: &Path, override_paths: &[String], defaults: &[&str])
 
 /// Mirror Go's `filepath.Join`: lexical join + `path.Clean` (drops `.` and
 /// trailing slashes).
+#[cfg(test)]
 fn go_filepath_join(base: &str, rel: &str) -> String {
     let joined = if base.ends_with('/') {
         format!("{base}{rel}")
@@ -550,6 +280,7 @@ fn go_filepath_join(base: &str, rel: &str) -> String {
 
 /// Lexically cleans `p` by resolving `.` and `..` segments and collapsing
 /// duplicate slashes — mirrors Go's `path.Clean`.
+#[cfg(test)]
 #[allow(clippy::collapsible_if, clippy::collapsible_match)]
 fn clean_path(p: &str) -> String {
     if p.is_empty() {
@@ -920,16 +651,16 @@ mod tests {
     #[test]
     fn audit_category_command_returns_expected() {
         assert_eq!(
-            audit_category_command("agents-md-size"),
-            "repo-governance agents-md-size"
+            audit_category_command("layer-coherence"),
+            "repo-governance layer-coherence"
         );
         assert_eq!(
-            audit_category_command("agents-detect-duplication"),
-            "agents detect-duplication"
+            audit_category_command("traceability-audit"),
+            "repo-governance traceability-audit"
         );
         assert_eq!(
-            audit_category_command("gherkin-keyword-cardinality"),
-            "repo-governance gherkin-keyword-cardinality"
+            audit_category_command("vendor-audit"),
+            "repo-governance vendor-audit"
         );
         assert_eq!(audit_category_command("unknown"), "");
     }
@@ -937,21 +668,10 @@ mod tests {
     #[test]
     fn audit_category_order_is_fixed() {
         let o = audit_category_order();
-        assert_eq!(o.len(), 12);
-        assert_eq!(o[0], "agents-md-size");
-        assert_eq!(o[10], "agents-detect-duplication");
-        assert_eq!(o[11], "gherkin-keyword-cardinality");
-    }
-
-    #[test]
-    fn default_paths_return_non_empty() {
-        assert!(!default_frontmatter_paths().is_empty());
-        assert!(!default_readme_index_paths().is_empty());
-        assert!(!default_emoji_paths().is_empty());
-        assert!(!default_gherkin_keyword_cardinality_paths().is_empty());
-        assert!(!default_docs_validate_naming_paths().is_empty());
-        assert!(!default_docs_validate_frontmatter_paths().is_empty());
-        assert!(!default_docs_validate_heading_hierarchy_paths().is_empty());
+        assert_eq!(o.len(), 3);
+        assert_eq!(o[0], "layer-coherence");
+        assert_eq!(o[1], "traceability-audit");
+        assert_eq!(o[2], "vendor-audit");
     }
 
     #[test]
@@ -975,93 +695,15 @@ mod tests {
     #[test]
     fn run_audit_include_only_filter() {
         let dir = tempfile::tempdir().unwrap();
-        std::fs::write(dir.path().join("AGENTS.md"), "x").unwrap();
         let opts = AuditOptions {
             repo_root: dir.path().to_path_buf(),
-            include_only: vec!["agents-md-size".to_string()],
+            include_only: vec!["layer-coherence".to_string()],
             now: Some("2026-05-23T00:00:00Z".to_string()),
             ..Default::default()
         };
         let env = run_audit(&opts).unwrap();
         assert_eq!(env.result.categories.len(), 1);
-        assert_eq!(env.result.categories[0].name, "agents-md-size");
-    }
-
-    #[test]
-    fn run_audit_missing_agents_md_emits_finding() {
-        let dir = tempfile::tempdir().unwrap();
-        let opts = AuditOptions {
-            repo_root: dir.path().to_path_buf(),
-            include_only: vec!["agents-md-size".to_string()],
-            now: Some("2026-05-23T00:00:00Z".to_string()),
-            ..Default::default()
-        };
-        let env = run_audit(&opts).unwrap();
-        assert_eq!(env.result.total_findings, 1);
-        let f = &env.result.categories[0].findings[0];
-        assert!(f.message.contains("AGENTS.md is missing"));
-    }
-
-    #[test]
-    fn run_audit_load_false_positives_skips() {
-        let dir = tempfile::tempdir().unwrap();
-        std::fs::create_dir_all(dir.path().join("generated-reports")).unwrap();
-        // Create an AGENTS.md too big.
-        std::fs::write(
-            dir.path().join("AGENTS.md"),
-            "x".repeat(41 * 1024).into_bytes(),
-        )
-        .unwrap();
-        // Pre-compute the key that would be assigned to the AGENTS.md finding
-        // — we don't know the exact message text, so we set a permissive
-        // skip-list that matches by key prefix.
-        let env = run_audit(&AuditOptions {
-            repo_root: dir.path().to_path_buf(),
-            include_only: vec!["agents-md-size".to_string()],
-            now: Some("2026-05-23T00:00:00Z".to_string()),
-            ..Default::default()
-        })
-        .unwrap();
-        let key = env.result.categories[0]
-            .findings
-            .first()
-            .map(|f| f.key.clone())
-            .unwrap_or_default();
-        std::fs::write(
-            dir.path()
-                .join("generated-reports/.known-false-positives.md"),
-            format!("- `{key}`\n"),
-        )
-        .unwrap();
-        let env2 = run_audit(&AuditOptions {
-            repo_root: dir.path().to_path_buf(),
-            include_only: vec!["agents-md-size".to_string()],
-            now: Some("2026-05-23T00:00:00Z".to_string()),
-            ..Default::default()
-        })
-        .unwrap();
-        assert_eq!(env2.result.total_findings, 0);
-        assert_eq!(env2.result.skipped_false_positives.len(), 1);
-    }
-
-    #[test]
-    fn run_audit_status_failed_when_findings() {
-        let dir = tempfile::tempdir().unwrap();
-        let opts = AuditOptions {
-            repo_root: dir.path().to_path_buf(),
-            include_only: vec!["agents-md-size".to_string()],
-            now: Some("2026-05-23T00:00:00Z".to_string()),
-            ..Default::default()
-        };
-        let env = run_audit(&opts).unwrap();
-        assert_eq!(env.status, "failed");
-    }
-
-    #[test]
-    fn read_git_sha_returns_unknown_in_nongit_dir() {
-        let dir = tempfile::tempdir().unwrap();
-        let s = read_git_sha(dir.path());
-        assert_eq!(s, "unknown");
+        assert_eq!(env.result.categories[0].name, "layer-coherence");
     }
 
     #[test]
@@ -1078,23 +720,6 @@ mod tests {
         };
         let env = run_audit(&opts).unwrap();
         assert!(env.result.categories.is_empty());
-    }
-
-    #[test]
-    fn run_category_handles_each_branch() {
-        let dir = tempfile::tempdir().unwrap();
-        let opts = AuditOptions {
-            repo_root: dir.path().to_path_buf(),
-            ..Default::default()
-        };
-        // Each category should not panic for an empty repo.
-        for cat in audit_category_order() {
-            if *cat == "license-audit" || *cat == "traceability-audit" {
-                // These walk repo_root structures; for an empty dir they
-                // return Ok with no findings, so the call should succeed.
-            }
-            let _ = run_category(cat, &opts);
-        }
     }
 
     #[test]
@@ -1125,6 +750,13 @@ mod tests {
         };
         let s = serde_json::to_string(&env).unwrap();
         assert!(s.contains("\"schema\":\"rhino-cli/repo-governance-audit/v1\""));
+    }
+
+    #[test]
+    fn read_git_sha_returns_unknown_in_nongit_dir() {
+        let dir = tempfile::tempdir().unwrap();
+        let s = read_git_sha(dir.path());
+        assert_eq!(s, "unknown");
     }
 
     use std::collections::BTreeMap;

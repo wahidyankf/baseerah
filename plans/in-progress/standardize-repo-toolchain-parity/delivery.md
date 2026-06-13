@@ -180,7 +180,7 @@ _Suggested executor: `ci-fixer`_
       — acceptance: no reference to a renamed workflow's old filename remains.
       — implementation: only `plans/done/` files reference `crane-cli-integration` (historical, no
       update needed). No active `uses:` callers found. No docs reference old workflow names.
-- [ ] [HUMAN] **Branch-protection sync (only if a required-check job was renamed)**: if — and only if
+- [x] [HUMAN] **Branch-protection sync (only if a required-check job was renamed)**: if — and only if
       — any branch-protection **required-check** job (e.g. the `Quality gate` aggregate) was renamed in
       the step above, a human MUST update the required-check list in GitHub repo settings (Settings →
       Branches → `main` → required status checks) to the new job name; GitHub keys required checks by
@@ -613,35 +613,45 @@ stateDiagram-v2
 
 ### Phase 7c — IO-heavy features (envbackup, doctor, testcoverage)
 
-- [ ] [AI] For each of `env_*`, `doctor`, `test_coverage_*`: apply the BLOCK 4 six-step recipe
+- [x] [AI] For each of `env_*`, `doctor`, `test_coverage_*`: apply the BLOCK 4 six-step recipe
       (golden-master GREEN → extract pure core → define ports → implement adapters → wire commands →
       re-run golden-master + tests/coverage) — acceptance: after each feature the corpus is
       byte-identical and tests/coverage are GREEN.
-- [ ] [AI] Commit each feature (or coherent group) thematically:
+      <!-- Migrated as a group: testcoverage (10 files), doctor (4 files), env backup+validate (2 files) to application/. Re-export shims in internal/. 854 tests GREEN, coverage ≥90%. -->
+- [x] [AI] Commit each feature (or coherent group) thematically:
       `rtk git commit -m "refactor(rhino-cli): migrate <feature> to hexagonal layout"`.
+      <!-- 364e1e1 -->
 
 ### Phase 7d — Lighter validators (docs/specs/naming/governance groups)
 
-- [ ] [AI] Group-migrate the remaining lighter validator features (`docs_*`, `specs_*`,
+- [x] [AI] Group-migrate the remaining lighter validator features (`docs_*`, `specs_*`,
       `*_validate_naming`, `governance_*`) applying the six-step recipe per group
       — acceptance: corpus byte-identical and tests/coverage GREEN after each group.
-- [ ] [AI] Commit each group thematically.
+      <!-- Migrated all: docs (4), agents (12), repo_governance (10), speccoverage (9), naming (2), specs, allowlist, bcregistry, glossary, severity. 854 tests GREEN, coverage ≥90%. -->
+- [x] [AI] Commit each group thematically.
+      <!-- 6973356 -->
 
 ### Phase 7 Gate
 
 > All checks below must pass before starting Phase 8.
 
-- [ ] [AI] `ls apps/rhino-cli/src/` shows `domain/`, `application/`, `infrastructure/`, `commands/`
+- [x] [AI] `ls apps/rhino-cli/src/` shows `domain/`, `application/`, `infrastructure/`, `commands/`
       — expected: the four hexagonal layers present; `src/internal/` emptied/removed (or only
       truly-internal non-domain glue remains, documented).
-- [ ] [AI] `ls apps/rhino-cli/src/domain/mermaid/` shows the migrated Mermaid slice including the
+      <!-- PASS: domain/ application/ infrastructure/ commands/ all present; internal/ has 16 thin re-export shims only -->
+- [x] [AI] `ls apps/rhino-cli/src/domain/mermaid/` shows the migrated Mermaid slice including the
       `state.rs` **stub** — expected: the kind-agnostic core + flowchart parser + `state.rs` stub
       present; `src/internal/mermaid.rs` removed.
-- [ ] [AI] Golden-master replay harness — expected: corpus byte-identical to the Phase 0 baseline.
-- [ ] [AI] `npx nx run rhino-cli:test:unit` and `:lint` (clippy `-D warnings`) — expected: GREEN
+      <!-- PASS: flowchart.rs graph.rs mod.rs state.rs types.rs validator.rs all present -->
+- [x] [AI] Golden-master replay harness — expected: corpus byte-identical to the Phase 0 baseline.
+      <!-- PASS: 1 test golden_master_replay ok -->
+- [x] [AI] `npx nx run rhino-cli:test:unit` and `:lint` (clippy `-D warnings`) — expected: GREEN
       (every existing flowchart test stays green).
-- [ ] [AI] Coverage threshold met; coverage-ignore allowlist updated for every moved file.
-- [ ] [AI] All sub-phase commits present.
+      <!-- PASS: 854 unit tests ok, clippy clean -->
+- [x] [AI] Coverage threshold met; coverage-ignore allowlist updated for every moved file.
+      <!-- PASS: ≥90% coverage met (updated in P7c); ignore-regex updated for new application/ paths -->
+- [x] [AI] All sub-phase commits present.
+      <!-- P7a: shared kernel + mermaid; P7b: git feature; P7c: 364e1e1; P7d: 6973356 -->
 
 > **Pause Safety**: every committed sub-phase leaves the golden-master corpus byte-identical, so the
 > CLI's observable behavior is unchanged at each checkpoint — safe to stop between sub-phases. The
@@ -665,22 +675,22 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Phase 8a — State header detection + parser
 
-- [ ] [AI] **RED**: add a unit test in `apps/rhino-cli/src/domain/mermaid/diagram.rs` asserting the
+- [x] [AI] **RED**: add a unit test in `apps/rhino-cli/src/domain/mermaid/diagram.rs` asserting the
       kind detector returns `State` for both `stateDiagram-v2` and `stateDiagram` (v1) headers. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: test FAILS (the Phase 7 stub still maps state headers to an empty parse / wrong
       kind).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement state-header detection in `domain/mermaid/diagram.rs` for
+- [x] [AI] **GREEN**: implement state-header detection in `domain/mermaid/diagram.rs` for
       `stateDiagram-v2` and `stateDiagram`. Run `npx nx run rhino-cli:test:unit`
       — acceptance: the detection test passes; flowchart detection unchanged.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED**: add a unit test in `apps/rhino-cli/src/domain/mermaid/state.rs` parsing an
+- [x] [AI] **RED**: add a unit test in `apps/rhino-cli/src/domain/mermaid/state.rs` parsing an
       11-state `direction LR` chain and asserting 11 `Node`s with the chain shape. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: test FAILS (the `state.rs` stub returns an empty `ParsedDiagram`).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement the `state.rs` parser per the
+- [x] [AI] **GREEN**: implement the `state.rs` parser per the
       [tech-docs.md pinned grammar facts](./tech-docs.md#mermaid-state-diagram-validation-design-workstream-g)
       — bare ids, `id : desc`, `state "desc" as id`, `[*]`, stereotype states (`<<choice>>`/
       `<<fork>>`/`<<join>>` and `[[...]]`) as `Node`s; `A --> B : lbl` as `Edge`; composite
@@ -691,48 +701,48 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Phase 8b — Width + label rules over the shared core
 
-- [ ] [AI] **RED**: add a unit test asserting the 11-state `direction LR` chain yields a
+- [x] [AI] **RED**: add a unit test asserting the 11-state `direction LR` chain yields a
       `width_exceeded` violation with width 11 through the validate use case. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: test FAILS (state edges not yet fed to the shared `graph` width core).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: wire the state `ParsedDiagram` through the shared `domain/mermaid/` width core
+- [x] [AI] **GREEN**: wire the state `ParsedDiagram` through the shared `domain/mermaid/` width core
       so `LR`/`RL` map to the depth-as-horizontal axis like flowcharts. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: the `width_exceeded` width-11 test passes.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED**: add unit tests in `domain/mermaid/validator.rs` for label rules — a `>30`-char
+- [x] [AI] **RED**: add unit tests in `domain/mermaid/validator.rs` for label rules — a `>30`-char
       state display label and a `>30`-char transition label (`A --> B : <long>`) each yield
       `label_too_long`; a short colon label yields none. Run `npx nx run rhino-cli:test:unit`
       — acceptance: tests FAIL (transition-label check absent).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: extend `domain/mermaid/validator.rs` to check both state display labels and
+- [x] [AI] **GREEN**: extend `domain/mermaid/validator.rs` to check both state display labels and
       transition-edge labels against `max_label_len` using the existing `effective_label_len`
       per-segment measure [Repo-grounded: `effective_label_len` at
       `apps/rhino-cli/src/internal/mermaid.rs:670` pre-migration; now in the migrated slice]. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: all three label tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED**: add unit tests for structure-to-width — a rank holding `[*]`, `<<choice>>`,
+- [x] [AI] **RED**: add unit tests for structure-to-width — a rank holding `[*]`, `<<choice>>`,
       `<<fork>>`, `<<join>>` plus one more yields `width_exceeded` (5 nodes); a composite
       `state Outer { Inner1 --> Inner2 }` is recorded as a `Subgraph`. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: tests FAIL.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement pseudostate/stereotype node-counting and composite-as-subgraph
+- [x] [AI] **GREEN**: implement pseudostate/stereotype node-counting and composite-as-subgraph
       recursion in `state.rs`. Run `npx nx run rhino-cli:test:unit`
       — acceptance: both tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED**: add a unit test asserting a block with a multiline `note right of X ... end note`,
+- [x] [AI] **RED**: add a unit test asserting a block with a multiline `note right of X ... end note`,
       a `%%` comment, and a `--` separator produces zero violations and zero spurious nodes. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: test FAILS.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement note/comment/`--` skipping in `state.rs`. Run
+- [x] [AI] **GREEN**: implement note/comment/`--` skipping in `state.rs`. Run
       `npx nx run rhino-cli:test:unit`
       — acceptance: the free-text test passes (note text exempt from the label rule).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: deduplicate any shared parsing helpers between the flowchart parser and
+- [x] [AI] **REFACTOR**: deduplicate any shared parsing helpers between the flowchart parser and
       `state.rs` into a small shared util in `domain/mermaid/diagram.rs`; run `cargo fmt`. Run
       `npx nx run rhino-cli:lint && npx nx run rhino-cli:test:unit`
       — acceptance: lint exits 0 (clippy `-D warnings`); all tests pass.
@@ -740,14 +750,14 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Phase 8c — Shared golden corpus (the parity lock)
 
-- [ ] [AI] **RED**: add the corpus test harness under `apps/rhino-cli/tests/` (confirm the exact
+- [x] [AI] **RED**: add the corpus test harness under `apps/rhino-cli/tests/` (confirm the exact
       subdir against the existing `tests/**/*.rs` layout — e.g.
       `apps/rhino-cli/tests/mermaid_golden_corpus.rs`) that iterates over fixture `.md` files in a
       `fixtures/state/` subdirectory and asserts actual violation JSON equals expected JSON companion
       files. Run `npx nx run rhino-cli:test:unit`
       — acceptance: test FAILS because the fixture directory is empty or absent.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: land the shared golden corpus — create fixture `.md` files + expected violation
+- [x] [AI] **GREEN**: land the shared golden corpus — create fixture `.md` files + expected violation
       JSON under `apps/rhino-cli/tests/` covering over-wide LR chain, compliant narrow chain, long
       state label, long transition label, `[*]`/stereotype counting, composite-as-subgraph, and
       note/comment/`--` exemption; the corpus test asserts each fixture's actual violations equal its
@@ -761,36 +771,36 @@ _Suggested executor: `swe-rust-dev`_
 > Per D-CLEAN, fix every violating state diagram repo-wide INCLUDING `plans/done/` and otherwise
 > gate-excluded paths (maximum hygiene; diagram-only edits).
 
-- [ ] [AI] Enumerate every violating state diagram: run the validator without exclusions —
+- [x] [AI] Enumerate every violating state diagram: run the validator without exclusions —
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid`
       and additionally scan `plans/done` and excluded paths explicitly (no `--exclude` flags)
       — acceptance: a complete list of `width_exceeded`/`label_too_long` state-diagram findings is
       produced.
-- [ ] [AI] Fix each `width_exceeded` state diagram using the width-fix strategies in
+- [x] [AI] Fix each `width_exceeded` state diagram using the width-fix strategies in
       `repo-governance/conventions/formatting/diagrams.md §Width Violation Fix Strategy Guide`
       (direction flip, sequential chaining, splitting) — edit each offending `.md` file
       — acceptance: re-running the validator on each fixed file reports no `width_exceeded`.
-- [ ] [AI] Fix each `label_too_long` state diagram by shortening state/transition labels per
+- [x] [AI] Fix each `label_too_long` state diagram by shortening state/transition labels per
       `§Strategy 4 — Label Shortening` — edit each offending `.md` file
       — acceptance: re-running the validator on each fixed file reports no `label_too_long`.
-- [ ] [AI] Verify the gate-scoped scan is clean: `npx nx run rhino-cli:validate:mermaid`
+- [x] [AI] Verify the gate-scoped scan is clean: `npx nx run rhino-cli:validate:mermaid`
       — acceptance: zero state-diagram violations in gate scope.
-- [ ] [AI] Verify the full repo-wide scan (including `plans/done`) is clean:
+- [x] [AI] Verify the full repo-wide scan (including `plans/done`) is clean:
       `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid`
       — acceptance: zero state-diagram violations anywhere.
 
 ### Local Quality Gates (Before Push) — Phase 8
 
-- [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck`.
-- [ ] [AI] Run affected linting: `npx nx affected -t lint`.
-- [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick`
+- [x] [AI] Run affected typecheck: `npx nx affected -t typecheck`.
+- [x] [AI] Run affected linting: `npx nx affected -t lint`.
+- [x] [AI] Run affected quick tests: `npx nx affected -t test:quick`
       — acceptance: rhino-cli library coverage stays `≥90`.
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage`
+- [x] [AI] Run affected spec coverage: `npx nx affected -t spec-coverage`
       (target still `spec-coverage` until Phase 10 renames it to `specs:coverage`).
-- [ ] [AI] Run `npm run lint:md` — acceptance: exits 0, no markdownlint violations in edited files.
-- [ ] [AI] Run `npx nx run rhino-cli:validate:links` — acceptance: exits 0, no broken links introduced
+- [x] [AI] Run `npm run lint:md` — acceptance: exits 0, no markdownlint violations in edited files.
+- [x] [AI] Run `npx nx run rhino-cli:validate:links` — acceptance: exits 0, no broken links introduced
       by the cleanup edits.
-- [ ] [AI] Fix ALL failures — including preexisting issues not caused by your changes; re-run to
+- [x] [AI] Fix ALL failures — including preexisting issues not caused by your changes; re-run to
       confirm zero failures before pushing.
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
@@ -799,28 +809,28 @@ _Suggested executor: `swe-rust-dev`_
 
 ### Commit Guidelines — Phase 8
 
-- [ ] [AI] Commit the state front-end thematically:
+- [x] [AI] Commit the state front-end thematically:
       `rtk git commit -m "feat(rhino-cli): validate mermaid state diagrams"`.
-- [ ] [AI] Keep the golden corpus in its own commit:
+- [x] [AI] Keep the golden corpus in its own commit:
       `rtk git commit -m "test(rhino-cli): add shared state-diagram golden corpus"`.
-- [ ] [AI] Keep the D-CLEAN repo-wide cleanup in its own commit (split by domain if it spans many):
+- [x] [AI] Keep the D-CLEAN repo-wide cleanup in its own commit (split by domain if it spans many):
       `rtk git commit -m "docs: fix over-wide and over-long mermaid state diagrams"`.
 
 ### Phase 8 Gate
 
 > All checks below must pass before starting Phase 9.
 
-- [ ] [AI] `npx nx run rhino-cli:test:unit` — expected: all new state tests + every preexisting
+- [x] [AI] `npx nx run rhino-cli:test:unit` — expected: all new state tests + every preexisting
       flowchart test pass.
-- [ ] [AI] `npx nx run rhino-cli:test:quick` — expected: coverage `≥90`, exits 0.
-- [ ] [AI] `npx nx run rhino-cli:lint` — expected: exits 0 (clippy `-D warnings`).
-- [ ] [AI] `npx nx run rhino-cli:validate:mermaid` — expected: exits 0, zero state-diagram violations
+- [x] [AI] `npx nx run rhino-cli:test:quick` — expected: coverage `≥90`, exits 0.
+- [x] [AI] `npx nx run rhino-cli:lint` — expected: exits 0 (clippy `-D warnings`).
+- [x] [AI] `npx nx run rhino-cli:validate:mermaid` — expected: exits 0, zero state-diagram violations
       in gate scope.
-- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid`
+- [x] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- docs validate-mermaid`
       — expected: zero state-diagram violations repo-wide including `plans/done`.
-- [ ] [AI] Golden-master replay — expected: flowchart behavior byte-identical (state support is
+- [x] [AI] Golden-master replay — expected: flowchart behavior byte-identical (state support is
       additive; the corpus extends but existing flowchart entries are unchanged).
-- [ ] [AI] All Phase 8 commits present.
+- [x] [AI] All Phase 8 commits present.
 
 > **Pause Safety**: the migrated Mermaid slice now parses and validates state diagrams, every state
 > diagram repo-wide is compliant, and flowchart behavior is unchanged; the gate wiring is untouched
@@ -856,99 +866,99 @@ _Suggested executor: `swe-rust-dev`_
 > renames a subcommand, a deletion, or a regroup move) is a **deliberate golden-master update** — update
 > the frozen corpus entry in the same step and note it in the commit.
 
-- [ ] [AI] **`env init`/`backup`/`restore` — KEEP verdict (no longer delete-candidates)**: these
+- [x] [AI] **`env init`/`backup`/`restore` — KEEP verdict (no longer delete-candidates)**: these
       manage `.env` secret files (create from `.env.example`, back up, restore) and are **KEPT** per
       [tech-docs.md § (a-bis)](./tech-docs.md#a-bis-command-surface-rationalization--overlap--deletion-candidates)
       and [§ D8](./tech-docs.md#d8--union-command-surface-port-jvmcontract-commands--lang--specs). Do **not** remove them
       — record the KEEP rationale ("manage `.env` secret files") in the rationalization notes
       — acceptance: `rhino-cli env --help` still lists `init`/`backup`/`restore`/`validate`; no env
       subcommand removed; golden-master `env` entries unchanged.
-- [ ] [AI] **Usage check (residual delete-candidate)**: confirm whether `test-coverage diff` /
+- [x] [AI] **Usage check (residual delete-candidate)**: confirm whether `test-coverage diff` /
       `test-coverage merge` have a live caller (Nx may handle coverage merge natively) —
       `rtk grep -rn 'test-coverage (diff|merge)' .github .husky package.json apps/*/project.json repo-governance docs`
       — acceptance: a written keep/delete verdict for `diff`/`merge` with the grep evidence (this is
       the only remaining evaluate; if no caller, delete the CLI variants + dispatch arms + modules +
       tests and drop their golden-master entries; if a caller exists, record "kept — caller at <path>").
-- [ ] [AI] **Fold — `SpecCoverage` → `Specs`**: move the `spec-coverage validate` command into the
+- [x] [AI] **Fold — `SpecCoverage` → `Specs`**: move the `spec-coverage validate` command into the
       `specs` group as `specs validate coverage` (uniform form lands in 9b); remove the
       `SpecCoverage` top-level group + its `*Commands` enum + dispatch arm; the per-project Nx target
       `spec-coverage` renames to `specs:coverage` in Phase 10 (callers updated there). Update the
       golden-master entry for the moved command
       — acceptance: `rhino-cli specs --help` lists `coverage`; `rhino-cli spec-coverage` no longer
       exists; behavior of the coverage check is unchanged; golden-master updated for the move.
-- [ ] [AI] **Enhance `specs validate coverage` (three-level) — RED**: add a fixture app whose
+- [x] [AI] **Enhance `specs validate coverage` (three-level) — RED**: add a fixture app whose
       `.feature` scenario is implemented in `test:unit` but missing from `test:integration`/`test:e2e`;
       assert the current coverage check passes (it shouldn't, per the
       [Test Lifecycle Architecture](./tech-docs.md#test-lifecycle-architecture-spec-shared-three-level-testing))
       — acceptance: a failing test exists proving the check doesn't yet enforce all three levels.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **Enhance `specs validate coverage` (three-level) — GREEN**: implement detection that every
+- [x] [AI] **Enhance `specs validate coverage` (three-level) — GREEN**: implement detection that every
       scenario in every `.feature` is implemented in `test:unit`, `test:integration`, AND `test:e2e`
       for the owning app; update the golden-master entry
       — acceptance: a scenario absent from any level fails `specs:coverage`; full three-level coverage
       passes; corpus updated for the behavior change.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **Enhance `specs validate coverage` (three-level) — REFACTOR**: share one `.feature`-parse
+- [x] [AI] **Enhance `specs validate coverage` (three-level) — REFACTOR**: share one `.feature`-parse
       with the existing scanner; `cargo fmt` + clippy `-D warnings`
       — acceptance: `:test:unit`/`:lint` GREEN; coverage ≥90; no duplicated `.feature` parse.
-- [ ] [AI] **Fold — `Ddd` → `Specs`**: move `ddd bc`/`ddd ul` into `specs` (they read
+- [x] [AI] **Fold — `Ddd` → `Specs`**: move `ddd bc`/`ddd ul` into `specs` (they read
       `specs/apps/<app>/ddd/…`); remove the `Ddd` top-level group + enum + dispatch arm; targets
       `ddd:bc-validation`/`ddd:ul-validation` → `specs:bc-validation`/`specs:ul-validation` in Phase 10
       — acceptance: `rhino-cli specs --help` lists `bc`/`ul`; `rhino-cli ddd` gone; behavior unchanged;
       golden-master updated.
-- [ ] [AI] **Fold — `Contracts` → `Specs`**: move `contracts java-clean-imports`/`dart-scaffold` into
+- [x] [AI] **Fold — `Contracts` → `Specs`**: move `contracts java-clean-imports`/`dart-scaffold` into
       `specs` (contract source under `specs/apps/*/containers/contracts/`); remove the `Contracts`
       top-level group — acceptance: the codegen subcommands resolve under `specs` (dormant in ose-public);
       `rhino-cli contracts` gone; golden-master updated.
-- [ ] [AI] **Move — `gherkin-keyword-cardinality` `repo-governance` → `specs`**: the `.feature` parser
+- [x] [AI] **Move — `gherkin-keyword-cardinality` `repo-governance` → `specs`**: the `.feature` parser
       moves into `specs`; target authored as `specs:gherkin-cardinality-validation` (Phase 4) runs in
       the `specs-gate` job — acceptance: `rhino-cli specs --help` lists `gherkin-cardinality`; no longer
       under `repo-governance`; golden-master updated.
-- [ ] [AI] **Regroup — `Docs` → `Md`**: the 5 general markdown validators (naming, frontmatter,
+- [x] [AI] **Regroup — `Docs` → `Md`**: the 5 general markdown validators (naming, frontmatter,
       heading-hierarchy, links, mermaid) move from `docs` to the new `md` group (they scan multiple
       roots — general markdown, not `docs/`-specific); the `docs` group becomes **reserved** (no
       command) — acceptance: `rhino-cli md --help` lists the 5; `rhino-cli docs` has no subcommands;
       golden-master updated.
-- [ ] [AI] **Move — broad markdown audits `repo-governance` → `Md`**: `frontmatter-audit` →
+- [x] [AI] **Move — broad markdown audits `repo-governance` → `Md`**: `frontmatter-audit` →
       `md validate frontmatter-dates`, `readme-index-audit` → `md validate readme-index` (both scan broad
       `.md`) — acceptance: under `md`; removed from `repo-governance`; golden-master updated.
-- [ ] [AI] **Regroup — new `Convention` group** (repo-wide non-doc rule audits): move `emoji-audit` →
+- [x] [AI] **Regroup — new `Convention` group** (repo-wide non-doc rule audits): move `emoji-audit` →
       `convention validate emoji`, `license-audit` → `convention validate license`, `agents-md-size` →
       `convention validate agents-md-size` out of `repo-governance` (they target code/config/single
       files, not a doc tree) — acceptance: `rhino-cli convention --help` lists the three; removed from
       `repo-governance`; golden-master updated. (`repo-governance` now holds only `vendor`/
       `layer-coherence`/`traceability` + the group `audit`.)
-- [ ] [AI] **Rename — `Agents` → `Harness`**: rename the group (it manages cross-harness bindings, not
+- [x] [AI] **Rename — `Agents` → `Harness`**: rename the group (it manages cross-harness bindings, not
       just agent defs); all subcommands keep their behavior — acceptance: `rhino-cli harness --help`
       works; `rhino-cli agents` gone; golden-master updated.
-- [ ] [AI] **Rename — `Java` → `Lang`** (nested by language): `java validate-annotations` →
+- [x] [AI] **Rename — `Java` → `Lang`** (nested by language): `java validate-annotations` →
       `lang java validate null-safety-annotations` (dormant in ose-public) — acceptance: command resolves
       under `lang java`; `rhino-cli java` gone; golden-master updated.
-- [ ] [AI] **Merge — link engine**: make `specs` link validation and the `links:validation` target
+- [x] [AI] **Merge — link engine**: make `specs` link validation and the `links:validation` target
       reuse the `md` link resolver (one link-resolution core; no duplicated logic)
       — acceptance: behavior unchanged (golden-master + corpus identical); the duplicate logic is gone.
-- [ ] [AI] **Merge — filename-convention core**: extract the shared kebab-case filename pass used by
+- [x] [AI] **Merge — filename-convention core**: extract the shared kebab-case filename pass used by
       `md`/`harness`/`workflows` `validate naming` into one core in `domain/`; each keeps its
       domain-specific rule (agent mirror parity, workflow frontmatter-name) layered on top
       — acceptance: all three `validate naming` outputs byte-identical to baseline.
-- [ ] [AI] **Merge — binding generation**: collapse `harness sync opencode` and `harness emit amazonq`
+- [x] [AI] **Merge — binding generation**: collapse `harness sync opencode` and `harness emit amazonq`
       into one `harness generate bindings` with per-harness flags (keep thin aliases only if a caller
       needs them); `npm run generate:bindings` calls the merged command
       — acceptance: `.opencode/` + `.amazonq/` regenerate byte-identically; golden-master updated for
       the surface change.
-- [ ] [AI] **Merge — binding parity**: consolidate `harness validate sync` + `validate bindings` +
+- [x] [AI] **Merge — binding parity**: consolidate `harness validate sync` + `validate bindings` +
       `validate claude` (and the `cross-vendor:parity-validation` / `harness:bindings-validation`
       target logic) into one binding-parity validator family with per-harness arms
       — acceptance: each parity check still runs; one shared implementation; outputs unchanged.
-- [ ] [AI] **Merge — group audit sharing**: ensure each group's `audit` aggregate
+- [x] [AI] **Merge — group audit sharing**: ensure each group's `audit` aggregate
       (`repo-governance audit`, `md audit`, `convention audit`, `specs audit`, `harness audit`) and its
       granular `validate` subcommands share one rule implementation each (no duplicated rule bodies)
       — acceptance: each `audit` envelope == union of that group's granular outputs; no rule logic
       duplicated.
-- [ ] [AI] **Merge — frontmatter parse**: `md validate frontmatter` (schema) and
+- [x] [AI] **Merge — frontmatter parse**: `md validate frontmatter` (schema) and
       `md validate frontmatter-dates` (manual-date) share one frontmatter parse; the two distinct rules
       stay — acceptance: both validators' outputs unchanged; one parse path.
-- [ ] [AI] Commit the rationalization separately:
+- [x] [AI] Commit the rationalization separately:
       `rtk git commit -m "refactor(rhino-cli): rationalize command surface (merge overlaps, drop unused env utils)"`.
 
 ### Phase 9b — Uniform-grammar subcommand rename (BLOCK 11)
