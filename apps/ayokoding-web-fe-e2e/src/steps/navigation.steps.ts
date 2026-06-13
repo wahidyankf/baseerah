@@ -8,9 +8,7 @@ When("a visitor navigates to {string}", async ({ page }, url: string) => {
 });
 
 Then("the page should respond with HTTP 200", async ({ page }) => {
-  const response = await page.waitForLoadState("networkidle").then(() =>
-    page.evaluate(() => document.readyState),
-  );
+  const response = await page.waitForLoadState("networkidle").then(() => page.evaluate(() => document.readyState));
   // Verify we landed on a real page (not a 404/500 error page) by checking the
   // document is fully interactive. Playwright's goto throws on network-level
   // errors; application-level 404 pages are caught by asserting the article
