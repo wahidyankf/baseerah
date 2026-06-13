@@ -3,12 +3,8 @@ name: PR Quality Gate
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_call:
-    inputs:
-      nx-base:
-        required: false
-        type: string
-        default: ""
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -18,7 +14,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  NX_BASE: ${{ inputs.nx-base != '' && inputs.nx-base || format('origin/{0}', github.base_ref) }}
+  NX_BASE: ${{ github.event_name == 'push' && github.event.before || format('origin/{0}', github.base_ref) }}
   NX_HEAD: ${{ github.sha }}
 
 jobs:

@@ -458,7 +458,7 @@ must be recorded here with a justification; undocumented deviations are always b
 | All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                                        | `actionlint`; PR quality gate            |
 | CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                                       | `pr-quality-gate.yml` job keys           |
 | Specs-gate job runs `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation` and `specs:gherkin-cardinality-validation` | `pr-quality-gate.yml` specs-gate job     |
-| Full quality gate runs on every push to `main` (thin caller `run-quality-gate-on-push.yml`)                                                                              | `run-quality-gate-on-push.yml` trigger   |
+| Full quality gate runs on every push to `main` (direct `push` trigger on `pr-quality-gate.yml`)                                                                          | `pr-quality-gate.yml` `on.push` trigger  |
 | Scheduled workflows run at 2× WIB cadence (06:00 WIB = 23:00 UTC, 18:00 WIB = 11:00 UTC)                                                                                 | `test-and-deploy-*.yml` CRON expressions |
 
 ### Invariant B — Git Hook Lifecycle
