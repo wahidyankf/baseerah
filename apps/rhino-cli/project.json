@@ -82,6 +82,7 @@
         "{projectRoot}/Cargo.toml",
         "{projectRoot}/src/**/*.rs",
         "{projectRoot}/tests/**/*.rs",
+        "{projectRoot}/tests/golden-master/**/*",
         "{workspaceRoot}/specs/apps/rhino/**/*.feature"
       ]
     },
