@@ -7,8 +7,8 @@ use std::fmt::Write as _;
 use anyhow::{Error, anyhow};
 use clap::Args;
 
+use crate::domain::cliout::OutputFormat;
 use crate::internal::agents::bindings::{EmitResult, emit_bindings};
-use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
 /// CLI arguments for `agents emit-bindings`.

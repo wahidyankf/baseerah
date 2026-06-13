@@ -5,11 +5,11 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
+use crate::domain::cliout::OutputFormat;
 use crate::internal::agents::reporter::{
     format_validation_json, format_validation_markdown, format_validation_text,
 };
 use crate::internal::agents::sync_validator::validate_sync;
-use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
 /// CLI arguments for `agents validate-sync`.

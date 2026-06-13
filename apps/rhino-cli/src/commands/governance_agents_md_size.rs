@@ -7,7 +7,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::agents_md_size::{AgentsMdSizeFinding, check_agents_md_size};
 

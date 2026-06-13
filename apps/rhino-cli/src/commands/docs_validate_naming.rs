@@ -9,7 +9,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::docs::naming::{DocsNamingFinding, validate_docs_naming};
 use crate::internal::git;
 

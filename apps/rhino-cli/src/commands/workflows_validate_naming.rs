@@ -9,7 +9,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use walkdir::WalkDir;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::naming::{self, Violation};
 

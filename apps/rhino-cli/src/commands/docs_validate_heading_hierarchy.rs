@@ -9,7 +9,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::docs::heading_hierarchy::{
     DocsHeadingFinding, validate_docs_heading_hierarchy,
     validate_docs_heading_hierarchy_allowlisted,

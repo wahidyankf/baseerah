@@ -8,8 +8,8 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
+use crate::domain::cliout::OutputFormat;
 use crate::internal::agents::detect_duplication::{DuplicationFinding, detect_duplication};
-use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
 /// JSON output schema identifier for this command.

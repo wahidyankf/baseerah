@@ -5,7 +5,7 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::doctor::{
     self, CheckOptions, FixOptions, Scope, check_all, fix_all, format_fix_summary, format_json,
     format_markdown, format_text,

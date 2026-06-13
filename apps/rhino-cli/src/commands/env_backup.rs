@@ -5,7 +5,7 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::envbackup::{
     DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE, Options, backup, default_skip_dirs, detect_worktree,
     expand_tilde, format_json, format_markdown, format_text,

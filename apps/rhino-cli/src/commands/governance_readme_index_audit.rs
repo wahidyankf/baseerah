@@ -9,7 +9,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::readme_index_audit::{
     ReadmeIndexFinding, audit_readme_index,

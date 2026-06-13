@@ -6,7 +6,7 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::envvalidate;
 use crate::internal::git;
 

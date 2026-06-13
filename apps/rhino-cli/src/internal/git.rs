@@ -15,6 +15,7 @@ use std::time::{Duration, Instant};
 
 use anyhow::{Error, anyhow};
 
+use crate::domain::mermaid::{default_validate_options, extract_blocks, validate_blocks};
 use crate::internal::agents::claude_validator::validate_claude;
 use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::agents::sync_validator::validate_sync;
@@ -23,7 +24,6 @@ use crate::internal::docs::heading_hierarchy::{
     is_prose_allowlisted, validate_docs_heading_hierarchy,
 };
 use crate::internal::docs::links::{ScanOptions, validate_all_links};
-use crate::internal::mermaid::{default_validate_options, extract_blocks, validate_blocks};
 
 /// Maximum time allowed for a single pipeline step before it is skipped.
 const STEP_TIMEOUT: Duration = Duration::from_secs(30);

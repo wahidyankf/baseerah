@@ -10,7 +10,7 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::repo_governance::gherkin_keyword_cardinality_audit::{
     GherkinCardinalityFinding, audit_gherkin_keyword_cardinality,

@@ -9,7 +9,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 use walkdir::WalkDir;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 
 /// Directories under `repo_root` that are scanned for `.env.example` files.

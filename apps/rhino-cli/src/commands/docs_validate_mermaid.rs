@@ -10,12 +10,10 @@ use anyhow::{Context, Error, anyhow};
 use clap::Args;
 use walkdir::WalkDir;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
+use crate::domain::mermaid::{MermaidBlock, ValidateOptions, extract_blocks, validate_blocks};
+use crate::infrastructure::mermaid::reporter::{format_json, format_markdown, format_text};
 use crate::internal::git;
-use crate::internal::mermaid::{
-    MermaidBlock, ValidateOptions, extract_blocks, format_json, format_markdown, format_text,
-    validate_blocks,
-};
 
 /// CLI arguments for `docs validate-mermaid`.
 #[derive(Args, Debug)]

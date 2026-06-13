@@ -570,13 +570,14 @@ stateDiagram-v2
 > Behavior is byte-for-byte preserved: every existing flowchart test stays green and `state.rs` is a
 > stub at this stage (state behavior lands in Phase 8).
 
-- [ ] [AI] **RED**: golden-master replay harness GREEN on the unmodified tree
+- [x] [AI] **RED**: golden-master replay harness GREEN on the unmodified tree
       — acceptance: corpus diff empty (precondition for any move).
-- [ ] [AI] **GREEN**: move the shared-kernel modules (`mermaid`, `cliout`, and any 2+-consumer helper
+- [x] [AI] **GREEN**: move the shared-kernel modules (`mermaid`, `cliout`, and any 2+-consumer helper
       currently in `src/internal/`) into `src/domain/<kernel>/` (pure) with the outbound ports they
       need defined in `src/application/` — acceptance: `cargo build` clean; modules compile in the
       new location.
-- [ ] [AI] **GREEN — Mermaid slice**: migrate `apps/rhino-cli/src/internal/mermaid.rs` straight into
+      <!-- cargo build clean; lib.rs + internal.rs + all 39 command files updated -->
+- [x] [AI] **GREEN — Mermaid slice**: migrate `apps/rhino-cli/src/internal/mermaid.rs` straight into
       the hexagonal layers — `domain/mermaid/` holds the kind-agnostic core (`ParsedDiagram`/`Node`/
       `Edge`/`Subgraph` types, the rank/width/depth `graph` computation, the width/label `validator`
       rules) plus the pure front-end parsers (the existing `flowchart` parser; a `state.rs` **stub**
@@ -587,9 +588,11 @@ stateDiagram-v2
       — acceptance: `cargo build` clean; every existing flowchart test stays green; the `state.rs`
       stub compiles but adds no behavior.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: re-run golden-master replay + `npx nx run rhino-cli:test:unit`
+  <!-- 854 unit tests GREEN; golden-master 1 test GREEN (byte-identical corpus) -->
+- [x] [AI] **REFACTOR**: re-run golden-master replay + `npx nx run rhino-cli:test:unit`
       — acceptance: corpus byte-identical; unit tests GREEN; coverage threshold met (update the
       coverage-ignore allowlist if a file moved).
+      <!-- test:unit 854 pass; golden-master 1 pass; cargo build clean -->
 - [ ] [AI] Commit: `rtk git commit -m "refactor(rhino-cli): extract shared kernel + migrate mermaid slice to hexagonal domain"`.
 
 ### Phase 7b — Pilot feature (`git`)

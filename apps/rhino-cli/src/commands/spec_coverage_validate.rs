@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use anyhow::{Context, Error, anyhow};
 use clap::Args;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::speccoverage::{checker, reporter, types::ScanOptions};
 

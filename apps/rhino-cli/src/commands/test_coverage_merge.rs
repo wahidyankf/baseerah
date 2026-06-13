@@ -5,7 +5,7 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::testcoverage::merge::{
     CoverageMap, merge_coverage_maps, result_from_coverage_map, to_coverage_map, write_lcov,

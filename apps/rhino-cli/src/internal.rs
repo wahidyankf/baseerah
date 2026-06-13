@@ -1,18 +1,13 @@
 //! Internal implementation modules shared across commands.
 pub mod agents;
 pub mod allowlist;
-pub mod application;
 pub mod bcregistry;
-pub mod cliout;
 pub mod docs;
 pub mod doctor;
-pub mod domain;
 pub mod envbackup;
 pub mod envvalidate;
 pub mod git;
 pub mod glossary;
-pub mod infrastructure;
-pub mod mermaid;
 pub mod naming;
 pub mod repo_governance;
 pub mod severity;

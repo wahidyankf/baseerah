@@ -15,7 +15,7 @@ use crate::commands::{
     specs_validate_counts, specs_validate_links, specs_validate_tree, test_coverage_diff,
     test_coverage_merge, test_coverage_validate, workflows_validate_naming,
 };
-use crate::internal::cliout::OutputFormat;
+use crate::domain::cliout::OutputFormat;
 
 #[derive(Parser, Debug)]
 #[command(

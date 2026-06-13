@@ -5,8 +5,8 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
+use crate::domain::cliout::OutputFormat;
 use crate::internal::allowlist::apps_with_ddd;
-use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 use crate::internal::specs::validate_spec_links;
 

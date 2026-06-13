@@ -5,9 +5,9 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
+use crate::domain::cliout::OutputFormat;
 use crate::internal::agents::reporter::{format_sync_json, format_sync_markdown, format_sync_text};
 use crate::internal::agents::sync::{SyncOptions, sync_all};
-use crate::internal::cliout::OutputFormat;
 use crate::internal::git;
 
 /// CLI arguments for `agents sync`.
