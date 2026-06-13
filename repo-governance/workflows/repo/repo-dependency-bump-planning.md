@@ -158,7 +158,7 @@ For each dependency/runtime, determine its policy path and the version to propos
 external research to `web-research-maker` — the [default primitive for public-web information
 gathering](../../conventions/writing/web-research-delegation.md). **Group research by ecosystem**
 (one agent per ecosystem batch) rather than one agent per package, and cap concurrent agents at
-**3** per the [Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md).
+**2** per the [Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md).
 
 Each research batch must return, per package:
 
@@ -298,7 +298,7 @@ Scenario: User declines at the checkpoint
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `repo-dependency-bump-planning` parses as scope=`repo`, qualifier=`dependency-bump`, type=`planning`.
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: The backlog plan uses the `YYYY-MM-DD__<identifier>/` creation-date-prefixed folder form.
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**: Version/CVE/yank research delegated to `web-research-maker`.
-- **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: Research agents capped at 3 concurrent.
+- **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: Research agents capped at 2 concurrent.
 - **[Linking Convention](../../conventions/formatting/linking.md)**: Cross-references use GitHub-compatible markdown with `.md` extensions.
 
 ```

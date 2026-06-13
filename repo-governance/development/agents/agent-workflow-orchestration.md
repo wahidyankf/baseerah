@@ -98,6 +98,28 @@ Offload work to delegated agents when:
 
 Do not spawn a delegated agent for simple reads or lookups that take one or two tool calls. The overhead is not worth it for small operations.
 
+## Operating Budgets
+
+These budgets bound how agents spend two scarce resources — external API rate limits and token burn — and how repository rules themselves are created and kept in sync. They apply to every agent and to the main conversation, across all three OSE repositories (`ose-infra`, `ose-public`, `ose-primer`).
+
+### Authoring and Propagating Repository Rules
+
+Repository rules and conventions are authored, maintained, and propagated using the `repo-rules-maker` agent. `repo-rules-maker` is the canonical maker for `repo-governance/` content; `repo-rules-checker` validates it and `repo-rules-fixer` applies validated fixes.
+
+A rule that should hold everywhere is created with `repo-rules-maker` in one repo and then carried across the OSE repositories on the bidirectional `ose-primer` sync, so the same rule text lands in `ose-infra`, `ose-public`, and `ose-primer` rather than being retyped by hand per repo.
+
+### Parallelism Budget
+
+Parallelize aggressively — prefer running independent work concurrently over serially, and try to keep the parallel budget fully used whenever independent work is available.
+
+The budget is **two (2) concurrent background operations** — background delegated agents spawned via the Agent tool, and equivalent token-spending background tasks. The main thread's own work does not count toward this cap; only concurrent background operations do. Within the cap of two, run as much in parallel as possible to keep throughput high while holding the token burn rate in check.
+
+Exceeding two concurrent background operations requires clear, explicit permission from the user for that session. Absent that permission, never run more than two background operations at once — queue the remainder and launch the next as a slot frees. The detailed background-batch mechanics (sequencing, stuck detection, relaunch) live in the [Subagent Orchestration Convention](./subagent-orchestration.md), which sets the same cap of two.
+
+### CI and GitHub Actions Monitoring Cadence
+
+When monitoring or polling CI or GitHub Actions — run status, job logs, or workflow conclusions — never poll faster than once every two (2) minutes. This is a hard floor that protects the provider's rate limiter, which takes longer to recover from than simply waiting. The operational default is more conservative still: see the [CI Monitoring Convention](../workflow/ci-monitoring.md) for the required mechanics — scheduled wakeups, a single status check per wakeup, no stream-watching, and rate-limit recovery.
+
 ## Verification Before Done
 
 Never declare a task complete without proving it works.
@@ -333,7 +355,7 @@ After any correction, update `local-temp/lessons.md`. This is the direct applica
 - [Maker-Checker-Fixer Pattern](../pattern/maker-checker-fixer.md) - Multi-agent orchestration for content quality workflows
 - [AI Agents Convention](./ai-agents.md) - Agent structure, frontmatter, and tool access standards
 - [Skill Context Architecture](./skill-context-architecture.md) - Inline vs fork skills for delegated agent invocation
-- [Subagent Orchestration Convention](./subagent-orchestration.md) - Concurrency cap (max 3 simultaneous Agent-tool spawns) and 3-minute stuck-detection polling for background subagents; specializes the delegated agent model for background execution
+- [Subagent Orchestration Convention](./subagent-orchestration.md) - Concurrency cap (max 2 simultaneous background Agent-tool spawns) and 3-minute stuck-detection polling for background subagents; specializes the delegated agent model for background execution
 - [CI Post-Push Verification Convention](../workflow/ci-post-push-verification.md) - Trigger and monitor CI after every push; required final step in plan execution
 - [CI Monitoring Convention](../workflow/ci-monitoring.md) - Check every 3-5 min via ScheduleWakeup; `gh run watch` only for <5 min jobs; rate-limit recovery uses `ScheduleWakeup(delaySeconds=2100)`
 

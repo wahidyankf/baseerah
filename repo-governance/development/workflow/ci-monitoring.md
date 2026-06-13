@@ -17,6 +17,8 @@ Monitoring CI runs is a required step after every push to `origin main`. How you
 
 **Default poll interval: 3 minutes.** Schedule a wakeup every 3 minutes and issue one `gh run view --json status,conclusion` per wakeup. Do not use `gh run watch` (stream-watching is prohibited for CI monitoring).
 
+**Absolute floor: never poll CI or GitHub Actions faster than once every 2 minutes.** Two minutes is the hard, never-exceed minimum spacing for any CI or Actions status check; the 3-minute default above sits comfortably on the safe side of this floor. Any cadence faster than once per 2 minutes is forbidden regardless of mechanism (manual loop, scheduled wakeup, or stream-watch).
+
 ## Principles Implemented/Respected
 
 This convention implements the following core principles:
