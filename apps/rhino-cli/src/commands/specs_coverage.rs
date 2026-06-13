@@ -275,6 +275,7 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::test_support::CwdLock;
 
     fn base_args(paths: Vec<String>) -> ValidateArgs {
         ValidateArgs {
@@ -295,6 +296,7 @@ mod tests {
 
     #[test]
     fn run_returns_err_on_too_few_paths() {
+        let _cwd = CwdLock::acquire();
         let args = base_args(vec!["x".to_string()]);
         let err = run(&args, OutputFormat::Text).unwrap_err();
         assert!(err.to_string().contains("requires at least 2"));
@@ -302,6 +304,7 @@ mod tests {
 
     #[test]
     fn run_returns_err_with_gaps_when_specs_missing_test_files() {
+        let _cwd = CwdLock::acquire();
         let mut args = base_args(vec![
             "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),
             "apps/rhino-cli/scripts".to_string(), // wrong dir → 0 step matchers → step gaps
@@ -313,6 +316,7 @@ mod tests {
 
     #[test]
     fn run_returns_err_with_json_output_format() {
+        let _cwd = CwdLock::acquire();
         let mut args = base_args(vec![
             "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),
             "apps/rhino-cli/scripts".to_string(),
@@ -324,6 +328,7 @@ mod tests {
 
     #[test]
     fn three_level_fails_when_integration_and_e2e_missing() {
+        let _cwd = CwdLock::acquire();
         let args = ValidateArgs {
             paths: vec![
                 "apps/rhino-cli/tests/fixtures/three-level".to_string(),
@@ -351,6 +356,7 @@ mod tests {
 
     #[test]
     fn three_level_passes_when_all_levels_covered() {
+        let _cwd = CwdLock::acquire();
         let args = ValidateArgs {
             paths: vec![
                 "apps/rhino-cli/tests/fixtures/three-level".to_string(),
@@ -370,6 +376,7 @@ mod tests {
 
     #[test]
     fn partial_level_dirs_returns_err() {
+        let _cwd = CwdLock::acquire();
         let args = ValidateArgs {
             paths: vec![
                 "apps/rhino-cli/tests/fixtures/three-level".to_string(),
@@ -393,6 +400,7 @@ mod tests {
         // Runs against the actual repo state. After the Rust archival the Go step
         // implementations live under archived/rhino-cli; the spec scanner aggregates
         // both apps/rhino-cli (Rust) and archived/rhino-cli (Go) step defs.
+        let _cwd = CwdLock::acquire();
         let args = ValidateArgs {
             paths: vec![
                 "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),

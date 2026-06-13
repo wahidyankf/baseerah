@@ -39,9 +39,11 @@ mod tests {
     use tempfile::tempdir;
 
     use super::*;
+    use crate::test_support::CwdLock;
 
     #[test]
     fn get_staged_files_empty_no_repo() {
+        let _cwd = CwdLock::acquire();
         let dir = tempdir().unwrap();
         let provider = GitStagedFileProvider;
         let r = provider.get_staged(dir.path());

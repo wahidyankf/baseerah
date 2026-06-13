@@ -34,9 +34,11 @@ pub fn find_root() -> std::result::Result<PathBuf, Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_support::CwdLock;
 
     #[test]
     fn find_root_returns_repo_root() {
+        let _cwd = CwdLock::acquire();
         let root = find_root().expect("git root resolvable in test");
         assert!(
             root.join("Cargo.toml").exists() || root.join("AGENTS.md").exists(),

@@ -16,3 +16,7 @@ pub mod domain;
 pub mod infrastructure;
 /// Internal implementation modules shared across commands.
 pub mod internal;
+
+/// Test-only helpers for serializing process-global state (e.g. the cwd).
+#[cfg(test)]
+pub(crate) mod test_support;

@@ -522,6 +522,7 @@ mod hex {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::test_support::CwdLock;
 
     #[test]
     fn build_audit_key_deterministic() {
@@ -676,6 +677,7 @@ mod tests {
 
     #[test]
     fn run_audit_empty_repo_skip_all_categories() {
+        let _cwd = CwdLock::acquire();
         let dir = tempfile::tempdir().unwrap();
         let opts = AuditOptions {
             repo_root: dir.path().to_path_buf(),
@@ -694,6 +696,7 @@ mod tests {
 
     #[test]
     fn run_audit_include_only_filter() {
+        let _cwd = CwdLock::acquire();
         let dir = tempfile::tempdir().unwrap();
         let opts = AuditOptions {
             repo_root: dir.path().to_path_buf(),
@@ -711,6 +714,7 @@ mod tests {
         // Construct an opts with a fake skip name that does not exist —
         // since our include_only uses it but it's not in order, run_audit
         // will pass through with no categories.
+        let _cwd = CwdLock::acquire();
         let dir = tempfile::tempdir().unwrap();
         let opts = AuditOptions {
             repo_root: dir.path().to_path_buf(),
@@ -724,6 +728,7 @@ mod tests {
 
     #[test]
     fn run_category_unknown_returns_error() {
+        let _cwd = CwdLock::acquire();
         let dir = tempfile::tempdir().unwrap();
         let opts = AuditOptions {
             repo_root: dir.path().to_path_buf(),
@@ -754,6 +759,7 @@ mod tests {
 
     #[test]
     fn read_git_sha_returns_unknown_in_nongit_dir() {
+        let _cwd = CwdLock::acquire();
         let dir = tempfile::tempdir().unwrap();
         let s = read_git_sha(dir.path());
         assert_eq!(s, "unknown");
