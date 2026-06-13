@@ -1,4 +1,4 @@
-name: Deploy - OSE Application Web to Production
+name: Deploy OSE App Web to Production
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Backend - Typecheck
+name: Reusable Backend Typecheck
 
 on:
   workflow_call:

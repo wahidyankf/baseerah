@@ -1,4 +1,4 @@
-name: Frontend - E2E Tests
+name: Reusable Frontend E2E
 
 on:
   workflow_call:

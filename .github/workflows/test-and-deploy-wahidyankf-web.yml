@@ -1,4 +1,4 @@
-name: Test and Deploy - Wahidyankf Web
+name: Test and Deploy Wahidyankf Web
 
 on:
   schedule:

@@ -1,4 +1,4 @@
-name: Deploy - OrganicLever Web to Production
+name: Deploy Organiclever Web to Production
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Backend - Spec Coverage
+name: Reusable Backend Spec Coverage
 
 on:
   workflow_call:

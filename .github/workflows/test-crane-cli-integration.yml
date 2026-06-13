@@ -1,4 +1,4 @@
-name: crane-cli integration
+name: Test Crane CLI Integration
 
 on:
   push:

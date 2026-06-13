@@ -1,4 +1,4 @@
-name: Test - OSE Application Web Staging
+name: Test OSE App Web Staging
 
 # Runs FE E2E tests against the deployed staging URL. When chaining after
 # `test-and-deploy-ose-app-web-development.yml`, wait ~5 minutes after

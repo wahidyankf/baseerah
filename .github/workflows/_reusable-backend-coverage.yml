@@ -1,4 +1,4 @@
-name: Backend - Coverage
+name: Reusable Backend Coverage
 
 on:
   workflow_call:

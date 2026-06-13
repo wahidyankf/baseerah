@@ -1,4 +1,4 @@
-name: Test - OrganicLever Web Staging
+name: Test Organiclever Web Staging
 
 # Runs FE E2E tests against the deployed staging URL. When chaining after
 # `test-and-deploy-organiclever-web-development.yml`, wait ~5 minutes after

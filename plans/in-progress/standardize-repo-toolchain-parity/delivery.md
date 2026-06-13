@@ -44,44 +44,47 @@ This phase converges the toolchain, records the baseline, **hard-verifies the up
 (`bootstrap-be-messaging-and-crane-media`), and **captures the golden-master CLI corpus** that
 behavior-freezes the rhino-cli migration (Phases 7–8).
 
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
+- [x] [AI] Install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized.
-- [ ] [AI] Converge the full polyglot toolchain: `npm run doctor -- --fix`
+- [x] [AI] Converge the full polyglot toolchain: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift.
-- [ ] [AI] Record the affected baseline: `npx nx affected -t typecheck lint test:quick spec-coverage`
+- [x] [AI] Record the affected baseline: `npx nx affected -t typecheck lint test:quick spec-coverage`
       — acceptance: pass/fail count recorded; every preexisting failure documented.
       (Note: target is still `spec-coverage` until Phase 10 renames it to `specs:coverage`.)
-- [ ] [AI] Resolve all preexisting failures before proceeding (root-cause orientation)
+      <!-- baseline: 0 projects affected (branch at origin/main HEAD); no preexisting failures -->
+- [x] [AI] Resolve all preexisting failures before proceeding (root-cause orientation)
       — acceptance: no preexisting failures remain unresolved.
-- [ ] [AI] **Prerequisite — `crane-be` exists**: `test -d apps/crane-be && echo OK`
+- [x] [AI] **Prerequisite — `crane-be` exists**: `test -d apps/crane-be && echo OK`
       — acceptance: prints `OK`.
-- [ ] [AI] **Prerequisite — GHCR publish workflow exists**:
+- [x] [AI] **Prerequisite — GHCR publish workflow exists**:
       `ls .github/workflows/ | grep -Ei 'ghcr|publish|image' && echo OK`
       — acceptance: at least one matching workflow file is listed. If naming differs, confirm by
       reading the workflow for `ghcr.io/wahidyankf/crane-be`.
-- [ ] [AI] **Prerequisite — .NET detection present**:
+- [x] [AI] **Prerequisite — .NET detection present**:
       `grep -E 'lang:fsharp|lang:csharp|has-dotnet' .github/workflows/pr-quality-gate.yml && echo OK`
       — acceptance: `.NET` detection lines are present in the PR gate.
-- [ ] [AI] **Golden-master capture**: enumerate every `rhino-cli` subcommand
+- [x] [AI] **Golden-master capture**: enumerate every `rhino-cli` subcommand
       (`cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- --help` then each
       subcommand's `--help`) and record, against a fixed input fixture set, the stdout/stderr/exit
       code of each invocation into a versioned corpus under
       `apps/rhino-cli/tests/golden-master/` (or the repo's existing test-fixtures location)
       — acceptance: a re-run of the capture produces a byte-identical corpus (deterministic);
       the corpus covers every subcommand listed by `--help`.
-- [ ] [AI] Add a golden-master harness test that replays the corpus and diffs byte-for-byte
+      <!-- 40 commands × 3 files (stdout/stderr/exit) + manifest.json = 121 corpus files in tests/golden-master/ -->
+- [x] [AI] Add a golden-master harness test that replays the corpus and diffs byte-for-byte
       — acceptance: `npx nx run rhino-cli:test:unit` (or the golden-master test target) is GREEN on
       the unmodified tree.
+      <!-- tests/golden_master.rs + test:integration target; 867 tests pass including golden_master_replay -->
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
-- [ ] [AI] Baseline recorded and every preexisting failure resolved (zero unresolved).
-- [ ] [AI] All three prerequisite verifications printed `OK`. If any failed, STOP — the upstream
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift.
+- [x] [AI] Baseline recorded and every preexisting failure resolved (zero unresolved).
+- [x] [AI] All three prerequisite verifications printed `OK`. If any failed, STOP — the upstream
       prerequisite is not done and this plan must not proceed.
-- [ ] [AI] Golden-master corpus captured, deterministic on re-capture, and the replay harness is
+- [x] [AI] Golden-master corpus captured, deterministic on re-capture, and the replay harness is
       GREEN.
 
 > **Pause Safety**: only the local toolchain was verified, the baseline recorded, the prerequisite
@@ -114,11 +117,11 @@ scope table. Any safely-affected check still run whole-repo is moved onto `nx af
 
 _Suggested executor: `ci-fixer`_
 
-- [ ] [AI] **RED**: assert `run-many` still present in the per-language jobs:
+- [x] [AI] **RED**: assert `run-many` still present in the per-language jobs:
       `grep -n "nx run-many -t typecheck lint test:quick spec-coverage" .github/workflows/pr-quality-gate.yml`
       — acceptance: matches the Go, .NET, and Rust job lines (3 hits ~133/149/165). The
       single-project `specs-gate` `run-many` (~197) is separate and intentionally kept.
-- [ ] [AI] **GREEN — strip the Go job entirely**: remove the `golang:` job, its
+- [x] [AI] **GREEN — strip the Go job entirely**: remove the `golang:` job, its
       `if: needs.detect.outputs.has-golang == 'true'` guard, the `./.github/actions/setup-golang` step,
       the `has-golang` output + the `lang:golang) ... has-golang=true` detection arm in the `detect`
       job, and the `golang` entry from `quality-gate.needs` in
@@ -126,7 +129,7 @@ _Suggested executor: `ci-fixer`_
       — acceptance: `grep -nE 'golang|has-golang|setup-golang|lang:golang' .github/workflows/pr-quality-gate.yml`
       returns nothing.
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] **GREEN — drop Go from `rhino-cli doctor` (ose-public scope)**: remove Go from ose-public's
+- [x] [AI] **GREEN — drop Go from `rhino-cli doctor` (ose-public scope)**: remove Go from ose-public's
       required-tool scope in the doctor toolchain manifest / env-contract (the file the doctor reads for
       this repo's required tools — confirm exact path via
       `rtk grep -rln 'golang\|go.*toolchain\|"go"' apps/rhino-cli/ .tool-versions`), leaving Go in the
@@ -135,18 +138,18 @@ _Suggested executor: `ci-fixer`_
       — acceptance: `npm run doctor` no longer reports Go as required/missing for ose-public; infra/primer
       doctor scope is untouched.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: change the .NET job (`--projects='tag:lang:fsharp,tag:lang:csharp'`) to
+- [x] [AI] **GREEN**: change the .NET job (`--projects='tag:lang:fsharp,tag:lang:csharp'`) to
       `nx affected` — acceptance: the .NET job uses `affected`.
-- [ ] [AI] **GREEN**: change the Rust job (`--projects='tag:lang:rust'`) to `nx affected`; leave the
+- [x] [AI] **GREEN**: change the Rust job (`--projects='tag:lang:rust'`) to `nx affected`; leave the
       subsequent `rhino-cli:fmt:check` / `deny:check` / `check:msrv` steps unchanged
       — acceptance: the Rust job uses `affected`; the three rhino-cli single-target steps remain.
-- [ ] [AI] **GREEN — verify no per-language run-many remains**:
+- [x] [AI] **GREEN — verify no per-language run-many remains**:
       `grep -n "nx run-many" .github/workflows/pr-quality-gate.yml`
       — acceptance: the only remaining match is the `specs-gate` `--projects=rhino-cli` line.
-- [ ] [AI] **REFACTOR**: confirm each affected job retains its inline
+- [x] [AI] **REFACTOR**: confirm each affected job retains its inline
       `NX_BASE`/`NX_HEAD` env block (`grep -n "NX_BASE\|NX_HEAD" .github/workflows/pr-quality-gate.yml`)
       — acceptance: every per-language affected job retains its SHA env block.
-- [ ] [AI] **GREEN — affected-first sweep**: audit `pr-quality-gate.yml` (and the per-file lint jobs)
+- [x] [AI] **GREEN — affected-first sweep**: audit `pr-quality-gate.yml` (and the per-file lint jobs)
       for any check run whole-repo that is **safely affected/changed-file computable** — the per-file
       linters/validators (`shell`/`dockerfile`/`actions` lint, `mermaid`, `heading-hierarchy`) should
       be scoped to changed/affected files where computable; move any such check onto `nx affected` (or
@@ -155,7 +158,7 @@ _Suggested executor: `ci-fixer`_
       [tech-docs.md § D13](./tech-docs.md#d13--affected-first-pr-gate-whole-repo-only-by-exception)
       — acceptance: each remaining whole-repo check matches a justified row in the D13 scope table; no
       safely-affected check is left running whole-repo.
-- [ ] [AI] **GREEN — workflow file / `name:` / job-id naming (BLOCK 1-A scheme)**: audit every
+- [x] [AI] **GREEN — workflow file / `name:` / job-id naming (BLOCK 1-A scheme)**: audit every
       `.github/workflows/*.yml` against the canonical scheme — **file** = kebab-case
       `<verb>-<noun>[-<qualifier>].yml`, **`name:`** = Title Case matching the file, **job ids** =
       kebab-case (`rtk grep -nE '^name:|^  [a-zA-Z0-9_-]+:' .github/workflows/*.yml`); `git mv` any
@@ -164,12 +167,19 @@ _Suggested executor: `ci-fixer`_
       it — see the `[HUMAN]` step below)
       — acceptance: every workflow file is kebab-case `<verb>-<noun>`, every `name:` is Title Case
       matching the file, every job id is kebab-case, and `Quality gate` is unchanged.
+      — implementation: `git mv crane-cli-integration.yml test-crane-cli-integration.yml`; updated
+      `name:` in all 20 non-conforming files (removed `-` separators, Title-Cased stems). All 22
+      workflow `name:` fields now Title-Case-match their filenames. All job ids already kebab-case. Job
+      `quality-gate` / `name: Quality gate` unchanged. Workflow-level name changed from
+      `PR - Quality Gate` to `PR Quality Gate` — see HUMAN branch-protection note below.
   - _Suggested executor: `ci-fixer`_
-- [ ] [AI] **GREEN — update workflow cross-references after any `git mv`**: if a workflow file was
+- [x] [AI] **GREEN — update workflow cross-references after any `git mv`**: if a workflow file was
       renamed, update every reference to its old filename (reusable-workflow `uses:` paths, badge URLs
       in READMEs, branch-protection notes in docs) —
       `rtk grep -rn '<old-workflow-filename>' .github docs repo-governance AGENTS.md`
       — acceptance: no reference to a renamed workflow's old filename remains.
+      — implementation: only `plans/done/` files reference `crane-cli-integration` (historical, no
+      update needed). No active `uses:` callers found. No docs reference old workflow names.
 - [ ] [HUMAN] **Branch-protection sync (only if a required-check job was renamed)**: if — and only if
       — any branch-protection **required-check** job (e.g. the `Quality gate` aggregate) was renamed in
       the step above, a human MUST update the required-check list in GitHub repo settings (Settings →
@@ -180,29 +190,35 @@ _Suggested executor: `ci-fixer`_
       "branch-protection required checks updated to <new name>" (or "no required-check rename — no
       action") — observable resume signal: the human's confirmation message; the agent then re-checks
       that a test PR's `Quality gate` check still reports.
+      — agent note: job `quality-gate` / `name: Quality gate` was NOT renamed (unchanged). However the
+      workflow-level `name:` changed from `PR - Quality Gate` → `PR Quality Gate`. GitHub status check
+      contexts use `<workflow-name> / <job-name>` format, so the check context may change from
+      `PR - Quality Gate / Quality gate` → `PR Quality Gate / Quality gate`. Human: verify branch
+      protection settings and update if needed. If the old name was not a required check, this is a no-op.
 
 > **Note**: `[HUMAN]` because editing GitHub branch-protection settings is an out-of-band,
 > privileged-authority action an agent cannot perform. It is normally a no-op (the required-check job
 > is intentionally not renamed).
 
-- [ ] [AI] Lint: `actionlint .github/workflows/pr-quality-gate.yml` if available, else
+- [x] [AI] Lint: `actionlint .github/workflows/pr-quality-gate.yml` if available, else
       `npx prettier --check .github/workflows/pr-quality-gate.yml` — acceptance: exits 0.
+      — implementation: actionlint 1.7.12 run on all `.github/workflows/*.yml` — exits 0, no errors.
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `grep -c "nx affected -t typecheck lint test:quick spec-coverage" .github/workflows/pr-quality-gate.yml`
-      — expected: at least 3 (TypeScript + .NET + Rust; **no Go job**).
-- [ ] [AI] `grep -nE 'golang|has-golang|setup-golang|lang:golang' .github/workflows/pr-quality-gate.yml`
-      — expected: empty (Go fully stripped).
-- [ ] [AI] `grep "nx run-many" .github/workflows/pr-quality-gate.yml` — expected: only the
-      `specs-gate` `--projects=rhino-cli` line remains.
-- [ ] [AI] Every workflow file name is kebab-case `<verb>-<noun>`, every `name:` Title Case, every job
-      id kebab-case; `Quality gate` aggregate name unchanged — expected: BLOCK 1-A scheme satisfied.
-- [ ] [AI] `npm run doctor` no longer flags Go as required/missing for ose-public — expected: Go absent
-      from ose-public's required-tool scope.
-- [ ] [AI] Workflow lints clean — expected: exits 0.
+- [x] [AI] `grep -c "nx affected -t typecheck lint test:quick spec-coverage" .github/workflows/pr-quality-gate.yml`
+      — expected: at least 3 (TypeScript + .NET + Rust; **no Go job**). — result: 3 ✓
+- [x] [AI] `grep -nE 'golang|has-golang|setup-golang|lang:golang' .github/workflows/pr-quality-gate.yml`
+      — expected: empty (Go fully stripped). — result: empty ✓
+- [x] [AI] `grep "nx run-many" .github/workflows/pr-quality-gate.yml` — expected: only the
+      `specs-gate` `--projects=rhino-cli` line remains. — result: only specs-gate line ✓
+- [x] [AI] Every workflow file name is kebab-case `<verb>-<noun>`, every `name:` Title Case, every job
+      id kebab-case; `Quality gate` aggregate name unchanged — expected: BLOCK 1-A scheme satisfied. — result: ✓
+- [x] [AI] `npm run doctor` no longer flags Go as required/missing for ose-public — expected: Go absent
+      from ose-public's required-tool scope. — result: 6/6 tools (no golang) ✓
+- [x] [AI] Workflow lints clean — expected: exits 0. — result: actionlint 1.7.12 clean ✓
 - [ ] [AI] Commit thematically (split the affected convergence, the Go-strip, and the workflow rename
       into separate commits): e.g. `rtk git commit -m "ci(pr-gate): converge non-TS jobs to nx affected"`,
       `rtk git commit -m "ci(pr-gate): strip Go from ose-public (no Go code)"`,

@@ -1,4 +1,4 @@
-name: Backend - Lint
+name: Reusable Backend Lint
 
 on:
   workflow_call:

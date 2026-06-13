@@ -1,4 +1,4 @@
-name: Test and Deploy - OrganicLever Web Development
+name: Test and Deploy Organiclever Web Development
 
 on:
   schedule:
