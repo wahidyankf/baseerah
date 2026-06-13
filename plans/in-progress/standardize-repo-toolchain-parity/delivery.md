@@ -219,10 +219,12 @@ _Suggested executor: `ci-fixer`_
 - [x] [AI] `npm run doctor` no longer flags Go as required/missing for ose-public — expected: Go absent
       from ose-public's required-tool scope. — result: 6/6 tools (no golang) ✓
 - [x] [AI] Workflow lints clean — expected: exits 0. — result: actionlint 1.7.12 clean ✓
-- [ ] [AI] Commit thematically (split the affected convergence, the Go-strip, and the workflow rename
+- [x] [AI] Commit thematically (split the affected convergence, the Go-strip, and the workflow rename
       into separate commits): e.g. `rtk git commit -m "ci(pr-gate): converge non-TS jobs to nx affected"`,
       `rtk git commit -m "ci(pr-gate): strip Go from ose-public (no Go code)"`,
       `rtk git commit -m "ci(workflows): normalize workflow file/name/job-id naming"`.
+      — implementation: 3 commits: 6a41de6 (golden-master Phase 0), 3a1438b (ci(pr-gate): converge
+      non-TS + strip Go), 64f18d9 (ci(workflows): normalize naming).
 
 > **Pause Safety**: `pr-quality-gate.yml` is self-consistent (non-TS jobs on `nx affected`, Go fully
 > stripped, workflow names canonical), all workflows lint clean, and the changes are committed. Safe to
@@ -245,31 +247,32 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 ```
 
-- [ ] [AI] **RED**: assert no concurrency block exists across the targeted workflows:
+- [x] [AI] **RED**: assert no concurrency block exists across the targeted workflows:
       `grep -rL "concurrency:" .github/workflows/*.yml`
-      — acceptance: every workflow file is listed (none has a concurrency block).
-- [ ] [AI] **GREEN**: add the canonical block to `.github/workflows/pr-quality-gate.yml`
-      — acceptance: `grep -A2 "concurrency:" pr-quality-gate.yml` shows the group + cancel lines.
-- [ ] [AI] **GREEN**: add the block to `validate-markdown.yml` and `validate-env.yml`
-      — acceptance: block present in both.
-- [ ] [AI] **GREEN**: add the block to each scheduled workflow
+      — acceptance: every workflow file is listed (none has a concurrency block). — result: confirmed ✓
+- [x] [AI] **GREEN**: add the canonical block to `.github/workflows/pr-quality-gate.yml`
+      — acceptance: `grep -A2 "concurrency:" pr-quality-gate.yml` shows the group + cancel lines. — result: ✓
+- [x] [AI] **GREEN**: add the block to `validate-markdown.yml` and `validate-env.yml`
+      — acceptance: block present in both. — result: ✓
+- [x] [AI] **GREEN**: add the block to each scheduled workflow
       (`test-and-deploy-ayokoding-web.yml`, `test-and-deploy-ose-web.yml`,
       `test-and-deploy-organiclever-web-development.yml`,
       `test-and-deploy-ose-app-web-development.yml`, `test-and-deploy-wahidyankf-web.yml`)
       — acceptance: each declares the block; for these `schedule`+`push` workflows the group is keyed
-      by `github.ref` and cancel-in-progress stays effectively off (PR-only).
-- [ ] [AI] **REFACTOR**: confirm consistent placement (after `permissions:`, before `jobs:`)
-      — acceptance: visual/grep consistency across all edited files.
-- [ ] [AI] Lint all edited workflows — acceptance: exits 0.
+      by `github.ref` and cancel-in-progress stays effectively off (PR-only). — result: ✓
+- [x] [AI] **REFACTOR**: confirm consistent placement (after `permissions:`, before `jobs:`)
+      — acceptance: visual/grep consistency across all edited files. — result: ✓ (all after permissions)
+- [x] [AI] Lint all edited workflows — acceptance: exits 0. — result: actionlint clean ✓
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `grep -l "concurrency:" .github/workflows/*.yml | wc -l` — expected: at least 8.
-- [ ] [AI] `grep -A2 "concurrency:" .github/workflows/pr-quality-gate.yml` shows
+- [x] [AI] `grep -l "concurrency:" .github/workflows/*.yml | wc -l` — expected: at least 8. — result: 8 ✓
+- [x] [AI] `grep -A2 "concurrency:" .github/workflows/pr-quality-gate.yml` shows
       `cancel-in-progress: ${{ github.event_name == 'pull_request' }}` — expected: exact canonical line.
-- [ ] [AI] Workflows lint clean — expected: exits 0.
+      — result: exact canonical line present ✓
+- [x] [AI] Workflows lint clean — expected: exits 0. — result: actionlint 1.7.12 clean ✓
 - [ ] [AI] Commit thematically: `rtk git commit -m "ci(workflows): add canonical concurrency groups"`.
 
 > **Pause Safety**: every targeted workflow declares the canonical concurrency block, lints clean,
