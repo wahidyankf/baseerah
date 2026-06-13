@@ -46,9 +46,11 @@ Toolchain drift between sibling repos is a slow, compounding tax across six surf
   layout, not hexagonal; testing IO-bound logic means reaching through to the filesystem/process
   layer. A hexagonal core (pure domain + injected ports) makes the CLI testable and identical across
   repos, and folds in the salvaged `migrate-rhino-cli-to-hexagonal` design. [Repo-grounded]
-- **rhino-cli command-surface drift (D)** — ose-public is missing the `Java` and `Contracts`
-  subcommands that the union superset (and the siblings) carry, so the CLI is not a drop-in across
-  repos. [Repo-grounded — current set lacks both]
+- **rhino-cli command-surface drift (D)** — the command groups are organized ad-hoc (not by the scope
+  they operate on) and ose-public is missing the JVM/contract commands the union superset (and the
+  siblings) carry. The plan **regroups by scope** under a **uniform grammar** and ports the missing
+  commands (→ `lang` + `specs`), so the CLI is a drop-in across repos. [Repo-grounded — current set
+  lacks the JVM/contract commands]
 - **Target-naming drift (E)** — governance/validation/lint targets use ad-hoc `validate:*` / `lint:*`
   / `fmt:check` names rather than the canonical `{domain}:{work}` scheme, and `spec-coverage` is
   spelled inconsistently with the `:`-delimited lifecycle targets. [Repo-grounded]
@@ -112,8 +114,8 @@ consume the outputs**:
   from ose-public (no `golang` job, `setup-golang`, or `has-golang` detection); every workflow file is
   kebab-case `<verb>-<noun>` with a Title-Case `name:` and kebab-case job ids (`Quality gate` kept);
   every workflow declares a concurrency block; lint jobs are tool-named; the
-  `gherkin:keyword-cardinality-validation` target runs in CI; the **full quality gate runs on `push`
-  to `main`**; scheduler cadence is 2× WIB. [Observable — grep/diff the workflows against the
+  `specs:gherkin-cardinality-validation` target runs in CI (`specs-gate`); the **full quality gate runs
+  on `push` to `main`**; scheduler cadence is 2× WIB. [Observable — grep/diff the workflows against the
   CI/toolchain Parity Checklist]
 - **B — Hook parity met**: `commit-msg`/`pre-commit`/`pre-push` match the BLOCK 1-B canonical
   lifecycle and reference the renamed targets. [Observable — diff the `.husky/*` hooks against
@@ -121,8 +123,10 @@ consume the outputs**:
 - **C — Hexagonal migration complete**: rhino-cli has the `domain`/`application`/`infrastructure`/
   `commands` layout and the golden-master CLI suite is byte-identical to the Phase 0 baseline.
   [Observable — directory layout + golden-master diff = empty]
-- **D — Union command surface met**: `rhino-cli` exposes the full superset including `Java` and
-  `Contracts`. [Observable — `rhino-cli --help` lists all union subcommands]
+- **D — Regrouped union command surface met**: `rhino-cli` commands are grouped by the scope they
+  operate on under the uniform grammar (`md`/`repo-governance`/`convention`/`docs`/`harness`/
+  `workflows`/`specs`/`lang`/…), and the full superset (incl. the ported `lang` + `specs` codegen
+  commands) is present. [Observable — `rhino-cli --help` lists the regrouped union]
 - **E — Target naming met**: every governance/validation/lint/check target uses `{domain}:{work}`
   and `specs:coverage` repo-wide; no caller references an old name. [Observable — grep the project.json
   files, hooks, workflows, package.json]
@@ -133,6 +137,12 @@ consume the outputs**:
   after the aggressive cleanup; the golden corpus produces byte-identical violation output across all
   three repos; flowchart behavior is unchanged. [Observable — run the gate over the over-wide
   fixtures and a full-repo scan; diff the committed expected-JSON across repos]
+- **H — Test Lifecycle Architecture met**: `test:unit`/`test:integration`/`test:e2e` consume the same
+  `.feature` files; `test:integration`+`test:e2e` appear in **no** pre-merge surface (CRON-only);
+  `specs:coverage` fails on any scenario missing from any of the three levels; the per-app-group
+  heavy-test workflows exist at the right cadence (2× WIB public+infra, 1×/day primer; primer no
+  staging). [Observable — grep hooks/PR gate for integration/e2e (none); list the heavy-test workflows;
+  run `specs:coverage` against a deliberately-incomplete fixture]
 - **All CI green after push** — the standardized toolchain passes on `origin main`. [Observable —
   GitHub Actions status]
 

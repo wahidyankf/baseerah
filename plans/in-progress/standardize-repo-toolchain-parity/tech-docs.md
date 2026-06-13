@@ -41,26 +41,26 @@ ranking.
 
 ### A — CI workflows
 
-| Dimension                      | Converged target                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `actions/checkout` major       | `@v6`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| Workflow file + `name:` naming | canonical scheme, identical across repos for every shared workflow: **file** = kebab-case `<verb>-<noun>[-<qualifier>].yml` (e.g. `validate-markdown.yml`, `publish-images.yml`, `_reusable-backend-lint.yml`); **`name:`** = Title Case matching the file (`Validate Markdown`); **job ids** = kebab-case; the PR-gate aggregate job keeps the branch-protection-required name (`Quality gate`) — any rename of a required-check job is paired with a `[HUMAN]` branch-protection update |
-| Non-TS PR-gate test semantics  | `nx affected` (single-project governance gates may keep `run-many`)                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Reusable-workflow pattern      | adopted (`_reusable-*.yml` + thin callers)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Concurrency                    | canonical block on every workflow: `group: ${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`                                                                                                                                                                                                                                                                                                                                    |
-| Lint-gate jobs                 | three tool-named CI jobs: `shellcheck`, `hadolint`, `actionlint`                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| Governance jobs                | `naming` (where `.claude/agents/`) + `specs-gate` (where `specs/`)                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `gherkin-keyword-cardinality`  | present as an Nx target + run in the markdown validator workflow                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| Main-branch CI                 | the **full quality gate runs on `push` to `main`** (post-merge), not only on `pull_request`; `validate-*` workflows present + identically triggered everywhere                                                                                                                                                                                                                                                                                                                            |
-| Scheduled cadence              | governance/scheduled validators twice-daily WIB (`0 23 * * *`, `0 11 * * *`); app-deploy/test schedules stay per-portfolio but documented                                                                                                                                                                                                                                                                                                                                                 |
+| Dimension                      | Converged target                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `actions/checkout` major       | `@v6`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Workflow file + `name:` naming | canonical scheme, identical across repos for every shared workflow: **file** = kebab-case `<verb>-<noun>[-<qualifier>].yml` (e.g. `validate-markdown.yml`, `publish-images.yml`, `_reusable-backend-lint.yml`); **`name:`** = Title Case matching the file (`Validate Markdown`); **job ids** = kebab-case; the PR-gate aggregate job keeps the branch-protection-required name (`Quality gate`) — any rename of a required-check job is paired with a `[HUMAN]` branch-protection update. **Heavy-test workflows** (Test Lifecycle Architecture) follow `test-and-deploy-{app-group}-development.yml` + `test-{app-group}-staging.yml` (staging absent in ose-primer) |
+| Non-TS PR-gate test semantics  | `nx affected` (single-project governance gates may keep `run-many`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Reusable-workflow pattern      | adopted (`_reusable-*.yml` + thin callers)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Concurrency                    | canonical block on every workflow: `group: ${{ github.workflow }}-${{ github.ref }}`, `cancel-in-progress: ${{ github.event_name == 'pull_request' }}`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Lint-gate jobs                 | three tool-named CI jobs: `shellcheck`, `hadolint`, `actionlint`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Governance jobs                | `naming` (where `.claude/agents/`) + `specs-gate` (where `specs/`)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `gherkin-keyword-cardinality`  | present as an Nx target + run in the markdown validator workflow                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Main-branch CI                 | the **full quality gate runs on `push` to `main`** (post-merge), not only on `pull_request`; `validate-*` workflows present + identically triggered everywhere                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Scheduled cadence              | governance/scheduled validators twice-daily WIB (`0 23 * * *`, `0 11 * * *`); **heavy-test CRON** (Test Lifecycle Architecture — `test:integration` + `test:e2e` per app-group) **2× WIB for ose-public + ose-infra, 1×/day for ose-primer**                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ### B — Git hooks (canonical, identical behavior)
 
-| Hook         | Converged target                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `commit-msg` | `npx --no -- commitlint --edit "$1"`; commitlint config identical across repos                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `pre-commit` | `git-identity-check.sh` → `check-no-env-staged.sh` → canonical staged-file lint (`shellcheck`/`hadolint`/`actionlint` on staged files, graceful skip if tool absent) → `rhino-cli git pre-commit` built with `--release`                                                                                                                                                                                                                                                                                                            |
-| `pre-push`   | `nx affected -t typecheck lint test:quick specs:coverage specs:tree-validation specs:links-validation specs:counts-validation specs:adoption-validation` → `markdown:lint` → `env:validation` → conditional (changed-path-gated): `naming:agents-validation`, `naming:workflows-validation`, `governance:vendor-audit-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation`, `shell:lint`/`dockerfile:lint`/`actions:lint`. **Infra-only deviation**: terraform/ansible/yamllint conditionals (IaC surface). |
+| Hook         | Converged target                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `commit-msg` | `npx --no -- commitlint --edit "$1"`; commitlint config identical across repos                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `pre-commit` | `git-identity-check.sh` → `check-no-env-staged.sh` → canonical staged-file lint (`shellcheck`/`hadolint`/`actionlint` on staged files, graceful skip if tool absent) → `rhino-cli git pre-commit` built with `--release` → **`nx affected -t test:quick`** (the app bundle **format + lint + typecheck + `test:unit`**, mocked; changed apps). **Infra-only deviation**: terraform/ansible/yamllint staged conditionals (IaC surface).                                                                                                                                                                                                                                   |
+| `pre-push`   | **`nx affected -t specs:coverage test-coverage`** (per-app: every `.feature` implemented across unit+integration+e2e, + line-coverage threshold) → `nx affected -t specs:tree-validation specs:links-validation specs:counts-validation specs:adoption-validation` → `markdown:lint` → `env:validation` → conditional (changed-path-gated): `naming:harness-validation`, `naming:workflows-validation`, `governance:vendor-audit-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation`. **`test:integration`/`test:e2e` are NOT here — CRON only ([Test Lifecycle Architecture](#test-lifecycle-architecture-spec-shared-three-level-testing)).** |
 
 ### C — rhino-cli architecture
 
@@ -71,53 +71,60 @@ ranking.
 
 ### D — rhino-cli command surface (union superset, identical in all repos)
 
-`TestCoverage`, `RepoGovernance`, `Docs`, `Agents`, `Workflows`, `Specs`, `Ddd`, `Git`,
-`Env`, `Java`, `Contracts`. Port direction: `Java`+`Contracts` → public (ref: infra/primer);
-`Specs`+`Ddd` → primer (ref: public/infra). Even where a subcommand's surface is unused in a
-repo, the command exists for an identical CLI.
+`TestCoverage`, `RepoGovernance`, `Convention`, `Md`, `Docs`, `Harness`, `Workflows`, `Specs`,
+`Lang`, `Git`, `Env` (+ standalone `Doctor`). Port direction: contract/JVM commands (now under
+`Specs`+`Lang`) → public (ref: infra/primer); `Specs` structural set → primer (ref: public/infra).
+Even where a subcommand's surface is unused in a repo, the command exists for an identical CLI.
 
-**`SpecCoverage` is FOLDED into `Specs`** (workstream 9a): the former top-level `spec-coverage
-validate` becomes `specs validate coverage`, and its per-project Nx target `spec-coverage` →
-`specs:coverage`. Rationale: spec-coverage validates BDD specs under `specs/`, so it belongs in the
-`specs` family; `test-coverage` (code line coverage) stays a separate top-level group. Scope nuance:
-`specs:coverage` is the one `specs:*` target that runs **per-project**, whereas the other `specs:*`
-targets are rhino-cli-scoped structural checks.
+**Grouping principle — a command group = the scope it operates on** (Phase 9a regroup). Commands
+are filed by their primary operation target: `repo-governance/`-exclusive ops under `repo-governance`;
+`docs/`-exclusive ops under `docs` (none today — reserved); `specs/` ops under `specs`; general
+markdown mechanics (any root) under `md`; repo-wide non-doc rule audits (code/config/single-file)
+under `convention`; AI-harness config under `harness`; language-source checks under `lang`. This
+drives the Phase 9 folds and moves below.
 
-The diagram below shows the union command-surface tree; the orange leaves are the two groups
-`ose-public` is missing today (added in Phase 9 from the infra/primer reference):
+**Folds & moves** (all Phase 9a, reference-first):
 
-```mermaid
-%% rhino-cli union command surface tree
-flowchart LR
-  ROOT["rhino-cli"]
-  ROOT --> TC["test-coverage"]
-  ROOT --> RG["repo-governance"]
-  ROOT --> DOCS["docs"]
-  ROOT --> AG["agents"]
-  ROOT --> WF["workflows"]
-  ROOT --> SP["specs"]
-  ROOT --> DDD["ddd"]
-  ROOT --> GIT["git"]
-  ROOT --> ENV["env"]
-  ROOT --> DOC["doctor"]
-  ROOT --> JAVA["java (add in P9)"]
-  ROOT --> CON["contracts (add in P9)"]
+- `SpecCoverage` → `specs validate coverage` (Nx `spec-coverage` → `specs:coverage`, the one
+  per-project `specs:*` target). `Ddd` → `specs validate bc`/`specs validate ul`. `Contracts` →
+  `specs clean java-imports`/`specs scaffold dart`. `gherkin-keyword-cardinality` → `specs validate
+gherkin-cardinality` (`.feature` files live under `specs/`).
+- `Docs` group → **`md`** (its validators are general markdown, multi-root — not `docs/`-specific).
+  `frontmatter-audit` → `md validate frontmatter-dates`, `readme-index-audit` → `md validate
+readme-index` (broad markdown scanners moved out of governance).
+- `emoji-audit`/`license-audit`/`agents-md-size` → new **`convention`** group (repo-wide rule audits
+  over code/config/single files, not a doc tree).
+- `Agents` → **`harness`** (manages cross-harness bindings, not just agent defs). `Java` → **`lang`**
+  (`lang java validate null-safety-annotations`, nested by language).
 
-  linkStyle default stroke:#808080,stroke-width:1px
-  style ROOT fill:#0173B2,stroke:#000000,color:#FFFFFF
-  style TC fill:#FFFFFF,stroke:#000000,color:#000000
-  style RG fill:#FFFFFF,stroke:#000000,color:#000000
-  style DOCS fill:#FFFFFF,stroke:#000000,color:#000000
-  style AG fill:#FFFFFF,stroke:#000000,color:#000000
-  style WF fill:#FFFFFF,stroke:#000000,color:#000000
-  style SP fill:#FFFFFF,stroke:#000000,color:#000000
-  style DDD fill:#FFFFFF,stroke:#000000,color:#000000
-  style GIT fill:#FFFFFF,stroke:#000000,color:#000000
-  style ENV fill:#FFFFFF,stroke:#000000,color:#000000
-  style DOC fill:#FFFFFF,stroke:#000000,color:#000000
-  style JAVA fill:#DE8F05,stroke:#000000,color:#000000
-  style CON fill:#DE8F05,stroke:#000000,color:#000000
-```
+**Uniform grammar — `<group> [<language>] <verb> [<object>]`**: every read-only check is
+`validate <object>`; `<group> audit` is the group run-all aggregate; generators/mutators use a
+fixed verb set (`sync`/`emit`/`clean`/`scaffold`/`init`/`backup`/`restore`; `test-coverage`:
+`validate`/`diff`/`merge`). Full before/after in [§ (a-ter)](#a-ter-rhino-cli-verb-first-subcommand-rename-beforeafter). The CLI grammar deliberately
+diverges from the object-verb Nx target scheme (`{domain}:{work}`).
+
+The union surface is 11 top-level groups plus standalone `doctor`. **Regroup** = the group is
+renamed/reshaped from today's surface; **Add in P9** = the group is absent in `ose-public` today
+(ported from the infra/primer reference):
+
+| Group             | In `ose-public` today | Handles                                                                                                                                                                | When/where triggered                                                                                                                                       |
+| ----------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test-coverage`   | yes                   | Code line-coverage from LCOV: threshold gate (`validate`), diff-coverage, multi-report merge.                                                                          | `validate` rides each project's `test:quick` → **pre-push** (affected) + **PR gate** per-language jobs (affected). `diff`/`merge` on-demand.               |
+| `repo-governance` | yes (reduced)         | `repo-governance/`-**exclusive** audits only: `validate vendor` (vendor-neutrality), `validate layer-coherence`, `validate traceability`; `audit` runs all three.      | `validate vendor` → **pre-push** (changed-path); `repo-governance audit` → **scheduled CRON** sweep.                                                       |
+| `convention`      | yes (regroup)         | Repo-wide rule audits over code/config/single files: `validate emoji` (forbidden-type emoji), `validate license` (`LICENSE` presence), `validate agents-md-size`.      | `convention audit` → **scheduled CRON** sweep + **PR gate** where wired; `validate emoji`/`license` repo-wide.                                             |
+| `md`              | yes (regroup)         | General markdown mechanics, any root: `validate naming`/`frontmatter`/`frontmatter-dates`/`heading-hierarchy`/`links`/`mermaid`/`readme-index`; `audit` runs all.      | `mermaid`/`heading-hierarchy`/`links` → **pre-commit** (staged; links full); `markdown:lint` → **pre-push** + **PR gate** (full); broad audits → **CRON**. |
+| `docs`            | reserved              | `docs/`-**exclusive** operations. None exist today — reserved bucket for future Diátaxis-specific validators.                                                          | — (no command).                                                                                                                                            |
+| `harness`         | yes (was `agents`)    | AI-harness config (`.claude/` source + `.opencode/`/`.amazonq/` mirrors): `validate naming`/`claude`/`sync`/`bindings`/`duplication`; `sync opencode`; `emit amazonq`. | binding `sync` → **pre-commit** (auto-staged); `validate naming`/`bindings` → **pre-push** (changed-path) + **PR gate** `naming` job (full).               |
+| `workflows`       | yes                   | Workflow-definition files under `repo-governance/workflows/`: `validate naming` (filename suffix + `name:`-field match).                                               | `naming:workflows-validation` → **pre-push** (changed-path) + **PR gate** `naming` job (full).                                                             |
+| `specs`           | yes (expanded)        | `specs/` tree: `validate adoption`/`counts`/`links`/`tree`/`coverage`/`bc`/`ul`/`gherkin-cardinality` + contract codegen (`clean java-imports`, `scaffold dart`).      | structural validates + `coverage` → **pre-push** (affected); **PR gate** `specs-gate` job (full, now incl. `gherkin-cardinality`). Codegen on-demand.      |
+| `lang`            | **Add in P9**         | Language-source correctness checks: `java validate null-safety-annotations` (JVM annotations on generated code). Dormant in `ose-public` (no JVM source yet).          | Dormant in `ose-public`; in infra/primer rides the JVM lint target at **pre-push**/**PR gate**.                                                            |
+| `git`             | yes                   | The Rust pre-commit engine the Husky hook wraps: identity, staged-file format, markdown link/lint/mermaid/heading, binding sync — one fast pass.                       | **Every commit** — the `pre-commit` Husky hook _is_ a thin wrapper over `rhino-cli git pre-commit`.                                                        |
+| `env`             | yes                   | `.env` secret-file lifecycle (sanctioned path; agents may not touch real `.env`): `init`/`backup`/`restore` + `validate` (code↔config drift).                          | `validate` (`env:validation`) → **pre-push** + **push-to-main** (full). `init`/`backup`/`restore` manual on-demand.                                        |
+| `doctor`          | yes                   | Local-toolchain probe: Node/Volta, Rust, language toolchains, lint tools — reports missing/wrong-version; `--fix` installs. Makes a fresh clone reproducible.          | On `npm install` (postinstall) + manual (`npm run doctor`, worktree init). Not a CI gate.                                                                  |
+
+> Contract codegen (`specs clean java-imports`, `specs scaffold dart`) and `lang` are **dormant in
+> `ose-public`** today — no JVM source or generated contracts here yet; they ship for an identical
+> union CLI and activate in infra/primer.
 
 ### E — Nx target naming (`{domain}:{work}`)
 
@@ -159,23 +166,24 @@ BLOCK 10 for the full design.
 
 ### Convergence status per repo (baseline 2026-06-12)
 
-| Dimension                   | ose-public                           | ose-infra                                                     | ose-primer                                  |
-| --------------------------- | ------------------------------------ | ------------------------------------------------------------- | ------------------------------------------- |
-| A `checkout@v6`             | done                                 | gap `@v4`                                                     | done                                        |
-| A non-TS `nx affected`      | gap `run-many`                       | done                                                          | done                                        |
-| A reusable workflows        | done                                 | gap (monolith)                                                | done                                        |
-| A concurrency               | gap (0)                              | gap (pr-gate 0 + 3 drifted)                                   | gap (0)                                     |
-| A lint jobs tool-named      | gap (`shell`/`dockerfile`/`actions`) | gap (`infra-lint` combined)                                   | done (reference)                            |
-| A gherkin target+CI         | gap                                  | done                                                          | done                                        |
-| A `naming`+`specs-gate`     | done                                 | gap (both)                                                    | gap (`specs-gate`)                          |
-| A full gate on push-to-main | gap                                  | gap                                                           | gap                                         |
-| A scheduler 2× WIB          | done (mixed)                         | gap (1×)                                                      | gap (weekly)                                |
-| B hooks canonical           | partial                              | partial (debug build; lint-staged-config.sh; no naming conds) | partial (`env:validate` name)               |
-| C hexagonal arch            | gap (reference — do first)           | gap (port)                                                    | gap (port; placeholders only)               |
-| D union commands            | gap (+Java,+Contracts)               | done                                                          | gap (+Specs,+Ddd)                           |
-| E `{domain}:{work}` targets | gap                                  | gap                                                           | gap (incl. `env:validate`→`env:validation`) |
-| F governance docs           | gap                                  | gap (missing lint-strictness doc)                             | gap (missing lint-strictness doc)           |
-| G state-diagram validation  | gap (reference — authors corpus)     | gap (mirror)                                                  | gap (mirror)                                |
+| Dimension                   | ose-public                            | ose-infra                                                     | ose-primer                                  |
+| --------------------------- | ------------------------------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| A `checkout@v6`             | done                                  | gap `@v4`                                                     | done                                        |
+| A non-TS `nx affected`      | gap `run-many`                        | done                                                          | done                                        |
+| A reusable workflows        | done                                  | gap (monolith)                                                | done                                        |
+| A concurrency               | gap (0)                               | gap (pr-gate 0 + 3 drifted)                                   | gap (0)                                     |
+| A lint jobs tool-named      | gap (`shell`/`dockerfile`/`actions`)  | gap (`infra-lint` combined)                                   | done (reference)                            |
+| A gherkin target+CI         | gap                                   | done                                                          | done                                        |
+| A `naming`+`specs-gate`     | done                                  | gap (both)                                                    | gap (`specs-gate`)                          |
+| A full gate on push-to-main | gap                                   | gap                                                           | gap                                         |
+| A scheduler 2× WIB          | done (mixed)                          | gap (1×)                                                      | gap (weekly)                                |
+| B hooks canonical           | partial                               | partial (debug build; lint-staged-config.sh; no naming conds) | partial (`env:validate` name)               |
+| C hexagonal arch            | gap (reference — do first)            | gap (port)                                                    | gap (port; placeholders only)               |
+| D union commands            | gap (+`lang`, +`specs` codegen)       | done                                                          | gap (+`specs` structural)                   |
+| E `{domain}:{work}` targets | gap                                   | gap                                                           | gap (incl. `env:validate`→`env:validation`) |
+| F governance docs           | gap                                   | gap (missing lint-strictness doc)                             | gap (missing lint-strictness doc)           |
+| G state-diagram validation  | gap (reference — authors corpus)      | gap (mirror)                                                  | gap (mirror)                                |
+| H test lifecycle (3-level)  | gap (define + heavy-test CRON 2× WIB) | gap (mirror; 2× WIB; has staging)                             | gap (mirror; 1×/day; no staging)            |
 
 Legend: _done_ = at target (confirm only) · _gap_ = closed by this repo's plan · _partial_ = some sub-items done.
 
@@ -212,11 +220,17 @@ converged target.
   [Hexagonal Architecture Design](#hexagonal-architecture-design-rhino-cli--reference-migration), and
   the [State-Diagram Validation Design](#mermaid-state-diagram-validation-design-workstream-g).
   [Repo-grounded]
-- **D (union commands)** — `ose-public` is missing `Java` and `Contracts`; current command set is
-  TestCoverage, RepoGovernance, Docs, Agents, Workflows, Specs (incl. folded coverage), Ddd, Git, Env. The port
-  - rationalization decision is [D8](#d8--union-command-surface-add-java--contracts). [Repo-grounded]
+- **D (union commands + regroup)** — `ose-public` is missing the JVM/contract commands (now `lang` +
+  `specs` codegen). The current flat command set (`TestCoverage`, `RepoGovernance`, `Docs`, `Agents`,
+  `Workflows`, `Specs`, `Ddd`, `Git`, `Env`) is **regrouped by scope** in Phase 9a → `md`,
+  `repo-governance` (reduced), `convention`, `docs` (reserved), `harness`, `workflows`, `specs`
+  (absorbs `spec-coverage`/`ddd`/`contracts`/`gherkin`), `lang`, `git`, `env`. The port +
+  rationalization + regroup decision is
+  [D8](#d8--union-command-surface-port-jvmcontract-commands--lang--specs). [Repo-grounded]
 - **E (target naming)** — `spec-coverage` is present in **every** app/lib `project.json`; the
-  source-side names are the `validate:*` forms. The full rename is the
+  source-side names are the `validate:*` forms. The full rename (incl. the Phase 9a re-domaining
+  `naming:agents`→`naming:harness`, `ddd:*`/`gherkin:*`→`specs:*`, governance→`md:*`/`convention:*`,
+  `java:*`→`lang:*`) is the
   [rename map](#domainwork-nx-target-rename-map) ([D9](#d9--domainwork-target-naming--spec-coveragespecscoverage)).
   [Repo-grounded — `apps/rhino-cli/project.json`]
 - **F (governance docs)** — `cross-language-lint-strictness.md` already **exists** in public
@@ -230,16 +244,18 @@ converged target.
 
 Intentional per-repo differences — **recorded, not converged**.
 
-| Deviation                             | ose-public                                  | ose-infra                                                         | ose-primer                                                             | Rationale                                                                                                                                                                                                                                                                           |
-| ------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runner target                         | `ubuntu-latest`                             | `[self-hosted, linux, ose-infra-runner]`                          | `ubuntu-latest`                                                        | infra needs warm Docker/Terraform/Ansible + on-prem reach                                                                                                                                                                                                                           |
-| Language matrix                       | TS + F#/.NET + Rust                         | TS + Go + Rust                                                    | full polyglot (TS, Go, JVM, .NET, Python, Rust, Elixir, Clojure, Dart) | detection follows each repo's real portfolio; primer is the polyglot template. **ose-public has NO Go** — its only CLIs (`ayokoding-cli`, `ose-cli`) are Rust; Go survives only under `archived/`. Strip Go from ose-public CI matrix, doctor scope, and AGENTS.md (workstream A/F) |
-| Container-image publishing            | yes (`publish-images.yml` → GHCR)           | yes (app/service images, self-hosted)                             | **NONE** — demo template; builds no container images                   | ose-primer is a demo/showcase template; it ships no deployable images, so it carries no image-publishing workflow                                                                                                                                                                   |
-| `npm` install flag                    | `npm ci`                                    | `npm ci --ignore-scripts`                                         | `npm ci`                                                               | self-hosted hardening on the persistent infra runner                                                                                                                                                                                                                                |
-| `setup-docker` composite              | absent                                      | present                                                           | absent                                                                 | hosted runners ship Docker; self-hosted must warm it                                                                                                                                                                                                                                |
-| Rust toolchain action                 | `actions-rust-lang/setup-rust-toolchain@v1` | `dtolnay/rust-toolchain@stable`                                   | `actions-rust-lang/setup-rust-toolchain@v1`                            | existing infra composite; kept to avoid churn                                                                                                                                                                                                                                       |
-| IaC lint surface                      | absent                                      | `iac-lint` job + pre-push terraform/ansible/yamllint conditionals | absent                                                                 | infra-only — terraform/ansible/yaml exist only in ose-infra                                                                                                                                                                                                                         |
-| App-deploy / scheduled-test workflows | 6 web-app deploy/test schedulers            | `test-coralpolyp`                                                 | 15 `test-crud-*` per-language                                          | each repo's app portfolio differs; only the governance scheduler cadence is converged                                                                                                                                                                                               |
+| Deviation                             | ose-public                                    | ose-infra                                                         | ose-primer                                                             | Rationale                                                                                                                                                                                                                                                                           |
+| ------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runner target                         | `ubuntu-latest`                               | `[self-hosted, linux, ose-infra-runner]`                          | `ubuntu-latest`                                                        | infra needs warm Docker/Terraform/Ansible + on-prem reach                                                                                                                                                                                                                           |
+| Language matrix                       | TS + F#/.NET + Rust                           | TS + Go + Rust                                                    | full polyglot (TS, Go, JVM, .NET, Python, Rust, Elixir, Clojure, Dart) | detection follows each repo's real portfolio; primer is the polyglot template. **ose-public has NO Go** — its only CLIs (`ayokoding-cli`, `ose-cli`) are Rust; Go survives only under `archived/`. Strip Go from ose-public CI matrix, doctor scope, and AGENTS.md (workstream A/F) |
+| Container-image publishing            | yes (`publish-images.yml` → GHCR)             | yes (app/service images, self-hosted)                             | **NONE** — demo template; builds no container images                   | ose-primer is a demo/showcase template; it ships no deployable images, so it carries no image-publishing workflow                                                                                                                                                                   |
+| `npm` install flag                    | `npm ci`                                      | `npm ci --ignore-scripts`                                         | `npm ci`                                                               | self-hosted hardening on the persistent infra runner                                                                                                                                                                                                                                |
+| `setup-docker` composite              | absent                                        | present                                                           | absent                                                                 | hosted runners ship Docker; self-hosted must warm it                                                                                                                                                                                                                                |
+| Rust toolchain action                 | `actions-rust-lang/setup-rust-toolchain@v1`   | `dtolnay/rust-toolchain@stable`                                   | `actions-rust-lang/setup-rust-toolchain@v1`                            | existing infra composite; kept to avoid churn                                                                                                                                                                                                                                       |
+| IaC lint surface                      | absent                                        | `iac-lint` job + pre-push terraform/ansible/yamllint conditionals | absent                                                                 | infra-only — terraform/ansible/yaml exist only in ose-infra                                                                                                                                                                                                                         |
+| App-deploy / scheduled-test workflows | 6 web-app deploy/test schedulers              | `test-coralpolyp`                                                 | 15 `test-crud-*` per-language                                          | each repo's app portfolio differs; only the governance scheduler cadence is converged                                                                                                                                                                                               |
+| Heavy-test CRON cadence               | **2× WIB**                                    | **2× WIB**                                                        | **1×/day**                                                             | primer is a demo template — lighter cadence for the integration/e2e CRON                                                                                                                                                                                                            |
+| Staging area (heavy-test)             | yes — builds staging container + staging test | yes — builds staging container + staging test                     | **NONE** — no staging container build, no staging test                 | primer has no staging area; runs development-level heavy tests only (consistent with no-container-images)                                                                                                                                                                           |
 
 Note: command-surface, architecture, and target names that were previously per-repo are now
 **converged** (workstreams C/D/E) and are therefore NOT in this matrix.
@@ -251,30 +267,30 @@ Note: command-surface, architecture, and target names that were previously per-r
 Canonical names (apply in all three repos; update every caller — hooks, workflows,
 `package.json` scripts, docs):
 
-| Current (varies by repo)                                             | Canonical `{domain}:{work}`              |
-| -------------------------------------------------------------------- | ---------------------------------------- |
-| `validate:env` / `env:validate`                                      | `env:validation`                         |
-| `validate:specs-tree`                                                | `specs:tree-validation`                  |
-| `validate:specs-links`                                               | `specs:links-validation`                 |
-| `validate:specs-counts`                                              | `specs:counts-validation`                |
-| `validate:specs-adoption`                                            | `specs:adoption-validation`              |
-| `validate:gherkin-keyword-cardinality`                               | `gherkin:keyword-cardinality-validation` |
-| `validate:links`                                                     | `links:validation`                       |
-| `validate:mermaid`                                                   | `mermaid:validation`                     |
-| `validate:heading-hierarchy`                                         | `headings:hierarchy-validation`          |
-| `validate:naming-agents`                                             | `naming:agents-validation`               |
-| `validate:naming-workflows`                                          | `naming:workflows-validation`            |
-| `validate:repo-governance-vendor-audit`                              | `governance:vendor-audit-validation`     |
-| `validate:cross-vendor-parity`                                       | `cross-vendor:parity-validation`         |
-| `validate:harness-bindings` (or `npm run validate:harness-bindings`) | `harness:bindings-validation`            |
-| `lint:shell` / inline shellcheck                                     | `shell:lint`                             |
-| `lint:dockerfiles` / inline hadolint                                 | `dockerfile:lint`                        |
-| `lint:actions` / inline actionlint                                   | `actions:lint`                           |
-| `lint:md` (markdownlint)                                             | `markdown:lint`                          |
-| `fmt:check`                                                          | `format:check`                           |
-| `check:msrv`                                                         | `msrv:check`                             |
-| `deny:check`                                                         | `deny:check` (already conformant)        |
-| `spec-coverage` (every project)                                      | `specs:coverage`                         |
+| Current (varies by repo)                                             | Canonical `{domain}:{work}`            |
+| -------------------------------------------------------------------- | -------------------------------------- |
+| `validate:env` / `env:validate`                                      | `env:validation`                       |
+| `validate:specs-tree`                                                | `specs:tree-validation`                |
+| `validate:specs-links`                                               | `specs:links-validation`               |
+| `validate:specs-counts`                                              | `specs:counts-validation`              |
+| `validate:specs-adoption`                                            | `specs:adoption-validation`            |
+| `validate:gherkin-keyword-cardinality`                               | `specs:gherkin-cardinality-validation` |
+| `validate:links`                                                     | `links:validation`                     |
+| `validate:mermaid`                                                   | `mermaid:validation`                   |
+| `validate:heading-hierarchy`                                         | `headings:hierarchy-validation`        |
+| `validate:naming-agents`                                             | `naming:harness-validation`            |
+| `validate:naming-workflows`                                          | `naming:workflows-validation`          |
+| `validate:repo-governance-vendor-audit`                              | `governance:vendor-audit-validation`   |
+| `validate:cross-vendor-parity`                                       | `cross-vendor:parity-validation`       |
+| `validate:harness-bindings` (or `npm run validate:harness-bindings`) | `harness:bindings-validation`          |
+| `lint:shell` / inline shellcheck                                     | `shell:lint`                           |
+| `lint:dockerfiles` / inline hadolint                                 | `dockerfile:lint`                      |
+| `lint:actions` / inline actionlint                                   | `actions:lint`                         |
+| `lint:md` (markdownlint)                                             | `markdown:lint`                        |
+| `fmt:check`                                                          | `format:check`                         |
+| `check:msrv`                                                         | `msrv:check`                           |
+| `deny:check`                                                         | `deny:check` (already conformant)      |
+| `spec-coverage` (every project)                                      | `specs:coverage`                       |
 
 Unchanged (platform Nx lifecycle): `build`, `lint`, `typecheck`, `test:unit`, `test:quick`,
 `test:integration`.
@@ -287,9 +303,12 @@ In `ose-public` today the source-side names are the `validate:*` forms (e.g. `va
 actionlint (CI jobs + pre-commit). `fmt:check`, `check:msrv`, `deny:check` are present and rename to
 `format:check`, `msrv:check`, `deny:check` (last unchanged). `spec-coverage` is present in **every**
 app/lib `project.json` and renames to `specs:coverage` repo-wide; every caller (the pre-push hook,
-`pr-quality-gate.yml`, any `package.json` script, and docs) updates with it. The new
-`gherkin-keyword-cardinality` target is **authored directly** under the canonical name
-`gherkin:keyword-cardinality-validation` in Phase 4 (no later rename needed).
+`pr-quality-gate.yml`, any `package.json` script, and docs) updates with it. The Phase 9a regroup
+also re-domains several targets: `validate:naming-agents`→`naming:harness-validation`,
+`ddd:*`→`specs:*`, governance audit targets→`md:*`/`convention:*`, `java:*`→`lang:*` (full list in the
+[§ (b) catalog](#b-nx-targets--validations--current--standardized-with-scope)). The new
+`gherkin-keyword-cardinality` target is **authored directly** under its final canonical name
+`specs:gherkin-cardinality-validation` (lives in `specs` — `.feature` files do), wired in Phase 4.
 
 ## Hexagonal Architecture Design (rhino-cli — reference migration)
 
@@ -318,7 +337,7 @@ app/lib `project.json` and renames to `specs:coverage` repo-wide; every caller (
   the coverage-ignore allowlist if a file moved. Migrate logic-rich features first; `git` is
   the pilot exemplar (already injects IO via a `Deps` struct).
 - **Phase-ordering constraint**: shared kernel (`mermaid`, `cliout`) migrates early (before
-  or with `docs`/`git`). IO-heavy features (envbackup, doctor, testcoverage, git) get their
+  or with `md`/`git`). IO-heavy features (envbackup, doctor, testcoverage, git) get their
   own phases; lighter features grouped.
 - **Mermaid slice (absorbs the folded validator unification — workstream G prerequisite)**:
   the monolithic `apps/rhino-cli/src/internal/mermaid.rs` is migrated **once**, straight into
@@ -328,7 +347,7 @@ app/lib `project.json` and renames to `specs:coverage` repo-wide; every caller (
   front-end parsers (`flowchart` parser; `state` parser added by workstream G);
   `application/mermaid/` holds the validate use case + an extractor **port**;
   `infrastructure/mermaid/` holds the markdown-extractor adapter + the text/JSON `reporter`
-  adapter; `commands/` keeps the `docs validate-mermaid` inbound adapter. Both parsers emit the
+  adapter; `commands/` keeps the `md validate mermaid` inbound adapter. Both parsers emit the
   same `ParsedDiagram`, so the width/label core is diagram-kind-agnostic — state support
   (workstream G) then falls out as a second front-end feeding the shared core. Behavior is
   byte-for-byte preserved (every existing flowchart test stays green) per the golden-master
@@ -418,15 +437,16 @@ The group key uses the PR number for `pull_request` events and the ref otherwise
 cancel the prior run while `push`-to-main and scheduled runs are keyed by ref and **not** cancelled
 (cancel-in-progress is `true` only for PR events).
 
-### D4 — `gherkin:keyword-cardinality-validation` Nx target
+### D4 — `specs:gherkin-cardinality-validation` Nx target
 
-The audit logic already ships as a rhino-cli command: `rhino-cli repo-governance
-gherkin-keyword-cardinality` [Repo-grounded —
+The audit logic already ships as a rhino-cli command (today `rhino-cli repo-governance
+gherkin-keyword-cardinality`) [Repo-grounded —
 `apps/rhino-cli/src/commands/governance_gherkin_keyword_cardinality_audit.rs`]. There is **no Nx
 target** wrapping it [Repo-grounded — no matching key in `apps/rhino-cli/project.json`]. This plan
-authors the target **directly under the canonical `{domain}:{work}` name**
-`gherkin:keyword-cardinality-validation` (so no later rename is needed), mirroring the existing
-`validate:*` target shape, then wires it into `validate-markdown.yml`.
+authors the target **directly under its final canonical name** `specs:gherkin-cardinality-validation`
+(so no later rename is needed). Per the Phase 9a regroup the command moves to the **`specs`** group
+(`specs validate gherkin-cardinality`) because `.feature` files live under `specs/`; the target is
+therefore `specs:*` and runs in the **`specs-gate`** job (not the markdown workflow).
 
 ### D5 — Governance alignment + CI/toolchain Parity Checklist
 
@@ -457,15 +477,18 @@ is therefore the longest-lead workstream and is sub-phased (golden-master captur
 per-feature groups). Over-engineering risk (maximal port depth) is accepted and recorded in the
 convention doc.
 
-### D8 — Union command surface (add `Java` + `Contracts`)
+### D8 — Union command surface (port JVM/contract commands → `lang` + `specs`)
 
-`ose-public` is missing the `Java` and `Contracts` subcommands present in the union superset
-[Repo-grounded — current command set has neither]. This plan **ports** them from the infra/primer
-reference implementations rather than authoring fresh, so the CLI surface is byte-identical across
-repos. The commands exist even though `ose-public` has no JVM project today (the Java subcommand's
-detection is a no-op here) — an identical CLI across repos is the goal. This workstream runs **after**
-the hexagonal migration (Phase 9 follows Phase 7) so the new commands land in the hexagonal layout,
-not the flat one.
+`ose-public` is missing the JVM/contract subcommands present in the union superset [Repo-grounded —
+current command set has neither]. This plan **ports** them from the infra/primer reference
+implementations rather than authoring fresh, so the CLI surface is byte-identical across repos. Per
+the Phase 9a regroup they land in their **final** homes — the JVM annotation check under **`lang`**
+(`lang java validate null-safety-annotations`) and the contract codegen helpers under **`specs`**
+(`specs clean java-imports`, `specs scaffold dart`), since the contract source lives in
+`specs/apps/*/containers/contracts/`. The commands exist even though `ose-public` has no JVM project
+or generated contracts today (dormant no-ops here) — an identical CLI across repos is the goal. This
+workstream runs **after** the hexagonal migration (Phase 9 follows Phase 7) so the new commands land
+in the hexagonal layout, not the flat one.
 
 **Rationalization gate (decision: port-the-full-union, but de-duplicate first).** "Identical
 surface" is a presence target, not a license to carry redundancy in triplicate. Before the surface
@@ -527,13 +550,13 @@ typecheck/lint/test/coverage and any project-scoped validator. A check runs **wh
 where correctness requires repo-wide scope**, and each such check is explicitly justified in the CI
 Parity Checklist. Default = affected; whole-repo = documented exception.
 
-| Check                                                                                                                                                             | Scope                                         | Why                                                      |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------- |
-| typecheck, lint, test:unit/quick/integration, `specs:coverage`                                                                                                    | **affected**                                  | project-scoped; affected graph is correct                |
-| `shell:lint`, `dockerfile:lint`, `actions:lint`, `headings:hierarchy-validation`, `mermaid:validation`                                                            | **affected where computable** (changed files) | per-file checks — scope to changed/affected files        |
-| `links:validation`                                                                                                                                                | **whole-repo**                                | links cross files; a change elsewhere can break one here |
-| `specs:tree-validation`, `specs:counts-validation`, `naming:agents-validation`, `naming:workflows-validation`                                                     | **whole-repo**                                | repo-wide structural invariants                          |
-| `governance:vendor-audit-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation`, `gherkin:keyword-cardinality-validation`, `env:validation` | **whole-repo**                                | cross-cutting governance/parity invariants               |
+| Check                                                                                                                                                           | Scope                                         | Why                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------- |
+| typecheck, lint, test:unit/quick/integration, `specs:coverage`                                                                                                  | **affected**                                  | project-scoped; affected graph is correct                |
+| `shell:lint`, `dockerfile:lint`, `actions:lint`, `headings:hierarchy-validation`, `mermaid:validation`                                                          | **affected where computable** (changed files) | per-file checks — scope to changed/affected files        |
+| `links:validation`                                                                                                                                              | **whole-repo**                                | links cross files; a change elsewhere can break one here |
+| `specs:tree-validation`, `specs:counts-validation`, `naming:harness-validation`, `naming:workflows-validation`                                                  | **whole-repo**                                | repo-wide structural invariants                          |
+| `governance:vendor-audit-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation`, `specs:gherkin-cardinality-validation`, `env:validation` | **whole-repo**                                | cross-cutting governance/parity invariants               |
 
 The plan must **move any check currently run whole-repo that is safely affected-computable onto
 `nx affected`**, and keep the whole-repo set minimal and justified. In `ose-public` this means the
@@ -598,22 +621,24 @@ standardized post-convergence forms; the authoritative per-dimension specs are �
 and [§ D13](#d13--affected-first-pr-gate-whole-repo-only-by-exception) (affected-first scope) — this
 table is the consolidated "what runs when" view, not a re-specification.
 
-| Stage                         | Trigger            | Checks (command) · scope                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Blocks?                   |
-| ----------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| **before-commit**             | `commit-msg` hook  | commitlint `--edit` — Conventional Commits format · message-only                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | local commit              |
-| **pre-commit**                | Husky `pre-commit` | `git-identity-check.sh` · n/a · `check-no-env-staged.sh` · staged · `shell:lint`/`dockerfile:lint`/`actions:lint` (graceful skip if tool absent) · **staged** · `rhino-cli git pre-commit` → prettier format + agent-def validation + binding sync + `markdown:lint` + `mermaid:validation` + `headings:hierarchy-validation` · **staged**, and `links:validation` · **full**                                                                                                                                                                                                                                                                                                | local commit              |
-| **pre-push**                  | Husky `pre-push`   | `nx affected -t typecheck lint test:quick specs:coverage specs:tree-validation specs:links-validation specs:counts-validation specs:adoption-validation` · **affected** · `markdown:lint` · **full** · `env:validation` · **full** · changed-path conditionals `naming:agents-validation`, `naming:workflows-validation`, `governance:vendor-audit-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation` · **full**                                                                                                                                                                                                                                   | local push                |
-| **PR quality gate**           | `pull_request`     | Prettier format · full · `shell:lint`/`dockerfile:lint`/`actions:lint` · full · TS `nx affected -t typecheck lint test:quick specs:coverage` · **affected** · .NET/Rust `nx affected -t typecheck lint test:quick specs:coverage` (+ Rust `format:check`/`deny:check`/`msrv:check`) · **affected** (post-convergence per D1; Go removed in ose-public) · `markdown:lint` · full · `naming:agents-validation`+`naming:workflows-validation` · full · specs-gate `specs:adoption-validation`/`specs:tree-validation`/`specs:counts-validation`/`specs:links-validation` · full · `gherkin:keyword-cardinality-validation` · full · aggregate **`Quality gate`** required check | **YES — gates the merge** |
-| **push-to-main** (post-merge) | `push: main`       | the **full PR quality gate re-runs** (D10 converged target — affected computed vs the prior main SHA) · affected + full · plus `markdown:lint`, `env:validation`, and image publish (public/infra; **primer: none**) · full                                                                                                                                                                                                                                                                                                                                                                                                                                                  | post-merge signal         |
-| **main CRON(s)**              | `schedule`         | governance/scheduled validators twice-daily WIB (`0 23 * * *`, `0 11 * * *`) · **full** · app deploy/test schedulers at per-portfolio cadence · **full**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | deploy / alert            |
+| Stage                         | Trigger            | App checks (command) · scope                                                                                                                                                                                | Repo-governance checks · scope                                                                                                                                                                                                                                                                                   | Blocks?                   |
+| ----------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| **before-commit**             | `commit-msg` hook  | —                                                                                                                                                                                                           | commitlint `--edit` — Conventional Commits · message-only                                                                                                                                                                                                                                                        | local commit              |
+| **pre-commit**                | Husky `pre-commit` | **`test:quick` = format + lint + typecheck + `test:unit`** · `nx affected` (changed apps)                                                                                                                   | `git-identity-check.sh` · `check-no-env-staged.sh` · `shell:lint`/`dockerfile:lint`/`actions:lint` (staged) · `rhino-cli git pre-commit` → prettier + binding sync + `markdown:lint` + `mermaid:validation` + `headings:hierarchy-validation` (staged) + `links:validation` (full)                               | local commit              |
+| **pre-push**                  | Husky `pre-push`   | **`specs:coverage`** (every `.feature` implemented — unit+integration+e2e) + **`test-coverage`** (line-coverage threshold) · `nx affected` (changed apps)                                                   | `specs:tree/links/counts/adoption-validation` · affected · `markdown:lint` · full · `env:validation` · full · changed-path conditionals `naming:harness-validation`, `naming:workflows-validation`, `governance:vendor-audit-validation`, `cross-vendor:parity-validation`, `harness:bindings-validation` · full | local push                |
+| **PR quality gate**           | `pull_request`     | **everything pre-commit + pre-push run**: per-language `nx affected -t test:quick specs:coverage test-coverage` (+ Rust `format:check`/`deny:check`/`msrv:check`) · **affected** (Go removed in ose-public) | Prettier · full · `shell:lint`/`dockerfile:lint`/`actions:lint` · full · `markdown:lint` · full · `naming:harness-validation`+`naming:workflows-validation` · full · specs-gate `specs:adoption/tree/counts/links/gherkin-cardinality-validation` · full · aggregate **`Quality gate`** required check           | **YES — gates the merge** |
+| **push-to-main** (post-merge) | `push: main`       | the **full PR quality gate re-runs** (D10; affected vs prior main SHA) · affected                                                                                                                           | full PR-gate governance re-runs · full · plus image publish (public/infra; **primer: none**)                                                                                                                                                                                                                     | post-merge signal         |
+| **main CRON(s)**              | `schedule`         | **HEAVY TESTS — `test:integration` + `test:e2e` per app-group** (real deps; never pre-merge) · **2× WIB public+infra, 1×/day primer**; dev/staging heavy-test workflows                                     | governance/scheduled validators 2× WIB (`0 23 * * *`, `0 11 * * *`) · full                                                                                                                                                                                                                                       | deploy / alert            |
 
-The local stages (before-commit → pre-commit → pre-push) are Husky-driven, fast, and mostly
-**affected/staged**; only cross-cutting governance/markdown/env checks go **full**. The PR quality
-gate is the merge-blocking authority (its aggregate `Quality gate` job is the branch-protection
-required check); **push-to-main re-runs that same gate** post-merge to catch main-only drift (the D10
-convergence item — today the PR gate is `pull_request`-only in all three repos). The `pre-push` hook
-routes its conditional validators by changed path — only the validators whose inputs changed actually
-fire (the affected gate always runs; the governance conditionals are gated):
+The **App** column is the per-app(-group) test pipeline (mandated here), `nx affected`-scoped to
+changed apps; the **Repo-governance** column is the cross-cutting repo-level gate. **`test:quick` is
+redefined** as the pre-commit bundle **format + lint + typecheck + `test:unit`** (mocked) — fastest
+feedback at commit; **pre-push** carries the heavier coverage gates (`specs:coverage` +
+`test-coverage`). **HARD RULE: `test:integration` + `test:e2e` run ONLY from CRON** (heavy; see
+[Test Lifecycle Architecture](#test-lifecycle-architecture-spec-shared-three-level-testing)) — never
+pre-commit/pre-push/PR/push-to-main. **PR = pre-commit ∪ pre-push; push-to-main = PR gate** (re-run
+post-merge per D10). The `pre-push` hook routes its conditional governance validators by changed path
+— only the validators whose inputs changed actually fire (the affected gate always runs):
 
 ```mermaid
 %% pre-push routing: affected gate always; path-gated validators fan out
@@ -692,12 +717,14 @@ post-convergence** — presence gaps are closed by workstreams A/D/E.
 ### (a) rhino-cli subcommands — descriptive reference (union surface)
 
 The union is **11 top-level groups** plus the standalone `doctor`: `test-coverage`,
-`repo-governance`, `docs`, `agents`, `workflows`, `specs`, `ddd`, `git`, `env`, `java`, `contracts`
-(`spec-coverage` is folded into `specs` — see §(a-bis)). Current presence gaps: `ose-public` lacks
-`java`/`contracts`; `ose-primer` lacks `specs`/`ddd`; `ose-infra` carries all. All three converge to
-the identical union. Each command below says **what it does, what it inspects, and what failure it
-catches** — written to be read cold, so this section also serves as the glossary for every command
-named in the lifecycle table above. Names shown are current; the verb-first renames are in §(a-ter).
+`repo-governance`, `convention`, `md`, `docs` (reserved), `harness`, `workflows`, `specs`, `lang`,
+`git`, `env`. Each group = the **scope** it operates on (Phase 9a regroup). Current presence gaps:
+`ose-public` lacks `lang` + the `specs` contract-codegen commands (no JVM/generated contracts yet);
+`ose-primer` lacks the `specs` structural set; `ose-infra` carries all. All three converge to the
+identical union. Commands below are shown in their **uniform verb-first spelling** (`<group> [<lang>]
+<verb> [<object>]`); each says **what it does, what it inspects, and what failure it catches** —
+written to be read cold, so this doubles as the glossary for every command in the lifecycle table.
+The full current→new before/after is in §(a-ter).
 
 **`test-coverage`** — code line-coverage utilities (works on LCOV reports produced by the test run).
 
@@ -712,104 +739,118 @@ named in the lifecycle table above. Names shown are current; the verb-first rena
   shards or as multiple suites, each emitting its own coverage file, that must be unioned before the
   threshold check.
 
-**`repo-governance`** — deterministic (no-AI) audits that keep the docs/governance layer consistent.
-Each one is a pure rule check that either passes or lists offending files.
+**`md`** — general markdown mechanics applied to **any** `.md` regardless of location (multi-root
+scanners; was the `docs` group + the two broad governance markdown audits). `md audit` runs them all.
 
-- **`audit`** — The aggregate: runs every deterministic governance audit below in a single pass and
-  emits one combined JSON envelope. Tooling that wants "all governance signals at once" calls this
-  instead of the nine individual audits.
-- **`agents-md-size`** — Measures `AGENTS.md`'s byte size against the 30/35/40 KB warn/error tiers.
-  `AGENTS.md` is the instruction file every AI agent loads first; if it grows past the budget, agents
-  start truncating it, so this audit fails the build before that happens.
-- **`emoji-audit`** — Scans file types where emoji are forbidden (source code, config) for emoji
-  codepoints. Catches an emoji accidentally pasted into a `.json`/`.ts`/`.yaml` file, which the emoji
-  convention bans outside docs/markdown.
-- **`frontmatter-audit`** — Flags **manually written date metadata** in markdown frontmatter (e.g. a
-  hand-typed `date:` or `lastUpdated:`). Dates must come from git history, not stale hand-maintained
-  fields, so this catches the forbidden manual-date pattern.
-- **`gherkin-keyword-cardinality`** — Parses every `.feature` file and flags scenarios that repeat a
-  **primary** Gherkin keyword (a second `Given`/`When`/`Then` instead of `And`/`But`). Enforces the
-  one-primary-keyword-per-clause rule that keeps BDD scenarios readable.
-- **`layer-coherence`** — Cross-checks the governance docs' six-layer hierarchy for consistent layer
-  numbering and naming, so two documents can't disagree about which layer a concept lives in.
-- **`license-audit`** — Verifies every per-directory `LICENSE` file carries the text the licensing
-  convention requires for that location, catching a missing or wrong-license file before it ships.
-- **`readme-index-audit`** — For each directory that has a README index, checks the index links match
-  the actual sibling markdown files — catching an index that forgot a new doc or still points at a
-  deleted one.
-- **`traceability-audit`** — Checks that governance documents contain the required traceability
+- **`validate naming`** — Checks every markdown filename is lowercase-kebab-case (e.g.
+  `add-new-app.md`, not `AddNewApp.md`), with `README.md` and metadata files exempt.
+- **`validate frontmatter`** — Validates each doc's YAML frontmatter against the schema for its area
+  (which keys are required, what types), catching a missing or malformed frontmatter field.
+- **`validate frontmatter-dates`** (moved from `repo-governance frontmatter-audit`) — Flags **manually
+  written date metadata** (a hand-typed `date:`/`lastUpdated:`). Dates must come from git history, not
+  stale hand-maintained fields. Distinct from the schema check `validate frontmatter`.
+- **`validate heading-hierarchy`** — On the prose allowlist, enforces exactly one `#` H1 per file and
+  no skipped levels (no `##` → `####`). Keeps documents navigable.
+- **`validate links`** — Resolves every relative markdown link against the filesystem and every
+  `#fragment` against the target file's headings, catching a renamed/moved file that orphaned a link.
+- **`validate mermaid`** — Enforces Mermaid render discipline so diagrams stay legible on mobile: ≤4
+  nodes on any one rank, ≤30 chars per `<br/>`-separated label segment, one diagram per fenced block.
+  After workstream G it covers state diagrams too, not just flowcharts.
+- **`validate readme-index`** (moved from `repo-governance readme-index-audit`) — For each directory
+  with a README index, checks the index links match the actual sibling markdown files — catching an
+  index that forgot a new doc or still points at a deleted one.
+
+**`repo-governance`** — deterministic (no-AI) audits **exclusive to the `repo-governance/` tree**
+(after the regroup, the broad/code/config audits moved out to `md`/`convention`). `repo-governance
+audit` runs all three.
+
+- **`validate vendor`** — Scans `repo-governance/` markdown for forbidden vendor-specific terms
+  (product names, tool brands). The governance layer must be vendor-neutral; vendor specifics belong
+  only in platform-binding sections, and this catches leaks.
+- **`validate layer-coherence`** — Cross-checks the governance docs' six-layer hierarchy for
+  consistent layer numbering and naming, so two documents can't disagree about which layer a concept
+  lives in.
+- **`validate traceability`** — Checks that governance documents contain the required traceability
   sections (the back-links from a rule to the principle/convention it implements), so no governance
   doc floats without provenance.
-- **`vendor-audit`** — Scans governance markdown for forbidden vendor-specific terms (product names,
-  tool brands). The governance layer must be vendor-neutral; vendor specifics belong only in
-  platform-binding sections, and this catches leaks.
 
-**`docs`** — validators for ordinary documentation markdown (the `docs/`, governance, and plan trees).
+**`convention`** — repo-wide rule audits that target **code/config or single files**, not a doc tree
+(moved out of `repo-governance`; named `convention` to avoid confusion with programming linters).
+`convention audit` runs all three.
 
-- **`validate-naming`** — Checks every markdown filename is lowercase-kebab-case (e.g.
-  `add-new-app.md`, not `AddNewApp.md`), with `README.md` and metadata files exempt. Catches a
-  mis-named file at commit time.
-- **`validate-frontmatter`** — Validates each doc's YAML frontmatter against the schema for its area
-  (which keys are required, what types their values must be), catching a doc with a missing or
-  malformed frontmatter field.
-- **`validate-heading-hierarchy`** — On the prose allowlist, enforces exactly one `#` H1 per file and
-  no skipped levels (no `##` jumping straight to `####`). Keeps documents navigable and their
-  table-of-contents correct.
-- **`validate-links`** — Resolves every relative markdown link against the filesystem and every
-  `#fragment` against the target file's headings, so a renamed or moved file that orphaned a link is
-  caught before it becomes a 404.
-- **`validate-mermaid`** — Enforces Mermaid render discipline so diagrams stay legible on mobile: at
-  most 4 nodes on any one rank, at most 30 characters per `<br/>`-separated label segment, one diagram
-  per fenced block. After workstream G it covers state diagrams too, not just flowcharts.
+- **`validate emoji`** — Scans file types where emoji are forbidden (`.json`/`.ts`/`.rs`/… source +
+  config) for emoji codepoints. Catches an emoji accidentally pasted into code/config, which the emoji
+  convention bans outside docs/markdown.
+- **`validate license`** — Verifies every required per-directory `LICENSE` (under `apps/`+`libs/`)
+  is present and carries the right text, catching a missing or wrong-license file before it ships.
+- **`validate agents-md-size`** — Measures `AGENTS.md`'s byte size against the 30/35/40 KB warn/error
+  tiers. `AGENTS.md` is the instruction file every AI agent loads first; if it grows past the budget
+  agents start truncating it, so this fails the build before that happens.
 
-**`agents`** — validators and generators for the AI-agent definition files and their cross-harness
-mirrors (`.claude/` is the source; `.opencode/` and `.amazonq/` are generated).
+**`docs`** — **reserved**. Operations exclusive to the `docs/` tree (Diátaxis structure) would live
+here; no such command exists today (all current markdown validators are general — see `md`).
 
-- **`validate-naming`** — Checks agent filenames carry the right suffix and that each `.claude/`
+**`harness`** — validators and generators for the AI-harness config surface (`.claude/` is the source;
+`.opencode/` and `.amazonq/` are generated). Renamed from `agents` — it manages cross-harness
+bindings, not just agent defs. `harness audit` runs the validators.
+
+- **`validate naming`** — Checks agent filenames carry the right suffix and that each `.claude/`
   agent has its matching `.opencode/` mirror — catching a half-added or mis-named agent.
-- **`detect-duplication`** — Finds verbatim copy-pasted passages across agent and skill files, so
-  shared text gets consolidated into one source instead of drifting in several copies.
-- **`validate-claude`** — Validates the structure/frontmatter of Claude Code agent and skill files
+- **`validate duplication`** (was `detect-duplication`) — Finds verbatim copy-pasted passages across
+  agent and skill files, so shared text gets consolidated into one source instead of drifting.
+- **`validate claude`** — Validates the structure/frontmatter of Claude Code agent and skill files
   under `.claude/` (the format the primary harness requires).
-- **`validate-sync`** — Confirms the generated `.opencode/` mirror is byte-for-byte what `.claude/`
-  would produce — catching a hand-edit to the generated mirror or a forgotten `generate:bindings`
-  run.
-- **`sync`** — The generator (not a validator) that regenerates the `.opencode/` agent mirror from
-  `.claude/`.
-- **`emit-bindings`** — The generator that emits the Amazon Q Developer binding bridge under
-  `.amazonq/` from `.claude/`, idempotently (re-running produces no diff).
-- **`validate-bindings`** — Validates the emitted `.amazonq/` bridge files and that every agent in the
-  catalog is represented in the bridge — catching an agent that exists in `.claude/` but never made it
-  into the Amazon Q binding.
+- **`validate sync`** — Confirms the generated `.opencode/` mirror is byte-for-byte what `.claude/`
+  would produce — catching a hand-edit to the generated mirror or a forgotten regeneration.
+- **`validate bindings`** — Validates the emitted `.amazonq/` bridge files and that every agent in the
+  catalog is represented — catching an agent in `.claude/` that never made it into the Amazon Q binding.
+- **`sync opencode`** — The generator (not a validator) that regenerates the `.opencode/` agent mirror
+  from `.claude/`.
+- **`emit amazonq`** — The generator that emits the Amazon Q Developer binding bridge under `.amazonq/`
+  from `.claude/`, idempotently (re-running produces no diff).
 
 **`workflows`** — validator for the workflow-definition files under `repo-governance/workflows/`.
 
-- **`validate-naming`** — Checks each workflow file's name suffix and that the filename matches the
+- **`validate naming`** — Checks each workflow file's name suffix and that the filename matches the
   `name:` field declared in its frontmatter, catching a renamed file whose frontmatter wasn't updated.
 
-**`specs`** — validators for the `specs/` BDD/DDD spec tree (now including the folded coverage check).
+**`specs`** — operations on the `specs/` tree (absorbs the former `spec-coverage`, `ddd`, `contracts`
+groups + `gherkin-keyword-cardinality`). `specs audit` runs the validators.
 
-- **`validate-adoption`** — Confirms a given app has actually adopted BDD + DDD: the expected spec
-  scaffolding (feature files, context registry) exists for that app, catching an app added to the repo
-  without its spec structure.
-- **`validate-counts`** — Checks every required spec subfolder holds at least one spec file, so a
+- **`validate adoption`** — Confirms a given app has actually adopted BDD + DDD: the expected spec
+  scaffolding (feature files, context registry) exists, catching an app added without its spec tree.
+- **`validate counts`** — Checks every required spec subfolder holds at least one spec file, so a
   mandatory folder can't sit empty and silently skip its scenarios.
-- **`validate-links`** — Resolves markdown links **inside spec files** (a `specs/`-scoped link check),
+- **`validate links`** — Resolves markdown links **inside spec files** (a `specs/`-scoped link check),
   catching a broken reference between specs.
-- **`validate-tree`** — Validates the canonical C4-aware five-folder spec-tree shape (context →
+- **`validate tree`** — Validates the canonical C4-aware five-folder spec-tree shape (context →
   containers → components …), catching a spec folder placed at the wrong level.
-- **`coverage`** (folded from the former top-level `spec-coverage validate`) — Confirms **every BDD
-  `.feature` scenario has a matching test implementation**, so no acceptance criterion is written but
-  left unexecuted. It runs **per-project** as the `specs:coverage` target — the one `specs:*` target
-  that is per-project rather than rhino-cli-scoped (because each app owns its own features + tests).
+- **`validate coverage`** (folded from `spec-coverage validate`) — Confirms **every scenario in every
+  `.feature` is implemented in all three test levels — `test:unit`, `test:integration`, AND
+  `test:e2e`** — for the owning app (per the [Test Lifecycle Architecture](#test-lifecycle-architecture-spec-shared-three-level-testing)).
+  A scenario missing from any level fails the gate, so no acceptance criterion is left unexecuted at
+  any fidelity. Runs **per-project** as `specs:coverage` — the one `specs:*` target that is
+  per-project rather than rhino-cli-scoped (each app owns its own features + tests); it is the
+  **pre-push** spec-coverage check.
+- **`validate bc`** (folded from `ddd bc`) — Validates bounded-context **structural parity**: the
+  contexts declared in `specs/apps/<app>/ddd/bounded-contexts.yaml` match the contexts implemented,
+  catching a context added in code but never registered (or vice-versa).
+- **`validate ul`** (folded from `ddd ul`) — Validates **ubiquitous-language** glossary parity: the
+  glossary terms in the registry stay in sync with their definitions, catching glossary drift.
+- **`validate gherkin-cardinality`** (moved from `repo-governance gherkin-keyword-cardinality`) —
+  Parses every `.feature` file and flags scenarios that repeat a **primary** Gherkin keyword (a second
+  `Given`/`When`/`Then` instead of `And`/`But`). Lives in `specs` because `.feature` files do.
+- **`clean java-imports`** (folded from `contracts java-clean-imports`; **dormant in ose-public**) —
+  Strips unused and same-package imports from generated Java contract files, cleaning codegen output.
+- **`scaffold dart`** (folded from `contracts dart-scaffold`; **dormant in ose-public**) — Generates
+  the Dart package scaffolding (pubspec, lib layout) around generated contract types.
 
-**`ddd`** — validators that keep domain-driven-design artifacts in sync with their registry.
+**`lang`** — language-specific **source** correctness checks, nested by language (was the `java`
+group; **dormant in ose-public** — no JVM source here yet).
 
-- **`bc`** — Validates bounded-context **structural parity**: the contexts declared in the DDD
-  registry match the contexts actually implemented, catching a context that was added in code but
-  never registered (or vice-versa).
-- **`ul`** — Validates **ubiquitous-language** glossary parity: the glossary terms in the registry
-  stay in sync with their definitions, catching glossary drift.
+- **`java validate null-safety-annotations`** — Checks Java packages carry the required null-safety
+  annotations on generated/contract code. Active in repos with JVM apps; a no-op in ose-public until
+  one lands. The `java` sub-namespace lets the group scale (`lang kotlin validate …`, etc.).
 
 **`git`** — git-hook helper (the Rust engine the Husky hooks call).
 
@@ -832,18 +873,6 @@ agents themselves may not — these are the sanctioned tooling path).
   `env:validation` gate; it catches a new `process.env.FOO` added in code without a matching contract
   entry (or a stale contract entry for a removed var).
 
-**`java`** (union surface; **dormant in ose-public** — no JVM source here yet).
-
-- **`validate-annotations`** — Checks Java packages carry the required null-safety annotations on
-  generated/contract code. Active in repos with JVM apps; a no-op in ose-public until one lands.
-
-**`contracts`** (union surface; **dormant in ose-public** — no generated contracts here yet).
-
-- **`java-clean-imports`** — Strips unused and same-package imports from generated Java contract files,
-  cleaning up codegen output.
-- **`dart-scaffold`** — Generates the Dart package scaffolding (pubspec, lib layout) around generated
-  contract types so they can be consumed as a Dart package.
-
 **`doctor`** (standalone) — Probes the local machine for every required toolchain (Node/Volta, Rust,
 the language toolchains, and the lint tools shellcheck/hadolint/actionlint) and reports anything
 missing or at the wrong version; `npm run doctor -- --fix` installs or repairs them. This is what
@@ -858,34 +887,40 @@ subsection marks, for every subcommand, a **disposition**: `keep` (distinct, ear
 or caller depends on it; evaluate for removal), or `dormant-in-public` (ported for CLI identity but
 validates nothing in this repo until a matching app lands). These are **candidates surfaced for the
 workstream D decision**, not auto-applied — the standing decision is full-union port (see
-[§ D8](#d8--union-command-surface-add-java--contracts)); rationalization runs as an
+[§ D8](#d8--union-command-surface-port-jvmcontract-commands--lang--specs)); rationalization runs as an
 explicit keep/merge/delete pass _within_ Phase 9 before the surface is frozen.
 
-| Subcommand                                                                                                                                         | Disposition              | Overlaps / rationale                                                                                                                                                                                                                                                                       |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `docs validate-links`                                                                                                                              | keep (engine owner)      | the general markdown-link resolver                                                                                                                                                                                                                                                         |
-| `specs validate-links`                                                                                                                             | merge-candidate          | a path-scoped subset of `docs validate-links` (specs/ only); same link-resolution logic. Fold into one link engine invoked with a path scope, or have it call the `docs` core                                                                                                              |
-| `links:validation` (repo-wide Nx target)                                                                                                           | keep                     | the whole-repo + `#fragment` anchor pass; wraps the same engine — keep as the target, drop the duplicate logic                                                                                                                                                                             |
-| `docs validate-naming`                                                                                                                             | keep (engine owner)      | the kebab-case filename core                                                                                                                                                                                                                                                               |
-| `agents validate-naming`                                                                                                                           | merge-candidate          | shares the filename-convention pass with `docs validate-naming`; adds agent-suffix + `.claude`↔`.opencode` mirror parity. Keep the agent-specific rule, share the filename core                                                                                                            |
-| `workflows validate-naming`                                                                                                                        | merge-candidate          | same filename-convention pass + a frontmatter-name-consistency rule. Share the core; keep the workflow rule                                                                                                                                                                                |
-| `agents sync`                                                                                                                                      | merge-candidate          | regenerates the `.opencode/` binding from `.claude/`                                                                                                                                                                                                                                       |
-| `agents emit-bindings`                                                                                                                             | merge-candidate          | regenerates the `.amazonq/` bridge from `.claude/`. `sync` + `emit-bindings` are the same "regenerate all downstream harness bindings" operation split by target; `npm run generate:bindings` already orchestrates both — collapse into one `agents generate-bindings` (per-harness flags) |
-| `agents validate-sync`                                                                                                                             | merge-candidate          | validates `.claude`↔`.opencode` parity                                                                                                                                                                                                                                                     |
-| `agents validate-bindings`                                                                                                                         | merge-candidate          | validates the `.amazonq/` bridge + catalog coverage                                                                                                                                                                                                                                        |
-| `agents validate-claude`                                                                                                                           | merge-candidate          | validates Claude format. These three + the `cross-vendor:parity-validation` and `harness:bindings-validation` Nx targets are five overlapping binding-parity checkers — consolidate into one binding-parity validator family with per-harness arms                                         |
-| `repo-governance audit`                                                                                                                            | keep (aggregate)         | runs ALL deterministic governance audits and emits one JSON envelope — by construction a superset of the nine individual audit subcommands                                                                                                                                                 |
-| `repo-governance {emoji,frontmatter,license,layer-coherence,traceability,readme-index,agents-md-size,vendor,gherkin-keyword-cardinality}-audit`    | keep (overlap-by-design) | each is subsumed by `audit` but retained for **granular** per-rule Nx targets / CI jobs. Justified overlap — but the aggregate and the individuals must share one implementation, not two copies of each rule                                                                              |
-| `docs validate-frontmatter`                                                                                                                        | keep                     | frontmatter **schema** validation (area-specific)                                                                                                                                                                                                                                          |
-| `repo-governance frontmatter-audit`                                                                                                                | evaluate                 | forbidden manual-date-metadata scan; partial overlap with `docs validate-frontmatter` (both parse frontmatter). Share the frontmatter parse, keep the two distinct rules                                                                                                                   |
-| `env validate`                                                                                                                                     | keep                     | the code↔config drift gate (runs in hooks/CI)                                                                                                                                                                                                                                              |
-| `env init` / `env backup` / `env restore`                                                                                                          | keep                     | manage `.env` secret files (create from `.env.example`, back up, restore). Not gate validators, but they earn their place as the sanctioned `.env` lifecycle utilities — **KEPT** (disposition flipped from delete-candidate)                                                              |
-| `test-coverage validate`                                                                                                                           | keep                     | the line-coverage threshold gate                                                                                                                                                                                                                                                           |
-| `test-coverage diff` / `test-coverage merge`                                                                                                       | evaluate                 | changed-line diff coverage + LCOV merge; confirm a live caller exists (Nx may handle coverage merge natively) — evaluate before freezing                                                                                                                                                   |
-| `java validate-annotations`                                                                                                                        | dormant-in-public        | ose-public has no JVM source; ported for identical CLI surface but validates nothing here until a JVM app lands                                                                                                                                                                            |
-| `contracts java-clean-imports` / `contracts dart-scaffold`                                                                                         | dormant-in-public        | ose-public has no generated-Java/Dart contracts; ported for identity, dormant until a contracts pipeline lands                                                                                                                                                                             |
-| `spec-coverage validate`                                                                                                                           | fold into `specs`        | validates BDD specs under `specs/`, so it belongs in the `specs` group → `specs validate coverage` (target `specs:coverage`); `test-coverage` stays separate as the code-line concern                                                                                                      |
-| all other groups (`ddd bc`/`ul`, `specs validate-{adoption,counts,tree}`, `git pre-commit`, `doctor`, `docs validate-{heading-hierarchy,mermaid}`) | keep                     | distinct purpose, no sibling overlap                                                                                                                                                                                                                                                       |
+> **Subcommands below use AS-IS (pre-regroup) names.** The Phase 9a **scope-based regroup** (§ (a-ter),
+> group table in § D) is what _realizes_ several dispositions here: the `spec-coverage`/`ddd`/
+> `contracts`/`gherkin` folds → `specs`; `docs`-group validators + the broad governance markdown
+> audits → `md`; `emoji`/`license`/`agents-md-size` → `convention`; `agents` → `harness`; `java` →
+> `lang`. Read this table as the _overlap analysis that motivated_ the regroup.
+
+| Subcommand                                                                                                                                         | Disposition              | Overlaps / rationale                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs validate-links`                                                                                                                              | keep (engine owner)      | the general markdown-link resolver                                                                                                                                                                                                                                                          |
+| `specs validate-links`                                                                                                                             | merge-candidate          | a path-scoped subset of `docs validate-links` (specs/ only); same link-resolution logic. Fold into one link engine invoked with a path scope, or have it call the `docs` core                                                                                                               |
+| `links:validation` (repo-wide Nx target)                                                                                                           | keep                     | the whole-repo + `#fragment` anchor pass; wraps the same engine — keep as the target, drop the duplicate logic                                                                                                                                                                              |
+| `docs validate-naming`                                                                                                                             | keep (engine owner)      | the kebab-case filename core                                                                                                                                                                                                                                                                |
+| `agents validate-naming`                                                                                                                           | merge-candidate          | shares the filename-convention pass with `docs validate-naming`; adds agent-suffix + `.claude`↔`.opencode` mirror parity. Keep the agent-specific rule, share the filename core                                                                                                             |
+| `workflows validate-naming`                                                                                                                        | merge-candidate          | same filename-convention pass + a frontmatter-name-consistency rule. Share the core; keep the workflow rule                                                                                                                                                                                 |
+| `agents sync`                                                                                                                                      | merge-candidate          | regenerates the `.opencode/` binding from `.claude/`                                                                                                                                                                                                                                        |
+| `agents emit-bindings`                                                                                                                             | merge-candidate          | regenerates the `.amazonq/` bridge from `.claude/`. `sync` + `emit-bindings` are the same "regenerate all downstream harness bindings" operation split by target; `npm run generate:bindings` already orchestrates both — collapse into one `harness generate bindings` (per-harness flags) |
+| `agents validate-sync`                                                                                                                             | merge-candidate          | validates `.claude`↔`.opencode` parity                                                                                                                                                                                                                                                      |
+| `agents validate-bindings`                                                                                                                         | merge-candidate          | validates the `.amazonq/` bridge + catalog coverage                                                                                                                                                                                                                                         |
+| `agents validate-claude`                                                                                                                           | merge-candidate          | validates Claude format. These three + the `cross-vendor:parity-validation` and `harness:bindings-validation` Nx targets are five overlapping binding-parity checkers — consolidate into one binding-parity validator family with per-harness arms                                          |
+| `repo-governance audit`                                                                                                                            | keep (aggregate)         | runs all governance audits and emits one JSON envelope. **Post-regroup it scopes to the `repo-governance`-group validators only** (vendor, layer-coherence, traceability); the moved audits get their own group aggregates (`md audit`, `convention audit`, `specs audit`)                  |
+| `repo-governance {emoji,frontmatter,license,layer-coherence,traceability,readme-index,agents-md-size,vendor,gherkin-keyword-cardinality}-audit`    | keep (overlap-by-design) | each is subsumed by `audit` but retained for **granular** per-rule Nx targets / CI jobs. Justified overlap — but the aggregate and the individuals must share one implementation, not two copies of each rule                                                                               |
+| `docs validate-frontmatter`                                                                                                                        | keep                     | frontmatter **schema** validation (area-specific)                                                                                                                                                                                                                                           |
+| `repo-governance frontmatter-audit`                                                                                                                | evaluate                 | forbidden manual-date-metadata scan; partial overlap with `docs validate-frontmatter` (both parse frontmatter). Share the frontmatter parse, keep the two distinct rules                                                                                                                    |
+| `env validate`                                                                                                                                     | keep                     | the code↔config drift gate (runs in hooks/CI)                                                                                                                                                                                                                                               |
+| `env init` / `env backup` / `env restore`                                                                                                          | keep                     | manage `.env` secret files (create from `.env.example`, back up, restore). Not gate validators, but they earn their place as the sanctioned `.env` lifecycle utilities — **KEPT** (disposition flipped from delete-candidate)                                                               |
+| `test-coverage validate`                                                                                                                           | keep                     | the line-coverage threshold gate                                                                                                                                                                                                                                                            |
+| `test-coverage diff` / `test-coverage merge`                                                                                                       | evaluate                 | changed-line diff coverage + LCOV merge; confirm a live caller exists (Nx may handle coverage merge natively) — evaluate before freezing                                                                                                                                                    |
+| `java validate-annotations`                                                                                                                        | dormant-in-public        | ose-public has no JVM source; ported for identical CLI surface but validates nothing here until a JVM app lands                                                                                                                                                                             |
+| `contracts java-clean-imports` / `contracts dart-scaffold`                                                                                         | dormant-in-public        | ose-public has no generated-Java/Dart contracts; ported for identity, dormant until a contracts pipeline lands                                                                                                                                                                              |
+| `spec-coverage validate`                                                                                                                           | fold into `specs`        | validates BDD specs under `specs/`, so it belongs in the `specs` group → `specs validate coverage` (target `specs:coverage`); `test-coverage` stays separate as the code-line concern                                                                                                       |
+| all other groups (`ddd bc`/`ul`, `specs validate-{adoption,counts,tree}`, `git pre-commit`, `doctor`, `docs validate-{heading-hierarchy,mermaid}`) | keep                     | distinct purpose, no sibling overlap                                                                                                                                                                                                                                                        |
 
 **Net rationalization shortlist** (resolve in Phase 9 before freezing the surface):
 
@@ -905,56 +940,62 @@ keep/merge/delete dispositions, infra/primer mirror them so the consolidated sur
 > The block below is embedded **verbatim** from the canonical contract (BLOCK 11). `ose-public`
 > performs this rename in **Phase 9b** (reference-first); the siblings mirror the identical surface.
 
-Chosen scheme: **verb-first git-style** `<group> <verb> [<object>]`. The verb leads (like
-`git remote add`); the object (when present) follows. Deliberately diverges from the object-verb
-Nx target scheme (`{domain}:{work}`) — CLI optimizes for natural typing, targets for namespacing.
-Top-level groups are unchanged. This rename runs in Phase 9b (reference-first), updates every caller
-(Nx `project.json` target commands, `.husky/*`, `package.json`, docs) and the golden-master corpus.
+Chosen scheme: **uniform grammar** `<group> [<language>] <verb> [<object>]`. The verb leads (like
+`git remote add`); the object follows. **Every read-only check is `validate <object>`; `audit` is the
+group run-all aggregate; generators/mutators use a fixed verb set.** Deliberately diverges from the
+object-verb Nx target scheme (`{domain}:{work}`). This rename **+ scope-based regroup** runs in
+Phase 9 (reference-first), updates every caller (Nx `project.json`, `.husky/*`, `package.json`, docs)
+and the golden-master corpus. The "After group" column shows the **final** group post-regroup.
 
-| Group                         | Before                                     | After (verb-first)                                                                               |
-| ----------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `test-coverage`               | `validate` / `diff` / `merge`              | `validate` / `diff` / `merge` (already verb-first)                                               |
-| `specs` (was `spec-coverage`) | `spec-coverage validate`                   | `specs validate coverage` (folded into `specs`; target `specs:coverage`)                         |
-| `repo-governance`             | `audit`                                    | `audit` (run-all; bare verb)                                                                     |
-| `repo-governance`             | `agents-md-size`                           | `audit agents-md-size`                                                                           |
-| `repo-governance`             | `emoji-audit`                              | `audit emoji`                                                                                    |
-| `repo-governance`             | `frontmatter-audit`                        | `audit frontmatter`                                                                              |
-| `repo-governance`             | `gherkin-keyword-cardinality`              | `audit gherkin-cardinality`                                                                      |
-| `repo-governance`             | `layer-coherence`                          | `audit layer-coherence`                                                                          |
-| `repo-governance`             | `license-audit`                            | `audit license`                                                                                  |
-| `repo-governance`             | `readme-index-audit`                       | `audit readme-index`                                                                             |
-| `repo-governance`             | `traceability-audit`                       | `audit traceability`                                                                             |
-| `repo-governance`             | `vendor-audit`                             | `audit vendor`                                                                                   |
-| `docs`                        | `validate-naming`                          | `validate naming`                                                                                |
-| `docs`                        | `validate-frontmatter`                     | `validate frontmatter`                                                                           |
-| `docs`                        | `validate-heading-hierarchy`               | `validate heading-hierarchy`                                                                     |
-| `docs`                        | `validate-links`                           | `validate links`                                                                                 |
-| `docs`                        | `validate-mermaid`                         | `validate mermaid`                                                                               |
-| `agents`                      | `validate-naming`                          | `validate naming`                                                                                |
-| `agents`                      | `validate-claude`                          | `validate claude`                                                                                |
-| `agents`                      | `validate-sync`                            | `validate sync`                                                                                  |
-| `agents`                      | `validate-bindings`                        | `validate bindings`                                                                              |
-| `agents`                      | `detect-duplication`                       | `detect duplication`                                                                             |
-| `agents`                      | `sync`                                     | `sync opencode`                                                                                  |
-| `agents`                      | `emit-bindings`                            | `emit amazonq`                                                                                   |
-| `workflows`                   | `validate-naming`                          | `validate naming`                                                                                |
-| `specs`                       | `validate-adoption`                        | `validate adoption`                                                                              |
-| `specs`                       | `validate-counts`                          | `validate counts`                                                                                |
-| `specs`                       | `validate-links`                           | `validate links`                                                                                 |
-| `specs`                       | `validate-tree`                            | `validate tree`                                                                                  |
-| `ddd`                         | `bc`                                       | `validate bc`                                                                                    |
-| `ddd`                         | `ul`                                       | `validate ul`                                                                                    |
-| `git`                         | `pre-commit`                               | `pre-commit` (hook-stage name; unchanged)                                                        |
-| `env`                         | `init` / `backup` / `restore` / `validate` | `init` / `backup` / `restore` / `validate` (already verb-first; KEPT — `.env` secret management) |
-| `java`                        | `validate-annotations`                     | `validate annotations`                                                                           |
-| `contracts`                   | `java-clean-imports`                       | `clean java-imports`                                                                             |
-| `contracts`                   | `dart-scaffold`                            | `scaffold dart`                                                                                  |
-| `doctor`                      | `doctor`                                   | `doctor` (standalone; unchanged)                                                                 |
+| Before (group · subcommand)                   | After group       | After (uniform)                           |
+| --------------------------------------------- | ----------------- | ----------------------------------------- |
+| `test-coverage validate` / `diff` / `merge`   | `test-coverage`   | `validate` / `diff` / `merge` (unchanged) |
+| `spec-coverage validate`                      | `specs`           | `validate coverage`                       |
+| `docs validate-naming`                        | `md`              | `validate naming`                         |
+| `docs validate-frontmatter`                   | `md`              | `validate frontmatter`                    |
+| `docs validate-heading-hierarchy`             | `md`              | `validate heading-hierarchy`              |
+| `docs validate-links`                         | `md`              | `validate links`                          |
+| `docs validate-mermaid`                       | `md`              | `validate mermaid`                        |
+| `repo-governance frontmatter-audit`           | `md`              | `validate frontmatter-dates`              |
+| `repo-governance readme-index-audit`          | `md`              | `validate readme-index`                   |
+| `repo-governance vendor-audit`                | `repo-governance` | `validate vendor`                         |
+| `repo-governance layer-coherence`             | `repo-governance` | `validate layer-coherence`                |
+| `repo-governance traceability-audit`          | `repo-governance` | `validate traceability`                   |
+| `repo-governance emoji-audit`                 | `convention`      | `validate emoji`                          |
+| `repo-governance license-audit`               | `convention`      | `validate license`                        |
+| `repo-governance agents-md-size`              | `convention`      | `validate agents-md-size`                 |
+| `repo-governance gherkin-keyword-cardinality` | `specs`           | `validate gherkin-cardinality`            |
+| `repo-governance audit` (run-all)             | `repo-governance` | `audit` (now group-scoped run-all)        |
+| `agents validate-naming`                      | `harness`         | `validate naming`                         |
+| `agents validate-claude`                      | `harness`         | `validate claude`                         |
+| `agents validate-sync`                        | `harness`         | `validate sync`                           |
+| `agents validate-bindings`                    | `harness`         | `validate bindings`                       |
+| `agents detect-duplication`                   | `harness`         | `validate duplication`                    |
+| `agents sync`                                 | `harness`         | `sync opencode`                           |
+| `agents emit-bindings`                        | `harness`         | `emit amazonq`                            |
+| `workflows validate-naming`                   | `workflows`       | `validate naming`                         |
+| `specs validate-adoption`                     | `specs`           | `validate adoption`                       |
+| `specs validate-counts`                       | `specs`           | `validate counts`                         |
+| `specs validate-links`                        | `specs`           | `validate links`                          |
+| `specs validate-tree`                         | `specs`           | `validate tree`                           |
+| `ddd bc`                                      | `specs`           | `validate bc`                             |
+| `ddd ul`                                      | `specs`           | `validate ul`                             |
+| `contracts java-clean-imports`                | `specs`           | `clean java-imports`                      |
+| `contracts dart-scaffold`                     | `specs`           | `scaffold dart`                           |
+| `java validate-annotations`                   | `lang`            | `java validate null-safety-annotations`   |
+| `env init`/`backup`/`restore`/`validate`      | `env`             | unchanged (KEPT — `.env` secret mgmt)     |
+| `git pre-commit`                              | `git`             | `pre-commit` (hook-stage name; unchanged) |
+| `doctor`                                      | `doctor`          | unchanged (standalone)                    |
 
-Controlled verb vocabulary after rename: `validate`, `audit`, `detect`, `sync`, `emit`, `clean`,
-`scaffold`, `diff`, `merge`, `init`, `backup`, `restore`, `pre-commit`, `doctor`. If workstream-9a
-rationalization MERGES `sync`+`emit` into one binding generator, the merged form is
-`generate bindings` (per-harness flags) and the two rows above collapse.
+**`audit` aggregate**: any group with ≥2 `validate`s exposes a bare `<group> audit` that runs them
+all — `md audit`, `repo-governance audit`, `convention audit`, `specs audit`, `harness audit`. The
+`docs` group is **reserved** (no `docs/`-exclusive command today).
+
+Controlled verb vocabulary after rename: `validate` (every check), `audit` (group run-all aggregate
+only), `sync`, `emit`, `clean`, `scaffold`, `diff`, `merge`, `init`, `backup`, `restore`,
+`pre-commit`, `doctor`. The old per-check verbs `detect`/`*-audit` are gone (collapsed into
+`validate`). If workstream-9a MERGES `sync`+`emit` into one binding generator, the merged form is
+`harness generate bindings` and those two rows collapse.
 
 #### Before/after mandate
 
@@ -973,15 +1014,15 @@ invokes pre- vs post-standardization (the gate wiring is otherwise unchanged):
 
 | Gate stage              | Invokes (before)                   | Invokes (after)                               |
 | ----------------------- | ---------------------------------- | --------------------------------------------- |
-| pre-commit / CI Mermaid | `rhino-cli docs validate-mermaid`  | `rhino-cli docs validate mermaid`             |
+| pre-commit / CI Mermaid | `rhino-cli docs validate-mermaid`  | `rhino-cli md validate mermaid`               |
 | Nx Mermaid target       | `validate:mermaid`                 | `mermaid:validation`                          |
-| pre-push / CI links     | `rhino-cli docs validate-links`    | `rhino-cli docs validate links`               |
+| pre-push / CI links     | `rhino-cli docs validate-links`    | `rhino-cli md validate links`                 |
 | Nx links target         | `validate:links`                   | `links:validation`                            |
 | pre-push specs tree     | `rhino-cli specs validate-tree`    | `rhino-cli specs validate tree`               |
 | Nx specs-tree target    | `validate:specs-tree`              | `specs:tree-validation`                       |
 | pre-push env            | `rhino-cli env validate`           | `rhino-cli env validate` (already verb-first) |
 | Nx env target           | `validate:env`                     | `env:validation`                              |
-| CI gherkin              | (no target)                        | `gherkin:keyword-cardinality-validation`      |
+| CI gherkin              | (no target)                        | `specs:gherkin-cardinality-validation`        |
 | pre-push spec coverage  | `rhino-cli spec-coverage validate` | `rhino-cli specs validate coverage`           |
 
 The CLI-subcommand axis (verb-first) and the Nx-target axis (`{domain}:{work}`) **deliberately
@@ -996,31 +1037,39 @@ and status. **What each one does is in §(a)** (the descriptive command referenc
 specs) — this table is the rename + scope reference only, so the description is not repeated.
 Confirmed against `apps/rhino-cli/project.json`; standard Nx lifecycle targets keep platform names.
 
-| Current (ose-public)                                                                         | Standardized `{domain}:{work}`           | Scope                                   | Status                            |
-| -------------------------------------------------------------------------------------------- | ---------------------------------------- | --------------------------------------- | --------------------------------- |
-| `build`/`install`/`run`/`lint`/`typecheck`/`fmt`/`test:unit`/`test:quick`/`test:integration` | unchanged (Nx lifecycle)                 | affected                                | unchanged                         |
-| `fmt:check`                                                                                  | `format:check`                           | affected                                | rename (E)                        |
-| `check:msrv`                                                                                 | `msrv:check`                             | affected                                | rename (E)                        |
-| `deny:check`                                                                                 | `deny:check`                             | affected                                | already conformant                |
-| `spec-coverage`                                                                              | `specs:coverage`                         | affected (per-project)                  | rename (E)                        |
-| `validate:specs-tree`                                                                        | `specs:tree-validation`                  | whole-repo (structural)                 | rename (E)                        |
-| `validate:specs-links`                                                                       | `specs:links-validation`                 | whole-repo                              | rename (E)                        |
-| `validate:specs-counts`                                                                      | `specs:counts-validation`                | whole-repo (structural)                 | rename (E)                        |
-| `validate:specs-adoption`                                                                    | `specs:adoption-validation`              | whole-repo                              | rename (E)                        |
-| `validate:naming-agents`                                                                     | `naming:agents-validation`               | whole-repo (structural)                 | rename (E)                        |
-| `validate:naming-workflows`                                                                  | `naming:workflows-validation`            | whole-repo (structural)                 | rename (E)                        |
-| `validate:mermaid`                                                                           | `mermaid:validation`                     | affected/changed-file                   | rename (E) + state scope (G)      |
-| `validate:links`                                                                             | `links:validation`                       | whole-repo                              | rename (E)                        |
-| `validate:heading-hierarchy`                                                                 | `headings:hierarchy-validation`          | affected/changed-file                   | rename (E)                        |
-| `validate:repo-governance-vendor-audit`                                                      | `governance:vendor-audit-validation`     | whole-repo                              | rename (E)                        |
-| `validate:cross-vendor-parity`                                                               | `cross-vendor:parity-validation`         | whole-repo                              | rename (E)                        |
-| `validate:env`                                                                               | `env:validation`                         | whole-repo                              | rename (E)                        |
-| (no target today)                                                                            | `gherkin:keyword-cardinality-validation` | whole-repo                              | new, authored canonical (Phase 4) |
-| `validate:harness-bindings` (`npm run`)                                                      | `harness:bindings-validation`            | whole-repo                              | rename (E)                        |
-| `lint:dockerfiles` / inline hadolint                                                         | `dockerfile:lint`                        | affected/changed-file                   | rename/normalize (E)              |
-| `lint:shell` / inline shellcheck                                                             | `shell:lint`                             | affected/changed-file                   | rename/normalize (E)              |
-| `lint:actions` / inline actionlint                                                           | `actions:lint`                           | affected/changed-file                   | rename/normalize (E)              |
-| `lint:md` (markdownlint, `npm run`)                                                          | `markdown:lint`                          | changed-file (staged) / whole-repo (CI) | rename/normalize (E)              |
+| Current (ose-public)                                                                         | Standardized `{domain}:{work}`                 | Scope                                   | Status                             |
+| -------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------- | ---------------------------------- |
+| `build`/`install`/`run`/`lint`/`typecheck`/`fmt`/`test:unit`/`test:quick`/`test:integration` | unchanged (Nx lifecycle)                       | affected                                | unchanged                          |
+| `fmt:check`                                                                                  | `format:check`                                 | affected                                | rename (E)                         |
+| `check:msrv`                                                                                 | `msrv:check`                                   | affected                                | rename (E)                         |
+| `deny:check`                                                                                 | `deny:check`                                   | affected                                | already conformant                 |
+| `spec-coverage`                                                                              | `specs:coverage`                               | affected (per-project)                  | rename (E)                         |
+| `validate:specs-tree`                                                                        | `specs:tree-validation`                        | whole-repo (structural)                 | rename (E)                         |
+| `validate:specs-links`                                                                       | `specs:links-validation`                       | whole-repo                              | rename (E)                         |
+| `validate:specs-counts`                                                                      | `specs:counts-validation`                      | whole-repo (structural)                 | rename (E)                         |
+| `validate:specs-adoption`                                                                    | `specs:adoption-validation`                    | whole-repo                              | rename (E)                         |
+| `validate:naming-agents`                                                                     | `naming:harness-validation`                    | whole-repo (structural)                 | rename (E) + `agents`→`harness`    |
+| `validate:naming-workflows`                                                                  | `naming:workflows-validation`                  | whole-repo (structural)                 | rename (E)                         |
+| `validate:mermaid`                                                                           | `mermaid:validation`                           | affected/changed-file                   | rename (E) + state scope (G)       |
+| `validate:links`                                                                             | `links:validation`                             | whole-repo                              | rename (E)                         |
+| `validate:heading-hierarchy`                                                                 | `headings:hierarchy-validation`                | affected/changed-file                   | rename (E)                         |
+| `validate:repo-governance-vendor-audit`                                                      | `governance:vendor-audit-validation`           | whole-repo                              | rename (E)                         |
+| `validate:cross-vendor-parity`                                                               | `cross-vendor:parity-validation`               | whole-repo                              | rename (E)                         |
+| `validate:env`                                                                               | `env:validation`                               | whole-repo                              | rename (E)                         |
+| (no target today)                                                                            | `specs:gherkin-cardinality-validation`         | whole-repo                              | new + moved to `specs` (Phase 4/9) |
+| `ddd:bc-validation`                                                                          | `specs:bc-validation`                          | whole-repo (registry)                   | fold `ddd`→`specs` (9a)            |
+| `ddd:ul-validation`                                                                          | `specs:ul-validation`                          | whole-repo (registry)                   | fold `ddd`→`specs` (9a)            |
+| `governance:frontmatter-audit-validation`                                                    | `md:frontmatter-dates-validation`              | whole-repo                              | move governance→`md` (9a)          |
+| `governance:readme-index-audit-validation`                                                   | `md:readme-index-validation`                   | whole-repo                              | move governance→`md` (9a)          |
+| `governance:emoji-audit-validation`                                                          | `convention:emoji-validation`                  | whole-repo                              | move governance→`convention` (9a)  |
+| `governance:license-audit-validation`                                                        | `convention:license-validation`                | whole-repo                              | move governance→`convention` (9a)  |
+| `governance:agents-md-size-validation`                                                       | `convention:agents-md-size-validation`         | whole-repo (single file)                | move governance→`convention` (9a)  |
+| `java:annotations-validation` (dormant)                                                      | `lang:java-null-safety-annotations-validation` | affected (JVM)                          | rename `java`→`lang` (9a)          |
+| `validate:harness-bindings` (`npm run`)                                                      | `harness:bindings-validation`                  | whole-repo                              | rename (E)                         |
+| `lint:dockerfiles` / inline hadolint                                                         | `dockerfile:lint`                              | affected/changed-file                   | rename/normalize (E)               |
+| `lint:shell` / inline shellcheck                                                             | `shell:lint`                                   | affected/changed-file                   | rename/normalize (E)               |
+| `lint:actions` / inline actionlint                                                           | `actions:lint`                                 | affected/changed-file                   | rename/normalize (E)               |
+| `lint:md` (markdownlint, `npm run`)                                                          | `markdown:lint`                                | changed-file (staged) / whole-repo (CI) | rename/normalize (E)               |
 
 ## Mermaid State-Diagram Validation Design (workstream G)
 
@@ -1157,34 +1206,36 @@ flowchart LR
 
 ## File Impact
 
-| File / area                                                                              | Change                                                                                                                                                                                 | Phase      |
-| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| `.github/workflows/pr-quality-gate.yml`                                                  | run-many → affected (.NET/Rust); **strip Go** (`golang` job + `setup-golang` + `has-golang` detection); concurrency; lint-job rename → tool-named + `needs`; full gate on push-to-main | 1, 2, 3, 5 |
-| `rhino-cli doctor` toolchain manifest / env-contract (ose-public scope)                  | drop Go from ose-public's required-tool scope (Go stays in the shared doctor binary for infra/primer) — workstream A/F                                                                 | 1, 11      |
-| `.github/workflows/validate-markdown.yml`                                                | gherkin validator step; concurrency                                                                                                                                                    | 2, 4       |
-| `.github/workflows/validate-env.yml`                                                     | concurrency                                                                                                                                                                            | 2          |
-| `.github/workflows/test-and-deploy-*.yml` (scheduled)                                    | concurrency; scheduler cadence confirm/align 2× WIB                                                                                                                                    | 2, 5       |
-| `.husky/commit-msg`, `.husky/pre-commit`, `.husky/pre-push`                              | converge to BLOCK 1-B canonical; reference renamed targets                                                                                                                             | 6, 10      |
-| `apps/rhino-cli/src/domain/`, `src/application/`, `src/infrastructure/`, `src/commands/` | hexagonal migration (from flat `src/commands/` + `src/internal/`)                                                                                                                      | 7          |
-| `apps/rhino-cli/src/domain/mermaid/state.rs` (+ width/label wiring)                      | NEW state front-end (workstream G) added to the migrated Mermaid slice; `stateDiagram-v2` + `stateDiagram` v1                                                                          | 8          |
-| `apps/rhino-cli/tests/` (state golden corpus + harness)                                  | NEW shared golden corpus (`.md` fixtures + expected violation JSON) — the parity lock; ose-public authors                                                                              | 8          |
-| repo-wide `*.md` violating state diagrams (incl. `plans/done/`, gate-excluded paths)     | D-CLEAN aggressive cleanup of over-wide / over-long state diagrams (diagram-only edits)                                                                                                | 8          |
-| `apps/rhino-cli/src/commands/` (+Java, +Contracts)                                       | port union commands into the hexagonal layout                                                                                                                                          | 9          |
-| `apps/rhino-cli/project.json`                                                            | new `gherkin:keyword-cardinality-validation` target; `{domain}:{work}` renames; `spec-coverage`→`specs:coverage`                                                                       | 4, 10      |
-| every other app/lib `project.json`                                                       | `spec-coverage`→`specs:coverage`                                                                                                                                                       | 10         |
-| `package.json` scripts (any caller of renamed targets)                                   | update to renamed targets                                                                                                                                                              | 10         |
-| `repo-governance/development/infra/ci-conventions.md`                                    | converged standard + CI/toolchain Parity Checklist                                                                                                                                     | 5, 11      |
-| `repo-governance/development/infra/nx-targets.md`                                        | `{domain}:{work}` naming + `specs:coverage`                                                                                                                                            | 11         |
-| `repo-governance/development/pattern/hexagonal-architecture-cli.md`                      | confirm/extend existing hexagonal-CLI convention (already present) for the rhino-cli reference + port-depth note                                                                       | 7, 11      |
-| `repo-governance/conventions/formatting/diagrams.md`                                     | width/label rules + `mermaid:validation` enforcement now enumerate **state diagrams** (workstream G)                                                                                   | 11         |
-| `repo-governance/development/quality/markdown.md` + `repository-validation.md`           | note state diagrams are now in `mermaid:validation` scope (workstream G)                                                                                                               | 11         |
-| `repo-governance/development/infra/nx-target-naming.md` (or equivalent)                  | NEW `{domain}:{work}` convention                                                                                                                                                       | 11         |
-| NEW git-hook-lifecycle convention under `repo-governance/development/workflow/`          | canonical commit-msg/pre-commit/pre-push                                                                                                                                               | 11         |
-| `repo-governance/development/quality/cross-language-lint-strictness.md`                  | "CI job" column → tool-named jobs (exists in public)                                                                                                                                   | 3, 11      |
-| `AGENTS.md`                                                                              | Cross-Language Lint Gates, rhino-cli command surface, target naming; **drop Go from Tech Stack** + fix stale "Go CLI" labels on `ayokoding-cli`/`ose-cli` (both Rust)                  | 11         |
-| `apps/rhino-cli/README.md`                                                               | command surface + hexagonal architecture                                                                                                                                               | 11         |
-| governance dev/quality/infra/pattern index READMEs                                       | list the above                                                                                                                                                                         | 11         |
-| `.claude/agents/ci-checker.md`, `.claude/agents/repo-rules-*.md`                         | parity-check additions (if warranted); re-sync bindings                                                                                                                                | 5, 11      |
+| File / area                                                                                    | Change                                                                                                                                                                                               | Phase      |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `.github/workflows/pr-quality-gate.yml`                                                        | run-many → affected (.NET/Rust); **strip Go** (`golang` job + `setup-golang` + `has-golang` detection); concurrency; lint-job rename → tool-named + `needs`; full gate on push-to-main               | 1, 2, 3, 5 |
+| `rhino-cli doctor` toolchain manifest / env-contract (ose-public scope)                        | drop Go from ose-public's required-tool scope (Go stays in the shared doctor binary for infra/primer) — workstream A/F                                                                               | 1, 11      |
+| `.github/workflows/validate-markdown.yml`                                                      | gherkin validator step; concurrency                                                                                                                                                                  | 2, 4       |
+| `.github/workflows/validate-env.yml`                                                           | concurrency                                                                                                                                                                                          | 2          |
+| `.github/workflows/test-and-deploy-{app-group}-development.yml` (per app-group)                | heavy-test CRON (Test Lifecycle Architecture): integration+e2e using Dockerfile/local; build staging container; 2× WIB                                                                               | 5          |
+| `.github/workflows/test-{app-group}-staging.yml` (per app-group)                               | heavy-test CRON: same integration+e2e against the staging URL; 2× WIB                                                                                                                                | 5          |
+| `.husky/commit-msg`, `.husky/pre-commit`, `.husky/pre-push`                                    | converge to BLOCK 1-B canonical; **pre-commit gains `test:quick` (format+lint+typecheck+test:unit); pre-push = `specs:coverage`+`test-coverage`**; reference renamed targets                         | 6, 10      |
+| `apps/*/project.json` (`test:unit`/`test:integration`/`test:e2e`/`test:quick`/`test-coverage`) | three-level test targets sharing `.feature` files; `test:quick` redefined; integration/e2e wired to CRON workflows only                                                                              | 6, 9, 10   |
+| `apps/rhino-cli/src/domain/`, `src/application/`, `src/infrastructure/`, `src/commands/`       | hexagonal migration (from flat `src/commands/` + `src/internal/`)                                                                                                                                    | 7          |
+| `apps/rhino-cli/src/domain/mermaid/state.rs` (+ width/label wiring)                            | NEW state front-end (workstream G) added to the migrated Mermaid slice; `stateDiagram-v2` + `stateDiagram` v1                                                                                        | 8          |
+| `apps/rhino-cli/tests/` (state golden corpus + harness)                                        | NEW shared golden corpus (`.md` fixtures + expected violation JSON) — the parity lock; ose-public authors                                                                                            | 8          |
+| repo-wide `*.md` violating state diagrams (incl. `plans/done/`, gate-excluded paths)           | D-CLEAN aggressive cleanup of over-wide / over-long state diagrams (diagram-only edits)                                                                                                              | 8          |
+| `apps/rhino-cli/src/commands/` (+`lang`, +`specs` codegen)                                     | port union commands + scope-based regroup into the hexagonal layout                                                                                                                                  | 9          |
+| `apps/rhino-cli/project.json`                                                                  | new `specs:gherkin-cardinality-validation` target; `{domain}:{work}` renames + 9a re-domaining (`naming:harness`, `specs:bc/ul`, `md:*`, `convention:*`, `lang:*`); `spec-coverage`→`specs:coverage` | 4, 9, 10   |
+| every other app/lib `project.json`                                                             | `spec-coverage`→`specs:coverage`                                                                                                                                                                     | 10         |
+| `package.json` scripts (any caller of renamed targets)                                         | update to renamed targets                                                                                                                                                                            | 10         |
+| `repo-governance/development/infra/ci-conventions.md`                                          | converged standard + CI/toolchain Parity Checklist                                                                                                                                                   | 5, 11      |
+| `repo-governance/development/infra/nx-targets.md`                                              | `{domain}:{work}` naming + `specs:coverage`                                                                                                                                                          | 11         |
+| `repo-governance/development/pattern/hexagonal-architecture-cli.md`                            | confirm/extend existing hexagonal-CLI convention (already present) for the rhino-cli reference + port-depth note                                                                                     | 7, 11      |
+| `repo-governance/conventions/formatting/diagrams.md`                                           | width/label rules + `mermaid:validation` enforcement now enumerate **state diagrams** (workstream G)                                                                                                 | 11         |
+| `repo-governance/development/quality/markdown.md` + `repository-validation.md`                 | note state diagrams are now in `mermaid:validation` scope (workstream G)                                                                                                                             | 11         |
+| `repo-governance/development/infra/nx-target-naming.md` (or equivalent)                        | NEW `{domain}:{work}` convention                                                                                                                                                                     | 11         |
+| NEW git-hook-lifecycle convention under `repo-governance/development/workflow/`                | canonical commit-msg/pre-commit/pre-push                                                                                                                                                             | 11         |
+| `repo-governance/development/quality/cross-language-lint-strictness.md`                        | "CI job" column → tool-named jobs (exists in public)                                                                                                                                                 | 3, 11      |
+| `AGENTS.md`                                                                                    | Cross-Language Lint Gates, rhino-cli command surface, target naming; **drop Go from Tech Stack** + fix stale "Go CLI" labels on `ayokoding-cli`/`ose-cli` (both Rust)                                | 11         |
+| `apps/rhino-cli/README.md`                                                                     | command surface + hexagonal architecture                                                                                                                                                             | 11         |
+| governance dev/quality/infra/pattern index READMEs                                             | list the above                                                                                                                                                                                       | 11         |
+| `.claude/agents/ci-checker.md`, `.claude/agents/repo-rules-*.md`                               | parity-check additions (if warranted); re-sync bindings                                                                                                                                              | 5, 11      |
 
 ## Action-Version Reference (recorded for the converged target)
 
@@ -1207,6 +1258,78 @@ ose-public (confirm only); the bump work falls to whichever sibling plan still t
 
 All "current major" statements above are [Web-cited — official GitHub Actions release pages,
 accessed 2026-06-11].
+
+## Test Lifecycle Architecture (spec-shared three-level testing)
+
+> The block below is embedded **verbatim** from the canonical contract (BLOCK 13). All three sibling
+> plans embed the identical text; per-repo cadence/staging differences live in the
+> [Deviation Matrix](#deviation-matrix).
+
+**Core principle — one set of specs, three fidelities.** Every app's behavior is specified **once**
+as Gherkin `.feature` files under `specs/`. All **three** test levels consume the **same `.feature`
+files**, so the BDD scenarios are the single source of truth, verified at increasing fidelity:
+
+| Level                  | Dependencies                                                                                                                                                                    | Speed / where it runs                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| **`test:unit`**        | **Always mocked.** Runs **every** BDD scenario (must cover all `.feature` scenarios); may add conventional unit tests alongside, but BDD coverage is mandatory.                 | fast, cacheable → **pre-commit** (`test:quick`) |
+| **`test:integration`** | Real deps **inside the same container/boundary only** — e.g. a backend service + **its own** Postgres. **One DB per service** (no shared-DB antipattern). **No** external APIs. | heavy → **CRON only**                           |
+| **`test:e2e`**         | Same `.feature` scenarios; **may call any external dependency** when needed (real downstream services, external APIs, staging URLs).                                            | heaviest → **CRON only**                        |
+
+**Why share the specs**: unit/integration/e2e exercising the identical scenarios guarantees the three
+levels test the _same behavior_ at different fidelities — no drift between what unit tests check and
+what e2e checks. The `.feature` files are the contract.
+
+**Execution is via Nx project commands — always.** Each level is an Nx **target** on the owning
+project (`test:unit`, `test:integration`, `test:e2e`, plus `test:quick`, `specs:coverage`,
+`test-coverage`) and is run **only** through Nx — `nx affected -t <target>` in hooks/PR (changed
+projects), `nx run-many -t test:integration test:e2e --projects=<app-group>` in the CRON heavy-test
+workflows, `nx run <project>:<target>` for one project. **No level is invoked via direct tooling**
+(no bare `jest`/`vitest`/`cargo test`/`playwright`/`go test` in hooks or workflows) — Nx owns
+caching, affected-graph scoping, and dependency order.
+
+**Uniform target surface — every project declares every lifecycle target (`echo` stub where N/A).**
+**Every** Nx project's `project.json` declares the **full** target set — `format`, `lint`,
+`typecheck`, `test:unit`, `test:integration`, `test:e2e`, `test:quick`, `specs:coverage`,
+`test-coverage` (+ `build` where applicable) — even when a target doesn't apply to that project type,
+in which case it is a **no-op `echo` stub that exits 0**. This guarantees `nx affected -t <target>`
+and `nx run-many -t <target>` **never error on a missing target** and the lifecycle sweeps uniformly
+across the whole graph. Example: a backend service (`organiclever-be`) has real `test:unit` +
+`test:integration` but an **`echo` `test:e2e`** (the real e2e lives in the paired
+`organiclever-be-e2e` project); an e2e project (`organiclever-be-e2e`) has a real `test:e2e` but
+**`echo` `test:unit`/`test:integration`**. Each behavior is tested at the level that owns it, while
+every project still answers every target.
+
+**`specs:coverage` enforcement (rhino-cli).** `specs validate coverage` is extended to detect and
+**enforce that every scenario in every `.feature` is implemented in all three levels** — unit,
+integration, AND e2e — for the owning app. A scenario missing from any level fails the gate. It runs
+per-project (the `specs:coverage` target) and is the **pre-push** spec-coverage check.
+
+**Stage placement** (see the [CI lifecycle table](#ci-lifecycle-and-pre-push-validator-routing)):
+`test:unit` → pre-commit (via `test:quick`); `specs:coverage` + `test-coverage` → pre-push; PR =
+pre-commit ∪ pre-push; push-to-main = PR. **`test:integration` + `test:e2e` NEVER run pre-merge —
+CRON only**, because they are heavy.
+
+### Heavy-test workflows — three levels (development → staging → production)
+
+Heavy tests (integration + e2e) run per **app-group** (a deployable family of related projects — e.g.
+`organiclever` = web + be + contracts + their e2e; keyed off the Nx project graph, not a hardcoded
+list). Two scheduled workflow files per app-group, plus manual prod:
+
+| Level           | Workflow file                                                   | What it does                                                                                                                |
+| --------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **development** | `.github/workflows/test-and-deploy-{app-group}-development.yml` | runs the heavy tests using **Dockerfile / local** deps; **builds the container image for staging** (ose-public + ose-infra) |
+| **staging**     | `.github/workflows/test-{app-group}-staging.yml`                | runs the **same** heavy tests against the **staging URL**                                                                   |
+| **production**  | (none — **manual** deploy for now)                              | production deploy is performed manually; no automated prod workflow yet                                                     |
+
+**Cadence**: the development (and, where present, staging) heavy-test workflows run on `schedule` —
+**2× WIB for ose-public + ose-infra, 1×/day for ose-primer**.
+
+**Per-repo deviations** ([Deviation Matrix](#deviation-matrix)): **ose-public + ose-infra** build the
+staging container (development workflow) and run the staging workflow against the staging URL;
+**ose-primer** builds **no** staging container and runs **no** staging test (no staging area) —
+development-level heavy tests only, 1×/day, consistent with its no-image / demo-template deviation.
+(This resolves the requirements' apparent "public and primer" slip in favor of the established
+"primer = no container images" deviation — flagged for confirmation.)
 
 ## Testing Strategy
 
@@ -1243,7 +1366,7 @@ in place between sessions (output surface unchanged at every committed checkpoin
 ## Dependencies
 
 No new runtime or build dependencies are introduced. The new Nx target wraps an **already-shipped**
-rhino-cli command; the hexagonal migration and the `Java`/`Contracts` ports reuse existing crates and
+rhino-cli command; the hexagonal migration and the `lang`/`specs` codegen ports reuse existing crates and
 port logic from the sibling repos. The
 [Dependency Bump Policy](../../../repo-governance/development/workflow/dependency-bump-policy.md) is
 therefore not triggered by this plan.
