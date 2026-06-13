@@ -179,6 +179,7 @@ pub fn format_fix_summary(fr: &FixResult) -> String {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::application::doctor::tools;
     use crate::internal::doctor::ToolCheck;
     use std::cell::RefCell;
     use std::time::Duration;
@@ -210,7 +211,7 @@ mod tests {
     }
 
     /// Builds a minimal [`ToolDef`] with the given `name` and optional install function.
-    fn def(name: &str, install: Option<crate::internal::doctor::tools::InstallFunc>) -> ToolDef {
+    fn def(name: &str, install: Option<tools::InstallFunc>) -> ToolDef {
         ToolDef {
             name: name.into(),
             binary: name.into(),

@@ -609,7 +609,7 @@ stateDiagram-v2
       — acceptance: corpus byte-identical; tests GREEN; coverage met.
       <!-- 854 unit tests GREEN; golden-master 1 pass; coverage allowlist updated (application/git/pre_commit.rs + infrastructure/git/ added to ignore); test:quick GREEN -->
 - [x] [AI] Commit: `rtk git commit -m "refactor(rhino-cli): migrate git feature to hexagonal layout"`.
-      <!-- pending -->
+      <!-- 3624cbd -->
 
 ### Phase 7c — IO-heavy features (envbackup, doctor, testcoverage)
 
