@@ -95,23 +95,6 @@ pub(super) fn read_java_version(path: &Path) -> Option<String> {
     Some(data[s + needle_open.len()..s + needle_open.len() + e].to_string())
 }
 
-/// Reads the `go` directive version from a `go.mod` file.
-///
-/// Returns `None` when the file is missing or contains no `go` directive.
-pub(super) fn read_go_version(path: &Path) -> Option<String> {
-    let data = std::fs::read_to_string(path).ok()?;
-    for line in data.lines() {
-        let t = line.trim();
-        if let Some(rest) = t.strip_prefix("go ") {
-            let parts: Vec<&str> = rest.split_whitespace().collect();
-            if !parts.is_empty() {
-                return Some(parts[0].to_string());
-            }
-        }
-    }
-    None
-}
-
 /// Reads the Python version from a `.python-version` file (plain text, trimmed).
 ///
 /// Returns `None` when the file is missing.
@@ -801,14 +784,6 @@ mod tests {
     }
 
     #[test]
-    fn read_go_version_finds_directive() {
-        let dir = tempfile::tempdir().unwrap();
-        let p = dir.path().join("go.mod");
-        std::fs::write(&p, "module x\n\ngo 1.25.0\n").unwrap();
-        assert_eq!(read_go_version(&p).as_deref(), Some("1.25.0"));
-    }
-
-    #[test]
     fn read_node_version_reads_volta_node() {
         let dir = tempfile::tempdir().unwrap();
         let p = dir.path().join("package.json");
@@ -914,7 +889,7 @@ mod tests {
             scope: Scope::Minimal,
         };
         let r = check_all(&opts);
-        assert_eq!(r.checks.len(), 7);
+        assert_eq!(r.checks.len(), 6);
         assert!(r.ok_count >= 2);
         assert!(r.missing_count >= 1);
     }

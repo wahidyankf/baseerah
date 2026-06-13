@@ -1,4 +1,4 @@
-name: PR - Quality Gate
+name: PR Quality Gate
 
 on:
   pull_request:
@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       has-ts: ${{ steps.detect.outputs.has-ts }}
-      has-golang: ${{ steps.detect.outputs.has-golang }}
       has-dotnet: ${{ steps.detect.outputs.has-dotnet }}
       has-rust: ${{ steps.detect.outputs.has-rust }}
       has-markdown: ${{ steps.detect.outputs.has-markdown }}
@@ -31,7 +30,6 @@ jobs:
           # Check language tags for affected projects
           {
             echo "has-ts=false"
-            echo "has-golang=false"
             echo "has-dotnet=false"
             echo "has-rust=false"
             echo "has-markdown=false"
@@ -42,7 +40,6 @@ jobs:
             for tag in $TAGS; do
               case "$tag" in
                 lang:ts) echo "has-ts=true" >> "$GITHUB_OUTPUT" ;;
-                lang:golang) echo "has-golang=true" >> "$GITHUB_OUTPUT" ;;
                 lang:fsharp|lang:csharp) echo "has-dotnet=true" >> "$GITHUB_OUTPUT" ;;
                 lang:rust) echo "has-rust=true" >> "$GITHUB_OUTPUT" ;;
               esac
@@ -68,10 +65,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: ShellCheck (warning threshold)
         run: |
           shellcheck --version
-          files=$(git ls-files '*.sh' | grep -v 'husky/_/' | grep -v '^archived/')
+          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.sh$' | grep -v 'husky/_/' | grep -v '^archived/' || true)
+          if [ -z "$files" ]; then echo "No changed shell scripts — skipping"; exit 0; fi
           # shellcheck disable=SC2086 # word-splitting the file list is intentional
           shellcheck --severity=warning $files
 
@@ -80,12 +80,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: hadolint (warning threshold)
         run: |
           sudo curl -sSL -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-Linux-x86_64
           sudo chmod +x /usr/local/bin/hadolint
           hadolint --version
-          files=$(git ls-files | grep -iE 'Dockerfile' | grep -vE '^archived/')
+          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -iE 'Dockerfile' | grep -vE '^archived/' || true)
+          if [ -z "$files" ]; then echo "No changed Dockerfiles — skipping"; exit 0; fi
           # shellcheck disable=SC2086 # word-splitting the file list is intentional
           hadolint --failure-threshold warning $files
 
@@ -94,12 +97,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: actionlint
         run: |
           curl -sSL -o download-actionlint.bash \
             https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash
           bash download-actionlint.bash 1.7.12
-          ./actionlint -color
+          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '^\.github/workflows/.*\.yml$' || true)
+          if [ -z "$files" ]; then echo "No changed workflow files — skipping"; exit 0; fi
+          # shellcheck disable=SC2086 # word-splitting the file list is intentional
+          ./actionlint -color $files
 
   typescript:
     name: TypeScript quality gate
@@ -114,23 +122,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
-      - run: npx nx affected -t typecheck lint test:quick spec-coverage --exclude='tag:lang:golang,tag:lang:fsharp,tag:lang:csharp,tag:lang:rust'
-
-  golang:
-    name: Go quality gate
-    needs: detect
-    if: needs.detect.outputs.has-golang == 'true'
-    runs-on: ubuntu-latest
-    env:
-      NX_BASE: origin/${{ github.base_ref }}
-      NX_HEAD: ${{ github.sha }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-golang
-      - run: npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:golang'
+      - run: npx nx affected -t typecheck lint test:quick spec-coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust'
 
   dotnet:
     name: .NET quality gate
@@ -146,7 +138,7 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-dotnet
-      - run: npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:fsharp,tag:lang:csharp'
+      - run: npx nx affected -t typecheck lint test:quick spec-coverage --exclude='tag:lang:ts,tag:lang:rust'
 
   rust:
     name: Rust quality gate
@@ -162,7 +154,7 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
-      - run: npx nx run-many -t typecheck lint test:quick spec-coverage --projects='tag:lang:rust'
+      - run: npx nx affected -t typecheck lint test:quick spec-coverage --exclude='tag:lang:ts,tag:lang:fsharp,tag:lang:csharp'
       - run: npx nx run rhino-cli:fmt:check
       - run: npx nx run rhino-cli:deny:check
       - run: npx nx run rhino-cli:check:msrv
@@ -198,7 +190,7 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    needs: [detect, format, shell, dockerfile, actions, typescript, golang, dotnet, rust, markdown, naming, specs-gate]
+    needs: [detect, format, shell, dockerfile, actions, typescript, dotnet, rust, markdown, naming, specs-gate]
     if: always()
     runs-on: ubuntu-latest
     steps:

@@ -41,7 +41,7 @@ impl ToolStatus {
 ///
 /// `Full` checks every known tool.  `Minimal` restricts to the core set
 /// required in almost every environment: `git`, `volta`, `node`, `npm`,
-/// `golang`, `docker`, and `jq`.
+/// `docker`, and `jq`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Scope {
     /// Check every tool in the full tool list.
@@ -74,12 +74,9 @@ impl Scope {
 
 /// Returns `true` when `name` belongs to the minimal tool set.
 ///
-/// The minimal set is: `git`, `volta`, `node`, `npm`, `golang`, `docker`, `jq`.
+/// The minimal set is: `git`, `volta`, `node`, `npm`, `docker`, `jq`.
 pub fn is_minimal_tool(name: &str) -> bool {
-    matches!(
-        name,
-        "git" | "volta" | "node" | "npm" | "golang" | "docker" | "jq"
-    )
+    matches!(name, "git" | "volta" | "node" | "npm" | "docker" | "jq")
 }
 
 /// Result of checking a single tool against its version requirement.

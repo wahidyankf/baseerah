@@ -14,9 +14,8 @@ use super::checker::{
     parse_flutter_version, parse_golangci_lint_version, parse_hadolint_version, parse_java_version,
     parse_jq_version, parse_line_word, parse_playwright_version, parse_python_version,
     parse_rust_version, parse_shellcheck_version, parse_trim_version, read_dart_sdk_version,
-    read_dotnet_version, read_flutter_version, read_go_version, read_java_version,
-    read_node_version, read_npm_version, read_python_version, read_rust_version,
-    read_tool_versions_entry,
+    read_dotnet_version, read_flutter_version, read_java_version, read_node_version,
+    read_npm_version, read_python_version, read_rust_version, read_tool_versions_entry,
 };
 
 /// A single step in an auto-install sequence.
@@ -79,10 +78,6 @@ fn parse_maven_version(s: &str) -> String {
 
 /// Extracts the Go version from `go version` output
 /// (e.g. `"go version go1.25.0 darwin/arm64"` → `"1.25.0"`).
-fn parse_go_version(s: &str) -> String {
-    parse_line_word(s, "go version ", 2, "go")
-}
-
 // Per-binary readers using a path captured in a static OnceLock.
 // Go's closures capture repo_root; in Rust we precompute paths and stash them via static
 // once-locks keyed off PID-stable build_tool_defs(repo_root) call.
@@ -97,8 +92,6 @@ struct Paths {
     package_json: PathBuf,
     /// Path to `apps/organiclever-be/pom.xml` (for `<java.version>`).
     pom_xml: PathBuf,
-    /// Path to `apps/rhino-cli/go.mod` (for `go` directive).
-    go_mod: PathBuf,
     /// Path to the Python `.python-version` file.
     python_version: PathBuf,
     /// Path to the root `.tool-versions` file (for Elixir / Erlang).
@@ -122,7 +115,6 @@ fn set_paths(repo_root: &Path) {
             .join("apps")
             .join("organiclever-be")
             .join("pom.xml"),
-        go_mod: repo_root.join("apps").join("rhino-cli").join("go.mod"),
         python_version: repo_root
             .join("apps")
             .join("a-demo-be-python-fastapi")
@@ -167,10 +159,6 @@ fn read_npm_v() -> String {
 /// Reads the Java version from the cached `pom.xml`.
 fn read_java_v() -> String {
     read_java_version(&p().pom_xml).unwrap_or_default()
-}
-/// Reads the Go version from the cached `go.mod`.
-fn read_go_v() -> String {
-    read_go_version(&p().go_mod).unwrap_or_default()
 }
 /// Reads the Python version from the cached `.python-version` file.
 fn read_python_v() -> String {
@@ -291,29 +279,6 @@ fn install_maven(_req: &str, _platform: &str) -> Vec<InstallStep> {
 
 /// Returns install steps for Go.
 ///
-/// On macOS: `brew install go`.
-/// On Linux: downloads and extracts the tarball from `go.dev`.
-fn install_golang(req: &str, platform: &str) -> Vec<InstallStep> {
-    if platform == "darwin" {
-        vec![InstallStep {
-            description: "Install Go via Homebrew".into(),
-            command: "brew".into(),
-            args: vec!["install".into(), "go".into()],
-        }]
-    } else {
-        vec![InstallStep {
-            description: "Install Go from go.dev".into(),
-            command: "bash".into(),
-            args: vec![
-                "-c".into(),
-                format!(
-                    "curl -L https://go.dev/dl/go{req}.linux-amd64.tar.gz | sudo tar -xz -C /usr/local"
-                ),
-            ],
-        }]
-    }
-}
-
 /// Returns install steps for Python via pyenv.
 fn install_python(req: &str, platform: &str) -> Vec<InstallStep> {
     if platform == "darwin" {
@@ -721,17 +686,6 @@ fn tool_defs_jvm_and_go() -> Vec<ToolDef> {
             read_req: no_req,
             install_cmd: Some(install_maven),
         },
-        ToolDef {
-            name: "golang".into(),
-            binary: "go".into(),
-            source: "apps/rhino-cli/go.mod → go directive".into(),
-            args: vec!["version".into()],
-            use_stderr: false,
-            parse_ver: parse_go_version,
-            compare: compare_gte,
-            read_req: read_go_v,
-            install_cmd: Some(install_golang),
-        },
     ]
 }
 
@@ -944,7 +898,7 @@ mod tests {
     fn build_returns_all_known_tools() {
         let dir = tempfile::tempdir().unwrap();
         let defs = build_tool_defs(dir.path());
-        assert_eq!(defs.len(), 23);
+        assert_eq!(defs.len(), 22);
         assert_eq!(defs[0].name, "git");
         assert_eq!(defs.last().unwrap().name, "playwright");
         assert!(defs.iter().any(|d| d.name == "shellcheck"));
