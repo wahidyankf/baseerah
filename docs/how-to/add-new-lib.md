@@ -289,7 +289,7 @@ export default function Component() {
 - [ ] `src/lib/` contains implementation files
 - [ ] Test files created with `.test.ts` extension
 - [ ] `project.json` created with Nx configuration
-- [ ] `tags` field includes `type:lib`, `lang:` value (e.g., `lang:ts`, `lang:golang`)
+- [ ] `tags` field includes `type:lib`, `lang:` value (e.g., `lang:ts`, `lang:rust`)
 - [ ] All targets use `nx:run-commands` executor
 - [ ] `tsconfig.json` and `tsconfig.build.json` created
 - [ ] `package.json` created with library metadata

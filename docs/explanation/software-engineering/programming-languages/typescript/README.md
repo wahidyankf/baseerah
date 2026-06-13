@@ -679,7 +679,7 @@ apps/
 ├── ayokoding-web/            # Next.js 16 fullstack content platform (TypeScript, tRPC)
 ├── organiclever-web/         # Next.js 16 landing website
 ├── wahidyankf-web/           # Next.js 16 personal portfolio
-├── ayokoding-cli/            # Go CLI tool (content link validation)
+├── ayokoding-cli/            # Rust CLI tool (content link validation)
 └── rhino-cli/               # Rust CLI tool (repository management)
 
 libs/
@@ -1534,7 +1534,6 @@ async function processDonation(data: DonationInput): Promise<Result<Donation, Er
 
 ### Related Stack Documentation
 
-- [Golang Documentation](../golang/README.md)
 - [Rust Documentation](../rust/README.md)
 - [F# Documentation](../f-sharp/README.md)
 - [C# Documentation](../c-sharp/README.md)

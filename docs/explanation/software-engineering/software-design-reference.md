@@ -64,7 +64,7 @@ Each language directory contains:
 Languages covered:
 
 - **[TypeScript](./programming-languages/typescript/README.md)** - Frontend and Node.js
-- **[Go](./programming-languages/golang/README.md)** - CLI tools and infrastructure
+- **[Rust](./programming-languages/rust/README.md)** - Backend services, CLI tools, and infrastructure
 
 ### Framework-Specific Standards
 
@@ -124,9 +124,9 @@ Software design documentation in `docs/explanation/software-engineering/` contai
 
 The following `docs/explanation/` content assumes readers have completed the corresponding AyoKoding learning paths:
 
-| Advanced Reference (docs/explanation/)                           | Prerequisite Learning (ayokoding-web)                                                                                                                       |
-| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [programming-languages/golang/](./programming-languages/golang/) | [learn/software-engineering/programming-languages/golang/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/) |
+| Advanced Reference (docs/explanation/)                       | Prerequisite Learning (ayokoding-web)                                                                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [programming-languages/rust/](./programming-languages/rust/) | [learn/software-engineering/programming-languages/rust/](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/rust/) |
 
 ### Content Types and Scope
 
@@ -171,7 +171,7 @@ When writing code or making architectural decisions:
 Skills available for quick reference:
 
 - `swe-programming-typescript` - TypeScript coding standards
-- `swe-programming-golang` - Go coding standards
+- `swe-programming-rust` - Rust coding standards
 
 ## Validation
 

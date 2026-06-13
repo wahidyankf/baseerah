@@ -18,7 +18,7 @@ created: 2026-01-20
 
 ## Overview
 
-**The Polyglot Confusion**: Every language has its own idioms, conventions, and gotchas. Developers switch between TypeScript promises, Go goroutines, Rust ownership semantics, and F# discriminated unions. What's idiomatic in one language is an antipattern in another. Copy-pasting patterns across languages leads to awkward, non-idiomatic code.
+**The Polyglot Confusion**: Every language has its own idioms, conventions, and gotchas. Developers switch between TypeScript promises, Rust ownership semantics, and F# discriminated unions. What's idiomatic in one language is an antipattern in another. Copy-pasting patterns across languages leads to awkward, non-idiomatic code.
 
 **Curated Language Guidance**: We provide language-specific documentation that captures idioms, best practices, and antipatterns for each active language in the platform. Learn how to write code that feels native to the language, not awkwardly translated from another one.
 
@@ -30,7 +30,7 @@ This directory contains comprehensive documentation on programming languages use
 2. **Best Practices** - Proven approaches for writing clean, maintainable code
 3. **Antipatterns** - Common mistakes and pitfalls to avoid
 
-**Domain-Specific Standards Pattern** (Go, Rust, F#, C#):
+**Domain-Specific Standards Pattern** (Rust, F#, C#):
 
 Multiple domain-focused standards files covering specific areas (testing, security, concurrency, etc.) as separate documents rather than three consolidated files. See each language's README for their specific document structure.
 
@@ -40,8 +40,8 @@ Multiple domain-focused standards files covering specific areas (testing, securi
 | ---------------------------------------- | -------------------- | ---------------------------------------------- |
 | REST API backend (current ose-public)    | Rust/Axum            | See organiclever-be, ose-app-be                |
 | Frontend web application                 | TypeScript           | [TypeScript Standards](./typescript/README.md) |
-| CLI tool for repository automation       | Rust/Go              | See rhino-cli (Rust), ayokoding-cli (Go)       |
-| Infrastructure tooling                   | Go                   | See existing CLI tools                         |
+| CLI tool for repository automation       | Rust                 | See rhino-cli, ayokoding-cli, ose-cli (Rust)   |
+| Infrastructure tooling                   | Rust                 | See existing CLI tools                         |
 | Real-time updates and WebSocket handling | TypeScript           | [TypeScript Standards](./typescript/README.md) |
 | Complex domain logic with DDD            | F#/Rust              | See language-specific README files             |
 | Enterprise API with .NET interop         | C#/F#                | See c-sharp/ and f-sharp/ README files         |
@@ -49,8 +49,7 @@ Multiple domain-focused standards files covering specific areas (testing, securi
 **Platform Guidance**:
 
 - **TypeScript**: Active for all frontend applications (Next.js) and tRPC backends
-- **Go**: Active for CLI tools (ayokoding-cli, ose-cli)
-- **Rust**: Active for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, crane-cli)
+- **Rust**: Active for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, ayokoding-cli, ose-cli)
 - **F#**: Active for content pipeline tooling (crane-cli — Content Retrieval And Normalization Engine)
 - **C#**: Retained for potential .NET interop with F#
 
@@ -81,7 +80,6 @@ All code written in the languages documented here MUST follow the standards, pat
 **Skills Available**:
 
 - `swe-programming-typescript` - TypeScript standards quick reference
-- `swe-programming-golang` - Go standards quick reference
 - `swe-programming-rust` - Rust standards quick reference
 - `swe-programming-fsharp` - F# standards quick reference
 - `swe-programming-csharp` - C# standards quick reference
@@ -102,7 +100,7 @@ Each language directory contains a README.md (language overview and version info
 └── antipatterns.md        # Common antipatterns
 ```
 
-**Domain-Specific Standards Pattern** (Go, Rust, F#, C#):
+**Domain-Specific Standards Pattern** (Rust, F#, C#):
 
 ```
 [language-name]/
@@ -168,19 +166,6 @@ F# is a functional-first .NET language where immutability is the default and dis
 - Pure computation engines with units of measure
 - Content pipeline tooling (PDF-to-Markdown conversion, crane-cli)
 
-### 🐹 [Go](./golang/README.md)
-
-**Go development for CLI tools and infrastructure services**
-
-Go is used for CLI tools and infrastructure services in the repository. The platform uses Go for ayokoding-cli (content automation) and ose-cli (site maintenance).
-
-**Use Go when you need:**
-
-- CLI tools and command-line applications
-- High-performance infrastructure services
-- Static binaries with minimal dependencies
-- Concurrent systems with goroutines
-
 ### 🦀 [Rust](./rust/README.md)
 
 **Rust development with ownership-based memory safety, zero-cost abstractions, and Axum**
@@ -234,13 +219,12 @@ Languages in this documentation are chosen based on:
 
 ### Current Language Usage
 
-| Language       | Primary Use Cases                       | Status                                                        |
-| -------------- | --------------------------------------- | ------------------------------------------------------------- |
-| **C#**         | Enterprise APIs, .NET interop with F#   | 📋 Retained — .NET interop                                    |
-| **F#**         | Content pipeline tooling (crane-cli)    | ✅ Active — crane-cli                                         |
-| **Go**         | CLI tools, infrastructure services      | ✅ Active — ayokoding-cli, ose-cli                            |
-| **Rust**       | Backend APIs, CLI tools, infrastructure | ✅ Active — organiclever-be, ose-app-be, rhino-cli, crane-cli |
-| **TypeScript** | Frontend applications, tRPC backends    | ✅ Active — all Next.js apps                                  |
+| Language       | Primary Use Cases                       | Status                                                                     |
+| -------------- | --------------------------------------- | -------------------------------------------------------------------------- |
+| **C#**         | Enterprise APIs, .NET interop with F#   | 📋 Retained — .NET interop                                                 |
+| **F#**         | Content pipeline tooling (crane-cli)    | ✅ Active — crane-cli                                                      |
+| **Rust**       | Backend APIs, CLI tools, infrastructure | ✅ Active — organiclever-be, ose-app-be, rhino-cli, ayokoding-cli, ose-cli |
+| **TypeScript** | Frontend applications, tRPC backends    | ✅ Active — all Next.js apps                                               |
 
 **Legend**: ✅ Active (in use in ose-public) | 📋 Retained (standards documented; not yet used in active apps)
 

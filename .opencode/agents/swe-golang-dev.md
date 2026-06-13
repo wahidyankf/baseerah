@@ -78,7 +78,6 @@ Three linters were added in 2026-05-10 to strengthen type safety:
 
 - Prefer sealed interfaces (`//sumtype:decl`) over typed string enums when variants may carry per-variant data
 - Every type switch over a `//sumtype:decl` interface must cover all variants
-- See [Sealed-Interface Sum Types](../../docs/explanation/software-engineering/programming-languages/golang/design-patterns.md#sealed-interface-sum-types)
 
 **`iotamixing`** — Const-block hygiene:
 
@@ -126,9 +125,10 @@ func (ScopeFull) isScope() {}; func (ScopeFull) Code() string { return "full" };
 **Documentation Separation**:
 
 - **[AyoKoding](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)** - "How to code in Go" (educational, universal patterns)
-- **[docs/explanation](../../docs/explanation/software-engineering/programming-languages/golang/)** - "How to code Go in OSE Platform" (repository conventions, framework choices)
 
-**You MUST complete AyoKoding Go learning path before using OSE standards:**
+> **Note**: `ose-public` no longer ships a Go style-guide tree under `docs/explanation/`; Go was removed from active apps (the CLIs are now Rust). This agent authors Go for the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template, which is authoritative for Go standards. Use the AyoKoding educational content below for universal Go idioms.
+
+**You MUST complete the AyoKoding Go learning path before authoring Go:**
 
 1. **[Go Learning Path](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)** - Initial setup, overview, quick start (0-95% language coverage)
 2. **[Go By Example](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/by-example/)** - 75+ annotated code examples (beginner to advanced)
@@ -139,28 +139,13 @@ func (ScopeFull) isScope() {}; func (ScopeFull) Code() string { return "full" };
 
 ## Coding Standards
 
-**Authoritative Reference**: `docs/explanation/software-engineering/programming-languages/golang/README.md`
+**Authoritative Reference**: The AyoKoding Go educational content at [`apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/`](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/), plus the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template for Go style guides. `ose-public` no longer hosts a Go style-guide tree under `docs/explanation/`.
 
-All Go code MUST follow the platform coding standards organized into two categories:
+All Go code MUST follow universal Go idioms covered in the AyoKoding learning path:
 
-### Core Standards (Mandatory for All Code)
-
-1. **[Coding Standards](../../docs/explanation/software-engineering/programming-languages/golang/coding-standards.md)** - Naming conventions, package organization, Effective Go idioms
-2. **[Testing Standards](../../docs/explanation/software-engineering/programming-languages/golang/testing-standards.md)** - Table-driven tests, testify, gomock, TestContainers, Godog
-3. **[Code Quality Standards](../../docs/explanation/software-engineering/programming-languages/golang/code-quality-standards.md)** - golangci-lint, gofmt, staticcheck, go vet
-4. **[Build Configuration](../../docs/explanation/software-engineering/programming-languages/golang/build-configuration.md)** - go.mod structure, Makefile patterns, CI/CD integration
-
-### Context-Specific Standards (Apply When Relevant)
-
-1. **[Security Standards](../../docs/explanation/software-engineering/programming-languages/golang/security-standards.md)** - Input validation, injection prevention, crypto practices (user-facing services)
-2. **[Concurrency Standards](../../docs/explanation/software-engineering/programming-languages/golang/concurrency-standards.md)** - Goroutines, channels, context (concurrent code)
-3. **[DDD Standards](../../docs/explanation/software-engineering/programming-languages/golang/ddd-standards.md)** - Domain-Driven Design tactical patterns (business domains)
-4. **[API Standards](../../docs/explanation/software-engineering/programming-languages/golang/api-standards.md)** - REST conventions, HTTP routing (web services)
-5. **[Performance Standards](../../docs/explanation/software-engineering/programming-languages/golang/performance-standards.md)** - Profiling with pprof, benchmarking (optimization needed)
-6. **[Error Handling Standards](../../docs/explanation/software-engineering/programming-languages/golang/error-handling-standards.md)** - Error wrapping, sentinel errors, custom error types
-7. **[Type Safety Standards](../../docs/explanation/software-engineering/programming-languages/golang/type-safety-standards.md)** - Generics, type parameters (reusable code)
-8. **[Dependency Standards](../../docs/explanation/software-engineering/programming-languages/golang/dependency-standards.md)** - Go modules, version selection, replace directives
-9. **[Design Patterns](../../docs/explanation/software-engineering/programming-languages/golang/design-patterns.md)** - Idiomatic Go patterns (functional options, interface design)
+1. **[Go Overview](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/overview.md)** - Naming conventions, package organization, Effective Go idioms
+2. **[Go By Example](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/by-example/)** - Annotated patterns including testing, concurrency, error handling, generics
+3. **[Go In the Field](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/in-the-field/)** - Production guides: security, DDD, API design, performance, dependency management
 
 **See `swe-programming-golang` Skill** for quick access to coding standards during development.
 
@@ -183,7 +168,7 @@ All Go code MUST follow the platform coding standards organized into two categor
 
 **Coding Standards** (Authoritative):
 
-- [docs/explanation/software-engineering/programming-languages/golang/README.md](../../docs/explanation/software-engineering/programming-languages/golang/README.md)
+- [AyoKoding Go learning path](../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/) - Universal Go idioms (ose-public no longer ships a Go style-guide tree; downstream Go standards live in `ose-primer`)
 
 **Development Practices**:
 

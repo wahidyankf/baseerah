@@ -145,7 +145,7 @@ All three levels consume the same shared Gherkin scenarios from the project's `s
 For Nx to invalidate cached test results when relevant files change, all `test:unit` and
 `test:quick` targets must declare explicit `inputs` in `project.json` that include:
 
-1. **Source files** — language-specific glob patterns (e.g., `{projectRoot}/src/**/*.go`)
+1. **Source files** — language-specific glob patterns (e.g., `{projectRoot}/src/**/*.rs`)
 2. **Generated contracts** — `{projectRoot}/generated-contracts/**/*`
 3. **Gherkin specs** — `{workspaceRoot}/specs/apps/<app-name>/**/*.feature` (for backends with BDD)
 
@@ -178,11 +178,11 @@ Coverage is measured **only at the unit level**. Integration tests (`test:integr
 
 Different project types carry different coverage thresholds, reflecting the practical testability of each category:
 
-| Threshold | Projects                                                 | Rationale                                                                                           |
-| --------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| 90%       | API backends (`organiclever-be`), CLI apps (Go), Go libs | Core business logic with high mock isolation; all execution paths reachable in unit tests           |
-| 80%       | Content platforms (`ayokoding-web`, `ose-web`)           | Significant UI rendering code; some React rendering paths are hard to unit-test                     |
-| 70%       | FE apps (`organiclever-web`)                             | API/auth/query layers are fully mocked by design; threshold reflects intentional mocking boundaries |
+| Threshold | Projects                                                   | Rationale                                                                                           |
+| --------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 90%       | API backends (`organiclever-be`), Rust CLI apps, Rust libs | Core business logic with high mock isolation; all execution paths reachable in unit tests           |
+| 80%       | Content platforms (`ayokoding-web`, `ose-web`)             | Significant UI rendering code; some React rendering paths are hard to unit-test                     |
+| 70%       | FE apps (`organiclever-web`)                               | API/auth/query layers are fully mocked by design; threshold reflects intentional mocking boundaries |
 
 ## Mandatory Test Levels Matrix
 
@@ -361,50 +361,48 @@ apps/{backend-name}/
   project.json                     # test:unit, test:integration, test:e2e targets
 ```
 
-The exact directory structure varies by language convention (e.g., Go uses `_test.go` files, F# uses `tests/` with xUnit).
+The exact directory structure varies by language convention (e.g., Rust uses `#[cfg(test)]` modules alongside source plus a `tests/` directory, F# uses `tests/` with xUnit).
 
 ## CLI App Implementation Pattern
 
-Go CLI apps (`ayokoding-cli`, `ose-cli`) consume the same Gherkin specs from `specs/apps/<cli-name>/` at both the unit and integration levels. The difference is what the step definitions use as their I/O substrate:
+The Rust CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`) consume the same Gherkin specs from `specs/apps/<cli-name>/` at both the unit and integration levels. The difference is what the tests use as their I/O substrate:
 
-| Level       | Test File Pattern                       | Step Implementation                                                 | What's Real                   |
-| ----------- | --------------------------------------- | ------------------------------------------------------------------- | ----------------------------- |
-| Unit        | `{domain}_{action}_test.go` (no tag)    | Calls command logic with mocked I/O via package-level function vars | Application logic only        |
-| Integration | `{domain}_{action}.integration_test.go` | Drives command in-process via `cmd.RunE()` against `/tmp` fixtures  | Filesystem + command pipeline |
+| Level       | Test File Location               | Implementation                                                       | What's Real                   |
+| ----------- | -------------------------------- | -------------------------------------------------------------------- | ----------------------------- |
+| Unit        | `#[cfg(test)]` modules in `src/` | Calls command logic with mocked I/O via injected function/trait deps | Application logic only        |
+| Integration | `apps/<cli-name>/tests/*.rs`     | Drives the command in-process against `/tmp` fixtures                | Filesystem + command pipeline |
 
-**Architecture**: Both levels filter scenarios by the same `@tag` from the same feature files. Unit step definitions inject mock function variables (e.g., `readFileFn`, `writeFileFn`) to replace real filesystem calls. Integration step definitions run the full `cmd.RunE()` path against controlled temporary directory fixtures.
+**Architecture**: Both levels exercise the same behaviour described in the feature files. Unit tests inject mock dependencies (e.g., filesystem reader/writer) to replace real filesystem calls. Integration tests run the full command path against controlled temporary directory fixtures.
 
 ```
-Unit:        Gherkin Step -> Command Logic -> Mocked I/O function vars
-Integration: Gherkin Step -> cmd.RunE()   -> Real /tmp filesystem
+Unit:        Behaviour -> Command Logic -> Mocked I/O dependencies
+Integration: Behaviour -> Command run   -> Real /tmp filesystem
 ```
 
-**Coverage**: Coverage is measured at the unit level only (≥90% line coverage via `rhino-cli test-coverage validate`). Both levels must consume all Gherkin scenarios for their command.
+**Coverage**: Coverage is measured at the unit level (≥90% line coverage via `rhino-cli test-coverage validate` / `cargo-llvm-cov`). Both levels must cover all behaviour for their command.
 
 **Spec directory**: `specs/apps/<cli-name>/` — one feature file per command, organized by domain subdirectory.
-
-The Rust CLI app (`rhino-cli`) follows the same dual-level spec consumption pattern but uses Rust test files (`.rs`) instead of Go test files (`.go`). Unit tests live alongside source in `apps/rhino-cli/src/` and integration tests in `apps/rhino-cli/tests/`.
 
 ## Applicability by Project Type
 
 The three-level standard applies universally, with adaptations per project type:
 
-| Project Type                    | Unit                            | Integration                      | E2E                | test:quick | Gherkin Specs                          |
-| ------------------------------- | ------------------------------- | -------------------------------- | ------------------ | ---------- | -------------------------------------- |
-| API backend (`organiclever-be`) | All mocked + specs              | Real PostgreSQL, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
-| Web UI app (`organiclever-web`) | Vitest mocks                    | MSW in-process (cacheable)       | Playwright         | Yes        | Project-specific                       |
-| Content platform                | Vitest mocks                    | MSW/tRPC in-process (cacheable)  | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
-| CLI app (Go)                    | Go test mocks + Gherkin (godog) | Godog BDD in-process (cacheable) | N/A                | Yes        | `specs/apps/<cli-name>/`               |
-| Library (Go)                    | Go test mocks                   | Godog BDD in-process (cacheable) | N/A                | Yes        | `specs/libs/<lib-name>/`               |
-| E2E runner                      | N/A                             | N/A                              | Playwright         | N/A        | Shared specs                           |
+| Project Type                    | Unit                          | Integration                      | E2E                | test:quick | Gherkin Specs                          |
+| ------------------------------- | ----------------------------- | -------------------------------- | ------------------ | ---------- | -------------------------------------- |
+| API backend (`organiclever-be`) | All mocked + specs            | Real PostgreSQL, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
+| Web UI app (`organiclever-web`) | Vitest mocks                  | MSW in-process (cacheable)       | Playwright         | Yes        | Project-specific                       |
+| Content platform                | Vitest mocks                  | MSW/tRPC in-process (cacheable)  | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| CLI app (Rust)                  | cargo test unit + integration | cargo integration (cacheable)    | N/A                | Yes        | `specs/apps/<cli-name>/`               |
+| Library (Rust)                  | cargo test unit               | cargo integration (cacheable)    | N/A                | Yes        | `specs/libs/<lib-name>/`               |
+| E2E runner                      | N/A                           | N/A                              | Playwright         | N/A        | Shared specs                           |
 
 **Key rules by project type**:
 
 - **API backends**: All three levels mandatory; all consume Gherkin specs; integration uses real PostgreSQL with no HTTP
 - **Content platforms**: All three levels mandatory; integration uses MSW/tRPC in-process mocking (cacheable); Gherkin consumption planned (see "Known Gaps")
 - **Web UI apps**: All three levels mandatory; integration uses in-process mocking (MSW); cacheable
-- **CLI apps**: Unit + integration mandatory; both levels consume Gherkin specs via godog; unit mocks all I/O via package-level function variables; integration uses real filesystem with `/tmp` fixtures; cacheable
-- **Libraries**: Unit mandatory; integration optional (Godog BDD with public API calls); cacheable
+- **CLI apps**: Unit + integration mandatory; both levels cover the behaviour in the Gherkin specs; unit mocks all I/O via injected dependencies; integration uses real filesystem with `/tmp` fixtures; cacheable
+- **Libraries**: Unit mandatory; integration optional (public API calls); cacheable
 
 ## Anti-Patterns
 

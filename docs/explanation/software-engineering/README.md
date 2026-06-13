@@ -49,7 +49,6 @@ Language-specific idioms, best practices, and antipatterns:
 
 - **[C#](./programming-languages/c-sharp/README.md)** - C# development for .NET applications and enterprise services
 - **[F#](./programming-languages/f-sharp/README.md)** - F# development for .NET applications with functional-first programming
-- **[Go](./programming-languages/golang/README.md)** - Go development for CLI tools and infrastructure services
 - **[Rust](./programming-languages/rust/README.md)** - Rust development for systems programming and high-performance services
 - **[TypeScript](./programming-languages/typescript/README.md)** - TypeScript development for frontend applications and Node.js services
 

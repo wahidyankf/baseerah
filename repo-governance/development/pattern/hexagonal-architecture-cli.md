@@ -8,7 +8,7 @@ tags:
   - hexagonal
   - cli
   - rust
-  - go
+  - fsharp
 created: 2026-05-26
 ---
 
@@ -46,14 +46,14 @@ implementations satisfy those ports.
 
 The table below shows the canonical layout for all four CLI apps.
 
-| Layer              | rhino-cli (Rust)      | crane-cli (F#)      | ose-cli (Go)      | ayokoding-cli (Go) |
-| ------------------ | --------------------- | ------------------- | ----------------- | ------------------ |
-| Inbound adapter    | `src/commands/`       | `src/Adapters/In/`  | `commands/`       | `commands/`        |
-| Application        | `src/application/`    | `src/Core/Logic/`   | `application/`    | `application/`     |
-| Domain             | `src/domain/`         | `src/Core/Domain/`  | `domain/`         | `domain/`          |
-| Outbound adapters  | `src/infrastructure/` | `src/Adapters/Out/` | `infrastructure/` | `infrastructure/`  |
-| I/O port contracts | —                     | `src/Core/Ports.fs` | —                 | —                  |
-| Binary entry point | `src/main.rs`         | `src/Program.fs`    | `main.go`         | `main.go`          |
+| Layer              | rhino-cli (Rust)      | crane-cli (F#)      | ose-cli (Rust)        | ayokoding-cli (Rust)  |
+| ------------------ | --------------------- | ------------------- | --------------------- | --------------------- |
+| Inbound adapter    | `src/commands/`       | `src/Adapters/In/`  | `src/commands/`       | `src/commands/`       |
+| Application        | `src/application/`    | `src/Core/Logic/`   | `src/application/`    | `src/application/`    |
+| Domain             | `src/domain/`         | `src/Core/Domain/`  | `src/domain/`         | `src/domain/`         |
+| Outbound adapters  | `src/infrastructure/` | `src/Adapters/Out/` | `src/infrastructure/` | `src/infrastructure/` |
+| I/O port contracts | —                     | `src/Core/Ports.fs` | —                     | —                     |
+| Binary entry point | `src/main.rs`         | `src/Program.fs`    | `src/main.rs`         | `src/main.rs`         |
 
 **`src/internal/` backward-compatibility shim**: `rhino-cli` retains a `src/internal/` directory containing
 thin re-export modules (e.g., `pub use crate::application::agents::*;`). These exist solely for callers that

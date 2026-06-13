@@ -47,8 +47,8 @@ Partial lines count as NOT covered.
 
 | Project Type     | Threshold | Rationale                               |
 | ---------------- | --------- | --------------------------------------- |
-| CLI tools (Go)   | >= 90%    | Core business logic                     |
-| Go libraries     | >= 90%    | Shared utilities                        |
+| CLI tools (Rust) | >= 90%    | Core business logic                     |
+| Rust libraries   | >= 90%    | Shared utilities                        |
 | organiclever-be  | >= 90%    | Rust/Axum backend API                   |
 | organiclever-web | >= 70%    | Frontend app with MSW integration tests |
 | ayokoding-web    | >= 80%    | Content platform with UI rendering code |

@@ -23,9 +23,9 @@
   - `ayokoding-web` — Next.js 16 fullstack content platform (TypeScript, tRPC)
   - `ayokoding-web-be-e2e` — Playwright BE E2E tests for ayokoding-web tRPC API
   - `ayokoding-web-fe-e2e` — Playwright FE E2E tests for ayokoding-web UI
-  - `ayokoding-cli` — Go CLI tool for content link validation
+  - `ayokoding-cli` — Rust CLI tool for content link validation
   - `rhino-cli` — Rust CLI tool for repository management (Repository Hygiene & INtegration Orchestrator). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
-  - `ose-cli` — Go CLI tool for OSE Platform site maintenance (link validation)
+  - `ose-cli` — Rust CLI tool for OSE Platform site maintenance (link validation)
   - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture. Original F# source at `archived/crane-cli/`; Rust port 2026-05-26 preserved at `archived/crane-cli-rust/`.
   - `crane-be` — F# / Giraffe / ASP.NET 10 HTTP + NATS backend for PDF-to-Markdown conversion (crane-be service). Hexagonal architecture consuming `libs/fsharp-crane-core`. Dev port 8300.
   - `crane-be-e2e` — Playwright-BDD + @nats-io/transport-node E2E tests for crane-be (real HTTP + real NATS)

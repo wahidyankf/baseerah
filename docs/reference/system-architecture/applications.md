@@ -52,12 +52,12 @@ The platform consists of the following applications across its technology stacks
 - **Dev Port**: 3201
 - **Location**: `apps/wahidyankf-web/`
 
-### CLI Tools (Go)
+### CLI Tools
 
 #### ayokoding-cli
 
 - **Purpose**: Link validation for ayokoding-web content
-- **Language**: Go 1.26
+- **Language**: Rust
 - **Build Command**: `nx build ayokoding-cli`
 - **Location**: `apps/ayokoding-cli/`
 - **Features**:
@@ -75,7 +75,7 @@ The platform consists of the following applications across its technology stacks
 #### ose-cli
 
 - **Purpose**: OSE Platform site link validation
-- **Language**: Go 1.26
+- **Language**: Rust
 - **Build Command**: `nx build ose-cli`
 - **Location**: `apps/ose-cli/`
 - **Features**:

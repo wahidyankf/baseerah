@@ -26,7 +26,7 @@ Shows the internal components within each container. Components are groupings of
 - **Source Directory**: App source at `apps/ose-web/src/`
 - **Static Assets**: Images and public assets at `apps/ose-web/public/`
 
-### ayokoding-cli Components (Go CLI Tool)
+### ayokoding-cli Components (Rust CLI Tool)
 
 **Component Responsibilities:**
 
@@ -77,8 +77,8 @@ graph TB
 
 ## C4 Level 4: Code Architecture
 
-Shows implementation details for critical components. Focus on Go CLI tool package structures and key implementation patterns.
+Shows implementation details for critical components. Focus on Rust CLI tool package structures and key implementation patterns.
 
-### ayokoding-cli Package Structure (Go)
+### ayokoding-cli Package Structure (Rust)
 
 ayokoding-cli now provides only `links check` for validating internal links in ayokoding-web content. The title update and navigation regeneration commands were removed as part of the migration from Hugo to Next.js.

@@ -126,7 +126,7 @@ All Go project targets (`build`, `test:quick`, `test:unit`, `test:integration`, 
 
 ### Step 3: Go-Specific Standards
 
-**Reference**: `docs/explanation/software-engineering/programming-languages/golang/README.md`
+**Reference**: AyoKoding Go educational content (`apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/`) and the downstream `ose-primer` Go style guides. (`ose-public` no longer ships a Go style-guide tree under `docs/explanation/`; ose-public itself has no Go projects, but this checker also runs against Go projects in `ose-primer`.)
 
 For each Go project:
 
@@ -348,7 +348,6 @@ Each finding follows the standard format:
 
 **Coding Standards** (Authoritative):
 
-- [Go Standards](../../docs/explanation/software-engineering/programming-languages/golang/README.md)
 - [TypeScript Standards](../../docs/explanation/software-engineering/programming-languages/typescript/README.md)
 - [Rust Standards](../../docs/explanation/software-engineering/programming-languages/rust/README.md)
 - [F# Standards](../../docs/explanation/software-engineering/programming-languages/f-sharp/README.md)

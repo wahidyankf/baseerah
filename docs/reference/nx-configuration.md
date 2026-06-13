@@ -353,12 +353,12 @@ All projects use a standard four-dimension tag scheme:
 | ----------- | ----------------------------------------------------------- | ------------------------ | ----------------------- |
 | `type:`     | `app`, `lib`, `e2e`                                         | Yes                      | Project kind            |
 | `platform:` | `cli`, `nextjs`, `flutter`, `spring-boot`, `playwright`     | For apps/e2e             | Framework/runtime       |
-| `lang:`     | `golang`, `ts`, `java`, `dart`                              | Where source code exists | Primary language        |
+| `lang:`     | `rust`, `ts`, `dotnet`                                      | Where source code exists | Primary language        |
 | `domain:`   | `ayokoding`, `ose`, `organiclever`, `wahidyankf`, `tooling` | Yes                      | Business/product domain |
 
 **Notes**:
 
-- Go libs omit `platform:` — no framework, only `lang:golang`
+- Rust libs omit `platform:` — no framework, only `lang:rust`
 - Use `domain:tooling` for generic dev utilities not tied to a product domain
 
 ### Field Reference

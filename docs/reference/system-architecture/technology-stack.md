@@ -37,19 +37,19 @@ Technology stack summary, quality tools, and future architecture considerations 
 
 ### CLI Tools
 
-**Go CLI Tools**:
-
-- **Language**: Go 1.26
-- **Build**: Native Go toolchain via Nx
-- **Distribution**: Local binaries
-- **Applications**: ayokoding-cli, ose-cli
-
 **Rust CLI Tools**:
 
 - **Language**: Rust (edition 2024, rust-version 1.88)
 - **Build**: Cargo via Nx
 - **Distribution**: Local binaries
-- **Applications**: rhino-cli (Repository Hygiene & INtegration Orchestrator), crane-cli (Content Retrieval And Normalization Engine)
+- **Applications**: rhino-cli (Repository Hygiene & INtegration Orchestrator), ayokoding-cli, ose-cli
+
+**F# CLI Tools**:
+
+- **Language**: F# (.NET)
+- **Build**: dotnet via Nx
+- **Distribution**: Local binaries
+- **Applications**: crane-cli (Content Retrieval And Normalization Engine)
 
 ### Infrastructure
 
@@ -73,7 +73,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 
 ### Future Additions
 
-- **Shared Libraries**: TypeScript, Go, Python libs in `libs/`
+- **Shared Libraries**: TypeScript, Rust, F# libs in `libs/`
 - **Additional Applications**: More domain-specific enterprise apps
 - **Backend Services**: Sharia-compliant business logic services
 - **Authentication Service**: Centralized auth for all applications
@@ -88,7 +88,7 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **CDN**: Static asset delivery optimization (currently Vercel for Next.js sites)
 - **Additional Next.js Sites**: More specialized content platforms
 - **CLI Tool Suite Expansion**: More specialized automation tools
-- **Shared Go Modules**: Common functionality across Go CLI tools
+- **Shared Rust Crates**: Common functionality across Rust CLI tools
 
 ## Related Documentation
 

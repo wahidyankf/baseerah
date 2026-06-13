@@ -60,16 +60,16 @@ This separation follows the **DRY principle** (Don't Repeat Yourself) - educatio
 **PASS: Repository-specific style guides**:
 
 ```
-docs/explanation/software-engineering/programming-languages/golang/
+docs/explanation/software-engineering/programming-languages/rust/
 ├── README.md                                        # Overview + links to ayokoding-web
-├── coding-standards.md            # OSE Platform Go conventions
-├── code-quality-standards.md      # OSE Platform Go code quality
+├── coding-standards.md            # OSE Platform Rust conventions
+├── code-quality-standards.md      # OSE Platform Rust code quality
 ├── error-handling-standards.md    # OSE Platform error patterns
 ├── security-standards.md          # OSE Platform security standards
 └── testing-standards.md           # OSE Platform testing standards
 ```
 
-> **Note**: Go (along with Java and Elixir) follows the "Domain-Specific Standards Pattern" — multiple topic-focused standards files — rather than the "Three-Document Pattern" (idioms/best-practices/anti-patterns) used by TypeScript, Python, and Dart. Both patterns are valid. See `docs/explanation/software-engineering/programming-languages/README.md` for details.
+> **Note**: Rust (along with F# and C#) follows the "Domain-Specific Standards Pattern" — multiple topic-focused standards files — rather than the "Three-Document Pattern" (idioms/best-practices/anti-patterns) used by TypeScript. Both patterns are valid. See `docs/explanation/software-engineering/programming-languages/README.md` for details.
 
 **Content includes**:
 
@@ -310,7 +310,6 @@ This convention applies to **ALL** programming languages in the repository:
 - Kotlin (JVM) - `docs/explanation/.../kotlin/`, `apps/ayokoding-web/.../kotlin/`
 - Python - `docs/explanation/.../python/`, `apps/ayokoding-web/.../python/`
 - TypeScript (Node.js) - `docs/explanation/.../typescript/`, `apps/ayokoding-web/.../typescript/`
-- Golang - `docs/explanation/.../golang/`, `apps/ayokoding-web/.../golang/`
 - Elixir (BEAM) - `docs/explanation/.../elixir/`, `apps/ayokoding-web/.../elixir/`
 - Dart (Flutter) - `docs/explanation/.../dart/`, `apps/ayokoding-web/.../dart/`
 - Rust - `docs/explanation/.../rust/`, `apps/ayokoding-web/.../rust/`

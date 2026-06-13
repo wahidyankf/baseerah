@@ -86,9 +86,9 @@ Flat structure - all apps at the same level, no subdirectories.
 
 - `ose-web` - OSE Platform website (Next.js 16 content platform)
 - `ayokoding-web` - AyoKoding educational platform (Next.js 16 fullstack content platform)
-- `ayokoding-cli` - AyoKoding CLI tool (Go application)
+- `ayokoding-cli` - AyoKoding CLI tool (Rust application)
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
-- `ose-cli` - OSE Platform site maintenance CLI (Go application)
+- `ose-cli` - OSE Platform site maintenance CLI (Rust application)
 - `organiclever-web` - OrganicLever landing website (Next.js application)
 - `organiclever-be` - OrganicLever REST API backend (Rust/Axum application)
 - `organiclever-web-e2e` - Playwright FE E2E tests for organiclever-web
@@ -108,15 +108,22 @@ apps/ose-web/
 └── README.md                  # App documentation
 ```
 
-### App Structure (Go CLI Application)
+### App Structure (Rust CLI Application)
 
 ```
 apps/ayokoding-cli/
-├── cmd/                       # CLI commands
-├── internal/                  # Internal packages
-├── dist/                      # Build output (gitignored)
-├── main.go                    # Entry point
-├── go.mod                     # Go module definition
+├── src/                       # Source code
+│   ├── commands/              # CLI command handlers
+│   ├── domain/                # Domain logic
+│   ├── application/           # Application services
+│   ├── infrastructure/        # Adapters (I/O, HTTP)
+│   ├── cli.rs                 # CLI argument parsing
+│   ├── lib.rs                 # Library root
+│   └── main.rs                # Entry point
+├── tests/                     # Integration tests
+├── target/                    # Build output (gitignored)
+├── Cargo.toml                 # Rust package manifest
+├── rust-toolchain.toml        # Pinned Rust toolchain
 ├── project.json               # Nx project configuration
 └── README.md                  # App documentation
 ```
@@ -227,7 +234,7 @@ libs/ts-utils/
 
 ### Current Scope
 
-Rust (`rust-commons`), F# (`fsharp-crane-core`), and future TypeScript, Java, Kotlin, Python libraries.
+Rust (`rust-commons`), F# (`fsharp-crane-core`), and future TypeScript libraries.
 
 ## Experimental Projects vs Monorepo Projects
 
@@ -235,7 +242,7 @@ The repository contains two distinct project structures with different purposes 
 
 ### Nx Monorepo Projects (`apps/` and `libs/`)
 
-**Purpose**: Integrated projects (TypeScript, Go, Java) that benefit from shared tooling and workspace integration.
+**Purpose**: Integrated projects (TypeScript, Rust, F#) that benefit from shared tooling and workspace integration.
 
 **Characteristics**:
 
@@ -258,9 +265,9 @@ The repository contains two distinct project structures with different purposes 
 **Examples**:
 
 - Next.js frontend applications
-- Spring Boot backend services
-- Go CLI tools
-- Reusable TypeScript and Go libraries
+- Rust/Axum backend services
+- Rust CLI tools
+- Reusable Rust and F# libraries
 
 ### Experimental Projects (`apps-labs/`)
 
@@ -269,7 +276,7 @@ The repository contains two distinct project structures with different purposes 
 **Characteristics**:
 
 - NOT managed by Nx workspace
-- Independent build systems (Hugo, Go, Python, Rust, etc.)
+- Independent build systems (Hugo, Python, Rust, etc.)
 - Self-contained configuration
 - Separate deployment pipelines
 - No access to workspace path mappings
@@ -279,30 +286,30 @@ The repository contains two distinct project structures with different purposes 
 **When to use**:
 
 - Framework evaluation (Next.js vs Remix vs SvelteKit)
-- Language exploration (Python, Go, Rust, etc.)
+- Language exploration (Python, Rust, etc.)
 - Technology POCs (databases, authentication approaches, etc.)
 - Quick prototypes without monorepo integration overhead
 - Temporary experiments that might be deleted after evaluation
 
-**Note on Nx integration**: Even projects with non-Node.js toolchains (like Go, Python) can be integrated with Nx using the `nx:run-commands` executor to wrap their CLI commands. This provides benefits like task caching, unified command interface, and dependency graph visualization.
+**Note on Nx integration**: Even projects with non-Node.js toolchains (like Rust, F#) can be integrated with Nx using the `nx:run-commands` executor to wrap their CLI commands. This provides benefits like task caching, unified command interface, and dependency graph visualization.
 
 ### Key Differences
 
-| Aspect                     | Nx Monorepo (`apps/`, `libs/`)    | Experimental (`apps-labs/`)          |
-| -------------------------- | --------------------------------- | ------------------------------------ |
-| Build System               | Nx workspace                      | Independent (Hugo, Go, Python, etc.) |
-| Configuration              | Shared `tsconfig.base.json`       | Self-contained                       |
-| Path Mappings              | Yes (`@open-sharia-enterprise/*`) | No                                   |
-| Task Caching               | Yes (Nx cache)                    | No                                   |
-| Cross-project Dependencies | Supported                         | Not supported                        |
-| Deployment                 | Varies by app                     | Independent pipelines                |
-| Language                   | TypeScript, Go, Java (current)    | Any language                         |
+| Aspect                     | Nx Monorepo (`apps/`, `libs/`)    | Experimental (`apps-labs/`)            |
+| -------------------------- | --------------------------------- | -------------------------------------- |
+| Build System               | Nx workspace                      | Independent (Hugo, Python, Rust, etc.) |
+| Configuration              | Shared `tsconfig.base.json`       | Self-contained                         |
+| Path Mappings              | Yes (`@open-sharia-enterprise/*`) | No                                     |
+| Task Caching               | Yes (Nx cache)                    | No                                     |
+| Cross-project Dependencies | Supported                         | Not supported                          |
+| Deployment                 | Varies by app                     | Independent pipelines                  |
+| Language                   | TypeScript, Rust, F# (current)    | Any language                           |
 
 ### Decision Guide
 
 **Use Nx monorepo (`apps/` or `libs/`)** if:
 
-- Project is TypeScript, Go, Java, or Spring Boot-based
+- Project is TypeScript, Rust, or F#-based
 - Project shares code with other monorepo projects
 - Project benefits from task caching
 - Project needs unified tooling
@@ -420,12 +427,12 @@ All projects use a standard four-dimension tag scheme:
 | ----------- | ----------------------------------------------------------- | ------------------------ | ----------------------- |
 | `type:`     | `app`, `lib`, `e2e`                                         | Yes                      | Project kind            |
 | `platform:` | `cli`, `nextjs`, `spring-boot`, `playwright`                | For apps/e2e             | Framework/runtime       |
-| `lang:`     | `golang`, `ts`, `java`                                      | Where source code exists | Primary language        |
+| `lang:`     | `rust`, `ts`, `dotnet`                                      | Where source code exists | Primary language        |
 | `domain:`   | `ayokoding`, `ose`, `organiclever`, `wahidyankf`, `tooling` | Yes                      | Business/product domain |
 
 **Notes**:
 
-- Go libs omit `platform:` — they have no framework, only `lang:golang`
+- Rust libs omit `platform:` — they have no framework, only `lang:rust`
 - Use `domain:tooling` for generic dev utilities not tied to a product domain
 
 ### `tsconfig.json` (TypeScript Configuration)
@@ -482,13 +489,15 @@ All projects use a standard four-dimension tag scheme:
 
 ### App Configuration Files
 
-**Go Apps** use `go.mod` for dependency management:
+**Rust Apps** use `Cargo.toml` for dependency management:
 
-```go
-// apps/ayokoding-cli/go.mod
-module github.com/wahidyankf/ose-public/apps/ayokoding-cli
-
-go 1.26
+```toml
+# apps/ayokoding-cli/Cargo.toml
+[package]
+name = "ayokoding-cli"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
 ```
 
 **TypeScript/Next.js Apps** use `package.json`:
@@ -531,7 +540,7 @@ go 1.26
 
 ### Import Patterns
 
-**Note**: Go apps do not use TypeScript path mappings. These patterns apply to TypeScript/Next.js apps.
+**Note**: Rust/F# apps do not use TypeScript path mappings. These patterns apply to TypeScript/Next.js apps.
 
 **Apps importing libs** (TypeScript apps):
 
@@ -553,7 +562,7 @@ import { formatDate } from "@open-sharia-enterprise/ts-utils";
 2. **Libs can import from other libs**
 3. **No circular dependencies** (A → B → A is prohibited)
 4. **Apps should NOT import from other apps**
-5. **Language boundaries exist** (TypeScript libs can't directly import Go/Python/Rust libs)
+5. **Language boundaries exist** (TypeScript libs can't directly import Rust/F# libs)
 
 ### Monitoring Dependencies
 
@@ -595,9 +604,9 @@ Configured in `tsconfig.base.json`:
 
 ### Apps
 
-- **Go**: `apps/[app-name]/dist/` (compiled binaries)
+- **Rust**: `apps/[app-name]/target/` (compiled binaries)
 - **Next.js**: `apps/[app-name]/.next/`
-- **Spring Boot**: `apps/[app-name]/target/`
+- **F#/.NET**: `apps/[app-name]/bin/`
 
 ### Libraries
 

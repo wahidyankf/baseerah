@@ -25,15 +25,15 @@ tests, and E2E tests will all work locally.
 
 ## Overview
 
-The monorepo contains projects in TypeScript, Go, and F#. Each language has its own runtime,
+The monorepo contains projects in TypeScript, Rust, and F#. Each language has its own runtime,
 but they all share the same Nx build system and git hooks.
 
 **Two setup paths**:
 
-- **Minimal** — Node.js + Go + Docker + jq. Covers git hooks, TypeScript/Go projects, and
+- **Minimal** — Node.js + Docker + jq. Covers git hooks, TypeScript projects, and
   basic E2E tests.
 - **Full** — All tools checked by doctor. Required for working on Rust backend apps
-  (`organiclever-be`, `ose-app-be`) and Go CLI tools.
+  (`organiclever-be`, `ose-app-be`) and Rust CLI tools.
 - **Automated** — Run `npm run doctor -- --fix` to auto-install missing tools. Use
   `npm run doctor -- --fix --dry-run` to preview what would be installed.
 
@@ -45,7 +45,7 @@ but they all share the same Nx build system and git hooks.
 
 ## Quick Start (Minimal Setup)
 
-If you only work on TypeScript or Go projects, this is all you need:
+If you only work on TypeScript projects, this is all you need:
 
 ```bash
 # 1. Install Homebrew (macOS — skip if already installed)
@@ -59,10 +59,7 @@ brew install jq
 curl https://get.volta.sh | bash
 source ~/.zshrc
 
-# 4. Install Go
-brew install go
-
-# 5. Clone and bootstrap
+# 4. Clone and bootstrap
 git clone https://github.com/wahidyankf/ose-public.git
 cd open-sharia-enterprise
 npm install          # Installs deps + git hooks
@@ -148,26 +145,9 @@ volta install node@24.13.1
 volta install npm@11.10.1
 ```
 
-### Step 4: Go
+### Step 4: Rust Toolchain
 
-Required for Go-based tooling. Note: `ayokoding-cli` and `ose-cli` have migrated to Rust (2026-05-25); Go is no longer required for those apps.
-
-```bash
-# macOS
-brew install go
-
-# Linux — download from https://go.dev/dl/
-```
-
-Verify the installed version meets or exceeds the `go` directive in `apps/ayokoding-cli/go.mod`:
-
-```bash
-go version
-```
-
-### Step 5: Rust Toolchain
-
-Required for `organiclever-be` (Rust/Axum), `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
+Required for `organiclever-be` (Rust/Axum), `ose-app-be`, `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
 
 ```bash
 # Install rustup (if not present)
@@ -180,7 +160,7 @@ cargo install cargo-deny --locked
 rustc --version
 ```
 
-### Step 6: Clone and Bootstrap
+### Step 5: Clone and Bootstrap
 
 ```bash
 git clone https://github.com/wahidyankf/ose-public.git
@@ -194,7 +174,7 @@ npm install
 2. Runs `npm run doctor` automatically (postinstall script) to verify your toolchain
 3. Sets up Husky git hooks (pre-commit, commit-msg, pre-push)
 
-### Step 7: Restore Environment Files
+### Step 6: Restore Environment Files
 
 `.env` files are gitignored but required by many apps. If you have a previous backup,
 restore them:
@@ -216,7 +196,7 @@ To create a backup for future use:
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env backup --include-config
 ```
 
-### Step 8: Install Playwright Browsers
+### Step 7: Install Playwright Browsers
 
 ```bash
 npx playwright install
@@ -347,7 +327,6 @@ All version requirements are auto-detected by `npm run doctor` from these config
 | ---------- | ------------------------------------------------ |
 | Node.js    | `package.json` → `volta.node`                    |
 | npm        | `package.json` → `volta.npm`                     |
-| Go         | `apps/ayokoding-cli/go.mod` → `go` directive     |
 | Rust       | `apps/rhino-cli/rust-toolchain.toml` → `channel` |
 | .NET       | `apps/organiclever-be/global.json` → `sdk`       |
 | Docker, jq | Any (no pinned version)                          |

@@ -1,6 +1,6 @@
 ---
 title: Restructure Backends to F# and Split Web Tiers
-description: Rewrite both backends from Rust to F# (Giraffe/EF Core/DbUp/NATS.Net) and drop crane media; rename organiclever to the *-app-* family; split organiclever into a simple marketing site (www) and a CSR app (app.*); add a shared design-system lib consumed by all four product frontends; simplify the marketing sites to the wahidyankf-web pattern. Restructure the matching specs/. Prod cutover (Vercel/DNS) is deferred downstream.
+description: Rewrite both backends from Rust to F# (Giraffe/EF Core/DbUp/NATS.Net) as generic per-product backends (organiclever-be rewritten in place, ose-app-be → ose-be) and drop crane media; rename the organiclever web tier to the *-app-* family; split organiclever into a simple marketing site (organiclever-www) and a CSR app (organiclever-app-web); adopt a repo-wide -www suffix for the public-website tier (ose-web → ose-www, wahidyankf-web → wahidyankf-www, ayokoding-web → ayokoding-www); add a shared design-system lib consumed by the app web clients; simplify the new marketing sites to the wahidyankf-www pattern. Restructure the matching specs/. Runs in its own worktree for parallel execution. Prod cutover (Vercel/DNS) is deferred downstream.
 ---
 
 # Restructure Backends to F# and Split Web Tiers
@@ -10,7 +10,8 @@ description: Rewrite both backends from Rust to F# (Giraffe/EF Core/DbUp/NATS.Ne
 
 ## Context
 
-`ose-public` runs two production backends — `apps/organiclever-be` and `apps/ose-app-be` — both
+`ose-public` runs two production backends — `apps/organiclever-be` and `apps/ose-app-be`
+`[Repo-grounded: apps/organiclever-be, apps/ose-app-be]` — both
 written in **Rust (Axum / sqlx / async-nats)** and shipped by the archived
 [`bootstrap-be-messaging-and-crane-media`](../../done/2026-06-12__bootstrap-be-messaging-and-crane-media/README.md)
 plan (done 2026-06-12). That plan also stood up a shared F# media service `apps/crane-be/` (PDF to
@@ -28,43 +29,82 @@ into a **platform-tier restructure**:
 2. **The web tier is inconsistent.** `organiclever-web` is a single app that conflates a marketing
    landing surface with the local-first journal app. OSE already runs the clean two-tier split
    (`ose-web` marketing + `ose-app-web` app + `ose-app-be`). OrganicLever should match it.
+3. **The web-tier naming is ambiguous.** `-web` is used for both public content sites and the OSE
+   app's web client, so the **deployment role** a project plays is not legible from its name. This
+   plan adopts a repo-wide naming rule (recorded below): **`-www` = a public website served at the
+   domain root (the public/marketing/content deployment role, Vercel); `-app-web` = an
+   application's web client served at `app.*` (Vercel).** Every public-website project is renamed to
+   the `-www` suffix; the application web clients keep `-app-web`. The `-www` suffix denotes the
+   **deployment role**, not the internal architecture: the simple flat `src/features/` shape is the
+   **default for NEW `-www` sites**, but established content platforms (`ose-www`, `ayokoding-www`)
+   keep their existing tRPC/content internals — the suffix does not force a structure retrofit.
+4. **The backend tier should be cost-driven generic, not per-tier.** The team self-hosts
+   Kubernetes, so each product runs **one generic backend** rather than a per-tier backend. The
+   target name is `<product>-be` (generic) — not `<product>-app-be`. The `*-app-web` clients call
+   the generic `<product>-be`. This is "generic first": forward-compatible with a future split if
+   one is ever needed, without paying the cost of multiple backends today.
 
 ### What this plan does
 
-1. **Rewrites both backends from Rust to F#**, mirroring the reference stack in
-   `ose-primer/apps/crud-be-fsharp-giraffe/` — Giraffe on .NET 10, EF Core 10 for data access,
-   **DbUp** for run-on-boot migrations (replacing `sqlx::migrate!`), and **NATS.Net** for messaging
-   (replacing `async-nats`).
-   - `ose-app-be` is a **port**: it has a real consumer (`ose-app-web` via generated contracts) and
-     five non-media bounded contexts; its OpenAPI contract is **preserved** (minus media).
-   - `organiclever-app-be` is **greenfield-ish**: it becomes a real backend with **minimal `journal`
-     CRUD** (mirroring the existing PGlite client schema), plus `health` + the JetStream demo. The
-     web↔be consumption model (server-authoritative vs local-first + sync) is a **deferred
-     decision**; the journal CRUD ships **unconsumed but contract-smoke-tested** in this plan.
+1. **Rewrites both backends from Rust to F# as generic `<product>-be` backends**, mirroring the
+   reference stack in `ose-primer/apps/crud-be-fsharp-giraffe/` — Giraffe on .NET 10, EF Core 10 for
+   data access, **DbUp** for run-on-boot migrations (replacing `sqlx::migrate!`), and **NATS.Net**
+   for messaging (replacing `async-nats`).
+   - `ose-app-be` is a **rename + port**: it is renamed `ose-app-be` → **`ose-be`** (generic) and
+     ported Rust → F#. It has a real consumer (`ose-app-web` via generated contracts) and five
+     non-media bounded contexts; its OpenAPI contract is **preserved** (minus media). It is an
+     **AI/LLM backend** (gap-analysis via OpenRouter); the F# port **preserves the OpenRouter
+     integration** (core, not media).
+   - `organiclever-be` is an **in-place F# rewrite** (the name `organiclever-be` is already generic
+     and current — **no `git mv` for the backend**). It becomes a real backend with **minimal
+     `journal` CRUD** (mirroring the existing PGlite client schema), plus `health` + the JetStream
+     demo. The web↔be consumption model (server-authoritative vs local-first + sync) is a
+     **deferred decision**; the journal CRUD ships **unconsumed but contract-smoke-tested** in this
+     plan.
 2. **Removes the crane media service entirely.** `apps/crane-be/` and `apps/crane-be-e2e/` are
    deleted; both backends lose their `contexts/media/`, their `crane_client`, the `/media/pdf-to-md`
    HTTP endpoint, and the `crane.convert` NATS subject. The image roster drops from three to two.
-3. **Splits the organiclever web tier and renames to the `*-app-*` family.** Today's
+3. **Splits the organiclever web tier and adopts the `-www`/`-app-web` tier naming.** Today's
    `organiclever-web` (the PGlite app) is renamed to **`organiclever-app-web`**; a **new, simple
-   `organiclever-web`** marketing site is created from the extracted `landing` context. The backend
-   is renamed `organiclever-be` → **`organiclever-app-be`**.
-4. **Adds a shared design-system lib** (`libs/ts-ui`) consumed by all **four** product frontends
-   (`organiclever-web`, `organiclever-app-web`, `ose-web`, `ose-app-web`).
-5. **Simplifies the marketing sites to the wahidyankf-web pattern** — `ose-web` (structure-only;
-   keeps its tRPC + content/feed pipeline) and the new `organiclever-web` (greenfield-simple) adopt
-   the flat `src/features/` shape; the DDD/Effect/XState/CSR weight stays in the `-app-` webs.
-6. **Restructures the matching `specs/`** — rename organiclever spec surfaces, add the marketing
-   tier, drop crane-be specs (keep crane-cli), remove media everywhere.
+   marketing site `organiclever-www`** is created from the extracted `landing` context. The backend
+   keeps its current generic name `organiclever-be` (in-place F# rewrite, **not** renamed). So the
+   organiclever **atomic rename unit covers only the web tier** (`organiclever-web` →
+   `organiclever-app-web` + new `organiclever-www` + their e2e); the backend is a separate in-place
+   rewrite.
+4. **Renames the existing public-website sites to the `-www` suffix.** `ose-web` → **`ose-www`**
+   (structure-only simplification, now also a project rename), `wahidyankf-web` →
+   **`wahidyankf-www`** (the structural pattern reference, mechanical rename), and `ayokoding-web` →
+   **`ayokoding-www`** (mechanical rename — bilingual content/education platform that **keeps** its
+   existing structure and tRPC; the `-www` suffix denotes its public-site deployment role, not a
+   structure change). Every public website carries the `-www` tier suffix.
+5. **Renames the OSE backend to the generic name.** `ose-app-be` → **`ose-be`** (`git mv`, its own
+   atomic rename unit so `main` is never half-renamed): e2e `ose-app-be-e2e` → `ose-be-e2e`, env
+   `OSE_APP_BE_*` → `OSE_BE_*`, GHCR image `ghcr.io/wahidyankf/ose-be`, and the `ose-app-web`
+   generated-contracts codegen source pointer updated to `ose-be`.
+6. **Adds a shared design-system lib** (`libs/ts-ui`) consumed by the app web clients and the new
+   simple marketing site (`organiclever-www`, `organiclever-app-web`, `ose-app-web`); `ose-www` and
+   `ayokoding-www` keep their established content internals and are not forced to retrofit `ts-ui`.
+7. **Simplifies the NEW marketing sites to the wahidyankf pattern** — the new `organiclever-www`
+   (greenfield-simple) adopts the flat `src/features/` shape. `ose-www` keeps a structure-only
+   simplification (still keeps its tRPC + content/feed pipeline); `ayokoding-www` keeps its full
+   existing structure (no reshape). The DDD/Effect/XState/CSR weight stays in the `-app-web` apps.
+8. **Restructures the matching `specs/`** — rename organiclever web spec surfaces (keep
+   `behavior/organiclever-be`), add the marketing tier; rename the OSE backend spec surfaces to
+   match `ose-be` (`behavior/app-be` → `behavior/be`, `components/app-be` → `components/be`) and
+   annotate `platform-web` as `ose-www`; rename ayokoding-web spec references to `ayokoding-www`;
+   drop crane-be specs (keep crane-cli); remove media everywhere.
 
 `libs/fsharp-crane-core/` **stays** — `apps/crane-cli` (F#) still depends on it. `libs/rust-commons/`
 **stays** — `apps/ayokoding-cli` and `apps/ose-cli` (both remain Rust) still depend on it.
 
 ### What this plan does NOT do
 
-- **No production cutover.** Vercel project creation, `app.organiclever.com` DNS, and the new
-  `prod-organiclever-app-web` branch are **deferred downstream** (a follow-on / `ose-infra` cutover
-  plan). This plan delivers everything renamed, built, and CI-green, but the new www/app split is
-  **not live in production** at plan end.
+- **No production cutover.** Vercel project creation, `app.organiclever.com` DNS, the new
+  `prod-organiclever-www` / `prod-organiclever-app-web` branches, and the prod-branch renames for the
+  renamed public-website sites (`prod-ose-web` → `prod-ose-www`, `prod-wahidyankf-web` →
+  `prod-wahidyankf-www`, `prod-ayokoding-web` → `prod-ayokoding-www`) are **deferred downstream** (a
+  follow-on / `ose-infra` cutover plan). This plan delivers everything renamed, built, and CI-green,
+  but the new www/app split is **not live in production** at plan end.
 - It does not resolve the deferred organiclever **sync-vs-server-authoritative** product decision.
 - It does not author the converged toolchain (owned by `standardize-repo-toolchain-parity`,
   assumed DONE).
@@ -77,38 +117,45 @@ author it.
 
 ## Decision Ledger (resolved during grilling)
 
-| #   | Fork                         | Decision                                                                     |
-| --- | ---------------------------- | ---------------------------------------------------------------------------- |
-| 1   | organiclever-be purpose      | Becomes **real** (client-server)                                             |
-| 2   | fold vs separate plan        | **Fold + rename** into this plan                                             |
-| 3   | data architecture            | Build **CRUD now**, consumption model **decided later**                      |
-| 4   | k3s gate                     | **Decouple** — bootable BE images ship early                                 |
-| 5   | CRUD scope                   | **Minimal** (one context) now                                                |
-| 6   | www marketing content        | **Extract** the existing `landing` context                                   |
-| 7   | naming                       | **Full `*-app-*` parity rename**                                             |
-| 8   | OSE frontend                 | **Also realign** (simplify + audit)                                          |
-| 9   | first CRUD context           | **journal**                                                                  |
-| 10  | prod topology (target)       | Reuse www project for marketing; new app project + DNS (**wiring deferred**) |
-| 11  | shared design system         | **One shared UI lib** (`libs/ts-ui`) for all four frontends                  |
-| 12  | OSE realign depth            | Full structure + naming audit                                                |
-| 13  | ose-web simplify depth       | **Structure-only** (keep tRPC + content/feed infra)                          |
-| 14  | organiclever marketing build | **Greenfield-simple**, reuse landing content                                 |
-| 15  | plan shape                   | **Single mega-plan**                                                         |
-| 16  | k3s unblock timing           | **ASAP** — publish bootable images right after scaffold                      |
-| 17  | ts-ui ordering               | **ts-ui first**, then all frontends consume it                               |
-| 18  | prod wiring                  | **Defer** Vercel/DNS/prod-branch downstream                                  |
-| 19  | push cadence / rollback      | **Incremental push per gate**; the rename is one **atomic** commit           |
+| #   | Fork                         | Decision                                                                                                                                                                                                                                                                                                                                                                                     |
+| --- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | organiclever-be purpose      | Becomes **real** (client-server)                                                                                                                                                                                                                                                                                                                                                             |
+| 2   | fold vs separate plan        | **Fold + rename** into this plan                                                                                                                                                                                                                                                                                                                                                             |
+| 3   | data architecture            | Build **CRUD now**, consumption model **decided later**                                                                                                                                                                                                                                                                                                                                      |
+| 4   | k3s gate                     | **Decouple** — bootable BE images ship early                                                                                                                                                                                                                                                                                                                                                 |
+| 5   | CRUD scope                   | **Minimal** (one context) now                                                                                                                                                                                                                                                                                                                                                                |
+| 6   | www marketing content        | **Extract** the existing `landing` context                                                                                                                                                                                                                                                                                                                                                   |
+| 7   | naming                       | organiclever **web** tier → `*-app-*` family (`organiclever-web` app → `organiclever-app-web` + new `organiclever-www`); backend stays generic `organiclever-be` (see #21)                                                                                                                                                                                                                   |
+| 8   | OSE frontend                 | **Also realign** (simplify + audit)                                                                                                                                                                                                                                                                                                                                                          |
+| 9   | first CRUD context           | **journal**                                                                                                                                                                                                                                                                                                                                                                                  |
+| 10  | prod topology (target)       | Reuse www project for marketing; new app project + DNS (**wiring deferred**)                                                                                                                                                                                                                                                                                                                 |
+| 11  | shared design system         | **One shared UI lib** (`libs/ts-ui`) for the app web clients + the new `organiclever-www`; `ose-www`/`ayokoding-www` keep their content internals, not forced to adopt                                                                                                                                                                                                                       |
+| 12  | OSE realign depth            | Full structure + naming audit                                                                                                                                                                                                                                                                                                                                                                |
+| 13  | ose-www simplify depth       | **Structure-only** (keep tRPC + content/feed infra)                                                                                                                                                                                                                                                                                                                                          |
+| 14  | organiclever marketing build | **Greenfield-simple**, reuse landing content                                                                                                                                                                                                                                                                                                                                                 |
+| 15  | plan shape                   | **Single mega-plan**                                                                                                                                                                                                                                                                                                                                                                         |
+| 16  | k3s unblock timing           | **ASAP** — publish bootable images right after scaffold                                                                                                                                                                                                                                                                                                                                      |
+| 17  | ts-ui ordering               | **ts-ui first**, then all frontends consume it                                                                                                                                                                                                                                                                                                                                               |
+| 18  | prod wiring                  | **Defer** Vercel/DNS/prod-branch downstream                                                                                                                                                                                                                                                                                                                                                  |
+| 19  | push cadence / rollback      | **Incremental push per gate**; the rename is one **atomic** commit                                                                                                                                                                                                                                                                                                                           |
+| 20  | public-website-tier naming   | **Repo-wide `-www` suffix** = public-website **deployment role** (domain root, Vercel); `-app-web` = app web client at `app.*`. New OL marketing = `organiclever-www`; `ose-web` → `ose-www`; `wahidyankf-web` → `wahidyankf-www`; `ayokoding-web` → `ayokoding-www` (#22). Simple `features/` is the DEFAULT for NEW `-www` sites only — established content platforms keep their internals |
+| 21  | backend naming (generic)     | **Generic `<product>-be`** (cost-driven, self-hosted k8s, one backend per product). `organiclever-app-be` REVERTED → in-place F# rewrite of `organiclever-be` (NO `git mv`); `ose-app-be` → **`ose-be`** (`git mv`, own atomic unit). `*-app-web` clients call the generic `<product>-be`                                                                                                    |
+| 22  | ayokoding joins `-www`       | `ayokoding-web` → **`ayokoding-www`** (mechanical rename; KEEPS structure + tRPC, NOT a `ts-ui` consumer; `-www` = deployment role)                                                                                                                                                                                                                                                          |
+| 23  | container images             | **Only the two generic backends** get GHCR images: `ghcr.io/wahidyankf/organiclever-be`, `ghcr.io/wahidyankf/ose-be`. Web tiers deploy via Vercel — **no** container images                                                                                                                                                                                                                  |
 
 ### Default mechanical mappings
 
-| Item           | Mapping                                                                                                                                              |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rename         | `organiclever-web` (app) → `organiclever-app-web`; `organiclever-be` → `organiclever-app-be`; NEW `organiclever-web` = marketing                     |
-| Dev ports      | marketing `organiclever-web` keeps **3200**; app `organiclever-app-web` = **3202**; `organiclever-app-be` keeps **8202**                             |
-| E2E pairs      | `organiclever-web-e2e` (app) → `organiclever-app-web-e2e`; NEW `organiclever-web-e2e` (marketing); `organiclever-be-e2e` → `organiclever-app-be-e2e` |
-| Shared lib     | `libs/ts-ui` (tokens + primitives; shadcn/Radix/Tailwind/CVA per swe-ui conventions)                                                                 |
-| OSE names      | `ose-web` / `ose-app-web` / `ose-app-be` already correct — **no rename**                                                                             |
-| wahidyankf-web | **pattern reference only** — not renamed, not forced onto `ts-ui` (separate personal brand)                                                          |
+| Item             | Mapping                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rename (OL web)  | `organiclever-web` (app) → `organiclever-app-web`; NEW `organiclever-www` = marketing. Backend `organiclever-be` keeps its name (in-place F# rewrite, NO `git mv`)                                                                                                                                                                                                                                              |
+| Rename (BE)      | `ose-app-be` → `ose-be` (own atomic unit); `organiclever-be` unchanged (in-place rewrite)                                                                                                                                                                                                                                                                                                                       |
+| Rename (www)     | `ose-web` → `ose-www`; `wahidyankf-web` → `wahidyankf-www`; `ayokoding-web` → `ayokoding-www` (repo-wide `-www` public-site suffix, decisions #20/#22)                                                                                                                                                                                                                                                          |
+| Dev ports        | marketing `organiclever-www` keeps **3200**; app `organiclever-app-web` = **3202**; `organiclever-be` keeps **8202**; `ose-www` keeps **3100**; `wahidyankf-www` keeps **3201**; `ayokoding-www` keeps its current port                                                                                                                                                                                         |
+| E2E pairs        | `organiclever-web-e2e` (app) → `organiclever-app-web-e2e`; NEW `organiclever-www-e2e` (marketing); `organiclever-be-e2e` (kept, name unchanged); `ose-app-be-e2e` → `ose-be-e2e`; `ose-web-be-e2e` → `ose-www-be-e2e`; `ose-web-fe-e2e` → `ose-www-fe-e2e`; `wahidyankf-web-fe-e2e` → `wahidyankf-www-fe-e2e`; `ayokoding-web-be-e2e` → `ayokoding-www-be-e2e`; `ayokoding-web-fe-e2e` → `ayokoding-www-fe-e2e` |
+| Shared lib       | `libs/ts-ui` (tokens + primitives; shadcn/Radix/Tailwind/CVA per swe-ui conventions)                                                                                                                                                                                                                                                                                                                            |
+| OSE app-web name | `ose-app-web` already correct — **no rename** (only `ose-app-be` → `ose-be` and `ose-web` → `ose-www`)                                                                                                                                                                                                                                                                                                          |
+| wahidyankf-www   | **pattern reference** for the simple `features/` shape **and** renamed `wahidyankf-web` → `wahidyankf-www`; not forced onto `ts-ui` (separate personal brand)                                                                                                                                                                                                                                                   |
+| ayokoding-www    | `ayokoding-web` → `ayokoding-www` mechanical rename only; KEEPS structure + tRPC; NOT a `ts-ui` consumer (#22)                                                                                                                                                                                                                                                                                                  |
 
 ## Approach
 
@@ -123,17 +170,20 @@ flowchart TB
     W_OL["organiclever-web<br/>app + landing (PGlite)"]
   end
 
-  subgraph AFTER["After (F#, no crane, split web)"]
+  subgraph AFTER["After (F# generic -be, no crane, split web, -www public-site tier)"]
     direction TB
-    F_OL["organiclever-app-be<br/>F#/Giraffe (journal CRUD)"]
-    F_OA["ose-app-be<br/>F#/Giraffe"]
-    WW["organiclever-web<br/>marketing (simple)"]
+    F_OL["organiclever-be<br/>F#/Giraffe (journal CRUD, in-place)"]
+    F_OA["ose-be<br/>F#/Giraffe (+ OpenRouter)"]
+    WW["organiclever-www<br/>marketing (simple)"]
     WA["organiclever-app-web<br/>app (PGlite, CSR)"]
+    OWW["ose-www<br/>content (was ose-web)"]
+    KWW["wahidyankf-www<br/>(was wahidyankf-web)"]
+    AKW["ayokoding-www<br/>content (was ayokoding-web)"]
     UI["libs/ts-ui<br/>shared design system"]
   end
 
-  R_OL -->|rewrite + rename| F_OL
-  R_OA -->|rewrite| F_OA
+  R_OL -->|in-place rewrite| F_OL
+  R_OA -->|rewrite + rename| F_OA
   R_CB -->|deleted| GONE["removed:<br/>media + crane.convert"]
   W_OL -->|rename| WA
   W_OL -->|extract landing| WW
@@ -152,6 +202,9 @@ flowchart TB
   style F_OA fill:#029E73,stroke:#000000,color:#000000
   style WW fill:#0173B2,stroke:#000000,color:#FFFFFF
   style WA fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style OWW fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style KWW fill:#0173B2,stroke:#000000,color:#FFFFFF
+  style AKW fill:#0173B2,stroke:#000000,color:#FFFFFF
   style UI fill:#CC78BC,stroke:#000000,color:#000000
   style GONE fill:#808080,stroke:#000000,color:#FFFFFF
 ```
@@ -160,60 +213,91 @@ flowchart TB
 
 ### In Scope
 
-- Rewrite `apps/ose-app-be` from Rust to F# (Giraffe / EF Core 10 / DbUp / NATS.Net), preserving its
-  OpenAPI contract minus media, including its five non-media bounded contexts (`health`,
-  `ai-orchestration`, `gap-analysis`, `internal-policy`, `regulatory-source`).
-- Rewrite + rename `apps/organiclever-be` → `apps/organiclever-app-be` (F#), with **minimal
+- Rewrite + rename `apps/ose-app-be` → `apps/ose-be` from Rust to F# (Giraffe / EF Core 10 / DbUp /
+  NATS.Net), preserving its OpenAPI contract minus media, including its five non-media bounded
+  contexts (`health`, `ai-orchestration`, `gap-analysis`, `internal-policy`, `regulatory-source`) and
+  its **OpenRouter LLM integration** (gap-analysis; core, preserved).
+- **In-place F# rewrite** of `apps/organiclever-be` (name kept — NO `git mv`), with **minimal
   `journal` CRUD** mirroring the existing PGlite client schema, plus `health` + the JetStream demo.
 - Reuse / author migration SQL via DbUp-embedded `db/migrations/*.sql`, run on boot.
-- Keep `generated-contracts/` codegen — regenerate F# contract types from the OpenAPI specs.
-- **Delete** `apps/crane-be/` and `apps/crane-be-e2e/`; remove `contexts/media/`, `crane_client`,
-  the `/media/pdf-to-md` endpoint, and the `crane.convert` subject from both backends.
-- Publish workflow **3 → 2 images** (affected-aware): `ghcr.io/wahidyankf/organiclever-app-be`,
-  `ghcr.io/wahidyankf/ose-app-be`; bootable images published **early** to unblock the downstream
+- Keep `generated-contracts/` codegen — regenerate F# contract types from the OpenAPI specs; update
+  the `ose-app-web` codegen source pointer to `ose-be`.
+- **Delete** `apps/crane-be/` and `apps/crane-be-e2e/` (+ `libs/fsharp-crane-core` is removed once
+  `crane-cli`'s dependency is re-verified — see Out of Scope note); remove `contexts/media/`,
+  `crane_client`, the `/media/pdf-to-md` endpoint, and the `crane.convert` subject from both backends.
+- Publish workflow **3 → 2 images** (affected-aware) — **only the two generic backends** get GHCR
+  images: `ghcr.io/wahidyankf/organiclever-be`, `ghcr.io/wahidyankf/ose-be`; web tiers deploy via
+  Vercel (no container images); bootable backend images published **early** to unblock the downstream
   k3s Phase 0.5 gate.
 - Rename today's `organiclever-web` (app) → `organiclever-app-web`; create a **new simple
-  `organiclever-web`** marketing site from the extracted `landing` context (wahidyankf-web pattern).
-- Create `libs/ts-ui` and adopt it across all four product frontends.
-- Simplify `ose-web` (structure-only) to the wahidyankf-web `src/features/` shape, keeping its tRPC +
-  content/feed pipeline; full OSE frontend structure + naming audit.
-- Adapt all E2E runners (rename pairs, add a marketing pair, drop media scenarios).
+  `organiclever-www`** marketing site from the extracted `landing` context (wahidyankf pattern).
+- Rename `ose-web` → **`ose-www`** (structure-only simplification PLUS a project rename),
+  `wahidyankf-web` → **`wahidyankf-www`** (the pattern reference, mechanical rename), and
+  `ayokoding-web` → **`ayokoding-www`** (mechanical rename; keeps structure + tRPC), adopting the
+  repo-wide `-www` public-website-tier suffix.
+- Create `libs/ts-ui` and adopt it across the app web clients + the new `organiclever-www`
+  (`organiclever-www`, `organiclever-app-web`, `ose-app-web`); `ose-www`/`ayokoding-www` keep their
+  content internals (not forced to adopt).
+- Simplify `ose-www` (structure-only) to the `wahidyankf-www` `src/features/` shape, keeping its
+  tRPC + content/feed pipeline; full OSE frontend structure + naming audit.
+- Adapt all E2E runners (rename pairs incl. the `-www`/`ose-be`/`ayokoding-www` e2e pairs, add a
+  marketing pair, drop media scenarios).
 - New F# Dockerfiles for the two backends; per-app integration/e2e compose adjusted.
-- `<APP>_*` env vars updated for the F# stack and the renamed projects; crane vars removed; drift
-  guard kept green.
-- **Restructure `specs/`** to match every rename, the new marketing tier, the dropped crane-be, and
-  the removed media surfaces (see [tech-docs.md](./tech-docs.md) Specs Restructure).
+- `<APP>_*` env vars updated for the F# stack and the renamed projects (`OSE_APP_BE_*` → `OSE_BE_*`;
+  `ORGANICLEVER_BE_*` unchanged); crane vars removed; drift guard kept green.
+- **Restructure `specs/`** to match every rename (organiclever web, `ose-be`, `ayokoding-www`), the
+  new marketing tier, the dropped crane-be, and the removed media surfaces (see
+  [tech-docs.md](./tech-docs.md) Specs Restructure).
+- **Comprehensive `.md` sweep**: update every related markdown surface (`AGENTS.md`, `CLAUDE.md`,
+  `docs/reference/monorepo-structure.md`, `docs/reference/platform-bindings.md`, each renamed app's
+  `README.md`, new `apps/organiclever-www/README.md` + `libs/ts-ui/README.md`,
+  `repo-governance/conventions/structure/file-naming.md` + the app-naming convention) with a
+  repo-wide grep acceptance proving zero stale references.
 
 ### Out of Scope
 
 - **Production cutover**: Vercel project creation, `app.organiclever.com` DNS, the
-  `prod-organiclever-app-web` branch — deferred to a follow-on / `ose-infra` plan.
+  `prod-organiclever-www` / `prod-organiclever-app-web` branches, and the prod-branch renames for the
+  renamed public-website sites (`prod-ose-web` → `prod-ose-www`, `prod-wahidyankf-web` →
+  `prod-wahidyankf-www`, `prod-ayokoding-web` → `prod-ayokoding-www`) — deferred to a follow-on /
+  `ose-infra` plan.
 - The deferred organiclever **sync-vs-server-authoritative** decision and any consumption wiring
   beyond the contract smoke-probe.
 - Authoring the converged Nx F#/.NET targets, doctor .NET SDK check, CI conventions, or F# coverage
   tooling — owned by `standardize-repo-toolchain-parity` (assumed DONE).
 - New end-user backend features beyond `journal` CRUD (organiclever) / current non-media parity (ose).
-- `libs/fsharp-crane-core`, `apps/crane-cli`, `libs/rust-commons` internals (dependency graph
-  re-verified only).
-- `wahidyankf-web` changes (it is the pattern reference, not a target).
+- `apps/crane-cli`, `libs/rust-commons` internals (dependency graph re-verified only).
+  `libs/fsharp-crane-core` is removed after confirming `crane-cli` no longer depends on it.
+- `wahidyankf-web` and `ayokoding-web` **content/behavior/structure** changes; the only change to each
+  is the mechanical `-www` project rename (`wahidyankf-web` → `wahidyankf-www`, `ayokoding-web` →
+  `ayokoding-www`).
 - k3s manifests, ClusterIP wiring, production deployment — owned by `ose-infra`.
 
 ### Affected Areas
 
-- `apps/ose-app-be/`, `apps/ose-app-be-e2e/` (Rust → F# port; drop media)
-- `apps/organiclever-be/` → `apps/organiclever-app-be/`, `apps/organiclever-be-e2e/` →
-  `apps/organiclever-app-be-e2e/` (rewrite + rename)
+- `apps/ose-app-be/` → `apps/ose-be/`, `apps/ose-app-be-e2e/` → `apps/ose-be-e2e/` (Rust → F# port +
+  rename; drop media; preserve OpenRouter)
+- `apps/organiclever-be/`, `apps/organiclever-be-e2e/` (in-place F# rewrite — name kept, **no rename**)
 - `apps/organiclever-web/` → `apps/organiclever-app-web/`, `apps/organiclever-web-e2e/` →
   `apps/organiclever-app-web-e2e/` (rename)
-- NEW `apps/organiclever-web/` + `apps/organiclever-web-e2e/` (marketing site + e2e)
+- NEW `apps/organiclever-www/` + `apps/organiclever-www-e2e/` (marketing site + e2e)
 - NEW `libs/ts-ui/` (shared design system)
-- `apps/ose-web/`, `apps/ose-app-web/` (simplify / adopt `ts-ui`)
-- `apps/crane-be/`, `apps/crane-be-e2e/` (**deleted**)
-- `specs/apps/organiclever/`, `specs/apps/ose/`, `specs/apps/crane/` (restructure; drop crane-be +
-  media)
+- `apps/ose-web/` → `apps/ose-www/`, `apps/ose-web-be-e2e/` → `apps/ose-www-be-e2e/`,
+  `apps/ose-web-fe-e2e/` → `apps/ose-www-fe-e2e/` (simplify structure-only + rename)
+- `apps/ose-app-web/` (adopt `ts-ui`; codegen source pointer → `ose-be`)
+- `apps/wahidyankf-web/` → `apps/wahidyankf-www/`, `apps/wahidyankf-web-fe-e2e/` →
+  `apps/wahidyankf-www-fe-e2e/` (mechanical rename only)
+- `apps/ayokoding-web/` → `apps/ayokoding-www/`, `apps/ayokoding-web-be-e2e/` →
+  `apps/ayokoding-www-be-e2e/`, `apps/ayokoding-web-fe-e2e/` → `apps/ayokoding-www-fe-e2e/`
+  (mechanical rename only; keeps structure + tRPC)
+- `apps/crane-be/`, `apps/crane-be-e2e/`, `libs/fsharp-crane-core/` (**deleted**)
+- `specs/apps/organiclever/`, `specs/apps/ose/`, `specs/apps/crane/`, `specs/apps/ayokoding/`
+  (restructure; rename `ose-be` surfaces; ayokoding-www references; drop crane-be + media)
 - `.github/workflows/publish-images.yml` (3 → 2 images), CI workflows referencing renamed projects
 - `env-contract.yaml`, each backend `.env.example`, each web `.env.example`
-- `docs/reference/monorepo-structure.md`, `AGENTS.md`, `CLAUDE.md` (project roster + platform tags)
+- `docs/reference/monorepo-structure.md`, `docs/reference/platform-bindings.md`, `AGENTS.md`,
+  `CLAUDE.md`, every renamed app `README.md`, `repo-governance/conventions/structure/file-naming.md`
+  (project roster + platform tags + `www` app type)
 
 ## Relationship to ose-infra k3s Deploy Plans
 
@@ -223,12 +307,12 @@ the reader is not assumed to have access to the private `ose-infra` repo):
 - `ose-infra/plans/in-progress/deploy-k3s-cluster-staging/`
 - `ose-infra/plans/in-progress/deploy-k3s-cluster-prod/`
 
-Each carries a **Phase 0.5 gate** that hard-stops until: the **two** F# backend images
-(`ghcr.io/wahidyankf/organiclever-app-be`, `ghcr.io/wahidyankf/ose-app-be`) are publicly pullable;
+Each carries a **Phase 0.5 gate** that hard-stops until: the **two** generic F# backend images
+(`ghcr.io/wahidyankf/organiclever-be`, `ghcr.io/wahidyankf/ose-be`) are publicly pullable;
 DbUp run-on-boot migrations and NATS.Net JetStream wiring are confirmed in those images; and
 **crane-be is gone**. Because k3s only needs **bootable** images, this plan publishes them **early**
 (Phase 2) — the gate unblocks before the full feature ports and the entire web-tier restructure
-complete.
+complete. Only the two backends ship images; the web tiers deploy via Vercel.
 
 ```mermaid
 %% Color-blind-friendly palette: blue #0173B2, orange #DE8F05, green #029E73, grey #808080
@@ -276,25 +360,51 @@ registered at archival (Phase 9) but is **not** part of this chain.
 
 ## Delivery Phases At A Glance
 
-| Phase | Name                                                   | Outcome                                                                |
-| ----- | ------------------------------------------------------ | ---------------------------------------------------------------------- |
-| 0     | Environment, prerequisite gate, dependency clearance   | Toolchain converged; parity plan DONE; F# pins re-confirmed            |
-| 1     | Scaffold both F# skeletons + EF/DbUp + codegen         | Both backends boot + migrate + NATS + `/health`; F# contract types gen |
-| 2     | Remove crane + media; publish 3→2 (bootable)           | crane gone; two bootable images public → **k3s Phase 0.5 unblocked**   |
-| 3     | Port ose-app-be (5 contexts, preserve contract)        | ose-app-be fully F#; contract preserved minus media                    |
-| 4     | organiclever-app-be minimal journal CRUD + rename      | journal CRUD + smoke-probe; be renamed; consumption deferred           |
-| 5     | `libs/ts-ui` shared design system                      | Tokens + primitives lib builds; ready for frontend adoption            |
-| 6     | organiclever web split + rename (consume ts-ui)        | app renamed; new simple marketing site; both consume ts-ui (code+CI)   |
-| 7     | Simplify ose-web + ose-app-web adopt ts-ui + OSE audit | Marketing sites on wahidyankf pattern; OSE frontend realigned          |
-| 8     | E2E + coverage + quality gate                          | All renamed/new e2e pairs green; coverage met; full gate green         |
-| 9     | Docs + specs finalize + archival                       | Docs/specs updated; cutover follow-on registered; plan archived; CI ok |
+| Phase | Name                                                                                | Outcome                                                                                                              |
+| ----- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 0     | Environment, prerequisite gate, dependency clearance                                | Toolchain converged; parity plan DONE; F# pins re-confirmed                                                          |
+| 1     | Scaffold both F# skeletons + EF/DbUp + codegen                                      | Both backends boot + migrate + NATS + `/health`; F# contract types gen                                               |
+| 2     | Remove crane + media; publish 3→2 (bootable)                                        | crane gone; two bootable images public → **k3s Phase 0.5 unblocked**                                                 |
+| 3     | Port ose-app-be → ose-be (5 contexts, preserve contract + OpenRouter)               | `ose-app-be` → `ose-be` fully F#; contract preserved minus media; OpenRouter intact                                  |
+| 4     | organiclever-be in-place rewrite + journal CRUD; organiclever web split + rename    | journal CRUD + smoke-probe (be name kept); web tier renamed `*-app-*` + new `organiclever-www`; consumption deferred |
+| 5     | `libs/ts-ui` shared design system                                                   | Tokens + primitives lib builds; ready for frontend adoption                                                          |
+| 6     | organiclever web consume ts-ui (split landed in P4)                                 | `organiclever-www` + `organiclever-app-web` consume ts-ui (code+CI)                                                  |
+| 7     | Rename + simplify ose-www, rename wahidyankf-www + ayokoding-www, ose-app-web ts-ui | `ose-web`→`ose-www`, `wahidyankf-web`→`wahidyankf-www`, `ayokoding-web`→`ayokoding-www`; OSE frontend realigned      |
+| 8     | E2E + coverage + quality gate                                                       | All renamed/new e2e pairs green; coverage met; full gate green                                                       |
+| 9     | Docs + specs finalize + archival                                                    | Docs/specs updated; cutover follow-on registered; plan archived; CI ok                                               |
+
+## Worktree
+
+This plan runs in its **own git worktree** at `worktrees/restructure-fsharp-be-and-web-app-tiers/` so
+it can execute in **parallel** with other projects without blocking `main`. All delivery phases
+execute inside this worktree; pushes go to `origin main` per the per-gate cadence.
+
+Provision the worktree from the repo root (per the
+[Worktree Toolchain Initialization](../../../repo-governance/development/workflow/worktree-setup.md)
+convention — after `git worktree add`, run **both** `npm install` AND `npm run doctor -- --fix`
+inside the worktree):
+
+```bash
+git worktree add worktrees/restructure-fsharp-be-and-web-app-tiers main
+cd worktrees/restructure-fsharp-be-and-web-app-tiers
+npm install
+npm run doctor -- --fix
+```
+
+The repo-local `WorktreeCreate` hook routes worktrees to `worktrees/<name>/` (see
+[Worktree Path Convention](../../../repo-governance/conventions/structure/worktree-path.md)). The
+plan-execution Step 0 gate enters this worktree by default, auto-provisioning from the latest
+`origin/main` when missing and syncing with `origin/main` before implementing. The full provisioning
+checklist also lives in [delivery.md](./delivery.md) `## Worktree`.
 
 ## Git Workflow
 
-- **Worktree**: all work happens in `worktrees/restructure-fsharp-be-and-web-app-tiers/` (see
-  [delivery.md](./delivery.md) `## Worktree`).
+- **Worktree**: all work happens in `worktrees/restructure-fsharp-be-and-web-app-tiers/` (see the
+  `## Worktree` section above and [delivery.md](./delivery.md) `## Worktree`), enabling parallel
+  execution alongside other projects without blocking `main`.
 - **Branching**: Trunk Based Development — worktree-to-main, **incremental push per phase gate** (main
-  stays green throughout), direct push to `origin main`, no PR. The wide `*-app-*` rename is pushed as
-  **one atomic commit**.
+  stays green throughout), direct push to `origin main`, no PR. Each wide rename (the organiclever
+  web-tier `*-app-*` rename, the `ose-app-be` → `ose-be` rename, and each `-www` rename) is pushed as
+  its **own atomic commit** so `main` is never left with a half-renamed Nx graph.
 - **Commits**: thematic, Conventional Commits, split by domain/concern. See
   [Trunk Based Development Convention](../../../repo-governance/development/workflow/trunk-based-development.md).
