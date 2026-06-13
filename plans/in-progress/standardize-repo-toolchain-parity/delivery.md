@@ -491,13 +491,13 @@ the gate note.
 
 _Suggested executor: `ci-fixer`_
 
-- [ ] [AI] **RED**: diff the current hooks against BLOCK 1-B:
+- [x] [AI] **RED**: diff the current hooks against BLOCK 1-B:
       `cat .husky/commit-msg .husky/pre-commit .husky/pre-push`
       — acceptance: record which BLOCK 1-B elements are missing/divergent (build flag, lint-staged
       wiring, conditional validators, ordering).
-- [ ] [AI] **GREEN — commit-msg**: ensure `commit-msg` is exactly
+- [x] [AI] **GREEN — commit-msg**: ensure `commit-msg` is exactly
       `npx --no -- commitlint --edit "$1"` — acceptance: matches BLOCK 1-B.
-- [ ] [AI] **GREEN — pre-commit**: ensure the order is
+- [x] [AI] **GREEN — pre-commit**: ensure the order is
       `git-identity-check.sh` → `check-no-env-staged.sh` → canonical staged-file lint
       (`shellcheck`/`hadolint`/`actionlint` on staged files, graceful skip if absent) →
       `rhino-cli git pre-commit` built with `--release` → **`nx affected -t test:quick`** (the app
@@ -505,7 +505,7 @@ _Suggested executor: `ci-fixer`_
       [Test Lifecycle Architecture](./tech-docs.md#test-lifecycle-architecture-spec-shared-three-level-testing)
       — acceptance: pre-commit matches BLOCK 1-B order, uses the `--release` build, and runs
       `test:quick` on affected apps.
-- [ ] [AI] **GREEN — pre-push**: ensure pre-push runs **`nx affected -t spec-coverage test-coverage`**
+- [x] [AI] **GREEN — pre-push**: ensure pre-push runs **`nx affected -t spec-coverage test-coverage`**
       (per-app coverage gates — every `.feature` implemented across unit+integration+e2e + line
       threshold; uses the CURRENT `spec-coverage` name, re-pointed to `specs:coverage` in Phase 10) →
       `nx affected -t validate:specs-tree validate:specs-links validate:specs-counts validate:specs-adoption` →
@@ -516,22 +516,22 @@ _Suggested executor: `ci-fixer`_
       `validate:specs-*`, `validate:env`) so the hook stays runnable; Phase 10 re-points them all to
       `{domain}:{work}` — acceptance: pre-push matches the new BLOCK 1-B shape; every target it references currently
       exists; no integration/e2e target is invoked.
-- [ ] [AI] **REFACTOR**: run a no-op commit + dry-run push in the worktree to confirm the hooks
+- [x] [AI] **REFACTOR**: run a no-op commit + dry-run push in the worktree to confirm the hooks
       execute end-to-end without referencing a missing target
       — acceptance: hooks run clean on a trivial change.
-- [ ] [AI] Lint the hook shell scripts: `shellcheck .husky/*` if available
+- [x] [AI] Lint the hook shell scripts: `shellcheck .husky/*` if available
       — acceptance: exits 0 (warning threshold).
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `commit-msg`/`pre-commit`/`pre-push` match the BLOCK 1-B lifecycle shape.
-- [ ] [AI] Every target the hooks reference **currently exists** (no forward reference to a
+- [x] [AI] `commit-msg`/`pre-commit`/`pre-push` match the BLOCK 1-B lifecycle shape.
+- [x] [AI] Every target the hooks reference **currently exists** (no forward reference to a
       not-yet-renamed target) — expected: a dry-run push runs clean. **NOTE for Phase 10**: the
       target-name re-point in the hooks happens in Phase 10, atomically with the project.json renames.
-- [ ] [AI] `shellcheck .husky/*` clean — expected: exits 0.
-- [ ] [AI] Commit: `rtk git commit -m "chore(hooks): converge git hooks to canonical lifecycle"`.
+- [x] [AI] `shellcheck .husky/*` clean — expected: exits 0.
+- [x] [AI] Commit: `rtk git commit -m "chore(hooks): converge git hooks to canonical lifecycle"`.
 
 > **Pause Safety**: the hooks match the canonical lifecycle and reference only existing targets;
 > hooks run clean. Safe to stop. To resume: re-run a dry-run push and confirm the commit.

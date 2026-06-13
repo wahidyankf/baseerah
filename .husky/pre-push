@@ -1,17 +1,19 @@
 #!/usr/bin/env sh
 set -e
 
-# Pre-commit: rhino-cli checks (formatting, link validation, config sync)
-# Pre-push: typecheck + lint + test:quick + spec-coverage + markdown linting (all cacheable by Nx)
-# If pre-push times out, run `npx nx affected -t typecheck lint test:quick spec-coverage` first to warm the cache, then push again
+# Pre-push: spec + code-coverage gates, BDD spec validators, markdown lint,
+# env-contract validation, and changed-path-gated governance validators.
+# typecheck/lint/test:unit run in pre-commit (via test:quick) — NOT here.
+# test:integration/test:e2e are CRON-only — NOT here.
+# If pre-push times out, run the nx commands below manually to warm cache, then push again.
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
-npx nx affected -t typecheck lint test:quick spec-coverage validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --parallel="$PARALLEL"
+npx nx affected -t spec-coverage test-coverage validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --parallel="$PARALLEL"
 npm run lint:md
 npx nx run rhino-cli:validate:env
 
 # Naming validators — scoped to pushes that touch the relevant trees.
 # Upstream may be missing on first push of a branch; default to empty range in that case.
-RANGE=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1 && echo "@{u}..HEAD" || echo "")
+RANGE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 && echo '@{u}..HEAD' || echo "")
 if [ -n "$RANGE" ]; then
   CHANGED=$(git diff --name-only "$RANGE" 2>/dev/null || echo "")
   if echo "$CHANGED" | grep -qE '^(\.claude/agents/|\.opencode/agent/)'; then

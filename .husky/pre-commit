@@ -38,3 +38,6 @@ if [ -n "$staged_wf" ]; then
 fi
 
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- git pre-commit
+
+PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
+npx nx affected -t test:quick --parallel="$PARALLEL"
