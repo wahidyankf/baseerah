@@ -20,7 +20,7 @@ nx dev organiclever-web   # http://localhost:3200
 | `nx run organiclever-web:test:quick`       | Unit tests + coverage (70%) + DDD checks |
 | `nx run organiclever-web:test:unit`        | Unit tests only                          |
 | `nx run organiclever-web:test:integration` | Integration tests                        |
-| `nx run organiclever-web:spec-coverage`    | Gherkin spec coverage                    |
+| `nx run organiclever-web:specs:coverage`   | Gherkin spec coverage                    |
 | `nx run organiclever-web:lint`             | Lint with oxlint + ESLint                |
 | `nx run organiclever-web:typecheck`        | TypeScript type check                    |
 

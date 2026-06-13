@@ -24,7 +24,7 @@ nx run ose-app-be:test:unit
 | `nx run ose-app-be:lint`             | Clippy with `-D warnings`                              |
 | `nx run ose-app-be:fmt:check`        | Rustfmt format check                                   |
 | `nx run ose-app-be:typecheck`        | `cargo check --all-targets`                            |
-| `nx run ose-app-be:spec-coverage`    | Validate BDD spec coverage via rhino-cli               |
+| `nx run ose-app-be:specs:coverage`   | Validate BDD spec coverage via rhino-cli               |
 | `nx run ose-app-be:deny:check`       | License and vulnerability audit via cargo-deny         |
 
 ## Prerequisites

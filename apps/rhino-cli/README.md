@@ -53,7 +53,7 @@ Toolchain is pinned to Rust 1.95.0 via `rust-toolchain.toml`; the first `cargo` 
 | `test:unit`        | `cargo test --lib` (in-source `#[cfg(test)]` modules)                                   |
 | `test:integration` | `cargo test --tests` (integration tests under `tests/`)                                 |
 | `test:quick`       | `cargo llvm-cov --lib --lcov --fail-under-lines 90` (Phase 1 swaps to native validator) |
-| `spec-coverage`    | Phase 0 stub; Phase 1 wires cucumber-rs spec consumption                                |
+| `specs:coverage`   | Phase 0 stub; Phase 1 wires cucumber-rs spec consumption                                |
 | `run`              | `cargo run --`                                                                          |
 | `install`          | `cargo fetch`                                                                           |
 

@@ -70,7 +70,7 @@ npx nx run crane-cli:lint             # fantomas check + fsharplint
 npx nx run crane-cli:fmt              # fantomas format
 npx nx run crane-cli:test:quick       # Unit tests + ≥95% line coverage
 npx nx run crane-cli:test:integration # TickSpec integration tests
-npx nx run crane-cli:spec-coverage    # Gherkin spec coverage validation
+npx nx run crane-cli:specs:coverage   # Gherkin spec coverage validation
 ```
 
 ## Architecture

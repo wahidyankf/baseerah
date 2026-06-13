@@ -27,17 +27,17 @@ docker compose -f apps/crane-be-e2e/docker-compose.e2e.yml down -v
 
 ## Commands
 
-| Nx target                           | What it does                                  |
-| ----------------------------------- | --------------------------------------------- |
-| `nx run crane-be-e2e:test:quick`    | bddgen + tsc --noEmit + oxlint                |
-| `nx run crane-be-e2e:test:e2e`      | All `@e2e` scenarios (requires compose stack) |
-| `nx run crane-be-e2e:test:e2e:ui`   | Playwright UI mode                            |
-| `nx run crane-be-e2e:spec-coverage` | Gherkin step coverage (rhino-cli)             |
+| Nx target                            | What it does                                  |
+| ------------------------------------ | --------------------------------------------- |
+| `nx run crane-be-e2e:test:quick`     | bddgen + tsc --noEmit + oxlint                |
+| `nx run crane-be-e2e:test:e2e`       | All `@e2e` scenarios (requires compose stack) |
+| `nx run crane-be-e2e:test:e2e:ui`    | Playwright UI mode                            |
+| `nx run crane-be-e2e:specs:coverage` | Gherkin step coverage (rhino-cli)             |
 
 ## Specification coverage
 
 ```bash
-nx run crane-be-e2e:spec-coverage
+nx run crane-be-e2e:specs:coverage
 ```
 
 Covers all four gherkin domains: `health/`, `media/`, and `messaging/` (including the

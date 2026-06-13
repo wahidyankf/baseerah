@@ -20,7 +20,7 @@ nx dev crane-be   # http://localhost:8300
 | `nx run crane-be:test:integration` | TickSpec @integration (filesystem, no NATS)            |
 | `nx run crane-be:lint`             | fsharplint + dotnet format                             |
 | `nx run crane-be:typecheck`        | `dotnet build`                                         |
-| `nx run crane-be:spec-coverage`    | Gherkin step coverage (rhino-cli, excludes messaging/) |
+| `nx run crane-be:specs:coverage`   | Gherkin step coverage (rhino-cli, excludes messaging/) |
 
 ## Architecture
 

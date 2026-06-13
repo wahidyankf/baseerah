@@ -9,11 +9,11 @@ Playwright-BDD frontend E2E tests for ose-app-web.
 
 ## Commands
 
-| Command                                | Description                 |
-| -------------------------------------- | --------------------------- |
-| `nx run ose-app-web-e2e:test:e2e`      | Run FE E2E tests headlessly |
-| `nx run ose-app-web-e2e:test:e2e:ui`   | Run with Playwright UI      |
-| `nx run ose-app-web-e2e:spec-coverage` | Check Gherkin step coverage |
+| Command                                 | Description                 |
+| --------------------------------------- | --------------------------- |
+| `nx run ose-app-web-e2e:test:e2e`       | Run FE E2E tests headlessly |
+| `nx run ose-app-web-e2e:test:e2e:ui`    | Run with Playwright UI      |
+| `nx run ose-app-web-e2e:specs:coverage` | Check Gherkin step coverage |
 
 ## Feature Files
 

@@ -52,7 +52,7 @@ nx run ose-web:test:quick
 nx run ose-web:test:integration
 
 # Spec coverage (both web + api perspectives)
-nx run ose-web:spec-coverage
+nx run ose-web:specs:coverage
 ```
 
 ## Project Structure

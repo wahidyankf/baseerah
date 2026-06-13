@@ -23,7 +23,7 @@ nx dev organiclever-be   # http://localhost:8202
 | `nx run organiclever-be:fmt:check`        | `cargo fmt --check`                        |
 | `nx run organiclever-be:deny:check`       | License + advisory check (`cargo deny`)    |
 | `nx run organiclever-be:check:msrv`       | Compile with Rust 1.88 (MSRV)              |
-| `nx run organiclever-be:spec-coverage`    | Gherkin step coverage (rhino-cli)          |
+| `nx run organiclever-be:specs:coverage`   | Gherkin step coverage (rhino-cli)          |
 
 ## Prerequisites
 

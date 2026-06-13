@@ -9,10 +9,10 @@ Playwright-BDD backend E2E tests for ose-app-be.
 
 ## Commands
 
-| Command                               | Description                 |
-| ------------------------------------- | --------------------------- |
-| `nx run ose-app-be-e2e:test:e2e`      | Run BE E2E tests headlessly |
-| `nx run ose-app-be-e2e:spec-coverage` | Check Gherkin step coverage |
+| Command                                | Description                 |
+| -------------------------------------- | --------------------------- |
+| `nx run ose-app-be-e2e:test:e2e`       | Run BE E2E tests headlessly |
+| `nx run ose-app-be-e2e:specs:coverage` | Check Gherkin step coverage |
 
 ## Feature Files
 
