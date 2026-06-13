@@ -339,7 +339,7 @@ Workflow should stabilize in 3-5 iterations. If not converged after 7 iterations
 
 - Does NOT modify any files (read-only + report generation)
 - Does NOT validate folders not in the explicit list
-- Does NOT validate test code or step definitions (that is `rhino-cli spec-coverage validate`)
+- Does NOT validate test code or step definitions (that is `rhino-cli specs coverage`)
 - Does NOT validate governance docs (that is `repo-rules-checker`)
 - Does NOT run tests (that is CI)
 
