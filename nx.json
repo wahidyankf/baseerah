@@ -24,6 +24,12 @@
     },
     "test:e2e": {
       "cache": false
+    },
+    "spec-coverage": {
+      "cache": true
+    },
+    "test-coverage": {
+      "cache": true
     }
   },
   "namedInputs": {

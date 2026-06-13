@@ -63,6 +63,27 @@
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/steps/**/*.ts"]
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:integration": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],

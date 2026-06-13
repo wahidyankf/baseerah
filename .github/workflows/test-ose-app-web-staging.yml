@@ -7,6 +7,9 @@ name: Test OSE App Web Staging
 # staging URL. Dispatching earlier hits the previous build.
 
 on:
+  schedule:
+    - cron: "0 22 * * *" # 5 AM WIB (UTC+7)
+    - cron: "0 10 * * *" # 5 PM WIB (UTC+7)
   workflow_dispatch:
 
 permissions:

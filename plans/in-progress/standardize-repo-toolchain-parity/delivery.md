@@ -373,7 +373,8 @@ _Suggested executor: `swe-rust-dev`_
 - [x] [AI] `grep "specs:gherkin-cardinality-validation" .github/workflows/pr-quality-gate.yml`
       — expected: the `specs-gate` job runs it.
 - [x] [AI] Workflow lints clean — expected: exits 0.
-- [ ] [AI] Commit: `rtk git commit -m "ci(validators): add gherkin cardinality target to specs-gate"`.
+- [x] [AI] Commit: `rtk git commit -m "ci(validators): add gherkin cardinality target to specs-gate"`.
+      — done: 360e1ff.
 
 > **Pause Safety**: the canonical-named target exists, passes on the current tree, and runs in the
 > `specs-gate` job of `pr-quality-gate.yml`; the change is committed. Safe to stop. To resume: re-run
@@ -399,24 +400,24 @@ D2), and only the justified repo-wide checks run whole-repo.
 
 _Suggested executor: `ci-fixer`_
 
-- [ ] [AI] **RED — push trigger absent**:
+- [x] [AI] **RED — push trigger absent**:
       `grep -nA4 "^on:" .github/workflows/pr-quality-gate.yml`
       — acceptance: the `on:` block triggers `pull_request` only (no `push: branches: [main]`).
-- [ ] [AI] Decision step — choose the mechanism (per D2/D10): extend `pr-quality-gate.yml`'s `on:`
+- [x] [AI] Decision step — choose the mechanism (per D2/D10): extend `pr-quality-gate.yml`'s `on:`
       to add `push: branches: [main]` (with the affected base computed for push events), OR add a
       thin caller workflow that runs the same gate on push. Record the choice inline in the workflow
       comment — acceptance: the chosen mechanism is documented in the workflow.
-- [ ] [AI] **GREEN**: implement the chosen mechanism so the full gate runs on push to `main`
+- [x] [AI] **GREEN**: implement the chosen mechanism so the full gate runs on push to `main`
       — acceptance: the gate's `on:` (or the caller) includes `push: branches: [main]`; for push
       events the affected base resolves correctly (e.g. prior `main` SHA or full non-affected run).
-- [ ] [AI] **GREEN — scheduler cadence**: confirm the governance/scheduled validators run twice-daily
+- [x] [AI] **GREEN — scheduler cadence**: confirm the governance/scheduled validators run twice-daily
       WIB (`0 23 * * *`, `0 11 * * *`); align any single-schedule workflow to the 2× cadence
       — acceptance: `grep -n "cron:" .github/workflows/*.yml` shows the 2× WIB cadence for governance
       schedulers (app-deploy schedules stay per-portfolio, documented in the deviation matrix).
-- [ ] [AI] **REFACTOR**: ensure the push-gate path does not double-run on PR merge in a wasteful way
+- [x] [AI] **REFACTOR**: ensure the push-gate path does not double-run on PR merge in a wasteful way
       (concurrency group from Phase 2 keys push runs by ref) — acceptance: no redundant concurrent
       push run.
-- [ ] [AI] Lint all edited workflows — acceptance: exits 0.
+- [x] [AI] Lint all edited workflows — acceptance: exits 0.
 
 ### Phase 5b — Heavy-test CRON workflows (per app-group)
 
@@ -425,52 +426,52 @@ _Suggested executor: `ci-fixer`_
 > **HARD RULE: integration/e2e run ONLY here (CRON) — never in pre-commit/pre-push/PR/push-to-main.**
 > App-group = a deployable family keyed off the Nx project graph (e.g. `organiclever` = web+be+contracts+e2e).
 
-- [ ] [AI] **Uniform target surface — RED**: prove some project is missing a lifecycle target —
+- [x] [AI] **Uniform target surface — RED**: prove some project is missing a lifecycle target —
       `npx nx run-many -t test:e2e --all` errors "target not found" on at least one project (e.g. a
       backend service that has no e2e) — acceptance: the missing-target error is reproduced and recorded.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **Uniform target surface — GREEN**: in **every** `apps/*/project.json` (and lib) declare the
+- [x] [AI] **Uniform target surface — GREEN**: in **every** `apps/*/project.json` (and lib) declare the
       full set `format`, `lint`, `typecheck`, `test:unit`, `test:integration`, `test:e2e`, `test:quick`,
       `spec-coverage` (current name; → `specs:coverage` in Phase 10), `test-coverage` — a **no-op `echo`
       stub (exit 0)** where the target doesn't apply to that project type (a backend service's `test:e2e`
       = echo; an `*-e2e` project's `test:unit`/`test:integration` = echo) — acceptance:
       `npx nx run-many -t test:unit test:integration test:e2e --all` exits 0 with no missing-target error.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **Uniform target surface — REFACTOR**: factor the repeated stub into a shared Nx target
+- [x] [AI] **Uniform target surface — REFACTOR**: factor the repeated stub into a shared Nx target
       default / `targetDefaults` where the tooling allows, so new projects inherit the full surface —
       acceptance: `nx run-many`/`nx affected` for any lifecycle target sweeps the whole graph without a
       missing-target failure; no per-project stub drift.
-- [ ] [AI] **Identify app-groups**: enumerate the deployable app-group families from the Nx project
+- [x] [AI] **Identify app-groups**: enumerate the deployable app-group families from the Nx project
       graph (`npx nx graph`) — acceptance: a written list of app-groups and their member projects.
-- [ ] [AI] **GREEN — development workflow** (per app-group): create
+- [x] [AI] **GREEN — development workflow** (per app-group): create
       `.github/workflows/test-and-deploy-{app-group}-development.yml` running `nx run-many -t
 test:integration test:e2e` for the group using Dockerfile/local deps, then **building the staging
       container image** — schedule `0 23 * * *` + `0 11 * * *` (2× WIB)
       — acceptance: the workflow runs the group's integration+e2e and builds the staging image.
-- [ ] [AI] **GREEN — staging workflow** (per app-group): create
+- [x] [AI] **GREEN — staging workflow** (per app-group): create
       `.github/workflows/test-{app-group}-staging.yml` running the **same** integration+e2e against the
       **staging URL**, schedule 2× WIB
       — acceptance: the workflow runs the same tests against staging.
-- [ ] [AI] **Guard — no heavy tests pre-merge**: assert no pre-merge surface invokes integration/e2e —
+- [x] [AI] **Guard — no heavy tests pre-merge**: assert no pre-merge surface invokes integration/e2e —
       `rtk grep -rn 'test:integration|test:e2e' .husky .github/workflows/pr-quality-gate.yml`
       — acceptance: matches appear ONLY in the `test-and-deploy-*`/`test-*-staging` CRON workflows,
       never in hooks or the PR gate.
-- [ ] [AI] **Production deploy is manual** — record that prod deploy is manual for now (no automated
+- [x] [AI] **Production deploy is manual** — record that prod deploy is manual for now (no automated
       prod workflow) in the workflow header comment — acceptance: the note is present.
-- [ ] [AI] Lint the new workflows — acceptance: exits 0.
+- [x] [AI] Lint the new workflows — acceptance: exits 0.
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `grep -nA4 "^on:" .github/workflows/pr-quality-gate.yml` (or the caller) shows
+- [x] [AI] `grep -nA4 "^on:" .github/workflows/pr-quality-gate.yml` (or the caller) shows
       `push: branches: [main]` — expected: present.
-- [ ] [AI] Governance scheduler cadence is 2× WIB — expected: the two cron lines present.
-- [ ] [AI] Heavy-test workflows exist per app-group (`test-and-deploy-{group}-development.yml` +
+- [x] [AI] Governance scheduler cadence is 2× WIB — expected: the two cron lines present.
+- [x] [AI] Heavy-test workflows exist per app-group (`test-and-deploy-{group}-development.yml` +
       `test-{group}-staging.yml`) on the 2× WIB schedule; `test:integration`/`test:e2e` appear in **no**
       pre-merge surface — expected: the guard grep passes.
-- [ ] [AI] Workflows lint clean — expected: exits 0.
-- [ ] [AI] Commit: `rtk git commit -m "ci(pr-gate): full gate on push to main + heavy-test CRON workflows"`.
+- [x] [AI] Workflows lint clean — expected: exits 0.
+- [x] [AI] Commit: `rtk git commit -m "ci(pr-gate): full gate on push to main + heavy-test CRON workflows"`.
 
 > **Pause Safety**: the full quality gate now runs on push to `main` and the scheduler cadence is
 > aligned; workflows lint clean and the change is committed. Safe to stop. To resume: re-run the

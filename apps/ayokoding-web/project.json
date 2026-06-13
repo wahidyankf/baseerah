@@ -117,6 +117,20 @@
         "{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-build-tools/gherkin/**/*.feature",
         "{projectRoot}/**/*.{ts,tsx}"
       ]
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
     }
   },
   "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"],

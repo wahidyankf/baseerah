@@ -133,6 +133,20 @@
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
     }
   },
   "tags": ["type:app", "platform:axum", "lang:rust", "domain:ose"],

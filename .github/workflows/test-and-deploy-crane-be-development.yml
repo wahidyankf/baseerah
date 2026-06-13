@@ -1,0 +1,121 @@
+name: Test and Deploy Crane BE Development
+
+# Heavy-test CRON workflow for the crane app-group (crane-be + crane-cli + crane-be-e2e).
+# Runs integration and E2E tests against a locally-built Docker image; 2× WIB schedule.
+# Prod deploy is MANUAL — no automated prod promotion workflow exists yet.
+# Staging: crane-be has no staging URL yet (deviation from web-app groups); the Docker
+# image is built here as a smoke-test.  When a staging environment is provisioned, add
+# a docker push step and update the Deviation Matrix in tech-docs.md.
+
+on:
+  schedule:
+    - cron: "0 23 * * *" # 6 AM WIB (UTC+7)
+    - cron: "0 11 * * *" # 6 PM WIB (UTC+7)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  spec-coverage:
+    name: Spec coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-dotnet
+      - name: Run spec-coverage for crane projects
+        run: |
+          npx nx run crane-be:spec-coverage
+          npx nx run crane-cli:spec-coverage
+
+  integration:
+    name: Integration tests (crane-be + crane-cli)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-dotnet
+      - name: Run crane-be integration tests
+        run: npx nx run crane-be:test:integration
+      - name: Run crane-cli integration tests
+        run: npx nx run crane-cli:test:integration
+
+  build-image:
+    name: Build crane-be Docker image
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build crane-be:local image
+        run: |
+          docker build -f apps/crane-be/Dockerfile \
+            -t crane-be:local \
+            .
+
+  e2e:
+    name: E2E tests (crane-be-e2e)
+    needs: [integration, build-image]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+
+      - name: Build crane-be:local image for compose
+        run: |
+          docker build -f apps/crane-be/Dockerfile \
+            -t crane-be:local \
+            .
+
+      - name: Start crane-be + NATS stack
+        run: |
+          docker compose -f apps/crane-be-e2e/docker-compose.e2e.yml up --build -d
+          echo "Waiting for crane-be to be healthy..."
+          for i in $(seq 1 24); do
+            if curl -sf http://localhost:8300/health > /dev/null 2>&1; then
+              echo "crane-be is healthy"
+              exit 0
+            fi
+            echo "[$i/24] Waiting..."
+            sleep 5
+          done
+          echo "crane-be did not become healthy within 2 minutes"
+          docker compose -f apps/crane-be-e2e/docker-compose.e2e.yml logs crane-be
+          exit 1
+
+      - uses: ./.github/actions/setup-playwright
+
+      - name: Run crane-be E2E tests
+        run: npx nx run crane-be-e2e:test:e2e
+        env:
+          BASE_URL: http://localhost:8300
+
+      - name: Upload E2E report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-crane-be
+          path: apps/crane-be-e2e/playwright-report/
+          retention-days: 7
+
+      - name: Teardown
+        if: always()
+        run: docker compose -f apps/crane-be-e2e/docker-compose.e2e.yml down -v
+
+  specs-gate:
+    name: Specs gate (BDD+DDD validators)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run-many -t validate:specs-adoption validate:specs-tree validate:specs-counts validate:specs-links --projects=rhino-cli
+      - run: npx nx run rhino-cli:specs:gherkin-cardinality-validation

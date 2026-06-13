@@ -103,6 +103,20 @@
         "{workspaceRoot}/specs/apps/crane/behavior/crane-cli/gherkin/**/*.feature",
         "{projectRoot}/src/**/*.fs"
       ]
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
     }
   },
   "tags": ["type:app", "platform:cli", "lang:dotnet", "domain:crane"],

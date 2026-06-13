@@ -1,0 +1,23 @@
+name: Run Quality Gate on Push
+
+# Thin caller: runs the full PR quality gate on every push to main so that
+# direct worktree-to-main pushes (Trunk-Based-Development norm) are gated
+# identically to PRs (D10). NX_BASE is the commit SHA immediately before the
+# push, so nx affected scopes exactly to what was just merged.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/pr-quality-gate.yml
+    with:
+      nx-base: ${{ github.event.before }}

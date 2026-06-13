@@ -1,5 +1,9 @@
 name: Test and Deploy OSE App Web Development
 
+# Heavy-test CRON workflow for the ose-app app-group (web + be + e2e).
+# Deploys to staging (stag-ose-app-web) on success.
+# Prod deploy is MANUAL — use deploy-ose-app-web-to-production.yml.
+
 on:
   schedule:
     - cron: "0 20 * * *" # 3 AM WIB (UTC+7)
