@@ -1,7 +1,7 @@
 {
   "fsharp-crane-core.dll": {},
   "crane-be.dll": {
-    "/Users/wkf/ose-projects/ose-public/worktrees/bootstrap-be-messaging-and-crane-media/apps/crane-be/src/Adapters/In/HttpHandlers.fs": {
+    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/apps/crane-be/src/Adapters/In/HttpHandlers.fs": {
       "CraneBe.Adapters.In.HttpHandlers": {
         "System.Threading.Tasks.Task`1<Microsoft.FSharp.Core.FSharpOption`1<Microsoft.AspNetCore.Http.HttpContext>> CraneBe.Adapters.In.HttpHandlers::healthHandler(Microsoft.FSharp.Core.FSharpFunc`2<Microsoft.AspNetCore.Http.HttpContext,System.Threading.Tasks.Task`1<Microsoft.FSharp.Core.FSharpOption`1<Microsoft.AspNetCore.Http.HttpContext>>>,Microsoft.AspNetCore.Http.HttpContext)": {
           "Lines": {
@@ -826,7 +826,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/bootstrap-be-messaging-and-crane-media/apps/crane-be/src/Adapters/Out/FakeMediaAdapter.fs": {
+    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/apps/crane-be/src/Adapters/Out/FakeMediaAdapter.fs": {
       "CraneBe.Adapters.Out.FakeMediaAdapter/FakeMediaAdapter": {
         "Microsoft.FSharp.Core.FSharpResult`2<System.String,System.String> CraneBe.Adapters.Out.FakeMediaAdapter/FakeMediaAdapter::CraneBe.Core.Ports.IMediaPort.Convert(System.Byte[])": {
           "Lines": {
@@ -842,7 +842,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/bootstrap-be-messaging-and-crane-media/apps/crane-be/src/Application/MediaService.fs": {
+    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/apps/crane-be/src/Application/MediaService.fs": {
       "CraneBe.Application.MediaService": {
         "Microsoft.FSharp.Core.FSharpResult`2<System.String,System.String> CraneBe.Application.MediaService::convert(CraneBe.Core.Ports/IMediaPort,System.Byte[])": {
           "Lines": {

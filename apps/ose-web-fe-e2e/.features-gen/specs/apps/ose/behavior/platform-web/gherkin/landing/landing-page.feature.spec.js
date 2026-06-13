@@ -1,4 +1,4 @@
-// Generated from: ../../specs/apps/ose-platform/behavior/web/gherkin/landing/landing-page.feature
+// Generated from: ../../specs/apps/ose/behavior/platform-web/gherkin/landing/landing-page.feature
 import { test } from "playwright-bdd";
 
 test.describe('Landing Page', () => {
@@ -27,7 +27,7 @@ test.describe('Landing Page', () => {
 
 test.use({
   $test: [({}, use) => use(test), { scope: 'test', box: true }],
-  $uri: [({}, use) => use('../../specs/apps/ose-platform/behavior/web/gherkin/landing/landing-page.feature'), { scope: 'test', box: true }],
+  $uri: [({}, use) => use('../../specs/apps/ose/behavior/platform-web/gherkin/landing/landing-page.feature'), { scope: 'test', box: true }],
   $bddFileData: [({}, use) => use(bddFileData), { scope: "test", box: true }],
 });
 

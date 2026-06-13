@@ -1,4 +1,4 @@
-// Generated from: ../../specs/apps/ose-platform/behavior/web/gherkin/app-shell/accessibility.feature
+// Generated from: ../../specs/apps/ose/behavior/platform-web/gherkin/app-shell/accessibility.feature
 import { test } from "playwright-bdd";
 
 test.describe('Accessibility compliance', () => {
@@ -42,7 +42,7 @@ test.describe('Accessibility compliance', () => {
 
 test.use({
   $test: [({}, use) => use(test), { scope: 'test', box: true }],
-  $uri: [({}, use) => use('../../specs/apps/ose-platform/behavior/web/gherkin/app-shell/accessibility.feature'), { scope: 'test', box: true }],
+  $uri: [({}, use) => use('../../specs/apps/ose/behavior/platform-web/gherkin/app-shell/accessibility.feature'), { scope: 'test', box: true }],
   $bddFileData: [({}, use) => use(bddFileData), { scope: "test", box: true }],
 });
 
