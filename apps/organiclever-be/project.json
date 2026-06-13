@@ -7,122 +7,109 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'TODO: update openapi-generator-cli to -g rust once generator is validated' && git diff --exit-code -- apps/organiclever-be/generated-contracts/"
+        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/organiclever-be/generated-contracts --model-package OrganicleverBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
       },
+      "dependsOn": ["organiclever-contracts:bundle"],
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/organiclever/containers/contracts/generated/openapi-bundled.yaml"],
       "outputs": ["{projectRoot}/generated-contracts"]
     },
-    "install": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo fetch --manifest-path apps/organiclever-be/Cargo.toml"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/Cargo.lock"]
-    },
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo build --release --manifest-path apps/organiclever-be/Cargo.toml"
+        "command": "dotnet publish apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj -c Release -o apps/organiclever-be/dist"
       },
-      "outputs": ["{projectRoot}/target"],
+      "dependsOn": ["codegen"],
+      "outputs": ["{projectRoot}/dist"],
       "cache": true,
-      "inputs": ["{projectRoot}/src/**", "{projectRoot}/Cargo.toml"]
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/OrganicleverBe/OrganicleverBe.fsproj",
+        "{projectRoot}/db/migrations/**/*.sql",
+        "{projectRoot}/generated-contracts/**/*.fs"
+      ]
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "dotnet build apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj"
+      },
+      "dependsOn": ["codegen"],
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/src/OrganicleverBe/OrganicleverBe.fsproj",
+        "{projectRoot}/db/migrations/**/*.sql",
+        "{projectRoot}/generated-contracts/**/*.fs"
+      ]
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "fantomas --check apps/organiclever-be/src",
+          "dotnet fsharplint lint apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj --lint-config apps/organiclever-be/fsharplint.json",
+          "dotnet tool restore && dotnet fsharp-analyzers --project apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj --analyzers-path $(find $(dotnet nuget locals global-packages --list | sed 's/.*: //')g-research.fsharp.analyzers -path '*/analyzers/dotnet/fs' -type d | head -1) --treat-as-error GRA-STRING-001 GRA-STRING-002 GRA-STRING-003 GRA-STRING-004 GRA-UNIONCASE-001 GRA-VIRTUALCALL-001 GRA-JSONOPTS-001 GRA-DISPBEFOREASYNC-001 GRA-IMMUTABLECOLLECTIONEQUALITY-001 GRA-LOGARGFUNCFULLAPP-001 GRA-LOGTEMPLMISSVALS-001 GRA-TYPE-ANNOTATE-001 GRA-INTERPOLATED-001"
+        ],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/OrganicleverBe/OrganicleverBe.fsproj"]
     },
     "fmt": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo fmt --manifest-path apps/organiclever-be/Cargo.toml"
+        "command": "fantomas apps/organiclever-be/src"
       }
     },
     "format:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo fmt --check --manifest-path apps/organiclever-be/Cargo.toml"
+        "command": "fantomas --check apps/organiclever-be/src"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**", "{projectRoot}/Cargo.toml"]
+      "inputs": ["{projectRoot}/src/**/*.fs"]
     },
-    "lint": {
+    "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo clippy --manifest-path apps/organiclever-be/Cargo.toml --all-targets -- -D warnings"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**", "{projectRoot}/Cargo.toml"]
-    },
-    "deny:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo deny --manifest-path apps/organiclever-be/Cargo.toml check"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/deny.toml"]
-    },
-    "msrv:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo +1.88 check --manifest-path apps/organiclever-be/Cargo.toml"
+        "command": "dotnet watch run --project apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj"
       }
     },
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --manifest-path apps/organiclever-be/Cargo.toml"
+        "command": "dotnet run --project apps/organiclever-be/src/OrganicleverBe/OrganicleverBe.fsproj"
       }
-    },
-    "dev": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo run --manifest-path apps/organiclever-be/Cargo.toml"
-      }
-    },
-    "typecheck": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo check --manifest-path apps/organiclever-be/Cargo.toml --all-targets"
-      },
-      "cache": true,
-      "inputs": [
-        "{projectRoot}/src/**",
-        "{projectRoot}/tests/**",
-        "{projectRoot}/migrations/**",
-        "{projectRoot}/Cargo.toml"
-      ]
     },
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo test --manifest-path apps/organiclever-be/Cargo.toml --test unit"
+        "command": "dotnet test apps/organiclever-be/tests/unit/OrganicleverBe.UnitTests.fsproj"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**", "{projectRoot}/tests/unit/**", "{projectRoot}/Cargo.toml"]
+      "inputs": [
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/unit/**/*.fs",
+        "{projectRoot}/src/OrganicleverBe/OrganicleverBe.fsproj"
+      ]
     },
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate bc organiclever",
-          "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate ul organiclever",
-          "cargo llvm-cov --manifest-path apps/organiclever-be/Cargo.toml --test unit --ignore-filename-regex '(main|db/infrastructure/mod|messaging/(client|crane_client|jetstream_demo))\\.rs' --fail-under-lines 90"
-        ],
-        "parallel": false
+        "command": "dotnet test apps/organiclever-be/tests/unit/OrganicleverBe.UnitTests.fsproj"
       },
       "cache": true,
       "inputs": [
-        "{projectRoot}/src/**",
-        "{projectRoot}/tests/unit/**",
-        "{projectRoot}/Cargo.toml",
-        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/organiclever/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/organiclever/ddd/ubiquitous-language/**/*.md"
+        "{projectRoot}/src/**/*.fs",
+        "{projectRoot}/tests/unit/**/*.fs",
+        "{projectRoot}/src/OrganicleverBe/OrganicleverBe.fsproj"
       ]
     },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker compose -f apps/organiclever-be/docker-compose.integration.yml down -v && docker compose -f apps/organiclever-be/docker-compose.integration.yml up --abort-on-container-exit --build"
+        "command": "apps/organiclever-be/scripts/run-integration.sh"
       },
       "cache": false
     },
@@ -134,7 +121,7 @@
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature",
-        "{projectRoot}/**/*.rs"
+        "{projectRoot}/src/**/*.fs"
       ]
     },
     "test:e2e": {
@@ -152,6 +139,6 @@
       "cache": true
     }
   },
-  "tags": ["type:app", "platform:axum", "lang:rust", "domain:organiclever"],
-  "implicitDependencies": ["organiclever-contracts"]
+  "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:organiclever"],
+  "implicitDependencies": ["organiclever-contracts", "rhino-cli"]
 }

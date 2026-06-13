@@ -653,6 +653,33 @@ validate … 90` (≥90% backend floor); frontends keep their existing threshold
   is unset `[Repo-grounded: primer Program.fs lines 166-170]`. The production backends require
   PostgreSQL; Phase 1 decides whether to keep the SQLite dev fallback or fail-fast on missing
   `DATABASE_URL` — recorded as a Phase 1 decision, not silently inherited.
+
+### Phase 1 Decisions (recorded 2026-06-14)
+
+- **Missing `DATABASE_URL` → fail-fast (no SQLite fallback)** `[Decision]`: Both F# backends are
+  server backends requiring PostgreSQL, so the primer's SQLite `EnsureCreated` dev fallback is
+  **dropped**. `Infrastructure/Database.fs.requireDatabaseUrl` raises
+  `failwith "DATABASE_URL is required (PostgreSQL connection string)"` when the env var is unset/empty,
+  before the host is built. EF Core registers `UseNpgsql(...).UseSnakeCaseNamingConvention()`
+  unconditionally; DbUp runs the embedded `db/migrations/*.sql` against the same connection string on
+  boot, failing fast if any script fails. This matches the Rust originals' `dotenvy + envy` fail-fast
+  behavior (Rust→F# mapping row "Config / env").
+- **`db/migrations/` lives at the app root** `[Decision]`: per the tech-docs per-app layout, migrations
+  sit at `apps/<backend>/db/migrations/` (sibling to `src/<AppName>/`), not inside `src/` as the primer
+  does. The fsproj references them via
+  `<EmbeddedResource Include="..\..\db\migrations\*.sql"><Link>db/migrations/...</Link></EmbeddedResource>`
+  so DbUp still finds them as embedded resources in the app assembly.
+- **`specs:coverage` keeps the `cargo run … apps/rhino-cli/Cargo.toml` invocation** `[Deviation —
+flag]`: The 1a-REFACTOR acceptance greps `cargo|rustc` to zero across each backend `project.json`.
+  The backend's own Rust toolchain (build/test/lint/typecheck/codegen) is fully removed, BUT the
+  shared `rhino-cli` spec validator is invoked repo-wide via
+  `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage`
+  — exactly as the F# reference `apps/crane-be/project.json` does (line 99). There is no canonical
+  non-cargo rhino-cli invocation in this repo (`package.json` scripts and every other `project.json`
+  use the same `cargo run` form). So `specs:coverage` retains one `cargo` line per backend; the literal
+  grep returns non-zero for that single line only. Resolution options for the orchestrator: (a) accept
+  this as the established convention (recommended — matches crane-be), or (b) introduce a prebuilt
+  `rhino-cli` binary/wrapper target repo-wide (out of this sub-section's scope).
 - **Deviation**: `organiclever-be` is greenfield journal CRUD, not a behavioral port — its first
   tests come from the new journal Gherkin, not preserved Rust behavior.
 - **Boundary**: production deployment, k3s manifests, ClusterIP wiring, the organiclever www/app

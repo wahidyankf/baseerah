@@ -1,0 +1,47 @@
+module OrganicleverBe.IntegrationTests.DatabaseBootTests
+
+open System
+open Microsoft.EntityFrameworkCore
+open Npgsql
+open Xunit
+open OrganicleverBe.Infrastructure.AppDbContext
+open OrganicleverBe.Infrastructure.Database
+
+let private connectionString () =
+    match Environment.GetEnvironmentVariable("DATABASE_URL") with
+    | null
+    | "" -> failwith "DATABASE_URL must be set for integration tests"
+    | value -> value
+
+let private tableExists (connStr: string) (tableName: string) : bool =
+    use conn = new NpgsqlConnection(connStr)
+    conn.Open()
+
+    use cmd =
+        new NpgsqlCommand("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = @t)", conn)
+
+    cmd.Parameters.AddWithValue("t", tableName) |> ignore
+    cmd.ExecuteScalar() :?> bool
+
+[<Fact>]
+let ``DbUp creates the SchemaVersions tracking table on boot`` () =
+    let connStr = connectionString ()
+    runMigrations connStr
+    Assert.True(tableExists connStr "schemaversions", "DbUp SchemaVersions table should exist after boot")
+
+[<Fact>]
+let ``DbUp applies the journal schema on boot`` () =
+    let connStr = connectionString ()
+    runMigrations connStr
+    Assert.True(tableExists connStr "journal_entries", "journal_entries table should exist after migration")
+
+[<Fact>]
+let ``EF context boots against PostgreSQL after migration`` () =
+    let connStr = connectionString ()
+    runMigrations connStr
+
+    let options =
+        DbContextOptionsBuilder<AppDbContext>().UseNpgsql(connStr).UseSnakeCaseNamingConvention().Options
+
+    use ctx = new AppDbContext(options)
+    Assert.True(ctx.Database.CanConnect(), "EF context should connect to PostgreSQL")

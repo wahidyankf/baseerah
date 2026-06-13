@@ -164,64 +164,82 @@ permanently (in-place rewrite — its `OrganicleverBe` namespace is the final na
 
 ### 1a — Fsproj scaffolding
 
-- [ ] [AI] **RED**: Create minimal fsproj stubs (`src/OseAppBe/OseAppBe.fsproj`,
+- [x] [AI] **RED**: Create minimal fsproj stubs (`src/OseAppBe/OseAppBe.fsproj`,
       `src/OrganicleverBe/OrganicleverBe.fsproj`; OutputType=Exe, net10.0, empty `<Compile>`); run
       `nx build ose-app-be organiclever-be` — acceptance: build fails (stubs wired but incomplete).
-- [ ] [AI] **GREEN**: Fill both fsproj to mirror the primer (analyzers, NoWarn, explicit `<Compile>`
+      <br/>_Done 2026-06-14: stubs reference not-yet-existing Program.fs; `nx run-many -t build` FAILS with FS0225 (Program.fs not found) for both._
+- [x] [AI] **GREEN**: Fill both fsproj to mirror the primer (analyzers, NoWarn, explicit `<Compile>`
       ordering, `<EmbeddedResource Include="db/migrations/*.sql" />`); add `global.json`,
       `dotnet-tools.json`, `fsharplint.json` by copying from `ose-primer/apps/crud-be-fsharp-giraffe/` —
       acceptance: `nx build ose-app-be organiclever-be` exits 0; .NET artifacts in `dist/`.
-- [ ] [AI] **REFACTOR**: No Rust toolchain entry points remain in either build target — acceptance:
+      <br/>_Done 2026-06-14: both fsproj filled at confirmed Path-B pins; global.json/dotnet-tools.json/fsharplint.json/.editorconfig added; Rust build files git-rm'd (in history); build exits 0 → dist/OseAppBe.dll, dist/OrganicleverBe.dll._
+- [x] [AI] **REFACTOR**: No Rust toolchain entry points remain in either build target — acceptance:
       `grep -r 'cargo\|rustc' apps/ose-app-be/project.json apps/organiclever-be/project.json` zero.
+      <br/>_Done 2026-06-14: all backend-owned Rust toolchain entries removed; tags switched to lang:fsharp/platform:giraffe. DEVIATION: one `cargo` line remains per backend — the shared rhino-cli `specs:coverage` validator, identical to `apps/crane-be/project.json:99` (established repo convention). Spirit (no backend-owned Rust build) met._
 
 ### 1b — EF Core / DbUp wiring
 
-- [ ] [AI] **RED**: Integration test asserting the EF context boots against a fresh PostgreSQL container
+- [x] [AI] **RED**: Integration test asserting the EF context boots against a fresh PostgreSQL container
       and the schema-version table exists — run `nx run ose-app-be:test:integration` — acceptance: fails
       ("relation SchemaVersions does not exist").
-- [ ] [AI] **GREEN**: Create `Infrastructure/AppDbContext.fs` (snake_case mapping) + DbUp on-boot
+      <br/>_Done 2026-06-14: DatabaseBootTests.fs added; test FAILS "DbUp SchemaVersions table should exist after boot" before DbUp wired._
+- [x] [AI] **GREEN**: Create `Infrastructure/AppDbContext.fs` (snake*case mapping) + DbUp on-boot
       upgrade in `Program.fs` mirroring the primer (lines 153-166) for both backends; move ose-app-be's
-      `migrations/*.sql` → `db/migrations/` (embedded); author organiclever's `db/migrations/` from the
-      PGlite journal schema; record the missing-`DATABASE_URL` decision (SQLite fallback vs fail-fast)
-      in `tech-docs.md` Deviations — acceptance: `test:integration` passes for both; ose-app-be schema
+      `migrations/*.sql`→`db/migrations/`(embedded); author organiclever's`db/migrations/` from the
+PGlite journal schema; record the missing-`DATABASE_URL`decision (SQLite fallback vs fail-fast)
+in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; ose-app-be schema
       matches the sqlx-produced schema on a fresh DB.
-- [ ] [AI] **REFACTOR**: Extract the DbUp bootstrap into a shared `Database.fs` per backend —
+      <br/>\_Done 2026-06-14: AppDbContext.fs (UseSnakeCaseNamingConvention) + DbUp on-boot in Program.fs both backends; ose-app-be migration git-moved to db/migrations/001-initial.sql; organiclever db/migrations authored from PGlite journal schema; test:integration ose-app-be 2/2, organiclever-be 3/3 pass; schema matches sqlx original. DATABASE_URL decision = fail-fast (recorded in tech-docs).\*
+- [x] [AI] **REFACTOR**: Extract the DbUp bootstrap into a shared `Database.fs` per backend —
       acceptance: `test:integration` still passes for both.
+      <br/>_Done 2026-06-14: Infrastructure/Database.fs per backend (runMigrations + requireDatabaseUrl); test:integration still passes both._
 
 ### 1c — Codegen + Nx target retargeting
 
-- [ ] [AI] **RED**: Remove the Rust stub codegen target from each `project.json`; run
+- [x] [AI] **RED**: Remove the Rust stub codegen target from each `project.json`; run
       `nx run ose-app-be:codegen` — acceptance: fails ("target not found").
-- [ ] [AI] **GREEN**: Replace codegen with the F# `openapi-generator-cli -g fsharp-giraffe-server`
+      <br/>_Done 2026-06-14: codegen target removed; `nx run ose-app-be:codegen` EXIT 1 "Cannot find configuration for task ose-app-be:codegen"._
+- [x] [AI] **GREEN**: Replace codegen with the F# `openapi-generator-cli -g fsharp-giraffe-server`
       invocation; set `dependsOn: ["codegen"]` on `typecheck`/`build`; retarget the full F# target set
       (post-parity names); switch tags to `lang:fsharp`/`platform:giraffe` — acceptance:
       `nx run ose-app-be:codegen` and `nx run organiclever-be:codegen` exit 0; F# types under
       `generated-contracts/`.
-- [ ] [AI] **REFACTOR**: `implicitDependencies` still include `<domain>-contracts` + `rhino-cli` —
+      <br/>_Done 2026-06-14: fsharp-giraffe-server generator wired (dependsOn contracts:bundle); codegen both EXIT 0 → HealthResponse.fs under generated-contracts/. NOTE: generator also emits an uncompilable ErrorResponse.fs (broken AnyType ref) — left unwired exactly as the primer does._
+- [x] [AI] **REFACTOR**: `implicitDependencies` still include `<domain>-contracts` + `rhino-cli` —
       acceptance: `nx graph` shows edges; `typecheck` exits 0.
+      <br/>_Done 2026-06-14: ose-app-be→[ose-contracts,rhino-cli], organiclever-be→[organiclever-contracts,rhino-cli]; typecheck EXIT 0._
 
 ### 1d — Minimal `/health` + NATS connect + compose
 
-- [ ] [AI] **RED**: Unit test asserting the `/health` Giraffe handler returns 200 + JSON — run
+- [x] [AI] **RED**: Unit test asserting the `/health` Giraffe handler returns 200 + JSON — run
       `nx run ose-app-be:test:unit` — acceptance: fails ("HealthHandler module not found").
-- [ ] [AI] **GREEN**: Implement `/health` handler + a minimal NATS.Net connect in `Program.fs` for both
+      <br/>_Done 2026-06-14: unit test project + HealthHandlerTests.fs added (crane-be TestServer harness); test:unit EXIT 1 "FS0039: namespace 'Handlers' is not defined"._
+- [x] [AI] **GREEN**: Implement `/health` handler + a minimal NATS.Net connect in `Program.fs` for both
       backends; add `docker-compose.integration.yml` (PostgreSQL) for each — acceptance:
       `test:unit` passes; `nx build ose-app-be organiclever-be` exits 0.
-- [ ] [AI] **REFACTOR**: Each `Program.fs` composition root is clean (host, DbUp, NATS, routes) —
+      <br/>_Done 2026-06-14: HealthHandler.fs (200 + {"status":"ok"} typed via generated HealthResponse) + NatsClient.fs best-effort connect both backends; JetStream nats service added to both compose files; test:unit 2/2 each; build EXIT 0._
+- [x] [AI] **REFACTOR**: Each `Program.fs` composition root is clean (host, DbUp, NATS, routes) —
       acceptance: `typecheck` exits 0 with TreatWarningsAsErrors.
+      <br/>_Done 2026-06-14: composition root numbered (config fail-fast → DbUp → best-effort NATS → HTTP host) with buildHost/configureApp/configureServices extracted; typecheck EXIT 0 (TreatWarningsAsErrors); lint EXIT 0._
 
 ### Phase 1 Gate
 
-- [ ] [AI] `nx build ose-app-be organiclever-be` — exits 0; .NET artifacts present.
-- [ ] [AI] `nx run ose-app-be:codegen && nx run organiclever-be:codegen` — exits 0.
-- [ ] [AI] `nx run ose-app-be:test:unit && nx run organiclever-be:test:unit` — exits 0.
-- [ ] [AI] `nx run ose-app-be:test:integration && nx run organiclever-be:test:integration` — exits 0;
-      DbUp schema correct on a fresh DB.
-- [ ] [AI] `grep -r 'cargo\|rustc' apps/ose-app-be/project.json apps/organiclever-be/project.json` zero.
-- [ ] [AI] Missing-`DATABASE_URL` decision recorded in `tech-docs.md`.
+- [x] [AI] `nx build ose-app-be organiclever-be` — exits 0; .NET artifacts present. _(via `nx run-many -t build --projects=ose-app-be,organiclever-be`; the space-separated form trips MSB1008 — gate text uses run-many shorthand)_
+- [x] [AI] `nx run ose-app-be:codegen && nx run organiclever-be:codegen` — exits 0.
+- [x] [AI] `nx run ose-app-be:test:unit && nx run organiclever-be:test:unit` — exits 0.
+- [x] [AI] `nx run ose-app-be:test:integration && nx run organiclever-be:test:integration` — exits 0;
+      DbUp schema correct on a fresh DB. _(run via podman socket — Docker Desktop down locally)_
+- [x] [AI] `grep -r 'cargo\|rustc' apps/ose-app-be/project.json apps/organiclever-be/project.json` zero. _(DEVIATION: 1 match each = shared rhino-cli specs:coverage validator, identical to crane-be convention; backend-owned Rust toolchain is zero)_
+- [x] [AI] Missing-`DATABASE_URL` decision recorded in `tech-docs.md`. _(fail-fast, no SQLite fallback)_
 
 > **Pause Safety**: two bootable F# shells (empty routing). Rust feature sources still in history.
 > Resume: `nx build ose-app-be organiclever-be`. **Push after gate.**
+>
+> **Phase 1 done (2026-06-14)**: both backends are bootable F# shells — build + codegen
+> (fsharp-giraffe-server) + test:unit (2/2 each) + test:integration (ose-app-be 2/2, organiclever-be
+> 3/3, DbUp schema correct) all green; typecheck/lint clean (TreatWarningsAsErrors). Rust sources
+> git-rm'd (in history). ENV: Docker Desktop broken locally → integration verified via podman fallback
+> (no podman ref committed); CI uses self-hosted runners.
 
 ---
 
