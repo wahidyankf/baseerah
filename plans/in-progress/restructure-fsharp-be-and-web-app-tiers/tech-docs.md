@@ -124,7 +124,7 @@ The current backends carry `migrations/0001_initial.sql` (+ `.gitkeep`)
 2. Marks them `<EmbeddedResource Include="db/migrations/*.sql" />` in the fsproj
    `[Repo-grounded: primer fsproj line 78-80]`.
 3. Runs DbUp once at startup before serving, exactly as the primer does
-   `[Repo-grounded: primer Program.fs lines 153-166]`:
+   `[Repo-grounded: primer Program.fs lines 156-165 (let result = DeployChanges.To … failwith)]`:
 
    ```fsharp
    let result =

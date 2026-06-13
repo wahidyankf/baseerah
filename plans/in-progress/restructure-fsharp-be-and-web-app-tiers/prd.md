@@ -149,7 +149,7 @@ Scenario: the ose-app-be OpenAPI contract still validates after media removal
 ```gherkin
 Scenario: all five ose-app-be bounded contexts are preserved
   Given ose-app-be has been ported to F#
-  When the spec-coverage target runs over its behavior specs
+  When the spec-coverage target runs over its behavior specs [Repo-grounded: ose-primer/apps/crud-be-fsharp-giraffe/project.json — future F# backend mirrors primer target name]
   Then health, ai-orchestration, gap-analysis, internal-policy, and regulatory-source steps are all bound
   And no bounded context is missing
 ```
