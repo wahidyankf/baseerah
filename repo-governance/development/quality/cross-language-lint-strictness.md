@@ -29,16 +29,16 @@ of the cross-language lint gates and the policy that binds them.
 
 | Artifact            | Tool         | Threshold / config                                      | CI job       |
 | ------------------- | ------------ | ------------------------------------------------------- | ------------ |
-| Shell scripts       | `shellcheck` | `--severity=warning`; root `.shellcheckrc`              | `shell`      |
-| Dockerfiles         | `hadolint`   | `--failure-threshold warning`; root `.hadolint.yaml`    | `dockerfile` |
-| GitHub Actions YAML | `actionlint` | non-zero on any finding (embeds shellcheck)             | `actions`    |
+| Shell scripts       | `shellcheck` | `--severity=warning`; root `.shellcheckrc`              | `shellcheck` |
+| Dockerfiles         | `hadolint`   | `--failure-threshold warning`; root `.hadolint.yaml`    | `hadolint`   |
+| GitHub Actions YAML | `actionlint` | non-zero on any finding (embeds shellcheck)             | `actionlint` |
 | F# projects         | TWAE         | `TreatWarningsAsErrors` on every `.fsproj`              | `dotnet`     |
 | F# projects         | analyzers    | G-Research.FSharp.Analyzers, `GRA-*` `--treat-as-error` | `dotnet`     |
 | F# formatting       | `fantomas`   | `fantomas --check`                                      | `dotnet`     |
 | Markdown            | markdownlint | see [markdown.md](./markdown.md)                        | `markdown`   |
 | Formatting          | Prettier     | `prettier --check`                                      | `format`     |
 
-The `shell`, `dockerfile`, and `actions` jobs are **always-run** (their artifacts
+The `shellcheck`, `hadolint`, and `actionlint` jobs are **always-run** (their artifacts
 are not Nx-tagged projects, so they are not gated by language detection). The F#
 gates ride the existing Nx `lint`/`typecheck`/`test:quick` targets, which the
 `dotnet` quality-gate job already runs, so no separate F# lint job is required.

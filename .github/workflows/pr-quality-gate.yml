@@ -64,7 +64,7 @@ jobs:
       - uses: ./.github/actions/setup-node
       - run: npx prettier --check .
 
-  shell:
+  shellcheck:
     name: Shell lint (ShellCheck)
     runs-on: ubuntu-latest
     steps:
@@ -79,7 +79,7 @@ jobs:
           # shellcheck disable=SC2086 # word-splitting the file list is intentional
           shellcheck --severity=warning $files
 
-  dockerfile:
+  hadolint:
     name: Dockerfile lint (hadolint)
     runs-on: ubuntu-latest
     steps:
@@ -96,7 +96,7 @@ jobs:
           # shellcheck disable=SC2086 # word-splitting the file list is intentional
           hadolint --failure-threshold warning $files
 
-  actions:
+  actionlint:
     name: GitHub Actions lint (actionlint)
     runs-on: ubuntu-latest
     steps:
@@ -194,7 +194,7 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    needs: [detect, format, shell, dockerfile, actions, typescript, dotnet, rust, markdown, naming, specs-gate]
+    needs: [detect, format, shellcheck, hadolint, actionlint, typescript, dotnet, rust, markdown, naming, specs-gate]
     if: always()
     runs-on: ubuntu-latest
     steps:

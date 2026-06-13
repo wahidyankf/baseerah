@@ -273,7 +273,8 @@ concurrency:
       `cancel-in-progress: ${{ github.event_name == 'pull_request' }}` — expected: exact canonical line.
       — result: exact canonical line present ✓
 - [x] [AI] Workflows lint clean — expected: exits 0. — result: actionlint 1.7.12 clean ✓
-- [ ] [AI] Commit thematically: `rtk git commit -m "ci(workflows): add canonical concurrency groups"`.
+- [x] [AI] Commit thematically: `rtk git commit -m "ci(workflows): add canonical concurrency groups"`.
+      — implementation: b834381
 
 > **Pause Safety**: every targeted workflow declares the canonical concurrency block, lints clean,
 > and the change is committed. Safe to stop. To resume: re-run the count and confirm the commit.
@@ -288,34 +289,34 @@ thresholds, same file sets; only job identifiers change. Every reference moves w
 
 _Suggested executor: `ci-fixer`_
 
-- [ ] [AI] **RED**: `grep -nE '^  (shell|dockerfile|actions):' .github/workflows/pr-quality-gate.yml`
-      — acceptance: matches the three job keys (~L66/78/92).
-- [ ] [AI] **GREEN**: rename `shell:`→`shellcheck:`, `dockerfile:`→`hadolint:`, `actions:`→`actionlint:`
-      — acceptance: the three new keys present; the three old keys gone.
-- [ ] [AI] **GREEN — `quality-gate.needs`**: change the `needs:` list from
+- [x] [AI] **RED**: `grep -nE '^  (shell|dockerfile|actions):' .github/workflows/pr-quality-gate.yml`
+      — acceptance: matches the three job keys (~L66/78/92). — result: lines 67,82,99 ✓
+- [x] [AI] **GREEN**: rename `shell:`→`shellcheck:`, `dockerfile:`→`hadolint:`, `actions:`→`actionlint:`
+      — acceptance: the three new keys present; the three old keys gone. — result: ✓
+- [x] [AI] **GREEN — `quality-gate.needs`**: change the `needs:` list from
       `[..., shell, dockerfile, actions, ...]` to `[..., shellcheck, hadolint, actionlint, ...]`
       — acceptance: `grep -n "shell\|dockerfile\|actions" pr-quality-gate.yml` no longer matches the
-      old job names as job keys or `needs` entries.
-- [ ] [AI] **GREEN — governance doc "CI job" column**: in
+      old job names as job keys or `needs` entries. — result: ✓
+- [x] [AI] **GREEN — governance doc "CI job" column**: in
       `repo-governance/development/quality/cross-language-lint-strictness.md` change the
       `shell`/`dockerfile`/`actions` job-name references to `shellcheck`/`hadolint`/`actionlint`
       — acceptance: the updated column uses the tool names; old category names no longer appear as
-      CI-job references.
-- [ ] [AI] **REFACTOR**: `grep -rnE '\b(shell|dockerfile|actions):' .github/workflows/` returns no
+      CI-job references. — result: table + body text updated ✓
+- [x] [AI] **REFACTOR**: `grep -rnE '\b(shell|dockerfile|actions):' .github/workflows/` returns no
       lint-gate-job match and actionlint reports the `needs` graph consistent
-      — acceptance: actionlint clean (or `prettier --check` fallback) and no stale references.
-- [ ] [AI] Lint the workflow — acceptance: exits 0.
+      — acceptance: actionlint clean (or `prettier --check` fallback) and no stale references. — result: clean ✓
+- [x] [AI] Lint the workflow — acceptance: exits 0. — result: actionlint clean ✓
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `grep -nE '^  (shellcheck|hadolint|actionlint):' .github/workflows/pr-quality-gate.yml`
-      — expected: all three new job keys present.
-- [ ] [AI] `quality-gate` `needs:` lists `shellcheck, hadolint, actionlint` and not the old names.
-- [ ] [AI] `grep -nE 'shellcheck|hadolint|actionlint' repo-governance/development/quality/cross-language-lint-strictness.md`
-      — expected: the "CI job" column uses the tool-named jobs.
-- [ ] [AI] Workflow lints clean — expected: exits 0.
+- [x] [AI] `grep -nE '^  (shellcheck|hadolint|actionlint):' .github/workflows/pr-quality-gate.yml`
+      — expected: all three new job keys present. — result: ✓
+- [x] [AI] `quality-gate` `needs:` lists `shellcheck, hadolint, actionlint` and not the old names. — result: ✓
+- [x] [AI] `grep -nE 'shellcheck|hadolint|actionlint' repo-governance/development/quality/cross-language-lint-strictness.md`
+      — expected: the "CI job" column uses the tool-named jobs. — result: ✓
+- [x] [AI] Workflow lints clean — expected: exits 0. — result: ✓
 - [ ] [AI] Commit: `rtk git commit -m "ci(pr-gate): rename lint jobs to tool-named scheme"`.
 
 > **Pause Safety**: the three lint-gate jobs are renamed, `needs` and the governance doc reference
