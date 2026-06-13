@@ -5,6 +5,7 @@ pub const STAGED_SKIP_PREFIXES: &[&str] = &[
     "plans/done",
     "apps/ayokoding-web/content",
     "apps/ose-web/content",
+    "apps/rhino-cli/tests/fixtures",
 ];
 
 /// Returns the subset of `staged` files that end with `.md` and whose
