@@ -7,7 +7,7 @@
 # invariants hold, non-zero otherwise.
 #
 # The script is intentionally implemented as a thin shell wrapper that
-# invokes existing tools (rhino-cli vendor-audit, npm sync, ls/grep/diff)
+# invokes existing tools (rhino-cli repo-governance validate vendor, npm sync, ls/grep/diff)
 # rather than re-implementing their logic. See:
 #   .claude/agents/repo-parity-checker.md
 #   repo-governance/conventions/structure/governance-vendor-independence.md
@@ -37,21 +37,21 @@ pass() {
 
 # Invariant 1: governance prose vendor-neutrality.
 print_invariant 1 "Governance prose vendor-neutrality"
-if (cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit repo-governance/ >/tmp/parity-inv1.log 2>&1); then
-  pass "rhino-cli repo-governance vendor-audit repo-governance/ (0 violations)"
+if (cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance validate vendor repo-governance/ >/tmp/parity-inv1.log 2>&1); then
+  pass "rhino-cli repo-governance validate vendor repo-governance/ (0 violations)"
 else
   cat /tmp/parity-inv1.log
-  fail "rhino-cli repo-governance vendor-audit repo-governance/ reported violations"
+  fail "rhino-cli repo-governance validate vendor repo-governance/ reported violations"
 fi
 
 # Invariant 2: root instruction surface vendor-neutrality.
 print_invariant 2 "AGENTS.md and CLAUDE.md vendor-neutrality"
 for target in AGENTS.md CLAUDE.md; do
-  if (cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit "${target}" >/tmp/parity-inv2.log 2>&1); then
-    pass "rhino-cli repo-governance vendor-audit ${target} (0 violations)"
+  if (cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance validate vendor "${target}" >/tmp/parity-inv2.log 2>&1); then
+    pass "rhino-cli repo-governance validate vendor ${target} (0 violations)"
   else
     cat /tmp/parity-inv2.log
-    fail "rhino-cli repo-governance vendor-audit ${target} reported violations"
+    fail "rhino-cli repo-governance validate vendor ${target} reported violations"
   fi
 done
 
