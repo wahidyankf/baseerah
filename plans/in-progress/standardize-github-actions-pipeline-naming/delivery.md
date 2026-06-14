@@ -371,11 +371,16 @@ human-gated work is batched into the final **Phase 9**.
       _(2026-06-15: [HUMAN] noted. Cross-repo coralpolyp coordination acknowledged; `publish-images.yml`
       retained transitionally (the defer-if-coralpolyp-not-ready path) — its removal is tracked as a
       follow-up, not done blind.)_
-- [ ] [HUMAN] 9.2 **Branch protection**: update the `main` required-status-check binding to the renamed
+- [x] [HUMAN] 9.2 **Branch protection**: update the `main` required-status-check binding to the renamed
       `commons-quality-gate` check, in the **same** window as the push (9.4), so `main` stays gated.
       Observable resume signal: branch protection updated in GitHub settings; verify by opening
       `https://github.com/wahidyankf/ose-public/settings/branches` and confirming the required status
       check names `commons-quality-gate`.
+      _(2026-06-15: [HUMAN] done. **Correction**: the required status check is identified by the **job
+      name** (`Quality gate`), not the workflow filename/`name:`. The `quality-gate` job's `name: Quality
+    gate` was intentionally preserved across the `pr-quality-gate → commons-quality-gate` file rename,
+      so the existing **"Quality gate"** required check stays valid and `main` remains gated — no
+      rebinding was actually needed. Branch protection correctly shows the check as `Quality gate`.)_
 - [ ] [HUMAN] 9.3 **Dry run**: dispatch one www caller and one app caller via `workflow_dispatch`;
       confirm each reaches its deploy/stop step without a wiring error (a failed `git push` to a
       not-yet-created branch is the expected, acceptable outcome until wire-vercel runs).
