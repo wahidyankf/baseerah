@@ -373,7 +373,7 @@ Heading hierarchy is mechanically enforced on a **prose allowlist** (default-den
 - `plans/done/` — frozen archived plans
 - All other paths not in the allowlist above
 
-**Gate locations**: Runs at **pre-commit (staged `.md` files within the prose allowlist)** and in the `validate-markdown.yml` CI workflow via `npx nx run rhino-cli:headings:hierarchy-validation`. Does NOT run at pre-push.
+**Gate locations**: Runs at **pre-commit (staged `.md` files within the prose allowlist)** and in the `markdown-validate.yml` CI workflow via `npx nx run rhino-cli:headings:hierarchy-validation`. Does NOT run at pre-push.
 
 ## Accessibility Standards
 

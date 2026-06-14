@@ -46,13 +46,13 @@ After pushing app or library code to `origin main`, you MUST:
 
 ## Workflow Mapping
 
-| App(s) Changed                                              | Workflow to Trigger                                |
-| ----------------------------------------------------------- | -------------------------------------------------- |
-| `apps/ayokoding-www/`                                       | `test-and-deploy-ayokoding-web.yml`                |
-| `apps/ose-www/`                                             | `test-and-deploy-ose-web.yml`                      |
-| `apps/organiclever-web/`, `apps/organiclever-be/`           | `test-and-deploy-organiclever-web-development.yml` |
-| `apps/wahidyankf-www/`                                      | `test-and-deploy-wahidyankf-web.yml`               |
-| `libs/`, shared infrastructure, or cross-cutting governance | All workflows for apps in blast radius             |
+| App(s) Changed                                              | Workflow to Trigger                           |
+| ----------------------------------------------------------- | --------------------------------------------- |
+| `apps/ayokoding-www/`                                       | `ayokoding-www-test-local-deploy-prod.yml`    |
+| `apps/ose-www/`                                             | `ose-www-test-local-deploy-prod.yml`          |
+| `apps/organiclever-app-web/`, `apps/organiclever-be/`       | `organiclever-app-test-local-deploy-stag.yml` |
+| `apps/wahidyankf-www/`                                      | `wahidyankf-www-test-local-deploy-prod.yml`   |
+| `libs/`, shared infrastructure, or cross-cutting governance | All workflows for apps in blast radius        |
 
 When a change touches shared code (a lib, a shared type, a contract), trigger every workflow for every app that imports that code — not just the app most obviously related to the change.
 
@@ -76,10 +76,10 @@ See [CI Monitoring Convention](./ci-monitoring.md) for:
 git diff HEAD~1 --name-only
 
 # Trigger a specific workflow on main
-gh workflow run test-and-deploy-ayokoding-web.yml
+gh workflow run ayokoding-www-test-local-deploy-prod.yml
 
 # List recent runs for a workflow to find the run ID
-gh run list --workflow=test-and-deploy-ayokoding-web.yml --limit=5
+gh run list --workflow=ayokoding-www-test-local-deploy-prod.yml --limit=5
 
 # Check run status (call every 3-5 min via ScheduleWakeup — do NOT use gh run watch for long jobs)
 gh run view <run-id> --json conclusion,status,jobs
@@ -155,10 +155,10 @@ Agent: Pushed feat(organiclever-web): update hero section to origin main.
 Identifying blast radius: apps/organiclever-web/ changed.
 
 Triggering CI:
-  gh workflow run test-and-deploy-organiclever-web-development.yml
+  gh workflow run organiclever-app-test-local-deploy-stag.yml
 
 Monitoring:
-  gh run list --workflow=test-and-deploy-organiclever-web-development.yml --limit=3
+  gh run list --workflow=organiclever-app-test-local-deploy-stag.yml --limit=3
   gh run watch 12345678
 
 Result: All steps passed. Work is complete.
@@ -191,7 +191,7 @@ The pre-push hook does not run integration tests, E2E tests, or deployment workf
 Agent: Pushed feat(organiclever-be): update auth endpoint to origin main.
 
 Triggering CI:
-  gh workflow run test-and-deploy-organiclever-web-development.yml
+  gh workflow run organiclever-app-test-local-deploy-stag.yml
 
 Monitoring: run 12345679 failed — integration test failure in organiclever-be.
 
@@ -203,7 +203,7 @@ Fix:
   git push origin main
 
 Re-triggering CI:
-  gh workflow run test-and-deploy-organiclever-web-development.yml
+  gh workflow run organiclever-app-test-local-deploy-stag.yml
 
 Result: All steps passed. Work is complete.
 ```

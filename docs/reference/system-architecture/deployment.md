@@ -96,14 +96,16 @@ graph LR
 ### Environment Branches
 
 - **Purpose**: Deployment triggers only
-- **Branches**: `prod-ose-web`, `prod-ayokoding-web`, `stag-organiclever-web`, `prod-organiclever-web`
+- **Branches**: `prod-ose-web`, `prod-ayokoding-web`, `prod-wahidyankf-web`, `stag-organiclever-app-web`, `stag-organiclever-be`
 - **Policy**: NEVER commit directly to these branches outside CI automation
-- **Workflows**:
-  - `test-and-deploy-ayokoding-web.yml` (6 AM / 6 PM WIB) → `prod-ayokoding-web`
-  - `test-and-deploy-ose-web.yml` (6 AM / 6 PM WIB) → `prod-ose-web`
-  - `test-and-deploy-organiclever-web-development.yml` (3 AM / 3 PM WIB) → `stag-organiclever-web`
-    (deploys to **staging**, not production)
-  - `deploy-organiclever-web-to-production.yml` (`workflow_dispatch` only) →
-    `prod-organiclever-web` (gated by FE E2E against staging; promotes from
-    `stag-organiclever-web`)
+- **Workflows** (here, "deploy" means a **branch force-push** — Vercel builds web from the pushed branch;
+  a be-build-deploy workflow fires for backends):
+  - `ayokoding-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ayokoding-web`
+  - `ose-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ose-web`
+  - `wahidyankf-www-test-local-deploy-prod.yml` (scheduled) → `prod-wahidyankf-web`
+  - `organiclever-app-test-local-deploy-stag.yml` (3 AM / 3 PM WIB) → `stag-organiclever-app-web`
+    and `stag-organiclever-be` (deploys to **staging**, not production)
+  - `organiclever-app-test-stag-deploy-prod.yml` (+2.5h after the stag deploy) — gated FE E2E
+    against the staging URL; **stops on pass without promoting**. Production continuous delivery
+    is deferred to a separate plan, so no production-CD workflow exists yet.
   - All workflows can also be triggered manually from the GitHub Actions UI

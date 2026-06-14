@@ -479,14 +479,14 @@ Deploy ose-web to production using automated CI or the deployer agent.
 
 ### Automated Deployment (Primary)
 
-The `test-and-deploy-ose-web.yml` GitHub Actions workflow handles routine deployment:
+The `ose-www-test-local-deploy-prod.yml` GitHub Actions workflow handles routine deployment:
 
 - **Schedule**: Runs at 6 AM and 6 PM WIB (UTC+7) every day
 - **Change detection**: Diffs `HEAD` vs `prod-ose-web` scoped to `apps/ose-www/` — skips build/deploy when nothing changed
 - **Build**: Runs `nx build ose-web` (Next.js extended build with Next.js 16 theme)
 - **Deploy**: Force-pushes `main` to `prod-ose-web`; Vercel auto-builds
 
-**Manual trigger**: From the GitHub Actions UI, trigger `test-and-deploy-ose-web.yml` with `force_deploy=true` to deploy immediately regardless of changes.
+**Manual trigger**: From the GitHub Actions UI, trigger `ose-www-test-local-deploy-prod.yml` with `force_deploy=true` to deploy immediately regardless of changes.
 
 ### Emergency / On-Demand Deployment
 

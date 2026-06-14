@@ -319,7 +319,7 @@ Configuration has been tuned to disable overly strict rules. If you still see ma
 - [Repository Validation Methodology Convention](./repository-validation.md) — canonical
   reference for all three Markdown Quality Gates (mermaid:validation, links:validation,
   headings:hierarchy-validation), their commands, exclusions, gate locations, and the
-  `validate-markdown.yml` CI workflow
+  `markdown-validate.yml` CI workflow
 - [Code Quality Convention](./code.md)
 
 ## Maintenance

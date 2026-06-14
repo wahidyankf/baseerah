@@ -292,13 +292,13 @@ human-gated work is batched into the final **Phase 9**.
 
 ## Phase 7 — reference sweep + wire-vercel reduction + READMEs
 
-- [ ] [AI] 7.1 **RED**: `git grep -nE '(pr-quality-gate|validate-markdown|validate-env|publish-images|test-crane-cli-integration|test-and-deploy-[a-z-]+|test-[a-z-]+-web-staging|deploy-[a-z-]+-to-production)\.yml' -- ':!plans/done/**'`
+- [x] [AI] 7.1 **RED**: `git grep -nE '(pr-quality-gate|validate-markdown|validate-env|publish-images|test-crane-cli-integration|test-and-deploy-[a-z-]+|test-[a-z-]+-web-staging|deploy-[a-z-]+-to-production)\.yml' -- ':!plans/done/**'`
       — lists every doc still naming an old file (the failing set).
-- [ ] [AI] 7.2 **Renamed-file sweep**: update `.github/README.md`, `.github/workflows/README.md`,
+- [x] [AI] 7.2 **Renamed-file sweep**: update `.github/README.md`, `.github/workflows/README.md`,
       `.github/actions/README.md` (workflow tables), `docs/reference/system-architecture/ci-cd.md`, and
       any agent definition that names a workflow (e.g. `apps-organiclever-web-deployer`, which targets the
       renamed promotion workflow) — then `npm run generate:bindings` if any `.claude/agents/**` changed.
-- [ ] [AI] 7.3 **Env-injection governance sweep**: update every related governance `.md`/rule so
+- [x] [AI] 7.3 **Env-injection governance sweep**: update every related governance `.md`/rule so
       the injection standard is consistent repo-wide —
       `repo-governance/conventions/security/{secrets-and-env-standards,env-file-access,no-secrets-in-committed-files,README}.md`,
       `repo-governance/conventions/README.md`, `env-contract.yaml` (cross-ref `env-injection.yaml`),
@@ -306,21 +306,22 @@ human-gated work is batched into the final **Phase 9**.
       `repo-governance/development/workflow/reproducible-environments.md`,
       `docs/reference/system-architecture/ci-cd.md`, and `AGENTS.md` if its env/secret notes need the
       injection cross-link. Re-sync bindings if any `.claude/**` changed.
-- [ ] [AI] 7.4 Reduce `wire-vercel-www-app-cutover` — remove `.github/workflows` items from its
+- [x] [AI] 7.4 Reduce `wire-vercel-www-app-cutover` — remove `.github/workflows` items from its
       Scope/tech-docs/delivery, add the `stag-*-be` / `prod-*-be` branches to its branch-creation list,
       add the value-population step driven by `env-injection.yaml`, and point its workflow section at this
       plan. Keep its Vercel/DNS/Environment/branch-creation steps.
-- [ ] [AI] 7.5 **Verify**: the RED grep from 7.1 returns nothing (or only intentional historical
+- [x] [AI] 7.5 **Verify**: the RED grep from 7.1 returns nothing (or only intentional historical
       mentions — none active).
+      _(2026-06-15: 7.2 sweep updated agent defs/skills/docs/governance to new workflow names (REMOVED workflows reworded to "prod CD deferred"/"removed"); generate:bindings regenerated .opencode/.amazonq mirrors (idempotent). 7.3 added env-injection cross-links (manifest link restored, env-contract + security-README cross-refs). 7.4 reconciled wire-vercel residual "workflows" phrasings. RED grep returns only the intentional anti-pattern counter-example in github-actions-workflow-naming.md.)_
 
 ### Phase 7 Gate
 
 > All checks below must pass before starting Phase 8.
 
-- [ ] [AI] `npx nx run rhino-cli:links:validation` — exits 0
-- [ ] [AI] `npx nx run rhino-cli:headings:hierarchy-validation` — exits 0
-- [ ] [AI] `npm run lint:md` — exits 0
-- [ ] [AI] `npm run generate:bindings && git diff --exit-code` — exits 0 (generate:bindings idempotent, no residual diff)
+- [x] [AI] `npx nx run rhino-cli:links:validation` — exits 0
+- [x] [AI] `npx nx run rhino-cli:headings:hierarchy-validation` — exits 0
+- [x] [AI] `npm run lint:md` — exits 0
+- [x] [AI] `npm run generate:bindings && git diff --exit-code` — exits 0 (generate:bindings idempotent, no residual diff)
 
 > **Pause Safety**: Reference sweep complete, wire-vercel reduced, injection standard consistent across all docs. Safe to stop.
 > To resume: `npx nx run rhino-cli:links:validation && npm run lint:md`.

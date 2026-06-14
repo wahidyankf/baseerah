@@ -23,8 +23,8 @@ commits of sensitive files, and related security events.
 
 - [Secrets and Env Standards](./secrets-and-env-standards.md) — **Hub doc.** The authoritative
   reference for naming convention, `.env.example` layout, annotation format, startup validation,
-  `rhino-cli env` toolchain, storage-tier ladder, drift guard (`env-contract.yaml`), and
-  `guard-env-file-access` policy.
+  `rhino-cli env` toolchain, storage-tier ladder, drift guard (`env-contract.yaml`), tiered
+  injection standard (`env-injection.yaml`), and `guard-env-file-access` policy.
 - [No Secrets in Committed Files](./no-secrets-in-committed-files.md) — Hard iron rule stub.
   No system secret may enter any git-tracked file. Full details in the hub doc.
 - [Environment File Access](./env-file-access.md) — `guard-env-file-access` policy stub.

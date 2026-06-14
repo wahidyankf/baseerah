@@ -121,7 +121,7 @@ git pull origin main
 
 ## When to Use This Agent
 
-**Note**: Routine scheduled deployments are automated by the `test-and-deploy-ose-web.yml` GitHub Actions workflow (runs at 6 AM and 6 PM WIB). Use this agent for emergency or on-demand deploys only.
+**Note**: Routine scheduled deployments are automated by the `ose-www-test-local-deploy-prod.yml` GitHub Actions workflow (runs at 6 AM and 6 PM WIB). Use this agent for emergency or on-demand deploys only.
 
 **Use when**:
 

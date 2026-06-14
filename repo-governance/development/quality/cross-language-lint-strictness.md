@@ -10,7 +10,7 @@ of the cross-language lint gates and the policy that binds them.
 - **Threshold**: every gate fails on a finding of severity **warning or above**.
   This matches how Prettier and markdownlint are already gated — there is no
   "advisory" tier that prints findings without blocking.
-- **Two enforcement points**: every gate runs in CI (`.github/workflows/pr-quality-gate.yml`)
+- **Two enforcement points**: every gate runs in CI (`.github/workflows/commons-quality-gate.yml`)
   **and** in the local Husky hooks (`.husky/pre-commit`). CI is the hard gate;
   the local hook gives fast feedback and degrades gracefully (skips with a hint)
   when the tool is not yet installed, so a fresh checkout can still commit before

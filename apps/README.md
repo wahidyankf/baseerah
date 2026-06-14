@@ -255,7 +255,7 @@ git push origin main:prod-ayokoding-web --force
 ```
 
 **ose-www**: Deployed automatically by scheduled GitHub Actions
-workflow (`test-and-deploy-ose-web.yml`) running at 6 AM and 6 PM
+workflow (`ose-www-test-local-deploy-prod.yml`) running at 6 AM and 6 PM
 WIB. The workflow detects changes scoped to the app directory before building and deploying.
 Trigger on-demand from the GitHub Actions UI (set `force_deploy=true` to skip change detection).
 

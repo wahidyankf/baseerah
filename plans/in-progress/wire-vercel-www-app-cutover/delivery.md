@@ -66,7 +66,7 @@ the worktree after the plan is archived and pushed.
 
 ---
 
-## Phase 1: In-Repo Wiring Edits (vercel.json + deployer agents + workflows + docs)
+## Phase 1: In-Repo Wiring Edits (vercel.json + deployer agents + workflow verification + docs)
 
 > All edits stay on the local worktree branch. Nothing deploys in this phase.
 

@@ -406,9 +406,9 @@ Drift detection commands (`drift-routes`, `drift-endpoints`, `drift-contracts`) 
 Every `validate:specs-*` target runs on all four gating surfaces — no surface lags behind:
 
 - `.husky/pre-push` (every developer push, single line)
-- `.github/workflows/pr-quality-gate.yml` (every PR, dedicated `specs-gate` job in `quality-gate.needs:`)
-- `.github/workflows/_reusable-test-and-deploy.yml` (called by 3 cron deploys, `specs-gate` job in `deploy.needs:`)
-- `.github/workflows/test-and-deploy-organiclever-web-development.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`)
+- `.github/workflows/commons-quality-gate.yml` (every PR, dedicated `specs-gate` job in `quality-gate.needs:`)
+- `.github/workflows/_reusable-www-test-local-deploy.yml` (called by the www cron deploys, `specs-gate` job in `deploy.needs:`)
+- `.github/workflows/organiclever-app-test-local-deploy-stag.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`)
 
 `docs validate-links` is NOT gated by this plan — it scans the entire repo's markdown (repo-governance/, docs/, app READMEs) and is owned by a separate planned validator-unification effort.
 

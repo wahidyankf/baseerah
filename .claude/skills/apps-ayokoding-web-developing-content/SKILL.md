@@ -118,14 +118,14 @@ Deploy ayokoding-web to production using automated CI or the deployer agent.
 
 ### Automated Deployment (Primary)
 
-The `test-and-deploy-ayokoding-web.yml` GitHub Actions workflow handles routine deployment:
+The `ayokoding-www-test-local-deploy-prod.yml` GitHub Actions workflow handles routine deployment:
 
 - **Schedule**: Runs at 6 AM and 6 PM WIB (UTC+7) every day
 - **Change detection**: Diffs `HEAD` vs `prod-ayokoding-web` scoped to `apps/ayokoding-www/` — skips build/deploy when nothing changed
 - **Build**: Runs `nx build ayokoding-web` (Next.js build)
 - **Deploy**: Force-pushes `main` to `prod-ayokoding-web`; Vercel auto-builds
 
-**Manual trigger**: From the GitHub Actions UI, trigger `test-and-deploy-ayokoding-web.yml` with `force_deploy=true` to deploy immediately regardless of changes.
+**Manual trigger**: From the GitHub Actions UI, trigger `ayokoding-www-test-local-deploy-prod.yml` with `force_deploy=true` to deploy immediately regardless of changes.
 
 ### Emergency / On-Demand Deployment
 

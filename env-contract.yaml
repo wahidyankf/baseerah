@@ -1,5 +1,9 @@
 # env-contract.yaml — surface registry for rhino-cli env validate
 #
+# Companion: env-injection.yaml declares, per app, the injection HOME for each key
+# at every deploy stage (names only, never values). `rhino-cli env validate` checks
+# both this drift contract AND env-injection.yaml consistency in one pass.
+#
 # Each surface entry carries:
 #   root      — path relative to repo root
 #   kind      — "app" (active); "terraform"/"ansible" are forward-scaffold

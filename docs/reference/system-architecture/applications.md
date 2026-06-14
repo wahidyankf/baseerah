@@ -103,10 +103,11 @@ The platform consists of the following applications across its technology stacks
 - **Purpose**: Landing site for OrganicLever — local-first mode; BE integration deferred
 - **URL**: <https://www.organiclever.com>
 - **Technology**: Next.js 16 (App Router) + React 19 + TailwindCSS
-- **Deployment**: Vercel — staging via `stag-organiclever-web` branch (CI-automated by
-  `test-and-deploy-organiclever-web-development.yml`); production via
-  `prod-organiclever-web` branch (promoted on demand by
-  `deploy-organiclever-web-to-production.yml`)
+- **Deployment**: Vercel — staging via `stag-organiclever-app-web` branch (CI-automated by
+  `organiclever-app-test-local-deploy-stag.yml`, which deploys by force-pushing the stag
+  branch). Production continuous delivery is **deferred** to a separate plan — no
+  production-CD workflow exists yet; the gated `organiclever-app-test-stag-deploy-prod.yml`
+  runs the FE E2E gate against staging and stops on pass without promoting.
 - **Build Command**: `nx build organiclever-www`
 - **Dev Command**: `nx dev organiclever-www`
 - **Location**: `apps/organiclever-www/`

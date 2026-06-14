@@ -227,7 +227,7 @@ surfaces:
 
 `rhino-cli env validate` compares declared keys in `.env.example` against read keys in source code,
 reporting `declared-but-unread` (stale template entry) and `read-but-undeclared` (undocumented read)
-drift findings. Invoked by `.husky/pre-push` and `.github/workflows/validate-env.yml`.
+drift findings. Invoked by `.husky/pre-push` and `.github/workflows/commons-env-validate.yml`.
 
 ## 7. Tiered Injection Standard
 
@@ -393,4 +393,4 @@ ensuring the pattern is immediately available when it does.
 - [`reproducible-environments.md`](../../../repo-governance/development/workflow/reproducible-environments.md) — environment setup (stub for env section)
 - [`docs/explanation/standardize-secrets-and-env-parity-decisions.md`](../../../docs/explanation/standardize-secrets-and-env-parity-decisions.md) — cross-repo parity decisions
 - [`env-contract.yaml`](../../../env-contract.yaml) — surface registry
-- `env-injection.yaml` — value-less injection manifest (names only; see §7). Created by this plan's Phase 6; the live cross-link is wired in the Phase 7 governance sweep once the file exists.
+- [`env-injection.yaml`](../../../env-injection.yaml) — value-less injection manifest (names only; see §7)

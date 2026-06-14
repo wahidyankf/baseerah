@@ -394,7 +394,7 @@ The default push behavior is constant regardless of execution context:
 
 AI agents must not infer a branch + PR workflow from execution context alone. The triggering signal is always an explicit instruction in the user's prompt or delivery checklist.
 
-Note: this does **not** affect environment branches (`prod-ayokoding-web`, `prod-ose-web`, `prod-organiclever-web`, `stag-organiclever-web`). Those follow their own documented deployment workflows. The OrganicLever staging branch (`stag-organiclever-web`) is CI-automated; the production branch (`prod-organiclever-web`) is promoted on demand via `deploy-organiclever-web-to-production.yml` (dispatch-only).
+Note: this does **not** affect environment branches (`prod-ayokoding-web`, `prod-ose-web`, `stag-organiclever-app-web`, `stag-organiclever-be`). Those follow their own documented deployment workflows. The OrganicLever app staging branches (`stag-organiclever-app-web`, `stag-organiclever-be`) are CI-automated by `organiclever-app-test-local-deploy-stag.yml`. Production promotion for the OrganicLever app is **deferred** to a separate plan — no production-CD workflow exists yet.
 
 ## When Branches Are Appropriate
 
@@ -457,7 +457,7 @@ The `apps/ayokoding-www/` project uses a production deployment branch:
 - **Location**: Deploys `apps/ayokoding-www/` (Next.js 16 application)
 - **Workflow** (automated):
   1. All development happens in `main`
-  2. The `test-and-deploy-ayokoding-web.yml` GitHub Actions workflow runs at 6 AM and 6 PM WIB, detects changes in `apps/ayokoding-www/`, builds, then force-pushes `main` to `prod-ayokoding-web`
+  2. The `ayokoding-www-test-local-deploy-prod.yml` GitHub Actions workflow runs at 6 AM and 6 PM WIB, detects changes in `apps/ayokoding-www/`, builds, then force-pushes `main` to `prod-ayokoding-web`
   3. Push to `prod-ayokoding-web` triggers production deployment via Vercel
 - **Important**: Never commit directly to `prod-ayokoding-web` outside the CI automation
 

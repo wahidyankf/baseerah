@@ -125,7 +125,7 @@ graph LR
 
 ### PR Quality Gate Workflow
 
-**File**: `.github/workflows/pr-quality-gate.yml`
+**File**: `.github/workflows/commons-quality-gate.yml`
 
 **Trigger**: Pull request opened, synchronized, or reopened
 
@@ -141,7 +141,7 @@ graph LR
 
 ### Validate Markdown Workflow
 
-**File**: `.github/workflows/validate-markdown.yml`
+**File**: `.github/workflows/markdown-validate.yml`
 
 **Trigger**: Pull request and push to `main`
 
@@ -155,19 +155,19 @@ graph LR
 
 **Purpose**: Block PRs/pushes with broken markdown links, invalid mermaid diagrams, or heading-hierarchy violations
 
-### Test and Deploy AyoKoding Web Workflow
+### AyoKoding Web Test + Deploy Workflow
 
-**File**: `.github/workflows/test-and-deploy-ayokoding-web.yml`
+**File**: `.github/workflows/ayokoding-www-test-local-deploy-prod.yml`
 
 **Trigger**: Push to `main` branch (CRON twice daily + manual dispatch)
 
-**Steps**: Full test pipeline via `_reusable-test-and-deploy.yml` (lint, typecheck, test:quick, E2E), then force-push to `prod-ayokoding-web`; Vercel auto-builds.
+**Steps**: Full local-stack test pipeline via `_reusable-www-test-local-deploy.yml` (lint, typecheck, test:quick, E2E), then "deploy" by force-pushing `main` to `prod-ayokoding-web`; Vercel auto-builds.
 
 **Purpose**: Deploy ayokoding.com (Next.js 16 fullstack content platform)
 
-### Test and Deploy OSE Platform Web Workflow
+### OSE Platform Web Test + Deploy Workflow
 
-**File**: `.github/workflows/test-and-deploy-ose-web.yml`
+**File**: `.github/workflows/ose-www-test-local-deploy-prod.yml`
 
 **Trigger**: Scheduled (6 AM and 6 PM WIB daily) or manual `workflow_dispatch`
 
@@ -180,9 +180,9 @@ graph LR
 
 **Purpose**: Automated scheduled deployments for oseplatform.com with change detection to avoid unnecessary builds
 
-### Test and Deploy wahidyankf-web Workflow
+### wahidyankf-web Test + Deploy Workflow
 
-**File**: `.github/workflows/test-and-deploy-wahidyankf-web.yml`
+**File**: `.github/workflows/wahidyankf-www-test-local-deploy-prod.yml`
 
 **Trigger**: Scheduled or manual `workflow_dispatch`
 
@@ -195,54 +195,41 @@ graph LR
 
 **Purpose**: Automated deployments for www.wahidyankf.com with change detection to avoid unnecessary builds
 
-### Test and Deploy OrganicLever Web Development Workflow
+### OrganicLever App Test + Local-Deploy Staging Workflow
 
-**File**: `.github/workflows/test-and-deploy-organiclever-web-development.yml`
+**File**: `.github/workflows/organiclever-app-test-local-deploy-stag.yml`
 
 **Trigger**: Scheduled (3 AM and 3 PM WIB daily) or manual `workflow_dispatch`
 
 **Steps:**
 
-1. Run `specs:coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-www`, `organiclever-be-e2e`, `organiclever-www-be-e2e`, `organiclever-www-fe-e2e`)
-2. Run `fe-lint` for `organiclever-www`
-3. Run `be-integration` tests with docker-compose (real PostgreSQL) under `organiclever-web-development` env
+1. Run `specs:coverage` across the OrganicLever app projects (`organiclever-be`, `organiclever-app-web`, `organiclever-be-e2e`, and the app-web E2E projects)
+2. Run `fe-lint` for `organiclever-app-web`
+3. Run `be-integration` tests with docker-compose (real PostgreSQL) under the `organiclever-app-staging` env
 4. Run `fe-integration` tests (MSW-mocked)
-5. Run combined `e2e` stage under `organiclever-web-development` env: full stack via docker-compose, then `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`), `organiclever-www-be-e2e` (placeholder — tolerated-absent via `|| true`), and `organiclever-www-fe-e2e` (`WEB_BASE_URL: http://localhost:3200`) Playwright tests
-6. `detect-changes`: check `apps/organiclever-www/` vs previous commit
-7. `deploy` (gated on all test jobs + `detect-changes == true`): force-push `HEAD` to `stag-organiclever-web`; Vercel auto-builds the staging site
+5. Run combined `e2e` stage: full stack via docker-compose, then the `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`) and `organiclever-app-web` FE E2E (`WEB_BASE_URL: http://localhost:3202`) Playwright tests
+6. `detect-changes`: check the app paths vs previous commit
+7. `deploy` (gated on all test jobs + `detect-changes == true`): "deploy" by force-pushing `HEAD` to BOTH `stag-organiclever-app-web` (Vercel auto-builds the staging app) and `stag-organiclever-be` (the be-build-deploy workflow fires for the backend image)
 
-**Purpose**: Automated scheduled deployments to **staging** for www.organiclever.com, gated on full FE+BE test suite, with change detection to avoid unnecessary builds. Production promotion is gated and dispatch-only via `deploy-organiclever-web-to-production.yml` (see below).
+**Purpose**: Automated scheduled staging deploys for the OrganicLever app group, gated on the full FE+BE test suite, with change detection to avoid unnecessary builds. Production continuous delivery is **deferred** to a separate plan — no production-CD workflow exists yet.
 
-### Test OrganicLever Web Staging Workflow
+### OrganicLever App Test-Staging Gate Workflow
 
-**File**: `.github/workflows/test-organiclever-web-staging.yml`
+**File**: `.github/workflows/organiclever-app-test-stag-deploy-prod.yml`
 
-**Trigger**: Scheduled (5 AM and 5 PM WIB daily, 2 hours after development deploy) or manual `workflow_dispatch`
-
-**Steps:**
-
-1. Single job `e2e-staging` under `organiclever-web-staging` env
-2. Runs `npx nx run organiclever-www-fe-e2e:test:e2e` against the staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}`
-3. Uploads `playwright-report-organiclever-web-staging` as an artifact
-
-**Purpose**: Continuous health check of the staging deployment between development pushes. Read-only — never deploys.
-
-### Deploy OrganicLever Web to Production Workflow
-
-**File**: `.github/workflows/deploy-organiclever-web-to-production.yml`
-
-**Trigger**: Manual `workflow_dispatch` only — no schedule, no push trigger
+**Trigger**: Scheduled (+2.5h after the local-deploy-stag run) or manual `workflow_dispatch`
 
 **Steps:**
 
-1. Job `e2e-staging` (pre-deploy gate) under `organiclever-web-staging` env: re-runs FE E2E against staging URL via `vars.WEB_BASE_URL`. Uploads `playwright-report-organiclever-web-staging-predeploy`.
-2. Job `promote-to-production` (`needs: [e2e-staging]`) under `organiclever-web-production` env: checks out `stag-organiclever-web` (`fetch-depth: 0`), then `git push origin HEAD:prod-organiclever-web --force`. Vercel auto-builds the production site.
+1. Single job `e2e-staging` under the `organiclever-app-staging` env
+2. Runs the `organiclever-app-web` FE E2E suite against the deployed staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}` (Vercel bypass secret)
+3. Uploads the Playwright report as an artifact
 
-**Purpose**: Gated, dispatch-only promotion of `stag-organiclever-web` → `prod-organiclever-web`. Production is never deployed from `main` directly.
+**Purpose**: Continuous gated health check of the staging deployment. Despite the `-deploy-prod` name slot reserved for the future promote step, this workflow currently **stops on pass without promoting** — production CD is deferred. It never deploys today.
 
-### PR Quality Gate Workflow
+### Commons Quality Gate Workflow (PR)
 
-**File**: `.github/workflows/pr-quality-gate.yml`
+**File**: `.github/workflows/commons-quality-gate.yml`
 
 **Trigger**: Pull request opened, synchronized, or reopened
 

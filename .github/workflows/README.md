@@ -16,11 +16,11 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 
 ## PR and repo-wide gates
 
-| Workflow                | Trigger             | Role                                                                                    |
-| ----------------------- | ------------------- | --------------------------------------------------------------------------------------- |
-| `pr-quality-gate.yml`   | Pull request        | Typecheck, lint, `test:quick`, `specs:coverage`, naming validation (Node + .NET + Rust) |
-| `validate-markdown.yml` | PR + push to `main` | Mermaid, link, and heading-hierarchy validation via `rhino-cli`                         |
-| `validate-env.yml`      | PR + push           | Environment-variable contract validation                                                |
+| Workflow                   | Trigger             | Role                                                                                    |
+| -------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
+| `commons-quality-gate.yml` | Pull request        | Typecheck, lint, `test:quick`, `specs:coverage`, naming validation (Node + .NET + Rust) |
+| `markdown-validate.yml`    | PR + push to `main` | Mermaid, link, and heading-hierarchy validation via `rhino-cli`                         |
+| `commons-env-validate.yml` | PR + push           | Environment-variable contract validation                                                |
 
 ## www tier — direct deploy (scheduled callers of `_reusable-www-test-local-deploy.yml`)
 
@@ -42,10 +42,11 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 
 ## Backend images and CLIs
 
-| Workflow                         | Role                                                                                                         |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `publish-images.yml`             | Build and push `organiclever-be` / `ose-be` images to GHCR (deployed by the ose-infra k3s plans, not Vercel) |
-| `test-crane-cli-integration.yml` | `crane-cli` integration tests (OCR) on `apps/crane-cli/**` and `specs/apps/crane/**` changes                 |
+| Workflow                                | Role                                                                                                                        |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `publish-images.yml`                    | Build and push `organiclever-be` / `ose-be` images to GHCR (deployed by the ose-infra k3s plans, not Vercel) — transitional |
+| `organiclever-be-build-deploy-stag.yml` | Build the `organiclever-be` image and push it to GHCR; triggered on `stag-organiclever-be` push                             |
+| `ose-be-build-deploy-stag.yml`          | Build the `ose-be` image and push it to GHCR; triggered on `stag-ose-be` push                                               |
 
 > **In-flight cutover:** the
 > [wire-vercel-www-app-cutover plan](../../plans/in-progress/wire-vercel-www-app-cutover/README.md)

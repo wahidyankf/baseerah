@@ -439,7 +439,7 @@ cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md vali
 
 Run without flags to perform a repo-wide scan (the Nx target runs with `--exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` plus the standardized noise-skip set) using defaults (MaxWidth=4, unlimited depth). Pass additional `--exclude <prefix>` flags to suppress noise in project-specific runs.
 
-**Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit hook and in the `validate-markdown.yml` CI workflow (`push`/`pull_request` → `main`) via `npx nx run rhino-cli:mermaid:validation`. Does NOT run at pre-push.
+**Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit hook and in the `markdown-validate.yml` CI workflow (`push`/`pull_request` → `main`) via `npx nx run rhino-cli:mermaid:validation`. Does NOT run at pre-push.
 
 ### Width Violation Fix Strategy Guide
 
@@ -525,7 +525,7 @@ Guide apply (see above). Direction flip does not apply to state diagrams (they h
 directive); use Diagram Splitting or Sequential Chaining when width is exceeded.
 
 **Automated enforcement**: Same Nx target and gate location as flowcharts — `mermaid:validation`
-runs at pre-commit (staged `.md` files) and in `validate-markdown.yml` CI.
+runs at pre-commit (staged `.md` files) and in `markdown-validate.yml` CI.
 
 ### Mermaid Best Practices
 

@@ -121,13 +121,13 @@ All projects enforce ≥90% test coverage as part of `test:quick`.
 **Quality gates**: pre-commit hooks (formatting, linting), pre-push hooks (`typecheck`, `lint`, `test:quick` for affected projects), and [commons quality gate](./.github/workflows/commons-quality-gate.yml).
 
 - OSE Platform
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-ose-web.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-ose-web.yml)
+  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/ose-www-test-local-deploy-prod.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/ose-www-test-local-deploy-prod.yml)
 - AyoKoding
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-ayokoding-web.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-ayokoding-web.yml)
-- OrganicLever
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-organiclever-web-development.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-organiclever-web-development.yml)
+  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/ayokoding-www-test-local-deploy-prod.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/ayokoding-www-test-local-deploy-prod.yml)
+- OrganicLever (app — staging)
+  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/organiclever-app-test-local-deploy-stag.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/organiclever-app-test-local-deploy-stag.yml)
 - Wahidyankf
-  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-wahidyankf-web.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-wahidyankf-web.yml)
+  - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/wahidyankf-www-test-local-deploy-prod.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/wahidyankf-www-test-local-deploy-prod.yml)
 - [`rhino-cli`](./apps/rhino-cli/)
 
 For polyglot demo app CI badges, see the [`ose-primer`](https://github.com/wahidyankf/ose-primer) repository.

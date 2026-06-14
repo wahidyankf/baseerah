@@ -485,7 +485,7 @@ grep -F "^$field:" frontmatter.txt
 
 ## Markdown Quality Gates
 
-Three automated markdown validators run on every commit and in CI via the `validate-markdown.yml` workflow:
+Three automated markdown validators run on every commit and in CI via the `markdown-validate.yml` workflow:
 
 ### 1. Mermaid Diagram Validation
 
@@ -493,7 +493,7 @@ Three automated markdown validators run on every commit and in CI via the `valid
 
 Repo-wide scan: the Nx target runs `md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` (plus the standardized noise-skip set: `node_modules`, `dist`, `target`, `.next`, `coverage`, `generated-reports`, `local-temp`, `archived`, `apps-labs`, `worktrees`, `.terraform`, `generated-contracts`, `.nx`, `.git`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax. Diagram types covered: `flowchart`/`graph` (all directions) and `stateDiagram-v2`/`stateDiagram` (v1) — state node count contributes to width; state display names and transition edge labels are subject to the ≤ 30-char limit. The `--exclude` flag is repeatable; pass additional prefixes to suppress noise in project-specific runs.
 
-**Gate locations**: Pre-commit (staged `.md` files only) + `validate-markdown.yml` CI. Not at pre-push.
+**Gate locations**: Pre-commit (staged `.md` files only) + `markdown-validate.yml` CI. Not at pre-push.
 
 ### 2. Markdown Link Validation
 
@@ -501,7 +501,7 @@ Repo-wide scan: the Nx target runs `md validate mermaid --max-depth=4 --exclude 
 
 Full-repo link scan (same standardized noise-skip set as `mermaid:validation`). Validates all relative `[text](path.md)` links resolve to existing files. Also validates `#fragment` anchor references using the GitHub slug algorithm — underscores and Unicode letters/digits are kept, spaces map to hyphens, duplicates receive `-1`, `-2`, … suffixes (verified against the `github-slugger` v2 reference implementation). A fragment with no matching heading emits a `broken-anchor` finding.
 
-**Gate locations**: Pre-commit (staged `.md` files only, link step) + `validate-markdown.yml` CI. Not at pre-push.
+**Gate locations**: Pre-commit (staged `.md` files only, link step) + `markdown-validate.yml` CI. Not at pre-push.
 
 ### 3. Heading Hierarchy Validation
 
@@ -509,11 +509,11 @@ Full-repo link scan (same standardized noise-skip set as `mermaid:validation`). 
 
 Validates heading nesting on a prose allowlist (default-deny): `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), `specs/`, root `*.md`, `apps/*/README.md`, `libs/*/README.md`, `apps/*/docs/**`, `libs/*/docs/**`. All other paths (including `.claude/**`, `apps/ayokoding-www/content/`, `apps/ose-www/content/`, `plans/done/`) are skipped.
 
-**Gate locations**: Pre-commit (staged `.md` files within the prose allowlist) + `validate-markdown.yml` CI. Not at pre-push.
+**Gate locations**: Pre-commit (staged `.md` files within the prose allowlist) + `markdown-validate.yml` CI. Not at pre-push.
 
 ### CI Workflow
 
-All three validators run in `.github/workflows/validate-markdown.yml` on every `push` and `pull_request` targeting `main`.
+All three validators run in `.github/workflows/markdown-validate.yml` on every `push` and `pull_request` targeting `main`.
 
 ## Related Conventions
 

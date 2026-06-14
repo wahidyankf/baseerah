@@ -165,7 +165,7 @@ All markdown files auto-linted and formatted through a three-gate system:
   validation — width, label length, syntax — repo-wide scan covering `flowchart`/`graph`
   and `stateDiagram-v2`/`stateDiagram` (v1); excludes `plans/done`,
   `apps/ayokoding-www/content`, and the standard noise-skip set; runs at pre-commit on
-  staged `.md` files + `validate-markdown.yml` CI; does NOT run at pre-push)
+  staged `.md` files + `markdown-validate.yml` CI; does NOT run at pre-push)
 - **links:validation** (`npx nx run rhino-cli:links:validation`): Full-repo link scan
   including `#fragment` anchor validation (runs at pre-commit + CI; does NOT run at
   pre-push)
@@ -189,7 +189,7 @@ npm run lint:md:fix
 
 Beyond markdown, the repo gates shell scripts, Dockerfiles, GitHub Actions
 workflows, and F# at a uniform **warning-and-above** threshold, enforced in both
-CI (`.github/workflows/pr-quality-gate.yml`) and the local Husky hooks:
+CI (`.github/workflows/commons-quality-gate.yml`) and the local Husky hooks:
 
 - **shellcheck** (`--severity=warning`, root `.shellcheckrc`) — all tracked `.sh` files (CI `shell` job)
 - **hadolint** (`--failure-threshold warning`, root `.hadolint.yaml`) — all Dockerfiles (CI `dockerfile` job)
