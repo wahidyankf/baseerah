@@ -131,21 +131,6 @@ contexts:
     gherkin: specs/apps/organiclever/behavior/organiclever-app-web/gherkin/health
     relationships: []
 
-  - name: landing
-    summary: >-
-      Marketing landing surface at / — hero, features, principles, rhythm demo,
-      footer. No domain logic; pure presentational content.
-    layers:
-      - domain
-      - application
-      - infrastructure
-      - presentation
-    code:
-      - apps/organiclever-app-web/src/contexts/landing
-    glossary: specs/apps/organiclever/ddd/ubiquitous-language/landing.md
-    gherkin: specs/apps/organiclever/behavior/organiclever-app-web/gherkin/landing
-    relationships: []
-
   - name: routing
     summary: >-
       Disabled-route guards. No authentication ships today, so /login and /profile

@@ -8,8 +8,7 @@ context. Each folder maps to one bounded context from the
 
 ```
 specs/apps/organiclever/behavior/organiclever-app-web/gherkin/
-├── app-shell/             # Navigation, accessibility, cross-cutting loggers
-│   ├── accessibility.feature
+├── app-shell/             # Navigation, cross-cutting loggers
 │   ├── entry-loggers.feature
 │   └── navigation.feature
 ├── health/                # Backend health diagnostic page
@@ -17,8 +16,6 @@ specs/apps/organiclever/behavior/organiclever-app-web/gherkin/
 ├── journal/               # Journal events — today's entries, filtering
 │   ├── home-screen.feature
 │   └── journal-mechanism.feature
-├── landing/               # Marketing landing page
-│   └── landing.feature
 ├── routine/               # Workout routine management
 │   └── routine-management.feature
 ├── routing/               # App routing and 404 guards

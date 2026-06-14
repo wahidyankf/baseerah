@@ -15,7 +15,6 @@ One markdown file per bounded context, plus this index. Each file lists the term
 | `settings`        | [settings.md](./settings.md)               |
 | `app-shell`       | [app-shell.md](./app-shell.md)             |
 | `health`          | [health.md](./health.md)                   |
-| `landing`         | [landing.md](./landing.md)                 |
 | `routing`         | [routing.md](./routing.md)                 |
 
 The bounded-context map and the strategic-pattern relationships between these contexts live in [`ddd/bounded-context-map.md`](../bounded-context-map.md).

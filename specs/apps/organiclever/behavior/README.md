@@ -9,7 +9,8 @@ each project can wire its step implementations against the right glob.
 ## Children
 
 - `organiclever-be/` — Backend Gherkin scenarios (HTTP semantic).
-- `organiclever-app-web/` — Frontend Gherkin scenarios (UI semantic).
+- `organiclever-app-web/` — App-client Gherkin scenarios (UI semantic).
+- `organiclever-www/` — Public marketing site Gherkin scenarios (UI semantic).
 
 ## Surfaces
 
@@ -18,8 +19,9 @@ flat product-surface convention.
 
 | Surface                | Perspective                             | Background                 | Consumed by                              |
 | ---------------------- | --------------------------------------- | -------------------------- | ---------------------------------------- |
-| `organiclever-be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/organiclever-be` (Rust/Axum)       |
+| `organiclever-be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/organiclever-be` (F#/Giraffe)      |
 | `organiclever-app-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/organiclever-app-web` (Next.js 16) |
+| `organiclever-www`     | UI-semantic (clicks, types, sees)       | —                          | `apps/organiclever-www` (Next.js 16)     |
 
 ## Gherkin coverage
 
@@ -34,18 +36,27 @@ flat product-surface convention.
 Organized by bounded context (one folder per context, matching the
 [DDD registry](../ddd/bounded-contexts.yaml)).
 
-| Bounded Context | Features                                       | Count  |
-| --------------- | ---------------------------------------------- | ------ |
-| app-shell       | `accessibility`, `entry-loggers`, `navigation` | 3      |
-| health          | `system-status-be`                             | 1      |
-| journal         | `home-screen`, `journal-mechanism`             | 2      |
-| landing         | `landing`                                      | 1      |
-| routine         | `routine-management`                           | 1      |
-| routing         | `app-routes`, `disabled-routes`                | 2      |
-| settings        | `dark-mode`, `language`, `settings-screen`     | 3      |
-| stats           | `history-screen`, `progress-screen`            | 2      |
-| workout-session | `workout-session`                              | 1      |
-| **Total**       |                                                | **16** |
+| Bounded Context | Features                                   | Count  |
+| --------------- | ------------------------------------------ | ------ |
+| app-shell       | `entry-loggers`, `navigation`              | 2      |
+| health          | `system-status-be`                         | 1      |
+| journal         | `home-screen`, `journal-mechanism`         | 2      |
+| routine         | `routine-management`                       | 1      |
+| routing         | `app-routes`, `disabled-routes`            | 2      |
+| settings        | `dark-mode`, `language`, `settings-screen` | 3      |
+| stats           | `history-screen`, `progress-screen`        | 2      |
+| workout-session | `workout-session`                          | 1      |
+| **Total**       |                                            | **14** |
+
+### `organiclever-www/gherkin/`
+
+Greenfield-simple marketing surface (no DDD bounded contexts).
+
+| Domain        | Features        | Count |
+| ------------- | --------------- | ----- |
+| home          | `home`          | 1     |
+| accessibility | `accessibility` | 1     |
+| **Total**     |                 | **2** |
 
 ## Related
 

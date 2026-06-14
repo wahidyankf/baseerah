@@ -512,56 +512,56 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 > public website at the domain root) and wires `ts-ui` into the two organiclever frontends. The app
 > keeps `-app-web` (`organiclever-app-web`).
 
-- [ ] [AI] **RED**: Write a failing Playwright e2e test in `apps/organiclever-www-e2e/` (new project)
+- [x] [AI] **RED**: Write a failing Playwright e2e test in `apps/organiclever-www-e2e/` (new project)
       asserting the marketing site home page renders with the expected `<h1>` heading — run
       `nx run organiclever-www-e2e:test:e2e` — acceptance: fails (project or page not found).
-- [ ] [AI] **GREEN**: Scaffold a fresh Next.js project (`src/app` + `src/features/{home,app-shell}`,
+- [x] [AI] **GREEN**: Scaffold a fresh Next.js project (`src/app` + `src/features/{home,app-shell}`,
       wahidyankf pattern, port 3200) at `apps/organiclever-www/`; add Nx project.json; wire
       `@open-sharia-enterprise/ts-ui` import; carry over content + assets from the former `landing`
       context (`apps/organiclever-app-web/src/contexts/landing/`); **no** PGlite/Effect/XState —
       acceptance: `nx build organiclever-www` exits 0;
       `nx run organiclever-www-e2e:test:e2e` passes; `grep -rE 'pglite|xstate|effect'
 apps/organiclever-www/src` zero.
-- [ ] [AI] **REFACTOR**: Ensure `src/features/` is the only context shape in `apps/organiclever-www/src`
+- [x] [AI] **REFACTOR**: Ensure `src/features/` is the only context shape in `apps/organiclever-www/src`
       — acceptance: `grep -r 'src/contexts' apps/organiclever-www/src` zero; `nx run
 organiclever-www:lint && nx run organiclever-www:typecheck` exit 0.
-- [ ] [AI] **RED**: Write a failing unit test for the `landing` context removal in
+- [x] [AI] **RED**: Write a failing unit test for the `landing` context removal in
       `apps/organiclever-app-web/` asserting the landing route/component does not exist — run
       `nx run organiclever-app-web:test:unit` — acceptance: test fails (landing module unexpectedly
       found or assertion inverted).
-- [ ] [AI] **GREEN**: Remove the `landing` context (`src/contexts/landing/`) from
+- [x] [AI] **GREEN**: Remove the `landing` context (`src/contexts/landing/`) from
       `apps/organiclever-app-web/` (now redundant); update routing and imports — acceptance:
       `nx build organiclever-app-web` exits 0; `nx run organiclever-app-web:test:unit` passes; app
       still serves journal/routine/settings.
-- [ ] [AI] **REFACTOR**: Clean up any dead imports or unused exports after landing removal —
+- [x] [AI] **REFACTOR**: Clean up any dead imports or unused exports after landing removal —
       acceptance: `nx run organiclever-app-web:lint && nx run organiclever-app-web:typecheck` exit 0.
-- [ ] [AI] **RED**: Write a failing unit test asserting `@open-sharia-enterprise/ts-ui` is imported in
+- [x] [AI] **RED**: Write a failing unit test asserting `@open-sharia-enterprise/ts-ui` is imported in
       at least one component of `apps/organiclever-app-web/src/` — run
       `nx run organiclever-app-web:test:unit` — acceptance: test fails (import absent).
-- [ ] [AI] **GREEN**: Wire `libs/ts-ui` into `apps/organiclever-app-web/` — add to `tsconfig` path
+- [x] [AI] **GREEN**: Wire `libs/ts-ui` into `apps/organiclever-app-web/` — add to `tsconfig` path
       aliases and `project.json` `implicitDependencies`; replace at least one primitive with the ts-ui
       equivalent — acceptance: `nx graph` shows `organiclever-app-web` → `ts-ui`; `nx build
 organiclever-app-web` exits 0; test passes.
-- [ ] [AI] **REFACTOR**: Ensure all ts-ui imports use the canonical package name
+- [x] [AI] **REFACTOR**: Ensure all ts-ui imports use the canonical package name
       `@open-sharia-enterprise/ts-ui` — acceptance: `nx run organiclever-app-web:typecheck` exits 0.
-- [ ] [AI] **New marketing e2e** `organiclever-www-e2e` (Playwright) asserting the marketing site
+- [x] [AI] **New marketing e2e** `organiclever-www-e2e` (Playwright) asserting the marketing site
       renders; keep `organiclever-app-web-e2e` for the app — acceptance: both project.json valid;
       `nx show projects` lists both.
-- [ ] [AI] **Specs — marketing tier**: add `specs/apps/organiclever/behavior/organiclever-www/` +
+- [x] [AI] **Specs — marketing tier**: add `specs/apps/organiclever/behavior/organiclever-www/` +
       marketing `components/web/` for the marketing surface (per tech-docs Specs Restructure) —
       acceptance: spec dirs exist with at least a README + landing behavior.
-- [ ] [AI] `.env.example` for the new `organiclever-www` (port only) registered in `env-contract.yaml`;
+- [x] [AI] `.env.example` for the new `organiclever-www` (port only) registered in `env-contract.yaml`;
       `rhino-cli env validate`.
 
 ### Phase 6 Gate
 
-- [ ] [AI] `nx build organiclever-www organiclever-app-web` — exits 0.
-- [ ] [AI] `nx graph` — both consume `libs/ts-ui`.
-- [ ] [AI] `grep -rE 'pglite|xstate|@effect' apps/organiclever-www/src` — zero (marketing is simple).
-- [ ] [AI] `nx run organiclever-www:test:unit && nx run organiclever-app-web:test:unit` — exit 0.
-- [ ] [AI] `nx show projects` — `organiclever-www` and `organiclever-www-e2e` exist; no
+- [x] [AI] `nx build organiclever-www organiclever-app-web` — exits 0.
+- [x] [AI] `nx graph` — both consume `libs/ts-ui`.
+- [x] [AI] `grep -rE 'pglite|xstate|@effect' apps/organiclever-www/src` — zero (marketing is simple).
+- [x] [AI] `nx run organiclever-www:test:unit && nx run organiclever-app-web:test:unit` — exit 0.
+- [x] [AI] `nx show projects` — `organiclever-www` and `organiclever-www-e2e` exist; no
       `organiclever-web` / `organiclever-web-e2e` (the old marketing/app-flavored names are gone).
-- [ ] [AI] `rhino-cli env validate` — exits 0.
+- [x] [AI] `rhino-cli env validate` — exits 0.
 
 > **Pause Safety**: organiclever two-tier in code (`organiclever-www` + `organiclever-app-web`); split
 > not live in prod (deferred). Resume: `nx build organiclever-www organiclever-app-web`. **Push after

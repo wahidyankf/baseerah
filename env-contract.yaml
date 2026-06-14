@@ -45,6 +45,13 @@ surfaces:
       - PORT
       - HOSTNAME
 
+  - root: apps/organiclever-www
+    kind: app
+    lang: typescript
+    allowlist:
+      - PORT # framework-reserved Next.js dev-server port
+      - HOSTNAME # framework-reserved Next.js dev-server hostname
+
   - root: apps/organiclever-app-web
     kind: app
     lang: typescript

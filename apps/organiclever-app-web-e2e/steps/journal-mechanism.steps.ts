@@ -263,9 +263,10 @@ async function dismissAddEntrySheet(page: Page): Promise<void> {
 // Background steps
 // ---------------------------------------------------------------------------
 
-// "the app is running" is already registered in accessibility.steps.ts as a
-// no-op. playwright-bdd requires each pattern registered exactly once across
-// all step files. This file does NOT re-register it.
+// "the app is running" is a no-op: the server is assumed running for all e2e
+// scenarios. playwright-bdd requires each pattern registered exactly once
+// across all step files.
+Given("the app is running", async () => {});
 
 Given("I have opened {string} in a fresh browser session", async ({ page }, path: string) => {
   // Navigate so we have an origin context that can access IndexedDB.

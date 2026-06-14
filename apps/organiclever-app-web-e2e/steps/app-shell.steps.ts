@@ -4,7 +4,8 @@
  * Covers: specs/apps/organiclever/behavior/organiclever-app-web/gherkin/app-shell/navigation.feature
  *
  * Selector notes:
- * - The app lives at /app (AppRoot mounts there). Root / is the marketing landing page.
+ * - The app lives at /app (AppRoot mounts there). Root / redirects to /app/home
+ *   (the marketing landing now lives in the separate organiclever-www site).
  * - TabBar buttons are plain <button> elements with text labels — no data-testid, no <a> links.
  * - FAB button carries aria-label="Log entry".
  * - AddEntrySheet is a fixed overlay rendered when the FAB is pressed.

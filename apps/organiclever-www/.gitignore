@@ -1,0 +1,18 @@
+# Next.js
+.next/
+out/
+
+# Node
+node_modules/
+
+# Coverage
+coverage/
+
+# Environment files
+.env*.local
+
+# Build output
+dist/
+
+# Vercel
+.vercel
