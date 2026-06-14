@@ -47,55 +47,61 @@ human-gated work is batched into the final **Phase 9**.
 
 ## Phase 0 — Setup & baseline (repo-setup-manager)
 
-- [ ] [AI] 0.1 `npm install` and `npm run doctor -- --fix` (Node + .NET + Rust toolchain present).
-- [ ] [AI] 0.2 Baseline green: `actionlint .github/workflows/*.yml`, `npm run lint:md`,
+- [x] [AI] 0.1 `npm install` and `npm run doctor -- --fix` (Node + .NET + Rust toolchain present).
+      _(2026-06-14: npm install clean; doctor 22/22 tools OK.)_
+- [x] [AI] 0.2 Baseline green: `actionlint .github/workflows/*.yml`, `npm run lint:md`,
       `npx nx run rhino-cli:links:validation`. Record any pre-existing failures and fix them first
       (root-cause, do not defer).
-- [ ] [AI] 0.3 Snapshot the current inventory:
+      _(2026-06-14: actionlint exit 0; lint:md 0 errors (2197 files); links:validation success. No preexisting failures.)_
+- [x] [AI] 0.3 Snapshot the current inventory:
       `ls .github/workflows/ .github/actions/ | tee local-temp/workflow-inventory-before.txt`
       — acceptance: `local-temp/workflow-inventory-before.txt` is non-empty and readable.
+      _(2026-06-14: inventory written, 25 lines; local-temp/ created in worktree.)_
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0, no errors
-- [ ] [AI] `npm run lint:md` — exits 0
-- [ ] [AI] `npx nx run rhino-cli:links:validation` — exits 0
-- [ ] [AI] `test -s local-temp/workflow-inventory-before.txt` — exits 0 (inventory file non-empty)
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0, no errors
+- [x] [AI] `npm run lint:md` — exits 0
+- [x] [AI] `npx nx run rhino-cli:links:validation` — exits 0
+- [x] [AI] `test -s local-temp/workflow-inventory-before.txt` — exits 0 (inventory file non-empty)
 
 > **Pause Safety**: Repo is at baseline-green with pre-existing issues fixed. Safe to stop.
 > To resume: `actionlint .github/workflows/*.yml && npm run lint:md && npx nx run rhino-cli:links:validation`.
 
 ## Phase 1 — Convention
 
-- [ ] [AI] 1.1 Edit `repo-governance/development/infra/github-actions-workflow-naming.md` to
+- [x] [AI] 1.1 Edit `repo-governance/development/infra/github-actions-workflow-naming.md` to
       define the domain-first `{domain}-{action-chain}` grammar, the cross-cutting keyword list
       (`commons`/`markdown`/`docs`/`{cli}`), the verb vocabulary (incl. `deploy-stag`/`deploy-prod` =
       branch force-push, `build-deploy-*` for backends), and the reusable/composite-action exemptions.
       Replace the stale "Complete Codebase Reference" table with the after-state filenames.
       _Acceptance_: the doc lists every target filename from tech-docs.
-- [ ] [AI] 1.2 Align `repo-governance/development/infra/ci-conventions.md` — File Organisation
+      _(2026-06-14: rewrote naming doc — grammar table, verb vocab, deploy-model mermaid, Target File Set with all 17 after-state filenames, refreshed examples. All target filenames verified present.)_
+- [x] [AI] 1.2 Align `repo-governance/development/infra/ci-conventions.md` — File Organisation
       table, Naming Conventions table, the CRON-schedule section (2.5 h staging→prod gap), the
       Invariant-A row (correct the inaccurate claim that `rhino-cli:naming:workflows-validation` enforces
       `.github/workflows` filenames; it validates `repo-governance/workflows/*.md` only), and a **new
       invariant**: `test:integration`/`test:e2e` run only in the scheduled tiered pipelines, never in
       `commons-quality-gate`, `.husky/pre-commit`, or `.husky/pre-push`.
-- [ ] [AI] 1.3 **Injection standard**: add a "Tiered injection" section to
+      _(2026-06-14: updated File Organisation + Naming tables to 17-file after-state, staggered CRON with 2.5h gap, corrected Invariant-A workflows-validation scope, added Invariant B2 no-heavy-tests-in-fast-gates.)_
+- [x] [AI] 1.3 **Injection standard**: add a "Tiered injection" section to
       `repo-governance/conventions/security/secrets-and-env-standards.md` — the variable classes
       (app-runtime server/public, CI test-harness, platform-injected), the app × stage × platform
       injection matrix, the GitHub Environment ↔ key registry, the Vercel target mapping
       (`prod-*`→Production, `stag-*`→Preview), the k3s/coralpolyp contract boundary, and the
       value-less `env-injection.yaml` manifest. Extend the §7 census with the GitHub/Vercel/k3s rows.
       _Acceptance_: the doc matches [tech-docs §Tiered injection](./tech-docs.md#tiered-env--secret-injection-standard).
+      _(2026-06-14: added §7 Tiered Injection Standard (classes, matrix, GH-Env registry, env-injection.yaml manifest), extended §8 census. Renumber pushed guard-policy §8→§9; fixed inbound anchors in AGENTS.md + env-file-access.md (root-cause). env-injection.yaml markdown link kept as inline-code until Phase 6 creates the file.)_
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `npm run lint:md` — exits 0
-- [ ] [AI] `npx nx run rhino-cli:links:validation` — exits 0
-- [ ] [AI] Convention docs describe the after-state including the deploy-as-branch-push model and
+- [x] [AI] `npm run lint:md` — exits 0
+- [x] [AI] `npx nx run rhino-cli:links:validation` — exits 0
+- [x] [AI] Convention docs describe the after-state including the deploy-as-branch-push model and
       tiered injection standard: `grep -c 'domain.*action-chain' repo-governance/development/infra/github-actions-workflow-naming.md`
       returns ≥ 1
 

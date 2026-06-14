@@ -297,13 +297,23 @@ Broad exclusion prevents accidentally including large directories (e.g., `node_m
 
 ### File Organisation
 
-| Artifact                  | Path                                          | Purpose                                                          |
-| ------------------------- | --------------------------------------------- | ---------------------------------------------------------------- |
-| Composite action          | `.github/actions/{name}/action.yml`           | One per language/tool setup (e.g., `setup-dotnet`, `setup-node`) |
-| Reusable workflow         | `.github/workflows/_reusable-{purpose}.yml`   | Shared job logic called by per-variant workflows                 |
-| Per-variant test workflow | `.github/workflows/test-{app-name}.yml`       | ~40-line file that calls reusable workflows                      |
-| PR quality gate           | `.github/workflows/pr-{purpose}.yml`          | Runs `nx affected` checks on pull requests                       |
-| Deploy workflow           | `.github/workflows/test-and-deploy-{app}.yml` | Runs tests then deploys on branch push                           |
+| Artifact                     | Path pattern                                                | Concrete examples (after-state)                                                                                                                                              |
+| ---------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Composite action             | `.github/actions/{name}/action.yml`                         | `setup-dotnet`, `setup-node`, `setup-rust`                                                                                                                                   |
+| Reusable workflow            | `.github/workflows/_reusable-{purpose}.yml`                 | `_reusable-www-test-local-deploy.yml`, `_reusable-app-test-local-deploy-stag.yml`, `_reusable-app-test-stag.yml`, `_reusable-be-build-deploy.yml`                            |
+| www deploy workflow          | `.github/workflows/{domain}-www-test-local-deploy-prod.yml` | `ose-www-test-local-deploy-prod.yml`, `ayokoding-www-test-local-deploy-prod.yml`, `organiclever-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml` |
+| App staging workflow         | `.github/workflows/{domain}-app-test-local-deploy-stag.yml` | `organiclever-app-test-local-deploy-stag.yml`, `ose-app-test-local-deploy-stag.yml`                                                                                          |
+| App staging-gate workflow    | `.github/workflows/{domain}-app-test-stag-deploy-prod.yml`  | `organiclever-app-test-stag-deploy-prod.yml`, `ose-app-test-stag-deploy-prod.yml`                                                                                            |
+| Backend build+deploy         | `.github/workflows/{domain}-be-build-deploy-stag.yml`       | `organiclever-be-build-deploy-stag.yml`, `ose-be-build-deploy-stag.yml`                                                                                                      |
+| Cross-cutting quality gate   | `.github/workflows/commons-quality-gate.yml`                | `commons-quality-gate.yml` (replaces `pr-quality-gate.yml`)                                                                                                                  |
+| Cross-cutting env validation | `.github/workflows/commons-env-validate.yml`                | `commons-env-validate.yml` (replaces `validate-env.yml`)                                                                                                                     |
+| Markdown validation          | `.github/workflows/markdown-validate.yml`                   | `markdown-validate.yml` (replaces `validate-markdown.yml`)                                                                                                                   |
+
+The 17-workflow after-state consists of 4 reusables, 4 www workflows, 2 app local-deploy-stag, 2
+app test-stag-deploy-prod, 2 be-build-deploy-stag, and 3 cross-cutting workflows. The stale files
+`pr-quality-gate.yml`, `validate-env.yml`, `validate-markdown.yml`, `test-and-deploy-*.yml`,
+`test-*-web-staging.yml`, `deploy-*-to-production.yml`, `publish-images.yml`, and
+`test-crane-cli-integration.yml` are removed by this plan.
 
 The underscore prefix on reusable workflows (`_reusable-*.yml`) visually separates shared
 infrastructure from top-level entry-point workflows in the GitHub Actions UI.
@@ -338,18 +348,27 @@ variant-specific inputs.
 **Examples**:
 
 ```
-.github/workflows/_reusable-test-and-deploy.yml
+.github/workflows/_reusable-www-test-local-deploy.yml
+.github/workflows/_reusable-app-test-local-deploy-stag.yml
+.github/workflows/_reusable-app-test-stag.yml
+.github/workflows/_reusable-be-build-deploy.yml
 ```
 
 ### CRON Schedule
 
-Scheduled workflows (the production `test-and-deploy-*.yml` quartet for ayokoding-www,
-ose-www, organiclever, and wahidyankf-www) run twice daily aligned to WIB (UTC+7) business hours:
+Scheduled service workflows run twice daily aligned to WIB (UTC+7). The app tier uses a
+**staggered** schedule — `*-app-test-local-deploy-stag` fires first to produce the staging deploy,
+then `*-app-test-stag-deploy-prod` fires **2.5 hours later** once Vercel and coralpolyp have
+settled. The www tier is independent and runs after both app-tier passes.
 
-| WIB Time | UTC Time             | Purpose                                     |
-| -------- | -------------------- | ------------------------------------------- |
-| 06:00    | 23:00 (previous day) | Morning run — catches overnight regressions |
-| 18:00    | 11:00                | Afternoon run — validates pre-EOD state     |
+`*-be-build-deploy-stag` is **not** scheduled — it fires on push to the `stag-*-be` branch, which
+the `*-app-test-local-deploy-stag` deploy job force-pushes on success.
+
+| Pipeline                       | WIB           | UTC           | Rationale                                                           |
+| ------------------------------ | ------------- | ------------- | ------------------------------------------------------------------- |
+| `*-app-test-local-deploy-stag` | 03:00 / 15:00 | 20:00 / 08:00 | Earliest — produces the staging deploy the later stag-gate verifies |
+| `*-app-test-stag-deploy-prod`  | 05:30 / 17:30 | 22:30 / 10:30 | **+2.5 h** after staging, so Vercel + coralpolyp have rolled out    |
+| `*-www-test-local-deploy-prod` | 06:00 / 18:00 | 23:00 / 11:00 | Independent of the app tier (direct www test → prod deploy)         |
 
 ### 5-Track Parallel CRON
 
@@ -368,20 +387,25 @@ services themselves run in parallel across matrix entries.
 
 ## Naming Conventions
 
-| Entity              | Pattern                                                                                   | Example                                                     |
-| ------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Backend app         | `{domain}-be` or `{domain}-be-{lang}-{framework}`                                         | `organiclever-be`                                           |
-| Frontend app        | `{domain}-fe` or `{domain}-fe-{lang}-{framework}`                                         | `organiclever-web`                                          |
-| Infra dev directory | `infra/dev/{app-name}/`                                                                   | `infra/dev/organiclever-be/`                                |
-| Specs directory     | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/organiclever/behavior/organiclever-be/gherkin/` |
-| Test workflow       | `test-{app-name}.yml`                                                                     | `test-and-deploy-organiclever-web-development.yml`          |
-| Reusable workflow   | `_reusable-{purpose}.yml`                                                                 | `_reusable-test-and-deploy.yml`                             |
-| Composite action    | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                     |
-| Deploy workflow     | `test-and-deploy-{app}.yml`                                                               | `test-and-deploy-organiclever-web-development.yml`          |
-| PR workflow         | `pr-{purpose}.yml`                                                                        | `pr-quality-gate.yml`                                       |
+Workflow filenames follow the domain-first `{domain}-{action-chain}` grammar. The `{action-chain}`
+encodes ordered execution phases left-to-right (e.g., `test-local-deploy-stag`). See
+[GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md) for the complete
+grammar, allowed tokens, and the rule that the workflow `name:` field must mirror the filename.
 
-See [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md) for the full
-derivation rule between workflow `name:` fields and filenames.
+| Entity                    | Pattern                                                                                   | Example                                                     |
+| ------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Backend app               | `{domain}-be` or `{domain}-be-{lang}-{framework}`                                         | `organiclever-be`                                           |
+| Frontend app              | `{domain}-app-web`                                                                        | `organiclever-app-web`                                      |
+| www site app              | `{domain}-www`                                                                            | `organiclever-www`                                          |
+| Infra dev directory       | `infra/dev/{app-name}/`                                                                   | `infra/dev/organiclever-be/`                                |
+| Specs directory           | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/organiclever/behavior/organiclever-be/gherkin/` |
+| Reusable workflow         | `_reusable-{purpose}.yml`                                                                 | `_reusable-app-test-local-deploy-stag.yml`                  |
+| www deploy workflow       | `{domain}-www-test-local-deploy-prod.yml`                                                 | `organiclever-www-test-local-deploy-prod.yml`               |
+| App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `organiclever-app-test-local-deploy-stag.yml`               |
+| App staging-gate workflow | `{domain}-app-test-stag-deploy-prod.yml`                                                  | `organiclever-app-test-stag-deploy-prod.yml`                |
+| BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `organiclever-be-build-deploy-stag.yml`                     |
+| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `commons-quality-gate.yml`, `markdown-validate.yml`         |
+| Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                     |
 
 ## Adding a New App to CI
 
@@ -447,17 +471,21 @@ must be recorded here with a justification; undocumented deviations are always b
 
 ### Invariant A — CI Workflow Shape
 
-| Requirement                                                                                                                                                              | Enforced by                              |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------- |
-| All `checkout` steps use `actions/checkout@v6`                                                                                                                           | `actionlint` + PR quality gate           |
-| Workflow filenames follow `{purpose}.yml` or `test-and-deploy-{app}-{env}.yml`                                                                                           | `rhino-cli:naming:workflows-validation`  |
-| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                                    | `pr-quality-gate.yml` structure          |
-| Per-variant test workflows call reusable workflows (thin callers, ≤40 lines each)                                                                                        | Code review; reusable workflow structure |
-| All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                                        | `actionlint`; PR quality gate            |
-| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                                       | `pr-quality-gate.yml` job keys           |
-| Specs-gate job runs `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation` and `specs:gherkin-cardinality-validation` | `pr-quality-gate.yml` specs-gate job     |
-| Full quality gate runs on every push to `main` (direct `push` trigger on `pr-quality-gate.yml`)                                                                          | `pr-quality-gate.yml` `on.push` trigger  |
-| Scheduled workflows run at 2× WIB cadence (06:00 WIB = 23:00 UTC, 18:00 WIB = 11:00 UTC)                                                                                 | `test-and-deploy-*.yml` CRON expressions |
+| Requirement                                                                                                                                                              | Enforced by                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| All `checkout` steps use `actions/checkout@v6`                                                                                                                           | `actionlint` + PR quality gate                                      |
+| Workflow filenames follow the `{domain}-{action-chain}.yml` grammar (see [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md))               | `actionlint` syntax check; code review                              |
+| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                                    | `commons-quality-gate.yml` structure                                |
+| Per-variant test workflows call reusable workflows (thin callers, ≤40 lines each)                                                                                        | Code review; reusable workflow structure                            |
+| All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                                        | `actionlint`; PR quality gate                                       |
+| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                                       | `commons-quality-gate.yml` job keys                                 |
+| Specs-gate job runs `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation` and `specs:gherkin-cardinality-validation` | `commons-quality-gate.yml` specs-gate job                           |
+| Full quality gate runs on every push to `main` (direct `push` trigger on `commons-quality-gate.yml`)                                                                     | `commons-quality-gate.yml` `on.push` trigger                        |
+| App-tier scheduled workflows use staggered 2× WIB cadence: `*-app-test-local-deploy-stag` at 03:00/15:00, `*-app-test-stag-deploy-prod` at 05:30/17:30 (+2.5 h)          | `*-app-test-local-deploy-stag.yml` and `*-app-test-stag-*.yml` CRON |
+| www-tier scheduled workflows run at 06:00/18:00 WIB (23:00/11:00 UTC)                                                                                                    | `*-www-test-local-deploy-prod.yml` CRON expressions                 |
+
+Note: `rhino-cli:naming:workflows-validation` validates `repo-governance/workflows/*.md` naming
+only — it does **not** validate `.github/workflows/` filenames.
 
 ### Invariant B — Git Hook Lifecycle
 
@@ -473,6 +501,25 @@ Conditional pre-push naming validators:
 
 - `nx run rhino-cli:naming:harness-validation` — fires when `.claude/agents/**` or `.opencode/agents/**` changed
 - `nx run rhino-cli:naming:workflows-validation` — fires when `repo-governance/workflows/**` changed
+
+### Invariant B2 — No Heavy Tests in Fast Gates
+
+`test:integration` and `test:e2e` are heavy (docker-compose, Playwright, real services). They run
+**only** in the scheduled tiered pipelines and must never appear on the fast feedback path. See
+tech-docs §"Fast-gate test policy" for the rationale and the current compliance state.
+
+| Surface                           | Runs                                                            | `test:integration` / `test:e2e`? |
+| --------------------------------- | --------------------------------------------------------------- | -------------------------------- |
+| `.husky/pre-commit`               | `nx affected -t test:quick`                                     | **never**                        |
+| `.husky/pre-push`                 | `typecheck`, `lint`, `test:quick`, `specs:coverage`             | **never**                        |
+| `commons-quality-gate` (PR gate)  | `typecheck`, `lint`, `test:quick`, `specs:coverage` + lint jobs | **never**                        |
+| `*-test-local-*` (CRON scheduled) | `test:integration` + `test:e2e` via docker-compose              | **yes**                          |
+| `*-test-stag-*` (CRON scheduled)  | `test:e2e` against deployed staging                             | **yes**                          |
+
+Any workflow that wires `test:integration` or `test:e2e` into a `pull_request` or `push` trigger
+(rather than a `schedule` trigger) violates this invariant and must be corrected or removed before
+merging. The deletion of `test-crane-cli-integration.yml` (which ran `crane-cli:test:integration`
+on `pull_request`) was the remediation action that eliminated the last known violation.
 
 ### Invariant C — rhino-cli Hexagonal Architecture
 

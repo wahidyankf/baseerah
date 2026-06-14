@@ -15,7 +15,7 @@ updated: 2026-06-10
 # Environment File Access Convention
 
 > **Stub.** The full `guard-env-file-access` policy lives in
-> [`secrets-and-env-standards.md` § 8](./secrets-and-env-standards.md#8-guard-env-file-access-policy).
+> [`secrets-and-env-standards.md` § 9](./secrets-and-env-standards.md#9-guard-env-file-access-policy).
 
 **Summary**: AI agents must not directly read, write, edit, or commit any `.env*` file except
 `.env.example`. Policy identifier: `guard-env-file-access`. Exceptions: project scripts under

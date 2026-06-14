@@ -369,7 +369,7 @@ Volta for Node.js/npm pinning, package-lock.json, .env.example.
 
 **Hard iron rule — no secrets in committed files**: Never commit system secrets (keys, passwords, tokens, privileged usernames, certificates, connection strings, and similar) to ANY git-tracked file; git history is permanent. Real values go in uncommitted `.env*` files (except `.env.example`) or other gitignored files; committed files use placeholders or env-var references only. Binds agents and humans alike. See [Secrets and Env Standards](./repo-governance/conventions/security/secrets-and-env-standards.md).
 
-**Guardrail**: Agents must not directly read, write, edit, or commit real `.env*` files — only `.env.example` is permitted directly; project scripts under `apps/`/`libs/`/`scripts/` are exempt. See [guard-env-file-access policy](./repo-governance/conventions/security/secrets-and-env-standards.md#8-guard-env-file-access-policy).
+**Guardrail**: Agents must not directly read, write, edit, or commit real `.env*` files — only `.env.example` is permitted directly; project scripts under `apps/`/`libs/`/`scripts/` are exempt. See [guard-env-file-access policy](./repo-governance/conventions/security/secrets-and-env-standards.md#9-guard-env-file-access-policy).
 
 **See**: [repo-governance/development/workflow/reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md)
 
