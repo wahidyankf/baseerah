@@ -19,11 +19,16 @@ DB_DIR="${CARGO_HOME:-$HOME/.cargo}/advisory-dbs/advisory-db-3157b0e258782691"
 MANIFEST="apps/rhino-cli/Cargo.toml"
 
 # Force a clean full clone pinned to the good rev. A cached/shallow clone (as
-# cargo-deny creates) may not contain $PIN, so we replace it outright.
+# cargo-deny creates) may not contain $PIN, so we replace it outright. We
+# `reset --hard` the default branch to $PIN (not a detached checkout) and drop
+# the origin remote, so cargo-deny — which resets the db to its branch/remote
+# tip even under --offline — reads the pinned good revision rather than the
+# corrupt upstream HEAD.
 rm -rf "$DB_DIR"
 mkdir -p "$(dirname "$DB_DIR")"
 git clone --quiet https://github.com/rustsec/advisory-db "$DB_DIR"
-git -C "$DB_DIR" checkout --quiet "$PIN"
+git -C "$DB_DIR" reset --hard --quiet "$PIN"
+git -C "$DB_DIR" remote remove origin 2>/dev/null || true
 # Fail loudly if the pin didn't land the good (parseable) advisory.
 if grep -q '^cvss = ' "$DB_DIR/crates/libcrux-chacha20poly1305/RUSTSEC-2026-0124.md"; then
   echo "advisory-db pinned to $PIN (good RUSTSEC-2026-0124)"
