@@ -447,7 +447,7 @@ This creates `.env` files from all `.env.example` templates in `infra/dev/`. Use
 to overwrite existing files.
 
 **Success criteria**: Restored files appear in their original app directories (e.g.,
-`apps/ayokoding-web/.env.local`, `apps/organiclever-be/.env`).
+`apps/ayokoding-www/.env.local`, `apps/organiclever-be/.env`).
 
 **On failure**: If no backup exists, copy `.env.example` to `.env` in each app you plan to
 work on and fill in the required values.

@@ -283,13 +283,13 @@ flowchart TB
   `apps/organiclever-app-web-e2e/` (rename)
 - NEW `apps/organiclever-www/` + `apps/organiclever-www-e2e/` (marketing site + e2e)
 - NEW `libs/ts-ui/` (shared design system)
-- `apps/ose-web/` → `apps/ose-www/`, `apps/ose-web-be-e2e/` → `apps/ose-www-be-e2e/`,
-  `apps/ose-web-fe-e2e/` → `apps/ose-www-fe-e2e/` (simplify structure-only + rename)
+- `apps/ose-www/` → `apps/ose-www/`, `apps/ose-www-be-e2e/` → `apps/ose-www-be-e2e/`,
+  `apps/ose-www-fe-e2e/` → `apps/ose-www-fe-e2e/` (simplify structure-only + rename)
 - `apps/ose-app-web/` (adopt `ts-ui`; codegen source pointer → `ose-be`)
-- `apps/wahidyankf-web/` → `apps/wahidyankf-www/`, `apps/wahidyankf-web-fe-e2e/` →
+- `apps/wahidyankf-www/` → `apps/wahidyankf-www/`, `apps/wahidyankf-www-fe-e2e/` →
   `apps/wahidyankf-www-fe-e2e/` (mechanical rename only)
-- `apps/ayokoding-web/` → `apps/ayokoding-www/`, `apps/ayokoding-web-be-e2e/` →
-  `apps/ayokoding-www-be-e2e/`, `apps/ayokoding-web-fe-e2e/` → `apps/ayokoding-www-fe-e2e/`
+- `apps/ayokoding-www/` → `apps/ayokoding-www/`, `apps/ayokoding-www-be-e2e/` →
+  `apps/ayokoding-www-be-e2e/`, `apps/ayokoding-www-fe-e2e/` → `apps/ayokoding-www-fe-e2e/`
   (mechanical rename only; keeps structure + tRPC)
 - `apps/crane-be/`, `apps/crane-be-e2e/`, `libs/fsharp-crane-core/` (**deleted**)
 - `specs/apps/organiclever/`, `specs/apps/ose/`, `specs/apps/crane/`, `specs/apps/ayokoding/`

@@ -138,7 +138,7 @@ specs/apps/<app-family>/
 | Surface profile                   | Folders populated                                                                                                                                    | Folders absent or empty                         |
 | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | Full-stack (e.g., `organiclever`) | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/organiclever-be/gherkin/` + `behavior/organiclever-web/gherkin/` | None                                            |
-| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-web/gherkin/`                                                  | `containers/contracts/`, `components/be/`       |
+| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-www/gherkin/`                                                  | `containers/contracts/`, `components/be/`       |
 | CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                       | `components/{be,web}/`, `containers/contracts/` |
 | Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, plus web layers if applicable                                                                                                      | Nothing additional omitted                      |
 
@@ -174,7 +174,7 @@ renamed from the old bare `build-tools/` slug during the `standardize-app-spec-t
 specs/apps/organiclever/behavior/organiclever-be/gherkin/expenses/expense-management.feature
 specs/apps/organiclever/behavior/organiclever-be/gherkin/authentication/password-login.feature
 specs/apps/organiclever/behavior/organiclever-web/gherkin/authentication/google-login.feature
-specs/apps/ayokoding/behavior/ayokoding-web/gherkin/accessibility/accessibility.feature
+specs/apps/ayokoding/behavior/ayokoding-www/gherkin/accessibility/accessibility.feature
 ```
 
 A domain folder may contain one or many feature files.

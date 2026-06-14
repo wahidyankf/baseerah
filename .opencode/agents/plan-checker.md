@@ -435,7 +435,7 @@ After validating the worktree specification (Step 5d), audit every delivery chec
 Every checkbox in `delivery.md` (or the Delivery Checklist section of a single-file plan's `README.md`) MUST satisfy ALL of the following that apply to the action:
 
 1. **Explicit file path(s)** when the action touches a known file
-   - Acceptable: `apps/ose-web/src/server/trpc.ts`, `repo-governance/conventions/structure/plans.md`, etc.
+   - Acceptable: `apps/ose-www/src/server/trpc.ts`, `repo-governance/conventions/structure/plans.md`, etc.
    - When the path cannot be determined at authoring time, the checkbox MUST give the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
    - Bare "the auth file", "the relevant config", "wherever needed": **HIGH** finding.
 

@@ -528,7 +528,7 @@ Media removal:
 
 ### ayokoding specs (rename web references)
 
-`specs/apps/ayokoding/behavior/ayokoding-web/` and `specs/apps/ayokoding/components/web/` exist
+`specs/apps/ayokoding/behavior/ayokoding-www/` and `specs/apps/ayokoding/components/web/` exist
 `[Repo-grounded]`. The mechanical `ayokoding-web` → `ayokoding-www` rename requires:
 
 - `git mv specs/apps/ayokoding/behavior/ayokoding-web specs/apps/ayokoding/behavior/ayokoding-www`.

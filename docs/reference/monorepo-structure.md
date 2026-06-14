@@ -99,7 +99,7 @@ Flat structure - all apps at the same level, no subdirectories.
 ### App Structure (Next.js Application — ose-web)
 
 ```
-apps/ose-web/
+apps/ose-www/
 ├── src/                       # Source code (App Router)
 ├── public/                    # Static assets
 ├── next.config.mjs            # Next.js configuration

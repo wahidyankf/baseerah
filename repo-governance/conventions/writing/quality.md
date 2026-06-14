@@ -368,8 +368,8 @@ Heading hierarchy is mechanically enforced on a **prose allowlist** (default-den
 **Exempt paths** (skipped by the heading validator):
 
 - `.claude/**` — agent definition and skill files
-- `apps/ayokoding-web/content/` — educational content
-- `apps/ose-web/content/` — site content
+- `apps/ayokoding-www/content/` — educational content
+- `apps/ose-www/content/` — site content
 - `plans/done/` — frozen archived plans
 - All other paths not in the allowlist above
 

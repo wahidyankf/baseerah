@@ -42,7 +42,7 @@ Use this Skill when:
 **What to validate**:
 
 - Internal markdown links (docs/, repo-governance/, plans/)
-- Content links (apps/ayokoding-web/, apps/ose-web/)
+- Content links (apps/ayokoding-www/, apps/ose-www/)
 - External URLs (HTTP/HTTPS)
 - Image links (relative paths)
 - Anchor links (same-page headings)
@@ -66,7 +66,7 @@ Use this Skill when:
 ❌ FAIL: [[file-naming]] ← Wiki-link syntax (GitHub does not render these)
 ❌ FAIL: [file-naming.md](../meta/file-naming.md) ← Using filename as link text
 
-**Note**: Both `apps/ayokoding-web/` and `apps/ose-web/` have migrated to Next.js 16. Their content links are validated by their respective CLI tools (`ayokoding-cli links check`, `ose-cli links check`), not by this Skill's link validation rules.
+**Note**: Both `apps/ayokoding-www/` and `apps/ose-www/` have migrated to Next.js 16. Their content links are validated by their respective CLI tools (`ayokoding-cli links check`, `ose-cli links check`), not by this Skill's link validation rules.
 
 ### Validation Methodology
 

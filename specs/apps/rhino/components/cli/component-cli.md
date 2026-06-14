@@ -7,7 +7,7 @@ See [README.md](./README.md) for C4 L3 CLI internals.
 | Flag                 | Type              | Description                                                                                                                                                                 |
 | -------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--staged-only`      | bool              | Only validate files staged in the Git index.                                                                                                                                |
-| `--exclude <prefix>` | repeatable string | Skip any markdown file whose repo-relative path starts with `<prefix>`. May be specified multiple times (e.g. `--exclude plans/done --exclude apps/ayokoding-web/content`). |
+| `--exclude <prefix>` | repeatable string | Skip any markdown file whose repo-relative path starts with `<prefix>`. May be specified multiple times (e.g. `--exclude plans/done --exclude apps/ayokoding-www/content`). |
 
 Anchor fragments are validated with a GitHub-correct slug algorithm (verified
 against the `github-slugger` v2 reference): lowercase; Unicode letters/digits,

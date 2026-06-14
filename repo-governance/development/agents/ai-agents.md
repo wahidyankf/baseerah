@@ -522,7 +522,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 
 **Scope naming rules:**
 
-- App/lib names must match directory names exactly (e.g., `ayokoding-web` matches `apps/ayokoding-web/`)
+- App/lib names must match directory names exactly (e.g., `ayokoding-web` matches `apps/ayokoding-www/`)
 - Use kebab-case throughout (no camelCase, PascalCase, or snake_case)
 - Hyphens `-` separate all parts of the agent name (consistent kebab-case throughout)
 - Agent name after scope uses standard kebab-case patterns
@@ -827,7 +827,7 @@ This role-based categorization was chosen because it:
 
 **Cache files are NOT temporary:**
 
-- Location: `docs/metadata/` (docs-link-checker) and `apps/ayokoding-web/` (apps-ayokoding-web-link-checker)
+- Location: `docs/metadata/` (docs-link-checker) and `apps/ayokoding-www/` (apps-ayokoding-web-link-checker)
 - Purpose: Long-term link status tracking (6-month expiry), shared across team
 - Committed to git: Yes (operational metadata)
 - Updated every run: Yes (including lastFullScan timestamp)

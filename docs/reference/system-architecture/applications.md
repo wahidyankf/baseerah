@@ -27,7 +27,7 @@ The platform consists of the following applications across its technology stacks
 - **Deployment**: Vercel (via `prod-ose-web` branch)
 - **Build Command**: `nx build ose-web`
 - **Dev Command**: `nx dev ose-web`
-- **Location**: `apps/ose-web/`
+- **Location**: `apps/ose-www/`
 
 #### ayokoding-web
 
@@ -38,8 +38,8 @@ The platform consists of the following applications across its technology stacks
 - **Deployment**: Vercel (via `prod-ayokoding-web` branch)
 - **Build Command**: `nx build ayokoding-web`
 - **Dev Command**: `nx dev ayokoding-web`
-- **Location**: `apps/ayokoding-web/`
-- **Content**: Co-located at `apps/ayokoding-web/content/`
+- **Location**: `apps/ayokoding-www/`
+- **Content**: Co-located at `apps/ayokoding-www/content/`
 
 #### wahidyankf-web
 
@@ -50,7 +50,7 @@ The platform consists of the following applications across its technology stacks
 - **Build Command**: `nx build wahidyankf-web`
 - **Dev Command**: `nx dev wahidyankf-web`
 - **Dev Port**: 3201
-- **Location**: `apps/wahidyankf-web/`
+- **Location**: `apps/wahidyankf-www/`
 
 ### CLI Tools
 
@@ -137,35 +137,35 @@ The platform consists of the following applications across its technology stacks
 - **Purpose**: Frontend E2E tests for ose-web UI
 - **Technology**: Playwright
 - **Run Command**: `nx run ose-web-fe-e2e:test:e2e`
-- **Location**: `apps/ose-web-fe-e2e/`
+- **Location**: `apps/ose-www-fe-e2e/`
 
 #### ose-web-be-e2e
 
 - **Purpose**: Backend E2E tests for ose-web tRPC API
 - **Technology**: Playwright
 - **Run Command**: `nx run ose-web-be-e2e:test:e2e`
-- **Location**: `apps/ose-web-be-e2e/`
+- **Location**: `apps/ose-www-be-e2e/`
 
 #### ayokoding-web-fe-e2e
 
 - **Purpose**: Frontend E2E tests for ayokoding-web UI
 - **Technology**: Playwright
 - **Run Command**: `nx run ayokoding-web-fe-e2e:test:e2e`
-- **Location**: `apps/ayokoding-web-fe-e2e/`
+- **Location**: `apps/ayokoding-www-fe-e2e/`
 
 #### ayokoding-web-be-e2e
 
 - **Purpose**: Backend E2E tests for ayokoding-web tRPC API
 - **Technology**: Playwright
 - **Run Command**: `nx run ayokoding-web-be-e2e:test:e2e`
-- **Location**: `apps/ayokoding-web-be-e2e/`
+- **Location**: `apps/ayokoding-www-be-e2e/`
 
 #### wahidyankf-web-fe-e2e
 
 - **Purpose**: Frontend E2E tests for wahidyankf-web UI (Playwright-BDD)
 - **Technology**: Playwright-BDD
 - **Run Command**: `nx run wahidyankf-web-fe-e2e:test:e2e`
-- **Location**: `apps/wahidyankf-web-fe-e2e/`
+- **Location**: `apps/wahidyankf-www-fe-e2e/`
 
 #### organiclever-web-e2e
 
@@ -303,4 +303,4 @@ CLI Tools:
 **Link Validation Pipeline (ayokoding-web):**
 
 ayokoding-cli validates internal links in ayokoding-web content as part of the quality gate.
-Content is co-located at `apps/ayokoding-web/content/` and served by the Next.js application.
+Content is co-located at `apps/ayokoding-www/content/` and served by the Next.js application.

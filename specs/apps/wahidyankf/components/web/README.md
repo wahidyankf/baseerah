@@ -4,7 +4,7 @@ Audience: Engineers, Technical Product/Project Managers
 
 Component-level specifications for the `web` container — five bounded contexts and their
 relationships. Each bounded context maps to a folder under
-`apps/wahidyankf-web/src/contexts/<bc>/`.
+`apps/wahidyankf-www/src/contexts/<bc>/`.
 
 ## Bounded Contexts
 
@@ -24,4 +24,4 @@ relationships. Each bounded context maps to a folder under
 ## Related
 
 - `../../ddd/` — DDD registry and ubiquitous-language glossaries
-- [`../../behavior/wahidyankf-web/gherkin/`](../../behavior/wahidyankf-web/gherkin/README.md) — Gherkin features per BC
+- [`../../behavior/wahidyankf-www/gherkin/`](../../behavior/wahidyankf-www/gherkin/README.md) — Gherkin features per BC

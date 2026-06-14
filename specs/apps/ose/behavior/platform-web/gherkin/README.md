@@ -1,7 +1,7 @@
 # OSE Platform Web — `web` perspective Gherkin
 
 UI-semantic Gherkin scenarios for `ose-web`. Step style: `clicks`, `types`, `sees`,
-`navigates`. Background: `Given the app is running`. Consumed by `apps/ose-web-fe-e2e`
+`navigates`. Background: `Given the app is running`. Consumed by `apps/ose-www-fe-e2e`
 (Playwright).
 
 Organized per bounded context (one folder per BC, matching

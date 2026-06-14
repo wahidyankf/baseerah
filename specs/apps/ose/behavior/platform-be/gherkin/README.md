@@ -2,7 +2,7 @@
 
 tRPC HTTP-semantic Gherkin scenarios for `ose-web`. Step style: `sends GET/POST`,
 `status code`, `response body`. Background: `Given the API is running`. Consumed by
-`apps/ose-web-be-e2e` (Playwright tRPC HTTP).
+`apps/ose-www-be-e2e` (Playwright tRPC HTTP).
 
 > **Slug note**: this perspective is `api`, not `be`. The tRPC layer runs **inside** the same
 > Next.js process as the UI — there is no separate backend container. See

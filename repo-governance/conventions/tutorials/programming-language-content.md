@@ -42,7 +42,7 @@ This convention ensures:
 This convention applies to:
 
 - **All programming language tutorial content** across the repository:
-  - **ayokoding-web** (`apps/ayokoding-web/content/[lang]/learn/swe/programming-languages/[language]/`) - canonical location
+  - **ayokoding-web** (`apps/ayokoding-www/content/[lang]/learn/swe/programming-languages/[language]/`) - canonical location
   - **Any other location** where programming language tutorials exist
 - Includes: tutorials (foundational, by-concept, by-example, cookbook), how-to guides, best practices, anti-patterns
 - Enforced by: `apps-ayokoding-web-general-checker`, `apps-ayokoding-web-by-example-checker`, `apps-ayokoding-web-general-maker`, `apps-ayokoding-web-by-example-maker`, `apps-ayokoding-web-facts-checker` agents
@@ -717,7 +717,7 @@ See [How to Add a Programming Language](../../../docs/how-to/add-programming-lan
 
 ### Golang (Reference Implementation)
 
-**Location:** `apps/ayokoding-web/content/en/learn/swe/programming-languages/golang/`
+**Location:** `apps/ayokoding-www/content/en/learn/swe/programming-languages/golang/`
 
 **Characteristics:**
 
@@ -731,7 +731,7 @@ See [How to Add a Programming Language](../../../docs/how-to/add-programming-lan
 
 ### Python (Reference Implementation)
 
-**Location:** `apps/ayokoding-web/content/en/learn/swe/programming-languages/python/`
+**Location:** `apps/ayokoding-www/content/en/learn/swe/programming-languages/python/`
 
 **Characteristics:**
 
@@ -745,7 +745,7 @@ See [How to Add a Programming Language](../../../docs/how-to/add-programming-lan
 
 ### Java (Reference Implementation)
 
-**Location:** `apps/ayokoding-web/content/en/learn/swe/programming-languages/java/`
+**Location:** `apps/ayokoding-www/content/en/learn/swe/programming-languages/java/`
 
 **Characteristics:**
 

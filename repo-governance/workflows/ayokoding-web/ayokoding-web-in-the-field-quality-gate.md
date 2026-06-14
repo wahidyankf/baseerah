@@ -184,7 +184,7 @@ required.
 ```bash
 # Invoke via Task tool
 subagent_type: apps-ayokoding-web-in-the-field-checker
-prompt: "Validate apps/ayokoding-web/content/en/learn/software-engineering/programming-language/java/in-the-field/ for compliance with in-the-field standards"
+prompt: "Validate apps/ayokoding-www/content/en/learn/software-engineering/programming-language/java/in-the-field/ for compliance with in-the-field standards"
 ```
 
 **Validation areas**:

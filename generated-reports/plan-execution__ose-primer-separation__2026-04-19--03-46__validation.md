@@ -202,7 +202,7 @@ OUTSIDE the BRD-allowed paths:
    present tense. Content was authored before extraction and describes the state at that time.
    This is narrative/historical content in a product marketing document.
 
-7. `apps/ayokoding-web/content/en/learn/software-engineering/data/tools/*/by-example/*.md`
+7. `apps/ayokoding-www/content/en/learn/software-engineering/data/tools/*/by-example/*.md`
    — multiple matches. Tutorial inline commentary like "the `a-demo-be-ts-effect` codebase uses..."
    These are code-example explanations in educational articles that reference the demo codebase
    by name for context. The links are commentary, not functional references.

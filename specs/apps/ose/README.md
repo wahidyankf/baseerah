@@ -62,8 +62,8 @@ Content and marketing site for the OSE Platform.
 
 | Surface        | Perspective                             | Background                 | Consumers                  |
 | -------------- | --------------------------------------- | -------------------------- | -------------------------- |
-| `platform-be`  | tRPC HTTP-semantic (procedures, routes) | `Given the API is running` | `apps/ose-web-be-e2e`      |
-| `platform-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/ose-web-fe-e2e`      |
+| `platform-be`  | tRPC HTTP-semantic (procedures, routes) | `Given the API is running` | `apps/ose-www-be-e2e`      |
+| `platform-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/ose-www-fe-e2e`      |
 | `cli`          | CLI invocation (link validation)        | N/A                        | `apps/ose-cli` (Go, godog) |
 
 ### Bounded Contexts (ose-web/ose-cli)
@@ -95,5 +95,5 @@ Content and marketing site for the OSE Platform.
 - [BDD Spec-Test Mapping](../../../repo-governance/development/infra/bdd-spec-test-mapping.md)
 - [apps/ose-be/](../../../apps/ose-be/README.md)
 - [apps/ose-app-web/](../../../apps/ose-app-web/README.md)
-- [apps/ose-web/](../../../apps/ose-web/README.md)
+- [apps/ose-www/](../../../apps/ose-www/README.md)
 - [apps/ose-cli/](../../../apps/ose-cli/README.md)

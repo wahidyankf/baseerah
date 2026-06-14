@@ -136,7 +136,7 @@ npx prettier --write [file-path]
 | 1    | `.claude/` or `.opencode/` staged      | Validate → Sync → Validate-sync                                              | exit 1     |
 | 2    | `docker-compose.ya?ml` staged          | `docker compose -f <file> config` per file                                   | exit 1     |
 | 3    | always                                 | `nx affected -t run-pre-commit --skip-nx-cache`                              | warn only  |
-| 4    | always                                 | `git add apps/ayokoding-web/content/`                                        | ignored    |
+| 4    | always                                 | `git add apps/ayokoding-www/content/`                                        | ignored    |
 | 5    | always                                 | `npx lint-staged`                                                            | exit 1     |
 | 5b   | `apps/<app>/package.json` staged       | Regenerate + stage `apps/<app>/package-lock.json`                            | exit 1     |
 | 6    | `docs/` staged                         | Validate + auto-fix naming, then `git add docs/ repo-governance/ .claude/`   | exit 1     |

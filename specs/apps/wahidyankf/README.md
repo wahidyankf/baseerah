@@ -39,7 +39,7 @@ One container: the `web` Next.js app. No backend container exists today.
 
 | Container | Perspective                       | Background                 | Scenarios                                                                       | Consumed by                        |
 | --------- | --------------------------------- | -------------------------- | ------------------------------------------------------------------------------- | ---------------------------------- |
-| `web`     | UI-semantic (clicks, types, sees) | `Given the app is running` | [behavior/wahidyankf-web/gherkin/](./behavior/wahidyankf-web/gherkin/README.md) | `apps/wahidyankf-web` (Next.js 16) |
+| `web`     | UI-semantic (clicks, types, sees) | `Given the app is running` | [behavior/wahidyankf-www/gherkin/](./behavior/wahidyankf-www/gherkin/README.md) | `apps/wahidyankf-web` (Next.js 16) |
 
 ## Bounded Contexts
 
@@ -58,7 +58,7 @@ Counts are Gherkin features per container.
 - **[system-context/](./system-context/README.md)**, **[containers/](./containers/README.md)**,
   **[components/](./components/README.md)** — C4 architecture diagrams (L1/L2/L3)
 - **[components/web/](./components/web/README.md)** — Frontend component specs
-  ([Gherkin features](./behavior/wahidyankf-web/gherkin/README.md))
+  ([Gherkin features](./behavior/wahidyankf-www/gherkin/README.md))
 
 ## DDD Registry (`bounded-contexts.yaml`)
 

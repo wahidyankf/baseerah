@@ -93,7 +93,7 @@ docs/explanation/software-engineering/programming-languages/rust/
 **PASS: Educational programming language content**:
 
 ```
-apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/
+apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/
 ├── _index.md                                   # Language overview
 ├── initial-setup.md                            # Installation, IDE setup
 ├── quick-start.md                              # First program, hello world
@@ -207,7 +207,7 @@ Is this content about {LANGUAGE} fundamentals or generic patterns?
 
 **Example - Error Handling**:
 
-**ayokoding-web** (`apps/ayokoding-web/content/en/learn/.../golang/in-practice/error-handling.md`):
+**ayokoding-web** (`apps/ayokoding-www/content/en/learn/.../golang/in-practice/error-handling.md`):
 
 ````markdown
 # Error Handling in Go
@@ -306,16 +306,16 @@ This convention applies to **ALL** programming languages in the repository:
 
 **Current languages**:
 
-- Java (JVM) - `docs/explanation/.../java/`, `apps/ayokoding-web/.../java/`
-- Kotlin (JVM) - `docs/explanation/.../kotlin/`, `apps/ayokoding-web/.../kotlin/`
-- Python - `docs/explanation/.../python/`, `apps/ayokoding-web/.../python/`
-- TypeScript (Node.js) - `docs/explanation/.../typescript/`, `apps/ayokoding-web/.../typescript/`
-- Elixir (BEAM) - `docs/explanation/.../elixir/`, `apps/ayokoding-web/.../elixir/`
-- Dart (Flutter) - `docs/explanation/.../dart/`, `apps/ayokoding-web/.../dart/`
-- Rust - `docs/explanation/.../rust/`, `apps/ayokoding-web/.../rust/`
-- Clojure (JVM) - `docs/explanation/.../clojure/`, `apps/ayokoding-web/.../clojure/`
-- F# (.NET) - `docs/explanation/.../f-sharp/`, `apps/ayokoding-web/.../f-sharp/`
-- C# (.NET) - `docs/explanation/.../c-sharp/`, `apps/ayokoding-web/.../c-sharp/`
+- Java (JVM) - `docs/explanation/.../java/`, `apps/ayokoding-www/.../java/`
+- Kotlin (JVM) - `docs/explanation/.../kotlin/`, `apps/ayokoding-www/.../kotlin/`
+- Python - `docs/explanation/.../python/`, `apps/ayokoding-www/.../python/`
+- TypeScript (Node.js) - `docs/explanation/.../typescript/`, `apps/ayokoding-www/.../typescript/`
+- Elixir (BEAM) - `docs/explanation/.../elixir/`, `apps/ayokoding-www/.../elixir/`
+- Dart (Flutter) - `docs/explanation/.../dart/`, `apps/ayokoding-www/.../dart/`
+- Rust - `docs/explanation/.../rust/`, `apps/ayokoding-www/.../rust/`
+- Clojure (JVM) - `docs/explanation/.../clojure/`, `apps/ayokoding-www/.../clojure/`
+- F# (.NET) - `docs/explanation/.../f-sharp/`, `apps/ayokoding-www/.../f-sharp/`
+- C# (.NET) - `docs/explanation/.../c-sharp/`, `apps/ayokoding-www/.../c-sharp/`
 
 **Future languages**: Apply same separation pattern when adding new languages.
 
@@ -385,7 +385,7 @@ See [Golang README](./README.md#purpose) for detailed examples.
 
 ### Example 1: Golang - Correct Separation
 
-**ayokoding-web** (`apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/by-example/beginner.md`):
+**ayokoding-web** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/by-example/beginner.md`):
 
 ````markdown
 # Go By Example - Beginner
@@ -446,7 +446,7 @@ OSE Platform Go code follows these conventions:
 
 ### Example 2: Python - Correct Separation
 
-**ayokoding-web** (`apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/python/in-practice/error-handling.md`):
+**ayokoding-web** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/python/in-practice/error-handling.md`):
 
 ````markdown
 # Error Handling in Python
@@ -526,7 +526,7 @@ def validate_transaction(transaction: Transaction) -> None:
 
 ### Example 3: Java - Correct Separation
 
-**ayokoding-web** (`apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/java/by-example/intermediate.md`):
+**ayokoding-web** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/java/by-example/intermediate.md`):
 
 ```markdown
 # Java By Example - Intermediate
@@ -702,7 +702,7 @@ OSE Platform-specific Python conventions...
 **FAIL: OSE Platform patterns in ayokoding-web**:
 
 ````markdown
-# apps/ayokoding-web/.../golang/in-practice/error-handling.md
+# apps/ayokoding-www/.../golang/in-practice/error-handling.md
 
 ## Error Handling
 
@@ -724,7 +724,7 @@ if err != nil {
 **PASS: Generic Go error patterns**:
 
 ```markdown
-# apps/ayokoding-web/.../golang/in-practice/error-handling.md
+# apps/ayokoding-www/.../golang/in-practice/error-handling.md
 
 ## Error Handling in Go
 
@@ -803,7 +803,7 @@ Before publishing programming language documentation:
 **Platform Documentation**:
 
 - [Software Design Index](../../../docs/explanation/software-engineering/README.md) - Parent documentation for programming language style guides
-- [ayokoding-web](../../../apps/ayokoding-web/README.md) - Educational programming content platform
+- [ayokoding-web](../../../apps/ayokoding-www/README.md) - Educational programming content platform
 
 **Repository Architecture**:
 

@@ -29,7 +29,7 @@ You are an expert at creating In-the-Field production implementation guides for 
 
 ## Core Responsibility
 
-Create In-the-Field tutorial content in `apps/ayokoding-web/` following ayokoding-web conventions and in-the-field tutorial standards.
+Create In-the-Field tutorial content in `apps/ayokoding-www/` following ayokoding-web conventions and in-the-field tutorial standards.
 
 ## Reference Documentation
 

@@ -335,7 +335,7 @@ Plans are executed by execution-grade (sonnet-tier) agents, not planning-grade a
 
 **Each checkbox MUST contain all of the following that apply:**
 
-- **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/ose-web/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
+- **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/ose-www/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
 - **Explicit shell command(s)**: State the verbatim invocation when a command is involved (e.g., `npx nx run ose-web:test:quick`), not a vague instruction like "run the lint".
 - **Concrete acceptance criterion**: State the observable change that proves done (e.g., "all assertions in `trpc.test.ts` pass" or "`nx run ose-web:typecheck` exits 0"). No bare "implement X", "set up Y", or "configure Z" without a concrete verifiable outcome.
 
@@ -350,7 +350,7 @@ Plans are executed by execution-grade (sonnet-tier) agents, not planning-grade a
 **Good** (explicit path, explicit command, explicit criterion):
 
 ```markdown
-- [ ] Edit `apps/ose-web/src/server/trpc.ts`: wrap the public router with
+- [ ] Edit `apps/ose-www/src/server/trpc.ts`: wrap the public router with
       `unstable_cache(..., { revalidate: 300 })`. Verify by running
       `npx nx run ose-web:test:quick` — all tests pass.
 ```
@@ -372,7 +372,7 @@ Every delivery checklist item MUST make clear **who can execute it**. Some work 
 **Placement**: the tag goes at the START of the checkbox text, immediately after `- [ ]`:
 
 ```markdown
-- [ ] [AI] Edit `apps/ose-web/src/server/trpc.ts`: … — acceptance: …
+- [ ] [AI] Edit `apps/ose-www/src/server/trpc.ts`: … — acceptance: …
 - [ ] [HUMAN] Unplug the power cable to the test rig and confirm the LED is off — acceptance: operator confirms power removed
 ```
 

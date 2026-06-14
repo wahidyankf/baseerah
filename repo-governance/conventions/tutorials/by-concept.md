@@ -758,8 +758,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all by-concept tutorial content** across the repository:
 
-- **apps/ayokoding-web/content/** - Canonical location for programming language tutorials (Java, Golang, Python, etc.)
-- **apps/ose-web/content/** - Platform tutorials using by-concept approach
+- **apps/ayokoding-www/content/** - Canonical location for programming language tutorials (Java, Golang, Python, etc.)
+- **apps/ose-www/content/** - Platform tutorials using by-concept approach
 - **Any other location** - By-concept tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.

@@ -553,7 +553,7 @@ as flowchart diagrams:
   Use abbreviations or split composite states when labels exceed this limit.
 
 Both rules are enforced by `rhino-cli:mermaid:validation`, which scans the entire repo (excluding
-`plans/done/`, `apps/ayokoding-web/content/`, and the standard noise-skip set).
+`plans/done/`, `apps/ayokoding-www/content/`, and the standard noise-skip set).
 
 ### Affected-First PR-Gate Principle
 

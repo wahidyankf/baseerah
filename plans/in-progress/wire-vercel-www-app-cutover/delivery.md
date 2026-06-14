@@ -72,7 +72,7 @@ the worktree after the plan is archived and pushed.
 
 ### 1a — Update vercel.json ignoreCommand for each www site
 
-- [ ] [AI] Edit `apps/ose-www/vercel.json` (copy `apps/ose-web/vercel.json` if renamed app does not have one yet): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ose-www" ]` — acceptance: `cat apps/ose-www/vercel.json | grep ignoreCommand` shows `prod-ose-www`.
+- [ ] [AI] Edit `apps/ose-www/vercel.json` (copy `apps/ose-www/vercel.json` if renamed app does not have one yet): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ose-www" ]` — acceptance: `cat apps/ose-www/vercel.json | grep ignoreCommand` shows `prod-ose-www`.
 - [ ] [AI] Edit `apps/ayokoding-www/vercel.json`: set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ayokoding-www" ]` — acceptance: grep confirms `prod-ayokoding-www`.
 - [ ] [AI] Edit `apps/wahidyankf-www/vercel.json`: set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-wahidyankf-www" ]` — acceptance: grep confirms `prod-wahidyankf-www`.
 - [ ] [AI] Create `apps/organiclever-www/vercel.json` (model on `apps/wahidyankf-www/vercel.json`): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-organiclever-www" ]` — acceptance: file exists and grep confirms branch name.
@@ -94,9 +94,9 @@ the worktree after the plan is archived and pushed.
 
 ### 1c — Update GitHub Actions deploy workflows
 
-- [ ] [AI] Edit `.github/workflows/test-and-deploy-ose-web.yml`: update `push.branches` filter `prod-ose-web` → `prod-ose-www`, update `paths` filter `apps/ose-web/**` → `apps/ose-www/**`, update the force-push command target — acceptance: `grep 'prod-ose-web' .github/workflows/test-and-deploy-ose-web.yml` returns nothing. Do NOT rename the workflow file — keep existing filename `test-and-deploy-ose-web.yml` to preserve CI history. Only update the branch references and affected-path filters inside the file.
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-ose-web.yml`: update `push.branches` filter `prod-ose-web` → `prod-ose-www`, update `paths` filter `apps/ose-www/**` → `apps/ose-www/**`, update the force-push command target — acceptance: `grep 'prod-ose-web' .github/workflows/test-and-deploy-ose-web.yml` returns nothing. Do NOT rename the workflow file — keep existing filename `test-and-deploy-ose-web.yml` to preserve CI history. Only update the branch references and affected-path filters inside the file.
 - [ ] [AI] Edit `.github/workflows/test-and-deploy-ayokoding-web.yml`: same pattern → `prod-ayokoding-www`, `apps/ayokoding-www/**` — acceptance: no stale branch name.
-- [ ] [AI] Edit `.github/workflows/test-and-deploy-wahidyankf-web.yml` (if exists): `prod-wahidyankf-web` → `prod-wahidyankf-www`, `apps/wahidyankf-web/**` → `apps/wahidyankf-www/**` — acceptance: no stale branch name.
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-wahidyankf-web.yml` (if exists): `prod-wahidyankf-web` → `prod-wahidyankf-www`, `apps/wahidyankf-www/**` → `apps/wahidyankf-www/**` — acceptance: no stale branch name.
 - [ ] [AI] Edit `.github/workflows/deploy-organiclever-web-to-production.yml`: update staging branch `stag-organiclever-web` → `stag-organiclever-app-web`, production branch `prod-organiclever-web` → `prod-organiclever-app-web`, path filter `apps/organiclever-web/**` → `apps/organiclever-app-web/**` — acceptance: no stale names remain.
 - [ ] [AI] Create `.github/workflows/deploy-ose-app-web-to-production.yml` (model on updated `deploy-organiclever-web-to-production.yml`): staging → `stag-ose-app-web`, production → `prod-ose-app-web`, path filter `apps/ose-app-web/**` — acceptance: file exists, lints cleanly with actionlint.
 - [ ] [AI] Create `.github/workflows/deploy-organiclever-www-to-production.yml` for the marketing site direct deploy (model on `test-and-deploy-wahidyankf-web.yml`): branch `prod-organiclever-www`, path `apps/organiclever-www/**` — acceptance: file exists, lints cleanly.

@@ -160,7 +160,7 @@ All markdown files auto-linted and formatted through a three-gate system:
 - **mermaid:validation** (`npx nx run rhino-cli:mermaid:validation`): Mermaid diagram
   validation — width, label length, syntax — repo-wide scan covering `flowchart`/`graph`
   and `stateDiagram-v2`/`stateDiagram` (v1); excludes `plans/done`,
-  `apps/ayokoding-web/content`, and the standard noise-skip set; runs at pre-commit on
+  `apps/ayokoding-www/content`, and the standard noise-skip set; runs at pre-commit on
   staged `.md` files + `validate-markdown.yml` CI; does NOT run at pre-push)
 - **links:validation** (`npx nx run rhino-cli:links:validation`): Full-repo link scan
   including `#fragment` anchor validation (runs at pre-commit + CI; does NOT run at
@@ -463,7 +463,7 @@ Six-layer governance hierarchy:
 - **Dev port**: 3100
 - **E2E tests**: `ose-web-be-e2e`, `ose-web-fe-e2e`
 
-**See**: [apps/ose-web/README.md](./apps/ose-web/README.md)
+**See**: [apps/ose-www/README.md](./apps/ose-www/README.md)
 
 ### ayokoding-web
 
@@ -475,7 +475,7 @@ Six-layer governance hierarchy:
 - **Content**: Educational platform (programming, AI, security)
 - **E2E tests**: `ayokoding-web-be-e2e`, `ayokoding-web-fe-e2e`
 
-**See**: [apps/ayokoding-web/README.md](./apps/ayokoding-web/README.md)
+**See**: [apps/ayokoding-www/README.md](./apps/ayokoding-www/README.md)
 
 ### organiclever-app-web
 
@@ -499,7 +499,7 @@ Six-layer governance hierarchy:
 - **E2E tests**: `wahidyankf-web-fe-e2e`
 - **Dev port**: 3201
 
-**See**: [apps/wahidyankf-web/README.md](./apps/wahidyankf-web/README.md)
+**See**: [apps/wahidyankf-www/README.md](./apps/wahidyankf-www/README.md)
 
 ### ose-app-web
 

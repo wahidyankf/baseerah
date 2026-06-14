@@ -45,7 +45,7 @@ outputs:
 
 # Software Engineering Documentation Separation Quality Gate Workflow
 
-**Purpose**: Automatically validate separation between OSE Platform style guides (docs/explanation/software-engineering/) and AyoKoding educational content (apps/ayokoding-web/), then apply fixes iteratively until all separation violations are resolved.
+**Purpose**: Automatically validate separation between OSE Platform style guides (docs/explanation/software-engineering/) and AyoKoding educational content (apps/ayokoding-www/), then apply fixes iteratively until all separation violations are resolved.
 
 **IMPORTANT - Validation Scope**:
 

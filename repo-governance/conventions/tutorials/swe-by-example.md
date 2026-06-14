@@ -1283,7 +1283,7 @@ three separate level pages.
 ```
 
 The live FSM by-example tutorial at
-`apps/ayokoding-web/content/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/by-example/overview.md`
+`apps/ayokoding-www/content/en/learn/software-engineering/software-architecture/finite-state-machine-fsm/by-example/overview.md`
 follows this exact pattern and can be used as a reference implementation.
 
 > **NOTE**: This section is automatically regenerable. If a heading on any level page changes,
@@ -1514,8 +1514,8 @@ This convention implements and respects:
 
 **Universal Application**: This convention applies to **all by-example tutorial content** across the repository:
 
-- **apps/ayokoding-web/content/** - Canonical location for programming language tutorials (Java, Golang, Python, etc.)
-- **apps/ose-web/content/** - Platform tutorials using by-example approach
+- **apps/ayokoding-www/content/** - Canonical location for programming language tutorials (Java, Golang, Python, etc.)
+- **apps/ose-www/content/** - Platform tutorials using by-example approach
 - **Any other location** - By-example tutorials regardless of directory
 
 **Implementation Notes**: While these standards apply universally, platform-specific details (frontmatter, weights, navigation) are covered in site-specific skills.

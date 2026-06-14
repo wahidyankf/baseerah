@@ -24,7 +24,7 @@ Remove content that mentions `ose-public`-specific product apps while preserving
 The transform flags a heading or body paragraph as product-specific when any of the following tokens appear (case-insensitive, word-boundary):
 
 - Product names: `OrganicLever`, `AyoKoding`, `OSE Platform`, `Open Sharia Enterprise` (when used as a product name rather than the repo name).
-- Product paths: `apps/organiclever-*`, `apps/ayokoding-*`, `apps/ose-web`, `apps/ose-web-be-e2e`, `apps/ose-web-fe-e2e`, `apps/ose-cli`, `specs/apps/organiclever/`, `specs/apps/ayokoding/`, `specs/apps/ose-platform/`.
+- Product paths: `apps/organiclever-*`, `apps/ayokoding-*`, `apps/ose-web`, `apps/ose-www-be-e2e`, `apps/ose-www-fe-e2e`, `apps/ose-cli`, `specs/apps/organiclever/`, `specs/apps/ayokoding/`, `specs/apps/ose-platform/`.
 - Product domain strings: `organiclever.com`, `ayokoding.com`, `oseplatform.com`.
 
 ### Rewrite rules

@@ -324,7 +324,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial only
-# apps/ayokoding-web/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/ayokoding-www/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # No automatic Indonesian creation
 # /id/belajar/swe/programming-languages/typescript/ does NOT exist
@@ -334,10 +334,10 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Agent creates English tutorial
-# apps/ayokoding-web/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/ayokoding-www/content/en/learn/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 
 # Agent ALSO creates Indonesian mirror (WRONG!)
-# apps/ayokoding-web/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
+# apps/ayokoding-www/content/id/belajar/swe/programming-languages/typescript/tutorials/by-example/advanced.md
 # This violates English-first policy unless explicitly requested
 ```
 
@@ -349,7 +349,7 @@ Policy: These will only be recreated if explicitly requested with maintenance pl
 
 ```bash
 # Create Indonesian personal essay (encouraged)
-# apps/ayokoding-web/content/id/celoteh/2024/02/refleksi-belajar-golang.md
+# apps/ayokoding-www/content/id/celoteh/2024/02/refleksi-belajar-golang.md
 ```
 
 **Content Focus**:
@@ -375,13 +375,13 @@ User: "Please translate the Golang Initial Setup tutorial to Indonesian. This is
 
 ```bash
 # Create Indonesian translation
-# apps/ayokoding-web/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+# apps/ayokoding-www/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in English version
-echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/ayokoding-web/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "**Similar article:** [Pengaturan Awal Golang](/id/belajar/swe/programming-languages/golang/tutorials/initial-setup)" >> apps/ayokoding-www/content/en/learn/swe/programming-languages/golang/tutorials/initial-setup.md
 
 # Add cross-reference in Indonesian version with machine translation disclaimer
-echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/ayokoding-web/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
+echo "> _Artikel ini adalah hasil terjemahan dengan bantuan mesin..._" >> apps/ayokoding-www/content/id/belajar/swe/programming-languages/golang/tutorials/initial-setup.md
 ```
 
 **Key Points**:

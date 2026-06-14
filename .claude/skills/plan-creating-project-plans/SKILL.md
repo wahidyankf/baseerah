@@ -214,7 +214,7 @@ Plans are executed by **execution-grade (sonnet-tier)** agents, not planning-gra
 **Good** (explicit path, explicit command, explicit criterion):
 
 ```markdown
-- [ ] Edit `apps/ose-web/src/server/trpc.ts`: wrap the public router with
+- [ ] Edit `apps/ose-www/src/server/trpc.ts`: wrap the public router with
       `unstable_cache(..., { revalidate: 300 })`. Verify by running
       `npx nx run ose-web:test:quick` — all tests pass.
 ```
@@ -381,7 +381,7 @@ Domain-specialized agents hallucinate less than generic orchestration. When a de
 **When to annotate**:
 
 - Action touches a specific language file (`.fs`, `.go`, `.kt`, `.cs`, `.fsproj`, `.csproj`, etc.)
-- Action touches a specific app context (`apps/ose-web/...` → `apps-ose-web-content-maker` for content)
+- Action touches a specific app context (`apps/ose-www/...` → `apps-ose-web-content-maker` for content)
 - Action is content/documentation (`docs-maker`, `readme-maker`, `specs-maker`)
 - Action is governance / repo rules (`repo-rules-maker`)
 - Action is content-platform skill domain (`apps-ayokoding-web-by-example-maker`, `apps-ayokoding-web-in-the-field-maker`, etc.)

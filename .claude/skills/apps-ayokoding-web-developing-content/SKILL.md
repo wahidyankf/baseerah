@@ -21,7 +21,7 @@ This Skill provides comprehensive knowledge for creating and managing content on
 
 ### Site Overview
 
-**ayokoding-web** (`apps/ayokoding-web/`):
+**ayokoding-web** (`apps/ayokoding-www/`):
 
 - **Site**: ayokoding.com
 - **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
@@ -44,7 +44,7 @@ This Skill provides comprehensive knowledge for creating and managing content on
 
 ## Canonical Content Tree Shape
 
-All new content under `apps/ayokoding-web/content/en/learn/` MUST follow the canonical four-layer hierarchy:
+All new content under `apps/ayokoding-www/content/en/learn/` MUST follow the canonical four-layer hierarchy:
 
 ```
 learn/<domain>/<area>/<topic>/
@@ -71,7 +71,7 @@ learn/<domain>/<area>/<topic>/
 - `business/` — 4+ files
 - `personal-development/` — 50+ files (formerly `human/`), area: `tools/`
 
-**Redirect map**: any new URL renames must be added to `apps/ayokoding-web/src/redirects/learn-reorg.ts`.
+**Redirect map**: any new URL renames must be added to `apps/ayokoding-www/src/redirects/learn-reorg.ts`.
 
 ## By-Example Tutorial Standards
 
@@ -121,7 +121,7 @@ Deploy ayokoding-web to production using automated CI or the deployer agent.
 The `test-and-deploy-ayokoding-web.yml` GitHub Actions workflow handles routine deployment:
 
 - **Schedule**: Runs at 6 AM and 6 PM WIB (UTC+7) every day
-- **Change detection**: Diffs `HEAD` vs `prod-ayokoding-web` scoped to `apps/ayokoding-web/` — skips build/deploy when nothing changed
+- **Change detection**: Diffs `HEAD` vs `prod-ayokoding-web` scoped to `apps/ayokoding-www/` — skips build/deploy when nothing changed
 - **Build**: Runs `nx build ayokoding-web` (Next.js build)
 - **Deploy**: Force-pushes `main` to `prod-ayokoding-web`; Vercel auto-builds
 

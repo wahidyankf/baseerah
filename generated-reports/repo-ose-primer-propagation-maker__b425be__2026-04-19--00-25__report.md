@@ -189,7 +189,7 @@ Coverage table for every row evaluated. Counts are file-counts in `ose-public` m
 - **Path**: `.claude/agents/docs-software-engineering-separation-checker.md`, `.claude/agents/docs-software-engineering-separation-fixer.md`
 - **Direction + transform**: `bidirectional` / `identity`
 - **Bucket**: high
-- **Change**: Agent definitions exist only in ose-public. Classifier `.claude/agents/docs-*.md` → `bidirectional`/`identity`. But both agents are explicitly scoped to "OSE Platform style guides (docs/explanation/) vs AyoKoding educational content (apps/ayokoding-web/)". `identity` would inject product names directly.
+- **Change**: Agent definitions exist only in ose-public. Classifier `.claude/agents/docs-*.md` → `bidirectional`/`identity`. But both agents are explicitly scoped to "OSE Platform style guides (docs/explanation/) vs AyoKoding educational content (apps/ayokoding-www/)". `identity` would inject product names directly.
 - **Diff snippet**:
 
   ```
@@ -201,7 +201,7 @@ Coverage table for every row evaluated. Counts are file-counts in `ose-public` m
   Inline marker example:
 
   ```
-  description: Validates software engineering documentation separation between OSE Platform style guides (docs/explanation/) and AyoKoding educational content (apps/ayokoding-web/). [...]
+  description: Validates software engineering documentation separation between OSE Platform style guides (docs/explanation/) and AyoKoding educational content (apps/ayokoding-www/). [...]
   ```
 
 - **Recommendation**: Transform-gap; abstain. Operator may either (a) reclassify under a new `apps-ayokoding-*` umbrella row that resolves to `neither`, or (b) generalise the agent to a content-separation pattern decoupled from specific product names.
@@ -211,7 +211,7 @@ Coverage table for every row evaluated. Counts are file-counts in `ose-public` m
 - **Path**: `.claude/skills/docs-validating-software-engineering-separation/SKILL.md` (and any reference modules under that directory)
 - **Direction + transform**: `bidirectional` / `identity`
 - **Bucket**: high
-- **Change**: Skill exists only in ose-public; matches `.claude/skills/* (other)` → `bidirectional`/`identity`. SKILL.md heavily references `OSE Platform`, `AyoKoding`, `apps/ayokoding-web/`, and the ose-public-only convention `programming-language-docs-separation.md`.
+- **Change**: Skill exists only in ose-public; matches `.claude/skills/* (other)` → `bidirectional`/`identity`. SKILL.md heavily references `OSE Platform`, `AyoKoding`, `apps/ayokoding-www/`, and the ose-public-only convention `programming-language-docs-separation.md`.
 - **Diff snippet**:
 
   ```
@@ -222,7 +222,7 @@ Coverage table for every row evaluated. Counts are file-counts in `ose-public` m
   Sample inline marker:
 
   ```
-  This Skill provides comprehensive guidance for validating the separation between repository-specific style guides (docs/explanation/software-engineering/) and educational content (apps/ayokoding-web/), as defined in the [Programming Language Documentation Separation Convention](../../../repo-governance/conventions/structure/programming-language-docs-separation.md).
+  This Skill provides comprehensive guidance for validating the separation between repository-specific style guides (docs/explanation/software-engineering/) and educational content (apps/ayokoding-www/), as defined in the [Programming Language Documentation Separation Convention](../../../repo-governance/conventions/structure/programming-language-docs-separation.md).
   ```
 
 - **Recommendation**: Transform-gap; abstain. Same options as the SES checker/fixer above; the skill, agent pair, and convention should be reclassified or generalised together.
@@ -350,7 +350,7 @@ Coverage table for every row evaluated. Counts are file-counts in `ose-public` m
 - **Path**: `repo-governance/conventions/structure/programming-language-docs-separation.md`
 - **Direction + transform**: `bidirectional` / `identity`
 - **Bucket**: medium
-- **Change**: Convention exists only in ose-public; matches `repo-governance/conventions/**` → `bidirectional`/`identity`. Heavily references `OSE Platform`, `ayokoding-web`, `apps/ayokoding-web/`. Direct propagation would inject product names into the primer.
+- **Change**: Convention exists only in ose-public; matches `repo-governance/conventions/**` → `bidirectional`/`identity`. Heavily references `OSE Platform`, `ayokoding-web`, `apps/ayokoding-www/`. Direct propagation would inject product names into the primer.
 - **Diff snippet** (file primer-absent):
 
   ```

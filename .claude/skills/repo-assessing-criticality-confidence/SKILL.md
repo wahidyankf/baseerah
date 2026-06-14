@@ -464,7 +464,7 @@ for finding in low_priority:
 ```markdown
 ### 1. Missing Required Frontmatter Field
 
-**File**: `apps/ayokoding-web/content/en/programming/python/_index.md:3`
+**File**: `apps/ayokoding-www/content/en/programming/python/_index.md:3`
 ****Criticality**: CRITICAL - Breaks page rendering
 **Category**: Missing Required Field
 

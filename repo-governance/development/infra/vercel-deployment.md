@@ -112,10 +112,10 @@ Include any directory that contains build-time generated files the runtime depen
 
 | App                | `vercel.json` location              | `buildCommand` status                       | Notes                                                    |
 | ------------------ | ----------------------------------- | ------------------------------------------- | -------------------------------------------------------- |
-| `ayokoding-web`    | `apps/ayokoding-web/vercel.json`    | Set (fixed after incident)                  | Runs `generate-indexes` and `generate-search-data` first |
+| `ayokoding-web`    | `apps/ayokoding-www/vercel.json`    | Set (fixed after incident)                  | Runs `generate-indexes` and `generate-search-data` first |
 | `organiclever-web` | `apps/organiclever-web/vercel.json` | Not set (no build-time targets at present)  | At risk if build-time targets are added                  |
-| `ose-web`          | `apps/ose-web/vercel.json`          | Set (`generate-search-data` + `next build`) | Next.js build with search data generation                |
-| `wahidyankf-web`   | `apps/wahidyankf-web/vercel.json`   | Set                                         | Adopted 2026-04-19; deploys via `prod-wahidyankf-web`    |
+| `ose-web`          | `apps/ose-www/vercel.json`          | Set (`generate-search-data` + `next build`) | Next.js build with search data generation                |
+| `wahidyankf-web`   | `apps/wahidyankf-www/vercel.json`   | Set                                         | Adopted 2026-04-19; deploys via `prod-wahidyankf-web`    |
 
 ## When to Check
 
@@ -162,13 +162,13 @@ Vercel project settings).
 
 **Fix**: Confirm the Vercel project's root directory setting. Scripts in `buildCommand` run
 relative to that directory. In this monorepo, `buildCommand` runs from the app directory (e.g.,
-`apps/ayokoding-web/`).
+`apps/ayokoding-www/`).
 
 ## Examples
 
 ### PASS: `ayokoding-web` — `buildCommand` mirrors `dependsOn`
 
-`apps/ayokoding-web/project.json`:
+`apps/ayokoding-www/project.json`:
 
 ```json
 "build": {
@@ -176,7 +176,7 @@ relative to that directory. In this monorepo, `buildCommand` runs from the app d
 }
 ```
 
-`apps/ayokoding-web/vercel.json`:
+`apps/ayokoding-www/vercel.json`:
 
 ```json
 {
@@ -188,7 +188,7 @@ Both entries are present and in the same order.
 
 ### FAIL: `dependsOn` target added but `vercel.json` not updated
 
-`apps/ayokoding-web/project.json`:
+`apps/ayokoding-www/project.json`:
 
 ```json
 "build": {
@@ -196,7 +196,7 @@ Both entries are present and in the same order.
 }
 ```
 
-`apps/ayokoding-web/vercel.json`:
+`apps/ayokoding-www/vercel.json`:
 
 ```json
 {

@@ -169,7 +169,7 @@ When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, bo
 - `specs/apps/ayokoding/system-context/`, `containers/`, `components/` — C4 diagrams kept current with the Next.js App Router structure and tRPC routers
 - `specs/apps/ayokoding/behavior/organiclever-be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-web-be-e2e`
 
-When a new tRPC router is added to `apps/ayokoding-web/`, a new component entry appears in the C4 component diagram and new scenarios are added to the Gherkin directory.
+When a new tRPC router is added to `apps/ayokoding-www/`, a new component entry appears in the C4 component diagram and new scenarios are added to the Gherkin directory.
 
 ### CLI apps
 

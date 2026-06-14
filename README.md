@@ -85,7 +85,7 @@ open-sharia-enterprise/
 
 **Applications** (`apps/`):
 
-- **Sites**: [`ose-web`](./apps/ose-web/), [`ayokoding-web`](./apps/ayokoding-web/), [`organiclever-web`](./apps/organiclever-app-web/), [`organiclever-be`](./apps/organiclever-be/), [`organiclever-web-e2e`](./apps/organiclever-app-web-e2e/), [`organiclever-be-e2e`](./apps/organiclever-be-e2e/), [`wahidyankf-web`](./apps/wahidyankf-web/), [`wahidyankf-web-fe-e2e`](./apps/wahidyankf-web-fe-e2e/)
+- **Sites**: [`ose-web`](./apps/ose-www/), [`ayokoding-web`](./apps/ayokoding-www/), [`organiclever-web`](./apps/organiclever-app-web/), [`organiclever-be`](./apps/organiclever-be/), [`organiclever-web-e2e`](./apps/organiclever-app-web-e2e/), [`organiclever-be-e2e`](./apps/organiclever-be-e2e/), [`wahidyankf-web`](./apps/wahidyankf-www/), [`wahidyankf-web-fe-e2e`](./apps/wahidyankf-www-fe-e2e/)
 - **CLI tools**: [`ayokoding-cli`](./apps/ayokoding-cli/), [`rhino-cli`](./apps/rhino-cli/), [`ose-cli`](./apps/ose-cli/)
 - **Polyglot demo apps**: extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template repository, which is now authoritative for the polyglot showcase (Go, Java, Elixir, F#, Python, Rust, Kotlin, TypeScript, C#, Clojure backends + Next.js, TanStack Start, Flutter Web frontends).
 

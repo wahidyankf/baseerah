@@ -48,10 +48,10 @@ After pushing app or library code to `origin main`, you MUST:
 
 | App(s) Changed                                              | Workflow to Trigger                                |
 | ----------------------------------------------------------- | -------------------------------------------------- |
-| `apps/ayokoding-web/`                                       | `test-and-deploy-ayokoding-web.yml`                |
-| `apps/ose-web/`                                             | `test-and-deploy-ose-web.yml`                      |
+| `apps/ayokoding-www/`                                       | `test-and-deploy-ayokoding-web.yml`                |
+| `apps/ose-www/`                                             | `test-and-deploy-ose-web.yml`                      |
 | `apps/organiclever-web/`, `apps/organiclever-be/`           | `test-and-deploy-organiclever-web-development.yml` |
-| `apps/wahidyankf-web/`                                      | `test-and-deploy-wahidyankf-web.yml`               |
+| `apps/wahidyankf-www/`                                      | `test-and-deploy-wahidyankf-web.yml`               |
 | `libs/`, shared infrastructure, or cross-cutting governance | All workflows for apps in blast radius             |
 
 When a change touches shared code (a lib, a shared type, a contract), trigger every workflow for every app that imports that code — not just the app most obviously related to the change.

@@ -601,7 +601,7 @@ All fixer agents MUST:
 
 ### 1. Missing Required Field Breaks Content Validation
 
-**File**: `apps/ayokoding-web/content/en/programming/python/_index.md:3`
+**File**: `apps/ayokoding-www/content/en/programming/python/_index.md:3`
 **Criticality**: CRITICAL - Breaks Next.js content validation
 **Confidence**: HIGH - Field objectively missing from frontmatter
 

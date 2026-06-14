@@ -491,7 +491,7 @@ Three automated markdown validators run on every commit and in CI via the `valid
 
 **Command**: `npx nx run rhino-cli:mermaid:validation`
 
-Repo-wide scan: the Nx target runs `md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content` (plus the standardized noise-skip set: `node_modules`, `dist`, `target`, `.next`, `coverage`, `generated-reports`, `local-temp`, `archived`, `apps-labs`, `worktrees`, `.terraform`, `generated-contracts`, `.nx`, `.git`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax. Diagram types covered: `flowchart`/`graph` (all directions) and `stateDiagram-v2`/`stateDiagram` (v1) — state node count contributes to width; state display names and transition edge labels are subject to the ≤ 30-char limit. The `--exclude` flag is repeatable; pass additional prefixes to suppress noise in project-specific runs.
+Repo-wide scan: the Nx target runs `md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` (plus the standardized noise-skip set: `node_modules`, `dist`, `target`, `.next`, `coverage`, `generated-reports`, `local-temp`, `archived`, `apps-labs`, `worktrees`, `.terraform`, `generated-contracts`, `.nx`, `.git`). Checks: maximum horizontal width (4 nodes per rank), label line length (≤ 30 chars), single diagram per fenced block, valid syntax. Diagram types covered: `flowchart`/`graph` (all directions) and `stateDiagram-v2`/`stateDiagram` (v1) — state node count contributes to width; state display names and transition edge labels are subject to the ≤ 30-char limit. The `--exclude` flag is repeatable; pass additional prefixes to suppress noise in project-specific runs.
 
 **Gate locations**: Pre-commit (staged `.md` files only) + `validate-markdown.yml` CI. Not at pre-push.
 
@@ -507,7 +507,7 @@ Full-repo link scan (same standardized noise-skip set as `mermaid:validation`). 
 
 **Command**: `npx nx run rhino-cli:headings:hierarchy-validation`
 
-Validates heading nesting on a prose allowlist (default-deny): `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), `specs/`, root `*.md`, `apps/*/README.md`, `libs/*/README.md`, `apps/*/docs/**`, `libs/*/docs/**`. All other paths (including `.claude/**`, `apps/ayokoding-web/content/`, `apps/ose-web/content/`, `plans/done/`) are skipped.
+Validates heading nesting on a prose allowlist (default-deny): `docs/`, `repo-governance/`, `plans/` (excluding `plans/done/`), `specs/`, root `*.md`, `apps/*/README.md`, `libs/*/README.md`, `apps/*/docs/**`, `libs/*/docs/**`. All other paths (including `.claude/**`, `apps/ayokoding-www/content/`, `apps/ose-www/content/`, `plans/done/`) are skipped.
 
 **Gate locations**: Pre-commit (staged `.md` files within the prose allowlist) + `validate-markdown.yml` CI. Not at pre-push.
 

@@ -74,15 +74,15 @@ all use the same MIT text.
 | ------------------------------- | ------- |
 | `LICENSE` (root)                | MIT     |
 | `apps/ayokoding-cli/`           | MIT     |
-| `apps/ayokoding-web/`           | MIT     |
+| `apps/ayokoding-www/`           | MIT     |
 | `apps/crane-cli/`               | MIT     |
 | `apps/organiclever-be/`         | MIT     |
 | `apps/organiclever-web/`        | MIT     |
 | `apps/ose-cli/`                 | MIT     |
 | `apps/ose-app-be/`              | MIT     |
 | `apps/ose-app-web/`             | MIT     |
-| `apps/ose-web/`                 | MIT     |
-| `apps/wahidyankf-web/`          | MIT     |
+| `apps/ose-www/`                 | MIT     |
+| `apps/wahidyankf-www/`          | MIT     |
 | `specs/`                        | MIT     |
 | `libs/clojure-openapi-codegen/` | MIT     |
 | `libs/rust-commons/`            | MIT     |

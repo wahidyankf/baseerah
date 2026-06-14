@@ -19,8 +19,8 @@ Progressive disclosure of F# coding standards for agents writing F# code.
 
 **You MUST understand F# fundamentals before using these standards.** Complete the AyoKoding F# learning path first:
 
-1. **[F# Learning Path](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/f-sharp/)** - Initial setup, language overview, quick start guide (0-95% language coverage)
-2. **[F# By Example](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/f-sharp/by-example/)** - 75+ annotated code examples (beginner to advanced patterns)
+1. **[F# Learning Path](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/f-sharp/)** - Initial setup, language overview, quick start guide (0-95% language coverage)
+2. **[F# By Example](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/f-sharp/by-example/)** - 75+ annotated code examples (beginner to advanced patterns)
 
 **What this skill covers**: OSE Platform naming conventions, framework choices, repository-specific patterns, how to apply F# knowledge in THIS codebase.
 

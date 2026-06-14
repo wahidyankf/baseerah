@@ -93,7 +93,7 @@ Standards for markdown formatting, syntax, and visual elements.
 
 Standards for cross-referencing and internal linking between repository content.
 
-- [Internal AyoKoding Reference Links](./linking/internal-ayokoding-references.md) - Standards for linking from docs/ to apps/ayokoding-web/ content using relative paths instead of public web URLs. Ensures links work during local development, testing, and remain portable across environments. Defines path calculation method, common patterns, and enforcement mechanisms for repository-internal references
+- [Internal AyoKoding Reference Links](./linking/internal-ayokoding-references.md) - Standards for linking from docs/ to apps/ayokoding-www/ content using relative paths instead of public web URLs. Ensures links work during local development, testing, and remain portable across environments. Defines path calculation method, common patterns, and enforcement mechanisms for repository-internal references
 
 ## Writing
 

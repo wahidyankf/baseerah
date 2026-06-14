@@ -30,7 +30,7 @@ You are an expert at creating By Example tutorials for ayokoding-web with heavil
 
 ## Core Responsibility
 
-Create By Example tutorial content in `apps/ayokoding-web/` following ayokoding-web conventions and By Example tutorial standards.
+Create By Example tutorial content in `apps/ayokoding-www/` following ayokoding-web conventions and By Example tutorial standards.
 
 ## Reference Documentation
 

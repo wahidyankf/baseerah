@@ -23,8 +23,8 @@ Shows the internal components within each container. Components are groupings of
 
 - **Next.js App Router**: Static generation and routing for platform content
 - **tRPC API**: Backend API for content retrieval and navigation
-- **Source Directory**: App source at `apps/ose-web/src/`
-- **Static Assets**: Images and public assets at `apps/ose-web/public/`
+- **Source Directory**: App source at `apps/ose-www/src/`
+- **Static Assets**: Images and public assets at `apps/ose-www/public/`
 
 ### ayokoding-cli Components (Rust CLI Tool)
 
@@ -72,7 +72,7 @@ graph TB
 
 - **Next.js App Router**: Static generation and routing for educational content
 - **tRPC API**: Backend API for content retrieval, search, and navigation
-- **Content Directory**: Co-located markdown content at `apps/ayokoding-web/content/`
+- **Content Directory**: Co-located markdown content at `apps/ayokoding-www/content/`
 - **Bilingual Support**: Default English with Indonesian content
 
 ## C4 Level 4: Code Architecture

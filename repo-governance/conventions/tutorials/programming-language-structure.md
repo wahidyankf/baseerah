@@ -41,7 +41,7 @@ This convention ensures:
 **Applies to:**
 
 - **All programming language tutorial structures** across the repository:
-  - **ayokoding-web** (`apps/ayokoding-web/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`) - canonical location
+  - **ayokoding-web** (`apps/ayokoding-www/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`) - canonical location
   - **Any other location** where programming language tutorials are organized
 - Languages: Java, Elixir, Golang, Kotlin, Python, Rust (and future additions)
 
@@ -706,7 +706,7 @@ If a language is missing components (created before Full Set requirement), follo
 **Step 1: Audit current state**
 
 ```bash
-cd apps/ayokoding-web/content/en/learn/software-engineering/programming-language/[language]/tutorials/
+cd apps/ayokoding-www/content/en/learn/software-engineering/programming-language/[language]/tutorials/
 ls -la  # Check what exists
 ```
 

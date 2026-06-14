@@ -172,7 +172,7 @@ graph LR
 
 **Steps:**
 
-1. Detect changes in `apps/ose-web/` vs `prod-ose-web` branch
+1. Detect changes in `apps/ose-www/` vs `prod-ose-web` branch
 2. If changes exist (or `force_deploy=true`): setup Volta, Go 1.26.0
 3. Install dependencies and run `nx build ose-web`
 4. Force-push `main` to `prod-ose-web`; Vercel auto-builds
@@ -187,7 +187,7 @@ graph LR
 
 **Steps:**
 
-1. Detect changes in `apps/wahidyankf-web/` vs `prod-wahidyankf-web` branch
+1. Detect changes in `apps/wahidyankf-www/` vs `prod-wahidyankf-web` branch
 2. If changes exist (or `force_deploy=true`): setup Volta, Go 1.26.0
 3. Install dependencies and run `nx build wahidyankf-web`
 4. Force-push `main` to `prod-wahidyankf-web`; Vercel auto-builds

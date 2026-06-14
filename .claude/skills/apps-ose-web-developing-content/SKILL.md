@@ -21,7 +21,7 @@ This Skill provides guidance for creating and managing content on the **ose-web*
 
 ### Site Overview
 
-**ose-web** (`apps/ose-web/`):
+**ose-web** (`apps/ose-www/`):
 
 - **Site**: oseplatform.com
 - **Theme**: Next.js 16 (App Router, TypeScript, tRPC)
@@ -46,7 +46,7 @@ This Skill provides guidance for creating and managing content on the **ose-web*
 ## Content Structure
 
 ```
-apps/ose-web/content/
+apps/ose-www/content/
 ├── updates/                               # Platform updates
 │   ├── _index.md
 │   ├── 2025-12-07-initial-release.md    # Date-prefixed
@@ -236,7 +236,7 @@ Check out our [getting started guide]({{< ref "/updates/getting-started" >}})
 
 ## Asset Organization
 
-**Location**: `apps/ose-web/static/`
+**Location**: `apps/ose-www/static/`
 
 **Structure**:
 
@@ -348,7 +348,7 @@ params:
 
 ```bash
 # 1. Create file with date prefix
-# apps/ose-web/content/updates/2025-12-07-feature-release.md
+# apps/ose-www/content/updates/2025-12-07-feature-release.md
 
 # 2. Edit frontmatter
 # (add title, date, tags, cover image)
@@ -363,7 +363,7 @@ params:
 
 ```bash
 # 1. Create file
-# apps/ose-web/content/about.md
+# apps/ose-www/content/about.md
 
 # 2. Edit frontmatter
 # (add title, url, summary)
@@ -482,7 +482,7 @@ Deploy ose-web to production using automated CI or the deployer agent.
 The `test-and-deploy-ose-web.yml` GitHub Actions workflow handles routine deployment:
 
 - **Schedule**: Runs at 6 AM and 6 PM WIB (UTC+7) every day
-- **Change detection**: Diffs `HEAD` vs `prod-ose-web` scoped to `apps/ose-web/` — skips build/deploy when nothing changed
+- **Change detection**: Diffs `HEAD` vs `prod-ose-web` scoped to `apps/ose-www/` — skips build/deploy when nothing changed
 - **Build**: Runs `nx build ose-web` (Next.js extended build with Next.js 16 theme)
 - **Deploy**: Force-pushes `main` to `prod-ose-web`; Vercel auto-builds
 

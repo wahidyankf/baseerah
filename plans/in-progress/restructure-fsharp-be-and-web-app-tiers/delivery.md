@@ -464,7 +464,7 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 > organiclever-app-web (port 3202, specs+roster+env-contract+workflows+infra updated, all cross-ref
 > links fixed). Gate green: nx show projects, build, test:quick, specs:coverage, env validate, DDD.
 > #109 grep `organiclever-web` NOT literal-zero — remaining refs are exclusively (a) historical blog
-> posts under `apps/ose-web/content/updates/` (immutable record) and (b) the **deferred prod-cutover**
+> posts under `apps/ose-www/content/updates/` (immutable record) and (b) the **deferred prod-cutover**
 > infra (`prod-organiclever-web` branch, `apps-organiclever-web-deployer` agent, Vercel env/workflow
 > filenames) explicitly out of scope per the plan (L30-31, L774-778). All active build/spec refs
 > renamed. NOTE: also pulled forward a Phase-8 e2e slice (crane steps removed + journal steps bound in
@@ -584,15 +584,15 @@ organiclever-app-web` exits 0; test passes.
 
 > Single atomic commit (decision #19). Apply ALL three renames together, then push as one commit.
 
-- [x] [AI] `git mv apps/ose-web apps/ose-www`; `git mv apps/ose-web-be-e2e apps/ose-www-be-e2e`;
-      `git mv apps/ose-web-fe-e2e apps/ose-www-fe-e2e` — acceptance: the three new dirs exist; old dirs
+- [x] [AI] `git mv apps/ose-web apps/ose-www`; `git mv apps/ose-www-be-e2e apps/ose-www-be-e2e`;
+      `git mv apps/ose-www-fe-e2e apps/ose-www-fe-e2e` — acceptance: the three new dirs exist; old dirs
       gone.
 - [x] [AI] `git mv apps/wahidyankf-web apps/wahidyankf-www`;
-      `git mv apps/wahidyankf-web-fe-e2e apps/wahidyankf-www-fe-e2e` — acceptance: new dirs exist; old
+      `git mv apps/wahidyankf-www-fe-e2e apps/wahidyankf-www-fe-e2e` — acceptance: new dirs exist; old
       dirs gone.
 - [x] [AI] `git mv apps/ayokoding-web apps/ayokoding-www`;
-      `git mv apps/ayokoding-web-be-e2e apps/ayokoding-www-be-e2e`;
-      `git mv apps/ayokoding-web-fe-e2e apps/ayokoding-www-fe-e2e` — acceptance: the three new dirs
+      `git mv apps/ayokoding-www-be-e2e apps/ayokoding-www-be-e2e`;
+      `git mv apps/ayokoding-www-fe-e2e apps/ayokoding-www-fe-e2e` — acceptance: the three new dirs
       exist; old dirs gone.
 - [x] [AI] Update each renamed `project.json` `name`/targets, tags, `implicitDependencies`, the e2e
       `webServer` configs (dev ports kept: `ose-www` 3100, `wahidyankf-www` 3201, `ayokoding-www` its

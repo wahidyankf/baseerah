@@ -437,7 +437,7 @@ The `rhino-cli md validate mermaid` command enforces a maximum horizontal width 
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate mermaid
 ```
 
-Run without flags to perform a repo-wide scan (the Nx target runs with `--exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content` plus the standardized noise-skip set) using defaults (MaxWidth=4, unlimited depth). Pass additional `--exclude <prefix>` flags to suppress noise in project-specific runs.
+Run without flags to perform a repo-wide scan (the Nx target runs with `--exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` plus the standardized noise-skip set) using defaults (MaxWidth=4, unlimited depth). Pass additional `--exclude <prefix>` flags to suppress noise in project-specific runs.
 
 **Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit hook and in the `validate-markdown.yml` CI workflow (`push`/`pull_request` → `main`) via `npx nx run rhino-cli:mermaid:validation`. Does NOT run at pre-push.
 
@@ -1547,7 +1547,7 @@ graph LR
 
 **Rule**: Never use `\n` in any Mermaid label (node or edge). Use `<br/>` for multi-line node labels. For edge labels, keep them single-line (edge labels do not support `<br/>`).
 
-**Real-World Context**: Discovered when building a roadmap diagram on `apps/ose-web/content/about.md`. Both node labels (`"Phase 3\nEnterprise Application\nLarge Organizations"`) and edge labels (`"Revenue\n& Learnings"`) rendered with literal `\n` characters visible.
+**Real-World Context**: Discovered when building a roadmap diagram on `apps/ose-www/content/about.md`. Both node labels (`"Phase 3\nEnterprise Application\nLarge Organizations"`) and edge labels (`"Revenue\n& Learnings"`) rendered with literal `\n` characters visible.
 
 ### Error 8: Label Constraints — Character Width Limit, No HTML in Edge Labels, No URL Paths
 

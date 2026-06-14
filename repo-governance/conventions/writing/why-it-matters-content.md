@@ -67,8 +67,8 @@ This convention eliminates the problem at the source by prohibiting the pattern 
 ### What This Convention Covers
 
 - All `**Why It Matters**:` sections in ayokoding-web tutorial files
-- Applies to both by-example tutorials (`apps/ayokoding-web/content/en/learn/**/by-example/`)
-- Applies to in-the-field guides (`apps/ayokoding-web/content/en/learn/**/in-the-field/`)
+- Applies to both by-example tutorials (`apps/ayokoding-www/content/en/learn/**/by-example/`)
+- Applies to in-the-field guides (`apps/ayokoding-www/content/en/learn/**/in-the-field/`)
 - Applies to all future tutorial formats that include a Why It Matters section
 - Applies equally to English and Indonesian content
 

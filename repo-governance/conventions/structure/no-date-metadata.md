@@ -55,10 +55,10 @@ All markdown files outside the website app directories:
 
 Content files under the following app directories that render in the UI may keep their dates because human readers see "last updated" in the browser and it communicates content freshness directly:
 
-- `apps/ayokoding-web/` — educational platform content
-- `apps/ose-web/` — platform marketing content
+- `apps/ayokoding-www/` — educational platform content
+- `apps/ose-www/` — platform marketing content
 - `apps/organiclever-web/` — product landing site content
-- `apps/wahidyankf-web/` — personal portfolio content
+- `apps/wahidyankf-www/` — personal portfolio content
 
 The `date:` field in ose-web post frontmatter (publication date, not maintenance date) is also unaffected.
 

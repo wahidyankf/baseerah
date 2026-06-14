@@ -16,7 +16,7 @@ Progressive disclosure of Go coding standards for agents writing Go code.
 > the authoritative source for OSE Go conventions. Use the AyoKoding educational content below for
 > universal Go idioms.
 
-**Educational Resource**: [AyoKoding Go Learning Path](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)
+**Educational Resource**: [AyoKoding Go Learning Path](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/)
 
 **Usage**: Auto-loaded for agents when writing Go code. Provides quick reference to idioms, best practices, and antipatterns.
 
@@ -26,10 +26,10 @@ Progressive disclosure of Go coding standards for agents writing Go code.
 
 **You MUST understand Go fundamentals before using these standards.** Complete the AyoKoding Go learning path first:
 
-1. **[Go Learning Path](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)** — Initial setup, language overview, quick start guide
-2. **[Go By Example](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/by-example/)** — 75+ heavily annotated code examples (beginner to advanced patterns)
-3. **[Go In the Field](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/in-the-field/)** — Production implementation guides (standard library first, framework integration)
-4. **[Go Release Highlights](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/release-highlights/)** — Go 1.18+ features (generics, fuzzing, PGO, iterators, Green Tea GC)
+1. **[Go Learning Path](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/)** — Initial setup, language overview, quick start guide
+2. **[Go By Example](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/by-example/)** — 75+ heavily annotated code examples (beginner to advanced patterns)
+3. **[Go In the Field](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/in-the-field/)** — Production implementation guides (standard library first, framework integration)
+4. **[Go Release Highlights](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/release-highlights/)** — Go 1.18+ features (generics, fuzzing, PGO, iterators, Green Tea GC)
 
 **What this skill covers**: OSE Platform naming conventions, framework choices, repository-specific patterns, how to apply Go knowledge in THIS codebase (and in ose-primer).
 
@@ -267,10 +267,10 @@ in OSE-derived projects). `ose-public` itself has no active Go apps.
 
 **AyoKoding educational content** (universal Go idioms — use for fundamentals and patterns):
 
-- [Go Learning Path](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)
-- [Go By Example](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/by-example/)
-- [Go In the Field](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/in-the-field/)
-- [Go Release Highlights](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/release-highlights/)
+- [Go Learning Path](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/)
+- [Go By Example](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/by-example/)
+- [Go In the Field](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/in-the-field/)
+- [Go Release Highlights](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/release-highlights/)
 
 ## Test-Driven Development
 
@@ -291,6 +291,6 @@ gopter covers invariants over generated inputs.
 
 ## References
 
-- [AyoKoding Go Overview](../../../apps/ayokoding-web/content/en/learn/software-engineering/programming-languages/golang/)
+- [AyoKoding Go Overview](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/)
 - [Functional Programming](../../../repo-governance/development/pattern/functional-programming.md)
 - [Programming Language Docs Separation](../../../repo-governance/conventions/structure/programming-language-docs-separation.md)

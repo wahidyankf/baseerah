@@ -199,7 +199,7 @@ When using the flat layout, each feature directory (`src/features/<name>/`) shou
 self-contained and import only from sibling features or shared libraries — never from
 `src/contexts/`.
 
-**Documented example**: `apps/wahidyankf-web/` (personal portfolio) uses `src/features/`
+**Documented example**: `apps/wahidyankf-www/` (personal portfolio) uses `src/features/`
 because it has no IO ports and no business rules.
 
 ## Related

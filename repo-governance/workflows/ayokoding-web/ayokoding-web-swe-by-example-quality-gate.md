@@ -183,7 +183,7 @@ lean. The delegation is encoded in each agent's prompt — no workflow-level con
 ```bash
 # Invoke via Task tool
 subagent_type: apps-ayokoding-web-by-example-checker
-prompt: "Validate apps/ayokoding-web/content/en/learn/software-engineering/programming-language/golang/tutorials/by-example/ for compliance with by-example standards"
+prompt: "Validate apps/ayokoding-www/content/en/learn/software-engineering/programming-language/golang/tutorials/by-example/ for compliance with by-example standards"
 ```
 
 **Validation areas**:

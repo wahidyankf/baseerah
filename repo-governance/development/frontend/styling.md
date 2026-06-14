@@ -54,7 +54,7 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 }
 ```
 
-See `apps/organiclever-web/src/app/globals.css` and `apps/ayokoding-web/src/app/globals.css` for the full reference implementations.
+See `apps/organiclever-web/src/app/globals.css` and `apps/ayokoding-www/src/app/globals.css` for the full reference implementations.
 
 ## Utility-First Approach
 
