@@ -1,5 +1,9 @@
 Feature: Settings Screen
 
+  As an app user
+  I want to view and update my profile and preferences in the settings screen
+  So that the app reflects my personal configuration
+
   Scenario: Settings screen loads user profile
     Given the settings screen is loaded
     Then the user name input is visible

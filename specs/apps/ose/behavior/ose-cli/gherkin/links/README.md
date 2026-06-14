@@ -1,6 +1,6 @@
 # ose-platform-cli — links domain
 
-Gherkin scenarios for the `links` domain: link validation across the ose-web content
+Gherkin scenarios for the `links` domain: link validation across the ose-www content
 tree. Consumed by `apps/ose-cli`.
 
 | Feature file          | Description                                      |

@@ -1,4 +1,9 @@
 Feature: Home Screen
+
+  As an app user
+  I want to see my recent journal entries on the home screen
+  So that I can review and manage what I have logged
+
   Scenario: Home screen shows entry list
     Given the home screen is loaded with entries
     Then the entry list is visible

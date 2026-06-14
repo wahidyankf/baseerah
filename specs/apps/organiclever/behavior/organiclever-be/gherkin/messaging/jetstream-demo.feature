@@ -1,5 +1,9 @@
 Feature: organiclever-be JetStream durable demo
 
+  As an operations engineer
+  I want organiclever-be to publish and durably consume messages via JetStream
+  So that at-least-once delivery is verified end-to-end before the service handles real traffic
+
   @e2e
   Scenario: organiclever-be publishes and durably consumes its demo subject with ack
     Given organiclever-be has a JetStream durable stream and consumer for its demo subject

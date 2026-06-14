@@ -1,4 +1,9 @@
 Feature: Entry Loggers
+
+  As an app user
+  I want to log different types of entries (reading, learning, meal, focus, custom) from the app shell
+  So that all my activities are captured in the journal with minimal friction
+
   Scenario: Open Add Entry sheet
     Given the app shell is visible
     When the user taps the FAB

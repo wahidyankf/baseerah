@@ -49,29 +49,33 @@ One row per deployable container (C4 L2). Container slug is canonical: it indexe
 glob. Adding a future container (e.g. `mobile`, `desktop`, a second backend) means adding
 a row here, not changing the schema.
 
-| Container | Perspective                             | Background                 | Scenarios                                                                                   | Domains                          | Consumed by                                   |
-| --------- | --------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------- |
-| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | [behavior/organiclever-be/gherkin/](./behavior/organiclever-be/gherkin/README.md)           | health                           | `apps/organiclever-be` (F#/Giraffe, TickSpec) |
-| `web`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/organiclever-app-web/gherkin/](./behavior/organiclever-app-web/gherkin/README.md) | landing, system, layout, routing | `apps/organiclever-app-web` (Next.js 16)      |
+| Container | Perspective                             | Background                 | Scenarios                                                                                   | Domains                                                                        | Consumed by                                   |
+| --------- | --------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------- |
+| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | [behavior/organiclever-be/gherkin/](./behavior/organiclever-be/gherkin/README.md)           | health, journal, db, messaging                                                 | `apps/organiclever-be` (F#/Giraffe, TickSpec) |
+| `app-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/organiclever-app-web/gherkin/](./behavior/organiclever-app-web/gherkin/README.md) | app-shell, health, journal, routine, routing, settings, stats, workout-session | `apps/organiclever-app-web` (Next.js 16)      |
+| `www`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/organiclever-www/gherkin/](./behavior/organiclever-www/gherkin/README.md)         | home, accessibility                                                            | `apps/organiclever-www` (Next.js 16)          |
 
-The `web` container's system-status page consumes the `be` container's health endpoint.
-Otherwise `web` is local-first today.
+The `app-web` container's system-status page consumes the `be` container's health endpoint.
+Otherwise `app-web` is local-first today.
 
 ## Bounded Contexts
 
 Counts are Gherkin features per container. `--` means no features in that container today.
 
-| Bounded Context | `be` features | `web` features | Description                                                |
-| --------------- | ------------- | -------------- | ---------------------------------------------------------- |
-| app-shell       | --            | 2              | Navigation chrome, accessibility, entry-logging overlays   |
-| health          | 1             | 1              | Service health status (`be` probe + `web` diagnostic page) |
-| journal         | --            | 2              | Append-only event log — system of record (PGlite)          |
-| landing         | --            | 1              | Marketing landing page                                     |
-| routine         | --            | 1              | Workout routine management                                 |
-| routing         | --            | 2              | App routing and disabled-route 404 guards                  |
-| settings        | --            | 3              | User preferences — dark mode, language                     |
-| stats           | --            | 2              | History and progress projections over journal events       |
-| workout-session | --            | 1              | Active workout session FSM                                 |
+| Bounded Context | `be` features | `app-web` features | `www` features | Description                                                    |
+| --------------- | ------------- | ------------------ | -------------- | -------------------------------------------------------------- |
+| app-shell       | --            | 2                  | --             | Navigation chrome, accessibility, entry-logging overlays       |
+| db              | 1             | --                 | --             | Database schema migrations                                     |
+| health          | 1             | 1                  | --             | Service health status (`be` probe + `app-web` diagnostic page) |
+| home            | --            | --                 | 1              | Marketing landing page (organiclever-www)                      |
+| accessibility   | --            | --                 | 1              | Accessibility compliance for marketing site                    |
+| journal         | 1             | 2                  | --             | Append-only event log — system of record (PGlite)              |
+| messaging       | 3             | --                 | --             | NATS/JetStream messaging infrastructure                        |
+| routine         | --            | 1                  | --             | Workout routine management                                     |
+| routing         | --            | 2                  | --             | App routing and disabled-route 404 guards                      |
+| settings        | --            | 3                  | --             | User preferences — dark mode, language                         |
+| stats           | --            | 2                  | --             | History and progress projections over journal events           |
+| workout-session | --            | 1                  | --             | Active workout session FSM                                     |
 
 ## Spec Artifacts
 

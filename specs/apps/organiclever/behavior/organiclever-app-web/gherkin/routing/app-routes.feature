@@ -1,5 +1,9 @@
 Feature: App Routes URL Scheme
 
+  As an app user
+  I want each section of the app to have a stable URL
+  So that I can bookmark, share, and refresh pages without losing my navigation state
+
   Background:
     Given the application is running
 

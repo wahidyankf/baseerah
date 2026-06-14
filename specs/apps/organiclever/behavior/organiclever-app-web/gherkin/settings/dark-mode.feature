@@ -1,5 +1,9 @@
 Feature: Dark Mode
 
+  As an app user
+  I want to toggle dark mode in settings
+  So that I can use the app comfortably in low-light environments
+
   Scenario: Toggle dark mode on
     Given the settings screen shows dark mode is off
     When the user toggles dark mode

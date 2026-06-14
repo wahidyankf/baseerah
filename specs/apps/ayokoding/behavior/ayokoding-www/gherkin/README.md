@@ -18,7 +18,9 @@ specs/apps/ayokoding/behavior/ayokoding-www/gherkin/
 ├── i18n/                  # Locale switcher (English ↔ Indonesian)
 │   └── i18n.feature
 └── navigation/            # Top-level navigation, sidebar, breadcrumb
-    └── navigation.feature
+    ├── navigation.feature
+    ├── architecture-cases-routes.feature
+    └── learn-reorg-redirects.feature
 ```
 
 ## Ubiquitous Language

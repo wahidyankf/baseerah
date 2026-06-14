@@ -30,7 +30,7 @@ specs/apps/ose/
     ├── app-web/gherkin/        # ose-app-web UI-semantic scenarios
     ├── platform-be/gherkin/    # ose-web tRPC HTTP-semantic scenarios
     ├── platform-web/gherkin/   # ose-web UI-semantic scenarios
-    └── cli/gherkin/            # ose-cli link-check scenarios
+    └── ose-cli/gherkin/        # ose-cli link-check scenarios
 ```
 
 ## OSE Application (`ose-app-*`)

@@ -1,5 +1,9 @@
 Feature: Workout Session
 
+  As an app user
+  I want to start, log sets, and complete a workout session
+  So that my exercise activity is recorded in the journal
+
   Scenario: Start a blank workout
     Given the workout screen is open with no routine
     When the user starts the workout

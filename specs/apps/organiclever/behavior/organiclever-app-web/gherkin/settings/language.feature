@@ -1,5 +1,9 @@
 Feature: Language Setting
 
+  As an app user
+  I want to switch the app language between English and Bahasa Indonesia
+  So that I can use the app in my preferred language
+
   Scenario: Switch to Bahasa Indonesia
     Given the settings screen shows language is English
     When the user selects Indonesian language

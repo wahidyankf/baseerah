@@ -1,5 +1,9 @@
 Feature: App Shell Navigation
 
+  As an app user
+  I want consistent bottom-tab navigation across all screens
+  So that I can move between sections of the app without losing my place
+
   Scenario: Default tab is Home on first load
     Given the app is freshly loaded
     Then the Home tab is active

@@ -4,10 +4,14 @@ Backend (HTTP-semantic) Gherkin scenarios for `ose-be`. Consumed by xUnit + Tick
 
 ## Feature files
 
-| Feature file                                     | Domain            |
-| ------------------------------------------------ | ----------------- |
-| [health/health.feature](./health/health.feature) | health            |
-| [regulatory-source/](./regulatory-source/)       | regulatory-source |
-| [internal-policy/](./internal-policy/)           | internal-policy   |
-| [gap-analysis/](./gap-analysis/)                 | gap-analysis      |
-| [ai-orchestration/](./ai-orchestration/)         | ai-orchestration  |
+| Feature file                                                           | Domain            |
+| ---------------------------------------------------------------------- | ----------------- |
+| [health/health.feature](./health/health.feature)                       | health            |
+| [regulatory-source/](./regulatory-source/)                             | regulatory-source |
+| [internal-policy/](./internal-policy/)                                 | internal-policy   |
+| [gap-analysis/](./gap-analysis/)                                       | gap-analysis      |
+| [ai-orchestration/](./ai-orchestration/)                               | ai-orchestration  |
+| [db/migrations.feature](./db/migrations.feature)                       | db                |
+| [messaging/nats-connect.feature](./messaging/nats-connect.feature)     | messaging         |
+| [messaging/nats-config.feature](./messaging/nats-config.feature)       | messaging         |
+| [messaging/jetstream-demo.feature](./messaging/jetstream-demo.feature) | messaging         |

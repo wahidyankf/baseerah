@@ -43,14 +43,14 @@ about API contract behavior without conflating it with UI behavior.
 
 Organized by bounded context (one folder per BC, matching the DDD registry).
 
-| Bounded Context | Features                      | Count |
-| --------------- | ----------------------------- | ----- |
-| app-shell       | `responsive`, `accessibility` | 2     |
-| content         | `content-rendering`           | 1     |
-| search          | `search`                      | 1     |
-| i18n            | `i18n`                        | 1     |
-| navigation      | `navigation`                  | 1     |
-| **Total**       |                               | **6** |
+| Bounded Context | Features                                                           | Count |
+| --------------- | ------------------------------------------------------------------ | ----- |
+| app-shell       | `responsive`, `accessibility`                                      | 2     |
+| content         | `content-rendering`                                                | 1     |
+| search          | `search`                                                           | 1     |
+| i18n            | `i18n`                                                             | 1     |
+| navigation      | `navigation`, `architecture-cases-routes`, `learn-reorg-redirects` | 3     |
+| **Total**       |                                                                    | **8** |
 
 ### `ayokoding-be/gherkin/` — tRPC API perspective
 

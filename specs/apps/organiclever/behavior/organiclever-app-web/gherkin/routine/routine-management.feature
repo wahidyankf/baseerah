@@ -1,5 +1,9 @@
 Feature: Routine Management
 
+  As an app user
+  I want to create, edit, and delete workout routines
+  So that I can plan and reuse structured workout sequences
+
   Scenario: Create a new routine
     Given the edit routine screen is open for a new routine
     When the user enters a routine name

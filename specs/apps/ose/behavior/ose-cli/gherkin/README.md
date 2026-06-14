@@ -1,7 +1,7 @@
 # ose-cli Gherkin Specs
 
 Gherkin feature files for [ose-cli](../../../../../../apps/ose-cli/README.md) — the
-CLI tool for ose-web Hugo site maintenance. 1 file, 4 scenarios.
+CLI tool for ose-www site link validation. 1 file, 4 scenarios.
 
 ## Feature Files
 

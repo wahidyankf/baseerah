@@ -1,4 +1,9 @@
 Feature: History Screen
+
+  As an app user
+  I want to view my past journal entries in reverse chronological order
+  So that I can review my recent activity at a glance
+
   Scenario: History shows entries in reverse order
     Given the history screen has entries
     Then entries are shown newest first

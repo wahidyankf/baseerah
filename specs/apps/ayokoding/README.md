@@ -72,7 +72,7 @@ Counts are Gherkin features per perspective. `--` means no features in that pers
 | content         | 1              | 1              | Content rendering + tRPC content procedures             |
 | search          | 1              | 1              | Search dialog + tRPC search procedures                  |
 | i18n            | 1              | 1              | Locale switcher + tRPC locale data + Next.js middleware |
-| navigation      | 1              | 1              | Top-level navigation + tRPC navigation tree             |
+| navigation      | 3              | 1              | Top-level navigation + tRPC navigation tree             |
 | health          | --             | 1              | Service liveness probe                                  |
 
 ## Spec Artifacts

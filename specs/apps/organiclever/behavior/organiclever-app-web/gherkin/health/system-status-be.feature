@@ -1,5 +1,9 @@
 Feature: BE Status Page
 
+  As an app user
+  I want the app to show the backend connectivity status
+  So that I can diagnose whether the backend service is reachable
+
   Scenario: BE status page shows Not Configured when env unset
     Given ORGANICLEVER_BE_URL is unset
     When a visitor requests GET /system/status/be
