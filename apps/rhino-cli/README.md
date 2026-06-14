@@ -2,7 +2,7 @@
 
 **RHINO** – Repository Hygiene & INtegration Orchestrator
 
-Command-line tools for repository management and automation. The canonical implementation is Rust (this crate); the predecessor Go binary lives at [`archived/rhino-cli/`](../../archived/rhino-cli/) for git-history archaeology only. The Rust rewrite completed 2026-05-23.
+Command-line tools for repository management and automation. The canonical implementation is Rust (this crate). The Rust rewrite completed 2026-05-23 (the predecessor Go binary remains recoverable from git history).
 
 ## What is rhino-cli?
 
@@ -81,6 +81,5 @@ Reviewed 2026-05-23. Policy paths per [Dependency Bump Stability & Safety Policy
 
 ## See also
 
-- Go implementation (archived at cutover): [`archived/rhino-cli/README.md`](../../archived/rhino-cli/README.md)
-- Migration plan (completed 2026-05-23): [`plans/done/2026-05-23__rhino-cli-rust-rewrite/`](../../plans/done/2026-05-23__rhino-cli-rust-rewrite/README.md)
+- Migration plan (completed 2026-05-23): [`plans/done/2026-05-23__rhino-cli-rust-rewrite/`](../../plans/done/2026-05-23__rhino-cli-rust-rewrite/README.md) — documents the Go implementation that preceded this crate (recoverable from git history)
 - Gherkin specs (shared with Go binary): [`specs/apps/rhino/behavior/rhino-cli/gherkin/`](../../specs/apps/rhino/behavior/rhino-cli/gherkin/)

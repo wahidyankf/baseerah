@@ -28,14 +28,10 @@ or substantial portions of the software.
 
 ## Third-Party Code
 
-Some vendored or forked code in this repository is licensed under its original license, not this
-repository's MIT license:
-
-| Path                          | License | Copyright  |
-| ----------------------------- | ------- | ---------- |
-| `archived/ayokoding-web-hugo` | MIT     | Xin (2023) |
-
-Check the `LICENSE` file in each subdirectory for the applicable license.
+No third-party or forked code is currently vendored in this repository — all code is first-party
+and MIT-licensed. If third-party code is vendored in the future, it retains its original license
+(not this repository's MIT license), and the applicable terms are recorded in a `LICENSE` file
+within the relevant subdirectory.
 
 ## More Information
 

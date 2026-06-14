@@ -93,7 +93,7 @@ Flat structure - all apps at the same level, no subdirectories.
 - `ayokoding-www-be-e2e` - Playwright BE E2E tests for ayokoding-www tRPC API
 - `ayokoding-www-fe-e2e` - Playwright FE E2E tests for ayokoding-www UI
 - `ayokoding-cli` - AyoKoding CLI tool (Rust application)
-- `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
+- `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23 (predecessor Go source recoverable from git history).
 - `ose-cli` - OSE Platform site maintenance CLI (Rust application)
 - `crane-cli` - PDF-to-Markdown pipeline CLI (F# application)
 - `organiclever-www` - OrganicLever marketing website (Next.js 16, port 3200)

@@ -30,9 +30,9 @@
   - `ayokoding-www-be-e2e` — Playwright BE E2E tests for ayokoding-www tRPC API
   - `ayokoding-www-fe-e2e` — Playwright FE E2E tests for ayokoding-www UI
   - `ayokoding-cli` — Rust CLI tool for content link validation
-  - `rhino-cli` — Rust CLI tool for repository management (Repository Hygiene & INtegration Orchestrator). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
+  - `rhino-cli` — Rust CLI tool for repository management (Repository Hygiene & INtegration Orchestrator). Ported from Go 2026-05-23.
   - `ose-cli` — Rust CLI tool for OSE Platform site maintenance (link validation)
-  - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture. Original F# source at `archived/crane-cli/`; Rust port 2026-05-26 preserved at `archived/crane-cli-rust/`.
+  - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture.
   - `organiclever-www` — Next.js 16 OrganicLever marketing website (port 3200)
   - `organiclever-www-e2e` — Playwright FE E2E tests for organiclever-www
   - `organiclever-app-web` — Next.js 16 OrganicLever app frontend (port 3202)
@@ -72,7 +72,6 @@ ose-public/
 │   ├── organiclever-be-e2e/  # Playwright BE E2E tests for organiclever-be
 │   ├── wahidyankf-www/       # Wahidyan Kresna Fridayoka portfolio (Next.js 16, port 3201)
 │   ├── wahidyankf-www-fe-e2e/ # Playwright-BDD E2E tests for wahidyankf-www
-├── archived/                 # Archived applications (no longer active)
 ├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
 │   ├── rust-commons/         # Shared Rust utilities (link-checking, HTTP)

@@ -221,9 +221,8 @@ summary report and exits non-zero so the orchestrator escalates:
 - **New harness additions**: full onboarding involves catalog row, binding directory
   decision, and rhino-cli implementation
 - **rhino-cli generator-logic changes** (a translation rule, not just regenerated data):
-  only `apps/rhino-cli/` (Rust) is active; `archived/rhino-cli/` (Go) is archived and must
-  NOT receive changes — surface this as a single finding for human or `swe-rust-dev` agent
-  authorship
+  only `apps/rhino-cli/` (Rust) is active and validated — surface this as a single finding
+  for human or `swe-rust-dev` agent authorship
 - **Evidence that conflicts across sources**: escalate to human with both sources presented
 
 ## Fix Patterns
@@ -294,7 +293,7 @@ to the next finding.
    - **Pass**: exits 0 → log as VALIDATED
    - **Fail**: exits non-zero → capture output, surface failing files, exit non-zero
 
-7. Re-run vendor audit (Rust rhino-cli only — `archived/rhino-cli/` is NOT run):
+7. Re-run vendor audit (Rust `apps/rhino-cli/` only):
 
    ```bash
    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit repo-governance/

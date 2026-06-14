@@ -232,8 +232,8 @@ Apply validated fixes from the audit report based on mode level.
 - New harness additions (full onboarding involves catalog row, binding directory decision,
   and rhino-cli implementation)
 - rhino-cli **generator-logic** changes (a translation rule, not just regenerated data): only
-  `apps/rhino-cli/` (Rust) is active; `archived/rhino-cli/` (Go) is archived and must not
-  receive changes — surfaced as a human or `swe-rust-dev` agent authorship task
+  `apps/rhino-cli/` (Rust) is active and validated — surfaced as a human or `swe-rust-dev`
+  agent authorship task
 
 **On out-of-scope findings**: Surface with full context in the orchestrator's user-visible
 status; do not loop further until the human resolves.

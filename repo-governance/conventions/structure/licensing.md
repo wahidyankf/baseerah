@@ -90,7 +90,7 @@ all use the same MIT text.
 | `libs/web-ui/`                  | MIT     |
 | `libs/web-ui-token/`            | MIT     |
 
-Third-party code in `archived/` retains its original license (see LICENSING-NOTICE.md).
+Any third-party code that is vendored or archived retains its original license (see LICENSING-NOTICE.md).
 
 ### Root LICENSE Fallback
 
