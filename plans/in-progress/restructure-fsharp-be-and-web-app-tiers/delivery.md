@@ -739,7 +739,7 @@ http://localhost:3200` — acceptance: page loads without errors.
 
 > _Suggested executor: docs-maker + specs-fixer_
 
-- [ ] [AI] **Sanction the `www` app type in conventions**: document `www` as a new sanctioned app
+- [x] [AI] **Sanction the `www` app type in conventions**: document `www` as a new sanctioned app
       project `type` (alongside `web`/`be`/`cli`) in
       `repo-governance/conventions/structure/file-naming.md` (and the app-naming convention if a
       separate one exists), defining `[domain]-www` = public website at the domain root (deployment
@@ -747,14 +747,14 @@ http://localhost:3200` — acceptance: page loads without errors.
       per-product backend — acceptance:
       `grep -rE '\bwww\b' repo-governance/conventions/structure/file-naming.md` shows the new type
       documented. - _Suggested executor: repo-rules-maker_
-- [ ] [AI] Update `docs/reference/monorepo-structure.md`: platform tags for both backends → F#/Giraffe;
+- [x] [AI] Update `docs/reference/monorepo-structure.md`: platform tags for both backends → F#/Giraffe;
       rename `ose-app-be`→`ose-be`, `ose-web`→`ose-www`, `wahidyankf-web`→`wahidyankf-www`,
       `ayokoding-web`→`ayokoding-www` (+ their e2e pairs); add `organiclever-app-web` +
       `organiclever-www`(marketing) + `libs/ts-ui`; note `organiclever-be` kept (in-place F# rewrite);
       remove `crane-be`/`crane-be-e2e`/`libs/fsharp-crane-core`-references where dropped — acceptance:
       `grep -rnE 'axum|crane-be|\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b' docs/reference/monorepo-structure.md`
       zero. - _Suggested executor: docs-maker_
-- [ ] [AI] Update `AGENTS.md` (and the `CLAUDE.md` shim where it lists apps): the app inventory, the
+- [x] [AI] Update `AGENTS.md` (and the `CLAUDE.md` shim where it lists apps): the app inventory, the
       Web Sites section, env-var mentions, and dev ports — rename `ose-app-be`→`ose-be`,
       `ose-web`→`ose-www`, `wahidyankf-web`→`wahidyankf-www`, `ayokoding-web`→`ayokoding-www` (with
       their e2e pairs), add `organiclever-www` (marketing) + `organiclever-app-web`, note
@@ -762,37 +762,37 @@ http://localhost:3200` — acceptance: page loads without errors.
       vs `-app-web` vs `<product>-be` tier rule — acceptance:
       `grep -nE '\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b|crane-be' AGENTS.md`
       returns zero. - _Suggested executor: repo-rules-maker_
-- [ ] [AI] Update `docs/reference/platform-bindings.md` if it lists any renamed app — acceptance:
+- [x] [AI] Update `docs/reference/platform-bindings.md` if it lists any renamed app — acceptance:
       `grep -nE '\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b|crane-be' docs/reference/platform-bindings.md`
       returns zero.
-- [ ] [AI] Update `apps/ose-be/README.md` + `apps/organiclever-be/README.md` to the F# stack (and the
+- [x] [AI] Update `apps/ose-be/README.md` + `apps/organiclever-be/README.md` to the F# stack (and the
       `ose-app-be`→`ose-be` rename in the OSE one) — acceptance:
       `grep -rE 'Rust|Axum|sqlx|cargo|\bose-app-be\b' apps/ose-be/README.md apps/organiclever-be/README.md`
       zero.
-- [ ] [AI] Update `apps/organiclever-app-web/README.md`, new `apps/organiclever-www/README.md`,
+- [x] [AI] Update `apps/organiclever-app-web/README.md`, new `apps/organiclever-www/README.md`,
       `apps/organiclever-app-web-e2e/README.md`, `apps/organiclever-be-e2e/README.md`, and new
       `libs/ts-ui/README.md` to reflect the new stack, rename, and purpose — acceptance:
       `grep -rE '\borganiclever-web\b' apps/organiclever-app-web/README.md apps/organiclever-www/README.md apps/organiclever-app-web-e2e/README.md`
       returns zero; `libs/ts-ui/README.md` exists. - _Suggested executor: readme-maker_
-- [ ] [AI] Update `apps/ose-www/README.md`, `apps/wahidyankf-www/README.md`, and
+- [x] [AI] Update `apps/ose-www/README.md`, `apps/wahidyankf-www/README.md`, and
       `apps/ayokoding-www/README.md` for the `-www` rename (project name + any
       `ose-web`/`wahidyankf-web`/`ayokoding-web` self-references) — acceptance:
       `grep -rnE '\bose-web\b' apps/ose-www/README.md`,
       `grep -rnE '\bwahidyankf-web\b' apps/wahidyankf-www/README.md`, and
       `grep -rnE '\bayokoding-web\b' apps/ayokoding-www/README.md` return zero. - _Suggested executor: readme-maker_
-- [ ] [AI] Sweep any remaining `docs/` or `repo-governance/` file cross-referencing old names —
+- [x] [AI] Sweep any remaining `docs/` or `repo-governance/` file cross-referencing old names —
       acceptance:
       `grep -rnE '\bose-app-be\b|\bose-web\b|\bayokoding-web\b|\bwahidyankf-web\b|\borganiclever-app-be\b' docs/ repo-governance/`
       returns zero (excluding historical/plan-archive contexts under `plans/done/`).
-- [ ] [AI] Finalize specs: confirm `specs/apps/organiclever` reflects the web `*-app-*` shape + the
+- [x] [AI] Finalize specs: confirm `specs/apps/organiclever` reflects the web `*-app-*` shape + the
       `behavior/organiclever-www/` marketing tier + journal (backend `behavior/organiclever-be` kept);
       `specs/apps/ose` has `behavior/be`+`components/be` (renamed from `app-be`), `platform-web`
       annotated as `(= ose-www)`, media-free; `specs/apps/ayokoding` has `behavior/ayokoding-www`;
       `specs/apps/crane` crane-cli-only — run `specs-checker` on those four folders — acceptance: no
       CRITICAL/HIGH findings. - _Suggested executor: specs-fixer_
-- [ ] [AI] `grep -rnE 'crane-be|pdf-to-md|crane\.convert' docs/` — zero (crane-cli-scoped OK).
-- [ ] [AI] `npm run lint:md:fix && npm run format:md`; `npm run lint:md` — exits 0.
-- [ ] [AI] **Register the prod-cutover follow-on**: add `plans/backlog/YYYY-MM-DD__cutover-organiclever-web-app-tiers/`
+- [x] [AI] `grep -rnE 'crane-be|pdf-to-md|crane\.convert' docs/` — zero (crane-cli-scoped OK).
+- [x] [AI] `npm run lint:md:fix && npm run format:md`; `npm run lint:md` — exits 0.
+- [x] [AI] **Register the prod-cutover follow-on**: add `plans/backlog/YYYY-MM-DD__cutover-organiclever-web-app-tiers/`
       (or an `ideas.md` entry) capturing the deferred Vercel project + `app.organiclever.com` DNS +
       `prod-organiclever-www` / `prod-organiclever-app-web` branch wiring, **plus** the prod-branch
       renames for the `-www` public-website sites (`prod-ose-web` → `prod-ose-www`,
@@ -807,20 +807,20 @@ http://localhost:3200` — acceptance: page loads without errors.
 
 ### Phase 9 Gate
 
-- [ ] [AI] `grep -rnE 'axum|crane-be|\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b' docs/reference/monorepo-structure.md`
+- [x] [AI] `grep -rnE 'axum|crane-be|\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b' docs/reference/monorepo-structure.md`
       — zero.
-- [ ] [AI] `grep -nE '\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b|crane-be' AGENTS.md`
+- [x] [AI] `grep -nE '\bose-app-be\b|\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b|crane-be' AGENTS.md`
       — zero (renamed + crane removed).
-- [ ] [AI] **Repo-wide stale-name sweep**:
+- [x] [AI] **Repo-wide stale-name sweep**:
       `grep -rnE '\bose-app-be\b|\bose-web\b|\bayokoding-web\b|\bwahidyankf-web\b|\borganiclever-app-be\b' AGENTS.md docs/ repo-governance/ apps/*/README.md libs/*/README.md`
       — zero (excluding historical/plan-archive contexts).
-- [ ] [AI] `grep -rE '\bwww\b' repo-governance/conventions/structure/file-naming.md` — `www` app type
+- [x] [AI] `grep -rE '\bwww\b' repo-governance/conventions/structure/file-naming.md` — `www` app type
       documented.
-- [ ] [AI] `grep -rE 'Rust|Axum|sqlx|cargo' apps/ose-be/README.md apps/organiclever-be/README.md`
+- [x] [AI] `grep -rE 'Rust|Axum|sqlx|cargo' apps/ose-be/README.md apps/organiclever-be/README.md`
       — zero.
-- [ ] [AI] `grep -rnE 'crane-be|pdf-to-md|crane\.convert' docs/` — zero.
-- [ ] [AI] `specs-checker` on `specs/apps/{organiclever,ose,crane,ayokoding}` — no CRITICAL/HIGH.
-- [ ] [AI] **Final `apps/` inventory matches** the post-implementation table in
+- [x] [AI] `grep -rnE 'crane-be|pdf-to-md|crane\.convert' docs/` — zero.
+- [x] [AI] `specs-checker` on `specs/apps/{organiclever,ose,crane,ayokoding}` — no CRITICAL/HIGH.
+- [x] [AI] **Final `apps/` inventory matches** the post-implementation table in
       `tech-docs.md` (`## Final apps/ Inventory`): `ls -1 apps/ | grep -v '^README'` lists exactly the
       22 entries — `ayokoding-cli`, `ayokoding-www`, `ayokoding-www-be-e2e`, `ayokoding-www-fe-e2e`,
       `crane-cli`, `organiclever-app-web`, `organiclever-app-web-e2e`, `organiclever-be`,
@@ -829,8 +829,8 @@ http://localhost:3200` — acceptance: page loads without errors.
       `ose-www-fe-e2e`, `rhino-cli`, `wahidyankf-www`, `wahidyankf-www-fe-e2e` — and
       `test ! -d apps/crane-be && test ! -d apps/crane-be-e2e` (dropped). Acceptance: list matches
       exactly; no stale `*-web`/`ose-app-be`/`crane-be` entries remain.
-- [ ] [AI] `npm run lint:md` — exits 0.
-- [ ] [AI] Prod-cutover follow-on registered in `plans/`.
+- [x] [AI] `npm run lint:md` — exits 0.
+- [x] [AI] Prod-cutover follow-on registered in `plans/`.
 - [ ] [AI] CI `ci.yml` + `publish-images.yml` green for the final push.
 - [ ] [AI] `test -d plans/done/*restructure-fsharp-be-and-web-app-tiers` — present in `done/`.
 
