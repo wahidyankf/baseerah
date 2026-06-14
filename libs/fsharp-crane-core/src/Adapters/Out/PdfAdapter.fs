@@ -7,10 +7,10 @@ open CraneCore.Domain.PdfMetadata
 open CraneCore.Ports
 
 let private nullableToOption (s: string | null) =
-    if System.String.IsNullOrEmpty(s) then
-        None
-    else
-        Some(string (s: string))
+    match s with
+    | null
+    | "" -> None
+    | value -> Some value
 
 [<ExcludeFromCodeCoverage(Justification = "Integration-tested against real PDF files")>]
 type RealPdfAdapter() =
