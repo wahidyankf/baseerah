@@ -101,6 +101,6 @@
       "cache": true
     }
   },
-  "tags": ["type:lib", "domain:crane", "lang:dotnet"],
+  "tags": ["type:lib", "domain:crane", "lang:fsharp"],
   "implicitDependencies": []
 }

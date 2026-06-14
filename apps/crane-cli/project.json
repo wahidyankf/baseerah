@@ -119,6 +119,6 @@
       "cache": true
     }
   },
-  "tags": ["type:app", "platform:cli", "lang:dotnet", "domain:crane"],
+  "tags": ["type:app", "platform:cli", "lang:fsharp", "domain:crane"],
   "implicitDependencies": []
 }

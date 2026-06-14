@@ -230,7 +230,7 @@ Languages in this documentation are chosen based on:
 
 ### For Backend Developers
 
-1. **Rust backends** - See [organiclever-be](../../../../apps/organiclever-be/README.md) and [ose-app-be](../../../../apps/ose-app-be/README.md) for active examples
+1. **F# backends** - See [organiclever-be](../../../../apps/organiclever-be/README.md) and [ose-be](../../../../apps/ose-be/README.md) for active examples
 2. **Apply Rust standards** - [Rust Standards](./rust/README.md)
 3. **Hexagonal DDD** - [DDD + Hexagonal In Practice](../architecture/ddd-hexagonal-in-practice/README.md)
 4. **For F#/C# standards** - See language-specific README files
