@@ -46,9 +46,12 @@ plans. This plan covers only the Vercel-served `-www` and `-app-web` tiers.
 - **Retire obsolete branches** after cutover (`prod-ose-web`, `prod-ayokoding-web`,
   `prod-organiclever-web`, `prod-wahidyankf-web`, `stag-organiclever-web`).
 - **Update in-repo wiring artifacts**: each app's `vercel.json` `ignoreCommand`, the four
-  `apps-*-deployer` agent definitions (+ binding resync), the `.github/workflows/test-and-deploy-*`
-  and `deploy-organiclever-web-to-production` workflows, the `AGENTS.md` prod-branch list, the affected
-  app `README.md`s, and `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`.
+  `apps-*-deployer` agent definitions (+ binding resync), the full set of www/app-web GitHub Actions
+  workflows (the `_reusable-test-and-deploy` www callers, a new `organiclever-www` caller, and the
+  OrganicLever app-web dev/staging/promotion trio — see the
+  [tech-docs workflow inventory](./tech-docs.md#related-github-actions-workflows-complete-inventory)),
+  the `AGENTS.md` prod-branch list, the affected app `README.md`s, and
+  `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`.
 
 ### Out of scope
 

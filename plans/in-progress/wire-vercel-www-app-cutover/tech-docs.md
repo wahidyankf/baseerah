@@ -101,6 +101,62 @@ Vercel project. This plan's verification explicitly asserts their **absence** fr
 | organiclever-app-web | **Create new project** + DNS                        | `prod-organiclever-app-web` | `apps/organiclever-app-web` | app.organiclever.com |
 | ose-app-web          | **Create new project** + DNS                        | `prod-ose-app-web`          | `apps/ose-app-web`          | app.oseplatform.com  |
 
+## Related GitHub Actions workflows (complete inventory)
+
+`[Repo-grounded: .github/workflows/*.yml as of the .github CI cleanup]`
+
+Every deploy/staging/promotion workflow that names a cutover branch, environment, or app is listed
+below with its **current** references and the **cutover action**. Workflows that touch no cutover
+branch/app are listed under "Out of scope" so the inventory is provably complete.
+
+### www tier — direct deploy (thin callers of `_reusable-test-and-deploy.yml`)
+
+| Workflow file                          | Current refs                                        | Cutover action                                                                            |
+| -------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `_reusable-test-and-deploy.yml`        | force-pushes to `inputs.prod-branch` (no hardcoded) | **No change** — generic; callers pass the new inputs                                      |
+| `test-and-deploy-ose-web.yml`          | `app-name: ose-web`, `prod-branch: prod-ose-web`    | **Update inputs** → `app-name: ose-www`, `prod-branch: prod-ose-www`                      |
+| `test-and-deploy-ayokoding-web.yml`    | `ayokoding-web` / `prod-ayokoding-web`              | **Update inputs** → `ayokoding-www` / `prod-ayokoding-www`                                |
+| `test-and-deploy-wahidyankf-web.yml`   | `wahidyankf-web` / `prod-wahidyankf-web`            | **Update inputs** → `wahidyankf-www` / `prod-wahidyankf-www`                              |
+| `test-and-deploy-organiclever-www.yml` | **does not exist**                                  | **Create** — model on the wahidyankf caller; `organiclever-www` / `prod-organiclever-www` |
+
+> The three existing callers pass the **pre-restructure** `app-name`, so their nightly CRON currently
+> runs `nx run ose-web:…` against a project that is now `ose-www` — i.e. they are already failing. The
+> input update both fixes the build and repoints the deploy branch. `organiclever-www` (marketing) has
+> **no** deploy workflow today because the old OrganicLever workflow was migrated to the app-web tier
+> (see below), so a new caller is required.
+
+### app-web tier — gated promotion (dev → staging → dispatch promotion)
+
+`organiclever-app-web` — trio exists but still on **old** branch/env names → **update**:
+
+| Workflow file                                      | Current refs                                                                                     | Cutover action                                                                                                           |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `test-and-deploy-organiclever-web-development.yml` | tests `organiclever-app-web`; pushes `stag-organiclever-web`; env `organiclever-web-development` | **Update** staging branch → `stag-organiclever-app-web`; env → `organiclever-app-web-development`                        |
+| `test-organiclever-web-staging.yml`                | env `organiclever-web-staging`; `stag-organiclever-web` (comments)                               | **Update** env → `organiclever-app-web-staging`; branch refs → `stag-organiclever-app-web`                               |
+| `deploy-organiclever-web-to-production.yml`        | `stag-organiclever-web → prod-organiclever-web`; envs `organiclever-web-{staging,production}`    | **Update** → `stag-organiclever-app-web → prod-organiclever-app-web`; envs → `organiclever-app-web-{staging,production}` |
+
+`ose-app-web` — trio already provisioned with the **target** names → **verify only**:
+
+| Workflow file                                 | Current refs                                                                   | Cutover action                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------- |
+| `test-and-deploy-ose-app-web-development.yml` | pushes `stag-ose-app-web`; env `ose-app-web-development`                       | **Verify** — already correct, no edit |
+| `test-ose-app-web-staging.yml`                | `stag-ose-app-web`; env `ose-app-web-staging`                                  | **Verify** — already correct, no edit |
+| `deploy-ose-app-web-to-production.yml`        | `stag-ose-app-web → prod-ose-app-web`; envs `ose-app-web-{staging,production}` | **Verify** — already correct, no edit |
+
+### GitHub Actions Environments (HUMAN, dashboard)
+
+The staging/promotion jobs run under named **GitHub Actions Environments** that hold the deploy
+secrets — `STAGING_BASE_URL_ORGANICLEVER_APP_WEB`, `STAGING_BASE_URL_OSE_APP_WEB`, and the staging
+`WEB_BASE_URL` var. Renaming the OrganicLever environments to the `organiclever-app-web-*` form
+requires creating those environments in **repo Settings → Environments** and setting their secrets
+there (never in the repo). `ose-app-web-*` environments already match the workflow references.
+
+### Out of scope (no cutover branch/app)
+
+`publish-images.yml` (organiclever-be / ose-be GHCR images — owned by the ose-infra k3s plans),
+`pr-quality-gate.yml`, `validate-markdown.yml`, `validate-env.yml`, and
+`test-crane-cli-integration.yml` reference no cutover branch, environment, or web app.
+
 ## File-impact analysis (in-repo `[AI]` edits)
 
 - `apps/ose-www/vercel.json`, `apps/ayokoding-www/vercel.json`, `apps/wahidyankf-www/vercel.json` —
@@ -111,10 +167,10 @@ Vercel project. This plan's verification explicitly asserts their **absence** fr
   `description`, and the push target `prod-ose-web` → `prod-ose-www`. Same for `apps-ayokoding-web-deployer`,
   `apps-organiclever-web-deployer`, `apps-wahidyankf-web-deployer`. Add new `apps-ose-app-web-deployer`
   (model on an existing deployer). Run `npm run generate:bindings` to resync `.opencode/agents/`.
-- `.github/workflows/test-and-deploy-ose-web.yml`, `test-and-deploy-ayokoding-web.yml`,
-  `test-and-deploy-wahidyankf-web.yml`, and the OrganicLever
-  `deploy-organiclever-web-to-production.yml` — branch names + affected-path filters
-  `apps/<old>` → `apps/<new>`; add app-web deploy workflows.
+- `.github/workflows/` — every cutover-related workflow; see the
+  [complete inventory](#related-github-actions-workflows-complete-inventory) above for each file's
+  current refs and its update / create / verify action (4 www callers incl. a new `organiclever-www`
+  one, the OrganicLever app-web trio to rename, and the already-correct ose-app-web trio to verify).
 - `AGENTS.md` — the prod-branch list (lines ~231–234) and the per-site "Production branch" rows
   (~459, 471, 483, 495, 507).
 - `apps/ose-www/README.md`, `apps/ayokoding-www/README.md`, `apps/wahidyankf-www/README.md`,

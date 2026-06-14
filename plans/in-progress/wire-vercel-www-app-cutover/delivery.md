@@ -92,14 +92,29 @@ the worktree after the plan is archived and pushed.
 - [ ] [AI] Create `.claude/agents/apps-organiclever-app-web-deployer.md` similarly: `name: apps-organiclever-app-web-deployer`, production branch `prod-organiclever-app-web`, staging branch `stag-organiclever-app-web`, domain `app.organiclever.com` — acceptance: file exists and `grep 'prod-organiclever-app-web'` returns a match.
 - [ ] [AI] Run `npm run generate:bindings` to resync `.opencode/agents/` — acceptance: exits 0; `git diff --stat .opencode/agents/` shows agent mirror changes.
 
-### 1c — Update GitHub Actions deploy workflows
+### 1c — Update GitHub Actions workflows
 
-- [ ] [AI] Edit `.github/workflows/test-and-deploy-ose-web.yml`: update `push.branches` filter `prod-ose-web` → `prod-ose-www`, update `paths` filter `apps/ose-www/**` → `apps/ose-www/**`, update the force-push command target — acceptance: `grep 'prod-ose-web' .github/workflows/test-and-deploy-ose-web.yml` returns nothing. Do NOT rename the workflow file — keep existing filename `test-and-deploy-ose-web.yml` to preserve CI history. Only update the branch references and affected-path filters inside the file.
-- [ ] [AI] Edit `.github/workflows/test-and-deploy-ayokoding-web.yml`: same pattern → `prod-ayokoding-www`, `apps/ayokoding-www/**` — acceptance: no stale branch name.
-- [ ] [AI] Edit `.github/workflows/test-and-deploy-wahidyankf-web.yml` (if exists): `prod-wahidyankf-web` → `prod-wahidyankf-www`, `apps/wahidyankf-www/**` → `apps/wahidyankf-www/**` — acceptance: no stale branch name.
-- [ ] [AI] Edit `.github/workflows/deploy-organiclever-web-to-production.yml`: update staging branch `stag-organiclever-web` → `stag-organiclever-app-web`, production branch `prod-organiclever-web` → `prod-organiclever-app-web`, path filter `apps/organiclever-web/**` → `apps/organiclever-app-web/**` — acceptance: no stale names remain.
-- [ ] [AI] Create `.github/workflows/deploy-ose-app-web-to-production.yml` (model on updated `deploy-organiclever-web-to-production.yml`): staging → `stag-ose-app-web`, production → `prod-ose-app-web`, path filter `apps/ose-app-web/**` — acceptance: file exists, lints cleanly with actionlint.
-- [ ] [AI] Create `.github/workflows/deploy-organiclever-www-to-production.yml` for the marketing site direct deploy (model on `test-and-deploy-wahidyankf-web.yml`): branch `prod-organiclever-www`, path `apps/organiclever-www/**` — acceptance: file exists, lints cleanly.
+> Full inventory + per-file rationale: [tech-docs → Related GitHub Actions workflows](./tech-docs.md#related-github-actions-workflows-complete-inventory).
+> Keep existing filenames (preserve CI history); edit the branch/app/env references inside.
+
+**www tier — repoint the thin `_reusable-test-and-deploy` callers (these set `app-name`/`prod-branch` _inputs_, not push filters):**
+
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-ose-web.yml`: set `app-name: ose-www` and `prod-branch: prod-ose-www` — acceptance: `grep -E 'ose-web|prod-ose-web' .github/workflows/test-and-deploy-ose-web.yml` returns nothing.
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-ayokoding-web.yml`: `app-name: ayokoding-www`, `prod-branch: prod-ayokoding-www` — acceptance: no `ayokoding-web` / `prod-ayokoding-web`.
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-wahidyankf-web.yml`: `app-name: wahidyankf-www`, `prod-branch: prod-wahidyankf-www` — acceptance: no `wahidyankf-web` / `prod-wahidyankf-web`.
+- [ ] [AI] Create `.github/workflows/test-and-deploy-organiclever-www.yml` (model on `test-and-deploy-wahidyankf-web.yml`): thin caller of `_reusable-test-and-deploy.yml` with `app-name: organiclever-www`, `prod-branch: prod-organiclever-www` (marketing site has no deploy workflow today — the old OrganicLever workflow became app-web) — acceptance: file exists; `actionlint` clean.
+
+**app-web tier (organiclever) — update branch + environment names:**
+
+- [ ] [AI] Edit `.github/workflows/test-and-deploy-organiclever-web-development.yml`: staging push target `stag-organiclever-web` → `stag-organiclever-app-web`; environment `organiclever-web-development` → `organiclever-app-web-development` — acceptance: `grep -E 'stag-organiclever-web|organiclever-web-development' …` returns nothing.
+- [ ] [AI] Edit `.github/workflows/test-organiclever-web-staging.yml`: environment `organiclever-web-staging` → `organiclever-app-web-staging`; `stag-organiclever-web` refs → `stag-organiclever-app-web` — acceptance: no stale names.
+- [ ] [AI] Edit `.github/workflows/deploy-organiclever-web-to-production.yml`: `ref: stag-organiclever-web` → `stag-organiclever-app-web`; force-push target `prod-organiclever-web` → `prod-organiclever-app-web`; environments `organiclever-web-{staging,production}` → `organiclever-app-web-{staging,production}` — acceptance: `grep 'organiclever-web' .github/workflows/deploy-organiclever-web-to-production.yml` returns nothing.
+
+**app-web tier (ose) — verify only (already on target names):**
+
+- [ ] [AI] Verify `.github/workflows/test-and-deploy-ose-app-web-development.yml`, `test-ose-app-web-staging.yml`, and `deploy-ose-app-web-to-production.yml` already reference `stag-ose-app-web` / `prod-ose-app-web` / `ose-app-web-*` environments — acceptance: `grep -rnE 'prod-ose-web\b|stag-ose-web\b' .github/workflows/*ose-app-web*.yml` returns nothing; no edit needed.
+
+- [ ] [AI] Run `actionlint .github/workflows/*.yml` — acceptance: zero errors across edited + created workflows.
 
 ### 1d — Update AGENTS.md and app READMEs
 
@@ -140,6 +155,8 @@ the worktree after the plan is archived and pushed.
 > All checks below must pass before starting Phase 2.
 
 - [ ] [AI] `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web\b' apps/ .claude/agents/ .github/workflows/ AGENTS.md docs/` — acceptance: zero matches.
+- [ ] [AI] `rg 'stag-organiclever-web\b|organiclever-web-(development|staging|production)' .github/workflows/` — acceptance: zero matches (OrganicLever app-web staging branch + environments renamed to `*-app-web-*`).
+- [ ] [AI] `actionlint .github/workflows/*.yml` — acceptance: zero errors (all edited + created workflows valid).
 - [ ] [AI] `npx nx run rhino-cli:links:validation` — acceptance: exits 0.
 - [ ] [AI] `npx nx run rhino-cli:mermaid:validation` — acceptance: exits 0.
 - [ ] [AI] No literal staging URL committed anywhere: `git grep -nE 'https?://[a-z0-9.-]*stag'` — acceptance: zero matches (staging URLs live only in Vercel + GitHub Actions secrets).
@@ -206,6 +223,7 @@ the worktree after the plan is archived and pushed.
 - [ ] [HUMAN] Add DNS CNAME for `app.organiclever.com` → the Vercel-assigned `*.vercel.app` target — acceptance: `dig app.organiclever.com CNAME` shows the Vercel target; `curl -sI https://app.organiclever.com | head -1` → 200 (DNS may take up to 48 h to propagate).
 - [ ] [HUMAN] **Create new Vercel project** `ose-app-web`: connect repo, Root `apps/ose-app-web`, Production Branch `prod-ose-app-web`, staging/preview `stag-ose-app-web`; deploy from the dashboard — acceptance: Vercel shows a green build. Confirm Vercel also serves `stag-ose-app-web` at its staging URL/domain; store that staging URL ONLY in Vercel + the GitHub Actions secret `STAGING_BASE_URL_OSE_APP_WEB` — never paste it into the repo or this checklist.
 - [ ] [HUMAN] Add DNS CNAME for `app.oseplatform.com` → Vercel target — acceptance: `dig app.oseplatform.com CNAME` resolves; `curl -sI https://app.oseplatform.com | head -1` → 200.
+- [ ] [HUMAN] In repo **Settings → Environments**, create `organiclever-app-web-{development,staging,production}` (and confirm `ose-app-web-{development,staging,production}` already exist); on each `*-staging` environment set the staging-URL secret (`STAGING_BASE_URL_ORGANICLEVER_APP_WEB` / `STAGING_BASE_URL_OSE_APP_WEB`) and the staging `WEB_BASE_URL` var — acceptance: every environment named by a workflow exists with its secrets/vars; no secret value is committed to the repo.
 
 ### Phase 3 Gate
 
