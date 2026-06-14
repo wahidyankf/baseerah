@@ -1,0 +1,14 @@
+namespace OseBe.Contexts.InternalPolicy
+
+open OseBe.Infrastructure.AppDbContext
+open OseBe.Infrastructure.Repositories.RepositoryTypes
+open OseBe.Infrastructure.Repositories.EfRepositories
+
+/// Infrastructure adapters for the internal-policy bounded context.
+///
+/// Adapts the shared EF internal-policy-document repository for this context's
+/// storage port.
+module Infrastructure =
+
+    /// The EF-backed document repository for this context.
+    let repository (db: AppDbContext) : InternalPolicyDocumentRepository = internalPolicyDocumentRepository db

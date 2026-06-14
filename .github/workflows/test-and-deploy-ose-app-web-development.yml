@@ -28,7 +28,7 @@ jobs:
       - uses: ./.github/actions/setup-golang
       - name: Run specs:coverage for all OSE Application projects
         run: |
-          npx nx run ose-app-be:specs:coverage
+          npx nx run ose-be:specs:coverage
           npx nx run ose-app-web:specs:coverage
 
   fe-lint:
@@ -53,16 +53,16 @@ jobs:
       - name: Generate contract types for backend
         run: |
           npx nx run ose-app-contracts:bundle
-          npx nx run ose-app-be:codegen
+          npx nx run ose-be:codegen
 
       - name: Run integration tests
         run: |
-          docker compose -f apps/ose-app-be/docker-compose.integration.yml down -v 2>/dev/null || true
-          docker compose -f apps/ose-app-be/docker-compose.integration.yml up --abort-on-container-exit --build
+          docker compose -f apps/ose-be/docker-compose.integration.yml down -v 2>/dev/null || true
+          docker compose -f apps/ose-be/docker-compose.integration.yml up --abort-on-container-exit --build
 
       - name: Teardown integration
         if: always()
-        run: docker compose -f apps/ose-app-be/docker-compose.integration.yml down -v
+        run: docker compose -f apps/ose-be/docker-compose.integration.yml down -v
 
   fe-integration:
     name: FE integration tests
@@ -95,7 +95,7 @@ jobs:
       - name: Generate contract types
         run: |
           npx nx run ose-app-contracts:bundle
-          npx nx run ose-app-be:codegen
+          npx nx run ose-be:codegen
           npx nx run ose-app-web:codegen
 
       - name: Start full stack (backend + frontend)
@@ -113,7 +113,7 @@ jobs:
             sleep 10
           done
           echo "Backend did not become healthy within 6 minutes"
-          docker compose -f infra/dev/ose-app/docker-compose.yml -f infra/dev/ose-app/docker-compose.ci.yml logs ose-app-be
+          docker compose -f infra/dev/ose-app/docker-compose.yml -f infra/dev/ose-app/docker-compose.ci.yml logs ose-be
           exit 1
 
       - name: Wait for frontend to be ready
@@ -134,7 +134,7 @@ jobs:
       - uses: ./.github/actions/setup-playwright
 
       - name: Run BE E2E tests
-        run: npx nx run ose-app-be-e2e:test:e2e
+        run: npx nx run ose-be-e2e:test:e2e
         env:
           BASE_URL: http://localhost:8302
 
@@ -142,8 +142,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report-ose-app-be
-          path: apps/ose-app-be-e2e/playwright-report/
+          name: playwright-report-ose-be
+          path: apps/ose-be-e2e/playwright-report/
           retention-days: 7
 
       - name: Run FE E2E tests

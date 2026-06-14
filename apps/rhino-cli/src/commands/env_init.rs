@@ -121,7 +121,7 @@ mod tests {
     fn collect_examples_finds_apps_env_example() {
         let tmp = TempDir::new().unwrap();
         make_fixture(&tmp, "infra/dev/organiclever/.env.example");
-        make_fixture(&tmp, "apps/ose-app-be/.env.example");
+        make_fixture(&tmp, "apps/ose-be/.env.example");
 
         let found: Vec<String> = collect_examples(tmp.path())
             .into_iter()
@@ -134,8 +134,8 @@ mod tests {
             .collect();
 
         assert!(
-            found.contains(&"apps/ose-app-be/.env.example".to_string()),
-            "apps/ose-app-be/.env.example must be discovered; got: {found:?}"
+            found.contains(&"apps/ose-be/.env.example".to_string()),
+            "apps/ose-be/.env.example must be discovered; got: {found:?}"
         );
     }
 }

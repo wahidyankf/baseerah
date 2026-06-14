@@ -5,6 +5,6 @@ Feature: Internal policy context
 
   # Stub — detailed scenarios added in internal-policy feature plan
   Scenario: Internal policy context is declared
-    Given the ose-app-be service is running
+    Given the ose-be service is running
     When the internal-policy bounded context is initialized
     Then the context is ready to accept internal policy documents

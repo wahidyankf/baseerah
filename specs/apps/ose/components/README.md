@@ -4,7 +4,7 @@ C4 Level 3: per-container internals for all OSE-family deployables.
 
 ## OSE Application (`ose-app-*`)
 
-- [app-be/](./app-be/) — ose-app-be (Rust/Axum) component specs
+- [be/](./be/) — ose-be (F#/Giraffe) component specs
 
 ## OSE Platform Web (`ose-web`)
 

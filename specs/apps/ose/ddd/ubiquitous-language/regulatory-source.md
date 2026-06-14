@@ -1,7 +1,7 @@
 # Ubiquitous Language — regulatory-source
 
 **Bounded context**: `regulatory-source`
-**Maintainer**: ose-app-be team
+**Maintainer**: ose-be team
 **Last reviewed**: 2026-05-13
 
 ## Responsibility

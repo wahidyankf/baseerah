@@ -1,0 +1,25 @@
+namespace OseBe.Contexts.Db
+
+open System.Reflection
+open DbUp
+
+/// Infrastructure layer for the db bounded context: the on-boot migration
+/// routine. The Rust db context's migration orchestration is absorbed here by
+/// DbUp, which applies the embedded db/migrations/*.sql scripts before the HTTP
+/// server starts (decision #24).
+module Infrastructure =
+
+    /// Applies all pending embedded migrations to the given PostgreSQL connection
+    /// string. The migration scripts live as embedded resources in the OseBe
+    /// assembly. Fails fast if any script cannot be applied.
+    let runMigrations (connStr: string) : unit =
+        let result =
+            DeployChanges.To
+                .PostgresqlDatabase(connStr)
+                .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                .LogToConsole()
+                .Build()
+                .PerformUpgrade()
+
+        if not result.Successful then
+            failwith (sprintf "Database migration failed: %s" result.Error.Message)

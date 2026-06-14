@@ -5,6 +5,6 @@ Feature: Gap analysis context
 
   # Stub — detailed scenarios added in gap-analysis feature plan
   Scenario: Gap analysis context is declared
-    Given the ose-app-be service is running
+    Given the ose-be service is running
     When the gap-analysis bounded context is initialized
     Then the context is ready to compare regulatory and policy documents

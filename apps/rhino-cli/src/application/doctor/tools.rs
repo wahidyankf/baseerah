@@ -96,7 +96,7 @@ struct Paths {
     python_version: PathBuf,
     /// Path to the root `.tool-versions` file (for Elixir / Erlang).
     tool_versions: PathBuf,
-    /// Path to `apps/ose-app-be/global.json` (for .NET `sdk.version`).
+    /// Path to `apps/ose-be/global.json` (for .NET `sdk.version`).
     global_json: PathBuf,
     /// Path to the Flutter `pubspec.yaml` (for Dart SDK / Flutter versions).
     pubspec: PathBuf,
@@ -120,10 +120,7 @@ fn set_paths(repo_root: &Path) {
             .join("a-demo-be-python-fastapi")
             .join(".python-version"),
         tool_versions: repo_root.join(".tool-versions"),
-        global_json: repo_root
-            .join("apps")
-            .join("ose-app-be")
-            .join("global.json"),
+        global_json: repo_root.join("apps").join("ose-be").join("global.json"),
         pubspec: repo_root
             .join("apps")
             .join("a-demo-fe-dart-flutterweb")
@@ -761,7 +758,7 @@ fn tool_defs_dotnet_and_mobile() -> Vec<ToolDef> {
         ToolDef {
             name: "dotnet".into(),
             binary: "dotnet".into(),
-            source: "apps/ose-app-be/global.json → sdk.version".into(),
+            source: "apps/ose-be/global.json → sdk.version".into(),
             args: vec!["--version".into()],
             use_stderr: false,
             parse_ver: parse_dotnet_version,

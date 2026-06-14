@@ -29,8 +29,8 @@ COPY apps/ose-app-web/package.json apps/ose-app-web/tsconfig.json apps/ose-app-w
 # RUN npx @hey-api/openapi-ts -i specs/apps/ose-app/containers/contracts/generated/openapi-bundled.yaml -o src/generated-contracts -s
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ARG OSE_APP_BE_URL=http://ose-app-be:8202
-ENV OSE_APP_BE_URL=${OSE_APP_BE_URL}
+ARG OSE_BE_URL=http://ose-be:8202
+ENV OSE_BE_URL=${OSE_BE_URL}
 RUN npx next build
 
 FROM node:24-alpine

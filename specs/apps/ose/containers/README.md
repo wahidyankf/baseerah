@@ -4,7 +4,7 @@ Container-level specifications for all OSE-family deployables.
 
 ## OSE Application (`ose-app-*`)
 
-- [container.md](./container.md) — C4 container diagram (ose-app-web + ose-app-be + PostgreSQL + OpenRouter)
+- [container.md](./container.md) — C4 container diagram (ose-app-web + ose-be + PostgreSQL + OpenRouter)
 - [deployment.md](./deployment.md) — Deployment topology
 - [contracts/](./contracts/) — OpenAPI 3.1 contract spec (`ose-contracts` Nx project)
 

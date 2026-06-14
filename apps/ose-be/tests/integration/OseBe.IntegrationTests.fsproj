@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Steps/DbMigrationSteps.fs" />
     <Compile Include="DatabaseBootTests.fs" />
   </ItemGroup>
 
@@ -19,10 +20,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="TickSpec" Version="2.0.5" />
+    <PackageReference Include="Npgsql" Version="10.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/OseAppBe/OseAppBe.fsproj" />
+    <ProjectReference Include="../../src/OseBe/OseBe.fsproj" />
   </ItemGroup>
 
 </Project>

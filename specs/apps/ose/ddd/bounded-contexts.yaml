@@ -6,16 +6,16 @@ contexts:
       Liveness endpoint — advertises service health to orchestrators and
       monitoring systems. Stateless, no DB dependency.
     layers:
-      - domain
-      - application
-      - infrastructure
-      - api
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/ose-app-be/src/contexts/health
+      - apps/ose-be/src/OseBe/Contexts/Health
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/health.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/health
+    gherkin: specs/apps/ose/behavior/be/gherkin/health
 
   - name: regulatory-source
     summary: >-
@@ -23,16 +23,16 @@ contexts:
       with provenance metadata. Acts as the authoritative source for all
       regulatory text consumed by gap-analysis.
     layers:
-      - domain
-      - application
-      - infrastructure
-      - api
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/ose-app-be/src/contexts/regulatory-source
+      - apps/ose-be/src/OseBe/Contexts/RegulatorySource
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/regulatory-source.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/regulatory-source
+    gherkin: specs/apps/ose/behavior/be/gherkin/regulatory-source
     relationships:
       - to: gap-analysis
         kind: customer-supplier
@@ -44,16 +44,16 @@ contexts:
       with version and scope metadata. Acts as the authoritative source for all
       internal policy text consumed by gap-analysis.
     layers:
-      - domain
-      - application
-      - infrastructure
-      - api
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/ose-app-be/src/contexts/internal-policy
+      - apps/ose-be/src/OseBe/Contexts/InternalPolicy
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/internal-policy.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/internal-policy
+    gherkin: specs/apps/ose/behavior/be/gherkin/internal-policy
     relationships:
       - to: gap-analysis
         kind: customer-supplier
@@ -65,16 +65,16 @@ contexts:
       emits structured GapItem records. Orchestrates calls to ai-orchestration
       for LLM-assisted comparison. Owns the gap report lifecycle.
     layers:
-      - domain
-      - application
-      - infrastructure
-      - api
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/ose-app-be/src/contexts/gap-analysis
+      - apps/ose-be/src/OseBe/Contexts/GapAnalysis
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/gap-analysis.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/gap-analysis
+    gherkin: specs/apps/ose/behavior/be/gherkin/gap-analysis
     relationships:
       - to: regulatory-source
         kind: customer-supplier
@@ -92,16 +92,16 @@ contexts:
       token-budget accounting. Stateless from the BE side — does not persist
       LLM outputs.
     layers:
-      - domain
-      - application
-      - infrastructure
-      - api
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/ose-app-be/src/contexts/ai-orchestration
+      - apps/ose-be/src/OseBe/Contexts/AiOrchestration
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/ai-orchestration.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/ai-orchestration
+    gherkin: specs/apps/ose/behavior/be/gherkin/ai-orchestration
     relationships:
       - to: gap-analysis
         kind: customer-supplier
@@ -109,25 +109,31 @@ contexts:
 
   - name: db
     summary: >-
-      Database schema lifecycle — applies pending sqlx migrations on boot before
-      the HTTP server starts. Ensures the schema is always up-to-date without
-      manual intervention. Cross-cutting infrastructure concern.
+      Database schema lifecycle — applies pending DbUp embedded migrations on
+      boot before the HTTP server starts. Ensures the schema is always
+      up-to-date without manual intervention. Cross-cutting infrastructure
+      concern.
     layers:
-      - infrastructure
+      - Infrastructure
     code:
-      - apps/ose-app-be/src/contexts/db
+      - apps/ose-be/src/OseBe/Contexts/Db
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/db.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/db
+    gherkin: specs/apps/ose/behavior/be/gherkin/db
 
   - name: messaging
     summary: >-
       NATS client and JetStream durable stream demo. Connects to NATS at startup
       (fail-fast on missing URL), publishes and acks on ose-app.messaging.demo.
+    layers:
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/ose-app-be/src/contexts/messaging
+      - apps/ose-be/src/OseBe/Contexts/Messaging
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/ose/ddd/ubiquitous-language/messaging.md
-    gherkin: specs/apps/ose/behavior/app-be/gherkin/messaging
+    gherkin: specs/apps/ose/behavior/be/gherkin/messaging

@@ -5,6 +5,6 @@ Feature: Regulatory source context
 
   # Stub — detailed scenarios added in regulatory-source feature plan
   Scenario: Regulatory source context is declared
-    Given the ose-app-be service is running
+    Given the ose-be service is running
     When the regulatory-source bounded context is initialized
     Then the context is ready to accept regulatory documents

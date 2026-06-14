@@ -1,7 +1,7 @@
 # Ubiquitous Language — gap-analysis
 
 **Bounded context**: `gap-analysis`
-**Maintainer**: ose-app-be team
+**Maintainer**: ose-be team
 **Last reviewed**: 2026-05-13
 
 ## Responsibility

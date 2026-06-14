@@ -5,6 +5,6 @@ Feature: AI orchestration context
 
   # Stub — detailed scenarios added in ai-orchestration feature plan
   Scenario: AI orchestration context is declared
-    Given the ose-app-be service is running
+    Given the ose-be service is running
     When the ai-orchestration bounded context is initialized
     Then the context is ready to wrap LLM calls via OpenRouter

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       build-organiclever-be: ${{ steps.detect.outputs.build-organiclever-be }}
-      build-ose-app-be: ${{ steps.detect.outputs.build-ose-app-be }}
+      build-ose-be: ${{ steps.detect.outputs.build-ose-be }}
     env:
       NX_BASE: ${{ github.event.before }}
       NX_HEAD: ${{ github.sha }}
@@ -34,12 +34,12 @@ jobs:
           AFFECTED=$(npx nx show projects --affected 2>/dev/null || echo "")
           {
             echo "build-organiclever-be=false"
-            echo "build-ose-app-be=false"
+            echo "build-ose-be=false"
           } >> "$GITHUB_OUTPUT"
           for project in $AFFECTED; do
             case "$project" in
               organiclever-be) echo "build-organiclever-be=true" >> "$GITHUB_OUTPUT" ;;
-              ose-app-be) echo "build-ose-app-be=true" >> "$GITHUB_OUTPUT" ;;
+              ose-be) echo "build-ose-be=true" >> "$GITHUB_OUTPUT" ;;
             esac
           done
 
@@ -64,10 +64,10 @@ jobs:
           docker push ghcr.io/wahidyankf/organiclever-be:latest
           docker push ghcr.io/wahidyankf/organiclever-be:${{ github.sha }}
 
-  publish-ose-app-be:
-    name: Publish ose-app-be
+  publish-ose-be:
+    name: Publish ose-be
     needs: detect
-    if: needs.detect.outputs.build-ose-app-be == 'true'
+    if: needs.detect.outputs.build-ose-be == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -76,11 +76,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push ose-app-be
+      - name: Build and push ose-be
         run: |
-          docker build -f apps/ose-app-be/Dockerfile \
-            -t ghcr.io/wahidyankf/ose-app-be:latest \
-            -t ghcr.io/wahidyankf/ose-app-be:${{ github.sha }} \
+          docker build -f apps/ose-be/Dockerfile \
+            -t ghcr.io/wahidyankf/ose-be:latest \
+            -t ghcr.io/wahidyankf/ose-be:${{ github.sha }} \
             .
-          docker push ghcr.io/wahidyankf/ose-app-be:latest
-          docker push ghcr.io/wahidyankf/ose-app-be:${{ github.sha }}
+          docker push ghcr.io/wahidyankf/ose-be:latest
+          docker push ghcr.io/wahidyankf/ose-be:${{ github.sha }}

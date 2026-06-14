@@ -4,7 +4,7 @@ Playwright-BDD frontend E2E tests for ose-app-web.
 
 ## Quick Start
 
-1. Start dev servers: `nx dev ose-app-web` and `nx dev ose-app-be`
+1. Start dev servers: `nx dev ose-app-web` and `nx dev ose-be`
 2. Run E2E: `nx run ose-app-web-e2e:test:e2e`
 
 ## Commands

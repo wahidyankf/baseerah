@@ -19,17 +19,17 @@ surfaces:
       - ORGANICLEVER_BE_PORT
       - ORGANICLEVER_BE_CORS_ORIGINS
 
-  - root: apps/ose-app-be
+  - root: apps/ose-be
     kind: app
     lang: fsharp
     allowlist:
       # Forward-declared config not yet consumed by the Phase 1 F# shell
       # (port/CORS + OpenRouter wired in later phases); declared ahead of use.
-      - OSE_APP_BE_PORT
-      - OSE_APP_BE_CORS_ORIGINS
-      - OSE_APP_BE_OPENROUTER_API_KEY
-      - OSE_APP_BE_OPENROUTER_MODEL
-      - OSE_APP_BE_OPENROUTER_BASE_URL
+      - OSE_BE_PORT
+      - OSE_BE_CORS_ORIGINS
+      - OSE_BE_OPENROUTER_API_KEY
+      - OSE_BE_OPENROUTER_MODEL
+      - OSE_BE_OPENROUTER_BASE_URL
 
   - root: apps/ose-web
     kind: app

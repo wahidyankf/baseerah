@@ -1,68 +1,68 @@
 {
-  "name": "ose-app-be-e2e",
+  "name": "ose-be-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "apps/ose-app-be-e2e/steps",
+  "sourceRoot": "apps/ose-be-e2e/steps",
   "targets": {
     "install": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npm install",
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       }
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx oxlint@latest .",
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       }
     },
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx bddgen && npx tsc --noEmit",
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       },
-      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature"]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature"]
     },
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
         "commands": ["npx oxlint@latest .", "npx bddgen && npx tsc --noEmit"],
         "parallel": true,
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       },
-      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature"]
+      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx bddgen && npx playwright test",
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       }
     },
     "test:e2e:ui": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx bddgen && npx playwright test --ui",
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       }
     },
     "test:e2e:report": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx playwright show-report",
-        "cwd": "apps/ose-app-be-e2e"
+        "cwd": "apps/ose-be-e2e"
       }
     },
     "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir db specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be-e2e"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir db specs/apps/ose/behavior/be/gherkin apps/ose-be-e2e"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/steps/**/*.ts"]
+      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature", "{projectRoot}/steps/**/*.ts"]
     },
     "test:unit": {
       "executor": "nx:run-commands",
@@ -87,5 +87,5 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
-  "implicitDependencies": ["ose-app-be"]
+  "implicitDependencies": ["ose-be"]
 }

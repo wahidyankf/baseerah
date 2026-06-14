@@ -1,7 +1,7 @@
 # Ubiquitous Language — health
 
 **Bounded context**: `health`
-**Maintainer**: ose-app-be team
+**Maintainer**: ose-be team
 **Last reviewed**: 2026-05-27
 
 ## Responsibility
@@ -14,7 +14,7 @@ systems to determine whether the service is ready to handle traffic.
 | Term          | Code identifier(s)       | Used in features |
 | ------------- | ------------------------ | ---------------- |
 | health status | `HealthStatus`, `status` | health.feature   |
-| get health    | `get_health`             | health.feature   |
+| get health    | `getHealth`              | health.feature   |
 
 ## Out of scope
 

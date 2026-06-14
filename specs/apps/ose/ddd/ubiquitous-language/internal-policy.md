@@ -1,7 +1,7 @@
 # Ubiquitous Language — internal-policy
 
 **Bounded context**: `internal-policy`
-**Maintainer**: ose-app-be team
+**Maintainer**: ose-be team
 **Last reviewed**: 2026-05-13
 
 ## Responsibility

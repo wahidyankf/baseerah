@@ -8,7 +8,7 @@
 
 graph TD
     WEB["ose-app-web<br/>Next.js 16<br/>port 3300"]:::app
-    BE["ose-app-be<br/>Rust/Axum<br/>port 8302"]:::app
+    BE["ose-be<br/>Rust/Axum<br/>port 8302"]:::app
     PG["PostgreSQL 17<br/>Documents + Gap Reports"]:::data
     OR["OpenRouter API<br/>LLM gateway"]:::external
 
@@ -24,7 +24,7 @@ graph TD
 | Container      | Technology             | Port | Purpose                                            |
 | -------------- | ---------------------- | ---- | -------------------------------------------------- |
 | `ose-app-web`  | Next.js 16, TypeScript | 3300 | Frontend SPA — document upload UI, gap report view |
-| `ose-app-be`   | Rust/Axum              | 8302 | REST API — document ingestion, gap analysis engine |
+| `ose-be`       | Rust/Axum              | 8302 | REST API — document ingestion, gap analysis engine |
 | PostgreSQL 17  | Docker (dev), managed  | 5432 | Persistence for documents, policies, gap reports   |
 | OpenRouter API | External HTTP API      | —    | LLM gateway for AI-assisted gap analysis           |
 

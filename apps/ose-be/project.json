@@ -1,13 +1,13 @@
 {
-  "name": "ose-app-be",
+  "name": "ose-be",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/ose-app-be/src",
+  "sourceRoot": "apps/ose-be/src",
   "projectType": "application",
   "targets": {
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/ose/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/ose-app-be/generated-contracts --model-package OseAppBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
+        "command": "npx openapi-generator-cli generate -i $(pwd)/specs/apps/ose/containers/contracts/generated/openapi-bundled.yaml -g fsharp-giraffe-server -o $(pwd)/apps/ose-be/generated-contracts --model-package OseBe.Contracts --global-property=models,modelDocs=false,apiDocs=false"
       },
       "dependsOn": ["ose-contracts:bundle"],
       "cache": true,
@@ -17,14 +17,14 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet publish apps/ose-app-be/src/OseAppBe/OseAppBe.fsproj -c Release -o apps/ose-app-be/dist"
+        "command": "dotnet publish apps/ose-be/src/OseBe/OseBe.fsproj -c Release -o apps/ose-be/dist"
       },
       "dependsOn": ["codegen"],
       "outputs": ["{projectRoot}/dist"],
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
-        "{projectRoot}/src/OseAppBe/OseAppBe.fsproj",
+        "{projectRoot}/src/OseBe/OseBe.fsproj",
         "{projectRoot}/db/migrations/**/*.sql",
         "{projectRoot}/generated-contracts/**/*.fs"
       ]
@@ -32,13 +32,13 @@
     "typecheck": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet build apps/ose-app-be/src/OseAppBe/OseAppBe.fsproj"
+        "command": "dotnet build apps/ose-be/src/OseBe/OseBe.fsproj"
       },
       "dependsOn": ["codegen"],
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
-        "{projectRoot}/src/OseAppBe/OseAppBe.fsproj",
+        "{projectRoot}/src/OseBe/OseBe.fsproj",
         "{projectRoot}/db/migrations/**/*.sql",
         "{projectRoot}/generated-contracts/**/*.fs"
       ]
@@ -47,25 +47,25 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "fantomas --check apps/ose-app-be/src",
-          "dotnet fsharplint lint apps/ose-app-be/src/OseAppBe/OseAppBe.fsproj --lint-config apps/ose-app-be/fsharplint.json",
-          "dotnet tool restore && dotnet fsharp-analyzers --project apps/ose-app-be/src/OseAppBe/OseAppBe.fsproj --analyzers-path $(find $(dotnet nuget locals global-packages --list | sed 's/.*: //')g-research.fsharp.analyzers -path '*/analyzers/dotnet/fs' -type d | head -1) --treat-as-error GRA-STRING-001 GRA-STRING-002 GRA-STRING-003 GRA-STRING-004 GRA-UNIONCASE-001 GRA-VIRTUALCALL-001 GRA-JSONOPTS-001 GRA-DISPBEFOREASYNC-001 GRA-IMMUTABLECOLLECTIONEQUALITY-001 GRA-LOGARGFUNCFULLAPP-001 GRA-LOGTEMPLMISSVALS-001 GRA-TYPE-ANNOTATE-001 GRA-INTERPOLATED-001"
+          "fantomas --check apps/ose-be/src",
+          "dotnet fsharplint lint apps/ose-be/src/OseBe/OseBe.fsproj --lint-config apps/ose-be/fsharplint.json",
+          "dotnet tool restore && dotnet fsharp-analyzers --project apps/ose-be/src/OseBe/OseBe.fsproj --analyzers-path $(find $(dotnet nuget locals global-packages --list | sed 's/.*: //')g-research.fsharp.analyzers -path '*/analyzers/dotnet/fs' -type d | head -1) --treat-as-error GRA-STRING-001 GRA-STRING-002 GRA-STRING-003 GRA-STRING-004 GRA-UNIONCASE-001 GRA-VIRTUALCALL-001 GRA-JSONOPTS-001 GRA-DISPBEFOREASYNC-001 GRA-IMMUTABLECOLLECTIONEQUALITY-001 GRA-LOGARGFUNCFULLAPP-001 GRA-LOGTEMPLMISSVALS-001 GRA-TYPE-ANNOTATE-001 GRA-INTERPOLATED-001"
         ],
         "parallel": false
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/OseAppBe/OseAppBe.fsproj"]
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/OseBe/OseBe.fsproj"]
     },
     "fmt": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "fantomas apps/ose-app-be/src"
+        "command": "fantomas apps/ose-be/src"
       }
     },
     "format:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "fantomas --check apps/ose-app-be/src"
+        "command": "fantomas --check apps/ose-be/src"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs"]
@@ -73,53 +73,53 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet watch run --project apps/ose-app-be/src/OseAppBe/OseAppBe.fsproj"
+        "command": "dotnet watch run --project apps/ose-be/src/OseBe/OseBe.fsproj"
       }
     },
     "run": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet run --project apps/ose-app-be/src/OseAppBe/OseAppBe.fsproj"
+        "command": "dotnet run --project apps/ose-be/src/OseBe/OseBe.fsproj"
       }
     },
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/ose-app-be/tests/unit/OseAppBe.UnitTests.fsproj"
+        "command": "dotnet test apps/ose-be/tests/unit/OseBe.UnitTests.fsproj"
       },
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
         "{projectRoot}/tests/unit/**/*.fs",
-        "{projectRoot}/src/OseAppBe/OseAppBe.fsproj"
+        "{projectRoot}/src/OseBe/OseBe.fsproj"
       ]
     },
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/ose-app-be/tests/unit/OseAppBe.UnitTests.fsproj"
+        "command": "dotnet test apps/ose-be/tests/unit/OseBe.UnitTests.fsproj"
       },
       "cache": true,
       "inputs": [
         "{projectRoot}/src/**/*.fs",
         "{projectRoot}/tests/unit/**/*.fs",
-        "{projectRoot}/src/OseAppBe/OseAppBe.fsproj"
+        "{projectRoot}/src/OseBe/OseBe.fsproj"
       ]
     },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "apps/ose-app-be/scripts/run-integration.sh"
+        "command": "apps/ose-be/scripts/run-integration.sh"
       },
       "cache": false
     },
     "specs:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir regulatory-source --exclude-dir internal-policy --exclude-dir gap-analysis --exclude-dir ai-orchestration --exclude-dir messaging specs/apps/ose/behavior/app-be/gherkin apps/ose-app-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir messaging specs/apps/ose/behavior/be/gherkin apps/ose-be"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/app-be/gherkin/**/*.feature", "{projectRoot}/src/**/*.fs"]
+      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature", "{projectRoot}/src/**/*.fs"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",

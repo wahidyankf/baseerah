@@ -1,6 +1,6 @@
 # OSE Application BE — Gherkin Scenarios
 
-Backend (HTTP-semantic) Gherkin scenarios for `ose-app-be`. Consumed by xUnit + TickSpec.
+Backend (HTTP-semantic) Gherkin scenarios for `ose-be`. Consumed by xUnit + TickSpec.
 
 ## Feature files
 

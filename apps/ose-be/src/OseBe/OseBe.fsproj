@@ -3,8 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <AssemblyName>OseAppBe</AssemblyName>
-    <RootNamespace>OseAppBe</RootNamespace>
+    <AssemblyName>OseBe</AssemblyName>
+    <RootNamespace>OseBe</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
     <OtherFlags>--warnon:1182 --nowarn:3261 --nowarn:3264 --nowarn:3511</OtherFlags>
@@ -17,14 +17,50 @@
     <!-- Generated contract types from OpenAPI spec (generated-contracts/, gitignored).
          Only the usable models are wired; ErrorResponse.fs is generated but excluded
          (it references an AnyType module the generator does not emit). -->
-    <Compile Include="..\..\generated-contracts\OpenAPI\src\OseAppBe.Contracts\HealthResponse.fs" />
-    <!-- Infrastructure: EF Core context + DbUp bootstrap + NATS client -->
+    <Compile Include="..\..\generated-contracts\OpenAPI\src\OseBe.Contracts\HealthResponse.fs" />
+    <!-- Shared domain (the only cross-context coupling) -->
+    <Compile Include="Domain/Readiness.fs" />
+    <!-- Shared infrastructure: EF Core context + repositories + OpenRouter + DbUp config + NATS -->
     <Compile Include="Infrastructure/AppDbContext.fs" />
+    <Compile Include="Infrastructure/Repositories/RepositoryTypes.fs" />
+    <Compile Include="Infrastructure/Repositories/EfRepositories.fs" />
+    <Compile Include="Infrastructure/OpenRouterClient.fs" />
     <Compile Include="Infrastructure/Database.fs" />
     <Compile Include="Infrastructure/NatsClient.fs" />
-    <!-- HTTP handlers -->
-    <Compile Include="Handlers/HealthHandler.fs" />
+    <!-- db context (DbUp migration routine) -->
+    <Compile Include="Contexts/Db/Infrastructure/DbMigrations.fs" />
+    <!-- health context slice -->
+    <Compile Include="Contexts/Health/Domain/HealthDomain.fs" />
+    <Compile Include="Contexts/Health/Application/HealthService.fs" />
+    <Compile Include="Contexts/Health/Infrastructure/HealthInfrastructure.fs" />
+    <Compile Include="Contexts/Health/Api/HealthApi.fs" />
+    <!-- regulatory-source context slice -->
+    <Compile Include="Contexts/RegulatorySource/Domain/RegulatorySourceDomain.fs" />
+    <Compile Include="Contexts/RegulatorySource/Application/RegulatorySourceService.fs" />
+    <Compile Include="Contexts/RegulatorySource/Infrastructure/RegulatorySourceInfrastructure.fs" />
+    <Compile Include="Contexts/RegulatorySource/Api/RegulatorySourceApi.fs" />
+    <!-- internal-policy context slice -->
+    <Compile Include="Contexts/InternalPolicy/Domain/InternalPolicyDomain.fs" />
+    <Compile Include="Contexts/InternalPolicy/Application/InternalPolicyService.fs" />
+    <Compile Include="Contexts/InternalPolicy/Infrastructure/InternalPolicyInfrastructure.fs" />
+    <Compile Include="Contexts/InternalPolicy/Api/InternalPolicyApi.fs" />
+    <!-- gap-analysis context slice -->
+    <Compile Include="Contexts/GapAnalysis/Domain/GapAnalysisDomain.fs" />
+    <Compile Include="Contexts/GapAnalysis/Application/GapAnalysisService.fs" />
+    <Compile Include="Contexts/GapAnalysis/Infrastructure/GapAnalysisInfrastructure.fs" />
+    <Compile Include="Contexts/GapAnalysis/Api/GapAnalysisApi.fs" />
+    <!-- ai-orchestration context slice -->
+    <Compile Include="Contexts/AiOrchestration/Domain/AiOrchestrationDomain.fs" />
+    <Compile Include="Contexts/AiOrchestration/Application/AiOrchestrationService.fs" />
+    <Compile Include="Contexts/AiOrchestration/Infrastructure/AiOrchestrationInfrastructure.fs" />
+    <Compile Include="Contexts/AiOrchestration/Api/AiOrchestrationApi.fs" />
+    <!-- messaging context slice -->
+    <Compile Include="Contexts/Messaging/Domain/MessagingDomain.fs" />
+    <Compile Include="Contexts/Messaging/Application/MessagingStatus.fs" />
+    <Compile Include="Contexts/Messaging/Infrastructure/JetStreamDemo.fs" />
+    <Compile Include="Contexts/Messaging/Api/MessagingApi.fs" />
     <!-- Composition root -->
+    <Compile Include="WebApp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

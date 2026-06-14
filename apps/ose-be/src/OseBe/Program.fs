@@ -1,4 +1,4 @@
-module OseAppBe.Program
+module OseBe.Program
 
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
@@ -6,13 +6,16 @@ open Microsoft.EntityFrameworkCore
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Giraffe
-open OseAppBe.Infrastructure.AppDbContext
-open OseAppBe.Infrastructure.Database
-open OseAppBe.Infrastructure.NatsClient
-open OseAppBe.Handlers.HealthHandler
+open OseBe.Infrastructure.AppDbContext
+open OseBe.Infrastructure.Database
+open OseBe.Infrastructure.NatsClient
+open OseBe.Contexts.Db.Infrastructure
+open OseBe.Contexts.Messaging.Application
+open OseBe.Contexts.Messaging.Infrastructure
+open OseBe.Contexts.Messaging.Domain
+open OseBe.WebApp
 
-// Routes: /health now; bounded-context routes are added in Phase 3.
-let private configureApp (app: IApplicationBuilder) = app.UseGiraffe webApp
+let private configureApp (handler: HttpHandler) (app: IApplicationBuilder) = app.UseGiraffe handler
 
 let private configureServices (connStr: string) (services: IServiceCollection) =
     services.AddGiraffe() |> ignore
@@ -20,11 +23,11 @@ let private configureServices (connStr: string) (services: IServiceCollection) =
     services.AddDbContext<AppDbContext>(fun opts -> opts.UseNpgsql(connStr).UseSnakeCaseNamingConvention() |> ignore)
     |> ignore
 
-let private buildHost (args: string[]) (connStr: string) =
+let private buildHost (args: string[]) (connStr: string) (handler: HttpHandler) =
     Host
         .CreateDefaultBuilder(args)
         .ConfigureWebHostDefaults(fun webHostBuilder ->
-            webHostBuilder.Configure(configureApp).ConfigureServices(configureServices connStr)
+            webHostBuilder.Configure(configureApp handler).ConfigureServices(configureServices connStr)
             |> ignore)
         .Build()
 
@@ -33,15 +36,23 @@ let main args =
     // 1. Config (fail-fast on missing DATABASE_URL).
     let connStr = requireDatabaseUrl ()
 
-    // 2. Schema migration on boot (DbUp embedded scripts).
+    // 2. Schema migration on boot (db context — DbUp embedded scripts).
     runMigrations connStr
 
-    // 3. Messaging: best-effort NATS connect (non-fatal; exercised at e2e).
+    // 3. Messaging: best-effort NATS connect + JetStream durable demo (non-fatal).
+    let status = newShared ()
+
     let natsConnection =
         connectAsync (natsUrl ()) |> Async.AwaitTask |> Async.RunSynchronously
 
-    // 4. HTTP host (Giraffe routes + EF DbContext).
-    let host = buildHost args connStr
+    match natsConnection with
+    | Some conn ->
+        let outcome = runDemo conn |> Async.AwaitTask |> Async.RunSynchronously
+        status.Set outcome
+    | None -> status.Set(Failed "NATS unavailable at startup")
+
+    // 4. HTTP host (Giraffe routes for all bounded contexts + EF DbContext).
+    let host = buildHost args connStr (buildWebApp status)
 
     host.Run()
 

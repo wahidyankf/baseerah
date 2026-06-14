@@ -1,10 +1,10 @@
-# ose-app-be — Component Spec (C4 L3)
+# ose-be — Component Spec (C4 L3)
 
 See [components/README.md](../README.md) for the full C4 L3 overview.
 
 ## Container
 
-F#/Giraffe REST API (`ose-app-be`) at `api.oseplatform.com`.
+F#/Giraffe REST API (`ose-be`) at `api.oseplatform.com`.
 
 ## Bounded-Context Modules
 

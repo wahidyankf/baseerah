@@ -24,7 +24,7 @@ Next.js 16 frontend for OSE Application (Governance, Risk, and Compliance) platf
 
 - **Next.js 16** — App Router, React 19
 - **TypeScript** — Strict mode
-- **tRPC** — Type-safe API calls to ose-app-be
+- **tRPC** — Type-safe API calls to ose-be
 - **Tailwind v4** — Styling
 - **@open-sharia-enterprise/web-ui** — Shared component library
 - **Vitest** — Unit testing
@@ -32,7 +32,7 @@ Next.js 16 frontend for OSE Application (Governance, Risk, and Compliance) platf
 
 ## Related
 
-- [ose-app-be](../ose-app-be/) — F#/Giraffe backend API
-- [ose-app-be-e2e](../ose-app-be-e2e/) — BE E2E tests
+- [ose-be](../ose-be/) — F#/Giraffe backend API
+- [ose-be-e2e](../ose-be-e2e/) — BE E2E tests
 - [ose-app-web-e2e](../ose-app-web-e2e/) — FE E2E tests
 - [specs/apps/ose](../../specs/apps/ose/) — DDD specs and behavior

@@ -6,7 +6,7 @@ Gherkin feature files for all OSE-family products, organized by flat product-sur
 
 | Surface        | Product        | Perspective     | Gherkin path                     |
 | -------------- | -------------- | --------------- | -------------------------------- |
-| `app-be`       | ose-app-be     | REST API (HTTP) | `behavior/app-be/gherkin/`       |
+| `be`           | ose-be         | REST API (HTTP) | `behavior/be/gherkin/`           |
 | `app-web`      | ose-app-web    | Browser UI      | `behavior/app-web/gherkin/`      |
 | `platform-be`  | ose-web (tRPC) | tRPC HTTP       | `behavior/platform-be/gherkin/`  |
 | `platform-web` | ose-web (UI)   | Browser UI      | `behavior/platform-web/gherkin/` |

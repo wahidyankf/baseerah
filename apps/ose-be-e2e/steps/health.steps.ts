@@ -1,7 +1,7 @@
 /**
  * Step definitions for the OSE Application BE health endpoint feature.
  *
- * Covers: specs/apps/ose/behavior/app-be/gherkin/health/health.feature
+ * Covers: specs/apps/ose/behavior/be/gherkin/health/health.feature
  */
 import { expect } from "@playwright/test";
 import { createBdd } from "playwright-bdd";
@@ -13,7 +13,7 @@ Before(() => {
   clearResponse();
 });
 
-Given("the ose-app-be service is running", async () => {
+Given("the ose-be service is running", async () => {
   // No-op: the test suite assumes the BE is running at baseURL (http://localhost:8302).
 });
 

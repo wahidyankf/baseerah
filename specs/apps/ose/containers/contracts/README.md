@@ -5,7 +5,7 @@ OpenAPI 3.1 specification for the OSE Application (Governance, Risk, and Complia
 ## Purpose
 
 This contract defines the exact shape of every request and response for the OSE Application backend
-(`ose-app-be`) and frontend (`ose-app-web`). It is the **single source of truth** for API
+(`ose-be`) and frontend (`ose-app-web`). It is the **single source of truth** for API
 types — code generators produce language-specific types from this spec.
 
 ## Quick Start
@@ -52,14 +52,14 @@ contracts/
 ## Nx Cache Integration
 
 Generated contract paths are explicit Nx cache inputs for `test:unit` and `test:quick` in both
-`ose-app-be` and `ose-app-web`. This ensures that re-running codegen (which changes the
+`ose-be` and `ose-app-web`. This ensures that re-running codegen (which changes the
 generated files) triggers a cache miss and re-runs affected test targets.
 
 ## Adoption Status
 
 | App         | Codegen target | generated-contracts in inputs |
 | ----------- | :------------: | :---------------------------: |
-| ose-app-be  |      yes       |              yes              |
+| ose-be      |      yes       |              yes              |
 | ose-app-web |      yes       |              yes              |
 
 ## Rules

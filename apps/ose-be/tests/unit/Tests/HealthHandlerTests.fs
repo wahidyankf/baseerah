@@ -1,21 +1,27 @@
-module OseAppBe.Tests.Unit.Tests.HealthHandlerTests
+module OseBe.Tests.Unit.Tests.HealthHandlerTests
 
 open System.Net
 open Xunit
-open OseAppBe.Handlers.HealthHandler
-open OseAppBe.Tests.Unit.Steps.BddState
+open OseBe.Contexts.Health.Application
+open OseBe.WebApp
+open OseBe.Tests.Unit.Steps.BddState
 
 [<Fact>]
-let ``health handler returns 200`` () =
+let ``get health returns healthy status`` () =
+    let status = getHealth ()
+    Assert.Equal("healthy", status.Status)
+
+[<Fact>]
+let ``health route returns 200`` () =
     let client = buildClient webApp
-    let resp = client.GetAsync("/health").Result
+    let resp = client.GetAsync("/api/v1/health").Result
     Assert.Equal(HttpStatusCode.OK, resp.StatusCode)
 
 [<Fact>]
-let ``health handler returns JSON status ok`` () =
+let ``health route returns JSON status healthy`` () =
     let client = buildClient webApp
-    let resp = client.GetAsync("/health").Result
+    let resp = client.GetAsync("/api/v1/health").Result
     let body = resp.Content.ReadAsStringAsync().Result
     Assert.Contains("\"status\"", body)
-    Assert.Contains("ok", body)
+    Assert.Contains("healthy", body)
     Assert.Equal("application/json", resp.Content.Headers.ContentType.MediaType)

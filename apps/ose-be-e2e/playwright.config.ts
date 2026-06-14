@@ -2,8 +2,8 @@ import { defineConfig } from "@playwright/test";
 import { defineBddConfig } from "playwright-bdd";
 
 const testDir = defineBddConfig({
-  featuresRoot: "../../specs/apps/ose/behavior/app-be/gherkin",
-  features: "../../specs/apps/ose/behavior/app-be/gherkin/**/*.feature",
+  featuresRoot: "../../specs/apps/ose/behavior/be/gherkin",
+  features: "../../specs/apps/ose/behavior/be/gherkin/**/*.feature",
   steps: ["./steps/**/*.ts"],
   // Exclude @unit scenarios (Rust unit tests) and @integration scenarios
   // (Rust integration tests with real DB, no HTTP server).

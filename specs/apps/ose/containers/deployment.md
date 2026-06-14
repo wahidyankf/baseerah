@@ -2,11 +2,11 @@
 
 ## Environments
 
-| Environment | Frontend             | Backend             | Database         |
-| ----------- | -------------------- | ------------------- | ---------------- |
-| Development | `nx dev ose-app-web` | `nx dev ose-app-be` | Docker Compose   |
-| Staging     | Vercel (TBD)         | Kubernetes (TBD)    | Managed Postgres |
-| Production  | Vercel (TBD)         | Kubernetes (TBD)    | Managed Postgres |
+| Environment | Frontend             | Backend          | Database         |
+| ----------- | -------------------- | ---------------- | ---------------- |
+| Development | `nx dev ose-app-web` | `nx dev ose-be`  | Docker Compose   |
+| Staging     | Vercel (TBD)         | Kubernetes (TBD) | Managed Postgres |
+| Production  | Vercel (TBD)         | Kubernetes (TBD) | Managed Postgres |
 
 ## Dev stack
 
@@ -15,7 +15,7 @@
 docker compose -f infra/dev/ose-app/docker-compose.yml up --build -d
 
 # Or start individually
-nx dev ose-app-be   # http://localhost:8302
+nx dev ose-be   # http://localhost:8302
 nx dev ose-app-web  # http://localhost:3300
 ```
 
@@ -23,7 +23,7 @@ nx dev ose-app-web  # http://localhost:3300
 
 | Image               | Base                                       | Purpose               |
 | ------------------- | ------------------------------------------ | --------------------- |
-| `ose-app-be` (dev)  | `mcr.microsoft.com/dotnet/sdk:10.0-alpine` | Hot-reload dev server |
+| `ose-be` (dev)      | `mcr.microsoft.com/dotnet/sdk:10.0-alpine` | Hot-reload dev server |
 | `ose-app-web` (dev) | `node:24-alpine`                           | Hot-reload dev server |
 
 ## Notes

@@ -1,11 +1,11 @@
-module OseAppBe.IntegrationTests.DatabaseBootTests
+module OseBe.IntegrationTests.DatabaseBootTests
 
 open System
 open Microsoft.EntityFrameworkCore
 open Npgsql
 open Xunit
-open OseAppBe.Infrastructure.AppDbContext
-open OseAppBe.Infrastructure.Database
+open OseBe.Infrastructure.AppDbContext
+open OseBe.Contexts.Db.Infrastructure
 
 let private connectionString () =
     match Environment.GetEnvironmentVariable("DATABASE_URL") with
@@ -41,3 +41,48 @@ let ``EF context boots against PostgreSQL after migration`` () =
 
     use ctx = new AppDbContext(options)
     Assert.True(ctx.Database.CanConnect(), "EF context should connect to PostgreSQL")
+
+let private dbContext (connStr: string) =
+    let options =
+        DbContextOptionsBuilder<AppDbContext>().UseNpgsql(connStr).UseSnakeCaseNamingConvention().Options
+
+    new AppDbContext(options)
+
+[<Fact>]
+let ``regulatory-source repository persists and lists documents`` () =
+    let connStr = connectionString ()
+    runMigrations connStr
+    use ctx = dbContext connStr
+    let repo = OseBe.Contexts.RegulatorySource.Infrastructure.repository ctx
+
+    let entity: RegulatoryDocumentEntity =
+        { Id = Guid.NewGuid()
+          Title = "Circular 2026/01"
+          Issuer = "Regulator"
+          Jurisdiction = "ID"
+          DocumentType = "circular"
+          CreatedAt = DateTime.UtcNow }
+
+    let created = repo.Create(entity).Result
+    Assert.Equal(entity.Id, created.Id)
+    let found = repo.FindById(entity.Id).Result
+    Assert.True(found.IsSome, "regulatory document should be retrievable by id")
+
+[<Fact>]
+let ``internal-policy repository persists and lists documents`` () =
+    let connStr = connectionString ()
+    runMigrations connStr
+    use ctx = dbContext connStr
+    let repo = OseBe.Contexts.InternalPolicy.Infrastructure.repository ctx
+
+    let entity: InternalPolicyDocumentEntity =
+        { Id = Guid.NewGuid()
+          Title = "SOP-100"
+          Version = "1.0"
+          Scope = "company-wide"
+          CreatedAt = DateTime.UtcNow }
+
+    let created = repo.Create(entity).Result
+    Assert.Equal(entity.Id, created.Id)
+    let found = repo.FindById(entity.Id).Result
+    Assert.True(found.IsSome, "internal policy document should be retrievable by id")

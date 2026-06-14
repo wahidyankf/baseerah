@@ -86,5 +86,5 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
-  "implicitDependencies": ["ose-app-web", "ose-app-be"]
+  "implicitDependencies": ["ose-app-web", "ose-be"]
 }

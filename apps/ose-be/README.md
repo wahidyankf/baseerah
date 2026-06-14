@@ -1,4 +1,4 @@
-# ose-app-be
+# ose-be
 
 Rust/Axum REST API backend for the OSE Application (Governance, Risk and Compliance) platform.
 
@@ -6,26 +6,26 @@ Rust/Axum REST API backend for the OSE Application (Governance, Risk and Complia
 
 ```bash
 # Run development server (localhost:8302)
-nx dev ose-app-be
+nx dev ose-be
 
 # Run unit tests
-nx run ose-app-be:test:unit
+nx run ose-be:test:unit
 ```
 
 ## Commands
 
-| Command                              | Description                                            |
-| ------------------------------------ | ------------------------------------------------------ |
-| `nx dev ose-app-be`                  | Start development server on localhost:8302             |
-| `nx build ose-app-be`                | Production build (`cargo build --release`)             |
-| `nx run ose-app-be:test:quick`       | DDD validation + unit tests + llvm-cov coverage (≥90%) |
-| `nx run ose-app-be:test:unit`        | Unit tests only                                        |
-| `nx run ose-app-be:test:integration` | Integration tests via Docker Compose (cucumber BDD)    |
-| `nx run ose-app-be:lint`             | Clippy with `-D warnings`                              |
-| `nx run ose-app-be:fmt:check`        | Rustfmt format check                                   |
-| `nx run ose-app-be:typecheck`        | `cargo check --all-targets`                            |
-| `nx run ose-app-be:specs:coverage`   | Validate BDD spec coverage via rhino-cli               |
-| `nx run ose-app-be:deny:check`       | License and vulnerability audit via cargo-deny         |
+| Command                          | Description                                            |
+| -------------------------------- | ------------------------------------------------------ |
+| `nx dev ose-be`                  | Start development server on localhost:8302             |
+| `nx build ose-be`                | Production build (`cargo build --release`)             |
+| `nx run ose-be:test:quick`       | DDD validation + unit tests + llvm-cov coverage (≥90%) |
+| `nx run ose-be:test:unit`        | Unit tests only                                        |
+| `nx run ose-be:test:integration` | Integration tests via Docker Compose (cucumber BDD)    |
+| `nx run ose-be:lint`             | Clippy with `-D warnings`                              |
+| `nx run ose-be:fmt:check`        | Rustfmt format check                                   |
+| `nx run ose-be:typecheck`        | `cargo check --all-targets`                            |
+| `nx run ose-be:specs:coverage`   | Validate BDD spec coverage via rhino-cli               |
+| `nx run ose-be:deny:check`       | License and vulnerability audit via cargo-deny         |
 
 ## Prerequisites
 
@@ -74,4 +74,4 @@ Five DDD bounded contexts (hexagonal layout):
 
 - **Specs**: `specs/apps/ose/`
 - **Contracts**: `specs/apps/ose/containers/contracts/` (OpenAPI 3.1)
-- **E2E tests**: `apps/ose-app-be-e2e/`
+- **E2E tests**: `apps/ose-be-e2e/`

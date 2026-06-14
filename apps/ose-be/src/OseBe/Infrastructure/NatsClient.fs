@@ -1,12 +1,12 @@
-module OseAppBe.Infrastructure.NatsClient
+module OseBe.Infrastructure.NatsClient
 
 open System
 open System.Threading.Tasks
 open NATS.Client.Core
 
-/// Reads OSE_APP_BE_NATS_URL or falls back to the default local NATS URL.
+/// Reads OSE_BE_NATS_URL or falls back to the default local NATS URL.
 let natsUrl () : string =
-    match Environment.GetEnvironmentVariable("OSE_APP_BE_NATS_URL") with
+    match Environment.GetEnvironmentVariable("OSE_BE_NATS_URL") with
     | null
     | "" -> "nats://localhost:4222"
     | value -> value

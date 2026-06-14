@@ -29,7 +29,7 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 - **[ayokoding](./apps/ayokoding/README.md)** — AyoKoding educational website specifications (Next.js 16, multilingual programming, AI, and security tutorials)
 - **[crane](./apps/crane/README.md)** — crane-cli specifications (Content Retrieval And Normalization Engine CLI, Python/pytest-bdd)
 - **[organiclever](./apps/organiclever/README.md)** — OrganicLever fullstack specifications (F#/Giraffe backend REST API + Next.js 16 frontend)
-- **[ose](./apps/ose/README.md)** — OSE family specifications (ose-app-be/web GRC platform + ose-web platform site, unified under one spec tree)
+- **[ose](./apps/ose/README.md)** — OSE family specifications (ose-be/web GRC platform + ose-web platform site, unified under one spec tree)
 - **[rhino](./apps/rhino/README.md)** — rhino-cli specifications (Repository Hygiene and INtegration Orchestrator CLI, Rust)
 - **[wahidyankf](./apps/wahidyankf/README.md)** — wahidyankf-web specifications (personal portfolio site, Next.js 16, static)
 
@@ -71,7 +71,7 @@ perspective. The format is `<product>-<surface>` where:
 - `<surface>` — execution context: `be` (HTTP backend), `web` (browser UI), `cli`
   (command-line), `build-tools` (build-time tooling)
 
-Examples: `organiclever-be`, `platform-web`, `app-be`, `crane-cli`, `rhino-cli`.
+Examples: `organiclever-be`, `platform-web`, `be`, `crane-cli`, `rhino-cli`.
 
 **Deprecated slugs** (do not use in new spec trees): bare `be`, bare `web`, bare `cli`,
 `api`. All existing spec trees were migrated to the flat `<product>-<surface>` scheme.
