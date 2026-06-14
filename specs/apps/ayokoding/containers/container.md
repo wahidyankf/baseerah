@@ -13,7 +13,7 @@ not two containers — because they ship as one Vercel deployment unit.
 
 The Gherkin behavior tree splits along **API perspective**, not deployable-container boundary:
 
-- `behavior/ayokoding-web/gherkin/` — UI-semantic scenarios (DOM, navigation, accessibility, locale switcher).
+- `behavior/ayokoding-www/gherkin/` — UI-semantic scenarios (DOM, navigation, accessibility, locale switcher).
 - `behavior/ayokoding-be/gherkin/` — tRPC HTTP-semantic scenarios (procedure shapes, error codes,
   locale-scoped responses).
 
@@ -139,4 +139,4 @@ A single Next.js 16 deployment with two runtime tiers and two perspective slugs.
 - **Context diagram**: [../system-context/context.md](../system-context/context.md)
 - **API perspective component diagram**: [../components/api/component-api.md](../components/api/component-api.md)
 - **Web perspective component diagram**: [../components/web/component-web.md](../components/web/component-web.md)
-- **Parent**: [ayokoding-web specs](../README.md)
+- **Parent**: [ayokoding-www specs](../README.md)

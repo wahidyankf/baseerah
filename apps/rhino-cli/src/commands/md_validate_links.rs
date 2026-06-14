@@ -81,7 +81,7 @@ mod tests {
     fn args_exclude_is_threaded_to_skip_paths() {
         let args = ValidateLinksArgs {
             staged_only: false,
-            exclude: vec!["plans/done".to_string(), "apps/ayokoding-web".to_string()],
+            exclude: vec!["plans/done".to_string(), "apps/ayokoding-www".to_string()],
         };
         assert_eq!(args.exclude.len(), 2);
         assert_eq!(args.exclude[0], "plans/done");

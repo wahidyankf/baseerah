@@ -1,10 +1,10 @@
 # ayokoding-cli
 
-Command-line tools for ayokoding-web content validation.
+Command-line tools for ayokoding-www content validation.
 
 ## What is ayokoding-cli?
 
-A Go-based CLI tool that validates internal links in the ayokoding-web content
+A Go-based CLI tool that validates internal links in the ayokoding-www content
 directory. Provides fast link checking with support for multiple output formats
 and verbose logging.
 
@@ -15,7 +15,7 @@ and verbose logging.
 ayokoding-cli links check
 
 # Check specific content directory
-ayokoding-cli links check --content apps/ayokoding-web/content
+ayokoding-cli links check --content apps/ayokoding-www/content
 
 # JSON output for scripting or CI
 ayokoding-cli links check -o json
@@ -46,7 +46,7 @@ The binary will be created at `apps/ayokoding-cli/dist/ayokoding-cli`.
 ayokoding-cli links check
 
 # Check specific content directory
-ayokoding-cli links check --content apps/ayokoding-web/content
+ayokoding-cli links check --content apps/ayokoding-www/content
 
 # JSON output for scripting or CI
 ayokoding-cli links check -o json
@@ -83,7 +83,7 @@ ayokoding-cli links check --quiet
 
 **Flags:**
 
-- `--content` — Content directory path (default: `apps/ayokoding-web/content`)
+- `--content` — Content directory path (default: `apps/ayokoding-www/content`)
 
 **Global Flags** (available to all commands):
 
@@ -96,10 +96,10 @@ ayokoding-cli links check --quiet
 
 ```bash
 # Run standalone (builds ayokoding-cli first automatically)
-nx run ayokoding-web:links:check
+nx run ayokoding-www:links:check
 
 # Runs automatically as part of test:quick
-nx run ayokoding-web:test:quick
+nx run ayokoding-www:test:quick
 ```
 
 **Performance:** ~100ms for 850+ files / 3000+ links
@@ -142,7 +142,7 @@ apps/ayokoding-cli/
 
 **Removed**: `nav regen` and `titles update` commands.
 
-The ayokoding-web Hugo site has been replaced by a Next.js app. The navigation
+The ayokoding-www Hugo site has been replaced by a Next.js app. The navigation
 regeneration and title update commands were Hugo-specific and are no longer
 needed. Only the `links check` command is retained.
 
@@ -154,8 +154,8 @@ needed. Only the `links check` command is retained.
 **New**: `links check` command for internal link validation.
 
 - No breaking changes
-- `nx run ayokoding-web:test:quick` now runs `links:check` before the Hugo build
-- Fix broken internal links to keep CI green: `nx run ayokoding-web:links:check`
+- `nx run ayokoding-www:test:quick` now runs `links:check` before the Hugo build
+- Fix broken internal links to keep CI green: `nx run ayokoding-www:links:check`
 
 ## Integration with AI Agents
 
@@ -165,11 +165,11 @@ Internal link validation is handled by this CLI during `test:quick`.
 ## Pre-commit Automation
 
 Navigation and title automation via pre-commit hook has been removed as of
-v0.5.0 (ayokoding-web migrated from Hugo to Next.js). The `run-pre-commit`
-target no longer exists for ayokoding-web.
+v0.5.0 (ayokoding-www migrated from Hugo to Next.js). The `run-pre-commit`
+target no longer exists for ayokoding-www.
 
-The ayokoding-cli binary is still auto-built by Nx when `ayokoding-web:test:quick`
-runs, because `ayokoding-web/project.json` declares `ayokoding-cli` as an
+The ayokoding-cli binary is still auto-built by Nx when `ayokoding-www:test:quick`
+runs, because `ayokoding-www/project.json` declares `ayokoding-cli` as an
 implicit dependency.
 
 ## Testing

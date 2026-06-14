@@ -1,8 +1,8 @@
 # AyoKoding DDD Artifacts
 
-Domain-Driven Design artifacts for the `ayokoding-web` bounded-context architecture.
+Domain-Driven Design artifacts for the `ayokoding-www` bounded-context architecture.
 These files are the machine-readable source of truth consumed by `rhino-cli ddd bc` and
-`rhino-cli ddd ul` during `nx run ayokoding-web:test:quick`.
+`rhino-cli ddd ul` during `nx run ayokoding-www:test:quick`.
 
 ## Structure
 

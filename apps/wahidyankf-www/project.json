@@ -1,0 +1,101 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "wahidyankf-www",
+  "sourceRoot": "apps/wahidyankf-www/src",
+  "projectType": "application",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "next dev --port 3201",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "next build",
+        "cwd": "{projectRoot}"
+      },
+      "outputs": ["{projectRoot}/.next"]
+    },
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "next start --port 3201",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx oxlint@latest --jsx-a11y-plugin .",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": ["{projectRoot}/src/**/*", "{projectRoot}/oxlint.json", "{projectRoot}/tsconfig.json"]
+    },
+    "test:unit": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature"],
+      "options": {
+        "command": "npx vitest run --project unit-fe",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["rhino-cli:build"],
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature"],
+      "outputs": ["{projectRoot}/coverage"],
+      "options": {
+        "commands": [
+          "npx vitest run --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/wahidyankf-www/coverage/lcov.info 80)"
+        ],
+        "parallel": false,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test:integration": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature"],
+      "options": {
+        "command": "npx vitest run --project integration",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "specs:coverage": {
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin apps/wahidyankf-www",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature",
+        "{projectRoot}/**/*.{ts,tsx}"
+      ]
+    },
+    "test:e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test-coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    }
+  },
+  "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"],
+  "implicitDependencies": []
+}

@@ -485,6 +485,39 @@ defer), so the backend spec surfaces are renamed to match `ose-be`:
 > short-name-vs-full-name convention explicitly; it does not force a cross-product unification (out of
 > scope).
 
+#### Phase 7 OSE FE audit results (executed)
+
+Structure + naming parity of the OSE frontend tier against the new organiclever layout, recorded at
+Phase 7 execution:
+
+| Project       | `src/` layout                                                   | Organiclever counterpart                 | Parity verdict                                                                             |
+| ------------- | --------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `ose-www`     | `app/`, `features/`, `lib/`, `scripts/`, `test/`                | `organiclever-www` (`app/`, `features/`) | Parity — `contexts/` reshaped to `features/` in 7b (matches the `-www` content-site shape) |
+| `ose-app-web` | `app/`, `contexts/`, `shared/`, `generated-contracts/`, `test/` | `organiclever-app-web` (identical set)   | Parity — same DDD `contexts/` + `shared/` + `generated-contracts/` shape                   |
+| `ose-be`      | Rust backend (renamed in earlier phase)                         | `organiclever-be`                        | Parity — backend short-name `be` tier                                                      |
+
+Findings:
+
+- **No rename required for OSE FE projects.** After 7a renames (`ose-web` → `ose-www`) and the 7b
+  `contexts/` → `features/` reshape, `ose-www` matches the `organiclever-www` content-site shape and
+  `ose-app-web` already matches `organiclever-app-web` (DDD `contexts/` + `shared/` +
+  `generated-contracts/`).
+- **OSE spec short-name vs full-name convention is deliberately NOT unified.** OSE specs keep the short
+  tier dir names (`be`, `app-web`, `platform-web`) while organiclever specs use full project names.
+  `platform-web` is annotated as `= ose-www`. This divergence is an intentional judgment call, not a
+  defect.
+- **web-ui consumer wiring.** `ose-app-web` is a canonical `@open-sharia-enterprise/web-ui` consumer
+  (Nx graph edge + `implicitDependencies` + `Button` import in `src/app/page.tsx`); `ose-www` and
+  `ayokoding-www` deliberately have **no** Nx `web-ui` edge (content platforms).
+- **Pre-existing web-ui symbol imports in content apps `[noted, out of scope]`.** Both `ose-www` and
+  `ayokoding-www` source import a few `web-ui` symbols (`Button`/`cn`/`Alert`) that predate Phase 7.
+  These do **not** create an Nx project edge (web-ui is not in their `package.json` deps), so the
+  "no web-ui edge" gate holds at the graph level. Removing the symbol imports would require
+  re-homing primitives locally and is out of the structure-only 7b scope; left as-is.
+- **`ts-ui` is a plan-doc alias for `web-ui`.** The canonical design-system package is
+  `@open-sharia-enterprise/web-ui` (`libs/web-ui`); no `ts-ui` package exists. Phase 7 consumes
+  `web-ui` everywhere the plan text says `ts-ui`.
+
 Media removal:
 
 - Delete `behavior/be/gherkin/messaging/crane-convert.feature` (post-rename path).

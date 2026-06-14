@@ -1,6 +1,6 @@
 # ayokoding-cli — links domain
 
-Gherkin scenarios for the `links` domain: link validation across the ayokoding-web content
+Gherkin scenarios for the `links` domain: link validation across the ayokoding-www content
 tree. Consumed by `apps/ayokoding-cli`.
 
 | Feature file          | Description                                      |

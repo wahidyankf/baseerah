@@ -10,7 +10,7 @@ use crate::commands;
 #[derive(Debug, Parser)]
 #[command(
     name = "ose-cli",
-    about = "CLI tools for ose-web site maintenance",
+    about = "CLI tools for ose-www site maintenance",
     version
 )]
 pub struct Cli {
@@ -38,7 +38,7 @@ pub struct Cli {
 /// Top-level subcommands for `ose-cli`.
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Link management commands for `ose-web` content.
+    /// Link management commands for `ose-www` content.
     Links(LinksCmd),
 }
 
@@ -53,7 +53,7 @@ pub struct LinksCmd {
 /// Subcommands available under `links`.
 #[derive(Debug, Subcommand)]
 pub enum LinksSubcommand {
-    /// Validate internal links in `ose-web` content.
+    /// Validate internal links in `ose-www` content.
     Check(commands::links::LinksCheckArgs),
 }
 

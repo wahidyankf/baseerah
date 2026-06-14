@@ -22,7 +22,7 @@ i18n locale switching, and top-level navigation.
 | Scope      | tRPC procedure shapes — HTTP-semantic                                               | Browser UI — user interaction-semantic                                                |
 | Steps      | `the client calls`, response shape, error code                                      | `clicks`, `types`, `sees`, `navigates`                                                |
 | Background | `Given the API is running`                                                          | `Given the app is running`                                                            |
-| Scenarios  | See [behavior/ayokoding-be/gherkin/](../../behavior/ayokoding-be/gherkin/README.md) | See [behavior/ayokoding-web/gherkin/](../../behavior/ayokoding-web/gherkin/README.md) |
+| Scenarios  | See [behavior/ayokoding-be/gherkin/](../../behavior/ayokoding-be/gherkin/README.md) | See [behavior/ayokoding-www/gherkin/](../../behavior/ayokoding-www/gherkin/README.md) |
 
 Both perspectives execute inside the same `web` Next.js container. The split is a slug, not
 a container boundary.
@@ -31,12 +31,12 @@ a container boundary.
 
 | Implementation  | Framework               | BDD Tool                |
 | --------------- | ----------------------- | ----------------------- |
-| `ayokoding-web` | Next.js 16 (App Router) | Playwright-BDD (FE E2E) |
+| `ayokoding-www` | Next.js 16 (App Router) | Playwright-BDD (FE E2E) |
 
 ## Feature File Organization
 
 ```
-specs/apps/ayokoding/behavior/ayokoding-web/gherkin/
+specs/apps/ayokoding/behavior/ayokoding-www/gherkin/
 ├── README.md
 ├── app-shell/
 │   ├── responsive.feature
@@ -56,7 +56,7 @@ specs/apps/ayokoding/behavior/ayokoding-web/gherkin/
 ## Adding a Feature File
 
 1. Identify the bounded context (e.g., `app-shell`, `content`)
-2. Create the folder if it does not exist: `specs/apps/ayokoding/behavior/ayokoding-web/gherkin/[bc]/`
+2. Create the folder if it does not exist: `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/[bc]/`
 3. Create the `.feature` file: `[domain-capability].feature`
 4. Open with `Feature:` then a user story block (`As a … / I want … / So that …`)
 5. Use `Given the app is running` as the first Background step

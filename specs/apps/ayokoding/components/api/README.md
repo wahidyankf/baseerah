@@ -40,7 +40,7 @@ The `web` container's tRPC API surface is exercised at two levels:
 
 | Implementation | Language   | Unit Test Framework | E2E runner |
 | -------------- | ---------- | ------------------- | ---------- |
-| ayokoding-web  | TypeScript | Vitest              | Playwright |
+| ayokoding-www  | TypeScript | Vitest              | Playwright |
 
 ## Feature File Organization
 
@@ -65,10 +65,10 @@ specs/apps/ayokoding/behavior/ayokoding-be/gherkin/
 
 ```bash
 # Unit tests (mocked dependencies, coverage measured here)
-nx run ayokoding-web:test:quick
+nx run ayokoding-www:test:quick
 
 # Full BE E2E (Playwright against running Next.js)
-nx run ayokoding-web-be-e2e:test:e2e
+nx run ayokoding-www-be-e2e:test:e2e
 ```
 
 ## Nx Cache Inputs

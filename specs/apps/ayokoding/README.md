@@ -53,8 +53,8 @@ along container boundaries. Both perspectives execute inside the same `web` cont
 
 | Perspective | Background                 | Scenarios                                                                     | Domains covered                                                          | Consumed by                              |
 | ----------- | -------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------- |
-| `web`       | `Given the app is running` | [behavior/ayokoding-web/gherkin/](./behavior/ayokoding-web/gherkin/README.md) | app-shell (responsive, accessibility), content, search, i18n, navigation | `apps/ayokoding-web` (Playwright FE E2E) |
-| `api`       | `Given the API is running` | [behavior/ayokoding-be/gherkin/](./behavior/ayokoding-be/gherkin/README.md)   | content, search, navigation, i18n, health                                | `apps/ayokoding-web` (Playwright BE E2E) |
+| `web`       | `Given the app is running` | [behavior/ayokoding-www/gherkin/](./behavior/ayokoding-www/gherkin/README.md) | app-shell (responsive, accessibility), content, search, i18n, navigation | `apps/ayokoding-www` (Playwright FE E2E) |
+| `api`       | `Given the API is running` | [behavior/ayokoding-be/gherkin/](./behavior/ayokoding-be/gherkin/README.md)   | content, search, navigation, i18n, health                                | `apps/ayokoding-www` (Playwright BE E2E) |
 
 The slug `api` is a **perspective slug**, not a container. There is no separate API
 container — tRPC procedures execute inside the same `web` container's Next.js server. The
@@ -82,13 +82,13 @@ Counts are Gherkin features per perspective. `--` means no features in that pers
 - **[components/api/](./components/api/README.md)** — API (tRPC HTTP-semantic) component specs
   ([Gherkin features](./behavior/ayokoding-be/gherkin/README.md))
 - **[components/web/](./components/web/README.md)** — Web (UI-semantic) component specs
-  ([Gherkin features](./behavior/ayokoding-web/gherkin/README.md))
+  ([Gherkin features](./behavior/ayokoding-www/gherkin/README.md))
 
 ## DDD Registry (`bounded-contexts.yaml`)
 
 `bounded-contexts.yaml` is the machine-readable declaration of every bounded context in
-`ayokoding-web`. Two `rhino-cli ddd` subcommands read it to enforce structural and
-vocabulary invariants automatically in `nx run ayokoding-web:test:quick`.
+`ayokoding-www`. Two `rhino-cli ddd` subcommands read it to enforce structural and
+vocabulary invariants automatically in `nx run ayokoding-www:test:quick`.
 
 ### Schema
 
@@ -146,11 +146,11 @@ Reads the registry to locate every `glossary:` file, then validates each:
 
 1. Add an entry to `bounded-contexts.yaml` with all six fields.
 2. Create the code directory with the declared layer subfolders under
-   `apps/ayokoding-web/src/contexts/<bc>/`.
+   `apps/ayokoding-www/src/contexts/<bc>/`.
 3. Create the glossary file at `ddd/ubiquitous-language/<bc>.md`.
 4. Create the gherkin directory and add at least one `.feature` file under
-   `behavior/ayokoding-web/gherkin/<bc>/` (and optionally `behavior/ayokoding-be/gherkin/<bc>/`).
-5. Run `nx run ayokoding-web:test:quick` — `ddd bc` and `ddd ul` confirm
+   `behavior/ayokoding-www/gherkin/<bc>/` (and optionally `behavior/ayokoding-be/gherkin/<bc>/`).
+5. Run `nx run ayokoding-www:test:quick` — `ddd bc` and `ddd ul` confirm
    the registry matches the filesystem before any unit tests run.
 
 ## tRPC Procedures
@@ -179,5 +179,5 @@ The `web` container consumes specs at two test levels:
 - [Three-Level Testing Standard](../../../repo-governance/development/quality/three-level-testing-standard.md)
 - [BDD Spec-Test Mapping](../../../repo-governance/development/infra/bdd-spec-test-mapping.md)
 - [BDD Standards](../../../docs/explanation/software-engineering/development/behavior-driven-development-bdd/README.md)
-- [apps/ayokoding-web/](../../../apps/ayokoding-web/README.md) — Next.js implementation
+- [apps/ayokoding-www/](../../../apps/ayokoding-www/README.md) — Next.js implementation
 - [apps/ayokoding-cli/](../../../apps/ayokoding-cli/README.md) — CLI tool (content link validation)

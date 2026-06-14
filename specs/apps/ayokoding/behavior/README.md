@@ -12,7 +12,7 @@ right glob.
 AyoKoding ships **one deployable container**: `web` (Next.js 16). The behavior tree splits
 along **perspective**, not deployable-container boundary:
 
-- `ayokoding-web/` — UI-semantic scenarios (DOM, navigation, accessibility, locale).
+- `ayokoding-www/` — UI-semantic scenarios (DOM, navigation, accessibility, locale).
 - `ayokoding-be/` — tRPC HTTP-semantic scenarios (procedure shapes, error codes, locale).
 - `ayokoding-cli/` — CLI-semantic scenarios for `ayokoding-cli`.
 - `ayokoding-build-tools/` — build-time tooling (index generation, etc.).
@@ -23,7 +23,7 @@ about API contract behavior without conflating it with UI behavior.
 
 ## Children
 
-- `ayokoding-web/gherkin/` — Browser UI Gherkin scenarios.
+- `ayokoding-www/gherkin/` — Browser UI Gherkin scenarios.
 - `ayokoding-be/gherkin/` — tRPC API Gherkin scenarios (HTTP semantic).
 - `ayokoding-cli/` — CLI-semantic scenarios for `ayokoding-cli`.
 - `ayokoding-build-tools/` — Build-time tooling scenarios.
@@ -32,14 +32,14 @@ about API contract behavior without conflating it with UI behavior.
 
 | Surface                 | Background                          | Step style                                     | Consumed by                              |
 | ----------------------- | ----------------------------------- | ---------------------------------------------- | ---------------------------------------- |
-| `ayokoding-web`         | `Given the app is running`          | `clicks`, `types`, `sees`, `navigates`         | `apps/ayokoding-web-fe-e2e` (Playwright) |
-| `ayokoding-be`          | `Given the API is running`          | `the client calls`, response shape, error code | `apps/ayokoding-web-be-e2e` (Playwright) |
+| `ayokoding-www`         | `Given the app is running`          | `clicks`, `types`, `sees`, `navigates`         | `apps/ayokoding-www-fe-e2e` (Playwright) |
+| `ayokoding-be`          | `Given the API is running`          | `the client calls`, response shape, error code | `apps/ayokoding-www-be-e2e` (Playwright) |
 | `ayokoding-cli`         | `Given the CLI binary is available` | `runs`, exit code, output assertions           | `apps/ayokoding-cli` (Go test + godog)   |
-| `ayokoding-build-tools` | build-time                          | index generation assertions                    | `apps/ayokoding-web` (unit tests)        |
+| `ayokoding-build-tools` | build-time                          | index generation assertions                    | `apps/ayokoding-www` (unit tests)        |
 
 ## Gherkin coverage
 
-### `ayokoding-web/gherkin/` — UI perspective
+### `ayokoding-www/gherkin/` — UI perspective
 
 Organized by bounded context (one folder per BC, matching the DDD registry).
 

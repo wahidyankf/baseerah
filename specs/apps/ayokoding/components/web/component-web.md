@@ -106,7 +106,7 @@ graph LR
 ## Gherkin Coverage by Component
 
 Each component above is exercised by Gherkin features from
-[`specs/apps/ayokoding/behavior/ayokoding-web/gherkin/`](../../behavior/ayokoding-web/gherkin/):
+[`specs/apps/ayokoding/behavior/ayokoding-www/gherkin/`](../../behavior/ayokoding-www/gherkin/):
 
 | Component                        | BC         | Scope                                  |
 | -------------------------------- | ---------- | -------------------------------------- |
@@ -127,5 +127,5 @@ Each component above is exercised by Gherkin features from
 
 - **Container diagram**: [../../containers/container.md](../../containers/container.md)
 - **API perspective component diagram**: [../api/component-api.md](../api/component-api.md)
-- **Web gherkin specs**: [../../behavior/ayokoding-web/gherkin/](../../behavior/ayokoding-web/gherkin/)
+- **Web gherkin specs**: [../../behavior/ayokoding-www/gherkin/](../../behavior/ayokoding-www/gherkin/)
 - **Parent**: [ayokoding specs](../../README.md)

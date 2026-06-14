@@ -1,4 +1,6 @@
 # AyoKoding bounded context registry
 # Consumed by: rhino-cli ddd bc ayokoding
 # Schema: see specs/apps/organiclever/ddd/bounded-contexts.yaml for reference
+version: 2
+app: ayokoding
 contexts: []

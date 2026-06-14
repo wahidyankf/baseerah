@@ -176,7 +176,7 @@
     "mermaid:validation": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content --exclude apps/rhino-cli/tests/fixtures"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content --exclude apps/rhino-cli/tests/fixtures"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
@@ -184,7 +184,7 @@
     "links:validation": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate links --exclude plans/done --exclude apps/ayokoding-web/content --exclude apps/ose-web/content"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate links --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]

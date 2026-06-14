@@ -192,11 +192,11 @@ fn step3_nx_pre_commit(git_root: &Path, deps: &mut Deps) {
     }
 }
 
-/// Step 4: stages any changes in `apps/ayokoding-web/content/` produced by earlier steps.
+/// Step 4: stages any changes in `apps/ayokoding-www/content/` produced by earlier steps.
 fn step4_stage_ayokoding(git_root: &Path, _deps: &mut Deps) {
     let _ = Command::new("git")
         .arg("add")
-        .arg("apps/ayokoding-web/content/")
+        .arg("apps/ayokoding-www/content/")
         .current_dir(git_root)
         .status();
 }
@@ -340,8 +340,8 @@ fn step7_validate_links(git_root: &Path, deps: &mut Deps) -> Result<(), Error> {
         skip_paths: vec![
             ".claude/worktrees/".to_string(),
             "plans/done".to_string(),
-            "apps/ayokoding-web/content".to_string(),
-            "apps/ose-web/content".to_string(),
+            "apps/ayokoding-www/content".to_string(),
+            "apps/ose-www/content".to_string(),
         ],
     })?;
     if !r.broken_links.is_empty() {

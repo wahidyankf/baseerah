@@ -584,91 +584,91 @@ organiclever-app-web` exits 0; test passes.
 
 > Single atomic commit (decision #19). Apply ALL three renames together, then push as one commit.
 
-- [ ] [AI] `git mv apps/ose-web apps/ose-www`; `git mv apps/ose-web-be-e2e apps/ose-www-be-e2e`;
+- [x] [AI] `git mv apps/ose-web apps/ose-www`; `git mv apps/ose-web-be-e2e apps/ose-www-be-e2e`;
       `git mv apps/ose-web-fe-e2e apps/ose-www-fe-e2e` — acceptance: the three new dirs exist; old dirs
       gone.
-- [ ] [AI] `git mv apps/wahidyankf-web apps/wahidyankf-www`;
+- [x] [AI] `git mv apps/wahidyankf-web apps/wahidyankf-www`;
       `git mv apps/wahidyankf-web-fe-e2e apps/wahidyankf-www-fe-e2e` — acceptance: new dirs exist; old
       dirs gone.
-- [ ] [AI] `git mv apps/ayokoding-web apps/ayokoding-www`;
+- [x] [AI] `git mv apps/ayokoding-web apps/ayokoding-www`;
       `git mv apps/ayokoding-web-be-e2e apps/ayokoding-www-be-e2e`;
       `git mv apps/ayokoding-web-fe-e2e apps/ayokoding-www-fe-e2e` — acceptance: the three new dirs
       exist; old dirs gone.
-- [ ] [AI] Update each renamed `project.json` `name`/targets, tags, `implicitDependencies`, the e2e
+- [x] [AI] Update each renamed `project.json` `name`/targets, tags, `implicitDependencies`, the e2e
       `webServer` configs (dev ports kept: `ose-www` 3100, `wahidyankf-www` 3201, `ayokoding-www` its
       current port), tsconfig path aliases, and any `OSE_WEB_*`/`AYOKODING_WEB_*`/`WAHIDYANKF_WEB_*`
       env var or port var that keys off the project name (rename consistently; otherwise leave env
       vars) — acceptance: `nx show projects` lists `ose-www`, `ose-www-be-e2e`, `ose-www-fe-e2e`,
       `wahidyankf-www`, `wahidyankf-www-fe-e2e`, `ayokoding-www`, `ayokoding-www-be-e2e`,
       `ayokoding-www-fe-e2e`; old `ose-web*`/`wahidyankf-web*`/`ayokoding-web*` names gone.
-- [ ] [AI] Update the `env-contract.yaml` `root:` entries `apps/ose-web` → `apps/ose-www`,
+- [x] [AI] Update the `env-contract.yaml` `root:` entries `apps/ose-web` → `apps/ose-www`,
       `apps/wahidyankf-web` → `apps/wahidyankf-www`, `apps/ayokoding-web` → `apps/ayokoding-www`; run
       `rhino-cli env validate` — acceptance: exits 0.
-- [ ] [AI] **Specs — ayokoding rename**:
+- [x] [AI] **Specs — ayokoding rename**:
       `git mv specs/apps/ayokoding/behavior/ayokoding-web specs/apps/ayokoding/behavior/ayokoding-www`;
       update any `ayokoding-web` references inside `specs/apps/ayokoding/` — acceptance:
       `grep -rn 'ayokoding-web' specs/apps/ayokoding` returns zero.
-- [ ] [AI] Post-rename gate before continuing: `npx nx run-many -t typecheck --projects=ose-www,ose-www-be-e2e,ose-www-fe-e2e,wahidyankf-www,wahidyankf-www-fe-e2e,ayokoding-www,ayokoding-www-be-e2e,ayokoding-www-fe-e2e`
+- [x] [AI] Post-rename gate before continuing: `npx nx run-many -t typecheck --projects=ose-www,ose-www-be-e2e,ose-www-fe-e2e,wahidyankf-www,wahidyankf-www-fe-e2e,ayokoding-www,ayokoding-www-be-e2e,ayokoding-www-fe-e2e`
       — acceptance: exits 0; no dangling old-name references.
 
 ### 7b — Simplify ose-www (structure-only; keeps tRPC, NOT a ts-ui consumer)
 
-- [ ] [AI] **RED**: Write a failing unit test in `apps/ose-www/` asserting that
+- [x] [AI] **RED**: Write a failing unit test in `apps/ose-www/` asserting that
       `src/features/` exists as the module root (e.g., import from `@/features/landing`) and that the
       tRPC feed handler is reachable — run `nx run ose-www:test:unit` — acceptance: test fails
       (features/ path not found).
-- [ ] [AI] **GREEN**: Reshape `apps/ose-www/src/contexts/*` → `apps/ose-www/src/features/*` matching the
+- [x] [AI] **GREEN**: Reshape `apps/ose-www/src/contexts/*` → `apps/ose-www/src/features/*` matching the
       wahidyankf pattern, **keeping** tRPC + the content/updates/feed/rss pipeline intact; **do NOT**
       adopt `libs/ts-ui` (content platform — keeps its own primitives); update all internal imports and
       tsconfig path aliases — acceptance: `nx build ose-www` exits 0; `apps/ose-www/src/features/`
       exists; `nx run ose-www:test:unit` passes; tRPC + content infra intact.
-- [ ] [AI] **REFACTOR**: Confirm no `src/contexts` references remain in `apps/ose-www/src/` —
+- [x] [AI] **REFACTOR**: Confirm no `src/contexts` references remain in `apps/ose-www/src/` —
       acceptance: `grep -r 'src/contexts' apps/ose-www/src` zero; `nx run ose-www:lint && nx run
 ose-www:typecheck` exit 0.
 
 ### 7c — wahidyankf-www + ayokoding-www post-rename verification (mechanical, no further work)
 
-- [ ] [AI] Confirm `wahidyankf-www` builds unchanged in structure: `nx build wahidyankf-www` — acceptance:
+- [x] [AI] Confirm `wahidyankf-www` builds unchanged in structure: `nx build wahidyankf-www` — acceptance:
       exits 0; no structure/content/ts-ui changes were made.
-- [ ] [AI] Confirm `ayokoding-www` builds with its existing structure + tRPC intact:
+- [x] [AI] Confirm `ayokoding-www` builds with its existing structure + tRPC intact:
       `nx build ayokoding-www` — acceptance: exits 0;
       `grep -rE '@open-sharia-enterprise/ts-ui' apps/ayokoding-www/src` returns zero (not a ts-ui
       consumer); tRPC pipeline still present.
 
 ### 7d — ose-app-web adopt ts-ui
 
-- [ ] [AI] **RED**: Write a failing unit test asserting `@open-sharia-enterprise/ts-ui` is imported in
+- [x] [AI] **RED**: Write a failing unit test asserting `@open-sharia-enterprise/ts-ui` is imported in
       at least one component of `apps/ose-app-web/src/` — run `nx run ose-app-web:test:unit` —
       acceptance: test fails (import absent).
-- [ ] [AI] **GREEN**: Wire `libs/ts-ui` into `apps/ose-app-web/` — add to `tsconfig` path aliases and
+- [x] [AI] **GREEN**: Wire `libs/ts-ui` into `apps/ose-app-web/` — add to `tsconfig` path aliases and
       `project.json` `implicitDependencies`; replace at least one primitive with the ts-ui equivalent;
       keep the `codegen` source pointer at `ose-be` (set in Phase 3) — acceptance: `nx graph` shows
       `ose-app-web` → `ts-ui`; `nx build ose-app-web` exits 0; test passes.
-- [ ] [AI] **REFACTOR**: Ensure all ts-ui imports use the canonical package name
+- [x] [AI] **REFACTOR**: Ensure all ts-ui imports use the canonical package name
       `@open-sharia-enterprise/ts-ui` — acceptance: `nx run ose-app-web:typecheck` exits 0.
 
 ### 7e — OSE FE audit + final frontend wiring
 
-- [ ] [AI] **OSE FE structure + naming audit**: confirm `ose-www`/`ose-app-web`/`ose-be` naming +
+- [x] [AI] **OSE FE structure + naming audit**: confirm `ose-www`/`ose-app-web`/`ose-be` naming +
       structure parity with the new organiclever layout; record findings (incl. the OSE spec short-name
       vs full-name convention, deliberately not unified) in `tech-docs.md` — acceptance: audit notes
       written; no required rename, or any required change applied + built.
-- [ ] [AI] Confirm the three ts-ui consumers consume it — acceptance: `nx graph` shows three edges
+- [x] [AI] Confirm the three ts-ui consumers consume it — acceptance: `nx graph` shows three edges
       (`organiclever-www`, `organiclever-app-web`, `ose-app-web` → `libs/ts-ui`); `ose-www` and
       `ayokoding-www` have **no** edge to `ts-ui` (content platforms).
 
 ### Phase 7 Gate
 
-- [ ] [AI] `nx build ose-www ose-app-web wahidyankf-www ayokoding-www` — exits 0; `ose-www/src/features/`
+- [x] [AI] `nx build ose-www ose-app-web wahidyankf-www ayokoding-www` — exits 0; `ose-www/src/features/`
       present.
-- [ ] [AI] `nx run ose-www:test:unit` — exits 0; tRPC/content pipeline intact.
-- [ ] [AI] `nx show projects` — `ose-www`, `ose-www-be-e2e`, `ose-www-fe-e2e`, `wahidyankf-www`,
+- [x] [AI] `nx run ose-www:test:unit` — exits 0; tRPC/content pipeline intact.
+- [x] [AI] `nx show projects` — `ose-www`, `ose-www-be-e2e`, `ose-www-fe-e2e`, `wahidyankf-www`,
       `wahidyankf-www-fe-e2e`, `ayokoding-www`, `ayokoding-www-be-e2e`, `ayokoding-www-fe-e2e` exist;
       `grep -rnE '\bose-web\b|\bwahidyankf-web\b|\bayokoding-web\b' apps/ .github/ nx.json env-contract.yaml`
       returns zero (fully renamed).
-- [ ] [AI] `nx graph` — `organiclever-www`, `organiclever-app-web`, `ose-app-web` all → `libs/ts-ui`;
+- [x] [AI] `nx graph` — `organiclever-www`, `organiclever-app-web`, `ose-app-web` all → `libs/ts-ui`;
       `ose-www`/`ayokoding-www` have no `ts-ui` edge.
-- [ ] [AI] OSE FE audit notes recorded in `tech-docs.md`.
+- [x] [AI] OSE FE audit notes recorded in `tech-docs.md`.
 
 > **Pause Safety**: the three ts-ui consumers wired; `ose-www` simplified; public-website tier fully on
 > the `-www` suffix (incl. `ayokoding-www`). Resume:

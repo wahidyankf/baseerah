@@ -1,7 +1,7 @@
 //! `links` subcommand implementations for `ayokoding-cli`.
 //!
 //! Provides the `links check` subcommand that validates internal links
-//! in `ayokoding-web` markdown content.
+//! in `ayokoding-www` markdown content.
 use std::path::Path;
 use std::time::Instant;
 
@@ -12,7 +12,7 @@ use rust_commons::links;
 #[derive(Debug, Args)]
 pub struct LinksCheckArgs {
     /// Path to the content directory to scan for internal links.
-    #[arg(long, default_value = "apps/ayokoding-web/content")]
+    #[arg(long, default_value = "apps/ayokoding-www/content")]
     pub content: String,
 }
 

@@ -1,7 +1,7 @@
 # ayokoding-cli Gherkin Specs
 
 Gherkin feature files for [ayokoding-cli](../../../../../../apps/ayokoding-cli/README.md) — the CLI
-tool for ayokoding-web content validation. 1 file, 4 scenarios.
+tool for ayokoding-www content validation. 1 file, 4 scenarios.
 
 ## Feature Files
 

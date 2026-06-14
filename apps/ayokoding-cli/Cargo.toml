@@ -3,7 +3,7 @@ name = "ayokoding-cli"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.88"
-description = "CLI tools for ayokoding-web link validation — Rust port"
+description = "CLI tools for ayokoding-www link validation — Rust port"
 license = "MIT"
 publish = false
 

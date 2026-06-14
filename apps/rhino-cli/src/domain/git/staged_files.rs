@@ -3,8 +3,8 @@
 /// Directories skipped by the staged-mermaid and staged-heading steps.
 pub const STAGED_SKIP_PREFIXES: &[&str] = &[
     "plans/done",
-    "apps/ayokoding-web/content",
-    "apps/ose-web/content",
+    "apps/ayokoding-www/content",
+    "apps/ose-www/content",
     "apps/rhino-cli/tests/fixtures",
 ];
 
@@ -41,7 +41,7 @@ mod tests {
         let staged = vec![
             "docs/foo.md".to_string(),
             "plans/done/old.md".to_string(),
-            "apps/ayokoding-web/content/page.md".to_string(),
+            "apps/ayokoding-www/content/page.md".to_string(),
             "src/main.rs".to_string(),
         ];
         let result = staged_md_files(&staged, STAGED_SKIP_PREFIXES);

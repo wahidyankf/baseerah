@@ -26,10 +26,10 @@ pub struct FrontmatterFinding {
 /// Path prefixes that identify website app content directories, which are
 /// exempt from this audit.
 const WEBSITE_APP_PREFIXES: &[&str] = &[
-    "apps/ayokoding-web/",
-    "apps/ose-web/",
+    "apps/ayokoding-www/",
+    "apps/ose-www/",
     "apps/organiclever-app-web/",
-    "apps/wahidyankf-web/",
+    "apps/wahidyankf-www/",
 ];
 
 /// Returns a compiled `Regex` matching a `**Last Updated**` bold marker in
@@ -284,7 +284,7 @@ mod tests {
     #[test]
     fn skips_website_apps() {
         let tmp = TempDir::new().unwrap();
-        let dir = tmp.path().join("apps/ose-web/content");
+        let dir = tmp.path().join("apps/ose-www/content");
         fs::create_dir_all(&dir).unwrap();
         fs::write(dir.join("post.md"), "---\nupdated: 2026-01-01\n---\n").unwrap();
         let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();

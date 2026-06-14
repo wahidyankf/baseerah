@@ -1,6 +1,6 @@
 # ose-cli
 
-Go CLI tool for ose-web Hugo site maintenance. Validates internal links
+Go CLI tool for ose-www Hugo site maintenance. Validates internal links
 across all markdown content files.
 
 ## Usage
@@ -13,7 +13,7 @@ ose-cli <command> [flags]
 
 | Command       | Description                                |
 | ------------- | ------------------------------------------ |
-| `links check` | Validate internal links in ose-web content |
+| `links check` | Validate internal links in ose-www content |
 
 ### Global Flags
 
@@ -28,7 +28,7 @@ ose-cli <command> [flags]
 
 | Flag        | Default                | Description            |
 | ----------- | ---------------------- | ---------------------- |
-| `--content` | `apps/ose-web/content` | Content directory path |
+| `--content` | `apps/ose-www/content` | Content directory path |
 
 ### Exit codes
 
@@ -45,7 +45,7 @@ ose-cli <command> [flags]
 ./apps/ose-cli/dist/ose-cli links check
 
 # Check links with explicit content path
-ose-cli links check --content apps/ose-web/content
+ose-cli links check --content apps/ose-www/content
 
 # Output as JSON
 ose-cli links check -o json
@@ -125,8 +125,8 @@ nx run ose-cli:run -- links check
 
 ## Why this exists
 
-`ose-web` needs internal link validation as a quality gate before build.
-This CLI runs as a `dependsOn` step in `ose-web`'s `test:quick` target,
+`ose-www` needs internal link validation as a quality gate before build.
+This CLI runs as a `dependsOn` step in `ose-www`'s `test:quick` target,
 ensuring broken links are caught before the Hugo build runs.
 
 Keeping it as a standalone binary prevents unrelated changes from triggering

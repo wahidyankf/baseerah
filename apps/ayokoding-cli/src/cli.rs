@@ -10,7 +10,7 @@ use crate::commands;
 #[derive(Debug, Parser)]
 #[command(
     name = "ayokoding-cli",
-    about = "CLI tools for ayokoding-web site maintenance",
+    about = "CLI tools for ayokoding-www site maintenance",
     version
 )]
 pub struct Cli {
@@ -38,7 +38,7 @@ pub struct Cli {
 /// Top-level subcommands for `ayokoding-cli`.
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// Link management commands for `ayokoding-web` content.
+    /// Link management commands for `ayokoding-www` content.
     Links(LinksCmd),
 }
 
@@ -53,7 +53,7 @@ pub struct LinksCmd {
 /// Subcommands available under `links`.
 #[derive(Debug, Subcommand)]
 pub enum LinksSubcommand {
-    /// Validate internal links in `ayokoding-web` content.
+    /// Validate internal links in `ayokoding-www` content.
     Check(commands::links::LinksCheckArgs),
 }
 

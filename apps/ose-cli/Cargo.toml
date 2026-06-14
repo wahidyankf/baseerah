@@ -3,7 +3,7 @@ name = "ose-cli"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.88"
-description = "CLI tools for ose-web site maintenance"
+description = "CLI tools for ose-www site maintenance"
 license = "MIT"
 publish = false
 
