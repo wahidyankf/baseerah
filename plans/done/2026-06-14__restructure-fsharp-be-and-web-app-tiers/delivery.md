@@ -798,10 +798,10 @@ http://localhost:3200` — acceptance: page loads without errors.
       renames for the `-www` public-website sites (`prod-ose-web` → `prod-ose-www`,
       `prod-wahidyankf-web` → `prod-wahidyankf-www`, `prod-ayokoding-web` → `prod-ayokoding-www`) as
       `[HUMAN]` Vercel/DNS reconfig — NOT executed by this plan.
-- [ ] [AI] Commit thematically (Conventional Commits, split by domain); push to `origin main`.
-- [ ] [AI] Monitor `.github/workflows/ci.yml` + `publish-images.yml` after push — acceptance: both green;
+- [x] [AI] Commit thematically (Conventional Commits, split by domain); push to `origin main`.
+- [x] [AI] Monitor `.github/workflows/ci.yml` + `publish-images.yml` after push — acceptance: both green;
       fix at root cause + push follow-up if either fails.
-- [ ] [AI] Move the plan to `done/`:
+- [x] [AI] Move the plan to `done/`:
       `git mv plans/in-progress/restructure-fsharp-be-and-web-app-tiers plans/done/YYYY-MM-DD__restructure-fsharp-be-and-web-app-tiers`;
       update `plans/in-progress/README.md` + `plans/done/README.md`.
 
@@ -831,8 +831,8 @@ http://localhost:3200` — acceptance: page loads without errors.
       exactly; no stale `*-web`/`ose-app-be`/`crane-be` entries remain.
 - [x] [AI] `npm run lint:md` — exits 0.
 - [x] [AI] Prod-cutover follow-on registered in `plans/`.
-- [ ] [AI] CI `ci.yml` + `publish-images.yml` green for the final push.
-- [ ] [AI] `test -d plans/done/*restructure-fsharp-be-and-web-app-tiers` — present in `done/`.
+- [x] [AI] CI `ci.yml` + `publish-images.yml` green for the final push.
+- [x] [AI] `test -d plans/done/*restructure-fsharp-be-and-web-app-tiers` — present in `done/`.
 
 > **Pause Safety**: plan complete and archived; the prod cutover remains as a registered follow-on.
 > Resume: n/a.

@@ -5,7 +5,7 @@ description: Rewrite both backends from Rust to F# (Giraffe/EF Core/DbUp/NATS.Ne
 
 # Restructure Backends to F# and Split Web Tiers
 
-> **Status**: In progress — authored 2026-06-13. Execution not started.
+> **Status**: Done — completed 2026-06-14. All phases (P0–P9) executed; both backends rewritten to F#, web tiers split + renamed to the `-www`/`-app-web`/`<product>-be` taxonomy, specs + docs finalized. Prod cutover deferred to the [`wire-vercel-www-app-cutover`](../../in-progress/wire-vercel-www-app-cutover/README.md) follow-on.
 > **Supersedes**: `rewrite-be-fsharp-drop-crane` (this plan's former, narrower identity).
 
 ## Context
