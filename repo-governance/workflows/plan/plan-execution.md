@@ -220,6 +220,12 @@ Plan execution ALWAYS happens inside the plan's designated worktree, synced to t
    5. Verify sync: `git merge-base --is-ancestor origin/main HEAD` must succeed.
 6. **Confirm gate passed**: emit `Worktree gate: passed (worktrees/<plan-identifier>/ @ <short-sha>, up to date with origin/main)` and proceed to Step 1. All subsequent steps run with the worktree as the execution root.
 
+**Secret/State-Dependent Infrastructure Operations Run from the Primary Checkout**
+
+A worktree provisioned from `origin/main` contains no gitignored secrets or local infrastructure state. Credential files (`.env` and similar) and any local-backend infrastructure-state file (for example a Terraform state file) are gitignored and exist only in the primary checkout. Because of this, secret- or state-dependent infrastructure operations — `terraform apply`, a live Ansible converge (`ansible-playbook` against real hosts), or any equivalent state-changing infra operation — MUST run from the primary checkout as `[HUMAN]` / operator steps, never from the plan's worktree. Running `terraform apply` from a worktree that has no state causes Terraform to see an empty state and attempt to recreate the entire managed estate; copying state into a worktree creates split-brain, with two checkouts mutating real infrastructure against divergent state copies. Keeping these operations in the primary checkout keeps all secret-bearing, state-changing work in a single location.
+
+Mark such steps `[HUMAN]` in the delivery checklist (per [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule)) and instruct the operator to run them from the primary checkout where the secrets and state reside.
+
 **Output**: Execution running inside the designated worktree, up to date with the latest `origin/main` (provisioned if needed).
 
 **Why this is a hard gate**: The missing `## Worktree` section is a hard-fail because there is no declared path to provision — the plan is incomplete and must be fixed by the author before execution can proceed. A CWD mismatch, by contrast, is recoverable: the executor knows the target path and navigates to or provisions the worktree automatically. Running outside a worktree without a declared path would pollute the main checkout with in-flight work, break the parallel-safety guarantee, and risk dirty-gitlink hazards in any subrepo context. The freshness sync is equally mandatory: implementing against a stale base invites merge conflicts at push time and validates the plan against code that no longer matches `origin/main`.
@@ -529,6 +535,17 @@ Report final status, archive plan if successful, and update all related READMEs.
 **Logic**:
 
 - If status is `pass` (zero findings):
+
+  **Infra-Execution Gate (precondition before archival)**: Before running `git mv`, check whether the plan's delivery checklist contains any infrastructure-apply step — `terraform apply`, `terraform destroy`, a live Ansible converge (`ansible-playbook` against real hosts), or any equivalent state-changing infra operation per the [Step 0 policy note](#0-enter-the-designated-worktree-sequential-hard-gate). If any such step is present but has NOT been verified-executed from the primary checkout (i.e., its checkbox remains unticked, or its implementation notes show it was deferred rather than genuinely run and confirmed), the workflow MUST NOT archive. Instead:
+  1. Set status to `partial`.
+  2. Leave the plan in `plans/in-progress/`.
+  3. Retain the worktree.
+  4. Surface to the user the exact infra step(s) that remain unexecuted, quoting the checkbox text and acceptance criterion verbatim.
+  5. Stop. Do not proceed to any archival step.
+
+  Zero validation findings alone is NOT sufficient for archival when an infra-apply step is still pending — the apply must be genuinely performed and its acceptance criterion verified (the provisioned resource exists and the target service responds), not merely reviewed or deferred. Only when all infra-apply steps in the delivery checklist are confirmed executed from the primary checkout may archival proceed.
+
+  When the gate passes, proceed with archival:
   1. Move entire plan folder from current location to `plans/done/`:
 
      ```bash
@@ -580,8 +597,8 @@ Report final status, archive plan if successful, and update all related READMEs.
 
 **Status determination**:
 
-- PASS: **Success** (`pass`): Zero findings after validation, all requirements met, plan moved to `plans/done/`
-- **Partial** (`partial`): Findings remain after max-iterations, plan stays in current location
+- PASS: **Success** (`pass`): Zero findings after validation, all requirements met, AND all infrastructure-apply steps in the delivery checklist (`terraform apply`, live Ansible converge, or equivalent) are verified-executed from the primary checkout — plan moved to `plans/done/`
+- **Partial** (`partial`): Findings remain after max-iterations, OR an infrastructure-apply step (`terraform apply`, live Ansible converge, or equivalent per the Step 0 policy) remains unexecuted from the primary checkout — plan stays in current location
 - FAIL: **Failure** (`fail`): Technical errors during execution or checking, plan stays in current location
 
 **Depends on**: Reaching this step from step 4, 6, or 7
@@ -616,8 +633,8 @@ with a note explaining why it was skipped rather than silently omitting it.
 
 ## Termination Criteria
 
-- PASS: **Success** (`pass`): Zero findings of ANY criticality level (CRITICAL, HIGH, MEDIUM, LOW) in final validation, all deliverables complete, plan archived to `plans/done/`
-- **Partial** (`partial`): Findings remain after max-iterations cycles, plan requires manual intervention
+- PASS: **Success** (`pass`): Zero findings of ANY criticality level (CRITICAL, HIGH, MEDIUM, LOW) in final validation, all deliverables complete, all infrastructure-apply steps verified-executed from the primary checkout, plan archived to `plans/done/`
+- **Partial** (`partial`): Findings remain after max-iterations cycles, OR an infrastructure-apply step remains unexecuted from the primary checkout — plan requires manual intervention
 - FAIL: **Failure** (`fail`): Orchestrator or checker encountered technical errors preventing completion
 
 ## Example Usage

@@ -531,6 +531,18 @@ Plans differ from `docs/` in several important ways:
 5. **Git commit**: Commit the move with completion message
 6. **Archive**: Plan is now archived for historical reference
 
+### Infra-Apply Gate (HARD RULE)
+
+A plan that contains infrastructure-apply steps — `terraform apply`, a live Ansible converge against
+real hosts, or any equivalent state-changing infra operation — MUST remain in `plans/in-progress/`
+until those steps are genuinely executed and verified from the primary checkout. Zero validation
+findings is not sufficient for completion when an infra-apply step is still pending or merely
+deferred; the plan status stays `partial`. See the
+[Step 0 policy note](../../workflows/plan/plan-execution.md#0-enter-the-designated-worktree-sequential-hard-gate)
+(secrets and infrastructure state live only in the primary checkout, never the worktree) and the
+[Step 8 Infra-Execution Gate](../../workflows/plan/plan-execution.md#8-finalization-and-archival-sequential)
+for the complete policy.
+
 ### Plan Index Files
 
 Each subfolder (`backlog/`, `in-progress/`, `done/`) has a `README.md` that:
