@@ -8,7 +8,7 @@ description: Business rationale for the deferred Vercel production cutover of th
 ## Business goal
 
 Make the post-restructure production topology **real**. After
-[`restructure-fsharp-be-and-web-app-tiers`](../restructure-fsharp-be-and-web-app-tiers/README.md)
+[`restructure-fsharp-be-and-web-app-tiers`](../../done/2026-06-14__restructure-fsharp-be-and-web-app-tiers/README.md)
 merges, the repository describes a clean three-tier model (`-www` public sites, `-app-web` app clients,
 `-be` backends) but production still runs on the old `prod-*-web` branches and old Vercel projects, and
 the app-web tier has no production presence at all. This plan performs the deferred cutover so the live

@@ -6,13 +6,13 @@ description: Downstream production cutover deferred by restructure-fsharp-be-and
 # Wire the www + app-web Tiers to the Vercel Pipeline (Prod Cutover)
 
 > **Status**: In progress — authored 2026-06-13. Execution not started.
-> **Depends on**: [`restructure-fsharp-be-and-web-app-tiers`](../restructure-fsharp-be-and-web-app-tiers/README.md)
+> **Depends on**: [`restructure-fsharp-be-and-web-app-tiers`](../../done/2026-06-14__restructure-fsharp-be-and-web-app-tiers/README.md)
 > must land first (it performs the app-directory renames and the marketing/app split but
 > **explicitly defers** the Vercel/DNS/prod-branch cutover to this plan).
 
 ## Context
 
-The [`restructure-fsharp-be-and-web-app-tiers`](../restructure-fsharp-be-and-web-app-tiers/README.md)
+The [`restructure-fsharp-be-and-web-app-tiers`](../../done/2026-06-14__restructure-fsharp-be-and-web-app-tiers/README.md)
 plan renames every public-website app to the `-www` suffix, splits OrganicLever into a marketing site
 (`organiclever-www`) plus a CSR app (`organiclever-app-web`), and renames `ose-app-be → ose-be`. It
 **deliberately does not touch production wiring** — its README records: _"No production cutover. Vercel
