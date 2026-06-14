@@ -8,7 +8,10 @@ description: Downstream production cutover deferred by restructure-fsharp-be-and
 > **Status**: In progress — authored 2026-06-13. Execution not started.
 > **Depends on**: [`restructure-fsharp-be-and-web-app-tiers`](../../done/2026-06-14__restructure-fsharp-be-and-web-app-tiers/README.md)
 > must land first (it performs the app-directory renames and the marketing/app split but
-> **explicitly defers** the Vercel/DNS/prod-branch cutover to this plan).
+> **explicitly defers** the Vercel/DNS/prod-branch cutover to this plan); and
+> [`standardize-github-actions-pipeline-naming`](../standardize-github-actions-pipeline-naming/README.md),
+> which now **owns all `.github/workflows` editing** — once it lands, this plan's workflow-update scope
+> drops to Vercel projects, DNS, GitHub Environment creation, branch creation, and non-workflow docs.
 
 ## Context
 
