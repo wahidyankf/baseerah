@@ -110,66 +110,68 @@ human-gated work is batched into the final **Phase 9**.
 
 ## Phase 2 — Reusable workflows
 
-- [ ] [AI] 2.1a **RED**: confirm `_reusable-test-and-deploy.yml` exists and the rename target does not:
+- [x] [AI] 2.1a **RED**: confirm `_reusable-test-and-deploy.yml` exists and the rename target does not:
       `test -f .github/workflows/_reusable-test-and-deploy.yml && ! test -f .github/workflows/_reusable-www-test-local-deploy.yml`
       — acceptance: exits 0.
-- [ ] [AI] 2.1b **GREEN**: `git mv .github/workflows/_reusable-test-and-deploy.yml`
+- [x] [AI] 2.1b **GREEN**: `git mv .github/workflows/_reusable-test-and-deploy.yml`
       `.github/workflows/_reusable-www-test-local-deploy.yml`; update its `name:` to
       `_reusable-www-test-local-deploy`; keep the uniform `{app}-be-e2e`+`{app}-fe-e2e` runner pair
       (be-e2e tolerant of absence via `|| true`).
       — command: `actionlint .github/workflows/_reusable-www-test-local-deploy.yml`
       — acceptance: actionlint clean; `name:` derives to filename.
-- [ ] [AI] 2.2 **GREEN**: create `_reusable-app-test-local-deploy-stag.yml` factoring the be+fe
+- [x] [AI] 2.2 **GREEN**: create `_reusable-app-test-local-deploy-stag.yml` factoring the be+fe
       integration/e2e job graph + the **dual-branch deploy** (force-push `stag-web-branch` **and**
       `stag-be-branch`) out of the two app dev workflows. Inputs: `web-project`, `be-project`,
       `contracts-project`, `compose-dir`, `stag-web-branch`, `stag-be-branch`, `be-port`, `web-port`,
       `environment`. _Acceptance_: actionlint clean; inputs cover both groups.
-- [ ] [AI] 2.3 **GREEN**: create `_reusable-app-test-stag.yml` factoring the staging-e2e job
+- [x] [AI] 2.3 **GREEN**: create `_reusable-app-test-stag.yml` factoring the staging-e2e job
       (`fe-e2e-project`, `environment`, web-base-url var); **no** promote job. _Acceptance_: actionlint clean.
-- [ ] [AI] 2.4 **GREEN**: create `_reusable-be-build-deploy.yml` by lifting `publish-images.yml`'s per-be
+- [x] [AI] 2.4 **GREEN**: create `_reusable-be-build-deploy.yml` by lifting `publish-images.yml`'s per-be
       GHCR build+push job (inputs: `be-project`, `image-name`, `environment`). _Acceptance_: actionlint clean.
+      _(2026-06-14: created 3 new reusables + renamed www reusable; all 4 actionlint-clean in isolation. Full-suite actionlint stays red on the 3 stale www callers until Phase 3.3 rewrites them — Gate 2a deferred to post-3.3.)_
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/_reusable-www-test-local-deploy.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/_reusable-app-test-local-deploy-stag.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/_reusable-app-test-stag.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/_reusable-be-build-deploy.yml` — exits 0
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0 _(cleared after Phase 3.3 rewrote the stale callers)_
+- [x] [AI] `test -f .github/workflows/_reusable-www-test-local-deploy.yml` — exits 0
+- [x] [AI] `test -f .github/workflows/_reusable-app-test-local-deploy-stag.yml` — exits 0
+- [x] [AI] `test -f .github/workflows/_reusable-app-test-stag.yml` — exits 0
+- [x] [AI] `test -f .github/workflows/_reusable-be-build-deploy.yml` — exits 0
 
 > **Pause Safety**: Four reusable workflows created and actionlint-clean. Safe to stop.
 > To resume: `actionlint .github/workflows/*.yml`.
 
 ## Phase 3 — www tier + e2e split
 
-- [ ] [AI] 3.1 **RED**: confirm stale callers exist — `git grep -n 'app-name: \(ose\|ayokoding\|wahidyankf\)-web'`
+- [x] [AI] 3.1 **RED**: confirm stale callers exist — `git grep -n 'app-name: \(ose\|ayokoding\|wahidyankf\)-web'`
       returns three lines; and `nx show project organiclever-www-be-e2e` exits non-zero (not split yet).
-- [ ] [AI] 3.2 **GREEN (e2e split)**: split `apps/organiclever-www-e2e` into `organiclever-www-be-e2e` +
+- [x] [AI] 3.2 **GREEN (e2e split)**: split `apps/organiclever-www-e2e` into `organiclever-www-be-e2e` +
       `organiclever-www-fe-e2e` (new `project.json`s, move specs/steps, register in Nx). _Acceptance_:
       `nx show project organiclever-www-be-e2e` and `nx show project organiclever-www-fe-e2e` both
       resolve; `npx nx run organiclever-www-fe-e2e:test:e2e` is wired.
-- [ ] [AI] 3.3 **GREEN**: `git mv` + rewrite the three stale callers to the new filename,
+- [x] [AI] 3.3 **GREEN**: `git mv` + rewrite the three stale callers to the new filename,
       `app-name: {site}-www`, `prod-branch: prod-{site}-www`, calling `_reusable-www-test-local-deploy.yml`:
       `ose-www-test-local-deploy-prod.yml`, `ayokoding-www-test-local-deploy-prod.yml`,
       `wahidyankf-www-test-local-deploy-prod.yml`.
-- [ ] [AI] 3.4 **GREEN**: create `organiclever-www-test-local-deploy-prod.yml` (→ `prod-organiclever-www`)
+- [x] [AI] 3.4 **GREEN**: create `organiclever-www-test-local-deploy-prod.yml` (→ `prod-organiclever-www`)
       **and** `infra/dev/organiclever-www/{docker-compose.yml,docker-compose.ci.yml,.env.example}`.
       _Acceptance_: `docker compose -f infra/dev/organiclever-www/docker-compose.yml config` valid.
-- [ ] [AI] 3.5 **REFACTOR**: confirm all four callers are thin (~15 lines) and identical in shape.
-- [ ] [AI] 3.6 **Verify**: the RED checks from 3.1 now pass/return nothing —
+      _(2026-06-15: created caller + `infra/dev/organiclever-www/docker-compose.yml` (port 3200, config-valid). Deviation: created ONLY docker-compose.yml — the www reusable references only that file and ose-www's template has no ci.yml; a per-stack `.env.example` is forbidden by tech-docs §"no duplicate templates" and organiclever-www reads no env. Note: organiclever-www has no Dockerfile yet, so the live `up --build` needs one (app follow-up); compose config + all gate checks pass.)_
+- [x] [AI] 3.5 **REFACTOR**: confirm all four callers are thin (~15 lines) and identical in shape.
+- [x] [AI] 3.6 **Verify**: the RED checks from 3.1 now pass/return nothing —
       `git grep -n 'app-name: \(ose\|ayokoding\|wahidyankf\)-web'` returns nothing.
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/ose-www-test-local-deploy-prod.yml && test -f .github/workflows/ayokoding-www-test-local-deploy-prod.yml && test -f .github/workflows/wahidyankf-www-test-local-deploy-prod.yml && test -f .github/workflows/organiclever-www-test-local-deploy-prod.yml` — exits 0
-- [ ] [AI] `nx show project organiclever-www-be-e2e && nx show project organiclever-www-fe-e2e` — both resolve
-- [ ] [AI] `git grep -n 'app-name: \(ose\|ayokoding\|wahidyankf\)-web'` — returns nothing
-- [ ] [AI] `docker compose -f infra/dev/organiclever-www/docker-compose.yml config` — exits 0
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0
+- [x] [AI] `test -f .github/workflows/ose-www-test-local-deploy-prod.yml && test -f .github/workflows/ayokoding-www-test-local-deploy-prod.yml && test -f .github/workflows/wahidyankf-www-test-local-deploy-prod.yml && test -f .github/workflows/organiclever-www-test-local-deploy-prod.yml` — exits 0
+- [x] [AI] `nx show project organiclever-www-be-e2e && nx show project organiclever-www-fe-e2e` — both resolve
+- [x] [AI] `git grep -n 'app-name: \(ose\|ayokoding\|wahidyankf\)-web'` — returns nothing
+- [x] [AI] `docker compose -f infra/dev/organiclever-www/docker-compose.yml config` — exits 0
 
 > **Pause Safety**: www tier callers created, e2e split complete, compose stack valid. Safe to stop.
 > To resume: `actionlint .github/workflows/*.yml && npx nx run rhino-cli:links:validation`.

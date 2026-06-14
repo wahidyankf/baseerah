@@ -1,4 +1,4 @@
-name: Reusable Test and Deploy
+name: _reusable-www-test-local-deploy
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: Test and Deploy Wahidyankf Web
+name: ayokoding-www-test-local-deploy-prod
 
 on:
   schedule:
@@ -14,10 +14,10 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test-and-deploy:
-    uses: ./.github/workflows/_reusable-test-and-deploy.yml
+  test-local-deploy-prod:
+    uses: ./.github/workflows/_reusable-www-test-local-deploy.yml
     with:
-      app-name: wahidyankf-web
-      prod-branch: prod-wahidyankf-web
-      health-url: http://localhost:3201
+      app-name: ayokoding-www
+      prod-branch: prod-ayokoding-www
+      health-url: http://localhost:3101/api/trpc/meta.health
       health-timeout: 150

@@ -1,6 +1,6 @@
-# organiclever-www-e2e
+# organiclever-www-fe-e2e
 
-End-to-end tests for [`apps/organiclever-www`](../organiclever-www/) using
+End-to-end frontend tests for [`apps/organiclever-www`](../organiclever-www/) using
 Playwright and `playwright-bdd`. Consumes the Gherkin feature files at
 `specs/apps/organiclever/behavior/organiclever-www/gherkin/`.
 
@@ -8,24 +8,25 @@ Playwright and `playwright-bdd`. Consumes the Gherkin feature files at
 
 ```bash
 # Install Chromium for Playwright
-nx run organiclever-www-e2e:install
+nx run organiclever-www-fe-e2e:install
 
-# Run all E2E scenarios headlessly (Playwright starts the dev server)
-nx run organiclever-www-e2e:test:e2e
+# Run all E2E scenarios headlessly (Playwright starts the production server)
+nx run organiclever-www-fe-e2e:test:e2e
 
 # Run with Playwright UI
-nx run organiclever-www-e2e:test:e2e:ui
+nx run organiclever-www-fe-e2e:test:e2e:ui
 
 # View last run report
-nx run organiclever-www-e2e:test:e2e:report
+nx run organiclever-www-fe-e2e:test:e2e:report
 
 # Pre-push quick gate (typecheck + lint; e2e runs nightly / on demand)
-nx run organiclever-www-e2e:test:quick
+nx run organiclever-www-fe-e2e:test:quick
 ```
 
 ## Features consumed
 
 - `home/home.feature` — marketing landing page rendering
+- `accessibility/accessibility.feature` — WCAG AA compliance
 
 ## Default base URL
 

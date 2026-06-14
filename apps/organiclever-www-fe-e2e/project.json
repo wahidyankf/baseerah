@@ -1,59 +1,58 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "organiclever-www-e2e",
-  "sourceRoot": "apps/organiclever-www-e2e/steps",
+  "name": "organiclever-www-fe-e2e",
+  "sourceRoot": "apps/organiclever-www-fe-e2e/src",
   "projectType": "application",
   "targets": {
     "install": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx playwright install --with-deps chromium",
-        "cwd": "{projectRoot}"
+        "command": "npm install",
+        "cwd": "apps/organiclever-www-fe-e2e"
       }
-    },
-    "typecheck": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsc --noEmit",
-        "cwd": "{projectRoot}"
-      },
-      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www/gherkin/**/*.feature"]
     },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx oxlint@latest .",
-        "cwd": "{projectRoot}"
+        "cwd": "apps/organiclever-www-fe-e2e"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx tsc --noEmit",
+        "cwd": "apps/organiclever-www-fe-e2e"
       }
     },
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["tsc --noEmit", "npx oxlint@latest ."],
+        "commands": ["npx oxlint@latest .", "npx tsc --noEmit"],
         "parallel": true,
-        "cwd": "{projectRoot}"
-      },
-      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www/gherkin/**/*.feature"]
+        "cwd": "apps/organiclever-www-fe-e2e"
+      }
     },
     "test:e2e": {
       "executor": "nx:run-commands",
+      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www/gherkin/**/*.feature"],
       "options": {
         "command": "npx bddgen && npx playwright test",
-        "cwd": "{projectRoot}"
+        "cwd": "apps/organiclever-www-fe-e2e"
       }
     },
     "test:e2e:ui": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx bddgen && npx playwright test --ui",
-        "cwd": "{projectRoot}"
+        "cwd": "apps/organiclever-www-fe-e2e"
       }
     },
     "test:e2e:report": {
       "executor": "nx:run-commands",
       "options": {
         "command": "npx playwright show-report",
-        "cwd": "{projectRoot}"
+        "cwd": "apps/organiclever-www-fe-e2e"
       }
     },
     "test:unit": {

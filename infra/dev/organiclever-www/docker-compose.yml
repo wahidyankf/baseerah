@@ -1,0 +1,16 @@
+services:
+  organiclever-www:
+    build:
+      context: ../../../
+      dockerfile: apps/organiclever-www/Dockerfile
+    ports:
+      - "3200:3200"
+    environment:
+      - PORT=3200
+      - HOSTNAME=0.0.0.0
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3200"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

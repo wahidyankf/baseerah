@@ -93,7 +93,8 @@ graph TD
 ```mermaid
 graph TD
   %% E2E tests (top level)
-  OLWWWE2E[organiclever-www-e2e]
+  OLWWWFEE2E[organiclever-www-fe-e2e]
+  OLWWWBEE2E[organiclever-www-be-e2e]
   OLAPPE2E[organiclever-app-web-e2e]
   OLBE2E[organiclever-be-e2e]
 
@@ -107,7 +108,8 @@ graph TD
   RC[rhino-cli]
 
   %% Edges
-  OLWWWE2E --> OLWWW
+  OLWWWFEE2E --> OLWWW
+  OLWWWBEE2E -.-> OLWWW
   OLAPPE2E --> OLAPP
   OLBE2E --> OLB
   OLAPP --> OLC
@@ -120,7 +122,7 @@ graph TD
 
   class RC cli
   class OLWWW,OLAPP,OLB,OLC product
-  class OLWWWE2E,OLAPPE2E,OLBE2E e2e
+  class OLWWWFEE2E,OLWWWBEE2E,OLAPPE2E,OLBE2E e2e
 ```
 
 **Legend**:
@@ -173,7 +175,8 @@ consolidate logic shared by `ose-cli` and `ayokoding-cli` after their Go-to-Rust
 | organiclever-www         | rhino-cli                         | organiclever-www/\* (test:integration)          |
 | organiclever-app-web     | rhino-cli, organiclever-contracts | organiclever-app-web/\* (test:integration)      |
 | organiclever-be          | organiclever-contracts            | organiclever-be/\* (test:integration)           |
-| organiclever-www-e2e     | organiclever-www                  | organiclever-www/\* (typecheck, test:quick)     |
+| organiclever-www-fe-e2e  | organiclever-www                  | organiclever-www/\* (test:e2e)                  |
+| organiclever-www-be-e2e  | (none — placeholder slot)         | organiclever-www-be/\* (test:e2e)               |
 | organiclever-app-web-e2e | organiclever-app-web              | organiclever-app-web/\* (typecheck, test:quick) |
 | organiclever-be-e2e      | organiclever-be                   | organiclever-be/\* (typecheck, test:quick)      |
 

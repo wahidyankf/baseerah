@@ -1,0 +1,214 @@
+name: _reusable-app-test-local-deploy-stag
+
+# Reusable heavy-test pipeline for an app-group (web + be + e2e).
+# Spins the full stack locally via docker-compose, runs integration + e2e, then
+# on success force-pushes BOTH the staging web branch (Vercel builds it) and the
+# staging be branch (triggers {product}-be-build-deploy-stag.yml -> GHCR -> coralpolyp).
+
+on:
+  workflow_call:
+    inputs:
+      web-project:
+        required: true
+        type: string
+      be-project:
+        required: true
+        type: string
+      contracts-project:
+        required: true
+        type: string
+      compose-dir:
+        required: true
+        type: string
+      stag-web-branch:
+        required: true
+        type: string
+      stag-be-branch:
+        required: true
+        type: string
+      be-port:
+        required: true
+        type: number
+      web-port:
+        required: true
+        type: number
+      environment:
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  specs-coverage:
+    name: Spec coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - name: Run specs:coverage for the app group
+        run: |
+          npx nx run ${{ inputs.be-project }}:specs:coverage
+          npx nx run ${{ inputs.web-project }}:specs:coverage
+
+  fe-lint:
+    name: FE lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - run: npx nx run ${{ inputs.web-project }}:lint
+
+  be-integration:
+    name: BE integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+
+      - name: Generate contract types for backend
+        run: |
+          npx nx run ${{ inputs.contracts-project }}:bundle
+          npx nx run ${{ inputs.be-project }}:codegen
+
+      - name: Run integration tests
+        run: |
+          docker compose -f apps/${{ inputs.be-project }}/docker-compose.integration.yml down -v 2>/dev/null || true
+          docker compose -f apps/${{ inputs.be-project }}/docker-compose.integration.yml up --abort-on-container-exit --build
+
+      - name: Teardown integration
+        if: always()
+        run: docker compose -f apps/${{ inputs.be-project }}/docker-compose.integration.yml down -v
+
+  fe-integration:
+    name: FE integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+
+      - name: Generate contract types
+        run: |
+          npx nx run ${{ inputs.contracts-project }}:bundle
+          npx nx run ${{ inputs.web-project }}:codegen
+
+      - name: Run integration tests
+        run: npx nx run ${{ inputs.web-project }}:test:integration
+
+  e2e:
+    name: E2E tests (BE + FE)
+    needs: [be-integration, fe-integration]
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+
+      - name: Generate contract types
+        run: |
+          npx nx run ${{ inputs.contracts-project }}:bundle
+          npx nx run ${{ inputs.be-project }}:codegen
+          npx nx run ${{ inputs.web-project }}:codegen
+
+      - name: Start full stack (backend + frontend)
+        run: docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml up --build -d
+
+      - name: Wait for backend to be healthy
+        run: |
+          echo "Waiting for backend on port ${{ inputs.be-port }}..."
+          for i in $(seq 1 36); do
+            if curl -sf "http://localhost:${{ inputs.be-port }}/api/v1/health" > /dev/null 2>&1; then
+              echo "Backend is healthy"
+              exit 0
+            fi
+            echo "[$i/36] Waiting..."
+            sleep 10
+          done
+          echo "Backend did not become healthy within 6 minutes"
+          docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml logs ${{ inputs.be-project }}
+          exit 1
+
+      - name: Wait for frontend to be ready
+        run: |
+          echo "Waiting for frontend on port ${{ inputs.web-port }}..."
+          for i in $(seq 1 36); do
+            if curl -sf "http://localhost:${{ inputs.web-port }}" > /dev/null 2>&1; then
+              echo "Frontend is ready"
+              exit 0
+            fi
+            echo "[$i/36] Waiting..."
+            sleep 10
+          done
+          echo "Frontend did not start within 6 minutes"
+          docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml logs ${{ inputs.web-project }}
+          exit 1
+
+      - uses: ./.github/actions/setup-playwright
+
+      - name: Run BE E2E tests
+        run: npx nx run ${{ inputs.be-project }}-e2e:test:e2e
+        env:
+          BASE_URL: http://localhost:${{ inputs.be-port }}
+
+      - name: Upload BE E2E report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ inputs.be-project }}
+          path: apps/${{ inputs.be-project }}-e2e/playwright-report/
+          retention-days: 7
+
+      - name: Run FE E2E tests
+        run: npx nx run ${{ inputs.web-project }}-e2e:test:e2e
+        env:
+          WEB_BASE_URL: http://localhost:${{ inputs.web-port }}
+
+      - name: Upload FE E2E report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ inputs.web-project }}
+          path: apps/${{ inputs.web-project }}-e2e/playwright-report/
+          retention-days: 7
+
+      - name: Teardown
+        if: always()
+        run: docker compose -f ${{ inputs.compose-dir }}/docker-compose.yml -f ${{ inputs.compose-dir }}/docker-compose.ci.yml down -v
+
+  specs-gate:
+    name: Specs gate (BDD+DDD validators)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run-many -t specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --projects=rhino-cli
+
+  deploy:
+    name: Deploy to staging (force-push web + be branches)
+    needs: [specs-coverage, fe-lint, be-integration, fe-integration, e2e, specs-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      # Force-push the staging web branch: Vercel listens to it and builds the
+      # preview. Allow ~2.5h before the *-app-test-stag-deploy-prod run so the
+      # Vercel build + coralpolyp rollout have settled.
+      - name: Deploy web to staging branch
+        run: git push origin HEAD:${{ inputs.stag-web-branch }} --force
+      # Force-push the staging be branch: triggers {product}-be-build-deploy-stag.yml
+      # which builds + pushes the GHCR image consumed by ose-infra coralpolyp.
+      - name: Deploy be to staging branch
+        run: git push origin HEAD:${{ inputs.stag-be-branch }} --force

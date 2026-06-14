@@ -30,5 +30,6 @@ nx dev organiclever-www   # http://localhost:3200
 
 ## Related
 
-- [organiclever-www-e2e](../organiclever-www-e2e/README.md) — Playwright E2E tests
+- [organiclever-www-fe-e2e](../organiclever-www-fe-e2e/README.md) — Playwright FE E2E tests
+- [organiclever-www-be-e2e](../organiclever-www-be-e2e/README.md) — Playwright BE E2E slot (placeholder)
 - [specs/apps/organiclever/](../../specs/apps/organiclever/README.md) — full spec tree

@@ -27,7 +27,7 @@ specs/apps/organiclever/behavior/organiclever-www/gherkin/
 ## Consumed by
 
 - **Unit**: `apps/organiclever-www/test/unit/steps/` via `@amiceli/vitest-cucumber`
-- **E2E**: `apps/organiclever-www-e2e/steps/` via `playwright-bdd`
+- **E2E**: `apps/organiclever-www-fe-e2e/src/steps/` via `playwright-bdd`
 
 ## Related
 

@@ -97,7 +97,8 @@ Flat structure - all apps at the same level, no subdirectories.
 - `ose-cli` - OSE Platform site maintenance CLI (Rust application)
 - `crane-cli` - PDF-to-Markdown pipeline CLI (F# application)
 - `organiclever-www` - OrganicLever marketing website (Next.js 16, port 3200)
-- `organiclever-www-e2e` - Playwright FE E2E tests for organiclever-www
+- `organiclever-www-fe-e2e` - Playwright FE E2E tests for organiclever-www
+- `organiclever-www-be-e2e` - Playwright BE E2E slot for organiclever-www (placeholder — no backend API)
 - `organiclever-app-web` - OrganicLever app frontend (Next.js 16 application, port 3202)
 - `organiclever-app-web-e2e` - Playwright FE E2E tests for organiclever-app-web
 - `organiclever-be` - OrganicLever F#/Giraffe/ASP.NET REST API backend (port 8202)

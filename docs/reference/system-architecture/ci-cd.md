@@ -203,11 +203,11 @@ graph LR
 
 **Steps:**
 
-1. Run `specs:coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-www`, `organiclever-be-e2e`, `organiclever-www-e2e`)
+1. Run `specs:coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-www`, `organiclever-be-e2e`, `organiclever-www-be-e2e`, `organiclever-www-fe-e2e`)
 2. Run `fe-lint` for `organiclever-www`
 3. Run `be-integration` tests with docker-compose (real PostgreSQL) under `organiclever-web-development` env
 4. Run `fe-integration` tests (MSW-mocked)
-5. Run combined `e2e` stage under `organiclever-web-development` env: full stack via docker-compose, then `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`) and `organiclever-www-e2e` (`WEB_BASE_URL: http://localhost:3200`) Playwright tests
+5. Run combined `e2e` stage under `organiclever-web-development` env: full stack via docker-compose, then `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`), `organiclever-www-be-e2e` (placeholder — tolerated-absent via `|| true`), and `organiclever-www-fe-e2e` (`WEB_BASE_URL: http://localhost:3200`) Playwright tests
 6. `detect-changes`: check `apps/organiclever-www/` vs previous commit
 7. `deploy` (gated on all test jobs + `detect-changes == true`): force-push `HEAD` to `stag-organiclever-web`; Vercel auto-builds the staging site
 
@@ -222,7 +222,7 @@ graph LR
 **Steps:**
 
 1. Single job `e2e-staging` under `organiclever-web-staging` env
-2. Runs `npx nx run organiclever-www-e2e:test:e2e` against the staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}`
+2. Runs `npx nx run organiclever-www-fe-e2e:test:e2e` against the staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}`
 3. Uploads `playwright-report-organiclever-web-staging` as an artifact
 
 **Purpose**: Continuous health check of the staging deployment between development pushes. Read-only — never deploys.

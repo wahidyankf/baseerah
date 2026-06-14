@@ -1,0 +1,50 @@
+name: _reusable-app-test-stag
+
+# Reusable staging gate: run the app's FE E2E suite against the deployed staging
+# URL (behind Vercel Deployment Protection, so the bypass secret is required).
+# On pass it STOPS — there is no promote job (prod CD is a separate plan).
+
+on:
+  workflow_call:
+    inputs:
+      fe-e2e-project:
+        required: true
+        type: string
+      environment:
+        required: false
+        type: string
+        default: ""
+      web-base-url-var:
+        required: false
+        type: string
+        default: WEB_BASE_URL
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-staging:
+    name: FE E2E tests against staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-playwright
+
+      - name: Run FE E2E tests against staging
+        run: npx nx run ${{ inputs.fe-e2e-project }}:test:e2e
+        env:
+          WEB_BASE_URL: ${{ vars[inputs.web-base-url-var] }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          PLAYWRIGHT_GREP_INVERT: "@local-fullstack"
+
+      - name: Upload FE E2E report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-${{ inputs.fe-e2e-project }}-staging
+          path: apps/${{ inputs.fe-e2e-project }}/playwright-report/
+          retention-days: 7

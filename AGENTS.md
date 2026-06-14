@@ -34,7 +34,8 @@
   - `ose-cli` — Rust CLI tool for OSE Platform site maintenance (link validation)
   - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture.
   - `organiclever-www` — Next.js 16 OrganicLever marketing website (port 3200)
-  - `organiclever-www-e2e` — Playwright FE E2E tests for organiclever-www
+  - `organiclever-www-be-e2e` — Playwright BE E2E slot for organiclever-www (placeholder — no backend API)
+  - `organiclever-www-fe-e2e` — Playwright FE E2E tests for organiclever-www
   - `organiclever-app-web` — Next.js 16 OrganicLever app frontend (port 3202)
   - `organiclever-app-web-e2e` — Playwright FE E2E tests for organiclever-app-web
   - `organiclever-be` — F# / Giraffe / ASP.NET 10 REST API backend for OrganicLever (port 8202)
@@ -65,7 +66,8 @@ ose-public/
 │   ├── ose-cli/              # OSE Platform site CLI (Rust)
 │   ├── crane-cli/            # PDF-to-Markdown pipeline CLI (F#)
 │   ├── organiclever-www/     # OrganicLever marketing website (Next.js 16, port 3200)
-│   ├── organiclever-www-e2e/ # Playwright FE E2E tests for organiclever-www
+│   ├── organiclever-www-be-e2e/ # Playwright BE E2E slot for organiclever-www (placeholder)
+│   ├── organiclever-www-fe-e2e/ # Playwright FE E2E tests for organiclever-www
 │   ├── organiclever-app-web/ # OrganicLever app frontend (Next.js 16, port 3202)
 │   ├── organiclever-app-web-e2e/ # Playwright FE E2E tests for organiclever-app-web
 │   ├── organiclever-be/      # OrganicLever F#/Giraffe REST API backend (port 8202)
@@ -489,7 +491,7 @@ Six-layer governance hierarchy:
 - **Deployment**: Vercel
 - **Content**: OrganicLever marketing website
 - **Dev port**: 3200
-- **E2E tests**: `organiclever-www-e2e`
+- **E2E tests**: `organiclever-www-be-e2e`, `organiclever-www-fe-e2e`
 
 **See**: [apps/organiclever-www/README.md](./apps/organiclever-www/README.md)
 

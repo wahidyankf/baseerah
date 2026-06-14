@@ -1,4 +1,4 @@
-name: Test and Deploy OSE Web
+name: wahidyankf-www-test-local-deploy-prod
 
 on:
   schedule:
@@ -14,10 +14,10 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test-and-deploy:
-    uses: ./.github/workflows/_reusable-test-and-deploy.yml
+  test-local-deploy-prod:
+    uses: ./.github/workflows/_reusable-www-test-local-deploy.yml
     with:
-      app-name: ose-web
-      prod-branch: prod-ose-web
-      health-url: http://localhost:3100/api/trpc/health.check
+      app-name: wahidyankf-www
+      prod-branch: prod-wahidyankf-www
+      health-url: http://localhost:3201
       health-timeout: 150
