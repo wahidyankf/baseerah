@@ -1,8 +1,0 @@
-go 1.26
-
-use (
-	./apps/ayokoding-cli
-	./apps/ose-cli
-	./libs/golang-commons
-	./libs/golang-link-commons
-)
