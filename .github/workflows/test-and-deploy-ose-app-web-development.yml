@@ -52,7 +52,7 @@ jobs:
 
       - name: Generate contract types for backend
         run: |
-          npx nx run ose-app-contracts:bundle
+          npx nx run ose-contracts:bundle
           npx nx run ose-be:codegen
 
       - name: Run integration tests
@@ -75,7 +75,7 @@ jobs:
 
       - name: Generate contract types
         run: |
-          npx nx run ose-app-contracts:bundle
+          npx nx run ose-contracts:bundle
           npx nx run ose-app-web:codegen
 
       - name: Run integration tests
@@ -94,7 +94,7 @@ jobs:
 
       - name: Generate contract types
         run: |
-          npx nx run ose-app-contracts:bundle
+          npx nx run ose-contracts:bundle
           npx nx run ose-be:codegen
           npx nx run ose-app-web:codegen
 
