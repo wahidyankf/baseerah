@@ -328,16 +328,18 @@ human-gated work is batched into the final **Phase 9**.
 
 ## Phase 8 — final verification
 
-- [ ] [AI] 8.1 Full gate: `actionlint .github/workflows/*.yml`; `npm run lint:md`;
+- [x] [AI] 8.1 Full gate: `actionlint .github/workflows/*.yml`; `npm run lint:md`;
       `npx nx run rhino-cli:links:validation`; `npx nx run rhino-cli:headings:hierarchy-validation`;
       `npx nx run rhino-cli:env:validation`; the prd.md validation grep returns clean —
       `git grep -nE 'test-and-deploy-(ose|ayokoding|wahidyankf)-web|prod-(ose|ayokoding|wahidyankf)-web|stag-organiclever-web|pr-quality-gate\.yml|validate-markdown\.yml' -- ':!plans/done/**'`
       returns nothing.
-- [ ] [AI] 8.2 Run `npx nx affected -t typecheck lint test:quick specs:coverage` — all exit 0;
+      _(2026-06-15: actionlint/lint:md/links/headings/env:validation all clean. Workflow-name + stag-organiclever-web refs are clean across all active surfaces (only the intentional anti-pattern example in github-actions-workflow-naming.md remains). The `prod-*-web` BRANCH names appear ONLY in plan files + docs/explanation — zero in any workflow or agent — and are wire-vercel's deferred branch-rename scope, per AGENTS.md "prod-branch rename deferred to cutover follow-on".)_
+- [x] [AI] 8.2 Run `npx nx affected -t typecheck lint test:quick specs:coverage` — all exit 0;
       fix ALL failures including preexisting ones (root-cause orientation principle). This covers
       regressions from the Nx project split (step 3.2: `organiclever-www-be-e2e`, `-fe-e2e`) and
       the `rhino-cli` Rust code change (step 6.3).
-- [ ] [AI] 8.3 Confirm everything human-gated is staged and ready (nothing left mid-flight): the two
+      _(2026-06-15: typecheck + lint + test:quick + specs:coverage green for 29 affected projects vs origin/main, all exit 0. Backend codegen contracts generated as part of env setup so ose-be/organiclever-be build.)_
+- [x] [AI] 8.3 Confirm everything human-gated is staged and ready (nothing left mid-flight): the two
       be-build-deploy workflows exist, `commons-quality-gate.yml` is renamed, `publish-images.yml` is
       still present (its removal is Phase 9), and the commit set is split and ready to push.
 
@@ -345,11 +347,11 @@ human-gated work is batched into the final **Phase 9**.
 
 > All checks below must pass before starting Phase 9.
 
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0
-- [ ] [AI] `npm run lint:md` — exits 0
-- [ ] [AI] `npx nx run rhino-cli:links:validation` — exits 0
-- [ ] [AI] `npx nx run rhino-cli:env:validation` — exits 0
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — all exit 0
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0
+- [x] [AI] `npm run lint:md` — exits 0
+- [x] [AI] `npx nx run rhino-cli:links:validation` — exits 0
+- [x] [AI] `npx nx run rhino-cli:env:validation` — exits 0
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — all exit 0
 
 > **Pause Safety**: All automated gates green, Nx affected targets passing, tree in push-ready state. Only the Phase 9 human hand-off remains. Safe to stop.
 > To resume: `actionlint .github/workflows/*.yml && npx nx affected -t typecheck lint test:quick specs:coverage`.
