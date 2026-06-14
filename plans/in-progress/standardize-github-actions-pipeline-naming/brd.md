@@ -33,14 +33,14 @@ coherent, correctly-wired workflow set to build on.
 - **Setting real env/secret values** in GitHub, Vercel, or k3s — this plan defines the contract +
   manifest only; value population is wire-vercel / ose-infra `[HUMAN]` work.
 
-## Stakeholders
+## Affected Roles
 
-| Stakeholder            | Interest                                                                 |
-| ---------------------- | ------------------------------------------------------------------------ |
-| Repo maintainer        | Legible, correctly-wired CI; unblocked Vercel cutover                    |
-| Future contributors    | Predictable place + name for each app's pipeline                         |
-| `wire-vercel` executor | A workflow set that only needs branches/projects created, not rewritten  |
-| ose-infra owner        | Clear boundary: be images published here, k8s rollout stays in ose-infra |
+| Role                   | How affected                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| Repo maintainer        | Gains legible, correctly-wired CI; Vercel cutover is unblocked                           |
+| Future contributors    | Finds a predictable place + name for each app's pipeline                                 |
+| `wire-vercel` executor | Receives a workflow set that only needs branches/projects created, not rewritten         |
+| ose-infra owner        | Benefits from a clear boundary: be images published here, k8s rollout stays in ose-infra |
 
 ## Impact
 

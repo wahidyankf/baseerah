@@ -341,6 +341,33 @@ new target wiring**. It stays a **static, value-free** check. Actual presence of
 GitHub/Vercel/k3s is **not** machine-checkable from this repo and stays a wire-vercel / ose-infra
 `[HUMAN]` responsibility — the manifest is what they verify against.
 
+### Testing strategy
+
+The only code change in this plan is the extension of `rhino-cli env validate` with a
+manifest-consistency pass (delivery step 6.3). All other changes are YAML/Markdown edits,
+which are tested by linters, not unit tests.
+
+**Unit-test approach for the `env validate` extension**:
+
+- Tests live in `apps/rhino-cli/src/` alongside existing `env validate` tests, following the
+  repo's TDD shape: RED (write a failing test asserting the new manifest-consistency rule),
+  GREEN (implement the pass), REFACTOR (clean up).
+- Test fixture: a deliberately mismatched `env-injection.yaml` + `.env.example` pair that causes
+  the new pass to fail. The test asserts the command exits non-zero and emits a diagnostic naming
+  the mismatched key.
+- A correctly-matched fixture asserts the command exits zero (happy path).
+- The Nx target `rhino-cli:env:validation` already runs `env validate` against the repo's live
+  files; the new pass rides the same target — no new target wiring required.
+- TDD fixture files are committed under `apps/rhino-cli/tests/fixtures/env-injection/` (_New
+  directory_).
+
+**Coverage for workflow YAML changes**:
+
+- `actionlint` validates every `.github/workflows/*.yml` file — syntax, job references, and input
+  types are all checked.
+- `rhino-cli:links:validation` confirms no cross-reference points at an old (pre-rename) filename.
+- The PRD validation grep (`git grep`) confirms no stale project names remain in workflow files.
+
 ### Docs & rules this introduces or amends
 
 The env-injection standard touches a fixed governance surface; the delivery sweep updates all of it:
