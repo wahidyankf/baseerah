@@ -41,6 +41,18 @@ export default defineConfig({
     screenshot: "only-on-failure",
     extraHTTPHeaders,
   },
+  webServer: {
+    command:
+      "cp -r apps/organiclever-app-web/.next/static apps/organiclever-app-web/.next/standalone/worktrees/restructure-fsharp-be-and-web-app-tiers/apps/organiclever-app-web/.next/ && cp -r apps/organiclever-app-web/public apps/organiclever-app-web/.next/standalone/worktrees/restructure-fsharp-be-and-web-app-tiers/apps/organiclever-app-web/ && node apps/organiclever-app-web/.next/standalone/worktrees/restructure-fsharp-be-and-web-app-tiers/apps/organiclever-app-web/server.js",
+    url: "http://localhost:3202",
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    cwd: "../..",
+    env: {
+      PORT: "3202",
+      NODE_ENV: "production",
+    },
+  },
   projects: [
     {
       name: "chromium",

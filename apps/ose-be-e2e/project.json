@@ -38,8 +38,7 @@
     "test:e2e": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx bddgen && npx playwright test",
-        "cwd": "apps/ose-be-e2e"
+        "command": "apps/ose-be/scripts/run-e2e.sh"
       }
     },
     "test:e2e:ui": {

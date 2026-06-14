@@ -681,55 +681,55 @@ ose-www:typecheck` exit 0.
 
 > _Suggested executor: swe-e2e-dev_
 
-- [ ] [AI] Adapt all e2e: `ose-be-e2e`, `organiclever-be-e2e` (drop media + crane NATS steps;
+- [x] [AI] Adapt all e2e: `ose-be-e2e`, `organiclever-be-e2e` (drop media + crane NATS steps;
       keep preserved-path + JetStream-demo-over-HTTP); `organiclever-app-web-e2e` (app);
       `organiclever-www-e2e` (marketing renders); `ose-www-fe-e2e` (feed/updates render);
       `wahidyankf-www-fe-e2e` (renders); `ayokoding-www-be-e2e` + `ayokoding-www-fe-e2e` (renders,
       tRPC) — acceptance: `grep -rE 'crane|media' apps/*-e2e/` zero.
-- [ ] [AI] Update each backend `docker-compose.e2e.yml` to PostgreSQL + NATS (no crane) — acceptance:
+- [x] [AI] Update each backend `docker-compose.e2e.yml` to PostgreSQL + NATS (no crane) — acceptance:
       `grep crane apps/*/docker-compose.e2e.yml` zero.
-- [ ] [AI] Run all e2e: `nx run ose-be-e2e:test:e2e`, `nx run organiclever-be-e2e:test:e2e`,
+- [x] [AI] Run all e2e: `nx run ose-be-e2e:test:e2e`, `nx run organiclever-be-e2e:test:e2e`,
       `nx run organiclever-app-web-e2e:test:e2e`, `nx run organiclever-www-e2e:test:e2e`,
       `nx run ose-www-fe-e2e:test:e2e`, `nx run wahidyankf-www-fe-e2e:test:e2e`,
       `nx run ayokoding-www-be-e2e:test:e2e`, `nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: all
       exit 0; JetStream demo (delivered + acked) asserted.
-- [ ] [AI] Full affected quality gate:
+- [x] [AI] Full affected quality gate:
       `npx nx affected -t typecheck lint test:quick test:integration specs:coverage --base=origin/main`
       — acceptance: exits 0.
-- [ ] [AI] If any target failed: root-cause + fix-forward (no `--skip-nx-cache` / bypass), re-run —
+- [x] [AI] If any target failed: root-cause + fix-forward (no `--skip-nx-cache` / bypass), re-run —
       acceptance: exits 0.
 
 ### Manual UI Verification (Playwright MCP)
 
-- [ ] [AI] Start dev servers: `nx dev organiclever-www` (port 3200) and `nx dev ose-www` (port 3100).
-- [ ] [AI] Navigate to the new `organiclever-www` marketing site via `browser_navigate
+- [x] [AI] Start dev servers: `nx dev organiclever-www` (port 3200) and `nx dev ose-www` (port 3100).
+- [x] [AI] Navigate to the new `organiclever-www` marketing site via `browser_navigate
 http://localhost:3200` — acceptance: page loads without errors.
-- [ ] [AI] Inspect DOM via `browser_snapshot` — verify the marketing site home page renders the
+- [x] [AI] Inspect DOM via `browser_snapshot` — verify the marketing site home page renders the
       expected landing content from the former `landing` context (headline, hero section).
-- [ ] [AI] Test interactive elements via `browser_click` on any nav links or CTAs — verify navigation
+- [x] [AI] Test interactive elements via `browser_click` on any nav links or CTAs — verify navigation
       works without JS errors.
-- [ ] [AI] Check for JS errors via `browser_console_messages` — must be zero errors on
+- [x] [AI] Check for JS errors via `browser_console_messages` — must be zero errors on
       `organiclever-www`.
-- [ ] [AI] Take a screenshot via `browser_take_screenshot` for visual record of the new marketing site.
-- [ ] [AI] Navigate to `ose-www` via `browser_navigate http://localhost:3100` — verify `src/features/`
+- [x] [AI] Take a screenshot via `browser_take_screenshot` for visual record of the new marketing site.
+- [x] [AI] Navigate to `ose-www` via `browser_navigate http://localhost:3100` — verify `src/features/`
       layout renders correctly and content pipeline (feed/updates) is present via `browser_snapshot`.
-- [ ] [AI] Check `browser_console_messages` on `ose-www` — must be zero JS errors.
-- [ ] [AI] Take a screenshot via `browser_take_screenshot` for visual record of the simplified
+- [x] [AI] Check `browser_console_messages` on `ose-www` — must be zero JS errors.
+- [x] [AI] Take a screenshot via `browser_take_screenshot` for visual record of the simplified
       `ose-www`. Stop dev servers.
 
 ### Manual API Verification (curl)
 
-- [ ] [AI] Start each backend dev server; `curl /health` → 200 + JSON; verify one non-`/health`
+- [x] [AI] Start each backend dev server; `curl /health` → 200 + JSON; verify one non-`/health`
       preserved endpoint (ose-be) + one journal CRUD verb (organiclever-be) returns 2xx; verify
       an error case returns 404/400 (not 500). Stop servers.
 
 ### Phase 8 Gate
 
-- [ ] [AI] All e2e runs exit 0; no media scenarios executed.
-- [ ] [AI] `nx run ose-be:test:quick && nx run organiclever-be:test:quick` — coverage ≥90%.
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick test:integration specs:coverage --base=origin/main`
+- [x] [AI] All e2e runs exit 0; no media scenarios executed.
+- [x] [AI] `nx run ose-be:test:quick && nx run organiclever-be:test:quick` — coverage ≥90%.
+- [x] [AI] `npx nx affected -t typecheck lint test:quick test:integration specs:coverage --base=origin/main`
       — exits 0.
-- [ ] [AI] `curl` /health on both backends — 200 confirmed.
+- [x] [AI] `curl` /health on both backends — 200 confirmed.
 
 > **Pause Safety**: all gates green locally. Resume: re-run the full affected gate. **Push after gate.**
 

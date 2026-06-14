@@ -26,7 +26,7 @@ Given("the journal API is running", async () => {
 
 Given("a journal entry has been created", async ({ request }) => {
   const resp = await request.post("/api/v1/journal/entries", {
-    data: { name: "fixture entry" },
+    data: { name: "workout" },
     headers: { "Content-Type": "application/json" },
   });
   expect(resp.status()).toBe(201);
@@ -38,7 +38,7 @@ Given("a journal entry has been created", async ({ request }) => {
 When("a client posts a valid journal entry", async ({ request }) => {
   setResponse(
     await request.post("/api/v1/journal/entries", {
-      data: { name: "my first entry" },
+      data: { name: "reading" },
       headers: { "Content-Type": "application/json" },
     }),
   );
@@ -65,7 +65,7 @@ When("a client updates the journal entry name", async ({ request }) => {
   expect(createdEntryId).not.toBeNull();
   setResponse(
     await request.put(`/api/v1/journal/entries/${createdEntryId}`, {
-      data: { name: "updated entry name" },
+      data: { name: "focus" },
       headers: { "Content-Type": "application/json" },
     }),
   );
@@ -96,7 +96,7 @@ Then("the journal list should include the created entry", async () => {
 
 Then("the updated journal entry should reflect the new name", async () => {
   const body = (await getResponse().json()) as Record<string, unknown>;
-  expect(body["name"]).toBe("updated entry name");
+  expect(body["name"]).toBe("focus");
 });
 
 Then("fetching the deleted journal entry should return 404", async ({ request }) => {

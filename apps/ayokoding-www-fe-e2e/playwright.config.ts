@@ -22,6 +22,18 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
+  webServer: {
+    command:
+      "cp -r apps/ayokoding-www/.next/static apps/ayokoding-www/.next/standalone/apps/ayokoding-www/.next/ && cp -r apps/ayokoding-www/public apps/ayokoding-www/.next/standalone/apps/ayokoding-www/ && node apps/ayokoding-www/.next/standalone/apps/ayokoding-www/server.js",
+    url: "http://localhost:3101",
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    cwd: workspaceRoot,
+    env: {
+      PORT: "3101",
+      NODE_ENV: "production",
+    },
+  },
   projects: process.env.CI
     ? [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }]
     : [
