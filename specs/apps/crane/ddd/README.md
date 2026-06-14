@@ -1,6 +1,6 @@
 # crane — DDD Artifacts
 
-DDD adoption status for the `crane-cli` / `crane-be` apps.
+DDD adoption status for the `crane-cli` app.
 
 ## Adoption Status
 

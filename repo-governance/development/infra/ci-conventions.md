@@ -338,9 +338,7 @@ variant-specific inputs.
 **Examples**:
 
 ```
-.github/workflows/_reusable-backend-e2e.yml
-.github/workflows/_reusable-frontend-e2e.yml
-.github/workflows/_reusable-coverage-upload.yml
+.github/workflows/_reusable-test-and-deploy.yml
 ```
 
 ### CRON Schedule
@@ -377,8 +375,8 @@ services themselves run in parallel across matrix entries.
 | Infra dev directory | `infra/dev/{app-name}/`                                                                   | `infra/dev/organiclever-be/`                                |
 | Specs directory     | See [Specs Directory Structure](../../conventions/structure/specs-directory-structure.md) | `specs/apps/organiclever/behavior/organiclever-be/gherkin/` |
 | Test workflow       | `test-{app-name}.yml`                                                                     | `test-and-deploy-organiclever-web-development.yml`          |
-| Reusable workflow   | `_reusable-{purpose}.yml`                                                                 | `_reusable-backend-e2e.yml`                                 |
-| Composite action    | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-golang/action.yml`                   |
+| Reusable workflow   | `_reusable-{purpose}.yml`                                                                 | `_reusable-test-and-deploy.yml`                             |
+| Composite action    | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                     |
 | Deploy workflow     | `test-and-deploy-{app}.yml`                                                               | `test-and-deploy-organiclever-web-development.yml`          |
 | PR workflow         | `pr-{purpose}.yml`                                                                        | `pr-quality-gate.yml`                                       |
 

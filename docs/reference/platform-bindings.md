@@ -60,12 +60,13 @@ must never carry content that diverges from `AGENTS.md`. See the
 Two binding directories already exist in the repository but were **not produced by `rhino-cli agents
 sync`**:
 
-- **`.github/{agents,prompts,skills}`** — These directories are provided by the Nx MCP tooling
-  infrastructure (specifically the `nx-mcp` server and the Nx CI monitor skill). The
-  `.github/agents/ci-monitor-subagent.agent.md` and `.github/prompts/monitor-ci.prompt.md` files
-  are GitHub Copilot agent and prompt artifacts used by the Nx CI-monitoring workflow, not by the
-  repo's own agent authoring pipeline. `rhino-cli agents sync` does not write to `.github/` and
-  will not clobber these files.
+- **`.github/skills/`** — Provided by the Nx MCP tooling infrastructure (the `nx-mcp` server): the
+  Nx workspace skills (`nx-workspace`, `nx-generate`, `nx-run-tasks`, and the like) that the repo's
+  agent guidance invokes. `rhino-cli agents sync` does not write to `.github/` and will not clobber
+  these files. (The Nx CI-monitor Copilot artifacts that previously lived at
+  `.github/agents/ci-monitor-subagent.agent.md` and `.github/prompts/monitor-ci.prompt.md` were
+  removed — the repo monitors CI via the `gh` CLI per its CI-monitoring convention, not the Nx Cloud
+  self-healing assistant.)
 
 - **`.codex/config.toml`** — Provided by the OpenAI Codex CLI tooling. It configures the
   `nx-mcp` MCP server for Codex and declares the `ci-monitor-subagent` agent entry as an

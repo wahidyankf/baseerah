@@ -132,27 +132,28 @@ graph LR
 **Steps:**
 
 1. Checkout PR branch
-2. Setup language runtimes (Node.js, Go, .NET, Python)
+2. Setup language runtimes (Node.js, .NET, Rust)
 3. Install dependencies
 4. Run typecheck, lint, test:quick, specs:coverage for affected projects
 5. Validate agent naming and workflow naming conventions
 
 **Purpose**: Full quality gate on every PR — typecheck, lint, unit tests, coverage, naming validation
 
-### PR Link Validation Workflow
+### Validate Markdown Workflow
 
-**File**: `.github/workflows/pr-validate-links.yml`
+**File**: `.github/workflows/validate-markdown.yml`
 
-**Trigger**: Pull request opened, synchronized, or reopened
+**Trigger**: Pull request and push to `main`
 
 **Steps:**
 
-1. Checkout PR branch
-2. Setup Go 1.26.0
-3. Run link validation (`rhino-cli md validate links`)
-4. Fail PR if broken links detected
+1. Checkout (full history)
+2. Setup Node and Rust
+3. Validate mermaid diagrams (`nx run rhino-cli:mermaid:validation`)
+4. Validate markdown links (`nx run rhino-cli:links:validation`)
+5. Validate heading hierarchy (`nx run rhino-cli:headings:hierarchy-validation`)
 
-**Purpose**: Prevent merging PRs with broken markdown links
+**Purpose**: Block PRs/pushes with broken markdown links, invalid mermaid diagrams, or heading-hierarchy violations
 
 ### Test and Deploy AyoKoding Web Workflow
 
@@ -173,7 +174,7 @@ graph LR
 **Steps:**
 
 1. Detect changes in `apps/ose-www/` vs `prod-ose-web` branch
-2. If changes exist (or `force_deploy=true`): setup Volta, Go 1.26.0
+2. If changes exist (or `force_deploy=true`): setup Node (Volta)
 3. Install dependencies and run `nx build ose-www`
 4. Force-push `main` to `prod-ose-web`; Vercel auto-builds
 
@@ -188,7 +189,7 @@ graph LR
 **Steps:**
 
 1. Detect changes in `apps/wahidyankf-www/` vs `prod-wahidyankf-web` branch
-2. If changes exist (or `force_deploy=true`): setup Volta, Go 1.26.0
+2. If changes exist (or `force_deploy=true`): setup Node (Volta)
 3. Install dependencies and run `nx build wahidyankf-www`
 4. Force-push `main` to `prod-wahidyankf-web`; Vercel auto-builds
 
