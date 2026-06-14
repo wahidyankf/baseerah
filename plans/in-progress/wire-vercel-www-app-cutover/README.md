@@ -5,16 +5,26 @@ description: Downstream production cutover deferred by restructure-fsharp-be-and
 
 # Wire the www + app-web Tiers to the Vercel Pipeline (Prod Cutover)
 
-> **Status**: In progress — authored 2026-06-13. Execution not started.
+> **Status**: In progress — authored 2026-06-13. Execution not started. **Both prerequisites are now
+> complete** (see below), so this plan is **unblocked and ready to execute**.
 > **Depends on**: [`restructure-fsharp-be-and-web-app-tiers`](../../done/2026-06-14__restructure-fsharp-be-and-web-app-tiers/README.md)
-> must land first (it performs the app-directory renames and the marketing/app split but
-> **explicitly defers** the Vercel/DNS/prod-branch cutover to this plan); and
-> [`standardize-github-actions-pipeline-naming`](../../done/2026-06-15__standardize-github-actions-pipeline-naming/README.md),
-> which now **owns all `.github/workflows` editing** and defines the tiered env/secret **injection
-> standard** (the value-less `env-injection.yaml` manifest). **This plan assumes that plan is DONE**:
-> the workflows are already restructured/renamed and the manifest exists, so this plan's scope drops to
+> (**DONE** — completed + archived 2026-06-14; it performed the app-directory renames and the
+> marketing/app split but **explicitly deferred** the Vercel/DNS/prod-branch cutover to this plan); and
+> [`standardize-github-actions-pipeline-naming`](../../done/2026-06-15__standardize-github-actions-pipeline-naming/README.md)
+> (**DONE** — completed + archived 2026-06-15), which **owns all `.github/workflows` editing** and
+> defines the tiered env/secret **injection standard** (the value-less `env-injection.yaml` manifest).
+> Both plans have landed on `origin/main`: the workflows are already restructured/renamed (the
+> `{site}-www-test-local-deploy-prod` / `{group}-app-test-local-deploy-stag` / `*-test-stag-deploy-prod`
+> / `*-be-build-deploy-stag` set) and `env-injection.yaml` exists, so this plan's scope drops to
 > Vercel projects, DNS, branch creation, and **populating the real env/secret values** the manifest
 > declares (GitHub Environments + Vercel) — plus non-workflow docs. It does **not** edit workflows.
+>
+> **Current branch conditions (2026-06-15)**: `origin` already carries the old `stag-organiclever-web`
+> (to be **retired** by this plan) and `stag-ose-app-web`. The standardize plan's Phase 9 dry run
+> dispatched `organiclever-app-test-local-deploy-stag` on `main`, which — on a passing run — force-creates
+> `stag-organiclever-app-web` + `stag-organiclever-be` early (the latter triggers
+> `organiclever-be-build-deploy-stag.yml`). Treat any such pre-created branches as already-satisfied
+> items in the branch-creation checklist below; create only the ones still missing.
 >
 > **Vercel Deployment Protection note**: the new app-web Vercel projects ship with Deployment
 > Protection on, which 401s unauthenticated requests to staging/preview URLs. The staging E2E gate must
