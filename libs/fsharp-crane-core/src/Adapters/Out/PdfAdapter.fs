@@ -10,7 +10,7 @@ let private nullableToOption (s: string | null) =
     if System.String.IsNullOrEmpty(s) then
         None
     else
-        Some(s |> string)
+        Some(string (s: string))
 
 [<ExcludeFromCodeCoverage(Justification = "Integration-tested against real PDF files")>]
 type RealPdfAdapter() =

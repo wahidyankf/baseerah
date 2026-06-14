@@ -28,7 +28,7 @@ let extractMdHeadings (mdText: string) : HeadingEntry list =
     |> Array.choose (fun line ->
         let trimmed = line.TrimStart()
 
-        if trimmed.StartsWith("#") then
+        if trimmed.StartsWith("#", System.StringComparison.Ordinal) then
             let depth = trimmed |> Seq.takeWhile ((=) '#') |> Seq.length
             let text = trimmed.TrimStart('#').Trim()
             Some { Depth = depth; Text = text }

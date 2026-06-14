@@ -9,7 +9,11 @@ let extractNestingLevels (layoutText: string) : NestingItem list =
     |> Array.choose (fun line ->
         let trimmed = line.TrimStart()
 
-        if trimmed.StartsWith("-") || trimmed.StartsWith("*") || trimmed.StartsWith("•") then
+        if
+            trimmed.StartsWith("-", System.StringComparison.Ordinal)
+            || trimmed.StartsWith("*", System.StringComparison.Ordinal)
+            || trimmed.StartsWith("•", System.StringComparison.Ordinal)
+        then
             let indent = line.Length - line.TrimStart().Length
             let level = indent / 2 + 1
             let text = trimmed.TrimStart('-', '*', '•', ' ')

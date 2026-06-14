@@ -45,8 +45,8 @@ let private parseMetadata (block: string list) : Map<string, string> =
     |> List.choose (fun line ->
         let trimmed = line.TrimStart()
 
-        if trimmed.StartsWith("**") then
-            let endMarker = trimmed.IndexOf("**:", 2)
+        if trimmed.StartsWith("**", System.StringComparison.Ordinal) then
+            let endMarker = trimmed.IndexOf("**:", 2, System.StringComparison.Ordinal)
 
             if endMarker > 0 then
                 let key = trimmed.Substring(2, endMarker - 2).Trim()
@@ -67,9 +67,11 @@ let private parseEntries (path: string) : SkipListEntry list =
         let rec walk (acc: SkipListEntry list) (remaining: string list) =
             match remaining with
             | [] -> List.rev acc
-            | line :: rest when line.StartsWith(FalsePositivePrefix) ->
+            | line :: rest when line.StartsWith(FalsePositivePrefix, System.StringComparison.Ordinal) ->
                 let metaLines =
-                    rest |> List.takeWhile (fun l -> not (l.StartsWith("## ")) && l.Trim() <> "---")
+                    rest
+                    |> List.takeWhile (fun l ->
+                        not (l.StartsWith("## ", System.StringComparison.Ordinal)) && l.Trim() <> "---")
 
                 let nextRest = rest |> List.skip metaLines.Length
 
@@ -142,7 +144,11 @@ let private appendEntry (path: string) (entry: SkipListEntry) =
 
     if File.Exists(path) then
         let existing = File.ReadAllText(path)
-        let needsBlankLine = not (existing.EndsWith("\n\n")) && existing.Length > 0
+
+        let needsBlankLine =
+            not (existing.EndsWith("\n\n", System.StringComparison.Ordinal))
+            && existing.Length > 0
+
         let prefix = if needsBlankLine then "\n" else ""
         File.AppendAllText(path, prefix + text)
     else
