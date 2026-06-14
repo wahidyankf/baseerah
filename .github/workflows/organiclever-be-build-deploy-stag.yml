@@ -1,0 +1,21 @@
+name: organiclever-be-build-deploy-stag
+
+# Fires when the app-tier local-deploy-stag run force-pushes stag-organiclever-be.
+# Builds the organiclever-be image and pushes it to GHCR; ose-infra coralpolyp
+# rolls it out to the staging k3s cluster.
+
+on:
+  push:
+    branches: [stag-organiclever-be]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/_reusable-be-build-deploy.yml
+    with:
+      be-project: organiclever-be
+      image-name: ghcr.io/wahidyankf/organiclever-be

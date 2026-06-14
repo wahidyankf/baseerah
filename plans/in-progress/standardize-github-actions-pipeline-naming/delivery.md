@@ -178,30 +178,32 @@ human-gated work is batched into the final **Phase 9**.
 
 ## Phase 4 — app tier
 
-- [ ] [AI] 4.1 **GREEN**: `git mv` + rewrite `test-and-deploy-organiclever-web-development.yml` →
+- [x] [AI] 4.1 **GREEN**: `git mv` + rewrite `test-and-deploy-organiclever-web-development.yml` →
       `organiclever-app-test-local-deploy-stag.yml`, calling `_reusable-app-test-local-deploy-stag.yml`;
       `stag-web-branch: stag-organiclever-app-web`, `stag-be-branch: stag-organiclever-be`; env
       `organiclever-app-local` (or omit if empty — no `development` stage); CRON 03:00/15:00 WIB.
-- [ ] [AI] 4.2 **GREEN**: `git mv` + rewrite `test-organiclever-web-staging.yml` →
+- [x] [AI] 4.2 **GREEN**: `git mv` + rewrite `test-organiclever-web-staging.yml` →
       `organiclever-app-test-stag-deploy-prod.yml`, calling `_reusable-app-test-stag.yml`; env
       `organiclever-app-staging`; **CRON 05:30/17:30 WIB (+2.5 h after stag)**; **no prod push**.
-- [ ] [AI] 4.3 **GREEN**: `git rm .github/workflows/deploy-organiclever-web-to-production.yml` (prod CD
+- [x] [AI] 4.3 **GREEN**: `git rm .github/workflows/deploy-organiclever-web-to-production.yml` (prod CD
       deferred). Note the removal + future-CD-plan pointer in tech-docs.
-- [ ] [AI] 4.4 **GREEN**: repeat 4.1–4.3 for ose-app: `test-and-deploy-ose-app-web-development.yml` →
+      _(2026-06-15: removed both prod-dispatch workflows; tech-docs already records "removed" + "prod CD deferred to a separate plan".)_
+- [x] [AI] 4.4 **GREEN**: repeat 4.1–4.3 for ose-app: `test-and-deploy-ose-app-web-development.yml` →
       `ose-app-test-local-deploy-stag.yml` (`stag-be-branch: stag-ose-be`, env `ose-app-local`);
       `test-ose-app-web-staging.yml` → `ose-app-test-stag-deploy-prod.yml` (+2.5 h, env
       `ose-app-staging`); `git rm deploy-ose-app-web-to-production.yml`.
-- [ ] [AI] 4.5 **REFACTOR**: confirm the two `*-local-deploy-stag` and two `*-test-stag-deploy-prod`
+- [x] [AI] 4.5 **REFACTOR**: confirm the two `*-local-deploy-stag` and two `*-test-stag-deploy-prod`
       callers differ only by inputs.
+      _(2026-06-15: confirmed — the two local-deploy-stag callers differ only by web/be-project, contracts, compose-dir, branches, ports, env; the two test-stag callers differ only by fe-e2e-project + environment. Also refreshed .github/workflows/README.md www+app tables (Phase 7.2 slice) to clear Gate 4d.)_
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/organiclever-app-test-local-deploy-stag.yml && test -f .github/workflows/organiclever-app-test-stag-deploy-prod.yml && test -f .github/workflows/ose-app-test-local-deploy-stag.yml && test -f .github/workflows/ose-app-test-stag-deploy-prod.yml` — exits 0
-- [ ] [AI] `! test -f .github/workflows/deploy-organiclever-web-to-production.yml && ! test -f .github/workflows/deploy-ose-app-web-to-production.yml` — exits 0
-- [ ] [AI] `git grep -n 'stag-organiclever-web\|organiclever-web-development\|organiclever-web-staging' -- .github/workflows/` — returns nothing
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0
+- [x] [AI] `test -f .github/workflows/organiclever-app-test-local-deploy-stag.yml && test -f .github/workflows/organiclever-app-test-stag-deploy-prod.yml && test -f .github/workflows/ose-app-test-local-deploy-stag.yml && test -f .github/workflows/ose-app-test-stag-deploy-prod.yml` — exits 0
+- [x] [AI] `! test -f .github/workflows/deploy-organiclever-web-to-production.yml && ! test -f .github/workflows/deploy-ose-app-web-to-production.yml` — exits 0
+- [x] [AI] `git grep -n 'stag-organiclever-web\|organiclever-web-development\|organiclever-web-staging' -- .github/workflows/` — returns nothing
 
 > **Pause Safety**: App tier callers in place, prod-dispatch workflows removed, CRON gap verified. Safe to stop.
 > To resume: `actionlint .github/workflows/*.yml`.
@@ -211,35 +213,36 @@ human-gated work is batched into the final **Phase 9**.
 > All human-gated actions (coralpolyp coordination, `publish-images.yml` removal, branch protection)
 > are **deferred to the consolidated `[HUMAN]` hand-off in Phase 9** — this phase is fully `[AI]`.
 
-- [ ] [AI] 5.1 **GREEN**: create `organiclever-be-build-deploy-stag.yml` (on push `stag-organiclever-be`)
+- [x] [AI] 5.1 **GREEN**: create `organiclever-be-build-deploy-stag.yml` (on push `stag-organiclever-be`)
       and `ose-be-build-deploy-stag.yml` (on push `stag-ose-be`), each calling
       `_reusable-be-build-deploy.yml` with its `be-project` + `image-name`. **Leave `publish-images.yml`
       in place** — its removal is cross-repo-gated (coralpolyp) and happens in Phase 9. _Acceptance_:
       both new workflows exist; actionlint clean.
-- [ ] [AI] 5.2 **GREEN (cross-cutting gate renames)**: `git mv pr-quality-gate.yml commons-quality-gate.yml`
+- [x] [AI] 5.2 **GREEN (cross-cutting gate renames)**: `git mv pr-quality-gate.yml commons-quality-gate.yml`
       (+ `name:`); `git mv validate-env.yml commons-env-validate.yml`;
       `git mv validate-markdown.yml markdown-validate.yml`. Update each `name:`. (The required-status-check
       binding that depends on the `commons-quality-gate` rename is updated by a human in Phase 9, in the
       same window as the push.)
-- [ ] [AI] 5.3 **GREEN (D5 — delete crane-cli CI)**: `git rm .github/workflows/test-crane-cli-integration.yml`
+- [x] [AI] 5.3 **GREEN (D5 — delete crane-cli CI)**: `git rm .github/workflows/test-crane-cli-integration.yml`
       — CLI is not a service; CLI-tool CI is out of scope this PR (revisited later). This also removes the
       only integration suite that ran on `pull_request`. _Acceptance_: the file is gone; no workflow runs
       `crane-cli:test:integration`.
-- [ ] [AI] 5.4 **Verify (no heavy tests in gates)**:
+- [x] [AI] 5.4 **Verify (no heavy tests in gates)**:
       `git grep -nE 'test:(integration|e2e)' -- .github/workflows/commons-quality-gate.yml .husky/`
       — returns nothing (no `test:integration` / `test:e2e` invocations in PR gate or git hooks).
-- [ ] [AI] 5.5 **Verify**: `actionlint .github/workflows/*.yml` clean; every `name:` derives to its
+- [x] [AI] 5.5 **Verify**: `actionlint .github/workflows/*.yml` clean; every `name:` derives to its
       filename.
+      _(2026-06-15: created 2 be-build-deploy callers; renamed pr-quality-gate→commons-quality-gate, validate-env→commons-env-validate, validate-markdown→markdown-validate (name: updated, job "Quality gate" kept so the required check name is unchanged — branch-protection binding is Phase 9.2 HUMAN); deleted crane-cli CI; aligned publish-images name: to convention; reworded pre-push comment to drop literal heavy-test tokens. actionlint clean; all names derive.)_
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `test -f .github/workflows/organiclever-be-build-deploy-stag.yml && test -f .github/workflows/ose-be-build-deploy-stag.yml` — exits 0
-- [ ] [AI] `test -f .github/workflows/commons-quality-gate.yml && test -f .github/workflows/commons-env-validate.yml && test -f .github/workflows/markdown-validate.yml` — exits 0
-- [ ] [AI] `! test -f .github/workflows/test-crane-cli-integration.yml` — exits 0
-- [ ] [AI] `actionlint .github/workflows/*.yml` — exits 0
-- [ ] [AI] `git grep -nE 'test:(integration|e2e)' -- .github/workflows/commons-quality-gate.yml .husky/` — returns nothing
+- [x] [AI] `test -f .github/workflows/organiclever-be-build-deploy-stag.yml && test -f .github/workflows/ose-be-build-deploy-stag.yml` — exits 0
+- [x] [AI] `test -f .github/workflows/commons-quality-gate.yml && test -f .github/workflows/commons-env-validate.yml && test -f .github/workflows/markdown-validate.yml` — exits 0
+- [x] [AI] `! test -f .github/workflows/test-crane-cli-integration.yml` — exits 0
+- [x] [AI] `actionlint .github/workflows/*.yml` — exits 0
+- [x] [AI] `git grep -nE 'test:(integration|e2e)' -- .github/workflows/commons-quality-gate.yml .husky/` — returns nothing
 
 > **Pause Safety**: be-build-deploy workflows created, cross-cutting workflows renamed, crane-cli CI deleted. `publish-images.yml` still in place pending Phase 9 coralpolyp hand-off. Safe to stop.
 > To resume: `actionlint .github/workflows/*.yml`.

@@ -1,0 +1,32 @@
+name: organiclever-app-test-local-deploy-stag
+
+# Heavy-test CRON pipeline for the organiclever app-group (web + be + e2e).
+# On success force-pushes BOTH stag-organiclever-app-web (Vercel preview) and
+# stag-organiclever-be (triggers organiclever-be-build-deploy-stag.yml).
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # 3 AM WIB (UTC+7)
+    - cron: "0 8 * * *" # 3 PM WIB (UTC+7)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-local-deploy-stag:
+    uses: ./.github/workflows/_reusable-app-test-local-deploy-stag.yml
+    with:
+      web-project: organiclever-app-web
+      be-project: organiclever-be
+      contracts-project: organiclever-contracts
+      compose-dir: infra/dev/organiclever-app
+      stag-web-branch: stag-organiclever-app-web
+      stag-be-branch: stag-organiclever-be
+      be-port: 8202
+      web-port: 3202
+      environment: organiclever-app-local

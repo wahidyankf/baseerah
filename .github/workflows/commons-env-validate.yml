@@ -1,4 +1,4 @@
-name: Validate Markdown
+name: commons-env-validate
 
 on:
   pull_request:
@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  validate-markdown:
-    name: Validate markdown (mermaid, links, heading-hierarchy)
+  validate-env:
+    name: Validate env-contract surfaces (no drift)
     runs-on: ubuntu-latest
 
     steps:
@@ -30,11 +30,5 @@ jobs:
       - name: Setup Rust
         uses: ./.github/actions/setup-rust
 
-      - name: Validate mermaid diagrams
-        run: npx nx run rhino-cli:mermaid:validation
-
-      - name: Validate markdown links
-        run: npx nx run rhino-cli:links:validation
-
-      - name: Validate heading hierarchy
-        run: npx nx run rhino-cli:headings:hierarchy-validation
+      - name: Validate env contract
+        run: npx nx run rhino-cli:env:validation

@@ -1,0 +1,21 @@
+name: ose-app-test-stag-deploy-prod
+
+# Staging gate for the ose-app: FE E2E against the deployed staging URL.
+# Scheduled +2.5h after ose-app-test-local-deploy-stag so the Vercel build +
+# coralpolyp rollout have settled. On pass it STOPS (prod CD deferred).
+
+on:
+  schedule:
+    - cron: "30 22 * * *" # 5:30 AM WIB (UTC+7), +2.5h after stag
+    - cron: "30 10 * * *" # 5:30 PM WIB (UTC+7), +2.5h after stag
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-stag:
+    uses: ./.github/workflows/_reusable-app-test-stag.yml
+    with:
+      fe-e2e-project: ose-app-web-e2e
+      environment: ose-app-staging

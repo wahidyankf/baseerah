@@ -1,4 +1,4 @@
-name: PR Quality Gate
+name: commons-quality-gate
 
 on:
   pull_request:

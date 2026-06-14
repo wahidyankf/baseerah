@@ -1,0 +1,21 @@
+name: ose-be-build-deploy-stag
+
+# Fires when the app-tier local-deploy-stag run force-pushes stag-ose-be.
+# Builds the ose-be image and pushes it to GHCR; ose-infra coralpolyp rolls it
+# out to the staging k3s cluster.
+
+on:
+  push:
+    branches: [stag-ose-be]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-deploy:
+    uses: ./.github/workflows/_reusable-be-build-deploy.yml
+    with:
+      be-project: ose-be
+      image-name: ghcr.io/wahidyankf/ose-be

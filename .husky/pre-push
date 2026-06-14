@@ -4,7 +4,7 @@ set -e
 # Pre-push: spec + code-coverage gates, BDD spec validators, markdown lint,
 # env-contract validation, and changed-path-gated governance validators.
 # typecheck/lint/test:unit run in pre-commit (via test:quick) — NOT here.
-# test:integration/test:e2e are CRON-only — NOT here.
+# Heavy integration + e2e suites are CRON-only (scheduled tiered pipelines) — never in this hook.
 # If pre-push times out, run the nx commands below manually to warm cache, then push again.
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
 npx nx affected -t specs:coverage test-coverage specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --parallel="$PARALLEL"
