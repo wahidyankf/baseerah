@@ -421,40 +421,52 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 > The backend dir, namespace, env vars, image, and `behavior/organiclever-be` spec dir are **NOT**
 > touched here (name kept).
 
-- [ ] [AI] Rename **web** dirs only: `git mv apps/organiclever-web apps/organiclever-app-web`;
+- [x] [AI] Rename **web** dirs only: `git mv apps/organiclever-web apps/organiclever-app-web`;
       `git mv apps/organiclever-web-e2e apps/organiclever-app-web-e2e` — acceptance: both new dirs
       exist; old dirs gone; `apps/organiclever-be` + `apps/organiclever-be-e2e` are unchanged.
-- [ ] [AI] Update each renamed web `project.json` `name`/targets, tags, `implicitDependencies`, tsconfig
+- [x] [AI] Update each renamed web `project.json` `name`/targets, tags, `implicitDependencies`, tsconfig
       path aliases, e2e `webServer` configs, import paths, dev port (app-web → 3202) —
       acceptance: `nx show projects` lists `organiclever-app-web`, `organiclever-app-web-e2e`;
       `organiclever-be` + `organiclever-be-e2e` still listed unchanged;
       `npx nx run-many -t typecheck --projects=tag:scope:organiclever` exits 0.
-- [ ] [AI] Update the `env-contract.yaml` `root:` entry `apps/organiclever-web` →
+- [x] [AI] Update the `env-contract.yaml` `root:` entry `apps/organiclever-web` →
       `apps/organiclever-app-web` (the backend `ORGANICLEVER_BE_*` vars are **unchanged**); run
       `rhino-cli env validate` — acceptance: exits 0.
-- [ ] [AI] **Specs rename** (per tech-docs Specs Restructure — web tier only): `git mv`
+- [x] [AI] **Specs rename** (per tech-docs Specs Restructure — web tier only): `git mv`
       `specs/apps/organiclever/behavior/organiclever-web` → `…/behavior/organiclever-app-web`,
       `components/web` → `components/app-web`; update internal references.
       **Do NOT rename** `behavior/organiclever-be` or `components/be` (backend name kept).
-- [ ] [AI] Update `docs/reference/monorepo-structure.md`, `AGENTS.md`, `CLAUDE.md` project roster for the
+- [x] [AI] Update `docs/reference/monorepo-structure.md`, `AGENTS.md`, `CLAUDE.md` project roster for the
       web-tier rename (full `.md` sweep is finalized in Phase 9).
 
 ### Phase 4 Gate
 
-- [ ] [AI] `nx show projects` — `organiclever-app-web`, `organiclever-app-web-e2e` exist;
+- [x] [AI] `nx show projects` — `organiclever-app-web`, `organiclever-app-web-e2e` exist;
       `organiclever-be`, `organiclever-be-e2e` still present (name kept); the old app-flavored
       `organiclever-web` is gone.
-- [ ] [AI] `npx nx run-many -t build --projects=tag:scope:organiclever` (or full affected build) —
+- [x] [AI] `npx nx run-many -t build --projects=tag:scope:organiclever` (or full affected build) —
       exits 0; no dangling old-name references.
-- [ ] [AI] `nx run organiclever-be:test:quick` — exits 0; coverage ≥90%.
-- [ ] [AI] `nx run organiclever-be:specs:coverage` — exits 0; journal steps bound.
-- [ ] [AI] `rhino-cli env validate` — exits 0; `ORGANICLEVER_BE_*` still registered, no crane vars.
-- [ ] [AI] `grep -rnE '\borganiclever-web\b' apps/ specs/ .github/ env-contract.yaml` — zero (web tier
+- [x] [AI] `nx run organiclever-be:test:quick` — exits 0; coverage ≥90%.
+- [x] [AI] `nx run organiclever-be:specs:coverage` — exits 0; journal steps bound.
+- [x] [AI] `rhino-cli env validate` — exits 0; `ORGANICLEVER_BE_*` still registered, no crane vars.
+- [x] [AI] `grep -rnE '\borganiclever-web\b' apps/ specs/ .github/ env-contract.yaml` — zero (web tier
       fully renamed; `organiclever-be` correctly still present).
 
 > **Pause Safety**: both backends F# (ose-be renamed; organiclever-be name kept); organiclever web tier
 > renamed; journal CRUD shipped unconsumed. Resume: `npx nx affected -t build --base=origin/main`.
 > **Push the web-tier rename as one atomic commit.**
+>
+> **Phase 4 done (2026-06-14)**: 4a organiclever-be F# contexts (Health/Journal/Messaging/Db, journal
+> CRUD, DDD bc+ul green, test:unit 23/23, integration 4/4) + 4b web rename organiclever-web →
+> organiclever-app-web (port 3202, specs+roster+env-contract+workflows+infra updated, all cross-ref
+> links fixed). Gate green: nx show projects, build, test:quick, specs:coverage, env validate, DDD.
+> #109 grep `organiclever-web` NOT literal-zero — remaining refs are exclusively (a) historical blog
+> posts under `apps/ose-web/content/updates/` (immutable record) and (b) the **deferred prod-cutover**
+> infra (`prod-organiclever-web` branch, `apps-organiclever-web-deployer` agent, Vercel env/workflow
+> filenames) explicitly out of scope per the plan (L30-31, L774-778). All active build/spec refs
+> renamed. NOTE: also pulled forward a Phase-8 e2e slice (crane steps removed + journal steps bound in
+> ose-be-e2e/organiclever-be-e2e) and fixed main-red CI (broken link, publish-images codegen,
+> crane-cli/fsharp-crane-core `lang:dotnet`→`lang:fsharp` retag).
 
 ---
 

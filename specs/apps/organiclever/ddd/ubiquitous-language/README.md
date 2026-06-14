@@ -31,14 +31,14 @@ The bounded-context map and the strategic-pattern relationships between these co
 
 ## How this folder is consumed
 
-- **`organiclever-web` Gherkin features** under [`behavior/organiclever-web/gherkin/`](../../behavior/organiclever-web/gherkin/README.md) — every term in scenario titles and step text comes from here.
-- **`organiclever-web` source** under [`apps/organiclever-web/src/`](../../../../../apps/organiclever-web/src/) — type names, function names, and event names match the `Code identifier(s)` column.
+- **`organiclever-app-web` Gherkin features** under [`behavior/organiclever-app-web/gherkin/`](../../behavior/organiclever-app-web/gherkin/README.md) — every term in scenario titles and step text comes from here.
+- **`organiclever-app-web` source** under [`apps/organiclever-app-web/src/`](../../../../../apps/organiclever-app-web/src/) — type names, function names, and event names match the `Code identifier(s)` column.
 - **C4 component diagrams** under `components/` — labels match owned-term names.
 - **Future `organiclever-be` source** under [`apps/organiclever-be/`](../../../../../apps/organiclever-be/) — when DDD adoption reaches the backend, the same glossary governs F# record names and route handlers.
 
 ## Glossary parity check
 
-Phase 9 of the [DDD adoption plan](../../../../../plans/done/2026-05-03__organiclever-adopt-ddd/delivery.md) wires a glossary parity check into `nx run organiclever-web:specs:coverage` — Gherkin terms missing from any glossary file produce warnings. Phase 2 (this scaffolding) does not enable that check yet; it lands once Phase 9 reorganizes Gherkin folders by bounded context.
+Phase 9 of the [DDD adoption plan](../../../../../plans/done/2026-05-03__organiclever-adopt-ddd/delivery.md) wires a glossary parity check into `nx run organiclever-app-web:specs:coverage` — Gherkin terms missing from any glossary file produce warnings. Phase 2 (this scaffolding) does not enable that check yet; it lands once Phase 9 reorganizes Gherkin folders by bounded context.
 
 ## Related
 
@@ -47,4 +47,4 @@ Phase 9 of the [DDD adoption plan](../../../../../plans/done/2026-05-03__organic
 - [DDD Standards (platform-wide)](../../../../../docs/explanation/software-engineering/architecture/domain-driven-design-ddd/README.md)
 - [BDD with DDD Standards](../../../../../docs/explanation/software-engineering/development/behavior-driven-development-bdd/bdd-with-ddd-standards.md)
 - [organiclever specs README](../../README.md)
-- [organiclever web specs README](../../components/web/README.md)
+- [organiclever web specs README](../../components/app-web/README.md)

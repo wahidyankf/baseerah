@@ -1,7 +1,7 @@
 # Ubiquitous Language — landing
 
 **Bounded context**: `landing`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -34,9 +34,9 @@ is the `CTA` button linking to `/app/home`.
 
 **Code identifier(s)**:
 `LandingPage` — the root React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-page.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-page.tsx`).
 `/` — the Next.js App Router route
-(`apps/organiclever-web/src/app/page.tsx`).
+(`apps/organiclever-app-web/src/app/page.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -56,7 +56,7 @@ supporting tagline, and the `CTA` button. Occupies the top viewport on first loa
 
 **Code identifier(s)**:
 `LandingHero` — the React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-hero.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-hero.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -76,7 +76,7 @@ format.
 
 **Code identifier(s)**:
 `LandingFeatures` — the React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-features.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-features.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -95,7 +95,7 @@ to the visitor.
 
 **Code identifier(s)**:
 `LandingPrinciples` — the React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-principles.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-principles.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -114,7 +114,7 @@ illustrative; reads no live PGlite data.
 
 **Code identifier(s)**:
 `LandingRhythmDemo` — the React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-rhythm-demo.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-rhythm-demo.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -133,7 +133,7 @@ the app.
 
 **Code identifier(s)**:
 `LandingNav` — the React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-nav.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-nav.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -151,7 +151,7 @@ The closing section of the `Landing page` with copyright, links, and metadata.
 
 **Code identifier(s)**:
 `LandingFooter` — the React component
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-footer.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-footer.tsx`).
 
 **Used in features**: `landing/*.feature`
 
@@ -171,7 +171,7 @@ marketing surface into the OrganicLever life journal. Its label is the literal s
 
 **Code identifier(s)**:
 Button with label `"Open the app"` rendered inside `LandingHero`
-(`apps/organiclever-web/src/contexts/landing/presentation/components/landing-hero.tsx`).
+(`apps/organiclever-app-web/src/contexts/landing/presentation/components/landing-hero.tsx`).
 
 **Used in features**: `landing/*.feature`
 

@@ -29,9 +29,9 @@
   - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture. Original F# source at `archived/crane-cli/`; Rust port 2026-05-26 preserved at `archived/crane-cli-rust/`.
   - `crane-be` — F# / Giraffe / ASP.NET 10 HTTP + NATS backend for PDF-to-Markdown conversion (crane-be service). Hexagonal architecture consuming `libs/fsharp-crane-core`. Dev port 8300.
   - `crane-be-e2e` — Playwright-BDD + @nats-io/transport-node E2E tests for crane-be (real HTTP + real NATS)
-  - `organiclever-web` — Next.js 16 landing and promotional website (www.organiclever.com)
+  - `organiclever-app-web` — Next.js 16 OrganicLever app frontend (port 3202)
   - `organiclever-be` — Rust/Axum REST API backend for OrganicLever
-  - `organiclever-web-e2e` — Playwright FE E2E tests for organiclever-web
+  - `organiclever-app-web-e2e` — Playwright FE E2E tests for organiclever-app-web
   - `organiclever-be-e2e` — Playwright BE E2E tests for organiclever-be
   - `organiclever-contracts` — OpenAPI 3.1 API contract spec (in `specs/apps/organiclever/containers/contracts/`); generates types + encoders/decoders for organiclever apps via `codegen` Nx target
   - `ose-app-be` — Rust/Axum REST API backend for OSE Application platform (api.oseplatform.com)
@@ -60,9 +60,9 @@ ose-public/
 │   ├── crane-cli/    # PDF-to-Markdown pipeline CLI (F#)
 │   ├── crane-be/     # PDF-to-Markdown HTTP + NATS backend (F#/Giraffe, port 8300)
 │   ├── crane-be-e2e/ # Playwright + NATS E2E tests for crane-be
-│   ├── organiclever-web/     # OrganicLever landing website (Next.js)
+│   ├── organiclever-app-web/     # OrganicLever app frontend (Next.js)
 │   ├── organiclever-be/      # OrganicLever Rust/Axum REST API backend
-│   ├── organiclever-web-e2e/ # Playwright FE E2E tests for organiclever-web
+│   ├── organiclever-app-web-e2e/ # Playwright FE E2E tests for organiclever-app-web
 │   ├── organiclever-be-e2e/  # Playwright BE E2E tests for organiclever-be
 │   ├── ose-app-be/               # OSE Application Rust/Axum REST API (api.oseplatform.com)
 │   ├── ose-app-be-e2e/           # Playwright BE E2E tests for ose-app-be
@@ -477,17 +477,17 @@ Six-layer governance hierarchy:
 
 **See**: [apps/ayokoding-web/README.md](./apps/ayokoding-web/README.md)
 
-### organiclever-web
+### organiclever-app-web
 
 - **URL**: <https://www.organiclever.com/>
-- **Production branch**: `prod-organiclever-web` → www.organiclever.com
+- **Production branch**: `prod-organiclever-web` → www.organiclever.com (prod-branch rename deferred to the cutover follow-on)
 - **Framework**: Next.js 16 (App Router)
 - **Deployment**: Vercel
-- **Content**: Landing and promotional website for OrganicLever
-- **E2E tests**: `organiclever-web-e2e`
-- **Dev port**: 3200
+- **Content**: OrganicLever app frontend
+- **E2E tests**: `organiclever-app-web-e2e`
+- **Dev port**: 3202
 
-**See**: [apps/organiclever-web/README.md](./apps/organiclever-web/README.md)
+**See**: [apps/organiclever-app-web/README.md](./apps/organiclever-app-web/README.md)
 
 ### wahidyankf-web
 

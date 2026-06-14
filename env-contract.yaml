@@ -45,7 +45,7 @@ surfaces:
       - PORT
       - HOSTNAME
 
-  - root: apps/organiclever-web
+  - root: apps/organiclever-app-web
     kind: app
     lang: typescript
     allowlist:

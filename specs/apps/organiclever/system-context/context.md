@@ -36,5 +36,5 @@ wiring.
 
 - **Container diagram**: [container.md](../containers/container.md)
 - **Backend component diagram**: [component-be.md](../components/be/component-be.md)
-- **Frontend component diagram**: [component-web.md](../components/web/component-web.md)
+- **Frontend component diagram**: [component-web.md](../components/app-web/component-web.md)
 - **Parent**: [organiclever specs](../README.md)

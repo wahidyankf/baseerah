@@ -26,7 +26,7 @@ specs/apps/organiclever/
 │   ├── be/                # F#/Giraffe backend component specs
 │   │   ├── README.md
 │   │   └── component-be.md
-│   └── web/               # Next.js frontend component specs
+│   └── app-web/           # Next.js frontend component specs
 │       ├── README.md
 │       └── component-web.md
 ├── ddd/                   # DDD artifacts (platform-agnostic; shared by all surfaces)
@@ -38,8 +38,8 @@ specs/apps/organiclever/
 │       └── *.md           # One glossary file per bounded context
 └── behavior/              # Gherkin scenarios (HTTP-semantic + UI-semantic)
     ├── README.md
-    ├── be/gherkin/        # Backend Gherkin scenarios
-    └── web/gherkin/       # Frontend Gherkin scenarios (per bounded context)
+    ├── organiclever-be/gherkin/        # Backend Gherkin scenarios
+    └── organiclever-app-web/gherkin/   # Frontend Gherkin scenarios (per bounded context)
 ```
 
 ## Containers
@@ -49,10 +49,10 @@ One row per deployable container (C4 L2). Container slug is canonical: it indexe
 glob. Adding a future container (e.g. `mobile`, `desktop`, a second backend) means adding
 a row here, not changing the schema.
 
-| Container | Perspective                             | Background                 | Scenarios                                                                           | Domains                          | Consumed by                                   |
-| --------- | --------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------- |
-| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | [behavior/organiclever-be/gherkin/](./behavior/organiclever-be/gherkin/README.md)   | health                           | `apps/organiclever-be` (F#/Giraffe, TickSpec) |
-| `web`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/organiclever-web/gherkin/](./behavior/organiclever-web/gherkin/README.md) | landing, system, layout, routing | `apps/organiclever-web` (Next.js 16)          |
+| Container | Perspective                             | Background                 | Scenarios                                                                                   | Domains                          | Consumed by                                   |
+| --------- | --------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------- |
+| `be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | [behavior/organiclever-be/gherkin/](./behavior/organiclever-be/gherkin/README.md)           | health                           | `apps/organiclever-be` (F#/Giraffe, TickSpec) |
+| `web`     | UI-semantic (clicks, types, sees)       | `Given the app is running` | [behavior/organiclever-app-web/gherkin/](./behavior/organiclever-app-web/gherkin/README.md) | landing, system, layout, routing | `apps/organiclever-app-web` (Next.js 16)      |
 
 The `web` container's system-status page consumes the `be` container's health endpoint.
 Otherwise `web` is local-first today.
@@ -83,14 +83,14 @@ Counts are Gherkin features per container. `--` means no features in that contai
   **[components/](./components/README.md)** — C4 architecture diagrams (L1/L2/L3)
 - **[components/be/](./components/be/README.md)** — Backend API component specs
   ([Gherkin features](./behavior/organiclever-be/gherkin/README.md))
-- **[components/web/](./components/web/README.md)** — Frontend component specs
-  ([Gherkin features](./behavior/organiclever-web/gherkin/README.md))
+- **[components/app-web/](./components/app-web/README.md)** — Frontend component specs
+  ([Gherkin features](./behavior/organiclever-app-web/gherkin/README.md))
 
 ## DDD Registry (`bounded-contexts.yaml`)
 
 `bounded-contexts.yaml` is the machine-readable declaration of every bounded context in
-`organiclever-web`. Two `rhino-cli ddd` subcommands read it to enforce structural and
-vocabulary invariants automatically in `nx run organiclever-web:test:quick`.
+`organiclever-app-web`. Two `rhino-cli ddd` subcommands read it to enforce structural and
+vocabulary invariants automatically in `nx run organiclever-app-web:test:quick`.
 
 ### Schema
 
@@ -139,7 +139,7 @@ Both commands default to `error` severity — a finding fails the build.
 
 ```bash
 # Downgrade to warnings locally (never commit with this set)
-OSE_RHINO_DDD_SEVERITY=warn nx run organiclever-web:test:quick
+OSE_RHINO_DDD_SEVERITY=warn nx run organiclever-app-web:test:quick
 
 # Or per-command
 rhino-cli ddd bc organiclever --severity=warn
@@ -152,7 +152,7 @@ rhino-cli ddd ul organiclever --severity=warn
 2. Create the code directory with the declared layer subfolders.
 3. Create the glossary file at the declared path (use an existing one as a template).
 4. Create the gherkin directory and add at least one `.feature` file.
-5. Run `nx run organiclever-web:test:quick` — `ddd bc` and `ddd ul` will confirm
+5. Run `nx run organiclever-app-web:test:quick` — `ddd bc` and `ddd ul` will confirm
    the registry matches the filesystem before any unit tests run.
 
 ## Spec Consumption
@@ -182,7 +182,7 @@ new to DDD, ask an engineer to walk you through `bounded-context-map.md` first.
    Next.js web app (Vercel) and F#/Giraffe backend (Kubernetes). How they connect.
    Also see [containers/deployment.md](./containers/deployment.md) for environments
    and Docker image details.
-4. **[components/web/](./components/web/README.md)** — Frontend internals:
+4. **[components/app-web/](./components/app-web/README.md)** — Frontend internals:
    bounded-context architecture, routes and screens, design system.
    [components/be/api.md](./components/be/api.md) covers the backend API surface.
 5. **[behavior/](./behavior/README.md)** — What the system is supposed to do, expressed

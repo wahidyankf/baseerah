@@ -1,7 +1,7 @@
 # Ubiquitous Language — routing
 
 **Bounded context**: `routing`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -32,9 +32,9 @@ available" message inside the shared `not-found.tsx` shell.
 
 **Code identifier(s)**:
 `DisabledRoute` — the React component rendered by disabled route segments
-(`apps/organiclever-web/src/contexts/routing/presentation/index.ts`).
+(`apps/organiclever-app-web/src/contexts/routing/presentation/index.ts`).
 `not-found.tsx` — the Next.js special file that Next.js invokes for 404 responses
-(`apps/organiclever-web/src/app/not-found.tsx`).
+(`apps/organiclever-app-web/src/app/not-found.tsx`).
 
 **Used in features**: `routing/*.feature`
 
@@ -54,7 +54,7 @@ elsewhere (which could mislead users about auth availability).
 
 **Code identifier(s)**:
 `login` — the Next.js App Router route segment directory
-(`apps/organiclever-web/src/app/login/`).
+(`apps/organiclever-app-web/src/app/login/`).
 
 **Used in features**: `routing/*.feature`
 
@@ -74,7 +74,7 @@ surface.
 
 **Code identifier(s)**:
 `profile` — the Next.js App Router route segment directory
-(`apps/organiclever-web/src/app/profile/`).
+(`apps/organiclever-app-web/src/app/profile/`).
 
 **Used in features**: `routing/*.feature`
 
@@ -94,7 +94,7 @@ renders it automatically when `notFound()` is called or a route segment is missi
 
 **Code identifier(s)**:
 `not-found.tsx` — the Next.js special-file convention
-(`apps/organiclever-web/src/app/not-found.tsx`).
+(`apps/organiclever-app-web/src/app/not-found.tsx`).
 
 **Used in features**: `routing/*.feature`
 

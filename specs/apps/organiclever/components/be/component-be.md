@@ -45,6 +45,6 @@ Each component above is exercised by Gherkin features from
 ## Related
 
 - **Container diagram**: [container.md](../../containers/container.md)
-- **Frontend component diagram**: [component-web.md](../web/component-web.md)
+- **Frontend component diagram**: [component-web.md](../app-web/component-web.md)
 - **Backend gherkin specs**: [behavior/organiclever-be/gherkin/](../../behavior/organiclever-be/gherkin/README.md)
 - **Parent**: [organiclever specs](../../README.md)

@@ -9,23 +9,23 @@ containerized and deployed to Kubernetes (a container orchestration platform).
 
 ## Environments
 
-| Environment | Purpose              | Frontend branch           | Backend infra path                   |
-| ----------- | -------------------- | ------------------------- | ------------------------------------ |
-| Development | Local dev            | `main` (local `nx dev`)   | `docker compose` (local)             |
-| Staging     | Pre-production QA    | n/a (Vercel preview URLs) | `infra/k8s/organiclever/staging/`    |
-| Production  | Live user-facing app | `prod-organiclever-web`   | `infra/k8s/organiclever/production/` |
+| Environment | Purpose              | Frontend branch             | Backend infra path                   |
+| ----------- | -------------------- | --------------------------- | ------------------------------------ |
+| Development | Local dev            | `main` (local `nx dev`)     | `docker compose` (local)             |
+| Staging     | Pre-production QA    | n/a (Vercel preview URLs)   | `infra/k8s/organiclever/staging/`    |
+| Production  | Live user-facing app | `prod-organiclever-app-web` | `infra/k8s/organiclever/production/` |
 
 ## Frontend deployment (Vercel)
 
-`organiclever-web` deploys to Vercel via the `prod-organiclever-web` branch.
+`organiclever-app-web` deploys to Vercel via the `prod-organiclever-app-web` branch.
 
-- **Trigger**: push to `prod-organiclever-web` branch.
+- **Trigger**: push to `prod-organiclever-app-web` branch.
 - **Build**: Vercel auto-detects Next.js; no `builds` array needed in `vercel.json`.
 - **URL**: [www.organiclever.com](https://www.organiclever.com/)
-- **Security headers**: configured in `apps/organiclever-web/vercel.json`
+- **Security headers**: configured in `apps/organiclever-app-web/vercel.json`
   (`X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`).
-- **Deployment agent**: `apps-organiclever-web-deployer` (force-pushes `main` →
-  `prod-organiclever-web`).
+- **Deployment agent**: `apps-organiclever-app-web-deployer` (force-pushes `main` →
+  `prod-organiclever-app-web`).
 
 ## Backend deployment (Kubernetes)
 
@@ -44,10 +44,10 @@ containerized and deployed to Kubernetes (a container orchestration platform).
 Both images use multi-stage builds for minimal size (~150–200 MB) and run as non-root
 `app` user.
 
-| Service            | Dockerfile                         | Build command                                                                   |
-| ------------------ | ---------------------------------- | ------------------------------------------------------------------------------- |
-| `organiclever-be`  | `apps/organiclever-be/Dockerfile`  | `docker build -t organiclever-be:latest apps/organiclever-be/`                  |
-| `organiclever-web` | `apps/organiclever-web/Dockerfile` | `docker build -f apps/organiclever-web/Dockerfile -t organiclever-web:latest .` |
+| Service                | Dockerfile                             | Build command                                                                           |
+| ---------------------- | -------------------------------------- | --------------------------------------------------------------------------------------- |
+| `organiclever-be`      | `apps/organiclever-be/Dockerfile`      | `docker build -t organiclever-be:latest apps/organiclever-be/`                          |
+| `organiclever-app-web` | `apps/organiclever-app-web/Dockerfile` | `docker build -f apps/organiclever-app-web/Dockerfile -t organiclever-app-web:latest .` |
 
 ## Note on Spring profile references
 
@@ -68,4 +68,4 @@ will be updated in a future fix plan.
 
 - [Container diagram](./container.md) — C4 container view
 - [BE API](../components/be/api.md) — endpoint reference
-- [Web architecture](../components/web/architecture.md) — frontend structure
+- [Web architecture](../components/app-web/architecture.md) — frontend structure

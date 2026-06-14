@@ -1,7 +1,7 @@
 # Ubiquitous Language — routine
 
 **Bounded context**: `routine`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -68,7 +68,7 @@ classDiagram
 
 **Code identifier(s)**:
 `Routine` — the aggregate root type
-(`apps/organiclever-web/src/contexts/routine/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/routine/domain/types.ts`).
 `RoutineId` — branded string alias for `Routine.id` (same file).
 
 **Persisted as**: One row per `Routine` in the PGlite `routines` table, with `groups`
@@ -102,9 +102,9 @@ in product and design conversations.
 
 **Code identifier(s)**:
 `ExerciseGroup` — the labeled grouping type
-(`apps/organiclever-web/src/contexts/routine/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/routine/domain/types.ts`).
 `ExerciseTemplate` — the individual exercise schema (shared-kernel)
-(`apps/organiclever-web/src/contexts/journal/domain/typed-payloads.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/domain/typed-payloads.ts`).
 
 **Persisted as**: Serialized inside the `groups` JSONB column of the `routines` table.
 
@@ -130,7 +130,7 @@ stored on `ExerciseTemplate` fields: `targetSets`, `targetReps`, `targetWeight`.
 `targetReps: number` — default rep count on `ExerciseTemplate`.
 `targetWeight: string | null` — default weight (or null if unset) on `ExerciseTemplate`.
 All three live in
-`apps/organiclever-web/src/contexts/journal/domain/typed-payloads.ts`.
+`apps/organiclever-app-web/src/contexts/journal/domain/typed-payloads.ts`.
 
 **Persisted as**: Part of the `ExerciseTemplate` objects nested inside `groups` JSONB.
 
@@ -153,11 +153,11 @@ This is a presentation-layer concept; the domain only knows `saveRoutine` and
 
 **Code identifier(s)**:
 `EditRoutineScreen` — the React component
-(`apps/organiclever-web/src/contexts/routine/presentation/components/edit-routine-screen.tsx`).
+(`apps/organiclever-app-web/src/contexts/routine/presentation/components/edit-routine-screen.tsx`).
 `routines/edit` — the Next.js route segment
-(`apps/organiclever-web/src/app/app/routines/edit/page.tsx`).
+(`apps/organiclever-app-web/src/app/app/routines/edit/page.tsx`).
 `saveRoutine` — the Effect-based use-case (upsert) invoked on save
-(`apps/organiclever-web/src/contexts/routine/application/index.ts`).
+(`apps/organiclever-app-web/src/contexts/routine/application/index.ts`).
 
 **Used in features**: `routine/routine-management.feature`
 
@@ -180,7 +180,7 @@ context; the `workout-session` context calls `listRoutines` cross-context via th
 **Code identifier(s)**:
 `listRoutines` — Effect-based use-case function returning
 `ReadonlyArray<Routine>`
-(`apps/organiclever-web/src/contexts/routine/application/index.ts`).
+(`apps/organiclever-app-web/src/contexts/routine/application/index.ts`).
 
 **Persisted as**: The PGlite `routines` table (all rows for the current user).
 

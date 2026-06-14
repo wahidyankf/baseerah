@@ -9,17 +9,17 @@ each project can wire its step implementations against the right glob.
 ## Children
 
 - `organiclever-be/` — Backend Gherkin scenarios (HTTP semantic).
-- `organiclever-web/` — Frontend Gherkin scenarios (UI semantic).
+- `organiclever-app-web/` — Frontend Gherkin scenarios (UI semantic).
 
 ## Surfaces
 
 One row per product-surface. Each surface dir named `<product>-<perspective>` per the
 flat product-surface convention.
 
-| Surface            | Perspective                             | Background                 | Consumed by                          |
-| ------------------ | --------------------------------------- | -------------------------- | ------------------------------------ |
-| `organiclever-be`  | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/organiclever-be` (Rust/Axum)   |
-| `organiclever-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/organiclever-web` (Next.js 16) |
+| Surface                | Perspective                             | Background                 | Consumed by                              |
+| ---------------------- | --------------------------------------- | -------------------------- | ---------------------------------------- |
+| `organiclever-be`      | HTTP-semantic (GET, POST, status codes) | `Given the API is running` | `apps/organiclever-be` (Rust/Axum)       |
+| `organiclever-app-web` | UI-semantic (clicks, types, sees)       | `Given the app is running` | `apps/organiclever-app-web` (Next.js 16) |
 
 ## Gherkin coverage
 
@@ -29,7 +29,7 @@ flat product-surface convention.
 | ------ | ----------------------------- | --------- |
 | health | `health/health-check.feature` | 2         |
 
-### `organiclever-web/gherkin/`
+### `organiclever-app-web/gherkin/`
 
 Organized by bounded context (one folder per context, matching the
 [DDD registry](../ddd/bounded-contexts.yaml)).

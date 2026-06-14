@@ -1,7 +1,7 @@
 # Ubiquitous Language — stats
 
 **Bounded context**: `stats`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -33,10 +33,10 @@ are computed on read; none are persisted to PGlite.
 
 **Code identifier(s)**:
 `getWeeklyStats` — Effect-based use-case returning `WeeklyStats`
-(`apps/organiclever-web/src/contexts/stats/application/stats.ts`).
+(`apps/organiclever-app-web/src/contexts/stats/application/stats.ts`).
 `WeeklyStats` — the aggregate value type (`workoutsThisWeek: number`, `streak: number`,
 `totalMins: number`, `totalSets: number`)
-(`apps/organiclever-web/src/contexts/stats/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/stats/domain/types.ts`).
 Also: `getLast7Days` returns `DayEntry[]` (7-day bar-chart data), `getVolume` returns
 volume totals, both in the same application file.
 
@@ -82,11 +82,11 @@ flowchart LR
 **Code identifier(s)**:
 `ExerciseProgress` — per-exercise progress projection (`routineName: string | null`,
 `points: ExerciseProgressPoint[]`)
-(`apps/organiclever-web/src/contexts/stats/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/stats/domain/types.ts`).
 `DayEntry` — per-day summary (`date: Date`, `label: string`, `durationMins: number`,
 `sessions: number`) (same file).
 `getExerciseProgress` — Effect-based use-case returning `ExerciseProgress`
-(`apps/organiclever-web/src/contexts/stats/application/stats.ts`).
+(`apps/organiclever-app-web/src/contexts/stats/application/stats.ts`).
 
 **Used in features**: `stats/*.feature`
 
@@ -107,7 +107,7 @@ arguments. The most common period today is `week` (the `WeeklyStats` aggregate u
 **Code identifier(s)**:
 `"day"` / `"week"` / `"month"` — literal string values passed as arguments to stats
 use-cases in
-`apps/organiclever-web/src/contexts/stats/application/stats.ts`.
+`apps/organiclever-app-web/src/contexts/stats/application/stats.ts`.
 
 **Used in features**: `stats/*.feature`
 
@@ -127,7 +127,7 @@ the home and progress screens as motivation metric.
 
 **Code identifier(s)**:
 `computeStreak` — pure domain function taking `WeekWorkoutRow[]` and returning `number`
-(`apps/organiclever-web/src/contexts/stats/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/stats/domain/types.ts`).
 `WeekWorkoutRow` — the input shape: `{ week_start: string | Date; workout_count: string
 | number }` (same file).
 `streak` — the field on `WeeklyStats` returned by `getWeeklyStats` (same file).
@@ -150,9 +150,9 @@ journal write operations.
 
 **Code identifier(s)**:
 `HistoryScreen` — the React component
-(`apps/organiclever-web/src/contexts/stats/presentation/components/history-screen.tsx`).
+(`apps/organiclever-app-web/src/contexts/stats/presentation/components/history-screen.tsx`).
 `app/history` — the Next.js route segment
-(`apps/organiclever-web/src/app/app/history/page.tsx`).
+(`apps/organiclever-app-web/src/app/app/history/page.tsx`).
 
 **Used in features**: `stats/*.feature` (history-flavoured scenarios)
 
@@ -173,9 +173,9 @@ to understand their long-term workout trend.
 
 **Code identifier(s)**:
 `ProgressScreen` — the React component
-(`apps/organiclever-web/src/contexts/stats/presentation/components/progress-screen.tsx`).
+(`apps/organiclever-app-web/src/contexts/stats/presentation/components/progress-screen.tsx`).
 `app/progress` — the Next.js route segment
-(`apps/organiclever-web/src/app/app/progress/page.tsx`).
+(`apps/organiclever-app-web/src/app/app/progress/page.tsx`).
 
 **Used in features**: `stats/*.feature` (progress scenarios)
 

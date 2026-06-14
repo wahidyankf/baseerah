@@ -106,5 +106,5 @@ The canonical input pattern used in `project.json`:
 ## Related
 
 - **Parent**: [organiclever specs](../../README.md)
-- **Frontend counterpart**: [web/](../web/README.md) — UI-semantic frontend specs
+- **Frontend counterpart**: [web/](../app-web/README.md) — UI-semantic frontend specs
 - **BDD Standards**: [behavior-driven-development-bdd/](../../../../../docs/explanation/software-engineering/development/behavior-driven-development-bdd/README.md)

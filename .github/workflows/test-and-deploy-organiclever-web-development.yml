@@ -29,7 +29,7 @@ jobs:
       - name: Run specs:coverage for all OrganicLever projects
         run: |
           npx nx run organiclever-be:specs:coverage
-          npx nx run organiclever-web:specs:coverage
+          npx nx run organiclever-app-web:specs:coverage
 
   fe-lint:
     name: FE lint
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-      - run: npx nx run organiclever-web:lint
+      - run: npx nx run organiclever-app-web:lint
 
   be-integration:
     name: BE integration tests
@@ -76,10 +76,10 @@ jobs:
       - name: Generate contract types
         run: |
           npx nx run organiclever-contracts:bundle
-          npx nx run organiclever-web:codegen
+          npx nx run organiclever-app-web:codegen
 
       - name: Run integration tests
-        run: npx nx run organiclever-web:test:integration
+        run: npx nx run organiclever-app-web:test:integration
 
   e2e:
     name: E2E tests (BE + FE)
@@ -96,7 +96,7 @@ jobs:
         run: |
           npx nx run organiclever-contracts:bundle
           npx nx run organiclever-be:codegen
-          npx nx run organiclever-web:codegen
+          npx nx run organiclever-app-web:codegen
 
       - name: Start full stack (backend + frontend)
         run: docker compose -f infra/dev/organiclever/docker-compose.yml -f infra/dev/organiclever/docker-compose.ci.yml up --build -d
@@ -118,9 +118,9 @@ jobs:
 
       - name: Wait for frontend to be ready
         run: |
-          echo "Waiting for frontend on port 3200..."
+          echo "Waiting for frontend on port 3202..."
           for i in $(seq 1 36); do
-            if curl -sf http://localhost:3200 > /dev/null 2>&1; then
+            if curl -sf http://localhost:3202 > /dev/null 2>&1; then
               echo "Frontend is ready"
               exit 0
             fi
@@ -128,7 +128,7 @@ jobs:
             sleep 10
           done
           echo "Frontend did not start within 6 minutes"
-          docker compose -f infra/dev/organiclever/docker-compose.yml -f infra/dev/organiclever/docker-compose.ci.yml logs organiclever-web
+          docker compose -f infra/dev/organiclever/docker-compose.yml -f infra/dev/organiclever/docker-compose.ci.yml logs organiclever-app-web
           exit 1
 
       - uses: ./.github/actions/setup-playwright
@@ -147,16 +147,16 @@ jobs:
           retention-days: 7
 
       - name: Run FE E2E tests
-        run: npx nx run organiclever-web-e2e:test:e2e
+        run: npx nx run organiclever-app-web-e2e:test:e2e
         env:
-          WEB_BASE_URL: http://localhost:3200
+          WEB_BASE_URL: http://localhost:3202
 
       - name: Upload FE E2E report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-report-organiclever-web
-          path: apps/organiclever-web-e2e/playwright-report/
+          name: playwright-report-organiclever-app-web
+          path: apps/organiclever-app-web-e2e/playwright-report/
           retention-days: 7
 
       - name: Teardown

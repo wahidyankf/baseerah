@@ -16,7 +16,7 @@ Feature: Bounded-Context Structural Parity Validation
 
   Scenario: Orphan code folder not in registry is flagged
     Given a registry that does not list a context named "phantom"
-    And a folder "apps/organiclever-web/src/contexts/phantom/" exists on the filesystem
+    And a folder "apps/organiclever-app-web/src/contexts/phantom/" exists on the filesystem
     When the developer runs "rhino-cli ddd bc organiclever"
     Then the command exits with a failure code
     And the output mentions "orphan"

@@ -82,9 +82,9 @@ graph TB
 
 **Repository Apps (In Development):**
 
-- 🌐 [`organiclever-web`](./apps/organiclever-web/) - Next.js landing/promotional website (www.organiclever.com)
+- 🌐 [`organiclever-web`](./apps/organiclever-app-web/) - Next.js landing/promotional website (www.organiclever.com)
 - 🔧 [`organiclever-be`](./apps/organiclever-be/) - F#/Giraffe REST API backend (port 8202)
-- 🧪 [`organiclever-web-e2e`](./apps/organiclever-web-e2e/) - Playwright FE E2E tests for organiclever-web
+- 🧪 [`organiclever-web-e2e`](./apps/organiclever-app-web-e2e/) - Playwright FE E2E tests for organiclever-web
 - 🧪 [`organiclever-be-e2e`](./apps/organiclever-be-e2e/) - Playwright BE E2E tests for organiclever-be
 
 **Tech Stack:**

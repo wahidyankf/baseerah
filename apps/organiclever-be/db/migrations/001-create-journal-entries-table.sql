@@ -1,6 +1,6 @@
 -- Mirrors the PGlite client migration
 -- 2026_04_28T14_05_30__create_journal_entries_table
--- (apps/organiclever-web/src/contexts/journal/infrastructure/migrations/).
+-- (apps/organiclever-app-web/src/contexts/journal/infrastructure/migrations/).
 -- The journal EF entity + CRUD endpoints are implemented in Phase 4; this
 -- migration only establishes the schema so DbUp records it on boot.
 CREATE TABLE IF NOT EXISTS journal_entries (

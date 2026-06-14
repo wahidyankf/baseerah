@@ -1,7 +1,7 @@
 # Ubiquitous Language — journal
 
 **Bounded context**: `journal`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -53,9 +53,9 @@ stateDiagram-v2
 
 **Code identifier(s)**:
 `JournalEntry` — the persistent domain record
-(`apps/organiclever-web/src/contexts/journal/domain/schema.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/domain/schema.ts`).
 `JournalEvent` — the XState machine event union
-(`apps/organiclever-web/src/contexts/journal/application/journal-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/application/journal-machine.ts`).
 
 **Persisted as**: One row in the PGlite `journal_entries` table. Written via
 `appendEntries`, re-ordered via `bumpEntry`.
@@ -101,7 +101,7 @@ classDiagram
 
 **Code identifier(s)**:
 `EntryPayload` — discriminated union base
-(`apps/organiclever-web/src/contexts/journal/domain/typed-payloads.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/domain/typed-payloads.ts`).
 `WorkoutPayload` — workout-session outcome (same file).
 `ReadingPayload` — reading-session outcome (same file).
 
@@ -125,7 +125,7 @@ full history and enables projection-based `stats`. Callers supply an `EntryPaylo
 
 **Code identifier(s)**:
 `appendEntries` — Effect-based use-case function
-(`apps/organiclever-web/src/contexts/journal/application/index.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/application/index.ts`).
 
 **Used in features**: `journal/journal-mechanism.feature`
 
@@ -145,7 +145,7 @@ Append (no new row) and from any notion of edit (content is immutable).
 
 **Code identifier(s)**:
 `bumpEntry` — Effect-based use-case function
-(`apps/organiclever-web/src/contexts/journal/application/index.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/application/index.ts`).
 
 **Used in features**: `journal/journal-mechanism.feature`
 
@@ -164,7 +164,7 @@ list. Consumed by the home screen (recent entries) and history screen (full log)
 
 **Code identifier(s)**:
 `listEntries` — Effect-based use-case function
-(`apps/organiclever-web/src/contexts/journal/application/index.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/application/index.ts`).
 
 **Used in features**: `journal/journal-mechanism.feature`, `journal/home-screen.feature`
 
@@ -184,7 +184,7 @@ returns an empty array from `listEntries`.
 
 **Code identifier(s)**:
 `JournalList` — the React component that owns the empty-state branch
-(`apps/organiclever-web/src/contexts/journal/presentation/components/journal-list.tsx`).
+(`apps/organiclever-app-web/src/contexts/journal/presentation/components/journal-list.tsx`).
 
 **Used in features**: `journal/journal-mechanism.feature`
 
@@ -204,7 +204,7 @@ only stores timestamps.
 
 **Code identifier(s)**:
 `EntryCard` — the React component that renders the bump indicator
-(`apps/organiclever-web/src/contexts/journal/presentation/components/entry-card.tsx`).
+(`apps/organiclever-app-web/src/contexts/journal/presentation/components/entry-card.tsx`).
 
 **Used in features**: `journal/journal-mechanism.feature`
 
@@ -224,7 +224,7 @@ no journal-domain dependency — it is a pure formatting function reusable acros
 
 **Code identifier(s)**:
 `formatRelativeTime` — pure helper function
-(`apps/organiclever-web/src/shared/utils/format-relative-time.ts`).
+(`apps/organiclever-app-web/src/shared/utils/format-relative-time.ts`).
 
 **Used in features**: `journal/journal-mechanism.feature`
 

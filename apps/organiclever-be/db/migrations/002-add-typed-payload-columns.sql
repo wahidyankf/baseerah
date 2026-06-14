@@ -1,6 +1,6 @@
 -- Mirrors the PGlite client migration
 -- 2026_05_01T03_33_00__add_typed_payload_columns
--- (apps/organiclever-web/src/contexts/journal/infrastructure/migrations/).
+-- (apps/organiclever-app-web/src/contexts/journal/infrastructure/migrations/).
 -- Adds typed payload columns to journal_entries plus the routines and settings
 -- tables. The matching EF entities + CRUD land in Phase 4.
 ALTER TABLE journal_entries

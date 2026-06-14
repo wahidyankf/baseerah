@@ -7,7 +7,7 @@ open System.Text.RegularExpressions
 /// The journal is the append-only system of record for everything the user did
 /// (workout, reading, learning, meal, focus, or a custom kind). Each entry
 /// mirrors the PGlite client schema
-/// (apps/organiclever-web/src/contexts/journal/domain/schema.ts): a kind slug
+/// (apps/organiclever-app-web/src/contexts/journal/domain/schema.ts): a kind slug
 /// (`Name`), a JSON `Payload`, an activity window (`StartedAt`/`FinishedAt`),
 /// audit timestamps, and free-form `Labels`.
 module Domain =

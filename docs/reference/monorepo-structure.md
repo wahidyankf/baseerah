@@ -89,9 +89,9 @@ Flat structure - all apps at the same level, no subdirectories.
 - `ayokoding-cli` - AyoKoding CLI tool (Rust application)
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
 - `ose-cli` - OSE Platform site maintenance CLI (Rust application)
-- `organiclever-web` - OrganicLever landing website (Next.js application)
+- `organiclever-app-web` - OrganicLever app frontend (Next.js application, port 3202)
 - `organiclever-be` - OrganicLever REST API backend (Rust/Axum application)
-- `organiclever-web-e2e` - Playwright FE E2E tests for organiclever-web
+- `organiclever-app-web-e2e` - Playwright FE E2E tests for organiclever-app-web
 - `organiclever-be-e2e` - Playwright BE E2E tests for organiclever-be
 - `wahidyankf-web` - Personal portfolio website (Next.js 16 application, port 3201)
 - `wahidyankf-web-fe-e2e` - Playwright FE E2E tests for wahidyankf-web
@@ -131,7 +131,7 @@ apps/ayokoding-cli/
 ### App Structure (Next.js Application)
 
 ```
-apps/organiclever-web/
+apps/organiclever-app-web/
 ├── src/                       # Source code
 ├── public/                    # Static assets
 ├── .storybook/                # Storybook configuration
@@ -545,7 +545,7 @@ rust-version = "1.88"
 **Apps importing libs** (TypeScript apps):
 
 ```typescript
-// In apps/organiclever-web/app/page.tsx
+// In apps/organiclever-app-web/app/page.tsx
 import { formatDate } from "@open-sharia-enterprise/ts-utils";
 ```
 

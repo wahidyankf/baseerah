@@ -4,10 +4,10 @@ Docker Compose setup for running the full OrganicLever stack locally.
 
 ## Services
 
-| Service          | Port | Description                |
-| ---------------- | ---- | -------------------------- |
-| organiclever-be  | 8202 | Rust/Axum REST API backend |
-| organiclever-web | 3200 | Next.js 16 frontend        |
+| Service              | Port | Description                |
+| -------------------- | ---- | -------------------------- |
+| organiclever-be      | 8202 | Rust/Axum REST API backend |
+| organiclever-app-web | 3202 | Next.js 16 frontend        |
 
 ## Quick Start
 

@@ -17,14 +17,14 @@ services:
       # mount); a cold CI build has no cargo cache, so allow a long warm-up.
       start_period: 600s
 
-  organiclever-web:
+  organiclever-app-web:
     build:
       context: ../../..
-      dockerfile: apps/organiclever-web/Dockerfile
+      dockerfile: apps/organiclever-app-web/Dockerfile
       args:
         ORGANICLEVER_BE_URL: http://organiclever-be:8202
     ports:
-      - "3200:3200"
+      - "3202:3202"
     environment:
       ORGANICLEVER_BE_URL: "http://organiclever-be:8202"
     depends_on:

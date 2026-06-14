@@ -1,7 +1,7 @@
 # Ubiquitous Language — health
 
 **Bounded context**: `health`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -34,7 +34,7 @@ renders "Not configured" without attempting a probe.
 
 **Code identifier(s)**:
 `ORGANICLEVER_BE_URL` — the Node.js environment variable read in the server-rendered page
-(`apps/organiclever-web/src/app/system/status/be/page.tsx`).
+(`apps/organiclever-app-web/src/app/system/status/be/page.tsx`).
 
 **Used in features**: `health/*.feature`
 
@@ -54,9 +54,9 @@ timeout, or non-2xx status.
 
 **Code identifier(s)**:
 `BackendClient` — the Effect Service Tag defining the `get` and `post` port methods
-(`apps/organiclever-web/src/contexts/health/infrastructure/backend-client.ts`).
+(`apps/organiclever-app-web/src/contexts/health/infrastructure/backend-client.ts`).
 `BackendClientLive` — the live implementation that issues real HTTP requests
-(`apps/organiclever-web/src/contexts/health/infrastructure/backend-client-live.ts`).
+(`apps/organiclever-app-web/src/contexts/health/infrastructure/backend-client-live.ts`).
 
 **Used in features**: `health/*.feature`
 
@@ -79,7 +79,7 @@ The `Diagnostic page` renders a status tile for exactly one of these states.
 
 **Code identifier(s)**:
 `NetworkError` — the tagged error for connection/timeout failures
-(`apps/organiclever-web/src/contexts/health/infrastructure/errors.ts`).
+(`apps/organiclever-app-web/src/contexts/health/infrastructure/errors.ts`).
 `ApiError` — the tagged error for non-2xx responses (same file).
 The three string labels (`"UP"`, `"DOWN"`, `"Not configured"`) are presentation-layer
 constants in the server-rendered page.
@@ -103,7 +103,7 @@ hydration logic. The entire page is a single server component marked `force-dyna
 
 **Code identifier(s)**:
 Server-rendered page component at
-`apps/organiclever-web/src/app/system/status/be/page.tsx`.
+`apps/organiclever-app-web/src/app/system/status/be/page.tsx`.
 
 **Used in features**: `health/*.feature`
 
@@ -125,7 +125,7 @@ swapping the live layer for a test layer requires only a different Layer binding
 
 **Code identifier(s)**:
 `BackendClient` — Effect Context.Tag defining `BackendClientService` (port interface)
-(`apps/organiclever-web/src/contexts/health/infrastructure/backend-client.ts`).
+(`apps/organiclever-app-web/src/contexts/health/infrastructure/backend-client.ts`).
 `BackendClientLive` — live HTTP layer (same directory, `backend-client-live.ts`).
 `createBackendClientTest` — test factory (same directory, `backend-client-test.ts`).
 
@@ -148,7 +148,7 @@ render as "DOWN" within a 200 response.
 
 **Code identifier(s)**:
 `system/status/be` — the Next.js route segment
-(`apps/organiclever-web/src/app/system/status/be/page.tsx`).
+(`apps/organiclever-app-web/src/app/system/status/be/page.tsx`).
 `export const dynamic = "force-dynamic"` — the Next.js cache directive that prevents
 build-time prerendering (same file).
 

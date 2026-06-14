@@ -5,7 +5,7 @@ open OrganicleverBe.Contexts.Journal.Domain
 
 // ---------------------------------------------------------------------------
 // Entry-name validation mirrors the PGlite client schema
-// (apps/organiclever-web/src/contexts/journal/domain/schema.ts EntryName):
+// (apps/organiclever-app-web/src/contexts/journal/domain/schema.ts EntryName):
 // 1..64 chars, lowercase, matching ^[a-z][a-z0-9-]*$.
 // ---------------------------------------------------------------------------
 

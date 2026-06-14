@@ -1,7 +1,7 @@
 # Ubiquitous Language — workout-session
 
 **Bounded context**: `workout-session`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -63,7 +63,7 @@ stateDiagram-v2
 
 **Code identifier(s)**:
 `WorkoutMachineContext` — the machine context type holding all session state
-(`apps/organiclever-web/src/contexts/workout-session/application/workout-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/workout-session/application/workout-machine.ts`).
 `workoutSessionMachine` — the XState v5 machine definition (same file).
 
 **Used in features**: `workout-session/*.feature`
@@ -85,7 +85,7 @@ interval.
 
 **Code identifier(s)**:
 `START` — the XState machine event type
-(`apps/organiclever-web/src/contexts/workout-session/application/workout-machine.ts`,
+(`apps/organiclever-app-web/src/contexts/workout-session/application/workout-machine.ts`,
 `WorkoutMachineEvent` union).
 
 **Used in features**: `workout-session/*.feature`
@@ -108,7 +108,7 @@ persisting).
 
 **Code identifier(s)**:
 `END_WORKOUT` — the intent event (transition from `exercising`/`resting` → `confirming`)
-(`apps/organiclever-web/src/contexts/workout-session/application/workout-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/workout-session/application/workout-machine.ts`).
 `CONFIRM_FINISH` — the confirmation event (transition `confirming` → `finishing`, same
 file).
 
@@ -131,9 +131,9 @@ fires.
 
 **Code identifier(s)**:
 `buildWorkoutEntry` — pure function converting `WorkoutMachineContext` → `NewEntryInput`
-(`apps/organiclever-web/src/contexts/workout-session/application/workout-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/workout-session/application/workout-machine.ts`).
 `WorkoutPayload` — the typed payload schema the outcome is encoded as
-(`apps/organiclever-web/src/contexts/journal/domain/typed-payloads.ts`).
+(`apps/organiclever-app-web/src/contexts/journal/domain/typed-payloads.ts`).
 
 **Used in features**: `workout-session/*.feature`, `journal/*`
 
@@ -156,7 +156,7 @@ persisted.
 `exercises: ActiveExercise[]` — the field on `WorkoutMachineContext` that stores the
 set-by-set progress. `ActiveExercise` extends `ExerciseTemplate` with a `sets:
 CompletedSet[]` array
-(`apps/organiclever-web/src/contexts/workout-session/application/workout-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/workout-session/application/workout-machine.ts`).
 `LOG_SET` — the machine event that appends one `CompletedSet` to the active exercise
 (same file).
 
@@ -179,9 +179,9 @@ The machine is mounted at the app layout level; the `WorkoutScreen` component re
 
 **Code identifier(s)**:
 `WorkoutScreen` — the React component
-(`apps/organiclever-web/src/contexts/workout-session/presentation/components/workout-screen.tsx`).
+(`apps/organiclever-app-web/src/contexts/workout-session/presentation/components/workout-screen.tsx`).
 `workout` — the Next.js route segment
-(`apps/organiclever-web/src/app/app/workout/page.tsx`).
+(`apps/organiclever-app-web/src/app/app/workout/page.tsx`).
 
 **Used in features**: `workout-session/*.feature`
 
@@ -200,9 +200,9 @@ completed, sets/reps/weights logged — before the user navigates back to home.
 
 **Code identifier(s)**:
 `FinishScreen` — the React component
-(`apps/organiclever-web/src/contexts/workout-session/presentation/components/finish-screen.tsx`).
+(`apps/organiclever-app-web/src/contexts/workout-session/presentation/components/finish-screen.tsx`).
 `workout/finish` — the Next.js route segment
-(`apps/organiclever-web/src/app/app/workout/finish/page.tsx`).
+(`apps/organiclever-app-web/src/app/app/workout/finish/page.tsx`).
 
 **Used in features**: `workout-session/*.feature`
 

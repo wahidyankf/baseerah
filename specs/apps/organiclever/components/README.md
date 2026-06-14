@@ -13,7 +13,7 @@ language belongs to the bounded context, not to one implementation surface.
   - `component-be.md` — moved from `c4/` in Phase 2A.
   - `README.md` — moved from legacy flat-root `be/README.md` in Phase 2A.
   - `api.md` — API endpoints, env vars, architecture tree. Authored in Phase 3.
-- `web/` — Frontend (Next.js 16) component specs.
+- `app-web/` — Frontend (Next.js 16) component specs.
   - `component-web.md` — moved from `c4/` in Phase 2A.
   - `README.md` — moved from legacy flat-root `web/README.md` in Phase 2A.
   - `architecture.md` — bounded-context tree, layer rules. Authored in Phase 3.

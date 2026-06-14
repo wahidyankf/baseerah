@@ -1,7 +1,7 @@
 # Ubiquitous Language — app-shell
 
 **Bounded context**: `app-shell`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -37,10 +37,10 @@ seeds preferences, and spawns the `appMachine` actor. All per-tab screens (`home
 
 **Code identifier(s)**:
 `appMachine` — the XState v5 machine governing overlay state
-(`apps/organiclever-web/src/contexts/app-shell/presentation/app-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/app-machine.ts`).
 `AppRuntimeContext` — the React context broadcasting the PGlite runtime and `appMachine`
 actor reference to the component tree
-(`apps/organiclever-web/src/contexts/app-shell/presentation/app-runtime-context.tsx`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/app-runtime-context.tsx`).
 
 **Used in features**: `app-shell/*.feature`
 
@@ -83,7 +83,7 @@ stateDiagram-v2
 
 **Code identifier(s)**:
 `appMachine` — XState v5 machine definition
-(`apps/organiclever-web/src/contexts/app-shell/presentation/app-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/app-machine.ts`).
 `AppMachineContext` — the machine context interface (`isDesktop`, `darkMode`,
 `loggerKind`, `customLoggerName`) (same file).
 `ActiveLoggerKind` — the union `"reading" | "learning" | "meal" | "focus"` (same file).
@@ -108,9 +108,9 @@ strings.
 
 **Code identifier(s)**:
 `useT` — the React hook returning the typed translation resolver
-(`apps/organiclever-web/src/contexts/app-shell/presentation/use-t.ts`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/use-t.ts`).
 `TRANSLATIONS` — the flat key-to-string-pair table
-(`apps/organiclever-web/src/contexts/app-shell/presentation/translations.ts`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/translations.ts`).
 
 **Used in features**: `app-shell/*.feature`
 
@@ -191,7 +191,7 @@ determines which overlay renders. `OverlayTree` reads from the machine actor via
 
 **Code identifier(s)**:
 `OverlayTree` — the React component
-(`apps/organiclever-web/src/contexts/app-shell/presentation/components/overlay-tree.tsx`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/components/overlay-tree.tsx`).
 
 **Used in features**: `app-shell/*.feature`
 
@@ -214,10 +214,10 @@ the machine.
 **Code identifier(s)**:
 `FocusLogger`, `LearningLogger`, `ReadingLogger`, `CustomEntryLogger` — per-type
 components
-(`apps/organiclever-web/src/contexts/app-shell/presentation/components/loggers/`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/components/loggers/`).
 `LoggerShell` — the shared container component (same directory).
 `ActiveLoggerKind` — the union `"reading" | "learning" | "meal" | "focus"`
-(`apps/organiclever-web/src/contexts/app-shell/presentation/app-machine.ts`).
+(`apps/organiclever-app-web/src/contexts/app-shell/presentation/app-machine.ts`).
 
 **Used in features**: `app-shell/*.feature`
 

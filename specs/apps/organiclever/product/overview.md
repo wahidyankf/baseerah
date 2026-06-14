@@ -105,5 +105,5 @@ graph TD
 - [System context](../system-context/context.md) — how OrganicLever fits into the
   broader technical landscape
 - [Container diagram](../containers/container.md) — web app + backend health diagnostic
-- [Behavior specs](../behavior/organiclever-web/gherkin/README.md) — Gherkin acceptance criteria per
+- [Behavior specs](../behavior/organiclever-app-web/gherkin/README.md) — Gherkin acceptance criteria per
   bounded context

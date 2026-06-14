@@ -4,6 +4,6 @@ services:
       ORGANICLEVER_BE_PORT: "8202"
       ORGANICLEVER_BE_CORS_ORIGINS: "*"
 
-  organiclever-web:
+  organiclever-app-web:
     environment:
       ORGANICLEVER_BE_URL: "http://organiclever-be:8202"

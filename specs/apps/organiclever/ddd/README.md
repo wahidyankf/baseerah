@@ -1,12 +1,12 @@
 # OrganicLever DDD Artifacts
 
-Domain-Driven Design artifacts for the `organiclever-web` bounded-context architecture.
+Domain-Driven Design artifacts for the `organiclever-app-web` bounded-context architecture.
 These files are the machine-readable source of truth consumed by `rhino-cli ddd bc` and
-`rhino-cli ddd ul` during `nx run organiclever-web:test:quick`.
+`rhino-cli ddd ul` during `nx run organiclever-app-web:test:quick`.
 
 DDD artifacts live at the application root (`specs/apps/organiclever/ddd/`), not under
-`components/web/`, because the ubiquitous language belongs to the bounded context — not to one
-implementation surface. Today only `organiclever-web` implements these contexts; when
+`components/app-web/`, because the ubiquitous language belongs to the bounded context — not to one
+implementation surface. Today only `organiclever-app-web` implements these contexts; when
 `organiclever-be` grows domain code, its paths join the same registry without a folder rename.
 
 ## Structure

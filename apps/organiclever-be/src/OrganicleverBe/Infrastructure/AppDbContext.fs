@@ -6,7 +6,7 @@ open System.ComponentModel.DataAnnotations.Schema
 open Microsoft.EntityFrameworkCore
 
 /// EF entity for a journal entry. Mirrors the PGlite client schema
-/// (apps/organiclever-web/src/contexts/journal/...) column-for-column: a string
+/// (apps/organiclever-app-web/src/contexts/journal/...) column-for-column: a string
 /// id, a kind-slug name, a JSONB payload (stored verbatim as a JSON string), the
 /// activity window, audit timestamps, and a text-array of labels.
 [<CLIMutable>]

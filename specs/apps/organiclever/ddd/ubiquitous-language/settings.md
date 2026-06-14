@@ -1,7 +1,7 @@
 # Ubiquitous Language — settings
 
 **Bounded context**: `settings`
-**Maintainer**: organiclever-web team
+**Maintainer**: organiclever-app-web team
 **Last reviewed**: 2026-05-09
 **Audience:** Engineers, Technical Product/Project Managers
 
@@ -35,9 +35,9 @@ rest durations).
 **Code identifier(s)**:
 `AppSettings` — the aggregate interface: `{ name: string; restSeconds: RestSeconds;
 darkMode: boolean; lang: Lang }`
-(`apps/organiclever-web/src/contexts/settings/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/settings/domain/types.ts`).
 `getSettings` — Effect-based use-case returning `AppSettings`
-(`apps/organiclever-web/src/contexts/settings/application/index.ts`).
+(`apps/organiclever-app-web/src/contexts/settings/application/index.ts`).
 `saveSettings` — Effect-based use-case persisting a full `AppSettings` record (same
 file).
 
@@ -62,7 +62,7 @@ explicitly.
 
 **Code identifier(s)**:
 `darkMode: boolean` — the field on `AppSettings`
-(`apps/organiclever-web/src/contexts/settings/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/settings/domain/types.ts`).
 
 **Used in features**: `settings/*.feature`
 
@@ -82,7 +82,7 @@ resolution in `app-shell`. Stored as `lang: Lang` on `AppSettings`.
 
 **Code identifier(s)**:
 `Lang` — the TypeScript union type `"en" | "id"`
-(`apps/organiclever-web/src/contexts/settings/domain/types.ts`).
+(`apps/organiclever-app-web/src/contexts/settings/domain/types.ts`).
 `lang: Lang` — the field on `AppSettings` (same file).
 
 **Used in features**: `settings/*.feature`
@@ -121,9 +121,9 @@ separate "save" button in the current UI — form fields update preferences on c
 
 **Code identifier(s)**:
 `SettingsScreen` — the React component
-(`apps/organiclever-web/src/contexts/settings/presentation/components/settings-screen.tsx`).
+(`apps/organiclever-app-web/src/contexts/settings/presentation/components/settings-screen.tsx`).
 `app/settings` — the Next.js route segment
-(`apps/organiclever-web/src/app/app/settings/page.tsx`).
+(`apps/organiclever-app-web/src/app/app/settings/page.tsx`).
 
 **Used in features**: `settings/*.feature`
 

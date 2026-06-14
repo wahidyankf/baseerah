@@ -28,7 +28,7 @@ pub struct FrontmatterFinding {
 const WEBSITE_APP_PREFIXES: &[&str] = &[
     "apps/ayokoding-web/",
     "apps/ose-web/",
-    "apps/organiclever-web/",
+    "apps/organiclever-app-web/",
     "apps/wahidyankf-web/",
 ];
 
