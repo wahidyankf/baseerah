@@ -25,8 +25,8 @@ description: Wiring architecture, per-project mechanics, gated-promotion design,
 ```mermaid
 flowchart LR
     subgraph www [www tier - direct deploy]
-      M1[main] -->|force-push| POW[prod-ose-www] --> D1[oseplatform.com]
-      M1 -->|force-push| PAW[prod-ayokoding-www] --> D2[ayokoding.com]
+      M1[main] -->|force-push| POW[prod-ose-www] --> D1[www.oseplatform.com]
+      M1 -->|force-push| PAW[prod-ayokoding-www] --> D2[www.ayokoding.com]
       M1 -->|force-push| POLW[prod-organiclever-www] --> D3[www.organiclever.com]
       M1 -->|force-push| PWW[prod-wahidyankf-www] --> D4[www.wahidyankf.com]
     end
@@ -63,6 +63,15 @@ existing OrganicLever safety pattern and extends it to `ose-app-web`, while keep
 simple. _Judgment call:_ a staging gate for app clients reduces blast radius of a bad app build; no
 incident baseline measured.
 
+**Staging URL (private).** Each `-app-web` Vercel project also listens on its `stag-*-app-web` branch and
+serves it as a persistent staging deployment at a dedicated staging URL, so the app can be exercised before
+the gated promotion to prod. That staging URL is environment-private and **must never be committed** to the
+repo (per [Secrets and Env Standards](../../../repo-governance/conventions/security/secrets-and-env-standards.md)):
+every committed artifact — deployer agents, app READMEs, architecture docs, deploy workflows — refers to it
+only via a placeholder (e.g. `<staging-url:ose-app-web>`) or a GitHub Actions secret (e.g.
+`STAGING_BASE_URL_OSE_APP_WEB`). The FE E2E gate that promotes `stag-*-app-web → prod-*-app-web` reads the
+staging base URL from that secret, not from a literal in the workflow file.
+
 ### D2 — Repoint by add-then-verify-then-delete (zero-downtime ordering)
 
 For each renamed site: create the new `prod-*-www` branch, set the Vercel project's production branch to
@@ -85,8 +94,8 @@ Vercel project. This plan's verification explicitly asserts their **absence** fr
 
 | Project              | Vercel action                                       | Production branch           | Root directory              | Domain               |
 | -------------------- | --------------------------------------------------- | --------------------------- | --------------------------- | -------------------- |
-| ose-www              | Repoint prod branch + rename + root dir             | `prod-ose-www`              | `apps/ose-www`              | oseplatform.com      |
-| ayokoding-www        | Repoint prod branch + rename + root dir             | `prod-ayokoding-www`        | `apps/ayokoding-www`        | ayokoding.com        |
+| ose-www              | Repoint prod branch + rename + root dir             | `prod-ose-www`              | `apps/ose-www`              | www.oseplatform.com  |
+| ayokoding-www        | Repoint prod branch + rename + root dir             | `prod-ayokoding-www`        | `apps/ayokoding-www`        | www.ayokoding.com    |
 | organiclever-www     | Reuse OL marketing project; repoint + rename + root | `prod-organiclever-www`     | `apps/organiclever-www`     | www.organiclever.com |
 | wahidyankf-www       | Repoint prod branch + rename + root dir             | `prod-wahidyankf-www`       | `apps/wahidyankf-www`       | www.wahidyankf.com   |
 | organiclever-app-web | **Create new project** + DNS                        | `prod-organiclever-app-web` | `apps/organiclever-app-web` | app.organiclever.com |

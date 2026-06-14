@@ -39,6 +39,9 @@ plans. This plan covers only the Vercel-served `-www` and `-app-web` tiers.
   `ayokoding-www`, `organiclever-www`, `wahidyankf-www`.
 - **Create 2 new Vercel projects** for the app-web tier: `organiclever-app-web`
   (`app.organiclever.com`) and `ose-app-web` (`app.oseplatform.com`), including DNS.
+- **Wire the app-web staging deployments**: each new project also serves its `stag-*-app-web` branch at
+  a private staging URL (kept out of the repo — placeholder/secret only) that feeds the FE E2E promotion
+  gate. See [tech-docs D1](./tech-docs.md).
 - **Define and create the branch set** Vercel listens to (production + staging-gate branches).
 - **Retire obsolete branches** after cutover (`prod-ose-web`, `prod-ayokoding-web`,
   `prod-organiclever-web`, `prod-wahidyankf-web`, `stag-organiclever-web`).
@@ -59,8 +62,8 @@ plans. This plan covers only the Vercel-served `-www` and `-app-web` tiers.
 
 | Tier      | App (post-restructure) | Domain                             | Vercel action            |
 | --------- | ---------------------- | ---------------------------------- | ------------------------ |
-| `www`     | `ose-www`              | oseplatform.com                    | repoint + rename project |
-| `www`     | `ayokoding-www`        | ayokoding.com                      | repoint + rename project |
+| `www`     | `ose-www`              | www.oseplatform.com                | repoint + rename project |
+| `www`     | `ayokoding-www`        | www.ayokoding.com                  | repoint + rename project |
 | `www`     | `organiclever-www`     | www.organiclever.com               | repoint + rename project |
 | `www`     | `wahidyankf-www`       | www.wahidyankf.com                 | repoint + rename project |
 | `app-web` | `organiclever-app-web` | app.organiclever.com (**new DNS**) | **new project**          |
@@ -94,8 +97,10 @@ plans. This plan covers only the Vercel-served `-www` and `-app-web` tiers.
    reference the new branch names, behind the still-old live wiring. Nothing deploys yet.
 2. **Create branches** ([AI]) — cut the new `prod-*-www`, `prod-*-app-web`, and `stag-*-app-web`
    branches from `main`.
-3. **Rewire + create Vercel projects + DNS** ([HUMAN]) — dashboard work: repoint production branches,
-   rename projects, create the two app-web projects, point DNS. Requires Vercel/DNS credentials.
+3. **Rewire + create Vercel projects + DNS** ([HUMAN]) — pure dashboard/DNS work, gated on a precondition
+   that all eight target branches already exist on origin (from Phase 2): repoint production branches,
+   rename projects, create the two app-web projects, Redeploy, point DNS. No git pushes in this phase.
+   Requires Vercel/DNS credentials.
 4. **Verify + retire** ([AI+HUMAN]) — confirm each domain serves from the new branch, then delete the
    obsolete branches and the obsolete Vercel project settings.
 

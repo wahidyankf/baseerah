@@ -48,7 +48,7 @@ Feature: Public-website tier deploys from prod-*-www branches
   Scenario: ose-www serves from its new production branch
     Given the ose-www Vercel project's production branch is set to prod-ose-www
     When main is force-pushed to prod-ose-www
-    Then oseplatform.com responds 200 from the new build
+    Then www.oseplatform.com responds 200 from the new build
     And the build originates from the prod-ose-www branch
 
   Scenario: wahidyankf-www vercel.json gates on the new branch

@@ -119,6 +119,18 @@ the worktree after the plan is archived and pushed.
 - [ ] [AI] Edit `docs/reference/system-architecture/deployment.md`: update branch names in the Mermaid diagram nodes and the branch list — acceptance: diagram compiles via `npx nx run rhino-cli:mermaid:validation`.
 - [ ] [AI] Run `npx nx run rhino-cli:links:validation` — acceptance: exits 0 (no broken links introduced by edits).
 
+### 1g — Document the app-web staging deployments (placeholder/secret only)
+
+> Vercel also listens on each `stag-*-app-web` branch and serves it at a private staging URL (see
+> tech-docs D1). Propagate this topology to every related doc, referencing the URL ONLY via a placeholder
+> (`<staging-url:ose-app-web>`) or a GitHub Actions secret — never a literal — per
+> [Secrets and Env Standards](../../../repo-governance/conventions/security/secrets-and-env-standards.md).
+
+- [ ] [AI] In both app-web deployer agents (`.claude/agents/apps-ose-app-web-deployer.md`, `.claude/agents/apps-organiclever-app-web-deployer.md`), document the `stag-*-app-web` Vercel staging deployment and name its staging-URL secret (`STAGING_BASE_URL_OSE_APP_WEB` / `STAGING_BASE_URL_ORGANICLEVER_APP_WEB`) — acceptance: each file names the staging branch and the secret; `git grep -nE 'https?://[a-z0-9.-]*stag' .claude/agents/` returns nothing.
+- [ ] [AI] In `apps/organiclever-app-web/README.md` and `apps/ose-app-web/README.md`, add a "Staging" note: served from `stag-*-app-web`, staging URL kept private (placeholder/secret) — acceptance: both READMEs name the staging branch with no literal URL.
+- [ ] [AI] In `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`, document the app-web staging deployments and the E2E promotion gate sourcing the staging base URL from a secret — acceptance: `rg -i 'stag-.*-app-web' docs/reference/system-architecture/` shows the staging deployments; `git grep -nE 'https?://[a-z0-9.-]*stag' docs/` returns nothing.
+- [ ] [AI] Re-run `npm run generate:bindings` to resync `.opencode/agents/` for the deployer-agent edits — acceptance: exits 0.
+
 ### 1f — Commit wiring edits
 
 - [ ] [AI] Stage explicit file paths (`git add apps/*/vercel.json .claude/agents/ .github/workflows/ AGENTS.md apps/*/README.md docs/reference/system-architecture/`) and commit with message `chore(vercel): rewire www + app-web tier prod branches and deployer agents` — acceptance: `git log --oneline -1` shows the commit; `git status` clean.
@@ -130,6 +142,7 @@ the worktree after the plan is archived and pushed.
 - [ ] [AI] `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web\b' apps/ .claude/agents/ .github/workflows/ AGENTS.md docs/` — acceptance: zero matches.
 - [ ] [AI] `npx nx run rhino-cli:links:validation` — acceptance: exits 0.
 - [ ] [AI] `npx nx run rhino-cli:mermaid:validation` — acceptance: exits 0.
+- [ ] [AI] No literal staging URL committed anywhere: `git grep -nE 'https?://[a-z0-9.-]*stag'` — acceptance: zero matches (staging URLs live only in Vercel + GitHub Actions secrets).
 - [ ] [AI] `git log --oneline -1` — acceptance: wiring commit exists.
 
 > **Pause Safety**: All in-repo references updated and committed. Vercel and DNS unchanged — production
@@ -163,6 +176,7 @@ the worktree after the plan is archived and pushed.
 
 - [ ] [AI] `git ls-remote --heads origin | grep -E 'prod-ose-www|prod-ayokoding-www|prod-organiclever-www|prod-wahidyankf-www|prod-organiclever-app-web|prod-ose-app-web'` — acceptance: all six listed.
 - [ ] [AI] `git ls-remote --heads origin | grep -E 'stag-organiclever-app-web|stag-ose-app-web'` — acceptance: both listed.
+- [ ] [AI] Exact-count guard (catches any partial/failed push): `git fetch origin --prune && git ls-remote --heads origin | grep -Ec 'refs/heads/(prod-(ose|ayokoding|organiclever|wahidyankf)-www|prod-(organiclever|ose)-app-web|stag-(organiclever|ose)-app-web)$'` — acceptance: returns exactly `8`. Every branch Vercel will reference MUST exist on origin before Phase 3.
 
 > **Pause Safety**: New branches exist on origin; wiring edits pushed. Old `prod-*-web` branches still
 > live — Vercel still deploying from them. Safe to stop. To resume: proceed to Phase 3 (Vercel + DNS).
@@ -172,27 +186,38 @@ the worktree after the plan is archived and pushed.
 ## Phase 3: Vercel Dashboard and DNS (Human Steps)
 
 > All steps in this phase require Vercel and DNS credentials. The AI agent cannot perform them.
+>
+> **Precondition — every target branch must already exist on origin before any Vercel wiring.**
+> Vercel cannot point a Production/Preview Branch at a ref origin does not have; a project wired to a
+> missing branch builds nothing and serves a silent 404. Confirm the full branch set is live on origin
+> first, and do NOT begin the dashboard steps below until this check passes.
 
-- [ ] [HUMAN] In the Vercel dashboard: for the **ose-www** project, set Production Branch to `prod-ose-www`, set Root Directory to `apps/ose-www`, rename the project to `ose-www` if needed — acceptance: Vercel dashboard shows production branch `prod-ose-www`.
-- [ ] [HUMAN] Trigger a Vercel build for `ose-www` by pushing `prod-ose-www` (e.g., `git push origin origin/main:prod-ose-www --force`) — acceptance: Vercel build succeeds; `curl -sI https://oseplatform.com | head -1` returns `HTTP/... 200`.
-- [ ] [HUMAN] Repeat for **ayokoding-www**: set production branch `prod-ayokoding-www`, root `apps/ayokoding-www`, force-push branch, verify `curl -sI https://ayokoding.com | head -1` → 200.
-- [ ] [HUMAN] Repeat for **wahidyankf-www**: set production branch `prod-wahidyankf-www`, root `apps/wahidyankf-www`, force-push, verify `curl -sI https://www.wahidyankf.com | head -1` → 200.
-- [ ] [HUMAN] For **organiclever-www**: reuse the existing OrganicLever marketing Vercel project; set production branch `prod-organiclever-www`, root `apps/organiclever-www`, force-push, verify `curl -sI https://www.organiclever.com | head -1` → 200.
-- [ ] [HUMAN] **Create new Vercel project** for `organiclever-app-web`: connect the repo, set root `apps/organiclever-app-web`, production branch `prod-organiclever-app-web`, staging branch `stag-organiclever-app-web`; deploy — acceptance: Vercel dashboard shows new project with green build.
-- [ ] [HUMAN] Add DNS CNAME for `app.organiclever.com` pointing to the Vercel-assigned `*.vercel.app` domain — acceptance: `dig app.organiclever.com CNAME` shows the Vercel target; `curl -sI https://app.organiclever.com | head -1` → 200 (may take up to 48 h for DNS propagation).
-- [ ] [HUMAN] **Create new Vercel project** for `ose-app-web`: connect repo, root `apps/ose-app-web`, production branch `prod-ose-app-web`, staging `stag-ose-app-web`; deploy — acceptance: Vercel shows green build.
+- [ ] [AI] `git fetch origin --prune && git ls-remote --heads origin | grep -Ec 'refs/heads/(prod-(ose|ayokoding|organiclever|wahidyankf)-www|prod-(organiclever|ose)-app-web|stag-(organiclever|ose)-app-web)$'` — acceptance: returns exactly `8` (four `prod-*-www`, two `prod-*-app-web`, two `stag-*-app-web`). If fewer than 8, return to Phase 2 and push the missing branch(es) before continuing.
+- [ ] [AI] Per-branch confirmation that each ref resolves on origin: `for b in prod-ose-www prod-ayokoding-www prod-organiclever-www prod-wahidyankf-www prod-organiclever-app-web prod-ose-app-web stag-organiclever-app-web stag-ose-app-web; do git ls-remote --exit-code --heads origin "$b" >/dev/null && echo "ok $b" || echo "MISSING $b"; done` — acceptance: every line prints `ok`, none `MISSING`.
+
+> Pure Vercel/DNS — no git pushes in this phase. Every branch already exists on origin (Phase 2), so
+> wiring a project to it and clicking **Redeploy** is all that's needed; Vercel also auto-builds on connect.
+
+- [ ] [HUMAN] **ose-www**: in the Vercel dashboard set Production Branch to `prod-ose-www`, Root Directory to `apps/ose-www`, rename the project to `ose-www` if needed, then **Redeploy** from the dashboard (Deployments → Redeploy) — acceptance: Vercel shows a green build on `prod-ose-www` and `curl -sI https://www.oseplatform.com | head -1` → `HTTP/... 200`.
+- [ ] [HUMAN] **ayokoding-www**: set Production Branch `prod-ayokoding-www`, Root `apps/ayokoding-www`, rename if needed, Redeploy — acceptance: green build; `curl -sI https://www.ayokoding.com | head -1` → 200.
+- [ ] [HUMAN] **wahidyankf-www**: set Production Branch `prod-wahidyankf-www`, Root `apps/wahidyankf-www`, rename if needed, Redeploy — acceptance: green build; `curl -sI https://www.wahidyankf.com | head -1` → 200.
+- [ ] [HUMAN] **organiclever-www**: reuse the existing OrganicLever marketing project; set Production Branch `prod-organiclever-www`, Root `apps/organiclever-www`, Redeploy — acceptance: green build; `curl -sI https://www.organiclever.com | head -1` → 200.
+- [ ] [HUMAN] **Create new Vercel project** `organiclever-app-web`: connect the repo, Root `apps/organiclever-app-web`, Production Branch `prod-organiclever-app-web`, staging/preview branch `stag-organiclever-app-web`; deploy from the dashboard — acceptance: Vercel shows the new project with a green build. Confirm Vercel also serves `stag-organiclever-app-web` at its staging URL/domain; store that staging URL ONLY in Vercel + the GitHub Actions secret `STAGING_BASE_URL_ORGANICLEVER_APP_WEB` — never paste it into the repo or this checklist.
+- [ ] [HUMAN] Add DNS CNAME for `app.organiclever.com` → the Vercel-assigned `*.vercel.app` target — acceptance: `dig app.organiclever.com CNAME` shows the Vercel target; `curl -sI https://app.organiclever.com | head -1` → 200 (DNS may take up to 48 h to propagate).
+- [ ] [HUMAN] **Create new Vercel project** `ose-app-web`: connect repo, Root `apps/ose-app-web`, Production Branch `prod-ose-app-web`, staging/preview `stag-ose-app-web`; deploy from the dashboard — acceptance: Vercel shows a green build. Confirm Vercel also serves `stag-ose-app-web` at its staging URL/domain; store that staging URL ONLY in Vercel + the GitHub Actions secret `STAGING_BASE_URL_OSE_APP_WEB` — never paste it into the repo or this checklist.
 - [ ] [HUMAN] Add DNS CNAME for `app.oseplatform.com` → Vercel target — acceptance: `dig app.oseplatform.com CNAME` resolves; `curl -sI https://app.oseplatform.com | head -1` → 200.
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `curl -sI https://oseplatform.com | head -1` — acceptance: `HTTP/... 200`.
-- [ ] [AI] `curl -sI https://ayokoding.com | head -1` — acceptance: `HTTP/... 200`.
+- [ ] [AI] `curl -sI https://www.oseplatform.com | head -1` — acceptance: `HTTP/... 200`.
+- [ ] [AI] `curl -sI https://www.ayokoding.com | head -1` — acceptance: `HTTP/... 200`.
 - [ ] [AI] `curl -sI https://www.organiclever.com | head -1` — acceptance: `HTTP/... 200`.
 - [ ] [AI] `curl -sI https://www.wahidyankf.com | head -1` — acceptance: `HTTP/... 200`.
 - [ ] [HUMAN] Verify `app.organiclever.com` returns 200 in a browser (DNS propagation may require patience).
 - [ ] [HUMAN] Verify `app.oseplatform.com` returns 200 in a browser.
+- [ ] [HUMAN] Verify each app-web **staging** deployment serves the `stag-*-app-web` build (200) at its private staging URL — keep the URL private; do not paste it into this checklist or any committed file.
 
 > **Pause Safety**: All six production domains serve from new branches. Old branches still exist as
 > rollback. Safe to stop. To resume: verify domains still 200, then proceed to Phase 4 (retire branches).
