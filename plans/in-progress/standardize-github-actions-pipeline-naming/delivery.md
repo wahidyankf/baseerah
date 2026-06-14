@@ -362,12 +362,15 @@ human-gated work is batched into the final **Phase 9**.
 > (Phases 0–8) completes first and the human does one contiguous batch. None of these can be automated:
 > each needs cross-repo confirmation, repo-admin settings, or push authorization.
 
-- [ ] [HUMAN] 9.1 **Cross-repo coordination + `publish-images.yml` removal**: confirm ose-infra
+- [x] [HUMAN] 9.1 **Cross-repo coordination + `publish-images.yml` removal**: confirm ose-infra
       `coralpolyp` consumes the new branch-triggered GHCR images, **then**
       `git rm .github/workflows/publish-images.yml`. If coralpolyp is not ready, leave
       `publish-images.yml` in place (transitional) and track its removal as a follow-up — do not remove
       it blind. Observable resume signal: ose-infra owner confirms coralpolyp is updated; verify with
       `test -f .github/workflows/publish-images.yml && echo "still present (transitional)" || echo "removed"`.
+      _(2026-06-15: [HUMAN] noted. Cross-repo coralpolyp coordination acknowledged; `publish-images.yml`
+      retained transitionally (the defer-if-coralpolyp-not-ready path) — its removal is tracked as a
+      follow-up, not done blind.)_
 - [ ] [HUMAN] 9.2 **Branch protection**: update the `main` required-status-check binding to the renamed
       `commons-quality-gate` check, in the **same** window as the push (9.4), so `main` stays gated.
       Observable resume signal: branch protection updated in GitHub settings; verify by opening
