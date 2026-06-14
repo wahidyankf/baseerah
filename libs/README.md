@@ -10,8 +10,7 @@ The `libs/` directory contains **reusable library packages** that can be shared 
 
 ```
 libs/
-├── golang-commons/            # Shared Go utilities (output, common helpers)
-├── golang-link-commons/       # Shared Go link-checking utilities
+├── fsharp-crane-core/         # Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
 ├── rust-commons/              # Shared Rust utilities (link-checking, HTTP)
 ├── ts-ui/                     # TypeScript UI component library
 ├── web-ui/                    # Web UI component library
@@ -27,8 +26,8 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 ### Language Prefixes
 
 - **`ts-*`** - TypeScript libraries
-- **`go-*`** / **`golang-*`** - Go libraries (`golang-commons` uses full name for clarity)
 - **`rust-*`** - Rust libraries
+- **`fsharp-*`** - F# libraries
 
 ### Examples
 
@@ -39,24 +38,24 @@ This flat structure with language prefixes supports a **polyglot monorepo** wher
 - `ts-hooks` - Custom React hooks
 - `ts-api` - API client libraries
 
-**Go libraries** (current):
-
-- `golang-commons` - Shared Go utilities (links checker, output)
-
 **Rust libraries** (current):
 
 - `rust-commons` - Shared Rust utilities (link-checking, HTTP)
 
+**F# libraries** (current):
+
+- `fsharp-crane-core` - Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
+
 ## Current Implementation
 
-**`golang-commons`** - Shared Go utilities used by `ayokoding-cli` and `ose-cli` (links
-checker, output formatting).
+**`rust-commons`** - Shared Rust utilities (link-checking, HTTP) used by the Rust CLIs
+(`ayokoding-cli`, `ose-cli`, `rhino-cli`).
 
-**`golang-link-commons`** - Shared Go link-checking utilities used by `ayokoding-cli` and `ose-cli`.
+**`fsharp-crane-core`** - Shared F# PDF-to-Markdown core (PdfPig + Tesseract) consumed by `crane-cli`.
 
 ## Library Characteristics
 
-- **Polyglot-Ready** - Designed to support multiple languages (TypeScript, Go, Rust active)
+- **Polyglot-Ready** - Designed to support multiple languages (TypeScript, Rust, F# active)
 - **Flat Structure** - All libs at same level (no nested scopes)
 - **Language-Specific** - Each language uses its own conventions and tools
 - **Reusable** - Libs are designed to be imported by apps and other libs
@@ -83,23 +82,6 @@ libs/ts-[name]/
 ├── tsconfig.build.json      # Build-specific TS config
 └── README.md                # Library documentation
 ```
-
-## Required Files (Go Libraries)
-
-Each Go library requires:
-
-```
-libs/golang-commons/
-├── links/              # Sub-package: link checker + output
-│   ├── checker.go
-│   ├── checker_test.go
-│   └── output.go
-├── go.mod              # Go module definition
-├── project.json        # Nx project configuration
-└── README.md           # Library documentation
-```
-
-Go libraries are consumed via the Go workspace (`go.work`) at the repository root. No `replace` directives needed.
 
 ## Nx Configuration (project.json)
 
@@ -140,7 +122,7 @@ Each library must have a `project.json` file:
 1. **Apps can import from any lib** - Applications are consumers
 2. **Libs can import from other libs** - Cross-library dependencies allowed
 3. **No circular dependencies** - Strictly prohibited (A → B → A not allowed)
-4. **Language boundaries** - TypeScript libs can't directly import Go/Rust libs (use APIs or IPC)
+4. **Language boundaries** - TypeScript libs can't directly import Rust/F# libs (use APIs or IPC)
 5. **Keep dependencies minimal** - Each lib should have clear, focused dependencies
 
 ### Monitoring Dependencies
@@ -203,7 +185,7 @@ nx run-many -t build
 Current active languages with lib support:
 
 - **TypeScript**: Standard TS project structure with `tsconfig.json`
-- **Go**: Module-based with `go.mod`, consumed via Go workspace (`go.work`)
 - **Rust**: Cargo workspace member, shared via `[workspace]` in root `Cargo.toml`
+- **F#**: .NET project (`.fsproj`) built via `dotnet`, consumed as a project reference
 
 Each language uses its own build tools via `nx:run-commands` executor, maintaining the vanilla Nx approach.
