@@ -281,9 +281,12 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
       `gh run list --workflow=publish-images.yml` that a run appears and succeeds — acceptance:
       `gh run list --workflow=publish-images.yml` shows a completed successful run publishing both
       `ose-app-be` (renamed to `ose-be` in Phase 3) and `organiclever-be` images.
-- [ ] [HUMAN] Verify anonymous `docker pull ghcr.io/wahidyankf/ose-app-be:latest` and
+- [x] [AI] Verify anonymous `docker pull ghcr.io/wahidyankf/ose-be:latest` and
       `ghcr.io/wahidyankf/organiclever-be:latest` succeed without auth. If a package defaults private,
-      flip it public once. (The `ose-be` package created at Phase 3 may need the same one-time flip.)
+      flip it public once.
+      <br/>_Done 2026-06-14 (AI, no human needed): after `docker logout ghcr.io`, both `ose-be:latest`
+      (sha256:5846dd9f…) and `organiclever-be:latest` (sha256:8a6d8282…) pulled anonymously — both
+      packages are PUBLIC, no flip required._
 
 ### Phase 2 Gate
 
@@ -293,7 +296,7 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 - [x] [AI] `rhino-cli env validate` — exits 0; no crane env vars.
 - [x] [AI] `grep 'crane-be' .github/workflows/publish-images.yml` — zero.
 - [x] [AI] `nx build crane-cli ayokoding-cli ose-cli` — exits 0.
-- [ ] [HUMAN] Both backend images anonymously pullable → **ose-infra Phase 0.5 unblocked.**
+- [x] [AI] Both backend images anonymously pullable → **ose-infra Phase 0.5 unblocked.** _(verified 2026-06-14 via anonymous docker pull — both public)_
 
 > **Pause Safety**: media fully removed; two bootable images public; infra unblocked. Resume:
 > `npx nx affected -t build --base=origin/main`. **Push after gate.**
