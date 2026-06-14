@@ -37,8 +37,9 @@ else
   exit 1
 fi
 
-# Advisories: offline against the pinned good DB (avoids the corrupt HEAD).
-# (--offline is a global flag and must precede the `check` subcommand.)
-cargo deny --manifest-path "$MANIFEST" --offline check advisories
+# Advisories: --disable-fetch keeps cargo-deny from re-fetching the advisory-db
+# (which would pull the corrupt upstream HEAD); it reads the pinned good DB we
+# pre-seeded above. (--offline only governs the crates.io index, not the db.)
+cargo deny --manifest-path "$MANIFEST" check advisories --disable-fetch
 # Bans / licenses / sources: online as usual (need the crates index).
 cargo deny --manifest-path "$MANIFEST" check bans licenses sources
