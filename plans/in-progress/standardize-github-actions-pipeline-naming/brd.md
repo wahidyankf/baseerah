@@ -17,8 +17,12 @@ coherent, correctly-wired workflow set to build on.
   factored into reusable workflows so adding a site is a thin caller.
 - **Correct wiring** — every www caller points at its renamed `-www` project and new `prod-*-www`
   branch; every app workflow points at the new `stag-*-app-web` branches and renamed Environments.
+- **One tiered env/secret injection standard** — each app's canonical `apps/<app>/.env.example` key
+  set injects uniformly into GitHub Actions Environments, Vercel targets, and the k3s/coralpolyp path
+  across local/staging/production, with a value-less `env-injection.yaml` manifest and a static
+  consistency check. No more ad-hoc, per-workflow env wiring.
 - **Unblock the Vercel cutover** — leave `wire-vercel-www-app-cutover` with only dashboard/DNS/branch
-  work.
+  work plus value population driven by the manifest.
 
 ## Non-goals
 
@@ -26,6 +30,8 @@ coherent, correctly-wired workflow set to build on.
 - Standing up Vercel projects, DNS, GitHub Environments, or branches (wire-vercel).
 - Backend k8s rollout (ose-infra).
 - Changing any test's logic or coverage thresholds.
+- **Setting real env/secret values** in GitHub, Vercel, or k3s — this plan defines the contract +
+  manifest only; value population is wire-vercel / ose-infra `[HUMAN]` work.
 
 ## Stakeholders
 
@@ -47,13 +53,15 @@ coherent, correctly-wired workflow set to build on.
 
 ## Risks
 
-| Risk                                                            | Likelihood | Impact | Mitigation                                                                                     |
-| --------------------------------------------------------------- | ---------- | ------ | ---------------------------------------------------------------------------------------------- |
-| Renaming `pr-quality-gate.yml` breaks the required status check | Medium     | High   | Open Decision 1 — keep job/check names or coordinate a branch-protection update (`[HUMAN]`)    |
-| New workflows push to branches that do not exist yet            | High       | Low    | Expected until wire-vercel creates them; failure is loud + non-destructive (failed `git push`) |
-| `organiclever-www` has no local test stack                      | Certain    | Medium | Create `infra/dev/organiclever-www` compose in this plan                                       |
-| Broken in-repo links to renamed workflow files                  | Medium     | Low    | `links:validation` gate + explicit doc-sweep phase                                             |
-| Scope overlap/conflict with `wire-vercel`                       | Medium     | Medium | This plan explicitly takes workflow ownership and edits wire-vercel to match                   |
+| Risk                                                            | Likelihood | Impact | Mitigation                                                                                                                    |
+| --------------------------------------------------------------- | ---------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Renaming `pr-quality-gate.yml` breaks the required status check | Medium     | High   | Open Decision 1 — keep job/check names or coordinate a branch-protection update (`[HUMAN]`)                                   |
+| New workflows push to branches that do not exist yet            | High       | Low    | Expected until wire-vercel creates them; failure is loud + non-destructive (failed `git push`)                                |
+| `organiclever-www` has no local test stack                      | Certain    | Medium | Create `infra/dev/organiclever-www` compose in this plan                                                                      |
+| Broken in-repo links to renamed workflow files                  | Medium     | Low    | `links:validation` gate + explicit doc-sweep phase                                                                            |
+| Scope overlap/conflict with `wire-vercel`                       | Medium     | Medium | This plan explicitly takes workflow ownership and edits wire-vercel to match                                                  |
+| CI test-harness keys (`WEB_BASE_URL`) leak into `.env.example`  | Medium     | Medium | New CI test-harness var class — registered in `env-injection.yaml`, kept out of every `.env.example`; drift guard stays clean |
+| Injection manifest drifts from the real GitHub/Vercel/k3s state | Medium     | Medium | Manifest is value-less + statically checked; wire-vercel/ose-infra populate against it as the authoritative checklist         |
 
 ## Success criteria
 

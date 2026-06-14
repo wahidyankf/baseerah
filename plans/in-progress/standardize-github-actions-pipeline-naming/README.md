@@ -1,9 +1,9 @@
 ---
-title: Standardize GitHub Actions Pipeline Naming + Tiered Deploy Structure
-description: Establishes a single domain-first naming convention for every file and folder under .github/workflows/ and .github/actions/, then restructures the deploy pipelines into two explicit tiers — a www tier (test-local → deploy-prod, direct) and an app tier (test-local → deploy-stag, then test-stag → deploy-prod gate) — with the prod CD step deliberately deferred. Each pipeline is a scheduled (2× WIB daily) workflow whose filename reads {domain}-{action-chain}.yml. Cross-cutting workflows adopt commons-*/docs-*/markdown-*/{cli}-* domain prefixes. Also repoints the stale post-restructure www callers (ose-web→ose-www, etc.) to their renamed projects and new prod-*-www / stag-*-app-web branches. Prerequisite to wire-vercel-www-app-cutover, which is reduced to Vercel-project/DNS/branch-creation work once this lands.
+title: Standardize GitHub Actions Pipeline Naming + Tiered Deploy + Env/Secret Injection
+description: Establishes a single domain-first naming convention for every file and folder under .github/workflows/ and .github/actions/, then restructures the deploy pipelines into two explicit tiers — a www tier (test-local → deploy-prod, direct) and an app tier (test-local → deploy-stag, then test-stag → deploy-prod gate) — with the prod CD step deliberately deferred. Each pipeline is a scheduled (2× WIB daily) workflow whose filename reads {domain}-{action-chain}.yml. Cross-cutting workflows adopt commons-*/docs-*/markdown-*/{cli}-* domain prefixes. Also repoints the stale post-restructure www callers (ose-web→ose-www, etc.) to their renamed projects and new prod-*-www / stag-*-app-web branches. Adds a tiered env/secret injection standard — one canonical .env.example key set per app injected uniformly into GitHub Actions Environments, Vercel targets, and the k3s/coralpolyp path across local/staging/production, plus a value-less env-injection.yaml manifest and a static consistency check — and sweeps every related governance .md/rule. Prerequisite to wire-vercel-www-app-cutover, which is reduced to Vercel-project/DNS/branch-creation and value-population work once this lands.
 ---
 
-# Standardize GitHub Actions Pipeline Naming + Tiered Deploy Structure
+# Standardize GitHub Actions Pipeline Naming + Tiered Deploy + Env/Secret Injection
 
 > **Status**: In progress — authored 2026-06-14. Execution not started.
 > **Blocks**: [`wire-vercel-www-app-cutover`](../wire-vercel-www-app-cutover/README.md) — that plan's
@@ -96,24 +96,53 @@ intentionally **not** implemented here — continuous delivery to production is 
 - **Author the naming convention** in `repo-governance/development/infra/github-actions-workflow-naming.md`
   (domain-first rule, `{domain}-{action-chain}` grammar, cross-cutting keyword list, reusable + action
   exemptions) and align `ci-conventions.md` (File Organisation + Naming tables + Invariant A).
-- **Restructure the deploy workflows** into the two tiers above (12 entry-point workflows + 4
-  reusables), repointing every www caller to its renamed `-www` project and new `prod-*-www` branch,
+- **Restructure the deploy workflows** into the two tiers above (13 entry-point workflows + 4
+  reusables; 15 files today → 17 after), repointing every www caller to its renamed `-www` project and new `prod-*-www` branch,
   and every app-group workflow to the new `stag-*-app-web` / `stag-*-be` branches and renamed GitHub
   Environments. Deploy = branch force-push.
 - **Add the backend container-build-deploy workflows** (`{product}-be-build-deploy-stag.yml`),
   refactoring `publish-images.yml` into a `_reusable-be-build-deploy.yml` triggered by the `stag-*-be`
   branch push; GHCR image hand-off to ose-infra `coralpolyp` for the cluster rollout.
-- **Rename cross-cutting workflows** to the domain-keyword scheme (`commons-*`, `markdown-*`,
-  `crane-cli-*`), including the full `pr-quality-gate` → `commons-quality-gate` rename **with a
-  coordinated branch-protection update** (required status-check binding).
+- **Rename cross-cutting gate workflows** to the domain-keyword scheme (`commons-*`, `markdown-*`),
+  including the full `pr-quality-gate` → `commons-quality-gate` rename **with a coordinated
+  branch-protection update** (required status-check binding). The `{cli}-*` keyword stays in the
+  convention as a forward-looking slot, but no CLI workflow ships in this PR (see below).
+- **Scope = "service" workflows only (BE / FE / Web).** CLI-tool CI is out of scope this PR;
+  `test-crane-cli-integration.yml` is **deleted** (crane-cli's pipeline is revisited in a later plan).
+  Its removal is also the only thing that was running an integration suite on `pull_request`.
+- **Keep heavy tests out of the fast feedback gates** — codify the invariant that
+  `test:integration` and `test:e2e` run **only** in the scheduled tiered service pipelines
+  (`*-test-local-*`, `*-test-stag-*`), **never** in the PR quality gate (`commons-quality-gate`),
+  `.husky/pre-commit`, or `.husky/pre-push`. The PR gate / pre-commit / pre-push already run only
+  `typecheck`/`lint`/`test:quick`/`specs:coverage`; deleting the crane-cli integration workflow removes
+  the lone `pull_request` integration violation.
 - **Create the missing `organiclever-www` pipeline** (caller + its `infra/dev/organiclever-www`
   local-test stack) and **split `organiclever-www-e2e`** into `-be-e2e` + `-fe-e2e` so the www
   reusable stays uniform.
-- **Sweep every in-repo reference** to the renamed files: `.github/**/README.md`,
-  `docs/reference/system-architecture/ci-cd.md`, `repo-governance/**`, the
-  `wire-vercel-www-app-cutover` plan, and any agent definitions that name a workflow file.
-- **Reduce `wire-vercel-www-app-cutover`** to Vercel/DNS/Environment/branch-creation + non-workflow
-  docs, pointing its workflow section at this plan.
+- **Normalize `apps/` + `infra/` to the standard** (cleanup/rename in scope) — align every
+  `apps/<app>/.env.example` to the injection variable classes (server vs `NEXT_PUBLIC_*` public vs
+  out-of-template CI test-harness keys), keep `env-contract.yaml` in step, and rename the `infra/dev/`
+  compose stacks to the `{group}` scheme so a stack folder reads as its pipeline domain (e.g.
+  `infra/dev/organiclever` → `infra/dev/organiclever-app`; add `infra/dev/organiclever-www`). Update
+  every `compose-dir` workflow input + doc reference to match.
+- **Standardize tiered env/secret injection** — define one cross-platform injection standard so each
+  app's canonical `apps/<app>/.env.example` key set is injected uniformly into GitHub Actions
+  Environments (`vars.`/`secrets.` under `{group}-app-{tier}`), Vercel targets (Production for
+  `prod-*`, Preview for `stag-*`), and the backend k3s/coralpolyp path, across **local / staging /
+  production**. Add the value-less `env-injection.yaml` manifest (a CI test-harness key registry +
+  per-app injection homes) and extend `commons-env-validate` with a static, value-free consistency
+  check. This plan writes **references and the manifest only** — real values are wire-vercel /
+  ose-infra `[HUMAN]` work. See [tech-docs](./tech-docs.md#tiered-env--secret-injection-standard).
+- **Sweep every in-repo reference + all related governance `.md`/rules** — the renamed-file set
+  (`.github/**/README.md`, `docs/reference/system-architecture/ci-cd.md`, `repo-governance/**`, the
+  `wire-vercel-www-app-cutover` plan, agent definitions naming a workflow file) **and** the
+  env-injection governance surface (`secrets-and-env-standards.md`, `env-contract.yaml`,
+  `ci-conventions.md`, `reproducible-environments.md`, the `conventions/security/*` stubs +
+  `conventions/README.md`). See the full list in
+  [tech-docs](./tech-docs.md#docs--rules-this-introduces-or-amends).
+- **Reduce `wire-vercel-www-app-cutover`** to Vercel/DNS/Environment/branch-creation + value
+  population (working from the `env-injection.yaml` manifest) + non-workflow docs, pointing its
+  workflow section at this plan.
 
 ### Out of scope
 
@@ -124,6 +153,10 @@ intentionally **not** implemented here — continuous delivery to production is 
   yet anyway. The `*-be-build-deploy-prod.yml` variants are likewise deferred.
 - **Vercel projects, DNS, GitHub Environment + secret creation, branch creation** — owned by
   `wire-vercel-www-app-cutover` (this plan references the new names; that plan brings them to life).
+- **Real env/secret values** — this plan defines the injection standard, the GitHub Environment key
+  registry, and the value-less `env-injection.yaml` manifest, but sets **no** values. Populating GitHub
+  Environment `vars.`/`secrets.` and Vercel project env is `wire-vercel`'s `[HUMAN]` work; the backend
+  k3s secret values are ose-infra `coralpolyp`'s.
 - **Backend k8s rollout** — `organiclever-be` / `ose-be` ship as GHCR images built by the
   `*-be-build-deploy-stag` workflows; the actual k3s rollout is orchestrated by ose-infra `coralpolyp`.
   The `publish-images` trigger swap (main-push → branch-push) needs ose-infra coordination — see the

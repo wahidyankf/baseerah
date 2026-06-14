@@ -67,10 +67,12 @@ incident baseline measured.
 serves it as a persistent staging deployment at a dedicated staging URL, so the app can be exercised before
 the gated promotion to prod. That staging URL is environment-private and **must never be committed** to the
 repo (per [Secrets and Env Standards](../../../repo-governance/conventions/security/secrets-and-env-standards.md)):
-every committed artifact — deployer agents, app READMEs, architecture docs, deploy workflows — refers to it
-only via a placeholder (e.g. `<staging-url:ose-app-web>`) or a GitHub Actions secret (e.g.
-`STAGING_BASE_URL_OSE_APP_WEB`). The FE E2E gate that promotes `stag-*-app-web → prod-*-app-web` reads the
-staging base URL from that secret, not from a literal in the workflow file.
+every committed artifact — deployer agents, app READMEs, architecture docs, workflows — refers to it only via
+a placeholder (e.g. `<staging-url:ose-app-web>`). Per the standardize plan's injection standard, the staging
+base URL lives in the `{group}-app-staging` GitHub Environment as the **`WEB_BASE_URL`** var (kept private,
+not committed), and the staging E2E gate reads it from `vars.WEB_BASE_URL` — never from a literal in the
+workflow. Reaching that protected URL also requires the `VERCEL_AUTOMATION_BYPASS_SECRET` secret (see the
+[bypass section](#vercel-deployment-protection--the-bypass-secret-load-bearing)).
 
 ### D2 — Repoint by add-then-verify-then-delete (zero-downtime ordering)
 
@@ -101,61 +103,80 @@ Vercel project. This plan's verification explicitly asserts their **absence** fr
 | organiclever-app-web | **Create new project** + DNS                        | `prod-organiclever-app-web` | `apps/organiclever-app-web` | app.organiclever.com |
 | ose-app-web          | **Create new project** + DNS                        | `prod-ose-app-web`          | `apps/ose-app-web`          | app.oseplatform.com  |
 
-## Related GitHub Actions workflows (complete inventory)
+## GitHub Actions workflows — owned by the standardize plan (verify only)
 
-`[Repo-grounded: .github/workflows/*.yml as of the .github CI cleanup]`
+`[Prerequisite: standardize-github-actions-pipeline-naming is DONE]`
 
-Every deploy/staging/promotion workflow that names a cutover branch, environment, or app is listed
-below with its **current** references and the **cutover action**. Workflows that touch no cutover
-branch/app are listed under "Out of scope" so the inventory is provably complete.
+All `.github/workflows/` restructuring — the `_reusable-www-test-local-deploy` callers, the
+`*-app-test-local-deploy-stag` / `*-app-test-stag-deploy-prod` app pipelines, the
+`*-be-build-deploy-stag` backend workflows, and the `commons-*` / `markdown-*` cross-cutting renames —
+is performed by [`standardize-github-actions-pipeline-naming`](../standardize-github-actions-pipeline-naming/README.md)
+and lands **before** this plan runs. This plan **does not edit any workflow file**. Its only workflow
+interaction is a read-only **verification** that the already-standardized workflows reference the
+branches and Environments this plan creates:
 
-### www tier — direct deploy (thin callers of `_reusable-test-and-deploy.yml`)
+| Standardized workflow (after the prerequisite) | References this plan must satisfy                                         |
+| ---------------------------------------------- | ------------------------------------------------------------------------- |
+| `{site}-www-test-local-deploy-prod.yml`        | force-pushes `prod-{site}-www` (branch created here)                      |
+| `{group}-app-test-local-deploy-stag.yml`       | force-pushes `stag-{group}-app-web` + `stag-{group}-be` (created here)    |
+| `{group}-app-test-stag-deploy-prod.yml`        | env `{group}-app-staging` holds `WEB_BASE_URL` + bypass secret (set here) |
+| `{group}-be-build-deploy-stag.yml`             | triggered by the `stag-{group}-be` push (branch created here)             |
 
-| Workflow file                          | Current refs                                        | Cutover action                                                                            |
-| -------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `_reusable-test-and-deploy.yml`        | force-pushes to `inputs.prod-branch` (no hardcoded) | **No change** — generic; callers pass the new inputs                                      |
-| `test-and-deploy-ose-web.yml`          | `app-name: ose-web`, `prod-branch: prod-ose-web`    | **Update inputs** → `app-name: ose-www`, `prod-branch: prod-ose-www`                      |
-| `test-and-deploy-ayokoding-web.yml`    | `ayokoding-web` / `prod-ayokoding-web`              | **Update inputs** → `ayokoding-www` / `prod-ayokoding-www`                                |
-| `test-and-deploy-wahidyankf-web.yml`   | `wahidyankf-web` / `prod-wahidyankf-web`            | **Update inputs** → `wahidyankf-www` / `prod-wahidyankf-www`                              |
-| `test-and-deploy-organiclever-www.yml` | **does not exist**                                  | **Create** — model on the wahidyankf caller; `organiclever-www` / `prod-organiclever-www` |
+## Env/secret value population (from the injection manifest)
 
-> The three existing callers pass the **pre-restructure** `app-name`, so their nightly CRON currently
-> runs `nx run ose-web:…` against a project that is now `ose-www` — i.e. they are already failing. The
-> input update both fixes the build and repoints the deploy branch. `organiclever-www` (marketing) has
-> **no** deploy workflow today because the old OrganicLever workflow was migrated to the app-web tier
-> (see below), so a new caller is required.
+`[Prerequisite: env-injection.yaml + the tiered injection standard exist]`
 
-### app-web tier — gated promotion (dev → staging → dispatch promotion)
+The standardize plan defines **where** every key is injected (the value-less `env-injection.yaml`); this
+plan sets the **real values** in those homes. Names follow the
+[Secrets and Env Standards](../../../repo-governance/conventions/security/secrets-and-env-standards.md) —
+no tier qualifier in a key, identical key names across platforms, never committed.
 
-`organiclever-app-web` — trio exists but still on **old** branch/env names → **update**:
+### GitHub Environments (repo Settings → Environments, HUMAN)
 
-| Workflow file                                      | Current refs                                                                                     | Cutover action                                                                                                           |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `test-and-deploy-organiclever-web-development.yml` | tests `organiclever-app-web`; pushes `stag-organiclever-web`; env `organiclever-web-development` | **Update** staging branch → `stag-organiclever-app-web`; env → `organiclever-app-web-development`                        |
-| `test-organiclever-web-staging.yml`                | env `organiclever-web-staging`; `stag-organiclever-web` (comments)                               | **Update** env → `organiclever-app-web-staging`; branch refs → `stag-organiclever-app-web`                               |
-| `deploy-organiclever-web-to-production.yml`        | `stag-organiclever-web → prod-organiclever-web`; envs `organiclever-web-{staging,production}`    | **Update** → `stag-organiclever-app-web → prod-organiclever-app-web`; envs → `organiclever-app-web-{staging,production}` |
+Per the standardize model there are **only `local` and `staging`** app Environments — no `development`,
+and no `production` (app-tier prod CD is deferred to a later plan):
 
-`ose-app-web` — trio already provisioned with the **target** names → **verify only**:
+| Environment                | `vars.`        | `secrets.`                        | Why                                            |
+| -------------------------- | -------------- | --------------------------------- | ---------------------------------------------- |
+| `organiclever-app-local`   | _(none)_       | local-CI secrets, if any          | compose-only; omit the env if it ends up empty |
+| `organiclever-app-staging` | `WEB_BASE_URL` | `VERCEL_AUTOMATION_BYPASS_SECRET` | staging E2E gate hits the protected Vercel URL |
+| `ose-app-local`            | _(none)_       | local-CI secrets, if any          | compose-only; omit if empty                    |
+| `ose-app-staging`          | `WEB_BASE_URL` | `VERCEL_AUTOMATION_BYPASS_SECRET` | staging E2E gate hits the protected Vercel URL |
 
-| Workflow file                                 | Current refs                                                                   | Cutover action                        |
-| --------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------- |
-| `test-and-deploy-ose-app-web-development.yml` | pushes `stag-ose-app-web`; env `ose-app-web-development`                       | **Verify** — already correct, no edit |
-| `test-ose-app-web-staging.yml`                | `stag-ose-app-web`; env `ose-app-web-staging`                                  | **Verify** — already correct, no edit |
-| `deploy-ose-app-web-to-production.yml`        | `stag-ose-app-web → prod-ose-app-web`; envs `ose-app-web-{staging,production}` | **Verify** — already correct, no edit |
+`WEB_BASE_URL` is the staging deployment URL (kept private — set as an Environment **var**, not
+committed). The www tier has **no** GitHub Environment (its e2e runs on local docker-compose, never
+against a deployed URL).
 
-### GitHub Actions Environments (HUMAN, dashboard)
+### Vercel Deployment Protection + the bypass secret (load-bearing)
 
-The staging/promotion jobs run under named **GitHub Actions Environments** that hold the deploy
-secrets — `STAGING_BASE_URL_ORGANICLEVER_APP_WEB`, `STAGING_BASE_URL_OSE_APP_WEB`, and the staging
-`WEB_BASE_URL` var. Renaming the OrganicLever environments to the `organiclever-app-web-*` form
-requires creating those environments in **repo Settings → Environments** and setting their secrets
-there (never in the repo). `ose-app-web-*` environments already match the workflow references.
+Each app-web Vercel project ships with **Deployment Protection** enabled, which returns `401` to any
+unauthenticated request to a preview/staging URL. The standardized `_reusable-app-test-stag` job runs
+Playwright **against that protected staging URL**, so it must present a **Protection Bypass for
+Automation** token. Operationally, this plan:
+
+1. Enables **Protection Bypass for Automation** on each app-web Vercel project (Settings → Deployment
+   Protection), which mints a bypass token.
+2. Stores that token as the `VERCEL_AUTOMATION_BYPASS_SECRET` **secret** on each `{group}-app-staging`
+   GitHub Environment (never committed).
+3. Relies on the standardized workflow already sending it (the existing
+   `test-organiclever-web-staging.yml` reads `secrets.VERCEL_AUTOMATION_BYPASS_SECRET` + sets
+   `WEB_BASE_URL` — the standardized reusable preserves this).
+
+Without the bypass token every staging E2E run `401`s on the first request — this is the single most
+common cause of a green deploy but red gate, so it is called out explicitly here and in delivery.
+
+### Vercel project env (per target, HUMAN)
+
+App-runtime keys from each app's `apps/<app>/.env.example` are set in the Vercel project env, scoped by
+target: **Production** target for the `prod-*` branch, **Preview** target for the `stag-*-app-web`
+branch. `NEXT_PUBLIC_*` keys are build-time/public; server keys are encrypted. Backend (`-be`) runtime
+secrets are **not** on Vercel — they are k3s secrets owned by ose-infra `coralpolyp`.
 
 ### Out of scope (no cutover branch/app)
 
-`publish-images.yml` (organiclever-be / ose-be GHCR images — owned by the ose-infra k3s plans),
-`pr-quality-gate.yml`, `validate-markdown.yml`, `validate-env.yml`, and
-`test-crane-cli-integration.yml` reference no cutover branch, environment, or web app.
+The `commons-*` / `markdown-*` cross-cutting workflows reference no cutover branch, environment, or web
+app. `publish-images.yml` is absorbed into the standardized `*-be-build-deploy-stag` workflows by the
+prerequisite plan; the GHCR image rollout remains ose-infra `coralpolyp`'s.
 
 ## File-impact analysis (in-repo `[AI]` edits)
 
@@ -167,22 +188,24 @@ there (never in the repo). `ose-app-web-*` environments already match the workfl
   `description`, and the push target `prod-ose-web` → `prod-ose-www`. Same for `apps-ayokoding-web-deployer`,
   `apps-organiclever-web-deployer`, `apps-wahidyankf-web-deployer`. Add new `apps-ose-app-web-deployer`
   (model on an existing deployer). Run `npm run generate:bindings` to resync `.opencode/agents/`.
-- `.github/workflows/` — every cutover-related workflow; see the
-  [complete inventory](#related-github-actions-workflows-complete-inventory) above for each file's
-  current refs and its update / create / verify action (4 www callers incl. a new `organiclever-www`
-  one, the OrganicLever app-web trio to rename, and the already-correct ose-app-web trio to verify).
+- `.github/workflows/` — **not edited here.** Owned by `standardize-github-actions-pipeline-naming`
+  (already landed). This plan only verifies the standardized workflows reference the branches +
+  Environments it creates (see [Workflows — owned by the standardize plan](#github-actions-workflows--owned-by-the-standardize-plan-verify-only)).
 - `AGENTS.md` — the prod-branch list (lines ~231–234) and the per-site "Production branch" rows
   (~459, 471, 483, 495, 507).
 - `apps/ose-www/README.md`, `apps/ayokoding-www/README.md`, `apps/wahidyankf-www/README.md`,
   `apps/organiclever-www/README.md`, and the two app-web READMEs — deploy-branch references.
-- `docs/reference/system-architecture/applications.md`, `ci-cd.md`, `deployment.md` — branch names,
-  the deployment mermaid nodes, and the workflow tables.
+- `docs/reference/system-architecture/applications.md`, `ci-cd.md`, `deployment.md` — branch names and
+  the deployment mermaid nodes (the **branch references** in the workflow tables; the workflow
+  **filenames** in those tables are updated by the standardize plan's sweep — coordinate to avoid
+  double-editing a row).
 
-> **Boundary with the restructure plan:** the restructure plan renames the app **directories** and
-> updates prose that names the **apps**; this plan owns every reference to the **deploy branch names**
-> and the **Vercel/workflow wiring**. If the restructure already renamed a branch reference, this plan
-> verifies it; the two must not double-edit the same line — Phase 0 diffs against `main` to confirm the
-> starting state.
+> **Boundary with the upstream plans:** the restructure plan renames the app **directories** and prose
+> that names the **apps**; `standardize-github-actions-pipeline-naming` owns the **workflow files** and
+> the env/secret **injection standard**; this plan owns the **Vercel/DNS wiring**, the **deploy-branch
+> creation**, and the **real env/secret values**. It edits no workflow. If an upstream plan already
+> renamed a branch reference, this plan verifies it; no two plans double-edit the same line — Phase 0
+> diffs against `main` to confirm the starting state.
 
 ## Dependencies
 

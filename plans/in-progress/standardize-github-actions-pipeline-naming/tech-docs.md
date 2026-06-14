@@ -102,16 +102,41 @@ symmetric with web prod.
 
 ### Cross-cutting workflows
 
-| Before                           | After                      | Domain      | Notes                                                         |
-| -------------------------------- | -------------------------- | ----------- | ------------------------------------------------------------- |
-| `pr-quality-gate.yml`            | `commons-quality-gate.yml` | `commons`   | Full rename incl. `name:`; **branch protection updated** (D1) |
-| `validate-env.yml`               | `commons-env-validate.yml` | `commons`   | Repo-wide `.env.example` contract validation                  |
-| `validate-markdown.yml`          | `markdown-validate.yml`    | `markdown`  | Mermaid + link + heading-hierarchy validation                 |
-| `test-crane-cli-integration.yml` | `crane-cli-test-local.yml` | `crane-cli` | OCR integration tests on `apps/crane-cli/**`                  |
+| Before                           | After                      | Domain     | Notes                                                                   |
+| -------------------------------- | -------------------------- | ---------- | ----------------------------------------------------------------------- |
+| `pr-quality-gate.yml`            | `commons-quality-gate.yml` | `commons`  | Full rename incl. `name:`; **branch protection updated** (D1)           |
+| `validate-env.yml`               | `commons-env-validate.yml` | `commons`  | Repo-wide `.env.example` contract validation + injection-manifest check |
+| `validate-markdown.yml`          | `markdown-validate.yml`    | `markdown` | Mermaid + link + heading-hierarchy validation                           |
+| `test-crane-cli-integration.yml` | **removed**                | —          | CLI is not a service — out of scope this PR; revisited later (D5)       |
 
-Net: **16 files today → 18 after** (4 reusables, 4 www, 4 app, 2 be-build-deploy, 4 cross-cutting),
-minus the 2 removed prod-dispatch workflows and the absorbed `publish-images.yml`, plus the new
-`infra/dev/organiclever-www/` compose stack and the `organiclever-www-e2e` → `-be-e2e`/`-fe-e2e` split.
+Net: **15 files today → 17 after** (4 reusables, 4 www, 4 app, 2 be-build-deploy, 3 cross-cutting:
+`commons-quality-gate`, `commons-env-validate`, `markdown-validate`), accounting for the 2 removed
+prod-dispatch workflows, the deleted `test-crane-cli-integration.yml`, and `publish-images.yml`
+absorbed into the 2 be-build-deploy workflows, plus the new `infra/dev/organiclever-www/` compose stack
+and the `organiclever-www-e2e` → `-be-e2e`/`-fe-e2e` split. Scope is **service workflows only**
+(BE / FE / Web); CLI-tool CI is deferred.
+
+## Fast-gate test policy (no integration/e2e in the gates)
+
+`test:integration` and `test:e2e` are heavy (docker-compose, Playwright, real services). They belong
+**only** to the scheduled tiered pipelines and must never sit on the fast feedback path:
+
+| Surface                          | Runs                                                            | Integration / e2e? |
+| -------------------------------- | --------------------------------------------------------------- | ------------------ |
+| `.husky/pre-commit`              | `nx affected -t test:quick`                                     | **no**             |
+| `.husky/pre-push`                | `specs:coverage`, `test-coverage`, specs/markdown/naming        | **no**             |
+| `commons-quality-gate` (PR gate) | `typecheck`, `lint`, `test:quick`, `specs:coverage` + lint jobs | **no**             |
+| `*-test-local-*` (CRON)          | `test:integration` + `test:e2e` via docker-compose              | **yes**            |
+| `*-test-stag-*` (CRON)           | `test:e2e` vs deployed staging                                  | **yes**            |
+
+Current state is **already compliant** on the PR gate, pre-commit, and pre-push (verified: they run
+only `test:quick`/`typecheck`/`lint`/`specs:coverage`/coverage+validators). The **one violation** is
+`test-crane-cli-integration.yml`, which runs `crane-cli:test:integration` on `pull_request` — making
+an integration suite a PR gate. **Decision 5 (D5)**: rather than reschedule it, this plan **deletes**
+`test-crane-cli-integration.yml` outright — crane-cli is a CLI tool, not a service, and CLI-tool CI is
+out of scope this PR (revisited in a later plan). Deletion removes the violation cleanly. This plan
+also codifies the invariant in `ci-conventions.md` so no
+future reusable/caller wires integration/e2e back into a gate.
 
 ## Per-tier mechanics
 
@@ -196,6 +221,140 @@ This plan writes only the **references**. Creating Environments/branches and set
 is a `wire-vercel-www-app-cutover` `[HUMAN]` step. Staging URLs/secrets are never committed —
 placeholder/secret only.
 
+## Tiered env & secret injection standard
+
+The repo already standardizes how each app **declares** its env vars locally:
+[`secrets-and-env-standards.md`](../../../repo-governance/conventions/security/secrets-and-env-standards.md)
+fixes the naming convention (`{APP}_` prefix), the `apps/<app>/.env.example` layout, the annotation
+format, the `rhino-cli env validate` code↔template drift guard, and the `env-contract.yaml` surface
+registry. What it does **not** yet standardize is how a declared key is **injected** into each
+running surface — GitHub Actions, Vercel, and the backend container/k3s path — across the three
+deploy stages. This plan introduces a pipeline whose `environment:` scoping and `vars.`/`secrets.`
+reads must be uniform, so it is the right place to close that gap.
+
+**Source of truth.** `apps/<app>/.env.example` is the canonical key set for every app-runtime
+variable. Every injection target (GitHub Environment, Vercel project, k3s secret) uses the **same key
+names** — the existing rule that **a tier qualifier never appears in a key** (`DATABASE_URL`, not
+`PROD_DATABASE_URL`; §2 of the standard) is what makes one key set serve all three stages. The stage
+is encoded by **which injection target** holds the value, never by the key.
+
+### Variable classes (extends §2 of the standard with injection homes)
+
+| Class                      | Example                                                                     | `.env.example`?    | Injection home                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------ |
+| App-runtime (server)       | `DATABASE_URL`, `ORGANICLEVER_BE_NATS_URL`                                  | **yes**            | local `.env.local` · GitHub Env (CI) · Vercel encrypted env · k3s secret       |
+| App-runtime (public build) | `NEXT_PUBLIC_*`                                                             | **yes**            | same, but **build-time** + bundled (never a secret)                            |
+| CI test-harness            | `WEB_BASE_URL`, `VERCEL_AUTOMATION_BYPASS_SECRET`, `PLAYWRIGHT_GREP_INVERT` | **no** (test-only) | GitHub Environment `vars.`/`secrets.` only; registered in `env-injection.yaml` |
+| Platform-injected          | `VERCEL_GIT_COMMIT_REF`, `PORT`, `HOSTNAME`                                 | allowlisted        | supplied by the platform/framework; never declared, never set by us            |
+
+The CI test-harness class is new and important: `WEB_BASE_URL` + `VERCEL_AUTOMATION_BYPASS_SECRET`
+(read by `_reusable-app-test-stag.yml`) are **not** app config — they describe the deployed staging
+target the e2e job probes. They must never leak into `apps/<app>/.env.example` (the drift guard would
+wrongly flag them `declared-but-unread`), so they get their own registry (below).
+
+`VERCEL_AUTOMATION_BYPASS_SECRET` is **load-bearing, not optional**: every app-web Vercel deployment
+has Deployment Protection on, which returns `401` to unauthenticated requests to the staging/preview
+URL. The staging e2e job runs Playwright against that protected URL, so it must send Vercel's
+**Protection Bypass for Automation** token — exactly as the current `test-organiclever-web-staging.yml`
+already does. Without it every staging run 401s. The token's real value is created in
+`wire-vercel-www-app-cutover` (enable Protection Bypass per project → set the GitHub Environment
+secret); this plan only declares the key in the manifest + reads it in the reusable.
+
+### Injection matrix (app × stage × platform)
+
+| App type         | Stage      | Platform / target                                   | Injection home                                                          | Values owned by                           |
+| ---------------- | ---------- | --------------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- |
+| www / app-web    | local      | dev machine                                         | `apps/<app>/.env.local` (gitignored), auto-loaded by Next.js            | developer                                 |
+| www / app-web    | local (CI) | GitHub Actions + docker-compose                     | `infra/dev/<stack>/` compose env, sourced from the app `.env.example`   | this plan (refs) / committed placeholders |
+| www              | production | Vercel **Production** target (`prod-*-www` branch)  | Vercel project env, keys from `.env.example`                            | wire-vercel `[HUMAN]`                     |
+| app-web          | staging    | Vercel **Preview** target (`stag-*-app-web` branch) | Vercel project env (Preview scope)                                      | wire-vercel `[HUMAN]`                     |
+| app-web e2e gate | staging    | GitHub Env `{group}-app-staging`                    | `vars.WEB_BASE_URL`, `secrets.VERCEL_AUTOMATION_BYPASS_SECRET`          | wire-vercel `[HUMAN]`                     |
+| be (F#)          | local (CI) | GitHub Actions + docker-compose                     | `infra/dev/<group>/` compose env, sourced from the app `.env.example`   | this plan (refs) / committed placeholders |
+| be (F#)          | staging    | k3s via ose-infra `coralpolyp`                      | container env from the ose-infra secret store, keys from `.env.example` | ose-infra (cross-repo)                    |
+
+Two boundaries fall out of the matrix and are load-bearing for the plan split:
+
+- **This plan writes only references** — the `environment:` names, the `vars.`/`secrets.` reads, the
+  compose env wiring sourced from committed placeholders, and the value-less `env-injection.yaml`
+  manifest. It creates **no real values**.
+- **`wire-vercel` populates the values** — GitHub Environment secrets/vars and Vercel project env at
+  each target. **coralpolyp (ose-infra)** owns the backend k3s secret values. The contract (key set)
+  is defined here; the cutover plan and ose-infra fill it in.
+
+### `infra/dev/<stack>` compose env — no duplicate templates
+
+§3 of the standard forbids a second template per app. Compose stacks therefore **must not** introduce
+their own `.env.example` key list. Today they load a gitignored local `.env` (e.g.
+`infra/dev/organiclever/.env`, already `.gitignore`d) and override with inline `environment:` in
+`docker-compose.ci.yml` for CI — never a committed second template. Any value a CI job needs is set
+inline in the compose override or sourced from the app's canonical `apps/<app>/.env.example` keys
+(placeholders only), so the drift guard still sees one source of truth. The new
+`infra/dev/organiclever-www/` stack (delivery Phase 3) follows this rule, and the `{group}` stack
+rename (`infra/dev/organiclever` → `infra/dev/organiclever-app`) keeps the gitignored `.env` in place.
+
+### GitHub Environment ↔ key registry
+
+Each `environment:` named by the pipeline holds exactly the keys that stage's jobs read, split into
+non-secret `vars.` and secret `secrets.`. Values are placeholders/secret only in-repo (created by
+wire-vercel):
+
+| Environment               | `vars.`                 | `secrets.`                        | Read by                                |
+| ------------------------- | ----------------------- | --------------------------------- | -------------------------------------- |
+| `{group}-app-local`       | _(none — compose-only)_ | local-CI secrets, if any          | `_reusable-app-test-local-deploy-stag` |
+| `{group}-app-staging`     | `WEB_BASE_URL`          | `VERCEL_AUTOMATION_BYPASS_SECRET` | `_reusable-app-test-stag`              |
+| _(www has no GitHub Env)_ | —                       | —                                 | www e2e runs entirely on local compose |
+
+If `{group}-app-local` ends up empty, **omit the `environment:` key** rather than bind an empty
+environment (already noted in the Environments section above).
+
+### `env-injection.yaml` — the value-less injection manifest
+
+A new committed registry at repo root declares, per app, the injection home for every key at every
+stage it runs in — **names only, never values**. It is the static contract that `commons-env-validate`
+checks for internal consistency (every app-runtime key in `.env.example` has a documented home at each
+stage the app runs; every CI test-harness key is registered and has no `.env.example` entry). It is
+also the **checklist wire-vercel works from** when populating real values.
+
+```yaml
+# env-injection.yaml — value-less injection contract (extends env-contract.yaml)
+apps:
+  - app: organiclever-app-web
+    runtime: { local: env-local, staging: vercel-preview, production: vercel-production }
+    keys-from: apps/organiclever-app-web/.env.example
+  - app: organiclever-be
+    runtime: { local-ci: compose, staging: k3s-coralpolyp }
+    keys-from: apps/organiclever-be/.env.example
+ci-harness:
+  # test-only keys, never in any .env.example
+  - key: WEB_BASE_URL
+    class: var
+    environments: [organiclever-app-staging, ose-app-staging]
+  - key: VERCEL_AUTOMATION_BYPASS_SECRET
+    class: secret
+    environments: [organiclever-app-staging, ose-app-staging]
+```
+
+`rhino-cli env validate` gains a manifest-consistency pass — **not** a separate target. The manifest
+and `.env.example` are the same conceptual surface (the env contract), and `env validate` is already
+wired into `.husky/pre-push` and `commons-env-validate.yml`, so extending it adds the check with **no
+new target wiring**. It stays a **static, value-free** check. Actual presence of secret **values** in
+GitHub/Vercel/k3s is **not** machine-checkable from this repo and stays a wire-vercel / ose-infra
+`[HUMAN]` responsibility — the manifest is what they verify against.
+
+### Docs & rules this introduces or amends
+
+The env-injection standard touches a fixed governance surface; the delivery sweep updates all of it:
+
+- `repo-governance/conventions/security/secrets-and-env-standards.md` — new "Tiered injection"
+  section (matrix, classes, Environment registry, manifest); §7 census gains the GitHub/Vercel/k3s rows.
+- `env-contract.yaml` — cross-reference the new `env-injection.yaml`; `env-injection.yaml` — **new**.
+- `repo-governance/development/infra/ci-conventions.md` — env injection in the workflow `environment:`
+  conventions.
+- `docs/reference/system-architecture/ci-cd.md` — injection matrix in the deploy topology.
+- `repo-governance/development/workflow/reproducible-environments.md`,
+  `repo-governance/conventions/security/{README,env-file-access,no-secrets-in-committed-files}.md`,
+  `repo-governance/conventions/README.md` — cross-links to the injection section.
+
 ## Resolved decisions
 
 1. **PR quality gate — full rename, branch protection updated.** Rename file **and** `name:` to
@@ -208,6 +367,19 @@ placeholder/secret only.
 3. **`organiclever-www` e2e — split the runner.** Split `organiclever-www-e2e` into
    `organiclever-www-be-e2e` + `organiclever-www-fe-e2e` so the www reusable stays uniform. (User
    confirmed: "split it. it will make it easier.")
+4. **Env/secret injection — references + manifest here, values in wire-vercel.** This plan defines the
+   tiered injection standard (matrix, classes, GitHub Environment registry, the value-less
+   `env-injection.yaml`) and wires every workflow's `environment:`/`vars.`/`secrets.` reads uniformly;
+   it sets **no** real values. `wire-vercel` populates GitHub Environment + Vercel values; ose-infra
+   `coralpolyp` owns the backend k3s secret values. (User asked to standardize env/secret injection
+   across local/staging/prod on GitHub, Vercel, and anything else.)
+5. **No integration/e2e in the fast gates; delete crane-cli CI.** `test:integration` + `test:e2e` run
+   only in the scheduled tiered **service** pipelines. The PR gate / pre-commit / pre-push are already
+   compliant; the lone violation, `test-crane-cli-integration.yml` (integration on `pull_request`), is
+   **deleted** — CLI-tool CI is out of scope this PR and revisited later. The invariant is codified in
+   `ci-conventions.md`. (User: "no `test:integration` and `test:e2e` run in the PR gate, or pre-push, or
+   pre-commit. it is too heavy." + "we can also remove/delete `test-crane-cli-integration.yml` … we will
+   only focus on the 'service' type (BE, FE, Web, etc) workflow for this PR.")
 
 ## Cross-repo coordination
 
@@ -215,8 +387,9 @@ The `publish-images` trigger swap (main-push → `stag-*-be` branch push) change
 appear in GHCR. **ose-infra `coralpolyp` must be updated to watch the branch-triggered images** before
 this repo stops the main-push publish, or staging backend rollout will silently stall. Track this as a
 hand-off to the ose-infra owner; do **not** remove `publish-images` behavior until coralpolyp confirms
-the new source. Until then, a transitional option is to keep both triggers briefly (documented in
-delivery Phase 5).
+the new source. The removal is therefore deferred to the consolidated `[HUMAN]` hand-off (delivery
+Phase 9), where it sits alongside every other human-gated action; until then `publish-images.yml`
+stays in place (transitional).
 
 ## Rollback
 

@@ -10,8 +10,17 @@ description: Downstream production cutover deferred by restructure-fsharp-be-and
 > must land first (it performs the app-directory renames and the marketing/app split but
 > **explicitly defers** the Vercel/DNS/prod-branch cutover to this plan); and
 > [`standardize-github-actions-pipeline-naming`](../standardize-github-actions-pipeline-naming/README.md),
-> which now **owns all `.github/workflows` editing** — once it lands, this plan's workflow-update scope
-> drops to Vercel projects, DNS, GitHub Environment creation, branch creation, and non-workflow docs.
+> which now **owns all `.github/workflows` editing** and defines the tiered env/secret **injection
+> standard** (the value-less `env-injection.yaml` manifest). **This plan assumes that plan is DONE**:
+> the workflows are already restructured/renamed and the manifest exists, so this plan's scope drops to
+> Vercel projects, DNS, branch creation, and **populating the real env/secret values** the manifest
+> declares (GitHub Environments + Vercel) — plus non-workflow docs. It does **not** edit workflows.
+>
+> **Vercel Deployment Protection note**: the new app-web Vercel projects ship with Deployment
+> Protection on, which 401s unauthenticated requests to staging/preview URLs. The staging E2E gate must
+> send a **Protection Bypass for Automation** token, so this plan enables that feature per app-web
+> project and stores its token as the `VERCEL_AUTOMATION_BYPASS_SECRET` GitHub Environment secret (the
+> standardized `_reusable-app-test-stag` workflow already reads it). Without it, every staging test 401s.
 
 ## Context
 
@@ -48,13 +57,18 @@ plans. This plan covers only the Vercel-served `-www` and `-app-web` tiers.
 - **Define and create the branch set** Vercel listens to (production + staging-gate branches).
 - **Retire obsolete branches** after cutover (`prod-ose-web`, `prod-ayokoding-web`,
   `prod-organiclever-web`, `prod-wahidyankf-web`, `stag-organiclever-web`).
-- **Update in-repo wiring artifacts**: each app's `vercel.json` `ignoreCommand`, the four
-  `apps-*-deployer` agent definitions (+ binding resync), the full set of www/app-web GitHub Actions
-  workflows (the `_reusable-test-and-deploy` www callers, a new `organiclever-www` caller, and the
-  OrganicLever app-web dev/staging/promotion trio — see the
-  [tech-docs workflow inventory](./tech-docs.md#related-github-actions-workflows-complete-inventory)),
+- **Update in-repo wiring artifacts** (workflows excluded — owned by `standardize-github-actions-pipeline-naming`):
+  each app's `vercel.json` `ignoreCommand`, the `apps-*-deployer` agent definitions (+ binding resync),
   the `AGENTS.md` prod-branch list, the affected app `README.md`s, and
-  `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`.
+  `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`. The GitHub Actions workflows
+  are **already restructured + renamed by the prerequisite plan**; this plan only **verifies** they
+  reference the right branches/Environments.
+- **Populate env/secret VALUES from the injection manifest** — working from the value-less
+  `env-injection.yaml` defined by `standardize-github-actions-pipeline-naming`, set the real values in
+  their injection homes: GitHub Environment `vars.`/`secrets.` under `{group}-app-staging`
+  (`WEB_BASE_URL`, `VERCEL_AUTOMATION_BYPASS_SECRET`) and Vercel project env per target (Production for
+  `prod-*-www`/`prod-*-app-web`, Preview for `stag-*-app-web`). Backend k3s secret values stay with
+  ose-infra `coralpolyp`. No value is committed — placeholder/secret only.
 
 ### Out of scope
 
@@ -94,19 +108,29 @@ plans. This plan covers only the Vercel-served `-www` and `-app-web` tiers.
 - `stag-organiclever-app-web` (new; replaces `stag-organiclever-web`)
 - `stag-ose-app-web` (new)
 
+**Backend staging branches** (created here for the standardized `*-be-build-deploy-stag` workflows to
+push to; the GHCR image rollout is ose-infra `coralpolyp`):
+
+- `stag-organiclever-be` (new)
+- `stag-ose-be` (new)
+
 **Branches retired after cutover**: `prod-ose-web`, `prod-ayokoding-web`, `prod-organiclever-web`,
 `prod-wahidyankf-web`, `stag-organiclever-web`.
 
 ## Approach summary
 
-1. **Prepare in-repo wiring** ([AI]) — update `vercel.json`, deployer agents, workflows, and docs to
-   reference the new branch names, behind the still-old live wiring. Nothing deploys yet.
-2. **Create branches** ([AI]) — cut the new `prod-*-www`, `prod-*-app-web`, and `stag-*-app-web`
-   branches from `main`.
-3. **Rewire + create Vercel projects + DNS** ([HUMAN]) — pure dashboard/DNS work, gated on a precondition
-   that all eight target branches already exist on origin (from Phase 2): repoint production branches,
-   rename projects, create the two app-web projects, Redeploy, point DNS. No git pushes in this phase.
-   Requires Vercel/DNS credentials.
+1. **Prepare in-repo wiring** ([AI]) — update `vercel.json`, deployer agents, and docs to reference the
+   new branch names, behind the still-old live wiring. **Workflows are not touched** (owned by the
+   standardize plan); this plan only verifies they reference the right branches/Environments. Nothing
+   deploys yet.
+2. **Create branches** ([AI]) — cut the new `prod-*-www`, `prod-*-app-web`, `stag-*-app-web`, and
+   `stag-*-be` branches from `main`.
+3. **Rewire + create Vercel projects + DNS + values** ([HUMAN]) — dashboard/DNS work, gated on a
+   precondition that all eight Vercel-target branches already exist on origin (from Phase 2): repoint
+   production branches, rename projects, create the two app-web projects, Redeploy, point DNS, **enable
+   Vercel Protection Bypass for Automation, and populate the GitHub Environment + Vercel env values per
+   `env-injection.yaml`** (including `WEB_BASE_URL` + `VERCEL_AUTOMATION_BYPASS_SECRET`). No git pushes
+   in this phase. Requires Vercel/DNS credentials.
 4. **Verify + retire** ([AI+HUMAN]) — confirm each domain serves from the new branch, then delete the
    obsolete branches and the obsolete Vercel project settings.
 

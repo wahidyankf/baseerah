@@ -32,6 +32,11 @@ matches the live one, and retire the obsolete `prod-*-web` branches.
    is no ambiguous or accidental deploy source.
 5. **As an AI deployer agent**, I want my definition to reference the correct new branch **so that** a
    delegated deploy pushes to the right place.
+6. **As the deployer**, I want to populate each env/secret value in its standardized injection home
+   (per `env-injection.yaml`) **so that** the already-standardized workflows resolve their `vars.`/
+   `secrets.` at run time.
+7. **As an operator**, I want the Vercel Protection Bypass token set as `VERCEL_AUTOMATION_BYPASS_SECRET`
+   **so that** the staging E2E gate authenticates past Vercel Deployment Protection instead of 401-ing.
 
 ## Acceptance criteria (Gherkin)
 
@@ -88,6 +93,32 @@ Feature: Obsolete branches and references are retired
     When the operator deletes prod-ose-web, prod-ayokoding-web, prod-organiclever-web, prod-wahidyankf-web, stag-organiclever-web
     Then git ls-remote --heads origin lists none of the retired branches
     And only the new prod-*-www, prod-*-app-web, and stag-*-app-web branches remain as deploy branches
+```
+
+```gherkin
+Feature: Env/secret values are populated and the staging gate authenticates
+
+  Background:
+    Given standardize-github-actions-pipeline-naming has landed
+    And env-injection.yaml declares the injection homes per app per stage
+
+  Scenario: The staging Environment holds the values its workflow reads
+    Given the organiclever-app-staging GitHub Environment
+    When the standardized stag-deploy-prod workflow runs
+    Then it resolves vars.WEB_BASE_URL to the private staging URL
+    And it resolves secrets.VERCEL_AUTOMATION_BYPASS_SECRET
+    And no value is committed to the repo
+
+  Scenario: The staging E2E gate bypasses Vercel Deployment Protection
+    Given Protection Bypass for Automation is enabled on the app-web Vercel project
+    When the staging E2E job requests the protected staging URL with the bypass token
+    Then the response is 200, not 401
+    And the gate proceeds instead of failing on protection
+
+  Scenario: App-tier Environments follow the local+staging model
+    Given the repo Settings → Environments after this plan
+    Then organiclever-app-staging and ose-app-staging exist
+    And no organiclever-app-web-development or organiclever-app-web-production Environment exists
 ```
 
 ```gherkin

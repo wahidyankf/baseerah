@@ -23,6 +23,9 @@
    branches so they stop being no-ops.
 6. As the wire-vercel executor, I want this plan to own all workflow edits so my plan only creates
    Vercel projects, DNS, Environments, and branches.
+7. As a maintainer, I want one tiered env/secret injection standard so a key declared once in
+   `apps/<app>/.env.example` injects the same way into GitHub Actions, Vercel, and k3s at each stage,
+   and a value-less manifest tells wire-vercel exactly which values to set where.
 
 ## Acceptance criteria (Gherkin)
 
@@ -40,9 +43,9 @@ Feature: Domain-first workflow naming
     Given the renamed cross-cutting workflows
     Then "pr-quality-gate.yml" is "commons-quality-gate.yml"
     And "validate-env.yml" is "commons-env-validate.yml"
-    And "publish-images.yml" is "commons-publish-be-images.yml"
     And "validate-markdown.yml" is "markdown-validate.yml"
-    And "test-crane-cli-integration.yml" is "crane-cli-test-local.yml"
+    And "test-crane-cli-integration.yml" is deleted (CLI CI out of scope this PR)
+    And "publish-images.yml" is absorbed into "organiclever-be-build-deploy-stag.yml" and "ose-be-build-deploy-stag.yml"
 ```
 
 ```gherkin
@@ -97,6 +100,58 @@ Feature: Repo gates stay green
     Then no link resolves to an old workflow filename
 ```
 
+```gherkin
+Feature: Heavy tests stay off the fast feedback path
+
+  Scenario: The PR gate runs no integration or e2e
+    Given "commons-quality-gate.yml" after this plan
+    Then it invokes no "test:integration" target
+    And it invokes no "test:e2e" target
+    And it runs only typecheck, lint, test:quick, specs:coverage, and the lint/validation jobs
+
+  Scenario: The git hooks run no integration or e2e
+    Given ".husky/pre-commit" and ".husky/pre-push"
+    Then neither invokes "test:integration"
+    And neither invokes "test:e2e"
+
+  Scenario: The crane-cli integration workflow is removed
+    Given the .github/workflows directory after this plan
+    Then "test-crane-cli-integration.yml" no longer exists
+    And no workflow runs "crane-cli:test:integration" on "pull_request"
+
+  Scenario: Integration and e2e live in the scheduled service pipelines
+    Given the tiered pipelines after this plan
+    Then "test:integration" and "test:e2e" run only in "*-test-local-*" and "*-test-stag-*"
+```
+
+```gherkin
+Feature: Tiered env/secret injection
+
+  Scenario: One canonical key set per app injects across platforms
+    Given the env injection standard after this plan
+    Then every app-runtime key originates from "apps/<app>/.env.example"
+    And no key carries a tier qualifier in its name
+    And the same key name is used in the GitHub Environment, the Vercel target, and the k3s secret
+
+  Scenario: CI test-harness keys are registered, not app config
+    Given "WEB_BASE_URL" and "VERCEL_AUTOMATION_BYPASS_SECRET"
+    Then they appear in "env-injection.yaml" under "ci-harness"
+    And they appear in no "apps/<app>/.env.example"
+    And they are bound to the "{group}-app-staging" GitHub Environment
+
+  Scenario: The injection manifest is value-less and statically checked
+    Given "env-injection.yaml" at repo root
+    Then it lists injection homes per app per stage by key name only, never values
+    When I run the env injection consistency check
+    Then every app-runtime key has a documented home at each stage the app runs
+    And the check reads no real secret value
+
+  Scenario: This plan sets no real values
+    Given the repo after this plan
+    Then no GitHub Environment secret value, Vercel env value, or k3s secret value is created here
+    And populating them is left to wire-vercel-www-app-cutover and ose-infra coralpolyp
+```
+
 ## Validation commands
 
 ```bash
@@ -105,4 +160,8 @@ npx nx run rhino-cli:links:validation
 npx nx run rhino-cli:headings:hierarchy-validation
 npm run lint:md
 git grep -nE 'test-and-deploy-(ose|ayokoding|wahidyankf)-web|prod-(ose|ayokoding|wahidyankf)-web|stag-organiclever-web|pr-quality-gate\.yml|validate-markdown\.yml' -- ':!plans/done/**'
+# env injection: manifest present, value-less, and statically consistent
+test -f env-injection.yaml
+npx nx run rhino-cli:env:validation        # extended with the manifest-consistency pass
+git grep -nE 'WEB_BASE_URL|VERCEL_AUTOMATION_BYPASS_SECRET' -- 'apps/*/.env.example'  # expect: no hits
 ```
