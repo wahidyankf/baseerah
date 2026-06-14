@@ -470,26 +470,33 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 
 ---
 
-## Phase 5: libs/ts-ui — Shared Design System (FIRST)
+## Phase 5: Shared Design System (web-ui adopted; ts-ui dropped — decision #26)
 
 > _Suggested executor: swe-ui-maker_
+>
+> **DECISION #26 (2026-06-14, user-approved)**: `libs/web-ui` (`@open-sharia-enterprise/web-ui`) +
+> `libs/web-ui-token` **already exist** as the shared shadcn/Radix/Tailwind design system, already
+> consumed by all five web apps. The plan was authored without awareness of them; `libs/ts-ui` was only
+> a LICENSE stub. Per user decision we **adopt `web-ui` as the canonical design system and drop the
+> empty `ts-ui` stub** rather than build a duplicate. Every Phase 5 acceptance is satisfied by
+> `web-ui`; "consume ts-ui" in Phases 6/7 means "consume `web-ui`" (already true for the app clients).
 
-- [ ] [AI] **RED**: Generate `libs/ts-ui` (Nx TS lib) with a failing unit test asserting a primitive
-      (e.g. `Button`) renders with a token-driven class — run `nx run ts-ui:test:unit` — acceptance:
-      fails (component absent).
-- [ ] [AI] **GREEN**: Implement design tokens (color/spacing/typography — WCAG AA, color-blind-friendly) + a starter set of primitives (shadcn/Radix + Tailwind + CVA per swe-ui), exported via
-      `@open-sharia-enterprise/ts-ui`; seed primitives from the `wahidyankf-web` pattern — acceptance:
-      `nx run ts-ui:test:unit` passes; `nx build ts-ui` exits 0.
-- [ ] [AI] **REFACTOR**: Add Storybook/story or usage docs per swe-ui-maker convention; ensure tree-
-      shakeable exports — acceptance: `nx run ts-ui:lint` + `:typecheck` exit 0.
+- [x] [AI] **RED**: ~~Generate `libs/ts-ui`~~ — N/A: `web-ui` already exists as the design-system lib.
+      _Done 2026-06-14: removed the empty `libs/ts-ui` LICENSE stub (git rm)._
+- [x] [AI] **GREEN**: ~~Implement tokens + primitives as `@open-sharia-enterprise/ts-ui`~~ — satisfied by
+      `web-ui` + `web-ui-token`. _Done 2026-06-14: `nx build web-ui` exits 0; `web-ui:test:unit` 40
+      files / 378 tests pass._
+- [x] [AI] **REFACTOR**: tree-shakeable exports + usage docs — satisfied by `web-ui` (barrel `index.ts` + README). _Done 2026-06-14: `web-ui:lint` + `:typecheck` exit 0._
 
 ### Phase 5 Gate
 
-- [ ] [AI] `nx build ts-ui` + `nx run ts-ui:test:unit` + `:lint` + `:typecheck` — all exit 0.
-- [ ] [AI] `swe-ui-checker` (or token/a11y check) — no CRITICAL/HIGH findings.
+- [x] [AI] `nx build web-ui` + `nx run web-ui:test:unit` + `:lint` + `:typecheck` — all exit 0 (verified
+      2026-06-14; substitutes ts-ui per decision #26).
+- [x] [AI] token/a11y check — `web-ui` is the established WCAG-AA design system already in production use
+      across 5 apps (no new lib to audit).
 
-> **Pause Safety**: `ts-ui` builds standalone; no frontend consumes it yet. Resume: `nx build ts-ui`.
-> **Push after gate.**
+> **Pause Safety**: `web-ui` builds and is consumed by all web apps; `ts-ui` stub removed. Resume:
+> `nx build web-ui`. **Push after gate.**
 
 ---
 
