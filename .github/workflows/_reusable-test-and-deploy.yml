@@ -43,7 +43,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-golang
       - name: Run specs:coverage for app and E2E runners
         run: |
           npx nx run ${{ inputs.app-name }}:specs:coverage

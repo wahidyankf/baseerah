@@ -26,4 +26,5 @@ jobs:
       - uses: ./.github/actions/setup-dotnet
       - name: Install tesseract (OCR integration tests)
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr libtesseract-dev
+      - run: npx nx run crane-cli:specs:coverage
       - run: npx nx run crane-cli:test:integration

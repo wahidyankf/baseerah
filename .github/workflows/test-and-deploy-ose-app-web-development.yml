@@ -25,7 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-      - uses: ./.github/actions/setup-golang
       - name: Run specs:coverage for all OSE Application projects
         run: |
           npx nx run ose-be:specs:coverage
