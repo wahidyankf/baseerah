@@ -53,7 +53,7 @@ You MUST complete the [AyoKoding Playwright Learning Path](../../../../../../app
 
 **What this documentation covers**: OSE Platform Playwright standards, test organization, page object patterns, how to apply Playwright knowledge in THIS codebase.
 
-**What this documentation does NOT cover**: Playwright tutorials, basic selectors, generic patterns (those are in ayokoding-web).
+**What this documentation does NOT cover**: Playwright tutorials, basic selectors, generic patterns (those are in ayokoding-www).
 
 **This documentation is OSE Platform-specific explanation**, not Playwright tutorials.
 

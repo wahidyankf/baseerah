@@ -57,18 +57,18 @@ This convention establishes designated directories for temporary files created b
 All checker agents in the following families MUST write audit reports to `generated-reports/`:
 
 1. **repo-rules-checker** - Repository consistency validation
-2. **apps-ayokoding-web-general-checker** - General content validation (ayokoding-web)
-3. **apps-ayokoding-web-by-example-checker** - By-example tutorial validation (ayokoding-web)
+2. **apps-ayokoding-web-general-checker** - General content validation (ayokoding-www)
+3. **apps-ayokoding-web-by-example-checker** - By-example tutorial validation (ayokoding-www)
 4. **apps-ayokoding-web-facts-checker** - Educational content factual accuracy validation
-5. **apps-ayokoding-web-link-checker** - Link validation (ayokoding-web)
-6. **apps-ose-web-content-checker** - Content validation (ose-web, Next.js)
+5. **apps-ayokoding-web-link-checker** - Link validation (ayokoding-www)
+6. **apps-ose-web-content-checker** - Content validation (ose-www, Next.js)
 7. **docs-checker** - Documentation factual accuracy validation
 8. **docs-link-checker** - External and internal link validation
 9. **docs-tutorial-checker** - Tutorial quality validation
 10. **readme-checker** - README quality validation
 11. **plan-checker** - Plan readiness validation
 12. **plan-execution-checker** - Implementation validation
-13. **apps-ayokoding-web-in-the-field-checker** - In-the-field content validation (ayokoding-web)
+13. **apps-ayokoding-web-in-the-field-checker** - In-the-field content validation (ayokoding-www)
 14. **docs-software-engineering-separation-checker** - Software engineering docs separation validation
 15. **repo-workflow-checker** - Workflow documentation quality validation
 16. **specs-checker** - Gherkin/BDD specs directory structural and content validation

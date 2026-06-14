@@ -84,19 +84,28 @@ Flat structure - all apps at the same level, no subdirectories.
 
 **Current Apps**:
 
-- `ose-web` - OSE Platform website (Next.js 16 content platform)
-- `ayokoding-web` - AyoKoding educational platform (Next.js 16 fullstack content platform)
+- `ose-www` - OSE Platform public website (Next.js 16 content platform, port 3100)
+- `ose-www-be-e2e` - Playwright BE E2E tests for ose-www tRPC API
+- `ose-www-fe-e2e` - Playwright FE E2E tests for ose-www UI
+- `ose-be` - OSE Application F#/Giraffe/ASP.NET REST API backend (port 8302)
+- `ose-be-e2e` - Playwright BE E2E tests for ose-be
+- `ayokoding-www` - AyoKoding educational platform (Next.js 16 fullstack content platform, port 3101)
+- `ayokoding-www-be-e2e` - Playwright BE E2E tests for ayokoding-www tRPC API
+- `ayokoding-www-fe-e2e` - Playwright FE E2E tests for ayokoding-www UI
 - `ayokoding-cli` - AyoKoding CLI tool (Rust application)
 - `rhino-cli` - Repository management CLI (Rust application). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
 - `ose-cli` - OSE Platform site maintenance CLI (Rust application)
-- `organiclever-app-web` - OrganicLever app frontend (Next.js application, port 3202)
-- `organiclever-be` - OrganicLever REST API backend (Rust/Axum application)
+- `crane-cli` - PDF-to-Markdown pipeline CLI (F# application)
+- `organiclever-www` - OrganicLever marketing website (Next.js 16, port 3200)
+- `organiclever-www-e2e` - Playwright FE E2E tests for organiclever-www
+- `organiclever-app-web` - OrganicLever app frontend (Next.js 16 application, port 3202)
 - `organiclever-app-web-e2e` - Playwright FE E2E tests for organiclever-app-web
+- `organiclever-be` - OrganicLever F#/Giraffe/ASP.NET REST API backend (port 8202)
 - `organiclever-be-e2e` - Playwright BE E2E tests for organiclever-be
-- `wahidyankf-web` - Personal portfolio website (Next.js 16 application, port 3201)
-- `wahidyankf-web-fe-e2e` - Playwright FE E2E tests for wahidyankf-web
+- `wahidyankf-www` - Personal portfolio website (Next.js 16 application, port 3201)
+- `wahidyankf-www-fe-e2e` - Playwright FE E2E tests for wahidyankf-www
 
-### App Structure (Next.js Application — ose-web)
+### App Structure (Next.js Application — ose-www)
 
 ```
 apps/ose-www/
@@ -141,16 +150,15 @@ apps/organiclever-app-web/
 └── README.md                  # App documentation
 ```
 
-### App Structure (Rust/Axum Application)
+### App Structure (F#/Giraffe Application)
 
 ```
 apps/organiclever-be/
-├── src/                       # Source code
+├── src/                       # Source code (F# modules)
 ├── tests/                     # Test suites (unit/, integration/)
-├── migrations/                # SQLx database migrations
 ├── Dockerfile                 # Production multi-stage build
 ├── .dockerignore              # Docker build context exclusions
-├── Cargo.toml                 # Rust package manifest
+├── *.fsproj                   # F# project file
 ├── project.json               # Nx project configuration
 └── README.md                  # App documentation
 ```
@@ -194,6 +202,7 @@ Contains reusable library packages.
 
 - `rust-commons` - Shared Rust utilities (link-checking, HTTP)
 - `fsharp-crane-core` - Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
+- `web-ui` - Shared React component library (shadcn/ui patterns, Radix UI primitives, Tailwind CSS)
 
 **Examples** (planned):
 
@@ -234,7 +243,7 @@ libs/ts-utils/
 
 ### Current Scope
 
-Rust (`rust-commons`), F# (`fsharp-crane-core`), and future TypeScript libraries.
+Rust (`rust-commons`), F# (`fsharp-crane-core`), and TypeScript (`web-ui`) libraries.
 
 ## Experimental Projects vs Monorepo Projects
 
@@ -265,9 +274,9 @@ The repository contains two distinct project structures with different purposes 
 **Examples**:
 
 - Next.js frontend applications
-- Rust/Axum backend services
+- F#/Giraffe backend services
 - Rust CLI tools
-- Reusable Rust and F# libraries
+- Reusable Rust, F#, and TypeScript libraries
 
 ### Experimental Projects (`apps-labs/`)
 
@@ -328,26 +337,26 @@ The repository contains two distinct project structures with different purposes 
 
 Location: `apps/[app-name]/project.json` or `libs/[lib-name]/project.json`
 
-**Next.js App Example** (`ose-web`):
+**Next.js App Example** (`ose-www`):
 
 ```json
 {
-  "name": "ose-web",
-  "sourceRoot": "apps/ose-web",
+  "name": "ose-www",
+  "sourceRoot": "apps/ose-www",
   "projectType": "application",
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next dev --port 3100",
-        "cwd": "apps/ose-web"
+        "cwd": "apps/ose-www"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next build",
-        "cwd": "apps/ose-web"
+        "cwd": "apps/ose-www"
       },
       "outputs": ["{projectRoot}/.next"]
     }
@@ -571,7 +580,7 @@ import { formatDate } from "@open-sharia-enterprise/ts-utils";
 nx graph
 
 # View specific project dependencies
-nx graph --focus=ose-web
+nx graph --focus=ose-www
 
 # View affected projects
 nx affected:graph

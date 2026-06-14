@@ -1,6 +1,6 @@
 ---
 title: "Tutorials"
-description: Tutorials have been migrated to ayokoding-web
+description: Tutorials have been migrated to ayokoding-www
 category: tutorial
 tags:
   - index

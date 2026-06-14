@@ -1,10 +1,10 @@
 ---
 title: "Why It Matters Content Convention"
-description: Rule prohibiting corporate case studies and fabricated platform scenarios in Why It Matters sections of ayokoding-web tutorials; requires theoretical explanations only
+description: Rule prohibiting corporate case studies and fabricated platform scenarios in Why It Matters sections of ayokoding-www tutorials; requires theoretical explanations only
 category: explanation
 subcategory: conventions
 tags:
-  - ayokoding-web
+  - ayokoding-www
   - tutorial-content
   - factual-accuracy
   - why-it-matters
@@ -15,7 +15,7 @@ created: 2026-05-09
 # Why It Matters Content Convention
 
 This convention defines the content rules for `**Why It Matters**:` sections in
-ayokoding-web tutorials. These sections must use theoretical explanations only.
+ayokoding-www tutorials. These sections must use theoretical explanations only.
 Corporate case studies, anecdotal company events, and fabricated platform scenarios
 are prohibited regardless of how plausible they appear.
 
@@ -66,7 +66,7 @@ This convention eliminates the problem at the source by prohibiting the pattern 
 
 ### What This Convention Covers
 
-- All `**Why It Matters**:` sections in ayokoding-web tutorial files
+- All `**Why It Matters**:` sections in ayokoding-www tutorial files
 - Applies to both by-example tutorials (`apps/ayokoding-www/content/en/learn/**/by-example/`)
 - Applies to in-the-field guides (`apps/ayokoding-www/content/en/learn/**/in-the-field/`)
 - Applies to all future tutorial formats that include a Why It Matters section

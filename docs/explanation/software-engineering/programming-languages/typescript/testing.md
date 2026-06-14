@@ -270,7 +270,7 @@ import { server } from "../server";
 import { MOCK_MEMBERS } from "../helpers/mock-data";
 import { http, HttpResponse } from "msw";
 
-const feature = await loadFeature("../../specs/apps/organiclever-web/members/member-list.feature");
+const feature = await loadFeature("../../specs/apps/organiclever/members/member-list.feature");
 
 describeFeature(feature, ({ Scenario }) => {
   Scenario("Viewing the member list as a logged-in user", ({ Given, When, Then }) => {
@@ -366,7 +366,7 @@ reach the real backend.
 ### E2E project structure
 
 ```
-apps/organiclever-web-e2e/
+apps/organiclever-app-web-e2e/
   tests/
     steps/
       auth/
@@ -409,8 +409,8 @@ Then("the user is redirected to the dashboard", async () => {
 ### Nx targets for E2E
 
 ```bash
-nx run organiclever-web-e2e:test:e2e        # Headless — real system, no mocking
-nx run organiclever-web-e2e:test:e2e:ui     # Playwright UI mode
+nx run organiclever-app-web-e2e:test:e2e        # Headless — real system, no mocking
+nx run organiclever-app-web-e2e:test:e2e:ui     # Playwright UI mode
 ```
 
 ---

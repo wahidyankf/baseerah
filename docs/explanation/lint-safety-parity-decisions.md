@@ -61,7 +61,7 @@ the former Go CLIs (`ayokoding-cli`, `ose-cli`) are now Rust projects. No
 `project.json` lint target invokes `golangci-lint run`, and the `setup-golang`
 composite action installs the binary only for the `oapi-codegen` toolchain, never
 to lint. The config was dead. The `golangci-lint` references that remain are in
-ayokoding-web **educational content** and a few stale READMEs — preexisting
+ayokoding-www **educational content** and a few stale READMEs — preexisting
 doc-drift, out of this dimension's scope.
 
 ### D7 — Shell lint (shellcheck)
@@ -93,7 +93,8 @@ with documented rationale: pinning exact OS-package versions makes images brittl
 because upstream Debian/Ubuntu/Alpine repositories drop old versions, breaking
 `docker build` on a cache miss; reproducibility comes from the pinned base-image
 tag instead. `trustedRegistries` lists `docker.io`, `mcr.microsoft.com` (for the
-crane-be .NET base images), and `ghcr.io`.
+former PDF-pipeline backend's .NET base images, which were present at the time of this decision),
+and `ghcr.io`.
 
 ### D8 — GitHub Actions lint (actionlint)
 
@@ -126,13 +127,15 @@ analyzer findings. The effort was config wiring, not code change.
 
 **Test-project suppressions**: the five test projects receive
 `--nowarn:3261 --nowarn:3264` (F# nullness-interop noise on `box`-ed test data,
-matching the primer reference). The crane-be **unit** test project additionally
-suppresses **FS0044** because its BDD harness deliberately uses the
-deprecated-but-standard Giraffe in-process `WebHostBuilder`/`TestServer` pattern;
-rewriting it to `WebApplicationBuilder` would add risk for no functional gain. The
-crane-be **integration** project does not use that pattern, so it does **not**
-carry the `FS0044` suppression — an unused suppression would itself violate
-clean-then-gate minimalism.
+matching the primer reference). The former PDF-pipeline backend's **unit** test
+project additionally suppressed **FS0044** because its BDD harness deliberately
+used the deprecated-but-standard Giraffe in-process `WebHostBuilder`/`TestServer`
+pattern; rewriting it to `WebApplicationBuilder` would have added risk for no
+functional gain. The former PDF-pipeline backend's **integration** project did not
+use that pattern, so it did **not** carry the `FS0044` suppression — an unused
+suppression would itself violate clean-then-gate minimalism. (That backend has
+since been removed from the repository; these suppressions are recorded here for
+historical completeness.)
 
 **Stricter than primer on one point**: primer applies `TreatWarningsAsErrors`
 to source projects only; this plan's gate requires it on all 8 `.fsproj`, so test

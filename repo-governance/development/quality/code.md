@@ -471,9 +471,9 @@ git commit -m "fix: correct validation logic"
 # Commit includes formatted version automatically
 ```
 
-## ayokoding-web Link Validation
+## ayokoding-www Link Validation
 
-Internal links in ayokoding-web content are validated
+Internal links in ayokoding-www content are validated
 automatically on every `test:quick` run via `ayokoding-cli links check`.
 
 **Convention:**
@@ -507,10 +507,10 @@ automatically on every `test:quick` run via `ayokoding-cli links check`.
 
 ```bash
 # Full quality gate including link check
-nx run ayokoding-web:test:quick
+nx run ayokoding-www:test:quick
 
 # Link check only (standalone)
-nx run ayokoding-web:links:check
+nx run ayokoding-www:links:check
 ```
 
 **When broken links are found:**
@@ -518,13 +518,13 @@ nx run ayokoding-web:links:check
 1. The command exits with code 1 — CI fails
 2. Output table shows source file, line number, link text, and broken target
 3. Fix by correcting the target path in the source file
-4. Re-run `nx run ayokoding-web:links:check` to confirm
+4. Re-run `nx run ayokoding-www:links:check` to confirm
 
-**Dependency chain:** `ayokoding-cli:build` → `ayokoding-web:links:check` → `ayokoding-web:test:quick`
+**Dependency chain:** `ayokoding-cli:build` → `ayokoding-www:links:check` → `ayokoding-www:test:quick`
 
 ## Rust CLI Linting
 
-Rust CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`, `apps/rhino-cli`, `apps/organiclever-be`) use [Clippy](https://github.com/rust-lang/rust-clippy) for static analysis.
+Rust CLI projects (`apps/ayokoding-cli`, `apps/ose-cli`, `apps/rhino-cli`) use [Clippy](https://github.com/rust-lang/rust-clippy) for static analysis.
 
 **Configuration**: Each project declares lints in its `Cargo.toml` under `[lints.clippy]`. The standard pedantic profile is used with selective allows.
 

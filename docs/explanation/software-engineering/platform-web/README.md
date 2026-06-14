@@ -82,7 +82,7 @@ React is the primary frontend library for building interactive, maintainable use
 
 **Full-stack React framework for production web applications**
 
-Next.js is the primary framework for all OSE Platform web applications (ose-web, ayokoding-web, organiclever-web, wahidyankf-web, ose-app-web). It provides App Router, tRPC integration, and server-side rendering.
+Next.js is the primary framework for all OSE Platform web applications (ose-www, ayokoding-www, organiclever-www, wahidyankf-www, ose-app-web). It provides App Router, tRPC integration, and server-side rendering.
 
 **Use Next.js when you need:**
 

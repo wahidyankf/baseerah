@@ -60,7 +60,7 @@ Content files under the following app directories that render in the UI may keep
 - `apps/organiclever-web/` — product landing site content
 - `apps/wahidyankf-www/` — personal portfolio content
 
-The `date:` field in ose-web post frontmatter (publication date, not maintenance date) is also unaffected.
+The `date:` field in ose-www post frontmatter (publication date, not maintenance date) is also unaffected.
 
 ### The `created:` Frontmatter Field is Unaffected
 

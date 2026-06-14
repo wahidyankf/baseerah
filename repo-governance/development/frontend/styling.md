@@ -14,7 +14,7 @@ created: 2026-03-28
 
 # Styling Convention
 
-CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across `organiclever-web` and `ayokoding-web`.
+CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across `organiclever-web` and `ayokoding-www`.
 
 ## Tailwind v4 Directives
 
@@ -25,11 +25,11 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 @import "tailwindcss";
 
 /* Content scan path — required when files live outside the default scan root */
-/* ayokoding-web uses this because source lives in a non-default location */
+/* ayokoding-www uses this because source lives in a non-default location */
 @source "../../src/**/*.{ts,tsx}";
 
 /* Tailwind plugins */
-/* ayokoding-web uses @tailwindcss/typography for prose content */
+/* ayokoding-www uses @tailwindcss/typography for prose content */
 @plugin "@tailwindcss/typography";
 
 /* Dark mode variant — class-based (.dark), not media-query-based */
@@ -97,7 +97,7 @@ Never use `!important`. Use `@layer` ordering or Tailwind modifiers for specific
 }
 ```
 
-**Known violation**: `ayokoding-web/src/app/globals.css` contains 10 `!important` declarations in code block styles to override `@tailwindcss/typography` defaults. These are scheduled for removal by replacing them with rules placed outside `@layer base`.
+**Known violation**: `ayokoding-www/src/app/globals.css` contains 10 `!important` declarations in code block styles to override `@tailwindcss/typography` defaults. These are scheduled for removal by replacing them with rules placed outside `@layer base`.
 
 ## No `@apply` Outside `@layer base`
 

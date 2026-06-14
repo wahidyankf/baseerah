@@ -16,30 +16,32 @@
 - **Node.js**: 24.13.1 (LTS, managed by Volta)
 - **npm**: 11.10.1
 - **Monorepo**: Nx workspace
+- **App naming tiers**: `[domain]-www` = public website at the domain root; `[domain]-app-web` = product
+  web client at `app.*`; `[domain]-be` = generic HTTP backend for a product domain.
 - **Current Apps**:
-  - `ose-web` — Next.js 16 content platform (TypeScript, tRPC)
-  - `ose-web-be-e2e` — Playwright BE E2E tests for ose-web tRPC API
-  - `ose-web-fe-e2e` — Playwright FE E2E tests for ose-web UI
-  - `ayokoding-web` — Next.js 16 fullstack content platform (TypeScript, tRPC)
-  - `ayokoding-web-be-e2e` — Playwright BE E2E tests for ayokoding-web tRPC API
-  - `ayokoding-web-fe-e2e` — Playwright FE E2E tests for ayokoding-web UI
+  - `ose-www` — Next.js 16 public website for OSE Platform (TypeScript, tRPC, port 3100)
+  - `ose-www-be-e2e` — Playwright BE E2E tests for ose-www tRPC API
+  - `ose-www-fe-e2e` — Playwright FE E2E tests for ose-www UI
+  - `ose-be` — F# / Giraffe / ASP.NET 10 REST API backend for OSE Application platform (api.oseplatform.com, port 8302)
+  - `ose-be-e2e` — Playwright BE E2E tests for ose-be
+  - `ose-app-web` — Next.js 16 OSE Application frontend (app.oseplatform.com, port 3300)
+  - `ose-app-web-e2e` — Playwright FE E2E tests for ose-app-web
+  - `ayokoding-www` — Next.js 16 fullstack educational content platform (TypeScript, tRPC, port 3101)
+  - `ayokoding-www-be-e2e` — Playwright BE E2E tests for ayokoding-www tRPC API
+  - `ayokoding-www-fe-e2e` — Playwright FE E2E tests for ayokoding-www UI
   - `ayokoding-cli` — Rust CLI tool for content link validation
   - `rhino-cli` — Rust CLI tool for repository management (Repository Hygiene & INtegration Orchestrator). Ported from Go 2026-05-23; Go source preserved at `archived/rhino-cli/`.
   - `ose-cli` — Rust CLI tool for OSE Platform site maintenance (link validation)
   - `crane-cli` — F# CLI tool for PDF-to-Markdown conversion pipeline (Content Retrieval And Normalization Engine). Hexagonal ports-and-adapters architecture. Original F# source at `archived/crane-cli/`; Rust port 2026-05-26 preserved at `archived/crane-cli-rust/`.
-  - `crane-be` — F# / Giraffe / ASP.NET 10 HTTP + NATS backend for PDF-to-Markdown conversion (crane-be service). Hexagonal architecture consuming `libs/fsharp-crane-core`. Dev port 8300.
-  - `crane-be-e2e` — Playwright-BDD + @nats-io/transport-node E2E tests for crane-be (real HTTP + real NATS)
+  - `organiclever-www` — Next.js 16 OrganicLever marketing website (port 3200)
+  - `organiclever-www-e2e` — Playwright FE E2E tests for organiclever-www
   - `organiclever-app-web` — Next.js 16 OrganicLever app frontend (port 3202)
-  - `organiclever-be` — Rust/Axum REST API backend for OrganicLever
   - `organiclever-app-web-e2e` — Playwright FE E2E tests for organiclever-app-web
+  - `organiclever-be` — F# / Giraffe / ASP.NET 10 REST API backend for OrganicLever (port 8202)
   - `organiclever-be-e2e` — Playwright BE E2E tests for organiclever-be
   - `organiclever-contracts` — OpenAPI 3.1 API contract spec (in `specs/apps/organiclever/containers/contracts/`); generates types + encoders/decoders for organiclever apps via `codegen` Nx target
-  - `ose-app-be` — Rust/Axum REST API backend for OSE Application platform (api.oseplatform.com)
-  - `ose-app-be-e2e` — Playwright BE E2E tests for ose-app-be
-  - `ose-app-web` — Next.js 16 OSE Application frontend (app.oseplatform.com)
-  - `ose-app-web-e2e` — Playwright FE E2E tests for ose-app-web
-  - `wahidyankf-web` — Next.js 16 personal portfolio site (www.wahidyankf.com)
-  - `wahidyankf-web-fe-e2e` — Playwright-BDD E2E tests for wahidyankf-web UI
+  - `wahidyankf-www` — Next.js 16 personal portfolio site (www.wahidyankf.com, port 3201)
+  - `wahidyankf-www-fe-e2e` — Playwright-BDD E2E tests for wahidyankf-www UI
 
 Polyglot demo apps (11 backend implementations + 3 frontends + 1 fullstack) were extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template, which is now authoritative for the polyglot showcase.
 
@@ -48,33 +50,34 @@ Polyglot demo apps (11 backend implementations + 3 frontends + 1 fullstack) were
 ```
 ose-public/
 ├── apps/                     # Deployable applications (Nx)
-│   ├── ose-web/      # OSE Platform website
-│   ├── ose-web-be-e2e/ # Playwright BE E2E tests for ose-web
-│   ├── ose-web-fe-e2e/ # Playwright FE E2E tests for ose-web
-│   ├── ayokoding-web/        # AyoKoding website (Next.js 16)
-│   ├── ayokoding-web-be-e2e/ # Playwright BE E2E tests for ayokoding-web
-│   ├── ayokoding-web-fe-e2e/ # Playwright FE E2E tests for ayokoding-web
-│   ├── ayokoding-cli/        # Content link validation CLI
-│   ├── rhino-cli/            # Repository management CLI
-│   ├── ose-cli/      # OSE Platform site CLI
-│   ├── crane-cli/    # PDF-to-Markdown pipeline CLI (F#)
-│   ├── crane-be/     # PDF-to-Markdown HTTP + NATS backend (F#/Giraffe, port 8300)
-│   ├── crane-be-e2e/ # Playwright + NATS E2E tests for crane-be
-│   ├── organiclever-app-web/     # OrganicLever app frontend (Next.js)
-│   ├── organiclever-be/      # OrganicLever Rust/Axum REST API backend
+│   ├── ose-www/              # OSE Platform public website (Next.js 16, port 3100)
+│   ├── ose-www-be-e2e/       # Playwright BE E2E tests for ose-www tRPC API
+│   ├── ose-www-fe-e2e/       # Playwright FE E2E tests for ose-www UI
+│   ├── ose-be/               # OSE Application F#/Giraffe REST API backend (port 8302)
+│   ├── ose-be-e2e/           # Playwright BE E2E tests for ose-be
+│   ├── ose-app-web/          # OSE Application Next.js 16 frontend (app.oseplatform.com, port 3300)
+│   ├── ose-app-web-e2e/      # Playwright FE E2E tests for ose-app-web
+│   ├── ayokoding-www/        # AyoKoding educational website (Next.js 16, port 3101)
+│   ├── ayokoding-www-be-e2e/ # Playwright BE E2E tests for ayokoding-www tRPC API
+│   ├── ayokoding-www-fe-e2e/ # Playwright FE E2E tests for ayokoding-www UI
+│   ├── ayokoding-cli/        # Content link validation CLI (Rust)
+│   ├── rhino-cli/            # Repository management CLI (Rust)
+│   ├── ose-cli/              # OSE Platform site CLI (Rust)
+│   ├── crane-cli/            # PDF-to-Markdown pipeline CLI (F#)
+│   ├── organiclever-www/     # OrganicLever marketing website (Next.js 16, port 3200)
+│   ├── organiclever-www-e2e/ # Playwright FE E2E tests for organiclever-www
+│   ├── organiclever-app-web/ # OrganicLever app frontend (Next.js 16, port 3202)
 │   ├── organiclever-app-web-e2e/ # Playwright FE E2E tests for organiclever-app-web
+│   ├── organiclever-be/      # OrganicLever F#/Giraffe REST API backend (port 8202)
 │   ├── organiclever-be-e2e/  # Playwright BE E2E tests for organiclever-be
-│   ├── ose-app-be/               # OSE Application Rust/Axum REST API (api.oseplatform.com)
-│   ├── ose-app-be-e2e/           # Playwright BE E2E tests for ose-app-be
-│   ├── ose-app-web/              # OSE Application Next.js 16 frontend (app.oseplatform.com, port 3300)
-│   ├── ose-app-web-e2e/          # Playwright FE E2E tests for ose-app-web
-│   ├── wahidyankf-web/       # Wahidyan Kresna Fridayoka portfolio (Next.js 16)
-│   ├── wahidyankf-web-fe-e2e/   # Playwright-BDD E2E tests for wahidyankf-web
+│   ├── wahidyankf-www/       # Wahidyan Kresna Fridayoka portfolio (Next.js 16, port 3201)
+│   ├── wahidyankf-www-fe-e2e/ # Playwright-BDD E2E tests for wahidyankf-www
 ├── archived/                 # Archived applications (no longer active)
 ├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
 │   ├── rust-commons/         # Shared Rust utilities (link-checking, HTTP)
-│   └── fsharp-crane-core/    # Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
+│   ├── fsharp-crane-core/    # Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
+│   └── web-ui/               # Shared React component library (shadcn/ui, Radix UI, Tailwind CSS)
 ├── docs/                     # Documentation (Diátaxis framework)
 │   ├── tutorials/            # Learning-oriented
 │   ├── how-to/               # Problem-solving
@@ -227,7 +230,8 @@ nx graph                     # Visualize dependencies
 **Trunk Based Development** — All development on `main`:
 
 - **Default branch**: `main`
-- **Environment branches** (Vercel deployment only — never commit directly):
+- **Environment branches** (Vercel deployment only — never commit directly; branch renames deferred to
+  prod-cutover follow-on):
   - `prod-ayokoding-web` → [ayokoding.com](https://ayokoding.com)
   - `prod-ose-web` → [oseplatform.com](https://oseplatform.com)
   - `prod-organiclever-web` → [www.organiclever.com](https://www.organiclever.com/)
@@ -305,7 +309,7 @@ Exception: `README.md` for index files, `docs/metadata/` files.
 ### Linking
 
 GitHub-compatible markdown: `Text` with `.md` extension.
-Next.js sites (ayokoding-web, ose-web) use standard GitHub-compatible markdown links with `.md` extension.
+Next.js sites (ayokoding-www, ose-www) use standard GitHub-compatible markdown links with `.md` extension.
 
 **See**: [repo-governance/conventions/formatting/linking.md](./repo-governance/conventions/formatting/linking.md)
 
@@ -453,51 +457,63 @@ Six-layer governance hierarchy:
 
 ## Web Sites
 
-### ose-web
+### ose-www
 
 - **URL**: <https://oseplatform.com>
-- **Production branch**: `prod-ose-web` → oseplatform.com
+- **Production branch**: `prod-ose-web` → oseplatform.com (prod-branch rename deferred to cutover follow-on)
 - **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
 - **Deployment**: Vercel
-- **Content**: Marketing site for platform
+- **Content**: Public marketing website for the OSE Platform
 - **Dev port**: 3100
-- **E2E tests**: `ose-web-be-e2e`, `ose-web-fe-e2e`
+- **E2E tests**: `ose-www-be-e2e`, `ose-www-fe-e2e`
 
 **See**: [apps/ose-www/README.md](./apps/ose-www/README.md)
 
-### ayokoding-web
+### ayokoding-www
 
 - **URL**: <https://ayokoding.com>
-- **Production branch**: `prod-ayokoding-web` → ayokoding.com
+- **Production branch**: `prod-ayokoding-web` → ayokoding.com (prod-branch rename deferred to cutover follow-on)
 - **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
 - **Languages**: English (primary), Indonesian
 - **Deployment**: Vercel
 - **Content**: Educational platform (programming, AI, security)
-- **E2E tests**: `ayokoding-web-be-e2e`, `ayokoding-web-fe-e2e`
+- **Dev port**: 3101
+- **E2E tests**: `ayokoding-www-be-e2e`, `ayokoding-www-fe-e2e`
 
 **See**: [apps/ayokoding-www/README.md](./apps/ayokoding-www/README.md)
 
-### organiclever-app-web
+### organiclever-www
 
 - **URL**: <https://www.organiclever.com/>
-- **Production branch**: `prod-organiclever-web` → www.organiclever.com (prod-branch rename deferred to the cutover follow-on)
+- **Production branch**: `prod-organiclever-web` → www.organiclever.com (prod-branch rename deferred to cutover follow-on)
 - **Framework**: Next.js 16 (App Router)
 - **Deployment**: Vercel
-- **Content**: OrganicLever app frontend
-- **E2E tests**: `organiclever-app-web-e2e`
+- **Content**: OrganicLever marketing website
+- **Dev port**: 3200
+- **E2E tests**: `organiclever-www-e2e`
+
+**See**: [apps/organiclever-www/README.md](./apps/organiclever-www/README.md)
+
+### organiclever-app-web
+
+- **URL**: (app subdomain — TBD)
+- **Framework**: Next.js 16 (App Router)
+- **Deployment**: Vercel (TBD)
+- **Content**: OrganicLever productivity tracker app frontend
 - **Dev port**: 3202
+- **E2E tests**: `organiclever-app-web-e2e`
 
 **See**: [apps/organiclever-app-web/README.md](./apps/organiclever-app-web/README.md)
 
-### wahidyankf-web
+### wahidyankf-www
 
 - **URL**: <https://www.wahidyankf.com/>
-- **Production branch**: `prod-wahidyankf-web` → www.wahidyankf.com
+- **Production branch**: `prod-wahidyankf-web` → www.wahidyankf.com (prod-branch rename deferred to cutover follow-on)
 - **Framework**: Next.js 16 (App Router)
 - **Deployment**: Vercel
 - **Content**: Personal portfolio (Home, CV, Personal Projects)
-- **E2E tests**: `wahidyankf-web-fe-e2e`
 - **Dev port**: 3201
+- **E2E tests**: `wahidyankf-www-fe-e2e`
 
 **See**: [apps/wahidyankf-www/README.md](./apps/wahidyankf-www/README.md)
 
@@ -508,20 +524,20 @@ Six-layer governance hierarchy:
 - **Framework**: Next.js 16 (App Router)
 - **Deployment**: Vercel (TBD)
 - **Content**: OSE Application platform frontend — regulatory document upload, gap analysis, policy management
-- **Backend**: `ose-app-be` at <https://api.oseplatform.com> (TBD)
+- **Backend**: `ose-be` at <https://api.oseplatform.com> (TBD)
 - **Future**: `ose-app-mobile` (iOS/Android) will join this `ose-app-*` family
-- **E2E tests**: `ose-app-web-e2e`
 - **Dev port**: 3300
+- **E2E tests**: `ose-app-web-e2e`
 
 **See**: [apps/ose-app-web/README.md](./apps/ose-app-web/README.md)
 
 ### organiclever-be
 
-- **Framework**: Rust/Axum REST API
+- **Framework**: F# / Giraffe / ASP.NET 10 REST API
 - **Deployment**: Kubernetes (staging/production)
 - **Content**: Backend API for OrganicLever productivity tracker
-- **E2E tests**: `organiclever-be-e2e`
 - **Dev port**: 8202
+- **E2E tests**: `organiclever-be-e2e`
 - **Contract**: OpenAPI 3.1 spec at `specs/apps/organiclever/containers/contracts/`
 
 ## Temporary Files for AI Agents

@@ -1,10 +1,10 @@
 ---
-title: "Indonesian Content Policy - ayokoding-web"
-description: Policy defining when and how to create Indonesian content in ayokoding-web bilingual platform
+title: "Indonesian Content Policy - ayokoding-www"
+description: Policy defining when and how to create Indonesian content in ayokoding-www bilingual platform
 category: explanation
 subcategory: conventions
 tags:
-  - ayokoding-web
+  - ayokoding-www
   - indonesian
   - bilingual
   - content-policy
@@ -12,9 +12,9 @@ tags:
 created: 2026-02-07
 ---
 
-# Indonesian Content Policy - ayokoding-web
+# Indonesian Content Policy - ayokoding-www
 
-This document defines the policy for Indonesian language content in ayokoding-web, establishing when Indonesian content should be created and what types of content are appropriate for Indonesian translation.
+This document defines the policy for Indonesian language content in ayokoding-www, establishing when Indonesian content should be created and what types of content are appropriate for Indonesian translation.
 
 ## Principles Implemented/Respected
 
@@ -28,7 +28,7 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes a clear content language policy for ayokoding-web to:
+This convention establishes a clear content language policy for ayokoding-www to:
 
 - Define the primary language for different content types
 - Prevent redundant translation effort for technical tutorials
@@ -55,7 +55,7 @@ This convention establishes a clear content language policy for ayokoding-web to
 
 ## Core Policy: English-First for Technical Tutorials
 
-**CRITICAL RULE**: ayokoding-web is **English-first** for technical tutorials and programming language content.
+**CRITICAL RULE**: ayokoding-www is **English-first** for technical tutorials and programming language content.
 
 **Rationale**:
 
@@ -422,7 +422,7 @@ Before creating Indonesian content, verify:
 
 **Agents**:
 
-- `apps-ayokoding-web-general-maker` - Creates ayokoding-web content following this policy
+- `apps-ayokoding-web-general-maker` - Creates ayokoding-www content following this policy
 - `apps-ayokoding-web-by-example-maker` - Creates by-example tutorials (English-first)
 - `apps-ayokoding-web-in-the-field-maker` - Creates in-the-field production guides (English-first)
 - `apps-ayokoding-web-general-checker` - Validates compliance with this policy

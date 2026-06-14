@@ -187,7 +187,7 @@ idioms:
 
 - **[CLI Apps](./hexagonal-architecture-cli.md)** — `commands/` as inbound adapter; Rust and Go CLIs
 - **[Web Apps](./hexagonal-architecture-web.md)** — `contexts/<name>/` feature modules; Next.js with Effect.ts
-- **[Backend Apps](./hexagonal-architecture-be.md)** — DDD bounded contexts + hexagonal layers; Rust/Axum
+- **[Backend Apps](./hexagonal-architecture-be.md)** — DDD bounded contexts + hexagonal layers; F#/Giraffe
 
 ## Related
 

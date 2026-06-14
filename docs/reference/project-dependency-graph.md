@@ -46,7 +46,7 @@ invalidated and `nx affected` flags the project.
 ```json
 "inputs": [
   "default",
-  "{workspaceRoot}/specs/apps/organiclever-web/**/*.feature"
+  "{workspaceRoot}/specs/apps/organiclever/**/*.feature"
 ]
 ```
 
@@ -57,9 +57,9 @@ invalidated and `nx affected` flags the project.
 ```mermaid
 graph TD
   %% Content sites (top level)
-  AKW[ayokoding-web]
-  OPW[ose-web]
-  WKF[wahidyankf-web]
+  AKW[ayokoding-www]
+  OPW[ose-www]
+  WKF[wahidyankf-www]
 
   %% CLI tools
   AKC[ayokoding-cli]
@@ -93,11 +93,13 @@ graph TD
 ```mermaid
 graph TD
   %% E2E tests (top level)
-  OLFE2E[organiclever-web-e2e]
+  OLWWWE2E[organiclever-www-e2e]
+  OLAPPE2E[organiclever-app-web-e2e]
   OLBE2E[organiclever-be-e2e]
 
   %% Apps
-  OLF[organiclever-web]
+  OLWWW[organiclever-www]
+  OLAPP[organiclever-app-web]
   OLB[organiclever-be]
 
   %% Shared
@@ -105,10 +107,11 @@ graph TD
   RC[rhino-cli]
 
   %% Edges
-  OLFE2E --> OLF
+  OLWWWE2E --> OLWWW
+  OLAPPE2E --> OLAPP
   OLBE2E --> OLB
-  OLF --> OLC
-  OLF --> RC
+  OLAPP --> OLC
+  OLAPP --> RC
   OLB --> OLC
 
   classDef cli fill:#DE8F05,stroke:#A56A04,color:#FFFFFF
@@ -116,8 +119,8 @@ graph TD
   classDef e2e fill:#0173B2,stroke:#01537F,color:#FFFFFF
 
   class RC cli
-  class OLF,OLB,OLC product
-  class OLFE2E,OLBE2E e2e
+  class OLWWW,OLAPP,OLB,OLC product
+  class OLWWWE2E,OLAPPE2E,OLBE2E e2e
 ```
 
 **Legend**:
@@ -137,7 +140,7 @@ graph TD
 Repository management CLI used by most projects for coverage validation
 (`rhino-cli test-coverage validate`) and spec coverage (`rhino-cli specs coverage`).
 
-- **Dependents**: CLI tools, libs, content platforms, organiclever-web
+- **Dependents**: CLI tools, libs, content platforms, organiclever-app-web
 - **Mechanism**: `implicitDependencies`
 - **Own dependency**: None (self-contained Rust application with only Rust crate dependencies)
 - **Note**: rhino-cli was ported from Go to Rust (2026-05-23).
@@ -158,19 +161,21 @@ consolidate logic shared by `ose-cli` and `ayokoding-cli` after their Go-to-Rust
 
 | Project        | Dependencies  | Spec Inputs |
 | -------------- | ------------- | ----------- |
-| ayokoding-web  | ayokoding-cli | (none)      |
-| ose-web        | ose-cli       | (none)      |
-| wahidyankf-web | (none)        | (none)      |
+| ayokoding-www  | ayokoding-cli | (none)      |
+| ose-www        | ose-cli       | (none)      |
+| wahidyankf-www | (none)        | (none)      |
 
 ### OrganicLever
 
-| Project                | Dependencies                      | Spec Inputs                                 |
-| ---------------------- | --------------------------------- | ------------------------------------------- |
-| organiclever-contracts | (none)                            | (self — project root is spec dir)           |
-| organiclever-web       | rhino-cli, organiclever-contracts | organiclever-web/\* (test:integration)      |
-| organiclever-be        | organiclever-contracts            | organiclever-be/\* (test:integration)       |
-| organiclever-web-e2e   | organiclever-web                  | organiclever-web/\* (typecheck, test:quick) |
-| organiclever-be-e2e    | organiclever-be                   | organiclever-be/\* (typecheck, test:quick)  |
+| Project                  | Dependencies                      | Spec Inputs                                     |
+| ------------------------ | --------------------------------- | ----------------------------------------------- |
+| organiclever-contracts   | (none)                            | (self — project root is spec dir)               |
+| organiclever-www         | rhino-cli                         | organiclever-www/\* (test:integration)          |
+| organiclever-app-web     | rhino-cli, organiclever-contracts | organiclever-app-web/\* (test:integration)      |
+| organiclever-be          | organiclever-contracts            | organiclever-be/\* (test:integration)           |
+| organiclever-www-e2e     | organiclever-www                  | organiclever-www/\* (typecheck, test:quick)     |
+| organiclever-app-web-e2e | organiclever-app-web              | organiclever-app-web/\* (typecheck, test:quick) |
+| organiclever-be-e2e      | organiclever-be                   | organiclever-be/\* (typecheck, test:quick)      |
 
 ### CLI Tools
 
@@ -191,13 +196,13 @@ consolidate logic shared by `ose-cli` and `ayokoding-cli` after their Go-to-Rust
 All Gherkin specs and API contracts live under `specs/` and are consumed via
 `{workspaceRoot}` inputs.
 
-| Spec Directory                                  | Consumed By                            | Targets                                 |
-| ----------------------------------------------- | -------------------------------------- | --------------------------------------- |
-| `specs/apps/organiclever/containers/contracts/` | organiclever-web, organiclever-be      | codegen                                 |
-| `specs/apps/organiclever-web/`                  | organiclever-web, organiclever-web-e2e | test:integration, typecheck, test:quick |
-| `specs/apps/rhino/`                             | rhino-cli                              | test:integration                        |
-| `specs/apps/ayokoding/`                         | ayokoding-cli, ayokoding-web           | test:integration                        |
-| `specs/apps/ose/`                               | ose-cli, ose-web                       | test:integration                        |
+| Spec Directory                                  | Consumed By                                    | Targets                                 |
+| ----------------------------------------------- | ---------------------------------------------- | --------------------------------------- |
+| `specs/apps/organiclever/containers/contracts/` | organiclever-app-web, organiclever-be          | codegen                                 |
+| `specs/apps/organiclever/`                      | organiclever-app-web, organiclever-app-web-e2e | test:integration, typecheck, test:quick |
+| `specs/apps/rhino/`                             | rhino-cli                                      | test:integration                        |
+| `specs/apps/ayokoding/`                         | ayokoding-cli, ayokoding-www                   | test:integration                        |
+| `specs/apps/ose/`                               | ose-cli, ose-www                               | test:integration                        |
 
 ## Related Documentation
 

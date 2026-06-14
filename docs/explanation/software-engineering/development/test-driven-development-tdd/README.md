@@ -49,7 +49,7 @@ All code developed for the OSE Platform MUST follow the TDD methodology and stan
 
 **What this documentation covers**: OSE Platform-specific TDD patterns, Islamic finance domain testing, Nx monorepo testing strategy, repository-specific test organization, integration with DDD patterns.
 
-**What this documentation does NOT cover**: TDD fundamentals, Red-Green-Refactor basics, generic testing patterns (those are in ayokoding-web).
+**What this documentation does NOT cover**: TDD fundamentals, Red-Green-Refactor basics, generic testing patterns (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 

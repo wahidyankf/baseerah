@@ -26,14 +26,14 @@ This convention implements the following core principles:
 
 ## Purpose
 
-This convention establishes universal quality standards that apply to **all markdown content** in the repository. It ensures consistent writing quality, accessibility compliance, and professional presentation across documentation, ayokoding-web content, planning documents, and repository root files. These standards make content readable, maintainable, and accessible to all users including those using assistive technologies.
+This convention establishes universal quality standards that apply to **all markdown content** in the repository. It ensures consistent writing quality, accessibility compliance, and professional presentation across documentation, ayokoding-www content, planning documents, and repository root files. These standards make content readable, maintainable, and accessible to all users including those using assistive technologies.
 
 ## Scope
 
 These principles apply to markdown content in:
 
 - **docs/** - Documentation (tutorials, how-to guides, reference, explanations)
-- **apps/** - ayokoding-web and ose-web content
+- **apps/** - ayokoding-www and ose-www content
 - **plans/** - Project planning documents
 - **Repository root files** - README.md, CONTRIBUTING.md, SECURITY.md, etc.
 
@@ -846,7 +846,7 @@ Coverage percentages are allowed because they indicate **depth/scope**, not **ti
 **Where This Applies**:
 
 - All tutorial content (`docs/tutorials/`)
-- Educational content in ayokoding-web
+- Educational content in ayokoding-www
 - How-to guides that teach concepts
 - Reference documentation with learning components
 

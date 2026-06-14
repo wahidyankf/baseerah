@@ -79,7 +79,7 @@ all use the same MIT text.
 | `apps/organiclever-be/`         | MIT     |
 | `apps/organiclever-web/`        | MIT     |
 | `apps/ose-cli/`                 | MIT     |
-| `apps/ose-app-be/`              | MIT     |
+| `apps/ose-be/`                  | MIT     |
 | `apps/ose-app-web/`             | MIT     |
 | `apps/ose-www/`                 | MIT     |
 | `apps/wahidyankf-www/`          | MIT     |

@@ -31,18 +31,18 @@ scoped to FSL-1.1-MIT; now MIT throughout.
 
 ## Production Dependency License Summary
 
-| App                | Ecosystem | Result                                        |
-| ------------------ | --------- | --------------------------------------------- |
-| `ayokoding-web`    | npm       | All permissive after LGPL removal (see below) |
-| `ose-web`          | npm       | All permissive after LGPL removal (see below) |
-| `organiclever-web` | npm       | All permissive after LGPL removal (see below) |
-| `organiclever-be`  | Rust      | All permissive (MIT, Apache-2.0, PostgreSQL)  |
-| `ose-app-be`       | Rust      | All permissive (MIT, Apache-2.0, PostgreSQL)  |
-| `crane-cli`        | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
-| `rhino-cli`        | Rust      | MIT (Cargo dependencies — all permissive)     |
-| `ayokoding-cli`    | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
-| `ose-cli`          | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
-| `rust-commons`     | Rust      | MIT/Apache-2.0 (Cargo dependencies)           |
+| App                | Ecosystem    | Result                                        |
+| ------------------ | ------------ | --------------------------------------------- |
+| `ayokoding-www`    | npm          | All permissive after LGPL removal (see below) |
+| `ose-www`          | npm          | All permissive after LGPL removal (see below) |
+| `organiclever-web` | npm          | All permissive after LGPL removal (see below) |
+| `organiclever-be`  | .NET (NuGet) | All permissive (MIT, Apache-2.0, PostgreSQL)  |
+| `ose-be`           | .NET (NuGet) | All permissive (MIT, Apache-2.0, PostgreSQL)  |
+| `crane-cli`        | Rust         | MIT/Apache-2.0 (Cargo dependencies)           |
+| `rhino-cli`        | Rust         | MIT (Cargo dependencies — all permissive)     |
+| `ayokoding-cli`    | Rust         | MIT/Apache-2.0 (Cargo dependencies)           |
+| `ose-cli`          | Rust         | MIT/Apache-2.0 (Cargo dependencies)           |
+| `rust-commons`     | Rust         | MIT/Apache-2.0 (Cargo dependencies)           |
 
 ## LGPL-3.0 Elimination: `@img/sharp-libvips`
 

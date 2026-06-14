@@ -264,22 +264,22 @@ Per-project:
 
 ```json
 {
-  "name": "ose-web",
-  "sourceRoot": "apps/ose-web",
+  "name": "ose-www",
+  "sourceRoot": "apps/ose-www",
   "projectType": "application",
   "targets": {
     "dev": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next dev --port 3100",
-        "cwd": "apps/ose-web"
+        "cwd": "apps/ose-www"
       }
     },
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "command": "next build",
-        "cwd": "apps/ose-web"
+        "cwd": "apps/ose-www"
       },
       "outputs": ["{projectRoot}/.next"]
     },
@@ -287,7 +287,7 @@ Per-project:
       "executor": "nx:run-commands",
       "options": {
         "command": "rm -rf .next",
-        "cwd": "apps/ose-web"
+        "cwd": "apps/ose-www"
       }
     }
   },
@@ -373,7 +373,7 @@ Project name used by Nx CLI.
 
 **Examples**:
 
-- `"ose-web"` (app)
+- `"ose-www"` (app)
 - `"ts-utils"` (lib)
 
 #### `sourceRoot`
@@ -386,7 +386,7 @@ Location of source code.
 
 **Examples**:
 
-- `"apps/ose-web"` (app root)
+- `"apps/ose-www"` (app root)
 - `"libs/ts-utils/src"` (lib source)
 
 #### `projectType`
@@ -440,7 +440,7 @@ Executor options.
   - Examples: `"next build"`, `"tsc -p tsconfig.json"`
 - `cwd` (string): Working directory
   - Optional (defaults to workspace root)
-  - Examples: `"apps/ose-web"`, `"."`
+  - Examples: `"apps/ose-www"`, `"."`
 
 **Example**:
 
@@ -448,7 +448,7 @@ Executor options.
 {
   "options": {
     "command": "next build",
-    "cwd": "apps/ose-web"
+    "cwd": "apps/ose-www"
   }
 }
 ```
@@ -698,7 +698,7 @@ Skip Nx cache.
 **Usage**:
 
 ```bash
-NX_SKIP_NX_CACHE=true nx build ose-web
+NX_SKIP_NX_CACHE=true nx build ose-www
 ```
 
 #### `NX_DAEMON`
@@ -708,7 +708,7 @@ Enable/disable Nx daemon.
 **Usage**:
 
 ```bash
-NX_DAEMON=false nx build ose-web
+NX_DAEMON=false nx build ose-www
 ```
 
 ## Related Documentation

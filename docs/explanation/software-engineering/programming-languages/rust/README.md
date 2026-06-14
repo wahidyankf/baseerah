@@ -93,7 +93,7 @@ OSE Platform Rust applications MUST use the following stack:
 
 **What this documentation covers**: OSE Platform naming conventions, framework choices, repository-specific patterns, how to apply Rust knowledge in THIS codebase.
 
-**What this documentation does NOT cover**: Rust syntax, ownership/borrowing fundamentals, language concepts (those are in ayokoding-web).
+**What this documentation does NOT cover**: Rust syntax, ownership/borrowing fundamentals, language concepts (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 

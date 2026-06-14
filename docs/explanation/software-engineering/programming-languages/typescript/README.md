@@ -58,7 +58,7 @@ TypeScript is the primary language for OSE Platform development. It provides sta
 
 **What this documentation covers**: OSE Platform naming conventions, framework choices, repository-specific patterns, how to apply TypeScript knowledge in THIS codebase.
 
-**What this documentation does NOT cover**: TypeScript syntax, language fundamentals, generic patterns (those are in ayokoding-web).
+**What this documentation does NOT cover**: TypeScript syntax, language fundamentals, generic patterns (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 
@@ -167,7 +167,7 @@ timeline
 - Improved error messages with actionable suggestions
 - Better JSDoc support for type inference
 
-**See**: [TypeScript Release Highlights](../../../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/typescript/release-highlights/) on ayokoding-web — TypeScript 5.x version feature guides.
+**See**: [TypeScript Release Highlights](../../../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/typescript/release-highlights/) on ayokoding-www — TypeScript 5.x version feature guides.
 
 ## Documentation Structure
 
@@ -675,10 +675,10 @@ export class CampaignController {
 
 ```
 apps/
-├── ose-web/         # Next.js 16 content platform (TypeScript, tRPC)
-├── ayokoding-web/            # Next.js 16 fullstack content platform (TypeScript, tRPC)
-├── organiclever-web/         # Next.js 16 landing website
-├── wahidyankf-web/           # Next.js 16 personal portfolio
+├── ose-www/         # Next.js 16 content platform (TypeScript, tRPC)
+├── ayokoding-www/            # Next.js 16 fullstack content platform (TypeScript, tRPC)
+├── organiclever-www/         # Next.js 16 landing website
+├── wahidyankf-www/           # Next.js 16 personal portfolio
 ├── ayokoding-cli/            # Rust CLI tool (content link validation)
 └── rhino-cli/               # Rust CLI tool (repository management)
 
@@ -1202,8 +1202,9 @@ fn calculate_zakat(wealth: f64, nisab: f64) -> Result<f64, ZakatError> {
 
 **OSE Platform Usage**:
 
-- **TypeScript**: `ose-web`, `ayokoding-web`, `organiclever-web`, `ose-app-web` — all web frontends and tRPC backends
-- **Rust**: `rhino-cli` (repo management), `organiclever-be` (REST API), `ose-app-be` (REST API), `crane-cli` (PDF pipeline)
+- **TypeScript**: `ose-www`, `ayokoding-www`, `organiclever-www`, `ose-app-web` — all web frontends and tRPC backends
+- **Rust**: `rhino-cli` (repo management), `crane-cli` (PDF pipeline)
+- **F#**: `organiclever-be` (REST API), `ose-be` (REST API)
 
 **When to Choose**:
 
@@ -1377,12 +1378,12 @@ record DonationRequest(Guid CampaignId, decimal Amount, string DonorName);
 **Choose Rust when**:
 
 - Building performance-critical CLI tools (`rhino-cli`, `crane-cli`)
-- REST API backends where memory safety and throughput matter (`organiclever-be`, `ose-app-be`)
 - Single-binary distribution with no runtime dependency
 - Systems-level code where zero-cost abstractions are required
 
 **Choose F# when**:
 
+- Building REST API backends where functional-first design and domain modelling matter (`organiclever-be`, `ose-be`)
 - Building document-processing or data-transformation pipelines (`crane-cli`)
 - Domain modelling that benefits from exhaustive discriminated unions and pattern matching
 - Functional-first design within the .NET ecosystem

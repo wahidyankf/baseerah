@@ -64,17 +64,17 @@ specs/
 | BE App            | Spec Path                                                   |
 | ----------------- | ----------------------------------------------------------- |
 | `organiclever-be` | `specs/apps/organiclever/containers/contracts/openapi.yaml` |
-| `ose-app-be`      | `specs/apps/ose/containers/contracts/openapi.yaml`          |
+| `ose-be`          | `specs/apps/ose/containers/contracts/openapi.yaml`          |
 
 The spec file is the only artefact that humans edit. Generated files are never edited by hand.
 
 ## Codegen Tooling
 
-| Target                                                | Tool                                   | Output Path                | Notes                                      |
-| ----------------------------------------------------- | -------------------------------------- | -------------------------- | ------------------------------------------ |
-| TypeScript client (`organiclever-web`, `ose-app-web`) | `@hey-api/openapi-ts`                  | `src/generated-contracts/` | Emits typed fetch client + schema types    |
-| Rust server (`organiclever-be`)                       | `openapi-generator` (rust-axum target) | `generated-contracts/`     | Emits Axum handler skeletons + model types |
-| Rust server (`ose-app-be`)                            | `openapi-generator` (rust-axum target) | `generated-contracts/`     | Emits Axum handler skeletons + model types |
+| Target                                            | Tool                  | Output Path                | Notes                                     |
+| ------------------------------------------------- | --------------------- | -------------------------- | ----------------------------------------- |
+| TypeScript client (`organiclever-web`, `ose-www`) | `@hey-api/openapi-ts` | `src/generated-contracts/` | Emits typed fetch client + schema types   |
+| F# server (`organiclever-be`)                     | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
+| F# server (`ose-be`)                              | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
 
 Generated directories are committed to the repository. The CI drift check (see below) compares the freshly generated
 output against the committed files and fails if they differ.
@@ -86,9 +86,9 @@ Each app that participates in contract-first development exposes these Nx target
 | Target    | App                      | Command                                                      |
 | --------- | ------------------------ | ------------------------------------------------------------ |
 | `codegen` | `organiclever-web`       | Runs `@hey-api/openapi-ts` against the contracts spec        |
-| `codegen` | `organiclever-be`        | Runs `openapi-generator` rust-axum target                    |
-| `codegen` | `ose-app-web`            | Runs `@hey-api/openapi-ts` against the contracts spec        |
-| `codegen` | `ose-app-be`             | Runs `openapi-generator` rust-axum target                    |
+| `codegen` | `organiclever-be`        | Runs `nswag` F# target                                       |
+| `codegen` | `ose-www`                | Runs `@hey-api/openapi-ts` against the contracts spec        |
+| `codegen` | `ose-be`                 | Runs `nswag` F# target                                       |
 | `lint`    | `organiclever-contracts` | Validates and bundles the OpenAPI spec (Redocly or Spectral) |
 | `docs`    | `organiclever-contracts` | Generates browsable API documentation                        |
 
@@ -97,8 +97,8 @@ Run codegen for a specific app:
 ```bash
 nx run organiclever-web:codegen
 nx run organiclever-be:codegen
-nx run ose-app-web:codegen
-nx run ose-app-be:codegen
+nx run ose-www:codegen
+nx run ose-be:codegen
 ```
 
 Validate the spec itself:
@@ -134,9 +134,9 @@ Contract-first development covers these BE↔client pairs:
 | Backend           | Client             | Spec                                                        |
 | ----------------- | ------------------ | ----------------------------------------------------------- |
 | `organiclever-be` | `organiclever-web` | `specs/apps/organiclever/containers/contracts/openapi.yaml` |
-| `ose-app-be`      | `ose-app-web`      | `specs/apps/ose/containers/contracts/openapi.yaml`          |
+| `ose-be`          | `ose-www`          | `specs/apps/ose/containers/contracts/openapi.yaml`          |
 
-Apps outside this table (CLI tools, content-only web apps such as `ayokoding-web` and `ose-web`) do not participate
+Apps outside this table (CLI tools, content-only web apps such as `ayokoding-www` and `ose-www`) do not participate
 in contract-first codegen.
 
 ## Related

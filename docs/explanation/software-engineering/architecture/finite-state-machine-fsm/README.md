@@ -60,7 +60,7 @@ OSE Platform FSM implementations MUST use the following frameworks:
 
 **What this documentation covers**: OSE Platform-specific FSM patterns, Procure-to-Pay state machines (PurchaseOrder lifecycle, Invoice three-way matching, Supplier approval), framework choices (Spring State Machine, XState), integration with DDD aggregates, repository-specific FSM conventions.
 
-**What this documentation does NOT cover**: FSM fundamentals, basic state/transition concepts, generic FSM theory (those are in ayokoding-web).
+**What this documentation does NOT cover**: FSM fundamentals, basic state/transition concepts, generic FSM theory (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 

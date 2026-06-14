@@ -77,9 +77,9 @@ Each role is implemented as a separate agent with specific responsibilities and 
 This pattern is used across multiple agent families. See [AI Agents Index](../../../.claude/agents/README.md) for the complete list of agent families using this pattern. Key families include:
 
 1. **repo-rules-\*** - Repository-wide consistency
-2. **apps-ayokoding-web-\*** - Next.js 16 content for ayokoding-web
+2. **apps-ayokoding-web-\*** - Next.js 16 content for ayokoding-www
 3. **docs-tutorial-\*** - Tutorial quality validation
-4. **apps-ose-web-content-\*** - Next.js 16 content for ose-web
+4. **apps-ose-web-content-\*** - Next.js 16 content for ose-www
 5. **readme-\*** - README quality standards
 6. **docs-\*** - Documentation factual accuracy
 7. **plan-\*** - Plan completeness and structure
@@ -129,7 +129,7 @@ This pattern is used across multiple agent families. See [AI Agents Index](../..
 **Example Workflow**:
 
 ```markdown
-User: "Add a new tutorial to ayokoding-web about TypeScript generics"
+User: "Add a new tutorial to ayokoding-www about TypeScript generics"
 
 Maker Agent (apps-ayokoding-web-general-maker):
 
@@ -314,7 +314,7 @@ Fixer Agent (apps-ayokoding-web-general-fixer):
 
 ```bash
 # Step 1: Create content
-User: "Create TypeScript generics tutorial for ayokoding-web"
+User: "Create TypeScript generics tutorial for ayokoding-www"
 Agent: apps-ayokoding-web-general-maker (creates tutorial + navigation updates)
 
 # Step 2: Validate
@@ -400,9 +400,9 @@ See [AI Agents Convention - Agent Color Categorization](../agents/ai-agents.md#a
 3. repo-rules-fixer: Fix non-compliant files found in audit
 ```
 
-### 2. apps-ayokoding-web-\* (Next.js 16 Content for ayokoding-web)
+### 2. apps-ayokoding-web-\* (Next.js 16 Content for ayokoding-www)
 
-**Domain**: Next.js 16 content for ayokoding-web (App Router, TypeScript, tRPC) - learning content, blog posts, by-example tutorials
+**Domain**: Next.js 16 content for ayokoding-www (App Router, TypeScript, tRPC) - learning content, blog posts, by-example tutorials
 
 **Agents (General/By-Example/In-the-Field)**:
 
@@ -418,15 +418,15 @@ See [AI Agents Convention - Agent Color Categorization](../agents/ai-agents.md#a
 
 **Agents (Factual Accuracy)**:
 
-- **apps-ayokoding-web-facts-checker** (🟩 Checker) - Validates factual accuracy of ayokoding-web content using WebSearch/WebFetch. Verifies command syntax, versions, code examples, external references with confidence classification
+- **apps-ayokoding-web-facts-checker** (🟩 Checker) - Validates factual accuracy of ayokoding-www content using WebSearch/WebFetch. Verifies command syntax, versions, code examples, external references with confidence classification
 - **apps-ayokoding-web-facts-fixer** (🟨 Fixer) - Applies validated fixes from facts-checker audit reports
 
 **Agents (Link Validation)**:
 
-- **apps-ayokoding-web-link-checker** (🟩 Checker) - Validates links in ayokoding-web content following absolute path convention (/docs/path without .md). Checks internal and external links
+- **apps-ayokoding-web-link-checker** (🟩 Checker) - Validates links in ayokoding-www content following absolute path convention (/docs/path without .md). Checks internal and external links
 - **apps-ayokoding-web-link-fixer** (🟨 Fixer) - Applies validated fixes from link-checker audit reports
 
-**Use Case**: Creating and validating educational content for ayokoding-web
+**Use Case**: Creating and validating educational content for ayokoding-www
 
 **Example (General Content)**:
 
@@ -466,9 +466,9 @@ See [AI Agents Convention - Agent Color Categorization](../agents/ai-agents.md#a
 
 **Note**: docs-tutorial-fixer applies objective/mechanical fixes (missing sections, format violations) automatically. Subjective narrative quality improvements (flow, engagement, tone) require human judgment and manual review.
 
-### 4. apps-ose-web-content-\* (Next.js 16 Content for ose-web)
+### 4. apps-ose-web-content-\* (Next.js 16 Content for ose-www)
 
-**Domain**: Next.js 16 content for ose-web (App Router, TypeScript, tRPC) - platform updates, about pages
+**Domain**: Next.js 16 content for ose-www (App Router, TypeScript, tRPC) - platform updates, about pages
 
 **Agents**:
 

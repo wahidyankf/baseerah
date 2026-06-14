@@ -45,15 +45,16 @@ Partial lines count as NOT covered.
 
 ## Thresholds
 
-| Project Type     | Threshold | Rationale                               |
-| ---------------- | --------- | --------------------------------------- |
-| CLI tools (Rust) | >= 90%    | Core business logic                     |
-| Rust libraries   | >= 90%    | Shared utilities                        |
-| organiclever-be  | >= 90%    | Rust/Axum backend API                   |
-| organiclever-web | >= 70%    | Frontend app with MSW integration tests |
-| ayokoding-web    | >= 80%    | Content platform with UI rendering code |
-| ose-web          | >= 80%    | Content platform with UI rendering code |
-| wahidyankf-web   | >= 80%    | Personal portfolio (Next.js)            |
+| Project Type         | Threshold | Rationale                               |
+| -------------------- | --------- | --------------------------------------- |
+| CLI tools (Rust)     | >= 90%    | Core business logic                     |
+| Rust libraries       | >= 90%    | Shared utilities                        |
+| organiclever-be      | >= 90%    | F#/Giraffe backend API                  |
+| ose-be               | >= 90%    | F#/Giraffe backend API                  |
+| organiclever-app-web | >= 70%    | Frontend app with MSW integration tests |
+| ayokoding-www        | >= 80%    | Content platform with UI rendering code |
+| ose-www              | >= 80%    | Content platform with UI rendering code |
+| wahidyankf-www       | >= 80%    | Personal portfolio (Next.js)            |
 
 ## Per-Project Coverage Details
 
@@ -74,22 +75,22 @@ Partial lines count as NOT covered.
 **Tool**: Vitest with `@vitest/coverage-v8`
 **Format**: LCOV at `coverage/lcov.info`
 
-| Project          | Threshold | Exclusions |
-| ---------------- | --------- | ---------- |
-| organiclever-web | 70%       | None       |
-| ayokoding-web    | 80%       | None       |
-| ose-web          | 80%       | None       |
-| wahidyankf-web   | 80%       | None       |
+| Project              | Threshold | Exclusions |
+| -------------------- | --------- | ---------- |
+| organiclever-app-web | 70%       | None       |
+| ayokoding-www        | 80%       | None       |
+| ose-www              | 80%       | None       |
+| wahidyankf-www       | 80%       | None       |
 
-### Rust Projects
+### F# Projects
 
-**Tool**: cargo-llvm-cov with `--test unit --ignore-filename-regex 'main\.rs'`
+**Tool**: NUnit / xUnit + Coverlet
 **Format**: LCOV via `rhino-cli test-coverage validate`
 
-| Project         | Threshold | Notes                                              |
-| --------------- | --------- | -------------------------------------------------- |
-| organiclever-be | 90%       | Line coverage via cargo-llvm-cov                   |
-| ose-app-be      | 90%       | Line coverage via cargo-llvm-cov; main.rs excluded |
+| Project         | Threshold | Notes                      |
+| --------------- | --------- | -------------------------- |
+| organiclever-be | 90%       | Line coverage via Coverlet |
+| ose-be          | 90%       | Line coverage via Coverlet |
 
 ## CI Integration
 

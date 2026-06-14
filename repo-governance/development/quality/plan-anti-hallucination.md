@@ -63,7 +63,7 @@ Plans drift from reality in predictable ways. Each category maps to a verificati
 | **File path**         | `apps/ose-www/src/server/trpc.ts`                         | `Glob` or `Bash test -f`; if NEW, mark `_New file_`                                                            |
 | **Directory path**    | `repo-governance/conventions/writing/`                    | `Bash test -d` or `Glob` for sibling                                                                           |
 | **Symbol / function** | `unstable_cache`, `getServerSession`, `RouteConfig`       | `Grep` against the codebase or cite the import path                                                            |
-| **Nx target**         | `nx run ose-web:test:quick`                               | Read `apps/ose-www/project.json` or `nx show project`                                                          |
+| **Nx target**         | `nx run ose-www:test:quick`                               | Read `apps/ose-www/project.json` or `nx show project`                                                          |
 | **Package version**   | `next@16.0.0`, `tRPC v11`                                 | Grep `package.json` (or `go.mod`, `Cargo.toml`, `*.csproj`, etc.)                                              |
 | **API signature**     | `unstable_cache(fn, keyParts, { revalidate })`            | `web-research-maker` against authoritative docs                                                                |
 | **Command flag**      | `npx nx affected -t typecheck --parallel=cores-1`         | `<cmd> --help` or repo's documented usage in `package.json` scripts                                            |
@@ -171,9 +171,9 @@ Cache file may or may not exist at that path. `Glob` or `test -f` first. If NEW,
 
 ### AP-3: Citing an Nx target that may not exist
 
-> "Run `nx run ose-web:integration-test`..."
+> "Run `nx run ose-www:integration-test`..."
 
-Nx targets vary per project. Read `project.json` or run `nx show project ose-web` to enumerate real targets. The actual target is `test:integration`, not `integration-test`.
+Nx targets vary per project. Read `project.json` or run `nx show project ose-www` to enumerate real targets. The actual target is `test:integration`, not `integration-test`.
 
 ### AP-4: Inventing a function or method name
 
@@ -271,7 +271,7 @@ Each plan agent applies this convention at a specific point in its workflow:
       `unstable_cache(fn, keyParts, { revalidate: 300 })` per Next.js 16 docs (verified
       2026-05-03 at https://nextjs.org/docs/app/api-reference/functions/unstable_cache,
       excerpt: "unstable_cache allows caching results of expensive operations") [Web-cited].
-      Verify by running `npx nx run ose-web:test:quick` — all tests pass.
+      Verify by running `npx nx run ose-www:test:quick` — all tests pass.
 ```
 
 ### Bad — invented file path + fabricated API

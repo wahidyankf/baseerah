@@ -57,7 +57,7 @@ OSE Platform Islamic finance systems MUST use the following DDD patterns:
 
 **What this documentation covers**: OSE Platform-specific DDD patterns, Islamic finance domain modeling, aggregate boundaries, bounded context mapping in OSE Platform, integration with C4 and FSM, repository-specific tactical patterns.
 
-**What this documentation does NOT cover**: DDD fundamentals, basic aggregate/entity/value object concepts, generic strategic design (those are in ayokoding-web).
+**What this documentation does NOT cover**: DDD fundamentals, basic aggregate/entity/value object concepts, generic strategic design (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 

@@ -110,13 +110,13 @@ Confidence levels serve multiple critical purposes:
 All fixer agents implement this confidence level system:
 
 - **repo-rules-fixer** - Repository-wide structural consistency fixes
-- **apps-ayokoding-web-general-fixer** - ayokoding-web general content fixes
-- **apps-ayokoding-web-by-example-fixer** - ayokoding-web by-example tutorial fixes
-- **apps-ayokoding-web-facts-fixer** - ayokoding-web factual accuracy fixes
-- **apps-ayokoding-web-in-the-field-fixer** - ayokoding-web in-the-field tutorial fixes
-- **apps-ayokoding-web-link-fixer** - ayokoding-web link validation fixes
+- **apps-ayokoding-web-general-fixer** - ayokoding-www general content fixes
+- **apps-ayokoding-web-by-example-fixer** - ayokoding-www by-example tutorial fixes
+- **apps-ayokoding-web-facts-fixer** - ayokoding-www factual accuracy fixes
+- **apps-ayokoding-web-in-the-field-fixer** - ayokoding-www in-the-field tutorial fixes
+- **apps-ayokoding-web-link-fixer** - ayokoding-www link validation fixes
 - **docs-tutorial-fixer** - Tutorial quality fixes
-- **apps-ose-web-content-fixer** - ose-web Next.js content fixes
+- **apps-ose-web-content-fixer** - ose-www Next.js content fixes
 - **readme-fixer** - README quality fixes
 - **docs-fixer** - Documentation factual accuracy fixes
 - **plan-fixer** - Plan structural and format fixes
@@ -477,7 +477,7 @@ Each fixer agent has domain-specific validation checks:
 
 **apps-ayokoding-web-general-fixer:**
 
-- Next.js/MDX frontmatter for ayokoding-web
+- Next.js/MDX frontmatter for ayokoding-www
 - Bilingual content validation (en/id)
 - Learning content specific rules (overview/ikhtisar, weight ordering)
 - Navigation link format (absolute paths with language prefix)
@@ -491,7 +491,7 @@ Each fixer agent has domain-specific validation checks:
 
 **apps-ose-web-content-fixer:**
 
-- Next.js/MDX frontmatter for ose-web
+- Next.js/MDX frontmatter for ose-www
 - English-only content validation
 - Cover image alt text requirements
 - Heading hierarchy (single H1 rule)
@@ -884,16 +884,16 @@ FAIL: All agent files - Frontmatter comment detection
 ### Fixer Agents Using This Convention
 
 - [repo-rules-fixer.md](../../../.claude/agents/repo-rules-fixer.md) - Repository structural consistency fixer
-- [apps-ayokoding-web-general-fixer.md](../../../.claude/agents/apps-ayokoding-web-general-fixer.md) - ayokoding-web general Next.js content fixer
-- [apps-ayokoding-web-by-example-fixer.md](../../../.claude/agents/apps-ayokoding-web-by-example-fixer.md) - ayokoding-web by-example tutorial fixer
-- [apps-ayokoding-web-facts-fixer.md](../../../.claude/agents/apps-ayokoding-web-facts-fixer.md) - ayokoding-web factual accuracy fixer
+- [apps-ayokoding-web-general-fixer.md](../../../.claude/agents/apps-ayokoding-web-general-fixer.md) - ayokoding-www general Next.js content fixer
+- [apps-ayokoding-web-by-example-fixer.md](../../../.claude/agents/apps-ayokoding-web-by-example-fixer.md) - ayokoding-www by-example tutorial fixer
+- [apps-ayokoding-web-facts-fixer.md](../../../.claude/agents/apps-ayokoding-web-facts-fixer.md) - ayokoding-www factual accuracy fixer
 - [docs-tutorial-fixer.md](../../../.claude/agents/docs-tutorial-fixer.md) - Tutorial quality fixer
-- [apps-ose-web-content-fixer.md](../../../.claude/agents/apps-ose-web-content-fixer.md) - ose-web Next.js content fixer
+- [apps-ose-web-content-fixer.md](../../../.claude/agents/apps-ose-web-content-fixer.md) - ose-www Next.js content fixer
 - [readme-fixer.md](../../../.claude/agents/readme-fixer.md) - README quality fixer
 - [plan-fixer.md](../../../.claude/agents/plan-fixer.md) - Plan structural and format fixer
 - [docs-fixer.md](../../../.claude/agents/docs-fixer.md) - Documentation factual accuracy fixer
-- [apps-ayokoding-web-in-the-field-fixer.md](../../../.claude/agents/apps-ayokoding-web-in-the-field-fixer.md) - ayokoding-web in-the-field tutorial fixer
-- [apps-ayokoding-web-link-fixer.md](../../../.claude/agents/apps-ayokoding-web-link-fixer.md) - ayokoding-web link validation fixer
+- [apps-ayokoding-web-in-the-field-fixer.md](../../../.claude/agents/apps-ayokoding-web-in-the-field-fixer.md) - ayokoding-www in-the-field tutorial fixer
+- [apps-ayokoding-web-link-fixer.md](../../../.claude/agents/apps-ayokoding-web-link-fixer.md) - ayokoding-www link validation fixer
 - [docs-software-engineering-separation-fixer.md](../../../.claude/agents/docs-software-engineering-separation-fixer.md) - Software engineering documentation separation fixer
 - [repo-workflow-fixer.md](../../../.claude/agents/repo-workflow-fixer.md) - Repository workflow structural consistency fixer
 
@@ -909,7 +909,7 @@ FAIL: All agent files - Frontmatter comment detection
 - [Tutorial Convention](../../conventions/tutorials/general.md)
 - [Content Quality Principles](../../conventions/writing/quality.md) - Universal content quality standards
 - [README Quality Convention](../../conventions/writing/readme-quality.md)
-- [Indonesian Content Policy](../../conventions/writing/indonesian-content-policy.md) - ayokoding-web bilingual content policy (English-first for technical tutorials)
+- [Indonesian Content Policy](../../conventions/writing/indonesian-content-policy.md) - ayokoding-www bilingual content policy (English-first for technical tutorials)
 
 **Infrastructure:**
 - [Temporary Files Convention](../infra/temporary-files.md) - Where to store fix reports (`generated-reports/`)

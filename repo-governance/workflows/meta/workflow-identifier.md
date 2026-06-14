@@ -231,7 +231,7 @@ Steps execute one after another. Later steps can reference outputs from earlier 
 
 **Agent**: `swe-typescript-dev`
 
-- **Args**: `action: build, project: ayokoding-web`
+- **Args**: `action: build, project: ayokoding-www`
 - **Output**: `{build-artifacts}`
 
 ### 2. Run Tests (Sequential)

@@ -116,7 +116,7 @@ specs/apps/<app-family>/
 │       └── <bc>.md
 └── behavior/                       # Cross-cutting Gherkin (all C4 levels)
     ├── README.md
-    └── <product>-<surface>/         # e.g., organiclever-be, ayokoding-web, rhino-cli
+    └── <product>-<surface>/         # e.g., organiclever-be, ayokoding-www, rhino-cli
         └── gherkin/
             ├── README.md
             └── <domain>/            # Domain subdir — required for all surfaces
@@ -156,7 +156,7 @@ Where:
 
 - **`<app-family>`** = project name (e.g., `organiclever`, `ayokoding`, `rhino`)
 - **`<product>-<surface>`** = flat slug combining product name and perspective (e.g.,
-  `organiclever-be`, `ayokoding-web`, `rhino-cli`, `ayokoding-build-tools`)
+  `organiclever-be`, `ayokoding-www`, `rhino-cli`, `ayokoding-build-tools`)
 - **`{domain}`** = business domain grouping folder (all surfaces, including CLI)
 - **`{feature}`** = feature file name in kebab-case
 
@@ -303,7 +303,7 @@ single source of truth is `apps/rhino-cli/src/internal/allowlist.rs`.
 
 ### Adding a Feature File to an Existing Project
 
-1. Identify the correct `<product>-<surface>` slug (e.g., `organiclever-be`, `ayokoding-web`,
+1. Identify the correct `<product>-<surface>` slug (e.g., `organiclever-be`, `ayokoding-www`,
    `rhino-cli`). For ayokoding build-time features, use `ayokoding-build-tools`
 2. Place the file in the appropriate domain subdirectory under
    `behavior/<product>-<surface>/gherkin/<domain>/`, creating the domain folder if it does not exist
@@ -391,7 +391,7 @@ The validator handles Scenario Outline forms in both directions: outline steps a
 
 #### Combined gherkin scopes per app
 
-`rhino-cli specs coverage` accepts a variadic specs-dirs list (`specs coverage <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-web has web + api; ayokoding-web has web + api + cli) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
+`rhino-cli specs coverage` accepts a variadic specs-dirs list (`specs coverage <specs-dir> [<specs-dir>...] <app-dir>`). Apps with multiple gherkin perspectives (ose-www has web + api; ayokoding-www has web + api + cli) declare a single combined run in `project.json` so impls shared across scopes don't false-positive on per-scope orphan checks.
 
 #### Expanded relationship symmetry (DDD validators)
 

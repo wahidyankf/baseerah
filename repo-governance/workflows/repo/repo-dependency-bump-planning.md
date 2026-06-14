@@ -118,8 +118,8 @@ governed by the policy (intersected with `scope-filter`/`ecosystems`):
 - **npm**: workspace-root `package.json` (`volta` block = Node/npm language pins; `dependencies`,
   `devDependencies`, `optionalDependencies`), `apps/*/package.json`, `libs/*/package.json`, and the
   `.opencode/package.json` binding manifest.
-- **Cargo**: `apps/*/Cargo.toml` and `libs/*/Cargo.toml` `[dependencies]` (e.g. `organiclever-be`,
-  `ose-app-be`, `rhino-cli`, `rust-commons`), plus per-project `rust-toolchain.toml`
+- **Cargo**: `apps/*/Cargo.toml` and `libs/*/Cargo.toml` `[dependencies]` (e.g. `rhino-cli`,
+  `rust-commons`, `ose-cli`, `ayokoding-cli`), plus per-project `rust-toolchain.toml`
   compiler-channel pins (every Rust app **and** `libs/rust-commons`).
 - **.NET**: `apps/*/*.fsproj`/`*.csproj` `<PackageReference>` (e.g. `crane-cli`). The .NET SDK
   version is **not** pinned via a per-app `global.json` here — it lives in the

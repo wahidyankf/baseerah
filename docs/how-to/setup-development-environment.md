@@ -32,8 +32,8 @@ but they all share the same Nx build system and git hooks.
 
 - **Minimal** — Node.js + Docker + jq. Covers git hooks, TypeScript projects, and
   basic E2E tests.
-- **Full** — All tools checked by doctor. Required for working on Rust backend apps
-  (`organiclever-be`, `ose-app-be`) and Rust CLI tools.
+- **Full** — All tools checked by doctor. Required for working on F# backend apps
+  (`organiclever-be`, `ose-be`) and Rust CLI tools.
 - **Automated** — Run `npm run doctor -- --fix` to auto-install missing tools. Use
   `npm run doctor -- --fix --dry-run` to preview what would be installed.
 
@@ -147,7 +147,7 @@ volta install npm@11.10.1
 
 ### Step 4: Rust Toolchain
 
-Required for `organiclever-be` (Rust/Axum), `ose-app-be`, `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
+Required for `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. The toolchain version is pinned via `rust-toolchain.toml` in each project — `rustup` picks it up automatically.
 
 ```bash
 # Install rustup (if not present)

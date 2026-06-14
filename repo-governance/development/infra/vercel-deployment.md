@@ -50,7 +50,7 @@ is invisible to Vercel unless it is explicitly added to `buildCommand`.
 ## Why This Matters
 
 Nx `dependsOn` is an orchestration instruction for the Nx task runner. When you run `nx build
-ayokoding-web` locally, Nx resolves the dependency graph and runs `generate-indexes` and
+ayokoding-www` locally, Nx resolves the dependency graph and runs `generate-indexes` and
 `generate-search-data` first, then `next build`.
 
 Vercel bypasses Nx entirely. It calls `next build` (or the configured `buildCommand`) in the app
@@ -112,10 +112,10 @@ Include any directory that contains build-time generated files the runtime depen
 
 | App                | `vercel.json` location              | `buildCommand` status                       | Notes                                                    |
 | ------------------ | ----------------------------------- | ------------------------------------------- | -------------------------------------------------------- |
-| `ayokoding-web`    | `apps/ayokoding-www/vercel.json`    | Set (fixed after incident)                  | Runs `generate-indexes` and `generate-search-data` first |
+| `ayokoding-www`    | `apps/ayokoding-www/vercel.json`    | Set (fixed after incident)                  | Runs `generate-indexes` and `generate-search-data` first |
 | `organiclever-web` | `apps/organiclever-web/vercel.json` | Not set (no build-time targets at present)  | At risk if build-time targets are added                  |
-| `ose-web`          | `apps/ose-www/vercel.json`          | Set (`generate-search-data` + `next build`) | Next.js build with search data generation                |
-| `wahidyankf-web`   | `apps/wahidyankf-www/vercel.json`   | Set                                         | Adopted 2026-04-19; deploys via `prod-wahidyankf-web`    |
+| `ose-www`          | `apps/ose-www/vercel.json`          | Set (`generate-search-data` + `next build`) | Next.js build with search data generation                |
+| `wahidyankf-www`   | `apps/wahidyankf-www/vercel.json`   | Set                                         | Adopted 2026-04-19; deploys via `prod-wahidyankf-web`    |
 
 ## When to Check
 
@@ -140,7 +140,7 @@ absent at runtime.
 
 ### Pitfall 2: Assuming Nx orchestration applies to Vercel builds
 
-**Scenario**: A developer runs `nx build ayokoding-web` and confirms the full pipeline works, then
+**Scenario**: A developer runs `nx build ayokoding-www` and confirms the full pipeline works, then
 assumes Vercel will do the same.
 
 **Fix**: `nx build` and Vercel's build are independent pipelines. `vercel.json`'s `buildCommand`
@@ -166,7 +166,7 @@ relative to that directory. In this monorepo, `buildCommand` runs from the app d
 
 ## Examples
 
-### PASS: `ayokoding-web` — `buildCommand` mirrors `dependsOn`
+### PASS: `ayokoding-www` — `buildCommand` mirrors `dependsOn`
 
 `apps/ayokoding-www/project.json`:
 

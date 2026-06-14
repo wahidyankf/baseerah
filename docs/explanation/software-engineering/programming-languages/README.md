@@ -38,7 +38,7 @@ Multiple domain-focused standards files covering specific areas (testing, securi
 
 | Task                                     | Recommended Language | Start With                                     |
 | ---------------------------------------- | -------------------- | ---------------------------------------------- |
-| REST API backend (current ose-public)    | Rust/Axum            | See organiclever-be, ose-app-be                |
+| REST API backend (current ose-public)    | F#/Giraffe           | See organiclever-be, ose-be                    |
 | Frontend web application                 | TypeScript           | [TypeScript Standards](./typescript/README.md) |
 | CLI tool for repository automation       | Rust                 | See rhino-cli, ayokoding-cli, ose-cli (Rust)   |
 | Infrastructure tooling                   | Rust                 | See existing CLI tools                         |
@@ -49,8 +49,8 @@ Multiple domain-focused standards files covering specific areas (testing, securi
 **Platform Guidance**:
 
 - **TypeScript**: Active for all frontend applications (Next.js) and tRPC backends
-- **Rust**: Active for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, ayokoding-cli, ose-cli)
-- **F#**: Active for content pipeline tooling (crane-cli — Content Retrieval And Normalization Engine)
+- **Rust**: Active for CLI tools (rhino-cli, ayokoding-cli, ose-cli, crane-cli)
+- **F#**: Active for REST API backends (organiclever-be, ose-be) and content pipeline tooling (crane-cli — Content Retrieval And Normalization Engine)
 - **C#**: Retained for potential .NET interop with F#
 
 ## Purpose
@@ -170,7 +170,7 @@ F# is a functional-first .NET language where immutability is the default and dis
 
 **Rust development with ownership-based memory safety, zero-cost abstractions, and Axum**
 
-Rust guarantees memory safety and fearless concurrency without a garbage collector, making it ideal for high-performance, security-critical systems. OSE Platform uses Rust for backend services (organiclever-be, ose-app-be) and CLI tools (rhino-cli, crane-cli).
+Rust guarantees memory safety and fearless concurrency without a garbage collector, making it ideal for high-performance, security-critical systems. OSE Platform uses Rust for CLI tools (rhino-cli, ayokoding-cli, ose-cli, crane-cli).
 
 **Use Rust when you need:**
 
@@ -219,12 +219,12 @@ Languages in this documentation are chosen based on:
 
 ### Current Language Usage
 
-| Language       | Primary Use Cases                       | Status                                                                     |
-| -------------- | --------------------------------------- | -------------------------------------------------------------------------- |
-| **C#**         | Enterprise APIs, .NET interop with F#   | 📋 Retained — .NET interop                                                 |
-| **F#**         | Content pipeline tooling (crane-cli)    | ✅ Active — crane-cli                                                      |
-| **Rust**       | Backend APIs, CLI tools, infrastructure | ✅ Active — organiclever-be, ose-app-be, rhino-cli, ayokoding-cli, ose-cli |
-| **TypeScript** | Frontend applications, tRPC backends    | ✅ Active — all Next.js apps                                               |
+| Language       | Primary Use Cases                     | Status                                                   |
+| -------------- | ------------------------------------- | -------------------------------------------------------- |
+| **C#**         | Enterprise APIs, .NET interop with F# | 📋 Retained — .NET interop                               |
+| **F#**         | REST API backends, content pipeline   | ✅ Active — organiclever-be, ose-be, crane-cli           |
+| **Rust**       | CLI tools, infrastructure             | ✅ Active — rhino-cli, ayokoding-cli, ose-cli, crane-cli |
+| **TypeScript** | Frontend applications, tRPC backends  | ✅ Active — all Next.js apps                             |
 
 **Legend**: ✅ Active (in use in ose-public) | 📋 Retained (standards documented; not yet used in active apps)
 
@@ -237,7 +237,7 @@ Languages in this documentation are chosen based on:
 
 ### For Full-Stack Developers
 
-1. Learn backend (Rust) and frontend (TypeScript) idioms
+1. Learn backend (F#) and frontend (TypeScript) idioms
 2. Understand language-specific testing approaches
 3. Apply consistent patterns across languages
 4. Practice polyglot development

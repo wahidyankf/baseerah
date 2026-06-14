@@ -1,6 +1,6 @@
 ---
 title: "How to Add a Programming Language"
-description: "Step-by-step guide for adding programming languages to ayokoding-web following the Programming Language Content Standard"
+description: "Step-by-step guide for adding programming languages to ayokoding-www following the Programming Language Content Standard"
 category: how-to
 tags:
   - programming-languages
@@ -13,11 +13,11 @@ created: 2025-12-18
 
 # How to Add a Programming Language
 
-> **Note**: This guide was written when ayokoding-web was a Hugo static site. ayokoding-web has since migrated to Next.js 16. The content structure and tutorial standards remain applicable, but Hugo-specific instructions (frontmatter weights, `_index.md` navigation files, Hugo build commands, Hextra shortcodes) no longer apply. Content now lives at `apps/ayokoding-www/content/`.
+> **Note**: This guide was written when ayokoding-www was a Hugo static site. ayokoding-www has since migrated to Next.js 16. The content structure and tutorial standards remain applicable, but Hugo-specific instructions (frontmatter weights, `_index.md` navigation files, Hugo build commands, Hextra shortcodes) no longer apply. Content now lives at `apps/ayokoding-www/content/`.
 
-**Step-by-step guide for adding a new programming language to ayokoding-web following the Programming Language Content Standard.**
+**Step-by-step guide for adding a new programming language to ayokoding-www following the Programming Language Content Standard.**
 
-This guide walks you through the complete process of adding a new programming language (e.g., Kotlin, TypeScript, Rust, Clojure) to ayokoding-web. Follow these steps to ensure your content meets quality standards and integrates seamlessly with existing content.
+This guide walks you through the complete process of adding a new programming language (e.g., Kotlin, TypeScript, Rust, Clojure) to ayokoding-www. Follow these steps to ensure your content meets quality standards and integrates seamlessly with existing content.
 
 ## Prerequisites
 
@@ -43,7 +43,7 @@ Before starting, ensure you have:
 
 ### Step 1.1: Choose Language and Validate Demand
 
-**Why:** Ensure the language addition provides value to ayokoding-web users.
+**Why:** Ensure the language addition provides value to ayokoding-www users.
 
 **Actions:**
 
@@ -101,7 +101,7 @@ Before starting, ensure you have:
 
 **Actions:**
 
-1. Navigate to ayokoding-web content directory:
+1. Navigate to ayokoding-www content directory:
 
    ```bash
    cd apps/ayokoding-www/content/en/learn/swe/programming-languages/
@@ -739,7 +739,7 @@ Before starting, ensure you have:
 
 ### Step 5.2: Deploy to Production
 
-**Why:** Make content available to ayokoding-web users.
+**Why:** Make content available to ayokoding-www users.
 
 **Actions:**
 
@@ -749,7 +749,7 @@ Before starting, ensure you have:
 
    ```
    Spawn ayokoding-web-deployer agent:
-   "Deploy ayokoding-web to production (ayokoding.com)
+   "Deploy ayokoding-www to production (ayokoding.com)
 
    This will sync prod-ayokoding-web branch with main and trigger Vercel deployment."
    ```
@@ -901,7 +901,7 @@ Use this final checklist to verify completion:
 - [ ] Cross-references: 15+ per tutorial
 - [ ] Code examples: 25+ per major tutorial
 
-**Congratulations!** You've successfully added a new programming language to ayokoding-web following the Programming Language Content Standard. Your content is now part of a consistent, high-quality educational platform.
+**Congratulations!** You've successfully added a new programming language to ayokoding-www following the Programming Language Content Standard. Your content is now part of a consistent, high-quality educational platform.
 
 ## Related Documentation
 

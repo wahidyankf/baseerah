@@ -1,6 +1,6 @@
 ---
 title: "FP-Variant Multi-Language Convention"
-description: Bidirectional idiomatic-language rule requiring F# AND Clojure tabs in FP-variant by-example tutorials in ayokoding-web, with each language kept idiomatically native rather than mechanically translated from the other
+description: Bidirectional idiomatic-language rule requiring F# AND Clojure tabs in FP-variant by-example tutorials in ayokoding-www, with each language kept idiomatically native rather than mechanically translated from the other
 category: explanation
 subcategory: conventions
 tags:
@@ -8,14 +8,14 @@ tags:
   - clojure
   - fsharp
   - by-example
-  - ayokoding-web
+  - ayokoding-www
   - tutorial
 created: 2026-05-17
 ---
 
 # FP-Variant Multi-Language Convention
 
-FP-variant by-example tutorials in ayokoding-web teach functional programming concepts through architecture examples. Without a normative language rule, authors may present only one language, mechanically translate idioms across languages, or present non-idiomatic code that misleads learners. This convention establishes the bidirectional idiomatic-language rule: every FP-variant by-example page presents code in F# AND Clojure using tabbed format, and each language stays idiomatic to its own community and runtime rather than being forced into the shape of the other.
+FP-variant by-example tutorials in ayokoding-www teach functional programming concepts through architecture examples. Without a normative language rule, authors may present only one language, mechanically translate idioms across languages, or present non-idiomatic code that misleads learners. This convention establishes the bidirectional idiomatic-language rule: every FP-variant by-example page presents code in F# AND Clojure using tabbed format, and each language stays idiomatic to its own community and runtime rather than being forced into the shape of the other.
 
 ## Principles Implemented/Respected
 
@@ -314,7 +314,7 @@ The following checks determine whether an FP-variant by-example page complies wi
 - [Content Quality Principles](./quality.md) — universal markdown quality standards (active voice, heading nesting, accessibility) that apply to all content including FP-variant by-example pages.
 - [Why It Matters Content Convention](./why-it-matters-content.md) — prohibits fabricated scenarios and unsourced claims in `**Why It Matters**:` sections; applies to both tabs in FP-variant examples.
 - [Programming Language Content Standard](../tutorials/programming-language-content.md) — Full Set Tutorial Package architecture; FP-variant by-example is Component 3 (code-first priority track).
-- [Programming Language Documentation Separation](../structure/programming-language-docs-separation.md) — scope boundary between ayokoding-web tutorial content and docs/explanation/ language reference material.
+- [Programming Language Documentation Separation](../structure/programming-language-docs-separation.md) — scope boundary between ayokoding-www tutorial content and docs/explanation/ language reference material.
 
 **Agents:**
 

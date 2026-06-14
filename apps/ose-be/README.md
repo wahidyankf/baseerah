@@ -1,6 +1,6 @@
 # ose-be
 
-Rust/Axum REST API backend for the OSE Application (Governance, Risk and Compliance) platform.
+F# / Giraffe / ASP.NET 10 REST API backend for the OSE Application (Governance, Risk and Compliance) platform.
 
 ## Quick Start
 
@@ -14,24 +14,21 @@ nx run ose-be:test:unit
 
 ## Commands
 
-| Command                          | Description                                            |
-| -------------------------------- | ------------------------------------------------------ |
-| `nx dev ose-be`                  | Start development server on localhost:8302             |
-| `nx build ose-be`                | Production build (`cargo build --release`)             |
-| `nx run ose-be:test:quick`       | DDD validation + unit tests + llvm-cov coverage (≥90%) |
-| `nx run ose-be:test:unit`        | Unit tests only                                        |
-| `nx run ose-be:test:integration` | Integration tests via Docker Compose (cucumber BDD)    |
-| `nx run ose-be:lint`             | Clippy with `-D warnings`                              |
-| `nx run ose-be:fmt:check`        | Rustfmt format check                                   |
-| `nx run ose-be:typecheck`        | `cargo check --all-targets`                            |
-| `nx run ose-be:specs:coverage`   | Validate BDD spec coverage via rhino-cli               |
-| `nx run ose-be:deny:check`       | License and vulnerability audit via cargo-deny         |
+| Command                          | Description                                                |
+| -------------------------------- | ---------------------------------------------------------- |
+| `nx dev ose-be`                  | Start development server on localhost:8302                 |
+| `nx build ose-be`                | Production build (`dotnet publish`)                        |
+| `nx run ose-be:test:quick`       | DDD validation + unit tests + coverage (≥90%)              |
+| `nx run ose-be:test:unit`        | Unit tests only                                            |
+| `nx run ose-be:test:integration` | Integration tests via Docker Compose (real HTTP + real DB) |
+| `nx run ose-be:lint`             | F# strict lint (`TreatWarningsAsErrors`)                   |
+| `nx run ose-be:fmt:check`        | Fantomas format check                                      |
+| `nx run ose-be:typecheck`        | `dotnet build` (type checks the project)                   |
+| `nx run ose-be:specs:coverage`   | Validate BDD spec coverage via rhino-cli                   |
 
 ## Prerequisites
 
-- Rust 1.95 (managed via `rust-toolchain.toml`)
-- `cargo-llvm-cov` (`cargo install cargo-llvm-cov`)
-- `cargo-deny` (`cargo install cargo-deny`)
+- .NET 10 SDK
 - Docker (for integration tests)
 - Volta + Node.js (for `nx` commands)
 
@@ -50,11 +47,11 @@ Copy `.env.example` to `.env` and fill in values:
 
 ## Tech Stack
 
-- **Language**: Rust (edition 2024, MSRV 1.88)
-- **Web framework**: Axum 0.8
-- **Database**: PostgreSQL via SQLx 0.8
-- **Testing**: cargo-llvm-cov (unit) + cucumber-rs (integration BDD)
-- **Linting**: Clippy pedantic + cargo-deny
+- **Language**: F# (.NET 10)
+- **Web framework**: Giraffe (ASP.NET Core)
+- **Database**: PostgreSQL
+- **Architecture**: Hexagonal ports-and-adapters
+- **Linting**: F# strict (`TreatWarningsAsErrors`) + G-Research.FSharp.Analyzers + Fantomas
 
 ## Architecture
 

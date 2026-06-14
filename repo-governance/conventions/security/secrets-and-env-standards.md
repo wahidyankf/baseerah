@@ -68,15 +68,15 @@ the `standardize-secrets-and-env` plan to match the canonical name.
 
 ### Variable classes
 
-| Class                      | Rule                                        | Example                                               |
-| -------------------------- | ------------------------------------------- | ----------------------------------------------------- |
-| App-defined value          | `SCREAMING_SNAKE`, per-app prefix           | `ORGANICLEVER_BE_PORT`, `OSE_APP_BE_OPENROUTER_MODEL` |
-| Framework-reserved         | Keep the framework's required name          | `NEXT_PUBLIC_*`, Next.js `PORT`                       |
-| Shared service connection  | Unprefixed, conventional name               | `DATABASE_URL`                                        |
-| Environment tier in a name | **Forbidden** (keys identical across tiers) | not `PROD_DATABASE_URL`                               |
+| Class                      | Rule                                        | Example                                           |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------- |
+| App-defined value          | `SCREAMING_SNAKE`, per-app prefix           | `ORGANICLEVER_BE_PORT`, `OSE_BE_OPENROUTER_MODEL` |
+| Framework-reserved         | Keep the framework's required name          | `NEXT_PUBLIC_*`, Next.js `PORT`                   |
+| Shared service connection  | Unprefixed, conventional name               | `DATABASE_URL`                                    |
+| Environment tier in a name | **Forbidden** (keys identical across tiers) | not `PROD_DATABASE_URL`                           |
 
-The **per-app prefix** is the app's Nx project name upcased with `_` separators: `ose-app-be` →
-`OSE_APP_BE_`, `ose-web` → `OSE_WEB_`.
+The **per-app prefix** is the app's Nx project name upcased with `_` separators: `ose-be` →
+`OSE_BE_`, `ose-www` → `OSE_WWW_`.
 
 ### Framework-reserved exempt names
 
@@ -89,8 +89,8 @@ The **per-app prefix** is the app's Nx project name upcased with `_` separators:
 | `HOSTNAME`      | Platform convention for Next.js dev server                                    |
 
 **Critical asymmetry**: The **Next.js dev server** reads `PORT` natively — renaming it to
-`OSE_WEB_PORT` would break `nx dev ose-web`. Rust **backend** ports are app-defined code, so they
-**do** take the prefix (`ORGANICLEVER_BE_PORT`, `OSE_APP_BE_PORT`). This is the single most
+`OSE_WWW_PORT` would break `nx dev ose-www`. Rust **backend** ports are app-defined code, so they
+**do** take the prefix (`ORGANICLEVER_BE_PORT`, `OSE_BE_PORT`). This is the single most
 error-prone point of the naming standard.
 
 ## 3. Layout Standard — One Template per App
@@ -218,7 +218,7 @@ surfaces:
     kind: app
     lang: rust
     allowlist: []
-  - root: apps/ose-web
+  - root: apps/ose-www
     kind: app
     lang: typescript
     allowlist: [PORT, HOSTNAME]

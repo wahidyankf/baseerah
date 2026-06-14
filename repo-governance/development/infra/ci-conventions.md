@@ -69,7 +69,7 @@ order:
 | 1    | Validate `.claude/` and `.opencode/` config (YAML, tools, model, skills, semantic equivalence) | Blocks commit               |
 | 2    | Validate `docker-compose` files found in staged changes                                        | Blocks commit               |
 | 3    | Run `nx affected run-pre-commit` (format checks, lightweight per-project hooks)                | Warn only — does not block  |
-| 4    | Stage `ayokoding-web` content files (auto-generated link data)                                 | N/A (staging step)          |
+| 4    | Stage `ayokoding-www` content files (auto-generated link data)                                 | N/A (staging step)          |
 | 5    | Run lint-staged (format all staged files by language)                                          | Blocks commit               |
 | 6    | Sync app `package-lock.json` files                                                             | Blocks commit if sync fails |
 | 7    | Validate docs file naming convention across staged files                                       | Blocks commit               |
@@ -173,7 +173,7 @@ app type realises each level.
 | **BE API** (`organiclever-be`)                    | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
 | **FE** (`organiclever-web`)                       | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
 | **CLI** (`*-cli`)                                 | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
-| **Content platform** (`ayokoding-web`, `ose-web`) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
+| **Content platform** (`ayokoding-www`, `ose-www`) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
 | **Library** (`rust-commons`)                      | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
 | **E2E runner** (`*-e2e`)                          | Not applicable                                        | Not applicable                                                                | Playwright — this project IS the E2E suite           |
 
@@ -200,7 +200,7 @@ unit tests.
 | Threshold | App Types                                              | Rationale                                                                                                                                                                       |
 | --------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **90%**   | BE API backends (`organiclever-be`), CLI apps, Go libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
-| **80%**   | Content platforms (`ayokoding-web`, `ose-web`)         | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
+| **80%**   | Content platforms (`ayokoding-www`, `ose-www`)         | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
 | **70%**   | FE apps (`organiclever-web`)                           | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
 
 Coverage is measured via the appropriate reporter for each language and converted to LCOV or
@@ -345,8 +345,8 @@ variant-specific inputs.
 
 ### CRON Schedule
 
-Scheduled workflows (the production `test-and-deploy-*.yml` quartet for ayokoding-web,
-ose-web, organiclever, and wahidyankf-web) run twice daily aligned to WIB (UTC+7) business hours:
+Scheduled workflows (the production `test-and-deploy-*.yml` quartet for ayokoding-www,
+ose-www, organiclever, and wahidyankf-www) run twice daily aligned to WIB (UTC+7) business hours:
 
 | WIB Time | UTC Time             | Purpose                                     |
 | -------- | -------------------- | ------------------------------------------- |
@@ -416,7 +416,7 @@ Each app pairs with dedicated E2E runner projects for end-to-end testing.
 
 | App Type                                           | E2E Pairing                                    |
 | -------------------------------------------------- | ---------------------------------------------- |
-| Backend (`organiclever-be`, `ayokoding-web`, etc.) | Dedicated `*-be-e2e` Playwright runner project |
+| Backend (`organiclever-be`, `ayokoding-www`, etc.) | Dedicated `*-be-e2e` Playwright runner project |
 | Frontend (`organiclever-web`, etc.)                | Dedicated `*-fe-e2e` Playwright runner project |
 | Content platforms                                  | Both `*-be-e2e` and `*-fe-e2e` runners         |
 

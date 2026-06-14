@@ -129,7 +129,7 @@ Sections prioritize:
 - **Intermediate**: 12-20 sections (40-75% coverage) - Production patterns
 - **Advanced**: 10-20 sections (75-95% coverage) - Expert mastery
 
-**Actual ranges observed in production** (ayokoding-web):
+**Actual ranges observed in production** (ayokoding-www):
 
 - Golang: 60 sections (20/21/19)
 - Python: 42 sections (20/12/10)
@@ -293,7 +293,7 @@ fmt.Println(value)                // => Output: 42
 
 ## Complete Section Structure (Production Reference)
 
-Below is a complete section from ayokoding-web demonstrating the recommended structure:
+Below is a complete section from ayokoding-www demonstrating the recommended structure:
 
 ### Goroutines and Concurrency (Golang Beginner)
 
@@ -439,13 +439,13 @@ print(y)                          # => Output: 84
 
 **Guideline**: 30-50 total diagrams per language (same as by-example)
 
-**Production standards** (ayokoding-web enhanced target):
+**Production standards** (ayokoding-www enhanced target):
 
 - **Beginner level**: 10-15 diagrams (50-40% of 15-25 sections)
 - **Intermediate level**: 10-15 diagrams (60-75% of 12-20 sections)
 - **Advanced level**: 10-15 diagrams (60-75% of 10-20 sections)
 
-**Current production state** (ayokoding-web, needs enhancement):
+**Current production state** (ayokoding-www, needs enhancement):
 
 - Most languages: 8-15 diagrams total (below target)
 - Dart: 46 diagrams (above target, good reference)
@@ -648,7 +648,7 @@ The **apps-ayokoding-web-general-checker** agent validates:
 - **Section structure**: Intro, narrative, code, takeaway, why it matters present
 - **Frontmatter completeness**: Title, date, weight, description, tags present
 
-**Production validation targets** (ayokoding-web needs enhancement to match by-example quality):
+**Production validation targets** (ayokoding-www needs enhancement to match by-example quality):
 
 - Current: 40-60 sections, 8-15 diagrams, minimal annotation
 - Target: 40-60 sections, 30-50 diagrams, 1.0-2.25 annotation density
@@ -702,7 +702,7 @@ When creating by-concept tutorials for multiple languages:
 
 ## Production-Validated Standards Summary
 
-This convention reflects standards that should be achieved by by-concept tutorials on ayokoding-web:
+This convention reflects standards that should be achieved by by-concept tutorials on ayokoding-www:
 
 **Section Count**: 40-60 total
 
@@ -736,7 +736,7 @@ This convention reflects standards that should be achieved by by-concept tutoria
 5. Key takeaway (1-2 sentences)
 6. Why it matters (50-100 words)
 
-**Current state** (ayokoding-web as of 2026-01-30):
+**Current state** (ayokoding-www as of 2026-01-30):
 
 - Section counts: ✅ 42-60 sections (within target)
 - Diagram counts: ❌ 8-15 diagrams (needs enhancement to 30-50)

@@ -856,7 +856,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 
 **Agent:** `docs-checker`, `docs-fixer`
 
-### Educational Content (ayokoding-web)
+### Educational Content (ayokoding-www)
 
 **Validation Focus:**
 
@@ -868,7 +868,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 
 **Agent:** `apps-ayokoding-web-facts-checker`, `apps-ayokoding-web-facts-fixer`
 
-### Platform Content (ose-web)
+### Platform Content (ose-www)
 
 **Validation Focus:**
 
@@ -904,7 +904,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 **Implementation Agents:**
 
 - `docs-checker.md` - Documentation factual accuracy validator (implements this convention for `docs/`)
-- `apps-ayokoding-web-facts-checker.md` - Educational content factual validator (implements this convention for ayokoding-web)
+- `apps-ayokoding-web-facts-checker.md` - Educational content factual validator (implements this convention for ayokoding-www)
 - `plan-checker.md` - Plan accuracy validator (implements portions of this convention)
 
 **Quality Standards:**

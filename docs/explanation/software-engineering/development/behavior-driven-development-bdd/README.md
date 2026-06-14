@@ -53,7 +53,7 @@ All acceptance criteria and stakeholder-facing specifications MUST follow the BD
 
 **What this documentation covers**: OSE Platform-specific BDD patterns, Islamic finance scenarios, Three Amigos with Shariah scholars, repository-specific feature organization, integration with DDD bounded contexts.
 
-**What this documentation does NOT cover**: BDD fundamentals, basic Gherkin syntax, generic collaboration techniques (those are in ayokoding-web).
+**What this documentation does NOT cover**: BDD fundamentals, basic Gherkin syntax, generic collaboration techniques (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 

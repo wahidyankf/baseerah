@@ -7,7 +7,8 @@ tags:
   - database
   - audit-trail
   - soft-delete
-  - sqlx
+  - dbup
+  - ef-core
   - migrations
 created: 2026-03-09
 ---
@@ -22,9 +23,9 @@ This pattern implements the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: All audit metadata is stored in dedicated, named columns with mandatory types and nullability. There is no implicit or hidden tracking; every change is visible in the schema.
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: SQLx's `sqlx::migrate!()` macro embeds and applies migrations automatically at startup. Manual service code is only required for soft-delete columns (`deleted_at`, `deleted_by`).
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: DbUp discovers and applies migration scripts automatically at startup. EF Core handles entity mapping. Manual service code is only required for soft-delete columns (`deleted_at`, `deleted_by`).
 
-- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: SQLx embeds migration files at compile time, ensuring the schema is reproducible across PostgreSQL environments (dev/staging/prod) and Dockerised test databases without divergence.
+- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: DbUp applies versioned SQL scripts in deterministic order, ensuring the schema is reproducible across PostgreSQL environments (dev/staging/prod) and Dockerised test databases without divergence.
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: This pattern documents the required columns, types, and implementation approach before any table is created, ensuring teams follow a consistent and verifiable standard.
 
@@ -87,8 +88,8 @@ Each backend uses the idiomatic migration tool for its language and framework ec
 
 | App             | Migration Tool | License |
 | --------------- | -------------- | ------- |
-| organiclever-be | SQLx migrate   | MIT     |
-| ose-app-be      | SQLx migrate   | MIT     |
+| organiclever-be | DbUp           | MIT     |
+| ose-be          | DbUp           | MIT     |
 
 > For polyglot migration tool patterns (Liquibase, Ecto, Alembic, goose, Flyway, EF Core, Migratus, @effect/sql, SQLx, Drizzle), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -106,139 +107,147 @@ Regardless of the tool used, migrations must satisfy:
 - `deleted_at` and `deleted_by` are nullable with no default — `NULL` is the active-row state
 - Each migration is reversible (rollback support where the tool provides it)
 
-### Rust / SQLx: `sqlx::migrate!`
+### F# / DbUp: versioned SQL scripts
 
-Use plain `.sql` files under `migrations/`. SQLx embeds them at compile time via the `sqlx::migrate!()` macro and applies them in filename order at startup.
+Use plain `.sql` files under `Migrations/`. DbUp discovers and applies them in filename order at startup — no compilation step required.
 
 The following example shows the `members` table as the reference implementation. Apply the same pattern to every new table.
 
 ```sql
--- migrations/20240101000001_create_members.sql
+-- Migrations/20240101000001_CreateMembers.sql
 CREATE TABLE members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     -- audit columns
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    created_by UUID NOT NULL,
+    created_by VARCHAR(255) NOT NULL DEFAULT 'system',
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_by UUID NOT NULL,
+    updated_by VARCHAR(255) NOT NULL DEFAULT 'system',
     deleted_at TIMESTAMPTZ,
-    deleted_by UUID
+    deleted_by VARCHAR(255)
 );
 ```
 
 Key points:
 
-- Migration files are named `{timestamp}_{description}.sql` so SQLx applies them in deterministic order.
+- Migration files are named `{timestamp}_{Description}.sql` so DbUp applies them in deterministic order.
 - `DEFAULT now()` provides a safe fallback for raw SQL inserts (migrations, seeds, background jobs).
-- `created_by` and `updated_by` are `UUID` referencing the actor; use `TEXT NOT NULL DEFAULT 'system'` when the actor is a string identifier rather than a UUID.
+- `created_by` and `updated_by` default to `'system'` so background jobs produce a traceable actor without caller intervention.
 - `deleted_at` and `deleted_by` are nullable with no default — `NULL` is the active-row state.
-- SQLx does not have a built-in rollback concept for embedded migrations; provide a separate `_down.sql` file or manage rollbacks manually if required.
+- DbUp does not support rollback scripts; design migrations to be additive and forward-only.
 
-## Rust Entity Implementation
+## F# Entity Implementation
 
-### Struct Definition
+### EF Core Entity Type
 
-Derive `sqlx::FromRow` on every domain struct that maps to an audited table. Use `time::OffsetDateTime` for timestamp columns and `uuid::Uuid` for UUID columns.
+Map every audited table to an F# record type and configure audit columns explicitly via `IEntityTypeConfiguration`.
 
-```rust
-// src/domain/member.rs
-use sqlx::FromRow;
-use time::OffsetDateTime;
-use uuid::Uuid;
+```fsharp
+// Contexts/Members/Infrastructure/MemberEntity.fs
+module Contexts.Members.Infrastructure.MemberEntity
 
-#[derive(Debug, FromRow)]
-pub struct Member {
-    pub id: Uuid,
-    pub name: String,
-    // audit columns
-    pub created_at: OffsetDateTime,
-    pub created_by: Uuid,
-    pub updated_at: OffsetDateTime,
-    pub updated_by: Uuid,
-    pub deleted_at: Option<OffsetDateTime>,
-    pub deleted_by: Option<Uuid>,
-}
+open System
+open Microsoft.EntityFrameworkCore
+open Microsoft.EntityFrameworkCore.Metadata.Builders
+
+[<CLIMutable>]
+type MemberEntity =
+    { Id: Guid
+      Name: string
+      CreatedAt: DateTimeOffset
+      CreatedBy: string
+      UpdatedAt: DateTimeOffset
+      UpdatedBy: string
+      DeletedAt: DateTimeOffset option
+      DeletedBy: string option }
+
+type MemberEntityConfiguration() =
+    interface IEntityTypeConfiguration<MemberEntity> with
+        member _.Configure(builder: EntityTypeBuilder<MemberEntity>) =
+            builder.ToTable("members") |> ignore
+            builder.HasKey(fun m -> m.Id :> obj) |> ignore
+            builder.Property(fun m -> m.CreatedBy).HasMaxLength(255).HasDefaultValue("system") |> ignore
+            builder.Property(fun m -> m.UpdatedBy).HasMaxLength(255).HasDefaultValue("system") |> ignore
 ```
 
 ### Run Migrations at Startup
 
-Call `sqlx::migrate!()` in `main` (or in the application builder) before the HTTP server starts accepting requests.
+Call DbUp in `Program.fs` before the HTTP server starts accepting requests.
 
-```rust
-// src/main.rs (excerpt)
-let pool = sqlx::PgPool::connect(&database_url).await?;
-sqlx::migrate!("./migrations").run(&pool).await?;
+```fsharp
+// Program.fs (excerpt)
+open DbUp
+
+let upgrader =
+    DeployChanges
+        .To
+        .PostgresqlDatabase(connectionString)
+        .WithScriptsFromFileSystem("Migrations")
+        .LogToConsole()
+        .Build()
+
+let result = upgrader.PerformUpgrade()
+if not result.Successful then
+    failwithf "DbUp migration failed: %s" (result.Error.Message)
 ```
 
 ### Soft-Delete in the Repository Layer
 
 `deleted_at` and `deleted_by` are set explicitly in the repository layer. Never issue a `DELETE` statement on audited tables; always use a soft-delete `UPDATE`.
 
-```rust
-// src/repository/member_repository.rs (excerpt)
-pub async fn soft_delete_member(
-    pool: &PgPool,
-    id: Uuid,
-    actor: Uuid,
-) -> Result<(), sqlx::Error> {
-    sqlx::query!(
-        r#"
-        UPDATE members
-        SET deleted_at = now(),
-            deleted_by = $1
-        WHERE id = $2
-          AND deleted_at IS NULL
-        "#,
-        actor,
-        id,
-    )
-    .execute(pool)
-    .await?;
-    Ok(())
-}
+```fsharp
+// Contexts/Members/Infrastructure/EfCoreMemberRepository.fs (excerpt)
+member _.SoftDelete(id: Guid, actor: string) =
+    task {
+        let! member_ =
+            dbContext.Members
+                .Where(fun m -> m.Id = id && not m.DeletedAt.HasValue)
+                .FirstOrDefaultAsync()
+        match box member_ with
+        | null -> return Error "not found"
+        | _ ->
+            dbContext.Members.Entry(member_).CurrentValues["DeletedAt"] <- DateTimeOffset.UtcNow
+            dbContext.Members.Entry(member_).CurrentValues["DeletedBy"] <- actor
+            let! _ = dbContext.SaveChangesAsync()
+            return Ok ()
+    }
 ```
 
 ## Soft-Delete Query Discipline
 
-All queries against audited tables MUST include `WHERE deleted_at IS NULL` unless the endpoint is an explicit admin or audit endpoint.
+All queries against audited tables MUST filter `DeletedAt = null` unless the endpoint is an explicit admin or audit endpoint.
 
 **PASS: active-row query — soft-deleted rows excluded**:
 
-```rust
-sqlx::query_as!(
-    Member,
-    "SELECT * FROM members WHERE deleted_at IS NULL"
-)
-.fetch_all(pool)
-.await?
+```fsharp
+dbContext.Members
+    .Where(fun m -> not m.DeletedAt.HasValue)
+    .ToListAsync()
 ```
 
-**FAIL: never omit the `deleted_at` filter without explicit justification**:
+**FAIL: never omit the `DeletedAt` filter without explicit justification**:
 
-```rust
+```fsharp
 // Returns soft-deleted rows — only acceptable for admin/audit endpoints
-sqlx::query_as!(Member, "SELECT * FROM members")
-    .fetch_all(pool)
-    .await?
+dbContext.Members.ToListAsync()
 ```
 
-When an admin or audit endpoint legitimately needs soft-deleted rows, name the function clearly (e.g., `fetch_all_including_deleted`) and restrict the route to admin roles.
+When an admin or audit endpoint legitimately needs soft-deleted rows, name the function clearly (e.g., `fetchAllIncludingDeleted`) and restrict the route to admin roles.
 
-## Rust Nullability Convention
+## F# Nullability Convention
 
-Rust's type system encodes nullability directly. The audit field mapping is:
+F# option types encode nullability directly. The audit field mapping is:
 
-| Column       | Rust type                | Rationale                          |
-| ------------ | ------------------------ | ---------------------------------- |
-| `created_at` | `OffsetDateTime`         | Non-null; database `DEFAULT now()` |
-| `created_by` | `Uuid`                   | Non-null; caller must supply actor |
-| `updated_at` | `OffsetDateTime`         | Non-null; database `DEFAULT now()` |
-| `updated_by` | `Uuid`                   | Non-null; caller must supply actor |
-| `deleted_at` | `Option<OffsetDateTime>` | `None` means active row            |
-| `deleted_by` | `Option<Uuid>`           | `None` means active row            |
+| Column       | F# type                 | Rationale                          |
+| ------------ | ----------------------- | ---------------------------------- |
+| `created_at` | `DateTimeOffset`        | Non-null; database `DEFAULT now()` |
+| `created_by` | `string`                | Non-null; caller must supply actor |
+| `updated_at` | `DateTimeOffset`        | Non-null; database `DEFAULT now()` |
+| `updated_by` | `string`                | Non-null; caller must supply actor |
+| `deleted_at` | `DateTimeOffset option` | `None` means active row            |
+| `deleted_by` | `string option`         | `None` means active row            |
 
-`Option<T>` maps directly to nullable SQL columns via SQLx's `FromRow` derive.
+EF Core maps `option` fields to nullable SQL columns via the `HasConversion` / nullable column configuration.
 
 ## Compliance Checklist
 
@@ -250,30 +259,31 @@ Use this checklist when adding a new table or reviewing an existing one.
 - [ ] `created_at` and `updated_at` are timezone-aware timestamps, NOT NULL, defaulting to the current time
 - [ ] `created_by` and `updated_by` are string columns (max 255 chars), NOT NULL, defaulting to `'system'`
 - [ ] `deleted_at` and `deleted_by` are nullable with no default
-- [ ] Migration is reversible (rollback or down migration provided where the tool supports it)
+- [ ] Migration is additive and forward-only (DbUp does not support rollback scripts)
 
-**Rust / SQLx additional checks:**
+**F# / DbUp additional checks:**
 
-- [ ] Migration file name follows `{timestamp}_{description}.sql` format
-- [ ] `sqlx::migrate!("./migrations").run(&pool).await?` is called before the server starts accepting requests
+- [ ] Migration file name follows `{timestamp}_{Description}.sql` format
+- [ ] DbUp `PerformUpgrade()` is called in `Program.fs` before the server starts accepting requests
+- [ ] DbUp result is checked and startup aborts on failure
 
-### Struct (Rust / SQLx)
+### Entity Type (F# / EF Core)
 
-- [ ] Struct derives `sqlx::FromRow`
-- [ ] `created_at` and `updated_at` fields use `time::OffsetDateTime` (non-`Option`)
-- [ ] `created_by` and `updated_by` fields use `Uuid` (non-`Option`)
-- [ ] `deleted_at` and `deleted_by` fields use `Option<OffsetDateTime>` and `Option<Uuid>` respectively
+- [ ] Entity record type is `[<CLIMutable>]` and mapped via `IEntityTypeConfiguration`
+- [ ] `CreatedAt` and `UpdatedAt` fields use `DateTimeOffset` (non-option)
+- [ ] `CreatedBy` and `UpdatedBy` fields use `string` (non-option)
+- [ ] `DeletedAt` and `DeletedBy` fields use `DateTimeOffset option` and `string option` respectively
 
-### Repository Layer (Rust / SQLx)
+### Repository Layer (F# / EF Core)
 
 - [ ] No `DELETE` statement issued against audited tables
-- [ ] Soft-delete issues an `UPDATE` setting both `deleted_at = now()` and `deleted_by = $actor`
-- [ ] Soft-delete query includes `AND deleted_at IS NULL` to guard against double-deletes
+- [ ] Soft-delete sets both `DeletedAt = DateTimeOffset.UtcNow` and `DeletedBy = actor`
+- [ ] Soft-delete filters `not m.DeletedAt.HasValue` to guard against double-deletes
 
 ### Queries
 
-- [ ] All `SELECT` queries include `WHERE deleted_at IS NULL` unless the endpoint is explicitly an admin/audit endpoint
-- [ ] Functions that intentionally return soft-deleted rows are named clearly (e.g., `fetch_all_including_deleted`) and the route is restricted to admin roles
+- [ ] All EF Core queries filter `not m.DeletedAt.HasValue` unless the endpoint is explicitly an admin/audit endpoint
+- [ ] Functions that intentionally return soft-deleted rows are named clearly (e.g., `fetchAllIncludingDeleted`) and the route is restricted to admin roles
 
 ## Related Documentation
 
@@ -288,18 +298,15 @@ Use this checklist when adding a new table or reviewing an existing one.
 
 - [Auth Register/Login Tech Docs](../../../plans/done/2026-04-22__auth-register-login/tech-docs.md) - Reference implementation of the `users` table applying this pattern
 
-**External (Rust / SQLx):**
+**External (F# / DbUp / EF Core):**
 
-- [SQLx `migrate!` macro](https://docs.rs/sqlx/latest/sqlx/macro.migrate.html)
-- [SQLx `Migrate` trait](https://docs.rs/sqlx/latest/sqlx/migrate/trait.Migrate.html)
-- [time crate `OffsetDateTime`](https://docs.rs/time/latest/time/struct.OffsetDateTime.html)
-- [uuid crate](https://docs.rs/uuid/latest/uuid/)
+- [DbUp migrations (F#/.NET)](https://dbup.readthedocs.io/)
+- [EF Core — `IEntityTypeConfiguration`](https://learn.microsoft.com/en-us/ef/core/modeling/)
+- [EF Core Migrations (C#/.NET)](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
 
 **External (Other Active Ecosystems):**
 
 - [goose migrations (Go)](https://github.com/pressly/goose)
-- [DbUp migrations (F#/.NET)](https://dbup.readthedocs.io/)
-- [EF Core Migrations (C#/.NET)](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
 - [@effect/sql Migrator (TypeScript)](https://effect.website/docs/sql/sql-migrator)
 - [Drizzle migrations (TypeScript)](https://orm.drizzle.team/docs/migrations)
 

@@ -117,16 +117,16 @@ an explicitly-blessed unprefixed shared name, not an oversight.
 
 **Deviation**: None.
 
-### 6. Next.js `PORT` exempt vs Rust backend `PORT` prefixed
+### 6. Next.js `PORT` exempt vs backend `PORT` prefixed
 
-**Decision**: In Next.js webs (`ose-web`, `ayokoding-web`, etc.), `PORT` stays unprefixed — it is a
-framework-reserved name the Next.js dev server reads natively. In Rust backends (`organiclever-be`,
-`ose-app-be`), the port var takes the full prefix (`ORGANICLEVER_BE_PORT`, `OSE_APP_BE_PORT`).
+**Decision**: In Next.js webs (`ose-www`, `ayokoding-www`, etc.), `PORT` stays unprefixed — it is a
+framework-reserved name the Next.js dev server reads natively. In F# backends (`organiclever-be`,
+`ose-be`), the port var takes the full prefix (`ORGANICLEVER_BE_PORT`, `OSE_BE_PORT`).
 
 **Why**: This asymmetry follows from who owns the binding. The Next.js dev server reads `PORT` from
-the platform (PaaS or OS) with no indirection through app code — renaming it to `OSE_WEB_PORT` would
-break `nx dev ose-web`. Axum backends bind whatever value _our own code_ reads from the environment,
-so the backend port is app-defined and takes the prefix.
+the platform (PaaS or OS) with no indirection through app code — renaming it to `OSE_WWW_PORT` would
+break `nx dev ose-www`. ASP.NET/Giraffe backends bind whatever value _our own code_ reads from the
+environment, so the backend port is app-defined and takes the prefix.
 
 **Deviation from ose-infra**: `ose-infra` has no Next.js applications, so the web exemption is
 structural rather than a policy divergence — the underlying rule (framework-reserved names stay
@@ -138,7 +138,7 @@ exemption. No deviation.
 ## Summary
 
 All four policy decisions are aligned across the three sibling repos after this plan. The only
-structural delta is Decision 6 (Next.js `PORT` vs Rust `PORT`) — a necessary consequence of the
+structural delta is Decision 6 (Next.js `PORT` vs backend `PORT`) — a necessary consequence of the
 mixed web/backend topology in ose-public and ose-primer that does not exist in ose-infra.
 
 See: [`secrets-and-env-standards.md`](../../repo-governance/conventions/security/secrets-and-env-standards.md)

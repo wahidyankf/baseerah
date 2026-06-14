@@ -89,7 +89,7 @@ graph LR
 **Key Relationships:**
 
 - **Developers & Authors**: Interact with GitHub (source of truth) to build applications and create content
-- **Learners**: Access educational content via Vercel-hosted sites (ayokoding-web, ose-web)
+- **Learners**: Access educational content via Vercel-hosted sites (ayokoding-www, ose-www)
 - **GitHub**: Central hub for CI/CD automation and quality gates
 - **Vercel**: Automated deployment platform for Next.js web applications
 

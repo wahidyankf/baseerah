@@ -40,8 +40,8 @@ This document defines **authoritative standards** for visualizing Nx monorepo st
 
 ```
 apps/
-├── ose-web/        # Next.js 16 fullstack platform
-├── ayokoding-web/          # Next.js 16 fullstack platform
+├── ose-www/        # Next.js 16 fullstack platform
+├── ayokoding-www/          # Next.js 16 fullstack platform
 ├── ayokoding-cli/          # Rust CLI tool
 └── rhino-cli/              # Rust CLI tool
 ```
@@ -84,7 +84,7 @@ graph TD
 
 **Example**:
 
-If `ayokoding-cli` has an Nx dependency on `ayokoding-web` (builds it), show this as a relationship in the container diagram.
+If `ayokoding-cli` has an Nx dependency on `ayokoding-www` (builds it), show this as a relationship in the container diagram.
 
 ## Container Naming for Nx Apps
 

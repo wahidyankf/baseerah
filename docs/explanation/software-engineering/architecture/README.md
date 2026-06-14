@@ -81,13 +81,13 @@ DDD provides two complementary pattern sets: strategic design for understanding 
 
 **OSE Platform port, adapter, composition root, and testing conventions**
 
-Hexagonal Architecture (Ports and Adapters) isolates the domain core from all infrastructure concerns. OSE Platform conventions govern port naming and ownership, adapter package placement and forbidden imports, composition root wiring for Rust/Axum, and the port-contract-test pattern that maps to Nx `test:unit` / `test:integration` targets.
+Hexagonal Architecture (Ports and Adapters) isolates the domain core from all infrastructure concerns. OSE Platform conventions govern port naming and ownership, adapter package placement and forbidden imports, composition root wiring for F#/Giraffe, and the port-contract-test pattern that maps to Nx `test:unit` / `test:integration` targets.
 
 **Use Hexagonal Architecture conventions when you are:**
 
 - Designing a new port interface for an OrganicLever bounded context
 - Implementing a database, messaging, or HTTP adapter
-- Wiring adapters in a Rust composition root
+- Wiring adapters in an F# composition root
 - Writing port contract tests or setting up an in-memory adapter for `test:unit`
 
 ### 🔄 [Finite State Machine (FSM)](./finite-state-machine-fsm/README.md)
@@ -107,7 +107,7 @@ Finite State Machines provide a formal model for managing entity lifecycle trans
 
 **OSE Platform conventions for combining DDD with Hexagonal Architecture**
 
-Strategic DDD (bounded contexts, context maps) and tactical DDD (aggregates, value objects, domain events) integrate cleanly with Hexagonal port-and-adapter structure. OSE Platform conventions govern bounded-context-to-port mapping, aggregate-port boundaries, cross-context integration via domain events and ACLs, and module organization for Rust/Axum backends.
+Strategic DDD (bounded contexts, context maps) and tactical DDD (aggregates, value objects, domain events) integrate cleanly with Hexagonal port-and-adapter structure. OSE Platform conventions govern bounded-context-to-port mapping, aggregate-port boundaries, cross-context integration via domain events and ACLs, and module organization for F#/Giraffe backends.
 
 **Use these conventions when you are:**
 

@@ -162,12 +162,12 @@ Use this table when uncertain whether a change requires a spec update:
 
 When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, both the corresponding Gherkin scenarios and the C4 component diagram must be updated to reflect the new behavior and component.
 
-### ayokoding-web specs
+### ayokoding-www specs
 
 `specs/apps/ayokoding/` maintains C4 diagrams and Gherkin scenarios for the Next.js 16 fullstack platform:
 
 - `specs/apps/ayokoding/system-context/`, `containers/`, `components/` — C4 diagrams kept current with the Next.js App Router structure and tRPC routers
-- `specs/apps/ayokoding/behavior/organiclever-be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-web-be-e2e`
+- `specs/apps/ayokoding/behavior/organiclever-be/gherkin/` — Scenarios for tRPC procedures consumed by `ayokoding-www-be-e2e`
 
 When a new tRPC router is added to `apps/ayokoding-www/`, a new component entry appears in the C4 component diagram and new scenarios are added to the Gherkin directory.
 

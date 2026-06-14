@@ -711,7 +711,7 @@ Excellent development workflow:
 Feature-based organization aligned with Next.js App Router:
 
 ```
-apps/ose-web-nextjs/
+apps/my-nextjs-app/
 ├── src/
 │   ├── app/                        # App Router (file-system routing)
 │   │   ├── (marketing)/           # Route group (doesn't affect URL)

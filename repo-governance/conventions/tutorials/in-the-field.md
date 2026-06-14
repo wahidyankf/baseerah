@@ -133,7 +133,7 @@ In-the-field prioritizes:
 
 **Target range**: 20-40 production implementation guides per language or framework
 
-**Actual production counts** (ayokoding-web Java in-the-field):
+**Actual production counts** (ayokoding-www Java in-the-field):
 
 - Current: 31 guides (authentication, security, TDD, BDD, build tools, CI/CD, Docker/K8s, SQL, NoSQL, messaging, caching, performance, logging, DDD, DI, web services, API integration, configuration, concurrency, reactive, resilience patterns, cloud-native patterns, design principles, best practices, anti-patterns, finite state machines, functional programming, type safety, CLI apps, linting/formatting)
 
@@ -2294,7 +2294,7 @@ When creating in-the-field tutorials for multiple languages:
 
 ## Production-Validated Standards Summary
 
-This convention reflects standards validated by production in-the-field content on ayokoding-web, enhanced with comprehensive examples matching swe-by-example.md quality standards:
+This convention reflects standards validated by production in-the-field content on ayokoding-www, enhanced with comprehensive examples matching swe-by-example.md quality standards:
 
 **Guide Count**: 20-40 production guides (currently 31 for Java)
 

@@ -99,7 +99,7 @@ Enforce these soft limits; exceeding them is a governance finding:
 - CLI tools using emoji for terminal output formatting (e.g., `apps/rhino-cli/src/`,
   `apps/rhino-cli/internal/`, `apps/rhino-cli/cmd/` — status indicators ✓ ✗ ✅ ❌)
 - Web UI component code where emoji is part of rendered UI content (e.g., React TSX components
-  in `apps/*/src/` for ayokoding-web, organiclever-web, ose-web, and `libs/web-ui/src/`)
+  in `apps/*/src/` for ayokoding-www, organiclever-web, ose-www, and `libs/web-ui/src/`)
 - Third-party agent skill scripts outside repo-governance scope (e.g.,
   `.agents/skills/caveman-compress/`)
 

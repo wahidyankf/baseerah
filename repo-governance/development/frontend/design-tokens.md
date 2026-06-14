@@ -106,7 +106,7 @@ Brand tokens express each app's visual identity. Apps define these in their own 
 **App-specific extensions**
 
 - `organiclever-web`: chart tokens `--chart-1` through `--chart-5`
-- `ayokoding-web`: sidebar tokens `--sidebar-background`, `--sidebar-foreground`, `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`, `--sidebar-accent-foreground`, `--sidebar-border`, `--sidebar-ring`
+- `ayokoding-www`: sidebar tokens `--sidebar-background`, `--sidebar-foreground`, `--sidebar-primary`, `--sidebar-primary-foreground`, `--sidebar-accent`, `--sidebar-accent-foreground`, `--sidebar-border`, `--sidebar-ring`
 
 ## Naming Convention
 
@@ -149,7 +149,7 @@ The monorepo currently has two formatting approaches in production apps.
 
 The bare variable holds only the HSL components (no `hsl()` wrapper), and the `@theme` alias wraps it.
 
-**Direct value** (`ayokoding-web`):
+**Direct value** (`ayokoding-www`):
 
 ```css
 /* globals.css */

@@ -94,7 +94,7 @@ See [Fixer Confidence Levels Convention](./fixer-confidence-levels.md) for compl
 - Agent `name` field doesn't match filename (breaks agent discovery)
 - Broken internal link to non-existent file in documentation
 
-**Next.js Content (ayokoding-web/ose-web)**:
+**Next.js Content (ayokoding-www/ose-www)**:
 
 - Missing required `title` field (content validation fails)
 - Invalid frontmatter syntax (YAML parsing error)
@@ -653,7 +653,7 @@ Update link to current documentation URL or find alternative resource
 - Consider alternative organization
 - Potential future sections
 
-### Next.js Content - ayokoding-web (general-checker, facts-checker, link-checker)
+### Next.js Content - ayokoding-www (general-checker, facts-checker, link-checker)
 
 **CRITICAL**:
 
@@ -683,7 +683,7 @@ Update link to current documentation URL or find alternative resource
 - Potential cross-linking opportunity
 - Suggest mentioning alternative approach
 
-### Next.js Content - ose-web (content-checker)
+### Next.js Content - ose-www (content-checker)
 
 **CRITICAL**:
 

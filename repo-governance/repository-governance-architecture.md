@@ -235,7 +235,7 @@ Development: AI Agents Convention — agent colors use accessible palette
 **Scope**:
 
 - **docs/** directory (all documentation)
-- **apps/** (ayokoding-web, ose-web content)
+- **apps/** (ayokoding-www, ose-www content)
 - **plans/** directory (project planning)
 - **README files** (repository root and project READMEs)
 
@@ -783,7 +783,7 @@ As the repository grows, additional layers might be considered:
 
 **As project matures**:
 
-- **New domains**: Additional Islamic finance domain patterns as ose-app-be grows
+- **New domains**: Additional Islamic finance domain patterns as ose-be grows
 - **Enhanced validation**: More sophisticated checker/fixer agents
 - **Performance conventions**: Optimization and scalability standards
 

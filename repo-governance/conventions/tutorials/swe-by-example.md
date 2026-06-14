@@ -129,7 +129,7 @@ Examples prioritize:
 - **Intermediate**: 25-30 examples (40-75% coverage) - Production patterns
 - **Advanced**: 25-28 examples (75-95% coverage) - Expert mastery
 
-**Actual ranges observed in production** (ayokoding-web):
+**Actual ranges observed in production** (ayokoding-www):
 
 - Golang: 85 examples (30/30/25)
 - Python: 80 examples (27/27/26)
@@ -614,7 +614,7 @@ result := transform(y)           // => result is "20-transformed" (string)
 fmt.Println(result)              // => Output: 20-transformed
 ```
 
-**Production example from ayokoding-web** (Golang Example 1):
+**Production example from ayokoding-www** (Golang Example 1):
 
 ```go
 package main // => Declares this is the main executable package
@@ -697,13 +697,13 @@ func main() { // => Entry point - every executable needs main() in main package
 - **Contextual**: Specific to the concept, NOT generic statements
 - **Production-focused**: Reference real usage, companies, or measurable impacts
 
-**Production example from ayokoding-web** (Golang Example 1, 62 words):
+**Production example from ayokoding-www** (Golang Example 1, 62 words):
 
 ```markdown
 **Why It Matters**: Single-binary deployment makes Go ideal for containers and microservices, where `go build` produces a statically-linked executable with no runtime dependencies unlike Java (requires JVM) or Python (requires interpreter and packages). Docker containers for Go services are 5-10MB (vs 200MB+ for equivalent Java apps), enabling faster deployments, reduced attack surface, and simplified distribution as a single file that runs anywhere.
 ```
 
-**Production example from ayokoding-web** (Rust Example 2, 78 words):
+**Production example from ayokoding-www** (Rust Example 2, 78 words):
 
 ```markdown
 **Why It Matters**: Microsoft research shows that 70% of security vulnerabilities stem from memory safety issues, many caused by unexpected mutations in concurrent contexts. Rust's immutable-by-default design eliminates data races at compile time—bugs that cost companies millions in C++ codebases—while enabling aggressive compiler optimizations since immutable values can be safely cached and parallelized without locks.
@@ -713,7 +713,7 @@ func main() { // => Entry point - every executable needs main() in main package
 
 ## Complete Example Structure (Production Reference)
 
-Below is a complete example from ayokoding-web demonstrating all five parts in practice:
+Below is a complete example from ayokoding-www demonstrating all five parts in practice:
 
 ### Example 1: Hello World and Go Compilation (Golang)
 
@@ -928,7 +928,7 @@ go processRequest(req)  // => Goroutine spawned (runs concurrently with minimal 
 - Keep code annotations focused on state tracking (`// =>` notation)
 - Reserve extensive explanations for "Brief Explanation" and "Why It Matters" sections
 
-**Note**: This annotation density standard (1-2.25 per example) is the general ayokoding-web code annotation standard applied to all content. By-example tutorials follow the same standard as other tutorial types, with additional requirements for self-containment and five-part format.
+**Note**: This annotation density standard (1-2.25 per example) is the general ayokoding-www code annotation standard applied to all content. By-example tutorials follow the same standard as other tutorial types, with additional requirements for self-containment and five-part format.
 
 ### Output Annotation Pattern
 
@@ -1038,7 +1038,7 @@ fmt.Println(value)               // => Output: 42
 
 **Guideline**: 30-50% of examples should include diagrams (30-50 total diagrams per language)
 
-**Actual diagram counts in production** (ayokoding-web):
+**Actual diagram counts in production** (ayokoding-www):
 
 - **Beginner level**: 7-11 diagrams (25-37% of 27-30 examples)
 - **Intermediate level**: 8-17 diagrams (30-60% of 20-30 examples)
@@ -1300,7 +1300,7 @@ follows this exact pattern and can be used as a reference implementation.
 - **Intermediate**: Examples 31-60 (40-75% coverage)
 - **Advanced**: Examples 61-85 (75-95% coverage)
 
-**Actual distributions in production** (ayokoding-web):
+**Actual distributions in production** (ayokoding-www):
 
 - Golang: 1-30 (beginner), 31-60 (intermediate), 61-85 (advanced)
 - Python: 1-27 (beginner), 28-54 (intermediate), 55-80 (advanced)
@@ -1407,7 +1407,7 @@ The **apps-ayokoding-web-by-example-checker** agent validates:
 - **Five-part structure**: Brief explanation, diagram (when appropriate), annotated code, key takeaway, why it matters
 - **Frontmatter completeness**: Title, date, weight, description, tags present
 
-**Production validation results** (ayokoding-web languages):
+**Production validation results** (ayokoding-www languages):
 
 - Golang: ✅ 85 examples, 33 diagrams, 2.1 avg density
 - Python: ✅ 80 examples, 34 diagrams, 2.0 avg density
@@ -1465,7 +1465,7 @@ When creating by-example tutorials for multiple languages:
 
 ## Production-Validated Standards Summary
 
-This convention reflects standards validated by **7 production languages** (75-85 examples each) on ayokoding-web:
+This convention reflects standards validated by **7 production languages** (75-85 examples each) on ayokoding-www:
 
 **Example Count**: 75-85 total (refined from initial 75-85 target)
 

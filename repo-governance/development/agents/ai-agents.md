@@ -314,7 +314,7 @@ Agents can reference multiple agent skills that work together:
 ```yaml
 ---
 name: apps-ayokoding-web-general-maker
-description: Expert at creating general Next.js content for ayokoding-web. Use when creating or updating general content pages for the AyoKoding website.
+description: Expert at creating general Next.js content for ayokoding-www. Use when creating or updating general content pages for the AyoKoding website.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 color: blue
@@ -445,7 +445,7 @@ After frontmatter, agents should follow this structure:
 
 **Required Sections:**
 
-1. **Title (H1)**: Must follow pattern `# [Name] Agent`. Exception: App-scoped agents may use `# [Role] for [app-name]` (e.g., `# Content Checker for ose-web`)
+1. **Title (H1)**: Must follow pattern `# [Name] Agent`. Exception: App-scoped agents may use `# [Role] for [app-name]` (e.g., `# Content Checker for ose-www`)
 2. **Core Expertise/Responsibility (H2)**: Clear purpose statement
 3. **Reference Documentation (H2)**: Links to relevant conventions and guidance
 
@@ -500,7 +500,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 **When to use scope prefixes:**
 
 1. **`apps-[app-name]-`** - Agent works ONLY with a specific app
-   - Content creation for Next.js sites (ayokoding-web, ose-web)
+   - Content creation for Next.js sites (ayokoding-www, ose-www)
    - App-specific validation, deployment, structure management
    - Examples: `apps-ayokoding-web-general-maker`, `apps-ose-web-deployer`
 
@@ -522,7 +522,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 
 **Scope naming rules:**
 
-- App/lib names must match directory names exactly (e.g., `ayokoding-web` matches `apps/ayokoding-www/`)
+- App/lib names must match directory names exactly (e.g., `ayokoding-www` matches `apps/ayokoding-www/`)
 - Use kebab-case throughout (no camelCase, PascalCase, or snake_case)
 - Hyphens `-` separate all parts of the agent name (consistent kebab-case throughout)
 - Agent name after scope uses standard kebab-case patterns
@@ -552,7 +552,7 @@ Example - App-scoped agent:
 
 ```yaml
 name: apps-ayokoding-web-general-maker # Includes scope prefix
-description: Expert at creating general Next.js content for ayokoding-web. Use when creating or updating general content pages for the AyoKoding website. # Detailed usage guidance
+description: Expert at creating general Next.js content for ayokoding-www. Use when creating or updating general content pages for the AyoKoding website. # Detailed usage guidance
 ```
 
 ## Tool Access Patterns
@@ -809,7 +809,7 @@ This role-based categorization was chosen because it:
 **Link Checker Agents:**
 
 - **docs-link-checker** - Validates documentation links + manages external-links-status.yaml cache
-- **apps-ayokoding-web-link-checker** - Validates ayokoding-web content links + manages ayokoding-links-status.yaml cache
+- **apps-ayokoding-web-link-checker** - Validates ayokoding-www content links + manages ayokoding-links-status.yaml cache
 
 **Why green (not purple)?**
 
@@ -1339,9 +1339,9 @@ Agent files are organized into **three complexity tiers** with corresponding siz
 - docs-tutorial-checker (tutorial quality validation)
 - docs-file-manager (file organization, relative path calculation, link updates)
 - agent-maker (agent creation automation)
-- apps-ayokoding-web-general-maker (general Next.js content creation for ayokoding-web)
+- apps-ayokoding-web-general-maker (general Next.js content creation for ayokoding-www)
 - apps-ayokoding-web-by-example-maker (by-example tutorial creation)
-- apps-ose-web-content-maker (Next.js content creation for ose-web)
+- apps-ose-web-content-maker (Next.js content creation for ose-www)
 
 **When to use this tier**:
 
@@ -2488,8 +2488,8 @@ When simplifying an agent:
 - `repo-generating-validation-reports` - Report generation, UUID chains, timestamps
 - `repo-assessing-criticality-confidence` - Criticality levels, confidence assessment
 - `repo-applying-maker-checker-fixer` - Three-stage workflow, mode handling
-- `apps-ayokoding-web-developing-content` - Next.js 16 content patterns for ayokoding-web, bilingual content strategy
-- `apps-ose-web-developing-content` - Next.js 16 content patterns for ose-web
+- `apps-ayokoding-web-developing-content` - Next.js 16 content patterns for ayokoding-www, bilingual content strategy
+- `apps-ose-web-developing-content` - Next.js 16 content patterns for ose-www
 - `docs-creating-by-example-tutorials` - Annotation standards, five-part structure
 - `docs-creating-accessible-diagrams` - Color palettes, accessibility
 - `docs-applying-content-quality` - Markdown quality standards

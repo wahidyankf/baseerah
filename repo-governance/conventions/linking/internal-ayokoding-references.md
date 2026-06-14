@@ -8,7 +8,7 @@ tags:
   - cross-reference
   - relative-paths
   - portability
-  - ayokoding-web
+  - ayokoding-www
 created: 2026-02-07
 ---
 
@@ -20,7 +20,7 @@ This document defines standards for linking from documentation in `docs/` to edu
 
 This convention implements the following core principles:
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Uses explicit relative file paths instead of implicit external URLs. When a docs/ file references ayokoding-web content, the relative path `../../../../../apps/ayokoding-www/content/en/learn/...` makes the relationship explicit and visible. No hidden assumptions about domain availability or DNS resolution.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Uses explicit relative file paths instead of implicit external URLs. When a docs/ file references ayokoding-www content, the relative path `../../../../../apps/ayokoding-www/content/en/learn/...` makes the relationship explicit and visible. No hidden assumptions about domain availability or DNS resolution.
 
 - **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Relative paths work consistently across all environments (local development, CI/CD, offline testing, cloned repositories). External URLs depend on network availability, domain ownership, and DNS configuration. Relative paths eliminate these external dependencies for reproducible local builds.
 
@@ -52,7 +52,7 @@ This convention ensures documentation references to AyoKoding educational conten
 ### What This Convention Does NOT Cover
 
 - **General markdown linking** - Covered by [Linking Convention](../formatting/linking.md)
-- **ayokoding-web internal navigation** - Covered by [Programming Language Content Standard](../tutorials/programming-language-content.md)
+- **ayokoding-www internal navigation** - Covered by [Programming Language Content Standard](../tutorials/programming-language-content.md)
 - **External web resources** - Public URLs to third-party sites (Stack Overflow, GitHub, etc.)
 - **Cross-repository references** - Links to content in separate git repositories
 - **apps/ayokoding-www/ → docs/** - Reverse direction (educational content linking to docs)
@@ -199,7 +199,7 @@ Use **descriptive, context-appropriate link text** that follows [Content Quality
 
 [Click this link](../../../../../../apps/ayokoding-www/content/en/learn/software-engineering/platforms/web/tools/jvm-spring/) ← Non-descriptive
 
-[ayokoding-web](../../../../../../apps/ayokoding-www/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) ← Technical, not semantic
+[ayokoding-www](../../../../../../apps/ayokoding-www/content/en/learn/software-engineering/platforms/web/tools/jvm-spring-boot/) ← Technical, not semantic
 ```
 
 ## Examples

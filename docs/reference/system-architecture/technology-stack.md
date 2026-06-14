@@ -23,17 +23,17 @@ Technology stack summary, quality tools, and future architecture considerations 
 - **React**: 19
 - **Styling**: TailwindCSS + Radix UI / shadcn-ui
 - **Deployment**: Vercel
-- **Applications**: ose-web, organiclever-web, ayokoding-web (with tRPC backend)
+- **Applications**: ose-www, organiclever-www, organiclever-app-web, ayokoding-www, wahidyankf-www (with tRPC backend)
 
 ### Backend
 
-**REST API** (Rust/Axum):
+**REST API** (F#/Giraffe):
 
-- **Framework**: Axum
-- **Language**: Rust (edition 2024, rust-version 1.88)
-- **Build**: Cargo via Nx
-- **Testing**: cargo-llvm-cov (>=90% coverage)
-- **Applications**: organiclever-be, ose-app-be
+- **Framework**: Giraffe (ASP.NET Core)
+- **Language**: F# (.NET 10)
+- **Build**: dotnet via Nx
+- **Testing**: NUnit / xUnit + Testcontainers (>=90% coverage)
+- **Applications**: organiclever-be, ose-be
 
 ### CLI Tools
 

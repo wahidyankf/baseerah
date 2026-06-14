@@ -17,7 +17,7 @@ C4 Level 3 component diagrams and Level 4 code architecture for the Open Sharia 
 
 Shows the internal components within each container. Components are groupings of related functionality behind a well-defined interface.
 
-### ose-web Components (Next.js 16)
+### ose-www Components (Next.js 16)
 
 **Component Responsibilities:**
 
@@ -31,7 +31,7 @@ Shows the internal components within each container. Components are groupings of
 **Component Responsibilities:**
 
 - **Root Command**: CLI entry point, command routing, help text
-- **Links Check Command**: Validate internal links in ayokoding-web content
+- **Links Check Command**: Validate internal links in ayokoding-www content
 
 ### rhino-cli Components (Rust CLI Tool)
 
@@ -66,7 +66,7 @@ graph TB
 - **Automation Module**: Extensible module system for automation workflows
 - **Config Loader**: Load butler-specific configuration
 
-### ayokoding-web Components (Next.js Fullstack Platform)
+### ayokoding-www Components (Next.js Fullstack Platform)
 
 **Component Responsibilities:**
 
@@ -81,4 +81,4 @@ Shows implementation details for critical components. Focus on Rust CLI tool pac
 
 ### ayokoding-cli Package Structure (Rust)
 
-ayokoding-cli now provides only `links check` for validating internal links in ayokoding-web content. The title update and navigation regeneration commands were removed as part of the migration from Hugo to Next.js.
+ayokoding-cli now provides only `links check` for validating internal links in ayokoding-www content. The title update and navigation regeneration commands were removed as part of the migration from Hugo to Next.js.

@@ -484,14 +484,14 @@ deploy-production:
 npm run build
 
 # Upload to S3
-aws s3 sync dist/ s3://ose-web \
+aws s3 sync dist/ s3://ose-www \
   --delete \
   --cache-control "public, max-age=31536000" \
   --exclude "index.html" \
   --exclude "*.map"
 
 # Upload index.html without cache
-aws s3 cp dist/index.html s3://ose-web/index.html \
+aws s3 cp dist/index.html s3://ose-www/index.html \
   --cache-control "no-cache, no-store, must-revalidate" \
   --metadata-directive REPLACE
 
@@ -509,7 +509,7 @@ aws cloudfront create-invalidation \
     "WebsiteBucket": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
-        "BucketName": "ose-web",
+        "BucketName": "ose-www",
         "WebsiteConfiguration": {
           "IndexDocument": "index.html",
           "ErrorDocument": "index.html"
@@ -522,7 +522,7 @@ aws cloudfront create-invalidation \
         "DistributionConfig": {
           "Origins": [
             {
-              "DomainName": "ose-web.s3-website-us-east-1.amazonaws.com",
+              "DomainName": "ose-www.s3-website-us-east-1.amazonaws.com",
               "Id": "S3Origin",
               "CustomOriginConfig": {
                 "HTTPPort": 80,
@@ -603,21 +603,21 @@ volumes:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ose-web
+  name: ose-www
   namespace: production
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: ose-web
+      app: ose-www
   template:
     metadata:
       labels:
-        app: ose-web
+        app: ose-www
     spec:
       containers:
         - name: web
-          image: ose-web:latest
+          image: ose-www:latest
           ports:
             - containerPort: 80
           env:
@@ -650,12 +650,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ose-web
+  name: ose-www
   namespace: production
 spec:
   type: LoadBalancer
   selector:
-    app: ose-web
+    app: ose-www
   ports:
     - protocol: TCP
       port: 80
@@ -678,7 +678,7 @@ data:
 replicaCount: 3
 
 image:
-  repository: ose-web
+  repository: ose-www
   tag: latest
   pullPolicy: Always
 

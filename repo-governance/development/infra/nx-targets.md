@@ -184,29 +184,29 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 
 ### Current Project Tags
 
-| Project                 | Tags                                                                    |
-| ----------------------- | ----------------------------------------------------------------------- |
-| `ayokoding-web`         | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`        |
-| `ayokoding-cli`         | `["type:app", "platform:cli", "lang:rust", "domain:ayokoding"]`         |
-| `rhino-cli`             | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`           |
-| `organiclever-web`      | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`     |
-| `organiclever-be`       | `["type:app", "platform:axum", "lang:rust", "domain:organiclever"]`     |
-| `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]` |
-| `organiclever-be-e2e`   | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]` |
-| `ose-cli`               | `["type:app", "platform:cli", "lang:rust", "domain:ose"]`               |
-| `ose-web`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose"]`              |
-| `wahidyankf-web`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`       |
-| `wahidyankf-web-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`   |
-| `rust-commons`          | `["type:lib", "lang:rust"]`                                             |
+| Project                 | Tags                                                                     |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `ayokoding-www`         | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`         |
+| `ayokoding-cli`         | `["type:app", "platform:cli", "lang:rust", "domain:ayokoding"]`          |
+| `rhino-cli`             | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`            |
+| `organiclever-web`      | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`      |
+| `organiclever-be`       | `["type:app", "platform:giraffe", "lang:dotnet", "domain:organiclever"]` |
+| `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
+| `organiclever-be-e2e`   | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
+| `ose-cli`               | `["type:app", "platform:cli", "lang:rust", "domain:ose"]`                |
+| `ose-www`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose"]`               |
+| `wahidyankf-www`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`        |
+| `wahidyankf-www-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`    |
+| `rust-commons`          | `["type:lib", "lang:rust"]`                                              |
 
 ### Example: Complete Tag Declaration
 
-A Rust/Axum backend app declares all four dimensions:
+An F#/Giraffe backend app declares all four dimensions:
 
 ```json
 {
   "name": "organiclever-be",
-  "tags": ["type:app", "platform:axum", "lang:rust", "domain:organiclever"]
+  "tags": ["type:app", "platform:giraffe", "lang:dotnet", "domain:organiclever"]
 }
 ```
 
@@ -245,9 +245,9 @@ Derived from three rules: (1) All apps+libs → unit tests, (2) All apps → int
 
 **Product backend `typecheck` examples** (all statically typed backends use `typecheck` with `dependsOn: ["codegen"]` where codegen applies):
 
-| Backend           | `typecheck` command                                                         |
-| ----------------- | --------------------------------------------------------------------------- |
-| `organiclever-be` | `cargo check --manifest-path apps/organiclever-be/Cargo.toml --all-targets` |
+| Backend           | `typecheck` command                                                   |
+| ----------------- | --------------------------------------------------------------------- |
+| `organiclever-be` | `dotnet build apps/organiclever-be/organiclever-be.fsproj -c Release` |
 
 > For polyglot backend `typecheck` patterns (Go, F#, Java, Kotlin, Python, Rust, Elixir, TypeScript, C#, Clojure), see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
@@ -286,7 +286,7 @@ TypeScript and other statically typed projects:
 | ----------- | -------------------------------------------------------------------------- |
 | `typecheck` | Run the type checker without emitting artifacts (`tsc --noEmit`, `mypy .`) |
 
-**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. The `ose-app-be` example: `cargo check --manifest-path apps/ose-app-be/Cargo.toml`.
+**Statically typed backends declare `typecheck`** with `dependsOn: ["codegen"]` where contract codegen applies. The `ose-be` example: `dotnet build apps/ose-be/ose-be.fsproj -c Release`.
 
 **Not required for dynamically typed languages** (plain JavaScript, Ruby) or languages where
 compilation already enforces types and `build` covers it — except when an additional static
@@ -412,7 +412,7 @@ the project's feature files has a matching step definition in the implementation
 | Go CLI apps (`ayokoding-cli`, `ose-cli`)                    | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                     |
 | API backends (`organiclever-be`)                            | Enforced | `--shared-steps --exclude-dir test-support`                                                  |
 | E2E runners (`organiclever-be-e2e`, `organiclever-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                               |
-| Content platforms (`ayokoding-web`, `ose-web`)              | Enforced | `--shared-steps`                                                                             |
+| Content platforms (`ayokoding-www`, `ose-www`)              | Enforced | `--shared-steps`                                                                             |
 | Web UI apps (`organiclever-web`)                            | Enforced | `--shared-steps`                                                                             |
 | Libraries (`rust-commons`)                                  | Enforced | `--shared-steps`                                                                             |
 | Projects with genuine step gaps                             | Deferred | `specs:coverage` target exists but validation deferred until step implementation is complete |
@@ -449,7 +449,7 @@ quality gate, and scheduled Test CI workflows):
 
 | Project                                                       | Static a11y tool           |
 | ------------------------------------------------------------- | -------------------------- |
-| `organiclever-web`, `ayokoding-web`, `ose-web`, `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
+| `organiclever-web`, `ayokoding-www`, `ose-www`, `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
 
 Static a11y linting catches common accessibility violations at compile time: missing alt text,
 missing ARIA labels, invalid ARIA attributes, missing form labels, and incorrect role usage.

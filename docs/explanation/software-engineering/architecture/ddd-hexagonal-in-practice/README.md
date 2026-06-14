@@ -25,7 +25,7 @@ OSE Platform conventions for integrating Domain-Driven Design bounded contexts w
 - **Hexagonal fundamentals** — [Hexagonal Architecture Overview](../../../../../apps/ayokoding-www/content/en/learn/software-engineering/software-architecture/hexagonal-architecture/overview.md)
 - **DDD + Hexagonal in Production** — [Cases](../../../../../apps/ayokoding-www/content/en/learn/software-engineering/software-architecture/by-example/cases/overview.md) (In FP and In OOP cases)
 
-This directory is **OSE Platform-specific conventions** — not educational tutorials. The ayokoding-web tutorials above supply the conceptual foundation.
+This directory is **OSE Platform-specific conventions** — not educational tutorials. The ayokoding-www tutorials above supply the conceptual foundation.
 
 **See also**: [DDD Standards](../domain-driven-design-ddd/README.md), [Hexagonal Architecture Standards](../hexagonal-architecture/README.md) — the two sibling convention sets that this directory integrates.
 
@@ -46,13 +46,13 @@ OSE Platform Phase 1 centers on **OrganicLever** — a Sharia-compliant procurem
 
 | Bounded Context | Nx App            | Primary Stack | Aggregate Roots                        |
 | --------------- | ----------------- | ------------- | -------------------------------------- |
-| Purchasing      | `organiclever-be` | Rust/Axum     | `PurchaseRequisition`, `PurchaseOrder` |
-| Supplier        | `organiclever-be` | Rust/Axum     | `Supplier`                             |
-| Receiving       | `organiclever-be` | Rust/Axum     | `GoodsReceiptNote`                     |
-| Invoicing       | `organiclever-be` | Rust/Axum     | `Invoice`                              |
-| Payments        | `organiclever-be` | Rust/Axum     | `Payment`                              |
+| Purchasing      | `organiclever-be` | F#/Giraffe    | `PurchaseRequisition`, `PurchaseOrder` |
+| Supplier        | `organiclever-be` | F#/Giraffe    | `Supplier`                             |
+| Receiving       | `organiclever-be` | F#/Giraffe    | `GoodsReceiptNote`                     |
+| Invoicing       | `organiclever-be` | F#/Giraffe    | `Invoice`                              |
+| Payments        | `organiclever-be` | F#/Giraffe    | `Payment`                              |
 
-The Rust/Axum backend (`organiclever-be`) hosts the composition root and HTTP adapter while domain and port definitions remain language-agnostic by design. These same bounded contexts appear in the ayokoding-web cases using the name `procurement-platform-be`.
+The F#/Giraffe backend (`organiclever-be`) hosts the composition root and HTTP adapter while domain and port definitions remain language-agnostic by design. These same bounded contexts appear in the ayokoding-www cases using the name `procurement-platform-be`.
 
 ## Convention Standards
 

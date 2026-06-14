@@ -76,7 +76,7 @@ Valid types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 | 1    | Validate `.claude/` and `.opencode/` configs (YAML, tools, model, skills, parity)   | Blocks commit               |
 | 2    | Validate `docker-compose` files in staged changes                                   | Blocks commit               |
 | 3    | Run `nx affected run-pre-commit` (lightweight per-project hooks)                    | Warn only                   |
-| 4    | Stage `ayokoding-web` content files (auto-generated link data)                      | N/A (staging step)          |
+| 4    | Stage `ayokoding-www` content files (auto-generated link data)                      | N/A (staging step)          |
 | 5    | Run lint-staged (format staged files by language: Prettier, rustfmt, dotnet format) | Blocks commit               |
 | 6    | Sync `package-lock.json` files                                                      | Blocks commit if sync fails |
 | 7    | Validate docs file naming convention in staged files                                | Blocks commit               |

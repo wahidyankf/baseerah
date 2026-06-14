@@ -19,50 +19,63 @@ The platform consists of the following applications across its technology stacks
 
 ### Web Applications (Next.js)
 
-#### ose-web
+#### ose-www
 
-- **Purpose**: Marketing and documentation website for OSE Platform
+- **Purpose**: Public marketing website for OSE Platform
 - **URL**: <https://oseplatform.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript + tRPC
-- **Deployment**: Vercel (via `prod-ose-web` branch)
-- **Build Command**: `nx build ose-web`
-- **Dev Command**: `nx dev ose-web`
+- **Deployment**: Vercel (via `prod-ose-web` branch — rename deferred to cutover follow-on)
+- **Build Command**: `nx build ose-www`
+- **Dev Command**: `nx dev ose-www`
+- **Dev Port**: 3100
 - **Location**: `apps/ose-www/`
 
-#### ayokoding-web
+#### ayokoding-www
 
 - **Purpose**: Educational platform for programming, AI, and security
 - **URL**: <https://ayokoding.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript + tRPC
 - **Languages**: Bilingual (default English)
-- **Deployment**: Vercel (via `prod-ayokoding-web` branch)
-- **Build Command**: `nx build ayokoding-web`
-- **Dev Command**: `nx dev ayokoding-web`
+- **Deployment**: Vercel (via `prod-ayokoding-web` branch — rename deferred to cutover follow-on)
+- **Build Command**: `nx build ayokoding-www`
+- **Dev Command**: `nx dev ayokoding-www`
+- **Dev Port**: 3101
 - **Location**: `apps/ayokoding-www/`
 - **Content**: Co-located at `apps/ayokoding-www/content/`
 
-#### wahidyankf-web
+#### wahidyankf-www
 
 - **Purpose**: Personal portfolio site for Wahidyan Kresna Fridayoka
 - **URL**: <https://www.wahidyankf.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript
-- **Deployment**: Vercel (via `prod-wahidyankf-web` branch)
-- **Build Command**: `nx build wahidyankf-web`
-- **Dev Command**: `nx dev wahidyankf-web`
+- **Deployment**: Vercel (via `prod-wahidyankf-web` branch — rename deferred to cutover follow-on)
+- **Build Command**: `nx build wahidyankf-www`
+- **Dev Command**: `nx dev wahidyankf-www`
 - **Dev Port**: 3201
 - **Location**: `apps/wahidyankf-www/`
+
+#### organiclever-www
+
+- **Purpose**: Marketing website for the OrganicLever productivity platform
+- **URL**: <https://www.organiclever.com>
+- **Technology**: Next.js 16 (App Router) + TypeScript
+- **Deployment**: Vercel (via `prod-organiclever-web` branch — rename deferred to cutover follow-on)
+- **Build Command**: `nx build organiclever-www`
+- **Dev Command**: `nx dev organiclever-www`
+- **Dev Port**: 3200
+- **Location**: `apps/organiclever-www/`
 
 ### CLI Tools
 
 #### ayokoding-cli
 
-- **Purpose**: Link validation for ayokoding-web content
+- **Purpose**: Link validation for ayokoding-www content
 - **Language**: Rust
 - **Build Command**: `nx build ayokoding-cli`
 - **Location**: `apps/ayokoding-cli/`
 - **Features**:
-  - Link validation for ayokoding-web content
-- **Usage**: Runs as part of ayokoding-web quality checks
+  - Link validation for ayokoding-www content
+- **Usage**: Runs as part of ayokoding-www quality checks
 
 #### rhino-cli
 
@@ -79,13 +92,13 @@ The platform consists of the following applications across its technology stacks
 - **Build Command**: `nx build ose-cli`
 - **Location**: `apps/ose-cli/`
 - **Features**:
-  - Validates all internal links in ose-web content
+  - Validates all internal links in ose-www content
   - Text, JSON, and markdown output formats
-- **Usage**: Runs as first step of `ose-web`'s `test:quick` target
+- **Usage**: Runs as first step of `ose-www`'s `test:quick` target
 
 ### OrganicLever Applications
 
-#### organiclever-web
+#### organiclever-www
 
 - **Purpose**: Landing site for OrganicLever — local-first mode; BE integration deferred
 - **URL**: <https://www.organiclever.com>
@@ -94,9 +107,9 @@ The platform consists of the following applications across its technology stacks
   `test-and-deploy-organiclever-web-development.yml`); production via
   `prod-organiclever-web` branch (promoted on demand by
   `deploy-organiclever-web-to-production.yml`)
-- **Build Command**: `nx build organiclever-web`
-- **Dev Command**: `nx dev organiclever-web`
-- **Location**: `apps/organiclever-web/`
+- **Build Command**: `nx build organiclever-www`
+- **Dev Command**: `nx dev organiclever-www`
+- **Location**: `apps/organiclever-www/`
 - **Features**:
   - Static landing page at `/` (no network dependency)
   - `/system/status/be` diagnostic page (probes `ORGANICLEVER_BE_URL` at request time)
@@ -108,71 +121,71 @@ The platform consists of the following applications across its technology stacks
 
 #### organiclever-be
 
-- **Purpose**: REST API backend for OrganicLever (Rust/Axum implementation)
-- **Technology**: Rust + Axum (edition 2024, rust-version 1.88)
+- **Purpose**: REST API backend for OrganicLever (F#/Giraffe/ASP.NET 10 implementation)
+- **Technology**: F# + Giraffe + ASP.NET 10 + EF Core + DbUp
 - **Build Command**: `nx build organiclever-be`
 - **Dev Command**: `nx dev organiclever-be`
 - **Location**: `apps/organiclever-be/`
 - **Features**:
-  - cargo-llvm-cov code coverage enforcement (>=90%)
+  - Coverlet code coverage enforcement (>=90%)
   - Production Dockerfile with multi-stage build
   - OpenAPI 3.1 contract-first development
 
-#### ose-app-be
+#### ose-be
 
 - **Purpose**: REST API backend for OSE Application platform (api.oseplatform.com)
-- **Technology**: Rust + Axum (edition 2024, rust-version 1.88)
-- **Build Command**: `nx build ose-app-be`
-- **Dev Command**: `nx dev ose-app-be`
-- **Location**: `apps/ose-app-be/`
+- **Technology**: F# + Giraffe + ASP.NET 10 + EF Core + DbUp
+- **Build Command**: `nx build ose-be`
+- **Dev Command**: `nx dev ose-be`
+- **Location**: `apps/ose-be/`
 - **Features**:
-  - cargo-llvm-cov code coverage enforcement (>=90%)
+  - Coverlet code coverage enforcement (>=90%)
   - Hexagonal DDD architecture with 5 bounded contexts
   - OpenAPI 3.1 contract-first development (planned)
 
 ### E2E Test Suites (Playwright)
 
-#### ose-web-fe-e2e
+#### ose-www-fe-e2e
 
-- **Purpose**: Frontend E2E tests for ose-web UI
+- **Purpose**: Frontend E2E tests for ose-www UI
 - **Technology**: Playwright
-- **Run Command**: `nx run ose-web-fe-e2e:test:e2e`
+- **Run Command**: `nx run ose-www-fe-e2e:test:e2e`
 - **Location**: `apps/ose-www-fe-e2e/`
 
-#### ose-web-be-e2e
+#### ose-www-be-e2e
 
-- **Purpose**: Backend E2E tests for ose-web tRPC API
+- **Purpose**: Backend E2E tests for ose-www tRPC API
 - **Technology**: Playwright
-- **Run Command**: `nx run ose-web-be-e2e:test:e2e`
+- **Run Command**: `nx run ose-www-be-e2e:test:e2e`
 - **Location**: `apps/ose-www-be-e2e/`
 
-#### ayokoding-web-fe-e2e
+#### ayokoding-www-fe-e2e
 
-- **Purpose**: Frontend E2E tests for ayokoding-web UI
+- **Purpose**: Frontend E2E tests for ayokoding-www UI
 - **Technology**: Playwright
-- **Run Command**: `nx run ayokoding-web-fe-e2e:test:e2e`
+- **Run Command**: `nx run ayokoding-www-fe-e2e:test:e2e`
 - **Location**: `apps/ayokoding-www-fe-e2e/`
 
-#### ayokoding-web-be-e2e
+#### ayokoding-www-be-e2e
 
-- **Purpose**: Backend E2E tests for ayokoding-web tRPC API
+- **Purpose**: Backend E2E tests for ayokoding-www tRPC API
 - **Technology**: Playwright
-- **Run Command**: `nx run ayokoding-web-be-e2e:test:e2e`
+- **Run Command**: `nx run ayokoding-www-be-e2e:test:e2e`
 - **Location**: `apps/ayokoding-www-be-e2e/`
 
-#### wahidyankf-web-fe-e2e
+#### wahidyankf-www-fe-e2e
 
-- **Purpose**: Frontend E2E tests for wahidyankf-web UI (Playwright-BDD)
+- **Purpose**: Frontend E2E tests for wahidyankf-www UI (Playwright-BDD)
 - **Technology**: Playwright-BDD
-- **Run Command**: `nx run wahidyankf-web-fe-e2e:test:e2e`
+- **Run Command**: `nx run wahidyankf-www-fe-e2e:test:e2e`
 - **Location**: `apps/wahidyankf-www-fe-e2e/`
 
-#### organiclever-web-e2e
+#### organiclever-www-e2e
 
-- **Purpose**: End-to-end tests for organiclever-web
+- **Purpose**: End-to-end tests for organiclever-www
 - **Technology**: Playwright
-- **Run Command**: `nx run organiclever-web-e2e:test:e2e`
-- **Location**: `apps/organiclever-web-e2e/`
+- **Run Command**: `nx run organiclever-www-e2e:test:e2e`
+- **Location**: `apps/organiclever-www-e2e/`
 
 #### organiclever-be-e2e
 
@@ -190,14 +203,14 @@ Shows the high-level technical building blocks (containers) of the system. In C4
 ```mermaid
 graph LR
     subgraph "Marketing & Education"
-        OSE[ose-web<br/>Next.js App]
-        AYO[ayokoding-web<br/>Next.js App]
-        WKF[wahidyankf-web<br/>Next.js App]
+        OSE[ose-www<br/>Next.js App]
+        AYO[ayokoding-www<br/>Next.js App]
+        WKF[wahidyankf-www<br/>Next.js App]
     end
 
     subgraph "CLI Tools"
-        AYOCLI[ayokoding-cli<br/>Go CLI]
-        OSECLI[ose-cli<br/>Go CLI]
+        AYOCLI[ayokoding-cli<br/>Rust CLI]
+        OSECLI[ose-cli<br/>Rust CLI]
     end
 
     subgraph "Shared Infrastructure"
@@ -223,13 +236,13 @@ graph LR
 graph LR
     subgraph "CLI Tools"
         RHINO[rhino-cli<br/>Rust CLI]
-        AYOCLI[ayokoding-cli<br/>Go CLI]
+        AYOCLI[ayokoding-cli<br/>Rust CLI]
     end
 
     subgraph "Marketing & Education"
-        OSE[ose-web<br/>Next.js App]
-        AYO[ayokoding-web<br/>Next.js App]
-        WKF[wahidyankf-web<br/>Next.js App]
+        OSE[ose-www<br/>Next.js App]
+        AYO[ayokoding-www<br/>Next.js App]
+        WKF[wahidyankf-www<br/>Next.js App]
     end
 
     subgraph "Shared Infrastructure"
@@ -256,12 +269,12 @@ graph LR
 ```mermaid
 graph LR
     subgraph "OrganicLever Platform"
-        OL_FE[organiclever-web<br/>Next.js App]
-        OL_BE[organiclever-be<br/>Rust/Axum API]
+        OL_FE[organiclever-www<br/>Next.js App]
+        OL_BE[organiclever-be<br/>F#/Giraffe API]
     end
 
     subgraph "E2E Test Suites"
-        OL_FE_E2E[organiclever-web-e2e<br/>Playwright E2E]
+        OL_FE_E2E[organiclever-www-e2e<br/>Playwright E2E]
         OL_BE_E2E[organiclever-be-e2e<br/>Playwright E2E]
     end
 
@@ -285,13 +298,13 @@ graph LR
 
 Marketing & Education Sites:
 
-- ose-web: Next.js 16 content platform
-- ayokoding-web: Next.js fullstack content platform (with CLI link validation)
-- wahidyankf-web: Next.js 16 personal portfolio
+- ose-www: Next.js 16 content platform
+- ayokoding-www: Next.js fullstack content platform (with CLI link validation)
+- wahidyankf-www: Next.js 16 personal portfolio
 
 CLI Tools:
 
-- ayokoding-cli: Validates links in ayokoding-web content
+- ayokoding-cli: Validates links in ayokoding-www content
 - rhino-cli: Repository management automation
 
 **Build-Time Dependencies:**
@@ -300,7 +313,7 @@ CLI Tools:
 - CLI tools executed during build processes
 - Shared libraries may be imported at build time via `@open-sharia-enterprise/[lib-name]`
 
-**Link Validation Pipeline (ayokoding-web):**
+**Link Validation Pipeline (ayokoding-www):**
 
-ayokoding-cli validates internal links in ayokoding-web content as part of the quality gate.
+ayokoding-cli validates internal links in ayokoding-www content as part of the quality gate.
 Content is co-located at `apps/ayokoding-www/content/` and served by the Next.js application.

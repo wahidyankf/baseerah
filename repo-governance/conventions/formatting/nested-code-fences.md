@@ -48,7 +48,7 @@ This convention establishes the pattern for nesting code fences when documenting
 This convention applies to markdown content in:
 
 - **docs/** - Documentation showing markdown examples
-- **Next.js sites** - Content demonstrating markdown structure (ayokoding-web, ose-web)
+- **Next.js sites** - Content demonstrating markdown structure (ayokoding-www, ose-www)
 - **plans/** - Planning documents with markdown examples
 - **Repository root files** - README.md, CONTRIBUTING.md when documenting markdown
 

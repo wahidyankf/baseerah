@@ -6,7 +6,7 @@ subcategory: conventions
 tags:
   - programming-languages
   - tutorials
-  - ayokoding-web
+  - ayokoding-www
   - education
   - structure
 created: 2025-12-27
@@ -14,7 +14,7 @@ created: 2025-12-27
 
 # Programming Language Tutorial Structure Convention
 
-**Defines the dual-path tutorial directory organization for programming language content on ayokoding-web.**
+**Defines the dual-path tutorial directory organization for programming language content on ayokoding-www.**
 
 This convention standardizes how programming language tutorials are organized as a **Full Set Tutorial Package** with 5 mandatory components: foundational tutorials (initial-setup, quick-start), two complementary learning tracks (narrative-driven by-concept and code-first by-example, both achieving 95% coverage), and practical cookbook for problem-solving. All 5 components are required for complete language content.
 
@@ -41,7 +41,7 @@ This convention ensures:
 **Applies to:**
 
 - **All programming language tutorial structures** across the repository:
-  - **ayokoding-web** (`apps/ayokoding-www/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`) - canonical location
+  - **ayokoding-www** (`apps/ayokoding-www/content/[lang]/learn/software-engineering/programming-language/[language]/tutorials/`) - canonical location
   - **Any other location** where programming language tutorials are organized
 - Languages: Java, Elixir, Golang, Kotlin, Python, Rust (and future additions)
 
@@ -102,7 +102,7 @@ Languages with only by-concept path (by-example not yet created):
 
 ## The Full Set Tutorial Package Components
 
-A complete programming language on ayokoding-web requires **all 5 mandatory components**:
+A complete programming language on ayokoding-www requires **all 5 mandatory components**:
 
 ### Component 1-2: Foundational Tutorials (Mandatory)
 
@@ -308,7 +308,7 @@ tutorials/
 
 ### Weight Values
 
-Uses ayokoding-web's level-based weight system with powers of 10 ranges:
+Uses ayokoding-www's level-based weight system with powers of 10 ranges:
 
 **Path Calculation:**
 
@@ -370,7 +370,7 @@ tutorials/
 2. **Content INSIDE folder** is one level deeper → uses level N+1 base weight
 3. **Weights RESET per parent**: by-concept/ and by-example/ both start at 10000000 for overview.md (different parents, independent sequences)
 
-See the ayokoding-web developing content skill for complete level-based weight system details.
+See the ayokoding-www developing content skill for complete level-based weight system details.
 
 ## Full Set Completeness Requirements
 
@@ -411,8 +411,8 @@ tags: ["language-name", "tutorial-type", "skill-level"]
 
 **Rules:**
 
-- **No categories field**: Not used in ayokoding-web content
-- **No author field**: Not used in ayokoding-web content
+- **No categories field**: Not used in ayokoding-www content
+- **No author field**: Not used in ayokoding-www content
 - **Date format**: UTC+7 with ISO 8601 format
 - **Weight field**: MANDATORY - uses level-based system
 - **Tags**: JSON array format `["tag1", "tag2"]` (NOT dash-based YAML)

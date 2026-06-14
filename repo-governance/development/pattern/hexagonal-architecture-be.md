@@ -1,13 +1,13 @@
 ---
 title: Hexagonal Architecture + DDD — Backend Apps
-description: Hexagonal architecture with DDD bounded contexts for backend apps — Rust/Axum directory layouts, language-specific idioms, and inter-context isolation rules
+description: Hexagonal architecture with DDD bounded contexts for backend apps — F#/Giraffe directory layouts, language-specific idioms, and inter-context isolation rules
 category: explanation
 subcategory: development
 tags:
   - architecture
   - hexagonal
   - ddd
-  - rust
+  - fsharp
   - backend
 created: 2026-05-26
 ---
@@ -16,7 +16,7 @@ created: 2026-05-26
 
 Backend apps combine hexagonal architecture with Domain-Driven Design (DDD) bounded contexts. Each bounded context
 lives under `contexts/<name>/` and owns its hexagonal layers independently. DDD applies **only** to backend apps
-(`organiclever-be`, `ose-app-be`). Web apps use `contexts/` as an Effect.ts naming convention, not DDD — see
+(`organiclever-be`, `ose-be`). Web apps use `contexts/` as an Effect.ts naming convention, not DDD — see
 [Hexagonal Architecture — Web Apps](./hexagonal-architecture-web.md).
 
 ## Principles Implemented/Respected
@@ -53,101 +53,82 @@ and `api/mcp/` are reserved for future transports. All transport-specific code s
 
 ## Directory Layout
 
-### Rust/Axum — `organiclever-be`
+### F#/Giraffe — `organiclever-be` / `ose-be`
 
 ```
 src/
-├── contexts/
-│   ├── <name>/
-│   │   ├── domain/            # Entities, value objects, domain errors
-│   │   ├── application/       # Use-cases, inbound ports, outbound port traits
-│   │   ├── infrastructure/    # Outbound adapter implementations (SQLx repos, HTTP clients)
-│   │   └── api/
-│   │       └── http/          # Axum handlers, request/response types, error mapping
-│   └── shared/
-│       └── infrastructure/    # Cross-context shared infrastructure (DB pool, migrations)
-└── main.rs                    # Composition root — wires Axum router + dependency graph
+├── Contexts/
+│   ├── <Name>/
+│   │   ├── Domain/            # Entities, value objects, domain errors
+│   │   ├── Application/       # Use-cases, inbound ports, outbound port interfaces
+│   │   ├── Infrastructure/    # Outbound adapter implementations (EF Core repos, HTTP clients)
+│   │   └── Api/
+│   │       └── Http/          # Giraffe handlers, request/response types, error mapping
+│   └── Shared/
+│       └── Infrastructure/    # Cross-context shared infrastructure (DB context, migrations)
+└── Program.fs                 # Composition root — wires Giraffe router + dependency graph
 ```
 
-| Layer           | Path                              | Contents                                                      |
-| --------------- | --------------------------------- | ------------------------------------------------------------- |
-| Domain          | `contexts/<n>/domain/`            | Entities, value objects, `DomainError` enum                   |
-| Application     | `contexts/<n>/application/`       | Use-case functions, port traits (`trait TaskRepository`)      |
-| Infrastructure  | `contexts/<n>/infrastructure/`    | `SqlxTaskRepository`, external HTTP clients                   |
-| Inbound adapter | `contexts/<n>/api/http/`          | Axum handlers, `From<DomainError> for ApiError`, request DTOs |
-| Shared infra    | `contexts/shared/infrastructure/` | DB pool, migration runner, shared middleware                  |
+| Layer           | Path                              | Contents                                                            |
+| --------------- | --------------------------------- | ------------------------------------------------------------------- |
+| Domain          | `Contexts/<N>/Domain/`            | Entities, value objects, `DomainError` discriminated union          |
+| Application     | `Contexts/<N>/Application/`       | Use-case functions, port interfaces (`type ITaskRepository`)        |
+| Infrastructure  | `Contexts/<N>/Infrastructure/`    | `EfCoreTaskRepository`, external HTTP clients                       |
+| Inbound adapter | `Contexts/<N>/Api/Http/`          | Giraffe handlers, `DomainError → HttpHandler` mapping, request DTOs |
+| Shared infra    | `Contexts/Shared/Infrastructure/` | DB context, DbUp migration runner, shared middleware                |
 
-## Rust-Specific
+## F#-Specific
 
-### Traits as Ports
+### Interfaces as Ports
 
-Outbound ports are Rust `trait` definitions in the application layer. Infrastructure crates provide concrete
-`struct` implementations.
+Outbound ports are F# `interface` definitions in the application layer. Infrastructure modules provide
+concrete implementations that depend on EF Core or other infrastructure concerns.
 
-```rust
-// contexts/tasks/application/ports.rs  — outbound port (application layer)
-use async_trait::async_trait;
-use crate::contexts::tasks::domain::{Task, TaskId, DomainError};
+```fsharp
+// Contexts/Tasks/Application/Ports.fs  — outbound port (application layer)
+module Contexts.Tasks.Application.Ports
 
-#[async_trait]
-pub trait TaskRepository: Send + Sync {
-    async fn find_by_id(&self, id: TaskId) -> Result<Option<Task>, DomainError>;
-    async fn save(&self, task: &Task) -> Result<(), DomainError>;
-}
+open Contexts.Tasks.Domain
+
+type ITaskRepository =
+    abstract member FindById : TaskId -> Async<Task option>
+    abstract member Save : Task -> Async<unit>
 ```
 
-### `#[async_trait]` vs Native Async Trait
+### Dependency Injection via ASP.NET 10
 
-- Use `#[async_trait]` only when the trait requires **dynamic dispatch** (`dyn TaskRepository`).
-- For **static dispatch** (generics, `impl TaskRepository`), use native `async fn in trait` (stable from MSRV 1.88).
-  Do not add `#[async_trait]` where dynamic dispatch is not needed.
+Application services receive port interfaces through ASP.NET 10 constructor injection. Infrastructure
+implementations are registered in `Program.fs` and never referenced directly by application or domain
+modules.
 
-```rust
-// PASS: static dispatch — no #[async_trait] needed (MSRV 1.88+)
-pub async fn create_task<R: TaskRepository>(repo: &R, input: CreateTaskInput) -> Result<Task, AppError> {
-    // ...
-}
-
-// PASS: dynamic dispatch — #[async_trait] required
-pub async fn create_task(repo: &dyn TaskRepository, input: CreateTaskInput) -> Result<Task, AppError> {
-    // ...
-}
+```fsharp
+// Program.fs  — wire infrastructure implementations to application ports
+builder.Services.AddScoped<ITaskRepository, EfCoreTaskRepository>()
 ```
 
 ### Error Mapping at the API Boundary
 
-Domain errors must not contain HTTP status codes. The `api/http/` layer owns the translation.
+Domain errors must not contain HTTP status codes. The `Api/Http/` layer owns the translation to
+Giraffe `HttpHandler` responses.
 
-```rust
-// contexts/tasks/domain/errors.rs  — domain errors (no HTTP types)
-#[derive(Debug, thiserror::Error)]
-pub enum DomainError {
-    #[error("task not found: {0}")]
-    NotFound(TaskId),
-    #[error("task is already completed")]
-    AlreadyCompleted,
-}
+```fsharp
+// Contexts/Tasks/Domain/Errors.fs  — domain errors (no HTTP types)
+module Contexts.Tasks.Domain.Errors
 
-// contexts/tasks/api/http/errors.rs  — translation at API boundary
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use crate::contexts::tasks::domain::DomainError;
+type DomainError =
+    | NotFound of TaskId
+    | AlreadyCompleted
 
-pub struct ApiError(DomainError);
+// Contexts/Tasks/Api/Http/Errors.fs  — translation at API boundary
+module Contexts.Tasks.Api.Http.Errors
 
-impl From<DomainError> for ApiError {
-    fn from(e: DomainError) -> Self { ApiError(e) }
-}
+open Giraffe
+open Contexts.Tasks.Domain.Errors
 
-impl IntoResponse for ApiError {
-    fn into_response(self) -> Response {
-        let status = match &self.0 {
-            DomainError::NotFound(_) => StatusCode::NOT_FOUND,
-            DomainError::AlreadyCompleted => StatusCode::CONFLICT,
-        };
-        (status, self.0.to_string()).into_response()
-    }
-}
+let toHttpHandler (error: DomainError) : HttpHandler =
+    match error with
+    | NotFound taskId -> RequestErrors.notFound (text (sprintf "task not found: %A" taskId))
+    | AlreadyCompleted -> RequestErrors.conflict (text "task is already completed")
 ```
 
 ## DDD Integration
@@ -175,12 +156,12 @@ the boundary.
 
 ## Forbidden Imports
 
-| Layer             | Forbidden                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| `domain/`         | `axum`, `sqlx`, `reqwest`, `tokio::fs`, HTTP status types, `serde_json` (HTTP-specific)    |
-| `application/`    | `axum`, `sqlx`, concrete infrastructure structs, HTTP types                                |
-| `infrastructure/` | `axum`, HTTP response types, business logic                                                |
-| `api/http/`       | Direct DB driver calls (must go through outbound port), other context's `domain/` directly |
+| Layer             | Forbidden                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `Domain/`         | `Giraffe`, `EntityFrameworkCore`, `HttpContext`, HTTP status types, serialisation attributes |
+| `Application/`    | `Giraffe`, `EntityFrameworkCore`, concrete infrastructure types, HTTP types                  |
+| `Infrastructure/` | `Giraffe`, HTTP response types, business logic                                               |
+| `Api/Http/`       | Direct DB driver calls (must go through outbound port), other context's `Domain/` directly   |
 
 ## Related
 

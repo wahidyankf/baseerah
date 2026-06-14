@@ -1,6 +1,6 @@
 ---
 title: "Programming Language Documentation Separation Convention"
-description: Establishes the relationship between docs/explanation/programming-languages/ repository-specific style guides and ayokoding-web educational content
+description: Establishes the relationship between docs/explanation/programming-languages/ repository-specific style guides and ayokoding-www educational content
 category: explanation
 subcategory: conventions
 tags:
@@ -14,13 +14,13 @@ created: 2026-02-04
 
 # Programming Language Documentation Separation Convention
 
-This convention establishes the clear separation between **repository-specific programming language style guides** in `docs/explanation/software-engineering/programming-languages/` and **educational programming language content** in ayokoding-web. It prevents duplication, defines scope boundaries, and ensures prerequisite knowledge relationships.
+This convention establishes the clear separation between **repository-specific programming language style guides** in `docs/explanation/software-engineering/programming-languages/` and **educational programming language content** in ayokoding-www. It prevents duplication, defines scope boundaries, and ensures prerequisite knowledge relationships.
 
 ## Principles Implemented/Respected
 
 This convention implements the following core principles:
 
-- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Clear separation of concerns prevents confusion about where content belongs. One source for learning (ayokoding-web), one source for OSE Platform style (docs/explanation/)
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Clear separation of concerns prevents confusion about where content belongs. One source for learning (ayokoding-www), one source for OSE Platform style (docs/explanation/)
 
 - **[Documentation First](../../principles/content/documentation-first.md)**: Explicit prerequisite knowledge statements ensure developers know where to learn languages before applying OSE Platform styles. Documentation acknowledges the educational foundation
 
@@ -31,17 +31,17 @@ This convention implements the following core principles:
 This convention prevents duplication and confusion by defining:
 
 - **What belongs in `docs/explanation/software-engineering/programming-languages/{language}/`**: Repository-specific style guides, coding standards, and conventions
-- **What belongs in ayokoding-web**: Educational programming language content (0-95% coverage, by-example, in-practice, tutorials)
+- **What belongs in ayokoding-www**: Educational programming language content (0-95% coverage, by-example, in-practice, tutorials)
 - **How to link between them**: Explicit prerequisite knowledge statements
 
-This separation follows the **DRY principle** (Don't Repeat Yourself) - educational content lives in ONE place (ayokoding-web), style guides live in ANOTHER place (docs/explanation/), and they reference each other.
+This separation follows the **DRY principle** (Don't Repeat Yourself) - educational content lives in ONE place (ayokoding-www), style guides live in ANOTHER place (docs/explanation/), and they reference each other.
 
 ## Scope
 
 ### What This Convention Covers
 
 - Scope boundaries for `docs/explanation/software-engineering/programming-languages/{language}/`
-- Scope boundaries for ayokoding-web learning content
+- Scope boundaries for ayokoding-www learning content
 - Required prerequisite knowledge statements
 - Linking patterns between educational and style guide content
 - Content organization for all programming languages in the repository
@@ -51,7 +51,7 @@ This separation follows the **DRY principle** (Don't Repeat Yourself) - educatio
 - **How to write educational content** - Covered in tutorial conventions ([Programming Language Content Standard](../tutorials/programming-language-content.md), [By Example Tutorial](../tutorials/swe-by-example.md))
 - **How to write style guides** - Covered in [Content Quality Principles](../writing/quality.md)
 - **Diátaxis framework application** - Covered in [Diátaxis Framework Convention](./diataxis-framework.md)
-- **ayokoding-web content conventions** - Covered in [Programming Language Content Standard](../tutorials/programming-language-content.md)
+- **ayokoding-www content conventions** - Covered in [Programming Language Content Standard](../tutorials/programming-language-content.md)
 
 ## Content Separation Rules
 
@@ -61,7 +61,7 @@ This separation follows the **DRY principle** (Don't Repeat Yourself) - educatio
 
 ```
 docs/explanation/software-engineering/programming-languages/rust/
-├── README.md                                        # Overview + links to ayokoding-web
+├── README.md                                        # Overview + links to ayokoding-www
 ├── coding-standards.md            # OSE Platform Rust conventions
 ├── code-quality-standards.md      # OSE Platform Rust code quality
 ├── error-handling-standards.md    # OSE Platform error patterns
@@ -78,9 +78,9 @@ docs/explanation/software-engineering/programming-languages/rust/
 - Repository-specific patterns (how we structure services, how we handle errors)
 - Platform-specific anti-patterns (mistakes to avoid in OSE Platform context)
 - Alignment with repo-governance/principles/software-engineering/ principles
-- References to ayokoding-web for language fundamentals
+- References to ayokoding-www for language fundamentals
 
-**FAIL: Educational content** (move to ayokoding-web):
+**FAIL: Educational content** (move to ayokoding-www):
 
 - ❌ Language syntax tutorials (variables, loops, functions)
 - ❌ By-example learning content (75-85 annotated examples)
@@ -88,7 +88,7 @@ docs/explanation/software-engineering/programming-languages/rust/
 - ❌ Beginner/intermediate/advanced learning paths
 - ❌ Comprehensive language coverage (0-95%)
 
-### Rule 2: ayokoding-web Focus - Educational Content (0-95% Coverage)
+### Rule 2: ayokoding-www Focus - Educational Content (0-95% Coverage)
 
 **PASS: Educational programming language content**:
 
@@ -130,20 +130,20 @@ apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/g
 
 ### Rule 3: Explicit Prerequisite Knowledge Statements
 
-**REQUIRED**: Every `docs/explanation/software-engineering/programming-languages/{language}/README.md` MUST include explicit prerequisite knowledge statement linking to ayokoding-web.
+**REQUIRED**: Every `docs/explanation/software-engineering/programming-languages/{language}/README.md` MUST include explicit prerequisite knowledge statement linking to ayokoding-www.
 
 **Template**:
 
 ```markdown
 ## Prerequisite Knowledge
 
-**This documentation assumes you have completed the ayokoding-web {LANGUAGE} learning path**:
+**This documentation assumes you have completed the ayokoding-www {LANGUAGE} learning path**:
 
-- [ayokoding-web {LANGUAGE} Overview](https://ayokoding.com/en/learn/software-engineering/programming-languages/{language}/)
+- [ayokoding-www {LANGUAGE} Overview](https://ayokoding.com/en/learn/software-engineering/programming-languages/{language}/)
 - [By Example Tutorial](https://ayokoding.com/en/learn/software-engineering/programming-languages/{language}/by-example/) (0-95% coverage, 75-85 examples)
 - [In Practice Guides](https://ayokoding.com/en/learn/software-engineering/programming-languages/{language}/in-practice/)
 
-If you're new to {LANGUAGE}, **start with ayokoding-web first**. This documentation focuses exclusively on OSE Platform-specific style guides and conventions, not language fundamentals.
+If you're new to {LANGUAGE}, **start with ayokoding-www first**. This documentation focuses exclusively on OSE Platform-specific style guides and conventions, not language fundamentals.
 
 ## What This Documentation Covers
 
@@ -155,7 +155,7 @@ This documentation is the **authoritative reference for {LANGUAGE} coding standa
 - Anti-patterns to avoid in OSE Platform context
 - Alignment with [Software Engineering Principles](../../principles/software-engineering/README.md)
 
-**This is NOT a {LANGUAGE} tutorial** - see ayokoding-web for comprehensive language education.
+**This is NOT a {LANGUAGE} tutorial** - see ayokoding-www for comprehensive language education.
 ```
 
 **Examples**:
@@ -165,12 +165,12 @@ This documentation is the **authoritative reference for {LANGUAGE} coding standa
 ```markdown
 ## Prerequisite Knowledge
 
-**This documentation assumes you have completed the ayokoding-web Golang learning path**:
+**This documentation assumes you have completed the ayokoding-www Golang learning path**:
 
-- [ayokoding-web Golang Overview](https://ayokoding.com/en/learn/software-engineering/programming-languages/golang/)
+- [ayokoding-www Golang Overview](https://ayokoding.com/en/learn/software-engineering/programming-languages/golang/)
 - [By Example Tutorial](https://ayokoding.com/en/learn/software-engineering/programming-languages/golang/by-example/)
 
-If you're new to Go, **start with ayokoding-web first**.
+If you're new to Go, **start with ayokoding-www first**.
 ```
 
 **FAIL: No prerequisite statement**:
@@ -189,25 +189,25 @@ Use goroutines for concurrency...
 
 ### Rule 4: No Duplication Between Platforms
 
-**CRITICAL**: Content covered in ayokoding-web MUST NOT be duplicated in docs/explanation/.
+**CRITICAL**: Content covered in ayokoding-www MUST NOT be duplicated in docs/explanation/.
 
 **Decision tree**:
 
 ```
 Is this content about {LANGUAGE} fundamentals or generic patterns?
-├─ Yes → ayokoding-web (educational content)
+├─ Yes → ayokoding-www (educational content)
 │   Examples: syntax, by-example code, generic error patterns, DDD in Go
 │
 └─ No → Is this content OSE Platform-specific?
     ├─ Yes → docs/explanation/ (style guide)
     │   Examples: "We use Gin for HTTP", "Name variables like this in OSE Platform"
     │
-    └─ No → Still ayokoding-web (generic programming knowledge)
+    └─ No → Still ayokoding-www (generic programming knowledge)
 ```
 
 **Example - Error Handling**:
 
-**ayokoding-web** (`apps/ayokoding-www/content/en/learn/.../golang/in-practice/error-handling.md`):
+**ayokoding-www** (`apps/ayokoding-www/content/en/learn/.../golang/in-practice/error-handling.md`):
 
 ````markdown
 # Error Handling in Go
@@ -234,7 +234,7 @@ Use `errors.New()` to create errors, `fmt.Errorf()` to wrap them...
 ```markdown
 # Go Error Handling - OSE Platform Standards
 
-**Prerequisite**: Complete [ayokoding-web Error Handling](https://ayokoding.com/en/learn/.../golang/in-practice/error-handling/) first.
+**Prerequisite**: Complete [ayokoding-www Error Handling](https://ayokoding.com/en/learn/.../golang/in-practice/error-handling/) first.
 
 ## OSE Platform Error Standards
 
@@ -263,27 +263,27 @@ if err != nil {
 
 **Key differences**:
 
-- **ayokoding-web**: Generic Go error patterns (what `error` interface is, how to use `errors.New()`)
+- **ayokoding-www**: Generic Go error patterns (what `error` interface is, how to use `errors.New()`)
 - **docs/explanation/**: OSE Platform-specific error conventions (structured logging, error codes, audit requirements)
 
 ### Rule 5: Cross-Referencing Pattern
 
 **Required linking between platforms**:
 
-**From docs/explanation/ → ayokoding-web**:
+**From docs/explanation/ → ayokoding-www**:
 
 ```markdown
 ## Prerequisite Knowledge
 
-**This documentation assumes you have completed the ayokoding-web {LANGUAGE} learning path**:
+**This documentation assumes you have completed the ayokoding-www {LANGUAGE} learning path**:
 
-- [ayokoding-web {LANGUAGE} Overview](https://ayokoding.com/en/learn/.../programming-languages/{language}/)
+- [ayokoding-www {LANGUAGE} Overview](https://ayokoding.com/en/learn/.../programming-languages/{language}/)
 - [By Example Tutorial](https://ayokoding.com/en/learn/.../programming-languages/{language}/by-example/)
 
-If you're new to {LANGUAGE}, **start with ayokoding-web first**.
+If you're new to {LANGUAGE}, **start with ayokoding-www first**.
 ````
 
-**From ayokoding-web → docs/explanation/** (optional, when relevant):
+**From ayokoding-www → docs/explanation/** (optional, when relevant):
 
 ```markdown
 ## Repository-Specific Guides
@@ -295,9 +295,9 @@ For OSE Platform-specific {LANGUAGE} conventions, see:
 
 **Linking rules**:
 
-- docs/explanation/ README.md MUST link to ayokoding-web (prerequisite)
-- ayokoding-web MAY link to docs/explanation/ (optional, for contributors)
-- Use absolute URLs for ayokoding-web (Next.js site)
+- docs/explanation/ README.md MUST link to ayokoding-www (prerequisite)
+- ayokoding-www MAY link to docs/explanation/ (optional, for contributors)
+- Use absolute URLs for ayokoding-www (Next.js site)
 - Use relative paths for docs/explanation/ (GitHub markdown)
 
 ## Scope for All Programming Languages
@@ -385,7 +385,7 @@ See [Golang README](./README.md#purpose) for detailed examples.
 
 ### Example 1: Golang - Correct Separation
 
-**ayokoding-web** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/by-example/beginner.md`):
+**ayokoding-www** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/golang/by-example/beginner.md`):
 
 ````markdown
 # Go By Example - Beginner
@@ -417,7 +417,7 @@ Key takeaway: Go supports both explicit types and type inference via `:=`.
 ```markdown
 # Go Best Practices - OSE Platform
 
-**Prerequisite**: Complete [ayokoding-web Golang By Example](https://ayokoding.com/en/learn/software-engineering/programming-languages/golang/by-example/).
+**Prerequisite**: Complete [ayokoding-www Golang By Example](https://ayokoding.com/en/learn/software-engineering/programming-languages/golang/by-example/).
 
 ## Naming Conventions
 
@@ -439,14 +439,14 @@ OSE Platform Go code follows these conventions:
 
 **Why this works**:
 
-- **Separation**: ayokoding-web teaches Go variables (generic), docs/explanation/ defines OSE Platform naming
-- **Prerequisite**: docs/explanation/ explicitly links to ayokoding-web
-- **No duplication**: Variable syntax in ayokoding-web, naming conventions in docs/explanation/
-- **Clear scope**: ayokoding-web = education, docs/explanation/ = OSE Platform standards
+- **Separation**: ayokoding-www teaches Go variables (generic), docs/explanation/ defines OSE Platform naming
+- **Prerequisite**: docs/explanation/ explicitly links to ayokoding-www
+- **No duplication**: Variable syntax in ayokoding-www, naming conventions in docs/explanation/
+- **Clear scope**: ayokoding-www = education, docs/explanation/ = OSE Platform standards
 
 ### Example 2: Python - Correct Separation
 
-**ayokoding-web** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/python/in-practice/error-handling.md`):
+**ayokoding-www** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/python/in-practice/error-handling.md`):
 
 ````markdown
 # Error Handling in Python
@@ -478,7 +478,7 @@ Key takeaway: Use specific exception types, always handle errors explicitly.
 ```markdown
 # Python Error Handling - OSE Platform Standards
 
-**Prerequisite**: Complete [ayokoding-web Python Error Handling](https://ayokoding.com/en/learn/software-engineering/programming-languages/python/in-practice/error-handling/).
+**Prerequisite**: Complete [ayokoding-www Python Error Handling](https://ayokoding.com/en/learn/software-engineering/programming-languages/python/in-practice/error-handling/).
 
 ## OSE Platform Exception Hierarchy
 
@@ -519,14 +519,14 @@ def validate_transaction(transaction: Transaction) -> None:
 
 **Why this works**:
 
-- **Separation**: ayokoding-web teaches Python exceptions (generic), docs/explanation/ defines OSE Platform domain exceptions
-- **Prerequisite**: docs/explanation/ explicitly links to ayokoding-web
-- **No duplication**: Generic try/except in ayokoding-web, domain hierarchy in docs/explanation/
-- **Clear scope**: ayokoding-web = Python fundamentals, docs/explanation/ = Shariah compliance patterns
+- **Separation**: ayokoding-www teaches Python exceptions (generic), docs/explanation/ defines OSE Platform domain exceptions
+- **Prerequisite**: docs/explanation/ explicitly links to ayokoding-www
+- **No duplication**: Generic try/except in ayokoding-www, domain hierarchy in docs/explanation/
+- **Clear scope**: ayokoding-www = Python fundamentals, docs/explanation/ = Shariah compliance patterns
 
 ### Example 3: Java - Correct Separation
 
-**ayokoding-web** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/java/by-example/intermediate.md`):
+**ayokoding-www** (`apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/java/by-example/intermediate.md`):
 
 ```markdown
 # Java By Example - Intermediate
@@ -561,7 +561,7 @@ Key takeaway: Use `Optional<T>` to explicitly represent absence, never return nu
 ```markdown
 # Java Type Safety - OSE Platform Standards
 
-**Prerequisite**: Complete [ayokoding-web Java By Example](https://ayokoding.com/en/learn/software-engineering/programming-languages/java/by-example/).
+**Prerequisite**: Complete [ayokoding-www Java By Example](https://ayokoding.com/en/learn/software-engineering/programming-languages/java/by-example/).
 
 ## Mandatory Optional Usage
 
@@ -607,10 +607,10 @@ Optional<ZakatPayment> findById(UUID id) {
 
 **Why this works**:
 
-- **Separation**: ayokoding-web teaches `Optional<T>` API (generic), docs/explanation/ mandates OSE Platform usage
-- **Prerequisite**: docs/explanation/ explicitly links to ayokoding-web
-- **No duplication**: Generic `Optional` usage in ayokoding-web, mandatory patterns in docs/explanation/
-- **Clear scope**: ayokoding-web = Java `Optional` education, docs/explanation/ = OSE Platform enforcement
+- **Separation**: ayokoding-www teaches `Optional<T>` API (generic), docs/explanation/ mandates OSE Platform usage
+- **Prerequisite**: docs/explanation/ explicitly links to ayokoding-www
+- **No duplication**: Generic `Optional` usage in ayokoding-www, mandatory patterns in docs/explanation/
+- **Clear scope**: ayokoding-www = Java `Optional` education, docs/explanation/ = OSE Platform enforcement
 
 ## Common Mistakes to Avoid
 
@@ -634,14 +634,14 @@ Use `:=` for local variables, `var` for package-level...
 
 ````
 
-**Why it fails**: This is educational content about Go syntax. Belongs in ayokoding-web, not docs/explanation/.
+**Why it fails**: This is educational content about Go syntax. Belongs in ayokoding-www, not docs/explanation/.
 
 **PASS: Repository-specific convention**:
 
 ```markdown
 # docs/explanation/.../golang/best-practices.md
 
-**Prerequisite**: Complete [ayokoding-web Golang By Example](https://ayokoding.com/en/learn/.../golang/by-example/).
+**Prerequisite**: Complete [ayokoding-www Golang By Example](https://ayokoding.com/en/learn/.../golang/by-example/).
 
 ## Variable Naming in OSE Platform
 
@@ -654,7 +654,7 @@ OSE Platform Go code follows these conventions:
 **Rationale**: Explicit domain terminology for Shariah compliance clarity.
 ````
 
-**Why it passes**: Focuses on OSE Platform-specific naming, links to ayokoding-web for fundamentals.
+**Why it passes**: Focuses on OSE Platform-specific naming, links to ayokoding-www for fundamentals.
 
 ### Mistake 2: Missing Prerequisite Statement
 
@@ -683,12 +683,12 @@ Follow PEP 8 standards...
 
 ## Prerequisite Knowledge
 
-**This documentation assumes you have completed the ayokoding-web Python learning path**:
+**This documentation assumes you have completed the ayokoding-www Python learning path**:
 
-- [ayokoding-web Python Overview](https://ayokoding.com/en/learn/.../python/)
+- [ayokoding-www Python Overview](https://ayokoding.com/en/learn/.../python/)
 - [By Example Tutorial](https://ayokoding.com/en/learn/.../python/by-example/)
 
-If you're new to Python, **start with ayokoding-web first**.
+If you're new to Python, **start with ayokoding-www first**.
 
 ## What This Documentation Covers
 
@@ -697,9 +697,9 @@ OSE Platform-specific Python conventions...
 
 **Why it passes**: Explicit prerequisite statement, clear scope definition.
 
-### Mistake 3: Repository-Specific Content in ayokoding-web
+### Mistake 3: Repository-Specific Content in ayokoding-www
 
-**FAIL: OSE Platform patterns in ayokoding-web**:
+**FAIL: OSE Platform patterns in ayokoding-www**:
 
 ````markdown
 # apps/ayokoding-www/.../golang/in-practice/error-handling.md
@@ -719,7 +719,7 @@ if err != nil {
 
 ````
 
-**Why it fails**: This is OSE Platform-specific convention. Belongs in docs/explanation/, not ayokoding-web.
+**Why it fails**: This is OSE Platform-specific convention. Belongs in docs/explanation/, not ayokoding-www.
 
 **PASS: Generic Go error patterns**:
 
@@ -756,14 +756,14 @@ Before publishing programming language documentation:
 
 ### For docs/explanation/ Style Guides
 
-- [ ] README.md includes explicit prerequisite statement linking to ayokoding-web
+- [ ] README.md includes explicit prerequisite statement linking to ayokoding-www
 - [ ] Content focuses on OSE Platform-specific conventions, not language fundamentals
-- [ ] No duplication of educational content from ayokoding-web
+- [ ] No duplication of educational content from ayokoding-www
 - [ ] Alignment section links to [Software Engineering Principles](../../principles/software-engineering/README.md)
-- [ ] Cross-references to ayokoding-web for language learning
-- [ ] Clear scope: "This is NOT a tutorial, see ayokoding-web"
+- [ ] Cross-references to ayokoding-www for language learning
+- [ ] Clear scope: "This is NOT a tutorial, see ayokoding-www"
 
-### For ayokoding-web Educational Content
+### For ayokoding-www Educational Content
 
 - [ ] Content covers language fundamentals and generic patterns (0-95% coverage)
 - [ ] No OSE Platform-specific conventions (framework choices, naming standards)
@@ -782,7 +782,7 @@ Before publishing programming language documentation:
 
 **Tutorial Standards**:
 
-- [Programming Language Content Standard](../tutorials/programming-language-content.md) - Full Set Tutorial Package for programming languages (ayokoding-web follows this)
+- [Programming Language Content Standard](../tutorials/programming-language-content.md) - Full Set Tutorial Package for programming languages (ayokoding-www follows this)
 - [By Example Tutorial](../tutorials/swe-by-example.md) - Code-first tutorial standards (Component 3 of Full Set)
 - [Tutorial Naming](../tutorials/naming.md) - Tutorial type standards and naming patterns
 
@@ -803,7 +803,7 @@ Before publishing programming language documentation:
 **Platform Documentation**:
 
 - [Software Design Index](../../../docs/explanation/software-engineering/README.md) - Parent documentation for programming language style guides
-- [ayokoding-web](../../../apps/ayokoding-www/README.md) - Educational programming content platform
+- [ayokoding-www](../../../apps/ayokoding-www/README.md) - Educational programming content platform
 
 **Repository Architecture**:
 
@@ -819,7 +819,7 @@ Before publishing programming language documentation:
 **Makers**:
 
 - `docs-maker` - Creates style guide content in docs/explanation/ following this convention
-- `apps-ayokoding-web-general-maker` - Creates educational content in ayokoding-web following this convention
+- `apps-ayokoding-web-general-maker` - Creates educational content in ayokoding-www following this convention
 - `apps-ayokoding-web-by-example-maker` - Creates by-example tutorials following separation rules
 
 **Checkers**:

@@ -27,9 +27,9 @@ All hexagonal architecture implementations in OSE Platform MUST comply with the 
 - **[Hexagonal Architecture By Example in FP](../../../../../apps/ayokoding-www/content/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-fp-by-example/overview.md)** — Ports as function type aliases, adapters as record literals, partial application DI
 - **[Hexagonal Architecture By Example in OOP](../../../../../apps/ayokoding-www/content/en/learn/software-engineering/software-architecture/hexagonal-architecture/in-oop-by-example/overview.md)** — Ports as interfaces, adapters as implementing classes, constructor DI
 
-**What this documentation covers**: OSE Platform-specific port naming, adapter package placement, composition root wiring in Rust/Axum, Nx target integration, OrganicLever bounded context wiring, and hexagonal-specific testing conventions.
+**What this documentation covers**: OSE Platform-specific port naming, adapter package placement, composition root wiring in F#/Giraffe, Nx target integration, OrganicLever bounded context wiring, and hexagonal-specific testing conventions.
 
-**What this documentation does NOT cover**: hexagonal architecture concepts, port/adapter theory, general DI patterns (those are in ayokoding-web).
+**What this documentation does NOT cover**: hexagonal architecture concepts, port/adapter theory, general DI patterns (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 
@@ -39,7 +39,7 @@ All hexagonal architecture implementations in OSE Platform MUST comply with the 
 
 1. **[Port Standards](./port-standards.md)** — Port (interface) naming, ownership, package placement, and OrganicLever port catalog
 2. **[Adapter Standards](./adapter-standards.md)** — Adapter (implementation) naming, package placement, forbidden imports, and polyglot conventions
-3. **[Composition Root Standards](./composition-root-standards.md)** — DI wiring conventions for Rust/Axum, Nx-aware startup
+3. **[Composition Root Standards](./composition-root-standards.md)** — DI wiring conventions for F#/Giraffe, Nx-aware startup
 4. **[Testing Standards](./testing-standards.md)** — Port contract tests, in-memory adapter swap, integration boundary rules, Nx target mapping
 
 ## OrganicLever Bounded Context Overview
@@ -48,14 +48,14 @@ OSE Platform Phase 1 centers on **OrganicLever** — a Sharia-compliant producti
 
 | Bounded Context | Nx App             | Primary Stack      | Status  |
 | --------------- | ------------------ | ------------------ | ------- |
-| Purchasing      | `organiclever-be`  | Rust/Axum          | Active  |
-| Supplier        | `organiclever-be`  | Rust/Axum          | Active  |
-| Receiving       | `organiclever-be`  | Rust/Axum          | Active  |
-| Invoicing       | `organiclever-be`  | Rust/Axum          | Planned |
-| Payments        | `organiclever-be`  | Rust/Axum          | Planned |
-| Frontend shell  | `organiclever-web` | Next.js/TypeScript | Active  |
+| Purchasing      | `organiclever-be`  | F#/Giraffe         | Active  |
+| Supplier        | `organiclever-be`  | F#/Giraffe         | Active  |
+| Receiving       | `organiclever-be`  | F#/Giraffe         | Active  |
+| Invoicing       | `organiclever-be`  | F#/Giraffe         | Planned |
+| Payments        | `organiclever-be`  | F#/Giraffe         | Planned |
+| Frontend shell  | `organiclever-www` | Next.js/TypeScript | Active  |
 
-The Rust/Axum backend (`organiclever-be`) exposes the composition root and HTTP adapter while the domain and port definitions are language-agnostic by design.
+The F#/Giraffe backend (`organiclever-be`) exposes the composition root and HTTP adapter while the domain and port definitions are language-agnostic by design.
 
 ## Dependency Direction Rule
 

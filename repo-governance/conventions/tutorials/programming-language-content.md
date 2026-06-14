@@ -1,6 +1,6 @@
 ---
 title: "Programming Language Content Standard"
-description: "Universal content architecture for programming language education on ayokoding-web with mandatory structure, coverage model, and quality benchmarks"
+description: "Universal content architecture for programming language education on ayokoding-www with mandatory structure, coverage model, and quality benchmarks"
 category: explanation
 subcategory: conventions
 tags:
@@ -14,9 +14,9 @@ created: 2025-12-18
 
 # Programming Language Content Standard
 
-**Defines the universal content architecture for programming language education on ayokoding-web.**
+**Defines the universal content architecture for programming language education on ayokoding-www.**
 
-All programming language content on ayokoding-web follows a standardized **Full Set Tutorial Package** architecture: 5 mandatory components (foundational tutorials, by-concept track, by-example track, cookbook, plus supporting documentation) providing complete language education from 0% to 95% coverage through multiple learning modalities.
+All programming language content on ayokoding-www follows a standardized **Full Set Tutorial Package** architecture: 5 mandatory components (foundational tutorials, by-concept track, by-example track, cookbook, plus supporting documentation) providing complete language education from 0% to 95% coverage through multiple learning modalities.
 
 ## Principles Implemented/Respected
 
@@ -42,7 +42,7 @@ This convention ensures:
 This convention applies to:
 
 - **All programming language tutorial content** across the repository:
-  - **ayokoding-web** (`apps/ayokoding-www/content/[lang]/learn/swe/programming-languages/[language]/`) - canonical location
+  - **ayokoding-www** (`apps/ayokoding-www/content/[lang]/learn/swe/programming-languages/[language]/`) - canonical location
   - **Any other location** where programming language tutorials exist
 - Includes: tutorials (foundational, by-concept, by-example, cookbook), how-to guides, best practices, anti-patterns
 - Enforced by: `apps-ayokoding-web-general-checker`, `apps-ayokoding-web-by-example-checker`, `apps-ayokoding-web-general-maker`, `apps-ayokoding-web-by-example-maker`, `apps-ayokoding-web-facts-checker` agents
@@ -145,7 +145,7 @@ The level-based weight system uses a two-part rule:
 
 The rule connects them: folder at directory depth N uses weight range N, content inside uses weight range N+1.
 
-The level-based weight system above is the complete reference for ayokoding-web content navigation.
+The level-based weight system above is the complete reference for ayokoding-www content navigation.
 
 **Notes:**
 
@@ -221,7 +221,7 @@ reference/
 - **Level 5** (language folder): Language folder's `_index.md` at 10002
 - **Level 6** (content inside language folder): `overview.md` at 100000, category folders' `_index.md` at 100002, 100003, 100004...
 - **Level 7** (content inside category folders): 1000000, 1000001, 1000002... (resets per category parent)
-- Follows ayokoding-web's level-based system: folder at level N has `_index.md` at level N, content inside at level N+1
+- Follows ayokoding-www's level-based system: folder at level N has `_index.md` at level N, content inside at level N+1
 
 ## Coverage Philosophy
 

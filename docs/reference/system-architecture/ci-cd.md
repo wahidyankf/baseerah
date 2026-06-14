@@ -84,7 +84,7 @@ graph LR
 **Execution Order:**
 
 1. **AyoKoding Content Processing** (if affected):
-   - Validate links in ayokoding-web content
+   - Validate links in ayokoding-www content
 2. **Prettier Formatting** (via lint-staged):
    - Format all staged files
    - Auto-stage formatted changes
@@ -174,7 +174,7 @@ graph LR
 
 1. Detect changes in `apps/ose-www/` vs `prod-ose-web` branch
 2. If changes exist (or `force_deploy=true`): setup Volta, Go 1.26.0
-3. Install dependencies and run `nx build ose-web`
+3. Install dependencies and run `nx build ose-www`
 4. Force-push `main` to `prod-ose-web`; Vercel auto-builds
 
 **Purpose**: Automated scheduled deployments for oseplatform.com with change detection to avoid unnecessary builds
@@ -189,7 +189,7 @@ graph LR
 
 1. Detect changes in `apps/wahidyankf-www/` vs `prod-wahidyankf-web` branch
 2. If changes exist (or `force_deploy=true`): setup Volta, Go 1.26.0
-3. Install dependencies and run `nx build wahidyankf-web`
+3. Install dependencies and run `nx build wahidyankf-www`
 4. Force-push `main` to `prod-wahidyankf-web`; Vercel auto-builds
 
 **Purpose**: Automated deployments for www.wahidyankf.com with change detection to avoid unnecessary builds
@@ -202,12 +202,12 @@ graph LR
 
 **Steps:**
 
-1. Run `specs:coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-web`, `organiclever-be-e2e`, `organiclever-web-e2e`)
-2. Run `fe-lint` for `organiclever-web`
+1. Run `specs:coverage` across all OrganicLever projects (`organiclever-be`, `organiclever-www`, `organiclever-be-e2e`, `organiclever-www-e2e`)
+2. Run `fe-lint` for `organiclever-www`
 3. Run `be-integration` tests with docker-compose (real PostgreSQL) under `organiclever-web-development` env
 4. Run `fe-integration` tests (MSW-mocked)
-5. Run combined `e2e` stage under `organiclever-web-development` env: full stack via docker-compose, then `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`) and `organiclever-web-e2e` (`WEB_BASE_URL: http://localhost:3200`) Playwright tests
-6. `detect-changes`: check `apps/organiclever-web/` vs previous commit
+5. Run combined `e2e` stage under `organiclever-web-development` env: full stack via docker-compose, then `organiclever-be-e2e` (`BASE_URL: http://localhost:8202`) and `organiclever-www-e2e` (`WEB_BASE_URL: http://localhost:3200`) Playwright tests
+6. `detect-changes`: check `apps/organiclever-www/` vs previous commit
 7. `deploy` (gated on all test jobs + `detect-changes == true`): force-push `HEAD` to `stag-organiclever-web`; Vercel auto-builds the staging site
 
 **Purpose**: Automated scheduled deployments to **staging** for www.organiclever.com, gated on full FE+BE test suite, with change detection to avoid unnecessary builds. Production promotion is gated and dispatch-only via `deploy-organiclever-web-to-production.yml` (see below).
@@ -221,7 +221,7 @@ graph LR
 **Steps:**
 
 1. Single job `e2e-staging` under `organiclever-web-staging` env
-2. Runs `npx nx run organiclever-web-e2e:test:e2e` against the staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}`
+2. Runs `npx nx run organiclever-www-e2e:test:e2e` against the staging URL using `WEB_BASE_URL: ${{ vars.WEB_BASE_URL }}`
 3. Uploads `playwright-report-organiclever-web-staging` as an artifact
 
 **Purpose**: Continuous health check of the staging deployment between development pushes. Read-only — never deploys.
@@ -303,7 +303,7 @@ graph LR
 
    - Pre-commit hook runs:
      - Formats code with Prettier
-     - Processes ayokoding-web content if affected
+     - Processes ayokoding-www content if affected
      - Validates links
    - Commit-msg hook validates format
    - Commit created

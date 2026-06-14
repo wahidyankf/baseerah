@@ -78,7 +78,7 @@ Organize code by feature/domain, not by technical layer.
 **Recommended Structure**:
 
 ```
-apps/ose-web-app/
+apps/my-react-app/
 ├── src/
 │   ├── features/              # Feature modules (domains)
 │   │   ├── zakat/

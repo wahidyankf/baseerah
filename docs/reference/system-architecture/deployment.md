@@ -28,7 +28,7 @@ graph LR
         NX_BUILD[Nx Build System<br/>Affected Detection]
         NEXT_BUILD[Next.js Build<br/>Standalone Output]
         SPRING_BUILD[Spring Boot Build<br/>Maven]
-        GO_BUILD[Go Build<br/>CLI Tools]
+        RUST_BUILD[Rust Build<br/>CLI Tools]
     end
 
     subgraph "Deployment Targets"
@@ -45,17 +45,17 @@ graph LR
     PROD_OSE --> NEXT_BUILD
     PROD_AYO --> NEXT_BUILD
     PROD_OL --> NEXT_BUILD
-    MAIN --> GO_BUILD
+    MAIN --> RUST_BUILD
     MAIN --> SPRING_BUILD
 
     NEXT_BUILD --> VERCEL_OSE
     NEXT_BUILD --> VERCEL_AYO
     NEXT_BUILD --> VERCEL_OL
-    GO_BUILD --> LOCAL
+    RUST_BUILD --> LOCAL
 
     NX_BUILD -.->|Orchestrates| NEXT_BUILD
     NX_BUILD -.->|Orchestrates| SPRING_BUILD
-    NX_BUILD -.->|Orchestrates| GO_BUILD
+    NX_BUILD -.->|Orchestrates| RUST_BUILD
 
     style MAIN fill:#0077b6,stroke:#03045e,color:#ffffff
     style PROD_OSE fill:#2a9d8f,stroke:#264653,color:#ffffff
@@ -64,7 +64,7 @@ graph LR
     style NX_BUILD fill:#6a4c93,stroke:#22223b,color:#ffffff
     style NEXT_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
     style SPRING_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
-    style GO_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
+    style RUST_BUILD fill:#457b9d,stroke:#1d3557,color:#ffffff
     style VERCEL_OSE fill:#e76f51,stroke:#9d0208,color:#ffffff
     style VERCEL_AYO fill:#e76f51,stroke:#9d0208,color:#ffffff
     style VERCEL_OL fill:#e76f51,stroke:#9d0208,color:#ffffff
@@ -75,7 +75,7 @@ graph LR
 
 ### Vercel Deployment
 
-**Next.js Sites** (ose-web, ayokoding-web, organiclever-web):
+**Next.js Sites** (ose-www, ayokoding-www, organiclever-www):
 
 - **Build Framework**: Next.js (standalone output)
 - **Build Command**: `next build`

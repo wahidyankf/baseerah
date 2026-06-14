@@ -304,7 +304,7 @@ skills: [domain__your-skill-name] # Add your Skill here
 
 **Wrong**: `description: "Helps with documentation tasks"`
 
-**Right**: `description: "Provides comprehensive guide for creating content on ayokoding-web, a Next.js 16 fullstack content platform. Auto-loads when task mentions bilingual content, by-example tutorials, programming language tutorials, or ayokoding-web site development."`
+**Right**: `description: "Provides comprehensive guide for creating content on ayokoding-www, a Next.js 16 fullstack content platform. Auto-loads when task mentions bilingual content, by-example tutorials, programming language tutorials, or ayokoding-www site development."`
 
 **Why**: Generic descriptions won't trigger auto-loading reliably. Be specific about terminology and use cases.
 

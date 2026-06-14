@@ -124,7 +124,7 @@ Software design documentation in `docs/explanation/software-engineering/` contai
 
 The following `docs/explanation/` content assumes readers have completed the corresponding AyoKoding learning paths:
 
-| Advanced Reference (docs/explanation/)                       | Prerequisite Learning (ayokoding-web)                                                                                                                   |
+| Advanced Reference (docs/explanation/)                       | Prerequisite Learning (ayokoding-www)                                                                                                                   |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [programming-languages/rust/](./programming-languages/rust/) | [learn/software-engineering/programming-languages/rust/](../../../apps/ayokoding-www/content/en/learn/software-engineering/programming-languages/rust/) |
 

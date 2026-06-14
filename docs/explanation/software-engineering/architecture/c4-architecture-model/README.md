@@ -63,7 +63,7 @@ OSE Platform C4 diagrams MUST use the following tools and conventions:
 
 **What this documentation covers**: OSE Platform-specific C4 patterns, Mermaid syntax conventions, color-blind friendly palettes, integration with DDD bounded contexts, repository diagram standards.
 
-**What this documentation does NOT cover**: C4 fundamentals, basic diagram types, generic C4 notation (those are in ayokoding-web).
+**What this documentation does NOT cover**: C4 fundamentals, basic diagram types, generic C4 notation (those are in ayokoding-www).
 
 **See**: [Programming Language Documentation Separation Convention](../../../../../repo-governance/conventions/structure/programming-language-docs-separation.md) for content separation rules.
 
