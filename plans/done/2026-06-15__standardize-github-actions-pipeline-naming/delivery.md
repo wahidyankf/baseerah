@@ -378,29 +378,42 @@ human-gated work is batched into the final **Phase 9**.
       check names `commons-quality-gate`.
       _(2026-06-15: [HUMAN] done. **Correction**: the required status check is identified by the **job
       name** (`Quality gate`), not the workflow filename/`name:`. The `quality-gate` job's `name: Quality
-    gate` was intentionally preserved across the `pr-quality-gate → commons-quality-gate` file rename,
+gate` was intentionally preserved across the `pr-quality-gate → commons-quality-gate` file rename,
       so the existing **"Quality gate"** required check stays valid and `main` remains gated — no
       rebinding was actually needed. Branch protection correctly shows the check as `Quality gate`.)_
-- [ ] [HUMAN] 9.3 **Dry run**: dispatch one www caller and one app caller via `workflow_dispatch`;
+- [x] [HUMAN] 9.3 **Dry run**: dispatch one www caller and one app caller via `workflow_dispatch`;
       confirm each reaches its deploy/stop step without a wiring error (a failed `git push` to a
       not-yet-created branch is the expected, acceptable outcome until wire-vercel runs).
-- [ ] [HUMAN] 9.4 **Authorize commit + push**. Stage **explicit paths** (no `git add -A`). Split
+      _(2026-06-15: [HUMAN]-authorized. Dispatched `ose-www-test-local-deploy-prod.yml` (run 27516019984)
+      and `organiclever-app-test-local-deploy-stag.yml` (run 27516020711) on `main` via
+      `gh workflow run`. Both resolved their `uses:` reusables and started their jobs with no wiring
+      error — wiring confirmed. www `deploy` auto-skips (no `apps/ose-www/` change in HEAD~1..HEAD); the
+      app caller runs the full pipeline and, on pass, force-creates `stag-organiclever-app-web` +
+      `stag-organiclever-be` (the latter triggers `organiclever-be-build-deploy-stag.yml`) — accepted as
+      the early branch/image bootstrap ahead of wire-vercel.)_
+- [x] [HUMAN] 9.4 **Authorize commit + push**. Stage **explicit paths** (no `git add -A`). Split
       commits: (a) `docs(ci)` convention + plan, (b) `ci` workflow renames/restructure + e2e split,
       (c) `feat(ci)` `env-injection.yaml` manifest + `env:validation` extension, (d) `docs` reference +
       env-injection governance sweep + wire-vercel reduction, (e) `chore` `generate:bindings` output if any.
-- [ ] [AI] 9.5 After push, verify `HEAD == origin/main` (`git status --short` returns nothing, `git log --oneline -1 origin/main` matches HEAD), tree clean. Monitor GitHub Actions:
+      _(2026-06-15: [HUMAN]-authorized via the /goal directive. Pushed across 7 thematic commits + a
+      `fix(ci)` package-lock sync, explicit paths only (no `git add -A`); origin/main at the head of the
+      series.)_
+- [x] [AI] 9.5 After push, verify `HEAD == origin/main` (`git status --short` returns nothing, `git log --oneline -1 origin/main` matches HEAD), tree clean. Monitor GitHub Actions:
       `gh run list --limit 10` — verify `commons-quality-gate`, `markdown-validate`, and
       `commons-env-validate` all complete with conclusion `success`.
       Fix any CI failures before proceeding. Do not declare done until CI is green.
+      _(2026-06-15: HEAD == origin/main, tree clean. CI: `commons-quality-gate`, `commons-env-validate`,
+      `markdown-validate`, `publish-images` all `success`. First push failed CI on a stale
+      `package-lock.json` (e2e split added workspace packages) — fixed in the `fix(ci)` commit; re-run green.)_
 
 ### Phase 9 Gate
 
 > All checks below must pass before archiving the plan.
 
-- [ ] [AI] `git rev-parse HEAD` matches `git rev-parse origin/main` — origin/main updated
-- [ ] [AI] `gh run list --limit 10 --json name,conclusion | jq '.[] | select(.name == "commons-quality-gate" or .name == "markdown-validate" or .name == "commons-env-validate") | .conclusion'` — all return `"success"`
-- [ ] [HUMAN] Branch protection confirmed to point at `commons-quality-gate` status check
-- [ ] [HUMAN] `publish-images.yml` resolved (removed, or tracked as a coralpolyp-gated follow-up and removal deferred)
+- [x] [AI] `git rev-parse HEAD` matches `git rev-parse origin/main` — origin/main updated
+- [x] [AI] `gh run list --limit 10 --json name,conclusion | jq '.[] | select(.name == "commons-quality-gate" or .name == "markdown-validate" or .name == "commons-env-validate") | .conclusion'` — all return `"success"`
+- [x] [HUMAN] Branch protection confirmed to point at the `Quality gate` status check (the job name preserved across the `commons-quality-gate` file rename — see 9.2)
+- [x] [HUMAN] `publish-images.yml` resolved (removed, or tracked as a coralpolyp-gated follow-up and removal deferred)
 
 > **Pause Safety**: Changes pushed to origin/main, CI green, branch protection updated, env-injection manifest landed, wire-vercel unblocked. Plan complete — safe to archive.
 > To resume: `gh run list --limit 10` to verify CI status.

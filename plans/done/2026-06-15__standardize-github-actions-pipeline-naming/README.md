@@ -5,7 +5,7 @@ description: Establishes a single domain-first naming convention for every file 
 
 # Standardize GitHub Actions Pipeline Naming + Tiered Deploy + Env/Secret Injection
 
-> **Status**: In progress — authored 2026-06-14. Execution not started.
+> **Status**: Done — authored 2026-06-14, executed + archived 2026-06-15. Phases 0–8 (`[AI]`) and Phase 9 (`[HUMAN]`) complete; CI green on `origin/main`.
 > **Blocks**: [`wire-vercel-www-app-cutover`](../wire-vercel-www-app-cutover/README.md) — that plan's
 > entire `.github/workflows` editing scope moves here; it shrinks to Vercel projects, DNS, GitHub
 > Environment creation, branch creation, and non-workflow docs once this plan lands.

@@ -9,7 +9,7 @@ description: Downstream production cutover deferred by restructure-fsharp-be-and
 > **Depends on**: [`restructure-fsharp-be-and-web-app-tiers`](../../done/2026-06-14__restructure-fsharp-be-and-web-app-tiers/README.md)
 > must land first (it performs the app-directory renames and the marketing/app split but
 > **explicitly defers** the Vercel/DNS/prod-branch cutover to this plan); and
-> [`standardize-github-actions-pipeline-naming`](../standardize-github-actions-pipeline-naming/README.md),
+> [`standardize-github-actions-pipeline-naming`](../../done/2026-06-15__standardize-github-actions-pipeline-naming/README.md),
 > which now **owns all `.github/workflows` editing** and defines the tiered env/secret **injection
 > standard** (the value-less `env-injection.yaml` manifest). **This plan assumes that plan is DONE**:
 > the workflows are already restructured/renamed and the manifest exists, so this plan's scope drops to

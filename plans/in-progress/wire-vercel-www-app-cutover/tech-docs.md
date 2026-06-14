@@ -110,7 +110,7 @@ Vercel project. This plan's verification explicitly asserts their **absence** fr
 All `.github/workflows/` restructuring — the `_reusable-www-test-local-deploy` callers, the
 `*-app-test-local-deploy-stag` / `*-app-test-stag-deploy-prod` app pipelines, the
 `*-be-build-deploy-stag` backend workflows, and the `commons-*` / `markdown-*` cross-cutting renames —
-is performed by [`standardize-github-actions-pipeline-naming`](../standardize-github-actions-pipeline-naming/README.md)
+is performed by [`standardize-github-actions-pipeline-naming`](../../done/2026-06-15__standardize-github-actions-pipeline-naming/README.md)
 and lands **before** this plan runs. This plan **does not edit any workflow file**. Its only workflow
 interaction is a read-only **verification** that the already-standardized workflows reference the
 branches and Environments this plan creates:
