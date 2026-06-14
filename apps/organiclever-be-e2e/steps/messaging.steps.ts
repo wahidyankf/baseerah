@@ -1,17 +1,12 @@
 import { expect } from "@playwright/test";
 import { createBdd } from "playwright-bdd";
-import { readFileSync } from "fs";
-import { join } from "path";
-import { setResponse, getResponse, clearResponse } from "../utils/response-store";
+import { clearResponse } from "../utils/response-store";
 
 const { Given, When, Then, Before } = createBdd();
 
 Before(() => {
   clearResponse();
 });
-
-// Uses the PDF fixture from crane-be for convenience
-const PDF_FIXTURE = join(__dirname, "../../crane-be/tests/fixtures/sample.pdf");
 
 Given("ORGANICLEVER_BE_NATS_URL points to a running NATS server with JetStream enabled", async () => {
   // No-op: compose brings up NATS; host-running backend connects at startup
@@ -21,26 +16,12 @@ Given("organiclever-be has a JetStream durable stream and consumer for its demo 
   // No-op: backend runs the JetStream demo at startup
 });
 
-Given("a running stack of organiclever-be, its NATS server, and crane-be", async () => {
-  // No-op: compose stack + host backend both running
-});
-
 When("organiclever-be starts up", async () => {
   // The health endpoint confirms startup; no-op here
 });
 
 When("organiclever-be publishes a demo message to that subject", async () => {
   // Demo runs at startup; just read the status endpoint in Then steps
-});
-
-When("a client sends POST to the organiclever-be media-convert endpoint with a sample PDF", async ({ request }) => {
-  const pdfBytes = readFileSync(PDF_FIXTURE);
-  setResponse(
-    await request.post("/api/v1/media/convert", {
-      data: pdfBytes,
-      headers: { "Content-Type": "application/octet-stream" },
-    }),
-  );
 });
 
 Then("the NATS connection is established", async ({ request }) => {
@@ -69,15 +50,6 @@ Then("the messaging status surface reports the demo delivered and acked", async 
   const resp = await request.get("/api/v1/system/status/messaging");
   const body = (await resp.json()) as Record<string, string>;
   expect(body["jetstream_demo"]).toBe("delivered_and_acked");
-});
-
-Then("the response status is 200", async () => {
-  expect(getResponse().status()).toBe(200);
-});
-
-Then("the response body contains markdown produced by crane-be", async () => {
-  const text = await getResponse().text();
-  expect(text.length).toBeGreaterThan(0);
 });
 
 // ── @unit step stubs ───────────────────────────────────────────────────────

@@ -1,0 +1,72 @@
+JournalEntry:
+  type: object
+  description: A persisted journal entry (server-of-record mirror of the PGlite client schema)
+  required:
+    - id
+    - name
+    - payload
+    - startedAt
+    - finishedAt
+    - labels
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      type: string
+    name:
+      type: string
+      description: Kind slug matching ^[a-z][a-z0-9-]*$
+    payload:
+      type: object
+      additionalProperties: true
+    startedAt:
+      type: string
+      format: date-time
+    finishedAt:
+      type: string
+      format: date-time
+    labels:
+      type: array
+      items:
+        type: string
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+
+NewJournalEntry:
+  type: object
+  description: Request body to create a journal entry
+  required:
+    - name
+    - payload
+    - startedAt
+    - finishedAt
+  properties:
+    name:
+      type: string
+    payload:
+      type: object
+      additionalProperties: true
+    startedAt:
+      type: string
+      format: date-time
+    finishedAt:
+      type: string
+      format: date-time
+    labels:
+      type: array
+      items:
+        type: string
+
+UpdateJournalEntry:
+  type: object
+  description: Request body to update a journal entry (partial)
+  properties:
+    name:
+      type: string
+    payload:
+      type: object
+      additionalProperties: true

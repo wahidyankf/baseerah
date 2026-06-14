@@ -14,7 +14,7 @@ systems to determine whether the service is ready to handle traffic.
 | Term          | Code identifier(s)       | Used in features     |
 | ------------- | ------------------------ | -------------------- |
 | health status | `HealthStatus`, `status` | health-check.feature |
-| get health    | `get_health`             | health-check.feature |
+| get health    | `getHealth`              | health-check.feature |
 
 ## Out of scope
 

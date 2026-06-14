@@ -2,7 +2,7 @@
 
 **Bounded context**: `messaging`
 **Maintainer**: organiclever-be team
-**Last reviewed**: 2026-06-12
+**Last reviewed**: 2026-06-14
 **Audience:** Engineers, Technical Product/Project Managers
 
 ## One-line summary
@@ -15,7 +15,7 @@ proving message delivery via JetStream durable consumers at startup.
 | Term               | Code identifier(s)                             | Used in features                   |
 | ------------------ | ---------------------------------------------- | ---------------------------------- |
 | `NATS subject`     | `organiclever.messaging.demo` (stream subject) | `messaging/nats-connect.feature`   |
-| `JetStream`        | `async_nats::jetstream`                        | `messaging/jetstream-demo.feature` |
+| `JetStream`        | `NatsJSContext`                                | `messaging/jetstream-demo.feature` |
 | `durable consumer` | `organiclever-messaging-demo` (consumer name)  | `messaging/jetstream-demo.feature` |
 | `messaging status` | `SharedMessagingStatus`                        | `messaging/jetstream-demo.feature` |
 
@@ -27,8 +27,8 @@ A string channel identifier on the NATS broker to which publishers send messages
 subscribers listen. In this bounded context the primary subject is
 `organiclever.messaging.demo`, used for the JetStream stream demonstration.
 
-**Code identifier(s)**: `ORGANICLEVER_MESSAGING_DEMO` (Rust constant in
-`apps/organiclever-be/src/messaging/`).
+**Code identifier(s)**: `Subject` value (`organiclever.messaging.demo`) in
+`apps/organiclever-be/src/OrganicleverBe/Contexts/Messaging/Infrastructure/JetStreamDemo.fs`.
 
 **Used in features**: `messaging/nats-connect.feature`
 
@@ -41,8 +41,8 @@ JetStream retains messages in named streams and tracks consumer delivery via
 acknowledgements. The organiclever-be messaging context uses JetStream to prove
 durable, at-least-once delivery at startup.
 
-**Code identifier(s)**: `async_nats::jetstream` (Rust crate module in
-`apps/organiclever-be/src/messaging/`).
+**Code identifier(s)**: `NatsJSContext` (NATS.Net JetStream context in
+`apps/organiclever-be/src/OrganicleverBe/Contexts/Messaging/Infrastructure/JetStreamDemo.fs`).
 
 **Used in features**: `messaging/jetstream-demo.feature`
 
@@ -57,8 +57,8 @@ restarts. A durable consumer is identified by a consumer name rather than an eph
 ID. The organiclever-be messaging context creates a durable consumer
 `organiclever-messaging-demo` on the `ORGANICLEVER_MESSAGING_DEMO` stream at startup.
 
-**Code identifier(s)**: `organiclever-messaging-demo` (consumer name in
-`apps/organiclever-be/src/messaging/`).
+**Code identifier(s)**: `ConsumerName` value (`organiclever-messaging-demo`) in
+`apps/organiclever-be/src/OrganicleverBe/Contexts/Messaging/Infrastructure/JetStreamDemo.fs`.
 
 **Used in features**: `messaging/jetstream-demo.feature`
 
@@ -76,8 +76,9 @@ outcome of the JetStream demo run (stream created, message published, consumer c
 message delivered and acked). Allows operators and e2e tests to verify the NATS
 integration without starting a full business workflow.
 
-**Code identifier(s)**: `GET /api/v1/system/status/messaging` route in
-`apps/organiclever-be/src/messaging/status.rs`.
+**Code identifier(s)**: `SharedMessagingStatus` backing the
+`GET /api/v1/system/status/messaging` route in
+`apps/organiclever-be/src/OrganicleverBe/Contexts/Messaging/`.
 
 **Used in features**: `messaging/jetstream-demo.feature`
 

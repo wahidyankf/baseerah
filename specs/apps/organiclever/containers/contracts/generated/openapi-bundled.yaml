@@ -12,6 +12,8 @@ servers:
 tags:
   - name: Health
     description: Service health checks
+  - name: Journal
+    description: Journal entry CRUD (server-of-record mirror; ships unconsumed)
 paths:
   /api/v1/health:
     get:
@@ -26,6 +28,120 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthResponse'
+  /api/v1/journal/entries:
+    get:
+      operationId: listJournalEntries
+      summary: List journal entries
+      tags:
+        - Journal
+      responses:
+        '200':
+          description: All journal entries, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalEntry'
+    post:
+      operationId: createJournalEntry
+      summary: Create a journal entry
+      tags:
+        - Journal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewJournalEntry'
+      responses:
+        '201':
+          description: The created journal entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/journal/entries/{id}:
+    get:
+      operationId: getJournalEntry
+      summary: Fetch a journal entry by id
+      tags:
+        - Journal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The journal entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateJournalEntry
+      summary: Update a journal entry
+      tags:
+        - Journal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJournalEntry'
+      responses:
+        '200':
+          description: The updated journal entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalEntry'
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteJournalEntry
+      summary: Delete a journal entry
+      tags:
+        - Journal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Entry deleted
+        '404':
+          description: Entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     ErrorResponse:
@@ -50,3 +166,73 @@ components:
         status:
           type: string
           example: UP
+    JournalEntry:
+      type: object
+      description: A persisted journal entry (server-of-record mirror of the PGlite client schema)
+      required:
+        - id
+        - name
+        - payload
+        - startedAt
+        - finishedAt
+        - labels
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: Kind slug matching ^[a-z][a-z0-9-]*$
+        payload:
+          type: object
+          additionalProperties: true
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+        labels:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    NewJournalEntry:
+      type: object
+      description: Request body to create a journal entry
+      required:
+        - name
+        - payload
+        - startedAt
+        - finishedAt
+      properties:
+        name:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+        labels:
+          type: array
+          items:
+            type: string
+    UpdateJournalEntry:
+      type: object
+      description: Request body to update a journal entry (partial)
+      properties:
+        name:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true

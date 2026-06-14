@@ -5,7 +5,7 @@ open Microsoft.EntityFrameworkCore
 open Npgsql
 open Xunit
 open OrganicleverBe.Infrastructure.AppDbContext
-open OrganicleverBe.Infrastructure.Database
+open OrganicleverBe.Contexts.Db.Infrastructure
 
 let private connectionString () =
     match Environment.GetEnvironmentVariable("DATABASE_URL") with

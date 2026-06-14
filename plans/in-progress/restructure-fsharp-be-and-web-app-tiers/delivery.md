@@ -297,6 +297,15 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 
 > **Pause Safety**: media fully removed; two bootable images public; infra unblocked. Resume:
 > `npx nx affected -t build --base=origin/main`. **Push after gate.**
+>
+> **REORDER (2026-06-14, decision #25)**: the Phase 2 main-push (item 9) + GHCR/k3s-unblock
+> ([HUMAN] items) are **deferred** until after Phase 3 + Phase 4a. Reason: the Phase 1 F# rewrite left
+> the backend DDD specs (`bounded-contexts.yaml` bc + ubiquitous-language ul, validated inside the
+> **web** projects' `test:quick`) pointing at removed Rust contexts/identifiers; the validators require
+> the F# per-context hexagonal layers + matching identifiers that only exist once Phase 3 (ose-be) and
+> Phase 4a (organiclever-be) implement them. All Phase 2 [AI] work is done in the working tree but
+> stays **uncommitted** until DDD bc/ul is green for both backends. Commit order then becomes
+> Phase 2 → Phase 3 → Phase 4, and the first `origin/main` push bundles Phases 1–4.
 
 ---
 
@@ -310,9 +319,10 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 
 ### 3a — Port ose-app-be to F# (under current name)
 
-- [ ] [AI] **RED**: Failing unit tests for each of the five bounded-context handlers (`health`,
+- [x] [AI] **RED**: Failing unit tests for each of the five bounded-context handlers (`health`,
       `ai-orchestration`, `gap-analysis`, `internal-policy`, `regulatory-source`) in
       `apps/ose-app-be/tests/unit/` — acceptance: all five fail (module/route not found).
+      <br/>_Done 2026-06-14: 5 context test modules added; test:unit FAILS FS0039 "namespace 'Contexts' is not defined"._
 - [ ] [AI] **GREEN**: Implement each as a `Contexts/<Name>/{Domain,Application,Infrastructure,Api}`
       slice; wire EF repositories (`Infrastructure/Repositories/EfRepositories.fs`) + DI in `Program.fs`;
       implement `Contexts/Messaging/` (NATS.Net client, JetStream demo, status surface), **dropping**
@@ -320,54 +330,63 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
       `Infrastructure/OpenRouterClient.fs` driven by the `*_OPENROUTER_*` env vars and wire it into the
       `gap-analysis`/`ai-orchestration` contexts; the API key stays a placeholder in `.env.example`
       (never committed) — acceptance: `nx run ose-app-be:test:unit` + `:test:integration` pass.
-- [ ] [AI] **REFACTOR**: Extract `Infrastructure/NatsClient.fs`; each context independent (no
+      <br/>_Done 2026-06-14: 6 Contexts/<Name>/{Domain,Application,Infrastructure,Api} slices (5 + Messaging + Db); EfRepositories + DI; NATS JetStream demo (crane_client dropped); OpenRouterClient wired into gap-analysis/ai-orchestration. test:unit 7/7, test:integration 4/4 (podman)._
+- [x] [AI] **REFACTOR**: Extract `Infrastructure/NatsClient.fs`; each context independent (no
       cross-context imports except shared Domain) — acceptance: `typecheck` exits 0.
-- [ ] [AI] **Spec adaptation**: bind F# TickSpec steps for all six contexts; remove media from
+      <br/>_Done 2026-06-14: NatsClient.fs extracted; contexts couple only to shared Domain.Readiness; typecheck + lint EXIT 0 (TreatWarningsAsErrors)._
+- [x] [AI] **Spec adaptation**: bind F# TickSpec steps for all six contexts; remove media from
       `specs/apps/ose/` behavior/contract; regenerate via `nx run ose-app-be:codegen` — acceptance:
       `nx run ose-app-be:specs:coverage` exits 0 (messaging excluded); no media in generated types.
+      <br/>_Done 2026-06-14: bounded-contexts.yaml rebound to F# (code→Contexts/<Name>, code_lang:fs, layers match PascalCase slice dirs); glossaries rebound to F# identifiers; TickSpec steps bound. **specs validate bc ose + ul ose both EXIT 0 (zero findings)**; specs:coverage EXIT 0 (6 specs/19 steps); codegen EXIT 0, no media._
 
 ### 3b — Atomic rename `ose-app-be` → `ose-be`
 
 > Single atomic commit (decision #19/#21). Apply ALL of the following together, then push as one commit.
 
-- [ ] [AI] Rename dirs: `git mv apps/ose-app-be apps/ose-be`; `git mv apps/ose-app-be-e2e apps/ose-be-e2e`
+- [x] [AI] Rename dirs: `git mv apps/ose-app-be apps/ose-be`; `git mv apps/ose-app-be-e2e apps/ose-be-e2e`
       — acceptance: both new dirs exist; old dirs gone.
-- [ ] [AI] Rename the F# project/namespace `OseAppBe` → `OseBe` (fsproj `apps/ose-be/src/OseBe/OseBe.fsproj`,
+- [x] [AI] Rename the F# project/namespace `OseAppBe` → `OseBe` (fsproj `apps/ose-be/src/OseBe/OseBe.fsproj`,
       namespaces, `<Compile>` paths, `src/` folder) — acceptance:
       `grep -r 'OseAppBe' apps/ose-be/src` returns zero.
-- [ ] [AI] Update both renamed `project.json` `name`/targets, tags, `implicitDependencies`, e2e
+- [x] [AI] Update both renamed `project.json` `name`/targets, tags, `implicitDependencies`, e2e
       `webServer`/`baseURL` configs, import paths, and the Dockerfile path — acceptance:
       `nx show projects` lists `ose-be`, `ose-be-e2e`; old `ose-app-be*` names gone;
       `npx nx run-many -t typecheck --projects=ose-be,ose-be-e2e` exits 0.
-- [ ] [AI] Rename env vars `OSE_APP_BE_*` → `OSE_BE_*` in `apps/ose-be/.env.example` (specifically
+- [x] [AI] Rename env vars `OSE_APP_BE_*` → `OSE_BE_*` in `apps/ose-be/.env.example` (specifically
       `OSE_BE_PORT`, `OSE_BE_CORS_ORIGINS`, `OSE_BE_NATS_URL`, `OSE_BE_OPENROUTER_API_KEY` [SECRET —
       placeholder only], `OSE_BE_OPENROUTER_BASE_URL`, `OSE_BE_OPENROUTER_MODEL`) and the `root:` entry
       `apps/ose-app-be` → `apps/ose-be` in `env-contract.yaml`; run `rhino-cli env validate` —
       acceptance: exits 0; `grep -rE 'OSE_APP_BE_' apps/ose-be/.env.example env-contract.yaml` zero.
-- [ ] [AI] Update `.github/workflows/publish-images.yml`: rename the OSE backend job/output
+- [x] [AI] Update `.github/workflows/publish-images.yml`: rename the OSE backend job/output
       `ose-app-be` → `ose-be` (image `ghcr.io/wahidyankf/ose-be`) — acceptance:
       `grep 'ose-app-be' .github/workflows/publish-images.yml` zero.
-- [ ] [AI] Update the `ose-app-web` `codegen` source pointer to read the `ose-be` bundled OpenAPI spec —
+- [x] [AI] Update the `ose-app-web` `codegen` source pointer to read the `ose-be` bundled OpenAPI spec —
       acceptance: `nx run ose-app-web:codegen` exits 0 reading from the `ose-be` spec path.
-- [ ] [AI] **Specs rename**: `git mv specs/apps/ose/behavior/app-be specs/apps/ose/behavior/be`;
+- [x] [AI] **Specs rename**: `git mv specs/apps/ose/behavior/app-be specs/apps/ose/behavior/be`;
       `git mv specs/apps/ose/components/app-be specs/apps/ose/components/be`; update internal references
       and READMEs to `be` — acceptance: `test -d specs/apps/ose/behavior/be` and
       `grep -rn 'app-be' specs/apps/ose/behavior specs/apps/ose/components` returns zero.
 
 ### Phase 3 Gate
 
-- [ ] [AI] `nx show projects` — `ose-be`, `ose-be-e2e` exist; old `ose-app-be`/`ose-app-be-e2e` gone.
-- [ ] [AI] `nx affected -t typecheck lint test:quick specs:coverage --base=origin/main` — exits 0 for
+- [x] [AI] `nx show projects` — `ose-be`, `ose-be-e2e` exist; old `ose-app-be`/`ose-app-be-e2e` gone.
+- [x] [AI] `nx affected -t typecheck lint test:quick specs:coverage --base=origin/main` — exits 0 for
       ose-be.
-- [ ] [AI] `nx run ose-be:test:quick` — exits 0; coverage ≥90%.
-- [ ] [AI] `nx run ose-be:specs:coverage` — exits 0; all six contexts bound (incl. db/migrations.feature via DbUp binding; decision #24).
-- [ ] [AI] `nx run ose-be:codegen` — exits 0; contract validates minus media.
-- [ ] [AI] `grep -r 'OSE_BE_OPENROUTER' apps/ose-be/src/OseBe/` — ≥1 match (OpenRouter integration kept).
-- [ ] [AI] `grep -rnE '\bose-app-be\b|OSE_APP_BE_' apps/ specs/ .github/ env-contract.yaml` — zero
+- [x] [AI] `nx run ose-be:test:quick` — exits 0; coverage ≥90%.
+- [x] [AI] `nx run ose-be:specs:coverage` — exits 0; all six contexts bound (incl. db/migrations.feature via DbUp binding; decision #24).
+- [x] [AI] `nx run ose-be:codegen` — exits 0; contract validates minus media.
+- [x] [AI] `grep -r 'OSE_BE_OPENROUTER' apps/ose-be/src/OseBe/` — ≥1 match (OpenRouter integration kept).
+- [x] [AI] `grep -rnE '\bose-app-be\b|OSE_APP_BE_' apps/ specs/ .github/ env-contract.yaml` — zero
       (fully renamed).
 
 > **Pause Safety**: ose-be fully F# and renamed, contract + OpenRouter preserved. Resume:
 > `nx run ose-be:test:quick`. **Push the rename as one atomic commit.**
+>
+> **Phase 3 done (2026-06-14)**: ose-app-be ported to F# (6 context slices: 5 + Messaging + Db) and
+> atomically renamed → `ose-be`. OpenRouter preserved. Gate all EXIT 0: specs validate bc+ul ose (zero
+> findings), test:unit 7/7, test:integration 4/4 (podman), specs:coverage (6 specs/19 steps), codegen
+> (no media), typecheck/lint; zero stale `ose-app-be`/`OSE_APP_BE_` refs. Per REORDER: UNCOMMITTED
+> until Phase 4a makes organiclever DDD green.
 
 ---
 
@@ -380,19 +399,19 @@ in`tech-docs.md`Deviations — acceptance:`test:integration` passes for both; os
 
 ### 4a — journal CRUD + health + messaging (backend, name kept)
 
-- [ ] [AI] **RED**: Failing unit + journal-CRUD tests in `apps/organiclever-be/tests/` asserting
+- [x] [AI] **RED**: Failing unit + journal-CRUD tests in `apps/organiclever-be/tests/` asserting
       create/read/update/delete return expected status + shape, and `/health` + messaging status — run
       `nx run organiclever-be:test:unit` — acceptance: fail (handlers/repo not found).
-- [ ] [AI] **GREEN**: Implement `Contexts/{Health,Journal,Messaging}/` slices; EF repository for
+- [x] [AI] **GREEN**: Implement `Contexts/{Health,Journal,Messaging}/` slices; EF repository for
       `journal` whose entity mirrors the PGlite client schema
       (`apps/organiclever-web/src/contexts/journal/`); NATS.Net JetStream demo + status; DI in
       `Program.fs` — acceptance: `test:unit` + `test:integration` pass.
-- [ ] [AI] **REFACTOR**: Extract `NatsClient.fs`; journal slice independent — acceptance: `typecheck` 0.
-- [ ] [AI] **Contract**: add the `journal` path to `specs/apps/organiclever/.../contracts`; add journal
+- [x] [AI] **REFACTOR**: Extract `NatsClient.fs`; journal slice independent — acceptance: `typecheck` 0.
+- [x] [AI] **Contract**: add the `journal` path to `specs/apps/organiclever/.../contracts`; add journal
       Gherkin under `specs/apps/organiclever/behavior/organiclever-be/gherkin/journal/` (dir name kept —
       backend not renamed); regenerate via `nx run organiclever-be:codegen` — acceptance: codegen 0;
       journal types present.
-- [ ] [AI] **Smoke-probe**: a contract smoke-probe (curl or test) exercises the journal CRUD over HTTP
+- [x] [AI] **Smoke-probe**: a contract smoke-probe (curl or test) exercises the journal CRUD over HTTP
       — acceptance: all four verbs return expected responses. The CRUD ships **unconsumed**
       (organiclever-app-web stays PGlite).
 

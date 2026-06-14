@@ -1,0 +1,115 @@
+/api/v1/journal/entries:
+  get:
+    operationId: listJournalEntries
+    summary: List journal entries
+    tags:
+      - Journal
+    responses:
+      "200":
+        description: All journal entries, newest first
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "../schemas/journal.yaml#/JournalEntry"
+  post:
+    operationId: createJournalEntry
+    summary: Create a journal entry
+    tags:
+      - Journal
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/journal.yaml#/NewJournalEntry"
+    responses:
+      "201":
+        description: The created journal entry
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/journal.yaml#/JournalEntry"
+      "400":
+        description: Invalid input
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+
+/api/v1/journal/entries/{id}:
+  get:
+    operationId: getJournalEntry
+    summary: Fetch a journal entry by id
+    tags:
+      - Journal
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      "200":
+        description: The journal entry
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/journal.yaml#/JournalEntry"
+      "404":
+        description: Entry not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+  put:
+    operationId: updateJournalEntry
+    summary: Update a journal entry
+    tags:
+      - Journal
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/journal.yaml#/UpdateJournalEntry"
+    responses:
+      "200":
+        description: The updated journal entry
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/journal.yaml#/JournalEntry"
+      "404":
+        description: Entry not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"
+  delete:
+    operationId: deleteJournalEntry
+    summary: Delete a journal entry
+    tags:
+      - Journal
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      "204":
+        description: Entry deleted
+      "404":
+        description: Entry not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/error.yaml#/ErrorResponse"

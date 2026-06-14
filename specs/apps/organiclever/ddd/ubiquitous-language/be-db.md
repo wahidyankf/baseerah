@@ -7,7 +7,7 @@
 ## Responsibility
 
 Manages the database schema lifecycle for `organiclever-be`. On each startup, applies
-any pending `sqlx` migrations to the connected PostgreSQL instance before the HTTP
+any pending DbUp embedded migrations to the connected PostgreSQL instance before the HTTP
 server begins accepting requests. This ensures the schema is always up-to-date
 without manual intervention.
 
@@ -15,9 +15,9 @@ without manual intervention.
 
 | Term              | Code identifier(s) | Used in features   |
 | ----------------- | ------------------ | ------------------ |
-| migration         | `run_migrations`   | migrations.feature |
-| migration routine | `run_migrations`   | migrations.feature |
-| applied migration | `run_migrations`   | migrations.feature |
+| migration         | `runMigrations`    | migrations.feature |
+| migration routine | `runMigrations`    | migrations.feature |
+| applied migration | `runMigrations`    | migrations.feature |
 
 ## Out of scope
 

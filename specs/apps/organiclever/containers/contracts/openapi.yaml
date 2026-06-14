@@ -14,6 +14,8 @@ servers:
 tags:
   - name: Health
     description: Service health checks
+  - name: Journal
+    description: Journal entry CRUD (server-of-record mirror; ships unconsumed)
 
 components:
   schemas:
@@ -22,8 +24,20 @@ components:
       $ref: "./schemas/error.yaml#/ErrorResponse"
     HealthResponse:
       $ref: "./schemas/health.yaml#/HealthResponse"
+    # Journal
+    JournalEntry:
+      $ref: "./schemas/journal.yaml#/JournalEntry"
+    NewJournalEntry:
+      $ref: "./schemas/journal.yaml#/NewJournalEntry"
+    UpdateJournalEntry:
+      $ref: "./schemas/journal.yaml#/UpdateJournalEntry"
 
 paths:
   # Health
   /api/v1/health:
     $ref: "./paths/health.yaml#/~1api~1v1~1health"
+  # Journal
+  /api/v1/journal/entries:
+    $ref: "./paths/journal.yaml#/~1api~1v1~1journal~1entries"
+  /api/v1/journal/entries/{id}:
+    $ref: "./paths/journal.yaml#/~1api~1v1~1journal~1entries~1{id}"

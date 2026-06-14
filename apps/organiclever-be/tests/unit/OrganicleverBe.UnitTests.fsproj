@@ -14,7 +14,13 @@
 
   <ItemGroup>
     <Compile Include="Steps/BddState.fs" />
+    <Compile Include="Steps/HealthSteps.fs" />
+    <Compile Include="Steps/JournalSteps.fs" />
     <Compile Include="Tests/HealthHandlerTests.fs" />
+    <Compile Include="Tests/HealthContextTests.fs" />
+    <Compile Include="Tests/JournalDomainTests.fs" />
+    <Compile Include="Tests/JournalApiTests.fs" />
+    <Compile Include="Tests/MessagingTests.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +31,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
+    <PackageReference Include="TickSpec" Version="2.0.5" />
   </ItemGroup>
 
   <ItemGroup>

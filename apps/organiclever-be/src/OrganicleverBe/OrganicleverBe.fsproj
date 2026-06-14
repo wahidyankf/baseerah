@@ -18,13 +18,32 @@
          Only the usable models are wired; ErrorResponse.fs is generated but excluded
          (it references an AnyType module the generator does not emit). -->
     <Compile Include="..\..\generated-contracts\OpenAPI\src\OrganicleverBe.Contracts\HealthResponse.fs" />
-    <!-- Infrastructure: EF Core context + DbUp bootstrap + NATS client -->
+    <!-- Shared infrastructure: EF Core context + DbUp config + NATS client -->
     <Compile Include="Infrastructure/AppDbContext.fs" />
     <Compile Include="Infrastructure/Database.fs" />
     <Compile Include="Infrastructure/NatsClient.fs" />
-    <!-- HTTP handlers -->
+    <!-- db context (DbUp migration routine) -->
+    <Compile Include="Contexts/Db/Infrastructure/DbMigrations.fs" />
+    <!-- health context slice -->
+    <Compile Include="Contexts/Health/Domain/HealthDomain.fs" />
+    <Compile Include="Contexts/Health/Application/HealthService.fs" />
+    <Compile Include="Contexts/Health/Infrastructure/HealthInfrastructure.fs" />
+    <Compile Include="Contexts/Health/Api/HealthApi.fs" />
+    <!-- journal context slice (Infrastructure precedes Application: the storage
+         port type is declared in Infrastructure) -->
+    <Compile Include="Contexts/Journal/Domain/JournalDomain.fs" />
+    <Compile Include="Contexts/Journal/Infrastructure/JournalInfrastructure.fs" />
+    <Compile Include="Contexts/Journal/Application/JournalService.fs" />
+    <Compile Include="Contexts/Journal/Api/JournalApi.fs" />
+    <!-- messaging context slice -->
+    <Compile Include="Contexts/Messaging/Domain/MessagingDomain.fs" />
+    <Compile Include="Contexts/Messaging/Application/MessagingStatus.fs" />
+    <Compile Include="Contexts/Messaging/Infrastructure/JetStreamDemo.fs" />
+    <Compile Include="Contexts/Messaging/Api/MessagingApi.fs" />
+    <!-- legacy /health handler (retained for the web tier liveness probe) -->
     <Compile Include="Handlers/HealthHandler.fs" />
     <!-- Composition root -->
+    <Compile Include="WebApp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

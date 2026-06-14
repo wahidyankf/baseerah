@@ -164,41 +164,65 @@ contexts:
 
   - name: be-db
     summary: >-
-      Database schema lifecycle — applies pending sqlx migrations on boot before
-      the HTTP server starts. Ensures the schema is always up-to-date without
-      manual intervention. Cross-cutting infrastructure concern.
+      Database schema lifecycle — applies pending DbUp embedded migrations on
+      boot before the HTTP server starts. Ensures the schema is always
+      up-to-date without manual intervention. Cross-cutting infrastructure
+      concern.
     layers:
-      - infrastructure
+      - Infrastructure
     code:
-      - apps/organiclever-be/src/contexts/db
+      - apps/organiclever-be/src/OrganicleverBe/Contexts/Db
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-db.md
     gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/db
 
   - name: be-health
     summary: >-
       Liveness endpoint — advertises service health to orchestrators and
-      monitoring systems.
+      monitoring systems. Stateless, no DB dependency.
     layers:
-      - domain
-      - application
-      - infrastructure
-      - api
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/organiclever-be/src/contexts/health
+      - apps/organiclever-be/src/OrganicleverBe/Contexts/Health
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-health.md
     gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/health
+
+  - name: be-journal
+    summary: >-
+      Server-side journal CRUD — the F# / EF Core mirror of the PGlite client
+      journal context. Persists typed-payload JournalEntry rows to PostgreSQL and
+      exposes full create/read/update/delete over /api/v1/journal/entries. Ships
+      unconsumed; the web client remains PGlite-backed.
+    layers:
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
+    code:
+      - apps/organiclever-be/src/OrganicleverBe/Contexts/Journal
+    code_lang:
+      - fs
+    glossary: specs/apps/organiclever/ddd/ubiquitous-language/be-journal.md
+    gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/journal
 
   - name: messaging
     summary: >-
       NATS client and JetStream durable stream demo. Connects to NATS at startup
-      (fail-fast on missing URL), publishes and acks on organiclever.messaging.demo.
+      (best-effort), publishes and acks on organiclever.messaging.demo.
+    layers:
+      - Domain
+      - Application
+      - Infrastructure
+      - Api
     code:
-      - apps/organiclever-be/src/contexts/messaging
+      - apps/organiclever-be/src/OrganicleverBe/Contexts/Messaging
     code_lang:
-      - rs
+      - fs
     glossary: specs/apps/organiclever/ddd/ubiquitous-language/messaging.md
     gherkin: specs/apps/organiclever/behavior/organiclever-be/gherkin/messaging
