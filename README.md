@@ -118,7 +118,7 @@ See [Code Quality](./repo-governance/development/quality/code.md) and [Commit Me
 
 All projects enforce ≥90% test coverage as part of `test:quick`.
 
-**Quality gates**: pre-commit hooks (formatting, linting), pre-push hooks (`typecheck`, `lint`, `test:quick` for affected projects), and [PR Quality Gate](./.github/workflows/pr-quality-gate.yml).
+**Quality gates**: pre-commit hooks (formatting, linting), pre-push hooks (`typecheck`, `lint`, `test:quick` for affected projects), and [commons quality gate](./.github/workflows/commons-quality-gate.yml).
 
 - OSE Platform
   - [![Deploy](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-ose-web.yml/badge.svg)](https://github.com/wahidyankf/ose-public/actions/workflows/test-and-deploy-ose-web.yml)

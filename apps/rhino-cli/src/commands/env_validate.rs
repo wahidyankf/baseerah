@@ -7,6 +7,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::domain::cliout::OutputFormat;
+use crate::internal::envinjection;
 use crate::internal::envvalidate;
 use crate::internal::git;
 
@@ -49,10 +50,16 @@ pub fn run_at_root(
     let contract = envvalidate::load_contract(repo_root)?;
     let findings = envvalidate::validate_all(repo_root, &contract)?;
 
-    if findings.is_empty() {
+    // Manifest-consistency pass: static, value-free check of env-injection.yaml
+    // against env-contract.yaml and the apps' .env.example files.
+    let manifest_findings = envinjection::validate_manifest(repo_root, &contract)?;
+
+    let total = findings.len() + manifest_findings.len();
+
+    if total == 0 {
         writeln!(
             stdout,
-            "env validate: no drift detected across all surfaces"
+            "env validate: no drift detected across all surfaces; env-injection.yaml consistent"
         )?;
         return Ok(());
     }
@@ -67,18 +74,26 @@ pub fn run_at_root(
         )?;
     }
 
+    for f in &manifest_findings {
+        writeln!(
+            stderr,
+            "MANIFEST  {}  {}  {}",
+            f.problem.label(),
+            f.subject,
+            f.detail
+        )?;
+    }
+
     if args.warn_only {
         writeln!(
             stderr,
-            "env validate: {} drift finding(s) — warn-only mode, not failing",
-            findings.len()
+            "env validate: {total} finding(s) — warn-only mode, not failing"
         )?;
         return Ok(());
     }
 
     Err(anyhow!(
-        "env validate: {} drift finding(s); fix the divergent keys listed above",
-        findings.len()
+        "env validate: {total} finding(s); fix the divergent keys/manifest entries listed above"
     ))
 }
 

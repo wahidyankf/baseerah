@@ -22,4 +22,4 @@ kubectl apply -f infra/k8s/organiclever/production/
 
 Use Docker Compose instead of Kubernetes for local dev.
 
-See [infra/dev/organiclever/README.md](../../dev/organiclever/README.md).
+See [infra/dev/organiclever-app/README.md](../../dev/organiclever-app/README.md).

@@ -5,6 +5,7 @@ pub mod bcregistry;
 pub mod docs;
 pub mod doctor;
 pub mod envbackup;
+pub mod envinjection;
 pub mod envvalidate;
 pub mod git;
 pub mod glossary;

@@ -5,5 +5,7 @@
 
 /// Env-file backup and restore use case.
 pub mod backup;
+/// Env-injection manifest consistency use case.
+pub mod injection;
 /// Env-contract drift detection use case.
 pub mod validate;

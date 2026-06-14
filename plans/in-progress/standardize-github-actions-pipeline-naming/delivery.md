@@ -249,41 +249,43 @@ human-gated work is batched into the final **Phase 9**.
 
 ## Phase 6 — env/secret injection manifest + validate extension
 
-- [ ] [AI] 6.1 **RED**: confirm the failing conditions — `test -f env-injection.yaml` exits non-zero
+- [x] [AI] 6.1 **RED**: confirm the failing conditions — `test -f env-injection.yaml` exits non-zero
       (manifest absent); and `git grep -nE 'WEB_BASE_URL|VERCEL_AUTOMATION_BYPASS_SECRET' -- 'apps/*/.env.example'`
       returns nothing (CI test-harness keys absent from app templates — must stay absent).
-- [ ] [AI] 6.2 **GREEN (manifest)**: create `env-injection.yaml` at repo root — per-app injection homes
+- [x] [AI] 6.2 **GREEN (manifest)**: create `env-injection.yaml` at repo root — per-app injection homes
       (`runtime: {local, local-ci, staging, production}` → `env-local`/`compose`/`vercel-preview`/`vercel-production`/`k3s-coralpolyp`),
       `keys-from: apps/<app>/.env.example`, and the `ci-harness` registry (`WEB_BASE_URL`,
       `VERCEL_AUTOMATION_BYPASS_SECRET` → `{group}-app-staging`). Names only, **no values**.
       _Acceptance_: every app in `env-contract.yaml` has an `env-injection.yaml` entry.
-- [ ] [AI] 6.3 **GREEN (validate extension)**: extend the **existing** `rhino-cli env validate` command
+- [x] [AI] 6.3 **GREEN (validate extension)**: extend the **existing** `rhino-cli env validate` command
       (not a separate target) with a static, value-free pass: every app-runtime key declared in
       `.env.example` has a documented home at each stage the app runs; every `ci-harness` key is
       registered and absent from all `.env.example`. No new Nx target — `env validate` is already wired
       into `commons-env-validate.yml` and `.husky/pre-push`, so the new pass rides along. _Acceptance_:
       `npx nx run rhino-cli:env:validation` passes; a deliberately-mismatched fixture fails it (TDD).
-- [ ] [AI] 6.4 **GREEN (`.env.example` normalize)**: align every `apps/<app>/.env.example` to the
+- [x] [AI] 6.4 **GREEN (`.env.example` normalize)**: align every `apps/<app>/.env.example` to the
       injection variable classes — annotate server vs `NEXT_PUBLIC_*` public keys, confirm no CI
       test-harness key is present, keep `env-contract.yaml` allowlists in step. _Acceptance_:
       `npx nx run rhino-cli:env:validation` green for all surfaces.
-- [ ] [AI] 6.5 **GREEN (infra/dev rename + compose env)**:
+      _(2026-06-15: the `.env.example` files already follow the §4 annotation format (`SCOPE | type | desc`, PORT/HOSTNAME marked framework-reserved); no `NEXT_PUBLIC_\*`or CI test-harness keys present.`env:validation` green across all 8 surfaces — no edits needed; confirmed conformant.)\_
+- [x] [AI] 6.5 **GREEN (infra/dev rename + compose env)**:
       `git mv infra/dev/organiclever infra/dev/organiclever-app` (the stack serves the app group:
       `organiclever-be` + `organiclever-app-web`; gitignored `.env` rides along), and confirm the new
       `infra/dev/organiclever-www/` stack sources keys from the app `.env.example` (placeholders only) —
       no duplicate template (§3). Repoint every `compose-dir` workflow input and doc reference to the new
       paths. _Acceptance_: `docker compose -f infra/dev/organiclever-app/docker-compose.yml config` valid.
-- [ ] [AI] 6.6 **Verify**: `test -f env-injection.yaml` — exits 0 now; no CI test-harness key sits in
+      _(2026-06-15: git mv infra/dev/organiclever → infra/dev/organiclever-app (6 tracked files); repointed package.json scripts, infra/k8s/organiclever/README.md, secrets-and-env-standards.md §7. organiclever-www stack already env-inline, no duplicate template. compose config valid.)_
+- [x] [AI] 6.6 **Verify**: `test -f env-injection.yaml` — exits 0 now; no CI test-harness key sits in
       any `.env.example`; no `infra/dev/organiclever/` references remain in workflow files.
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `test -f env-injection.yaml` — exits 0
-- [ ] [AI] `npx nx run rhino-cli:env:validation` — exits 0
-- [ ] [AI] `git grep -nE 'WEB_BASE_URL|VERCEL_AUTOMATION_BYPASS_SECRET' -- 'apps/*/.env.example'` — returns nothing
-- [ ] [AI] `docker compose -f infra/dev/organiclever-app/docker-compose.yml config` — exits 0
+- [x] [AI] `test -f env-injection.yaml` — exits 0
+- [x] [AI] `npx nx run rhino-cli:env:validation` — exits 0
+- [x] [AI] `git grep -nE 'WEB_BASE_URL|VERCEL_AUTOMATION_BYPASS_SECRET' -- 'apps/*/.env.example'` — returns nothing
+- [x] [AI] `docker compose -f infra/dev/organiclever-app/docker-compose.yml config` — exits 0
 
 > **Pause Safety**: `env-injection.yaml` manifest created, `env:validation` extended with consistency pass, infra/dev stacks renamed. Safe to stop.
 > To resume: `npx nx run rhino-cli:env:validation`.

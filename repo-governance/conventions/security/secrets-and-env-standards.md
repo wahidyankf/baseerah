@@ -295,7 +295,7 @@ Two load-bearing boundaries follow from the matrix:
 ### `infra/dev/<stack>` compose env — no duplicate templates
 
 §3 forbids a second template per app. Compose stacks must not introduce their own `.env.example`
-key list. They load a gitignored local `.env` (e.g. `infra/dev/organiclever/.env`, already
+key list. They load a gitignored local `.env` (e.g. `infra/dev/organiclever-app/.env`, already
 gitignored) and override with inline `environment:` in `docker-compose.ci.yml` for CI — never a
 committed second template. Any value a CI job needs is set inline in the compose override or
 sourced from the app's canonical `apps/<app>/.env.example` keys (placeholders only), so the drift

@@ -12,6 +12,17 @@ fn write(dir: &TempDir, rel: &str, content: &str) {
     fs::write(p, content).unwrap();
 }
 
+/// Write a minimal `env-injection.yaml` consistent with a single `apps/myapp`
+/// `kind: app` surface, so the manifest-consistency pass stays clean and the
+/// drift-focused assertions below isolate the behavior under test.
+fn write_consistent_manifest(dir: &TempDir) {
+    write(
+        dir,
+        "env-injection.yaml",
+        "apps:\n  - app: myapp\n    keys-from: apps/myapp/.env.example\n    runtime: { local: env-local }\nci-harness: []\n",
+    );
+}
+
 const ARGS_NO_WARN: EnvValidateArgs = EnvValidateArgs { warn_only: false };
 
 // ── matching surface ─────────────────────────────────────────────────────────
@@ -19,6 +30,7 @@ const ARGS_NO_WARN: EnvValidateArgs = EnvValidateArgs { warn_only: false };
 #[test]
 fn integration_matching_typescript_surface_exits_clean() {
     let tmp = TempDir::new().unwrap();
+    write_consistent_manifest(&tmp);
 
     write(
         &tmp,
@@ -46,6 +58,7 @@ fn integration_matching_typescript_surface_exits_clean() {
 #[test]
 fn integration_matching_rust_surface_exits_clean() {
     let tmp = TempDir::new().unwrap();
+    write_consistent_manifest(&tmp);
 
     write(
         &tmp,
@@ -78,6 +91,7 @@ fn integration_matching_rust_surface_exits_clean() {
 #[test]
 fn integration_declared_but_unread_exits_nonzero_and_names_key() {
     let tmp = TempDir::new().unwrap();
+    write_consistent_manifest(&tmp);
 
     write(
         &tmp,
@@ -110,6 +124,7 @@ fn integration_declared_but_unread_exits_nonzero_and_names_key() {
 #[test]
 fn integration_read_but_undeclared_exits_nonzero_and_names_key() {
     let tmp = TempDir::new().unwrap();
+    write_consistent_manifest(&tmp);
 
     write(
         &tmp,
@@ -144,6 +159,7 @@ fn integration_read_but_undeclared_exits_nonzero_and_names_key() {
 #[test]
 fn integration_warn_only_does_not_fail_on_drift() {
     let tmp = TempDir::new().unwrap();
+    write_consistent_manifest(&tmp);
 
     write(
         &tmp,
@@ -166,5 +182,61 @@ fn integration_warn_only_does_not_fail_on_drift() {
     assert!(
         stderr.contains("warn-only"),
         "expected warn-only notice in stderr"
+    );
+}
+
+// ── env-injection.yaml manifest-consistency pass (committed fixtures) ──────────
+
+fn fixture_root(name: &str) -> std::path::PathBuf {
+    std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/env-injection")
+        .join(name)
+}
+
+#[test]
+fn integration_matched_manifest_fixture_exits_clean() {
+    let root = fixture_root("matched");
+    let mut out = Vec::new();
+    let mut err = Vec::new();
+    let result = run_at_root(&root, &ARGS_NO_WARN, &mut out, &mut err);
+    assert!(
+        result.is_ok(),
+        "expected clean exit on matched fixture; got: {}",
+        String::from_utf8_lossy(&err)
+    );
+    assert!(
+        String::from_utf8_lossy(&out).contains("env-injection.yaml consistent"),
+        "expected consistency notice; got: {}",
+        String::from_utf8_lossy(&out)
+    );
+}
+
+#[test]
+fn integration_mismatched_ci_leak_fixture_fails_and_names_key() {
+    // The ci-harness key WEB_BASE_URL is wrongly declared in apps/demo-www/.env.example.
+    let root = fixture_root("mismatched-ci-leak");
+    let mut out = Vec::new();
+    let mut err = Vec::new();
+    let result = run_at_root(&root, &ARGS_NO_WARN, &mut out, &mut err);
+    assert!(
+        result.is_err(),
+        "expected non-zero exit on manifest inconsistency"
+    );
+    let stderr = String::from_utf8_lossy(&err);
+    assert!(
+        stderr.contains("MANIFEST"),
+        "expected MANIFEST finding line; got: {stderr}"
+    );
+    assert!(
+        stderr.contains("ci-harness-key-leaks-into-app"),
+        "expected leak problem label; got: {stderr}"
+    );
+    assert!(
+        stderr.contains("WEB_BASE_URL"),
+        "expected offending key named; got: {stderr}"
+    );
+    assert!(
+        stderr.contains("demo-www"),
+        "expected offending app named; got: {stderr}"
     );
 }
