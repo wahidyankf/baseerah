@@ -2,7 +2,12 @@
   "name": "rhino-cli",
   "sourceRoot": "apps/rhino-cli",
   "projectType": "application",
-  "tags": ["type:app", "platform:cli", "lang:rust", "domain:tooling"],
+  "tags": [
+    "type:app",
+    "platform:cli",
+    "lang:rust",
+    "domain:tooling"
+  ],
   "implicitDependencies": [],
   "targets": {
     "build": {
@@ -10,7 +15,10 @@
       "options": {
         "command": "cargo build --release --manifest-path apps/rhino-cli/Cargo.toml && mkdir -p apps/rhino-cli/dist && cp apps/rhino-cli/target/release/rhino-cli apps/rhino-cli/dist/rhino-cli"
       },
-      "outputs": ["{projectRoot}/dist", "{projectRoot}/target"]
+      "outputs": [
+        "{projectRoot}/dist",
+        "{projectRoot}/target"
+      ]
     },
     "install": {
       "executor": "nx:run-commands",
@@ -30,7 +38,11 @@
         "command": "cargo fmt --manifest-path apps/rhino-cli/Cargo.toml -- --check"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{projectRoot}/.rustfmt.toml", "{workspaceRoot}/.rustfmt.toml"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{projectRoot}/.rustfmt.toml",
+        "{workspaceRoot}/.rustfmt.toml"
+      ]
     },
     "lint": {
       "executor": "nx:run-commands",
@@ -45,10 +57,15 @@
     "deny:check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo deny --manifest-path apps/rhino-cli/Cargo.toml check"
+        "command": "bash apps/rhino-cli/scripts/deny-check.sh"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/Cargo.lock", "{projectRoot}/deny.toml"]
+      "inputs": [
+        "{projectRoot}/Cargo.toml",
+        "{projectRoot}/Cargo.lock",
+        "{projectRoot}/deny.toml",
+        "{projectRoot}/scripts/deny-check.sh"
+      ]
     },
     "msrv:check": {
       "executor": "nx:run-commands",
@@ -56,7 +73,10 @@
         "command": "cargo hack --manifest-path apps/rhino-cli/Cargo.toml check --rust-version"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
+      "inputs": [
+        "{projectRoot}/Cargo.toml",
+        "{projectRoot}/src/**/*.rs"
+      ]
     },
     "run": {
       "executor": "nx:run-commands",
@@ -70,7 +90,10 @@
         "command": "echo 'Phase 0 — specs:coverage stubbed; cucumber tests + validator land in Phase 1'"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/rhino/behavior/rhino-cli/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
+      "inputs": [
+        "{workspaceRoot}/specs/apps/rhino/behavior/rhino-cli/gherkin/**/*.feature",
+        "{projectRoot}/**/*.rs"
+      ]
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -97,7 +120,9 @@
         "{projectRoot}/src/**/*.rs",
         "{workspaceRoot}/specs/apps/rhino/**/*.feature"
       ],
-      "outputs": ["{projectRoot}/lcov.info"]
+      "outputs": [
+        "{projectRoot}/lcov.info"
+      ]
     },
     "test:unit": {
       "executor": "nx:run-commands",
@@ -105,7 +130,10 @@
         "command": "cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
+      "inputs": [
+        "{projectRoot}/Cargo.toml",
+        "{projectRoot}/src/**/*.rs"
+      ]
     },
     "typecheck": {
       "executor": "nx:run-commands",
@@ -119,7 +147,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate adoption"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.feature"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/specs/apps/**/*.feature"
+      ]
     },
     "specs:tree-validation": {
       "executor": "nx:run-commands",
@@ -127,7 +158,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate tree"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/specs/apps/**/*"
+      ]
     },
     "specs:counts-validation": {
       "executor": "nx:run-commands",
@@ -135,7 +169,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate counts"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/specs/apps/**/*"
+      ]
     },
     "specs:links-validation": {
       "executor": "nx:run-commands",
@@ -143,7 +180,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate links"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.md"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/specs/apps/**/*.md"
+      ]
     },
     "specs:gherkin-cardinality-validation": {
       "executor": "nx:run-commands",
@@ -151,7 +191,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate gherkin-cardinality"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/**/*.feature"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/specs/**/*.feature"
+      ]
     },
     "naming:harness-validation": {
       "executor": "nx:run-commands",
@@ -171,7 +214,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- workflows validate naming"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/repo-governance/workflows/**/*.md"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/repo-governance/workflows/**/*.md"
+      ]
     },
     "mermaid:validation": {
       "executor": "nx:run-commands",
@@ -179,7 +225,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate mermaid --max-depth=4 --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content --exclude apps/rhino-cli/tests/fixtures"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/**/*.md"
+      ]
     },
     "links:validation": {
       "executor": "nx:run-commands",
@@ -187,7 +236,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate links --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/**/*.md"
+      ]
     },
     "headings:hierarchy-validation": {
       "executor": "nx:run-commands",
@@ -195,7 +247,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate heading-hierarchy"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/**/*.md"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/**/*.md"
+      ]
     },
     "governance:vendor-audit-validation": {
       "executor": "nx:run-commands",
@@ -203,7 +258,10 @@
         "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance validate vendor repo-governance/"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/repo-governance/**/*.md"]
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/repo-governance/**/*.md"
+      ]
     },
     "cross-vendor:parity-validation": {
       "executor": "nx:run-commands",
