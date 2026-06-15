@@ -2,6 +2,9 @@
 /* Scan web-ui source so Tailwind includes classes used in transpiled components */
 @source "../../../../libs/web-ui/src/**/*.{ts,tsx}";
 
+@import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
+@import "@open-sharia-enterprise/web-ui-token/src/wahidyankf.css";
+
 @theme {
   --color-light-background: #ffffff;
   --color-light-foreground: #1e1e1e;
