@@ -99,22 +99,29 @@ Because no new version is introduced, the soak requirement is satisfied (version
 production). CVE clearance must still be recorded against the policy's **five sources** at execution
 time and entered here:
 
-| Source               | Check                                   | Status at authoring                                                                                             |
-| -------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| NVD                  | Search each package@version             | _Verify at delivery — record result_                                                                            |
-| GitHub Advisories    | `gh api` / advisory DB per package      | _Verify at delivery — record result_                                                                            |
-| Snyk DB              | snyk.io package pages                   | [Web-cited] No active CVE shown for `radix-ui` / `@radix-ui/react-dialog@1.1.15` — snyk.io, accessed 2026-06-15 |
-| Vendor security page | radix-ui/primitives GitHub security tab | _Verify at delivery — record result_                                                                            |
-| CISA KEV feed        | KEV catalogue lookup per package        | _Verify at delivery — record result_                                                                            |
+| Source               | Check                                   | Status at delivery (2026-06-15)                                                                                              |
+| -------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| NVD                  | Search each package@version             | **CLEAN** — no CVE records found for any of the 12 packages; adjacent CVE-2025-55182 is React RSC (unrelated package family) |
+| GitHub Advisories    | advisory DB per package                 | **CLEAN** — 0 reviewed npm advisories for radix-ui, CVA, clsx, tailwind-merge, lucide-react                                  |
+| Snyk DB              | snyk.io package pages                   | **CLEAN** — "No direct vulnerabilities found" for all 12 packages; 0 Critical/High/Medium/Low                                |
+| Vendor security page | radix-ui/primitives GitHub security tab | **CLEAN** — security page: "There aren't any published security advisories." (accessed 2026-06-15)                           |
+| CISA KEV feed        | KEV catalogue lookup per package        | **CLEAN** — none of the 12 packages appear in the CISA KEV catalog as of 2026-06-15                                          |
 
-- **KEV Fast-Track**: if any unpatched CVE appears in the CISA KEV catalogue, escalate to Path C.
-- **EPSS Escalation**: if an unpatched CVE's EPSS ≥ 0.5, apply Path C urgency.
-- **Cutoff date**: record the clearance cutoff date in writing at execution time (Phase 1 gate).
+- **KEV Fast-Track**: NOT triggered — no KEV entries for any of these packages.
+- **EPSS Escalation**: NOT triggered — no unpatched CVEs found.
+- **Clearance cutoff date**: **2026-06-15** — re-check recommended in 6 months (2026-12-15) or on major radix-ui release.
 
-Sources consulted at authoring:
+Sources consulted at delivery:
 
 - [radix-ui — Snyk](https://security.snyk.io/package/npm/radix-ui) (accessed 2026-06-15)
-- [@radix-ui/react-dialog — Snyk](https://security.snyk.io/package/npm/@radix-ui/react-dialog) (accessed 2026-06-15)
+- [@radix-ui/react-dialog — Snyk](https://security.snyk.io/package/npm/%40radix-ui%2Freact-dialog) (accessed 2026-06-15)
+- [class-variance-authority — Snyk](https://security.snyk.io/package/npm/class-variance-authority) (accessed 2026-06-15)
+- [clsx — Snyk](https://security.snyk.io/package/npm/clsx) (accessed 2026-06-15)
+- [tailwind-merge — Snyk](https://security.snyk.io/package/npm/tailwind-merge) (accessed 2026-06-15)
+- [lucide-react — Snyk](https://security.snyk.io/package/npm/lucide-react) (accessed 2026-06-15)
+- [GitHub Advisory Database](https://github.com/advisories) (accessed 2026-06-15)
+- [radix-ui/primitives Security Page](https://github.com/radix-ui/primitives/security) (accessed 2026-06-15)
+- [NVD — National Vulnerability Database](https://nvd.nist.gov/) (accessed 2026-06-15)
 
 ## Storybook-on-Vercel Mechanics
 
