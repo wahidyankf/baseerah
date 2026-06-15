@@ -235,8 +235,8 @@ subgraph-density warning in `tech-docs.md`, non-blocking).
 > missing branch builds nothing and serves a silent 404. Confirm the full branch set is live on origin
 > first, and do NOT begin the dashboard steps below until this check passes.
 
-- [ ] [AI] `git fetch origin --prune && git ls-remote --heads origin | grep -Ec 'refs/heads/(prod-(ose|ayokoding|organiclever|wahidyankf)-www|prod-(organiclever|ose)-app-web|stag-(organiclever|ose)-app-web)$'` — acceptance: returns exactly `8` (four `prod-*-www`, two `prod-*-app-web`, two `stag-*-app-web`). If fewer than 8, return to Phase 2 and push the missing branch(es) before continuing.
-- [ ] [AI] Per-branch confirmation that each ref resolves on origin: `for b in prod-ose-www prod-ayokoding-www prod-organiclever-www prod-wahidyankf-www prod-organiclever-app-web prod-ose-app-web stag-organiclever-app-web stag-ose-app-web; do git ls-remote --exit-code --heads origin "$b" >/dev/null && echo "ok $b" || echo "MISSING $b"; done` — acceptance: every line prints `ok`, none `MISSING`.
+- [x] [AI] `git fetch origin --prune && git ls-remote --heads origin | grep -Ec 'refs/heads/(prod-(ose|ayokoding|organiclever|wahidyankf)-www|prod-(organiclever|ose)-app-web|stag-(organiclever|ose)-app-web)$'` — acceptance: returns exactly `8` (four `prod-*-www`, two `prod-*-app-web`, two `stag-*-app-web`). If fewer than 8, return to Phase 2 and push the missing branch(es) before continuing. **DONE 2026-06-15** — returned exactly `8`.
+- [x] [AI] Per-branch confirmation that each ref resolves on origin: `for b in prod-ose-www prod-ayokoding-www prod-organiclever-www prod-wahidyankf-www prod-organiclever-app-web prod-ose-app-web stag-organiclever-app-web stag-ose-app-web; do git ls-remote --exit-code --heads origin "$b" >/dev/null && echo "ok $b" || echo "MISSING $b"; done` — acceptance: every line prints `ok`, none `MISSING`. **DONE 2026-06-15** — all 8 printed `ok`, none `MISSING`.
 
 > Pure Vercel/DNS — no git pushes in this phase. Every branch already exists on origin (Phase 2), so
 > wiring a project to it and clicking **Redeploy** is all that's needed; Vercel also auto-builds on connect.
