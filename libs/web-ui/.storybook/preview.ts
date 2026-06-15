@@ -3,6 +3,9 @@ import { withThemeByClassName } from "@storybook/addon-themes";
 
 import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
 import "@open-sharia-enterprise/web-ui-token/src/organiclever.css";
+import "@open-sharia-enterprise/web-ui-token/src/ose.css";
+import "@open-sharia-enterprise/web-ui-token/src/ayokoding.css";
+import "@open-sharia-enterprise/web-ui-token/src/wahidyankf.css";
 import "./storybook.css";
 
 const preview: Preview = {
@@ -26,8 +29,13 @@ const preview: Preview = {
       themes: {
         light: "",
         dark: "dark",
+        OSE: "ose",
+        AyoKoding: "ayokoding",
+        wahidyankf: "wahidyankf",
+        OrganicLever: "organiclever",
       },
       defaultTheme: "light",
+      parentSelector: "html",
     }),
   ],
 };

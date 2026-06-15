@@ -1,7 +1,44 @@
 // Utility
 export { cn } from "./utils/cn";
 
-// Components
+// Primitives — shadcn/radix base layer
+// Note: button, badge, card, dialog, sheet primitives are not barrel-exported yet
+// (composite counterparts with OSE-specific APIs are still in active use by apps).
+// They will replace the composite exports in a later migration phase.
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+} from "./primitives/command/command";
+export {
+  DropdownMenu,
+  DropdownMenuPortal,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from "./primitives/dropdown-menu/dropdown-menu";
+export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants } from "./primitives/tabs/tabs";
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./primitives/tooltip/tooltip";
+export { ScrollArea, ScrollBar } from "./primitives/scroll-area/scroll-area";
+export { Separator } from "./primitives/separator/separator";
+
+// Components — OSE composites (higher-level, app-specific)
 export { Button, buttonVariants } from "./components/button/button";
 export { Alert, AlertTitle, AlertDescription, alertVariants } from "./components/alert/alert";
 export { Input } from "./components/input/input";
