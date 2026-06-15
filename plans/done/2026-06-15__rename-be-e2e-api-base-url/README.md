@@ -5,8 +5,8 @@ description: Rename the Playwright base-URL environment variable from BASE_URL t
 
 # Standardize Backend E2E Base-URL Env Var to `API_BASE_URL`
 
-> **Status**: In progress — authored 2026-06-15. Execution **not started** (this plan is created and
-> parked; it is not executed in the same session that created it).
+> **Status**: Done — Phase 1 executed 2026-06-15. Phase 2 (staging backend E2E consumption) is
+> DEFERRED pending ose-infra staging backend URL.
 > **Related**: [`wire-vercel-www-app-cutover`](../../done/2026-06-15__wire-vercel-www-app-cutover/README.md) — during that
 > plan's Phase 3 the operator added an `API_BASE_URL` variable to the `organiclever-app-staging` and
 > `ose-app-staging` GitHub Environments (alongside the staging gate's `WEB_BASE_URL`). That variable is

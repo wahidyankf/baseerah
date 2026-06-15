@@ -4,9 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-| Plan                                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [rename-be-e2e-api-base-url](./rename-be-e2e-api-base-url/README.md) | Renames the backend (F#/Giraffe) E2E Playwright base-URL env var `BASE_URL` → `API_BASE_URL` in `ose-be-e2e` + `organiclever-be-e2e` and their single CI setter, mirroring the app-web FE suites' `WEB_BASE_URL`. Keeps localhost fallbacks (behavior-neutral), updates both READMEs, and records `API_BASE_URL` in `env-injection.yaml`. Leaves the three `www-be-e2e` suites on `BASE_URL`. Phase 2 (running BE E2E against a deployed staging backend URL that consumes the `*-app-staging` `API_BASE_URL` variable) is **DEFERRED** — blocked on ose-infra exposing a reachable staging backend URL. |
+No active plans.
 
 ## Instructions
 
