@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-No active plans.
+- [unify-web-ui-kit-and-deploy-storybook](./unify-web-ui-kit-and-deploy-storybook/README.md) — Unify all six FE web apps onto the single `web-ui` component kit themed via `web-ui-token`, and deploy the web-ui Storybook to Vercel at `web-ui.oseplatform.com`. Executes directly on `main` (no worktree, no PR).
 
 ## Instructions
 
