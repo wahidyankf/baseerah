@@ -205,6 +205,12 @@ canonical set, organized by tier:
 | `organiclever-be-build-deploy-stag.yml` | `stag-organiclever-be` | `_reusable-be-build-deploy.yml` |
 | `ose-be-build-deploy-stag.yml`          | `stag-ose-be`          | `_reusable-be-build-deploy.yml` |
 
+### Library deploy workflows
+
+| Filename                       | Domain   | Purpose                                                             |
+| ------------------------------ | -------- | ------------------------------------------------------------------- |
+| `web-ui-build-deploy-prod.yml` | `web-ui` | Build Storybook and force-push to `prod-web-ui` (daily + on-demand) |
+
 ### Cross-cutting workflows
 
 | Filename                   | Domain     | Purpose                                                         |
