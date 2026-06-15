@@ -193,21 +193,21 @@ subgraph-density warning in `tech-docs.md`, non-blocking).
 
 ## Phase 2: Create New Production Branches
 
-- [ ] [AI] Run `git fetch origin main && git push origin origin/main:refs/heads/prod-ose-www` — acceptance: `git ls-remote --heads origin prod-ose-www` shows the branch.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/prod-ayokoding-www` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/prod-organiclever-www` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/prod-wahidyankf-www` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/stag-organiclever-app-web` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/prod-organiclever-app-web` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/stag-ose-app-web` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/prod-ose-app-web` — acceptance: branch listed in remote.
-- [ ] [AI] Run `git push origin origin/main:refs/heads/stag-organiclever-be` — acceptance: branch listed in remote (the standardized `organiclever-be-build-deploy-stag.yml` triggers on push here).
-- [ ] [AI] Run `git push origin origin/main:refs/heads/stag-ose-be` — acceptance: branch listed in remote (triggers `ose-be-build-deploy-stag.yml`).
-- [ ] [AI] Run quality gates: `npx nx affected -t typecheck lint && npm run lint:md && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:mermaid:validation`
+- [x] [AI] Run `git fetch origin main && git push origin origin/main:refs/heads/prod-ose-www` — acceptance: `git ls-remote --heads origin prod-ose-www` shows the branch.
+- [x] [AI] Run `git push origin origin/main:refs/heads/prod-ayokoding-www` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/prod-organiclever-www` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/prod-wahidyankf-www` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/stag-organiclever-app-web` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/prod-organiclever-app-web` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/stag-ose-app-web` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/prod-ose-app-web` — acceptance: branch listed in remote.
+- [x] [AI] Run `git push origin origin/main:refs/heads/stag-organiclever-be` — acceptance: branch listed in remote (the standardized `organiclever-be-build-deploy-stag.yml` triggers on push here).
+- [x] [AI] Run `git push origin origin/main:refs/heads/stag-ose-be` — acceptance: branch listed in remote (triggers `ose-be-build-deploy-stag.yml`).
+- [x] [AI] Run quality gates: `npx nx affected -t typecheck lint && npm run lint:md && npx nx run rhino-cli:links:validation && npx nx run rhino-cli:mermaid:validation`
   - Acceptance criterion: zero errors
   - Fix ALL failures found, not just those caused by current changes
-- [ ] [AI] Push wiring commit to origin main: `git push origin HEAD:main` — acceptance: `git log origin/main --oneline -1` matches local HEAD.
-- [ ] [AI] Verify GitHub Actions CI passes: `gh run list --branch main --limit 5` then `gh run view <run-id> --json status,conclusion`
+- [x] [AI] Push wiring commit to origin main: `git push origin HEAD:main` — acceptance: `git log origin/main --oneline -1` matches local HEAD.
+- [x] [AI] Verify GitHub Actions CI passes: `gh run list --branch main --limit 5` then `gh run view <run-id> --json status,conclusion` — ✓ `commons-quality-gate` + markdown-validate + commons-env-validate + publish-images all **success** on `800c04db4`. The first push's `.NET quality gate` failure was a pre-existing codegen race (F# `lint`/`test` lacked `dependsOn: [codegen]`) — fixed in `800c04db4` (`fix(nx)`), re-verified green.
   - Poll every 3 minutes until status=completed
   - Acceptance criterion: conclusion=success for all affected workflows
   - If any fail: investigate root cause, fix, re-push — never skip or bypass
@@ -216,10 +216,10 @@ subgraph-density warning in `tech-docs.md`, non-blocking).
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `git ls-remote --heads origin | grep -E 'prod-ose-www|prod-ayokoding-www|prod-organiclever-www|prod-wahidyankf-www|prod-organiclever-app-web|prod-ose-app-web'` — acceptance: all six listed.
-- [ ] [AI] `git ls-remote --heads origin | grep -E 'stag-organiclever-app-web|stag-ose-app-web'` — acceptance: both listed.
-- [ ] [AI] `git ls-remote --heads origin | grep -E 'stag-organiclever-be|stag-ose-be'` — acceptance: both backend staging branches listed (for the standardized `*-be-build-deploy-stag` workflows).
-- [ ] [AI] Exact-count guard (catches any partial/failed push): `git fetch origin --prune && git ls-remote --heads origin | grep -Ec 'refs/heads/(prod-(ose|ayokoding|organiclever|wahidyankf)-www|prod-(organiclever|ose)-app-web|stag-(organiclever|ose)-app-web)$'` — acceptance: returns exactly `8` (Vercel-referenced branches). Separately, `… | grep -Ec 'refs/heads/stag-(organiclever|ose)-be$'` returns exactly `2`. Every branch Vercel will reference MUST exist on origin before Phase 3.
+- [x] [AI] `git ls-remote --heads origin | grep -E 'prod-ose-www|prod-ayokoding-www|prod-organiclever-www|prod-wahidyankf-www|prod-organiclever-app-web|prod-ose-app-web'` — acceptance: all six listed.
+- [x] [AI] `git ls-remote --heads origin | grep -E 'stag-organiclever-app-web|stag-ose-app-web'` — acceptance: both listed.
+- [x] [AI] `git ls-remote --heads origin | grep -E 'stag-organiclever-be|stag-ose-be'` — acceptance: both backend staging branches listed (for the standardized `*-be-build-deploy-stag` workflows).
+- [x] [AI] Exact-count guard (catches any partial/failed push): `git fetch origin --prune && git ls-remote --heads origin | grep -Ec 'refs/heads/(prod-(ose|ayokoding|organiclever|wahidyankf)-www|prod-(organiclever|ose)-app-web|stag-(organiclever|ose)-app-web)$'` — acceptance: returns exactly `8` (Vercel-referenced branches). Separately, `… | grep -Ec 'refs/heads/stag-(organiclever|ose)-be$'` returns exactly `2`. Every branch Vercel will reference MUST exist on origin before Phase 3.
 
 > **Pause Safety**: New branches exist on origin; wiring edits pushed. Old `prod-*-web` branches still
 > live — Vercel still deploying from them. Safe to stop. To resume: proceed to Phase 3 (Vercel + DNS).
