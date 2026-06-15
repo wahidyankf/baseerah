@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Badge } from "@/features/app-shell/presentation/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/features/app-shell/presentation/ui/card";
+import { Badge } from "@open-sharia-enterprise/web-ui/primitives";
+import { Card, CardContent, CardHeader, CardTitle } from "@open-sharia-enterprise/web-ui/primitives";
 import type { ContentMeta } from "@/features/content/application/types";
 
 interface UpdateCardProps {

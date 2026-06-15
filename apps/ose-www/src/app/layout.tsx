@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { SearchProvider } from "@/features/search/presentation/search-provider";
-import { TooltipProvider } from "@/features/app-shell/presentation/ui/tooltip";
+import { TooltipProvider } from "@open-sharia-enterprise/web-ui";
 import "./globals.css";
 
 export const metadata: Metadata = {

@@ -9,7 +9,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/features/app-shell/presentation/ui/command";
+} from "@open-sharia-enterprise/web-ui";
 import { useSearchOpen } from "@/features/search/presentation/use-search";
 import { trpcClient } from "@/lib/trpc/client";
 import type { SearchResult } from "@/features/content/application/types";

@@ -4,6 +4,7 @@
 @plugin "@tailwindcss/typography";
 
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
+@import "@open-sharia-enterprise/web-ui-token/src/ose.css";
 
 @theme {
   /* ose-www brand: primary blue */

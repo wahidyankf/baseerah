@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Badge } from "@/features/app-shell/presentation/ui/badge";
+import { Badge } from "@open-sharia-enterprise/web-ui/primitives";
 import { Header } from "@/features/app-shell/presentation/header";
 import { Footer } from "@/features/app-shell/presentation/footer";
 import { Breadcrumb } from "@/features/content/presentation/breadcrumb";

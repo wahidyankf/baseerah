@@ -36,10 +36,6 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
     }
     return <button {...props}>{children}</button>;
   },
-}));
-
-// Mock @/features/app-shell/presentation/ui/tooltip
-vi.mock("@/features/app-shell/presentation/ui/tooltip", () => ({
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipTrigger: ({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) => {
     if (asChild && React.isValidElement(children)) {

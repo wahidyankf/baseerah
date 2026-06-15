@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/features/app-shell/presentation/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@open-sharia-enterprise/web-ui/primitives";
 
 interface MobileNavProps {
   open: boolean;
