@@ -2,7 +2,7 @@
   "version": 2,
   "installCommand": "npm install --prefix=../.. --ignore-scripts",
   "buildCommand": "node scripts/gen-migrations.mjs && next build",
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"prod-organiclever-app-web\" ]",
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"prod-organiclever-app-web\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"stag-organiclever-app-web\" ]",
   "headers": [
     {
       "source": "/_next/static/(.*)",
