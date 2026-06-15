@@ -266,7 +266,7 @@ subgraph-density warning in `tech-docs.md`, non-blocking).
 - [x] [HUMAN] Verify `app.organiclever.com` returns 200 in a browser (DNS propagation may require patience). **DONE 2026-06-15** — after the `gen:migrations` build fix (`44d3b9b33`) + rebuild, `curl https://app.organiclever.com` → `HTTP/2 307` → `/app/home` → `200`.
 - [x] [HUMAN] Verify `app.oseplatform.com` returns 200 in a browser. **DONE 2026-06-15** — `curl https://app.oseplatform.com` → `HTTP/2 200`.
 - [x] [HUMAN] Verify each app-web **staging** deployment serves the `stag-*-app-web` build (200) at its private staging URL — keep the URL private; do not paste it into this checklist or any committed file. **DONE 2026-06-15** — staging Previews were skipped entirely (the `vercel.json` `ignoreCommand` only allowed the prod branch); fixed in `c4bc603d0` to also build `stag-*-app-web`. After re-push both staging URLs flipped from **404** to **401** (Vercel Deployment Protection — `server: Vercel` + `_vercel_sso_nonce`, confirming a healthy protected deployment). Operator confirmed both render **200** in an authenticated browser session. (URLs kept private — not recorded here.)
-- [ ] [HUMAN] Verify the **Protection Bypass** works end-to-end: dispatch the standardized `{group}-app-test-stag-deploy-prod` workflow (or a manual `curl` with the bypass header) against the staging URL and confirm it returns 200, not 401 — acceptance: the staging E2E gate authenticates past Vercel Deployment Protection. A 401 here means `VERCEL_AUTOMATION_BYPASS_SECRET` is missing/wrong. **PENDING** — operator dispatches the staging workflow once the staging deployments are green.
+- [x] [HUMAN] Verify the **Protection Bypass** works end-to-end: dispatch the standardized `{group}-app-test-stag-deploy-prod` workflow (or a manual `curl` with the bypass header) against the staging URL and confirm it returns 200, not 401 — acceptance: the staging E2E gate authenticates past Vercel Deployment Protection. A 401 here means `VERCEL_AUTOMATION_BYPASS_SECRET` is missing/wrong. **DONE 2026-06-15** — both `organiclever-app-test-stag-deploy-prod` and `ose-app-test-stag-deploy-prod` dispatched on `main` and **passed** (FE E2E authenticated past Vercel Deployment Protection — 200, not 401). Getting here required four fixes landed this session: (1) `gen:migrations` in the app-web Vercel `buildCommand`; (2) `ignoreCommand` extended to build the `stag-*-app-web` Preview; (3) `secrets: inherit` on both `*-app-test-stag-deploy-prod` callers (environment **secrets** — unlike **variables** — are not auto-passed to reusable workflows); (4) skip the local `webServer` in `organiclever-app-web-e2e` when `WEB_BASE_URL` is set (it carried a stale restructure-worktree path). Final blocker was an operator-side swap of the two environments' `WEB_BASE_URL`/token pairs (bypass secrets are per-project), corrected before this green run.
 
 > **Pause Safety**: All six production domains serve from new branches. Old branches still exist as
 > rollback. Safe to stop. To resume: verify domains still 200, then proceed to Phase 4 (retire branches).
@@ -297,14 +297,14 @@ subgraph-density warning in `tech-docs.md`, non-blocking).
 
 ## Plan Archival
 
-- [ ] [AI] Move plan to `done/`:
+- [x] [AI] Move plan to `done/`:
 
   ```bash
-  git mv plans/in-progress/wire-vercel-www-app-cutover/ plans/done/YYYY-MM-DD__wire-vercel-www-app-cutover/
+  git mv plans/in-progress/wire-vercel-www-app-cutover/ plans/done/2026-06-15__wire-vercel-www-app-cutover/
   ```
 
-  Replace `YYYY-MM-DD` with actual completion date. Acceptance criterion: folder exists under `plans/done/`.
+  Replace `YYYY-MM-DD` with actual completion date. Acceptance criterion: folder exists under `plans/done/`. **DONE 2026-06-15.**
 
-- [ ] [AI] Remove this plan's row from `plans/in-progress/README.md`
-- [ ] [AI] Update `plans/done/README.md` to add an entry for this plan
-- [ ] [AI] Commit: `chore(plans): move wire-vercel-www-app-cutover to done`
+- [x] [AI] Remove this plan's row from `plans/in-progress/README.md` **DONE 2026-06-15.**
+- [x] [AI] Update `plans/done/README.md` to add an entry for this plan **DONE 2026-06-15.**
+- [x] [AI] Commit: `chore(plans): move wire-vercel-www-app-cutover to done` **DONE 2026-06-15.**
