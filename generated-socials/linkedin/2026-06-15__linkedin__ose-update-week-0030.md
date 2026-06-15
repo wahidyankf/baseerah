@@ -26,17 +26,17 @@ Naming got legible — -www marketing/landing site, -app-web app client, -be bac
 
 The strategy: on-premise first. Cloud prices keep climbing and the IDR keeps weakening vs the USD, so self-hosting on hardware we own is the cost-driven default — expand to cloud as needed.
 
-A "host unreachable" outage became a blameless post-mortem and a hardened two-node fleet: Wake-on-LAN, scheduled backups, watchdog, off-host alerting. A second self-hosted node came online, plus a Proxmox Datacenter Manager VM; twin k3s clusters (staging-1/prod-2) are staged next.
+A "host unreachable" outage became a blameless post-mortem and a hardened two-node fleet: Wake-on-LAN, scheduled backups, watchdog, off-host alerting. A second self-hosted node came online, plus a Proxmox Datacenter Manager VM; twin k3s clusters (staging-1/prod-2) next.
 
 📦 ose-primer
 
-Absorbed the cross-cutting work across the polyglot demos — markdown gate, dependency hygiene, post-mortems, toolchain parity. Also dropped the Go rhino-cli, consolidating on Rust to match ose-public.
+Absorbed the cross-cutting work across the polyglot demos — markdown gate, dependency hygiene, post-mortems, toolchain parity. Also dropped the Go rhino-cli for Rust, matching ose-public.
 
 🔜 Next 2–4 weeks
 
 Ship ose-be and organiclever-be to the on-premise k3s clusters — first backends in a real environment. Stand up staging + production k3s. Power is the honest risk; production moves to cloud/colocation as we grow.
 
-Last month I said "all-in on Rust." This month I walked it back: Rust where I run it lean, F#/.NET where it earns its keep. The throughline — strong static typing as a deterministic guardrail, plus code a human can actually read. Because if an engineer can't read the patterns in a codebase, don't expect an AI to write good code in it either.
+Last month I said "all-in on Rust." This month I walked it back: Rust where I run it lean, F#/.NET where it earns its keep. The throughline — strong static typing as a deterministic guardrail, plus code a human can read: if an engineer can't read the patterns, don't expect an AI to write good code in them either.
 
 Full write-up: https://www.oseplatform.com/updates/2026-06-15-phase-1-week-18-fsharp-backends-and-tier-split
 
