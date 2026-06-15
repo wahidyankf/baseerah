@@ -161,7 +161,7 @@ graph LR
 
 **Trigger**: Push to `main` branch (CRON twice daily + manual dispatch)
 
-**Steps**: Full local-stack test pipeline via `_reusable-www-test-local-deploy.yml` (lint, typecheck, test:quick, E2E), then "deploy" by force-pushing `main` to `prod-ayokoding-web`; Vercel auto-builds.
+**Steps**: Full local-stack test pipeline via `_reusable-www-test-local-deploy.yml` (lint, typecheck, test:quick, E2E), then "deploy" by force-pushing `main` to `prod-ayokoding-www`; Vercel auto-builds.
 
 **Purpose**: Deploy ayokoding.com (Next.js 16 fullstack content platform)
 
@@ -173,10 +173,10 @@ graph LR
 
 **Steps:**
 
-1. Detect changes in `apps/ose-www/` vs `prod-ose-web` branch
+1. Detect changes in `apps/ose-www/` vs `prod-ose-www` branch
 2. If changes exist (or `force_deploy=true`): setup Node (Volta)
 3. Install dependencies and run `nx build ose-www`
-4. Force-push `main` to `prod-ose-web`; Vercel auto-builds
+4. Force-push `main` to `prod-ose-www`; Vercel auto-builds
 
 **Purpose**: Automated scheduled deployments for oseplatform.com with change detection to avoid unnecessary builds
 
@@ -188,10 +188,10 @@ graph LR
 
 **Steps:**
 
-1. Detect changes in `apps/wahidyankf-www/` vs `prod-wahidyankf-web` branch
+1. Detect changes in `apps/wahidyankf-www/` vs `prod-wahidyankf-www` branch
 2. If changes exist (or `force_deploy=true`): setup Node (Volta)
 3. Install dependencies and run `nx build wahidyankf-www`
-4. Force-push `main` to `prod-wahidyankf-web`; Vercel auto-builds
+4. Force-push `main` to `prod-wahidyankf-www`; Vercel auto-builds
 
 **Purpose**: Automated deployments for www.wahidyankf.com with change detection to avoid unnecessary builds
 

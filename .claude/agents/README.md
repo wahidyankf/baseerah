@@ -9,10 +9,10 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[docs-maker](docs-maker.md)** - Expert documentation writer
 - **[docs-tutorial-maker](docs-tutorial-maker.md)** - Tutorial creation specialist
 - **[readme-maker](readme-maker.md)** - README file writer
-- **[apps-ayokoding-web-general-maker](apps-ayokoding-web-general-maker.md)** - General content for AyoKoding
-- **[apps-ayokoding-web-by-example-maker](apps-ayokoding-web-by-example-maker.md)** - By-example tutorials
-- **[apps-ayokoding-web-in-the-field-maker](apps-ayokoding-web-in-the-field-maker.md)** - In-the-field tutorials for AyoKoding
-- **[apps-ose-web-content-maker](apps-ose-web-content-maker.md)** - OSE Platform content
+- **[apps-ayokoding-www-general-maker](apps-ayokoding-www-general-maker.md)** - General content for AyoKoding
+- **[apps-ayokoding-www-by-example-maker](apps-ayokoding-www-by-example-maker.md)** - By-example tutorials
+- **[apps-ayokoding-www-in-the-field-maker](apps-ayokoding-www-in-the-field-maker.md)** - In-the-field tutorials for AyoKoding
+- **[apps-ose-www-content-maker](apps-ose-www-content-maker.md)** - OSE Platform content
 - **[pdf-to-md-maker](pdf-to-md-maker.md)** - PDF to verbatim Markdown conversion (text-based and image-only via OCR)
 - **[plan-maker](plan-maker.md)** - Project plan creation
 - **[repo-rules-maker](repo-rules-maker.md)** - Governance document creation
@@ -31,12 +31,12 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[docs-link-checker](docs-link-checker.md)** - Link validity checking
 - **[docs-software-engineering-separation-checker](docs-software-engineering-separation-checker.md)** - Programming language docs separation validation
 - **[readme-checker](readme-checker.md)** - README quality validation
-- **[apps-ayokoding-web-general-checker](apps-ayokoding-web-general-checker.md)** - General content validation
-- **[apps-ayokoding-web-by-example-checker](apps-ayokoding-web-by-example-checker.md)** - By-example validation
-- **[apps-ayokoding-web-in-the-field-checker](apps-ayokoding-web-in-the-field-checker.md)** - In-the-field content validation
-- **[apps-ayokoding-web-facts-checker](apps-ayokoding-web-facts-checker.md)** - Factual accuracy for AyoKoding
-- **[apps-ayokoding-web-link-checker](apps-ayokoding-web-link-checker.md)** - Link validation for AyoKoding
-- **[apps-ose-web-content-checker](apps-ose-web-content-checker.md)** - OSE content validation
+- **[apps-ayokoding-www-general-checker](apps-ayokoding-www-general-checker.md)** - General content validation
+- **[apps-ayokoding-www-by-example-checker](apps-ayokoding-www-by-example-checker.md)** - By-example validation
+- **[apps-ayokoding-www-in-the-field-checker](apps-ayokoding-www-in-the-field-checker.md)** - In-the-field content validation
+- **[apps-ayokoding-www-facts-checker](apps-ayokoding-www-facts-checker.md)** - Factual accuracy for AyoKoding
+- **[apps-ayokoding-www-link-checker](apps-ayokoding-www-link-checker.md)** - Link validation for AyoKoding
+- **[apps-ose-www-content-checker](apps-ose-www-content-checker.md)** - OSE content validation
 - **[pdf-to-md-checker](pdf-to-md-checker.md)** - PDF-to-Markdown fidelity validation (text completeness, tables, figures, Mermaid, OCR quality)
 - **[plan-checker](plan-checker.md)** - Project plan validation
 - **[plan-execution-checker](plan-execution-checker.md)** - Plan execution validation
@@ -56,12 +56,12 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[docs-tutorial-fixer](docs-tutorial-fixer.md)** - Apply tutorial fixes
 - **[docs-software-engineering-separation-fixer](docs-software-engineering-separation-fixer.md)** - Fix programming language docs separation issues
 - **[readme-fixer](readme-fixer.md)** - Apply README fixes
-- **[apps-ayokoding-web-general-fixer](apps-ayokoding-web-general-fixer.md)** - Apply general content fixes
-- **[apps-ayokoding-web-by-example-fixer](apps-ayokoding-web-by-example-fixer.md)** - Apply by-example fixes
-- **[apps-ayokoding-web-in-the-field-fixer](apps-ayokoding-web-in-the-field-fixer.md)** - Fix in-the-field content issues
-- **[apps-ayokoding-web-facts-fixer](apps-ayokoding-web-facts-fixer.md)** - Apply factual corrections
-- **[apps-ayokoding-web-link-fixer](apps-ayokoding-web-link-fixer.md)** - Fix broken links
-- **[apps-ose-web-content-fixer](apps-ose-web-content-fixer.md)** - Fix OSE content issues
+- **[apps-ayokoding-www-general-fixer](apps-ayokoding-www-general-fixer.md)** - Apply general content fixes
+- **[apps-ayokoding-www-by-example-fixer](apps-ayokoding-www-by-example-fixer.md)** - Apply by-example fixes
+- **[apps-ayokoding-www-in-the-field-fixer](apps-ayokoding-www-in-the-field-fixer.md)** - Fix in-the-field content issues
+- **[apps-ayokoding-www-facts-fixer](apps-ayokoding-www-facts-fixer.md)** - Apply factual corrections
+- **[apps-ayokoding-www-link-fixer](apps-ayokoding-www-link-fixer.md)** - Fix broken links
+- **[apps-ose-www-content-fixer](apps-ose-www-content-fixer.md)** - Fix OSE content issues
 - **[pdf-to-md-fixer](pdf-to-md-fixer.md)** - Apply validated PDF-to-Markdown fixes (re-extracts missing content from PDF source)
 - **[plan-fixer](plan-fixer.md)** - Apply plan fixes
 - **[repo-rules-fixer](repo-rules-fixer.md)** - Fix governance compliance issues
@@ -77,10 +77,12 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 ### 🟪 Operations
 
-- **[apps-ayokoding-web-deployer](apps-ayokoding-web-deployer.md)** - AyoKoding deployment (Next.js via Vercel)
-- **[apps-ose-web-deployer](apps-ose-web-deployer.md)** - OSE Platform deployment
-- **[apps-organiclever-web-deployer](apps-organiclever-web-deployer.md)** - organiclever-web deployment
-- **[apps-wahidyankf-web-deployer](apps-wahidyankf-web-deployer.md)** - wahidyankf-web deployment (Next.js via Vercel)
+- **[apps-ayokoding-www-deployer](apps-ayokoding-www-deployer.md)** - AyoKoding marketing site deployment (`prod-ayokoding-www`, Next.js via Vercel)
+- **[apps-ose-www-deployer](apps-ose-www-deployer.md)** - OSE Platform marketing site deployment (`prod-ose-www`)
+- **[apps-organiclever-www-deployer](apps-organiclever-www-deployer.md)** - OrganicLever marketing site deployment (`prod-organiclever-www`)
+- **[apps-organiclever-app-web-deployer](apps-organiclever-app-web-deployer.md)** - OrganicLever app-group staging deployment (`stag-organiclever-app-web` + `stag-organiclever-be`; prod CD deferred)
+- **[apps-ose-app-web-deployer](apps-ose-app-web-deployer.md)** - OSE Application app-group staging deployment (`stag-ose-app-web` + `stag-ose-be`; prod CD deferred)
+- **[apps-wahidyankf-www-deployer](apps-wahidyankf-www-deployer.md)** - wahidyankf portfolio deployment (`prod-wahidyankf-www`, Next.js via Vercel)
 
 ### 💻 Development
 
@@ -111,7 +113,7 @@ Normative source: [Agent Naming Convention](../../repo-governance/conventions/st
 | `checker`  | Validates an artifact against standards                   | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
 | `fixer`    | Applies validated checker findings                        | `plan-fixer`, `swe-ui-fixer`                                 |
 | `dev`      | Writes code in a language or test framework               | `swe-rust-dev`, `swe-e2e-dev`                                |
-| `deployer` | Deploys an application to an environment                  | `apps-ayokoding-web-deployer`                                |
+| `deployer` | Deploys an application to an environment                  | `apps-ayokoding-www-deployer`                                |
 | `manager`  | Performs file or resource operations (rename/move/delete) | `docs-file-manager`                                          |
 
 Enforcement: `rhino-cli agents validate-naming` (wired into pre-push and CI).

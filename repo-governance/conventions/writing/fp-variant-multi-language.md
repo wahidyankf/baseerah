@@ -298,13 +298,13 @@ The following checks determine whether an FP-variant by-example page complies wi
 5. **Cross-paradigm annotations**: When a concept is language-specific, does the other tab include a `// [Clojure: ...]` or `; [F#: ...]` annotation?
 6. **Annotation density**: Does each tab's code block meet the 1.0–2.25 comment-to-code ratio?
 
-`apps-ayokoding-web-by-example-checker` enforces checks 1, 5, and 6. Checks 2, 3, and 4 require AI semantic judgement and are part of the checker's content audit pass.
+`apps-ayokoding-www-by-example-checker` enforces checks 1, 5, and 6. Checks 2, 3, and 4 require AI semantic judgement and are part of the checker's content audit pass.
 
 ## Tools and Automation
 
-- **`apps-ayokoding-web-by-example-maker`** — creates FP-variant by-example content; responsible for applying this convention when generating or updating F# + Clojure tabs.
-- **`apps-ayokoding-web-by-example-checker`** — validates tabs format, annotation density, and cross-paradigm annotation presence.
-- **`apps-ayokoding-web-by-example-fixer`** — applies fixes to non-compliant pages (adds missing tabs, adds missing annotations, adjusts annotation density).
+- **`apps-ayokoding-www-by-example-maker`** — creates FP-variant by-example content; responsible for applying this convention when generating or updating F# + Clojure tabs.
+- **`apps-ayokoding-www-by-example-checker`** — validates tabs format, annotation density, and cross-paradigm annotation presence.
+- **`apps-ayokoding-www-by-example-fixer`** — applies fixes to non-compliant pages (adds missing tabs, adds missing annotations, adjusts annotation density).
 
 ## References
 
@@ -318,9 +318,9 @@ The following checks determine whether an FP-variant by-example page complies wi
 
 **Agents:**
 
-- [`apps-ayokoding-web-by-example-maker`](../../../.claude/agents/apps-ayokoding-web-by-example-maker.md) — creates FP-variant by-example content following this convention
-- [`apps-ayokoding-web-by-example-checker`](../../../.claude/agents/apps-ayokoding-web-by-example-checker.md) — validates compliance
-- [`apps-ayokoding-web-by-example-fixer`](../../../.claude/agents/apps-ayokoding-web-by-example-fixer.md) — fixes violations
+- [`apps-ayokoding-www-by-example-maker`](../../../.claude/agents/apps-ayokoding-www-by-example-maker.md) — creates FP-variant by-example content following this convention
+- [`apps-ayokoding-www-by-example-checker`](../../../.claude/agents/apps-ayokoding-www-by-example-checker.md) — validates compliance
+- [`apps-ayokoding-www-by-example-fixer`](../../../.claude/agents/apps-ayokoding-www-by-example-fixer.md) — fixes violations
 
 **In-FP-by-example overview pages:**
 
@@ -331,5 +331,5 @@ The following checks determine whether an FP-variant by-example page complies wi
 
 **Repository Architecture:**
 
-- [Repository Governance Architecture](../../repository-governance-architecture.md) — six-layer hierarchy. This convention is Layer 2 (Conventions), governing Layer 4 agents (`apps-ayokoding-web-by-example-*`) consumed at runtime by Layer 5 workflows (ayokoding-web by-example quality gate).
+- [Repository Governance Architecture](../../repository-governance-architecture.md) — six-layer hierarchy. This convention is Layer 2 (Conventions), governing Layer 4 agents (`apps-ayokoding-www-by-example-*`) consumed at runtime by Layer 5 workflows (ayokoding-web by-example quality gate).
 - [Diátaxis Framework](../structure/diataxis-framework.md) — FP-variant by-example tutorials are the Tutorial quadrant of Diátaxis (learning-oriented, hands-on, step-by-step).

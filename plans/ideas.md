@@ -14,8 +14,8 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 
 ### AyoKoding Web (added 2026-05-22 as ayokoding-web-learn-reorg after-action)
 
-- Future plan: add canonical shape enforcement rules to `apps-ayokoding-web-by-example-checker` and `apps-ayokoding-web-in-the-field-checker` — validate that every checked topic follows the `<domain>/<area>/<topic>/{overview.md,by-example/,by-concept/,in-the-field/}` tree shape.
-- Future plan: consider creating `apps-ayokoding-web-by-concept-checker` agent once the by-concept track has sufficient coverage to warrant dedicated structural validation.
+- Future plan: add canonical shape enforcement rules to `apps-ayokoding-www-by-example-checker` and `apps-ayokoding-www-in-the-field-checker` — validate that every checked topic follows the `<domain>/<area>/<topic>/{overview.md,by-example/,by-concept/,in-the-field/}` tree shape.
+- Future plan: consider creating `apps-ayokoding-www-by-concept-checker` agent once the by-concept track has sufficient coverage to warrant dedicated structural validation.
 - Indonesian content reorg (id/) is not needed: `content/id/` uses `belajar/` with Indonesian-named dirs and has no parallel platform-\*/human/ structure. No action required.
 
 ### Infrastructure

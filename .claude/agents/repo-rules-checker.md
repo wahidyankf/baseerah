@@ -157,7 +157,7 @@ Outline` `Examples` tables are exempt. `plans/done/` is exempt (immutable archiv
 - UUID generation logic (should reference `repo-generating-validation-reports`)
 - Criticality level definitions (should reference `repo-assessing-criticality-confidence`)
 - Mode parameter handling (should reference `repo-applying-maker-checker-fixer`)
-- Content organization systems (should reference `apps-ayokoding-web-developing-content`)
+- Content organization systems (should reference `apps-ayokoding-www-developing-content`)
 - Color palettes (should reference `docs-creating-accessible-diagrams`)
 - Report templates (should reference `repo-generating-validation-reports`)
 - Annotation density (should reference `docs-creating-by-example-tutorials`)
@@ -644,7 +644,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 **Domain-Specific Exemptions** (DO NOT flag these):
 
-- `apps-ayokoding-web-developing-content` vs `apps-ose-web-developing-content`
+- `apps-ayokoding-www-developing-content` vs `apps-ose-www-developing-content`
   - **Reason**: Different audiences and content types (educational platform vs project landing page), despite both using Next.js 16
   - **Keep Separate**: Platform-specific skills serve different apps
 

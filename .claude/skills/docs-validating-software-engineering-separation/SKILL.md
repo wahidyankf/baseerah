@@ -238,11 +238,11 @@ These are OSE Platform-specific style guides, not educational tutorials.
 - repo-assessing-criticality-confidence
 - repo-applying-maker-checker-fixer
 - repo-generating-validation-reports
-- apps-ayokoding-web-developing-content
+- apps-ayokoding-www-developing-content
 
 ## Related Agents
 
 - docs-software-engineering-separation-checker - Validates explicit relationships
 - docs-software-engineering-separation-fixer - Fixes violations
 - docs-maker - Creates style guide content
-- apps-ayokoding-web-general-maker - Creates educational content
+- apps-ayokoding-www-general-maker - Creates educational content

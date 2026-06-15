@@ -19,9 +19,9 @@ Deployment architecture, environment branches, and Vercel configuration for the 
 graph LR
     subgraph "Source Control"
         MAIN[main branch<br/>Trunk-Based Dev]
-        PROD_OSE[prod-ose-web<br/>Deploy Only]
-        PROD_AYO[prod-ayokoding-web<br/>Deploy Only - Next.js]
-        PROD_OL[prod-organiclever-web<br/>Deploy Only]
+        PROD_OSE[prod-ose-www<br/>Deploy Only]
+        PROD_AYO[prod-ayokoding-www<br/>Deploy Only - Next.js]
+        PROD_OL[prod-organiclever-www<br/>Deploy Only]
     end
 
     subgraph "Build System"
@@ -96,13 +96,13 @@ graph LR
 ### Environment Branches
 
 - **Purpose**: Deployment triggers only
-- **Branches**: `prod-ose-web`, `prod-ayokoding-web`, `prod-wahidyankf-web`, `stag-organiclever-app-web`, `stag-organiclever-be`
+- **Branches**: `prod-ose-www`, `prod-ayokoding-www`, `prod-wahidyankf-www`, `stag-organiclever-app-web`, `stag-organiclever-be`
 - **Policy**: NEVER commit directly to these branches outside CI automation
 - **Workflows** (here, "deploy" means a **branch force-push** — Vercel builds web from the pushed branch;
   a be-build-deploy workflow fires for backends):
-  - `ayokoding-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ayokoding-web`
-  - `ose-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ose-web`
-  - `wahidyankf-www-test-local-deploy-prod.yml` (scheduled) → `prod-wahidyankf-web`
+  - `ayokoding-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ayokoding-www`
+  - `ose-www-test-local-deploy-prod.yml` (6 AM / 6 PM WIB) → `prod-ose-www`
+  - `wahidyankf-www-test-local-deploy-prod.yml` (scheduled) → `prod-wahidyankf-www`
   - `organiclever-app-test-local-deploy-stag.yml` (3 AM / 3 PM WIB) → `stag-organiclever-app-web`
     and `stag-organiclever-be` (deploys to **staging**, not production)
   - `organiclever-app-test-stag-deploy-prod.yml` (+2.5h after the stag deploy) — gated FE E2E

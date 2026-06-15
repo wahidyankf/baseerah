@@ -31,7 +31,7 @@ This convention establishes a universal **four-level criticality system** (CRITI
 **Problem**: Seven different severity classification systems existed across checker agents, causing confusion and inconsistency:
 
 - `repo-rules-checker`: Critical/Important/Minor
-- `apps-ayokoding-web-general-checker`: Must Fix/Warnings/Suggestions
+- `apps-ayokoding-www-general-checker`: Must Fix/Warnings/Suggestions
 - `readme-checker`: High/Medium/Low Priority
 - `docs-checker`: [Verified]/[Error]/[Outdated] (verification-based, NOT severity)
 - `docs-link-checker`: [OK]/[BROKEN]/[REDIRECT] (status-based, NOT severity)
@@ -546,9 +546,9 @@ Run `{agent-family}-fixer` on this audit report:
 
 - `docs-checker` - Verification labels ([Verified], [Error], [Outdated], [Unverified])
 - `docs-tutorial-checker` - Verification labels
-- `apps-ayokoding-web-facts-checker` - Verification labels
+- `apps-ayokoding-www-facts-checker` - Verification labels
 - `docs-link-checker` - Status labels ([OK], [BROKEN], [REDIRECT])
-- `apps-ayokoding-web-link-checker` - Status labels
+- `apps-ayokoding-www-link-checker` - Status labels
 
 **Format for dual-label findings**:
 
@@ -818,7 +818,7 @@ Update link to current documentation URL or find alternative resource
 - Consider alternative agent selection
 - Potential optimization
 
-### By-Example Tutorials (apps-ayokoding-web-by-example-checker)
+### By-Example Tutorials (apps-ayokoding-www-by-example-checker)
 
 **CRITICAL**:
 
@@ -1374,10 +1374,10 @@ Existing agents using different terminology should migrate to this convention.
 
 **Severity-Based Family**:
 
-- apps-ayokoding-web-general-checker
-- apps-ayokoding-web-by-example-checker
-- apps-ayokoding-web-in-the-field-checker
-- apps-ose-web-content-checker
+- apps-ayokoding-www-general-checker
+- apps-ayokoding-www-by-example-checker
+- apps-ayokoding-www-in-the-field-checker
+- apps-ose-www-content-checker
 - repo-workflow-checker
 
 **Dual-Label Family** (preserve existing labels + add criticality):
@@ -1385,8 +1385,8 @@ Existing agents using different terminology should migrate to this convention.
 - docs-checker ([Verified]/[Error]/[Outdated] + CRITICAL/HIGH/MEDIUM/LOW)
 - docs-tutorial-checker
 - docs-software-engineering-separation-checker
-- apps-ayokoding-web-facts-checker
-- apps-ayokoding-web-link-checker
+- apps-ayokoding-www-facts-checker
+- apps-ayokoding-www-link-checker
 - docs-link-checker ([OK]/[BROKEN]/[REDIRECT] + CRITICAL/HIGH/MEDIUM/LOW)
 - repo-rules-checker
 
@@ -1401,14 +1401,14 @@ Existing agents using different terminology should migrate to this convention.
 Update all fixer agents to use priority-based execution:
 
 - repo-rules-fixer (pilot)
-- apps-ayokoding-web-general-fixer
-- apps-ayokoding-web-by-example-fixer
-- apps-ayokoding-web-facts-fixer
-- apps-ayokoding-web-in-the-field-fixer
-- apps-ayokoding-web-link-fixer
+- apps-ayokoding-www-general-fixer
+- apps-ayokoding-www-by-example-fixer
+- apps-ayokoding-www-facts-fixer
+- apps-ayokoding-www-in-the-field-fixer
+- apps-ayokoding-www-link-fixer
 - docs-tutorial-fixer
 - docs-software-engineering-separation-fixer
-- apps-ose-web-content-fixer
+- apps-ose-www-content-fixer
 - readme-fixer
 - docs-fixer
 - plan-fixer

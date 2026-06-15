@@ -64,10 +64,10 @@ outputs:
 
 ## Execution Mode
 
-**Preferred Mode**: Agent Delegation — invoke `apps-ayokoding-web-general-checker`,
-`apps-ayokoding-web-facts-checker`,
-`apps-ayokoding-web-link-checker`, `apps-ayokoding-web-general-fixer`,
-and `apps-ayokoding-web-facts-fixer`
+**Preferred Mode**: Agent Delegation — invoke `apps-ayokoding-www-general-checker`,
+`apps-ayokoding-www-facts-checker`,
+`apps-ayokoding-www-link-checker`, `apps-ayokoding-www-general-fixer`,
+and `apps-ayokoding-www-facts-fixer`
 via the Agent tool with `subagent_type`
 (see [Workflow Execution Modes Convention](../meta/execution-modes.md)).
 
@@ -102,7 +102,7 @@ tools in the main context — use this when agent delegation is unavailable.
 
 ## Research Delegation
 
-The `apps-ayokoding-web-facts-checker` agent invoked by this workflow delegates multi-page web
+The `apps-ayokoding-www-facts-checker` agent invoked by this workflow delegates multi-page web
 research to the [`web-research-maker`](../../../.claude/agents/web-research-maker.md) delegated agent when
 verifying a single claim requires more than one or two searches, or more than two fetches.
 Checkers retain in-context `WebSearch`/`WebFetch` only for single-shot verification against known
@@ -115,17 +115,17 @@ agent's prompt — no workflow-level configuration required.
 
 Run all ayokoding validators concurrently to identify all issues across different quality dimensions.
 
-**Agent 1a**: `apps-ayokoding-web-general-checker`
+**Agent 1a**: `apps-ayokoding-www-general-checker`
 
 - **Args**: `scope: {input.scope}`
 - **Output**: `{content-report-N}` - Content quality, bilingual consistency
 
-**Agent 1b**: `apps-ayokoding-web-facts-checker`
+**Agent 1b**: `apps-ayokoding-www-facts-checker`
 
 - **Args**: `scope: {input.scope}`
 - **Output**: `{facts-report-N}` - Factual accuracy, code examples, tutorial sequences
 
-**Agent 1c**: `apps-ayokoding-web-link-checker`
+**Agent 1c**: `apps-ayokoding-www-link-checker`
 
 - **Args**: `scope: {input.scope}`
 - **Output**: `{links-report-N}` - Internal/external link validation
@@ -163,7 +163,7 @@ Analyze all audit reports to determine if fixes are needed.
 
 Fix convention violations, frontmatter issues, and content quality problems.
 
-**Agent**: `apps-ayokoding-web-general-fixer`
+**Agent**: `apps-ayokoding-www-general-fixer`
 
 - **Args**: `report: {step1.outputs.content-report-N}, approved: all`
 - **Output**: `{content-fixes-applied}`
@@ -178,7 +178,7 @@ Fix convention violations, frontmatter issues, and content quality problems.
 
 Fix factual errors, outdated information, and incorrect code examples.
 
-**Agent**: `apps-ayokoding-web-facts-fixer`
+**Agent**: `apps-ayokoding-www-facts-fixer`
 
 - **Args**: `report: {step1.outputs.facts-report-N}, approved: all`
 - **Output**: `{facts-fixes-applied}`
@@ -226,9 +226,9 @@ Run all checkers one final time to confirm zero issues remain.
 
 **Agents**: All checkers in parallel
 
-- apps-ayokoding-web-general-checker
-- apps-ayokoding-web-facts-checker
-- apps-ayokoding-web-link-checker
+- apps-ayokoding-www-general-checker
+- apps-ayokoding-www-facts-checker
+- apps-ayokoding-www-link-checker
 
 **Args**: `scope: {input.scope}, expect: zero-issues`
 
@@ -270,8 +270,8 @@ User: "Run ayokoding-web general quality gate workflow"
 
 The AI will invoke specialized agents via the Agent tool:
 
-- Validate all ayokoding-web content in parallel (`apps-ayokoding-web-general-checker`, `apps-ayokoding-web-facts-checker`, `apps-ayokoding-web-link-checker` delegated agents)
-- Fix all findings (`apps-ayokoding-web-general-fixer`, `apps-ayokoding-web-facts-fixer` delegated agents)
+- Validate all ayokoding-web content in parallel (`apps-ayokoding-www-general-checker`, `apps-ayokoding-www-facts-checker`, `apps-ayokoding-www-link-checker` delegated agents)
+- Fix all findings (`apps-ayokoding-www-general-fixer`, `apps-ayokoding-www-facts-fixer` delegated agents)
 - Iterate until zero findings achieved
 
 ### Validate Specific Language
@@ -371,19 +371,19 @@ Result: SUCCESS (2 iterations)
 
 ## Validation Dimensions
 
-### Content Validation (apps-ayokoding-web-general-checker)
+### Content Validation (apps-ayokoding-www-general-checker)
 
 - Content quality principles
 - Bilingual consistency
 
-### Facts Validation (apps-ayokoding-web-facts-checker)
+### Facts Validation (apps-ayokoding-www-facts-checker)
 
 - Technical accuracy using web verification
 - Code examples correctness
 - Tutorial sequences validity
 - Bilingual factual consistency
 
-### Links Validation (apps-ayokoding-web-link-checker)
+### Links Validation (apps-ayokoding-www-link-checker)
 
 - Internal link validity
 - External link accessibility

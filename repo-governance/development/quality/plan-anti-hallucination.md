@@ -233,10 +233,10 @@ Domain-specialized agents hallucinate less than generic orchestration because th
 **When to annotate**:
 
 - The action touches a specific language (`.ts`/`.tsx` → `swe-typescript-dev`, `.go` → `swe-golang-dev`, `.rs` → `swe-rust-dev`, `.fs`/`.fsproj` → `swe-fsharp-dev`, `.cs`/`.csproj` → `swe-csharp-dev`, etc.).
-- The action touches a specific app context (`apps/ose-www/...` → `apps-ose-web-content-maker` for content edits).
+- The action touches a specific app context (`apps/ose-www/...` → `apps-ose-www-content-maker` for content edits).
 - The action is a content/documentation change (`docs-maker`, `readme-maker`).
 - The action is repo-governance/repo-rules (`repo-rules-maker`).
-- The action is a content-platform skill domain (`apps-ayokoding-web-by-example-maker`, `apps-ayokoding-web-in-the-field-maker`).
+- The action is a content-platform skill domain (`apps-ayokoding-www-by-example-maker`, `apps-ayokoding-www-in-the-field-maker`).
 
 **When to skip annotation** (default plan-execution Agent Selection suffices):
 

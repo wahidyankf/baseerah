@@ -41,7 +41,7 @@ deployments match the documented architecture and the new app-web apps can ship.
 - **Maintainer (deployer hat):** runs the cutover; performs the Vercel dashboard + DNS steps that
   require real credentials.
 - **Maintainer (operator hat):** uses the updated deployer agents and workflows day-to-day after cutover.
-- **AI deployer agents** (`apps-ose-web-deployer` and siblings): consume the updated branch names; will
+- **AI deployer agents** (`apps-ose-www-deployer` and siblings): consume the updated branch names; will
   be renamed/repointed by this plan.
 - **AI execution agent:** performs all in-repo `[AI]` wiring edits and branch creation.
 

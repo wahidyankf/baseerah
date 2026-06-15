@@ -231,12 +231,13 @@ nx graph                     # Visualize dependencies
 **Trunk Based Development** — All development on `main`:
 
 - **Default branch**: `main`
-- **Environment branches** (Vercel deployment only — never commit directly; branch renames deferred to
-  prod-cutover follow-on):
-  - `prod-ayokoding-web` → [ayokoding.com](https://ayokoding.com)
-  - `prod-ose-web` → [oseplatform.com](https://oseplatform.com)
-  - `prod-organiclever-web` → [www.organiclever.com](https://www.organiclever.com/)
-  - `prod-wahidyankf-web` → [www.wahidyankf.com](https://www.wahidyankf.com/)
+- **Environment branches** (Vercel deployment only — never commit directly):
+  - `prod-ayokoding-www` → [ayokoding.com](https://ayokoding.com)
+  - `prod-ose-www` → [oseplatform.com](https://oseplatform.com)
+  - `prod-organiclever-www` → [www.organiclever.com](https://www.organiclever.com/)
+  - `prod-wahidyankf-www` → [www.wahidyankf.com](https://www.wahidyankf.com/)
+  - `prod-organiclever-app-web` → app.organiclever.com (app tier; staging `stag-organiclever-app-web`)
+  - `prod-ose-app-web` → app.oseplatform.com (app tier; staging `stag-ose-app-web`)
 - **Commit format**: Conventional Commits `<type>(<scope>): <description>`
   - Types: feat, fix, docs, style, refactor, perf, test, chore, ci, revert
   - Scope optional but recommended
@@ -398,11 +399,11 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 
 ## AI Agents
 
-**Content Creation**: docs-maker, docs-tutorial-maker, readme-maker, specs-maker, apps-ayokoding-web-general-maker, apps-ayokoding-web-by-example-maker, apps-ayokoding-web-in-the-field-maker, apps-ose-web-content-maker, swe-ui-maker
+**Content Creation**: docs-maker, docs-tutorial-maker, readme-maker, specs-maker, apps-ayokoding-www-general-maker, apps-ayokoding-www-by-example-maker, apps-ayokoding-www-in-the-field-maker, apps-ose-www-content-maker, swe-ui-maker
 
-**Validation**: docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, apps-ayokoding-web-general-checker, apps-ayokoding-web-by-example-checker, apps-ayokoding-web-in-the-field-checker, apps-ayokoding-web-facts-checker, apps-ayokoding-web-link-checker, apps-ose-web-content-checker, swe-code-checker, swe-ui-checker, ci-checker, web-research-maker, repo-rules-checker, repo-workflow-checker, repo-harness-compatibility-checker
+**Validation**: docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, apps-ayokoding-www-general-checker, apps-ayokoding-www-by-example-checker, apps-ayokoding-www-in-the-field-checker, apps-ayokoding-www-facts-checker, apps-ayokoding-www-link-checker, apps-ose-www-content-checker, swe-code-checker, swe-ui-checker, ci-checker, web-research-maker, repo-rules-checker, repo-workflow-checker, repo-harness-compatibility-checker
 
-**Fixing**: docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, apps-ayokoding-web-general-fixer, apps-ayokoding-web-by-example-fixer, apps-ayokoding-web-in-the-field-fixer, apps-ayokoding-web-facts-fixer, apps-ayokoding-web-link-fixer, apps-ose-web-content-fixer, docs-file-manager, swe-ui-fixer, ci-fixer, repo-rules-fixer, repo-workflow-fixer, repo-harness-compatibility-fixer
+**Fixing**: docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, apps-ayokoding-www-general-fixer, apps-ayokoding-www-by-example-fixer, apps-ayokoding-www-in-the-field-fixer, apps-ayokoding-www-facts-fixer, apps-ayokoding-www-link-fixer, apps-ose-www-content-fixer, docs-file-manager, swe-ui-fixer, ci-fixer, repo-rules-fixer, repo-workflow-fixer, repo-harness-compatibility-fixer
 
 **Planning**: plan-maker (grills user before and after plan creation using multiple-choice
 options per [Grilling-With-Options Convention](./repo-governance/development/workflow/grilling-with-options.md);
@@ -414,7 +415,7 @@ repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 
 **Development**: swe-golang-dev, swe-typescript-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev
 
-**Operations**: apps-ayokoding-web-deployer, apps-ose-web-deployer, apps-organiclever-web-deployer, apps-wahidyankf-web-deployer
+**Operations**: apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-www-deployer, apps-organiclever-app-web-deployer, apps-ose-app-web-deployer, apps-wahidyankf-www-deployer
 
 **Content**: pdf-to-md-maker, pdf-to-md-checker, pdf-to-md-fixer
 
@@ -461,7 +462,7 @@ Six-layer governance hierarchy:
 ### ose-www
 
 - **URL**: <https://oseplatform.com>
-- **Production branch**: `prod-ose-web` → oseplatform.com (prod-branch rename deferred to cutover follow-on)
+- **Production branch**: `prod-ose-www` → oseplatform.com
 - **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
 - **Deployment**: Vercel
 - **Content**: Public marketing website for the OSE Platform
@@ -473,7 +474,7 @@ Six-layer governance hierarchy:
 ### ayokoding-www
 
 - **URL**: <https://ayokoding.com>
-- **Production branch**: `prod-ayokoding-web` → ayokoding.com (prod-branch rename deferred to cutover follow-on)
+- **Production branch**: `prod-ayokoding-www` → ayokoding.com
 - **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
 - **Languages**: English (primary), Indonesian
 - **Deployment**: Vercel
@@ -486,7 +487,7 @@ Six-layer governance hierarchy:
 ### organiclever-www
 
 - **URL**: <https://www.organiclever.com/>
-- **Production branch**: `prod-organiclever-web` → www.organiclever.com (prod-branch rename deferred to cutover follow-on)
+- **Production branch**: `prod-organiclever-www` → www.organiclever.com
 - **Framework**: Next.js 16 (App Router)
 - **Deployment**: Vercel
 - **Content**: OrganicLever marketing website
@@ -509,7 +510,7 @@ Six-layer governance hierarchy:
 ### wahidyankf-www
 
 - **URL**: <https://www.wahidyankf.com/>
-- **Production branch**: `prod-wahidyankf-web` → www.wahidyankf.com (prod-branch rename deferred to cutover follow-on)
+- **Production branch**: `prod-wahidyankf-www` → www.wahidyankf.com
 - **Framework**: Next.js 16 (App Router)
 - **Deployment**: Vercel
 - **Content**: Personal portfolio (Home, CV, Personal Projects)

@@ -45,11 +45,11 @@ outputs:
   - name: checker-report
     type: file
     pattern: generated-reports/ayokoding-web-in-the-field__*__*__audit.md
-    description: Final validation report from apps-ayokoding-web-in-the-field-checker (4-part format with UUID chain)
+    description: Final validation report from apps-ayokoding-www-in-the-field-checker (4-part format with UUID chain)
   - name: fixer-report
     type: file
     pattern: generated-reports/ayokoding-web-in-the-field__*__*__fix.md
-    description: Final fixes report from apps-ayokoding-web-in-the-field-fixer (4-part format with UUID chain)
+    description: Final fixes report from apps-ayokoding-www-in-the-field-fixer (4-part format with UUID chain)
   - name: execution-scope
     type: string
     description: Scope identifier for UUID chain tracking (derived from tutorial-path, e.g., "java" for Java tutorials)
@@ -78,8 +78,8 @@ This workflow implements the **Maker-Checker-Fixer pattern** to ensure in-the-fi
 
 ## Execution Mode
 
-**Preferred Mode**: Agent Delegation — invoke `apps-ayokoding-web-in-the-field-checker` and
-`apps-ayokoding-web-in-the-field-fixer` via the Agent tool with `subagent_type`
+**Preferred Mode**: Agent Delegation — invoke `apps-ayokoding-www-in-the-field-checker` and
+`apps-ayokoding-www-in-the-field-fixer` via the Agent tool with `subagent_type`
 (see [Workflow Execution Modes Convention](../meta/execution-modes.md)).
 
 **Fallback Mode**: Manual Orchestration — execute workflow logic directly using
@@ -98,9 +98,9 @@ User: "Run ayokoding-web in-the-field quality gate workflow for java/in-the-fiel
 
 The AI will:
 
-1. Invoke `apps-ayokoding-web-in-the-field-checker` via the Agent tool (validates guides, writes audit)
+1. Invoke `apps-ayokoding-www-in-the-field-checker` via the Agent tool (validates guides, writes audit)
 2. User reviews audit report and decides on fixes (manual decision point)
-3. Invoke `apps-ayokoding-web-in-the-field-fixer` via the Agent tool (reads audit, applies fixes, writes fix report)
+3. Invoke `apps-ayokoding-www-in-the-field-fixer` via the Agent tool (reads audit, applies fixes, writes fix report)
 4. Iterate until EXCELLENT status achieved (zero findings, 20-40 guides, production quality)
 5. Show git status with modified files
 6. Wait for user commit approval
@@ -135,7 +135,7 @@ graph TB
 
 ## Research Delegation
 
-The `apps-ayokoding-web-in-the-field-maker` and `apps-ayokoding-web-facts-checker` agents invoked
+The `apps-ayokoding-www-in-the-field-maker` and `apps-ayokoding-www-facts-checker` agents invoked
 by this workflow delegate multi-page web research to the
 [`web-research-maker`](../../../.claude/agents/web-research-maker.md) delegated agent when composing or
 verifying claims about library versions, API signatures, or production best practices requires
@@ -158,7 +158,7 @@ required.
 - Focus on standard library first, then frameworks
 - Don't worry about perfect compliance (checker will catch issues)
 
-**Option B: AI-assisted creation** (apps-ayokoding-web-in-the-field-maker)
+**Option B: AI-assisted creation** (apps-ayokoding-www-in-the-field-maker)
 
 - Use in-the-field-maker with production specifications
 - Generate initial guides based on language/framework
@@ -177,13 +177,13 @@ required.
 
 **Objective**: Identify gaps and issues against in-the-field standards
 
-**Agent**: `apps-ayokoding-web-in-the-field-checker`
+**Agent**: `apps-ayokoding-www-in-the-field-checker`
 
 **Execution**:
 
 ```bash
 # Invoke via Task tool
-subagent_type: apps-ayokoding-web-in-the-field-checker
+subagent_type: apps-ayokoding-www-in-the-field-checker
 prompt: "Validate apps/ayokoding-www/content/en/learn/software-engineering/programming-language/java/in-the-field/ for compliance with in-the-field standards"
 ```
 
@@ -280,13 +280,13 @@ graph TD
 
 **Objective**: Automatically apply safe, validated improvements
 
-**Agent**: `apps-ayokoding-web-in-the-field-fixer`
+**Agent**: `apps-ayokoding-www-in-the-field-fixer`
 
 **Execution**:
 
 ```bash
 # Invoke via Task tool with audit report and mode parameter
-subagent_type: apps-ayokoding-web-in-the-field-fixer
+subagent_type: apps-ayokoding-www-in-the-field-fixer
 prompt: "Apply fixes from generated-reports/ayokoding-in-the-field__a1b2c3__2026-02-06--14-30__audit.md with mode={input.mode}"
 ```
 
@@ -432,6 +432,6 @@ This workflow is part of the **Tutorial Quality Family**:
 
 - **[In-the-Field Tutorial Convention](../../conventions/tutorials/in-the-field.md)**: Quality standards
 - **[Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md)**: Workflow pattern
-- **[`apps-ayokoding-web-in-the-field-checker` agent](../../../.claude/agents/apps-ayokoding-web-in-the-field-checker.md)**: Validation agent
-- **[`apps-ayokoding-web-in-the-field-fixer` agent](../../../.claude/agents/apps-ayokoding-web-in-the-field-fixer.md)**: Fixing agent
-- **[`apps-ayokoding-web-in-the-field-maker` agent](../../../.claude/agents/apps-ayokoding-web-in-the-field-maker.md)**: Content creation agent
+- **[`apps-ayokoding-www-in-the-field-checker` agent](../../../.claude/agents/apps-ayokoding-www-in-the-field-checker.md)**: Validation agent
+- **[`apps-ayokoding-www-in-the-field-fixer` agent](../../../.claude/agents/apps-ayokoding-www-in-the-field-fixer.md)**: Fixing agent
+- **[`apps-ayokoding-www-in-the-field-maker` agent](../../../.claude/agents/apps-ayokoding-www-in-the-field-maker.md)**: Content creation agent

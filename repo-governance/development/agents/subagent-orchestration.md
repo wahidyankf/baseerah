@@ -74,7 +74,7 @@ This convention codifies two interlocking standards that address both failure mo
 
 The main agent MUST NOT have more than **2 background subagents active simultaneously** at any point, unless the user explicitly raises the cap for a specific session or batch. The main thread's own work does not count toward the cap — only concurrent background subagents do. When two independent units of work are ready, both background slots should be kept full rather than running them one at a time.
 
-**Applies to**: All Agent-tool spawns, whether background or foreground. Both content-producing makers (e.g., `apps-ayokoding-web-by-example-maker`) and meta-agents (e.g., `repo-rules-maker`) count toward the cap. Total simultaneous Agent-tool invocations is the metric, not agent type.
+**Applies to**: All Agent-tool spawns, whether background or foreground. Both content-producing makers (e.g., `apps-ayokoding-www-by-example-maker`) and meta-agents (e.g., `repo-rules-maker`) count toward the cap. Total simultaneous Agent-tool invocations is the metric, not agent type.
 
 **Rationale**: Each subagent operates its own independent tool-call stream against the Claude API. Running more than 2 concurrently risks saturating the per-minute request quota at the model vendor and increases token burn rate, producing rate-limit errors that cascade and slow the entire batch. Two concurrent agents deliver adequate throughput while staying safely below observed saturation thresholds.
 

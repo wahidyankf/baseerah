@@ -11,7 +11,7 @@ above system context. Read this first if you are new to the portfolio site.
 `wahidyankf-web` is a personal portfolio and CV site for Wahidyan Kresna Fridayoka. It
 serves two audiences: technical recruiters and hiring managers scanning a professional
 profile, and collaborators looking for contact and project links. The site is read-only,
-fully static (no backend, no auth, no database), and deploys from `prod-wahidyankf-web` to
+fully static (no backend, no auth, no database), and deploys from `prod-wahidyankf-www` to
 Vercel at [www.wahidyankf.com](https://www.wahidyankf.com).
 
 ## Planned children

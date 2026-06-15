@@ -45,7 +45,7 @@ This convention applies to:
   - **ayokoding-www** (`apps/ayokoding-www/content/[lang]/learn/swe/programming-languages/[language]/`) - canonical location
   - **Any other location** where programming language tutorials exist
 - Includes: tutorials (foundational, by-concept, by-example, cookbook), how-to guides, best practices, anti-patterns
-- Enforced by: `apps-ayokoding-web-general-checker`, `apps-ayokoding-web-by-example-checker`, `apps-ayokoding-web-general-maker`, `apps-ayokoding-web-by-example-maker`, `apps-ayokoding-web-facts-checker` agents
+- Enforced by: `apps-ayokoding-www-general-checker`, `apps-ayokoding-www-by-example-checker`, `apps-ayokoding-www-general-maker`, `apps-ayokoding-www-by-example-maker`, `apps-ayokoding-www-facts-checker` agents
 
 **Implementation Notes**: While the Full Set Tutorial Package architecture applies universally, implementation details (frontmatter, weight values, navigation) are documented in the Content Requirements section below.
 
@@ -673,7 +673,7 @@ From benchmark analysis:
 
 Content creators MUST:
 
-1. **Use apps-ayokoding-web-general-maker or apps-ayokoding-web-by-example-maker agent** for initial content creation
+1. **Use apps-ayokoding-www-general-maker or apps-ayokoding-www-by-example-maker agent** for initial content creation
 2. **Follow this standard exactly** (don't improvise structure)
 3. **Test all code examples** (ensure they run)
 4. **Verify factual accuracy** (check documentation, official sources)
@@ -683,9 +683,9 @@ Content creators MUST:
 
 Content MUST pass:
 
-1. **apps-ayokoding-web-general-checker** or **apps-ayokoding-web-by-example-checker** validation (quality principles)
-2. **apps-ayokoding-web-facts-checker** verification (factual correctness)
-3. **apps-ayokoding-web-link-checker** validation (all links work)
+1. **apps-ayokoding-www-general-checker** or **apps-ayokoding-www-by-example-checker** validation (quality principles)
+2. **apps-ayokoding-www-facts-checker** verification (factual correctness)
+3. **apps-ayokoding-www-link-checker** validation (all links work)
 4. **Manual review** (pedagogical effectiveness, clarity)
 
 ### Post-Publishing

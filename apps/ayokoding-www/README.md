@@ -45,11 +45,11 @@ curl http://localhost:3101/api/trpc/meta.health
 
 ## Deployment
 
-Deployed to Vercel via production branch `prod-ayokoding-web`.
+Deployed to Vercel via production branch `prod-ayokoding-www`.
 
 ```bash
 # Vercel auto-builds when code is pushed to prod branch
-git push origin main:prod-ayokoding-web
+git push origin main:prod-ayokoding-www
 ```
 
 ## Source Layout

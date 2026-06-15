@@ -30,6 +30,17 @@ Next.js 16 frontend for OSE Application (Governance, Risk, and Compliance) platf
 - **Vitest** — Unit testing
 - **Storybook** — Component development
 
+## Deployment
+
+- **Staging**: served by Vercel from the `stag-ose-app-web` branch, which the scheduled
+  `ose-app-test-local-deploy-stag.yml` workflow force-pushes from `main` after the
+  local-stack test gate passes. The staging URL is kept **private** (Vercel Deployment
+  Protection) — it lives only in the `ose-app-staging` GitHub Environment var
+  `WEB_BASE_URL`, never in a tracked file.
+- **Production**: `prod-ose-app-web` → `app.oseplatform.com`. Production CD is **deferred** —
+  no production-promotion workflow exists yet.
+- **Deployer agent**: [`apps-ose-app-web-deployer`](../../.claude/agents/apps-ose-app-web-deployer.md).
+
 ## Related
 
 - [ose-be](../ose-be/) — F#/Giraffe backend API

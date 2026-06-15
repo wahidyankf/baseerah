@@ -30,6 +30,17 @@ nx dev organiclever-app-web   # http://localhost:3202
 | --------------------- | ----------- | -------- | --------------------------------------------------- |
 | `ORGANICLEVER_BE_URL` | Server-only | No       | Backend base URL probed by `/system/status/be` only |
 
+## Deployment
+
+- **Staging**: served by Vercel from the `stag-organiclever-app-web` branch, which the
+  scheduled `organiclever-app-test-local-deploy-stag.yml` workflow force-pushes from `main`
+  after the local-stack test gate passes. The staging URL is kept **private** (Vercel
+  Deployment Protection) — it lives only in the `organiclever-app-staging` GitHub
+  Environment var `WEB_BASE_URL`, never in a tracked file.
+- **Production**: `prod-organiclever-app-web` → `app.organiclever.com`. Production CD is
+  **deferred** — no production-promotion workflow exists yet.
+- **Deployer agent**: [`apps-organiclever-app-web-deployer`](../../.claude/agents/apps-organiclever-app-web-deployer.md).
+
 ## Project Layout
 
 ```

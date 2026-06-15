@@ -90,17 +90,17 @@ Spec tree: `specs/apps/ose/`.
 
 ## Deployment
 
-Deployed to Vercel via production branch `prod-ose-web`.
+Deployed to Vercel via production branch `prod-ose-www`.
 
 - **Production**: <https://oseplatform.com>
-- **Deploy**: Push `main` to `prod-ose-web`; Vercel builds automatically
+- **Deploy**: Push `main` to `prod-ose-www`; Vercel builds automatically
 
 ```bash
-git push origin main:prod-ose-web
+git push origin main:prod-ose-www
 ```
 
 ## Related
 
 - [Specs root](../../specs/apps/ose/README.md)
 - [Main Repository](https://github.com/wahidyankf/ose-public)
-- [apps-ose-web-deployer](../../.claude/agents/) — AI agent for deployments
+- [apps-ose-www-deployer](../../.claude/agents/) — AI agent for deployments

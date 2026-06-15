@@ -24,7 +24,7 @@ The platform consists of the following applications across its technology stacks
 - **Purpose**: Public marketing website for OSE Platform
 - **URL**: <https://oseplatform.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript + tRPC
-- **Deployment**: Vercel (via `prod-ose-web` branch — rename deferred to cutover follow-on)
+- **Deployment**: Vercel (via `prod-ose-www` branch)
 - **Build Command**: `nx build ose-www`
 - **Dev Command**: `nx dev ose-www`
 - **Dev Port**: 3100
@@ -36,7 +36,7 @@ The platform consists of the following applications across its technology stacks
 - **URL**: <https://ayokoding.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript + tRPC
 - **Languages**: Bilingual (default English)
-- **Deployment**: Vercel (via `prod-ayokoding-web` branch — rename deferred to cutover follow-on)
+- **Deployment**: Vercel (via `prod-ayokoding-www` branch)
 - **Build Command**: `nx build ayokoding-www`
 - **Dev Command**: `nx dev ayokoding-www`
 - **Dev Port**: 3101
@@ -48,7 +48,7 @@ The platform consists of the following applications across its technology stacks
 - **Purpose**: Personal portfolio site for Wahidyan Kresna Fridayoka
 - **URL**: <https://www.wahidyankf.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript
-- **Deployment**: Vercel (via `prod-wahidyankf-web` branch — rename deferred to cutover follow-on)
+- **Deployment**: Vercel (via `prod-wahidyankf-www` branch)
 - **Build Command**: `nx build wahidyankf-www`
 - **Dev Command**: `nx dev wahidyankf-www`
 - **Dev Port**: 3201
@@ -59,7 +59,7 @@ The platform consists of the following applications across its technology stacks
 - **Purpose**: Marketing website for the OrganicLever productivity platform
 - **URL**: <https://www.organiclever.com>
 - **Technology**: Next.js 16 (App Router) + TypeScript
-- **Deployment**: Vercel (via `prod-organiclever-web` branch — rename deferred to cutover follow-on)
+- **Deployment**: Vercel (via `prod-organiclever-www` branch)
 - **Build Command**: `nx build organiclever-www`
 - **Dev Command**: `nx dev organiclever-www`
 - **Dev Port**: 3200

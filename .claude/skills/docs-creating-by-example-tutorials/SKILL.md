@@ -495,7 +495,7 @@ int x = 10;  // This line declares a variable named x and assigns it the integer
 
 **Related Skills**:
 
-- `apps-ayokoding-web-developing-content` - ayokoding-web specific patterns for hosting tutorials
+- `apps-ayokoding-www-developing-content` - ayokoding-web specific patterns for hosting tutorials
 - `docs-creating-accessible-diagrams` - Accessible diagram creation for complex examples
 
 ---

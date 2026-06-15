@@ -394,7 +394,7 @@ The default push behavior is constant regardless of execution context:
 
 AI agents must not infer a branch + PR workflow from execution context alone. The triggering signal is always an explicit instruction in the user's prompt or delivery checklist.
 
-Note: this does **not** affect environment branches (`prod-ayokoding-web`, `prod-ose-web`, `stag-organiclever-app-web`, `stag-organiclever-be`). Those follow their own documented deployment workflows. The OrganicLever app staging branches (`stag-organiclever-app-web`, `stag-organiclever-be`) are CI-automated by `organiclever-app-test-local-deploy-stag.yml`. Production promotion for the OrganicLever app is **deferred** to a separate plan — no production-CD workflow exists yet.
+Note: this does **not** affect environment branches (`prod-ayokoding-www`, `prod-ose-www`, `stag-organiclever-app-web`, `stag-organiclever-be`). Those follow their own documented deployment workflows. The OrganicLever app staging branches (`stag-organiclever-app-web`, `stag-organiclever-be`) are CI-automated by `organiclever-app-test-local-deploy-stag.yml`. Production promotion for the OrganicLever app is **deferred** to a separate plan — no production-CD workflow exists yet.
 
 ## When Branches Are Appropriate
 
@@ -448,25 +448,25 @@ Environment branches serve deployment purposes, not feature isolation:
 
 **Key distinction**: Environment branches reflect deployment state, not development work.
 
-**Example in this repository: `prod-ayokoding-web`**
+**Example in this repository: `prod-ayokoding-www`**
 
 The `apps/ayokoding-www/` project uses a production deployment branch:
 
-- **Branch**: `prod-ayokoding-web`
+- **Branch**: `prod-ayokoding-www`
 - **Purpose**: Triggers automatic deployment to ayokoding.com via Vercel
 - **Location**: Deploys `apps/ayokoding-www/` (Next.js 16 application)
 - **Workflow** (automated):
   1. All development happens in `main`
-  2. The `ayokoding-www-test-local-deploy-prod.yml` GitHub Actions workflow runs at 6 AM and 6 PM WIB, detects changes in `apps/ayokoding-www/`, builds, then force-pushes `main` to `prod-ayokoding-web`
-  3. Push to `prod-ayokoding-web` triggers production deployment via Vercel
-- **Important**: Never commit directly to `prod-ayokoding-web` outside the CI automation
+  2. The `ayokoding-www-test-local-deploy-prod.yml` GitHub Actions workflow runs at 6 AM and 6 PM WIB, detects changes in `apps/ayokoding-www/`, builds, then force-pushes `main` to `prod-ayokoding-www`
+  3. Push to `prod-ayokoding-www` triggers production deployment via Vercel
+- **Important**: Never commit directly to `prod-ayokoding-www` outside the CI automation
 
 **Why this is TBD-compliant**:
 
 - Development still happens on `main` (trunk)
 - No feature isolation in branches
-- `prod-ayokoding-web` is a deployment trigger, not a development workspace
-- Changes flow from `main` to `prod-ayokoding-web`, never the reverse
+- `prod-ayokoding-www` is a deployment trigger, not a development workspace
+- Changes flow from `main` to `prod-ayokoding-www`, never the reverse
 - Consistent with TBD principles: environment branches are for release management, not feature development
 
 **Reference**: [TrunkBasedDevelopment.com - Branch for Release](https://trunkbaseddevelopment.com/branch-for-release/) explicitly describes release branches as acceptable in TBD.

@@ -6,7 +6,7 @@ in 2026-04 and retrofitted to the `ose-public` Nx monorepo conventions.
 
 **Framework**: Next.js 16 (App Router) · React 19 · Tailwind CSS 4
 **Language**: TypeScript
-**Deployment**: Vercel via `prod-wahidyankf-web` branch
+**Deployment**: Vercel via `prod-wahidyankf-www` branch
 **Production domain**: <https://www.wahidyankf.com/>
 **Dev port**: 3201
 
@@ -82,8 +82,8 @@ libraries.
 
 ## Deployment
 
-`prod-wahidyankf-web` branch receives force-pushes from `main` via the
-`apps-wahidyankf-web-deployer` agent. Vercel watches the branch and
+`prod-wahidyankf-www` branch receives force-pushes from `main` via the
+`apps-wahidyankf-www-deployer` agent. Vercel watches the branch and
 rebuilds on every push.
 
 ## Structure

@@ -54,7 +54,7 @@ Repo maintains **multi-harness compatibility** with Claude Code, OpenCode, and A
 
 ### organiclever-web skill
 
-The organiclever-web content development skill is at [.claude/skills/apps-organiclever-web-developing-content/SKILL.md](./.claude/skills/apps-organiclever-web-developing-content/SKILL.md).
+The organiclever-web content development skill is at [.claude/skills/apps-organiclever-www-developing-content/SKILL.md](./.claude/skills/apps-organiclever-www-developing-content/SKILL.md).
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->

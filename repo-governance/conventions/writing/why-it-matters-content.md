@@ -228,13 +228,13 @@ investigation report, and the fact is citable.
 
 ## Tools and Automation
 
-- **`apps-ayokoding-web-by-example-checker`** — Validates by-example tutorial content,
+- **`apps-ayokoding-www-by-example-checker`** — Validates by-example tutorial content,
   including scanning `**Why It Matters**:` sections for prohibited patterns
-- **`apps-ayokoding-web-in-the-field-checker`** — Validates in-the-field tutorial content
+- **`apps-ayokoding-www-in-the-field-checker`** — Validates in-the-field tutorial content
   using the same Why It Matters rules
-- **`apps-ayokoding-web-by-example-fixer`** — Applies fixes to by-example tutorial content,
+- **`apps-ayokoding-www-by-example-fixer`** — Applies fixes to by-example tutorial content,
   rewriting prohibited Why It Matters patterns as theoretical explanations
-- **`apps-ayokoding-web-in-the-field-fixer`** — Applies fixes to in-the-field tutorial content
+- **`apps-ayokoding-www-in-the-field-fixer`** — Applies fixes to in-the-field tutorial content
 
 ## References
 
@@ -256,9 +256,9 @@ investigation report, and the fact is citable.
 
 **Agents:**
 
-- `apps-ayokoding-web-by-example-maker` — Creates by-example tutorials; must follow this convention
-- `apps-ayokoding-web-in-the-field-maker` — Creates in-the-field guides; must follow this convention
-- `apps-ayokoding-web-by-example-checker` — Validates Why It Matters sections in by-example tutorials
-- `apps-ayokoding-web-in-the-field-checker` — Validates Why It Matters sections in in-the-field guides
-- `apps-ayokoding-web-by-example-fixer` — Fixes prohibited patterns in by-example tutorials
-- `apps-ayokoding-web-in-the-field-fixer` — Fixes prohibited patterns in in-the-field guides
+- `apps-ayokoding-www-by-example-maker` — Creates by-example tutorials; must follow this convention
+- `apps-ayokoding-www-in-the-field-maker` — Creates in-the-field guides; must follow this convention
+- `apps-ayokoding-www-by-example-checker` — Validates Why It Matters sections in by-example tutorials
+- `apps-ayokoding-www-in-the-field-checker` — Validates Why It Matters sections in in-the-field guides
+- `apps-ayokoding-www-by-example-fixer` — Fixes prohibited patterns in by-example tutorials
+- `apps-ayokoding-www-in-the-field-fixer` — Fixes prohibited patterns in in-the-field guides

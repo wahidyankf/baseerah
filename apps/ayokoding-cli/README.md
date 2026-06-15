@@ -60,7 +60,7 @@ ayokoding-cli links check --quiet
 - Walks all `.md` files in the content directory
 - Extracts every markdown link (`[text](target)`) from non-code-block lines
 - Skips external links (`http://`, `https://`, `mailto:`, `//`) — use the
-  `apps-ayokoding-web-link-checker` AI agent for those
+  `apps-ayokoding-www-link-checker` AI agent for those
 - Skips same-page anchors (`#section`)
 - Strips `#fragment` and `?query` from internal link targets before resolving
 - Resolves each internal link against the content directory:
@@ -73,7 +73,7 @@ ayokoding-cli links check --quiet
 | Type                     | Example                  | Handled by                              |
 | ------------------------ | ------------------------ | --------------------------------------- |
 | Internal (absolute path) | `/en/learn/swe/overview` | `ayokoding-cli links check`             |
-| External URL             | `https://example.com`    | `apps-ayokoding-web-link-checker` agent |
+| External URL             | `https://example.com`    | `apps-ayokoding-www-link-checker` agent |
 | Same-page anchor         | `#section-name`          | Not validated                           |
 
 **Exit codes:**
@@ -159,7 +159,7 @@ needed. Only the `links check` command is retained.
 
 ## Integration with AI Agents
 
-The `apps-ayokoding-web-link-checker` agent validates external links separately.
+The `apps-ayokoding-www-link-checker` agent validates external links separately.
 Internal link validation is handled by this CLI during `test:quick`.
 
 ## Pre-commit Automation

@@ -117,7 +117,7 @@ Examples prioritize:
 - Platform-specific advanced features
 - Deprecated features
 
-**Coverage verification**: The apps-ayokoding-web-by-example-checker agent validates coverage against comprehensive checklists for each language/framework.
+**Coverage verification**: The apps-ayokoding-www-by-example-checker agent validates coverage against comprehensive checklists for each language/framework.
 
 ### 3. Example Count: 75-85 Total
 
@@ -419,7 +419,7 @@ The Java by-example tutorial demonstrates this principle for programming languag
 
 ### Validation Criteria
 
-The apps-ayokoding-web-by-example-checker validates:
+The apps-ayokoding-www-by-example-checker validates:
 
 - **Beginner dependency count**: 0 external dependencies/abstractions (CRITICAL)
 - **Intermediate dependency justification**: Each external dependency has explicit "Why Not Core Features" explanation (HIGH)
@@ -1395,7 +1395,7 @@ Before publishing by-example content, verify:
 
 ### Automated Validation
 
-The **apps-ayokoding-web-by-example-checker** agent validates:
+The **apps-ayokoding-www-by-example-checker** agent validates:
 
 - **Coverage percentage**: 95% target achieved
 - **Example count**: 75-85 total (beginner: 27-30, intermediate: 20-30, advanced: 25-28)
@@ -1421,10 +1421,10 @@ The **apps-ayokoding-web-by-example-checker** agent validates:
 
 The **by-example-quality-gate** workflow orchestrates:
 
-1. **apps-ayokoding-web-by-example-maker**: Creates/updates examples
-2. **apps-ayokoding-web-by-example-checker**: Validates against standards
+1. **apps-ayokoding-www-by-example-maker**: Creates/updates examples
+2. **apps-ayokoding-www-by-example-checker**: Validates against standards
 3. **User review**: Reviews audit report
-4. **apps-ayokoding-web-by-example-fixer**: Applies validated fixes
+4. **apps-ayokoding-www-by-example-fixer**: Applies validated fixes
 
 ## Relationship to Other Tutorial Types
 
@@ -1504,7 +1504,7 @@ This convention reflects standards validated by **7 production languages** (75-8
 
 This convention implements and respects:
 
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via apps-ayokoding-web-by-example-checker agent
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Automated validation via apps-ayokoding-www-by-example-checker agent
 - **[Progressive Disclosure](../../principles/content/progressive-disclosure.md)**: Content organized in complexity levels (beginner/intermediate/advanced)
 - **[No Time Estimates](../../principles/content/no-time-estimates.md)**: Uses coverage percentages instead of time-based estimates
 - **[Accessibility First](../../principles/content/accessibility-first.md)**: Color-blind friendly diagrams and accessible formatting
@@ -1535,7 +1535,7 @@ This convention implements and respects:
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
 - **Code quality** - Source code standards in development conventions
-- **Tutorial validation** - Covered by apps-ayokoding-web-by-example-checker agent
+- **Tutorial validation** - Covered by apps-ayokoding-www-by-example-checker agent
 
 ## Related Documentation
 
@@ -1547,9 +1547,9 @@ This convention implements and respects:
 
 ## Related Agents
 
-- [apps-ayokoding-web-by-example-maker](../../../.claude/agents/apps-ayokoding-web-by-example-maker.md) - Creates by-example content
-- [apps-ayokoding-web-by-example-checker](../../../.claude/agents/apps-ayokoding-web-by-example-checker.md) - Validates by-example standards
-- [apps-ayokoding-web-by-example-fixer](../../../.claude/agents/apps-ayokoding-web-by-example-fixer.md) - Applies validated fixes
+- [apps-ayokoding-www-by-example-maker](../../../.claude/agents/apps-ayokoding-www-by-example-maker.md) - Creates by-example content
+- [apps-ayokoding-www-by-example-checker](../../../.claude/agents/apps-ayokoding-www-by-example-checker.md) - Validates by-example standards
+- [apps-ayokoding-www-by-example-fixer](../../../.claude/agents/apps-ayokoding-www-by-example-fixer.md) - Applies validated fixes
 
 ## Related Workflows
 

@@ -41,7 +41,7 @@ the worktree after the plan is archived and pushed.
 
 > All Phase 0 checks confirm that the upstream restructure landed before any wiring edit begins.
 
-- [ ] [AI] Provision worktree:
+- [x] [AI] Provision worktree — **ADAPTED**: per user directive, executing directly on `main` (no worktree). `git status` clean at start.
 
   ```bash
   claude --worktree wire-vercel-www-app-cutover
@@ -49,17 +49,17 @@ the worktree after the plan is archived and pushed.
 
   Acceptance criterion: `worktrees/wire-vercel-www-app-cutover/` exists and `git status` is clean.
 
-- [ ] [AI] Run `ls apps/ose-www apps/ayokoding-www apps/organiclever-www apps/wahidyankf-www apps/organiclever-app-web apps/ose-app-web` — acceptance: all six directories exist (restructure merged).
-- [ ] [AI] Run `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web' apps/ .claude/ .github/ AGENTS.md docs/ --count` to record starting stale-reference count — acceptance: output logged for comparison in Phase 4.
-- [ ] [AI] Run `git ls-remote --heads origin` and verify `prod-ose-web`, `prod-ayokoding-web`, `prod-wahidyankf-web`, `stag-organiclever-web`, `prod-organiclever-web` still exist (rollback anchors intact) — acceptance: all five listed.
-- [ ] [AI] Run `npm install && npm run doctor -- --scope minimal` — acceptance: exits 0.
+- [x] [AI] Run `ls apps/ose-www apps/ayokoding-www apps/organiclever-www apps/wahidyankf-www apps/organiclever-app-web apps/ose-app-web` — acceptance: all six directories exist (restructure merged). ✓ all six present.
+- [x] [AI] Run `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web' apps/ .claude/ .github/ AGENTS.md docs/ --count` to record starting stale-reference count — acceptance: output logged for comparison in Phase 4. **Baseline = 105 matches** (note: `--count-matches` total; `.github/` already clean from the standardize plan).
+- [x] [AI] Run `git ls-remote --heads origin` and verify `prod-ose-web`, `prod-ayokoding-web`, `prod-wahidyankf-web`, `stag-organiclever-web`, `prod-organiclever-web` still exist (rollback anchors intact) — acceptance: all five listed. ✓ all five present on origin.
+- [x] [AI] Run `npm install && npm run doctor -- --scope minimal` — acceptance: exits 0. ✓ `6/6 tools OK` after the doctor purge committed (`e52dc712f`). Polyglot phantom-tool noise gone.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `ls apps/ose-www apps/ayokoding-www apps/organiclever-www apps/wahidyankf-www apps/organiclever-app-web apps/ose-app-web` — acceptance: exits 0 (all six dirs exist).
-- [ ] [AI] `git ls-remote --heads origin | grep -E 'prod-ose-web|prod-ayokoding-web|prod-wahidyankf-web'` — acceptance: at least these three listed.
+- [x] [AI] `ls apps/ose-www apps/ayokoding-www apps/organiclever-www apps/wahidyankf-www apps/organiclever-app-web apps/ose-app-web` — acceptance: exits 0 (all six dirs exist). ✓
+- [x] [AI] `git ls-remote --heads origin | grep -E 'prod-ose-web|prod-ayokoding-web|prod-wahidyankf-web'` — acceptance: at least these three listed. ✓ all three present.
 
 > **Pause Safety**: Phase 0 is read-only verification only. Repository and Vercel state unchanged.
 > Safe to stop. To resume: re-run the Phase 0 checklist.
@@ -72,25 +72,47 @@ the worktree after the plan is archived and pushed.
 
 ### 1a — Update vercel.json ignoreCommand for each www site
 
-- [ ] [AI] Edit `apps/ose-www/vercel.json` (copy `apps/ose-www/vercel.json` if renamed app does not have one yet): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ose-www" ]` — acceptance: `cat apps/ose-www/vercel.json | grep ignoreCommand` shows `prod-ose-www`.
-- [ ] [AI] Edit `apps/ayokoding-www/vercel.json`: set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ayokoding-www" ]` — acceptance: grep confirms `prod-ayokoding-www`.
-- [ ] [AI] Edit `apps/wahidyankf-www/vercel.json`: set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-wahidyankf-www" ]` — acceptance: grep confirms `prod-wahidyankf-www`.
-- [ ] [AI] Create `apps/organiclever-www/vercel.json` (model on `apps/wahidyankf-www/vercel.json`): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-organiclever-www" ]` — acceptance: file exists and grep confirms branch name.
-- [ ] [AI] Create `apps/organiclever-app-web/vercel.json` (model on `apps/wahidyankf-www/vercel.json`): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-organiclever-app-web" ]` — acceptance: file exists and grep confirms branch name.
-- [ ] [AI] Create `apps/ose-app-web/vercel.json` (model on `apps/wahidyankf-www/vercel.json`): set `ignoreCommand` to `[ "$VERCEL_GIT_COMMIT_REF" != "prod-ose-app-web" ]` — acceptance: file exists and grep confirms branch name.
+- [x] [AI] Edit `apps/ose-www/vercel.json`: `ignoreCommand` → `prod-ose-www`. ✓
+- [x] [AI] Edit `apps/ayokoding-www/vercel.json`: `ignoreCommand` → `prod-ayokoding-www`. ✓
+- [x] [AI] Edit `apps/wahidyankf-www/vercel.json`: `ignoreCommand` → `prod-wahidyankf-www`. ✓
+- [x] [AI] Create `apps/organiclever-www/vercel.json`: `ignoreCommand` → `prod-organiclever-www`. ✓
+- [x] [AI] Create `apps/organiclever-app-web/vercel.json`: `ignoreCommand` → `prod-organiclever-app-web`. ✓
+- [x] [AI] Create `apps/ose-app-web/vercel.json`: `ignoreCommand` → `prod-ose-app-web`. ✓
 
 > These paths exist only after `restructure-fsharp-be-and-web-app-tiers` has merged — Phase 0 gate
 > verifies their presence.
 
-### 1b — Rename and update deployer agents
+### 1b — Rename and update deployer agents (EXPANDED to a full `-web` → `-www`/`-app-web` sweep per user)
 
-- [ ] [AI] In `.claude/agents/`: rename `apps-ose-web-deployer.md` → `apps-ose-www-deployer.md`; update `name: apps-ose-www-deployer`, `description`, and every occurrence of `prod-ose-web` → `prod-ose-www` inside the file — acceptance: `grep 'prod-ose-web' .claude/agents/apps-ose-www-deployer.md` returns nothing.
-- [ ] [AI] Rename `apps-ayokoding-web-deployer.md` → `apps-ayokoding-www-deployer.md`; update name, description, `prod-ayokoding-web` → `prod-ayokoding-www` — acceptance: no stale branch name in new file.
-- [ ] [AI] Rename `apps-organiclever-web-deployer.md` → `apps-organiclever-www-deployer.md`; update name, description, branch refs — acceptance: no stale branch name in new file.
-- [ ] [AI] Rename `apps-wahidyankf-web-deployer.md` → `apps-wahidyankf-www-deployer.md`; update name, description, `prod-wahidyankf-web` → `prod-wahidyankf-www` — acceptance: no stale branch name in new file.
-- [ ] [AI] Create `.claude/agents/apps-ose-app-web-deployer.md` (model on `apps-wahidyankf-www-deployer.md`): set `name: apps-ose-app-web-deployer`, production branch `prod-ose-app-web`, staging branch `stag-ose-app-web`, domain `app.oseplatform.com` — acceptance: file exists and `grep 'prod-ose-app-web'` returns a match.
-- [ ] [AI] Create `.claude/agents/apps-organiclever-app-web-deployer.md` similarly: `name: apps-organiclever-app-web-deployer`, production branch `prod-organiclever-app-web`, staging branch `stag-organiclever-app-web`, domain `app.organiclever.com` — acceptance: file exists and `grep 'prod-organiclever-app-web'` returns a match.
-- [ ] [AI] Run `npm run generate:bindings` to resync `.opencode/agents/` — acceptance: exits 0; `git diff --stat .opencode/agents/` shows agent mirror changes.
+> **Scope expansion (user-approved 2026-06-15).** The user directed a full rename of every
+> outdated `-web` agent and skill, not just the deployers. Executed sweep:
+>
+> - **Deployers** (`git mv` + content update): `apps-ose-web-deployer` → `apps-ose-www-deployer`,
+>   `apps-ayokoding-web-deployer` → `apps-ayokoding-www-deployer`,
+>   `apps-wahidyankf-web-deployer` → `apps-wahidyankf-www-deployer`.
+> - **Reconciliation**: `apps-organiclever-web-deployer` was already the OrganicLever **app-group
+>   staging** deployer (force-pushes `stag-organiclever-app-web` + `stag-organiclever-be`, prod CD
+>   deferred), NOT a www-marketing deployer. Renamed it to its true identity
+>   `apps-organiclever-app-web-deployer`, and **created a separate** `apps-organiclever-www-deployer`
+>   for the marketing site (`prod-organiclever-www`).
+> - **New**: `apps-ose-app-web-deployer` (ose app group: `stag-ose-app-web`, `app.oseplatform.com`,
+>   prod CD deferred — modeled on the organiclever app-group deployer).
+> - **Content-agent families** (`git mv` + cross-ref sweep): `apps-ose-web-content-{maker,checker,fixer}`
+>   → `apps-ose-www-content-*`; all 13 `apps-ayokoding-web-*` → `apps-ayokoding-www-*`.
+> - **Skills** (`git mv` dir + `name:` + all references): `apps-ose-web-developing-content`,
+>   `apps-ayokoding-web-developing-content`, `apps-organiclever-web-developing-content` → `…-www-…`.
+> - **Cross-refs swept** across `AGENTS.md`, `CLAUDE.md`, `.claude/agents/README.md`,
+>   `.claude/skills/**`, `repo-governance/**`, app READMEs, active plans. **Excluded** (history not
+>   falsified): `apps/*/content/**` changelog posts, `generated-reports/**`, `generated-socials/**`,
+>   `plans/done/**`, and the regenerated `.opencode/**` / `.amazonq/**` bindings.
+
+- [x] [AI] Rename `apps-ose-web-deployer.md` → `apps-ose-www-deployer.md`; update `name`, `description`, and `prod-ose-web` → `prod-ose-www` — acceptance: `grep 'prod-ose-web' .claude/agents/apps-ose-www-deployer.md` returns nothing. ✓
+- [x] [AI] Rename `apps-ayokoding-web-deployer.md` → `apps-ayokoding-www-deployer.md`; `prod-ayokoding-web` → `prod-ayokoding-www` — acceptance: no stale branch name. ✓
+- [x] [AI] Rename `apps-organiclever-web-deployer.md` → `apps-organiclever-app-web-deployer.md` (app-group deployer) **and** create `apps-organiclever-www-deployer.md` (marketing, `prod-organiclever-www`) — acceptance: both exist; no stale branch name. ✓
+- [x] [AI] Rename `apps-wahidyankf-web-deployer.md` → `apps-wahidyankf-www-deployer.md`; `prod-wahidyankf-web` → `prod-wahidyankf-www` — acceptance: no stale branch name. ✓
+- [x] [AI] Create `.claude/agents/apps-ose-app-web-deployer.md`: `name: apps-ose-app-web-deployer`, staging `stag-ose-app-web`, domain `app.oseplatform.com`, prod CD deferred — acceptance: file exists and `grep 'stag-ose-app-web'` matches. ✓
+- [x] [AI] Rename content-agent families + the 3 `*-developing-content` skills, sweep all cross-refs (see scope box) — acceptance: `git grep 'apps-(ose|ayokoding|wahidyankf|organiclever)-web-' -- ':!plans/done' ':!*/content/**'` returns only `apps-organiclever-app-web-deployer`. ✓
+- [x] [AI] Run `npm run generate:bindings` to resync `.opencode/agents/` + `.amazonq/` — acceptance: exits 0; mirrors regenerated. ✓ (run at end of Phase 1)
 
 ### 1c — Verify the standardized GitHub Actions workflows (no edits here)
 

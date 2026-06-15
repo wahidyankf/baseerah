@@ -81,7 +81,7 @@ Force-push and hook-bypass operations are not always wrong. Common legitimate si
 
 - Cleaning up a local branch before merging (amending commits, squashing, rebasing) when the branch has no other contributors.
 - Emergency hotfix where the pre-push hook is malfunctioning and the hook problem is being tracked separately.
-- CI automation that explicitly documents the force-push in workflow files and is reviewed as part of code review (for example, the `prod-ayokoding-web` deployment workflow — see [Trunk Based Development Convention](./trunk-based-development.md)).
+- CI automation that explicitly documents the force-push in workflow files and is reviewed as part of code review (for example, the `prod-ayokoding-www` deployment workflow — see [Trunk Based Development Convention](./trunk-based-development.md)).
 
 In every case, the decision requires human judgment about the specific context. An agent cannot reliably determine whether a force-push is safe without that context.
 
@@ -180,7 +180,7 @@ It does not apply to:
 ## Related Documentation
 
 - [Code Quality Convention](../quality/code.md) — Git hooks (Husky, lint-staged, pre-push) that `--no-verify` bypasses.
-- [Trunk Based Development Convention](./trunk-based-development.md) — Git workflow and the specific environment branches (`prod-ayokoding-web`, etc.) where CI-managed force-push is explicitly documented.
+- [Trunk Based Development Convention](./trunk-based-development.md) — Git workflow and the specific environment branches (`prod-ayokoding-www`, etc.) where CI-managed force-push is explicitly documented.
 - [Commit Message Convention](./commit-messages.md) — Conventional Commits format enforced by the commit-msg hook.
 - [Reproducible Environments Convention](./reproducible-environments.md) — Why deterministic, consistent operations matter across the team.
 - [Git Push Default Convention](./git-push-default.md) — The default push behavior (direct to main, PR opt-in) that this convention complements for destructive operations.

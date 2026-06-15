@@ -866,7 +866,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 - Indonesian/English consistency
 - Educational sequences are logical
 
-**Agent:** `apps-ayokoding-web-facts-checker`, `apps-ayokoding-web-facts-fixer`
+**Agent:** `apps-ayokoding-www-facts-checker`, `apps-ayokoding-www-facts-fixer`
 
 ### Platform Content (ose-www)
 
@@ -904,7 +904,7 @@ Recommendation: Clarify which context applies or use HTTPS everywhere
 **Implementation Agents:**
 
 - `docs-checker.md` - Documentation factual accuracy validator (implements this convention for `docs/`)
-- `apps-ayokoding-web-facts-checker.md` - Educational content factual validator (implements this convention for ayokoding-www)
+- `apps-ayokoding-www-facts-checker.md` - Educational content factual validator (implements this convention for ayokoding-www)
 - `plan-checker.md` - Plan accuracy validator (implements portions of this convention)
 
 **Quality Standards:**

@@ -45,11 +45,11 @@ outputs:
   - name: checker-report
     type: file
     pattern: generated-reports/ayokoding-web-by-example__*__*__audit.md
-    description: Final validation report from apps-ayokoding-web-by-example-checker (4-part format with UUID chain)
+    description: Final validation report from apps-ayokoding-www-by-example-checker (4-part format with UUID chain)
   - name: fixer-report
     type: file
     pattern: generated-reports/ayokoding-web-by-example__*__*__fix.md
-    description: Final fixes report from apps-ayokoding-web-by-example-fixer (4-part format with UUID chain)
+    description: Final fixes report from apps-ayokoding-www-by-example-fixer (4-part format with UUID chain)
   - name: execution-scope
     type: string
     description: Scope identifier for UUID chain tracking (derived from tutorial-path, e.g., "golang" for golang tutorials)
@@ -78,8 +78,8 @@ This workflow implements the **Maker-Checker-Fixer pattern** to ensure by-exampl
 
 ## Execution Mode
 
-**Preferred Mode**: Agent Delegation — invoke `apps-ayokoding-web-by-example-checker` and
-`apps-ayokoding-web-by-example-fixer` via the Agent tool with `subagent_type`
+**Preferred Mode**: Agent Delegation — invoke `apps-ayokoding-www-by-example-checker` and
+`apps-ayokoding-www-by-example-fixer` via the Agent tool with `subagent_type`
 (see [Workflow Execution Modes Convention](../meta/execution-modes.md)).
 
 **Fallback Mode**: Manual Orchestration — execute workflow logic directly using
@@ -98,9 +98,9 @@ User: "Run ayokoding-web by-example quality gate workflow for golang/tutorials/b
 
 The AI will:
 
-1. Invoke `apps-ayokoding-web-by-example-checker` via the Agent tool (validates tutorial, writes audit)
+1. Invoke `apps-ayokoding-www-by-example-checker` via the Agent tool (validates tutorial, writes audit)
 2. User reviews audit report and decides on fixes (manual decision point)
-3. Invoke `apps-ayokoding-web-by-example-fixer` via the Agent tool (reads audit, applies fixes, writes fix report)
+3. Invoke `apps-ayokoding-www-by-example-fixer` via the Agent tool (reads audit, applies fixes, writes fix report)
 4. Iterate until EXCELLENT status achieved (zero findings, 75-85 examples, 95% coverage)
 5. Show git status with modified files
 6. Wait for user commit approval
@@ -135,7 +135,7 @@ graph TB
 
 ## Research Delegation
 
-The `apps-ayokoding-web-by-example-maker` and `apps-ayokoding-web-facts-checker` agents invoked
+The `apps-ayokoding-www-by-example-maker` and `apps-ayokoding-www-facts-checker` agents invoked
 by this workflow delegate multi-page web research to the
 [`web-research-maker`](../../../.claude/agents/web-research-maker.md) delegated agent when composing or
 verifying claims about library versions, API signatures, or best practices requires more than
@@ -176,13 +176,13 @@ lean. The delegation is encoded in each agent's prompt — no workflow-level con
 
 **Objective**: Identify gaps and issues against by-example standards
 
-**Agent**: `apps-ayokoding-web-by-example-checker`
+**Agent**: `apps-ayokoding-www-by-example-checker`
 
 **Execution**:
 
 ```bash
 # Invoke via Task tool
-subagent_type: apps-ayokoding-web-by-example-checker
+subagent_type: apps-ayokoding-www-by-example-checker
 prompt: "Validate apps/ayokoding-www/content/en/learn/software-engineering/programming-language/golang/tutorials/by-example/ for compliance with by-example standards"
 ```
 
@@ -311,13 +311,13 @@ graph TD
 
 **Objective**: Automatically apply safe, validated improvements
 
-**Agent**: `apps-ayokoding-web-by-example-fixer`
+**Agent**: `apps-ayokoding-www-by-example-fixer`
 
 **Execution**:
 
 ```bash
 # Invoke via Task tool with audit report and mode parameter
-subagent_type: apps-ayokoding-web-by-example-fixer
+subagent_type: apps-ayokoding-www-by-example-fixer
 prompt: "Apply fixes from generated-reports/ayokoding-web-by-example__a1b2c3__2025-12-25--14-30__audit.md with mode={input.mode}"
 ```
 
@@ -467,7 +467,7 @@ Report final status and summary.
 **Step 2: Checker** (validation)
 
 ```bash
-apps-ayokoding-web-by-example-checker validates golang by-example
+apps-ayokoding-www-by-example-checker validates golang by-example
 ```
 
 **Results**:
@@ -489,7 +489,7 @@ apps-ayokoding-web-by-example-checker validates golang by-example
 **Step 4: Fixer** (apply fixes)
 
 ```bash
-apps-ayokoding-web-by-example-fixer applies fixes from audit
+apps-ayokoding-www-by-example-fixer applies fixes from audit
 ```
 
 **Fixes applied**:
@@ -502,7 +502,7 @@ apps-ayokoding-web-by-example-fixer applies fixes from audit
 **Step 5: Re-validation**
 
 ```bash
-apps-ayokoding-web-by-example-checker re-validates
+apps-ayokoding-www-by-example-checker re-validates
 ```
 
 **Results**:
@@ -528,7 +528,7 @@ apps-ayokoding-web-by-example-checker re-validates
 **Step 2: Checker**
 
 ```bash
-apps-ayokoding-web-by-example-checker validates elixir by-example
+apps-ayokoding-www-by-example-checker validates elixir by-example
 ```
 
 **Results**:
@@ -546,7 +546,7 @@ apps-ayokoding-web-by-example-checker validates elixir by-example
 **Step 4: Fixer**
 
 ```bash
-apps-ayokoding-web-by-example-fixer applies fixes
+apps-ayokoding-www-by-example-fixer applies fixes
 ```
 
 **Fixes applied**:
@@ -558,7 +558,7 @@ apps-ayokoding-web-by-example-fixer applies fixes
 **Step 5: Re-validation**
 
 ```bash
-apps-ayokoding-web-by-example-checker re-validates
+apps-ayokoding-www-by-example-checker re-validates
 ```
 
 **Results**:
@@ -576,7 +576,7 @@ apps-ayokoding-web-by-example-checker re-validates
 **Step 1: Checker** (initial validation)
 
 ```bash
-apps-ayokoding-web-by-example-checker validates java by-example
+apps-ayokoding-www-by-example-checker validates java by-example
 ```
 
 **Results**:
@@ -603,7 +603,7 @@ apps-ayokoding-web-by-example-checker validates java by-example
 **Step 4: Checker** (re-validation after rework)
 
 ```bash
-apps-ayokoding-web-by-example-checker re-validates
+apps-ayokoding-www-by-example-checker re-validates
 ```
 
 **Results**:
@@ -728,9 +728,9 @@ User: "Run ayokoding-web by-example quality gate workflow for golang/tutorials/b
 **AI orchestrates all phases**:
 
 1. **Create content** (if needed): User writes examples or uses maker agent
-2. **Validate**: Invoke `apps-ayokoding-web-by-example-checker` via Agent tool
+2. **Validate**: Invoke `apps-ayokoding-www-by-example-checker` via Agent tool
 3. **Review**: User reads audit report from generated-reports/
-4. **Fix**: Invoke `apps-ayokoding-web-by-example-fixer` via Agent tool
+4. **Fix**: Invoke `apps-ayokoding-www-by-example-fixer` via Agent tool
 5. **Re-validate**: Invoke checker via Agent tool again
 6. **Iterate**: Repeat validation-fixing until clean or max-iterations
 
@@ -827,6 +827,6 @@ This workflow is part of the **Tutorial Quality Family**:
 - **[By-Example Tutorial Convention](../../conventions/tutorials/swe-by-example.md)**: Quality standards
 - **[Maker-Checker-Fixer Pattern](../../development/pattern/maker-checker-fixer.md)**: Workflow pattern
 - **[Fixer Confidence Levels](../../development/quality/fixer-confidence-levels.md)**: Confidence assessment
-- **[`apps-ayokoding-web-by-example-checker` agent](../../../.claude/agents/apps-ayokoding-web-by-example-checker.md)**: Validation agent
-- **[`apps-ayokoding-web-by-example-fixer` agent](../../../.claude/agents/apps-ayokoding-web-by-example-fixer.md)**: Fixing agent
-- **[`apps-ayokoding-web-by-example-maker` agent](../../../.claude/agents/apps-ayokoding-web-by-example-maker.md)**: Content creation agent
+- **[`apps-ayokoding-www-by-example-checker` agent](../../../.claude/agents/apps-ayokoding-www-by-example-checker.md)**: Validation agent
+- **[`apps-ayokoding-www-by-example-fixer` agent](../../../.claude/agents/apps-ayokoding-www-by-example-fixer.md)**: Fixing agent
+- **[`apps-ayokoding-www-by-example-maker` agent](../../../.claude/agents/apps-ayokoding-www-by-example-maker.md)**: Content creation agent

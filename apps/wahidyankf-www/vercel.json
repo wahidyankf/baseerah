@@ -2,7 +2,7 @@
   "version": 2,
   "installCommand": "npm install --prefix=../.. --ignore-scripts",
   "buildCommand": "next build",
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"prod-wahidyankf-web\" ]",
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"prod-wahidyankf-www\" ]",
   "headers": [
     {
       "source": "/_next/static/(.*)",

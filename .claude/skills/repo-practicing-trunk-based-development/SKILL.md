@@ -227,8 +227,8 @@ function renderCheckout() {
 
 This repository has **environment-specific branches** for deployment:
 
-- `prod-ayokoding-web` - Production deployment for ayokoding.com
-- `prod-ose-web` - Production deployment for oseplatform.com
+- `prod-ayokoding-www` - Production deployment for ayokoding.com
+- `prod-ose-www` - Production deployment for oseplatform.com
 
 ### Critical Rules
 
@@ -256,8 +256,8 @@ Developer commits to main → CI/CD tests → CI/CD deploys to environment branc
 
 **Examples**:
 
-- `prod-ayokoding-web`
-- `prod-ose-web`
+- `prod-ayokoding-www`
+- `prod-ose-www`
 
 **Rationale**: Clear, explicit, unambiguous naming prevents accidental commits.
 
@@ -486,7 +486,7 @@ test(user): add integration tests for user service
 
 ### ❌ Mistake 3: Treating environment branches as development branches
 
-**Wrong**: `git commit` directly to `prod-ayokoding-web`
+**Wrong**: `git commit` directly to `prod-ayokoding-www`
 
 **Right**: Commit to `main`, let CI/CD deploy to environment branch
 

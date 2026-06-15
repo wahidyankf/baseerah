@@ -14,7 +14,7 @@ created: 2025-12-14
 
 # Fixer Confidence Levels Convention
 
-This document defines the universal confidence level system used by all fixer agents (repo-rules-fixer, apps-ayokoding-web-general-fixer, apps-ayokoding-web-by-example-fixer, apps-ayokoding-web-facts-fixer, docs-tutorial-fixer, apps-ose-web-content-fixer, readme-fixer, docs-fixer, plan-fixer) to assess findings from checker agents and determine which fixes can be applied automatically versus which require manual review.
+This document defines the universal confidence level system used by all fixer agents (repo-rules-fixer, apps-ayokoding-www-general-fixer, apps-ayokoding-www-by-example-fixer, apps-ayokoding-www-facts-fixer, docs-tutorial-fixer, apps-ose-www-content-fixer, readme-fixer, docs-fixer, plan-fixer) to assess findings from checker agents and determine which fixes can be applied automatically versus which require manual review.
 
 ## Principles Implemented/Respected
 
@@ -110,13 +110,13 @@ Confidence levels serve multiple critical purposes:
 All fixer agents implement this confidence level system:
 
 - **repo-rules-fixer** - Repository-wide structural consistency fixes
-- **apps-ayokoding-web-general-fixer** - ayokoding-www general content fixes
-- **apps-ayokoding-web-by-example-fixer** - ayokoding-www by-example tutorial fixes
-- **apps-ayokoding-web-facts-fixer** - ayokoding-www factual accuracy fixes
-- **apps-ayokoding-web-in-the-field-fixer** - ayokoding-www in-the-field tutorial fixes
-- **apps-ayokoding-web-link-fixer** - ayokoding-www link validation fixes
+- **apps-ayokoding-www-general-fixer** - ayokoding-www general content fixes
+- **apps-ayokoding-www-by-example-fixer** - ayokoding-www by-example tutorial fixes
+- **apps-ayokoding-www-facts-fixer** - ayokoding-www factual accuracy fixes
+- **apps-ayokoding-www-in-the-field-fixer** - ayokoding-www in-the-field tutorial fixes
+- **apps-ayokoding-www-link-fixer** - ayokoding-www link validation fixes
 - **docs-tutorial-fixer** - Tutorial quality fixes
-- **apps-ose-web-content-fixer** - ose-www Next.js content fixes
+- **apps-ose-www-content-fixer** - ose-www Next.js content fixes
 - **readme-fixer** - README quality fixes
 - **docs-fixer** - Documentation factual accuracy fixes
 - **plan-fixer** - Plan structural and format fixes
@@ -158,7 +158,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Wrong field value verified by comparing actual vs expected value
 - File naming convention violation verified by checking filename against the kebab-case pattern
 
-**apps-ayokoding-web-general-fixer:**
+**apps-ayokoding-www-general-fixer:**
 
 - Missing `draft: false` field verified by re-reading frontmatter
 - Wrong date format verified by regex pattern match (missing UTC+7 timezone)
@@ -172,7 +172,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Wrong tutorial type naming verified against convention patterns
 - Time estimate violation verified by keyword search (forbidden in tutorials)
 
-**apps-ose-web-content-fixer:**
+**apps-ose-www-content-fixer:**
 
 - Missing required frontmatter field verified (title, date, draft)
 - Wrong date format verified by regex (missing timezone)
@@ -225,7 +225,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Link target unclear (file missing, but can't determine correct target automatically)
 - Field value could be valid in specific context (non-standard but potentially intentional)
 
-**apps-ayokoding-web-general-fixer:**
+**apps-ayokoding-www-general-fixer:**
 
 - Description length borderline (145 chars vs 150-160 optimal - functional but could improve)
 - Line length slightly over 100 characters (breaking might harm readability)
@@ -240,7 +240,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Content balance assessments (theory vs practice ratio)
 - Example quality assessments (examples work but could be better)
 
-**apps-ose-web-content-fixer:**
+**apps-ose-www-content-fixer:**
 
 - Summary length is short but functional (85 chars vs 150-160 optimal)
 - Image alt text vague but not missing ("screenshot" - need image context to improve)
@@ -293,7 +293,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Checker reported missing field that actually exists (case sensitivity issue)
 - Checker misinterpreted file content (wrong pattern match)
 
-**apps-ayokoding-web-general-fixer:**
+**apps-ayokoding-www-general-fixer:**
 
 - Checker flagged overview.md in English folder but file is correct (checker confused /en/ with /id/)
 - Checker flagged missing ikhtisar.md in blogging content (learning-only rule applied to wrong directory)
@@ -305,7 +305,7 @@ The three confidence levels (HIGH, MEDIUM, FALSE_POSITIVE) are universal. Each a
 - Checker reported missing diagram but diagram exists (different Mermaid syntax or placement)
 - Checker misinterpreted tutorial type (tutorial follows convention correctly)
 
-**apps-ose-web-content-fixer:**
+**apps-ose-www-content-fixer:**
 
 - Checker flagged Next.js MDX link as broken (doesn't recognize component-style link syntax)
 - Checker applied post validation rules to static page (about.md doesn't need date field)
@@ -475,7 +475,7 @@ Each fixer agent has domain-specific validation checks:
 - File naming convention compliance
 - Structural consistency across repository
 
-**apps-ayokoding-web-general-fixer:**
+**apps-ayokoding-www-general-fixer:**
 
 - Next.js/MDX frontmatter for ayokoding-www
 - Bilingual content validation (en/id)
@@ -489,7 +489,7 @@ Each fixer agent has domain-specific validation checks:
 - Tutorial naming patterns by type
 - No time estimates rule
 
-**apps-ose-web-content-fixer:**
+**apps-ose-www-content-fixer:**
 
 - Next.js/MDX frontmatter for ose-www
 - English-only content validation
@@ -884,16 +884,16 @@ FAIL: All agent files - Frontmatter comment detection
 ### Fixer Agents Using This Convention
 
 - [repo-rules-fixer.md](../../../.claude/agents/repo-rules-fixer.md) - Repository structural consistency fixer
-- [apps-ayokoding-web-general-fixer.md](../../../.claude/agents/apps-ayokoding-web-general-fixer.md) - ayokoding-www general Next.js content fixer
-- [apps-ayokoding-web-by-example-fixer.md](../../../.claude/agents/apps-ayokoding-web-by-example-fixer.md) - ayokoding-www by-example tutorial fixer
-- [apps-ayokoding-web-facts-fixer.md](../../../.claude/agents/apps-ayokoding-web-facts-fixer.md) - ayokoding-www factual accuracy fixer
+- [apps-ayokoding-www-general-fixer.md](../../../.claude/agents/apps-ayokoding-www-general-fixer.md) - ayokoding-www general Next.js content fixer
+- [apps-ayokoding-www-by-example-fixer.md](../../../.claude/agents/apps-ayokoding-www-by-example-fixer.md) - ayokoding-www by-example tutorial fixer
+- [apps-ayokoding-www-facts-fixer.md](../../../.claude/agents/apps-ayokoding-www-facts-fixer.md) - ayokoding-www factual accuracy fixer
 - [docs-tutorial-fixer.md](../../../.claude/agents/docs-tutorial-fixer.md) - Tutorial quality fixer
-- [apps-ose-web-content-fixer.md](../../../.claude/agents/apps-ose-web-content-fixer.md) - ose-www Next.js content fixer
+- [apps-ose-www-content-fixer.md](../../../.claude/agents/apps-ose-www-content-fixer.md) - ose-www Next.js content fixer
 - [readme-fixer.md](../../../.claude/agents/readme-fixer.md) - README quality fixer
 - [plan-fixer.md](../../../.claude/agents/plan-fixer.md) - Plan structural and format fixer
 - [docs-fixer.md](../../../.claude/agents/docs-fixer.md) - Documentation factual accuracy fixer
-- [apps-ayokoding-web-in-the-field-fixer.md](../../../.claude/agents/apps-ayokoding-web-in-the-field-fixer.md) - ayokoding-www in-the-field tutorial fixer
-- [apps-ayokoding-web-link-fixer.md](../../../.claude/agents/apps-ayokoding-web-link-fixer.md) - ayokoding-www link validation fixer
+- [apps-ayokoding-www-in-the-field-fixer.md](../../../.claude/agents/apps-ayokoding-www-in-the-field-fixer.md) - ayokoding-www in-the-field tutorial fixer
+- [apps-ayokoding-www-link-fixer.md](../../../.claude/agents/apps-ayokoding-www-link-fixer.md) - ayokoding-www link validation fixer
 - [docs-software-engineering-separation-fixer.md](../../../.claude/agents/docs-software-engineering-separation-fixer.md) - Software engineering documentation separation fixer
 - [repo-workflow-fixer.md](../../../.claude/agents/repo-workflow-fixer.md) - Repository workflow structural consistency fixer
 

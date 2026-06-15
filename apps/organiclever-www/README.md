@@ -25,7 +25,7 @@ nx dev organiclever-www   # http://localhost:3200
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4 + `@open-sharia-enterprise/web-ui`
-- **Deployment**: Vercel via `prod-organiclever-web` branch (prod-branch rename deferred to cutover follow-on)
+- **Deployment**: Vercel via `prod-organiclever-www` branch
 - **Dev port**: 3200
 
 ## Related

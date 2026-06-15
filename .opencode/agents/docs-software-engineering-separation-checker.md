@@ -449,7 +449,7 @@ Validation is successful when:
 **Related Agents**:
 
 - **docs-software-engineering-separation-fixer** - Fixes prerequisite issues from audit reports
-- **apps-ayokoding-web-general-checker** - Validates AyoKoding content quality
+- **apps-ayokoding-www-general-checker** - Validates AyoKoding content quality
 - **docs-link-checker** - Validates cross-reference links
 
 ## Project Guidance
@@ -491,9 +491,9 @@ Validation is successful when:
 
 **Content Validation**:
 
-- **apps-ayokoding-web-general-checker** - Validates AyoKoding content quality
-- **apps-ayokoding-web-by-example-checker** - Validates By Example completeness
-- **apps-ayokoding-web-in-the-field-checker** - Validates In-the-Field completeness
+- **apps-ayokoding-www-general-checker** - Validates AyoKoding content quality
+- **apps-ayokoding-www-by-example-checker** - Validates By Example completeness
+- **apps-ayokoding-www-in-the-field-checker** - Validates In-the-Field completeness
 - **docs-checker** - Validates docs/explanation factual accuracy
 
 **Link Validation**:

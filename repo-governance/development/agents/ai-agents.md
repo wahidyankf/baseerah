@@ -313,13 +313,13 @@ Agents can reference multiple agent skills that work together:
 
 ```yaml
 ---
-name: apps-ayokoding-web-general-maker
+name: apps-ayokoding-www-general-maker
 description: Expert at creating general Next.js content for ayokoding-www. Use when creating or updating general content pages for the AyoKoding website.
 tools: Read, Write, Edit, Glob, Grep
 model: sonnet
 color: blue
 skills:
-  - apps-ayokoding-web-developing-content
+  - apps-ayokoding-www-developing-content
   - docs-creating-accessible-diagrams
   - docs-validating-factual-accuracy
 ---
@@ -479,10 +479,10 @@ PASS: Good - General agents (no scope prefix):
 - readme-maker.md
 
 PASS: Good - App-scoped agents:
-- apps-ayokoding-web-general-maker.md
-- apps-ayokoding-web-by-example-checker.md
-- apps-ose-web-content-maker.md
-- apps-ose-web-deployer.md
+- apps-ayokoding-www-general-maker.md
+- apps-ayokoding-www-by-example-checker.md
+- apps-ose-www-content-maker.md
+- apps-ose-www-deployer.md
 
 FAIL: Bad:
 - DocWriter.md (PascalCase)
@@ -502,7 +502,7 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
 1. **`apps-[app-name]-`** - Agent works ONLY with a specific app
    - Content creation for Next.js sites (ayokoding-www, ose-www)
    - App-specific validation, deployment, structure management
-   - Examples: `apps-ayokoding-web-general-maker`, `apps-ose-web-deployer`
+   - Examples: `apps-ayokoding-www-general-maker`, `apps-ose-www-deployer`
 
 2. **`libs-[lib-name]-`** - Agent works ONLY with a specific library
    - Future use when monorepo has libraries with specific agents
@@ -551,7 +551,7 @@ description: Expert documentation writer specializing in GitHub-compatible markd
 Example - App-scoped agent:
 
 ```yaml
-name: apps-ayokoding-web-general-maker # Includes scope prefix
+name: apps-ayokoding-www-general-maker # Includes scope prefix
 description: Expert at creating general Next.js content for ayokoding-www. Use when creating or updating general content pages for the AyoKoding website. # Detailed usage guidance
 ```
 
@@ -592,12 +592,12 @@ ALL checker agents MUST write their validation/audit reports to `generated-repor
 
 1. repo-rules-checker
 2. repo-workflow-checker
-3. apps-ayokoding-web-general-checker
-4. apps-ayokoding-web-by-example-checker
-5. apps-ayokoding-web-in-the-field-checker
-6. apps-ayokoding-web-facts-checker
-7. apps-ayokoding-web-link-checker
-8. apps-ose-web-content-checker
+3. apps-ayokoding-www-general-checker
+4. apps-ayokoding-www-by-example-checker
+5. apps-ayokoding-www-in-the-field-checker
+6. apps-ayokoding-www-facts-checker
+7. apps-ayokoding-www-link-checker
+8. apps-ose-www-content-checker
 9. docs-checker
 10. docs-tutorial-checker
 11. docs-link-checker
@@ -750,7 +750,7 @@ Agents are categorized by their **primary role** which aligns with naming suffix
 | Color         | Role             | Purpose                               | Tool Pattern                            | Agents                                                                                                             |
 | ------------- | ---------------- | ------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | 🟦 **Blue**   | **Makers**       | Create new content from scratch       | Has `Write` tool                        | docs-maker<br>plan-maker<br>docs-tutorial-maker<br>repo-rules-maker                                                |
-| 🟩 **Green**  | **Checkers**     | Validate and generate reports         | Has `Write`, `Bash` (no `Edit`)\*\*     | repo-rules-checker<br>plan-checker<br>docs-checker<br>docs-link-checker\*\*<br>apps-ayokoding-web-link-checker\*\* |
+| 🟩 **Green**  | **Checkers**     | Validate and generate reports         | Has `Write`, `Bash` (no `Edit`)\*\*     | repo-rules-checker<br>plan-checker<br>docs-checker<br>docs-link-checker\*\*<br>apps-ayokoding-www-link-checker\*\* |
 | 🟨 **Yellow** | **Fixers**       | Modify and propagate existing content | Has `Edit` (usually not `Write`)        | docs-file-manager<br>readme-fixer<br>repo-rules-fixer                                                              |
 | 🟪 **Purple** | **Implementors** | Execute plans with full tool access   | Has `Write`, `Edit`, `Bash` (or Bash)\* | deployers\*<br>swe-\*-dev agents                                                                                   |
 
@@ -786,8 +786,8 @@ The content below is platform-specific. It documents the concrete translation ap
 **Edge Case Notes:**
 
 - **\*Yellow with Write**: Some Yellow fixer agents (e.g., readme-fixer, repo-rules-fixer) may have Write tool for audit report generation. Documented exception.
-- **\*Purple Bash-only**: Deployers (apps-ayokoding-web-deployer, apps-ose-web-deployer, apps-organiclever-web-deployer) only need Bash for git/deployment orchestration. Purple without Write/Edit is valid for Bash-only orchestrators.
-- **\*\*Green with Write + Edit**: Link checker agents (docs-link-checker, apps-ayokoding-web-link-checker) also have Edit and Write tools for cache file management, but their primary role is validation (checker). Color is green to reflect primary role. See "Link Checker Agents Note" below.
+- **\*Purple Bash-only**: Deployers (apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer) only need Bash for git/deployment orchestration. Purple without Write/Edit is valid for Bash-only orchestrators.
+- **\*\*Green with Write + Edit**: Link checker agents (docs-link-checker, apps-ayokoding-www-link-checker) also have Edit and Write tools for cache file management, but their primary role is validation (checker). Color is green to reflect primary role. See "Link Checker Agents Note" below.
 - **\*\*\*Green research agent (`web-research-maker`)**: The `web-research-maker` agent has `color: green` despite its `-maker` suffix. Green is used because the agent's primary purpose is validation-adjacent research — verifying external claims and gathering current information — rather than content creation. The green color reflects the validation/research context. See "Research Agent Note" below.
 
 **Color Accessibility Note**: The four active role colors (blue, green, yellow, purple) are from the verified accessible palette defined in [Color Accessibility Convention](../../conventions/formatting/color-accessibility.md) — the master reference for all color usage in this repository. These colors meet WCAG AA standards for both light and dark modes and work for all types of color blindness (protanopia, deuteranopia, and tritanopia). The additional reserved colors (red, orange, pink, cyan) are reserved for future role categories; when adopted they MUST also be drawn from the accessible palette and verified against the Color Accessibility Convention. See the accessibility section below for details on how agents are identified beyond color. All color-related work must reference the Color Accessibility Convention as the authoritative source.
@@ -809,7 +809,7 @@ This role-based categorization was chosen because it:
 **Link Checker Agents:**
 
 - **docs-link-checker** - Validates documentation links + manages external-links-status.yaml cache
-- **apps-ayokoding-web-link-checker** - Validates ayokoding-www content links + manages ayokoding-links-status.yaml cache
+- **apps-ayokoding-www-link-checker** - Validates ayokoding-www content links + manages ayokoding-links-status.yaml cache
 
 **Why green (not purple)?**
 
@@ -827,7 +827,7 @@ This role-based categorization was chosen because it:
 
 **Cache files are NOT temporary:**
 
-- Location: `docs/metadata/` (docs-link-checker) and `apps/ayokoding-www/` (apps-ayokoding-web-link-checker)
+- Location: `docs/metadata/` (docs-link-checker) and `apps/ayokoding-www/` (apps-ayokoding-www-link-checker)
 - Purpose: Long-term link status tracking (6-month expiry), shared across team
 - Committed to git: Yes (operational metadata)
 - Updated every run: Yes (including lastFullScan timestamp)
@@ -893,12 +893,12 @@ Start: What is the agent's primary capability?
   - Write tool needed for audit reports in generated-reports/
   - Edit tool needed for cache file management (external-links-status.yaml updates)
   - Bash tool needed for UTC+7 timestamps
-  - Examples: docs-link-checker, apps-ayokoding-web-link-checker
+  - Examples: docs-link-checker, apps-ayokoding-www-link-checker
 - **Deployers with Bash only**: Use `purple` (Implementor)
   - Execute deployment orchestration (purple's "executes plans/orchestrates tasks")
   - Don't create or edit files, only run git/deployment commands
   - Edge case: purple without Write/Edit tools (Bash-only orchestration)
-  - Examples: apps-ayokoding-web-deployer, apps-ose-web-deployer, apps-organiclever-web-deployer
+  - Examples: apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer
 - **Fixers with Write tool**: Investigate actual usage
   - Yellow (Fixers) should have Edit but NOT Write
   - If Write is needed for creating new convention files → keep yellow, document exception
@@ -1305,9 +1305,9 @@ Agent files are organized into **three complexity tiers** with corresponding siz
 
 **Examples**:
 
-- apps-ayokoding-web-deployer (deployment automation)
-- apps-ose-web-deployer (deployment automation)
-- apps-organiclever-web-deployer (deployment automation)
+- apps-ayokoding-www-deployer (deployment automation)
+- apps-ose-www-deployer (deployment automation)
+- apps-organiclever-app-web-deployer (deployment automation)
 - social-linkedin-post-maker (single-purpose content generation)
 - repo-workflow-maker (workflow document creation)
 
@@ -1339,9 +1339,9 @@ Agent files are organized into **three complexity tiers** with corresponding siz
 - docs-tutorial-checker (tutorial quality validation)
 - docs-file-manager (file organization, relative path calculation, link updates)
 - agent-maker (agent creation automation)
-- apps-ayokoding-web-general-maker (general Next.js content creation for ayokoding-www)
-- apps-ayokoding-web-by-example-maker (by-example tutorial creation)
-- apps-ose-web-content-maker (Next.js content creation for ose-www)
+- apps-ayokoding-www-general-maker (general Next.js content creation for ayokoding-www)
+- apps-ayokoding-www-by-example-maker (by-example tutorial creation)
+- apps-ose-www-content-maker (Next.js content creation for ose-www)
 
 **When to use this tier**:
 
@@ -1387,8 +1387,8 @@ Quick categorization for existing agents:
 
 | Tier                 | Agents                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Tier 1: Simple**   | apps-ayokoding-web-deployer, apps-ose-web-deployer, apps-organiclever-web-deployer, social-linkedin-post-maker, apps-ayokoding-web-facts-fixer, apps-ayokoding-web-link-fixer, apps-ose-web-content-fixer, repo-workflow-maker, repo-workflow-checker, repo-workflow-fixer, ci-fixer, repo-ose-primer-adoption-maker, swe-ui-fixer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| **Tier 2: Standard** | docs-maker, docs-tutorial-maker, docs-checker, docs-tutorial-checker, docs-file-manager, docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-maker, readme-checker, readme-fixer, agent-maker, plan-fixer, apps-ayokoding-web-general-maker, apps-ayokoding-web-general-checker, apps-ayokoding-web-general-fixer, apps-ayokoding-web-by-example-maker, apps-ayokoding-web-by-example-checker, apps-ayokoding-web-by-example-fixer, apps-ayokoding-web-in-the-field-maker, apps-ayokoding-web-in-the-field-checker, apps-ayokoding-web-in-the-field-fixer, apps-ayokoding-web-link-checker, apps-ayokoding-web-facts-checker, apps-ose-web-content-maker, apps-ose-web-content-checker, swe-typescript-dev, swe-golang-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev, swe-code-checker, specs-maker, specs-checker, specs-fixer, ci-checker, web-research-maker, swe-ui-maker, swe-ui-checker |
+| **Tier 1: Simple**   | apps-ayokoding-www-deployer, apps-ose-www-deployer, apps-organiclever-app-web-deployer, social-linkedin-post-maker, apps-ayokoding-www-facts-fixer, apps-ayokoding-www-link-fixer, apps-ose-www-content-fixer, repo-workflow-maker, repo-workflow-checker, repo-workflow-fixer, ci-fixer, repo-ose-primer-adoption-maker, swe-ui-fixer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| **Tier 2: Standard** | docs-maker, docs-tutorial-maker, docs-checker, docs-tutorial-checker, docs-file-manager, docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-maker, readme-checker, readme-fixer, agent-maker, plan-fixer, apps-ayokoding-www-general-maker, apps-ayokoding-www-general-checker, apps-ayokoding-www-general-fixer, apps-ayokoding-www-by-example-maker, apps-ayokoding-www-by-example-checker, apps-ayokoding-www-by-example-fixer, apps-ayokoding-www-in-the-field-maker, apps-ayokoding-www-in-the-field-checker, apps-ayokoding-www-in-the-field-fixer, apps-ayokoding-www-link-checker, apps-ayokoding-www-facts-checker, apps-ose-www-content-maker, apps-ose-www-content-checker, swe-typescript-dev, swe-golang-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev, swe-code-checker, specs-maker, specs-checker, specs-fixer, ci-checker, web-research-maker, swe-ui-maker, swe-ui-checker |
 | **Tier 3: Complex**  | plan-maker, plan-checker, plan-execution-checker, repo-rules-maker, repo-rules-checker, repo-rules-fixer, docs-link-checker, docs-software-engineering-separation-checker, repo-ose-primer-propagation-maker                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 ### When to Condense or Split Agents
@@ -2336,7 +2336,7 @@ See `repo-assessing-criticality-confidence` Skill for level definitions.
 **Before Simplification** (1,100+ lines):
 
 ```markdown
-# apps-ayokoding-web-by-example-maker
+# apps-ayokoding-www-by-example-maker
 
 ## Weight System
 
@@ -2364,15 +2364,15 @@ See `repo-assessing-criticality-confidence` Skill for level definitions.
 ```markdown
 ---
 skills:
-  - apps-ayokoding-web-developing-content
+  - apps-ayokoding-www-developing-content
   - docs-creating-by-example-tutorials
 ---
 
-# apps-ayokoding-web-by-example-maker
+# apps-ayokoding-www-by-example-maker
 
 ## Content Patterns
 
-See `apps-ayokoding-web-developing-content` Skill for weight system, bilingual strategy.
+See `apps-ayokoding-www-developing-content` Skill for weight system, bilingual strategy.
 
 ## Example Structure
 
@@ -2488,8 +2488,8 @@ When simplifying an agent:
 - `repo-generating-validation-reports` - Report generation, UUID chains, timestamps
 - `repo-assessing-criticality-confidence` - Criticality levels, confidence assessment
 - `repo-applying-maker-checker-fixer` - Three-stage workflow, mode handling
-- `apps-ayokoding-web-developing-content` - Next.js 16 content patterns for ayokoding-www, bilingual content strategy
-- `apps-ose-web-developing-content` - Next.js 16 content patterns for ose-www
+- `apps-ayokoding-www-developing-content` - Next.js 16 content patterns for ayokoding-www, bilingual content strategy
+- `apps-ose-www-developing-content` - Next.js 16 content patterns for ose-www
 - `docs-creating-by-example-tutorials` - Annotation standards, five-part structure
 - `docs-creating-accessible-diagrams` - Color palettes, accessibility
 - `docs-applying-content-quality` - Markdown quality standards

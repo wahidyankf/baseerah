@@ -306,11 +306,11 @@ Finding: [BROKEN] - Internal Link to Non-Existent File
 
 **Domain Skills**:
 
-- apps-ayokoding-web-developing-content - ayokoding-web content linking patterns (Next.js)
+- apps-ayokoding-www-developing-content - ayokoding-web content linking patterns (Next.js)
 
 ## Related Agents
 
 **Link Validation Agents**:
 
 - docs-link-checker - Validates links in docs/, repo-governance/, plans/
-- apps-ayokoding-web-link-checker - Validates links in ayokoding-web content
+- apps-ayokoding-www-link-checker - Validates links in ayokoding-web content

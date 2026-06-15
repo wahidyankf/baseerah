@@ -127,7 +127,7 @@ In-the-field prioritizes:
 - Comprehensive language coverage (by-example achieves 95%)
 - Sequential skill building (by-example/by-concept handle this)
 
-**Coverage verification**: The apps-ayokoding-web-general-checker agent validates production scenario completeness.
+**Coverage verification**: The apps-ayokoding-www-general-checker agent validates production scenario completeness.
 
 ### 3. Topic Count: 20-40 Production Guides
 
@@ -2211,7 +2211,7 @@ Before publishing in-the-field content, verify:
 
 ### Automated Validation
 
-The **apps-ayokoding-web-general-checker** agent validates:
+The **apps-ayokoding-www-general-checker** agent validates:
 
 - **Production topic coverage**: 20-40 guides
 - **Standard library first**: Built-in examples precede frameworks
@@ -2227,10 +2227,10 @@ The **apps-ayokoding-web-general-checker** agent validates:
 
 The **in-the-field-quality-gate** workflow orchestrates:
 
-1. **apps-ayokoding-web-general-maker**: Creates/updates production guides
-2. **apps-ayokoding-web-general-checker**: Validates against standards
+1. **apps-ayokoding-www-general-maker**: Creates/updates production guides
+2. **apps-ayokoding-www-general-checker**: Validates against standards
 3. **User review**: Reviews audit report
-4. **apps-ayokoding-web-general-fixer**: Applies validated fixes
+4. **apps-ayokoding-www-general-fixer**: Applies validated fixes
 
 ## Relationship to Other Tutorial Types
 
@@ -2404,7 +2404,7 @@ This convention implements and respects:
 - **General tutorial standards** - Covered in [Tutorials Convention](./general.md)
 - **Tutorial naming** - Covered in [Tutorial Naming Convention](./naming.md)
 - **Code quality** - Source code standards in development conventions
-- **Tutorial validation** - Covered by apps-ayokoding-web-general-checker agent
+- **Tutorial validation** - Covered by apps-ayokoding-www-general-checker agent
 
 ## Related Documentation
 
@@ -2418,9 +2418,9 @@ This convention implements and respects:
 
 ## Related Agents
 
-- [apps-ayokoding-web-in-the-field-maker](../../../.claude/agents/apps-ayokoding-web-in-the-field-maker.md) - Creates in-the-field content
-- [apps-ayokoding-web-in-the-field-checker](../../../.claude/agents/apps-ayokoding-web-in-the-field-checker.md) - Validates in-the-field standards
-- [apps-ayokoding-web-in-the-field-fixer](../../../.claude/agents/apps-ayokoding-web-in-the-field-fixer.md) - Applies validated fixes
+- [apps-ayokoding-www-in-the-field-maker](../../../.claude/agents/apps-ayokoding-www-in-the-field-maker.md) - Creates in-the-field content
+- [apps-ayokoding-www-in-the-field-checker](../../../.claude/agents/apps-ayokoding-www-in-the-field-checker.md) - Validates in-the-field standards
+- [apps-ayokoding-www-in-the-field-fixer](../../../.claude/agents/apps-ayokoding-www-in-the-field-fixer.md) - Applies validated fixes
 
 ## Related Workflows
 

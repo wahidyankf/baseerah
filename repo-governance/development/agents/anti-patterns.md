@@ -317,7 +317,7 @@ tool.md
 
 ```
 docs-tutorial-checker.md
-apps-ayokoding-web-deployer.md
+apps-ayokoding-www-deployer.md
 plan-execution-checker.md
 readme-maker.md
 ```

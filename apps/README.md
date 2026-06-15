@@ -244,14 +244,14 @@ Vercel-deployed apps use dedicated production branches (deployment-only — neve
 
 | Branch                  | Production URL                                        | App                  |
 | ----------------------- | ----------------------------------------------------- | -------------------- |
-| `prod-ayokoding-web`    | [ayokoding.com](https://ayokoding.com)                | ayokoding-www        |
-| `prod-ose-web`          | [oseplatform.com](https://oseplatform.com)            | ose-www              |
-| `prod-organiclever-web` | [www.organiclever.com](https://www.organiclever.com/) | organiclever-app-web |
+| `prod-ayokoding-www`    | [ayokoding.com](https://ayokoding.com)                | ayokoding-www        |
+| `prod-ose-www`          | [oseplatform.com](https://oseplatform.com)            | ose-www              |
+| `prod-organiclever-www` | [www.organiclever.com](https://www.organiclever.com/) | organiclever-app-web |
 
 **ayokoding-www**: Deploy by force-pushing `main` to the production branch:
 
 ```bash
-git push origin main:prod-ayokoding-web --force
+git push origin main:prod-ayokoding-www --force
 ```
 
 **ose-www**: Deployed automatically by scheduled GitHub Actions
@@ -262,10 +262,10 @@ Trigger on-demand from the GitHub Actions UI (set `force_deploy=true` to skip ch
 **organiclever-app-web**: Deploy by force-pushing `main` to the production branch:
 
 ```bash
-git push origin main:prod-organiclever-web --force
+git push origin main:prod-organiclever-www --force
 ```
 
-Use the corresponding deployer agent (e.g. `apps-organiclever-web-deployer`) for guided deployment.
+Use the corresponding deployer agent (e.g. `apps-organiclever-app-web-deployer`) for guided deployment.
 
 ## Language Support
 

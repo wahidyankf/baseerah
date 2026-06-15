@@ -751,7 +751,7 @@ Before starting, ensure you have:
    Spawn ayokoding-web-deployer agent:
    "Deploy ayokoding-www to production (ayokoding.com)
 
-   This will sync prod-ayokoding-web branch with main and trigger Vercel deployment."
+   This will sync prod-ayokoding-www branch with main and trigger Vercel deployment."
    ```
 
 3. **Verify deployment**:

@@ -47,8 +47,8 @@ This convention ensures:
 
 **Enforced by:**
 
-- `apps-ayokoding-web-general-checker` (validates by-concept structure)
-- `apps-ayokoding-web-by-example-checker` (validates by-example structure)
+- `apps-ayokoding-www-general-checker` (validates by-concept structure)
+- `apps-ayokoding-www-by-example-checker` (validates by-example structure)
 - `docs-tutorial-checker` (validates docs/ tutorial quality)
 
 **Implementation Notes**: The Full Set Tutorial Package structure is universal. Platform-specific details (weight values, frontmatter, navigation) are covered in site-specific skills.
@@ -548,7 +548,7 @@ weight: 100002
 
 ### Automated Validation
 
-**apps-ayokoding-web-general-checker** validates:
+**apps-ayokoding-www-general-checker** validates:
 
 - PASS: By-concept directory structure exists
 - PASS: All mandatory files present (\_index.md, overview.md, beginner/intermediate/advanced.md)
@@ -557,7 +557,7 @@ weight: 100002
 - PASS: Frontmatter completeness
 - PASS: No H1 headings in content
 
-**apps-ayokoding-web-by-example-checker** validates:
+**apps-ayokoding-www-by-example-checker** validates:
 
 - PASS: By-example directory structure (when exists)
 - PASS: 75-90 examples across three files
@@ -763,7 +763,7 @@ Follow [By Example Tutorial Convention](./swe-by-example.md) to create 75-90 ann
 
 **Step 6: Validate**
 
-Run `apps-ayokoding-web-by-example-checker` to verify structure and content quality.
+Run `apps-ayokoding-www-by-example-checker` to verify structure and content quality.
 
 ## Related Conventions
 

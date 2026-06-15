@@ -480,7 +480,7 @@ automatically on every `test:quick` run via `ayokoding-cli links check`.
 
 - Internal links are validated for correctness
 - External links (`http://`, `https://`, `mailto:`) are NOT validated by this tool — use the
-  `apps-ayokoding-web-link-checker` AI agent for those
+  `apps-ayokoding-www-link-checker` AI agent for those
 - Same-page anchors (`#section`) are not validated
 
 **Examples:**

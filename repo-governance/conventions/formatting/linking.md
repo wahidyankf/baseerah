@@ -39,7 +39,7 @@ This convention establishes the standard linking format for all markdown files i
 
 ### What This Convention Does NOT Cover
 
-- **Link validation** - Covered by docs-link-checker and apps-ayokoding-web-link-checker agents
+- **Link validation** - Covered by docs-link-checker and apps-ayokoding-www-link-checker agents
 - **Link text quality** - Descriptive link text is covered in [Content Quality Principles](../writing/quality.md)
 - **Anchor links** - Deep linking to specific sections (implementation detail)
 

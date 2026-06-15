@@ -77,9 +77,9 @@ Each role is implemented as a separate agent with specific responsibilities and 
 This pattern is used across multiple agent families. See [AI Agents Index](../../../.claude/agents/README.md) for the complete list of agent families using this pattern. Key families include:
 
 1. **repo-rules-\*** - Repository-wide consistency
-2. **apps-ayokoding-web-\*** - Next.js 16 content for ayokoding-www
+2. **apps-ayokoding-www-\*** - Next.js 16 content for ayokoding-www
 3. **docs-tutorial-\*** - Tutorial quality validation
-4. **apps-ose-web-content-\*** - Next.js 16 content for ose-www
+4. **apps-ose-www-content-\*** - Next.js 16 content for ose-www
 5. **readme-\*** - README quality standards
 6. **docs-\*** - Documentation factual accuracy
 7. **plan-\*** - Plan completeness and structure
@@ -108,10 +108,10 @@ This pattern is used across multiple agent families. See [AI Agents Index](../..
 | Agent                               | Creates/Updates                                    | Also Manages                                      | Tools Used            |
 | ----------------------------------- | -------------------------------------------------- | ------------------------------------------------- | --------------------- |
 | repo-rules-maker                    | Convention docs, AGENTS.md sections, agent prompts | Cross-references, indices, related documentation  | Bash (not Edit/Write) |
-| apps-ayokoding-web-general-maker    | General Next.js learning content, blog posts       | Navigation files, overview pages, indices         | Write, Edit           |
-| apps-ayokoding-web-by-example-maker | By-example tutorials with annotated code           | 75-90 examples, diagrams, educational annotations | Write, Edit           |
+| apps-ayokoding-www-general-maker    | General Next.js learning content, blog posts       | Navigation files, overview pages, indices         | Write, Edit           |
+| apps-ayokoding-www-by-example-maker | By-example tutorials with annotated code           | 75-90 examples, diagrams, educational annotations | Write, Edit           |
 | docs-tutorial-maker                 | Tutorial content with narrative flow               | Learning objectives, diagrams, code examples      | Write, Edit           |
-| apps-ose-web-content-maker          | Platform update posts, about pages                 | Navigation, asset references                      | Write, Edit           |
+| apps-ose-www-content-maker          | Platform update posts, about pages                 | Navigation, asset references                      | Write, Edit           |
 | readme-maker                        | README sections with engaging content              | Links to detailed docs, cross-references          | Write, Edit           |
 
 **Note**: `repo-rules-maker` is a special case that uses bash commands (cat, sed, awk) instead of Edit/Write tools for file operations.
@@ -131,7 +131,7 @@ This pattern is used across multiple agent families. See [AI Agents Index](../..
 ```markdown
 User: "Add a new tutorial to ayokoding-www about TypeScript generics"
 
-Maker Agent (apps-ayokoding-web-general-maker):
+Maker Agent (apps-ayokoding-www-general-maker):
 
 1. Creates content/en/learn/swe/programming-languages/typescript/generics.md
 2. Creates content/id/belajar/swe/programming-languages/typescript/generics.md (bilingual)
@@ -167,10 +167,10 @@ Maker Agent (apps-ayokoding-web-general-maker):
 | Agent                                 | Validates                                                                                                                                        | Generates Report                                                |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
 | repo-rules-checker                    | AGENTS.md, agents, conventions, documentation (preflight JSON consumed; report has `## Deterministic Findings` + `## AI-Only Findings` sections) | `repo-rules__{uuid-chain}__{timestamp}__audit.md`               |
-| apps-ayokoding-web-general-checker    | General Next.js content (frontmatter, links)                                                                                                     | `ayokoding-web__{uuid-chain}__{timestamp}__audit.md`            |
-| apps-ayokoding-web-by-example-checker | By-example tutorials (coverage, annotations)                                                                                                     | `ayokoding-web-by-example__{uuid-chain}__{timestamp}__audit.md` |
+| apps-ayokoding-www-general-checker    | General Next.js content (frontmatter, links)                                                                                                     | `ayokoding-web__{uuid-chain}__{timestamp}__audit.md`            |
+| apps-ayokoding-www-by-example-checker | By-example tutorials (coverage, annotations)                                                                                                     | `ayokoding-web-by-example__{uuid-chain}__{timestamp}__audit.md` |
 | docs-tutorial-checker                 | Tutorial pedagogy, narrative flow, visual aids                                                                                                   | `docs-tutorial__{uuid-chain}__{timestamp}__audit.md`            |
-| apps-ose-web-content-checker          | Platform content (structure, formatting, links)                                                                                                  | `ose-web__{uuid-chain}__{timestamp}__audit.md`                  |
+| apps-ose-www-content-checker          | Platform content (structure, formatting, links)                                                                                                  | `ose-web__{uuid-chain}__{timestamp}__audit.md`                  |
 | readme-checker                        | README engagement, accessibility, jargon                                                                                                         | `readme__{uuid-chain}__{timestamp}__audit.md`                   |
 
 **Note on Report File Naming**: The `__` (double underscore) in report filenames (e.g., `readme__{timestamp}__audit.md`) is the **report file naming separator** defined in the [Temporary Files Convention](../infra/temporary-files.md), separating agent-family prefix, UUID chain, and timestamp. This is NOT an old agent name - it is the standard 4-part pattern: `{agent-family}__{uuid-chain}__{timestamp}__{type}.md`.
@@ -203,7 +203,7 @@ Checkers categorize findings by **importance/urgency**:
 ```markdown
 User: "Check the new TypeScript tutorial for quality issues"
 
-Checker Agent (apps-ayokoding-web-general-checker):
+Checker Agent (apps-ayokoding-www-general-checker):
 
 1. Reads content/en/learn/swe/programming-languages/typescript/generics.md
 2. Validates frontmatter (date format, required fields, weight ordering)
@@ -240,8 +240,8 @@ Checker Agent (apps-ayokoding-web-general-checker):
 | Agent                               | Fixes                                               | Generates Report                                              | Tools Used            |
 | ----------------------------------- | --------------------------------------------------- | ------------------------------------------------------------- | --------------------- |
 | repo-rules-fixer                    | Convention violations from repo-rules-checker       | `repo-rules__{uuid-chain}__{timestamp}__fix.md`               | Bash (not Edit/Write) |
-| apps-ayokoding-web-general-fixer    | General Next.js content issues from general-checker | `ayokoding-web__{uuid-chain}__{timestamp}__fix.md`            | Edit, Write, Bash     |
-| apps-ayokoding-web-by-example-fixer | By-example tutorial issues from by-example-checker  | `ayokoding-web-by-example__{uuid-chain}__{timestamp}__fix.md` | Edit, Write, Bash     |
+| apps-ayokoding-www-general-fixer    | General Next.js content issues from general-checker | `ayokoding-web__{uuid-chain}__{timestamp}__fix.md`            | Edit, Write, Bash     |
+| apps-ayokoding-www-by-example-fixer | By-example tutorial issues from by-example-checker  | `ayokoding-web-by-example__{uuid-chain}__{timestamp}__fix.md` | Edit, Write, Bash     |
 | readme-fixer                        | README quality issues from readme-checker           | `readme__{uuid-chain}__{timestamp}__fix.md`                   | Edit, Write, Bash     |
 
 **Note**: `repo-rules-fixer` is a special case that uses bash commands (sed, awk, cat) instead of Edit/Write tools for file modifications. It still needs bash for report generation and timestamps.
@@ -275,7 +275,7 @@ Fixers combine **criticality** (importance) with **confidence** (certainty) to d
 ```markdown
 User: "Apply fixes from the latest ayokoding-web audit report"
 
-Fixer Agent (apps-ayokoding-web-general-fixer):
+Fixer Agent (apps-ayokoding-www-general-fixer):
 
 1. Auto-detects latest: generated-reports/ayokoding-web**2025-12-14--20-45**audit.md
 2. Parses findings (25 issues found)
@@ -315,15 +315,15 @@ Fixer Agent (apps-ayokoding-web-general-fixer):
 ```bash
 # Step 1: Create content
 User: "Create TypeScript generics tutorial for ayokoding-www"
-Agent: apps-ayokoding-web-general-maker (creates tutorial + navigation updates)
+Agent: apps-ayokoding-www-general-maker (creates tutorial + navigation updates)
 
 # Step 2: Validate
 User: "Check the new tutorial"
-Agent: apps-ayokoding-web-general-checker (generates audit report)
+Agent: apps-ayokoding-www-general-checker (generates audit report)
 
 # Step 3: Fix
 User: "Apply the fixes"
-Agent: apps-ayokoding-web-general-fixer (applies validated fixes from audit)
+Agent: apps-ayokoding-www-general-fixer (applies validated fixes from audit)
 ```
 
 ### Iterative Workflow: Maker → Checker → Fixer → Checker
@@ -370,8 +370,8 @@ The maker-checker-fixer pattern aligns with the agent color categorization syste
 
 | Color         | Role     | Stage   | Tool Pattern                                 | Examples                                                                                  |
 | ------------- | -------- | ------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| 🟦 **Blue**   | Writers  | Maker   | Has `Write` (creates new files)              | apps-ayokoding-web-general-maker, apps-ayokoding-web-by-example-maker, readme-maker       |
-| 🟩 **Green**  | Checkers | Checker | Has `Write`, `Bash` (no `Edit`)              | apps-ayokoding-web-general-checker, apps-ayokoding-web-by-example-checker, readme-checker |
+| 🟦 **Blue**   | Writers  | Maker   | Has `Write` (creates new files)              | apps-ayokoding-www-general-maker, apps-ayokoding-www-by-example-maker, readme-maker       |
+| 🟩 **Green**  | Checkers | Checker | Has `Write`, `Bash` (no `Edit`)              | apps-ayokoding-www-general-checker, apps-ayokoding-www-by-example-checker, readme-checker |
 | 🟨 **Yellow** | Fixers   | Fixer   | Has `Edit` + `Write` (for report generation) | repo-rules-fixer                                                                          |
 
 **Note**: Purple (🟪 Implementors) agents execute plans and use all tools, falling outside the maker-checker-fixer pattern.
@@ -400,48 +400,48 @@ See [AI Agents Convention - Agent Color Categorization](../agents/ai-agents.md#a
 3. repo-rules-fixer: Fix non-compliant files found in audit
 ```
 
-### 2. apps-ayokoding-web-\* (Next.js 16 Content for ayokoding-www)
+### 2. apps-ayokoding-www-\* (Next.js 16 Content for ayokoding-www)
 
 **Domain**: Next.js 16 content for ayokoding-www (App Router, TypeScript, tRPC) - learning content, blog posts, by-example tutorials
 
 **Agents (General/By-Example/In-the-Field)**:
 
-- **apps-ayokoding-web-general-maker** (🟦 Maker) - Creates general Next.js learning content following conventions
-- **apps-ayokoding-web-by-example-maker** (🟦 Maker) - Creates by-example tutorials with annotated code
-- **apps-ayokoding-web-general-checker** (🟩 Checker) - Validates general Next.js content (frontmatter, links, quality)
-- **apps-ayokoding-web-by-example-checker** (🟩 Checker) - Validates by-example tutorial quality (coverage, annotations)
-- **apps-ayokoding-web-general-fixer** (🟨 Fixer) - Fixes general Next.js content issues
-- **apps-ayokoding-web-by-example-fixer** (🟨 Fixer) - Fixes by-example tutorial issues
-- **apps-ayokoding-web-in-the-field-maker** (🟦 Maker) - Creates in-the-field tutorials from real-world experiences
-- **apps-ayokoding-web-in-the-field-checker** (🟩 Checker) - Validates in-the-field tutorial quality
-- **apps-ayokoding-web-in-the-field-fixer** (🟨 Fixer) - Applies validated fixes to in-the-field tutorials
+- **apps-ayokoding-www-general-maker** (🟦 Maker) - Creates general Next.js learning content following conventions
+- **apps-ayokoding-www-by-example-maker** (🟦 Maker) - Creates by-example tutorials with annotated code
+- **apps-ayokoding-www-general-checker** (🟩 Checker) - Validates general Next.js content (frontmatter, links, quality)
+- **apps-ayokoding-www-by-example-checker** (🟩 Checker) - Validates by-example tutorial quality (coverage, annotations)
+- **apps-ayokoding-www-general-fixer** (🟨 Fixer) - Fixes general Next.js content issues
+- **apps-ayokoding-www-by-example-fixer** (🟨 Fixer) - Fixes by-example tutorial issues
+- **apps-ayokoding-www-in-the-field-maker** (🟦 Maker) - Creates in-the-field tutorials from real-world experiences
+- **apps-ayokoding-www-in-the-field-checker** (🟩 Checker) - Validates in-the-field tutorial quality
+- **apps-ayokoding-www-in-the-field-fixer** (🟨 Fixer) - Applies validated fixes to in-the-field tutorials
 
 **Agents (Factual Accuracy)**:
 
-- **apps-ayokoding-web-facts-checker** (🟩 Checker) - Validates factual accuracy of ayokoding-www content using WebSearch/WebFetch. Verifies command syntax, versions, code examples, external references with confidence classification
-- **apps-ayokoding-web-facts-fixer** (🟨 Fixer) - Applies validated fixes from facts-checker audit reports
+- **apps-ayokoding-www-facts-checker** (🟩 Checker) - Validates factual accuracy of ayokoding-www content using WebSearch/WebFetch. Verifies command syntax, versions, code examples, external references with confidence classification
+- **apps-ayokoding-www-facts-fixer** (🟨 Fixer) - Applies validated fixes from facts-checker audit reports
 
 **Agents (Link Validation)**:
 
-- **apps-ayokoding-web-link-checker** (🟩 Checker) - Validates links in ayokoding-www content following absolute path convention (/docs/path without .md). Checks internal and external links
-- **apps-ayokoding-web-link-fixer** (🟨 Fixer) - Applies validated fixes from link-checker audit reports
+- **apps-ayokoding-www-link-checker** (🟩 Checker) - Validates links in ayokoding-www content following absolute path convention (/docs/path without .md). Checks internal and external links
+- **apps-ayokoding-www-link-fixer** (🟨 Fixer) - Applies validated fixes from link-checker audit reports
 
 **Use Case**: Creating and validating educational content for ayokoding-www
 
 **Example (General Content)**:
 
 ```
-1. apps-ayokoding-web-general-maker: Create TypeScript tutorial with bilingual content
-2. apps-ayokoding-web-general-checker: Validate frontmatter, links, navigation, weight ordering
-3. apps-ayokoding-web-general-fixer: Apply validated fixes from audit
+1. apps-ayokoding-www-general-maker: Create TypeScript tutorial with bilingual content
+2. apps-ayokoding-www-general-checker: Validate frontmatter, links, navigation, weight ordering
+3. apps-ayokoding-www-general-fixer: Apply validated fixes from audit
 ```
 
 **Example (By-Example Tutorial)**:
 
 ```
-1. apps-ayokoding-web-by-example-maker: Create Golang by-example with 75-90 annotated examples
-2. apps-ayokoding-web-by-example-checker: Validate 95% coverage, annotations, self-containment
-3. apps-ayokoding-web-by-example-fixer: Apply validated fixes from audit
+1. apps-ayokoding-www-by-example-maker: Create Golang by-example with 75-90 annotated examples
+2. apps-ayokoding-www-by-example-checker: Validate 95% coverage, annotations, self-containment
+3. apps-ayokoding-www-by-example-fixer: Apply validated fixes from audit
 ```
 
 ### 3. docs-tutorial-\* (Tutorial Quality)
@@ -466,24 +466,24 @@ See [AI Agents Convention - Agent Color Categorization](../agents/ai-agents.md#a
 
 **Note**: docs-tutorial-fixer applies objective/mechanical fixes (missing sections, format violations) automatically. Subjective narrative quality improvements (flow, engagement, tone) require human judgment and manual review.
 
-### 4. apps-ose-web-content-\* (Next.js 16 Content for ose-www)
+### 4. apps-ose-www-content-\* (Next.js 16 Content for ose-www)
 
 **Domain**: Next.js 16 content for ose-www (App Router, TypeScript, tRPC) - platform updates, about pages
 
 **Agents**:
 
-- **apps-ose-web-content-maker** (🟦 Maker) - Creates platform content (updates, about)
-- **apps-ose-web-content-checker** (🟩 Checker) - Validates content structure, formatting
-- **apps-ose-web-content-fixer** (🟨 Fixer) - Applies validated fixes from apps-ose-web-content-checker audit reports
+- **apps-ose-www-content-maker** (🟦 Maker) - Creates platform content (updates, about)
+- **apps-ose-www-content-checker** (🟩 Checker) - Validates content structure, formatting
+- **apps-ose-www-content-fixer** (🟨 Fixer) - Applies validated fixes from apps-ose-www-content-checker audit reports
 
 **Use Case**: Creating and validating professional English content for platform landing page
 
 **Example**:
 
 ```
-1. apps-ose-web-content-maker: Create beta release announcement post
-2. apps-ose-web-content-checker: Validate frontmatter, links, cover images
-3. apps-ose-web-content-fixer: Apply validated fixes from audit
+1. apps-ose-www-content-maker: Create beta release announcement post
+2. apps-ose-www-content-checker: Validate frontmatter, links, cover images
+3. apps-ose-www-content-fixer: Apply validated fixes from audit
 ```
 
 ### 5. readme-\* (README Quality)
@@ -813,12 +813,12 @@ If verification fails, log the fix as FAILED (not applied). Do NOT log as "fixed
 - `.claude/agents/repo-rules-maker.md` - Example maker agent
 - `.claude/agents/repo-rules-checker.md` - Example checker agent
 - `.claude/agents/repo-rules-fixer.md` - Example fixer agent
-- `.claude/agents/apps-ayokoding-web-general-maker.md` - General Next.js content maker
-- `.claude/agents/apps-ayokoding-web-by-example-maker.md` - By-example tutorial maker
-- `.claude/agents/apps-ayokoding-web-general-checker.md` - General Next.js content checker
-- `.claude/agents/apps-ayokoding-web-by-example-checker.md` - By-example tutorial checker
-- `.claude/agents/apps-ayokoding-web-general-fixer.md` - General Next.js content fixer
-- `.claude/agents/apps-ayokoding-web-by-example-fixer.md` - By-example tutorial fixer
+- `.claude/agents/apps-ayokoding-www-general-maker.md` - General Next.js content maker
+- `.claude/agents/apps-ayokoding-www-by-example-maker.md` - By-example tutorial maker
+- `.claude/agents/apps-ayokoding-www-general-checker.md` - General Next.js content checker
+- `.claude/agents/apps-ayokoding-www-by-example-checker.md` - By-example tutorial checker
+- `.claude/agents/apps-ayokoding-www-general-fixer.md` - General Next.js content fixer
+- `.claude/agents/apps-ayokoding-www-by-example-fixer.md` - By-example tutorial fixer
 
 ---
 

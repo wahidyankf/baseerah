@@ -184,9 +184,9 @@ prerequisite plan; the GHCR image rollout remains ose-infra `coralpolyp`'s.
   `ignoreCommand` branch string `prod-*-web` → `prod-*-www`. (`organiclever-www` and the two app-web
   apps need a `vercel.json` created if the restructure did not carry one; model on
   `apps/wahidyankf-www/vercel.json`.)
-- `.claude/agents/apps-ose-web-deployer.md` → rename to `apps-ose-www-deployer.md`; update `name`,
-  `description`, and the push target `prod-ose-web` → `prod-ose-www`. Same for `apps-ayokoding-web-deployer`,
-  `apps-organiclever-web-deployer`, `apps-wahidyankf-web-deployer`. Add new `apps-ose-app-web-deployer`
+- `.claude/agents/apps-ose-www-deployer.md` → rename to `apps-ose-www-deployer.md`; update `name`,
+  `description`, and the push target `prod-ose-web` → `prod-ose-www`. Same for `apps-ayokoding-www-deployer`,
+  `apps-organiclever-app-web-deployer`, `apps-wahidyankf-www-deployer`. Add new `apps-ose-app-web-deployer`
   (model on an existing deployer). Run `npm run generate:bindings` to resync `.opencode/agents/`.
 - `.github/workflows/` — **not edited here.** Owned by `standardize-github-actions-pipeline-naming`
   (already landed). This plan only verifies the standardized workflows reference the branches +

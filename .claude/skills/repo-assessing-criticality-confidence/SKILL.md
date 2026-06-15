@@ -218,9 +218,9 @@ Fixer agents MUST process findings in strict priority order:
 
 - `docs-checker` - [Verified]/[Error]/[Outdated]/[Unverified] + criticality
 - `docs-tutorial-checker` - Verification labels + criticality
-- `apps-ayokoding-web-facts-checker` - Verification labels + criticality
+- `apps-ayokoding-www-facts-checker` - Verification labels + criticality
 - `docs-link-checker` - [OK]/[BROKEN]/[REDIRECT] + criticality
-- `apps-ayokoding-web-link-checker` - Status labels + criticality
+- `apps-ayokoding-www-link-checker` - Status labels + criticality
 
 **Format**:
 

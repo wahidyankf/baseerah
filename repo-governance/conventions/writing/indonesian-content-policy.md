@@ -230,7 +230,7 @@ START: Should I create Indonesian content?
 
 ### Content Creation Agents
 
-**apps-ayokoding-web-general-maker**, **apps-ayokoding-web-by-example-maker**, **apps-ayokoding-web-in-the-field-maker**:
+**apps-ayokoding-www-general-maker**, **apps-ayokoding-www-by-example-maker**, **apps-ayokoding-www-in-the-field-maker**:
 
 - **Default behavior**: Create technical tutorials in English under `/en/learn/`
 - **Do NOT automatically mirror** to Indonesian (`/id/belajar/`)
@@ -250,7 +250,7 @@ Agent: Creates /id/celoteh/2024/02/belajar-typescript.md
 
 ### Validation Agents
 
-**apps-ayokoding-web-general-checker**:
+**apps-ayokoding-www-general-checker**:
 
 - Validates that technical tutorials in English do NOT have automatic Indonesian mirrors
 - Flags Indonesian technical tutorials without explicit translation justification
@@ -422,7 +422,7 @@ Before creating Indonesian content, verify:
 
 **Agents**:
 
-- `apps-ayokoding-web-general-maker` - Creates ayokoding-www content following this policy
-- `apps-ayokoding-web-by-example-maker` - Creates by-example tutorials (English-first)
-- `apps-ayokoding-web-in-the-field-maker` - Creates in-the-field production guides (English-first)
-- `apps-ayokoding-web-general-checker` - Validates compliance with this policy
+- `apps-ayokoding-www-general-maker` - Creates ayokoding-www content following this policy
+- `apps-ayokoding-www-by-example-maker` - Creates by-example tutorials (English-first)
+- `apps-ayokoding-www-in-the-field-maker` - Creates in-the-field production guides (English-first)
+- `apps-ayokoding-www-general-checker` - Validates compliance with this policy
