@@ -215,7 +215,7 @@ graph LR
 
 ### OrganicLever App Test-Staging Gate Workflow
 
-**File**: `.github/workflows/organiclever-app-test-stag-deploy-prod.yml`
+**File**: `.github/workflows/organiclever-app-test-stag.yml`
 
 **Trigger**: Scheduled (+2.5h after the local-deploy-stag run) or manual `workflow_dispatch`
 

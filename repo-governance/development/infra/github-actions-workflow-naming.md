@@ -142,7 +142,7 @@ flowchart TD
     W -->|Vercel builds| VS[Vercel staging URL]
     B -->|triggers| BD[be-build-deploy-stag workflow]
     BD -->|GHCR image| CP[ose-infra coralpolyp<br/>cluster rollout]
-    A2[app-test-stag-deploy-prod<br/>e2e vs staging] -->|on pass: STOP| X[prod CD = separate plan]
+    A2[app-test-stag<br/>e2e vs staging] -->|on pass: STOP| X[prod CD = separate plan]
 
     style A fill:#DE8F05,stroke:#000,color:#000
     style A2 fill:#DE8F05,stroke:#000,color:#000
@@ -159,8 +159,12 @@ flowchart TD
   `{product}-be-build-deploy-stag.yml` (triggered on push to that branch) builds and pushes the
   GHCR image. The actual k3s rollout runs in ose-infra via `coralpolyp` — out of this repo.
 - **Prod CD**: Production deployment for app-tier workflows is deferred to a separate follow-on
-  plan. The `deploy-prod` qualifier appears in www-tier callers (direct to prod) but not yet in
-  app-tier workflows.
+  plan. Because no prod deploy happens yet, the app-tier staging gate ends at the `test-stag` verb —
+  it is named `{group}-app-test-stag.yml` (it runs e2e against the deployed staging URL and stops on
+  pass), with **no** `deploy-prod` segment. The `deploy-prod` qualifier is used today only by
+  www-tier callers (`*-www-test-local-deploy-prod`, direct to prod) and is reserved for the app tier
+  for when its prod CD lands (at which point the terminal step would extend to
+  `*-app-test-stag-deploy-prod`).
 
 ## Target File Set
 
@@ -190,9 +194,9 @@ canonical set, organized by tier:
 | Filename                                      | Domain             | Force-pushes                                         |
 | --------------------------------------------- | ------------------ | ---------------------------------------------------- |
 | `organiclever-app-test-local-deploy-stag.yml` | `organiclever-app` | `stag-organiclever-app-web` + `stag-organiclever-be` |
-| `organiclever-app-test-stag-deploy-prod.yml`  | `organiclever-app` | (stops on pass — prod CD deferred)                   |
+| `organiclever-app-test-stag.yml`              | `organiclever-app` | (stops on pass — prod CD deferred)                   |
 | `ose-app-test-local-deploy-stag.yml`          | `ose-app`          | `stag-ose-app-web` + `stag-ose-be`                   |
-| `ose-app-test-stag-deploy-prod.yml`           | `ose-app`          | (stops on pass — prod CD deferred)                   |
+| `ose-app-test-stag.yml`                       | `ose-app`          | (stops on pass — prod CD deferred)                   |
 
 ### Backend build-deploy (triggered on push to `stag-*-be`)
 

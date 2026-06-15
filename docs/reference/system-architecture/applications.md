@@ -106,7 +106,7 @@ The platform consists of the following applications across its technology stacks
 - **Deployment**: Vercel — staging via `stag-organiclever-app-web` branch (CI-automated by
   `organiclever-app-test-local-deploy-stag.yml`, which deploys by force-pushing the stag
   branch). Production continuous delivery is **deferred** to a separate plan — no
-  production-CD workflow exists yet; the gated `organiclever-app-test-stag-deploy-prod.yml`
+  production-CD workflow exists yet; the gated `organiclever-app-test-stag.yml`
   runs the FE E2E gate against staging and stops on pass without promoting.
 - **Build Command**: `nx build organiclever-www`
 - **Dev Command**: `nx dev organiclever-www`

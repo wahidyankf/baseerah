@@ -303,7 +303,7 @@ Broad exclusion prevents accidentally including large directories (e.g., `node_m
 | Reusable workflow            | `.github/workflows/_reusable-{purpose}.yml`                 | `_reusable-www-test-local-deploy.yml`, `_reusable-app-test-local-deploy-stag.yml`, `_reusable-app-test-stag.yml`, `_reusable-be-build-deploy.yml`                            |
 | www deploy workflow          | `.github/workflows/{domain}-www-test-local-deploy-prod.yml` | `ose-www-test-local-deploy-prod.yml`, `ayokoding-www-test-local-deploy-prod.yml`, `organiclever-www-test-local-deploy-prod.yml`, `wahidyankf-www-test-local-deploy-prod.yml` |
 | App staging workflow         | `.github/workflows/{domain}-app-test-local-deploy-stag.yml` | `organiclever-app-test-local-deploy-stag.yml`, `ose-app-test-local-deploy-stag.yml`                                                                                          |
-| App staging-gate workflow    | `.github/workflows/{domain}-app-test-stag-deploy-prod.yml`  | `organiclever-app-test-stag-deploy-prod.yml`, `ose-app-test-stag-deploy-prod.yml`                                                                                            |
+| App staging-gate workflow    | `.github/workflows/{domain}-app-test-stag.yml`              | `organiclever-app-test-stag.yml`, `ose-app-test-stag.yml`                                                                                                                    |
 | Backend build+deploy         | `.github/workflows/{domain}-be-build-deploy-stag.yml`       | `organiclever-be-build-deploy-stag.yml`, `ose-be-build-deploy-stag.yml`                                                                                                      |
 | Cross-cutting quality gate   | `.github/workflows/commons-quality-gate.yml`                | `commons-quality-gate.yml` (replaces `pr-quality-gate.yml`)                                                                                                                  |
 | Cross-cutting env validation | `.github/workflows/commons-env-validate.yml`                | `commons-env-validate.yml` (replaces `validate-env.yml`)                                                                                                                     |
@@ -358,7 +358,7 @@ variant-specific inputs.
 
 Scheduled service workflows run twice daily aligned to WIB (UTC+7). The app tier uses a
 **staggered** schedule — `*-app-test-local-deploy-stag` fires first to produce the staging deploy,
-then `*-app-test-stag-deploy-prod` fires **2.5 hours later** once Vercel and coralpolyp have
+then `*-app-test-stag` fires **2.5 hours later** once Vercel and coralpolyp have
 settled. The www tier is independent and runs after both app-tier passes.
 
 `*-be-build-deploy-stag` is **not** scheduled — it fires on push to the `stag-*-be` branch, which
@@ -367,7 +367,7 @@ the `*-app-test-local-deploy-stag` deploy job force-pushes on success.
 | Pipeline                       | WIB           | UTC           | Rationale                                                           |
 | ------------------------------ | ------------- | ------------- | ------------------------------------------------------------------- |
 | `*-app-test-local-deploy-stag` | 03:00 / 15:00 | 20:00 / 08:00 | Earliest — produces the staging deploy the later stag-gate verifies |
-| `*-app-test-stag-deploy-prod`  | 05:30 / 17:30 | 22:30 / 10:30 | **+2.5 h** after staging, so Vercel + coralpolyp have rolled out    |
+| `*-app-test-stag`              | 05:30 / 17:30 | 22:30 / 10:30 | **+2.5 h** after staging, so Vercel + coralpolyp have rolled out    |
 | `*-www-test-local-deploy-prod` | 06:00 / 18:00 | 23:00 / 11:00 | Independent of the app tier (direct www test → prod deploy)         |
 
 ### 5-Track Parallel CRON
@@ -402,7 +402,7 @@ grammar, allowed tokens, and the rule that the workflow `name:` field must mirro
 | Reusable workflow         | `_reusable-{purpose}.yml`                                                                 | `_reusable-app-test-local-deploy-stag.yml`                  |
 | www deploy workflow       | `{domain}-www-test-local-deploy-prod.yml`                                                 | `organiclever-www-test-local-deploy-prod.yml`               |
 | App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `organiclever-app-test-local-deploy-stag.yml`               |
-| App staging-gate workflow | `{domain}-app-test-stag-deploy-prod.yml`                                                  | `organiclever-app-test-stag-deploy-prod.yml`                |
+| App staging-gate workflow | `{domain}-app-test-stag.yml`                                                              | `organiclever-app-test-stag.yml`                            |
 | BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `organiclever-be-build-deploy-stag.yml`                     |
 | Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `commons-quality-gate.yml`, `markdown-validate.yml`         |
 | Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                     |
@@ -481,7 +481,7 @@ must be recorded here with a justification; undocumented deviations are always b
 | CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                                       | `commons-quality-gate.yml` job keys                                 |
 | Specs-gate job runs `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation` and `specs:gherkin-cardinality-validation` | `commons-quality-gate.yml` specs-gate job                           |
 | Full quality gate runs on every push to `main` (direct `push` trigger on `commons-quality-gate.yml`)                                                                     | `commons-quality-gate.yml` `on.push` trigger                        |
-| App-tier scheduled workflows use staggered 2× WIB cadence: `*-app-test-local-deploy-stag` at 03:00/15:00, `*-app-test-stag-deploy-prod` at 05:30/17:30 (+2.5 h)          | `*-app-test-local-deploy-stag.yml` and `*-app-test-stag-*.yml` CRON |
+| App-tier scheduled workflows use staggered 2× WIB cadence: `*-app-test-local-deploy-stag` at 03:00/15:00, `*-app-test-stag` at 05:30/17:30 (+2.5 h)                      | `*-app-test-local-deploy-stag.yml` and `*-app-test-stag-*.yml` CRON |
 | www-tier scheduled workflows run at 06:00/18:00 WIB (23:00/11:00 UTC)                                                                                                    | `*-www-test-local-deploy-prod.yml` CRON expressions                 |
 
 Note: `rhino-cli:naming:workflows-validation` validates `repo-governance/workflows/*.md` naming

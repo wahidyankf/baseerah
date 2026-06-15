@@ -36,9 +36,9 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 | Workflow                                      | Stage                                                            |
 | --------------------------------------------- | ---------------------------------------------------------------- |
 | `organiclever-app-test-local-deploy-stag.yml` | Test the organiclever app group, force-push web + be stag branch |
-| `organiclever-app-test-stag-deploy-prod.yml`  | FE E2E gate vs staging (+2.5h); stops on pass                    |
+| `organiclever-app-test-stag.yml`              | FE E2E gate vs staging (+2.5h); stops on pass                    |
 | `ose-app-test-local-deploy-stag.yml`          | Test the ose-app group, force-push web + be stag branch          |
-| `ose-app-test-stag-deploy-prod.yml`           | FE E2E gate vs staging (+2.5h); stops on pass                    |
+| `ose-app-test-stag.yml`                       | FE E2E gate vs staging (+2.5h); stops on pass                    |
 
 ## Backend images and CLIs
 
@@ -47,9 +47,3 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 | `publish-images.yml`                    | Build and push `organiclever-be` / `ose-be` images to GHCR (deployed by the ose-infra k3s plans, not Vercel) — transitional |
 | `organiclever-be-build-deploy-stag.yml` | Build the `organiclever-be` image and push it to GHCR; triggered on `stag-organiclever-be` push                             |
 | `ose-be-build-deploy-stag.yml`          | Build the `ose-be` image and push it to GHCR; triggered on `stag-ose-be` push                                               |
-
-> **In-flight cutover:** the
-> [wire-vercel-www-app-cutover plan](../../plans/in-progress/wire-vercel-www-app-cutover/README.md)
-> creates the `prod-*-www`, `stag-*-app-web`, and `stag-*-be` branches and populates the Vercel +
-> GitHub Environment values these workflows reference. Until then a scheduled run's `git push` to a
-> not-yet-created branch fails loudly (expected, non-destructive).

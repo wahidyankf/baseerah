@@ -105,7 +105,7 @@ graph LR
   - `wahidyankf-www-test-local-deploy-prod.yml` (scheduled) → `prod-wahidyankf-www`
   - `organiclever-app-test-local-deploy-stag.yml` (3 AM / 3 PM WIB) → `stag-organiclever-app-web`
     and `stag-organiclever-be` (deploys to **staging**, not production)
-  - `organiclever-app-test-stag-deploy-prod.yml` (+2.5h after the stag deploy) — gated FE E2E
+  - `organiclever-app-test-stag.yml` (+2.5h after the stag deploy) — gated FE E2E
     against the staging URL; **stops on pass without promoting**. Production continuous delivery
     is deferred to a separate plan, so no production-CD workflow exists yet.
   - All workflows can also be triggered manually from the GitHub Actions UI

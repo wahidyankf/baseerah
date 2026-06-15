@@ -204,7 +204,7 @@ jobs:
         with:
           fetch-depth: 0
       # Force-push the staging web branch: Vercel listens to it and builds the
-      # preview. Allow ~2.5h before the *-app-test-stag-deploy-prod run so the
+      # preview. Allow ~2.5h before the *-app-test-stag run so the
       # Vercel build + coralpolyp rollout have settled.
       - name: Deploy web to staging branch
         run: git push origin HEAD:${{ inputs.stag-web-branch }} --force

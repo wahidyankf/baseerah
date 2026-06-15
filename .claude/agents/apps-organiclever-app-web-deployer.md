@@ -44,7 +44,7 @@ Ship the OrganicLever app group to staging via a gated GitHub Actions workflow:
 automatically builds the Next.js 16 app on push. No local build needed.
 
 **Production promotion is deferred**: There is no production-CD workflow for the
-OrganicLever app group. The gated `organiclever-app-test-stag-deploy-prod.yml`
+OrganicLever app group. The gated `organiclever-app-test-stag.yml`
 workflow currently runs the FE E2E gate against the staging URL and **stops on
 pass — it does not promote to production**. Production continuous delivery is
 deferred to a separate plan. Do not invent or invoke a prod-promotion workflow.
