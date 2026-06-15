@@ -44,6 +44,7 @@
       ]
     },
     "lint": {
+      "dependsOn": ["codegen"],
       "executor": "nx:run-commands",
       "options": {
         "commands": [
@@ -83,6 +84,7 @@
       }
     },
     "test:unit": {
+      "dependsOn": ["codegen"],
       "executor": "nx:run-commands",
       "options": {
         "command": "dotnet test apps/organiclever-be/tests/unit/OrganicleverBe.UnitTests.fsproj"
@@ -95,6 +97,7 @@
       ]
     },
     "test:quick": {
+      "dependsOn": ["codegen"],
       "executor": "nx:run-commands",
       "options": {
         "command": "dotnet test apps/organiclever-be/tests/unit/OrganicleverBe.UnitTests.fsproj"
