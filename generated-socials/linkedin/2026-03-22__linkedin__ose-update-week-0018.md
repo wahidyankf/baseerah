@@ -41,6 +41,8 @@ Current state:
 - 29 Gherkin feature files (14 BE + 15 FE), 170 total scenarios
 - OpenAPI 3.1 contract with codegen for all 14 demo apps
 
+Why this shape of work: the contract, the types, the audited graph, the three-level tests are guardrails, not ceremony. Strong static typing turns a class of mistakes into a compile error instead of a production surprise — a deterministic check that holds whether a human or an AI agent writes the next line. And it only pays off if the codebase stays readable: if an engineer can't follow the patterns, don't expect an AI to write good code in them either. Patterns and architecture first; features on top.
+
 Phase 1 Goal: OrganicLever (productivity tracker)
 Stack leaning: Next.js + XState + Effect TS (frontend), F#/Giraffe (backend) — still evaluating
 Timeline: Quality over deadlines, Insha Allah
