@@ -19,3 +19,7 @@ jobs:
     with:
       fe-e2e-project: ose-app-web-e2e
       environment: ose-app-staging
+    # Environment VARIABLES (WEB_BASE_URL) reach a reusable workflow automatically,
+    # but environment SECRETS (VERCEL_AUTOMATION_BYPASS_SECRET) require secrets: inherit.
+    # Without this the staging E2E hits the Vercel SSO wall (401 "Log in to Vercel").
+    secrets: inherit
