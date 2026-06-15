@@ -9,7 +9,7 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
-} from "@/contexts/app-shell/presentation/ui/command";
+} from "@open-sharia-enterprise/web-ui";
 import { useLocale } from "@/contexts/i18n/presentation/use-locale";
 import { useSearchOpen } from "@/contexts/search/presentation/use-search";
 import { t } from "@/contexts/i18n/application/translations";

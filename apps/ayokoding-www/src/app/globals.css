@@ -7,6 +7,7 @@
 @plugin "@tailwindcss/typography";
 
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
+@import "@open-sharia-enterprise/web-ui-token/src/ayokoding.css";
 
 @theme {
   /* ayokoding-www brand: primary blue */

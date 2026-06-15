@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/contexts/app-shell/presentation/ui/dropdown-menu";
+} from "@open-sharia-enterprise/web-ui";
 import { LOCALE_LABELS, SUPPORTED_LOCALES } from "@/contexts/i18n/application/config";
 
 interface LanguageSwitcherProps {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/contexts/app-shell/presentation/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@open-sharia-enterprise/web-ui";
 import { domToReact, type HTMLReactParserOptions, type DOMNode, Element } from "html-react-parser";
 
 interface ContentTabsProps {

@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/contexts/app-shell/presentation/ui/dropdown-menu";
+} from "@open-sharia-enterprise/web-ui";
 
 export function ThemeToggle() {
   const { setTheme } = useTheme();

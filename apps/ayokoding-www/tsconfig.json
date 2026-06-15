@@ -24,6 +24,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@open-sharia-enterprise/web-ui": ["../../libs/web-ui/src/index.ts"],
+      "@open-sharia-enterprise/web-ui/primitives": ["../../libs/web-ui/src/primitives/index.ts"],
       "@open-sharia-enterprise/web-ui-token": ["../../libs/web-ui-token/src/index.ts"]
     },
     "target": "ES2017"

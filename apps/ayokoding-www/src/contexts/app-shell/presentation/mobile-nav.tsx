@@ -1,6 +1,6 @@
 "use client";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/contexts/app-shell/presentation/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@open-sharia-enterprise/web-ui/primitives";
 import { SidebarTree } from "@/contexts/navigation/presentation/sidebar-tree";
 import { useEffect, useState } from "react";
 import type { TreeNode } from "@/contexts/content/infrastructure/types";
