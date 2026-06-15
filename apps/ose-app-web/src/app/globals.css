@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @source "../../../../libs/web-ui/src/**/*.{ts,tsx}";
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css";
+@import "@open-sharia-enterprise/web-ui-token/src/ose.css";
 
 @theme {
   --font-sans: var(--font-nunito), ui-rounded, system-ui, -apple-system, sans-serif;
