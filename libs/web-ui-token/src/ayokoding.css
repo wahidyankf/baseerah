@@ -1,0 +1,124 @@
+/* NO @import url(google fonts) — fonts are loaded via next/font/google */
+
+/* ── AyoKoding reference palette (raw vars, referenced by @theme and dark block) ── */
+/* Brand: energetic educational orange/amber tones (#E69F00 family) */
+:root {
+  /* 6 semantic hues */
+  --hue-terracotta: oklch(65% 0.16 30);
+  --hue-honey: oklch(76% 0.15 75);
+  --hue-sage: oklch(70% 0.1 150);
+  --hue-teal: oklch(66% 0.1 200);
+  --hue-sky: oklch(68% 0.11 230);
+  --hue-plum: oklch(60% 0.12 305);
+
+  /* ink — for text on wash backgrounds */
+  --hue-terracotta-ink: oklch(40% 0.13 30);
+  --hue-honey-ink: oklch(44% 0.12 75);
+  --hue-sage-ink: oklch(37% 0.09 150);
+  --hue-teal-ink: oklch(37% 0.09 200);
+  --hue-sky-ink: oklch(39% 0.1 230);
+  --hue-plum-ink: oklch(37% 0.1 305);
+
+  /* wash — tinted backgrounds, chips, tags */
+  --hue-terracotta-wash: oklch(95% 0.04 30);
+  --hue-honey-wash: oklch(96% 0.05 75);
+  --hue-sage-wash: oklch(95% 0.03 150);
+  --hue-teal-wash: oklch(95% 0.03 200);
+  --hue-sky-wash: oklch(95% 0.03 230);
+  --hue-plum-wash: oklch(95% 0.03 305);
+
+  /* amber-tinted neutral scale */
+  --warm-0: oklch(99% 0.006 85);
+  --warm-50: oklch(97% 0.009 85);
+  --warm-100: oklch(94% 0.012 85);
+  --warm-200: oklch(88% 0.014 85);
+  --warm-300: oklch(78% 0.016 85);
+  --warm-400: oklch(62% 0.016 85);
+  --warm-500: oklch(48% 0.018 80);
+  --warm-700: oklch(32% 0.018 75);
+  --warm-800: oklch(24% 0.018 70);
+  --warm-900: oklch(18% 0.016 70);
+}
+
+/* ── Tailwind @theme overrides (ayokoding-specific, overrides tokens.css defaults) ── */
+@theme {
+  /* Semantic color tokens */
+  --color-background: var(--warm-0);
+  --color-foreground: var(--warm-900);
+  --color-card: #ffffff;
+  --color-card-foreground: var(--warm-900);
+  --color-popover: #ffffff;
+  --color-popover-foreground: var(--warm-900);
+  --color-primary: var(--hue-honey);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--warm-100);
+  --color-secondary-foreground: var(--warm-900);
+  --color-muted: var(--warm-100);
+  --color-muted-foreground: var(--warm-500);
+  --color-accent: var(--hue-terracotta-wash);
+  --color-accent-foreground: var(--hue-terracotta-ink);
+  --color-destructive: var(--hue-terracotta);
+  --color-destructive-foreground: #ffffff;
+  --color-border: var(--warm-200);
+  --color-input: var(--warm-200);
+  --color-ring: var(--hue-honey);
+
+  /* AyoKoding radius scale — friendly, rounded */
+  --radius: 0.75rem; /* 12 px — base */
+  --radius-sm: 0.5rem; /* 8 px  */
+  --radius-md: 0.75rem; /* 12 px */
+  --radius-lg: 1rem; /* 16 px */
+  --radius-xl: 1.25rem; /* 20 px */
+  --radius-2xl: 1.75rem; /* 28 px */
+  --radius-3xl: 2rem; /* 32 px */
+
+  /* Amber-tinted shadow scale */
+  --shadow-xs: 0 1px 2px 0 oklch(20% 0.02 75 / 0.06);
+  --shadow-sm: 0 1px 3px 0 oklch(20% 0.02 75 / 0.08), 0 1px 2px -1px oklch(20% 0.02 75 / 0.06);
+  --shadow-md: 0 4px 8px -2px oklch(20% 0.02 75 / 0.08), 0 2px 4px -2px oklch(20% 0.02 75 / 0.06);
+  --shadow-lg: 0 12px 24px -6px oklch(20% 0.02 75 / 0.12), 0 4px 8px -4px oklch(20% 0.02 75 / 0.08);
+}
+
+/* ── Dark mode overrides ─────────────────────────────────────────────────── */
+[data-theme="dark"],
+.dark {
+  /* Amber neutral scale — dark inverted */
+  --warm-0: oklch(20% 0.012 70);
+  --warm-50: oklch(23% 0.014 70);
+  --warm-100: oklch(27% 0.016 70);
+  --warm-200: oklch(33% 0.018 70);
+  --warm-300: oklch(42% 0.018 70);
+  --warm-400: oklch(58% 0.016 75);
+  --warm-500: oklch(70% 0.015 80);
+  --warm-700: oklch(82% 0.014 85);
+  --warm-800: oklch(90% 0.012 85);
+  --warm-900: oklch(96% 0.01 85);
+
+  /* Hue wash — darker in dark mode */
+  --hue-terracotta-wash: oklch(36% 0.08 30);
+  --hue-honey-wash: oklch(36% 0.08 75);
+  --hue-sage-wash: oklch(34% 0.06 150);
+  --hue-teal-wash: oklch(34% 0.06 200);
+  --hue-sky-wash: oklch(34% 0.06 230);
+  --hue-plum-wash: oklch(36% 0.07 305);
+
+  /* Hue base — slightly brighter in dark mode */
+  --hue-terracotta: oklch(70% 0.18 30);
+  --hue-honey: oklch(82% 0.17 75);
+  --hue-sage: oklch(74% 0.12 150);
+  --hue-teal: oklch(70% 0.12 200);
+  --hue-sky: oklch(72% 0.13 230);
+  --hue-plum: oklch(66% 0.14 305);
+
+  /* Hue ink — bright on dark wash backgrounds */
+  --hue-terracotta-ink: oklch(88% 0.14 30);
+  --hue-honey-ink: oklch(90% 0.14 75);
+  --hue-sage-ink: oklch(86% 0.11 150);
+  --hue-teal-ink: oklch(86% 0.11 200);
+  --hue-sky-ink: oklch(86% 0.12 230);
+  --hue-plum-ink: oklch(84% 0.12 305);
+
+  /* Semantic tokens that cannot auto-resolve (hardcoded in @theme) */
+  --color-card: var(--warm-50); /* was #ffffff — must override in dark */
+  --color-popover: var(--warm-50); /* was #ffffff — must override in dark */
+}
