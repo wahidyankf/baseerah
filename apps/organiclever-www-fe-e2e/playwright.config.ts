@@ -25,7 +25,7 @@ export default defineConfig({
   webServer: {
     command: "npx nx run organiclever-www:start",
     url: "http://localhost:3200",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120000,
     cwd: workspaceRoot,
   },

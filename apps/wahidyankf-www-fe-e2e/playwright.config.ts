@@ -22,7 +22,7 @@ export default defineConfig({
   webServer: {
     command: "npx nx run wahidyankf-www:start",
     url: "http://localhost:3201",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120000,
     cwd: "../..",
   },

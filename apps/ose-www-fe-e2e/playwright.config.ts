@@ -26,7 +26,7 @@ export default defineConfig({
     command:
       "cp -r apps/ose-www/.next/static apps/ose-www/.next/standalone/apps/ose-www/.next/ && cp -r apps/ose-www/public apps/ose-www/.next/standalone/apps/ose-www/ && node apps/ose-www/.next/standalone/apps/ose-www/server.js",
     url: "http://localhost:3100",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120000,
     cwd: workspaceRoot,
     env: {
