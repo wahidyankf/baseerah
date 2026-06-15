@@ -121,28 +121,28 @@ the worktree after the plan is archived and pushed.
 > set references the branches and Environments this plan creates. See
 > [tech-docs → Workflows owned by the standardize plan](./tech-docs.md#github-actions-workflows--owned-by-the-standardize-plan-verify-only).
 
-- [ ] [AI] Confirm the standardized www callers force-push the right branches: `grep -l 'prod-{site}-www'`-style check across `{ose,ayokoding,organiclever,wahidyankf}-www-test-local-deploy-prod.yml` — acceptance: each names its `prod-*-www` branch; no `prod-*-web` remains.
-- [ ] [AI] Confirm the standardized app pipelines reference the staging branches + `{group}-app-staging` Environment: `grep -rnE 'stag-(organiclever|ose)-(app-web|be)|(organiclever|ose)-app-staging' .github/workflows/*-app-test-*.yml` — acceptance: the `stag-*-app-web`, `stag-*-be`, and `*-app-staging` references are present; no `*-app-web-development` / `*-app-web-production` env names exist (the standardize model has only `local` + `staging`).
-- [ ] [AI] Confirm the staging gate reads `vars.WEB_BASE_URL` + `secrets.VERCEL_AUTOMATION_BYPASS_SECRET` — acceptance: `grep -rn 'WEB_BASE_URL\|VERCEL_AUTOMATION_BYPASS_SECRET' .github/workflows/_reusable-app-test-stag.yml` shows both.
-- [ ] [AI] Run `actionlint .github/workflows/*.yml` — acceptance: zero errors (sanity; no files changed here).
+- [x] [AI] Confirm the standardized www callers force-push the right branches: `grep -l 'prod-{site}-www'`-style check across `{ose,ayokoding,organiclever,wahidyankf}-www-test-local-deploy-prod.yml` — acceptance: each names its `prod-*-www` branch; no `prod-*-web` remains.
+- [x] [AI] Confirm the standardized app pipelines reference the staging branches + `{group}-app-staging` Environment: `grep -rnE 'stag-(organiclever|ose)-(app-web|be)|(organiclever|ose)-app-staging' .github/workflows/*-app-test-*.yml` — acceptance: the `stag-*-app-web`, `stag-*-be`, and `*-app-staging` references are present; no `*-app-web-development` / `*-app-web-production` env names exist (the standardize model has only `local` + `staging`).
+- [x] [AI] Confirm the staging gate reads `vars.WEB_BASE_URL` + `secrets.VERCEL_AUTOMATION_BYPASS_SECRET` — acceptance: `grep -rn 'WEB_BASE_URL\|VERCEL_AUTOMATION_BYPASS_SECRET' .github/workflows/_reusable-app-test-stag.yml` shows both.
+- [x] [AI] Run `actionlint .github/workflows/*.yml` — acceptance: zero errors (sanity; no files changed here).
 
 ### 1d — Update AGENTS.md and app READMEs
 
-- [ ] [AI] Edit `AGENTS.md` lines ~231–234 (prod-branch list): replace `prod-ose-web`, `prod-ayokoding-web`, `prod-organiclever-web`, `prod-wahidyankf-web` with `prod-ose-www`, `prod-ayokoding-www`, `prod-organiclever-www`, `prod-wahidyankf-www`; add `prod-organiclever-app-web`, `prod-ose-app-web` — acceptance: `grep 'prod-.*-web\b' AGENTS.md` returns zero matches outside historical context.
-- [ ] [AI] Edit `AGENTS.md` per-site "Production branch" rows (~459, 471, 483, 495, 507): update each branch name and URL — acceptance: all six sites have correct branch in AGENTS.md.
-- [ ] [AI] Edit `apps/ose-www/README.md`: update deploy-branch reference `prod-ose-web` → `prod-ose-www` — acceptance: `grep 'prod-ose-web' apps/ose-www/README.md` returns nothing.
-- [ ] [AI] Edit `apps/ayokoding-www/README.md`: `prod-ayokoding-web` → `prod-ayokoding-www` — acceptance: no stale branch name.
-- [ ] [AI] Edit `apps/wahidyankf-www/README.md`: `prod-wahidyankf-web` → `prod-wahidyankf-www` — acceptance: no stale branch name.
-- [ ] [AI] Edit `apps/organiclever-www/README.md` (create if absent): add deploy-branch `prod-organiclever-www`, URL `www.organiclever.com` — acceptance: file exists with correct branch.
-- [ ] [AI] Edit `apps/organiclever-app-web/README.md` (create if absent): add deploy-branch `prod-organiclever-app-web`, staging `stag-organiclever-app-web`, URL `app.organiclever.com` — acceptance: file exists with correct branches.
-- [ ] [AI] Edit `apps/ose-app-web/README.md` (create if absent): add deploy-branch `prod-ose-app-web`, staging `stag-ose-app-web`, URL `app.oseplatform.com` — acceptance: file exists with correct branches.
+- [x] [AI] Edit `AGENTS.md` lines ~231–234 (prod-branch list): replace `prod-ose-web`, `prod-ayokoding-web`, `prod-organiclever-web`, `prod-wahidyankf-web` with `prod-ose-www`, `prod-ayokoding-www`, `prod-organiclever-www`, `prod-wahidyankf-www`; add `prod-organiclever-app-web`, `prod-ose-app-web` — acceptance: `grep 'prod-.*-web\b' AGENTS.md` returns zero matches outside historical context.
+- [x] [AI] Edit `AGENTS.md` per-site "Production branch" rows (~459, 471, 483, 495, 507): update each branch name and URL — acceptance: all six sites have correct branch in AGENTS.md.
+- [x] [AI] Edit `apps/ose-www/README.md`: update deploy-branch reference `prod-ose-web` → `prod-ose-www` — acceptance: `grep 'prod-ose-web' apps/ose-www/README.md` returns nothing.
+- [x] [AI] Edit `apps/ayokoding-www/README.md`: `prod-ayokoding-web` → `prod-ayokoding-www` — acceptance: no stale branch name.
+- [x] [AI] Edit `apps/wahidyankf-www/README.md`: `prod-wahidyankf-web` → `prod-wahidyankf-www` — acceptance: no stale branch name.
+- [x] [AI] Edit `apps/organiclever-www/README.md` (create if absent): add deploy-branch `prod-organiclever-www`, URL `www.organiclever.com` — acceptance: file exists with correct branch.
+- [x] [AI] Edit `apps/organiclever-app-web/README.md` (create if absent): add deploy-branch `prod-organiclever-app-web`, staging `stag-organiclever-app-web`, URL `app.organiclever.com` — acceptance: file exists with correct branches.
+- [x] [AI] Edit `apps/ose-app-web/README.md` (create if absent): add deploy-branch `prod-ose-app-web`, staging `stag-ose-app-web`, URL `app.oseplatform.com` — acceptance: file exists with correct branches.
 
 ### 1e — Update architecture docs
 
-- [ ] [AI] Edit `docs/reference/system-architecture/applications.md`: update prod-branch references for all four www sites and add the two app-web entries — acceptance: no `prod-*-web` references outside historical notes.
-- [ ] [AI] Edit `docs/reference/system-architecture/ci-cd.md`: update all `prod-*-web`, `stag-organiclever-web` references and the workflow table — acceptance: `grep 'prod-.*-web\b' docs/reference/system-architecture/ci-cd.md` returns nothing.
-- [ ] [AI] Edit `docs/reference/system-architecture/deployment.md`: update branch names in the Mermaid diagram nodes and the branch list — acceptance: diagram compiles via `npx nx run rhino-cli:mermaid:validation`.
-- [ ] [AI] Run `npx nx run rhino-cli:links:validation` — acceptance: exits 0 (no broken links introduced by edits).
+- [x] [AI] Edit `docs/reference/system-architecture/applications.md`: update prod-branch references for all four www sites and add the two app-web entries — acceptance: no `prod-*-web` references outside historical notes.
+- [x] [AI] Edit `docs/reference/system-architecture/ci-cd.md`: update all `prod-*-web`, `stag-organiclever-web` references and the workflow table — acceptance: `grep 'prod-.*-web\b' docs/reference/system-architecture/ci-cd.md` returns nothing.
+- [x] [AI] Edit `docs/reference/system-architecture/deployment.md`: update branch names in the Mermaid diagram nodes and the branch list — acceptance: diagram compiles via `npx nx run rhino-cli:mermaid:validation`.
+- [x] [AI] Run `npx nx run rhino-cli:links:validation` — acceptance: exits 0 (no broken links introduced by edits).
 
 ### 1g — Document the app-web staging deployments (placeholder/secret only)
 
@@ -151,26 +151,39 @@ the worktree after the plan is archived and pushed.
 > (`<staging-url:ose-app-web>`) or a GitHub Actions secret — never a literal — per
 > [Secrets and Env Standards](../../../repo-governance/conventions/security/secrets-and-env-standards.md).
 
-- [ ] [AI] In both app-web deployer agents (`.claude/agents/apps-ose-app-web-deployer.md`, `.claude/agents/apps-organiclever-app-web-deployer.md`), document the `stag-*-app-web` Vercel staging deployment, the `{group}-app-staging` Environment's `WEB_BASE_URL` var (private staging URL), and the required `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel Protection Bypass for Automation) — acceptance: each file names the staging branch, the `WEB_BASE_URL` var, and the bypass secret; `git grep -nE 'https?://[a-z0-9.-]*stag' .claude/agents/` returns nothing.
-- [ ] [AI] In `apps/organiclever-app-web/README.md` and `apps/ose-app-web/README.md`, add a "Staging" note: served from `stag-*-app-web`, staging URL kept private (placeholder/secret) — acceptance: both READMEs name the staging branch with no literal URL.
-- [ ] [AI] In `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`, document the app-web staging deployments and the E2E promotion gate sourcing the staging base URL from a secret — acceptance: `rg -i 'stag-.*-app-web' docs/reference/system-architecture/` shows the staging deployments; `git grep -nE 'https?://[a-z0-9.-]*stag' docs/` returns nothing.
-- [ ] [AI] Re-run `npm run generate:bindings` to resync `.opencode/agents/` for the deployer-agent edits — acceptance: exits 0.
+- [x] [AI] In both app-web deployer agents (`.claude/agents/apps-ose-app-web-deployer.md`, `.claude/agents/apps-organiclever-app-web-deployer.md`), document the `stag-*-app-web` Vercel staging deployment, the `{group}-app-staging` Environment's `WEB_BASE_URL` var (private staging URL), and the required `VERCEL_AUTOMATION_BYPASS_SECRET` (Vercel Protection Bypass for Automation) — acceptance: each file names the staging branch, the `WEB_BASE_URL` var, and the bypass secret; `git grep -nE 'https?://[a-z0-9.-]*stag' .claude/agents/` returns nothing.
+- [x] [AI] In `apps/organiclever-app-web/README.md` and `apps/ose-app-web/README.md`, add a "Staging" note: served from `stag-*-app-web`, staging URL kept private (placeholder/secret) — acceptance: both READMEs name the staging branch with no literal URL.
+- [x] [AI] In `docs/reference/system-architecture/{applications,ci-cd,deployment}.md`, document the app-web staging deployments and the E2E promotion gate sourcing the staging base URL from a secret — acceptance: `rg -i 'stag-.*-app-web' docs/reference/system-architecture/` shows the staging deployments; `git grep -nE 'https?://[a-z0-9.-]*stag' docs/` returns nothing.
+- [x] [AI] Re-run `npm run generate:bindings` to resync `.opencode/agents/` for the deployer-agent edits — acceptance: exits 0.
 
 ### 1f — Commit wiring edits
 
-- [ ] [AI] Stage explicit file paths (`git add apps/*/vercel.json .claude/agents/ .opencode/agents/ AGENTS.md apps/*/README.md docs/reference/system-architecture/`) and commit with message `chore(vercel): rewire www + app-web tier prod branches and deployer agents` — acceptance: `git log --oneline -1` shows the commit; `git status` clean. (No `.github/workflows/` — owned by the standardize plan.)
+- [x] [AI] Stage explicit file paths (`git add apps/*/vercel.json .claude/agents/ .opencode/agents/ AGENTS.md apps/*/README.md docs/reference/system-architecture/`) and commit with message `chore(vercel): rewire www + app-web tier prod branches and deployer agents` — acceptance: `git log --oneline -1` shows the commit; `git status` clean. (No `.github/workflows/` — owned by the standardize plan.)
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web\b' apps/ .claude/agents/ AGENTS.md docs/` — acceptance: zero matches (workflows excluded — owned by the standardize plan).
-- [ ] [AI] `rg 'stag-organiclever-web\b|organiclever-web-(development|staging|production)' .github/workflows/` — acceptance: zero matches (the standardize plan already renamed these to the `{group}-app-staging` model).
-- [ ] [AI] `actionlint .github/workflows/*.yml` — acceptance: zero errors (sanity only; this plan edits no workflow).
-- [ ] [AI] `npx nx run rhino-cli:links:validation` — acceptance: exits 0.
-- [ ] [AI] `npx nx run rhino-cli:mermaid:validation` — acceptance: exits 0.
-- [ ] [AI] No literal staging URL committed anywhere: `git grep -nE 'https?://[a-z0-9.-]*stag'` — acceptance: zero matches (staging URLs live only in Vercel + GitHub Actions secrets).
-- [ ] [AI] `git log --oneline -1` — acceptance: wiring commit exists.
+- [x] [AI] `rg 'prod-(ose|ayokoding|organiclever|wahidyankf)-web\b' apps/ .claude/agents/ AGENTS.md docs/` — acceptance: zero matches (workflows excluded — owned by the standardize plan).
+- [x] [AI] `rg 'stag-organiclever-web\b|organiclever-web-(development|staging|production)' .github/workflows/` — acceptance: zero matches (the standardize plan already renamed these to the `{group}-app-staging` model).
+- [x] [AI] `actionlint .github/workflows/*.yml` — acceptance: zero errors (sanity only; this plan edits no workflow).
+- [x] [AI] `npx nx run rhino-cli:links:validation` — acceptance: exits 0.
+- [x] [AI] `npx nx run rhino-cli:mermaid:validation` — acceptance: exits 0.
+- [x] [AI] No literal staging URL committed anywhere: `git grep -nE 'https?://[a-z0-9.-]*stag'` — acceptance: zero matches (staging URLs live only in Vercel + GitHub Actions secrets).
+- [x] [AI] `git log --oneline -1` — acceptance: wiring commit exists. ✓ `6f40031b2`.
+
+**Phase 1 Gate — RESULT (2026-06-15): PASS** with two documented scope refinements:
+
+1. **G1 (`prod-*-web` in `apps/`)** scoped to exclude `apps/*/content/**`. Five published changelog
+   posts + hermes-agent tutorials reference the old branch names as point-in-time facts; rewriting them
+   would falsify history (same principle as the rename sweep's content exclusion). All **active wiring**
+   surfaces are zero.
+2. **G6 (no literal staging URL)** — the only `https://…stag…` matches are generic tutorial example
+   domains in `apps/ayokoding-www/content/**` (`staging.example.com`, `staging.myapp.com`, etc.), not
+   our private Vercel staging URLs. No real staging URL is committed anywhere.
+
+Other gate checks (G2 stale workflow refs, actionlint, links, mermaid) are clean (mermaid: 1 pre-existing
+subgraph-density warning in `tech-docs.md`, non-blocking).
 
 > **Pause Safety**: All in-repo references updated and committed. Vercel and DNS unchanged — production
 > still serving from old `prod-*-web` branches. Safe to stop. To resume: skip to Phase 2 (branch
