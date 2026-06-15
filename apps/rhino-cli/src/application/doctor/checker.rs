@@ -81,43 +81,6 @@ pub(super) fn read_npm_version(path: &Path) -> Option<String> {
         .map(std::string::ToString::to_string)
 }
 
-/// Reads the `<java.version>` value from a Maven `pom.xml` file.
-///
-/// Performs a minimal XML scan without a full XML parser.  Returns `None`
-/// when the file is missing or does not contain a `<java.version>` element.
-pub(super) fn read_java_version(path: &Path) -> Option<String> {
-    let data = std::fs::read_to_string(path).ok()?;
-    // Minimal XML scan for <java.version>X</java.version> under <properties>.
-    let needle_open = "<java.version>";
-    let needle_close = "</java.version>";
-    let s = data.find(needle_open)?;
-    let e = data[s + needle_open.len()..].find(needle_close)?;
-    Some(data[s + needle_open.len()..s + needle_open.len() + e].to_string())
-}
-
-/// Reads the Python version from a `.python-version` file (plain text, trimmed).
-///
-/// Returns `None` when the file is missing.
-pub(super) fn read_python_version(path: &Path) -> Option<String> {
-    let data = std::fs::read_to_string(path).ok()?;
-    Some(data.trim().to_string())
-}
-
-/// Reads the version for `tool` from an `.tool-versions` file.
-///
-/// Each line has the form `<tool_name> <version>`.  Returns `None` when the
-/// file is missing or does not contain an entry for `tool`.
-pub(super) fn read_tool_versions_entry(path: &Path, tool: &str) -> Option<String> {
-    let data = std::fs::read_to_string(path).ok()?;
-    for line in data.lines() {
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() >= 2 && parts[0] == tool {
-            return Some(parts[1].to_string());
-        }
-    }
-    None
-}
-
 /// Reads the .NET SDK version from a `global.json` file (`sdk.version`).
 ///
 /// Returns `None` when the file is missing, malformed, or lacks `sdk.version`.
@@ -128,36 +91,6 @@ pub(super) fn read_dotnet_version(path: &Path) -> Option<String> {
         .get("version")?
         .as_str()
         .map(std::string::ToString::to_string)
-}
-
-/// Reads the Dart SDK minimum version from a `pubspec.yaml` file.
-///
-/// Looks for the `sdk:` key inside the `environment:` block and strips
-/// range prefixes (`^`, `>=`).  Returns `None` when the file is missing or
-/// the `environment.sdk` key is absent.
-pub(super) fn read_dart_sdk_version(path: &Path) -> Option<String> {
-    let data = std::fs::read_to_string(path).ok()?;
-    let mut in_env = false;
-    for line in data.lines() {
-        let trimmed = line.trim();
-        if trimmed == "environment:" {
-            in_env = true;
-            continue;
-        }
-        if in_env {
-            if !line.starts_with(' ') && !line.starts_with('\t') && !trimmed.is_empty() {
-                break;
-            }
-            if let Some(rest) = trimmed.strip_prefix("sdk:") {
-                let mut v = rest.trim().to_string();
-                v = v.trim_matches('"').to_string();
-                v = v.strip_prefix('^').unwrap_or(&v).to_string();
-                v = v.strip_prefix(">=").unwrap_or(&v).to_string();
-                return Some(v.trim().to_string());
-            }
-        }
-    }
-    None
 }
 
 /// Reads the `rust-version` (MSRV) from a `Cargo.toml` file.
@@ -179,71 +112,7 @@ pub(super) fn read_rust_version(path: &Path) -> Option<String> {
     None
 }
 
-/// Reads the Flutter minimum version from a `pubspec.yaml` file.
-///
-/// Looks for the `flutter:` key inside the `environment:` block and strips
-/// range prefixes (`^`, `>=`).  Returns `None` when the file is missing or
-/// the `environment.flutter` key is absent.
-pub(super) fn read_flutter_version(path: &Path) -> Option<String> {
-    let data = std::fs::read_to_string(path).ok()?;
-    let mut in_env = false;
-    for line in data.lines() {
-        let trimmed = line.trim();
-        if trimmed == "environment:" {
-            in_env = true;
-            continue;
-        }
-        if in_env {
-            if !line.starts_with(' ') && !line.starts_with('\t') && !trimmed.is_empty() {
-                break;
-            }
-            if let Some(rest) = trimmed.strip_prefix("flutter:") {
-                let mut v = rest.trim().to_string();
-                v = v.trim_matches('"').to_string();
-                v = v.strip_prefix('^').unwrap_or(&v).to_string();
-                v = v.strip_prefix(">=").unwrap_or(&v).to_string();
-                return Some(v.trim().to_string());
-            }
-        }
-    }
-    None
-}
-
 // --- Parsers for tool output ---
-
-/// Extracts the Java major version number from `java -version` stderr output.
-///
-/// Handles both old-style (`"1.8.0_292"` → `"8"`) and new-style
-/// (`"21.0.1"` → `"21"`) version strings.  Returns an empty string when
-/// no version line is found.
-pub(super) fn parse_java_version(stderr: &str) -> String {
-    for line in stderr.split('\n') {
-        if line.contains("version") {
-            let start = line.find('"');
-            let end = line.rfind('"');
-            if let (Some(s), Some(e)) = (start, end) {
-                if s != e {
-                    let version = &line[s + 1..e];
-                    let parts: Vec<&str> = version.split('.').collect();
-                    if let Some(first) = parts.first() {
-                        if !first.is_empty() {
-                            if *first == "1" && parts.len() > 1 {
-                                return parts[1].to_string();
-                            }
-                            return first.to_string();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    String::new()
-}
-
-/// Extracts the Python version from `python3 --version` output (e.g. `"Python 3.12.0"`).
-pub(super) fn parse_python_version(out: &str) -> String {
-    parse_line_word(out, "Python ", 1, "")
-}
 
 /// Extracts the Rust version from `rustc --version` output (e.g. `"rustc 1.88.0 ..."`).
 pub(super) fn parse_rust_version(out: &str) -> String {
@@ -255,46 +124,9 @@ pub(super) fn parse_cargo_llvm_cov(out: &str) -> String {
     parse_line_word(out, "cargo-llvm-cov ", 1, "")
 }
 
-/// Extracts the Elixir version from `elixir --version` output (e.g. `"Elixir 1.19.0 ..."`).
-pub(super) fn parse_elixir_version(out: &str) -> String {
-    parse_line_word(out, "Elixir ", 1, "")
-}
-
-/// Extracts the Erlang OTP release string from `erl -noshell -eval` output (trimmed).
-pub(super) fn parse_erlang_version(out: &str) -> String {
-    out.trim().to_string()
-}
-
 /// Extracts the .NET SDK version from `dotnet --version` output (trimmed).
 pub(super) fn parse_dotnet_version(out: &str) -> String {
     out.trim().to_string()
-}
-
-/// Extracts the Clojure CLI version from `clj --version` output
-/// (e.g. `"Clojure CLI version 1.12.4.1582"`).
-pub(super) fn parse_clojure_version(out: &str) -> String {
-    parse_line_word(out, "Clojure CLI version ", 3, "")
-}
-
-/// Extracts the Dart SDK version from `dart --version` output
-/// (e.g. `"Dart SDK version: 3.11.3 (stable) ..."`).
-pub(super) fn parse_dart_version(out: &str) -> String {
-    for line in out.split('\n') {
-        let t = line.trim();
-        if let Some(rest) = t.strip_prefix("Dart SDK version:") {
-            let fields: Vec<&str> = rest.trim().split_whitespace().collect();
-            if let Some(first) = fields.first() {
-                return first.to_string();
-            }
-        }
-    }
-    String::new()
-}
-
-/// Extracts the Flutter version from `flutter --version` output
-/// (e.g. `"Flutter 3.41.5 ..."`).
-pub(super) fn parse_flutter_version(out: &str) -> String {
-    parse_line_word(out, "Flutter ", 1, "")
 }
 
 /// Extracts the Docker version from `docker --version` output
@@ -310,11 +142,6 @@ pub(super) fn parse_docker_version(out: &str) -> String {
         }
     }
     String::new()
-}
-
-/// Extracts the `golangci-lint` version from `golangci-lint version` output.
-pub(super) fn parse_golangci_lint_version(out: &str) -> String {
-    parse_line_word(out, "golangci-lint", 3, "")
 }
 
 /// Extracts the `shellcheck` version from `shellcheck --version` output
@@ -367,28 +194,6 @@ pub(super) fn compare_exact(installed: &str, required: &str) -> (ToolStatus, Str
     let inst = normalize_simple_version(installed);
     let req = normalize_simple_version(required);
     if inst == req {
-        (ToolStatus::Ok, format!("required: {required}"))
-    } else {
-        (
-            ToolStatus::Warning,
-            format!("required: {required}, version mismatch"),
-        )
-    }
-}
-
-/// Compares only the major version component of two version strings.
-///
-/// Returns `Ok` when the major components match, `Warning` otherwise.
-/// Returns `Ok` immediately when `required` is empty.
-pub(super) fn compare_major(installed: &str, required: &str) -> (ToolStatus, String) {
-    if required.is_empty() {
-        return (ToolStatus::Ok, "no version requirement".into());
-    }
-    let inst = normalize_simple_version(installed);
-    let req = normalize_simple_version(required);
-    let inst_major = inst.splitn(2, '.').next().unwrap_or("");
-    let req_major = req.splitn(2, '.').next().unwrap_or("");
-    if !inst_major.is_empty() && inst_major == req_major {
         (ToolStatus::Ok, format!("required: {required}"))
     } else {
         (
@@ -672,18 +477,6 @@ mod tests {
     }
 
     #[test]
-    fn compare_major_match() {
-        let (s, _) = compare_major("21.0.1", "21");
-        assert_eq!(s, ToolStatus::Ok);
-    }
-
-    #[test]
-    fn compare_major_mismatch() {
-        let (s, _) = compare_major("17", "21");
-        assert_eq!(s, ToolStatus::Warning);
-    }
-
-    #[test]
     fn compare_gte_higher_ok() {
         let (s, _) = compare_gte("1.25.0", "1.24.0");
         assert_eq!(s, ToolStatus::Ok);
@@ -738,18 +531,6 @@ mod tests {
     }
 
     #[test]
-    fn parse_java_old_style() {
-        let stderr = "openjdk version \"1.8.0_292\"";
-        assert_eq!(parse_java_version(stderr), "8");
-    }
-
-    #[test]
-    fn parse_java_new_style() {
-        let stderr = "openjdk version \"21.0.1\"";
-        assert_eq!(parse_java_version(stderr), "21");
-    }
-
-    #[test]
     fn parse_docker_strips_comma() {
         assert_eq!(
             parse_docker_version("Docker version 29.2.1, build abc"),
@@ -760,22 +541,6 @@ mod tests {
     #[test]
     fn parse_jq_strips_prefix() {
         assert_eq!(parse_jq_version("jq-1.8.1"), "1.8.1");
-    }
-
-    #[test]
-    fn parse_dart_version_first_field() {
-        assert_eq!(
-            parse_dart_version("Dart SDK version: 3.11.3 (stable) on host"),
-            "3.11.3"
-        );
-    }
-
-    #[test]
-    fn parse_clojure_version_word_index() {
-        assert_eq!(
-            parse_clojure_version("Clojure CLI version 1.12.4.1582"),
-            "1.12.4.1582"
-        );
     }
 
     #[test]
@@ -790,34 +555,6 @@ mod tests {
         std::fs::write(&p, r#"{"volta":{"node":"24.11.1","npm":"10.9.0"}}"#).unwrap();
         assert_eq!(read_node_version(&p).as_deref(), Some("24.11.1"));
         assert_eq!(read_npm_version(&p).as_deref(), Some("10.9.0"));
-    }
-
-    #[test]
-    fn read_tool_versions_entry_finds_value() {
-        let dir = tempfile::tempdir().unwrap();
-        let p = dir.path().join(".tool-versions");
-        std::fs::write(&p, "elixir 1.19.5-otp-27\nerlang 27.3.4\n").unwrap();
-        assert_eq!(
-            read_tool_versions_entry(&p, "elixir").as_deref(),
-            Some("1.19.5-otp-27")
-        );
-        assert_eq!(
-            read_tool_versions_entry(&p, "erlang").as_deref(),
-            Some("27.3.4")
-        );
-    }
-
-    #[test]
-    fn read_dart_sdk_version_with_caret() {
-        let dir = tempfile::tempdir().unwrap();
-        let p = dir.path().join("pubspec.yaml");
-        std::fs::write(
-            &p,
-            "name: x\nenvironment:\n  sdk: ^3.11.3\n  flutter: ^3.41.5\n",
-        )
-        .unwrap();
-        assert_eq!(read_dart_sdk_version(&p).as_deref(), Some("3.11.3"));
-        assert_eq!(read_flutter_version(&p).as_deref(), Some("3.41.5"));
     }
 
     #[test]
