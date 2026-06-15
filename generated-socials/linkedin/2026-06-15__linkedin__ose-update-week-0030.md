@@ -20,7 +20,7 @@ This past month was about foundations — finding the patterns, architecture, an
 
 The honest story: both backends churned through stacks — F#/Giraffe → Java/Spring → Rust/Axum — before settling back on F#/Giraffe (.NET 10, EF Core, DbUp, NATS.Net). The rule that emerged: Rust for the CLIs and lean infra; F#/.NET for the product backends. ose-app-be → the generic ose-be (now an ERP-direction backend); organiclever-be became a real backend; crane-cli reverted Rust → F# too.
 
-Naming got legible — -www public site, -app-web app client, -be backend. ose/ayokoding/wahidyankf -web → -www; OrganicLever split into marketing + app.
+Naming got legible — -www marketing/landing site, -app-web app client, -be backend. ose/ayokoding/wahidyankf -web → -www; OrganicLever split into marketing + app.
 
 🏗️ ose-infra
 

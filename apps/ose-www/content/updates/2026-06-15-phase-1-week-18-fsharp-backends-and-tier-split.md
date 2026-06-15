@@ -146,7 +146,7 @@ The naming was ambiguous: `-web` meant both a public marketing site and an appli
 so a project's **deployment role** was not legible from its name. This period adopted a repo-wide
 taxonomy:
 
-- **`<domain>-www`** — a public website served at the domain root (marketing/content; Vercel).
+- **`<domain>-www`** — a public marketing/landing site served at the domain root (Vercel).
 - **`<domain>-app-web`** — an application's web client served at `app.*` (Vercel).
 - **`<domain>-be`** — the generic backend for a product domain.
 
