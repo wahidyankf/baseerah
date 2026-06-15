@@ -25,13 +25,14 @@ Make the convention real for the two product-backend E2E suites, so the operator
 variable has a defined meaning and a reader, and so future staging backend E2E wiring has an obvious name
 to inject.
 
-## In/out of scope
+## Business-scope Non-Goals
 
-**In**: rename `BASE_URL` → `API_BASE_URL` in `ose-be-e2e` + `organiclever-be-e2e` configs, the one CI
-setter, both READMEs, and the env-injection manifest.
-
-**Out**: the `www-be-e2e` suites (they test the web server, not an API service); and the deferred work of
-running backend E2E against a deployed staging backend URL (depends on ose-infra exposing one).
+- No behavior change for any E2E suite — localhost fallbacks are preserved; the rename is purely cosmetic
+  at the variable-name level.
+- No staging backend E2E gate wired in this plan — the deferred Phase 2 (consuming `API_BASE_URL` from a
+  deployed staging backend) is blocked on ose-infra and is not a business deliverable of this plan.
+- No renaming of the `www-be-e2e` suites (`ose-www-be-e2e`, `ayokoding-www-be-e2e`,
+  `organiclever-www-be-e2e`) — they target the web server origin, not a backend API service.
 
 ## Impact
 
@@ -41,6 +42,16 @@ running backend E2E against a deployed staging backend URL (depends on ose-infra
   fallbacks are preserved, so local and local-CI runs are unchanged.
 - **Operability**: the `API_BASE_URL` GitHub Environment variable gains a documented purpose (and a
   defined future reader), removing a dangling, unexplained config entry.
+
+## Affected Roles
+
+- **Platform engineer hat** — maintains the CI E2E pipelines; benefits from symmetric, self-describing
+  env-var names (`WEB_BASE_URL` / `API_BASE_URL`) when reading or authoring the staging gate.
+- **Backend developer hat** — runs `nx run ose-be-e2e:test:e2e` or `nx run organiclever-be-e2e:test:e2e`
+  locally; must not have their workflow broken by the rename (localhost fallbacks preserved).
+- **Release operator hat** — sets GitHub Environment variables; gains a documented reader for the
+  `API_BASE_URL` variable they created during `wire-vercel-www-app-cutover`.
+- **Consuming agent**: `swe-e2e-dev` — the suggested executor for the config and workflow edits in Phase 1.
 
 ## Risks and mitigations
 

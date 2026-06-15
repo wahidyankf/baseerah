@@ -40,6 +40,8 @@ claude --worktree rename-be-e2e-api-base-url
 
 ### Phase 0 Gate
 
+> All checks below must pass before starting Phase 1.
+
 - [ ] [AI] `git grep -nE '\bBASE_URL\b' -- apps/ose-be-e2e apps/organiclever-be-e2e` — acceptance: 2 hits
       (the current readers), confirming the starting state.
 
@@ -82,6 +84,8 @@ claude --worktree rename-be-e2e-api-base-url
       manual compose) — acceptance: `ose-be-e2e` and `organiclever-be-e2e` pass with the new variable name.
       If the backend stack cannot run in this environment, state so and rely on CI to exercise the gate.
 - [ ] [AI] Run `npx nx run rhino-cli:links:validation` and `npm run lint:md` — acceptance: both exit 0.
+- [ ] [AI] Run `npx nx affected -t typecheck lint test:quick specs:coverage` — acceptance: exits 0, no
+      errors reported. Fix ALL failures found, including any preexisting issues not caused by this rename.
 
 ### 1d — Commit + push
 
@@ -92,6 +96,8 @@ claude --worktree rename-be-e2e-api-base-url
       jobs) — acceptance: conclusion=success; poll every 3 min, never `gh run watch` for long jobs.
 
 ### Phase 1 Gate
+
+> All checks below must pass before archiving or starting Phase 2.
 
 - [ ] [AI] `git grep -nE '\bBASE_URL\b' -- apps/ose-be-e2e apps/organiclever-be-e2e` — acceptance: zero matches.
 - [ ] [AI] `git grep -nE '\bBASE_URL\b' -- apps/ose-www-be-e2e apps/ayokoding-www-be-e2e apps/organiclever-www-be-e2e`

@@ -5,6 +5,45 @@ description: Product scope, user stories, and Gherkin acceptance criteria for th
 
 # PRD — Backend E2E `API_BASE_URL` Standardization
 
+## Product overview
+
+This plan renames the Playwright base-URL environment variable in the two F#/Giraffe backend E2E suites
+(`ose-be-e2e`, `organiclever-be-e2e`) from the generic `BASE_URL` to the semantic `API_BASE_URL`, and
+updates the single CI setter and both suite READMEs to match. The rename also registers `API_BASE_URL` in
+the `env-injection.yaml` manifest. The observable outcome is a symmetric `WEB_BASE_URL` / `API_BASE_URL`
+pair that mirrors the naming convention already established for the frontend E2E suites.
+
+## Product scope
+
+### In scope
+
+- `apps/ose-be-e2e/playwright.config.ts` — rename `process.env.BASE_URL` to `process.env.API_BASE_URL`
+  (localhost fallback preserved).
+- `apps/organiclever-be-e2e/playwright.config.ts` — same rename (localhost fallback preserved).
+- `.github/workflows/_reusable-app-test-local-deploy-stag.yml` — rename the CI setter key from
+  `BASE_URL` to `API_BASE_URL` in the "Run BE E2E tests" step.
+- `apps/ose-be-e2e/README.md` and `apps/organiclever-be-e2e/README.md` — update env-var table and prose.
+- `env-injection.yaml` — add `API_BASE_URL` entry to the `ci-harness` section (names only, no values).
+
+### Out of scope
+
+- The three `www-be-e2e` suites (`ose-www-be-e2e`, `ayokoding-www-be-e2e`, `organiclever-www-be-e2e`) —
+  they target the Next.js web server, not a backend API service, and run through a different workflow.
+- Staging backend E2E gate (deferred Phase 2) — actually wiring a backend E2E job that reads
+  `API_BASE_URL` from the GitHub Environment and runs against a deployed staging backend URL.
+
+## Product risks
+
+- **Partial rename / reader-setter mismatch**: if one of the two readers is renamed but the setter is
+  not (or vice versa), CI silently falls back to the localhost literal. Mitigated by renaming all three
+  sites in one commit and re-running both suites in the Phase 1 gate.
+- **Silent localhost fallback in CI**: the fallback `|| "http://localhost:..."` means a missing env var
+  produces no immediate error — the test runs against localhost (possibly the wrong host). The CI setter
+  rename is the critical guard; the Phase 1 gate's `actionlint` check confirms the setter is present.
+- **www-be-e2e accidentally renamed**: a future contributor might mistakenly extend this rename to the
+  three `www-be-e2e` suites, which legitimately keep `BASE_URL`. The explicit scope exclusion in the
+  blast-radius table and BRD non-goals guards against this.
+
 ## Personas
 
 - **Platform engineer** — runs and maintains the CI E2E pipelines; wants symmetric, self-describing
@@ -16,11 +55,13 @@ description: Product scope, user stories, and Gherkin acceptance criteria for th
 
 ## User stories
 
-1. As a platform engineer, I want the backend E2E suites to read `API_BASE_URL` so it mirrors the
-   frontend `WEB_BASE_URL` and the two halves of a staging promotion read consistently.
-2. As a backend developer, I want the localhost fallback preserved so my local E2E runs need no env setup.
-3. As a release operator, I want `API_BASE_URL` recorded in the env-injection manifest so the variable I
-   created has a documented home and meaning.
+1. As a platform engineer, I want the backend E2E suites to read `API_BASE_URL`
+   So that it mirrors the frontend `WEB_BASE_URL` and the two halves of a staging promotion read
+   consistently.
+2. As a backend developer, I want the localhost fallback preserved
+   So that my local E2E runs need no env setup.
+3. As a release operator, I want `API_BASE_URL` recorded in the env-injection manifest
+   So that the variable I created has a documented home and meaning.
 
 ## Functional requirements
 

@@ -5,6 +5,30 @@ description: Exact edits, blast radius, scope-exclusion rationale, and the defer
 
 # Tech Docs — Backend E2E `API_BASE_URL` Standardization
 
+## Variable data-flow overview
+
+The diagram below shows the single CI setter and its two readers after the rename, alongside the three
+`www-be-e2e` readers that remain on `BASE_URL` (out of scope).
+
+```mermaid
+%% Color palette: Blue #0173B2, Teal #029E73, Orange #DE8F05, Gray #808080
+%% All colors are color-blind friendly and meet WCAG AA contrast standards
+flowchart LR
+    setter["_reusable-app-test-local-deploy-stag.yml\nRun BE E2E tests step\n#40;setter#41;"]:::blue
+    ose["apps/ose-be-e2e\nplaywright.config.ts\n#40;reader#41;"]:::teal
+    ol["apps/organiclever-be-e2e\nplaywright.config.ts\n#40;reader#41;"]:::teal
+    www1["apps/ose-www-be-e2e\n#40;keeps BASE_URL — out of scope#41;"]:::gray
+    www2["apps/ayokoding-www-be-e2e\n#40;keeps BASE_URL — out of scope#41;"]:::gray
+    www3["apps/organiclever-www-be-e2e\n#40;keeps BASE_URL — out of scope#41;"]:::gray
+
+    setter -->|"injects API_BASE_URL"| ose
+    setter -->|"injects API_BASE_URL"| ol
+
+    classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef gray fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
 ## Blast radius — every `BASE_URL` site
 
 `git grep -nE '\bBASE_URL\b'` (excluding `WEB_BASE_URL`) returns five Playwright config readers and one
