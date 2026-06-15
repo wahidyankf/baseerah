@@ -8,7 +8,7 @@ and Playwright's `APIRequestContext` (no browser required).
 
 ## Prerequisites
 
-Backend must be running on `http://localhost:8202` (or `BASE_URL`):
+Backend must be running on `http://localhost:8202` (or `API_BASE_URL`):
 
 ```bash
 nx dev organiclever-be
@@ -42,10 +42,10 @@ nx run organiclever-be-e2e:test:quick
 
 ## Environment Variables
 
-| Variable   | Default                 | Description                  |
-| ---------- | ----------------------- | ---------------------------- |
-| `BASE_URL` | `http://localhost:8202` | Backend base URL             |
-| `CI`       | unset                   | Enables CI mode (no retries) |
+| Variable       | Default                 | Description                  |
+| -------------- | ----------------------- | ---------------------------- |
+| `API_BASE_URL` | `http://localhost:8202` | Backend base URL             |
+| `CI`           | unset                   | Enables CI mode (no retries) |
 
 ## Project Structure
 

@@ -158,7 +158,7 @@ jobs:
       - name: Run BE E2E tests
         run: npx nx run ${{ inputs.be-project }}-e2e:test:e2e
         env:
-          BASE_URL: http://localhost:${{ inputs.be-port }}
+          API_BASE_URL: http://localhost:${{ inputs.be-port }}
 
       - name: Upload BE E2E report
         if: always()

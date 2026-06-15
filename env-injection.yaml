@@ -55,6 +55,12 @@ apps:
 # drift guard would wrongly flag them declared-but-unread). Injected only into
 # GitHub Environment vars./secrets. read by the staging e2e gate.
 ci-harness:
+  - key: API_BASE_URL
+    class: var
+    # Injected inline (localhost:<be-port>) by _reusable-app-test-local-deploy-stag.yml today.
+    # Staging-environment consumption (running BE E2E against a deployed staging backend) is
+    # deferred — see plans/in-progress/rename-be-e2e-api-base-url Phase 2.
+    environments: [organiclever-app-staging, ose-app-staging]
   - key: WEB_BASE_URL
     class: var
     environments: [organiclever-app-staging, ose-app-staging]
