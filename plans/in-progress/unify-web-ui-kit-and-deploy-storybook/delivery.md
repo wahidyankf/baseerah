@@ -367,7 +367,8 @@ No `worktrees/` directory is provisioned for this plan.
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Push changes to `main`: `git push origin HEAD:main`
+- [x] [AI] Push changes to `main`: `git push origin HEAD:main`
+  > **2026-06-16** | Status: DONE | 11 thematic commits pushed to origin/main (fbb8f23ea..0308fae84). Pre-push hook: specs:coverage 27 projects, markdownlint 0 errors, all parity validators PASSED.
 - [ ] [AI] Monitor the following GitHub Actions workflows (poll `gh run list --limit 10` every 3 minutes;
       do NOT use `gh run watch`): `commons-quality-gate`, `markdown-validate`, `commons-env-validate`,
       and `web-ui-build-deploy-prod` (if triggered)
