@@ -13,7 +13,7 @@ This past month was about foundations — finding the patterns, architecture, an
 
 - governance/ → repo-governance/ rename. Unified markdown gate (links, anchors, headings, mermaid) in one CI workflow.
 - Cross-language lint gates — shellcheck, hadolint, actionlint at warning threshold, joining strict F#.
-- Dependency policy clears CVEs against five sources incl. CISA KEV + EPSS; exact version pins throughout.
+- Dependency policy clears CVEs vs five sources incl. CISA KEV + EPSS; exact pins throughout.
 - Blameless post-mortem convention adopted across all three repos.
 
 🌳 ose-public
@@ -30,11 +30,11 @@ A "host unreachable" outage became a blameless post-mortem and a hardened two-no
 
 📦 ose-primer
 
-Absorbed the cross-cutting work across the polyglot demos — markdown gate, dependency hygiene, post-mortems, toolchain parity — and keeps both the Go and Rust rhino-cli builds live.
+Absorbed the cross-cutting work across the polyglot demos — markdown gate, dependency hygiene, post-mortems, toolchain parity. Also dropped the Go rhino-cli, consolidating on Rust to match ose-public.
 
 🔜 Next 2–4 weeks
 
-Ship ose-be and organiclever-be to the on-premise k3s clusters — first backends in a real environment. Stand up staging + production k3s on the fleet. Power is the honest risk; production moves to cloud/colocation as we grow.
+Ship ose-be and organiclever-be to the on-premise k3s clusters — first backends in a real environment. Stand up staging + production k3s. Power is the honest risk; production moves to cloud/colocation as we grow.
 
 Last month I said "all-in on Rust." This month I walked it back: Rust where I run it lean, F#/.NET where it earns its keep. The throughline — strong static typing as a deterministic guardrail, plus code a human can actually read. Because if an engineer can't read the patterns in a codebase, don't expect an AI to write good code in it either.
 

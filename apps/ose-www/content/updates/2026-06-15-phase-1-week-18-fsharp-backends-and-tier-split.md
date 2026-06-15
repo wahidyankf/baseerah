@@ -272,9 +272,11 @@ gitignored files and represented by placeholders in every committed document.
 The downstream template kept pace by absorbing the period's cross-cutting work across its polyglot
 demo apps: the unified markdown gate, the dependency-hygiene pass (exact pins, CVE-clean toolchain),
 the post-mortem convention, the Gherkin keyword-cardinality rule, and the harness-binding updates.
-Unlike `ose-public`, the template deliberately keeps both the Go and Rust builds of `rhino-cli` live —
-Go remains a reasonable CLI choice, and a template is more useful showing both. Its specs also adopted
-the flat product-surface directory layout.
+It also **dropped the Go build of `rhino-cli`** this period: after a stretch of running the Go and
+Rust implementations side by side under a parity harness, the template removed the Go version and
+renamed `rhino-cli-rust` → `rhino-cli`, consolidating on Rust to match `ose-public`. (Go is still one
+of the template's demo backend languages — `crud-be-golang-gin`, `golang-commons` — just no longer the
+CLI's.) Its specs also adopted the flat product-surface directory layout.
 
 ## Numerical Snapshot
 
