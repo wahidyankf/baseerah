@@ -121,7 +121,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - **Executor tagging (HARD RULE)**: every checkbox declares `[AI]` / `[HUMAN]` / `[HUMAN → AI]` (unmarked = `[AI]`), with a legend at the top of the checklist. Flag any untagged or `[AI]`-tagged human-only step (physical acts, hardware/BIOS, external auth) as **HIGH**. Validated in detail by Step 5h (rule 14).
 - **Phase gate & natural pause (HARD RULE)**: every phase ends with a `### Phase N Gate` (must-pass checklist + Pause Safety note) and reaches a safe-to-stop state. Flag a phase missing its gate as **HIGH**; a non-pause phase that should be merged as **MEDIUM**. Validated in detail by Step 5i (rule 15).
 - **Specs & Gherkin delivery (per Two Paths)**: a plan that creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/` MUST include delivery steps that add/update the companion `specs/` Gherkin `.feature` files and run `specs:coverage`. Validated in detail by Step 5j (rule 16). See [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md).
-- **UI-design-funnel completeness (UI-bearing plans)**: a plan that adds/changes user-facing screens or components under `apps/` or `libs/` MUST carry the design-funnel artefacts (≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named selection, a rationale, and a grounding/prior-art note). Validated in detail by Step 5k (rule 17). Pure-refactor / no-UI / governance-only plans are exempt. See [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+- **UI-design-funnel completeness (UI-bearing plans)**: a plan that adds/changes user-facing screens or components under `apps/` or `libs/` MUST carry the design-funnel artefacts (≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named selection, a rationale, a grounding/prior-art note, and a **responsive** strategy across mobile/tablet/desktop). Validated in detail by Step 5k (rule 17). Pure-refactor / no-UI / governance-only plans are exempt. See [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
 
 #### PR Step Authorization Check (per [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md))
 
@@ -666,7 +666,13 @@ user-facing screens or components under any `apps/**` or `libs/**` path (e.g. `l
 7. **Grounding / prior-art note** — The plan MUST carry the R5 grounding note (surveyed
    `libs/web-ui` / target app / sibling screens, net-new components named) and the R7 prior-art
    citation (`web-research-maker` survey). A missing grounding or prior-art note: **HIGH**.
-8. **Exemption** — Pure-refactor / no-UI / governance-only plans are **EXEMPT** (mirror the
+8. **Responsive strategy (mobile/tablet/desktop)** — The funnel MUST address **responsive design**,
+   **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
+   The selected design's decision record MUST state a **responsive strategy** per breakpoint (which
+   components stack, collapse, hide, or change), and the low-fi tier MUST show the mobile↔desktop
+   reflow where it differs. A UI-bearing plan whose selected design has **no responsive strategy**
+   stated, or whose finalists were evaluated **desktop-only**, is flagged: **HIGH**.
+9. **Exemption** — Pure-refactor / no-UI / governance-only plans are **EXEMPT** (mirror the
    specs/Gherkin exemption). Verify any claimed exemption is legitimate; an illegitimate exemption
    used to skip the funnel on a genuinely UI-bearing plan is **HIGH**.
 
@@ -674,6 +680,8 @@ user-facing screens or components under any `apps/**` or `libs/**` path (e.g. `l
 
 - UI-bearing plan missing any funnel artefact (no alternatives, no hi-fi finalists, unnamed
   selection, missing rationale, missing grounding/prior-art note): **HIGH**
+- UI-bearing plan whose selected design states no **responsive** strategy (mobile/tablet/desktop),
+  or whose finalists were evaluated desktop-only: **HIGH**
 - Artefact present but vague (e.g. alternatives not genuinely different, no drop reasons): **MEDIUM**
 - Illegitimate "no UI" exemption used to skip the funnel on a UI-bearing plan: **HIGH**
 - Non-UI / pure-refactor / governance-only plan: **not flagged** (exempt)

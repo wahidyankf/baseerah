@@ -435,7 +435,19 @@ PNGs). Use placeholders the author must replace; never invent the design content
 | ------ | ------------------- | --------------------- |
 | <X>    | Chosen              | <author: why it won>  |
 | <Y>    | Runner-up / Dropped | <author: why it lost> |
+
+### Stage 5 — Responsive Strategy (mobile/tablet/desktop, mobile-first)
+
+| Breakpoint            | Layout behaviour for the selected design                         |
+| --------------------- | ---------------------------------------------------------------- |
+| Mobile (`< sm`)       | <author: how it stacks/collapses — the mobile-first base layout> |
+| Tablet (`md` ≥ 768)   | <author: what changes vs mobile>                                 |
+| Desktop (`lg` ≥ 1024) | <author: full layout — what expands/splits>                      |
 ````
+
+When the checker flags the **responsive strategy** as missing (Step 5k rule 17 item 8), scaffold the
+Stage 5 responsive-strategy stub above — the mobile/tablet/desktop bullets the author must fill —
+and ensure the low-fi tier shows the mobile↔desktop reflow.
 
 Also scaffold the **grounding note (R5)** and **prior-art citation (R7)** when missing — add a stub
 delivery step delegating the survey to `web-research-maker` (prior art) and the

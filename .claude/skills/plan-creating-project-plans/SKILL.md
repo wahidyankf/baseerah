@@ -142,6 +142,12 @@ The funnel produces four kinds of artefact, all visible in the plan (`prd.md` + 
   exists; name any net-new component explicitly.
 - **Prior-art citation (R7)** — consult prior art on how comparable tools solve the screen via the
   `web-research-maker` agent, so the divergent alternatives are informed rather than invented.
+- **Responsive design (mobile/tablet/desktop)** — the funnel MUST address **responsive** behaviour,
+  **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
+  The low-fi tier must show the mobile↔desktop reflow where it differs (e.g. table → stacked cards,
+  side rail → top sheet); the selected design's record must state the **responsive strategy** per
+  breakpoint; and each finalist is evaluated on its **mobile-first responsive behaviour**, not its
+  desktop appearance alone. A desktop-only design is not a valid finalist.
 
 `plan-maker` requires these artefacts and emits delivery steps that produce them; `plan-checker`
 flags any missing artefact at HIGH criticality (its UI-design-funnel completeness step, sibling to
@@ -163,6 +169,10 @@ standing options — a free-form blank-state type and "chat about this"):
   web-ui kit only), so the diverge stage is informed rather than invented.
 - **Which selection, and why?** Present the finalists as options (e.g. Option A / Option B) and ask
   which design wins and the one-sentence rationale, so the Select + Justify stages are explicit.
+- **What responsive strategy?** Present 2-4 ways the selected layout reflows from **mobile** to
+  **desktop** (e.g. table collapses to stacked cards / side rail moves into a top sheet / two-pane
+  split becomes a single column), so the **responsive** behaviour across mobile/tablet/desktop is
+  decided mobile-first rather than designed desktop-only.
 
 See [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md)
 for the authoritative multiple-choice format.

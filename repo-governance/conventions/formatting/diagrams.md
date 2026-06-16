@@ -2061,6 +2061,30 @@ Copy-paste example:
 _High-fidelity mockup. Edit with the Excalidraw VSCode extension — the PNG carries the scene._
 ```
 
+### Responsive Design — Mobile / Tablet / Desktop
+
+Every UI-bearing screen MUST be designed for all three display classes, **mobile-first**. A
+desktop-only mockup does not pass review.
+
+| Display class | Breakpoint (Tailwind) | Reference width |
+| ------------- | --------------------- | --------------- |
+| Mobile        | base (`< sm`)         | ~360 px         |
+| Tablet        | `md` (≥ 768 px)       | ~768 px         |
+| Desktop       | `lg` (≥ 1024 px)      | ~1280 px        |
+
+The mockups MUST make the responsive behaviour explicit rather than showing a single desktop width:
+
+- **Low-fidelity (Tier 1)** — provide an ASCII wireframe (or an inline note) for at least the
+  **mobile** and **desktop** layouts where they differ, showing how the layout reflows: e.g. a
+  multi-column table collapses to stacked cards on mobile; a left control rail moves into a top
+  sheet / drawer; a two-pane split becomes a single column.
+- **High-fidelity (Tier 2)** — the selected design's record MUST state the **responsive strategy**
+  per breakpoint: which components stack, collapse, hide, or change, grounded in the repo's UI-kit
+  breakpoint tokens (Tailwind `sm` / `md` / `lg`).
+- **Selection rationale** — each finalist MUST be evaluated on its **responsive behaviour
+  (mobile-first)**, not only its desktop appearance; a layout that only works on desktop is not a
+  valid finalist.
+
 ### Grounding Rule (R5)
 
 Before drafting **either** tier, the author MUST survey the existing UI in the related app(s) and

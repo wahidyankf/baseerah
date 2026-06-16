@@ -271,6 +271,13 @@ labelled subsections, with no alternative silently discarded:
    name any net-new component. Reference the `swe-developing-frontend-ui` skill.
 7. **R7 prior-art citation** — consult prior art on comparable tools via `web-research-maker` to
    inform the divergent alternatives.
+8. **Responsive note (mobile/tablet/desktop)** — the funnel MUST address **responsive design**,
+   **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
+   The low-fi tier must show how the layout reflows between **mobile** and **desktop** where they
+   differ (e.g. table → stacked cards, side rail → top sheet); the selected design's decision
+   record MUST state the **responsive strategy** per breakpoint (which components stack, collapse,
+   hide, or change); and each finalist MUST be evaluated on its **mobile-first responsive
+   behaviour**, not its desktop appearance alone. A desktop-only design is not a valid finalist.
 
 ### Delivery Steps to Emit (UI-bearing plans)
 
@@ -289,6 +296,9 @@ exactly as the specs/Gherkin delivery section does for feature changes:
       them in `prd.md` — acceptance: `grep -c "excalidraw.png" prd.md` ≥ 2
 - [ ] [AI] Select + Justify: add the named selection and the rationale table in `prd.md`
       — acceptance: `grep -c "Selected:" prd.md` ≥ 1
+- [ ] [AI] Responsive: state the selected design's **responsive** strategy per breakpoint
+      (mobile/tablet/desktop, mobile-first) in `prd.md` and show the mobile↔desktop reflow in the
+      low-fi tier — acceptance: `grep -ci "responsive" prd.md` ≥ 1
 ```
 
 `plan-checker` validates these artefacts via its **UI-design-funnel completeness** step (sibling to
