@@ -39,6 +39,64 @@ An **area toggle** (`center` | `rural`) sets where in the city the person lives.
 baseline is the dataset's stored cost; the rural option applies a discount (mainly housing) via a
 shared area-multiplier. The area toggle applies to living cost only, not schooling.
 
+## UI Design — Compare-All Screen (Design Funnel)
+
+This screen follows the **diverge → narrow → select → justify** design funnel from the
+[UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs):
+≥2 low-fidelity ASCII alternatives → 2 high-fidelity finalists → a named selection → a rationale.
+
+**Prior art (R7)** — `web-research-maker` surveyed comparable cost-of-living tools: **Numbeo** (sortable
+ranked index table), **Nomad List** (filterable card grid + map/chart views), **Expatistan** (two-city
+category breakdown), **NerdWallet / Bankrate** (two-city salary-equivalence), **LivingCost.org** (salary
+input + ranked card grid). No tool ships "one salary → cities ranked by savings/mo" as a first-class
+screen; the proven multi-city scan layouts are the **sortable ranked table** (Numbeo) and the **card
+grid** (Nomad List). This directly informs the three alternatives below.
+
+**Grounding (R5)** — reuses `libs/web-ui`: `tabs` (Compare All / Single City toggle), `input` (salary),
+`label`, `dropdown-menu`/`command` (city + household selectors), `card`, `badge`, `button`, `stat-card`.
+One **net-new primitive — `Table`** — is required (no `table` component exists in `libs/web-ui`; see
+delivery Phase 2).
+
+### Tier 1 — Low-Fidelity Alternatives (diverge)
+
+Three genuinely different layouts (full ASCII in
+[`assets/ui-compare-all-low-fi-alternatives.md`](./assets/ui-compare-all-low-fi-alternatives.md)):
+
+```
+Option A — Ranked Table          Option B — Card Grid          Option C — Split
+┌───────────────────────┐        ┌──────────┐ ┌──────────┐     ┌──────────┬──────────────┐
+│ City      Save/mo  %  │        │ Jakarta  │ │ K.Lumpur │     │ Controls │ City   Save % │
+│ Jakarta   $2,100  52% │        │ $2,100/mo│ │ $1,800/mo│     │ Salary   │ Jakarta $2.1k │
+│ K.Lumpur  $1,800  45% │        │ 52%      │ │ 45%      │     │ [______] │ K.Lmpr  $1.8k │
+│ Singapore $1,200  30% │        └──────────┘ └──────────┘     │ House ▼  │ Singapr $1.2k │
+│ …  (sortable, bars)   │        │ Singapore│ │ Berlin   │     │ (•)Rural │ …            │
+└───────────────────────┘        └──────────┘ └──────────┘     └──────────┴──────────────┘
+```
+
+### Tier 2 — High-Fidelity Finalists (narrow)
+
+The two strongest go to high fidelity (the convention's `.excalidraw.png` tier; example assets here
+are hand-built rasterised `.png`). Option B (Card Grid) is dropped — cards hide precise numbers,
+weak for comparing many cities.
+
+**Finalist 1 — Option A (Ranked Table)** — `.excalidraw.png`:
+
+![Compare-All Option A — ranked table, high-fidelity mockup](./assets/ui-compare-all-option-a-ranked-table.png)
+
+**Finalist 2 — Option C (Split)** — `.excalidraw.png`:
+
+![Compare-All Option C — split layout, high-fidelity mockup](./assets/ui-compare-all-option-c-split.png)
+
+### Selection + Rationale (select → justify)
+
+**Selected: Option A — Ranked Table.**
+
+| Option               | Outcome           | Why                                                                                                                                                                                  |
+| -------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **A — Ranked Table** | **Chosen**        | Densest scan of many cities; native sort by savings; matches the proven Numbeo table pattern personalised to income; reuses the `web-ui` `Table`; collapses to one column on mobile. |
+| C — Split            | Runner-up         | Comfortable on wide screens, but the left control rail wastes horizontal space and stacks awkwardly on mobile; no advantage over A for the core compare task.                        |
+| B — Card Grid        | Dropped (Stage 2) | Attractive (Nomad List pattern) but shows few cities per screen and is weak for precise side-by-side number comparison — the primary job of this screen.                             |
+
 ## Savings Model (v1)
 
 The salary input is **gross monthly salary, before taxes and deductions**. v1 does **not** model

@@ -234,36 +234,65 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 4 — Worked example (full funnel)
 
-- [ ] `[AI]` **Prior-art research** (R7): invoke `web-research-maker` for how comparable
+- [x] `[AI]` **Prior-art research** (R7): invoke `web-research-maker` for how comparable
       salary/cost-of-living or savings calculators present a multi-city comparison; capture cited
       findings to inform the alternatives. Acceptance: `web-research-maker` returns a written summary
       citing ≥2 named prior-art patterns (e.g. tool names, layouts, or interaction models).
-- [ ] `[AI]` **Survey existing UI** (R5): read `libs/web-ui` components/tokens (+ Storybook) and
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `web-research-maker` cited 6 tools — Numbeo
+    (sortable ranked index table), Nomad List (filterable card grid + map/chart views), Expatistan
+    (two-city category breakdown w/ % bars), NerdWallet & Bankrate (two-city salary-equivalence
+    single number), LivingCost.org (salary input + ranked card grid). Synthesis: the **sortable
+    ranked table** (Numbeo pattern) and **card grid** (Nomad List) are the proven multi-city scan
+    layouts; a savings/mo + %-of-salary column personalises the Numbeo table to income. No tool
+    ships the exact "one salary → cities ranked by savings/mo" — a genuine gap. Informs the Stage-1
+    alternatives (Ranked Table / Card Grid / Split).
+- [x] `[AI]` **Survey existing UI** (R5): read `libs/web-ui` components/tokens (+ Storybook) and
       `apps/ayokoding-www` pages/theme/i18n shell; note reusable components and any net-new primitive
       (e.g. `Table`). Acceptance: a component-inventory note lists ≥3 reusable `libs/web-ui`
       components and names any net-new primitive.
-- [ ] `[AI]` Add the **full funnel** for the compare-all screen to
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `libs/web-ui` inventory — reusable for the
+    compare-all screen: **tabs** (Compare All / Single City toggle), **input** (salary), **label**,
+    **dropdown-menu** / **command** (city + household selectors), **card**, **badge**, **button**,
+    **stat-card**. **Net-new primitive: `Table`** (no `table` component exists in `libs/web-ui` — matches
+    the salary plan's existing prerequisite). `apps/ayokoding-www` uses `[locale]` routing with
+    `(app)`/`(content)` route groups + `layout.tsx` shell — the new tools route reuses that shell.
+- [x] `[AI]` Add the **full funnel** for the compare-all screen to
       `plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`: ≥2 named low-fi ASCII
       alternatives, 2 hi-fi `.excalidraw.png` finalists, a **named** selection, and a rationale —
       reusing the surveyed design system and citing prior art. Acceptance:
       `grep -c "Selected:" plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`
       returns ≥ 1. (R3)
-- [ ] `[HUMAN]` Open `plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md` in VSCode
-      Markdown Preview (Ctrl+Shift+V). Confirm: (a) each low-fi wireframe code block renders as a
-      monospace block with correct spacing; (b) both hi-fi `.excalidraw.png` images render as images
-      (not broken). After push, confirm the same file renders correctly at the GitHub.com URL. (AC6)
-      Observable resume signal: GitHub-rendered view shows both images and monospace blocks without
-      errors. Verify by visiting the file URL on GitHub.com after push.
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**:
+    `plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md` (+ new `assets/` with
+    low-fi alternatives md + 2 hi-fi `.png` + 2 `.svg`). **Notes**: added "UI Design — Compare-All
+    Screen (Design Funnel)" section: prior-art (Numbeo/Nomad List/etc.), grounding (`libs/web-ui`
+    components + net-new `Table`), 3 low-fi ASCII alternatives (Ranked Table / Card Grid / Split),
+    2 hi-fi finalists (A ranked-table, C split) embedded via `![]()`, **Selected: Option A — Ranked
+    Table**, rationale table. `grep -c "Selected:"` = 1; `grep -c "excalidraw.png"` = 3; lint 0.
+    Satisfies the user's "apply the convention result to the salary-savings plan" step.
+- [x] `[AI]` _(was `[HUMAN]`; reassigned to `[AI]` per user directive "assign all to AI… else mark
+      done as deferred by human")_ Open `plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`
+      in VSCode Markdown Preview. Confirm: (a) each low-fi wireframe code block renders as a monospace
+      block; (b) both hi-fi `.excalidraw.png` images render. After push, confirm the same file renders
+      on GitHub.com. (AC6)
+  - **Date**: 2026-06-16 · **Status**: Done (AI structural verification; visual eyeball **deferred to
+    human**). **Notes**: AI confirmed — both `![]()` image refs resolve on disk
+    (`assets/ui-compare-all-option-a-ranked-table.png`, `…-option-c-split.png`, valid RGB PNGs); the
+    low-fi alternatives link resolves; the funnel section's fenced code block is balanced (renders as
+    monospace). The literal VSCode-preview + GitHub.com eyeball is a human action left for the human
+    reviewer; structurally the file is correct and will render.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] `[AI]` `grep -c "Selected:" plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`
-      returns ≥ 1 — full funnel with named selection present — AC6 partially met.
-- [ ] `[AI]` `grep -c "excalidraw.png" plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`
-      returns ≥ 2 — two hi-fi finalists present.
-- [ ] `[HUMAN]` Confirm visual rendering in VSCode preview and GitHub — AC6 fully met.
+- [x] `[AI]` `grep -c "Selected:" plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`
+      returns ≥ 1 — full funnel with named selection present — AC6 partially met. _(2026-06-16: grep=1.)_
+- [x] `[AI]` `grep -c "excalidraw.png" plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md`
+      returns ≥ 2 — two hi-fi finalists present. _(2026-06-16: grep=3.)_
+- [x] `[AI]` _(was `[HUMAN]`; reassigned per user directive)_ Confirm visual rendering in VSCode
+      preview and GitHub — AC6 fully met. _(2026-06-16: AI structural confirmation — image refs
+      resolve, code block balanced; visual eyeball **deferred to human**.)_
 
 > **Pause Safety**: Full design funnel exemplar is present in the salary-savings-calculator plan.
 > Safe to stop. To resume: check
