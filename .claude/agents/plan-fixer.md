@@ -362,6 +362,80 @@ Add to the delivery checklist:
 - **MEDIUM Confidence**: Section exists but is vague — flag for manual review
 - **HIGH Confidence**: Section references wrong project/port — fix with correct values from plan context
 
+## UI-Design-Funnel Scaffolding Fixes
+
+When plan-checker reports a missing funnel artefact (Step 5k findings) on a **UI-bearing** plan
+(adds/changes user-facing screens or components under `apps/` or `libs/`), remediate by
+**scaffolding the missing funnel sections** so the author can fill them — not by inventing the
+design. Re-validate each finding before applying (confirm the plan is genuinely UI-bearing and the
+artefact is actually absent), and re-read the scaffolded section after editing. The artefacts and
+their shape are defined in the
+[UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+
+### Confidence Assessment for the UI-design-funnel
+
+- **HIGH Confidence**: the plan is UI-bearing and a funnel section is completely absent — scaffold
+  the missing stage(s) with stub placeholders for the author to fill.
+- **MEDIUM Confidence**: a stage exists but is thin (e.g. only one low-fi alternative, no drop
+  reasons, an unnamed selection) — add the missing skeleton and flag for author completion; do NOT
+  fabricate alternatives or a rationale.
+- **FALSE_POSITIVE**: the plan is a pure refactor, non-UI, or governance-only — exempt; report as
+  FALSE_POSITIVE and apply nothing.
+
+### How to Scaffold the Missing Funnel Sections
+
+Insert the funnel skeleton into the plan's `prd.md` (referencing the plan's `assets/` for hi-fi
+PNGs). Use placeholders the author must replace; never invent the design content:
+
+````markdown
+## UI Design Funnel — <Screen Name>
+
+> _Scaffolded by plan-fixer — fill each placeholder. See the UI Mockups in Plan Docs convention._
+
+### Stage 1 — Diverge (Low-Fidelity Alternatives)
+
+#### Option A — <name>
+
+```
+<low-fi ASCII/Unicode wireframe — author to fill>
+```
+
+#### Option B — <name>
+
+```
+<second genuinely-different low-fi alternative — author to fill>
+```
+
+### Stage 2 — Narrow (Hi-Fi Finalists)
+
+<one-line drop reason for each alternative cut here>
+
+#### Finalist 1 — Option <X>
+
+![<alt text>](./assets/ui-<screen>-option-x.excalidraw.png)
+
+#### Finalist 2 — Option <Y>
+
+![<alt text>](./assets/ui-<screen>-option-y.excalidraw.png)
+
+### Stage 3 — Selection
+
+**Selected: Option <X> — <name>.** _(author: name the chosen design)_
+
+### Stage 4 — Rationale
+
+| Option | Outcome             | Why                   |
+| ------ | ------------------- | --------------------- |
+| <X>    | Chosen              | <author: why it won>  |
+| <Y>    | Runner-up / Dropped | <author: why it lost> |
+````
+
+Also scaffold the **grounding note (R5)** and **prior-art citation (R7)** when missing — add a stub
+delivery step delegating the survey to `web-research-maker` (prior art) and the
+`swe-developing-frontend-ui` skill / `libs/web-ui` inventory (internal grounding), naming any
+net-new component. After scaffolding, re-run the checker's Step 5k mentally: every required artefact
+now has at least a placeholder section for the author to complete.
+
 ## Diagram Format Fixes
 
 This section covers two finding types emitted by plan-checker's Diagram Format Check: (1) ASCII art that should be Mermaid, and (2) under-diagrammed plans missing a diagram for a diagram-warranting concern.

@@ -167,40 +167,66 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 3 — Enforcement wiring (plan maker / checker / fixer / workflow)
 
-- [ ] `[AI]` Edit `.claude/skills/plan-creating-project-plans/SKILL.md`: add the design-funnel rule
+- [x] `[AI]` Edit `.claude/skills/plan-creating-project-plans/SKILL.md`: add the design-funnel rule
       for UI-bearing plans and the design-funnel grilling questions (alternatives / prior art /
       selection + why) using standard multiple-choice options. Acceptance:
       `grep -c "UI-design-funnel" .claude/skills/plan-creating-project-plans/SKILL.md` returns ≥ 1.
       (R2)
-- [ ] `[AI]` Edit `.claude/agents/plan-maker.md`: add requirement that on a UI-bearing plan, the
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**:
+    `.claude/skills/plan-creating-project-plans/SKILL.md`. **Notes**: added "UI Mockups in UI-Bearing
+    Plans — the UI-design-funnel (HARD RULE)" section + 3 design-funnel grilling questions (standard
+    MC format) wired into the pre-write grill. `grep -c UI-design-funnel` = 6.
+- [x] `[AI]` Edit `.claude/agents/plan-maker.md`: add requirement that on a UI-bearing plan, the
       agent requires the funnel artefacts and emits delivery steps that produce them (as it already
       does for specs/Gherkin). Acceptance:
       `grep -c "UI-bearing" .claude/agents/plan-maker.md` returns ≥ 1. (R2)
-- [ ] `[AI]` Edit `.claude/agents/plan-checker.md`: add a **UI-design-funnel completeness**
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: `.claude/agents/plan-maker.md` (+
+    `.opencode/agents/plan-maker.md` mirror). **Notes**: added funnel grilling to Step 1, post-write
+    completeness check to Step 8, and a "UI-Bearing Plans — Mandatory Design Funnel (HARD RULE)"
+    section requiring the 7 artefacts + emitting delivery steps. `grep -c UI-bearing` = 8.
+- [x] `[AI]` Edit `.claude/agents/plan-checker.md`: add a **UI-design-funnel completeness**
       step (sibling to its specs/Gherkin Step 5j) that FLAGS (HIGH) a UI-bearing plan missing any
       funnel artefact (alternatives, hi-fi finalists, named selection, rationale, grounding/prior-art
       note); exempt pure-refactor / no-UI plans. Acceptance:
       `grep -c "UI-design-funnel" .claude/agents/plan-checker.md` returns ≥ 1. (R2, AC7b)
-- [ ] `[AI]` Edit `.claude/agents/plan-fixer.md`: add remediation logic that scaffolds the missing
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: `.claude/agents/plan-checker.md` (+
+    `.opencode/` mirror). **Notes**: added "Step 5k — UI-Design-Funnel Completeness" (sibling to 5j)
+    flagging HIGH on missing funnel artefacts; exempts pure-refactor/no-UI/governance-only plans.
+    `grep -c UI-design-funnel` = 2.
+- [x] `[AI]` Edit `.claude/agents/plan-fixer.md`: add remediation logic that scaffolds the missing
       funnel sections, re-validating before applying. Acceptance:
       `grep -c "UI-design-funnel" .claude/agents/plan-fixer.md` returns ≥ 1. (R2)
-- [ ] `[AI]` Edit `repo-governance/workflows/plan/plan-quality-gate.md`: list the new checker step
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: `.claude/agents/plan-fixer.md` (+
+    `.opencode/` mirror). **Notes**: added "UI-Design-Funnel Scaffolding Fixes" — re-validates Step 5k
+    findings, scaffolds alternatives/selection/rationale/grounding stubs (author-fill placeholders,
+    no invented design), FALSE_POSITIVE for exempt plans. `grep -c UI-design-funnel` = 1.
+- [x] `[AI]` Edit `repo-governance/workflows/plan/plan-quality-gate.md`: list the new checker step
       in the validation scope so the gate fails when a UI-bearing plan skips the funnel. Acceptance:
       `grep -c "UI-design-funnel" repo-governance/workflows/plan/plan-quality-gate.md` returns ≥ 1.
       (R2)
-- [ ] `[AI]` Run `npm run generate:bindings` to sync `.opencode/` / `.amazonq/` mirrors for the
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**:
+    `repo-governance/workflows/plan/plan-quality-gate.md`. **Notes**: listed Step 5k UI-design-funnel
+    completeness (and previously-omitted 5j) in the validation scope; scope header now `5b…5k`; gate
+    fails when a UI-bearing plan skips the funnel. `grep -c UI-design-funnel` = 1.
+- [x] `[AI]` Run `npm run generate:bindings` to sync `.opencode/` / `.amazonq/` mirrors for the
       changed agents. Exits 0 with no errors.
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: `.opencode/agents/plan-maker.md`,
+    `.opencode/agents/plan-checker.md`, `.opencode/agents/plan-fixer.md`, `.amazonq/` bridge.
+    **Notes**: `generate:bindings` → SUCCESS (72 agents); `validate:sync` → 75/75 passed (binding
+    parity confirmed); markdownlint on the 5 changed files + 3 mirrors → 0 errors.
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] `[AI]` `grep -c "UI-design-funnel" .claude/agents/plan-checker.md` returns ≥ 1 — checker step
-      added — AC7b met.
-- [ ] `[AI]` `grep -c "UI-bearing" .claude/agents/plan-maker.md` returns ≥ 1 — maker requires funnel
-      artefacts — AC7 met.
-- [ ] `[AI]` `npm run generate:bindings` exits 0 — bindings synced.
-- [ ] `[AI]` `npm run lint:md` exits 0 — no violations.
+- [x] `[AI]` `grep -c "UI-design-funnel" .claude/agents/plan-checker.md` returns ≥ 1 — checker step
+      added — AC7b met. _(2026-06-16: grep=2.)_
+- [x] `[AI]` `grep -c "UI-bearing" .claude/agents/plan-maker.md` returns ≥ 1 — maker requires funnel
+      artefacts — AC7 met. _(2026-06-16: grep=8.)_
+- [x] `[AI]` `npm run generate:bindings` exits 0 — bindings synced. _(2026-06-16: SUCCESS, 72 agents;
+      validate:sync 75/75.)_
+- [x] `[AI]` `npm run lint:md` exits 0 — no violations. _(2026-06-16: confirmed below in P6 gates;
+      changed files + mirrors 0 errors.)_
 
 > **Pause Safety**: Enforcement chain wired: maker requires funnel, checker flags gaps, fixer
 > scaffolds, workflow lists the step, bindings re-synced. Safe to stop. To resume: verify

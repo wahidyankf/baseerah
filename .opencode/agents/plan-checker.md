@@ -127,6 +127,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - **Executor tagging (HARD RULE)**: every checkbox declares `[AI]` / `[HUMAN]` / `[HUMAN → AI]` (unmarked = `[AI]`), with a legend at the top of the checklist. Flag any untagged or `[AI]`-tagged human-only step (physical acts, hardware/BIOS, external auth) as **HIGH**. Validated in detail by Step 5h (rule 14).
 - **Phase gate & natural pause (HARD RULE)**: every phase ends with a `### Phase N Gate` (must-pass checklist + Pause Safety note) and reaches a safe-to-stop state. Flag a phase missing its gate as **HIGH**; a non-pause phase that should be merged as **MEDIUM**. Validated in detail by Step 5i (rule 15).
 - **Specs & Gherkin delivery (per Two Paths)**: a plan that creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/` MUST include delivery steps that add/update the companion `specs/` Gherkin `.feature` files and run `specs:coverage`. Validated in detail by Step 5j (rule 16). See [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md).
+- **UI-design-funnel completeness (UI-bearing plans)**: a plan that adds/changes user-facing screens or components under `apps/` or `libs/` MUST carry the design-funnel artefacts (≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named selection, a rationale, and a grounding/prior-art note). Validated in detail by Step 5k (rule 17). Pure-refactor / no-UI / governance-only plans are exempt. See [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
 
 #### PR Step Authorization Check (per [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md))
 
@@ -642,3 +643,43 @@ Enforces the [Feature Change Completeness Convention §Two Paths](../../repo-gov
 - Specs/Gherkin step present but no `specs:coverage` gate: **HIGH**
 - Step present but vague (no specific `.feature` path or domain): **MEDIUM**
 - Illegitimate "no behavior change" exemption used to skip specs: **HIGH**
+
+### 17. UI-Design-Funnel Completeness (Step 5k — MANDATORY)
+
+Enforces the [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
+for the plan path. This is the **UI-design-funnel completeness** check — the sibling of the
+specs/Gherkin Step 5j: just as a behavior-changing plan must carry companion Gherkin, a **UI-bearing**
+plan must carry the design funnel. A plan is UI-bearing when it adds, changes, or replaces
+user-facing screens or components under any `apps/**` or `libs/**` path (e.g. `libs/web-ui`).
+
+#### What to Validate
+
+1. **Scope detection** — From the plan's Scope (`README.md` / `prd.md`), file-impact (`tech-docs.md`),
+   and delivery steps, determine whether it adds or changes user-facing screens or components under
+   `apps/**` or `libs/**`. If not UI-bearing, skip this step (no findings).
+2. **Both tiers per screen** — Each UI-bearing screen MUST have a low-fidelity ASCII/Unicode
+   wireframe in a fenced code block AND a high-fidelity `.excalidraw.png` referenced via `![](./…)`,
+   in separate labelled subsections. Missing a tier: **HIGH**. Use of a ruled-out format (inline
+   HTML+CSS, MDX, Mermaid-as-wireframe, `.excalidraw.svg`): **HIGH**.
+3. **≥ 2 named low-fi alternatives** — The funnel's diverge stage MUST present at least two named,
+   genuinely different alternatives (Option A / B / …). None or only one: **HIGH**.
+4. **2 hi-fi `.excalidraw.png` finalists** — The narrow stage MUST carry the strongest alternatives
+   forward as hi-fi finalists. Missing the hi-fi finalists: **HIGH**.
+5. **Named selection** — The select stage MUST name the chosen design explicitly (e.g.
+   "Selected: Option A — Ranked Table"). An unnamed/implicit selection: **HIGH**.
+6. **Rationale / decision record** — The justify stage MUST include a short rationale (a table is
+   enough): why the winner won and why each runner-up lost. Missing rationale: **HIGH**.
+7. **Grounding / prior-art note** — The plan MUST carry the R5 grounding note (surveyed
+   `libs/web-ui` / target app / sibling screens, net-new components named) and the R7 prior-art
+   citation (`web-research-maker` survey). A missing grounding or prior-art note: **HIGH**.
+8. **Exemption** — Pure-refactor / no-UI / governance-only plans are **EXEMPT** (mirror the
+   specs/Gherkin exemption). Verify any claimed exemption is legitimate; an illegitimate exemption
+   used to skip the funnel on a genuinely UI-bearing plan is **HIGH**.
+
+#### Finding Severity
+
+- UI-bearing plan missing any funnel artefact (no alternatives, no hi-fi finalists, unnamed
+  selection, missing rationale, missing grounding/prior-art note): **HIGH**
+- Artefact present but vague (e.g. alternatives not genuinely different, no drop reasons): **MEDIUM**
+- Illegitimate "no UI" exemption used to skip the funnel on a UI-bearing plan: **HIGH**
+- Non-UI / pure-refactor / governance-only plan: **not flagged** (exempt)

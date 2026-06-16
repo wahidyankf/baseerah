@@ -79,6 +79,9 @@ Ask about (each as a structured multiple-choice question):
 - What is the scope? What is explicitly out of scope?
 - What are the constraints (performance, compatibility, harness-neutrality, etc.)?
 - Are there design decision forks where the user has a preference?
+- **For UI-bearing plans only** (the plan adds/changes user-facing screens or components under
+  `apps/` or `libs/`): the **UI-design-funnel** questions — which low-fi alternatives, what prior
+  art, which selection + why. See [UI-Bearing Plans — Mandatory Design Funnel](#ui-bearing-plans--mandatory-design-funnel-hard-rule).
 
 Do NOT proceed to Step 2 until all open branches are resolved. Unresolved design decisions
 discovered during writing force expensive rewrites — resolve them now.
@@ -221,9 +224,69 @@ Cover (each as a structured multiple-choice question):
   or `repo-governance/` paths, confirm that no vendor-specific content was introduced into
   governance files. Reference the
   [Governance Vendor-Independence Convention](../../repo-governance/conventions/structure/governance-vendor-independence.md).
+- **UI-design-funnel completeness (UI-bearing plans only)**: If the plan adds/changes user-facing
+  screens or components under `apps/` or `libs/`, confirm the funnel artefacts are all present —
+  ≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named selection, a rationale,
+  the R5 grounding note, and R7 prior-art citation — and that delivery steps produce them. See
+  [UI-Bearing Plans — Mandatory Design Funnel](#ui-bearing-plans--mandatory-design-funnel-hard-rule).
 
 Revise files as needed based on user feedback. Signal done only after the user confirms the
 plan is complete and correct.
+
+## UI-Bearing Plans — Mandatory Design Funnel (HARD RULE)
+
+A plan is **UI-bearing** when it adds or changes user-facing screens or components under `apps/` or
+`libs/` (e.g. `libs/web-ui`). For a UI-bearing plan, plan-maker MUST enforce the **UI-design-funnel**
+exactly as it already enforces specs/Gherkin for feature changes — require the artefacts AND emit the
+delivery steps that produce them. Pure refactors, no-UI plans, and governance-only plans are exempt;
+state the exemption explicitly in `tech-docs.md`.
+
+This mirrors the **Specs & Gherkin completeness (both paths)** binding: just as app/lib code never
+lands without companion Gherkin, a UI-bearing plan never passes quality gates without its design
+funnel. The funnel is authored per the
+[UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+
+### Required Funnel Artefacts (require all on a UI-bearing plan)
+
+For each UI-bearing screen, the plan (`prd.md` + the plan's `assets/`) MUST carry, in separate
+labelled subsections, with no alternative silently discarded:
+
+1. **Both tiers per screen** — a low-fidelity ASCII/Unicode wireframe in a fenced code block AND a
+   high-fidelity `.excalidraw.png` referenced via `![](./file)`. Never inline HTML+CSS, MDX,
+   Mermaid-as-wireframe, or `.excalidraw.svg`.
+2. **≥ 2 named low-fi alternatives** (Option A / B / C), genuinely different, not cosmetic variants.
+3. **2 hi-fi `.excalidraw.png` finalists** carried from the strongest alternatives, each dropped
+   alternative given a one-line drop reason.
+4. **A named selection** — the chosen design named explicitly (e.g. "Selected: Option A — Ranked Table").
+5. **A rationale / decision record** — a short table: why the winner won, why each runner-up lost.
+6. **R5 grounding note** — survey `libs/web-ui` (component inventory + tokens + Storybook), the
+   target app shell, and sibling screens before drafting either tier; reuse existing components;
+   name any net-new component. Reference the `swe-developing-frontend-ui` skill.
+7. **R7 prior-art citation** — consult prior art on comparable tools via `web-research-maker` to
+   inform the divergent alternatives.
+
+### Delivery Steps to Emit (UI-bearing plans)
+
+Emit explicit, execution-grade delivery steps (in `delivery.md`) that produce the funnel artefacts,
+exactly as the specs/Gherkin delivery section does for feature changes:
+
+```markdown
+### UI Design Funnel Delivery
+
+- [ ] [AI] Survey existing UI (R5): read `libs/web-ui` component inventory + tokens + Storybook and
+      the target app shell — acceptance: net-new components named in `tech-docs.md`
+  - _Suggested executor: `web-research-maker` (prior art, R7) + `swe-developing-frontend-ui` skill_
+- [ ] [AI] Diverge: author ≥2 named low-fi ASCII alternatives for `<screen>` in `prd.md`
+      — acceptance: `grep -c "Option [AB]" prd.md` ≥ 2
+- [ ] [AI] Narrow: add 2 hi-fi `.excalidraw.png` finalists under the plan's `assets/` and reference
+      them in `prd.md` — acceptance: `grep -c "excalidraw.png" prd.md` ≥ 2
+- [ ] [AI] Select + Justify: add the named selection and the rationale table in `prd.md`
+      — acceptance: `grep -c "Selected:" prd.md` ≥ 1
+```
+
+`plan-checker` validates these artefacts via its **UI-design-funnel completeness** step (sibling to
+the specs/Gherkin Step 5j) and flags any missing artefact at HIGH; `plan-fixer` scaffolds the
+missing funnel sections.
 
 ## Plan Quality Standards
 

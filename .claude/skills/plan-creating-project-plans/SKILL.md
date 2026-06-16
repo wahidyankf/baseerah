@@ -44,6 +44,9 @@ tiebreaker for genuinely ambiguous decisions.
 - What is the scope? What is explicitly out of scope?
 - What are the constraints (performance, harness-neutrality, backwards compatibility)?
 - Are there design decision forks where the user has a preference?
+- **For UI-bearing plans only**: the UI-design-funnel questions — which low-fi alternatives, what
+  prior art, which selection + why (see
+  [the UI-design-funnel grilling questions](#design-funnel-grilling-questions-ui-bearing-plans)).
 
 **Post-write grill covers** (each as a structured multiple-choice question):
 
@@ -110,6 +113,59 @@ Prefer multiple focused diagrams over one overloaded diagram. Trivial/linear pla
 **Authoritative rule**: [repo-governance/conventions/structure/plans.md §Diagrams in Plans](../../../repo-governance/conventions/structure/plans.md#diagrams-in-plans)
 
 **Palette and accessibility**: use the `docs-creating-accessible-diagrams` skill for the verified WCAG-compliant hex codes and color-blind-friendly palette.
+
+## UI Mockups in UI-Bearing Plans — the UI-design-funnel (HARD RULE)
+
+A plan is **UI-bearing** when it adds or changes user-facing screens or components under `apps/` or
+`libs/` (e.g. `libs/web-ui`). Pure refactors, no-UI plans, and governance-only plans are exempt —
+exactly as with the specs/Gherkin binding.
+
+Every UI-bearing plan MUST document its draft UI through the **UI-design-funnel**
+(diverge → narrow → select → justify), authored per the
+[UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+The funnel produces four kinds of artefact, all visible in the plan (`prd.md` + the plan's
+`assets/`); no alternative is silently discarded:
+
+- **Both tiers per screen** — each screen gets a **low-fidelity** ASCII/Unicode wireframe in a
+  fenced code block AND a **high-fidelity** `.excalidraw.png` referenced via `![](./file)`, in
+  separate labelled subsections. Never use inline HTML+CSS, MDX, Mermaid-as-wireframe, or
+  `.excalidraw.svg` (GitHub strips/garbles them).
+- **Diverge** — **≥ 2 (aim for 3) genuinely different** named low-fi alternatives (Option A / B / C).
+- **Narrow** — the **2 strongest** carried forward as hi-fi `.excalidraw.png` finalists, with a
+  one-line drop reason for each alternative cut.
+- **Select** — the chosen design **named explicitly** (e.g. "Selected: Option A — Ranked Table").
+- **Justify** — a short **rationale / decision record** (a small table is enough): why the winner
+  won and why each runner-up lost.
+- **Grounding note (R5)** — before drafting either tier, survey the existing UI of the related
+  app(s) and lib(s) (`libs/web-ui` component inventory + tokens + Storybook, the target app's
+  shell, sibling screens; reference the `swe-developing-frontend-ui` skill) and reuse what already
+  exists; name any net-new component explicitly.
+- **Prior-art citation (R7)** — consult prior art on how comparable tools solve the screen via the
+  `web-research-maker` agent, so the divergent alternatives are informed rather than invented.
+
+`plan-maker` requires these artefacts and emits delivery steps that produce them; `plan-checker`
+flags any missing artefact at HIGH criticality (its UI-design-funnel completeness step, sibling to
+the specs/Gherkin Step 5j); `plan-fixer` scaffolds the missing funnel sections. This mirrors the
+**Specs & Gherkin completeness (both paths)** binding: a UI-bearing plan never passes quality gates
+without its design funnel.
+
+### Design-funnel grilling questions (UI-bearing plans)
+
+When grilling the user on a UI-bearing plan, the pre-write grill MUST cover the UI-design-funnel
+decisions as structured multiple-choice questions (each with 2-4 concrete options plus the two
+standing options — a free-form blank-state type and "chat about this"):
+
+- **Which alternatives?** Present 2-4 candidate low-fi layouts for the screen (e.g. Ranked Table /
+  Card Grid / Split Layout), each option stating its trade-off in one sentence, one marked
+  `(Recommended)`. The author must produce ≥2 genuinely different named alternatives.
+- **What prior art?** Present 2-4 ways to ground the alternatives (e.g. delegate a
+  `web-research-maker` survey of comparable tools / reuse a named sibling screen pattern / blend the
+  web-ui kit only), so the diverge stage is informed rather than invented.
+- **Which selection, and why?** Present the finalists as options (e.g. Option A / Option B) and ask
+  which design wins and the one-sentence rationale, so the Select + Justify stages are explicit.
+
+See [Grilling-With-Options Convention](../../../repo-governance/development/workflow/grilling-with-options.md)
+for the authoritative multiple-choice format.
 
 ## Plan Structure
 

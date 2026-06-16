@@ -112,7 +112,7 @@ Run plan validation to identify completeness, accuracy, and hallucination issues
 - **Args**: `scope: {input.scope}`
 - **Output**: `{audit-report-1}` - Initial audit report in `generated-reports/`
 
-**Validation scope** (per `plan-checker` Steps 0-7 + 5b/5c/5d/5e/5f/5g):
+**Validation scope** (per `plan-checker` Steps 0-7 + 5b/5c/5d/5e/5f/5g/5h/5i/5j/5k):
 
 - Structure (folder name, file layout, mandatory sections)
 - Requirements (BRD + PRD content placement, Gherkin)
@@ -128,6 +128,15 @@ Run plan validation to identify completeness, accuracy, and hallucination issues
 - **Harness-neutrality scan** (Step 5g — conditional: fires only when the plan touches agents,
   skills, rules, or `repo-governance/` paths) per the
   [Multi-Harness Binding Convention](../../conventions/structure/multi-harness-binding.md)
+- **Specs & Gherkin delivery coverage** (Step 5j — conditional: behavior-changing plans under
+  `apps/`/`libs/`/`specs/` must carry companion Gherkin + a `specs:coverage` gate) per the
+  [Feature Change Completeness Convention](../../development/quality/feature-change-completeness.md)
+- **UI-design-funnel completeness** (Step 5k — conditional: fires only on **UI-bearing** plans that
+  add/change user-facing screens or components under `apps/` or `libs/`; FLAGS at HIGH any missing
+  funnel artefact — ≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named
+  selection, a rationale, the grounding/prior-art note; pure-refactor / no-UI / governance-only
+  plans are exempt). The gate fails when a UI-bearing plan skips the funnel. Per the
+  [UI Mockups in Plan Docs convention](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 
 For external claims that are not already documented in the repo and require more than a
 single-shot URL fetch, `plan-checker` delegates research to
