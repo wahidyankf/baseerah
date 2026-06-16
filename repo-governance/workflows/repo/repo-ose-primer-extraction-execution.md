@@ -197,6 +197,6 @@ Scenario: Post-extraction verification fails
 ## Conventions Implemented/Respected
 
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `repo-ose-primer-extraction-execution` parses as scope=`repo`, qualifier=`ose-primer-extraction`, type=`execution`.
-- **[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md)**: Safety Rules 5 and 6 (ose-public direct-to-main, ose-primer PR-only) are invariant across this workflow.
+- **[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md)**: Safety Rules 5 and 6 (ose-public direct-to-main; ose-primer dual-mode delivery — worktree always, then draft PR or direct push to `main` per caller's choice, neither default) are invariant across this workflow.
 - **[Trunk-Based Development](../../development/workflow/trunk-based-development.md)**: Extraction commits land directly on `main`; no feature branch.
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: This workflow is referenced from the plan's `delivery.md`.

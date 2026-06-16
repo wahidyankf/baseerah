@@ -1,8 +1,8 @@
 ---
 name: repo-ose-primer-sync-execution
 title: "repo-ose-primer-sync-execution"
-goal: Orchestrate a single ongoing sync invocation (adopt or propagate, dry-run or apply) between `ose-public` and `ose-primer`, surfacing findings and optionally opening a draft PR against the primer.
-termination: "Sync report written; in apply mode, additionally a draft PR opened against `wahidyankf/ose-primer:main`."
+goal: Orchestrate a single ongoing sync invocation (adopt or propagate, dry-run or apply) between `ose-public` and `ose-primer`, surfacing findings and — in apply mode — delivering the primer mutation via the caller-chosen mode (draft PR or direct push to the primer's `main`).
+termination: "Sync report written; in apply mode, additionally the primer mutation delivered via the caller-chosen mode — a draft PR opened against `wahidyankf/ose-primer:main`, or a direct push to `ose-primer:main`."
 inputs:
   - name: direction
     type: enum
@@ -12,9 +12,14 @@ inputs:
   - name: mode
     type: enum
     values: [dry-run, apply]
-    description: Whether to only write a findings report (dry-run) or additionally create a branch + draft PR against the primer (apply). Apply is only valid when direction is `propagate`.
+    description: Whether to only write a findings report (dry-run) or additionally deliver the primer mutation (apply). Apply is only valid when direction is `propagate`, and requires a `delivery` choice.
     required: false
     default: dry-run
+  - name: delivery
+    type: enum
+    values: [pr, direct]
+    description: Required when `mode=apply`. `pr` creates a worktree + branch + draft PR against the primer; `direct` creates a worktree then pushes its commits straight to `ose-primer:main`. Neither is the default — the caller MUST choose per run.
+    required: false
   - name: clone-path
     type: string
     description: Optional override for the primer clone path. Falls back to `$OSE_PRIMER_CLONE`, then to the convention default `$HOME/ose-projects/ose-primer`.
@@ -30,14 +35,17 @@ outputs:
     description: The sync report (frontmatter + findings). Always written.
   - name: pr-url
     type: string
-    description: URL of the draft PR opened against the primer. Written only when `mode=apply` and findings are non-empty.
+    description: URL of the draft PR opened against the primer. Written only when `mode=apply`, `delivery=pr`, and findings are non-empty.
+  - name: pushed-sha
+    type: string
+    description: SHA(s) pushed directly to `ose-primer:main`. Written only when `mode=apply`, `delivery=direct`, and findings are non-empty.
 ---
 
 # `ose-primer` Sync Execution Workflow
 
-**Purpose**: Single-pass orchestration for ongoing sync between `ose-public` and `ose-primer`. Drives the appropriate sync-maker agent once per invocation, collects its report, and (in apply mode) surfaces the resulting PR URL.
+**Purpose**: Single-pass orchestration for ongoing sync between `ose-public` and `ose-primer`. Drives the appropriate sync-maker agent once per invocation, collects its report, and (in apply mode) surfaces the resulting PR URL or pushed SHA depending on the caller-chosen delivery mode.
 
-This is **not** an iterative quality gate like `repo-rules-quality-gate` — one invocation produces one report (and optionally one PR). Callers who need repeated invocations (for example, during Phase 7 catch-up in the plan's extraction workflow) re-enter this workflow explicitly.
+This is **not** an iterative quality gate like `repo-rules-quality-gate` — one invocation produces one report (and optionally one primer mutation delivered as a draft PR or a direct push to `main`). Callers who need repeated invocations (for example, during Phase 7 catch-up in the plan's extraction workflow) re-enter this workflow explicitly.
 
 ## Execution Mode
 
@@ -92,26 +100,24 @@ Validate environment before touching either repo.
 
 ### 4. Optional apply-mode actions (Sequential, Conditional)
 
-**Condition**: `mode=apply` AND report contains at least one finding AND all findings have been dry-run-reviewed.
+**Condition**: `mode=apply` AND a `delivery` mode (`pr` or `direct`) was supplied AND report contains at least one finding AND all findings have been dry-run-reviewed.
 
 **Actions** (handled inside the propagation-maker agent):
 
-- Create a worktree at `$OSE_PRIMER_CLONE/.claude/worktrees/sync-<ts>-<uuid>/`.
-- Check out a new branch `sync/<ts>-<uuid>` tracking `origin/main`.
+- Create a worktree at `$OSE_PRIMER_CLONE/.claude/worktrees/sync-<ts>-<uuid>/` (worktree isolation applies to BOTH delivery modes).
 - Apply the transformed files (`identity` or `strip-product-sections` per classifier row).
 - Commit inside the worktree with a conventional-commits message group-by-direction.
-- Push the branch to `origin`.
-- Open a draft PR via `gh pr create --draft --base main --head <branch> --title "..." --body "..."`.
-- Record the PR URL in the report.
+- **`delivery=pr`**: check out a new branch `sync/<ts>-<uuid>` tracking `origin/main`, push the branch to `origin`, open a draft PR via `gh pr create --draft --base main --head <branch> --title "..." --body "..."`, and record the PR URL in the report.
+- **`delivery=direct`**: push the worktree commits straight to the primer's `main` via `git push origin HEAD:main`, and record the pushed SHA(s) in the report.
 
-**On failure**: Leave the worktree in place (for debugging), record the error in the report, return without merging.
+**On failure**: Leave the worktree in place (for debugging), record the error in the report, return.
 
 ### 5. Post-flight (Sequential)
 
 **Actions**:
 
-- Emit a summary line indicating the report path and (if apply) PR URL.
-- Remind the operator to review the PR in the primer's GitHub UI before merging.
+- Emit a summary line indicating the report path and (if apply) the PR URL or pushed SHA.
+- If `delivery=pr`, remind the operator to review the PR in the primer's GitHub UI before merging.
 
 ## Gherkin Success Criteria
 
@@ -127,16 +133,37 @@ Scenario: Adopt-direction dry-run completes cleanly
   And no file outside generated-reports/ is modified in ose-public
   And no file is modified in the primer clone
 
-Scenario: Propagate-direction apply-mode opens a PR
+Scenario: Propagate-direction apply-mode with delivery=pr opens a PR
   Given the primer clone passes pre-flight
   And direction is "propagate"
   And mode is "apply"
+  And delivery is "pr"
   And the dry-run report has at least one finding
   When the workflow runs
   Then a git worktree is created at $OSE_PRIMER_CLONE/.claude/worktrees/sync-<ts>-<uuid>/
   And a branch named sync/<ts>-<uuid> is pushed to origin
   And a draft PR is opened against wahidyankf/ose-primer:main
   And the report records the PR URL
+
+Scenario: Propagate-direction apply-mode with delivery=direct pushes to main
+  Given the primer clone passes pre-flight
+  And direction is "propagate"
+  And mode is "apply"
+  And delivery is "direct"
+  And the dry-run report has at least one finding
+  When the workflow runs
+  Then a git worktree is created at $OSE_PRIMER_CLONE/.claude/worktrees/sync-<ts>-<uuid>/
+  And the worktree commits are pushed directly to ose-primer:main
+  And the report records the pushed SHA
+
+Scenario: Apply-mode without an explicit delivery choice aborts
+  Given the primer clone passes pre-flight
+  And direction is "propagate"
+  And mode is "apply"
+  And no delivery mode is supplied
+  When the workflow runs
+  Then the workflow aborts before mutating the primer
+  And the report notes that an explicit delivery=pr or delivery=direct is required
 
 Scenario: Dirty clone aborts pre-flight
   Given the primer clone's working tree contains uncommitted changes
@@ -166,5 +193,5 @@ Scenario: Dirty clone aborts pre-flight
 
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `repo-ose-primer-sync-execution` parses as scope=`repo`, qualifier=`ose-primer-sync`, type=`execution`.
 - **[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md)**: Classifier + safety invariants consumed by the invoked agents.
-- **[Trunk-Based Development](../../development/workflow/trunk-based-development.md)**: Sync reports in `ose-public` commit direct-to-main; primer mutations follow the primer-PR-only invariant.
+- **[Trunk-Based Development](../../development/workflow/trunk-based-development.md)**: Sync reports in `ose-public` commit direct-to-main; primer mutations follow the primer dual-mode delivery invariant (worktree always; draft PR or direct push to `main` per caller's choice, neither default).
 - **[Linking Convention](../../conventions/formatting/linking.md)**: Cross-references use GitHub-compatible markdown with `.md` extensions.

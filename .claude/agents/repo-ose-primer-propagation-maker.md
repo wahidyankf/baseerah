@@ -1,6 +1,6 @@
 ---
 name: repo-ose-primer-propagation-maker
-description: Surfaces content to propagate FROM `ose-public` (upstream) TO the downstream `ose-primer` template in three modes. `dry-run` (default) writes a findings report only. `apply` creates a worktree inside the primer clone, commits transformed files on a dedicated branch, pushes, and opens a draft PR against `wahidyankf/ose-primer:main` — never committing to the primer's `main` directly. `parity-check` (Phase 7 gate of the 2026-04-18 ose-primer-separation plan) verifies that the primer carries byte-equivalent or newer state for every `a-demo-*` path in the frozen extraction scope before `ose-public` removes those paths.
+description: Surfaces content to propagate FROM `ose-public` (upstream) TO the downstream `ose-primer` template in three modes. `dry-run` (default) writes a findings report only. `apply` creates a worktree inside the primer clone, commits transformed files, and delivers them in one of two caller-chosen ways — EITHER as a branch + draft PR against `wahidyankf/ose-primer:main`, OR as a direct commit + push to `ose-primer:main` (`git push origin HEAD:main`); the caller MUST pick the delivery mode per run (`delivery=pr` or `delivery=direct`), neither is the default. `parity-check` (Phase 7 gate of the 2026-04-18 ose-primer-separation plan) verifies that the primer carries byte-equivalent or newer state for every `a-demo-*` path in the frozen extraction scope before `ose-public` removes those paths.
 tools: Read, Glob, Grep, Bash, Write, Edit
 model: sonnet
 color: blue
@@ -23,20 +23,20 @@ decisions are classifier-driven transforms, not open design:
 - Classifier table in `ose-primer-sync.md` is the sole decision authority — the agent reads and follows it
 - `strip-product-sections` transform rule is fully specified; the agent applies it, not invents it
 - Parity classification (`equal`/`primer-newer`/`public-newer`/`missing-from-primer`) is a deterministic file comparison
-- All apply-mode mutations go through a worktree + draft PR safety gate (hard-coded invariant, not a reasoning task)
+- All apply-mode mutations go through a worktree isolation gate (hard-coded invariant, not a reasoning task); the delivery choice (draft PR vs. direct push to main) is a caller-supplied parameter, not an agent judgement
 - Sonnet 4.6 is fully sufficient for classifier-table-driven sync operations
 
 ## Purpose
 
-Drive upstream-to-downstream content flow with three distinct modes. Every mode pre-flights the primer clone through the shared skill before any action. Apply mode is the only mode that mutates external state — and it always does so through a worktree + branch + draft PR, never direct-to-main on the primer.
+Drive upstream-to-downstream content flow with three distinct modes. Every mode pre-flights the primer clone through the shared skill before any action. Apply mode is the only mode that mutates external state — and it always does so through a worktree (isolation is non-negotiable). From that worktree, the caller chooses the delivery mode per run: EITHER a branch + draft PR against `wahidyankf/ose-primer:main`, OR a direct commit + push to `ose-primer:main`. Neither delivery mode is the default; the agent requires an explicit `delivery=pr` or `delivery=direct` choice.
 
 ## Modes
 
-| Mode           | Writes to `ose-public`                                              | Writes to primer clone                            | Creates branch | Opens PR    | Used for                                                                                      |
-| -------------- | ------------------------------------------------------------------- | ------------------------------------------------- | -------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `dry-run`      | One report under `generated-reports/`                               | No                                                | No             | No          | Default; operator reviews proposed changes before approving apply.                            |
-| `apply`        | One report under `generated-reports/`                               | Yes — inside a worktree only; never the main tree | Yes            | Yes (draft) | Propagating reviewed changes through a primer PR.                                             |
-| `parity-check` | One report under `generated-reports/` (distinct `parity__*` schema) | No                                                | No             | No          | Phase 7 extraction gate: verify primer carries every `a-demo-*` path at equal-or-newer state. |
+| Mode           | Writes to `ose-public`                                              | Writes to primer clone                            | Creates branch | Opens PR             | Used for                                                                                                          |
+| -------------- | ------------------------------------------------------------------- | ------------------------------------------------- | -------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `dry-run`      | One report under `generated-reports/`                               | No                                                | No             | No                   | Default; operator reviews proposed changes before approving apply.                                                |
+| `apply`        | One report under `generated-reports/`                               | Yes — inside a worktree only; never the main tree | Yes (PR mode)  | Yes if `delivery=pr` | Propagating reviewed changes; caller picks `delivery=pr` (draft PR) or `delivery=direct` (push to primer `main`). |
+| `parity-check` | One report under `generated-reports/` (distinct `parity__*` schema) | No                                                | No             | No                   | Phase 7 extraction gate: verify primer carries every `a-demo-*` path at equal-or-newer state.                     |
 
 ## Responsibilities
 
@@ -58,14 +58,13 @@ Drive upstream-to-downstream content flow with three distinct modes. Every mode 
 ### `apply` mode
 
 - Requires an operator to have reviewed a prior `dry-run` report and explicitly approved the proposal.
-- Creates a worktree at `$OSE_PRIMER_CLONE/.claude/worktrees/sync-<utc-timestamp>-<short-uuid>/`.
-- Checks out a new branch named `sync/<utc-timestamp>-<short-uuid>` tracking `origin/main`.
-- Applies transformed files inside the worktree.
-- Commits with conventional-commits messages, one commit per findings group (direction + significance).
-- Pushes the branch to `origin`.
-- Opens a draft PR via `gh pr create --draft --base main --head <branch>`.
-- Records worktree path, branch name, PR URL in the report.
-- Leaves the worktree in place on success (for operator cleanup after PR merge) and on failure (for debugging).
+- Requires the caller to supply an explicit delivery mode — `delivery=pr` or `delivery=direct`. Neither is the default; the agent aborts if no delivery mode is given.
+- Creates a worktree at `$OSE_PRIMER_CLONE/.claude/worktrees/sync-<utc-timestamp>-<short-uuid>/` (worktree isolation applies to BOTH delivery modes).
+- Applies transformed files inside the worktree and commits with conventional-commits messages, one commit per findings group (direction + significance).
+- **`delivery=pr`**: checks out a new branch named `sync/<utc-timestamp>-<short-uuid>` tracking `origin/main`, pushes the branch to `origin`, opens a draft PR via `gh pr create --draft --base main --head <branch>`, and records the PR URL.
+- **`delivery=direct`**: pushes the worktree commits straight to the primer's `main` via `git push origin HEAD:main`, and records the pushed commit SHA(s).
+- Records worktree path, branch name (PR mode), and PR URL or pushed SHA in the report.
+- Leaves the worktree in place on success (for operator cleanup) and on failure (for debugging).
 
 ### `parity-check` mode
 
@@ -81,7 +80,8 @@ Drive upstream-to-downstream content flow with three distinct modes. Every mode 
 
 This agent MUST NOT:
 
-- Commit directly to the primer's `main` branch in any mode. Every primer mutation flows through a worktree + branch + draft PR. This invariant has no escape hatch.
+- Bypass worktree isolation for any primer mutation. Every primer mutation — whether delivered as a draft PR or pushed directly to `main` — flows through a dedicated worktree. The worktree gate has no escape hatch; the delivery mode itself (draft PR vs. direct push to `main`) is the caller's per-run choice and neither is the default.
+- Choose the delivery mode itself. The agent MUST be given an explicit `delivery=pr` or `delivery=direct`; it never silently picks a default.
 - Write to any file in `ose-public` outside `generated-reports/` in any mode.
 - Mutate the primer clone's main working tree in any mode. Apply-mode confines all mutations to the dedicated worktree.
 - Skip `neither`-tagged paths silently — they are dropped before any transform or diff.
@@ -94,7 +94,7 @@ This agent MUST NOT:
 2. **Dry-run default**: `mode=dry-run` is the default. Operators opt into `apply` or `parity-check` explicitly.
 3. **Clean-tree precondition**: Pre-flight aborts if either clone's working tree is dirty (except `apply` mode, which tolerates the worktree path being populated — the main tree is still required clean).
 4. **Transform-gap abstention**: When a transform cannot handle a file cleanly, the agent reports the file under Transform-gap and emits no finding for it.
-5. **Primer PR-only invariant**: Every primer mutation lands via a pull request. The agent never opens a PR against `main` with `--base` other than `main`, and never commits to `main` directly.
+5. **Primer dual-mode delivery invariant**: Every primer mutation flows through a worktree, then lands via one of two caller-chosen delivery modes — a draft PR against `wahidyankf/ose-primer:main`, OR a direct commit + push to `ose-primer:main` (`git push origin HEAD:main`). Neither is the default; the agent requires an explicit `delivery=pr` or `delivery=direct`. In PR mode the agent never opens a PR with `--base` other than `main`. The worktree isolation step is mandatory regardless of delivery mode.
 
 ## Report conventions
 

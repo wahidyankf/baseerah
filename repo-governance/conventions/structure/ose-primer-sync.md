@@ -39,7 +39,7 @@ This convention does NOT:
 
 - Define release cadence (syncs happen on demand, not on a schedule).
 - Control how `ose-primer` itself is cloned, built, or deployed.
-- Authorise any direct commit to `ose-primer`; every mutation is gated through a pull request (see Safety Invariants).
+- Mandate a single delivery mode for mutations reaching `ose-primer`; each apply run is delivered EITHER as a draft pull request OR as a direct commit + push to the primer's `main`, with the caller choosing the mode per run (neither is the default — see Safety Invariants).
 
 ## The two repositories
 
@@ -214,7 +214,7 @@ These rules are absolute; no agent or operator may bypass them:
 3. **Clean-tree precondition**: Pre-flight aborts if either `ose-public`'s working tree or the primer clone's main working tree is dirty.
 4. **Transform-gap abstention**: When a `bidirectional` file needs a transform the skill does not implement, the agent reports the file and abstains — it does not guess.
 5. **`ose-public` → direct-to-main**: Sync-related commits in `ose-public` land directly on `main` per Trunk-Based Development. No feature branch, no PR.
-6. **`ose-primer` → PR-only**: Every mutation reaching `ose-primer` MUST flow through a worktree + branch + draft pull request. Direct commits to the primer's `main` are prohibited in every mode. This invariant has no escape hatch.
+6. **`ose-primer` → dual-mode delivery, caller's choice**: Every mutation reaching `ose-primer` MUST flow through a worktree (isolation is unchanged and non-negotiable). From that worktree, the apply run is delivered EITHER as (a) a branch + **draft pull request** against `wahidyankf/ose-primer:main`, OR (b) a **direct commit + push to `ose-primer:main`** (`git push origin HEAD:main`). The caller MUST choose the delivery mode for each apply run — **NEITHER is the default**; the agent requires an explicit delivery choice (e.g. `delivery=pr` or `delivery=direct`). The only difference between the two modes is whether the worktree's work lands as a draft PR or is pushed straight to `main`.
 
 ## Relationship to other conventions
 

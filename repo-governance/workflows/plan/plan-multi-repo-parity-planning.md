@@ -160,11 +160,12 @@ gh pr create --title "plan: <objective> parity" --body "..." --draft
 Use this mode when a formal review step is wanted before plans land on `main`.
 
 **Note on ose-primer**: The
-[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md) defaults propagation
-to PRs (Safety Invariant 6: every mutation reaching `ose-primer` must flow through a worktree +
-branch + draft PR). When the selected mode is `main-to-main` or `worktree-to-main` this is a
-documented, invoker-approved deviation from that default. The grilling in Step 3 MUST surface this
-conflict explicitly and record the invoker's decision before proceeding.
+[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md) allows propagation to
+`ose-primer` to be delivered EITHER as a draft PR OR as a direct push to `ose-primer:main`
+(Safety Invariant 6: every mutation must flow through a worktree, but the delivery mode is the
+caller's per-run choice — neither is the default). Selecting `main-to-main` or `worktree-to-main`
+is therefore a first-class delivery choice, not a deviation. The grilling in Step 3 MUST surface
+the delivery-mode choice explicitly and record the invoker's decision before proceeding.
 
 ## Steps
 
@@ -213,8 +214,9 @@ Meta-dimensions to include alongside technical dimensions:
 - **Rationale doc location**: where each repo's `docs/explanation/<objective-slug>-parity-decisions.md`
   (or closest equivalent) will be created (app-scoped `apps/<app>/docs/`, lib-scoped
   `libs/<lib>/docs/`, repo governance tree, etc.)
-- **ose-primer sync conflict**: whether the selected mode deviates from the primer's PR-only
-  default (applies when ose-primer is in the parity set and mode is a main-push mode)
+- **ose-primer delivery mode**: which delivery mode (draft PR vs. direct push to `ose-primer:main`)
+  the selected parity mode implies for the primer — both are first-class, caller-chosen, neither
+  default (applies when ose-primer is in the parity set)
 - **Repo-specific constraints**: any repo constraint (private visibility, self-hosted CI runner,
   dual-CLI parity guard, missing toolchain) that forces a per-repo deviation
 
@@ -258,10 +260,12 @@ as the research-needed flag (yes / no). This flag governs whether Step 4 runs or
 
 **Mandatory meta-questions** (surface these explicitly regardless of mode):
 
-1. If ose-primer is in the parity set and mode is `main-to-main` or `worktree-to-main`:
-   "The ose-primer sync convention requires PRs for all mutations to ose-primer. The selected
-   mode bypasses this. Please confirm the deviation or switch to `worktree-to-pr`."
-   Options: (A) Accept deviation — record justification. (B) Switch mode to `worktree-to-pr`.
+1. If ose-primer is in the parity set: "The ose-primer sync convention allows EITHER a draft PR
+   OR a direct push to `ose-primer:main` for every mutation — neither is the default, so a
+   delivery mode must be chosen explicitly. The selected parity mode implies
+   {draft PR | direct push to main}. Please confirm the delivery mode for ose-primer."
+   Options: (A) Direct push to `main` (`main-to-main` / `worktree-to-main`). (B) Draft PR
+   (`worktree-to-pr`). Record the chosen mode.
 2. Rationale doc location per repo (where does `<objective-slug>-parity-decisions.md` live in
    each repo?).
 3. Any repo-specific constraint flagged in Step 2 that forces a deviation.
@@ -617,8 +621,9 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Lowercase kebab-case
   for all plan files and rationale docs created by this workflow.
 - **[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md)**: When
-  ose-primer is in the parity set and mode is a main-push mode, the deviation from the PR-only
-  default is surfaced in grilling and requires explicit invoker approval.
+  ose-primer is in the parity set, the delivery mode (draft PR vs. direct push to
+  `ose-primer:main` — both first-class, neither default) is surfaced in grilling and requires an
+  explicit invoker choice.
 - **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: No
   system secret enters any plan file or rationale doc created by this workflow.
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:

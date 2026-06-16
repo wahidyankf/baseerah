@@ -39,7 +39,7 @@ Summary:
 - Clone path: resolved from `OSE_PRIMER_CLONE`; convention default `~/ose-projects/ose-primer`.
 - Pre-flight: env-var check, `.git` present, origin remote URL verified, `fetch --prune`, clean-tree check, main-branch check.
 - Apply mode: works inside a git worktree at `$OSE_PRIMER_CLONE/.claude/worktrees/sync-<ts>-<uuid>/` on branch `sync/<ts>-<uuid>`. Never mutates the primer's main working tree.
-- Every primer mutation reaches GitHub through a draft pull request — no escape hatch.
+- Every primer mutation flows through a worktree (no escape hatch on isolation), then reaches GitHub via one of two caller-chosen delivery modes — a draft pull request OR a direct push to `ose-primer:main`. Neither is the default; the caller picks `delivery=pr` or `delivery=direct` per run.
 
 ## Transform implementations
 
@@ -100,15 +100,15 @@ Scope covers all 17 `apps/a-demo-*` directories plus `specs/apps/a-demo/`. Froze
 - **Mode**: `dry-run` (default), `apply`, `parity-check`.
 - **Inputs**:
   - `dry-run`: optional scope filter.
-  - `apply`: operator's explicit approval of a prior `dry-run` proposal.
+  - `apply`: operator's explicit approval of a prior `dry-run` proposal, plus an explicit delivery mode (`delivery=pr` or `delivery=direct` — neither is the default).
   - `parity-check`: reads `reference/extraction-scope.md` path list.
 - **Writes**:
   - `dry-run`/`apply`: `generated-reports/repo-ose-primer-propagation-maker__*__report.md`.
-  - `apply` additionally: git worktree under `$OSE_PRIMER_CLONE/.claude/worktrees/`, branch + draft PR.
+  - `apply` additionally: git worktree under `$OSE_PRIMER_CLONE/.claude/worktrees/`, then EITHER a branch + draft PR (`delivery=pr`) OR a direct push to the primer's `main` (`delivery=direct`, `git push origin HEAD:main`).
   - `parity-check`: `generated-reports/parity__*__report.md`.
 - **Side effects**:
   - `dry-run`, `parity-check`: none outside the report file.
-  - `apply`: mutates the primer worktree (not main), pushes branch, opens draft PR.
+  - `apply`: mutates the primer worktree (never the main working tree), then either pushes a branch and opens a draft PR, or pushes the worktree commits straight to `main` — caller's per-run choice.
 
 ## Safety checklist (every mode)
 

@@ -584,7 +584,7 @@ The `open-sharia-enterprise` ecosystem consists of three independent sibling rep
 - [`ose-primer`](https://github.com/wahidyankf/ose-primer) — downstream public template packaging the scaffolding layer (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) for teams building their own Sharia-compliant enterprise products. MIT licensed.
 - [`ose-infra`](https://github.com/wahidyankf/ose-infra) — private infrastructure repository. Hosts the self-hosted GitHub Actions runner stack, `coralpolyp` app, and infrastructure-only governance. Proprietary; not publicly accessible.
 
-`ose-public` is the **upstream source of truth** for scaffolding. Content flows bidirectionally between `ose-public` and `ose-primer` via `repo-ose-primer-propagation-maker` (upstream → template, always via PR) and `repo-ose-primer-adoption-maker` (downstream → upstream, direct commits to `main`). `ose-infra` does not participate in the sync loop.
+`ose-public` is the **upstream source of truth** for scaffolding. Content flows bidirectionally between `ose-public` and `ose-primer` via `repo-ose-primer-propagation-maker` (upstream → template, via draft PR or direct push to main — caller's choice per run, neither default) and `repo-ose-primer-adoption-maker` (downstream → upstream, direct commits to `main`). `ose-infra` does not participate in the sync loop.
 
 See: [Related Repositories reference](./docs/reference/related-repositories.md), [ose-primer sync convention](./repo-governance/conventions/structure/ose-primer-sync.md).
 
