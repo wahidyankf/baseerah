@@ -10,25 +10,23 @@ states the requirements.
 
 ## Design process — the funnel
 
-A UI-bearing plan follows a **diverge → narrow → select → justify** process. See
+A UI-bearing plan follows a **diverge → narrow → select → justify** process — entered once goals are
+clear (BRD/PRD) and the existing UI is surveyed (R5). See
 [tech-docs.md §Design funnel](./tech-docs.md) for the full mechanics. The summary:
 
 ```mermaid
-%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Gray #808080
+%% Color Palette: Orange #DE8F05, Teal #029E73
 %% Funnel stages: DIVERGE (low-fi) → NARROW (hi-fi shortlist) → SELECT → JUSTIFY
 flowchart LR
-    A["Goals clear<br/>BRD/PRD + UI surveyed R5"]:::blue
     B["DIVERGE<br/>≥2 named low-fi<br/>ASCII alternatives"]:::orange
     C["NARROW<br/>2 hi-fi .excalidraw.png<br/>finalists"]:::orange
     D["SELECT<br/>Name the winner<br/>e.g. Ranked Table"]:::teal
     E["JUSTIFY<br/>Rationale / decision record<br/>why winner won; rest lost"]:::teal
 
-    A --> B
     B --> C
     C --> D
     D --> E
 
-    classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef orange fill:#DE8F05,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
 ```
