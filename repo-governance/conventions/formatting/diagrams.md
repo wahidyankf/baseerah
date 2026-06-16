@@ -1930,7 +1930,7 @@ This section governs how draft UI screens are represented inside plan documents 
 `plans/`). It is part of the diagrams convention because plan UI mockups are a third visualization
 category alongside Mermaid diagrams and ASCII art, and keeping them here avoids convention sprawl.
 
-Originating plan: [`plans/in-progress/plan-doc-ui-mockup-convention/`](../../../plans/in-progress/plan-doc-ui-mockup-convention/)
+Originating plan: [`plans/done/2026-06-16__plan-doc-ui-mockup-convention/`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/)
 
 ### Principles in Practice (UI Mockups)
 
@@ -1958,7 +1958,7 @@ are exempt.
 
 The following rendering-support matrix summarises the candidate formats evaluated during the
 research that produced this section (research in
-[tech-docs.md](../../../plans/in-progress/plan-doc-ui-mockup-convention/tech-docs.md)):
+[tech-docs.md](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/tech-docs.md)):
 
 | Format                           | VSCode built-in | VSCode + extension      | GitHub.com              | Diffable      | Lint-safe |
 | -------------------------------- | --------------- | ----------------------- | ----------------------- | ------------- | --------- |
@@ -2165,16 +2165,16 @@ alternatives are informed by real-world patterns rather than invented from a bla
 ### Worked Example
 
 The full funnel is demonstrated for the Salary Savings Calculator compare-all screen in
-[`plans/in-progress/plan-doc-ui-mockup-convention/assets/`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/):
+[`plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/):
 
 - Stage 1 diverge (low-fi): three named alternatives in
-  [`example-low-fi-wireframe.md`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/example-low-fi-wireframe.md)
+  [`example-low-fi-wireframe.md`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/example-low-fi-wireframe.md)
 - Stage 2 narrow (hi-fi finalists):
-  [`example-hi-fi-option-a-ranked-table.png`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/example-hi-fi-option-a-ranked-table.png)
+  [`example-hi-fi-option-a-ranked-table.png`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/example-hi-fi-option-a-ranked-table.png)
   and
-  [`example-hi-fi-option-c-split.png`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/example-hi-fi-option-c-split.png)
+  [`example-hi-fi-option-c-split.png`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/example-hi-fi-option-c-split.png)
 - Stages 3–4 select + justify: named selection (Option A) and the rationale table in
-  [`assets/README.md`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/README.md)
+  [`assets/README.md`](../../../plans/done/2026-06-16__plan-doc-ui-mockup-convention/assets/README.md)
 
 ## Related Documentation
 
