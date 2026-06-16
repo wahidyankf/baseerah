@@ -21,6 +21,8 @@ backend — that proves out a reusable `tools/` pattern for future calculators.
 
 - **G1**: Visitors can compute monthly savings for a salary across tech-hub cities in both en and id.
 - **G2**: Savings shown as percentage **and** local-currency amount, per the request.
+- **G2b**: Cost basis adjustable by household type (single → married + 3 kids), area (city center vs
+  rural), and — for households with kids — public vs private school (median cost).
 - **G3**: Tool is fully client-side and deterministic (static dataset), no new infra or API keys.
 - **G4**: Calculation core has dedicated unit tests; page meets WCAG AA and is responsive.
 
@@ -30,22 +32,26 @@ test coverage meets the app threshold; fe-e2e smoke test passes in CI.
 ## Constraints
 
 - Static curated dataset only; values are estimates with a recorded snapshot date and a visible
-  "estimates only" disclaimer.
+  "estimates only" disclaimer. Household and area adjustments use shared multiplier tables (not
+  per-city data); school cost is a per-city public/private median.
 - **Israeli cities are deliberately excluded** from the dataset (explicit product constraint). This
   is a country-level choice about the state of Israel and its political stance, **not** a choice
   about any ethnic, racial, or religious group. The exclusion targets the country and its political
   stance only.
-- Must follow existing `[locale]` routing and i18n; no new dependencies beyond what the app ships.
+- Must follow existing `[locale]` routing and i18n; no new third-party dependencies. UI reuses the
+  shared `web-ui` kit; the one missing primitive (a `Table` for the comparison view) is added to
+  `libs/web-ui` rather than hand-rolled in the app.
 - Bilingual parity (en/id) is mandatory.
 
 ## Risks & Mitigations
 
-| Risk                                          | Impact | Mitigation                                                        |
-| --------------------------------------------- | ------ | ----------------------------------------------------------------- |
-| Cost-of-living / FX figures drift or mislead  | Med    | Snapshot date + "estimates only" disclaimer; centralize in data   |
-| Scope creep (taxes, live FX, charts)          | Med    | Explicitly deferred in PRD out-of-scope; iterate later            |
-| First interactive page diverges from patterns | Low    | Reuse Tailwind + i18n conventions; calc logic isolated and tested |
-| Negative savings (cost > salary) confuses UI  | Low    | Define and test the deficit case; show negative clearly           |
+| Risk                                                     | Impact | Mitigation                                                                                             |
+| -------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
+| Cost-of-living / FX figures drift or mislead             | Med    | Snapshot date + "estimates only" disclaimer; centralize in data                                        |
+| Scope creep (taxes, live FX, charts)                     | Med    | Explicitly deferred in PRD out-of-scope; iterate later                                                 |
+| First interactive page diverges from patterns            | Low    | Reuse Tailwind + i18n conventions; calc logic isolated and tested                                      |
+| Negative savings (cost > salary) confuses UI             | Low    | Define and test the deficit case; show negative clearly                                                |
+| Household/area multipliers + school medians oversimplify | Med    | Disclaimer names each approximation; indicative values sourced in Phase 1; per-city overrides deferred |
 
 ## Out of Scope
 
