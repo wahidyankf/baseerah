@@ -1,6 +1,6 @@
 ---
 title: "Feature Change Completeness Convention"
-description: Practice requiring all related specs, contracts, tests, and documentation to be updated as part of any feature change
+description: Practice requiring all related specs, contracts, tests, and documentation to be updated as part of any feature change -- binding both the direct-code path and the plan path
 category: explanation
 subcategory: development
 tags:
@@ -51,6 +51,16 @@ The related artifacts are:
 4. **Documentation** -- READMEs, docs/, repo-governance/, and inline documentation
 
 A feature change is not complete until all four categories are addressed.
+
+## Two Paths: With a Plan and Without a Plan
+
+This convention binds **both** ways a behavior change reaches `apps/`, `libs/`, or `specs/` -- whether or not a planning document mediates it:
+
+1. **Direct change (no plan doc)** -- When application or library code is edited directly, without a plan, the companion `specs/` Gherkin (and the contracts, tests, and documentation named below) MUST be added or updated **in the same commit or PR**. The `specs:coverage` Nx target and the `swe-code-checker` agent enforce this path.
+
+2. **Planned change (plan doc)** -- When the work is mediated by a plan under `plans/`, the plan files are not themselves implementation artifacts, but any plan whose **scope creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/`** MUST carry explicit delivery-checklist steps that create or update the corresponding `specs/` Gherkin `.feature` files and run `specs:coverage`. The `plan-maker` agent emits these steps; the `plan-checker` agent flags their absence. The specs/Gherkin work is then executed -- and verified by path 1 -- when the plan runs.
+
+The end state is identical on both paths: code under `apps/`/`libs/` never lands without its companion `specs/` Gherkin. The plan path simply moves the obligation earlier, into planning, so missing specs are never discovered late.
 
 ## What Must Be Updated
 
@@ -184,7 +194,7 @@ This convention applies to:
 
 It does not apply to:
 
-- `plans/` -- planning documents describe intentions, not implementation artifacts
+- `plans/` -- plan documents are intentions, not implementation artifacts, so this convention does not treat the plan files themselves as artifacts to keep in sync. **However**, per the [Two Paths](#two-paths-with-a-plan-and-without-a-plan) section above, a plan whose scope touches `apps/`, `libs/`, or `specs/` MUST plan the companion specs/Gherkin work in its delivery checklist; a plan that omits those steps is incomplete (enforced by `plan-maker` and `plan-checker`).
 - `generated-contracts/` -- auto-generated; update the source spec instead
 - Governance documents that are not tied to specific features
 

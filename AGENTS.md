@@ -50,30 +50,7 @@ Polyglot demo apps (11 backend implementations + 3 frontends + 1 fullstack) were
 
 ```
 ose-public/
-├── apps/                     # Deployable applications (Nx)
-│   ├── ose-www/              # OSE Platform public website (Next.js 16, port 3100)
-│   ├── ose-www-be-e2e/       # Playwright BE E2E tests for ose-www tRPC API
-│   ├── ose-www-fe-e2e/       # Playwright FE E2E tests for ose-www UI
-│   ├── ose-be/               # OSE Application F#/Giraffe REST API backend (port 8302)
-│   ├── ose-be-e2e/           # Playwright BE E2E tests for ose-be
-│   ├── ose-app-web/          # OSE Application Next.js 16 frontend (app.oseplatform.com, port 3300)
-│   ├── ose-app-web-e2e/      # Playwright FE E2E tests for ose-app-web
-│   ├── ayokoding-www/        # AyoKoding educational website (Next.js 16, port 3101)
-│   ├── ayokoding-www-be-e2e/ # Playwright BE E2E tests for ayokoding-www tRPC API
-│   ├── ayokoding-www-fe-e2e/ # Playwright FE E2E tests for ayokoding-www UI
-│   ├── ayokoding-cli/        # Content link validation CLI (Rust)
-│   ├── rhino-cli/            # Repository management CLI (Rust)
-│   ├── ose-cli/              # OSE Platform site CLI (Rust)
-│   ├── crane-cli/            # PDF-to-Markdown pipeline CLI (F#)
-│   ├── organiclever-www/     # OrganicLever marketing website (Next.js 16, port 3200)
-│   ├── organiclever-www-be-e2e/ # Playwright BE E2E slot for organiclever-www (placeholder)
-│   ├── organiclever-www-fe-e2e/ # Playwright FE E2E tests for organiclever-www
-│   ├── organiclever-app-web/ # OrganicLever app frontend (Next.js 16, port 3202)
-│   ├── organiclever-app-web-e2e/ # Playwright FE E2E tests for organiclever-app-web
-│   ├── organiclever-be/      # OrganicLever F#/Giraffe REST API backend (port 8202)
-│   ├── organiclever-be-e2e/  # Playwright BE E2E tests for organiclever-be
-│   ├── wahidyankf-www/       # Wahidyan Kresna Fridayoka portfolio (Next.js 16, port 3201)
-│   ├── wahidyankf-www-fe-e2e/ # Playwright-BDD E2E tests for wahidyankf-www
+├── apps/                     # Deployable applications (Nx) — full list in "Current Apps" above
 ├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
 │   ├── rust-commons/         # Shared Rust utilities (link-checking, HTTP)
@@ -366,19 +343,30 @@ Write the failing test first, then make it pass, then refactor — Red → Green
 
 **See**: [repo-governance/development/workflow/test-driven-development.md](./repo-governance/development/workflow/test-driven-development.md)
 
+### Specs & Gherkin Completeness (Both Paths)
+
+Code under `apps/`/`libs/` never lands without its companion `specs/` Gherkin — **both** when behavior is changed directly and when a plan mediates it:
+
+- **Direct change (no plan)**: edit app/lib code and add/update the matching `specs/apps/**` or `specs/libs/**` Gherkin in the **same commit/PR**. Enforced by `specs:coverage` + `swe-code-checker` (Step 6.6).
+- **Planned change**: any plan touching `apps/`/`libs/`/`specs/` MUST carry delivery steps that add/update the companion Gherkin and run `specs:coverage`. `plan-maker` emits them; `plan-checker` (Step 5j) flags absence.
+
+Pure refactors, no-behavior-change bumps, and docs/governance-only changes are exempt.
+
+**See**: [repo-governance/development/quality/feature-change-completeness.md](./repo-governance/development/quality/feature-change-completeness.md)
+
 ### Reproducible Environments
 
 Volta for Node.js/npm pinning, package-lock.json, .env.example.
 
-**Hard iron rule — no secrets in committed files**: Never commit system secrets (keys, passwords, tokens, privileged usernames, certificates, connection strings, and similar) to ANY git-tracked file; git history is permanent. Real values go in uncommitted `.env*` files (except `.env.example`) or other gitignored files; committed files use placeholders or env-var references only. Binds agents and humans alike. See [Secrets and Env Standards](./repo-governance/conventions/security/secrets-and-env-standards.md).
+**Hard iron rule — no secrets in committed files**: Never commit system secrets (keys, passwords, tokens, privileged usernames, certs, connection strings) to ANY git-tracked file — history is permanent. Real values live in uncommitted `.env*` (except `.env.example`) or gitignored files; committed files use placeholders/env-var references only. Binds agents and humans. See [Secrets and Env Standards](./repo-governance/conventions/security/secrets-and-env-standards.md).
 
-**Guardrail**: Agents must not directly read, write, edit, or commit real `.env*` files — only `.env.example` is permitted directly; project scripts under `apps/`/`libs/`/`scripts/` are exempt. See [guard-env-file-access policy](./repo-governance/conventions/security/secrets-and-env-standards.md#9-guard-env-file-access-policy).
+**Guardrail**: Agents must not read/write/edit/commit real `.env*` files — only `.env.example` is permitted; scripts under `apps/`/`libs/`/`scripts/` are exempt. See [guard-env-file-access policy](./repo-governance/conventions/security/secrets-and-env-standards.md#9-guard-env-file-access-policy).
 
 **See**: [repo-governance/development/workflow/reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md)
 
 ### Dependency Bump Stability & Safety Policy
 
-Three-path decision tree governing every dependency bump: Path A (LTS latest patch), Path B (60-day soak + CVE-clean), Path C (security-override waiver). Within the chosen path, select the most recent eligible version (Rule 5a) and reject versions with known fatal functional defects — yanked, deprecated, or open release-blocker (Rule 5b). All versions must be exact pins (no caret/tilde). CVE clearance required via five sources: NVD, GitHub Advisories, Snyk DB, vendor security pages, and the CISA KEV feed. KEV Fast-Track: if any unpatched CVE appears in the CISA KEV catalog the 60-day soak is bypassed and the bump escalates to Path C. EPSS Escalation: if an unpatched CVE's EPSS score is ≥ 0.5 the bump receives Path C urgency. Cutoff dates computed and recorded in writing. Waivers documented in the introducing plan's `tech-docs.md` and `docs/reference/security-waivers.md`.
+Every dependency bump follows a three-path tree — A (LTS latest patch), B (60-day soak + CVE-clean), C (security-override waiver) — exact pins only, CVE-clean across five sources (NVD, GitHub Advisories, Snyk, vendor pages, CISA KEV); CISA-KEV fast-track and EPSS ≥ 0.5 escalate to Path C. Full rules, cutoff recording, and waiver locations in the linked policy.
 
 **See**: [repo-governance/development/workflow/dependency-bump-policy.md](./repo-governance/development/workflow/dependency-bump-policy.md)
 

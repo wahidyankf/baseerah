@@ -126,6 +126,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - **Execution-grade clarity (HARD RULE)**: every checkbox MUST name explicit file path(s) (or maximum-possible-detail target when path is unknowable), verbatim shell command(s) when applicable, and a concrete acceptance criterion. Flag as **HIGH** any checkbox whose action is not unambiguously executable by a sonnet-tier agent without consulting additional context — bare "implement X", "set up Y", "configure Z", "add caching" are violations. See [Plans Organization Convention §Execution-Grade Clarity](../../repo-governance/conventions/structure/plans.md#execution-grade-clarity-hard-rule).
 - **Executor tagging (HARD RULE)**: every checkbox declares `[AI]` / `[HUMAN]` / `[HUMAN → AI]` (unmarked = `[AI]`), with a legend at the top of the checklist. Flag any untagged or `[AI]`-tagged human-only step (physical acts, hardware/BIOS, external auth) as **HIGH**. Validated in detail by Step 5h (rule 14).
 - **Phase gate & natural pause (HARD RULE)**: every phase ends with a `### Phase N Gate` (must-pass checklist + Pause Safety note) and reaches a safe-to-stop state. Flag a phase missing its gate as **HIGH**; a non-pause phase that should be merged as **MEDIUM**. Validated in detail by Step 5i (rule 15).
+- **Specs & Gherkin delivery (per Two Paths)**: a plan that creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/` MUST include delivery steps that add/update the companion `specs/` Gherkin `.feature` files and run `specs:coverage`. Validated in detail by Step 5j (rule 16). See [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md).
 
 #### PR Step Authorization Check (per [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md))
 
@@ -623,3 +624,21 @@ Per [Plans Organization Convention §Applicability](../../repo-governance/conven
 - Phase missing its `### Phase N Gate`: **HIGH** per phase
 - Gate missing the verification checklist or the Pause Safety note: **MEDIUM** per phase
 - Phase that is not a genuine natural pause (should be merged): **MEDIUM** per phase
+
+### 16. Specs & Gherkin Delivery Coverage (Step 5j — MANDATORY)
+
+Enforces the [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md) for the plan path: a plan that will create, modify, or delete observable behavior in `apps/`, `libs/`, or `specs/` MUST carry explicit delivery-checklist steps that add or update the companion `specs/` Gherkin `.feature` files and run `specs:coverage`.
+
+#### What to Validate
+
+1. **Scope detection** — From the plan's Scope (`README.md` / `prd.md`), file-impact (`tech-docs.md`), and delivery steps, determine whether it creates, modifies, or deletes observable behavior under any `apps/**`, `libs/**`, or `specs/**` path.
+2. **Specs/Gherkin authoring step present** — If yes, the delivery checklist MUST include at least one explicit step that creates or updates the relevant `specs/apps/**` or `specs/libs/**` Gherkin `.feature` file(s). Missing: **HIGH**.
+3. **specs:coverage gate present** — The checklist (or a phase gate) MUST run the project's `specs:coverage` target (e.g. `npx nx affected -t specs:coverage` or `npx nx run <project>:specs:coverage`). Missing: **HIGH**.
+4. **Behavior-change exemption** — Behavior-preserving refactors, dependency bumps with no behavior change, and docs/governance-only plans are exempt (mirror the Feature Change Completeness applicability table). Verify the exemption is legitimate and that the plan states it; an illegitimate exemption claim used to skip specs is **HIGH**.
+
+#### Finding Severity
+
+- Behavior-affecting plan with no specs/Gherkin authoring step: **HIGH**
+- Specs/Gherkin step present but no `specs:coverage` gate: **HIGH**
+- Step present but vague (no specific `.feature` path or domain): **MEDIUM**
+- Illegitimate "no behavior change" exemption used to skip specs: **HIGH**

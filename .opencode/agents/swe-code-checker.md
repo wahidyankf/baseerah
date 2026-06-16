@@ -297,6 +297,32 @@ has only informal manual notes and no automated coverage plan.
 **Recommendation**: [write failing test first; move to cheaper level; structure manual script]
 ```
 
+### Step 6.6: Specs & Gherkin Completeness (Direct-Code Path)
+
+**Reference**: [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md)
+
+For app/lib changes made WITHOUT a plan, verify the companion `specs/` Gherkin was added or updated
+in the same change set. This is the "direct change (no plan)" path of the Feature Change
+Completeness Convention — the counterpart to the plan path that `plan-checker` Step 5j enforces.
+
+#### 6.6.1 Companion Gherkin Present
+
+- A change under `apps/**` or `libs/**` that alters observable behavior (new/changed/removed
+  endpoint, command, procedure, component, or user-facing behavior) MUST have a matching `.feature`
+  add/update under `specs/apps/**` or `specs/libs/**`.
+- **Criticality**: HIGH when behavior changed with no companion spec; MEDIUM when a spec exists but
+  is stale (scenarios do not reflect the new behavior).
+
+#### 6.6.2 specs:coverage Wired and Green
+
+- The affected project MUST have a `specs:coverage` target, and it MUST pass
+  (`rhino-cli specs validate coverage`). A behavior change that breaks `specs:coverage` is **HIGH**.
+
+#### 6.6.3 Pure-Refactor / No-Behavior-Change Exemption
+
+- Behavior-preserving refactors, dependency bumps without behavior change, and config-only edits are
+  exempt (per the Feature Change Completeness applicability table). Do not flag these.
+
 ### Step 7: Finalize Report
 
 Update report status to "Complete", add summary statistics:

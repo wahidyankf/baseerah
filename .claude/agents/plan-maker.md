@@ -512,6 +512,26 @@ Pause Safety note — the same shape every phase must follow):
 
 Add `test:integration` and `test:e2e` if relevant to the plan scope.
 
+**2b. Specs & Gherkin Delivery** (conditional — MANDATORY when the plan's scope creates, modifies,
+or deletes observable behavior in `apps/`, `libs/`, or `specs/`; see
+[Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md)):
+
+```markdown
+### Specs & Gherkin Delivery
+
+- [ ] [AI] RED: add/extend Gherkin scenarios in
+      `specs/apps/<app>/behavior/<surface>/gherkin/<domain>/<feature>.feature` (or
+      `specs/libs/<lib>/gherkin/<domain>/<feature>.feature`) describing the new/changed behavior
+      — acceptance: scenarios present; `npx nx run <project>:specs:coverage` fails (no step defs yet)
+- [ ] [AI] GREEN: implement the step definitions / tests that consume those scenarios
+      — acceptance: `npx nx run <project>:specs:coverage` exits 0
+- [ ] [AI] Update C4 diagrams / READMEs under `specs/` if the change alters architecture or surface
+      inventory — acceptance: affected `specs/**` README and diagrams reflect the change
+```
+
+Pure refactors that preserve behavior, dependency bumps with no behavior change, and
+docs/governance-only plans are exempt — state the exemption explicitly in `tech-docs.md`.
+
 **3. Post-Push CI Verification** (after every push step):
 
 ```markdown
