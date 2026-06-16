@@ -3,62 +3,118 @@
 ## Overview
 
 Define WHAT the convention says and HOW an author represents draft UI in a plan. The supporting
-research and citations live in [tech-docs.md](./tech-docs.md).
+research and citations live in [tech-docs.md](./tech-docs.md). The full design funnel mechanics and
+tier descriptions are documented in detail in [tech-docs.md §Design funnel](./tech-docs.md) and
+[tech-docs.md §The two required tiers](./tech-docs.md); this document summarises the rules and
+states the requirements.
 
 ## Design process — the funnel
 
-A UI-bearing plan does not jump straight to one mockup. After goals are clear (BRD/PRD) and the
-existing design system has been surveyed (R5), each screen goes through a **diverge → narrow →
-select → justify** funnel, and the plan docs record every stage:
+A UI-bearing plan follows a **diverge → narrow → select → justify** process. See
+[tech-docs.md §Design funnel](./tech-docs.md) for the full mechanics. The summary:
 
-```
-Goals clear (BRD/PRD)  +  existing UI surveyed (R5)
-        │
-        ▼
-[1] DIVERGE — Low-fi alternatives        ≥ 2 (aim 3) named ASCII wireframes: Option A / B / C
-        │     explore genuinely different layouts, not cosmetic variants
-        ▼
-[2] NARROW — Hi-fi shortlist             carry the 2 strongest forward as .excalidraw.png mockups
-        │     (drop the rest; note in one line why each was dropped)
-        ▼
-[3] SELECT — Choose + NAME the winner    e.g. "Selected: Option B — Ranked Table"
-        │     (more than one may be selected if the screen needs variants)
-        ▼
-[4] JUSTIFY — Rationale in the plan       why the chosen design won; why the runners-up lost
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Gray #808080
+%% Funnel stages: DIVERGE (low-fi) → NARROW (hi-fi shortlist) → SELECT → JUSTIFY
+flowchart LR
+    A["Goals clear<br/>BRD/PRD + UI surveyed R5"]:::blue
+    B["DIVERGE<br/>≥2 named low-fi<br/>ASCII alternatives"]:::orange
+    C["NARROW<br/>2 hi-fi .excalidraw.png<br/>finalists"]:::orange
+    D["SELECT<br/>Name the winner<br/>e.g. Ranked Table"]:::teal
+    E["JUSTIFY<br/>Rationale / decision record<br/>why winner won; rest lost"]:::teal
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+
+    classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef orange fill:#DE8F05,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
 ```
 
 Every stage is visible in the plan: the low-fi alternatives, the hi-fi shortlist, the **named**
-selection, and a short **rationale** (a decision record). Nothing is silently discarded — a dropped
-alternative gets a one-line reason so the reasoning survives review.
+selection, and a short **rationale** (a decision record). Nothing is silently discarded.
 
 ## Core rule — both tiers, separated
 
 Within the funnel, each screen is represented at **two** fidelities, in **separate, labelled
-sections** — low-fi for divergence, hi-fi for the shortlist/selection:
+sections**:
 
-1. **Low-fidelity mockup (required)** — ASCII / Unicode **wireframe in a fenced code block**.
-   Captures layout, structure, control placement, and flow. Inline in the `.md`, perfectly diffable,
-   renders identically in VSCode and GitHub. This is the structural source of truth that reviewers
-   comment on line-by-line.
-2. **High-fidelity version (required)** — Excalidraw **`.excalidraw.png`** referenced via
-   `![](./file.excalidraw.png)` (plain `.png` screenshot as fallback once design is final). Conveys
-   real spacing, grouping, color, typography, and visual hierarchy. Renders on GitHub and in VSCode;
-   stays re-editable via the embedded scene.
+- **Low-fidelity mockup (required)** — ASCII / Unicode wireframe in a fenced code block.
+- **High-fidelity version (required)** — Excalidraw `.excalidraw.png` referenced via
+  `![](./file.excalidraw.png)` (plain `.png` screenshot as fallback once design is final).
 
-Keep them in distinct subsections (e.g. `### Low-Fidelity Wireframe` and `### High-Fidelity Mockup`)
-so the diffable structural intent and the visual intent are each reviewable on their own terms.
+The two tiers per screen:
 
-```
-For each screen in a UI-bearing plan:
-│
-├─ Low-Fidelity Wireframe   → ASCII / Unicode in a fenced code block        (REQUIRED)
-│
-└─ High-Fidelity Mockup     → Excalidraw .excalidraw.png via ![](./…)       (REQUIRED)
-                              (plain .png screenshot = fallback when final)
-```
+- Low-Fidelity Wireframe → ASCII / Unicode in a fenced code block (REQUIRED)
+- High-Fidelity Mockup → Excalidraw `.excalidraw.png` via `![](./…)` (REQUIRED; plain `.png`
+  screenshot = fallback when final)
 
 **Never use in plan docs:** inline HTML+CSS, MDX, Mermaid-as-wireframe, or `.excalidraw.svg`
 (see the ruled-out table in [tech-docs.md](./tech-docs.md) for the per-option reason).
+
+## Personas
+
+- **Plan author (human wearing the "UI designer" hat)** — writes plan docs for UI-bearing plans;
+  needs the funnel rules to know what artefacts to produce per screen.
+- **`plan-maker` agent** — creates plan docs; must enforce the design funnel on UI-bearing plans
+  and emit delivery steps for the required artefacts.
+- **`plan-checker` agent** — validates plans; must flag missing funnel artefacts at HIGH criticality.
+- **`plan-fixer` agent** — remedies plan gaps; must scaffold missing funnel sections.
+- **`web-research-maker` agent** — supplies prior-art research for Stage 0 of the funnel's diverge
+  step.
+- **Sibling-repo consumers (ose-infra, ose-primer)** — adopt the convention via parallel plans in
+  their own repos, grounding references in their own UI libs (`libs/ts-ui`, `libs/ts-ui-tokens`).
+
+## User Stories
+
+- As a **plan author**, I want a documented, unambiguous convention for embedding draft UI in plan
+  `.md` files, so that mockups render identically in VSCode and GitHub without me having to guess
+  which format works.
+- As a **plan author**, I want a staged design funnel (diverge → narrow → select → justify), so
+  that I explore real alternatives before committing to a design, and the rationale survives review.
+- As a **plan reviewer** (on GitHub PRs and in VSCode), I want to see identical mockups in both
+  surfaces plus the alternatives considered and the rationale for the chosen design, so that I can
+  give meaningful feedback.
+- As a **`plan-maker` agent**, I want clear rules about what funnel artefacts to require on a
+  UI-bearing plan, so that I can emit the correct delivery steps automatically.
+- As a **`plan-checker` agent**, I want a formal UI-design-funnel completeness check, so that I can
+  flag missing artefacts at HIGH criticality and prevent incomplete designs from passing quality
+  gates.
+- As a **sibling-repo consumer** (ose-infra, ose-primer maintainer), I want a parallel
+  `plan-doc-ui-mockup-convention` plan in my own repo, so that the convention is adopted with the
+  correct local grounding references rather than inheriting a foreign repo's paths.
+
+## Product Scope
+
+See [README.md §Scope](./README.md) for full context. This section states the product-level
+inclusions and exclusions so an executor validating only `prd.md` can determine what is in and out
+of scope.
+
+**In scope:**
+
+- The UI-mockup convention text: both-tiers rule, grounding rule (R5), design-funnel stages (R6),
+  prior-art recommendation (R7), rendering-support matrix, and ruled-out table — authored as a
+  section of `repo-governance/conventions/formatting/diagrams.md` (or a new sibling file if
+  diagrams.md is too large).
+- Enforcement wiring across the plan maker → checker → fixer chain and the `plan-quality-gate`
+  workflow: `plan-maker` requires funnel artefacts on UI-bearing plans; `plan-checker` flags gaps at
+  HIGH criticality; `plan-fixer` scaffolds missing sections; `plan-quality-gate` lists the new step.
+- A self-contained worked example in `plans/in-progress/plan-doc-ui-mockup-convention/assets/`
+  demonstrating the full funnel for the salary-savings calculator compare-all screen (≥2 low-fi
+  ASCII alternatives, 2 hi-fi `.excalidraw.png` finalists, named selection, rationale), plus
+  injecting the funnel into the `ayokoding-www-salary-savings-calculator` plan's `prd.md`.
+- Cross-repo parallel-plan adoption across all three sibling repos (ose-public, ose-infra,
+  ose-primer), each grounded in its own UI lib.
+
+**Out of scope:**
+
+- Production app UI work — this plan ships a convention and exemplar, not any `apps/` screen or
+  `libs/` component.
+- A new dedicated markdown lint rule or bespoke CI gate beyond the existing `mermaid:validation` and
+  `lint:md` targets — enforcement is through the plan maker/checker/fixer chain.
+- A custom wireframe tool or external design-system integration.
 
 ## Requirements
 
@@ -121,10 +177,16 @@ plan never passes without its design funnel enforced by `plan-checker` + `plan-f
 - The **single-city** screen MAY be documented more lightly (at minimum both tiers — one low-fi
   wireframe + one hi-fi mockup); the compare-all screen is the canonical full-funnel demonstration.
 
-### R4 — Propagation
+### R4 — Cross-repo adoption
 
-- The convention MUST be propagated to the `ose-primer` downstream template via the standard
-  propagation maker (PR, not direct commit).
+- The convention MUST be adopted across **all three sibling repos** (ose-public, ose-infra, ose-primer)
+  via **parallel `plan-doc-ui-mockup-convention` plans** — same convention text, rendering-matrix,
+  ruled-out table, funnel, and enforcement in each, differing only in grounding references (each
+  repo's own UI lib: ose-public `libs/web-ui`; ose-infra and ose-primer `libs/ts-ui` +
+  `libs/ts-ui-tokens`) and the worked-example exemplar.
+- ose-primer self-adopts via its own plan, pushed directly to its `origin main` (an explicit owner
+  decision overriding the usual ose-primer PR-only rule).
+- Parallel plans exist and pass strict `plan-quality-gate` in all three repos.
 
 ### R5 — Ground mockups in existing UI
 
@@ -144,7 +206,7 @@ plan never passes without its design funnel enforced by `plan-checker` + `plan-f
 ### R6 — Design funnel (diverge → narrow → select → justify)
 
 The convention MUST require, and `plan-maker` MUST enforce, the staged design process for each
-UI-bearing screen:
+UI-bearing screen. See [tech-docs.md §Design funnel](./tech-docs.md) for the full stage descriptions.
 
 - **Diverge (low-fi)** — present **≥ 2 (aim for 3) genuinely different** named low-fidelity ASCII
   alternatives (Option A / B / C), not cosmetic variants.
@@ -184,38 +246,85 @@ silently discarded.
 
 ## Acceptance Criteria
 
-Because this is a governance/docs change (no `apps/`/`libs/` code), acceptance is verified by review
-and the markdown quality gates rather than Gherkin specs.
+```gherkin
+Scenario: Convention document renders correctly on GitHub
+  Given the convention document contains an ASCII wireframe example in a fenced code block
+  When a reader opens the file on GitHub.com rendered view
+  Then the wireframe renders as a monospace block with correct spacing
+  And the rendering-support matrix table renders correctly
+  And the ruled-out table renders correctly
 
-- **AC1** — Opening the convention doc in **GitHub.com rendered view** shows the ASCII wireframe
-  example rendering as a monospace block and the matrix/tables rendering correctly.
-- **AC2** — Opening the same doc in the **VSCode built-in Markdown preview** shows identical content.
-- **AC3** — The ruled-out table names inline HTML+CSS, MDX, Mermaid-as-wireframe, and
-  `.excalidraw.svg`, each with a reason.
-- **AC4** — The convention states the both-tiers rule (low-fi wireframe + hi-fi version, separate
-  subsections) as mandatory for UI-bearing plans.
-- **AC4b** — The convention states the grounding rule (R5): survey existing app/lib UI before
-  drafting mockups, reuse the real design system, flag net-new components.
-- **AC4c** — The convention states the design funnel (R6): ≥2 named low-fi alternatives → 2 hi-fi
-  finalists → named selection → rationale/decision record, no alternative silently dropped.
-- **AC4d** — The convention recommends `web-research-maker` prior-art research (R7) as an input to
-  the funnel's diverge stage.
-- **AC5** — `npm run lint:md` passes on all new/edited Markdown; links validate.
-- **AC6** — The salary-savings-calculator `prd.md` shows the full funnel for the compare-all screen:
-  ≥2 low-fi ASCII alternatives, 2 hi-fi `.excalidraw.png` finalists, a **named** selection, and a
-  rationale — all rendering in both VSCode and GitHub.
-- **AC7** — `plan-maker` and the `plan-creating-project-plans` skill require the funnel artefacts and
-  emit delivery steps for them on a UI-bearing plan; the grilling gates ask the design-funnel
-  questions.
-- **AC7b** — `plan-checker` gains a UI-design-funnel completeness step that FLAGS (HIGH) a UI-bearing
-  plan missing any funnel artefact; `plan-fixer` can scaffold the missing sections; `plan-quality-gate`
-  lists the step in its validation scope. A deliberately incomplete UI-bearing test plan is flagged.
-- **AC8** — An `ose-primer` PR carrying the convention exists (propagation done).
-- **AC9** — The rule was propagated via `repo-rules-maker` (R8): convention doc + index + the
-  `repo-rules-checker` register updated, bindings re-synced, and `repo-rules-checker` reports no
-  governance contradictions.
-- **AC10** — The [`plan-quality-gate`](../../../repo-governance/workflows/plan/plan-quality-gate.md)
-  workflow (strict) reaches two consecutive zero-finding validations on this plan (R9).
+Scenario: Convention document renders correctly in VSCode
+  Given the convention document contains an ASCII wireframe example and a rendering-support matrix
+  When a reader opens the file in the VSCode built-in Markdown preview
+  Then the content renders identically to the GitHub.com view
+
+Scenario: Ruled-out table names all excluded options with reasons
+  Given the convention document includes a ruled-out table
+  When the table is inspected
+  Then it names inline HTML+CSS, MDX, Mermaid-as-wireframe, and .excalidraw.svg
+  And each entry has a one-line reason for exclusion
+
+Scenario: Convention states the both-tiers rule as mandatory
+  Given the convention document is authored
+  When the both-tiers rule section is read
+  Then it states that low-fidelity wireframe and high-fidelity version are both required
+  And it states they must be in separate labelled subsections for UI-bearing plans
+
+Scenario: Lint and link validation pass on all changed files
+  Given all new and edited Markdown files are staged
+  When npm run lint:md and link validation are run
+  Then both exit 0 with no errors reported
+
+Scenario: Salary-savings-calculator prd.md shows the full funnel
+  Given the full funnel has been authored for the compare-all screen
+  When plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md is inspected
+  Then it contains at least two named low-fi ASCII alternatives
+  And it contains at least two hi-fi .excalidraw.png mockups
+  And it contains a named selection e.g. Selected: Option B — Ranked Table
+  And it contains a rationale decision record
+  And all elements render correctly in VSCode preview and on GitHub.com
+
+Scenario: plan-maker requires funnel artefacts and emits delivery steps for them
+  Given plan-maker is invoked for a UI-bearing plan
+  When the plan is created or updated
+  Then plan-maker requires the funnel artefacts in its grilling questions
+  And plan-maker emits delivery steps that produce the low-fi alternatives and hi-fi finalists
+
+Scenario: plan-checker flags a UI-bearing plan missing funnel artefacts
+  Given a UI-bearing test plan stub is missing the design funnel artefacts
+  When plan-checker runs its UI-design-funnel completeness step on the plan
+  Then plan-checker emits a HIGH finding for each missing funnel artefact
+  And pure-refactor and no-UI plans are not flagged
+
+Scenario: Convention propagated via repo-rules-maker across all in-repo surfaces
+  Given the convention has been authored by repo-rules-maker
+  When repo-rules-checker is run
+  Then it reports no governance contradictions or inconsistencies
+  And the convention index, repo-rules-checker register, and bindings are all updated
+
+Scenario: Parallel plans exist and pass quality gates in all three sibling repos
+  Given parallel plan-doc-ui-mockup-convention plans have been created in ose-infra and ose-primer
+  When plan-quality-gate strict is run on each parallel plan
+  Then each plan reaches two consecutive zero-finding validations
+  And the ose-primer plan is pushed directly to ose-primer origin main
+
+Scenario: This plan passes plan-quality-gate strict mode
+  Given this plan has been self-validated via plan-quality-gate
+  When plan-quality-gate strict is run with scope plans/in-progress/plan-doc-ui-mockup-convention/
+  Then it reaches two consecutive zero-finding validations
+```
+
+## Product Risks
+
+| Risk                                                                        | Likelihood | Mitigation                                                                                                                        |
+| --------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Convention adoption friction — authors ignore the funnel steps              | Medium     | Enforcement via `plan-maker` grilling and `plan-checker` HIGH findings makes the path of least resistance the correct one         |
+| Incorrect "UI-bearing" classification — checker flags non-UI plans          | Low        | "UI-bearing" scope mirrors specs/Gherkin binding: only plans touching `apps/` or `libs/` screens/components; pure-refactor exempt |
+| Enforcement false positives on non-UI plans over-blocking delivery          | Low        | Exempt condition is explicit and mirrors the already-tested specs/Gherkin exemption pattern                                       |
+| Funnel over-engineering for small plans with a single obvious design        | Low        | R6 requires ≥2 alternatives but plan author can note "only one viable layout" with rationale; fixer scaffolds stubs, not full art |
+| Parallel plan grounding drift — ose-infra/ose-primer use wrong UI lib paths | Medium     | Each parallel plan's delivery Phase 2 explicitly names `libs/ts-ui` + `libs/ts-ui-tokens`; plan-checker validates paths           |
+| ose-primer direct-push override causes rework if policy changes             | Low        | Documented as explicit owner decision in R4 and delivery Phase 5; policy override is intentional and scoped                       |
 
 ## Open Questions (resolved)
 
@@ -225,3 +334,5 @@ and the markdown quality gates rather than Gherkin specs.
 - _`.svg` vs `.png` for Excalidraw on GitHub?_ — `.png` (SVG font CSP fallback). Resolved.
 - _New convention doc vs extend `diagrams.md`?_ — Decision deferred to tech-docs; default is to add a
   section under the existing formatting/diagrams convention to avoid convention sprawl.
+- _Propagation to ose-primer via PR or direct push?_ — Direct push to ose-primer origin main (explicit
+  owner decision). ose-infra and ose-primer self-adopt via parallel plans. Resolved.

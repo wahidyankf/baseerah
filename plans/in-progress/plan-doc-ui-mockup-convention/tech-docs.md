@@ -11,7 +11,10 @@ copy-paste examples, and citations.
 GitHub's Markdown HTML sanitizer removes the `style=`, `class`, and `id` attributes and the
 `<style>` and `<script>` elements entirely. It is an allowlist, not a partial filter — only legacy
 presentation attributes survive: `align`, `border`, `cellpadding`, `cellspacing`, `color`, `height`,
-`width`, `valign`, `colspan`, `rowspan`, plus `href`/`src`/`alt`/`title`.
+`width`, `valign`, `colspan`, `rowspan`, plus `href`/`src`/`alt`/`title`. [Web-cited: the
+`rhysd/marked-sanitizer-github` library (which ports GitHub's sanitizer) confirms `style`, `class`,
+and `id` are absent from the allowed-attribute list; see
+https://github.com/rhysd/marked-sanitizer-github, accessed 2026-06-16]
 
 Consequence: a `<div style="background:#f0f0f0;border-radius:8px;padding:12px">` card mockup renders
 in VSCode but becomes a bare, unstyled `<div>` on GitHub. **Inline-CSS mockups are not viable for
@@ -24,14 +27,19 @@ Allowed elements include `table`, `thead`, `tbody`, `tr`, `td`, `th`, `details`,
 
 VSCode's built-in Markdown preview uses **markdown-it** with raw-HTML passthrough enabled. Its
 webview CSP blocks `<script>` execution and external HTTP resources, but does **not** strip
-`style=`. So inline HTML+CSS renders fully in VSCode. This is the asymmetry that makes inline-HTML
-mockups misleading: they look right locally and break on GitHub.
+`style=`. So inline HTML+CSS renders fully in VSCode. [Web-cited: the official VSCode Markdown
+documentation states the preview "disables script execution" but does not restrict inline HTML
+attributes such as `style=`; see https://code.visualstudio.com/docs/languages/markdown, accessed
+2026-06-16] This is the asymmetry that makes inline-HTML mockups misleading: they look right
+locally and break on GitHub.
 
 ### Mermaid has no wireframe type
 
 Mermaid renders natively on both GitHub and VSCode, but it has **no UI/wireframe diagram type**
-(requested 2020 in mermaid-js/mermaid#1184, still "contributor needed"). Repurposing flowchart nodes
-produces a flow diagram, not a UI. The repo's own mermaid validator
+(requested 2020 in mermaid-js/mermaid#1184, still open with label "Contributor needed" and no
+implementation as of 2026-06-16 [Web-cited: issue confirmed open and unassigned at
+https://github.com/mermaid-js/mermaid/issues/1184, accessed 2026-06-16]). Repurposing flowchart
+nodes produces a flow diagram, not a UI. The repo's own mermaid validator
 (`rhino-cli md validate mermaid`) further caps node width and label length, making any UI layout
 impossible. **Not viable for wireframes.**
 
@@ -41,7 +49,10 @@ impossible. **Not viable for wireframes.**
 in metadata — both re-open as an editable canvas in the Excalidraw VSCode extension or on
 excalidraw.com. Both render on GitHub via `![](./file)`. **But** Excalidraw's custom hand-drawn
 fonts (Virgil, Cascadia) load from a CDN that GitHub's CSP blocks for SVG, so `.excalidraw.svg` text
-labels fall back to a generic font on GitHub (excalidraw/excalidraw#4855). `.excalidraw.png`
+labels fall back to a generic font on GitHub [Web-cited: issue excalidraw/excalidraw#4855 confirms
+"fonts fail to load when SVGs are embedded in GitHub markdown" due to GitHub's CSP blocking the
+font CDN; browsers fall back to Times; see
+https://github.com/excalidraw/excalidraw/issues/4855, accessed 2026-06-16]. `.excalidraw.png`
 rasterises the fonts and renders faithfully → **use PNG for any GitHub-visible mockup.**
 
 Inline `<svg>` pasted directly into Markdown does **not** render on GitHub (sanitizer strips it) —
@@ -141,6 +152,25 @@ The funnel is enforced by the existing plan maker → checker → fixer chain, m
 "UI-bearing" = the plan adds/changes user-facing screens or components under `apps/` or `libs/`. Pure
 refactors and non-UI plans are exempt, exactly as with the specs/Gherkin binding.
 
+```mermaid
+%% Color Palette: Blue #0173B2, Orange #DE8F05, Teal #029E73, Purple #CC78BC, Gray #808080
+%% Enforcement chain: plan-maker → plan-checker → plan-fixer → plan-quality-gate
+flowchart LR
+    A["plan-maker<br/>Requires funnel artefacts<br/>on UI-bearing plans;<br/>emits delivery steps"]:::blue
+    B["plan-checker<br/>#40;new step#41;<br/>FLAGs HIGH any missing<br/>funnel artefact;<br/>exempts no-UI plans"]:::orange
+    C["plan-fixer<br/>Scaffolds missing<br/>funnel sections;<br/>re-validates before apply"]:::teal
+    D["plan-quality-gate<br/>Lists new checker step;<br/>gate fails if funnel<br/>skipped on UI-bearing plan"]:::purple
+
+    A --> B
+    B --> C
+    C --> D
+
+    classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef orange fill:#DE8F05,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+    classDef purple fill:#CC78BC,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
 ## The two required tiers
 
 A UI-bearing plan documents each screen at **both** fidelities, in separate labelled subsections.
@@ -218,17 +248,86 @@ convention sprawl. The diagrams convention already governs Mermaid and ASCII art
 are a natural third category there. (Revisit only if the section grows large enough to warrant its
 own file.)
 
+## File Impact
+
+Files modified or created by this plan, organized by delivery phase:
+
+**Phase 2 — Convention authored:**
+
+- `repo-governance/conventions/formatting/diagrams.md` — **MODIFIED**: new "UI Mockups in Plan
+  Docs" section added (both-tiers rule, grounding rule, design funnel, prior-art recommendation,
+  rendering-support matrix, ruled-out table, copy-paste examples).
+- `repo-governance/conventions/formatting/ui-mockups-in-plan-docs.md` — **NEW** (only if
+  `diagrams.md` is too large to extend; fallback path). _New file — created only if diagrams.md is
+  too large._
+- `repo-governance/conventions/README.md` — **MODIFIED**: new convention entry added.
+- `repo-rules-checker` register — **MODIFIED**: new rule entry added.
+- Any governance-architecture index enumerating conventions — **MODIFIED** (identified during sweep).
+
+**Phase 3 — Enforcement wiring:**
+
+- `.claude/skills/plan-creating-project-plans/SKILL.md` — **MODIFIED**: design-funnel rule and
+  grilling questions added.
+- `.claude/agents/plan-maker.md` — **MODIFIED**: UI-bearing plan funnel requirement added.
+- `.claude/agents/plan-checker.md` — **MODIFIED**: UI-design-funnel completeness step added.
+- `.claude/agents/plan-fixer.md` — **MODIFIED**: funnel-section scaffolding logic added.
+- `repo-governance/workflows/plan/plan-quality-gate.md` — **MODIFIED**: new checker step listed in
+  validation scope.
+- `.opencode/agents/plan-maker.md`, `.opencode/agents/plan-checker.md`,
+  `.opencode/agents/plan-fixer.md` — **MODIFIED** (auto-synced via `npm run generate:bindings`).
+- `.amazonq/rules/` — **MODIFIED** (auto-synced via `npm run generate:bindings`).
+
+**Phase 4 — Worked example:**
+
+- `plans/in-progress/ayokoding-www-salary-savings-calculator/prd.md` — **MODIFIED**: full design
+  funnel for the compare-all screen added (≥2 low-fi alternatives, 2 hi-fi finalists, named
+  selection, rationale).
+
+**Phase 5 — Cross-repo parallel plans:**
+
+- `ose-infra:plans/in-progress/plan-doc-ui-mockup-convention/` — **NEW** (parallel plan folder
+  created in ose-infra repo).
+- `ose-primer:plans/in-progress/plan-doc-ui-mockup-convention/` — **NEW** (parallel plan folder
+  created in ose-primer repo, pushed directly to origin main).
+
+## Rollback
+
+This plan makes purely additive changes — new sections appended to existing files, new delivery
+steps, new validation checks. No existing convention text is removed. Rollback strategies by phase:
+
+- **Phase 2**: Revert `diagrams.md` to the pre-plan commit using `git revert <commit>` or
+  `git checkout <pre-plan-sha> -- repo-governance/conventions/formatting/diagrams.md`. Re-run
+  `npm run generate:bindings` to restore bindings. Rollback cost: low (one file revert).
+- **Phase 3**: Revert each agent/skill/workflow file individually (`git revert` or `git checkout`).
+  Re-run `npm run generate:bindings` to restore auto-synced mirrors. The new checker step in
+  `plan-checker.md` is additive; removing it restores previous behaviour without breaking existing
+  plans.
+- **Phase 4**: Revert `ayokoding-www-salary-savings-calculator/prd.md` to pre-Phase-4 state.
+  Binary `.excalidraw.png` assets can be removed from `git rm`. Cost: low (one plan file, assets
+  directory).
+- **Phase 5**: Parallel plans in ose-infra and ose-primer are self-contained. Delete
+  `plans/in-progress/plan-doc-ui-mockup-convention/` in each sibling repo and push to origin main.
+
 ## Citations
 
 - [rhysd/marked-sanitizer-github — sanitizer allowlist](https://github.com/rhysd/marked-sanitizer-github)
+  (accessed 2026-06-16)
 - [GitHub Community Discussion #22728 — inline CSS stripped](https://github.com/orgs/community/discussions/22728)
+  (accessed 2026-06-16)
 - [HTML tags usable on GitHub (seanh gist)](https://gist.github.com/seanh/13a93686bf4c2cb16e658b3cf96807f2)
+  (accessed 2026-06-16)
 - [alexwlchan — how SVGs render on GitHub (2024)](https://alexwlchan.net/notes/2024/how-to-render-svgs-on-github/)
+  (accessed 2026-06-16)
 - [Excalidraw VSCode extension (pomdtr)](https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor)
+  (accessed 2026-06-16)
 - [excalidraw/excalidraw#4855 — fonts blocked on GitHub SVG](https://github.com/excalidraw/excalidraw/issues/4855)
+  (accessed 2026-06-16)
 - [mermaid-js/mermaid#1184 — wireframe request](https://github.com/mermaid-js/mermaid/issues/1184)
-- [PlantUML Salt](https://plantuml.com/salt)
+  (accessed 2026-06-16)
+- [PlantUML Salt](https://plantuml.com/salt) (accessed 2026-06-16)
 - [VS Code Markdown documentation](https://code.visualstudio.com/docs/languages/markdown)
+  (accessed 2026-06-16)
 - [markdownlint MD033](https://github.com/DavidAnson/markdownlint/blob/main/doc/md033.md)
-- [BareMinimum — ASCII wireframe generator](https://bareminimum.design/)
-- [Mockdown — ASCII wireframe editor](https://www.mockdown.design/)
+  (accessed 2026-06-16)
+- [BareMinimum — ASCII wireframe generator](https://bareminimum.design/) (accessed 2026-06-16)
+- [Mockdown — ASCII wireframe editor](https://www.mockdown.design/) (accessed 2026-06-16)

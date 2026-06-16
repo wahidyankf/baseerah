@@ -54,7 +54,9 @@ authors at it.
   plus the `plan-creating-project-plans` skill and its grilling gates.
 - Authoring/propagating the rule across in-repo surfaces via **`repo-rules-maker`**, and validating
   this plan's integration with current rules via the **`plan-quality-gate`** workflow.
-- Propagation to the downstream `ose-primer` template (governance content sync).
+- Cross-repo adoption: parallel `plan-doc-ui-mockup-convention` plans in all three sibling repos
+  (ose-public, ose-infra, ose-primer), each grounded in the repo's own UI lib; ose-primer
+  self-adopts via direct push to its `origin main` (explicit owner decision).
 
 **Out of scope:**
 
@@ -74,7 +76,9 @@ authors at it.
    scaffolds it, `plan-quality-gate` lists it; skill + grilling updated.
 5. **Phase 4 — Worked example**: full funnel (prior art → alternatives → finalists → named selection
    → rationale) in the salary-savings-calculator `prd.md`.
-6. **Phase 5 — Propagation**: sync the convention into `ose-primer`.
+6. **Phase 5 — Cross-repo parallel plans**: create parallel `plan-doc-ui-mockup-convention` plans in
+   ose-infra and ose-primer, each grounded in their own UI lib (`libs/ts-ui`, `libs/ts-ui-tokens`);
+   push ose-primer plan directly to its `origin main` (owner decision).
 7. **Phase 6 — Quality gates + archival**.
 
 ## Documents

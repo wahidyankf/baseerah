@@ -50,7 +50,10 @@ plan to apply it to.
   `repo-rules-checker` clean), and this plan passes the **`plan-quality-gate`** workflow.
 - The salary-savings-calculator `prd.md` carries the **full funnel** (prior art → alternatives →
   finalists → named selection → rationale) rendering in both VSCode and GitHub, as the exemplar.
-- The convention is propagated to `ose-primer`.
+- The convention is adopted across all three sibling repos (ose-public, ose-infra, ose-primer) via
+  **parallel `plan-doc-ui-mockup-convention` plans** in each repo — same convention text, differing
+  only in grounding references and worked-example exemplar. ose-primer self-adopts via its own plan
+  pushed directly to its `origin main` (explicit owner decision).
 
 ## Non-Goals
 
