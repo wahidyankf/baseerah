@@ -64,7 +64,10 @@ Before reading the codebase or creating any files, invoke the `grill-me` skill
 (`.claude/skills/grill-me/SKILL.md`) to resolve all open design decisions with the user.
 
 **Multiple-options requirement (HARD RULE)**: Every grill question MUST present 2-4 concrete
-options with trade-off descriptions — open-ended questions without options are FORBIDDEN. Use the
+options with trade-off descriptions — open-ended questions without options are FORBIDDEN. Every
+question MUST ALSO carry two standing options: a free-form **type-your-own (blank state)** path
+(explicit, never merely implicit — the most common omission) and a **"chat about this"** option
+for discussing the branch before deciding. Use the
 `AskUserQuestion` tool (preferred in Claude Code context) or the markdown question format from
 the `grill-me` skill. Read the codebase before asking so options are grounded in repo reality.
 See [Grilling-With-Options Convention](../../repo-governance/development/workflow/grilling-with-options.md).
@@ -190,7 +193,8 @@ After all plan files are written, invoke the `grill-me` skill again to validate 
 the user before signaling done.
 
 **Multiple-options requirement (HARD RULE)**: Same as Step 1 — every validation question MUST
-present 2-4 concrete options. Use `AskUserQuestion` tool (preferred) or markdown question format.
+present 2-4 concrete options plus the two standing options (free-form blank-state type and "chat
+about this"). Use `AskUserQuestion` tool (preferred) or markdown question format.
 Never present a binary yes/no without offering design alternatives. See
 [Grilling-With-Options Convention](../../repo-governance/development/workflow/grilling-with-options.md).
 
@@ -327,7 +331,7 @@ Unsolicited PR steps conflict with Trunk Based Development. `plan-checker` will 
 - [plan-execution workflow](../../repo-governance/workflows/plan/plan-execution.md) - Execute plans (calling context orchestrates; no dedicated subagent); invokes the `grill-me` skill to stress-test unresolved design decisions before execution begins
 - `plan-execution-checker` - Validates completed work
 - `plan-fixer` - Fixes plan issues
-- `grill-me` skill - Stress-test open design decisions before committing to implementation; every question presents 2-4 concrete options (use `AskUserQuestion` tool in Claude Code or markdown format); invoke via the `grill-me` Skill when requirements have unresolved branches
+- `grill-me` skill - Stress-test open design decisions before committing to implementation; every question presents 2-4 concrete options plus two standing options — a free-form blank-state type and a "chat about this" path (use `AskUserQuestion` tool in Claude Code or markdown format); invoke via the `grill-me` Skill when requirements have unresolved branches
 
 **Remember**: Good plans are executable blueprints, not vague intentions. Make them specific, structured, and actionable.
 

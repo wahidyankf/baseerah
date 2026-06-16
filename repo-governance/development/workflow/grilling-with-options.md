@@ -3,7 +3,9 @@ title: "Grilling-With-Options Convention"
 description: >
   Agents and workflows MUST resolve open design decisions using structured multiple-choice
   questions, not open-ended prose prompts. Every grilling question presents 2-4 concrete
-  options, each with its trade-off, and exactly one option marked Recommended. Applies to
+  options, each with its trade-off, and exactly one option marked Recommended. Every question
+  also always carries two standing options — a free-form blank-state write-in and a "chat about
+  this" path — so the user is never boxed into a listed choice. Applies to
   all agent and workflow contexts: plan creation, design review, stress-testing, and
   requirements clarification.
 category: explanation
@@ -109,10 +111,12 @@ ground truth; the user is the tiebreaker for genuinely ambiguous decisions.
 
 ### Rule 2 — Structured Options (2-4, Mutually Exclusive)
 
-Every grilling question MUST present between 2 and 4 concrete, mutually exclusive options.
-The options MUST collectively cover the realistic decision space. A free-form write-in path
-("Other") is always implicitly available; agents MUST acknowledge it when using the markdown
-fallback.
+Every grilling question MUST present between 2 and 4 concrete, mutually exclusive substantive
+options. The options MUST collectively cover the realistic decision space. Beyond those
+substantive options, every question ALSO carries two standing options — a free-form blank-state
+write-in and a "chat about this" path (see Rule 8). The two standing options do NOT count
+against the 2-4 substantive cap, and the blank-state write-in MUST be surfaced explicitly,
+never left merely implicit.
 
 **Rationale**: Fewer than 2 options is a binary yes/no (use a confirmation prompt instead,
 not a grill). More than 4 options overwhelms the user and signals the agent has not pruned
@@ -168,7 +172,10 @@ format:
 - **Option 1 — [Label]**: [Trade-off sentence] _(Recommended — [rationale])_
 - **Option 2 — [Label]**: [Trade-off sentence]
 - **Option 3 — [Label]**: [Trade-off sentence]
-- **Other**: Write in your own approach.
+- **Other — type your own answer**: Free-form write-in; the answer is whatever you type (blank
+  state). Always present.
+- **Chat about this**: Talk the decision through before deciding instead of picking now. Always
+  present.
 ```
 
 The markdown fallback MUST still satisfy Rules 2–5 (2-4 options, trade-offs, one Recommended,
@@ -179,6 +186,30 @@ one decision per question).
 Options are a structured starting point, not a closed cage. The agent MUST treat a user's
 write-in answer with the same weight as a listed option. If the write-in answer opens a new
 decision branch, the agent grills on that branch before proceeding.
+
+### Rule 8 — Two Standing Options Always Present: Type (Blank State) and Chat
+
+Beyond its 2-4 substantive options, every grilling question MUST ALWAYS surface two standing
+options, on every question, regardless of rendering mechanism:
+
+1. **Type (blank state)** — an explicit free-form write-in path whose answer depends entirely
+   on what the user types. This is NOT optional and NOT merely implicit: it MUST be visible on
+   every question. When a native tool auto-provides a free-text "Other" entry, that entry
+   satisfies this requirement; with the markdown fallback, an explicit
+   `**Other — type your own answer**` bullet MUST be listed.
+2. **Chat about this** — an explicit option signalling the user wants to discuss the decision
+   conversationally before committing, rather than pick a listed option or write a final
+   answer. When the user selects it, the agent drops the structured options, talks the branch
+   through in prose, then returns to a structured question once the user is ready to decide.
+
+These two standing options do NOT count against the 2-4 substantive cap; they are universal
+escape hatches present on every question, not decision branches.
+
+**Rationale**: Structured options accelerate the common path, but a user must never be boxed
+in. The blank-state type guarantees the user can always answer in their own words; the chat
+option guarantees they can always reopen the decision for discussion. Dropping either —
+especially the blank-state type, the single most common omission — turns a grill into a forced
+choice.
 
 ## When This Convention Applies
 
@@ -287,14 +318,19 @@ A grill question is valid when ALL of the following hold:
 - [ ] The question addresses exactly one decision
 - [ ] Options are grounded in codebase reality (not invented)
 - [ ] An interactive multiple-choice tool is used when the coding agent supports it
+- [ ] A free-form blank-state "type your own answer" option is surfaced explicitly (never
+      implicit-only)
+- [ ] A "chat about this" option is offered
 
 A grill question is invalid when ANY of the following hold:
 
 - No options are presented (open-ended)
 - Only one option is presented (not a real choice)
-- More than four options are presented (too many; simplify)
+- More than four substantive options are presented (too many; simplify)
 - Options are not grounded in codebase reality
 - Multiple decisions are bundled into one question
+- The blank-state "type your own answer" option is missing or only implicit
+- No "chat about this" option is offered
 
 ## Special Considerations
 
@@ -356,8 +392,11 @@ grilling inside a Claude Code session, the `grill-me` skill MUST invoke `AskUser
 with:
 
 - `questions`: 1–4 questions (one per tightly-coupled decision cluster)
-- `options` per question: 2–4 selectable options (string labels)
-- A free-form "Other" option always included as the last option per question
+- `options` per question: 2–3 substantive selectable options plus a standing
+  `"Let's chat about this"` option (≤4 array entries total, reserving room for chat)
+- The harness's auto-provided free-text `"Other"` entry is the blank-state type option — the
+  answer is whatever the user writes; it is always present and satisfies the Rule 8 blank-state
+  requirement
 
 `AskUserQuestion` returns a structured response the agent uses directly without parsing
 free-text. Markdown option lists are only a fallback when `AskUserQuestion` is unavailable.
@@ -372,9 +411,10 @@ AskUserQuestion({
       options: [
         "development/workflow/grilling-with-options.md  [RECOMMENDED — layer-coherent, matches adjacent workflow docs]",
         "conventions/writing/grilling-with-options.md  [fails layer-coherence; conventions/ is documentation-scoped]",
-        "development/agents/grilling-with-options.md  [too narrow; grilling applies beyond agent-only contexts]",
-        "Other — specify below"
+        "Let's chat about this  [discuss the decision before committing]"
       ]
+      // The harness auto-appends a free-text "Other" entry — that is the blank-state type
+      // option (answer = whatever the user writes), always present per Rule 8.
     }
   ]
 })

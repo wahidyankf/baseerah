@@ -47,11 +47,20 @@ sync.
 5. The user can always supply an **unlisted write-in answer** — options are a starting point, not
    a cage. Treat a write-in with the same weight as a listed option; if it opens a new branch,
    grill on that branch.
-6. Continue until all branches are resolved — do not stop early.
+6. **Two standing options on EVERY question** — beyond the 2-4 substantive options, ALWAYS
+   surface (a) a free-form **type-your-own (blank state)** path whose answer is whatever the user
+   types — explicit, never merely implicit (this is the most common omission) — and (b) a
+   **"chat about this"** option that lets the user discuss the branch in prose before deciding.
+   With `AskUserQuestion`, the auto-provided free-text "Other" entry is the blank-state type; add
+   "Let's chat about this" as an explicit option (keep substantive options ≤3 so it fits the
+   4-option cap). When the user picks "chat about this", drop the structured options, talk the
+   branch through, then return to a structured question once they are ready to decide.
+7. Continue until all branches are resolved — do not stop early.
 
 **Violation of Rule 2 (asking without options) is the most common failure mode.** If you catch
 yourself writing a question without listing concrete options, rewrite it with options before
-sending.
+sending. **Dropping the blank-state type option (Rule 6) is the second most common failure** —
+every question MUST let the user type their own answer.
 
 ## Mechanism — use the AskUserQuestion tool
 
@@ -64,6 +73,9 @@ free-form "Other" path.
   tightly-coupled decision clusters (Rule 4).
 - Each question carries 2–4 options (Rule 2); put the Recommended one first and append
   `(Recommended)` to its label with the rationale in its description (Rule 3).
+- Every question keeps a standing **"Let's chat about this"** option and relies on the
+  auto-provided free-text **"Other"** entry for the blank-state type (Rule 6); use ≤3
+  substantive options so the chat option fits within the 4-option cap.
 
 **Fallback only when `AskUserQuestion` is unavailable** (non-interactive harness): use inline
 markdown options instead, still satisfying Rules 2–5:
@@ -72,8 +84,9 @@ markdown options instead, still satisfying Rules 2–5:
 >
 > - **Option A**: [description] — [trade-off] **(Recommended — [rationale])**
 > - **Option B**: [description] — [trade-off]
-> - **Option C**: [description] — [trade-off]
-> - **Other**: write in your own approach.
+> - **Other — type your own answer**: free-form write-in; the answer is whatever you type (blank
+>   state). Always present.
+> - **Chat about this**: talk the decision through before deciding. Always present.
 
 No bare "What do you think about X?" questions. No yes/no questions without an options list.
 Present the choices; let the user pick or override.
