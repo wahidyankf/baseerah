@@ -1,6 +1,6 @@
 {
   "framework": null,
   "buildCommand": "npx nx run web-ui:build-storybook",
-  "outputDirectory": "libs/web-ui/storybook-static",
+  "outputDirectory": "storybook-static",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
