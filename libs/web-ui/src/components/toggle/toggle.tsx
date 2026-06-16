@@ -24,8 +24,8 @@ export function Toggle({ value, onChange, label, disabled = false }: ToggleProps
     >
       <span
         className={cn(
-          "pointer-events-none absolute top-[3px] h-[22px] w-[22px] rounded-full bg-white shadow-xs transition-[left] duration-200",
-          value ? "left-[23px]" : "left-[3px]",
+          "pointer-events-none absolute top-[1px] h-[22px] w-[22px] rounded-full bg-white shadow-xs transition-[left] duration-200",
+          value ? "left-[21px]" : "left-[1px]",
         )}
       />
     </button>
