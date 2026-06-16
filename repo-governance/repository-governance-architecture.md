@@ -242,7 +242,7 @@ Development: AI Agents Convention — agent colors use accessible palette
 **Convention Categories** (among others):
 
 - **Structure**: File naming, Diátaxis framework, plans organization, programming language docs separation
-- **Formatting**: Linking, indentation, emoji usage, diagrams, color accessibility, mathematical notation, timestamp, nested code fences
+- **Formatting**: Linking, indentation, emoji usage, diagrams, color accessibility, mathematical notation, timestamp, nested code fences, UI mockups in plan docs (both-tiers rule, design funnel)
 - **Writing**: Content quality, README quality, factual validation, conventions writing, dynamic collection references, OSS documentation
 - **Linking**: Internal AyoKoding references and cross-repository linking patterns
 - **Tutorials**: Tutorial types, naming, programming language content and structure, Indonesian content policy

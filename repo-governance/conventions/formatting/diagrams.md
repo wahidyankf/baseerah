@@ -26,6 +26,8 @@ This convention implements the following core principles:
 
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Mermaid as the primary format for all markdown files provides a single, universal approach instead of juggling multiple diagram tools. Simple, text-based syntax that's easy to learn and version control.
 
+- **[Documentation First](../../principles/content/documentation-first.md)**: The [UI Mockups in Plan Docs](#ui-mockups-in-plan-docs) section requires every UI-bearing plan to document its design exploration visibly — alternatives considered, selection made, rationale preserved — so later readers can trace why a layout was chosen.
+
 ## Purpose
 
 This convention establishes Mermaid diagrams as the primary visualization format for all markdown files in the repository. It ensures diagrams are accessible, maintainable, and render consistently across GitHub, VS Code, and mobile platforms. This replaces fragmented diagram approaches with a single, universal standard that works everywhere.
@@ -44,7 +46,7 @@ This convention establishes Mermaid diagrams as the primary visualization format
 ### What This Convention Does NOT Cover
 
 - **Diagram content strategy** - What diagrams to create (covered in specific domain conventions)
-- **Vector graphics or images** - This convention is only for text-based diagrams (Mermaid and ASCII)
+- **Vector graphics or images** - This convention is only for text-based diagrams (Mermaid and ASCII), **except** the high-fidelity `.excalidraw.png` plan mockups governed by the [UI Mockups in Plan Docs](#ui-mockups-in-plan-docs) section below
 - **Interactive diagram features** - Platform-specific interactivity (zoom, pan) is implementation detail
 - **Diagram export formats** - Exporting Mermaid to PNG, SVG, PDF (tool-specific, not repository standard)
 
@@ -1921,6 +1923,258 @@ graph TD
 5. **Mobile-first** - Ensure readability on narrow screens
 
 This prevents "too small" diagram issues and improves mobile user experience.
+
+## UI Mockups in Plan Docs
+
+This section governs how draft UI screens are represented inside plan documents (files under
+`plans/`). It is part of the diagrams convention because plan UI mockups are a third visualization
+category alongside Mermaid diagrams and ASCII art, and keeping them here avoids convention sprawl.
+
+Originating plan: [`plans/in-progress/plan-doc-ui-mockup-convention/`](../../../plans/in-progress/plan-doc-ui-mockup-convention/)
+
+### Principles in Practice (UI Mockups)
+
+This section applies the convention's canonical principles (see the top-level
+[Principles Implemented/Respected](#principles-implementedrespected)) to UI mockups specifically:
+
+- **[Accessibility First](../../principles/content/accessibility-first.md)**: ASCII wireframes
+  render identically in every surface including screen readers and terminal output. Excalidraw PNG
+  mockups bake in the design-system color palette and token-driven spacing for readers who rely on
+  visual clarity.
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Only
+  two formats are approved. Ruled-out options are named explicitly so authors do not spend effort
+  on approaches that fail on GitHub.
+- **[Documentation First](../../principles/content/documentation-first.md)**: Every UI-bearing
+  plan must document the design exploration visibly — alternatives considered, selection made,
+  rationale preserved — so later readers can trace why a layout was chosen.
+
+### Scope
+
+This section applies to **UI-bearing plans**: plans that add or change user-facing screens or
+components under `apps/` or `libs/`. Pure refactors, non-UI plans, and governance-only changes
+are exempt.
+
+### Rendering-Support Matrix
+
+The following rendering-support matrix summarises the candidate formats evaluated during the
+research that produced this section (research in
+[tech-docs.md](../../../plans/in-progress/plan-doc-ui-mockup-convention/tech-docs.md)):
+
+| Format                           | VSCode built-in | VSCode + extension      | GitHub.com              | Diffable      | Lint-safe |
+| -------------------------------- | --------------- | ----------------------- | ----------------------- | ------------- | --------- |
+| **ASCII wireframe (code block)** | Renders         | —                       | Renders                 | Excellent     | Yes       |
+| **`.excalidraw.png` + `![]()`**  | Renders (image) | Edit: pomdtr Excalidraw | Renders                 | No (binary)   | Yes       |
+| **Plain `.png` screenshot**      | Renders         | —                       | Renders                 | No (binary)   | Yes       |
+| `.excalidraw.svg` + `![]()`      | Renders (image) | Edit: pomdtr Excalidraw | Renders (font fallback) | Partial (XML) | Yes       |
+| Inline HTML + CSS                | Renders fully   | —                       | **Style stripped**      | Yes           | Yes       |
+| Mermaid                          | Renders         | —                       | Renders                 | Yes           | Yes       |
+| MDX (`.mdx`)                     | No              | —                       | No                      | Yes           | n/a       |
+| Inline `<svg>` in `.md`          | Renders         | —                       | **Stripped**            | Yes           | Yes       |
+
+### Ruled-Out Formats
+
+The following ruled-out table lists formats that MUST NOT be used for plan-doc UI mockups, each
+with a one-line reason:
+
+| Option               | Why not (for plan docs)                                                           |
+| -------------------- | --------------------------------------------------------------------------------- |
+| Inline HTML + CSS    | GitHub strips `style=`/`class`/`id` → renders unstyled on GitHub; VSCode-only.    |
+| MDX (`.mdx`)         | Needs a build/runtime; renders on neither GitHub nor VSCode preview as plan docs. |
+| Mermaid as wireframe | No wireframe diagram type; repo validator caps layout. Flowchart ≠ UI.            |
+| `.excalidraw.svg`    | Excalidraw fonts blocked by GitHub CSP → text falls back to generic font.         |
+
+**Why inline HTML+CSS fails on GitHub**: GitHub's Markdown sanitizer removes `style=`, `class`,
+`id`, `<style>`, and `<script>` entirely — only a legacy set of presentation attributes survives
+(`align`, `border`, `color`, `width`, `height`, `colspan`, `rowspan`, `href`, `src`, `alt`).
+An `<div style="...">` mockup renders fully in VSCode but becomes an unstyled bare element on
+GitHub. [Web-cited: `rhysd/marked-sanitizer-github` confirms `style`, `class`, `id` absent from
+the allowed-attribute list; accessed 2026-06-16]
+
+**Why `.excalidraw.png` is required over `.excalidraw.svg`**: Excalidraw's custom hand-drawn fonts
+(Virgil, Cascadia) load from a CDN that GitHub's CSP blocks for SVG files, so `.excalidraw.svg`
+text labels fall back to a generic font on GitHub. `.excalidraw.png` rasterises the fonts and
+renders faithfully. [Web-cited: excalidraw/excalidraw#4855 confirms font CSP fallback on GitHub;
+accessed 2026-06-16]
+
+### The Both-Tiers Rule
+
+Every screen in a UI-bearing plan MUST be documented at **both** fidelities, in **separate,
+labelled subsections**. This is the **both-tiers rule**:
+
+| Tier          | Format                                    | Role                                                    |
+| ------------- | ----------------------------------------- | ------------------------------------------------------- |
+| Low-fidelity  | ASCII / Unicode wireframe in fenced block | Structure, control placement, flow — diffable, inline   |
+| High-fidelity | Excalidraw `.excalidraw.png` via `![]()`  | Spacing, color, typography, visual hierarchy — editable |
+
+The two tiers are **complementary**, not alternatives. The low-fidelity tier is the diffable
+structural source of truth that reviewers comment on line-by-line. The high-fidelity tier shows
+what the screen actually looks like with real design-system spacing and color.
+
+**Plain `.png` screenshot** is the high-fidelity fallback once a design is final and no longer
+iterating — it renders everywhere but is binary and must be replaced on every change.
+
+#### Tier 1 — Low-Fidelity ASCII Wireframe (Required)
+
+Zero dependencies. Renders identically in GitHub, VSCode, and terminals. Perfectly diffable.
+Stays inline in the `.md` file. Captures layout, control placement, and flow.
+
+Copy-paste example:
+
+```markdown
+### Low-Fidelity Wireframe — Compare-All Mode
+
+\`\`\`
+┌──────────────────────────────────────────────────────┐
+│ Salary Savings Calculator │
+├──────────────────────────────────────────────────────┤
+│ [ Compare All ] ( Single City ) ← tab toggle │
+├──────────────────────────────────────────────────────┤
+│ Salary (USD/mo): [________________] │
+│ Household: [ Single ▼] │
+│ Area: ( ) Center (•) Rural │
+├──────────────────────────────────────────────────────┤
+│ City Savings/mo % of Salary │
+│ ────────────── ─────────── ─────────── │
+│ Singapore $1,200 30% │
+│ Jakarta $2,100 52% │
+│ Kuala Lumpur $1,800 45% │
+└──────────────────────────────────────────────────────┘
+\`\`\`
+```
+
+#### Tier 2 — High-Fidelity Excalidraw PNG (Required)
+
+Real spacing, grouping, color, typography, and visual hierarchy, while staying editable (embedded
+scene). The PNG file lives beside the plan, for example
+`plans/in-progress/<name>/ui-compare-all.excalidraw.png`.
+
+**Tooling**: The Excalidraw VSCode extension (`pomdtr.excalidraw-editor`) is needed to **edit**
+an `.excalidraw.png` but not to **view** it. ASCII needs nothing.
+
+Copy-paste example:
+
+```markdown
+### High-Fidelity Mockup — Compare-All Mode
+
+![Compare-All mode — high-fidelity mockup](./ui-compare-all.excalidraw.png)
+
+_High-fidelity mockup. Edit with the Excalidraw VSCode extension — the PNG carries the scene._
+```
+
+### Grounding Rule (R5)
+
+Before drafting **either** tier, the author MUST survey the existing UI in the related app(s) and
+lib(s) and build the mockup from what is already there:
+
+- **Shared kit** — `libs/web-ui`: the canonical component inventory (shadcn/ui + Radix + Tailwind),
+  its design tokens, and its Storybook. Reuse real components (tabs, inputs, toggles, radio groups,
+  combobox, badges, alerts, cards, table) and token-driven spacing and color instead of inventing
+  visual language.
+- **Target app** — the app's existing pages, layout shell, theme, and locale/i18n structure so the
+  new screen matches the surrounding site.
+- **Sibling screens** — any existing page the new screen should visually match.
+- **Skill reference** — `swe-developing-frontend-ui` documents token usage, component patterns, and
+  the brand context to honour.
+
+Any **net-new component** the mockup introduces MUST be named explicitly (for example the `Table`
+primitive the salary-savings plan adds to `libs/web-ui`), so the build gap is visible before
+development begins.
+
+### Design Funnel (R6)
+
+The both-tiers rule describes the **artefacts**. The **design funnel** is the process that produces
+them. Low-fidelity is cheap, so design divergence happens there; high-fidelity is more expensive, so
+only the shortlist receives that treatment. The funnel keeps the design space wide early and the
+commitment explicit late.
+
+Every stage of the funnel is visible in the plan. No alternative is silently discarded.
+
+| Stage      | Fidelity | Count       | What lands in the plan                                                  |
+| ---------- | -------- | ----------- | ----------------------------------------------------------------------- |
+| 1. Diverge | Low-fi   | ≥ 2 (aim 3) | Named ASCII alternatives (Option A / B / C), genuinely different        |
+| 2. Narrow  | Hi-fi    | 2 finalists | `.excalidraw.png` mockups of the two strongest; one-line drop reasons   |
+| 3. Select  | —        | 1 (named)   | The chosen design, **named** (e.g. "Selected: Option A — Ranked Table") |
+| 4. Justify | —        | 1 record    | Rationale: why the winner won, why each runner-up lost                  |
+
+**Copy-paste example — funnel record (place in plan's `prd.md`)**:
+
+```markdown
+## UI Design Funnel — Compare-All Screen
+
+### Stage 1 — Diverge (Low-Fidelity Alternatives)
+
+#### Option A — Ranked Table
+
+\`\`\`
+┌────────────────────────────────────────────────────────────┐
+│ ┏ Compare All ┓ ( Single City ) │
+│ Salary [ 4,000 USD/mo ] Household [ Single ▼ ] (•)Rural │
+├────────────────────────────────────────────────────────────┤
+│ City Savings/mo % of salary ⇅ │
+│ Jakarta $2,100 52% ███████ │
+│ Kuala Lumpur $1,800 45% ██████ │
+│ Singapore $1,200 30% ████ │
+└────────────────────────────────────────────────────────────┘
+\`\`\`
+
+#### Option B — Card Grid
+
+\`\`\`
+┌────────────────────────────────────────────────────────────┐
+│ ┏ Compare All ┓ ( Single City ) │
+│ ┌── Jakarta ───────┐ ┌── Kuala Lumpur ──┐ │
+│ │ Save $2,100/mo │ │ Save $1,800/mo │ │
+│ └──────────────────┘ └──────────────────┘ │
+└────────────────────────────────────────────────────────────┘
+\`\`\`
+
+### Stage 2 — Narrow (Hi-Fi Finalists)
+
+Option B dropped here: shows few cities per screen, weak for side-by-side number comparison.
+
+#### Finalist 1 — Option A (Ranked Table)
+
+![Option A — Ranked Table, hi-fi mockup](./assets/ui-compare-all-option-a.excalidraw.png)
+
+#### Finalist 2 — Option C (Split Layout)
+
+![Option C — Split layout, hi-fi mockup](./assets/ui-compare-all-option-c.excalidraw.png)
+
+### Stage 3 — Selection
+
+**Selected: Option A — Ranked Table.**
+
+### Stage 4 — Rationale
+
+| Option         | Outcome           | Why                                                                          |
+| -------------- | ----------------- | ---------------------------------------------------------------------------- |
+| A — Ranked Tbl | **Chosen**        | Densest scan; native sort; reuses web-ui Table; collapses cleanly on mobile. |
+| C — Split      | Runner-up         | Left rail wastes space on mobile; no advantage over A for compare task.      |
+| B — Card Grid  | Dropped (Stage 2) | Weak for precise side-by-side number comparison.                             |
+```
+
+### Prior-Art Recommendation (R7)
+
+When crafting the divergent low-fidelity alternatives, the author SHOULD consult prior art — how
+comparable tools solve the same screen in the wild — using the `web-research-maker` agent.
+
+This complements the internal grounding rule (R5, the repo's own design system) with an external
+pattern survey. Cited findings inform the Stage 1 alternatives and the Stage 4 rationale, so
+alternatives are informed by real-world patterns rather than invented from a blank page.
+
+### Worked Example
+
+The full funnel is demonstrated for the Salary Savings Calculator compare-all screen in
+[`plans/in-progress/plan-doc-ui-mockup-convention/assets/`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/):
+
+- Stage 1 diverge (low-fi): three named alternatives in
+  [`example-low-fi-wireframe.md`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/example-low-fi-wireframe.md)
+- Stage 2 narrow (hi-fi finalists):
+  [`example-hi-fi-option-a-ranked-table.png`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/example-hi-fi-option-a-ranked-table.png)
+  and
+  [`example-hi-fi-option-c-split.png`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/example-hi-fi-option-c-split.png)
+- Stages 3–4 select + justify: named selection (Option A) and the rationale table in
+  [`assets/README.md`](../../../plans/in-progress/plan-doc-ui-mockup-convention/assets/README.md)
 
 ## Related Documentation
 

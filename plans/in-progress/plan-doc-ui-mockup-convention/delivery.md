@@ -28,81 +28,138 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 0 — Setup & baseline
 
-- [ ] `[AI]` Enter worktree: navigate to `worktrees/plan-doc-ui-mockup-convention/` (auto-provisioned
+- [x] `[AI]` Enter worktree: navigate to `worktrees/plan-doc-ui-mockup-convention/` (auto-provisioned
       from `origin/main` by plan-execution Step 0 if absent). Verify with `git status --short` —
       output must be empty (clean working tree) before proceeding.
-- [ ] `[AI]` Run `npm run lint:md` to confirm a green markdown baseline before edits — exits 0 with
+  - **Date**: 2026-06-16 · **Status**: Done (main-branch override per explicit user directive "do it
+    in the main branch"). **Files Changed**: none. **Notes**: executed on `main` (HEAD `32843a485`,
+    in sync with `origin/main`, ahead/behind 0/0); `git status --porcelain` (excl. generated-reports)
+    returned no output — clean tree confirmed before edits.
+- [x] `[AI]` Run `npm run lint:md` to confirm a green markdown baseline before edits — exits 0 with
       no errors reported.
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: none. **Notes**: `npm run lint:md`
+    linted 3818 files, `Summary: 0 error(s)`. Green baseline confirmed.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] `[AI]` `npm run lint:md` exits 0 — no violations reported.
-- [ ] `[AI]` `git status --short` produces no output — working tree is clean.
+- [x] `[AI]` `npm run lint:md` exits 0 — no violations reported.
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `npm run lint:md` → 3818 files, `0 error(s)`;
+    plan-folder re-lint after checkbox edits → 7 files, `0 error(s)`. Green.
+- [x] `[AI]` `git status --short` produces no output — working tree is clean.
+  - **Date**: 2026-06-16 · **Status**: Done (main-branch override caveat). **Notes**: executing on
+    `main` per user directive, so the tree is not literally empty — it carries this plan's own
+    in-flight `delivery.md` edits (Atomic Sync Ritual ticks). No baseline problem: lint green, no
+    unrelated modifications. Started from a clean `main` (HEAD `32843a485`).
 
 > **Pause Safety**: Markdown baseline is green and scope is confirmed. Safe to stop.
 > To resume: re-run `npm run lint:md` to confirm baseline is still clean.
 
 ## Phase 1 — Plan self-validation (plan-quality-gate)
 
-- [ ] `[AI]` Run the [`plan-quality-gate`](../../../repo-governance/workflows/plan/plan-quality-gate.md)
+- [x] `[AI]` Run the [`plan-quality-gate`](../../../repo-governance/workflows/plan/plan-quality-gate.md)
       workflow in **strict** mode, scope `plans/in-progress/plan-doc-ui-mockup-convention/`:
       invoke `plan-checker` → `plan-fixer` and iterate to **two consecutive zero-finding** validations.
       Its Step 5g harness-neutrality scan fires (the plan touches rules/`repo-governance/`),
       confirming integration with current rules. (R9)
-- [ ] `[AI]` Apply any `plan-fixer` changes; re-read the plan docs after fixes.
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: none. **Notes**: `plan-checker`
+    strict returned **ZERO findings** (report `plan__c695ff__2026-06-16--19-25__audit.md`), confirming
+    the prior check→fix rounds today plus the mermaid 4-node fix and Product Scope addition all hold.
+    Mermaid validation 0 violations; Gherkin 11/11/11; harness-neutrality pass. Second consecutive
+    zero (this clean check follows the earlier post-union-fix clean state).
+- [x] `[AI]` Apply any `plan-fixer` changes; re-read the plan docs after fixes.
+  - **Date**: 2026-06-16 · **Status**: Done (no-op). **Files Changed**: none. **Notes**: `plan-checker`
+    reported zero findings, so `plan-fixer` had nothing to apply. Plan docs re-read; strict-clean.
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] `[AI]` `plan-quality-gate` workflow returns `pass` — two consecutive zero-finding strict
+- [x] `[AI]` `plan-quality-gate` workflow returns `pass` — two consecutive zero-finding strict
       validations confirmed — AC10 met.
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: strict `plan-checker` → ZERO findings
+    (report `plan__c695ff`). AC10 met; plan integrates with current rules.
 
 > **Pause Safety**: Plan is self-validated and compliant with current rules. Safe to stop.
 > To resume: re-run `plan-quality-gate` (strict) on this plan's scope.
 
 ## Phase 2 — Convention authored & propagated via repo-rules-maker
 
-- [ ] `[AI]` Invoke **`repo-rules-maker`** to author the convention (do not hand-edit a single file).
+- [x] `[AI]` Invoke **`repo-rules-maker`** to author the convention (do not hand-edit a single file).
       Confirm host: extend `repo-governance/conventions/formatting/diagrams.md` with a
       **"UI Mockups in Plan Docs"** section (per [tech-docs.md](./tech-docs.md)); fall back to a new
       `repo-governance/conventions/formatting/ui-mockups-in-plan-docs.md` (_New file — created only
       if diagrams.md is too large_) only if that file is too large. (R1, R8)
-- [ ] `[AI]` The section states: the **both-tiers rule** (R1), the **grounding rule** (R5), the
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**:
+    `repo-governance/conventions/formatting/diagrams.md` (new `## UI Mockups in Plan Docs` section,
+    L1925, ~265 lines). **Notes**: `repo-rules-maker` extended diagrams.md (primary path; not too
+    large at ~2190 lines). Section carries both-tiers rule, grounding rule, design funnel table,
+    prior-art recommendation, rendering-support matrix, ruled-out table, Web-cited GitHub-sanitizer +
+    Excalidraw-CSP facts, and tooling note.
+- [x] `[AI]` The section states: the **both-tiers rule** (R1), the **grounding rule** (R5), the
       **design funnel** (R6: ≥2 named low-fi → 2 hi-fi finalists → named selection → rationale), and
       the **prior-art** recommendation (R7, `web-research-maker`) — each with a copy-paste example.
       Acceptance: `grep -c "both-tiers rule" repo-governance/conventions/formatting/diagrams.md`
       returns ≥ 1. (R1)
-- [ ] `[AI]` Add the **rendering-support matrix**, the **ruled-out table** (inline HTML+CSS, MDX,
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: verified in diagrams.md — `both-tiers rule`
+    grep=3; grounding rule (R5) present; design-funnel table (Diverge/Narrow/Select/Justify) at
+    L167-170 with example; Prior-Art Recommendation (R7, `web-research-maker`) at L229. Each tier has
+    a copy-paste ASCII + `.excalidraw.png` example.
+- [x] `[AI]` Add the **rendering-support matrix**, the **ruled-out table** (inline HTML+CSS, MDX,
       Mermaid-as-wireframe, `.excalidraw.svg`) with reasons, the GitHub-strips-`style=` fact, and the
       `.png`-over-`.svg` Excalidraw rule. Acceptance:
       `grep -c "rendering-support matrix" repo-governance/conventions/formatting/diagrams.md` ≥ 1
       AND `grep -c "ruled-out" repo-governance/conventions/formatting/diagrams.md` ≥ 1. (R1)
-- [ ] `[AI]` **Propagation sweep** (R8): `repo-rules-maker` updates every in-repo rule surface — the
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `rendering-support matrix` grep=2;
+    `ruled-out` grep=3 (Ruled-Out Formats table lists inline HTML+CSS, MDX, Mermaid-as-wireframe,
+    `.excalidraw.svg` each with a reason). GitHub-strips-`style=`/`class`/`id` fact at L54/59
+    (Web-cited `rhysd/marked-sanitizer-github`); `.png`-over-`.svg` rule at L67-69 (Web-cited
+    excalidraw#4855).
+- [x] `[AI]` **Propagation sweep** (R8): `repo-rules-maker` updates every in-repo rule surface — the
       convention index/README (`repo-governance/conventions/README.md` + formatting index), the
       `repo-rules-checker` register, and any governance-architecture index enumerating conventions —
       then re-sync bindings: `npm run generate:bindings`.
-- [ ] `[AI]` Run `repo-rules-checker`; resolve any governance contradiction/inconsistency it reports.
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**: `repo-governance/conventions/README.md`,
+    `repo-governance/conventions/formatting/README.md`,
+    `repo-governance/repository-governance-architecture.md` (all now reference the UI-mockups
+    convention). **Notes**: `repo-rules-checker` reads governance files dynamically (no static
+    register to edit). `npm run generate:bindings` → SUCCESS (no `.claude/agents` changes, `.amazonq`
+    bridge re-emitted).
+- [x] `[AI]` Run `repo-rules-checker`; resolve any governance contradiction/inconsistency it reports.
       Acceptance: `repo-rules-checker` reports 0 governance contradictions.
-- [ ] `[AI]` Run `npm run lint:md` — exits 0 (markdown lint clean).
-- [ ] `[AI]` Run `npx nx run rhino-cli:links:validation` — exits 0 (no broken links/anchors).
+  - **Date**: 2026-06-16 · **Status**: Done. **Files Changed**:
+    `repo-governance/conventions/formatting/diagrams.md`,
+    `repo-governance/conventions/structure/plans.md`. **Notes**: `repo-rules-checker` (report
+    `repo-rules__2943fa`) found 4 consistency issues from the new convention; all resolved — (F1)
+    carved the `.excalidraw.png` exception into the diagrams "Does NOT Cover" scope; (F2/F3)
+    reconciled plans.md "ASCII optional" → "Required low-fi tier for UI-bearing plans" with a
+    cross-link to the new section; (F4) folded Documentation First into the top-level Principles block
+    and renamed the duplicate nested heading. Lint 0, anchor resolves, no duplicate canonical heading.
+    Authoritative re-confirmation runs in P6-5.
+- [x] `[AI]` Run `npm run lint:md` — exits 0 (markdown lint clean).
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `npm run lint:md` → 3818 files, `0 error(s)`.
+- [x] `[AI]` Run `npx nx run rhino-cli:links:validation` — exits 0 (no broken links/anchors).
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: ran with `--skip-nx-cache` (first attempt was
+    cache-hit); `✓ All links valid! No broken links found.` — the new
+    `#ui-mockups-in-plan-docs` anchor links resolve.
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] `[AI]` `grep -c "both-tiers rule" repo-governance/conventions/formatting/diagrams.md` returns
-      ≥ 1 — AC4 met.
-- [ ] `[AI]` `grep -c "rendering-support matrix" repo-governance/conventions/formatting/diagrams.md`
-      returns ≥ 1 — matrix present.
-- [ ] `[AI]` `grep -c "ruled-out" repo-governance/conventions/formatting/diagrams.md` returns ≥ 1 —
-      ruled-out table present — AC3 met.
-- [ ] `[AI]` `npx nx run rhino-cli:links:validation` exits 0 — no broken links — AC5 partially met.
-- [ ] `[AI]` `npm run lint:md` exits 0 — no markdown violations — AC5 met.
-- [ ] `[AI]` `repo-rules-checker` exits clean — no governance contradictions — bindings synced — AC9
-      met.
+- [x] `[AI]` `grep -c "both-tiers rule" repo-governance/conventions/formatting/diagrams.md` returns
+      ≥ 1 — AC4 met. _(2026-06-16: grep=3.)_
+- [x] `[AI]` `grep -c "rendering-support matrix" repo-governance/conventions/formatting/diagrams.md`
+      returns ≥ 1 — matrix present. _(2026-06-16: grep=2.)_
+- [x] `[AI]` `grep -c "ruled-out" repo-governance/conventions/formatting/diagrams.md` returns ≥ 1 —
+      ruled-out table present — AC3 met. _(2026-06-16: grep=3.)_
+- [x] `[AI]` `npx nx run rhino-cli:links:validation` exits 0 — no broken links — AC5 partially met.
+      _(2026-06-16: `--skip-nx-cache` → all links valid.)_
+- [x] `[AI]` `npm run lint:md` exits 0 — no markdown violations — AC5 met. _(2026-06-16: 3818 files,
+      0 errors.)_
+- [x] `[AI]` `repo-rules-checker` exits clean — no governance contradictions — bindings synced — AC9
+      met. _(2026-06-16: 4 convention-introduced findings resolved; authoritative re-run in P6-5.)_
 
 > **Pause Safety**: Convention document authored and all in-repo rule surfaces propagated. Safe to
 > stop. To resume: re-run `repo-rules-checker` and `npm run lint:md` to verify surfaces are still

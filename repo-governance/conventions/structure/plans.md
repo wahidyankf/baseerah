@@ -559,7 +559,7 @@ Files in `plans/` folder MUST use **Mermaid diagrams** as the primary format (sa
 **Diagram Standards**:
 
 - **Primary Format**: Mermaid diagrams for all flowcharts, architecture diagrams, sequences
-- **ASCII Art**: Optional, only for simple directory trees or rare edge cases
+- **ASCII Art**: Optional for general diagrams (simple directory trees or rare edge cases), but **Required** as the low-fidelity wireframe tier for **UI-bearing plans** — see [UI Mockups in Plan Docs](../formatting/diagrams.md#ui-mockups-in-plan-docs) for the both-tiers rule, design funnel, and grounding rule
 - **Orientation**: Default to left-to-right (`flowchart LR` / `graph LR`) per the [Diagram and Schema Convention](../formatting/diagrams.md); use top-down only when semantically required
 - **Colors**: Use color-blind friendly palette from [Color Accessibility Convention](../formatting/color-accessibility.md)
 
