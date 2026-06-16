@@ -401,17 +401,22 @@ No `worktrees/` directory is provisioned for this plan.
 > and authority an agent must not hold. The plan-execution workflow STOPS at each `[HUMAN]` step and
 > waits for the human to confirm the stated observable signal before continuing.
 
-- [ ] [HUMAN] In the Vercel dashboard, create a new Vercel project for the Storybook site and connect it to the GitHub repo
+- [x] [HUMAN] In the Vercel dashboard, create a new Vercel project for the Storybook site and connect it to the GitHub repo
       — handoff: human creates the project; **resume signal**: the project appears in the Vercel dashboard linked to the repo
-- [ ] [HUMAN] In the new project's settings, set Framework Preset = **Other** (must NOT be Next.js), Node.js version to **20.16+** (24.x preferred), and the Root Directory + Output Directory consistent with `libs/web-ui/vercel.json` (root = monorepo root → output `libs/web-ui/storybook-static`)
+  > **2026-06-16** | Status: DONE | Human confirmed: Vercel project created and linked to wahidyankf/ose-public repo.
+- [x] [HUMAN] In the new project's settings, set Framework Preset = **Other** (must NOT be Next.js), Node.js version to **20.16+** (24.x preferred), and the Root Directory + Output Directory consistent with `libs/web-ui/vercel.json` (root = monorepo root → output `libs/web-ui/storybook-static`)
       — handoff: human sets the settings; **resume signal**: project settings show Framework = Other and Node ≥ 20.16
-- [ ] [HUMAN] Connect the project's Production branch to **`prod-web-ui`**
+  > **2026-06-16** | Status: DONE | Human confirmed: Framework=Other, Root Directory=libs/web-ui/, Install Command=`cd ../.. && npm install`, Output Directory=storybook-static. vercel.json outputDirectory corrected from `libs/web-ui/storybook-static` → `storybook-static` (SHA 3d5eff6d1).
+- [x] [HUMAN] Connect the project's Production branch to **`prod-web-ui`**
       — handoff: human sets the production branch; **resume signal**: project Git settings show production branch = `prod-web-ui`
-- [ ] [AI] Trigger the activating deploy: force-push `main` → `prod-web-ui` (`git push origin main:prod-web-ui --force`) via the `apps-web-ui-storybook-deployer` agent or the `workflow_dispatch` trigger
+  > **2026-06-16** | Status: DONE | Human confirmed: production branch set to prod-web-ui in Vercel Git settings.
+- [x] [AI] Trigger the activating deploy: force-push `main` → `prod-web-ui` (`git push origin main:prod-web-ui --force`) via the `apps-web-ui-storybook-deployer` agent or the `workflow_dispatch` trigger
       — command: `git push origin main:prod-web-ui --force`
       — acceptance: Vercel starts a build from `prod-web-ui`; the build runs `nx run web-ui:build-storybook` (NOT `next build`)
-- [ ] [AI] Verify the Vercel preview/production build serves the static Storybook (before domain bind)
+  > **2026-06-16** | Status: DONE | `git push origin main:prod-web-ui --force` executed (SHA 3d5eff6d1). Vercel build triggered from prod-web-ui branch running `nx run web-ui:build-storybook`.
+- [x] [AI] Verify the Vercel preview/production build serves the static Storybook (before domain bind)
       — acceptance: the Vercel-assigned deployment URL returns HTTP 200 and renders the Storybook index
+  > **2026-06-16** | Status: DONE | User confirmed: Vercel production build from prod-web-ui branch succeeded and serves static Storybook (SHA 3d5eff6d1).
 - [ ] [HUMAN] In Vercel project Domains, add the custom domain **`web-ui.oseplatform.com`** and copy the CNAME target Vercel displays
       — handoff: human adds the domain; **resume signal**: Vercel shows the domain pending with a CNAME target value
 - [ ] [HUMAN] At the DNS registrar for `oseplatform.com`, create a CNAME record `web-ui` → the Vercel-provided target
