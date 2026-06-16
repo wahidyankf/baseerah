@@ -4,7 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No active plans._
+- [ayokoding-www Salary Savings Calculator](./ayokoding-www-salary-savings-calculator/README.md) — bilingual interactive savings calculator
+- [Plan-Doc UI Mockup Convention](./plan-doc-ui-mockup-convention/README.md) — how to embed draft UI in plan docs (VSCode + GitHub)
 
 ## Instructions
 
