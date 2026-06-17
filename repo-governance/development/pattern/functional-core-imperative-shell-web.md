@@ -1,209 +1,148 @@
 ---
-title: Hexagonal Architecture — Web Apps
-description: Hexagonal architecture specialization for Next.js web apps — feature context modules, Effect.ts ports, application barrel rule, and adapter placement
+title: Functional Core / Imperative Shell — Web Apps
+description: The architecture pattern for Next.js web apps — every feature module splits into a pure functional core and an effectful imperative shell under src/features/<name>/{core,shell}/
 category: explanation
 subcategory: development
 tags:
   - architecture
-  - hexagonal
+  - functional-core-imperative-shell
   - nextjs
-  - effect-ts
+  - functional-programming
   - web
-created: 2026-05-26
+created: 2026-06-17
 ---
 
-# Hexagonal Architecture — Web Apps
+# Functional Core / Imperative Shell — Web Apps
 
-Next.js web apps apply hexagonal architecture through feature context modules. Each module under `contexts/<name>/`
-owns its domain, application, infrastructure, and presentation layers. The `contexts/` directory name follows the
-Effect.ts `Context.Tag` naming convention — it does **not** represent DDD bounded contexts. DDD applies only to
-backend apps; see [Hexagonal Architecture + DDD — Backend Apps](./hexagonal-architecture-be.md).
+Next.js web apps in this repo organise every feature as a **functional core / imperative shell** module under
+`src/features/<name>/`. Each module splits into exactly two zones: a pure `core/` that holds all logic and decisions,
+and an effectful `shell/` that performs IO, renders UI, and wires the framework. The shell calls the core; the core
+never reaches back.
+
+This is **not** hexagonal architecture and **not** DDD. There are no ports, no adapters, no `Context.Tag` services,
+no `domain`/`application`/`infrastructure`/`presentation` layering, and no application barrel rule. Web apps render
+content and orchestrate a thin amount of IO; the two-zone core/shell split is the minimum viable structure that keeps
+the logic pure and testable. The ports-and-adapters hexagonal pattern is reserved for **backend** services — see
+[Hexagonal Architecture + DDD — Backend Apps](./hexagonal-architecture-be.md).
 
 ## Principles Implemented/Respected
 
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Effect.ts
-  `Context.Tag` defines each outbound port as a named, typed interface. Callers declare their dependencies
-  explicitly; no global singletons or ambient module state.
+- **[Pure Functions Over Side Effects](../../principles/software-engineering/pure-functions.md)**: The functional core
+  is pure — every decision, transformation, validation, and derivation lives in functions with no IO and no side
+  effects. Effects are pushed to the imperative shell at the edge.
 
-- **[Pure Functions Over Side Effects](../../principles/software-engineering/pure-functions.md)**: Domain and
-  application logic run as pure Effect pipelines. Side effects (API calls, localStorage) are pushed into
-  infrastructure adapters and composed at the presentation boundary.
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Two zones, not four
+  layers. No port interfaces or dependency-injection wiring are introduced for their own sake; the shell imports the
+  core directly.
 
-- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: The application barrel
-  rule (`application/index.ts`) gives presentation and cross-context callers a single, stable import surface. Renaming
-  or reorganising internals does not break callers.
+- **[Immutability Over Mutability](../../principles/software-engineering/immutability.md)**: Core data is immutable;
+  shell state uses immutable update patterns (spread, `produce`).
 
-- **[Immutability Over Mutability](../../principles/software-engineering/immutability.md)**: Domain value objects are
-  immutable. State management in presentation layers uses immutable update patterns (spread, `produce`).
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: The directory a file
+  lives in declares its nature. A file under `core/` is provably pure; a file under `shell/` is where effects are
+  allowed. No ambient inference required.
 
 ## Conventions Implemented/Respected
 
-- **[Functional Programming Practices](./functional-programming.md)**: Application and domain layers use pure
-  functions and immutable data structures.
-
-## Overview
-
-Web apps organise feature concerns into context modules. Each context module is self-contained: it owns its business
-rules (domain), orchestration (application), external connections (infrastructure), and UI (presentation). Cross-context
-calls go through the application barrel of the target context — never directly into domain or infrastructure.
-
-The `contexts/` directory name arises from Effect.ts, which uses `Context.Tag` to model typed service dependencies.
-This naming is a framework convention, not a DDD concept. Web apps do not apply DDD bounded-context isolation rules.
+- **[Functional Programming Practices](./functional-programming.md)**: The core uses pure functions and immutable data
+  structures throughout.
 
 ## Directory Layout
 
 ```
 src/
-└── contexts/
+└── features/
     └── <name>/
-        ├── domain/            # Business entities, value objects, pure rules
-        ├── application/
-        │   └── index.ts       # Sole public API surface for this context
-        ├── infrastructure/    # Outbound adapters (tRPC client, fetch, localStorage)
-        └── presentation/      # Server Components, Client Components, Server Actions
+        ├── core/      # PURE: logic, decisions, validation, transforms, schemas, types, constant data
+        └── shell/     # EFFECTFUL: React components, hooks, fs/network/tRPC, Server Actions, route handlers, wiring
 ```
 
-| Layer          | Path                              | Exports                                     |
-| -------------- | --------------------------------- | ------------------------------------------- |
-| Domain         | `contexts/<name>/domain/`         | Entities, value objects, domain error types |
-| Application    | `contexts/<name>/application/`    | `index.ts` barrel only                      |
-| Infrastructure | `contexts/<name>/infrastructure/` | Internal — not imported by other contexts   |
-| Presentation   | `contexts/<name>/presentation/`   | React components, Server Actions            |
+| Zone  | Path                     | Holds                                                                            |
+| ----- | ------------------------ | -------------------------------------------------------------------------------- |
+| Core  | `features/<name>/core/`  | Pure functions, immutable data, plain types/interfaces, zod schemas, data tables |
+| Shell | `features/<name>/shell/` | React components, DOM hooks, fs readers, repositories, tRPC routers, route.ts    |
 
-## Layer Responsibilities
+A feature that has no pure logic (UI-only) has only a `shell/`. A feature that has no effects has only a `core/`.
+Create only the zones a feature actually needs — do not add empty placeholder directories or barrels.
 
-### domain/ — Domain Layer
+## Zone Responsibilities
 
-- Business entities and value objects (immutable, equality by value)
-- Pure validation and transformation functions
-- Domain error types (no HTTP status codes, no React types)
+### core/ — Functional Core
 
-### application/ — Application Layer
+- Pure functions: validation, transformation, derivation, ranking, formatting, calculation
+- Immutable value types and plain TypeScript interfaces
+- zod schemas (pure data validation)
+- Constant data tables (e.g. i18n translation maps, static datasets)
+- Shared interfaces that the shell implements (e.g. a repository interface) live here so the shell can depend on the
+  core without the core ever depending on the shell
 
-- Use-case functions that orchestrate domain objects and call outbound ports
-- Outbound port definitions as Effect.ts `Context.Tag` services
-- `index.ts` barrel: the sole export surface (see Application Barrel Rule below)
+The core is fully unit-testable without a Next.js runtime, a DOM, a filesystem, or a network.
 
-### infrastructure/ — Outbound Adapters
+### shell/ — Imperative Shell
 
-- Concrete `Context.Tag` implementations (tRPC client, REST fetch wrappers, localStorage)
-- Effect.ts `Layer` definitions wiring implementations to tags
-- Never imported by other contexts or by presentation directly
+- Next.js Server Components and Client Components (`.tsx`)
+- React hooks that touch the DOM or browser globals
+- Filesystem readers, content repositories, search-index generators
+- tRPC routers, tRPC init, root router (server wiring)
+- Next.js middleware, route handlers (`route.ts`), Server Actions
+- Any code performing IO, network, or framework wiring
 
-### presentation/ — Inbound Adapters
+The shell stays thin: it gathers inputs, calls the core for decisions, and applies the results as effects.
 
-- Next.js Server Components and Client Components
-- Server Actions
-- Route handlers (`route.ts`)
-- Imports from `application/index.ts` only — never from `domain/` or `infrastructure/` directly
+## The Dependency Rule
 
-## Port Pattern
-
-Effect.ts `Context.Tag` serves as the port definition mechanism. The application layer declares what it needs; the
-infrastructure layer provides the implementation; the presentation layer (or a root `Layer`) wires them together.
-
-```typescript
-// contexts/tasks/application/ports.ts  — port definition (application layer)
-import { Context, Effect } from "effect";
-
-export interface TaskRepository {
-  findById(id: string): Effect.Effect<Task | null, TaskNotFoundError>;
-  save(task: Task): Effect.Effect<void, PersistenceError>;
-}
-
-export const TaskRepository = Context.GenericTag<TaskRepository>("TaskRepository");
+```
+shell/  --imports-->  core/      ALLOWED
+core/   --imports-->  shell/     FORBIDDEN
 ```
 
-```typescript
-// contexts/tasks/infrastructure/trpc-task-repository.ts  — port implementation
-import { Layer } from "effect";
-import { TaskRepository } from "../application/ports";
+`core/` MUST NOT import any of: `react`, `react-dom`, `next`, `next/*`, node builtins (`fs`, `path`, `node:*`),
+`@trpc/server` router/init wiring, any HTTP/DB/`fetch` client, or browser globals — not even as types. If a file under
+`core/` needs one of those, it belongs in `shell/`. `core/` may import other `core/` modules (pure to pure). `shell/`
+may freely import its own and sibling `core/`.
 
-export const TrpcTaskRepositoryLive = Layer.succeed(TaskRepository, {
-  findById: (id) => {
-    /* tRPC call */
-  },
-  save: (task) => {
-    /* tRPC call */
-  },
-});
+### Forbidden imports
+
+| Zone     | Forbidden                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `core/`  | `react`, `react-dom`, `next`, `next/*`, `fs`/`path`/`node:*`, `@trpc/server`, `fetch`/HTTP |
+| `shell/` | Business decisions that belong in the core (extract pure logic to `core/` and call it)     |
+
+Verify core purity with:
+
+```bash
+rg -n "from ['\"](react|react-dom|next|node:|fs|path|@trpc/server)" apps/<app>/src/features/*/core
 ```
 
-## Application Barrel Rule
+This must return nothing.
 
-`application/index.ts` is the sole public API surface for a context. Presentation layers and other contexts import
-only from this barrel.
+## Next.js Construct Placement
 
-```typescript
-// contexts/tasks/application/index.ts  — barrel (only public export)
-export { createTask } from "./use-cases/create-task";
-export { completeTask } from "./use-cases/complete-task";
-export type { CreateTaskInput, TaskView } from "./types";
-// Do NOT re-export domain internals or infrastructure types
-```
+Next.js framework constructs are effects and belong in `shell/`:
 
-```typescript
-// PASS: presentation imports from barrel
-import { createTask } from "@/contexts/tasks/application";
+| Construct                   | Placement | Notes                                                           |
+| --------------------------- | --------- | --------------------------------------------------------------- |
+| Server Components           | `shell/`  | Call `core/` functions directly for any logic                   |
+| Client Components           | `shell/`  | Hold UI state; delegate decisions to `core/`                    |
+| Server Actions              | `shell/`  | Thin wrappers that call `core/` and return serialisable values  |
+| Route handlers (`route.ts`) | `shell/`  | Validate input (zod schema from `core/`), call `core/`, respond |
+| Middleware                  | `shell/`  | Framework wiring                                                |
+| tRPC routers / init         | `shell/`  | Server wiring                                                   |
 
-// FAIL: presentation reaches into domain directly
-import { Task } from "@/contexts/tasks/domain/task";
+## Reference Implementations
 
-// FAIL: presentation reaches into infrastructure
-import { TrpcTaskRepositoryLive } from "@/contexts/tasks/infrastructure/trpc-task-repository";
-```
+All three Next.js content apps follow this pattern identically:
 
-The barrel boundary means that renaming, splitting, or reorganising files inside `application/`, `domain/`, or
-`infrastructure/` does not break any presentation component as long as the barrel's public surface stays stable.
-
-## Next.js Adapter Placement
-
-Next.js-specific constructs are inbound adapters and belong in `presentation/`:
-
-| Construct                   | Placement       | Notes                                                                         |
-| --------------------------- | --------------- | ----------------------------------------------------------------------------- |
-| Server Components           | `presentation/` | May call `application/index.ts` use-cases directly                            |
-| Client Components           | `presentation/` | Communicate with server through Server Actions or tRPC                        |
-| Server Actions              | `presentation/` | Thin wrappers that call `application/index.ts` and return serialisable values |
-| Route handlers (`route.ts`) | `presentation/` | Validate input, call application, map errors to HTTP responses                |
-
-Server Components and Server Actions must not import from `domain/` directly. All access goes through the application
-barrel so that business logic is testable without a Next.js runtime.
-
-## Forbidden Imports
-
-| Layer             | Forbidden                                                        |
-| ----------------- | ---------------------------------------------------------------- |
-| `domain/`         | React, Next.js, tRPC, Effect `Layer`, any HTTP client, `fetch`   |
-| `application/`    | React, Next.js, `next/headers`, concrete infrastructure modules  |
-| `infrastructure/` | React, Next.js UI primitives, business logic (move to `domain/`) |
-| `presentation/`   | `domain/` (must go through barrel), `infrastructure/` directly   |
-
-## Reference Implementation
-
-`organiclever-web` is the canonical reference implementation of this pattern in the monorepo. Its `contexts/`
-directory demonstrates the barrel rule, Effect.ts port definitions, and Server Action adapter placement.
-
-## Exemptions
-
-Trivially-small static content sites with no IO ports, no business rules, and no
-framework-level service dependencies MAY use a flat `src/features/<name>/` layout
-instead of the hexagonal `contexts/<name>/{domain,application,infrastructure,presentation}/`
-layout. This exemption applies when:
-
-- The site renders static or near-static content with no data-mutation flows.
-- No outbound port interfaces are needed (no repositories, no API clients).
-- No business invariants need guarding.
-
-When using the flat layout, each feature directory (`src/features/<name>/`) should be
-self-contained and import only from sibling features or shared libraries — never from
-`src/contexts/`.
-
-**Documented example**: `apps/wahidyankf-www/` (personal portfolio) uses `src/features/`
-because it has no IO ports and no business rules.
+- `apps/ose-www/` — content/landing/search/seo/rss-feed features, each split into `core/` (parsers, schemas, builders)
+  and `shell/` (fs repositories, tRPC routers, React components)
+- `apps/ayokoding-www/` — content/i18n/navigation/search features in the same split
+- `apps/wahidyankf-www/` — portfolio features; pure CV/project/search data and helpers in `core/`, React UI in
+  `shell/`
 
 ## Related
 
-- **[Hexagonal Architecture](./hexagonal-architecture.md)** — Core pattern, dependency rule, and layer definitions
-- **[Hexagonal Architecture + DDD — Backend Apps](./hexagonal-architecture-be.md)** — DDD bounded contexts for
-  backend services; explains why `contexts/` in web apps is different from bounded contexts
+- **[Hexagonal Architecture](./hexagonal-architecture.md)** — Core dependency-rule idea shared with the backend pattern
+- **[Hexagonal Architecture + DDD — Backend Apps](./hexagonal-architecture-be.md)** — The ports-and-adapters / DDD
+  pattern used by backend services; explains why web apps deliberately use the simpler core/shell split instead
+- **[Functional Programming Practices](./functional-programming.md)** — Pure-function and immutability conventions the
+  core depends on

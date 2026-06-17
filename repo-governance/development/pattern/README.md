@@ -33,10 +33,10 @@ These patterns define **HOW to structure development workflows and code**, cover
 ## Documents
 
 - [Database Audit Trail Pattern](./database-audit-trail.md) - Required 6-column audit trail (created_at/by, updated_at/by, deleted_at/by) for every database table. Covers language-agnostic migration requirements, F#/DbUp patterns (versioned SQL scripts, EF Core entity mapping), and soft-delete discipline
+- [Functional Core / Imperative Shell — Web Apps](./functional-core-imperative-shell-web.md) - Next.js pattern: every `features/<name>/` module splits into a pure `core/` and an effectful `shell/` (React/IO/wiring); deliberately not hexagonal/DDD
 - [Functional Programming Practices](./functional-programming.md) - Guidelines for applying functional programming principles in TypeScript/JavaScript (immutability patterns, pure functions, function composition)
 - [Hexagonal Architecture](./hexagonal-architecture.md) - Core ports-and-adapters pattern: dependency rule, layer definitions (domain, application, infrastructure, inbound adapters), and links to app-type specializations
 - [Hexagonal Architecture — CLI Apps](./hexagonal-architecture-cli.md) - CLI specialization: `commands/` as inbound adapter, canonical directory layouts for rhino-cli/crane-cli/ose-cli/ayokoding-cli, layer responsibilities, and forbidden imports
-- [Hexagonal Architecture — Web Apps](./hexagonal-architecture-web.md) - Next.js specialization: `contexts/<name>/` feature modules, Effect.ts `Context.Tag` port pattern, application barrel rule, and Server Component adapter placement
 - [Hexagonal Architecture + DDD — Backend Apps](./hexagonal-architecture-be.md) - Backend specialization with DDD bounded contexts: F#/Giraffe directory layouts, error mapping at the API boundary, and inter-context isolation rules
 - [Maker-Checker-Fixer Pattern](./maker-checker-fixer.md) - Three-stage quality workflow for content creation and validation with user review gates and confidence level integration
 - [OpenAPI Contract-First Development](./openapi-contract-first.md) - Spec-first API development: OpenAPI YAML as single source of truth, codegen tooling per language, Nx targets, and CI drift enforcement

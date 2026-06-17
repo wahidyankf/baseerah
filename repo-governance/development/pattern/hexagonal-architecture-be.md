@@ -16,8 +16,9 @@ created: 2026-05-26
 
 Backend apps combine hexagonal architecture with Domain-Driven Design (DDD) bounded contexts. Each bounded context
 lives under `contexts/<name>/` and owns its hexagonal layers independently. DDD applies **only** to backend apps
-(`organiclever-be`, `ose-be`). Web apps use `contexts/` as an Effect.ts naming convention, not DDD — see
-[Hexagonal Architecture — Web Apps](./hexagonal-architecture-web.md).
+(`organiclever-be`, `ose-be`). Next.js web apps do not use hexagonal/DDD at all — they use the simpler
+functional-core / imperative-shell split (`features/<name>/{core,shell}/`) — see
+[Functional Core / Imperative Shell — Web Apps](./functional-core-imperative-shell-web.md).
 
 ## Principles Implemented/Respected
 

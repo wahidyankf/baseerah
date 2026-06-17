@@ -143,5 +143,5 @@ in contract-first codegen.
 
 - **[Hexagonal Architecture + DDD — Backend Apps](./hexagonal-architecture-be.md)** — Where generated types land in
   the layer structure (`api/http/` boundary); domain types are never generated
-- **[Hexagonal Architecture — Web Apps](./hexagonal-architecture-web.md)** — Where generated TypeScript client types
-  land in the web app layer structure (`infrastructure/` adapter)
+- **[Functional Core / Imperative Shell — Web Apps](./functional-core-imperative-shell-web.md)** — Where generated
+  TypeScript client types land in the web app structure (`features/<name>/shell/`, the imperative shell)
