@@ -104,8 +104,10 @@ The page has three tabs selected by a tab toggle.
   single-city detail** and each **country name links to the Cost-of-living tab filtered to that
   country**. Each tab also **always shows the healthcare funding scheme** for the selected
   city/country (a badge: "Healthcare: tax-funded (NHS-style)" / "mandatory payroll insurance" /
-  "out-of-pocket"), plus a **"health insurance: compulsory / optional"** indicator. The shared
-  Region / Country / City filters narrow the table.
+  "out-of-pocket"), plus a **"health insurance: compulsory / optional"** indicator. The **Healthcare
+  (OOP)** column header is explained on screen — **OOP = out-of-pocket**, the healthcare you pay
+  yourself on top of any tax-funded or insurance coverage — via a legend/footnote line on every tab that
+  shows the column. The shared Region / Country / City filters narrow the table.
 - **Savings** — one **gross salary** input accepted as **monthly or annual** (enter one, the tool
   shows both; annual = 12 × monthly), in USD. For each city the tool computes
   **net = gross × (1 − (federalRate[band] + subNationalRate[band]))** via the country's federal banded
@@ -132,15 +134,27 @@ The page has three tabs selected by a tab toggle.
   Each row shows the best city **and its country** (**both the best-city name and the country name are
   links** — best-city → that city's Cost-of-living detail, country → the Cost-of-living tab filtered to
   that country), the role × country **p25 / median / p75** salary
-  distribution, a typical **non-salary comp**, and a derived **total compensation** (base + non-salary
-  comp, informational, for negotiation context). The Region / Country / City filters scope the
-  candidate cities.
+  distribution, a typical **non-salary comp**, a derived **total compensation** (base + non-salary
+  comp, informational, for negotiation context), and the **essential savings**. **Every money column on
+  this tab — p25, median, p75, non-salary comp, total comp, and essential savings — is shown dual
+  (display currency on line 1 + the best city's local currency on line 2)**, consistent with the
+  universal "local + USD everywhere" rule; the display-currency selector simply chooses which currency
+  fills line 1 (defaulting to USD). The Region / Country / City filters scope the candidate cities, and
+  the **shared household / area / school-type cost-basis controls** (the same set shown on the other two
+  tabs) apply here too — the minimum qualifying role depends on the household and area, because a role's
+  essential savings falls as the modeled essentials rise. For example, **SWE I may be enough if you are
+  single, but not if you have two children and live in the city center**, where childcare, schooling,
+  and central housing push essentials above the role's net.
 
-The **household**, **area**, and **school-type** cost-basis controls below apply to all three tabs
-(they shape the modeled expenses used in every figure, including the role candidates'). Across all
-three tabs **every monetary figure is shown in both the city's local currency and USD**; the
-minimum-role tab adds a **display-currency** selector so savings can additionally be read in a
-user-chosen currency (local + USD + chosen) at once.
+The **household**, **area**, and **school-type** cost-basis controls below — together with the
+**Region / Country / City** geographic filters — form a **single shared control set that applies on all
+three tabs, including Minimum role** (they shape the modeled expenses used in every figure, including the
+role candidates'; the Minimum-role essential-savings computation uses the active household / area /
+school basis). Across all three tabs **every monetary figure — including each salary percentile (p25 /
+median / p75), each compensation figure (non-salary comp, total comp), each expense category, and each
+savings figure — is shown in both the city's local currency and USD**; the minimum-role tab adds a
+**display-currency** selector so figures can additionally be read in a user-chosen currency (the
+selector chooses which currency occupies the primary line alongside the local figure).
 
 A **household control** applies to all three tabs and sets the cost-of-living basis. The household is
 specified as:
@@ -219,19 +233,24 @@ Full rationale table + the city-detail sketch are in
 The Cost-of-living table columns are: **Country | City | Housing | Food | Transport | Utilities |
 Healthcare (OOP) + scheme badge | Childcare | School | Essentials subtotal | Lifestyle | Monthly total |
 Relocation sunk | Liquidity reserve | confidence**. Filters sit above; the city name links to the
-single-city detail.
+single-city detail. The **Healthcare (OOP)** column header is accompanied by an **on-screen
+explanation** that **OOP = out-of-pocket** — the healthcare costs the user pays themselves, on top of
+any tax-funded or insurance coverage — shown as a legend/footnote line on the screen (and repeated in
+the city-detail healthcare panel). This OOP explanation appears on **every tab that shows the Healthcare
+(OOP) column**.
 
 ### Tier 2 — High-Fidelity Finalist (Option A)
 
 The desktop high-fidelity finalist for the selected **Option A — Category Table**, with all current
 refinements applied (three-tab toggle with Cost of living active; the Region / Country / City cascading
 filter row; the household, area, and school-type controls; underlined city-name links; the always-on
-healthcare funding-scheme badge; dual-currency money cells; the snapshot-date + "estimates only"
+healthcare funding-scheme badge **whose full label fits inside the taller table row**; an **OOP =
+out-of-pocket legend line**; dual-currency money cells; the snapshot-date + "estimates only"
 disclaimer; and a city-detail inset). Authored as an SVG and rasterised to PNG at 2× via
 `rsvg-convert -z 2`, using the color-blind-friendly palette and WCAG-AA contrast per the
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
-![High-fidelity desktop mockup of the Cost-of-living tab as a Category Table: the three-tab toggle shows Cost of living active; a Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense table whose rows (Jakarta Indonesia, Singapore, Berlin Germany) list each expense category with money cells showing local currency over USD, a healthcare funding-scheme badge per row, underlined Country and City links (a City link opens that city's detail, a Country link opens the Cost-of-living tab filtered to that country), and a city-detail inset plus an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table.png)
+![High-fidelity desktop mockup of the Cost-of-living tab as a Category Table: the three-tab toggle shows Cost of living active; a Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense table whose rows (Jakarta Indonesia, Singapore, Berlin Germany) list each expense category with money cells showing local currency over USD and a healthcare funding-scheme badge per row whose full label sits inside the taller row, underlined Country and City links (a City link opens that city's detail, a Country link opens the Cost-of-living tab filtered to that country), a legend explaining OOP means out-of-pocket, and a city-detail inset plus an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -312,15 +331,18 @@ detail.
 
 The desktop high-fidelity finalist for the selected **Option A — Net/Savings Table**, with all current
 refinements applied (three-tab toggle with Savings active; the gross-salary input shown **monthly AND
-annual**; the Region / Country / City cascading filters; the "Roles: software-engineering (IC +
+annual**; the Region / Country / City cascading filters; the **shared cost-basis controls row —
+household (adults, pre-school kids, school-age kids), area (center / rural), and school-type (public /
+private)** — the same control set shown on every tab; the "Roles: software-engineering (IC +
 management)" caption; the sortable-by-essential-savings indicator on that column; effective tax split
-into federal + sub-national; non-salary comp marked informational; dual-currency money cells;
-underlined city-name links; healthcare scheme badges; and the "savings before pension" + "nominal-FX
-vs PPP" disclaimer). Authored as an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the
+into federal + sub-national; non-salary comp marked informational; dual-currency money cells; underlined
+city-name links; **healthcare scheme badges whose full label fits inside the row**; an **OOP =
+out-of-pocket legend line**; and the "savings before pension" + "nominal-FX vs PPP" disclaimer).
+Authored as an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the
 color-blind-friendly palette and WCAG-AA contrast per the
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
-![High-fidelity desktop mockup of the Savings tab as a Net/Savings Table: the three-tab toggle shows Savings active; a gross-salary input reads $8,000/mo equals $96,000/yr beside Region/Country/City filters and a roles caption; the table ranks Jakarta, Kuala Lumpur, and Berlin by essential savings (the sorted column highlighted) with columns for gross, non-salary comp, total comp, income band, effective tax split federal plus sub-national, net, essentials, lifestyle, essential and after-lifestyle savings, savings percent, and a healthcare scheme badge, money cells showing local over USD, both Country and City names rendered as underlined links (a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country), and a savings-before-pension and nominal-FX-vs-PPP disclaimer.](./assets/ui-savings-option-a-net-savings-table.png)
+![High-fidelity desktop mockup of the Savings tab as a Net/Savings Table: the three-tab toggle shows Savings active; a gross-salary input reads $8,000/mo equals $96,000/yr beside Region/Country/City filters, a roles caption, and a shared cost-basis controls row with household (adults, pre-school kids, school-age kids), area (center/rural), and school-type (public/private) controls; the table ranks Jakarta, Kuala Lumpur, and Berlin by essential savings (the sorted column highlighted) with columns for gross, non-salary comp, total comp, income band, effective tax split federal plus sub-national, net, essentials, lifestyle, essential and after-lifestyle savings, savings percent, and a healthcare scheme badge whose full label sits inside the row, money cells showing local over USD, both Country and City names rendered as underlined links (a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country), a legend noting OOP means out-of-pocket, and a savings-before-pension and nominal-FX-vs-PPP disclaimer.](./assets/ui-savings-option-a-net-savings-table.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -390,27 +412,33 @@ marked MINIMUM, then a **divider**, then dimmed **non-qualifying ("below minimum
 (6) a **"Roles: software-engineering (IC + management)"** caption; (7) city-name links to the detail.
 The selected Option A is realised as a hi-fi finalist in [Tier 2](#tier-2--high-fidelity-finalist-option-a-2) below.
 
-The Minimum-role table columns are: **Role | Country | Best city | Salary p25/median/p75 (role ×
-country) | Non-salary comp | Total comp (base + non-salary, informational) | Essential savings
-(USD · local · display)** with a ✓/MINIMUM marker. The
-ladder is **reordered**: qualifying roles grouped high→low down to the MINIMUM, a divider, then the
-dimmed non-qualifying roles. Filters scope the candidate cities; ranking and the reference-role baseline
-use the **median** salary as the representative figure.
+The Minimum-role table columns are: **Role | Best city | Country | p25 | Median | p75 | Non-salary comp
+| Total comp (base + non-salary, informational) | Essential savings** with a ✓/MINIMUM marker. **Every
+money column — p25, median, p75, non-salary comp, total comp, and essential savings — is rendered dual:
+the display currency on line 1 and the best city's local currency on line 2** (the display-currency
+selector chooses line 1, defaulting to USD), consistent with the universal "local + USD everywhere"
+rule. The ladder is **reordered**: qualifying roles grouped high→low down to the MINIMUM, a divider,
+then the dimmed non-qualifying roles. Filters and the **shared household / area / school-type cost-basis
+controls** scope and shape the candidate cities; ranking and the reference-role baseline use the
+**median** salary as the representative figure, and the essential-savings figure uses the active
+household / area / school basis.
 
 ### Tier 2 — High-Fidelity Finalist (Option A)
 
 The desktop high-fidelity finalist for the selected **Option A — Ladder Table**, with all current
 refinements applied (three-tab toggle with Minimum role active; the "Roles: software-engineering
 (IC + management)" caption badge; the baseline selector — my salary / reference role / savings target —
-plus the display-currency selector; the Region / Country / City scope filters; the p25 / median / p75
-distribution per role × country; the non-salary-comp and total-comp columns; qualifying roles ranked
-high→low down to a clearly-marked **MINIMUM** row, then a divider, then the dimmed below-minimum roles;
-essential savings shown in the chosen display currency + local; and the disclaimer line). Authored as
-an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the color-blind-friendly palette and
-WCAG-AA contrast per the
+plus the display-currency selector; the Region / Country / City scope filters; the **shared cost-basis
+controls row — household (adults, pre-school kids, school-age kids), area (center / rural), and
+school-type (public / private)** — the same control set shown on every tab; the p25 / median / p75
+distribution per role × country; the non-salary-comp and total-comp columns; **every money column shown
+dual (display currency on line 1 + local currency on line 2)**; qualifying roles ranked high→low down to
+a clearly-marked **MINIMUM** row, then a divider, then the dimmed below-minimum roles; and the
+disclaimer line). Authored as an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the
+color-blind-friendly palette and WCAG-AA contrast per the
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
-![High-fidelity desktop mockup of the Minimum-role tab as a Ladder Table: the three-tab toggle shows Minimum role active beside a software-engineering roles caption; a baseline selector (reference role chosen), a EUR display-currency selector, and Region/Country/City scope filters sit above the ladder; qualifying roles (Director, Staff SWE) are ranked high to low down to a highlighted Sr SWE MINIMUM row badged MIN, followed by a dashed Below Minimum divider and dimmed SWE II and SWE I rows; columns show best-city and country both as underlined links (a best-city link opens that city's Cost-of-living detail, a country link opens the Cost-of-living tab filtered to that country), p25/median/p75, non-salary and total comp, and essential savings in EUR plus local, with an estimates-only disclaimer.](./assets/ui-min-role-option-a-ladder-table.png)
+![High-fidelity desktop mockup of the Minimum-role tab as a Ladder Table: the three-tab toggle shows Minimum role active beside a software-engineering roles caption; a baseline selector (reference role chosen), a USD-default display-currency selector, Region/Country/City scope filters, and a shared cost-basis controls row with household (adults, pre-school kids, school-age kids), area (center/rural), and school-type (public/private) controls sit above the ladder; qualifying roles (Director, Staff SWE) are ranked high to low down to a highlighted Sr SWE MINIMUM row badged MIN, followed by a dashed Below Minimum divider and dimmed SWE II and SWE I rows; every money column (p25, median, p75, non-salary comp, total comp, essential savings) shows the display currency over the local currency, best-city and country are both underlined links (a best-city link opens that city's Cost-of-living detail, a country link opens the Cost-of-living tab filtered to that country), and a legend notes the minimum depends on the household/area cost basis above an estimates-only disclaimer.](./assets/ui-min-role-option-a-ladder-table.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -438,10 +466,12 @@ is a modeled dataset expense.
 
 **Every monetary figure is always shown in BOTH the city's local currency AND USD**, across all three
 tabs — costs, the essentials subtotal and total, savings, net take-home, relocation, role salaries,
-and the baseline. Neither currency is ever shown alone. The **Minimum-role** tab additionally keeps
-its user-chosen **display currency**, so each of its money figures reads as local + USD + the chosen
-display currency at once. USD is the common unit for all absolute cross-city comparisons (see
-Minimum-Role Resolution); local + the chosen display currency are presentation only.
+and the baseline. Neither currency is ever shown alone. On the **Minimum-role** tab the
+**display-currency selector defaults to USD**, so by default every money figure (p25, median, p75,
+non-salary comp, total comp, essential savings) reads as **USD + local** — just like the other tabs —
+and the selector lets the user optionally switch the non-local line to another currency (e.g. EUR),
+giving _chosen + local_. USD is the common unit for all absolute cross-city comparisons (see
+Minimum-Role Resolution); the local and display-currency figures are presentation only.
 
 **FX is single-sourced from `fx.ts`** — every currency conversion (local → USD, and USD → the chosen
 display currency on the Minimum-role tab) reads from the in-repo `fx.ts` table (ISO-4217 → USD per 1
@@ -724,9 +754,10 @@ in the right context rather than treating one number as the salary.
 ### US-12: Choose how the baseline is set and read savings in my currency
 
 As a minimum-role user, I want to set the baseline three ways — my own salary, a reference city +
-role, or a raw savings target — and read each savings figure in the candidate city's local currency
-and USD (always both), plus a display currency I pick, So that the comparison fits whatever I already
-know.
+role, or a raw savings target — and read **every money figure (each salary percentile, each
+compensation figure, and the savings)** in the candidate city's local currency and USD (always both),
+with the display currency I pick on the primary line, So that the comparison fits whatever I already
+know without any column hiding the local value.
 
 ## Acceptance Criteria (Gherkin)
 
@@ -781,6 +812,12 @@ Feature: Salary savings calculator
     When I select any city on any tab
     Then a healthcare funding-scheme badge is shown for that city's country
     And the badge reads "tax-funded", "mandatory payroll insurance", or "out-of-pocket"
+
+  Scenario: The OOP abbreviation is explained on screen
+    Given I am on a tab that shows the "Healthcare (OOP)" column
+    When I read the legend near the table
+    Then an on-screen explanation states that "OOP = out-of-pocket"
+    And the explanation says it is the healthcare you pay yourself on top of any tax-funded or insurance coverage
 
   Scenario: Relocation reserve is shown separately from sunk costs
     Given I am on the "Cost of living" tab
@@ -942,6 +979,18 @@ Feature: Salary savings calculator
     When I choose a display currency
     Then each role row shows its essential savings in USD, the city's local currency, and the display currency
 
+  Scenario: Every money column on the Minimum-role tab is dual currency
+    Given I am on the "Minimum role" tab with a baseline set and a display currency chosen
+    When I read a role row
+    Then every money column (p25, median, p75, non-salary comp, total comp, and essential savings) shows the display currency on the first line and the city's local currency on the second line
+    And no money column shows only a single currency
+
+  Scenario: Household composition changes the minimum qualifying role
+    Given I am on the "Minimum role" tab and the "SWE I" role qualifies for the "single" household basis
+    When I change the household to "married with 2 children" and the area to "center"
+    Then "SWE I" no longer qualifies because childcare, schooling, and central housing raise its essentials above its net
+    And a more senior role becomes the marked minimum
+
   Scenario: No role can reach the bar
     Given I am on the "Minimum role" tab
     When I set a savings target higher than any role's essential savings in any city
@@ -1077,9 +1126,11 @@ Feature: Salary savings calculator
 - FR-14: The baseline can be set three ways — (a) my salary (+ its city/country), (b) a reference
   city + software-engineering role (using the role × country **median** salary), (c) a raw savings
   target in a chosen currency — and switching source recomputes the ladder.
-- FR-15: In minimum-role mode each role row shows savings in **the candidate city's local currency
-  and USD (always both), plus a user-selected display currency**; a display-currency selector is
-  provided.
+- FR-15: In minimum-role mode **every money column on each role row — p25, median, p75, non-salary
+  comp, total comp, and essential savings — is shown dual: the candidate city's local currency AND the
+  display currency (which defaults to USD), never a single currency**; a display-currency selector
+  chooses the primary line. This makes the percentile and compensation columns dual just like essential
+  savings, consistent with the universal "local + USD everywhere" rule (NFR-1e).
 - FR-16: Each city carries seven modeled expense categories (incl. `childcare`), a
   `childcareMedianLocal`, a `{ public, private }` school median, a split one-time relocation block
   (sunk costs incl. **key money** + a liquidity-reserve cash cushion), an ISO-4217 `currency` (its
@@ -1103,9 +1154,11 @@ Feature: Salary savings calculator
   `healthcare` expense category models only out-of-pocket costs so the premium is not double-counted.
 - FR-19: **Healthcare funding scheme is always shown** — every tab displays a badge for the selected
   city/country derived from `Country.healthcareModelType` (e.g. "Healthcare: tax-funded (NHS-style)",
-  "mandatory payroll insurance", or "out-of-pocket"). The `healthcare` expense category models
-  out-of-pocket costs **only**; for `tax-funded`/`mixed` countries it is the small residual
-  (prescriptions, dental, copays, optical) since mandatory premiums sit inside the effective tax rate.
+  "mandatory payroll insurance", or "out-of-pocket"), **with the full badge label fully visible (not
+  clipped) inside its row**. The `healthcare` expense category models out-of-pocket costs **only**; for
+  `tax-funded`/`mixed` countries it is the small residual (prescriptions, dental, copays, optical) since
+  mandatory premiums sit inside the effective tax rate. The "OOP = out-of-pocket" abbreviation in the
+  Healthcare (OOP) column header is explained on screen per **FR-22**.
 - FR-20: Kids split by stage — **pre-school-age children incur childcare** (per pre-school child,
   an essential) and **school-age children incur schooling** (per school-age child). The shared kids
   control is two number inputs (pre-school 0–3, school-age 0–3); every city carries
@@ -1114,6 +1167,18 @@ Feature: Salary savings calculator
   (`net − essentials`) and `afterLifestyleSavings` (`essentialSavings − lifestyle`) — each shown in
   local + USD. The Minimum-role tab **ranks on `essentialSavings`**; lifestyle is excluded from the
   ranking.
+- FR-22: **On-screen "OOP = out-of-pocket" explanation** — every tab that shows the **Healthcare (OOP)**
+  column displays an on-screen explanation (a legend/footnote line, e.g. "OOP = out-of-pocket —
+  healthcare you pay yourself, on top of any tax-funded or insurance coverage") so the abbreviation in
+  the column header is never unexplained. The explanation is localized (en/id) and is repeated in the
+  city-detail healthcare panel.
+- FR-23: **Shared cost-basis controls on all three tabs (including Minimum role)** — the **household**
+  (adults + pre-school-kid count + school-age-kid count), **area** (center / rural), and **school-type**
+  (public / private) controls, together with the **Region / Country / City** geographic filters, form a
+  single shared control set present and applied on **every tab, including Minimum role**. The
+  Minimum-role essential-savings computation (and therefore which role is the minimum) uses the active
+  household / area / school basis, because a role's essential savings falls as the modeled essentials
+  rise with household size, central area, and private schooling.
 
 ## Non-Functional Requirements
 
@@ -1131,8 +1196,10 @@ Feature: Salary savings calculator
   `cities.ts` — no city without a country tax band — each band confidence-tiered and snapshot-dated.
 - NFR-1e: **Universal dual-currency display** — every monetary value rendered anywhere in the tool is
   formatted in **both** the city's local currency **and** USD, on every tab; no money figure is ever
-  shown in only one currency. The minimum-role tab layers its user-chosen display currency on top
-  (local + USD + chosen).
+  shown in only one currency. This explicitly includes the Minimum-role tab's **salary percentile
+  columns (p25 / median / p75)** and **compensation columns (non-salary comp, total comp)**, not only
+  the savings figure — each is dual. The minimum-role tab layers its user-chosen display currency on top
+  (the display-currency selector chooses which currency occupies the primary line alongside local).
 - NFR-2: WCAG AA — labeled inputs, keyboard-operable, sufficient contrast; responsive (mobile→desktop).
 - NFR-2b: **Healthcare funding-scheme badge accessibility** — the always-shown healthcare-scheme badge
   conveys its meaning by **text label**, not colour alone; it is keyboard-focusable/announced and meets

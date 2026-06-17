@@ -24,8 +24,14 @@ ranking and for the reference-role baseline; **all three percentiles are display
 **non-salary comp** (RSU/equity + bonus) per role × country is also shown as informational total-comp
 context (not folded into the savings math).
 
-**Geographic filters (all tabs)** — three cascading **Region / Country / City** filters sit above the
-ladder; they **scope the candidate cities** (each role's best city is chosen within the filtered set).
+**Shared control set (all tabs, including Minimum role)** — three cascading **Region / Country / City**
+filters **plus the cost-basis controls (household single/married + pre-school & school-age kid counts,
+area `center`/`rural`, school-type `public`/`private`)** sit above the ladder — the same control set
+shown on the Cost-of-living and Savings tabs. They **scope the candidate cities** (each role's best city
+is chosen within the filtered set) **and set the cost basis** for each role's essential-savings
+computation, so the minimum role depends on household + area (e.g. SWE I may qualify when single but not
+at married + 2 kids in the city center). **Every money column — p25, median, p75, non-salary comp,
+total comp, and essential savings — is shown dual (display currency + local).**
 Every qualifying/non-qualifying row **always shows both Country and City** (a **Country column to the
 left of the City column**; mobile cards read "City, Country"). **Both the Country and the (best) City
 name are links**: clicking a **City name** opens the single-city **Cost-of-living detail**
@@ -65,33 +71,37 @@ best-city name and the country name are links** — a City link opens the single
 The role ladder as sortable rows, **reordered around the minimum**: qualifying roles are listed
 high→low down to the marked **MINIMUM** qualifier, then a divider, then the **dimmed non-qualifying
 ("below minimum")** roles grouped below. Each row shows the best (cheapest-qualifying) city **and its
-country**, the role × country **p25 / median / p75** distribution, and the resulting **essential
-savings** in USD / local / your currency.
+country**, the role × country **p25 / median / p75** distribution, the non-salary comp, the total comp,
+and the resulting **essential savings**. **Every money column is dual (display currency over local)**,
+and the **shared cost-basis controls (household / area / school-type) plus Region/Country/City filters**
+sit above the ladder — the same control set as the other tabs. Because the minimum depends on the cost
+basis, changing the household composition can change which role is the minimum (e.g. SWE I may suffice
+when **single** but not at **married + 2 kids + center**, where childcare, schooling, and central
+housing raise essentials).
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────┐
-│  💰  Salary Savings Calculator   [ Healthcare: OOP ]  Roles: SWE (IC + management) │
-├──────────────────────────────────────────────────────────────────────────────────┤
-│  ( Cost of living ) ( Savings ) ┏ Minimum role ┓                                  │
-│  Baseline: ( My salary ) (•)Reference role ( Savings target )                     │
-│  Region [ All ▼ ] Country [ All ▼ ] City [ All ▼ ]                                │
-│  Ref City [ Jakarta ▼ ]  Ref Role [ Senior SWE ▼ ]  → bar = $2,100/mo            │
-│  Show in: [ USD ▼ ]  ( )Single (•)Married Pre[1] Sch[1]  (•)Rural                 │
-├──────────────────────────────────────────────────────────────────────────────────┤
-│  Role            Country*  Best city* Salary p25/med/p75   E.Save/mo (USD·local) ⇅│
-│  ─────────────   ────────  ─────────  ──────────────────   ─────────────────────  │
-│  ── Qualifies (best-city essential savings ≥ bar) ──────────────────────────────  │
-│  Director        Malaysia  K.Lumpur·  $9k / $12k / $16k    $4,910 · RM23k    ✓    │
-│  Staff SWE       Philipp.  Manila·    $6k / $8k  / $11k    $3,520 · ₱204k    ✓    │
-│  Eng. Manager    Thailand  Bangkok·   $5k / $7k  / $9k     $2,640 · ฿94k     ✓    │
-│  ▶ Senior SWE    Indonesia Jakarta·   $4k / $6k  / $8k     $2,310 · Rp36.9m  ✓ MIN│
-│  ── Below minimum (cannot clear the bar anywhere) ──────────────────────────────  │
-│  ░ SWE II        Indonesia Jakarta·   $3k / $4k  / $5k     $1,780 · Rp28.4m       │
-│  ░ SWE I         Vietnam   Hanoi·     $2k / $3k  / $4k     $1,150 · ₫29.0m        │
-│  (Salary p25/med/p75 = role×country distribution, median ranks; E.Save = essential │
-│   savings, lifestyle excluded; Best city* → detail, Country* → Cost-of-living       │
-│   filtered to that country; non-salary comp shown on tap)                          │
-└──────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────┐
+│  💰  Salary Savings Calculator   [ Healthcare: OOP ]  Roles: SWE (IC + management)          │
+├──────────────────────────────────────────────────────────────────────────────────────────┤
+│  ( Cost of living ) ( Savings ) ┏ Minimum role ┓                                            │
+│  Baseline: ( My salary ) (•)Reference role ( Savings target )    Show in: [ USD ▼ ]         │
+│  Region [ All ▼ ] Country [ All ▼ ] City [ All ▼ ]   Ref [ Jakarta · Senior SWE ▼ ]         │
+│  Cost basis: ( )Single (•)Married Pre[1] Sch[1]   Area (•)Rural   School (•)Public ( )Priv. │
+│             → bar = $1,930/mo (≈ $2,100) at the active household + area + school basis       │
+├──────────────────────────────────────────────────────────────────────────────────────────┤
+│  Role          Country* Best city*  p25       Median    p75       Non-sal  Total   E.Save ⇅│
+│                                     (USD/loc) (USD/loc) (USD/loc) (USD/loc)(USD/loc)(USD/loc)│
+│  ────────────  ──────── ──────────  ───────   ───────   ───────   ───────  ──────  ──────── │
+│  ── Qualifies (best-city essential savings ≥ bar) ─────────────────────────────────────────│
+│  Director      Malaysia K.Lumpur·   $8.3k/RM  $11k/RM   $15k/RM   +$2.4k   $13.4k  $4,510  ✓ │
+│  Staff SWE     Philipp. Manila·     $5.5k/₱   $7.3k/₱   $10k/₱    +$1.5k   $8.8k   $3,230  ✓ │
+│  ▶ Sr SWE      Indon.   Jakarta·    $3.7k/Rp  $5.5k/Rp  $7.3k/Rp  +$0.9k   $6.4k   $1,930✓MIN│
+│  ── Below minimum (cannot clear the bar anywhere) ─────────────────────────────────────────│
+│  ░ SWE II      Indon.   Jakarta·    $2.8k/Rp  $4.1k/Rp  $5.4k/Rp  +$0.5k   $4.6k   $1,470    │
+│  ░ SWE I       Vietnam  Hanoi·      $2.2k/₫   $3.2k/₫   $4.2k/₫   +$0.3k   $3.5k   $980       │
+│  (Every money column = display currency over local; median ranks; Best city* → detail,      │
+│   Country* → Cost-of-living filtered; the minimum depends on the cost basis above)           │
+└──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Option B — Banner + List (dropped)

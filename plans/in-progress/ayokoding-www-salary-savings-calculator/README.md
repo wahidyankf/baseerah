@@ -57,9 +57,10 @@ _"For a savings goal, what is the lowest engineering role anywhere that reaches 
   - **Cost of living** — no salary input; per city, the full monthly expense-category breakdown
     (housing, food, transport, utilities, healthcare, childcare, school, lifestyle) with an essentials
     subtotal and a total, plus a separate one-time **relocation sunk-cost** line and a separately
-    labelled **liquidity reserve**, and an always-shown **healthcare funding-scheme** badge. Lists
-    tech-hub cities worldwide, narrowed by the shared cascading filters; each city name links to its
-    single-city detail.
+    labelled **liquidity reserve**, and an always-shown **healthcare funding-scheme** badge. The
+    **Healthcare (OOP)** column header is explained on screen (**OOP = out-of-pocket** — healthcare you
+    pay yourself, on top of any tax-funded or insurance coverage). Lists tech-hub cities worldwide,
+    narrowed by the shared cascading filters; each city name links to its single-city detail.
   - **Savings** — enter a **gross salary** as **monthly or annual** (both shown; annual = 12 ×
     monthly), USD; for each city the tool converts gross to **net take-home** via the country's
     federal banded effective tax rate plus any city sub-national rate, subtracts the modeled
@@ -74,8 +75,12 @@ _"For a savings goal, what is the lowest engineering role anywhere that reaches 
     excluded), marks the **lowest qualifier**, and **reorders** the ladder so qualifying roles sit
     above the minimum and non-qualifying roles below a divider. Each row shows the best city + its
     country, the role × country **p25 / median / p75** distribution, and the typical **non-salary
-    comp → total compensation** (base + non-salary comp) for negotiation context. Savings shown in
-    **USD, the city's local currency, and a user-chosen display currency**.
+    comp → total compensation** (base + non-salary comp) for negotiation context. **Every money
+    column — p25, median, p75, non-salary comp, total comp, and essential savings — is shown dual
+    (the city's local currency + USD, with a user-chosen display currency on the primary line).** The
+    same shared **household / area / school-type cost-basis controls** apply here, so the **minimum role
+    depends on the household + area** (e.g. SWE I may suffice when single but not at married + 2 kids in
+    the city center).
 - Shared cost-basis controls (apply to all three tabs):
   - **Household** — single/married (1–2 adults) plus counts of pre-school children and school-age
     children (scales expenses on an OECD-modified basis; pre-school kids drive childcare, school-age

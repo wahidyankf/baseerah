@@ -21,7 +21,18 @@ server-side rendering of results, no backend, no tRPC procedure, no network at r
    minimum-role search); fully unit-tested.
 3. **Presentation** — a `'use client'` interactive page under
    `/[locale]/tools/cost-of-living-calculator`, plus small components for the three tabs; consumes the
-   calc core and i18n strings.
+   calc core and i18n strings. Presentation rules that span all tabs:
+   - **Dual-currency on every money column** — a shared money-cell renderer formats each monetary value
+     as the display currency (line 1; defaults to USD) over the city's local currency (line 2). On the
+     Minimum-role tab this applies to **every** money column — p25, median, p75, non-salary comp, total
+     comp, and essential savings — not only the savings figure (FR-15, NFR-1e).
+   - **Shared cost-basis controls on all three tabs** — `geo-filters.tsx` (Region / Country / City) and
+     `controls.tsx` (household / area / school-type) render on **every** tab including Minimum role; the
+     Minimum-role essential-savings computation and ranking read the active household / area / school
+     basis (FR-23). A taller-row table layout keeps the healthcare funding-scheme badge fully visible.
+   - **On-screen OOP explanation** — every tab that shows the Healthcare (OOP) column renders a
+     legend/footnote line stating "OOP = out-of-pocket" with the plain-language meaning (FR-22), sourced
+     from i18n (en/id).
 
 ```mermaid
 flowchart LR
@@ -73,7 +84,10 @@ flowchart TD
 ### Minimum-role resolution
 
 The minimum-role branch resolves a USD baseline, then ranks the role ladder by each role's best-city
-absolute net savings:
+absolute net savings. The per-role essential savings is computed at the **active household / area /
+school-type cost basis** (the same shared controls shown on every tab), so changing the household
+composition or area re-derives the essentials and can change which role is the minimum — e.g. a role
+that qualifies for a `single` basis may fall below the bar at `married + 2 kids` in the city `center`:
 
 ```mermaid
 flowchart LR
@@ -170,7 +184,7 @@ apps/ayokoding-www/src/
       cost-of-living.tsx          # "Cost of living" tab (category table; Country+City columns; Country & City name links; country case = filtered table via ?tab=cost&country=<id>)
       city-detail.tsx             # single-city Cost-of-living detail view (drill-down, ?tab=cost&city=<id>)
       savings.tsx                 # "Savings" tab (gross monthly+annual -> net -> savings + non-salary comp + total-comp table)
-      min-role.tsx                # "Minimum role" tab (baseline selector + reordered ladder table; p25/median/p75 + total-comp)
+      min-role.tsx                # "Minimum role" tab (baseline selector + shared cost-basis controls + reordered ladder table; p25/median/p75 + comp + savings ALL dual-currency)
       *.test.tsx                  # component tests
 ```
 
@@ -642,7 +656,8 @@ toDisplayCurrencies(fx, savingsUsd, cityCurrency, displayCurrency): { usd, local
   percentages. Minimum-role rows show the **best city + its country**, the role × country **p25 /
   median / p75** distribution, the **non-salary comp**, a derived **total compensation** (base +
   non-salary comp, informational), and `essentialSavings` (the ranking figure, median-based) in
-  **USD + the candidate city's local currency + the chosen display currency**, plus
+  **the display currency (line 1; defaults to USD, user-switchable) + the candidate city's local
+  currency (line 2)** — so by default USD + local, like every other tab — plus
   `afterLifestyleSavings` for context; **both the best-city name and the country name are links** (best
   city → that city's detail, country → the Cost-of-living tab filtered to that country); the ladder is
   **reordered** so qualifying roles sit above the marked MINIMUM and non-qualifying ("below minimum")

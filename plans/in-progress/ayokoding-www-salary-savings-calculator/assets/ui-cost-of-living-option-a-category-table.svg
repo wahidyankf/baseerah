@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="760" viewBox="0 0 1180 760" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="780" viewBox="0 0 1180 780" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
   <title>Cost-of-living screen, Option A (Category Table) high-fidelity finalist</title>
-  <desc>High-fidelity mockup of the Cost of Living Calculator Cost-of-living tab using the Category Table layout. A three-tab toggle has Cost of living active. A Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense category table. Money cells show local currency on the first line and USD on the second line. Healthcare cells carry a funding-scheme badge. Both Country and City names are underlined links: a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country. An inset previews the city-detail view.</desc>
+  <desc>High-fidelity mockup of the Cost of Living Calculator Cost-of-living tab using the Category Table layout. A three-tab toggle has Cost of living active. A Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense category table. Money cells show local currency on the first line and USD on the second line. Healthcare cells carry a funding-scheme badge whose full label fits inside the taller row. A legend explains OOP means out-of-pocket. Both Country and City names are underlined links: a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country. An inset previews the city-detail view.</desc>
 
   <!-- palette: blue #0173B2, orange #DE8F05, teal #029E73, purple #CC78BC, brown #CA9161, gray #808080, black #000000 -->
-  <rect x="0" y="0" width="1180" height="760" fill="#FFFFFF"/>
-  <rect x="0.5" y="0.5" width="1179" height="759" fill="none" stroke="#000000" stroke-width="1"/>
+  <rect x="0" y="0" width="1180" height="780" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="1179" height="779" fill="none" stroke="#000000" stroke-width="1"/>
 
   <!-- ===== Header bar ===== -->
   <rect x="0" y="0" width="1180" height="48" fill="#0173B2"/>
@@ -92,8 +92,9 @@
   </g>
 
   <!-- row template: each money cell = local (line1) + USD (line2). City names underlined links (blue). -->
+  <!-- Rows are 70px tall so the full healthcare funding-scheme badge sits inside the row, never clipped. -->
   <!-- Row 1: Jakarta, Indonesia -->
-  <rect x="20" y="232" width="1140" height="56" fill="#FFFFFF"/>
+  <rect x="20" y="232" width="1140" height="70" fill="#FFFFFF"/>
   <g font-size="11" text-anchor="middle">
     <text x="78"  y="262" fill="#0173B2" text-decoration="underline" font-weight="600">Indonesia</text>
     <text x="160" y="262" fill="#0173B2" text-decoration="underline" font-weight="600">Jakarta</text>
@@ -111,100 +112,102 @@
     <text x="980" y="256" fill="#000000">Rp 75M</text><text x="980" y="270" fill="#808080" font-size="10">$4,800</text>
     <text x="1070" y="256" fill="#000000">Rp 2.8M</text><text x="1070" y="270" fill="#808080" font-size="10">$180</text>
   </g>
-  <!-- healthcare scheme badge -->
-  <rect x="464" y="278" width="72" height="15" rx="7" fill="#029E73"/>
-  <text x="500" y="289" font-size="9" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
-  <line x1="20" y1="288" x2="1160" y2="288" stroke="#E5E5E5" stroke-width="1"/>
+  <!-- healthcare scheme badge: full-label box centered under the Healthcare value, inside the row -->
+  <rect x="456" y="282" width="88" height="16" rx="8" fill="#029E73"/>
+  <text x="500" y="293.5" font-size="9" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
+  <line x1="20" y1="302" x2="1160" y2="302" stroke="#E5E5E5" stroke-width="1"/>
 
   <!-- Row 2: Singapore, Singapore -->
-  <rect x="20" y="288" width="1140" height="56" fill="#F6F8FA"/>
+  <rect x="20" y="302" width="1140" height="70" fill="#F6F8FA"/>
   <g font-size="11" text-anchor="middle">
-    <text x="78"  y="318" fill="#0173B2" text-decoration="underline" font-weight="600">Singapore</text>
-    <text x="160" y="318" fill="#0173B2" text-decoration="underline" font-weight="600">Singapore</text>
-    <text x="160" y="332" fill="#808080" font-size="9">view detail →</text>
-    <text x="232" y="312" fill="#000000">S$3.0k</text><text x="232" y="326" fill="#808080" font-size="10">$2,250</text>
-    <text x="300" y="312" fill="#000000">S$0.8k</text><text x="300" y="326" fill="#808080" font-size="10">$600</text>
-    <text x="362" y="312" fill="#000000">S$0.2k</text><text x="362" y="326" fill="#808080" font-size="10">$150</text>
-    <text x="426" y="312" fill="#000000">S$0.3k</text><text x="426" y="326" fill="#808080" font-size="10">$230</text>
-    <text x="500" y="312" fill="#000000">S$0.4k</text><text x="500" y="326" fill="#808080" font-size="10">$300</text>
-    <text x="572" y="312" fill="#000000">S$1.6k</text><text x="572" y="326" fill="#808080" font-size="10">$1,200</text>
-    <text x="644" y="318" fill="#000000">—</text>
-    <text x="714" y="312" fill="#000000" font-weight="600">S$6.3k</text><text x="714" y="326" fill="#808080" font-size="10">$4,730</text>
-    <text x="794" y="312" fill="#000000" font-weight="700">S$7.5k</text><text x="794" y="326" fill="#808080" font-size="10">$5,630</text>
-    <text x="884" y="312" fill="#000000">S$12k</text><text x="884" y="326" fill="#808080" font-size="10">$9,000</text>
-    <text x="980" y="312" fill="#000000">S$20k</text><text x="980" y="326" fill="#808080" font-size="10">$15,000</text>
-    <text x="1070" y="312" fill="#000000">S$1.2k</text><text x="1070" y="326" fill="#808080" font-size="10">$900</text>
+    <text x="78"  y="332" fill="#0173B2" text-decoration="underline" font-weight="600">Singapore</text>
+    <text x="160" y="332" fill="#0173B2" text-decoration="underline" font-weight="600">Singapore</text>
+    <text x="160" y="346" fill="#808080" font-size="9">view detail →</text>
+    <text x="232" y="326" fill="#000000">S$3.0k</text><text x="232" y="340" fill="#808080" font-size="10">$2,250</text>
+    <text x="300" y="326" fill="#000000">S$0.8k</text><text x="300" y="340" fill="#808080" font-size="10">$600</text>
+    <text x="362" y="326" fill="#000000">S$0.2k</text><text x="362" y="340" fill="#808080" font-size="10">$150</text>
+    <text x="426" y="326" fill="#000000">S$0.3k</text><text x="426" y="340" fill="#808080" font-size="10">$230</text>
+    <text x="500" y="326" fill="#000000">S$0.4k</text><text x="500" y="340" fill="#808080" font-size="10">$300</text>
+    <text x="572" y="326" fill="#000000">S$1.6k</text><text x="572" y="340" fill="#808080" font-size="10">$1,200</text>
+    <text x="644" y="332" fill="#000000">—</text>
+    <text x="714" y="326" fill="#000000" font-weight="600">S$6.3k</text><text x="714" y="340" fill="#808080" font-size="10">$4,730</text>
+    <text x="794" y="326" fill="#000000" font-weight="700">S$7.5k</text><text x="794" y="340" fill="#808080" font-size="10">$5,630</text>
+    <text x="884" y="326" fill="#000000">S$12k</text><text x="884" y="340" fill="#808080" font-size="10">$9,000</text>
+    <text x="980" y="326" fill="#000000">S$20k</text><text x="980" y="340" fill="#808080" font-size="10">$15,000</text>
+    <text x="1070" y="326" fill="#000000">S$1.2k</text><text x="1070" y="340" fill="#808080" font-size="10">$900</text>
   </g>
-  <rect x="466" y="334" width="68" height="15" rx="7" fill="#DE8F05"/>
-  <text x="500" y="345" font-size="9" fill="#FFFFFF" text-anchor="middle" font-weight="700">payroll</text>
-  <line x1="20" y1="344" x2="1160" y2="344" stroke="#E5E5E5" stroke-width="1"/>
+  <rect x="456" y="352" width="88" height="16" rx="8" fill="#DE8F05"/>
+  <text x="500" y="363.5" font-size="9" fill="#FFFFFF" text-anchor="middle" font-weight="700">payroll</text>
+  <line x1="20" y1="372" x2="1160" y2="372" stroke="#E5E5E5" stroke-width="1"/>
 
   <!-- Row 3: Berlin, Germany -->
-  <rect x="20" y="344" width="1140" height="56" fill="#FFFFFF"/>
+  <rect x="20" y="372" width="1140" height="70" fill="#FFFFFF"/>
   <g font-size="11" text-anchor="middle">
-    <text x="78"  y="374" fill="#0173B2" text-decoration="underline" font-weight="600">Germany</text>
-    <text x="160" y="374" fill="#0173B2" text-decoration="underline" font-weight="600">Berlin</text>
-    <text x="160" y="388" fill="#808080" font-size="9">view detail →</text>
-    <text x="232" y="368" fill="#000000">€1,010</text><text x="232" y="382" fill="#808080" font-size="10">$1,100</text>
-    <text x="300" y="368" fill="#000000">€370</text><text x="300" y="382" fill="#808080" font-size="10">$400</text>
-    <text x="362" y="368" fill="#000000">€83</text><text x="362" y="382" fill="#808080" font-size="10">$90</text>
-    <text x="426" y="368" fill="#000000">€165</text><text x="426" y="382" fill="#808080" font-size="10">$180</text>
-    <text x="500" y="368" fill="#000000">€28</text><text x="500" y="382" fill="#808080" font-size="10">$30</text>
-    <text x="572" y="368" fill="#000000">€294</text><text x="572" y="382" fill="#808080" font-size="10">$320</text>
-    <text x="644" y="374" fill="#000000">—</text>
-    <text x="714" y="368" fill="#000000" font-weight="600">€2,315</text><text x="714" y="382" fill="#808080" font-size="10">$2,520</text>
-    <text x="794" y="368" fill="#000000" font-weight="700">€2,635</text><text x="794" y="382" fill="#808080" font-size="10">$2,870</text>
-    <text x="884" y="368" fill="#000000">€6,790</text><text x="884" y="382" fill="#808080" font-size="10">$7,400</text>
-    <text x="980" y="368" fill="#000000">€7,160</text><text x="980" y="382" fill="#808080" font-size="10">$7,800</text>
-    <text x="1070" y="368" fill="#000000">€321</text><text x="1070" y="382" fill="#808080" font-size="10">$350</text>
+    <text x="78"  y="402" fill="#0173B2" text-decoration="underline" font-weight="600">Germany</text>
+    <text x="160" y="402" fill="#0173B2" text-decoration="underline" font-weight="600">Berlin</text>
+    <text x="160" y="416" fill="#808080" font-size="9">view detail →</text>
+    <text x="232" y="396" fill="#000000">€1,010</text><text x="232" y="410" fill="#808080" font-size="10">$1,100</text>
+    <text x="300" y="396" fill="#000000">€370</text><text x="300" y="410" fill="#808080" font-size="10">$400</text>
+    <text x="362" y="396" fill="#000000">€83</text><text x="362" y="410" fill="#808080" font-size="10">$90</text>
+    <text x="426" y="396" fill="#000000">€165</text><text x="426" y="410" fill="#808080" font-size="10">$180</text>
+    <text x="500" y="396" fill="#000000">€28</text><text x="500" y="410" fill="#808080" font-size="10">$30</text>
+    <text x="572" y="396" fill="#000000">€294</text><text x="572" y="410" fill="#808080" font-size="10">$320</text>
+    <text x="644" y="402" fill="#000000">—</text>
+    <text x="714" y="396" fill="#000000" font-weight="600">€2,315</text><text x="714" y="410" fill="#808080" font-size="10">$2,520</text>
+    <text x="794" y="396" fill="#000000" font-weight="700">€2,635</text><text x="794" y="410" fill="#808080" font-size="10">$2,870</text>
+    <text x="884" y="396" fill="#000000">€6,790</text><text x="884" y="410" fill="#808080" font-size="10">$7,400</text>
+    <text x="980" y="396" fill="#000000">€7,160</text><text x="980" y="410" fill="#808080" font-size="10">$7,800</text>
+    <text x="1070" y="396" fill="#000000">€321</text><text x="1070" y="410" fill="#808080" font-size="10">$350</text>
   </g>
-  <rect x="464" y="390" width="72" height="15" rx="7" fill="#029E73"/>
-  <text x="500" y="401" font-size="9" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
-  <rect x="20" y="232" width="1140" height="168" fill="none" stroke="#000000" stroke-width="1.5"/>
+  <rect x="456" y="422" width="88" height="16" rx="8" fill="#029E73"/>
+  <text x="500" y="433.5" font-size="9" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
+  <rect x="20" y="232" width="1140" height="210" fill="none" stroke="#000000" stroke-width="1.5"/>
 
-  <!-- money-cell legend -->
+  <!-- money-cell + OOP legend -->
   <g font-size="11">
-    <rect x="20" y="412" width="640" height="26" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
-    <text x="32" y="429" fill="#000000">Money cells: <tspan font-weight="700">local currency</tspan> (line 1) · <tspan fill="#808080">USD (line 2)</tspan>. <tspan fill="#0173B2" text-decoration="underline">Country</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">City</tspan> are links → Cost-of-living filtered.</text>
+    <rect x="20" y="454" width="1140" height="44" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
+    <text x="32" y="471" fill="#000000">Money cells: <tspan font-weight="700">local currency</tspan> (line 1) · <tspan fill="#808080">USD (line 2)</tspan>. <tspan fill="#0173B2" text-decoration="underline">Country</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">City</tspan> are links → Cost-of-living filtered.</text>
+    <text x="32" y="490" fill="#000000"><tspan font-weight="700">OOP = out-of-pocket</tspan> — the healthcare you pay yourself, on top of any tax-funded or insurance cover. The scheme badge shows how care is funded.</text>
   </g>
 
   <!-- ===== City-detail inset ===== -->
   <g>
-    <rect x="470" y="448" width="690" height="252" rx="8" fill="#FFFFFF" stroke="#CC78BC" stroke-width="2"/>
-    <rect x="470" y="448" width="690" height="30" rx="8" fill="#CC78BC"/>
-    <text x="484" y="468" font-size="13" font-weight="700" fill="#FFFFFF">City detail — Jakarta, Indonesia (drill-down from city link)</text>
+    <rect x="470" y="508" width="690" height="252" rx="8" fill="#FFFFFF" stroke="#CC78BC" stroke-width="2"/>
+    <rect x="470" y="508" width="690" height="30" rx="8" fill="#CC78BC"/>
+    <text x="484" y="528" font-size="13" font-weight="700" fill="#FFFFFF">City detail — Jakarta, Indonesia (drill-down from city link)</text>
     <g font-size="11" fill="#000000">
-      <text x="486" y="500" font-weight="600">Category</text>
-      <text x="690" y="500" font-weight="600" text-anchor="end">Local</text>
-      <text x="820" y="500" font-weight="600" text-anchor="end">USD</text>
-      <line x1="486" y1="508" x2="830" y2="508" stroke="#808080" stroke-width="1"/>
-      <text x="486" y="528">Housing</text><text x="690" y="528" text-anchor="end">Rp 9.4M</text><text x="820" y="528" text-anchor="end" fill="#808080">$600</text>
-      <text x="486" y="548">Food</text><text x="690" y="548" text-anchor="end">Rp 3.9M</text><text x="820" y="548" text-anchor="end" fill="#808080">$250</text>
-      <text x="486" y="568">Transport</text><text x="690" y="568" text-anchor="end">Rp 0.5M</text><text x="820" y="568" text-anchor="end" fill="#808080">$30</text>
-      <text x="486" y="588">Utilities</text><text x="690" y="588" text-anchor="end">Rp 1.9M</text><text x="820" y="588" text-anchor="end" fill="#808080">$120</text>
-      <text x="486" y="608" font-weight="700">Essentials subtotal</text><text x="690" y="608" text-anchor="end" font-weight="700">Rp 22M</text><text x="820" y="608" text-anchor="end" font-weight="700">$1,400</text>
-      <line x1="486" y1="618" x2="830" y2="618" stroke="#808080" stroke-width="1"/>
-      <text x="486" y="638">Relocation (sunk, one-time)</text><text x="690" y="638" text-anchor="end">Rp 64M</text><text x="820" y="638" text-anchor="end" fill="#808080">$4,100</text>
-      <text x="486" y="658">Liquidity reserve</text><text x="690" y="658" text-anchor="end">Rp 75M</text><text x="820" y="658" text-anchor="end" fill="#808080">$4,800</text>
+      <text x="486" y="560" font-weight="600">Category</text>
+      <text x="690" y="560" font-weight="600" text-anchor="end">Local</text>
+      <text x="820" y="560" font-weight="600" text-anchor="end">USD</text>
+      <line x1="486" y1="568" x2="830" y2="568" stroke="#808080" stroke-width="1"/>
+      <text x="486" y="588">Housing</text><text x="690" y="588" text-anchor="end">Rp 9.4M</text><text x="820" y="588" text-anchor="end" fill="#808080">$600</text>
+      <text x="486" y="608">Food</text><text x="690" y="608" text-anchor="end">Rp 3.9M</text><text x="820" y="608" text-anchor="end" fill="#808080">$250</text>
+      <text x="486" y="628">Transport</text><text x="690" y="628" text-anchor="end">Rp 0.5M</text><text x="820" y="628" text-anchor="end" fill="#808080">$30</text>
+      <text x="486" y="648">Utilities</text><text x="690" y="648" text-anchor="end">Rp 1.9M</text><text x="820" y="648" text-anchor="end" fill="#808080">$120</text>
+      <text x="486" y="668" font-weight="700">Essentials subtotal</text><text x="690" y="668" text-anchor="end" font-weight="700">Rp 22M</text><text x="820" y="668" text-anchor="end" font-weight="700">$1,400</text>
+      <line x1="486" y1="678" x2="830" y2="678" stroke="#808080" stroke-width="1"/>
+      <text x="486" y="698">Relocation (sunk, one-time)</text><text x="690" y="698" text-anchor="end">Rp 64M</text><text x="820" y="698" text-anchor="end" fill="#808080">$4,100</text>
+      <text x="486" y="718">Liquidity reserve</text><text x="690" y="718" text-anchor="end">Rp 75M</text><text x="820" y="718" text-anchor="end" fill="#808080">$4,800</text>
     </g>
-    <rect x="880" y="494" width="262" height="100" rx="6" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
-    <text x="896" y="516" font-size="11" font-weight="700" fill="#000000">Healthcare funding</text>
-    <rect x="896" y="524" width="84" height="18" rx="9" fill="#029E73"/>
-    <text x="938" y="537" font-size="10" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
-    <text x="896" y="562" font-size="10" fill="#808080">Public scheme; modeled out-of-</text>
-    <text x="896" y="576" font-size="10" fill="#808080">pocket only in the OOP column.</text>
-    <text x="880" y="630" font-size="10" fill="#808080">Deep-link: ?tab=cost&amp;city=jakarta-id</text>
+    <rect x="880" y="554" width="262" height="116" rx="6" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
+    <text x="896" y="576" font-size="11" font-weight="700" fill="#000000">Healthcare funding</text>
+    <rect x="896" y="584" width="100" height="18" rx="9" fill="#029E73"/>
+    <text x="946" y="597" font-size="10" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
+    <text x="896" y="622" font-size="10" fill="#808080">Public scheme; only out-of-pocket</text>
+    <text x="896" y="636" font-size="10" fill="#808080">(OOP) spend shows in the OOP column.</text>
+    <text x="896" y="650" font-size="10" fill="#808080">OOP = what you pay yourself.</text>
+    <text x="880" y="700" font-size="10" fill="#808080">Deep-link: ?tab=cost&amp;city=jakarta-id</text>
   </g>
 
   <!-- ===== Disclaimer footer ===== -->
-  <line x1="20" y1="448" x2="450" y2="448" stroke="#808080" stroke-width="1"/>
+  <line x1="20" y1="508" x2="450" y2="508" stroke="#808080" stroke-width="1"/>
   <g font-size="11" fill="#808080">
-    <text x="20" y="466" font-weight="700" fill="#DE8F05">Estimates only</text>
-    <text x="20" y="484">Modeled monthly figures, not quotes.</text>
-    <text x="20" y="500">Snapshot date 2026-06; FX nominal.</text>
-    <text x="20" y="516">Healthcare = modeled out-of-pocket;</text>
-    <text x="20" y="532">scheme badge shows the funding model.</text>
-    <text x="20" y="548">Relocation is a one-time sunk cost;</text>
-    <text x="20" y="564">liquidity reserve is a held cushion.</text>
+    <text x="20" y="526" font-weight="700" fill="#DE8F05">Estimates only</text>
+    <text x="20" y="544">Modeled monthly figures, not quotes.</text>
+    <text x="20" y="560">Snapshot date 2026-06; FX nominal.</text>
+    <text x="20" y="576">Healthcare (OOP) = out-of-pocket you</text>
+    <text x="20" y="592">pay yourself; badge shows funding model.</text>
+    <text x="20" y="608">Relocation is a one-time sunk cost;</text>
+    <text x="20" y="624">liquidity reserve is a held cushion.</text>
   </g>
 </svg>

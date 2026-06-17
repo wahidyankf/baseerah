@@ -11,7 +11,8 @@ savings columns** — only the modeled monthly expense breakdown (housing, food,
 healthcare-OOP, childcare, school, lifestyle) with an essentials subtotal and a total, a separate
 one-time **relocation sunk-cost** line, and a separately labelled **liquidity reserve** (the cash
 cushion the user keeps). Every layout also shows the always-on **healthcare funding-scheme badge** for
-the selected city/country.
+the selected city/country, plus an **on-screen legend explaining the "Healthcare (OOP)" column header —
+OOP = out-of-pocket**, the healthcare you pay yourself on top of any tax-funded or insurance coverage.
 
 **Geographic filters (all tabs)** — three cascading filters sit above the table on every tab:
 **Region** narrows the **Country** list, and **Country** narrows the **City** list. Every row
