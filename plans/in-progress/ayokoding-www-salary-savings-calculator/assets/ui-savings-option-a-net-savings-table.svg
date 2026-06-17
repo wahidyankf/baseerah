@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="640" viewBox="0 0 1180 640" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+  <title>Savings screen, Option A (Net/Savings Table) high-fidelity finalist</title>
+  <desc>High-fidelity mockup of the Cost of Living Calculator Savings tab using the Net/Savings Table layout. A three-tab toggle has Savings active. A gross salary input shows monthly and annual amounts, Region/Country/City cascading filters sit alongside, and a dense table ranks cities by essential savings. Columns cover gross monthly and annual, non-salary comp, total comp, income band, effective tax percent split into federal and sub-national, net, essentials, lifestyle, essential savings, after-lifestyle savings, essential savings percent, and a healthcare scheme badge. Money cells show local currency and USD; city names are underlined links; the essential-savings column header carries a sort indicator.</desc>
+
+  <rect x="0" y="0" width="1180" height="640" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="1179" height="639" fill="none" stroke="#000000" stroke-width="1"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1180" height="48" fill="#0173B2"/>
+  <text x="20" y="31" font-size="19" font-weight="700" fill="#FFFFFF">Cost of Living Calculator — Savings</text>
+  <rect x="940" y="13" width="222" height="22" rx="11" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+  <text x="956" y="28" font-size="12" fill="#000000">Snapshot: 2026-06 · estimates only</text>
+
+  <!-- Tabs -->
+  <g font-size="14">
+    <rect x="20" y="62" width="130" height="34" rx="6" fill="#FFFFFF" stroke="#808080" stroke-width="1"/>
+    <text x="85" y="84" text-anchor="middle" fill="#808080">Cost of living</text>
+    <rect x="154" y="62" width="100" height="34" rx="6" fill="#0173B2" stroke="#000000" stroke-width="1.5"/>
+    <text x="204" y="84" text-anchor="middle" font-weight="700" fill="#FFFFFF">Savings</text>
+    <rect x="258" y="62" width="130" height="34" rx="6" fill="#FFFFFF" stroke="#808080" stroke-width="1"/>
+    <text x="323" y="84" text-anchor="middle" fill="#808080">Minimum role</text>
+  </g>
+
+  <!-- Gross salary input: monthly AND annual -->
+  <rect x="20" y="108" width="356" height="58" rx="8" fill="#F6F8FA" stroke="#0173B2" stroke-width="1.5"/>
+  <text x="34" y="128" font-size="12" font-weight="700" fill="#000000">Gross salary</text>
+  <rect x="34" y="134" width="150" height="26" rx="5" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+  <text x="44" y="152" font-size="13" fill="#000000">$8,000 / mo</text>
+  <text x="194" y="152" font-size="13" fill="#808080">=</text>
+  <rect x="208" y="134" width="156" height="26" rx="5" fill="#FFFFFF" stroke="#808080" stroke-width="1"/>
+  <text x="218" y="152" font-size="13" fill="#000000">$96,000 / yr</text>
+
+  <!-- Cascading filters -->
+  <g font-size="13">
+    <text x="396" y="125" font-weight="600" fill="#000000">Region</text>
+    <rect x="454" y="112" width="130" height="26" rx="5" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+    <text x="464" y="129" fill="#000000">All regions</text><text x="572" y="129" fill="#808080">▼</text>
+    <text x="396" y="158" font-weight="600" fill="#000000">Country</text>
+    <rect x="458" y="145" width="126" height="26" rx="5" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+    <text x="468" y="162" fill="#000000">All countries</text><text x="572" y="162" fill="#808080">▼</text>
+
+    <text x="610" y="125" font-weight="600" fill="#000000">City</text>
+    <rect x="652" y="112" width="130" height="26" rx="5" fill="#FFFFFF" stroke="#000000" stroke-width="1"/>
+    <text x="662" y="129" fill="#000000">All cities</text><text x="770" y="129" fill="#808080">▼</text>
+  </g>
+
+  <!-- caption badge -->
+  <rect x="806" y="112" width="356" height="26" rx="13" fill="#CC78BC"/>
+  <text x="984" y="129" font-size="12" fill="#FFFFFF" text-anchor="middle" font-weight="700">Roles: software-engineering (IC + management)</text>
+  <text x="806" y="162" font-size="12" fill="#808080">Sort ▼ Essential savings (high → low)</text>
+
+  <line x1="20" y1="180" x2="1160" y2="180" stroke="#808080" stroke-width="1"/>
+
+  <!-- Table header -->
+  <rect x="20" y="188" width="1140" height="42" fill="#0173B2"/>
+  <g font-size="10.5" fill="#FFFFFF" font-weight="700" text-anchor="middle">
+    <text x="70"  y="212">Country</text>
+    <text x="142" y="212">City</text>
+    <text x="222" y="206">Gross</text><text x="222" y="218">(mo / yr)</text>
+    <text x="300" y="206">Non-sal</text><text x="300" y="218">comp</text>
+    <text x="370" y="206">Total</text><text x="370" y="218">comp</text>
+    <text x="436" y="206">Income</text><text x="436" y="218">band</text>
+    <text x="516" y="206">Eff. tax %</text><text x="516" y="218">(fed+sub)</text>
+    <text x="592" y="212">Net</text>
+    <text x="662" y="212">Essentials</text>
+    <text x="736" y="212">Lifestyle</text>
+    <text x="818" y="206">Essential</text><text x="818" y="218">savings ↓</text>
+    <text x="906" y="206">After-life</text><text x="906" y="218">savings</text>
+    <text x="982" y="206">Ess.</text><text x="982" y="218">sav %</text>
+    <text x="1080" y="212">Scheme</text>
+  </g>
+  <!-- sort arrow emphasis on essential savings -->
+  <rect x="780" y="188" width="78" height="42" fill="#DE8F05" opacity="0.25"/>
+
+  <!-- Row 1: Jakarta -->
+  <rect x="20" y="230" width="1140" height="52" fill="#FFFFFF"/>
+  <g font-size="10.5" text-anchor="middle">
+    <text x="70"  y="254" fill="#000000">Indonesia</text>
+    <text x="142" y="254" fill="#0173B2" text-decoration="underline" font-weight="600">Jakarta</text>
+    <text x="142" y="266" fill="#808080" font-size="9">view →</text>
+    <text x="222" y="250" fill="#000000">$8.0k/mo</text><text x="222" y="263" fill="#808080" font-size="9">$96k/yr</text>
+    <text x="300" y="254" fill="#808080">+$10k</text>
+    <text x="370" y="254" fill="#000000">$106k</text>
+    <text x="436" y="254" fill="#000000">High</text>
+    <text x="516" y="250" fill="#000000">15%</text><text x="516" y="263" fill="#808080" font-size="9">12+3</text>
+    <text x="592" y="254" fill="#000000">$6,800</text>
+    <text x="662" y="254" fill="#000000">$1,400</text>
+    <text x="736" y="254" fill="#000000">$0</text>
+    <text x="818" y="254" fill="#029E73" font-weight="700">$5,400</text>
+    <text x="906" y="254" fill="#000000">$5,400</text>
+    <text x="982" y="254" fill="#000000">79%</text>
+    <text x="1080" y="254" fill="#000000" font-size="9">Rp 87.7M / yr</text>
+  </g>
+  <rect x="1046" y="258" width="68" height="14" rx="7" fill="#029E73"/>
+  <text x="1080" y="269" font-size="8.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
+  <line x1="20" y1="282" x2="1160" y2="282" stroke="#E5E5E5" stroke-width="1"/>
+
+  <!-- Row 2: Kuala Lumpur -->
+  <rect x="20" y="282" width="1140" height="52" fill="#F6F8FA"/>
+  <g font-size="10.5" text-anchor="middle">
+    <text x="70"  y="306" fill="#000000">Malaysia</text>
+    <text x="142" y="306" fill="#0173B2" text-decoration="underline" font-weight="600">K. Lumpur</text>
+    <text x="142" y="318" fill="#808080" font-size="9">view →</text>
+    <text x="222" y="302" fill="#000000">$8.0k/mo</text><text x="222" y="315" fill="#808080" font-size="9">$96k/yr</text>
+    <text x="300" y="306" fill="#808080">+$8k</text>
+    <text x="370" y="306" fill="#000000">$104k</text>
+    <text x="436" y="306" fill="#000000">High</text>
+    <text x="516" y="302" fill="#000000">19%</text><text x="516" y="315" fill="#808080" font-size="9">19+0</text>
+    <text x="592" y="306" fill="#000000">$6,500</text>
+    <text x="662" y="306" fill="#000000">$1,665</text>
+    <text x="736" y="306" fill="#000000">$0</text>
+    <text x="818" y="306" fill="#029E73" font-weight="700">$4,835</text>
+    <text x="906" y="306" fill="#000000">$4,835</text>
+    <text x="982" y="306" fill="#000000">74%</text>
+    <text x="1080" y="306" fill="#000000" font-size="9">RM 30.6k / yr</text>
+  </g>
+  <rect x="1052" y="310" width="56" height="14" rx="7" fill="#DE8F05"/>
+  <text x="1080" y="321" font-size="8.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">payroll</text>
+  <line x1="20" y1="334" x2="1160" y2="334" stroke="#E5E5E5" stroke-width="1"/>
+
+  <!-- Row 3: Berlin -->
+  <rect x="20" y="334" width="1140" height="52" fill="#FFFFFF"/>
+  <g font-size="10.5" text-anchor="middle">
+    <text x="70"  y="358" fill="#000000">Germany</text>
+    <text x="142" y="358" fill="#0173B2" text-decoration="underline" font-weight="600">Berlin</text>
+    <text x="142" y="370" fill="#808080" font-size="9">view →</text>
+    <text x="222" y="354" fill="#000000">$8.0k/mo</text><text x="222" y="367" fill="#808080" font-size="9">$96k/yr</text>
+    <text x="300" y="358" fill="#808080">+$6k</text>
+    <text x="370" y="358" fill="#000000">$102k</text>
+    <text x="436" y="358" fill="#000000">Top</text>
+    <text x="516" y="354" fill="#000000">35%</text><text x="516" y="367" fill="#808080" font-size="9">33+2</text>
+    <text x="592" y="358" fill="#000000">$5,200</text>
+    <text x="662" y="358" fill="#000000">$2,520</text>
+    <text x="736" y="358" fill="#000000">$0</text>
+    <text x="818" y="358" fill="#029E73" font-weight="700">$2,680</text>
+    <text x="906" y="358" fill="#000000">$2,680</text>
+    <text x="982" y="358" fill="#000000">52%</text>
+    <text x="1080" y="358" fill="#000000" font-size="9">€29.5k / yr</text>
+  </g>
+  <rect x="1046" y="362" width="68" height="14" rx="7" fill="#029E73"/>
+  <text x="1080" y="373" font-size="8.5" fill="#FFFFFF" text-anchor="middle" font-weight="700">tax-funded</text>
+  <rect x="20" y="230" width="1140" height="156" fill="none" stroke="#000000" stroke-width="1.5"/>
+
+  <!-- legend -->
+  <g font-size="11">
+    <rect x="20" y="400" width="620" height="26" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
+    <text x="32" y="417" fill="#000000">Money cells: <tspan font-weight="700">local</tspan> + <tspan fill="#808080">USD</tspan>. Non-salary comp is informational (excluded from savings). Sorted by <tspan fill="#029E73" font-weight="700">essential savings</tspan>.</text>
+  </g>
+
+  <!-- Disclaimer -->
+  <line x1="20" y1="446" x2="1160" y2="446" stroke="#808080" stroke-width="1"/>
+  <g font-size="11" fill="#808080">
+    <text x="20" y="466" font-weight="700" fill="#DE8F05">Estimates only — read before relying</text>
+    <text x="20" y="486">Savings are computed <tspan font-weight="600">before pension / retirement contributions</tspan> — these are deducted separately and are not reflected here.</text>
+    <text x="20" y="504">USD figures use <tspan font-weight="600">nominal FX</tspan>, not purchasing-power parity (PPP); a high nominal-USD saving may buy less locally than the local figure implies.</text>
+    <text x="20" y="522">Effective tax % combines <tspan font-weight="600">federal + sub-national</tspan> bands. Non-salary comp (RSU/bonus) is shown for total-comp context only and is not added to net or savings.</text>
+    <text x="20" y="540">Snapshot date 2026-06. Modeled figures, not quotes or offers.</text>
+  </g>
+</svg>
