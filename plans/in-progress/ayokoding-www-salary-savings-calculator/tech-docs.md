@@ -61,25 +61,29 @@ Exact paths confirmed against the app during Phase 1; the shape:
 apps/ayokoding-www/src/
   app/[locale]/tools/salary-savings/
     page.tsx                      # 'use client' page; mode toggle + state
-  features/salary-savings/        # feature module (co-located)
-    data/cities.ts                # static city dataset + snapshot date
-    data/cities.test.ts           # city dataset invariants (no Israel, fields present)
-    data/roles.ts                 # static role ladder + role×city salary matrix + snapshot date
-    data/roles.test.ts            # role dataset invariants (full matrix, no Israel, confidence tiers)
-    calc.ts                       # pure per-city cost/savings functions
-    calc.test.ts                  # unit tests for calc
-    role-lookup.ts                # pure baseline-resolution + minimum-role search
-    role-lookup.test.ts           # unit tests for role lookup
-    components/controls.tsx       # shared household / area / school-type controls
-    components/compare-table.tsx  # "Compare all" mode
-    components/single-city.tsx    # "Single city" mode
-    components/min-role.tsx       # "Minimum role" mode (baseline selector + ladder table)
-    components/*.test.tsx          # component tests
-    strings.ts                    # en/id UI strings (or wired into existing i18n)
+  features/salary-savings/        # feature module (functional core / imperative shell)
+    core/                         # PURE — no React, no IO
+      data/cities.ts              # static city dataset + snapshot date
+      data/cities.test.ts         # city dataset invariants (no Israel, fields present)
+      data/roles.ts               # static role ladder + role×city salary matrix + snapshot date
+      data/roles.test.ts          # role dataset invariants (full matrix, no Israel, confidence tiers)
+      calc.ts                     # pure per-city cost/savings functions
+      calc.test.ts                # unit tests for calc
+      role-lookup.ts              # pure baseline-resolution + minimum-role search
+      role-lookup.test.ts         # unit tests for role lookup
+      strings.ts                  # en/id UI string tables (pure data; or wired into i18n core)
+    shell/                        # EFFECTFUL — React components
+      controls.tsx                # shared household / area / school-type controls
+      compare-table.tsx           # "Compare all" mode
+      single-city.tsx             # "Single city" mode
+      min-role.tsx                # "Minimum role" mode (baseline selector + ladder table)
+      *.test.tsx                  # component tests
 ```
 
-If the app convention prefers `src/contexts/<name>/` over `src/features/`, follow the existing
-pattern discovered in Phase 0 rather than introducing a new top-level folder.
+The app follows the repo-standard functional-core / imperative-shell layout
+(`src/features/<name>/{core,shell}/`) — pure datasets and calculation/lookup logic in `core/`, React UI in `shell/`.
+See [Functional Core / Imperative Shell — Web Apps](../../../repo-governance/development/pattern/functional-core-imperative-shell-web.md).
+The `app/[locale]/tools/salary-savings/page.tsx` route entry is part of the shell and imports from `core/`.
 
 ## Data Model
 
@@ -304,7 +308,7 @@ toDisplayCurrencies(savingsUsd, cityFx, displayFx): { usd, local, display }
 
 ## i18n
 
-Follow the existing `ayokoding-www` i18n mechanism (`src/contexts/i18n/`). Add the calculator's UI
+Follow the existing `ayokoding-www` i18n mechanism (`src/features/i18n/core/`). Add the calculator's UI
 strings (headings, labels, mode names — incl. "Minimum role", household-type labels, school-type +
 area toggle labels, baseline-source labels, display-currency label, confidence-tier labels,
 disclaimer) for both `en` and `id`.
@@ -376,7 +380,7 @@ City/country display names live in `cities.ts` (`name.en` / `name.id`) and **rol
   `roles.ts` documents the chosen 15 rungs and the within-band IC-first ordering rule. Salary data is
   uneven outside US tech hubs — `web-research-maker` flags `moderate`/`proxy` cells and the UI
   surfaces the flag (curation task in Phase 1b).
-- Confirm app's feature-folder convention (`features/` vs `contexts/`) in Phase 0 before scaffolding.
+- Place the feature under `src/features/salary-savings/{core,shell}/` per the functional-core / imperative-shell convention; confirm the exact layout in Phase 0 before scaffolding.
 - Confirm whether disclaimers/snapshot belong in i18n strings or dataset — default: disclaimer text
   in i18n, snapshot date in dataset.
 

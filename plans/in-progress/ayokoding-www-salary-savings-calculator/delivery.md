@@ -34,14 +34,14 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] **[HUMAN]** Create worktree: `git worktree add worktrees/ayokoding-www-salary-savings-calculator -b ayokoding-www-salary-savings-calculator`.
 - [ ] **[AI]** In the worktree, install + converge toolchain: `npm install` then `npm run doctor -- --fix`.
 - [ ] **[AI]** Establish green baseline for the app and the shared UI lib (Phase 2 adds a `web-ui` primitive): `npx nx run ayokoding-www:test:quick` and `npx nx run web-ui:test:quick`. Acceptance: both pass before any change.
-- [ ] **[AI]** Confirm feature-folder convention by inspecting `apps/ayokoding-www/src` (`features/` vs `contexts/`) and the i18n mechanism in `src/contexts/i18n/`. Confirm whether the new `tools/` route should live under the `(app)` route group (`app/[locale]/(app)/tools/salary-savings/page.tsx`) or directly under `[locale]` (`app/[locale]/tools/salary-savings/page.tsx`). Record both decisions in `tech-docs.md §Risks / Open Questions` if the chosen layout differs from the proposed one.
+- [ ] **[AI]** Confirm the functional-core / imperative-shell layout in `apps/ayokoding-www/src/features/<name>/{core,shell}/` and the i18n mechanism in `src/features/i18n/core/`. Confirm whether the new `tools/` route should live under the `(app)` route group (`app/[locale]/(app)/tools/salary-savings/page.tsx`) or directly under `[locale]` (`app/[locale]/tools/salary-savings/page.tsx`). Record both decisions in `tech-docs.md §Risks / Open Questions` if the chosen layout differs from the proposed one.
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
 - [ ] [AI] `npx nx run ayokoding-www:test:quick` and `npx nx run web-ui:test:quick` — both exit 0 (green baseline before any change).
-- [ ] [AI] `apps/ayokoding-www/src/contexts/i18n/application/translations.ts` exists — `test -f apps/ayokoding-www/src/contexts/i18n/application/translations.ts && echo "OK"`.
+- [ ] [AI] `apps/ayokoding-www/src/features/i18n/core/translations.ts` exists — `test -f apps/ayokoding-www/src/features/i18n/core/translations.ts && echo "OK"`.
 - [ ] [AI] Feature-folder convention and route-group placement decision recorded in `tech-docs.md`.
 
 > **Pause Safety**: worktree provisioned, toolchain converged, baseline green, conventions confirmed.
@@ -165,7 +165,7 @@ the `nx affected` quality gates in Phase 4.
 
 ## Phase 3 — Bilingual Strings + Polish
 
-- [ ] **[AI]** Edit `apps/ayokoding-www/src/contexts/i18n/application/translations.ts` — add all
+- [ ] **[AI]** Edit `apps/ayokoding-www/src/features/i18n/core/translations.ts` — add all
       calculator UI strings (headings, labels, mode names incl. "Minimum role", household-type
       labels, area + school-type toggle labels, **baseline-source labels** (my salary / reference
       role / savings target), **display-currency label**, **confidence-tier labels** (estimate /
@@ -212,7 +212,7 @@ the `nx affected` quality gates in Phase 4.
 - [ ] [AI] `/en/tools/salary-savings` and `/id/tools/salary-savings` both render correctly —
       confirmed by Playwright MCP `browser_navigate` + `browser_snapshot` steps above.
 - [ ] [AI] All calculator UI strings present in both `en` and `id` keys in
-      `apps/ayokoding-www/src/contexts/i18n/application/translations.ts` — grep for the salary-label
+      `apps/ayokoding-www/src/features/i18n/core/translations.ts` — grep for the salary-label
       key in both locale branches returns a non-empty string.
 - [ ] [AI] "Data last updated" label and "estimates only" disclaimer visible in both locales —
       confirmed by `browser_snapshot` above.
