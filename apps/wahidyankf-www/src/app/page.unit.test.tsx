@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { HomeContent } from "@/features/home/HomeContent";
-import { filterItems } from "@/features/search/search";
+import { HomeContent } from "@/features/home/shell/HomeContent";
+import { filterItems } from "@/features/search/core/search";
 
 // Mock the next/navigation module
 const mockPush = vi.fn();
@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock the components imported from other files
-vi.mock("@/features/app-shell/Navigation", () => ({
+vi.mock("@/features/app-shell/shell/Navigation", () => ({
   Navigation: () => <div data-testid="navigation">Navigation</div>,
 }));
 
@@ -43,12 +43,12 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
 }));
 
 // Mock the filterItems function
-vi.mock("@/features/search/search", () => ({
+vi.mock("@/features/search/core/search", () => ({
   filterItems: vi.fn((items) => items),
 }));
 
 // Mock the data and utility functions
-vi.mock("@/features/cv/data", () => ({
+vi.mock("@/features/cv/core/data", () => ({
   cvData: [
     {
       type: "about",

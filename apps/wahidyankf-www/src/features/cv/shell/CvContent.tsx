@@ -1,7 +1,7 @@
 "use client";
 
-import { Navigation } from "@/features/app-shell/Navigation";
-import { filterItems } from "@/features/search/search";
+import { Navigation } from "@/features/app-shell/shell/Navigation";
+import { filterItems } from "@/features/search/core/search";
 import {
   Award,
   Briefcase,
@@ -31,9 +31,9 @@ import {
   getTopSkillsLastFiveYears,
   getTopLanguagesLastFiveYears,
   getTopFrameworksLastFiveYears,
-} from "@/features/cv/data";
+} from "@/features/cv/core/data";
 import { SearchComponent, HighlightText } from "@open-sharia-enterprise/web-ui";
-import { parseMarkdownLinks } from "@/features/cv/markdown";
+import { parseMarkdownLinks } from "@/features/cv/shell/markdown";
 
 // Update the type definition for topSkills, topLanguages, and topFrameworks
 type TopItem = { name: string; duration: number };

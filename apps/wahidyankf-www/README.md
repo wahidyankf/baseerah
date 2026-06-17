@@ -71,11 +71,18 @@ Platform-agnostic specifications for this app live at
 
 ## Architecture
 
-This app uses a flat feature-module layout (`src/features/<name>/`) rather than the full
-hexagonal `contexts/<name>/{domain,application,infrastructure,presentation}/` layout. It
-qualifies for this exemption — defined in
-[`repo-governance/development/pattern/hexagonal-architecture-web.md`](../../repo-governance/development/pattern/hexagonal-architecture-web.md#exemptions)
-— because it renders static content with no IO ports and no business invariants to guard.
+This app uses the repo-standard functional-core / imperative-shell feature-module layout
+(`src/features/<name>/{core,shell}/`) shared by all Next.js web apps — defined in
+[`repo-governance/development/pattern/functional-core-imperative-shell-web.md`](../../repo-governance/development/pattern/functional-core-imperative-shell-web.md).
+Because this is a static portfolio, most features are shell-only, with pure CV/project/search data and helpers in
+`core/`.
+
+Each feature splits into two layers:
+
+- **`core/`** — functional core: pure functions, immutable data, plain types, and constant
+  data tables. Never imports `react`, `next`, or node builtins, and never imports `shell/`.
+- **`shell/`** — imperative shell: React components, DOM-touching hooks, and anything
+  effectful. May import its own and sibling `core/`.
 
 Each feature directory is self-contained and imports only from sibling features or shared
 libraries.
@@ -100,12 +107,21 @@ apps/wahidyankf-www/
 │   │   ├── head.tsx
 │   │   ├── page.tsx          # Routes to HomeContent from home feature
 │   │   └── globals.css       # Tailwind 4 entry
-│   ├── features/             # Flat feature modules
-│   │   ├── app-shell/        # Navigation, style utility
-│   │   ├── cv/               # data.ts (CVEntry, cvData, helpers), markdown.tsx, CvContent.tsx
-│   │   ├── home/             # HomeContent.tsx
-│   │   ├── personal-projects/ # projects.ts (Project, filterProjects), PersonalProjectsContent.tsx
-│   │   └── search/           # search.ts (filterItems, SearchTerm, SearchResult), SearchSection.tsx
+│   ├── features/             # Feature modules (core = pure, shell = UI/IO)
+│   │   ├── app-shell/
+│   │   │   ├── core/         # style.ts (cn class-name utility)
+│   │   │   └── shell/        # Navigation.tsx
+│   │   ├── cv/
+│   │   │   ├── core/         # data.ts (CVEntry, cvData, helpers)
+│   │   │   └── shell/        # markdown.tsx, CvContent.tsx
+│   │   ├── home/
+│   │   │   └── shell/        # HomeContent.tsx
+│   │   ├── personal-projects/
+│   │   │   ├── core/         # projects.ts (Project, filterProjects)
+│   │   │   └── shell/        # PersonalProjectsContent.tsx
+│   │   └── search/
+│   │       ├── core/         # search.ts (filterItems, SearchTerm, SearchResult)
+│   │       └── shell/        # SearchSection.tsx
 │   └── test/setup.ts         # Vitest + Testing Library setup
 └── test/unit/steps/          # Gherkin step implementations
 ```

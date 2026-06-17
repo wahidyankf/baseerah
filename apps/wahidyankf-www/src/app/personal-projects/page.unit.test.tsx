@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PersonalProjectsContent } from "@/features/personal-projects/PersonalProjectsContent";
+import { PersonalProjectsContent } from "@/features/personal-projects/shell/PersonalProjectsContent";
 
 // Mock declarations
 const mockPush = vi.fn();
@@ -12,7 +12,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/features/app-shell/Navigation", () => ({
+vi.mock("@/features/app-shell/shell/Navigation", () => ({
   Navigation: () => <div data-testid="navigation">Navigation</div>,
 }));
 
@@ -49,7 +49,7 @@ type ProjectItem = {
   links: Record<string, string>;
 };
 
-vi.mock("@/features/search/search", () => ({
+vi.mock("@/features/search/core/search", () => ({
   filterItems: vi.fn((items: ProjectItem[], searchTerm: string) =>
     items.filter((item) => item.title.toLowerCase().includes(searchTerm.toLowerCase())),
   ),

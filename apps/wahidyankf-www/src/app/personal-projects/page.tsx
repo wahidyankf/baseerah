@@ -1,4 +1,4 @@
-import { PersonalProjectsContent } from "@/features/personal-projects/PersonalProjectsContent";
+import { PersonalProjectsContent } from "@/features/personal-projects/shell/PersonalProjectsContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

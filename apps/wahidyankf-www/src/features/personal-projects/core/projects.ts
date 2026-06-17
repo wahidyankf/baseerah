@@ -1,4 +1,4 @@
-import { filterItems } from "@/features/search/search";
+import { filterItems } from "@/features/search/core/search";
 
 export type Project = {
   title: string;

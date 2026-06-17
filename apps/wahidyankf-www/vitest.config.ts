@@ -13,7 +13,7 @@ export default defineConfig({
       exclude: [
         "src/app/layout.tsx",
         "src/app/head.tsx",
-        "src/features/cv/data.ts",
+        "src/features/cv/core/data.ts",
         "src/app/fonts/**",
         "src/app/**/*.css",
         "src/test/**",

@@ -1,4 +1,4 @@
-import { CvContent } from "@/features/cv/CvContent";
+import { CvContent } from "@/features/cv/shell/CvContent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

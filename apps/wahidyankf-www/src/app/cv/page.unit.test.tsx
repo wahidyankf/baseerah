@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { CvContent } from "@/features/cv/CvContent";
+import { CvContent } from "@/features/cv/shell/CvContent";
 
 // Mock declarations
 const mockPush = vi.fn();
@@ -17,7 +17,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/features/app-shell/Navigation", () => ({
+vi.mock("@/features/app-shell/shell/Navigation", () => ({
   Navigation: () => <div data-testid="navigation">Navigation</div>,
 }));
 
@@ -41,11 +41,11 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
   HighlightText: ({ text }: { text: string }) => <span>{text}</span>,
 }));
 
-vi.mock("@/features/search/search", () => ({
+vi.mock("@/features/search/core/search", () => ({
   filterItems: vi.fn((items) => items),
 }));
 
-vi.mock("@/features/cv/data", () => ({
+vi.mock("@/features/cv/core/data", () => ({
   cvData: [
     {
       type: "about",
