@@ -2,7 +2,7 @@ import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import "./helpers/test-setup";
-import { t } from "@/contexts/i18n/application/translations";
+import { t } from "@/features/i18n/core/translations";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/ayokoding-www/gherkin/i18n/i18n.feature"),

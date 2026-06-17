@@ -1,9 +1,9 @@
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@open-sharia-enterprise/web-ui/primitives";
-import { SidebarTree } from "@/contexts/navigation/presentation/sidebar-tree";
+import { SidebarTree } from "@/features/navigation/shell/sidebar-tree";
 import { useEffect, useState } from "react";
-import type { TreeNode } from "@/contexts/content/infrastructure/types";
+import type { TreeNode } from "@/features/content/core/types";
 import { trpcClient } from "@/lib/trpc/client";
 
 interface MobileNavProps {

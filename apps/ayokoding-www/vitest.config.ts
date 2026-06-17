@@ -13,14 +13,16 @@ export default defineConfig({
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
         // App shell presentation (chrome) — passive UI primitives + layout shell
-        "src/contexts/app-shell/presentation/**",
-        // Per-BC presentation (UI surfaces — exercised via E2E + fe-step Gherkin scenarios)
-        "src/contexts/content/presentation/**",
-        "src/contexts/search/presentation/**",
-        "src/contexts/i18n/presentation/**",
-        "src/contexts/navigation/presentation/**",
+        "src/features/app-shell/shell/*.tsx",
+        // Per-feature presentation (UI surfaces — exercised via E2E + fe-step Gherkin scenarios)
+        "src/features/content/shell/*.tsx",
+        "src/features/search/shell/*.tsx",
+        "src/features/search/shell/use-search.ts",
+        "src/features/i18n/shell/*.tsx",
+        "src/features/i18n/shell/use-locale.ts",
+        "src/features/navigation/shell/*.tsx",
         // Re-export shim — pure type re-export, no executable code
-        "src/contexts/navigation/application/schemas.ts",
+        "src/features/navigation/core/schemas.ts",
         // Next.js app router pages — covered via E2E
         "src/app/**",
         // Cross-cutting tRPC client wiring
@@ -29,19 +31,19 @@ export default defineConfig({
         "src/lib/trpc/server.ts",
         // i18n middleware re-export shim and implementation (covered via fe-e2e)
         "src/middleware.ts",
-        "src/contexts/i18n/application/middleware.ts",
+        "src/features/i18n/shell/middleware.ts",
         // Content infrastructure adapters + scripts (covered via integration suite)
-        "src/contexts/content/infrastructure/parser.ts",
-        "src/contexts/content/infrastructure/reader.ts",
-        "src/contexts/content/infrastructure/repository.ts",
-        "src/contexts/content/infrastructure/repository-fs.ts",
-        "src/contexts/content/infrastructure/types.ts",
-        "src/contexts/content/infrastructure/index-generator.ts",
-        "src/contexts/search/infrastructure/**",
+        "src/features/content/core/parser.ts",
+        "src/features/content/shell/reader.ts",
+        "src/features/content/core/repository.ts",
+        "src/features/content/shell/repository-fs.ts",
+        "src/features/content/core/types.ts",
+        "src/features/content/shell/index-generator.ts",
+        "src/features/search/shell/generate-search-data.ts",
         "src/scripts/**",
         // tRPC routers — composition-only; behaviour is exercised via BE-E2E
-        "src/contexts/**/application/router.ts",
-        "src/contexts/app-shell/application/root-router.ts",
+        "src/features/*/shell/router.ts",
+        "src/features/app-shell/shell/root-router.ts",
         // Test infra
         "src/test/**",
         "**/*.{test,spec}.{ts,tsx}",

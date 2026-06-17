@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import { processAllIndexFiles } from "../../../src/contexts/content/infrastructure/index-generator";
+import { processAllIndexFiles } from "../../../src/features/content/shell/index-generator";
 
 const feature = await loadFeature(
   path.resolve(

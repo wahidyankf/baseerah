@@ -1,5 +1,5 @@
-import { ContentService } from "@/contexts/content/infrastructure/service";
-import { FileSystemContentRepository } from "@/contexts/content/infrastructure/repository-fs";
+import { ContentService } from "@/features/content/shell/service";
+import { FileSystemContentRepository } from "@/features/content/shell/repository-fs";
 import path from "node:path";
 
 const contentDir = path.resolve(process.cwd(), "content");

@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
-import { publicProcedure } from "@/contexts/app-shell/application/trpc-init";
-import { searchQuerySchema } from "@/contexts/search/application/schemas";
+import { publicProcedure } from "@/features/app-shell/shell/trpc-init";
+import { searchQuerySchema } from "@/features/search/core/schemas";
 
 export const searchProcedures = {
   query: publicProcedure.input(searchQuerySchema).query(async ({ ctx, input }) => {

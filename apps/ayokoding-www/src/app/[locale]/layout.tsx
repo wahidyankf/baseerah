@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "next-themes";
-import { SUPPORTED_LOCALES } from "@/contexts/i18n/application/config";
+import { SUPPORTED_LOCALES } from "@/features/i18n/core/config";
 import { TRPCProvider } from "@/lib/trpc/provider";
-import { SearchProvider } from "@/contexts/search/presentation/search-provider";
-import { Header } from "@/contexts/app-shell/presentation/header";
-import { Footer } from "@/contexts/app-shell/presentation/footer";
+import { SearchProvider } from "@/features/search/shell/search-provider";
+import { Header } from "@/features/app-shell/shell/header";
+import { Footer } from "@/features/app-shell/shell/footer";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));

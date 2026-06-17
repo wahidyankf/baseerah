@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { ContentService } from "@/contexts/content/infrastructure/service";
-import { InMemoryContentRepository } from "@/contexts/content/infrastructure/repository-memory";
-import type { ContentMeta } from "@/contexts/content/infrastructure/types";
+import { ContentService } from "@/features/content/shell/service";
+import { InMemoryContentRepository } from "@/features/content/shell/repository-memory";
+import type { ContentMeta } from "@/features/content/core/types";
 
 function createService(
   items: ContentMeta[],

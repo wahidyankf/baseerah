@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseMarkdown } from "@/contexts/content/infrastructure/parser";
+import { parseMarkdown } from "@/features/content/core/parser";
 
 describe("parseMarkdown", () => {
   it("renders fenced code blocks with rehype-pretty-code figure wrapper", async () => {

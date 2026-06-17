@@ -1,9 +1,9 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import matter from "gray-matter";
-import { frontmatterSchema } from "@/contexts/content/application/schemas";
-import type { ContentMeta } from "./types";
-import type { ContentRepository } from "./repository";
+import { frontmatterSchema } from "@/features/content/core/schemas";
+import type { ContentMeta } from "../core/types";
+import type { ContentRepository } from "../core/repository";
 import { env } from "../../../env";
 
 const DEFAULT_CONTENT_DIR = env.AYOKODING_WEB_CONTENT_DIR ?? path.resolve(process.cwd(), "content");

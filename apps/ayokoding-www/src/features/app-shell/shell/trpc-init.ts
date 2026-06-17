@@ -1,8 +1,8 @@
 import path from "node:path";
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
-import { ContentService } from "@/contexts/content/infrastructure/service";
-import { FileSystemContentRepository } from "@/contexts/content/infrastructure/repository-fs";
+import { ContentService } from "@/features/content/shell/service";
+import { FileSystemContentRepository } from "@/features/content/shell/repository-fs";
 
 export interface TRPCContext {
   contentService: ContentService;

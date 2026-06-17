@@ -2,7 +2,7 @@ import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import { testCaller } from "./helpers/test-caller";
-import type { SearchResult } from "@/contexts/content/infrastructure/types";
+import type { SearchResult } from "@/features/content/core/types";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ayokoding/behavior/ayokoding-be/gherkin/search/search-api.feature"),

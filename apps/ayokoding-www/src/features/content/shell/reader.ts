@@ -1,8 +1,8 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 import matter from "gray-matter";
-import { frontmatterSchema } from "@/contexts/content/application/schemas";
-import type { ContentMeta } from "./types";
+import { frontmatterSchema } from "@/features/content/core/schemas";
+import type { ContentMeta } from "../core/types";
 import { env } from "../../../env";
 
 const CONTENT_DIR = env.AYOKODING_WEB_CONTENT_DIR ?? path.resolve(process.cwd(), "content");

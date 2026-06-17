@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import type { TreeNode } from "@/contexts/content/infrastructure/types";
+import type { TreeNode } from "@/features/content/core/types";
 
 interface SidebarTreeProps {
   nodes: TreeNode[];

@@ -3,7 +3,7 @@ import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { render, screen } from "@testing-library/react";
 import { expect } from "vitest";
 import "./helpers/test-setup";
-import { MarkdownRenderer } from "@/contexts/content/presentation/markdown-renderer";
+import { MarkdownRenderer } from "@/features/content/shell/markdown-renderer";
 
 const feature = await loadFeature(
   path.resolve(

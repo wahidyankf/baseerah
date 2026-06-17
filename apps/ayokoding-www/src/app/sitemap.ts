@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { createTRPCContext } from "@/contexts/app-shell/application/trpc-init";
+import { createTRPCContext } from "@/features/app-shell/shell/trpc-init";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { contentService } = createTRPCContext();

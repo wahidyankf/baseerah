@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Heading } from "@/contexts/content/infrastructure/types";
+import type { Heading } from "@/features/content/core/types";
 
 interface TocProps {
   headings: Heading[];

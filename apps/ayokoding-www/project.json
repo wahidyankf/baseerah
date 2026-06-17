@@ -28,7 +28,7 @@
     "generate-search-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx tsx src/contexts/search/infrastructure/generate-search-data.ts",
+        "command": "npx tsx src/features/search/shell/generate-search-data.ts",
         "cwd": "{projectRoot}"
       }
     },

@@ -21,7 +21,7 @@ describe("ayokoding-www env var prefix: AYOKODING_WEB_SHOW_DRAFTS", () => {
     process.env["AYOKODING_WEB_SHOW_DRAFTS"] = "true";
 
     // Re-import after env var is set so module-level constant is fresh
-    const { readAllContent } = await import("@/contexts/content/infrastructure/reader");
+    const { readAllContent } = await import("@/features/content/shell/reader");
 
     // readAllContent will throw trying to read the filesystem — that's fine.
     // We only need the draft-filtering branch to use the prefixed var.
@@ -37,7 +37,7 @@ describe("ayokoding-www env var prefix: AYOKODING_WEB_SHOW_DRAFTS", () => {
     process.env["AYOKODING_WEB_CONTENT_DIR"] = "/custom/ayokoding/content";
 
     // Re-import after env var is set
-    const { getContentDir } = await import("@/contexts/content/infrastructure/reader");
+    const { getContentDir } = await import("@/features/content/shell/reader");
 
     // If the module reads AYOKODING_WEB_CONTENT_DIR, getContentDir() returns the custom path.
     expect(getContentDir()).toBe("/custom/ayokoding/content");

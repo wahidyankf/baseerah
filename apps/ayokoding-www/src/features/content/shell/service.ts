@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import FlexSearch from "flexsearch";
-import type { ContentRepository } from "./repository";
-import type { ContentIndex, ContentMeta, TreeNode, PageLink, SearchResult, Heading } from "./types";
-import { parseMarkdown } from "./parser";
+import type { ContentRepository } from "../core/repository";
+import type { ContentIndex, ContentMeta, TreeNode, PageLink, SearchResult, Heading } from "../core/types";
+import { parseMarkdown } from "../core/parser";
 import { stripMarkdown } from "./reader";
-import { buildTrees, getParentSlug, findSubtree, computePrevNext } from "./tree-builder";
+import { buildTrees, getParentSlug, findSubtree, computePrevNext } from "../core/tree-builder";
 
 export interface SearchDoc {
   id: string;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { transformShortcodes } from "@/contexts/content/infrastructure/shortcodes";
+import { transformShortcodes } from "@/features/content/core/shortcodes";
 
 describe("transformShortcodes", () => {
   it("transforms callout shortcodes", () => {

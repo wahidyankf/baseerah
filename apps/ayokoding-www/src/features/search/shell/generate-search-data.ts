@@ -1,8 +1,8 @@
 import path from "node:path";
 import fs from "node:fs/promises";
-import { FileSystemContentRepository } from "@/contexts/content/infrastructure/repository-fs";
-import { stripMarkdown } from "@/contexts/content/infrastructure/reader";
-import type { SearchDoc } from "@/contexts/content/infrastructure/service";
+import { FileSystemContentRepository } from "@/features/content/shell/repository-fs";
+import { stripMarkdown } from "@/features/content/shell/reader";
+import type { SearchDoc } from "@/features/content/shell/service";
 
 const contentDir = path.resolve(process.cwd(), "content");
 const outputDir = path.resolve(process.cwd(), "generated");

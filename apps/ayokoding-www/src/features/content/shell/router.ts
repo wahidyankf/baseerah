@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { publicProcedure } from "@/contexts/app-shell/application/trpc-init";
-import { localeSchema } from "@/contexts/i18n/application/schemas";
+import { publicProcedure } from "@/features/app-shell/shell/trpc-init";
+import { localeSchema } from "@/features/i18n/core/schemas";
 
 export const contentProcedures = {
   getBySlug: publicProcedure

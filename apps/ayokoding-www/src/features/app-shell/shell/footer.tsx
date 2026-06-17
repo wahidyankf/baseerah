@@ -1,5 +1,5 @@
-import { t } from "@/contexts/i18n/application/translations";
-import type { Locale } from "@/contexts/i18n/application/config";
+import { t } from "@/features/i18n/core/translations";
+import type { Locale } from "@/features/i18n/core/config";
 
 interface FooterProps {
   locale: string;

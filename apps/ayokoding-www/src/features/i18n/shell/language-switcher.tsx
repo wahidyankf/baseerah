@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@open-sharia-enterprise/web-ui";
-import { LOCALE_LABELS, SUPPORTED_LOCALES } from "@/contexts/i18n/application/config";
+import { LOCALE_LABELS, SUPPORTED_LOCALES } from "@/features/i18n/core/config";
 
 interface LanguageSwitcherProps {
   locale: string;

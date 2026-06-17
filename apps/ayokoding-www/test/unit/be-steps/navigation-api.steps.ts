@@ -2,7 +2,7 @@ import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
 import { testCaller } from "./helpers/test-caller";
-import type { TreeNode } from "@/contexts/content/infrastructure/types";
+import type { TreeNode } from "@/features/content/core/types";
 
 const feature = await loadFeature(
   path.resolve(

@@ -1,5 +1,5 @@
-import type { ContentMeta } from "./types";
-import type { ContentRepository } from "./repository";
+import type { ContentMeta } from "../core/types";
+import type { ContentRepository } from "../core/repository";
 
 interface FileData {
   content: string;

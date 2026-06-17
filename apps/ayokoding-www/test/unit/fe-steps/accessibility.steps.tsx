@@ -3,9 +3,9 @@ import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { render, screen } from "@testing-library/react";
 import { expect } from "vitest";
 import "./helpers/test-setup";
-import { Breadcrumb } from "@/contexts/navigation/presentation/breadcrumb";
-import { TableOfContents } from "@/contexts/navigation/presentation/toc";
-import { PrevNext } from "@/contexts/navigation/presentation/prev-next";
+import { Breadcrumb } from "@/features/navigation/shell/breadcrumb";
+import { TableOfContents } from "@/features/navigation/shell/toc";
+import { PrevNext } from "@/features/navigation/shell/prev-next";
 
 const feature = await loadFeature(
   path.resolve(

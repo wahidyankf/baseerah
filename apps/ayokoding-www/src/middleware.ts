@@ -1,4 +1,4 @@
-export { middleware } from "./contexts/i18n/application/middleware";
+export { middleware } from "./features/i18n/shell/middleware";
 
 // Next.js 16 statically analyzes `config` and rejects re-exports.
 // Per tech-docs.md §Risk and rollback fallback, define config inline here.

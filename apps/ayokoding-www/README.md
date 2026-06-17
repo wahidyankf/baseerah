@@ -54,28 +54,33 @@ git push origin main:prod-ayokoding-www
 
 ## Source Layout
 
-`src/` is organized by **hexagonal feature module** under `src/contexts/`. Each module owns
-three layers — `application/`, `infrastructure/`, and `presentation/` — rather than grouping
-code by technical layer across the whole app. The `domain/` layer was removed; domain logic
-lives directly in `application/` for this app. The `contexts/` directory name follows the
-Effect.ts `Context.Tag` convention, not a domain-modeling concept.
+`src/` is organized by **feature module** under `src/features/`. Each module splits its code
+into two zones following the **functional core / imperative shell** convention:
 
-See [Hexagonal Architecture — Web Apps](../../repo-governance/development/pattern/hexagonal-architecture-web.md)
-for the structural authority on layer rules, barrel imports, and forbidden cross-layer imports.
+- **`core/`** — the functional core. Pure only: pure functions, immutable data, derivations,
+  validation, Zod schemas, plain TS types/interfaces, constant data tables, and pure
+  transforms. `core/` files never import `react`, `next`, node builtins, `@trpc/server`
+  wiring, or any IO/network client, and never import from `shell/`.
+- **`shell/`** — the imperative shell. Everything effectful: React components, DOM/browser
+  hooks, filesystem readers, repository adapters, tRPC routers and init wiring, and Next.js
+  middleware. `shell/` may import from `core/`.
 
-| Feature module | Layers present                                | Owns                                                                      |
-| -------------- | --------------------------------------------- | ------------------------------------------------------------------------- |
-| `app-shell`    | `[application, presentation]`                 | tRPC root router stitching + chrome (header, footer, theme toggle, ui/)   |
-| `content`      | `[application, infrastructure, presentation]` | tRPC `content.*` procedures + filesystem reader + markdown rendering      |
-| `search`       | `[application, infrastructure, presentation]` | tRPC `search.query` + FlexSearch index (in content infra) + search dialog |
-| `i18n`         | `[application, presentation]`                 | Locale schema + `meta.languages` + middleware + locale switcher           |
-| `navigation`   | `[application, presentation]`                 | tRPC `content.getTree` (navigation-owned) + sidebar/breadcrumb/toc        |
-| `health`       | `[application]`                               | tRPC `meta.health` liveness probe                                         |
+Classify each file by what it actually does, not by where it used to live. When in doubt (any
+IO, React, or wiring) → `shell/`.
 
-Each feature module exposes its public surface through an `index.ts` barrel in `application/`
-(and `infrastructure/` or `presentation/` where applicable). Other modules and presentation
-code import only from the `application/index.ts` barrel — never from `domain/` or
-`infrastructure/` directly.
+| Feature module | Zones present   | core (pure)                                                            | shell (IO + UI + wiring)                                                                                                        |
+| -------------- | --------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `app-shell`    | `[shell]`       | —                                                                      | tRPC root router + `trpc-init` + chrome (header, footer, mobile-nav, theme toggle)                                              |
+| `content`      | `[core, shell]` | schemas, types, repository interface, tree-builder, shortcodes, parser | tRPC `content.*` router + fs reader/repository-fs/repository-memory + service + index-generator + markdown rendering components |
+| `search`       | `[core, shell]` | search schemas                                                         | tRPC `search.query` router + `generate-search-data` (fs) + search dialog/provider + `use-search` hook                           |
+| `i18n`         | `[core, shell]` | config, locale schema, translations                                    | tRPC `meta.languages` router + Next middleware + locale switcher + `use-locale` hook                                            |
+| `navigation`   | `[core, shell]` | tree-node schema (+ locale re-export)                                  | tRPC `content.getTree` router + sidebar/sidebar-tree/breadcrumb/prev-next/toc                                                   |
+| `health`       | `[shell]`       | —                                                                      | tRPC `meta.health` liveness probe                                                                                               |
+
+Other modules and pages import feature code directly from the file in `core/` or `shell/`
+(e.g. `@/features/content/core/schemas`, `@/features/i18n/shell/middleware`). The cardinal
+rule is one-directional: `shell/` may depend on `core/`, but `core/` must never depend on
+`shell/`.
 
 ## Specs
 
@@ -94,14 +99,14 @@ rename `be` → `api` reflects this (the `organiclever` peer keeps `be` because
 ## i18n middleware ownership
 
 The Next.js middleware lives at the conventional path `src/middleware.ts` but is reduced to
-a one-line re-export from the `i18n` feature module's application layer:
+a one-line re-export from the `i18n` feature module's shell zone:
 
 ```ts
-export { middleware, config } from "./contexts/i18n/application/middleware";
+export { middleware, config } from "./features/i18n/shell/middleware";
 ```
 
 The actual implementation (locale negotiation, `/` redirect to `/<DEFAULT_LOCALE>`) lives in
-`src/contexts/i18n/application/middleware.ts`. This keeps `next dev` and `next build` happy
+`src/features/i18n/shell/middleware.ts`. This keeps `next dev` and `next build` happy
 (they find the middleware where Next.js expects it) while putting all i18n code under the
 `i18n` feature module's ownership.
 

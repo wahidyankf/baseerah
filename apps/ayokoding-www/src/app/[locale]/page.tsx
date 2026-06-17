@@ -1,7 +1,7 @@
 import { serverCaller } from "@/lib/trpc/server";
 import Link from "next/link";
-import type { Locale } from "@/contexts/i18n/application/config";
-import type { TreeNode } from "@/contexts/content/infrastructure/types";
+import type { Locale } from "@/features/i18n/core/config";
+import type { TreeNode } from "@/features/content/core/types";
 
 interface Props {
   params: Promise<{ locale: string }>;

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { frontmatterSchema } from "@/contexts/content/application/schemas";
-import { searchQuerySchema } from "@/contexts/search/application/schemas";
-import { localeSchema } from "@/contexts/i18n/application/schemas";
+import { frontmatterSchema } from "@/features/content/core/schemas";
+import { searchQuerySchema } from "@/features/search/core/schemas";
+import { localeSchema } from "@/features/i18n/core/schemas";
 
 describe("frontmatterSchema", () => {
   it("parses valid frontmatter", () => {

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { Menu, Search } from "lucide-react";
 import { Button } from "@open-sharia-enterprise/web-ui";
-import { ThemeToggle } from "@/contexts/app-shell/presentation/theme-toggle";
-import { LanguageSwitcher } from "@/contexts/i18n/presentation/language-switcher";
-import { MobileNav } from "@/contexts/app-shell/presentation/mobile-nav";
-import { useSearchOpen } from "@/contexts/search/presentation/use-search";
+import { ThemeToggle } from "@/features/app-shell/shell/theme-toggle";
+import { LanguageSwitcher } from "@/features/i18n/shell/language-switcher";
+import { MobileNav } from "@/features/app-shell/shell/mobile-nav";
+import { useSearchOpen } from "@/features/search/shell/use-search";
 import { useState } from "react";
 
 interface HeaderProps {

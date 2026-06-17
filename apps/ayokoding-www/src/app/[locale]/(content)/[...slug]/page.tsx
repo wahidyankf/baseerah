@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { serverCaller } from "@/lib/trpc/server";
-import type { Locale } from "@/contexts/i18n/application/config";
-import { t } from "@/contexts/i18n/application/translations";
-import { Breadcrumb } from "@/contexts/navigation/presentation/breadcrumb";
-import { TableOfContents } from "@/contexts/navigation/presentation/toc";
-import { PrevNext } from "@/contexts/navigation/presentation/prev-next";
-import { MarkdownRenderer } from "@/contexts/content/presentation/markdown-renderer";
+import type { Locale } from "@/features/i18n/core/config";
+import { t } from "@/features/i18n/core/translations";
+import { Breadcrumb } from "@/features/navigation/shell/breadcrumb";
+import { TableOfContents } from "@/features/navigation/shell/toc";
+import { PrevNext } from "@/features/navigation/shell/prev-next";
+import { MarkdownRenderer } from "@/features/content/shell/markdown-renderer";
 import { TRPCError } from "@trpc/server";
-import { createTRPCContext } from "@/contexts/app-shell/application/trpc-init";
+import { createTRPCContext } from "@/features/app-shell/shell/trpc-init";
 
 export const dynamicParams = false;
 

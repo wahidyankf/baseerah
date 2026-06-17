@@ -1,4 +1,4 @@
-import { publicProcedure } from "@/contexts/app-shell/application/trpc-init";
+import { publicProcedure } from "@/features/app-shell/shell/trpc-init";
 
 export const i18nProcedures = {
   languages: publicProcedure.query(() => {

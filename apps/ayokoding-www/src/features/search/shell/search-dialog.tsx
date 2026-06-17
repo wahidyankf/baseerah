@@ -10,11 +10,11 @@ import {
   CommandGroup,
   CommandItem,
 } from "@open-sharia-enterprise/web-ui";
-import { useLocale } from "@/contexts/i18n/presentation/use-locale";
-import { useSearchOpen } from "@/contexts/search/presentation/use-search";
-import { t } from "@/contexts/i18n/application/translations";
+import { useLocale } from "@/features/i18n/shell/use-locale";
+import { useSearchOpen } from "@/features/search/shell/use-search";
+import { t } from "@/features/i18n/core/translations";
 import { trpcClient } from "@/lib/trpc/client";
-import type { SearchResult } from "@/contexts/content/infrastructure/types";
+import type { SearchResult } from "@/features/content/core/types";
 
 function formatSectionPath(slug: string): string {
   const parts = slug.split("/");

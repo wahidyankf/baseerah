@@ -1,8 +1,8 @@
 import fs from "node:fs/promises";
 import matter from "gray-matter";
 import { FileSystemContentRepository } from "./repository-fs";
-import { buildTrees } from "./tree-builder";
-import type { TreeNode } from "./types";
+import { buildTrees } from "../core/tree-builder";
+import type { TreeNode } from "../core/types";
 
 export function generateChildList(locale: string, children: TreeNode[], knownSlugs: Set<string>): string {
   const lines: string[] = [];

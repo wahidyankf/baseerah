@@ -1,4 +1,4 @@
-import type { ContentMeta, TreeNode } from "@/contexts/content/infrastructure/types";
+import type { ContentMeta, TreeNode } from "@/features/content/core/types";
 
 export const mockContentMeta: ContentMeta[] = [
   {

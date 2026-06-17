@@ -1,6 +1,6 @@
 import { serverCaller } from "@/lib/trpc/server";
 import { SidebarTree } from "./sidebar-tree";
-import type { TreeNode } from "@/contexts/content/infrastructure/types";
+import type { TreeNode } from "@/features/content/core/types";
 
 interface SidebarProps {
   locale: string;

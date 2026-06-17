@@ -1,9 +1,9 @@
 import { router } from "./trpc-init";
-import { contentProcedures } from "@/contexts/content/application/router";
-import { navigationProcedures } from "@/contexts/navigation/application/router";
-import { searchProcedures } from "@/contexts/search/application/router";
-import { healthProcedures } from "@/contexts/health/application/router";
-import { i18nProcedures } from "@/contexts/i18n/application/router";
+import { contentProcedures } from "@/features/content/shell/router";
+import { navigationProcedures } from "@/features/navigation/shell/router";
+import { searchProcedures } from "@/features/search/shell/router";
+import { healthProcedures } from "@/features/health/shell/router";
+import { i18nProcedures } from "@/features/i18n/shell/router";
 
 export const appRouter = router({
   content: router({ ...contentProcedures, ...navigationProcedures }),
