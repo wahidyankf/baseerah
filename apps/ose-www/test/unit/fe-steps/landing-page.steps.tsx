@@ -46,8 +46,8 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
   TooltipContent: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }));
 
-import { Hero } from "@/features/landing/presentation/hero";
-import { SocialIcons } from "@/features/landing/presentation/social-icons";
+import { Hero } from "@/features/landing/shell/hero";
+import { SocialIcons } from "@/features/landing/shell/social-icons";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-web/gherkin/landing/landing-page.feature"),

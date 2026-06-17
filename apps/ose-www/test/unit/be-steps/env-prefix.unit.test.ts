@@ -12,8 +12,8 @@ vi.mock("@/env", () => ({
     get: (_, key: string) => process.env[key],
   }),
 }));
-import { InMemoryContentRepository } from "@/features/content/infrastructure/repository-memory";
-import { ContentService } from "@/features/content/application/service";
+import { InMemoryContentRepository } from "@/features/content/core/repository-memory";
+import { ContentService } from "@/features/content/shell/service";
 
 afterEach(() => {
   delete process.env["OSE_WEB_SHOW_DRAFTS"];

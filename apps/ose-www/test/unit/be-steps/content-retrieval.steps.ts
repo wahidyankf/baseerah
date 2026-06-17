@@ -1,10 +1,10 @@
 import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import type { ContentMeta } from "@/features/content/application/types";
+import type { ContentMeta } from "@/features/content/core/types";
 import { createCallerFactory } from "@/lib/trpc/init";
 import type { TRPCContext } from "@/lib/trpc/init";
-import { appRouter } from "@/features/app-shell/application/root-router";
+import { appRouter } from "@/features/app-shell/shell/root-router";
 import { testContentService, testContentServiceWithDraft } from "./helpers/test-service";
 
 const feature = await loadFeature(

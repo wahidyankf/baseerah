@@ -1,9 +1,9 @@
 import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import type { ContentMeta } from "@/features/content/application/types";
-import { InMemoryContentRepository } from "@/features/content/infrastructure/repository-memory";
-import { ContentService } from "@/features/content/application/service";
+import type { ContentMeta } from "@/features/content/core/types";
+import { InMemoryContentRepository } from "@/features/content/core/repository-memory";
+import { ContentService } from "@/features/content/shell/service";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-be/gherkin/rss-feed/rss-feed.feature"),

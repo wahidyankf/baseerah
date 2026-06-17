@@ -6,8 +6,8 @@
 import path from "node:path";
 import fs from "node:fs";
 import matter from "gray-matter";
-import { frontmatterSchema } from "../features/content/application/schemas";
-import { stripMarkdown } from "../features/content/infrastructure/reader";
+import { frontmatterSchema } from "../features/content/core/schemas";
+import { stripMarkdown } from "../features/content/core/reader";
 
 const CONTENT_DIR = path.resolve(__dirname, "../../content");
 const OUTPUT_DIR = path.resolve(__dirname, "../../generated");

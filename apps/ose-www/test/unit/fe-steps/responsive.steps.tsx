@@ -46,25 +46,25 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
   },
 }));
 
-// Mock @/features/app-shell/presentation/theme-toggle
-vi.mock("@/features/app-shell/presentation/theme-toggle", () => ({
+// Mock @/features/app-shell/shell/theme-toggle
+vi.mock("@/features/app-shell/shell/theme-toggle", () => ({
   ThemeToggle: () => <button aria-label="Toggle theme">Theme</button>,
 }));
 
-// Mock @/features/app-shell/presentation/mobile-nav
-vi.mock("@/features/app-shell/presentation/mobile-nav", () => ({
+// Mock @/features/app-shell/shell/mobile-nav
+vi.mock("@/features/app-shell/shell/mobile-nav", () => ({
   MobileNav: ({ open }: { open: boolean; onOpenChange: (v: boolean) => void }) => (
     <div data-testid="mobile-nav" data-open={String(open)} />
   ),
 }));
 
 // Mock @/lib/hooks/use-search
-vi.mock("@/features/search/presentation/use-search", () => ({
+vi.mock("@/features/search/shell/use-search", () => ({
   useSearchOpen: () => ({ open: false, setOpen: vi.fn() }),
   SearchContext: React.createContext({ open: false, setOpen: vi.fn() }),
 }));
 
-import { Header } from "@/features/app-shell/presentation/header";
+import { Header } from "@/features/app-shell/shell/header";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-web/gherkin/app-shell/responsive.feature"),

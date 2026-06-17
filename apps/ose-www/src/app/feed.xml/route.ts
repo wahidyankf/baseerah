@@ -1,4 +1,4 @@
-import { buildFeed } from "@/features/rss-feed/application/feed-builder";
+import { buildFeed } from "@/features/rss-feed/shell/feed-builder";
 
 export const dynamic = "force-static";
 

@@ -1,7 +1,7 @@
 "use client";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
-import type { AppRouter } from "@/features/app-shell/application/root-router";
+import type { AppRouter } from "@/features/app-shell/shell/root-router";
 
 function getBaseUrl() {
   if (typeof window !== "undefined") return "";

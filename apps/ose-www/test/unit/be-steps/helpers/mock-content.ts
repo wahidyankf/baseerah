@@ -1,4 +1,4 @@
-import type { ContentMeta } from "@/features/content/application/types";
+import type { ContentMeta } from "@/features/content/core/types";
 
 export const mockUpdateMetas: ContentMeta[] = [
   {

@@ -42,25 +42,25 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
   },
 }));
 
-// Mock @/features/app-shell/presentation/theme-toggle
-vi.mock("@/features/app-shell/presentation/theme-toggle", () => ({
+// Mock @/features/app-shell/shell/theme-toggle
+vi.mock("@/features/app-shell/shell/theme-toggle", () => ({
   ThemeToggle: () => <button aria-label="Toggle theme">Theme</button>,
 }));
 
-// Mock @/features/app-shell/presentation/mobile-nav
-vi.mock("@/features/app-shell/presentation/mobile-nav", () => ({
+// Mock @/features/app-shell/shell/mobile-nav
+vi.mock("@/features/app-shell/shell/mobile-nav", () => ({
   MobileNav: () => <div data-testid="mobile-nav" />,
 }));
 
 // Mock @/lib/hooks/use-search
-vi.mock("@/features/search/presentation/use-search", () => ({
+vi.mock("@/features/search/shell/use-search", () => ({
   useSearchOpen: () => ({ open: false, setOpen: vi.fn() }),
   SearchContext: React.createContext({ open: false, setOpen: vi.fn() }),
 }));
 
-import { Header } from "@/features/app-shell/presentation/header";
-import { Breadcrumb } from "@/features/content/presentation/breadcrumb";
-import { PrevNext } from "@/features/content/presentation/prev-next";
+import { Header } from "@/features/app-shell/shell/header";
+import { Breadcrumb } from "@/features/content/shell/breadcrumb";
+import { PrevNext } from "@/features/content/shell/prev-next";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-web/gherkin/app-shell/navigation.feature"),

@@ -1,11 +1,12 @@
 /**
- * Phase 7b structure guard: `src/features/` is the module root for ose-www
- * (matching the wahidyankf-www pattern), and the tRPC content/feed pipeline
- * remains reachable through the new layout.
+ * Structure guard: `src/features/` is the module root for ose-www (matching the
+ * wahidyankf-www pattern), each feature splits into a functional `core/` (pure)
+ * and an imperative `shell/` (IO + UI + wiring), and the tRPC content/feed
+ * pipeline remains reachable through the new layout.
  *
  * RED: fails before the contexts -> features reshape (import paths unresolved).
- * GREEN: passes once src/features/ exists and the tRPC router/feed builder
- * resolve from it.
+ * GREEN: passes once src/features/ exists, the core/shell split is in place,
+ * and the tRPC router/feed builder resolve from it.
  */
 import { describe, it, expect } from "vitest";
 import { existsSync } from "node:fs";
@@ -18,13 +19,24 @@ describe("ose-www features module root", () => {
     expect(existsSync(path.join(root, "contexts"))).toBe(false);
   });
 
+  it("splits each feature into core/ (pure) and shell/ (IO + UI)", () => {
+    const features = path.resolve(__dirname, "../../../src/features");
+    // content carries both layers: pure derivations in core/, IO + UI in shell/.
+    expect(existsSync(path.join(features, "content/core/reader.ts"))).toBe(true);
+    expect(existsSync(path.join(features, "content/shell/service.ts"))).toBe(true);
+    // legacy DDD layer folders are gone.
+    expect(existsSync(path.join(features, "content/application"))).toBe(false);
+    expect(existsSync(path.join(features, "content/infrastructure"))).toBe(false);
+    expect(existsSync(path.join(features, "content/presentation"))).toBe(false);
+  });
+
   it("keeps the tRPC app router reachable from features/", async () => {
-    const mod = await import("@/features/app-shell/application/root-router");
+    const mod = await import("@/features/app-shell/shell/root-router");
     expect(mod.appRouter).toBeDefined();
   });
 
   it("keeps the content service (feed source) reachable from features/", async () => {
-    const mod = await import("@/features/content/application/service");
+    const mod = await import("@/features/content/shell/service");
     expect(mod.ContentService).toBeDefined();
   });
 
@@ -32,6 +44,6 @@ describe("ose-www features module root", () => {
     // feed-builder pulls the Next.js `server-only` tRPC server caller, so it is
     // asserted by file location rather than imported into the node test env.
     const root = path.resolve(__dirname, "../../../src");
-    expect(existsSync(path.join(root, "features/rss-feed/application/feed-builder.ts"))).toBe(true);
+    expect(existsSync(path.join(root, "features/rss-feed/shell/feed-builder.ts"))).toBe(true);
   });
 });

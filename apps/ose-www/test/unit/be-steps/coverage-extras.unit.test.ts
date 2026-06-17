@@ -13,9 +13,9 @@ vi.mock("@/env", () => ({
 import { writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { cn } from "@/lib/utils";
-import { InMemoryContentRepository } from "@/features/content/infrastructure/repository-memory";
-import { ContentService } from "@/features/content/application/service";
-import type { SearchDoc } from "@/features/content/application/service";
+import { InMemoryContentRepository } from "@/features/content/core/repository-memory";
+import { ContentService } from "@/features/content/shell/service";
+import type { SearchDoc } from "@/features/content/shell/service";
 import { createTRPCContext } from "@/lib/trpc/init";
 
 // --- lib/utils.ts ---

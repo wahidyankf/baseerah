@@ -1,7 +1,7 @@
 import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { expect } from "vitest";
-import type { ContentMeta } from "@/features/content/application/types";
+import type { ContentMeta } from "@/features/content/core/types";
 import { integrationCaller } from "./helpers/test-caller";
 
 const feature = await loadFeature(

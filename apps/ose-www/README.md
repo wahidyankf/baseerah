@@ -20,15 +20,21 @@ community informed as we build with radical transparency.
 - **Search**: FlexSearch for full-text search
 - **Diagrams**: Mermaid diagram support
 - **Testing**: Vitest (unit + integration), 86% line coverage enforced via rhino-cli
-- **Structure**: Hexagonal feature modules under `src/contexts/<feature>/` with three layers
+- **Structure**: Feature modules under `src/features/<feature>/`, each split into `core/` and `shell/`
 
-The codebase follows the
-[hexagonal architecture for web applications](../../repo-governance/development/pattern/hexagonal-architecture-web.md)
-pattern, organized into three layers per feature module:
+The codebase follows the functional-core / imperative-shell convention. Each feature module splits
+into two layers:
 
-- **application** — use cases, business logic, and ports (interfaces to the outside world)
-- **infrastructure** — adapters implementing the ports (file system, HTTP, database)
-- **presentation** — UI components and tRPC route handlers that face the client
+- **core** — the functional core: pure functions, immutable data, derivations, validation, Zod
+  schemas, plain TypeScript types, and constant data tables. `core/` performs no IO and never
+  imports React, Next.js, node builtins, tRPC wiring, or any network/file client. `core/` never
+  imports from `shell/`.
+- **shell** — the imperative shell: everything effectful — React components and DOM hooks, file
+  system readers, repository adapters, tRPC routers and init wiring, route handlers, and the RSS /
+  sitemap generators. `shell/` may import from `core/`.
+
+A shared pure type that both layers depend on (such as a repository interface) lives in `core/`, so
+`shell/` adapters implement it without `core/` ever depending on `shell/`.
 
 ## Quick Start
 
@@ -60,8 +66,8 @@ nx run ose-www:specs:coverage
 ```
 ose-www/
 ├── src/
-│   ├── app/            # Next.js App Router routes (thin glue, imports from contexts/)
-│   ├── contexts/       # Feature modules (one folder per feature)
+│   ├── app/            # Next.js App Router routes (thin glue, imports from features/)
+│   ├── features/       # Feature modules (one folder per feature, each with core/ + shell/)
 │   │   ├── app-shell/  # Site chrome + root tRPC router
 │   │   ├── landing/    # Marketing landing page
 │   │   ├── content/    # Content retrieval + rendering

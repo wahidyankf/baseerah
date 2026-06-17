@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { TRPCProvider } from "@/lib/trpc/provider";
-import { SearchProvider } from "@/features/search/presentation/search-provider";
+import { SearchProvider } from "@/features/search/shell/search-provider";
 import { TooltipProvider } from "@open-sharia-enterprise/web-ui";
 import "./globals.css";
 

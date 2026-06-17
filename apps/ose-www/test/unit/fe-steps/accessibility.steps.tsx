@@ -39,20 +39,20 @@ vi.mock("@open-sharia-enterprise/web-ui", () => ({
 }));
 
 // Mock theme-toggle and mobile-nav
-vi.mock("@/features/app-shell/presentation/theme-toggle", () => ({
+vi.mock("@/features/app-shell/shell/theme-toggle", () => ({
   ThemeToggle: () => <button aria-label="Toggle theme">Theme</button>,
 }));
-vi.mock("@/features/app-shell/presentation/mobile-nav", () => ({
+vi.mock("@/features/app-shell/shell/mobile-nav", () => ({
   MobileNav: () => <div data-testid="mobile-nav" />,
 }));
 
 // Mock search context
-vi.mock("@/features/search/presentation/use-search", () => ({
+vi.mock("@/features/search/shell/use-search", () => ({
   useSearchOpen: () => ({ open: false, setOpen: vi.fn() }),
   SearchContext: React.createContext({ open: false, setOpen: vi.fn() }),
 }));
 
-import { Header } from "@/features/app-shell/presentation/header";
+import { Header } from "@/features/app-shell/shell/header";
 
 const feature = await loadFeature(
   path.resolve(process.cwd(), "../../specs/apps/ose/behavior/platform-web/gherkin/app-shell/accessibility.feature"),

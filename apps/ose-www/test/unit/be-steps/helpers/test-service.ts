@@ -1,6 +1,6 @@
-import type { ContentMeta } from "@/features/content/application/types";
-import { ContentService } from "@/features/content/application/service";
-import { InMemoryContentRepository } from "@/features/content/infrastructure/repository-memory";
+import type { ContentMeta } from "@/features/content/core/types";
+import { ContentService } from "@/features/content/shell/service";
+import { InMemoryContentRepository } from "@/features/content/core/repository-memory";
 import { mockUpdateMetas, mockAboutMeta, mockSectionMeta, mockDraftMeta } from "./mock-content";
 
 const allMetas: ContentMeta[] = [

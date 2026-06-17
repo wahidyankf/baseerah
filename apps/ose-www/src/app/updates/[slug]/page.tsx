@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Badge } from "@open-sharia-enterprise/web-ui/primitives";
-import { Header } from "@/features/app-shell/presentation/header";
-import { Footer } from "@/features/app-shell/presentation/footer";
-import { Breadcrumb } from "@/features/content/presentation/breadcrumb";
-import { TableOfContents } from "@/features/content/presentation/toc";
-import { MarkdownRenderer } from "@/features/content/presentation/markdown-renderer";
-import { PrevNext } from "@/features/content/presentation/prev-next";
+import { Header } from "@/features/app-shell/shell/header";
+import { Footer } from "@/features/app-shell/shell/footer";
+import { Breadcrumb } from "@/features/content/shell/breadcrumb";
+import { TableOfContents } from "@/features/content/shell/toc";
+import { MarkdownRenderer } from "@/features/content/shell/markdown-renderer";
+import { PrevNext } from "@/features/content/shell/prev-next";
 import { serverCaller } from "@/lib/trpc/server";
 
 export const dynamicParams = false;

@@ -1,3 +1,3 @@
-import { buildSitemap } from "@/features/seo/application/sitemap-builder";
+import { buildSitemap } from "@/features/seo/shell/sitemap-builder";
 
 export default buildSitemap;
