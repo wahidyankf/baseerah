@@ -7,6 +7,12 @@ job-offer decisions. A salary-savings calculator turns an abstract salary number
 comparable signal: _how much can I actually keep, here vs. elsewhere?_ It is sticky, shareable, and
 reinforces the site's practical, career-oriented brand.
 
+The tool also answers the question in reverse — _"to save at least this much, what is the lowest
+engineering role I'd need, and where?"_ — mapping a savings bar onto the canonical engineering
+career ladder. This is a **novel** framing: research found no existing public tool offering a
+"savings target → minimum role + city worldwide" lookup, so it is differentiating as well as
+career-relevant.
+
 It is also a low-risk first **interactive tool** for the site — pure client-side, static data, no
 backend — that proves out a reusable `tools/` pattern for future calculators.
 
@@ -14,7 +20,11 @@ backend — that proves out a reusable `tools/` pattern for future calculators.
 
 - **Visitor / tech worker** — primary user; inputs a salary, compares cities, reads savings.
 - **Relocation / remote-work planner** — uses the comparison table to shortlist destinations.
+- **Career planner / job seeker** — uses the minimum-role mode to see what seniority a savings goal
+  implies and where it is most reachable.
 - **Content / site owner** — gains an engaging, low-maintenance feature; owns dataset accuracy.
+- **web-research-maker agent** — sources the engineering-role taxonomy and the role×city salary
+  matrix (with confidence tiers + snapshot date) that the reverse lookup runs on.
 - **swe-typescript-dev / swe-ui-maker agents** — implement calculation core and UI.
 
 ## Goals & Success Metrics
@@ -23,17 +33,25 @@ backend — that proves out a reusable `tools/` pattern for future calculators.
 - **G2**: Savings shown as percentage **and** local-currency amount, per the request.
 - **G2b**: Cost basis adjustable by household type (single → married + 3 kids), area (city center vs
   rural), and — for households with kids — public vs private school (median cost).
-- **G3**: Tool is fully client-side and deterministic (static dataset), no new infra or API keys.
+- **G2c**: Given a savings **baseline** (own salary, a reference city + role, or a raw target), the
+  tool names the **minimum engineering role** worldwide that saves at least as much in absolute
+  terms, with savings shown in USD, local, and a user-chosen display currency.
+- **G3**: Tool is fully client-side and deterministic (static datasets), no new infra or API keys.
 - **G4**: Calculation core has dedicated unit tests; page meets WCAG AA and is responsive.
 
-Success signals: feature ships behind `/[locale]/tools/salary-savings` in both locales; calc module
-test coverage meets the app threshold; fe-e2e smoke test passes in CI.
+Success signals: feature ships behind `/[locale]/tools/salary-savings` in both locales with all
+three modes; calc and reverse-lookup modules' test coverage meets the app threshold; fe-e2e smoke
+test passes in CI.
 
 ## Constraints
 
-- Static curated dataset only; values are estimates with a recorded snapshot date and a visible
+- Static curated datasets only; values are estimates with a recorded snapshot date and a visible
   "estimates only" disclaimer. Household and area adjustments use shared multiplier tables (not
   per-city data); school cost is a per-city public/private median.
+- The **role-salary matrix** (`roles.ts`) is likewise static and `web-research-maker`-sourced; public
+  salary data is uneven outside the US, so each cell carries a confidence tier (`high` | `moderate` |
+  `proxy`) and lower-confidence rows are flagged in the UI. The role ladder is a synthesised
+  industry-consensus taxonomy (no standards body publishes one), documented in `tech-docs.md`.
 - **Israeli cities are deliberately excluded** from the dataset (explicit product constraint). This
   is a country-level choice about the state of Israel and its political stance, **not** a choice
   about any ethnic, racial, or religious group. The exclusion targets the country and its political
@@ -45,15 +63,19 @@ test coverage meets the app threshold; fe-e2e smoke test passes in CI.
 
 ## Risks & Mitigations
 
-| Risk                                                     | Impact | Mitigation                                                                                             |
-| -------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------ |
-| Cost-of-living / FX figures drift or mislead             | Med    | Snapshot date + "estimates only" disclaimer; centralize in data                                        |
-| Scope creep (taxes, live FX, charts)                     | Med    | Explicitly deferred in PRD out-of-scope; iterate later                                                 |
-| First interactive page diverges from patterns            | Low    | Reuse Tailwind + i18n conventions; calc logic isolated and tested                                      |
-| Negative savings (cost > salary) confuses UI             | Low    | Define and test the deficit case; show negative clearly                                                |
-| Household/area multipliers + school medians oversimplify | Med    | Disclaimer names each approximation; indicative values sourced in Phase 1; per-city overrides deferred |
+| Risk                                                               | Impact | Mitigation                                                                                                                                                                               |
+| ------------------------------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cost-of-living / FX figures drift or mislead                       | Med    | Snapshot date + "estimates only" disclaimer; centralize in data                                                                                                                          |
+| Scope creep (taxes, live FX, charts)                               | Med    | Explicitly deferred in PRD out-of-scope; iterate later                                                                                                                                   |
+| First interactive page diverges from patterns                      | Low    | Reuse Tailwind + i18n conventions; calc logic isolated and tested                                                                                                                        |
+| Negative savings (cost > salary) confuses UI                       | Low    | Define and test the deficit case; show negative clearly                                                                                                                                  |
+| Household/area multipliers + school medians oversimplify           | Med    | Disclaimer names each approximation; indicative values sourced in Phase 1; per-city overrides deferred                                                                                   |
+| Role-salary data uneven / stale outside US tech hubs               | Med    | `web-research-maker`-sourced with per-cell confidence tier; low-confidence rows flagged; snapshot date shown; proxy cells derived from documented regional multipliers, never fabricated |
+| Single linear "minimum" ordering across IC + mgmt tracks ambiguous | Low    | Rank by resulting absolute savings (primary); documented seniority ordering only as display tiebreaker — `tech-docs.md` records the rule                                                 |
 
 ## Out of Scope
 
-Live data APIs, tax/deduction modelling, savings goals, persistence/sharing/export, non-default
-currencies per city, and any Israeli city. These are candidates for later iterations.
+Live data APIs (cost-of-living, FX, **or salary**), tax/deduction modelling, savings goals,
+persistence/sharing/export, per-city non-default currencies, company-specific or equity/bonus
+salary breakdowns, per-person career-progression modelling, and any Israeli city. These are
+candidates for later iterations.

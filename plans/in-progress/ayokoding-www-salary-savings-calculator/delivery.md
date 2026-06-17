@@ -66,7 +66,58 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > **Pause Safety**: `cities.ts` dataset and `calc.ts` pure functions are complete, unit-tested, and
 > lint-clean. No UI code exists yet. Safe to stop. To resume: `npx nx run ayokoding-www:test:unit`
-> — must still pass before Phase 2.
+> — must still pass before Phase 1b.
+
+## Phase 1b — Role-Salary Data + Reverse-Lookup Core (TDD)
+
+Adds the second dataset (`roles.ts`) and the pure `role-lookup.ts` search that powers the
+minimum-role mode. The role taxonomy + salary matrix are sourced via `web-research-maker`, then
+encoded as a static full city×role matrix with per-cell confidence tiers. Still no UI.
+
+- [ ] **[AI]** Source the role data via `web-research-maker`: (a) the canonical 15-rung engineering
+      ladder (IC + management, with `rank`/`track`/`label`), and (b) a typical monthly gross salary
+      per role per city in `cities.ts`, each with a `confidence` tier (`high` | `moderate` | `proxy`)
+      and a source note. Record the cited findings + `snapshotDate` in a research note referenced
+      from `roles.ts` comments. Acceptance: a complete role list + a salary value (or documented
+      `proxy` derivation) for every city×role pair, no fabricated exact figures.
+- [ ] **[AI] RED** Add `roles.test.ts` asserting matrix invariants: `ladder` is the full 15-rung set
+      with strictly increasing `rank`; `salaries` keys **exactly match** `cities.ts` city IDs (full
+      matrix, no holes); every cell has a positive `monthlyGrossLocal` and a valid `confidence`;
+      **no Israeli city / `ILS`** leaks in; a `snapshotDate` is present. File:
+      `apps/ayokoding-www/src/features/salary-savings/data/roles.test.ts`. Command:
+      `npx nx run ayokoding-www:test:unit`. Acceptance: fails (no `roles.ts` yet).
+- [ ] **[AI] GREEN** Add `roles.ts` — the `ladder` metadata + the full `salaries` matrix from the
+      research step, with sourced-estimate comments and `snapshotDate`. File:
+      `.../data/roles.ts`. Acceptance: `roles.test.ts` passes.
+- [ ] **[AI] RED** Add `role-lookup.test.ts` covering `roleSalaryUsd`, `candidateSavingsUsd`,
+      `bestCityForRole`, `resolveBaselineUsd` (all three baseline sources), `rankLadder`,
+      `minimumRole`, and `toDisplayCurrencies`, including: the no-qualifier case (`minimumRole` →
+      `null`); reference-role baseline parity (a reference role clears its own bar); cost-basis
+      changes (household/area/school) shifting candidates; and confidence propagation to the chosen
+      row. File: `.../role-lookup.test.ts`. Acceptance: fails (no `role-lookup.ts` yet).
+- [ ] **[AI] GREEN** Implement pure `role-lookup.ts` per `tech-docs.md` (USD-normalised qualify,
+      seniority-ordered display, lowest-rank minimum). File: `.../role-lookup.ts`. Acceptance:
+      `role-lookup.test.ts` passes.
+- [ ] **[AI] REFACTOR** Tidy types/naming in `role-lookup.ts` and `roles.ts`; ensure `role-lookup.ts`
+      is React-free and side-effect-free (no React imports, no `console.log`, no module-level
+      mutation) and reuses `calc.ts` rather than duplicating cost math. Acceptance:
+      `npx nx run ayokoding-www:test:unit` exits 0; `npx nx run ayokoding-www:lint` exits 0.
+
+### Phase 1b Gate
+
+> All checks below must pass before starting Phase 2.
+
+- [ ] [AI] `npx nx run ayokoding-www:test:unit` — exits 0 (all `roles.test.ts` and
+      `role-lookup.test.ts` assertions pass).
+- [ ] [AI] `npx nx run ayokoding-www:lint` — exits 0 with no errors on the new role data/lookup files.
+- [ ] [AI] Full-matrix check: `roles.ts` `salaries` key set equals `cities.ts` city-ID set (no
+      missing or extra cities) — asserted by `roles.test.ts`.
+- [ ] [AI] No Israeli city in role matrix: grep for `ILS` and `Israel` returns 0 results in
+      `roles.ts`.
+
+> **Pause Safety**: both datasets and both pure cores (`calc.ts` + `role-lookup.ts`) are complete,
+> unit-tested, and lint-clean. No UI code exists yet. Safe to stop. To resume:
+> `npx nx run ayokoding-www:test:unit` — must still pass before Phase 2.
 
 ## Phase 2 — Interactive Page (TDD)
 
@@ -82,13 +133,16 @@ the `nx affected` quality gates in Phase 4.
 - [ ] **[AI] GREEN** Implement `compare-table.tsx` (sortable table consuming the calc core and the new `Table` primitive from `@open-sharia-enterprise/web-ui`). Acceptance: test passes.
 - [ ] **[AI] RED** Add a component test for "Single city": select a city, enter local salary, assert cost/savings breakdown (cost shown in both local currency and USD) incl. deficit case. File: `.../components/single-city.test.tsx`. Acceptance: fails.
 - [ ] **[AI] GREEN** Implement `single-city.tsx`. Acceptance: test passes.
+- [ ] **[AI] RED** Add a component test for "Minimum role": set a savings-target baseline, assert the role ladder renders ascending by seniority via the `Table`, the lowest qualifying role is marked as the minimum, below-bar roles are de-emphasised, each row shows savings in USD + local + display currency, switching the baseline source (my salary / reference role / savings target) recomputes, and the no-qualifier message shows when the target exceeds every role's best-city savings. File: `.../components/min-role.test.tsx`. Acceptance: fails.
+- [ ] **[AI] GREEN** Implement `min-role.tsx` (baseline selector, display-currency picker, ranked ladder table consuming `role-lookup.ts` + the shared `Table`, minimum marker + confidence badges + summary line). Acceptance: test passes.
 - [ ] **[AI] RED** Add a component test for the shared controls: household selector, area toggle (`center`/`rural`), and a school-type toggle (`public`/`private`) that is **hidden** for childless households and **shown** once kids are selected; assert cost/savings recompute when each changes. File: `.../components/controls.test.tsx`. Acceptance: fails.
 - [ ] **[AI] GREEN** Implement the shared controls (household select, area toggle, conditional school-type toggle). Acceptance: test passes.
-- [ ] **[AI] GREEN** Add `page.tsx` (`'use client'`) at `apps/ayokoding-www/src/app/[locale]/tools/salary-savings/page.tsx` with the mode toggle wiring both components + salary, household, area, and school-type state. Acceptance: route renders in dev (`npx nx dev ayokoding-www`, visit `/en/tools/salary-savings`).
+- [ ] **[AI] GREEN** Add `page.tsx` (`'use client'`) at `apps/ayokoding-www/src/app/[locale]/tools/salary-savings/page.tsx` with the **three-way** mode toggle wiring `compare-table`, `single-city`, and `min-role` + salary, household, area, school-type, and minimum-role (baseline source, reference city/role, savings target, display currency) state. Acceptance: route renders in dev (`npx nx dev ayokoding-www`, visit `/en/tools/salary-savings`) with all three tabs reachable.
 - [ ] **[AI] REFACTOR** Extract shared `Intl.NumberFormat` formatting logic into a shared helper (e.g.
       `formatCurrency(amount, currency, locale)`); de-duplicate formatting calls across
       `apps/ayokoding-www/src/features/salary-savings/components/compare-table.tsx`,
-      `apps/ayokoding-www/src/features/salary-savings/components/single-city.tsx`, and
+      `apps/ayokoding-www/src/features/salary-savings/components/single-city.tsx`,
+      `apps/ayokoding-www/src/features/salary-savings/components/min-role.tsx`, and
       `apps/ayokoding-www/src/app/[locale]/tools/salary-savings/page.tsx` (or equivalent paths
       confirmed in Phase 0). Acceptance: `npx nx run ayokoding-www:test:unit` exits 0; no test
       regressions.
@@ -100,24 +154,27 @@ the `nx affected` quality gates in Phase 4.
 - [ ] [AI] `npx nx run web-ui:test:unit` and `npx nx run web-ui:lint` — both exit 0 (new `Table`
       primitive tested and lint-clean); `npx nx run web-ui:build-storybook` succeeds.
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` — exits 0 (all component tests for `compare-table`,
-      `single-city`, and `controls` pass).
+      `single-city`, `min-role`, and `controls` pass).
 - [ ] [AI] Dev server check: `npx nx dev ayokoding-www` starts; navigate to `/en/tools/salary-savings`
-      — page renders without a crash.
+      — page renders without a crash and all three tabs are reachable.
 - [ ] [AI] `npx nx run ayokoding-www:lint` — exits 0 on all new component files.
 
-> **Pause Safety**: both calculator modes render and compute correctly with full component test
+> **Pause Safety**: all three calculator modes render and compute correctly with full component test
 > coverage; dev server verified. Bilingual strings and a11y not yet applied. Safe to stop.
 > To resume: `npx nx run ayokoding-www:test:unit` — must still pass before Phase 3.
 
 ## Phase 3 — Bilingual Strings + Polish
 
 - [ ] **[AI]** Edit `apps/ayokoding-www/src/contexts/i18n/application/translations.ts` — add all
-      calculator UI strings (headings, labels, mode names, household-type labels, area + school-type
-      toggle labels, "estimates only" disclaimer, "Gross monthly salary (before tax)" salary label,
-      "Data last updated" label) for both `en` and `id` locales, following the existing
+      calculator UI strings (headings, labels, mode names incl. "Minimum role", household-type
+      labels, area + school-type toggle labels, **baseline-source labels** (my salary / reference
+      role / savings target), **display-currency label**, **confidence-tier labels** (estimate /
+      lower-confidence), "estimates only" disclaimer, "Gross monthly salary (before tax)" salary
+      label, "Data last updated" label) for both `en` and `id` locales, following the existing
       `Record<Locale, Record<string, string>>` shape in that file. Wire the new keys into the
-      calculator page and components. Acceptance: `/id/tools/salary-savings` shows Indonesian labels
-      for all calculator UI elements.
+      calculator page and components. Role labels come from `roles.ts` (`ladder[].label.en/id`).
+      Acceptance: `/id/tools/salary-savings` shows Indonesian labels for all calculator UI elements
+      including the minimum-role tab.
 - [ ] **[AI]** Label salary inputs "Gross monthly salary (before tax)"; show a prominent, localized
       **"Data last updated: &lt;date&gt;"** label (formatted from `snapshotDate` via `Intl.DateTimeFormat`)
       near the results, plus a disclaimer covering "estimates only", "gross/pre-tax — taxes not
@@ -132,10 +189,16 @@ the `nx affected` quality gates in Phase 4.
 - [ ] [AI] `browser_navigate` to `http://localhost:3101/en/tools/salary-savings` — acceptance: page
       loads without JS errors.
 - [ ] [AI] `browser_snapshot` — verify calculator UI renders with salary input, mode toggle
-      ("Compare all" / "Single city"), household selector, and area toggle all visible.
+      ("Compare all" / "Single city" / "Minimum role"), household selector, and area toggle all
+      visible.
 - [ ] [AI] `browser_fill_form` salary input with `"8000"`, then `browser_click` "Compare all" /
       sort trigger — acceptance: table populates with city rows showing cost of living in both local
       currency and USD, plus a savings % and savings amount column.
+- [ ] [AI] `browser_click` the "Minimum role" tab, set the baseline source to "savings target", and
+      `browser_fill_form` the target with `"2000"` — acceptance: the role ladder renders with a row
+      marked as the minimum and below-bar rows de-emphasised; savings show in USD + local + display
+      currency. Resize narrow (`browser_resize` to ~375 px) — acceptance: the ladder reflows to
+      stacked cards (responsive mobile layout) without overflow.
 - [ ] [AI] `browser_console_messages` — acceptance: zero JS errors.
 - [ ] [AI] `browser_navigate` to `http://localhost:3101/id/tools/salary-savings`, then
       `browser_snapshot` — acceptance: all labels, headings, and the disclaimer are in Indonesian.
@@ -164,9 +227,11 @@ the `nx affected` quality gates in Phase 4.
 - [ ] **[AI] RED** Add a failing fe-e2e smoke test in
       `apps/ayokoding-www-fe-e2e/src/salary-savings.spec.ts` (_New file_): navigate to
       `/en/tools/salary-savings`, enter a salary of `"8000"`, assert the results table is populated
-      and at least one savings cell is visible. Command: `npx nx run ayokoding-www-fe-e2e:test:e2e`.
-      Acceptance: test file exists and the test fails (page route not yet reached by e2e or an element
-      assertion fails when written before the page is fully wired).
+      and at least one savings cell is visible; then switch to the "Minimum role" tab, set a savings
+      target of `"2000"`, and assert a role row is marked as the minimum. Command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e`. Acceptance: test file exists and the test fails
+      (page route not yet reached by e2e or an element assertion fails when written before the page is
+      fully wired).
 - [ ] **[AI] GREEN** Confirm that `npx nx run ayokoding-www-fe-e2e:test:e2e` passes with the
       calculator page fully implemented from Phases 1–3. Acceptance: smoke test passes end-to-end
       with zero errors.
@@ -174,8 +239,9 @@ the `nx affected` quality gates in Phase 4.
 
 ### Commit Guidelines
 
-- Commit changes thematically: data layer (`cities.ts` + `calc.ts`) in one commit, UI components
-  in a second, bilingual strings in a third, e2e in a fourth. Follow Conventional Commits format:
+- Commit changes thematically: city data layer (`cities.ts` + `calc.ts`) in one commit, role data
+  layer (`roles.ts` + `role-lookup.ts`) in a second, UI components in a third, bilingual strings in a
+  fourth, e2e in a fifth. Follow Conventional Commits format:
   `feat(ayokoding-www): add salary-savings calculator`.
 - Do NOT bundle unrelated fixes into the same commit. Note: commits happen only on explicit user
   instruction per repo policy.

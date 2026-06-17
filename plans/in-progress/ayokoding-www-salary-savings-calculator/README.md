@@ -2,7 +2,9 @@
 
 Add a bilingual (en/id) interactive tool to `apps/ayokoding-www` that estimates how much money a
 person can save per month given a salary, across major tech-hub cities worldwide. Results show
-savings as both a **percentage** of salary and an amount in the city's **local currency**.
+savings as both a **percentage** of salary and an amount in the city's **local currency**. The tool
+also runs the question in reverse: given a savings bar, it finds the **minimum engineering role**
+(across any city worldwide) whose typical salary saves at least as much in absolute terms.
 
 ## Status
 
@@ -22,11 +24,15 @@ where in the world do I save the most, and how much?"_
 **In scope:**
 
 - New interactive route `/[locale]/tools/salary-savings` (client component).
-- Two modes via a tab toggle:
+- Three modes via a tab toggle:
   - **Compare all** — enter one salary (USD); table lists tech-hub cities with estimated living
     cost (local currency + USD), savings %, and savings in local currency; sortable by savings.
   - **Single city** — pick one city, enter salary in that city's local currency; show a breakdown.
-- Shared cost-basis controls (apply to both modes):
+  - **Minimum role** — set a savings **baseline** (own salary, a reference city + engineering role,
+    or a raw savings target), and the tool ranks the canonical engineering-role ladder to mark the
+    **lowest role** (anywhere worldwide) whose typical salary saves at least that much in absolute
+    terms. Savings shown in **USD, the city's local currency, and a user-chosen display currency**.
+- Shared cost-basis controls (apply to all three modes):
   - **Household type** — single, married, or married with 1–3 kids (scales living cost).
   - **Area** — city center vs rural (discounts living cost outside the center).
   - **School type** — public vs private median per-child cost, shown only when the household has
@@ -37,6 +43,12 @@ where in the world do I save the most, and how much?"_
   can** (`cities.ts`): name (en/id), country, currency, single-person city-center monthly living
   cost, median public/private school cost per child, and an FX-to-USD snapshot rate with a recorded
   snapshot date — plus shared household/area multiplier tables.
+- A second **static, hand-curated role-salary matrix** (`roles.ts`): for every city, the typical
+  monthly gross salary of each rung on a canonical **engineering role ladder** (full IC + management
+  track — SWE I … Distinguished/Fellow, EM … CTO). The matrix and its role taxonomy are sourced via
+  the **`web-research-maker`** agent (levels.fyi / BLS / Glassdoor / Numbeo), each cell carrying a
+  confidence tier (`high` | `moderate` | `proxy`) and a snapshot date. Like `cities.ts`, the data is
+  static for v1 — no live salary API.
 - The whole feature is **client-side rendered (CSR)** — a `'use client'` page that computes
   everything in the browser; no server-side rendering of results, no backend, no runtime network.
 - Pure calculation functions in a separate module, fully unit-tested (TDD).
@@ -60,13 +72,17 @@ where in the world do I save the most, and how much?"_
 ## Approach Summary
 
 1. **Phase 0 — Setup & baseline**: worktree, deps, green baseline for `ayokoding-www`.
-2. **Phase 1 — Data + calculation core (TDD)**: `cities.ts` dataset + pure `calc` module with tests.
-3. **Phase 2 — Interactive page (TDD)**: add the missing `Table` primitive to `libs/web-ui`, then
-   build the `/[locale]/tools/salary-savings` page, both modes, and component tests.
-4. **Phase 3 — Bilingual strings + polish**: en/id UI strings, accessibility, responsive.
-5. **Phase 4 — E2E + local quality gates**: fe-e2e smoke test, typecheck/lint/test:quick.
-6. **Phase 5 — Post-push CI verification**.
-7. **Phase 6 — Plan archival**.
+2. **Phase 1 — City data + calculation core (TDD)**: `cities.ts` dataset + pure `calc` module with
+   tests.
+3. **Phase 1b — Role-salary data + reverse-lookup core (TDD)**: source the role ladder + role×city
+   matrix via `web-research-maker` into `roles.ts`; add pure `roleLookup` functions (baseline
+   resolution, candidate ranking, minimum-role) with tests.
+4. **Phase 2 — Interactive page (TDD)**: add the missing `Table` primitive to `libs/web-ui`, then
+   build the `/[locale]/tools/salary-savings` page, all three modes, and component tests.
+5. **Phase 3 — Bilingual strings + polish**: en/id UI strings, accessibility, responsive.
+6. **Phase 4 — E2E + local quality gates**: fe-e2e smoke test, typecheck/lint/test:quick.
+7. **Phase 5 — Post-push CI verification**.
+8. **Phase 6 — Plan archival**.
 
 ## Worktree
 

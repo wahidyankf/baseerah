@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="600" viewBox="0 0 680 600" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="High-fidelity mockup of the Salary Savings Calculator minimum-role screen, ladder-table layout">
+  <rect width="680" height="600" fill="#f1f5f9"/>
+  <!-- card -->
+  <rect x="24" y="24" width="632" height="552" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- header -->
+  <text x="48" y="62" font-size="22" font-weight="700" fill="#0f172a">Minimum Engineering Role</text>
+  <text x="48" y="86" font-size="13.5" fill="#64748b">What is the lowest role that saves at least this much, anywhere?</text>
+
+  <!-- tab toggle -->
+  <rect x="48" y="102" width="120" height="34" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="108" y="124" font-size="13" font-weight="600" fill="#475569" text-anchor="middle">Compare All</text>
+  <rect x="174" y="102" width="120" height="34" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="234" y="124" font-size="13" font-weight="600" fill="#475569" text-anchor="middle">Single City</text>
+  <rect x="300" y="102" width="128" height="34" rx="9" fill="#0f766e"/>
+  <text x="364" y="124" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">Minimum Role</text>
+
+  <!-- baseline selector -->
+  <text x="48" y="166" font-size="13" fill="#475569">Baseline</text>
+  <circle cx="128" cy="161" r="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="142" y="166" font-size="13" fill="#334155">My salary</text>
+  <circle cx="232" cy="161" r="6" fill="#0f766e"/>
+  <circle cx="232" cy="161" r="2.4" fill="#ffffff"/>
+  <text x="246" y="166" font-size="13" font-weight="600" fill="#0f172a">Reference role</text>
+  <circle cx="392" cy="161" r="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="406" y="166" font-size="13" fill="#334155">Savings target</text>
+
+  <!-- reference city + role -->
+  <rect x="48" y="180" width="172" height="32" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="62" y="201" font-size="13" fill="#0f172a">Jakarta</text>
+  <path d="M198 192 l6 7 l6 -7" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="230" y="180" width="172" height="32" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="244" y="201" font-size="13" fill="#0f172a">Senior SWE</text>
+  <path d="M380 192 l6 7 l6 -7" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="414" y="180" width="194" height="32" rx="7" fill="#ecfdf5" stroke="#0f766e" stroke-width="1.2"/>
+  <text x="428" y="201" font-size="13" font-weight="700" fill="#0f766e">bar = $2,100 / mo</text>
+
+  <!-- display currency + cost basis -->
+  <text x="48" y="240" font-size="12.5" fill="#475569">Show in</text>
+  <rect x="104" y="226" width="84" height="28" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="116" y="245" font-size="12.5" fill="#0f172a">USD</text>
+  <path d="M170 237 l5 6 l5 -6" fill="none" stroke="#64748b" stroke-width="1.4"/>
+  <text x="208" y="240" font-size="12.5" fill="#475569">Household</text>
+  <rect x="280" y="226" width="92" height="28" rx="7" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="292" y="245" font-size="12.5" fill="#0f172a">Single</text>
+  <text x="392" y="240" font-size="12.5" fill="#475569">Area</text>
+  <circle cx="438" cy="235" r="5.5" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="450" y="240" font-size="12.5" fill="#334155">Center</text>
+  <circle cx="510" cy="235" r="5.5" fill="#0f766e"/>
+  <circle cx="510" cy="235" r="2.2" fill="#ffffff"/>
+  <text x="522" y="240" font-size="12.5" font-weight="600" fill="#0f172a">Rural</text>
+
+  <!-- divider -->
+  <line x1="48" y1="268" x2="632" y2="268" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <!-- table header -->
+  <text x="48" y="294" font-size="11.5" font-weight="700" fill="#64748b" letter-spacing="0.4">ROLE</text>
+  <text x="230" y="294" font-size="11.5" font-weight="700" fill="#64748b" letter-spacing="0.4">BEST CITY</text>
+  <text x="396" y="294" font-size="11.5" font-weight="700" fill="#64748b" letter-spacing="0.4">SAVES / MO (USD · LOCAL)</text>
+
+  <!-- row: SWE I (below, dimmed) -->
+  <text x="48" y="322" font-size="13.5" fill="#94a3b8">SWE I</text>
+  <text x="230" y="322" font-size="13.5" fill="#94a3b8">Hanoi</text>
+  <text x="396" y="322" font-size="13.5" fill="#94a3b8">$1,150 · ₫29.0m</text>
+  <text x="556" y="322" font-size="11.5" fill="#cbd5e1">below</text>
+
+  <!-- row: SWE II (below, dimmed) -->
+  <text x="48" y="350" font-size="13.5" fill="#94a3b8">SWE II</text>
+  <text x="230" y="350" font-size="13.5" fill="#94a3b8">Jakarta</text>
+  <text x="396" y="350" font-size="13.5" fill="#94a3b8">$1,780 · Rp28.4m</text>
+  <text x="556" y="350" font-size="11.5" fill="#cbd5e1">below</text>
+
+  <!-- threshold highlight band: Senior SWE -->
+  <rect x="40" y="362" width="600" height="34" rx="8" fill="#ecfdf5" stroke="#0f766e" stroke-width="1.4"/>
+  <path d="M52 379 l5 5 l9 -10" fill="none" stroke="#0f766e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="74" y="384" font-size="14" font-weight="700" fill="#0f172a">Senior SWE</text>
+  <text x="230" y="384" font-size="13.5" font-weight="600" fill="#0f172a">Jakarta</text>
+  <text x="396" y="384" font-size="13.5" font-weight="700" fill="#0f766e">$2,310 · Rp36.9m</text>
+  <text x="556" y="384" font-size="11" font-weight="700" fill="#0f766e">MINIMUM</text>
+
+  <!-- row: Eng Manager -->
+  <text x="48" y="424" font-size="13.5" fill="#0f172a">Eng. Manager</text>
+  <text x="230" y="424" font-size="13.5" fill="#334155">Bangkok</text>
+  <text x="396" y="424" font-size="13.5" fill="#0f766e">$2,640 · ฿94.0k</text>
+  <text x="566" y="424" font-size="13" fill="#0f766e">✓</text>
+
+  <!-- row: Staff SWE -->
+  <text x="48" y="452" font-size="13.5" fill="#0f172a">Staff SWE</text>
+  <text x="230" y="452" font-size="13.5" fill="#334155">Manila</text>
+  <text x="396" y="452" font-size="13.5" fill="#0f766e">$3,520 · ₱204k</text>
+  <text x="566" y="452" font-size="13" fill="#0f766e">✓</text>
+
+  <!-- row: Director -->
+  <text x="48" y="480" font-size="13.5" fill="#0f172a">Director</text>
+  <text x="230" y="480" font-size="13.5" fill="#334155">Kuala Lumpur</text>
+  <text x="396" y="480" font-size="13.5" fill="#0f766e">$4,910 · RM23.0k</text>
+  <text x="566" y="480" font-size="13" fill="#0f766e">✓</text>
+
+  <!-- footer -->
+  <line x1="48" y1="508" x2="632" y2="508" stroke="#e2e8f0" stroke-width="1.2"/>
+  <text x="48" y="532" font-size="11.5" fill="#94a3b8">Salary snapshot: 2026-Q1  ·  estimates only  ·  some non-US rows lower-confidence</text>
+  <text x="48" y="552" font-size="11.5" fill="#94a3b8">Absolute savings normalised to USD via FX snapshot  ·  sorted by role seniority</text>
+</svg>
