@@ -16,16 +16,22 @@ and one-time relocation budget per city). Both are reachable from the three tabs
 tab is introduced.
 
 All three tabs share a **Region → Country → City** cascading filter group (region narrows countries;
-country narrows cities), every row **always shows both Country and City** (a Country column immediately
-to the left of the City column), and **clicking any city name** opens a single-city
-**Cost-of-living detail** view (deep-linkable as `?tab=cost&city=<id>`).
+country narrows cities), and every row **always shows both Country and City** (a Country column
+immediately to the left of the City column) where **both the Country name and the City name are links**.
+Clicking either navigates to the **Cost-of-living tab with the related geographic filter pre-selected**:
+clicking a **City name** opens that city's single-city **Cost-of-living detail** view (deep-linkable as
+`?tab=cost&city=<id>`); clicking a **Country name** opens the **Cost-of-living tab filtered to that
+country** — that country's cities as a filtered list, not a single-city detail (deep-linkable as
+`?tab=cost&country=<id>`). A city click takes precedence if both params are present (a city implies its
+country).
 
 1. **Cost of living** — _"How much do I need to live in each hub?"_ No salary input. Per city, the
    full monthly **expense-category breakdown** (housing, food, transport, utilities, healthcare,
    childcare, school, lifestyle) with an essentials subtotal and a total, plus a separate one-time
    **relocation sunk-cost** line and a separately labelled **liquidity reserve**. Lists tech-hub
-   cities worldwide, filtered via the shared Region / Country / City filters; each city name links to
-   its single-city detail.
+   cities worldwide, filtered via the shared Region / Country / City filters; each **city name links to
+   its single-city detail** and each **country name links to the Cost-of-living tab filtered to that
+   country**.
 2. **Savings** — _"For my gross salary, where do I save most across cities?"_ Enter a **gross salary**
    (USD) **monthly or annual** (enter one, both are shown; annual = 12 × monthly). For each city the
    tool converts gross to **net take-home** via the country's federal banded effective tax rate plus
@@ -66,12 +72,24 @@ this cascading group; the removed "single-city breakdown" mode is now the **city
 (below).
 
 Every table row **always shows both Country and City** — a **Country column immediately to the left of
-the City column** (on mobile cards the heading reads "City, Country"). **Clicking any city name
-anywhere** (on any tab) navigates to the single-city **Cost-of-living detail** view: the Cost-of-living
-tab scoped to that one city, showing the full per-category breakdown, essentials subtotal, total,
-healthcare scheme badge, and the split relocation (sunk + liquidity reserve), all dual-currency. The
-detail view is **deep-linkable** via `?tab=cost&city=<id>` and offers a back affordance to the full
-table.
+the City column** (on mobile cards the heading reads "City, Country") — and **both the Country name and
+the City name are links** on every tab. Each navigates to the **Cost-of-living tab with the related
+geographic filter pre-selected**:
+
+- **Clicking any city name anywhere** (on any tab) navigates to the single-city **Cost-of-living
+  detail** view: the Cost-of-living tab scoped to that one city (its City filter pre-selected), showing
+  the full per-category breakdown, essentials subtotal, total, healthcare scheme badge, and the split
+  relocation (sunk + liquidity reserve), all dual-currency. It is **deep-linkable** via
+  `?tab=cost&city=<id>` and offers a back affordance to the full table.
+- **Clicking any country name anywhere** (on any tab) navigates to the **Cost-of-living tab filtered to
+  that country** — the Country filter (and its Region) pre-selected so the table shows that country's
+  cities as a filtered list (NOT a single-city detail). It is **deep-linkable** via
+  `?tab=cost&country=<id>`.
+
+Both integrate with the existing Region → Country → City cascading filter: a country click sets the
+Country filter (and its Region); a city click sets the City filter (and its Country + Region). A city
+click takes **precedence** if both `country` and `city` query params are present, because a city
+implies its country.
 
 ## Tabs
 
@@ -82,8 +100,9 @@ The page has three tabs selected by a tab toggle.
   utilities, healthcare, **childcare**, lifestyle) plus the **school** add-on, an **essentials
   subtotal** (housing + food + transport + utilities + healthcare + childcare + school), a **total**
   (essentials + lifestyle), a separate one-time **relocation sunk-cost** total, and a **separately
-  labelled liquidity reserve** (the cash cushion the user keeps). Each city name links to its
-  single-city detail. Each tab also **always shows the healthcare funding scheme** for the selected
+  labelled liquidity reserve** (the cash cushion the user keeps). Each **city name links to its
+  single-city detail** and each **country name links to the Cost-of-living tab filtered to that
+  country**. Each tab also **always shows the healthcare funding scheme** for the selected
   city/country (a badge: "Healthcare: tax-funded (NHS-style)" / "mandatory payroll insurance" /
   "out-of-pocket"), plus a **"health insurance: compulsory / optional"** indicator. The shared
   Region / Country / City filters narrow the table.
@@ -93,7 +112,9 @@ The page has three tabs selected by a tab toggle.
   tax model plus any city sub-national rate (US states / Canada provinces / Switzerland cantons), then
   derives **two savings figures** — `essentialSavings = net − essentials` and
   `afterLifestyleSavings = essentialSavings − lifestyle` — and shows **both amounts + both
-  percentages** (each in local + USD), sortable. Columns include the Country+City, the gross monthly
+  percentages** (each in local + USD), sortable. Columns include the Country+City (**both the Country
+  and the City name are links** — City → that city's detail, Country → the Cost-of-living tab filtered
+  to that country), the gross monthly
   AND annual, a typical **non-salary comp** (RSU/equity + bonus, informational total-comp context only
   — NOT in the savings math), a derived **total compensation** figure (base annual + non-salary comp,
   informational, for negotiation context), the income band + effective tax %, net, essentials, and the
@@ -108,7 +129,9 @@ The page has three tabs selected by a tab toggle.
   **median** salary; lifestyle EXCLUDED — it is a personal-preference variable), marking the **lowest
   role** that clears the bar. The ladder is **reordered**: qualifying roles are grouped high→low down
   to the marked MINIMUM, then a divider, then the dimmed **non-qualifying ("below minimum")** roles.
-  Each row shows the best city **and its country**, the role × country **p25 / median / p75** salary
+  Each row shows the best city **and its country** (**both the best-city name and the country name are
+  links** — best-city → that city's Cost-of-living detail, country → the Cost-of-living tab filtered to
+  that country), the role × country **p25 / median / p75** salary
   distribution, a typical **non-salary comp**, and a derived **total compensation** (base + non-salary
   comp, informational, for negotiation context). The Region / Country / City filters scope the
   candidate cities.
@@ -208,7 +231,7 @@ disclaimer; and a city-detail inset). Authored as an SVG and rasterised to PNG a
 `rsvg-convert -z 2`, using the color-blind-friendly palette and WCAG-AA contrast per the
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
-![High-fidelity desktop mockup of the Cost-of-living tab as a Category Table: the three-tab toggle shows Cost of living active; a Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense table whose rows (Jakarta Indonesia, Singapore, Berlin Germany) list each expense category with money cells showing local currency over USD, a healthcare funding-scheme badge per row, underlined city-name links to a city-detail view, and a city-detail inset plus an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table.png)
+![High-fidelity desktop mockup of the Cost-of-living tab as a Category Table: the three-tab toggle shows Cost of living active; a Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense table whose rows (Jakarta Indonesia, Singapore, Berlin Germany) list each expense category with money cells showing local currency over USD, a healthcare funding-scheme badge per row, underlined Country and City links (a City link opens that city's detail, a Country link opens the Cost-of-living tab filtered to that country), and a city-detail inset plus an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -297,7 +320,7 @@ vs PPP" disclaimer). Authored as an SVG and rasterised to PNG at 2× via `rsvg-c
 color-blind-friendly palette and WCAG-AA contrast per the
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
-![High-fidelity desktop mockup of the Savings tab as a Net/Savings Table: the three-tab toggle shows Savings active; a gross-salary input reads $8,000/mo equals $96,000/yr beside Region/Country/City filters and a roles caption; the table ranks Jakarta, Kuala Lumpur, and Berlin by essential savings (the sorted column highlighted) with columns for gross, non-salary comp, total comp, income band, effective tax split federal plus sub-national, net, essentials, lifestyle, essential and after-lifestyle savings, savings percent, and a healthcare scheme badge, money cells showing local over USD, and a savings-before-pension and nominal-FX-vs-PPP disclaimer.](./assets/ui-savings-option-a-net-savings-table.png)
+![High-fidelity desktop mockup of the Savings tab as a Net/Savings Table: the three-tab toggle shows Savings active; a gross-salary input reads $8,000/mo equals $96,000/yr beside Region/Country/City filters and a roles caption; the table ranks Jakarta, Kuala Lumpur, and Berlin by essential savings (the sorted column highlighted) with columns for gross, non-salary comp, total comp, income band, effective tax split federal plus sub-national, net, essentials, lifestyle, essential and after-lifestyle savings, savings percent, and a healthcare scheme badge, money cells showing local over USD, both Country and City names rendered as underlined links (a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country), and a savings-before-pension and nominal-FX-vs-PPP disclaimer.](./assets/ui-savings-option-a-net-savings-table.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -387,7 +410,7 @@ an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the color-bli
 WCAG-AA contrast per the
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
-![High-fidelity desktop mockup of the Minimum-role tab as a Ladder Table: the three-tab toggle shows Minimum role active beside a software-engineering roles caption; a baseline selector (reference role chosen), a EUR display-currency selector, and Region/Country/City scope filters sit above the ladder; qualifying roles (Director, Staff SWE) are ranked high to low down to a highlighted Sr SWE MINIMUM row badged MIN, followed by a dashed Below Minimum divider and dimmed SWE II and SWE I rows; columns show best-city links, country, p25/median/p75, non-salary and total comp, and essential savings in EUR plus local, with an estimates-only disclaimer.](./assets/ui-min-role-option-a-ladder-table.png)
+![High-fidelity desktop mockup of the Minimum-role tab as a Ladder Table: the three-tab toggle shows Minimum role active beside a software-engineering roles caption; a baseline selector (reference role chosen), a EUR display-currency selector, and Region/Country/City scope filters sit above the ladder; qualifying roles (Director, Staff SWE) are ranked high to low down to a highlighted Sr SWE MINIMUM row badged MIN, followed by a dashed Below Minimum divider and dimmed SWE II and SWE I rows; columns show best-city and country both as underlined links (a best-city link opens that city's Cost-of-living detail, a country link opens the Cost-of-living tab filtered to that country), p25/median/p75, non-salary and total comp, and essential savings in EUR plus local, with an estimates-only disclaimer.](./assets/ui-min-role-option-a-ladder-table.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -614,6 +637,14 @@ Cost-of-living detail view showing that city's full per-category breakdown, esse
 healthcare scheme, and split relocation in local + USD, So that I can study one city in depth; I want
 the view to be deep-linkable (`?tab=cost&city=<id>`) So that I can share it.
 
+### US-17: Jump from a country name to that country's cities
+
+As a relocation planner, I want to click any country name (on any tab) and land on the Cost-of-living
+tab filtered to that country — its cities shown as a filtered list with the Country filter (and its
+Region) pre-selected — So that I can scan all the cities in a country I'm interested in without manually
+setting the cascading filters; I want the view to be deep-linkable (`?tab=cost&country=<id>`) So that I
+can share it.
+
 ### US-03: See the one-time relocation budget, split sunk vs reserve
 
 As a relocation planner, I want each city to show a separate one-time relocation **sunk-cost** total
@@ -730,7 +761,20 @@ Feature: Salary savings calculator
     Given I am on "/en/tools/cost-of-living-calculator"
     When I click a city name in any table
     Then I am taken to that city's single-city Cost-of-living detail at "?tab=cost&city=<id>"
+    And the City filter is pre-selected to that city
     And the detail shows the full per-category breakdown, essentials subtotal, total, healthcare scheme badge, and split relocation in both local currency and USD
+
+  Scenario: Clicking a country opens Cost-of-living filtered to that country
+    Given I am on "/en/tools/cost-of-living-calculator"
+    When I click a country name in any table
+    Then I am taken to the Cost-of-living tab filtered to that country at "?tab=cost&country=<id>"
+    And the Country filter is pre-selected to that country with its Region set
+    And the table shows that country's cities as a filtered list rather than a single-city detail
+
+  Scenario: A city link takes precedence over a country link when both params are present
+    Given I am on the calculator with both a country and a city query param set
+    When the page resolves the deep link at "?tab=cost&country=<id>&city=<id>"
+    Then the single-city Cost-of-living detail for the city is shown because a city implies its country
 
   Scenario: Healthcare funding scheme is always shown
     Given I am on "/en/tools/cost-of-living-calculator"
@@ -929,17 +973,27 @@ Feature: Salary savings calculator
   categories (housing, food, transport, utilities, healthcare, **childcare**, lifestyle) plus the
   **school** add-on, an essentials subtotal, a total, a separate one-time relocation **sunk-cost**
   total, and a separately labelled **liquidity reserve**; sortable; each **city name is a link** to its
-  single-city Cost-of-living detail.
+  single-city Cost-of-living detail and each **country name is a link** to the Cost-of-living tab
+  filtered to that country.
 - FR-2b: A shared **Region → Country → City** cascading filter group applies to all three tabs:
   selecting a Region narrows the Country list, selecting a Country narrows the City list, and each
   level is clearable (clearing a higher level resets the lower ones). It replaces the removed single
   country-only filter and the removed single-city mode.
 - FR-2c: **Every table row on every tab always shows both Country and City** — a Country column
-  immediately to the left of the City column (mobile cards read "City, Country").
+  immediately to the left of the City column (mobile cards read "City, Country") — and **both the
+  Country name and the City name are clickable links** that navigate to the Cost-of-living tab with the
+  related geographic filter pre-selected.
 - FR-2d: **Clicking any city name anywhere** navigates to a single-city **Cost-of-living detail** view
-  (the Cost-of-living tab scoped to that one city) showing the full per-category breakdown, essentials
-  subtotal, total, healthcare scheme badge, and split relocation (sunk + liquidity reserve), all in
-  local + USD. The view is **deep-linkable** via `?tab=cost&city=<id>` and offers a back affordance.
+  (the Cost-of-living tab scoped to that one city, with the City filter pre-selected) showing the full
+  per-category breakdown, essentials subtotal, total, healthcare scheme badge, and split relocation
+  (sunk + liquidity reserve), all in local + USD. The view is **deep-linkable** via `?tab=cost&city=<id>`
+  and offers a back affordance.
+- FR-2e: **Clicking any country name anywhere** navigates to the **Cost-of-living tab filtered to that
+  country** — the Country filter (and its Region) pre-selected so the table shows that country's cities
+  as a filtered list (NOT a single-city detail). The view is **deep-linkable** via
+  `?tab=cost&country=<id>`. The page reads/writes the `tab`, `country`, and `city` query params; if both
+  `country` and `city` are present, the `city` deep-link takes **precedence** (a city implies its
+  country).
 - FR-3: **Savings** tab: a gross salary input accepted as **monthly or annual** (enter one, both
   shown; annual = 12 × monthly), in USD → for each city, the Country+City, the gross monthly AND
   annual, a typical **non-salary comp** (RSU/equity + bonus) informational column, the income band +

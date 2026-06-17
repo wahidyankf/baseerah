@@ -86,12 +86,13 @@ flowchart LR
     NORM --> RANK[Rank by best-city savings]
 ```
 
-### Geographic filters + city-detail navigation
+### Geographic filters + country/city navigation
 
-All three tabs share a **Region → Country → City** cascading filter group and a **city-name → detail**
-navigation. Filter state lives in the **shell** (`page.tsx`), is passed into the shell tab components,
-and parameterises the pure-core selectors (the core stays filter-agnostic — it receives an already
-scoped city list / `cityScope`).
+All three tabs share a **Region → Country → City** cascading filter group and a **Country/City name →
+Cost-of-living navigation** (both the Country name and the City name in every row are links). Filter
+state lives in the **shell** (`page.tsx`), is passed into the shell tab components, and parameterises
+the pure-core selectors (the core stays filter-agnostic — it receives an already scoped city list /
+`cityScope`).
 
 ```mermaid
 stateDiagram-v2
@@ -105,7 +106,15 @@ stateDiagram-v2
     CityPicked --> CityDetail: click a city name
     AllCities --> CityDetail: click a city name (any tab)
     CityDetail --> AllCities: back to all cities
+    AllCities --> CountryFiltered: click a country name (any tab)
+    CountryFiltered --> CityDetail: click a city name
+    CountryFiltered --> AllCities: clear Country
 ```
+
+Two link targets share one navigation: a **City** link sets `?tab=cost&city=<id>` (single-city
+detail); a **Country** link sets `?tab=cost&country=<id>` (the Cost-of-living tab filtered to that
+country's cities — a list, not a detail). A `city` param wins over a `country` param (a city implies
+its country).
 
 - **Cascading filters** — `Region` (the `City.region` tag) narrows the available `Country` options;
   the selected `Country` narrows the available `City` options. Each filter is clearable; clearing a
@@ -115,12 +124,22 @@ stateDiagram-v2
   left of the City column**; mobile cards show "City, Country". The `City.countryId` resolves the
   country display name from the `countries` table.
 - **City-name → Cost-of-living detail** — clicking any city name anywhere navigates to the **single-city
-  Cost-of-living detail** view: the Cost-of-living tab scoped to that one city, showing the full
-  per-category breakdown (housing, food, transport, utilities, healthcare-OOP, childcare, school,
-  lifestyle), the essentials subtotal, the total, the healthcare scheme badge, and the split relocation
-  (sunk + liquidity reserve), all dual-currency (local + USD). It is **deep-linkable** via the URL
-  query (`?tab=cost&city=<id>`); the page reads/writes `tab` + `city` query params so the detail view
-  is shareable and back-navigable. A back affordance returns to the full city table.
+  Cost-of-living detail** view: the Cost-of-living tab scoped to that one city (its City filter set),
+  showing the full per-category breakdown (housing, food, transport, utilities, healthcare-OOP,
+  childcare, school, lifestyle), the essentials subtotal, the total, the healthcare scheme badge, and
+  the split relocation (sunk + liquidity reserve), all dual-currency (local + USD). It is
+  **deep-linkable** via the URL query (`?tab=cost&city=<id>`) and is shareable and back-navigable. A
+  back affordance returns to the full city table.
+- **Country-name → Cost-of-living filtered to that country** — clicking any country name anywhere
+  navigates to the **Cost-of-living tab filtered to that country**: the Country filter (and its Region)
+  are set so the table lists that country's cities (a filtered list, **not** a single-city detail). It
+  is **deep-linkable** via the URL query (`?tab=cost&country=<id>`). No new component is required — the
+  country case reuses `cost-of-living.tsx` with the Country filter pre-applied; only `city-detail.tsx`
+  remains the dedicated single-city surface.
+- **Query-param contract + precedence** — the page reads/writes the `tab`, `country`, and `city` query
+  params. A city click sets the City filter (and implicitly its Country + Region); a country click sets
+  the Country filter (and its Region). If both `country` and `city` are present in the URL, the `city`
+  deep-link **wins** and the single-city detail is shown (a city implies its country).
 
 ## Proposed File Layout
 
@@ -148,7 +167,7 @@ apps/ayokoding-www/src/
     shell/                        # EFFECTFUL — React components
       controls.tsx                # shared household / area / school-type controls
       geo-filters.tsx             # shared Region / Country / City cascading-filter row (all tabs)
-      cost-of-living.tsx          # "Cost of living" tab (category table; Country+City columns; city-name links)
+      cost-of-living.tsx          # "Cost of living" tab (category table; Country+City columns; Country & City name links; country case = filtered table via ?tab=cost&country=<id>)
       city-detail.tsx             # single-city Cost-of-living detail view (drill-down, ?tab=cost&city=<id>)
       savings.tsx                 # "Savings" tab (gross monthly+annual -> net -> savings + non-salary comp + total-comp table)
       min-role.tsx                # "Minimum role" tab (baseline selector + reordered ladder table; p25/median/p75 + total-comp)
@@ -596,7 +615,10 @@ toDisplayCurrencies(fx, savingsUsd, cityCurrency, displayCurrency): { usd, local
 
 - `page.tsx` is `'use client'`; holds active tab (`costOfLiving` | `savings` | `minRole`), the shared
   **Region / Country / City** cascading-filter state (all tabs), the selected single-city `detailCity`
-  (drill-down) synced to the `?tab=cost&city=<id>` URL query, the gross salary input (savings, **stored
+  (drill-down) and the active **Country filter**, both synced to the URL query — `?tab=cost&city=<id>`
+  for a city drill-down and `?tab=cost&country=<id>` for the country-filtered list (a city click sets
+  the City filter, a country click sets the Country filter + its Region; `city` wins over `country`
+  when both params are present) — the gross salary input (savings, **stored
   monthly with the annual derived** = 12×, either field editable), the minimum-role state
   (`baselineSource`, reference city/role, savings-target + `displayCurrency`), plus the shared
   `household` (default `single`), `area` (default `center`), and `schoolType` (default `public`).
@@ -609,8 +631,10 @@ toDisplayCurrencies(fx, savingsUsd, cityCurrency, displayCurrency): { usd, local
   expense category columns (housing, food, transport, utilities, healthcare-OOP, childcare, school,
   lifestyle) + essentials subtotal + total, a separate **relocation sunk-cost** column, and a
   **separately labelled liquidity-reserve** figure (the cash cushion the user keeps); the per-city
-  expense total is shown in **both** the city's local currency and USD; **each city name is a link** to
-  the single-city Cost-of-living **detail** view. The Savings tab shows the Country+City columns, the
+  expense total is shown in **both** the city's local currency and USD; **both the city name and the
+  country name are links** — the city name to the single-city Cost-of-living **detail** view, the
+  country name to the Cost-of-living tab **filtered to that country**. The Savings tab shows the
+  Country+City columns (**both the city and the country name are links**, same targets), the
   gross **monthly AND annual**, the typical **non-salary comp** (RSU/equity + bonus, informational
   only), a derived **total compensation** (base + non-salary comp, informational, for negotiation
   context), the income band + effective tax %, net (after federal + sub-national tax) + essentials +
@@ -619,8 +643,10 @@ toDisplayCurrencies(fx, savingsUsd, cityCurrency, displayCurrency): { usd, local
   median / p75** distribution, the **non-salary comp**, a derived **total compensation** (base +
   non-salary comp, informational), and `essentialSavings` (the ranking figure, median-based) in
   **USD + the candidate city's local currency + the chosen display currency**, plus
-  `afterLifestyleSavings` for context; the ladder is **reordered** so qualifying roles sit above the
-  marked MINIMUM and non-qualifying ("below minimum") roles sit dimmed below a divider.
+  `afterLifestyleSavings` for context; **both the best-city name and the country name are links** (best
+  city → that city's detail, country → the Cost-of-living tab filtered to that country); the ladder is
+  **reordered** so qualifying roles sit above the marked MINIMUM and non-qualifying ("below minimum")
+  roles sit dimmed below a divider.
 - **Healthcare funding scheme is always shown** — every tab renders a badge for the selected
   city/country derived from `Country.healthcareModelType` (e.g. "Healthcare: tax-funded (NHS-style)",
   "mandatory payroll insurance", or "out-of-pocket"), so the user always knows how health cover is
@@ -629,16 +655,22 @@ toDisplayCurrencies(fx, savingsUsd, cityCurrency, displayCurrency): { usd, local
   (`Command`/dropdown over the `region` tags → `countries` → `cities`) used by every tab; selecting a
   Region narrows the Country list and a Country narrows the City list; each level is clearable.
 - `cost-of-living.tsx` renders the category table via the shared `Table` with a **Country column left
-  of the City column**, the geographic filters above it, and **each city name as a link** that sets
-  `detailCity` + the `?tab=cost&city=<id>` query. `city-detail.tsx` renders the single-city detail
-  view (full per-category breakdown + healthcare badge + split relocation, dual-currency) with a back
-  affordance to the full table; it is reached by deep link or by clicking a city name anywhere.
+  of the City column**, the geographic filters above it, **each city name as a link** that sets
+  `detailCity` + the `?tab=cost&city=<id>` query, and **each country name as a link** that sets the
+  Country filter (+ its Region) + the `?tab=cost&country=<id>` query (the country case is just this same
+  table with the Country filter pre-applied — no separate component). `city-detail.tsx` renders the
+  single-city detail view (full per-category breakdown + healthcare badge + split relocation,
+  dual-currency) with a back affordance to the full table; it is reached by deep link or by clicking a
+  city name anywhere.
 - `savings.tsx` renders the gross-salary input (**monthly and annual**, enter one → both shown) and
-  the net/expenses/savings table via the shared `Table` (Country+City columns, non-salary-comp column,
+  the net/expenses/savings table via the shared `Table` (Country+City columns with **both names linked**
+  — city → detail, country → Cost-of-living filtered, non-salary-comp column,
   band + tax %), sortable by savings.
 - `min-role.tsx` renders the baseline selector (radio: my salary / reference role / savings target),
   the conditional inputs per source, the display-currency `Command`/dropdown, and the **reordered**
-  ranked ladder via the shared `Table`: a **Country column + best city** per row, the role × country
+  ranked ladder via the shared `Table`: a **Country column + best city** per row (**both linked** — best
+  city → that city's detail via `?tab=cost&city=<id>`, country → the Cost-of-living tab filtered to that
+  country via `?tab=cost&country=<id>`), the role × country
   **p25 / median / p75** distribution, the non-salary comp, qualifying roles grouped above the minimum
   (high→low seniority) with the minimum row marked with a `Badge`, a divider, then dimmed non-qualifying
   ("below minimum") rows, and a `proxy`/`moderate` confidence `Badge` where applicable. A summary line
@@ -743,9 +775,12 @@ and **role labels live in `roles.ts`** (`ladder[].label.en/id`), so data and UI 
 - **Component (vitest + Testing Library)**: render each tab, simulate input, assert rendered figures
   and locale strings. **Shared geo filters**: assert the Region / Country / City cascading filters —
   selecting a Region narrows the Country options, selecting a Country narrows the City options, every
-  row shows a **Country column to the left of the City column**, and clicking a city name navigates to
-  the single-city detail (`?tab=cost&city=<id>`). **City detail**: assert the drill-down view renders
-  the full per-category breakdown, healthcare badge, and split relocation for the deep-linked city.
+  row shows a **Country column to the left of the City column**, clicking a **city name** navigates to
+  the single-city detail (`?tab=cost&city=<id>`), and clicking a **country name** navigates to the
+  Cost-of-living tab filtered to that country (`?tab=cost&country=<id>`) with the Country filter
+  pre-selected (the table narrows to that country's cities, not a single-city detail). **City detail**:
+  assert the drill-down view renders the full per-category breakdown, healthcare badge, and split
+  relocation for the deep-linked city.
   Cost-of-living: assert the eight category columns (incl. childcare + school), essentials subtotal,
   total, the separate relocation **sunk-cost** column, the separately labelled **liquidity-reserve**
   figure, the **healthcare funding-scheme badge**, and the Country+City columns. Savings: assert the
@@ -847,10 +882,14 @@ and **role labels live in `roles.ts`** (`ladder[].label.en/id`), so data and UI 
   country-only filter, scales to a worldwide city list, and scopes the minimum-role candidate cities.
   Every row always shows **both Country and City** (Country column left of City) so a city is never
   ambiguous across same-named or regionally-clustered entries.
-- **City name links to a single-city Cost-of-living detail** — the dense multi-city table answers
-  "compare hubs"; a per-city deep-dive answers "tell me everything about this one city". Making the
-  city name a link to a deep-linkable (`?tab=cost&city=<id>`) detail view serves both without a
-  separate navigation surface, and is shareable.
+- **Both Country and City names link into the Cost-of-living tab** — the dense multi-city table answers
+  "compare hubs"; two complementary deep-dives answer "tell me everything about this one city" and
+  "show me every city in this country". Making the **city name** a link to a deep-linkable
+  (`?tab=cost&city=<id>`) single-city detail and the **country name** a link to a deep-linkable
+  (`?tab=cost&country=<id>`) country-filtered list serves all three without a separate navigation
+  surface, and both are shareable. The country case needs no new component — it is the existing
+  Cost-of-living table with the Country filter pre-applied, so only `city-detail.tsx` is a dedicated
+  surface. A `city` param wins over a `country` param (a city implies its country).
 - **Minimum-role ladder reordered around the minimum** — grouping qualifying roles above the marked
   MINIMUM (high→low seniority) and the non-qualifying ("below minimum") roles dimmed below a divider
   makes the answer ("what is the floor, and what comfortably clears it") scannable at a glance, instead

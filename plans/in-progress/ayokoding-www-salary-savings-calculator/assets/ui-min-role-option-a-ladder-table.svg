@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1180" height="660" viewBox="0 0 1180 660" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
   <title>Minimum-role screen, Option A (Ladder Table) high-fidelity finalist</title>
-  <desc>High-fidelity mockup of the Cost of Living Calculator Minimum role tab using the Ladder Table layout. A three-tab toggle has Minimum role active. A caption badge reads Roles: software-engineering (IC plus management). A baseline selector chooses my salary, reference role, or savings target, with a display-currency selector, alongside Region/Country/City filters. The ladder table lists qualifying roles ranked high to low down to a clearly marked MINIMUM row, then a divider, then dimmed non-qualifying roles below the minimum. Columns cover role, best city as a link, country, p25, median, p75, non-salary comp, total comp, essential savings in USD and local, and a qualifying status. The chosen display currency is reflected throughout.</desc>
+  <desc>High-fidelity mockup of the Cost of Living Calculator Minimum role tab using the Ladder Table layout. A three-tab toggle has Minimum role active. A caption badge reads Roles: software-engineering (IC plus management). A baseline selector chooses my salary, reference role, or savings target, with a display-currency selector, alongside Region/Country/City filters. The ladder table lists qualifying roles ranked high to low down to a clearly marked MINIMUM row, then a divider, then dimmed non-qualifying roles below the minimum. Columns cover role, best city and country both as underlined links (a best-city link opens that city's Cost-of-living detail, a country link opens the Cost-of-living tab filtered to that country), p25, median, p75, non-salary comp, total comp, essential savings in USD and local, and a qualifying status. The chosen display currency is reflected throughout.</desc>
 
   <rect x="0" y="0" width="1180" height="660" fill="#FFFFFF"/>
   <rect x="0.5" y="0.5" width="1179" height="659" fill="none" stroke="#000000" stroke-width="1"/>
@@ -69,8 +69,8 @@
   <rect x="20" y="210" width="1140" height="40" fill="#0173B2"/>
   <g font-size="11" fill="#FFFFFF" font-weight="700" text-anchor="middle">
     <text x="120" y="234">Role</text>
-    <text x="270" y="234">Best city</text>
-    <text x="390" y="234">Country</text>
+    <text x="270" y="234" text-decoration="underline">Best city</text>
+    <text x="390" y="234" text-decoration="underline">Country</text>
     <text x="476" y="234">p25</text>
     <text x="560" y="234">Median</text>
     <text x="648" y="234">p75</text>
@@ -89,7 +89,7 @@
   <g font-size="11" text-anchor="middle">
     <text x="120" y="296" fill="#000000" font-weight="600">Director</text>
     <text x="270" y="296" fill="#0173B2" text-decoration="underline" font-weight="600">Kuala Lumpur</text>
-    <text x="390" y="296" fill="#000000">Malaysia</text>
+    <text x="390" y="296" fill="#0173B2" text-decoration="underline" font-weight="600">Malaysia</text>
     <text x="476" y="296" fill="#808080">€8.3k</text>
     <text x="560" y="296" fill="#000000" font-weight="600">€11.0k</text>
     <text x="648" y="296" fill="#808080">€14.7k</text>
@@ -106,7 +106,7 @@
   <g font-size="11" text-anchor="middle">
     <text x="120" y="336" fill="#000000" font-weight="600">Staff SWE</text>
     <text x="270" y="336" fill="#0173B2" text-decoration="underline" font-weight="600">Manila</text>
-    <text x="390" y="336" fill="#000000">Philippines</text>
+    <text x="390" y="336" fill="#0173B2" text-decoration="underline" font-weight="600">Philippines</text>
     <text x="476" y="336" fill="#808080">€5.5k</text>
     <text x="560" y="336" fill="#000000" font-weight="600">€7.3k</text>
     <text x="648" y="336" fill="#808080">€10.1k</text>
@@ -124,7 +124,7 @@
   <g font-size="11" text-anchor="middle">
     <text x="120" y="378" fill="#000000" font-weight="700">▶ Sr SWE</text>
     <text x="270" y="378" fill="#0173B2" text-decoration="underline" font-weight="700">Jakarta</text>
-    <text x="390" y="378" fill="#000000">Indonesia</text>
+    <text x="390" y="378" fill="#0173B2" text-decoration="underline" font-weight="700">Indonesia</text>
     <text x="476" y="378" fill="#808080">€3.7k</text>
     <text x="560" y="378" fill="#000000" font-weight="700">€5.5k</text>
     <text x="648" y="378" fill="#808080">€7.3k</text>
@@ -147,7 +147,7 @@
   <g font-size="11" text-anchor="middle" opacity="0.45">
     <text x="120" y="443" fill="#000000">SWE II</text>
     <text x="270" y="443" fill="#0173B2" text-decoration="underline">Jakarta</text>
-    <text x="390" y="443" fill="#000000">Indonesia</text>
+    <text x="390" y="443" fill="#0173B2" text-decoration="underline">Indonesia</text>
     <text x="476" y="443" fill="#808080">€2.8k</text>
     <text x="560" y="443" fill="#000000">€4.1k</text>
     <text x="648" y="443" fill="#808080">€5.4k</text>
@@ -164,7 +164,7 @@
   <g font-size="11" text-anchor="middle" opacity="0.45">
     <text x="120" y="481" fill="#000000">SWE I</text>
     <text x="270" y="481" fill="#0173B2" text-decoration="underline">Jakarta</text>
-    <text x="390" y="481" fill="#000000">Indonesia</text>
+    <text x="390" y="481" fill="#0173B2" text-decoration="underline">Indonesia</text>
     <text x="476" y="481" fill="#808080">€2.2k</text>
     <text x="560" y="481" fill="#000000">€3.2k</text>
     <text x="648" y="481" fill="#808080">€4.2k</text>
@@ -179,8 +179,8 @@
 
   <!-- legend -->
   <g font-size="11">
-    <rect x="20" y="510" width="700" height="26" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
-    <text x="32" y="527" fill="#000000">Essential savings shown in <tspan font-weight="700">display currency (EUR)</tspan> + <tspan fill="#808080">local</tspan>. Ranking uses the role × country <tspan font-weight="600">median</tspan>. Best city links to detail.</text>
+    <rect x="20" y="510" width="820" height="26" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
+    <text x="32" y="527" fill="#000000">Essential savings shown in <tspan font-weight="700">display currency (EUR)</tspan> + <tspan fill="#808080">local</tspan>. Ranking uses the role × country <tspan font-weight="600">median</tspan>. <tspan fill="#0173B2" text-decoration="underline">Best city</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">Country</tspan> are links → Cost-of-living filtered.</text>
   </g>
 
   <!-- Disclaimer -->

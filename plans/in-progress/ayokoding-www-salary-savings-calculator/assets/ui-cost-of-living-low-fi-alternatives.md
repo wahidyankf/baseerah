@@ -16,9 +16,11 @@ the selected city/country.
 **Geographic filters (all tabs)** — three cascading filters sit above the table on every tab:
 **Region** narrows the **Country** list, and **Country** narrows the **City** list. Every row
 **always shows both Country and City** — a **Country column immediately to the LEFT of the City
-column** in the table (on mobile cards the heading reads "City, Country"). Clicking any **city name**
-anywhere navigates to the single-city **Cost-of-living detail** view (deep-linkable as
-`?tab=cost&city=<id>`).
+column** in the table (on mobile cards the heading reads "City, Country"). **Both the Country and the
+City name are links** in every row: clicking a **City name** navigates to that city's single-city
+**Cost-of-living detail** view (deep-linkable as `?tab=cost&city=<id>`); clicking a **Country name**
+switches to the **Cost-of-living tab filtered to that country** (its cities as a list, deep-linkable as
+`?tab=cost&country=<id>`).
 
 ## Selection — Option A (stakeholder-selected)
 
@@ -35,8 +37,10 @@ the tool is built for.
 | C — Country Drill (2-pane) | Dropped  | Single-country pane too narrow for the worldwide scan; left rail stacks awkwardly on mobile           |
 
 Refinements folded into the selected Option A: (1) **Region / Country / City** cascading filter row;
-(2) a **Country column immediately left of City**; (3) **city names are links** to the single-city
-**Cost-of-living detail** view; (4) the **school** column is shown inline alongside childcare.
+(2) a **Country column immediately left of City**; (3) **both Country and City names are links** —
+a City link opens the single-city **Cost-of-living detail** view (`?tab=cost&city=<id>`), a Country
+link opens the **Cost-of-living tab filtered to that country** (`?tab=cost&country=<id>`); (4) the
+**school** column is shown inline alongside childcare.
 
 ## Option A — Category Table (SELECTED)
 
@@ -53,23 +57,27 @@ cities across categories. The three cascading **Region / Country / City** filter
 │  Region [ All ▼ ]  Country [ All ▼ ]  City [ All ▼ ]                                       │
 │  ( )Single (•)Married  Pre-school[1] School-age[1]  (•)Rural                               │
 ├──────────────────────────────────────────────────────────────────────────────────────────┤
-│  Country    City*     Hous Food Trans Util Hlth Care Schl Life Essen  Total  Sunk  Reserve │
+│  Country*   City*     Hous Food Trans Util Hlth Care Schl Life Essen  Total  Sunk  Reserve │
 │  ────────   ───────   ──── ──── ───── ──── ──── ──── ──── ──── ─────  ─────  ────  ─────── │
 │  Indonesia  Jakarta·  600  250  30    120  40   180  0    180  $1,400 $1,580 $4,100 $4,800  │
 │  Malaysia   K.Lumpur· 720  300  35    140  50   210  0    220  $1,665 $1,885 $5,000 $5,500  │
 │  Germany    Berlin·  1,100 400  90    180  30   320  0    350  $2,520 $2,870 $7,400 $7,800  │
 │  Portugal   Lisbon·   950  350  45    160  35   270  0    300  $2,080 $2,380 $6,200 $6,600  │
-│  (City* = click a city name → single-city Cost-of-living detail; Sunk = relocation sunk    │
-│   cost; Reserve = liquidity reserve kept; all money also shown in USD)                     │
+│  (City* = click → single-city Cost-of-living detail; Country* = click → Cost-of-living     │
+│   filtered to that country; Sunk = relocation sunk cost; Reserve = liquidity reserve kept; │
+│   all money also shown in USD)                                                             │
 └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Single-city Cost-of-living detail (drill-down from a city link)
 
-Clicking any city name anywhere (any tab) opens the **Cost-of-living tab scoped to that one city**
+Clicking any **city name** anywhere (any tab) opens the **Cost-of-living tab scoped to that one city**
 (deep-linkable as `?tab=cost&city=<id>`): the full per-category breakdown, essentials subtotal, total,
 healthcare scheme badge, and the split relocation (sunk + liquidity reserve), all dual-currency
-(local + USD). A back affordance returns to the full table.
+(local + USD). A back affordance returns to the full table. Clicking a **country name** instead opens
+the **Cost-of-living tab filtered to that country** (`?tab=cost&country=<id>`) — the full table scoped
+to that country's cities (a filtered list, not a single-city detail); a city click always wins when
+both a `country` and a `city` param are present (a city implies its country).
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -136,8 +144,8 @@ cascading-filter idea is **grafted into Option A** as the Region / Country / Cit
 ## Mobile reflow (Option A — selected)
 
 On mobile (`< sm`) the category table collapses to **stacked cards**, one city per card (heading
-"City, Country" — the city name remains the tappable link to the detail view), controls full-width
-above; the three cascading filters stack:
+"City, Country" — both the city name (→ detail) and the country name (→ Cost-of-living filtered to
+that country) remain tappable links), controls full-width above; the three cascading filters stack:
 
 ```
 ┌────────────────────────────┐

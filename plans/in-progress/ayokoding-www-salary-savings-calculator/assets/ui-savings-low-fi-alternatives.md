@@ -17,8 +17,9 @@ savings math). The always-on **healthcare funding-scheme badge** is shown too.
 **Geographic filters (all tabs)** — three cascading **Region / Country / City** filters sit above the
 table (region narrows countries; country narrows cities). Every row **always shows both Country and
 City** — a **Country column immediately to the LEFT of the City column** (mobile cards read "City,
-Country"). Clicking any **city name** navigates to the single-city **Cost-of-living detail** view
-(deep-linkable as `?tab=cost&city=<id>`).
+Country"). **Both the Country and the City name are links** in every row: clicking a **City name**
+navigates to that city's single-city **Cost-of-living detail** view (`?tab=cost&city=<id>`); clicking a
+**Country name** switches to the **Cost-of-living tab filtered to that country** (`?tab=cost&country=<id>`).
 
 **Roles** are **software-engineering roles (IC + management tracks)** — a caption/badge states this so
 the gross figures and non-salary comp are read in that context.
@@ -37,7 +38,9 @@ for a worldwide savings scan.
 | B — Savings Card Grid     | Dropped  | Hides essentials/net chain; too few cities per screen for the worldwide savings scan          |
 
 Refinements folded into the selected Option A: (1) **Region / Country / City** cascading filters;
-(2) a **Country column immediately left of City** + city-name links to the detail view; (3) gross
+(2) a **Country column immediately left of City** + **both Country and City names as links** (City →
+single-city detail `?tab=cost&city=<id>`; Country → Cost-of-living filtered to that country
+`?tab=cost&country=<id>`); (3) gross
 shown **monthly AND annual**; (4) a **non-salary comp** column and a derived **total compensation**
 (base + non-salary comp, informational — for salary-negotiation context, not in the savings math);
 (5) a **"Roles: software-engineering (IC + management)"** caption.
@@ -61,14 +64,15 @@ essentials → savings chain transparent in one row.
 │  Region [ All ▼ ] Country [ All ▼ ] City [ All ▼ ]                                           │
 │  Gross [ 8,000 USD/mo ] (= 96,000 USD/yr)  ( )Single (•)Married Pre[1] Sch[1]  (•)Rural      │
 ├────────────────────────────────────────────────────────────────────────────────────────────┤
-│  Country  City*    Gross/mo  Gross/yr  Non-salary  Band Tax%  Net    Essen  E.Save E% L.Save │
+│  Country* City*    Gross/mo  Gross/yr  Non-salary  Band Tax%  Net    Essen  E.Save E% L.Save │
 │  ───────  ──────   ───────   ───────   ─────────   ──── ────  ─────  ─────  ────── ── ────── │
 │  Indon.   Jakarta· $8,000    $96,000   +$10k RSU   mid  15%   $6,800 $1,400 $5,400 79% $5,220 │
 │  Malays.  K.Lmpr·  $8,000    $96,000   +$8k  RSU   mid  19%   $6,500 $1,665 $4,835 74% $4,625 │
 │  Portugal Lisbon·  $8,000    $96,000   +$5k  RSU   high 33%   $5,400 $2,080 $3,320 61% $3,020 │
 │  Germany  Berlin·  $8,000    $96,000   +$6k  RSU   high 35%   $5,200 $2,520 $2,680 52% $2,360 │
-│  (City* = link → single-city Cost-of-living detail; Non-salary = typical RSU/equity + bonus, │
-│   informational total-comp only, NOT in the savings math; E.Save = ranking figure; all $=+local)│
+│  (City* = link → single-city Cost-of-living detail; Country* = link → Cost-of-living filtered │
+│   to that country; Non-salary = typical RSU/equity + bonus, informational total-comp only,   │
+│   NOT in the savings math; E.Save = ranking figure; all $=+local)                            │
 └────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -99,8 +103,9 @@ net-of-tax chain harder to read at a glance.
 ## Mobile reflow (Option A — selected)
 
 On mobile (`< sm`) the net/savings table collapses to **stacked cards**, one city per card (heading
-"City, Country"; the city name remains the tappable link to the detail view), the gross input
-(monthly + derived annual) and the three cascading filters full-width above:
+"City, Country"; both the city name (→ detail) and the country name (→ Cost-of-living filtered to that
+country) remain tappable links), the gross input (monthly + derived annual) and the three cascading
+filters full-width above:
 
 ```
 ┌────────────────────────────┐

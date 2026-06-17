@@ -10,8 +10,9 @@ cities worldwide. The tool is organised into three distinct tabs: **Cost of livi
 monthly expense-category breakdown + one-time relocation), **Savings** (gross salary → net take-home
 → savings across cities), and **Minimum role** (given a savings baseline, the lowest
 **software-engineering** role anywhere that clears it). All tabs share a **Region → Country → City**
-cascading filter (every row shows both Country and City), and clicking a city name opens a
-single-city Cost-of-living **detail** view. Roles are software-engineering roles (IC + management),
+cascading filter (every row shows both Country and City, with both names as links), and clicking a
+city name opens a single-city Cost-of-living **detail** view while clicking a country name opens the
+Cost-of-living tab filtered to that country. Roles are software-engineering roles (IC + management),
 with salaries modeled as a per-role × country p25 / median / p75 distribution. Every figure is a
 modeled, confidence-tiered, snapshot-dated dataset value — there are no rule-of-thumb budgeting
 percentages.
@@ -49,8 +50,9 @@ _"For a savings goal, what is the lowest engineering role anywhere that reaches 
 - New interactive route `/[locale]/tools/cost-of-living-calculator` (client component).
 - Shared across all three tabs: a **Region → Country → City** cascading filter (region narrows
   countries; country narrows cities), a **Country column immediately to the left of the City column**
-  in every table, and **city-name links** to a single-city Cost-of-living **detail** view
-  (deep-linkable as `?tab=cost&city=<id>`).
+  in every table, and **both Country and City names as links** — a City link opens a single-city
+  Cost-of-living **detail** view (deep-linkable as `?tab=cost&city=<id>`), a Country link opens the
+  Cost-of-living tab **filtered to that country** (deep-linkable as `?tab=cost&country=<id>`).
 - Three tabs via a tab toggle:
   - **Cost of living** — no salary input; per city, the full monthly expense-category breakdown
     (housing, food, transport, utilities, healthcare, childcare, school, lifestyle) with an essentials

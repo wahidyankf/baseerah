@@ -27,8 +27,10 @@ context (not folded into the savings math).
 **Geographic filters (all tabs)** — three cascading **Region / Country / City** filters sit above the
 ladder; they **scope the candidate cities** (each role's best city is chosen within the filtered set).
 Every qualifying/non-qualifying row **always shows both Country and City** (a **Country column to the
-left of the City column**; mobile cards read "City, Country"). Clicking any **city name** opens the
-single-city **Cost-of-living detail** (`?tab=cost&city=<id>`).
+left of the City column**; mobile cards read "City, Country"). **Both the Country and the (best) City
+name are links**: clicking a **City name** opens the single-city **Cost-of-living detail**
+(`?tab=cost&city=<id>`); clicking a **Country name** switches to the **Cost-of-living tab filtered to
+that country** (`?tab=cost&country=<id>`).
 
 ## Selection — Option A (stakeholder-selected)
 
@@ -49,8 +51,10 @@ to the marked MINIMUM, then a **divider**, then dimmed non-qualifying roles belo
 column** (best city + its country); (3) **p25 / median / p75** shown per role × country; (4) a
 **non-salary comp** line and a derived **total compensation** (base + non-salary comp, informational —
 for salary-negotiation context, not in the ranking); (5) **Region / Country / City** filters scope the
-candidate cities; (6) a **"Roles: software-engineering (IC + management)"** caption; (7) city names
-link to the detail.
+candidate cities; (6) a **"Roles: software-engineering (IC + management)"** caption; (7) **both the
+best-city name and the country name are links** — a City link opens the single-city detail
+(`?tab=cost&city=<id>`), a Country link opens the Cost-of-living tab filtered to that country
+(`?tab=cost&country=<id>`).
 
 > Note: this low-fi tier stays at sketch fidelity — non-salary-comp / total-comp are shown on tap in
 > the ASCII; the hi-fi pass surfaces the explicit Total-comp figure. All money figures render in USD +
@@ -74,7 +78,7 @@ savings** in USD / local / your currency.
 │  Ref City [ Jakarta ▼ ]  Ref Role [ Senior SWE ▼ ]  → bar = $2,100/mo            │
 │  Show in: [ USD ▼ ]  ( )Single (•)Married Pre[1] Sch[1]  (•)Rural                 │
 ├──────────────────────────────────────────────────────────────────────────────────┤
-│  Role            Country   Best city  Salary p25/med/p75   E.Save/mo (USD·local) ⇅│
+│  Role            Country*  Best city* Salary p25/med/p75   E.Save/mo (USD·local) ⇅│
 │  ─────────────   ────────  ─────────  ──────────────────   ─────────────────────  │
 │  ── Qualifies (best-city essential savings ≥ bar) ──────────────────────────────  │
 │  Director        Malaysia  K.Lumpur·  $9k / $12k / $16k    $4,910 · RM23k    ✓    │
@@ -85,7 +89,8 @@ savings** in USD / local / your currency.
 │  ░ SWE II        Indonesia Jakarta·   $3k / $4k  / $5k     $1,780 · Rp28.4m       │
 │  ░ SWE I         Vietnam   Hanoi·     $2k / $3k  / $4k     $1,150 · ₫29.0m        │
 │  (Salary p25/med/p75 = role×country distribution, median ranks; E.Save = essential │
-│   savings, lifestyle excluded; City* links to detail; non-salary comp shown on tap)│
+│   savings, lifestyle excluded; Best city* → detail, Country* → Cost-of-living       │
+│   filtered to that country; non-salary comp shown on tap)                          │
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -139,7 +144,8 @@ Good on wide screens; the left rail wastes space and forces stacking on mobile.
 ## Mobile reflow (Option A — selected)
 
 On mobile (`< sm`) the ladder collapses to **stacked cards** (one role per card, heading "City,
-Country"; the city name links to the detail view), baseline + filter controls full-width above. The
+Country"; both the city name (→ detail) and the country name (→ Cost-of-living filtered to that
+country) are links), baseline + filter controls full-width above. The
 qualifying cards come first (threshold card emphasised), a divider, then the dimmed below-minimum
 cards:
 
