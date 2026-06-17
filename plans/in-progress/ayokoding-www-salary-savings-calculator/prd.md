@@ -470,9 +470,13 @@ annual figure is presentation/entry convenience.
 
 Per **role × country**, the dataset stores a typical **non-salary compensation** figure (typical annual
 RSU/equity + bonus). It is **displayed as informational total-comp context** — a separate column/line
-with a clear note — and is **NOT folded into the deterministic monthly net-savings math** (equity
-vesting schedules and equity tax stay out of scope). "RSU/equity/bonus modeling into savings" therefore
-remains in Out of Scope; the field exists only to give total-comp context alongside the gross salary.
+with a clear note — and is **NOT folded into the deterministic monthly net-savings math**. Both savings
+figures (essential and after-lifestyle) are computed from **net base salary only**; non-salary comp
+never enters them. The reason is **volatility**: RSU/equity value swings up and down with the share
+price (and bonuses are not guaranteed), so folding it in would make the savings figure unstable and
+unreliable for a relocation/negotiation decision. Equity vesting schedules and equity tax also stay out
+of scope. "RSU/equity/bonus modeling into savings" therefore remains in Out of Scope; the field exists
+only to give total-comp context alongside the gross base salary.
 
 ### Tax → net (federal banded rate + optional sub-national)
 
@@ -951,7 +955,9 @@ Feature: Salary savings calculator
   the net computation.
 - FR-3c: A typical **non-salary compensation** (annual RSU/equity + bonus) per role × country is
   **displayed as informational total-comp context only** and is **NOT** folded into net, essential
-  savings, or after-lifestyle savings.
+  savings, or after-lifestyle savings — both savings figures use net **base salary only**, because
+  RSU/equity is **volatile** (swings with the share price; bonuses not guaranteed) and would otherwise
+  destabilize the savings figure.
 - FR-3d: The Savings tab surfaces a **total compensation** view for negotiation context — base
   (monthly + annual) plus the typical **non-salary comp** → **total annual compensation**
   (`totalComp = grossAnnual + nonSalaryComp.annual`), shown as an informational figure alongside the
@@ -1102,7 +1108,10 @@ The tool shows a visible **Disclaimers** block (localized en/id) covering:
   `{ p25, median, p75 }` distribution and **cities inherit their country's figures**; salary is **not**
   city-specific, so a city's modeled role savings may be optimistic or pessimistic versus reality.
 - **Non-salary comp (RSU/equity + bonus)** is shown only as **informational total-comp context** and
-  is **not** part of the net-savings math; equity vesting and equity tax are not modeled.
+  is **not** part of the net-savings math — both savings figures use net **base salary only**. This is
+  deliberate: RSU/equity value is **volatile** (it rises and falls with the share price, and bonuses
+  are not guaranteed), so including it would make savings unstable; equity vesting and equity tax are
+  also not modeled.
 
 ## Product Risks
 

@@ -422,8 +422,10 @@ type RoleSalaryDistribution = {
   median: SalaryPoint; // representative salary (used for ranking + baseline)
   p75: SalaryPoint; // top 25%
   // Typical NON-SALARY compensation (annual RSU/equity + bonus), informational total-comp context
-  // ONLY — NOT folded into the deterministic monthly net-savings math (equity vesting/tax is out of
-  // scope). Displayed as a separate column/line with a clear note.
+  // ONLY — NOT folded into the deterministic monthly net-savings math. Both savings figures use net
+  // BASE salary only, because RSU/equity is volatile (swings with the share price; bonuses are not
+  // guaranteed) and would destabilize savings; equity vesting/tax is also out of scope. Displayed as
+  // a separate column/line with a clear note.
   nonSalaryComp: { annualLocal: number; confidence: Confidence; note?: string };
 };
 
