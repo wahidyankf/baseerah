@@ -94,9 +94,6 @@
     <text x="982" y="248">Ess.</text><text x="982" y="260">sav %</text>
     <text x="1080" y="254">Scheme</text>
   </g>
-  <!-- sort arrow emphasis on essential savings -->
-  <rect x="780" y="230" width="78" height="42" fill="#DE8F05" opacity="0.25"/>
-
   <!-- Row 1: Jakarta -->
   <rect x="20" y="272" width="1140" height="52" fill="#FFFFFF"/>
   <g font-size="10.5" text-anchor="middle">
