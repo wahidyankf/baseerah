@@ -181,9 +181,9 @@ or schooling.
 
 The stakeholder has **selected Option A — Category Table** from the low-fidelity alternatives. The
 low-fi ASCII alternatives (≥2) and a mobile/tablet/desktop responsive strategy remain below; the
-selection + rationale are recorded in the Selection subsection. The **high-fidelity finalist for the
-selected Option A is now produced** (see [Tier 2](#tier-2--high-fidelity-finalist-option-a) below) —
-it is no longer deferred. The full
+selection + rationale are recorded in the Selection subsection. The **two hi-fi finalists are
+produced** (Option A — winner, and Option B — runner-up; see [Tier 2](#tier-2--high-fidelity-finalists-cost-of-living)
+below) — neither is deferred. The full
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 funnel (diverge → narrow → select → justify) is satisfied across both the low-fi and hi-fi tiers.
 
@@ -226,7 +226,7 @@ cross-city comparison, and reflows cleanly to stacked cards on mobile; the card/
 too few cities for the worldwide scan. Refinements folded into Option A: the **Region / Country / City**
 cascading filter row, a **Country column immediately left of City**, **city-name links** to the
 single-city Cost-of-living **detail** view, and the **school** column shown inline. The selected
-Option A is realised as a hi-fi finalist in [Tier 2](#tier-2--high-fidelity-finalist-option-a) below.
+Option A is realised as a hi-fi finalist in [Tier 2](#tier-2--high-fidelity-finalists-cost-of-living) below.
 Full rationale table + the city-detail sketch are in
 [`assets/ui-cost-of-living-low-fi-alternatives.md`](./assets/ui-cost-of-living-low-fi-alternatives.md).
 
@@ -239,7 +239,16 @@ any tax-funded or insurance coverage — shown as a legend/footnote line on the 
 the city-detail healthcare panel). This OOP explanation appears on **every tab that shows the Healthcare
 (OOP) column**.
 
-### Tier 2 — High-Fidelity Finalist (Option A)
+### Tier 2 — High-Fidelity Finalists (Cost of Living)
+
+The narrow stage carries the **two strongest alternatives** forward in hi-fi: the selected
+**Option A — Category Table** (winner) and the runner-up **Option B — Category Cards**. Drop reason
+for Option C: single-country drill-down pane is too narrow for the worldwide scan and the left rail
+stacks awkwardly on mobile — carried to hi-fi. Drop reason for Option B (runner-up):
+card grid shows too few cities per screen for the worldwide scan and weakens side-by-side category
+comparison — documented below.
+
+#### Finalist 1 — Option A (Category Table) — SELECTED
 
 The desktop high-fidelity finalist for the selected **Option A — Category Table**, with all current
 refinements applied (three-tab toggle with Cost of living active; the Region / Country / City cascading
@@ -251,6 +260,22 @@ disclaimer; and a city-detail inset). Authored as an SVG and rasterised to PNG a
 [Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
 
 ![High-fidelity desktop mockup of the Cost-of-living tab as a Category Table: the three-tab toggle shows Cost of living active; a Region/Country/City cascading filter row and household, area, and school-type controls sit above a dense table whose rows (Jakarta Indonesia, Singapore, Berlin Germany) list each expense category with money cells showing local currency over USD and a healthcare funding-scheme badge per row whose full label sits inside the taller row, underlined Country and City links (a City link opens that city's detail, a Country link opens the Cost-of-living tab filtered to that country), a legend explaining OOP means out-of-pocket, and a city-detail inset plus an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table.png)
+
+#### Finalist 2 — Option B (Category Cards) — Runner-up
+
+The desktop high-fidelity finalist for the runner-up **Option B — Category Cards**: each city is
+rendered as a card with expense categories stacked, an essentials subtotal, a monthly total, a
+relocation sunk-cost line, and a liquidity-reserve line. The three-tab toggle shows Cost of living
+active; Region/Country/City cascading filters and shared household/area/school controls sit above
+the card grid; healthcare funding-scheme badges are present per card; OOP legend shown. Authored as
+an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the color-blind-friendly palette
+and WCAG-AA contrast per the
+[Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
+
+**Drop reason**: card grid is more visual but shows too few cities per screen for the worldwide scan;
+side-by-side category comparison is weaker than the inline table.
+
+![High-fidelity desktop mockup of the Cost-of-living tab as a Category Cards layout (runner-up finalist): a three-tab toggle shows Cost of living active; Region/Country/City cascading filters and shared household/area/school controls sit above a grid of four city cards (Jakarta Indonesia, K. Lumpur Malaysia, Berlin Germany, Lisbon Portugal); each card lists all expense categories stacked with an essentials subtotal, a monthly total, a relocation sunk-cost line, and a liquidity-reserve line; healthcare funding-scheme badges are shown per card; an OOP legend and an estimates-only disclaimer appear below the grid; a dashed note explains why this design was dropped in favour of Option A.](./assets/ui-cost-of-living-option-b-category-cards.png)
 
 ### Responsive Design — Mobile / Tablet / Desktop
 
@@ -265,7 +290,7 @@ classes:
 
 The selected Option A is delivered as a hi-fi finalist at **all three display sizes** (mobile, tablet,
 desktop) — three of the **nine** hi-fi mockups across the three tabs. Desktop is the
-[Tier 2 finalist above](#tier-2--high-fidelity-finalist-option-a); the mobile and tablet finalists:
+[Finalist 1 above](#finalist-1--option-a-category-table--selected); the mobile and tablet finalists:
 
 **Mobile (`< sm`) — stacked cards:**
 
@@ -282,9 +307,9 @@ Low-fidelity reflow (mobile stacked-card vs desktop table) is sketched in the
 
 The stakeholder has **selected Option A — Net/Savings Table** from the low-fidelity alternatives. The
 low-fi ASCII alternatives (≥2) and a mobile/tablet/desktop responsive strategy remain below; the
-selection + rationale are recorded in the Selection subsection. The **high-fidelity finalist for the
-selected Option A is now produced** (see [Tier 2](#tier-2--high-fidelity-finalist-option-a-1) below) —
-it is no longer deferred. The full
+selection + rationale are recorded in the Selection subsection. The **two hi-fi finalists are
+produced** (Option A — winner, and Option B — runner-up; see [Tier 2](#tier-2--high-fidelity-finalists-savings)
+below) — neither is deferred. The full
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 funnel (diverge → narrow → select → justify) is satisfied across both the low-fi and hi-fi tiers.
 
@@ -330,8 +355,8 @@ columns; the card grid hides the net/essentials chain and shows too few cities f
 Refinements folded into Option A: the **Region / Country / City** cascading filters, a **Country column
 immediately left of City** + city-name links to the detail view, gross shown **monthly AND annual**, a
 **non-salary comp** column (informational total-comp only), and a **"Roles: software-engineering
-(IC + management)"** caption. The selected Option A is realised as a hi-fi finalist in
-[Tier 2](#tier-2--high-fidelity-finalist-option-a-1) below.
+(IC + management)"** caption. The selected Option A is realised as hi-fi Finalist 1 in
+[Tier 2](#tier-2--high-fidelity-finalists-savings) below.
 
 The Savings table columns are: **Country | City | Gross (monthly + annual) | Non-salary comp | Total
 comp (base + non-salary, informational) | Income band | Effective tax % (federal + sub-national) |
@@ -339,7 +364,14 @@ Net | Essentials | Lifestyle | Essential savings | After-lifestyle savings | Ess
 healthcare scheme badge**. Sortable by essential savings; filters above; city name links to the
 detail.
 
-### Tier 2 — High-Fidelity Finalist (Option A)
+### Tier 2 — High-Fidelity Finalists (Savings)
+
+The narrow stage carries the **two strongest alternatives** forward in hi-fi: the selected
+**Option A — Net/Savings Table** (winner) and the runner-up **Option B — Savings Card Grid**. Drop
+reason for Option B (runner-up): card grid hides the essentials/net chain and shows too few cities
+per screen for the worldwide savings scan — documented below.
+
+#### Finalist 1 — Option A (Net/Savings Table) — SELECTED
 
 The desktop high-fidelity finalist for the selected **Option A — Net/Savings Table**, with all current
 refinements applied (three-tab toggle with Savings active; the gross-salary input shown **monthly AND
@@ -356,6 +388,22 @@ color-blind-friendly palette and WCAG-AA contrast per the
 
 ![High-fidelity desktop mockup of the Savings tab as a Net/Savings Table: the three-tab toggle shows Savings active; a gross-salary input reads $8,000/mo equals $96,000/yr beside Region/Country/City filters, a roles caption, and a shared cost-basis controls row with household (adults, pre-school kids, school-age kids), area (center/rural), and school-type (public/private) controls; the table ranks Jakarta, Kuala Lumpur, and Berlin by essential savings (the sorted column highlighted) with columns for gross, non-salary comp, total comp, income band, effective tax split federal plus sub-national, net, essentials, lifestyle, essential and after-lifestyle savings, savings percent, and a healthcare scheme badge whose full label sits inside the row, money cells showing local over USD, both Country and City names rendered as underlined links (a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country), a legend noting OOP means out-of-pocket, and a savings-before-pension and nominal-FX-vs-PPP disclaimer.](./assets/ui-savings-option-a-net-savings-table.png)
 
+#### Finalist 2 — Option B (Savings Card Grid) — Runner-up
+
+The desktop high-fidelity finalist for the runner-up **Option B — Savings Card Grid**: each city is
+rendered as a card showing its rank, net take-home, non-salary comp line, essentials, essential and
+after-lifestyle savings with percentages, and a healthcare scheme badge. Cards are ranked by essential
+savings. The three-tab toggle shows Savings active; gross-salary input, Region/Country/City cascading
+filters, and shared cost-basis controls sit above the card grid. Authored as an SVG and rasterised to
+PNG at 2× via `rsvg-convert -z 2`, using the color-blind-friendly palette and WCAG-AA contrast per the
+[Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
+
+**Drop reason**: card grid hides the gross→net→essentials→savings chain and shows too few cities per
+screen for the worldwide savings scan; the transparent row-by-row chain of Option A is superior for
+the tool's core use case.
+
+![High-fidelity desktop mockup of the Savings tab as a Savings Card Grid (runner-up finalist): a three-tab toggle shows Savings active; a gross-salary input ($8,000/mo = $96,000/yr), Region/Country/City filters, and shared cost-basis controls sit above a 2x2 grid of ranked city cards; each card shows the rank number, underlined city and country links, a healthcare scheme badge, the net take-home, non-salary comp line, essentials, essential savings and percentage in teal, and after-lifestyle savings; cards are ordered Jakarta rank 1 (essential savings $5,400), K. Lumpur rank 2 ($4,835), Lisbon rank 3 ($3,320), Berlin rank 4 ($2,680); a legend notes OOP and that non-salary comp is informational; a dashed note explains why this design was dropped in favour of Option A.](./assets/ui-savings-option-b-savings-card-grid.png)
+
 ### Responsive Design — Mobile / Tablet / Desktop
 
 Designed **mobile-first**; the chosen net/savings table reflows:
@@ -367,7 +415,7 @@ Designed **mobile-first**; the chosen net/savings table reflows:
 | Desktop | `lg` (≥ 1024 px) | Full table with Country+City, gross monthly+annual, non-salary comp, band + tax %, net, essentials, both savings, and % columns inline; controls in a single row.                                                                                |
 
 The selected Option A is delivered as a hi-fi finalist at **all three display sizes** (mobile, tablet,
-desktop). Desktop is the [Tier 2 finalist above](#tier-2--high-fidelity-finalist-option-a-1); the
+desktop). Desktop is the [Finalist 1 above](#finalist-1--option-a-netsavings-table--selected); the
 mobile and tablet finalists:
 
 **Mobile (`< sm`) — stacked cards:**
@@ -382,9 +430,9 @@ mobile and tablet finalists:
 
 The stakeholder has **selected Option A — Ladder Table** from the low-fidelity alternatives. The
 low-fi ASCII alternatives (≥2) and a mobile/tablet/desktop responsive strategy remain below; the
-selection + rationale are recorded in the Selection subsection. The **high-fidelity finalist for the
-selected Option A is now produced** (see [Tier 2](#tier-2--high-fidelity-finalist-option-a-2) below) —
-it is no longer deferred. The full
+selection + rationale are recorded in the Selection subsection. The **two hi-fi finalists are
+produced** (Option A — winner, and Option B — runner-up; see [Tier 2](#tier-2--high-fidelity-finalists-minimum-role)
+below) — neither is deferred. The full
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 funnel (diverge → narrow → select → justify) is satisfied across both the low-fi and hi-fi tiers.
 
@@ -399,10 +447,14 @@ specific competitor.
 
 **Grounding (R5)** — reuses `libs/web-ui`: `tabs` (tab toggle), `input` (salary / savings target),
 `label`, `dropdown-menu`/`command` (Region / Country / City filters, reference city/role,
-display-currency, household selectors), radio group (baseline source, area), `badge` (`MINIMUM`
-marker, confidence tier, "Roles: software-engineering (IC + management)" caption, p25/median/p75
-labels), `alert`/`InfoTip` (disclaimer), and the **net-new `Table`** primitive (shared with the other
-tabs; see delivery Phase 2). No further net-new component is required for this screen.
+display-currency, household selectors), `button` (pill/toggle buttons for the baseline-source selector
+— My salary / Reference role / Savings target — and the area toggle — Center / Rural; no standalone
+`RadioGroup` primitive exists in `libs/web-ui`; these controls are implemented as grouped `button`
+elements styled as a segmented control, consistent with how the Area toggle is shown in all three
+hi-fi mockups), `badge` (`MINIMUM` marker, confidence tier, "Roles: software-engineering (IC +
+management)" caption, p25/median/p75 labels), `alert`/`InfoTip` (disclaimer), and the **net-new
+`Table`** primitive (shared with the other tabs; see delivery Phase 2). No further net-new component
+is required for this screen.
 
 ### Tier 1 — Low-Fidelity Alternatives (diverge)
 
@@ -434,7 +486,7 @@ marked MINIMUM, then a **divider**, then dimmed **non-qualifying ("below minimum
 **Country column** (best city + its country); (3) **p25 / median / p75** shown per role × country;
 (4) a **non-salary comp** line; (5) **Region / Country / City** filters scope the candidate cities;
 (6) a **"Roles: software-engineering (IC + management)"** caption; (7) city-name links to the detail.
-The selected Option A is realised as a hi-fi finalist in [Tier 2](#tier-2--high-fidelity-finalist-option-a-2) below.
+The selected Option A is realised as hi-fi Finalist 1 in [Tier 2](#tier-2--high-fidelity-finalists-minimum-role) below.
 
 The Minimum-role table columns are: **Role | Best city | Country | p25 | Median | p75 | Non-salary comp
 | Total comp (base + non-salary, informational) | Essential savings** with a ✓/MINIMUM marker. **Every
@@ -447,7 +499,14 @@ controls** scope and shape the candidate cities; ranking and the reference-role 
 **median** salary as the representative figure, and the essential-savings figure uses the active
 household / area / school basis.
 
-### Tier 2 — High-Fidelity Finalist (Option A)
+### Tier 2 — High-Fidelity Finalists (Minimum Role)
+
+The narrow stage carries the **two strongest alternatives** forward in hi-fi: the selected
+**Option A — Ladder Table** (winner) and the runner-up **Option B — Banner + List**. Drop reasons for
+Options B and C at the narrow stage: Option B hides the near-miss context (how close the failing rungs
+came to qualifying); Option C left rail wastes width and forces awkward mobile stacking.
+
+#### Finalist 1 — Option A (Ladder Table) — SELECTED
 
 The desktop high-fidelity finalist for the selected **Option A — Ladder Table**, with all current
 refinements applied (three-tab toggle with Minimum role active; the "Roles: software-engineering
@@ -464,6 +523,22 @@ color-blind-friendly palette and WCAG-AA contrast per the
 
 ![High-fidelity desktop mockup of the Minimum-role tab as a Ladder Table: the three-tab toggle shows Minimum role active beside a software-engineering roles caption; a baseline selector (reference role chosen), a USD-default display-currency selector, Region/Country/City scope filters, and a shared cost-basis controls row with household (adults, pre-school kids, school-age kids), area (center/rural), and school-type (public/private) controls sit above the ladder; qualifying roles (Director, Staff SWE) are ranked high to low down to a highlighted Sr SWE MINIMUM row badged MIN, followed by a dashed Below Minimum divider and dimmed SWE II and SWE I rows; every money column (p25, median, p75, non-salary comp, total comp, essential savings) shows the display currency over the local currency, best-city and country are both underlined links (a best-city link opens that city's Cost-of-living detail, a country link opens the Cost-of-living tab filtered to that country), and a legend notes the minimum depends on the household/area cost basis above an estimates-only disclaimer.](./assets/ui-min-role-option-a-ladder-table.png)
 
+#### Finalist 2 — Option B (Banner + List) — Runner-up
+
+The desktop high-fidelity finalist for the runner-up **Option B — Banner + List**: a large answer
+banner states the minimum role and city plainly at the top; below it a qualifying list shows all
+role-city combinations sorted by essential savings, then a below-minimum section. Baseline selector,
+display-currency selector, Region/Country/City scope filters, and shared cost-basis controls sit above
+the banner. Authored as an SVG and rasterised to PNG at 2× via `rsvg-convert -z 2`, using the
+color-blind-friendly palette and WCAG-AA contrast per the
+[Diagrams convention](../../../repo-governance/conventions/formatting/diagrams.md#accessible-color-palette).
+
+**Drop reason**: the banner gives the plain answer directly but hides near-miss context — how close
+failing rungs came to qualifying. The Ladder Table (Option A) surfaces the full qualifying/non-qualifying
+ranked ladder with p25/median/p75 per role, which is the tool's core differentiator.
+
+![High-fidelity desktop mockup of the Minimum-role tab as a Banner + List layout (runner-up finalist): the three-tab toggle shows Minimum role active; a baseline selector (Reference role chosen), display-currency selector, Region/Country/City filters, and shared cost-basis controls sit above a large blue answer banner reading Minimum role to match $2,100/mo essential savings: Senior SWE in Jakarta Indonesia, with median salary and savings details; below the banner a qualifying list ranks Staff SWE, Eng. Manager, and Sr SWE (highlighted as MIN) by essential savings with p25/median/p75 and non-salary-comp columns; a dashed below-minimum section shows SWE II and SWE I; a legend and disclaimer appear at the bottom; a dashed note explains why this design was dropped in favour of Option A.](./assets/ui-min-role-option-b-banner-list.png)
+
 ### Responsive Design — Mobile / Tablet / Desktop
 
 Designed **mobile-first**; the chosen ladder table reflows across the convention's three display
@@ -477,7 +552,7 @@ classes:
 
 The selected Option A is delivered as a hi-fi finalist at **all three display sizes** (mobile, tablet,
 desktop) — completing the **nine** hi-fi mockups across the three tabs. Desktop is the
-[Tier 2 finalist above](#tier-2--high-fidelity-finalist-option-a-2); the mobile and tablet finalists:
+[Finalist 1 above](#finalist-1--option-a-ladder-table--selected); the mobile and tablet finalists:
 
 **Mobile (`< sm`) — stacked rank cards:**
 
