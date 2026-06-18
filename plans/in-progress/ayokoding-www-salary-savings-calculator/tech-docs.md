@@ -728,6 +728,27 @@ and **role labels live in `roles.ts`** (`ladder[].label.en/id`), so data and UI 
 
 ## Testing Strategy
 
+### Gherkin specs added (under `specs/apps/ayokoding/`)
+
+This plan adds **one** new Gherkin feature, under the **`ayokoding-www`** (web/UI) perspective
+only, inside a **new `tools/` bounded-context directory**. No `ayokoding-be` (API) Gherkin is
+added — the calculator is a static front-end content tool backed by in-repo TypeScript datasets
+(`cities.ts` / `roles.ts` / `fx.ts`), with **no backend API surface**, so there is nothing to
+specify on the `ayokoding-be` side.
+
+| Action   | Path                                                                                          | Notes                                                                                                                                                       |
+| -------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Add**  | `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature` | New file in a new `tools/` directory; scenarios mirrored **verbatim** from `prd.md` [§Acceptance Criteria (Gherkin)](./prd.md#acceptance-criteria-gherkin). |
+| **Add**  | `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/README.md`                         | New bounded-context README describing the `tools/` slug (in-browser productivity tools), mirroring the sibling context READMEs.                             |
+| **Edit** | `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/README.md`                               | Register `tools/` in the **Structure** tree (alongside `app-shell/`, `content/`, `search/`, `i18n/`, `navigation/`).                                        |
+
+`tools/` is the bounded context for in-browser productivity tools; `cost-of-living-calculator` is
+its first capability. The feature is the **single behavioral contract** and is consumed by **both**
+the unit tier (in-app `@amiceli/vitest-cucumber` step definitions — the tier `specs:coverage` scans)
+and the fe-e2e tier (`ayokoding-www-fe-e2e` via `playwright-bdd`/`bddgen`). Step-definition locations
+and the per-tier assertions are detailed in the bullets below. Delivery steps that author, register,
+and gate these files are in [delivery.md](./delivery.md) (companion-Gherkin + `specs:coverage` steps).
+
 ayokoding-www uses **unit + e2e only** — it has **no integration tier** (`test:integration` is a no-op
 `echo`; the integration tier is reserved for app-tier products such as `organiclever-app-web`). The
 companion Gherkin feature

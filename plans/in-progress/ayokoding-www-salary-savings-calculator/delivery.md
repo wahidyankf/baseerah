@@ -12,6 +12,20 @@
 Commands assume repo root `/Users/wkf/ose-projects/ose-public` unless noted. Each code step uses
 RED → GREEN → REFACTOR.
 
+**Gherkin tags** — every RED step carries a **Gherkin →** tag naming the scenario(s) from `prd.md`
+[§Acceptance Criteria (Gherkin)](./prd.md#acceptance-criteria-gherkin) (mirrored verbatim into
+`…/gherkin/tools/cost-of-living-calculator.feature`) that the current RED→GREEN→REFACTOR cycle is
+implementing — so it is always clear which acceptance criteria the task in front of you drives. Two
+forms:
+
+- **Gherkin (underpins) →** — pure-core data/calculation steps (Phase 1 / 1b). They supply the
+  math/data a scenario relies on but do **not** bind its steps; they are covered by plain vitest
+  invariants, not BDD step definitions.
+- **Gherkin (binds) →** — the page-level component tests (Phase 2), the feature-consuming unit test
+  (Phase 2), the bilingual steps (Phase 3), and the e2e step definitions (Phase 4). These bind the
+  scenario's Gherkin steps. The feature-consuming unit test **plus** the e2e step defs together bind
+  **every** scenario in the feature — that total binding is what `specs:coverage` enforces.
+
 ## Worktree
 
 Worktree path: `worktrees/ayokoding-www-salary-savings-calculator/`
@@ -74,6 +88,16 @@ via its `currency` — there is no standalone `fxToUsd` field on a city.** All f
       guard a missing currency rather than returning `NaN`). File:
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/data/fx.test.ts`. Command:
       `npx nx run ayokoding-www:test:unit`. Acceptance: test fails (no `fx.ts` yet).
+  - **Gherkin (underpins) →** "Every monetary figure converts to USD via the in-repo FX table"
+
+    ```gherkin
+    Scenario: Every monetary figure converts to USD via the in-repo FX table
+      Given I am on the calculator
+      When I read any USD figure derived from a local-currency value
+      Then the conversion uses the rate for that currency stored in the in-repo fx.ts table
+      And every currency referenced by a city, country, role, or display-currency selector has an fx.ts entry
+    ```
+
 - [ ] **[AI] GREEN** Add `fx.ts` — the authoritative `FxTable` (`ratesUsdPerUnit` ISO-4217 → USD per 1
       unit + `fxSnapshotDate`) from the FX research step, with sourced-estimate comments; export the
       `fxToUsd(fx, currency)`, `cityFxToUsd(fx, city)`, and `usdToDisplay(fx, usd, displayCurrency)`
@@ -115,6 +139,7 @@ via its `currency` — there is no standalone `fxToUsd` field on a city.** All f
       ASEAN, Japan, Europe (non-Nordic), and the Nordics** via the `region` field. File:
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/data/cities.test.ts`. Command:
       `npx nx run ayokoding-www:test:unit`. Acceptance: test fails (no dataset yet).
+  - **Gherkin (underpins) →** "No Israeli cities are listed"; "Healthcare funding scheme is always shown" (per-country `healthcareModelType`); "Every monetary figure converts to USD via the in-repo FX table" (each city currency resolves to an `fx.ts` entry)
 - [ ] **[AI] GREEN** Add `cities.ts` static dataset covering **as many tech-hub cities worldwide as we
       reasonably can** (breadth-first, excl. Israel): per-city seven expense categories (incl.
       childcare), childcare + school medians, split `relocation` block, `countryId`, `currency`
@@ -148,6 +173,7 @@ via its `currency` — there is no standalone `fxToUsd` field on a city.** All f
       and zero/negative-salary edge cases. File:
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/calc.test.ts`. Command:
       `npx nx run ayokoding-www:test:unit`. Acceptance: fails (no calc yet).
+  - **Gherkin (underpins) →** "Savings tab converts gross salary to net before subtracting expenses"; "Sub-national tax lowers net only in federal countries"; "Net take-home is lower than the entered gross"; "Essentials above net show a deficit"; "Gross salary entered monthly shows the derived annual figure"; "Total compensation is shown for negotiation context"; "Non-salary comp is shown as informational context only"; "Relocation reserve is shown separately from sunk costs"; "Adding adults and children changes the modeled expenses"; "Pre-school children incur childcare, not schooling"; "Private school raises expenses more than public"; "Rural area lowers housing versus city center"
 - [ ] **[AI] GREEN** Implement pure `calc.ts` functions per `tech-docs.md` (OECD-modified per-category
       household + area scaling, per-pre-school-child childcare add-on, per-school-age-child school
       add-on, federal + sub-national `netUsd`, gross monthly↔annual derivation, `totalCompAnnual`, the
@@ -204,6 +230,7 @@ the **same net→expenses→savings engine** from `calc.ts`. Still no UI.
       `ILS`** leaks in; a `snapshotDate` is present. File:
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/data/roles.test.ts`. Command:
       `npx nx run ayokoding-www:test:unit`. Acceptance: fails (no `roles.ts` yet).
+  - **Gherkin (underpins) →** "Each role shows its per-country salary distribution"; "No Israeli cities are listed"; "No Israeli city appears among role candidates"
 - [ ] **[AI] GREEN** Add `roles.ts` — the `ladder` metadata + the full role × **country** `salaries`
       matrix (each cell `{ p25, median, p75 }` + `nonSalaryComp`) from the research step, with
       sourced-estimate comments and `snapshotDate`. File:
@@ -215,6 +242,7 @@ the **same net→expenses→savings engine** from `calc.ts`. Still no UI.
       resets lower ones; no filter returns all cities. File:
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/geo-filter.test.ts`. Command:
       `npx nx run ayokoding-www:test:unit`. Acceptance: fails (no `geo-filter.ts` yet).
+  - **Gherkin (underpins) →** "Region narrows the country filter and country narrows the city filter"; "Geographic filter scopes the candidate cities"
 - [ ] **[AI] GREEN** Implement pure `geo-filter.ts` (Region → Country → City cascading selectors over
       `cities.ts`). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/core/geo-filter.ts`.
       Acceptance: `geo-filter.test.ts` passes.
@@ -233,6 +261,7 @@ the **same net→expenses→savings engine** from `calc.ts`. Still no UI.
       chosen row.
       File: `apps/ayokoding-www/src/features/cost-of-living-calculator/core/role-lookup.test.ts`. Command:
       `npx nx run ayokoding-www:test:unit`. Acceptance: fails (no `role-lookup.ts` yet).
+  - **Gherkin (underpins) →** "Minimum role for a savings target ranks on essential savings and is reordered"; "Each role shows its per-country salary distribution"; "Best city shows its country alongside the city name"; "Geographic filter scopes the candidate cities"; "Non-salary comp does not change the minimum-role ranking"; "Lifestyle does not change the minimum-role ranking"; "Minimum role from a reference city and role"; "Minimum role from my own salary"; "Household composition changes the minimum qualifying role"; "No role can reach the bar"; "Cost-basis controls affect role candidates"; "No Israeli city appears among role candidates"
 - [ ] **[AI] GREEN** Implement pure `role-lookup.ts` per `tech-docs.md` (reuses `calc.ts`
       `savingsRow`; **median**-based salary, USD-normalised qualify, `cityScope` filtering,
       seniority-ordered display, lowest-rank minimum, and the qualifying/non-qualifying `orderForDisplay`
@@ -278,8 +307,9 @@ authored here, before those tests.
 
 - [ ] **[AI]** Create the companion feature file
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
-      (_New file_, _New directory_ `tools/`) from `prd.md §Acceptance Criteria (Gherkin)`: canonical
-      header `Feature: Cost of Living Calculator`, every scenario mirrored **verbatim** from `prd.md`.
+      (_New file_, _New directory_ `tools/`) from `prd.md §Acceptance Criteria (Gherkin)`: the
+      `Feature:` line and every scenario mirrored **verbatim** from `prd.md` (so the scenario titles
+      match the **Gherkin →** tags on the TDD steps below).
       Acceptance:
       `test -f specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature && echo OK`.
 - [ ] **[AI]** Register the new spec area in `specs/`: add
@@ -290,20 +320,522 @@ authored here, before those tests.
       stays green.
 
 - [ ] **[AI] RED** Add a unit test for a new `Table` primitive in `libs/web-ui` following the existing primitive pattern (e.g. `libs/web-ui/src/primitives/table/table.test.tsx`): assert it renders `Table`/`TableHeader`/`TableBody`/`TableRow`/`TableHead`/`TableCell`/`TableCaption` with correct semantic roles. Command: `npx nx run web-ui:test:unit`. Acceptance: fails (no component yet).
+  - **Gherkin →** none directly (shared `web-ui` `Table` primitive; the tab scenarios render their tables through it)
 - [ ] **[AI] GREEN** Create the `Table` primitive (delegate to `swe-ui-maker`): `libs/web-ui/src/primitives/table/table.tsx` (shadcn `Table` family, CVA variants, semantic `<table>` markup, AA-contrast tokens), barrel-export it from `libs/web-ui/src/index.ts`, and add `libs/web-ui/src/primitives/table/table.stories.tsx`. Acceptance: `npx nx run web-ui:test:unit` exits 0; `npx nx run web-ui:lint` exits 0; `npx nx run web-ui:build-storybook` succeeds.
   - _Suggested executor: `swe-ui-maker`_
-- [ ] **[AI] RED** Add a component test for the shared **geo-filters** component: render the Region / Country / City cascading filter row; assert selecting a Region narrows the Country options, selecting a Country narrows the City options, and clearing a higher level resets the lower ones; assert the selected scope is reported to the parent. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.test.tsx`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: fails.
-- [ ] **[AI] GREEN** Implement `geo-filters.tsx` (Region / Country / City cascading `Command`/dropdown row consuming `geo-filter.ts`). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.tsx`. Acceptance: test passes.
-- [ ] **[AI] RED** Add a component test for the **Cost-of-living** tab: render the category table, assert a city row shows a **Country column immediately to the left of the City column**, all seven expense categories (incl. childcare) plus the **school** column, an essentials subtotal, a total (in both local currency and USD), a separate relocation **sunk-cost** total, and a separately labelled **liquidity reserve**; assert the **healthcare funding-scheme badge** is shown; assert the shared geo-filters narrow the rows; assert clicking a **city name** fires the city-detail navigation (`?tab=cost&city=<id>`) **and** clicking a **country name** fires the country-filtered navigation (`?tab=cost&country=<id>`) that pre-selects the Country filter (the table narrows to that country's cities, not a single-city detail). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: fails.
-- [ ] **[AI] GREEN** Implement `cost-of-living.tsx` (category table consuming `calc.ts` `costOfLivingRow` and the new `Table` primitive, Country column left of City, the **school** column, **city-name links to the detail view AND country-name links that pre-select the Country filter / write `?tab=cost&country=<id>`** — the country case is the same table with the Country filter applied, no new component, the healthcare-scheme badge, and the shared `geo-filters`). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx`. Acceptance: test passes.
-- [ ] **[AI] RED** Add a component test for the single-city **city-detail** view: render with a deep-linked `city` id; assert the full per-category breakdown (housing/food/transport/utilities/healthcare-OOP/childcare/school/lifestyle), essentials subtotal, total, healthcare scheme badge, and split relocation (sunk + liquidity reserve) are shown in both local currency and USD, and a back affordance returns to the full table. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/city-detail.test.tsx`. Acceptance: fails.
-- [ ] **[AI] GREEN** Implement `city-detail.tsx` (single-city Cost-of-living detail consuming `calc.ts` `costOfLivingRow`, dual-currency, healthcare badge, split relocation, back affordance; reached via `?tab=cost&city=<id>` or a city-name click). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/city-detail.tsx`. Acceptance: test passes.
-- [ ] **[AI] RED** Add a component test for the **Savings** tab: enter a gross salary, assert the **monthly AND annual** figures are both shown (entering monthly fills annual = 12×), each city row shows a Country column left of City, the informational **non-salary comp** column, a **total compensation** column (base annual + non-salary comp), net (after federal + sub-national tax, lower than gross), essentials, **both savings figures** (`essentialSavings` and `afterLifestyleSavings`) with percentages, and the healthcare-scheme badge, including the deficit case; assert non-salary comp **and total comp** are NOT in the net/savings; assert sort by savings; assert **city-name links navigate to the detail (`?tab=cost&city=<id>`) AND country-name links navigate to the Cost-of-living tab filtered to that country (`?tab=cost&country=<id>`)**. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx`. Acceptance: fails.
-- [ ] **[AI] GREEN** Implement `savings.tsx` (gross input accepting monthly or annual with the other derived, non-salary-comp column, **total-comp column (informational, for negotiation context)**, Country+City columns with **both names linked** (city → detail `?tab=cost&city=<id>`, country → Cost-of-living filtered `?tab=cost&country=<id>`), net/essentials/two-savings-figures table consuming `calc.ts` `savingsRow` + `totalCompAnnual`). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.tsx`. Acceptance: test passes.
-- [ ] **[AI] RED** Add a component test for the **Minimum role** tab: set a savings-target baseline, assert the **"Roles: software-engineering (IC + management)"** caption renders; assert the **shared cost-basis controls (household single/married + pre-school & school-age kid counts, area `center`/`rural`, school-type `public`/`private`) AND the Region/Country/City filters render on this tab** (the same shared control set as the other tabs); assert the ladder is **reordered** — qualifying roles grouped above a divider with the lowest qualifier (ranked on **essential savings** via the **median** salary) marked as the minimum, and non-qualifying roles grouped, dimmed, below the divider; assert each row shows a Country column + best city, and that **every money column — p25, median, p75, non-salary comp, total comp, and essential savings — is dual (display currency + the best city's local currency), never single-currency**; assert essential savings additionally reflects the chosen display currency; assert **changing the household composition changes which role is the minimum** (a role that qualifies for the `single` basis no longer qualifies for `married + 2 kids` + `center` because essentials rise above its net, and a more senior role becomes the minimum); assert **clicking a best-city name navigates to that city's detail (`?tab=cost&city=<id>`) AND clicking a country name navigates to the Cost-of-living tab filtered to that country (`?tab=cost&country=<id>`)**; assert switching the baseline source recomputes; assert the geo-filters scope the candidate cities; assert the no-qualifier message shows when the target exceeds every role's best-city essential savings. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx`. Acceptance: fails.
-- [ ] **[AI] GREEN** Implement `min-role.tsx` (SE-roles caption, baseline selector, display-currency picker, **shared `controls` (household/area/school-type) + shared geo-filters both rendered on this tab** scoping candidates and feeding the active cost basis into `role-lookup.ts`, reordered ranked ladder table consuming `role-lookup.ts` + the shared `Table` with the Country column (**both the best-city name and the country name linked** — city → detail `?tab=cost&city=<id>`, country → Cost-of-living filtered `?tab=cost&country=<id>`), **every money column — p25/median/p75, non-salary comp, total comp, and essential savings — rendered dual (display currency over local) via the shared money-cell renderer**, minimum marker + confidence badges + healthcare-scheme badge + summary line). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.tsx`. Acceptance: test passes.
-- [ ] **[AI] RED** Add a component test for the shared controls: single/married selector, two kids number inputs (**pre-school 0–3**, **school-age 0–3**), area toggle (`center`/`rural`), and a school-type toggle (`public`/`private`) that is **hidden** when there are no school-age children and **shown** once school-age kids are selected; assert modeled expenses recompute (childcare scales with pre-school kids, schooling with school-age kids) when each changes; assert the same `controls` component renders on **all three tabs (Cost of living, Savings, Minimum role)**. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx`. Acceptance: fails.
-- [ ] **[AI] GREEN** Implement the shared controls (single/married + pre-school & school-age kid counts, area toggle, conditional school-type toggle) and mount them on **all three tabs including Minimum role**. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.tsx`. Acceptance: test passes.
+
+#### Component cycle A — geo-filters (`shell/geo-filters.tsx`)
+
+- [ ] **[AI] RED** Add `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.test.tsx` with a test asserting ONLY: selecting a Region narrows the Country options to that region, then selecting a Country narrows the City options to that country, clearing a higher level resets the lower ones, and the selected scope is reported to the parent (the table narrows to that country's cities). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails (no component yet).
+
+  **Gherkin (binds) →** "Region narrows the country filter and country narrows the city filter"
+
+  ```gherkin
+  Scenario: Region narrows the country filter and country narrows the city filter
+    Given I am on "/en/tools/cost-of-living-calculator"
+    And the "Cost of living" tab is active
+    When I select the region "ASEAN" then the country "Indonesia" in the cascading filters
+    Then the Country filter lists only ASEAN countries
+    And the City filter lists only Indonesian cities
+    And only cities in Indonesia are shown in the table
+  ```
+
+- [ ] **[AI] GREEN** Create `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.tsx` (Region / Country / City cascading `Command`/dropdown row consuming `geo-filter.ts`) making this scenario pass. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/geo-filters.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+
+#### Component cycle B — cost-of-living (`shell/cost-of-living.tsx`)
+
+- [ ] **[AI] RED** Add `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx` with a test asserting ONLY: the category table renders a table of tech-hub cities where each row shows a Country column immediately to the left of the City column, all seven expense categories (incl. childcare) plus the school column, an essentials subtotal and total, a separate one-time relocation sunk-cost total, and a separately labelled liquidity reserve. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails (no component yet).
+
+  **Gherkin (binds) →** "Cost-of-living breakdown lists category expenses per city"
+
+  ```gherkin
+  Scenario: Cost-of-living breakdown lists category expenses per city
+    Given I am on "/en/tools/cost-of-living-calculator"
+    And the "Cost of living" tab is active
+    When the page finishes loading
+    Then I see a table of tech-hub cities
+    And each row shows a Country column immediately to the left of the City column
+    And each row shows monthly housing, food, transport, utilities, healthcare, childcare, school, and lifestyle expenses
+    And each row shows an essentials subtotal and a total
+    And each row shows a separate one-time relocation sunk-cost total
+    And each row shows a separately labelled liquidity reserve
+  ```
+
+- [ ] **[AI] GREEN** Create `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx` (category table consuming `calc.ts` `costOfLivingRow` and the new `Table` primitive, Country column left of City, the school column, essentials/total/relocation/liquidity-reserve cells) making this scenario pass. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/cost-of-living.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx` with a test asserting ONLY: every row of the results table shows a Country column immediately to the left of the City column on any tab. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Country and city are always shown together on every tab"
+
+  ```gherkin
+  Scenario: Country and city are always shown together on every tab
+    Given I am on "/en/tools/cost-of-living-calculator"
+    When I view any tab's results table
+    Then every row shows a Country column immediately to the left of the City column
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/cost-of-living.tsx` that guarantees the Country-left-of-City column pairing on every row. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/cost-of-living.tsx` (extract a shared Country+City cell if helpful). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx` with a test asserting ONLY: a per-country healthcare funding-scheme badge is shown for a selected city and the badge reads "tax-funded", "mandatory payroll insurance", or "out-of-pocket". Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Healthcare funding scheme is always shown"
+
+  ```gherkin
+  Scenario: Healthcare funding scheme is always shown
+    Given I am on "/en/tools/cost-of-living-calculator"
+    When I select any city on any tab
+    Then a healthcare funding-scheme badge is shown for that city's country
+    And the badge reads "tax-funded", "mandatory payroll insurance", or "out-of-pocket"
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/cost-of-living.tsx` that renders the healthcare funding-scheme badge from the city's country `healthcareModelType`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/cost-of-living.tsx` (extract the badge renderer if shared). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx` with a test asserting ONLY: clicking a city name in the table fires the single-city detail navigation `?tab=cost&city=<id>` with the City filter pre-selected to that city. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Clicking a city name opens its single-city cost-of-living detail"
+
+  ```gherkin
+  Scenario: Clicking a city name opens its single-city cost-of-living detail
+    Given I am on "/en/tools/cost-of-living-calculator"
+    When I click a city name in any table
+    Then I am taken to that city's single-city Cost-of-living detail at "?tab=cost&city=<id>"
+    And the City filter is pre-selected to that city
+    And the detail shows the full per-category breakdown, essentials subtotal, total, healthcare scheme badge, and split relocation in both local currency and USD
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/cost-of-living.tsx` that makes each city name a link writing `?tab=cost&city=<id>` and pre-selecting the City filter. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/cost-of-living.tsx` (extract the city-link affordance if shared). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx` with a test asserting ONLY: clicking a country name fires the country-filtered navigation `?tab=cost&country=<id>`, pre-selecting the Country filter (and its Region) so the table narrows to that country's cities as a filtered list, not a single-city detail. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Clicking a country opens Cost-of-living filtered to that country"
+
+  ```gherkin
+  Scenario: Clicking a country opens Cost-of-living filtered to that country
+    Given I am on "/en/tools/cost-of-living-calculator"
+    When I click a country name in any table
+    Then I am taken to the Cost-of-living tab filtered to that country at "?tab=cost&country=<id>"
+    And the Country filter is pre-selected to that country with its Region set
+    And the table shows that country's cities as a filtered list rather than a single-city detail
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/cost-of-living.tsx` that makes each country name a link writing `?tab=cost&country=<id>` and pre-selecting the Country filter + its Region (same table, country filter applied — no new component). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/cost-of-living.tsx` (extract the country-link affordance if shared). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+
+#### Component cycle C — city-detail (`shell/city-detail.tsx`)
+
+- [ ] **[AI] RED** Add `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/city-detail.test.tsx` with a test asserting ONLY: rendered with a deep-linked `city` id, the one-time relocation sunk-cost total is shown distinct from the monthly total, and the liquidity-reserve cash cushion is shown in its own labelled figure, not folded into the sunk-cost total. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails (no component yet).
+
+  **Gherkin (binds) →** "Relocation reserve is shown separately from sunk costs"
+
+  ```gherkin
+  Scenario: Relocation reserve is shown separately from sunk costs
+    Given I am on the "Cost of living" tab
+    When I read a city row
+    Then the one-time relocation sunk-cost total is shown distinct from the monthly total
+    And the liquidity-reserve cash cushion is shown in its own labelled figure, not folded into the sunk-cost total
+  ```
+
+- [ ] **[AI] GREEN** Create `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/city-detail.tsx` (single-city Cost-of-living detail consuming `calc.ts` `costOfLivingRow`, dual-currency per-category breakdown, healthcare badge, split relocation showing the sunk-cost total distinct from the separately labelled liquidity reserve, back affordance; reached via `?tab=cost&city=<id>` or a city-name click) making this scenario pass. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/city-detail.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+
+#### Component cycle D — savings (`shell/savings.tsx`)
+
+- [ ] **[AI] RED** Add `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: entering a gross monthly salary of "8000" USD shows each city row's net take-home after the country's federal and sub-national effective tax, the essentials, the savings after essentials and the savings after lifestyle with percentages, and the table can be sorted by savings. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails (no component yet).
+
+  **Gherkin (binds) →** "Savings tab converts gross salary to net before subtracting expenses"
+
+  ```gherkin
+  Scenario: Savings tab converts gross salary to net before subtracting expenses
+    Given I am on "/en/tools/cost-of-living-calculator"
+    And I switch to the "Savings" tab
+    When I enter a gross monthly salary of "8000" USD
+    Then each city row shows a net take-home after the country's federal and sub-national effective tax
+    And each row shows the essentials, the savings after essentials, and the savings after lifestyle with percentages
+    And the table can be sorted by savings
+  ```
+
+- [ ] **[AI] GREEN** Create `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.tsx` (gross-salary input feeding `calc.ts` `savingsRow`, Country+City columns, net/essentials/two-savings-figures table with percentages, sort-by-savings) making this scenario pass. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: entering a gross monthly salary of "8000" USD shows the annual gross as "96000" USD and the annual figure equals twelve times the monthly figure. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Gross salary entered monthly shows the derived annual figure"
+
+  ```gherkin
+  Scenario: Gross salary entered monthly shows the derived annual figure
+    Given I am on the "Savings" tab
+    When I enter a gross monthly salary of "8000" USD
+    Then the annual gross is shown as "96000" USD
+    And the annual figure equals twelve times the monthly figure
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/savings.tsx` that derives and displays the annual gross (= 12 × monthly) via `calc.ts` `grossMonthlyToAnnual`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: a typical non-salary compensation (RSU/equity + bonus) figure is shown as a separate informational column and is NOT added into the net, the essential savings, or the after-lifestyle savings. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Non-salary comp is shown as informational context only"
+
+  ```gherkin
+  Scenario: Non-salary comp is shown as informational context only
+    Given I am on the "Savings" tab with a gross salary entered
+    When I read a city row
+    Then a typical non-salary compensation (RSU/equity + bonus) figure is shown as a separate informational column
+    But it is not added into the net, the essential savings, or the after-lifestyle savings
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/savings.tsx` that renders the informational non-salary-comp column while leaving net/savings math unchanged. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: a total compensation figure equal to the base annual gross plus the typical non-salary comp is shown as informational context and is NOT added into the net, the essential savings, or the after-lifestyle savings. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Total compensation is shown for negotiation context"
+
+  ```gherkin
+  Scenario: Total compensation is shown for negotiation context
+    Given I am on the "Savings" tab with a gross salary entered
+    When I read a city row
+    Then a total compensation figure equal to the base annual gross plus the typical non-salary comp is shown as informational context
+    And the total compensation is not added into the net, the essential savings, or the after-lifestyle savings
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/savings.tsx` that renders the informational total-comp column via `calc.ts` `totalCompAnnual` while leaving net/savings math unchanged. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: a US/Canadian/Swiss city applies its city sub-national rate on top of the federal rate, while a unitary-country city applies the federal rate alone. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Sub-national tax lowers net only in federal countries"
+
+  ```gherkin
+  Scenario: Sub-national tax lowers net only in federal countries
+    Given I am on the "Savings" tab with a gross salary entered
+    When I compare a US, Canadian, or Swiss city against a unitary-country city
+    Then the federal-country city applies its city sub-national rate on top of the federal rate
+    But the unitary-country city applies the federal rate alone
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/savings.tsx` that surfaces the federal + sub-national net for US/CA/CH cities versus federal-only for unitary-country cities. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: entering a gross monthly salary above a city's tax band threshold shows a net take-home for that city lower than the entered gross. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Net take-home is lower than the entered gross"
+
+  ```gherkin
+  Scenario: Net take-home is lower than the entered gross
+    Given I am on the "Savings" tab
+    When I enter a gross monthly salary above a city's tax band threshold
+    Then the net take-home shown for that city is lower than the entered gross
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/savings.tsx` that displays the net-below-gross result for an above-threshold salary. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` with a test asserting ONLY: for a high-cost city where net is lower than modeled essentials, the savings-after-essentials amount and percentage are shown as negative. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Essentials above net show a deficit"
+
+  ```gherkin
+  Scenario: Essentials above net show a deficit
+    Given I am on the "Savings" tab for a high-cost city
+    When I enter a gross salary whose net is lower than that city's modeled essentials
+    Then the savings-after-essentials amount and percentage are shown as negative
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/savings.tsx` that renders a negative savings-after-essentials amount and percentage in the deficit case. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/savings.tsx` (dedupe/extract as needed); React-free where applicable. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+
+#### Component cycle E — min-role (`shell/min-role.tsx`)
+
+- [ ] **[AI] RED** Add `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: with the baseline source set to "savings target" and a monthly target of "2000" USD, the ladder is reordered — qualifying roles grouped above a divider with the lowest qualifier (whose best city reaches ≥ 2000 USD essential savings via the median salary) marked as the minimum, and non-qualifying roles dimmed below the divider. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails (no component yet).
+
+  **Gherkin (binds) →** "Minimum role for a savings target ranks on essential savings and is reordered"
+
+  ```gherkin
+  Scenario: Minimum role for a savings target ranks on essential savings and is reordered
+    Given I am on "/en/tools/cost-of-living-calculator"
+    And I switch to the "Minimum role" tab
+    And I set the baseline source to "savings target"
+    When I enter a monthly savings target of "2000" USD
+    Then I see the software-engineering role ladder with qualifying roles grouped above a divider and non-qualifying roles dimmed below it
+    And the lowest role whose best city reaches at least 2000 USD essential savings is marked as the minimum
+    And roles whose best city cannot reach 2000 USD essential savings are shown below the divider and de-emphasised
+  ```
+
+- [ ] **[AI] GREEN** Create `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.tsx` (baseline selector, reordered ranked ladder table consuming `role-lookup.ts` + the shared `Table`, qualifying-above / non-qualifying-below-divider grouping, minimum marker) making this scenario pass. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: a caption states the ladder is software-engineering roles covering IC and management tracks. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Roles are labelled as software-engineering roles"
+
+  ```gherkin
+  Scenario: Roles are labelled as software-engineering roles
+    Given I am on the "Minimum role" tab
+    When the page finishes loading
+    Then a caption states the ladder is software-engineering roles covering IC and management tracks
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the "Roles: software-engineering (IC + management)" caption. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: a role row shows its country's p25, median, and p75 salary distribution and the row's essential savings is computed from the median salary. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Each role shows its per-country salary distribution"
+
+  ```gherkin
+  Scenario: Each role shows its per-country salary distribution
+    Given I am on the "Minimum role" tab with a baseline set
+    When I read a role row
+    Then the role shows its country's p25, median, and p75 salary distribution
+    And the row's essential savings is computed from the median salary
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the p25/median/p75 distribution columns with essential savings computed from the median. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: a qualifying role row shows the best city and its country. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Best city shows its country alongside the city name"
+
+  ```gherkin
+  Scenario: Best city shows its country alongside the city name
+    Given I am on the "Minimum role" tab with a baseline set
+    When I read a qualifying role row
+    Then the row shows the best city and its country
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the best city alongside its country on each qualifying role row. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: selecting the country "Indonesia" in the cascading filters scopes each role's best city to Indonesian cities only. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Geographic filter scopes the candidate cities"
+
+  ```gherkin
+  Scenario: Geographic filter scopes the candidate cities
+    Given I am on the "Minimum role" tab with a baseline set
+    When I select the country "Indonesia" in the cascading filters
+    Then each role's best city is chosen only from Indonesian cities
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the shared geo-filters and passes the active `cityScope` into `role-lookup.ts` so the candidate cities re-scope. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: two roles whose non-salary comp differs but whose median salary is equal keep an unchanged essential-savings ranking because non-salary comp is informational only. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Non-salary comp does not change the minimum-role ranking"
+
+  ```gherkin
+  Scenario: Non-salary comp does not change the minimum-role ranking
+    Given I am on the "Minimum role" tab with a baseline set
+    When I compare two roles whose non-salary comp differs but whose median salary is equal
+    Then their essential-savings ranking is unchanged because non-salary comp is informational only
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that keeps the ranking driven only by essential savings (non-salary comp excluded from the sort key). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: changing a city's lifestyle assumption leaves the marked minimum role unchanged because ranking is on essential savings only. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Lifestyle does not change the minimum-role ranking"
+
+  ```gherkin
+  Scenario: Lifestyle does not change the minimum-role ranking
+    Given I am on the "Minimum role" tab with a baseline set
+    When I change a city's lifestyle assumption
+    Then the marked minimum role is unchanged because ranking is on essential savings only
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that holds the minimum marker stable across lifestyle changes (ranking keyed on essential savings). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: with the baseline source "reference role", picking the city "Jakarta" and role "Senior SWE" sets the baseline savings bar equal to that role's essential savings in Jakarta and the marked minimum role reaches at least that essential savings in absolute terms. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Minimum role from a reference city and role"
+
+  ```gherkin
+  Scenario: Minimum role from a reference city and role
+    Given I am on the "Minimum role" tab
+    And I set the baseline source to "reference role"
+    And I pick the city "Jakarta" and the role "Senior SWE"
+    When I view the minimum role result
+    Then the baseline savings bar equals that role's essential savings in Jakarta
+    And the marked minimum role reaches at least that essential savings in absolute terms
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that wires the reference city/role baseline source through `role-lookup.ts` `resolveBaselineUsd`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: with the baseline source "my salary", entering my gross salary and its city sets the baseline savings bar equal to my computed essential savings and the ladder marks the lowest role that meets or beats it. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Minimum role from my own salary"
+
+  ```gherkin
+  Scenario: Minimum role from my own salary
+    Given I am on the "Minimum role" tab
+    And I set the baseline source to "my salary"
+    When I enter my gross salary and its city
+    Then the baseline savings bar equals my computed essential savings
+    And the ladder marks the lowest role that meets or beats it
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that wires the my-salary baseline source through `role-lookup.ts` `resolveBaselineUsd`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: choosing a display currency shows each role row's essential savings in USD, the city's local currency, and the display currency. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Savings shown in USD, local, and display currency"
+
+  ```gherkin
+  Scenario: Savings shown in USD, local, and display currency
+    Given I am on the "Minimum role" tab with a baseline set
+    When I choose a display currency
+    Then each role row shows its essential savings in USD, the city's local currency, and the display currency
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the display-currency picker and shows essential savings in USD + local + display currency via `role-lookup.ts` `toDisplayCurrencies`. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: with a display currency chosen, every money column (p25, median, p75, non-salary comp, total comp, and essential savings) shows the display currency on the first line and the city's local currency on the second line, and no money column shows only a single currency. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Every money column on the Minimum-role tab is dual currency"
+
+  ```gherkin
+  Scenario: Every money column on the Minimum-role tab is dual currency
+    Given I am on the "Minimum role" tab with a baseline set and a display currency chosen
+    When I read a role row
+    Then every money column (p25, median, p75, non-salary comp, total comp, and essential savings) shows the display currency on the first line and the city's local currency on the second line
+    And no money column shows only a single currency
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that routes every money column through a shared dual-currency money-cell renderer (display over local). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (extract the shared money-cell renderer). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: when the "SWE I" role qualifies for the "single" basis, changing the household to "married with 2 children" and the area to "center" disqualifies "SWE I" and makes a more senior role the marked minimum. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Household composition changes the minimum qualifying role"
+
+  ```gherkin
+  Scenario: Household composition changes the minimum qualifying role
+    Given I am on the "Minimum role" tab and the "SWE I" role qualifies for the "single" household basis
+    When I change the household to "married with 2 children" and the area to "center"
+    Then "SWE I" no longer qualifies because childcare, schooling, and central housing raise its essentials above its net
+    And a more senior role becomes the marked minimum
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that feeds the active household/area cost basis into `role-lookup.ts` so the marked minimum shifts when composition changes. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: setting a savings target higher than any role's essential savings in any city makes the tool state that no role clears the bar and marks no row as the minimum. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "No role can reach the bar"
+
+  ```gherkin
+  Scenario: No role can reach the bar
+    Given I am on the "Minimum role" tab
+    When I set a savings target higher than any role's essential savings in any city
+    Then the tool states that no role clears the bar
+    And no row is marked as the minimum
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the no-qualifier message (from `role-lookup.ts` `minimumRole` → `null`) and marks no minimum. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: changing the household type or area updates the role candidates' savings and the marked minimum role accordingly. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Cost-basis controls affect role candidates"
+
+  ```gherkin
+  Scenario: Cost-basis controls affect role candidates
+    Given I am on the "Minimum role" tab with a baseline set
+    When I change the household type or area
+    Then the role candidates' savings and the marked minimum role update accordingly
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders the shared `controls` on this tab and recomputes candidates + minimum from the changed cost basis. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: any cell backed by a lower-confidence estimate shows a confidence flag. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Low-confidence cells are flagged"
+
+  ```gherkin
+  Scenario: Low-confidence cells are flagged
+    Given I am on the calculator
+    When the page finishes loading
+    Then any cell backed by a lower-confidence estimate shows a confidence flag
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that renders a confidence flag on cells backed by a lower-confidence estimate. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` with a test asserting ONLY: no Israeli city appears as a candidate city for any role. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "No Israeli city appears among role candidates"
+
+  ```gherkin
+  Scenario: No Israeli city appears among role candidates
+    Given I am on the "Minimum role" tab
+    When the page finishes loading
+    Then no Israeli city appears as a candidate city for any role
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/min-role.tsx` that surfaces only non-Israeli candidate cities (inherited from the Israel-free dataset) on every role row. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/min-role.tsx` (extract the best-city/country link affordances — city → detail `?tab=cost&city=<id>`, country → Cost-of-living filtered `?tab=cost&country=<id>` — and shared renderers); React-free where applicable. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+
+#### Component cycle F — controls (`shell/controls.tsx`)
+
+- [ ] **[AI] RED** Add `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx` with a test asserting ONLY: changing the household from "single" to married with 2 school-age children increases modeled housing and utilities sub-linearly, increases food and healthcare near per-capita, and adds schooling for the two school-age children. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails (no component yet).
+
+  **Gherkin (binds) →** "Adding adults and children changes the modeled expenses"
+
+  ```gherkin
+  Scenario: Adding adults and children changes the modeled expenses
+    Given I am on the "Cost of living" tab
+    When I change the household from "single" to married with 2 school-age children
+    Then the modeled housing and utilities increase sub-linearly
+    And the modeled food and healthcare increase near per-capita
+    And schooling is added for the two school-age children
+  ```
+
+- [ ] **[AI] GREEN** Create `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.tsx` (single/married selector + pre-school & school-age kid counts feeding the cost basis into `calc.ts`) making this scenario pass. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/controls.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx` with a test asserting ONLY: setting the household to 1 pre-school child and 0 school-age children adds the childcare expense for the one pre-school child but adds no schooling cost. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Pre-school children incur childcare, not schooling"
+
+  ```gherkin
+  Scenario: Pre-school children incur childcare, not schooling
+    Given I am on the "Cost of living" tab
+    When I set the household to 1 pre-school child and 0 school-age children
+    Then the childcare expense is added for the one pre-school child
+    But no schooling cost is added
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/controls.tsx` that scales childcare with pre-school kids and adds no schooling when there are no school-age children. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/controls.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx` with a test asserting ONLY: when the household has no school-age children, no school-type toggle is shown. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "School type toggle is hidden without school-age children"
+
+  ```gherkin
+  Scenario: School type toggle is hidden without school-age children
+    Given I am on "/en/tools/cost-of-living-calculator"
+    When the household has no school-age children
+    Then no school-type toggle is shown
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/controls.tsx` that hides the school-type toggle until school-age kids are selected. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/controls.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx` with a test asserting ONLY: with 2 school-age children, switching the school type from "public" to "private" increases the schooling portion of the modeled expenses. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Private school raises expenses more than public"
+
+  ```gherkin
+  Scenario: Private school raises expenses more than public
+    Given I am on "/en/tools/cost-of-living-calculator"
+    And the household has 2 school-age children
+    When I switch the school type from "public" to "private"
+    Then the schooling portion of the modeled expenses increases
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/controls.tsx` that wires the public/private school-type toggle so private raises the schooling portion. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/controls.tsx` (dedupe/extract as needed). Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
+- [ ] **[AI] RED** Extend `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx` with a test asserting ONLY: switching the area from "city center" to "rural" decreases the modeled housing expense and the city total decreases accordingly. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: the new assertion fails.
+
+  **Gherkin (binds) →** "Rural area lowers housing versus city center"
+
+  ```gherkin
+  Scenario: Rural area lowers housing versus city center
+    Given I am on the "Cost of living" tab
+    When I switch the area from "city center" to "rural"
+    Then the modeled housing expense decreases
+    And the city total decreases accordingly
+  ```
+
+- [ ] **[AI] GREEN** Implement the slice of `…/shell/controls.tsx` that wires the center/rural area toggle so rural lowers housing and the city total, and mount the shared controls on **all three tabs (Cost of living, Savings, Minimum role)**. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: this scenario's test passes; no prior tests regress.
+- [ ] **[AI] REFACTOR** Tidy the slice just added to `…/shell/controls.tsx` (dedupe/extract as needed); React-free where applicable. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: all tests still pass.
 - [ ] **[AI] RED** Add the **feature-consuming unit test** that drives the page-level scenarios from the
       companion `.feature` via `@amiceli/vitest-cucumber` (`loadFeature` + `describeFeature`, jsdom +
       React Testing Library, **external deps mocked**) at
@@ -322,6 +854,15 @@ authored here, before those tests.
       `npx nx run ayokoding-www:test:unit`. Acceptance:
       the test fails (page.tsx does not exist yet) and every step it defines binds to a Gherkin step in
       the feature file (no unbound steps). - _Suggested executor: `swe-e2e-dev`_
+  - **Gherkin (binds, full feature) →** binds the steps of **every** scenario in `cost-of-living-calculator.feature` so `specs:coverage` resolves each Gherkin step to an in-app step definition; the page-level deep-link / recompute scenarios it drives behaviourally are "Clicking a city name opens its single-city cost-of-living detail"; "Clicking a country opens Cost-of-living filtered to that country"; "A city link takes precedence over a country link when both params are present"; "Adding adults and children changes the modeled expenses"
+
+    ```gherkin
+    Scenario: A city link takes precedence over a country link when both params are present
+      Given I am on the calculator with both a country and a city query param set
+      When the page resolves the deep link at "?tab=cost&country=<id>&city=<id>"
+      Then the single-city Cost-of-living detail for the city is shown because a city implies its country
+    ```
+
 - [ ] **[AI] GREEN** Add `page.tsx` (`'use client'`) at `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/page.tsx` with the **three-tab** toggle wiring `cost-of-living`, `savings`, `min-role`, and the single-city `city-detail` view + the shared household (single/married + pre-school & school-age kid counts), area, school-type state, the shared **Region / Country / City** cascading-filter state, the `detailCity` drill-down + active **Country filter** both synced to the URL query (`?tab=cost&city=<id>` for the single-city detail, `?tab=cost&country=<id>` for the country-filtered list; a city click sets the City filter, a country click sets the Country filter + its Region; `city` wins over `country` when both are present), the savings gross-salary input (**monthly with annual derived**), and the minimum-role (baseline source, reference city/role, savings target, display currency) state. Acceptance: `npx nx run ayokoding-www:test:unit` exits 0 (the feature-consuming unit test passes); route renders in dev (`npx nx dev ayokoding-www`, visit `/en/tools/cost-of-living-calculator`) with all three tabs reachable, the cascading filters working, `?tab=cost&city=<id>` deep-linking to a single-city detail, and `?tab=cost&country=<id>` deep-linking to the Cost-of-living tab filtered to that country.
 - [ ] **[AI] REFACTOR** Extract shared `Intl.NumberFormat` formatting logic into a shared helper (e.g.
       `formatCurrency(amount, currency, locale)`); de-duplicate formatting calls across
@@ -383,6 +924,21 @@ authored here, before those tests.
       labels for all calculator UI elements including the three tabs, the eight category names, the
       Region/Country/City filter labels, the SE-roles caption, the tax/net wording, the healthcare-scheme
       badge, the **on-screen "OOP = out-of-pocket" explanation legend**, and the relocation labels. - _Suggested executor: `apps-ayokoding-www-general-maker`_
+  - **Gherkin (binds) →** "Indonesian locale is fully translated"; "The OOP abbreviation is explained on screen"
+
+    ```gherkin
+    Scenario: Indonesian locale is fully translated
+      Given I am on "/id/tools/cost-of-living-calculator"
+      When the page finishes loading
+      Then all labels, category names, tax wording, healthcare-scheme labels, relocation labels, and the disclaimer are in Indonesian
+
+    Scenario: The OOP abbreviation is explained on screen
+      Given I am on a tab that shows the "Healthcare (OOP)" column
+      When I read the legend near the table
+      Then an on-screen explanation states that "OOP = out-of-pocket"
+      And the explanation says it is the healthcare you pay yourself on top of any tax-funded or insurance coverage
+    ```
+
 - [ ] **[AI]** Label salary inputs "Gross monthly salary (before tax)"; show a prominent, localized
       **"Data last updated: &lt;date&gt;"** label (formatted from `snapshotDate` via `Intl.DateTimeFormat`)
       near the results, plus the **Disclaimers** block covering "estimates only", "savings are net of a
@@ -400,6 +956,20 @@ authored here, before those tests.
       savings math**". Acceptance: last-updated date, gross-salary (monthly + annual) labels,
       healthcare-scheme badge, SE-roles caption, and the full disclaimer block clearly visible in both
       locales.
+  - **Gherkin (binds) →** "Data snapshot date is clearly shown"
+
+    ```gherkin
+    Scenario: Data snapshot date is clearly shown
+      Given I am on the calculator
+      When the page finishes loading
+      Then I see a prominent "Data last updated" label with the dataset snapshot date
+      And I see an "estimates only" disclaimer
+
+    Scenario: No Israeli cities are listed
+      Given I am on the calculator in either locale
+      When the page finishes loading
+      Then no Israeli city appears in the dataset or any table
+    ```
 
 ### Manual UI Verification (Playwright MCP)
 
@@ -453,6 +1023,7 @@ that duplicates the scenarios**. This phase adds the step definitions that bind 
       `bddgen` generates the calculator scenarios from the feature and the run fails (page not yet
       reached / an assertion fails before the page is fully wired); **no unbound steps remain**. -
       _Suggested executor: `swe-e2e-dev`_
+  - **Gherkin (binds, e2e) →** binds the same feature's steps against the live app via `playwright-bdd`; explicitly drives "Cost-of-living breakdown lists category expenses per city"; "Region narrows the country filter and country narrows the city filter"; "Clicking a city name opens its single-city cost-of-living detail"; "Clicking a country opens Cost-of-living filtered to that country"; "Savings tab converts gross salary to net before subtracting expenses"; "Gross salary entered monthly shows the derived annual figure"; "Minimum role for a savings target ranks on essential savings and is reordered"; "Roles are labelled as software-engineering roles"; "Best city shows its country alongside the city name"
 - [ ] **[AI] GREEN** With the calculator page fully implemented from Phases 1–3, confirm
       `npx nx run ayokoding-www-fe-e2e:test:e2e` passes — `bddgen` emits the calculator scenarios from
       the feature and every generated scenario is green end-to-end across all three tabs. Acceptance:
