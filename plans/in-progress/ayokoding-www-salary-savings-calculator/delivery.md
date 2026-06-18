@@ -31,7 +31,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 0 — Setup & Baseline
 
-- [ ] **[HUMAN]** Create worktree: `git worktree add worktrees/ayokoding-www-salary-savings-calculator -b ayokoding-www-salary-savings-calculator`.
+- [ ] **[AI]** Create worktree: `git worktree add worktrees/ayokoding-www-salary-savings-calculator -b ayokoding-www-salary-savings-calculator`. Acceptance: `git worktree list` shows the path (the plan-execution Step 0 gate also auto-provisions it).
 - [ ] **[AI]** In the worktree, install + converge toolchain: `npm install` then `npm run doctor -- --fix`.
 - [ ] **[AI]** Establish green baseline for the app and the shared UI lib (Phase 2 adds a `web-ui` primitive): `npx nx run ayokoding-www:test:quick` and `npx nx run web-ui:test:quick`. Acceptance: both pass before any change.
 - [ ] **[AI]** Confirm the functional-core / imperative-shell layout in `apps/ayokoding-www/src/features/<name>/{core,shell}/` and the i18n mechanism in `src/features/i18n/core/`. Confirm whether the new `tools/` route should live under the `(app)` route group (`app/[locale]/(app)/tools/cost-of-living-calculator/page.tsx`) or directly under `[locale]` (`app/[locale]/tools/cost-of-living-calculator/page.tsx`). Record both decisions in `tech-docs.md §Risks / Open Questions` if the chosen layout differs from the proposed one.
@@ -450,10 +450,9 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
 
 ## Phase 5 — Post-Push CI Verification
 
-- [ ] **[HUMAN]** Review the diff and approve push to `main` (trunk-based). Observable resume signal:
-      user confirms approval; verify with `git log --oneline -1 origin/main` after push shows the new
-      commit.
-- [ ] **[AI]** Push and trigger/monitor relevant GitHub Actions for `ayokoding-www` (poll every 3 min
+- [ ] **[AI]** Commit and push to `origin main` (trunk-based; direct push is the repo default).
+      Acceptance: `git log --oneline -1 origin/main` shows the new commit.
+- [ ] **[AI]** Trigger/monitor relevant GitHub Actions for `ayokoding-www` (poll every 3 min
       via `gh run list --limit 5` + `gh run view <run-id> --json status,conclusion`; do not use
       `gh run watch`). Acceptance: CI green.
 
@@ -476,9 +475,10 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
       (`test ! -d plans/in-progress/ayokoding-www-salary-savings-calculator && echo "OK"`).
       Also update `plans/in-progress/README.md` (remove this plan's entry) and
       `plans/done/README.md` (add entry with completion date).
-- [ ] **[HUMAN]** Remove the worktree once merged:
-      `git worktree remove worktrees/ayokoding-www-salary-savings-calculator`. Observable resume
-      signal: `git worktree list` no longer shows the worktree path.
+- [ ] **[AI]** Remove the worktree once work is pushed and archived (executor self-confirms nothing is
+      uncommitted/unpushed, then prompts inline before deleting):
+      `git worktree remove worktrees/ayokoding-www-salary-savings-calculator`. Acceptance:
+      `git worktree list` no longer shows the worktree path.
 
 ### Phase 6 Gate
 
