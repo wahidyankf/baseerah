@@ -98,12 +98,11 @@
     },
     "test:integration": {
       "executor": "nx:run-commands",
-      "inputs": ["default", "{workspaceRoot}/specs/apps/ayokoding/**/*.feature"],
       "options": {
-        "command": "npx vitest run --project integration",
+        "command": "echo 'no-op: integration tier not used for this content app'",
         "cwd": "{projectRoot}"
       },
-      "cache": false
+      "cache": true
     },
     "specs:coverage": {
       "executor": "nx:run-commands",

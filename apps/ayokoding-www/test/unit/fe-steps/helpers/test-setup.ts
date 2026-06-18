@@ -10,19 +10,8 @@ if (typeof globalThis.IntersectionObserver === "undefined") {
   } as unknown as typeof globalThis.IntersectionObserver;
 }
 
-// Mock next/navigation
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    back: vi.fn(),
-    prefetch: vi.fn(),
-  }),
-  usePathname: () => "/en/learn/overview",
-  useParams: () => ({ locale: "en", slug: ["learn", "overview"] }),
-  useSearchParams: () => new URLSearchParams(),
-  notFound: vi.fn(),
-}));
+// next/navigation is mocked per-step-file (hoisted vi.mock) so each file controls its own mock.
+// navigation.steps.tsx renders no next/navigation-dependent components, so no mock needed there.
 
 // Mock next/link
 vi.mock("next/link", () => ({

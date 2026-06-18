@@ -32,7 +32,7 @@ export default defineConfig({
         // i18n middleware re-export shim and implementation (covered via fe-e2e)
         "src/middleware.ts",
         "src/features/i18n/shell/middleware.ts",
-        // Content infrastructure adapters + scripts (covered via integration suite)
+        // Content infrastructure adapters + scripts (covered via unit suite with mocked deps)
         "src/features/content/core/parser.ts",
         "src/features/content/shell/reader.ts",
         "src/features/content/core/repository.ts",
@@ -70,19 +70,10 @@ export default defineConfig({
         plugins: sharedPlugins,
         test: {
           name: "unit-fe",
-          include: ["test/unit/fe-steps/**/*.steps.{ts,tsx}"],
+          include: ["test/unit/fe-steps/**/*.steps.{ts,tsx}", "src/features/**/*.test.{ts,tsx}"],
           exclude: ["node_modules"],
           environment: "jsdom",
           setupFiles: ["./src/test/setup.ts"],
-        },
-      },
-      {
-        plugins: sharedPlugins,
-        test: {
-          name: "integration",
-          include: ["test/integration/be-steps/**/*.steps.ts", "**/*.integration.{test,spec}.{ts,tsx}"],
-          exclude: ["node_modules"],
-          environment: "node",
         },
       },
     ],

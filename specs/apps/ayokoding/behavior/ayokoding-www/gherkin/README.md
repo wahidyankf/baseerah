@@ -17,10 +17,12 @@ specs/apps/ayokoding/behavior/ayokoding-www/gherkin/
 │   └── search.feature
 ├── i18n/                  # Locale switcher (English ↔ Indonesian)
 │   └── i18n.feature
-└── navigation/            # Top-level navigation, sidebar, breadcrumb
-    ├── navigation.feature
-    ├── architecture-cases-routes.feature
-    └── learn-reorg-redirects.feature
+├── navigation/            # Top-level navigation, sidebar, breadcrumb
+│   ├── navigation.feature
+│   ├── architecture-cases-routes.feature
+│   └── learn-reorg-redirects.feature
+└── tools/                 # Interactive calculator tools
+    └── cost-of-living-calculator.feature
 ```
 
 ## Ubiquitous Language
