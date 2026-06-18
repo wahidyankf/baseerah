@@ -728,6 +728,16 @@ and **role labels live in `roles.ts`** (`ladder[].label.en/id`), so data and UI 
 
 ## Testing Strategy
 
+ayokoding-www uses **unit + e2e only** — it has **no integration tier** (`test:integration` is a no-op
+`echo`; the integration tier is reserved for app-tier products such as `organiclever-app-web`). The
+companion Gherkin feature
+`specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature` (mirrored
+verbatim from `prd.md §Acceptance Criteria`) is the single behavioral contract, consumed by **both** the
+unit tier (in-app `@amiceli/vitest-cucumber` step definitions, external deps mocked — also what
+`specs:coverage` scans) and the e2e tier (`ayokoding-www-fe-e2e` via `playwright-bdd`/`bddgen`). The
+pure-core unit tests below are plain vitest tests on React-free functions; the page-level behavioral
+scenarios are exercised through the feature-driven unit and e2e tiers, not a hand-written spec.
+
 - **Unit (vitest) — FX (`fx.test.ts`)**: asserts `fx.ts` is the single FX source — every currency
   referenced by any city/country/role **and** every supported chosen-display currency has an entry in
   `ratesUsdPerUnit`; all rates are positive numbers; `USD` maps to `1`; and `fxSnapshotDate` is
@@ -796,6 +806,14 @@ and **role labels live in `roles.ts`** (`ladder[].label.en/id`), so data and UI 
   pre-selected (the table narrows to that country's cities, not a single-city detail). **City detail**:
   assert the drill-down view renders the full per-category breakdown, healthcare badge, and split
   relocation for the deep-linked city.
+- **Unit — feature-consuming (vitest + `@amiceli/vitest-cucumber`, jsdom, mocked deps)**: a
+  feature-consuming test at `apps/ayokoding-www/test/unit/fe-steps/cost-of-living-calculator.steps.tsx`
+  loads the companion `.feature` (`loadFeature` + `describeFeature`) and binds step definitions for the
+  page-level scenarios — all three tabs reachable, the Savings tab gross input, `?tab=cost&city=<id>`
+  city-detail deep-link, `?tab=cost&country=<id>` Country-filter deep-link, city-wins-over-country, and
+  shared-household recompute. Runs under the existing jsdom `unit-fe` vitest project via
+  `npx nx run ayokoding-www:test:unit`. These in-app step defs are what satisfy `specs:coverage`. (There
+  is **no** integration tier — `test:integration` is a no-op `echo`.)
   Cost-of-living: assert the eight category columns (incl. childcare + school), essentials subtotal,
   total, the separate relocation **sunk-cost** column, the separately labelled **liquidity-reserve**
   figure, the **healthcare funding-scheme badge**, and the Country+City columns. Savings: assert the
@@ -810,10 +828,14 @@ and **role labels live in `roles.ts`** (`ladder[].label.en/id`), so data and UI 
   **reordered groups** (qualifying roles above the minimum, non-qualifying roles dimmed below a
   divider), the geographic-filter scoping of candidate cities, the three-currency savings display, the
   healthcare badge, baseline-source switching, and the no-qualifier message.
-- **E2E (ayokoding-www-fe-e2e, Playwright)**: one smoke test — load
-  `/en/tools/cost-of-living-calculator`, read the Cost-of-living table, switch to Savings and enter a
-  gross salary, then switch to Minimum role and set a savings target; assert each tab renders its
-  expected populated output.
+- **E2E (ayokoding-www-fe-e2e, `playwright-bdd`) — consumes the feature**: step definitions at
+  `apps/ayokoding-www-fe-e2e/src/steps/cost-of-living-calculator.steps.ts` (`createBdd()`) bind the
+  companion feature's steps; the fe-e2e `defineBddConfig` already globs
+  `…/ayokoding-www/gherkin/**/*.feature`, so `npx bddgen && npx playwright test` generates and runs the
+  calculator scenarios against the live page — load `/en/tools/cost-of-living-calculator`, read the
+  Cost-of-living table, switch to Savings and enter a gross salary, then switch to Minimum role and set a
+  savings target; each generated scenario asserts its tab's populated output. No hand-written spec
+  duplicates the scenarios.
 - Meet the app's existing coverage threshold (rhino-cli validator in `test:quick`).
 
 ## Design Decisions

@@ -35,6 +35,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] **[AI]** In the worktree, install + converge toolchain: `npm install` then `npm run doctor -- --fix`.
 - [ ] **[AI]** Establish green baseline for the app and the shared UI lib (Phase 2 adds a `web-ui` primitive): `npx nx run ayokoding-www:test:quick` and `npx nx run web-ui:test:quick`. Acceptance: both pass before any change.
 - [ ] **[AI]** Confirm the functional-core / imperative-shell layout in `apps/ayokoding-www/src/features/<name>/{core,shell}/` and the i18n mechanism in `src/features/i18n/core/`. Confirm whether the new `tools/` route should live under the `(app)` route group (`app/[locale]/(app)/tools/cost-of-living-calculator/page.tsx`) or directly under `[locale]` (`app/[locale]/tools/cost-of-living-calculator/page.tsx`). Record both decisions in `tech-docs.md §Risks / Open Questions` if the chosen layout differs from the proposed one.
+- [ ] **[AI]** Normalize ayokoding-www to unit + e2e only (no integration tier — integration is reserved for app-tier products such as `organiclever-app-web`): in `apps/ayokoding-www/project.json` set the `test:integration` target to a no-op `echo 'no-op: integration tier not used for this content app'` (mirroring the existing no-op `test:e2e` target); move or merge any existing `test/integration` step files into the unit tier under `test/unit/be-steps` or `test/unit/fe-steps` (still consuming the same Gherkin via `@amiceli/vitest-cucumber` with external deps mocked); and remove the now-unused `integration` project from `apps/ayokoding-www/vitest.config.ts`. Pure test-infra move — no app behavior changes, so no companion Gherkin change is required. Acceptance: `npx nx run ayokoding-www:test:integration` prints the no-op and exits 0; `npx nx run ayokoding-www:test:unit` exits 0 with the merged scenarios; `npx nx run ayokoding-www:specs:coverage` exits 0 (every Gherkin step still resolves to an in-app step definition).
 
 ### Phase 0 Gate
 
@@ -43,6 +44,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] `npx nx run ayokoding-www:test:quick` and `npx nx run web-ui:test:quick` — both exit 0 (green baseline before any change).
 - [ ] [AI] `apps/ayokoding-www/src/features/i18n/core/translations.ts` exists — `test -f apps/ayokoding-www/src/features/i18n/core/translations.ts && echo "OK"`.
 - [ ] [AI] Feature-folder convention and route-group placement decision recorded in `tech-docs.md`.
+- [ ] [AI] ayokoding-www normalized to unit + e2e only: `npx nx run ayokoding-www:test:integration` prints the no-op `echo` and exits 0; no `integration` project remains in `apps/ayokoding-www/vitest.config.ts`; any prior `test/integration/**` step files now live under `test/unit/**` and `npx nx run ayokoding-www:test:unit` + `specs:coverage` both exit 0.
 
 > **Pause Safety**: worktree provisioned, toolchain converged, baseline green, conventions confirmed.
 > Safe to stop. To resume: `npx nx run ayokoding-www:test:quick` — must still pass before Phase 1.
@@ -262,6 +264,31 @@ All three tabs need a `Table` primitive that `libs/web-ui` does not yet ship. Bu
 the shared lib first, then consume it from the app. Changes under `libs/web-ui` are picked up by the
 `nx affected` quality gates in Phase 4.
 
+ayokoding-www uses **unit + e2e only** — there is **no integration tier** (Phase 0 sets its
+`test:integration` target to a no-op `echo`; the integration tier is reserved for app-tier products
+such as `organiclever-app-web`). FE component/unit tests and the feature-consuming unit test both run
+under the existing jsdom `unit-fe` vitest project; external dependencies are mocked at the unit tier.
+
+### Companion Gherkin spec (authored before the tests that consume it)
+
+The companion feature file is the single behavioral contract consumed by **both** the unit tier
+(in-app `@amiceli/vitest-cucumber` step definitions with mocked external deps — which is what
+`specs:coverage` scans) and the e2e tier (`ayokoding-www-fe-e2e` via `playwright-bdd`/`bddgen`). It is
+authored here, before those tests.
+
+- [ ] **[AI]** Create the companion feature file
+      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
+      (_New file_, _New directory_ `tools/`) from `prd.md §Acceptance Criteria (Gherkin)`: canonical
+      header `Feature: Cost of Living Calculator`, every scenario mirrored **verbatim** from `prd.md`.
+      Acceptance:
+      `test -f specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature && echo OK`.
+- [ ] **[AI]** Register the new spec area in `specs/`: add
+      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/README.md` describing the `tools/`
+      bounded context, and add a `tools/` entry to the gherkin index
+      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/README.md`. Acceptance: both READMEs
+      reference `cost-of-living-calculator`; `npx nx run rhino-cli:links:validation --skip-nx-cache`
+      stays green.
+
 - [ ] **[AI] RED** Add a unit test for a new `Table` primitive in `libs/web-ui` following the existing primitive pattern (e.g. `libs/web-ui/src/primitives/table/table.test.tsx`): assert it renders `Table`/`TableHeader`/`TableBody`/`TableRow`/`TableHead`/`TableCell`/`TableCaption` with correct semantic roles. Command: `npx nx run web-ui:test:unit`. Acceptance: fails (no component yet).
 - [ ] **[AI] GREEN** Create the `Table` primitive (delegate to `swe-ui-maker`): `libs/web-ui/src/primitives/table/table.tsx` (shadcn `Table` family, CVA variants, semantic `<table>` markup, AA-contrast tokens), barrel-export it from `libs/web-ui/src/index.ts`, and add `libs/web-ui/src/primitives/table/table.stories.tsx`. Acceptance: `npx nx run web-ui:test:unit` exits 0; `npx nx run web-ui:lint` exits 0; `npx nx run web-ui:build-storybook` succeeds.
   - _Suggested executor: `swe-ui-maker`_
@@ -277,19 +304,25 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
 - [ ] **[AI] GREEN** Implement `min-role.tsx` (SE-roles caption, baseline selector, display-currency picker, **shared `controls` (household/area/school-type) + shared geo-filters both rendered on this tab** scoping candidates and feeding the active cost basis into `role-lookup.ts`, reordered ranked ladder table consuming `role-lookup.ts` + the shared `Table` with the Country column (**both the best-city name and the country name linked** — city → detail `?tab=cost&city=<id>`, country → Cost-of-living filtered `?tab=cost&country=<id>`), **every money column — p25/median/p75, non-salary comp, total comp, and essential savings — rendered dual (display currency over local) via the shared money-cell renderer**, minimum marker + confidence badges + healthcare-scheme badge + summary line). File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.tsx`. Acceptance: test passes.
 - [ ] **[AI] RED** Add a component test for the shared controls: single/married selector, two kids number inputs (**pre-school 0–3**, **school-age 0–3**), area toggle (`center`/`rural`), and a school-type toggle (`public`/`private`) that is **hidden** when there are no school-age children and **shown** once school-age kids are selected; assert modeled expenses recompute (childcare scales with pre-school kids, schooling with school-age kids) when each changes; assert the same `controls` component renders on **all three tabs (Cost of living, Savings, Minimum role)**. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.test.tsx`. Acceptance: fails.
 - [ ] **[AI] GREEN** Implement the shared controls (single/married + pre-school & school-age kid counts, area toggle, conditional school-type toggle) and mount them on **all three tabs including Minimum role**. File: `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.tsx`. Acceptance: test passes.
-- [ ] **[AI] RED** Add an integration test for the top-level page at
-      `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/page.test.tsx` (_New file_):
-      render the page and assert (a) all three tabs ("Cost of living", "Savings", "Minimum role") are
-      reachable via tab click, (b) clicking the "Savings" tab shows the gross-salary input, (c) the URL
-      query `?tab=cost&city=<id>` syncs the city-detail view (clicking a city name sets `detailCity` and
-      the detail renders), (c2) the URL query `?tab=cost&country=<id>` syncs the **Country filter**
-      (clicking a country name pre-selects the Country filter and the Cost-of-living table narrows to
-      that country's cities, not a single-city detail), (c3) when both `country` and `city` params are
-      present the **city deep-link wins** (the single-city detail renders), and (d) the shared household
-      state (single/married + pre-school & school-age kid counts) is passed down and triggers a
-      recompute. Command: `npx nx run ayokoding-www:test:unit`. Acceptance: test fails (page.tsx does not
-      exist yet).
-- [ ] **[AI] GREEN** Add `page.tsx` (`'use client'`) at `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/page.tsx` with the **three-tab** toggle wiring `cost-of-living`, `savings`, `min-role`, and the single-city `city-detail` view + the shared household (single/married + pre-school & school-age kid counts), area, school-type state, the shared **Region / Country / City** cascading-filter state, the `detailCity` drill-down + active **Country filter** both synced to the URL query (`?tab=cost&city=<id>` for the single-city detail, `?tab=cost&country=<id>` for the country-filtered list; a city click sets the City filter, a country click sets the Country filter + its Region; `city` wins over `country` when both are present), the savings gross-salary input (**monthly with annual derived**), and the minimum-role (baseline source, reference city/role, savings target, display currency) state. Acceptance: `npx nx run ayokoding-www:test:unit` exits 0 (page.test.tsx passes); route renders in dev (`npx nx dev ayokoding-www`, visit `/en/tools/cost-of-living-calculator`) with all three tabs reachable, the cascading filters working, `?tab=cost&city=<id>` deep-linking to a single-city detail, and `?tab=cost&country=<id>` deep-linking to the Cost-of-living tab filtered to that country.
+- [ ] **[AI] RED** Add the **feature-consuming unit test** that drives the page-level scenarios from the
+      companion `.feature` via `@amiceli/vitest-cucumber` (`loadFeature` + `describeFeature`, jsdom +
+      React Testing Library, **external deps mocked**) at
+      `apps/ayokoding-www/test/unit/fe-steps/cost-of-living-calculator.steps.tsx`
+      (_New file_). Load
+      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature` and
+      implement step definitions for the page-level scenarios: (a) all three tabs ("Cost of living",
+      "Savings", "Minimum role") reachable via tab click, (b) the "Savings" tab shows the gross-salary
+      input, (c) `?tab=cost&city=<id>` syncs the city-detail view (clicking a city name renders the
+      detail), (c2) `?tab=cost&country=<id>` syncs the **Country filter** (clicking a country name
+      pre-selects the Country filter and the table narrows to that country's cities, not a single-city
+      detail), (c3) when both `country` and `city` params are present the **city deep-link wins**, and
+      (d) the shared household state (single/married + pre-school & school-age kid counts) triggers a
+      recompute. The file lives under the existing jsdom `unit-fe` vitest project
+      (`test/unit/fe-steps/**`) — ayokoding-www has **no integration tier**. Command:
+      `npx nx run ayokoding-www:test:unit`. Acceptance:
+      the test fails (page.tsx does not exist yet) and every step it defines binds to a Gherkin step in
+      the feature file (no unbound steps). - _Suggested executor: `swe-e2e-dev`_
+- [ ] **[AI] GREEN** Add `page.tsx` (`'use client'`) at `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/page.tsx` with the **three-tab** toggle wiring `cost-of-living`, `savings`, `min-role`, and the single-city `city-detail` view + the shared household (single/married + pre-school & school-age kid counts), area, school-type state, the shared **Region / Country / City** cascading-filter state, the `detailCity` drill-down + active **Country filter** both synced to the URL query (`?tab=cost&city=<id>` for the single-city detail, `?tab=cost&country=<id>` for the country-filtered list; a city click sets the City filter, a country click sets the Country filter + its Region; `city` wins over `country` when both are present), the savings gross-salary input (**monthly with annual derived**), and the minimum-role (baseline source, reference city/role, savings target, display currency) state. Acceptance: `npx nx run ayokoding-www:test:unit` exits 0 (the feature-consuming unit test passes); route renders in dev (`npx nx dev ayokoding-www`, visit `/en/tools/cost-of-living-calculator`) with all three tabs reachable, the cascading filters working, `?tab=cost&city=<id>` deep-linking to a single-city detail, and `?tab=cost&country=<id>` deep-linking to the Cost-of-living tab filtered to that country.
 - [ ] **[AI] REFACTOR** Extract shared `Intl.NumberFormat` formatting logic into a shared helper (e.g.
       `formatCurrency(amount, currency, locale)`); de-duplicate formatting calls across
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx`,
@@ -308,6 +341,10 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
 
 - [ ] [AI] `npx nx run web-ui:test:unit` and `npx nx run web-ui:lint` — both exit 0 (new `Table` primitive tested and lint-clean); `npx nx run web-ui:build-storybook` succeeds.
 - [ ] [AI] `npx nx run ayokoding-www:test:unit` — exits 0 (all component tests for `geo-filters`, `cost-of-living`, `city-detail`, `savings`, `min-role`, and `controls` pass).
+- [ ] [AI] `npx nx run ayokoding-www:test:unit` — exits 0 (the feature-consuming unit test at `test/unit/fe-steps/cost-of-living-calculator.steps.tsx` passes, driven by `…/gherkin/tools/cost-of-living-calculator.feature`, with external deps mocked).
+- [ ] [AI] `npx nx run ayokoding-www:specs:coverage` — exits 0 (every Gherkin step in the new feature resolves to a step definition in `apps/ayokoding-www`; the unit-tier step defs provide that coverage).
+- [ ] [AI] `npx nx run ayokoding-www:test:integration` — exits 0 (prints the no-op `echo`; ayokoding-www has no integration tier).
+- [ ] [AI] Companion spec registered: `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature` and `tools/README.md` exist and the gherkin `README.md` index lists `tools/`.
 - [ ] [AI] Dev server check: `npx nx dev ayokoding-www` starts; navigate to `/en/tools/cost-of-living-calculator` — page renders without a crash, all three tabs are reachable, the cascading filters work, `?tab=cost&city=<id>` deep-links to a single-city detail, and `?tab=cost&country=<id>` deep-links to the Cost-of-living tab filtered to that country.
 - [ ] [AI] `npx nx run ayokoding-www:lint` — exits 0 on all new component files.
 
@@ -373,7 +410,7 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
 - [ ] [AI] `browser_click` a city name in the table — acceptance: navigates to the single-city Cost-of-living detail (URL contains `?tab=cost&city=`); the detail shows the full per-category breakdown + healthcare badge + split relocation in local + USD; a back affordance returns to the full table.
 - [ ] [AI] `browser_click` a country name in the table — acceptance: navigates to the Cost-of-living tab filtered to that country (URL contains `?tab=cost&country=`); the Country filter is pre-selected and the table narrows to that country's cities (a filtered list, NOT a single-city detail).
 - [ ] [AI] `browser_click` the **Savings** tab, `browser_fill_form` the gross monthly salary with `"8000"` — acceptance: the annual gross shows `96,000`; each city row shows the Country+City, the informational non-salary-comp column, the **total compensation** column (base annual + non-salary comp), net (after federal + sub-national tax, lower than 8000), essentials, both savings figures (after essentials, after lifestyle), and savings % columns; `browser_click` a sort trigger sorts by savings.
-- [ ] [AI] `browser_click` the **Minimum role** tab, confirm the "Roles: software-engineering (IC + management)" caption is present, set the baseline source to "savings target", and `browser_fill_form` the target with `"2000"` — acceptance: the ladder is reordered — qualifying roles grouped above the marked minimum, non-qualifying roles dimmed below a divider; each row shows the best city + its country, the p25/median/p75 distribution, and the **total compensation** (base + non-salary comp) figure; savings show in USD + local + display currency; selecting a Country in the filters re-scopes the candidate cities. Resize narrow (`browser_resize` to ~375 px) — acceptance: the ladder reflows to stacked cards (responsive mobile layout) without overflow.
+- [ ] [AI] `browser_click` the **Minimum role** tab, confirm the "Roles: software-engineering (IC + management)" caption is present, set the baseline source to "savings target", and `browser_fill_form` the target with `"2000"` — acceptance: the ladder is reordered — qualifying roles grouped above the marked minimum, non-qualifying roles dimmed below a divider; each row shows the best city + its country, the p25/median/p75 distribution, and the **total compensation** (base + non-salary comp) figure; savings show in USD + local + display currency; selecting a Country in the filters re-scopes the candidate cities. Verify all three designed breakpoints with `browser_resize`: ~375 px (mobile) — acceptance: each tab reflows to stacked cards matching the mobile hi-fi mockups, no overflow; ~768 px (tablet) — acceptance: each tab shows the condensed table with tap-to-expand columns matching the tablet hi-fi mockups; ~1280 px (desktop) — acceptance: the full inline table matches the desktop hi-fi mockup.
 - [ ] [AI] `browser_console_messages` — acceptance: zero JS errors.
 - [ ] [AI] `browser_navigate` to `http://localhost:3101/id/tools/cost-of-living-calculator`, then `browser_snapshot` — acceptance: all labels, tab names, category names, and the disclaimer are in Indonesian.
 - [ ] [AI] `browser_take_screenshot` — save as visual record for this phase.
@@ -392,45 +429,45 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
 > Playwright MCP smoke passed in both locales. Safe to stop. To resume: re-run the Playwright
 > MCP verification steps above — both locale URLs must render without JS errors.
 
-## Phase 4 — E2E + Local Quality Gates
+## Phase 4 — E2E (feature-driven) + Local Quality Gates
 
-- [ ] **[AI]** Create the companion Gherkin spec file at
-      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
-      (_New file_, _New directory_ `tools/`): copy the 38 Gherkin scenarios from `prd.md
-§Acceptance Criteria (Gherkin)` into the feature file with the canonical `Feature:` header
-      (`Feature: Cost of Living Calculator`). Mirror the scenario text verbatim from `prd.md`.
-      Acceptance:
-      `test -f specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature && echo "OK"`.
+The companion feature file (authored in Phase 2) is already globbed by the fe-e2e `defineBddConfig`
+(`features: …/specs/apps/ayokoding/behavior/ayokoding-www/gherkin/**/*.feature`), so the e2e tier
+consumes it through `playwright-bdd` (`npx bddgen && npx playwright test`) — **no hand-written spec
+that duplicates the scenarios**. This phase adds the step definitions that bind the feature's steps.
 
-- [ ] **[AI] RED** Add a failing fe-e2e smoke test in
-      `apps/ayokoding-www-fe-e2e/src/cost-of-living-calculator.spec.ts` (_New file_): navigate to
-      `/en/tools/cost-of-living-calculator`, assert the **Cost of living** table is populated with at least one
-      city row showing both a Country and a City column plus category expenses; apply a Region then
-      Country filter and assert the rows narrow; click a **city name** and assert it deep-links to
-      `?tab=cost&city=` showing the single-city detail; navigate back, click a **country name** and
-      assert it deep-links to `?tab=cost&country=` with the Country filter pre-selected and the table
-      narrowed to that country's cities (a filtered list, not a single-city detail); switch to the
-      **Savings** tab, enter a gross
-      monthly salary of `"8000"`, assert the annual `96,000` is shown and at least one net/savings cell
-      and the non-salary-comp + total-comp columns are visible; then switch to the **Minimum role** tab, confirm the
-      software-engineering-roles caption, set a savings target of `"2000"`, and assert the ladder is
-      reordered (a qualifying group above a divider with one role marked as the minimum, a dimmed
-      below-minimum group beneath) and a row shows the best city + its country.
-      Command: `npx nx run ayokoding-www-fe-e2e:test:e2e`. Acceptance: test file exists and the test
-      fails (page route not yet reached by e2e or an element assertion fails when written before the
-      page is fully wired). - _Suggested executor: `swe-e2e-dev`_
-- [ ] **[AI] GREEN** Confirm that `npx nx run ayokoding-www-fe-e2e:test:e2e` passes with the calculator
-      page fully implemented from Phases 1–3. Acceptance: smoke test passes end-to-end across all three
-      tabs with zero errors.
+- [ ] **[AI] RED** Add the **playwright-bdd step definitions** that consume the companion feature at
+      `apps/ayokoding-www-fe-e2e/src/steps/cost-of-living-calculator.steps.ts` (_New file_) using
+      `createBdd()` — implement the `Given`/`When`/`Then` steps the feature references: navigate to
+      `/en/tools/cost-of-living-calculator`; the **Cost of living** table is populated with at least one
+      city row showing both a Country and a City column plus category expenses; applying a Region then
+      Country filter narrows the rows; clicking a **city name** deep-links `?tab=cost&city=` showing the
+      single-city detail; clicking a **country name** deep-links `?tab=cost&country=` with the Country
+      filter pre-selected and the table narrowed to that country's cities (a filtered list, not a
+      single-city detail); the **Savings** tab derives the annual `96,000` from a `"8000"` monthly entry
+      and shows net/savings + non-salary-comp + total-comp columns; the **Minimum role** tab shows the
+      software-engineering-roles caption and, for a `"2000"` savings target, reorders the ladder (a
+      qualifying group above a divider with one role marked as the minimum, a dimmed below-minimum group
+      beneath) with each row showing the best city + its country. Command:
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` (runs `npx bddgen && npx playwright test`). Acceptance:
+      `bddgen` generates the calculator scenarios from the feature and the run fails (page not yet
+      reached / an assertion fails before the page is fully wired); **no unbound steps remain**. -
+      _Suggested executor: `swe-e2e-dev`_
+- [ ] **[AI] GREEN** With the calculator page fully implemented from Phases 1–3, confirm
+      `npx nx run ayokoding-www-fe-e2e:test:e2e` passes — `bddgen` emits the calculator scenarios from
+      the feature and every generated scenario is green end-to-end across all three tabs. Acceptance:
+      e2e passes with zero errors and zero undefined/pending steps.
 - [ ] **[AI]** Run affected local quality gates: `npx nx affected -t typecheck lint test:quick specs:coverage` — warm the cache first (`npx nx affected -t typecheck lint test:quick specs:coverage --skip-nx-cache` if cache is cold). Fix ALL failures encountered — including preexisting issues not introduced by this plan's changes (root-cause orientation: do not defer or mention-and-skip existing failures). Acceptance: all four targets exit 0.
 
 ### Commit Guidelines
 
 - Commit changes thematically: FX + city data layer (`fx.ts` + `cities.ts` + tax/relocation +
   `calc.ts`) in one commit, role data layer (`roles.ts` role × country distribution + `geo-filter.ts`
-  - `role-lookup.ts`) in a second, `web-ui` `Table` primitive in a third, UI components (geo-filters,
-    cost-of-living, city-detail, savings, min-role, controls) in a fourth, bilingual strings in a fifth,
-    e2e in a sixth. Follow Conventional Commits format:
+  - `role-lookup.ts`) in a second, `web-ui` `Table` primitive in a third, the companion Gherkin spec
+    (`…/gherkin/tools/cost-of-living-calculator.feature` + registration) plus the feature-consuming
+    unit test in a fourth, UI components (geo-filters, cost-of-living, city-detail, savings,
+    min-role, controls) in a fifth, bilingual strings in a sixth, and the fe-e2e step definitions in a
+    seventh. Follow Conventional Commits format:
     `feat(ayokoding-www): add cost-of-living calculator`.
 - Do NOT bundle unrelated fixes into the same commit. Note: commits happen only on explicit user
   instruction per repo policy.
@@ -439,11 +476,12 @@ the shared lib first, then consume it from the app. Changes under `libs/web-ui` 
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` — exits 0 (smoke test passes across all three tabs).
+- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` — exits 0 (`bddgen` emits the calculator scenarios from the companion feature and every generated scenario passes across all three tabs).
+- [ ] [AI] Feature consumed by **both** tiers: the **unit** test (`@amiceli/vitest-cucumber`, mocked deps) and the fe-e2e (`playwright-bdd`) both bind the steps of `…/gherkin/tools/cost-of-living-calculator.feature` — no hand-written e2e spec duplicates the scenarios (`test ! -f apps/ayokoding-www-fe-e2e/src/cost-of-living-calculator.spec.ts && echo OK`).
 - [ ] [AI] `npx nx affected -t typecheck` — exits 0.
 - [ ] [AI] `npx nx affected -t lint` — exits 0.
 - [ ] [AI] `npx nx affected -t test:quick` — exits 0.
-- [ ] [AI] `npx nx affected -t specs:coverage` — exits 0.
+- [ ] [AI] `npx nx affected -t specs:coverage` — exits 0 (every Gherkin step in the new feature resolves to a step definition).
 
 > **Pause Safety**: all local quality gates green and e2e smoke passing. Safe to stop before push.
 > To resume: `npx nx affected -t typecheck lint test:quick specs:coverage` — all must still exit 0.

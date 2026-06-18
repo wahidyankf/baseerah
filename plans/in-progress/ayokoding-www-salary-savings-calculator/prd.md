@@ -263,6 +263,18 @@ classes:
 | Tablet  | `md` (≥ 768 px)  | Controls in a 2-column grid; condensed table showing Country · City · Essentials · Total · Relocation, with the category columns revealed on row-expand/tap.                                           |
 | Desktop | `lg` (≥ 1024 px) | Full category table with all category columns inline (Country left of City) plus subtotal, total, and relocation columns; controls in a single row.                                                    |
 
+The selected Option A is delivered as a hi-fi finalist at **all three display sizes** (mobile, tablet,
+desktop) — three of the **nine** hi-fi mockups across the three tabs. Desktop is the
+[Tier 2 finalist above](#tier-2--high-fidelity-finalist-option-a); the mobile and tablet finalists:
+
+**Mobile (`< sm`) — stacked cards:**
+
+![High-fidelity mobile mockup of the Cost-of-living tab: a narrow single-column phone layout with the three-tab toggle (Cost of living active), stacked Region/Country/City filters and household/area/school controls, and one city rendered as a stacked card headed "Jakarta, Indonesia" (underlined links) listing each expense category with local-over-USD values, a healthcare funding-scheme badge, an essentials subtotal, a monthly total, and a relocation line, the top edge of a second city card to imply scroll, an OOP = out-of-pocket legend, and an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table-mobile.png)
+
+**Tablet (`md`) — condensed table:**
+
+![High-fidelity tablet mockup of the Cost-of-living tab: a 768px layout with controls in a two-column grid above a condensed table (Country, City, Scheme, Essentials, Total, Relocation) for Jakarta, Singapore, and Berlin with a tap-to-expand chevron that reveals the category columns, dual-currency cells, healthcare funding-scheme badges, underlined Country/City links, an OOP legend, and an estimates-only disclaimer.](./assets/ui-cost-of-living-option-a-category-table-tablet.png)
+
 Low-fidelity reflow (mobile stacked-card vs desktop table) is sketched in the
 [low-fi alternatives asset](./assets/ui-cost-of-living-low-fi-alternatives.md).
 
@@ -353,6 +365,18 @@ Designed **mobile-first**; the chosen net/savings table reflows:
 | Mobile  | base (`< sm`)    | Salary input (monthly + derived annual) + Region/Country/City filters + controls stack full-width; each city renders as a **stacked card** headed "City, Country" (net, non-salary comp, essentials, both savings, %), sort control as a select. |
 | Tablet  | `md` (≥ 768 px)  | Controls in a 2-column grid; condensed table (Country · City · Net · Essential savings · %), the gross/annual + non-salary-comp columns revealed on row-expand/tap.                                                                              |
 | Desktop | `lg` (≥ 1024 px) | Full table with Country+City, gross monthly+annual, non-salary comp, band + tax %, net, essentials, both savings, and % columns inline; controls in a single row.                                                                                |
+
+The selected Option A is delivered as a hi-fi finalist at **all three display sizes** (mobile, tablet,
+desktop). Desktop is the [Tier 2 finalist above](#tier-2--high-fidelity-finalist-option-a-1); the
+mobile and tablet finalists:
+
+**Mobile (`< sm`) — stacked cards:**
+
+![High-fidelity mobile mockup of the Savings tab: a narrow single-column phone layout with the three-tab toggle (Savings active), a full-width gross-salary input ($8,000/mo = $96,000/yr), stacked Region/Country/City filters and cost-basis controls, and one city rendered as a stacked card headed "Jakarta, Indonesia" (underlined links) listing Gross, Non-salary comp, Total comp, Income band, Effective tax (federal + sub-national), Net, Essentials, Lifestyle, and the two highlighted savings figures with percentages and a healthcare scheme badge, the top edge of a second city card, an OOP legend, and a savings-before-pension / nominal-FX disclaimer.](./assets/ui-savings-option-a-net-savings-table-mobile.png)
+
+**Tablet (`md`) — condensed table:**
+
+![High-fidelity tablet mockup of the Savings tab: a 768px layout with controls in a two-column grid above a condensed table ranking Jakarta, Kuala Lumpur, and Berlin by essential savings (Country, City, Net, Essentials, Essential savings, After-lifestyle %, scheme badge) with a tap-to-expand chevron that reveals the gross/non-salary/total-comp/tax-split columns, dual-currency cells, underlined Country/City links, an OOP legend, and a disclaimer.](./assets/ui-savings-option-a-net-savings-table-tablet.png)
 
 ## UI Design — Minimum-Role Screen (Design Funnel)
 
@@ -450,6 +474,18 @@ classes:
 | Mobile  | base (`< sm`)    | Baseline + Region/Country/City controls stack full-width; the ladder renders as **stacked cards** headed "City, Country" (role title, country, p25/median/p75, savings in the three currencies, ✓/below badge), grouped into a qualifying group then a divider then the dimmed below-minimum group, threshold card emphasised. |
 | Tablet  | `md` (≥ 768 px)  | Baseline controls in a 2-column grid; ladder as a condensed table (Role · Country · Best city · Savings(USD) · badge), p25/median/p75 + local/display currency shown on tap/row-expand; groups kept.                                                                                                                           |
 | Desktop | `lg` (≥ 1024 px) | Full reordered ladder table with the Country column, p25/median/p75, non-salary comp, and all three currency columns inline; baseline controls in a single row.                                                                                                                                                                |
+
+The selected Option A is delivered as a hi-fi finalist at **all three display sizes** (mobile, tablet,
+desktop) — completing the **nine** hi-fi mockups across the three tabs. Desktop is the
+[Tier 2 finalist above](#tier-2--high-fidelity-finalist-option-a-2); the mobile and tablet finalists:
+
+**Mobile (`< sm`) — stacked rank cards:**
+
+![High-fidelity mobile mockup of the Minimum-role tab: a narrow single-column phone layout with the three-tab toggle (Minimum role active) and software-engineering-roles caption, stacked baseline and USD-default display-currency selectors, stacked scope filters and cost-basis controls, and the ladder rendered as stacked rank cards (Director, Staff SWE, a highlighted Sr SWE MIN card, a dashed Below-Minimum divider, then dimmed SWE II and SWE I cards); each card shows the role, best city and country as underlined links, and the p25/median/p75/non-salary-comp/total-comp/essential-savings money rows as display currency (USD) over local currency, above a legend and an estimates-only disclaimer.](./assets/ui-min-role-option-a-ladder-table-mobile.png)
+
+**Tablet (`md`) — condensed ladder table:**
+
+![High-fidelity tablet mockup of the Minimum-role tab: a 768px layout with selectors and cost-basis controls in a two-column grid above a condensed ladder table (Role, Best city with Country, Median, Essential savings, Status) with the Sr SWE minimum row highlighted and badged MIN, a dashed Below-Minimum divider with dimmed rows, and a tap-to-expand chevron revealing the p25/p75/non-salary/total-comp columns; money cells show display currency over local, with underlined best-city and country links, a legend, and a disclaimer.](./assets/ui-min-role-option-a-ladder-table-tablet.png)
 
 Low-fidelity reflow (mobile stacked-card vs desktop table) is sketched in the
 [low-fi alternatives asset](./assets/ui-min-role-low-fi-alternatives.md). Each low-fi alternative was
@@ -1205,7 +1241,12 @@ Feature: Salary savings calculator
   conveys its meaning by **text label**, not colour alone; it is keyboard-focusable/announced and meets
   AA contrast so screen-reader and colour-blind users get the scheme (tax-funded / mandatory payroll
   insurance / out-of-pocket) unambiguously on every tab.
-- NFR-3: Calculation core is pure and unit-tested; component has tests; one fe-e2e smoke test.
+- NFR-3: Calculation core is pure and unit-tested; components have tests; the companion Gherkin feature
+  (`specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`) is
+  consumed by both the **unit** tier (`@amiceli/vitest-cucumber`, external deps mocked, which satisfies
+  `specs:coverage`) and the fe-e2e tier (`playwright-bdd`/`bddgen`) — no hand-written e2e spec
+  duplicates the scenarios. ayokoding-www has **no integration tier** (`test:integration` is a no-op
+  `echo`; integration is reserved for app-tier products such as `organiclever-app-web`).
 - NFR-4: No new runtime dependencies beyond those `ayokoding-www` already ships.
 
 ## Disclaimers
