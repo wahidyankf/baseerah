@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [ayokoding-www Salary Savings Calculator](./ayokoding-www-salary-savings-calculator/README.md) — bilingual interactive savings calculator
+_(none)_
 
 ## Instructions
 
