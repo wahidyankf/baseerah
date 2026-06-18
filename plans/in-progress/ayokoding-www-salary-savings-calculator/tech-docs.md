@@ -1004,8 +1004,15 @@ scenarios are exercised through the feature-driven unit and e2e tiers, not a han
   `web-research-maker` sources a typical annual figure; it is displayed as total-comp context and never
   enters the savings math (equity vesting/tax is out of scope). Uneven data flagged via confidence,
   never fabricated.
-- Place the feature under `src/features/cost-of-living-calculator/{core,shell}/` per the
-  functional-core / imperative-shell convention; confirm the exact layout in Phase 0 before scaffolding.
+- **Phase 0 decision — feature-folder layout and route-group placement (confirmed)**:
+  Feature module lives at `src/features/cost-of-living-calculator/{core,shell}/` per the
+  functional-core / imperative-shell convention (confirmed: `apps/ayokoding-www/src/features/`
+  uses `{core,shell}` structure for all features). Route lives at
+  `app/[locale]/tools/cost-of-living-calculator/page.tsx` — directly under `[locale]`, NOT
+  under the `(app)` route group. Rationale: `(app)` is reserved for auth-gated product
+  application pages; the calculator is a public SEO-facing educational tool that should be
+  indexable without authentication, consistent with the rest of `ayokoding-www`. The `(app)` group
+  contains only a `.gitkeep` placeholder; placing a public tool there would be a category error.
 - Confirm whether disclaimers/snapshot belong in i18n strings or dataset — default: disclaimer text in
   i18n, snapshot date in dataset.
 - **Candidate enhancement (NOT in v1 scope) — "compare against my current city / current salary"**: a
