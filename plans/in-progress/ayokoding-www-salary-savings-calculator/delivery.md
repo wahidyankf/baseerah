@@ -320,7 +320,7 @@ authored here, before those tests.
       stays green.
 
 - [ ] **[AI] RED** Add a unit test for a new `Table` primitive in `libs/web-ui` following the existing primitive pattern (e.g. `libs/web-ui/src/primitives/table/table.test.tsx`): assert it renders `Table`/`TableHeader`/`TableBody`/`TableRow`/`TableHead`/`TableCell`/`TableCaption` with correct semantic roles. Command: `npx nx run web-ui:test:unit`. Acceptance: fails (no component yet).
-  - **Gherkin →** none directly (shared `web-ui` `Table` primitive; the tab scenarios render their tables through it)
+  - **Gherkin (underpins) →** none directly (shared `web-ui` `Table` primitive; the tab scenarios render their tables through it)
 - [ ] **[AI] GREEN** Create the `Table` primitive (delegate to `swe-ui-maker`): `libs/web-ui/src/primitives/table/table.tsx` (shadcn `Table` family, CVA variants, semantic `<table>` markup, AA-contrast tokens), barrel-export it from `libs/web-ui/src/index.ts`, and add `libs/web-ui/src/primitives/table/table.stories.tsx`. Acceptance: `npx nx run web-ui:test:unit` exits 0; `npx nx run web-ui:lint` exits 0; `npx nx run web-ui:build-storybook` succeeds.
   - _Suggested executor: `swe-ui-maker`_
 
@@ -901,37 +901,48 @@ authored here, before those tests.
       **childcare**, **school**, lifestyle), **essentials subtotal / total** labels, **net / tax**
       wording (incl. "federal" + "state/province/canton" sub-national + income-band labels),
       **healthcare funding-scheme** badge labels ("tax-funded", "mandatory payroll insurance",
-      "out-of-pocket"), the **"Healthcare (OOP)" column header** plus its **on-screen OOP-explanation
-      legend** (en: "OOP = out-of-pocket — healthcare you pay yourself, on top of any tax-funded or
-      insurance coverage"; id: "OOP = out-of-pocket — biaya kesehatan yang Anda bayar sendiri, di luar
-      jaminan dari pajak atau asuransi"), the **two savings-figure** labels ("Savings after essentials" /
-      "Savings after lifestyle"), **relocation** labels split into **sunk costs** (deposit, **key money**, moving,
-      visa/admin) and **liquidity reserve** (cash cushion), the **Region / Country / City** filter
-      labels, **Country** + **City** column headers, the city-detail **"Back to all cities"** label, the
-      gross-salary **monthly** + **annual** labels, the **non-salary comp** ("Typical RSU/equity +
-      bonus") label + its informational note, the **total compensation** ("Total comp") label + its
-      informational note, the **p25 / median / p75** labels ("Bottom 25%", "Median",
-      "Top 25%"), the **"Roles: software-engineering (IC + management)"** caption, the **qualifies /
-      below minimum** group labels, single/married labels, the **pre-school children** + **school-age
-      children** count labels, area + school-type toggle labels, **baseline-source labels** (my salary /
-      reference role / savings target), **display-currency label**, **confidence-tier labels**, the
-      **Disclaimers** block (pension-excluded, clothing/personal-care-in-lifestyle, nominal-FX-not-PPP,
-      snapshot-staleness, simplified-tax, healthcare-OOP, relocation-reserve, **role-salary-national-level**,
-      **non-salary-comp-informational**), the "Gross monthly salary (before tax)" salary label, and the
-      "Data last updated" label — following the existing `Record<Locale, Record<string, string>>` shape
-      in that file. Wire the new keys into the calculator page and components. Role labels come from
-      `roles.ts` (`ladder[].label.en/id`). Acceptance: `/id/tools/cost-of-living-calculator` shows Indonesian
-      labels for all calculator UI elements including the three tabs, the eight category names, the
-      Region/Country/City filter labels, the SE-roles caption, the tax/net wording, the healthcare-scheme
-      badge, the **on-screen "OOP = out-of-pocket" explanation legend**, and the relocation labels. - _Suggested executor: `apps-ayokoding-www-general-maker`_
-  - **Gherkin (binds) →** "Indonesian locale is fully translated"; "The OOP abbreviation is explained on screen"
+      "out-of-pocket"), the **"Healthcare (OOP)" column header**, the **two savings-figure** labels
+      ("Savings after essentials" / "Savings after lifestyle"), **relocation** labels split into
+      **sunk costs** (deposit, **key money**, moving, visa/admin) and **liquidity reserve** (cash
+      cushion), the **Region / Country / City** filter labels, **Country** + **City** column headers,
+      the city-detail **"Back to all cities"** label, the gross-salary **monthly** + **annual** labels,
+      the **non-salary comp** ("Typical RSU/equity + bonus") label + its informational note, the
+      **total compensation** ("Total comp") label + its informational note, the **p25 / median / p75**
+      labels ("Bottom 25%", "Median", "Top 25%"), the **"Roles: software-engineering (IC +
+      management)"** caption, the **qualifies / below minimum** group labels, single/married labels,
+      the **pre-school children** + **school-age children** count labels, area + school-type toggle
+      labels, **baseline-source labels** (my salary / reference role / savings target),
+      **display-currency label**, **confidence-tier labels**, the **Disclaimers** block
+      (pension-excluded, clothing/personal-care-in-lifestyle, nominal-FX-not-PPP, snapshot-staleness,
+      simplified-tax, healthcare-OOP, relocation-reserve, **role-salary-national-level**,
+      **non-salary-comp-informational**), the "Gross monthly salary (before tax)" salary label, and
+      the "Data last updated" label — following the existing `Record<Locale, Record<string, string>>`
+      shape in that file. Wire the new keys into the calculator page and components. Role labels come
+      from `roles.ts` (`ladder[].label.en/id`). Acceptance: `/id/tools/cost-of-living-calculator`
+      shows Indonesian labels for all calculator UI elements including the three tabs, the eight
+      category names, the Region/Country/City filter labels, the SE-roles caption, the tax/net
+      wording, the healthcare-scheme badge, and the relocation labels. - _Suggested executor:
+      `apps-ayokoding-www-general-maker`_
+  - **Gherkin (binds) →** "Indonesian locale is fully translated"
 
     ```gherkin
     Scenario: Indonesian locale is fully translated
       Given I am on "/id/tools/cost-of-living-calculator"
       When the page finishes loading
       Then all labels, category names, tax wording, healthcare-scheme labels, relocation labels, and the disclaimer are in Indonesian
+    ```
 
+- [ ] **[AI]** Add the **on-screen OOP-explanation legend** key to
+      `apps/ayokoding-www/src/features/i18n/core/translations.ts` for both locales (en: "OOP =
+      out-of-pocket — healthcare you pay yourself, on top of any tax-funded or insurance coverage";
+      id: "OOP = out-of-pocket — biaya kesehatan yang Anda bayar sendiri, di luar jaminan dari pajak
+      atau asuransi") and wire it into the component that renders the "Healthcare (OOP)" column —
+      the legend must appear near the table whenever that column is visible. Acceptance: the
+      on-screen "OOP = out-of-pocket" explanation legend is visible near the "Healthcare (OOP)"
+      column in both locales. - _Suggested executor: `apps-ayokoding-www-general-maker`_
+  - **Gherkin (binds) →** "The OOP abbreviation is explained on screen"
+
+    ```gherkin
     Scenario: The OOP abbreviation is explained on screen
       Given I am on a tab that shows the "Healthcare (OOP)" column
       When I read the legend near the table
@@ -964,7 +975,18 @@ authored here, before those tests.
       When the page finishes loading
       Then I see a prominent "Data last updated" label with the dataset snapshot date
       And I see an "estimates only" disclaimer
+    ```
 
+- [ ] **[AI]** Verify via Playwright MCP (`browser_navigate` to `/en/tools/cost-of-living-calculator`
+      then `browser_snapshot`) that no Israeli city appears in the Cost-of-living table, the Savings
+      table, or the Minimum-role table in either locale. The dataset exclusion is enforced at the
+      data layer (`cities.test.ts` Phase 1 `(underpins)` step); this step confirms it holds through
+      the rendered UI. Acceptance: `browser_snapshot` of each tab in both locales shows no city
+      whose country is Israel and no row associated with ILS currency. - _Suggested executor:
+      `apps-ayokoding-www-general-maker`_
+  - **Gherkin (binds) →** "No Israeli cities are listed"
+
+    ```gherkin
     Scenario: No Israeli cities are listed
       Given I am on the calculator in either locale
       When the page finishes loading
