@@ -178,6 +178,15 @@ sanctioned `[AI]` path (e.g., a sanctioned `scripts/` action). Any plan using `[
 top of `delivery.md`, and every `[HUMAN]` step MUST state what the human does plus the observable signal
 the agent checks to resume.
 
+**Git-mechanical steps are `[AI]` (HARD RULE)** — three recurring steps MUST be tagged `[AI]`, never
+`[HUMAN]`: provisioning the worktree (`git worktree add …`), committing and pushing to `origin main`, and
+removing the worktree (`git worktree remove …`). Direct push to `main` is the repo default (Trunk Based
+Development) — do NOT emit a `[HUMAN]` "review the diff and approve push to main" gate unless the user or
+plan explicitly requested a PR or an out-of-band sign-off for that change. Write the push step as
+`- [ ] [AI] Commit and push to origin main`. See the
+[Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md) and
+[Plans Organization Convention §Executor Tagging](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule).
+
 **Phase gates and natural pauses (HARD RULE)** — every phase (including Phase 0) MUST end with a
 `### Phase N Gate` containing must-pass, independently verifiable checks (each with its `[AI]`/`[HUMAN]`
 marker), followed by a **Pause Safety** blockquote stating the safe-to-stop state and the single

@@ -188,6 +188,8 @@ When removing a worktree:
 
 For plan worktrees, the [plan-execution workflow](../../workflows/plan/plan-execution.md) performs this cleanup automatically after a plan is archived and pushed — but ALWAYS prompts the user for confirmation first. Worktrees are never deleted silently.
 
+**Plan delivery checklist tagging**: when any of these three commands — `git worktree add`, `git push origin main`, or `git worktree remove` — appear as steps in a plan delivery checklist, they MUST be tagged `[AI]`. Tagging them `[HUMAN]` incorrectly creates a hand-off gate where none exists. See [Plans Organization Convention §Executor Tagging](./plans.md#executor-tagging--ai-vs-human-hard-rule) and the [Git Push Default Convention](../../development/workflow/git-push-default.md) for the canonical rule statement and FAIL/PASS examples.
+
 ### Multiple Worktrees
 
 The pattern supports multiple concurrent worktrees:

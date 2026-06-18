@@ -329,6 +329,8 @@ Running from inside a git worktree -- whether the agent uses `isolation: "worktr
 
 Branch + PR from a worktree is opt-in. It applies only when the user's prompt or the plan's delivery checklist explicitly requests it (see [Git Push Default Convention](./git-push-default.md) Standard 2 for the full list of opt-in signals).
 
+**Plan delivery checklist tagging**: the three git-mechanical lifecycle steps — create worktree, commit-and-push to `origin main`, and remove worktree — MUST be tagged `[AI]`, never `[HUMAN]`, in plan delivery checklists. Tagging any of them `[HUMAN]` imports a hand-off gate that does not exist in TBD. See [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) and the [Git Push Default Convention §Examples](./git-push-default.md#examples) for the FAIL/PASS examples.
+
 ### Branch + Draft PR (Opt-In)
 
 When a branch + draft PR is **explicitly requested**, the workflow is:

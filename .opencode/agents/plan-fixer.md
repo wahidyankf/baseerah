@@ -655,6 +655,17 @@ review) when it is unclear whether a sanctioned `[AI]` channel exists — do not
 justification: retag `[AI]`. **FALSE_POSITIVE** when the plan documents a real reason the agent must
 not perform it (e.g., a sanctioned-channel exception explicitly declined).
 
+The three git-mechanical lifecycle steps are the most common over-tags — retag each `[AI]` at **HIGH
+confidence**:
+
+- `[HUMAN] Create worktree: git worktree add …` → `[AI]`
+- `[HUMAN] Review the diff and approve push to main` → rewrite as `[AI] Commit and push to origin main` (direct push is the repo default — drop the approve-push gate)
+- `[HUMAN] Remove the worktree: git worktree remove …` → `[AI]`
+
+**FALSE_POSITIVE** only when the user's prompt or the plan explicitly requested a PR or an out-of-band
+sign-off for that change. See the
+[Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md).
+
 ### 4. Missing `### Phase N Gate`
 
 **HIGH confidence** — append a gate to the offending phase, derived from that phase's work items:

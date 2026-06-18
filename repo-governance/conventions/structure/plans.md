@@ -369,6 +369,14 @@ Every delivery checklist item MUST make clear **who can execute it**. Some work 
 
 **Bias to `[AI]` (HARD RULE)**: prefer `[AI]` as much as possible and use `[HUMAN]` as little as possible. Tag a step `[HUMAN]` ONLY when it is genuinely inevitable — physically impossible for an agent, unsafe, or requiring real-world authority or credentials an agent must not hold — OR when the plan author or user has explicitly asked for `[HUMAN]` on that step. Before tagging `[HUMAN]`, first try to engineer a sanctioned `[AI]` path (for example, a scripted action through an approved guard). When both an `[AI]` and a `[HUMAN]` path would accomplish the step, choose `[AI]`.
 
+**Git-mechanical steps are `[AI]` — worktree and push are never `[HUMAN]` by default (HARD RULE)**: three recurring lifecycle steps are routinely mis-tagged `[HUMAN]` even though an agent performs them directly with plain git commands. Tag each `[AI]`:
+
+- **Create / provision the worktree** — `git worktree add worktrees/<id> -b <id>` is an ordinary git command the executor runs; the [plan-execution workflow](../../workflows/plan/plan-execution.md) Step 0 gate even auto-provisions it. Tag `[AI]`, never `[HUMAN]`.
+- **Commit and push to `origin main`** — direct push to `main` is the repository default (Trunk Based Development; see [Git Push Default Convention](../../development/workflow/git-push-default.md)). Write the step as `- [ ] [AI] Commit and push to origin main`. There is **no** `[HUMAN]` "review the diff and approve push to main" gate — that framing imports a pull-request approval the repo does not use by default. Drop it unless the user or plan explicitly asked for a PR or an out-of-band sign-off on that change.
+- **Remove the worktree after archival** — `git worktree remove worktrees/<id>` is mechanical; the executor self-confirms via the safety preconditions (nothing uncommitted or unpushed) and prompts inline before deleting. Tag `[AI]`, never `[HUMAN]`.
+
+A push to `main` (or any of these three steps) becomes `[HUMAN]` or `[AI+HUMAN]` ONLY when the user or plan explicitly requested an out-of-band approval, sign-off, or PR for that specific change. Absent that explicit request, all three are `[AI]`.
+
 **Placement**: the tag goes at the START of the checkbox text, immediately after `- [ ]`:
 
 ```markdown

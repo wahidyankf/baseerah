@@ -200,6 +200,30 @@ User prompt: "Plan a governance update for Y."
 
 `plan-checker` must flag this step. `plan-fixer` must remove it.
 
+### FAIL: Incorrect plan-maker behavior — `[HUMAN]` approve-push gate
+
+User prompt: "Plan a feature for Z." (no PR or sign-off requested)
+
+```markdown
+<!-- In delivery.md — WRONG -->
+
+- [ ] [HUMAN] Create worktree: `git worktree add worktrees/feature-z -b feature-z`
+- [ ] [HUMAN] Review the diff and approve push to main (trunk-based)
+- [ ] [HUMAN] Remove the worktree: `git worktree remove worktrees/feature-z`
+```
+
+All three are plain git-mechanical steps an agent performs directly. Direct push to `main` is the default — there is no human approve-push gate unless a PR or sign-off was explicitly requested. These are mis-tags per [Plans Organization Convention §Executor Tagging](../../conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule). `plan-checker` flags them; `plan-fixer` retags them `[AI]`.
+
+### PASS: Correct plan-maker behavior — git-mechanical steps tagged `[AI]`
+
+```markdown
+<!-- In delivery.md — RIGHT -->
+
+- [ ] [AI] Create worktree: `git worktree add worktrees/feature-z -b feature-z`
+- [ ] [AI] Commit and push to `origin main`
+- [ ] [AI] Remove the worktree: `git worktree remove worktrees/feature-z`
+```
+
 ### PASS: Correct linear history before push
 
 ```bash

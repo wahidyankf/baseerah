@@ -583,11 +583,19 @@ physically impossible action.
    supplies a value an agent then consumes.
 4. **Tagging is orthogonal to suggested-executor** — do NOT conflate `[AI]`/`[HUMAN]` with
    `_Suggested executor: <agent>_`; both may appear on one step. Confusing the two is **MEDIUM**.
+5. **Git-mechanical steps must be `[AI]`** — three recurring steps are git-mechanical and an agent performs
+   them directly: provisioning the worktree (`git worktree add …`), committing and pushing to `origin main`,
+   and removing the worktree (`git worktree remove …`). A `[HUMAN]`-tagged worktree-create, worktree-remove,
+   or push-to-main step is a **HIGH** mis-tag — including a `[HUMAN]` "review the diff and approve push to
+   main" gate, which imports a PR approval the repo does not use by default. Exception (not a finding): the
+   user's prompt or the plan explicitly requested a PR or an out-of-band sign-off for that change. See the
+   [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md).
 
 #### Finding Severity
 
 - Missing executor-tag legend: **HIGH**
 - Untagged (or `[AI]`-tagged) human-only step: **HIGH** per occurrence
+- `[HUMAN]`-tagged git-mechanical step (worktree create/remove, push to `main`) absent an explicit PR/sign-off request: **HIGH** per occurrence
 - Executor-tag / suggested-executor conflation: **MEDIUM**
 
 ### 15. Phase-Gate & Natural-Pause Validation (Step 5i — MANDATORY HARD RULE)
