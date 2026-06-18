@@ -8,4 +8,5 @@ export * from "./scroll-area/scroll-area";
 export * from "./separator/separator";
 export * from "./sheet/sheet";
 export * from "./tabs/tabs";
+export * from "./table/table";
 export * from "./tooltip/tooltip";

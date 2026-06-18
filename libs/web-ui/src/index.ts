@@ -37,6 +37,7 @@ export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants } from "./pr
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./primitives/tooltip/tooltip";
 export { ScrollArea, ScrollBar } from "./primitives/scroll-area/scroll-area";
 export { Separator } from "./primitives/separator/separator";
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from "./primitives/table/table";
 
 // Components — OSE composites (higher-level, app-specific)
 export { Button, buttonVariants } from "./components/button/button";
