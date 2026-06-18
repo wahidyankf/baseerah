@@ -338,6 +338,16 @@ Plans are executed by execution-grade (sonnet-tier) agents, not planning-grade a
 - **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/ose-www/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
 - **Explicit shell command(s)**: State the verbatim invocation when a command is involved (e.g., `npx nx run ose-www:test:quick`), not a vague instruction like "run the lint".
 - **Concrete acceptance criterion**: State the observable change that proves done (e.g., "all assertions in `trpc.test.ts` pass" or "`nx run ose-www:typecheck` exits 0"). No bare "implement X", "set up Y", or "configure Z" without a concrete verifiable outcome.
+- **One scenario per behavior cycle + inline Gherkin**: Every behavior-implementing
+  RED→GREEN→REFACTOR cycle targets **exactly one** Gherkin scenario. Its RED step carries a
+  single-scenario `**Gherkin (binds) →** "<title>"` tag line followed immediately by that
+  scenario's full `Given/When/Then` as a fenced ` ```gherkin ` block copied verbatim from the
+  companion `.feature`; never bundle multiple scenarios into one cycle (long checklists are
+  expected). Pure-core (`**Gherkin (underpins) →**`) data/calc tests and the aggregate
+  feature-consuming / `playwright-bdd` binders are the only steps that keep a multi-scenario
+  title list. `plan-checker` flags a multi-scenario behavior RED, or absent/non-verbatim inline
+  Gherkin, as a **HIGH** finding. See
+  [Gherkin-Tagged Delivery Steps](../../development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps).
 
 **HARD RULE**: `plan-checker` flags violations of this rule as HIGH severity. `plan-fixer` rewrites offending items with maximum detail.
 

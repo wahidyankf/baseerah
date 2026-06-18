@@ -60,6 +60,13 @@ This convention binds **both** ways a behavior change reaches `apps/`, `libs/`, 
 
 2. **Planned change (plan doc)** -- When the work is mediated by a plan under `plans/`, the plan files are not themselves implementation artifacts, but any plan whose **scope creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/`** MUST carry explicit delivery-checklist steps that create or update the corresponding `specs/` Gherkin `.feature` files and run `specs:coverage`. The `plan-maker` agent emits these steps; the `plan-checker` agent flags their absence. The specs/Gherkin work is then executed -- and verified by path 1 -- when the plan runs.
 
+   Additionally, every behavior-implementing RED→GREEN→REFACTOR cycle targets **exactly one**
+   Gherkin scenario, and its RED step embeds that one scenario's full verbatim `Given/When/Then`
+   inline as a fenced Gherkin block under a single-scenario `**Gherkin (binds) →**` tag.
+   `plan-checker` flags a multi-scenario behavior RED, or absent/non-verbatim inline Gherkin, as a
+   **HIGH** finding. See
+   [Gherkin-Tagged Delivery Steps](../workflow/test-driven-development.md#gherkin-tagged-delivery-steps).
+
 The end state is identical on both paths: code under `apps/`/`libs/` never lands without its companion `specs/` Gherkin. The plan path simply moves the obligation earlier, into planning, so missing specs are never discovered late.
 
 ## What Must Be Updated

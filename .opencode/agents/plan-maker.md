@@ -168,6 +168,14 @@ unit ending in an independently verifiable, safe-to-stop state)
 **Phase Gates**: Every phase closes with a `### Phase N Gate` (must-pass checks) + a **Pause Safety**
 note (safe-to-stop state + resume command)
 **Acceptance Criteria**: Final verification steps
+**Gherkin tags on TDD steps (one scenario per cycle)**: give each behavior-implementing
+RED→GREEN→REFACTOR cycle **exactly one** Gherkin scenario from `prd.md §Acceptance Criteria` — the RED
+step carries a single-scenario `**Gherkin (binds) →** "<title>"` tag and embeds that scenario's full
+`Given/When/Then` verbatim as a fenced ` ```gherkin ` block; the GREEN/REFACTOR steps implement and
+tidy just that slice. Never bundle multiple scenarios into one cycle (long checklists are expected).
+Exceptions kept as one multi-scenario step: pure-core `**Gherkin (underpins) →**` data/calc tests, and
+the aggregate feature-consuming/`playwright-bdd` binders that consume the whole `.feature`. See
+[Gherkin-Tagged Delivery Steps](../../repo-governance/development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps)
 
 **Execution markers** — prefix each checkbox (after `- [ ]`) with `[AI]` or `[HUMAN]`. `[AI]` is the
 default (unmarked = `[AI]`). Use `[AI]` as much as possible and `[HUMAN]` as little as possible: tag
