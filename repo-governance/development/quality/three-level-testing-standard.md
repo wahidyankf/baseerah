@@ -23,7 +23,7 @@ Defines the mandatory three-level testing architecture for all projects in the m
 
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: All three levels consume the same Gherkin specifications automatically. Adding a new scenario to the shared specs propagates to unit, integration, and E2E tests without manual synchronization.
 
-- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Three levels — no more, no fewer. Each level tests a distinct concern: business logic (unit), data persistence (integration), full-stack behavior (E2E).
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Up to three levels — no more. Each tests a distinct concern: business logic (unit), a real integration boundary such as data persistence where one exists (integration), full-stack behavior (E2E). Project types without a real integration boundary (content platforms and marketing FE) run unit + e2e only.
 
 ## Conventions Implemented/Respected
 
@@ -188,14 +188,23 @@ Different project types carry different coverage thresholds, reflecting the prac
 
 The table below states which test levels are mandatory per app type:
 
-| App Type          | test:unit | test:integration            | test:e2e               |
-| ----------------- | --------- | --------------------------- | ---------------------- |
-| API backends      | Mandatory | Mandatory (real PostgreSQL) | Mandatory (Playwright) |
-| CLI apps          | Mandatory | Mandatory (real filesystem) | N/A                    |
-| Content platforms | Mandatory | Mandatory (MSW)             | Mandatory (Playwright) |
-| FE apps           | Mandatory | N/A                         | Mandatory (Playwright) |
-| Libraries         | Mandatory | Optional                    | N/A                    |
-| E2E runners       | N/A       | N/A                         | Mandatory              |
+| App Type                         | test:unit | test:integration                 | test:e2e               |
+| -------------------------------- | --------- | -------------------------------- | ---------------------- |
+| API backends                     | Mandatory | Mandatory (real PostgreSQL)      | Mandatory (Playwright) |
+| CLI apps                         | Mandatory | Mandatory (real filesystem)      | N/A                    |
+| Product app-web (app-tier)       | Mandatory | Mandatory (MSW / mocked backend) | Mandatory (Playwright) |
+| Content platforms & marketing FE | Mandatory | N/A (no-op `echo`)               | Mandatory (Playwright) |
+| Libraries                        | Mandatory | Optional                         | N/A                    |
+| E2E runners                      | N/A       | N/A                              | Mandatory              |
+
+**The integration tier is for app-tier products that cross a real integration boundary** — API
+backends (real PostgreSQL), CLI apps (real filesystem), and **product app-web clients** (`*-app-web`,
+e.g. `organiclever-app-web`, `ose-app-web`) that integrate with a real backend API (mocked in-process
+via MSW). **Content platforms and marketing front-ends** (`*-www`, e.g. `ayokoding-www`, `ose-www`,
+`organiclever-www`, `wahidyankf-www`) have **no integration tier**: their `test:integration` target is a
+no-op `echo`, and their full Gherkin contract is consumed at the **unit** tier (all external
+dependencies mocked) plus the **e2e** tier. A site that renders content and calls a typed tRPC layer
+does not integrate a separate backend service, so a middle tier would only duplicate unit coverage.
 
 ## Gherkin-Everywhere Mandate
 
@@ -205,19 +214,19 @@ All testable projects must consume Gherkin specs at **all applicable test levels
 - **Integration tests stick to Gherkin** — integration step definitions consume the same feature files as unit step definitions; no additional non-BDD tests at this level
 - **E2E tests stick to Gherkin** — Playwright step definitions map directly to Gherkin scenarios; no additional non-BDD tests at this level
 
-The Gherkin spec is the shared contract. Unit tests honor it and extend it. Integration and E2E tests honor it exactly.
+The Gherkin spec is the shared contract. Unit tests honor it and extend it. Integration and E2E tests honor it exactly. Where a project type has **no integration tier** (content platforms and marketing FE), the **unit** tier is the BDD level that consumes the full Gherkin contract — with all external dependencies mocked — and the **e2e** tier consumes it against the running app; `specs:coverage` is satisfied by the unit-tier step definitions.
 
 ## No Network in Integration Tests
 
 Integration tests must not make inbound or outbound network calls. This constraint applies across all project types:
 
 - **API backends**: The test harness calls service/repository functions directly. No HTTP server starts. No HTTP client library is used. The only real external dependency is the PostgreSQL database.
-- **FE apps**: Integration tests do not apply (N/A per "Mandatory Test Levels Matrix").
+- **Content platforms & marketing FE**: Integration tests do not apply (N/A per "Mandatory Test Levels Matrix"); `test:integration` is a no-op `echo`. The Gherkin contract is consumed at the unit tier (mocked dependencies) and the e2e tier.
 - **CLI apps**: Integration tests drive commands via `cmd.RunE()` in-process. No network calls. The only real dependency is the local filesystem (via `/tmp` fixtures).
-- **Content platforms**: Integration tests use MSW (Mock Service Worker) or equivalent in-process mocking. No real HTTP servers start and no real network calls are made.
+- **Product app-web (app-tier)**: Integration tests use MSW (Mock Service Worker) or equivalent in-process mocking of the backend API. No real HTTP servers start and no real network calls are made.
 - **Libraries**: When integration tests apply, they use real filesystem or in-process fixtures. No network calls.
 
-The principle: integration tests introduce exactly one real dependency per project type (database for backends, filesystem for CLI apps, in-process mocking for FE/content). Everything else remains mocked.
+The principle: integration tests introduce exactly one real dependency per project type (database for backends, filesystem for CLI apps, in-process backend mocking for product app-web). Everything else remains mocked.
 
 ## External Dependencies Optional in E2E
 
@@ -344,7 +353,7 @@ linting and the enforcement gates.
 The following gaps are known and tracked for future resolution:
 
 - **FE unit tests lack Gherkin**: `organiclever-web` does not yet consume Gherkin specs at the unit level. A BDD runner compatible with Vitest-based unit tests needs to be selected.
-- **Content platform Gherkin pending**: `ayokoding-www` and `ose-www` do not yet consume Gherkin specs at any test level. Gherkin consumption for content platforms is planned as part of the same standardization effort.
+- **Content platform Gherkin pending**: `ayokoding-www` and `ose-www` do not yet consume Gherkin specs at any test level. Gherkin consumption for content platforms is planned at the **unit + e2e** tiers (content platforms have no integration tier; `test:integration` is a no-op `echo`).
 - **specs:coverage deferred for some projects**: Some projects have `specs:coverage` temporarily deferred until step implementations are complete. See "Spec-Coverage Validation" above and [Nx Target Standards](../infra/nx-targets.md) for the deferred project list.
 
 ## Per-Backend Implementation Pattern
@@ -390,8 +399,8 @@ The three-level standard applies universally, with adaptations per project type:
 | Project Type                    | Unit                          | Integration                      | E2E                | test:quick | Gherkin Specs                          |
 | ------------------------------- | ----------------------------- | -------------------------------- | ------------------ | ---------- | -------------------------------------- |
 | API backend (`organiclever-be`) | All mocked + specs            | Real PostgreSQL, no HTTP + specs | Playwright + specs | Yes        | `specs/apps/<backend-name>/`           |
-| Web UI app (`organiclever-web`) | Vitest mocks                  | MSW in-process (cacheable)       | Playwright         | Yes        | Project-specific                       |
-| Content platform                | Vitest mocks                  | MSW/tRPC in-process (cacheable)  | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| Product app-web (`*-app-web`)   | Vitest mocks + specs          | MSW in-process (cacheable)       | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
+| Content platform & marketing FE | Vitest mocks + all specs      | N/A (no-op `echo`)               | Playwright + specs | Yes        | `specs/apps/{domain}/{be,fe}/gherkin/` |
 | CLI app (Rust)                  | cargo test unit + integration | cargo integration (cacheable)    | N/A                | Yes        | `specs/apps/<cli-name>/`               |
 | Library (Rust)                  | cargo test unit               | cargo integration (cacheable)    | N/A                | Yes        | `specs/libs/<lib-name>/`               |
 | E2E runner                      | N/A                           | N/A                              | Playwright         | N/A        | Shared specs                           |
@@ -399,8 +408,8 @@ The three-level standard applies universally, with adaptations per project type:
 **Key rules by project type**:
 
 - **API backends**: All three levels mandatory; all consume Gherkin specs; integration uses real PostgreSQL with no HTTP
-- **Content platforms**: All three levels mandatory; integration uses MSW/tRPC in-process mocking (cacheable); Gherkin consumption planned (see "Known Gaps")
-- **Web UI apps**: All three levels mandatory; integration uses in-process mocking (MSW); cacheable
+- **Product app-web (app-tier, `*-app-web`)**: All three levels mandatory; integration uses in-process backend mocking (MSW); cacheable
+- **Content platforms & marketing FE (`*-www`)**: Unit + e2e mandatory; **no integration tier** (`test:integration` is a no-op `echo`); the full Gherkin contract is consumed at the unit tier (external deps mocked) plus e2e; cacheable
 - **CLI apps**: Unit + integration mandatory; both levels cover the behaviour in the Gherkin specs; unit mocks all I/O via injected dependencies; integration uses real filesystem with `/tmp` fixtures; cacheable
 - **Libraries**: Unit mandatory; integration optional (public API calls); cacheable
 
