@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="660" viewBox="0 0 768 660" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="690" viewBox="0 0 768 690" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
   <title>Savings screen, Option A (Net/Savings Table), tablet reflow</title>
   <desc>Tablet reflow of the Cost of Living Calculator Savings tab using the Net/Savings Table layout. A blue header bar reads Cost of Living Calculator — Savings. A three-tab toggle has Savings active. A gross-salary input shows 8,000 dollars per month deriving 96,000 dollars per year. The Region, Country, City filters and the shared cost-basis controls — household (adults, pre-school kids, school-age kids), area (center or rural), school-type (public or private) — are arranged in a 2-column grid. A condensed table ranks three cities (Jakarta, Indonesia; Kuala Lumpur, Malaysia; Berlin, Germany) by essential savings with the most important columns inline: Country, City, Net, Essentials, Essential savings, After-lifestyle savings with percent, and a healthcare scheme badge; a right-hand chevron on each row implies the fuller column set — gross monthly and annual, non-salary comp, total comp, and the federal plus sub-national tax split — reveals on row-tap. Money cells show local currency over USD; both Country and City names are underlined links (a City link opens that city's Cost-of-living detail, a Country link opens the Cost-of-living tab filtered to that country). A legend explains OOP means out-of-pocket, and a disclaimer notes savings are computed before pension contributions and that USD figures use nominal FX, not purchasing-power parity.</desc>
 
-  <rect x="0" y="0" width="768" height="660" fill="#FFFFFF"/>
-  <rect x="0.5" y="0.5" width="767" height="659" fill="none" stroke="#000000" stroke-width="1"/>
+  <rect x="0" y="0" width="768" height="690" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="767" height="689" fill="none" stroke="#000000" stroke-width="1"/>
 
   <!-- Header -->
   <rect x="0" y="0" width="768" height="46" fill="#0173B2"/>
@@ -20,8 +20,8 @@
     <rect x="234" y="58" width="116" height="30" rx="6" fill="#FFFFFF" stroke="#808080" stroke-width="1"/>
     <text x="292" y="77" text-anchor="middle" fill="#808080">Minimum role</text>
   </g>
-  <rect x="540" y="58" width="212" height="30" rx="15" fill="#CC78BC"/>
-  <text x="646" y="77" font-size="11" fill="#FFFFFF" text-anchor="middle" font-weight="700">Roles: software-engineering (IC + mgmt)</text>
+  <rect x="486" y="58" width="266" height="30" rx="15" fill="#CC78BC"/>
+  <text x="619" y="77" font-size="11" fill="#FFFFFF" text-anchor="middle" font-weight="700">Roles: software-engineering (IC + mgmt)</text>
 
   <!-- Gross salary input -->
   <rect x="18" y="98" width="356" height="54" rx="8" fill="#F6F8FA" stroke="#0173B2" stroke-width="1.5"/>
@@ -151,19 +151,24 @@
   <rect x="18" y="258" width="732" height="168" fill="none" stroke="#000000" stroke-width="1.5"/>
 
   <!-- legend -->
-  <rect x="18" y="438" width="732" height="44" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
+  <rect x="18" y="438" width="732" height="80" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
   <g font-size="11">
-    <text x="30" y="455" fill="#000000">Money cells: <tspan font-weight="700">local</tspan> over <tspan fill="#808080">USD</tspan>. <tspan fill="#0173B2" text-decoration="underline">Country</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">City</tspan> are links → Cost-of-living filtered. Chevron (›) expands the full column set. Sorted by <tspan fill="#029E73" font-weight="700">essential savings</tspan>.</text>
-    <text x="30" y="474" fill="#000000"><tspan font-weight="700">OOP = out-of-pocket</tspan> — healthcare you pay yourself; the essentials behind these savings model OOP only. The scheme badge shows how care is funded per country.</text>
+    <text x="30" y="455" fill="#000000">Money cells: <tspan font-weight="700">local</tspan> over <tspan fill="#808080">USD</tspan>. <tspan fill="#0173B2" text-decoration="underline">Country</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">City</tspan> are links → Cost-of-living filtered. Chevron (›) expands</text>
+    <text x="30" y="471" fill="#000000">the full column set. Sorted by <tspan fill="#029E73" font-weight="700">essential savings</tspan>.</text>
+    <text x="30" y="492" fill="#000000"><tspan font-weight="700">OOP = out-of-pocket</tspan> — healthcare you pay yourself; the essentials behind these savings model OOP only.</text>
+    <text x="30" y="508" fill="#000000">The scheme badge shows how care is funded per country.</text>
   </g>
 
   <!-- Disclaimer -->
-  <line x1="18" y1="488" x2="750" y2="488" stroke="#808080" stroke-width="1"/>
+  <line x1="18" y1="528" x2="750" y2="528" stroke="#808080" stroke-width="1"/>
   <g font-size="11" fill="#808080">
-    <text x="18" y="508" font-weight="700" fill="#DE8F05">Estimates only — read before relying</text>
-    <text x="18" y="528">Savings are computed <tspan font-weight="600">before pension / retirement contributions</tspan> — these are deducted separately and are not reflected here.</text>
-    <text x="18" y="546">USD figures use <tspan font-weight="600">nominal FX</tspan>, not purchasing-power parity (PPP); a high nominal-USD saving may buy less locally than the local figure implies.</text>
-    <text x="18" y="564">Effective tax % combines <tspan font-weight="600">federal + sub-national</tspan> bands. Non-salary comp (RSU/bonus) is shown for total-comp context only and is not added to net or savings.</text>
-    <text x="18" y="582">Snapshot date 2026-06. Modeled figures, not quotes or offers.</text>
+    <text x="18" y="548" font-weight="700" fill="#DE8F05">Estimates only — read before relying</text>
+    <text x="18" y="568">Savings are computed <tspan font-weight="600">before pension / retirement contributions</tspan> — these are deducted separately</text>
+    <text x="18" y="582">and are not reflected here.</text>
+    <text x="18" y="600">USD figures use <tspan font-weight="600">nominal FX</tspan>, not purchasing-power parity (PPP); a high nominal-USD saving may buy less</text>
+    <text x="18" y="614">locally than the local figure implies.</text>
+    <text x="18" y="632">Effective tax % combines <tspan font-weight="600">federal + sub-national</tspan> bands. Non-salary comp (RSU/bonus) is shown for</text>
+    <text x="18" y="646">total-comp context only and is not added to net or savings.</text>
+    <text x="18" y="664">Snapshot date 2026-06. Modeled figures, not quotes or offers.</text>
   </g>
 </svg>

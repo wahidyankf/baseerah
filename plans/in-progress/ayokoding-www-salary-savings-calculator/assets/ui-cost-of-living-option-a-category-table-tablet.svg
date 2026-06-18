@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="768" height="640" viewBox="0 0 768 640" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="692" viewBox="0 0 768 692" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
   <title>Cost-of-living screen, Option A (Category Table) — tablet reflow</title>
   <desc>High-fidelity tablet mockup (768px md width) of the Cost of Living Calculator Cost-of-living tab. A blue header bar shows the title and an estimates-only snapshot pill. Three tab pills follow with Cost of living active. The Region, Country, and City cascading filters and the household, area, and school-type controls are arranged in a two-column grid. Below sits a condensed table with columns Country, City, Essentials, Total, and Relocation, plus a chevron in each row hinting that the full category columns reveal on row tap. Three city rows appear: Jakarta Indonesia, Singapore, and Berlin Germany. Country and City names are underlined links. Money cells show local currency over USD. Healthcare funding-scheme badges (tax-funded, payroll) sit in a per-row scheme column. A legend explains OOP means out-of-pocket and that Country and City are links, and an estimates-only disclaimer closes the screen.</desc>
 
   <!-- palette: blue #0173B2, orange #DE8F05, teal #029E73, purple #CC78BC, brown #CA9161, gray #808080, black #000000 -->
-  <rect x="0" y="0" width="768" height="640" fill="#FFFFFF"/>
-  <rect x="0.5" y="0.5" width="767" height="639" fill="none" stroke="#000000" stroke-width="1"/>
+  <rect x="0" y="0" width="768" height="692" fill="#FFFFFF"/>
+  <rect x="0.5" y="0.5" width="767" height="691" fill="none" stroke="#000000" stroke-width="1"/>
 
   <!-- ===== Header bar ===== -->
   <rect x="0" y="0" width="768" height="46" fill="#0173B2"/>
@@ -120,16 +120,19 @@
 
   <!-- ===== Legend + disclaimer ===== -->
   <g font-size="11">
-    <rect x="18" y="494" width="732" height="44" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
-    <text x="30" y="511" fill="#000000"><tspan font-weight="700">OOP = out-of-pocket</tspan> — the healthcare you pay yourself, on top of any tax-funded or insurance cover. The scheme badge shows how care is funded.</text>
-    <text x="30" y="530" fill="#000000">Money cells: <tspan font-weight="700">local currency</tspan> over <tspan fill="#808080">USD</tspan>. <tspan fill="#0173B2" text-decoration="underline">Country</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">City</tspan> are links → Cost-of-living filtered. Tap a row to reveal all category columns.</text>
+    <rect x="18" y="494" width="732" height="76" rx="5" fill="#F6F8FA" stroke="#808080" stroke-width="1"/>
+    <text x="30" y="511" fill="#000000"><tspan font-weight="700">OOP = out-of-pocket</tspan> — the healthcare you pay yourself, on top of any tax-funded or</text>
+    <text x="30" y="525" fill="#000000">insurance cover. The scheme badge shows how care is funded.</text>
+    <text x="30" y="544" fill="#000000">Money cells: <tspan font-weight="700">local currency</tspan> over <tspan fill="#808080">USD</tspan>. <tspan fill="#0173B2" text-decoration="underline">Country</tspan> &amp; <tspan fill="#0173B2" text-decoration="underline">City</tspan> are links → Cost-of-living filtered.</text>
+    <text x="30" y="558" fill="#000000">Tap a row to reveal all category columns.</text>
   </g>
 
-  <line x1="18" y1="552" x2="750" y2="552" stroke="#808080" stroke-width="1"/>
+  <line x1="18" y1="584" x2="750" y2="584" stroke="#808080" stroke-width="1"/>
   <g font-size="11" fill="#808080">
-    <text x="18" y="572" font-weight="700" fill="#DE8F05">Estimates only</text>
-    <text x="120" y="572">Modeled monthly figures, not quotes; snapshot 2026-06, FX nominal.</text>
-    <text x="18" y="592">Relocation is a one-time sunk cost; a separate liquidity reserve (held cushion) appears in the expanded row and city detail.</text>
-    <text x="18" y="612">Healthcare (OOP) is the out-of-pocket spend you cover yourself; the per-row badge shows the funding model.</text>
+    <text x="18" y="604" font-weight="700" fill="#DE8F05">Estimates only</text>
+    <text x="120" y="604">Modeled monthly figures, not quotes; snapshot 2026-06, FX nominal.</text>
+    <text x="18" y="624">Relocation is a one-time sunk cost; a separate liquidity reserve (held cushion) appears in the</text>
+    <text x="18" y="644">expanded row and city detail.</text>
+    <text x="18" y="664">Healthcare (OOP) is the out-of-pocket spend you cover yourself; the per-row badge shows the funding model.</text>
   </g>
 </svg>
