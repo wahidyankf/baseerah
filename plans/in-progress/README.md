@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [ayokoding-www-salary-savings-calculator](./ayokoding-www-salary-savings-calculator/README.md) — Phase 5 UI polish: colored tab buttons, healthcare scheme badges, segmented area/school toggles, city detail side panel.
+- [ayokoding-www-calc-exploratory-findings](./ayokoding-www-calc-exploratory-findings/README.md) — Exploratory testing of the cost-of-living calculator surfaced 7 defects (4 Major, 3 Minor) and 4 spec gaps. Major: geo-filter dropdowns not seeded from `?country=`/`?city=` deep links, `html lang="en"` on `/id/` pages (WCAG 3.1.1 Level A), and the desktop table showing English city/country names on the Indonesian locale while mobile cards show Indonesian. Core calculator math verified correct.
 
 ## Instructions
 

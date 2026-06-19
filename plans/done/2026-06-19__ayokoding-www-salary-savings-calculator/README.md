@@ -31,7 +31,7 @@ The tool is built for two real decisions:
 
 ## Status
 
-In progress (created 2026-06-16)
+Done (created 2026-06-16, completed 2026-06-19)
 
 ## Context
 
