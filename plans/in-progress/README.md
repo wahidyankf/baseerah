@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_(none)_
+- [ayokoding-www-salary-savings-calculator](./ayokoding-www-salary-savings-calculator/README.md) — Phase 5 UI polish: colored tab buttons, healthcare scheme badges, segmented area/school toggles, city detail side panel.
 
 ## Instructions
 

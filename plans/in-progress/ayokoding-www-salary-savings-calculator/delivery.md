@@ -1145,25 +1145,271 @@ that duplicates the scenarios**. This phase adds the step definitions that bind 
 
 ## Phase 6 — Plan Archival
 
-- [x] **[AI]** Run
+> **REOPENED 2026-06-19** — This plan was archived to `plans/done/` after Phase 5, then
+> reopened when a production review surfaced a **design-parity gap**: the shipped UI rendered
+> functionally but visually plain — raw unstyled `<button role="tab">` tabs (run together, no
+> color), plain `<span>` healthcare-scheme labels (no colored badges), and `<select>` dropdowns
+> for Area/School where the approved hi-fi mockups (`assets/ui-*-option-a-*.png`) show colored
+> segmented controls. The web-ui primitives that carry these colors (`Tabs`/`TabsList`/
+> `TabsTrigger`, `Badge` with `hue`, `Toggle`) were **already available and barrel-exported** but
+> were not used. **Phase 7 (below) closes the gap; this archival phase re-runs only after Phase 7
+> is green.** The boxes below are unticked because the plan is no longer archived.
+
+- [ ] **[AI]** Run
       `git mv plans/in-progress/ayokoding-www-salary-savings-calculator plans/done/$(date +%Y-%m-%d)__ayokoding-www-salary-savings-calculator`
       from repo root. Acceptance: folder appears under `plans/done/` with today's date prefix;
       `plans/in-progress/ayokoding-www-salary-savings-calculator/` no longer exists
       (`test ! -d plans/in-progress/ayokoding-www-salary-savings-calculator && echo "OK"`).
       Also update `plans/in-progress/README.md` (remove this plan's entry) and
       `plans/done/README.md` (add entry with completion date).
-- [x] **[AI]** Remove the worktree once work is pushed and archived (executor self-confirms nothing is
+- [ ] **[AI]** Remove the worktree once work is pushed and archived (executor self-confirms nothing is
       uncommitted/unpushed, then prompts inline before deleting):
       `git worktree remove worktrees/ayokoding-www-salary-savings-calculator`. Acceptance:
       `git worktree list` no longer shows the worktree path.
 
 ### Phase 6 Gate
 
-> All checks below must pass to consider the plan complete.
+> All checks below must pass to consider the plan complete. **Blocked on Phase 7.**
 
-- [x] [AI] `test ! -d plans/in-progress/ayokoding-www-salary-savings-calculator && echo "OK"` — plan folder no longer exists under `in-progress/`.
-- [x] [AI] `ls plans/done/ | grep ayokoding-www-salary-savings-calculator` — folder exists under `done/` with a date prefix.
-- [x] [AI] `plans/in-progress/README.md` no longer lists this plan; `plans/done/README.md` lists it with a completion date.
+- [ ] [AI] `test ! -d plans/in-progress/ayokoding-www-salary-savings-calculator && echo "OK"` — plan folder no longer exists under `in-progress/`.
+- [ ] [AI] `ls plans/done/ | grep ayokoding-www-salary-savings-calculator` — folder exists under `done/` with a date prefix.
+- [ ] [AI] `plans/in-progress/README.md` no longer lists this plan; `plans/done/README.md` lists it with a completion date.
 
 > **Pause Safety**: plan archived, worktree cleaned up. Feature live at
 > `/[locale]/tools/cost-of-living-calculator` in `en` + `id`. No further action required.
+
+## Phase 7 — UI Design Parity (Reopened)
+
+> **Why this phase exists** — Phases 1–5 shipped a functionally-correct but visually-plain UI to
+> production. The approved hi-fi mockups in `assets/` (`ui-cost-of-living-option-a-category-table.png`,
+> `ui-savings-option-a-net-savings-table.png`, `ui-min-role-option-a-ladder-table.png`) call for
+> **colored segmented tabs**, **colored healthcare-scheme badges** (green = tax-funded, blue/teal =
+> mandatory payroll insurance, amber = out-of-pocket), and **segmented Area/School controls**. The
+> shipped build used raw unstyled `<button role="tab">`, plain `<span>` text, and `<select>`
+> dropdowns instead. **Root cause of the escape**: the plan-execution **Manual Behavioral Assertions**
+> step (Playwright MCP visual check, workflow Step 2d) was not performed against the mockups before
+> archival — automated unit/E2E tests assert behavior and DOM presence, never visual design parity.
+> Phase 7 fixes the UI **and** adds the missing manual-verification gate so this cannot recur.
+>
+> All web-ui primitives needed below are already barrel-exported from
+> `@open-sharia-enterprise/web-ui` (`Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `Badge` with a
+> `hue` prop, `Toggle`) — no web-ui change is required; this is wiring the calculator shell onto them.
+>
+> Each code step is RED → GREEN → REFACTOR. Every RED step carries a **Gherkin (binds) →** tag naming
+> the scenario in `prd.md` whose styling assertion it drives. New visual assertions are added to
+> `prd.md` [§Acceptance Criteria (Gherkin)](./prd.md#acceptance-criteria-gherkin) and mirrored into
+> `…/gherkin/tools/cost-of-living-calculator.feature` so `specs:coverage` stays green.
+
+### 7.0 — Add visual-parity acceptance criteria to specs
+
+- [ ] **[AI]** Add three new scenarios to `prd.md` §Acceptance Criteria (Gherkin) — `Tabs render as a
+colored segmented control`, `Healthcare scheme shows a color-coded badge`, `Area and School are
+segmented toggles` — then mirror them verbatim into
+      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`.
+      Acceptance: `npx nx run ayokoding-www:specs:coverage` lists the three new scenarios and reports
+      all covered (the step defs land in 7.1–7.3 below).
+
+### 7.1 — Tabs as a colored segmented control
+
+- [ ] **[AI] RED** — In
+      `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/calculator-content.test.tsx`
+      (new file if absent), assert the tab row renders web-ui `TabsList`/`TabsTrigger` markup: the
+      active trigger carries `data-state="active"` and a non-transparent background class, and the
+      three triggers are siblings inside a single `role="tablist"` container.
+      **Gherkin (binds) →** `Tabs render as a colored segmented control`.
+      Command: `npx nx run ayokoding-www:test:unit -- calculator-content`. Acceptance: fails because
+      the current markup is a bare `<nav>` of `<button role="tab">`.
+- [ ] **[AI] GREEN** — Replace the hand-rolled `<nav><button role="tab">…` block in
+      `calculator-content.tsx` with `Tabs`/`TabsList`/`TabsTrigger`/`TabsContent` from
+      `@open-sharia-enterprise/web-ui`, wiring `value={activeTab}` / `onValueChange`. Acceptance: the
+      RED test passes; tab control renders as a filled segmented control matching the mockup header.
+- [ ] **[AI] REFACTOR** — Collapse the three `activeTab === …` conditional blocks into `TabsContent`
+      panels; keep the existing `setDetailCityId(null)` reset on the cost tab. Acceptance: unit +
+      existing E2E tab-switch scenarios stay green (`npx nx run ayokoding-www:test:unit`).
+
+### 7.2 — Color-coded healthcare-scheme badges (all three tables)
+
+- [ ] **[AI] RED** — In `cost-of-living.test.tsx`, assert `[data-testid="healthcare-badge"]` renders a
+      web-ui `Badge` whose `hue` maps by scheme: `tax-funded` → green, `mixed`/mandatory-payroll →
+      teal/blue, `oop` → amber. **Gherkin (binds) →** `Healthcare scheme shows a color-coded badge`.
+      Command: `npx nx run ayokoding-www:test:unit -- cost-of-living`. Acceptance: fails (current badge
+      is a bare `<span>`).
+- [ ] **[AI] GREEN** — In
+      `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx`, replace the
+      plain `<span data-testid="healthcare-badge">` with `<Badge hue={…} variant="outline">`, adding a
+      `healthcareBadgeHue(type)` helper (oop→amber, tax-funded→green, mixed→teal). Acceptance: RED test
+      passes.
+- [ ] **[AI] GREEN** — Apply the same `Badge` treatment to the healthcare-scheme cell in
+      `savings.tsx` and `min-role.tsx` (and the status markers: savings `qualifies`/`below`, min-role
+      `MIN`). Acceptance: `npx nx run ayokoding-www:test:unit -- savings min-role` green with badge
+      assertions added.
+- [ ] **[AI] REFACTOR** — Hoist `healthcareBadgeHue` + `healthcareBadgeLabel` into
+      `…/core/format.ts` (pure) so all three tables import one source of truth. Acceptance: no duplicate
+      hue logic; unit suite green.
+
+### 7.3 — Segmented Area / School controls
+
+- [ ] **[AI] RED** — In `controls.test.tsx`, assert Area (`center`/`rural`) and School
+      (`public`/`private`) render as a two-option segmented control (`role="radiogroup"` with two
+      `role="radio"` children, the selected one `aria-checked="true"`) rather than a `<select>`.
+      **Gherkin (binds) →** `Area and School are segmented toggles`. Command:
+      `npx nx run ayokoding-www:test:unit -- controls`. Acceptance: fails (current control is a
+      `<select>`).
+- [ ] **[AI] GREEN** — In
+      `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.tsx`, replace the Area
+      and School `<select>` elements with a small accessible `SegmentedControl` (local shell component
+      built on web-ui `Button` variants, or two `Toggle`s) preserving the existing `onAreaChange` /
+      `onSchoolTypeChange` callbacks and `aria-label`s. Acceptance: RED test passes; keyboard
+      arrow-key selection works.
+- [ ] **[AI] REFACTOR** — Ensure the segmented control matches the mockup pill styling (active =
+      filled hue, inactive = outline) and dark-mode tokens. Acceptance: `npx nx run ayokoding-www:lint` + `:typecheck` green.
+
+### 7.4 — Local quality gates + push
+
+- [ ] **[AI]** Run `npx nx affected -t typecheck lint test:quick specs:coverage` from repo root. Fix
+      ALL failures (including preexisting). Acceptance: every target exits 0.
+- [ ] **[AI]** Commit thematically (`feat(ayokoding-www): apply design-parity styling to cost-of-living
+calculator`) and push to `origin main`. Acceptance: `git log --oneline -1 origin/main` shows the
+      commit.
+- [ ] **[AI]** Re-deploy to production via `apps-ayokoding-www-deployer` (push `main` →
+      `prod-ayokoding-www`). Acceptance: GitHub Deployments API
+      (`gh api repos/wahidyankf/ose-public/deployments/<id>/statuses`) reports `state: success`.
+
+### 7.5 — Manual Behavioral Assertions (the previously-missing gate — HARD)
+
+> This is the step whose absence let a plain UI reach production. It is now a blocking gate.
+
+- [ ] **[AI]** With Playwright MCP, `browser_navigate` to the **production** URL
+      `https://ayokoding.com/en/tools/cost-of-living-calculator`, then `browser_take_screenshot`
+      (full page) for each of the three tabs (`cost`, `savings`, `min-role`). Acceptance: three
+      screenshots captured post-deploy.
+- [ ] **[AI]** Side-by-side compare each screenshot against its approved mockup in `assets/`
+      (`ui-cost-of-living-option-a-category-table.png`, `ui-savings-option-a-net-savings-table.png`,
+      `ui-min-role-option-a-ladder-table.png`). Acceptance: tabs render as a **colored segmented
+      control**, healthcare-scheme cells render as **colored badges** (green/teal/amber), and
+      Area/School render as **segmented toggles** — all matching the mockups. Record the verdict in
+      this step's implementation notes.
+- [ ] **[AI]** `browser_console_messages` on each tab. Acceptance: no JS errors (the pre-existing
+      benign favicon/resource 404 excepted and noted).
+- [ ] **[AI]** Repeat the screenshot + mockup comparison for the `id` locale
+      (`https://ayokoding.com/id/tools/cost-of-living-calculator`). Acceptance: same styling parity in
+      Indonesian.
+
+### 7.6 — Execution Log, Findings & Lessons (2026-06-19)
+
+> **Authoritative record of what was actually done during the reopened Phase 7.** Captured for
+> two purposes: (1) traceability of the fixes; (2) **lessons to propagate into how we CREATE and
+> PLAN plan docs** (see [§Lessons for Plan-Doc Creation & Planning](#lessons-for-plan-doc-creation--planning)).
+> Everything below was discovered during live production review with the user — not by the
+> automated gates, which all passed while these defects shipped.
+
+#### What shipped (code)
+
+- [x] **[AI] Tabs → web-ui segmented control.** `calculator-content.tsx` replaced the hand-rolled
+      `<nav><button role="tab">` with `Tabs`/`TabsList`/`TabsTrigger`/`TabsContent` from
+      `@open-sharia-enterprise/web-ui`. Tabs now render as a colored, filled segmented control.
+      Tests: existing `getByRole("tab", …)` interactions still bind (Radix preserves `role="tab"`).
+- [x] **[AI] Healthcare-scheme colored badges (cost tab).** `cost-of-living.tsx` swaps the plain
+      `<span data-testid="healthcare-badge">` for `<Badge hue={…} variant="outline">`; new pure
+      helper `healthcareBadgeHue` in `core/format.ts` maps `tax-funded→sage (green)`,
+      `mixed→teal`, `oop→honey (amber)` (color-blind-friendly ayokoding hues).
+- [x] **[AI] Area/School dropdowns → segmented controls.** `controls.tsx` adds an accessible
+      `SegmentedControl` (`role="radiogroup"` + `role="radio"`, arrow-key + click) replacing the two
+      `<select>`s. Component + step tests updated from `selectOptions(combobox)` to `click(radio)`
+      and existence checks from `combobox`→`radiogroup`.
+- [x] **[AI] Labelled expense preview.** `controls.tsx` preview chips were bare currency values
+      (`MYR 1,875 / 800 / …`) — unreadable. Now each chip carries its category label
+      (`Housing`, `Food`, … `Total` in teal) under a `"<city> — estimated monthly essentials"`
+      heading. New i18n key `previewMonthlyEstimate` (en + id).
+- [x] **[AI] Responsive (partial).** Table wrapped in `-mx-4 overflow-x-auto px-4 sm:mx-0` for
+      tablet/mobile horizontal scroll; controls + preview use `flex-wrap`. **Deferred** (documented,
+      not shipped): the full mobile **card transform** and tablet **column reduction** shown in the
+      `*-mobile.png` / `*-tablet.png` mockups — currently small screens get a scrollable wide table,
+      not the stacked-card / condensed-column layouts. Tracked as follow-up.
+
+#### Bugs found in production review (not caught by any gate)
+
+- [x] **[AI] BUG #1 — City filter silently ignored (calculation/scope).** On the Min-role (and
+      Savings) tabs, selecting `City = Kuala Lumpur` with `Country = "All countries"` still ranked
+      candidates across **all** cities (best-city = Austin/Prague/Berlin). Root cause:
+      `calculator-content.tsx` `scopedCities` branched on `geoScope.countryId` and `geoScope.region`
+      only — never `geoScope.cityId`, so a city-only selection fell through to the full dataset.
+      Fix: add a highest-priority `if (geoScope.cityId) …` branch. Verified: KL now scopes every
+      best-city to Kuala Lumpur.
+- [x] **[AI] BUG #2 — Minimum-role ranking inverted (logic).** Higher-savings senior roles
+      (Engineering Manager, Staff SWE) were dumped **below** the "does not reach the savings bar"
+      divider while a lower-savings role was marked the minimum. Root cause: `orderForDisplay`
+      (`core/role-lookup.ts`) computed `clears` as `e.rank <= minRank` (plus a spurious savings-vs-
+      minRole comparison) — the inverse of the intended semantics. The minimum role is the **least
+      senior** role that clears; everyone **more senior** (`rank >= minRank`) must also qualify. Fix:
+      `clears = e.rank >= minRank`; both groups sorted rank high→low.
+- [x] **[AI] Test correction exposing BUG #2.** The bound scenario used `savings_target = 2000 USD`
+      with a 1-adult household — which, under correct logic, clears **all 15 roles** (no split). The
+      old test "passed" only because the inverted logic always forced a 1-above / many-below split.
+      Empirically probed the data: target **8000 USD** genuinely splits the default household
+      (`swe_1≈2950`, `swe_2≈6150` below; `senior_swe≈8710` = minimum). Updated `prd.md` + the
+      `.feature` + the steps + the component test to `8000`, and added a **rank-ordering regression
+      guard** (all `non-qualifying-row`s must sit after `qualifying-divider` in DOM order) that would
+      have caught the inversion.
+
+#### Lessons for Plan-Doc Creation & Planning
+
+> **Propagate these into `plan-maker` / `plan-checker` / the plans + TDD + UI-mockup conventions.**
+> Each lesson is a concrete gap this plan had that let defects ship despite green gates.
+
+1. **A UI plan needs a Manual Visual-Parity gate, executed, before archival.** All unit/E2E tests
+   asserted DOM/behavior presence; none compared the rendered pixels to the approved `assets/`
+   mockups. The plan-execution workflow's Step 2d (Playwright MCP visual check) was never run.
+   → Plans that ship UI MUST carry an explicit, checked "screenshot vs each mockup, per breakpoint,
+   per locale" step, and `plan-checker` should flag its absence (like it flags the design funnel).
+2. **"Use the design-system primitive" must be an explicit delivery step, not assumed.** The web-ui
+   `Tabs`/`Badge`/`Toggle` primitives existed and were exported, yet the build hand-rolled bare
+   `<button role="tab">` / `<span>` / `<select>`. → When a mockup shows a known primitive (tabs,
+   badge, segmented control), the plan step must name the primitive and assert its presence.
+3. **Responsive parity must be a first-class, per-breakpoint deliverable.** The plan had `*-mobile`
+   and `*-tablet` mockups in `assets/` but no delivery step that bound them; the build shipped one
+   wide desktop table. → Each responsive mockup needs its own RED/GREEN step + a viewport-specific
+   visual assertion.
+4. **Filter/scope coverage must be exhaustive over the cascade.** The city-only path (city set,
+   country/region null) had no test, so BUG #1 shipped. → For any cascading filter, the plan's
+   Gherkin must enumerate **each** level independently (region-only, country-only, **city-only**,
+   and combinations), not just the happy cascade.
+5. **Monotonicity / ordering assumptions need a value-bearing test, not a presence test.** The
+   min-role scenario asserted "a divider exists + some rows are dimmed" — true under both correct
+   and inverted logic. It never asserted **which** roles land where. → Ordering/threshold features
+   must assert concrete positions/identities (e.g., "Staff SWE is above the minimum, SWE I below"),
+   and choose fixture inputs that actually produce the split (probe the data when authoring).
+6. **Every displayed number needs a visible label.** The preview rendered eight bare currency chips
+   with no legend. → A plan presenting computed figures must require a label/legend for each value
+   in its acceptance criteria.
+7. **Green automated gates are necessary, not sufficient, for UI/UX correctness.** Four real defects
+   (plus a label-clarity issue) shipped to production with unit/E2E/lint/typecheck/CI all green.
+   → The maker-checker-fixer loop for UI work needs a human-or-Playwright visual sign-off rung that
+   the automated gates cannot substitute for.
+8. **Mockup colors must be specified as THEME TOKENS, then reconciled to the target app's brand.**
+   The hi-fi mockups used a generic palette (blue header, teal toggles, green/orange badges). The
+   first implementation copied raw colors (teal accents) that were off-brand for ayokoding (whose
+   primary is blue) and mis-mapped the payroll badge to teal instead of the mockup's amber. Final
+   reconciliation: active tab/toggles/total → ayokoding **brand primary (blue)**; badges →
+   traffic-light **sage/honey/terracotta** (green/amber/red) matching the mockup's semantics via
+   web-ui `hue` tokens. The teal→blue shift is an **intentional, theme-driven deviation** from the
+   mockup. → Plan-doc UI mockups should annotate each color with the **theme token** it represents
+   (e.g. "active = `--color-primary`", "covered = `hue=sage`"), not a raw swatch, and the delivery
+   step must require reconciliation to the **specific app's** brand tokens. `plan-checker` should
+   flag mockups whose colors are raw values with no token mapping.
+
+### Phase 7 Gate
+
+> All checks below must pass before re-running Phase 6 archival. **§7.6 above is the authoritative
+> execution record** (the 7.0–7.5 substeps were the pre-execution plan; actual work, deferrals, and
+> the bugs found in review are logged in 7.6).
+
+- [x] [AI] `npx nx run ayokoding-www:specs:coverage` — green (15 specs, 116 scenarios, 402 steps, all covered) after the min-role scenario target change (2000→8000).
+- [x] [AI] `npx nx run ayokoding-www:typecheck lint test:unit` — all green (1307 unit tests pass; lint warnings only, no errors).
+- [ ] [AI] CI green on `main` for the styling commit (`gh run list --limit 5 --json status,conclusion,name`).
+- [ ] [AI] Production re-deploy `state: success`; Playwright MCP screenshots of all three tabs (both locales) confirmed to match the `assets/` mockups (brand-blue tabs/toggles, green/amber/red scheme badges, segmented toggles, labelled preview).
+- [ ] [AI] **Deferred (tracked, not blocking this gate):** full mobile **card transform** + tablet **column-reduction** per the `*-mobile.png` / `*-tablet.png` mockups; healthcare-scheme badge **columns** on the Savings + Min-role tables (net-new columns). These remain open follow-ups recorded in §7.6.
+
+> **Pause Safety**: design-parity styling live in production and visually verified against the
+> approved mockups. Safe to stop. To resume, proceed to **Phase 6 — Plan Archival** (re-run the
+> `git mv` to `done/`, README updates, and worktree cleanup).

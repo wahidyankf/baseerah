@@ -10,9 +10,37 @@ import {
   relocationSunkLocal,
   schoolLocal,
 } from "../core/calc";
-import { fmtCurrency } from "../core/format";
+import { fmtCurrency, healthcareBadgeHue } from "../core/format";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
+import { Badge } from "@open-sharia-enterprise/web-ui";
+
+function Row({
+  label,
+  value,
+  testId,
+  emphasis,
+}: {
+  label: string;
+  value: string;
+  testId: string;
+  emphasis?: "subtotal" | "total";
+}) {
+  const cls =
+    emphasis === "total"
+      ? "flex items-baseline justify-between border-t pt-2 text-base font-semibold"
+      : emphasis === "subtotal"
+        ? "flex items-baseline justify-between border-t pt-2 font-medium"
+        : "flex items-baseline justify-between";
+  return (
+    <div className={cls}>
+      <span className="text-muted-foreground">{label}</span>
+      <span data-testid={testId} className="tabular-nums">
+        {value}
+      </span>
+    </div>
+  );
+}
 
 type Props = {
   dataset: Dataset;
@@ -50,58 +78,71 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
   const liquidityReserve = liquidityReserveLocal(city);
 
   return (
-    <div>
-      <h2>
-        {city.name.en}
-        {country ? `, ${country.name.en}` : ""}
-      </h2>
+    <div className="mx-auto max-w-xl overflow-hidden rounded-lg border bg-card shadow-sm">
+      {/* Colored header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 bg-primary px-4 py-3 text-primary-foreground">
+        <div className="flex flex-col">
+          <h2 className="text-lg leading-tight font-semibold">
+            {city.name[locale] ?? city.name.en}
+            {country ? `, ${country.name[locale] ?? country.name.en}` : ""}
+          </h2>
+          <a href="?tab=cost" className="text-sm text-primary-foreground/80 underline hover:text-primary-foreground">
+            {t(locale, "backToAllCities")}
+          </a>
+        </div>
+        {country && (
+          <Badge
+            data-testid="healthcare-badge"
+            variant="outline"
+            hue={healthcareBadgeHue(country.healthcareModelType)}
+            className="border-white/40 bg-white/15 text-white"
+          >
+            {healthcareBadgeLabel(country.healthcareModelType, locale)}
+          </Badge>
+        )}
+      </div>
 
-      <a href="?tab=cost">{t(locale, "backToAllCities")}</a>
+      {/* Body */}
+      <div className="space-y-4 p-4">
+        <section aria-label={t(locale, "sectionMonthlyExpenses")} className="space-y-1.5 text-sm">
+          <Row label={t(locale, "labelHousing")} value={fmtCurrency(housingAmt, cur)} testId="expense-housing" />
+          <Row label={t(locale, "labelFood")} value={fmtCurrency(foodAmt, cur)} testId="expense-food" />
+          <Row label={t(locale, "labelTransport")} value={fmtCurrency(transportAmt, cur)} testId="expense-transport" />
+          <Row label={t(locale, "labelUtilities")} value={fmtCurrency(utilitiesAmt, cur)} testId="expense-utilities" />
+          <Row
+            label={t(locale, "labelHealthcareOOP")}
+            value={fmtCurrency(healthcareAmt, cur)}
+            testId="expense-healthcare"
+          />
+          <Row label={t(locale, "labelChildcare")} value={fmtCurrency(childcareAmt, cur)} testId="expense-childcare" />
+          <Row label={t(locale, "labelSchool")} value={fmtCurrency(schoolAmt, cur)} testId="expense-school" />
+          <Row
+            label={t(locale, "labelEssentialsSubtotal")}
+            value={fmtCurrency(essentials, cur)}
+            testId="essentials-subtotal"
+            emphasis="subtotal"
+          />
+          <Row
+            label={t(locale, "labelMonthlyTotal")}
+            value={fmtCurrency(monthlyTotal, cur)}
+            testId="monthly-total"
+            emphasis="total"
+          />
+        </section>
 
-      {country && (
-        <span data-testid="healthcare-badge">{healthcareBadgeLabel(country.healthcareModelType, locale)}</span>
-      )}
-
-      <section aria-label={t(locale, "sectionMonthlyExpenses")}>
-        <dl>
-          <dt>{t(locale, "labelHousing")}</dt>
-          <dd data-testid="expense-housing">{fmtCurrency(housingAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelFood")}</dt>
-          <dd data-testid="expense-food">{fmtCurrency(foodAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelTransport")}</dt>
-          <dd data-testid="expense-transport">{fmtCurrency(transportAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelUtilities")}</dt>
-          <dd data-testid="expense-utilities">{fmtCurrency(utilitiesAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelHealthcareOOP")}</dt>
-          <dd data-testid="expense-healthcare">{fmtCurrency(healthcareAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelChildcare")}</dt>
-          <dd data-testid="expense-childcare">{fmtCurrency(childcareAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelSchool")}</dt>
-          <dd data-testid="expense-school">{fmtCurrency(schoolAmt, cur)}</dd>
-
-          <dt>{t(locale, "labelEssentialsSubtotal")}</dt>
-          <dd data-testid="essentials-subtotal">{fmtCurrency(essentials, cur)}</dd>
-
-          <dt>{t(locale, "labelMonthlyTotal")}</dt>
-          <dd data-testid="monthly-total">{fmtCurrency(monthlyTotal, cur)}</dd>
-        </dl>
-      </section>
-
-      <section aria-label={t(locale, "sectionRelocationCosts")}>
-        <dl>
-          <dt>{t(locale, "labelRelocationSunkCost")}</dt>
-          <dd data-testid="relocation-sunk">{fmtCurrency(relocationSunk, cur)}</dd>
-
-          <dt>{t(locale, "labelLiquidityReserve")}</dt>
-          <dd data-testid="liquidity-reserve">{fmtCurrency(liquidityReserve, cur)}</dd>
-        </dl>
-      </section>
+        <section aria-label={t(locale, "sectionRelocationCosts")} className="space-y-1.5 border-t pt-3 text-sm">
+          <Row
+            label={t(locale, "labelRelocationSunkCost")}
+            value={fmtCurrency(relocationSunk, cur)}
+            testId="relocation-sunk"
+          />
+          <Row
+            label={t(locale, "labelLiquidityReserve")}
+            value={fmtCurrency(liquidityReserve, cur)}
+            testId="liquidity-reserve"
+          />
+        </section>
+      </div>
     </div>
   );
 }

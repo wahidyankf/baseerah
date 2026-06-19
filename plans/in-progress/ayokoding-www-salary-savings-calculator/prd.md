@@ -1034,10 +1034,10 @@ Feature: Salary savings calculator
     Given I am on "/en/tools/cost-of-living-calculator"
     And I switch to the "Minimum role" tab
     And I set the baseline source to "savings target"
-    When I enter a monthly savings target of "2000" USD
+    When I enter a monthly savings target of "8000" USD
     Then I see the software-engineering role ladder with qualifying roles grouped above a divider and non-qualifying roles dimmed below it
-    And the lowest role whose best city reaches at least 2000 USD essential savings is marked as the minimum
-    And roles whose best city cannot reach 2000 USD essential savings are shown below the divider and de-emphasised
+    And the lowest role whose best city reaches at least 8000 USD essential savings is marked as the minimum
+    And roles whose best city cannot reach 8000 USD essential savings are shown below the divider and de-emphasised
 
   Scenario: Roles are labelled as software-engineering roles
     Given I am on the "Minimum role" tab
