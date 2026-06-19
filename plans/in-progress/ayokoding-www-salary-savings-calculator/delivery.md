@@ -1398,6 +1398,40 @@ calculator`) and push to `origin main`. Acceptance: `git log --oneline -1 origin
    step must require reconciliation to the **specific app's** brand tokens. `plan-checker` should
    flag mockups whose colors are raw values with no token mapping.
 
+### 7.7 — Full responsive transform (mobile cards + tablet column-reduction)
+
+> Implemented in-plan (no longer deferred) after the user pushed back on shipping only a
+> horizontal-scroll table. Every breakpoint now matches its mockup (`*-mobile.png` /
+> `*-tablet.png` / desktop) across **all three** tab tables.
+
+- [x] **[AI] Cost-of-living table** (`cost-of-living.tsx`) — three layouts from one computed `rows`
+      array: **desktop (lg+)** full 14-column table; **tablet (md→lg)** the granular per-category
+      columns (`Housing…School`) collapse via `hidden lg:table-cell`, leaving
+      Country/City/Scheme/Essentials/Total/Relocation/Liquidity; **mobile (<md)** a stacked
+      `data-testid="mobile-city-cards"` view, one card per city (blue header = city link + scheme
+      badge, labelled rows, emphasised Essentials/Total). Table rendered before cards in DOM so a
+      country link still precedes its same-named city link (fixed a test that the naive card-first
+      order broke). New unit test asserts one mobile card per city.
+- [x] **[AI] Savings table** (`savings.tsx`) — tablet collapses Net/Essentials/Non-salary/Total-comp
+      (`hidden lg:table-cell`); mobile `data-testid="mobile-savings-cards"` shows Net, Essentials,
+      Essential savings (+%), After-lifestyle savings (+%), Non-salary comp, Total comp, with negative
+      savings in `text-destructive`.
+- [x] **[AI] Min-role table** (`min-role.tsx`) — tablet collapses Track/P25/P75/Non-salary
+      (`DualCell` gained a `className` prop); mobile `data-testid="mobile-role-cards"` renders the
+      ladder as cards in `orderForDisplay` order (qualifying first, then `opacity-60` below-minimum),
+      each card = role + min-marker + track header, Best city, Median, emphasised Essential savings.
+      Table keeps the canonical `minimum-marker` / `qualifying-divider` / `non-qualifying-row`
+      testids (cards are presentational, no duplicate testids).
+- [x] **[AI]** Verified with Playwright MCP at 390 px (mobile cards), 820 px (tablet reduced columns),
+      and 1280 px (full table) on the cost / savings / min-role tabs; `typecheck` + `lint` +
+      `test:unit` (1308) + `specs:coverage` all green.
+
+> **Lesson 9 (responsive is per-breakpoint work, not a CSS afterthought).** The dual-render
+> table+cards pattern (one computed dataset, two DOM views toggled by Tailwind `md:`/`lg:`) is the
+> reusable approach. → A plan with `*-mobile`/`*-tablet` mockups must carry an explicit delivery step
+> **per table per breakpoint** and a Playwright check at each viewport, not a single "make it
+> responsive" line.
+
 ### Phase 7 Gate
 
 > All checks below must pass before re-running Phase 6 archival. **§7.6 above is the authoritative
@@ -1405,11 +1439,16 @@ calculator`) and push to `origin main`. Acceptance: `git log --oneline -1 origin
 > the bugs found in review are logged in 7.6).
 
 - [x] [AI] `npx nx run ayokoding-www:specs:coverage` — green (15 specs, 116 scenarios, 402 steps, all covered) after the min-role scenario target change (2000→8000).
-- [x] [AI] `npx nx run ayokoding-www:typecheck lint test:unit` — all green (1307 unit tests pass; lint warnings only, no errors).
-- [ ] [AI] CI green on `main` for the styling commit (`gh run list --limit 5 --json status,conclusion,name`).
-- [ ] [AI] Production re-deploy `state: success`; Playwright MCP screenshots of all three tabs (both locales) confirmed to match the `assets/` mockups (brand-blue tabs/toggles, green/amber/red scheme badges, segmented toggles, labelled preview).
-- [ ] [AI] **Deferred (tracked, not blocking this gate):** full mobile **card transform** + tablet **column-reduction** per the `*-mobile.png` / `*-tablet.png` mockups; healthcare-scheme badge **columns** on the Savings + Min-role tables (net-new columns). These remain open follow-ups recorded in §7.6.
+- [x] [AI] `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` — all green (1308 unit tests pass; lint warnings only, no errors; 15 specs/116 scenarios/402 steps covered).
+- [x] [AI] Full responsive transform shipped for all three tables (§7.7) — mobile cards / tablet reduced columns / desktop table verified at 390/820/1280 px.
+- [ ] [AI] CI green on `main` for the styling + responsive commits (`gh run list --limit 5 --json status,conclusion,name`).
+- [ ] [AI] Production re-deploy `state: success`; Playwright MCP screenshots of all three tabs (both locales) confirmed to match the `assets/` mockups (brand-blue tabs/toggles, green/amber/red scheme badges, segmented toggles, labelled preview, responsive cards/columns).
+- [ ] [AI] **Deferred (tracked, not blocking this gate):** healthcare-scheme badge **columns** on the Savings + Min-role _desktop_ tables (net-new data columns, distinct from the responsive work above). Open follow-up recorded in §7.6.
 
+> **Archival hold (per user instruction 2026-06-19):** do NOT move this plan back to `plans/done/`
+> until the user explicitly approves. The plan stays in `plans/in-progress/` with Phase 6 archival
+> boxes unticked.
+>
 > **Pause Safety**: design-parity styling live in production and visually verified against the
 > approved mockups. Safe to stop. To resume, proceed to **Phase 6 — Plan Archival** (re-run the
 > `git mv` to `done/`, README updates, and worktree cleanup).
