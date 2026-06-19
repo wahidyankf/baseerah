@@ -135,4 +135,5 @@ Never paste secrets or credential material — see no-secrets rule. -->
 
 ## Index
 
+- **[ayokoding-www Calculator — Bland, Buggy UI Shipped Past Green Gates](./2026-06-19-ui-design-parity-shipped-past-green-gates.md)** (2026-06-19, Sev-3) — A user-facing calculator was validated to zero findings, archived to `plans/done/`, and deployed bland, off-design, and carrying two calculation bugs while every automated gate was green. Root cause: the done/archival criterion had no production visual or value-bearing sign-off. Fixed and codified as the [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md) (14 rules).
 - **[Amazon Q Bindings Prettier Parity Guard Break](./2026-05-03-amazonq-bindings-prettier-parity-guard-break.md)** (2026-05-03, Sev-3) — Prettier's post-tool hook reformatted emitter-generated `.amazonq/**` binding artifacts, breaking the `validate:cross-vendor-parity` byte-equality guard on every Edit operation. Fixed by adding emitter-generated paths to `.prettierignore`.
