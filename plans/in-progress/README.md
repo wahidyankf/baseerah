@@ -4,7 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [ayokoding-www-calc-exploratory-findings](./ayokoding-www-calc-exploratory-findings/README.md) — Exploratory testing of the cost-of-living calculator surfaced 7 defects (4 Major, 3 Minor) and 4 spec gaps. Major: geo-filter dropdowns not seeded from `?country=`/`?city=` deep links, `html lang="en"` on `/id/` pages (WCAG 3.1.1 Level A), and the desktop table showing English city/country names on the Indonesian locale while mobile cards show Indonesian. Core calculator math verified correct.
+- [ayokoding-www-calc-exploratory-findings](./ayokoding-www-calc-exploratory-findings/README.md) — Spec-aware exploratory testing of the cost-of-living calculator. After a 2026-06-19 re-run, **13 defects** (5 Major, 8 Minor) and **6 spec gaps** are open; all 7 original findings re-verified STILL-PRESENT. Major: geo-filter dropdowns not seeded from `?country=`/`?city=` deep links, `html lang="en"` on `/id/` pages (WCAG 3.1.1 Level A), English city/country names on the Indonesian desktop table, the Housing column ignoring the rural area discount, and confidence flags missing on the Cost-of-Living/Savings tabs. Core calculator math verified correct.
+- [ayokoding-www-calc-usability-findings](./ayokoding-www-calc-usability-findings/README.md) — Spec-blind heuristic usability evaluation of the same cost-of-living calculator (Nielsen 10 heuristics + 0–4 severity, cognitive walkthrough, information scent, responsive mobile/tablet/desktop, URL naturalness). Judges only what a first-time user perceives. Findings catalogued as UWT-001…UWT-014 with a per-task cognitive walkthrough in `walkthrough.md`.
 
 ## Instructions
 

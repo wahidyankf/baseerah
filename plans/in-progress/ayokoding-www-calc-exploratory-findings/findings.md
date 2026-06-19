@@ -1,8 +1,27 @@
 # Findings — Cost-of-Living Calculator Exploratory Testing
 
-**Session date**: 2026-06-19
+**Session date**: 2026-06-19 (initial); 2026-06-19 (re-run, merged)
 **Tester agent**: `web-exploratory-tester`
 **Ground truth**: `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
+
+---
+
+## Re-verification of prior findings (2026-06-19 re-run)
+
+A second spec-aware exploratory pass re-checked every original finding. All seven remain open — none
+show evidence of a fix attempt.
+
+| ID      | Verdict       | Evidence                                                                                                                 |
+| ------- | ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| EWT-001 | STILL-PRESENT | `?country=id` sets country select value to `""`; table filters to 1 row but both dropdowns show "All countries/regions". |
+| EWT-002 | STILL-PRESENT | `?city=jakarta` sets city select value to `""`; city detail renders, filter dropdown shows "All cities".                 |
+| EWT-003 | STILL-PRESENT | `html lang` on `/id/` = `"en"` on dev **and** production; root `layout.tsx` hardcodes `lang="en"`.                       |
+| EWT-004 | STILL-PRESENT | Desktop country column on `/id/` returns English names; `cost-of-living.tsx` still uses `.name.en`.                      |
+| EWT-005 | STILL-PRESENT | Min-role `/id/` best-city text still English (`Austin, United States`); `min-role.tsx` still `.name.en`.                 |
+| EWT-006 | STILL-PRESENT | Sort button measured `h: 20`, `paddingTop/Bottom: 0px`. No change.                                                       |
+| EWT-007 | STILL-PRESENT | Salary input `min` attribute is `null`; annual gross at `−1000` shows `−12,000 USD`. No validation added.                |
+
+The re-run also surfaced six new defects (EWT-008…EWT-013) and two new spec gaps (SG-005, SG-006).
 
 ---
 
@@ -274,3 +293,260 @@ Annual gross at -1000 input: -12,000 USD
 
 - `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.tsx` ~line 98: add `min="0"` to gross salary `<input type="number">`.
 - `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.tsx`: add `min="0"` to `#target-amount-input` and `#my-gross-input`.
+
+---
+
+## EWT-008 — Housing column displays base (city-center) amount when Rural area is selected
+
+- **Severity**: Major
+- **Priority**: Medium
+- **Area**: Functional / Cost-of-Living Tab / Cost Basis Controls
+- **Defect type**: Functional
+- **Reproducibility**: Always
+
+**Environment**
+
+URL: `http://localhost:3101/en/tools/cost-of-living-calculator`
+Browser: Chromium (Playwright), viewport 1440 x 900
+
+**Steps to reproduce**
+
+1. Open the Cost-of-Living tab (default tab on load).
+2. Observe the Housing column for any city (e.g. Jakarta: `8,000,000 IDR`; Singapore: `3,500 SGD`).
+3. Click the "Rural" area button in the cost-basis controls.
+4. Wait for values to recalculate (~500 ms).
+5. Observe the Housing column value.
+
+**Expected result**
+
+Per spec `cost-of-living-calculator.feature > Scenario: Rural area lowers housing versus city center`: the housing expense decreases when Rural is selected. The Housing column should reflect the discounted value: `city.expenses.housing.amount × AREA_MULTIPLIERS["rural"]` (0.75). For Jakarta: `8,000,000 × 0.75 = 6,000,000 IDR`. The displayed per-row Housing figure should match the value used in the Essentials calculation.
+
+**Actual result**
+
+Housing column: `8,000,000 IDR` (unchanged — same as City Center). Essentials column: drops correctly from `13,700,000` to `11,700,000` (a `2,000,000` IDR reduction = `8,000,000 × 0.25`), confirming the calculation applies the 0.75 multiplier internally. The Housing cell displays the base/center amount while the total uses the discounted amount — a display/calculation split. Confirmed identically for Singapore (`3,500 SGD` housing stays unchanged while Essentials drops from `4,328` to `3,453`).
+
+**Evidence**
+
+```
+Jakarta Housing before rural: 8,000,000 IDR
+Jakarta Housing after rural:  8,000,000 IDR  (no change — wrong)
+Jakarta Essentials before rural: 13,700,000 IDR
+Jakarta Essentials after rural:  11,700,000 IDR  (correctly discounted)
+Expected housing after rural: 8,000,000 × 0.75 = 6,000,000 IDR
+```
+
+**Suggested fix locus**
+
+`apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx` line 57: `housing: e.housing.amount` — replace with `housing: e.housing.amount * AREA_MULTIPLIERS[area]` (or extract a `housingLocal(city, area)` helper matching the pattern of `essentialsLocal`). The `area` prop is already passed to `CostOfLivingTable` (line 47).
+
+---
+
+## EWT-009 — Calculator page `<title>` is the generic site name, not the page name
+
+- **Severity**: Minor
+- **Priority**: Medium
+- **Area**: URL / IA Quality / SEO / Meta
+- **Defect type**: Content / Functional
+- **Reproducibility**: Always
+
+**Environment**
+
+URL: `http://localhost:3101/en/tools/cost-of-living-calculator` and production `https://www.ayokoding.com/en/tools/cost-of-living-calculator`
+Verified via `page.title()` in Playwright and `curl … | grep '<title>'` on production.
+
+**Steps to reproduce**
+
+1. Open `http://localhost:3101/en/tools/cost-of-living-calculator` in a browser.
+2. Read the browser tab title (or `document.title`).
+
+**Expected result**
+
+Per `apps/ayokoding-www/src/app/layout.tsx` line 9 (`template: "%s | AyoKoding"`): any page that exports its own `metadata.title` gets a composed title like `"Salary Savings Calculator | AyoKoding"`. The H1 is `"Salary Savings Calculator"` — the page has a clear identity; the title should express it. Browsers, screen readers, history, search engines, and link-sharing previews all rely on the `<title>`.
+
+**Actual result**
+
+Title on both dev and production: `"AyoKoding"` (the default fallback). The `/en/tools/cost-of-living-calculator/page.tsx` exports no `metadata` or `generateMetadata`, so the title template never fires. `/id/` page title is also `"AyoKoding"` (no Indonesian equivalent exposed). No `og:title`, no `twitter:title`, and the meta description is the generic site description rather than a calculator-specific one.
+
+**Evidence**
+
+```
+Dev: document.title = "AyoKoding"
+Prod: <title>AyoKoding</title>
+H1: "Salary Savings Calculator"
+OG title: none
+Meta description: "Bilingual educational platform for software engineering - helping the Indonesian tech community learn and grow"
+```
+
+**Suggested fix locus**
+
+`apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/page.tsx` — add a `generateMetadata` that returns a locale-specific `title` (`"Salary Savings Calculator"` / `"Kalkulator Tabungan Gaji"`), a calculator-specific `description`, and matching `openGraph` fields so the title template fires.
+
+---
+
+## EWT-010 — Footer links below WCAG 2.5.8 minimum touch target at mobile viewports
+
+- **Severity**: Minor
+- **Priority**: Low
+- **Area**: Accessibility / Footer
+- **Defect type**: Accessibility
+- **Reproducibility**: Always
+
+**Environment**
+
+URL: `http://localhost:3101/en/tools/cost-of-living-calculator`
+Browser: Chromium (Playwright), viewport 375 × 812 (mobile)
+
+**Steps to reproduce**
+
+1. Open the page at 375 px viewport.
+2. Scroll to the footer.
+3. Measure the rendered height of the "FSL-1.1-MIT" and "Source-Available Project" links.
+
+**Expected result**
+
+WCAG 2.5.8 (Level AA, Target Size Minimum): interactive targets must be ≥ 24 × 24 CSS px, or have adjacent offset spacing providing equivalent effective target area.
+
+**Actual result**
+
+- `FSL-1.1-MIT` link: height `17 px`, width `77 px`, no padding or margin. Parent element height `20 px`. Effective area `17 px` — below the 24 px threshold with no offset spacing to compensate.
+- `Source-Available Project` link: height `20 px`, width `158 px`, no padding or margin. Effective area `20 px` — also below threshold.
+
+Both links lack the CSS spacing that would qualify them under the "offset spacing" exception.
+
+**Evidence**
+
+```
+FSL-1.1-MIT:          h=17, w=77,  parentH=20, padding="0px 0px"
+Source-Available:     h=20, w=158, parentH=48, padding="0px 0px"
+```
+
+**Suggested fix locus**
+
+Footer link component (rendered by `apps/ayokoding-www/src/features/app-shell/shell/footer.tsx` — exact line TBD): add `py-2` (adds `8 px` top+bottom padding → effective height ≥ 33 px) or wrap in an element with `min-h-6` to meet the 24 px threshold.
+
+---
+
+## EWT-011 — Nav header causes horizontal overflow (8 px) at 320 px viewport
+
+- **Severity**: Minor
+- **Priority**: Low
+- **Area**: Responsive / Navigation
+- **Defect type**: Responsive
+- **Reproducibility**: Always at 320 px; absent at 375 px and above
+
+**Environment**
+
+URL: `http://localhost:3101/en/tools/cost-of-living-calculator`
+Browser: Chromium (Playwright), viewport 320 × 568
+
+**Steps to reproduce**
+
+1. Open the page at 320 px viewport width (Galaxy S5/SE baseline).
+2. Observe `document.body.scrollWidth` vs `document.body.clientWidth`.
+3. Observe the "Toggle theme" button in the header.
+
+**Expected result**
+
+Per WCAG 1.4.10 (Reflow, Level AA): content must reflow at 320 px without horizontal scrolling. No element should extend beyond the viewport, requiring the user to scroll horizontally to access content.
+
+**Actual result**
+
+`document.body.scrollWidth = 328`, `document.body.clientWidth = 320` — 8 px horizontal overflow. The offending element is the "Toggle theme" button (id `radix-_R_1r6kndlb_`): `left: 292 px, width: 36 px → right: 328 px`. The nav header flex row `mx-auto flex h-16 max-w-screen-2xl items-center gap-4 px-4` pushes the theme button 8 px off-screen at 320 px.
+
+**Evidence**
+
+```
+body.scrollWidth=328, body.clientWidth=320 (overflow: true) at 320px
+Offending element: BUTTON id=radix-_R_1r6kndlb_ (Toggle theme)
+  right=328, left=292, width=36
+Parent: DIV.mx-auto.flex.h-16.max-w-screen-2xl.items-center.gap-4.px-4
+Viewport 375px: overflow false (not affected)
+```
+
+**Suggested fix locus**
+
+`apps/ayokoding-www/src/features/app-shell/shell/header.tsx` — the nav bar flex row at 320 px overflows. Fix: reduce `gap-4` to `gap-2` at the smallest breakpoint, or add `min-w-0` on flex children to allow shrinking, or hide the theme toggle at the smallest breakpoint and include it in the mobile menu.
+
+---
+
+## EWT-012 — Calculator page absent from `sitemap.xml`
+
+- **Severity**: Minor
+- **Priority**: Low
+- **Area**: URL / IA Quality / SEO
+- **Defect type**: Content
+- **Reproducibility**: Always
+
+**Environment**
+
+Production: `https://www.ayokoding.com/sitemap.xml` fetched via `curl`.
+
+**Steps to reproduce**
+
+1. Fetch `https://www.ayokoding.com/sitemap.xml`.
+2. Search for `cost-of-living-calculator` or `tools`.
+
+**Expected result**
+
+A canonical public tool page (available at `/en/tools/cost-of-living-calculator` and `/id/tools/cost-of-living-calculator`) should be included in `sitemap.xml` so search engines can discover and index it.
+
+**Actual result**
+
+Neither `/en/tools/cost-of-living-calculator` nor `/id/tools/cost-of-living-calculator` appears in the sitemap. The `apps/ayokoding-www/src/app/sitemap.ts` only iterates `contentService.getIndex()` (markdown-based content pages); tool pages under `/tools/` are not registered.
+
+**Evidence**
+
+```
+curl https://www.ayokoding.com/sitemap.xml | grep "cost-of-living" → no output
+sitemap.ts: only loops contentService.getIndex(); no tool URL entries
+```
+
+**Suggested fix locus**
+
+`apps/ayokoding-www/src/app/sitemap.ts` — append static entries for the tool URLs after the content loop, or extend `contentService` to include tool routes. At minimum add both `/en/tools/cost-of-living-calculator` and `/id/tools/cost-of-living-calculator`.
+
+---
+
+## EWT-013 — Confidence flags absent from Cost-of-Living and Savings tabs
+
+- **Severity**: Major
+- **Priority**: Medium
+- **Area**: Functional / Confidence Flagging / Cost-of-Living Tab / Savings Tab
+- **Defect type**: Functional
+- **Reproducibility**: Always
+
+**Environment**
+
+URL: `http://localhost:3101/en/tools/cost-of-living-calculator`
+Browser: Chromium (Playwright), viewport 1440 x 900
+
+**Steps to reproduce**
+
+1. Open the Cost-of-Living tab.
+2. Inspect the Healthcare (OOP), Childcare, and School columns for any city.
+3. Check for a confidence-flag indicator (the `[data-testid="confidence-flag"]` span used in the Minimum-Role tab, or equivalent).
+4. Repeat on the Savings tab (Essentials column).
+
+**Expected result**
+
+Per spec `cost-of-living-calculator.feature > Scenario: Low-confidence cells are flagged`: "any cell backed by a lower-confidence estimate shows a confidence flag." The data in `cities.ts` marks many cells as `"moderate"` confidence (e.g. Jakarta healthcare `500,000 IDR`, Bangkok childcare `15,000 THB`, Singapore lifestyle `250 SGD`, Dubai school-public `1,000 AED` as `"proxy"`). The Min-Role tab correctly shows `[proxy]` via `data-testid="confidence-flag"` for lower-confidence best-city cells. The same mechanism should apply to Cost-of-Living and Savings cell values.
+
+**Actual result**
+
+Neither the Cost-of-Living tab nor the Savings tab renders any confidence flag. `cost-of-living.tsx` has zero references to `confidence`. `savings.tsx` also has zero references. Only `min-role.tsx` (lines 135–137) implements the confidence flag. All `"moderate"`- and `"proxy"`-confidence values in the two larger tables are displayed without any qualifier.
+
+**Evidence**
+
+```
+cost-of-living.tsx: grep "confidence" → 0 matches
+savings.tsx:        grep "confidence" → 0 matches
+min-role.tsx:       confidence flag at lines 135-137 (works correctly)
+Playwright: data-testid="confidence-flag" count on cost tab = 0
+            data-testid="confidence-flag" count on savings tab = 0
+cities.ts: 268 matches for "moderate"/"proxy"; many in healthcare, childcare, school, lifestyle columns
+```
+
+**Suggested fix locus**
+
+- `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx` — add per-cell confidence from `city.expenses.<category>.confidence` and render a `<span data-testid="confidence-flag">` for `moderate` and `proxy` values, following the pattern in `min-role.tsx` line 135.
+- `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.tsx` — same for the Essentials cell where the constituting expense values include lower-confidence data.

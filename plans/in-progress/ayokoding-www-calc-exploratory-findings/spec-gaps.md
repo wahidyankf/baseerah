@@ -121,3 +121,81 @@ city name opens its single-city cost-of-living detail" does not include the back
 ```
 
 **Target spec file**: extend existing "Clicking a city name opens its single-city cost-of-living detail" scenario or add a new scenario in `cost-of-living-calculator.feature`.
+
+---
+
+## SG-005 — Housing column value should reflect the area discount (rural vs city center)
+
+**Observed behaviour**
+
+On the Cost-of-Living tab, selecting "Rural" correctly reduces the Essentials and Total columns (the
+`essentialsLocal()` function applies `AREA_MULTIPLIERS["rural"] = 0.75` to housing). However the Housing
+column still shows the base/center rate. A correct expected behaviour is that the Housing cell should
+agree with the value used in the Essentials sum.
+
+This is recorded as a spec gap rather than folded into EWT-008 because the _intended_ contract — whether
+the Housing column should show the discounted or base amount — is not stated explicitly in the spec. The
+current code's split (column shows base, total uses discounted) is internally inconsistent and could be
+either a bug or an intentional "show the base reference price" UX choice. The maintainer should decide and
+the spec should encode the decision.
+
+**Why spec-worthy**
+
+No existing scenario describes what the Housing column should display when Rural is selected. The current
+scenarios test that "rural area lowers housing versus city center" (total) but do not assert the Housing
+column value. Adding a scenario pins the correct contract.
+
+**Proposed Gherkin**
+
+```gherkin
+  Scenario: Housing column reflects the area-adjusted rate
+    Given I am on the "Cost of living" tab
+    And the area is set to "City center"
+    When I read the Housing column for Jakarta
+    Then the Housing value is the city-center base rate for Jakarta
+    When I switch the area to "Rural"
+    Then the Housing value decreases to the rural-discounted rate (base × 0.75)
+    And the Essentials value equals Housing (rural) plus the other modeled expenses
+```
+
+**Target spec file**: extend `cost-of-living-calculator.feature` under the "Cost basis controls" section, as a follow-on to the existing `Scenario: Rural area lowers housing versus city center`.
+
+---
+
+## SG-006 — Confidence flag coverage extends to Cost-of-Living and Savings tab cells
+
+**Observed behaviour**
+
+The Min-Role tab correctly shows a `[proxy]` confidence flag next to best-city cells backed by
+proxy-confidence data (observed when the Indonesia filter is applied, making Jakarta — which has a
+`"proxy"` school entry — the best city). The Cost-of-Living and Savings tabs render cells backed by
+`"moderate"`-confidence data (healthcare, childcare, lifestyle, relocation for many cities) without any
+flag.
+
+The existing spec scenario `Scenario: Low-confidence cells are flagged` is broad ("Given I am on the
+calculator") but has no step that names a specific tab. Adding a scenario per tab pins the cross-tab
+coverage contract.
+
+**Why spec-worthy**
+
+No scenario asserts that confidence flags appear on the Cost-of-Living or Savings tabs. Without this,
+adding flags to those tabs would require no spec change and removing them later would be invisible to the
+test suite.
+
+**Proposed Gherkin**
+
+```gherkin
+  Scenario: Confidence flags appear in Cost-of-Living table for lower-confidence cells
+    Given I am on the "Cost of living" tab
+    When the page finishes loading
+    Then any cell whose underlying data has "moderate" or "proxy" confidence shows a confidence flag
+    And cells with "high" confidence show no flag
+
+  Scenario: Confidence flags appear in Savings table for lower-confidence cities
+    Given I am on the "Savings" tab
+    And I enter a gross monthly salary
+    When the savings table renders
+    Then any Essentials cell for a city whose healthcare or childcare data has moderate confidence shows a confidence flag
+```
+
+**Target spec file**: extend `cost-of-living-calculator.feature` — add after the existing `Scenario: Low-confidence cells are flagged`.
