@@ -84,10 +84,10 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
   const nonQualifying = ordered.filter((e) => !e.clears);
   const noQualifiers = baselineReady && minRole === null;
 
-  function DualCell({ usdVal, cityCurrency }: { usdVal: number; cityCurrency: string }) {
+  function DualCell({ usdVal, cityCurrency, className }: { usdVal: number; cityCurrency: string; className?: string }) {
     const conv = toDisplayCurrencies(fx, usdVal, cityCurrency, displayCurrency);
     return (
-      <TableCell data-testid="dual-currency-cell">
+      <TableCell data-testid="dual-currency-cell" className={className}>
         <span data-line="display">{fmtCurrencyTrailing(conv.display, displayCurrency)}</span>
         <span data-line="local" className="block text-xs text-muted-foreground">
           {fmtCurrencyTrailing(conv.local, cityCurrency)}
@@ -129,7 +129,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
             </span>
           )}
         </TableCell>
-        <TableCell>{entry.track}</TableCell>
+        <TableCell className="hidden lg:table-cell">{entry.track}</TableCell>
         <TableCell data-testid="best-city-cell">
           {entry.bestCity.name.en}, {entry.bestCountry.name.en}
           {(entry.confidence === "proxy" || entry.confidence === "moderate") && (
@@ -138,11 +138,21 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
             </span>
           )}
         </TableCell>
-        <DualCell usdVal={entry.distributionUsd.p25} cityCurrency={entry.bestCity.currency} />
+        <DualCell
+          usdVal={entry.distributionUsd.p25}
+          cityCurrency={entry.bestCity.currency}
+          className="hidden lg:table-cell"
+        />
         <DualCell usdVal={entry.distributionUsd.median} cityCurrency={entry.bestCity.currency} />
-        <DualCell usdVal={entry.distributionUsd.p75} cityCurrency={entry.bestCity.currency} />
+        <DualCell
+          usdVal={entry.distributionUsd.p75}
+          cityCurrency={entry.bestCity.currency}
+          className="hidden lg:table-cell"
+        />
         <SavingsCell entry={entry} />
-        <TableCell className="text-right">{fmtCurrencyTrailing(entry.nonSalaryCompUsd, "USD")}</TableCell>
+        <TableCell className="hidden text-right lg:table-cell">
+          {fmtCurrencyTrailing(entry.nonSalaryCompUsd, "USD")}
+        </TableCell>
       </TableRow>
     );
   }
@@ -278,38 +288,82 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
       {/* No qualifiers message */}
       {noQualifiers && <p data-testid="no-qualifier-message">{t(locale, "noQualifierMessage")}</p>}
 
-      <Table>
-        <TableCaption data-testid="se-roles-caption">{t(locale, "seRolesCaption")}</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t(locale, "colRole")}</TableHead>
-            <TableHead>{t(locale, "colTrack")}</TableHead>
-            <TableHead>{t(locale, "colBestCity")}</TableHead>
-            <TableHead>{t(locale, "colP25")}</TableHead>
-            <TableHead>{t(locale, "colMedian")}</TableHead>
-            <TableHead>{t(locale, "colP75")}</TableHead>
-            <TableHead>{t(locale, "colEssentialSavings")}</TableHead>
-            <TableHead>{t(locale, "colNonSalaryCompInfo")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {qualifying.map((entry) => (
-            <RoleRow key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
-          ))}
-
-          {qualifying.length > 0 && nonQualifying.length > 0 && (
-            <TableRow data-testid="qualifying-divider">
-              <TableCell colSpan={8} className="text-center text-xs text-muted-foreground">
-                {t(locale, "qualifyingDivider")}
-              </TableCell>
+      {/* Tablet + desktop (md+): table. Track / P25 / P75 / non-salary columns collapse on tablet. */}
+      <div className="hidden overflow-x-auto md:block">
+        <Table>
+          <TableCaption data-testid="se-roles-caption">{t(locale, "seRolesCaption")}</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t(locale, "colRole")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colTrack")}</TableHead>
+              <TableHead>{t(locale, "colBestCity")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colP25")}</TableHead>
+              <TableHead>{t(locale, "colMedian")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colP75")}</TableHead>
+              <TableHead>{t(locale, "colEssentialSavings")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colNonSalaryCompInfo")}</TableHead>
             </TableRow>
-          )}
+          </TableHeader>
+          <TableBody>
+            {qualifying.map((entry) => (
+              <RoleRow key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
+            ))}
 
-          {nonQualifying.map((entry) => (
-            <RoleRow key={entry.role} entry={entry} isMin={false} dimmed={true} />
-          ))}
-        </TableBody>
-      </Table>
+            {qualifying.length > 0 && nonQualifying.length > 0 && (
+              <TableRow data-testid="qualifying-divider">
+                <TableCell colSpan={8} className="text-center text-xs text-muted-foreground">
+                  {t(locale, "qualifyingDivider")}
+                </TableCell>
+              </TableRow>
+            )}
+
+            {nonQualifying.map((entry) => (
+              <RoleRow key={entry.role} entry={entry} isMin={false} dimmed={true} />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile (<md): stacked role cards (qualifying first, divider, then dimmed below-minimum) */}
+      <div data-testid="mobile-role-cards" className="space-y-3 md:hidden">
+        {ordered.map((entry) => {
+          const isMin = entry.role === minRole;
+          const dimmed = !entry.clears;
+          const rowLabel = matrix.ladder.find((r) => r.role === entry.role)?.label.en ?? entry.role;
+          const med = toDisplayCurrencies(fx, entry.distributionUsd.median, entry.bestCity.currency, displayCurrency);
+          const sav = toDisplayCurrencies(fx, entry.bestEssentialSavingsUsd, entry.bestCity.currency, displayCurrency);
+          return (
+            <div
+              key={entry.role}
+              className={`overflow-hidden rounded-lg border bg-card shadow-sm ${dimmed ? "opacity-60" : ""}`}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 bg-primary px-3 py-2 text-primary-foreground">
+                <span className="font-semibold">
+                  {rowLabel}
+                  {isMin && <span className="ml-1 text-xs font-bold">{t(locale, "minimumMarker")}</span>}
+                </span>
+                <span className="text-xs text-primary-foreground/80">{entry.track}</span>
+              </div>
+              <div className="space-y-1 p-3 text-sm">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-muted-foreground">{t(locale, "colBestCity")}</span>
+                  <span>
+                    {entry.bestCity.name.en}, {entry.bestCountry.name.en}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-muted-foreground">{t(locale, "colMedian")}</span>
+                  <span className="tabular-nums">{fmtCurrencyTrailing(med.display, displayCurrency)}</span>
+                </div>
+                <div className="flex items-baseline justify-between border-t pt-1.5 font-medium">
+                  <span className="text-muted-foreground">{t(locale, "colEssentialSavings")}</span>
+                  <span className="tabular-nums">{fmtCurrencyTrailing(sav.display, displayCurrency)}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

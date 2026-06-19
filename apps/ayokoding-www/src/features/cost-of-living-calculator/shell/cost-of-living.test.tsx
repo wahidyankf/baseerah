@@ -121,4 +121,14 @@ describe("CostOfLivingTable", () => {
       expect(links[0]).toHaveAttribute("href", `?tab=cost&country=${country.id}`);
     }
   });
+
+  // Responsive parity: mobile stacked-card view exists alongside the table (toggled by CSS),
+  // one card per city, each card a city link. (Desktop/tablet use the table.)
+  it("renders a mobile city-card view with one card per city", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+    const cards = screen.getByTestId("mobile-city-cards");
+    expect(cards).toBeTruthy();
+    const cityLinks = cards.querySelectorAll('a[href^="?tab=cost&city="]');
+    expect(cityLinks.length).toBe(dataset.cities.length);
+  });
 });

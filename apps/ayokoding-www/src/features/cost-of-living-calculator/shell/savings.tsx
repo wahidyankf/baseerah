@@ -26,6 +26,16 @@ function pct(part: number, whole: number): string {
   return `${Math.round((part / whole) * 100)}%`;
 }
 
+// One labelled row inside a mobile savings card.
+function CardRow({ label, value, negative }: { label: string; value: string; negative?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={negative ? "text-destructive tabular-nums" : "tabular-nums"}>{value}</span>
+    </div>
+  );
+}
+
 // Use "senior_swe" as the canonical "typical" non-salary comp reference
 const REFERENCE_ROLE = "senior_swe" as const;
 
@@ -97,69 +107,102 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
         {t(locale, "nonSalaryCompNote")}
       </p>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t(locale, "colCountry")}</TableHead>
-            <TableHead>{t(locale, "colCity")}</TableHead>
-            <TableHead>{t(locale, "colNet")}</TableHead>
-            <TableHead>{t(locale, "colEssentials")}</TableHead>
-            <TableHead>
-              <button type="button" onClick={() => setSortAsc((v) => !v)} aria-label={t(locale, "sortBySavings")}>
-                {t(locale, "colSavingsEssential")}
-              </button>
-            </TableHead>
-            <TableHead>{t(locale, "colSavingsLifestyle")}</TableHead>
-            <TableHead>{t(locale, "colNonSalaryComp")}</TableHead>
-            <TableHead>{t(locale, "colTotalComp")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sorted.map(
-            ({
-              city,
-              country,
-              net,
-              essUsd,
-              essentialSavings,
-              afterLifestyle,
-              nonSalaryUsd,
-              totalCompUsd,
-              hasSubNational,
-            }) => (
-              <TableRow key={city.id}>
-                <TableCell>
-                  <a href={`?tab=cost&country=${city.countryId}`}>{country.name.en}</a>
-                </TableCell>
-                <TableCell>
-                  <a href={`?tab=cost&city=${city.id}`}>{city.name.en}</a>
-                </TableCell>
-                <TableCell data-testid="net-value" data-usd={net} className="text-right">
-                  {fmtNum(net)}
-                  {hasSubNational && (
-                    <span data-testid="sub-national-indicator" className="ml-1 text-xs">
-                      {t(locale, "subNationalIndicator")}
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">{fmtNum(essUsd)}</TableCell>
-                <TableCell
-                  data-testid="savings-essential"
-                  data-usd={essentialSavings}
-                  className={`text-right ${essentialSavings < 0 ? "text-destructive" : ""}`}
-                >
-                  {fmtNum(essentialSavings)} ({pct(essentialSavings, net)})
-                </TableCell>
-                <TableCell className="text-right">
-                  {fmtNum(afterLifestyle)} ({pct(afterLifestyle, net)})
-                </TableCell>
-                <TableCell className="text-right">{fmtNum(nonSalaryUsd)}</TableCell>
-                <TableCell className="text-right">{fmtNum(totalCompUsd)}</TableCell>
-              </TableRow>
-            ),
-          )}
-        </TableBody>
-      </Table>
+      {/* Tablet + desktop (md+): table. Net / Essentials / comp columns collapse on tablet. */}
+      <div className="hidden overflow-x-auto md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t(locale, "colCountry")}</TableHead>
+              <TableHead>{t(locale, "colCity")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colNet")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colEssentials")}</TableHead>
+              <TableHead>
+                <button type="button" onClick={() => setSortAsc((v) => !v)} aria-label={t(locale, "sortBySavings")}>
+                  {t(locale, "colSavingsEssential")}
+                </button>
+              </TableHead>
+              <TableHead>{t(locale, "colSavingsLifestyle")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colNonSalaryComp")}</TableHead>
+              <TableHead className="hidden lg:table-cell">{t(locale, "colTotalComp")}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sorted.map(
+              ({
+                city,
+                country,
+                net,
+                essUsd,
+                essentialSavings,
+                afterLifestyle,
+                nonSalaryUsd,
+                totalCompUsd,
+                hasSubNational,
+              }) => (
+                <TableRow key={city.id}>
+                  <TableCell>
+                    <a href={`?tab=cost&country=${city.countryId}`}>{country.name.en}</a>
+                  </TableCell>
+                  <TableCell>
+                    <a href={`?tab=cost&city=${city.id}`}>{city.name.en}</a>
+                  </TableCell>
+                  <TableCell data-testid="net-value" data-usd={net} className="hidden text-right lg:table-cell">
+                    {fmtNum(net)}
+                    {hasSubNational && (
+                      <span data-testid="sub-national-indicator" className="ml-1 text-xs">
+                        {t(locale, "subNationalIndicator")}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="hidden text-right lg:table-cell">{fmtNum(essUsd)}</TableCell>
+                  <TableCell
+                    data-testid="savings-essential"
+                    data-usd={essentialSavings}
+                    className={`text-right ${essentialSavings < 0 ? "text-destructive" : ""}`}
+                  >
+                    {fmtNum(essentialSavings)} ({pct(essentialSavings, net)})
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmtNum(afterLifestyle)} ({pct(afterLifestyle, net)})
+                  </TableCell>
+                  <TableCell className="hidden text-right lg:table-cell">{fmtNum(nonSalaryUsd)}</TableCell>
+                  <TableCell className="hidden text-right lg:table-cell">{fmtNum(totalCompUsd)}</TableCell>
+                </TableRow>
+              ),
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile (<md): stacked savings cards */}
+      <div data-testid="mobile-savings-cards" className="space-y-3 md:hidden">
+        {sorted.map((r) => (
+          <div key={r.city.id} className="overflow-hidden rounded-lg border bg-card shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 bg-primary px-3 py-2 text-primary-foreground">
+              <a href={`?tab=cost&city=${r.city.id}`} className="font-semibold underline">
+                {r.city.name[locale] ?? r.city.name.en}
+              </a>
+              <span className="text-xs text-primary-foreground/80">{r.country.name[locale] ?? r.country.name.en}</span>
+            </div>
+            <div className="space-y-1 p-3">
+              <CardRow label={t(locale, "colNet")} value={fmtNum(r.net)} />
+              <CardRow label={t(locale, "colEssentials")} value={fmtNum(r.essUsd)} />
+              <CardRow
+                label={t(locale, "colSavingsEssential")}
+                value={`${fmtNum(r.essentialSavings)} (${pct(r.essentialSavings, r.net)})`}
+                negative={r.essentialSavings < 0}
+              />
+              <CardRow
+                label={t(locale, "colSavingsLifestyle")}
+                value={`${fmtNum(r.afterLifestyle)} (${pct(r.afterLifestyle, r.net)})`}
+                negative={r.afterLifestyle < 0}
+              />
+              <CardRow label={t(locale, "colNonSalaryComp")} value={fmtNum(r.nonSalaryUsd)} />
+              <CardRow label={t(locale, "colTotalComp")} value={fmtNum(r.totalCompUsd)} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
