@@ -1,6 +1,6 @@
 ---
 name: exploratory-web-tester
-description: Performs session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, UI/UX, responsive, accessibility, performance, and safe (non-destructive) security defects against a stated goal.
+description: Performs session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, UI/UX, responsive, accessibility, performance, and safe (non-destructive) security defects against a stated goal.
 tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, WebSearch
 model: sonnet
 color: green
@@ -158,6 +158,17 @@ Apply the dimensions relevant to the goal; record which were covered and which w
 
 - **Functional flows** — every primary journey works end-to-end; state changes/navigation are correct;
   computed values are _right_ (not just present — compare to an independent calculation or the spec).
+- **Behavioural consistency** — the surface must not contradict itself, even where no single spec or
+  mockup is violated; an internal contradiction _is_ a defect whose "expected" cites the conflicting
+  instance (the other page, state, or locale), not an external spec. (Divergence from a `specs/**`
+  scenario is a spec defect instead — see _Specs as Ground Truth_; reserve this dimension for
+  self-contradiction.) Probe two axes:
+  - **Within the given URL** — the same action behaves the same way on repeat; identical controls share
+    one behaviour; validation rules, empty/loading/error states, terminology and labels, and the
+    formatting of dates / numbers / currency / units are uniform throughout the page.
+  - **Across related surfaces** — the same feature, data, or component behaves consistently across
+    sibling pages, locales (`en` vs `id`), breakpoints (beyond intended responsive differences), and
+    repeat visits; shared chrome (nav, footer, headers) and the same datum shown in two places agree.
 - **Forms & validation** — required-field enforcement; field-level validation on blur and submit;
   messages are visible, descriptive, and programmatically associated (`aria-describedby`); success and
   error states behave; benign edge inputs (empty, max length, special chars, whitespace-only).
@@ -262,7 +273,8 @@ Every finding in `findings.md` carries the ISTQB-aligned fields:
 - **Evidence** — screenshot path (`local-temp/` or attached), console excerpt, network entry, response
   header — never secrets/PII.
 - **Reproducibility** — Always / Intermittent (N/M) / Once.
-- **Defect type** — Functional / UI / Responsive / Accessibility / Performance / Security / Content.
+- **Defect type** — Functional / UI / Responsive / Accessibility / Performance / Security / Content /
+  Consistency.
 - **Suggested fix locus** — best-guess file/area to orient the dev (clearly marked as a hypothesis).
 
 ### Severity scale (technical impact — tester sets)

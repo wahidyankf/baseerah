@@ -77,7 +77,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 ### 🧪 Testing
 
-- **[exploratory-web-tester](exploratory-web-tester.md)** - Session-based exploratory testing of a live site against a goal; files findings (functional, UI/responsive, accessibility, performance, safe security surface) as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce). Compares live behaviour against existing `specs/**` Gherkin and proposes new scenarios for behaviours that lack coverage. Non-destructive; does not modify the site or fix code.
+- **[exploratory-web-tester](exploratory-web-tester.md)** - Session-based exploratory testing of a live site against a goal; files findings (functional, behavioural consistency, UI/responsive, accessibility, performance, safe security surface) as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce). Compares live behaviour against existing `specs/**` Gherkin and proposes new scenarios for behaviours that lack coverage. Non-destructive; does not modify the site or fix code.
 
 ### 🟪 Operations
 
