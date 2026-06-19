@@ -54,6 +54,7 @@ Workflow scope MUST match its parent directory under `repo-governance/workflows/
 - **`pdf-to-md`** — Workflows for converting PDF documents to verbatim Markdown and validating conversion fidelity (text completeness, tables, figures, OCR quality). Hosted under the `content/` directory.
 - **`specs`** — Workflows scoped to the `specs/` tree (Gherkin features, OpenAPI contracts, C4 diagrams).
 - **`ui`** — Workflows scoped to UI component quality (tokens, accessibility, responsive design).
+- **`web`** — Workflows that operate against the public web or a live running website: spec-aware exploratory testing and spec-blind heuristic-usability testing of a running site, optionally combined into a fix-planning deliverable. Aligned with agent scope `web` (`web-researcher`, `web-exploratory-tester`, `web-usability-tester`).
 
 New scope tokens MUST be added to this vocabulary first before any workflow is named against them.
 
@@ -108,7 +109,7 @@ Current workflows, grouped by type, all conforming to the rule:
 
 - **`quality-gate`** — `plan-quality-gate` (scope `plan`, type `quality-gate`), `repo-rules-quality-gate` (scope `repo`, qualifier `rules`, type `quality-gate`), `specs-quality-gate` (scope `specs`, type `quality-gate`), `docs-quality-gate` (scope `docs`, type `quality-gate`), `ci-quality-gate` (scope `ci`, type `quality-gate`), `ui-quality-gate` (scope `ui`, type `quality-gate`), `ayokoding-web-swe-by-example-quality-gate` (scope `ayokoding-web`, qualifier `by-example`, type `quality-gate`), `pdf-to-md-quality-gate` (scope `pdf-to-md`, type `quality-gate`, hosted in `content/` directory)
 - **`execution`** — `plan-execution` (scope `plan`, type `execution`), `plan-establishment-execution` (scope `plan`, qualifier `establishment`, type `execution`)
-- **`planning`** — `repo-dependency-bump-planning` (scope `repo`, qualifier `dependency-bump`, type `planning`)
+- **`planning`** — `repo-dependency-bump-planning` (scope `repo`, qualifier `dependency-bump`, type `planning`), `web-exploratory-and-usability-test-fixing-planning` (scope `web`, qualifier `exploratory-and-usability-test-fixing`, type `planning`)
 - **`setup`** — `infra-development-environment-setup` would be the fully qualified form; the file is stored as `development-environment-setup.md` in the `infra/` directory, making the scope implicit from directory location. The enforcement command (type-suffix check) passes. New `setup` workflows SHOULD include the scope prefix explicitly (e.g., `infra-something-setup.md`).
 
 ## Related
