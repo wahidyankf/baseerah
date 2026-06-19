@@ -18,7 +18,7 @@ Agents in this repository follow a **single filename rule with no exceptions**. 
 
 A uniform, exception-free naming rule gives the repository three concrete guarantees that loose naming cannot:
 
-- **Enforceable by checker**: A single regex suffix check (`-(maker|checker|fixer|dev|deployer|manager)$`) decides conformance. No per-agent judgement, no grandfathered legacy names, no "this one is special" carve-outs. `repo-rules-checker` can audit the entire population in one pass and produce a deterministic result.
+- **Enforceable by checker**: A single regex suffix check (`-(maker|checker|fixer|dev|deployer|manager|tester)$`) decides conformance. No per-agent judgement, no grandfathered legacy names, no "this one is special" carve-outs. `repo-rules-checker` can audit the entire population in one pass and produce a deterministic result.
 - **Zero-exception discipline**: Exceptions erode conventions. Once one agent is allowed a bespoke suffix, reviewers lose the ability to reject the next one on principle alone. Holding every agent to the same structure keeps the rule teachable in one sentence and cheap to enforce forever.
 - **Harness parity**: The coding agent reads the primary binding directory (`.claude/agents/*.md`); secondary binding directories (e.g., `.opencode/agents/*.md`) mirror this structure. The sync pipeline assumes a filename-for-filename mirror between the two directories. Drift in either direction — a rename in one directory but not the other, a primary agent with no secondary twin — breaks cross-harness invocation silently. A shared naming rule makes the mirror check a trivial set-difference.
 
@@ -48,6 +48,7 @@ Exactly one of the following tokens MUST appear as the first token of every agen
 - **`apps`** — Agents scoped to a specific deployable application under `apps/` (web content authoring, app-specific checking, deployers).
 - **`ci`** — Agents that diagnose, validate, or repair continuous-integration pipelines and their failures.
 - **`docs`** — Agents scoped to the `docs/` tree (Diátaxis content, link integrity, software-engineering separation).
+- **`exploratory`** — Agents that perform exploratory (unscripted, session-based) testing of a running system or live site and report discovered defects.
 - **`pdf-to-md`** — Agents that convert PDF documents to verbatim Markdown and validate conversion fidelity (text completeness, tables, diagrams, OCR quality).
 - **`plan`** — Agents in the plan lifecycle (authoring, checking, executing, validating execution, fixing plans).
 - **`readme`** — Agents that create, validate, or repair README files across the repository.
@@ -71,6 +72,7 @@ Exactly one of the following tokens MUST appear as the last token of every agent
 | `dev`      | Writes code in a language or test framework                 | `swe-rust-dev`, `swe-e2e-dev`                                |
 | `deployer` | Deploys an application to an environment                    | `apps-ayokoding-www-deployer`                                |
 | `manager`  | Performs file or resource operations (rename, move, delete) | `docs-file-manager`                                          |
+| `tester`   | Explores a running system or live site and reports defects  | `exploratory-web-tester`                                     |
 
 No other role suffixes are permitted. Introducing a new role requires amending this table first.
 
@@ -90,7 +92,7 @@ Filenames MUST be identical pair-for-pair between the two directories. Every `.c
 ```bash
 ls .claude/agents/*.md \
   | sed 's|.*/||; s|\.md$||' \
-  | grep -vE -- '-(maker|checker|fixer|dev|deployer|manager)$' \
+  | grep -vE -- '-(maker|checker|fixer|dev|deployer|manager|tester)$' \
   | grep -v '^README$'
 ```
 
@@ -106,6 +108,7 @@ Current agents, grouped by role, all conforming to the rule:
 - **`dev`** — `swe-rust-dev` (scope `swe`, qualifier `rust`, role `dev`), `swe-e2e-dev` (scope `swe`, qualifier `e2e`, role `dev`)
 - **`deployer`** — `apps-ayokoding-www-deployer` (scope `apps`, qualifiers `ayokoding-web`, role `deployer`)
 - **`manager`** — `docs-file-manager` (scope `docs`, qualifier `file`, role `manager`)
+- **`tester`** — `exploratory-web-tester` (scope `exploratory`, qualifier `web`, role `tester`)
 
 ## Related
 

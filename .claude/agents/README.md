@@ -75,6 +75,10 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 - **[web-research-maker](web-research-maker.md)** - Read-only web research specialist; returns cited, structured findings with confidence tags in an isolated context (no file writes, no shell). Invoke for current API/library docs, fact verification, best-practice surveys.
 
+### 🧪 Testing
+
+- **[exploratory-web-tester](exploratory-web-tester.md)** - Session-based exploratory testing of a live site against a goal; files findings (functional, UI/responsive, accessibility, performance, safe security surface) as a new backlog plan (README + brd + prd + findings with steps-to-reproduce). Non-destructive; does not modify the site or fix code.
+
 ### 🟪 Operations
 
 - **[apps-ayokoding-www-deployer](apps-ayokoding-www-deployer.md)** - AyoKoding marketing site deployment (`prod-ayokoding-www`, Next.js via Vercel)
@@ -97,7 +101,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 Every agent filename follows: `<scope>(-<qualifier>)*-<role>`
 
-- `scope` — top-level domain (`apps`, `ci`, `docs`, `pdf-to-md`, `plan`, `readme`, `repo`, `social`, `specs`, `swe`, `web`, `agent`).
+- `scope` — top-level domain (`agent`, `apps`, `ci`, `docs`, `exploratory`, `pdf-to-md`, `plan`, `readme`, `repo`, `social`, `specs`, `swe`, `web`).
 - `qualifier` — zero or more refinement tokens (e.g., `ayokoding-web`, `link`, `ui`, `execution`).
 - `role` — exactly one trailing token from the Role Vocabulary below.
 
@@ -107,14 +111,15 @@ Normative source: [Agent Naming Convention](../../repo-governance/conventions/st
 
 ## Role Vocabulary
 
-| Role       | Semantics                                                 | Example agents                                               |
-| ---------- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| `maker`    | Produces a content/research artifact                      | `docs-maker`, `web-research-maker`                           |
-| `checker`  | Validates an artifact against standards                   | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
-| `fixer`    | Applies validated checker findings                        | `plan-fixer`, `swe-ui-fixer`                                 |
-| `dev`      | Writes code in a language or test framework               | `swe-rust-dev`, `swe-e2e-dev`                                |
-| `deployer` | Deploys an application to an environment                  | `apps-ayokoding-www-deployer`                                |
-| `manager`  | Performs file or resource operations (rename/move/delete) | `docs-file-manager`                                          |
+| Role       | Semantics                                                  | Example agents                                               |
+| ---------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
+| `maker`    | Produces a content/research artifact                       | `docs-maker`, `web-research-maker`                           |
+| `checker`  | Validates an artifact against standards                    | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
+| `fixer`    | Applies validated checker findings                         | `plan-fixer`, `swe-ui-fixer`                                 |
+| `dev`      | Writes code in a language or test framework                | `swe-rust-dev`, `swe-e2e-dev`                                |
+| `deployer` | Deploys an application to an environment                   | `apps-ayokoding-www-deployer`                                |
+| `manager`  | Performs file or resource operations (rename/move/delete)  | `docs-file-manager`                                          |
+| `tester`   | Explores a running system or live site and reports defects | `exploratory-web-tester`                                     |
 
 Enforcement: `rhino-cli agents validate-naming` (wired into pre-push and CI).
 

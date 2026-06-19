@@ -15,7 +15,9 @@ use crate::internal::naming::{self, Violation};
 use crate::internal::naming::reporter::{format_json, format_markdown, format_text};
 
 /// Accepted role suffixes for agent file names.
-const AGENT_ROLES: &[&str] = &["maker", "checker", "fixer", "dev", "deployer", "manager"];
+const AGENT_ROLES: &[&str] = &[
+    "maker", "checker", "fixer", "dev", "deployer", "manager", "tester",
+];
 
 /// CLI arguments for `agents validate-naming` (none required).
 #[derive(Args, Debug)]
@@ -142,6 +144,23 @@ mod tests {
         std::fs::create_dir_all(&od).unwrap();
         std::fs::write(cd.join("foo-maker.md"), "---\nname: foo-maker\n---\n").unwrap();
         std::fs::write(od.join("foo-maker.md"), "---\n---\n").unwrap();
+        let result = agents_validate_naming(&tmp.path().to_string_lossy()).unwrap();
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn agents_validate_naming_accepts_tester_role() {
+        let tmp = TempDir::new().unwrap();
+        let cd = tmp.path().join(".claude/agents");
+        let od = tmp.path().join(".opencode/agents");
+        std::fs::create_dir_all(&cd).unwrap();
+        std::fs::create_dir_all(&od).unwrap();
+        std::fs::write(
+            cd.join("exploratory-web-tester.md"),
+            "---\nname: exploratory-web-tester\n---\n",
+        )
+        .unwrap();
+        std::fs::write(od.join("exploratory-web-tester.md"), "---\n---\n").unwrap();
         let result = agents_validate_naming(&tmp.path().to_string_lossy()).unwrap();
         assert!(result.is_empty());
     }
