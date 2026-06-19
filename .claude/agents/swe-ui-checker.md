@@ -83,6 +83,7 @@ Validate UI components across seven dimensions, producing audit reports in `gene
 - [Component Patterns Convention](../../repo-governance/development/frontend/component-patterns.md)
 - [Accessibility Convention](../../repo-governance/development/frontend/accessibility.md)
 - [Styling Convention](../../repo-governance/development/frontend/styling.md)
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Rule 2: flag unnamed design-system primitives; rule 9: flag hardcoded values that should use design tokens (colors, spacing)
 
 **Skills**:
 

@@ -2102,7 +2102,12 @@ lib(s) and build the mockup from what is already there:
 
 Any **net-new component** the mockup introduces MUST be named explicitly (for example the `Table`
 primitive the salary-savings plan adds to `libs/web-ui`), so the build gap is visible before
-development begins.
+development begins. This is rule 2 of the
+[User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md).
+
+**Mockup colors must use design-system tokens** (e.g., `bg-primary`, `text-destructive`), not raw
+hex or CSS color values — raw values in mockups drift away from the implemented design. This is
+rule 8 of the [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md).
 
 ### Design Funnel (R6)
 

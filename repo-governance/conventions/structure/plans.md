@@ -542,12 +542,16 @@ Plans differ from `docs/` in several important ways:
 
 ### Completing Work
 
-1. **Verify completion**: Ensure all deliverables and acceptance criteria met
+1. **Verify completion**: Ensure all deliverables and acceptance criteria met — for UI-bearing plans, this includes the production visual sign-off (rule 10 of the [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md))
 2. **Add completion date prefix**: Rename folder from `in-progress/[identifier]/` to `done/YYYY-MM-DD__[identifier]/` using today's date (the completion date, not the original creation date)
 3. **Move folder**: Move renamed folder to `done/`
 4. **Update index**: Update both `in-progress/README.md` and `done/README.md`
 5. **Git commit**: Commit the move with completion message
 6. **Archive**: Plan is now archived for historical reference
+
+**Checkbox lockstep (rule 13)**: tick each delivery checkbox only after the corresponding code, review, or evidence actually exists — not speculatively. See [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md) rule 13 for the full checkbox-lockstep requirement.
+
+**Reopen path (rule 14)**: if a production defect surfaces after archival, reopen the plan by moving it back from `done/` to `in-progress/`, stripping the completion-date prefix, and adding a dated note in `README.md` explaining the defect. See [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md) rule 14 for the full reopen procedure.
 
 ### Infra-Apply Gate (HARD RULE)
 

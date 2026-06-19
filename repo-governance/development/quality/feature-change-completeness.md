@@ -221,3 +221,4 @@ It does not apply to:
 - [BDD Spec-to-Test Mapping](../infra/bdd-spec-test-mapping.md) -- Gherkin spec consumption at each test level
 - [Nx Target Standards](../infra/nx-targets.md) -- Canonical target names and caching rules
 - [Implementation Workflow Convention](../workflow/implementation.md) -- Three-stage workflow where completeness is verified at each stage
+- [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) -- Adds per-breakpoint responsive deliverables, labelled outputs, and a pre-archival visual sign-off to the completeness bar for user-facing changes

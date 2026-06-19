@@ -214,3 +214,4 @@ It does not apply to:
 - [Code Quality Convention](./code.md) -- Automated quality gates (typecheck, lint, test:quick)
 - [Implementation Workflow Convention](../workflow/implementation.md) -- Three-stage workflow where manual verification fits in the "make it work" stage
 - [Specs-Application Sync Convention](./specs-application-sync.md) -- Spec updates required alongside code changes
+- [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) -- Extends this convention to a per-breakpoint, per-locale visual sign-off against the design mockups **before archival**, plus thirteen sibling rules for user-facing delivery

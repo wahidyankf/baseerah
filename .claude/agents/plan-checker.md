@@ -250,6 +250,10 @@ Update status to "Complete", add summary statistics and prioritized recommendati
 - `plan-execution-checker` - Validates completed work
 - `plan-fixer` - Fixes plan issues
 
+**Related Conventions:**
+
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Flag missing visual-parity gate (rule 1), mockup colors not expressed as theme tokens (rule 8), presence-only ordering tests that do not distinguish correct from buggy values (rule 5), and missing per-breakpoint responsive deliverable steps (rules 3, 4) as HIGH findings on UI-bearing plans
+
 **Harness Conventions (Step 5g):**
 
 - [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) - Two-tier binding model and no-shadowing rule

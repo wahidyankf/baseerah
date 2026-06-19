@@ -110,6 +110,7 @@ For every new component, create these files:
 - [Accessibility Convention](../../repo-governance/development/frontend/accessibility.md)
 - [Styling Convention](../../repo-governance/development/frontend/styling.md)
 - [Test-Driven Development](../../repo-governance/development/workflow/test-driven-development.md) - Required for all component authoring
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Rule 2: name every design-system primitive the component reuses or introduces; rule 8: mockup colors must reference theme tokens, not raw hex values
 
 ### Test-Driven Development
 

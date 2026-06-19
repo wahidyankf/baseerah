@@ -47,6 +47,7 @@ These standards define **HOW to maintain and validate quality**, covering automa
 - [Feature Change Completeness Convention](./feature-change-completeness.md) - Practice requiring all related specs, contracts, tests, and documentation to be updated as part of any feature change
 - [CI Blocker Resolution Convention](./ci-blocker-resolution.md) - Practice mandating that preexisting CI blockers are investigated at the root cause and fixed properly, never bypassed
 - [Plan Anti-Hallucination Convention](./plan-anti-hallucination.md) - Mandatory pre-write verification rituals, repo-grounding rule, refuse-on-uncertainty, confidence labels, anti-pattern catalog (AP-1 through AP-10), and specialized-executor annotation for AI agents authoring plan content
+- [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) - Fourteen durable rules for planning, executing, verifying, and archiving user-facing feature work so design-parity and behavioral defects cannot ship past green gates (visual-parity gate before archival, name the design-system primitive, per-breakpoint responsive deliverables, value-bearing tests, mockup-colors-as-theme-tokens, deploy-config-is-code, checkbox lockstep)
 
 ## Companion Documents
 

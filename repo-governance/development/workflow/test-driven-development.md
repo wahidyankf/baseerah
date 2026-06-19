@@ -427,3 +427,4 @@ Workflow verifiable and safe.
 - [plan-writing-gherkin-criteria skill](../../../.claude/skills/plan-writing-gherkin-criteria/SKILL.md) - Writing Gherkin scenarios that map to first failing tests
 - [BDD Spec-to-Test Mapping Convention](../infra/bdd-spec-test-mapping.md) - Mandatory 1:1 mapping between specs and tests
 - [Code Quality Convention](../quality/code.md) - Pre-push hooks that run the test suite TDD produces
+- [User-Facing Delivery Hardening Convention](../quality/user-facing-delivery-hardening.md) - Rule 5: tests for UI calculations must assert specific computed values, not just element presence; rule 12: every test assertion must distinguish correct behavior from a plausible bug (a test that passes on both the correct and an incorrect implementation provides no signal)

@@ -532,6 +532,15 @@ Determine whether to continue execution or terminate.
 
 Report final status, archive plan if successful, and update all related READMEs.
 
+**UI-bearing plan pre-archival gate (rules 1, 10)**: For plans that add or change user-facing
+screens or components, archival MUST NOT proceed until the production visual sign-off is confirmed
+(rule 1 — a human or Playwright observer verifies rendered output against the design mockups in the
+live or staging environment). Zero automated-gate findings are necessary but not sufficient. See
+[User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md)
+rules 1 and 10. If defects surface after archival, use the reopen path (rule 14) — move the folder
+back from `done/` to `in-progress/`, strip the completion-date prefix, and note the defect in
+`README.md`.
+
 **Logic**:
 
 - If status is `pass` (zero findings):
