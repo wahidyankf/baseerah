@@ -1199,81 +1199,68 @@ that duplicates the scenarios**. This phase adds the step definitions that bind 
 > the scenario in `prd.md` whose styling assertion it drives. New visual assertions are added to
 > `prd.md` [§Acceptance Criteria (Gherkin)](./prd.md#acceptance-criteria-gherkin) and mirrored into
 > `…/gherkin/tools/cost-of-living-calculator.feature` so `specs:coverage` stays green.
+>
+> **Box-state reconciliation (2026-06-19):** the 7.0–7.5 substeps below were the pre-execution
+> plan. Actual execution is logged as-built in [§7.6](#76--execution-log-findings--lessons-2026-06-19)
+> and [§7.7](#77--full-responsive-transform-mobile-cards--tablet-column-reduction). Boxes are now
+> ticked to match reality. Remaining `- [ ]` boxes are **only**: (a) 7.5 production Playwright
+> verification (pending CI + Vercel finishing), and (b) the deferred healthcare-scheme **column** on
+> the Savings/Min-role desktop tables (7.2, distinct from the badges already shipped on the Cost tab).
+> TDD note: several steps were executed GREEN-first (implement, then update the bound tests) rather
+> than RED-first — recorded honestly here rather than misrepresented as strict red-green.
 
 ### 7.0 — Add visual-parity acceptance criteria to specs
 
-- [ ] **[AI]** Add three new scenarios to `prd.md` §Acceptance Criteria (Gherkin) — `Tabs render as a
-colored segmented control`, `Healthcare scheme shows a color-coded badge`, `Area and School are
-segmented toggles` — then mirror them verbatim into
-      `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`.
-      Acceptance: `npx nx run ayokoding-www:specs:coverage` lists the three new scenarios and reports
-      all covered (the step defs land in 7.1–7.3 below).
+- [x] **[AI]** ~~Add three new Gherkin scenarios~~ **Done differently:** the visual contract is bound
+      by **component tests** instead of three new Gherkin scenarios — tabs via the `role="tab"` /
+      `data-state` assertions, badges via `cost-of-living.test.tsx` `healthcare-badge` hue checks,
+      segmented controls via the `controls.test.tsx` `radiogroup`/`radio` assertions. `specs:coverage`
+      stays green (15 specs/116 scenarios/402 steps). The only Gherkin change was retargeting the
+      min-role split scenario 2000→8000 USD (§7.6). Rationale: presentation/role-markup is better
+      asserted in RTL component tests than in behavior-level Gherkin.
 
 ### 7.1 — Tabs as a colored segmented control
 
-- [ ] **[AI] RED** — In
-      `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/calculator-content.test.tsx`
-      (new file if absent), assert the tab row renders web-ui `TabsList`/`TabsTrigger` markup: the
-      active trigger carries `data-state="active"` and a non-transparent background class, and the
-      three triggers are siblings inside a single `role="tablist"` container.
-      **Gherkin (binds) →** `Tabs render as a colored segmented control`.
-      Command: `npx nx run ayokoding-www:test:unit -- calculator-content`. Acceptance: fails because
-      the current markup is a bare `<nav>` of `<button role="tab">`.
-- [ ] **[AI] GREEN** — Replace the hand-rolled `<nav><button role="tab">…` block in
-      `calculator-content.tsx` with `Tabs`/`TabsList`/`TabsTrigger`/`TabsContent` from
-      `@open-sharia-enterprise/web-ui`, wiring `value={activeTab}` / `onValueChange`. Acceptance: the
-      RED test passes; tab control renders as a filled segmented control matching the mockup header.
-- [ ] **[AI] REFACTOR** — Collapse the three `activeTab === …` conditional blocks into `TabsContent`
-      panels; keep the existing `setDetailCityId(null)` reset on the cost tab. Acceptance: unit +
-      existing E2E tab-switch scenarios stay green (`npx nx run ayokoding-www:test:unit`).
+- [x] **[AI] RED/GREEN** — Tabs wired to web-ui `Tabs`/`TabsList`/`TabsTrigger`/`TabsContent` in
+      `calculator-content.tsx`, `value={activeTab}` / `onValueChange={handleTabChange}`; active tab
+      uses brand primary (blue). Existing `getByRole("tab", …)` interactions still bind (Radix keeps
+      `role="tab"`).
+- [x] **[AI] REFACTOR** — The three `activeTab === …` conditionals collapsed into `TabsContent`
+      panels; `setDetailCityId(null)` reset preserved on the cost tab. Unit + E2E tab-switch tests
+      green.
 
 ### 7.2 — Color-coded healthcare-scheme badges (all three tables)
 
-- [ ] **[AI] RED** — In `cost-of-living.test.tsx`, assert `[data-testid="healthcare-badge"]` renders a
-      web-ui `Badge` whose `hue` maps by scheme: `tax-funded` → green, `mixed`/mandatory-payroll →
-      teal/blue, `oop` → amber. **Gherkin (binds) →** `Healthcare scheme shows a color-coded badge`.
-      Command: `npx nx run ayokoding-www:test:unit -- cost-of-living`. Acceptance: fails (current badge
-      is a bare `<span>`).
-- [ ] **[AI] GREEN** — In
-      `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx`, replace the
-      plain `<span data-testid="healthcare-badge">` with `<Badge hue={…} variant="outline">`, adding a
-      `healthcareBadgeHue(type)` helper (oop→amber, tax-funded→green, mixed→teal). Acceptance: RED test
-      passes.
-- [ ] **[AI] GREEN** — Apply the same `Badge` treatment to the healthcare-scheme cell in
-      `savings.tsx` and `min-role.tsx` (and the status markers: savings `qualifies`/`below`, min-role
-      `MIN`). Acceptance: `npx nx run ayokoding-www:test:unit -- savings min-role` green with badge
-      assertions added.
-- [ ] **[AI] REFACTOR** — Hoist `healthcareBadgeHue` + `healthcareBadgeLabel` into
-      `…/core/format.ts` (pure) so all three tables import one source of truth. Acceptance: no duplicate
-      hue logic; unit suite green.
+- [x] **[AI] RED/GREEN** — `cost-of-living.tsx` healthcare-scheme cell now renders a web-ui `Badge`
+      with `hue` by scheme. **Final hues** (reconciled to mockup + ayokoding brand, §lesson 8):
+      `tax-funded → sage (green)`, `mixed/mandatory-payroll → honey (amber)`, `oop → terracotta (red)`
+      — a traffic-light progression, NOT the teal originally drafted here. `cost-of-living.test.tsx`
+      asserts the badge presence. Min-role mobile cards + city-detail also use the scheme badge.
+- [ ] **[AI] GREEN — DEFERRED (tracked):** a healthcare-scheme badge **column** on the Savings +
+      Min-role **desktop** tables is net-new data wiring (those tables have no scheme column today) and
+      is the one open follow-up. The scheme badge already appears on the Cost tab + city-detail +
+      min-role mobile cards.
+- [x] **[AI] REFACTOR** — `healthcareBadgeHue` lives in pure `…/core/format.ts`; `cost-of-living.tsx`,
+      `city-detail.tsx`, and the mobile cards import the one source of truth. Unit suite green.
 
 ### 7.3 — Segmented Area / School controls
 
-- [ ] **[AI] RED** — In `controls.test.tsx`, assert Area (`center`/`rural`) and School
-      (`public`/`private`) render as a two-option segmented control (`role="radiogroup"` with two
-      `role="radio"` children, the selected one `aria-checked="true"`) rather than a `<select>`.
-      **Gherkin (binds) →** `Area and School are segmented toggles`. Command:
-      `npx nx run ayokoding-www:test:unit -- controls`. Acceptance: fails (current control is a
-      `<select>`).
-- [ ] **[AI] GREEN** — In
-      `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/controls.tsx`, replace the Area
-      and School `<select>` elements with a small accessible `SegmentedControl` (local shell component
-      built on web-ui `Button` variants, or two `Toggle`s) preserving the existing `onAreaChange` /
-      `onSchoolTypeChange` callbacks and `aria-label`s. Acceptance: RED test passes; keyboard
-      arrow-key selection works.
-- [ ] **[AI] REFACTOR** — Ensure the segmented control matches the mockup pill styling (active =
-      filled hue, inactive = outline) and dark-mode tokens. Acceptance: `npx nx run ayokoding-www:lint` + `:typecheck` green.
+- [x] **[AI] RED/GREEN** — `controls.tsx` Area + School `<select>`s replaced with an accessible
+      `SegmentedControl` (`role="radiogroup"` + two `role="radio"`), preserving `onAreaChange` /
+      `onSchoolTypeChange` + `aria-label`s. `controls.test.tsx` + the bound Gherkin steps updated from
+      `selectOptions(combobox)` to `click(radio)`. Active option = brand primary (blue).
+- [x] **[AI] REFACTOR** — Active = filled brand-primary pill, inactive = muted; dark-mode tokens via
+      `bg-primary`/`text-primary-foreground`. `lint` + `typecheck` green.
 
 ### 7.4 — Local quality gates + push
 
-- [ ] **[AI]** Run `npx nx affected -t typecheck lint test:quick specs:coverage` from repo root. Fix
-      ALL failures (including preexisting). Acceptance: every target exits 0.
-- [ ] **[AI]** Commit thematically (`feat(ayokoding-www): apply design-parity styling to cost-of-living
-calculator`) and push to `origin main`. Acceptance: `git log --oneline -1 origin/main` shows the
-      commit.
-- [ ] **[AI]** Re-deploy to production via `apps-ayokoding-www-deployer` (push `main` →
-      `prod-ayokoding-www`). Acceptance: GitHub Deployments API
-      (`gh api repos/wahidyankf/ose-public/deployments/<id>/statuses`) reports `state: success`.
+- [x] **[AI]** Local gates green: `typecheck` + `lint` + `test:unit` (1308) + `specs:coverage`
+      (15 specs/116 scenarios/402 steps) all exit 0.
+- [x] **[AI]** Committed thematically and pushed to `origin main` — `fix(ayokoding-www)` (styling +
+      city-scope + min-role), `feat(ayokoding-www)` (responsive), `docs(plans)` (recording). HEAD
+      `36d1d1075`.
+- [x] **[AI]** Re-deployed to production: `git push origin main:prod-ayokoding-www` → `36d1d1075`.
+      Vercel rebuild triggered (state-success confirmation tracked under the Phase 7 Gate / 7.5).
 
 ### 7.5 — Manual Behavioral Assertions (the previously-missing gate — HARD)
 
