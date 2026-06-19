@@ -195,7 +195,7 @@ Workflows for development environment and infrastructure:
 
 Workflows that test a live running website and turn findings into a fix plan:
 
-- **web-exploratory-and-usability-test-fixing-planning**: Run spec-aware exploratory testing and spec-blind heuristic-usability testing against the same live URL(s) and goal, then synthesize both into one fix-ready plan (source-attributed findings + `tech-docs.md` + TDD `delivery.md`) in `plans/in-progress/`
+- **web-exploratory-and-usability-test-fixing-planning**: Run spec-aware exploratory testing and spec-blind heuristic-usability testing against the same live URL(s) and goal sequentially (integrating each before the next), then solidify one fix-ready plan (source-attributed findings + `tech-docs.md` + TDD `delivery.md` + an `assets/` UI-mockup folder when UI-bearing) in `plans/in-progress/`, grilling the user on every material decision
 
 ### Repository Governance Workflows
 

@@ -31,7 +31,7 @@ These workflows define **WHEN and HOW to test a running site and act on the resu
 
 ## Workflows
 
-- [Exploratory and Usability Test Fixing Planning](./web-exploratory-and-usability-test-fixing-planning.md) - Run `web-exploratory-tester` (spec-aware) and `web-usability-tester` (spec-blind) against the same live URL(s) and goal, then synthesize their findings into one plan whose findings section keeps the two sources clearly separated (EWT-### vs UWT-###) and which carries `tech-docs.md` (root-cause + fix approach) and a TDD-shaped `delivery.md`. Produces a new plan in `plans/in-progress/` by default; can merge into an existing plan on request. Deliverable is the plan, not the fixes.
+- [Exploratory and Usability Test Fixing Planning](./web-exploratory-and-usability-test-fixing-planning.md) - Run `web-exploratory-tester` (spec-aware) and `web-usability-tester` (spec-blind) against the same live URL(s) and goal **sequentially** — integrating each result set into the plan before the next runs — then solidify one plan whose findings section keeps the two sources clearly separated (EWT-### vs UWT-###) and which carries `tech-docs.md` (root-cause + fix approach), a TDD-shaped `delivery.md`, and — when the plan is UI-bearing — an `assets/` folder of both-tier (lo-fi + hi-fi) UI mockups. Grills the user hard on every material decision. Produces a new plan in `plans/in-progress/` by default; can merge into an existing plan on request. Deliverable is the plan, not the fixes.
 
 ## Related Documentation
 

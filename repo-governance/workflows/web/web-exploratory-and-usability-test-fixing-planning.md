@@ -3,10 +3,12 @@ name: web-exploratory-and-usability-test-fixing-planning
 title: "web-exploratory-and-usability-test-fixing-planning"
 goal: >
   Run spec-aware exploratory testing and spec-blind heuristic-usability testing against the same
-  live URL(s) and goal, then synthesize both result sets into one fix-ready plan whose findings
-  section keeps the two sources clearly separated (exploratory EWT-### vs usability UWT-###) and
-  which carries a tech-docs.md (root-cause + fix approach) and a TDD-shaped delivery.md describing
-  how to fix every finding. The deliverable is the plan, never the fixes.
+  live URL(s) and goal — sequentially, integrating each result set into the plan before the next
+  runs — then solidify one fix-ready plan whose findings section keeps the two sources clearly
+  separated (exploratory EWT-### vs usability UWT-###) and which carries a tech-docs.md (root-cause +
+  fix approach), a TDD-shaped delivery.md describing how to fix every finding, and — when the plan is
+  UI-bearing — an assets/ folder of both-tier (lo-fi + hi-fi) UI mockups. The deliverable is the
+  plan, never the fixes.
 termination: >
   A grill-validated plan exists under plans/in-progress/<identifier>/ containing README.md, brd.md,
   prd.md, findings.md (with separate Exploratory and Usability sections), tech-docs.md, and
@@ -68,9 +70,13 @@ inputs:
     default: strict
   - name: max-concurrency
     type: number
-    description: "Maximum testers/agents run in parallel. Default: 2 (the two testers run concurrently)."
+    description: >
+      Maximum agents run in parallel. Default 1: the two testers run SEQUENTIALLY by design
+      (exploratory pass → integrate → usability pass → integrate) so each result set is folded into
+      the plan before the next runs, and because both testers are sonnet-tier the staged order keeps
+      each pass's full context available during its integration.
     required: false
-    default: 2
+    default: 1
   - name: push-target
     type: string
     description: "Git push destination for the finished plan. Default: origin main."
@@ -111,9 +117,10 @@ document. It is **not** an iterative quality gate over the site.
 ## Execution Mode
 
 **Agent Delegation (preferred)** — the calling context orchestrates the phases, delegating the two
-testing passes to `web-exploratory-tester` and `web-usability-tester` via the Agent tool, running
-the synthesis and plan authoring through `plan-maker`, and gating with `plan-checker` / `plan-fixer`.
-The human grill checkpoint runs inline so the user's conversation is preserved.
+testing passes to `web-exploratory-tester` and `web-usability-tester` via the Agent tool **one at a
+time** (exploratory first, integrate, then usability, integrate), running the solidification and
+plan authoring through `plan-maker`, and gating with `plan-checker` / `plan-fixer`. The human grill
+checkpoint runs inline so the user's conversation is preserved.
 
 **Manual Orchestration (fallback)** — when those agents are unavailable as delegated agent types,
 the assistant executes each phase directly using the testers' and plan agents' documented procedures
@@ -143,6 +150,32 @@ with Read/Write/Edit tools.
 | `mode`             | no       | `strict`              | Threshold for the nested plan-quality-gate |
 | `push-target`      | no       | `origin main`         | Git destination for the finished plan      |
 
+## Grilling (Human Checkpoints)
+
+This workflow **grills the user hard whenever a decision is genuinely needed** — it never guesses a
+material choice. Every grill question is asked with the `AskUserQuestion` tool as a multiple-choice
+prompt per the
+[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md), and every
+question always offers the standing options required by that convention (a blank-state / "none of
+these" type answer **and** a "let's chat about this" escape hatch). Grill only when the answer
+changes what the workflow does; when a sensible default exists, take it and state it.
+
+Decision points that trigger a grill:
+
+- **Pre-flight** — ambiguous or multi-candidate target URLs; `plan-mode` (new vs merge) when not
+  given; the new-plan `plan-identifier`; which `locales`/`breakpoints` to cover when the target is
+  multi-locale or the responsive scope is unclear.
+- **After both passes are integrated (entering Phase 3)** — which findings are in scope vs deferred;
+  prioritization/severity disputes; the **fix approach** where more than one valid option exists;
+  whether to accept each exploratory `SG-###` as a specs addition.
+- **UI direction (UI-bearing plans)** — which low-fidelity alternative advances to high-fidelity, and
+  which high-fidelity finalist is selected (the design-funnel decision), grilled before the
+  `.excalidraw.png` finalists are committed.
+- **Before push** — confirm the `push-target` when it differs from the default.
+
+The Phase 3 `plan-maker` invocation performs its own before/after grill as part of authoring; this
+section governs the workflow-level checkpoints around it so no material decision is made silently.
+
 ## Phases
 
 ### 0. Pre-flight (Sequential)
@@ -162,68 +195,101 @@ with Read/Write/Edit tools.
 **On failure**: Dirty tree → ask the user to commit/stash first. Unreachable URL or missing
 merge target → abort with a clear message.
 
-### 1. Dual Testing (Parallel, delegated)
+### 1. Exploratory Pass + Integrate (Sequential, delegated)
 
-Run both testers concurrently against the identical `target-urls` + `testing-goal`, capped at
-`max-concurrency` (default 2) per the
-[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md). Both are
-**non-destructive / passive** — they read, click, resize, and probe but never mutate server state.
+Run the spec-aware tester **first, alone**, then fold its results into the plan before the usability
+pass starts. It is **non-destructive / passive** — it reads, clicks, resizes, and probes but never
+mutates server state.
 
 **Agent**: `web-exploratory-tester` — spec-aware. Compares live behaviour against existing
 `specs/**` Gherkin; produces a findings catalog `EWT-###` (functional, behavioural-consistency,
 UI/UX, responsive, accessibility, URL/IA, passive security) plus spec-gap proposals `SG-###`.
+
+- **Args**: `target-urls: {input.target-urls}`, `testing-goal: {input.testing-goal}`,
+  `breakpoints: {input.breakpoints}`, `locales: {input.locales}`.
+- **Output**: Returns its full findings set as structured text (README/brd/prd/findings/spec-gaps
+  bodies). Subagents cannot write under `plans/` directly, so the orchestrator captures the returned
+  text.
+
+**Integrate**: Establish the plan skeleton under `plan-path` (or, for `plan-mode=merge`, open the
+existing folder) and write the Exploratory half: a `## Exploratory findings (EWT-###)` section in
+`findings.md`, the `spec-gaps.md` proposals, and the exploratory slice of README/brd/prd. Preserve
+the tester's original IDs.
+
+**Success criteria**: Exploratory findings (possibly empty) integrated into the plan.
+**On failure**: If the tester fails, record the gap prominently in the plan README and proceed to
+Phase 2 with the usability perspective only — never silently drop a perspective.
+
+### 2. Usability Pass + Integrate (Sequential, delegated)
+
+Only after Phase 1 has integrated, run the spec-blind tester and fold its results into the **same**
+plan. Also passive / non-destructive.
 
 **Agent**: `web-usability-tester` — spec-blind. Deliberately ignores specs/source/mockups; judges
 only first-time-user perception against Nielsen's 10 heuristics (0–4 severity), cognitive walkthrough,
 information scent, and responsive usability; produces a findings catalog `UWT-###`. Emits no
 spec-gaps (proposing spec coverage requires reading the spec, which it refuses).
 
-- **Args (both)**: `target-urls: {input.target-urls}`, `testing-goal: {input.testing-goal}`,
-  `breakpoints: {input.breakpoints}`, `locales: {input.locales}`.
-- **Output**: Each tester returns its full findings set as structured text (README/brd/prd/findings
-  bodies, plus `spec-gaps` for exploratory and `walkthrough` for usability). Subagents cannot write
-  under `plans/` directly, so the orchestrator captures the returned text for Phase 2 rather than
-  letting each tester file a separate plan.
+- **Args**: same as Phase 1.
+- **Output**: Returns its findings + `walkthrough` body as structured text.
 
-**Success criteria**: Both testers return a findings catalog (possibly empty).
-**On failure**: If one tester fails, continue with the other's results and record the gap prominently
-in the combined plan's README; do not silently drop a perspective.
+**Integrate**: Add a **separate** `## Usability findings (UWT-###)` section to `findings.md` and the
+`walkthrough.md` transcript, merge the usability slice into README/brd/prd, and add a short
+**cross-reference note** flagging where an EWT and a UWT describe the same underlying defect (e.g. the
+`html lang="en"` locale issue both will catch) so the shared root cause is fixed once. The findings
+of the two sources MUST remain in their own labelled sections — a reader must always be able to tell
+an exploratory finding from a usability finding.
 
-### 2. Synthesis & Plan Authoring (Sequential, delegated)
+**Success criteria**: Both findings sections present and source-attributed in one `findings.md`.
 
-Compose **one** plan from both result sets. The findings MUST stay attributed to their source — a
-reader must always be able to tell an exploratory finding from a usability finding.
+### 3. Solidify — tech-docs, delivery, and (conditional) UI assets (Sequential, delegated)
+
+With both findings sets integrated, solidify the plan into a fix-ready deliverable.
 
 **Agent**: `plan-maker` — grills the user (multiple-choice, per the
 [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)) on scope,
-prioritization, and any ambiguous fixes, then authors the plan. Hand it a self-contained brief
-containing both testers' returned catalogs and this **required document set**:
+prioritization, fix approach, and any UI direction, then authors:
 
-- `README.md` — target URL(s)/environment, both testing goals, coverage map, and a combined risk
-  summary that labels each top risk `[Exploratory]` or `[Usability]`.
-- `brd.md` — business framing: who is affected, cost of the defects + friction, success metrics.
-- `prd.md` — personas, user stories, and Gherkin acceptance criteria for the corrected behaviours.
-- `findings.md` — **two clearly separated sections**: `## Exploratory findings (EWT-###)` and
-  `## Usability findings (UWT-###)`, each with severity and steps-to-reproduce, preserving the
-  testers' original IDs. A short cross-reference note flags where an EWT and a UWT describe the same
-  underlying defect (e.g. the `html lang="en"` locale issue seen by both) so the same root cause is
-  fixed once.
 - `tech-docs.md` — root-cause analysis and the chosen fix approach per finding (or per finding
   cluster), naming the affected files/components and the design-system primitives involved.
 - `delivery.md` — TDD-shaped delivery checklist (RED/GREEN/REFACTOR per code item, file path +
   verbatim command + acceptance criterion), tagged `[AI]`/`[HUMAN]`, with Phase 0 first and the
   **Specs & Gherkin completeness** coverage steps that fold the exploratory `SG-###` proposals into
   `specs/**` Gherkin (per [feature-change-completeness](../../development/quality/feature-change-completeness.md)).
+- Finalize `README.md` so its risk summary labels each top risk `[Exploratory]` or `[Usability]`,
+  and the document map lists every file including (when present) the `assets/` folder.
 
-- **plan-mode=new**: author the full set under `plans/in-progress/<plan-identifier>/`.
-- **plan-mode=merge**: integrate the new results into `target-plan-path` by ID continuation (do not
-  renumber prior findings); re-verify prior findings as STILL-PRESENT / FIXED and record the result,
-  then extend `tech-docs.md` and `delivery.md` to cover the newly added findings.
+**Conditional — UI-bearing gate**: if **any** finding's fix adds or changes a user-facing screen or
+component under `apps/`/`libs/`, the plan is **UI-bearing** and MUST carry an `assets/` folder with
+the both-tiers mockups required by the
+[UI Mockups in Plan Docs convention](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs),
+exactly as the originating
+[salary-savings-calculator plan](../../../plans/done/2026-06-19__ayokoding-www-salary-savings-calculator/assets)
+does:
 
-**Output**: Plan document set written under `plan-path`; `exploratory-findings-count` and
+- **Tier 1 (low-fidelity)** — ASCII/Unicode wireframes inline, plus a `ui-<screen>-low-fi-alternatives.md`
+  capturing the design-funnel divergence for each changed screen.
+- **Tier 2 (high-fidelity)** — `assets/ui-<screen>-option-<x>-<name>.excalidraw.png` for the
+  finalists, referenced from `tech-docs.md`/`delivery.md` via `./assets/...png` with descriptive alt
+  text. Mobile, tablet, and desktop are all designed (mobile-first); a desktop-only mockup fails.
+- **Grounding (R5)** — build every mockup from the existing `libs/web-ui` kit, the target app's
+  shell/theme/i18n, and sibling screens; name any net-new component explicitly. Mockup colors use
+  design-system tokens (`bg-primary`, `text-destructive`), never raw hex.
+
+If **no** finding touches UI, the plan is non-UI and the `assets/` folder is omitted (the
+convention's exemption for non-UI plans applies).
+
+**plan-mode handling**:
+
+- **new**: the full document set lands at `plans/in-progress/<plan-identifier>/`.
+- **merge**: new findings are appended to `target-plan-path` by ID continuation (never renumber prior
+  findings); prior findings are re-verified as STILL-PRESENT / FIXED with the result recorded; then
+  `tech-docs.md`, `delivery.md`, and any `assets/` mockups are extended to cover the new findings.
+
+**Output**: Complete plan document set under `plan-path`; `exploratory-findings-count` and
 `usability-findings-count` tallied.
 
-### 3. Plan Quality Gate (Nested Workflow)
+### 4. Plan Quality Gate (Nested Workflow)
 
 **Workflow**: `plan/plan-quality-gate`
 
@@ -238,7 +304,7 @@ TDD shape and specs-coverage steps).
 **On failure**: If it returns `partial` after max-iterations, surface the residual findings to the
 user before pushing.
 
-### 4. Push & Hand-back (Sequential)
+### 5. Push & Hand-back (Sequential)
 
 - Stage the explicit plan paths and the workflow/governance edits only (never `git add -A`; sibling
   repos carry unrelated WIP). Commit with a Conventional Commit message and push to `push-target`.
@@ -264,12 +330,39 @@ Scenario: One run produces one combined, source-attributed plan
   And the plan passes plan-quality-gate at strict mode
   And no file under apps/ or libs/ source is modified
 
+Scenario: Testers run sequentially with incremental integration
+  Given a reachable live URL and a testing goal
+  When the workflow runs
+  Then the exploratory tester runs and its EWT-### findings are integrated into the plan
+  And only then does the usability tester run and its UWT-### findings get integrated
+  And tech-docs.md and delivery.md are authored after both findings sets are integrated
+
+Scenario: A UI-bearing plan carries an assets folder with both-tier mockups
+  Given at least one finding's fix changes a user-facing screen or component
+  When the plan is solidified
+  Then the plan contains an assets/ folder
+  And each changed screen has a low-fidelity ASCII wireframe and a high-fidelity .excalidraw.png finalist
+  And mobile, tablet, and desktop layouts are all designed
+  And mockup colors use design-system tokens rather than raw hex
+
+Scenario: A non-UI plan omits the assets folder
+  Given no finding's fix touches a user-facing screen or component
+  When the plan is solidified
+  Then no assets/ folder is created
+
 Scenario: Merge mode extends an existing findings plan
   Given an existing plan folder under plans/in-progress/
   When the workflow runs in plan-mode=merge against that folder
   Then prior findings keep their original IDs and gain a re-verification result
   And new findings are appended by ID continuation
   And tech-docs.md and delivery.md are extended to cover the new findings
+
+Scenario: Material decisions are grilled with options
+  Given more than one valid fix approach exists for a finding
+  When the plan is being solidified
+  Then the workflow grills the user with a multiple-choice AskUserQuestion
+  And the question offers a blank-state option and a "let's chat about this" option
+  And no material decision is made without the user's answer
 
 Scenario: Unreachable target aborts before testing
   Given a target URL that does not return HTTP 200
@@ -281,10 +374,11 @@ Scenario: Unreachable target aborts before testing
 ## Related Documents
 
 - [web-exploratory-tester Agent](../../../.claude/agents/web-exploratory-tester.md) — Phase 1 spec-aware pass.
-- [web-usability-tester Agent](../../../.claude/agents/web-usability-tester.md) — Phase 1 spec-blind pass.
-- [plan-maker Agent](../../../.claude/agents/plan-maker.md) — Phase 2 synthesis + tech-docs/delivery authoring.
-- [Plan Quality Gate workflow](../plan/plan-quality-gate.md) — Phase 3 nested gate.
+- [web-usability-tester Agent](../../../.claude/agents/web-usability-tester.md) — Phase 2 spec-blind pass.
+- [plan-maker Agent](../../../.claude/agents/plan-maker.md) — Phase 3 solidification + tech-docs/delivery/UI-assets authoring.
+- [Plan Quality Gate workflow](../plan/plan-quality-gate.md) — Phase 4 nested gate.
 - [Plan Execution workflow](../plan/plan-execution.md) — runs the plan later, after human review.
+- [UI Mockups in Plan Docs](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs) — the both-tiers `assets/` mockup rule a UI-bearing plan must honour.
 - [Feature Change Completeness](../../development/quality/feature-change-completeness.md) — the specs+Gherkin rule the delivery checklist must honour.
 - [Plans Organization Convention](../../conventions/structure/plans.md) — in-progress plans use the date-free `<identifier>/` folder form.
 
@@ -301,5 +395,7 @@ Scenario: Unreachable target aborts before testing
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `web-exploratory-and-usability-test-fixing-planning` parses as scope=`web`, qualifier=`exploratory-and-usability-test-fixing`, type=`planning`.
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: The plan lands at `plans/in-progress/<identifier>/` with no date prefix.
 - **[Feature Change Completeness](../../development/quality/feature-change-completeness.md)**: The delivery checklist carries the specs+Gherkin coverage steps for the exploratory spec-gap proposals.
-- **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: The two testers run capped at 2 concurrent.
+- **[UI Mockups in Plan Docs](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)**: A UI-bearing plan carries an `assets/` folder with both-tier (lo-fi ASCII + hi-fi `.excalidraw.png`) mobile/tablet/desktop mockups, design-funnel alternatives, grounding rule, and token-only colors.
+- **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)**: Every material decision is grilled via `AskUserQuestion` with multiple-choice options plus the standing blank-state and "chat about this" options.
+- **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: The two testers run sequentially (one at a time), well within the concurrency cap.
 - **[Linking Convention](../../conventions/formatting/linking.md)**: Cross-references use GitHub-compatible markdown links with `.md` extensions.
