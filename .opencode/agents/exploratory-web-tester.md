@@ -1,5 +1,5 @@
 ---
-description: Performs session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, UI/UX, responsive, accessibility, performance, and safe (non-destructive) security defects against a stated goal.
+description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use usability-web-tester instead.
 model: opencode-go/minimax-m2.7
 permission:
   bash: allow
@@ -181,6 +181,14 @@ Apply the dimensions relevant to the goal; record which were covered and which w
   error states behave; benign edge inputs (empty, max length, special chars, whitespace-only).
 - **Navigation & links** — no 404s; external links open safely (`rel="noopener noreferrer"`);
   back/forward consistent; breadcrumbs/pagination accurate.
+- **URL / IA quality** — is the address itself natural and optimal (Nielsen, "URLs as UI")? Readable
+  human-meaningful slugs (lowercase kebab-case, no `.php`/`.aspx` or encoded spaces, no opaque `?id=`
+  query soup or session/tracking cruft as the canonical URL for primary content); predictable and
+  guessable (path hierarchy mirrors the IA and breadcrumb; a sibling URL is guessable); matches content
+  (slug agrees with the rendered title/H1 — URL-level information scent); hackable (removing a trailing
+  segment lands on a sensible parent, not a 404); and consistent across the site (uniform locale prefix
+  `/en/`·`/id/`, trailing-slash policy, and casing; sibling pages share one URL pattern). A leaky,
+  unpredictable, or inconsistent URL is a finding.
 - **Responsive / breakpoints** — at each viewport: nav collapse/hamburger, text overflow, image
   scaling, modal/overlay sizing, form layout, table overflow, touch targets (≥ 24×24 CSS px per WCAG
   2.5.8; ≥ 44×44 px preferred). Compare against `*-mobile`/`*-tablet`/`*-desktop` mockups when provided.

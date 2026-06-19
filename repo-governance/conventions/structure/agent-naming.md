@@ -49,6 +49,7 @@ Exactly one of the following tokens MUST appear as the first token of every agen
 - **`ci`** — Agents that diagnose, validate, or repair continuous-integration pipelines and their failures.
 - **`docs`** — Agents scoped to the `docs/` tree (Diátaxis content, link integrity, software-engineering separation).
 - **`exploratory`** — Agents that perform exploratory (unscripted, session-based) testing of a running system or live site and report discovered defects.
+- **`usability`** — Agents that perform spec-blind heuristic usability evaluation of a running system or live site (Nielsen heuristics, cognitive walkthrough, information scent) and report discovered friction.
 - **`pdf-to-md`** — Agents that convert PDF documents to verbatim Markdown and validate conversion fidelity (text completeness, tables, diagrams, OCR quality).
 - **`plan`** — Agents in the plan lifecycle (authoring, checking, executing, validating execution, fixing plans).
 - **`readme`** — Agents that create, validate, or repair README files across the repository.
@@ -64,16 +65,16 @@ New scope tokens MUST be added to this vocabulary first before any agent is name
 
 Exactly one of the following tokens MUST appear as the last token of every agent filename:
 
-| Role         | Semantics                                                     | Example agents                                               |
-| ------------ | ------------------------------------------------------------- | ------------------------------------------------------------ |
-| `maker`      | Produces a content or research artifact                       | `docs-maker`, `docs-tutorial-maker`                          |
-| `checker`    | Validates an artifact against standards                       | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
-| `fixer`      | Applies validated checker findings                            | `plan-fixer`, `swe-ui-fixer`                                 |
-| `dev`        | Writes code in a language or test framework                   | `swe-rust-dev`, `swe-e2e-dev`                                |
-| `deployer`   | Deploys an application to an environment                      | `apps-ayokoding-www-deployer`                                |
-| `manager`    | Performs file or resource operations (rename, move, delete)   | `docs-file-manager`                                          |
-| `tester`     | Explores a running system or live site and reports defects    | `exploratory-web-tester`                                     |
-| `researcher` | Gathers and verifies external information; read-only research | `web-researcher`                                             |
+| Role         | Semantics                                                                        | Example agents                                               |
+| ------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `maker`      | Produces a content or research artifact                                          | `docs-maker`, `docs-tutorial-maker`                          |
+| `checker`    | Validates an artifact against standards                                          | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
+| `fixer`      | Applies validated checker findings                                               | `plan-fixer`, `swe-ui-fixer`                                 |
+| `dev`        | Writes code in a language or test framework                                      | `swe-rust-dev`, `swe-e2e-dev`                                |
+| `deployer`   | Deploys an application to an environment                                         | `apps-ayokoding-www-deployer`                                |
+| `manager`    | Performs file or resource operations (rename, move, delete)                      | `docs-file-manager`                                          |
+| `tester`     | Explores or evaluates a running system or live site and reports defects/friction | `exploratory-web-tester`, `usability-web-tester`             |
+| `researcher` | Gathers and verifies external information; read-only research                    | `web-researcher`                                             |
 
 No other role suffixes are permitted. Introducing a new role requires amending this table first.
 
@@ -109,7 +110,7 @@ Current agents, grouped by role, all conforming to the rule:
 - **`dev`** — `swe-rust-dev` (scope `swe`, qualifier `rust`, role `dev`), `swe-e2e-dev` (scope `swe`, qualifier `e2e`, role `dev`)
 - **`deployer`** — `apps-ayokoding-www-deployer` (scope `apps`, qualifiers `ayokoding-web`, role `deployer`)
 - **`manager`** — `docs-file-manager` (scope `docs`, qualifier `file`, role `manager`)
-- **`tester`** — `exploratory-web-tester` (scope `exploratory`, qualifier `web`, role `tester`)
+- **`tester`** — `exploratory-web-tester` (scope `exploratory`, qualifier `web`, role `tester`), `usability-web-tester` (scope `usability`, qualifier `web`, role `tester`)
 - **`researcher`** — `web-researcher` (scope `web`, no qualifier, role `researcher`)
 
 ## Related
