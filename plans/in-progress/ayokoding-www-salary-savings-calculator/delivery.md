@@ -1382,6 +1382,40 @@ that duplicates the scenarios**. This phase adds the step definitions that bind 
    (e.g. "active = `--color-primary`", "covered = `hue=sage`"), not a raw swatch, and the delivery
    step must require reconciliation to the **specific app's** brand tokens. `plan-checker` should
    flag mockups whose colors are raw values with no token mapping.
+9. **Responsive is per-breakpoint work, not a CSS afterthought** — recorded in full at
+   [§7.7](#77--full-responsive-transform-mobile-cards--tablet-column-reduction). A plan with
+   `*-mobile`/`*-tablet` mockups needs an explicit delivery step **per table per breakpoint** plus a
+   Playwright check at each viewport. The reusable technique is the dual-render pattern (one computed
+   dataset, two DOM views toggled by Tailwind `md:`/`lg:`).
+10. **"Zero findings + CI green" is NOT "done" for a UI feature — and definitely not "archive".**
+    This plan was executed, validated to zero findings, and **archived to `plans/done/`** while the
+    shipped UI was bland and off-design; the gap only surfaced when the user opened production. →
+    The done/archival criterion for any user-facing change must include a **production visual sign-off
+    against the mockups, per breakpoint, per locale**. `plan-execution`'s finalization step should
+    block archival until that sign-off is recorded (mirror of lesson 1, applied to the archival gate).
+11. **Deploy configuration is code — validate it in the plan.** The first production deploy failed
+    because `apps/ayokoding-www/vercel.json`'s `buildCommand` still pointed at a **moved file path**
+    (`src/contexts/search/infrastructure/generate-search-data.ts` → `src/features/search/shell/…`);
+    nothing tested it, so a green local build still produced a broken Vercel build. → Any plan that
+    moves/renames files must include a **deploy-config sweep** (`vercel.json`, Dockerfiles, CI
+    `buildCommand`s) and a **real post-deploy smoke test** of the live URL, not just local gates.
+12. **Prefer assertions that distinguish correct from buggy; pick fixtures that exercise the branch.**
+    (Sharpens lesson 5.) The min-role test asserted only _presence_ ("a divider exists, some rows are
+    dimmed"), which held true under the **inverted** logic too, and used a target (`2000`) that
+    cleared _every_ role so no split even occurred. → Ordering/threshold tests must assert
+    **identity/position/value** (e.g. "Staff SWE sits above the minimum, SWE I below") and the author
+    must **probe the data** to choose an input that genuinely splits the set.
+13. **Keep delivery checkboxes in lockstep with execution (Atomic Sync Ritual).** During this work,
+    items were implemented but recorded in an as-built log rather than ticking the matching boxes,
+    so Phase 7 _looked_ unfinished and required a later reconciliation pass. → Tick the box the moment
+    the item lands; if you must record as-built (because plan substeps were speculative), reconcile
+    the boxes in the **same** commit, never leave them divergent.
+14. **A feature reopened after archival needs a clean re-entry, not silent edits on `main`.** This
+    fix round ran directly on `main` (worktree already removed at archival) under a tight feedback
+    loop. It worked, but the cleaner path is to **reopen the plan first** (move back to
+    `in-progress/`, re-provision the worktree) so the work has a home and the trunk stays clean. →
+    `plan-execution` should document a "reopen" entry path that re-creates the worktree and flips the
+    plan folder before any code changes.
 
 ### 7.7 — Full responsive transform (mobile cards + tablet column-reduction)
 
