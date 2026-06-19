@@ -1,7 +1,7 @@
 # Findings — Cost-of-Living Calculator Exploratory Testing
 
 **Session date**: 2026-06-19
-**Tester agent**: `exploratory-web-tester`
+**Tester agent**: `web-exploratory-tester`
 **Ground truth**: `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
 
 ---

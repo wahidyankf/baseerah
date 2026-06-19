@@ -1,5 +1,5 @@
 ---
-description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use usability-web-tester instead.
+description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use web-usability-tester instead.
 model: opencode-go/minimax-m2.7
 permission:
   bash: allow
@@ -17,7 +17,7 @@ skills:
   - docs-applying-content-quality
 ---
 
-# Exploratory Web Tester Agent
+# Web Exploratory Tester Agent
 
 ## Agent Metadata
 

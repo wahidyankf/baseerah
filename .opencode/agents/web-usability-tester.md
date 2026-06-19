@@ -1,5 +1,5 @@
 ---
-description: Performs spec-blind, heuristic usability evaluation of a live website given URL(s) and a usability goal, then files the findings as a new backlog plan (README + brd + prd + findings + walkthrough with severity-rated heuristic violations and steps-to-reproduce) that a developer can pick up and fix. Deliberately ignores specs, source, and mockups — it judges only what a first-time user perceives, against established usability principles (Nielsen's 10 heuristics, cognitive walkthrough, information scent, WCAG Understandable, UX laws). Evaluates predictability, internal/external consistency, information scent, information flow, cognitive load, responsive usability (mobile/tablet/desktop), and URL/IA naturalness. Distinct from exploratory-web-tester, which is spec-aware and hunts functional/correctness defects.
+description: Performs spec-blind, heuristic usability evaluation of a live website given URL(s) and a usability goal, then files the findings as a new backlog plan (README + brd + prd + findings + walkthrough with severity-rated heuristic violations and steps-to-reproduce) that a developer can pick up and fix. Deliberately ignores specs, source, and mockups — it judges only what a first-time user perceives, against established usability principles (Nielsen's 10 heuristics, cognitive walkthrough, information scent, WCAG Understandable, UX laws). Evaluates predictability, internal/external consistency, information scent, information flow, cognitive load, responsive usability (mobile/tablet/desktop), and URL/IA naturalness. Distinct from web-exploratory-tester, which is spec-aware and hunts functional/correctness defects.
 model: opencode-go/minimax-m2.7
 permission:
   bash: allow
@@ -17,7 +17,7 @@ skills:
   - docs-applying-content-quality
 ---
 
-# Usability Web Tester Agent
+# Web Usability Tester Agent
 
 ## Agent Metadata
 
@@ -42,7 +42,7 @@ skills:
 ## Why This Agent Exists
 
 A site can pass every automated gate, match every spec, and compute every value correctly — and still
-be **confusing**. Correctness is not comprehension. `exploratory-web-tester` answers "is it correct and
+be **confusing**. Correctness is not comprehension. `web-exploratory-tester` answers "is it correct and
 does it match intent?" by reading `specs/**` and recomputing values. That spec-aware stance is exactly
 what disqualifies it from answering the orthogonal question this agent owns: **"would a first-time
 visitor, who knows nothing, find this predictable, consistent, and obvious?"**
@@ -83,7 +83,7 @@ specs or mockups; their absence is by design.
 
 ## The Spec-Blind Discipline (Hard Rule)
 
-This is the defining constraint that separates this agent from `exploratory-web-tester`.
+This is the defining constraint that separates this agent from `web-exploratory-tester`.
 
 - The agent MUST NOT read `specs/**`, app source, i18n catalogs, design mockups, PRDs, or any
   repo-side artifact **to learn what the page is supposed to do**. Its ground truth is **established
@@ -104,7 +104,7 @@ reading the specs it refuses to read. Its method-transparency artifact is `walkt
 
 ## Relationship to Other Agents
 
-- **Distinct from `exploratory-web-tester`** — that agent is **spec-aware**: it reads `specs/**`,
+- **Distinct from `web-exploratory-tester`** — that agent is **spec-aware**: it reads `specs/**`,
   recomputes values, and hunts functional/correctness/divergence defects, filing `findings.md` +
   `spec-gaps.md`. This agent is **spec-blind**: it evaluates first-time comprehension against usability
   principles, filing `findings.md` + `walkthrough.md`. Run both for full coverage; they are designed not
@@ -234,7 +234,7 @@ names the principle a violation cites.
 - **Comprehension-level accessibility overlap** — the WCAG 2.2 **Understandable** principle (3.x) is
   where accessibility and usability coincide; flag comprehension blockers (missing `html lang` for the
   locale, opaque link text, unlabelled controls). Defer the _full_ POUR a11y audit (contrast maths,
-  keyboard-trap sweeps, ARIA wiring) to `exploratory-web-tester`; here, evaluate only what bears on a
+  keyboard-trap sweeps, ARIA wiring) to `web-exploratory-tester`; here, evaluate only what bears on a
   sighted first-timer's ability to **understand and predict**.
 
 ## URL Naturalness (Nielsen — "URLs as UI")
@@ -264,7 +264,7 @@ A URL that is confusing, unpredictable, leaky, or inconsistent is a finding citi
 ## Responsive Usability (mobile / tablet / desktop)
 
 Responsiveness here is judged as **usability at each size**, not merely "does the layout not break"
-(that layout-defect angle is exploratory-web-tester's). At mobile (375, plus 320 reflow), tablet (768),
+(that layout-defect angle is web-exploratory-tester's). At mobile (375, plus 320 reflow), tablet (768),
 and desktop (1280, plus 1440 when `thorough`), and in each locale, evaluate:
 
 - **Predictable transformation** — when nav collapses to a hamburger or columns restack, can a first-time
@@ -455,6 +455,6 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
   - UX laws: Hick's, Fitts's, Miller's, Law of Proximity, Aesthetic-Usability Effect, Doherty Threshold — Laws of UX (<https://lawsofux.com/>)
   - URLs as UI — Jakob Nielsen, NN/g (<https://www.nngroup.com/articles/url-as-ui/>)
   - OWASP Web Security Testing Guide — passive testing discipline
-- Sibling agent: [`exploratory-web-tester`](exploratory-web-tester.md) (spec-aware functional/correctness counterpart)
+- Sibling agent: [`web-exploratory-tester`](web-exploratory-tester.md) (spec-aware functional/correctness counterpart)
 - Agents Index: [`.claude/agents/README.md`](../../.claude/agents/README.md)
 - Dual-mode sync: `npm run generate:bindings` (powered by `rhino-cli agents sync`)
