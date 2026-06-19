@@ -155,10 +155,10 @@ and [Plans Organization Convention §Worktree Specification](../../../repo-gover
 
 <!-- Date: 2026-05-25 | Status: done | Files Changed: .claude/agents/agent-maker.md | Notes: 1 occurrence replaced in description frontmatter, zero matches verified -->
 
-- [x] Edit `.claude/agents/web-research-maker.md`: replace the 1 occurrence.
-      Verify: `grep "sync:claude-to-opencode" .claude/agents/web-research-maker.md` — zero matches.
+- [x] Edit `.claude/agents/web-researcher.md`: replace the 1 occurrence.
+      Verify: `grep "sync:claude-to-opencode" .claude/agents/web-researcher.md` — zero matches.
 
-<!-- Date: 2026-05-25 | Status: done | Files Changed: .claude/agents/web-research-maker.md | Notes: 1 occurrence replaced, zero matches verified -->
+<!-- Date: 2026-05-25 | Status: done | Files Changed: .claude/agents/web-researcher.md | Notes: 1 occurrence replaced, zero matches verified -->
 
 - [x] Edit `.claude/skills/agent-developing-agents/SKILL.md`: replace the 1 occurrence.
       Verify: `grep "sync:claude-to-opencode" .claude/skills/agent-developing-agents/SKILL.md` — zero matches.

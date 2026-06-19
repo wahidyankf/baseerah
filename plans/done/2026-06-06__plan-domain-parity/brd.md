@@ -21,7 +21,7 @@ discipline, the same worktree mechanics, and the same harness bindings.
   maintainer context-switching across three repos pays the inconsistency cost on every plan.
 - **Deprecated harness surface** `[Web-cited]`: OpenCode officially deprecated boolean
   `tools` flags in favor of the `permission` object
-  (<https://opencode.ai/docs/agents/>, accessed 2026-06-05 via web-research-maker), and
+  (<https://opencode.ai/docs/agents/>, accessed 2026-06-05 via web-researcher), and
   `.codex/agents/` per-agent directories are not an official Codex convention — the official
   path is `config.toml` `agents.<name>` sub-tables
   (<https://developers.openai.com/codex/config-reference>, accessed 2026-06-05). Staying on

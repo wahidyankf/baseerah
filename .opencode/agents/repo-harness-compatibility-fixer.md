@@ -78,7 +78,7 @@ the agent downgrades confidence and skips the fix pending human review.
 **Do NOT use for**:
 
 - Running the initial drift check — use `repo-harness-compatibility-checker` first
-- Web research on harness conventions — consult `web-research-maker` directly if you need
+- Web research on harness conventions — consult `web-researcher` directly if you need
   current upstream data before deciding whether to apply a fix
 - Repository-wide rules fixes — use `repo-rules-fixer` instead
 

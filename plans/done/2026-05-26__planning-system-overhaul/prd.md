@@ -124,7 +124,7 @@ Scenario: User invokes plan-establishment with a prompt
   When the orchestrator follows the plan-establishment workflow
   Then it explores the repo for related conventions and prior plans (Step 0)
   And it grills the user to resolve scope, push target, plan identifier, and definition of done (Step 1)
-  And if research is needed, it invokes web-research-maker (Step 2)
+  And if research is needed, it invokes web-researcher (Step 2)
   And it grills the user again to integrate research findings (Step 3)
   And it invokes plan-maker to create the plan in plans/in-progress/<identifier>/ (Step 4)
   And it reviews the created plan for structural completeness (Step 5)

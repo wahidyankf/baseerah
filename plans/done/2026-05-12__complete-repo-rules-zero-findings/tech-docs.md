@@ -21,7 +21,7 @@ flowchart TD
   end
 
   subgraph agents[".claude/agents/ + .claude/skills/"]
-    a["repo-rules-checker / fixer<br/>plan-checker / fixer / maker<br/>web-research-maker"]
+    a["repo-rules-checker / fixer<br/>plan-checker / fixer / maker<br/>web-researcher"]
     s["existing + new param skills"]
   end
 

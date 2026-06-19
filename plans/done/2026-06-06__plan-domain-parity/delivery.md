@@ -178,7 +178,7 @@ PR instruction exists). Worktree removed after archival.
 - [x] [AI] Restructure `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`
       (row 2): the `## Steps` section becomes, in order — Step 1 Survey; Step 2 Matrix;
       Step 3 First Grill (hard gate, blocks authoring until every matrix row is resolved);
-      Step 4 Web Research via `web-research-maker` (conditional); Step 5 Second Grill
+      Step 4 Web Research via `web-researcher` (conditional); Step 5 Second Grill
       (post-research); Step 6 Author; Step 7 Gate; Step 8 Deliver (absorbing the current
       Step 7 Finalization content). Update the `## Grilling Contract`,
       `## Termination Criteria`, and `## Sibling Plans` cross-references to the renumbered
@@ -186,7 +186,7 @@ PR instruction exists). Worktree removed after archival.
       `npx nx run rhino-cli:validate:links` exits 0 (no broken intra-file fragments).
   - _Implementation notes (2026-06-06)_: Status DONE (executor: repo-workflow-maker).
     Steps restructured to: Survey, Matrix, First Grill (hard gate + research-needed
-    flag), Web Research (web-research-maker, conditional w/ skip rule), Second Grill
+    flag), Web Research (web-researcher, conditional w/ skip rule), Second Grill
     (post-research, matrix rows may be added/updated), Author (handoff now carries
     Steps 3+5 decisions + Step 4 cited findings), Gate, Delivery and Finalization
     (merged). 12 cross-reference updates (Execution Mode list now 8 entries,
@@ -209,7 +209,7 @@ PR instruction exists). Worktree removed after archival.
       only deliberate historical mentions).
   - _Implementation notes (2026-06-06)_: Status DONE (direct edit — trivial). Parity
     row description updated to the two-grill+research structure; agents column gains
-    web-research-maker. `grep "Relentless Grilling"` = 0 hits. Files changed:
+    web-researcher. `grep "Relentless Grilling"` = 0 hits. Files changed:
     repo-governance/workflows/README.md.
 - [x] [AI] Run the docs gates: `npm run format:md`, `npm run lint:md`,
       `npx nx run rhino-cli:validate:links`,

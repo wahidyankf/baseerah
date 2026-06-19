@@ -211,7 +211,7 @@ Current `ose-public` F# `lint` target (per `apps/crane-be/project.json`) already
 > Tool installation wiring (CI setup actions + `npm run doctor` entries) is an execution concern;
 > the delivery checklist includes steps to add each tool to the toolchain converger.
 
-## Research Sources (cited from brief — M4 web-research-maker findings)
+## Research Sources (cited from brief — M4 web-researcher findings)
 
 - **D2 F#**: g-research.github.io/fsharp-analyzers; Ionide FSharp.Analyzers.SDK CI docs;
   dotnet/sdk#9767 (TWAE-in-F# SDK behavior). `[Web-cited]` (per brief's M4 research record)
@@ -237,7 +237,7 @@ Current `ose-public` F# `lint` target (per `apps/crane-be/project.json`) already
   configuration book; repo's `docs/explanation/software-engineering/programming-languages/rust/code-quality-standards.md`.
   `[Web-cited]` / `[Repo-grounded]`
 
-> All external claims above were resolved by `web-research-maker` during the orchestrator's two
+> All external claims above were resolved by `web-researcher` during the orchestrator's two
 > grill rounds (brief decision M4: "research DONE"). They are reproduced here as the cited source
 > set; execution should re-verify tool flag syntax via `<tool> --help` before wiring.
 

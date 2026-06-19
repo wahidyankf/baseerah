@@ -91,7 +91,7 @@ context — use this when agent delegation is unavailable.
 ## Research Delegation
 
 The `plan-checker` agent delegates multi-page web research to the
-[`web-research-maker`](../../../.claude/agents/web-research-maker.md) delegated agent when verifying a single
+[`web-researcher`](../../../.claude/agents/web-researcher.md) delegated agent when verifying a single
 technical claim requires more than one or two searches, or more than two fetches. This keeps the
 plan audit context lean — `plan-checker` receives a cited, synthesised summary and translates it
 into dual-labelled findings, rather than burning its own context on multi-page research. Checkers
@@ -99,7 +99,7 @@ retain in-context `WebSearch` and `WebFetch` for single-shot verification agains
 authoritative URLs. No workflow-level configuration is required; the delegation is encoded in the
 `plan-checker` prompt.
 
-Multi-page research delegation keeps plan-checker context lean — externalizing 2+ search or 3+ fetch operations into `web-research-maker` reduces the checker's per-claim context spend. Tracked under Observability Metrics as 'web-research delegation rate'.
+Multi-page research delegation keeps plan-checker context lean — externalizing 2+ search or 3+ fetch operations into `web-researcher` reduces the checker's per-claim context spend. Tracked under Observability Metrics as 'web-research delegation rate'.
 
 ## Steps
 
@@ -140,7 +140,7 @@ Run plan validation to identify completeness, accuracy, and hallucination issues
 
 For external claims that are not already documented in the repo and require more than a
 single-shot URL fetch, `plan-checker` delegates research to
-[`web-research-maker`](../../../.claude/agents/web-research-maker.md) per the lower plan-content
+[`web-researcher`](../../../.claude/agents/web-researcher.md) per the lower plan-content
 threshold (any non-grep'd external claim → delegate). See
 [Plan Anti-Hallucination Convention §Web-Research Delegation](../../development/quality/plan-anti-hallucination.md#web-research-delegation-lower-threshold-for-plans).
 
@@ -378,7 +378,7 @@ Result: SUCCESS (4 iterations)
 The plan-checker validates:
 
 - **Completeness**: All five canonical documents present in multi-file plans — `README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery.md`. Required sections populated in each file per the [Content-Placement Rules](../../conventions/structure/plans.md#content-placement-rules-brdmd-vs-prdmd). Single-file exception is allowed when the plan is trivially small (≤1000 lines) and a single `README.md` covers the nine mandatory sections: Context, Scope, Business Rationale (condensed BRD), Product Requirements (condensed PRD), Technical Approach, **Worktree**, Delivery Checklist, Quality Gates, Verification.
-- **Technical Accuracy**: Commands, versions, tool names, API signatures verified via repo `Grep` first (free, fast, accurate); external claims verified via `web-research-maker` per the lower plan-content delegation threshold
+- **Technical Accuracy**: Commands, versions, tool names, API signatures verified via repo `Grep` first (free, fast, accurate); external claims verified via `web-researcher` per the lower plan-content delegation threshold
 - **Anti-Hallucination Scan**: Every non-trivial factual claim carries an inline confidence label
   (`[Repo-grounded]` / `[Web-cited]` / `[Judgment call]` / `[Unverified]`); zero violations of
   Anti-Pattern Catalog AP-1 through AP-10; every cited file path / Nx target / agent / skill
@@ -427,7 +427,7 @@ Track across executions:
 
 - **Iterations-to-convergence per mode** — how many check-fix cycles needed per mode level
 - **Anti-hallucination violations by category** — AP-1 through AP-10 breakdown (from plan-checker Step 5f output)
-- **Web-research delegation rate** — count of `web-research-maker` invocations per audit; higher rate indicates more external fact-checking
+- **Web-research delegation rate** — count of `web-researcher` invocations per audit; higher rate indicates more external fact-checking
 - **AI tokens spent on validation** — measure cost per plan audit
 
 ## Related Workflows

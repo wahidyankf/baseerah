@@ -300,9 +300,9 @@ Use `docs-validating-factual-accuracy` Skill methodology:
 - Classify each claim: `[Verified]`, `[Error]`, `[Outdated]`, `[Unverified]`
 - Report unverified claims as MEDIUM findings (may be correct but cannot confirm)
 
-**Delegate multi-page research to `web-research-maker`**: Per the
+**Delegate multi-page research to `web-researcher`**: Per the
 [Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md),
-invoke the [`web-research-maker`](./web-research-maker.md) subagent for multi-page research
+invoke the [`web-researcher`](./web-researcher.md) subagent for multi-page research
 (threshold: 2+ `WebSearch` calls or 3+ `WebFetch` calls for a single claim). This keeps the
 plan audit context lean and returns a cited, synthesised summary. Use in-context
 `WebSearch`/`WebFetch` only for single-shot verification against a known authoritative URL.
@@ -512,7 +512,7 @@ Every `[Web-cited]` claim MUST include URL + access date + excerpt inline. Missi
 2. For every sentence asserting a file path, Nx target, version, API surface, agent/skill name, behavior claim, or numeric metric: check the corresponding row of the verification recipe table from the [Plan Anti-Hallucination Convention §Repo-Grounding Rule](../../repo-governance/development/quality/plan-anti-hallucination.md#repo-grounding-rule-hard).
 3. Run the recipe (`Bash test -f`, `Glob`, `Grep`, `jq` against `project.json`, etc.) to confirm the claim.
 4. If the recipe fails, file a finding under the appropriate Anti-Pattern.
-5. For external claims, verify the inline citation includes URL + access date + excerpt. If the claim warranted multi-page research, verify the plan documents `web-research-maker` delegation (output linked or summarized).
+5. For external claims, verify the inline citation includes URL + access date + excerpt. If the claim warranted multi-page research, verify the plan documents `web-researcher` delegation (output linked or summarized).
 
 #### Re-validation Caching (Iterations 2+)
 
@@ -529,7 +529,7 @@ This prevents re-verification thrash and keeps the audit deterministic.
 - AP-1, AP-2, AP-3, AP-4, AP-5, AP-6, AP-7, AP-10: **HIGH** per occurrence
 - AP-8, AP-9, missing inline excerpt on `[Web-cited]`, executor-mismatch: **MEDIUM** per occurrence
 - Bare unlabeled non-trivial claim (defaults to `[Unverified]`): **MEDIUM** per claim
-- Missing `web-research-maker` delegation when threshold (any external claim not single-shot URL) was crossed: **MEDIUM** finding
+- Missing `web-researcher` delegation when threshold (any external claim not single-shot URL) was crossed: **MEDIUM** finding
 
 ### 13. Harness-Neutrality Scan (Step 5g — CONDITIONAL)
 
@@ -684,7 +684,7 @@ user-facing screens or components under any `apps/**` or `libs/**` path (e.g. `l
    enough): why the winner won and why each runner-up lost. Missing rationale: **HIGH**.
 7. **Grounding / prior-art note** — The plan MUST carry the R5 grounding note (surveyed
    `libs/web-ui` / target app / sibling screens, net-new components named) and the R7 prior-art
-   citation (`web-research-maker` survey). A missing grounding or prior-art note: **HIGH**.
+   citation (`web-researcher` survey). A missing grounding or prior-art note: **HIGH**.
 8. **Responsive strategy (mobile/tablet/desktop)** — The funnel MUST address **responsive design**,
    **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
    The selected design's decision record MUST state a **responsive strategy** per breakpoint (which

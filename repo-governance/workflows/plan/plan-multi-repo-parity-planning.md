@@ -98,7 +98,7 @@ The orchestrator:
 2. Builds and presents the deviation matrix
 3. Grills the invoker until every matrix cell has a recorded decision; establishes the
    research-needed flag
-4. Delegates external research to `web-research-maker` (conditional on research-needed flag)
+4. Delegates external research to `web-researcher` (conditional on research-needed flag)
 5. Grills the invoker again with research findings to validate and close any new decision branches
 6. Delegates plan authoring to `plan-maker` per repo
 7. Runs `plan-quality-gate` per plan until double-zero
@@ -281,7 +281,7 @@ value; do not author plans with unresolved matrix rows.
 
 ### Step 4 — Web Research (Sequential, Conditional)
 
-Delegate external research to `web-research-maker` to verify claims and gather authoritative
+Delegate external research to `web-researcher` to verify claims and gather authoritative
 sources before plan authoring begins.
 
 **Skip condition**: Skip if ALL hold:
@@ -295,7 +295,7 @@ If skipping: emit `Step 4 skipped — no external research needed (confirmed in 
 
 **If NOT skipping**:
 
-Invoke `web-research-maker` via the Agent tool. Provide a focused research prompt covering:
+Invoke `web-researcher` via the Agent tool. Provide a focused research prompt covering:
 
 - Vendor or harness conventions the objective touches (e.g., CI runner behavior, tool API
   contracts, platform-specific constraints)
@@ -303,7 +303,7 @@ Invoke `web-research-maker` via the Agent tool. Provide a focused research promp
 - Library or tool behavior referenced in the objective (versions, API signatures, caveats)
 - Risks or caveats not surfaced in the Step 1 inventories
 
-**Agent**: `web-research-maker`
+**Agent**: `web-researcher`
 
 **Output**: Cited, structured research findings. Passed to Step 5 grill and included in the
 `plan-maker` handoffs in Step 6. If skipped, the skip line is included in Step 6 handoffs
@@ -523,7 +523,7 @@ User: "Run plan-multi-repo-parity-planning for objective: standardize markdown g
 ```
 
 The orchestrator surveys each repo, builds the deviation matrix, grills the invoker (Step 3),
-optionally delegates research to `web-research-maker` (Step 4), grills again post-research
+optionally delegates research to `web-researcher` (Step 4), grills again post-research
 (Step 5), authors three plans (one per repo) in `plans/in-progress/standardize-markdown-gates/`,
 gates each plan, and pushes each plan to its repo's `origin main` via worktrees.
 
@@ -627,5 +627,5 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
 - **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: No
   system secret enters any plan file or rationale doc created by this workflow.
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:
-  External research delegated to `web-research-maker` in Step 4 when the research-needed flag
+  External research delegated to `web-researcher` in Step 4 when the research-needed flag
   is set.

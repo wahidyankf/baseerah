@@ -31,7 +31,7 @@ The [Governance Vendor-Independence Convention](../../../repo-governance/convent
 - Correct factually-inaccurate Aider entry in `docs/reference/platform-bindings.md` and `AGENTS.md` (web research 2026-05-03 found Aider's own docs only document `CONVENTIONS.md`, not AGENTS.md)
 - **Operationalize parity** — author `repo-parity-checker` (green) and `repo-parity-fixer` (yellow) agents in `.claude/agents/` (auto-synced to `.opencode/agents/`) that invoke existing tools (rhino-cli vendor-audit, npm sync, ls/grep/diff, WebFetch) to validate the five invariants above. Author the `repo-cross-vendor-parity-quality-gate` workflow at `repo-governance/workflows/repo/repo-cross-vendor-parity-quality-gate.md` (mirrors `plan-quality-gate.md` — iterative check-fix-verify, terminates on double-zero). Wire into Nx target `validate:cross-vendor-parity` and pre-push hook so invariants stay green long-term without requiring memory of this plan.
 
-**External standards alignment** (verified 2026-05-03 via `web-research-maker`):
+**External standards alignment** (verified 2026-05-03 via `web-researcher`):
 
 - AGENTS.md is a real Linux Foundation standard under the Agentic AI Foundation (announced 2025-12-09). Confirms that AGENTS.md neutrality is the correct cross-vendor instruction surface.
 - OpenCode reads AGENTS.md natively (per <https://opencode.ai/docs/rules/>) and reads SKILL.md from `.claude/skills/<name>/SKILL.md` as one of multiple search paths (also `.opencode/skills/`, `.agents/skills/`).

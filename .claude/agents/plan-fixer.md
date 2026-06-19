@@ -62,7 +62,7 @@ Your primary job is to:
 This agent has `WebSearch` and `WebFetch` tools but invokes **Exception 2 (fixer re-validation)**
 of the [Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md).
 Fixer agents re-validate single audit findings in the same context as the fix they apply, so
-delegating to [`web-research-maker`](./web-research-maker.md) would break the re-validation-plus-fix
+delegating to [`web-researcher`](./web-researcher.md) would break the re-validation-plus-fix
 coupling. The agent therefore uses in-context `WebSearch`/`WebFetch` for single-finding
 re-validation only; if research expands beyond the audit frame, the agent classifies the
 finding as MEDIUM (manual review) or FALSE_POSITIVE rather than spawning a subagent itself.
@@ -443,7 +443,7 @@ Stage 5 responsive-strategy stub above — the mobile/tablet/desktop bullets the
 and ensure the low-fi tier shows the mobile↔desktop reflow.
 
 Also scaffold the **grounding note (R5)** and **prior-art citation (R7)** when missing — add a stub
-delivery step delegating the survey to `web-research-maker` (prior art) and the
+delivery step delegating the survey to `web-researcher` (prior art) and the
 `swe-developing-frontend-ui` skill / `libs/web-ui` inventory (internal grounding), naming any
 net-new component. After scaffolding, re-run the checker's Step 5k mentally: every required artefact
 now has at least a placeholder section for the author to complete.
@@ -780,12 +780,12 @@ If the recipe fails:
 | **AP-1**     | Version cited without manifest evidence  | `jq` the manifest, replace with the resolved version + `[Repo-grounded]` label                                                          |
 | **AP-2**     | File path does not exist, not marked NEW | `Glob` for the intended file; if found, replace path; if NEW, append `_New file_` and add a creation step to delivery.md                |
 | **AP-3**     | Nx target invalid                        | Read `apps/<project>/project.json`, list real targets, replace cited target with the closest match; if no match, MEDIUM (manual review) |
-| **AP-4**     | Function/method name fabricated          | Delegate to `web-research-maker` (in-context fixer Exception 2 only when single-shot URL fetches it; else escalate MEDIUM)              |
+| **AP-4**     | Function/method name fabricated          | Delegate to `web-researcher` (in-context fixer Exception 2 only when single-shot URL fetches it; else escalate MEDIUM)                  |
 | **AP-5**     | Fabricated numeric KPI                   | Rewrite as observable check / cited measurement / qualitative reasoning / `_Judgment call:_` (NEVER invent a plausible number)          |
 | **AP-6**     | Test name fabricated                     | If pre-existing, `Grep` for the real name; if NEW, append `_New test_` and ensure delivery checklist creates it                         |
 | **AP-7**     | Agent/skill name does not resolve        | List `.claude/agents/` or `.claude/skills/`, find closest match, replace; if no match, MEDIUM                                           |
 | **AP-8**     | CLI flag without evidence                | Run `<cmd> --help` (in-context bash); if flag exists, append `[Repo-grounded]`; if not, replace with verified usage                     |
-| **AP-9**     | Behavior claim without source            | Delegate to `web-research-maker`; embed inline excerpt + URL + access date; classify HIGH only after citation appended                  |
+| **AP-9**     | Behavior claim without source            | Delegate to `web-researcher`; embed inline excerpt + URL + access date; classify HIGH only after citation appended                      |
 | **AP-10**    | Cross-link target does not exist         | Resolve relative path; if file moved, update path; if file removed, find replacement reference; if no replacement, classify MEDIUM      |
 
 ### Confidence Assessment for Anti-Hallucination Fixes

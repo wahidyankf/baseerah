@@ -20,7 +20,7 @@ Google Antigravity CLI, and Pi (pi.dev).
 
 (OpenCode is already active and is treated as a tenth, already-covered harness.)
 
-Web research (delegated to `web-research-maker`, 2026-05-24) established that **seven of the nine read
+Web research (delegated to `web-researcher`, 2026-05-24) established that **seven of the nine read
 the root `AGENTS.md` natively** — Copilot, Cursor, Windsurf, Junie, Codex CLI, Antigravity, and Pi.
 Only **Amazon Q Developer does not read `AGENTS.md`** (open upstream feature request), and **Claude
 Code reads `CLAUDE.md`** (already bridged via the existing `@AGENTS.md` shim). This makes the canonical
@@ -38,7 +38,7 @@ citations]
 - Add or formalize platform bindings for the nine harnesses, using a **two-tier strategy** (native
   AGENTS.md readers get thin pointers / native reads; non-readers get an explicit bridge).
 - Create a new repository workflow `repo-harness-compatibility-quality-gate` that delegates to
-  `web-research-maker` to re-verify each harness's current config conventions and detect drift against the
+  `web-researcher` to re-verify each harness's current config conventions and detect drift against the
   platform-bindings catalog.
 - Extend `apps/rhino-cli/` (vendor-audit regex + binding emitters) and update `specs/apps/rhino/` Gherkin
   features accordingly.
@@ -70,7 +70,7 @@ the repo root.
    vendor vocabulary, with documented false-positive handling.
 3. **Generate/author the binding files** mechanically where possible (Amazon Q bridge, thin pointer files),
    so they cannot drift from `AGENTS.md`.
-4. **Author the compatibility-audit workflow** and its checker/fixer agents that use `web-research-maker`
+4. **Author the compatibility-audit workflow** and its checker/fixer agents that use `web-researcher`
    to keep the catalog honest over time (external drift).
 5. **Add a deterministic pre-push parity guard** (`rhino-cli agents validate-bindings`, no agent) for internal
    drift, wired into `.husky/pre-push`.

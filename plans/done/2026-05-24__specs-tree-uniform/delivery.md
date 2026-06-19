@@ -471,7 +471,7 @@ agent authorized to write rules and conventions there per
 
 - [x] Invoke `repo-rules-maker` with the brief in [§Propagation Brief](#propagation-brief)
     below. Pass the brief verbatim.
-<!-- Date: 2026-05-24 | Status: done | Notes: 14 files updated: specs-directory-structure.md, app-readme-vs-specs.md, deterministic-vs-ai-validation-split.md, bdd-spec-test-mapping.md, ci-conventions.md, feature-change-completeness.md, specs-application-sync.md, specs-quality-gate.md, specs-checker.md, specs-maker.md, web-research-maker.md, apps-ose-web/apps-organiclever-web SKILL.md, docs/how-to/add-new-app.md, docs/reference/monorepo-structure.md; also fixed ose-app gherkin READMEs broken links (health/ and smoke/ domain moves) -->
+<!-- Date: 2026-05-24 | Status: done | Notes: 14 files updated: specs-directory-structure.md, app-readme-vs-specs.md, deterministic-vs-ai-validation-split.md, bdd-spec-test-mapping.md, ci-conventions.md, feature-change-completeness.md, specs-application-sync.md, specs-quality-gate.md, specs-checker.md, specs-maker.md, web-researcher.md, apps-ose-web/apps-organiclever-web SKILL.md, docs/how-to/add-new-app.md, docs/reference/monorepo-structure.md; also fixed ose-app gherkin READMEs broken links (health/ and smoke/ domain moves) -->
 - [x] Verify `repo-rules-maker` only modified files under `repo-governance/`, `AGENTS.md`,
     `.claude/agents/`, `.claude/skills/`, or `docs/reference/`. If it touched anything else,
     reject and re-invoke with tighter scope.
@@ -479,7 +479,7 @@ agent authorized to write rules and conventions there per
 - [x] Run `npm run sync:claude-to-opencode` to mirror `.claude/agents/` changes into
     `.opencode/agents/`. Acceptance: exit code 0; diff shows only mechanical
     Claude-Code-to-OpenCode translations (color tokens, tool array → boolean flags).
-<!-- Date: 2026-05-24 | Status: done | Notes: 75 agents converted; .opencode mirrors updated for specs-checker, specs-maker, web-research-maker -->
+<!-- Date: 2026-05-24 | Status: done | Notes: 75 agents converted; .opencode mirrors updated for specs-checker, specs-maker, web-researcher -->
 - [x] Run `nx run rhino-cli:validate:specs-links` — exits 0 (governance updates may have
     changed cross-link targets).
 <!-- Date: 2026-05-24 | Status: done | Notes: 0 findings; fixed broken links in ose-app gherkin READMEs pointing to health/ and smoke/ domain subdirs -->
@@ -575,7 +575,7 @@ Decision D2. Update the remaining governance surfaces to match:
      need stale-flag rather than rewrite)
    - `apps/ayokoding-cli/README.md`, `apps/rhino-cli/README.md`, `apps/ose-cli/README.md`,
      `apps/crane-cli/README.md` — per-app READMEs must show the post-migration spec path
-   - `.claude/agents/{specs-checker,specs-maker,specs-fixer,web-research-maker,repo-ose-primer-propagation-maker}.md`
+   - `.claude/agents/{specs-checker,specs-maker,specs-fixer,web-researcher,repo-ose-primer-propagation-maker}.md`
    - `.claude/skills/{repo-syncing-with-ose-primer/SKILL,repo-syncing-with-ose-primer/reference/extraction-scope,repo-syncing-with-ose-primer/reference/transforms,apps-organiclever-web-developing-content/SKILL}.md`
 
    For each hit:

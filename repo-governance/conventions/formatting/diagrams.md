@@ -2185,7 +2185,7 @@ Option B dropped here: shows few cities per screen, weak for side-by-side number
 ### Prior-Art Recommendation (R7)
 
 When crafting the divergent low-fidelity alternatives, the author SHOULD consult prior art — how
-comparable tools solve the same screen in the wild — using the `web-research-maker` agent.
+comparable tools solve the same screen in the wild — using the `web-researcher` agent.
 
 This complements the internal grounding rule (R5, the repo's own design system) with an external
 pattern survey. Cited findings inform the Stage 1 alternatives and the Stage 4 rationale, so

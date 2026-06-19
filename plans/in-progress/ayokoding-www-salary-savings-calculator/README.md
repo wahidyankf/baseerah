@@ -95,7 +95,7 @@ _"For a savings goal, what is the lowest engineering role anywhere that reaches 
   visa/admin) and a liquidity-reserve cash cushion, all kept out of the monthly savings math.
 - Modeled transport **assumes public transport** (a monthly transit pass) in every city; car
   ownership/fuel/parking is not modeled (fixed v1 assumption, not a toggle).
-- Static, hand-curated, **`web-research-maker`-sourced** datasets:
+- Static, hand-curated, **`web-researcher`-sourced** datasets:
   - `fx.ts` — the authoritative **FX snapshot**: a table mapping ISO-4217 currency code → USD value
     per 1 unit, plus a `fxSnapshotDate`. This is the **single source** for every currency conversion
     in the app (local → USD, USD → chosen display currency); per-city `fxToUsd` is **derived** from
@@ -144,12 +144,12 @@ _"For a savings goal, what is the lowest engineering role anywhere that reaches 
 2. **Phase 1 — FX + city data + calculation core (TDD)**: `fx.ts` (authoritative ISO-4217 → USD
    snapshot, the single source for all conversions) + `cities.ts` (per-category expenses incl.
    childcare + federal tax bands + per-city sub-national rates + healthcare model + split relocation,
-   FX-to-USD derived from `fx.ts`, all `web-research-maker`-sourced) + pure `calc` module (net via
+   FX-to-USD derived from `fx.ts`, all `web-researcher`-sourced) + pure `calc` module (net via
    federal+sub-national bands, essentials sum, two savings figures, relocation split, conversions via
    `fx.ts`) with tests.
 3. **Phase 1b — Role-salary data + reverse-lookup core (TDD)**: source the software-engineering role
    ladder + role × **country** salary distribution (p25/median/p75) + non-salary comp via
-   `web-research-maker` into `roles.ts`; add pure `geo-filter` selectors + `roleLookup` functions
+   `web-researcher` into `roles.ts`; add pure `geo-filter` selectors + `roleLookup` functions
    (median-ranked baseline resolution, filter-scoped candidate ranking, reordered minimum-role) with
    tests.
 4. **Phase 2 — Interactive page (TDD)**: add the missing `Table` primitive to `libs/web-ui`, then

@@ -82,14 +82,14 @@ seven modeled monthly expense categories (incl. childcare), a per-pre-school-chi
 effective tax model, per-city **sub-national** rates for US/CA/CH, each country's `healthcareModelType`,
 and the shared OECD-modified household/area multipliers. **A city's FX-to-USD is derived from `fx.ts`
 via its `currency` — there is no standalone `fxToUsd` field on a city.** All figures are
-`web-research-maker`-sourced.
+`web-researcher`-sourced.
 
-- [x] **[AI]** Source the FX snapshot via `web-research-maker`: an authoritative **ISO-4217 → USD
+- [x] **[AI]** Source the FX snapshot via `web-researcher`: an authoritative **ISO-4217 → USD
       value per 1 unit** rate for **every currency** used by any city/country/role in the datasets
       **plus every supported chosen-display currency** (USD itself = 1), with a single `fxSnapshotDate`.
       Record cited findings + the snapshot date in a research note referenced from `fx.ts` comments.
       Acceptance: a rate exists for each currency the rest of the plan will reference; no fabricated
-      rates (each cited or documented). - _Suggested executor: `web-research-maker`_
+      rates (each cited or documented). - _Suggested executor: `web-researcher`_
   > **Implementation notes** — Date: 2026-06-18 | Status: done | Sources: ECB reference rates 2026-06-17, Xe.com mid-market 2026-06-17, x-rates.com 2026-06-18 cross-check | fxSnapshotDate: "2026-06-17" | 40 currencies sourced; USD=1.0; MMK/KHR/LAK/ARS marked moderate confidence; all others verified high confidence.
 - [x] **[AI] RED** Add `fx.test.ts` asserting the FX single-source invariants: `fx.ratesUsdPerUnit`
       has a positive-number entry for **every currency referenced by any city/country/role AND every
@@ -117,7 +117,7 @@ via its `currency` — there is no standalone `fxToUsd` field on a city.** All f
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/data/fx.ts`. Acceptance:
       `fx.test.ts` passes. - _Suggested executor: `swe-typescript-dev`_
   > **Implementation notes** — Date: 2026-06-18 | Status: done | File: `src/features/cost-of-living-calculator/core/data/fx.ts` | 36 currencies; fxSnapshotDate "2026-06-17"; fxToUsd throws on missing currency; cityFxToUsd/usdToDisplay compose over fxToUsd. GREEN confirmed: 25 files 395 tests pass.
-- [x] **[AI]** Source the city data via `web-research-maker`: (a) per city, the seven monthly expense
+- [x] **[AI]** Source the city data via `web-researcher`: (a) per city, the seven monthly expense
       categories (housing, food, transport-as-transit-pass, utilities, **healthcare as out-of-pocket
       only**, **childcare per pre-school child**, lifestyle) in local currency, a `{ public, private }`
       per-school-age-child school median, a per-pre-school-child `childcareMedianLocal`, and the **split**
@@ -137,7 +137,7 @@ via its `currency` — there is no standalone `fxToUsd` field on a city.** All f
       `effectiveRate`) to avoid double-counting. Acceptance: every city has all seven categories +
       childcare + school + a split relocation block + a resolvable country with federal banded rates +
       `healthcareModelType` + `compulsoryInsurance`, every US/CA/CH city carries `subNational`, no
-      fabricated exact figures (gaps documented as `proxy` derivations). - _Suggested executor: `web-research-maker`_
+      fabricated exact figures (gaps documented as `proxy` derivations). - _Suggested executor: `web-researcher`_
   > **Implementation notes** — Date: 2026-06-18 | Status: done | 30 cities (ASEAN 6, Japan 2, Europe non-Nordic 7, Nordics 4, Americas 6, Others 5), 28 countries. Federal tax bands + compulsoryInsurance for all; subNational for US/CA/CH cities. 7 expense categories + childcareMedianLocal + schoolMedianLocal + split relocation per city. snapshotDate "2026-06-18". Sources: Numbeo Jun 2026, PwC/OECD 2025, ECB/Xe.com.
 - [x] **[AI] RED** Add `cities.test.ts` asserting dataset invariants: every city has all seven expense
       categories (`housing`/`food`/`transport`/`utilities`/`healthcare`/`childcare`/`lifestyle`), a
@@ -229,18 +229,18 @@ via its `currency` — there is no standalone `fxToUsd` field on a city.** All f
 Adds the second dataset (`roles.ts`), the pure cascading `geo-filter.ts` selectors, and the pure
 `role-lookup.ts` search that powers the minimum-role tab. The **software-engineering** role taxonomy +
 the role × **country** salary distribution (p25 / median / p75) + non-salary comp are sourced via
-`web-research-maker`, then encoded as a static full **country**×role matrix with per-cell confidence
+`web-researcher`, then encoded as a static full **country**×role matrix with per-cell confidence
 tiers; cities inherit their country's distribution. The lookup runs the **median** role salary through
 the **same net→expenses→savings engine** from `calc.ts`. Still no UI.
 
-- [x] **[AI]** Source the role data via `web-research-maker`: (a) the canonical 15-rung
+- [x] **[AI]** Source the role data via `web-researcher`: (a) the canonical 15-rung
       **software-engineering** ladder (IC + management, with `rank`/`track`/`label`), and (b) per role
       per **country** present in `cities.ts`, a gross monthly **`{ p25, median, p75 }`** salary
       distribution (bottom 25% / median / top 25%) plus a typical **non-salary comp** (annual
       RSU/equity + bonus), each with a `confidence` tier and a source note. Record cited findings +
       `snapshotDate` in a research note referenced from `roles.ts` comments. Acceptance: a complete
       role list + a `{ p25, median, p75 }` distribution (with `p25 ≤ median ≤ p75`) and a non-salary
-      comp (or documented `proxy` derivation) for every country×role pair, no fabricated exact figures. - _Suggested executor: `web-research-maker`_
+      comp (or documented `proxy` derivation) for every country×role pair, no fabricated exact figures. - _Suggested executor: `web-researcher`_
   > **Implementation notes** — Date: 2026-06-18 | Status: done | Sources: levels.fyi 2025 EOY, ravio.com 2026, japan-dev.com/TokyoDev, highfive.global ID/VN 2026, fullscale.io PH, vietnamdevs.com 2026, nordictechjobs.com, ginitalent.com BR, howdy.com MX, devopswebdesigners.co.ke KE, Glassdoor/Jobstreet/PayScale per-country, regional proxies vs US | snapshotDate: "2026-06-18" | 28 countries × 15 roles = 420 cells; all confidence-tiered; no ILS/Israel.
 - [x] **[AI] RED** Add `roles.test.ts` asserting matrix invariants: `ladder` is the full 15-rung set
       with strictly increasing `rank`; `salaries` keys **exactly match** the **country** set referenced

@@ -78,7 +78,7 @@ Scenario: Grilling convention keeps the public name
 Scenario: Parity workflow exposes the two-grill plus research step structure
   Given the amended repo-governance/workflows/plan/plan-multi-repo-parity-planning.md
   When I read its Steps section headings in order
-  Then the ordered steps are Survey, Matrix, First Grill (hard gate), web-research-maker (conditional), Second Grill (post-research), Author, Gate, Deliver
+  Then the ordered steps are Survey, Matrix, First Grill (hard gate), web-researcher (conditional), Second Grill (post-research), Author, Gate, Deliver
   And the First Grill step is marked as a hard gate that blocks authoring until all matrix rows are resolved
   And internal cross-references (Grilling Contract, Termination Criteria, Sibling Plans) point at the renumbered steps
 ```

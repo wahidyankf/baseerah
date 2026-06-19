@@ -288,7 +288,7 @@ For each subsection of `tech-docs.md §4`, walk the `apps/rhino-cli/src/` tree a
 
 ## Phase 9 — Web-research re-verification
 
-- [x] **9.1** Spawn `web-research-maker` with the same prompt used at kickoff; compare new findings against `tech-docs.md §2` currency table.
+- [x] **9.1** Spawn `web-researcher` with the same prompt used at kickoff; compare new findings against `tech-docs.md §2` currency table.
   - Date: 2026-05-23 | Status: done | Notes: All four bumped deps (chrono 0.4.44, glob 0.3.3,
     sha2 0.11.0, tempfile 3.27.0) were already advanced to their crates.io latest at time of bump
     (Path A). No further movement detected within this audit window. Low re-check risk; deferred

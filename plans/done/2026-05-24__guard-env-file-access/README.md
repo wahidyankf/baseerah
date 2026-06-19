@@ -321,7 +321,7 @@ document a gap". Two mechanisms, use whichever (or both) OpenCode supports:
 
 [Unverified] OpenCode's exact `permission` schema and plugin/hook contract must
 be confirmed against OpenCode docs before authoring syntax — delegate to
-`web-research-maker`. The deliverable is mandatory: OpenCode MUST refuse direct
+`web-researcher`. The deliverable is mandatory: OpenCode MUST refuse direct
 `.env*` access. Only the _mechanism_ is to be determined; if a capability is
 genuinely absent, that specific gap (and its compensating control) is documented
 in the governance rule.
@@ -442,9 +442,9 @@ See [Trunk Based Development](../../../repo-governance/development/workflow/trun
 
 ### Phase 4 — OpenCode enforcement (mandatory)
 
-- [x] Confirm OpenCode's `permission` schema + plugin/hook contract for path-scoped denial and the `.env.example` exception. Delegate to `web-research-maker` if not documented in-repo; record findings in the governance rule.
-  <!-- Date: 2026-05-24 | Status: Done | Notes: Verified via web-research-maker: OpenCode uses "permission" key (singular) in opencode.json. Supports read/edit/bash tool scoped deny. Last-matching-rule wins. Default config uses *.env deny + *.env.example allow. Key is "permission" not "permissions". Glob depth semantics for *.env TBD at implementation. -->
-  - _Suggested executor: `web-research-maker`_ (docs lookup)
+- [x] Confirm OpenCode's `permission` schema + plugin/hook contract for path-scoped denial and the `.env.example` exception. Delegate to `web-researcher` if not documented in-repo; record findings in the governance rule.
+  <!-- Date: 2026-05-24 | Status: Done | Notes: Verified via web-researcher: OpenCode uses "permission" key (singular) in opencode.json. Supports read/edit/bash tool scoped deny. Last-matching-rule wins. Default config uses *.env deny + *.env.example allow. Key is "permission" not "permissions". Glob depth semantics for *.env TBD at implementation. -->
+  - _Suggested executor: `web-researcher`_ (docs lookup)
 - [x] Implement the OpenCode guard per `§Layer 4` (permission block and/or plugin/hook). Acceptance: `jq -e . opencode.json` exits 0; the env guard is present; an OpenCode read/write of `.env.local` is refused (verify per OpenCode's test path) while `.env.example` is allowed.
 <!-- Date: 2026-05-24 | Status: Done | Files: opencode.json | Notes: Added permission block: read/edit deny *.env/*.env.*, allow *.env.example (last-matching-rule wins); bash "*": "allow". jq -e . exits 0. -->
 - [x] If a specific capability is genuinely absent, document that exact gap + compensating control in the governance rule (do NOT silently ship partial coverage).

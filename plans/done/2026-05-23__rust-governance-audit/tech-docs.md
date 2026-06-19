@@ -76,7 +76,7 @@ Every Rust-touching artefact in scope, grouped by category. This table is the ca
 
 ## 2. Currency Table (web-verified, 2026-05-23)
 
-Source: kickoff `web-research-maker` invocation; full report archived in `generated-reports/rust-governance-audit__kickoff-research__2026-05-23.md` if generated separately.
+Source: kickoff `web-researcher` invocation; full report archived in `generated-reports/rust-governance-audit__kickoff-research__2026-05-23.md` if generated separately.
 
 ### 2.1 Toolchain
 
@@ -246,7 +246,7 @@ All four must pass before pushing.
 
 ### 5.3 Web-research re-verification
 
-If any dependency action takes more than a week, re-invoke `web-research-maker` to refresh the currency table before committing.
+If any dependency action takes more than a week, re-invoke `web-researcher` to refresh the currency table before committing.
 
 ## 6. Out-of-Band Considerations
 

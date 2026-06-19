@@ -61,7 +61,7 @@ There is no new code feature; the artefacts are documentation, configuration, an
 | Spec README rewrite reveals untested behaviour                                      | Low        | Low                                  | Audit existing `.feature` files against the `rhino-cli` command surface during Phase 1 before rewriting README in Phase 3.                                                                                                                                         |
 | Governance docs become inconsistent with future crates                              | Low        | Medium (drift recurs)                | Add a `repo-rules-checker`-style audit step to the delivery list (Phase 10.7) so the next Rust crate triggers the same checks.                                                                                                                                     |
 | Pair-wise contradiction sweep finds new contradictions not in the kickoff catalogue | Medium     | Low (handled by Phase 7 loop)        | Phase 7.3 loops fixes until empty; no time pressure on the loop because the plan is direct-to-main with no release dependency.                                                                                                                                     |
-| Web-research-cited dependency versions move upstream during the audit               | Medium     | Low                                  | Phase 9 re-invokes `web-research-maker` and re-opens Phase 4 for any newly-stale crate.                                                                                                                                                                            |
+| Web-research-cited dependency versions move upstream during the audit               | Medium     | Low                                  | Phase 9 re-invokes `web-researcher` and re-opens Phase 4 for any newly-stale crate.                                                                                                                                                                                |
 
 ## Functional Requirements
 
@@ -123,7 +123,7 @@ Pair-wise comparison of every Rust-naming governance doc against every other yie
 
 ### FR-7. Web-research findings encoded
 
-Every claim in this plan's [tech-docs.md](./tech-docs.md) "Currency table" derived from the kickoff `web-research-maker` invocation is reproducible via the cited URL and includes a `[Verified]` / `[Likely]` confidence label.
+Every claim in this plan's [tech-docs.md](./tech-docs.md) "Currency table" derived from the kickoff `web-researcher` invocation is reproducible via the cited URL and includes a `[Verified]` / `[Likely]` confidence label.
 
 ## Non-Functional Requirements
 

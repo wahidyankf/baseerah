@@ -253,7 +253,7 @@ If `rhino-cli repo-governance vendor-audit` does not yet accept arbitrary file t
 
 ## External Standards Verification (web research 2026-05-03)
 
-Verified via `web-research-maker` against current public docs. Findings inform plan scope and surface a factual-accuracy correction for `docs/reference/platform-bindings.md`.
+Verified via `web-researcher` against current public docs. Findings inform plan scope and surface a factual-accuracy correction for `docs/reference/platform-bindings.md`.
 
 | Claim                                                                                        | Status                                                                                                                                                                                   | Source                                                                                                                                                                                       |
 | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

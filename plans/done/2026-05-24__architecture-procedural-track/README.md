@@ -54,4 +54,4 @@ This is a multi-session deliverable. Rollout under [delivery.md](./delivery.md).
 
 ## Trigger
 
-User requested addition of Go / Rust / C to the architecture-track content "where appropriate" with web-research-maker-validated paradigm fit and conceptual adjustments to FP teaching where Rust does not collapse one-to-one.
+User requested addition of Go / Rust / C to the architecture-track content "where appropriate" with web-researcher-validated paradigm fit and conceptual adjustments to FP teaching where Rust does not collapse one-to-one.

@@ -95,7 +95,7 @@ finalization.
 orchestrator for the whole composite. This is mandatory, not preferred: plan-execution requires
 calling-context orchestration so the live Task list stays visible to the user in real time.
 Within the planning phase, the orchestrator delegates exactly as
-plan-multi-repo-parity-planning specifies (`plan-maker`, `web-research-maker`, `plan-checker`,
+plan-multi-repo-parity-planning specifies (`plan-maker`, `web-researcher`, `plan-checker`,
 `plan-fixer` via the Agent tool). Within the execution phase, it delegates per-item work to
 specialized agents exactly as plan-execution specifies, and invokes `plan-execution-checker` for
 independent validation.
@@ -404,7 +404,7 @@ Plans and executes only the two listed repos; the pre-execution grill confirms w
 - [plan-maker](../../../.claude/agents/plan-maker.md) — authors each repo's plan (planning phase)
 - [plan-checker](../../../.claude/agents/plan-checker.md) /
   [plan-fixer](../../../.claude/agents/plan-fixer.md) — quality gate per plan (planning phase)
-- [web-research-maker](../../../.claude/agents/web-research-maker.md) — conditional research
+- [web-researcher](../../../.claude/agents/web-researcher.md) — conditional research
   (planning phase)
 - [plan-execution-checker](../../../.claude/agents/plan-execution-checker.md) — independent
   validation per repo (execution phase)

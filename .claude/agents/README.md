@@ -73,7 +73,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 ### 🔍 Research (Green)
 
-- **[web-research-maker](web-research-maker.md)** - Read-only web research specialist; returns cited, structured findings with confidence tags in an isolated context (no file writes, no shell). Invoke for current API/library docs, fact verification, best-practice surveys.
+- **[web-researcher](web-researcher.md)** - Read-only web research specialist; returns cited, structured findings with confidence tags in an isolated context (no file writes, no shell). Invoke for current API/library docs, fact verification, best-practice surveys.
 
 ### 🧪 Testing
 
@@ -111,15 +111,16 @@ Normative source: [Agent Naming Convention](../../repo-governance/conventions/st
 
 ## Role Vocabulary
 
-| Role       | Semantics                                                  | Example agents                                               |
-| ---------- | ---------------------------------------------------------- | ------------------------------------------------------------ |
-| `maker`    | Produces a content/research artifact                       | `docs-maker`, `web-research-maker`                           |
-| `checker`  | Validates an artifact against standards                    | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
-| `fixer`    | Applies validated checker findings                         | `plan-fixer`, `swe-ui-fixer`                                 |
-| `dev`      | Writes code in a language or test framework                | `swe-rust-dev`, `swe-e2e-dev`                                |
-| `deployer` | Deploys an application to an environment                   | `apps-ayokoding-www-deployer`                                |
-| `manager`  | Performs file or resource operations (rename/move/delete)  | `docs-file-manager`                                          |
-| `tester`   | Explores a running system or live site and reports defects | `exploratory-web-tester`                                     |
+| Role         | Semantics                                                     | Example agents                                               |
+| ------------ | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| `maker`      | Produces a content/research artifact                          | `docs-maker`, `docs-tutorial-maker`                          |
+| `checker`    | Validates an artifact against standards                       | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
+| `fixer`      | Applies validated checker findings                            | `plan-fixer`, `swe-ui-fixer`                                 |
+| `dev`        | Writes code in a language or test framework                   | `swe-rust-dev`, `swe-e2e-dev`                                |
+| `deployer`   | Deploys an application to an environment                      | `apps-ayokoding-www-deployer`                                |
+| `manager`    | Performs file or resource operations (rename/move/delete)     | `docs-file-manager`                                          |
+| `tester`     | Explores a running system or live site and reports defects    | `exploratory-web-tester`                                     |
+| `researcher` | Gathers and verifies external information; read-only research | `web-researcher`                                             |
 
 Enforcement: `rhino-cli agents validate-naming` (wired into pre-push and CI).
 

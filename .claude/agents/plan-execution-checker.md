@@ -445,7 +445,7 @@ For every relative cross-link in plan files:
 2. For each factual claim, run the recipe in [Plan Anti-Hallucination Convention §Repo-Grounding Rule](../../repo-governance/development/quality/plan-anti-hallucination.md#repo-grounding-rule-hard).
 3. Compare results against the post-execution repo state.
 4. File findings per severity table below.
-5. For external behavior claims, delegate multi-page verification to `web-research-maker` per the lower threshold in [Plan Anti-Hallucination Convention §Web-Research Delegation](../../repo-governance/development/quality/plan-anti-hallucination.md#web-research-delegation-lower-threshold-for-plans).
+5. For external behavior claims, delegate multi-page verification to `web-researcher` per the lower threshold in [Plan Anti-Hallucination Convention §Web-Research Delegation](../../repo-governance/development/quality/plan-anti-hallucination.md#web-research-delegation-lower-threshold-for-plans).
 
 #### Finding Severity
 

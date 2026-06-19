@@ -45,7 +45,7 @@ undecided.
    `origin main`), worktree removed after delivery.
 3. **Parity workflow restructure** (matrix row 2):
    [plan-multi-repo-parity-planning.md](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
-   steps become Survey → Matrix → First Grill (hard gate) → web-research-maker (conditional)
+   steps become Survey → Matrix → First Grill (hard gate) → web-researcher (conditional)
    → Second Grill (post-research) → Author → Gate → Deliver.
 4. **rhino-cli emitter work** in `apps/rhino-cli/` (Rust, TDD-shaped): OpenCode emitter
    migrates deprecated boolean `tools` flags to the `permission` object (row 18); Codex

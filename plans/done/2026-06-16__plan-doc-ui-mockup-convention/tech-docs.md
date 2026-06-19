@@ -117,16 +117,16 @@ The two tiers below are the **artefacts**; the funnel is the **process** that us
 cheap, so divergence happens there; hi-fi is more expensive, so only the shortlist gets that
 treatment. The funnel keeps the design space wide early and the commitment explicit late.
 
-| Stage        | Fidelity | Count             | What lands in the plan                                              |
-| ------------ | -------- | ----------------- | ------------------------------------------------------------------- |
-| 0. Prior art | —        | cited survey      | `web-research-maker` findings: how comparable tools solve this (R7) |
-| 1. Diverge   | Low-fi   | ≥ 2 (aim 3)       | Named ASCII alternatives (Option A / B / C), genuinely different    |
-| 2. Narrow    | Hi-fi    | 2 finalists       | `.excalidraw.png` mockups of the strongest; one-line drop reasons   |
-| 3. Select    | —        | 1+ (named)        | The chosen design, **named** ("Selected: Option B — Ranked Table")  |
-| 4. Justify   | —        | 1 decision record | Rationale: why the winner won, why each runner-up lost              |
+| Stage        | Fidelity | Count             | What lands in the plan                                             |
+| ------------ | -------- | ----------------- | ------------------------------------------------------------------ |
+| 0. Prior art | —        | cited survey      | `web-researcher` findings: how comparable tools solve this (R7)    |
+| 1. Diverge   | Low-fi   | ≥ 2 (aim 3)       | Named ASCII alternatives (Option A / B / C), genuinely different   |
+| 2. Narrow    | Hi-fi    | 2 finalists       | `.excalidraw.png` mockups of the strongest; one-line drop reasons  |
+| 3. Select    | —        | 1+ (named)        | The chosen design, **named** ("Selected: Option B — Ranked Table") |
+| 4. Justify   | —        | 1 decision record | Rationale: why the winner won, why each runner-up lost             |
 
 Stage 0 pairs with the internal grounding rule (R5): **R5 surveys what the repo already has**
-(`libs/web-ui`, the target app); **R7 surveys prior art in the wild** via `web-research-maker` so the
+(`libs/web-ui`, the target app); **R7 surveys prior art in the wild** via `web-researcher` so the
 alternatives are informed by how comparable products solve the same problem rather than invented from
 a blank page. Both feed the divergent alternatives and the rationale.
 

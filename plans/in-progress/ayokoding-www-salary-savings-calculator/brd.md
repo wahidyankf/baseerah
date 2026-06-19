@@ -56,7 +56,7 @@ introduced.
 - **Career planner / job seeker** — uses the minimum-role tab to see what seniority a savings goal
   implies and where it is most reachable, reading the role × country salary distribution.
 - **Content / site owner** — gains an engaging, low-maintenance feature; owns dataset accuracy.
-- **web-research-maker agent** — sources the per-category expenses (incl. childcare medians),
+- **web-researcher agent** — sources the per-category expenses (incl. childcare medians),
   per-country federal effective tax bands + per-city sub-national rates (US/CA/CH) + each country's
   healthcare funding model, the split one-time relocation components (incl. key money), the
   **authoritative FX snapshot (ISO-4217 → USD per 1 unit) stored in `fx.ts`**, and the
@@ -135,13 +135,13 @@ passes in CI.
   per-individual tax are out of scope.
 - **Richer dataset** — each city now stores six expense categories, a relocation block, and a country
   FK (with per-country tax bands) rather than a single living-cost number; the curation burden is
-  higher, so `web-research-maker` sourcing with per-cell confidence tiers is mandatory and uneven data
+  higher, so `web-researcher` sourcing with per-cell confidence tiers is mandatory and uneven data
   is flagged rather than fabricated.
 - **FX is stored in-repo and single-sourced** — currency conversion rates live in `fx.ts` (an
-  ISO-4217 → USD-per-unit table + `fxSnapshotDate`), sourced by `web-research-maker`. Every
+  ISO-4217 → USD-per-unit table + `fxSnapshotDate`), sourced by `web-researcher`. Every
   conversion in the app (local → USD, USD → chosen display currency) reads from this one table, and
   each city's `fxToUsd` is derived from it via the city's `currency` rather than hand-entered.
-- The **role-salary matrix** (`roles.ts`) is likewise static and `web-research-maker`-sourced; public
+- The **role-salary matrix** (`roles.ts`) is likewise static and `web-researcher`-sourced; public
   salary data is uneven outside the US, so each cell carries a confidence tier (`high` | `moderate` |
   `proxy`) and lower-confidence rows are flagged in the UI. The role ladder is a synthesised
   industry-consensus taxonomy (no standards body publishes one), documented in `tech-docs.md`.
@@ -167,7 +167,7 @@ passes in CI.
 | First interactive page diverges from patterns                             | Low    | Reuse Tailwind + i18n conventions; calc logic isolated and tested                                                                                                                                                                                                |
 | Negative savings (expenses > net) confuses UI                             | Low    | Define and test the deficit case; show negative clearly                                                                                                                                                                                                          |
 | OECD-modified multipliers + childcare/school medians oversimplify         | Med    | Disclaimer names each approximation; OECD-modified basis documented; indicative values sourced in Phase 1; per-city overrides deferred                                                                                                                           |
-| Role-salary data uneven / stale outside US tech hubs                      | Med    | `web-research-maker`-sourced per role × country as a p25/median/p75 distribution with per-cell confidence tier; low-confidence rows flagged; snapshot date shown; proxy cells derived from documented regional multipliers, never fabricated                     |
+| Role-salary data uneven / stale outside US tech hubs                      | Med    | `web-researcher`-sourced per role × country as a p25/median/p75 distribution with per-cell confidence tier; low-confidence rows flagged; snapshot date shown; proxy cells derived from documented regional multipliers, never fabricated                         |
 | Role salary modeled at national (country) level, not per city             | Med    | Documented simplification: cities inherit their country's role-salary distribution; per-cell confidence + the displayed p25/median/p75 band + an explicit "salary is national-level" disclaimer; per-city salary overrides deferred                              |
 | Non-salary comp (RSU/equity/bonus) misread as part of savings             | Low    | Shown only as an informational total-comp column with a clear note; never folded into net or either savings figure; "RSU/equity/bonus modeling into savings" kept in Out of Scope                                                                                |
 | Single linear "minimum" ordering across IC + mgmt tracks ambiguous        | Low    | Rank by resulting absolute savings (primary, on the median salary); documented seniority ordering only as display tiebreaker; ladder reordered into qualifying / below-minimum groups — `tech-docs.md` records the rule                                          |

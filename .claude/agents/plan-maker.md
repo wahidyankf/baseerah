@@ -279,7 +279,7 @@ labelled subsections, with no alternative silently discarded:
 6. **R5 grounding note** — survey `libs/web-ui` (component inventory + tokens + Storybook), the
    target app shell, and sibling screens before drafting either tier; reuse existing components;
    name any net-new component. Reference the `swe-developing-frontend-ui` skill.
-7. **R7 prior-art citation** — consult prior art on comparable tools via `web-research-maker` to
+7. **R7 prior-art citation** — consult prior art on comparable tools via `web-researcher` to
    inform the divergent alternatives.
 8. **Responsive note (mobile/tablet/desktop)** — the funnel MUST address **responsive design**,
    **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
@@ -299,7 +299,7 @@ exactly as the specs/Gherkin delivery section does for feature changes:
 
 - [ ] [AI] Survey existing UI (R5): read `libs/web-ui` component inventory + tokens + Storybook and
       the target app shell — acceptance: net-new components named in `tech-docs.md`
-  - _Suggested executor: `web-research-maker` (prior art, R7) + `swe-developing-frontend-ui` skill_
+  - _Suggested executor: `web-researcher` (prior art, R7) + `swe-developing-frontend-ui` skill_
 - [ ] [AI] Diverge: author ≥2 named low-fi ASCII alternatives for `<screen>` in `prd.md`
       — acceptance: `grep -c "Option [AB]" prd.md` ≥ 2
 - [ ] [AI] Narrow: add 2 hi-fi `.excalidraw.png` finalists under the plan's `assets/` and reference
@@ -439,11 +439,11 @@ When creating plans that reference specific technologies, versions, APIs, or too
 
 Use the `docs-validating-factual-accuracy` Skill for systematic verification methodology.
 
-**Delegate research to `web-research-maker` for unfamiliar or fast-moving topics**: Per the
+**Delegate research to `web-researcher` for unfamiliar or fast-moving topics**: Per the
 [Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md)
 and the LOWER plan-content threshold defined in
 [Plan Anti-Hallucination Convention §Web-Research Delegation](../../repo-governance/development/quality/plan-anti-hallucination.md#web-research-delegation-lower-threshold-for-plans),
-invoke the [`web-research-maker`](./web-research-maker.md) subagent for ANY external claim
+invoke the [`web-researcher`](./web-researcher.md) subagent for ANY external claim
 that is not already documented in the repo (`docs/`, `repo-governance/`, `apps/*/README.md`,
 `package.json`, `go.mod`, `Cargo.toml`, etc.) and that requires more than a single `WebFetch`
 against a known authoritative URL. Incorporate only facts tagged `[Verified]` (web-cited with
@@ -468,12 +468,12 @@ the cheapest place to catch it.
 | **Symbol / function** | `Grep` against the codebase or quote the import path that defines it                          |
 | **Nx target**         | Read the project's `project.json` and confirm the target name in `targets`                    |
 | **Package version**   | `Grep` the relevant manifest (`package.json`, `go.mod`, `Cargo.toml`, `*.csproj`, etc.)       |
-| **API signature**     | Delegate to `web-research-maker` with the authoritative-doc URL                               |
+| **API signature**     | Delegate to `web-researcher` with the authoritative-doc URL                                   |
 | **Command flag**      | `<cmd> --help` OR repo-documented usage in `package.json` scripts / governance docs           |
 | **Test name**         | If pre-existing, `Grep` test files; if NEW, mark `_New test_`                                 |
 | **Agent / skill**     | `Bash test -f .claude/agents/<name>.md` or `Bash test -f .claude/skills/<name>/SKILL.md`      |
-| **External standard** | Delegate to `web-research-maker` with cited excerpt + URL + access date inline                |
-| **Behavior claim**    | `web-research-maker` with cited official-doc excerpt OR repo-doc reference                    |
+| **External standard** | Delegate to `web-researcher` with cited excerpt + URL + access date inline                    |
+| **Behavior claim**    | `web-researcher` with cited official-doc excerpt OR repo-doc reference                        |
 | **Cross-link target** | `Bash test -f` on the resolved relative path                                                  |
 | **Numeric KPI**       | Forbidden as bare fact unless observable check / cited measurement / `_Judgment call:_` label |
 

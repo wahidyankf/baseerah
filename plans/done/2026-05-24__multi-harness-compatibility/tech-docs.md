@@ -1,6 +1,6 @@
 # Technical Documentation — Multi-Harness Compatibility
 
-All harness-config facts below come from `web-research-maker` runs on **2026-05-24** and are labelled
+All harness-config facts below come from `web-researcher` runs on **2026-05-24** and are labelled
 `[Web-cited]` with their source. Repository facts are labelled `[Repo-grounded]`. Subjective design choices
 are labelled `[Judgment call]`. Some upstream facts carry the researcher's `[Needs Verification]` flag —
 these are the items the compatibility-audit workflow exists to re-check over time.
@@ -115,7 +115,7 @@ records their provenance.
 ### AD6 — Compatibility-audit workflow as a quality gate
 
 `[Judgment call]` Drift detection fits the maker-checker-fixer + `quality-gate` model: a checker fetches
-current upstream conventions (via `web-research-maker`) and diffs them against the catalog/binding files; a
+current upstream conventions (via `web-researcher`) and diffs them against the catalog/binding files; a
 fixer updates the catalog/bindings; iterate to zero drift. The workflow is named
 `repo-harness-compatibility-quality-gate` to satisfy the `<scope>-<qualifier>-<type>` rule (scope `repo`,
 qualifier `harness-compatibility`, type `quality-gate`). [Repo-grounded —
@@ -197,7 +197,7 @@ forbidden-paths table]
 
 **Agents (Layer 4) — authored under `.claude/agents/`, synced to `.opencode/`:**
 
-- `.claude/agents/repo-harness-compatibility-checker.md` — **new** checker; delegates to `web-research-maker`,
+- `.claude/agents/repo-harness-compatibility-checker.md` — **new** checker; delegates to `web-researcher`,
   diffs findings vs catalog/bindings. _New file_
 - `.claude/agents/repo-harness-compatibility-fixer.md` — **new** fixer; updates catalog/bindings from a
   validated audit. _New file_
@@ -268,8 +268,8 @@ targets are:
   then specs, then workflow + agents, then propagation + validation.
 - `rhino-cli` is Rust; changes go through `swe-rust-dev` and must keep `nx run rhino-cli:test:quick` green.
   [Repo-grounded — `AGENTS.md` build commands]
-- The compatibility workflow depends on `web-research-maker` (exists) and the two new agents.
-  [Repo-grounded — `.claude/agents/web-research-maker.md`]
+- The compatibility workflow depends on `web-researcher` (exists) and the two new agents.
+  [Repo-grounded — `.claude/agents/web-researcher.md`]
 
 ## Rollback
 

@@ -46,7 +46,7 @@ country).
    roles sit above the minimum and non-qualifying roles sit below a divider. The ladder is explicitly
    a **software-engineering (IC + management)** ladder.
 
-All figures come from static, curated, `web-research-maker`-sourced datasets. Every modeled value is
+All figures come from static, curated, `web-researcher`-sourced datasets. Every modeled value is
 **confidence-tiered** (`high` | `moderate` | `proxy`) and **snapshot-dated**. The tool is fully
 client-side rendered — no backend, no runtime network.
 
@@ -187,7 +187,7 @@ below) — neither is deferred. The full
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 funnel (diverge → narrow → select → justify) is satisfied across both the low-fi and hi-fi tiers.
 
-**Prior art (R7)** — `web-research-maker` surveyed comparable cost-of-living tools: **Numbeo**
+**Prior art (R7)** — `web-researcher` surveyed comparable cost-of-living tools: **Numbeo**
 (sortable ranked index + per-city category breakdown), **Expatistan** (two-city category breakdown),
 **Nomad List** (filterable card grid + cost meters), **Numbeo cost-of-living estimator** (per-city
 itemised monthly budget), **LivingCost.org** (per-city category bars). The proven multi-city scan
@@ -313,7 +313,7 @@ below) — neither is deferred. The full
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 funnel (diverge → narrow → select → justify) is satisfied across both the low-fi and hi-fi tiers.
 
-**Prior art (R7)** — `web-research-maker` surveyed forward salary-to-savings tooling: **Numbeo
+**Prior art (R7)** — `web-researcher` surveyed forward salary-to-savings tooling: **Numbeo
 International Salary Equivalent** (salary in city A → equivalent net-preserving salary in city B),
 **NerdWallet / Bankrate cost-of-living calculators** (two-city net-equivalence), **LivingCost.org**
 (salary input + ranked savings cards), **levels.fyi** (gross compensation, no net/savings ranking).
@@ -436,7 +436,7 @@ below) — neither is deferred. The full
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)
 funnel (diverge → narrow → select → justify) is satisfied across both the low-fi and hi-fi tiers.
 
-**Prior art (R7)** — `web-research-maker` surveyed reverse salary/role tooling: **levels.fyi**
+**Prior art (R7)** — `web-researcher` surveyed reverse salary/role tooling: **levels.fyi**
 (forward role → salary; a compensation-range filter is the nearest reverse pattern but is not
 city- or savings-aware), **Glassdoor / Payscale** (forward title + city → salary), **Numbeo
 International Salary Equivalent** (salary in city A → equivalent salary in city B preserving net
@@ -1298,7 +1298,7 @@ Feature: Salary savings calculator
 - NFR-1b: Dataset lists **as many tech-hub cities worldwide as we reasonably can** (static), excl.
   Israel; breadth over a fixed small set. **ASEAN, Japan, broader Europe, and the Nordics must each
   be represented**, alongside the Americas, Middle East, South/East Asia, Oceania, and Africa.
-- NFR-1c: The role-salary matrix (`roles.ts`) is static, `web-research-maker`-sourced, and covers
+- NFR-1c: The role-salary matrix (`roles.ts`) is static, `web-researcher`-sourced, and covers
   every role on the canonical ladder for every **country** referenced by `cities.ts` — no holes (each
   cell a `{ p25, median, p75 }` distribution + a non-salary-comp figure; gaps filled with documented
   `proxy` estimates, never fabricated exact figures) — with per-cell confidence tiers and a salary

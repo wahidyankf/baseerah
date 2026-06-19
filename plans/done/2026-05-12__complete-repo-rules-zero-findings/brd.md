@@ -36,7 +36,7 @@ This repo is solo-maintainer. The same person wears multiple hats; the maintaine
 - **`plan-executor` / `plan-execution`** — runs delivery.md sequentially.
 - **`repo-rules-checker`** — consumes the calibrated deterministic envelope plus its own AI-only categories during Phase 6 convergence.
 - **`repo-rules-fixer`** — applies AI-side fixes after Phase 5's skill extraction reshapes the agent corpus.
-- **`web-research-maker`** — invoked only if an external claim emerges during execution that is not already documented in the repo.
+- **`web-researcher`** — invoked only if an external claim emerges during execution that is not already documented in the repo.
 - **`swe-golang-dev`** — picks up Phase 1 edits (rhino-cli is Go). Mentioned as a suggested executor on Phase 1 checkboxes.
 - **`agent-maker`** — picks up Phase 5 skill extraction (touches `.claude/agents/` and `.claude/skills/`).
 

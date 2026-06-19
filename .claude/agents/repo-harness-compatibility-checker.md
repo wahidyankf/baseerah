@@ -60,7 +60,7 @@ This agent does NOT modify files. It validates only.
 - **Bash**: Generate UUIDs and UTC+7 timestamps; run Phase 0 invariant commands
 - **WebFetch**: Single-shot confirmation fetches for a known authoritative URL
 - **WebSearch**: Single-shot search for a specific term when delegation would be disproportionate
-- **Agent**: Delegate multi-page Phase 1 research queries to `web-research-maker`
+- **Agent**: Delegate multi-page Phase 1 research queries to `web-researcher`
 
 ## When to Use This Agent
 
@@ -77,7 +77,7 @@ This agent does NOT modify files. It validates only.
 
 - Fixing drift — use `repo-harness-compatibility-fixer` after reviewing this agent's report
 - Repository-wide rules consistency — use `repo-rules-checker` instead
-- General web research unrelated to harness config — use `web-research-maker` directly
+- General web research unrelated to harness config — use `web-researcher` directly
 
 ## Phase 0: Cross-Vendor Parity Invariants (Deterministic)
 
@@ -221,7 +221,7 @@ writing, and UTC+7 timestamp format.
 Report filename: `harness-compat__{uuid-chain}__{YYYY-MM-DD--HH-MM}__audit.md`
 
 Write the execution chain UUID to `generated-reports/.execution-chain-harness-compat`
-before spawning any `web-research-maker` tasks.
+before spawning any `web-researcher` tasks.
 
 ### Step 1: Run Phase 0 — Parity Invariants
 
@@ -241,7 +241,7 @@ summary. Continue to Phase 1 regardless — do not short-circuit.
 ### Step 3: For Each Harness — Delegate Web Research
 
 For each harness in the catalog (filtered by `scope` if provided), invoke
-`web-research-maker` via the Agent tool with a research query targeting:
+`web-researcher` via the Agent tool with a research query targeting:
 
 - Official harness documentation URL(s) from the catalog row
 - Current root instruction file convention
@@ -252,7 +252,7 @@ For each harness in the catalog (filtered by `scope` if provided), invoke
 **Research delegation pattern**:
 
 ```
-Delegate to web-research-maker:
+Delegate to web-researcher:
   "Fetch the current official documentation for [Harness Name] and report:
    1. The root instruction file name (e.g., AGENTS.md, CLAUDE.md) that the harness reads natively
    2. The config/binding directory path (e.g., .claude/, .opencode/)
@@ -264,16 +264,16 @@ Delegate to web-research-maker:
 ```
 
 Use `WebFetch` or `WebSearch` directly only for single-shot confirmations of a known URL.
-Delegate all multi-page or ambiguous research to `web-research-maker`.
+Delegate all multi-page or ambiguous research to `web-researcher`.
 
 ### Step 4: For Each Harness — Diff Research Against Catalog
 
-Compare the `web-research-maker` response against the catalog row for each of D1–D5. For
+Compare the `web-researcher` response against the catalog row for each of D1–D5. For
 each discrepancy:
 
 1. Determine criticality (D1/D2/D4 → HIGH; D3/D5 → MEDIUM by default; escalate to CRITICAL
    if breaking)
-2. Determine confidence (HIGH if web-research-maker returned a [Verified] source; MEDIUM if
+2. Determine confidence (HIGH if web-researcher returned a [Verified] source; MEDIUM if
    [Needs Verification])
 3. Write finding progressively (see finding format below)
 
@@ -283,7 +283,7 @@ For each harness that has committed binding files:
 
 1. Use Glob to enumerate agent definition files under the harness's agent directory
 2. For a sample (up to 10 files), read frontmatter and check against the harness's current
-   required schema as returned by `web-research-maker`
+   required schema as returned by `web-researcher`
 3. Use Grep to check config files (e.g., `opencode.json`, `.claude/settings.json`) for any
    deprecated fields named in the research results
 4. Write D6 findings progressively
@@ -334,7 +334,7 @@ Update report status to "Complete" and add a summary section:
 This agent follows the [Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md):
 
 - All multi-page or exploratory harness documentation research is delegated to
-  `web-research-maker` via the Agent tool
+  `web-researcher` via the Agent tool
 - `WebFetch` and `WebSearch` in this agent are reserved for single-shot confirmations where
   the URL is already known and delegation would be disproportionate
 - The delegated research results (with their `[Verified]`/`[Unverified]`/`[Needs Verification]`
@@ -349,7 +349,7 @@ processed.
 **Phase 0 Always Runs**: Even when `scope` is set to a specific harness, Phase 0 runs all
 five invariants against the full repo. Only Phase 1 is scoped.
 
-**Confidence Propagation**: If `web-research-maker` returns a finding tagged
+**Confidence Propagation**: If `web-researcher` returns a finding tagged
 `[Needs Verification]`, the checker sets `confidence: MEDIUM`. If it returns `[Verified]`,
 the checker sets `confidence: HIGH`.
 
@@ -374,7 +374,7 @@ count it in the findings total.
 
 - `repo-harness-compatibility-fixer` - Applies catalog, binding, and parity fixes found by
   this checker
-- `web-research-maker` - Delegated web research primitive used in Phase 1
+- `web-researcher` - Delegated web research primitive used in Phase 1
 - `repo-rules-checker` - Validates repository-wide rules consistency (different scope)
 
 **Related Conventions**:

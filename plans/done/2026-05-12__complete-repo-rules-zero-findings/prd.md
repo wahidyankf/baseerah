@@ -23,7 +23,7 @@ Solo-maintainer repo — same person wears every hat. Listing them as "agents th
 - **`repo-rules-fixer`** — Phase 4/6 fixer for residuals.
 - **`swe-golang-dev`** — Phase 1 suggested executor for rhino-cli Go edits.
 - **`agent-maker`** — Phase 5 suggested executor for agent + skill edits.
-- **`web-research-maker`** — only invoked if an external claim emerges during execution that is not already documented in the repo.
+- **`web-researcher`** — only invoked if an external claim emerges during execution that is not already documented in the repo.
 
 ## User Stories
 
@@ -178,7 +178,7 @@ Both `repo-rules-quality-gate.md` AND `plan-quality-gate.md` have an H2 "Observa
 
 ### FR-20 — Research-delegation cost note
 
-`plan-quality-gate.md` Research Delegation section documents the qualitative context-budget benefit of delegating multi-page research to `web-research-maker` and cross-references the Observability Metrics section.
+`plan-quality-gate.md` Research Delegation section documents the qualitative context-budget benefit of delegating multi-page research to `web-researcher` and cross-references the Observability Metrics section.
 
 ### FR-21 — Final Audit Report Structure section
 

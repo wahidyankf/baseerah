@@ -390,7 +390,7 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 
 **Content Creation**: docs-maker, docs-tutorial-maker, readme-maker, specs-maker, apps-ayokoding-www-general-maker, apps-ayokoding-www-by-example-maker, apps-ayokoding-www-in-the-field-maker, apps-ose-www-content-maker, swe-ui-maker
 
-**Validation**: docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, apps-ayokoding-www-general-checker, apps-ayokoding-www-by-example-checker, apps-ayokoding-www-in-the-field-checker, apps-ayokoding-www-facts-checker, apps-ayokoding-www-link-checker, apps-ose-www-content-checker, swe-code-checker, swe-ui-checker, ci-checker, web-research-maker, repo-rules-checker, repo-workflow-checker, repo-harness-compatibility-checker
+**Validation**: docs-checker, docs-tutorial-checker, docs-link-checker, docs-software-engineering-separation-checker, readme-checker, specs-checker, apps-ayokoding-www-general-checker, apps-ayokoding-www-by-example-checker, apps-ayokoding-www-in-the-field-checker, apps-ayokoding-www-facts-checker, apps-ayokoding-www-link-checker, apps-ose-www-content-checker, swe-code-checker, swe-ui-checker, ci-checker, web-researcher, repo-rules-checker, repo-workflow-checker, repo-harness-compatibility-checker
 
 **Fixing**: docs-fixer, docs-tutorial-fixer, docs-software-engineering-separation-fixer, readme-fixer, specs-fixer, apps-ayokoding-www-general-fixer, apps-ayokoding-www-by-example-fixer, apps-ayokoding-www-in-the-field-fixer, apps-ayokoding-www-facts-fixer, apps-ayokoding-www-link-fixer, apps-ose-www-content-fixer, docs-file-manager, swe-ui-fixer, ci-fixer, repo-rules-fixer, repo-workflow-fixer, repo-harness-compatibility-fixer
 
@@ -412,7 +412,7 @@ repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 
 **Maker-Checker-Fixer Pattern**: Three-stage workflow with criticality levels (CRITICAL/HIGH/MEDIUM/LOW), confidence assessment (HIGH/MEDIUM/FALSE_POSITIVE).
 
-**Web Research Default**: `web-research-maker` is the default primitive for public-web information gathering. See [Web Research Delegation Convention](./repo-governance/conventions/writing/web-research-delegation.md) for delegation threshold and exceptions.
+**Web Research Default**: `web-researcher` is the default primitive for public-web information gathering. See [Web Research Delegation Convention](./repo-governance/conventions/writing/web-research-delegation.md) for delegation threshold and exceptions.
 
 **Agent skills infrastructure**: Agents leverage agent skills providing two modes:
 

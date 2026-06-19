@@ -12,7 +12,7 @@ A self-contained, **client-side rendered (CSR)** feature in `apps/ayokoding-www`
 `'use client'` component; all state, input handling, and computation run in the browser. No
 server-side rendering of results, no backend, no tRPC procedure, no network at runtime. Three layers:
 
-1. **Data** — three static, hand-curated, `web-research-maker`-sourced datasets: an authoritative FX
+1. **Data** — three static, hand-curated, `web-researcher`-sourced datasets: an authoritative FX
    snapshot (`fx.ts`, the single source for all currency conversion), tech-hub cities with
    per-category expenses + per-country tax bands + relocation components (`cities.ts`, FX-to-USD
    derived from `fx.ts`), and the engineering-role × country salary matrix (`roles.ts`).
@@ -393,7 +393,7 @@ Notes on the model:
 
 The minimum-role tab needs a typical **gross** salary **distribution** for each rung of a canonical
 **software-engineering** role ladder, **per role × country** (not per role × city). The ladder is a
-**synthesised industry-consensus taxonomy** of **software-engineering roles** (`web-research-maker`
+**synthesised industry-consensus taxonomy** of **software-engineering roles** (`web-researcher`
 confirmed no standards body publishes one; the de-facto reference is levels.fyi's aggregation of
 Big-Tech leveling). It interleaves the individual-contributor (IC) and management (M) tracks at their
 commonly recognised equivalent compensation bands. `seniorityRank` gives a single total ordering for
@@ -965,7 +965,7 @@ scenarios are exercised through the feature-driven unit and e2e tiers, not a han
 - **Roles labelled as software-engineering roles (IC + management)** — the ladder is specifically a
   software-engineering career ladder; every role-showing surface states this so the figures are not
   misread as a generic salary ladder.
-- **`web-research-maker` sources the data** — the expense categories, country tax bands, relocation
+- **`web-researcher` sources the data** — the expense categories, country tax bands, relocation
   components, and the role × country salary distributions (p25/median/p75 + non-salary comp) are all
   sourced in an auditable, cited research pass rather than hand-guessed.
 
@@ -989,7 +989,7 @@ scenarios are exercised through the feature-driven unit and e2e tiers, not a han
   confidence tier + disclaimer that relocation is an informational one-time estimate, with the
   liquidity reserve clearly separated from sunk costs.
 - **Sub-national tax sourcing** — per-state/province/canton effective rates for US/CA/CH are sourced
-  by `web-research-maker` and added to the federal band; uneven data is flagged via confidence tier,
+  by `web-researcher` and added to the federal band; uneven data is flagged via confidence tier,
   never fabricated. Non-federal countries deliberately omit `subNational`.
 - The role ladder is a **synthesised** industry-consensus taxonomy of **software-engineering** roles
   (IC + management), not a standards-body list; `roles.ts` documents the chosen 15 rungs and the
@@ -1001,7 +1001,7 @@ scenarios are exercised through the feature-driven unit and e2e tiers, not a han
   pessimistic versus reality. Mitigation: per-cell confidence tiers, the displayed p25/median/p75 band,
   and an explicit disclaimer that role salary is national-level. Per-city salary overrides are deferred.
 - **Non-salary comp (RSU/equity + bonus) is per role × country and informational only** —
-  `web-research-maker` sources a typical annual figure; it is displayed as total-comp context and never
+  `web-researcher` sources a typical annual figure; it is displayed as total-comp context and never
   enters the savings math (equity vesting/tax is out of scope). Uneven data flagged via confidence,
   never fabricated.
 - **Phase 0 decision — feature-folder layout and route-group placement (confirmed)**:
@@ -1043,7 +1043,7 @@ routes, shared state, or database records. Rollback procedure:
 No new third-party runtime dependency. Uses Next.js 16 App Router, React 19, Tailwind 4, Vitest, and
 Playwright already present in `ayokoding-www` / `ayokoding-www-fe-e2e`.
 
-One **build-time** dependency on the `web-research-maker` agent: it produces (a) the per-city expense
+One **build-time** dependency on the `web-researcher` agent: it produces (a) the per-city expense
 categories (incl. **childcare** medians), (b) the per-country **federal** banded effective tax rates
 plus the per-city **sub-national** rates for US/CA/CH and each country's `healthcareModelType`, (c) the
 per-city split relocation components (sunk costs incl. **key money** + liquidity reserve), (d) the

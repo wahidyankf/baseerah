@@ -99,12 +99,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Excalidraw-CSP facts, and tooling note.
 - [x] `[AI]` The section states: the **both-tiers rule** (R1), the **grounding rule** (R5), the
       **design funnel** (R6: ≥2 named low-fi → 2 hi-fi finalists → named selection → rationale), and
-      the **prior-art** recommendation (R7, `web-research-maker`) — each with a copy-paste example.
+      the **prior-art** recommendation (R7, `web-researcher`) — each with a copy-paste example.
       Acceptance: `grep -c "both-tiers rule" repo-governance/conventions/formatting/diagrams.md`
       returns ≥ 1. (R1)
   - **Date**: 2026-06-16 · **Status**: Done. **Notes**: verified in diagrams.md — `both-tiers rule`
     grep=3; grounding rule (R5) present; design-funnel table (Diverge/Narrow/Select/Justify) at
-    L167-170 with example; Prior-Art Recommendation (R7, `web-research-maker`) at L229. Each tier has
+    L167-170 with example; Prior-Art Recommendation (R7, `web-researcher`) at L229. Each tier has
     a copy-paste ASCII + `.excalidraw.png` example.
 - [x] `[AI]` Add the **rendering-support matrix**, the **ruled-out table** (inline HTML+CSS, MDX,
       Mermaid-as-wireframe, `.excalidraw.svg`) with reasons, the GitHub-strips-`style=` fact, and the
@@ -234,11 +234,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 4 — Worked example (full funnel)
 
-- [x] `[AI]` **Prior-art research** (R7): invoke `web-research-maker` for how comparable
+- [x] `[AI]` **Prior-art research** (R7): invoke `web-researcher` for how comparable
       salary/cost-of-living or savings calculators present a multi-city comparison; capture cited
-      findings to inform the alternatives. Acceptance: `web-research-maker` returns a written summary
+      findings to inform the alternatives. Acceptance: `web-researcher` returns a written summary
       citing ≥2 named prior-art patterns (e.g. tool names, layouts, or interaction models).
-  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `web-research-maker` cited 6 tools — Numbeo
+  - **Date**: 2026-06-16 · **Status**: Done. **Notes**: `web-researcher` cited 6 tools — Numbeo
     (sortable ranked index table), Nomad List (filterable card grid + map/chart views), Expatistan
     (two-city category breakdown w/ % bars), NerdWallet & Bankrate (two-city salary-equivalence
     single number), LivingCost.org (salary input + ranked card grid). Synthesis: the **sortable

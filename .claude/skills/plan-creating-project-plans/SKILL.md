@@ -141,7 +141,7 @@ The funnel produces four kinds of artefact, all visible in the plan (`prd.md` + 
   shell, sibling screens; reference the `swe-developing-frontend-ui` skill) and reuse what already
   exists; name any net-new component explicitly.
 - **Prior-art citation (R7)** — consult prior art on how comparable tools solve the screen via the
-  `web-research-maker` agent, so the divergent alternatives are informed rather than invented.
+  `web-researcher` agent, so the divergent alternatives are informed rather than invented.
 - **Responsive design (mobile/tablet/desktop)** — the funnel MUST address **responsive** behaviour,
   **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
   The low-fi tier must show the mobile↔desktop reflow where it differs (e.g. table → stacked cards,
@@ -165,7 +165,7 @@ standing options — a free-form blank-state type and "chat about this"):
   Card Grid / Split Layout), each option stating its trade-off in one sentence, one marked
   `(Recommended)`. The author must produce ≥2 genuinely different named alternatives.
 - **What prior art?** Present 2-4 ways to ground the alternatives (e.g. delegate a
-  `web-research-maker` survey of comparable tools / reuse a named sibling screen pattern / blend the
+  `web-researcher` survey of comparable tools / reuse a named sibling screen pattern / blend the
   web-ui kit only), so the diverge stage is informed rather than invented.
 - **Which selection, and why?** Present the finalists as options (e.g. Option A / Option B) and ask
   which design wins and the one-sentence rationale, so the Select + Justify stages are explicit.
@@ -379,12 +379,12 @@ See [Plan Anti-Hallucination Convention](../../../repo-governance/development/qu
 | Symbol / function | `Grep` against the codebase                                                            |
 | Nx target         | Read `apps/<project>/project.json` and confirm under `targets`                         |
 | Package version   | `jq` the relevant manifest (`package.json`, `go.mod`, `Cargo.toml`, etc.)              |
-| API signature     | Delegate to `web-research-maker` with authoritative-doc URL                            |
+| API signature     | Delegate to `web-researcher` with authoritative-doc URL                                |
 | Command flag      | `<cmd> --help` OR repo-doc reference                                                   |
 | Test name         | `Grep` test files; if NEW, mark `_New test_`                                           |
 | Agent / skill     | `Bash test -f .claude/agents/<name>.md` or `.claude/skills/<name>/SKILL.md`            |
-| External standard | Delegate to `web-research-maker`; cite URL + access date + excerpt                     |
-| Behavior claim    | `web-research-maker` with cited official-doc excerpt                                   |
+| External standard | Delegate to `web-researcher`; cite URL + access date + excerpt                         |
+| Behavior claim    | `web-researcher` with cited official-doc excerpt                                       |
 | Cross-link target | `Bash test -f` on the resolved relative path                                           |
 | Numeric KPI       | Forbidden as bare fact; observable check / cited measurement / `_Judgment call:_` only |
 
@@ -414,7 +414,7 @@ Forbidden: writing the claim without a label and hoping it is correct.
 
 For plan content the threshold is LOWER than the universal convention:
 
-> **Any external claim that is not already documented in the repo (`docs/`, `repo-governance/`, `apps/*/README.md`, `package.json`, `go.mod`, etc.) and that requires more than a single `WebFetch` against an already-known authoritative URL MUST be delegated to `web-research-maker`.**
+> **Any external claim that is not already documented in the repo (`docs/`, `repo-governance/`, `apps/*/README.md`, `package.json`, `go.mod`, etc.) and that requires more than a single `WebFetch` against an already-known authoritative URL MUST be delegated to `web-researcher`.**
 
 Concretely: most external claims require delegation. Single-shot fetches against a known URL are the only in-context exception. See [Plan Anti-Hallucination Convention §Web-Research Delegation](../../../repo-governance/development/quality/plan-anti-hallucination.md#web-research-delegation-lower-threshold-for-plans).
 
@@ -425,7 +425,7 @@ Reject these patterns at authoring time. `plan-checker` flags occurrences as HIG
 - **AP-1** — citing a version without `Grep`'ing the manifest
 - **AP-2** — inventing a file path that "should exist"
 - **AP-3** — citing an Nx target that may not exist (read `project.json` first)
-- **AP-4** — inventing a function or method name (delegate to `web-research-maker`)
+- **AP-4** — inventing a function or method name (delegate to `web-researcher`)
 - **AP-5** — fabricating a numeric KPI presented as already-measured
 - **AP-6** — inventing a test name (mark `_New test_` when applicable)
 - **AP-7** — citing an agent or skill that does not exist

@@ -48,7 +48,7 @@ Agent renames:
 
 - `docs-link-general-checker` → `docs-link-checker` (drops misplaced "general" modifier).
 - `swe-e2e-test-dev` → `swe-e2e-dev` (drops redundant "test" token).
-- `web-researcher` → `web-research-maker` (eliminates unique `-researcher` suffix; `maker` produces research output).
+- `web-researcher` → `web-researcher` (eliminates unique `-researcher` suffix; `maker` produces research output).
 - `repo-governance-maker` → `repo-rules-maker` (aligns qualifier with new workflow `repo-rules-quality-gate`; "rules" is the artifact the maker/checker/fixer triad operates on).
 - `repo-governance-checker` → `repo-rules-checker` (same rationale).
 - `repo-governance-fixer` → `repo-rules-fixer` (same rationale).

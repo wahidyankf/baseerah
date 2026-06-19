@@ -320,7 +320,7 @@ These files reference repo-governance/ paths or vendor terms and may need update
 ## 9. Cross-References to Existing Conventions and Practices
 
 - [repo-governance/conventions/structure/plans.md](../../../repo-governance/conventions/structure/plans.md) — this plan's structure follows it.
-- [repo-governance/conventions/writing/web-research-delegation.md](../../../repo-governance/conventions/writing/web-research-delegation.md) — already followed; web research delegated to `web-research-maker`.
+- [repo-governance/conventions/writing/web-research-delegation.md](../../../repo-governance/conventions/writing/web-research-delegation.md) — already followed; web research delegated to `web-researcher`.
 - [repo-governance/development/workflow/test-driven-development.md](../../../repo-governance/development/workflow/test-driven-development.md) — validation tooling delivery items are TDD-shaped.
 - [repo-governance/development/workflow/trunk-based-development.md](../../../repo-governance/development/workflow/trunk-based-development.md) — refactor lands on `main` via direct-to-main publish per Standard 14.
 - [repo-governance/development/quality/code.md](../../../repo-governance/development/quality/code.md) — pre-push hook gates remain green throughout.

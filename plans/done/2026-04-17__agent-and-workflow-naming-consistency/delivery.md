@@ -45,19 +45,19 @@
 - [x] `npm run lint:md` passes
 - [x] Commit: `refactor(agents): rename swe-e2e-test-dev to swe-e2e-dev`
 
-## Phase 3: Rename `web-researcher` → `web-research-maker`
+## Phase 3: Rename `web-researcher` → `web-researcher`
 
-- [x] `git mv .claude/agents/web-researcher.md .claude/agents/web-research-maker.md`
-- [x] `git mv .opencode/agent/web-researcher.md .opencode/agent/web-research-maker.md`
-- [x] Update `name:` frontmatter in `.claude/agents/web-research-maker.md`
-- [x] Update `name:` frontmatter in `.opencode/agent/web-research-maker.md`
+- [x] `git mv .claude/agents/web-researcher.md .claude/agents/web-researcher.md`
+- [x] `git mv .opencode/agent/web-researcher.md .opencode/agent/web-researcher.md`
+- [x] Update `name:` frontmatter in `.claude/agents/web-researcher.md`
+- [x] Update `name:` frontmatter in `.opencode/agent/web-researcher.md`
 - [x] Grep sweep live refs (same path list as Phase 1)
-- [x] Replace `web-researcher` → `web-research-maker` in each live hit
+- [x] Replace `web-researcher` → `web-researcher` in each live hit
 - [x] `npm run sync:claude-to-opencode` — confirm no drift
 - [x] Verify zero live refs remain: `Grep "web-researcher"` excluding `plans/done`, `generated-reports`,
       `plans/in-progress/2026-04-17__agent-and-workflow-naming-consistency/`, `.git`, `node_modules`
 - [x] `npm run lint:md` passes
-- [x] Commit: `refactor(agents): rename web-researcher to web-research-maker`
+- [x] Commit: `refactor(agents): rename web-researcher to web-researcher`
 
 ## Phase 4: Rename `repo-governance-*` triad → `repo-rules-*` (atomic)
 

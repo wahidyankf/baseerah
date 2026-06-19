@@ -2,7 +2,7 @@
 
 ## Stage 1 — Overview Scaffolding (Shipped 2026-05-20)
 
-- [x] Research paradigm-fit for Go / Rust / C via web-research-maker
+- [x] Research paradigm-fit for Go / Rust / C via web-researcher
 - [x] Read all 5 FP overview.md files (patterns-and-principles, ddd, hexagonal, fsm, cases)
 - [x] Read all 5 OOP overview.md files
 - [x] Read parent \_index.md + overview.md

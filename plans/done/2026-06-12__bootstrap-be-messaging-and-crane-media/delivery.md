@@ -114,10 +114,10 @@ flowchart TB
   - No blocking preexisting failures; cache-timing flakiness (organiclever-web:typecheck, crane-cli:typecheck) passes individually; 22 npm vulnerabilities are pre-existing non-blocking
 - [x] [AI] Confirm the exact `NATS.Net` Path-B-eligible 2.7.x version and release date are
       ≥ 60 days old and CVE-clean (NVD, GitHub Advisories, Snyk, CISA KEV). Delegate to
-      `web-research-maker` if more than a single fetch is needed.
+      `web-researcher` if more than a single fetch is needed.
       — acceptance: confirmed version + date written back into `tech-docs.md` Dependency Clearance
       table; not 2.8.0/2.8.1
-  - _Suggested executor: `web-research-maker`_
+  - _Suggested executor: `web-researcher`_
   - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: tech-docs.md (Dependency Clearance table)
   - NATS.Net 2.7.3 released 2026-03-13 (90 days; cutoff 2026-04-12); CVE-clean; Path-B eligible. Written into tech-docs.md.
 - [x] [AI] Re-confirm `async-nats 0.47.0` (2026-03-31) and `Giraffe 8.2.0` (2025-11-12) release
@@ -127,10 +127,10 @@ flowchart TB
   - async-nats 0.47.0: 2026-03-31 → 72 days ✓. Giraffe 8.2.0: 2025-11-12 → 211 days ✓. Cutoff 2026-04-12. Both CVE-clean; Path-B eligible.
 - [x] [AI] Confirm the exact Path-B-eligible `nats` (NATS.js) 2.x version and release date are
       ≥ 60 days old and CVE-clean (NVD, GitHub Advisories, Snyk, CISA KEV) — the e2e runner's NATS
-      client. Delegate to `web-research-maker` if more than a single fetch is needed.
+      client. Delegate to `web-researcher` if more than a single fetch is needed.
       — acceptance: confirmed version + date written back into `tech-docs.md` Dependency Clearance
       table
-  - _Suggested executor: `web-research-maker`_
+  - _Suggested executor: `web-researcher`_
   - **Date**: 2026-06-11 | **Status**: DONE | **Files Changed**: tech-docs.md (Dependency Clearance table)
   - CRITICAL: `nats` 2.x officially deprecated (Rule 5b rejected). Using `@nats-io/transport-node 3.3.1` (2026-02-11, 120 days; CVE-clean; Path-B eligible) as official successor. tech-docs.md updated.
 

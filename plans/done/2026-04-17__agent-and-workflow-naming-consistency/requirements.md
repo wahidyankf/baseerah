@@ -46,20 +46,20 @@ Feature: swe-e2e-dev agent exists under new name
     Then zero matches are returned
 ```
 
-### AC3: Rename `web-researcher` → `web-research-maker`
+### AC3: Rename `web-researcher` → `web-researcher`
 
 ```gherkin
-Feature: web-research-maker agent exists under new name
+Feature: web-researcher agent exists under new name
   Scenario: Agent file renamed in both harnesses
     Given the repository contains agent sources
     When I list .claude/agents/ and .opencode/agent/
-    Then "web-research-maker.md" exists in both
+    Then "web-researcher.md" exists in both
     And "web-researcher.md" does not exist in either
 
   Scenario: Frontmatter name field updated
-    Given the agent file ".claude/agents/web-research-maker.md"
+    Given the agent file ".claude/agents/web-researcher.md"
     When I read its YAML frontmatter
-    Then the "name" field equals "web-research-maker"
+    Then the "name" field equals "web-researcher"
 
   Scenario: No live references to old name
     Given all markdown files outside plans/done/, generated-reports/,

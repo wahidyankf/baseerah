@@ -39,7 +39,7 @@ After each rename, the success condition is: `Grep "<old-name>"` with the exclus
 | --------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------- |
 | `docs-link-general-checker` | `docs-link-checker`  | Drop misplaced "general" modifier; parallel to other `*-link-checker`.                                  |
 | `swe-e2e-test-dev`          | `swe-e2e-dev`        | Drop redundant "test" token; parallel to other `swe-<qualifier>-dev`.                                   |
-| `web-researcher`            | `web-research-maker` | Eliminate unique `-researcher` suffix; `maker` produces research output.                                |
+| `web-researcher`            | `web-researcher`     | Eliminate unique `-researcher` suffix; `maker` produces research output.                                |
 | `repo-governance-maker`     | `repo-rules-maker`   | Align qualifier with workflow `repo-rules-quality-gate`; "rules" is the artifact the triad operates on. |
 | `repo-governance-checker`   | `repo-rules-checker` | Same rationale; triad stays internally consistent.                                                      |
 | `repo-governance-fixer`     | `repo-rules-fixer`   | Same rationale.                                                                                         |
@@ -71,7 +71,7 @@ No other structure is permitted. No exceptions.
 
 | Role       | Semantics                                                 | Example agents                                               |
 | ---------- | --------------------------------------------------------- | ------------------------------------------------------------ |
-| `maker`    | Produces a content/research artifact                      | `docs-maker`, `web-research-maker`                           |
+| `maker`    | Produces a content/research artifact                      | `docs-maker`, `web-researcher`                               |
 | `checker`  | Validates an artifact against standards                   | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
 | `fixer`    | Applies validated checker findings                        | `plan-fixer`, `swe-ui-fixer`                                 |
 | `dev`      | Writes code in a language or test framework               | `swe-rust-dev`, `swe-e2e-dev`                                |
@@ -269,7 +269,7 @@ Thirteen commits total, split for bisect-clean history. Ordering matters:
 
 1. `refactor(agents): rename docs-link-general-checker to docs-link-checker` — Phase 1.
 2. `refactor(agents): rename swe-e2e-test-dev to swe-e2e-dev` — Phase 2.
-3. `refactor(agents): rename web-researcher to web-research-maker` — Phase 3.
+3. `refactor(agents): rename web-researcher to web-researcher` — Phase 3.
 4. `refactor(agents): rename repo-governance triad to repo-rules` — Phase 4 (atomic; triad co-references).
 5. `docs(agents): publish naming rule and role vocabulary` — Phase 5.
 6. `docs(governance): add agent-naming convention` — Phase 6 (via repo-rules-maker).

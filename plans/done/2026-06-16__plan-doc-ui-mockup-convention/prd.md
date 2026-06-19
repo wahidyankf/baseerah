@@ -60,7 +60,7 @@ The two tiers per screen:
   and emit delivery steps for the required artefacts.
 - **`plan-checker` agent** — validates plans; must flag missing funnel artefacts at HIGH criticality.
 - **`plan-fixer` agent** — remedies plan gaps; must scaffold missing funnel sections.
-- **`web-research-maker` agent** — supplies prior-art research for Stage 0 of the funnel's diverge
+- **`web-researcher` agent** — supplies prior-art research for Stage 0 of the funnel's diverge
   step.
 - **Sibling-repo consumers (ose-infra, ose-primer)** — adopt the convention via parallel plans in
   their own repos, grounding references in their own UI libs (`libs/ts-ui`, `libs/ts-ui-tokens`).
@@ -218,10 +218,10 @@ UI-bearing screen. See [tech-docs.md §Design funnel](./tech-docs.md) for the fu
 The funnel artefacts live in the plan (`prd.md` plus the plan's `assets/`); no alternative is
 silently discarded.
 
-### R7 — Prior-art research (web-research-maker)
+### R7 — Prior-art research (web-researcher)
 
 - When crafting designs (low-fi **and** hi-fi), the author SHOULD consult **prior art** — how
-  comparable tools/screens are designed in the wild — via the `web-research-maker` agent, so the
+  comparable tools/screens are designed in the wild — via the `web-researcher` agent, so the
   divergent alternatives are informed rather than invented from a blank page.
 - This complements the **internal** grounding rule (R5, the repo's own design system) with an
   **external** pattern survey; cited findings inform the Stage 1 alternatives and the rationale.

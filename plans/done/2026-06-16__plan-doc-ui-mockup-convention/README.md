@@ -46,7 +46,7 @@ authors at it.
   net-new component.
 - A **design funnel**: diverge on ≥2 named low-fi alternatives → narrow to 2 hi-fi finalists →
   **name** the selected design → record the **rationale**, with **prior-art** research via
-  `web-research-maker` informing the alternatives.
+  `web-researcher` informing the alternatives.
 - Explicit "do not use" guidance for inline HTML+CSS, MDX, Mermaid-as-wireframe, and `.excalidraw.svg`
   (font/CSP caveat) in plan docs, with the rendering rationale.
 - **Enforcement** of all the above across the plan maker → checker → fixer chain and the

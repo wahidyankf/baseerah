@@ -60,7 +60,7 @@ Non-plan, non-generated-reports files:
 | `docs/reference/ai-model-benchmarks.md`                                     | Reference (×1)                                                                            |
 | `apps/rhino-cli/scripts/validate-cross-vendor-parity.sh`                    | Shell script (×2)                                                                         |
 | `.claude/skills/agent-developing-agents/SKILL.md`                           | Skill instruction (×1)                                                                    |
-| `.claude/agents/web-research-maker.md`                                      | Reference (×1)                                                                            |
+| `.claude/agents/web-researcher.md`                                          | Reference (×1)                                                                            |
 | `.claude/agents/repo-harness-compatibility-fixer.md`                        | Instruction (×8)                                                                          |
 | `.claude/agents/repo-harness-compatibility-checker.md`                      | Tool string (×1)                                                                          |
 | `.claude/agents/repo-rules-fixer.md`                                        | Instruction (×1)                                                                          |
@@ -221,7 +221,7 @@ One location. Replace.
 One location in description frontmatter. Replace.
 After editing, run `npm run generate:bindings`.
 
-### `.claude/agents/web-research-maker.md` [MODIFY]
+### `.claude/agents/web-researcher.md` [MODIFY]
 
 One location. Replace.
 After editing, run `npm run generate:bindings`.

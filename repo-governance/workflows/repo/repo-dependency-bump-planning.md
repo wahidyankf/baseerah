@@ -80,7 +80,7 @@ plan document. It is **not** an iterative quality gate.
 ## Execution Mode
 
 **Direct Orchestration** — the calling context (top-level assistant session) orchestrates the
-phases, delegating external version/CVE/yank research to `web-research-maker` via the Agent tool,
+phases, delegating external version/CVE/yank research to `web-researcher` via the Agent tool,
 running the human checkpoint inline (so the user's conversation is preserved), and invoking the
 [plan-establishment-execution workflow](../plan/plan-establishment-execution.md) for plan
 authoring.
@@ -155,7 +155,7 @@ out of scope per that same policy section.
 ### 2. Candidate Discovery & Classification (Parallel, delegated)
 
 For each dependency/runtime, determine its policy path and the version to propose. Delegate the
-external research to `web-research-maker` — the [default primitive for public-web information
+external research to `web-researcher` — the [default primitive for public-web information
 gathering](../../conventions/writing/web-research-delegation.md). **Group research by ecosystem**
 (one agent per ecosystem batch) rather than one agent per package, and cap concurrent agents at
 **2** per the [Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md).
@@ -180,7 +180,7 @@ Each research batch must return, per package:
   open release-blocker, or has a widely-reported fatal functional bug — and if so, the most recent
   eligible version that passes.
 
-**Agent**: `web-research-maker` (one invocation per ecosystem batch).
+**Agent**: `web-researcher` (one invocation per ecosystem batch).
 
 **Output**: Per-package classification: path (A/B/C), proposed target version, CVE status, Rule 5b
 status.
@@ -280,7 +280,7 @@ Scenario: User declines at the checkpoint
 - [Dependency Bump Stability & Safety Policy](../../development/workflow/dependency-bump-policy.md) — the authority this workflow operationalizes (three-path tree, Rule 5a/5b, KEV Fast-Track, EPSS Escalation, clearance statuses).
 - [plan-establishment-execution workflow](../plan/plan-establishment-execution.md) — invoked in Phase 5 with `target-stage=backlog`.
 - [Plan Execution workflow](../plan/plan-execution.md) — runs the plan later, after promotion to `in-progress/`.
-- [web-research-maker Agent](../../../.claude/agents/web-research-maker.md) — Phase 2 version/CVE/KEV/EPSS research.
+- [web-researcher Agent](../../../.claude/agents/web-researcher.md) — Phase 2 version/CVE/KEV/EPSS research.
 - [security-waivers register](../../../docs/reference/security-waivers.md) — destination for WAIVER / FUNCTIONAL-HOLD / KEV-listed entries.
 - [CISA KEV JSON feed](https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json) — daily feed of CVEs with confirmed active exploitation.
 - [FIRST.org EPSS API](https://api.first.org/data/v1/epss) — ML exploitation-probability scores by CVE ID.
@@ -297,7 +297,7 @@ Scenario: User declines at the checkpoint
 
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `repo-dependency-bump-planning` parses as scope=`repo`, qualifier=`dependency-bump`, type=`planning`.
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: The backlog plan uses the `YYYY-MM-DD__<identifier>/` creation-date-prefixed folder form.
-- **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**: Version/CVE/yank research delegated to `web-research-maker`.
+- **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**: Version/CVE/yank research delegated to `web-researcher`.
 - **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: Research agents capped at 2 concurrent.
 - **[Linking Convention](../../conventions/formatting/linking.md)**: Cross-references use GitHub-compatible markdown with `.md` extensions.
 

@@ -104,7 +104,7 @@ And the no-shadowing rule is documented in the multi-harness binding convention
 ```gherkin
 Given the repo-harness-compatibility-quality-gate workflow exists
 When the workflow runs
-Then it delegates to web-research-maker to fetch each supported harness's current config conventions
+Then it delegates to web-researcher to fetch each supported harness's current config conventions
 And it diffs those findings against docs/reference/platform-bindings.md and the committed binding files
 And it writes a drift audit report to generated-reports/ citing the web sources used
 ```

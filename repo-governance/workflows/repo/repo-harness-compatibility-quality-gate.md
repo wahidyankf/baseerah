@@ -94,7 +94,7 @@ The orchestrator will:
 
 1. Invoke `repo-harness-compatibility-checker` via the Agent tool (runs 5 deterministic
    parity invariants in Phase 0, then delegates per-harness web research to
-   `web-research-maker` in Phase 1, writes a combined drift audit report)
+   `web-researcher` in Phase 1, writes a combined drift audit report)
 2. Invoke `repo-harness-compatibility-fixer` via the Agent tool (reads audit, applies fixes
    to parity drift, catalog rows, binding files, and specs as needed)
 3. Iterate until zero findings achieved on two consecutive validations
@@ -112,11 +112,11 @@ the main context — use this when agent delegation is unavailable.
 
 ## Research Delegation
 
-The checker delegates **multi-page per-harness research** to `web-research-maker` rather
+The checker delegates **multi-page per-harness research** to `web-researcher` rather
 than performing web lookups inline. This keeps the audit context lean and lets the checker
 focus on diffing and reporting.
 
-For each supported harness, the checker spawns a `web-research-maker` sub-task that:
+For each supported harness, the checker spawns a `web-researcher` sub-task that:
 
 - Fetches current authoritative upstream documentation (official docs site, changelog,
   migration guides)
@@ -156,14 +156,14 @@ external drift detection (Phase 1).
 
 For each harness listed in the platform-binding catalog:
 
-1. Delegates research to `web-research-maker` (fetches current upstream conventions)
+1. Delegates research to `web-researcher` (fetches current upstream conventions)
 2. Compares upstream conventions against the local catalog entry in
    `docs/reference/platform-bindings.md`
 3. Compares upstream conventions against the committed binding files for that harness
 4. Records any drift as a finding (CRITICAL / HIGH / MEDIUM / LOW)
 
 **UUID Chain Tracking**: Checker generates a 6-char UUID and writes to
-`generated-reports/.execution-chain-harness-compat` before spawning `web-research-maker`
+`generated-reports/.execution-chain-harness-compat` before spawning `web-researcher`
 tasks. See the Temporary Files Convention for details.
 
 **Success criteria**: Checker completes and generates audit report.
@@ -256,7 +256,7 @@ introduced.
 
 **Note on research reuse**: For harnesses where the upstream conventions did not change
 between iterations (i.e., the fixer only made local file edits), the checker may reuse the
-prior `web-research-maker` research summary rather than re-fetching. The checker logs
+prior `web-researcher` research summary rather than re-fetching. The checker logs
 whether research was reused or refreshed for each harness.
 
 **Success criteria**: Checker completes validation.
@@ -320,7 +320,7 @@ Report final status and summary.
 
 **Failure** (`fail`):
 
-- Technical errors during check or fix (e.g., `web-research-maker` unreachable, binding
+- Technical errors during check or fix (e.g., `web-researcher` unreachable, binding
   file unreadable, `rhino-cli` build failure)
 
 **Note**: Below-threshold findings are reported in the final audit but do not prevent
@@ -347,7 +347,7 @@ Scenario: Phase 0 binding sync drift is auto-fixed
 Scenario: Checker delegates web research and produces a cited drift audit
   Given the workflow runs with scope "all"
   When repo-harness-compatibility-checker completes Phase 1
-  Then it delegates multi-page upstream research to web-research-maker for each harness
+  Then it delegates multi-page upstream research to web-researcher for each harness
   And it diffs the fetched data against docs/reference/platform-bindings.md and committed binding files
   And it writes a drift audit to generated-reports/ citing the web sources for each finding
   And each finding identifies the affected harness, the stale field, and the upstream source URL
@@ -539,7 +539,7 @@ Result: PARTIAL after 1 iteration; user must resolve before re-running.
   harness product names confined to non-load-bearing examples; load-bearing prose uses
   vendor-neutral terms ("each supported harness", "the platform-binding catalog")
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:
-  per-harness upstream research delegated to `web-research-maker`
+  per-harness upstream research delegated to `web-researcher`
 
 ## Agents
 

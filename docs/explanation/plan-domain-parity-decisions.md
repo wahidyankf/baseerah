@@ -58,7 +58,7 @@ The survey (empirical, 2026-06-06) established these facts before any decisions:
 - Infra CI runs on self-hosted runners `[self-hosted, linux, ose-infra-runner]`;
   it cannot use `ubuntu-latest`.
 
-Research findings from web-research-maker (2026-06-06) are cited per decision
+Research findings from web-researcher (2026-06-06) are cited per decision
 where relevant.
 
 ## Decisions by Matrix Row
@@ -76,7 +76,7 @@ invoke a cross-repo parity sweep.
 
 **Decision**: amend all copies of `plan-multi-repo-parity-planning.md` to add a
 two-grill + web-research step: Survey → Matrix → First Grill (hard gate) →
-web-research-maker (conditional) → Second Grill (post-research) → Author → Gate →
+web-researcher (conditional) → Second Grill (post-research) → Author → Gate →
 Deliver.
 
 **Rationale**: the invoker required this pattern (2026-06-06) to mirror the
@@ -220,7 +220,7 @@ deprecated boolean `tools` flags format to the `permission` object format
 `.opencode/agents/*.md` mirrors.
 
 **Rationale**: the OpenCode official documentation (accessed 2026-06-05 via
-web-research-maker) deprecates the boolean flags form in favor of the `permission`
+web-researcher) deprecates the boolean flags form in favor of the `permission`
 object. Source:
 <https://opencode.ai/docs/agents/> (accessed 2026-06-05).
 
@@ -240,7 +240,7 @@ files into `config.toml` `agents.<name>` sub-tables; stop treating
 sub-table keys — `config_file` and `description`. The `.codex/agents/` per-agent
 directory pattern is not an officially recognized Codex convention.
 Source: <https://developers.openai.com/codex/config-reference> (accessed
-2026-06-05 via web-research-maker).
+2026-06-05 via web-researcher).
 
 #### ose-public Nuance (Design Decision D5)
 
@@ -362,7 +362,7 @@ the benefit given the low frequency of parity sweeps.
 
 ## Research Citations
 
-All web research performed by web-research-maker on 2026-06-05 to 2026-06-06:
+All web research performed by web-researcher on 2026-06-05 to 2026-06-06:
 
 - **OpenCode agents format** (boolean `tools` → `permission` object, rows 18 and
   17): <https://opencode.ai/docs/agents/> (accessed 2026-06-05)

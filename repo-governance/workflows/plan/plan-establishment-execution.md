@@ -80,7 +80,7 @@ is promoted to `in-progress/` (date prefix stripped on promotion).
 
 **Direct Orchestration** — the calling context (the top-level assistant session) is the
 orchestrator. It follows this workflow step-by-step: exploring the repo, conducting grill sessions
-via the `grill-me` Skill, delegating research to `web-research-maker` and plan writing to
+via the `grill-me` Skill, delegating research to `web-researcher` and plan writing to
 `plan-maker` via the Agent tool, and running the `plan-quality-gate` workflow inline.
 
 Grill sessions run in the calling context (not delegated) so the user's conversation is preserved
@@ -187,7 +187,7 @@ confirmed. All decisions resolved. Research-needed flag set.
 
 ### 2. Web Research (Sequential, Conditional)
 
-Delegate external research to `web-research-maker` to verify claims and gather authoritative
+Delegate external research to `web-researcher` to verify claims and gather authoritative
 sources.
 
 **Skip condition**: Skip if ALL hold:
@@ -200,14 +200,14 @@ If skipping: emit `Step 2 skipped — no external research needed (confirmed in 
 
 **If NOT skipping**:
 
-Invoke `web-research-maker` via the Agent tool. Provide a focused research prompt covering:
+Invoke `web-researcher` via the Agent tool. Provide a focused research prompt covering:
 
 - Best practices or authoritative sources for the proposed approach
 - Library or tool behavior referenced in the prompt (versions, API signatures, caveats)
 - Prior art: has anyone formalized this pattern? Known failure modes?
 - Risks or caveats not mentioned in the prompt
 
-**Agent**: `web-research-maker`
+**Agent**: `web-researcher`
 
 **Output**: Cited, structured research findings. Passed to Step 3 grill and included in the
 plan-maker handoff in Step 4.
@@ -360,7 +360,7 @@ resolution.
   Step 1 grill includes an explicit harness-neutrality checkpoint for plans touching agents,
   skills, or `repo-governance/` paths
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:
-  External research delegated to `web-research-maker`
+  External research delegated to `web-researcher`
 - **[Commit Messages Convention](../../development/workflow/commit-messages.md)**: Conventional
   Commits format in Step 7
 - **[CI Post-Push Verification Convention](../../development/workflow/ci-post-push-verification.md)**:
@@ -382,6 +382,6 @@ resolution.
 - [Governance Vendor-Independence Convention](../../conventions/structure/governance-vendor-independence.md)
 - [grill-me Skill](../../../.claude/skills/grill-me/SKILL.md) — Steps 1 and 3
 - [plan-maker Agent](../../../.claude/agents/plan-maker.md) — Step 4
-- [web-research-maker Agent](../../../.claude/agents/web-research-maker.md) — Step 2
+- [web-researcher Agent](../../../.claude/agents/web-researcher.md) — Step 2
 - [repo-setup-manager Agent](../../../.claude/agents/repo-setup-manager.md) — Phase 0 of plans
   created by this workflow

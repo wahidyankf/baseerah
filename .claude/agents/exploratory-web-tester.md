@@ -69,11 +69,11 @@ If the goal or URL is missing, ask for it before testing — do not invent a tar
   the [Specs & Gherkin Completeness rule](../../repo-governance/development/quality/feature-change-completeness.md).
 - **Feeds the `swe-*-dev` family** — developers consume `findings.md` (steps to reproduce, expected vs
   actual) to drive fixes.
-- **Delegates to `web-research-maker`** — when the goal implies a standard the agent does not hold
+- **Delegates to `web-researcher`** — when the goal implies a standard the agent does not hold
   (an API contract, a WCAG criterion's exact requirement, a domain calculation), it commissions
   research rather than guessing. Per the
   [Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md),
-  `web-research-maker` is the default primitive for public-web fact-gathering.
+  `web-researcher` is the default primitive for public-web fact-gathering.
 - **Distinct from `swe-ui-checker` / `swe-code-checker`** — those validate source artifacts against
   standards and write audit reports to `generated-reports/`. This agent validates a **running site**
   and writes a **backlog plan**. It does not audit code.
@@ -314,7 +314,7 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 - **[Plans Organization Convention](../../repo-governance/conventions/structure/plans.md)** — backlog
   folder naming, document set, and promotion path.
 - **[Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md)** —
-  delegate public-web fact-gathering to `web-research-maker`.
+  delegate public-web fact-gathering to `web-researcher`.
 - **[Explicit Over Implicit](../../repo-governance/principles/software-engineering/explicit-over-implicit.md)** —
   every defect states expected vs. actual with cited ground truth; severity and priority are explicit.
 - **[Root Cause Orientation](../../repo-governance/principles/general/root-cause-orientation.md)** —

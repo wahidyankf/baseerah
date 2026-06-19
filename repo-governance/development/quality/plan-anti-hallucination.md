@@ -23,7 +23,7 @@ This convention implements the following core principles:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Every non-trivial factual claim in a plan carries an inline confidence label (`[Repo-grounded]`, `[Web-cited]`, `[Judgment call]`, `[Unverified]`). The author's confidence is explicit text, not implicit tone.
 - **[Root Cause Orientation](../../principles/general/root-cause-orientation.md)**: When verification fails, the author refuses to write the claim rather than papering over uncertainty. The defect surfaces at authoring time where it is cheapest to fix.
-- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Verification commands are repeatable. A reader audits the same claim by running the same `Glob`, `Grep`, `WebFetch`, or `web-research-maker` invocation the author ran.
+- **[Reproducibility First](../../principles/software-engineering/reproducibility.md)**: Verification commands are repeatable. A reader audits the same claim by running the same `Glob`, `Grep`, `WebFetch`, or `web-researcher` invocation the author ran.
 - **[Documentation First](../../principles/content/documentation-first.md)**: External claims cite the source inline (URL + access date + excerpt). Future readers verify the claim from the plan alone, even after the URL rots.
 
 ## Purpose
@@ -32,7 +32,7 @@ This convention exists to:
 
 - Establish bright-line **pre-write verification rituals** for every category of factual claim that appears in plan content (file paths, Nx targets, package versions, API signatures, command syntax, KPIs).
 - Make **repo-grounding** mandatory — every internal reference (file path, symbol, project, target) MUST be verified to exist in the current repo before being written.
-- Make **web-research-maker delegation** the default for any external claim that requires more than a single-shot fetch.
+- Make **web-researcher delegation** the default for any external claim that requires more than a single-shot fetch.
 - Establish **refuse-on-uncertainty** as a positive virtue — the author who writes `[Unverified]` or refuses the claim entirely is preferred over the author who writes a plausible-sounding fabrication.
 - Catalog known **hallucination anti-patterns** so plan-checker can flag them mechanically and plan-fixer can rewrite them deterministically.
 - Align the four plan agents (`plan-maker`, `plan-checker`, `plan-fixer`, `plan-execution-checker`) and the two plan workflows (`plan-quality-gate`, `plan-execution`) to one verification standard.
@@ -65,13 +65,13 @@ Plans drift from reality in predictable ways. Each category maps to a verificati
 | **Symbol / function** | `unstable_cache`, `getServerSession`, `RouteConfig`       | `Grep` against the codebase or cite the import path                                                            |
 | **Nx target**         | `nx run ose-www:test:quick`                               | Read `apps/ose-www/project.json` or `nx show project`                                                          |
 | **Package version**   | `next@16.0.0`, `tRPC v11`                                 | Grep `package.json` (or `go.mod`, `Cargo.toml`, `*.csproj`, etc.)                                              |
-| **API signature**     | `unstable_cache(fn, keyParts, { revalidate })`            | `web-research-maker` against authoritative docs                                                                |
+| **API signature**     | `unstable_cache(fn, keyParts, { revalidate })`            | `web-researcher` against authoritative docs                                                                    |
 | **Command flag**      | `npx nx affected -t typecheck --parallel=cores-1`         | `<cmd> --help` or repo's documented usage in `package.json` scripts                                            |
 | **Test name**         | `RateLimit_RejectsExceedingRequests`                      | If pre-existing, `Grep` test files; if NEW, mark `_New test_`                                                  |
-| **Agent name**        | `swe-typescript-dev`, `web-research-maker`                | List `.claude/agents/*.md` and confirm                                                                         |
+| **Agent name**        | `swe-typescript-dev`, `web-researcher`                    | List `.claude/agents/*.md` and confirm                                                                         |
 | **Skill name**        | `plan-creating-project-plans`                             | List `.claude/skills/` and confirm                                                                             |
-| **External standard** | "AGENTS.md spec at agents.md", "Conventional Commits 1.0" | `web-research-maker` with cited excerpt + URL + access date                                                    |
-| **Behavior claim**    | "Next.js serves `app/robots.ts` over `public/robots.txt`" | `web-research-maker` with cited official-doc excerpt                                                           |
+| **External standard** | "AGENTS.md spec at agents.md", "Conventional Commits 1.0" | `web-researcher` with cited excerpt + URL + access date                                                        |
+| **Behavior claim**    | "Next.js serves `app/robots.ts` over `public/robots.txt`" | `web-researcher` with cited official-doc excerpt                                                               |
 | **Numeric KPI**       | "reduces review time by 35%"                              | If no measured baseline exists: FORBIDDEN as fact, allowed only as `_Judgment call:_` or qualitative reasoning |
 | **Cross-link target** | `[Worktree Path Convention](./worktree-path.md)`          | `Bash test -f` on the resolved path                                                                            |
 
@@ -82,7 +82,7 @@ If a claim does not match any row above and is not directly observable from the 
 Every non-trivial factual claim written into a plan carries one of four inline labels. Labels are visible in the rendered markdown, not hidden in metadata.
 
 - **`[Repo-grounded]`** — verified against the current commit via `Glob`, `Grep`, `Bash`, or by reading the file. The label may be omitted when the claim appears within a fenced code block whose entire purpose is to quote a repo file (the fence itself is the evidence). Use the label inline whenever a repo path or symbol is named in prose.
-- **`[Web-cited]`** — verified against an external source. The claim MUST include the URL and the access date inline. Multi-page research MUST go through `web-research-maker` (see Delegation Threshold below).
+- **`[Web-cited]`** — verified against an external source. The claim MUST include the URL and the access date inline. Multi-page research MUST go through `web-researcher` (see Delegation Threshold below).
 - **`[Judgment call]`** — explicitly labeled subjective claim. No verification possible because the claim is opinion or expectation. Numeric KPIs that are gut targets (not measurements) MUST use this label.
 - **`[Unverified]`** — author flagged the claim as needing verification but proceeded under time pressure. `plan-checker` flags `[Unverified]` claims as MEDIUM findings; `plan-fixer` either verifies and re-labels or escalates to manual review.
 
@@ -136,20 +136,20 @@ Forbidden: writing the claim without a label and hoping it is correct. This is t
 
 ## Web-Research Delegation (Lower Threshold for Plans)
 
-The universal threshold from [Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md) is "2+ `WebSearch` calls OR 3+ `WebFetch` calls per claim → delegate to `web-research-maker`". For plan content, the threshold is LOWER:
+The universal threshold from [Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md) is "2+ `WebSearch` calls OR 3+ `WebFetch` calls per claim → delegate to `web-researcher`". For plan content, the threshold is LOWER:
 
-> **Any external claim that is not already documented in the repo (`docs/`, `repo-governance/`, `apps/*/README.md`, `package.json`, `go.mod`, `Cargo.toml`, etc.) and that requires more than a single `WebFetch` against an already-known authoritative URL MUST be delegated to `web-research-maker`.**
+> **Any external claim that is not already documented in the repo (`docs/`, `repo-governance/`, `apps/*/README.md`, `package.json`, `go.mod`, `Cargo.toml`, etc.) and that requires more than a single `WebFetch` against an already-known authoritative URL MUST be delegated to `web-researcher`.**
 
 Concretely:
 
-| Situation                                                                              | Action                               |
-| -------------------------------------------------------------------------------------- | ------------------------------------ |
-| Claim about a library version is already in `package.json` / lockfile                  | `Grep`, no web call needed           |
-| Claim about Nx behavior already in `repo-governance/development/infra/nx-targets.md`   | `Read`, no web call needed           |
-| Single `WebFetch` against a known URL (e.g., a specific Next.js docs page) confirms it | In-context `WebFetch` permitted      |
-| Two or more searches/fetches needed to find the right source                           | **Delegate to `web-research-maker`** |
-| Open-ended "current best practice" question                                            | **Delegate to `web-research-maker`** |
-| Library API surface unfamiliar to the maker                                            | **Delegate to `web-research-maker`** |
+| Situation                                                                              | Action                           |
+| -------------------------------------------------------------------------------------- | -------------------------------- |
+| Claim about a library version is already in `package.json` / lockfile                  | `Grep`, no web call needed       |
+| Claim about Nx behavior already in `repo-governance/development/infra/nx-targets.md`   | `Read`, no web call needed       |
+| Single `WebFetch` against a known URL (e.g., a specific Next.js docs page) confirms it | In-context `WebFetch` permitted  |
+| Two or more searches/fetches needed to find the right source                           | **Delegate to `web-researcher`** |
+| Open-ended "current best practice" question                                            | **Delegate to `web-researcher`** |
+| Library API surface unfamiliar to the maker                                            | **Delegate to `web-researcher`** |
 
 `plan-fixer` retains Exception 2 from the universal convention (in-context only; same-context re-validation is required for fixer atomicity). All other plan agents follow the lower threshold above.
 
@@ -179,7 +179,7 @@ Nx targets vary per project. Read `project.json` or run `nx show project ose-www
 
 > "Wrap with `unstable_cacheTagged(fn, tags, options)`..."
 
-Fabricated API. Real Next.js 16 surface is `unstable_cache(fn, keyParts, options)` plus `revalidateTag(tag)`. Check official docs (or delegate to `web-research-maker`) before writing the API surface.
+Fabricated API. Real Next.js 16 surface is `unstable_cache(fn, keyParts, options)` plus `revalidateTag(tag)`. Check official docs (or delegate to `web-researcher`) before writing the API surface.
 
 ### AP-5: Fabricating a numeric KPI
 
@@ -307,7 +307,7 @@ To validate a plan complies with this convention:
 
 ## Tools and Automation
 
-- **`web-research-maker`** — default research primitive for external claims.
+- **`web-researcher`** — default research primitive for external claims.
 - **`plan-checker`** — Step 5f hallucination scan against this convention.
 - **`plan-fixer`** — re-verification before applying replacement content.
 - **`plan-execution-checker`** — post-execution claim verification.
@@ -327,7 +327,7 @@ To validate a plan complies with this convention:
 **Agents:**
 
 - [`plan-maker`](../../../.claude/agents/plan-maker.md), [`plan-checker`](../../../.claude/agents/plan-checker.md), [`plan-fixer`](../../../.claude/agents/plan-fixer.md), [`plan-execution-checker`](../../../.claude/agents/plan-execution-checker.md) — the four agents this convention governs.
-- [`web-research-maker`](../../../.claude/agents/web-research-maker.md) — research primitive.
+- [`web-researcher`](../../../.claude/agents/web-researcher.md) — research primitive.
 
 **Workflows:**
 
@@ -349,4 +349,4 @@ To validate a plan complies with this convention:
 - **[Linking Convention](../../conventions/formatting/linking.md)**: GitHub-compatible markdown with `.md` extensions.
 - **[Content Quality Principles](../../conventions/writing/quality.md)**: active voice, single H1, proper heading hierarchy.
 - **[Factual Validation Convention](../../conventions/writing/factual-validation.md)**: extends the universal confidence-label system (`[Verified]`/`[Outdated]`/`[Unverified]`) with plan-specific repo-grounding labels (`[Repo-grounded]`, `[Web-cited]`, `[Judgment call]`, `[Unverified]`).
-- **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**: lowers the universal delegation threshold — for plan content, any external claim not grepable from the repo requires `web-research-maker` delegation.
+- **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**: lowers the universal delegation threshold — for plan content, any external claim not grepable from the repo requires `web-researcher` delegation.

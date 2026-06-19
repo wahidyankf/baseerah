@@ -124,7 +124,7 @@ flowchart TB
       altcover) **and** the new frontend deps for `ts-ui` (shadcn/Radix/CVA) against release dates;
       cutoff = exec date minus 60 days; CVE-clean. Resolve the exact Giraffe 8.x pin. — acceptance:
       confirmed versions + dates written back into `tech-docs.md`; none inside the soak.
-      _Suggested executor: web-research-maker._
+      _Suggested executor: web-researcher._
 - [x] [AI] Verify the dependency-graph baseline: `apps/crane-cli` → `libs/fsharp-crane-core`, and
       `apps/ayokoding-cli` + `apps/ose-cli` → `libs/rust-commons`. — acceptance: `nx graph` confirms.
 
