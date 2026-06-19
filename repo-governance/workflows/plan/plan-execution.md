@@ -532,14 +532,32 @@ Determine whether to continue execution or terminate.
 
 Report final status, archive plan if successful, and update all related READMEs.
 
-**UI-bearing plan pre-archival gate (rules 1, 10)**: For plans that add or change user-facing
+**UI-bearing plan pre-archival gate (rules 1, 10, 15)**: For plans that add or change user-facing
 screens or components, archival MUST NOT proceed until the production visual sign-off is confirmed
 (rule 1 — a human or Playwright observer verifies rendered output against the design mockups in the
 live or staging environment). Zero automated-gate findings are necessary but not sufficient. See
 [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md)
-rules 1 and 10. If defects surface after archival, use the reopen path (rule 14) — move the folder
-back from `done/` to `in-progress/`, strip the completion-date prefix, and note the defect in
-`README.md`.
+rules 1, 10, and 15.
+
+**Rule-15 web-UI exploratory retest (near-end, before archival)**: For **web-UI** plans
+specifically, after the implementation lands and the rule-1 visual sign-off is recorded, run **one**
+spec-aware `web-exploratory-tester` round against the running target URL(s). Its output is folded
+back into THIS plan, not a separate plan:
+
+1. Append each EWT-### finding to `delivery.md` as a **new unchecked task-list checkbox**
+   (`- [ ] EWT-NNN: <defect> — fix before archival`), and each SG-### spec-gap as its own unchecked
+   checkbox folded into the specs/\*\* coverage steps. Place them in a clearly labelled
+   "Rule-15 retest follow-ups" section at the end of the checklist.
+2. Each new checkbox materializes as exactly one harness task per the
+   [Task-Checklist Synchronization](#task-checklist-synchronization) 1:1 mapping, giving the user
+   live visibility of the retest backlog.
+3. Loop back into execution (Steps 2–7) to fix each finding and tick its checkbox via the Atomic
+   Sync Ritual. A finding may be left unchecked only if it is explicitly deferred with written
+   rationale recorded under the checkbox.
+4. Archival is blocked until every rule-15 checkbox is `- [x]` (fixed) or explicitly deferred.
+
+If defects surface after archival, use the reopen path (rule 14) — move the folder back from
+`done/` to `in-progress/`, strip the completion-date prefix, and note the defect in `README.md`.
 
 **Logic**:
 

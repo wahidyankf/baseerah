@@ -258,7 +258,7 @@ Update status to "Complete", add summary statistics and prioritized recommendati
 
 **Related Conventions:**
 
-- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Flag missing visual-parity gate (rule 1), mockup colors not expressed as theme tokens (rule 8), presence-only ordering tests that do not distinguish correct from buggy values (rule 5), and missing per-breakpoint responsive deliverable steps (rules 3, 4) as HIGH findings on UI-bearing plans
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Flag missing visual-parity gate (rule 1), mockup colors not expressed as theme tokens (rule 8), presence-only ordering tests that do not distinguish correct from buggy values (rule 5), missing per-breakpoint responsive deliverable steps (rules 3, 4), and a missing near-end `web-exploratory-tester` retest step that appends its findings to `delivery.md` as unchecked task-list items (rule 15) as HIGH findings on UI-bearing plans (rule 15 applies to web-UI plans only)
 
 **Harness Conventions (Step 5g):**
 

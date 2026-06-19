@@ -177,7 +177,7 @@ Update status to "Complete", add summary and recommendation (approve/revise).
 
 - [Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) - `[AI]`/`[HUMAN]` marker rules, legend, handoff/resume signal requirement (validated in Step 5f-gates)
 - [Plans Organization Convention §Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule) - Phase gate barrier rule, Pause Safety requirement (validated in Step 5f-gates)
-- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Verify that the production visual sign-off (rule 1) and the deploy-config smoke test (rule 11) were performed before archival; flag their absence as HIGH on UI-bearing plans
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Verify that the production visual sign-off (rule 1), the deploy-config smoke test (rule 11), and — on web-UI plans — the near-end `web-exploratory-tester` retest round ran with every rule-15 follow-up checkbox in `delivery.md` ticked (fixed) or explicitly deferred with rationale (rule 15) before archival; flag their absence as HIGH on UI-bearing plans
 
 **Remember**: This is the final quality gate. Be thorough, independent, and uncompromising on quality.
 

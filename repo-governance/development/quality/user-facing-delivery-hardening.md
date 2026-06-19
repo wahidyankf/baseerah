@@ -1,6 +1,6 @@
 ---
 title: "User-Facing Delivery Hardening Convention"
-description: Fourteen durable rules for planning, executing, verifying, and archiving user-facing feature work so design-parity and behavioral defects cannot ship past green gates
+description: Fifteen durable rules for planning, executing, verifying, and archiving user-facing feature work so design-parity and behavioral defects cannot ship past green gates
 category: explanation
 subcategory: development
 tags:
@@ -22,9 +22,10 @@ happened, and every automated gate was green while it happened. The defects surf
 human opened the live site.
 
 This convention distills the fourteen lessons from that incident into durable rules for the whole
-**plan → execute → verify → archive** loop. Each rule names the gap it closes and how to apply it,
-so it can be folded into how we author plans (`plan-maker`), gate them (`plan-checker`,
-`plan-execution-checker`), and execute them (the plan-execution workflow).
+**plan → execute → verify → archive** loop, plus a fifteenth rule added afterward to require a
+spec-aware exploratory retest of the live web UI before archival. Each rule names the gap it closes
+and how to apply it, so it can be folded into how we author plans (`plan-maker`), gate them
+(`plan-checker`, `plan-execution-checker`), and execute them (the plan-execution workflow).
 
 ## Principles Implemented/Respected
 
@@ -67,11 +68,11 @@ so it can be folded into how we author plans (`plan-maker`), gate them (`plan-ch
 - API-only behavior (covered by the curl path in
   [Manual Behavioral Verification](./manual-behavioral-verification.md)).
 
-## The Fourteen Rules
+## The Fifteen Rules
 
-Listed 1–14 in source order (each maps to the same-numbered lesson recorded in the originating
-plan's delivery log). A **phase tag** marks where each rule binds, and each states the **gap** it
-closes and **how to apply** it.
+Rules 1–14 are listed in source order (each maps to the same-numbered lesson from the originating
+incident); rule 15 was added afterward and does not correspond to an incident lesson. A **phase
+tag** marks where each rule binds, and each states the **gap** it closes and **how to apply** it.
 
 1. **(Authoring) A UI plan MUST carry a manual visual-parity gate, executed before archival.** Gap:
    automated tests asserted DOM/behavior presence; none compared the rendered pixels to the
@@ -154,6 +155,26 @@ closes and **how to apply** it.
     `plans/in-progress/`, re-provision the worktree) so the work has a home and the trunk stays
     clean; plan-execution documents this "reopen" entry path.
 
+15. **(Verification) A web-UI plan MUST run one round of `web-exploratory-tester` against the
+    running UI near the end of delivery, and fix its findings before archival.** Gap: the
+    visual-parity sign-off (Rule 10) confirms the screen matches the mockups but does not hunt for
+    functional, behavioural-consistency, responsive, accessibility, URL/IA, or passive-security
+    defects on the live build — exactly the class of defect that ships past green gates. Apply:
+    after the web UI is implemented and the Rule 10 visual sign-off is recorded, run a single
+    spec-aware `web-exploratory-tester` session against the plan's running target URL(s). **Record
+    each resulting finding in `delivery.md` as a new unchecked task-list checkbox**
+    (`- [ ] EWT-NNN: <defect> — fix before archival`) in a labelled "Rule-15 retest follow-ups"
+    section, and each SG-### spec-gap as its own unchecked checkbox folded into the `specs/**`
+    coverage steps per [Feature Change Completeness](./feature-change-completeness.md). During
+    plan-execution these checkboxes materialize 1:1 as harness Task items, are fixed within the same
+    plan, and are ticked (`- [x]`) via the Atomic Sync Ritual; a finding may stay unchecked only if
+    explicitly deferred with written rationale recorded under the checkbox. Archival is blocked until
+    every rule-15 checkbox is ticked or deferred. `plan-maker` emits this step (with the
+    follow-ups section scaffold); `plan-checker` flags its absence on web-UI plans;
+    `plan-execution-checker` verifies the round ran and every rule-15 checkbox is
+    resolved-or-explicitly-deferred before archival. Applies to web UI (browser-rendered apps) only
+    — not CLI/text user-facing output, which `web-exploratory-tester` cannot exercise.
+
 ## Examples
 
 ### PASS: A user-facing plan that cannot ship bland
@@ -166,6 +187,7 @@ closes and **how to apply** it.
 - Ordering test asserts which rows land above/below the divider (Rules 5, 12)
 - Finalization blocks archival on production Playwright sign-off per breakpoint/locale (Rules 1, 10)
 - Deploy-config sweep + live-URL smoke test included (Rule 11)
+- A spec-aware web-exploratory-tester round runs near the end; its findings are fixed before archival (Rule 15)
 ```
 
 ### FAIL: The incident this convention prevents
@@ -180,11 +202,17 @@ closes and **how to apply** it.
 ## Tools and Automation
 
 - **Playwright MCP**: per-breakpoint, per-locale visual sign-off against `assets/` mockups.
-- **`plan-maker`**: emits the delivery steps for Rules 1–8.
+- **`web-exploratory-tester`**: one spec-aware exploratory round against the running web UI near
+  the end of delivery (Rule 15); surfaces EWT-### functional/behavioural/responsive/accessibility
+  findings and SG-### spec-gap proposals.
+- **`plan-maker`**: emits the delivery steps for Rules 1–8 and the rule-15 exploratory-retest step
+  for web-UI plans.
 - **`plan-checker`**: flags missing visual-parity gate, raw-value mockup colors, presence-only
-  ordering tests, and missing per-breakpoint responsive steps.
+  ordering tests, missing per-breakpoint responsive steps, and a missing rule-15
+  exploratory-retest step on web-UI plans.
 - **`plan-execution-checker`**: verifies the production visual sign-off and deploy-config smoke
-  test were recorded before archival.
+  test were recorded before archival, and that the rule-15 exploratory-retest round ran with its
+  findings resolved-or-explicitly-deferred before archival.
 
 ## References
 
@@ -201,7 +229,9 @@ closes and **how to apply** it.
 
 - [Plan Execution](../../workflows/plan/plan-execution.md) — execution, finalization, archival gate.
 - [Plan Quality Gate](../../workflows/plan/plan-quality-gate.md) — pre-execution plan validation.
+- [Web Exploratory and Usability Test Fixing Planning](../../workflows/web/web-exploratory-and-usability-test-fixing-planning.md) — workflow that runs the spec-aware exploratory retest (Rule 15).
 
 **Agents:**
 
-- `plan-maker`, `plan-checker`, `plan-execution-checker`, `swe-ui-maker`, `swe-ui-checker`.
+- `plan-maker`, `plan-checker`, `plan-execution-checker`, `swe-ui-maker`, `swe-ui-checker`,
+  `web-exploratory-tester`.

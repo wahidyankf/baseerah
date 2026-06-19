@@ -256,6 +256,12 @@ prioritization, fix approach, and any UI direction, then authors:
   verbatim command + acceptance criterion), tagged `[AI]`/`[HUMAN]`, with Phase 0 first and the
   **Specs & Gherkin completeness** coverage steps that fold the exploratory `SG-###` proposals into
   `specs/**` Gherkin (per [feature-change-completeness](../../development/quality/feature-change-completeness.md)).
+  For a web-UI plan, the checklist also ends with a **"Rule-15 retest follow-ups"** section: run one
+  spec-aware `web-exploratory-tester` round against the running target URL(s) after the fixes land
+  and the visual sign-off is recorded, append each finding as a **new unchecked task-list checkbox**,
+  and fix/tick each before archival — per the
+  [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md)
+  (rule 15).
 - Finalize `README.md` so its risk summary labels each top risk `[Exploratory]` or `[Usability]`,
   and the document map lists every file including (when present) the `assets/` folder.
 

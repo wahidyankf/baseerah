@@ -421,7 +421,7 @@ Unsolicited PR steps conflict with Trunk Based Development. `plan-checker` will 
 - [CLAUDE.md](../../CLAUDE.md) - Primary guidance
 - [Plans Organization Convention](../../repo-governance/conventions/structure/plans.md) - Plan structure and organization
 - [Trunk Based Development Convention](../../repo-governance/development/workflow/trunk-based-development.md) - Git workflow
-- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Fourteen durable rules for UI-bearing plans; emit delivery steps for rules 1–8 (visual-parity gate, design-system primitive naming, per-breakpoint responsive steps, mockup colors as theme tokens, value-bearing calculation tests, deploy-config-is-code, pre-archival production sign-off, checkbox lockstep)
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Fifteen durable rules for UI-bearing plans; emit delivery steps for rules 1–8 and 15 (visual-parity gate, design-system primitive naming, per-breakpoint responsive steps, mockup colors as theme tokens, value-bearing calculation tests, deploy-config-is-code, pre-archival production sign-off, checkbox lockstep, and — for web-UI plans — a near-end `web-exploratory-tester` retest round (rule 15) whose findings are appended to `delivery.md` as unchecked task-list items in a "Rule-15 retest follow-ups" section and fixed/ticked before archival)
 
 **Related Agents / Workflows:**
 
