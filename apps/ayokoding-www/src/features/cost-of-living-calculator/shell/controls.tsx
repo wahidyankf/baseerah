@@ -7,6 +7,44 @@ import { childcareLocal, schoolLocal } from "../core/calc";
 import { fmtNum } from "../core/format";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
+import { cn } from "@/lib/utils";
+
+/** Accessible 2+-option segmented control (radiogroup) matching the hi-fi mockups. */
+function SegmentedControl<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div role="radiogroup" aria-label={label} className="inline-flex rounded-lg border border-border bg-muted p-[3px]">
+      {options.map((opt) => {
+        const selected = opt.value === value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            aria-label={opt.label}
+            onClick={() => onChange(opt.value)}
+            className={cn(
+              "rounded-md px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+              selected ? "bg-primary text-primary-foreground shadow-sm" : "text-foreground/60 hover:text-foreground",
+            )}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 type Props = {
   dataset: Dataset;
@@ -50,9 +88,9 @@ export function Controls({
   const kidOptions: Array<0 | 1 | 2 | 3> = [0, 1, 2, 3];
 
   return (
-    <div>
+    <div className="space-y-2">
       {/* Household selectors */}
-      <div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 [&_label]:text-sm [&_label]:font-medium [&_select]:rounded-md [&_select]:border [&_select]:border-border [&_select]:bg-background [&_select]:px-2 [&_select]:py-1 [&_select]:text-sm">
         <label htmlFor="controls-adults">{t(locale, "labelAdults")}</label>
         <select
           id="controls-adults"
@@ -111,62 +149,79 @@ export function Controls({
         </select>
       </div>
 
-      {/* School-type toggle — only when school-age kids > 0 */}
+      {/* School-type segmented control — only when school-age kids > 0 */}
       {household.schoolKids > 0 && (
-        <div>
-          <label htmlFor="controls-school-type">{t(locale, "labelSchoolType")}</label>
-          <select
-            id="controls-school-type"
-            aria-label={t(locale, "labelSchoolType")}
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-sm font-medium">{t(locale, "labelSchoolType")}</span>
+          <SegmentedControl<SchoolType>
+            label={t(locale, "labelSchoolType")}
             value={schoolType}
-            onChange={(e) => onSchoolTypeChange(e.target.value as SchoolType)}
-          >
-            <option value="public">{t(locale, "optPublic")}</option>
-            <option value="private">{t(locale, "optPrivate")}</option>
-          </select>
+            onChange={onSchoolTypeChange}
+            options={[
+              { value: "public", label: t(locale, "optPublic") },
+              { value: "private", label: t(locale, "optPrivate") },
+            ]}
+          />
         </div>
       )}
 
-      {/* Area selector */}
-      <div>
-        <label htmlFor="controls-area">{t(locale, "labelArea")}</label>
-        <select
-          id="controls-area"
-          aria-label={t(locale, "labelArea")}
+      {/* Area segmented control */}
+      <div className="mt-2 flex items-center gap-2">
+        <span className="text-sm font-medium">{t(locale, "labelArea")}</span>
+        <SegmentedControl<Area>
+          label={t(locale, "labelArea")}
           value={area}
-          onChange={(e) => onAreaChange(e.target.value as Area)}
-        >
-          <option value="center">{t(locale, "optCenter")}</option>
-          <option value="rural">{t(locale, "optRural")}</option>
-        </select>
+          onChange={onAreaChange}
+          options={[
+            { value: "center", label: t(locale, "optCenter") },
+            { value: "rural", label: t(locale, "optRural") },
+          ]}
+        />
       </div>
 
-      {/* Expense preview */}
-      <div>
-        <span data-testid="preview-housing" data-local={String(housing)}>
-          {city.currency} {fmtNum(housing)}
-        </span>
-        <span data-testid="preview-food" data-local={String(food)}>
-          {city.currency} {fmtNum(food)}
-        </span>
-        <span data-testid="preview-transport" data-local={String(transport)}>
-          {city.currency} {fmtNum(transport)}
-        </span>
-        <span data-testid="preview-utilities" data-local={String(utilities)}>
-          {city.currency} {fmtNum(utilities)}
-        </span>
-        <span data-testid="preview-healthcare" data-local={String(healthcare)}>
-          {city.currency} {fmtNum(healthcare)}
-        </span>
-        <span data-testid="preview-childcare" data-local={String(childcare)}>
-          {city.currency} {fmtNum(childcare)}
-        </span>
-        <span data-testid="preview-schooling" data-local={String(school)}>
-          {city.currency} {fmtNum(school)}
-        </span>
-        <span data-testid="preview-total" data-local={String(total)}>
-          {city.currency} {fmtNum(total)}
-        </span>
+      {/* Expense preview — labelled monthly breakdown for the preview city */}
+      <div className="space-y-1">
+        <p className="text-xs font-medium text-muted-foreground">
+          {city.name[locale] ?? city.name.en} — {t(locale, "previewMonthlyEstimate")}
+        </p>
+        <div className="flex flex-wrap gap-x-2 gap-y-1 text-sm [&>span]:inline-flex [&>span]:items-baseline [&>span]:gap-1 [&>span]:rounded [&>span]:bg-muted [&>span]:px-2 [&>span]:py-0.5">
+          <span data-testid="preview-housing" data-local={String(housing)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colHousing")}</span>
+            {city.currency} {fmtNum(housing)}
+          </span>
+          <span data-testid="preview-food" data-local={String(food)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colFood")}</span>
+            {city.currency} {fmtNum(food)}
+          </span>
+          <span data-testid="preview-transport" data-local={String(transport)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colTransport")}</span>
+            {city.currency} {fmtNum(transport)}
+          </span>
+          <span data-testid="preview-utilities" data-local={String(utilities)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colUtilities")}</span>
+            {city.currency} {fmtNum(utilities)}
+          </span>
+          <span data-testid="preview-healthcare" data-local={String(healthcare)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colHealthcareOOP")}</span>
+            {city.currency} {fmtNum(healthcare)}
+          </span>
+          <span data-testid="preview-childcare" data-local={String(childcare)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colChildcare")}</span>
+            {city.currency} {fmtNum(childcare)}
+          </span>
+          <span data-testid="preview-schooling" data-local={String(school)}>
+            <span className="text-xs text-muted-foreground">{t(locale, "colSchool")}</span>
+            {city.currency} {fmtNum(school)}
+          </span>
+          <span
+            data-testid="preview-total"
+            data-local={String(total)}
+            className="!bg-primary font-semibold !text-primary-foreground"
+          >
+            <span className="text-xs text-primary-foreground/80">{t(locale, "colTotal")}</span>
+            {city.currency} {fmtNum(total)}
+          </span>
+        </div>
       </div>
     </div>
   );

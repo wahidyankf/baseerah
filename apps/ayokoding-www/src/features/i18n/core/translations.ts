@@ -77,6 +77,7 @@ const translations: Record<Locale, Record<string, string>> = {
     colSchool: "School",
     colEssentials: "Essentials",
     colTotal: "Total",
+    previewMonthlyEstimate: "estimated monthly essentials",
     colRelocationSunk: "Relocation (sunk)",
     colLiquidityReserve: "Liquidity reserve",
     oopLegend: "OOP = out-of-pocket — healthcare you pay yourself, on top of any tax-funded or insurance coverage.",
@@ -218,6 +219,7 @@ const translations: Record<Locale, Record<string, string>> = {
     colSchool: "Sekolah",
     colEssentials: "Kebutuhan pokok",
     colTotal: "Total",
+    previewMonthlyEstimate: "perkiraan kebutuhan pokok bulanan",
     colRelocationSunk: "Relokasi (sunk)",
     colLiquidityReserve: "Cadangan likuiditas",
     oopLegend:

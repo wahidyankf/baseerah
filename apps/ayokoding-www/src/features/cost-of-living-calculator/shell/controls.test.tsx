@@ -96,13 +96,13 @@ describe("Controls", () => {
     render(<ControlsWithState />);
 
     // Initially hidden (0 school-age kids)
-    expect(screen.queryByRole("combobox", { name: /school type/i })).toBeNull();
+    expect(screen.queryByRole("radiogroup", { name: /school type/i })).toBeNull();
 
     // Add 1 school-age child
     await user.selectOptions(screen.getByRole("combobox", { name: /school-age children/i }), "1");
 
     // Now visible
-    expect(screen.getByRole("combobox", { name: /school type/i })).toBeTruthy();
+    expect(screen.getByRole("radiogroup", { name: /school type/i })).toBeTruthy();
   });
 
   // Gherkin (binds): "Private school raises expenses more than public"
@@ -112,7 +112,7 @@ describe("Controls", () => {
 
     const schoolingPublic = parseFloat(screen.getByTestId("preview-schooling").getAttribute("data-local") ?? "0");
 
-    await user.selectOptions(screen.getByRole("combobox", { name: /school type/i }), "private");
+    await user.click(screen.getByRole("radio", { name: /private/i }));
 
     const schoolingPrivate = parseFloat(screen.getByTestId("preview-schooling").getAttribute("data-local") ?? "0");
 
@@ -127,7 +127,7 @@ describe("Controls", () => {
     const housingCenter = parseFloat(screen.getByTestId("preview-housing").getAttribute("data-local") ?? "0");
     const totalCenter = parseFloat(screen.getByTestId("preview-total").getAttribute("data-local") ?? "0");
 
-    await user.selectOptions(screen.getByRole("combobox", { name: /area/i }), "rural");
+    await user.click(screen.getByRole("radio", { name: /rural/i }));
 
     const housingRural = parseFloat(screen.getByTestId("preview-housing").getAttribute("data-local") ?? "0");
     const totalRural = parseFloat(screen.getByTestId("preview-total").getAttribute("data-local") ?? "0");

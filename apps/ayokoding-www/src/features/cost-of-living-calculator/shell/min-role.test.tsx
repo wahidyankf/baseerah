@@ -18,7 +18,11 @@ describe("MinRoleTable", () => {
   };
 
   // Gherkin (binds): "Minimum role for a savings target ranks on essential savings and is reordered"
-  it("with savings_target=2000 shows qualifying above divider and minimum marked", async () => {
+  // NOTE: target 8000 USD genuinely splits the ladder for the default 1-adult household
+  // (savings: swe_1≈2950, swe_2≈6150, senior_swe≈8710 → senior_swe is the minimum, swe_1/swe_2
+  // fall below). A target of 2000 would clear ALL roles (no split) — the prior 2000 assertion
+  // only "passed" because of the rank-inversion bug in orderForDisplay (now fixed).
+  it("with savings_target=8000 shows qualifying above divider and minimum marked", async () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
@@ -28,7 +32,7 @@ describe("MinRoleTable", () => {
 
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
-    await user.type(targetInput, "2000");
+    await user.type(targetInput, "8000");
 
     // Divider separating qualifying from non-qualifying
     expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
@@ -39,6 +43,18 @@ describe("MinRoleTable", () => {
     // Non-qualifying rows are de-emphasised
     const dimmedRows = screen.getAllByTestId("non-qualifying-row");
     expect(dimmedRows.length).toBeGreaterThan(0);
+
+    // Regression guard against rank inversion: qualifying rows must all appear ABOVE the
+    // divider in DOM order, and non-qualifying rows BELOW it. (Pre-fix, senior roles with
+    // higher savings were wrongly dumped below the divider.)
+    const allRows = screen.getAllByRole("row");
+    const dividerIdx = allRows.findIndex(
+      (r) =>
+        r.querySelector('[data-testid="qualifying-divider"]') || r.getAttribute("data-testid") === "qualifying-divider",
+    );
+    const dimmedIdxs = dimmedRows.map((r) => allRows.indexOf(r));
+    expect(dividerIdx).toBeGreaterThan(-1);
+    for (const idx of dimmedIdxs) expect(idx).toBeGreaterThan(dividerIdx);
   });
 
   // Gherkin (binds): "Roles are labelled as software-engineering roles"

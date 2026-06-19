@@ -211,21 +211,20 @@ export function minimumRole(baselineUsd: number, rankedLadder: LadderEntry[]): E
 // ─── Display order ────────────────────────────────────────────────────────────
 
 // Reorder: qualifying (clears=true) roles first, sorted by rank HIGH→LOW down to the
-// minimum qualifier; then non-qualifying (clears=false) roles, also ranked LOW→HIGH.
+// Reorder: qualifying roles first — rank ≥ the minimum qualifier, i.e. the minimum role
+// PLUS everyone more senior — sorted rank HIGH→LOW down to the minimum; then the
+// below-minimum roles (rank < the minimum), also HIGH→LOW. A role at or above the minimum
+// seniority is sufficient — that is precisely what the minimum-role threshold means.
 export function orderForDisplay(rankedLadder: LadderEntry[], minRole: EngRole | null): LadderEntry[] {
-  // Recompute clears based on minRole presence
   const minRank = minRole ? (rankedLadder.find((e) => e.role === minRole)?.rank ?? Infinity) : Infinity;
 
   const withClears = rankedLadder.map((e) => ({
     ...e,
-    clears:
-      minRole !== null && e.rank <= minRank
-        ? e.bestEssentialSavingsUsd >= (rankedLadder.find((r) => r.role === minRole)?.bestEssentialSavingsUsd ?? 0)
-        : false,
+    clears: minRole !== null && e.rank >= minRank,
   }));
 
-  const qualifying = withClears.filter((e) => e.clears).sort((a, b) => b.rank - a.rank); // high→low seniority
-  const nonQualifying = withClears.filter((e) => !e.clears).sort((a, b) => a.rank - b.rank); // low→high for non-qualifying
+  const qualifying = withClears.filter((e) => e.clears).sort((a, b) => b.rank - a.rank); // high→low, ending at the minimum
+  const nonQualifying = withClears.filter((e) => !e.clears).sort((a, b) => b.rank - a.rank); // high→low, below the minimum
 
   return [...qualifying, ...nonQualifying];
 }

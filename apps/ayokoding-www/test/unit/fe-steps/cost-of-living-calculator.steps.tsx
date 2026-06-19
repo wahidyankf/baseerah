@@ -637,7 +637,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
     });
 
     Then("no school-type toggle is shown", () => {
-      expect(screen.queryByRole("combobox", { name: /school type/i })).toBeNull();
+      expect(screen.queryByRole("radiogroup", { name: /school type/i })).toBeNull();
     });
   });
 
@@ -652,7 +652,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
     });
 
     When('I switch the school type from "public" to "private"', async () => {
-      await user.selectOptions(screen.getByRole("combobox", { name: /school type/i }), "private");
+      await user.click(screen.getByRole("radio", { name: /private/i }));
     });
 
     Then("the schooling portion of the modeled expenses increases", () => {
@@ -669,7 +669,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
     });
 
     When('I switch the area from "city center" to "rural"', async () => {
-      await user.selectOptions(screen.getByRole("combobox", { name: /area/i }), "rural");
+      await user.click(screen.getByRole("radio", { name: /rural/i }));
     });
 
     Then("the modeled housing expense decreases", () => {
@@ -697,10 +697,10 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
         await user.selectOptions(screen.getByRole("combobox", { name: /baseline source/i }), "savings_target");
       });
 
-      When('I enter a monthly savings target of "2000" USD', async () => {
+      When('I enter a monthly savings target of "8000" USD', async () => {
         const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
         await user.clear(input);
-        await user.type(input, "2000");
+        await user.type(input, "8000");
       });
 
       Then(
@@ -712,14 +712,14 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
       );
 
       And(
-        "the lowest role whose best city reaches at least 2000 USD essential savings is marked as the minimum",
+        "the lowest role whose best city reaches at least 8000 USD essential savings is marked as the minimum",
         () => {
           expect(screen.getByTestId("minimum-marker")).toBeTruthy();
         },
       );
 
       And(
-        "roles whose best city cannot reach 2000 USD essential savings are shown below the divider and de-emphasised",
+        "roles whose best city cannot reach 8000 USD essential savings are shown below the divider and de-emphasised",
         () => {
           expect(screen.getAllByTestId("non-qualifying-row").length).toBeGreaterThan(0);
         },
@@ -1049,7 +1049,7 @@ describeFeature(feature, ({ Scenario, AfterEachScenario }) => {
     });
 
     When("I change the household type or area", async () => {
-      await user.selectOptions(screen.getByRole("combobox", { name: /area/i }), "rural");
+      await user.click(screen.getByRole("radio", { name: /rural/i }));
     });
 
     Then("the role candidates' savings and the marked minimum role update accordingly", () => {
