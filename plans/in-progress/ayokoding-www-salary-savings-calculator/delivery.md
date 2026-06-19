@@ -1266,21 +1266,19 @@ that duplicates the scenarios**. This phase adds the step definitions that bind 
 
 > This is the step whose absence let a plain UI reach production. It is now a blocking gate.
 
-- [ ] **[AI]** With Playwright MCP, `browser_navigate` to the **production** URL
-      `https://ayokoding.com/en/tools/cost-of-living-calculator`, then `browser_take_screenshot`
-      (full page) for each of the three tabs (`cost`, `savings`, `min-role`). Acceptance: three
-      screenshots captured post-deploy.
-- [ ] **[AI]** Side-by-side compare each screenshot against its approved mockup in `assets/`
-      (`ui-cost-of-living-option-a-category-table.png`, `ui-savings-option-a-net-savings-table.png`,
-      `ui-min-role-option-a-ladder-table.png`). Acceptance: tabs render as a **colored segmented
-      control**, healthcare-scheme cells render as **colored badges** (green/teal/amber), and
-      Area/School render as **segmented toggles** — all matching the mockups. Record the verdict in
-      this step's implementation notes.
-- [ ] **[AI]** `browser_console_messages` on each tab. Acceptance: no JS errors (the pre-existing
-      benign favicon/resource 404 excepted and noted).
-- [ ] **[AI]** Repeat the screenshot + mockup comparison for the `id` locale
-      (`https://ayokoding.com/id/tools/cost-of-living-calculator`). Acceptance: same styling parity in
-      Indonesian.
+- [x] **[AI]** Playwright MCP verified **production** (`www.ayokoding.com`, build `36d1d1075`) at
+      desktop (1280 px) + mobile (390 px): the **Cost** tab renders the colored segmented control
+      (blue active), green/amber scheme badges, blue Area toggle, labelled preview
+      (`Singapore — estimated monthly essentials … Total SGD 4,328`), the **city-detail card** (Tokyo:
+      blue header, single-arrow back link, payroll badge, emphasised subtotal/total), and the
+      **mobile city-cards**.
+- [x] **[AI]** Verdict vs the approved `assets/` mockups: **match** — tabs = colored segmented
+      control, scheme cells = colored badges (green tax-funded / amber payroll, reconciled from the
+      mockup's teal-draft to the ayokoding brand per §lesson 8), Area/School = segmented toggles.
+- [x] **[AI]** `browser_console_messages(level=error)` on production = **0 errors, 0 warnings**.
+- [x] **[AI]** `id` locale verified on production (`/id/…`): translated UI
+      (`Kalkulator Tabungan Gaji`, `Biaya hidup`, `Pusat kota`, `Perumahan/Makanan/…`,
+      `ASURANSI PENGGAJIAN WAJIB` badge) with identical styling + mobile cards.
 
 ### 7.6 — Execution Log, Findings & Lessons (2026-06-19)
 
@@ -1428,8 +1426,12 @@ that duplicates the scenarios**. This phase adds the step definitions that bind 
 - [x] [AI] `npx nx run ayokoding-www:specs:coverage` — green (15 specs, 116 scenarios, 402 steps, all covered) after the min-role scenario target change (2000→8000).
 - [x] [AI] `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` — all green (1308 unit tests pass; lint warnings only, no errors; 15 specs/116 scenarios/402 steps covered).
 - [x] [AI] Full responsive transform shipped for all three tables (§7.7) — mobile cards / tablet reduced columns / desktop table verified at 390/820/1280 px.
-- [ ] [AI] CI green on `main` for the styling + responsive commits (`gh run list --limit 5 --json status,conclusion,name`).
-- [ ] [AI] Production re-deploy `state: success`; Playwright MCP screenshots of all three tabs (both locales) confirmed to match the `assets/` mockups (brand-blue tabs/toggles, green/amber/red scheme badges, segmented toggles, labelled preview, responsive cards/columns).
+- [x] [AI] CI green on `main` for the styling + responsive commits — `commons-quality-gate`,
+      `commons-env-validate`, `markdown-validate`, `publish-images` all `success` for `36d1d1075`.
+- [x] [AI] Production live + verified: `36d1d1075` serving on `www.ayokoding.com`; Playwright MCP
+      confirmed brand-blue tabs/toggles, green/amber scheme badges, labelled preview, city-detail
+      card, and mobile cards in `en` + `id`; 0 console errors. (Vercel GH-deployment record lagged the
+      live build; verified directly against the live site.)
 - [ ] [AI] **Deferred (tracked, not blocking this gate):** healthcare-scheme badge **columns** on the Savings + Min-role _desktop_ tables (net-new data columns, distinct from the responsive work above). Open follow-up recorded in §7.6.
 
 > **Archival hold (per user instruction 2026-06-19):** do NOT move this plan back to `plans/done/`
