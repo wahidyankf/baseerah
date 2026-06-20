@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "next-themes";
-import { SUPPORTED_LOCALES } from "@/features/i18n/core/config";
+import { SUPPORTED_LOCALES, isValidLocale } from "@/features/i18n/core/config";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { SearchProvider } from "@/features/search/shell/search-provider";
 import { Header } from "@/features/app-shell/shell/header";
 import { Footer } from "@/features/app-shell/shell/footer";
+import { SkipLink } from "@/features/app-shell/shell/skip-link";
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
@@ -18,7 +19,7 @@ interface Props {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
 
-  if (!(SUPPORTED_LOCALES as readonly string[]).includes(locale)) {
+  if (!isValidLocale(locale)) {
     notFound();
   }
 
@@ -26,12 +27,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <TRPCProvider>
         <SearchProvider>
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-          >
-            Skip to content
-          </a>
+          <SkipLink locale={locale} />
           <div className="flex min-h-screen flex-col">
             <Header locale={locale} />
             <main id="main-content" className="flex-1">

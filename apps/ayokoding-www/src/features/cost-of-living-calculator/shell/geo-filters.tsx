@@ -18,6 +18,8 @@ type Props = {
   dataset: Dataset;
   locale?: Locale;
   onScopeChange: (scope: GeoScope) => void;
+  initialCountryId?: string | null;
+  initialCityId?: string | null;
 };
 
 const REGION_LABELS: Record<Region, string> = {
@@ -32,10 +34,26 @@ const REGION_LABELS: Record<Region, string> = {
   africa: "Africa",
 };
 
-export function GeoFilters({ dataset, locale = "en", onScopeChange }: Props) {
+/** Returns the locale-specific name, falling back to English. */
+function localeName(name: { en: string; id: string }, locale: Locale): string {
+  return name[locale] ?? name.en;
+}
+
+export function GeoFilters({ dataset, locale = "en", onScopeChange, initialCountryId, initialCityId }: Props) {
   const [region, setRegion] = useState<Region | null>(null);
-  const [countryId, setCountryId] = useState<string | null>(null);
-  const [cityId, setCityId] = useState<string | null>(null);
+  const [countryId, setCountryId] = useState<string | null>(initialCountryId ?? null);
+  const [cityId, setCityId] = useState<string | null>(initialCityId ?? null);
+
+  // Pre-resolve all translated strings to avoid repeated t() calls in JSX.
+  const labels = {
+    region: t(locale, "labelRegion"),
+    country: t(locale, "labelCountry"),
+    city: t(locale, "labelCity"),
+    allRegions: t(locale, "optAllRegions"),
+    allCountries: t(locale, "optAllCountries"),
+    allCities: t(locale, "optAllCities"),
+    clearRegion: t(locale, "clearRegion"),
+  };
 
   const availableRegions = [...new Set(dataset.cities.map((c) => c.region as Region))].sort();
 
@@ -76,16 +94,16 @@ export function GeoFilters({ dataset, locale = "en", onScopeChange }: Props) {
     <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-2">
         <label htmlFor="geo-region-select" className="text-sm font-medium">
-          {t(locale, "labelRegion")}
+          {labels.region}
         </label>
         <select
           id="geo-region-select"
-          aria-label={t(locale, "labelRegion")}
+          aria-label={labels.region}
           value={region ?? ""}
           onChange={(e) => handleRegionChange(e.target.value)}
           className="rounded border px-2 py-1 text-sm"
         >
-          <option value="">{t(locale, "optAllRegions")}</option>
+          <option value="">{labels.allRegions}</option>
           {availableRegions.map((r) => (
             <option key={r} value={r}>
               {REGION_LABELS[r]}
@@ -95,30 +113,30 @@ export function GeoFilters({ dataset, locale = "en", onScopeChange }: Props) {
         {region !== null && (
           <button
             type="button"
-            aria-label="Clear region"
+            aria-label={labels.clearRegion}
             onClick={clearRegion}
             className="text-xs text-muted-foreground underline"
           >
-            {t(locale, "clearRegion")}
+            {labels.clearRegion}
           </button>
         )}
       </div>
 
       <div className="flex items-center gap-2">
         <label htmlFor="geo-country-select" className="text-sm font-medium">
-          {t(locale, "labelCountry")}
+          {labels.country}
         </label>
         <select
           id="geo-country-select"
-          aria-label={t(locale, "labelCountry")}
+          aria-label={labels.country}
           value={countryId ?? ""}
           onChange={(e) => handleCountryChange(e.target.value)}
           className="rounded border px-2 py-1 text-sm"
         >
-          <option value="">{t(locale, "optAllCountries")}</option>
+          <option value="">{labels.allCountries}</option>
           {availableCountries.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name.en}
+              {localeName(c.name, locale)}
             </option>
           ))}
         </select>
@@ -126,19 +144,19 @@ export function GeoFilters({ dataset, locale = "en", onScopeChange }: Props) {
 
       <div className="flex items-center gap-2">
         <label htmlFor="geo-city-select" className="text-sm font-medium">
-          {t(locale, "labelCity")}
+          {labels.city}
         </label>
         <select
           id="geo-city-select"
-          aria-label={t(locale, "labelCity")}
+          aria-label={labels.city}
           value={cityId ?? ""}
           onChange={(e) => handleCityChange(e.target.value)}
           className="rounded border px-2 py-1 text-sm"
         >
-          <option value="">{t(locale, "optAllCities")}</option>
+          <option value="">{labels.allCities}</option>
           {availableCities.map((c) => (
             <option key={c.id} value={c.id}>
-              {c.name.en}
+              {localeName(c.name, locale)}
             </option>
           ))}
         </select>

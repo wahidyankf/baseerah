@@ -21,10 +21,13 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Calculator — page
     calcTitle: "Salary Savings Calculator",
+    calcSubtitle: "Compare cost of living and salary savings across cities",
     ariaTabsNav: "Calculator tabs",
     tabCostOfLiving: "Cost of living",
     tabSavings: "Savings",
+    tabSavingsDesc: "See how much you'd save",
     tabMinRole: "Minimum role",
+    tabMinRoleDesc: "Find the min role you need",
     dataLastUpdated: "Data last updated",
     estimatesOnly: "Estimates only",
 
@@ -68,11 +71,14 @@ const translations: Record<Locale, Record<string, string>> = {
     colCountry: "Country",
     colCity: "City",
     colHealthcareScheme: "Healthcare scheme",
+    tooltipHealthcareScheme:
+      "How healthcare costs are funded in this country: tax-funded, mandatory payroll insurance, or out-of-pocket.",
     colHousing: "Housing",
     colFood: "Food",
     colTransport: "Transport",
     colUtilities: "Utilities",
     colHealthcareOOP: "Healthcare (OOP)",
+    colHealthcareOOPPrefix: "Healthcare",
     colChildcare: "Childcare",
     colSchool: "School",
     colEssentials: "Essentials",
@@ -80,6 +86,10 @@ const translations: Record<Locale, Record<string, string>> = {
     previewMonthlyEstimate: "estimated monthly essentials",
     colRelocationSunk: "Relocation (sunk)",
     colLiquidityReserve: "Liquidity reserve",
+    tooltipRelocationSunk:
+      "One-time sunk costs: rental deposit, key money, moving, and visa fees. Not a monthly expense.",
+    tooltipLiquidityReserve:
+      "Cash cushion you keep on hand — not a sunk cost. Covers first months before salary starts.",
     oopLegend: "OOP = out-of-pocket — healthcare you pay yourself, on top of any tax-funded or insurance coverage.",
 
     // Calculator — healthcare scheme badges
@@ -163,10 +173,13 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Calculator — page
     calcTitle: "Kalkulator Tabungan Gaji",
+    calcSubtitle: "Bandingkan biaya hidup dan tabungan gaji di berbagai kota",
     ariaTabsNav: "Tab kalkulator",
     tabCostOfLiving: "Biaya hidup",
     tabSavings: "Tabungan",
+    tabSavingsDesc: "Lihat seberapa banyak yang bisa Anda hemat",
     tabMinRole: "Jabatan minimum",
+    tabMinRoleDesc: "Temukan jabatan minimum yang Anda butuhkan",
     dataLastUpdated: "Data terakhir diperbarui",
     estimatesOnly: "Hanya perkiraan",
 
@@ -210,18 +223,25 @@ const translations: Record<Locale, Record<string, string>> = {
     colCountry: "Negara",
     colCity: "Kota",
     colHealthcareScheme: "Skema kesehatan",
+    tooltipHealthcareScheme:
+      "Bagaimana biaya kesehatan didanai di negara ini: didanai pajak, asuransi penggajian wajib, atau bayar sendiri.",
     colHousing: "Perumahan",
     colFood: "Makanan",
     colTransport: "Transportasi",
     colUtilities: "Utilitas",
     colHealthcareOOP: "Kesehatan (OOP)",
+    colHealthcareOOPPrefix: "Kesehatan",
     colChildcare: "Penitipan anak",
     colSchool: "Sekolah",
     colEssentials: "Kebutuhan pokok",
     colTotal: "Total",
     previewMonthlyEstimate: "perkiraan kebutuhan pokok bulanan",
-    colRelocationSunk: "Relokasi (sunk)",
+    colRelocationSunk: "Relokasi (biaya hangus)",
     colLiquidityReserve: "Cadangan likuiditas",
+    tooltipRelocationSunk:
+      "Biaya hangus sekali: deposit sewa, uang kunci, pindahan, dan biaya visa. Bukan pengeluaran bulanan.",
+    tooltipLiquidityReserve:
+      "Dana cadangan yang Anda simpan — bukan biaya hangus. Menutup bulan-bulan awal sebelum gaji mulai.",
     oopLegend:
       "OOP = out-of-pocket — biaya kesehatan yang Anda bayar sendiri, di luar jaminan dari pajak atau asuransi.",
 
