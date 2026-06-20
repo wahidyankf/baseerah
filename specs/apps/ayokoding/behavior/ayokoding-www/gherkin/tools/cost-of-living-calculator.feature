@@ -238,12 +238,68 @@ Feature: Salary savings calculator
     When I change the household type or area
     Then the role candidates' savings and the marked minimum role update accordingly
 
-  Scenario: Low-confidence cells are flagged
-    Given I am on the calculator
-    When the page finishes loading
-    Then any cell backed by a lower-confidence estimate shows a confidence flag
+  Scenario: Low-confidence cells are flagged on the minimum-role tab
+    Given I am on the "Minimum role" tab
+    When the table renders
+    Then cells with lower data confidence display a visual flag indicator
 
   Scenario: No Israeli city appears among role candidates
     Given I am on the "Minimum role" tab
     When the page finishes loading
     Then no Israeli city appears as a candidate city for any role
+
+  Scenario: Zero or empty salary shows deficit with suppressed percentage
+    Given I am on the "Savings" tab
+    When the gross monthly salary field is empty or zero
+    Then each city row shows a negative essential-savings amount equal to the negation of that city's essential expenses in USD
+    And each percentage cell shows an em dash because there is no net income to compute a percentage from
+
+  Scenario: Rural area and multi-adult household multiply the housing estimate sub-linearly
+    Given I am on the "Cost of living" tab
+    And I set the household to 2 adults with no children
+    When I switch the area from "city center" to "rural"
+    Then the housing estimate in the expense preview decreases to base times subLinear 2 adults times 0.75
+    And the essentials total in the preview decreases accordingly
+
+  Scenario: Selecting a city from the City filter opens its detail view
+    Given I am on the "Cost of living" tab
+    When I select a city from the City dropdown filter
+    Then the single-city cost-of-living detail for that city is shown
+    And the detail is identical to the one shown when clicking the city name in the table
+
+  Scenario: Income exactly at the low-to-mid threshold uses the mid band
+    Given I am on the "Savings" tab
+    When I enter a gross monthly salary at exactly the low-to-mid band threshold for a city
+    Then that city's net take-home uses the mid band effective tax rate
+
+  Scenario: Mobile city cards show the country name alongside the city
+    Given I am viewing the "Cost of living" tab on a viewport narrower than 768 px
+    When the mobile city cards render
+    Then each card header shows both the city name and its country name
+
+  Scenario: Zero savings target marks the lowest role as the minimum
+    Given I am on the "Minimum role" tab
+    And I set the baseline source to "savings target"
+    When I enter a monthly savings target of zero USD
+    Then the qualifying divider is shown
+    And the minimum marker appears on the lowest-ranked role in the ladder
+    And all roles appear above the divider because every role clears a zero target
+
+  Scenario: Expense preview updates in real time when household controls change
+    Given I am on the cost-of-living calculator
+    And the default household is 1 adult with no children in city center
+    When I change the Adults control to 2
+    Then the Housing preview amount increases to base times subLinear 2 adults
+    And the Childcare and School preview amounts remain zero
+    And the Total preview updates immediately without a page reload
+
+  Scenario: Selecting filters updates the URL with query parameters
+    Given a user is on the cost-of-living calculator page
+    When the user selects Country "Indonesia" and City "Jakarta"
+    Then the URL updates to include query parameters reflecting those selections
+    And copying the URL and opening it in a new tab restores the same filter state
+
+  Scenario: Page title includes tool name on load
+    Given a user navigates to the cost-of-living calculator
+    When the page finishes loading with default filter state
+    Then the browser tab title includes the name of the tool

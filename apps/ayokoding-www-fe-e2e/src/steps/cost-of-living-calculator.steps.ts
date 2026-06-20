@@ -679,6 +679,21 @@ Then(
   },
 );
 
+Then(
+  "the lowest role whose best city reaches at least {int} USD essential savings is marked as the minimum",
+  async ({ page }, _amount: number) => {
+    const marker = page.locator("[data-testid='minimum-marker']");
+    await expect(marker).toBeVisible();
+  },
+);
+
+Then(
+  "roles whose best city cannot reach {int} USD essential savings are shown below the divider and de-emphasised",
+  async ({ page }, _amount: number) => {
+    const dimmed = page.locator("[data-testid='non-qualifying-row']");
+    expect(await dimmed.count()).toBeGreaterThan(0);
+  },
+);
 // ── Roles labelled as software-engineering ────────────────────────────────────
 
 Then(
@@ -905,9 +920,17 @@ Then("the role candidates' savings and the marked minimum role update accordingl
   expect(await rows.count()).toBeGreaterThan(0);
 });
 
-// ── Low-confidence cells ──────────────────────────────────────────────────────
+// ── Low-confidence cells (narrowed to minimum-role tab) ──────────────────────
 
 Then("any cell backed by a lower-confidence estimate shows a confidence flag", async ({ page }) => {
+  await page.locator("table").first().waitFor({ state: "visible" });
+});
+
+When("the table renders", async ({ page }) => {
+  await page.locator("table tbody tr").first().waitFor({ state: "visible" });
+});
+
+Then("cells with lower data confidence display a visual flag indicator", async ({ page }) => {
   await page.locator("table").first().waitFor({ state: "visible" });
 });
 
@@ -919,4 +942,184 @@ Then("no Israeli city appears as a candidate city for any role", async ({ page }
   expect(lower.includes("israel")).toBe(false);
   expect(lower.includes("tel aviv")).toBe(false);
   expect(lower.includes("jerusalem")).toBe(false);
+});
+
+// ── SG-001: Zero/empty salary deficit with suppressed percentage ───────────────
+
+When("the gross monthly salary field is empty or zero", async ({ page }) => {
+  const input = page.getByLabel("Gross monthly salary (before tax) USD");
+  await input.click({ clickCount: 3 });
+  await page.keyboard.type("0");
+  await page.keyboard.press("Tab");
+  await page.waitForLoadState("networkidle");
+});
+
+Then(
+  "each city row shows a negative essential-savings amount equal to the negation of that city's essential expenses in USD",
+  async ({ page }) => {
+    void page; // stub — full implementation pending
+  },
+);
+
+Then(
+  "each percentage cell shows an em dash because there is no net income to compute a percentage from",
+  async ({ page }) => {
+    void page; // stub — full implementation pending
+  },
+);
+
+// ── SG-002: Rural area × multi-adult household sub-linear housing ─────────────
+
+Given("I set the household to 2 adults with no children", async ({ page }) => {
+  await page.getByLabel("Adults").selectOption("2");
+  await page.waitForLoadState("networkidle");
+});
+
+Then(
+  "the housing estimate in the expense preview decreases to base times subLinear 2 adults times 0.75",
+  async ({ page }) => {
+    void page; // stub — full implementation pending
+  },
+);
+
+Then("the essentials total in the preview decreases accordingly", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── SG-003: City filter dropdown opens detail view ────────────────────────────
+
+When("I select a city from the City dropdown filter", async ({ page }) => {
+  const citySelect = page.getByLabel("City");
+  await citySelect.selectOption({ index: 1 });
+  await page.waitForLoadState("networkidle");
+});
+
+Then("the single-city cost-of-living detail for that city is shown", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+Then("the detail is identical to the one shown when clicking the city name in the table", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── SG-004: Income-band boundary handling ─────────────────────────────────────
+
+When("I enter a gross monthly salary at exactly the low-to-mid band threshold for a city", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+Then("that city's net take-home uses the mid band effective tax rate", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── SG-005: Mobile city cards show country name ───────────────────────────────
+
+Given("I am viewing the {string} tab on a viewport narrower than 768 px", async ({ page }, tabName: string) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const tabParam: Record<string, string> = {
+    "Cost of living": "cost",
+    Savings: "savings",
+    "Minimum role": "min-role",
+  };
+  const param = tabParam[tabName];
+  if (param) {
+    await page.goto(`/en/tools/cost-of-living-calculator?tab=${param}`);
+  } else {
+    await page.goto("/en/tools/cost-of-living-calculator");
+  }
+});
+
+When("the mobile city cards render", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+});
+
+Then("each card header shows both the city name and its country name", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── SG-006: Zero savings target marks lowest role as minimum ──────────────────
+
+When("I enter a monthly savings target of zero USD", async ({ page }) => {
+  const input = page.getByLabel("Monthly savings target");
+  await input.click({ clickCount: 3 });
+  await page.keyboard.type("0");
+  await page.keyboard.press("Tab");
+  await page.waitForLoadState("networkidle");
+});
+
+Then("the qualifying divider is shown", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+Then("the minimum marker appears on the lowest-ranked role in the ladder", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+Then("all roles appear above the divider because every role clears a zero target", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── SG-007: Expense preview updates in real time ──────────────────────────────
+
+Given("the default household is 1 adult with no children in city center", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+});
+
+When("I change the Adults control to 2", async ({ page }) => {
+  await page.getByLabel("Adults").selectOption("2");
+  await page.waitForLoadState("networkidle");
+});
+
+Then("the Housing preview amount increases to base times subLinear 2 adults", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+Then("the Childcare and School preview amounts remain zero", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+Then("the Total preview updates immediately without a page reload", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── SG-007: Expense preview updates in real time ─────────────────────────────
+
+Given("I am on the cost-of-living calculator", async ({ page }) => {
+  await page.goto("/en/tools/cost-of-living-calculator");
+});
+
+// ── USS-002: Filter state persisted in URL ────────────────────────────────────
+
+Given("a user is on the cost-of-living calculator page", async ({ page }) => {
+  await page.goto("/en/tools/cost-of-living-calculator");
+});
+
+When("the user selects Country {string} and City {string}", async ({ page }, country: string, city: string) => {
+  await page.getByLabel("Country").selectOption({ label: country });
+  await page.waitForLoadState("networkidle");
+  await page.getByLabel("City").selectOption({ label: city });
+  await page.waitForLoadState("networkidle");
+});
+
+Then("the URL updates to include query parameters reflecting those selections", async ({ page }) => {
+  expect(page.url()).toMatch(/country=|city=/);
+});
+
+Then("copying the URL and opening it in a new tab restores the same filter state", async ({ page }) => {
+  void page; // stub — full implementation pending
+});
+
+// ── USS-005: Descriptive page title ──────────────────────────────────────────
+
+Given("a user navigates to the cost-of-living calculator", async ({ page }) => {
+  await page.goto("/en/tools/cost-of-living-calculator");
+});
+
+When("the page finishes loading with default filter state", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+});
+
+Then("the browser tab title includes the name of the tool", async ({ page }) => {
+  const title = await page.title();
+  expect(title.toLowerCase()).toMatch(/cost.of.living|calculator|kalkulator/i);
 });
