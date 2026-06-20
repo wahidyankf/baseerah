@@ -1,7 +1,7 @@
 # ayokoding-www Cost-of-Living Calculator — Three-Tester Fix Plan
 
-**Status**: In Progress
-**Stage**: in-progress
+**Status**: Done
+**Stage**: done
 **Type**: web-UI feature-change (test-fixing)
 **App**: `ayokoding-www` — `/[locale]/tools/cost-of-living-calculator`
 **Origin**: [web-ux-test-fixing-planning workflow](../../../repo-governance/workflows/web/web-ux-test-fixing-planning.md), run 2026-06-20

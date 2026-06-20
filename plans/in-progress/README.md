@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [ayokoding-www-cost-of-living-calculator-test-fixing](./ayokoding-www-cost-of-living-calculator-test-fixing/) — three-tester (exploratory + usability + design) fix plan for the ayokoding-www cost-of-living calculator; 29 findings across both locales. Findings/plan only — fixes run later via plan-execution.
+_No active plans._
 
 ## Instructions
 

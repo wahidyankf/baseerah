@@ -779,14 +779,14 @@ unchecked, source-attributed checkbox and fix/tick it before archival.
 
 ## Phase 12 — Archival
 
-- [ ] [AI] **12.1** All boxes ticked; full gate green:
+- [x] [AI] **12.1** All boxes ticked; full gate green:
       `npx nx affected -t typecheck lint test:quick specs:coverage` — exits 0.
-- [ ] [AI] **12.2** Commit all changes:
+- [x] [AI] **12.2** Commit all changes:
       `git commit -m "fix(ayokoding-www): restore cost-of-living calculator fidelity (29 findings)"`
-      — acceptance: commit sha recorded.
-- [ ] [AI] **12.3** Push to origin:
+      — acceptance: commit sha recorded: `6e0cc6592`.
+- [x] [AI] **12.3** Push to origin:
       `git push origin main` — acceptance: CI workflows triggered; monitor until green.
-- [ ] [AI] **12.4** `git mv plans/in-progress/ayokoding-www-cost-of-living-calculator-test-fixing
+- [x] [AI] **12.4** `git mv plans/in-progress/ayokoding-www-cost-of-living-calculator-test-fixing
 plans/done/$(date +%Y-%m-%d)__ayokoding-www-cost-of-living-calculator-test-fixing`;
       update README status to Done and the in-progress/done indexes.
       Cmd: `git add -p` (stage only the mv + README edits), then
