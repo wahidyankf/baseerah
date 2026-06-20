@@ -60,7 +60,9 @@ inputs:
     type: string
     description: >
       Optional comma-separated locale path segments to cover (e.g. "en, id"). Forwarded to both
-      testers. Default is whatever the testers infer from target-urls.
+      testers. Default and minimum is ALL locales the target supports (discovered from the app's i18n
+      config or the locale-prefixed routes) — not just the default locale. Testing only one locale on
+      a multi-locale app is incomplete.
     required: false
   - name: mode
     type: enum
@@ -146,7 +148,7 @@ with Read/Write/Edit tools.
 | `plan-identifier`  | no       | derived from target   | New-plan slug (no date prefix)             |
 | `target-plan-path` | no       | —                     | Required when `plan-mode=merge`            |
 | `breakpoints`      | no       | testers' standard set | Responsive viewports                       |
-| `locales`          | no       | inferred from URLs    | Locale path segments                       |
+| `locales`          | no       | ALL supported locales | Locale path segments (never default-only)  |
 | `mode`             | no       | `strict`              | Threshold for the nested plan-quality-gate |
 | `push-target`      | no       | `origin main`         | Git destination for the finished plan      |
 
@@ -188,7 +190,9 @@ section governs the workflow-level checkpoints around it so no material decision
 - Resolve `plan-mode`. For `new`, resolve `plan-identifier` (input, else derive from the target,
   e.g. `ayokoding-www-calc-test-fixing`). For `merge`, require `target-plan-path` to point at an
   existing folder under `plans/in-progress/`; abort if absent.
-- Resolve `breakpoints` and `locales` (defaults = testers' own standard coverage).
+- Resolve `breakpoints` and `locales` (defaults = testers' own standard coverage; `locales` defaults
+  to ALL locales the target supports — discovered from the app's i18n config or locale-prefixed
+  routes — never just the default locale).
 
 **Output**: Targets reachable; plan destination resolved.
 

@@ -384,29 +384,44 @@ After every push to `main`, verify GitHub Actions.
 ### 2d. Manual Behavioral Assertions (Sequential, After Each Phase)
 
 After CI is green, manually verify actual application behavior using Playwright MCP and curl.
+Evidence MUST be captured: screenshots committed to the plan's `evidence/` subfolder and
+referenced in `delivery.md`; curl responses inlined as fenced code blocks. "Verified manually"
+without evidence is incomplete. See [Evidence Capture Convention](../../development/quality/evidence-capture.md).
 
 **Orchestrator action**:
 
-1. **For Web UI changes** — use Playwright MCP tools:
+1. **For Web UI changes** — use Playwright MCP tools across ALL supported locales and breakpoints:
+   - Discover supported locales: read `apps/<app>/src/features/i18n/` or `apps/<app>/next.config.ts`
    - Start dev server: `nx dev [project-name]`
-   - `browser_navigate` to affected pages
-   - `browser_snapshot` to inspect rendered DOM
-   - `browser_click`, `browser_fill_form` to test interactive flows
-   - `browser_console_messages` to check for JS errors
-   - `browser_network_requests` to verify API calls
-   - `browser_take_screenshot` for visual verification
+   - For EACH locale (e.g., `en`, `id`) × EACH breakpoint (375 px, 768 px, 1280 px):
+     - `browser_resize(width, 900)`
+     - `browser_navigate` to the locale-prefixed URL (e.g., `/en/page`, `/id/page`)
+     - `browser_snapshot` to inspect rendered DOM; verify `html[lang]` matches the locale
+     - `browser_console_messages` to check for JS errors
+     - `browser_network_requests` to verify API calls
+     - `browser_take_screenshot` — save to `evidence/phase-{N}-{description}-{locale}-{breakpoint}px.png`
+   - `browser_click`, `browser_fill_form` to test interactive flows (any locale sufficient for flow)
+   - Record screenshot paths in `delivery.md` under the relevant checkbox per the Evidence Capture Convention
 2. **For API changes** — use curl via Bash:
    - Start backend server: `nx dev [project-name]`
    - Hit affected endpoints with curl and verify response status, shape, and data
    - Test error cases with invalid payloads
+   - For locale-sensitive APIs (localized messages, locale-dependent formatting), verify with
+     `Accept-Language` header for EACH supported locale
+   - Inline the command, HTTP status, and response body (or first 20 lines) in `delivery.md` as
+     fenced code blocks; save long responses (> 20 lines) to `evidence/phase-{N}-{endpoint}.txt`
 3. **For full-stack changes** — run BOTH Playwright MCP and curl:
-   - Verify UI renders correctly
+   - Verify UI renders correctly in ALL locales at ALL breakpoints
    - Verify API responds correctly
    - Verify the full flow (UI action → API call → response → UI update)
 4. **Fix any broken behavior** — including preexisting issues (Iron Rule 3)
-5. **Document assertions** in delivery.md under the relevant items
+5. **Document evidence** in `delivery.md` under each ticked checkbox:
+   - Screenshot references: `![alt](./evidence/phase-N-...-{locale}-{breakpoint}px.png)`
+   - curl commands, status codes, response bodies as fenced code blocks
+   - Console-clean confirmation per locale
 
-**Output**: All manual assertions pass, application behavior verified
+**Output**: All manual assertions pass, application behavior verified, evidence committed in
+`evidence/` with `delivery.md` references
 
 **On failure**: Fix broken behavior, re-run assertions. Do NOT proceed to next phase with broken UI or API.
 
@@ -414,8 +429,10 @@ After CI is green, manually verify actual application behavior using Playwright 
 
 - This step is MANDATORY when the plan touches web UI or API code
 - Skip ONLY if the plan touches no UI and no API (e.g., pure documentation or governance changes)
+- For multi-locale apps, testing ONLY the default locale is INCOMPLETE — verify ALL locales
 - Playwright MCP provides real browser interaction — use it to catch rendering, JS, and integration issues that automated tests may miss
 - curl provides direct HTTP verification — use it to catch response format, status code, and data issues
+- See [Evidence Capture Convention](../../development/quality/evidence-capture.md) for screenshot naming, locale requirements, and delivery.md format
 
 ### 3. Validation (Sequential)
 

@@ -35,6 +35,8 @@ This practice implements/respects the following conventions:
 
 - **[Code Quality Convention](./code.md)**: Automated quality gates (typecheck, lint, test:quick) catch code-level issues. Manual verification catches behavioral issues that survive those gates. Together they form a complete quality boundary.
 
+- **[Evidence Capture Convention](./evidence-capture.md)**: Manual verification must leave a committed record — screenshots in the plan's `evidence/` subfolder, curl outputs inline in `delivery.md`. "Verified manually" without a record is incomplete.
+
 ## The Rule
 
 **Manual behavioral verification is MANDATORY after implementing UI or API changes.**
@@ -72,19 +74,30 @@ After implementing a UI change, verify:
 3. **No console errors**: Check `browser_console_messages` for JavaScript errors or unexpected warnings.
 4. **Network requests succeed**: Check `browser_network_requests` for failed API calls, unexpected 4xx/5xx responses, or missing requests.
 5. **Visual correctness**: Take a screenshot and confirm the layout, typography, and content match expectations.
+6. **All locales verified**: For multi-locale apps, repeat steps 1–5 for EVERY supported locale — navigate to each locale-prefixed URL (e.g., `/en/`, `/id/`). A UI change verified only in the default locale is incomplete. Confirm the `html[lang]` attribute matches each locale and that no strings are untranslated.
+7. **All breakpoints verified**: Repeat at mobile (375 px), tablet (768 px), and desktop (1280 px). Responsive behavior at one viewport does not imply correct behavior at others.
+8. **Evidence captured**: Save one screenshot per breakpoint per locale to the plan's `evidence/` subfolder; reference each from the `delivery.md` implementation notes. See [Evidence Capture Convention](./evidence-capture.md).
 
-### Example: UI Feature Verification
+### Example: UI Feature Verification (multi-locale app)
 
 ```
-1. browser_navigate("http://localhost:3200/products")
-2. browser_snapshot() -- confirm product list renders
-3. browser_click("Add Product button")
-4. browser_fill_form("Product Name", "Test Product")
-5. browser_click("Submit button")
-6. browser_snapshot() -- confirm product appears in list
-7. browser_console_messages() -- confirm no errors
-8. browser_network_requests() -- confirm POST /api/products returned 201
-9. browser_take_screenshot() -- capture visual evidence
+For each locale in ["en", "id"]:
+  For each breakpoint in [375, 768, 1280]:
+    1. browser_resize(breakpoint, 900)
+    2. browser_navigate("http://localhost:3200/{locale}/products")
+    3. browser_snapshot() -- confirm product list renders with correct language
+    4. browser_take_screenshot() -- save to evidence/phase-N-products-{locale}-{breakpoint}px.png
+    5. browser_console_messages() -- confirm no errors
+    6. browser_network_requests() -- confirm API calls succeed
+
+After all locales/breakpoints:
+  7. browser_click("Add Product button")
+  8. browser_fill_form("Product Name", "Test Product")
+  9. browser_click("Submit button")
+  10. browser_snapshot() -- confirm product appears in list
+  11. browser_network_requests() -- confirm POST /api/products returned 201
+
+Record inline in delivery.md: screenshot paths, console status, network status per locale.
 ```
 
 ## API Verification
@@ -127,6 +140,21 @@ curl -s -X POST http://localhost:8202/api/products \
   -d '{"name": "Test", "price": "not-a-number"}' | jq .
 ```
 
+Record the command, response body, and HTTP status code inline in `delivery.md` under the
+implementation notes for the step. If the response is long (> 20 lines), save it to
+`evidence/phase-N-<endpoint-slug>.txt` and reference it by path.
+
+### Locale-Aware API Verification
+
+For APIs that serve locale-specific responses (e.g., localized error messages, locale-dependent
+formatting), verify each supported locale explicitly:
+
+```bash
+# Verify locale-specific response (Accept-Language header or query param)
+curl -s -H "Accept-Language: en" http://localhost:8202/api/products | jq .name
+curl -s -H "Accept-Language: id" http://localhost:8202/api/products | jq .name
+```
+
 ## When Verification Is Required
 
 | Change Type                                 | UI Verification              | API Verification                       |
@@ -162,10 +190,12 @@ A feature is not complete until **both** automated tests pass **and** manual ver
 2. Write/update automated tests (unit, integration, E2E as appropriate)
 3. Run test:quick -- all pass
 4. Start dev server
-5. Manually verify UI renders correctly (browser_navigate, browser_snapshot)
-6. Manually verify API responds correctly (curl)
+5. Manually verify UI renders correctly in ALL locales at ALL breakpoints
+   (browser_navigate, browser_snapshot, browser_take_screenshot → evidence/)
+6. Manually verify API responds correctly (curl → inline in delivery.md)
 7. Check for console errors (browser_console_messages)
-8. Declare the feature complete
+8. Record evidence: screenshot paths in delivery.md, curl output inline
+9. Declare the feature complete
 ```
 
 ### FAIL: Skipping manual verification
@@ -214,4 +244,5 @@ It does not apply to:
 - [Code Quality Convention](./code.md) -- Automated quality gates (typecheck, lint, test:quick)
 - [Implementation Workflow Convention](../workflow/implementation.md) -- Three-stage workflow where manual verification fits in the "make it work" stage
 - [Specs-Application Sync Convention](./specs-application-sync.md) -- Spec updates required alongside code changes
-- [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) -- Extends this convention to a per-breakpoint, per-locale visual sign-off against the design mockups **before archival**, plus thirteen sibling rules for user-facing delivery
+- [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) -- Extends this convention to a per-breakpoint, per-locale visual sign-off against the design mockups **before archival**, plus fifteen sibling rules for user-facing delivery
+- [Evidence Capture Convention](./evidence-capture.md) -- Where and how to store verification evidence: screenshots in `evidence/`, curl outputs inline in `delivery.md`, locale and breakpoint coverage requirements

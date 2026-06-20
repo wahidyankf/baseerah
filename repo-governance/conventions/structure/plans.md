@@ -265,7 +265,10 @@ If the author cannot comfortably fit both the condensed BRD and condensed PRD se
 ├── brd.md                   # Business Requirements Document
 ├── prd.md                   # Product Requirements Document
 ├── tech-docs.md             # Technical documentation and architecture
-└── delivery.md              # Step-by-step delivery checklist
+├── delivery.md              # Step-by-step delivery checklist
+└── evidence/                # (optional) committed testing evidence — screenshots, curl responses
+    ├── phase-1-homepage-en-1280px.png
+    └── phase-2-api-health.txt
 ```
 
 **File purposes**:
@@ -275,6 +278,7 @@ If the author cannot comfortably fit both the condensed BRD and condensed PRD se
 - **prd.md** — **Product Requirements Document**: product overview, personas, user stories (`As a … I want … So that …`), acceptance criteria in Gherkin, product scope (in-scope + out-of-scope features), product-level risks.
 - **tech-docs.md**: architecture, design decisions with rationale, file-impact analysis, mechanics, dependencies, risks, rollback. No step-by-step checklist.
 - **delivery.md**: sequential, ticked checklist of executable steps (`- [ ]`), organized by phase if needed. Plan-execution workflow reads this file to drive execution; `plan-execution-checker` reads it to verify completion. Opens with the `[AI]`/`[HUMAN]` executor legend; each phase ends with a `### Phase N Gate` (must-pass verification) followed by a Pause Safety note.
+- **`evidence/`** (optional): committed folder for testing evidence produced during plan execution — screenshots (one per breakpoint per locale), saved curl responses, Lighthouse reports, and other file-based artifacts referenced from `delivery.md` implementation notes. Created when the plan's first manual verification step runs. Moves with the plan folder on archival to `done/`. Binary files (PNG/JPG) are committed alongside the text files. See [Evidence Capture Convention](../../development/quality/evidence-capture.md).
 
 ### Content-Placement Rules (brd.md vs prd.md)
 
@@ -710,6 +714,7 @@ Use the verification tip from the [Linking Convention](../formatting/linking.md#
 - [Plan Anti-Hallucination Convention](../../development/quality/plan-anti-hallucination.md) - Pre-write verification recipes, repo-grounding rule, refuse-on-uncertainty, anti-pattern catalog (AP-1 through AP-10), specialized-executor annotation; consumed by the Execution-Grade Clarity rule above and by the four plan agents
 - [Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md) - Every grill question during plan creation (pre-write, post-write) MUST present 2-4 concrete options with trade-off descriptions; open-ended questions without options are FORBIDDEN; consumed by plan-maker Steps 1 and 8
 - [No Secrets in Git Convention](../security/no-secrets-in-committed-files.md) - Hard iron rule prohibiting secret values in any committed file, including plans and their permanent `done/` history
+- [Evidence Capture Convention](../../development/quality/evidence-capture.md) - Standards for the plan `evidence/` subfolder: screenshot naming (phase/locale/breakpoint), curl/API response records, locale coverage requirements, and what `plan-execution-checker` validates
 
 **Development Guides**:
 

@@ -45,6 +45,10 @@ and how to apply it, so it can be folded into how we author plans (`plan-maker`)
 - **[Manual Behavioral Verification](./manual-behavioral-verification.md)**: This convention
   extends it from "verify before done" to "verify against the design mockups, per breakpoint, per
   locale, before **archival**."
+- **[Evidence Capture Convention](./evidence-capture.md)**: The per-breakpoint, per-locale sign-off
+  required by Rules 1 and 10 MUST leave a committed evidence trail — screenshots in the plan's
+  `evidence/` subfolder, screenshot paths referenced from `delivery.md` implementation notes. A
+  sign-off claimed without committed evidence is not a sign-off.
 - **[Feature Change Completeness](./feature-change-completeness.md)**: Completeness now includes
   per-breakpoint responsive deliverables and labelled outputs, not just specs+Gherkin parity.
 - **[Test-Driven Development](../workflow/test-driven-development.md)**: Sharpened by Rule 12
@@ -78,7 +82,9 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
    automated tests asserted DOM/behavior presence; none compared the rendered pixels to the
    approved `assets/` mockups, and the workflow's Playwright visual step was skipped. Apply: any
    plan that ships UI carries an explicit, checked "screenshot vs each mockup, per breakpoint, per
-   locale" step; `plan-checker` flags its absence the way it flags a missing design funnel.
+   locale" step; `plan-checker` flags its absence the way it flags a missing design funnel. The
+   sign-off step MUST save screenshots to `evidence/` and reference them in `delivery.md`; a
+   step without committed evidence is not signed off. See [Evidence Capture Convention](./evidence-capture.md).
 
 2. **(Authoring) Name the design-system primitive in the delivery step — never assume it.** Gap:
    the shared `Tabs`/`Badge`/`Toggle` primitives existed and were exported, yet the build
@@ -129,7 +135,10 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
     a user-facing change.** Gap: the plan was validated to zero findings and archived to
     `plans/done/` while the UI was bland and off-design. Apply: the done/archival criterion for any
     user-facing change includes a **production visual sign-off against the mockups, per breakpoint,
-    per locale**; plan-execution finalization blocks archival until that sign-off is recorded.
+    per locale**; plan-execution finalization blocks archival until that sign-off is recorded. The
+    sign-off MUST cover ALL supported locales (not just the default locale) and MUST be evidenced by
+    committed screenshots in `evidence/` with paths referenced in `delivery.md`. Discovering after
+    archival that only one locale was tested is a Rule 14 reopen event.
 
 11. **(Verification) Deploy configuration is code — validate it in the plan.** Gap: a production
     deploy failed because `vercel.json`'s `buildCommand` still pointed at a moved file path; nothing
@@ -161,19 +170,22 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
     functional, behavioural-consistency, responsive, accessibility, URL/IA, or passive-security
     defects on the live build — exactly the class of defect that ships past green gates. Apply:
     after the web UI is implemented and the Rule 10 visual sign-off is recorded, run a single
-    spec-aware `web-exploratory-tester` session against the plan's running target URL(s). **Record
-    each resulting finding in `delivery.md` as a new unchecked task-list checkbox**
-    (`- [ ] EWT-NNN: <defect> — fix before archival`) in a labelled "Rule-15 retest follow-ups"
-    section, and each SG-### spec-gap as its own unchecked checkbox folded into the `specs/**`
-    coverage steps per [Feature Change Completeness](./feature-change-completeness.md). During
-    plan-execution these checkboxes materialize 1:1 as harness Task items, are fixed within the same
-    plan, and are ticked (`- [x]`) via the Atomic Sync Ritual; a finding may stay unchecked only if
-    explicitly deferred with written rationale recorded under the checkbox. Archival is blocked until
-    every rule-15 checkbox is ticked or deferred. `plan-maker` emits this step (with the
-    follow-ups section scaffold); `plan-checker` flags its absence on web-UI plans;
-    `plan-execution-checker` verifies the round ran and every rule-15 checkbox is
-    resolved-or-explicitly-deferred before archival. Applies to web UI (browser-rendered apps) only
-    — not CLI/text user-facing output, which `web-exploratory-tester` cannot exercise.
+    spec-aware `web-exploratory-tester` session against the plan's running target URL(s) **across
+    all supported locales** (e.g., `/en/` and `/id/` paths for a bilingual app — a single-locale
+    retest is incomplete). **Record each resulting finding in `delivery.md` as a new unchecked
+    task-list checkbox** (`- [ ] EWT-NNN: <defect> — fix before archival`) in a labelled
+    "Rule-15 retest follow-ups" section, and each SG-### spec-gap as its own unchecked checkbox
+    folded into the `specs/**` coverage steps per
+    [Feature Change Completeness](./feature-change-completeness.md). During plan-execution these
+    checkboxes materialize 1:1 as harness Task items, are fixed within the same plan, and are
+    ticked (`- [x]`) via the Atomic Sync Ritual; a finding may stay unchecked only if explicitly
+    deferred with written rationale recorded under the checkbox. Archival is blocked until every
+    rule-15 checkbox is ticked or deferred. `plan-maker` emits this step (with the follow-ups
+    section scaffold and a locale-coverage note); `plan-checker` flags its absence or
+    single-locale-only scope on web-UI plans; `plan-execution-checker` verifies the round ran
+    across all locales and every rule-15 checkbox is resolved-or-explicitly-deferred before
+    archival. Applies to web UI (browser-rendered apps) only — not CLI/text user-facing output,
+    which `web-exploratory-tester` cannot exercise.
 
 ## Examples
 
@@ -186,8 +198,9 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
 - Cascading-filter Gherkin enumerates region/country/city independently (Rule 4)
 - Ordering test asserts which rows land above/below the divider (Rules 5, 12)
 - Finalization blocks archival on production Playwright sign-off per breakpoint/locale (Rules 1, 10)
+- Screenshots committed to evidence/ and referenced in delivery.md (Rules 1, 10; Evidence Capture Convention)
 - Deploy-config sweep + live-URL smoke test included (Rule 11)
-- A spec-aware web-exploratory-tester round runs near the end; its findings are fixed before archival (Rule 15)
+- A spec-aware web-exploratory-tester round runs near the end across ALL locales; its findings are fixed before archival (Rule 15)
 ```
 
 ### FAIL: The incident this convention prevents
@@ -202,23 +215,28 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
 ## Tools and Automation
 
 - **Playwright MCP**: per-breakpoint, per-locale visual sign-off against `assets/` mockups.
+  Screenshots saved to `evidence/` and referenced in `delivery.md` per the
+  [Evidence Capture Convention](./evidence-capture.md).
 - **`web-exploratory-tester`**: one spec-aware exploratory round against the running web UI near
-  the end of delivery (Rule 15); surfaces EWT-### functional/behavioural/responsive/accessibility
-  findings and SG-### spec-gap proposals.
+  the end of delivery (Rule 15); runs across ALL supported locales; surfaces EWT-### functional/
+  behavioural/responsive/accessibility findings and SG-### spec-gap proposals; saves screenshots
+  to the plan's `evidence/` folder.
 - **`plan-maker`**: emits the delivery steps for Rules 1–8 and the rule-15 exploratory-retest step
-  for web-UI plans.
+  for web-UI plans; includes a locale-coverage note and evidence-capture steps.
 - **`plan-checker`**: flags missing visual-parity gate, raw-value mockup colors, presence-only
-  ordering tests, missing per-breakpoint responsive steps, and a missing rule-15
-  exploratory-retest step on web-UI plans.
+  ordering tests, missing per-breakpoint responsive steps, missing evidence-capture steps, missing
+  locale coverage, and a missing rule-15 exploratory-retest step on web-UI plans.
 - **`plan-execution-checker`**: verifies the production visual sign-off and deploy-config smoke
-  test were recorded before archival, and that the rule-15 exploratory-retest round ran with its
-  findings resolved-or-explicitly-deferred before archival.
+  test were recorded before archival; verifies evidence/ screenshots exist and are referenced in
+  delivery.md; verifies rule-15 exploratory-retest round ran across all locales with its findings
+  resolved-or-explicitly-deferred before archival.
 
 ## References
 
 **Related Conventions:**
 
 - [Manual Behavioral Verification](./manual-behavioral-verification.md) — the visual/behavioral verification baseline this hardens.
+- [Evidence Capture Convention](./evidence-capture.md) — where and how to store committed verification evidence: screenshots in `evidence/`, curl outputs inline in `delivery.md`, locale and breakpoint coverage requirements.
 - [Feature Change Completeness](./feature-change-completeness.md) — completeness for app/lib changes.
 - [Test-Driven Development](../workflow/test-driven-development.md) — RED/GREEN/REFACTOR shape and value-bearing tests.
 - [UI Mockups in Plan Docs](../../conventions/formatting/diagrams.md) — both-tiers mockups, design funnel, theme-token colors.
