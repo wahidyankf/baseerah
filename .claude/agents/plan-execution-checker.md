@@ -291,6 +291,17 @@ After verifying operational readiness (Step 5b), verify that manual behavioral a
    - UI-verification checkbox ticked but `evidence/` has zero screenshots for it: **HIGH** finding
    - Per the [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) Step 7.
 
+6. **Rule-15 Three-Tester Retest (web-UI feature-change plans)**
+   - If the plan was a web-UI **feature-change** plan, verify it carried a near-end "Rule-15
+     three-tester retest" round — the [`web-ux-test-fixing-planning`](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md)
+     triad (`web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) — that ran across
+     ALL supported locales, and that every resulting `EWT-###`/`UWT-###`/`DWT-###` checkbox in
+     `delivery.md` is `- [x]` (fixed) or explicitly deferred with rationale before archival.
+   - A web-UI feature-change plan archived with no three-tester retest round, single-locale-only
+     scope, or unresolved/undeferred rule-15 checkboxes: **HIGH** finding.
+   - CLI/text output and pure governance/agent-definition plans are exempt.
+   - Per [User-Facing Delivery Hardening](../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 15.
+
 #### Finding Severity
 
 - Broken UI (JS errors, rendering failures): **CRITICAL**

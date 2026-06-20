@@ -23,7 +23,8 @@ human opened the live site.
 
 This convention distills the fourteen lessons from that incident into durable rules for the whole
 **plan → execute → verify → archive** loop, plus a fifteenth rule added afterward to require a
-spec-aware exploratory retest of the live web UI before archival. Each rule names the gap it closes
+near-end three-tester retest of the live web UI (the `web-ux-test-fixing-planning` workflow —
+exploratory correctness, usability, and design fidelity) before archival. Each rule names the gap it closes
 and how to apply it, so it can be folded into how we author plans (`plan-maker`), gate them
 (`plan-checker`, `plan-execution-checker`), and execute them (the plan-execution workflow).
 
@@ -164,28 +165,33 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
     `plans/in-progress/`, re-provision the worktree) so the work has a home and the trunk stays
     clean; plan-execution documents this "reopen" entry path.
 
-15. **(Verification) A web-UI plan MUST run one round of `web-exploratory-tester` against the
-    running UI near the end of delivery, and fix its findings before archival.** Gap: the
-    visual-parity sign-off (Rule 10) confirms the screen matches the mockups but does not hunt for
-    functional, behavioural-consistency, responsive, accessibility, URL/IA, or passive-security
-    defects on the live build — exactly the class of defect that ships past green gates. Apply:
-    after the web UI is implemented and the Rule 10 visual sign-off is recorded, run a single
-    spec-aware `web-exploratory-tester` session against the plan's running target URL(s) **across
-    all supported locales** (e.g., `/en/` and `/id/` paths for a bilingual app — a single-locale
-    retest is incomplete). **Record each resulting finding in `delivery.md` as a new unchecked
-    task-list checkbox** (`- [ ] EWT-NNN: <defect> — fix before archival`) in a labelled
-    "Rule-15 retest follow-ups" section, and each SG-### spec-gap as its own unchecked checkbox
-    folded into the `specs/**` coverage steps per
-    [Feature Change Completeness](./feature-change-completeness.md). During plan-execution these
-    checkboxes materialize 1:1 as harness Task items, are fixed within the same plan, and are
-    ticked (`- [x]`) via the Atomic Sync Ritual; a finding may stay unchecked only if explicitly
-    deferred with written rationale recorded under the checkbox. Archival is blocked until every
-    rule-15 checkbox is ticked or deferred. `plan-maker` emits this step (with the follow-ups
+15. **(Verification) A web-UI feature-change plan MUST run a near-end round of all three live-site
+    testers — `web-exploratory-tester` (correctness), `web-usability-tester` (usability), and
+    `web-design-tester` (design fidelity), i.e. the
+    [`web-ux-test-fixing-planning`](../../workflows/web/web-ux-test-fixing-planning.md) workflow —
+    against the running UI to iron out rough edges and inconsistencies, and fix their findings before
+    archival.** Gap: the visual-parity sign-off (Rule 10) confirms the screen matches the mockups but
+    does not hunt for functional, behavioural-consistency, responsive, accessibility, URL/IA, or
+    passive-security defects (exploratory), first-time-user confusion (usability), or runtime
+    design-token / design-system / spacing drift (design) on the live build — exactly the classes of
+    defect that ship past green gates. Apply: after the web UI is implemented and the Rule 10 visual
+    sign-off is recorded, run the three testers against the plan's running target URL(s) **across all
+    supported locales** (e.g., `/en/` and `/id/` paths for a bilingual app — a single-locale retest is
+    incomplete). **Record each resulting finding in `delivery.md` as a new unchecked task-list
+    checkbox**, source-attributed (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> —
+fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" section, and each
+    SG-### spec-gap / USS-### spec-suggestion as its own unchecked checkbox folded into the `specs/**`
+    coverage steps per [Feature Change Completeness](./feature-change-completeness.md). During
+    plan-execution these checkboxes materialize 1:1 as harness Task items, are fixed within the same
+    plan, and are ticked (`- [x]`) via the Atomic Sync Ritual; a finding may stay unchecked only if
+    explicitly deferred with written rationale recorded under the checkbox. Archival is blocked until
+    every rule-15 checkbox is ticked or deferred. `plan-maker` emits this step (with the follow-ups
     section scaffold and a locale-coverage note); `plan-checker` flags its absence or
-    single-locale-only scope on web-UI plans; `plan-execution-checker` verifies the round ran
-    across all locales and every rule-15 checkbox is resolved-or-explicitly-deferred before
-    archival. Applies to web UI (browser-rendered apps) only — not CLI/text user-facing output,
-    which `web-exploratory-tester` cannot exercise.
+    single-locale-only scope on web-UI feature-change plans; `plan-execution-checker` verifies the
+    three-tester round ran across all locales and every rule-15 checkbox is
+    resolved-or-explicitly-deferred before archival. Applies to web-UI **feature-change** plans
+    (browser-rendered apps) only — not CLI/text user-facing output (which the testers cannot exercise)
+    and not pure governance/agent-definition or no-behaviour-change plans.
 
 ## Examples
 
@@ -200,7 +206,7 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
 - Finalization blocks archival on production Playwright sign-off per breakpoint/locale (Rules 1, 10)
 - Screenshots committed to evidence/ and referenced in delivery.md (Rules 1, 10; Evidence Capture Convention)
 - Deploy-config sweep + live-URL smoke test included (Rule 11)
-- A spec-aware web-exploratory-tester round runs near the end across ALL locales; its findings are fixed before archival (Rule 15)
+- A near-end three-tester round (web-exploratory + web-usability + web-design) runs across ALL locales; its EWT/UWT/DWT findings are fixed before archival (Rule 15)
 ```
 
 ### FAIL: The incident this convention prevents
@@ -217,19 +223,20 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
 - **Playwright MCP**: per-breakpoint, per-locale visual sign-off against `assets/` mockups.
   Screenshots saved to `evidence/` and referenced in `delivery.md` per the
   [Evidence Capture Convention](./evidence-capture.md).
-- **`web-exploratory-tester`**: one spec-aware exploratory round against the running web UI near
-  the end of delivery (Rule 15); runs across ALL supported locales; surfaces EWT-### functional/
-  behavioural/responsive/accessibility findings and SG-### spec-gap proposals; saves screenshots
-  to the plan's `evidence/` folder.
-- **`plan-maker`**: emits the delivery steps for Rules 1–8 and the rule-15 exploratory-retest step
-  for web-UI plans; includes a locale-coverage note and evidence-capture steps.
+- **`web-exploratory-tester` / `web-usability-tester` / `web-design-tester`** (the
+  [`web-ux-test-fixing-planning`](../../workflows/web/web-ux-test-fixing-planning.md) triad): the
+  near-end three-tester round against the running web UI (Rule 15); runs across ALL supported locales;
+  surfaces EWT-### (correctness) / UWT-### (usability) / DWT-### (design-fidelity) findings plus SG-###
+  spec-gap / USS-### spec-suggestion proposals; saves screenshots to the plan's `evidence/` folder.
+- **`plan-maker`**: emits the delivery steps for Rules 1–8 and the rule-15 three-tester-retest step
+  for web-UI feature-change plans; includes a locale-coverage note and evidence-capture steps.
 - **`plan-checker`**: flags missing visual-parity gate, raw-value mockup colors, presence-only
   ordering tests, missing per-breakpoint responsive steps, missing evidence-capture steps, missing
-  locale coverage, and a missing rule-15 exploratory-retest step on web-UI plans.
+  locale coverage, and a missing rule-15 three-tester-retest step on web-UI feature-change plans.
 - **`plan-execution-checker`**: verifies the production visual sign-off and deploy-config smoke
   test were recorded before archival; verifies evidence/ screenshots exist and are referenced in
-  delivery.md; verifies rule-15 exploratory-retest round ran across all locales with its findings
-  resolved-or-explicitly-deferred before archival.
+  delivery.md; verifies the rule-15 three-tester retest round ran across all locales with its
+  EWT/UWT/DWT findings resolved-or-explicitly-deferred before archival.
 
 ## References
 
@@ -247,7 +254,7 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
 
 - [Plan Execution](../../workflows/plan/plan-execution.md) — execution, finalization, archival gate.
 - [Plan Quality Gate](../../workflows/plan/plan-quality-gate.md) — pre-execution plan validation.
-- [Web Exploratory and Usability Test Fixing Planning](../../workflows/web/web-exploratory-and-usability-test-fixing-planning.md) — workflow that runs the spec-aware exploratory retest (Rule 15).
+- [Web UX Test-Fixing Planning](../../workflows/web/web-ux-test-fixing-planning.md) — workflow that runs the three-tester near-end retest (Rule 15).
 
 **Agents:**
 

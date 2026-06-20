@@ -764,19 +764,21 @@ Include BOTH sections above, PLUS:
 - [ ] [AI] Document evidence (screenshots in `evidence/`, curl/network notes inline) in this checklist
 ```
 
-### For UI-Bearing Plans — Rule-15 Exploratory Retest
+### For Web-UI Feature-Change Plans — Rule-15 Three-Tester Retest
 
-For web-UI plans, ALSO include, near the end of the checklist before archival (per
+For web-UI **feature-change** plans, ALSO include, near the end of the checklist before archival (per
 [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)
-Rule 15):
+Rule 15). This does NOT apply to CLI/text output or pure governance/agent-definition plans:
 
 ```markdown
-### Rule-15 Web Exploratory Retest (before archival)
+### Rule-15 Three-Tester Retest (before archival)
 
-- [ ] [AI] Run one `web-exploratory-tester` round against the running target URL(s) across ALL
-      supported locales — acceptance: findings + spec-gaps recorded
-- [ ] [AI] Append each EWT-### finding here as a new unchecked checkbox
-      (`- [ ] EWT-NNN: <defect> — fix before archival`) and each SG-### spec-gap into the specs steps
+- [ ] [AI] Run the three live-site testers (the `web-ux-test-fixing-planning` workflow:
+      `web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) against the running
+      target URL(s) across ALL supported locales — acceptance: EWT/UWT/DWT findings + spec-gaps recorded
+- [ ] [AI] Append each finding here as a new unchecked checkbox, source-attributed
+      (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`) and each
+      SG-### spec-gap / USS-### spec-suggestion into the specs steps
 - [ ] [AI] Fix every rule-15 finding (or explicitly defer with rationale) before archival
 ```
 
@@ -791,7 +793,7 @@ ALWAYS include at the end of the delivery checklist:
 - [ ] Verify ALL quality gates pass (local + CI)
 - [ ] Verify ALL manual assertions pass (Playwright MCP / curl) with committed evidence in `evidence/`
 - [ ] Verify ALL supported locales were exercised in UI verification (not just the default)
-- [ ] Verify every rule-15 exploratory finding is fixed or explicitly deferred
+- [ ] Verify every rule-15 three-tester finding (EWT/UWT/DWT) is fixed or explicitly deferred
 - [ ] Rename and move: `git mv plans/in-progress/[identifier]/ plans/done/YYYY-MM-DD__[identifier]/` using today's date as the completion date (NOT the creation date)
 - [ ] Update `plans/in-progress/README.md` — remove the plan entry
 - [ ] Update `plans/done/README.md` — add the plan entry with completion date

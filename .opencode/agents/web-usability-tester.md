@@ -128,6 +128,13 @@ the specs to learn what already _is_ there. Its method-transparency artifact rem
   both for full coverage. A functional bug ("the total is wrong") belongs to exploratory; a comprehension
   failure ("nothing tells the user the total updated") belongs here — even when they touch the same
   control.
+- **Distinct from `web-design-tester`** — that agent is the third lens of the live-site **advocate
+  triad** (correctness / usability / design). It is **design-aware**: it reads the mockups, the design
+  tokens/theme at runtime, and the `libs/web-ui` primitives, judging whether the rendered page **matches
+  its design** and follows good design practice. This agent stays **mockup-blind and spec-blind** by
+  design — it judges first-time comprehension, never design intent. A page can be perfectly on-design and
+  still confusing (this agent's finding), or perfectly clear and off-brand (design-tester's finding). Run
+  all three testers for full live-site coverage.
 - **Feeds `plan-maker`** — the backlog plan is a findings record, not an executable delivery plan. On
   promotion to `plans/in-progress/`, `plan-maker` grills it and adds `tech-docs.md` + a TDD-shaped
   `delivery.md` with the specs/Gherkin coverage steps required by the

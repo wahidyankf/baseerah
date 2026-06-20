@@ -70,6 +70,16 @@ If the goal or URL is missing, ask for it before testing — do not invent a tar
 
 ## Relationship to Other Agents
 
+The three live-site testers form a deliberate **advocate triad** — each a separate professional lens on
+the same running site; they complement each other and never overlap:
+
+- **Sibling `web-usability-tester` (usability lens, spec-blind)** — judges first-time-user comprehension
+  against usability principles, deliberately blind to specs and mockups. Answers _"is it usable?"_ A
+  confusing label belongs to it; a wrong computed value belongs here.
+- **Sibling `web-design-tester` (design lens, design-aware)** — judges whether the rendered page matches
+  its design (mockups, runtime tokens, `libs/web-ui` primitives, optional external source) and follows
+  good design practice. Answers _"does it match the design?"_ A token drift or reinvented primitive
+  belongs to it; a functional/correctness defect belongs here. Run all three for full live-site coverage.
 - **Feeds `plan-maker`** — the backlog plan this agent files is a findings record, not yet an executable
   delivery plan. When the maintainer promotes it to `plans/in-progress/`, `plan-maker` grills it and
   adds `tech-docs.md` + a TDD-shaped `delivery.md` with the specs/Gherkin coverage steps required by

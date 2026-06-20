@@ -79,6 +79,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 
 - **[web-exploratory-tester](web-exploratory-tester.md)** - **Spec-aware** session-based exploratory testing of a live site against a goal; actively hunts edge cases and boundary conditions; files findings (functional, behavioural consistency, edge-case/boundary, UI/responsive, accessibility, performance, URL/IA quality, safe security surface) as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce). Compares live behaviour against existing `specs/**` Gherkin and proposes new scenarios (Gherkin) for correct behaviours — especially edge cases — that lack coverage. Non-destructive; does not modify the site or fix code.
 - **[web-usability-tester](web-usability-tester.md)** - **Spec-blind** heuristic usability evaluation of a live site; judges only what a first-time user perceives (deliberately ignores specs/source/mockups) against established usability principles (Nielsen's 10 heuristics + 0–4 severity, cognitive walkthrough, information scent, first-click, Jakob's Law, ISO 9241-110, WCAG Understandable, UX laws). Evaluates predictability, internal/external consistency, information scent & flow, cognitive load, edge-case UX states (empty/loading/error), responsive usability (mobile/tablet/desktop), and URL/IA naturalness. Files findings as a backlog plan (README + brd + prd + findings + walkthrough + spec-suggestions). Suggests new behaviour for `specs/**` in Gherkin (spec-blind `USS-###` candidates, flagged for reconciliation — distinct from exploratory's spec-gaps). Distinct from web-exploratory-tester (correctness); non-destructive.
+- **[web-design-tester](web-design-tester.md)** - **Design-aware** design-fidelity evaluation of a live site; judges whether the **running** rendered page matches its design and follows good design practice against five ground-truth sources (committed plan-folder mockups, design tokens/theme at runtime, design-system primitives `libs/web-ui`, an optional external Figma/mockup source passed at invocation, and general design best-practice grounded by `web-researcher`). Evaluates mockup fidelity, runtime token/theme fidelity, design-system-primitive reuse, visual hierarchy, alignment, spacing/density (not cramped), typography, colour, and cross-surface visual consistency. Files `DWT-###` findings as a backlog plan (README + brd + prd + findings + spec-gaps), locale- and evidence-aware. The **runtime** counterpart to `swe-ui-checker`'s **static** source audit, with no overlap. Distinct from web-exploratory-tester (correctness) and web-usability-tester (usability); non-destructive.
 
 ### 🟪 Operations
 
@@ -112,16 +113,16 @@ Normative source: [Agent Naming Convention](../../repo-governance/conventions/st
 
 ## Role Vocabulary
 
-| Role         | Semantics                                                                        | Example agents                                               |
-| ------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `maker`      | Produces a content/research artifact                                             | `docs-maker`, `docs-tutorial-maker`                          |
-| `checker`    | Validates an artifact against standards                                          | `plan-checker`, `plan-execution-checker`, `swe-code-checker` |
-| `fixer`      | Applies validated checker findings                                               | `plan-fixer`, `swe-ui-fixer`                                 |
-| `dev`        | Writes code in a language or test framework                                      | `swe-rust-dev`, `swe-e2e-dev`                                |
-| `deployer`   | Deploys an application to an environment                                         | `apps-ayokoding-www-deployer`                                |
-| `manager`    | Performs file or resource operations (rename/move/delete)                        | `docs-file-manager`                                          |
-| `tester`     | Explores or evaluates a running system or live site and reports defects/friction | `web-exploratory-tester`, `web-usability-tester`             |
-| `researcher` | Gathers and verifies external information; read-only research                    | `web-researcher`                                             |
+| Role         | Semantics                                                                        | Example agents                                                        |
+| ------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `maker`      | Produces a content/research artifact                                             | `docs-maker`, `docs-tutorial-maker`                                   |
+| `checker`    | Validates an artifact against standards                                          | `plan-checker`, `plan-execution-checker`, `swe-code-checker`          |
+| `fixer`      | Applies validated checker findings                                               | `plan-fixer`, `swe-ui-fixer`                                          |
+| `dev`        | Writes code in a language or test framework                                      | `swe-rust-dev`, `swe-e2e-dev`                                         |
+| `deployer`   | Deploys an application to an environment                                         | `apps-ayokoding-www-deployer`                                         |
+| `manager`    | Performs file or resource operations (rename/move/delete)                        | `docs-file-manager`                                                   |
+| `tester`     | Explores or evaluates a running system or live site and reports defects/friction | `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` |
+| `researcher` | Gathers and verifies external information; read-only research                    | `web-researcher`                                                      |
 
 Enforcement: `rhino-cli agents validate-naming` (wired into pre-push and CI).
 
