@@ -131,4 +131,160 @@ describe("CostOfLivingTable", () => {
     const cityLinks = cards.querySelectorAll('a[href^="?tab=cost&city="]');
     expect(cityLinks.length).toBe(dataset.cities.length);
   });
+
+  // UWT-005: definition tooltips on relocation column headers
+  it("UWT-005: Relocation (sunk) column header has a tooltip explaining it is a one-time cost", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+
+    const columnHeaders = screen.getAllByRole("columnheader");
+    const relocationHeader = columnHeaders.find((h) => /relocation/i.test(h.textContent ?? ""));
+    expect(relocationHeader).toBeDefined();
+    // Tooltip: either title attribute, aria-label on abbr, or data-tooltip
+    const title = relocationHeader!.querySelector("[title]") ?? relocationHeader!.closest("[title]");
+    const abbr = relocationHeader!.querySelector("abbr");
+    const hasTooltip = title !== null || (abbr !== null && abbr.hasAttribute("title"));
+    expect(hasTooltip).toBe(true);
+  });
+
+  it("UWT-005: Liquidity reserve column header has a tooltip explaining it is a cash cushion kept not spent", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+
+    const columnHeaders = screen.getAllByRole("columnheader");
+    const liquidityHeader = columnHeaders.find((h) => /liquidity/i.test(h.textContent ?? ""));
+    expect(liquidityHeader).toBeDefined();
+    const title = liquidityHeader!.querySelector("[title]") ?? liquidityHeader!.closest("[title]");
+    const abbr = liquidityHeader!.querySelector("abbr");
+    const hasTooltip = title !== null || (abbr !== null && abbr.hasAttribute("title"));
+    expect(hasTooltip).toBe(true);
+  });
+
+  // Phase 5 — Cycle 1c: Right-edge scroll affordance indicator
+  it("Phase5-1c: a scroll affordance element with data-testid='scroll-affordance' is rendered", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+    const affordance = screen.getByTestId("scroll-affordance");
+    expect(affordance).toBeTruthy();
+  });
+
+  // Phase 5 — Cycle 1a: Summary columns (Total, Essentials) appear immediately after City
+  it("Phase5-1a: Total column header appears before Housing column header", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+
+    const columnHeaders = screen.getAllByRole("columnheader");
+    const headerTexts = columnHeaders.map((h) => h.textContent?.toLowerCase() ?? "");
+
+    const totalIdx = headerTexts.findIndex((t) => /^total$/i.test(t.trim()));
+    const housingIdx = headerTexts.findIndex((t) => /housing/i.test(t));
+
+    expect(totalIdx).toBeGreaterThanOrEqual(0);
+    expect(housingIdx).toBeGreaterThanOrEqual(0);
+    // Total must come BEFORE Housing (summary-first ordering)
+    expect(totalIdx).toBeLessThan(housingIdx);
+  });
+
+  // Phase 5 — Cycle 1b: Total/Essentials in DOM and table wrapper has overflow-x-auto
+  it("Phase5-1b: Total and Essentials column headers are in the DOM and table wrapper has overflow-x-auto class", () => {
+    const { container } = render(<CostOfLivingTable {...defaultProps} />);
+
+    // Both summary columns must be present in the DOM
+    const columnHeaders = screen.getAllByRole("columnheader");
+    const headerTexts = columnHeaders.map((h) => h.textContent?.toLowerCase() ?? "");
+    expect(headerTexts.some((t) => /^total$/i.test(t.trim()))).toBe(true);
+    expect(headerTexts.some((t) => /essentials/i.test(t))).toBe(true);
+
+    // Table wrapper must have overflow-x-auto for horizontal scrollability
+    const tableWrapper = container.querySelector(".overflow-x-auto");
+    expect(tableWrapper).not.toBeNull();
+  });
+
+  // Phase 5 — Cycle 1a: Essentials also appears before Housing
+  it("Phase5-1a: Essentials column header appears before Housing column header", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+
+    const columnHeaders = screen.getAllByRole("columnheader");
+    const headerTexts = columnHeaders.map((h) => h.textContent?.toLowerCase() ?? "");
+
+    const essentialsIdx = headerTexts.findIndex((t) => /essentials/i.test(t));
+    const housingIdx = headerTexts.findIndex((t) => /housing/i.test(t));
+
+    expect(essentialsIdx).toBeGreaterThanOrEqual(0);
+    expect(housingIdx).toBeGreaterThanOrEqual(0);
+    // Essentials must come BEFORE Housing (summary-first ordering)
+    expect(essentialsIdx).toBeLessThan(housingIdx);
+  });
+
+  // UWT-014: "OOP" must be wrapped in an <abbr> with title="out-of-pocket"
+  it("UWT-014: the text 'OOP' is inside an abbr element with title='out-of-pocket'", () => {
+    const { container } = render(<CostOfLivingTable {...defaultProps} />);
+
+    const abbrElements = Array.from(container.querySelectorAll("abbr"));
+    const oopAbbr = abbrElements.find(
+      (el) => el.textContent?.trim() === "OOP" && el.getAttribute("title") === "out-of-pocket",
+    );
+    expect(oopAbbr).toBeDefined();
+  });
+
+  // UWT-011: healthcare scheme badge should be sentence-cased (not ALL-CAPS)
+  it("UWT-011: healthcare scheme badge text is sentence-cased, not all-caps", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+
+    const badges = screen.getAllByTestId("healthcare-badge");
+    expect(badges.length).toBeGreaterThan(0);
+
+    for (const badge of badges) {
+      const text = badge.textContent?.trim() ?? "";
+      if (text === "—") continue;
+      // Must NOT be all-caps (i.e., text !== text.toUpperCase())
+      expect(text).not.toBe(text.toUpperCase());
+    }
+  });
+
+  // UWT-011: healthcare scheme column header should have a tooltip
+  it("UWT-011: Healthcare scheme column header has a tooltip (title attribute)", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+
+    const columnHeaders = screen.getAllByRole("columnheader");
+    const healthcareSchemeHeader = columnHeaders.find((h) =>
+      /healthcare scheme|skema kesehatan/i.test(h.textContent ?? ""),
+    );
+    expect(healthcareSchemeHeader).toBeDefined();
+
+    const abbr = healthcareSchemeHeader!.querySelector("abbr");
+    const titleEl = healthcareSchemeHeader!.querySelector("[title]");
+    const hasTooltip = abbr !== null || titleEl !== null || healthcareSchemeHeader!.hasAttribute("title");
+    expect(hasTooltip).toBe(true);
+  });
+
+  // EWT-006: per-category column values must scale for household size so their sum
+  // equals the Essentials subtotal shown in the same row.
+  it("EWT-006: for a 2-adult household, per-category column amounts sum to the Essentials subtotal for each city row", () => {
+    const twoAdultProps = {
+      ...defaultProps,
+      household: { adults: 2 as const, preschoolKids: 0 as const, schoolKids: 0 as const },
+    };
+    render(<CostOfLivingTable {...twoAdultProps} />);
+
+    // Read all city rows via data-testid on individual cells
+    for (const city of dataset.cities) {
+      const housingCell = screen.getByTestId(`col-housing-${city.id}`);
+      const foodCell = screen.getByTestId(`col-food-${city.id}`);
+      const transportCell = screen.getByTestId(`col-transport-${city.id}`);
+      const utilitiesCell = screen.getByTestId(`col-utilities-${city.id}`);
+      const healthcareCell = screen.getByTestId(`col-healthcare-${city.id}`);
+      const childcareCell = screen.getByTestId(`col-childcare-${city.id}`);
+      const schoolCell = screen.getByTestId(`col-school-${city.id}`);
+      const essentialsCell = screen.getByTestId(`col-essentials-${city.id}`);
+
+      const housing = parseFloat(housingCell.getAttribute("data-raw") ?? "NaN");
+      const food = parseFloat(foodCell.getAttribute("data-raw") ?? "NaN");
+      const transport = parseFloat(transportCell.getAttribute("data-raw") ?? "NaN");
+      const utilities = parseFloat(utilitiesCell.getAttribute("data-raw") ?? "NaN");
+      const healthcare = parseFloat(healthcareCell.getAttribute("data-raw") ?? "NaN");
+      const childcare = parseFloat(childcareCell.getAttribute("data-raw") ?? "NaN");
+      const school = parseFloat(schoolCell.getAttribute("data-raw") ?? "NaN");
+      const essentials = parseFloat(essentialsCell.getAttribute("data-raw") ?? "NaN");
+
+      const categorySum = housing + food + transport + utilities + healthcare + childcare + school;
+      expect(Math.abs(categorySum - essentials)).toBeLessThan(0.01);
+    }
+  });
 });

@@ -43,6 +43,33 @@ function ControlsWithState(
 }
 
 describe("Controls", () => {
+  // UWT-010: Area label must not wrap (Indonesian locale has longer text)
+  it("UWT-010: the Area label element has whitespace-nowrap class", () => {
+    const { container } = render(<ControlsWithState />);
+
+    // Find the span/label for "Area"
+    const areaLabel = Array.from(container.querySelectorAll("span")).find((el) =>
+      el.textContent?.match(/area|wilayah/i),
+    );
+    expect(areaLabel).toBeDefined();
+    expect(areaLabel!.classList.contains("whitespace-nowrap")).toBe(true);
+  });
+
+  // UWT-009: interactive controls must have 44px minimum touch target
+  it("UWT-009: interactive select controls have min-h-[44px] class or data-min-touch attribute", () => {
+    const { container } = render(<ControlsWithState />);
+
+    const selects = container.querySelectorAll("select");
+    expect(selects.length).toBeGreaterThan(0);
+
+    for (const select of Array.from(selects)) {
+      const hasMinHeight = select.classList.contains("min-h-[44px]");
+      const hasDataAttr = select.getAttribute("data-min-touch") === "true";
+      const wrapper = select.closest("[data-min-touch='true']") ?? select.closest(".min-h-\\[44px\\]");
+      expect(hasMinHeight || hasDataAttr || wrapper !== null).toBe(true);
+    }
+  });
+
   // Gherkin (binds): "Adding adults and children changes the modeled expenses"
   it("changing from single to married+2-school-kids increases housing sub-linearly and adds schooling", async () => {
     const user = userEvent.setup();

@@ -96,6 +96,7 @@ export function Controls({
           id="controls-adults"
           aria-label={t(locale, "labelAdults")}
           value={household.adults}
+          className="min-h-[44px]"
           onChange={(e) =>
             onHouseholdChange({
               ...household,
@@ -115,6 +116,7 @@ export function Controls({
           id="controls-preschool"
           aria-label={t(locale, "labelPreschoolKids")}
           value={household.preschoolKids}
+          className="min-h-[44px]"
           onChange={(e) =>
             onHouseholdChange({
               ...household,
@@ -134,6 +136,7 @@ export function Controls({
           id="controls-schoolkids"
           aria-label={t(locale, "labelSchoolKids")}
           value={household.schoolKids}
+          className="min-h-[44px]"
           onChange={(e) =>
             onHouseholdChange({
               ...household,
@@ -167,7 +170,7 @@ export function Controls({
 
       {/* Area segmented control */}
       <div className="mt-2 flex items-center gap-2">
-        <span className="text-sm font-medium">{t(locale, "labelArea")}</span>
+        <span className="text-sm font-medium whitespace-nowrap">{t(locale, "labelArea")}</span>
         <SegmentedControl<Area>
           label={t(locale, "labelArea")}
           value={area}

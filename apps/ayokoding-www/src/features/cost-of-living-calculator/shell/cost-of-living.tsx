@@ -8,6 +8,7 @@ import {
   expensesLocal,
   liquidityReserveLocal,
   relocationSunkLocal,
+  scaleAmount,
   schoolLocal,
 } from "../core/calc";
 import { fmtNum } from "../core/format";
@@ -54,11 +55,11 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
     return {
       city,
       country,
-      housing: e.housing.amount,
-      food: e.food.amount,
-      transport: e.transport.amount,
-      utilities: e.utilities.amount,
-      healthcare: e.healthcare.amount,
+      housing: scaleAmount(e.housing.amount, "housing", household, area),
+      food: scaleAmount(e.food.amount, "food", household, area),
+      transport: scaleAmount(e.transport.amount, "transport", household, area),
+      utilities: scaleAmount(e.utilities.amount, "utilities", household, area),
+      healthcare: scaleAmount(e.healthcare.amount, "healthcare", household, area),
       childcare: childcareLocal(city, household),
       school: schoolLocal(city, household, schoolType),
       essentials: essentialsLocal(city, household, schoolType, area),
@@ -80,63 +81,135 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
       {/* Tablet + desktop (md+): table. Granular columns collapse on tablet, full on lg+.
           Rendered before the mobile cards so country/city links keep their DOM order
           (a country link precedes the same-named city link) regardless of breakpoint. */}
-      <div className="hidden overflow-x-auto md:block">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t(locale, "colCountry")}</TableHead>
-              <TableHead>{t(locale, "colCity")}</TableHead>
-              <TableHead>{t(locale, "colHealthcareScheme")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colHousing")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colFood")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colTransport")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colUtilities")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colHealthcareOOP")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colChildcare")}</TableHead>
-              <TableHead className={tabletHidden}>{t(locale, "colSchool")}</TableHead>
-              <TableHead>{t(locale, "colEssentials")}</TableHead>
-              <TableHead>{t(locale, "colTotal")}</TableHead>
-              <TableHead>{t(locale, "colRelocationSunk")}</TableHead>
-              <TableHead>{t(locale, "colLiquidityReserve")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((r) => (
-              <TableRow key={r.city.id}>
-                <TableCell>
-                  <a href={`?tab=cost&country=${r.city.countryId}`}>{r.country?.name.en ?? r.city.countryId}</a>
-                </TableCell>
-                <TableCell>
-                  <a href={`?tab=cost&city=${r.city.id}`}>{r.city.name.en}</a>
-                </TableCell>
-                <TableCell>
-                  {r.country ? (
-                    <Badge
-                      data-testid="healthcare-badge"
-                      variant="outline"
-                      hue={healthcareBadgeHue(r.country.healthcareModelType)}
-                    >
-                      {healthcareBadgeLabel(r.country.healthcareModelType, locale)}
-                    </Badge>
-                  ) : (
-                    <span data-testid="healthcare-badge">—</span>
-                  )}
-                </TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.housing)}</TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.food)}</TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.transport)}</TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.utilities)}</TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.healthcare)}</TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.childcare)}</TableCell>
-                <TableCell className={`text-right ${tabletHidden}`}>{fmtNum(r.school)}</TableCell>
-                <TableCell className="text-right font-medium">{fmtNum(r.essentials)}</TableCell>
-                <TableCell className="text-right font-medium">{fmtNum(r.total)}</TableCell>
-                <TableCell className="text-right">{fmtNum(r.relocation)}</TableCell>
-                <TableCell className="text-right">{fmtNum(r.liquidity)}</TableCell>
+      <div className="relative hidden md:block">
+        {/* Right-edge scroll affordance: gradient fade indicates more columns exist to the right */}
+        <div
+          data-testid="scroll-affordance"
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background/80 to-transparent"
+        />
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {/* Identity columns — always visible */}
+                <TableHead>{t(locale, "colCountry")}</TableHead>
+                <TableHead>{t(locale, "colCity")}</TableHead>
+                {/* Summary columns — always visible, placed before breakdown so they appear without scrolling */}
+                <TableHead>{t(locale, "colTotal")}</TableHead>
+                <TableHead>{t(locale, "colEssentials")}</TableHead>
+                {/* Breakdown columns — hidden on tablet, shown on desktop (lg+) */}
+                <TableHead className={tabletHidden}>
+                  <abbr title={t(locale, "tooltipHealthcareScheme")}>{t(locale, "colHealthcareScheme")}</abbr>
+                </TableHead>
+                <TableHead className={tabletHidden}>{t(locale, "colHousing")}</TableHead>
+                <TableHead className={tabletHidden}>{t(locale, "colFood")}</TableHead>
+                <TableHead className={tabletHidden}>{t(locale, "colTransport")}</TableHead>
+                <TableHead className={tabletHidden}>{t(locale, "colUtilities")}</TableHead>
+                <TableHead className={tabletHidden}>
+                  {t(locale, "colHealthcareOOPPrefix")} (<abbr title="out-of-pocket">OOP</abbr>)
+                </TableHead>
+                <TableHead className={tabletHidden}>{t(locale, "colChildcare")}</TableHead>
+                <TableHead className={tabletHidden}>{t(locale, "colSchool")}</TableHead>
+                {/* One-time cost columns */}
+                <TableHead>
+                  <abbr title={t(locale, "tooltipRelocationSunk")}>{t(locale, "colRelocationSunk")}</abbr>
+                </TableHead>
+                <TableHead>
+                  <abbr title={t(locale, "tooltipLiquidityReserve")}>{t(locale, "colLiquidityReserve")}</abbr>
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {rows.map((r) => (
+                <TableRow key={r.city.id}>
+                  {/* Identity cells */}
+                  <TableCell>
+                    <a href={`?tab=cost&country=${r.city.countryId}`}>{r.country?.name.en ?? r.city.countryId}</a>
+                  </TableCell>
+                  <TableCell>
+                    <a href={`?tab=cost&city=${r.city.id}`}>{r.city.name.en}</a>
+                  </TableCell>
+                  {/* Summary cells */}
+                  <TableCell className="text-right font-medium">{fmtNum(r.total)}</TableCell>
+                  <TableCell
+                    data-testid={`col-essentials-${r.city.id}`}
+                    data-raw={r.essentials}
+                    className="text-right font-medium"
+                  >
+                    {fmtNum(r.essentials)}
+                  </TableCell>
+                  {/* Breakdown cells */}
+                  <TableCell className={tabletHidden}>
+                    {r.country ? (
+                      <Badge
+                        data-testid="healthcare-badge"
+                        variant="outline"
+                        hue={healthcareBadgeHue(r.country.healthcareModelType)}
+                      >
+                        {healthcareBadgeLabel(r.country.healthcareModelType, locale)}
+                      </Badge>
+                    ) : (
+                      <span data-testid="healthcare-badge">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-housing-${r.city.id}`}
+                    data-raw={r.housing}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.housing)}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-food-${r.city.id}`}
+                    data-raw={r.food}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.food)}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-transport-${r.city.id}`}
+                    data-raw={r.transport}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.transport)}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-utilities-${r.city.id}`}
+                    data-raw={r.utilities}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.utilities)}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-healthcare-${r.city.id}`}
+                    data-raw={r.healthcare}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.healthcare)}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-childcare-${r.city.id}`}
+                    data-raw={r.childcare}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.childcare)}
+                  </TableCell>
+                  <TableCell
+                    data-testid={`col-school-${r.city.id}`}
+                    data-raw={r.school}
+                    className={`text-right ${tabletHidden}`}
+                  >
+                    {fmtNum(r.school)}
+                  </TableCell>
+                  {/* One-time cost cells */}
+                  <TableCell className="text-right">{fmtNum(r.relocation)}</TableCell>
+                  <TableCell className="text-right">{fmtNum(r.liquidity)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
       {/* Mobile (<md): stacked city cards */}
