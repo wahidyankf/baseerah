@@ -458,5 +458,5 @@ Scenario: Unreachable target aborts before testing
 - **[Feature Change Completeness](../../development/quality/feature-change-completeness.md)**: The delivery checklist carries the specs+Gherkin coverage steps for the exploratory spec-gap proposals.
 - **[UI Mockups in Plan Docs](../../conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)**: A UI-bearing plan carries an `assets/` folder with both-tier (lo-fi ASCII + hi-fi `.excalidraw.png`) mobile/tablet/desktop mockups, design-funnel alternatives, grounding rule, and token-only colors.
 - **[Grilling-With-Options Convention](../../development/workflow/grilling-with-options.md)**: Every material decision is grilled via `AskUserQuestion` with multiple-choice options plus the standing blank-state and "chat about this" options.
-- **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: The two testers run sequentially (one at a time), well within the concurrency cap.
+- **[Subagent Orchestration Convention](../../development/agents/subagent-orchestration.md)**: The three testers run sequentially (one at a time), well within the concurrency cap.
 - **[Linking Convention](../../conventions/formatting/linking.md)**: Cross-references use GitHub-compatible markdown links with `.md` extensions.

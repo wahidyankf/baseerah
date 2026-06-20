@@ -259,4 +259,4 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
 **Agents:**
 
 - `plan-maker`, `plan-checker`, `plan-execution-checker`, `swe-ui-maker`, `swe-ui-checker`,
-  `web-exploratory-tester`.
+  `web-exploratory-tester`, `web-usability-tester`, `web-design-tester`.

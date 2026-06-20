@@ -757,14 +757,16 @@ When the plan touches web UI or API code, delivery plans MUST include manual ass
 
 Include both sections above plus an end-to-end flow verification step (per locale).
 
-### For Web-UI Plans — Rule-15 Exploratory Retest
+### For Web-UI Feature-Change Plans — Rule-15 Three-Tester Retest
 
-Near the end of the checklist, before archival: run one `web-exploratory-tester` round against the
-running target across ALL supported locales; append each finding as a new unchecked checkbox and fix
-(or explicitly defer) before archival. See
+Near the end of the checklist, before archival: run the three live-site testers (the
+`web-ux-test-fixing-planning` workflow: `web-exploratory-tester` + `web-usability-tester` +
+`web-design-tester`) against the running target across ALL supported locales; append each finding as
+a new unchecked checkbox, source-attributed (`EWT-###`/`UWT-###`/`DWT-###`), and fix (or explicitly
+defer) before archival. See
 [User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 15.
 
-**Not applicable** for plans touching only documentation, governance, or non-code files.
+**Not applicable** for plans touching only documentation, governance, CLI/text output, or non-code files.
 
 ## Plan Archival (Mandatory Final Section)
 

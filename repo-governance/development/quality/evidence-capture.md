@@ -311,3 +311,5 @@ supports Indonesian.
   the backlog plan's evidence/ folder during exploratory testing.
 - [web-usability-tester](../../../.claude/agents/web-usability-tester.md) — saves screenshots to the
   backlog plan's evidence/ folder during usability evaluation.
+- [web-design-tester](../../../.claude/agents/web-design-tester.md) — saves screenshots to the
+  backlog plan's evidence/ folder during design-fidelity evaluation.
