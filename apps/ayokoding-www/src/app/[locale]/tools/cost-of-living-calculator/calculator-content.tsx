@@ -101,6 +101,9 @@ export function CostOfLivingCalculatorContent() {
   return (
     <main data-testid="calc-page" className="mx-auto max-w-6xl space-y-4 px-4 py-6">
       <h1 className="text-2xl font-bold tracking-tight">{t(locale, "calcTitle")}</h1>
+      <p data-testid="calc-subtitle" className="text-sm text-muted-foreground">
+        {t(locale, "calcSubtitle")}
+      </p>
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         {/* Colored segmented tab control — active tab uses ayokoding brand primary (blue) */}
@@ -116,12 +119,18 @@ export function CostOfLivingCalculatorContent() {
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             {t(locale, "tabSavings")}
+            <span data-testid="tab-desc-savings" className="sr-only">
+              {t(locale, "tabSavingsDesc")}
+            </span>
           </TabsTrigger>
           <TabsTrigger
             value="min-role"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           >
             {t(locale, "tabMinRole")}
+            <span data-testid="tab-desc-min-role" className="sr-only">
+              {t(locale, "tabMinRoleDesc")}
+            </span>
           </TabsTrigger>
         </TabsList>
 
@@ -129,10 +138,21 @@ export function CostOfLivingCalculatorContent() {
         <GeoFilters
           dataset={dataset}
           locale={locale}
+          initialCountryId={initialCityId ? null : initialCountryId}
+          initialCityId={initialCityId}
           onScopeChange={(scope) => {
             setGeoScope(scope);
             setActiveCountryId(scope.countryId);
             if (scope.cityId) setDetailCityId(scope.cityId);
+            // Write filter state back to URL
+            const params = new URLSearchParams();
+            params.set("tab", "cost");
+            if (scope.cityId) {
+              params.set("city", scope.cityId);
+            } else if (scope.countryId) {
+              params.set("country", scope.countryId);
+            }
+            router.replace(`?${params.toString()}`);
           }}
         />
 
