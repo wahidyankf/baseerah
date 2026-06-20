@@ -1,7 +1,7 @@
 # Web Design Tester Agent — Plan
 
-> **Status**: Backlog (created 2026-06-20). Not started. Execution begins when this folder is
-> promoted to `plans/in-progress/web-design-tester-agent/` (date prefix stripped).
+> **Status**: In Progress (created 2026-06-20, promoted 2026-06-20). Executing directly on each
+> repo's `main` (no worktrees).
 
 ## Context
 
