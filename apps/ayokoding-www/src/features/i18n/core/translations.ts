@@ -18,6 +18,8 @@ const translations: Record<Locale, Record<string, string>> = {
     noResults: "No results found",
     toggleTheme: "Toggle theme",
     skipToContent: "Skip to content",
+    toolsPageTitle: "Tools",
+    toolsPageCalcLink: "Cost of Living Calculator",
 
     // Calculator — page
     calcTitle: "Salary Savings Calculator",
@@ -170,6 +172,8 @@ const translations: Record<Locale, Record<string, string>> = {
     noResults: "Tidak ada hasil",
     toggleTheme: "Ubah tema",
     skipToContent: "Langsung ke konten",
+    toolsPageTitle: "Alat",
+    toolsPageCalcLink: "Kalkulator Biaya Hidup",
 
     // Calculator — page
     calcTitle: "Kalkulator Tabungan Gaji",

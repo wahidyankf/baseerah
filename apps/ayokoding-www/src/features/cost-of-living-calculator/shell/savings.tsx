@@ -187,7 +187,7 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
           type="button"
           onClick={() => setSortAsc((v) => !v)}
           aria-pressed={sortAsc}
-          className="mb-2 rounded-md border border-border px-3 py-2 text-sm font-medium"
+          className="mb-2 min-h-[44px] rounded-md border border-border px-3 py-2 text-sm font-medium"
         >
           {t(locale, "colSavingsEssential")} {sortAsc ? "↑" : "↓"}
         </button>
