@@ -445,8 +445,8 @@ Scenario: Unreachable target aborts before testing
 
 ## Principles Implemented/Respected
 
-- **[Deliberate Problem-Solving](../../principles/general/deliberate-problem-solving.md)**: Two independent perspectives are gathered and reconciled before any fix is proposed; the plan-maker grill forces explicit scope decisions.
-- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Findings stay attributed to their source (EWT vs UWT); the fix approach and delivery steps are written down before execution.
+- **[Deliberate Problem-Solving](../../principles/general/deliberate-problem-solving.md)**: Three independent perspectives are gathered and reconciled before any fix is proposed; the plan-maker grill forces explicit scope decisions.
+- **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**: Findings stay attributed to their source (EWT vs UWT vs DWT); the fix approach and delivery steps are written down before execution.
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: One plan, one delivery checklist — shared root causes are fixed once via the cross-reference note.
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Testing and authoring are delegated to specialized agents; the gate iterates automatically.
 - **[No Time Estimates](../../principles/content/no-time-estimates.md)**: Outcomes, not durations.
