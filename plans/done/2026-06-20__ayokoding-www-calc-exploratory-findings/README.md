@@ -1,5 +1,10 @@
 # Exploratory Testing Findings — Cost-of-Living Calculator
 
+> **SUPERSEDED (2026-06-20)** — A fresh, re-verified combined exploratory + usability fix plan now
+> covers this surface end-to-end (findings + tech-docs + TDD delivery + UI mockups). Use this archived
+> copy only as historical context; the live work is in
+> **[`plans/in-progress/ayokoding-www-cost-of-living-calc-test-fixing`](../../in-progress/ayokoding-www-cost-of-living-calc-test-fixing/README.md)**.
+
 **Plan type**: Exploratory testing backlog (tester output)
 
 **Status**: In Progress — exploratory findings filed and **re-verified (2026-06-19 re-run)**; awaiting `plan-maker` to add `tech-docs.md` + TDD `delivery.md`

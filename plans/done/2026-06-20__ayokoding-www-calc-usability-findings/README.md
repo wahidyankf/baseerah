@@ -1,6 +1,11 @@
 # Usability Evaluation: ayokoding-www Cost-of-Living / Salary Calculator
 
-**Plan status**: In Progress
+> **SUPERSEDED (2026-06-20)** — A fresh, re-verified combined exploratory + usability fix plan now
+> covers this surface end-to-end (findings + tech-docs + TDD delivery + UI mockups). Use this archived
+> copy only as historical context; the live work is in
+> **[`plans/in-progress/ayokoding-www-cost-of-living-calc-test-fixing`](../../in-progress/ayokoding-www-cost-of-living-calc-test-fixing/README.md)**.
+
+**Plan status**: Superseded (was In Progress)
 **Evaluation date**: 2026-06-19
 **Plan path**: `plans/in-progress/ayokoding-www-calc-usability-findings/`
 
