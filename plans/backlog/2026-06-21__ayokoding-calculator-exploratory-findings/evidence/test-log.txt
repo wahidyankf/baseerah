@@ -1,0 +1,65 @@
+[1A] Page title: "Cost of Living Calculator | AyoKoding | AyoKoding"
+[1B] H1: "Cost of Living Calculator"
+[1C] Tab labels: ["Cost of living","Savings","Minimum role"]
+[1D] Data last updated: "Data last updated: June 18, 2026 · Estimates only"
+[1D-disc] Estimates disclaimer: "Estimates only"
+[1E] Number of radiogroups: 1
+  RadioGroup "Area": ["City center","Rural"]
+[1F] <select> count on Cost tab: 6
+  <select id="geo-region-select" aria-label="Region" options=["All regions","Africa","Americas","ASEAN","Asia"]
+  <select id="geo-country-select" aria-label="Country" options=["All countries","Singapore","Thailand","Indonesia","Malaysia"]
+  <select id="geo-city-select" aria-label="City" options=["All cities","Singapore","Bangkok","Jakarta","Kuala Lumpur"]
+  <select id="controls-adults" aria-label="Adults" options=["1","2"]
+  <select id="controls-preschool" aria-label="Preschool children" options=["0","1","2","3"]
+  <select id="controls-schoolkids" aria-label="School-age children" options=["0","1","2","3"]
+[1G] Table headers: ["Country","City","Total","Essentials","Healthcare scheme","Housing","Food","Transport","Utilities","Healthcare (OOP)","Childcare","School","Relocation (sunk)","Liquidity reserve"]
+[1H] First data row cells (0-3): ["Singapore","Singapore","SGD 4,578 / $3,568","SGD 4,328 / $3,374"]
+[1I] OOP legend visible: 1
+[1J] School type radiogroup with 0 school kids: 0
+[1J-after] School type radiogroup with 2 school kids: 1
+[1K] Housing center=3500, rural=2625
+[1L] Israeli city check done
+[1M] Empty salary essential savings: data-usd="-577.591", text="INR -54,500 / $-578 (—)"
+[1N] Annual gross for 8000 monthly: "96,000 USD"
+[1N-net] First city net USD: 8000 (entered gross: 8000/mo)
+  FINDING[NET-NOT-TAXED]: Net ($8000/mo) >= gross ($8000/mo). Tax not applied.
+[1N-sort] Sort button count: 1
+[1O] Baseline source radiogroup count: 1
+[1O-opts] Baseline options: ["Monthly savings target","Reference role","My salary"]
+[1P] SE roles caption: "Roles: software-engineering (IC + management)"
+[1Q-min] Minimum markers: 1
+[1Q-div] Qualifying divider count: 1
+[1R] Zero target: no-qualifier-msg=0, min-marker=0
+  FINDING[ZERO-TARGET-NO-MIN]: Zero savings target — no minimum marker shown. Spec says lowest role should be marked.
+[1S] Reference role input count: 1
+[1T] My salary input count: 1
+[2A] ID h1: "Kalkulator Biaya Hidup"
+[2B] ID Tab labels: ["Biaya hidup","Tabungan","Jabatan minimum"]
+  [2C] ID RadioGroup "Wilayah": ["Pusat kota","Pedesaan"]
+[2D] ID Savings salary label: "Gaji kotor bulanan (sebelum pajak) USD"
+[2E] ID SE roles caption: "Jabatan: rekayasa perangkat lunak (IC + manajemen)"
+[2E-opts] ID Baseline opts: ["Target tabungan bulanan","Jabatan referensi","Gaji saya"]
+[3A] Tabs at 375px: ["Cost of living","Savings","Minimum role"]
+[3B] Mobile savings cards visible at 375px: true
+[3C] Mobile role cards visible at 375px: true
+[4A] Calculator link on tools index: 1
+[4A-h1] Tools page h1: "Tools"
+[5A] <select id="geo-region-select" aria-label="Region"> opts[0..4]=["All regions","Africa","Americas","ASEAN","Asia"]
+[5A] <select id="geo-country-select" aria-label="Country"> opts[0..4]=["All countries","Singapore","Thailand","Indonesia","Malaysia"]
+[5A] <select id="geo-city-select" aria-label="City"> opts[0..4]=["All cities","Singapore","Bangkok","Jakarta","Kuala Lumpur"]
+[5A] <select id="controls-adults" aria-label="Adults"> opts[0..4]=["1","2"]
+[5A] <select id="controls-preschool" aria-label="Preschool children"> opts[0..4]=["0","1","2","3"]
+[5A] <select id="controls-schoolkids" aria-label="School-age children"> opts[0..4]=["0","1","2","3"]
+[5B] Country options count: 29, first 5: ["All countries","Singapore","Thailand","Indonesia","Malaysia"]
+[5C] URL after Indonesia: "http://localhost:3101/en/tools/cost-of-living-calculator?tab=cost&country=id"
+[5D] City options after Indonesia: count=2, first 5: ["All cities","Jakarta"]
+[5E] Country select value on ?country=indonesia: ""
+[6A] Housing 1 adult=3500, 2 adults=4375
+[6B] Childcare 0 preschool kids=0, 1 preschool kid=1500
+[6B-school] School expense with 1 preschool kid (no school kids): 0
+[7A] Table visible at 768px (md:block): true
+[8A] HSTS present: false
+[8B] X-Frame-Options: DENY
+[8C] X-Content-Type-Options: nosniff
+[8D] CSP: present
+[8E] Referrer-Policy: strict-origin-when-cross-origin

@@ -1,0 +1,27 @@
+[NET-CHECK] Rows in savings table: 31
+  Row 0: country="United Arab Emirates" city="Dubai" net-usd=8000 net-text="AED 29,380 / $8,000"
+  Row 1: country="Indonesia" city="Jakarta" net-usd=5600 net-text="IDR 99,498,952 / $5,600"
+  Row 2: country="India" city="Bengaluru" net-usd=5359.999999999999 net-text="INR 505,756 / $5,360"
+  Row 3: country="Vietnam" city="Ho Chi Minh City" net-usd=5600 net-text="VND 147,411,093 / $5,600"
+  Row 4: country="Malaysia" city="Kuala Lumpur" net-usd=5680 net-text="MYR 23,091 / $5,680"
+[ZERO-TARGET] min-marker=0, divider=0, no-qual=0, non-qual-rows=15
+[EMPTY-TARGET] min-marker=0, divider=0, no-qual=0
+[EMPTY-TARGET] targetAmount initial value: ""
+[ZERO-TARGET-ANALYSIS] Source: baselineReady only set when targetAmount > 0 for savings_target.
+  Therefore: zero target has baselineReady=false → minRole=null → no min marker shown.
+  Spec says: zero target → all qualify → lowest marked. This is a divergence.
+[SMALL-TARGET] targetAmount=1: min-marker=1
+[TITLE-CHECK] Full page title: "Cost of Living Calculator | AyoKoding | AyoKoding"
+[COUNTRY-DEEPLINK] ?country=indonesia: select value=""
+[COUNTRY-DEEPLINK] ?tab=cost&country=id: select value="id"
+[SUB-NATIONAL] Sub-national indicators in savings table: 5
+[EMPTY-SALARY-TEXT] First savings-essential with empty salary: "INR -54,500 / $-578 (—)"
+[SAVINGS-HEADERS] ["Country","City","Net (monthly)","Essentials","Savings after essentials ↕","Savings after lifestyle","Typical non-salary comp (info, annual)","Total comp (info, annual)"]
+[SCHOOL] Public=300, Private=7000, ratio=23.33
+[RURAL-MULTI] 1 adult center=3500, 2 adult center=4375, 2 adult rural=3281.25
+[RURAL-MULTI] Expected 2adult rural=3281, actual=3281.25
+[PAGE-TITLE] From HTML: "Cost of Living Calculator | AyoKoding | AyoKoding"
+[PAGE-TITLE] AyoKoding count in title: 2
+  FINDING[DUPLICATE-TITLE]: Page title contains "AyoKoding" 2 times: "Cost of Living Calculator | AyoKoding | AyoKoding"
+[DEEPLINK-COUNTRY] ?country=Indonesia (full name): select=""
+[DEEPLINK-COUNTRY] ?country=id: select="id"
