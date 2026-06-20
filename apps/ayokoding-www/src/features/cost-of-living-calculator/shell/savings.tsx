@@ -94,9 +94,10 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
         <input
           id="gross-salary-input"
           type="number"
+          min="0"
           aria-label={t(locale, "grossMonthlySalaryLabel")}
           value={grossMonthly || ""}
-          onChange={(e) => setGrossMonthly(parseFloat(e.target.value) || 0)}
+          onChange={(e) => setGrossMonthly(Math.max(0, parseFloat(e.target.value) || 0))}
         />
         <span>
           {t(locale, "annualGrossLabel")}: <span data-testid="annual-gross">{fmtNum(annualGross)} USD</span>
@@ -117,7 +118,12 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
               <TableHead className="hidden lg:table-cell">{t(locale, "colNet")}</TableHead>
               <TableHead className="hidden lg:table-cell">{t(locale, "colEssentials")}</TableHead>
               <TableHead>
-                <button type="button" onClick={() => setSortAsc((v) => !v)} aria-label={t(locale, "sortBySavings")}>
+                <button
+                  type="button"
+                  onClick={() => setSortAsc((v) => !v)}
+                  aria-label={t(locale, "sortBySavings")}
+                  aria-pressed={sortAsc}
+                >
                   {t(locale, "colSavingsEssential")}
                 </button>
               </TableHead>
@@ -174,7 +180,18 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
         </Table>
       </div>
 
-      {/* Mobile (<md): stacked savings cards */}
+      {/* Mobile (<md): stacked savings cards — sort control */}
+      <div className="md:hidden">
+        <button
+          data-testid="sort-mobile"
+          type="button"
+          onClick={() => setSortAsc((v) => !v)}
+          aria-pressed={sortAsc}
+          className="mb-2 rounded-md border border-border px-3 py-2 text-sm font-medium"
+        >
+          {t(locale, "colSavingsEssential")} {sortAsc ? "↑" : "↓"}
+        </button>
+      </div>
       <div data-testid="mobile-savings-cards" className="space-y-3 md:hidden">
         {sorted.map((r) => (
           <div key={r.city.id} className="overflow-hidden rounded-lg border bg-card shadow-sm">

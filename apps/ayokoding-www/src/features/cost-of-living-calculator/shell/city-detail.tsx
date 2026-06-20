@@ -7,7 +7,10 @@ import {
   essentialsLocal,
   expensesLocal,
   liquidityReserveLocal,
+  liquidityReserveUsd,
   relocationSunkLocal,
+  relocationSunkUsd,
+  scaleAmount,
   schoolLocal,
 } from "../core/calc";
 import { fmtCurrency, healthcareBadgeHue } from "../core/format";
@@ -20,11 +23,13 @@ function Row({
   value,
   testId,
   emphasis,
+  rawValue,
 }: {
   label: string;
   value: string;
   testId: string;
   emphasis?: "subtotal" | "total";
+  rawValue?: number;
 }) {
   const cls =
     emphasis === "total"
@@ -35,7 +40,7 @@ function Row({
   return (
     <div className={cls}>
       <span className="text-muted-foreground">{label}</span>
-      <span data-testid={testId} className="tabular-nums">
+      <span data-testid={testId} data-raw={rawValue} className="tabular-nums">
         {value}
       </span>
     </div>
@@ -51,6 +56,11 @@ type Props = {
   locale?: Locale;
 };
 
+/** Formats a dual-currency string: local currency amount + USD equivalent. */
+function fmtDualCurrency(localAmount: number, localCurrency: string, usdAmount: number): string {
+  return `${fmtCurrency(localAmount, localCurrency)} / ${fmtCurrency(usdAmount, "USD")}`;
+}
+
 function healthcareBadgeLabel(type: "oop" | "tax-funded" | "mixed", locale: Locale): string {
   if (type === "oop") return t(locale, "healthcareOutOfPocket");
   if (type === "tax-funded") return t(locale, "healthcareTaxFunded");
@@ -65,17 +75,19 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
   const cur = city.currency;
 
   const e = city.expenses;
-  const housingAmt = e.housing.amount;
-  const foodAmt = e.food.amount;
-  const transportAmt = e.transport.amount;
-  const utilitiesAmt = e.utilities.amount;
-  const healthcareAmt = e.healthcare.amount;
+  const housingAmt = scaleAmount(e.housing.amount, "housing", household, area);
+  const foodAmt = scaleAmount(e.food.amount, "food", household, area);
+  const transportAmt = scaleAmount(e.transport.amount, "transport", household, area);
+  const utilitiesAmt = scaleAmount(e.utilities.amount, "utilities", household, area);
+  const healthcareAmt = scaleAmount(e.healthcare.amount, "healthcare", household, area);
   const childcareAmt = childcareLocal(city, household);
   const schoolAmt = schoolLocal(city, household, schoolType);
   const essentials = essentialsLocal(city, household, schoolType, area);
   const monthlyTotal = expensesLocal(city, household, schoolType, area);
   const relocationSunk = relocationSunkLocal(city);
+  const relocationSunkInUsd = relocationSunkUsd(city, dataset.fx);
   const liquidityReserve = liquidityReserveLocal(city);
+  const liquidityReserveInUsd = liquidityReserveUsd(city, dataset.fx);
 
   return (
     <div className="mx-auto max-w-xl overflow-hidden rounded-lg border bg-card shadow-sm">
@@ -105,22 +117,54 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
       {/* Body */}
       <div className="space-y-4 p-4">
         <section aria-label={t(locale, "sectionMonthlyExpenses")} className="space-y-1.5 text-sm">
-          <Row label={t(locale, "labelHousing")} value={fmtCurrency(housingAmt, cur)} testId="expense-housing" />
-          <Row label={t(locale, "labelFood")} value={fmtCurrency(foodAmt, cur)} testId="expense-food" />
-          <Row label={t(locale, "labelTransport")} value={fmtCurrency(transportAmt, cur)} testId="expense-transport" />
-          <Row label={t(locale, "labelUtilities")} value={fmtCurrency(utilitiesAmt, cur)} testId="expense-utilities" />
+          <Row
+            label={t(locale, "labelHousing")}
+            value={fmtCurrency(housingAmt, cur)}
+            testId="expense-housing"
+            rawValue={housingAmt}
+          />
+          <Row
+            label={t(locale, "labelFood")}
+            value={fmtCurrency(foodAmt, cur)}
+            testId="expense-food"
+            rawValue={foodAmt}
+          />
+          <Row
+            label={t(locale, "labelTransport")}
+            value={fmtCurrency(transportAmt, cur)}
+            testId="expense-transport"
+            rawValue={transportAmt}
+          />
+          <Row
+            label={t(locale, "labelUtilities")}
+            value={fmtCurrency(utilitiesAmt, cur)}
+            testId="expense-utilities"
+            rawValue={utilitiesAmt}
+          />
           <Row
             label={t(locale, "labelHealthcareOOP")}
             value={fmtCurrency(healthcareAmt, cur)}
             testId="expense-healthcare"
+            rawValue={healthcareAmt}
           />
-          <Row label={t(locale, "labelChildcare")} value={fmtCurrency(childcareAmt, cur)} testId="expense-childcare" />
-          <Row label={t(locale, "labelSchool")} value={fmtCurrency(schoolAmt, cur)} testId="expense-school" />
+          <Row
+            label={t(locale, "labelChildcare")}
+            value={fmtCurrency(childcareAmt, cur)}
+            testId="expense-childcare"
+            rawValue={childcareAmt}
+          />
+          <Row
+            label={t(locale, "labelSchool")}
+            value={fmtCurrency(schoolAmt, cur)}
+            testId="expense-school"
+            rawValue={schoolAmt}
+          />
           <Row
             label={t(locale, "labelEssentialsSubtotal")}
             value={fmtCurrency(essentials, cur)}
             testId="essentials-subtotal"
             emphasis="subtotal"
+            rawValue={essentials}
           />
           <Row
             label={t(locale, "labelMonthlyTotal")}
@@ -133,12 +177,12 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
         <section aria-label={t(locale, "sectionRelocationCosts")} className="space-y-1.5 border-t pt-3 text-sm">
           <Row
             label={t(locale, "labelRelocationSunkCost")}
-            value={fmtCurrency(relocationSunk, cur)}
+            value={fmtDualCurrency(relocationSunk, cur, relocationSunkInUsd)}
             testId="relocation-sunk"
           />
           <Row
             label={t(locale, "labelLiquidityReserve")}
-            value={fmtCurrency(liquidityReserve, cur)}
+            value={fmtDualCurrency(liquidityReserve, cur, liquidityReserveInUsd)}
             testId="liquidity-reserve"
           />
         </section>

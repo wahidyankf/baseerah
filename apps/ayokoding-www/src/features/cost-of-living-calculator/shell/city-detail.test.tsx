@@ -63,4 +63,43 @@ describe("CityDetail", () => {
     const validTexts = ["tax-funded", "mandatory payroll insurance", "out-of-pocket"];
     expect(validTexts).toContain(badge.textContent?.trim());
   });
+
+  // EWT-002: relocation sunk-cost and liquidity-reserve rows show both local currency AND USD equivalent.
+  it("EWT-002: relocation-sunk row shows both local currency and USD value", () => {
+    render(<CityDetail {...defaultProps} />);
+
+    const sunk = screen.getByTestId("relocation-sunk");
+    // Should contain "USD" somewhere in the text
+    expect(sunk.textContent).toMatch(/USD/i);
+  });
+
+  it("EWT-002: liquidity-reserve row shows both local currency and USD value", () => {
+    render(<CityDetail {...defaultProps} />);
+
+    const liquidity = screen.getByTestId("liquidity-reserve");
+    // Should contain "USD" somewhere in the text
+    expect(liquidity.textContent).toMatch(/USD/i);
+  });
+
+  // EWT-007: per-category rows in city-detail must scale for household size so
+  // their sum equals the Essentials subtotal shown.
+  it("EWT-007: for a 2-adult household, per-category row amounts sum to the essentials subtotal", () => {
+    const twoAdultProps = {
+      ...defaultProps,
+      household: { adults: 2 as const, preschoolKids: 0 as const, schoolKids: 0 as const },
+    };
+    render(<CityDetail {...twoAdultProps} />);
+
+    const housing = parseFloat(screen.getByTestId("expense-housing").getAttribute("data-raw") ?? "NaN");
+    const food = parseFloat(screen.getByTestId("expense-food").getAttribute("data-raw") ?? "NaN");
+    const transport = parseFloat(screen.getByTestId("expense-transport").getAttribute("data-raw") ?? "NaN");
+    const utilities = parseFloat(screen.getByTestId("expense-utilities").getAttribute("data-raw") ?? "NaN");
+    const healthcare = parseFloat(screen.getByTestId("expense-healthcare").getAttribute("data-raw") ?? "NaN");
+    const childcare = parseFloat(screen.getByTestId("expense-childcare").getAttribute("data-raw") ?? "NaN");
+    const school = parseFloat(screen.getByTestId("expense-school").getAttribute("data-raw") ?? "NaN");
+    const essentials = parseFloat(screen.getByTestId("essentials-subtotal").getAttribute("data-raw") ?? "NaN");
+
+    const categorySum = housing + food + transport + utilities + healthcare + childcare + school;
+    expect(Math.abs(categorySum - essentials)).toBeLessThan(0.01);
+  });
 });

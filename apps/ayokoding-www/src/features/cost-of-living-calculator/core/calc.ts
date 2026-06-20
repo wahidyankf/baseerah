@@ -70,6 +70,37 @@ export function netUsd(grossMonthlyUsd: number, city: City, country: Country, _f
   return grossMonthlyUsd * (1 - rate);
 }
 
+// ─── Per-Category Household Scaling ──────────────────────────────────────────
+
+// Expense categories that have distinct OECD scaling behaviours.
+export type ExpenseCategory = "housing" | "food" | "transport" | "utilities" | "healthcare";
+
+// Apply OECD household scaling to a single expense category amount (in local currency).
+// This is the single authoritative path for per-category scaling used by both the
+// comparison table and the city-detail view.
+//   housing   → sub-linear × area
+//   food      → per-capita
+//   transport → flat (one transit pass per household)
+//   utilities → sub-linear (no area factor)
+//   healthcare→ per-capita
+export function scaleAmount(amount: number, category: ExpenseCategory, household: Household, area: Area): number {
+  const s = subLinear(household);
+  const p = perCapita(household);
+  const areaMultiplier = AREA_MULTIPLIERS[area];
+  switch (category) {
+    case "housing":
+      return amount * s * areaMultiplier;
+    case "food":
+      return amount * p;
+    case "transport":
+      return amount;
+    case "utilities":
+      return amount * s;
+    case "healthcare":
+      return amount * p;
+  }
+}
+
 // ─── Expense Components (local currency) ────────────────────────────────────
 
 // Monthly childcare in local currency: per pre-school child, no OECD damping.
@@ -86,15 +117,12 @@ export function schoolLocal(city: City, household: Household, schoolType: School
 // Essentials = housing + food + transport + utilities + healthcare + childcare + school.
 export function essentialsLocal(city: City, household: Household, schoolType: SchoolType, area: Area): number {
   const e = city.expenses;
-  const s = subLinear(household);
-  const p = perCapita(household);
-  const areaMultiplier = AREA_MULTIPLIERS[area];
 
-  const housing = e.housing.amount * s * areaMultiplier;
-  const food = e.food.amount * p;
-  const transport = e.transport.amount; // flat per earner (1 transit pass assumed)
-  const utilities = e.utilities.amount * s;
-  const healthcare = e.healthcare.amount * p;
+  const housing = scaleAmount(e.housing.amount, "housing", household, area);
+  const food = scaleAmount(e.food.amount, "food", household, area);
+  const transport = scaleAmount(e.transport.amount, "transport", household, area);
+  const utilities = scaleAmount(e.utilities.amount, "utilities", household, area);
+  const healthcare = scaleAmount(e.healthcare.amount, "healthcare", household, area);
   const childcare = childcareLocal(city, household);
   const school = schoolLocal(city, household, schoolType);
 
