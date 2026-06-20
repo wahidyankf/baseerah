@@ -19,4 +19,4 @@ Follows the [AyoKoding Web Gherkin conventions](../README.md).
 ## Related
 
 - **Parent**: [gherkin specs index](../README.md)
-- **Plan**: [plans/in-progress/ayokoding-www-salary-savings-calculator](../../../../../../../plans/in-progress/ayokoding-www-salary-savings-calculator/delivery.md)
+- **Plan**: [plans/in-progress/ayokoding-www-cost-of-living-calc-test-fixing](../../../../../../../plans/in-progress/ayokoding-www-cost-of-living-calc-test-fixing/delivery.md)
