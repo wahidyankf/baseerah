@@ -1329,20 +1329,45 @@ unchecked checkbox and must be fixed and ticked before archival._
 
 ## Phase 10: Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked (including Rule-15 follow-ups)
-- [ ] [AI] Verify ALL quality gates pass (local + CI) and visual parity is signed off
-- [ ] [AI] Rename and move:
-      `git mv plans/in-progress/ayokoding-www-cost-of-living-calc-test-fixing/ plans/done/YYYY-MM-DD__ayokoding-www-cost-of-living-calc-test-fixing/`
+- [x] [AI] Verify ALL delivery checklist items are ticked (including Rule-15 follow-ups)
+
+  > **2026-06-20** | Status: Done | Notes: All Phase 0–9 items ticked. Phase 9 Rule-15 findings: EWT-R004 + EWT-R006 fixed; EWT-R001/R002/R003/R005/R007 deferred with rationale.
+
+- [x] [AI] Verify ALL quality gates pass (local + CI) and visual parity is signed off
+
+  > **2026-06-20** | Status: Done | Notes: commons-quality-gate run 27861771608 conclusion=success. All 4 CI workflows green. Local: typecheck/lint/test:quick/specs:coverage all exit 0. 1744 unit tests pass, 88.73% coverage ≥ 82%.
+
+- [x] [AI] Rename and move:
+      `git mv plans/in-progress/ayokoding-www-cost-of-living-calc-test-fixing/ plans/done/2026-06-20__ayokoding-www-cost-of-living-calc-test-fixing/`
       using today's date as the completion date
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the entry with completion date
-- [ ] [AI] Update any other READMEs that reference this plan
-- [ ] [AI] Commit the archival: `chore(plans): move ayokoding-www-cost-of-living-calc-test-fixing to done`
+
+  > **2026-06-20** | Status: Done | Notes: Moved to `plans/done/2026-06-20__ayokoding-www-cost-of-living-calc-test-fixing/`.
+
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+
+  > **2026-06-20** | Status: Done | Notes: Entry removed from Active Plans list.
+
+- [x] [AI] Update `plans/done/README.md` — add the entry with completion date
+
+  > **2026-06-20** | Status: Done | Notes: Entry added at top of Completed Projects list.
+
+- [x] [AI] Update any other READMEs that reference this plan
+
+  > **2026-06-20** | Status: Done | Notes: No other READMEs referenced this plan by in-progress path.
+
+- [x] [AI] Commit the archival: `chore(plans): move ayokoding-www-cost-of-living-calc-test-fixing to done`
+
+  > **2026-06-20** | Status: Done | Notes: Archival commit pushed to origin main.
 
 ### Phase 10 Gate
 
-- [ ] [AI] The plan folder lives under `plans/done/YYYY-MM-DD__…/` and the README indexes are updated
-- [ ] [AI] The archival commit is pushed and CI is green
+- [x] [AI] The plan folder lives under `plans/done/YYYY-MM-DD__…/` and the README indexes are updated
+
+  > **2026-06-20** | Status: Done | Notes: Folder at `plans/done/2026-06-20__ayokoding-www-cost-of-living-calc-test-fixing/`; both README indexes updated.
+
+- [x] [AI] The archival commit is pushed and CI is green
+
+  > **2026-06-20** | Status: Done | Notes: Archival commit pushed; CI verified green.
 
 > **Pause Safety**: the plan is archived and pushed. Work is complete. To resume (if needed): confirm
 > the folder is under `plans/done/` and CI is green.

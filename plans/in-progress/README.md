@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [ayokoding-www-cost-of-living-calc-test-fixing](./ayokoding-www-cost-of-living-calc-test-fixing/README.md) — Fix all failing and skipped tests in the cost-of-living calculator feature; address accessibility, i18n, numeric-display, relocation-column, URL-sync, and visual-polish defects found during exploratory and usability testing.
+_(none)_
 
 ## Instructions
 
