@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [Web Design Tester Agent](./web-design-tester-agent/) — Add a new `web-design-tester` agent completing the live-site advocate triad (correctness / usability / design), make the three testers reciprocally complement each other, rename the combined web workflow to `web-ux-test-fixing-planning`, and expand User-Facing Delivery Hardening Rule 15 into a three-tester near-end round for web-UI feature-change plans. Direct-on-`main` (no worktrees), topic-identical across all three sibling repos, with a `repo-rules-maker` consistency sweep per repo.
+_(none)_
 
 ## Instructions
 

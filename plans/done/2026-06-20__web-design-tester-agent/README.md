@@ -1,7 +1,8 @@
 # Web Design Tester Agent — Plan
 
-> **Status**: In Progress (created 2026-06-20, promoted 2026-06-20). Executing directly on each
-> repo's `main` (no worktrees).
+> **Status**: Done (created 2026-06-20, promoted 2026-06-20, completed 2026-06-20). Executed directly
+> on each repo's `main` (no worktrees); landed topic-identically in ose-public, ose-primer, and
+> ose-infra, all CI-green.
 
 ## Context
 
