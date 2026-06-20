@@ -13,7 +13,7 @@ import {
   scaleAmount,
   schoolLocal,
 } from "../core/calc";
-import { fmtCurrency, healthcareBadgeHue } from "../core/format";
+import { fmtCurrency, fmtDualCurrency, healthcareBadgeHue } from "../core/format";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 import { Badge } from "@open-sharia-enterprise/web-ui";
@@ -55,11 +55,6 @@ type Props = {
   area: Area;
   locale?: Locale;
 };
-
-/** Formats a dual-currency string: local currency amount + USD equivalent. */
-function fmtDualCurrency(localAmount: number, localCurrency: string, usdAmount: number): string {
-  return `${fmtCurrency(localAmount, localCurrency)} / ${fmtCurrency(usdAmount, "USD")}`;
-}
 
 function healthcareBadgeLabel(type: "oop" | "tax-funded" | "mixed", locale: Locale): string {
   if (type === "oop") return t(locale, "healthcareOutOfPocket");
@@ -117,6 +112,7 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
       {/* Body */}
       <div className="space-y-4 p-4">
         <section aria-label={t(locale, "sectionMonthlyExpenses")} className="space-y-1.5 text-sm">
+          <h2 className="text-sm font-semibold">{t(locale, "sectionMonthlyExpenses")}</h2>
           <Row
             label={t(locale, "labelHousing")}
             value={fmtCurrency(housingAmt, cur)}
@@ -175,6 +171,7 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
         </section>
 
         <section aria-label={t(locale, "sectionRelocationCosts")} className="space-y-1.5 border-t pt-3 text-sm">
+          <h2 className="text-sm font-semibold">{t(locale, "sectionRelocationCosts")}</h2>
           <Row
             label={t(locale, "labelRelocationSunkCost")}
             value={fmtDualCurrency(relocationSunk, cur, relocationSunkInUsd)}

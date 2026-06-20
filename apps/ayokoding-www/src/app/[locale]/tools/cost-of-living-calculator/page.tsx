@@ -1,9 +1,12 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { t } from "@/features/i18n/core/translations";
+import type { Locale } from "@/features/i18n/core/config";
 import { CostOfLivingCalculatorContent } from "./calculator-content";
 
-export async function generateMetadata(_props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  return { title: "Cost of Living Calculator | AyoKoding" };
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await props.params;
+  return { title: t(locale as Locale, "calcTitle") };
 }
 
 export default function CostOfLivingCalculatorPage() {

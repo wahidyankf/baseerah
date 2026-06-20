@@ -22,7 +22,7 @@ const translations: Record<Locale, Record<string, string>> = {
     toolsPageCalcLink: "Cost of Living Calculator",
 
     // Calculator — page
-    calcTitle: "Salary Savings Calculator",
+    calcTitle: "Cost of Living Calculator",
     calcSubtitle: "Compare cost of living and salary savings across cities",
     ariaTabsNav: "Calculator tabs",
     tabCostOfLiving: "Cost of living",
@@ -116,6 +116,7 @@ const translations: Record<Locale, Record<string, string>> = {
     backToAllCities: "← Back to all cities",
 
     // Calculator — savings table
+    savingsEmptyStateMessage: "Enter your gross monthly salary to see how much you could save in each city.",
     grossMonthlySalaryLabel: "Gross monthly salary (before tax) USD",
     annualGrossLabel: "Annual gross",
     nonSalaryCompNote: "Non-salary comp (RSU/equity + bonus) is informational only — not in savings math.",
@@ -176,7 +177,7 @@ const translations: Record<Locale, Record<string, string>> = {
     toolsPageCalcLink: "Kalkulator Biaya Hidup",
 
     // Calculator — page
-    calcTitle: "Kalkulator Tabungan Gaji",
+    calcTitle: "Kalkulator Biaya Hidup",
     calcSubtitle: "Bandingkan biaya hidup dan tabungan gaji di berbagai kota",
     ariaTabsNav: "Tab kalkulator",
     tabCostOfLiving: "Biaya hidup",
@@ -219,7 +220,7 @@ const translations: Record<Locale, Record<string, string>> = {
     labelSchoolType: "Jenis sekolah",
     optPublic: "Negeri",
     optPrivate: "Swasta",
-    labelArea: "Wilayah tempat tinggal",
+    labelArea: "Wilayah",
     optCenter: "Pusat kota",
     optRural: "Pedesaan",
 
@@ -271,6 +272,8 @@ const translations: Record<Locale, Record<string, string>> = {
     backToAllCities: "← Kembali ke semua kota",
 
     // Calculator — savings table
+    savingsEmptyStateMessage:
+      "Masukkan gaji kotor bulanan Anda untuk melihat berapa banyak yang bisa Anda hemat di setiap kota.",
     grossMonthlySalaryLabel: "Gaji kotor bulanan (sebelum pajak) USD",
     annualGrossLabel: "Total gaji tahunan",
     nonSalaryCompNote:

@@ -17,7 +17,12 @@ export function MobileNav({ locale, open, onOpenChange }: MobileNavProps) {
 
   useEffect(() => {
     if (open && tree.length === 0) {
-      trpcClient.content.getTree.query({ locale: locale as "en" | "id" }).then((data) => setTree(data as TreeNode[]));
+      trpcClient.content.getTree.query({ locale: locale as "en" | "id" }).then((data) => {
+        const raw = data as TreeNode[];
+        // Skip the root locale node (e.g., "English Content") — mirror desktop Sidebar behaviour
+        const rootNode = raw.find((n) => n.slug === "");
+        setTree(rootNode ? rootNode.children : raw);
+      });
     }
   }, [open, locale, tree.length]);
 

@@ -16,6 +16,8 @@ import type { RoleMeta, RoleMatrix } from "../core/data/roles";
 import { rankLadder, minimumRole, orderForDisplay, resolveBaselineUsd, toDisplayCurrencies } from "../core/role-lookup";
 import { fx } from "../core/data/fx";
 import { fmtCurrencyTrailing } from "../core/format";
+import { localeName } from "./geo-filters";
+import { SegmentedControl } from "./controls";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 
@@ -52,7 +54,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
   let baselineReady = false;
 
   try {
-    if (baselineSource === "savings_target" && targetAmount > 0) {
+    if (baselineSource === "savings_target" && targetAmount >= 0) {
       baselineUsd = resolveBaselineUsd(
         "savings_target",
         { amountLocal: targetAmount, displayCurrency: targetCurrency },
@@ -131,7 +133,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
         </TableCell>
         <TableCell className="hidden lg:table-cell">{entry.track}</TableCell>
         <TableCell data-testid="best-city-cell">
-          {entry.bestCity.name.en}, {entry.bestCountry.name.en}
+          {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
           {(entry.confidence === "proxy" || entry.confidence === "moderate") && (
             <span data-testid="confidence-flag" className="ml-1 text-xs text-muted-foreground">
               [{entry.confidence}]
@@ -161,17 +163,17 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
     <div>
       {/* Baseline source */}
       <div>
-        <label htmlFor="baseline-source-select">{t(locale, "labelBaselineSource")}</label>
-        <select
-          id="baseline-source-select"
-          aria-label={t(locale, "labelBaselineSource")}
+        <p className="mb-1 text-sm font-medium text-foreground">{t(locale, "labelBaselineSource")}</p>
+        <SegmentedControl
+          label={t(locale, "labelBaselineSource")}
           value={baselineSource}
-          onChange={(e) => setBaselineSource(e.target.value as "savings_target" | "reference_role" | "my_salary")}
-        >
-          <option value="savings_target">{t(locale, "optSavingsTarget")}</option>
-          <option value="reference_role">{t(locale, "optReferenceRole")}</option>
-          <option value="my_salary">{t(locale, "optMySalary")}</option>
-        </select>
+          onChange={(v) => setBaselineSource(v)}
+          options={[
+            { value: "savings_target" as const, label: t(locale, "optSavingsTarget") },
+            { value: "reference_role" as const, label: t(locale, "optReferenceRole") },
+            { value: "my_salary" as const, label: t(locale, "optMySalary") },
+          ]}
+        />
       </div>
 
       {/* Savings target inputs */}
@@ -211,7 +213,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
           >
             {dataset.cities.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name.en}
+                {localeName(c.name, locale)}
               </option>
             ))}
           </select>
@@ -253,7 +255,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
           >
             {dataset.cities.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name.en}
+                {localeName(c.name, locale)}
               </option>
             ))}
           </select>
@@ -348,7 +350,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
                 <div className="flex items-baseline justify-between">
                   <span className="text-muted-foreground">{t(locale, "colBestCity")}</span>
                   <span>
-                    {entry.bestCity.name.en}, {entry.bestCountry.name.en}
+                    {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
                   </span>
                 </div>
                 <div className="flex items-baseline justify-between">

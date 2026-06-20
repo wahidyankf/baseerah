@@ -70,6 +70,40 @@ describe("Controls", () => {
     }
   });
 
+  // Phase 9 Cluster J — id Area label must be short enough not to wrap at 375px
+  it("Phase9J: id locale Area label text is no longer than 10 characters", () => {
+    const { container } = render(
+      <Controls
+        dataset={dataset}
+        previewCityId={firstCity.id}
+        household={{ adults: 1, preschoolKids: 0, schoolKids: 0 }}
+        schoolType="public"
+        area="center"
+        locale="id"
+        onHouseholdChange={() => {}}
+        onSchoolTypeChange={() => {}}
+        onAreaChange={() => {}}
+      />,
+    );
+    const areaLabel = Array.from(container.querySelectorAll("span")).find((el) =>
+      el.className.includes("whitespace-nowrap"),
+    );
+    expect(areaLabel).toBeTruthy();
+    // "Wilayah tempat tinggal" = 22 chars; must be shortened
+    expect((areaLabel!.textContent ?? "").length).toBeLessThanOrEqual(10);
+  });
+
+  // Phase 9 Cluster I — each label+select pair must not mid-pair wrap at 320px
+  it("Phase9I: each label+select pair has its own flex wrapper (not siblings of other pairs)", () => {
+    const { container } = render(<ControlsWithState />);
+    const adultsLabel = container.querySelector('label[for="controls-adults"]');
+    const adultsSelect = container.querySelector("#controls-adults");
+    expect(adultsLabel).toBeTruthy();
+    expect(adultsSelect).toBeTruthy();
+    // Each pair must be isolated in its own wrapper (parent has exactly 2 children)
+    expect(adultsLabel!.parentElement!.children.length).toBe(2);
+  });
+
   // Gherkin (binds): "Adding adults and children changes the modeled expenses"
   it("changing from single to married+2-school-kids increases housing sub-linearly and adds schooling", async () => {
     const user = userEvent.setup();

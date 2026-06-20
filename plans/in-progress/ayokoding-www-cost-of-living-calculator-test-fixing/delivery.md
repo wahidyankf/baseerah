@@ -144,11 +144,15 @@ in scope): `SG-001…006`, `USS-001…005`, `SG-D-001…004`.
 
 ## Phase 2 — Cluster A: Dual-currency display (Critical)
 
-- [ ] [AI] **2.1 RED**: add `fmtDualCurrency` unit tests in
+- [x] [AI] **2.1 RED**: add `fmtDualCurrency` unit tests in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/format.test.ts`
       (e.g. `fmtDualCurrency(3500,"SGD",2250)` → `"SGD 3,500 / $2,250"`).
       Cmd: `npx nx run ayokoding-www:test:unit`.
       **Acceptance**: new test fails (symbol not yet in core).
+
+  **Implementation notes (2026-06-20)**: Created `core/format.test.ts` with 4 tests for
+  `fmtDualCurrency`. All 4 fail: "fmtDualCurrency is not a function" (export absent from
+  core/format.ts). Test suite: 4 failed | 1847 passed.
 
   **Gherkin (binds) →** "Money cells show dual currency in the cost-of-living table"
 
@@ -160,24 +164,36 @@ in scope): `SG-001…006`, `USS-001…005`, `SG-D-001…004`.
     And no money cell shows a bare integer without a currency label
   ```
 
-- [ ] [AI] **2.2 GREEN**: move/promote `fmtDualCurrency` from
+- [x] [AI] **2.2 GREEN**: move/promote `fmtDualCurrency` from
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/city-detail.tsx` into
       `apps/ayokoding-www/src/features/cost-of-living-calculator/core/format.ts`; wire every money
       cell in `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.tsx`
       and `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.tsx` (desktop
       tables + mobile cards) to it. Cmd: `npx nx run ayokoding-www:test:unit`. **Acceptance**: unit
       green; no bare-integer money cell in either table.
-- [ ] [AI] **2.3 REFACTOR**: single import path; remove the now-duplicate local helper in
+
+  **Implementation notes (2026-06-20)**: Added `fmtDualCurrency` to core/format.ts using `$`
+  prefix for USD (`"SGD 3,500 / $2,250"` format). Wired all 11 money cells in cost-of-living.tsx
+  (desktop + mobile) using `fxToUsd(dataset.fx, city.currency)` for conversion. Wired all 6 USD
+  money cells in savings.tsx using `usdAmount / fxRate` for local equivalent. Updated 2 pre-existing
+  EWT-002 tests in city-detail.test.tsx that checked for `/USD/i` (old format) → now check for
+  `/$` and `/SGD/`. All 1851 tests pass.
+
+- [x] [AI] **2.3 REFACTOR**: single import path; remove the now-duplicate local helper in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/city-detail.tsx`.
       Cmd: `npx nx run ayokoding-www:lint typecheck`. **Acceptance**: lint + typecheck green.
+
+  **Implementation notes (2026-06-20)**: Imported `fmtDualCurrency` from core/format in
+  city-detail.tsx; removed local helper def; removed now-unused `fmtNum` import from
+  cost-of-living.tsx. Lint + typecheck clean.
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `npx nx run ayokoding-www:test:unit` — all tests pass including new `fmtDualCurrency` tests.
-- [ ] [AI] `npx nx run ayokoding-www:lint typecheck` — exits 0.
-- [ ] [AI] No bare-integer money cell in `cost-of-living.tsx` or `savings.tsx`.
+- [x] [AI] `npx nx run ayokoding-www:test:unit` — all tests pass including new `fmtDualCurrency` tests.
+- [x] [AI] `npx nx run ayokoding-www:lint typecheck` — exits 0.
+- [x] [AI] No bare-integer money cell in `cost-of-living.tsx` or `savings.tsx`.
 
 > **Pause Safety**: dual-currency formatter promoted to core; tables updated. Safe to stop. To
 > resume: `npx nx run ayokoding-www:test:unit` must pass.
@@ -186,11 +202,20 @@ in scope): `SG-001…006`, `USS-001…005`, `SG-D-001…004`.
 
 ## Phase 3 — Cluster B: Locale-name leak on id desktop (Major)
 
-- [ ] [AI] **3.1 RED**: component test asserting the id desktop cost table renders "Singapura"/"Jepang"
+- [x] [AI] **3.1 RED**: component test asserting the id desktop cost table renders "Singapura"/"Jepang"
       (not "Singapore"/"Japan") in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx`;
       mirror for `savings.test.tsx` and `min-role.test.tsx`.
       Cmd: `npx nx run ayokoding-www:test:unit`. **Acceptance**: tests fail.
+
+  **Implementation notes (2026-06-20)**: Added RED tests to cost-of-living.test.tsx (2),
+  savings.test.tsx (2), min-role.test.tsx (2). Cost-of-living had multi-match issue
+  (`getByText` found both country link + city link "Singapura") — fixed to use
+  `getAllByRole("link").filter(href includes "country=")`. min-role tests failed because
+  locale="id" translates aria-labels, so `/baseline source/i` query fails — fixed to use
+  `container.querySelector("#baseline-source-select")` + `#target-amount-input`. Also
+  changed min-role id tests to use `cityScope` scoped to sg/jp cities so best-city is
+  deterministic. All 1857 tests pass now.
 
   **Gherkin (binds) →** "id-locale tables use Indonesian city and country names"
 
@@ -202,21 +227,31 @@ in scope): `SG-001…006`, `USS-001…005`, `SG-D-001…004`.
     And names lacking an Indonesian translation fall back to English
   ```
 
-- [ ] [AI] **3.2 GREEN**: export `localeName` from
+- [x] [AI] **3.2 GREEN**: export `localeName` from
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.tsx` (or move to
       `../core/`); replace `.name.en` with `localeName(name, locale)` in the country/city cells of
       `shell/cost-of-living.tsx` (~128/131), `shell/savings.tsx` (~150/153),
       `shell/min-role.tsx` `RoleRow` (~133/134) + mobile role cards.
       Cmd: `npx nx run ayokoding-www:test:unit`. **Acceptance**: unit green; English fallback retained.
-- [ ] [AI] **3.3 REFACTOR**: one shared helper, no duplicate definitions.
+
+  **Implementation notes (2026-06-20)**: `localeName` already existed in geo-filters.tsx
+  (private). Added `export` keyword. Wired into cost-of-living.tsx (desktop country/city
+  links), savings.tsx (desktop + mobile), min-role.tsx (`RoleRow` + mobile role cards +
+  city picker dropdowns). All 1857 tests pass.
+
+- [x] [AI] **3.3 REFACTOR**: one shared helper, no duplicate definitions.
       Cmd: `npx nx run ayokoding-www:lint typecheck`.
+
+  **Implementation notes (2026-06-20)**: Single exported `localeName` in geo-filters.tsx;
+  all three tables import from there. Lint + typecheck clean (only pre-existing a11y
+  warnings, no errors).
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `npx nx run ayokoding-www:test:unit` — id locale-name tests pass.
-- [ ] [AI] `npx nx run ayokoding-www:lint typecheck` — exits 0.
+- [x] [AI] `npx nx run ayokoding-www:test:unit` — id locale-name tests pass.
+- [x] [AI] `npx nx run ayokoding-www:lint typecheck` — exits 0.
 
 > **Pause Safety**: id locale names fixed in all three tables. Safe to stop. To resume:
 > `npx nx run ayokoding-www:test:unit` must pass.
@@ -225,11 +260,16 @@ in scope): `SG-001…006`, `USS-001…005`, `SG-D-001…004`.
 
 ## Phase 4 — Cluster C: Tool identity (Critical)
 
-- [ ] [AI] **4.1 RED**: test that the en H1/`calcTitle` is "Cost of Living Calculator" and the id
+- [x] [AI] **4.1 RED**: test that the en H1/`calcTitle` is "Cost of Living Calculator" and the id
       `<title>` is localized in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-content.test.tsx`
       (co-located in `shell/`) + a metadata test.
       Cmd: `npx nx run ayokoding-www:test:unit`.
+
+  **Implementation notes (2026-06-20)**: Added 2 tests in `calculator-content.test.tsx` under
+  "Phase 4 — H1 matches tool identity": en H1 must match `/cost of living calculator/i` and
+  id `generateMetadata` title must match `/kalkulator biaya hidup/i`. Both FAIL as expected
+  (current calcTitle="Salary Savings Calculator"; metadata is hardcoded non-locale).
 
   **Gherkin (binds) →** "Page heading matches the tool identity in each locale"
 
@@ -242,20 +282,28 @@ in scope): `SG-001…006`, `USS-001…005`, `SG-D-001…004`.
     And the active tab reads "Cost of living"
   ```
 
-- [ ] [AI] **4.2 GREEN**: `apps/ayokoding-www/src/features/i18n/core/translations.ts` `calcTitle` →
+- [x] [AI] **4.2 GREEN**: `apps/ayokoding-www/src/features/i18n/core/translations.ts` `calcTitle` →
       "Cost of Living Calculator" (en l.25) / "Kalkulator Biaya Hidup" (id l.179); route the
       locale-aware name through `generateMetadata` in
       `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/page.tsx`.
       Cmd: `npx nx run ayokoding-www:test:unit`. **Acceptance**: H1, `<title>`, tab agree per locale
       (closes UWT-013 too).
-- [ ] [AI] **4.3 REFACTOR**: Cmd: `npx nx run ayokoding-www:lint typecheck`.
+
+  **Implementation notes (2026-06-20)**: Changed en `calcTitle` from "Salary Savings Calculator"
+  to "Cost of Living Calculator"; id `calcTitle` from "Kalkulator Tabungan Gaji" to "Kalkulator
+  Biaya Hidup". Updated `generateMetadata` in page.tsx to read locale from params and return
+  `t(locale, "calcTitle") + " | AyoKoding"`. All 1859 tests pass.
+
+- [x] [AI] **4.3 REFACTOR**: Cmd: `npx nx run ayokoding-www:lint typecheck`.
+
+  **Implementation notes (2026-06-20)**: Lint (warnings only, no errors) + typecheck clean.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `npx nx run ayokoding-www:test:unit` — tool-identity tests pass.
-- [ ] [AI] `npx nx run ayokoding-www:lint typecheck` — exits 0.
+- [x] [AI] `npx nx run ayokoding-www:test:unit` — tool-identity tests pass.
+- [x] [AI] `npx nx run ayokoding-www:lint typecheck` — exits 0.
 
 > **Pause Safety**: tool name consistent across H1, title, and tab in both locales. Safe to stop.
 > To resume: `npx nx run ayokoding-www:test:unit` must pass.
@@ -675,20 +723,54 @@ Per [User-Facing Delivery Hardening](../../../repo-governance/development/qualit
 round) against the running URL(s) across **both** locales. Append each new finding below as an
 unchecked, source-attributed checkbox and fix/tick it before archival.
 
-- [ ] [AI] **11.1** Re-run `web-exploratory-tester`, `web-usability-tester`, `web-design-tester`
+- [x] [AI] **11.1** Re-run `web-exploratory-tester`, `web-usability-tester`, `web-design-tester`
       against `http://localhost:3101/{en,id}/tools/cost-of-living-calculator`.
-- [ ] [AI] **11.2** Append findings here (new `EWT-###`/`UWT-###`/`DWT-###`, continuing the ID
+- [x] [AI] **11.2** Append findings here (new `EWT-###`/`UWT-###`/`DWT-###`, continuing the ID
       series) and fix each. **Acceptance**: no new Critical/Major remains; all appended boxes ticked.
-  - _(retest findings appended during execution)_
+  - **EWT findings (web-exploratory-tester — spec-aware)**
+    - [x] EWT-001 [Major] Zero savings target (0 value) does not activate minimum-role
+          baseline → **FIXED**: `min-role.tsx` `targetAmount > 0` → `>= 0`
+    - [x] EWT-002 [Minor] Page title duplicates `| AyoKoding` suffix (root layout template
+          auto-appends it) → **FIXED**: removed manual suffix from `generateMetadata` in `page.tsx`
+  - **DWT findings (web-design-tester — design-aware)**
+    - [x] DWT-001 [Major] Tab bar overflows at 375px (Indonesian locale — longer tab labels) →
+          **FIXED**: `<TabsList className="overflow-x-auto">` in `calculator-content.tsx`
+    - [x] DWT-002 [Major] Dark mode active tab loses primary-blue fill (libs/web-ui override) →
+          **FIXED**: added `dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground`
+          to all three `TabsTrigger` classNames
+    - [x] DWT-003 [Minor] Savings tab salary input is bare `<input>`, not design-system `Input`
+          primitive → pre-existing; input already uses `Input` from web-ui (DWT agent saw stale
+          state). **FALSE POSITIVE** — no fix needed.
+    - [x] DWT-004 [Minor] Baseline source claimed to be `<select>` → already `SegmentedControl`.
+          **FALSE POSITIVE** — no fix needed.
+    - [x] DWT-005 [Low] Geo-filter selects have inconsistent border-radius → deferred to
+          backlog plan `2026-06-21__ayokoding-www-cost-of-living-design-findings/`
+    - [x] DWT-006 [Trivial] H1 title mismatch (stale cached page) → **FALSE POSITIVE**
+  - **UWT findings (web-usability-tester — spec-blind first-time-user)**
+    - [x] UWT-001 [Major] Savings tab shows all-negative values with no guidance when salary=0 →
+          **FIXED**: added `data-testid="savings-empty-state"` instructional message; table hidden
+          when `grossMonthly === 0`; unit tests updated (SG-001, EWT-012, EWT-014,
+          Singapura/Jepang, steps stub)
+    - [x] UWT-002 [Major] Minimum Role mode selector (SegmentedControl) has no visible group label
+          → **FIXED**: added visible `<p>` label above SegmentedControl in `min-role.tsx`
+    - [x] UWT-003 [Major] Tab sub-descriptions (sr-only) invisible to sighted users →
+          **FIXED**: added visible active-tab description `<p>` below TabsList in
+          `calculator-content.tsx` (shows on Savings/Min Role tabs, hidden on Cost tab)
+    - [x] UWT-004 [Minor] Savings salary input label hard-codes USD → deferred to backlog
+    - [x] UWT-005 [Minor] Tab switches don't update URL → deferred to backlog
+    - [x] UWT-006 [Minor] Min Role tab shows full list when no target set → resolved by UWT-001
+          fix (empty state now appears before the mode controls activate)
+    - [x] UWT-007..009 [Cosmetic] Various minor UX gaps → deferred to backlog plan
+          `2026-06-21__ayokoding-calculator-usability-findings/`
 
 ### Phase 11 Gate
 
 > All checks below must pass before starting Phase 12.
 
-- [ ] [AI] Three-tester retest complete (web-exploratory-tester, web-usability-tester,
+- [x] [AI] Three-tester retest complete (web-exploratory-tester, web-usability-tester,
       web-design-tester run across both locales).
-- [ ] [AI] No new Critical/Major finding remains open.
-- [ ] [AI] All appended retest finding checkboxes ticked.
+- [x] [AI] No new Critical/Major finding remains open.
+- [x] [AI] All appended retest finding checkboxes ticked.
 
 > **Pause Safety**: Rule-15 retest complete; no new Critical/Major open. Safe to stop. To resume:
 > verify all retest findings above are ticked and re-run the three testers if any doubt.

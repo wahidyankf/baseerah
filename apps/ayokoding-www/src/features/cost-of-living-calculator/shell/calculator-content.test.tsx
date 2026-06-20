@@ -137,6 +137,63 @@ describe("UWT-002 — subtitle below H1", () => {
   });
 });
 
+// ─── Phase 6: Tab label purity ────────────────────────────────────────────────
+
+describe("Phase 6 — tab labels are clean single phrases", () => {
+  beforeEach(() => {
+    setupSearchParams({ tab: null, country: null, city: null });
+  });
+
+  it("Phase6: Savings TabsTrigger text content is the label only (description not fused in)", () => {
+    render(<CostOfLivingCalculatorContent />);
+    const savingsTab = screen.getByRole("tab", { name: /savings/i });
+    // Description "See how much you'd save" must NOT be inside the trigger
+    expect(savingsTab.textContent?.trim()).not.toMatch(/see how much/i);
+  });
+
+  it("Phase6: Min Role TabsTrigger text content is the label only (description not fused in)", () => {
+    render(<CostOfLivingCalculatorContent />);
+    const minRoleTab = screen.getByRole("tab", { name: /minimum role/i });
+    // Description "Find the min role you need" must NOT be inside the trigger
+    expect(minRoleTab.textContent?.trim()).not.toMatch(/find the min role/i);
+  });
+
+  it("Phase6: Savings TabsTrigger references description via aria-describedby", () => {
+    render(<CostOfLivingCalculatorContent />);
+    const savingsTab = screen.getByRole("tab", { name: /savings/i });
+    const describedById = savingsTab.getAttribute("aria-describedby");
+    expect(describedById).toBeTruthy();
+    expect(document.getElementById(describedById!)).toBeTruthy();
+  });
+
+  it("Phase6: Min Role TabsTrigger references description via aria-describedby", () => {
+    render(<CostOfLivingCalculatorContent />);
+    const minRoleTab = screen.getByRole("tab", { name: /minimum role/i });
+    const describedById = minRoleTab.getAttribute("aria-describedby");
+    expect(describedById).toBeTruthy();
+    expect(document.getElementById(describedById!)).toBeTruthy();
+  });
+});
+
+// ─── Phase 4: Tool identity — H1 and metadata match "Cost of Living Calculator"
+describe("Phase 4 — H1 matches tool identity", () => {
+  beforeEach(() => {
+    setupSearchParams({ tab: null, country: null, city: null });
+  });
+
+  it("Phase4: en H1 reads 'Cost of Living Calculator'", () => {
+    render(<CostOfLivingCalculatorContent />);
+    const h1 = screen.getByRole("heading", { level: 1 });
+    expect(h1.textContent).toMatch(/cost of living calculator/i);
+  });
+
+  it("Phase4: id generateMetadata title contains 'Kalkulator Biaya Hidup'", async () => {
+    const { generateMetadata } = await import("@/app/[locale]/tools/cost-of-living-calculator/page");
+    const meta = await generateMetadata({ params: Promise.resolve({ locale: "id" }) });
+    expect((meta as { title?: string }).title).toMatch(/kalkulator biaya hidup/i);
+  });
+});
+
 // ─── Cycle 3: URL params initialise GeoFilter state ─────────────────────────
 
 describe("Cycle 3 — URL search params initialise filter state", () => {

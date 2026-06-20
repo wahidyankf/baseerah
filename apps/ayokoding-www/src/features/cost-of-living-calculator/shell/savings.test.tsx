@@ -153,16 +153,24 @@ describe("SavingsTable", () => {
     expect(hasDeficit).toBe(true);
   });
 
-  // EWT-014: sort control must be visible and tappable at mobile widths
-  it("EWT-014: a sort control with data-testid='sort-mobile' is present for mobile users", () => {
+  // EWT-014: sort control must be visible and tappable at mobile widths (only when salary > 0)
+  it("EWT-014: a sort control with data-testid='sort-mobile' is present for mobile users", async () => {
+    const user = userEvent.setup();
     render(<SavingsTable {...defaultProps} />);
+    const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
+    await user.clear(input);
+    await user.type(input, "8000");
     expect(screen.getByTestId("sort-mobile")).toBeTruthy();
   });
 
-  // EWT-012: sort button must have aria-pressed to reflect sort state
+  // EWT-012: sort button must have aria-pressed to reflect sort state (only when salary > 0)
   it("EWT-012: sort button has aria-pressed reflecting sort state", async () => {
     const user = userEvent.setup();
     render(<SavingsTable {...defaultProps} />);
+
+    const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
+    await user.clear(input);
+    await user.type(input, "8000");
 
     const sortBtn = screen.getByRole("button", { name: /sort/i });
     // Initial state: sortAsc is false (descending), aria-pressed should be "false"
@@ -173,25 +181,44 @@ describe("SavingsTable", () => {
     expect(sortBtn).toHaveAttribute("aria-pressed", "true");
   });
 
-  // SG-001: when salary is 0 or empty, each row shows a negative essential-savings amount
-  // (the deficit equals the city's essential expenses in USD) and the percentage shows "—"
-  // because no percentage is computable with zero income.
-  it("SG-001: when salary is 0, every row shows a negative savings amount and percentage of —", () => {
+  // SG-001: when salary is 0, empty-state guidance is shown and no savings table is visible
+  it("SG-001: when salary is 0, empty-state guidance is shown and savings table is hidden", () => {
     render(<SavingsTable {...defaultProps} />);
-    // Salary is 0 by default (no input entered)
+    // Empty state shown
+    expect(screen.getByTestId("savings-empty-state")).toBeTruthy();
+    // Savings cells not rendered
+    expect(screen.queryAllByTestId("savings-essential")).toHaveLength(0);
+  });
 
-    const savingsCells = screen.getAllByTestId("savings-essential");
-    expect(savingsCells.length).toBeGreaterThan(0);
+  // Phase 5: design-system primitives
+  it("Phase5: gross-salary input uses the Input design-system primitive (data-slot='input')", () => {
+    render(<SavingsTable {...defaultProps} />);
+    const input = document.querySelector("#gross-salary-input");
+    expect(input?.getAttribute("data-slot")).toBe("input");
+  });
 
-    for (const cell of savingsCells) {
-      // The savings value must be negative (city essentials in USD, negated)
-      const raw = parseFloat(cell.getAttribute("data-usd") ?? "0");
-      expect(raw).toBeLessThan(0);
+  // Gherkin (binds): "id-locale tables use Indonesian city and country names"
+  describe("id locale name rendering", () => {
+    it("renders 'Singapura' in the Country column when locale=id", async () => {
+      const user = userEvent.setup();
+      render(<SavingsTable {...defaultProps} locale="id" />);
+      const input = screen.getByRole("spinbutton", { name: /gaji kotor/i });
+      await user.clear(input);
+      await user.type(input, "8000");
+      const countryLinks = screen.getAllByRole("link").filter((el) => el.getAttribute("href")?.includes("country="));
+      const countryTexts = countryLinks.map((l) => l.textContent ?? "");
+      expect(countryTexts.some((t) => t === "Singapura")).toBe(true);
+    });
 
-      // The cell text must contain "—" (em dash) for the percentage, not a numeric %
-      const text = cell.textContent ?? "";
-      expect(text).toContain("—");
-      expect(text).not.toMatch(/\d+%/);
-    }
+    it("renders 'Jepang' in the Country column when locale=id", async () => {
+      const user = userEvent.setup();
+      render(<SavingsTable {...defaultProps} locale="id" />);
+      const input = screen.getByRole("spinbutton", { name: /gaji kotor/i });
+      await user.clear(input);
+      await user.type(input, "8000");
+      const countryLinks = screen.getAllByRole("link").filter((el) => el.getAttribute("href")?.includes("country="));
+      const countryTexts = countryLinks.map((l) => l.textContent ?? "");
+      expect(countryTexts.some((t) => t === "Jepang")).toBe(true);
+    });
   });
 });

@@ -69,16 +69,29 @@ describe("CityDetail", () => {
     render(<CityDetail {...defaultProps} />);
 
     const sunk = screen.getByTestId("relocation-sunk");
-    // Should contain "USD" somewhere in the text
-    expect(sunk.textContent).toMatch(/USD/i);
+    // Should contain "$" (USD indicator) and the local currency code
+    expect(sunk.textContent).toMatch(/\$/);
+    expect(sunk.textContent).toMatch(/SGD/);
   });
 
   it("EWT-002: liquidity-reserve row shows both local currency and USD value", () => {
     render(<CityDetail {...defaultProps} />);
 
     const liquidity = screen.getByTestId("liquidity-reserve");
-    // Should contain "USD" somewhere in the text
-    expect(liquidity.textContent).toMatch(/USD/i);
+    // Should contain "$" (USD indicator) and the local currency code
+    expect(liquidity.textContent).toMatch(/\$/);
+    expect(liquidity.textContent).toMatch(/SGD/);
+  });
+
+  // Phase 9 Cluster M — visible section headings (not only aria-label)
+  it("Phase9M: renders visible heading for 'Monthly expenses' section", () => {
+    render(<CityDetail {...defaultProps} />);
+    expect(screen.getByRole("heading", { name: /monthly expenses/i })).toBeTruthy();
+  });
+
+  it("Phase9M: renders visible heading for 'Relocation costs' section", () => {
+    render(<CityDetail {...defaultProps} />);
+    expect(screen.getByRole("heading", { name: /relocation costs/i })).toBeTruthy();
   });
 
   // EWT-007: per-category rows in city-detail must scale for household size so

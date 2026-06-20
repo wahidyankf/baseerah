@@ -26,6 +26,13 @@ export function middleware(request: NextRequest) {
   const segments = pathname.split("/").filter(Boolean);
   const firstSegment = segments[0];
 
+  // Redirect uppercase locale to canonical lowercase (e.g. /EN/ → /en/)
+  if (firstSegment && isValidLocale(firstSegment.toLowerCase()) && firstSegment !== firstSegment.toLowerCase()) {
+    const rest = segments.slice(1);
+    const newPath = `/${firstSegment.toLowerCase()}${rest.length > 0 ? `/${rest.join("/")}` : ""}`;
+    return NextResponse.redirect(new URL(newPath, request.url), { status: 308 });
+  }
+
   // If no valid locale prefix, redirect to default locale
   if (firstSegment && !isValidLocale(firstSegment)) {
     // Don't redirect for static assets

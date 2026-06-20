@@ -1,4 +1,13 @@
-import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@open-sharia-enterprise/web-ui";
+import {
+  Badge,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@open-sharia-enterprise/web-ui";
 import { healthcareBadgeHue } from "../core/format";
 import type { Dataset, Household } from "../core/data/cities";
 import type { Area, SchoolType } from "../core/calc";
@@ -11,7 +20,9 @@ import {
   scaleAmount,
   schoolLocal,
 } from "../core/calc";
-import { fmtNum } from "../core/format";
+import { fmtDualCurrency } from "../core/format";
+import { fxToUsd } from "../core/data/fx";
+import { localeName } from "./geo-filters";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 
@@ -52,9 +63,11 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
   const rows = dataset.cities.map((city) => {
     const country = countryById[city.countryId];
     const e = city.expenses;
+    const fxRate = fxToUsd(dataset.fx, city.currency);
     return {
       city,
       country,
+      fxRate,
       housing: scaleAmount(e.housing.amount, "housing", household, area),
       food: scaleAmount(e.food.amount, "food", household, area),
       transport: scaleAmount(e.transport.amount, "transport", household, area),
@@ -90,6 +103,9 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
         />
         <div className="overflow-x-auto">
           <Table>
+            <TableCaption data-testid="area-caption" className="text-xs text-muted-foreground">
+              {t(locale, area === "center" ? "optCenter" : "optRural")}
+            </TableCaption>
             <TableHeader>
               <TableRow>
                 {/* Identity columns — always visible */}
@@ -125,19 +141,23 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                 <TableRow key={r.city.id}>
                   {/* Identity cells */}
                   <TableCell>
-                    <a href={`?tab=cost&country=${r.city.countryId}`}>{r.country?.name.en ?? r.city.countryId}</a>
+                    <a href={`?tab=cost&country=${r.city.countryId}`}>
+                      {r.country ? localeName(r.country.name, locale) : r.city.countryId}
+                    </a>
                   </TableCell>
                   <TableCell>
-                    <a href={`?tab=cost&city=${r.city.id}`}>{r.city.name.en}</a>
+                    <a href={`?tab=cost&city=${r.city.id}`}>{localeName(r.city.name, locale)}</a>
                   </TableCell>
                   {/* Summary cells */}
-                  <TableCell className="text-right font-medium">{fmtNum(r.total)}</TableCell>
+                  <TableCell className="text-right font-medium">
+                    {fmtDualCurrency(r.total, r.city.currency, r.total * r.fxRate)}
+                  </TableCell>
                   <TableCell
                     data-testid={`col-essentials-${r.city.id}`}
                     data-raw={r.essentials}
                     className="text-right font-medium"
                   >
-                    {fmtNum(r.essentials)}
+                    {fmtDualCurrency(r.essentials, r.city.currency, r.essentials * r.fxRate)}
                   </TableCell>
                   {/* Breakdown cells */}
                   <TableCell className={tabletHidden}>
@@ -158,53 +178,57 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                     data-raw={r.housing}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.housing)}
+                    {fmtDualCurrency(r.housing, r.city.currency, r.housing * r.fxRate)}
                   </TableCell>
                   <TableCell
                     data-testid={`col-food-${r.city.id}`}
                     data-raw={r.food}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.food)}
+                    {fmtDualCurrency(r.food, r.city.currency, r.food * r.fxRate)}
                   </TableCell>
                   <TableCell
                     data-testid={`col-transport-${r.city.id}`}
                     data-raw={r.transport}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.transport)}
+                    {fmtDualCurrency(r.transport, r.city.currency, r.transport * r.fxRate)}
                   </TableCell>
                   <TableCell
                     data-testid={`col-utilities-${r.city.id}`}
                     data-raw={r.utilities}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.utilities)}
+                    {fmtDualCurrency(r.utilities, r.city.currency, r.utilities * r.fxRate)}
                   </TableCell>
                   <TableCell
                     data-testid={`col-healthcare-${r.city.id}`}
                     data-raw={r.healthcare}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.healthcare)}
+                    {fmtDualCurrency(r.healthcare, r.city.currency, r.healthcare * r.fxRate)}
                   </TableCell>
                   <TableCell
                     data-testid={`col-childcare-${r.city.id}`}
                     data-raw={r.childcare}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.childcare)}
+                    {fmtDualCurrency(r.childcare, r.city.currency, r.childcare * r.fxRate)}
                   </TableCell>
                   <TableCell
                     data-testid={`col-school-${r.city.id}`}
                     data-raw={r.school}
                     className={`text-right ${tabletHidden}`}
                   >
-                    {fmtNum(r.school)}
+                    {fmtDualCurrency(r.school, r.city.currency, r.school * r.fxRate)}
                   </TableCell>
                   {/* One-time cost cells */}
-                  <TableCell className="text-right">{fmtNum(r.relocation)}</TableCell>
-                  <TableCell className="text-right">{fmtNum(r.liquidity)}</TableCell>
+                  <TableCell className="text-right">
+                    {fmtDualCurrency(r.relocation, r.city.currency, r.relocation * r.fxRate)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {fmtDualCurrency(r.liquidity, r.city.currency, r.liquidity * r.fxRate)}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -221,6 +245,14 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                 {r.city.name[locale] ?? r.city.name.en}
               </a>
               {r.country && (
+                <a
+                  href={`?tab=cost&country=${r.city.countryId}`}
+                  className="text-xs text-primary-foreground/80 underline"
+                >
+                  {localeName(r.country.name, locale)}
+                </a>
+              )}
+              {r.country && (
                 <Badge
                   variant="outline"
                   hue={healthcareBadgeHue(r.country.healthcareModelType)}
@@ -231,17 +263,52 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
               )}
             </div>
             <div className="space-y-1 p-3">
-              <CardRow label={t(locale, "colHousing")} value={fmtNum(r.housing)} />
-              <CardRow label={t(locale, "colFood")} value={fmtNum(r.food)} />
-              <CardRow label={t(locale, "colTransport")} value={fmtNum(r.transport)} />
-              <CardRow label={t(locale, "colUtilities")} value={fmtNum(r.utilities)} />
-              <CardRow label={t(locale, "colHealthcareOOP")} value={fmtNum(r.healthcare)} />
-              <CardRow label={t(locale, "colChildcare")} value={fmtNum(r.childcare)} />
-              <CardRow label={t(locale, "colSchool")} value={fmtNum(r.school)} />
-              <CardRow label={t(locale, "colEssentials")} value={fmtNum(r.essentials)} emphasis="subtotal" />
-              <CardRow label={t(locale, "colTotal")} value={fmtNum(r.total)} emphasis="total" />
-              <CardRow label={t(locale, "colRelocationSunk")} value={fmtNum(r.relocation)} />
-              <CardRow label={t(locale, "colLiquidityReserve")} value={fmtNum(r.liquidity)} />
+              <CardRow
+                label={t(locale, "colHousing")}
+                value={fmtDualCurrency(r.housing, r.city.currency, r.housing * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colFood")}
+                value={fmtDualCurrency(r.food, r.city.currency, r.food * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colTransport")}
+                value={fmtDualCurrency(r.transport, r.city.currency, r.transport * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colUtilities")}
+                value={fmtDualCurrency(r.utilities, r.city.currency, r.utilities * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colHealthcareOOP")}
+                value={fmtDualCurrency(r.healthcare, r.city.currency, r.healthcare * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colChildcare")}
+                value={fmtDualCurrency(r.childcare, r.city.currency, r.childcare * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colSchool")}
+                value={fmtDualCurrency(r.school, r.city.currency, r.school * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colEssentials")}
+                value={fmtDualCurrency(r.essentials, r.city.currency, r.essentials * r.fxRate)}
+                emphasis="subtotal"
+              />
+              <CardRow
+                label={t(locale, "colTotal")}
+                value={fmtDualCurrency(r.total, r.city.currency, r.total * r.fxRate)}
+                emphasis="total"
+              />
+              <CardRow
+                label={t(locale, "colRelocationSunk")}
+                value={fmtDualCurrency(r.relocation, r.city.currency, r.relocation * r.fxRate)}
+              />
+              <CardRow
+                label={t(locale, "colLiquidityReserve")}
+                value={fmtDualCurrency(r.liquidity, r.city.currency, r.liquidity * r.fxRate)}
+              />
             </div>
           </div>
         ))}

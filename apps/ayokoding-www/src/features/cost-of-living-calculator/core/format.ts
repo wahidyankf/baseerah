@@ -16,6 +16,10 @@ export function fmtCurrencyTrailing(n: number, code: string): string {
  * covered), mandatory payroll insurance (mixed) → honey (amber, partly covered), out-of-pocket
  * → terracotta (red, you pay it yourself).
  */
+export function fmtDualCurrency(localAmount: number, localCurrency: string, usdAmount: number): string {
+  return `${fmtCurrency(localAmount, localCurrency)} / $${fmtNum(usdAmount)}`;
+}
+
 export function healthcareBadgeHue(type: "oop" | "tax-funded" | "mixed"): "sage" | "honey" | "terracotta" {
   if (type === "tax-funded") return "sage";
   if (type === "mixed") return "honey";

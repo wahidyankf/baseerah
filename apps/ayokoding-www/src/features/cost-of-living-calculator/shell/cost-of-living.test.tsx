@@ -287,4 +287,58 @@ describe("CostOfLivingTable", () => {
       expect(Math.abs(categorySum - essentials)).toBeLessThan(0.01);
     }
   });
+
+  // Phase 9 Cluster H — area-toggle visible feedback
+  describe("Phase 9H — area toggle shows visible caption", () => {
+    it("Phase9H: cost table shows a visible area caption indicating current area (center)", () => {
+      render(<CostOfLivingTable {...defaultProps} area="center" />);
+      const caption = screen.getByTestId("area-caption");
+      expect(caption).toBeTruthy();
+      expect(caption.textContent).toMatch(/city center/i);
+    });
+
+    it("Phase9H: area caption updates when area is rural", () => {
+      const { rerender } = render(<CostOfLivingTable {...defaultProps} area="center" />);
+      rerender(<CostOfLivingTable {...defaultProps} area="rural" />);
+      const caption = screen.getByTestId("area-caption");
+      expect(caption.textContent).toMatch(/rural/i);
+    });
+  });
+
+  // Phase 8: mobile cost card header shows both city and country
+  describe("Phase 8 — mobile card header shows city and country", () => {
+    it("Phase8: each mobile cost card header links to the country (en locale)", () => {
+      render(<CostOfLivingTable {...defaultProps} />);
+      const cards = screen.getByTestId("mobile-city-cards");
+      const countryLinks = cards.querySelectorAll('a[href*="country="]');
+      expect(countryLinks.length).toBe(dataset.cities.length);
+    });
+
+    it("Phase8: mobile cost card header shows Indonesian country name in id locale", () => {
+      render(<CostOfLivingTable {...defaultProps} locale="id" />);
+      const cards = screen.getByTestId("mobile-city-cards");
+      const countryLinks = Array.from(cards.querySelectorAll('a[href*="country="]'));
+      const countryTexts = countryLinks.map((l) => l.textContent ?? "");
+      expect(countryTexts.some((t) => t === "Singapura")).toBe(true);
+    });
+  });
+
+  // Gherkin (binds): "id-locale tables use Indonesian city and country names"
+  describe("id locale name rendering", () => {
+    it("renders 'Singapura' (not 'Singapore') in the Country column when locale=id", () => {
+      render(<CostOfLivingTable {...defaultProps} locale="id" />);
+      // Singapore country name in Indonesian is "Singapura" — should appear in at least one country link
+      const countryLinks = screen.getAllByRole("link").filter((el) => el.getAttribute("href")?.includes("country="));
+      const countryTexts = countryLinks.map((l) => l.textContent ?? "");
+      expect(countryTexts.some((t) => t === "Singapura")).toBe(true);
+    });
+
+    it("renders 'Jepang' (not 'Japan') in the Country column when locale=id", () => {
+      render(<CostOfLivingTable {...defaultProps} locale="id" />);
+      // Japan country name in Indonesian is "Jepang"
+      const countryLinks = screen.getAllByRole("link").filter((el) => el.getAttribute("href")?.includes("country="));
+      const countryTexts = countryLinks.map((l) => l.textContent ?? "");
+      expect(countryTexts.some((t) => t === "Jepang")).toBe(true);
+    });
+  });
 });

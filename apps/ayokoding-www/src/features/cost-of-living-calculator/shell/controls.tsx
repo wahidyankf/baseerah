@@ -10,7 +10,7 @@ import { t } from "@/features/i18n/core/translations";
 import { cn } from "@/lib/utils";
 
 /** Accessible 2+-option segmented control (radiogroup) matching the hi-fi mockups. */
-function SegmentedControl<T extends string>({
+export function SegmentedControl<T extends string>({
   label,
   value,
   options,
@@ -91,65 +91,71 @@ export function Controls({
     <div className="space-y-2">
       {/* Household selectors */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 [&_label]:text-sm [&_label]:font-medium [&_select]:rounded-md [&_select]:border [&_select]:border-border [&_select]:bg-background [&_select]:px-2 [&_select]:py-1 [&_select]:text-sm">
-        <label htmlFor="controls-adults">{t(locale, "labelAdults")}</label>
-        <select
-          id="controls-adults"
-          aria-label={t(locale, "labelAdults")}
-          value={household.adults}
-          className="min-h-[44px]"
-          onChange={(e) =>
-            onHouseholdChange({
-              ...household,
-              adults: parseInt(e.target.value, 10) as 1 | 2,
-            })
-          }
-        >
-          {adultOptions.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-1">
+          <label htmlFor="controls-adults">{t(locale, "labelAdults")}</label>
+          <select
+            id="controls-adults"
+            aria-label={t(locale, "labelAdults")}
+            value={household.adults}
+            className="min-h-[44px]"
+            onChange={(e) =>
+              onHouseholdChange({
+                ...household,
+                adults: parseInt(e.target.value, 10) as 1 | 2,
+              })
+            }
+          >
+            {adultOptions.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label htmlFor="controls-preschool">{t(locale, "labelPreschoolKids")}</label>
-        <select
-          id="controls-preschool"
-          aria-label={t(locale, "labelPreschoolKids")}
-          value={household.preschoolKids}
-          className="min-h-[44px]"
-          onChange={(e) =>
-            onHouseholdChange({
-              ...household,
-              preschoolKids: parseInt(e.target.value, 10) as 0 | 1 | 2 | 3,
-            })
-          }
-        >
-          {kidOptions.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-1">
+          <label htmlFor="controls-preschool">{t(locale, "labelPreschoolKids")}</label>
+          <select
+            id="controls-preschool"
+            aria-label={t(locale, "labelPreschoolKids")}
+            value={household.preschoolKids}
+            className="min-h-[44px]"
+            onChange={(e) =>
+              onHouseholdChange({
+                ...household,
+                preschoolKids: parseInt(e.target.value, 10) as 0 | 1 | 2 | 3,
+              })
+            }
+          >
+            {kidOptions.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label htmlFor="controls-schoolkids">{t(locale, "labelSchoolKids")}</label>
-        <select
-          id="controls-schoolkids"
-          aria-label={t(locale, "labelSchoolKids")}
-          value={household.schoolKids}
-          className="min-h-[44px]"
-          onChange={(e) =>
-            onHouseholdChange({
-              ...household,
-              schoolKids: parseInt(e.target.value, 10) as 0 | 1 | 2 | 3,
-            })
-          }
-        >
-          {kidOptions.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-1">
+          <label htmlFor="controls-schoolkids">{t(locale, "labelSchoolKids")}</label>
+          <select
+            id="controls-schoolkids"
+            aria-label={t(locale, "labelSchoolKids")}
+            value={household.schoolKids}
+            className="min-h-[44px]"
+            onChange={(e) =>
+              onHouseholdChange({
+                ...household,
+                schoolKids: parseInt(e.target.value, 10) as 0 | 1 | 2 | 3,
+              })
+            }
+          >
+            {kidOptions.map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* School-type segmented control — only when school-age kids > 0 */}

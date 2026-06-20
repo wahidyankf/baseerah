@@ -35,7 +35,7 @@ const REGION_LABELS: Record<Region, string> = {
 };
 
 /** Returns the locale-specific name, falling back to English. */
-function localeName(name: { en: string; id: string }, locale: Locale): string {
+export function localeName(name: { en: string; id: string }, locale: Locale): string {
   return name[locale] ?? name.en;
 }
 

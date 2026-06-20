@@ -27,8 +27,7 @@ describe("MinRoleTable", () => {
     render(<MinRoleTable {...defaultProps} />);
 
     // Select savings target baseline
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
 
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
@@ -70,8 +69,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -87,8 +85,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -109,8 +106,7 @@ describe("MinRoleTable", () => {
 
     render(<MinRoleTable {...defaultProps} cityScope={idCities} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "500");
@@ -130,8 +126,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -148,8 +143,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -167,8 +161,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "reference_role");
+    await user.click(screen.getByRole("radio", { name: /reference role/i }));
 
     // City selector and role selector appear
     expect(screen.getByRole("combobox", { name: /reference city/i })).toBeTruthy();
@@ -189,8 +182,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "my_salary");
+    await user.click(screen.getByRole("radio", { name: /my salary/i }));
 
     // Gross salary input and city selector appear
     expect(screen.getByRole("spinbutton", { name: /my gross monthly/i })).toBeTruthy();
@@ -211,8 +203,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -233,8 +224,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -255,8 +245,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     const { rerender } = render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "500");
@@ -276,8 +265,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "999999999");
@@ -291,8 +279,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     const { rerender } = render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -313,8 +300,7 @@ describe("MinRoleTable", () => {
     );
     render(<MinRoleTable {...defaultProps} cityScope={seaCities} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -329,8 +315,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    const sourceSelect = screen.getByRole("combobox", { name: /baseline source/i });
-    await user.selectOptions(sourceSelect, "savings_target");
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
     const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
@@ -339,5 +324,43 @@ describe("MinRoleTable", () => {
     for (const cell of bestCityCells) {
       expect(cell.textContent).not.toMatch(/israel|tel aviv/i);
     }
+  });
+
+  // Phase 5: design-system primitives
+  it("Phase5: baseline source selector uses a segmented control (role='radiogroup')", () => {
+    render(<MinRoleTable {...defaultProps} />);
+    const radiogroup = screen.getByRole("radiogroup", { name: /baseline source/i });
+    expect(radiogroup).toBeTruthy();
+  });
+
+  // Gherkin (binds): "id-locale tables use Indonesian city and country names"
+  describe("id locale name rendering", () => {
+    it("renders 'Singapura' in the best-city column when locale=id", async () => {
+      const user = userEvent.setup();
+      // Scope to Singapore only so best-city for every role is Singapore (id: "Singapura")
+      const sgCities = dataset.cities.filter((c) => c.countryId === "sg");
+      render(<MinRoleTable {...defaultProps} cityScope={sgCities} locale="id" />);
+      // savings_target is default; type directly into target input
+      const targetInput = document.querySelector("#target-amount-input") as HTMLInputElement;
+      await user.clear(targetInput);
+      await user.type(targetInput, "500");
+      const bestCityCells = screen.getAllByTestId("best-city-cell");
+      const texts = bestCityCells.map((c) => c.textContent ?? "");
+      expect(texts.some((t) => /Singapura/.test(t))).toBe(true);
+    });
+
+    it("renders 'Jepang' in the best-city column when locale=id", async () => {
+      const user = userEvent.setup();
+      // Scope to Japan only so best-city for every role has country name "Jepang" (id locale)
+      const jpCities = dataset.cities.filter((c) => c.countryId === "jp");
+      render(<MinRoleTable {...defaultProps} cityScope={jpCities} locale="id" />);
+      // savings_target is default; type directly into target input
+      const targetInput = document.querySelector("#target-amount-input") as HTMLInputElement;
+      await user.clear(targetInput);
+      await user.type(targetInput, "500");
+      const bestCityCells = screen.getAllByTestId("best-city-cell");
+      const texts = bestCityCells.map((c) => c.textContent ?? "");
+      expect(texts.some((t) => /Jepang/.test(t))).toBe(true);
+    });
   });
 });

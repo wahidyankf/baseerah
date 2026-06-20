@@ -107,32 +107,39 @@ export function CostOfLivingCalculatorContent() {
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         {/* Colored segmented tab control — active tab uses ayokoding brand primary (blue) */}
-        <TabsList aria-label={t(locale, "ariaTabsNav")}>
+        <TabsList aria-label={t(locale, "ariaTabsNav")} className="overflow-x-auto">
           <TabsTrigger
             value="cost"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
           >
             {t(locale, "tabCostOfLiving")}
           </TabsTrigger>
           <TabsTrigger
             value="savings"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            aria-describedby="tab-desc-savings"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
           >
             {t(locale, "tabSavings")}
-            <span data-testid="tab-desc-savings" className="sr-only">
-              {t(locale, "tabSavingsDesc")}
-            </span>
           </TabsTrigger>
           <TabsTrigger
             value="min-role"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            aria-describedby="tab-desc-min-role"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
           >
             {t(locale, "tabMinRole")}
-            <span data-testid="tab-desc-min-role" className="sr-only">
-              {t(locale, "tabMinRoleDesc")}
-            </span>
           </TabsTrigger>
         </TabsList>
+        <span id="tab-desc-savings" data-testid="tab-desc-savings" className="sr-only">
+          {t(locale, "tabSavingsDesc")}
+        </span>
+        <span id="tab-desc-min-role" data-testid="tab-desc-min-role" className="sr-only">
+          {t(locale, "tabMinRoleDesc")}
+        </span>
+        {activeTab !== "cost" && (
+          <p className="mt-1 text-sm text-muted-foreground" aria-hidden="true">
+            {activeTab === "savings" ? t(locale, "tabSavingsDesc") : t(locale, "tabMinRoleDesc")}
+          </p>
+        )}
 
         {/* Shared geo filters */}
         <GeoFilters
