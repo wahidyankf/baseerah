@@ -202,8 +202,10 @@ pass starts. It is **non-destructive / passive** — it reads, clicks, resizes, 
 mutates server state.
 
 **Agent**: `web-exploratory-tester` — spec-aware. Compares live behaviour against existing
-`specs/**` Gherkin; produces a findings catalog `EWT-###` (functional, behavioural-consistency,
-UI/UX, responsive, accessibility, URL/IA, passive security) plus spec-gap proposals `SG-###`.
+`specs/**` Gherkin; actively hunts edge cases and boundary conditions; produces a findings catalog
+`EWT-###` (functional, behavioural-consistency, edge-case/boundary, UI/UX, responsive, accessibility,
+URL/IA, passive security) plus spec-gap proposals `SG-###` (Gherkin scenarios for correct-but-unspecced
+behaviour, edge cases especially).
 
 - **Args**: `target-urls: {input.target-urls}`, `testing-goal: {input.testing-goal}`,
   `breakpoints: {input.breakpoints}`, `locales: {input.locales}`.
@@ -227,20 +229,26 @@ plan. Also passive / non-destructive.
 
 **Agent**: `web-usability-tester` — spec-blind. Deliberately ignores specs/source/mockups; judges
 only first-time-user perception against Nielsen's 10 heuristics (0–4 severity), cognitive walkthrough,
-information scent, and responsive usability; produces a findings catalog `UWT-###`. Emits no
-spec-gaps (proposing spec coverage requires reading the spec, which it refuses).
+information scent, edge-case UX states (empty/zero-result/loading/error), and responsive usability;
+produces a findings catalog `UWT-###`. Emits no spec-_gaps_ (gap analysis requires reading the specs,
+which it refuses), but MAY emit `USS-###` **spec-suggestions** — Gherkin scenarios for behaviour a
+first-timer expects but the page lacks, each flagged as a spec-blind candidate for reconciliation.
 
 - **Args**: same as Phase 1.
-- **Output**: Returns its findings + `walkthrough` body as structured text.
+- **Output**: Returns its findings + `walkthrough` + any `USS-###` spec-suggestions as structured text.
 
 **Integrate**: Add a **separate** `## Usability findings (UWT-###)` section to `findings.md` and the
 `walkthrough.md` transcript, merge the usability slice into README/brd/prd, and add a short
 **cross-reference note** flagging where an EWT and a UWT describe the same underlying defect (e.g. the
 `html lang="en"` locale issue both will catch) so the shared root cause is fixed once. The findings
 of the two sources MUST remain in their own labelled sections — a reader must always be able to tell
-an exploratory finding from a usability finding.
+an exploratory finding from a usability finding. Carry the usability tester's `USS-###`
+**spec-suggestions** into the plan's spec coverage too — keep them labelled as spec-blind suggestions
+distinct from the exploratory `SG-###` spec-gaps, and let the Phase 3 grill decide which to accept into
+`specs/**`.
 
-**Success criteria**: Both findings sections present and source-attributed in one `findings.md`.
+**Success criteria**: Both findings sections present and source-attributed in one `findings.md`;
+`SG-###` and `USS-###` spec proposals captured and kept distinct.
 
 ### 3. Solidify — tech-docs, delivery, and (conditional) UI assets (Sequential, delegated)
 

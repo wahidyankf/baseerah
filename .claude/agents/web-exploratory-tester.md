@@ -1,6 +1,6 @@
 ---
 name: web-exploratory-tester
-description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios for correct behaviours that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use web-usability-tester instead.
+description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Actively hunts edge cases and boundary conditions, not just the happy path. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios (in Gherkin) for correct behaviours — especially edge-case behaviours — that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, edge-case/boundary, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use web-usability-tester instead.
 tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, WebSearch
 model: sonnet
 color: green
@@ -158,6 +158,17 @@ Apply the dimensions relevant to the goal; record which were covered and which w
 
 - **Functional flows** — every primary journey works end-to-end; state changes/navigation are correct;
   computed values are _right_ (not just present — compare to an independent calculation or the spec).
+- **Edge cases & boundary conditions (always probe — find at least one, or state explicitly that a
+  genuine attempt surfaced none)** — deliberately push past the happy path. Exercise: boundary and
+  extreme values (min/max, zero, negative, very large, numeric overflow, off-by-one limits);
+  empty / null / missing / whitespace-only inputs; very long strings and large datasets; special
+  characters, Unicode, emoji, and RTL text; malformed or unexpected input types/formats; the
+  **empty / zero-result / loading / error** state of every data view (not just the populated one);
+  state-sequence edges (rapid repeat, double-submit, back/forward mid-flow, stale or concurrent
+  state); and temporal edges (timezone/DST, expiry, ordering, debounce/race). A _wrong_ behaviour at
+  an edge is a finding; a _correct_ edge behaviour that `specs/**` does not describe is a prime
+  **spec-gap** candidate (see _Specs as Ground Truth_). This dimension is mandatory for every run —
+  edge coverage is never "not applicable", only "attempted and none found" with that stated.
 - **Behavioural consistency** — the surface must not contradict itself, even where no single spec or
   mockup is violated; an internal contradiction _is_ a defect whose "expected" cites the conflicting
   instance (the other page, state, or locale), not an external spec. (Divergence from a `specs/**`
@@ -251,6 +262,10 @@ While touring the URL(s) / location, the agent continually observes behaviours t
 `specs/**` do **not** describe. Each is a candidate **spec gap** — a scenario the specs ought to carry so
 the behaviour is protected by the
 [Specs & Gherkin Completeness rule](../../repo-governance/development/quality/feature-change-completeness.md).
+**Edge-case behaviours are the richest source of gaps**: boundary handling, empty/zero-result states,
+error recovery, and input-validation rules are frequently correct in the running app yet absent from
+the spec. When an edge behaviour observed under the dimension above is correct and intended, propose it
+as a Gherkin scenario here rather than letting it stay unprotected.
 
 Propose a gap only when the observed behaviour is:
 
@@ -350,11 +365,13 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 1. Confirm URL(s) + goal; resolve depth, breakpoints, locales, ground truth.
 2. Frame charters from the goal.
 3. Establish the baseline (WebFetch + curl): structure, links, headers, redirects.
-4. Run interactive/visual/responsive/perf passes per breakpoint and locale as the goal requires.
+4. Run interactive/visual/responsive/perf passes per breakpoint and locale as the goal requires;
+   deliberately exercise edge cases and boundary conditions (the Data dimension + Antisocial/Intellectual
+   tour), not only the happy path — surface at least one edge observation or record that none were found.
 5. Compare every observation against ground truth — including each mapped `specs/**` scenario; recompute
    values; confirm reproducibility.
-6. Detect spec gaps: catalog correct behaviours the live target exhibits but `specs/**` does not cover,
-   and draft proposed Gherkin for each.
+6. Detect spec gaps: catalog correct behaviours the live target exhibits but `specs/**` does not cover —
+   giving edge-case behaviours special attention — and draft proposed Gherkin for each.
 7. Triage findings with severity + proposed priority; de-duplicate.
 8. Write the backlog plan (README, brd, prd, findings, spec-gaps) with steps-to-reproduce, Gherkin ACs,
    and spec-gap proposals.
