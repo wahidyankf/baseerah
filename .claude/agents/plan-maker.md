@@ -415,6 +415,8 @@ Unsolicited PR steps conflict with Trunk Based Development. `plan-checker` will 
 - [Plans Organization Convention](../../repo-governance/conventions/structure/plans.md) - Plan structure and organization
 - [Trunk Based Development Convention](../../repo-governance/development/workflow/trunk-based-development.md) - Git workflow
 - [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Fifteen durable rules for UI-bearing plans; emit delivery steps for rules 1–8 and 15 (visual-parity gate, design-system primitive naming, per-breakpoint responsive steps, mockup colors as theme tokens, value-bearing calculation tests, deploy-config-is-code, pre-archival production sign-off, checkbox lockstep, and — for web-UI plans — a near-end `web-exploratory-tester` retest round (rule 15) whose findings are appended to `delivery.md` as unchecked task-list items in a "Rule-15 retest follow-ups" section and fixed/ticked before archival)
+- [Manual Behavioral Verification Convention](../../repo-governance/development/quality/manual-behavioral-verification.md) - Mandatory Playwright/curl verification; emit the manual-assertion sections for any UI/API-touching plan
+- [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) - Emit evidence-capture steps in manual-assertion sections: screenshots to the plan's `evidence/` subfolder (named by phase/locale/breakpoint), curl responses inlined in `delivery.md`, ALL supported locales covered
 
 **Related Agents / Workflows:**
 
@@ -695,21 +697,39 @@ no commit.
 
 When the plan touches web UI or API code, the delivery plan MUST include manual behavioral assertion sections. Plans without them will be flagged as CRITICAL by plan-checker.
 
+**Two hard requirements bind every manual-assertion section:**
+
+1. **Locale coverage** — for any **multi-locale** app, every UI-verification step runs across ALL
+   supported locales (e.g. `en` AND `id`), never just the default. Discover the locale set from the
+   app's i18n config (`apps/<app>/src/features/i18n/` or `next.config.ts`) and name it in the steps.
+   A single-locale verification on a bilingual app is INCOMPLETE.
+2. **Evidence capture** — every manual-verification step produces a committed evidence artifact:
+   screenshots in the plan's `evidence/` subfolder (named
+   `phase-N-<description>-<locale>-<breakpoint>px.png`), curl responses inlined in `delivery.md` as
+   fenced code blocks. "Verified manually" without committed evidence is INCOMPLETE. See the
+   [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
+
 ### For Plans Touching Web UI
 
-ALWAYS include:
+ALWAYS include (substitute the discovered locale set for `{en,id}` and the app's breakpoints):
 
 ```markdown
-### Manual UI Verification (Playwright MCP)
+### Manual UI Verification (Playwright MCP) — all locales × all breakpoints
 
-- [ ] Start dev server: `nx dev [project-name]`
-- [ ] Navigate to affected pages via `browser_navigate`
-- [ ] Inspect DOM via `browser_snapshot` — verify correct rendering
-- [ ] Test interactive flows via `browser_click` / `browser_fill_form`
-- [ ] Check for JS errors via `browser_console_messages` — must be zero errors
-- [ ] Verify API integration via `browser_network_requests`
-- [ ] Take screenshots via `browser_take_screenshot` for visual verification
-- [ ] Document verification results in this checklist
+- [ ] [AI] Discover supported locales: read `apps/[app]/src/features/i18n/` or `next.config.ts` —
+      acceptance: locale set listed in notes (e.g. `en`, `id`)
+- [ ] [AI] Start dev server: `nx dev [project-name]`
+- [ ] [AI] For EACH locale × EACH breakpoint (375 / 768 / 1280 px), navigate to the locale-prefixed
+      URL (`/en/...`, `/id/...`) via `browser_navigate` + `browser_resize` — acceptance: page renders
+- [ ] [AI] Inspect DOM via `browser_snapshot`; verify `html[lang]` matches the locale and no strings
+      are untranslated — acceptance: correct language, lang attribute correct
+- [ ] [AI] Test interactive flows via `browser_click` / `browser_fill_form`
+- [ ] [AI] Check for JS errors via `browser_console_messages` — must be zero errors per locale
+- [ ] [AI] Verify API integration via `browser_network_requests`
+- [ ] [AI] Capture one screenshot per locale per breakpoint via `browser_take_screenshot`, saved to
+      `evidence/phase-N-[feature]-[locale]-[breakpoint]px.png` — acceptance: files exist in `evidence/`
+- [ ] [AI] Document evidence in this checklist: reference each screenshot
+      (`![alt](./evidence/...)`) and note console/network status per locale
 ```
 
 ### For Plans Touching API Endpoints
@@ -719,12 +739,14 @@ ALWAYS include:
 ```markdown
 ### Manual API Verification (curl)
 
-- [ ] Start backend server: `nx dev [project-name]`
-- [ ] Verify health endpoint: `curl -s http://localhost:[port]/api/health | jq .`
-- [ ] Verify affected endpoints return expected responses
-- [ ] Test error cases with invalid payloads — verify proper error responses
-- [ ] Verify response status codes, shapes, and data integrity
-- [ ] Document verification results in this checklist
+- [ ] [AI] Start backend server: `nx dev [project-name]`
+- [ ] [AI] Verify health endpoint: `curl -s http://localhost:[port]/api/health | jq .` — acceptance:
+      200 + expected body; paste response inline in delivery.md
+- [ ] [AI] Verify affected endpoints return expected responses — paste command + status + body inline
+- [ ] [AI] Test error cases with invalid payloads — verify proper error responses (4xx + error body)
+- [ ] [AI] For locale-sensitive responses, verify each locale via `Accept-Language` header
+- [ ] [AI] Document evidence: inline each curl command, HTTP status, and response body (or save
+      responses > 20 lines to `evidence/phase-N-[endpoint].txt` and reference by path)
 ```
 
 ### For Full-Stack Plans (UI + API)
@@ -734,12 +756,28 @@ Include BOTH sections above, PLUS:
 ```markdown
 ### End-to-End Flow Verification
 
-- [ ] Start both frontend and backend dev servers
-- [ ] Use Playwright MCP to interact with the UI
-- [ ] Verify UI actions trigger correct API calls (`browser_network_requests`)
-- [ ] Verify API responses are correctly rendered in the UI
-- [ ] Test complete user flows end-to-end
-- [ ] Document verification results in this checklist
+- [ ] [AI] Start both frontend and backend dev servers
+- [ ] [AI] Use Playwright MCP to interact with the UI in EACH supported locale
+- [ ] [AI] Verify UI actions trigger correct API calls (`browser_network_requests`)
+- [ ] [AI] Verify API responses are correctly rendered in the UI
+- [ ] [AI] Test complete user flows end-to-end per locale
+- [ ] [AI] Document evidence (screenshots in `evidence/`, curl/network notes inline) in this checklist
+```
+
+### For UI-Bearing Plans — Rule-15 Exploratory Retest
+
+For web-UI plans, ALSO include, near the end of the checklist before archival (per
+[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)
+Rule 15):
+
+```markdown
+### Rule-15 Web Exploratory Retest (before archival)
+
+- [ ] [AI] Run one `web-exploratory-tester` round against the running target URL(s) across ALL
+      supported locales — acceptance: findings + spec-gaps recorded
+- [ ] [AI] Append each EWT-### finding here as a new unchecked checkbox
+      (`- [ ] EWT-NNN: <defect> — fix before archival`) and each SG-### spec-gap into the specs steps
+- [ ] [AI] Fix every rule-15 finding (or explicitly defer with rationale) before archival
 ```
 
 ### Plan Archival Section
@@ -751,10 +789,12 @@ ALWAYS include at the end of the delivery checklist:
 
 - [ ] Verify ALL delivery checklist items are ticked
 - [ ] Verify ALL quality gates pass (local + CI)
-- [ ] Verify ALL manual assertions pass (Playwright MCP / curl)
+- [ ] Verify ALL manual assertions pass (Playwright MCP / curl) with committed evidence in `evidence/`
+- [ ] Verify ALL supported locales were exercised in UI verification (not just the default)
+- [ ] Verify every rule-15 exploratory finding is fixed or explicitly deferred
 - [ ] Rename and move: `git mv plans/in-progress/[identifier]/ plans/done/YYYY-MM-DD__[identifier]/` using today's date as the completion date (NOT the creation date)
 - [ ] Update `plans/in-progress/README.md` — remove the plan entry
 - [ ] Update `plans/done/README.md` — add the plan entry with completion date
 - [ ] Update any other READMEs that reference this plan (e.g., plans/README.md)
-- [ ] Commit the archival: `chore(plans): move [plan-name] to done`
+- [ ] Commit the archival (the `evidence/` subfolder moves with the plan): `chore(plans): move [plan-name] to done`
 ```

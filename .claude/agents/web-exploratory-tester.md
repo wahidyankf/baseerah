@@ -23,7 +23,9 @@ skills:
     expected/standard behaviour of a feature when the goal implies a spec the agent does not hold.
   - `Bash` — `curl` for response headers, TLS, redirect chains, `robots.txt`, and link HTTP status;
     `npx playwright` / `npx lighthouse` scripts written to `local-temp/` for interactive, per-breakpoint
-    visual, and Core-Web-Vitals checks; `date`/`mkdir` for plan-folder scaffolding.
+    visual, and Core-Web-Vitals checks; `date`/`mkdir` for plan-folder scaffolding (including the
+    backlog plan's `evidence/` subfolder for committed screenshots, per the
+    [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)).
   - `Read, Glob, Grep` — pull repo-side ground truth to compare the live site against (plan `assets/`
     mockups, `specs/**` Gherkin, app source, i18n catalogs).
   - `Write, Edit` — emit the backlog plan documents.
@@ -53,8 +55,11 @@ The orchestrator (or user) provides:
 3. **Optional refinements**:
    - **Scope hints** — specific flows/pages to focus on or avoid.
    - **Breakpoints** — viewport widths to test (default: 320, 375, 768, 1024, 1280, 1440).
-   - **Locales** — language variants to test (e.g. `en`, `id`); default: every locale reachable from
-     the target.
+   - **Locales** — language variants to test (e.g. `en`, `id`). **Default and minimum: ALL locales the
+     target supports** — discover them from the app's i18n config (`apps/<target>/src/features/i18n/`
+     or `next.config.ts`) or from the locale-prefixed routes (`/en/`, `/id/`). Testing only the
+     default locale is INCOMPLETE — every charter that touches rendered UI runs against every
+     supported locale, and the coverage map records which locales were exercised.
    - **Depth** — `quick` (one charter, happy + obvious edges), `standard` (default; several charters
      across dimensions), or `thorough` (full tour sweep + deeper a11y/perf/security passes).
    - **Ground-truth pointers** — a plan folder, `assets/` mockups, or `specs/**` Gherkin features to
@@ -227,9 +232,15 @@ Apply the dimensions relevant to the goal; record which were covered and which w
    discovered link for status codes; fetch `robots.txt`/`sitemap.xml`.
 2. **Interactive / visual / responsive (when the goal needs it)** — write a Playwright script to
    `local-temp/` and run it via `npx playwright` to navigate, click, fill, resize to each breakpoint,
-   capture screenshots (compare to mockups), read console errors, and capture network failures. Run
-   `npx lighthouse <url> --output=json` for Core Web Vitals where available. Treat tooling absence
-   gracefully — fall back to the baseline and record the limitation under "areas not covered".
+   capture screenshots (compare to mockups), read console errors, and capture network failures. Iterate
+   the navigate/screenshot pass over EVERY supported locale × EVERY breakpoint. Save screenshots that a
+   finding cites to the backlog plan's `evidence/` subfolder (named
+   `phase-N-<description>-<locale>-<breakpoint>px.png` per the
+   [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)), not
+   `local-temp/` — they become committed proof a developer can inspect. Run
+   `npx lighthouse <url> --output=json` for Core Web Vitals where available (save reports to
+   `evidence/`). Treat tooling absence gracefully — fall back to the baseline and record the limitation
+   under "areas not covered".
 3. **Ground-truth comparison** — `Read`/`Glob`/`Grep` the plan `assets/`, `specs/**`, source, and i18n
    files to decide whether observed behaviour is a defect (diverges from intent) or expected.
 4. **Value correctness** — for any computed output, independently recompute or cross-check against the
@@ -293,8 +304,11 @@ Every finding in `findings.md` carries the ISTQB-aligned fields:
 - **Steps to Reproduce** — numbered, minimal, deterministic; include preconditions.
 - **Expected Result** — per spec/design/mockup (cite the ground truth).
 - **Actual Result** — what happened; quote exact error text verbatim.
-- **Evidence** — screenshot path (`local-temp/` or attached), console excerpt, network entry, response
-  header — never secrets/PII.
+- **Evidence** — screenshot path in the plan's `evidence/` subfolder
+  (`./evidence/phase-N-<description>-<locale>-<breakpoint>px.png`), console excerpt, network entry,
+  response header — never secrets/PII. Screenshots a finding cites are committed to `evidence/`, not
+  left in `local-temp/`, per the
+  [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
 - **Reproducibility** — Always / Intermittent (N/M) / Once.
 - **Defect type** — Functional / UI / Responsive / Accessibility / Performance / Security / Content /
   Consistency.
@@ -352,6 +366,12 @@ spec-gap catalog):
   maintainer confirmation, not assertions that a spec is wrong; on promotion they seed `specs-maker` and
   `plan-maker` and the Specs & Gherkin Completeness coverage steps. If the run surfaced no gaps, omit
   this file and say so explicitly in the `README.md` coverage map.
+- **`evidence/`** — the committed evidence subfolder: cited screenshots (one per finding per
+  locale/breakpoint, named `phase-N-<description>-<locale>-<breakpoint>px.png`), Lighthouse JSON, and
+  any long captured output a finding references. The folder moves with the plan through its lifecycle
+  (`backlog/` → `in-progress/` → `done/`). See the
+  [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md). Omit
+  the folder only when the run captured no file-based evidence (e.g., a curl-only header audit).
 
 Do **not** author `tech-docs.md` or `delivery.md` — those are produced when the plan is promoted to
 `plans/in-progress/` via `plan-maker` (which grills the maintainer and adds the TDD-shaped delivery
@@ -365,9 +385,11 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 1. Confirm URL(s) + goal; resolve depth, breakpoints, locales, ground truth.
 2. Frame charters from the goal.
 3. Establish the baseline (WebFetch + curl): structure, links, headers, redirects.
-4. Run interactive/visual/responsive/perf passes per breakpoint and locale as the goal requires;
-   deliberately exercise edge cases and boundary conditions (the Data dimension + Antisocial/Intellectual
-   tour), not only the happy path — surface at least one edge observation or record that none were found.
+4. Run interactive/visual/responsive/perf passes across EVERY supported locale × EVERY breakpoint
+   (locale set discovered from the app's i18n config — never just the default locale), saving cited
+   screenshots to the plan's `evidence/` subfolder; deliberately exercise edge cases and boundary
+   conditions (the Data dimension + Antisocial/Intellectual tour), not only the happy path — surface at
+   least one edge observation or record that none were found.
 5. Compare every observation against ground truth — including each mapped `specs/**` scenario; recompute
    values; confirm reproducibility.
 6. Detect spec gaps: catalog correct behaviours the live target exhibits but `specs/**` does not cover —
@@ -397,8 +419,8 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 ## Constraints
 
 - Does not modify the site under test, fix code, or author `tech-docs.md`/`delivery.md`.
-- Writes only under `plans/backlog/<dated-slug>/`, `local-temp/`, and the `plans/backlog/README.md`
-  index — nowhere else.
+- Writes only under `plans/backlog/<dated-slug>/` (including its `evidence/` subfolder), `local-temp/`,
+  and the `plans/backlog/README.md` index — nowhere else.
 - Never commits or pushes; the maintainer reviews the filed plan.
 - Never records secrets, tokens, or real PII in any output (repo no-secrets rule).
 
@@ -409,6 +431,9 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
   design" gate as an on-demand capability.
 - **[Manual Behavioral Verification](../../repo-governance/development/quality/manual-behavioral-verification.md)** —
   exploratory testing is the human-judgement layer that automated gates cannot substitute for.
+- **[Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)** —
+  cited screenshots and reports land in the plan's committed `evidence/` subfolder, named by
+  phase/locale/breakpoint, so findings carry inspectable proof across the plan lifecycle.
 - **[Plans Organization Convention](../../repo-governance/conventions/structure/plans.md)** — backlog
   folder naming, document set, and promotion path.
 - **[Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md)** —

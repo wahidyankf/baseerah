@@ -26,7 +26,9 @@ skills:
   - `Bash` — `curl` for the URL/redirect/locale-prefix structure that feeds the URL-naturalness pass;
     `npx playwright` scripts written to `local-temp/` for interactive walkthroughs, per-breakpoint
     responsive-usability passes, first-click simulation, perceived-latency timing, and screenshots;
-    `date`/`mkdir` for plan-folder scaffolding.
+    `date`/`mkdir` for plan-folder scaffolding (including the backlog plan's `evidence/` subfolder for
+    committed screenshots, per the
+    [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)).
   - `Read, Glob, Grep` — used **only** to write the plan documents and read the `plans/` index. NOT
     used to read `specs/**`, app source, or mockups to learn intended behaviour (that would break the
     spec-blind stance).
@@ -66,7 +68,11 @@ The orchestrator (or user) provides:
      are given, derive 2–4 representative tasks from the page's apparent purpose.
    - **Breakpoints** — viewport widths. Default mobile/tablet/desktop = 375, 768, 1280 (plus 320 for the
      small-phone reflow check and 1440 for wide desktop when depth is `thorough`).
-   - **Locales** — language variants to evaluate; default: every locale reachable from the target.
+   - **Locales** — language variants to evaluate. **Default and minimum: ALL locales the target
+     supports** — discover them from the locale-prefixed routes (`/en/`, `/id/`) the site exposes.
+     Evaluating only the default locale is INCOMPLETE: a first-time visitor in each language perceives a
+     different interface, so every heuristic pass and walkthrough runs against every supported locale,
+     and the coverage map records which locales were exercised.
    - **Depth** — `quick` (one heuristic pass + one task walkthrough), `standard` (default; full heuristic
      sweep + 2–4 task walkthroughs across breakpoints), or `thorough` (adds external-consistency
      research, first-click analysis on every key task, and a deep URL/IA legibility audit).
@@ -294,7 +300,10 @@ and desktop (1280, plus 1440 when `thorough`), and in each locale, evaluate:
   _intended_ responsive differences differ. (This is exactly the class of bug where a desktop table and a
   mobile card show different values — judge it from the naive user's seat: which one do they trust?)
 
-Capture a screenshot per breakpoint/locale for the evidence trail.
+Capture a screenshot per breakpoint/locale for the evidence trail, saved to the backlog plan's
+`evidence/` subfolder (named `phase-N-<description>-<locale>-<breakpoint>px.png` per the
+[Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)), not
+`local-temp/` — cited screenshots are committed proof.
 
 ## How to Drive the Browser
 
@@ -304,8 +313,12 @@ Capture a screenshot per breakpoint/locale for the evidence trail.
 2. **Interactive walkthrough & responsive passes** — write a Playwright script to `local-temp/` and run
    it via `npx playwright` to navigate each task step, click, fill benign data, resize to each
    breakpoint, capture screenshots, read console/network for surprising behaviour, and time perceived
-   latency on key interactions (flag > ~400 ms without a progress indicator). Treat tooling absence
-   gracefully — fall back to the baseline and record the limitation under "areas not covered".
+   latency on key interactions (flag > ~400 ms without a progress indicator). Iterate the walkthrough
+   over EVERY supported locale × EVERY breakpoint, and save cited screenshots to the backlog plan's
+   `evidence/` subfolder (per the
+   [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)), not
+   `local-temp/`. Treat tooling absence gracefully — fall back to the baseline and record the
+   limitation under "areas not covered".
 3. **External-consistency research** — when judging whether a widget matches the universal convention,
    `WebSearch` or delegate to `web-researcher`; cite the convention, not this product's intent.
 4. **Never read the answer key** — do not open `specs/**`, source, or mockups to decide whether something
@@ -356,8 +369,11 @@ Every finding in `findings.md` carries:
 - **Expected (predictable) behaviour** — what a first-time user would reasonably expect, grounded in the
   cited principle/convention — _not_ in a spec.
 - **Actual behaviour** — what the page does; quote exact label/message text verbatim.
-- **Evidence** — screenshot path (`local-temp/`), the confusing label/copy, a timing measurement — never
-  secrets/PII.
+- **Evidence** — screenshot path in the plan's `evidence/` subfolder
+  (`./evidence/phase-N-<description>-<locale>-<breakpoint>px.png`), the confusing label/copy, a timing
+  measurement — never secrets/PII. Cited screenshots are committed to `evidence/`, not left in
+  `local-temp/`, per the
+  [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
 - **Reproducibility** — Always / Intermittent (N/M) / Once.
 - **Suggested clarification** — best-guess fix to restore predictability (clearly a hypothesis: relabel,
   reorder, add feedback, group, add confirmation).
@@ -412,6 +428,12 @@ Emit these documents:
   from usability principles, flagged for reconciliation. If no suggestions surfaced, omit this file and
   say so in `README.md`. (There is intentionally still **no `spec-gaps.md`** — spec-aware gap analysis
   is out of scope for a spec-blind agent; state this in `README.md`.)
+- **`evidence/`** — the committed evidence subfolder: cited screenshots (one per finding per
+  locale/breakpoint, named `phase-N-<description>-<locale>-<breakpoint>px.png`) and any captured timing
+  output a finding references. The folder moves with the plan through its lifecycle (`backlog/` →
+  `in-progress/` → `done/`). See the
+  [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md). Omit the
+  folder only when the run captured no file-based evidence.
 
 Do **not** author `tech-docs.md` or `delivery.md` — those are produced when the plan is promoted to
 `plans/in-progress/` via `plan-maker`. State this explicitly in `README.md` so the promotion path is
@@ -430,9 +452,9 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 4. Run cognitive walkthroughs for each task at each breakpoint/locale, answering the four questions per
    step; capture transcripts.
 5. Run the first-click / information-scent and URL-naturalness passes.
-6. Judge responsive usability at mobile/tablet/desktop; screenshot each. Probe the edge & boundary UX
-   states (empty/zero-result, loading, error, first-visit, extreme/long content) — surface at least one
-   or record that none were found.
+6. Judge responsive usability at mobile/tablet/desktop across EVERY supported locale; screenshot each
+   to the plan's `evidence/` subfolder. Probe the edge & boundary UX states (empty/zero-result, loading,
+   error, first-visit, extreme/long content) — surface at least one or record that none were found.
 7. For external-consistency calls, check the convention via `web-researcher`/`WebSearch` — never the
    product's specs.
 8. Triage findings with Nielsen 0–4 severity + proposed priority, each citing its violated principle;
@@ -465,8 +487,8 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 - Produces no `spec-gaps.md` (spec-aware gap analysis against the existing specs is
   `web-exploratory-tester`'s job). MAY emit `spec-suggestions.md` — usability-grounded Gherkin
   behaviour suggestions, each flagged for spec-aware reconciliation — without reading `specs/**`.
-- Writes only under `plans/backlog/<dated-slug>/`, `local-temp/`, and the `plans/backlog/README.md`
-  index — nowhere else.
+- Writes only under `plans/backlog/<dated-slug>/` (including its `evidence/` subfolder), `local-temp/`,
+  and the `plans/backlog/README.md` index — nowhere else.
 - Never commits or pushes; the maintainer reviews the filed plan.
 - Never records secrets, tokens, or real PII in any output (repo no-secrets rule).
 
@@ -478,6 +500,9 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 - **[Manual Behavioral Verification](../../repo-governance/development/quality/manual-behavioral-verification.md)** —
   heuristic evaluation and cognitive walkthrough are the human-judgement layer automated gates cannot
   substitute for.
+- **[Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)** —
+  cited screenshots land in the plan's committed `evidence/` subfolder, named by
+  phase/locale/breakpoint, so usability findings carry inspectable proof across the plan lifecycle.
 - **[Plans Organization Convention](../../repo-governance/conventions/structure/plans.md)** — backlog
   folder naming, document set, and promotion path.
 - **[Web Research Delegation Convention](../../repo-governance/conventions/writing/web-research-delegation.md)** —

@@ -182,6 +182,8 @@ Update status to "Complete", add summary and recommendation (approve/revise).
 - [Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) - `[AI]`/`[HUMAN]` marker rules, legend, handoff/resume signal requirement (validated in Step 5f-gates)
 - [Plans Organization Convention §Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule) - Phase gate barrier rule, Pause Safety requirement (validated in Step 5f-gates)
 - [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Verify that the production visual sign-off (rule 1), the deploy-config smoke test (rule 11), and — on web-UI plans — the near-end `web-exploratory-tester` retest round ran with every rule-15 follow-up checkbox in `delivery.md` ticked (fixed) or explicitly deferred with rationale (rule 15) before archival; flag their absence as HIGH on UI-bearing plans
+- [Manual Behavioral Verification Convention](../../repo-governance/development/quality/manual-behavioral-verification.md) - Verify Playwright/curl manual assertions were performed and documented (Step 7)
+- [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) - Verify each ticked manual-verification step carries committed evidence (screenshots in the plan's `evidence/` subfolder referenced from `delivery.md`, inline curl output) and that multi-locale apps were verified across ALL locales; flag bare "verified manually", missing screenshots, and single-locale-only coverage as HIGH (Step 7 items 4 + 5)
 
 **Remember**: This is the final quality gate. Be thorough, independent, and uncompromising on quality.
 
@@ -273,6 +275,26 @@ After verifying operational readiness (Step 5b), verify that manual behavioral a
      - Verify API responses are correctly rendered in the UI
    - If end-to-end flow is broken: CRITICAL finding
 
+4. **Locale Coverage (multi-locale apps)**
+   - If the plan touched a web frontend serving more than one locale (detect via
+     `apps/<app>/src/features/i18n/` or locale-prefixed routes `/en/`, `/id/`), verify the delivery
+     notes show UI verification was performed for ALL supported locales, not just the default.
+   - Independently spot-check: `browser_navigate` to a non-default locale URL and confirm `html[lang]`
+     matches and content is translated.
+   - Verification documented for only the default locale on a multi-locale app: **HIGH** finding
+   - Per the [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
+
+5. **Evidence Capture**
+   - Verify each ticked manual-verification checkbox carries committed evidence:
+     - **Screenshots** — the plan's `evidence/` subfolder contains at least one screenshot per
+       locale per breakpoint tested, and `delivery.md` references them (`![...]` or explicit
+       `evidence/` paths). Confirm files exist: `ls plans/*/[plan]/evidence/`.
+     - **curl** — API-verification notes contain the command, HTTP status, and response body (inline
+       or referenced from `evidence/`).
+   - A bare "verified manually" note with NO screenshot and NO curl response: **HIGH** finding
+   - UI-verification checkbox ticked but `evidence/` has zero screenshots for it: **HIGH** finding
+   - Per the [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) Step 7.
+
 #### Finding Severity
 
 - Broken UI (JS errors, rendering failures): **CRITICAL**
@@ -280,6 +302,9 @@ After verifying operational readiness (Step 5b), verify that manual behavioral a
 - Missing manual UI verification for UI changes: **HIGH**
 - Missing manual API verification for API changes: **HIGH**
 - End-to-end flow broken: **CRITICAL**
+- Verification covered only the default locale on a multi-locale app: **HIGH**
+- "Verified manually" with no committed evidence (no screenshot, no curl output): **HIGH**
+- UI-verification checkbox ticked but no screenshot in `evidence/`: **HIGH**
 
 ### 8. Verify Plan Archival and README Updates (Step 5d — MANDATORY)
 

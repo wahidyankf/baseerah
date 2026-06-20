@@ -129,6 +129,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - **Specs & Gherkin delivery (per Two Paths)**: a plan that creates, modifies, or deletes observable behavior in `apps/`, `libs/`, or `specs/` MUST include delivery steps that add/update the companion `specs/` Gherkin `.feature` files and run `specs:coverage`. Validated in detail by Step 5j (rule 16). See [Feature Change Completeness Convention §Two Paths](../../repo-governance/development/quality/feature-change-completeness.md).
 - **Gherkin-tagged TDD steps (one scenario per cycle)**: every behavior-implementing RED→GREEN→REFACTOR cycle MUST target **exactly one** Gherkin scenario — the RED step carries a single-scenario `**Gherkin (binds) →** "<title>"` tag and embeds that scenario's complete `Given/When/Then` inline as a fenced ` ```gherkin ` block, verbatim-equal to the companion `.feature`. Flag as **HIGH**: a behavior RED step whose `binds` tag lists **more than one** scenario (must be split one-cycle-per-scenario), a behavior step missing its Gherkin tag, or a step whose inline `Given/When/Then` is absent or not verbatim-equal to the `.feature`. Two exceptions keep a multi-scenario `;`-list tag and are NOT split: pure-core (`**Gherkin (underpins) →**`) data/calc unit tests, and aggregate BDD binders (a feature-consuming unit test or `playwright-bdd` step-def file consuming the whole `.feature` for `specs:coverage`/E2E). Pure refactors, no-behavior-change bumps, and docs/governance-only steps are exempt. See [Gherkin-Tagged Delivery Steps](../../repo-governance/development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps).
 - **UI-design-funnel completeness (UI-bearing plans)**: a plan that adds/changes user-facing screens or components under `apps/` or `libs/` MUST carry the design-funnel artefacts (≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named selection, a rationale, a grounding/prior-art note, and a **responsive** strategy across mobile/tablet/desktop). Validated in detail by Step 5k (rule 17). Pure-refactor / no-UI / governance-only plans are exempt. See [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+- **Manual-assertion locale + evidence completeness (UI/API plans)**: a plan touching web UI or API MUST carry manual-assertion steps that (a) cover ALL supported locales for a multi-locale app and (b) capture committed evidence (screenshots to the plan's `evidence/` subfolder, curl responses inlined in `delivery.md`). Validated in detail by Step 5c (items 4 + 5). Single-locale-only verification on a multi-locale app, or a manual-assertion section with no evidence-capture step, is **HIGH**. See [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
 
 #### PR Step Authorization Check (per [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md))
 
@@ -259,6 +260,8 @@ Update status to "Complete", add summary statistics and prioritized recommendati
 **Related Conventions:**
 
 - [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Flag missing visual-parity gate (rule 1), mockup colors not expressed as theme tokens (rule 8), presence-only ordering tests that do not distinguish correct from buggy values (rule 5), missing per-breakpoint responsive deliverable steps (rules 3, 4), and a missing near-end `web-exploratory-tester` retest step that appends its findings to `delivery.md` as unchecked task-list items (rule 15) as HIGH findings on UI-bearing plans (rule 15 applies to web-UI plans only)
+- [Manual Behavioral Verification Convention](../../repo-governance/development/quality/manual-behavioral-verification.md) - Flag missing Playwright/curl manual-assertion steps for UI/API plans (Step 5c)
+- [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) - Flag single-locale-only verification on multi-locale apps and manual-assertion sections lacking evidence-capture steps (screenshots to `evidence/`, inline curl output) as HIGH findings (Step 5c items 4 + 5)
 
 **Harness Conventions (Step 5g):**
 
@@ -392,7 +395,24 @@ After validating operational readiness (Step 5b), verify the plan includes manua
    - If the plan touches both UI and API, must include full-flow assertion (UI → API → response → UI update)
    - Missing entirely: **HIGH** finding
 
-4. **Not Applicable Exemption**
+4. **Locale Coverage for Multi-Locale UI Plans**
+   - If the plan modifies a web frontend that serves more than one locale (e.g. `en` + `id` —
+     detectable from `apps/<app>/src/features/i18n/` or locale-prefixed routes), the UI-verification
+     steps MUST cover ALL supported locales, not just the default. Look for explicit "for each locale"
+     / per-locale navigation or named locale URLs (`/en/...`, `/id/...`).
+   - Single-locale-only verification on a multi-locale app: **HIGH** finding
+   - Per the [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md)
+     and [Manual Behavioral Verification](../../repo-governance/development/quality/manual-behavioral-verification.md).
+
+5. **Evidence Capture Steps**
+   - Every manual-verification section MUST include evidence-capture steps: screenshots saved to the
+     plan's `evidence/` subfolder (named `phase-N-<description>-<locale>-<breakpoint>px.png`) and
+     referenced in `delivery.md`; curl responses inlined as fenced code blocks or saved to `evidence/`.
+   - Manual-assertion section present but with NO evidence-capture step (screenshots-to-`evidence/`
+     or inline-curl-output): **HIGH** finding
+   - Per the [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
+
+6. **Not Applicable Exemption**
    - If the plan touches ONLY documentation, governance, or non-code files, manual assertions are not required
    - Checker must verify the exemption is legitimate (plan truly has no UI/API changes)
 
@@ -401,6 +421,8 @@ After validating operational readiness (Step 5b), verify the plan includes manua
 - Missing Playwright MCP steps for UI plan: **CRITICAL**
 - Missing curl steps for API plan: **CRITICAL**
 - Missing end-to-end flow for full-stack plan: **HIGH**
+- Single-locale-only verification on a multi-locale app: **HIGH**
+- Missing evidence-capture steps in a manual-assertion section: **HIGH**
 - Steps present but vague (no specific pages/endpoints): **MEDIUM**
 
 ### 10. Worktree Specification Validation (Step 5d — MANDATORY)
