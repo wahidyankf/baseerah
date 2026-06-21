@@ -128,6 +128,7 @@ diagrams.
 The plan is done when: the `/c` URL move, 308 redirects, header/footer/mobile nav, landing
 homepage, SEO-internals sweep, and a11y/responsive are all implemented and tested; manual Playwright
 verification across **both** locales (`en`, `id`) at 320/375/768/1280 px is captured with committed
-evidence in [`evidence/`](./evidence/); the rule-15 three-tester retest is clean (or its findings
-are triaged and fixed); and all local + CI gates are green. Push target: `origin main` (direct,
-Trunk Based Development).
+evidence in [`evidence/`](./evidence/); **every** rule-15 three-tester defect finding
+(EWT/UWT/DWT) is **fixed** before archival — deferral is allowed ONLY with explicit user
+permission and only when fixing is genuinely impossible; and all local + CI gates are green.
+Push target: `origin main` (direct, Trunk Based Development).

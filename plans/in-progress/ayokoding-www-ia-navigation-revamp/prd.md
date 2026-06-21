@@ -44,31 +44,93 @@ old URLs. Bilingual (`en`, `id`), responsive at 320/375/768/1280 px, WCAG AA.
 
 ## UI Design Funnel
 
-A UI-bearing plan. The funnel covers three screens — **landing homepage**, **`/c` browse index**,
-and **header/footer navigation**. The diverge stage (≥3 named low-fi alternatives per screen, with
-mobile↔desktop reflow) lives in
-[`assets/ui-low-fi-alternatives.md`](./assets/ui-low-fi-alternatives.md). Grounding (R5): built from
-`libs/web-ui` primitives + existing `apps/ayokoding-www` Tailwind tokens, no net-new primitive
-(section cards reuse the existing card/border/`bg-accent` vocabulary). Prior art (R7): developer-
-content homepages (MDN, web.dev, Tailwind docs) consulted via `web-researcher`.
+A UI-bearing plan. Per the [UI-Mockups Placement HARD RULE](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs),
+the full funnel — inline low-fi wireframes, embedded hi-fi mockups, selection, and rationale —
+lives here in `prd.md`; the binary mockup files live beside the plan in [`assets/`](./assets/).
+The funnel covers three screens — **landing homepage**, **`/c` browse index**, and
+**header/footer navigation**. Grounding (R5): built from `libs/web-ui` primitives + existing
+`apps/ayokoding-www` Tailwind tokens, no net-new primitive (section cards reuse the existing
+card/border/`bg-accent` vocabulary). Prior art (R7): developer-content homepages (MDN, web.dev,
+Tailwind docs) consulted via `web-researcher`.
 
-### Narrow — hi-fi finalists
+### Diverge — low-fi alternatives (inline)
 
-The selected **Option A** hi-fi set is **already committed** under `assets/` as the
-visual-parity ground truth (`.svg` source + rendered `.png`), at 320/375/768/1280 px, built
-from real `libs/web-ui` tokens (see [`assets/README.md`](../assets/README.md) for the token
-table and selection record). Phase 1 **validates and, if needed, refines** these committed
-finalists rather than creating them from scratch:
+Three named alternatives per screen were explored. The selected **Option A** low-fi is inlined
+below at desktop + mobile to show the reflow; the full Option B / C alternatives and their drop
+reasons are in the extended gallery
+[`assets/ui-low-fi-alternatives.md`](./assets/ui-low-fi-alternatives.md).
 
-- Landing: `assets/landing-{320,375,768,1280}.{svg,png}` _committed_ (320 = overflow-proof
-  top-fold; same single-column layout as 375).
-- `/c` browse: `assets/browse-{375,768,1280}.{svg,png}` _committed_.
-- Nav chrome: `assets/chrome-{375,1280}.{svg,png}` _committed_ — `chrome-375` also renders the
-  open **MobileNav** drawer for mobile-nav parity.
+**Landing — Option A (Hero + Section-Card Grid + Tools Teaser):**
 
-The dropped Option-B alternatives are documented in
-[`assets/ui-low-fi-alternatives.md`](../assets/ui-low-fi-alternatives.md) and were not carried
-to hi-fi (the funnel converged on a single consistent card vocabulary across all three screens).
+```text
+Desktop (lg)                                  Mobile (< sm)
++---------------------------------------+     +----------------------+
+| [Logo]   Learn  Tools    [search][T]  |     | [=] AyoKoding [s][T] |
++---------------------------------------+     +----------------------+
+| H1 hero + intro                       |     | H1 hero (wraps)      |
+| [ Browse Learn ] [ Open Tools ]       |     | [ Browse Learn ]     |
++---------------------------------------+     | [ Open Tools ]       |
+| Explore                               |     +----------------------+
+| [card][card][card]   <- 3 cols        |     | Explore              |
+| [card][card][card]   (rants = card)   |     | [card]  <- 1 col     |
++---------------------------------------+     | [card] ... (rants)   |
+| TOOLS · Cost of Living Calc [Open ->] |     +----------------------+
++---------------------------------------+     | TOOLS  [Open ->]     |
+| [footer: Learn | Tools | About cols]  |     | [footer stacked]     |
++---------------------------------------+     +----------------------+
+```
+
+**`/c` browse — Option A (Restyled Section-Card Grid):**
+
+```text
+Home > Browse                                 Mobile: 1-col card stack
++---------------------------------------+     under the same breadcrumb
+| [card][card][card]  <- exhaustive     |
+| [card][card][card]  (every section)   |
++---------------------------------------+
+```
+
+**Nav chrome — Option A (Inline header links + multi-column footer):**
+
+```text
+Header:  [AyoKoding]  Learn  Tools        [search] [EN/ID] [theme]
+Mobile:  [=] [AyoKoding]                  [search] [theme]
+           (hamburger -> MobileNav: Learn, Tools, language, theme)
+Footer:  Learn        Tools        About        Project
+         Browse all   Calculator   About AK     GitHub
+         Rants                     Terms
+```
+
+### Narrow — hi-fi finalists (embedded)
+
+The selected **Option A** hi-fi set is committed under `assets/` (`.svg` source + rendered
+`.png`) at 320/375/768/1280 px, built from real `libs/web-ui` tokens (see
+[`assets/README.md`](./assets/README.md) for the token table and full per-breakpoint set). The
+key renders are embedded below; Phase 1 **validates/refines** them rather than creating from
+scratch.
+
+**Landing — desktop (1280px):**
+
+![Landing homepage — hi-fi desktop, Option A](./assets/landing-1280.png)
+
+**Landing — mobile (375px):**
+
+![Landing homepage — hi-fi mobile, Option A](./assets/landing-375.png)
+
+**`/c` browse index — desktop (1280px):**
+
+![/c browse index — hi-fi desktop, Option A](./assets/browse-1280.png)
+
+**Header + footer + MobileNav chrome:**
+
+![Header/footer chrome — hi-fi desktop, Option A](./assets/chrome-1280.png)
+
+![Header + open MobileNav drawer — hi-fi mobile, Option A](./assets/chrome-375.png)
+
+Full breakpoint set: `assets/landing-{320,375,768,1280}`, `assets/browse-{375,768,1280}`,
+`assets/chrome-{375,1280}` (each `.svg` + `.png`). The dropped Option-B/C alternatives were not
+carried to hi-fi (the funnel converged on a single consistent card vocabulary across all three
+screens).
 
 ### Select
 

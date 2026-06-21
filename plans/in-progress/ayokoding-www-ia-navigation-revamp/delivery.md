@@ -142,6 +142,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then the content page renders with status 200
     And the breadcrumb reflects the "/c/" prefixed path
   ```
+
 - [ ] [AI] **GREEN**: implement `contentUrl` + the per-locale loose-page allowlist in
       `apps/ayokoding-www/src/features/content/core/content-url.ts` (new) per `tech-docs.md §DD-1`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: the new test passes, no others broken
@@ -219,6 +220,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then the response is 200 and not a redirect
     And the URL remains "/en/about-ayokoding"
   ```
+
 - [ ] [AI] **REFACTOR**: add a unit test asserting the redirect-array shape (every entry
       `permanent: true`, `source`/`destination` non-empty) in
       `apps/ayokoding-www/src/redirects/content-namespace.test.ts` (new) — command:
@@ -240,6 +242,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then the page shows a browse index of section cards for every top-level section
     And the page shows a breadcrumb beginning at Home
   ```
+
 - [ ] [AI] **GREEN**: create `apps/ayokoding-www/src/app/[locale]/(content)/c/page.tsx` rendering the
       restyled section-card browse index (Option A) from `getTree(locale)`, with a `Home > Browse`
       breadcrumb — command: `npx nx run ayokoding-www:test:unit` — acceptance: test passes
@@ -287,6 +290,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     When the header renders
     Then the header shows a "Learn" link to "/en/c" and a "Tools" link to "/en/tools"
   ```
+
 - [ ] [AI] **GREEN**: add the inline primary nav (`Learn` → `/${locale}/c`, `Tools` → `/${locale}/tools`,
       labels via `t(locale, "navLearn"/"navTools")`) to `header.tsx`, hidden on mobile (`hidden md:flex`)
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: header test passes
@@ -301,6 +305,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     When the visitor opens the mobile navigation menu
     Then the menu shows a "Learn" link to "/en/c" and a "Tools" link to "/en/tools"
   ```
+
 - [ ] [AI] **GREEN**: add the Learn/Tools links to `mobile-nav.tsx` — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: mobile-nav test passes
 - [ ] [AI] **RED**: add a `footer.test.tsx` asserting the footer renders Learn / Tools / About columns with
@@ -316,6 +321,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then the footer shows a Learn column, a Tools column, and an About column
     And the About column links to "/id/tentang-ayokoding" and "/id/syarat-dan-ketentuan"
   ```
+
 - [ ] [AI] **GREEN**: rebuild `footer.tsx` into a multi-column nav (Learn · Tools · About/Terms) using
       per-locale loose-page slugs + `contentUrl`/allowlist, keeping the copyright + license row — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: footer test passes
@@ -357,6 +363,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then each visible card shows the section title and a blurb from its _index.md or an override
     But sections marked hidden in the config do not render a card
   ```
+
 - [ ] [AI] **GREEN**: implement `apps/ayokoding-www/src/features/content/core/landing-sections.ts` (curated
       override config + pure merge) per `tech-docs.md §DD-4` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: test passes
@@ -377,6 +384,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     And the page shows curated section cards including "Rants"
     And the page shows a Tools teaser card linking "/en/tools/cost-of-living-calculator"
   ```
+
 - [ ] [AI] **GREEN**: rewrite `apps/ayokoding-www/src/app/[locale]/page.tsx` into the homepage (hero via
       `t()`, section cards via `landing-sections` + `SectionCard` from P2, Tools teaser card) matching the
       selected Option A mockups — command: `npx nx run ayokoding-www:test:unit` — acceptance: landing test passes
@@ -418,6 +426,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     When the breadcrumb renders its ancestor segments
     Then each ancestor crumb links to a "/c/" prefixed URL
   ```
+
 - [ ] [AI] **GREEN**: route breadcrumb hrefs through `contentUrl` in `breadcrumb.tsx` and its callers
       (content page `c/[...slug]/page.tsx` `buildBreadcrumbs`) — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: breadcrumb test passes
@@ -433,6 +442,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then every content link resolves directly to a "/c/" URL with status 200
     And no internal content link resolves through a 308 redirect
   ```
+
 - [ ] [AI] **GREEN**: update `sidebar-tree.tsx` and `prev-next.tsx` to build hrefs via `contentUrl(locale, slug)`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: tests pass
 - [ ] [AI] **RED**: add failing test in `apps/ayokoding-www/src/features/search/shell/search-dialog.test.tsx` (new)
@@ -463,6 +473,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then every moved-content entry uses a "/c/" prefixed URL
     But top-level pages (about, terms, tools) are not prefixed with "/c/"
   ```
+
 - [ ] [AI] **GREEN**: update `apps/ayokoding-www/src/app/sitemap.ts` to build URLs via `contentUrl` — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: sitemap test passes
 - [ ] [AI] **RED**: add failing test asserting `apps/ayokoding-www/src/app/feed.xml/route.ts` item links use
@@ -609,17 +620,19 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 #### Rule-15 retest follow-ups
 
-_(Populated by the three-tester run; each fixed or explicitly deferred before archival.)_
+_(Populated by the three-tester run; every EWT/UWT/DWT defect finding is FIXED before archival.
+Deferral is allowed ONLY with explicit user permission and only when fixing is genuinely
+impossible. SG-### spec-gap proposals may be triaged.)_
 
-- [ ] [AI] Fix every rule-15 finding (or explicitly defer with rationale) and re-run the relevant gate
+- [ ] [AI] Fix **every** rule-15 EWT/UWT/DWT finding and re-run the relevant gate
       — command: `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` (+ `ayokoding-www-fe-e2e:test:e2e` where runtime proof is needed)
-      — acceptance: all findings resolved/deferred, gates green
+      — acceptance: all defect findings fixed (no deferral without explicit user permission for a genuinely-impossible fix), gates green
 
 ### Phase 7 Gate
 
 > All checks below must pass before archival.
 
-- [ ] [AI] All rule-15 EWT/UWT/DWT findings fixed or explicitly deferred with rationale
+- [ ] [AI] All rule-15 EWT/UWT/DWT findings fixed (deferral only with explicit user permission for a genuinely-impossible fix)
 - [ ] [AI] `npx nx affected -t typecheck lint test:unit specs:coverage` — all exit 0
 - [ ] [AI] Confirm no `// TODO(copy):` markers remain — command:
       `grep -c "TODO(copy)" apps/ayokoding-www/src/features/i18n/core/translations.ts`
@@ -653,7 +666,7 @@ _(Populated by the three-tester run; each fixed or explicitly deferred before ar
 - [ ] [AI] Verify ALL quality gates pass (local + CI)
 - [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`
 - [ ] [AI] Verify ALL supported locales (`en`, `id`) were exercised at all 4 breakpoints (not just the default)
-- [ ] [AI] Verify every rule-15 three-tester finding (EWT/UWT/DWT) is fixed or explicitly deferred
+- [ ] [AI] Verify every rule-15 three-tester finding (EWT/UWT/DWT) is fixed (deferral only with explicit user permission for a genuinely-impossible fix)
 - [ ] [AI] Verify the `[HUMAN]` copy-refinement step is complete (no `TODO(copy)` markers remain)
 - [ ] [AI] Move: `git mv plans/in-progress/ayokoding-www-ia-navigation-revamp/ plans/done/YYYY-MM-DD__ayokoding-www-ia-navigation-revamp/`
       using today's date as the completion date (the `evidence/` subfolder moves with it)
