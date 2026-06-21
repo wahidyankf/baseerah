@@ -163,6 +163,25 @@ const translations: Record<Locale, Record<string, string>> = {
     colEssentialSavings: "Essential savings",
     colNonSalaryCompInfo: "Non-salary comp (info, annual, RSU/equity)",
     minimumMarker: "← min",
+
+    // IA navigation revamp — landing homepage + global nav
+    heroHeading: "Learn to build software, the clear way.",
+    heroIntro:
+      "AyoKoding is an open, bilingual learning hub for software engineering — practical guides, worked examples, and free tools that grow with you.",
+    heroCtaLearn: "Start learning",
+    heroCtaTools: "Explore tools",
+    navLearn: "Learn",
+    navTools: "Tools",
+    browseTitle: "Browse",
+    browseIntro: "Browse every AyoKoding section in one place.",
+    sectionBlurbFallback: "Explore this section.",
+    toolsTeaserKicker: "Tools",
+    toolsTeaserTitle: "Cost of Living Calculator",
+    toolsTeaserDesc: "Compare monthly living costs, savings, and the minimum role you need across cities.",
+    toolsTeaserCta: "Open the calculator",
+    footerLearn: "Learn",
+    footerTools: "Tools",
+    footerAbout: "About",
   },
   id: {
     readMore: "Baca Selengkapnya",
@@ -331,6 +350,25 @@ const translations: Record<Locale, Record<string, string>> = {
     colEssentialSavings: "Tabungan kebutuhan pokok",
     colNonSalaryCompInfo: "Kompensasi non-gaji (info, tahunan, RSU/ekuitas)",
     minimumMarker: "← min",
+
+    // IA navigation revamp — landing homepage + global nav
+    heroHeading: "Belajar membangun perangkat lunak, dengan cara yang jelas.",
+    heroIntro:
+      "AyoKoding adalah pusat belajar terbuka dwibahasa untuk rekayasa perangkat lunak — panduan praktis, contoh nyata, dan alat gratis yang tumbuh bersama Anda.",
+    heroCtaLearn: "Mulai belajar",
+    heroCtaTools: "Jelajahi alat",
+    navLearn: "Belajar",
+    navTools: "Alat",
+    browseTitle: "Jelajahi",
+    browseIntro: "Jelajahi seluruh bagian AyoKoding dalam satu tempat.",
+    sectionBlurbFallback: "Jelajahi bagian ini.",
+    toolsTeaserKicker: "Alat",
+    toolsTeaserTitle: "Kalkulator Biaya Hidup",
+    toolsTeaserDesc: "Bandingkan biaya hidup bulanan, tabungan, dan peran minimum yang Anda butuhkan di berbagai kota.",
+    toolsTeaserCta: "Buka kalkulator",
+    footerLearn: "Belajar",
+    footerTools: "Alat",
+    footerAbout: "Tentang",
   },
 };
 
