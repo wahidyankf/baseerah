@@ -54,6 +54,7 @@ type Props = {
   schoolType: SchoolType;
   area: Area;
   locale?: Locale;
+  backHref?: string;
 };
 
 function healthcareBadgeLabel(type: "oop" | "tax-funded" | "mixed", locale: Locale): string {
@@ -62,7 +63,7 @@ function healthcareBadgeLabel(type: "oop" | "tax-funded" | "mixed", locale: Loca
   return t(locale, "healthcareMandatoryPayroll");
 }
 
-export function CityDetail({ dataset, cityId, household, schoolType, area, locale = "en" }: Props) {
+export function CityDetail({ dataset, cityId, household, schoolType, area, locale = "en", backHref }: Props) {
   const city = dataset.cities.find((c) => c.id === cityId);
   if (!city) return <p>City not found.</p>;
 
@@ -93,7 +94,10 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
             {city.name[locale] ?? city.name.en}
             {country ? `, ${country.name[locale] ?? country.name.en}` : ""}
           </h2>
-          <a href="?tab=cost" className="text-sm text-primary-foreground/80 underline hover:text-primary-foreground">
+          <a
+            href={backHref ?? "?tab=cost"}
+            className="text-sm text-primary-foreground/80 underline hover:text-primary-foreground"
+          >
             {t(locale, "backToAllCities")}
           </a>
         </div>

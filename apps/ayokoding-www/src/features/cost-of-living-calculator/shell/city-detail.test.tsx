@@ -94,6 +94,19 @@ describe("CityDetail", () => {
     expect(screen.getByRole("heading", { name: /relocation costs/i })).toBeTruthy();
   });
 
+  // Phase 3b: city-detail back link uses backHref prop (UWT-010)
+  it("3b: back link uses backHref prop when provided", () => {
+    render(<CityDetail {...defaultProps} backHref="?region=asean&country=sg" />);
+    const backLink = screen.getByRole("link", { name: /back to all cities/i });
+    expect(backLink.getAttribute("href")).toBe("?region=asean&country=sg");
+  });
+
+  it("3b: back link defaults to ?tab=cost when no backHref", () => {
+    render(<CityDetail {...defaultProps} />);
+    const backLink = screen.getByRole("link", { name: /back to all cities/i });
+    expect(backLink.getAttribute("href")).toBe("?tab=cost");
+  });
+
   // EWT-007: per-category rows in city-detail must scale for household size so
   // their sum equals the Essentials subtotal shown.
   it("EWT-007: for a 2-adult household, per-category row amounts sum to the essentials subtotal", () => {

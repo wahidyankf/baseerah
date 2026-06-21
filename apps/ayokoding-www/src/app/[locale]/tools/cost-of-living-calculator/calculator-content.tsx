@@ -13,6 +13,7 @@ import { MinRoleTable } from "@/features/cost-of-living-calculator/shell/min-rol
 import { CityDetail } from "@/features/cost-of-living-calculator/shell/city-detail";
 import { GeoFilters } from "@/features/cost-of-living-calculator/shell/geo-filters";
 import { Controls } from "@/features/cost-of-living-calculator/shell/controls";
+import { CalculatorBreadcrumb } from "@/features/cost-of-living-calculator/shell/calculator-breadcrumb";
 import { useLocale } from "@/features/i18n/shell/use-locale";
 import { t } from "@/features/i18n/core/translations";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@open-sharia-enterprise/web-ui";
@@ -21,6 +22,7 @@ import {
   encodeState,
   applyCountryChange,
   applyCityChange,
+  parentScopeParams,
 } from "@/features/cost-of-living-calculator/core/url-state";
 import type { CalculatorState } from "@/features/cost-of-living-calculator/core/url-state";
 
@@ -123,8 +125,17 @@ export function CostOfLivingCalculatorContent() {
   // Show city detail view when a city is selected on the cost tab
   const detailCityId = activeTab === "cost" ? cityId : null;
 
+  // Back link for city detail: encode parent geo scope (region+country, no city).
+  // Falls back to ?tab=cost when no geo scope is set.
+  const cityDetailBackHref = (() => {
+    const p = parentScopeParams(currentState);
+    const qs = p.toString();
+    return qs ? `?${qs}` : "?tab=cost";
+  })();
+
   return (
     <main data-testid="calc-page" className="mx-auto max-w-6xl space-y-4 px-4 py-6">
+      <CalculatorBreadcrumb />
       <h1 className="text-2xl font-bold tracking-tight">{t(locale, "calcTitle")}</h1>
       <p data-testid="calc-subtitle" className="text-sm text-muted-foreground">
         {t(locale, "calcSubtitle")}
@@ -213,6 +224,7 @@ export function CostOfLivingCalculatorContent() {
                   schoolType={schoolType}
                   area={area}
                   locale={locale}
+                  backHref={cityDetailBackHref}
                 />
               </div>
             ) : (
