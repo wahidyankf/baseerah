@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { dataset } from "@/features/cost-of-living-calculator/core/data/cities";
 import { roleMatrix } from "@/features/cost-of-living-calculator/core/data/roles";
@@ -16,48 +16,50 @@ import { Controls } from "@/features/cost-of-living-calculator/shell/controls";
 import { useLocale } from "@/features/i18n/shell/use-locale";
 import { t } from "@/features/i18n/core/translations";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@open-sharia-enterprise/web-ui";
-
-type Tab = "cost" | "savings" | "min-role";
-
-function parseTab(val: string | null): Tab {
-  if (val === "savings" || val === "min-role") return val;
-  return "cost";
-}
+import {
+  decodeState,
+  encodeState,
+  applyCountryChange,
+  applyCityChange,
+} from "@/features/cost-of-living-calculator/core/url-state";
+import type { CalculatorState } from "@/features/cost-of-living-calculator/core/url-state";
 
 export function CostOfLivingCalculatorContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const locale = useLocale();
 
-  const initialCityId = searchParams.get("city");
-  const initialCountryId = searchParams.get("country");
+  // URL is the single source of truth. Derive ALL state from decoded URL params.
+  const currentState = decodeState(new URLSearchParams(searchParams.toString()), dataset);
 
-  const [activeTab, setActiveTab] = useState<Tab>(() => parseTab(searchParams.get("tab")));
-  // city wins over country when both present
-  const [detailCityId, setDetailCityId] = useState<string | null>(initialCityId);
-  const [activeCountryId, setActiveCountryId] = useState<string | null>(initialCityId ? null : initialCountryId);
+  const { tab: activeTab, region, countryId, cityId, household, schoolType, area } = currentState;
 
-  const [household, setHousehold] = useState<Household>({
-    adults: 1,
-    preschoolKids: 0,
-    schoolKids: 0,
-  });
-  const [schoolType, setSchoolType] = useState<SchoolType>("public");
-  const [area, setArea] = useState<Area>("center");
+  // Canonicalize on mount: if decoded state differs from raw URL, replace with canonical form.
+  useEffect(() => {
+    const rawParams = new URLSearchParams(searchParams.toString());
+    const canonicalParams = encodeState(currentState);
+    if (rawParams.toString() !== canonicalParams.toString()) {
+      const qs = canonicalParams.toString();
+      router.replace(qs ? `?${qs}` : "?");
+    }
+    // Run only on mount — exhaustive deps would cause loops; eslint-disable is intentional.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const [geoScope, setGeoScope] = useState<GeoScope>({
-    region: null,
-    countryId: initialCityId ? null : initialCountryId,
-    cityId: initialCityId,
-  });
+  // Helper: encode new state and push to URL history.
+  function pushState(next: CalculatorState) {
+    const params = encodeState(next);
+    const qs = params.toString();
+    router.push(qs ? `?${qs}` : "?");
+  }
 
   // Build scoped dataset for filtered table views.
   // City selection is the narrowest scope and must win — a city-only filter
   // (Country = "All countries") still scopes candidates to that single city.
   const scopedCities = (() => {
-    if (geoScope.cityId) return dataset.cities.filter((c) => c.id === geoScope.cityId);
-    if (geoScope.countryId) return dataset.cities.filter((c) => c.countryId === geoScope.countryId);
-    if (geoScope.region) return dataset.cities.filter((c) => c.region === geoScope.region);
+    if (cityId) return dataset.cities.filter((c) => c.id === cityId);
+    if (countryId) return dataset.cities.filter((c) => c.countryId === countryId);
+    if (region) return dataset.cities.filter((c) => c.region === region);
     return dataset.cities;
   })();
   const scopedDataset = { ...dataset, cities: scopedCities };
@@ -72,31 +74,54 @@ export function CostOfLivingCalculatorContent() {
     const params = new URLSearchParams(href.slice(1));
     if (params.has("city")) {
       e.preventDefault();
-      const cityId = params.get("city")!;
-      setDetailCityId(cityId);
-      setActiveCountryId(null);
-      setActiveTab("cost");
-      router.replace(`?tab=cost&city=${cityId}`);
+      const newCityId = params.get("city")!;
+      const next = applyCityChange({ ...currentState, tab: "cost" }, newCityId, dataset);
+      pushState(next);
     } else if (params.has("country")) {
       e.preventDefault();
-      const countryId = params.get("country")!;
-      setActiveCountryId(countryId);
-      setDetailCityId(null);
-      setGeoScope((prev) => ({ ...prev, countryId, cityId: null }));
-      router.replace(`?tab=cost&country=${countryId}`);
+      const newCountryId = params.get("country")!;
+      const next = applyCountryChange({ ...currentState, tab: "cost" }, newCountryId, dataset);
+      pushState(next);
     }
   }
 
   const firstCity = dataset.cities[0]!;
 
-  // suppress unused variable warning — activeCountryId drives URL state via router.replace
-  void activeCountryId;
-
   function handleTabChange(value: string) {
-    const next = parseTab(value);
-    setActiveTab(next);
-    if (next === "cost") setDetailCityId(null);
+    const next = value as CalculatorState["tab"];
+    // Tab change: clear cityId when moving away from cost tab
+    const nextState: CalculatorState = {
+      ...currentState,
+      tab: next,
+      cityId: next === "cost" ? cityId : null,
+    };
+    pushState(nextState);
   }
+
+  function handleScopeChange(scope: GeoScope) {
+    const nextState: CalculatorState = {
+      ...currentState,
+      region: scope.region,
+      countryId: scope.countryId,
+      cityId: scope.cityId,
+    };
+    pushState(nextState);
+  }
+
+  function handleHouseholdChange(h: Household) {
+    pushState({ ...currentState, household: h });
+  }
+
+  function handleSchoolTypeChange(s: SchoolType) {
+    pushState({ ...currentState, schoolType: s });
+  }
+
+  function handleAreaChange(a: Area) {
+    pushState({ ...currentState, area: a });
+  }
+
+  // Show city detail view when a city is selected on the cost tab
+  const detailCityId = activeTab === "cost" ? cityId : null;
 
   return (
     <main data-testid="calc-page" className="mx-auto max-w-6xl space-y-4 px-4 py-6">
@@ -141,26 +166,14 @@ export function CostOfLivingCalculatorContent() {
           </p>
         )}
 
-        {/* Shared geo filters */}
+        {/* Shared geo filters — fully controlled, reads from URL-derived state */}
         <GeoFilters
           dataset={dataset}
           locale={locale}
-          initialCountryId={initialCityId ? null : initialCountryId}
-          initialCityId={initialCityId}
-          onScopeChange={(scope) => {
-            setGeoScope(scope);
-            setActiveCountryId(scope.countryId);
-            if (scope.cityId) setDetailCityId(scope.cityId);
-            // Write filter state back to URL
-            const params = new URLSearchParams();
-            params.set("tab", "cost");
-            if (scope.cityId) {
-              params.set("city", scope.cityId);
-            } else if (scope.countryId) {
-              params.set("country", scope.countryId);
-            }
-            router.replace(`?${params.toString()}`);
-          }}
+          region={region}
+          countryId={countryId}
+          cityId={cityId}
+          onScopeChange={handleScopeChange}
         />
 
         {/* Shared cost-basis controls */}
@@ -171,9 +184,9 @@ export function CostOfLivingCalculatorContent() {
           schoolType={schoolType}
           area={area}
           locale={locale}
-          onHouseholdChange={setHousehold}
-          onSchoolTypeChange={setSchoolType}
-          onAreaChange={setArea}
+          onHouseholdChange={handleHouseholdChange}
+          onSchoolTypeChange={handleSchoolTypeChange}
+          onAreaChange={handleAreaChange}
         />
 
         {/* Data last updated + estimates disclaimer */}

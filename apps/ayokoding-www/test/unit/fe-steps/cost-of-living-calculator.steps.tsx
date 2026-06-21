@@ -3,25 +3,75 @@ import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, vi } from "vitest";
+import React from "react";
 
-// Stable vi.fn() for useSearchParams — hoisted above vi.mock and all imports
-const { mockUseSearchParams } = vi.hoisted(() => ({
-  mockUseSearchParams: vi.fn(() => new URLSearchParams()),
-}));
+// ─── Reactive Navigation Mock ─────────────────────────────────────────────────
+// The steps file renders a full page that includes URL-driven components.
+// We need router.push/replace to trigger re-renders of the component tree.
+//
+// Strategy: use React Context. NavigationProvider holds URLSearchParams as
+// context value and exposes a setter. useSearchParams reads from context,
+// so any context update causes all consumers to re-render with the new params.
+// navState is hoisted so the vi.mock factory sees it before module body runs.
 
-// Override next/navigation so this file's factory wins over test-setup.ts
+// navState hoisted so vi.mock factory closure sees initialized object.
+const { navState } = vi.hoisted(() => {
+  const navState = {
+    params: new URLSearchParams(),
+    // setParams wired by NavigationProvider on mount
+    setParams: (_: URLSearchParams) => {},
+  };
+  return { navState };
+});
+
+// Context that holds the current URLSearchParams.
+const NavParamsContext = React.createContext<URLSearchParams>(new URLSearchParams());
+
+// Override next/navigation so this file's factory wins over test-setup.ts.
+// useSearchParams reads from NavParamsContext → context updates trigger re-renders.
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: vi.fn(),
-    replace: vi.fn(),
+    push: (url: string) => {
+      const qs = url.startsWith("?") ? url.slice(1) : url;
+      navState.params = new URLSearchParams(qs);
+      navState.setParams(navState.params);
+    },
+    replace: (url: string) => {
+      const qs = url.startsWith("?") ? url.slice(1) : url;
+      navState.params = new URLSearchParams(qs);
+      navState.setParams(navState.params);
+    },
     back: vi.fn(),
     prefetch: vi.fn(),
   }),
   usePathname: () => "/en/tools/cost-of-living-calculator",
   useParams: () => ({ locale: "en" }),
-  useSearchParams: mockUseSearchParams,
+  // Read from context — context updates force re-renders in all consumers.
+  useSearchParams: () => React.useContext(NavParamsContext),
   notFound: vi.fn(),
 }));
+
+// NavigationProvider: provides NavParamsContext and wires navState.setParams
+// so that router.push/replace triggers a context value update → children re-render.
+function NavigationProvider({ children }: { children: React.ReactNode }) {
+  const [params, setParams] = React.useState(() => navState.params);
+
+  React.useEffect(() => {
+    navState.setParams = (newParams) => {
+      setParams(newParams);
+    };
+    return () => {
+      navState.setParams = () => {};
+    };
+  }, []);
+
+  return <NavParamsContext.Provider value={params}>{children}</NavParamsContext.Provider>;
+}
+
+// Helper to render a page within the NavigationProvider.
+function renderPage(ui: React.ReactElement) {
+  return render(<NavigationProvider>{ui}</NavigationProvider>);
+}
 
 import "./helpers/test-setup";
 import CostOfLivingCalculatorPage from "@/app/[locale]/tools/cost-of-living-calculator/page";
@@ -37,7 +87,12 @@ const feature = await loadFeature(
 );
 
 describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
-  AfterEachScenario(cleanup);
+  AfterEachScenario(() => {
+    cleanup();
+    // Reset URL state between scenarios so each test starts with empty params
+    navState.params = new URLSearchParams();
+    navState.setParams = () => {};
+  });
 
   // ─── Cost of Living tab scenarios ───────────────────────────────────────────
 
@@ -46,7 +101,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     And('the "Cost of living" tab is active', () => {});
 
     When("the page finishes loading", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then("I see a table of tech-hub cities", () => {
@@ -101,7 +156,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       And('the "Cost of living" tab is active', () => {});
 
       When('I select the region "ASEAN" then the country "Indonesia" in the cascading filters', async () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
         await user.selectOptions(screen.getByRole("combobox", { name: /region/i }), "asean");
         await user.selectOptions(screen.getByRole("combobox", { name: /country/i }), "id");
       });
@@ -142,7 +197,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
 
     When("I view any tab's results table", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then("every row shows a Country column immediately to the left of the City column", () => {
@@ -159,7 +214,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const firstCity = dataset.cities[0]!;
 
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("I click a city name in any table", async () => {
@@ -194,7 +249,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const firstCountryCities = dataset.cities.filter((c) => c.countryId === firstCountry.id);
 
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("I click a country name in any table", async () => {
@@ -226,13 +281,11 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const firstCity = dataset.cities[0]!;
 
     Given("I am on the calculator with both a country and a city query param set", () => {
-      mockUseSearchParams.mockReturnValueOnce(
-        new URLSearchParams(`tab=cost&country=${firstCity.countryId}&city=${firstCity.id}`),
-      );
+      navState.params = new URLSearchParams(`tab=cost&country=${firstCity.countryId}&city=${firstCity.id}`);
     });
 
     When('the page resolves the deep link at "?tab=cost&country=<id>&city=<id>"', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then("the single-city Cost-of-living detail for the city is shown because a city implies its country", () => {
@@ -244,7 +297,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
 
     When("I select any city on any tab", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then("a healthcare funding-scheme badge is shown for that city's country", () => {
@@ -265,7 +318,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on a tab that shows the "Healthcare (OOP)" column', () => {});
 
     When("I read the legend near the table", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then('an on-screen explanation states that "OOP = out-of-pocket"', () => {
@@ -286,7 +339,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on the "Cost of living" tab', () => {});
 
     When("I read a city row", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then("the one-time relocation sunk-cost total is shown distinct from the monthly total", () => {
@@ -312,7 +365,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
       Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
       And('I switch to the "Savings" tab', async () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
         await user.click(screen.getByRole("tab", { name: /savings/i }));
       });
 
@@ -347,7 +400,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -371,7 +424,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab with a gross salary entered', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
       const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
       await user.clear(input);
@@ -399,7 +452,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab with a gross salary entered', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
       const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
       await user.clear(input);
@@ -430,7 +483,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab with a gross salary entered', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
       const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
       await user.clear(input);
@@ -454,7 +507,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -478,7 +531,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab for a high-cost city', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -522,7 +575,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("No Israeli cities are listed", ({ Given, When, Then }) => {
     Given("I am on the calculator in either locale", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the page finishes loading", () => {
@@ -539,7 +592,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Data snapshot date is clearly shown", ({ Given, When, Then, And }) => {
     Given("I am on the calculator", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the page finishes loading", () => {
@@ -561,7 +614,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Every monetary figure converts to USD via the in-repo FX table", ({ Given, When, Then, And }) => {
     Given("I am on the calculator", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("I read any USD figure derived from a local-currency value", () => {
@@ -585,7 +638,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Cost of living" tab', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When('I change the household from "single" to married with 2 school-age children', async () => {
@@ -612,7 +665,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Cost of living" tab', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("I set the household to 1 pre-school child and 0 school-age children", async () => {
@@ -634,7 +687,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
 
     When("the household has no school-age children", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     Then("no school-type toggle is shown", () => {
@@ -648,7 +701,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
 
     And("the household has 2 school-age children", async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.selectOptions(screen.getByRole("combobox", { name: /school-age children/i }), "2");
     });
 
@@ -666,7 +719,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Cost of living" tab', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When('I switch the area from "city center" to "rural"', async () => {
@@ -691,7 +744,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
       Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
       And('I switch to the "Minimum role" tab', async () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
         await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       });
       And('I set the baseline source to "savings target"', async () => {
@@ -732,7 +785,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
 
@@ -751,7 +804,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -779,7 +832,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -801,7 +854,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -828,7 +881,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -849,7 +902,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -870,7 +923,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
     And('I set the baseline source to "reference role"', async () => {
@@ -898,7 +951,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
     And('I set the baseline source to "my salary"', async () => {
@@ -925,7 +978,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -951,7 +1004,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set and a display currency chosen', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -985,7 +1038,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given(
       'I am on the "Minimum role" tab and the "SWE I" role qualifies for the "single" household basis',
       async () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
         await user.click(screen.getByRole("tab", { name: /minimum role/i }));
         await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
         const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -1017,7 +1070,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
 
@@ -1041,7 +1094,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
       const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
@@ -1062,7 +1115,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
 
@@ -1079,7 +1132,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("No Israeli city appears among role candidates", async ({ Given, When, Then }) => {
     Given('I am on the "Minimum role" tab', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the page finishes loading", () => {
@@ -1100,7 +1153,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1132,7 +1185,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       const user = userEvent.setup();
 
       Given('I am on the "Cost of living" tab', () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
       });
 
       And("I set the household to 2 adults with no children", async () => {
@@ -1161,7 +1214,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const firstCity = dataset.cities[0]!;
 
     Given('I am on the "Cost of living" tab', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("I select a city from the City dropdown filter", async () => {
@@ -1184,7 +1237,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1206,7 +1259,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
   Scenario("Mobile city cards show the country name alongside the city", async ({ Given, When, Then }) => {
     Given('I am viewing the "Cost of living" tab on a viewport narrower than 768 px', () => {
       // jsdom has no real viewport; responsive rendering verified at e2e level
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the mobile city cards render", () => {
@@ -1225,7 +1278,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
 
@@ -1264,7 +1317,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       const user = userEvent.setup();
 
       Given("I am on the cost-of-living calculator", () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
       });
 
       And("the default household is 1 adult with no children in city center", () => {
@@ -1299,7 +1352,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("a user is on the cost-of-living calculator page", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When('the user selects Country "Indonesia" and City "Jakarta"', async () => {
@@ -1323,7 +1376,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Page title includes tool name on load", ({ Given, When, Then }) => {
     Given("a user navigates to the cost-of-living calculator", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the page finishes loading with default filter state", () => {
@@ -1342,7 +1395,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1368,7 +1421,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1394,7 +1447,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1419,7 +1472,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("a user is on the cost-of-living calculator page", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When('the user selects Country "Indonesia" without selecting a city', async () => {
@@ -1449,7 +1502,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       const user = userEvent.setup();
 
       Given('I am on "/en/tools/cost-of-living-calculator"', () => {
-        render(<CostOfLivingCalculatorPage />);
+        renderPage(<CostOfLivingCalculatorPage />);
       });
 
       And("the household has no school-age children", () => {
@@ -1480,7 +1533,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("I am on the cost-of-living calculator", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     And("the default household is 1 adult with no children in city center", () => {
@@ -1515,7 +1568,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("a user has opened the Cost of Living Calculator", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("they click the Savings tab", async () => {
@@ -1544,7 +1597,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("a user is on the Savings tab with the empty-state message displayed", async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1569,7 +1622,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("a user has opened the Cost of Living Calculator", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("they click the Minimum Role tab", async () => {
@@ -1600,7 +1653,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("a user is on the Cost of Living tab", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     And('"City center" is the currently active area selection', () => {
@@ -1626,7 +1679,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Tab sub-labels are visually separated from tab names", ({ Given, When, Then, And }) => {
     Given("a user views the Cost of Living Calculator tab bar", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("any tab is in the inactive state", () => {
@@ -1692,7 +1745,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Cost-of-living table shows local currency and USD for each expense cell", ({ Given, When, Then, And }) => {
     Given("the user is on the Cost of living tab at desktop width", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the table renders with at least one city row", () => {
@@ -1713,7 +1766,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given("the user is on the Savings tab with a gross salary entered", async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
       const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
       await user.clear(input);
@@ -1737,7 +1790,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
   ScenarioOutline("H1 matches the tool's official name in each locale", ({ Given, When, Then, And }) => {
     Given('the user opens "/<locale>/tools/cost-of-living-calculator"', () => {
       // Locale-specific rendering verified at e2e level; unit stub
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the page renders", () => {
@@ -1758,7 +1811,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Id locale cost-of-living table uses Indonesian translations", ({ Given, When, Then, And }) => {
     Given('the user is on "/id/tools/cost-of-living-calculator" at desktop width', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the cost-of-living table renders", () => {
@@ -1779,7 +1832,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('the user is on "/id/tools/cost-of-living-calculator" at desktop width', () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     And("the Minimum role tab is active", async () => {
@@ -1801,7 +1854,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('the user is on the "Savings" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /savings/i }));
     });
 
@@ -1823,7 +1876,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     const user = userEvent.setup();
 
     Given('the user is on the "Minimum role" tab', async () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
 
@@ -1839,7 +1892,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
   Scenario("Tab labels are clean single phrases", ({ Given, When, Then }) => {
     Given("the user views the tab bar at any breakpoint", () => {
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the tab bar renders", () => {
@@ -1870,7 +1923,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
   Scenario("Mobile nav drawer shows localized site navigation", ({ Given, When, Then, And }) => {
     Given('the user opens the mobile nav drawer at 375px on the "/id/" locale', () => {
       // Mobile viewport not testable in jsdom; verified at e2e level
-      render(<CostOfLivingCalculatorPage />);
+      renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When("the drawer renders", () => {

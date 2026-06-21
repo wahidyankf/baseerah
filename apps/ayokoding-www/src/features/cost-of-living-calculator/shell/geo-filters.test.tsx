@@ -1,12 +1,54 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 import { dataset } from "../core/data/cities";
 import { countriesForRegion, citiesForCountry } from "../core/geo-filter";
 import { GeoFilters } from "./geo-filters";
+import type { GeoScope } from "./geo-filters";
 import { CostOfLivingTable } from "./cost-of-living";
 
 afterEach(cleanup);
+
+type Region = "asean" | "japan" | "europe" | "nordics" | "americas" | "mena" | "asia" | "oceania" | "africa";
+
+// Stateful wrapper for testing the controlled GeoFilters component.
+// Mirrors onScopeChange back to the controlled props so the component reflects changes.
+function ControlledGeoFilters({
+  onScopeChange,
+  initialRegion = null,
+  initialCountryId = null,
+  initialCityId = null,
+  locale,
+}: {
+  onScopeChange?: (scope: GeoScope) => void;
+  initialRegion?: Region | null;
+  initialCountryId?: string | null;
+  initialCityId?: string | null;
+  locale?: "en" | "id";
+}) {
+  const [scope, setScope] = useState<GeoScope>({
+    region: initialRegion,
+    countryId: initialCountryId,
+    cityId: initialCityId,
+  });
+
+  function handleScopeChange(newScope: GeoScope) {
+    setScope(newScope);
+    onScopeChange?.(newScope);
+  }
+
+  return (
+    <GeoFilters
+      dataset={dataset}
+      locale={locale}
+      region={scope.region}
+      countryId={scope.countryId}
+      cityId={scope.cityId}
+      onScopeChange={handleScopeChange}
+    />
+  );
+}
 
 // Gherkin (binds): "Region narrows the country filter and country narrows the city filter"
 describe("GeoFilters", () => {
@@ -14,7 +56,7 @@ describe("GeoFilters", () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} />);
 
     const aseanCountries = countriesForRegion(dataset, "asean");
 
@@ -38,7 +80,7 @@ describe("GeoFilters", () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} />);
 
     const regionSelect = screen.getByRole("combobox", { name: /region/i });
     await user.selectOptions(regionSelect, "asean");
@@ -66,7 +108,7 @@ describe("GeoFilters", () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} />);
 
     const regionSelect = screen.getByRole("combobox", { name: /region/i });
     await user.selectOptions(regionSelect, "asean");
@@ -88,7 +130,7 @@ describe("GeoFilters", () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} />);
 
     const regionSelect = screen.getByRole("combobox", { name: /region/i });
     await user.selectOptions(regionSelect, "asean");
@@ -96,12 +138,70 @@ describe("GeoFilters", () => {
     expect(onScopeChange).toHaveBeenCalledWith(expect.objectContaining({ region: "asean" }));
   });
 
+  it("renders region select with value from the region prop", () => {
+    const onScopeChange = vi.fn();
+
+    render(
+      <GeoFilters
+        dataset={dataset}
+        region={"europe" as Region}
+        countryId={null}
+        cityId={null}
+        onScopeChange={onScopeChange}
+      />,
+    );
+
+    const regionSelect = screen.getByRole("combobox", { name: /region/i });
+    expect(regionSelect).toHaveValue("europe");
+  });
+
+  it("renders country select with value from the countryId prop", () => {
+    const onScopeChange = vi.fn();
+
+    render(
+      <GeoFilters
+        dataset={dataset}
+        region={"asean" as Region}
+        countryId={"id"}
+        cityId={null}
+        onScopeChange={onScopeChange}
+      />,
+    );
+
+    const countrySelect = screen.getByRole("combobox", { name: /country/i });
+    expect(countrySelect).toHaveValue("id");
+  });
+
+  it("when region changes to incompatible region, onScopeChange receives cascaded scope with cleared country and city", async () => {
+    const user = userEvent.setup();
+    const onScopeChange = vi.fn();
+
+    // Start with asean + id (Indonesia)
+    render(
+      <ControlledGeoFilters
+        onScopeChange={onScopeChange}
+        initialRegion={"asean" as Region}
+        initialCountryId={"id"}
+        initialCityId={null}
+      />,
+    );
+
+    // Change to europe — Indonesia is not in Europe
+    const regionSelect = screen.getByRole("combobox", { name: /region/i });
+    await user.selectOptions(regionSelect, "europe");
+
+    // The cascaded scope should clear country and city
+    expect(onScopeChange).toHaveBeenCalledWith(
+      expect.objectContaining({ region: "europe", countryId: null, cityId: null }),
+    );
+  });
+
   // Gherkin (binds): "Filter dropdowns show Indonesian country and city names in the ID locale"
   it("shows Indonesian country names for locale=id after selecting ASEAN region", async () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} locale="id" onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} locale="id" />);
 
     const regionSelect = screen.getByRole("combobox", { name: /wilayah/i });
     await user.selectOptions(regionSelect, "asean");
@@ -122,7 +222,7 @@ describe("GeoFilters", () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} locale="id" onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} locale="id" />);
 
     const regionSelect = screen.getByRole("combobox", { name: /wilayah/i });
     await user.selectOptions(regionSelect, "asean");
@@ -167,7 +267,7 @@ describe("GeoFilters", () => {
     const user = userEvent.setup();
     const onScopeChange = vi.fn();
 
-    render(<GeoFilters dataset={dataset} locale="id" onScopeChange={onScopeChange} />);
+    render(<ControlledGeoFilters onScopeChange={onScopeChange} locale="id" />);
 
     // Select a region to reveal the clear button
     const regionSelect = screen.getByRole("combobox", { name: /wilayah/i });

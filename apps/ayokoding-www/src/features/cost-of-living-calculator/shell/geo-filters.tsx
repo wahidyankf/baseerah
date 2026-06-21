@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import type { Dataset } from "../core/data/cities";
 import { countriesForRegion, citiesForCountry, scopedCities } from "../core/geo-filter";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
+import { applyRegionChange, applyCountryChange, applyCityChange } from "../core/url-state";
+import type { CalculatorState } from "../core/url-state";
 
 type Region = "asean" | "japan" | "europe" | "nordics" | "americas" | "mena" | "asia" | "oceania" | "africa";
 
@@ -17,9 +18,10 @@ export type GeoScope = {
 type Props = {
   dataset: Dataset;
   locale?: Locale;
+  region: Region | null;
+  countryId: string | null;
+  cityId: string | null;
   onScopeChange: (scope: GeoScope) => void;
-  initialCountryId?: string | null;
-  initialCityId?: string | null;
 };
 
 const REGION_LABELS: Record<Region, string> = {
@@ -39,11 +41,20 @@ export function localeName(name: { en: string; id: string }, locale: Locale): st
   return name[locale] ?? name.en;
 }
 
-export function GeoFilters({ dataset, locale = "en", onScopeChange, initialCountryId, initialCityId }: Props) {
-  const [region, setRegion] = useState<Region | null>(null);
-  const [countryId, setCountryId] = useState<string | null>(initialCountryId ?? null);
-  const [cityId, setCityId] = useState<string | null>(initialCityId ?? null);
+// Build a minimal CalculatorState stub from the current geo props for apply helpers.
+function toStateStub(region: Region | null, countryId: string | null, cityId: string | null): CalculatorState {
+  return {
+    tab: "cost",
+    region,
+    countryId,
+    cityId,
+    household: { adults: 1, preschoolKids: 0, schoolKids: 0 },
+    schoolType: "public",
+    area: "center",
+  };
+}
 
+export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, onScopeChange }: Props) {
   // Pre-resolve all translated strings to avoid repeated t() calls in JSX.
   const labels = {
     region: t(locale, "labelRegion"),
@@ -64,29 +75,26 @@ export function GeoFilters({ dataset, locale = "en", onScopeChange, initialCount
 
   function handleRegionChange(val: string) {
     const newRegion = val === "" ? null : (val as Region);
-    setRegion(newRegion);
-    setCountryId(null);
-    setCityId(null);
-    onScopeChange({ region: newRegion, countryId: null, cityId: null });
+    const currentState = toStateStub(region, countryId, cityId);
+    const next = applyRegionChange(currentState, newRegion, dataset);
+    onScopeChange({ region: next.region, countryId: next.countryId, cityId: next.cityId });
   }
 
   function handleCountryChange(val: string) {
     const newCountryId = val === "" ? null : val;
-    setCountryId(newCountryId);
-    setCityId(null);
-    onScopeChange({ region, countryId: newCountryId, cityId: null });
+    const currentState = toStateStub(region, countryId, cityId);
+    const next = applyCountryChange(currentState, newCountryId, dataset);
+    onScopeChange({ region: next.region, countryId: next.countryId, cityId: next.cityId });
   }
 
   function handleCityChange(val: string) {
     const newCityId = val === "" ? null : val;
-    setCityId(newCityId);
-    onScopeChange({ region, countryId, cityId: newCityId });
+    const currentState = toStateStub(region, countryId, cityId);
+    const next = applyCityChange(currentState, newCityId, dataset);
+    onScopeChange({ region: next.region, countryId: next.countryId, cityId: next.cityId });
   }
 
   function clearRegion() {
-    setRegion(null);
-    setCountryId(null);
-    setCityId(null);
     onScopeChange({ region: null, countryId: null, cityId: null });
   }
 

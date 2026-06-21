@@ -41,24 +41,24 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Install dependencies in the root worktree: `npm install`
+- [x] [AI] Install dependencies in the root worktree: `npm install`
       — acceptance: exits 0, `node_modules/` synchronized
-- [ ] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
+- [x] [AI] Converge the full polyglot toolchain in the root worktree: `npm run doctor -- --fix`
       — acceptance: exits 0 with no unresolved drift
-- [ ] [AI] Confirm the dev server starts: `nx dev ayokoding-www` then stop it
+- [x] [AI] Confirm the dev server starts: `nx dev ayokoding-www` then stop it
       — acceptance: server binds port 3101 and serves `/en/tools/cost-of-living-calculator`
-- [ ] [AI] Establish the baseline for affected projects:
+- [x] [AI] Establish the baseline for affected projects:
       `npx nx run-many -t typecheck lint test:quick specs:coverage -p ayokoding-www ayokoding-www-fe-e2e`
       — acceptance: baseline pass/fail count recorded; all preexisting failures documented
-- [ ] [AI] Resolve all preexisting failures before proceeding
+- [x] [AI] Resolve all preexisting failures before proceeding
       — acceptance: no preexisting failures remain unresolved
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npx nx run-many -t typecheck lint test:quick specs:coverage -p ayokoding-www ayokoding-www-fe-e2e`
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+- [x] [AI] `npx nx run-many -t typecheck lint test:quick specs:coverage -p ayokoding-www ayokoding-www-fe-e2e`
       baseline recorded and every preexisting failure resolved (zero unresolved)
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no feature
@@ -75,23 +75,23 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### 1a. encode/decode round-trip + clean URLs
 
-- [ ] [AI] **RED**: create `apps/ayokoding-www/src/features/cost-of-living-calculator/core/url-state.unit.test.ts`
+- [x] [AI] **RED**: create `apps/ayokoding-www/src/features/cost-of-living-calculator/core/url-state.unit.test.ts`
       with tests asserting `encodeState(DEFAULT_STATE).toString() === ""` and
       `decodeState(new URLSearchParams("tab=savings"), dataset).tab === "savings"`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: fails because `core/url-state.ts` does not exist
   - **Gherkin (underpins) →** prd.md §Round-trip and §Sanitize default-stripping scenarios
-- [ ] [AI] **GREEN**: create `core/url-state.ts` with `PARAM_KEYS`, `DEFAULT_STATE`, `encodeState`,
+- [x] [AI] **GREEN**: create `core/url-state.ts` with `PARAM_KEYS`, `DEFAULT_STATE`, `encodeState`,
       `decodeState` (defaults omitted on encode; unknown/missing → default on decode)
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: the 1a tests pass; no other unit tests broken
-- [ ] [AI] **REFACTOR**: extract per-control parse/serialize helpers; remove duplication
+- [x] [AI] **REFACTOR**: extract per-control parse/serialize helpers; remove duplication
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 1b. numeric clamp (out-of-range → default)
 
-- [ ] [AI] **RED**: add tests asserting `decodeState("adults=4")` → `adults: 1`,
+- [x] [AI] **RED**: add tests asserting `decodeState("adults=4")` → `adults: 1`,
       `decodeState("preschool=9")` → `preschoolKids: 0`, `decodeState("schoolkids=-1")` → `0`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: fails (clamp not yet implemented)
@@ -105,16 +105,16 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the URL is rewritten to have no "adults" param
     ```
 
-- [ ] [AI] **GREEN**: implement range validation in `decodeState` (adults∈{1,2}, kids∈{0..3})
+- [x] [AI] **GREEN**: implement range validation in `decodeState` (adults∈{1,2}, kids∈{0..3})
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 1b tests pass
-- [ ] [AI] **REFACTOR**: centralize the valid-range table; ensure idempotency
+- [x] [AI] **REFACTOR**: centralize the valid-range table; ensure idempotency
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 1c. enum/id validity (drop unknown)
 
-- [ ] [AI] **RED**: add tests asserting `decodeState("city=atlantis")` → `cityId: null`,
+- [x] [AI] **RED**: add tests asserting `decodeState("city=atlantis")` → `cityId: null`,
       `decodeState("country=Indonesia")` → `countryId: null`, `decodeState("region=mars")` →
       `region: null`, `decodeState("schooltype=montessori")` → `schoolType: "public"`
       — command: `nx run ayokoding-www:test:unit`
@@ -129,17 +129,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the URL is rewritten to have no "country" param
     ```
 
-- [ ] [AI] **GREEN**: validate city/country ids against `dataset` and region/enum against the unions
+- [x] [AI] **GREEN**: validate city/country ids against `dataset` and region/enum against the unions
       in `decodeState`; drop unknowns
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 1c tests pass
-- [ ] [AI] **REFACTOR**: share the membership lookups with `core/geo-filter.ts`
+- [x] [AI] **REFACTOR**: share the membership lookups with `core/geo-filter.ts`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 1d. backfill (narrower fills broader)
 
-- [ ] [AI] **RED**: add tests asserting `applyCityChange(state, "singapore")` →
+- [x] [AI] **RED**: add tests asserting `applyCityChange(state, "singapore")` →
       `{ cityId:"singapore", countryId:"sg", region:"asean" }` and `applyCountryChange(state,"id")` →
       `{ countryId:"id", region:"asean" }`
       — command: `nx run ayokoding-www:test:unit`
@@ -154,17 +154,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the Country filter shows "Indonesia" and the Region filter shows "ASEAN"
     ```
 
-- [ ] [AI] **GREEN**: implement `applyCityChange` / `applyCountryChange` backfilling country+region
+- [x] [AI] **GREEN**: implement `applyCityChange` / `applyCountryChange` backfilling country+region
       via `core/geo-filter.ts` membership
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 1d tests pass
-- [ ] [AI] **REFACTOR**: factor a shared `backfillGeo(state)` helper
+- [x] [AI] **REFACTOR**: factor a shared `backfillGeo(state)` helper
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 1e. cascade-clear (broader clears narrower) — the Singapore→Europe case
 
-- [ ] [AI] **RED**: add tests asserting `applyRegionChange({cityId:"singapore",countryId:"sg",region:"asean"}, "europe")`
+- [x] [AI] **RED**: add tests asserting `applyRegionChange({cityId:"singapore",countryId:"sg",region:"asean"}, "europe")`
       → `{ region:"europe", countryId:null, cityId:null }` and that picking a region the current
       city DOES belong to keeps the city
       — command: `nx run ayokoding-www:test:unit`
@@ -179,17 +179,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       But the URL query string does not include "country" or "city"
     ```
 
-- [ ] [AI] **GREEN**: implement `applyRegionChange`/`applyCountryChange` clearing now-impossible
+- [x] [AI] **GREEN**: implement `applyRegionChange`/`applyCountryChange` clearing now-impossible
       narrower filters (membership-checked, not unconditional clear)
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 1e tests pass
-- [ ] [AI] **REFACTOR**: unify backfill + cascade into a single `reconcileGeo` step
+- [x] [AI] **REFACTOR**: unify backfill + cascade into a single `reconcileGeo` step
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 1f. sanitize + canonicalize (narrower-wins conflict, idempotent)
 
-- [ ] [AI] **RED**: add tests asserting `decodeState("region=europe&city=singapore")` →
+- [x] [AI] **RED**: add tests asserting `decodeState("region=europe&city=singapore")` →
       `{ cityId:"singapore", countryId:"sg", region:"asean" }` (narrower wins) and
       `sanitizeState(sanitizeState(s)) === sanitizeState(s)` (idempotent)
       — command: `nx run ayokoding-www:test:unit`
@@ -204,17 +204,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the URL is rewritten to canonical form with "city=singapore" and "region" backfilled to "asean"
     ```
 
-- [ ] [AI] **GREEN**: implement `sanitizeState` (narrower-wins, backfill, clamp, drop-unknown);
+- [x] [AI] **GREEN**: implement `sanitizeState` (narrower-wins, backfill, clamp, drop-unknown);
       ensure `decodeState` = parse + `sanitizeState`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 1f tests pass
-- [ ] [AI] **REFACTOR**: assert idempotency in a property-style test; tidy
+- [x] [AI] **REFACTOR**: assert idempotency in a property-style test; tidy
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 1g. parent scope for the back link
 
-- [ ] [AI] **RED**: add a test asserting `parentScopeParams({cityId:"singapore",countryId:"sg",region:"asean"}).toString()`
+- [x] [AI] **RED**: add a test asserting `parentScopeParams({cityId:"singapore",countryId:"sg",region:"asean"}).toString()`
       contains `region=asean` and `country=sg` but not `city`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: fails (`parentScopeParams` not yet implemented)
@@ -228,10 +228,10 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       But the URL query string does not include "city"
     ```
 
-- [ ] [AI] **GREEN**: implement `parentScopeParams` (encode region+country, omit defaults, drop city)
+- [x] [AI] **GREEN**: implement `parentScopeParams` (encode region+country, omit defaults, drop city)
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 1g test passes
-- [ ] [AI] **REFACTOR**: reuse `encodeState` internals; tidy
+- [x] [AI] **REFACTOR**: reuse `encodeState` internals; tidy
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
@@ -239,11 +239,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `nx run ayokoding-www:test:unit` — all `core/url-state.unit.test.ts` cases pass; no other
+- [x] [AI] `nx run ayokoding-www:test:unit` — all `core/url-state.unit.test.ts` cases pass; no other
       unit tests broken
-- [ ] [AI] `nx run ayokoding-www:typecheck` — exits 0
-- [ ] [AI] `nx run ayokoding-www:lint` — exits 0
-- [ ] [AI] Commit thematically (e.g. `feat(ayokoding-www): add pure url-state core for calculator`)
+- [x] [AI] `nx run ayokoding-www:typecheck` — exits 0
+- [x] [AI] `nx run ayokoding-www:lint` — exits 0
+- [x] [AI] Commit thematically (e.g. `feat(ayokoding-www): add pure url-state core for calculator`)
       — acceptance: commit created, working tree clean
 
 > **Pause Safety**: a new, fully-unit-tested pure module exists but nothing consumes it yet — the
@@ -260,24 +260,24 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### 2a. Make `GeoFilters` controlled
 
-- [ ] [AI] **RED**: update `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.test.tsx`
+- [x] [AI] **RED**: update `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.test.tsx`
       to assert `GeoFilters` renders the region/country/city `<select>` values from props (no
       internal `useState`) and calls `onScopeChange` with the cascaded scope
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: fails (component still self-stateful)
   - **Gherkin (underpins) →** prd.md §Cascade-clear + §Backfill component behavior
-- [ ] [AI] **GREEN**: refactor `shell/geo-filters.tsx` to controlled (props: `region`, `countryId`,
+- [x] [AI] **GREEN**: refactor `shell/geo-filters.tsx` to controlled (props: `region`, `countryId`,
       `cityId`, `onScopeChange`); remove the internal `useState`; delegate cascade to
       `core/url-state.ts` helpers
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 2a tests pass
-- [ ] [AI] **REFACTOR**: tidy prop types; remove dead `initialCountryId`/`initialCityId`
+- [x] [AI] **REFACTOR**: tidy prop types; remove dead `initialCountryId`/`initialCityId`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 2b. Tab change writes the URL
 
-- [ ] [AI] **RED**: update `shell/calculator-content.test.tsx` to assert switching tab calls
+- [x] [AI] **RED**: update `shell/calculator-content.test.tsx` to assert switching tab calls
       `router.push` with `tab=savings` (mock `useRouter`)
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: fails (`handleTabChange` does not write the URL today)
@@ -291,17 +291,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And reloading the page keeps the "Savings" tab active
     ```
 
-- [ ] [AI] **GREEN**: in `calculator-content.tsx`, derive `activeTab` from `decodeState`; make
+- [x] [AI] **GREEN**: in `calculator-content.tsx`, derive `activeTab` from `decodeState`; make
       `handleTabChange` call `router.push(encodeState(...))`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 2b tests pass
-- [ ] [AI] **REFACTOR**: replace the local `parseTab` with `decodeState`; remove duplicate state
+- [x] [AI] **REFACTOR**: replace the local `parseTab` with `decodeState`; remove duplicate state
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 2c. Cost-basis controls write the URL
 
-- [ ] [AI] **RED**: update `shell/controls.test.tsx` (and/or `calculator-content.test.tsx`) to assert
+- [x] [AI] **RED**: update `shell/controls.test.tsx` (and/or `calculator-content.test.tsx`) to assert
       changing Adults / preschool / schoolkids / schooltype / area calls `router.push` with the
       matching param
       — command: `nx run ayokoding-www:test:unit`
@@ -316,18 +316,18 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the household preview updates without a page reload
     ```
 
-- [ ] [AI] **GREEN**: in `calculator-content.tsx`, derive household/schoolType/area from
+- [x] [AI] **GREEN**: in `calculator-content.tsx`, derive household/schoolType/area from
       `decodeState`; route every `onHouseholdChange`/`onSchoolTypeChange`/`onAreaChange` through
       `router.push(encodeState(...))`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 2c tests pass
-- [ ] [AI] **REFACTOR**: remove the now-unused `useState` for household/schoolType/area/geoScope
+- [x] [AI] **REFACTOR**: remove the now-unused `useState` for household/schoolType/area/geoScope
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass; `geoScope`/`activeCountryId` drift eliminated
 
 ### 2d. Geo change uses push + full cascade/backfill (region/country/city all serialized)
 
-- [ ] [AI] **RED**: add a `calculator-content.test.tsx` case: selecting region "Europe" while
+- [x] [AI] **RED**: add a `calculator-content.test.tsx` case: selecting region "Europe" while
       `city=singapore` calls `router.push` with `region=europe` and no `country`/`city`; selecting
       city "Singapore" pushes `city=singapore` and the dropdowns show ASEAN/Singapore
       — command: `nx run ayokoding-www:test:unit`
@@ -342,17 +342,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the URL query string does not include "country" or "city"
     ```
 
-- [ ] [AI] **GREEN**: wire `GeoFilters.onScopeChange` to `applyRegionChange`/`applyCountryChange`/
+- [x] [AI] **GREEN**: wire `GeoFilters.onScopeChange` to `applyRegionChange`/`applyCountryChange`/
       `applyCityChange` then `router.push(encodeState(...))`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 2d tests pass
-- [ ] [AI] **REFACTOR**: collapse the geo write path into a single `pushState(next)` helper
+- [x] [AI] **REFACTOR**: collapse the geo write path into a single `pushState(next)` helper
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
 ### 2e. Canonicalize on mount (replace, no history)
 
-- [ ] [AI] **RED**: add a `calculator-content.test.tsx` case: mounting with `?city=atlantis` calls
+- [x] [AI] **RED**: add a `calculator-content.test.tsx` case: mounting with `?city=atlantis` calls
       `router.replace` (not `push`) with the cleaned params, and mounting with already-clean params
       calls neither
       — command: `nx run ayokoding-www:test:unit`
@@ -367,11 +367,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       And the URL is rewritten to have no "city" param
     ```
 
-- [ ] [AI] **GREEN**: in `calculator-content.tsx`, add a mount effect: if
+- [x] [AI] **GREEN**: in `calculator-content.tsx`, add a mount effect: if
       `encodeState(decodeState(raw)) !== raw`, call `router.replace(canonical)`
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: 2e tests pass
-- [ ] [AI] **REFACTOR**: guard against replace loops (compare normalized strings); tidy effect deps
+- [x] [AI] **REFACTOR**: guard against replace loops (compare normalized strings); tidy effect deps
       — command: `nx run ayokoding-www:test:unit`
       — acceptance: all tests still pass
 
@@ -381,21 +381,21 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > (root-cause orientation). Commit preexisting fixes separately with appropriate Conventional Commit
 > messages.
 
-- [ ] [AI] `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] `npx nx affected -t lint` — exits 0
-- [ ] [AI] `npx nx affected -t test:quick` — exits 0
-- [ ] [AI] `npx nx affected -t specs:coverage` — exits 0
-- [ ] [AI] Re-run any failing check to confirm resolution; verify zero failures before pushing
+- [x] [AI] `npx nx affected -t typecheck` — exits 0
+- [x] [AI] `npx nx affected -t lint` — exits 0
+- [x] [AI] `npx nx affected -t test:quick` — exits 0
+- [x] [AI] `npx nx affected -t specs:coverage` — exits 0
+- [x] [AI] Re-run any failing check to confirm resolution; verify zero failures before pushing
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `nx run ayokoding-www:test:unit` — all component + core tests pass; the round-trip
+- [x] [AI] `nx run ayokoding-www:test:unit` — all component + core tests pass; the round-trip
       assertions (every control change → encoded URL; reload-decode → same state) and the
       `?city=atlantis` → canonical-clean-URL assertion pass as machine-verifiable proxy evidence
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — exits 0
-- [ ] [AI] Commit thematically (e.g. `refactor(ayokoding-www): make calculator state URL-derived`)
+- [x] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — exits 0
+- [x] [AI] Commit thematically (e.g. `refactor(ayokoding-www): make calculator state URL-derived`)
 
 > **Pause Safety**: the calculator is now fully controlled by the URL with backfill/cascade/
 > canonicalize working, all unit tests green. Nav escape links not yet added but the app is coherent
