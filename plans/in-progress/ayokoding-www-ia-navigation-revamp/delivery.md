@@ -618,7 +618,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`); append each
       SG-### spec-gap into the specs steps — acceptance: every finding captured as a task item
 
-#### Rule-15 retest follow-ups
+### Rule-15 retest follow-ups
 
 _(Populated by the three-tester run; every EWT/UWT/DWT defect finding is FIXED before archival.
 Deferral is allowed ONLY with explicit user permission and only when fixing is genuinely

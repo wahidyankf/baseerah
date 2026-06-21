@@ -13,20 +13,20 @@ shell layout is preserved: pure URL/derivation logic in `src/features/**/core/`,
 flowchart LR
   subgraph app["src/app/[locale]"]
     home["page.tsx (landing homepage)"]
-    cidx["(content)/c/page.tsx (/c browse index)"]
+    cidx["(content)/c — browse index"]
     cslug["(content)/c/[...slug]/page.tsx (moved content)"]
     loose["(content)/[...slug]/page.tsx (about/terms/_index only)"]
     tools["tools/page.tsx + calculator"]
   end
   subgraph features["src/features"]
-    curl["content/core/content-url.ts (contentUrl helper)"]
-    cards["content/core/landing-sections.ts (curated overrides)"]
-    svc["content/shell/service.ts (getTree/getBySlug/getIndex)"]
-    nav["app-shell/shell/{header,footer,mobile-nav}.tsx"]
-    navs["navigation/shell/{sidebar-tree,breadcrumb,prev-next}.tsx"]
+    curl["core/content-url.ts"]
+    cards["core/landing-sections.ts"]
+    svc["content/shell/service.ts"]
+    nav["app-shell header/footer/nav"]
+    navs["nav: sidebar/breadcrumb/prev"]
     i18n["i18n/core/translations.ts (t)"]
   end
-  redir["next.config.ts redirects() + src/redirects/content-namespace.ts"]
+  redir["content-namespace redirects()"]
   home --> svc
   home --> cards
   home --> i18n
@@ -61,7 +61,7 @@ sequenceDiagram
 flowchart TD
   req["request /[locale]/<rest>"] --> isc{"starts with c/ ?"}
   isc -->|yes| cslug["c/[...slug]: strip 'c/', getBySlug(locale, rest)"]
-  isc -->|no| top{"loose top-level page?<br/>(about/terms/_index per locale)"}
+  isc -->|no| top{"loose top-level page?<br/>(about/terms/_index)"}
   top -->|yes| loose["[...slug]: resolve loose page"]
   top -->|no, is tools| tools["tools/* static route"]
   top -->|no, is old content| redir["redirects() 308 -> /c/<rest>"]
