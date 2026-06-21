@@ -47,8 +47,12 @@ apps/*/test-results/
 
 # Coverage
 apps/*/coverage/
+**/coverage.json
 **/cover.out
 **/cover_spec.out
+
+# Generated source artifacts
+**/*.generated.ts
 
 # Experimental
 apps-labs/
