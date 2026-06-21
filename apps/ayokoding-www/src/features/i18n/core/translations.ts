@@ -187,6 +187,7 @@ const translations: Record<Locale, Record<string, string>> = {
     footerAboutAyokoding: "About AyoKoding",
     footerTerms: "Terms & Conditions",
     footerProject: "Project",
+    sectionExploreHeading: "Explore",
   },
   id: {
     readMore: "Baca Selengkapnya",
@@ -379,6 +380,7 @@ const translations: Record<Locale, Record<string, string>> = {
     footerAboutAyokoding: "Tentang AyoKoding",
     footerTerms: "Syarat & Ketentuan",
     footerProject: "Proyek",
+    sectionExploreHeading: "Jelajahi",
   },
 };
 

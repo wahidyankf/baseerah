@@ -58,6 +58,19 @@ describe("Landing", () => {
     expect(cta.getAttribute("href")).toBe("/en/tools/cost-of-living-calculator");
   });
 
+  it("renders the section band H2 as 'Explore' (not 'Learn') — DWT-003 fix", () => {
+    render(<Landing locale="en" sections={enSections} />);
+    const h2 = screen.getByRole("heading", { level: 2, name: "Explore" });
+    expect(h2).toBeTruthy();
+  });
+
+  it("renders the section band H2 as 'Jelajahi' for id locale — DWT-003 fix", () => {
+    const idSections = [descriptor("belajar", "Belajar", "blurb")];
+    render(<Landing locale="id" sections={idSections} />);
+    const h2 = screen.getByRole("heading", { level: 2, name: "Jelajahi" });
+    expect(h2).toBeTruthy();
+  });
+
   it("renders id-locale chrome and an id section card (Celoteh)", () => {
     const idSections: LandingSectionDescriptor[] = [
       descriptor("belajar", "Belajar", "Bahasa, arsitektur, dan desain sistem — lewat contoh."),

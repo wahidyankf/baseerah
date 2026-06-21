@@ -18,7 +18,7 @@ export function ToolsTeaser({ locale }: ToolsTeaserProps) {
   return (
     <section className="px-6 py-10 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-col gap-6 rounded-xl border bg-accent p-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-6 rounded-xl border border-primary/15 bg-primary/5 p-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-semibold tracking-wide text-primary uppercase">
               {t(locale, "toolsTeaserKicker")}

@@ -11,9 +11,10 @@ export async function Sidebar({ locale }: SidebarProps) {
     locale: locale as "en" | "id",
   })) as TreeNode[];
 
-  // Skip the root locale node (e.g., "English Content") and show its children directly
+  // Skip the root locale node (e.g., "English Content") and show its section children only.
+  // Loose pages (About, Terms, Tools) are non-sections and belong in the footer, not the sidebar.
   const rootNode = tree.find((n) => n.slug === "");
-  const sidebarNodes = rootNode ? rootNode.children : tree;
+  const sidebarNodes = (rootNode ? rootNode.children : tree).filter((n) => n.isSection);
 
   return (
     <nav aria-label="Sidebar navigation">

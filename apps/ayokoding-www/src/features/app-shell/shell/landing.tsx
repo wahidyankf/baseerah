@@ -30,7 +30,7 @@ export function Landing({ locale, sections }: LandingProps) {
       <section aria-labelledby="explore-heading" className="px-6 py-4 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <h2 id="explore-heading" className="mb-6 text-2xl font-bold tracking-tight">
-            {t(locale, "navLearn")}
+            {t(locale, "sectionExploreHeading")}
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sections.map((section) => (
