@@ -211,7 +211,9 @@ export function Controls({
             {city.currency} {fmtNum(utilities)}
           </span>
           <span data-testid="preview-healthcare" data-local={String(healthcare)}>
-            <span className="text-xs text-muted-foreground">{t(locale, "colHealthcareOOP")}</span>
+            <span className="text-xs text-muted-foreground">
+              {t(locale, "colHealthcareOOPPrefix")} (<abbr title="out-of-pocket">OOP</abbr>)
+            </span>
             {city.currency} {fmtNum(healthcare)}
           </span>
           <span data-testid="preview-childcare" data-local={String(childcare)}>

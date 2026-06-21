@@ -333,6 +333,26 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
         expect(legend.textContent?.trim().length).toBeGreaterThan(0);
       },
     );
+
+    And('every "OOP" acronym is wrapped in an abbr element titled "out-of-pocket"', () => {
+      // Audit every text node using "OOP" as a standalone acronym, excluding the
+      // definitional legend ("OOP = out-of-pocket — …") which is prose, not an <abbr>.
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const oopNodes: Text[] = [];
+      let node = walker.nextNode();
+      while (node) {
+        const text = node.textContent ?? "";
+        const isLegend = /OOP\s*=\s*out-of-pocket/.test(text);
+        if (/\bOOP\b/.test(text) && !isLegend) oopNodes.push(node as Text);
+        node = walker.nextNode();
+      }
+      expect(oopNodes.length).toBeGreaterThan(0);
+      for (const textNode of oopNodes) {
+        const abbr = (textNode.parentElement as HTMLElement | null)?.closest("abbr");
+        expect(abbr).not.toBeNull();
+        expect(abbr!.getAttribute("title")).toBe("out-of-pocket");
+      }
+    });
   });
 
   Scenario("Relocation reserve is shown separately from sunk costs", ({ Given, When, Then, And }) => {
@@ -1910,6 +1930,43 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Then("each tab trigger's visible text is its label only, with the description not fused into it", () => {
       // Stub: tab label purity implemented in Phase 6
       expect(true).toBe(true);
+    });
+  });
+
+  Scenario("Each tab has a visible description associated with its trigger", ({ Given, When, Then, And }) => {
+    Given("the user views the calculator tab bar", () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the tab bar renders", () => {
+      expect(screen.getAllByRole("tab").length).toBe(3);
+    });
+
+    Then(
+      "each of the three tabs has a visibly rendered description element associated with its trigger via aria-describedby",
+      () => {
+        const pairs: Array<[RegExp, string]> = [
+          [/cost of living/i, "tab-desc-cost"],
+          [/savings/i, "tab-desc-savings"],
+          [/minimum role/i, "tab-desc-min-role"],
+        ];
+        for (const [name, descId] of pairs) {
+          const trigger = screen.getByRole("tab", { name });
+          expect(trigger.getAttribute("aria-describedby")).toBe(descId);
+          const desc = document.getElementById(descId);
+          expect(desc, `#${descId} should exist`).toBeTruthy();
+          // Visible: not sr-only, not aria-hidden.
+          expect(desc!.className).not.toMatch(/\bsr-only\b/);
+          expect(desc!.getAttribute("aria-hidden")).not.toBe("true");
+          expect(desc!.textContent?.trim().length).toBeGreaterThan(0);
+        }
+      },
+    );
+
+    And("no tab description text is duplicated elsewhere on screen", () => {
+      // The active (cost) tab's description prose appears exactly once in the DOM.
+      const costDesc = document.getElementById("tab-desc-cost")!.textContent!.trim();
+      expect(screen.getAllByText(costDesc).length).toBe(1);
     });
   });
 

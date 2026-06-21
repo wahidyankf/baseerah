@@ -271,46 +271,87 @@ focus-visible:*`) plus `min-h-[44px] w-full min-w-0 max-w-full`. Rebuilt standal
 
 ## Phase 4: Tab a11y & descriptions (UWT-011, UWT-003, UWT-012)
 
-- [ ] [AI] **RED**: extend
+- [x] [AI] **RED**: extend
       `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/calculator-content.test.tsx`
       asserting (a) the cost trigger has `aria-describedby="tab-desc-cost"` and a `#tab-desc-cost`
       element exists, and (b) all three description elements are visibly rendered (not `sr-only`)
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: assertions fail (no `#tab-desc-cost`; descriptions are `sr-only`)
+      _Done 2026-06-21: the planned app-dir test path does not exist; the live unit test for this
+      component is `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-content.test.tsx`
+      (renders `CostOfLivingCalculatorContent`). Added a `Phase4TF` describe with 3 tests: UWT-011
+      (cost trigger `aria-describedby="tab-desc-cost"` + `#tab-desc-cost` exists), UWT-003 (all three
+      `#tab-desc-*` not `sr-only`/`aria-hidden`), and a no-duplication guard. All 3 failed RED
+      (`aria-describedby` was null; `#tab-desc-cost` absent; the savings/min-role spans were `sr-only`)._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: add `tabCostDesc` keys (en + id) to
+- [x] [AI] **GREEN**: add `tabCostDesc` keys (en + id) to
       `apps/ayokoding-www/src/features/i18n/core/translations.ts`; in `calculator-content.tsx` add
       `aria-describedby="tab-desc-cost"` to the cost trigger, add a `#tab-desc-cost` span, render all
       three descriptions visibly (drop `sr-only`), and remove the duplicate `aria-hidden` visible
       paragraph (lines ~174–178) — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: RED assertions pass; no duplicated description text
+      _Done: added `tabCostDesc` (en "Compare monthly living costs across cities" / id "Bandingkan
+      biaya hidup bulanan di berbagai kota"); added `aria-describedby="tab-desc-cost"` to the cost
+      trigger; replaced the two `sr-only` spans + the `aria-hidden` paragraph with three visible `<p>`
+      description elements (`#tab-desc-cost`/`-savings`/`-min-role`), each shown for its active tab
+      (inactive ones carry `hidden`, never `sr-only`/`aria-hidden`). No description text is duplicated.
+      All 3 RED tests pass; 2058 unit tests green._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: add a unit assertion in
+- [x] [AI] **RED**: add a unit assertion in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/cost-of-living.test.tsx`
       requiring every rendered "OOP" acronym to be inside an `<abbr title="out-of-pocket">` (audit
       all occurrences incl. the mobile card label using `colHealthcareOOP` ~line 283)
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails if any OOP is a bare `<span>`; passes if all are already `<abbr>` (then no
       source change needed per Assumption A-2)
+      _Done 2026-06-21: added `UWT-012: every rendered 'OOP' acronym is inside an abbr` — a
+      `TreeWalker` audit over the rendered `CostOfLivingTable`, excluding the definitional legend
+      ("OOP = out-of-pocket — …"). RED **failed** (Assumption A-2 disproved): the mobile card label
+      `colHealthcareOOP` = "Healthcare (OOP)" rendered a **bare** OOP, so a source change was required._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: if RED failed, wrap the offending OOP occurrence(s) in
+- [x] [AI] **GREEN**: if RED failed, wrap the offending OOP occurrence(s) in
       `cost-of-living.tsx` with `<abbr title="out-of-pocket">OOP</abbr>`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: OOP audit test passes
+      _Done: widened `CardRow`'s `label` prop to `ReactNode` and passed a JSX label for the mobile
+      healthcare row: `{colHealthcareOOPPrefix} (<abbr title="out-of-pocket">OOP</abbr>)`, mirroring
+      the desktop header. Root-cause sweep also fixed the **identical** bare OOP in
+      `controls.tsx:214` (preview pane, same `colHealthcareOOP` string) with the same abbr wrap. The
+      now-unused `colHealthcareOOP` translation key is left in place (matching the Phase-2 precedent
+      of not churning `translations.ts` for dead keys). OOP audit passes; 2059 unit tests green._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED/GREEN**: add Gherkin AC-6 (tab descriptions visible + associated) and confirm AC-7
+- [x] [AI] **RED/GREEN**: add Gherkin AC-6 (tab descriptions visible + associated) and confirm AC-7
       (OOP abbr) — extend the existing "OOP abbreviation is explained" scenario to assert the
       `<abbr>` element — in the calculator `.feature`; wire step defs
       — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0
+      _Done: added Scenario "Each tab has a visible description associated with its trigger"
+      (Given/When/Then + 1 And — cardinality-clean) and extended "The OOP abbreviation is explained on
+      screen" with `And every "OOP" acronym is wrapped in an abbr element titled "out-of-pocket"`.
+      Wired both in `test/unit/fe-steps/cost-of-living-calculator.steps.tsx` (`@amiceli/vitest-cucumber`
+      `Scenario` blocks — this repo binds steps via executable step blocks, not separate defs). The
+      tab-desc step asserts the three triggers' `aria-describedby`, visibility, and no-duplication; the
+      OOP step reuses the TreeWalker audit. `specs:coverage` exits 0 (15 specs / 166 scenarios / 610
+      steps); `rhino-cli:specs:gherkin-cardinality-validation` clean._
   - _Suggested executor: `specs-maker`_
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
+-p ayokoding-www`: exit 0. typecheck clean; lint exits 0 with **one** pre-existing non-blocking
+      warning (`controls.tsx:32` jsx-a11y `prefer-tag-over-role`, unrelated radio control) — the two
+      prior `calculator-content.tsx:216` jsx-a11y warnings (`click-events-have-key-events`,
+      `no-static-element-interactions`) were **resolved** opportunistically (see note); test:unit 2064
+      passed; specs:coverage 15 specs / 166 scenarios / 610 steps.
+      **Opportunistic line-216 fix**: the warnings sat on `<div onClick={handleTableClick}>`, a
+      click-delegation surface over the inner interactive `<a>` links. Keyboard activation (Enter on a
+      focused anchor) synthesizes a click that bubbles to this div, so no extra key handler/role is
+      needed — adding a `role`/keydown to the div would be semantically wrong. Resolved with a scoped
+      `eslint-disable-next-line` plus a rationale comment (no behavior change). The `controls.tsx:32`
+      warning is a different rule on an unrelated element and was left untouched._
 
 > **Pause Safety**: all tabs have discoverable associated descriptions and OOP semantics are
 > correct; gate green. Safe to stop. To resume: re-run the gate command.

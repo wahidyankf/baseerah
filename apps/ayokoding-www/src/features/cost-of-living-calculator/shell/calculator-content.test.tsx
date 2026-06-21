@@ -222,6 +222,45 @@ describe("Phase 6 — tab labels are clean single phrases", () => {
   });
 });
 
+// ─── Phase 4 (test-fixing): tab descriptions associated + visible ────────────
+// UWT-011 (cost tab missing #tab-desc-cost), UWT-003 (descriptions are sr-only)
+describe("Phase4TF — cost tab description is associated and all tab descriptions are visible", () => {
+  beforeEach(() => {
+    setupSearchParams({});
+  });
+
+  it("UWT-011: the Cost tab trigger has aria-describedby='tab-desc-cost' and a #tab-desc-cost element exists", () => {
+    render(<CostOfLivingCalculatorContent />);
+
+    const costTab = screen.getByRole("tab", { name: /cost of living/i });
+    expect(costTab.getAttribute("aria-describedby")).toBe("tab-desc-cost");
+
+    const desc = document.getElementById("tab-desc-cost");
+    expect(desc).toBeTruthy();
+    expect(desc!.textContent?.trim().length).toBeGreaterThan(0);
+  });
+
+  it("UWT-003: all three tab description elements are visibly rendered (not sr-only)", () => {
+    render(<CostOfLivingCalculatorContent />);
+
+    for (const id of ["tab-desc-cost", "tab-desc-savings", "tab-desc-min-role"]) {
+      const el = document.getElementById(id);
+      expect(el, `#${id} should exist`).toBeTruthy();
+      expect(el!.className, `#${id} should not be sr-only`).not.toMatch(/\bsr-only\b/);
+      expect(el!.getAttribute("aria-hidden")).not.toBe("true");
+    }
+  });
+
+  it("UWT-003: no tab description text is duplicated on screen", () => {
+    render(<CostOfLivingCalculatorContent />);
+
+    // The Cost description text should appear exactly once in the DOM.
+    const costDesc = document.getElementById("tab-desc-cost")!.textContent!.trim();
+    const matches = screen.getAllByText(costDesc);
+    expect(matches.length).toBe(1);
+  });
+});
+
 // ─── Phase 4: Tool identity — H1 and metadata match "Cost of Living Calculator"
 describe("Phase 4 — H1 matches tool identity", () => {
   beforeEach(() => {

@@ -223,6 +223,36 @@ describe("CostOfLivingTable", () => {
     expect(oopAbbr).toBeDefined();
   });
 
+  // UWT-012 (test-fixing): EVERY rendered "OOP" acronym must be inside an
+  // <abbr title="out-of-pocket"> — audits all occurrences incl. the mobile card label.
+  it("UWT-012: every rendered 'OOP' acronym is inside an abbr title='out-of-pocket'", () => {
+    const { container } = render(<CostOfLivingTable {...defaultProps} />);
+
+    // Find every text node using "OOP" as a standalone acronym/label. Exclude the
+    // explanatory legend ("OOP = out-of-pocket — …"), which defines the term in prose
+    // and is intentionally not an <abbr>.
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const oopTextNodes: Text[] = [];
+    let node = walker.nextNode();
+    while (node) {
+      const text = node.textContent ?? "";
+      const isLegend = /OOP\s*=\s*out-of-pocket/.test(text);
+      if (/\bOOP\b/.test(text) && !isLegend) {
+        oopTextNodes.push(node as Text);
+      }
+      node = walker.nextNode();
+    }
+
+    expect(oopTextNodes.length).toBeGreaterThan(0);
+
+    // Each such text node's closest <abbr> must carry title="out-of-pocket".
+    for (const textNode of oopTextNodes) {
+      const abbr = (textNode.parentElement as HTMLElement | null)?.closest("abbr");
+      expect(abbr, `'OOP' text "${textNode.textContent}" must be wrapped in <abbr>`).not.toBeNull();
+      expect(abbr!.getAttribute("title")).toBe("out-of-pocket");
+    }
+  });
+
   // UWT-011: healthcare scheme badge should be sentence-cased (not ALL-CAPS)
   it("UWT-011: healthcare scheme badge text is sentence-cased, not all-caps", () => {
     render(<CostOfLivingTable {...defaultProps} />);

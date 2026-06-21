@@ -146,6 +146,7 @@ export function CostOfLivingCalculatorContent() {
         <TabsList aria-label={t(locale, "ariaTabsNav")} className="overflow-x-auto">
           <TabsTrigger
             value="cost"
+            aria-describedby="tab-desc-cost"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
           >
             {t(locale, "tabCostOfLiving")}
@@ -165,17 +166,30 @@ export function CostOfLivingCalculatorContent() {
             {t(locale, "tabMinRole")}
           </TabsTrigger>
         </TabsList>
-        <span id="tab-desc-savings" data-testid="tab-desc-savings" className="sr-only">
+        {/* Tab descriptions: visibly rendered and associated with each trigger via
+            aria-describedby. Showing only the active tab's description avoids duplicating
+            the same prose elsewhere on screen. */}
+        <p
+          id="tab-desc-cost"
+          data-testid="tab-desc-cost"
+          className={`mt-1 text-sm text-muted-foreground${activeTab === "cost" ? "" : "hidden"}`}
+        >
+          {t(locale, "tabCostDesc")}
+        </p>
+        <p
+          id="tab-desc-savings"
+          data-testid="tab-desc-savings"
+          className={`mt-1 text-sm text-muted-foreground${activeTab === "savings" ? "" : "hidden"}`}
+        >
           {t(locale, "tabSavingsDesc")}
-        </span>
-        <span id="tab-desc-min-role" data-testid="tab-desc-min-role" className="sr-only">
+        </p>
+        <p
+          id="tab-desc-min-role"
+          data-testid="tab-desc-min-role"
+          className={`mt-1 text-sm text-muted-foreground${activeTab === "min-role" ? "" : "hidden"}`}
+        >
           {t(locale, "tabMinRoleDesc")}
-        </span>
-        {activeTab !== "cost" && (
-          <p className="mt-1 text-sm text-muted-foreground" aria-hidden="true">
-            {activeTab === "savings" ? t(locale, "tabSavingsDesc") : t(locale, "tabMinRoleDesc")}
-          </p>
-        )}
+        </p>
 
         {/* Shared geo filters — fully controlled, reads from URL-derived state */}
         <GeoFilters
@@ -212,7 +226,12 @@ export function CostOfLivingCalculatorContent() {
           <span data-testid="estimates-disclaimer">{t(locale, "estimatesOnly")}</span>
         </p>
 
-        {/* Tab content — event delegation intercepts link clicks */}
+        {/* Tab content — event delegation intercepts clicks bubbling up from the
+            interactive <a> links inside the tables. The div is not itself an interactive
+            control; the real controls are the anchors. Keyboard activation (Enter on a
+            focused link) synthesizes a click that bubbles here, so no separate key handler
+            or role is needed — the jsx-a11y heuristics misfire on this delegation pattern. */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div onClick={handleTableClick}>
           <TabsContent value="cost">
             {detailCityId ? (

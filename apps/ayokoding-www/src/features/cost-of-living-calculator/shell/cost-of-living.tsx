@@ -24,6 +24,7 @@ import { fmtDualCurrency } from "../core/format";
 import { fxToUsd } from "../core/data/fx";
 import { localeName } from "./geo-filters";
 import type { Locale } from "@/features/i18n/core/config";
+import type { ReactNode } from "react";
 import { t } from "@/features/i18n/core/translations";
 
 type Props = {
@@ -41,7 +42,7 @@ function healthcareBadgeLabel(type: "oop" | "tax-funded" | "mixed", locale: Loca
 }
 
 // One labelled row inside a mobile city card.
-function CardRow({ label, value, emphasis }: { label: string; value: string; emphasis?: "subtotal" | "total" }) {
+function CardRow({ label, value, emphasis }: { label: ReactNode; value: string; emphasis?: "subtotal" | "total" }) {
   const cls =
     emphasis === "total"
       ? "flex items-baseline justify-between border-t pt-1.5 text-sm font-semibold"
@@ -280,7 +281,11 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                 value={fmtDualCurrency(r.utilities, r.city.currency, r.utilities * r.fxRate)}
               />
               <CardRow
-                label={t(locale, "colHealthcareOOP")}
+                label={
+                  <>
+                    {t(locale, "colHealthcareOOPPrefix")} (<abbr title="out-of-pocket">OOP</abbr>)
+                  </>
+                }
                 value={fmtDualCurrency(r.healthcare, r.city.currency, r.healthcare * r.fxRate)}
               />
               <CardRow

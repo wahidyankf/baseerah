@@ -54,6 +54,7 @@ Feature: Salary savings calculator
     When I read the legend near the table
     Then an on-screen explanation states that "OOP = out-of-pocket"
     And the explanation says it is the healthcare you pay yourself on top of any tax-funded or insurance coverage
+    And every "OOP" acronym is wrapped in an abbr element titled "out-of-pocket"
 
   Scenario: Relocation reserve is shown separately from sunk costs
     Given I am on the "Cost of living" tab
@@ -467,6 +468,12 @@ Feature: Salary savings calculator
     Given the user views the tab bar at any breakpoint
     When the tab bar renders
     Then each tab trigger's visible text is its label only, with the description not fused into it
+
+  Scenario: Each tab has a visible description associated with its trigger
+    Given the user views the calculator tab bar
+    When the tab bar renders
+    Then each of the three tabs has a visibly rendered description element associated with its trigger via aria-describedby
+    And no tab description text is duplicated elsewhere on screen
 
   Scenario: Uppercase locale URL redirects to canonical lowercase
     Given the user requests "/EN/tools/cost-of-living-calculator"
