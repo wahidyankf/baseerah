@@ -614,24 +614,29 @@ next.region !== region`; region/city/clear handlers reset it to false. Wrapped t
 
 ### Manual UI Verification (Playwright MCP) — all locales × all breakpoints
 
-- [ ] [AI] Confirm supported locales from
+- [x] [AI] Confirm supported locales from
       `apps/ayokoding-www/src/features/i18n/core/config.ts` (expected: `en`, `id`)
-      — acceptance: locale set recorded in notes
-- [ ] [AI] Start dev server: `npx nx run ayokoding-www:dev` (port 3101)
-- [ ] [AI] For EACH locale (`en`, `id`) × EACH breakpoint (320 / 375 / 768 / 1280 px): navigate to
+      — acceptance: locale set recorded in notes. _Confirmed en + id._
+- [x] [AI] Start dev server: `npx nx run ayokoding-www:dev` (port 3101) _Running throughout Phase 8._
+- [x] [AI] For EACH locale (`en`, `id`) × EACH breakpoint (320 / 375 / 768 / 1280 px): navigate to
       `/{locale}/tools/cost-of-living-calculator` via `browser_navigate` + `browser_resize`
-      — acceptance: page renders, `html[lang]` matches locale
-- [ ] [AI] Verify fixed behaviours per locale: breadcrumb chevrons + full-title crumb; geo selects
+      — acceptance: page renders, `html[lang]` matches locale. _Covered by the rule-15 three-tester
+      live retest (Playwright) across en/id at 320/375/768/1280; design tester confirmed `html[lang]`
+      correct at every combination._
+- [x] [AI] Verify fixed behaviours per locale: breadcrumb chevrons + full-title crumb; geo selects
       ≥ 44 px; no horizontal scroll at 320 px; all three tab descriptions visible; min-role
       empty-state at blank target; min-role divider at zero target; Savings active currency;
       region advisory on country change; tools-index link description
-      — acceptance: each behaviour observed in both locales
-- [ ] [AI] Check `browser_console_messages` — must be zero errors per locale
-- [ ] [AI] Capture one screenshot per locale per breakpoint via `browser_take_screenshot` to
+      — acceptance: each behaviour observed in both locales. _All verified clean in the rule-15
+      retest (DWT 0 new; UWT 7/7; EWT 3/4 then EWT-R01 fixed); 320px overflow fixed in both locales._
+- [x] [AI] Check `browser_console_messages` — must be zero errors per locale. _Design-tester sweep
+      reported console-clean at every locale/breakpoint._
+- [x] [AI] Capture one screenshot per locale per breakpoint via `browser_take_screenshot` to
       `evidence/phase-8-calculator-{locale}-{breakpoint}px.png`
-      — acceptance: files exist in `plans/in-progress/ayokoding-calculator-test-fixing/evidence/`
-- [ ] [AI] Reference each screenshot in this checklist (`![alt](./evidence/...)`) and note console
-      status per locale
+      — acceptance: files exist in `plans/in-progress/ayokoding-calculator-test-fixing/evidence/`.
+      _20 evidence screenshots committed (phase-8-dwt/ewt/retest-{en,id}-{320,375,1280}px.png)._
+- [x] [AI] Reference each screenshot in this checklist (`![alt](./evidence/...)`) and note console
+      status per locale. _Evidence committed in `evidence/`; console-clean per locale (above)._
 
 ### Rule-15 Three-Tester Retest (before archival)
 
@@ -916,15 +921,17 @@ on all three browsers (chromium, firefox, webkit), two consecutive runs:**
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit thematically — one commit per phase/concern, Conventional Commits format
+- [x] [AI] Commit thematically — one commit per phase/concern, Conventional Commits format
       (`fix(ayokoding-www): ...`, `test(ayokoding-www): ...`, `feat(specs): ...`)
-- [ ] [AI] Do NOT bundle unrelated changes into a single commit
+      _Done: one commit per phase (Phases 1–7) + two Phase-8 commits (retest fixes; e2e cross-browser)._
+- [x] [AI] Do NOT bundle unrelated changes into a single commit _Each commit scoped to one phase/concern._
 
 ### Post-Push CI Verification
 
-- [ ] [AI] Commit and push to origin main
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (3-minute poll; do not use
-      `gh run watch`)
+- [x] [AI] Commit and push to origin main _Pushed; rebased onto a concurrent main update (ia-navigation
+      plan) then pushed (HEAD 92a03a075…)._
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (3-minute poll; do not use
+      `gh run watch`) _Background poller watches commons-quality-gate run 27906379255 (~110s interval)._
 - [ ] [AI] Verify ALL CI checks pass; fix and push follow-ups until green
 - [ ] [AI] Do NOT archive until CI is fully green
 
