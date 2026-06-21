@@ -418,10 +418,11 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > _Suggested executor: `swe-typescript-dev` / `swe-ui-maker`_
 
-- [ ] [AI] **RED**: write failing unit test for `landing-sections` derivation+override in
+- [x] [AI] **RED**: write failing unit test for `landing-sections` derivation+override in
       `apps/ayokoding-www/src/features/content/core/landing-sections.test.ts` (new) — assert order/hide/icon
       overrides apply and title/blurb fall back to `_index.md` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (module undefined)
+      <!-- 2026-06-22 · Done · landing-sections.test.ts (RED), then GREEN. Asserts order/hide/icon overrides + blurb fallback to sectionBlurbFallback. -->
 
   **Gherkin (binds) →** "Section cards derive from the content tree with curated overrides"
 
@@ -433,15 +434,18 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     But sections marked hidden in the config do not render a card
   ```
 
-- [ ] [AI] **GREEN**: implement `apps/ayokoding-www/src/features/content/core/landing-sections.ts` (curated
+- [x] [AI] **GREEN**: implement `apps/ayokoding-www/src/features/content/core/landing-sections.ts` (curated
       override config + pure merge) per `tech-docs.md §DD-4` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: test passes
-- [ ] [AI] **REFACTOR**: tidy the override-merge + add JSDoc — command: `npx nx run ayokoding-www:test:unit`
+      <!-- 2026-06-22 · Done · landing-sections.ts: LANDING_SECTION_OVERRIDES (per-locale, keyed by the locale's own section slug) + pure mergeLandingSections(sections, overrides, fallbackBlurb) → ordered, hide-filtered LandingSectionDescriptor[]. -->
+- [x] [AI] **REFACTOR**: tidy the override-merge + add JSDoc — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: all tests pass
-- [ ] [AI] **RED**: write failing component test for the landing page in
+      <!-- 2026-06-22 · Done · merge tidied + JSDoc; stable-sort by order, un-ordered fall to end keeping tree order. test:unit green. -->
+- [x] [AI] **RED**: write failing component test for the landing page in
       `apps/ayokoding-www/src/app/[locale]/page.test.tsx` (new) asserting hero heading+intro, section cards
       (including Rants/Celoteh), and a Tools teaser linking `/${locale}/tools/cost-of-living-calculator`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails (still the old tree)
+      <!-- 2026-06-22 · Done · Repo vitest excludes src/app/**; testable rendering placed in presentational features/app-shell/shell/landing.tsx tested by landing.test.tsx (RED→GREEN): hero heading+intro, section cards incl Rants/Celoteh, Tools teaser → /{locale}/tools/cost-of-living-calculator. -->
 
   **Gherkin (binds) →** "Landing homepage renders hero, sections, and tools teaser in English"
 
@@ -454,16 +458,19 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     And the page shows a Tools teaser card linking "/en/tools/cost-of-living-calculator"
   ```
 
-- [ ] [AI] **GREEN**: rewrite `apps/ayokoding-www/src/app/[locale]/page.tsx` into the homepage (hero via
+- [x] [AI] **GREEN**: rewrite `apps/ayokoding-www/src/app/[locale]/page.tsx` into the homepage (hero via
       `t()`, section cards via `landing-sections` + `SectionCard` from P2, Tools teaser card) matching the
       selected Option A mockups — command: `npx nx run ayokoding-www:test:unit` — acceptance: landing test passes
-- [ ] [AI] **REFACTOR**: extract the hero + Tools-teaser into
+      <!-- 2026-06-22 · Done · page.tsx is now a thin server component (getTree → mergeLandingSections → <Landing>); old bare tree removed. Landing composes Hero + SectionCard grid (links via contentUrl) + ToolsTeaser. Matches landing-*.png. test:unit + build green. -->
+- [x] [AI] **REFACTOR**: extract the hero + Tools-teaser into
       `apps/ayokoding-www/src/features/app-shell/shell/{hero,tools-teaser}.tsx` — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: all tests pass
-- [ ] [AI] Add companion Gherkin for landing hero/sections/teaser (both locales) into
+      <!-- 2026-06-22 · Done · hero.tsx + tools-teaser.tsx extracted into app-shell/shell; Landing composes them. test:unit green (2218 tests). -->
+- [x] [AI] Add companion Gherkin for landing hero/sections/teaser (both locales) into
       `.../navigation/ia-navigation-revamp.feature` — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: exits 0
   - _Suggested executor: `specs-maker`_
+      <!-- 2026-06-22 · Done · 2 scenarios appended (landing hero/sections/teaser, en + id) + landing.steps.ts (scoped to main/hero region to avoid strict-mode ambiguity) + unit mirror. specs:coverage exit 0 (18 specs, 191 scenarios, 699 steps). -->
 
 ### Phase 4 Gate
 

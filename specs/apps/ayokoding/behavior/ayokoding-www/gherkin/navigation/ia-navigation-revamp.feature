@@ -40,3 +40,17 @@ Feature: IA navigation revamp
     And the footer should display an "About" column
     And the footer "About" column should link to "/id/tentang-ayokoding"
     And the footer "About" column should link to "/id/syarat-dan-ketentuan"
+
+  Scenario: Landing homepage renders hero, sections, and tools teaser in English
+    When a visitor navigates to "/en"
+    Then the hero heading should be visible on the landing page
+    And the hero intro should be visible on the landing page
+    And the landing section grid should include a card linking to "/en/c/rants"
+    And the tools teaser should link to "/en/tools/cost-of-living-calculator"
+
+  Scenario: Landing homepage renders hero, sections, and tools teaser in Indonesian
+    When a visitor navigates to "/id"
+    Then the hero heading should be visible on the landing page
+    And the hero intro should be visible on the landing page
+    And the landing section grid should include a card linking to "/id/c/celoteh"
+    And the tools teaser should link to "/id/tools/cost-of-living-calculator"

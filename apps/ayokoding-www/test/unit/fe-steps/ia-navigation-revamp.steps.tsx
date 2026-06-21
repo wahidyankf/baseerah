@@ -1,10 +1,12 @@
 import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { render, screen } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import { expect } from "vitest";
 import "./helpers/test-setup";
 import { BrowseIndex } from "@/features/content/shell/browse-index";
 import { Footer } from "@/features/app-shell/shell/footer";
+import { Landing } from "@/features/app-shell/shell/landing";
+import type { LandingSectionDescriptor } from "@/features/content/core/landing-sections";
 
 // Mocks required by Footer (no trpc/navigation needed — Footer is a server component)
 // next/link is already mocked in test-setup.ts
@@ -15,6 +17,24 @@ const feature = await loadFeature(
     "../../specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature",
   ),
 );
+
+// ---------------------------------------------------------------------------
+// Landing section descriptor stubs
+// ---------------------------------------------------------------------------
+
+function desc(slug: string, title: string, blurb: string): LandingSectionDescriptor {
+  return { slug, title, blurb, icon: undefined };
+}
+
+const EN_LANDING_SECTIONS: LandingSectionDescriptor[] = [
+  desc("learn", "Learn", "Languages, architecture, system design — by example."),
+  desc("rants", "Rants", "Opinionated takes — a first-class section."),
+];
+
+const ID_LANDING_SECTIONS: LandingSectionDescriptor[] = [
+  desc("belajar", "Belajar", "Bahasa, arsitektur, dan desain sistem — lewat contoh."),
+  desc("celoteh", "Celoteh", "Opini lugas — bagian kelas satu."),
+];
 
 /** Minimal TreeNode stubs sufficient for BrowseIndex rendering. */
 const learnSection = {
@@ -167,6 +187,75 @@ describeFeature(feature, ({ Scenario, Background }) => {
 
     And('the footer "About" column should link to "/id/syarat-dan-ketentuan"', () => {
       const link = document.querySelector('a[href="/id/syarat-dan-ketentuan"]');
+      expect(link).toBeTruthy();
+    });
+  });
+
+  Scenario("Landing homepage renders hero, sections, and tools teaser in English", ({ When, Then, And }) => {
+    When('a visitor navigates to "/en"', () => {
+      // Clean up any previous renders to isolate this scenario.
+      cleanup();
+      render(<Landing locale="en" sections={EN_LANDING_SECTIONS} />);
+    });
+
+    Then("the hero heading should be visible on the landing page", () => {
+      // The Landing renders a single H1 via Hero.
+      const h1s = screen.getAllByRole("heading", { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]?.textContent).toBeTruthy();
+    });
+
+    And("the hero intro should be visible on the landing page", () => {
+      // Intro paragraph is rendered inside the first <section> (the hero).
+      const sections = document.querySelectorAll("section");
+      const heroSection = sections[0];
+      expect(heroSection).toBeTruthy();
+      const para = heroSection!.querySelector("p");
+      expect(para).toBeTruthy();
+      expect((para?.textContent ?? "").length).toBeGreaterThan(0);
+    });
+
+    And('the landing section grid should include a card linking to "/en/c/rants"', () => {
+      // SectionCard renders as an <a> with href = contentUrl(locale, slug).
+      const link = document.querySelector('a[href="/en/c/rants"]');
+      expect(link).toBeTruthy();
+    });
+
+    And('the tools teaser should link to "/en/tools/cost-of-living-calculator"', () => {
+      const link = document.querySelector('a[href="/en/tools/cost-of-living-calculator"]');
+      expect(link).toBeTruthy();
+    });
+  });
+
+  Scenario("Landing homepage renders hero, sections, and tools teaser in Indonesian", ({ When, Then, And }) => {
+    When('a visitor navigates to "/id"', () => {
+      // Clean up any previous renders to isolate this scenario.
+      cleanup();
+      render(<Landing locale="id" sections={ID_LANDING_SECTIONS} />);
+    });
+
+    Then("the hero heading should be visible on the landing page", () => {
+      const h1s = screen.getAllByRole("heading", { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]?.textContent).toBeTruthy();
+    });
+
+    And("the hero intro should be visible on the landing page", () => {
+      const sections = document.querySelectorAll("section");
+      const heroSection = sections[0];
+      expect(heroSection).toBeTruthy();
+      const para = heroSection!.querySelector("p");
+      expect(para).toBeTruthy();
+      expect((para?.textContent ?? "").length).toBeGreaterThan(0);
+    });
+
+    And('the landing section grid should include a card linking to "/id/c/celoteh"', () => {
+      const link = document.querySelector('a[href="/id/c/celoteh"]');
+      expect(link).toBeTruthy();
+    });
+
+    And('the tools teaser should link to "/id/tools/cost-of-living-calculator"', () => {
+      const link = document.querySelector('a[href="/id/tools/cost-of-living-calculator"]');
       expect(link).toBeTruthy();
     });
   });
