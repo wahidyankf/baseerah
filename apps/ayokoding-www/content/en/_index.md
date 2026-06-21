@@ -10,8 +10,8 @@ cascade:
 breadcrumbs: false
 ---
 
-- [English Content](/en/)
+- [English Content](/en)
   - [About AyoKoding](/en/about-ayokoding)
-  - [Learn](/en/learn)
+  - [Learn](/en/c/learn)
   - [Terms and Conditions](/en/terms-and-conditions)
-  - [Rants](/en/rants)
+  - [Rants](/en/c/rants)

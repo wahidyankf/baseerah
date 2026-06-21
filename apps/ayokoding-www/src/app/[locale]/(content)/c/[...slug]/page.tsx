@@ -49,6 +49,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: page.description ?? undefined,
       alternates: {
         canonical: contentUrl(locale as Locale, slugStr),
+        languages: {
+          en: contentUrl("en", slugStr),
+          "x-default": contentUrl("en", slugStr),
+        },
       },
       openGraph: {
         title: page.title,
@@ -84,7 +88,7 @@ export default async function ContentPage({ params }: Props) {
   return (
     <>
       <article className="min-w-0 flex-1 px-6 py-8 lg:px-8">
-        <Breadcrumb locale={locale} slug={slugStr} segments={breadcrumbSegments} />
+        <Breadcrumb locale={locale} slug={slugStr} segments={breadcrumbSegments} contentHrefs />
 
         <h1 className="mb-6 text-4xl font-extrabold tracking-tight">{page.title}</h1>
 

@@ -3,16 +3,18 @@ import matter from "gray-matter";
 import { FileSystemContentRepository } from "./repository-fs";
 import { buildTrees } from "../core/tree-builder";
 import type { TreeNode } from "../core/types";
+import { contentUrl } from "../core/content-url";
+import type { Locale } from "../../i18n/core/config";
 
 export function generateChildList(locale: string, children: TreeNode[], knownSlugs: Set<string>): string {
   const lines: string[] = [];
 
   for (const child of children) {
     if (!knownSlugs.has(`${locale}:${child.slug}`)) continue;
-    lines.push(`- [${child.title}](/${locale}/${child.slug})`);
+    lines.push(`- [${child.title}](${contentUrl(locale as Locale, child.slug)})`);
     for (const grandchild of child.children) {
       if (!knownSlugs.has(`${locale}:${grandchild.slug}`)) continue;
-      lines.push(`  - [${grandchild.title}](/${locale}/${grandchild.slug})`);
+      lines.push(`  - [${grandchild.title}](${contentUrl(locale as Locale, grandchild.slug)})`);
     }
   }
 

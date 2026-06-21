@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { contentUrl } from "@/features/content/core/content-url";
+import type { Locale } from "@/features/i18n/core/config";
 
 interface BreadcrumbProps {
   locale: string;
@@ -9,13 +11,17 @@ interface BreadcrumbProps {
   // aria-current="page" crumb instead of being dropped. Callers that already
   // surface the current page in an <h1> leave this absent (default behaviour).
   showCurrent?: boolean;
+  // When true, segment hrefs are built via contentUrl (→ /c/ namespace).
+  // Default false for backward compatibility with non-content breadcrumbs.
+  contentHrefs?: boolean;
 }
 
-function hrefFor(locale: string, slug: string): string {
-  return slug ? `/${locale}/${slug}` : `/${locale}`;
+function hrefFor(locale: string, slug: string, useContentUrl: boolean): string {
+  if (!slug) return `/${locale}`;
+  return useContentUrl ? contentUrl(locale as Locale, slug) : `/${locale}/${slug}`;
 }
 
-export function Breadcrumb({ locale, segments, showCurrent = false }: BreadcrumbProps) {
+export function Breadcrumb({ locale, segments, showCurrent = false, contentHrefs = false }: BreadcrumbProps) {
   // Default: exclude the last segment — the current page title is shown in the h1.
   // showCurrent: keep every segment; render the last one as a non-link crumb.
   const visibleSegments = showCurrent ? segments : segments.slice(0, -1);
@@ -36,7 +42,7 @@ export function Breadcrumb({ locale, segments, showCurrent = false }: Breadcrumb
                   {segment.label}
                 </span>
               ) : (
-                <Link href={hrefFor(locale, segment.slug)} className="hover:text-foreground">
+                <Link href={hrefFor(locale, segment.slug, contentHrefs)} className="hover:text-foreground">
                   {segment.label}
                 </Link>
               )}

@@ -10,9 +10,9 @@ cascade:
 breadcrumbs: false
 ---
 
-- [Konten Bahasa Indonesia](/id/)
-  - [Belajar](/id/belajar)
+- [Konten Bahasa Indonesia](/id)
+  - [Belajar](/id/c/belajar)
   - [Syarat dan Ketentuan](/id/syarat-dan-ketentuan)
-  - [Celoteh](/id/celoteh)
-  - [Konten Video](/id/konten-video)
+  - [Celoteh](/id/c/celoteh)
+  - [Konten Video](/id/c/konten-video)
   - [Tentang AyoKoding](/id/tentang-ayokoding)

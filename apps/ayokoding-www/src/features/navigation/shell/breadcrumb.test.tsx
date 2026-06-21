@@ -51,3 +51,37 @@ describe("Breadcrumb", () => {
     expect(container.textContent).not.toContain("/");
   });
 });
+
+const contentSegments = [
+  { label: "Learn", slug: "learn" },
+  { label: "Software Engineering", slug: "learn/software-engineering" },
+  { label: "Data Structures", slug: "learn/software-engineering/data-structures" },
+];
+
+describe("Breadcrumb with contentHrefs", () => {
+  it("when contentHrefs=true emits /c/ prefixed hrefs for content ancestor segments", () => {
+    render(
+      <Breadcrumb
+        locale="en"
+        slug="learn/software-engineering/data-structures"
+        segments={contentSegments}
+        contentHrefs
+        showCurrent
+      />,
+    );
+    // Ancestor links point into the /c/ namespace.
+    expect(screen.getByRole("link", { name: "Learn" }).getAttribute("href")).toBe("/en/c/learn");
+    expect(screen.getByRole("link", { name: "Software Engineering" }).getAttribute("href")).toBe(
+      "/en/c/learn/software-engineering",
+    );
+    // Final segment is non-link aria-current.
+    const current = screen.getByText("Data Structures");
+    expect(current.getAttribute("aria-current")).toBe("page");
+    expect(current.closest("a")).toBeNull();
+  });
+
+  it("when contentHrefs is absent still emits bare hrefs (backward compat)", () => {
+    render(<Breadcrumb locale="en" slug="tools" segments={segments} showCurrent />);
+    expect(screen.getByRole("link", { name: "Tools" }).getAttribute("href")).toBe("/en/tools");
+  });
+});

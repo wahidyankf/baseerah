@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { PageLink } from "@/features/content/core/types";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
+import { contentUrl } from "@/features/content/core/content-url";
 
 interface PrevNextProps {
   locale: string;
@@ -20,7 +21,7 @@ export function PrevNext({ locale, prev, next }: PrevNextProps) {
     >
       {prev ? (
         <Link
-          href={`/${locale}/${prev.slug}`}
+          href={contentUrl(locale as Locale, prev.slug)}
           className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -34,7 +35,7 @@ export function PrevNext({ locale, prev, next }: PrevNextProps) {
       )}
       {next ? (
         <Link
-          href={`/${locale}/${next.slug}`}
+          href={contentUrl(locale as Locale, next.slug)}
           className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground sm:text-right"
         >
           <div>

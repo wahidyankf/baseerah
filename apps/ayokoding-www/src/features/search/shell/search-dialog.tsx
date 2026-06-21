@@ -15,6 +15,8 @@ import { useSearchOpen } from "@/features/search/shell/use-search";
 import { t } from "@/features/i18n/core/translations";
 import { trpcClient } from "@/lib/trpc/client";
 import type { SearchResult } from "@/features/content/core/types";
+import { contentUrl } from "@/features/content/core/content-url";
+import type { Locale } from "@/features/i18n/core/config";
 
 function formatSectionPath(slug: string): string {
   const parts = slug.split("/");
@@ -80,7 +82,7 @@ export function SearchDialog() {
     (slug: string) => {
       setOpen(false);
       setQuery("");
-      router.push(`/${locale}/${slug}`);
+      router.push(contentUrl(locale as Locale, slug));
     },
     [locale, router, setOpen],
   );

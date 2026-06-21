@@ -1,4 +1,6 @@
 import { createTRPCContext } from "@/features/app-shell/shell/trpc-init";
+import { contentUrl } from "@/features/content/core/content-url";
+import type { Locale } from "@/features/i18n/core/config";
 
 export const dynamic = "force-static";
 
@@ -9,11 +11,12 @@ export async function GET() {
 
   for (const [, meta] of index.contentMap) {
     if (meta.isSection || meta.locale !== "en") continue;
+    const url = `https://ayokoding.com${contentUrl(meta.locale as Locale, meta.slug)}`;
     items.push(`
     <item>
       <title><![CDATA[${meta.title}]]></title>
-      <link>https://ayokoding.com/${meta.locale}/${meta.slug}</link>
-      <guid>https://ayokoding.com/${meta.locale}/${meta.slug}</guid>
+      <link>${url}</link>
+      <guid>${url}</guid>
       ${meta.date ? `<pubDate>${new Date(meta.date).toUTCString()}</pubDate>` : ""}
       ${meta.description ? `<description><![CDATA[${meta.description}]]></description>` : ""}
     </item>`);

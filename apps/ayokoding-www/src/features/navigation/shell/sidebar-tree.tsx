@@ -6,6 +6,8 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { TreeNode } from "@/features/content/core/types";
+import { contentUrl } from "@/features/content/core/content-url";
+import type { Locale } from "@/features/i18n/core/config";
 
 interface SidebarTreeProps {
   nodes: TreeNode[];
@@ -25,7 +27,7 @@ export function SidebarTree({ nodes, locale, depth = 0 }: SidebarTreeProps) {
 
 function SidebarNode({ node, locale, depth }: { node: TreeNode; locale: string; depth: number }) {
   const pathname = usePathname();
-  const href = `/${locale}/${node.slug}`;
+  const href = contentUrl(locale as Locale, node.slug);
   const isActive = pathname === href;
   const isParent = pathname.startsWith(href + "/");
   const [expanded, setExpanded] = useState(isActive || isParent);
