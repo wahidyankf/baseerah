@@ -2426,7 +2426,11 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given("I am on the calculator at a 375px-wide viewport", () => {
       // jsdom has no layout engine, so the rendered pixel height is verified at the
       // e2e level (boundingBox >= 44px). The unit tier asserts the 44px-minimum
-      // styling contract — the min-h-[44px] utility — on each geo-filter select.
+      // styling contract on each geo-filter select: an explicit fixed height (h-11)
+      // PLUS appearance-none. The appearance-none is the load-bearing cross-browser
+      // fix — WebKit native selects use appearance:auto and pin min-height:18px in the
+      // UA stylesheet, overriding min-h-[44px]; removing the native appearance lets the
+      // author height apply on Safari, Chromium, AND Firefox alike.
       navState.params = new URLSearchParams();
       navState.setParams(navState.params);
       renderPage(<CostOfLivingCalculatorPage />);
@@ -2441,6 +2445,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
         const select = document.getElementById(id);
         expect(select, id).toBeTruthy();
         expect(select!.className).toContain("min-h-[44px]");
+        expect(select!.className).toContain("h-11");
+        expect(select!.className).toContain("appearance-none");
       }
     });
   });

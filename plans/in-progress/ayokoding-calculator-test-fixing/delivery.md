@@ -860,33 +860,56 @@ browsers. Root-cause investigation (diffing plan-touched source vs the pre-Phase
   city-detail re-render finished, hitting a 31-element strict-mode violation on Firefox. Now waits
   for `[data-testid="city-detail"]` and scopes the badge to the detail view.
 
-**Remaining e2e failures after fixes (documented, out of this plan's scope):**
+**All previously-remaining e2e failures RESOLVED (2026-06-21) — suite is fully green (423 passed)
+on all three browsers (chromium, firefox, webkit), two consecutive runs:**
 
-- **"Geographic filter scopes the candidate cities" (× 3 browsers) — PRE-EXISTING.** Fails
-  identically at the pre-Phase-1 baseline `ebd64d460` (verified by restoring baseline shell source
-  and re-running). The step asserts every best-city cell literally contains "Indonesia" after
-  selecting country=Indonesia; this is an unrelated pre-existing assertion/data condition, not
-  touched by this plan.
-- **Single-browser timing flakes (pass on other engines and on rerun):** "Region narrows the
-  country filter" (firefox), "Selecting filters updates the URL" (firefox), "Canonicalization does
-  not add a browser history entry" (firefox), "Gross salary entered monthly shows the derived annual
-  figure" (webkit). These pass on chromium/firefox and pass on rerun; CI runs with `retries: 2`.
-- **"Geo-filter selects meet the minimum touch-target height on mobile" (webkit) — PRE-EXISTING
-  webkit native-`<select>` limitation.** WebKit reports the geo-select computed `min-height` as
-  `18px` (UA default) and renders it at `22px`, ignoring the author `min-h-[44px]` + `padding`
-  because native selects use `appearance: auto`. The Phase-3/UWT-016 `min-h-[44px]` never took
-  effect on Safari's native selects. Passes on chromium/firefox (both 44px). A proper fix requires a
-  design decision (custom `appearance: none` select styling with a bespoke chevron, validated
-  against the mockups), so it is deferred as a pre-existing webkit accessibility gap outside this
-  plan's three-task scope.
+- **"Geographic filter scopes the candidate cities" (× 3 browsers) — ROOT-CAUSED + FIXED as a
+  brittle-timing test bug (app behavior was correct).** Reproduced deterministically: with NO wait
+  after `Country.selectOption("Indonesia")`, the best-city cells still showed the pre-filter
+  candidates ("Austin, United States"); with a wait they correctly showed "Jakarta, Indonesia".
+  The `selectOption` + `waitForLoadState("networkidle")` returned before React re-rendered with the
+  new scope, so the assertion ran against stale rows. The app's `cityScope` logic (filter cities by
+  `countryId`) is correct. Fix: the `When I select the country …` step now waits for the select to
+  carry the chosen value AND for the URL to commit `country=`; the `Then … Indonesian cities`
+  assertion uses `expect.poll` so it auto-retries until the scope re-render settles. The "Indonesia"
+  assertion was NOT weakened.
+- **Single-browser canonicalization / filter-timing failures — FIXED with deterministic waits, not
+  CI retries.** "Region narrows the country filter" (firefox), "Selecting filters updates the URL"
+  (firefox), the four canonicalize-on-load scenarios ("out-of-range numeric param reset",
+  "full-country-name param dropped", "unknown city param dropped", "Canonicalization does not add a
+  browser history entry"), the "contradictory region-and-city deep link" backfill (firefox), the
+  "Healthcare funding scheme is always shown" city-detail navigation (firefox), and "Gross salary
+  entered monthly shows the derived annual figure" (webkit). Every fixed-`waitForTimeout(600)` /
+  `networkidle` + sync-assertion pattern was replaced with `waitForURL` / `expect.poll` /
+  `toHaveValue` auto-retries keyed on the real signal (URL param committed, value committed,
+  hydration via `#geo-region-select` visible). Canonicalize-on-mount fires a post-hydration
+  `router.replace`; under 3-browser parallel load firefox hydration lags, so the polls use generous
+  (20s) timeouts. The webkit annual-figure step now confirms the controlled number input committed
+  its value (retrying the fill if a webkit `fill` is dropped) before asserting the derived figure.
+- **"Geo-filter selects meet the minimum touch-target height on mobile" (webkit) — ROOT-CAUSED +
+  FIXED AT SOURCE.** Confirmed via a WebKit probe: native `<select>` rendered with
+  `appearance: auto`, UA-pinned `min-height: 18px`, box height 22px — the author `min-h-[44px]` was
+  overridden by the UA stylesheet. Fix in `geo-filters.tsx`: the three geo selects now use a shared
+  `GEO_SELECT_CLASS` adding `appearance-none` + an explicit `h-11` (44px) alongside the kept
+  `min-h-[44px] min-w-0 max-w-full` and `border-input` token; a custom `ChevronDown` (lucide-react)
+  overlays the now-suppressed native arrow. Verified computed height = 44px on WebKit AND Chromium
+  AND Firefox via per-engine probes. Unit AC-4 binding extended to lock the `h-11` + `appearance-none`
+  contract; `geo-filters.test.tsx` + all 2114 unit tests stay green.
 
 ### Local Quality Gates (Before Push)
 
-- [ ] [AI] `npx nx affected -t typecheck` — exits 0
-- [ ] [AI] `npx nx affected -t lint` — exits 0
-- [ ] [AI] `npx nx affected -t test:unit` — exits 0
-- [ ] [AI] `npx nx affected -t specs:coverage` — exits 0
-- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` — exits 0
+- [x] [AI] `npx nx affected -t typecheck` — exits 0 _Done 2026-06-21: ayokoding-www typecheck clean._
+- [x] [AI] `npx nx affected -t lint` — exits 0 _Done: exits 0 with the single pre-existing
+      non-blocking `controls.tsx:32` jsx-a11y warning (unrelated to these changes)._
+- [x] [AI] `npx nx affected -t test:unit` — exits 0 _Done: 2114 unit tests passed (AC-4 binding
+      extended to lock the `h-11` + `appearance-none` cross-browser touch-target contract)._
+- [x] [AI] `npx nx affected -t specs:coverage` — exits 0 _Done: 16 specs / 177 scenarios / 648 steps
+      all covered._
+- [x] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` — exits 0 _Done 2026-06-21: **423 passed, 0
+      failed** on chromium + firefox + webkit, two consecutive `--skip-nx-cache` runs. All prior
+      geo-scope, canonicalization, filter-timing, and webkit 44px touch-target failures fixed at root
+      cause (deterministic Playwright waits + the `geo-filters.tsx` `appearance-none`/`h-11` source
+      fix). No reliance on CI retries._
 
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your
 > changes. Commit preexisting fixes separately with appropriate conventional commit messages.

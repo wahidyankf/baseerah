@@ -164,20 +164,31 @@ Then("each row shows a separately labelled liquidity reserve", async ({ page }) 
 When(
   "I select the region {string} then the country {string} in the cascading filters",
   async ({ page }, region: string, country: string) => {
+    // Selecting a region re-scopes the Country dropdown options. Wait for the
+    // region value to stick AND for the Country option list to shrink (the
+    // out-of-region "United States" must be gone) before picking the country —
+    // networkidle returns before the option list re-renders.
     await page.getByLabel("Region").selectOption({ label: region });
-    await page.waitForLoadState("networkidle");
+    await page.waitForURL(/region=/);
+    await expect
+      .poll(async () => (await page.getByLabel("Country").locator("option").allTextContents()).join("|").toLowerCase())
+      .not.toContain("united states");
     await page.getByLabel("Country").selectOption({ label: country });
-    await page.waitForLoadState("networkidle");
+    await expect(page.getByLabel("Country")).not.toHaveValue("");
+    await page.waitForURL(/country=/);
   },
 );
 
 Then("the Country filter lists only ASEAN countries", async ({ page }) => {
+  await expect
+    .poll(async () => (await page.getByLabel("Country").locator("option").allTextContents()).join("|").toLowerCase())
+    .not.toContain("united states");
   const opts = await page.getByLabel("Country").locator("option").allTextContents();
   expect(opts.length).toBeGreaterThan(0);
-  expect(opts.some((o) => o.toLowerCase().includes("united states"))).toBe(false);
 });
 
 Then("the City filter lists only Indonesian cities", async ({ page }) => {
+  await expect.poll(async () => page.getByLabel("City").locator("option").count()).toBeGreaterThan(0);
   const opts = await page.getByLabel("City").locator("option").allTextContents();
   expect(opts.length).toBeGreaterThan(0);
 });
@@ -189,7 +200,12 @@ Then("only cities in Indonesia are shown in the table", async ({ page }) => {
 
 When("I select the country {string} in the cascading filters", async ({ page }, country: string) => {
   await page.getByLabel("Country").selectOption({ label: country });
-  await page.waitForLoadState("networkidle");
+  // Deterministic wait: the selection drives a URL push (country=<id>) and a
+  // table re-render. Wait for the select to actually carry the chosen value so
+  // the subsequent scope assertions run against the re-rendered table, not the
+  // pre-selection state. networkidle alone returns before React re-renders.
+  await expect(page.getByLabel("Country")).not.toHaveValue("");
+  await page.waitForURL(/country=/);
 });
 
 // ── Country+city on every tab ─────────────────────────────────────────────────
@@ -275,12 +291,17 @@ Then(
 // ── Healthcare scheme badge ───────────────────────────────────────────────────
 
 When("I select any city on any tab", async ({ page }) => {
-  await page.locator("table tbody tr td:nth-child(2) a").first().click();
-  await page.waitForLoadState("networkidle");
-  // Wait for the single-city detail to render so the per-row table badges are gone
-  // and only the detail-view healthcare badge remains (avoids strict-mode violations
-  // when the click navigation has not finished re-rendering yet).
-  await page.locator("[data-testid='city-detail']").waitFor({ state: "visible", timeout: 8000 });
+  // Wait for the results table to be populated before clicking, so the city link
+  // is attached and stable (firefox occasionally clicked before hydration finished).
+  const cityLink = page.locator("table tbody tr td:nth-child(2) a").first();
+  await cityLink.waitFor({ state: "visible", timeout: 10000 });
+  await cityLink.click();
+  // The click drives a router.push(?city=…) then a re-render into the single-city
+  // detail. Wait for the URL to commit the city param first (the deterministic
+  // navigation signal), then for the detail view — networkidle alone raced the
+  // client-side navigation on firefox.
+  await page.waitForURL(/city=/, { timeout: 10000 });
+  await page.locator("[data-testid='city-detail']").waitFor({ state: "visible", timeout: 10000 });
 });
 
 Then("a healthcare funding-scheme badge is shown for that city's country", async ({ page }) => {
@@ -353,8 +374,21 @@ When("I switch to the {string} tab", async ({ page }, tabName: string) => {
 // ── Savings tab — gross salary input ─────────────────────────────────────────
 
 When("I enter a gross monthly salary of {string} USD", async ({ page }, amount: string) => {
-  await page.getByLabel("Gross monthly salary (before tax)").fill(amount);
-  await page.keyboard.press("Tab");
+  const input = page.getByLabel("Gross monthly salary (before tax)");
+  await input.click();
+  await input.fill(amount);
+  // Deterministically confirm the controlled number input committed the value
+  // before proceeding. WebKit occasionally drops a fill on a type="number" input
+  // when the assertion races; retrying the fill until the value sticks removes the
+  // flake without weakening the behavioural assertion downstream.
+  await expect(input)
+    .toHaveValue(amount, { timeout: 5000 })
+    .catch(async () => {
+      await input.fill("");
+      await input.pressSequentially(amount, { delay: 20 });
+    });
+  await expect(input).toHaveValue(amount, { timeout: 5000 });
+  await input.blur();
 });
 
 Then(
@@ -765,12 +799,24 @@ Then("the row shows the best city and its country", async ({ page }) => {
 
 Then("each role's best city is chosen only from Indonesian cities", async ({ page }) => {
   const bestCityCells = page.locator("[data-testid='best-city-cell']");
-  const count = await bestCityCells.count();
-  expect(count).toBeGreaterThan(0);
-  for (let i = 0; i < Math.min(count, 5); i++) {
-    const text = await bestCityCells.nth(i).textContent();
-    expect(text?.includes("Indonesia")).toBe(true);
-  }
+  // Auto-retry until the scope re-render settles: every visible best-city cell
+  // (sampled across the first five) must name an Indonesian city. Polling avoids
+  // the race where the table still shows the pre-filter candidates.
+  await expect
+    .poll(
+      async () => {
+        const count = await bestCityCells.count();
+        if (count === 0) return false;
+        const sample = Math.min(count, 5);
+        for (let i = 0; i < sample; i++) {
+          const text = await bestCityCells.nth(i).textContent();
+          if (!text?.includes("Indonesia")) return false;
+        }
+        return true;
+      },
+      { timeout: 10000 },
+    )
+    .toBe(true);
 });
 
 // ── Non-salary comp does not affect ranking ───────────────────────────────────
@@ -1130,14 +1176,17 @@ Given("a user is on the cost-of-living calculator page", async ({ page }) => {
 });
 
 When("the user selects Country {string} and City {string}", async ({ page }, country: string, city: string) => {
+  // Each selection drives a router.push. Wait for the country to land in the URL
+  // before choosing the city (the City option list re-renders on country change),
+  // then wait for the city to land — networkidle resolves before the push commits.
   await page.getByLabel("Country").first().selectOption({ label: country });
-  await page.waitForLoadState("networkidle");
+  await page.waitForURL(/country=/);
   await page.getByLabel("City").first().selectOption({ label: city });
-  await page.waitForLoadState("networkidle");
+  await page.waitForURL(/city=/);
 });
 
 Then("the URL updates to include query parameters reflecting those selections", async ({ page }) => {
-  expect(page.url()).toMatch(/country=|city=/);
+  await expect.poll(() => page.url()).toMatch(/country=|city=/);
 });
 
 Then("copying the URL and opening it in a new tab restores the same filter state", async ({ page }) => {
@@ -1645,15 +1694,22 @@ When("I open that link in a fresh tab", async () => {
 });
 
 When("the page resolves the deep link", async ({ page }) => {
+  // Canonicalize-on-mount fires a router.replace once the client component
+  // hydrates. Rather than a fixed delay (brittle on slower engines), wait for
+  // the calculator UI to be interactive (hydration signal); the downstream Then
+  // steps then auto-retry on the rewritten URL.
   await page.waitForLoadState("networkidle");
-  // Allow canonicalize-on-mount (router.replace) to settle
-  await page.waitForTimeout(600);
+  await expect(page.locator("#geo-region-select")).toBeVisible({ timeout: 20000 });
 });
 
 When("the page rewrites the URL to canonical form", async ({ page }) => {
+  // Deterministically wait for the canonicalize router.replace to strip the dirty
+  // param, so the subsequent Back-button assertion runs after the replace commits.
+  // Generous timeout: under 3-browser parallel load firefox hydration (and thus
+  // the post-hydration canonicalization effect) can lag well past a few seconds.
   await page.waitForLoadState("networkidle");
-  // Allow the replace effect to settle after mount
-  await page.waitForTimeout(600);
+  await expect(page.locator("#geo-region-select")).toBeVisible({ timeout: 20000 });
+  await expect.poll(() => new URL(page.url()).search.includes("atlantis"), { timeout: 20000 }).toBe(false);
 });
 
 When("I select the city {string}", async ({ page }, cityLabel: string) => {
@@ -1693,11 +1749,12 @@ Then("the Adults control shows {string}", async ({ page }, value: string) => {
 });
 
 Then("the URL is rewritten to have no {string} param", async ({ page }, paramName: string) => {
-  await page.waitForLoadState("networkidle");
-  // Wait for the canonicalize router.replace to fire
-  await page.waitForTimeout(600);
-  const url = new URL(page.url());
-  expect(url.searchParams.has(paramName)).toBe(false);
+  // Auto-retry until the canonicalize router.replace removes the param. A fixed
+  // timeout raced the replace on slower engines (firefox); polling is deterministic.
+  // Ensure the client is hydrated first, then poll generously for the replace to
+  // land under heavy 3-browser parallel load.
+  await expect(page.locator("#geo-region-select")).toBeVisible({ timeout: 20000 });
+  await expect.poll(() => new URL(page.url()).searchParams.has(paramName), { timeout: 20000 }).toBe(false);
 });
 
 Then("the Country filter returns to {string}", async ({ page }, _label: string) => {
@@ -1803,16 +1860,21 @@ Then("the single-city Cost-of-living detail for Singapore is shown", async ({ pa
 Then(
   "the URL is rewritten to canonical form with {string} and {string} backfilled to {string}",
   async ({ page }, primaryParam: string, backfillKey: string, backfillVal: string) => {
-    await page.waitForLoadState("networkidle");
-    await page.waitForTimeout(600);
-    const url = new URL(page.url());
+    // Wait for hydration, then auto-retry until the canonicalize router.replace
+    // both keeps the primary param and backfills the derived one — a fixed timeout
+    // raced the replace on firefox under parallel load.
+    await expect(page.locator("#geo-region-select")).toBeVisible({ timeout: 20000 });
     const [pk, pv] = primaryParam.split("=");
-    if (pv !== undefined) {
-      expect(url.searchParams.get(pk!)).toBe(pv);
-    } else {
-      expect(url.searchParams.has(pk!)).toBe(true);
-    }
-    expect(url.searchParams.get(backfillKey)).toBe(backfillVal);
+    await expect
+      .poll(
+        () => {
+          const params = new URL(page.url()).searchParams;
+          const primaryOk = pv !== undefined ? params.get(pk!) === pv : params.has(pk!);
+          return primaryOk && params.get(backfillKey) === backfillVal;
+        },
+        { timeout: 20000 },
+      )
+      .toBe(true);
   },
 );
 
@@ -1845,17 +1907,16 @@ Then("a {string} link to {string} is shown", async ({ page }, linkText: string, 
 });
 
 Then("pressing the browser Back button does not return to the {string} URL", async ({ page }, qs: string) => {
-  await page.waitForLoadState("networkidle");
-  // The canonical URL after replace should not contain the dirty param
-  const currentUrl = page.url();
-  // Navigate back; if router.replace was used, back goes to the page before
-  // the calculator (not the dirty URL), so the dirty qs should not appear
+  // Ensure the canonicalize router.replace has stripped the dirty param BEFORE
+  // pressing Back — otherwise goBack can race the replace and land on the dirty
+  // URL, producing a false failure on slower engines (firefox). Generous timeout
+  // for firefox hydration under 3-browser parallel load.
+  await expect(page.locator("#geo-region-select")).toBeVisible({ timeout: 20000 });
+  await page.waitForURL((url) => !url.search.includes(qs), { timeout: 20000 });
   await page.goBack();
   await page.waitForLoadState("networkidle");
-  const afterBackUrl = page.url();
   // The key assertion: Back must not return to a URL containing the dirty param value
-  expect(afterBackUrl).not.toContain(qs);
-  void currentUrl;
+  await expect.poll(() => page.url(), { timeout: 5000 }).not.toContain(qs);
 });
 
 // ── AC-4 / AC-5: Touch targets and 320px horizontal overflow ──────────────────

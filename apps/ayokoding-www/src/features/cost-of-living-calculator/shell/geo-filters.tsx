@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 import type { Dataset } from "../core/data/cities";
 import { countriesForRegion, citiesForCountry, scopedCities } from "../core/geo-filter";
 import type { Locale } from "@/features/i18n/core/config";
@@ -40,6 +41,52 @@ const REGION_LABELS: Record<Region, string> = {
 /** Returns the locale-specific name, falling back to English. */
 export function localeName(name: { en: string; id: string }, locale: Locale): string {
   return name[locale] ?? name.en;
+}
+
+// Shared geo-select styling. `appearance-none` + an explicit `h-11` (44px) is the
+// cross-browser fix for the WCAG 2.5.5 / Apple-HIG 44px tap-target rule: native
+// `<select>` elements on WebKit (Safari) render with `appearance: auto` and the UA
+// stylesheet pins `min-height: 18px`, overriding any author `min-h-[44px]`, so the
+// control measured ~22px on Safari. Removing the native appearance lets the author
+// height apply on WebKit, Chromium, AND Firefox alike. We keep `min-h-[44px]` (the
+// styling contract asserted by unit tests + the design system's 44px control family)
+// and `min-w-0 max-w-full` so the row never forces horizontal overflow. The native
+// dropdown affordance is replaced by a custom ChevronDown rendered by SelectField.
+const GEO_SELECT_CLASS =
+  "h-11 min-h-[44px] w-full max-w-full min-w-0 appearance-none rounded-md border border-input bg-transparent py-1 pr-8 pl-3 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+
+// Wraps a native <select> styled with GEO_SELECT_CLASS and overlays a custom
+// ChevronDown affordance (needed because `appearance-none` strips the native arrow).
+function SelectField({
+  id,
+  ariaLabel,
+  value,
+  onChange,
+  children,
+}: {
+  id: string;
+  ariaLabel: string;
+  value: string;
+  onChange: (val: string) => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative w-full max-w-full min-w-0">
+      <select
+        id={id}
+        aria-label={ariaLabel}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={GEO_SELECT_CLASS}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-2 size-4 -translate-y-1/2 text-muted-foreground"
+      />
+    </div>
+  );
 }
 
 // Build a minimal CalculatorState stub from the current geo props for apply helpers.
@@ -116,12 +163,11 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
           <label htmlFor="geo-region-select" className="text-sm font-medium">
             {labels.region}
           </label>
-          <select
+          <SelectField
             id="geo-region-select"
-            aria-label={labels.region}
+            ariaLabel={labels.region}
             value={region ?? ""}
-            onChange={(e) => handleRegionChange(e.target.value)}
-            className="min-h-[44px] w-full max-w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            onChange={handleRegionChange}
           >
             <option value="">{labels.allRegions}</option>
             {availableRegions.map((r) => (
@@ -129,7 +175,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
                 {REGION_LABELS[r]}
               </option>
             ))}
-          </select>
+          </SelectField>
           {region !== null && (
             <button
               type="button"
@@ -146,12 +192,11 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
           <label htmlFor="geo-country-select" className="text-sm font-medium">
             {labels.country}
           </label>
-          <select
+          <SelectField
             id="geo-country-select"
-            aria-label={labels.country}
+            ariaLabel={labels.country}
             value={countryId ?? ""}
-            onChange={(e) => handleCountryChange(e.target.value)}
-            className="min-h-[44px] w-full max-w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            onChange={handleCountryChange}
           >
             <option value="">{labels.allCountries}</option>
             {availableCountries.map((c) => (
@@ -159,27 +204,21 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
                 {localeName(c.name, locale)}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
 
         <div className="flex min-w-0 basis-full items-center gap-2 sm:basis-auto">
           <label htmlFor="geo-city-select" className="text-sm font-medium">
             {labels.city}
           </label>
-          <select
-            id="geo-city-select"
-            aria-label={labels.city}
-            value={cityId ?? ""}
-            onChange={(e) => handleCityChange(e.target.value)}
-            className="min-h-[44px] w-full max-w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          >
+          <SelectField id="geo-city-select" ariaLabel={labels.city} value={cityId ?? ""} onChange={handleCityChange}>
             <option value="">{labels.allCities}</option>
             {availableCities.map((c) => (
               <option key={c.id} value={c.id}>
                 {localeName(c.name, locale)}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
       </div>
       {regionAutoChanged && (
