@@ -418,7 +418,7 @@ without evidence is incomplete. See [Evidence Capture Convention](../../developm
    - Verify the full flow (UI action → API call → response → UI update)
 4. **Fix any broken behavior** — including preexisting issues (Iron Rule 3)
 5. **Document evidence** in `delivery.md` under each ticked checkbox:
-   - Screenshot references: `![alt](./evidence/phase-N-...-{locale}-{breakpoint}px.png)`
+   - Screenshot references via Markdown image syntax pointing at `./evidence/phase-N-...-{locale}-{breakpoint}px.png`
    - curl commands, status codes, response bodies as fenced code blocks
    - Console-clean confirmation per locale
 
