@@ -44,7 +44,7 @@ The survey (empirical, 2026-06-06) established these facts before any decisions:
 
 - `plan-quality-gate.md` is byte-identical in all three repos — no action needed.
 - `plan-multi-repo-parity-planning.md` exists only in ose-public.
-- The primer copy of `plan-establishment-execution.md` lacks the `target-stage`
+- The primer copy of `plan-planning.md` lacks the `target-stage`
   input field that ose-public and ose-infra carry.
 - The grilling convention exists as `grilling-with-options.md` in ose-public,
   `grilling.md` (different name, broader wording) in ose-infra, and not at all in
@@ -80,11 +80,11 @@ web-researcher (conditional) → Second Grill (post-research) → Author → Gat
 Deliver.
 
 **Rationale**: the invoker required this pattern (2026-06-06) to mirror the
-structure already established in `plan-establishment-execution.md`. Decisions that
+structure already established in `plan-planning.md`. Decisions that
 depend on external tool-convention research must not be locked in before the
 research runs.
 
-### Row 3 — plan-establishment-execution Merge; Worktree Default; target-stage
+### Row 3 — plan-planning Merge; Worktree Default; target-stage
 
 **Decision**: perform a 3-way best-of merge across all three repos. The merged
 version keeps the `target-stage` input that primer's copy lacked. The merged
@@ -302,13 +302,15 @@ files are low-risk content — they do not affect production deployments. The
 deviation is documented here and in the primer plan's tech-docs.md so that future
 contributors encounter an explicit record rather than an unexplained exception.
 
-**Safety Invariant 6 context**: the ose-primer sync convention
-(`repo-governance/conventions/structure/ose-primer-sync.md`) normally requires
-upstream → template propagation to go through a PR. Worktree-to-main execution of
-a self-contained plan inside primer does not cross the upstream→downstream
-boundary; the convention's intent (prevent accidental overwrites of downstream
-customizations) is not violated. The deviation is still recorded because the
-convention text does not carve out this case explicitly.
+**Safety Invariant 6 context**: at the time of this decision (2026-06-06) the
+now-retired ose-primer sync convention normally required upstream → template
+propagation to go through a PR. Worktree-to-main execution of a self-contained
+plan inside primer does not cross the upstream→downstream boundary; that
+convention's intent (prevent accidental overwrites of downstream customizations)
+is not violated. The deviation is still recorded for historical completeness.
+(The automated sync convention and its maker agents have since been retired;
+ose-public↔ose-primer parity is now maintained manually via the multi-repo
+parity planning workflows.)
 
 ### Row 23 — Primer planning-system-overhaul Plan Superseded
 
@@ -395,5 +397,6 @@ All web research performed by web-researcher on 2026-06-05 to 2026-06-06:
   of binding directories affected by rows 17–20
 - [Multi-Harness Binding Convention](../../repo-governance/conventions/structure/multi-harness-binding.md) —
   two-tier binding model governing rows 17–19
-- [ose-primer Sync Convention](../../repo-governance/conventions/structure/ose-primer-sync.md) —
-  PR-only sync default that row 22 deviates from
+- ose-primer Sync Convention (since retired) — the PR-only sync default that row 22
+  deviates from; ose-public↔ose-primer parity is now maintained manually via the
+  multi-repo parity planning workflows

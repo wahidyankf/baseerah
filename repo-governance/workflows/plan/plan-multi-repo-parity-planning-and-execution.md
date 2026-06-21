@@ -86,7 +86,7 @@ finalization.
 - Plans should be reviewed via PR before execution → run
   [plan-multi-repo-parity-planning](./plan-multi-repo-parity-planning.md) alone with
   `mode: worktree-to-pr`, then run [plan-execution](./plan-execution.md) per repo after merge
-- Single-repo work → [plan-establishment-execution](./plan-establishment-execution.md) followed by
+- Single-repo work → [plan-planning](./plan-planning.md) followed by
   [plan-execution](./plan-execution.md)
 
 ## Execution Mode
@@ -358,7 +358,7 @@ Plans and executes only the two listed repos; the pre-execution grill confirms w
 - [Plan Execution](./plan-execution.md) — nested per repo as the execution phase (Step 4); use it
   alone for plans that already exist
 - [Plan Quality Gate](./plan-quality-gate.md) — nested inside the planning phase per plan
-- [Plan Establishment](./plan-establishment-execution.md) — the single-repo analogue of the
+- [Plan Planning](./plan-planning.md) — the single-repo analogue of the
   planning phase
 
 ## Principles Implemented/Respected

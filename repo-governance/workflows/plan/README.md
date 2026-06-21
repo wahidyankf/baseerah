@@ -39,7 +39,7 @@ validation at the end.
 
 ## Workflows
 
-- [Plan Establishment](./plan-establishment-execution.md) - Orchestrate the full prompt-to-pushed-plan
+- [Plan Planning](./plan-planning.md) - Orchestrate the full prompt-to-pushed-plan
   lifecycle: repo exploration → grill → web research → grill → plan-maker → plan-quality-gate →
   push. Use when turning a behavioral prompt into a production-ready plan.
 - [Plan Execution](./plan-execution.md) - Execute plan tasks systematically with validation and completion tracking; orchestrated directly by the calling context, validated by `plan-execution-checker`

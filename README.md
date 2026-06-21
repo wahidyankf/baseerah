@@ -140,7 +140,7 @@ See [`docs/README.md`](./docs/README.md) for details.
 
 ## 🔗 Related Repositories
 
-- **[`ose-primer`](https://github.com/wahidyankf/ose-primer)** — public, MIT-licensed template repository derived from `ose-public`. Packages scaffolding (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) into a reusable starting point. `ose-public` is upstream source of truth; propagation and adoption flows are defined by the [ose-primer sync convention](./repo-governance/conventions/structure/ose-primer-sync.md). For the upstream/downstream relationship and license difference, see [Related Repositories reference](./docs/reference/related-repositories.md).
+- **[`ose-primer`](https://github.com/wahidyankf/ose-primer)** — public, MIT-licensed template repository derived from `ose-public`. Packages scaffolding (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) into a reusable starting point. `ose-public` is upstream source of truth; content parity with `ose-primer` is maintained manually via the multi-repo parity planning workflows. For the upstream/downstream relationship and license difference, see [Related Repositories reference](./docs/reference/related-repositories.md).
 
 ## 🎯 Motivation
 

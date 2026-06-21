@@ -1,6 +1,6 @@
 ---
-name: plan-establishment-execution
-title: "plan-establishment-execution"
+name: plan-planning
+title: "plan-planning"
 goal: >
   Create a well-researched, grill-validated project plan in the resolved target stage
   (plans/in-progress/ by default, or plans/backlog/ when target-stage=backlog) from a user prompt

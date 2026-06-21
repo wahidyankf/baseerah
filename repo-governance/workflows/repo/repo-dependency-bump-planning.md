@@ -41,7 +41,7 @@ inputs:
     default: dependency-bump
   - name: push-target
     type: string
-    description: "Git push destination for the backlog plan. Forwarded to plan-establishment-execution."
+    description: "Git push destination for the backlog plan. Forwarded to plan-planning."
     required: false
     default: "origin main"
 outputs:
@@ -65,7 +65,7 @@ into a concrete, validated **backlog plan** for updating dependencies across the
 (`apps/`, `libs/`, workspace-root pins, `.opencode/`, `infra/`, and the CI toolchain pins under
 `.github/`). This workflow performs the policy's survey-and-classify work (Application Workflow steps
 1–7: inventory → path classification → recency → functional stability → clearance) and hands the
-results to `plan-establishment-execution` to author the plan.
+results to `plan-planning` to author the plan.
 
 > **The outcome is the plan, not the implementation.** This workflow never edits a manifest,
 > never updates a lockfile, and never runs a bump. It produces a proposal in `plans/backlog/`. The
@@ -82,7 +82,7 @@ plan document. It is **not** an iterative quality gate.
 **Direct Orchestration** — the calling context (top-level assistant session) orchestrates the
 phases, delegating external version/CVE/yank research to `web-researcher` via the Agent tool,
 running the human checkpoint inline (so the user's conversation is preserved), and invoking the
-[plan-establishment-execution workflow](../plan/plan-establishment-execution.md) for plan
+[plan-planning workflow](../plan/plan-planning.md) for plan
 authoring.
 
 ## When to use
@@ -220,7 +220,7 @@ bumps here.
 
 ### 5. Backlog Plan Establishment (Sequential)
 
-Invoke the [plan-establishment-execution workflow](../plan/plan-establishment-execution.md) with:
+Invoke the [plan-planning workflow](../plan/plan-planning.md) with:
 
 - **Input** `target-stage`: `backlog` (lands at `plans/backlog/<YYYY-MM-DD>__<identifier>/`).
 - **Input** `push-target`: forwarded from this workflow's input.
@@ -236,7 +236,7 @@ Invoke the [plan-establishment-execution workflow](../plan/plan-establishment-ex
   - The delivery checklist mirrors the policy's [Application Workflow](../../development/workflow/dependency-bump-policy.md)
     steps 8–12, grouped per ecosystem, TDD-shaped where code changes are required.
 
-Because `plan-establishment-execution` runs its own grill + (optional) research + `plan-maker` +
+Because `plan-planning` runs its own grill + (optional) research + `plan-maker` +
 `plan-quality-gate` + push, this phase yields a strict-gate-passing backlog plan.
 
 **Output**: `plan-path`, `final-status`, `final-report` (from the nested quality gate).
@@ -278,7 +278,7 @@ Scenario: User declines at the checkpoint
 ## Related Documents
 
 - [Dependency Bump Stability & Safety Policy](../../development/workflow/dependency-bump-policy.md) — the authority this workflow operationalizes (three-path tree, Rule 5a/5b, KEV Fast-Track, EPSS Escalation, clearance statuses).
-- [plan-establishment-execution workflow](../plan/plan-establishment-execution.md) — invoked in Phase 5 with `target-stage=backlog`.
+- [plan-planning workflow](../plan/plan-planning.md) — invoked in Phase 5 with `target-stage=backlog`.
 - [Plan Execution workflow](../plan/plan-execution.md) — runs the plan later, after promotion to `in-progress/`.
 - [web-researcher Agent](../../../.claude/agents/web-researcher.md) — Phase 2 version/CVE/KEV/EPSS research.
 - [security-waivers register](../../../docs/reference/security-waivers.md) — destination for WAIVER / FUNCTIONAL-HOLD / KEV-listed entries.

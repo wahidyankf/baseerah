@@ -159,13 +159,12 @@ gh pr create --title "plan: <objective> parity" --body "..." --draft
 
 Use this mode when a formal review step is wanted before plans land on `main`.
 
-**Note on ose-primer**: The
-[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md) allows propagation to
-`ose-primer` to be delivered EITHER as a draft PR OR as a direct push to `ose-primer:main`
-(Safety Invariant 6: every mutation must flow through a worktree, but the delivery mode is the
-caller's per-run choice — neither is the default). Selecting `main-to-main` or `worktree-to-main`
-is therefore a first-class delivery choice, not a deviation. The grilling in Step 3 MUST surface
-the delivery-mode choice explicitly and record the invoker's decision before proceeding.
+**Note on ose-primer**: When `ose-primer` is a parity target, propagation to it can be delivered
+EITHER as a draft PR OR as a direct push to `ose-primer:main` — every mutation must flow through a
+worktree, but the delivery mode is the caller's per-run choice and neither is the default. Selecting
+`main-to-main` or `worktree-to-main` is therefore a first-class delivery choice, not a deviation. The
+grilling in Step 3 MUST surface the delivery-mode choice explicitly and record the invoker's decision
+before proceeding.
 
 ## Steps
 
@@ -576,7 +575,7 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
 ## Related Workflows
 
 - [Plan Quality Gate](./plan-quality-gate.md) — nested workflow called in Step 7 for each plan
-- [Plan Establishment](./plan-establishment-execution.md) — single-repo sibling; this workflow
+- [Plan Planning](./plan-planning.md) — single-repo sibling; this workflow
   is its multi-repo analogue (one plan per repo, one grill session across all repos)
 - [Plan Execution](./plan-execution.md) — downstream workflow that executes the plans this
   workflow creates; runs after plans are established and promoted to `in-progress/`
@@ -620,10 +619,6 @@ select `worktree-to-pr`. The PRs remain in draft until the invoker promotes them
   GitHub-compatible markdown with `.md` extensions and relative paths.
 - **[File Naming Convention](../../conventions/structure/file-naming.md)**: Lowercase kebab-case
   for all plan files and rationale docs created by this workflow.
-- **[ose-primer Sync Convention](../../conventions/structure/ose-primer-sync.md)**: When
-  ose-primer is in the parity set, the delivery mode (draft PR vs. direct push to
-  `ose-primer:main` — both first-class, neither default) is surfaced in grilling and requires an
-  explicit invoker choice.
 - **[No Secrets in Git Convention](../../conventions/security/no-secrets-in-committed-files.md)**: No
   system secret enters any plan file or rationale doc created by this workflow.
 - **[Web Research Delegation Convention](../../conventions/writing/web-research-delegation.md)**:

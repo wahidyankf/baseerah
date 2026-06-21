@@ -17,8 +17,6 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[plan-maker](plan-maker.md)** - Project plan creation
 - **[repo-rules-maker](repo-rules-maker.md)** - Governance document creation
 - **[repo-workflow-maker](repo-workflow-maker.md)** - Workflow documentation
-- **[repo-ose-primer-adoption-maker](repo-ose-primer-adoption-maker.md)** - Surfaces candidates to adopt from `ose-primer` into `ose-public` (dry-run only)
-- **[repo-ose-primer-propagation-maker](repo-ose-primer-propagation-maker.md)** - Propagates `ose-public` content to `ose-primer` (dry-run / apply / parity-check modes); apply opens draft PR against primer
 - **[specs-maker](specs-maker.md)** - Spec area scaffolding and feature file creation
 - **[social-linkedin-post-maker](social-linkedin-post-maker.md)** - LinkedIn content creation
 - **[agent-maker](agent-maker.md)** - Agent definition creation

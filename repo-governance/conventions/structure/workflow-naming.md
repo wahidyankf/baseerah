@@ -73,7 +73,7 @@ No other type suffixes are permitted. Introducing a new type requires amending t
 
 **Note on composed workflows**: A workflow step can be an agent, a procedure, or another workflow (nested). The type suffix describes the execution model of the workflow as a whole, not the nature of its individual steps. A `quality-gate` workflow may orchestrate sub-workflows internally; it still carries the `quality-gate` suffix because that describes its overall iterative loop-to-zero-findings model.
 
-**Note on `planning` vs `execution`**: A `planning` workflow performs domain analysis to decide WHAT a future plan should contain, then typically delegates the plan-authoring lifecycle to `plan-establishment-execution`; its deliverable is a plan document in `plans/`. An `execution` workflow runs a fixed defined procedure against inputs. `plan-establishment-execution` itself keeps the `execution` type because it executes the generic plan-authoring lifecycle (grill → research → write → gate → push) as a fixed procedure — a `planning` workflow is the domain-specific survey that feeds that procedure and owns the analysis determining the plan's content.
+**Note on `planning` vs `execution`**: A `planning` workflow performs domain analysis to decide WHAT a future plan should contain, then typically delegates the generic plan-authoring lifecycle (grill → research → write → gate → push) to `plan-planning`; its deliverable is a plan document in `plans/`. `plan-planning` is itself a `planning` workflow — the generic plan-authoring lifecycle whose terminal deliverable is a validated plan in `plans/`; domain-specific `planning` workflows run their own survey/analysis and feed that lifecycle. An `execution` workflow, by contrast, runs a fixed defined procedure against inputs and is distinguished by completing that procedure rather than producing a plan as its deliverable.
 
 ## Meta reference exception
 
@@ -108,8 +108,8 @@ The `rhino-cli workflows validate-naming` subcommand wraps this check plus a fro
 Current workflows, grouped by type, all conforming to the rule:
 
 - **`quality-gate`** — `plan-quality-gate` (scope `plan`, type `quality-gate`), `repo-rules-quality-gate` (scope `repo`, qualifier `rules`, type `quality-gate`), `specs-quality-gate` (scope `specs`, type `quality-gate`), `docs-quality-gate` (scope `docs`, type `quality-gate`), `ci-quality-gate` (scope `ci`, type `quality-gate`), `ui-quality-gate` (scope `ui`, type `quality-gate`), `ayokoding-web-swe-by-example-quality-gate` (scope `ayokoding-web`, qualifier `by-example`, type `quality-gate`), `pdf-to-md-quality-gate` (scope `pdf-to-md`, type `quality-gate`, hosted in `content/` directory)
-- **`execution`** — `plan-execution` (scope `plan`, type `execution`), `plan-establishment-execution` (scope `plan`, qualifier `establishment`, type `execution`)
-- **`planning`** — `repo-dependency-bump-planning` (scope `repo`, qualifier `dependency-bump`, type `planning`), `web-ux-test-fixing-planning` (scope `web`, qualifier `ux`, descriptor `test-fixing`, type `planning`)
+- **`execution`** — `plan-execution` (scope `plan`, type `execution`)
+- **`planning`** — `plan-planning` (scope `plan`, type `planning`), `repo-dependency-bump-planning` (scope `repo`, qualifier `dependency-bump`, type `planning`), `web-ux-test-fixing-planning` (scope `web`, qualifier `ux`, descriptor `test-fixing`, type `planning`)
 - **`setup`** — `infra-development-environment-setup` would be the fully qualified form; the file is stored as `development-environment-setup.md` in the `infra/` directory, making the scope implicit from directory location. The enforcement command (type-suffix check) passes. New `setup` workflows SHOULD include the scope prefix explicitly (e.g., `infra-something-setup.md`).
 
 ## Related

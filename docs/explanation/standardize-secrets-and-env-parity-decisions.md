@@ -81,8 +81,8 @@ all secrets and env practices.
 `reproducible-environments.md`). A single hub doc with explicit section anchors makes it possible for
 cross-references to point to exact rules rather than whole documents.
 
-**Cross-repo propagation**: The hub doc is designed to be propagated to `ose-primer` via
-`repo-ose-primer-propagation-maker`. `ose-infra` carries its own equivalent.
+**Cross-repo propagation**: The hub doc is designed to be propagated to `ose-primer` manually
+via the multi-repo parity planning workflows. `ose-infra` carries its own equivalent.
 
 **Deviation**: None in principle. Structural placement in
 `repo-governance/conventions/security/` is shared across ose-public and ose-primer;

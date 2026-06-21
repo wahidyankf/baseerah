@@ -30,11 +30,11 @@ The ecosystem consists of three independent sibling repositories. No parent coor
 
 ### Upstream / downstream relationship
 
-`ose-public` is **upstream**: all scaffolding originates here, then flows to `ose-primer` through the propagation flow documented in the [ose-primer sync convention](../../repo-governance/conventions/structure/ose-primer-sync.md).
+`ose-public` is **upstream**: all scaffolding originates here, then flows to `ose-primer` to keep the template current.
 
-`ose-primer` is **downstream**: it receives scaffolding updates, but its product layer (anything a consumer builds on top) is never pulled back into `ose-public`. Generic improvements that consumers contribute to `ose-primer` (for example, new governance patterns, Skill definitions, or demo-app implementations) can flow back to `ose-public` through the adoption flow documented in the same convention.
+`ose-primer` is **downstream**: it receives scaffolding updates, but its product layer (anything a consumer builds on top) is never pulled back into `ose-public`. Generic improvements that consumers contribute to `ose-primer` (for example, new governance patterns, Skill definitions, or demo-app implementations) can flow back to `ose-public` when adopted.
 
-The two flows are directional — propagation (upstream → downstream) and adoption (downstream → upstream) — and classified per path in the convention's classifier table. Paths that are product-specific (for example, `apps/organiclever-*` or `apps/ose-www`) are tagged `neither` and never flow in either direction.
+Both directions — propagation (upstream → downstream) and adoption (downstream → upstream) — are maintained **manually**, typically driven by the [plan-multi-repo-parity-planning](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md) and [plan-multi-repo-parity-planning-and-execution](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md) planning workflows, which survey both repos, record per-gap decisions, and author aligned plans. Paths that are product-specific (for example, `apps/organiclever-*` or `apps/ose-www`) are never propagated in either direction.
 
 ### Licensing
 
@@ -44,13 +44,13 @@ The two flows are directional — propagation (upstream → downstream) and adop
 
 ### Non-Goals for this document
 
-- This document does not describe sync automation mechanics or release cadence. Those details live in the [ose-primer sync convention](../../repo-governance/conventions/structure/ose-primer-sync.md) and the orchestrating workflows under `repo-governance/workflows/repo/`.
-- This document does not enumerate every file-by-file classification. The authoritative classifier table lives in the sync convention.
+- This document does not describe parity mechanics or release cadence. Those details live in the multi-repo parity planning workflows under `repo-governance/workflows/plan/`.
+- This document does not enumerate every file-by-file classification. Per-gap classification is decided during each parity planning pass.
 - This document does not describe how to clone, set up, or build `ose-primer` itself; that belongs in `ose-primer`'s own README.
 
 ### Where to look next
 
-- [ose-primer sync convention](../../repo-governance/conventions/structure/ose-primer-sync.md) — directional classification, transforms, safety invariants, and audit rules.
+- [plan-multi-repo-parity-planning](../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md) — the planning workflow that surveys sibling repos and authors aligned parity plans.
 - [ose-primer on GitHub](https://github.com/wahidyankf/ose-primer) — downstream template repository.
 
 ## `ose-infra`

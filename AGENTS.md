@@ -402,7 +402,7 @@ delivery checklists: Phase 0 first, tag steps `[AI]`/`[HUMAN]`, gate each phase)
 plan-checker, plan-execution-checker, plan-fixer,
 repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 [plan-execution workflow](./repo-governance/workflows/plan/plan-execution.md) and
-[plan-establishment workflow](./repo-governance/workflows/plan/plan-establishment-execution.md))
+[plan-planning workflow](./repo-governance/workflows/plan/plan-planning.md))
 
 **Development**: swe-golang-dev, swe-typescript-dev, swe-e2e-dev, swe-csharp-dev, swe-fsharp-dev, swe-rust-dev
 
@@ -410,7 +410,7 @@ repo-setup-manager (Phase 0 setup/baseline in every plan) (see
 
 **Content**: pdf-to-md-maker, pdf-to-md-checker, pdf-to-md-fixer
 
-**Meta**: agent-maker, repo-rules-maker, repo-workflow-maker, repo-ose-primer-adoption-maker, repo-ose-primer-propagation-maker, social-linkedin-post-maker
+**Meta**: agent-maker, repo-rules-maker, repo-workflow-maker, social-linkedin-post-maker
 
 **Maker-Checker-Fixer Pattern**: Three-stage workflow with criticality levels (CRITICAL/HIGH/MEDIUM/LOW), confidence assessment (HIGH/MEDIUM/FALSE_POSITIVE).
 
@@ -587,9 +587,9 @@ The `open-sharia-enterprise` ecosystem consists of three independent sibling rep
 - [`ose-primer`](https://github.com/wahidyankf/ose-primer) — downstream public template packaging the scaffolding layer (governance, AI agents, skills, conventions, CI harness, polyglot demo apps) for teams building their own Sharia-compliant enterprise products. MIT licensed.
 - [`ose-infra`](https://github.com/wahidyankf/ose-infra) — private infrastructure repository. Hosts the self-hosted GitHub Actions runner stack, `coralpolyp` app, and infrastructure-only governance. Proprietary; not publicly accessible.
 
-`ose-public` is the **upstream source of truth** for scaffolding. Content flows bidirectionally between `ose-public` and `ose-primer` via `repo-ose-primer-propagation-maker` (upstream → template, via draft PR or direct push to main — caller's choice per run, neither default) and `repo-ose-primer-adoption-maker` (downstream → upstream, direct commits to `main`). `ose-infra` does not participate in the sync loop.
+`ose-public` is the **upstream source of truth** for scaffolding. Content parity between `ose-public` and `ose-primer` is maintained manually — typically via the [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md) and [plan-multi-repo-parity-planning-and-execution](./repo-governance/workflows/plan/plan-multi-repo-parity-planning-and-execution.md) planning workflows, which survey both repos, record per-gap decisions, and author aligned plans. `ose-infra` does not participate in the parity loop.
 
-See: [Related Repositories reference](./docs/reference/related-repositories.md), [ose-primer sync convention](./repo-governance/conventions/structure/ose-primer-sync.md).
+See: [Related Repositories reference](./docs/reference/related-repositories.md).
 
 ## Models
 
