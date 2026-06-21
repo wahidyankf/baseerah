@@ -563,13 +563,15 @@ plans specifically, after the implementation lands and the rule-1 visual sign-of
 **three-tester** round against the running target URL(s) across all supported locales — the
 [`web-ux-test-fixing-planning`](../web/web-ux-test-fixing-planning.md) workflow:
 `web-exploratory-tester` (correctness), `web-usability-tester` (usability), and `web-design-tester`
-(design fidelity). Its output is folded back into THIS plan, not a separate plan:
+(design fidelity). Invoke each tester with **`output-mode: delivery`** and the executing plan's
+`plan-path`; this is the unified mechanism that appends findings directly into THIS plan's
+`delivery.md` rather than filing a separate plan. Its output is folded back into THIS plan, not a separate plan:
 
-1. Append each finding to `delivery.md` as a **new unchecked task-list checkbox**, source-attributed
-   (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`), and each
-   SG-### spec-gap / USS-### spec-suggestion as its own unchecked checkbox folded into the specs/\*\*
-   coverage steps. Place them in a clearly labelled "Rule-15 three-tester retest follow-ups" section
-   at the end of the checklist.
+1. Each tester with `output-mode: delivery` appends each finding to `delivery.md` as a **new
+   unchecked task-list checkbox**, source-attributed (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` /
+   `- [ ] DWT-NNN: <defect> — fix before archival`), and each SG-### spec-gap / USS-### spec-suggestion
+   as its own unchecked checkbox folded into the specs/\*\* coverage steps. Findings land in a clearly
+   labelled "Rule-15 three-tester retest follow-ups" section at the end of the checklist.
 2. Each new checkbox materializes as exactly one harness task per the
    [Task-Checklist Synchronization](#task-checklist-synchronization) 1:1 mapping, giving the user
    live visibility of the retest backlog.

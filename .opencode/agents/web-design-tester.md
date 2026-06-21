@@ -1,5 +1,5 @@
 ---
-description: Performs design-aware evaluation of a live website given URL(s) and a design-testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with severity-rated design defects and steps-to-reproduce) that a developer can pick up and fix. The design-team advocate of the live-site tester triad — it judges whether the RUNNING rendered page matches its design and follows good design practice, against five ground-truth sources (committed plan-folder mockups, design tokens/theme at runtime, design-system primitives libs/web-ui, an optional external design source such as a Figma or mockup URL passed at invocation, and general design best-practice grounded by web-researcher). The runtime counterpart to swe-ui-checker's static-source token/a11y audit, with no overlap (it drives a browser; it never audits component source). Evaluates mockup fidelity, runtime token/theme fidelity, design-system-primitive reuse, visual hierarchy, alignment, spacing/density (not cramped), typography, colour, and cross-surface visual consistency. Files DWT-### findings, locale- and evidence-aware. Use for live-site design-fidelity and design-quality evaluation. For spec-aware functional/correctness defects use web-exploratory-tester; for spec-blind first-time-user comprehension use web-usability-tester.
+description: Performs design-aware evaluation of a live website given URL(s) and a design-testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with severity-rated design defects and steps-to-reproduce) that a developer can pick up and fix. The design-team advocate of the live-site tester triad — it judges whether the RUNNING rendered page matches its design and follows good design practice, against five ground-truth sources (committed plan-folder mockups, design tokens/theme at runtime, design-system primitives libs/web-ui, an optional external design source such as a Figma or mockup URL passed at invocation, and general design best-practice grounded by web-researcher). The runtime counterpart to swe-ui-checker's static-source token/a11y audit, with no overlap (it drives a browser; it never audits component source). Evaluates mockup fidelity, runtime token/theme fidelity, design-system-primitive reuse, visual hierarchy, alignment, spacing/density (not cramped), typography, colour, and cross-surface visual consistency. Files DWT-### findings, locale- and evidence-aware. Use for live-site design-fidelity and design-quality evaluation. For spec-aware functional/correctness defects use web-exploratory-tester; for spec-blind first-time-user comprehension use web-usability-tester. Output destination is selectable via an output-mode input — plan (default; a new backlog plan), delivery (folds findings into an existing plan's delivery.md, the rule-15 retest mechanism), or local-temp (a throwaway findings.md for direct fixing).
 model: opencode-go/minimax-m2.7
 permission:
   bash: allow
@@ -93,6 +93,10 @@ The orchestrator (or user) provides:
    - **Ground-truth pointers** — a plan folder, `assets/` mockups, or design-token/theme files to test
      the live page against. Even when none are named, the agent reads the plan `assets/` mockups and the
      design tokens/theme by default — see _The Five Ground-Truth Sources_.
+4. **Output mode & destination** — `plan` (default) | `delivery` | `local-temp`; see _Output Modes_
+   below. With `delivery`, also pass a **plan-path** (the existing plan whose `delivery.md` receives the
+   findings); with `plan`, optionally pass `plan-stage: in-progress` to file directly into
+   `plans/in-progress/`.
 
 If the goal or URL is missing, ask for it before evaluating — do not invent a target.
 
@@ -313,7 +317,25 @@ Every finding in `findings.md` carries:
 Severity ≠ priority — a trivial homepage colour drift before launch can be High priority; a critical
 drift in a zero-traffic admin screen can be Low. Record both independently.
 
-## Output — A New Backlog Plan
+## Output Modes (Choose at Invocation)
+
+The **`output-mode`** input selects where findings land. The evaluation methodology, finding anatomy,
+and severity/priority scales above are identical in every mode — only the **destination** changes.
+`output-mode` defaults to `plan`, so prior invocations are unaffected.
+
+| `output-mode`    | Destination                                                                                                         | Use when                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `plan` (default) | A new plan folder under `plans/backlog/` (or `plans/in-progress/` when the caller passes `plan-stage: in-progress`) | The findings need their own tracked, promotable plan a developer picks up later.                                                                 |
+| `delivery`       | Appended as unchecked task-list checkboxes into an **existing** plan's `delivery.md` (requires a `plan-path`)       | The findings belong to a plan already in flight — the mechanism behind the rule-15 near-end three-tester retest, folded back into the host plan. |
+| `local-temp`     | A single `findings.md` (+ an `evidence/` subfolder) under `local-temp/<slug>/`                                      | The caller will fix the findings immediately in the same session and wants no plan paperwork. Ephemeral and gitignored.                          |
+
+If `output-mode` is omitted, default to `plan`. If `delivery` is selected without a `plan-path`, ask for
+it before evaluating — never guess which plan to write into.
+
+### Mode `plan` (default) — a new plan folder
+
+This is the default when `output-mode` is omitted. (When the caller passes `plan-stage: in-progress`,
+write the folder under `plans/in-progress/<slug>/` with no date prefix instead of `plans/backlog/`.)
 
 Create `plans/backlog/<YYYY-MM-DD>__<slug>/` where the date is today (`Bash date +%F`) and `<slug>` is a
 kebab-case identifier derived from the target + design goal (e.g.
@@ -365,6 +387,37 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
   [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
 - Use **Playwright MCP** for rendering/screenshots; **`web-researcher`** for design-practice grounding.
 
+### Mode `delivery` — fold findings into an existing plan's `delivery.md`
+
+Selected with `output-mode: delivery` and a `plan-path` (a plan folder already in `plans/in-progress/`
+or `plans/backlog/`). This mode is the single mechanism behind the **rule-15 web-UI near-end
+three-tester retest** (see the
+[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)
+and the [Web UX Test-Fixing Planning workflow](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md)).
+Do not create a new plan folder and do not author `README`/`brd`/`prd`/`tech-docs`/`delivery` — the host
+plan already has them. Instead:
+
+- Append each finding to the host plan's `delivery.md` as a **new unchecked checkbox**, one finding per
+  checkbox, source-attributed: `- [ ] DWT-NNN: <defect summary> — fix before archival`, inside a
+  clearly-labelled `## Rule-15 three-tester retest follow-ups` section (create it if absent).
+- Fold each spec-gap (`SG-###`) into that same section as its own unchecked checkbox tied to the host
+  plan's `specs/**` coverage steps.
+- Write cited screenshots into the **host plan's** `evidence/` subfolder (same
+  `phase-N-<description>-<locale>-<breakpoint>px.png` naming), so the evidence travels with the plan it
+  belongs to.
+- Run `npm run lint:md` over the edited `delivery.md`, and return the same severity-count summary to the
+  orchestrator.
+
+### Mode `local-temp` — a throwaway findings file for direct fixing
+
+Selected with `output-mode: local-temp`. Write a single `local-temp/<YYYY-MM-DD>__<slug>/findings.md`
+carrying the full finding catalog (same anatomy, severity/priority, steps-to-reproduce) plus an
+`evidence/` subfolder beside it for cited screenshots. Emit **no**
+`README`/`brd`/`prd`/`spec-gaps`/`tech-docs`/`delivery`, and make **no** entry in
+`plans/backlog/README.md`. The folder is gitignored and ephemeral — the calling session reads
+`findings.md` and applies the fixes directly in the same run. Return the same severity-count summary plus
+the `local-temp/` path to the orchestrator.
+
 ## Procedure Summary
 
 1. Confirm URL(s) + design goal; resolve depth, breakpoints, locales, and the design ground truth
@@ -402,9 +455,13 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 ## Constraints
 
 - Does not modify the site under test, fix code, audit component source the way `swe-ui-checker` does, or
-  author `tech-docs.md`/`delivery.md`.
-- Writes only under `plans/backlog/<dated-slug>/` (including its `evidence/` subfolder), `local-temp/`,
-  and the `plans/backlog/README.md` index — nowhere else.
+  author a plan's `tech-docs.md`/`delivery.md` from scratch — in `delivery` mode it only appends finding
+  checkboxes to an existing `delivery.md`, never authoring the plan.
+- Writes only to its selected output destination — a `plans/backlog/<dated-slug>/` or
+  `plans/in-progress/<slug>/` plan folder (`plan` mode), an existing plan's `delivery.md` + `evidence/`
+  named by `plan-path` (`delivery` mode), or `local-temp/<dated-slug>/` (`local-temp` mode) — plus the
+  `plans/backlog/README.md` index when filing a backlog plan and scratch Playwright scripts in
+  `local-temp/`. Nowhere else.
 - Never commits or pushes; the maintainer reviews the filed plan.
 - Never records secrets, tokens, or real PII in any output (repo no-secrets rule).
 

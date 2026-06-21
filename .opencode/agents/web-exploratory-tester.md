@@ -1,5 +1,5 @@
 ---
-description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Actively hunts edge cases and boundary conditions, not just the happy path. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios (in Gherkin) for correct behaviours — especially edge-case behaviours — that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, edge-case/boundary, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use web-usability-tester instead.
+description: Performs spec-aware session-based exploratory testing of a live website given URL(s) and a testing goal, then files the findings as a new backlog plan (README + brd + prd + findings + spec-gaps with steps-to-reproduce) that a developer can pick up and fix. Actively hunts edge cases and boundary conditions, not just the happy path. Compares live behaviour against existing specs/** Gherkin and proposes new scenarios (in Gherkin) for correct behaviours — especially edge-case behaviours — that currently lack spec coverage. Use when you want a running site explored for functional, behavioural-consistency, edge-case/boundary, UI/UX, responsive, accessibility, performance, URL/IA quality, and safe (non-destructive) security defects against a stated goal. For spec-blind first-time-user usability evaluation (predictability, confusion, information scent) use web-usability-tester instead. Output destination is selectable via an output-mode input — plan (default; a new backlog plan), delivery (folds findings into an existing plan's delivery.md, the rule-15 retest mechanism), or local-temp (a throwaway findings.md for direct fixing).
 model: opencode-go/minimax-m2.7
 permission:
   bash: allow
@@ -72,6 +72,10 @@ The orchestrator (or user) provides:
    - **Ground-truth pointers** — a plan folder, `assets/` mockups, or `specs/**` Gherkin features to
      test the live site against. Even when none are named, the agent reads `specs/apps/<target>/**` (and
      `specs/libs/**` for shared libs) by default — see _Specs as Ground Truth & Spec-Gap Detection_.
+4. **Output mode & destination** — `plan` (default) | `delivery` | `local-temp`; see _Output Modes_
+   below. With `delivery`, also pass a **plan-path** (the existing plan whose `delivery.md` receives the
+   findings); with `plan`, optionally pass `plan-stage: in-progress` to file directly into
+   `plans/in-progress/`.
 
 If the goal or URL is missing, ask for it before testing — do not invent a target.
 
@@ -352,7 +356,25 @@ Every finding in `findings.md` carries the ISTQB-aligned fields:
 Severity ≠ priority — a trivial homepage typo before launch can be High priority; a critical crash in a
 zero-user admin screen can be Low. Record both independently.
 
-## Output — A New Backlog Plan
+## Output Modes (Choose at Invocation)
+
+The **`output-mode`** input selects where findings land. The evaluation methodology, finding anatomy,
+and severity/priority scales above are identical in every mode — only the **destination** changes.
+`output-mode` defaults to `plan`, so prior invocations are unaffected.
+
+| `output-mode`    | Destination                                                                                                         | Use when                                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `plan` (default) | A new plan folder under `plans/backlog/` (or `plans/in-progress/` when the caller passes `plan-stage: in-progress`) | The findings need their own tracked, promotable plan a developer picks up later.                                                                 |
+| `delivery`       | Appended as unchecked task-list checkboxes into an **existing** plan's `delivery.md` (requires a `plan-path`)       | The findings belong to a plan already in flight — the mechanism behind the rule-15 near-end three-tester retest, folded back into the host plan. |
+| `local-temp`     | A single `findings.md` (+ an `evidence/` subfolder) under `local-temp/<slug>/`                                      | The caller will fix the findings immediately in the same session and wants no plan paperwork. Ephemeral and gitignored.                          |
+
+If `output-mode` is omitted, default to `plan`. If `delivery` is selected without a `plan-path`, ask for
+it before testing — never guess which plan to write into.
+
+### Mode `plan` (default) — a new plan folder
+
+This is the default when `output-mode` is omitted. (When the caller passes `plan-stage: in-progress`,
+write the folder under `plans/in-progress/<slug>/` with no date prefix instead of `plans/backlog/`.)
 
 Create `plans/backlog/<YYYY-MM-DD>__<slug>/` where the date is today (`Bash date +%F`) and `<slug>` is a
 kebab-case identifier derived from the target + goal (e.g. `ayokoding-calculator-exploratory-findings`).
@@ -397,6 +419,37 @@ checklist + specs:coverage steps). State this explicitly in `README.md` so the p
 After writing, add a one-line entry to `plans/backlog/README.md` if that index lists plans, and run
 `npm run lint:md` over the new files (or note it for the orchestrator) so they pass the markdown gates.
 
+### Mode `delivery` — fold findings into an existing plan's `delivery.md`
+
+Selected with `output-mode: delivery` and a `plan-path` (a plan folder already in `plans/in-progress/`
+or `plans/backlog/`). This mode is the single mechanism behind the **rule-15 web-UI near-end
+three-tester retest** (see the
+[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)
+and the [Web UX Test-Fixing Planning workflow](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md)).
+Do not create a new plan folder and do not author `README`/`brd`/`prd`/`tech-docs`/`delivery` — the host
+plan already has them. Instead:
+
+- Append each finding to the host plan's `delivery.md` as a **new unchecked checkbox**, one finding per
+  checkbox, source-attributed: `- [ ] EWT-NNN: <defect summary> — fix before archival`, inside a
+  clearly-labelled `## Rule-15 three-tester retest follow-ups` section (create it if absent).
+- Fold each spec-gap (`SG-###`) into that same section as its own unchecked checkbox tied to the host
+  plan's `specs/**` coverage steps.
+- Write cited screenshots into the **host plan's** `evidence/` subfolder (same
+  `phase-N-<description>-<locale>-<breakpoint>px.png` naming), so the evidence travels with the plan it
+  belongs to.
+- Run `npm run lint:md` over the edited `delivery.md`, and return the same severity-count summary to the
+  orchestrator.
+
+### Mode `local-temp` — a throwaway findings file for direct fixing
+
+Selected with `output-mode: local-temp`. Write a single `local-temp/<YYYY-MM-DD>__<slug>/findings.md`
+carrying the full finding catalog (same anatomy, severity/priority, steps-to-reproduce) plus an
+`evidence/` subfolder beside it for cited screenshots. Emit **no**
+`README`/`brd`/`prd`/`spec-gaps`/`tech-docs`/`delivery`, and make **no** entry in
+`plans/backlog/README.md`. The folder is gitignored and ephemeral — the calling session reads
+`findings.md` and applies the fixes directly in the same run. Return the same severity-count summary plus
+the `local-temp/` path to the orchestrator.
+
 ## Procedure Summary
 
 1. Confirm URL(s) + goal; resolve depth, breakpoints, locales, ground truth.
@@ -435,9 +488,14 @@ After writing, add a one-line entry to `plans/backlog/README.md` if that index l
 
 ## Constraints
 
-- Does not modify the site under test, fix code, or author `tech-docs.md`/`delivery.md`.
-- Writes only under `plans/backlog/<dated-slug>/` (including its `evidence/` subfolder), `local-temp/`,
-  and the `plans/backlog/README.md` index — nowhere else.
+- Does not modify the site under test, fix code, or author a plan's `tech-docs.md`/`delivery.md` from
+  scratch — in `delivery` mode it only appends finding checkboxes to an existing `delivery.md`, never
+  authoring the plan.
+- Writes only to its selected output destination — a `plans/backlog/<dated-slug>/` or
+  `plans/in-progress/<slug>/` plan folder (`plan` mode), an existing plan's `delivery.md` + `evidence/`
+  named by `plan-path` (`delivery` mode), or `local-temp/<dated-slug>/` (`local-temp` mode) — plus the
+  `plans/backlog/README.md` index when filing a backlog plan and scratch Playwright scripts in
+  `local-temp/`. Nowhere else.
 - Never commits or pushes; the maintainer reviews the filed plan.
 - Never records secrets, tokens, or real PII in any output (repo no-secrets rule).
 

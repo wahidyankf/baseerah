@@ -145,6 +145,14 @@ with Read/Write/Edit tools.
 - To refresh an existing findings plan: re-run all three testers and merge the new results into the
   prior plan folder (`plan-mode=merge`).
 
+> **Output-mode note**: This workflow invokes the testers in their default **`plan` output-mode** —
+> each tester files its findings into the new (or merged) plan folder that this workflow consolidates.
+> The **`delivery` output-mode** is the in-place rule-15 variant used when findings belong to a plan
+> already in flight: invoke each tester directly with `output-mode: delivery` and the executing
+> plan's `plan-path` (see the
+> [Rule-15 three-tester retest in plan-execution](../plan/plan-execution.md#8-finalization-and-archival-sequential)).
+> This workflow's behavior is unchanged; the note clarifies which mode each path uses.
+
 ## Inputs at a glance
 
 | Input              | Required | Default               | Notes                                      |

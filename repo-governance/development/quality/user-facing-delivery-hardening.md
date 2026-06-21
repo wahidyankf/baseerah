@@ -181,8 +181,10 @@ tag** marks where each rule binds, and each states the **gap** it closes and **h
     checkbox**, source-attributed (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> —
 fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" section, and each
     SG-### spec-gap / USS-### spec-suggestion as its own unchecked checkbox folded into the `specs/**`
-    coverage steps per [Feature Change Completeness](./feature-change-completeness.md). During
-    plan-execution these checkboxes materialize 1:1 as harness Task items, are fixed within the same
+    coverage steps per [Feature Change Completeness](./feature-change-completeness.md). The
+    in-place append is performed by invoking each tester with **`output-mode: delivery`** and the
+    executing plan's `plan-path` — this is the unified mechanism for the three-tester retest fold-in.
+    During plan-execution these checkboxes materialize 1:1 as harness Task items, are fixed within the same
     plan, and are ticked (`- [x]`) via the Atomic Sync Ritual; a finding may stay unchecked only if
     explicitly deferred with written rationale recorded under the checkbox. Archival is blocked until
     every rule-15 checkbox is ticked or deferred. `plan-maker` emits this step (with the follow-ups
@@ -228,6 +230,11 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
   near-end three-tester round against the running web UI (Rule 15); runs across ALL supported locales;
   surfaces EWT-### (correctness) / UWT-### (usability) / DWT-### (design-fidelity) findings plus SG-###
   spec-gap / USS-### spec-suggestion proposals; saves screenshots to the plan's `evidence/` folder.
+  Each tester supports a selectable **`output-mode`** input: `plan` (default — files a new backlog
+  plan), `delivery` (appends findings into an existing plan's `delivery.md`), or `local-temp` (writes
+  a throwaway `findings.md` with no plan paperwork). For the Rule-15 in-place append, invoke each
+  tester with **`output-mode: delivery`** and the executing plan's `plan-path`; this is the single
+  mechanism that produces the "Rule-15 three-tester retest follow-ups" section in `delivery.md`.
 - **`plan-maker`**: emits the delivery steps for Rules 1–8 and the rule-15 three-tester-retest step
   for web-UI feature-change plans; includes a locale-coverage note and evidence-capture steps.
 - **`plan-checker`**: flags missing visual-parity gate, raw-value mockup colors, presence-only
