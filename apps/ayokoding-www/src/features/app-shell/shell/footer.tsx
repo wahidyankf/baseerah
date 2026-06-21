@@ -1,5 +1,8 @@
+import Link from "next/link";
 import { t } from "@/features/i18n/core/translations";
 import type { Locale } from "@/features/i18n/core/config";
+import { contentUrl } from "@/features/content/core/content-url";
+import { PRIMARY_NAV_LINKS } from "@/features/app-shell/core/nav-links";
 
 interface FooterProps {
   locale: string;
@@ -7,11 +10,63 @@ interface FooterProps {
 
 export function Footer({ locale }: FooterProps) {
   const year = new Date().getFullYear();
+  const loc = locale as Locale;
+
+  // Shared primary destinations — kept in lockstep with the header + mobile nav.
+  const learnLink = PRIMARY_NAV_LINKS.find((l) => l.labelKey === "navLearn");
+  const toolsLink = PRIMARY_NAV_LINKS.find((l) => l.labelKey === "navTools");
+  const learnHref = learnLink ? learnLink.hrefFor(loc) : `/${locale}/c`;
+  const toolsHref = toolsLink ? toolsLink.hrefFor(loc) : `/${locale}/tools`;
+
+  // Loose top-level pages resolve to bare `/{locale}/{slug}` via contentUrl.
+  const aboutHref = contentUrl(loc, loc === "id" ? "tentang-ayokoding" : "about-ayokoding");
+  const termsHref = contentUrl(loc, loc === "id" ? "syarat-dan-ketentuan" : "terms-and-conditions");
+
+  const columnHeading = "mb-3 text-sm font-semibold text-foreground";
+  const columnLink = "block py-1 text-sm text-muted-foreground transition-colors hover:text-foreground";
 
   return (
-    <footer className="border-t border-border py-6">
-      <div className="mx-auto flex max-w-screen-2xl flex-col items-center gap-2 px-4 text-sm text-muted-foreground sm:flex-row sm:justify-between">
-        <p>
+    <footer className="border-t border-border py-10">
+      <div className="mx-auto max-w-screen-2xl px-4">
+        <nav aria-label="Footer" className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3 lg:grid-cols-4">
+          <div>
+            <h2 className={columnHeading}>{t(loc, "footerLearn")}</h2>
+            <Link href={learnHref} className={columnLink}>
+              {t(loc, "footerBrowseAll")}
+            </Link>
+          </div>
+
+          <div>
+            <h2 className={columnHeading}>{t(loc, "footerTools")}</h2>
+            <Link href={toolsHref} className={columnLink}>
+              {t(loc, "footerCalculator")}
+            </Link>
+          </div>
+
+          <div>
+            <h2 className={columnHeading}>{t(loc, "footerAbout")}</h2>
+            <Link href={aboutHref} className={columnLink}>
+              {t(loc, "footerAboutAyokoding")}
+            </Link>
+            <Link href={termsHref} className={columnLink}>
+              {t(loc, "footerTerms")}
+            </Link>
+          </div>
+
+          <div>
+            <h2 className={columnHeading}>{t(loc, "footerProject")}</h2>
+            <a
+              href="https://github.com/wahidyankf/ose-public"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={columnLink}
+            >
+              {t(loc, "openSourceProject")}
+            </a>
+          </div>
+        </nav>
+
+        <p className="mt-10 border-t border-border pt-6 text-sm text-muted-foreground">
           &copy; {year} AyoKoding &middot;{" "}
           <a
             href="https://github.com/wahidyankf/ose-public/blob/main/LICENSE"
@@ -20,16 +75,9 @@ export function Footer({ locale }: FooterProps) {
             className="hover:text-foreground"
           >
             FSL-1.1-MIT
-          </a>
+          </a>{" "}
+          &middot; {t(loc, "openSourceProject")}
         </p>
-        <a
-          href="https://github.com/wahidyankf/ose-public"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-foreground"
-        >
-          {t(locale as Locale, "openSourceProject")}
-        </a>
       </div>
     </footer>
   );

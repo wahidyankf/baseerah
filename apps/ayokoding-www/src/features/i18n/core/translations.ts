@@ -182,6 +182,11 @@ const translations: Record<Locale, Record<string, string>> = {
     footerLearn: "Learn",
     footerTools: "Tools",
     footerAbout: "About",
+    footerBrowseAll: "Browse all",
+    footerCalculator: "Cost of Living Calculator",
+    footerAboutAyokoding: "About AyoKoding",
+    footerTerms: "Terms & Conditions",
+    footerProject: "Project",
   },
   id: {
     readMore: "Baca Selengkapnya",
@@ -369,6 +374,11 @@ const translations: Record<Locale, Record<string, string>> = {
     footerLearn: "Belajar",
     footerTools: "Alat",
     footerAbout: "Tentang",
+    footerBrowseAll: "Jelajahi semua",
+    footerCalculator: "Kalkulator Biaya Hidup",
+    footerAboutAyokoding: "Tentang AyoKoding",
+    footerTerms: "Syarat & Ketentuan",
+    footerProject: "Proyek",
   },
 };
 

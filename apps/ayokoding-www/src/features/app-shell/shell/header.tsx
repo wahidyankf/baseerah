@@ -7,6 +7,9 @@ import { ThemeToggle } from "@/features/app-shell/shell/theme-toggle";
 import { LanguageSwitcher } from "@/features/i18n/shell/language-switcher";
 import { MobileNav } from "@/features/app-shell/shell/mobile-nav";
 import { useSearchOpen } from "@/features/search/shell/use-search";
+import { t } from "@/features/i18n/core/translations";
+import type { Locale } from "@/features/i18n/core/config";
+import { PRIMARY_NAV_LINKS } from "@/features/app-shell/core/nav-links";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -33,6 +36,18 @@ export function Header({ locale }: HeaderProps) {
         <Link href={`/${locale}`} className="text-lg font-bold tracking-tight">
           AyoKoding
         </Link>
+
+        <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
+          {PRIMARY_NAV_LINKS.map((link) => (
+            <Link
+              key={link.labelKey}
+              href={link.hrefFor(locale as Locale)}
+              className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+            >
+              {t(locale as Locale, link.labelKey)}
+            </Link>
+          ))}
+        </nav>
 
         <div className="flex-1" />
 
