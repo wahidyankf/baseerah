@@ -260,6 +260,11 @@ Observed via Playwright: URL before and after tab clicks was unchanged; city-sel
 Add `?tab=savings` / `?tab=min-role` / `?tab=cost` to the URL on tab change. Restore the correct
 tab on load when the param is present.
 
+> **Closed by** `plans/in-progress/ayokoding-calculator-url-state` (2026-06-21). All 9 controls
+> (tab, region, country, city, adults, preschool, schoolkids, schooltype, area) now serialize to URL.
+> Tab param is included: switching tabs calls `router.push` with `?tab=savings` / `?tab=min-role` /
+> `?tab=cost`. Deep-link restore and back-button stepping both work. Verified via Playwright MCP.
+
 ---
 
 ## UWT-006 — Minimum Role tab shows highest-earning roles ranked when no savings target is entered
@@ -467,6 +472,11 @@ Observed via Playwright: `back link href: "…?tab=cost"`.
 ### Suggested clarification
 
 Encode the active filter state in the back-link URL, e.g. `?tab=cost&region=asean&country=sg`.
+
+> **Closed by** `plans/in-progress/ayokoding-calculator-url-state` (2026-06-21). The city-detail
+> "Back to all cities" link now encodes the parent geo scope via `parentScopeParams(currentState)`,
+> producing e.g. `?region=asean&country=sg` instead of `?tab=cost`. Verified via Playwright MCP
+> and city-detail.test.tsx.
 
 ---
 

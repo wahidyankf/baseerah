@@ -131,3 +131,22 @@ at all breakpoints. Two real defects were found.
 `tech-docs.md` and `delivery.md` are not authored here. When this plan is promoted to
 `plans/in-progress/`, `plan-maker` grills the maintainer and adds those documents with a
 TDD-shaped delivery checklist and Specs/Gherkin completeness steps.
+
+---
+
+## Closure Note — URL / Deep-Link Finding
+
+> **Closed by** `plans/in-progress/ayokoding-calculator-url-state` (2026-06-21).
+>
+> The Coverage Map entry "Deep-link restoration: Partial — `?country=id` restores;
+> `?country=Indonesia` (full name) does not" is resolved. The new URL-state implementation:
+>
+> - All 9 controls (tab, region, country, city, adults, preschool, schoolkids, schooltype, area)
+>   now serialize to and restore from the URL query string.
+> - Deep links using city ID (e.g. `?city=singapore`) automatically backfill region and country.
+> - Unknown or invalid params are sanitized to defaults on load (canonicalize-on-mount).
+> - Using full-name values like `?country=Indonesia` intentionally remains unsupported — the URL
+>   contract uses lowercase IDs (`?country=sg`), which is consistent with how the dataset models
+>   countries.
+>
+> Verified via Playwright MCP on 2026-06-21.
