@@ -293,7 +293,10 @@ Feature: Salary savings calculator
     And the Childcare and School preview amounts remain zero
     And the Total preview updates immediately without a page reload
 
-  Scenario: Selecting filters updates the URL with query parameters
+  # Reconciled 2026-06-21: all 9 controls now serialized (region/country/city/tab/adults/
+  # preschool/schoolkids/schooltype/area); selecting country alone encodes only "country=id",
+  # not "tab=cost" (default tab is omitted per encodeState default-stripping).
+  Scenario: Selecting filters updates the URL with all active query parameters
     Given a user is on the cost-of-living calculator page
     When the user selects Country "Indonesia" and City "Jakarta"
     Then the URL updates to include query parameters reflecting those selections
@@ -328,10 +331,12 @@ Feature: Salary savings calculator
     And each city row shows a positive net take-home
 
   # SG-004 — Selecting only a country updates the URL
-  Scenario: Selecting only a country updates the URL tab and country parameter
+  # Reconciled 2026-06-21: default tab ("cost") is omitted from the URL; only "country=id" is
+  # encoded. The assertion that "tab=cost" appears in the URL was stale.
+  Scenario: Selecting only a country updates the URL country parameter
     Given a user is on the cost-of-living calculator page
     When the user selects Country "Indonesia" without selecting a city
-    Then the URL updates to include "tab=cost" and "country=id"
+    Then the URL query string includes "country=id"
     And opening that URL in a new tab shows only Indonesian cities in the table
     And the Country filter is pre-selected to "Indonesia"
 
@@ -472,3 +477,95 @@ Feature: Salary savings calculator
     When the drawer renders
     Then it shows the site's top-level navigation links
     And every drawer label is localized
+
+  # ── URL state Phase 4 scenarios (added 2026-06-21) ──────────────────────────
+
+  # URL-001 — Out-of-range numeric param is reset to its default on load
+  Scenario: An out-of-range numeric param is reset to its default on load
+    Given a deep link with query string "adults=4"
+    When the page resolves the deep link
+    Then the Adults control shows "1"
+    And the URL is rewritten to have no "adults" param
+
+  # URL-002 — Full country name is dropped (only ISO id is valid)
+  Scenario: A full-country-name param is dropped on load
+    Given a deep link with query string "country=Indonesia"
+    When the page resolves the deep link
+    Then the Country filter returns to "All countries"
+    And the URL is rewritten to have no "country" param
+
+  # URL-003 — Selecting a city backfills country and region
+  Scenario: Selecting a city under no prior filter backfills country and region
+    Given I am on the calculator with no query string
+    When I select the city "Jakarta"
+    Then the URL query string includes "city=jakarta"
+    And the Country filter shows "Indonesia" and the Region filter shows "ASEAN"
+
+  # URL-004 — Selecting a broader region clears incompatible narrower filters
+  Scenario: Selecting a broader region clears an incompatible country and city
+    Given I am on the calculator with query string "city=singapore"
+    When I select the region "Europe"
+    Then the URL query string includes "region=europe"
+    But the URL query string does not include "country" or "city"
+
+  # URL-005 — Contradictory region+city deep link resolves with narrower filter winning
+  Scenario: A contradictory region-and-city deep link resolves with the narrower filter winning
+    Given a deep link with query string "region=europe&city=singapore"
+    When the page resolves the deep link
+    Then the single-city detail for Singapore is shown
+    And the URL is rewritten to canonical form with "city=singapore" and "region" backfilled to "asean"
+
+  # URL-006 — City-detail back link preserves parent geo scope
+  Scenario: The city-detail back link preserves the parent geo scope
+    Given I am on the single-city detail with query string "city=singapore"
+    When I activate the "Back to all cities" link
+    Then the URL query string includes "region=asean" and "country=sg"
+    But the URL query string does not include "city"
+
+  # URL-007 — Tab change is written to the URL
+  Scenario: Changing the tab writes the tab to the URL
+    Given I am on the calculator with no query string
+    When I switch to the "Savings" tab
+    Then the URL query string includes "tab=savings"
+    And reloading the page keeps the "Savings" tab active
+
+  # URL-008 — Cost-basis control change is written to the URL
+  Scenario: Changing a cost-basis control writes it to the URL
+    Given I am on the calculator with no query string
+    When I change the Adults control to "2"
+    Then the URL query string includes "adults=2"
+    And the household preview updates without a page reload
+
+  # URL-009 — Breadcrumb offers Home and Tools escape links
+  Scenario: The breadcrumb offers an escape to the Tools index and Home
+    Given I am on the calculator with query string "city=singapore"
+    When I read the breadcrumb above the page title
+    Then a "Home" link to "/en" is shown
+    And a "Tools" link to "/en/tools" is shown
+
+  # URL-010 — Region selection writes region to the URL
+  Scenario: Selecting a region writes the region to the URL
+    Given I am on the calculator with no query string
+    When I select the region "Europe"
+    Then the URL query string includes "region=europe"
+    And the URL query string does not include "country" or "city"
+
+  # URL-011 — City deep link restores city and backfills country and region
+  Scenario: A city deep link restores the city and backfills country and region
+    Given a deep link with query string "city=singapore"
+    When I open that link in a fresh tab
+    Then the single-city Cost-of-living detail for Singapore is shown
+    And the Country filter shows "Singapore" and the Region filter shows "ASEAN"
+
+  # URL-012 — Unknown city param is dropped on load
+  Scenario: An unknown city param is dropped on load
+    Given a deep link with query string "city=atlantis"
+    When the page resolves the deep link
+    Then the City filter returns to "All cities"
+    And the URL is rewritten to have no "city" param
+
+  # URL-013 — Canonicalization uses replace so Back button skips the dirty URL
+  Scenario: Canonicalization does not add a browser history entry
+    Given a deep link with query string "city=atlantis"
+    When the page rewrites the URL to canonical form
+    Then pressing the browser Back button does not return to the "city=atlantis" URL
