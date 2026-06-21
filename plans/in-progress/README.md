@@ -4,7 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No active plans._
+- [`ayokoding-calculator-url-state/`](./ayokoding-calculator-url-state/README.md) — reflect all
+  cost-of-living calculator tabs and filters in the URL (single source of truth, backfill,
+  cascade-clear, sanitize/canonicalize, nav escape links).
 
 ## Instructions
 
