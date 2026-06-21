@@ -640,3 +640,34 @@ Feature: Salary savings calculator
     Given a deep link with query string "city=london"
     When I read the single-city detail back link
     Then the back link points to the bare calculator "?tab=cost" with no region or country
+
+  # ── Phase 7: spec coverage sweep ──────────────────────────────────────────────
+
+  # SG-U-001..004 (URL default-stripping): switching back to the default tab removes
+  # the tab param so the URL stays clean.
+  # Scenario: Switching to a non-default tab then back to the default tab removes the tab param
+  #   Given I am on the calculator with no query string
+  #   When I switch to the "Savings" tab and then switch back to the "Cost of living" tab
+  #   Then the URL query string does not include a "tab" parameter
+
+  # SG-U (country-narrows-city) — selecting a country without a region narrows the city dropdown
+  Scenario: Selecting a country without a region still narrows the city dropdown
+    Given I am on the calculator with no region or country selected
+    When I select the country "Indonesia" in the country filter without first selecting a region
+    Then the city dropdown lists only cities in Indonesia
+
+  # SG-U (area radiogroup) — the area control renders with role="radiogroup"
+  Scenario: The area control is rendered as a radiogroup
+    Given I am on the cost-of-living calculator
+    When the cost-basis controls render
+    Then the area segmented control has role="radiogroup"
+    And the area radiogroup contains the "City center" and "Rural" options
+
+  # SG-U (baseline SegmentedControl) — baseline selector is a radiogroup that shows or
+  # hides the relevant sub-form depending on which option is active
+  Scenario: The baseline selector shows the savings-target sub-form when savings target is selected
+    Given the user is on the "Minimum role" tab
+    When the tab renders
+    Then the baseline-source control renders as a radiogroup with at least three options
+    And the savings-target input is visible when savings target is the selected baseline
+    And the reference-role inputs are hidden when savings target is the selected baseline

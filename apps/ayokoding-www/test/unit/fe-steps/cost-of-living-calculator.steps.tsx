@@ -2587,4 +2587,102 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       expect(href).not.toContain("country=");
     });
   });
+
+  // ── Phase 7: spec coverage sweep ─────────────────────────────────────────────
+
+  // SG-U (country-narrows-city) — selecting country alone (no region) narrows city dropdown
+  Scenario("Selecting a country without a region still narrows the city dropdown", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("I am on the calculator with no region or country selected", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When('I select the country "Indonesia" in the country filter without first selecting a region', async () => {
+      await user.selectOptions(screen.getByRole("combobox", { name: /country/i }), "id");
+    });
+
+    Then("the city dropdown lists only cities in Indonesia", () => {
+      const citySelect = screen.getByRole("combobox", { name: /city/i });
+      const cityOptions = Array.from(citySelect.querySelectorAll("option")).filter(
+        (o) => o.getAttribute("value") !== "",
+      );
+      const idCityIds = dataset.cities.filter((c) => c.countryId === "id").map((c) => c.id);
+      // Every non-empty option must be an Indonesian city.
+      expect(cityOptions.length).toBeGreaterThan(0);
+      for (const opt of cityOptions) {
+        expect(idCityIds).toContain(opt.getAttribute("value"));
+      }
+    });
+  });
+
+  // SG-U (area radiogroup) — the area segmented control renders with role="radiogroup"
+  Scenario("The area control is rendered as a radiogroup", ({ Given, When, Then, And }) => {
+    Given("I am on the cost-of-living calculator", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the cost-basis controls render", () => {
+      expect(screen.getByRole("main")).toBeTruthy();
+    });
+
+    Then('the area segmented control has role="radiogroup"', () => {
+      // SegmentedControl renders a div with role="radiogroup" and aria-label={label}.
+      const areaGroup = screen.getByRole("radiogroup", { name: /area/i });
+      expect(areaGroup).toBeTruthy();
+    });
+
+    And('the area radiogroup contains the "City center" and "Rural" options', () => {
+      const areaGroup = screen.getByRole("radiogroup", { name: /area/i });
+      const radios = areaGroup.querySelectorAll('[role="radio"]');
+      const labels = Array.from(radios).map((r) => r.getAttribute("aria-label") ?? r.textContent ?? "");
+      const hasCenter = labels.some((l) => /city center|center/i.test(l));
+      const hasRural = labels.some((l) => /rural/i.test(l));
+      expect(hasCenter).toBe(true);
+      expect(hasRural).toBe(true);
+    });
+  });
+
+  // SG-U (baseline SegmentedControl) — baseline selector is a radiogroup that shows/hides sub-forms
+  Scenario(
+    "The baseline selector shows the savings-target sub-form when savings target is selected",
+    async ({ Given, When, Then, And }) => {
+      const user = userEvent.setup();
+
+      Given('the user is on the "Minimum role" tab', async () => {
+        navState.params = new URLSearchParams();
+        navState.setParams(navState.params);
+        renderPage(<CostOfLivingCalculatorPage />);
+        await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      });
+
+      When("the tab renders", () => {
+        expect(screen.getByRole("main")).toBeTruthy();
+      });
+
+      Then("the baseline-source control renders as a radiogroup with at least three options", () => {
+        // SegmentedControl uses role="radiogroup" with role="radio" children.
+        const baselineGroup = screen.getByRole("radiogroup", { name: /baseline source/i });
+        expect(baselineGroup).toBeTruthy();
+        const radios = baselineGroup.querySelectorAll('[role="radio"]');
+        expect(radios.length).toBeGreaterThanOrEqual(3);
+      });
+
+      And("the savings-target input is visible when savings target is the selected baseline", async () => {
+        // "savings_target" is the default baseline; the monthly-target input must be present.
+        await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
+        expect(screen.getByRole("spinbutton", { name: /monthly savings target/i })).toBeTruthy();
+      });
+
+      And("the reference-role inputs are hidden when savings target is the selected baseline", () => {
+        // When savings_target is selected, the reference-role city/role selects must not be in the DOM.
+        expect(screen.queryByRole("combobox", { name: /reference city/i })).toBeNull();
+        expect(screen.queryByRole("combobox", { name: /reference role/i })).toBeNull();
+      });
+    },
+  );
 });

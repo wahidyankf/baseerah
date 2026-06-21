@@ -564,26 +564,46 @@ next.region !== region`; region/city/clear handlers reset it to false. Wrapped t
 
 ## Phase 7: Spec coverage sweep & still-relevant proposals
 
-- [ ] [AI] **RED/GREEN**: ensure the calculator `.feature` also protects the still-relevant
+- [x] [AI] **RED/GREEN**: ensure the calculator `.feature` also protects the still-relevant
       proposals not yet covered — URL-param-per-control (SG-U-001..004: tab, region, country, city
       reflected in the URL), sub-national net indicator, country-narrows-city, area radiogroup,
       baseline `SegmentedControl` — adding scenarios + step defs that consume existing behaviour
       (RED only where a gap exists) — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0 with the new scenarios covered
+      _Done 2026-06-21. Coverage analysis:_ - _Sub-national net indicator: ALREADY COVERED by "Sub-national tax lowers net only in
+      federal countries" (step asserts `sub-national-indicator` testids). No new scenario added._ - _URL param per control (SG-U-001..004): tab (URL-007), region (URL-010), country (SG-004),
+      city (URL-003/011) are all already covered. The one genuine gap — URL default-stripping
+      (switching tab back to "cost" removes the `tab` param) — is aspirational at unit level
+      (router.push mock does not surface the stripped param in a way that distinguishes from
+      a stub). Deferred as a commented-out spec item in the feature file; e2e level covers it._ - _Country-narrows-city (without requiring region first): NEWLY ADDED — "Selecting a country
+      without a region still narrows the city dropdown". Step asserts only Indonesian city IDs
+      appear after selecting country "id" with no prior region._ - _Area radiogroup: NEWLY ADDED — "The area control is rendered as a radiogroup". Step
+      asserts `role="radiogroup"` with aria-label matching /area/i and radio children for
+      "City center" and "Rural"._ - _Baseline SegmentedControl: NEWLY ADDED — "The baseline selector shows the savings-target
+      sub-form when savings target is selected". Asserts the baseline group is a radiogroup with
+      ≥3 radios; savings-target input appears when savings_target is active; reference-role
+      selects are absent when savings_target is active._
+      _specs:coverage exits 0 (16 specs / 175 scenarios / 642 steps all covered)._
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] Run the Gherkin keyword-cardinality audit:
+- [x] [AI] Run the Gherkin keyword-cardinality audit:
       `npx nx run rhino-cli:specs:gherkin-cardinality-validation`
       — acceptance: no cardinality violations reported (one primary Given/When/Then per scenario in
       the changed `.feature` files)
+      _Done 2026-06-21: GHERKIN KEYWORD CARDINALITY AUDIT PASSED._
   - _Suggested executor: `specs-maker`_
 
 ### Phase 7 Gate
 
 > All checks below must pass before starting Phase 8.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
-- [ ] [AI] `npx nx run rhino-cli:specs:gherkin-cardinality-validation` — expected: clean
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
+-p ayokoding-www`: exit 0. typecheck clean; lint exits 0 with the single pre-existing
+      non-blocking `controls.tsx:32` jsx-a11y warning (prefer-tag-over-role on a SegmentedControl
+      radio button — unrelated to Phase 7 changes); test:unit 2106 passed; specs:coverage 16 specs
+      / 175 scenarios / 642 steps all covered._
+- [x] [AI] `npx nx run rhino-cli:specs:gherkin-cardinality-validation` — expected: clean
+      _Done: GHERKIN KEYWORD CARDINALITY AUDIT PASSED._
 
 > **Pause Safety**: all behaviours are spec-protected and Gherkin is cardinality-clean; gate green.
 > Safe to stop. To resume: re-run the gate command.
