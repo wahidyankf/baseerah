@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-- [AyoKoding IA & Navigation Revamp](./ayokoding-www-ia-navigation-revamp/README.md) — Revamp the AyoKoding information architecture: real homepage (hero + section cards + Tools teaser), `/c` content browse namespace with 308 redirects, header/footer/mobile nav, and SEO-internals sweep. Prerequisite `ayokoding-calculator-test-fixing` confirmed landed on `main` (archived 2026-06-21).
+_(none)_
 
 ## Instructions
 
