@@ -204,32 +204,61 @@ fn strip_fragment_and_query(target: &str) -> String {
 
 /// Return `true` when `abs_content_dir/target.md` or
 /// `abs_content_dir/target/_index.md` exists on disk.
+///
+/// Also handles the `/c/` URL routing namespace: a link like `/en/c/learn`
+/// is resolved by stripping the `c/` segment and checking `en/learn.*`.
 fn target_exists(abs_content_dir: &Path, target: &str) -> bool {
-    // Normalise the target (strip leading slash so Path::join works)
     let target_stripped = target.trim_start_matches('/');
-    let local_path = abs_content_dir.join(target_stripped);
+
+    if path_exists_in_content(abs_content_dir, target_stripped) {
+        return true;
+    }
+
+    // The `/c/` segment is a URL routing namespace prefix (`/<locale>/c/<slug>`),
+    // not a physical directory. Strip it and check the real content file location.
+    if let Some(de_prefixed) = strip_content_namespace(target_stripped)
+        && path_exists_in_content(abs_content_dir, &de_prefixed)
+    {
+        return true;
+    }
+
+    false
+}
+
+/// Check whether `<content_dir>/<path>.md` or `<content_dir>/<path>/_index.md` exists.
+fn path_exists_in_content(abs_content_dir: &Path, path: &str) -> bool {
+    let local_path = abs_content_dir.join(path);
 
     // Check <target>.md
     let mut md_path = local_path.clone();
     md_path.set_extension("md");
-    // Avoid .md.md: only append if extension wasn't already .md
     if md_path.exists() {
         return true;
     }
-    // Fall back to checking <target>.md directly (covers the set_extension approach above)
-    // and also try via string concatenation matching Go's `localPath + ".md"`
+    // Fallback: string-concatenation form (matches Go's `localPath + ".md"` convention)
     let md_str = format!("{}.md", local_path.display());
     if Path::new(&md_str).exists() {
         return true;
     }
 
     // Check <target>/_index.md
-    let index_path = local_path.join("_index.md");
-    if index_path.exists() {
-        return true;
-    }
+    local_path.join("_index.md").exists()
+}
 
-    false
+/// Strip the `/c/` URL routing namespace from a content path.
+///
+/// `en/c/learn/software-engineering` → `Some("en/learn/software-engineering")`
+/// `en/c` → `None` (no slug after the namespace segment)
+/// `en/learn` → `None` (no `/c/` segment present)
+fn strip_content_namespace(path: &str) -> Option<String> {
+    let mut parts = path.splitn(3, '/');
+    let locale = parts.next()?;
+    let segment = parts.next()?;
+    if segment != "c" {
+        return None;
+    }
+    let rest = parts.next()?;
+    Some(format!("{locale}/{rest}"))
 }
 
 /// Print a human-readable link-check report to stdout.
@@ -545,6 +574,77 @@ mod tests {
     fn test_target_exists_returns_false_when_missing() {
         let dir = TempDir::new().expect("tempdir");
         assert!(!target_exists(dir.path(), "nonexistent-page"));
+    }
+
+    #[test]
+    fn test_target_exists_resolves_content_namespace_prefix_via_section() {
+        // Link `/en/c/learn` should resolve to `en/learn/_index.md`
+        let dir = TempDir::new().expect("tempdir");
+        let learn = dir.path().join("en").join("learn");
+        std::fs::create_dir_all(&learn).expect("create dirs");
+        std::fs::File::create(learn.join("_index.md")).expect("create _index.md");
+        assert!(target_exists(dir.path(), "/en/c/learn"));
+    }
+
+    #[test]
+    fn test_target_exists_resolves_content_namespace_prefix_via_leaf_page() {
+        // Link `/en/c/rants/my-post` should resolve to `en/rants/my-post.md`
+        let dir = TempDir::new().expect("tempdir");
+        let rants = dir.path().join("en").join("rants");
+        std::fs::create_dir_all(&rants).expect("create dirs");
+        std::fs::File::create(rants.join("my-post.md")).expect("create my-post.md");
+        assert!(target_exists(dir.path(), "/en/c/rants/my-post"));
+    }
+
+    #[test]
+    fn test_target_exists_resolves_content_namespace_prefix_deep_nested() {
+        // Link `/en/c/learn/se/data` → `en/learn/se/data/_index.md`
+        let dir = TempDir::new().expect("tempdir");
+        let data = dir.path().join("en").join("learn").join("se").join("data");
+        std::fs::create_dir_all(&data).expect("create dirs");
+        std::fs::File::create(data.join("_index.md")).expect("create _index.md");
+        assert!(target_exists(dir.path(), "/en/c/learn/se/data"));
+    }
+
+    #[test]
+    fn test_target_exists_content_namespace_missing_returns_false() {
+        let dir = TempDir::new().expect("tempdir");
+        // `/en/c/does-not-exist` — no physical file matches
+        assert!(!target_exists(dir.path(), "/en/c/does-not-exist"));
+    }
+
+    // --- strip_content_namespace ---
+
+    #[test]
+    fn test_strip_content_namespace_en_slug() {
+        assert_eq!(
+            strip_content_namespace("en/c/learn/software-engineering"),
+            Some("en/learn/software-engineering".to_owned()),
+        );
+    }
+
+    #[test]
+    fn test_strip_content_namespace_id_slug() {
+        assert_eq!(
+            strip_content_namespace("id/c/belajar"),
+            Some("id/belajar".to_owned()),
+        );
+    }
+
+    #[test]
+    fn test_strip_content_namespace_no_c_segment() {
+        assert_eq!(strip_content_namespace("en/learn"), None);
+    }
+
+    #[test]
+    fn test_strip_content_namespace_only_locale_and_c() {
+        // `en/c` with no slug after → None (rest is missing)
+        assert_eq!(strip_content_namespace("en/c"), None);
+    }
+
+    #[test]
+    fn test_strip_content_namespace_non_c_second_segment() {
+        assert_eq!(strip_content_namespace("en/tools/react"), None);
     }
 
     // --- output_links_json status field ---
