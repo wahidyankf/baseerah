@@ -20,6 +20,8 @@ const translations: Record<Locale, Record<string, string>> = {
     skipToContent: "Skip to content",
     toolsPageTitle: "Tools",
     toolsPageCalcLink: "Cost of Living Calculator",
+    breadcrumbHome: "Home",
+    breadcrumbCalculator: "Calculator",
 
     // Calculator — page
     calcTitle: "Cost of Living Calculator",
@@ -175,6 +177,8 @@ const translations: Record<Locale, Record<string, string>> = {
     skipToContent: "Langsung ke konten",
     toolsPageTitle: "Alat",
     toolsPageCalcLink: "Kalkulator Biaya Hidup",
+    breadcrumbHome: "Beranda",
+    breadcrumbCalculator: "Kalkulator",
 
     // Calculator — page
     calcTitle: "Kalkulator Biaya Hidup",
