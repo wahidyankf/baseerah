@@ -66,7 +66,7 @@ User: "Execute plan plans/in-progress/new-feature/plan.md"
 
 The calling context will:
 
-1. **Enter the designated worktree** (Step 0): refuse to start if the plan lacks a `## Worktree` section; otherwise go to the declared worktree (provisioning it from `origin/main` if it does not exist) and sync it with the latest `origin/main` before any implementation
+1. **Enter the work branch** (Step 0): the work branch is whatever the user specifies at invocation (a dedicated worktree, the `main` checkout, or any existing branch); if unspecified, the plan docs win (the `## Worktree` section, defaulting to a worktree provisioned from `origin/main`) — refuse to start only when neither the user nor the plan specifies one. Then, by default, pull the latest `origin/main` into the work branch first — before any implementation — to minimize merge collisions
 2. Read the delivery checklist from the plan's `delivery.md` to understand all items
 3. Create granular tasks using `TaskCreate` — one per remaining checkbox (including nested sub-bullets)
 4. For each item: mark `in_progress`, **repo-ground its file paths and commands** (refuse-on-uncertainty if grounding fails), analyze it, **prefer the `_Suggested executor:_` annotation** if present (else fall back to Agent Selection heuristics), delegate to the chosen agent (or execute directly for trivial edits), verify the result
@@ -185,14 +185,16 @@ These rules govern ALL execution steps. No exception. No shortcut.
 
 ### 0. Enter the Designated Worktree (Sequential, Hard Gate)
 
-Plan execution ALWAYS happens inside the plan's designated worktree, synced to the latest `origin/main`. Before reading the delivery checklist, the executor goes to the declared worktree — provisioning it if it does not exist — and brings it up to date with `origin/main`. Executing a plan from the main checkout, or from a stale worktree, is forbidden.
+Plan execution happens on the plan's **work branch**, synced to the latest `origin/main`. The work branch is chosen by precedence: (1) a branch the **user explicitly specifies at invocation** — a dedicated worktree, the `main` checkout, or any other existing branch — wins; (2) if the user specifies nothing, the **plan docs win** — the plan's `## Worktree` section (or declared work branch) governs, and absent any override that defaults to a dedicated worktree provisioned from `origin/main`. Whichever branch is selected, the executor's **default first action is to pull the latest `origin/main` into that work branch** before any implementation, to minimize merge collisions later at push time. Executing a plan from a **stale** work branch — one not synced to the latest `origin/main` — is forbidden.
+
+**Work-branch provisioning vs. entry**: when the work branch is a dedicated worktree (the default-when-unspecified case), follow the provisioning and entry steps below. When the user specifies the `main` checkout or another existing branch, skip provisioning (orchestrator-action steps 1–4): confirm you are on that branch, then apply the freshness gate (step 5) directly to it.
 
 **Orchestrator action**:
 
 1. **Locate the `## Worktree` section** in the plan:
    - **Multi-file plans**: in `delivery.md` (top-level `## Worktree` heading, before any phase).
    - **Single-file plans**: in `README.md` (top-level `## Worktree` heading, before `## Delivery Checklist`).
-2. **If the section is missing**: terminate immediately with status `fail`. Emit a single user-visible line: `Worktree specification missing — add a "## Worktree" section to <delivery.md|README.md> per repo-governance/conventions/structure/plans.md#worktree-specification before re-invoking plan execution.`
+2. **If the section is missing AND the user specified no work branch at invocation**: terminate immediately with status `fail`. Emit a single user-visible line: `Worktree specification missing — add a "## Worktree" section to <delivery.md|README.md> per repo-governance/conventions/structure/plans.md#worktree-specification before re-invoking plan execution.` (If the user specified a work branch — a worktree, `main`, or any existing branch — that selection wins per the precedence above and a missing `## Worktree` section is not a failure; skip provisioning and apply the freshness gate to that branch.)
 3. **Parse the declared worktree path** (format: `worktrees/<plan-identifier>/`).
 4. **Go to the designated worktree — navigate or provision** (default behavior; no user prompt needed):
    - Check whether the worktree is already registered: `git worktree list --porcelain` from the repo root, and confirm the directory `<repo-root>/worktrees/<plan-identifier>` exists.
@@ -212,11 +214,11 @@ Plan execution ALWAYS happens inside the plan's designated worktree, synced to t
      4. Run `npm install && npm run doctor -- --fix` in the root repository worktree to initialize the toolchain, per [Worktree Toolchain Initialization](../../development/workflow/worktree-setup.md).
      5. Emit a user-visible line: `Worktree provisioned at worktrees/<plan-identifier>/ — continuing execution.`
 
-5. **Freshness gate — sync with latest `origin/main` (MANDATORY)**: before ANY implementation work, bring the worktree up to date:
-   1. `git fetch origin` (from inside the worktree).
-   2. If the worktree has uncommitted changes (`git status --porcelain` non-empty): do NOT auto-stash or discard. Surface the dirty state to the user and STOP until they decide (commit, stash, or discard explicitly).
-   3. If the worktree has no local commits ahead of `origin/main`: `git merge --ff-only origin/main`.
-   4. If the worktree has local commits not yet on `origin/main` (a resumed plan): `git rebase origin/main`. On conflict: `git rebase --abort`, surface the conflicting files to the user, and STOP — never auto-resolve.
+5. **Freshness gate — pull latest `origin/main` into the work branch FIRST, by default (MANDATORY)**: before ANY implementation work, bring the work branch up to date by pulling the newest `origin/main`. Pulling latest trunk first is the default — it minimizes merge collisions at push time:
+   1. `git fetch origin` (from inside the work branch).
+   2. If the work branch has uncommitted changes (`git status --porcelain` non-empty): do NOT auto-stash or discard. Surface the dirty state to the user and STOP until they decide (commit, stash, or discard explicitly).
+   3. If the work branch has no local commits ahead of `origin/main`: `git merge --ff-only origin/main`.
+   4. If the work branch has local commits not yet on `origin/main` (a resumed plan): `git rebase origin/main`. On conflict: `git rebase --abort`, surface the conflicting files to the user, and STOP — never auto-resolve.
    5. Verify sync: `git merge-base --is-ancestor origin/main HEAD` must succeed.
 6. **Confirm gate passed**: emit `Worktree gate: passed (worktrees/<plan-identifier>/ @ <short-sha>, up to date with origin/main)` and proceed to Step 1. All subsequent steps run with the worktree as the execution root.
 
@@ -228,7 +230,7 @@ Mark such steps `[HUMAN]` in the delivery checklist (per [Plans Organization Con
 
 **Output**: Execution running inside the designated worktree, up to date with the latest `origin/main` (provisioned if needed).
 
-**Why this is a hard gate**: The missing `## Worktree` section is a hard-fail because there is no declared path to provision — the plan is incomplete and must be fixed by the author before execution can proceed. A CWD mismatch, by contrast, is recoverable: the executor knows the target path and navigates to or provisions the worktree automatically. Running outside a worktree without a declared path would pollute the main checkout with in-flight work, break the parallel-safety guarantee, and risk dirty-gitlink hazards in any subrepo context. The freshness sync is equally mandatory: implementing against a stale base invites merge conflicts at push time and validates the plan against code that no longer matches `origin/main`.
+**Why this is a hard gate**: A missing `## Worktree` section is a hard-fail **only when the user has not specified a work branch at invocation** — in that case there is no declared path to provision, so the plan is incomplete and must be fixed by the author before execution can proceed. A CWD mismatch, by contrast, is recoverable: the executor knows the target path and navigates to or provisions the worktree automatically. Running outside a worktree without a declared path would pollute the main checkout with in-flight work, break the parallel-safety guarantee, and risk dirty-gitlink hazards in any subrepo context. The freshness sync is equally mandatory: implementing against a stale base invites merge conflicts at push time and validates the plan against code that no longer matches `origin/main`.
 
 ### 1. Load Delivery Checklist and Materialize Task List (Sequential)
 
