@@ -11,6 +11,8 @@ import { t } from "@/features/i18n/core/translations";
 import type { Locale } from "@/features/i18n/core/config";
 import { PRIMARY_NAV_LINKS } from "@/features/app-shell/core/nav-links";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   locale: string;
@@ -19,6 +21,7 @@ interface HeaderProps {
 export function Header({ locale }: HeaderProps) {
   const { setOpen: setSearchOpen } = useSearchOpen();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -38,15 +41,26 @@ export function Header({ locale }: HeaderProps) {
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
-          {PRIMARY_NAV_LINKS.map((link) => (
-            <Link
-              key={link.labelKey}
-              href={link.hrefFor(locale as Locale)}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
-            >
-              {t(locale as Locale, link.labelKey)}
-            </Link>
-          ))}
+          {PRIMARY_NAV_LINKS.map((link) => {
+            const href = link.hrefFor(locale as Locale);
+            // Active when on the exact page or anywhere within its subtree.
+            // aria-current="page" only when on the exact URL — deeper pages get
+            // visual emphasis only (aria-current="page" on a non-exact URL is incorrect ARIA).
+            const isActive = pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link
+                key={link.labelKey}
+                href={href}
+                aria-current={pathname === href ? "page" : undefined}
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-foreground",
+                  isActive ? "text-foreground underline decoration-primary underline-offset-4" : "text-foreground/80",
+                )}
+              >
+                {t(locale as Locale, link.labelKey)}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex-1" />
@@ -59,7 +73,7 @@ export function Header({ locale }: HeaderProps) {
           aria-label="Search"
         >
           <Search className="h-4 w-4" />
-          <span className="text-sm">Search...</span>
+          <span className="text-sm">{t(locale as Locale, "search")}</span>
           <kbd className="pointer-events-none ml-2 hidden rounded border bg-muted px-1.5 font-mono text-xs select-none lg:inline-block">
             ⌘K
           </kbd>

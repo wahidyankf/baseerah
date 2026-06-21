@@ -14,9 +14,7 @@ export function Footer({ locale }: FooterProps) {
 
   // Shared primary destinations — kept in lockstep with the header + mobile nav.
   const learnLink = PRIMARY_NAV_LINKS.find((l) => l.labelKey === "navLearn");
-  const toolsLink = PRIMARY_NAV_LINKS.find((l) => l.labelKey === "navTools");
   const learnHref = learnLink ? learnLink.hrefFor(loc) : `/${locale}/c`;
-  const toolsHref = toolsLink ? toolsLink.hrefFor(loc) : `/${locale}/tools`;
 
   // Loose top-level pages resolve to bare `/{locale}/{slug}` via contentUrl.
   const aboutHref = contentUrl(loc, loc === "id" ? "tentang-ayokoding" : "about-ayokoding");
@@ -38,7 +36,7 @@ export function Footer({ locale }: FooterProps) {
 
           <div>
             <h2 className={columnHeading}>{t(loc, "footerTools")}</h2>
-            <Link href={toolsHref} className={columnLink}>
+            <Link href={`/${locale}/tools/cost-of-living-calculator`} className={columnLink}>
               {t(loc, "footerCalculator")}
             </Link>
           </div>
