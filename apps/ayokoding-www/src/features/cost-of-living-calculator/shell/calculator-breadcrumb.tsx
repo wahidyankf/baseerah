@@ -1,35 +1,20 @@
 "use client";
 
-import Link from "next/link";
+import { Breadcrumb } from "@/features/navigation/shell/breadcrumb";
 import { t } from "@/features/i18n/core/translations";
 import { useLocale } from "@/features/i18n/shell/use-locale";
 
 export function CalculatorBreadcrumb() {
   const locale = useLocale();
 
-  return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-        <li>
-          <Link href={`/${locale}`} className="hover:text-foreground">
-            {t(locale, "breadcrumbHome")}
-          </Link>
-        </li>
-        <li aria-hidden="true" className="select-none">
-          /
-        </li>
-        <li>
-          <Link href={`/${locale}/tools`} className="hover:text-foreground">
-            {t(locale, "toolsPageTitle")}
-          </Link>
-        </li>
-        <li aria-hidden="true" className="select-none">
-          /
-        </li>
-        <li aria-current="page" className="font-medium text-foreground">
-          {t(locale, "breadcrumbCalculator")}
-        </li>
-      </ol>
-    </nav>
-  );
+  // Delegate to the shared Breadcrumb primitive. showCurrent renders the final
+  // segment as a non-link aria-current="page" crumb whose label matches the
+  // page H1 (calcTitle), and chevron separators replace the legacy slash glyph.
+  const segments = [
+    { label: t(locale, "breadcrumbHome"), slug: "" },
+    { label: t(locale, "toolsPageTitle"), slug: "tools" },
+    { label: t(locale, "calcTitle"), slug: "tools/cost-of-living-calculator" },
+  ];
+
+  return <Breadcrumb locale={locale} slug="tools/cost-of-living-calculator" segments={segments} showCurrent />;
 }

@@ -119,50 +119,71 @@ E2E suite (for runtime-proof findings): `npx nx run ayokoding-www-fe-e2e:test:e2
 
 ## Phase 2: Breadcrumb consolidation (DWT-B-003, DWT-B-004, UWT-013)
 
-- [ ] [AI] **RED**: extend
+- [x] [AI] **RED**: extend
       `apps/ayokoding-www/src/features/navigation/shell/breadcrumb.tsx` test (or add
       `breadcrumb.test.tsx` sibling) asserting the shared `Breadcrumb` can render the final
       (current-page) segment when given an opt-in prop — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: test fails (prop not yet supported)
+      _Done 2026-06-21: added sibling `breadcrumb.test.tsx`; the two `showCurrent` tests failed RED
+      (final segment dropped, no svg separators) while the default-behaviour test passed._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: extend `navigation/shell/breadcrumb.tsx` to optionally render the
+- [x] [AI] **GREEN**: extend `navigation/shell/breadcrumb.tsx` to optionally render the
       current-page (last) segment as a non-link `aria-current="page"` crumb, controlled by a new
       prop (e.g. `showCurrent`); keep existing callers' behaviour unchanged when the prop is absent
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: new test passes; existing breadcrumb callers' tests unaffected
+      _Done: added `showCurrent?: boolean` prop + `hrefFor` (empty slug → `/en`, not `/en/`); all
+      2035 unit tests pass including the content-page breadcrumb caller._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: rewrite the assertions in
+- [x] [AI] **RED**: rewrite the assertions in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-breadcrumb.test.tsx`
       to require (a) `ChevronRight` separators (no literal `/`), and (b) the final crumb text equals
       `t(locale, "calcTitle")` in both `en` and `id` — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: tests fail against the current bespoke component
+      _Done 2026-06-21: parametrized the `useLocale` mock via a hoisted holder so en+id render in one
+      file; 3 new assertions (DWT-B-003 chevrons/no-slash, UWT-013 final crumb = calcTitle en+id)
+      failed RED while the 3 legacy structural tests stayed green._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: rewrite
+- [x] [AI] **GREEN**: rewrite
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-breadcrumb.tsx`
       to delegate to the shared `Breadcrumb` with segments
       `[{label: breadcrumbHome, slug: ""}, {label: toolsPageTitle, slug: "tools"}, {label: calcTitle, slug: "tools/cost-of-living-calculator"}]`
       and `showCurrent` enabled; preserve the id-locale label translation and `flex-wrap`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the RED tests pass; no literal `/` remains in the rendered breadcrumb
+      _Done: component now delegates to shared `Breadcrumb` with `showCurrent`; flex-wrap preserved by
+      the shared `<ol className="flex flex-wrap …">`; all 2037 unit tests pass; final crumb = calcTitle
+      in both locales._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR**: remove now-dead bespoke markup; confirm the calculator page still imports
+- [x] [AI] **REFACTOR**: remove now-dead bespoke markup; confirm the calculator page still imports
       `CalculatorBreadcrumb` from the same path (`calculator-content.tsx` line ~16 unchanged)
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: all tests pass; no stale imports
-- [ ] [AI] **RED/GREEN**: add Gherkin scenarios AC-2 (chevron separators / shared primitive) and
+      _Done: bespoke `<ol>`/literal-`/` markup fully replaced by delegation; `calculator-content.tsx`
+      line 16 import unchanged; typecheck + lint clean (only 3 pre-existing jsx-a11y warnings).
+      `breadcrumbCalculator` key is now unused but left in `translations.ts` to avoid type-shape churn._
+- [x] [AI] **RED/GREEN**: add Gherkin scenarios AC-2 (chevron separators / shared primitive) and
       AC-3 (final crumb equals H1 per locale, as a `Scenario Outline`) to the calculator
       `.feature`; wire step defs — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0
+      _Done 2026-06-21: added "The breadcrumb separates crumbs with chevrons, not a literal slash"
+      (chevron-svg count + no-slash) and Scenario Outline "The final breadcrumb crumb matches the page
+      title in each locale" (en/id Examples) with one primary Given/When/Then each (And for extras).
+      RED: 5 missing steps; GREEN: wired step defs, specs:coverage exits 0 (15 specs/163 scenarios/599
+      steps); the outline reads `examples` via the `ScenarioOutlineTest` second callback arg._
   - _Suggested executor: `specs-maker`_
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
-- [ ] [AI] Grep proof: `grep -n '"/"' apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-breadcrumb.tsx`
-      — expected: no literal `/` separator list items remain
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
+  -p ayokoding-www`: exit 0 (typecheck clean; lint exits 0 with the 3 pre-existing non-blocking
+      jsx-a11y warnings; test:unit 2049 passed; specs:coverage 15 specs/163 scenarios/599 steps)._
+- [x] [AI] Grep proof: `grep -n '"/"' apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-breadcrumb.tsx`
+      — expected: no literal `/` separator list items remain _Done: grep exits 1 (no matches); the
+      bespoke literal-slash `<li>` items are gone._
 
 > **Pause Safety**: breadcrumb consolidated and locale-correct; gate green. Safe to stop. To
 > resume: re-run the gate command.

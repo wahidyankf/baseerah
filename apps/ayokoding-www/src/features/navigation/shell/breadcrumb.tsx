@@ -5,24 +5,44 @@ interface BreadcrumbProps {
   locale: string;
   slug: string;
   segments: { label: string; slug: string }[];
+  // When true, the final (current-page) segment is rendered as a non-link
+  // aria-current="page" crumb instead of being dropped. Callers that already
+  // surface the current page in an <h1> leave this absent (default behaviour).
+  showCurrent?: boolean;
 }
 
-export function Breadcrumb({ locale, segments }: BreadcrumbProps) {
-  // Exclude last segment — the current page title is already shown in the h1
-  const ancestorSegments = segments.slice(0, -1);
-  if (ancestorSegments.length === 0) return null;
+function hrefFor(locale: string, slug: string): string {
+  return slug ? `/${locale}/${slug}` : `/${locale}`;
+}
+
+export function Breadcrumb({ locale, segments, showCurrent = false }: BreadcrumbProps) {
+  // Default: exclude the last segment — the current page title is shown in the h1.
+  // showCurrent: keep every segment; render the last one as a non-link crumb.
+  const visibleSegments = showCurrent ? segments : segments.slice(0, -1);
+  if (visibleSegments.length === 0) return null;
+
+  const lastIndex = visibleSegments.length - 1;
 
   return (
     <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
       <ol className="flex flex-wrap items-center gap-1">
-        {ancestorSegments.map((segment, i) => (
-          <li key={segment.slug} className="flex items-center gap-1">
-            {i > 0 && <ChevronRight className="h-3 w-3 shrink-0" />}
-            <Link href={`/${locale}/${segment.slug}`} className="hover:text-foreground">
-              {segment.label}
-            </Link>
-          </li>
-        ))}
+        {visibleSegments.map((segment, i) => {
+          const isCurrent = showCurrent && i === lastIndex;
+          return (
+            <li key={segment.slug} className="flex items-center gap-1">
+              {i > 0 && <ChevronRight className="h-3 w-3 shrink-0" />}
+              {isCurrent ? (
+                <span aria-current="page" className="font-medium text-foreground">
+                  {segment.label}
+                </span>
+              ) : (
+                <Link href={hrefFor(locale, segment.slug)} className="hover:text-foreground">
+                  {segment.label}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

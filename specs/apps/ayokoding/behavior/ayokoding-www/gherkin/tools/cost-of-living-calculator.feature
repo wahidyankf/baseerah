@@ -544,6 +544,25 @@ Feature: Salary savings calculator
     Then a "Home" link to "/en" is shown
     And a "Tools" link to "/en/tools" is shown
 
+  # AC-2 (DWT-B-003/DWT-B-004) — Breadcrumb uses the shared primitive with chevron separators
+  Scenario: The breadcrumb separates crumbs with chevrons, not a literal slash
+    Given I am on the calculator with query string "city=singapore"
+    When I read the breadcrumb above the page title
+    Then the crumbs are separated by chevron icons
+    And no literal "/" separator is shown between crumbs
+
+  # AC-3 (UWT-013) — Final breadcrumb crumb equals the page H1 in each locale
+  Scenario Outline: The final breadcrumb crumb matches the page title in each locale
+    Given the user opens "/<locale>/tools/cost-of-living-calculator"
+    When the breadcrumb renders
+    Then the current-page crumb text reads "<expected_title>"
+    And the current-page crumb is marked aria-current="page"
+
+    Examples:
+      | locale | expected_title            |
+      | en     | Cost of Living Calculator |
+      | id     | Kalkulator Biaya Hidup    |
+
   # URL-010 — Region selection writes region to the URL
   Scenario: Selecting a region writes the region to the URL
     Given I am on the calculator with no query string
