@@ -19,3 +19,24 @@ Feature: IA navigation revamp
     And the browse index should show a section card for "rants"
     And a breadcrumb nav should be present
     And the breadcrumb should start with a Home link
+
+  Scenario: Header shows primary nav links on desktop
+    Given the viewport is set to desktop width
+    When a visitor navigates to "/en"
+    Then the header primary nav should contain a link to "/en/c" labelled "Learn"
+    And the header primary nav should contain a link to "/en/tools" labelled "Tools"
+
+  Scenario: Mobile navigation mirrors the header links
+    Given the viewport is set to mobile width
+    When a visitor navigates to "/en"
+    And the visitor opens the mobile navigation menu
+    Then the mobile nav should contain a link to "/en/c" labelled "Learn"
+    And the mobile nav should contain a link to "/en/tools" labelled "Tools"
+
+  Scenario: Footer shows grouped navigation with localized labels
+    When a visitor navigates to "/id"
+    Then the footer should display a "Learn" column
+    And the footer should display a "Tools" column
+    And the footer should display an "About" column
+    And the footer "About" column should link to "/id/tentang-ayokoding"
+    And the footer "About" column should link to "/id/syarat-dan-ketentuan"
