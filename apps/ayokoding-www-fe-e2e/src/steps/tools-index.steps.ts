@@ -15,8 +15,10 @@ When("the calculator entry renders", async ({ page }) => {
 });
 
 Then("the calculator entry shows a description distinct from its link text", async ({ page }) => {
-  // The link text and the description paragraph must both be visible and distinct
-  const calcLink = page.getByRole("link", { name: /cost of living/i });
+  // Scope to the main content area to avoid matching the footer Tools column
+  // which also links to the calculator (added in Phase 3 footer nav update).
+  const main = page.locator("#main-content");
+  const calcLink = main.getByRole("link", { name: /cost of living/i });
   await expect(calcLink).toBeVisible();
   const linkText = (await calcLink.textContent())?.trim() ?? "";
 

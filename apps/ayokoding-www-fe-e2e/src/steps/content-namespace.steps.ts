@@ -69,10 +69,11 @@ Then("a breadcrumb nav should be present", async ({ page }) => {
 });
 
 Then("the browse index should show a section card for {string}", async ({ page }, sectionSlug: string) => {
-  // SectionCard renders as an <a> link inside a grid. Scope to main to avoid
-  // matching same-named sidebar links. The card's href contains /c/{sectionSlug}.
+  // SectionCard renders as an <a class="group block ..."> link inside a grid.
+  // Sidebar links lack the "group" class — scope with it to avoid strict-mode
+  // ambiguity when both the sidebar and the section card share the same /c/ href.
   const main = page.getByRole("main");
-  const link = main.locator(`a[href*="/c/${sectionSlug}"]`);
+  const link = main.locator(`a.group[href*="/c/${sectionSlug}"]`);
   await expect(link).toBeVisible();
 });
 

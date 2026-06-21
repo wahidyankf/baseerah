@@ -1458,7 +1458,10 @@ When("the page renders", async ({ page }) => {
 
 Then("the page heading and the calculator link display readable English labels", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/tools/i);
-  await expect(page.getByRole("link", { name: /cost of living/i })).toBeVisible();
+  // Scope to main content to avoid strict-mode violation with the footer Tools
+  // column which also links to the calculator (footer added in Phase 3).
+  const main = page.locator("#main-content");
+  await expect(main.getByRole("link", { name: /cost of living/i })).toBeVisible();
 });
 
 Then("no raw i18n key strings are visible", async ({ page }) => {
@@ -1474,7 +1477,9 @@ Given(/a user navigates to \/id\/tools/, async ({ page }) => {
 
 Then("the heading and link labels are in Indonesian", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/alat/i);
-  await expect(page.getByRole("link", { name: /kalkulator/i })).toBeVisible();
+  // Scope to main content — footer also has "Kalkulator Biaya Hidup" (Phase 3).
+  const main = page.locator("#main-content");
+  await expect(main.getByRole("link", { name: /kalkulator/i })).toBeVisible();
 });
 
 // ── SG-D-001: Dual-currency in cost-of-living and savings tables ──────────────
