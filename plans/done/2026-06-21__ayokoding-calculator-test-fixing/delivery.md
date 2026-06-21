@@ -932,30 +932,37 @@ on all three browsers (chromium, firefox, webkit), two consecutive runs:**
       plan) then pushed (HEAD 92a03a075…)._
 - [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (3-minute poll; do not use
       `gh run watch`) _Background poller watches commons-quality-gate run 27906379255 (~110s interval)._
-- [ ] [AI] Verify ALL CI checks pass; fix and push follow-ups until green
-- [ ] [AI] Do NOT archive until CI is fully green
+- [x] [AI] Verify ALL CI checks pass; fix and push follow-ups until green
+      _Green on a06db97f1: commons-quality-gate ✅, commons-env-validate ✅, markdown-validate ✅,
+      publish-images ✅. Prior reds were self-hosted-runner infra flakes (setup-node HTML download
+      error; F# SafeFileHandle.Open I/O race; SIGINT) plus one real prettier issue from a concurrent
+      plan's unformatted docs, which was fixed; passed clean on re-run._
+- [x] [AI] Do NOT archive until CI is fully green _Archiving only after the green re-run above._
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI)
-- [ ] [AI] Verify manual assertions pass with committed evidence in `evidence/` (both locales,
-      320/375/768/1280 px)
-- [ ] [AI] Verify every rule-15 finding is fixed or explicitly deferred
-- [ ] [AI] Move plan: `git mv plans/in-progress/ayokoding-calculator-test-fixing plans/done/2026-06-21__ayokoding-calculator-test-fixing`
+- [x] [AI] Verify ALL delivery checklist items are ticked _All Phase 0–8 items ticked._
+- [x] [AI] Verify ALL quality gates pass (local + CI) _Local: typecheck/lint/test:unit (2114)/specs:coverage
+      (16 specs, 177 scenarios, 648 steps)/e2e (423 pass, 0 fail across chromium+firefox+webkit). CI green._
+- [x] [AI] Verify manual assertions pass with committed evidence in `evidence/` (both locales,
+      320/375/768/1280 px) _20 evidence screenshots committed; rule-15 live retest covered en/id ×
+      320/375/768/1280 with console-clean confirmation._
+- [x] [AI] Verify every rule-15 finding is fixed or explicitly deferred _EWT-R01 (id 320px overflow)
+      and UWT-019 (currency note) both fixed; DWT 0 new; all earlier findings resolved. Zero deferrals._
+- [x] [AI] Move plan: `git mv plans/in-progress/ayokoding-calculator-test-fixing plans/done/2026-06-21__ayokoding-calculator-test-fixing`
       (use the actual completion date)
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the entry
-- [ ] [AI] Update `plans/done/README.md` — add the entry with completion date
-- [ ] [AI] Commit the archival: `chore(plans): move ayokoding-calculator-test-fixing to done`
+- [x] [AI] Update `plans/in-progress/README.md` — remove the entry
+- [x] [AI] Update `plans/done/README.md` — add the entry with completion date
+- [x] [AI] Commit the archival: `chore(plans): move ayokoding-calculator-test-fixing to done`
 
 ### Phase 8 Gate
 
 > Final gate — the plan is complete only when all below pass.
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:unit specs:coverage` and
-      `ayokoding-www-fe-e2e:test:e2e` — expected: all exit 0
-- [ ] [AI] CI fully green on the pushed commits
-- [ ] [AI] Evidence committed for both locales at all breakpoints; rule-15 findings triaged
+- [x] [AI] `npx nx affected -t typecheck lint test:unit specs:coverage` and
+      `ayokoding-www-fe-e2e:test:e2e` — expected: all exit 0 _All exit 0 (unit 2114; e2e 423/0 on 3 browsers)._
+- [x] [AI] CI fully green on the pushed commits _Green on a06db97f1 after infra-flake re-run._
+- [x] [AI] Evidence committed for both locales at all breakpoints; rule-15 findings triaged _Done._
 
 > **Pause Safety**: all findings fixed, gates + CI green, evidence committed, plan archived. The
 > repository is coherent and the plan is done. To resume (if archival is incomplete): re-run the
