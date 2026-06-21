@@ -58,6 +58,19 @@ const contentSegments = [
   { label: "Data Structures", slug: "learn/software-engineering/data-structures" },
 ];
 
+describe("Breadcrumb with explicit href override", () => {
+  it("when segment has href field, uses that href instead of computed one — UWT-002 fix", () => {
+    const segments = [
+      { label: "Home", slug: "" },
+      { label: "Browse", slug: "c", href: "/en/c" },
+      { label: "Learn", slug: "learn" },
+    ];
+    render(<Breadcrumb locale="en" slug="learn" segments={segments} contentHrefs showCurrent />);
+    expect(screen.getByRole("link", { name: "Browse" }).getAttribute("href")).toBe("/en/c");
+    expect(screen.getByRole("link", { name: "Home" }).getAttribute("href")).toBe("/en");
+  });
+});
+
 describe("Breadcrumb with contentHrefs", () => {
   it("when contentHrefs=true emits /c/ prefixed hrefs for content ancestor segments", () => {
     render(

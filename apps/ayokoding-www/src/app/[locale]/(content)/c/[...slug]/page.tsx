@@ -83,7 +83,7 @@ export default async function ContentPage({ params }: Props) {
     throw err;
   }
 
-  const breadcrumbSegments = buildBreadcrumbs(slugStr, page.title);
+  const breadcrumbSegments = buildBreadcrumbs(locale, slugStr, page.title);
 
   return (
     <>
@@ -117,9 +117,17 @@ export default async function ContentPage({ params }: Props) {
   );
 }
 
-function buildBreadcrumbs(slug: string, currentTitle: string): { label: string; slug: string }[] {
+function buildBreadcrumbs(
+  locale: string,
+  slug: string,
+  currentTitle: string,
+): { label: string; slug: string; href?: string }[] {
   const parts = slug.split("/");
-  const segments: { label: string; slug: string }[] = [];
+  // Home → /{locale}; Browse → /{locale}/c (explicit href, not via contentUrl)
+  const segments: { label: string; slug: string; href?: string }[] = [
+    { label: t(locale as Locale, "breadcrumbHome"), slug: "" },
+    { label: t(locale as Locale, "browseTitle"), slug: "c", href: `/${locale}/c` },
+  ];
 
   for (let i = 0; i < parts.length - 1; i++) {
     const part = parts[i];

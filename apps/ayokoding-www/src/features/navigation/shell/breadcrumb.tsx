@@ -6,7 +6,7 @@ import type { Locale } from "@/features/i18n/core/config";
 interface BreadcrumbProps {
   locale: string;
   slug: string;
-  segments: { label: string; slug: string }[];
+  segments: { label: string; slug: string; href?: string }[];
   // When true, the final (current-page) segment is rendered as a non-link
   // aria-current="page" crumb instead of being dropped. Callers that already
   // surface the current page in an <h1> leave this absent (default behaviour).
@@ -16,9 +16,10 @@ interface BreadcrumbProps {
   contentHrefs?: boolean;
 }
 
-function hrefFor(locale: string, slug: string, useContentUrl: boolean): string {
-  if (!slug) return `/${locale}`;
-  return useContentUrl ? contentUrl(locale as Locale, slug) : `/${locale}/${slug}`;
+function hrefFor(locale: string, segment: { slug: string; href?: string }, useContentUrl: boolean): string {
+  if (segment.href !== undefined) return segment.href;
+  if (!segment.slug) return `/${locale}`;
+  return useContentUrl ? contentUrl(locale as Locale, segment.slug) : `/${locale}/${segment.slug}`;
 }
 
 export function Breadcrumb({ locale, segments, showCurrent = false, contentHrefs = false }: BreadcrumbProps) {
@@ -42,7 +43,7 @@ export function Breadcrumb({ locale, segments, showCurrent = false, contentHrefs
                   {segment.label}
                 </span>
               ) : (
-                <Link href={hrefFor(locale, segment.slug, contentHrefs)} className="hover:text-foreground">
+                <Link href={hrefFor(locale, segment, contentHrefs)} className="hover:text-foreground">
                   {segment.label}
                 </Link>
               )}
