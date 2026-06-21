@@ -69,6 +69,28 @@ plus URL-naturalness and responsive-usability passes.
 **Not covered**: 768 px tablet breakpoint (same class of issues as 375 px would appear); E2E
 Playwright test run against a production build.
 
+## Re-evaluation (2026-06-21) — Breadcrumb and URL-State Pass
+
+A targeted follow-up evaluation was run on the same day to verify the newly shipped breadcrumb
+navigation and URL-serialised filter controls. Results:
+
+| Previously known issue | Status       | Notes                                                  |
+| ---------------------- | ------------ | ------------------------------------------------------ |
+| UWT-005 (URL state)    | **RESOLVED** | Tab + filter state in URL; deep-link restore confirmed |
+| UWT-010 (back link)    | **RESOLVED** | Back link now carries `?region=…&country=…` context    |
+
+Four new findings were added (UWT-013 through UWT-016):
+
+- **UWT-013** (Severity 2): Breadcrumb current-page label "Calculator" does not match H1 "Cost of
+  Living Calculator" — confirmed in both `en` and `id` locales.
+- **UWT-014** (Severity 2): Selecting a Country auto-sets Region with no visual advisory — WCAG
+  3.2.2 On Input violation.
+- **UWT-015** (Severity 1): City-only deep link (`?city=X`) injects inferred region + country
+  into the "Back to all cities" href, making the back action non-symmetric.
+- **UWT-016** (Severity 2): Geo-filter selects and Area toggle buttons render at 28–29 px on
+  mobile (375 px) — below the 44 px preferred tap-target size; inconsistent with household-size
+  selects that already apply `min-h-[44px]`.
+
 ## Overall Usability Impression
 
 The calculator delivers **substantial data value** and has strong fundamentals: all form controls

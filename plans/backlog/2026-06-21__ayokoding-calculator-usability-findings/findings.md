@@ -226,6 +226,12 @@ USD.
 **Environment**: `/en/tools/cost-of-living-calculator`, Chromium, 1280 px, `en`, 2026-06-21
 **Reproducibility**: Always
 
+> **Resolution note (2026-06-21 re-evaluation)**: RESOLVED. Tab state is now reflected in the
+> URL (`?tab=savings`, `?tab=min-role`). Filter state (region, country, city) is also serialised
+> into the URL. Deep-link restore is confirmed working at all tested breakpoints and both locales.
+> This finding is closed; see UWT-013 (breadcrumb label) and UWT-014 (auto-region side effect) for
+> new issues uncovered in the same re-evaluation.
+
 ### Steps to Reproduce
 
 1. Open the calculator. Click "Savings" tab. URL stays:
@@ -446,6 +452,13 @@ essentials, savings potential, and minimum seniority across 30+ cities worldwide
 **Environment**: `/en/tools/cost-of-living-calculator`, Chromium, 1280 px, `en`, 2026-06-21
 **Reproducibility**: Always when a city is selected
 
+> **Resolution note (2026-06-21 re-evaluation)**: RESOLVED for the primary scenario. When a
+> user navigates with region + country + city (e.g. `?region=asean&country=th&city=bangkok`), the
+> back link now correctly carries `?region=asean&country=th`. A residual edge case exists (see
+> UWT-015): a deep-link with only `?city=X` causes the page to auto-derive and inject region +
+> country context that was not in the original URL, so the back link carries that injected context.
+> This is noted as a separate minor finding rather than a regression of UWT-010.
+
 ### Steps to Reproduce
 
 1. Set Region to "ASEAN", Country to "Singapore", City to "Singapore".
@@ -551,3 +564,214 @@ grouped visually.
 
 Wrap "OOP" in `<abbr title="out-of-pocket — healthcare you pay yourself">OOP</abbr>` wherever it
 appears so the definition is one hover away.
+
+---
+
+## Re-evaluation findings (2026-06-21) — URL-state and breadcrumb feature pass
+
+The following findings (UWT-013 through UWT-016) were surfaced during a targeted re-evaluation
+focused on the new breadcrumb navigation, URL-serialised filter controls, and their interaction.
+UWT-005 and UWT-010 are confirmed resolved (see resolution notes on each). These new findings are
+additional friction uncovered by the same pass.
+
+---
+
+## UWT-013 — Breadcrumb terminal node "Calculator" does not match the page title
+
+**Severity**: 2 — Minor usability problem
+**Priority**: Medium
+**Area**: Breadcrumb navigation — both locales
+**Persona & task**: First-time visitor, Task 1 (orient)
+**Environment**: `/en/tools/cost-of-living-calculator` and `/id/tools/cost-of-living-calculator`,
+Chromium, 375–1280 px, `en` + `id`, 2026-06-21
+**Reproducibility**: Always
+
+### Steps to Reproduce
+
+1. Open `http://localhost:3101/en/tools/cost-of-living-calculator`.
+2. Read the breadcrumb: "Home / Tools / Calculator".
+3. Read the H1: "Cost of Living Calculator".
+4. Note the mismatch: the breadcrumb says "Calculator"; the page title says "Cost of Living
+   Calculator".
+5. Repeat on `/id/`: breadcrumb says "Calculator"; H1 says "Kalkulator Biaya Hidup".
+
+### Expected (predictable) behaviour
+
+The current-page segment of a breadcrumb should match the H1/page title exactly, so a user
+scanning the breadcrumb can recognise the page they are on without reading the H1 separately.
+Standard practice (NN/g, WCAG 3.2.4 Consistent Identification) requires that the same element
+used to identify the same content uses consistent labelling across contexts.
+
+### Actual behaviour
+
+`<li aria-current="page">Calculator</li>` — an abbreviated label that does not match the H1
+("Cost of Living Calculator") or the `<title>` ("Cost of Living Calculator | AyoKoding"). Confirmed
+for both `en` and `id` locales.
+
+### Violated principle
+
+WCAG 3.2.4 (Consistent Identification) — the page is identified as "Cost of Living Calculator"
+in the `<title>` and H1 but as "Calculator" in the breadcrumb. Heuristic 4 (Consistency and
+standards) — the breadcrumb label should agree with the page title. Information scent (Pirolli &
+Card) — a truncated breadcrumb label provides weaker location cues than the full name.
+
+### Evidence
+
+`./evidence/phase-13-breadcrumb-label-en-1280px.png` (H1 vs breadcrumb mismatch, EN)
+`./evidence/phase-13-breadcrumb-label-id-1280px.png` (H1 vs breadcrumb mismatch, ID)
+
+### Suggested clarification
+
+Change the breadcrumb current-page label to "Cost of Living Calculator" (EN) / "Kalkulator Biaya
+Hidup" (ID) to match the H1. If space is a concern, abbreviate both the breadcrumb and the H1
+consistently.
+
+---
+
+## UWT-014 — Selecting a Country silently auto-sets the Region dropdown with no affordance
+
+**Severity**: 2 — Minor usability problem
+**Priority**: Medium
+**Area**: Cost of Living tab — geo-filter cascade (Country → Region)
+**Persona & task**: First-time visitor exploring city data without using the region filter
+**Environment**: `/en/tools/cost-of-living-calculator`, Chromium, 1280 px, `en`, 2026-06-21
+**Reproducibility**: Always when Country is selected before Region
+
+### Steps to Reproduce
+
+1. Open the calculator with no filters set (Region = "All regions").
+2. Open the Country dropdown and select "Germany".
+3. Observe the Region dropdown: it now reads "Europe" — even though the user never touched it.
+4. URL becomes `?region=europe&country=de`.
+
+### Expected (predictable) behaviour
+
+A first-time user selecting a country without intending to set a region will not expect the Region
+control to silently change. WCAG 3.2.2 (On Input) states that "changing the setting of any UI
+component does not automatically cause a change of context or automatic submission … unless the
+user has been advised of this behaviour before using the component." There is no visible advisory
+that selecting a Country will auto-populate Region.
+
+### Actual behaviour
+
+The Region select is programmatically updated and the URL is rewritten with both `region=` and
+`country=` when the user selects only a country. The region change is not announced or signalled
+visually beyond the dropdown itself changing value. A user who has already set a different region
+(or who wants "All regions" with just a country filter) cannot achieve that state.
+
+### Violated principle
+
+WCAG 3.2.2 (On Input) — an input change causes a context change (Region control changes) without
+prior advisory. Heuristic 1 (Visibility of system status) — the side effect on a sibling control
+is not communicated. Heuristic 4 (Consistency) — selecting Region does not auto-set Country (the
+inverse is false), so the relationship is asymmetric and unpredictable.
+
+### Evidence
+
+`./evidence/phase-14-auto-region-en-1280px.png` (Region shows "Europe" after selecting Germany)
+
+### Suggested clarification
+
+Announce the auto-region inference visually: add a note below the dropdowns such as "Region is
+automatically set based on your Country selection." Alternatively, allow the user to select Country
+without forcing Region (keep Region at "All regions"), and let the page filter by country alone. A
+tooltip or info icon on the Region label would also satisfy WCAG 3.2.2's advisory requirement.
+
+---
+
+## UWT-015 — City-only deep link injects undisclosed region + country into "Back to all cities" href
+
+**Severity**: 1 — Cosmetic problem
+**Priority**: Low
+**Area**: URL naturalness — deep-link edge case / back-link
+**Persona & task**: User sharing or following a city-only bookmarked link
+**Environment**: `/en/tools/cost-of-living-calculator?city=london`, Chromium, 1280 px, `en`,
+2026-06-21
+**Reproducibility**: Always when URL contains `city=` without `region=` or `country=`
+
+### Steps to Reproduce
+
+1. Navigate to `http://localhost:3101/en/tools/cost-of-living-calculator?city=london`.
+2. The page auto-derives Region = "Europe" and Country = "United Kingdom" (via the auto-region
+   mechanism in UWT-014) even though neither is in the URL.
+3. Click "← Back to all cities".
+4. The back link navigates to `?region=europe&country=gb` — injecting context that was never in
+   the original shared URL.
+
+### Expected (predictable) behaviour
+
+"Back to all cities" on a city-only deep link should navigate back to the bare calculator (no
+region/country), not to an inferred geo context the user never set. The back action should be
+symmetric with the incoming URL.
+
+### Actual behaviour
+
+`href="?region=europe&country=gb"` — region and country context injected by the auto-derive
+mechanism appears in the back-link URL, sending the user to a pre-filtered view they never
+requested.
+
+### Violated principle
+
+Heuristic 3 (User control and freedom) — the back action does not reverse the user's navigation
+to the expected prior state. Nielsen "URLs as UI" — the back-link URL does not match the
+incoming URL's implied state.
+
+### Evidence
+
+`./evidence/phase-15-city-deeplink-backlink-en-1280px.png`
+
+### Suggested clarification
+
+When the incoming URL contains only `city=X`, the back link should return to the bare calculator
+(`?` or no params) rather than to inferred geo context. Alternatively, document the auto-derive
+behaviour in UWT-014 and consistently encode the full derived state in the incoming URL so the
+back link is symmetric.
+
+---
+
+## UWT-016 — Geo-filter select controls and Area toggle are below WCAG 2.5.8 minimum tap-target size on mobile
+
+**Severity**: 2 — Minor usability problem
+**Priority**: Medium
+**Area**: Cost of Living tab — filter controls at 375 px mobile
+**Persona & task**: First-time visitor on a touchscreen phone, Task 2 (filter by region/country)
+**Environment**: `/en/tools/cost-of-living-calculator`, Chromium, 375 px, `en` + `id`, 2026-06-21
+**Reproducibility**: Always at 375 px
+
+### Steps to Reproduce
+
+1. Open the calculator at 375 px viewport width.
+2. Inspect the Region, Country, and City `<select>` controls and the Area toggle buttons.
+3. Measure rendered height: Region = 29 px, Country = 29 px, City = 29 px; Area radio buttons
+   ("City center" = 28 px, "Rural" = 28 px). All below the 44 px preferred touch target height.
+
+### Expected (predictable) behaviour
+
+Interactive controls on a mobile-targeted layout should meet the minimum touch-target size of 44 ×
+44 CSS px (Apple HIG, Google Material 3) and at minimum the WCAG 2.5.8 AA target of 24 × 24 CSS
+px with adequate spacing. At 29 px high the geo selects are above the absolute WCAG 2.5.8 minimum
+but below the usability-preferred threshold, increasing mis-tap rate on small phones.
+
+### Actual behaviour
+
+All geo `<select>` elements render at 29 px height. The Area radio buttons render at 28 px height.
+The Adults, Preschool children, and School-age children selects correctly render at 44 px (the
+`min-h-[44px]` class is applied). The geo filters and Area toggle lack this class.
+
+### Violated principle
+
+Fitts's Law — a smaller target increases selection error rate. WCAG 2.5.8 Target Size (AA, WCAG
+2.2) recommends 24 × 24 px minimum; 44 × 44 px is the usability-preferred size. Heuristic 4
+(Consistency) — the household-size selects already apply `min-h-[44px]`; the geo selects and Area
+toggle do not follow the same pattern.
+
+### Evidence
+
+`./evidence/phase-16-tap-targets-en-375px.png`
+`./evidence/phase-13-landing-en-375px.png`
+
+### Suggested clarification
+
+Apply `min-h-[44px]` (or equivalent `min-height: 44px` style) to the Region, Country, and City
+`<select>` elements and to the Area radio-button controls, matching the pattern already applied to
+the household-size controls.
