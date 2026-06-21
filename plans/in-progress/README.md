@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_(no active plans)_
+- [AyoKoding Calculator Test-Fixing](./ayokoding-calculator-test-fixing/) — Consolidated fix plan for the still-valid three-tester findings (1 correctness, 12 usability, 3 design + spec coverage) from the re-validated cost-of-living calculator backlog. Execution-ready, 9 phases.
 
 ## Instructions
 
