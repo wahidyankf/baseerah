@@ -169,6 +169,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   - _Suggested executor: `swe-e2e-dev`_
+
 - [ ] [AI] **GREEN**: create `apps/ayokoding-www/src/app/[locale]/(content)/c/[...slug]/page.tsx`
       (+ `layout.tsx`/`error.tsx`/`not-found.tsx` mirroring the sibling `[...slug]/` route) that strips the
       leading `c/`-free slug, calls `getBySlug(locale, rest)`, sets `dynamicParams = false`, and enumerates
@@ -197,6 +198,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   - _Suggested executor: `swe-e2e-dev`_
+
 - [ ] [AI] **GREEN**: create `apps/ayokoding-www/src/redirects/content-namespace.ts` exporting
       `contentNamespaceRedirects` (per-locale `:path*` wildcard rules with `permanent: true` for
       en `learn`/`rants` and id `belajar`/`celoteh`/`konten-video`, per `tech-docs.md §DD-3`) and spread it
@@ -207,6 +209,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   > any sources that overlap with the new `contentNamespaceRedirects` entries:
   > `grep -n "source" apps/ayokoding-www/src/redirects/learn-reorg.ts` — deduplicate any conflicting
   > or redundant rules before adding the new array to avoid Next.js redirect-precedence surprises.
+
 - [ ] [AI] **RED**: add e2e scenario asserting `/en/about-ayokoding`, `/id/syarat-dan-ketentuan`, and
       `/en/tools` are 200 and NOT redirected — command: `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance:
       passes immediately if rules are correctly scoped (guards against over-broad wildcards)
@@ -523,6 +526,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   ```
 
   - _Suggested executor: `swe-e2e-dev`_
+
 - [ ] [AI] **GREEN**: fix any remaining emitter still producing a bare-slug URL — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: no-308-hop scenario passes
 - [ ] [AI] **REFACTOR**: confirm every content-URL construction in `apps/ayokoding-www` routes through
