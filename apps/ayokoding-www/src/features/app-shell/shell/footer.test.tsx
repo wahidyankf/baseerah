@@ -59,13 +59,13 @@ describe("Phase 3 — Footer multi-column nav", () => {
     expect(hrefs).toContain("/id/syarat-dan-ketentuan");
   });
 
-  it("keeps the copyright row with the source-available license link", async () => {
+  it("keeps the copyright row with the MIT license link", async () => {
     const { Footer } = await import("./footer");
     render(<Footer locale="en" />);
 
     const year = new Date().getFullYear();
     expect(screen.getByText(new RegExp(`${year} AyoKoding`))).toBeTruthy();
-    const license = screen.getByRole("link", { name: "FSL-1.1-MIT" });
+    const license = screen.getByRole("link", { name: "MIT" });
     expect(license.getAttribute("href")).toContain("/LICENSE");
   });
 });

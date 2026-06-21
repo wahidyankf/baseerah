@@ -72,7 +72,7 @@ export function Footer({ locale }: FooterProps) {
             rel="noopener noreferrer"
             className="hover:text-foreground"
           >
-            FSL-1.1-MIT
+            MIT
           </a>{" "}
           &middot; {t(loc, "openSourceProject")}
         </p>
