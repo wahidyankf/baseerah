@@ -54,3 +54,31 @@ Feature: IA navigation revamp
     And the hero intro should be visible on the landing page
     And the landing section grid should include a card linking to "/id/c/celoteh"
     And the tools teaser should link to "/id/tools/cost-of-living-calculator"
+
+  Scenario: Breadcrumb segments link to /c URLs
+    Given a visitor is on "/en/c/learn/software-engineering/data"
+    When the breadcrumb renders its ancestor segments
+    Then each ancestor crumb links to a "/c/" prefixed URL
+
+  Scenario: Internal content links emit /c URLs directly without relying on redirects
+    Given the sidebar tree, breadcrumb, prev-next, and search results render content links
+    When their hrefs are computed via the central content URL helper
+    Then every content link resolves directly to a "/c/" URL with status 200
+    And no internal content link resolves through a 308 redirect
+
+  Scenario: Sitemap lists only the new /c content URLs
+    Given the sitemap is generated from the content index
+    When the sitemap entries are produced
+    Then every moved-content entry uses a "/c/" prefixed URL
+    But top-level pages (about, terms, tools) are not prefixed with "/c/"
+
+  Scenario: RSS feed item links use the new /c content URLs
+    Given the feed is generated from the content index
+    When the feed items are produced
+    Then every content item link uses a "/c/" prefixed URL
+
+  Scenario: Canonical link for moved content points to the /c URL
+    Given the content page at "/en/c/learn/software-engineering"
+    When its metadata is generated
+    Then the canonical alternate is "/en/c/learn/software-engineering"
+    And the language alternates include en and x-default
