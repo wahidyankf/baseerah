@@ -124,6 +124,7 @@ const translations: Record<Locale, Record<string, string>> = {
     savingsEmptyStateMessage: "Enter your gross monthly salary to see how much you could save in each city.",
     grossMonthlySalaryLabel: "Gross monthly salary (before tax)",
     salaryCurrencyIndicator: "Currency: USD",
+    salaryCurrencyExplanation: "Salaries are compared in USD across all cities.",
     annualGrossLabel: "Annual gross",
     nonSalaryCompNote: "Non-salary comp (RSU/equity + bonus) is informational only — not in savings math.",
     colNet: "Net (monthly)",
@@ -289,6 +290,7 @@ const translations: Record<Locale, Record<string, string>> = {
       "Masukkan gaji kotor bulanan Anda untuk melihat berapa banyak yang bisa Anda hemat di setiap kota.",
     grossMonthlySalaryLabel: "Gaji kotor bulanan (sebelum pajak)",
     salaryCurrencyIndicator: "Mata uang: USD",
+    salaryCurrencyExplanation: "Gaji dibandingkan dalam USD di semua kota.",
     annualGrossLabel: "Total gaji tahunan",
     nonSalaryCompNote:
       "Kompensasi non-gaji (RSU/ekuitas + bonus) hanya informasi — tidak termasuk dalam perhitungan tabungan.",

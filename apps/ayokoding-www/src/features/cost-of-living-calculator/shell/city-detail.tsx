@@ -96,6 +96,7 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
           </h2>
           <a
             href={backHref ?? "?tab=cost"}
+            data-back-link="true"
             className="text-sm text-primary-foreground/80 underline hover:text-primary-foreground"
           >
             {t(locale, "backToAllCities")}

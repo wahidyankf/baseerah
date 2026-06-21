@@ -27,14 +27,14 @@ Feature: Salary savings calculator
   Scenario: Clicking a city name opens its single-city cost-of-living detail
     Given I am on "/en/tools/cost-of-living-calculator"
     When I click a city name in any table
-    Then I am taken to that city's single-city Cost-of-living detail at "?tab=cost&city=<id>"
+    Then I am taken to that city's single-city Cost-of-living detail at "?city=<id>"
     And the City filter is pre-selected to that city
     And the detail shows the full per-category breakdown, essentials subtotal, total, healthcare scheme badge, and split relocation in both local currency and USD
 
   Scenario: Clicking a country opens Cost-of-living filtered to that country
     Given I am on "/en/tools/cost-of-living-calculator"
     When I click a country name in any table
-    Then I am taken to the Cost-of-living tab filtered to that country at "?tab=cost&country=<id>"
+    Then I am taken to the Cost-of-living tab filtered to that country at "?country=<id>"
     And the Country filter is pre-selected to that country with its Region set
     And the table shows that country's cities as a filtered list rather than a single-city detail
 
@@ -166,7 +166,7 @@ Feature: Salary savings calculator
     And roles whose best city cannot reach 8000 USD essential savings are shown below the divider and de-emphasised
 
   Scenario: Roles are labelled as software-engineering roles
-    Given I am on the "Minimum role" tab
+    Given I am on the "Minimum role" tab with a baseline set
     When the page finishes loading
     Then a caption states the ladder is software-engineering roles covering IC and management tracks
 
@@ -240,12 +240,12 @@ Feature: Salary savings calculator
     Then the role candidates' savings and the marked minimum role update accordingly
 
   Scenario: Low-confidence cells are flagged on the minimum-role tab
-    Given I am on the "Minimum role" tab
+    Given I am on the "Minimum role" tab with a baseline set
     When the table renders
     Then cells with lower data confidence display a visual flag indicator
 
   Scenario: No Israeli city appears among role candidates
-    Given I am on the "Minimum role" tab
+    Given I am on the "Minimum role" tab with a baseline set
     When the page finishes loading
     Then no Israeli city appears as a candidate city for any role
 
@@ -523,9 +523,12 @@ Feature: Salary savings calculator
     Then the single-city detail for Singapore is shown
     And the URL is rewritten to canonical form with "city=singapore" and "region" backfilled to "asean"
 
-  # URL-006 — City-detail back link preserves parent geo scope
+  # URL-006 — City-detail back link preserves an explicitly chosen parent geo scope.
+  # When the user explicitly selected region+country before opening a city, the back
+  # link returns to that scope. (A city-ONLY deep link, where scope was auto-derived,
+  # instead returns to the bare calculator — see the UWT-015 scenario below.)
   Scenario: The city-detail back link preserves the parent geo scope
-    Given I am on the single-city detail with query string "city=singapore"
+    Given I am on the single-city detail with query string "region=asean&country=sg&city=singapore"
     When I activate the "Back to all cities" link
     Then the URL query string includes "region=asean" and "country=sg"
     But the URL query string does not include "city"
@@ -609,12 +612,26 @@ Feature: Salary savings calculator
     When the calculator page renders
     Then the document does not scroll horizontally
 
+  # EWT-R01 (regression of UWT-008) — the longer Indonesian tab labels must not
+  # widen the document beyond 320px either.
+  Scenario: The calculator page has no horizontal overflow at 320px in the id locale
+    Given I am on the id-locale calculator at a 320px-wide viewport
+    When the calculator page renders
+    Then the document does not scroll horizontally
+
   # AC-8 (UWT-004) — Savings gross-salary field surfaces the active currency, not a hardcoded label
   Scenario: The Savings gross-salary field shows the active currency as a separate indicator
     Given I am on the "Savings" tab
     When the gross-salary field renders
     Then the gross-salary label does not contain the literal currency code "USD"
     And an active-currency indicator next to the field shows "USD"
+
+  # UWT-019 — the fixed USD indicator is accompanied by a short explanation of why USD
+  # is used for every city, so it is not mistaken for a missing currency selector.
+  Scenario: The Savings currency indicator explains why USD is used for every city
+    Given I am on the "Savings" tab
+    When the gross-salary field renders
+    Then an explanation states salaries are compared in USD across all cities
 
   # AC-9 (UWT-006) — Minimum-role tab shows empty-state guidance for a BLANK savings target only
   Scenario: A blank savings target shows empty-state guidance instead of the role ladder

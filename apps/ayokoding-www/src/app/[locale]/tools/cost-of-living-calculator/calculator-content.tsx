@@ -81,6 +81,11 @@ export function CostOfLivingCalculatorContent() {
   function handleTableClick(e: React.MouseEvent) {
     const a = (e.target as HTMLElement).closest("a");
     if (!a) return;
+    // The city-detail "Back to all cities" link must navigate to its bare parent-scope
+    // href as written. Without this guard, the delegation below would re-interpret a
+    // back href like "?region=…&country=…" as a country click and re-derive (and thus
+    // re-inject) the city via applyCountryChange — defeating the parent-scope back link.
+    if (a.dataset.backLink === "true") return;
     const href = a.getAttribute("href") ?? "";
     if (!href.startsWith("?")) return;
     const params = new URLSearchParams(href.slice(1));
@@ -161,7 +166,15 @@ export function CostOfLivingCalculatorContent() {
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         {/* Colored segmented tab control — active tab uses ayokoding brand primary (blue) */}
-        <TabsList aria-label={t(locale, "ariaTabsNav")} className="overflow-x-auto">
+        {/* EWT-R01: the tablist must never push document width past the viewport in any
+            locale. The web-ui TabsList defaults to `inline-flex w-fit`, so longer locale
+            labels (e.g. id: "Biaya hidup"/"Tabungan"/"Jabatan minimum") overflow at 320px.
+            Force a full-width, viewport-bounded box so `overflow-x-auto` scrolls the tabs
+            INTERNALLY instead of widening the page. */}
+        <TabsList
+          aria-label={t(locale, "ariaTabsNav")}
+          className="flex w-full max-w-full justify-start overflow-x-auto"
+        >
           <TabsTrigger
             value="cost"
             aria-describedby="tab-desc-cost"

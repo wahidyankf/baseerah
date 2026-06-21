@@ -207,6 +207,22 @@ describe("SavingsTable", () => {
     expect(indicator.textContent).toMatch(/USD/);
   });
 
+  // UWT-019: the fixed USD indicator carries a short explanation of why USD is used for
+  // every city, so it is not mistaken for a missing currency selector.
+  it("UWT-019: renders an explanation that salaries are compared in USD across all cities", () => {
+    render(<SavingsTable {...defaultProps} />);
+    const explanation = screen.getByTestId("salary-currency-explanation");
+    expect(explanation.textContent).toMatch(/USD/);
+    expect(explanation.textContent?.toLowerCase()).toContain("all cities");
+  });
+
+  it("UWT-019: renders the id-locale currency explanation", () => {
+    render(<SavingsTable {...defaultProps} locale="id" />);
+    const explanation = screen.getByTestId("salary-currency-explanation");
+    expect(explanation.textContent).toMatch(/USD/);
+    expect(explanation.textContent?.toLowerCase()).toContain("semua kota");
+  });
+
   // Gherkin (binds): "id-locale tables use Indonesian city and country names"
   describe("id locale name rendering", () => {
     it("renders 'Singapura' in the Country column when locale=id", async () => {

@@ -208,8 +208,11 @@ When("I click a city name in any table", async ({ page }) => {
 Then(
   "I am taken to that city's single-city Cost-of-living detail at {string}",
   async ({ page }, _urlPattern: string) => {
-    await page.waitForURL(/tab=cost&city=/);
-    expect(page.url()).toMatch(/tab=cost&city=/);
+    // The Cost-of-living tab is the default, so encodeState omits `tab=cost`.
+    // The single-city detail is identified by the `city=` param on the (default) cost tab.
+    await page.waitForURL(/[?&]city=/);
+    expect(page.url()).toMatch(/[?&]city=/);
+    expect(page.url()).not.toMatch(/tab=(savings|min-role)/);
   },
 );
 
@@ -237,8 +240,11 @@ When("I click a country name in any table", async ({ page }) => {
 Then(
   "I am taken to the Cost-of-living tab filtered to that country at {string}",
   async ({ page }, _urlPattern: string) => {
-    await page.waitForURL(/tab=cost&country=/);
-    expect(page.url()).toMatch(/tab=cost&country=/);
+    // The Cost-of-living tab is the default, so encodeState omits `tab=cost`.
+    // The country filter is identified by the `country=` param on the (default) cost tab.
+    await page.waitForURL(/[?&]country=/);
+    expect(page.url()).toMatch(/[?&]country=/);
+    expect(page.url()).not.toMatch(/tab=(savings|min-role)/);
   },
 );
 
@@ -271,16 +277,21 @@ Then(
 When("I select any city on any tab", async ({ page }) => {
   await page.locator("table tbody tr td:nth-child(2) a").first().click();
   await page.waitForLoadState("networkidle");
+  // Wait for the single-city detail to render so the per-row table badges are gone
+  // and only the detail-view healthcare badge remains (avoids strict-mode violations
+  // when the click navigation has not finished re-rendering yet).
+  await page.locator("[data-testid='city-detail']").waitFor({ state: "visible", timeout: 8000 });
 });
 
 Then("a healthcare funding-scheme badge is shown for that city's country", async ({ page }) => {
-  // After clicking a city link, CityDetail is rendered with data-testid="healthcare-badge"
-  const badge = page.locator("[data-testid='healthcare-badge']");
+  // After clicking a city link, CityDetail is rendered with data-testid="healthcare-badge".
+  // Scope to the detail view so we don't collide with the per-row badges in the table.
+  const badge = page.locator("[data-testid='city-detail'] [data-testid='healthcare-badge']");
   await expect(badge).toBeVisible();
 });
 
 Then("the badge reads {string}, {string}, or {string}", async ({ page }, _v1: string, _v2: string, _v3: string) => {
-  const badge = page.locator("[data-testid='healthcare-badge']");
+  const badge = page.locator("[data-testid='city-detail'] [data-testid='healthcare-badge']");
   await expect(badge).toBeVisible();
   const text = (await badge.textContent())?.toLowerCase() ?? "";
   expect(text.includes("tax-funded") || text.includes("mandatory payroll") || text.includes("out-of-pocket")).toBe(
@@ -342,7 +353,7 @@ When("I switch to the {string} tab", async ({ page }, tabName: string) => {
 // ── Savings tab — gross salary input ─────────────────────────────────────────
 
 When("I enter a gross monthly salary of {string} USD", async ({ page }, amount: string) => {
-  await page.getByLabel("Gross monthly salary (before tax) USD").fill(amount);
+  await page.getByLabel("Gross monthly salary (before tax)").fill(amount);
   await page.keyboard.press("Tab");
 });
 
@@ -429,7 +440,7 @@ Then(
 // ── Sub-national tax ─────────────────────────────────────────────────────────
 
 When("I compare a US, Canadian, or Swiss city against a unitary-country city", async ({ page }) => {
-  await page.getByLabel("Gross monthly salary (before tax) USD").fill("10000");
+  await page.getByLabel("Gross monthly salary (before tax)").fill("10000");
   await page.keyboard.press("Tab");
 });
 
@@ -446,7 +457,7 @@ Then("the unitary-country city applies the federal rate alone", async ({ page })
 // ── Net lower than gross ──────────────────────────────────────────────────────
 
 When("I enter a gross monthly salary above a city's tax band threshold", async ({ page }) => {
-  const input = page.getByLabel("Gross monthly salary (before tax) USD");
+  const input = page.getByLabel("Gross monthly salary (before tax)");
   // Triple-click selects all; keyboard.type fires real key events that React onChange picks up on webkit
   await input.click({ clickCount: 3 });
   await page.keyboard.type("10000");
@@ -473,7 +484,7 @@ Then("the net take-home shown for that city is lower than the entered gross", as
 // ── Deficit when essentials exceed net ───────────────────────────────────────
 
 When("I enter a gross salary whose net is lower than that city's modeled essentials", async ({ page }) => {
-  await page.getByLabel("Gross monthly salary (before tax) USD").fill("500");
+  await page.getByLabel("Gross monthly salary (before tax)").fill("500");
   await page.keyboard.press("Tab");
 });
 
@@ -961,7 +972,7 @@ Then("no Israeli city appears as a candidate city for any role", async ({ page }
 // ── SG-001: Zero/empty salary deficit with suppressed percentage ───────────────
 
 When("the gross monthly salary field is empty or zero", async ({ page }) => {
-  const input = page.getByLabel("Gross monthly salary (before tax) USD");
+  const input = page.getByLabel("Gross monthly salary (before tax)");
   await input.click({ clickCount: 3 });
   await page.keyboard.type("0");
   await page.keyboard.press("Tab");
@@ -1151,7 +1162,7 @@ Then("the browser tab title includes the name of the tool", async ({ page }) => 
 // ── SG-001 / SG-002 / SG-003: Salary edge cases ──────────────────────────────
 
 When("I enter a gross monthly salary of {string}", async ({ page }, amount: string) => {
-  const input = page.getByLabel("Gross monthly salary (before tax) USD");
+  const input = page.getByLabel("Gross monthly salary (before tax)");
   await input.click({ clickCount: 3 });
   await page.keyboard.type(amount);
   await page.keyboard.press("Tab");
@@ -1294,7 +1305,7 @@ Given("a user is on the Savings tab with the empty-state message displayed", asy
 });
 
 When("they enter a positive gross monthly salary value", async ({ page }) => {
-  const input = page.getByLabel("Gross monthly salary (before tax) USD");
+  const input = page.getByLabel("Gross monthly salary (before tax)");
   await input.click({ clickCount: 3 });
   await page.keyboard.type("5000");
   await page.keyboard.press("Tab");
@@ -1873,6 +1884,12 @@ Given("I am on the calculator at a 320px-wide viewport", async ({ page }) => {
   await page.waitForLoadState("networkidle");
 });
 
+Given("I am on the id-locale calculator at a 320px-wide viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 812 });
+  await page.goto("/id/tools/cost-of-living-calculator");
+  await page.waitForLoadState("networkidle");
+});
+
 When("the calculator page renders", async ({ page }) => {
   await expect(page.getByTestId("calc-page")).toBeVisible();
 });
@@ -1980,6 +1997,13 @@ Then("an active-currency indicator next to the field shows {string}", async ({ p
   await expect(indicator).toBeVisible();
   const text = await indicator.textContent();
   expect(text?.trim()).toContain(currencyCode);
+});
+
+Then("an explanation states salaries are compared in USD across all cities", async ({ page }) => {
+  const explanation = page.locator("[data-testid='salary-currency-explanation']");
+  await expect(explanation).toBeVisible();
+  const text = (await explanation.textContent())?.toUpperCase() ?? "";
+  expect(text).toContain("USD");
 });
 
 // ── AC-9: Minimum-role blank savings target → empty-state guidance ────────────

@@ -635,13 +635,250 @@ next.region !== region`; region/city/clear handlers reset it to false. Wrapped t
 
 ### Rule-15 Three-Tester Retest (before archival)
 
-- [ ] [AI] Run the `web-ux-test-fixing-planning` workflow (`web-exploratory-tester` +
+- [x] [AI] Run the `web-ux-test-fixing-planning` workflow (`web-exploratory-tester` +
       `web-usability-tester` + `web-design-tester`) against the running calculator URL across both
       locales — acceptance: EWT/UWT/DWT findings + spec-gaps recorded
-- [ ] [AI] Append each new finding here as an unchecked, source-attributed checkbox
+- [x] [AI] Append each new finding here as an unchecked, source-attributed checkbox
       (`- [ ] EWT-NNN:` / `- [ ] UWT-NNN:` / `- [ ] DWT-NNN: <defect> — fix before archival`); add
       each SG-### spec-gap to the Phase 7 spec steps
-- [ ] [AI] Fix every rule-15 finding (or explicitly defer with rationale) before archival
+- [x] [AI] Fix every rule-15 finding (or explicitly defer with rationale) before archival
+      (EWT-R01 fixed; UWT-019 fixed; all DWT/UWT/EWT verified-clean findings above; the e2e
+      navigation suite investigated — genuine back-link bug fixed + stale tests resynced; the
+      remaining failures are pre-existing/flaky and documented in the e2e navigation investigation
+      section below)
+
+#### Rule-15 DWT Retest results (2026-06-21)
+
+DWT retest (`web-design-tester`) run against `http://localhost:3101` — both locales (`en`, `id`),
+breakpoints 375 / 768 / 1280 px. Ground truth: design tokens/theme at runtime + `libs/web-ui`
+primitives.
+
+**DWT-B-003 — breadcrumb separators are ChevronRight icons, not literal "/"**
+VERIFIED CLEAN. Computed: 0 literal `"/"` separator `<li>` elements, 2 ChevronRight SVGs in
+`<nav><ol>` at all locales × breakpoints. Evidence:
+`./evidence/phase-8-dwt-retest-en-375px.png`,
+`./evidence/phase-8-dwt-retest-id-375px.png`.
+
+**DWT-B-004 — calculator breadcrumb reuses the shared navigation Breadcrumb primitive**
+VERIFIED CLEAN. Computed: `<nav><ol>` structure present (shared `Breadcrumb` renders `<ol>`);
+`[aria-current="page"]` element present with locale-correct text ("Cost of Living Calculator" /
+"Kalkulator Biaya Hidup") at all locales × breakpoints. Evidence: same screenshots above.
+
+**DWT-005 / UWT-016 — geo-filter selects ≥ 44 px tall with border-input styling**
+VERIFIED CLEAN. Computed: `#geo-region-select`, `#geo-country-select`, `#geo-city-select` all
+render at exactly **44.0 px** (bounding box) with `min-h-[44px]` at 375 px and 1280 px, both
+locales. Border color resolves to `lab(86.1348 0.424385 5.35419)` — the browser's conversion of
+the theme token `--color-input → var(--warm-200) = oklch(88% 0.014 85)` (ayokoding.css). The
+`border border-input` Tailwind classes are confirmed on all three `<select>` elements in
+`geo-filters.tsx`. Evidence: `./evidence/phase-8-dwt-retest-en-1280px.png`,
+`./evidence/phase-8-dwt-retest-id-1280px.png`.
+
+**Broader design sweep (all 4 locale × breakpoint combos)**
+Zero new design defects found. Specifically:
+
+- `html[lang]` matches locale at every breakpoint (en/id correct).
+- Exactly 1 H1 per page (locale-correct title).
+- No horizontal scroll at 375 px (scrollWidth = 375).
+- No inline color overrides on any design-relevant element (only the Next.js
+  `__next-route-announcer__` `div` carries `border-color: currentcolor`, which is the expected
+  framework artifact, not a design override).
+- 3 tab panels present with `role="tab"` at every breakpoint.
+- Primary action button present at every breakpoint.
+
+**Non-design observation (not a DWT finding):** the dev server's CSP policy
+(`script-src 'self' 'unsafe-inline' 'unsafe-eval'` in `next.config.ts`) blocks the Google Tag
+Manager analytics script from loading. This produces 2 console errors per page load in the dev
+environment. This is a preexisting infra/analytics configuration issue, not a design defect, and
+is outside DWT scope.
+
+**Conclusion: DWT Rule-15 verification passed — zero new design findings. All three targeted
+findings (DWT-B-003, DWT-B-004, DWT-005) are verified clean at both locales and all tested
+breakpoints.**
+
+#### Rule-15 UWT Retest results (2026-06-21)
+
+UWT retest (`web-usability-tester`) run against `http://localhost:3101` — both locales (`en`,
+`id`), breakpoints 375 / 1280 px. Spec-blind; judged against Nielsen's 10 heuristics, cognitive
+walkthrough, UX laws, and internal consistency.
+
+**UWT-003 — all three tab sub-descriptions now visible (not sr-only)**
+VERIFIED CLEAN. All three `#tab-desc-cost`, `#tab-desc-savings`, `#tab-desc-min-role` elements
+render at `visible: true, srOnly: false` at both locales × both breakpoints. English texts:
+"Compare monthly living costs across cities", "See how much you'd save", "Find the min role you
+need". Indonesian texts present and locale-correct. Evidence:
+`./evidence/phase-8-retest-en-375px.png`, `./evidence/phase-8-retest-id-375px.png`.
+
+**UWT-004 — Savings gross-salary label no longer hardcodes "USD"; active-currency indicator
+present**
+VERIFIED CLEAN. `label[for="gross-salary-input"]` reads "Gross monthly salary (before tax)" /
+"Gaji kotor bulanan (sebelum pajak)" — no currency code in the label. A separate
+`[data-testid="salary-currency-indicator"]` `<span>` reads "Currency: USD" / "Mata uang: USD".
+Both locales, both breakpoints. Evidence: `./evidence/phase-8-retest-en-1280px.png`.
+
+**UWT-006 — min-role tab shows guidance empty-state when savings target is blank**
+VERIFIED CLEAN. On fresh page load (blank savings target) → min-role tab active: no table,
+`[data-testid="savings-empty-state"]` reads "Enter a monthly savings target to see which roles
+reach it in each city." (en) / "Masukkan target tabungan bulanan untuk melihat jabatan mana yang
+mencapainya di setiap kota." (id). Both locales, both breakpoints. Evidence:
+`./evidence/phase-8-retest-en-375px.png`, `./evidence/phase-8-retest-id-375px.png`.
+
+**UWT-013 — breadcrumb final crumb shows full page title**
+VERIFIED CLEAN. Breadcrumb path: "Home > Tools > Cost of Living Calculator" (en) / "Beranda >
+Alat > Kalkulator Biaya Hidup" (id). Final crumb is full title in both locales, both breakpoints.
+Evidence: `./evidence/phase-8-retest-en-375px.png`, `./evidence/phase-8-retest-id-1280px.png`.
+
+**UWT-009 — tools index calculator entry has description distinct from link**
+VERIFIED CLEAN. en: link = "Cost of Living Calculator", card text includes "Compare monthly living
+costs, savings, and the minimum role needed across cities." id: link = "Kalkulator Biaya Hidup",
+card text includes "Bandingkan biaya hidup bulanan, tabungan, dan jabatan minimum yang dibutuhkan
+di berbagai kota." Distinct description present, both locales.
+
+**UWT-011/012 — cost tab description associated; OOP wrapped in abbr**
+VERIFIED CLEAN. Cost tab trigger carries `aria-describedby="tab-desc-cost"`. All `OOP`
+occurrences rendered as `<abbr title="out-of-pocket">OOP</abbr>` — 33 instances verified en,
+33 instances id. Both locales, both breakpoints. Evidence:
+`./evidence/phase-8-retest-en-1280px.png`.
+
+**UWT-016 — geo selects ≥ 44 px at both breakpoints**
+VERIFIED CLEAN. All six selects (`#geo-region-select`, `#geo-country-select`, `#geo-city-select`,
+`#controls-adults`, `#controls-preschool`, `#controls-schoolkids`) render at exactly **44 px**
+height at 375 px and 1280 px, both locales. Evidence:
+`./evidence/phase-8-retest-en-375px.png`, `./evidence/phase-8-retest-id-1280px.png`.
+
+**New finding — UWT-019 (Severity 2 / Priority Low):**
+On the Savings tab, the salary-currency indicator always shows "Currency: USD" / "Mata uang: USD"
+regardless of the selected city's local currency. When a user selects a GBP-denominated city
+(e.g., London, UK), the cost breakdown correctly shows GBP amounts, but the salary input still
+reads "Currency: USD" with no explanation. A first-time user (e.g., a UK professional) would
+reasonably expect to enter their salary in GBP and cannot tell from the UI whether to convert
+first. The savings rows later show local-currency + USD equivalents, which partially self-explains
+the convention, but nothing tells the user up front why USD is always used. Violated: **Heuristic
+2** (match between system and real world — the UI does not speak the selected city's currency
+language at the input stage) and **Heuristic 6** (recognition over recall — the user must infer
+the USD-always convention rather than having it explained). No tooltip, `title` attribute, or
+helper text is present on `[data-testid="salary-currency-indicator"]`. Evidence:
+`./evidence/phase-8-retest-london-savings-en-1280px.png`.
+
+- [x] UWT-019: Salary input always shows "Currency: USD" even when a non-USD city is selected
+      (e.g. London/GBP) — no tooltip or helper text explains why USD is used as the universal
+      comparator. Add a brief inline explanation (e.g. "Salaries compared in USD across all cities")
+      or a tooltip on the currency indicator — fix before archival.
+      **FIXED (2026-06-21):** Added `salaryCurrencyExplanation` translation key (en: "Salaries are
+      compared in USD across all cities."; id: "Gaji dibandingkan dalam USD di semua kota.") rendered
+      as a `[data-testid="salary-currency-explanation"]` helper `<p>` directly under the currency
+      indicator in `savings.tsx`. New Gherkin scenario "The Savings currency indicator explains why
+      USD is used for every city" + unit/e2e step bindings + two unit assertions (en + id) in
+      `savings.test.tsx`. test:unit + specs:coverage green; e2e scenario passes (chromium).
+
+#### Rule-15 EWT Retest results (2026-06-21)
+
+EWT retest (`web-exploratory-tester`) run against `http://localhost:3101` — both locales (`en`,
+`id`), breakpoints 320 / 375 / 1280 px. Playwright-driven; all four targeted fixes verified on the
+live dev server.
+
+**EWT-001 — min-role blank-target shows empty-state; explicit-zero shows divider**
+VERIFIED CLEAN. En + id locales both confirmed:
+
+- On fresh mount (blank target input): `data-testid="min-role-empty-state"` visible=true,
+  `data-testid="qualifying-divider"` absent. Matches the UWT-006 / Phase-5 fix.
+- After typing "0" in `#target-amount-input` (baseline engaged): `data-testid="qualifying-divider"`
+  visible=true, empty-state hidden. Matches the Phase-1 / EWT-001 fix.
+
+Evidence: `./evidence/phase-8-ewt-minrole-blank-en-1280px.png`,
+`./evidence/phase-8-ewt-minrole-zero-en-1280px.png`.
+
+**City-only deep link (`?city=london`) — back link is bare `?tab=cost`**
+VERIFIED CLEAN. Navigated to `/en/tools/cost-of-living-calculator?city=london`; after mount
+canonicalization, the city-detail back link href is `?tab=cost` — no injected `region=` or
+`country=` parameters. Matches the UWT-015 / Phase-6 fix.
+
+**Region auto-advisory on country change**
+VERIFIED CLEAN. En locale: selecting country `gb` with no prior region renders
+`data-testid="region-auto-advisory"` visible with text "Region updated automatically to match the
+selected country." Id locale: same interaction renders the Indonesian text "Wilayah diperbarui
+otomatis agar sesuai dengan negara yang dipilih." Matches the Phase-6 advisory fix.
+
+**No horizontal scroll at 320px**
+PARTIAL: En locale passes (scrollWidth=320). Id locale FAILS — scrollWidth=334 at 320px.
+New regression found; see EWT-R01 below.
+
+Evidence: `./evidence/phase-8-ewt-en-1280px.png`,
+`./evidence/phase-8-ewt-id-320px-new-overflow-regression.png`.
+
+**Conclusion: 3 of 4 targeted EWT fixes verified clean on the live dev server across both locales.
+One new regression found (EWT-R01): id locale tab list overflows at 320px due to longer translated
+tab labels. Zero other new correctness or edge-case regressions found.**
+
+- [x] EWT-R01: Id locale 320px horizontal overflow — the three Indonesian tab labels ("Biaya hidup" + "Tabungan" + "Jabatan minimum") cause the `[role="tablist"]` container (class `w-fit
+inline-flex`) to render at 334px right edge at a 320px viewport. English fits at 287px. The
+      Phase-3 overflow fix targeted the header `gap` and geo-filter wrappers but did not ensure the
+      tab list container respects the viewport at 320px when locale-variable text makes labels wider.
+      Offender confirmed via Playwright boundingBox: `Jabatan minimum` tab button box right=331,
+      width=135. Evidence: `./evidence/phase-8-ewt-id-320px-new-overflow-regression.png` — fix before
+      archival.
+      **FIXED (2026-06-21):** Overrode the web-ui `TabsList` default `inline-flex w-fit` with
+      `flex w-full max-w-full justify-start overflow-x-auto` in `calculator-content.tsx`, so the
+      tablist is viewport-bounded and the triggers scroll/shrink INTERNALLY instead of widening the
+      document. New Gherkin scenario "The calculator page has no horizontal overflow at 320px in the
+      id locale" + e2e step (`/id/` at 320px asserting `document.documentElement.scrollWidth <= 320`)
+      plus a unit structural assertion (tablist carries `max-w-full` + `overflow-x-auto`). Both the
+      en and id 320px e2e scenarios pass (chromium); test:unit + specs:coverage green.
+
+#### Rule-15 e2e navigation investigation (2026-06-21) — regression verdict + pre-existing condition
+
+A re-run of `ayokoding-www-fe-e2e:test:e2e` surfaced ~55 failing scenarios across all three
+browsers. Root-cause investigation (diffing plan-touched source vs the pre-Phase-1 baseline
+`ebd64d460`, plus empirically re-running the failing specs against restored-baseline source):
+
+- **NOT a regression — the forward city/country click navigation is unchanged.** `url-state.ts`
+  (`encodeState`) and the `handleTableClick` forward path are byte-identical to baseline. Clicking a
+  city navigates to `?region=…&country=…&city=<id>` (Cost-of-living is the default tab, so
+  `encodeState` correctly omits `tab=cost`). The failing step asserted `/tab=cost&city=/`, which
+  contradicts the encoder's documented default-stripping — it failed identically at baseline
+  (`ebd64d460`), so it is a **pre-existing wrong test assertion**, not a plan regression. Fixed the
+  two step assertions (`steps.ts`) and the two scenario URL strings to `?city=<id>` / `?country=<id>`.
+- **Plan-induced stale-test fallout (intended behavior, stale tests) — FIXED:**
+  - 7 salary-input steps referenced the old aria-label `"Gross monthly salary (before tax) USD"`;
+    UWT-004 (Phase 5) intentionally removed `USD` from the label. Updated all 7 to
+    `"Gross monthly salary (before tax)"` (~28 failures across browsers cleared).
+  - 3 min-role scenarios ("Roles are labelled…", "Low-confidence cells…", "No Israeli city among
+    role candidates") used the bare `Given I am on the "Minimum role" tab`; UWT-006 (Phase 5)
+    intentionally hides the ladder behind a blank-target empty-state. Switched them to
+    `…tab with a baseline set` (feature + unit + e2e step bindings) so the ladder renders.
+  - The old "back link preserves the parent geo scope" scenario used a city-only deep link
+    (`city=singapore`), which UWT-015 (Phase 6) deliberately routes to a bare `?tab=cost` back link —
+    directly contradicting the old assertion. Re-pointed it at an explicit-scope deep link
+    (`region=asean&country=sg&city=singapore`) so it tests genuine scope preservation; the city-only
+    case stays covered by the existing UWT-015 scenario.
+- **Genuine bug found and FIXED (back-link delegation hijack):** the city-detail "Back to all
+  cities" `<a>` lives inside the `<div onClick={handleTableClick}>`, so a back href carrying
+  `country=…` was re-interpreted as a country click and `applyCountryChange` re-injected the
+  belonging city — defeating parent-scope navigation. Marked the back link with `data-back-link` and
+  made `handleTableClick` skip it. Both behaviors now hold: explicit-scope back link drops the city,
+  city-only back link goes bare.
+- **Test-timing brittleness — FIXED:** the "healthcare badge" step asserted the badge before the
+  city-detail re-render finished, hitting a 31-element strict-mode violation on Firefox. Now waits
+  for `[data-testid="city-detail"]` and scopes the badge to the detail view.
+
+**Remaining e2e failures after fixes (documented, out of this plan's scope):**
+
+- **"Geographic filter scopes the candidate cities" (× 3 browsers) — PRE-EXISTING.** Fails
+  identically at the pre-Phase-1 baseline `ebd64d460` (verified by restoring baseline shell source
+  and re-running). The step asserts every best-city cell literally contains "Indonesia" after
+  selecting country=Indonesia; this is an unrelated pre-existing assertion/data condition, not
+  touched by this plan.
+- **Single-browser timing flakes (pass on other engines and on rerun):** "Region narrows the
+  country filter" (firefox), "Selecting filters updates the URL" (firefox), "Canonicalization does
+  not add a browser history entry" (firefox), "Gross salary entered monthly shows the derived annual
+  figure" (webkit). These pass on chromium/firefox and pass on rerun; CI runs with `retries: 2`.
+- **"Geo-filter selects meet the minimum touch-target height on mobile" (webkit) — PRE-EXISTING
+  webkit native-`<select>` limitation.** WebKit reports the geo-select computed `min-height` as
+  `18px` (UA default) and renders it at `22px`, ignoring the author `min-h-[44px]` + `padding`
+  because native selects use `appearance: auto`. The Phase-3/UWT-016 `min-h-[44px]` never took
+  effect on Safari's native selects. Passes on chromium/firefox (both 44px). A proper fix requires a
+  design decision (custom `appearance: none` select styling with a bespoke chevron, validated
+  against the mockups), so it is deferred as a pre-existing webkit accessibility gap outside this
+  plan's three-task scope.
 
 ### Local Quality Gates (Before Push)
 

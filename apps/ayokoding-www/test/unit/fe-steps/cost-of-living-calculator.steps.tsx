@@ -224,8 +224,9 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.click(cityLink!);
     });
 
-    Then('I am taken to that city\'s single-city Cost-of-living detail at "?tab=cost&city=<id>"', () => {
-      // City detail is shown — CityDetail renders a heading with the city name
+    Then('I am taken to that city\'s single-city Cost-of-living detail at "?city=<id>"', () => {
+      // City detail is shown — CityDetail renders a heading with the city name.
+      // (Cost-of-living is the default tab, so encodeState omits tab=cost from the URL.)
       expect(screen.getByTestId("city-detail")).toBeTruthy();
     });
 
@@ -259,8 +260,9 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.click(countryLink!);
     });
 
-    Then('I am taken to the Cost-of-living tab filtered to that country at "?tab=cost&country=<id>"', () => {
-      // The table now shows only cities from that country
+    Then('I am taken to the Cost-of-living tab filtered to that country at "?country=<id>"', () => {
+      // The table now shows only cities from that country.
+      // (Cost-of-living is the default tab, so encodeState omits tab=cost from the URL.)
       const rows = screen.getAllByRole("row").slice(1);
       expect(rows.length).toBe(firstCountryCities.length);
     });
@@ -804,7 +806,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
   Scenario("Roles are labelled as software-engineering roles", async ({ Given, When, Then }) => {
     const user = userEvent.setup();
 
-    Given('I am on the "Minimum role" tab', async () => {
+    Given('I am on the "Minimum role" tab with a baseline set', async () => {
       renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       // Enter a target so the ladder renders past the UWT-006 blank empty-state.
@@ -1138,7 +1140,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
   Scenario("Low-confidence cells are flagged on the minimum-role tab", async ({ Given, When, Then }) => {
     const user = userEvent.setup();
 
-    Given('I am on the "Minimum role" tab', async () => {
+    Given('I am on the "Minimum role" tab with a baseline set', async () => {
       renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
       // Enter a target so the ladder renders past the UWT-006 blank empty-state.
@@ -1159,8 +1161,15 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
   });
 
   Scenario("No Israeli city appears among role candidates", async ({ Given, When, Then }) => {
-    Given('I am on the "Minimum role" tab', () => {
+    const user = userEvent.setup();
+
+    Given('I am on the "Minimum role" tab with a baseline set', async () => {
       renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      // Enter a target so the ladder renders past the UWT-006 blank empty-state.
+      const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+      await user.clear(input);
+      await user.type(input, "1000");
     });
 
     When("the page finishes loading", () => {
@@ -2145,26 +2154,31 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     },
   );
 
-  // URL-006 — City-detail back link preserves parent geo scope
+  // URL-006 — City-detail back link preserves an explicitly chosen parent geo scope
   Scenario("The city-detail back link preserves the parent geo scope", ({ Given, When, Then, But }) => {
-    Given('I am on the single-city detail with query string "city=singapore"', () => {
-      navState.params = new URLSearchParams("city=singapore");
+    let backHref = "";
+
+    Given('I am on the single-city detail with query string "region=asean&country=sg&city=singapore"', () => {
+      navState.params = new URLSearchParams("region=asean&country=sg&city=singapore");
       navState.setParams(navState.params);
       renderPage(<CostOfLivingCalculatorPage />);
     });
 
     When('I activate the "Back to all cities" link', () => {
-      // Link click navigates; stub at unit level
-      expect(true).toBe(true);
+      const link = screen.getByRole("link", { name: /back to all cities/i });
+      backHref = link.getAttribute("href") ?? "";
     });
 
     Then('the URL query string includes "region=asean" and "country=sg"', () => {
-      // parentScopeParams encodes region+country without city; unit tests in url-state verify
-      expect(true).toBe(true);
+      // Explicit scope was chosen, so the back link encodes the parent region+country.
+      const params = new URLSearchParams(backHref.replace(/^\?/, ""));
+      expect(params.get("region")).toBe("asean");
+      expect(params.get("country")).toBe("sg");
     });
 
     But('the URL query string does not include "city"', () => {
-      expect(true).toBe(true);
+      const params = new URLSearchParams(backHref.replace(/^\?/, ""));
+      expect(params.has("city")).toBe(false);
     });
   });
 
@@ -2455,6 +2469,29 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
   });
 
+  // EWT-R01 (regression of UWT-008) — id-locale tab labels must not widen the page at 320px
+  Scenario("The calculator page has no horizontal overflow at 320px in the id locale", ({ Given, When, Then }) => {
+    Given("I am on the id-locale calculator at a 320px-wide viewport", () => {
+      // Horizontal scrollWidth is a layout measurement, verified at e2e level
+      // (scrollWidth <= 320). The unit tier asserts the locale-independent structural
+      // contract: the tablist is width-bounded (max-w-full + overflow-x-auto) so longer
+      // id labels scroll INTERNALLY instead of forcing document overflow.
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the calculator page renders", () => {
+      expect(screen.getByTestId("calc-page")).toBeTruthy();
+    });
+
+    Then("the document does not scroll horizontally", () => {
+      const tablist = screen.getByRole("tablist");
+      expect(tablist.className).toContain("max-w-full");
+      expect(tablist.className).toContain("overflow-x-auto");
+    });
+  });
+
   // AC-8 (UWT-004) — Savings gross-salary field surfaces the active currency separately
   Scenario(
     "The Savings gross-salary field shows the active currency as a separate indicator",
@@ -2480,6 +2517,25 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
     },
   );
+
+  // UWT-019 — the fixed USD indicator carries a short explanation of why USD is used
+  Scenario("The Savings currency indicator explains why USD is used for every city", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given('I am on the "Savings" tab', async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /savings/i }));
+    });
+
+    When("the gross-salary field renders", () => {
+      expect(document.querySelector("#gross-salary-input")).toBeTruthy();
+    });
+
+    Then("an explanation states salaries are compared in USD across all cities", () => {
+      const explanation = screen.getByTestId("salary-currency-explanation");
+      expect(explanation.textContent).toMatch(/USD/);
+    });
+  });
 
   // AC-9 (UWT-006) — Minimum-role empty-state for a BLANK target only (numeric zero → ladder)
   Scenario(

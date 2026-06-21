@@ -118,6 +118,11 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
             {t(locale, "salaryCurrencyIndicator")}
           </span>
         </div>
+        {/* UWT-019: explain WHY USD is used for every city so the fixed indicator is not
+            mistaken for a missing currency selector. */}
+        <p data-testid="salary-currency-explanation" className="mt-1 text-xs text-muted-foreground">
+          {t(locale, "salaryCurrencyExplanation")}
+        </p>
         <span>
           {t(locale, "annualGrossLabel")}: <span data-testid="annual-gross">{fmtNum(annualGross)} USD</span>
         </span>
