@@ -12,6 +12,9 @@ export default async function ToolsIndexPage({ params }: { params: Promise<{ loc
           <Link href="./tools/cost-of-living-calculator" className="text-primary underline">
             {t(locale, "toolsPageCalcLink")}
           </Link>
+          <p data-testid="tool-desc-calculator" className="text-sm text-muted-foreground">
+            {t(locale, "toolsPageCalcDesc")}
+          </p>
         </li>
       </ul>
     </main>

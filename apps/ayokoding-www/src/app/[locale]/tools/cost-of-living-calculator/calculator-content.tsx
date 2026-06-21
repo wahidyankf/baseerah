@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { dataset } from "@/features/cost-of-living-calculator/core/data/cities";
 import { roleMatrix } from "@/features/cost-of-living-calculator/core/data/roles";
@@ -23,6 +23,7 @@ import {
   applyCountryChange,
   applyCityChange,
   parentScopeParams,
+  PARAM_KEYS,
 } from "@/features/cost-of-living-calculator/core/url-state";
 import type { CalculatorState } from "@/features/cost-of-living-calculator/core/url-state";
 
@@ -33,6 +34,15 @@ export function CostOfLivingCalculatorContent() {
 
   // URL is the single source of truth. Derive ALL state from decoded URL params.
   const currentState = decodeState(new URLSearchParams(searchParams.toString()), dataset);
+
+  // UWT-015 (A-3): capture, at mount, whether the region/country were auto-derived
+  // solely from a city deep link (raw URL has `city` but no explicit
+  // `region`/`country`). Mount-time capture so the mount canonicalization — which
+  // injects region/country into the URL — does not flip this back to false.
+  const [regionAutoDerivedFromCity] = useState(() => {
+    const raw = new URLSearchParams(searchParams.toString());
+    return raw.has(PARAM_KEYS.city) && !raw.has(PARAM_KEYS.region) && !raw.has(PARAM_KEYS.country);
+  });
 
   const { tab: activeTab, region, countryId, cityId, household, schoolType, area } = currentState;
 
@@ -127,7 +137,15 @@ export function CostOfLivingCalculatorContent() {
 
   // Back link for city detail: encode parent geo scope (region+country, no city).
   // Falls back to ?tab=cost when no geo scope is set.
+  //
+  // UWT-015 (A-3): when the region/country were auto-derived solely from a city
+  // deep link (i.e. the raw URL has `city` but no explicit `region`/`country`),
+  // the user never chose that scope — so the back link returns to the bare
+  // calculator (`?tab=cost`) rather than injecting region=…&country=….
   const cityDetailBackHref = (() => {
+    if (regionAutoDerivedFromCity) {
+      return "?tab=cost";
+    }
     const p = parentScopeParams(currentState);
     const qs = p.toString();
     return qs ? `?${qs}` : "?tab=cost";

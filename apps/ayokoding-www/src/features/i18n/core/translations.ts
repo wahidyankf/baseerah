@@ -20,6 +20,7 @@ const translations: Record<Locale, Record<string, string>> = {
     skipToContent: "Skip to content",
     toolsPageTitle: "Tools",
     toolsPageCalcLink: "Cost of Living Calculator",
+    toolsPageCalcDesc: "Compare monthly living costs, savings, and the minimum role needed across cities.",
     breadcrumbHome: "Home",
     breadcrumbCalculator: "Calculator",
 
@@ -60,6 +61,7 @@ const translations: Record<Locale, Record<string, string>> = {
     optAllCountries: "All countries",
     optAllCities: "All cities",
     clearRegion: "Clear",
+    regionAutoAdvisory: "Region updated automatically to match the selected country.",
 
     // Calculator — controls
     labelAdults: "Adults",
@@ -180,6 +182,8 @@ const translations: Record<Locale, Record<string, string>> = {
     skipToContent: "Langsung ke konten",
     toolsPageTitle: "Alat",
     toolsPageCalcLink: "Kalkulator Biaya Hidup",
+    toolsPageCalcDesc:
+      "Bandingkan biaya hidup bulanan, tabungan, dan jabatan minimum yang dibutuhkan di berbagai kota.",
     breadcrumbHome: "Beranda",
     breadcrumbCalculator: "Kalkulator",
 
@@ -220,6 +224,7 @@ const translations: Record<Locale, Record<string, string>> = {
     optAllCountries: "Semua negara",
     optAllCities: "Semua kota",
     clearRegion: "Hapus",
+    regionAutoAdvisory: "Wilayah diperbarui otomatis agar sesuai dengan negara yang dipilih.",
 
     // Calculator — controls
     labelAdults: "Dewasa",

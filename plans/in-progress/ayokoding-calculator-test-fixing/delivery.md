@@ -450,60 +450,112 @@ focus-visible:*`) plus `min-h-[44px] w-full min-w-0 max-w-full`. Rebuilt standal
 
 ## Phase 6: Region & URL behaviour (UWT-007, UWT-014, UWT-015, UWT-009)
 
-- [ ] [AI] **RED**: add a unit test in
+- [x] [AI] **RED**: add a unit test in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.test.tsx`
       asserting the region selector lists exactly the nine intended regions
       (`africa, americas, asean, asia, europe, japan, mena, nordics, oceania`) per Assumption A-1
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: test asserts the complete set; fails only if a region is missing (likely passes,
       locking the verified set)
+      _Done 2026-06-21: A-1 verified against `core/data/cities.ts` (`grep` of `region: "…"` yields
+      exactly the nine: africa, americas, asean, asia, europe, japan, mena, nordics, oceania) — no
+      new region invented. Added "region selector lists exactly the nine intended regions" — it
+      **passed** as expected (set already complete), locking the verified set._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: extend `geo-filters.test.tsx` asserting that selecting a country whose region
+- [x] [AI] **RED**: extend `geo-filters.test.tsx` asserting that selecting a country whose region
       differs from the current selection renders a visible `data-testid="region-auto-advisory"`
       message — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (no advisory exists)
+      _Done 2026-06-21: added "shows a visible region-auto-advisory when a country change auto-changes
+      the region" (no region → pick gb/europe) + a negative guard ("does not show … when the
+      country's region matches"). The country dropdown is region-scoped, so the realistic
+      auto-advance trigger is null→region. Advisory test **failed RED** (testid absent); the lock +
+      negative-guard tests passed._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: add `regionAutoAdvisory` keys (en + id) to `translations.ts`; in
+- [x] [AI] **GREEN**: add `regionAutoAdvisory` keys (en + id) to `translations.ts`; in
       `geo-filters.tsx`, when `applyCountryChange` results in a region change, render the advisory
       below the dropdowns — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: RED advisory test passes
+      _Done: added `regionAutoAdvisory` (en "Region updated automatically to match the selected
+      country." / id "Wilayah diperbarui otomatis agar sesuai dengan negara yang dipilih."). In
+      `geo-filters.tsx`, `handleCountryChange` sets `regionAutoChanged = next.countryId !== null &&
+next.region !== region`; region/city/clear handlers reset it to false. Wrapped the filter row in a
+      `space-y-2` container and render the advisory as a `<output data-testid="region-auto-advisory">`
+      (implicit `role="status"`, polite live region — semantic match that also avoids a
+      `prefer-tag-over-role` lint warning) below the dropdowns. All 14 geo-filters tests pass._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: add a unit test in
+- [x] [AI] **RED**: add a unit test in
       `apps/ayokoding-www/src/app/[locale]/tools/cost-of-living-calculator/calculator-content.test.tsx`
       asserting that a city-only deep link (`?city=london`) produces a city-detail back link of
       `?tab=cost` (no injected `region`/`country`) per Assumption A-3
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (current `cityDetailBackHref` injects `region=europe&country=gb`)
+      _Done 2026-06-21: the live unit test for this component is
+      `src/features/cost-of-living-calculator/shell/calculator-content.test.tsx` (the app-dir path has
+      no co-located test; vitest `unit-fe` includes only `src/features/**` — same precedent as
+      Phase 4). Added a `UWT-015` describe: (a) `?city=london` → back link must be `?tab=cost` (with a
+      `waitFor` so it survives mount canonicalization, which injects region=europe&country=gb), and
+      (b) an explicit `?region=europe&country=gb&city=london` deep link **keeps** region/country.
+      Test (a) **failed RED** (back link injected region/country); test (b) passed._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: in `calculator-content.tsx` (and/or `core/url-state.ts` `parentScopeParams`)
+- [x] [AI] **GREEN**: in `calculator-content.tsx` (and/or `core/url-state.ts` `parentScopeParams`)
       omit region/country from the back link when they were auto-derived solely from a city deep
       link rather than user-selected — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: RED back-link test passes; existing url-state unit tests still pass
+      _Done: fixed in `calculator-content.tsx` (left `url-state.ts`/`encodeState` untouched so the
+      existing url-state unit tests stay green — confirmed 1g `parentScopeParams` + encode tests still
+      pass). Captured the auto-derivation as a mount-time `useState(() => raw.has(city) &&
+!raw.has(region) && !raw.has(country))` so the mount canonicalization (which adds region/country to
+      the URL) cannot flip it back; `cityDetailBackHref` returns `?tab=cost` when set. RED back-link
+      test passes; all 116 calculator-content + url-state tests green._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: add a unit test for the tools index (new
+- [x] [AI] **RED**: add a unit test for the tools index (new
       `apps/ayokoding-www/src/app/[locale]/tools/page.test.tsx`) asserting the calculator entry has
       a description element distinct from the link text — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (no description sibling)
+      _Done 2026-06-21: the planned app-dir path `src/app/.../page.test.tsx` is **not collected** by
+      vitest (`unit-fe` include is `src/features/**/*.test.{ts,tsx}`, not `src/app/**`). Per the
+      existing precedent (the tools-index page is already tested at
+      `src/features/i18n/shell/tools-page.test.tsx`), added the `UWT-009` describe there: asserts a
+      `data-testid="tool-desc-calculator"` element exists with non-empty text **distinct** from the
+      calculator link text (en) and is associated with the calculator `<li>` (id locale). Both
+      **failed RED** (no description sibling)._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: add `toolsPageCalcDesc` keys (en + id) to `translations.ts`; in
+- [x] [AI] **GREEN**: add `toolsPageCalcDesc` keys (en + id) to `translations.ts`; in
       `apps/ayokoding-www/src/app/[locale]/tools/page.tsx` render a description `<p>` under the link
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: RED tools-index test passes
+      _Done: added `toolsPageCalcDesc` (en "Compare monthly living costs, savings, and the minimum
+      role needed across cities." / id "Bandingkan biaya hidup bulanan, tabungan, dan jabatan minimum
+      yang dibutuhkan di berbagai kota."). Rendered a `<p data-testid="tool-desc-calculator">` under
+      the calculator `<Link>` in `tools/page.tsx`. All 4 tools-page tests pass._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED/GREEN**: add Gherkin AC-10 (region set), AC-11 (region advisory), AC-12 (back
+- [x] [AI] **RED/GREEN**: add Gherkin AC-10 (region set), AC-11 (region advisory), AC-12 (back
       link), and AC-13 (tools-index link description — create
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/tools-index.feature` if no
       tools-index feature exists) ; wire step defs
       — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0
+      _Done 2026-06-21: AC-10/AC-11/AC-12 added to `cost-of-living-calculator.feature` (one primary
+      Given/When/Then each — cardinality-clean) with `@amiceli/vitest-cucumber` Scenario blocks wired
+      in `cost-of-living-calculator.steps.tsx`. AC-13 lives in a **new**
+      `tools/tools-index.feature` (no tools-index feature existed) with a new
+      `test/unit/fe-steps/tools-index.steps.tsx` (renders the async `ToolsIndexPage`). RED: new
+      scenarios uncovered; GREEN: `specs:coverage` exits 0 (16 specs / 172 scenarios / 630 steps);
+      `rhino-cli:specs:gherkin-cardinality-validation` PASSED._
   - _Suggested executor: `specs-maker`_
 
 ### Phase 6 Gate
 
 > All checks below must pass before starting Phase 7.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
+-p ayokoding-www --skip-nx-cache`: exit 0. typecheck clean; lint exits 0 with the single
+      pre-existing non-blocking `controls.tsx:32` jsx-a11y warning (carried from Phase 4, unrelated —
+      my newly-introduced advisory warning was resolved by using `<output>` instead of
+      `role="status"`); test:unit 2094 passed; specs:coverage 16 specs / 172 scenarios / 630 steps all
+      covered; `rhino-cli:specs:gherkin-cardinality-validation` clean._
 
 > **Pause Safety**: region set verified, auto-change advised, back link predictable, tools-index
 > link described; gate green. Safe to stop. To resume: re-run the gate command.

@@ -262,6 +262,70 @@ describe("GeoFilters", () => {
     expect(relocationHeader).not.toMatch(/sunk/i);
   });
 
+  // ─── Phase 6 ────────────────────────────────────────────────────────────────
+
+  // UWT-007 / Assumption A-1: lock the region selector's intended set (nine regions).
+  it("region selector lists exactly the nine intended regions", () => {
+    const onScopeChange = vi.fn();
+
+    render(<GeoFilters dataset={dataset} region={null} countryId={null} cityId={null} onScopeChange={onScopeChange} />);
+
+    const regionSelect = screen.getByRole("combobox", { name: /region/i });
+    const optionValues = within(regionSelect)
+      .getAllByRole("option")
+      .map((o) => (o as HTMLOptionElement).value)
+      .filter((v) => v !== ""); // drop the "All regions" sentinel
+
+    expect([...optionValues].sort()).toEqual(
+      ["africa", "americas", "asean", "asia", "europe", "japan", "mena", "nordics", "oceania"].sort(),
+    );
+  });
+
+  // UWT-014: selecting a country whose region differs from the current selection
+  // silently changes the region — a visible advisory must appear.
+  // With no region selected, all countries are listed; picking one (gb → europe)
+  // auto-advances the region from null to europe.
+  it("shows a visible region-auto-advisory when a country change auto-changes the region", async () => {
+    const user = userEvent.setup();
+    const onScopeChange = vi.fn();
+
+    render(
+      <ControlledGeoFilters
+        onScopeChange={onScopeChange}
+        initialRegion={null}
+        initialCountryId={null}
+        initialCityId={null}
+      />,
+    );
+
+    const countrySelect = screen.getByRole("combobox", { name: /country/i });
+    await user.selectOptions(countrySelect, "gb");
+
+    const advisory = screen.getByTestId("region-auto-advisory");
+    expect(advisory).toBeTruthy();
+    expect(advisory.textContent ?? "").not.toBe("");
+  });
+
+  it("does not show the region-auto-advisory when the country's region matches the current region", async () => {
+    const user = userEvent.setup();
+    const onScopeChange = vi.fn();
+
+    // Region already ASEAN; picking id (Indonesia, also ASEAN) does not change the region.
+    render(
+      <ControlledGeoFilters
+        onScopeChange={onScopeChange}
+        initialRegion={"asean" as Region}
+        initialCountryId={null}
+        initialCityId={null}
+      />,
+    );
+
+    const countrySelect = screen.getByRole("combobox", { name: /country/i });
+    await user.selectOptions(countrySelect, "id");
+
+    expect(screen.queryByTestId("region-auto-advisory")).toBeNull();
+  });
+
   // Gherkin (binds): "Clear-region control aria-label is translated in the ID locale"
   it("clear-region button has Indonesian aria-label for locale=id", async () => {
     const user = userEvent.setup();

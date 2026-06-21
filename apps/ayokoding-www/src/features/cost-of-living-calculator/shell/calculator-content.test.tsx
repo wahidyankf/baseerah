@@ -16,7 +16,7 @@
  *    2e — Canonicalize on mount via router.replace
  */
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import React from "react";
@@ -424,6 +424,42 @@ describe("Cycle 5 — city click pre-selects City filter and updates URL", () =>
 
     // With city in URL params, city detail should be shown
     expect(screen.getByTestId("city-detail")).toBeTruthy();
+  });
+});
+
+// ─── UWT-015 / Assumption A-3: city-only deep link back link is bare ──────────
+
+describe("UWT-015 — city-only deep link back link omits auto-derived region/country", () => {
+  beforeEach(() => {
+    setupSearchParams({});
+  });
+
+  it("a ?city=london deep link yields a back link of ?tab=cost (no injected region/country)", async () => {
+    // London resolves to region=europe, country=gb — but the user never chose
+    // those, so the city-detail back link must return to the bare calculator.
+    setupSearchParams({ city: "london" });
+
+    render(<CostOfLivingCalculatorContent />);
+
+    // The mount canonicalization rewrites the URL to include the city-derived
+    // region/country; the back link must stay bare even after that settles.
+    await waitFor(() => {
+      const backLink = within(screen.getByTestId("city-detail")).getByRole("link", { name: /back to all cities/i });
+      expect(backLink.getAttribute("href")).toBe("?tab=cost");
+    });
+  });
+
+  it("an explicit ?region=europe&country=gb&city=london deep link keeps region/country in the back link", () => {
+    // Here the user explicitly selected the region and country, so the back link
+    // returns to that parent scope.
+    setupSearchParams({ region: "europe", country: "gb", city: "london" });
+
+    render(<CostOfLivingCalculatorContent />);
+
+    const backLink = within(screen.getByTestId("city-detail")).getByRole("link", { name: /back to all cities/i });
+    const href = backLink.getAttribute("href") ?? "";
+    expect(href).toContain("region=europe");
+    expect(href).toContain("country=gb");
   });
 });
 

@@ -2514,4 +2514,77 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
     },
   );
+
+  // AC-10 (UWT-007) — Region selector lists exactly the nine intended regions
+  Scenario("The region selector lists exactly the nine intended regions", ({ Given, When, Then }) => {
+    let regionSelect: HTMLElement;
+
+    Given("I am on the calculator with no query string", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the region filter renders", () => {
+      regionSelect = screen.getByRole("combobox", { name: /region/i });
+      expect(regionSelect).toBeTruthy();
+    });
+
+    Then(
+      "the region selector offers exactly the nine regions africa, americas, asean, asia, europe, japan, mena, nordics, and oceania",
+      () => {
+        const values = Array.from(regionSelect.querySelectorAll("option"))
+          .map((o) => (o as HTMLOptionElement).value)
+          .filter((v) => v !== "");
+        expect([...values].sort()).toEqual(
+          ["africa", "americas", "asean", "asia", "europe", "japan", "mena", "nordics", "oceania"].sort(),
+        );
+      },
+    );
+  });
+
+  // AC-11 (UWT-014) — A country change that auto-changes the region surfaces an advisory
+  Scenario("Selecting a country that changes the region shows a visible advisory", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("I am on the calculator with no region selected", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("I select a country whose region differs from the current selection", async () => {
+      // No region selected → all countries listed; gb belongs to europe.
+      await user.selectOptions(screen.getByRole("combobox", { name: /country/i }), "gb");
+    });
+
+    Then("a visible region-auto-advisory message is shown", () => {
+      const advisory = screen.getByTestId("region-auto-advisory");
+      expect(advisory).toBeTruthy();
+      expect(advisory.textContent ?? "").not.toBe("");
+    });
+  });
+
+  // AC-12 (UWT-015) — A city-only deep link returns to the bare calculator
+  Scenario("A city-only deep link back link omits the auto-derived region and country", ({ Given, When, Then }) => {
+    let backLink: HTMLElement;
+
+    Given('a deep link with query string "city=london"', () => {
+      navState.params = new URLSearchParams("city=london");
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("I read the single-city detail back link", () => {
+      backLink = screen.getByRole("link", { name: /back to all cities/i });
+      expect(backLink).toBeTruthy();
+    });
+
+    Then('the back link points to the bare calculator "?tab=cost" with no region or country', () => {
+      const href = backLink.getAttribute("href") ?? "";
+      expect(href).toBe("?tab=cost");
+      expect(href).not.toContain("region=");
+      expect(href).not.toContain("country=");
+    });
+  });
 });

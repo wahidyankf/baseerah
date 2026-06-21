@@ -622,3 +622,21 @@ Feature: Salary savings calculator
     When the tab renders
     Then a minimum-role empty-state guidance message is shown
     But entering an explicit zero target replaces the guidance with the role ladder and its divider
+
+  # AC-10 (UWT-007) — Region selector lists exactly the nine intended regions
+  Scenario: The region selector lists exactly the nine intended regions
+    Given I am on the calculator with no query string
+    When the region filter renders
+    Then the region selector offers exactly the nine regions africa, americas, asean, asia, europe, japan, mena, nordics, and oceania
+
+  # AC-11 (UWT-014) — A country change that auto-changes the region surfaces an advisory
+  Scenario: Selecting a country that changes the region shows a visible advisory
+    Given I am on the calculator with no region selected
+    When I select a country whose region differs from the current selection
+    Then a visible region-auto-advisory message is shown
+
+  # AC-12 (UWT-015) — A city-only deep link returns to the bare calculator
+  Scenario: A city-only deep link back link omits the auto-derived region and country
+    Given a deep link with query string "city=london"
+    When I read the single-city detail back link
+    Then the back link points to the bare calculator "?tab=cost" with no region or country
