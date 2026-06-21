@@ -9,7 +9,10 @@ visitor who lands on the homepage can flow into any part of the site without typ
 ## Business Rationale (WHY)
 
 AyoKoding is a bilingual educational platform whose value is its breadth: a large `learn/` library
-(1,165 `en` markdown files, 124 `id` files) [Repo-grounded], a `rants/` section, and a Tools area
+(1,165 `en` markdown files, 124 `id` files) [Repo-grounded — verified 2026-06-21 via
+`find apps/ayokoding-www/content/en/learn -name "*.md" | wc -l` = 1165;
+`find apps/ayokoding-www/content/id -name "*.md" | wc -l` = 124; counts will drift over time —
+treat as "large" rather than exact], a `rants/` section, and a Tools area
 with the cost-of-living calculator. Today that value is **structurally hidden**:
 
 - The homepage is a bare slug list — it neither explains what AyoKoding is nor curates an entry

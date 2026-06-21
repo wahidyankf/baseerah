@@ -13,6 +13,11 @@ hardening: both locales (`en`, `id`), breakpoints 320/375/768/1280 px, Phase-1 c
 visual-parity ground truth, and a near-end three-tester retest. Push target: `origin main` (direct,
 Trunk Based Development). Evidence lands in [`evidence/`](./evidence/).
 
+> **Fix ALL failures**: At every quality gate and before every push, fix ALL failures found —
+> including preexisting issues not caused by your changes. This follows the root cause orientation
+> principle. Commit preexisting fixes separately with appropriate conventional commit messages.
+> Run `npx nx affected -t typecheck lint test:unit specs:coverage` before each push.
+
 ## Worktree
 
 Worktree path: `worktrees/ayokoding-www-ia-navigation-revamp/`
@@ -85,12 +90,15 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Diverge: confirm/extend the ≥3 named low-fi ASCII alternatives per screen already drafted in
       `assets/ui-low-fi-alternatives.md` — acceptance: `grep -c "Option [ABC]" plans/in-progress/ayokoding-www-ia-navigation-revamp/assets/ui-low-fi-alternatives.md` ≥ 6
 - [ ] [AI] Narrow (landing): **validate/refine** the committed Option-A finalists
-      `assets/landing-{320,375,768,1280}.{svg,png}` against the surveyed primitives/tokens — acceptance:
-      `ls assets/landing-{320,375,768,1280}.svg` all exist and render (PNGs present)
-- [ ] [AI] Narrow (`/c` browse): **validate/refine** the committed `assets/browse-{375,768,1280}.{svg,png}`
-      — acceptance: browse finalist files exist under `assets/`
-- [ ] [AI] Narrow (nav chrome): **validate/refine** the committed `assets/chrome-{375,1280}.{svg,png}`
-      (`chrome-375` includes the open MobileNav drawer) — acceptance: nav finalist files exist under `assets/`
+      `assets/landing-{320,375,768,1280}.png` (hi-fi ground truth; `.svg` files are editable source only)
+      against the surveyed primitives/tokens — acceptance:
+      `ls plans/in-progress/ayokoding-www-ia-navigation-revamp/assets/landing-{320,375,768,1280}.png` — all four `.png` files exist
+- [ ] [AI] Narrow (`/c` browse): **validate/refine** the committed `assets/browse-{375,768,1280}.png`
+      (`.svg` source companions also present but not the hi-fi acceptance criterion)
+      — acceptance: `ls plans/in-progress/ayokoding-www-ia-navigation-revamp/assets/browse-{375,768,1280}.png` — all three `.png` files exist
+- [ ] [AI] Narrow (nav chrome): **validate/refine** the committed `assets/chrome-{375,1280}.png`
+      (`chrome-375` includes the open MobileNav drawer; `.svg` source companions present but not the acceptance criterion)
+      — acceptance: `ls plans/in-progress/ayokoding-www-ia-navigation-revamp/assets/chrome-{375,1280}.png` — both `.png` files exist
 - [ ] [AI] Select + Justify: confirm the named selection + rationale table is present in `prd.md §UI Design Funnel`
       and the selection record + token table in `assets/README.md` — acceptance: `grep -c "Selected:" prd.md` ≥ 3
 - [ ] [AI] Responsive: confirm `prd.md` states the selected design's responsive strategy per breakpoint and the
@@ -109,7 +117,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] All funnel finalist `.svg`+`.png` files exist under `assets/` (landing, browse, nav)
+- [ ] [AI] All funnel finalist `.png` hi-fi files exist under `assets/` (landing, browse, nav) —
+      `ls plans/in-progress/ayokoding-www-ia-navigation-revamp/assets/landing-{320,375,768,1280}.png assets/browse-{375,768,1280}.png assets/chrome-{375,1280}.png`
+      (`.svg` editable-source companions may also exist but are not the acceptance criterion)
 - [ ] [AI] `npx nx run ayokoding-www:typecheck` exits 0 with the new translation keys
 - [ ] [AI] `git status` shows only `plans/` + `apps/ayokoding-www/src/features/i18n/core/translations.ts` changes
 
@@ -133,7 +143,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `contentUrl("id","tentang-ayokoding") === "/id/tentang-ayokoding"`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: test fails (`contentUrl` undefined)
 
-  **Gherkin (binds) →** "English content resolves under the /c namespace"
+  **Gherkin (underpins) →** "English content resolves under the /c namespace"
+  _(unit-level helper test; the BDD binding is on the e2e RED step below)_
 
   ```gherkin
   Scenario: English content resolves under the /c namespace
@@ -340,6 +351,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > All checks below must pass before starting Phase 5.
 
 - [ ] [AI] `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` — all exit 0
+- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e -- --grep "nav|header|footer"` — nav chrome
+      rendering scenarios pass (header Learn/Tools links render, mobile hamburger opens MobileNav)
 - [ ] [AI] Commit and push to origin main
 
 > **Pause Safety**: global header/footer/mobile nav now link Learn and Tools on every page — a
@@ -404,6 +417,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 > All checks below must pass before starting Phase 5.
 
 - [ ] [AI] `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` — all exit 0
+- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e -- --grep "landing|homepage|hero"` — homepage
+      hero + section cards + Tools teaser routing scenarios pass (both `en` and `id` locales)
 - [ ] [AI] Commit and push to origin main
 
 > **Pause Safety**: the homepage is now a real homepage (hero + cards + Tools teaser) and the old
@@ -421,7 +436,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       ancestor crumbs link to `/c/` URLs (via `contentUrl`) — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (breadcrumb still emits bare slug hrefs)
 
-  **Gherkin (binds) →** "Breadcrumb segments link to /c URLs"
+  **Gherkin (underpins) →** "Breadcrumb segments link to /c URLs"
+  _(unit-level component test; the BDD binding for this behaviour is on the no-308-hop e2e RED step below)_
 
   ```gherkin
   Scenario: Breadcrumb segments link to /c URLs
@@ -436,7 +452,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] **RED**: add failing test asserting `sidebar-tree.tsx` and `prev-next.tsx` emit `/c/` hrefs via
       `contentUrl` — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
 
-  **Gherkin (binds) →** "Internal content links emit /c URLs directly without relying on redirects"
+  **Gherkin (underpins) →** "Internal content links emit /c URLs directly without relying on redirects"
+  _(unit-level component tests; the BDD binding for this behaviour is on the no-308-hop e2e RED step below)_
 
   ```gherkin
   Scenario: Internal content links emit /c URLs directly without relying on redirects
@@ -452,7 +469,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       asserting `apps/ayokoding-www/src/features/search/shell/search-dialog.tsx` result links use `contentUrl`
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails (search links emit bare slug hrefs)
 
-  **Gherkin (binds) →** "Internal content links emit /c URLs directly without relying on redirects"
+  **Gherkin (underpins) →** "Internal content links emit /c URLs directly without relying on redirects"
+  _(unit-level component test; the BDD binding for this behaviour is on the no-308-hop e2e RED step below)_
 
   ```gherkin
   Scenario: Internal content links emit /c URLs directly without relying on redirects
@@ -529,9 +547,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 - [ ] [AI] **GREEN**: fix any remaining emitter still producing a bare-slug URL — command:
       `npx nx run ayokoding-www-fe-e2e:test:e2e` — acceptance: no-308-hop scenario passes
-- [ ] [AI] **REFACTOR**: confirm every content-URL construction in `apps/ayokoding-www` routes through
-      `contentUrl` (`grep -rn "/\${locale}/" apps/ayokoding-www/src` audited) — command:
-      `npx nx run ayokoding-www:test:unit` — acceptance: no stray hand-built content URLs remain
+- [ ] [AI] **REFACTOR (audit)**: grep for stray hand-built content URL constructions —
+      command: `grep -rn "/\${locale}/" apps/ayokoding-www/src --include="*.tsx" --include="*.ts" | grep -v contentUrl | grep -v test | grep -v spec`
+      — acceptance: returns 0 lines (no content paths built outside `contentUrl`); any hits must be
+      replaced before proceeding
+- [ ] [AI] **REFACTOR (confirm)**: run unit tests to confirm all emitters now route through `contentUrl`
+      — command: `npx nx run ayokoding-www:test:unit`
+      — acceptance: all tests pass with no stray URL constructions
 - [ ] [AI] Add companion Gherkin for canonical/sitemap/feed/no-broken-links into
       `.../navigation/ia-navigation-revamp.feature` — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: exits 0

@@ -119,9 +119,11 @@ A new `src/app/[locale]/(content)/c/[...slug]/page.tsx` resolves moved content (
 pages (about/terms/\_index) — its `generateStaticParams` filters to the per-locale allowlist; the new
 `c/[...slug]` route's `generateStaticParams` enumerates the content slugs. Both set
 `dynamicParams = false`. Next.js route precedence puts the literal `c/` segment ahead of the sibling
-`[...slug]`, so the two coexist safely. [Web-cited: Next.js routing precedence static > dynamic >
-catch-all; `permanent: true` ⇒ 308; verified against Next.js 16 `next.config` redirects docs,
-accessed 2026-06-21.]
+`[...slug]`, so the two coexist safely. [Web-cited: Next.js App Router route resolution gives
+precedence to literal path segments over catch-all segments; `permanent: true` ⇒ 308 ("if true will
+use the 308 status code which instructs clients/search engines to cache the redirect forever");
+source: <https://nextjs.org/docs/app/api-reference/config/next-config-js/redirects>, accessed
+2026-06-21.]
 
 ### DD-3 — 308 permanent redirects, per-locale-and-section, wildcard-scoped
 
@@ -131,8 +133,12 @@ into `next.config.ts` `redirects()` alongside the existing `learnReorgRedirects`
 `{ source: "/:locale(en|id)/learn/:path*", destination: "/:locale/c/learn/:path*", permanent: true }`.
 Because `id` uses different slugs, the `id` rules target `belajar`/`celoteh`/`konten-video`, while
 `en` rules target `learn`/`rants`. About/terms/tools are naturally excluded (no rule matches them).
-`permanent: true` yields a method-preserving **308**. [Web-cited: `permanent: true` → 308; `:path*`
-path-to-regexp wildcard + regex group in `source`; Next.js redirects ref, accessed 2026-06-21.]
+`permanent: true` yields a method-preserving **308**. [Web-cited: `permanent: true` → 308 ("if true
+will use the 308 status code which instructs clients/search engines to cache the redirect forever");
+`:path*` wildcard syntax ("To match a wildcard path you can use `*` after a parameter, for example
+`/blog/:slug*` will match `/blog/a/b/c/d/hello-world`"); regex group `/:locale(en|id)` uses
+path-to-regexp parenthesis-capture syntax; source:
+<https://nextjs.org/docs/app/api-reference/config/next-config-js/redirects>, accessed 2026-06-21.]
 
 > The exact set of moved top-level sections per locale MUST be derived at authoring time from the
 > content tree (P2 RED step greps `content/<locale>/*/` for section dirs). Known today

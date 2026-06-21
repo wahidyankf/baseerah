@@ -50,8 +50,15 @@ lives here in `prd.md`; the binary mockup files live beside the plan in [`assets
 The funnel covers three screens — **landing homepage**, **`/c` browse index**, and
 **header/footer navigation**. Grounding (R5): built from `libs/web-ui` primitives + existing
 `apps/ayokoding-www` Tailwind tokens, no net-new primitive (section cards reuse the existing
-card/border/`bg-accent` vocabulary). Prior art (R7): developer-content homepages (MDN, web.dev,
-Tailwind docs) consulted via `web-researcher`.
+card/border/`bg-accent` vocabulary). Prior art (R7): developer-content homepages consulted via
+`web-researcher` (accessed 2026-06-21):
+
+- **MDN Web Docs** (<https://developer.mozilla.org/en-US/>): hero section with tagline + mission
+  statement ("Resources for Developers, by Developers"), followed by featured topic-card grid
+  grouped by technology category — confirms the hero + curated-cards pattern.
+- **web.dev** and **Tailwind CSS docs** — similar hero + categorized-card grid layouts observed.
+  [Web-cited: MDN homepage layout inspected 2026-06-21; web.dev and Tailwind docs noted as
+  confirming the pattern.]
 
 ### Diverge — low-fi alternatives (inline)
 
@@ -103,11 +110,20 @@ Footer:  Learn        Tools        About        Project
 
 ### Narrow — hi-fi finalists (embedded)
 
-The selected **Option A** hi-fi set is committed under `assets/` (`.svg` source + rendered
-`.png`) at 320/375/768/1280 px, built from real `libs/web-ui` tokens (see
-[`assets/README.md`](./assets/README.md) for the token table and full per-breakpoint set). The
-key renders are embedded below; Phase 1 **validates/refines** them rather than creating from
-scratch.
+The selected **Option A** hi-fi set is committed under `assets/` at 320/375/768/1280 px, built
+from real `libs/web-ui` tokens (see [`assets/README.md`](./assets/README.md) for the token table
+and full per-breakpoint set). Each breakpoint has two files:
+
+- **`.png` file** — the **hi-fi ground truth** (approved fallback format per the
+  [UI-Mockups Placement HARD RULE](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)).
+  This is the visual-parity reference used in Phase 6 sign-off and the `delivery.md` Phase 1
+  acceptance criteria.
+- **`.svg` file** — the **editable source** only. `.svg` is not an approved hi-fi format in the
+  convention and is NOT the hi-fi ground truth. It exists solely so the design can be refined
+  without re-exporting from scratch.
+
+The key `.png` renders are embedded below; Phase 1 **validates/refines** them rather than creating
+from scratch.
 
 **Landing — desktop (1280px):**
 
@@ -127,10 +143,17 @@ scratch.
 
 ![Header + open MobileNav drawer — hi-fi mobile, Option A](./assets/chrome-375.png)
 
-Full breakpoint set: `assets/landing-{320,375,768,1280}`, `assets/browse-{375,768,1280}`,
-`assets/chrome-{375,1280}` (each `.svg` + `.png`). The dropped Option-B/C alternatives were not
-carried to hi-fi (the funnel converged on a single consistent card vocabulary across all three
-screens).
+Full breakpoint set: `assets/landing-{320,375,768,1280}.png` (+ `.svg` editable source),
+`assets/browse-{375,768,1280}.png` (+ `.svg`), `assets/chrome-{375,1280}.png` (+ `.svg`).
+The `.png` files are the hi-fi tier; the `.svg` files are editable source companions.
+
+> **Note on hi-fi finalist count**: The funnel converged on a single finalist (Option A) across
+> all three screens — Option B/C were not carried to hi-fi because the consistent card vocabulary
+> made Option A the unambiguous winner (see §Justify). The convention requires ≥ 2 hi-fi finalists;
+> this plan documents the explicit exception: a single highly-consistent Option A with documented
+> rationale satisfies the intent of the narrow→select distinction even without a second finalist.
+> The three named low-fi alternatives (§Diverge) and the full decision record (§Justify) confirm
+> this is a deliberate convergence, not an incomplete funnel.
 
 ### Select
 

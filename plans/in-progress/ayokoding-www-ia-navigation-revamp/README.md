@@ -16,6 +16,13 @@ Consequently `Tools` (and the calculator inside it) is an island: there is no na
 `Home → Learn → Tools → Calculator`. This plan revamps the IA so Home, Learn (content), Tools, and
 the Calculator all interconnect naturally, and restyles the landing page into a real homepage.
 
+> **Prerequisite status (2026-06-21):** the prerequisite plan `ayokoding-calculator-test-fixing` has
+> **landed on `main`** and is archived under
+> `plans/done/2026-06-21__ayokoding-calculator-test-fixing/`. The calculator renders on the shared
+> `Breadcrumb` primitive (`apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-breadcrumb.tsx`)
+> and the tools-index page exists at `apps/ayokoding-www/src/app/[locale]/tools/page.tsx`. The hard
+> dependency (`tech-docs.md §A-1`) is satisfied; Phase 0 may proceed. [Repo-grounded]
+
 The app is `apps/ayokoding-www` — Next.js **16.2.6** with `output: "standalone"` (so
 `next.config.ts` `redirects()` are honored server-side, no `vercel.json` detour), dev port 3101,
 following the repo's functional-core / imperative-shell layout (`src/features/<name>/{core,shell}`).
