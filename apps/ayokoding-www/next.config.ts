@@ -2,6 +2,7 @@ import "./src/env.ts";
 import type { NextConfig } from "next";
 import path from "node:path";
 import { learnReorgRedirects } from "./src/redirects/learn-reorg";
+import { contentNamespaceRedirects } from "./src/redirects/content-namespace";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -35,7 +36,7 @@ const nextConfig: NextConfig = {
     ];
   },
   async redirects() {
-    return [...learnReorgRedirects];
+    return [...learnReorgRedirects, ...contentNamespaceRedirects];
   },
 };
 

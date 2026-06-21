@@ -1,27 +1,33 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { serverCaller } from "@/lib/trpc/server";
-import { isValidLocale, type Locale } from "@/features/i18n/core/config";
+import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
-import { LOOSE_PAGE_ALLOWLIST } from "@/features/content/core/content-url";
+import { contentUrl } from "@/features/content/core/content-url";
 import { slugFromSegments } from "@/features/content/core/slug";
 import { Breadcrumb } from "@/features/navigation/shell/breadcrumb";
 import { TableOfContents } from "@/features/navigation/shell/toc";
 import { PrevNext } from "@/features/navigation/shell/prev-next";
 import { MarkdownRenderer } from "@/features/content/shell/markdown-renderer";
 import { TRPCError } from "@trpc/server";
+import { createTRPCContext } from "@/features/app-shell/shell/trpc-init";
 
 export const dynamicParams = false;
 
-export function generateStaticParams({ params }: { params: { locale: string } }) {
-  // Narrowed (DD-2): this catch-all now resolves ONLY the per-locale loose
-  // top-level pages (about/terms). Content-tree slugs are statically generated
-  // by the sibling c/[...slug] route; old bare content paths fall through to the
-  // content-namespace 308 redirects. (The locale root "" / "_index" is served by
-  // app/[locale]/page.tsx, not this catch-all.)
-  if (!isValidLocale(params.locale)) return [];
+export async function generateStaticParams({ params }: { params: { locale: string } }) {
+  const { contentService } = createTRPCContext();
+  const index = await contentService.getIndex();
+  const slugs: { slug: string[] }[] = [];
 
-  return LOOSE_PAGE_ALLOWLIST[params.locale].map((slug) => ({ slug: slug.split("/") }));
+  // Enumerate ALL content slugs for this locale. The slug captured under /c/ is
+  // already the bare content slug (no leading "c/" to strip).
+  for (const [key, meta] of index.contentMap) {
+    if (!key.startsWith(`${params.locale}:`)) continue;
+    if (meta.slug === "") continue;
+    slugs.push({ slug: meta.slug.split("/") });
+  }
+
+  return slugs;
 }
 
 interface Props {
@@ -42,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: page.title,
       description: page.description ?? undefined,
       alternates: {
-        canonical: `/${locale}/${slugStr}`,
+        canonical: contentUrl(locale as Locale, slugStr),
       },
       openGraph: {
         title: page.title,
