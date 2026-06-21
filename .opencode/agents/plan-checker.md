@@ -130,7 +130,7 @@ Audit all plan files (`README.md`, `brd.md`, `prd.md`, `tech-docs.md`, `delivery
 - **Gherkin-tagged TDD steps (one scenario per cycle)**: every behavior-implementing RED→GREEN→REFACTOR cycle MUST target **exactly one** Gherkin scenario — the RED step carries a single-scenario `**Gherkin (binds) →** "<title>"` tag and embeds that scenario's complete `Given/When/Then` inline as a fenced ` ```gherkin ` block, verbatim-equal to the companion `.feature`. Flag as **HIGH**: a behavior RED step whose `binds` tag lists **more than one** scenario (must be split one-cycle-per-scenario), a behavior step missing its Gherkin tag, or a step whose inline `Given/When/Then` is absent or not verbatim-equal to the `.feature`. Two exceptions keep a multi-scenario `;`-list tag and are NOT split: pure-core (`**Gherkin (underpins) →**`) data/calc unit tests, and aggregate BDD binders (a feature-consuming unit test or `playwright-bdd` step-def file consuming the whole `.feature` for `specs:coverage`/E2E). Pure refactors, no-behavior-change bumps, and docs/governance-only steps are exempt. See [Gherkin-Tagged Delivery Steps](../../repo-governance/development/workflow/test-driven-development.md#gherkin-tagged-delivery-steps).
 - **UI-design-funnel completeness (UI-bearing plans)**: a plan that adds/changes user-facing screens or components under `apps/` or `libs/` MUST carry the design-funnel artefacts (≥2 named low-fi alternatives, 2 hi-fi `.excalidraw.png` finalists, a named selection, a rationale, a grounding/prior-art note, and a **responsive** strategy across mobile/tablet/desktop). Validated in detail by Step 5k (rule 17). Pure-refactor / no-UI / governance-only plans are exempt. See [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
 - **Manual-assertion locale + evidence completeness (UI/API plans)**: a plan touching web UI or API MUST carry manual-assertion steps that (a) cover ALL supported locales for a multi-locale app and (b) capture committed evidence (screenshots to the plan's `evidence/` subfolder, curl responses inlined in `delivery.md`). Validated in detail by Step 5c (items 4 + 5). Single-locale-only verification on a multi-locale app, or a manual-assertion section with no evidence-capture step, is **HIGH**. See [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md).
-- **Rule-15 three-tester retest (web-UI feature-change plans)**: a web-UI **feature-change** plan MUST carry a near-end "Rule-15 three-tester retest" step running the [`web-ux-test-fixing-planning`](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md) triad (`web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) against the running target across ALL supported locales, with each `EWT-###`/`UWT-###`/`DWT-###` finding folded into `delivery.md` as an unchecked checkbox fixed before archival. A missing step, or single-locale-only scope, on a web-UI feature-change plan is **HIGH**. CLI/text output and pure governance/agent-definition plans are exempt. See [User-Facing Delivery Hardening](../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 15.
+- **Rule-15 three-tester retest (web-UI feature-change plans)**: a web-UI **feature-change** plan MUST carry a near-end "Rule-15 three-tester retest" step running the [`web-ux-test-fixing-planning`](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md) triad (`web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) against the running target across ALL supported locales, with each `EWT-###`/`UWT-###`/`DWT-###` defect finding folded into `delivery.md` as an unchecked checkbox that MUST be fixed (ticked) before archival — deferral of an EWT/UWT/DWT defect finding requires explicit user permission and is allowed only when the fix is genuinely impossible. (`SG-###` spec-gap proposals and `USS-###` spec-suggestions are proposals, not defects, and may be triaged or deferred.) An unfixed EWT/UWT/DWT defect checkbox at archival time is a **HIGH** finding. A missing step, or single-locale-only scope, on a web-UI feature-change plan is **HIGH**. CLI/text output and pure governance/agent-definition plans are exempt. See [User-Facing Delivery Hardening](../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 15.
 
 #### PR Step Authorization Check (per [Git Push Default Convention](../../repo-governance/development/workflow/git-push-default.md))
 
@@ -260,7 +260,7 @@ Update status to "Complete", add summary statistics and prioritized recommendati
 
 **Related Conventions:**
 
-- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Flag missing visual-parity gate (rule 1), mockup colors not expressed as theme tokens (rule 8), presence-only ordering tests that do not distinguish correct from buggy values (rule 5), missing per-breakpoint responsive deliverable steps (rules 3, 4), and a missing near-end `web-exploratory-tester` retest step that appends its findings to `delivery.md` as unchecked task-list items (rule 15) as HIGH findings on UI-bearing plans (rule 15 applies to web-UI plans only)
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Flag missing visual-parity gate (rule 1), mockup colors not expressed as theme tokens (rule 8), presence-only ordering tests that do not distinguish correct from buggy values (rule 5), missing per-breakpoint responsive deliverable steps (rules 3, 4), and a missing near-end three-tester retest step (rule 15) as HIGH findings on UI-bearing plans (rule 15 applies to web-UI plans only); an unfixed EWT/UWT/DWT defect checkbox at archival time is a HIGH finding — deferral of a defect finding requires explicit user permission and is allowed only when the fix is genuinely impossible (SG-### proposals and USS-### suggestions may still be triaged)
 - [Manual Behavioral Verification Convention](../../repo-governance/development/quality/manual-behavioral-verification.md) - Flag missing Playwright/curl manual-assertion steps for UI/API plans (Step 5c)
 - [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) - Flag single-locale-only verification on multi-locale apps and manual-assertion sections lacking evidence-capture steps (screenshots to `evidence/`, inline curl output) as HIGH findings (Step 5c items 4 + 5)
 
@@ -693,35 +693,47 @@ user-facing screens or components under any `apps/**` or `libs/**` path (e.g. `l
 1. **Scope detection** — From the plan's Scope (`README.md` / `prd.md`), file-impact (`tech-docs.md`),
    and delivery steps, determine whether it adds or changes user-facing screens or components under
    `apps/**` or `libs/**`. If not UI-bearing, skip this step (no findings).
-2. **Both tiers per screen** — Each UI-bearing screen MUST have a low-fidelity ASCII/Unicode
-   wireframe in a fenced code block AND a high-fidelity `.excalidraw.png` referenced via `![](./…)`,
-   in separate labelled subsections. Missing a tier: **HIGH**. Use of a ruled-out format (inline
-   HTML+CSS, MDX, Mermaid-as-wireframe, `.excalidraw.svg`): **HIGH**.
-3. **≥ 2 named low-fi alternatives** — The funnel's diverge stage MUST present at least two named,
-   genuinely different alternatives (Option A / B / …). None or only one: **HIGH**.
-4. **2 hi-fi `.excalidraw.png` finalists** — The narrow stage MUST carry the strongest alternatives
-   forward as hi-fi finalists. Missing the hi-fi finalists: **HIGH**.
-5. **Named selection** — The select stage MUST name the chosen design explicitly (e.g.
+2. **Funnel placement in `prd.md` (HARD RULE)** — All funnel artefacts (low-fi wireframes, hi-fi
+   `![]()` embeds, named selection, rationale table) MUST be located inside `prd.md` specifically.
+   Funnel content found in `README.md`, `brd.md`, `tech-docs.md`, or any other file is a placement
+   violation. Binary mockup image assets live under the plan's `assets/` folder and are referenced
+   from `prd.md`. `prd.md` missing the funnel entirely, or the funnel present only in a different
+   plan file: **HIGH**. See
+   [UI Mockups in Plan Docs — Placement](../../repo-governance/conventions/formatting/diagrams.md#placement--the-ui-lives-in-prdmd-hard-rule).
+3. **Both tiers per screen** — Each UI-bearing screen MUST have a low-fidelity ASCII/Unicode
+   wireframe in a fenced code block AND a high-fidelity `.excalidraw.png` (or approved plain `.png`
+   screenshot) referenced via `![](./…)` in `prd.md`, in separate labelled subsections. Missing a
+   tier: **HIGH**. Use of a ruled-out format (inline HTML+CSS, MDX, Mermaid-as-wireframe,
+   `.excalidraw.svg`): **HIGH**.
+4. **≥ 2 named low-fi alternatives** — The funnel's diverge stage MUST present at least two named,
+   genuinely different alternatives (Option A / B / …), at least mobile + desktop where they differ.
+   None or only one: **HIGH**.
+5. **2 hi-fi `.excalidraw.png` finalists** — The narrow stage MUST carry the strongest alternatives
+   forward as hi-fi finalists (`.excalidraw.png` or plain `.png`). Missing the hi-fi finalists:
+   **HIGH**.
+6. **Named selection** — The select stage MUST name the chosen design explicitly (e.g.
    "Selected: Option A — Ranked Table"). An unnamed/implicit selection: **HIGH**.
-6. **Rationale / decision record** — The justify stage MUST include a short rationale (a table is
+7. **Rationale / decision record** — The justify stage MUST include a short rationale (a table is
    enough): why the winner won and why each runner-up lost. Missing rationale: **HIGH**.
-7. **Grounding / prior-art note** — The plan MUST carry the R5 grounding note (surveyed
+8. **Grounding / prior-art note** — The plan MUST carry the R5 grounding note (surveyed
    `libs/web-ui` / target app / sibling screens, net-new components named) and the R7 prior-art
    citation (`web-researcher` survey). A missing grounding or prior-art note: **HIGH**.
-8. **Responsive strategy (mobile/tablet/desktop)** — The funnel MUST address **responsive design**,
+9. **Responsive strategy (mobile/tablet/desktop)** — The funnel MUST address **responsive design**,
    **mobile-first**, across mobile (`< sm`), tablet (`md` ≥ 768 px), and desktop (`lg` ≥ 1024 px).
    The selected design's decision record MUST state a **responsive strategy** per breakpoint (which
    components stack, collapse, hide, or change), and the low-fi tier MUST show the mobile↔desktop
    reflow where it differs. A UI-bearing plan whose selected design has **no responsive strategy**
    stated, or whose finalists were evaluated **desktop-only**, is flagged: **HIGH**.
-9. **Exemption** — Pure-refactor / no-UI / governance-only plans are **EXEMPT** (mirror the
-   specs/Gherkin exemption). Verify any claimed exemption is legitimate; an illegitimate exemption
-   used to skip the funnel on a genuinely UI-bearing plan is **HIGH**.
+10. **Exemption** — Pure-refactor / no-UI / governance-only plans are **EXEMPT** (mirror the
+    specs/Gherkin exemption). Verify any claimed exemption is legitimate; an illegitimate exemption
+    used to skip the funnel on a genuinely UI-bearing plan is **HIGH**.
 
 #### Finding Severity
 
-- UI-bearing plan missing any funnel artefact (no alternatives, no hi-fi finalists, unnamed
-  selection, missing rationale, missing grounding/prior-art note): **HIGH**
+- UI-bearing plan whose `prd.md` is missing the funnel record entirely, or whose funnel is placed
+  in a different plan file (`README.md`, `brd.md`, `tech-docs.md`, other): **HIGH**
+- UI-bearing plan missing any funnel artefact in `prd.md` (no alternatives, no hi-fi finalists,
+  unnamed selection, missing rationale, missing grounding/prior-art note): **HIGH**
 - UI-bearing plan whose selected design states no **responsive** strategy (mobile/tablet/desktop),
   or whose finalists were evaluated desktop-only: **HIGH**
 - Artefact present but vague (e.g. alternatives not genuinely different, no drop reasons): **MEDIUM**

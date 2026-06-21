@@ -2125,6 +2125,26 @@ Every stage of the funnel is visible in the plan. No alternative is silently dis
 | 3. Select  | —        | 1 (named)   | The chosen design, **named** (e.g. "Selected: Option A — Ranked Table") |
 | 4. Justify | —        | 1 record    | Rationale: why the winner won, why each runner-up lost                  |
 
+### Placement — the UI lives in prd.md (HARD RULE)
+
+All UI-design-funnel artefacts for a UI-bearing plan MUST be placed in that plan's **`prd.md`**,
+not in `README.md`, `brd.md`, `tech-docs.md`, or any separate file:
+
+- **Low-fidelity ASCII wireframes** (Diverge stage, ≥ 2 named alternatives, at least mobile +
+  desktop where they differ) — inline in `prd.md`.
+- **High-fidelity mockups** (Narrow stage finalists) — binary image assets live under the plan's
+  `assets/` folder (e.g. `plans/in-progress/<name>/assets/ui-screen.excalidraw.png`) and are
+  embedded in `prd.md` via `![alt text](./assets/…)` `![]()` image links.
+- **Named selection** (Select stage) — the chosen design named explicitly, in `prd.md`.
+- **Rationale / decision record** (Justify stage) — the short table of why the winner won and why
+  each runner-up lost, in `prd.md`.
+
+**Enforcement**: a UI-bearing plan whose `prd.md` does NOT contain the complete funnel record
+(all four stages, embedded mockup links, at minimum both the mobile and desktop low-fi wireframes
+where they differ) fails the plan quality gate. `plan-checker` Step 5k flags each missing or
+misplaced element as **HIGH**. `plan-fixer` scaffolds missing funnel sections directly into
+`prd.md`.
+
 **Copy-paste example — funnel record (place in plan's `prd.md`)**:
 
 ```markdown

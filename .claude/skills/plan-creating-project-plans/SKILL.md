@@ -123,6 +123,14 @@ exactly as with the specs/Gherkin binding.
 Every UI-bearing plan MUST document its draft UI through the **UI-design-funnel**
 (diverge → narrow → select → justify), authored per the
 [UI Mockups in Plan Docs convention](../../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs).
+
+**PLACEMENT HARD RULE**: ALL funnel artefacts MUST be placed in the plan's **`prd.md`** — not in
+`README.md`, `brd.md`, `tech-docs.md`, or any separate file. Binary mockup image assets live
+under the plan's `assets/` folder and are referenced from `prd.md` via `![]()` image embeds.
+A UI-bearing plan whose `prd.md` does NOT contain the funnel record (all four stages plus embedded
+mockup links) fails the plan quality gate. See
+[UI Mockups in Plan Docs — Placement](../../../repo-governance/conventions/formatting/diagrams.md#placement--the-ui-lives-in-prdmd-hard-rule).
+
 The funnel produces four kinds of artefact, all visible in the plan (`prd.md` + the plan's
 `assets/`); no alternative is silently discarded:
 
@@ -779,7 +787,8 @@ Every delivery plan MUST end with a plan archival section:
 - [ ] Verify ALL quality gates pass (local + CI)
 - [ ] Verify ALL manual assertions pass with committed evidence in `evidence/` (screenshots + curl output)
 - [ ] Verify ALL supported locales were exercised in UI verification (not just the default)
-- [ ] Verify every rule-15 exploratory finding is fixed or explicitly deferred
+- [ ] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible)
+      for EWT/UWT/DWT defect findings; SG-### proposals and USS-### suggestions may be triaged or deferred
 - [ ] Move plan folder from `plans/in-progress/` to `plans/done/` via `git mv` (the `evidence/` subfolder moves with it)
 - [ ] Update `plans/in-progress/README.md` — remove the plan entry
 - [ ] Update `plans/done/README.md` — add the plan entry with completion date

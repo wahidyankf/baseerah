@@ -381,18 +381,24 @@ their shape are defined in the
 
 ### Confidence Assessment for the UI-design-funnel
 
-- **HIGH Confidence**: the plan is UI-bearing and a funnel section is completely absent — scaffold
-  the missing stage(s) with stub placeholders for the author to fill.
-- **MEDIUM Confidence**: a stage exists but is thin (e.g. only one low-fi alternative, no drop
-  reasons, an unnamed selection) — add the missing skeleton and flag for author completion; do NOT
-  fabricate alternatives or a rationale.
+- **HIGH Confidence**: the plan is UI-bearing and a funnel section is completely absent from
+  `prd.md` — scaffold the missing stage(s) with stub placeholders for the author to fill,
+  inserting them directly into `prd.md`.
+- **HIGH Confidence**: funnel content exists but is located in the wrong plan file (e.g.
+  `README.md` or `tech-docs.md`) — move it to `prd.md` mechanically (the placement rule is
+  unambiguous: all four funnel stages belong in `prd.md`).
+- **MEDIUM Confidence**: a stage exists in `prd.md` but is thin (e.g. only one low-fi alternative,
+  no drop reasons, an unnamed selection) — add the missing skeleton and flag for author completion;
+  do NOT fabricate alternatives or a rationale.
 - **FALSE_POSITIVE**: the plan is a pure refactor, non-UI, or governance-only — exempt; report as
   FALSE_POSITIVE and apply nothing.
 
 ### How to Scaffold the Missing Funnel Sections
 
-Insert the funnel skeleton into the plan's `prd.md` (referencing the plan's `assets/` for hi-fi
-PNGs). Use placeholders the author must replace; never invent the design content:
+Insert the funnel skeleton into the plan's **`prd.md`** (the mandatory placement — all funnel
+artefacts live in `prd.md`, not in `README.md`, `brd.md`, or `tech-docs.md`; binary image
+assets live under the plan's `assets/` folder and are referenced via `![]()` from `prd.md`).
+Use placeholders the author must replace; never invent the design content:
 
 ````markdown
 ## UI Design Funnel — <Screen Name>

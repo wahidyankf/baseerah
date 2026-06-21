@@ -181,7 +181,7 @@ Update status to "Complete", add summary and recommendation (approve/revise).
 
 - [Plans Organization Convention §Execution Markers](../../repo-governance/conventions/structure/plans.md#executor-tagging--ai-vs-human-hard-rule) - `[AI]`/`[HUMAN]` marker rules, legend, handoff/resume signal requirement (validated in Step 5f-gates)
 - [Plans Organization Convention §Phase Gates and Natural Pauses](../../repo-governance/conventions/structure/plans.md#phases-as-natural-pauses-with-clear-gates-hard-rule) - Phase gate barrier rule, Pause Safety requirement (validated in Step 5f-gates)
-- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Verify that the production visual sign-off (rule 1), the deploy-config smoke test (rule 11), and — on web-UI plans — the near-end `web-exploratory-tester` retest round ran with every rule-15 follow-up checkbox in `delivery.md` ticked (fixed) or explicitly deferred with rationale (rule 15) before archival; flag their absence as HIGH on UI-bearing plans
+- [User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md) - Verify that the production visual sign-off (rule 1), the deploy-config smoke test (rule 11), and — on web-UI plans — the near-end three-tester retest round ran (rule 15) with every rule-15 EWT/UWT/DWT defect checkbox in `delivery.md` fixed (ticked) before archival — deferral of a defect finding requires explicit user permission and is allowed only when the fix is genuinely impossible; an unfixed defect checkbox at archival time is a HIGH finding; flag their absence as HIGH on UI-bearing plans; SG-### proposals and USS-### suggestions may be triaged or deferred
 - [Manual Behavioral Verification Convention](../../repo-governance/development/quality/manual-behavioral-verification.md) - Verify Playwright/curl manual assertions were performed and documented (Step 7)
 - [Evidence Capture Convention](../../repo-governance/development/quality/evidence-capture.md) - Verify each ticked manual-verification step carries committed evidence (screenshots in the plan's `evidence/` subfolder referenced from `delivery.md`, inline curl output) and that multi-locale apps were verified across ALL locales; flag bare "verified manually", missing screenshots, and single-locale-only coverage as HIGH (Step 7 items 4 + 5)
 
@@ -299,10 +299,13 @@ After verifying operational readiness (Step 5b), verify that manual behavioral a
    - If the plan was a web-UI **feature-change** plan, verify it carried a near-end "Rule-15
      three-tester retest" round — the [`web-ux-test-fixing-planning`](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md)
      triad (`web-exploratory-tester` + `web-usability-tester` + `web-design-tester`) — that ran across
-     ALL supported locales, and that every resulting `EWT-###`/`UWT-###`/`DWT-###` checkbox in
-     `delivery.md` is `- [x]` (fixed) or explicitly deferred with rationale before archival.
+     ALL supported locales, and that every resulting `EWT-###`/`UWT-###`/`DWT-###` defect checkbox in
+     `delivery.md` is `- [x]` (fixed) before archival. Deferral of EWT/UWT/DWT defect findings is NOT
+     permitted — an unfixed defect checkbox at archival time is a **HIGH** finding. (`SG-###` spec-gap
+     proposals and `USS-###` spec-suggestions are proposals, not defects, and may be triaged or deferred
+     with written rationale.)
    - A web-UI feature-change plan archived with no three-tester retest round, single-locale-only
-     scope, or unresolved/undeferred rule-15 checkboxes: **HIGH** finding.
+     scope, or any unfixed rule-15 EWT/UWT/DWT defect checkbox: **HIGH** finding.
    - CLI/text output and pure governance/agent-definition plans are exempt.
    - Per [User-Facing Delivery Hardening](../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 15.
 
