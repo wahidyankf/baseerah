@@ -27,22 +27,22 @@ E2E suite (for runtime-proof findings): `npx nx run ayokoding-www-fe-e2e:test:e2
 
 > _Executor: repo-setup-manager_
 
-- [ ] [AI] Install dependencies in the root checkout: `npm install`
-      — acceptance: exits 0, `node_modules/` synchronized
-- [ ] [AI] Converge the toolchain: `npm run doctor -- --fix`
-      — acceptance: exits 0 with no unresolved drift
-- [ ] [AI] Record the calculator baseline:
+- [x] [AI] Install dependencies in the root checkout: `npm install`
+      — acceptance: exits 0, `node_modules/` synchronized. _Done 2026-06-21: deps already synchronized._
+- [x] [AI] Converge the toolchain: `npm run doctor -- --fix`
+      — acceptance: exits 0 with no unresolved drift. _Done: toolchain converged (prior install)._
+- [x] [AI] Record the calculator baseline:
       `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — acceptance: pass/fail counts recorded; any preexisting failure documented
-- [ ] [AI] Resolve all preexisting failures before proceeding
-      — acceptance: no unresolved preexisting failures remain
+      — acceptance: pass/fail counts recorded; any preexisting failure documented. _Baseline 2026-06-21: typecheck ✓, lint ✓ (3 pre-existing jsx-a11y warnings, non-blocking), test:unit 2030 passed, specs:coverage 15 specs/161 scenarios/590 steps all covered._
+- [x] [AI] Resolve all preexisting failures before proceeding
+      — acceptance: no unresolved preexisting failures remain. _No failures; only 3 non-blocking lint warnings (calculator-content.tsx:216, controls.tsx:32) carried into the relevant phases._
 
 ### Phase 0 Gate
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+- [x] [AI] `npm install` exited 0 and `npm run doctor -- --fix` reports no unresolved drift
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
       baseline recorded and every preexisting failure resolved (zero unresolved)
 
 > **Pause Safety**: only the local toolchain was verified and the baseline recorded — no feature
@@ -53,48 +53,64 @@ E2E suite (for runtime-proof findings): `npx nx run ayokoding-www-fe-e2e:test:e2
 
 ## Phase 1: Correctness — Minimum-role zero-target divider (EWT-001)
 
-- [ ] [AI] **RED**: add/adjust a failing unit test in
+- [x] [AI] **RED**: add/adjust a failing unit test in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` asserting
       that with baseline source = savings target and target = `0`, the element
       `data-testid="qualifying-divider"` is present (desktop table) and the lowest-clearing role is
       marked minimum — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the new assertion fails (divider not rendered at target 0)
+      _Done 2026-06-21: new test "with savings_target=0 (baseline engaged) renders the qualifying
+      divider and marks the minimum" failed RED (divider absent at target 0)._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: in
+- [x] [AI] **GREEN**: in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.tsx` change the
       divider render condition at ~line 314 from `qualifying.length > 0 && nonQualifying.length > 0`
       to render the divider whenever `baselineReady && qualifying.length > 0`; apply the equivalent
       fix to the mobile-cards section at ~line 330 — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: the RED test passes; no other `min-role.test.tsx` tests break
+      _Done: desktop divider uses `showDivider`; mobile cards split into qualifying/divider/
+      non-qualifying with a distinct `qualifying-divider-mobile` testid so the desktop divider stays
+      unique to existing `getByTestId` assertions._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR**: extract the divider-visibility condition into a named local
+- [x] [AI] **REFACTOR**: extract the divider-visibility condition into a named local
       (e.g. `showDivider`) used by both table and mobile blocks in `min-role.tsx`
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: all `min-role.test.tsx` tests still pass; single source of truth for the condition
-- [ ] [AI] **RED**: extend Gherkin — make the existing scenario "Zero savings target marks the
+      _Done: `const showDivider = baselineReady && qualifying.length > 0;` drives both blocks;
+      mobile card markup extracted into a `MobileRoleCard` component._
+- [x] [AI] **RED**: extend Gherkin — make the existing scenario "Zero savings target marks the
       lowest role as the minimum" in
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/tools/cost-of-living-calculator.feature`
       explicitly assert the divider is rendered (add an `And` line); add the step-def if missing
       — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` fails on the new uncovered step
+      _Done: added `And the qualifying divider element is rendered in the role ladder`;
+      specs:coverage failed RED on the uncovered step._
   - _Suggested executor: `specs-maker`_
-- [ ] [AI] **GREEN**: implement/connect the step definition so the scenario consumes the fixed
+- [x] [AI] **GREEN**: implement/connect the step definition so the scenario consumes the fixed
       behaviour — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0
-- [ ] [AI] **RED**: add an e2e assertion in `apps/ayokoding-www-fe-e2e` navigating to the min-role
+      _Done: wired the new step + strengthened the prior stub assertions to real `qualifying-divider`
+      / `minimum-marker` / `non-qualifying-row` checks; specs:coverage exits 0 (591 steps)._
+- [x] [AI] **RED**: add an e2e assertion in `apps/ayokoding-www-fe-e2e` navigating to the min-role
       tab, setting target to `0`, asserting `[data-testid="qualifying-divider"]` is visible
       — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: e2e fails before the GREEN source change is deployed to the dev build (or
       passes confirming the fix end-to-end if run after GREEN)
+      _Done: implemented the BDD e2e divider steps (was stubbed); the "Zero savings target" scenario
+      passes on chromium against the rebuilt standalone bundle._
   - _Suggested executor: `swe-e2e-dev`_
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
-- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` (divider spec) — expected: passes
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21: all 4 targets pass (typecheck clean; lint exits 0 with 3
+      pre-existing non-blocking jsx-a11y warnings; test:unit 2032 passed; specs:coverage 591 steps)._
+- [x] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` (divider spec) — expected: passes
+      _Done: "Zero savings target marks the lowest role as the minimum" e2e scenario passes on
+      chromium (PASS 1 / FAIL 0)._
 
 > **Pause Safety**: EWT-001 is fixed, unit + spec + e2e green. Safe to stop. To resume: re-run the
 > gate command.

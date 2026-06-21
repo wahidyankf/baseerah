@@ -1293,19 +1293,25 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     Then("the qualifying divider is shown", () => {
-      // A zero target means every role qualifies; divider may not render or render at bottom.
-      // Verified at core unit level; page-level: table renders without error.
-      expect(screen.getByRole("table")).toBeTruthy();
+      // EWT-001: a numeric zero target means every role qualifies; the divider still anchors the
+      // qualifying group. (Baseline IS engaged here — savings_target selected, target === 0 — which
+      // is distinct from the blank-target empty-state.)
+      expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
+    });
+
+    And("the qualifying divider element is rendered in the role ladder", () => {
+      // Explicit element assertion for the desktop role-ladder divider (EWT-001).
+      expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
     });
 
     And("the minimum marker appears on the lowest-ranked role in the ladder", () => {
-      // Stub: lowest-role marking with a zero target verified at core unit level
-      expect(true).toBe(true);
+      // With a zero target the lowest-clearing role is still flagged as the minimum.
+      expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
     });
 
     And("all roles appear above the divider because every role clears a zero target", () => {
-      // Stub: all-qualifying state verified at core unit level
-      expect(true).toBe(true);
+      // Every role qualifies, so there are no dimmed non-qualifying rows below the divider.
+      expect(screen.queryAllByTestId("non-qualifying-row").length).toBe(0);
     });
   });
 

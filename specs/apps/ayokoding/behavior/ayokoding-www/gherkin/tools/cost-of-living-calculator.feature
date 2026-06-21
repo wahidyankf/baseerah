@@ -282,6 +282,7 @@ Feature: Salary savings calculator
     And I set the baseline source to "savings target"
     When I enter a monthly savings target of zero USD
     Then the qualifying divider is shown
+    And the qualifying divider element is rendered in the role ladder
     And the minimum marker appears on the lowest-ranked role in the ladder
     And all roles appear above the divider because every role clears a zero target
 

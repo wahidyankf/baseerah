@@ -56,6 +56,30 @@ describe("MinRoleTable", () => {
     for (const idx of dimmedIdxs) expect(idx).toBeGreaterThan(dividerIdx);
   });
 
+  // EWT-001 (Major): Gherkin (binds): "Zero savings target marks the lowest role as the minimum".
+  // With baseline source = savings target and a numeric zero target, EVERY role qualifies (no role
+  // falls below the bar), so the qualifying divider must still render to anchor the qualifying group.
+  // NOTE: this is a baseline-ENGAGED, target===0 state (numeric zero, not blank). It is deliberately
+  // distinct from the Phase-5 min-role EMPTY-STATE, which applies to a BLANK target. Keep the two
+  // distinguishable: here a baseline IS engaged (savings_target is selected and the target is the
+  // literal number 0), so the table + divider render; the empty-state covers the no-target case.
+  it("with savings_target=0 (baseline engaged) renders the qualifying divider and marks the minimum", async () => {
+    const user = userEvent.setup();
+    render(<MinRoleTable {...defaultProps} />);
+
+    // Select savings target baseline (default, but assert it explicitly) and set target to 0.
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
+    const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+    await user.clear(targetInput);
+    await user.type(targetInput, "0");
+
+    // Divider anchors the qualifying group even when no role is below the minimum.
+    expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
+
+    // The lowest-clearing role is marked as the minimum.
+    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+  });
+
   // Gherkin (binds): "Roles are labelled as software-engineering roles"
   it("shows SE roles caption covering IC and management tracks", () => {
     render(<MinRoleTable {...defaultProps} />);

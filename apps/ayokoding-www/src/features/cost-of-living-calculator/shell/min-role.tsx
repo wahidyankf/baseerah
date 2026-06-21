@@ -86,6 +86,13 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
   const nonQualifying = ordered.filter((e) => !e.clears);
   const noQualifiers = baselineReady && minRole === null;
 
+  // EWT-001: the qualifying divider anchors the qualifying group whenever a baseline is engaged and
+  // at least one role qualifies — including the numeric zero-target case where EVERY role clears and
+  // `nonQualifying` is empty. (Previously the divider required `nonQualifying.length > 0`, so at
+  // target 0 it disappeared even though the qualifying group was non-empty.) Single source of truth
+  // for both the desktop table and the mobile cards below.
+  const showDivider = baselineReady && qualifying.length > 0;
+
   function DualCell({ usdVal, cityCurrency, className }: { usdVal: number; cityCurrency: string; className?: string }) {
     const conv = toDisplayCurrencies(fx, usdVal, cityCurrency, displayCurrency);
     return (
@@ -156,6 +163,39 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
           {fmtCurrencyTrailing(entry.nonSalaryCompUsd, "USD")}
         </TableCell>
       </TableRow>
+    );
+  }
+
+  function MobileRoleCard({ entry, isMin, dimmed }: { entry: (typeof ordered)[0]; isMin: boolean; dimmed: boolean }) {
+    const rowLabel = matrix.ladder.find((r) => r.role === entry.role)?.label.en ?? entry.role;
+    const med = toDisplayCurrencies(fx, entry.distributionUsd.median, entry.bestCity.currency, displayCurrency);
+    const sav = toDisplayCurrencies(fx, entry.bestEssentialSavingsUsd, entry.bestCity.currency, displayCurrency);
+    return (
+      <div className={`overflow-hidden rounded-lg border bg-card shadow-sm ${dimmed ? "opacity-60" : ""}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-primary px-3 py-2 text-primary-foreground">
+          <span className="font-semibold">
+            {rowLabel}
+            {isMin && <span className="ml-1 text-xs font-bold">{t(locale, "minimumMarker")}</span>}
+          </span>
+          <span className="text-xs text-primary-foreground/80">{entry.track}</span>
+        </div>
+        <div className="space-y-1 p-3 text-sm">
+          <div className="flex items-baseline justify-between">
+            <span className="text-muted-foreground">{t(locale, "colBestCity")}</span>
+            <span>
+              {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
+            </span>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-muted-foreground">{t(locale, "colMedian")}</span>
+            <span className="tabular-nums">{fmtCurrencyTrailing(med.display, displayCurrency)}</span>
+          </div>
+          <div className="flex items-baseline justify-between border-t pt-1.5 font-medium">
+            <span className="text-muted-foreground">{t(locale, "colEssentialSavings")}</span>
+            <span className="tabular-nums">{fmtCurrencyTrailing(sav.display, displayCurrency)}</span>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -311,7 +351,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
               <RoleRow key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
             ))}
 
-            {qualifying.length > 0 && nonQualifying.length > 0 && (
+            {showDivider && (
               <TableRow data-testid="qualifying-divider">
                 <TableCell colSpan={8} className="text-center text-xs text-muted-foreground">
                   {t(locale, "qualifyingDivider")}
@@ -328,43 +368,19 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
 
       {/* Mobile (<md): stacked role cards (qualifying first, divider, then dimmed below-minimum) */}
       <div data-testid="mobile-role-cards" className="space-y-3 md:hidden">
-        {ordered.map((entry) => {
-          const isMin = entry.role === minRole;
-          const dimmed = !entry.clears;
-          const rowLabel = matrix.ladder.find((r) => r.role === entry.role)?.label.en ?? entry.role;
-          const med = toDisplayCurrencies(fx, entry.distributionUsd.median, entry.bestCity.currency, displayCurrency);
-          const sav = toDisplayCurrencies(fx, entry.bestEssentialSavingsUsd, entry.bestCity.currency, displayCurrency);
-          return (
-            <div
-              key={entry.role}
-              className={`overflow-hidden rounded-lg border bg-card shadow-sm ${dimmed ? "opacity-60" : ""}`}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 bg-primary px-3 py-2 text-primary-foreground">
-                <span className="font-semibold">
-                  {rowLabel}
-                  {isMin && <span className="ml-1 text-xs font-bold">{t(locale, "minimumMarker")}</span>}
-                </span>
-                <span className="text-xs text-primary-foreground/80">{entry.track}</span>
-              </div>
-              <div className="space-y-1 p-3 text-sm">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-muted-foreground">{t(locale, "colBestCity")}</span>
-                  <span>
-                    {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-muted-foreground">{t(locale, "colMedian")}</span>
-                  <span className="tabular-nums">{fmtCurrencyTrailing(med.display, displayCurrency)}</span>
-                </div>
-                <div className="flex items-baseline justify-between border-t pt-1.5 font-medium">
-                  <span className="text-muted-foreground">{t(locale, "colEssentialSavings")}</span>
-                  <span className="tabular-nums">{fmtCurrencyTrailing(sav.display, displayCurrency)}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {qualifying.map((entry) => (
+          <MobileRoleCard key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
+        ))}
+
+        {showDivider && (
+          <p data-testid="qualifying-divider-mobile" className="text-center text-xs text-muted-foreground">
+            {t(locale, "qualifyingDivider")}
+          </p>
+        )}
+
+        {nonQualifying.map((entry) => (
+          <MobileRoleCard key={entry.role} entry={entry} isMin={false} dimmed={true} />
+        ))}
       </div>
     </div>
   );

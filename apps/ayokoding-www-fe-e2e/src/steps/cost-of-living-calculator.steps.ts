@@ -1064,15 +1064,23 @@ When("I enter a monthly savings target of zero USD", async ({ page }) => {
 });
 
 Then("the qualifying divider is shown", async ({ page }) => {
-  void page; // stub — full implementation pending
+  // EWT-001: the desktop role-ladder divider is visible even at a numeric zero target, where every
+  // role qualifies. (Baseline IS engaged — savings target selected, target === 0 — distinct from
+  // the blank-target empty-state.) Desktop viewport (md+) shows the table-scoped divider.
+  await expect(page.getByTestId("qualifying-divider")).toBeVisible();
+});
+
+Then("the qualifying divider element is rendered in the role ladder", async ({ page }) => {
+  await expect(page.getByTestId("qualifying-divider")).toBeVisible();
 });
 
 Then("the minimum marker appears on the lowest-ranked role in the ladder", async ({ page }) => {
-  void page; // stub — full implementation pending
+  await expect(page.getByTestId("minimum-marker").first()).toBeVisible();
 });
 
 Then("all roles appear above the divider because every role clears a zero target", async ({ page }) => {
-  void page; // stub — full implementation pending
+  // Every role qualifies at a zero target — no dimmed non-qualifying rows exist.
+  await expect(page.getByTestId("non-qualifying-row")).toHaveCount(0);
 });
 
 // ── SG-007: Expense preview updates in real time ──────────────────────────────
