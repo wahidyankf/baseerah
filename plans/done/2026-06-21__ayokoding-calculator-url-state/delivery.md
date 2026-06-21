@@ -695,42 +695,48 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### Commit Guidelines
 
-- [ ] [AI] Commit changes thematically; Conventional Commits format `<type>(<scope>): <description>`
-- [ ] [AI] Split different concerns into separate commits; preexisting fixes get their own commits
+- [x] [AI] Commit changes thematically; Conventional Commits format `<type>(<scope>): <description>`
+- [x] [AI] Split different concerns into separate commits; preexisting fixes get their own commits
 
 ### Push + Post-Push CI Verification
 
-- [ ] [AI] Commit and push to `origin main`
-- [ ] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 min; one
+- [x] [AI] Commit and push to `origin main`
+      — pushed HEAD d868250e0: fix(ayokoding-www) + chore(plans) commits
+- [x] [AI] Monitor ALL GitHub Actions workflows triggered by the push (poll every 3 min; one
       `gh run view --json status,conclusion` per wakeup; do NOT use `gh run watch`)
-- [ ] [AI] Verify ALL CI checks pass — no exceptions; if any fails, fix and push a follow-up commit;
+- [x] [AI] Verify ALL CI checks pass — no exceptions; if any fails, fix and push a follow-up commit;
       repeat until green
-- [ ] [AI] Do NOT archive until CI is fully green
+      — commons-quality-gate ✓, markdown-validate ✓, commons-env-validate ✓, publish-images ✓
+- [x] [AI] Do NOT archive until CI is fully green — CI green on 2026-06-21
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items are ticked
-- [ ] [AI] Verify ALL quality gates pass (local + CI)
-- [ ] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`
-- [ ] [AI] Verify BOTH locales (`en`, `id`) were exercised in UI verification
-- [ ] [AI] Verify every rule-15 three-tester finding is fixed or explicitly deferred
-- [ ] [AI] Rename and move:
-      `git mv plans/in-progress/ayokoding-calculator-url-state/ plans/done/YYYY-MM-DD__ayokoding-calculator-url-state/`
-      using today's completion date (the `evidence/` subfolder moves with it)
-- [ ] [AI] Update `plans/in-progress/README.md` — remove the plan entry
-- [ ] [AI] Update `plans/done/README.md` — add the plan entry with completion date
-- [ ] [AI] Update any other READMEs that reference this plan
-- [ ] [AI] Commit the archival: `chore(plans): move ayokoding-calculator-url-state to done`
-- [ ] [AI] Remove the worktree after archival is pushed: `git worktree remove worktrees/ayokoding-calculator-url-state`
+- [x] [AI] Verify ALL delivery checklist items are ticked
+- [x] [AI] Verify ALL quality gates pass (local + CI)
+      — local: typecheck lint test:quick specs:coverage all pass; CI: all 4 workflows green
+- [x] [AI] Verify ALL manual assertions pass (Playwright MCP) with committed evidence in `evidence/`
+      — 6 screenshots committed; all 9 controls verified; deep-link restore verified
+- [x] [AI] Verify BOTH locales (`en`, `id`) were exercised in UI verification
+      — en + id at 375/768/1280 px verified; breadcrumb locale-correct in both
+- [x] [AI] Verify every rule-15 three-tester finding is fixed or explicitly deferred
+      — EWT-001/DWT-B-001 fixed; DWT-B-002 fixed; DWT-B-003/004 deferred with rationale
+      — UWT-013–016 deferred with rationale
+- [x] [AI] Rename and move:
+      `git mv plans/in-progress/ayokoding-calculator-url-state/ plans/done/2026-06-21__ayokoding-calculator-url-state/`
+- [x] [AI] Update `plans/in-progress/README.md` — remove the plan entry
+- [x] [AI] Update `plans/done/README.md` — add the plan entry with completion date
+- [x] [AI] Update any other READMEs that reference this plan
+- [x] [AI] Commit the archival: `chore(plans): move ayokoding-calculator-url-state to done`
+- [x] [AI] Remove the worktree after archival is pushed: `git worktree remove worktrees/ayokoding-calculator-url-state`
 
 ### Phase 5 Gate
 
 > Final gate — the plan is complete only when all checks pass.
 
-- [ ] [AI] All manual UI verification passed for `en` and `id` at 375/768/1280 px with evidence
-- [ ] [AI] All three absorbed findings annotated closed
-- [ ] [AI] CI fully green on `origin main` after push
-- [ ] [AI] Plan archived to `plans/done/` and the archival commit pushed
+- [x] [AI] All manual UI verification passed for `en` and `id` at 375/768/1280 px with evidence
+- [x] [AI] All three absorbed findings annotated closed
+- [x] [AI] CI fully green on `origin main` after push
+- [x] [AI] Plan archived to `plans/done/` and the archival commit pushed
 
 > **Pause Safety**: the feature is shipped, verified, specced, and archived; CI is green. This is the
 > terminal state. To resume (if interrupted before archival): re-run
