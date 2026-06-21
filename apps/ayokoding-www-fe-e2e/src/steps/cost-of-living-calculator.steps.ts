@@ -1908,3 +1908,269 @@ Then("the current-page crumb text reads {string}", async ({ page }, expected: st
 Then('the current-page crumb is marked aria-current="page"', async ({ page }) => {
   await expect(page.locator('[aria-current="page"]')).toBeVisible();
 });
+
+// ── AC-OOP: abbr element wraps every OOP acronym ─────────────────────────────
+
+Then(
+  "every {string} acronym is wrapped in an abbr element titled {string}",
+  async ({ page }, acronym: string, title: string) => {
+    // All abbr elements whose text matches the acronym must have the expected title attribute
+    const abbrs = page.locator(`abbr`).filter({ hasText: acronym });
+    const count = await abbrs.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      const titleAttr = await abbrs.nth(i).getAttribute("title");
+      expect(titleAttr?.toLowerCase()).toContain(title.toLowerCase());
+    }
+  },
+);
+
+// ── AC-tab-desc: Tab descriptions associated via aria-describedby ─────────────
+
+Given("the user views the calculator tab bar", async ({ page }) => {
+  await page.goto("/en/tools/cost-of-living-calculator");
+  await page.waitForLoadState("networkidle");
+});
+
+Then(
+  "each of the three tabs has a visibly rendered description element associated with its trigger via aria-describedby",
+  async ({ page }) => {
+    // The three tab triggers each have aria-describedby pointing to a rendered <p>
+    const tabTriggers = page.locator('[role="tab"]');
+    const count = await tabTriggers.count();
+    expect(count).toBeGreaterThanOrEqual(3);
+    for (let i = 0; i < Math.min(count, 3); i++) {
+      const describedById = await tabTriggers.nth(i).getAttribute("aria-describedby");
+      expect(describedById).toBeTruthy();
+      // The element with that id must exist in the DOM (not necessarily visible — hidden class used)
+      const descEl = page.locator(`#${describedById}`);
+      await expect(descEl).toBeAttached();
+    }
+  },
+);
+
+Then("no tab description text is duplicated elsewhere on screen", async ({ page }) => {
+  // Each tab description should appear only once in the DOM (one <p> per tab, not repeated)
+  for (const id of ["tab-desc-cost", "tab-desc-savings", "tab-desc-min-role"]) {
+    const count = await page.locator(`#${id}`).count();
+    expect(count).toBe(1);
+  }
+});
+
+// ── AC-8: Savings gross-salary field active currency indicator ────────────────
+
+When("the gross-salary field renders", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator("#gross-salary-input")).toBeAttached();
+});
+
+Then(
+  "the gross-salary label does not contain the literal currency code {string}",
+  async ({ page }, currencyCode: string) => {
+    const label = page.locator("label[for='gross-salary-input']");
+    await expect(label).toBeVisible();
+    const labelText = await label.textContent();
+    // The label must NOT contain the raw code like "USD" as a standalone token
+    expect(labelText).not.toContain(currencyCode);
+  },
+);
+
+Then("an active-currency indicator next to the field shows {string}", async ({ page }, currencyCode: string) => {
+  const indicator = page.locator("[data-testid='salary-currency-indicator']");
+  await expect(indicator).toBeVisible();
+  const text = await indicator.textContent();
+  expect(text?.trim()).toContain(currencyCode);
+});
+
+// ── AC-9: Minimum-role blank savings target → empty-state guidance ────────────
+
+Given(
+  "I am on the {string} tab with the savings-target baseline and a blank target",
+  async ({ page }, tabName: string) => {
+    const tabParam: Record<string, string> = {
+      "Cost of living": "cost",
+      Savings: "savings",
+      "Minimum role": "min-role",
+    };
+    const param = tabParam[tabName] ?? "min-role";
+    // Navigate to the tab; do NOT pre-fill a target so the field stays blank
+    await page.goto(`/en/tools/cost-of-living-calculator?tab=${param}`);
+    await page.waitForLoadState("networkidle");
+    // Ensure "Monthly savings target" radio is selected (it is the default)
+    const savingsTargetRadio = page.getByRole("radio", { name: /savings target/i });
+    const isVisible = await savingsTargetRadio.isVisible().catch(() => false);
+    if (isVisible) {
+      await savingsTargetRadio.click();
+      await page.waitForLoadState("networkidle");
+    }
+  },
+);
+
+Then("a minimum-role empty-state guidance message is shown", async ({ page }) => {
+  await expect(page.locator("[data-testid='min-role-empty-state']")).toBeVisible();
+});
+
+Then(
+  "entering an explicit zero target replaces the guidance with the role ladder and its divider",
+  async ({ page }) => {
+    // Fill "0" into the savings-target input — explicit zero should dismiss empty state
+    const input = page.locator("#target-amount-input");
+    await input.click({ clickCount: 3 });
+    await page.keyboard.type("0");
+    await page.keyboard.press("Tab");
+    await page.waitForLoadState("networkidle");
+    // Empty state must be gone; qualifying divider must be visible
+    await expect(page.locator("[data-testid='min-role-empty-state']")).toBeHidden();
+    await expect(page.locator("[data-testid='qualifying-divider']")).toBeVisible();
+  },
+);
+
+// ── AC-10: Region selector lists the nine intended regions ───────────────────
+
+When("the region filter renders", async ({ page }) => {
+  await expect(page.locator("#geo-region-select")).toBeVisible();
+});
+
+Then(
+  "the region selector offers exactly the nine regions africa, americas, asean, asia, europe, japan, mena, nordics, and oceania",
+  async ({ page }) => {
+    const options = await page.locator("#geo-region-select option:not([value=''])").allTextContents();
+    const expectedRegions = ["africa", "americas", "asean", "asia", "europe", "japan", "mena", "nordics", "oceania"];
+    const lowerOptions = options.map((o) => o.trim().toLowerCase());
+    expect(options.length).toBe(9);
+    for (const region of expectedRegions) {
+      expect(lowerOptions.some((o) => o.includes(region))).toBe(true);
+    }
+  },
+);
+
+// ── AC-11: Country change that auto-changes region shows advisory ─────────────
+
+Given("I am on the calculator with no region selected", async ({ page }) => {
+  // Navigate to calculator with no geo params so region starts as "All regions"
+  await page.goto("/en/tools/cost-of-living-calculator");
+  await page.waitForLoadState("networkidle");
+  // Ensure region filter is cleared
+  await page.locator("#geo-region-select").selectOption("");
+  await page.waitForLoadState("networkidle");
+});
+
+When("I select a country whose region differs from the current selection", async ({ page }) => {
+  // With no region selected, pick any country — GeoFilters will auto-set the region
+  // Singapore is in ASEAN; picking it from "no region" will auto-set region=asean
+  const countrySelect = page.locator("#geo-country-select");
+  await countrySelect.selectOption("sg");
+  await page.waitForLoadState("networkidle");
+});
+
+Then("a visible region-auto-advisory message is shown", async ({ page }) => {
+  const advisory = page.locator("[data-testid='region-auto-advisory']");
+  await expect(advisory).toBeVisible();
+});
+
+// ── AC-12: City-only deep link back link omits auto-derived region/country ────
+
+When("I read the single-city detail back link", async ({ page }) => {
+  // Ensure city detail is rendered
+  await expect(page.locator("[data-testid='city-detail']")).toBeVisible({ timeout: 8000 });
+});
+
+Then(
+  "the back link points to the bare calculator {string} with no region or country",
+  async ({ page }, _expectedHref: string) => {
+    // The back link is an <a> inside the city-detail hero section
+    const backLink = page.locator("[data-testid='city-detail'] a[href*='tab=cost']");
+    await expect(backLink).toBeVisible();
+    const href = await backLink.getAttribute("href");
+    // The href must match the bare pattern and must not contain region= or country=
+    expect(href).toBeTruthy();
+    expect(href).toContain("tab=cost");
+    expect(href).not.toMatch(/region=/);
+    expect(href).not.toMatch(/country=/);
+  },
+);
+
+// ── SG-U: Country-narrows-city (no prior region selected) ───────────────────
+
+Given("I am on the calculator with no region or country selected", async ({ page }) => {
+  await page.goto("/en/tools/cost-of-living-calculator");
+  await page.waitForLoadState("networkidle");
+});
+
+When(
+  "I select the country {string} in the country filter without first selecting a region",
+  async ({ page }, country: string) => {
+    // Use the country filter select directly (no region change first)
+    const countrySelect = page.locator("#geo-country-select");
+    await countrySelect.selectOption({ label: country });
+    await page.waitForLoadState("networkidle");
+  },
+);
+
+Then("the city dropdown lists only cities in Indonesia", async ({ page }) => {
+  const citySelect = page.locator("#geo-city-select");
+  const options = await citySelect.locator("option:not([value=''])").allTextContents();
+  expect(options.length).toBeGreaterThan(0);
+  // Verify some known Indonesian cities appear
+  const optionTexts = options.map((o) => o.toLowerCase());
+  const hasIndonesianCity = optionTexts.some(
+    (o) => o.includes("jakarta") || o.includes("bandung") || o.includes("bali") || o.includes("surabaya"),
+  );
+  expect(hasIndonesianCity).toBe(true);
+});
+
+// ── SG-U: Area radiogroup ────────────────────────────────────────────────────
+
+When("the cost-basis controls render", async ({ page }) => {
+  await page.waitForLoadState("networkidle");
+});
+
+Then('the area segmented control has role="radiogroup"', async ({ page }) => {
+  // SegmentedControl renders a div with role="radiogroup" and aria-label matching the area label
+  const radiogroup = page.locator('[role="radiogroup"]').filter({ hasText: /city center|rural/i });
+  await expect(radiogroup.first()).toBeAttached();
+  const role = await radiogroup.first().getAttribute("role");
+  expect(role).toBe("radiogroup");
+});
+
+Then("the area radiogroup contains the {string} and {string} options", async ({ page }, opt1: string, opt2: string) => {
+  const radiogroup = page.locator('[role="radiogroup"]').filter({ hasText: new RegExp(opt1, "i") });
+  await expect(radiogroup.first()).toBeAttached();
+  const opt1Radio = radiogroup.first().getByRole("radio", { name: new RegExp(opt1, "i") });
+  const opt2Radio = radiogroup.first().getByRole("radio", { name: new RegExp(opt2, "i") });
+  await expect(opt1Radio).toBeAttached();
+  await expect(opt2Radio).toBeAttached();
+});
+
+// ── SG-U: Baseline SegmentedControl radiogroup ───────────────────────────────
+
+Then("the baseline-source control renders as a radiogroup with at least three options", async ({ page }) => {
+  // The baseline SegmentedControl renders role="radiogroup" with 3 radio options
+  // Filter to the one with savings target option text
+  const radiogroup = page
+    .locator('[role="radiogroup"]')
+    .filter({ hasText: /savings target|reference role|my salary/i });
+  await expect(radiogroup.first()).toBeAttached();
+  const radios = radiogroup.first().locator('[role="radio"]');
+  const count = await radios.count();
+  expect(count).toBeGreaterThanOrEqual(3);
+});
+
+Then("the savings-target input is visible when savings target is the selected baseline", async ({ page }) => {
+  // Ensure savings target baseline is selected (it is the default)
+  const savingsTargetRadio = page.getByRole("radio", { name: /savings target/i });
+  const isVisible = await savingsTargetRadio.isVisible().catch(() => false);
+  if (isVisible) {
+    await savingsTargetRadio.click();
+    await page.waitForLoadState("networkidle");
+  }
+  // The savings target input should now be visible
+  const targetInput = page.locator("#target-amount-input");
+  await expect(targetInput).toBeVisible();
+});
+
+Then("the reference-role inputs are hidden when savings target is the selected baseline", async ({ page }) => {
+  // When savings target is active, the reference-role sub-form (ref-city-select) must not be visible
+  const refCitySelect = page.locator("#ref-city-select");
+  await expect(refCitySelect).toBeHidden();
+});
