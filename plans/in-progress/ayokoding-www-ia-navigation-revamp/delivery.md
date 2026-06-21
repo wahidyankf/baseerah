@@ -320,7 +320,8 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       <!-- 2026-06-21 · Done · typecheck ✓, lint ✓ (1 preexisting controls.tsx a11y warning, untouched), test:unit ✓ (2143+ tests), specs:coverage ✓ (18 specs, 186 scenarios, 674 steps). -->
 - [x] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` — `/c` content 200, 308 redirects, about/terms not-redirected scenarios pass
       <!-- 2026-06-21 · Done · Full fe-e2e: 444 passed, 0 failed. Includes /c content 200, 308 redirect (en+id), about/terms/tools not-redirected, /c browse index, AND the learn-reorg regression fix (platform-web now lands in /c namespace). -->
-- [ ] [AI] Commit and push to origin main (thematic commits per Commit Guidelines below)
+- [x] [AI] Commit and push to origin main (thematic commits per Commit Guidelines below)
+      <!-- 2026-06-22 · Done · 4 thematic commits (copy keys / routing core / e2e specs / plan ticks) pushed to origin main @ 75560bf02. CI: TS+markdown+env gates green; .NET quality gate hit a known MSBuild obj/bin concurrency race (unrelated to ayokoding-www) — re-running failed jobs. -->
 
 > **Pause Safety**: content is now reachable at `/c/...`, old URLs 308-redirect, about/terms/tools
 > stay top-level, and the `/c` browse index renders — a coherent, shippable state even though the
@@ -333,9 +334,10 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > _Suggested executor: `swe-typescript-dev` (TSX) / `swe-ui-maker`_
 
-- [ ] [AI] **RED**: extend `apps/ayokoding-www/src/features/app-shell/shell/header.tsx`'s test (or add
+- [x] [AI] **RED**: extend `apps/ayokoding-www/src/features/app-shell/shell/header.tsx`'s test (or add
       `header.test.tsx`) asserting the header renders a "Learn" link to `/en/c` and a "Tools" link to
       `/en/tools` — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails (no nav links)
+      <!-- 2026-06-22 · Done · header.test.tsx added (RED: no nav links), then GREEN. -->
 
   **Gherkin (binds) →** "Header shows primary nav links on desktop"
 
@@ -346,11 +348,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then the header shows a "Learn" link to "/en/c" and a "Tools" link to "/en/tools"
   ```
 
-- [ ] [AI] **GREEN**: add the inline primary nav (`Learn` → `/${locale}/c`, `Tools` → `/${locale}/tools`,
+- [x] [AI] **GREEN**: add the inline primary nav (`Learn` → `/${locale}/c`, `Tools` → `/${locale}/tools`,
       labels via `t(locale, "navLearn"/"navTools")`) to `header.tsx`, hidden on mobile (`hidden md:flex`)
       — command: `npx nx run ayokoding-www:test:unit` — acceptance: header test passes
-- [ ] [AI] **RED**: extend `apps/ayokoding-www/src/features/app-shell/shell/mobile-nav.test.tsx` asserting the
+      <!-- 2026-06-22 · Done · header.tsx renders a `hidden md:flex` Primary nav landmark mapping PRIMARY_NAV_LINKS. test:unit green. -->
+- [x] [AI] **RED**: extend `apps/ayokoding-www/src/features/app-shell/shell/mobile-nav.test.tsx` asserting the
       mobile menu shows the same Learn/Tools links — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+      <!-- 2026-06-22 · Done · mobile-nav.test.tsx extended (RED), then GREEN. -->
 
   **Gherkin (binds) →** "Mobile navigation mirrors the header links"
 
@@ -361,11 +365,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     Then the menu shows a "Learn" link to "/en/c" and a "Tools" link to "/en/tools"
   ```
 
-- [ ] [AI] **GREEN**: add the Learn/Tools links to `mobile-nav.tsx` — command:
+- [x] [AI] **GREEN**: add the Learn/Tools links to `mobile-nav.tsx` — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: mobile-nav test passes
-- [ ] [AI] **RED**: add a `footer.test.tsx` asserting the footer renders Learn / Tools / About columns with
+      <!-- 2026-06-22 · Done · mobile-nav.tsx adds a MENU section with the Learn/Tools links (shared config) above SidebarTree; closes drawer on click. test:unit green. -->
+- [x] [AI] **RED**: add a `footer.test.tsx` asserting the footer renders Learn / Tools / About columns with
       localized labels and About links to `/${locale}/about-ayokoding` (en) and `/${locale}/tentang-ayokoding`
       (id) via the loose-page allowlist — command: `npx nx run ayokoding-www:test:unit` — acceptance: fails
+      <!-- 2026-06-22 · Done · footer.test.tsx added (RED), then GREEN. -->
 
   **Gherkin (binds) →** "Footer shows grouped navigation with localized labels"
 
@@ -377,24 +383,30 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
     And the About column links to "/id/tentang-ayokoding" and "/id/syarat-dan-ketentuan"
   ```
 
-- [ ] [AI] **GREEN**: rebuild `footer.tsx` into a multi-column nav (Learn · Tools · About/Terms) using
+- [x] [AI] **GREEN**: rebuild `footer.tsx` into a multi-column nav (Learn · Tools · About/Terms) using
       per-locale loose-page slugs + `contentUrl`/allowlist, keeping the copyright + license row — command:
       `npx nx run ayokoding-www:test:unit` — acceptance: footer test passes
-- [ ] [AI] **REFACTOR**: extract a shared `NavLinks` list config (label key + href builder) reused by header,
+      <!-- 2026-06-22 · Done · footer.tsx rebuilt into a 4-column nav landmark (Learn·Tools·About·Project); About column links about+terms via contentUrl (en about-ayokoding/terms-and-conditions, id tentang-ayokoding/syarat-dan-ketentuan); copyright + FSL-1.1-MIT/source-available row kept. Added footer label keys (en+id). test:unit green. -->
+- [x] [AI] **REFACTOR**: extract a shared `NavLinks` list config (label key + href builder) reused by header,
       mobile-nav, and footer — command: `npx nx run ayokoding-www:test:unit` — acceptance: all tests pass
-- [ ] [AI] Add companion Gherkin for header/footer/mobile nav presence + targets into
+      <!-- 2026-06-22 · Done · core/nav-links.ts exports PRIMARY_NAV_LINKS ({labelKey, hrefFor(locale)}); header, mobile-nav, footer all consume it so Learn/Tools never drift. nav-links.test.ts added. test:unit green. -->
+- [x] [AI] Add companion Gherkin for header/footer/mobile nav presence + targets into
       `specs/apps/ayokoding/behavior/ayokoding-www/gherkin/navigation/ia-navigation-revamp.feature` — command:
       `npx nx run ayokoding-www:specs:coverage` — acceptance: exits 0
   - _Suggested executor: `specs-maker`_
+      <!-- 2026-06-22 · Done · 3 scenarios appended (Header primary nav, Mobile nav mirrors, Footer grouped nav) + nav-chrome.steps.ts e2e step defs + unit mirror. specs:coverage exit 0 (18 specs, 189 scenarios, 689 steps). -->
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` — all exit 0
-- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e -- --grep "nav|header|footer"` — nav chrome
+- [x] [AI] `npx nx run ayokoding-www:typecheck lint test:unit specs:coverage` — all exit 0
+      <!-- 2026-06-22 · Done · typecheck ✓, lint ✓, test:unit ✓ (2188 tests), specs:coverage ✓ (18 specs, 189 scenarios, 689 steps). -->
+- [x] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e -- --grep "nav|header|footer"` — nav chrome
       rendering scenarios pass (header Learn/Tools links render, mobile hamburger opens MobileNav)
-- [ ] [AI] Commit and push to origin main
+      <!-- 2026-06-22 · Done · Header/Mobile/Footer nav scenarios pass across chromium+firefox+webkit. Fixed a strict-mode ambiguity in the mobile-nav step (drawer holds both chrome Learn link → /{locale}/c and the SidebarTree content "Learn"); disambiguated via .and() on the exact chrome href. -->
+- [x] [AI] Commit and push to origin main
+      <!-- 2026-06-22 · See P3 commit+push below (bundled with the F# CI-race infra fix). -->
 
 > **Pause Safety**: global header/footer/mobile nav now link Learn and Tools on every page — a
 > coherent, shippable state (the homepage may still be the old tree until P4, but navigation works
