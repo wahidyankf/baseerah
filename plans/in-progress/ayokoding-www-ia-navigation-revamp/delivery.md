@@ -704,15 +704,15 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
   **Evidence captured** (all in `evidence/`):
 
-  | Page           | en                                            | id                                            |
-  | -------------- | --------------------------------------------- | --------------------------------------------- |
-  | Landing 320px  | ![](./evidence/phase-6-landing-en-320px.png)  | ![](./evidence/phase-6-landing-id-320px.png)  |
-  | Landing 375px  | ![](./evidence/phase-6-landing-en-375px.png)  | ![](./evidence/phase-6-landing-id-375px.png)  |
-  | Landing 768px  | ![](./evidence/phase-6-landing-en-768px.png)  | ![](./evidence/phase-6-landing-id-768px.png)  |
-  | Landing 1280px | ![](./evidence/phase-6-landing-en-1280px.png) | ![](./evidence/phase-6-landing-id-1280px.png) |
-  | Browse 320px   | ![](./evidence/phase-6-browse-en-320px.png)   | ![](./evidence/phase-6-browse-id-320px.png)   |
-  | Browse 1280px  | ![](./evidence/phase-6-browse-en-1280px.png)  | —                                             |
-  | Content 1280px | ![](./evidence/phase-6-content-en-1280px.png) | ![](./evidence/phase-6-content-id-1280px.png) |
+  | Page           | en                                                             | id                                                             |
+  | -------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
+  | Landing 320px  | ![Landing en 320px](./evidence/phase-6-landing-en-320px.png)   | ![Landing id 320px](./evidence/phase-6-landing-id-320px.png)   |
+  | Landing 375px  | ![Landing en 375px](./evidence/phase-6-landing-en-375px.png)   | ![Landing id 375px](./evidence/phase-6-landing-id-375px.png)   |
+  | Landing 768px  | ![Landing en 768px](./evidence/phase-6-landing-en-768px.png)   | ![Landing id 768px](./evidence/phase-6-landing-id-768px.png)   |
+  | Landing 1280px | ![Landing en 1280px](./evidence/phase-6-landing-en-1280px.png) | ![Landing id 1280px](./evidence/phase-6-landing-id-1280px.png) |
+  | Browse 320px   | ![Browse en 320px](./evidence/phase-6-browse-en-320px.png)     | ![Browse id 320px](./evidence/phase-6-browse-id-320px.png)     |
+  | Browse 1280px  | ![Browse en 1280px](./evidence/phase-6-browse-en-1280px.png)   | —                                                              |
+  | Content 1280px | ![Content en 1280px](./evidence/phase-6-content-en-1280px.png) | ![Content id 1280px](./evidence/phase-6-content-id-1280px.png) |
 
   Console: GTM CSP only (expected dev-mode); 308 redirect confirmed via curl.
 
