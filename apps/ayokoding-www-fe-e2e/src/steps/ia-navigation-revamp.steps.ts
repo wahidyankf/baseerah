@@ -24,8 +24,9 @@ Then("each ancestor crumb links to a {string} prefixed URL", async ({ page }, pr
   expect(count).toBeGreaterThan(0);
   for (let i = 0; i < count; i++) {
     const href = await links.nth(i).getAttribute("href");
-    // Home link ("/en") is excluded — only ancestor segment links must use /c/
-    if (href && href !== "/" && !href.match(/^\/[a-z]{2}$/)) {
+    // Skip: root ("/"), locale root ("/en"), and the browse root ("/en/c") —
+    // browse root IS the /c/ namespace but has no trailing path segment.
+    if (href && href !== "/" && !href.match(/^\/[a-z]{2}$/) && !href.match(/^\/[a-z]{2}\/c$/)) {
       expect(href).toContain(prefix);
     }
   }
@@ -55,17 +56,22 @@ Then(
     const count = await navLinks.count();
     expect(count).toBeGreaterThan(0);
 
+    // Collect unique content hrefs, then check in parallel to avoid sequential timeout.
+    const hrefs: string[] = [];
+    const seen = new Set<string>();
     for (let i = 0; i < count; i++) {
       const href = await navLinks.nth(i).getAttribute("href");
-      if (!href) continue;
-      // Only check internal content hrefs (those with /c/ in the path).
-      if (!href.includes("/c/")) continue;
-
-      const response = await page.request.get(href, { maxRedirects: 0 });
-      // Allow both 200 (direct) and 3xx-that-eventually-200 — the key assertion is no 308.
-      // A 404 would indicate a missing route.
-      expect(response.status()).not.toBe(404);
+      if (!href || seen.has(href) || !href.includes("/c/")) continue;
+      seen.add(href);
+      hrefs.push(href);
     }
+
+    await Promise.all(
+      hrefs.map(async (href) => {
+        const response = await page.request.get(href, { maxRedirects: 0, timeout: 10000 });
+        expect(response.status()).not.toBe(404);
+      }),
+    );
   },
 );
 
@@ -73,13 +79,22 @@ Then("no internal content link resolves through a 308 redirect", async ({ page }
   const navLinks = page.locator("nav a[href]");
   const count = await navLinks.count();
 
+  // Collect unique internal hrefs, then check in parallel to avoid sequential timeout.
+  const hrefs: string[] = [];
+  const seen = new Set<string>();
   for (let i = 0; i < count; i++) {
     const href = await navLinks.nth(i).getAttribute("href");
-    if (!href || !href.startsWith("/")) continue;
-
-    const response = await page.request.get(href, { maxRedirects: 0 });
-    expect(response.status(), `Link ${href} should not be a 308 redirect`).not.toBe(308);
+    if (!href || !href.startsWith("/") || seen.has(href)) continue;
+    seen.add(href);
+    hrefs.push(href);
   }
+
+  await Promise.all(
+    hrefs.map(async (href) => {
+      const response = await page.request.get(href, { maxRedirects: 0, timeout: 10000 });
+      expect(response.status(), `Link ${href} should not be a 308 redirect`).not.toBe(308);
+    }),
+  );
 });
 
 // ---------------------------------------------------------------------------
