@@ -360,49 +360,88 @@ focus-visible:*`) plus `min-h-[44px] w-full min-w-0 max-w-full`. Rebuilt standal
 
 ## Phase 5: Currency & empty-states (UWT-004, UWT-006)
 
-- [ ] [AI] **RED**: extend
+- [x] [AI] **RED**: extend
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.test.tsx` asserting
       the gross-salary label does NOT contain the literal "USD" and that an active-currency
       indicator (or selector) is rendered — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (label currently ends "USD")
+      _Done 2026-06-21: added `UWT-004` test asserting `label[for="gross-salary-input"]` has no
+      `/USD/` and a `data-testid="salary-currency-indicator"` shows USD. Failed RED — indicator
+      absent (label still ended "USD")._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: update `grossMonthlySalaryLabel` (en + id) in `translations.ts` to drop the
+- [x] [AI] **GREEN**: update `grossMonthlySalaryLabel` (en + id) in `translations.ts` to drop the
       trailing "USD"; in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/savings.tsx` surface the
       active currency next to the input (indicator per Assumption A-6, or mirror min-role's
       `displayCurrency` selector if trivial) — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: RED test passes; existing savings tests still pass
+      _Done: dropped trailing "USD" from `grossMonthlySalaryLabel` (en "Gross monthly salary
+      (before tax)" / id "Gaji kotor bulanan (sebelum pajak)"); added `salaryCurrencyIndicator`
+      (en "Currency: USD" / id "Mata uang: USD"). savings.tsx now wraps the input + a
+      `data-testid="salary-currency-indicator"` span in a flex row — a fixed indicator (A-6), since
+      the savings model derives every figure in USD. All 2065 savings/unit tests pass._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: extend
+- [x] [AI] **RED**: extend
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/min-role.test.tsx` asserting
       that with savings-target baseline and a blank/zero target, the role table is hidden and a
       `data-testid="min-role-empty-state"` guidance message is shown
       — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: fails (table always renders today)
+      _Done 2026-06-21: added two `UWT-006` tests — (a) BLANK target on mount → `min-role-empty-state`
+      shown, no table/marker/divider (failed RED, table rendered at mount); (b) reconciliation guard:
+      typing explicit "0" → empty-state cleared, table + divider render (passed, confirming the
+      blank-vs-zero split is the only change)._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **GREEN**: add `minRoleEmptyStateMessage` keys (en + id) to `translations.ts`; in
+- [x] [AI] **GREEN**: add `minRoleEmptyStateMessage` keys (en + id) to `translations.ts`; in
       `min-role.tsx`, when `baselineSource === "savings_target" && targetAmount === 0`, render the
       `min-role-empty-state` message and skip the table/mobile-cards blocks (mirror the Savings
       empty-state pattern) — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: RED test passes; the Phase-1 divider tests (which set a non-zero/zero target
       with a chosen baseline) remain green
+      _Done: added `minRoleEmptyStateMessage` (en + id). **Blank-vs-zero distinction** (per the
+      Phase-1 reconciliation directive): replaced the `targetAmount` number-state with a raw string
+      state `targetRaw` (`useState("")`); `targetAmount = parseFloat(targetRaw) || 0` and
+      `targetIsBlank = targetRaw.trim() === ""`. The empty-state gate is
+      `showEmptyState = baselineSource === "savings_target" && targetIsBlank` — NOT `=== 0`. So a
+      blank field → empty-state; an explicit "0" (`targetRaw === "0"`, non-blank) → baseline engaged →
+      Phase-1 divider path. Also `baselineReady` now requires `!targetIsBlank`. Wrapped the desktop
+      table and mobile-cards blocks in `{!showEmptyState && (...)}`. Phase-1 divider tests stay green.
+      Fixed 3 dependent tests/scenarios that rendered the ladder on mount without a target (min-role
+      caption test, "Roles are labelled" + "Low-confidence cells" scenarios) by entering "1000" first._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR**: reconcile the empty-state with the EWT-001 divider — confirm the
+- [x] [AI] **REFACTOR**: reconcile the empty-state with the EWT-001 divider — confirm the
       zero-target _divider_ scenario from Phase 1 still expects the table when a baseline is
       explicitly engaged vs the empty-state when the target is blank; document the distinction in a
       code comment — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: all min-role tests pass, no contradiction between empty-state and divider tests
-- [ ] [AI] **RED/GREEN**: add Gherkin AC-8 (currency) and AC-9 (min-role empty-state) to the
+      _Done: the blank-vs-zero rationale is documented in three code comments in `min-role.tsx` — at
+      the `targetRaw`/`targetIsBlank` declaration, at `showEmptyState`, and the prior EWT-001 comment
+      at `showDivider`. The Phase-1 "savings_target=0 (baseline engaged)" test (types "0" → divider)
+      and the new UWT-006 blank test (mount → empty-state) both pass with no contradiction; the
+      UWT-006 numeric-zero guard test asserts they don't overlap. All 22 min-role.test.tsx tests pass._
+- [x] [AI] **RED/GREEN**: add Gherkin AC-8 (currency) and AC-9 (min-role empty-state) to the
       calculator `.feature`; wire step defs — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0
+      _Done: added AC-8 "The Savings gross-salary field shows the active currency as a separate
+      indicator" (Given/When/Then + And — no-USD label + indicator) and AC-9 "A blank savings target
+      shows empty-state guidance instead of the role ladder" (Given/When/Then + But, where the `But`
+      asserts the numeric-zero ladder/divider — the blank-vs-zero reconciliation in one scenario).
+      Wired both as `@amiceli/vitest-cucumber` Scenario blocks in
+      `test/unit/fe-steps/cost-of-living-calculator.steps.tsx`; also upgraded the previously-stubbed
+      USS-002 min-role empty-state scenario to real assertions now that the branch exists.
+      `specs:coverage` exits 0 (15 specs / 168 scenarios / 618 steps); cardinality audit clean._
   - _Suggested executor: `specs-maker`_
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
+-p ayokoding-www --skip-nx-cache`: exit 0. typecheck clean; lint exits 0 with the single
+      pre-existing non-blocking `controls.tsx:32` jsx-a11y warning (carried from Phase 4, unrelated);
+      test:unit 2075 passed; specs:coverage 15 specs / 168 scenarios / 618 steps all covered;
+      `rhino-cli:specs:gherkin-cardinality-validation` clean._
 
 > **Pause Safety**: Savings active currency is explicit and min-role has an empty-state; gate
 > green. Safe to stop. To resume: re-run the gate command.

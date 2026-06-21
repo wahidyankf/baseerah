@@ -120,7 +120,8 @@ const translations: Record<Locale, Record<string, string>> = {
 
     // Calculator — savings table
     savingsEmptyStateMessage: "Enter your gross monthly salary to see how much you could save in each city.",
-    grossMonthlySalaryLabel: "Gross monthly salary (before tax) USD",
+    grossMonthlySalaryLabel: "Gross monthly salary (before tax)",
+    salaryCurrencyIndicator: "Currency: USD",
     annualGrossLabel: "Annual gross",
     nonSalaryCompNote: "Non-salary comp (RSU/equity + bonus) is informational only — not in savings math.",
     colNet: "Net (monthly)",
@@ -147,6 +148,7 @@ const translations: Record<Locale, Record<string, string>> = {
       "Ranking key: essential savings (housing + food + transport + utilities + healthcare + school). Lifestyle excluded — personal preference variable.",
     nonSalaryRankNote: "Non-salary comp (RSU / equity / bonus) is informational only — not used in ranking.",
     noQualifierMessage: "No role reaches this savings bar in any city.",
+    minRoleEmptyStateMessage: "Enter a monthly savings target to see which roles reach it in each city.",
     seRolesCaption: "Roles: software-engineering (IC + management)",
     qualifyingDivider: "— roles below do not reach the savings bar —",
     colRole: "Role",
@@ -280,7 +282,8 @@ const translations: Record<Locale, Record<string, string>> = {
     // Calculator — savings table
     savingsEmptyStateMessage:
       "Masukkan gaji kotor bulanan Anda untuk melihat berapa banyak yang bisa Anda hemat di setiap kota.",
-    grossMonthlySalaryLabel: "Gaji kotor bulanan (sebelum pajak) USD",
+    grossMonthlySalaryLabel: "Gaji kotor bulanan (sebelum pajak)",
+    salaryCurrencyIndicator: "Mata uang: USD",
     annualGrossLabel: "Total gaji tahunan",
     nonSalaryCompNote:
       "Kompensasi non-gaji (RSU/ekuitas + bonus) hanya informasi — tidak termasuk dalam perhitungan tabungan.",
@@ -308,6 +311,8 @@ const translations: Record<Locale, Record<string, string>> = {
       "Kunci peringkat: tabungan kebutuhan pokok (perumahan + makanan + transportasi + utilitas + kesehatan + sekolah). Gaya hidup dikecualikan — variabel preferensi pribadi.",
     nonSalaryRankNote: "Kompensasi non-gaji (RSU / ekuitas / bonus) hanya informasi — tidak digunakan dalam peringkat.",
     noQualifierMessage: "Tidak ada jabatan yang mencapai target tabungan ini di kota manapun.",
+    minRoleEmptyStateMessage:
+      "Masukkan target tabungan bulanan untuk melihat jabatan mana yang mencapainya di setiap kota.",
     seRolesCaption: "Jabatan: rekayasa perangkat lunak (IC + manajemen)",
     qualifyingDivider: "— jabatan di bawah tidak mencapai target tabungan —",
     colRole: "Jabatan",

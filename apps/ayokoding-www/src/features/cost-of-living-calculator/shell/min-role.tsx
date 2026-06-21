@@ -39,7 +39,14 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
   const [baselineSource, setBaselineSource] = useState<"savings_target" | "reference_role" | "my_salary">(
     "savings_target",
   );
-  const [targetAmount, setTargetAmount] = useState(0);
+  // UWT-006 / EWT-001 reconciliation: we keep the RAW input string separately from the parsed
+  // numeric amount so we can tell "the user has not entered a target yet" (blank `targetRaw` →
+  // empty-state) apart from "the user explicitly typed 0" (`targetRaw === "0"` → baseline engaged,
+  // every role clears, divider renders). Relying on `targetAmount === 0` alone cannot distinguish
+  // these two states because both parse to the number 0.
+  const [targetRaw, setTargetRaw] = useState("");
+  const targetAmount = parseFloat(targetRaw) || 0;
+  const targetIsBlank = targetRaw.trim() === "";
   const [targetCurrency, setTargetCurrency] = useState("USD");
   const [refCityId, setRefCityId] = useState(dataset.cities[0]?.id ?? "");
   const [refRole, setRefRole] = useState<EngRole>("senior_swe");
@@ -54,7 +61,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
   let baselineReady = false;
 
   try {
-    if (baselineSource === "savings_target" && targetAmount >= 0) {
+    if (baselineSource === "savings_target" && !targetIsBlank && targetAmount >= 0) {
       baselineUsd = resolveBaselineUsd(
         "savings_target",
         { amountLocal: targetAmount, displayCurrency: targetCurrency },
@@ -92,6 +99,12 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
   // target 0 it disappeared even though the qualifying group was non-empty.) Single source of truth
   // for both the desktop table and the mobile cards below.
   const showDivider = baselineReady && qualifying.length > 0;
+
+  // UWT-006: when the savings-target baseline is selected but the target field is BLANK (the user
+  // has not stated a goal yet), suppress the role ladder and show empty-state guidance instead of
+  // dumping the full table. A numeric zero (`targetRaw === "0"`) is NOT blank — it engages the
+  // baseline and renders the ladder/divider via the Phase-1 EWT-001 path above.
+  const showEmptyState = baselineSource === "savings_target" && targetIsBlank;
 
   function DualCell({ usdVal, cityCurrency, className }: { usdVal: number; cityCurrency: string; className?: string }) {
     const conv = toDisplayCurrencies(fx, usdVal, cityCurrency, displayCurrency);
@@ -224,8 +237,8 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
             id="target-amount-input"
             type="number"
             aria-label={t(locale, "labelMonthlySavingsTarget")}
-            value={targetAmount || ""}
-            onChange={(e) => setTargetAmount(parseFloat(e.target.value) || 0)}
+            value={targetRaw}
+            onChange={(e) => setTargetRaw(e.target.value)}
           />
           <select
             aria-label={t(locale, "labelTargetCurrency")}
@@ -330,58 +343,69 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
       {/* No qualifiers message */}
       {noQualifiers && <p data-testid="no-qualifier-message">{t(locale, "noQualifierMessage")}</p>}
 
+      {/* UWT-006: blank savings target → guidance instead of the role ladder. */}
+      {showEmptyState && (
+        <p data-testid="min-role-empty-state" className="py-6 text-center text-sm text-muted-foreground">
+          {t(locale, "minRoleEmptyStateMessage")}
+        </p>
+      )}
+
       {/* Tablet + desktop (md+): table. Track / P25 / P75 / non-salary columns collapse on tablet. */}
-      <div className="hidden overflow-x-auto md:block">
-        <Table>
-          <TableCaption data-testid="se-roles-caption">{t(locale, "seRolesCaption")}</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t(locale, "colRole")}</TableHead>
-              <TableHead className="hidden lg:table-cell">{t(locale, "colTrack")}</TableHead>
-              <TableHead>{t(locale, "colBestCity")}</TableHead>
-              <TableHead className="hidden lg:table-cell">{t(locale, "colP25")}</TableHead>
-              <TableHead>{t(locale, "colMedian")}</TableHead>
-              <TableHead className="hidden lg:table-cell">{t(locale, "colP75")}</TableHead>
-              <TableHead>{t(locale, "colEssentialSavings")}</TableHead>
-              <TableHead className="hidden lg:table-cell">{t(locale, "colNonSalaryCompInfo")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {qualifying.map((entry) => (
-              <RoleRow key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
-            ))}
-
-            {showDivider && (
-              <TableRow data-testid="qualifying-divider">
-                <TableCell colSpan={8} className="text-center text-xs text-muted-foreground">
-                  {t(locale, "qualifyingDivider")}
-                </TableCell>
+      {!showEmptyState && (
+        <div className="hidden overflow-x-auto md:block">
+          <Table>
+            <TableCaption data-testid="se-roles-caption">{t(locale, "seRolesCaption")}</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t(locale, "colRole")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t(locale, "colTrack")}</TableHead>
+                <TableHead>{t(locale, "colBestCity")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t(locale, "colP25")}</TableHead>
+                <TableHead>{t(locale, "colMedian")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t(locale, "colP75")}</TableHead>
+                <TableHead>{t(locale, "colEssentialSavings")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t(locale, "colNonSalaryCompInfo")}</TableHead>
               </TableRow>
-            )}
+            </TableHeader>
+            <TableBody>
+              {qualifying.map((entry) => (
+                <RoleRow key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
+              ))}
 
-            {nonQualifying.map((entry) => (
-              <RoleRow key={entry.role} entry={entry} isMin={false} dimmed={true} />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+              {showDivider && (
+                <TableRow data-testid="qualifying-divider">
+                  <TableCell colSpan={8} className="text-center text-xs text-muted-foreground">
+                    {t(locale, "qualifyingDivider")}
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {nonQualifying.map((entry) => (
+                <RoleRow key={entry.role} entry={entry} isMin={false} dimmed={true} />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {/* Mobile (<md): stacked role cards (qualifying first, divider, then dimmed below-minimum) */}
-      <div data-testid="mobile-role-cards" className="space-y-3 md:hidden">
-        {qualifying.map((entry) => (
-          <MobileRoleCard key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
-        ))}
+      {!showEmptyState && (
+        <div data-testid="mobile-role-cards" className="space-y-3 md:hidden">
+          {qualifying.map((entry) => (
+            <MobileRoleCard key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
+          ))}
 
-        {showDivider && (
-          <p data-testid="qualifying-divider-mobile" className="text-center text-xs text-muted-foreground">
-            {t(locale, "qualifyingDivider")}
-          </p>
-        )}
+          {showDivider && (
+            <p data-testid="qualifying-divider-mobile" className="text-center text-xs text-muted-foreground">
+              {t(locale, "qualifyingDivider")}
+            </p>
+          )}
 
-        {nonQualifying.map((entry) => (
-          <MobileRoleCard key={entry.role} entry={entry} isMin={false} dimmed={true} />
-        ))}
-      </div>
+          {nonQualifying.map((entry) => (
+            <MobileRoleCard key={entry.role} entry={entry} isMin={false} dimmed={true} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -81,8 +81,13 @@ describe("MinRoleTable", () => {
   });
 
   // Gherkin (binds): "Roles are labelled as software-engineering roles"
-  it("shows SE roles caption covering IC and management tracks", () => {
+  it("shows SE roles caption covering IC and management tracks", async () => {
+    const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
+    // Enter a target so the ladder (and its caption) renders past the blank empty-state.
+    const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+    await user.clear(targetInput);
+    await user.type(targetInput, "1000");
     const caption = screen.getByTestId("se-roles-caption");
     expect(caption.textContent?.toLowerCase()).toMatch(/software.engineering|se roles/);
     expect(caption.textContent?.toLowerCase()).toMatch(/ic|management/);
@@ -348,6 +353,34 @@ describe("MinRoleTable", () => {
     for (const cell of bestCityCells) {
       expect(cell.textContent).not.toMatch(/israel|tel aviv/i);
     }
+  });
+
+  // UWT-006: with the savings-target baseline engaged but a BLANK target (no value entered yet),
+  // the role table is replaced by empty-state guidance — full salary data should not be dumped on
+  // the user before they state a goal. This is the BLANK case, deliberately distinct from the
+  // Phase-1 numeric-zero case (typing "0" → divider + table). On mount the target is blank.
+  it("UWT-006: with savings-target baseline and a BLANK target, the table is hidden and empty-state guidance is shown", () => {
+    render(<MinRoleTable {...defaultProps} />);
+    // savings_target is the default baseline source; no value has been typed → blank.
+    expect(screen.getByTestId("min-role-empty-state")).toBeTruthy();
+    // The role ladder (and its markers) must not render while the target is blank.
+    expect(screen.queryByRole("table")).toBeNull();
+    expect(screen.queryByTestId("minimum-marker")).toBeNull();
+    expect(screen.queryByTestId("qualifying-divider")).toBeNull();
+  });
+
+  // UWT-006 reconciliation guard: typing an explicit numeric "0" is NOT blank — it must engage the
+  // baseline, render the table + divider, and clear the empty-state. (Pairs with the Phase-1
+  // "savings_target=0 (baseline engaged)" test above.)
+  it("UWT-006: typing an explicit '0' clears the empty-state and renders the role table", async () => {
+    const user = userEvent.setup();
+    render(<MinRoleTable {...defaultProps} />);
+    const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+    await user.clear(targetInput);
+    await user.type(targetInput, "0");
+    expect(screen.queryByTestId("min-role-empty-state")).toBeNull();
+    expect(screen.getByRole("table")).toBeTruthy();
+    expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
   });
 
   // Phase 5: design-system primitives

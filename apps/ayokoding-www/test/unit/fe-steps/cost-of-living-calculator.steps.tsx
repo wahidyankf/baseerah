@@ -807,6 +807,10 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on the "Minimum role" tab', async () => {
       renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      // Enter a target so the ladder renders past the UWT-006 blank empty-state.
+      const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+      await user.clear(input);
+      await user.type(input, "1000");
     });
 
     When("the page finishes loading", () => {
@@ -1137,6 +1141,10 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     Given('I am on the "Minimum role" tab', async () => {
       renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      // Enter a target so the ladder renders past the UWT-006 blank empty-state.
+      const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+      await user.clear(input);
+      await user.type(input, "1000");
     });
 
     When("the table renders", () => {
@@ -1662,16 +1670,17 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     Then("the role comparison table is not shown", () => {
-      // Stub: empty-state branch implemented in Phase 7
-      expect(true).toBe(true);
+      // UWT-006: blank savings target (default on mount) suppresses the ladder.
+      expect(screen.queryByRole("table")).toBeNull();
     });
 
     And("an instructional message is shown", () => {
-      expect(true).toBe(true);
+      expect(screen.getByTestId("min-role-empty-state")).toBeTruthy();
     });
 
     And("no role salary data is visible", () => {
-      expect(true).toBe(true);
+      expect(screen.queryByTestId("minimum-marker")).toBeNull();
+      expect(screen.queryByTestId("best-city-cell")).toBeNull();
     });
   });
 
@@ -2445,4 +2454,64 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       }
     });
   });
+
+  // AC-8 (UWT-004) — Savings gross-salary field surfaces the active currency separately
+  Scenario(
+    "The Savings gross-salary field shows the active currency as a separate indicator",
+    async ({ Given, When, Then, And }) => {
+      const user = userEvent.setup();
+
+      Given('I am on the "Savings" tab', async () => {
+        renderPage(<CostOfLivingCalculatorPage />);
+        await user.click(screen.getByRole("tab", { name: /savings/i }));
+      });
+
+      When("the gross-salary field renders", () => {
+        expect(document.querySelector("#gross-salary-input")).toBeTruthy();
+      });
+
+      Then('the gross-salary label does not contain the literal currency code "USD"', () => {
+        const label = document.querySelector('label[for="gross-salary-input"]');
+        expect(label?.textContent).not.toMatch(/USD/);
+      });
+
+      And('an active-currency indicator next to the field shows "USD"', () => {
+        expect(screen.getByTestId("salary-currency-indicator").textContent).toMatch(/USD/);
+      });
+    },
+  );
+
+  // AC-9 (UWT-006) — Minimum-role empty-state for a BLANK target only (numeric zero → ladder)
+  Scenario(
+    "A blank savings target shows empty-state guidance instead of the role ladder",
+    async ({ Given, When, Then, But }) => {
+      const user = userEvent.setup();
+
+      Given('I am on the "Minimum role" tab with the savings-target baseline and a blank target', async () => {
+        renderPage(<CostOfLivingCalculatorPage />);
+        await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+        await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
+        // No target typed → blank.
+      });
+
+      When("the tab renders", () => {
+        expect(screen.getByRole("radiogroup", { name: /baseline source/i })).toBeTruthy();
+      });
+
+      Then("a minimum-role empty-state guidance message is shown", () => {
+        expect(screen.getByTestId("min-role-empty-state")).toBeTruthy();
+        // The role ladder must not render while the target is blank.
+        expect(screen.queryByRole("table")).toBeNull();
+      });
+
+      But("entering an explicit zero target replaces the guidance with the role ladder and its divider", async () => {
+        const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+        await user.clear(input);
+        await user.type(input, "0");
+        expect(screen.queryByTestId("min-role-empty-state")).toBeNull();
+        expect(screen.getByRole("table")).toBeTruthy();
+        expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
+      });
+    },
+  );
 });

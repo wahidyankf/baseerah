@@ -197,6 +197,16 @@ describe("SavingsTable", () => {
     expect(input?.getAttribute("data-slot")).toBe("input");
   });
 
+  // UWT-004: the gross-salary label must not hardcode the currency code "USD"; the active
+  // currency is surfaced as a dedicated indicator next to the input instead.
+  it("UWT-004: gross-salary label drops the literal 'USD' and an active-currency indicator is rendered", () => {
+    render(<SavingsTable {...defaultProps} />);
+    const label = document.querySelector('label[for="gross-salary-input"]');
+    expect(label?.textContent).not.toMatch(/USD/);
+    const indicator = screen.getByTestId("salary-currency-indicator");
+    expect(indicator.textContent).toMatch(/USD/);
+  });
+
   // Gherkin (binds): "id-locale tables use Indonesian city and country names"
   describe("id locale name rendering", () => {
     it("renders 'Singapura' in the Country column when locale=id", async () => {

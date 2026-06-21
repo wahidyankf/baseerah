@@ -608,3 +608,17 @@ Feature: Salary savings calculator
     Given I am on the calculator at a 320px-wide viewport
     When the calculator page renders
     Then the document does not scroll horizontally
+
+  # AC-8 (UWT-004) — Savings gross-salary field surfaces the active currency, not a hardcoded label
+  Scenario: The Savings gross-salary field shows the active currency as a separate indicator
+    Given I am on the "Savings" tab
+    When the gross-salary field renders
+    Then the gross-salary label does not contain the literal currency code "USD"
+    And an active-currency indicator next to the field shows "USD"
+
+  # AC-9 (UWT-006) — Minimum-role tab shows empty-state guidance for a BLANK savings target only
+  Scenario: A blank savings target shows empty-state guidance instead of the role ladder
+    Given I am on the "Minimum role" tab with the savings-target baseline and a blank target
+    When the tab renders
+    Then a minimum-role empty-state guidance message is shown
+    But entering an explicit zero target replaces the guidance with the role ladder and its divider

@@ -102,14 +102,22 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
     <div data-testid="savings-table" data-hydrated={hydrated ? "true" : undefined}>
       <div>
         <Label htmlFor="gross-salary-input">{t(locale, "grossMonthlySalaryLabel")}</Label>
-        <Input
-          id="gross-salary-input"
-          type="number"
-          min="0"
-          aria-label={t(locale, "grossMonthlySalaryLabel")}
-          value={grossMonthly || ""}
-          onChange={(e) => setGrossMonthly(Math.max(0, parseFloat(e.target.value) || 0))}
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            id="gross-salary-input"
+            type="number"
+            min="0"
+            aria-label={t(locale, "grossMonthlySalaryLabel")}
+            value={grossMonthly || ""}
+            onChange={(e) => setGrossMonthly(Math.max(0, parseFloat(e.target.value) || 0))}
+          />
+          {/* UWT-004: surface the active input currency explicitly instead of hardcoding "USD"
+              into the field label. The savings model derives every figure in USD, so this is a
+              fixed indicator (per Assumption A-6 — an indicator, not a selector). */}
+          <span data-testid="salary-currency-indicator" className="shrink-0 text-sm text-muted-foreground">
+            {t(locale, "salaryCurrencyIndicator")}
+          </span>
+        </div>
         <span>
           {t(locale, "annualGrossLabel")}: <span data-testid="annual-gross">{fmtNum(annualGross)} USD</span>
         </span>
