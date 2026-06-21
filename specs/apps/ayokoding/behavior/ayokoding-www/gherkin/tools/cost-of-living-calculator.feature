@@ -589,3 +589,15 @@ Feature: Salary savings calculator
     Given a deep link with query string "city=atlantis"
     When the page rewrites the URL to canonical form
     Then pressing the browser Back button does not return to the "city=atlantis" URL
+
+  # AC-4 (UWT-016/DWT-005) — Geo-filter selects meet the 44px minimum touch target
+  Scenario: Geo-filter selects meet the minimum touch-target height on mobile
+    Given I am on the calculator at a 375px-wide viewport
+    When the geo-filter selects render
+    Then each geo-filter select is at least 44 pixels tall
+
+  # AC-5 (UWT-008) — Calculator page does not overflow horizontally at 320px
+  Scenario: The calculator page has no horizontal overflow at 320px
+    Given I am on the calculator at a 320px-wide viewport
+    When the calculator page renders
+    Then the document does not scroll horizontally

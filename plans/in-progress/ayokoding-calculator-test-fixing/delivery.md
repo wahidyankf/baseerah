@@ -179,7 +179,7 @@ E2E suite (for runtime-proof findings): `npx nx run ayokoding-www-fe-e2e:test:e2
 
 - [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
       — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
-  -p ayokoding-www`: exit 0 (typecheck clean; lint exits 0 with the 3 pre-existing non-blocking
+-p ayokoding-www`: exit 0 (typecheck clean; lint exits 0 with the 3 pre-existing non-blocking
       jsx-a11y warnings; test:unit 2049 passed; specs:coverage 15 specs/163 scenarios/599 steps)._
 - [x] [AI] Grep proof: `grep -n '"/"' apps/ayokoding-www/src/features/cost-of-living-calculator/shell/calculator-breadcrumb.tsx`
       — expected: no literal `/` separator list items remain _Done: grep exits 1 (no matches); the
@@ -192,45 +192,77 @@ E2E suite (for runtime-proof findings): `npx nx run ayokoding-www-fe-e2e:test:e2
 
 ## Phase 3: Touch targets & responsive (UWT-016/DWT-005, UWT-008)
 
-- [ ] [AI] **RED**: add an e2e measurement test in `apps/ayokoding-www-fe-e2e` asserting each of
+- [x] [AI] **RED**: add an e2e measurement test in `apps/ayokoding-www-fe-e2e` asserting each of
       `#geo-region-select`, `#geo-country-select`, `#geo-city-select` has rendered height ≥ 44 px at
       375 px — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: test fails (selects measure ~29 px)
+      _Done 2026-06-21: added Gherkin scenario "Geo-filter selects meet the minimum touch-target
+      height on mobile" + e2e step defs (`boundingBox().height >= 44` for all three select ids).
+      RED measured `#geo-region-select` height = **29 px** (< 44) — failed as expected._
   - _Suggested executor: `swe-e2e-dev`_
-- [ ] [AI] **GREEN**: in
+- [x] [AI] **GREEN**: in
       `apps/ayokoding-www/src/features/cost-of-living-calculator/shell/geo-filters.tsx` replace the
       three selects' `className="rounded border px-2 py-1 text-sm"` with the shared web-ui control
       styling plus `min-h-[44px]` (reuse the `libs/web-ui` `Select` primitive if present; otherwise
       mirror its Tailwind classes) — command: `npx nx run ayokoding-www:test:unit`
       — acceptance: `geo-filters.test.tsx` still passes; selects carry `min-h-[44px]`
+      _Done: no `Select` primitive exists in `libs/web-ui` — mirrored the `Input` primitive's
+      Tailwind (`rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs
+focus-visible:*`) plus `min-h-[44px] w-full min-w-0 max-w-full`. Rebuilt standalone; e2e GREEN
+      measured all three selects ≥ 44 px. `geo-filters.test.tsx` (+ all 2055 unit tests) pass._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **RED**: add an e2e test asserting `document.documentElement.scrollWidth <= 320` at a
+- [x] [AI] **RED**: add an e2e test asserting `document.documentElement.scrollWidth <= 320` at a
       320 px viewport on the calculator page — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: test fails (scrollWidth 328 > 320)
+      _Done 2026-06-21: added Gherkin scenario "The calculator page has no horizontal overflow at
+      320px" + e2e step def (`document.documentElement.scrollWidth <= 320`). RED measured
+      scrollWidth = **328 px** (> 320) — failed as expected._
   - _Suggested executor: `swe-e2e-dev`_
-- [ ] [AI] **GREEN**: fix the overflow source — inspect the geo-filter row
+- [x] [AI] **GREEN**: fix the overflow source — inspect the geo-filter row
       (`flex flex-wrap items-center gap-3`) and tab list at 320 px; constrain offending widths
       (e.g. allow selects to shrink with `min-w-0`/`max-w-full`, ensure `overflow-x-auto` only where
       intended) in `geo-filters.tsx` and/or `calculator-content.tsx`
       — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: the 320 px overflow e2e test passes
+      _Done: diagnostic (boundingBox sweep at 320 px) found the **single** offender was the shared
+      app-header theme-toggle trigger at right=328 — not the geo-filter row. Root cause: header
+      `gap-4` (16 px × 4 gaps) overflowed at 320 px. Fixed minimally in
+      `apps/ayokoding-www/src/features/app-shell/shell/header.tsx`: `gap-4` → `gap-2 px-4 sm:gap-4`.
+      Also hardened geo-filter groups (`basis-full sm:basis-auto min-w-0` wrappers + select
+      `min-w-0 max-w-full`) so the filter row never forces overflow. Rebuilt standalone; e2e GREEN
+      scrollWidth = 320 (no overflow)._
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] **REFACTOR**: confirm the touch-target and overflow fixes coexist (re-run both e2e
+- [x] [AI] **REFACTOR**: confirm the touch-target and overflow fixes coexist (re-run both e2e
       measurements) — command: `npx nx run ayokoding-www-fe-e2e:test:e2e`
       — acceptance: both measurement tests pass together
-- [ ] [AI] **RED/GREEN**: add Gherkin AC-4 (44 px selects) and AC-5 (no overflow at 320 px) to the
+      _Done: ran both measurement scenarios together against the rebuilt standalone — `2 passed`
+      (selects ≥ 44 px AND scrollWidth ≤ 320). No regression between the two fixes._
+- [x] [AI] **RED/GREEN**: add Gherkin AC-4 (44 px selects) and AC-5 (no overflow at 320 px) to the
       calculator `.feature`; wire step defs — command: `npx nx run ayokoding-www:specs:coverage`
       — acceptance: `specs:coverage` exits 0
+      _Done: AC-4/AC-5 scenarios added to `cost-of-living-calculator.feature` (one primary
+      Given/When/Then each — cardinality-clean). Wired both e2e step defs and unit-fe bindings
+      (unit asserts the `min-h-[44px]` / `min-w-0` styling contract; jsdom has no layout engine, so
+      pixel measurement lives at e2e). Also fixed a **preexisting** gap: the Phase-2 breadcrumb
+      AC-2/AC-3 scenarios had no e2e step defs (bddgen failed with 5 missing steps), blocking e2e
+      generation — added those 5 breadcrumb e2e step defs too (all 3 breadcrumb e2e scenarios now
+      pass). `specs:coverage` exits 0 (15 specs / 165 scenarios / 605 steps);
+      `specs:gherkin-cardinality-validation` clean._
   - _Suggested executor: `specs-maker`_
 
 ### Phase 3 Gate
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
-      — expected: exits 0
-- [ ] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` (touch-target + 320 px overflow specs)
-      — expected: passes
+- [x] [AI] `npx nx run ayokoding-www:typecheck ayokoding-www:lint ayokoding-www:test:unit ayokoding-www:specs:coverage`
+      — expected: exits 0 _Done 2026-06-21 via `nx run-many -t typecheck lint test:unit specs:coverage
+-p ayokoding-www`: exit 0 (typecheck clean; lint exits 0 with the 3 pre-existing non-blocking
+      jsx-a11y warnings — calculator-content.tsx:216, controls.tsx:32; test:unit 2055 passed;
+      specs:coverage 15 specs / 165 scenarios / 605 steps)._
+- [x] [AI] `npx nx run ayokoding-www-fe-e2e:test:e2e` (touch-target + 320 px overflow specs)
+      — expected: passes _Done: both measurement scenarios pass on chromium against the rebuilt
+      standalone bundle (`2 passed`); the 3 breadcrumb AC-2/AC-3 e2e scenarios (whose step defs were a
+      preexisting gap) also pass (`3 passed`)._
 
 > **Pause Safety**: geo selects are tappable and the page no longer overflows at 320 px; gate
 > green. Safe to stop. To resume: re-run the gate command.

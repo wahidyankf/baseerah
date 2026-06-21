@@ -100,7 +100,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 basis-full items-center gap-2 sm:basis-auto">
         <label htmlFor="geo-region-select" className="text-sm font-medium">
           {labels.region}
         </label>
@@ -109,7 +109,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
           aria-label={labels.region}
           value={region ?? ""}
           onChange={(e) => handleRegionChange(e.target.value)}
-          className="rounded border px-2 py-1 text-sm"
+          className="min-h-[44px] w-full max-w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
           <option value="">{labels.allRegions}</option>
           {availableRegions.map((r) => (
@@ -130,7 +130,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 basis-full items-center gap-2 sm:basis-auto">
         <label htmlFor="geo-country-select" className="text-sm font-medium">
           {labels.country}
         </label>
@@ -139,7 +139,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
           aria-label={labels.country}
           value={countryId ?? ""}
           onChange={(e) => handleCountryChange(e.target.value)}
-          className="rounded border px-2 py-1 text-sm"
+          className="min-h-[44px] w-full max-w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
           <option value="">{labels.allCountries}</option>
           {availableCountries.map((c) => (
@@ -150,7 +150,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
         </select>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 basis-full items-center gap-2 sm:basis-auto">
         <label htmlFor="geo-city-select" className="text-sm font-medium">
           {labels.city}
         </label>
@@ -159,7 +159,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
           aria-label={labels.city}
           value={cityId ?? ""}
           onChange={(e) => handleCityChange(e.target.value)}
-          className="rounded border px-2 py-1 text-sm"
+          className="min-h-[44px] w-full max-w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
         >
           <option value="">{labels.allCities}</option>
           {availableCities.map((c) => (

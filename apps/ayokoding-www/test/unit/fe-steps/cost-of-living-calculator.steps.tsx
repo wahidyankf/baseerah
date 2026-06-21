@@ -2340,4 +2340,52 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       expect(true).toBe(true);
     });
   });
+
+  // AC-4 (UWT-016/DWT-005) — Geo-filter selects meet the 44px minimum touch target
+  Scenario("Geo-filter selects meet the minimum touch-target height on mobile", ({ Given, When, Then }) => {
+    Given("I am on the calculator at a 375px-wide viewport", () => {
+      // jsdom has no layout engine, so the rendered pixel height is verified at the
+      // e2e level (boundingBox >= 44px). The unit tier asserts the 44px-minimum
+      // styling contract — the min-h-[44px] utility — on each geo-filter select.
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the geo-filter selects render", () => {
+      expect(document.getElementById("geo-region-select")).toBeTruthy();
+    });
+
+    Then("each geo-filter select is at least 44 pixels tall", () => {
+      for (const id of ["geo-region-select", "geo-country-select", "geo-city-select"]) {
+        const select = document.getElementById(id);
+        expect(select, id).toBeTruthy();
+        expect(select!.className).toContain("min-h-[44px]");
+      }
+    });
+  });
+
+  // AC-5 (UWT-008) — Calculator page does not overflow horizontally at 320px
+  Scenario("The calculator page has no horizontal overflow at 320px", ({ Given, When, Then }) => {
+    Given("I am on the calculator at a 320px-wide viewport", () => {
+      // Horizontal scrollWidth is a layout measurement, verified at e2e level
+      // (scrollWidth <= 320). The unit tier asserts the structural contract: the
+      // geo-filter selects can shrink (min-w-0) so the row never forces overflow.
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the calculator page renders", () => {
+      expect(screen.getByTestId("calc-page")).toBeTruthy();
+    });
+
+    Then("the document does not scroll horizontally", () => {
+      for (const id of ["geo-region-select", "geo-country-select", "geo-city-select"]) {
+        const select = document.getElementById(id);
+        expect(select, id).toBeTruthy();
+        expect(select!.className).toContain("min-w-0");
+      }
+    });
+  });
 });

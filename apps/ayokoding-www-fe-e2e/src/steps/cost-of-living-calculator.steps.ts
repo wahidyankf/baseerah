@@ -1846,3 +1846,65 @@ Then("pressing the browser Back button does not return to the {string} URL", asy
   expect(afterBackUrl).not.toContain(qs);
   void currentUrl;
 });
+
+// ── AC-4 / AC-5: Touch targets and 320px horizontal overflow ──────────────────
+
+Given("I am on the calculator at a 375px-wide viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/en/tools/cost-of-living-calculator");
+  await page.waitForLoadState("networkidle");
+});
+
+When("the geo-filter selects render", async ({ page }) => {
+  await expect(page.locator("#geo-region-select")).toBeVisible();
+});
+
+Then("each geo-filter select is at least 44 pixels tall", async ({ page }) => {
+  for (const id of ["#geo-region-select", "#geo-country-select", "#geo-city-select"]) {
+    const box = await page.locator(id).boundingBox();
+    expect(box, `bounding box for ${id}`).not.toBeNull();
+    expect(box!.height, `rendered height for ${id}`).toBeGreaterThanOrEqual(44);
+  }
+});
+
+Given("I am on the calculator at a 320px-wide viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 812 });
+  await page.goto("/en/tools/cost-of-living-calculator");
+  await page.waitForLoadState("networkidle");
+});
+
+When("the calculator page renders", async ({ page }) => {
+  await expect(page.getByTestId("calc-page")).toBeVisible();
+});
+
+Then("the document does not scroll horizontally", async ({ page }) => {
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  expect(scrollWidth).toBeLessThanOrEqual(320);
+});
+
+// ── AC-2 / AC-3: Breadcrumb shared primitive (chevrons + current-page crumb) ───
+
+Then("the crumbs are separated by chevron icons", async ({ page }) => {
+  const breadcrumb = page.getByRole("navigation", { name: /breadcrumb/i });
+  const chevrons = breadcrumb.locator("svg.lucide-chevron-right");
+  expect(await chevrons.count()).toBeGreaterThan(0);
+});
+
+Then(/^no literal "\/" separator is shown between crumbs$/, async ({ page }) => {
+  const breadcrumb = page.getByRole("navigation", { name: /breadcrumb/i });
+  const separatorListItems = breadcrumb.locator("li", { hasText: /^\s*\/\s*$/ });
+  expect(await separatorListItems.count()).toBe(0);
+});
+
+When("the breadcrumb renders", async ({ page }) => {
+  await expect(page.getByRole("navigation", { name: /breadcrumb/i })).toBeVisible();
+});
+
+Then("the current-page crumb text reads {string}", async ({ page }, expected: string) => {
+  const current = page.locator('[aria-current="page"]');
+  await expect(current).toHaveText(expected);
+});
+
+Then('the current-page crumb is marked aria-current="page"', async ({ page }) => {
+  await expect(page.locator('[aria-current="page"]')).toBeVisible();
+});
