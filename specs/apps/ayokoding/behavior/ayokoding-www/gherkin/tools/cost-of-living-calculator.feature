@@ -70,6 +70,14 @@ Feature: Salary savings calculator
     And each row shows the essentials, the savings after essentials, and the savings after lifestyle with percentages
     And the table can be sorted by savings
 
+  Scenario: Savings tab honours the active geographic filter
+    Given I am on "/en/tools/cost-of-living-calculator"
+    And I switch to the "Savings" tab
+    And I enter a gross monthly salary of "5000" USD
+    When the Country filter is set to "Indonesia"
+    Then the savings table lists only Indonesian cities
+    And cities outside the selected scope are not shown
+
   Scenario: Gross salary entered monthly shows the derived annual figure
     Given I am on the "Savings" tab
     When I enter a gross monthly salary of "8000" USD
@@ -139,10 +147,11 @@ Feature: Salary savings calculator
     Then the childcare expense is added for the one pre-school child
     But no schooling cost is added
 
-  Scenario: School type toggle is hidden without school-age children
+  Scenario: School type toggle is shown but disabled without school-age children
     Given I am on "/en/tools/cost-of-living-calculator"
     When the household has no school-age children
-    Then no school-type toggle is shown
+    Then the school-type toggle is shown but disabled
+    And a hint explains that school-age children must be added to choose
 
   Scenario: Private school raises expenses more than public
     Given I am on "/en/tools/cost-of-living-calculator"
@@ -198,7 +207,7 @@ Feature: Salary savings calculator
 
   Scenario: Minimum role from a reference city and role
     Given I am on the "Minimum role" tab
-    And I set the baseline source to "reference role"
+    And I set the baseline source to "Match a role"
     And I pick the city "Jakarta" and the role "Senior SWE"
     When I view the minimum role result
     Then the baseline savings bar equals that role's essential savings in Jakarta
@@ -210,6 +219,14 @@ Feature: Salary savings calculator
     When I enter my gross salary and its city
     Then the baseline savings bar equals my computed essential savings
     And the ladder marks the lowest role that meets or beats it
+
+  Scenario: My-salary baseline accepts the gross in local currency or USD
+    Given I am on the "Minimum role" tab
+    And I set the baseline source to "my salary"
+    And I pick the salary city "Singapore"
+    Then I can enter my gross monthly salary in either Singapore's local currency or USD
+    And the local-currency option follows the selected salary city
+    And choosing the local currency converts the entered amount to USD using the fx snapshot before ranking
 
   Scenario: Savings shown in USD, local, and display currency
     Given I am on the "Minimum role" tab with a baseline set
@@ -304,6 +321,20 @@ Feature: Salary savings calculator
     Then the URL updates to include query parameters reflecting those selections
     And copying the URL and opening it in a new tab restores the same filter state
 
+  # Reconciled 2026-06-22: the min-role baseline source (savings target / match a role / my
+  # salary) and its inputs, plus the savings gross, are now part of the URL (single source of
+  # truth) so deep links restore the full tab state.
+  Scenario: Min-role baseline source and inputs are serialized in the URL
+    Given I am on the "Minimum role" tab
+    When I set the baseline source to "my salary"
+    And I enter my gross salary and its city
+    Then the URL query string includes the baseline source and the entered salary inputs
+
+  Scenario: Savings gross salary is serialized in the URL
+    Given I am on the "Savings" tab
+    When I enter a gross monthly salary of "5000" USD
+    Then the URL query string includes the entered gross salary
+
   Scenario: Page title includes tool name on load
     Given a user navigates to the cost-of-living calculator
     When the page finishes loading with default filter state
@@ -342,12 +373,13 @@ Feature: Salary savings calculator
     And opening that URL in a new tab shows only Indonesian cities in the table
     And the Country filter is pre-selected to "Indonesia"
 
-  # SG-005 — School type toggle appears when school-age children >= 1
-  Scenario: School type toggle appears when school-age children is set to one or more
+  # SG-005 — School type toggle is enabled when school-age children >= 1
+  Scenario: School type toggle becomes enabled when school-age children is set to one or more
     Given I am on "/en/tools/cost-of-living-calculator"
     And the household has no school-age children
+    And the school-type toggle is shown but disabled
     When I set the household to 1 school-age child
-    Then the school type toggle is shown with "Public" and "Private" options
+    Then the school type toggle is enabled with "Public" and "Private" options
     And the default selection is "Public"
 
   # SG-006 — Housing scales sub-linearly (1.25x) for a 2-adult household

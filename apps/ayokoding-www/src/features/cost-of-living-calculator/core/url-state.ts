@@ -9,6 +9,24 @@ import type { SchoolType, Area } from "./calc";
 
 type Region = City["region"];
 
+export type BaselineSource = "savings_target" | "reference_role" | "my_salary";
+export type GrossCurrency = "local" | "usd";
+
+// Min-role tab baseline inputs. refCityId/mySalaryCityId are null when unset (the component
+// resolves null to the first dataset city); targetRaw is kept as a raw string so a blank
+// field ("") is distinct from an explicit "0".
+export type MinRoleInputs = {
+  baselineSource: BaselineSource;
+  targetRaw: string;
+  targetCurrency: string;
+  refCityId: string | null;
+  refRole: string;
+  myGrossMonthly: number;
+  mySalaryCityId: string | null;
+  myGrossCurrency: GrossCurrency;
+  displayCurrency: string;
+};
+
 export type CalculatorState = {
   tab: "cost" | "savings" | "min-role";
   region: Region | null;
@@ -21,6 +39,10 @@ export type CalculatorState = {
   };
   schoolType: SchoolType;
   area: Area;
+  // Savings tab gross monthly salary (USD). 0 = unset (empty state).
+  gross: number;
+  // Min-role tab baseline inputs.
+  minRole: MinRoleInputs;
 };
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -35,6 +57,18 @@ export const PARAM_KEYS = {
   schoolkids: "schoolkids",
   schooltype: "schooltype",
   area: "area",
+  // Savings tab
+  gross: "gross",
+  // Min-role tab baseline inputs
+  baseline: "baseline",
+  target: "target",
+  targetcur: "targetcur",
+  refcity: "refcity",
+  refrole: "refrole",
+  mygross: "mygross",
+  mysalarycity: "mysalarycity",
+  mygrosscur: "mygrosscur",
+  displaycur: "displaycur",
 } as const;
 
 const VALID_TABS = ["cost", "savings", "min-role"] as const;
@@ -56,6 +90,9 @@ const VALID_ADULTS = [1, 2] as const;
 const VALID_PRESCHOOL_KIDS = [0, 1, 2, 3] as const;
 const VALID_SCHOOL_KIDS = [0, 1, 2, 3] as const;
 
+const VALID_BASELINE_SOURCES: readonly BaselineSource[] = ["savings_target", "reference_role", "my_salary"];
+const VALID_GROSS_CURRENCIES: readonly GrossCurrency[] = ["local", "usd"];
+
 // ─── Default State ───────────────────────────────────────────────────────────
 
 export const DEFAULT_STATE: CalculatorState = {
@@ -70,6 +107,18 @@ export const DEFAULT_STATE: CalculatorState = {
   },
   schoolType: "public",
   area: "center",
+  gross: 0,
+  minRole: {
+    baselineSource: "savings_target",
+    targetRaw: "",
+    targetCurrency: "USD",
+    refCityId: null,
+    refRole: "senior_swe",
+    myGrossMonthly: 0,
+    mySalaryCityId: null,
+    myGrossCurrency: "local",
+    displayCurrency: "USD",
+  },
 };
 
 // ─── Validation Helpers ───────────────────────────────────────────────────────
@@ -126,6 +175,30 @@ function parseCountryId(v: string | null, dataset: Dataset): string | null {
 function parseRegion(v: string | null): Region | null {
   if (v === null) return null;
   return isValidRegion(v) ? v : null;
+}
+
+// ─── Min-role / savings parse helpers ──────────────────────────────────────────
+
+// Non-negative finite number; invalid/blank → 0.
+function parseNonNegNumber(v: string | null): number {
+  if (v === null) return 0;
+  const n = parseFloat(v);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+function parseBaselineSource(v: string | null): BaselineSource {
+  if (v !== null && (VALID_BASELINE_SOURCES as readonly string[]).includes(v)) return v as BaselineSource;
+  return DEFAULT_STATE.minRole.baselineSource;
+}
+
+function parseGrossCurrency(v: string | null): GrossCurrency {
+  if (v !== null && (VALID_GROSS_CURRENCIES as readonly string[]).includes(v)) return v as GrossCurrency;
+  return DEFAULT_STATE.minRole.myGrossCurrency;
+}
+
+// Currency code: keep a non-empty string; otherwise fall back to the supplied default.
+function parseCurrencyCode(v: string | null, fallback: string): string {
+  return v !== null && v.trim() !== "" ? v : fallback;
 }
 
 // ─── Geo Backfill Helpers ────────────────────────────────────────────────────
@@ -201,6 +274,25 @@ export function sanitizeState(state: CalculatorState, dataset: Dataset): Calcula
   // Reconcile (narrower wins + backfill)
   const { cityId, countryId, region } = reconcileGeo(rawCityId, rawCountryId, rawRegion, dataset);
 
+  // Savings + min-role inputs
+  const gross = Number.isFinite(state.gross) && state.gross >= 0 ? state.gross : 0;
+  const mr = state.minRole;
+  const minRole: MinRoleInputs = {
+    baselineSource: (VALID_BASELINE_SOURCES as readonly string[]).includes(mr.baselineSource)
+      ? mr.baselineSource
+      : DEFAULT_STATE.minRole.baselineSource,
+    targetRaw: typeof mr.targetRaw === "string" ? mr.targetRaw : "",
+    targetCurrency: parseCurrencyCode(mr.targetCurrency, DEFAULT_STATE.minRole.targetCurrency),
+    refCityId: parseCityId(mr.refCityId, dataset),
+    refRole: mr.refRole && mr.refRole.trim() !== "" ? mr.refRole : DEFAULT_STATE.minRole.refRole,
+    myGrossMonthly: Number.isFinite(mr.myGrossMonthly) && mr.myGrossMonthly >= 0 ? mr.myGrossMonthly : 0,
+    mySalaryCityId: parseCityId(mr.mySalaryCityId, dataset),
+    myGrossCurrency: (VALID_GROSS_CURRENCIES as readonly string[]).includes(mr.myGrossCurrency)
+      ? mr.myGrossCurrency
+      : DEFAULT_STATE.minRole.myGrossCurrency,
+    displayCurrency: parseCurrencyCode(mr.displayCurrency, DEFAULT_STATE.minRole.displayCurrency),
+  };
+
   return {
     tab,
     region,
@@ -209,6 +301,8 @@ export function sanitizeState(state: CalculatorState, dataset: Dataset): Calcula
     household: { adults, preschoolKids, schoolKids },
     schoolType,
     area,
+    gross,
+    minRole,
   };
 }
 
@@ -235,6 +329,21 @@ export function decodeState(params: URLSearchParams, dataset: Dataset): Calculat
 
   const { cityId, countryId, region } = reconcileGeo(rawCityId, rawCountryId, rawRegion, dataset);
 
+  // Savings gross + min-role baseline inputs
+  const gross = parseNonNegNumber(params.get(PARAM_KEYS.gross));
+  const targetRaw = params.get(PARAM_KEYS.target);
+  const minRole: MinRoleInputs = {
+    baselineSource: parseBaselineSource(params.get(PARAM_KEYS.baseline)),
+    targetRaw: targetRaw ?? "",
+    targetCurrency: parseCurrencyCode(params.get(PARAM_KEYS.targetcur), DEFAULT_STATE.minRole.targetCurrency),
+    refCityId: parseCityId(params.get(PARAM_KEYS.refcity), dataset),
+    refRole: parseCurrencyCode(params.get(PARAM_KEYS.refrole), DEFAULT_STATE.minRole.refRole),
+    myGrossMonthly: parseNonNegNumber(params.get(PARAM_KEYS.mygross)),
+    mySalaryCityId: parseCityId(params.get(PARAM_KEYS.mysalarycity), dataset),
+    myGrossCurrency: parseGrossCurrency(params.get(PARAM_KEYS.mygrosscur)),
+    displayCurrency: parseCurrencyCode(params.get(PARAM_KEYS.displaycur), DEFAULT_STATE.minRole.displayCurrency),
+  };
+
   return {
     tab,
     region,
@@ -247,6 +356,8 @@ export function decodeState(params: URLSearchParams, dataset: Dataset): Calculat
     },
     schoolType: schooltypeRaw !== null && isValidSchoolType(schooltypeRaw) ? schooltypeRaw : DEFAULT_STATE.schoolType,
     area: areaRaw !== null && isValidArea(areaRaw) ? areaRaw : DEFAULT_STATE.area,
+    gross,
+    minRole,
   };
 }
 
@@ -282,6 +393,42 @@ export function encodeState(state: CalculatorState): URLSearchParams {
   }
   if (state.area !== DEFAULT_STATE.area) {
     params.set(PARAM_KEYS.area, state.area);
+  }
+
+  // Savings gross
+  if (state.gross !== DEFAULT_STATE.gross) {
+    params.set(PARAM_KEYS.gross, String(state.gross));
+  }
+
+  // Min-role baseline inputs (defaults omitted)
+  const mr = state.minRole;
+  const d = DEFAULT_STATE.minRole;
+  if (mr.baselineSource !== d.baselineSource) {
+    params.set(PARAM_KEYS.baseline, mr.baselineSource);
+  }
+  if (mr.targetRaw !== d.targetRaw) {
+    params.set(PARAM_KEYS.target, mr.targetRaw);
+  }
+  if (mr.targetCurrency !== d.targetCurrency) {
+    params.set(PARAM_KEYS.targetcur, mr.targetCurrency);
+  }
+  if (mr.refCityId !== d.refCityId) {
+    params.set(PARAM_KEYS.refcity, mr.refCityId ?? "");
+  }
+  if (mr.refRole !== d.refRole) {
+    params.set(PARAM_KEYS.refrole, mr.refRole);
+  }
+  if (mr.myGrossMonthly !== d.myGrossMonthly) {
+    params.set(PARAM_KEYS.mygross, String(mr.myGrossMonthly));
+  }
+  if (mr.mySalaryCityId !== d.mySalaryCityId) {
+    params.set(PARAM_KEYS.mysalarycity, mr.mySalaryCityId ?? "");
+  }
+  if (mr.myGrossCurrency !== d.myGrossCurrency) {
+    params.set(PARAM_KEYS.mygrosscur, mr.myGrossCurrency);
+  }
+  if (mr.displayCurrency !== d.displayCurrency) {
+    params.set(PARAM_KEYS.displaycur, mr.displayCurrency);
   }
 
   return params;

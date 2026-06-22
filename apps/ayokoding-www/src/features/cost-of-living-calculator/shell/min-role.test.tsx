@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import { dataset } from "../core/data/cities";
@@ -190,7 +190,7 @@ describe("MinRoleTable", () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
-    await user.click(screen.getByRole("radio", { name: /reference role/i }));
+    await user.click(screen.getByRole("radio", { name: /match a role/i }));
 
     // City selector and role selector appear
     expect(screen.getByRole("combobox", { name: /reference city/i })).toBeTruthy();
@@ -224,6 +224,28 @@ describe("MinRoleTable", () => {
     const citySelect = screen.getByRole("combobox", { name: /my salary city/i });
     await user.selectOptions(citySelect, "singapore");
 
+    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+  });
+
+  // Gherkin (binds): "My-salary baseline accepts the gross in local currency or USD"
+  it("my_salary gross can be entered in the salary city's local currency or USD, defaulting to local", async () => {
+    const user = userEvent.setup();
+    render(<MinRoleTable {...defaultProps} />);
+
+    await user.click(screen.getByRole("radio", { name: /my salary/i }));
+    await user.selectOptions(screen.getByRole("combobox", { name: /my salary city/i }), "singapore");
+
+    // A salary-currency toggle offers the city's local currency (SGD) and USD, defaulting to local.
+    const currencyGroup = screen.getByRole("radiogroup", { name: /salary currency/i });
+    const sgd = within(currencyGroup).getByRole("radio", { name: "SGD" });
+    const usd = within(currencyGroup).getByRole("radio", { name: "USD" });
+    expect(sgd.getAttribute("aria-checked")).toBe("true");
+    expect(usd.getAttribute("aria-checked")).toBe("false");
+
+    // Entering a gross in local currency still produces a ranked minimum.
+    const grossInput = screen.getByRole("spinbutton", { name: /my gross monthly/i });
+    await user.clear(grossInput);
+    await user.type(grossInput, "12000");
     expect(screen.getByTestId("minimum-marker")).toBeTruthy();
   });
 

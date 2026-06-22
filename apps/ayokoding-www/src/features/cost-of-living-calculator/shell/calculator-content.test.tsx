@@ -97,6 +97,7 @@ afterEach(() => {
   vi.clearAllMocks();
   navState.params = new URLSearchParams();
   navState.setParams = () => {};
+  window.history.replaceState({}, "", "/");
 });
 
 // ─── Helper to set up URLSearchParams mock ───────────────────────────────────
@@ -321,6 +322,22 @@ describe("Cycle 3 — URL search params initialise filter state", () => {
 
     const rows = screen.getAllByRole("row");
     expect(rows.length).toBe(dataset.cities.length + 1);
+  });
+
+  // Regression: the Savings tab must honour the same geo scope as the Cost tab.
+  // Previously the Savings tab rendered the full dataset regardless of region/country.
+  it("?tab=savings&country=id filters the savings table to Indonesian cities only", () => {
+    // Savings reads the gross salary straight from window.location.search.
+    window.history.replaceState({}, "", "?tab=savings&country=id&gross=5000");
+    setupSearchParams({ tab: "savings", country: "id", gross: "5000" });
+
+    render(<CostOfLivingCalculatorContent />);
+
+    const indonesianCities = dataset.cities.filter((c) => c.countryId === "id");
+    // Savings desktop table: 1 header + N Indonesian city rows.
+    const rows = screen.getAllByRole("row");
+    expect(rows.length).toBeLessThan(dataset.cities.length + 1);
+    expect(rows.length).toBe(indonesianCities.length + 1);
   });
 });
 

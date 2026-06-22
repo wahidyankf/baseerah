@@ -6,7 +6,7 @@ import type { Dataset } from "../core/data/cities";
 import { countriesForRegion, citiesForCountry, scopedCities } from "../core/geo-filter";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
-import { applyRegionChange, applyCountryChange, applyCityChange } from "../core/url-state";
+import { applyRegionChange, applyCountryChange, applyCityChange, DEFAULT_STATE } from "../core/url-state";
 import type { CalculatorState } from "../core/url-state";
 
 type Region = "asean" | "japan" | "europe" | "nordics" | "americas" | "mena" | "asia" | "oceania" | "africa";
@@ -91,14 +91,12 @@ function SelectField({
 
 // Build a minimal CalculatorState stub from the current geo props for apply helpers.
 function toStateStub(region: Region | null, countryId: string | null, cityId: string | null): CalculatorState {
+  // Only the geo fields matter for the apply helpers; fill the rest from defaults.
   return {
-    tab: "cost",
+    ...DEFAULT_STATE,
     region,
     countryId,
     cityId,
-    household: { adults: 1, preschoolKids: 0, schoolKids: 0 },
-    schoolType: "public",
-    area: "center",
   };
 }
 

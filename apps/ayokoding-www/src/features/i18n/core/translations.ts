@@ -70,6 +70,7 @@ const translations: Record<Locale, Record<string, string>> = {
     labelSchoolType: "School type",
     optPublic: "Public",
     optPrivate: "Private",
+    schoolTypeHint: "add school-age children to choose",
     labelArea: "Area",
     optCenter: "City center",
     optRural: "Rural",
@@ -138,14 +139,20 @@ const translations: Record<Locale, Record<string, string>> = {
     // Calculator — min-role table
     labelBaselineSource: "Baseline source",
     optSavingsTarget: "Monthly savings target",
-    optReferenceRole: "Reference role",
+    optReferenceRole: "Match a role",
     optMySalary: "My salary",
+    hintSavingsTarget: "Enter a monthly savings goal — the table marks the lowest role whose best city reaches it.",
+    hintReferenceRole:
+      "Pick a role and city as the yardstick — the table marks the lowest role that saves at least as much, no dollar figure needed.",
+    hintMySalary:
+      "Enter your current gross salary — the table marks the lowest role that saves at least what you do today.",
     labelMonthlySavingsTarget: "Monthly savings target",
     labelTargetCurrency: "Target currency",
     labelRefCity: "Reference city",
     labelRefRole: "Reference role",
-    labelMyGrossMonthly: "My gross monthly (USD)",
+    labelMyGrossMonthly: "My gross monthly",
     labelMySalaryCity: "My salary city",
+    labelSalaryInputCurrency: "Salary currency",
     labelDisplayCurrency: "Display currency",
     rankBasisNote:
       "Ranking key: essential savings (housing + food + transport + utilities + healthcare + school). Lifestyle excluded — personal preference variable.",
@@ -259,6 +266,7 @@ const translations: Record<Locale, Record<string, string>> = {
     labelSchoolType: "Jenis sekolah",
     optPublic: "Negeri",
     optPrivate: "Swasta",
+    schoolTypeHint: "tambahkan anak usia sekolah untuk memilih",
     labelArea: "Wilayah",
     optCenter: "Pusat kota",
     optRural: "Pedesaan",
@@ -330,14 +338,21 @@ const translations: Record<Locale, Record<string, string>> = {
     // Calculator — min-role table
     labelBaselineSource: "Sumber baseline",
     optSavingsTarget: "Target tabungan bulanan",
-    optReferenceRole: "Jabatan referensi",
+    optReferenceRole: "Samakan jabatan",
     optMySalary: "Gaji saya",
+    hintSavingsTarget:
+      "Masukkan target tabungan bulanan — tabel menandai jabatan terendah yang kota terbaiknya mencapainya.",
+    hintReferenceRole:
+      "Pilih jabatan dan kota sebagai patokan — tabel menandai jabatan terendah yang menabung setidaknya sebanyak itu, tanpa perlu angka.",
+    hintMySalary:
+      "Masukkan gaji kotor Anda saat ini — tabel menandai jabatan terendah yang menabung setidaknya sebanyak Anda sekarang.",
     labelMonthlySavingsTarget: "Target tabungan bulanan",
     labelTargetCurrency: "Mata uang target",
     labelRefCity: "Kota referensi",
     labelRefRole: "Jabatan referensi",
-    labelMyGrossMonthly: "Gaji kotor bulanan saya (USD)",
+    labelMyGrossMonthly: "Gaji kotor bulanan saya",
     labelMySalaryCity: "Kota gaji saya",
+    labelSalaryInputCurrency: "Mata uang gaji",
     labelDisplayCurrency: "Mata uang tampilan",
     rankBasisNote:
       "Kunci peringkat: tabungan kebutuhan pokok (perumahan + makanan + transportasi + utilitas + kesehatan + sekolah). Gaya hidup dikecualikan — variabel preferensi pribadi.",

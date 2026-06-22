@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import {
   Input,
   Label,
@@ -29,6 +30,12 @@ type Props = {
   schoolType: SchoolType;
   area: Area;
   locale?: Locale;
+  /** Shared generic filters, rendered after this tab's own gross-salary input. */
+  filtersSlot?: ReactNode;
+  /** Controlled gross monthly (USD). When provided with onGrossChange, the URL is the source
+      of truth; otherwise the component falls back to internal state hydrated from the URL. */
+  gross?: number;
+  onGrossChange?: (gross: number) => void;
 };
 
 function pct(part: number, whole: number): string {
@@ -49,16 +56,39 @@ function CardRow({ label, value, negative }: { label: string; value: string; neg
 // Use "senior_swe" as the canonical "typical" non-salary comp reference
 const REFERENCE_ROLE = "senior_swe" as const;
 
-export function SavingsTable({ dataset, matrix, household, schoolType, area, locale = "en" }: Props) {
-  const [grossMonthly, setGrossMonthly] = useState(0);
+export function SavingsTable({
+  dataset,
+  matrix,
+  household,
+  schoolType,
+  area,
+  locale = "en",
+  filtersSlot,
+  gross: grossProp,
+  onGrossChange,
+}: Props) {
+  // Controlled (URL-driven) when a gross prop is supplied; otherwise internal state hydrated
+  // from the URL on mount (legacy/standalone behavior).
+  const controlled = grossProp !== undefined;
+  const [internalGross, setInternalGross] = useState(0);
   const [sortAsc, setSortAsc] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
+    if (controlled) {
+      setHydrated(true);
+      return;
+    }
     const params = new URLSearchParams(window.location.search);
     const urlGross = parseFloat(params.get("gross") ?? "0");
-    if (urlGross > 0) setGrossMonthly(urlGross);
+    if (urlGross > 0) setInternalGross(urlGross);
     setHydrated(true);
-  }, []);
+  }, [controlled]);
+
+  const grossMonthly = controlled ? grossProp : internalGross;
+  const setGrossMonthly = (n: number) => {
+    if (controlled) onGrossChange?.(n);
+    else setInternalGross(n);
+  };
 
   const annualGross = grossMonthlyToAnnual(grossMonthly);
   const countryById = Object.fromEntries(dataset.countries.map((c) => [c.id, c]));
@@ -127,6 +157,9 @@ export function SavingsTable({ dataset, matrix, household, schoolType, area, loc
           {t(locale, "annualGrossLabel")}: <span data-testid="annual-gross">{fmtNum(annualGross)} USD</span>
         </span>
       </div>
+
+      {/* Shared generic filters follow this tab's own gross-salary input. */}
+      {filtersSlot}
 
       {grossMonthly === 0 && (
         <p data-testid="savings-empty-state" className="py-6 text-center text-sm text-muted-foreground">

@@ -65,6 +65,14 @@ export function CostOfLivingCalculatorContent() {
     router.push(qs ? `?${qs}` : "?");
   }
 
+  // Like pushState but replaces the current history entry — used for continuous inputs
+  // (gross/target text fields) so typing does not spam the browser back stack.
+  function replaceState(next: CalculatorState) {
+    const params = encodeState(next);
+    const qs = params.toString();
+    router.replace(qs ? `?${qs}` : "?");
+  }
+
   // Build scoped dataset for filtered table views.
   // City selection is the narrowest scope and must win — a city-only filter
   // (Country = "All countries") still scopes candidates to that single city.
@@ -156,6 +164,49 @@ export function CostOfLivingCalculatorContent() {
     return qs ? `?${qs}` : "?tab=cost";
   })();
 
+  // Shared (generic) geo + household filters. Rendered AFTER each tab's own specific inputs
+  // so the tab-specific controls lead and the generic filters follow on every tab. Only the
+  // active tab mounts, so this single node is never used in two places at once.
+  const filtersSlot = (
+    <>
+      {/* Shared geo filters — fully controlled, reads from URL-derived state */}
+      <GeoFilters
+        dataset={dataset}
+        locale={locale}
+        region={region}
+        countryId={countryId}
+        cityId={cityId}
+        onScopeChange={handleScopeChange}
+      />
+
+      {/* Shared cost-basis controls */}
+      <Controls
+        dataset={dataset}
+        previewCityId={detailCityId ?? firstCity.id}
+        household={household}
+        schoolType={schoolType}
+        area={area}
+        locale={locale}
+        showPreview={activeTab === "min-role"}
+        onHouseholdChange={handleHouseholdChange}
+        onSchoolTypeChange={handleSchoolTypeChange}
+        onAreaChange={handleAreaChange}
+      />
+
+      {/* Data last updated + estimates disclaimer */}
+      <p data-testid="data-last-updated" className="text-xs text-muted-foreground">
+        {t(locale, "dataLastUpdated")}:{" "}
+        {new Intl.DateTimeFormat(locale === "id" ? "id-ID" : "en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date(dataset.snapshotDate))}
+        {" · "}
+        <span data-testid="estimates-disclaimer">{t(locale, "estimatesOnly")}</span>
+      </p>
+    </>
+  );
+
   return (
     <main data-testid="calc-page" className="mx-auto max-w-6xl space-y-4 px-4 py-6">
       <CalculatorBreadcrumb />
@@ -222,49 +273,18 @@ export function CostOfLivingCalculatorContent() {
           {t(locale, "tabMinRoleDesc")}
         </p>
 
-        {/* Shared geo filters — fully controlled, reads from URL-derived state */}
-        <GeoFilters
-          dataset={dataset}
-          locale={locale}
-          region={region}
-          countryId={countryId}
-          cityId={cityId}
-          onScopeChange={handleScopeChange}
-        />
-
-        {/* Shared cost-basis controls */}
-        <Controls
-          dataset={dataset}
-          previewCityId={detailCityId ?? firstCity.id}
-          household={household}
-          schoolType={schoolType}
-          area={area}
-          locale={locale}
-          onHouseholdChange={handleHouseholdChange}
-          onSchoolTypeChange={handleSchoolTypeChange}
-          onAreaChange={handleAreaChange}
-        />
-
-        {/* Data last updated + estimates disclaimer */}
-        <p data-testid="data-last-updated" className="text-xs text-muted-foreground">
-          {t(locale, "dataLastUpdated")}:{" "}
-          {new Intl.DateTimeFormat(locale === "id" ? "id-ID" : "en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }).format(new Date(dataset.snapshotDate))}
-          {" · "}
-          <span data-testid="estimates-disclaimer">{t(locale, "estimatesOnly")}</span>
-        </p>
-
         {/* Tab content — event delegation intercepts clicks bubbling up from the
             interactive <a> links inside the tables. The div is not itself an interactive
             control; the real controls are the anchors. Keyboard activation (Enter on a
             focused link) synthesizes a click that bubbles here, so no separate key handler
-            or role is needed — the jsx-a11y heuristics misfire on this delegation pattern. */}
+            or role is needed — the jsx-a11y heuristics misfire on this delegation pattern.
+            Each tab leads with its own specific inputs, then the shared generic filters
+            (filtersSlot), then its results. */}
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div onClick={handleTableClick}>
           <TabsContent value="cost">
+            {/* Cost tab has no tab-specific inputs, so the generic filters lead. */}
+            {filtersSlot}
             {detailCityId ? (
               <div data-testid="city-detail">
                 <CityDetail
@@ -290,12 +310,15 @@ export function CostOfLivingCalculatorContent() {
 
           <TabsContent value="savings">
             <SavingsTable
-              dataset={dataset}
+              dataset={scopedDataset}
               matrix={roleMatrix}
               household={household}
               schoolType={schoolType}
               area={area}
               locale={locale}
+              filtersSlot={filtersSlot}
+              gross={currentState.gross}
+              onGrossChange={(gross) => replaceState({ ...currentState, gross })}
             />
           </TabsContent>
 
@@ -308,6 +331,9 @@ export function CostOfLivingCalculatorContent() {
               area={area}
               cityScope={cityScope}
               locale={locale}
+              filtersSlot={filtersSlot}
+              inputs={currentState.minRole}
+              onInputsChange={(minRole) => replaceState({ ...currentState, minRole })}
             />
           </TabsContent>
         </div>

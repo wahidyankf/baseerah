@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import {
   Table,
   TableBody,
@@ -14,7 +15,9 @@ import type { Dataset, Household, City } from "../core/data/cities";
 import type { Area, SchoolType } from "../core/calc";
 import type { RoleMeta, RoleMatrix } from "../core/data/roles";
 import { rankLadder, minimumRole, orderForDisplay, resolveBaselineUsd, toDisplayCurrencies } from "../core/role-lookup";
-import { fx } from "../core/data/fx";
+import { fx, fxToUsd } from "../core/data/fx";
+import { DEFAULT_STATE } from "../core/url-state";
+import type { MinRoleInputs, BaselineSource } from "../core/url-state";
 import { fmtCurrencyTrailing } from "../core/format";
 import { localeName } from "./geo-filters";
 import { SegmentedControl } from "./controls";
@@ -31,28 +34,76 @@ type Props = {
   area: Area;
   cityScope: City[] | null;
   locale?: Locale;
+  /** Shared generic filters, rendered after this tab's own baseline-source inputs. */
+  filtersSlot?: ReactNode;
+  /** Controlled baseline inputs. When provided with onInputsChange, the URL is the source of
+      truth; otherwise the component falls back to internal state (legacy/standalone behavior). */
+  inputs?: MinRoleInputs;
+  onInputsChange?: (next: MinRoleInputs) => void;
 };
 
 const DISPLAY_CURRENCIES = ["USD", "EUR", "SGD", "IDR", "GBP", "JPY", "CAD", "AED"];
 
-export function MinRoleTable({ dataset, matrix, household, schoolType, area, cityScope, locale = "en" }: Props) {
-  const [baselineSource, setBaselineSource] = useState<"savings_target" | "reference_role" | "my_salary">(
-    "savings_target",
-  );
+export function MinRoleTable({
+  dataset,
+  matrix,
+  household,
+  schoolType,
+  area,
+  cityScope,
+  locale = "en",
+  filtersSlot,
+  inputs,
+  onInputsChange,
+}: Props) {
+  // Controlled (URL-driven) when `inputs` is supplied; otherwise internal state.
+  const controlled = inputs !== undefined;
+  const [internal, setInternal] = useState<MinRoleInputs>(() => ({ ...DEFAULT_STATE.minRole }));
+  const s = controlled ? inputs : internal;
+  const update = (patch: Partial<MinRoleInputs>) => {
+    const next = { ...s, ...patch };
+    if (controlled) onInputsChange?.(next);
+    else setInternal(next);
+  };
+
+  // Derive the legacy local names + setters from the controlled/internal object so the rest of
+  // the component body is unchanged. City ids resolve null → the first dataset city.
+  const baselineSource = s.baselineSource;
+  const setBaselineSource = (v: BaselineSource) => update({ baselineSource: v });
   // UWT-006 / EWT-001 reconciliation: we keep the RAW input string separately from the parsed
   // numeric amount so we can tell "the user has not entered a target yet" (blank `targetRaw` →
   // empty-state) apart from "the user explicitly typed 0" (`targetRaw === "0"` → baseline engaged,
   // every role clears, divider renders). Relying on `targetAmount === 0` alone cannot distinguish
   // these two states because both parse to the number 0.
-  const [targetRaw, setTargetRaw] = useState("");
+  const targetRaw = s.targetRaw;
+  const setTargetRaw = (v: string) => update({ targetRaw: v });
   const targetAmount = parseFloat(targetRaw) || 0;
   const targetIsBlank = targetRaw.trim() === "";
-  const [targetCurrency, setTargetCurrency] = useState("USD");
-  const [refCityId, setRefCityId] = useState(dataset.cities[0]?.id ?? "");
-  const [refRole, setRefRole] = useState<EngRole>("senior_swe");
-  const [myGrossMonthly, setMyGrossMonthly] = useState(0);
-  const [mySalaryCityId, setMySalaryCityId] = useState(dataset.cities[0]?.id ?? "");
-  const [displayCurrency, setDisplayCurrency] = useState("USD");
+  const targetCurrency = s.targetCurrency;
+  const setTargetCurrency = (v: string) => update({ targetCurrency: v });
+  const refCityId = s.refCityId ?? dataset.cities[0]?.id ?? "";
+  const setRefCityId = (v: string) => update({ refCityId: v });
+  const refRole = s.refRole as EngRole;
+  const setRefRole = (v: EngRole) => update({ refRole: v });
+  const myGrossMonthly = s.myGrossMonthly;
+  const setMyGrossMonthly = (v: number) => update({ myGrossMonthly: v });
+  const mySalaryCityId = s.mySalaryCityId ?? dataset.cities[0]?.id ?? "";
+  const setMySalaryCityId = (v: string) => update({ mySalaryCityId: v });
+  // The gross-salary input can be entered in the salary city's local currency or in USD.
+  const myGrossCurrency = s.myGrossCurrency;
+  const setMyGrossCurrency = (v: "local" | "usd") => update({ myGrossCurrency: v });
+  const displayCurrency = s.displayCurrency;
+  const setDisplayCurrency = (v: string) => update({ displayCurrency: v });
+
+  // Currency of the selected salary city; the "local" input option follows this.
+  const mySalaryCity = dataset.cities.find((c) => c.id === mySalaryCityId);
+  const mySalaryCityCurrency = mySalaryCity?.currency ?? "USD";
+  // Normalise the entered gross to USD for ranking. A USD-currency city has no distinct local
+  // option, so it is always treated as USD regardless of the toggle.
+  const myGrossUsd =
+    myGrossCurrency === "usd" || mySalaryCityCurrency === "USD"
+      ? myGrossMonthly
+      : myGrossMonthly * fxToUsd(fx, mySalaryCityCurrency);
 
   const opts = { household, schoolType, area };
   const ranked = rankLadder(dataset, opts, matrix, cityScope);
@@ -80,7 +131,7 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
       );
       baselineReady = true;
     } else if (baselineSource === "my_salary" && myGrossMonthly > 0 && mySalaryCityId) {
-      baselineUsd = resolveBaselineUsd("my_salary", { grossMonthlyUsd: myGrossMonthly }, opts, dataset, matrix);
+      baselineUsd = resolveBaselineUsd("my_salary", { grossMonthlyUsd: myGrossUsd }, opts, dataset, matrix);
       baselineReady = true;
     }
   } catch {
@@ -212,11 +263,19 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
     );
   }
 
+  // Shared field styling — keeps the baseline-source inputs visually consistent with the
+  // cost + savings tab controls (labelled, bordered, 44px touch targets) instead of bare HTML.
+  const fieldRow = "flex flex-wrap items-end gap-3";
+  const fieldGroup = "flex flex-col gap-1";
+  const fieldLabel = "text-sm font-medium text-foreground";
+  const fieldControl =
+    "min-h-[44px] rounded-md border border-border bg-background px-3 py-1 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+
   return (
-    <div>
+    <div className="space-y-4">
       {/* Baseline source */}
-      <div>
-        <p className="mb-1 text-sm font-medium text-foreground">{t(locale, "labelBaselineSource")}</p>
+      <div className="space-y-1">
+        <p className={fieldLabel}>{t(locale, "labelBaselineSource")}</p>
         <SegmentedControl
           label={t(locale, "labelBaselineSource")}
           value={baselineSource}
@@ -227,99 +286,160 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
             { value: "my_salary" as const, label: t(locale, "optMySalary") },
           ]}
         />
+        {/* Plain-language explanation of the selected baseline source — clarifies what each
+            option means (esp. "Match a role") without forcing the user to infer it. */}
+        <p data-testid="baseline-source-hint" className="text-sm text-muted-foreground">
+          {t(
+            locale,
+            baselineSource === "savings_target"
+              ? "hintSavingsTarget"
+              : baselineSource === "reference_role"
+                ? "hintReferenceRole"
+                : "hintMySalary",
+          )}
+        </p>
       </div>
 
       {/* Savings target inputs */}
       {baselineSource === "savings_target" && (
-        <div>
-          <label htmlFor="target-amount-input">{t(locale, "labelMonthlySavingsTarget")}</label>
-          <input
-            id="target-amount-input"
-            type="number"
-            aria-label={t(locale, "labelMonthlySavingsTarget")}
-            value={targetRaw}
-            onChange={(e) => setTargetRaw(e.target.value)}
-          />
-          <select
-            aria-label={t(locale, "labelTargetCurrency")}
-            value={targetCurrency}
-            onChange={(e) => setTargetCurrency(e.target.value)}
-          >
-            {DISPLAY_CURRENCIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+        <div className={fieldRow}>
+          <div className={fieldGroup}>
+            <label htmlFor="target-amount-input" className={fieldLabel}>
+              {t(locale, "labelMonthlySavingsTarget")}
+            </label>
+            <input
+              id="target-amount-input"
+              type="number"
+              className={fieldControl}
+              aria-label={t(locale, "labelMonthlySavingsTarget")}
+              value={targetRaw}
+              onChange={(e) => setTargetRaw(e.target.value)}
+            />
+          </div>
+          <div className={fieldGroup}>
+            <label htmlFor="target-currency-select" className={fieldLabel}>
+              {t(locale, "labelTargetCurrency")}
+            </label>
+            <select
+              id="target-currency-select"
+              className={fieldControl}
+              aria-label={t(locale, "labelTargetCurrency")}
+              value={targetCurrency}
+              onChange={(e) => setTargetCurrency(e.target.value)}
+            >
+              {DISPLAY_CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
 
       {/* Reference role inputs */}
       {baselineSource === "reference_role" && (
-        <div>
-          <label htmlFor="ref-city-select">{t(locale, "labelRefCity")}</label>
-          <select
-            id="ref-city-select"
-            aria-label={t(locale, "labelRefCity")}
-            value={refCityId}
-            onChange={(e) => setRefCityId(e.target.value)}
-          >
-            {dataset.cities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {localeName(c.name, locale)}
-              </option>
-            ))}
-          </select>
-
-          <label htmlFor="ref-role-select">{t(locale, "labelRefRole")}</label>
-          <select
-            id="ref-role-select"
-            aria-label={t(locale, "labelRefRole")}
-            value={refRole}
-            onChange={(e) => setRefRole(e.target.value as EngRole)}
-          >
-            {matrix.ladder.map((r) => (
-              <option key={r.role} value={r.role}>
-                {r.label.en}
-              </option>
-            ))}
-          </select>
+        <div className={fieldRow}>
+          <div className={fieldGroup}>
+            <label htmlFor="ref-city-select" className={fieldLabel}>
+              {t(locale, "labelRefCity")}
+            </label>
+            <select
+              id="ref-city-select"
+              className={fieldControl}
+              aria-label={t(locale, "labelRefCity")}
+              value={refCityId}
+              onChange={(e) => setRefCityId(e.target.value)}
+            >
+              {dataset.cities.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {localeName(c.name, locale)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={fieldGroup}>
+            <label htmlFor="ref-role-select" className={fieldLabel}>
+              {t(locale, "labelRefRole")}
+            </label>
+            <select
+              id="ref-role-select"
+              className={fieldControl}
+              aria-label={t(locale, "labelRefRole")}
+              value={refRole}
+              onChange={(e) => setRefRole(e.target.value as EngRole)}
+            >
+              {matrix.ladder.map((r) => (
+                <option key={r.role} value={r.role}>
+                  {r.label.en}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
 
       {/* My salary inputs */}
       {baselineSource === "my_salary" && (
-        <div>
-          <label htmlFor="my-gross-input">{t(locale, "labelMyGrossMonthly")}</label>
-          <input
-            id="my-gross-input"
-            type="number"
-            aria-label={t(locale, "labelMyGrossMonthly")}
-            value={myGrossMonthly || ""}
-            onChange={(e) => setMyGrossMonthly(parseFloat(e.target.value) || 0)}
-          />
-
-          <label htmlFor="my-city-select">{t(locale, "labelMySalaryCity")}</label>
-          <select
-            id="my-city-select"
-            aria-label={t(locale, "labelMySalaryCity")}
-            value={mySalaryCityId}
-            onChange={(e) => setMySalaryCityId(e.target.value)}
-          >
-            {dataset.cities.map((c) => (
-              <option key={c.id} value={c.id}>
-                {localeName(c.name, locale)}
-              </option>
-            ))}
-          </select>
+        <div className={fieldRow}>
+          <div className={fieldGroup}>
+            <label htmlFor="my-gross-input" className={fieldLabel}>
+              {t(locale, "labelMyGrossMonthly")}
+            </label>
+            <input
+              id="my-gross-input"
+              type="number"
+              className={fieldControl}
+              aria-label={t(locale, "labelMyGrossMonthly")}
+              value={myGrossMonthly || ""}
+              onChange={(e) => setMyGrossMonthly(parseFloat(e.target.value) || 0)}
+            />
+          </div>
+          {/* Currency toggle — the gross can be entered in the salary city's local currency
+              (which follows the selected city) or in USD. Hidden when the city is already USD. */}
+          {mySalaryCityCurrency !== "USD" && (
+            <div className={fieldGroup}>
+              <span className={fieldLabel}>{t(locale, "labelSalaryInputCurrency")}</span>
+              <SegmentedControl<"local" | "usd">
+                label={t(locale, "labelSalaryInputCurrency")}
+                value={myGrossCurrency}
+                onChange={setMyGrossCurrency}
+                options={[
+                  { value: "local", label: mySalaryCityCurrency },
+                  { value: "usd", label: "USD" },
+                ]}
+              />
+            </div>
+          )}
+          <div className={fieldGroup}>
+            <label htmlFor="my-city-select" className={fieldLabel}>
+              {t(locale, "labelMySalaryCity")}
+            </label>
+            <select
+              id="my-city-select"
+              className={fieldControl}
+              aria-label={t(locale, "labelMySalaryCity")}
+              value={mySalaryCityId}
+              onChange={(e) => setMySalaryCityId(e.target.value)}
+            >
+              {dataset.cities.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {localeName(c.name, locale)}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
 
       {/* Display currency */}
-      <div>
-        <label htmlFor="display-currency-select">{t(locale, "labelDisplayCurrency")}</label>
+      <div className={fieldGroup}>
+        <label htmlFor="display-currency-select" className={fieldLabel}>
+          {t(locale, "labelDisplayCurrency")}
+        </label>
         <select
           id="display-currency-select"
+          className={fieldControl}
           aria-label={t(locale, "labelDisplayCurrency")}
           value={displayCurrency}
           onChange={(e) => setDisplayCurrency(e.target.value)}
@@ -333,12 +453,15 @@ export function MinRoleTable({ dataset, matrix, household, schoolType, area, cit
       </div>
 
       {/* Notes */}
-      <p data-testid="rank-basis-note" className="text-xs">
+      <p data-testid="rank-basis-note" className="text-xs text-muted-foreground">
         {t(locale, "rankBasisNote")}
       </p>
-      <p data-testid="non-salary-rank-note" className="text-xs">
+      <p data-testid="non-salary-rank-note" className="text-xs text-muted-foreground">
         {t(locale, "nonSalaryRankNote")}
       </p>
+
+      {/* Shared generic filters follow this tab's own baseline-source inputs. */}
+      {filtersSlot}
 
       {/* No qualifiers message */}
       {noQualifiers && <p data-testid="no-qualifier-message">{t(locale, "noQualifierMessage")}</p>}

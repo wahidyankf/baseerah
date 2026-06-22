@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { afterEach, describe, expect, it } from "vitest";
@@ -151,19 +151,34 @@ describe("Controls", () => {
     expect(schoolingAfter).toBe(schoolingBefore); // no schooling for preschool
   });
 
-  // Gherkin (binds): "School type toggle is hidden without school-age children"
-  it("school-type toggle hidden when no school-age children, shown when > 0", async () => {
+  // Gherkin (binds): "School type toggle is shown but disabled without school-age children"
+  it("school-type toggle always shown — disabled without school-age children, enabled when > 0", async () => {
     const user = userEvent.setup();
     render(<ControlsWithState />);
 
-    // Initially hidden (0 school-age kids)
-    expect(screen.queryByRole("radiogroup", { name: /school type/i })).toBeNull();
+    // Always present, but disabled at 0 school-age kids
+    const group = screen.getByRole("radiogroup", { name: /school type/i });
+    expect(group).toBeTruthy();
+    expect(group.getAttribute("aria-disabled")).toBe("true");
+    expect(
+      within(group)
+        .getAllByRole("radio")
+        .every((b) => (b as HTMLButtonElement).disabled),
+    ).toBe(true);
+    // A hint explains why it is disabled
+    expect(screen.getByText(/add school-age children to choose/i)).toBeTruthy();
 
-    // Add 1 school-age child
+    // Add 1 school-age child → toggle becomes enabled and the hint disappears
     await user.selectOptions(screen.getByRole("combobox", { name: /school-age children/i }), "1");
 
-    // Now visible
-    expect(screen.getByRole("radiogroup", { name: /school type/i })).toBeTruthy();
+    const enabled = screen.getByRole("radiogroup", { name: /school type/i });
+    expect(enabled.getAttribute("aria-disabled")).toBeNull();
+    expect(
+      within(enabled)
+        .getAllByRole("radio")
+        .every((b) => !(b as HTMLButtonElement).disabled),
+    ).toBe(true);
+    expect(screen.queryByText(/add school-age children to choose/i)).toBeNull();
   });
 
   // Gherkin (binds): "Private school raises expenses more than public"

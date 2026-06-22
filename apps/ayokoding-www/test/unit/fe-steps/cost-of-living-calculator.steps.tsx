@@ -1,6 +1,6 @@
 import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, vi } from "vitest";
 import React from "react";
@@ -669,16 +669,18 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     Then("the modeled housing and utilities increase sub-linearly", () => {
-      // The Controls component shows updated values; the table also recomputes
-      expect(screen.getByTestId("preview-housing")).toBeTruthy();
+      // Preview moved to the min-role tab; on the cost tab these figures live in the table.
+      expect(screen.getByTestId(`col-housing-${dataset.cities[0]!.id}`)).toBeTruthy();
     });
 
     And("the modeled food and healthcare increase near per-capita", () => {
-      expect(screen.getByTestId("preview-food")).toBeTruthy();
+      expect(screen.getByTestId(`col-food-${dataset.cities[0]!.id}`)).toBeTruthy();
     });
 
     And("schooling is added for the two school-age children", () => {
-      const schooling = parseFloat(screen.getByTestId("preview-schooling").getAttribute("data-local") ?? "0");
+      const schooling = parseFloat(
+        screen.getByTestId(`col-school-${dataset.cities[0]!.id}`).getAttribute("data-raw") ?? "0",
+      );
       expect(schooling).toBeGreaterThan(0);
     });
   });
@@ -695,25 +697,35 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     Then("the childcare expense is added for the one pre-school child", () => {
-      const childcare = parseFloat(screen.getByTestId("preview-childcare").getAttribute("data-local") ?? "0");
+      const childcare = parseFloat(
+        screen.getByTestId(`col-childcare-${dataset.cities[0]!.id}`).getAttribute("data-raw") ?? "0",
+      );
       expect(childcare).toBeGreaterThan(0);
     });
 
     But("no schooling cost is added", () => {
-      const schooling = parseFloat(screen.getByTestId("preview-schooling").getAttribute("data-local") ?? "0");
+      const schooling = parseFloat(
+        screen.getByTestId(`col-school-${dataset.cities[0]!.id}`).getAttribute("data-raw") ?? "0",
+      );
       expect(schooling).toBe(0);
     });
   });
 
-  Scenario("School type toggle is hidden without school-age children", ({ Given, When, Then }) => {
+  Scenario("School type toggle is shown but disabled without school-age children", ({ Given, When, Then, And }) => {
     Given('I am on "/en/tools/cost-of-living-calculator"', () => {});
 
     When("the household has no school-age children", () => {
       renderPage(<CostOfLivingCalculatorPage />);
     });
 
-    Then("no school-type toggle is shown", () => {
-      expect(screen.queryByRole("radiogroup", { name: /school type/i })).toBeNull();
+    Then("the school-type toggle is shown but disabled", () => {
+      const group = screen.getByRole("radiogroup", { name: /school type/i });
+      expect(group).toBeTruthy();
+      expect(group.getAttribute("aria-disabled")).toBe("true");
+    });
+
+    And("a hint explains that school-age children must be added to choose", () => {
+      expect(screen.getByText(/add school-age children to choose/i)).toBeTruthy();
     });
   });
 
@@ -732,8 +744,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     Then("the schooling portion of the modeled expenses increases", () => {
-      // The Controls preview shows updated schooling value; validated by controls.test.tsx
-      expect(screen.getByTestId("preview-schooling")).toBeTruthy();
+      // On the cost tab the schooling figure lives in the table (preview moved to min-role).
+      expect(screen.getByTestId(`col-school-${dataset.cities[0]!.id}`)).toBeTruthy();
     });
   });
 
@@ -749,11 +761,11 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     Then("the modeled housing expense decreases", () => {
-      expect(screen.getByTestId("preview-housing")).toBeTruthy();
+      expect(screen.getByTestId(`col-housing-${dataset.cities[0]!.id}`)).toBeTruthy();
     });
 
     And("the city total decreases accordingly", () => {
-      expect(screen.getByTestId("preview-total")).toBeTruthy();
+      expect(screen.getByTestId(`col-essentials-${dataset.cities[0]!.id}`)).toBeTruthy();
     });
   });
 
@@ -952,8 +964,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
-    And('I set the baseline source to "reference role"', async () => {
-      await user.click(screen.getByRole("radio", { name: /reference role/i }));
+    And('I set the baseline source to "Match a role"', async () => {
+      await user.click(screen.getByRole("radio", { name: /match a role/i }));
     });
     And('I pick the city "Jakarta" and the role "Senior SWE"', async () => {
       await user.selectOptions(screen.getByRole("combobox", { name: /reference city/i }), "jakarta");
@@ -997,6 +1009,107 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
     And("the ladder marks the lowest role that meets or beats it", () => {
       expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    });
+  });
+
+  Scenario("My-salary baseline accepts the gross in local currency or USD", async ({ Given, And, Then }) => {
+    const user = userEvent.setup();
+
+    Given('I am on the "Minimum role" tab', async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+    });
+    And('I set the baseline source to "my salary"', async () => {
+      await user.click(screen.getByRole("radio", { name: /my salary/i }));
+    });
+    And('I pick the salary city "Singapore"', async () => {
+      await user.selectOptions(screen.getByRole("combobox", { name: /my salary city/i }), "singapore");
+    });
+    Then("I can enter my gross monthly salary in either Singapore's local currency or USD", () => {
+      const group = screen.getByRole("radiogroup", { name: /salary currency/i });
+      expect(within(group).getByRole("radio", { name: "SGD" })).toBeTruthy();
+      expect(within(group).getByRole("radio", { name: "USD" })).toBeTruthy();
+    });
+    And("the local-currency option follows the selected salary city", () => {
+      const group = screen.getByRole("radiogroup", { name: /salary currency/i });
+      expect(within(group).getByRole("radio", { name: "SGD" }).getAttribute("aria-checked")).toBe("true");
+    });
+    And(
+      "choosing the local currency converts the entered amount to USD using the fx snapshot before ranking",
+      async () => {
+        const grossInput = screen.getByRole("spinbutton", { name: /my gross monthly/i });
+        await user.clear(grossInput);
+        await user.type(grossInput, "12000");
+        expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+      },
+    );
+  });
+
+  Scenario("Savings tab honours the active geographic filter", async ({ Given, And, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given('I am on "/en/tools/cost-of-living-calculator"', () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+    And('I switch to the "Savings" tab', async () => {
+      await user.click(screen.getByRole("tab", { name: /savings/i }));
+    });
+    And('I enter a gross monthly salary of "5000" USD', async () => {
+      const gross = screen.getByRole("spinbutton");
+      await user.clear(gross);
+      await user.type(gross, "5000");
+    });
+    When('the Country filter is set to "Indonesia"', async () => {
+      await user.selectOptions(screen.getByRole("combobox", { name: /region/i }), "asean");
+      await user.selectOptions(screen.getByRole("combobox", { name: /country/i }), "id");
+    });
+    Then("the savings table lists only Indonesian cities", () => {
+      // City links in the table point at ?tab=cost&city=<id>; Jakarta is Indonesian.
+      expect(document.querySelectorAll('a[href*="city=jakarta"]').length).toBeGreaterThan(0);
+    });
+    And("cities outside the selected scope are not shown", () => {
+      // Singapore (a non-Indonesian city) has no row link once the scope is Indonesia.
+      expect(document.querySelectorAll('a[href*="city=singapore"]').length).toBe(0);
+    });
+  });
+
+  Scenario("Min-role baseline source and inputs are serialized in the URL", async ({ Given, When, And, Then }) => {
+    const user = userEvent.setup();
+
+    Given('I am on the "Minimum role" tab', async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+    });
+    When('I set the baseline source to "my salary"', async () => {
+      await user.click(screen.getByRole("radio", { name: /my salary/i }));
+    });
+    And("I enter my gross salary and its city", async () => {
+      const grossInput = screen.getByRole("spinbutton", { name: /my gross monthly/i });
+      await user.clear(grossInput);
+      await user.type(grossInput, "12000");
+      await user.selectOptions(screen.getByRole("combobox", { name: /my salary city/i }), "singapore");
+    });
+    Then("the URL query string includes the baseline source and the entered salary inputs", () => {
+      expect(navState.params.get("baseline")).toBe("my_salary");
+      expect(navState.params.get("mygross")).toBe("12000");
+      expect(navState.params.get("mysalarycity")).toBe("singapore");
+    });
+  });
+
+  Scenario("Savings gross salary is serialized in the URL", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given('I am on the "Savings" tab', async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /savings/i }));
+    });
+    When('I enter a gross monthly salary of "5000" USD', async () => {
+      const gross = screen.getByRole("spinbutton");
+      await user.clear(gross);
+      await user.type(gross, "5000");
+    });
+    Then("the URL query string includes the entered gross salary", () => {
+      expect(navState.params.get("gross")).toBe("5000");
     });
   });
 
@@ -1234,12 +1347,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
 
       Then("the housing estimate in the expense preview decreases to base times subLinear 2 adults times 0.75", () => {
-        // Stub: exact multiplier verified at core unit level
-        expect(screen.getByTestId("preview-housing")).toBeTruthy();
+        // Stub: exact multiplier verified at core unit level. Cost tab surfaces it in the table.
+        expect(screen.getByTestId(`col-housing-${dataset.cities[0]!.id}`)).toBeTruthy();
       });
 
       And("the essentials total in the preview decreases accordingly", () => {
-        expect(screen.getByTestId("preview-total")).toBeTruthy();
+        expect(screen.getByTestId(`col-essentials-${dataset.cities[0]!.id}`)).toBeTruthy();
       });
     },
   );
@@ -1373,18 +1486,22 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
 
       Then("the Housing preview amount increases to base times subLinear 2 adults", () => {
-        expect(screen.getByTestId("preview-housing")).toBeTruthy();
+        expect(screen.getByTestId(`col-housing-${dataset.cities[0]!.id}`)).toBeTruthy();
       });
 
       And("the Childcare and School preview amounts remain zero", () => {
-        const childcare = parseFloat(screen.getByTestId("preview-childcare").getAttribute("data-local") ?? "0");
-        const schooling = parseFloat(screen.getByTestId("preview-schooling").getAttribute("data-local") ?? "0");
+        const childcare = parseFloat(
+          screen.getByTestId(`col-childcare-${dataset.cities[0]!.id}`).getAttribute("data-raw") ?? "0",
+        );
+        const schooling = parseFloat(
+          screen.getByTestId(`col-school-${dataset.cities[0]!.id}`).getAttribute("data-raw") ?? "0",
+        );
         expect(childcare).toBe(0);
         expect(schooling).toBe(0);
       });
 
       And("the Total preview updates immediately without a page reload", () => {
-        expect(screen.getByTestId("preview-total")).toBeTruthy();
+        expect(screen.getByTestId(`col-essentials-${dataset.cities[0]!.id}`)).toBeTruthy();
       });
     },
   );
@@ -1539,10 +1656,10 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
   });
 
-  // ─── SG-005: School type toggle appears when school-age children >= 1 ────────
+  // ─── SG-005: School type toggle becomes enabled when school-age children >= 1 ────────
 
   Scenario(
-    "School type toggle appears when school-age children is set to one or more",
+    "School type toggle becomes enabled when school-age children is set to one or more",
     async ({ Given, And, When, Then }) => {
       const user = userEvent.setup();
 
@@ -1554,20 +1671,29 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
         expect(screen.getByRole("main")).toBeTruthy();
       });
 
-      When("I set the household to 1 school-age child", async () => {
-        const schoolSelect = screen.queryByRole("combobox", { name: /school.age/i });
-        if (schoolSelect) {
-          await user.selectOptions(schoolSelect, "1");
-        }
+      And("the school-type toggle is shown but disabled", () => {
+        const group = screen.getByRole("radiogroup", { name: /school type/i });
+        expect(group.getAttribute("aria-disabled")).toBe("true");
       });
 
-      Then('the school type toggle is shown with "Public" and "Private" options', () => {
-        // Stub: conditional toggle verified at component level in Phase 5
-        expect(true).toBe(true);
+      When("I set the household to 1 school-age child", async () => {
+        await user.selectOptions(screen.getByRole("combobox", { name: /school.age/i }), "1");
+      });
+
+      Then('the school type toggle is enabled with "Public" and "Private" options', () => {
+        const group = screen.getByRole("radiogroup", { name: /school type/i });
+        expect(group.getAttribute("aria-disabled")).toBeNull();
+        expect(within(group).getByRole("radio", { name: /public/i })).toBeTruthy();
+        expect(within(group).getByRole("radio", { name: /private/i })).toBeTruthy();
       });
 
       And('the default selection is "Public"', () => {
-        expect(true).toBe(true);
+        const group = screen.getByRole("radiogroup", { name: /school type/i });
+        expect(
+          within(group)
+            .getByRole("radio", { name: /public/i })
+            .getAttribute("aria-checked"),
+        ).toBe("true");
       });
     },
   );
