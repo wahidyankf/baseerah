@@ -108,14 +108,38 @@ export function childcareLocal(city: City, household: Household): number {
   return city.childcareMedianLocal.amount * household.preschoolKids;
 }
 
-// Monthly school cost in local currency: per school-age child.
-export function schoolLocal(city: City, household: Household, schoolType: SchoolType): number {
-  return city.schoolMedianLocal[schoolType].amount * household.schoolKids;
+// Whether a FOREIGN resident worker can realistically budget for local-price PUBLIC school here.
+// Conservative: only when access is fully "open". "limited" (non-resident fees, local-language-only,
+// low admission priority) and "nationals-only" (legally barred) both fall back to private, matching
+// the research finding that most expat families use private/international in those countries.
+export function foreignerCanUsePublicSchool(country: Country): boolean {
+  return country.foreignerPublicSchool.access === "open";
+}
+
+// The school type actually charged to a FOREIGNER: a "public" choice collapses to "private" wherever
+// public schooling is not fully open to foreign residents, because the realistic relocation budget
+// there is private/international (see foreignerCanUsePublicSchool).
+export function effectiveSchoolType(country: Country, schoolType: SchoolType): SchoolType {
+  if (schoolType === "public" && !foreignerCanUsePublicSchool(country)) return "private";
+  return schoolType;
+}
+
+// Monthly school cost in local currency: per school-age child. Uses the EFFECTIVE school type, so a
+// foreigner in a nationals-only country pays the private figure even when "public" is chosen.
+export function schoolLocal(city: City, country: Country, household: Household, schoolType: SchoolType): number {
+  const effective = effectiveSchoolType(country, schoolType);
+  return city.schoolMedianLocal[effective].amount * household.schoolKids;
 }
 
 // Monthly essential expenses total in local currency.
 // Essentials = housing + food + transport + utilities + healthcare + childcare + school.
-export function essentialsLocal(city: City, household: Household, schoolType: SchoolType, area: Area): number {
+export function essentialsLocal(
+  city: City,
+  country: Country,
+  household: Household,
+  schoolType: SchoolType,
+  area: Area,
+): number {
   const e = city.expenses;
 
   const housing = scaleAmount(e.housing.amount, "housing", household, area);
@@ -124,15 +148,21 @@ export function essentialsLocal(city: City, household: Household, schoolType: Sc
   const utilities = scaleAmount(e.utilities.amount, "utilities", household, area);
   const healthcare = scaleAmount(e.healthcare.amount, "healthcare", household, area);
   const childcare = childcareLocal(city, household);
-  const school = schoolLocal(city, household, schoolType);
+  const school = schoolLocal(city, country, household, schoolType);
 
   return housing + food + transport + utilities + healthcare + childcare + school;
 }
 
 // Monthly total expenses in local currency (essentials + lifestyle).
 // Lifestyle stays flat (personal/discretionary — not household-scaled in v1).
-export function expensesLocal(city: City, household: Household, schoolType: SchoolType, area: Area): number {
-  return essentialsLocal(city, household, schoolType, area) + city.expenses.lifestyle.amount;
+export function expensesLocal(
+  city: City,
+  country: Country,
+  household: Household,
+  schoolType: SchoolType,
+  area: Area,
+): number {
+  return essentialsLocal(city, country, household, schoolType, area) + city.expenses.lifestyle.amount;
 }
 
 // ─── Relocation (local currency + USD) ──────────────────────────────────────
@@ -174,7 +204,7 @@ export function savingsRow(
 ): SavingsRow {
   const rate = fxToUsd(fx, city.currency);
   const net = netUsd(grossMonthlyUsd, city, country, fx);
-  const essLocal = essentialsLocal(city, household, schoolType, area);
+  const essLocal = essentialsLocal(city, country, household, schoolType, area);
   const essUsd = essLocal * rate;
   const lifestyleUsd = city.expenses.lifestyle.amount * rate;
   const essential = net - essUsd;

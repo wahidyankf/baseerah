@@ -2933,4 +2933,48 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
     },
   );
+
+  // Foreigner public-school eligibility: where public schooling isn't open to foreign residents,
+  // the calculator charges the private figure and flags the cell.
+  Scenario("Public schooling not open to foreigners is charged at the private rate", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+    const sg = dataset.cities.find((c) => c.id === "singapore")!;
+
+    Given("I am on the cost-of-living calculator", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+    When("I add one school-age child with public school selected", async () => {
+      // School type defaults to "public"; adding a school-age child enables the column.
+      await user.selectOptions(screen.getByRole("combobox", { name: /school-age children/i }), "1");
+    });
+    Then("the Singapore school cost equals its private-school figure and the cell is flagged", () => {
+      // Singapore is "limited" → a foreigner picking public is charged the PRIVATE figure.
+      const raw = screen.getByTestId("col-school-singapore").getAttribute("data-raw") ?? "0";
+      expect(parseFloat(raw)).toBe(sg.schoolMedianLocal.private.amount);
+      expect(parseFloat(raw)).not.toBe(sg.schoolMedianLocal.public.amount);
+      expect(screen.getByTestId("school-foreigner-flag-singapore")).toBeTruthy();
+    });
+  });
+
+  Scenario("Public schooling open to foreigners keeps the public cost", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+    const berlin = dataset.cities.find((c) => c.id === "berlin")!;
+
+    Given("I am on the cost-of-living calculator", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+    When("I add one school-age child with public school selected", async () => {
+      await user.selectOptions(screen.getByRole("combobox", { name: /school-age children/i }), "1");
+    });
+    Then("the Berlin school cost equals its public-school figure with no foreigner flag", () => {
+      // Germany is "open" → public stays public, no fallback, no flag.
+      const raw = screen.getByTestId("col-school-berlin").getAttribute("data-raw") ?? "0";
+      expect(parseFloat(raw)).toBe(berlin.schoolMedianLocal.public.amount);
+      expect(screen.queryByTestId("school-foreigner-flag-berlin")).toBeNull();
+    });
+  });
 });

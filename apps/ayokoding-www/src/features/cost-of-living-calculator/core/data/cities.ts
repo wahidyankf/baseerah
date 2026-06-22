@@ -60,6 +60,18 @@ export type Country = {
     socialSecurity: boolean;
     note?: string;
   };
+  // Whether a FOREIGN resident worker (work-visa holder, not a citizen/PR) can enrol children in
+  // PUBLIC primary school. "open" = on similar terms to locals; "limited" = legally allowed but
+  // with heavy barriers (non-resident fees, local-language-only, quotas) so most expat families
+  // use private/international; "nationals-only" = effectively unavailable to foreign residents.
+  // When access is NOT "open" (i.e. "limited" or "nationals-only"), the calculator charges the
+  // PRIVATE school figure for a foreigner even if "public" is selected — the realistic relocation
+  // budget where public schooling carries non-resident fees/barriers or is barred is private.
+  foreignerPublicSchool: {
+    access: "open" | "limited" | "nationals-only";
+    confidence: Confidence;
+    note?: string;
+  };
 };
 
 export type City = {
@@ -119,6 +131,11 @@ export const countries: Country[] = [
   // ── ASEAN ──
   {
     id: "sg",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "high",
+      note: "Non-citizens apply in Phase 3 after SC/PR (not guaranteed); intl-student fee ~S$985/mo non-ASEAN 2025; most expats use private. MOE 2023",
+    },
     name: { en: "Singapore", id: "Singapura" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8000 },
     effectiveRate: {
@@ -135,6 +152,11 @@ export const countries: Country[] = [
   },
   {
     id: "th",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "high",
+      note: "Foreigners may enrol but pay fees unlike Thais; all-Thai instruction; most expats use bilingual/intl schools. Allianz Care 2024",
+    },
     name: { en: "Thailand", id: "Thailand" },
     bandThresholdsUsd: { lowToMid: 2000, midToHigh: 6000 },
     effectiveRate: {
@@ -151,6 +173,11 @@ export const countries: Country[] = [
   },
   {
     id: "id",
+    foreignerPublicSchool: {
+      access: "nationals-only",
+      confidence: "high",
+      note: "Foreign nationals legally barred from Sekolah Nasional; must use SPK/international schools. ISJ expat guide 2024",
+    },
     name: { en: "Indonesia", id: "Indonesia" },
     bandThresholdsUsd: { lowToMid: 1500, midToHigh: 5000 },
     effectiveRate: {
@@ -167,6 +194,11 @@ export const countries: Country[] = [
   },
   {
     id: "my",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "high",
+      note: "Legal with a student pass (~MYR 250/yr) but Bahasa-medium + admin burden; most expats use intl schools. Expat Exchange 2025",
+    },
     name: { en: "Malaysia", id: "Malaysia" },
     bandThresholdsUsd: { lowToMid: 1800, midToHigh: 5500 },
     effectiveRate: {
@@ -183,6 +215,11 @@ export const countries: Country[] = [
   },
   {
     id: "vn",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "moderate",
+      note: "Permitted with a valid visa, tuition-free from 2025, but Vietnamese-only + ho khau priority; 2-3yr language prep. VTJ/Allianz 2025",
+    },
     name: { en: "Vietnam", id: "Vietnam" },
     bandThresholdsUsd: { lowToMid: 1000, midToHigh: 3500 },
     effectiveRate: {
@@ -199,6 +236,11 @@ export const countries: Country[] = [
   },
   {
     id: "ph",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "moderate",
+      note: "Free public basic education for legal residents; work-permit kids exempt from study permit; Filipino-medium. DepEd 2024",
+    },
     name: { en: "Philippines", id: "Filipina" },
     bandThresholdsUsd: { lowToMid: 1000, midToHigh: 3500 },
     effectiveRate: {
@@ -216,6 +258,11 @@ export const countries: Country[] = [
   // ── Japan ──
   {
     id: "jp",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Same right as nationals, tuition-free; Japanese-only forms/instruction need language support. Japan Living Guide / MEXT 2024",
+    },
     name: { en: "Japan", id: "Jepang" },
     bandThresholdsUsd: { lowToMid: 3000, midToHigh: 8000 },
     effectiveRate: {
@@ -233,6 +280,11 @@ export const countries: Country[] = [
   // ── Europe (non-Nordic) ──
   {
     id: "gb",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free state schools; admissions must not demand passport/visa; residency-based catchment applies equally. GOV.UK 2024",
+    },
     name: { en: "United Kingdom", id: "Inggris" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8500 },
     effectiveRate: {
@@ -249,6 +301,11 @@ export const countries: Country[] = [
   },
   {
     id: "de",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Schulpflicht applies to every resident child regardless of nationality; public schools free. Handbook Germany 2024",
+    },
     name: { en: "Germany", id: "Jerman" },
     bandThresholdsUsd: { lowToMid: 4000, midToHigh: 9000 },
     effectiveRate: {
@@ -265,6 +322,11 @@ export const countries: Country[] = [
   },
   {
     id: "nl",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free basisschool for all residents; non-Dutch speakers get a ~1yr newcomers class. Government.nl",
+    },
     name: { en: "Netherlands", id: "Belanda" },
     bandThresholdsUsd: { lowToMid: 4000, midToHigh: 9000 },
     effectiveRate: {
@@ -281,6 +343,11 @@ export const countries: Country[] = [
   },
   {
     id: "pt",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free compulsory schooling ages 6-18 for residents; PLNM language support. gov.pt",
+    },
     name: { en: "Portugal", id: "Portugal" },
     bandThresholdsUsd: { lowToMid: 2500, midToHigh: 6500 },
     effectiveRate: {
@@ -297,6 +364,11 @@ export const countries: Country[] = [
   },
   {
     id: "ch",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free public schooling for all legal residents; cantonal-language-only instruction; many expats still pick private. Expatica 2024",
+    },
     name: { en: "Switzerland", id: "Swiss" },
     bandThresholdsUsd: { lowToMid: 5000, midToHigh: 12000 },
     effectiveRate: {
@@ -313,6 +385,11 @@ export const countries: Country[] = [
   },
   {
     id: "pl",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Compulsory ages 6-18 regardless of status; catchment school must admit; free Polish classes. migrant.info.pl 2024",
+    },
     name: { en: "Poland", id: "Polandia" },
     bandThresholdsUsd: { lowToMid: 2000, midToHigh: 6000 },
     effectiveRate: {
@@ -329,6 +406,11 @@ export const countries: Country[] = [
   },
   {
     id: "cz",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "All foreigners resident 90+ days get free basic education regardless of residence type/language. portal.gov.cz",
+    },
     name: { en: "Czech Republic", id: "Ceko" },
     bandThresholdsUsd: { lowToMid: 2000, midToHigh: 5500 },
     effectiveRate: {
@@ -345,6 +427,11 @@ export const countries: Country[] = [
   },
   {
     id: "fr",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Compulsory ages 3-16 for all residents (Code educ. L.131-1); free; UPE2A French support. education.gouv.fr 2024",
+    },
     name: { en: "France", id: "Prancis" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 9000 },
     effectiveRate: {
@@ -362,6 +449,11 @@ export const countries: Country[] = [
   // ── Nordics ──
   {
     id: "se",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free compulsory schooling ages 6-16 for residence-permit holders' kids; Forberedelseklass support. sweden.se 2024",
+    },
     name: { en: "Sweden", id: "Swedia" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8000 },
     effectiveRate: {
@@ -378,6 +470,11 @@ export const countries: Country[] = [
   },
   {
     id: "dk",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free Folkeskole ages 6-16 for legal residents; reception class / language support. City of Copenhagen",
+    },
     name: { en: "Denmark", id: "Denmark" },
     bandThresholdsUsd: { lowToMid: 4000, midToHigh: 9000 },
     effectiveRate: {
@@ -394,6 +491,11 @@ export const countries: Country[] = [
   },
   {
     id: "no",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free compulsory schooling ages 6-16 for residence-permit holders; place within a month of arrival. nyinorge.no",
+    },
     name: { en: "Norway", id: "Norwegia" },
     bandThresholdsUsd: { lowToMid: 4000, midToHigh: 9000 },
     effectiveRate: {
@@ -410,6 +512,11 @@ export const countries: Country[] = [
   },
   {
     id: "fi",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free basic education for permanently resident kids 6-17; valmistava preparatory class. City of Helsinki",
+    },
     name: { en: "Finland", id: "Finlandia" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8000 },
     effectiveRate: {
@@ -427,6 +534,11 @@ export const countries: Country[] = [
   // ── Americas ──
   {
     id: "us",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Work-visa kids attend free; Plyler v. Doe bars status discrimination; no quota or fee. US State Dept",
+    },
     name: { en: "United States", id: "Amerika Serikat" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 9000 },
     effectiveRate: {
@@ -443,6 +555,11 @@ export const countries: Country[] = [
   },
   {
     id: "ca",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free K-12 for valid work-permit holders' kids in most provinces; Quebec may add conditions. WorkPermitCheck 2024",
+    },
     name: { en: "Canada", id: "Kanada" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8000 },
     effectiveRate: {
@@ -459,6 +576,11 @@ export const countries: Country[] = [
   },
   {
     id: "br",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Constitution + Lei 13.445/2017 bar nationality-based exclusion; free public schools for all residents. Library of Congress 2017",
+    },
     name: { en: "Brazil", id: "Brasil" },
     bandThresholdsUsd: { lowToMid: 1500, midToHigh: 4500 },
     effectiveRate: {
@@ -475,6 +597,11 @@ export const countries: Country[] = [
   },
   {
     id: "mx",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Constitution Art.3 universal free basic education; no nationality bar; revalidacion for transcripts. SEP guides 2024",
+    },
     name: { en: "Mexico", id: "Meksiko" },
     bandThresholdsUsd: { lowToMid: 1500, midToHigh: 4000 },
     effectiveRate: {
@@ -492,6 +619,11 @@ export const countries: Country[] = [
   // ── Middle East ──
   {
     id: "ae",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "high",
+      note: "Expats pay AED 6,000/yr, Arabic-medium, 85% grade + 20% quota + govt-employer condition; ~75% use private. UAE Gov 2024",
+    },
     name: { en: "United Arab Emirates", id: "Uni Emirat Arab" },
     bandThresholdsUsd: { lowToMid: 5000, midToHigh: 15000 },
     effectiveRate: {
@@ -509,6 +641,11 @@ export const countries: Country[] = [
   // ── South & East Asia (non-ASEAN) ──
   {
     id: "in",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "moderate",
+      note: "RTE Act is age-based (not citizenship); Hindi/regional-medium; virtually all expats use intl schools. Expat Arrivals 2024",
+    },
     name: { en: "India", id: "India" },
     bandThresholdsUsd: { lowToMid: 1000, midToHigh: 3500 },
     effectiveRate: {
@@ -525,6 +662,11 @@ export const countries: Country[] = [
   },
   {
     id: "kr",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "high",
+      note: "Free public elementary; enrolment cannot be refused; Korean-only instruction is a practical, not legal, barrier. Seoul Gov 2024",
+    },
     name: { en: "South Korea", id: "Korea Selatan" },
     bandThresholdsUsd: { lowToMid: 2500, midToHigh: 7000 },
     effectiveRate: {
@@ -542,6 +684,11 @@ export const countries: Country[] = [
   // ── Oceania ──
   {
     id: "au",
+    foreignerPublicSchool: {
+      access: "limited",
+      confidence: "high",
+      note: "482-visa kids enrol in all states but fees vary; NSW/WA charge temp-visa families (WA ~A$4,000/yr). State edu depts 2024",
+    },
     name: { en: "Australia", id: "Australia" },
     bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8500 },
     effectiveRate: {
@@ -559,6 +706,11 @@ export const countries: Country[] = [
   // ── Africa ──
   {
     id: "ke",
+    foreignerPublicSchool: {
+      access: "open",
+      confidence: "moderate",
+      note: "Basic Education Act 2013 covers residents; fees may apply to non-citizens but no exclusion; free primary in practice. Kenya Law 2022",
+    },
     name: { en: "Kenya", id: "Kenya" },
     bandThresholdsUsd: { lowToMid: 800, midToHigh: 2500 },
     effectiveRate: {

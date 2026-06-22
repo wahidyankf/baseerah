@@ -62,7 +62,7 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
 
   // Compute every city's figures once; both the table and the mobile cards render from this.
   const rows = dataset.cities.map((city) => {
-    const country = countryById[city.countryId];
+    const country = countryById[city.countryId]!;
     const e = city.expenses;
     const fxRate = fxToUsd(dataset.fx, city.currency);
     return {
@@ -75,11 +75,15 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
       utilities: scaleAmount(e.utilities.amount, "utilities", household, area),
       healthcare: scaleAmount(e.healthcare.amount, "healthcare", household, area),
       childcare: childcareLocal(city, household),
-      school: schoolLocal(city, household, schoolType),
-      essentials: essentialsLocal(city, household, schoolType, area),
-      total: expensesLocal(city, household, schoolType, area),
+      school: schoolLocal(city, country, household, schoolType),
+      essentials: essentialsLocal(city, country, household, schoolType, area),
+      total: expensesLocal(city, country, household, schoolType, area),
       relocation: relocationSunkLocal(city),
       liquidity: liquidityReserveLocal(city),
+      // True when "public" is selected but this country isn't fully open to foreign residents, so
+      // the shown school figure is actually the PRIVATE one (effectiveSchoolType fell back).
+      schoolForeignerFallback:
+        schoolType === "public" && household.schoolKids > 0 && country.foreignerPublicSchool.access !== "open",
     };
   });
 
@@ -222,6 +226,14 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                     className={`text-right ${tabletHidden}`}
                   >
                     {fmtDualCurrency(r.school, r.city.currency, r.school * r.fxRate)}
+                    {r.schoolForeignerFallback && (
+                      <span
+                        data-testid={`school-foreigner-flag-${r.city.id}`}
+                        className="ml-1 block text-xs text-muted-foreground"
+                      >
+                        {t(locale, "publicSchoolForeignerFlag")}
+                      </span>
+                    )}
                   </TableCell>
                   {/* One-time cost cells */}
                   <TableCell className="text-right">

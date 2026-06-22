@@ -106,9 +106,9 @@ export function SavingsTable({
     const country = countryById[city.countryId]!;
     const fxRate = fx.ratesUsdPerUnit[city.currency] ?? 1;
     const net = grossMonthly > 0 ? netUsd(grossMonthly, city, country, fx) : 0;
-    const essLocal = essentialsLocal(city, household, schoolType, area);
+    const essLocal = essentialsLocal(city, country, household, schoolType, area);
     const essUsd = essLocal * fxRate;
-    const totalExpUsd = expensesLocal(city, household, schoolType, area) * fxRate;
+    const totalExpUsd = expensesLocal(city, country, household, schoolType, area) * fxRate;
     const essentialSavings = net - essUsd;
     const lifestyleUsd = totalExpUsd - essUsd;
     const afterLifestyle = essentialSavings - lifestyleUsd;

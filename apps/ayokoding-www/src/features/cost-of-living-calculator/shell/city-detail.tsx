@@ -68,6 +68,7 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
   if (!city) return <p>City not found.</p>;
 
   const country = dataset.countries.find((c) => c.id === city.countryId);
+  if (!country) return <p>Country not found.</p>;
   const cur = city.currency;
 
   const e = city.expenses;
@@ -77,9 +78,13 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
   const utilitiesAmt = scaleAmount(e.utilities.amount, "utilities", household, area);
   const healthcareAmt = scaleAmount(e.healthcare.amount, "healthcare", household, area);
   const childcareAmt = childcareLocal(city, household);
-  const schoolAmt = schoolLocal(city, household, schoolType);
-  const essentials = essentialsLocal(city, household, schoolType, area);
-  const monthlyTotal = expensesLocal(city, household, schoolType, area);
+  const schoolAmt = schoolLocal(city, country, household, schoolType);
+  // When "public" is selected but this country isn't fully open to foreign residents, the figure
+  // above is actually the private one (effectiveSchoolType fell back) — annotate the label.
+  const schoolForeignerFallback =
+    schoolType === "public" && household.schoolKids > 0 && country.foreignerPublicSchool.access !== "open";
+  const essentials = essentialsLocal(city, country, household, schoolType, area);
+  const monthlyTotal = expensesLocal(city, country, household, schoolType, area);
   const relocationSunk = relocationSunkLocal(city);
   const relocationSunkInUsd = relocationSunkUsd(city, dataset.fx);
   const liquidityReserve = liquidityReserveLocal(city);
@@ -155,7 +160,11 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
             rawValue={childcareAmt}
           />
           <Row
-            label={t(locale, "labelSchool")}
+            label={
+              schoolForeignerFallback
+                ? `${t(locale, "labelSchool")} (${t(locale, "publicSchoolForeignerFlag")})`
+                : t(locale, "labelSchool")
+            }
             value={fmtCurrency(schoolAmt, cur)}
             testId="expense-school"
             rawValue={schoolAmt}

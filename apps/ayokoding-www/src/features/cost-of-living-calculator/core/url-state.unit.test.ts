@@ -24,6 +24,7 @@ const mockDataset: Dataset = {
   countries: [
     {
       id: "sg",
+      foreignerPublicSchool: { access: "limited", confidence: "high" },
       name: { en: "Singapore", id: "Singapura" },
       bandThresholdsUsd: { lowToMid: 3500, midToHigh: 8000 },
       effectiveRate: {
@@ -36,6 +37,7 @@ const mockDataset: Dataset = {
     },
     {
       id: "id",
+      foreignerPublicSchool: { access: "nationals-only", confidence: "high" },
       name: { en: "Indonesia", id: "Indonesia" },
       bandThresholdsUsd: { lowToMid: 1500, midToHigh: 5000 },
       effectiveRate: {
@@ -48,6 +50,7 @@ const mockDataset: Dataset = {
     },
     {
       id: "de",
+      foreignerPublicSchool: { access: "open", confidence: "high" },
       name: { en: "Germany", id: "Jerman" },
       bandThresholdsUsd: { lowToMid: 4000, midToHigh: 9000 },
       effectiveRate: {

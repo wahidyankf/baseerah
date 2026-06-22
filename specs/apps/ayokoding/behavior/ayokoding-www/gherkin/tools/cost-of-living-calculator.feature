@@ -736,3 +736,17 @@ Feature: Salary savings calculator
     When I type a gross monthly salary of "7000" without pausing
     Then the salary field immediately shows "7000"
     And the gross salary is written to the URL once typing settles
+
+  # Public primary schooling is not open to foreign residents in every country. Where it is not
+  # fully open (limited or nationals-only — e.g. Singapore, Indonesia, UAE), a relocating foreigner
+  # cannot realistically use it, so the calculator charges the PRIVATE figure and flags the cell.
+  Scenario: Public schooling not open to foreigners is charged at the private rate
+    Given I am on the cost-of-living calculator
+    When I add one school-age child with public school selected
+    Then the Singapore school cost equals its private-school figure and the cell is flagged
+
+  # Where public schooling IS open to foreign residents (e.g. Germany), the public figure stands.
+  Scenario: Public schooling open to foreigners keeps the public cost
+    Given I am on the cost-of-living calculator
+    When I add one school-age child with public school selected
+    Then the Berlin school cost equals its public-school figure with no foreigner flag

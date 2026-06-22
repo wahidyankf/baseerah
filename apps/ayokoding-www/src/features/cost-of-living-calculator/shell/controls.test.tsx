@@ -18,6 +18,7 @@ function ControlsWithState(
     schoolKids: 0 | 1 | 2 | 3;
     schoolType: SchoolType;
     area: Area;
+    previewCityId: string;
   }>,
 ) {
   const [household, setHousehold] = useState<Household>({
@@ -31,7 +32,7 @@ function ControlsWithState(
   return (
     <Controls
       dataset={dataset}
-      previewCityId={firstCity.id}
+      previewCityId={overrides.previewCityId ?? firstCity.id}
       household={household}
       schoolType={schoolType}
       area={area}
@@ -196,9 +197,11 @@ describe("Controls", () => {
   });
 
   // Gherkin (binds): "Private school raises expenses more than public"
+  // Preview Berlin (Germany = public school open to foreigners) so public < private holds; the
+  // default preview city (Singapore) is "limited", where public correctly falls back to private.
   it("switching to private school increases schooling portion", async () => {
     const user = userEvent.setup();
-    render(<ControlsWithState schoolKids={2} />);
+    render(<ControlsWithState schoolKids={2} previewCityId="berlin" />);
 
     const schoolingPublic = parseFloat(screen.getByTestId("preview-schooling").getAttribute("data-local") ?? "0");
 

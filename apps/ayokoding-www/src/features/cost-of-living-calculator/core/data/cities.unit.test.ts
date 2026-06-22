@@ -118,6 +118,11 @@ describe("countries — tax bands + healthcare + insurance", () => {
     expect(typeof country.compulsoryInsurance.health).toBe("boolean");
     expect(typeof country.compulsoryInsurance.socialSecurity).toBe("boolean");
   });
+
+  it.each(countries)("$id has foreignerPublicSchool with a valid access + confidence", (country) => {
+    expect(["open", "limited", "nationals-only"]).toContain(country.foreignerPublicSchool.access);
+    expect(["high", "moderate", "proxy"]).toContain(country.foreignerPublicSchool.confidence);
+  });
 });
 
 describe("dataset — region coverage", () => {

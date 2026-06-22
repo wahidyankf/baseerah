@@ -71,6 +71,9 @@ const translations: Record<Locale, Record<string, string>> = {
     optPublic: "Public",
     optPrivate: "Private",
     schoolTypeHint: "add school-age children to choose",
+    foreignerPublicSchoolNote:
+      "Public school isn't open to foreign residents in every country; where it isn't (e.g. UAE, Singapore), the private-school cost is used instead.",
+    publicSchoolForeignerFlag: "public n/a → private",
     labelArea: "Area",
     optCenter: "City center",
     optRural: "Rural",
@@ -267,6 +270,9 @@ const translations: Record<Locale, Record<string, string>> = {
     optPublic: "Negeri",
     optPrivate: "Swasta",
     schoolTypeHint: "tambahkan anak usia sekolah untuk memilih",
+    foreignerPublicSchoolNote:
+      "Sekolah negeri nggak terbuka buat warga asing di semua negara; di tempat yang nggak (mis. UEA, Singapura), biaya sekolah swasta yang dipakai.",
+    publicSchoolForeignerFlag: "negeri n/a → swasta",
     labelArea: "Wilayah",
     optCenter: "Pusat kota",
     optRural: "Pedesaan",

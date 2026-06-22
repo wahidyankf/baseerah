@@ -10,6 +10,8 @@ import {
   netUsd,
   childcareLocal,
   schoolLocal,
+  effectiveSchoolType,
+  foreignerCanUsePublicSchool,
   essentialsLocal,
   expensesLocal,
   relocationSunkLocal,
@@ -167,29 +169,56 @@ describe("childcareLocal", () => {
 
 describe("schoolLocal", () => {
   it("zero schoolKids → 0", () => {
-    expect(schoolLocal(berlin, singleNoKids, "public")).toBe(0);
+    expect(schoolLocal(berlin, deDe, singleNoKids, "public")).toBe(0);
   });
 
   it("private ≥ public for same household", () => {
     const oneSchoolKid = { adults: 1, preschoolKids: 0, schoolKids: 1 } as const;
-    const pub = schoolLocal(berlin, oneSchoolKid, "public");
-    const priv = schoolLocal(berlin, oneSchoolKid, "private");
+    const pub = schoolLocal(berlin, deDe, oneSchoolKid, "public");
+    const priv = schoolLocal(berlin, deDe, oneSchoolKid, "private");
     expect(priv).toBeGreaterThanOrEqual(pub);
   });
 
   it("scales per school-age child", () => {
     const oneKid = { adults: 1, preschoolKids: 0, schoolKids: 1 } as const;
     const twoKids = { adults: 1, preschoolKids: 0, schoolKids: 2 } as const;
-    const one = schoolLocal(berlin, oneKid, "public");
-    const two = schoolLocal(berlin, twoKids, "public");
+    const one = schoolLocal(berlin, deDe, oneKid, "public");
+    const two = schoolLocal(berlin, deDe, twoKids, "public");
     expect(two).toBe(berlin.schoolMedianLocal.public.amount * 2);
     expect(one).toBe(berlin.schoolMedianLocal.public.amount);
   });
 });
 
+describe("effectiveSchoolType — foreigner public-school eligibility", () => {
+  const oneSchoolKid = { adults: 1, preschoolKids: 0, schoolKids: 1 } as const;
+
+  it("keeps the chosen type where public school is fully open to foreigners (Germany)", () => {
+    expect(foreignerCanUsePublicSchool(deDe)).toBe(true);
+    expect(effectiveSchoolType(deDe, "public")).toBe("public");
+    expect(effectiveSchoolType(deDe, "private")).toBe("private");
+    // Berlin (open) keeps the public figure when "public" is chosen.
+    expect(schoolLocal(berlin, deDe, oneSchoolKid, "public")).toBe(berlin.schoolMedianLocal.public.amount);
+  });
+
+  it("falls back public→private where public is NOT fully open to foreigners (Singapore, limited)", () => {
+    expect(foreignerCanUsePublicSchool(sgSg)).toBe(false);
+    expect(effectiveSchoolType(sgSg, "public")).toBe("private");
+    // A foreigner picking "public" is charged the PRIVATE figure (they cannot use local public school).
+    const asPublic = schoolLocal(singapore, sgSg, oneSchoolKid, "public");
+    const asPrivate = schoolLocal(singapore, sgSg, oneSchoolKid, "private");
+    expect(asPublic).toBe(asPrivate);
+    expect(asPublic).toBe(singapore.schoolMedianLocal.private.amount);
+  });
+
+  it("a 'private' choice is never altered by eligibility", () => {
+    expect(effectiveSchoolType(sgSg, "private")).toBe("private");
+    expect(effectiveSchoolType(deDe, "private")).toBe("private");
+  });
+});
+
 describe("essentialsLocal — OECD household scaling", () => {
   it("housing rises sub-linearly from single to married+2preschool", () => {
-    const singleEss = essentialsLocal(berlin, singleNoKids, "public", "center");
+    const singleEss = essentialsLocal(berlin, deDe, singleNoKids, "public", "center");
     const singleHousing = berlin.expenses.housing.amount; // × subLinear(single)=1
 
     const marriedHousehold = marriedTwoPreschool;
@@ -209,8 +238,8 @@ describe("essentialsLocal — OECD household scaling", () => {
   });
 
   it("transport is flat (same regardless of household size)", () => {
-    const essOne = essentialsLocal(berlin, singleNoKids, "public", "center");
-    const essTwo = essentialsLocal(berlin, { adults: 2, preschoolKids: 0, schoolKids: 0 }, "public", "center");
+    const essOne = essentialsLocal(berlin, deDe, singleNoKids, "public", "center");
+    const essTwo = essentialsLocal(berlin, deDe, { adults: 2, preschoolKids: 0, schoolKids: 0 }, "public", "center");
     // transport doesn't change between these — difference is from food + housing only
     // We verify by checking transport component directly
     expect(berlin.expenses.transport.amount).toBeGreaterThan(0); // fixture sanity
@@ -220,31 +249,31 @@ describe("essentialsLocal — OECD household scaling", () => {
   });
 
   it("rural area reduces housing vs center", () => {
-    const center = essentialsLocal(berlin, singleNoKids, "public", "center");
-    const rural = essentialsLocal(berlin, singleNoKids, "public", "rural");
+    const center = essentialsLocal(berlin, deDe, singleNoKids, "public", "center");
+    const rural = essentialsLocal(berlin, deDe, singleNoKids, "public", "rural");
     expect(rural).toBeLessThan(center);
     expect(AREA_MULTIPLIERS.rural).toBeLessThan(AREA_MULTIPLIERS.center);
   });
 
   it("childcare included when preschoolKids > 0", () => {
-    const withKids = essentialsLocal(berlin, marriedTwoPreschool, "public", "center");
-    const noKids = essentialsLocal(berlin, { adults: 2, preschoolKids: 0, schoolKids: 0 }, "public", "center");
+    const withKids = essentialsLocal(berlin, deDe, marriedTwoPreschool, "public", "center");
+    const noKids = essentialsLocal(berlin, deDe, { adults: 2, preschoolKids: 0, schoolKids: 0 }, "public", "center");
     expect(withKids).toBeGreaterThan(noKids);
     const kidsDiff = withKids - noKids;
     expect(kidsDiff).toBeGreaterThan(berlin.childcareMedianLocal.amount * 1.5); // 2 kids approx
   });
 
   it("school included when schoolKids > 0", () => {
-    const withSchool = essentialsLocal(berlin, marriedOneSchool, "private", "center");
-    const noSchool = essentialsLocal(berlin, { adults: 2, preschoolKids: 0, schoolKids: 0 }, "private", "center");
+    const withSchool = essentialsLocal(berlin, deDe, marriedOneSchool, "private", "center");
+    const noSchool = essentialsLocal(berlin, deDe, { adults: 2, preschoolKids: 0, schoolKids: 0 }, "private", "center");
     expect(withSchool).toBeGreaterThan(noSchool);
   });
 });
 
 describe("expensesLocal", () => {
   it("expensesLocal = essentialsLocal + lifestyle", () => {
-    const ess = essentialsLocal(berlin, singleNoKids, "public", "center");
-    const exp = expensesLocal(berlin, singleNoKids, "public", "center");
+    const ess = essentialsLocal(berlin, deDe, singleNoKids, "public", "center");
+    const exp = expensesLocal(berlin, deDe, singleNoKids, "public", "center");
     expect(exp).toBeCloseTo(ess + berlin.expenses.lifestyle.amount, 6);
   });
 });
@@ -297,7 +326,7 @@ describe("savingsRow", () => {
     const row = savingsRow(gross, berlin, deDe, fx, singleNoKids, "public", "center");
     const rate = effectiveRateForCity(gross, berlin, deDe);
     const net = gross * (1 - rate);
-    const ess = essentialsLocal(berlin, singleNoKids, "public", "center");
+    const ess = essentialsLocal(berlin, deDe, singleNoKids, "public", "center");
     const essUsd = ess * fxToUsd(fx, berlin.currency);
     expect(row.essentialSavings).toBeCloseTo(net - essUsd, 4);
   });
@@ -312,7 +341,7 @@ describe("savingsRow", () => {
   it("deficit — essentials > net → negative essentialSavings", () => {
     // very low gross (Tokyo, very low USD)
     const row = savingsRow(1000, tokyo, jpJp, fx, singleNoKids, "public", "center");
-    const essUsd = essentialsLocal(tokyo, singleNoKids, "public", "center") * fxToUsd(fx, tokyo.currency);
+    const essUsd = essentialsLocal(tokyo, jpJp, singleNoKids, "public", "center") * fxToUsd(fx, tokyo.currency);
     const net = netUsd(1000, tokyo, jpJp, fx);
     if (essUsd > net) {
       expect(row.essentialSavings).toBeLessThan(0);
@@ -327,7 +356,7 @@ describe("savingsRow", () => {
   it("relocation not folded into savings", () => {
     const rowNoReloc = savingsRow(6000, berlin, deDe, fx, singleNoKids, "public", "center");
     // savings figures must not include relocation components
-    const ess = essentialsLocal(berlin, singleNoKids, "public", "center");
+    const ess = essentialsLocal(berlin, deDe, singleNoKids, "public", "center");
     const essUsd = ess * fxToUsd(fx, berlin.currency);
     const net = netUsd(6000, berlin, deDe, fx);
     expect(rowNoReloc.essentialSavings).toBeCloseTo(net - essUsd, 4);
@@ -360,7 +389,7 @@ describe("USD routing", () => {
     const gross = 7000;
     const row = savingsRow(gross, london, gbGb, fx, singleNoKids, "public", "center");
     const rate = fxToUsd(fx, "GBP");
-    const ess = essentialsLocal(london, singleNoKids, "public", "center");
+    const ess = essentialsLocal(london, gbGb, singleNoKids, "public", "center");
     expect(row.essentialsUsd).toBeCloseTo(ess * rate, 4);
   });
 });

@@ -90,6 +90,7 @@ export function Controls({
   onAreaChange,
 }: Props) {
   const city = dataset.cities.find((c) => c.id === previewCityId) ?? dataset.cities[0]!;
+  const country = dataset.countries.find((c) => c.id === city.countryId) ?? dataset.countries[0]!;
   const e = city.expenses;
   const s = subLinear(household);
   const p = perCapita(household);
@@ -101,7 +102,7 @@ export function Controls({
   const utilities = e.utilities.amount * s;
   const healthcare = e.healthcare.amount * p;
   const childcare = childcareLocal(city, household);
-  const school = schoolLocal(city, household, schoolType);
+  const school = schoolLocal(city, country, household, schoolType);
   const total = housing + food + transport + utilities + healthcare + childcare + school;
 
   const adultOptions: Array<1 | 2> = [1, 2];
@@ -195,6 +196,15 @@ export function Controls({
         />
         {household.schoolKids === 0 && (
           <span className="text-xs text-muted-foreground">{t(locale, "schoolTypeHint")}</span>
+        )}
+        {/* When "public" is selected and the household has school-age children, explain that
+            public schooling is not open to foreign residents everywhere — where it isn't, the
+            private figure is charged (effectiveSchoolType in calc.ts). basis-full puts the note
+            on its own line inside the flex-wrap row. */}
+        {household.schoolKids > 0 && schoolType === "public" && (
+          <span data-testid="foreigner-public-school-note" className="basis-full text-xs text-muted-foreground">
+            {t(locale, "foreignerPublicSchoolNote")}
+          </span>
         )}
       </div>
 
