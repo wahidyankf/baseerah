@@ -634,8 +634,18 @@ binding steps in
 > OOP abbr title "bayar sendiri", **console clean of CSP/GA errors** after the full GA4 origin whitelist,
 > no horizontal overflow at 375px. Evidence:
 >
-> - ![Cost tab id 1280px](./evidence/phase-9-cost-tab-id-1280px.png)
-> - ![Min-role en 375px (baseline-source wrap, 44px controls)](./evidence/phase-9-min-role-en-375px.png)
+> Evidence set — en + id × 320/375/768/1280 (cost tab, Singapore + schoolkids=1 to show the terracotta
+> foreigner flag) plus the Savings empty-state:
+>
+> - ![Cost tab en 320px](./evidence/phase-9-cost-tab-en-320px.png) ·
+>   ![en 768px](./evidence/phase-9-cost-tab-en-768px.png) ·
+>   ![en 1280px](./evidence/phase-9-cost-tab-en-1280px.png) ·
+>   ![min-role en 375px](./evidence/phase-9-min-role-en-375px.png)
+> - ![Cost tab id 320px](./evidence/phase-9-cost-tab-id-320px.png) ·
+>   ![id 375px](./evidence/phase-9-cost-tab-id-375px.png) ·
+>   ![id 768px](./evidence/phase-9-cost-tab-id-768px.png) ·
+>   ![id 1280px](./evidence/phase-9-cost-tab-id-1280px.png)
+> - ![Savings empty-state en 375px](./evidence/phase-9-savings-empty-en-375px.png)
 >
 > **Visual-parity sign-off (9.3)**: recorded by the Playwright observer (per User-Facing Delivery
 > Hardening rule 1, a human or Playwright observer) — rendered output matches the `assets/` lo-fi intent
@@ -728,15 +738,15 @@ _Retest findings (appended here in Phase 10):_
 
 ## Plan Archival
 
-- [ ] `[AI]` Verify ALL delivery checklist items above are ticked.
-- [ ] `[AI]` Verify ALL quality gates pass (local + CI): `npx nx run ayokoding-www:typecheck && npx nx run ayokoding-www:lint && npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:specs:coverage`.
-- [ ] `[AI]` Verify ALL manual assertions pass with committed evidence in `evidence/` (screenshots present
+- [x] `[AI]` Verify ALL delivery checklist items above are ticked.
+- [x] `[AI]` Verify ALL quality gates pass (local + CI): `npx nx run ayokoding-www:typecheck && npx nx run ayokoding-www:lint && npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:specs:coverage`.
+- [x] `[AI]` Verify ALL manual assertions pass with committed evidence in `evidence/` (screenshots present
       for each locale × breakpoint).
-- [ ] `[AI]` Verify both en and id locales were exercised in UI verification (not just the default).
-- [ ] `[AI]` Verify every rule-15 EWT/UWT/DWT defect finding from Phase 10 is fixed (ticked) or has
+- [x] `[AI]` Verify both en and id locales were exercised in UI verification (not just the default).
+- [x] `[AI]` Verify every rule-15 EWT/UWT/DWT defect finding from Phase 10 is fixed (ticked) or has
       explicit user deferral permission.
-- [ ] `[AI]` `git mv plans/in-progress/ayokoding-www-calculator-ux-hardening plans/done/$(date +%Y-%m-%d)__ayokoding-www-calculator-ux-hardening`
-- [ ] `[AI]` Update `plans/in-progress/README.md` — remove this plan entry.
-- [ ] `[AI]` Update `plans/done/README.md` — add this plan entry with completion date.
-- [ ] `[AI]` Update any other READMEs that reference this plan.
-- [ ] `[AI]` Commit: `chore(plans): move ayokoding-www-calculator-ux-hardening to done`
+- [x] `[AI]` `git mv plans/in-progress/ayokoding-www-calculator-ux-hardening plans/done/$(date +%Y-%m-%d)__ayokoding-www-calculator-ux-hardening`
+- [x] `[AI]` Update `plans/in-progress/README.md` — remove this plan entry.
+- [x] `[AI]` Update `plans/done/README.md` — add this plan entry with completion date.
+- [x] `[AI]` Update any other READMEs that reference this plan.
+- [x] `[AI]` Commit: `chore(plans): move ayokoding-www-calculator-ux-hardening to done`

@@ -8,7 +8,7 @@
 
 ## Status
 
-- **Stage**: in-progress
+- **Stage**: done (completed 2026-06-22)
 - **Type**: web-UI feature-change / UX-hardening (UI-bearing)
 - **App**: `apps/ayokoding-www` — `src/features/cost-of-living-calculator/`
 - **Targets tested**: `http://localhost:3101/{en,id}/tools/cost-of-living-calculator` (+ city-detail & URL deep links)
