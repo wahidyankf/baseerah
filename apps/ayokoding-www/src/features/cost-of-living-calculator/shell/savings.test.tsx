@@ -262,6 +262,23 @@ describe("SavingsTable", () => {
     expect(input).toHaveFocus();
   });
 
+  // UWT-016: the mount auto-focus must NOT scroll the page — focus is invoked with
+  // { preventScroll: true } so a scrolled-down user is not yanked back to the top
+  // (regression against the scroll-preservation goal introduced by USS-001's autoFocus).
+  it("UWT-016: gross-salary input focuses with preventScroll on mount (no scroll jump)", () => {
+    const focusSpy = vi.spyOn(HTMLElement.prototype, "focus");
+    render(<SavingsTable {...defaultProps} />);
+    const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
+    // The input still receives focus...
+    expect(input).toHaveFocus();
+    // ...but the focus call that landed on it passed { preventScroll: true }.
+    const focusedWithPreventScroll = focusSpy.mock.calls.some(
+      ([opts]) => opts !== undefined && (opts as FocusOptions).preventScroll === true,
+    );
+    expect(focusedWithPreventScroll).toBe(true);
+    focusSpy.mockRestore();
+  });
+
   // UWT-007: the USD currency indicator is an inline at-field adornment inside the input row,
   // a sibling of the gross-salary input (not only a block note below the label).
   it("UWT-007: USD currency indicator sits inline in the same row as the input", () => {

@@ -83,6 +83,9 @@ const translations: Record<Locale, Record<string, string>> = {
     optPublic: "Public",
     optPrivate: "Private",
     schoolTypeHint: "add school-age children to choose",
+    // UWT-015: native hover tooltip (title) on the disabled Public/Private buttons so a
+    // first-timer learns the prerequisite without relying on the screen-reader-only hint.
+    schoolTypeDisabledTitle: "Add a school-age child to enable this option",
     foreignerPublicSchoolNote:
       "Public school isn't open to foreign residents in every country; where it isn't (e.g. UAE, Singapore), the private-school cost is used instead.",
     publicSchoolForeignerFlag: "public n/a → private",
@@ -306,6 +309,8 @@ const translations: Record<Locale, Record<string, string>> = {
     optPublic: "Negeri",
     optPrivate: "Swasta",
     schoolTypeHint: "tambahkan anak usia sekolah untuk memilih",
+    // UWT-015: native hover tooltip (title) on the disabled Public/Private buttons.
+    schoolTypeDisabledTitle: "Tambahkan anak usia sekolah untuk mengaktifkan opsi ini",
     foreignerPublicSchoolNote:
       "Sekolah negeri nggak terbuka buat warga asing di semua negara; di tempat yang nggak (mis. UEA, Singapura), biaya sekolah swasta yang dipakai.",
     publicSchoolForeignerFlag: "negeri n/a → swasta",

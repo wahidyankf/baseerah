@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Input,
@@ -72,6 +72,15 @@ export function SavingsTable({
   // from the URL on mount (legacy/standalone behavior).
   const controlled = grossProp !== undefined;
   const [internalGross, setInternalGross] = useState(0);
+  // UWT-005 (USS-001): auto-focus the gross input when the Savings tab mounts (mount === tab
+  // activation) so the user can start typing immediately.
+  // UWT-016: focus WITHOUT scrolling — the `autoFocus` prop (and a bare focus()) trigger the
+  // browser's focus-scroll, yanking a scrolled-down user ~250px back to the top. Using a ref +
+  // focus({ preventScroll: true }) lands focus while preserving the scroll position.
+  const grossInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    grossInputRef.current?.focus({ preventScroll: true });
+  }, []);
   const [sortAsc, setSortAsc] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
@@ -142,15 +151,14 @@ export function SavingsTable({
       <div>
         <Label htmlFor="gross-salary-input">{t(locale, "grossMonthlySalaryLabel")}</Label>
         <div className="flex items-center gap-2">
-          {/* UWT-005 (USS-001): auto-focus the gross input when the Savings tab mounts so the
-              user can start typing their salary immediately. The Savings tab content mounts only
-              when the tab is active, so mount === tab activation. */}
+          {/* UWT-005 (USS-001): auto-focus on mount via the ref + effect above (UWT-016:
+              preventScroll so focus does not reset the scroll position). The Savings tab content
+              mounts only when the tab is active, so mount === tab activation. */}
           <Input
             id="gross-salary-input"
+            ref={grossInputRef}
             type="number"
             min="0"
-            // eslint-disable-next-line jsx-a11y/no-autofocus -- intentional: USS-001 tab-activation focus
-            autoFocus
             aria-label={t(locale, "grossMonthlySalaryLabel")}
             value={grossField.value || ""}
             onChange={(e) => grossField.onChange(Math.max(0, parseFloat(e.target.value) || 0))}

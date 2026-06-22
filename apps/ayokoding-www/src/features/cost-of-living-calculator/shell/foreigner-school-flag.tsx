@@ -17,16 +17,23 @@ type Props = {
 // city-detail view (city-detail.tsx) render identical wording + hierarchy and cannot drift
 // (UWT-002 wording, DWT-006 hierarchy, EWT-003 parity).
 //
-// Styling: design-system `Badge` (variant="outline") with the `honey` warning hue token —
-// NOT `text-muted-foreground`, so the flag reads as an override annotation rather than ordinary
-// caption text. `normal-case` overrides the Badge's default uppercase so the localized
-// sentence-case wording renders as written. No raw hex — hue resolves to a theme token.
+// Styling: design-system `Badge`, SOLID (default/filled) variant with the `terracotta` warning
+// hue token — NOT `text-muted-foreground`, so the flag reads as an override annotation rather than
+// ordinary caption text.
+//
+// DWT-008: the healthcare-scheme badge in the same row uses `honey` for the common
+// mixed/"mandatory payroll insurance" model (healthcareBadgeHue), so a previously honey + outline
+// foreigner flag was indistinguishable from it. The flag now uses a DISTINCT register — terracotta
+// (a stronger red alert tone) AND the solid filled variant (vs the healthcare badges' outline wash)
+// — so the override flag stands out in both hue and weight. terracotta is a real design-system hue
+// token; no raw hex. `normal-case` overrides the Badge's default uppercase so the localized
+// sentence-case wording renders as written.
 export function ForeignerSchoolFlag({ cityId, locale, testIdSuffix = "" }: Props) {
   return (
     <Badge
       data-testid={`school-foreigner-flag-${cityId}${testIdSuffix}`}
-      variant="outline"
-      hue="honey"
+      variant="default"
+      hue="terracotta"
       className="mt-1 max-w-full whitespace-normal normal-case"
     >
       {t(locale, "publicSchoolForeignerFlagBadge")}

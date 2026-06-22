@@ -186,6 +186,65 @@ describe("Controls", () => {
     }
   });
 
+  // UWT-015: the disabled Public/Private buttons must carry a localized native `title` tooltip
+  // explaining the prerequisite so a hovering first-timer learns why they can't be used.
+  it("UWT-015: disabled school-type buttons carry a localized title tooltip (en)", () => {
+    render(<ControlsWithState schoolKids={0} />);
+    const group = screen.getByRole("radiogroup", { name: /school type/i });
+    const buttons = within(group).getAllByRole("radio");
+    for (const button of buttons) {
+      expect(button.getAttribute("title")).toBe("Add a school-age child to enable this option");
+    }
+  });
+
+  it("UWT-015: disabled school-type buttons carry a localized title tooltip (id)", () => {
+    render(
+      <Controls
+        dataset={dataset}
+        previewCityId={firstCity.id}
+        household={{ adults: 1, preschoolKids: 0, schoolKids: 0 }}
+        schoolType="public"
+        area="center"
+        locale="id"
+        onHouseholdChange={() => {}}
+        onSchoolTypeChange={() => {}}
+        onAreaChange={() => {}}
+      />,
+    );
+    const group = screen.getByRole("radiogroup", { name: /jenis sekolah/i });
+    const buttons = within(group).getAllByRole("radio");
+    for (const button of buttons) {
+      expect(button.getAttribute("title")).toBe("Tambahkan anak usia sekolah untuk mengaktifkan opsi ini");
+    }
+  });
+
+  // UWT-015: the disabled school-type group must read as inactive BEFORE a click — it carries a
+  // reduced-opacity class, and the (formerly filled) selected option no longer keeps its active
+  // brand fill while disabled.
+  it("UWT-015: disabled school-type group is visually dimmed and drops the active fill", () => {
+    render(<ControlsWithState schoolKids={0} schoolType="public" />);
+    const group = screen.getByRole("radiogroup", { name: /school type/i });
+    // The group is dimmed.
+    expect(group.className).toMatch(/opacity-50/);
+    // No disabled option keeps the active brand fill (which would read as enabled/selected).
+    const buttons = within(group).getAllByRole("radio");
+    for (const button of buttons) {
+      expect(button.className).not.toMatch(/bg-primary/);
+    }
+  });
+
+  // UWT-015 guard: when ENABLED, the group is NOT dimmed and the selected option keeps its fill —
+  // the dim must apply only to the disabled state so other segmented groups are unaffected.
+  it("UWT-015: enabled school-type group keeps the active fill and is not dimmed", () => {
+    render(<ControlsWithState schoolKids={1} schoolType="public" />);
+    const group = screen.getByRole("radiogroup", { name: /school type/i });
+    expect(group.className).not.toMatch(/opacity-50/);
+    const selected = within(group)
+      .getAllByRole("radio")
+      .find((b) => b.getAttribute("aria-checked") === "true")!;
+    expect(selected.className).toMatch(/bg-primary/);
+  });
+
   // DWT-002: the household selects must use the shared SelectField chrome (appearance-none +
   // custom chevron overlay) so they match the geo selects instead of showing the native arrow.
   it("DWT-002: household selects use appearance-none chrome with a custom chevron overlay", () => {

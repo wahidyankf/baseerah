@@ -18,6 +18,7 @@ export function SegmentedControl<T extends string>({
   onChange,
   disabled = false,
   describedById,
+  disabledTitle,
 }: {
   label: string;
   value: T;
@@ -28,6 +29,9 @@ export function SegmentedControl<T extends string>({
       aria-describedby (and the options expose aria-disabled) so assistive tech announces why
       the control cannot be used. */
   describedById?: string;
+  /** When the control is disabled, this localized message is set as the native `title` on each
+      option so a hovering sighted user gets a tooltip explaining the prerequisite (UWT-015). */
+  disabledTitle?: string;
 }) {
   return (
     <div
@@ -57,11 +61,15 @@ export function SegmentedControl<T extends string>({
             disabled={disabled}
             aria-disabled={disabled || undefined}
             aria-describedby={disabled ? describedById : undefined}
+            title={disabled ? disabledTitle : undefined}
             onClick={() => onChange(opt.value)}
             className={cn(
               // Each option carries its own 44px touch target (EWT-002) and centres its label.
               "inline-flex min-h-[44px] items-center justify-center rounded-md px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-              selected
+              // UWT-015: when disabled, suppress the active brand fill so the selected option does
+              // not read as an enabled/active choice — the whole group is dimmed (opacity-50 on the
+              // container) and the option falls back to the muted/inactive treatment.
+              selected && !disabled
                 ? // Active option: brand fill PLUS a non-colour ring indicator (UWT-008) so the
                   // selection is perceivable without relying on colour alone.
                   "bg-primary text-primary-foreground shadow-sm ring-1 ring-primary-foreground/60 ring-inset"
@@ -208,6 +216,7 @@ export function Controls({
           onChange={onSchoolTypeChange}
           disabled={household.schoolKids === 0}
           describedById="school-type-hint"
+          disabledTitle={t(locale, "schoolTypeDisabledTitle")}
           options={[
             { value: "public", label: t(locale, "optPublic") },
             { value: "private", label: t(locale, "optPrivate") },
