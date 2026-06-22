@@ -4,7 +4,7 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_(none)_
+- [standardize-rhino-cli-sdlc-parity](./standardize-rhino-cli-sdlc-parity/README.md) — triage every rhino-cli command (wired/not-wired) and converge SDLC gate mechanics to `"identical"` across ose-public, ose-primer, ose-infra
 
 ## Instructions
 
