@@ -267,28 +267,22 @@ See `repo-generating-validation-reports` Skill for UUID chain, timestamp, progre
 
 ### Step 0.5: Consume Deterministic Preflight
 
-**Input**: `preflight-report` argument — path to `generated-reports/repo-governance-audit__*.json`. The orchestrating workflow (`repo-governance/workflows/repo/repo-rules-quality-gate.md`) runs `nx run rhino-cli:validate:repo-governance-audit -o json` and passes the resulting JSON file path here.
+**Input**: `preflight-report` argument — path to `generated-reports/repo-governance-audit__*.json`. The orchestrating workflow (`repo-governance/workflows/repo/repo-rules-quality-gate.md`) runs `./apps/rhino-cli/dist/rhino-cli repo-governance audit -o json` and passes the resulting JSON file path here.
 
 **Procedure**:
 
 1. **Read the preflight JSON**. Use `Read` on the path supplied.
 2. **Validate envelope**: confirm `schema` field equals `rhino-cli/repo-governance-audit/v1`. If missing or different, treat preflight as absent and run all Steps 1-8 in full (defensive fallback).
 3. **Extract findings**: parse `result.categories[]` (each carries `name`, `command`, `passed`, `findings[]`) and `result.skipped_false_positives[]`.
-4. **Populate the deterministic skip set** for this run — each category listed below tells which validation step (or sub-step) is already covered by rhino-cli and MUST NOT be re-evaluated by the AI checker:
+4. **Populate the deterministic skip set** for this run. The `repo-governance audit` orchestrator emits exactly **three** categories; each tells which validation step (or sub-step) is already covered by rhino-cli and MUST NOT be re-evaluated by the AI checker:
 
-   | Preflight category                | Step covered (skip)                                         |
-   | --------------------------------- | ----------------------------------------------------------- |
-   | `agents-md-size`                  | Step 6 "AGENTS.md Size Monitoring"                          |
-   | `frontmatter-audit`               | Step 1 frontmatter portion (No-Last-Updated convention)     |
-   | `traceability-audit`              | Step 7 traceability portion (Vision/Principles/Conventions) |
-   | `license-audit`                   | Step 7 licensing portion                                    |
-   | `readme-index-audit`              | Step 8.7 README index portion                               |
-   | `emoji-audit`                     | Step 1 emoji portion                                        |
-   | `layer-coherence`                 | Step 7 layer-coherence portion                              |
-   | `docs-validate-naming`            | Step 8.3 naming portion                                     |
-   | `docs-validate-frontmatter`       | Step 8.4 frontmatter portion                                |
-   | `docs-validate-heading-hierarchy` | Step 8.4 heading-hierarchy portion                          |
-   | `agents-detect-duplication`       | Step 2 (verbatim) and Step 3 (verbatim) portions            |
+   | Preflight category   | Step covered (skip)                                             |
+   | -------------------- | --------------------------------------------------------------- |
+   | `layer-coherence`    | Step 7 layer-coherence portion                                  |
+   | `traceability-audit` | Step 7 traceability portion (Vision/Principles/Conventions)     |
+   | `vendor-audit`       | Step 7 vendor-neutrality portion (governance prose terminology) |
+
+   **Not in this envelope**: the other deterministic validators — file naming, frontmatter shape, emoji codepoints, heading hierarchy, README index integrity, AGENTS.md size, license presence, and agent/skill verbatim duplication — are NOT part of `repo-governance audit`. They run under the sibling `rhino-cli md`, `convention`, and `harness` subcommands, enforced by the pre-commit and markdown CI gates. Do not look for them in this JSON envelope; the "deterministic-gate annotation" notes in Steps 1, 2, 3, 6, and 8 below say which dedicated gate owns each, so the AI checker can defer to it rather than AI-re-deriving mechanical checks.
 
 5. **Embed preflight findings in the final audit verbatim** under a new top-level section `## Deterministic Findings (rhino-cli preflight)` placed before `## AI-Only Findings`. Render each preflight finding as a regular report finding entry (same key/severity/criticality/file/line/message shape).
 6. **Re-validation iteration optimization**: compute `sha256(preflight-json-bytes)`. If identical to the prior iteration's preflight hash (stored under `generated-reports/.preflight-hash-<uuid-chain>`), reuse the prior deterministic findings section unchanged and ONLY re-evaluate AI-only categories. Store the new hash for the next iteration.
@@ -297,7 +291,7 @@ See `repo-generating-validation-reports` Skill for UUID chain, timestamp, progre
 
 ### Step 1: Core Repository Validation
 
-**Preflight skip annotation**: If preflight covered `frontmatter-audit` (No-Last-Updated convention) and `emoji-audit`, SKIP the frontmatter and emoji sub-portions of this step. Re-evaluate only the remaining sub-rules (file naming for non-doc paths, linking, convention compliance not already covered).
+**Deterministic-gate annotation**: file naming, frontmatter shape (No-Last-Updated convention), and emoji codepoints are enforced by the deterministic `rhino-cli md` and `convention` gates at pre-commit and markdown CI — they are NOT in this workflow's `repo-governance audit` preflight envelope. Do not AI-re-derive them; re-evaluate only the AI-only sub-rules (linking correctness, semantic convention compliance not caught mechanically).
 
 #### Known False Positive Skip List
 
@@ -346,7 +340,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 ### Step 2: Agent-to-Agent Duplication Detection
 
-**Preflight skip annotation**: If preflight covered `agents-detect-duplication`, SKIP the verbatim-match portion of this step. Re-evaluate only paraphrased / non-verbatim duplication (AI-only judgement).
+**Deterministic-gate annotation**: verbatim agent/skill duplication is caught by the deterministic `rhino-cli harness` gate at pre-commit and CI — not by this workflow's `repo-governance audit` preflight. Do not AI-re-derive the verbatim-match portion; re-evaluate only paraphrased / non-verbatim duplication (AI-only judgement).
 
 **CRITICAL VALIDATION**: Detect when multiple agents duplicate the same content.
 
@@ -483,7 +477,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 ### Step 3: Agent-Skill Duplication Detection
 
-**Preflight skip annotation**: If preflight covered `agents-detect-duplication`, SKIP the verbatim-match portion of this step. Re-evaluate only paraphrased / non-verbatim agent-skill duplication.
+**Deterministic-gate annotation**: verbatim agent/skill duplication is caught by the deterministic `rhino-cli harness` gate at pre-commit and CI — not by this workflow's `repo-governance audit` preflight. Do not AI-re-derive the verbatim-match portion; re-evaluate only paraphrased / non-verbatim agent-skill duplication.
 
 **For each agent in `.claude/agents/`**:
 
@@ -676,7 +670,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 ### Step 6: AGENTS.md Size Check
 
-**Preflight skip annotation**: If preflight covered `agents-md-size`, SKIP this entire step. The deterministic finding (if any) is already embedded in the `## Deterministic Findings (rhino-cli preflight)` section.
+**Deterministic-gate annotation**: AGENTS.md size is enforced by the deterministic `rhino-cli convention agents-md-size` gate at pre-commit and CI — not by this workflow's `repo-governance audit` preflight. Do not AI-re-derive the byte count; flag only qualitative bloat concerns the mechanical gate cannot judge.
 
 1. Read AGENTS.md
 2. Count characters
@@ -686,7 +680,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 ### Step 7: Rules Governance Validation
 
-**Preflight skip annotations**: If preflight covered `traceability-audit`, SKIP the traceability sub-portion (Vision Supported / Principles Implemented / Conventions Implemented headings). If preflight covered `license-audit`, SKIP the licensing sub-portion. If preflight covered `layer-coherence`, SKIP the cross-doc layer numbering sub-portion. Re-evaluate only the AI-only sub-portions (contradictions, inaccuracies, semantic inconsistencies, terminology alignment).
+**Preflight skip annotations**: If preflight covered `traceability-audit`, SKIP the traceability sub-portion (Vision Supported / Principles Implemented / Conventions Implemented headings). If preflight covered `layer-coherence`, SKIP the cross-doc layer numbering sub-portion. If preflight covered `vendor-audit`, SKIP the vendor-neutrality terminology sub-portion (forbidden vendor terms in governance prose). All three ARE emitted by `repo-governance audit`. License presence is enforced separately by the deterministic `rhino-cli convention license` gate — not this preflight — so do not AI-re-derive it. Re-evaluate only the AI-only sub-portions (contradictions, inaccuracies, semantic inconsistencies, terminology alignment).
 
 **Validate contradictions, inaccuracies, and inconsistencies** across all governance layers:
 
@@ -772,7 +766,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 ### Step 8: Software Documentation Validation
 
-**Preflight skip annotations**: If preflight covered `docs-validate-naming`, SKIP the file-naming sub-portion (Step 8.3). If preflight covered `docs-validate-frontmatter`, SKIP the frontmatter shape sub-portion (Step 8.4 frontmatter). If preflight covered `docs-validate-heading-hierarchy`, SKIP the heading-hierarchy sub-portion (Step 8.4 hierarchy). If preflight covered `readme-index-audit`, SKIP the README index integrity sub-portion (Step 8.7). Re-evaluate only the AI-only sub-portions (content accuracy, principle-alignment judgement, cross-doc terminology consistency).
+**Deterministic-gate annotation**: file naming (Step 8.3), frontmatter shape (Step 8.4 frontmatter), heading hierarchy (Step 8.4 hierarchy), and README index integrity (Step 8.7) are enforced by the deterministic `rhino-cli md` gate (validators `naming`, `frontmatter`, `heading-hierarchy`, `readme-index`) at pre-commit and markdown CI — they are NOT in this workflow's `repo-governance audit` preflight envelope. Do not AI-re-derive them; re-evaluate only the AI-only sub-portions (content accuracy, principle-alignment judgement, cross-doc terminology consistency).
 
 **Scope**: `docs/explanation/software-engineering/` (~265 files, ~345k lines)
 
@@ -1221,7 +1215,7 @@ When preflight is supplied (Step 0.5 succeeded), the final audit report is split
 
    **Key**: `<category>|<file>|<short-hash>`
    **Message**: <message>
-   **Source**: `rhino-cli repo-governance <category>` (preflight)
+   **Source**: `rhino-cli repo-governance validate <category>` (preflight)
    ```
 
    Findings are grouped under per-category H3 sub-headings to mirror the preflight envelope's `result.categories[]` ordering. Skipped false-positives are listed under an `### [INFO] Skipped (known false positives)` sub-section.

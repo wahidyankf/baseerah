@@ -284,7 +284,7 @@ of 2026-05-24. They must not be committed with content that diverges from `AGENT
   generated binding in memory, asserts byte-equality, asserts catalog completeness. Exits non-zero on
   any mismatch.
 - **`harness:bindings-validation`** npm script — wraps `rhino-cli agents validate-bindings`; appended
-  to the pre-push hook alongside `validate:repo-governance-vendor-audit` and
+  to the pre-push hook alongside `governance:vendor-audit-validation` and
   `cross-vendor:parity-validation` (AD8).
 - **`repo-harness-compatibility-checker`** / **`repo-harness-compatibility-fixer`** agents — run on
   demand or on a schedule; use web research to detect external upstream convention drift (distinct

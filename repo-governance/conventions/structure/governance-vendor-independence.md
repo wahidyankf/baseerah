@@ -120,7 +120,7 @@ The following patterns are forbidden in `repo-governance/` prose except inside t
 | ---------------------------------------------- | --------------------------------------------------------- |
 | `\bSkills\b` (capitalized, as branded concept) | Vendor-branded term; use lowercase "agent skills" instead |
 
-Combined audit regex used by `rhino-cli repo-governance vendor-audit`:
+Combined audit regex used by `rhino-cli repo-governance validate vendor`:
 
 ```
 Claude Code|OpenCode|\bCursor\b|\bWindsurf\b|\bCodeium\b|\bCopilot\b|\bAider\b|\bCline\b|\bDevin\b|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/|Anthropic|\bOpenAI\b|\bxAI\b|\bSonnet\b|\bOpus\b|\bHaiku\b|\bGPT\b|\bGemini\b|\bDeepSeek\b|\bQwen\b|\bLlama\b|\bMistral\b|\bGrok\b|\bSkills\b|\bJunie\b|\bJetBrains\b|\bAmazon Q\b|\bAntigravity\b|Pi Coding Agent|pi\.dev|\bEarendil\b|\.junie/|\.amazonq/|\.pi/|\.gemini/|\.agent/|\.agents/
@@ -215,7 +215,7 @@ See [`docs/reference/platform-bindings.md`](../../../docs/reference/platform-bin
 
 To refactor an existing governance file:
 
-1. **Scan**: prefer `rhino-cli repo-governance vendor-audit <path>` (it respects all allowlist regions). For ad-hoc grep, use `grep -n -E "Claude Code|OpenCode|Cursor|Windsurf|Codeium|Copilot|Aider|Cline|Devin|Junie|JetBrains|Amazon Q|Antigravity|Pi Coding Agent|pi\.dev|Earendil|Anthropic|OpenAI|xAI|Sonnet|Opus|Haiku|GPT|Gemini|DeepSeek|Qwen|Llama|Mistral|Grok|Skills|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/|\.junie/|\.amazonq/|\.pi/|\.gemini/|\.agent/|\.agents/" <file>` to find all matches.
+1. **Scan**: prefer `rhino-cli repo-governance validate vendor <path>` (it respects all allowlist regions). For ad-hoc grep, use `grep -n -E "Claude Code|OpenCode|Cursor|Windsurf|Codeium|Copilot|Aider|Cline|Devin|Junie|JetBrains|Amazon Q|Antigravity|Pi Coding Agent|pi\.dev|Earendil|Anthropic|OpenAI|xAI|Sonnet|Opus|Haiku|GPT|Gemini|DeepSeek|Qwen|Llama|Mistral|Grok|Skills|\.claude/|\.opencode/|\.cursor/|\.windsurf/|\.continue/|\.clinerules/|\.junie/|\.amazonq/|\.pi/|\.gemini/|\.agent/|\.agents/" <file>` to find all matches.
 2. **Classify each match**:
    - Load-bearing prose → rewrite using the Vocabulary Map above.
    - Cross-reference link → rewrite anchor text and link target to neutral equivalent.
@@ -227,16 +227,16 @@ To refactor an existing governance file:
 
 ## Enforcement
 
-Enforcement is automated via `rhino-cli repo-governance vendor-audit`.
+Enforcement is automated via `rhino-cli repo-governance validate vendor`.
 
 ### Running the audit manually
 
 ```bash
 # Audit the repo-governance/ directory (default)
-cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor-audit repo-governance/
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance validate vendor repo-governance/
 
 # Or via Nx (cached)
-npx nx run rhino-cli:validate:repo-governance-vendor-audit
+npx nx run rhino-cli:governance:vendor-audit-validation
 ```
 
 Exit code 0 means clean; exit code 1 means violations found. Each finding prints:
@@ -247,7 +247,7 @@ Exit code 0 means clean; exit code 1 means violations found. Each finding prints
 
 ### Pre-push integration
 
-The pre-push hook automatically runs `validate:repo-governance-vendor-audit` when any `repo-governance/**/*.md`
+The pre-push hook automatically runs `governance:vendor-audit-validation` when any `repo-governance/**/*.md`
 file changes. No manual invocation needed on pushes.
 
 ### Scope of the scanner

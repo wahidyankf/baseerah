@@ -106,7 +106,7 @@ context — use this when agent delegation is unavailable.
 
 ### 0.5. Deterministic Preflight (Sequential)
 
-Run the `rhino-cli` orchestrator to harvest all deterministic governance findings before invoking the AI checker. Deterministic categories (file naming, frontmatter shape, license presence, README index integrity, emoji codepoints, layer-coherence, doc heading hierarchy, agent-skill verbatim duplication, gherkin-keyword-cardinality) execute in milliseconds and cache via Nx; the AI checker then runs only the AI-only categories (paraphrased duplication, semantic contradictions, terminology alignment, principle-appropriateness judgement).
+Run the `rhino-cli` orchestrator to harvest the deterministic governance findings before invoking the AI checker. The `repo-governance audit` orchestrator runs exactly three governance categories in fixed order — `layer-coherence`, `traceability-audit`, and `vendor-audit` (the last scoped to `repo-governance/` prose plus the `AGENTS.md` and `CLAUDE.md` root instruction surfaces) — normalises their findings into one JSON envelope, and caches via Nx. The other deterministic markdown/convention/harness validators (file naming, frontmatter shape, license presence, README index integrity, emoji codepoints, heading hierarchy, agent-skill verbatim duplication, gherkin-keyword-cardinality) live under sibling `rhino-cli` subcommands (`md`, `convention`, `harness`, `workflows`, `specs`) and are enforced by the markdown and commit gates — they are not part of this preflight. The AI checker then runs only the AI-only categories (paraphrased duplication, semantic contradictions, terminology alignment, principle-appropriateness judgement).
 
 **Why Step 0.5 (and not Step 1, renumbering everything down)**: This step was inserted between the pre-existing Step 1 (Initial Validation) and the workflow start. Decimal numbering preserves the existing Step 1-6 references in the checker/fixer prompts that pre-date the preflight. The [Workflow Identifier Convention](../../../repo-governance/workflows/meta/workflow-identifier.md) explicitly allows sub-step decimals for non-disruptive insertions.
 
@@ -125,9 +125,9 @@ The binary must be built first via `nx build rhino-cli`; the prebuilt path is `a
 - **Exit handling**:
   - Exit 0 (clean): All deterministic categories pass; pass JSON path to checker.
   - Exit 1 (findings): Deterministic findings present; pass JSON path to checker (the checker incorporates the deterministic findings verbatim into the final audit's "Deterministic Findings (rhino-cli preflight)" section).
-  - Exit 2 (invocation error): Terminate workflow with `fail` status. **Debugging hint**: Re-run with `./apps/rhino-cli/dist/rhino-cli repo-governance audit -o text` for human-readable diagnostic. Common causes: missing binary (rebuild via `nx build rhino-cli`); broken category function (run individual `dist/rhino-cli repo-governance <category>` to isolate).
+  - Exit 2 (invocation error): Terminate workflow with `fail` status. **Debugging hint**: Re-run with `./apps/rhino-cli/dist/rhino-cli repo-governance audit -o text` for human-readable diagnostic. Common causes: missing binary (rebuild via `nx build rhino-cli`); broken category function (run individual `dist/rhino-cli repo-governance validate <category>` — one of `layer-coherence`, `traceability`, `vendor` — to isolate).
 
-> **Operator hatch**: If the calibrated emoji-audit (rhino-cli v0.16.1 expanded skip-dirs) still reports legacy-tree findings the operator needs to bypass, pass `--skip emoji-audit` to the orchestrator. This is a backup hatch — the primary remedy is to add the missing dir to `emojiSkipDirs` or to pass `--exclude <glob>`.
+> **Operator hatch**: The orchestrator accepts `--skip <category>` (one of `layer-coherence`, `traceability-audit`, `vendor-audit`) to bypass a whole category, and `--exclude <glob>` to drop findings whose path matches a glob. The `vendor-audit` category is already scoped to `repo-governance/` plus `AGENTS.md` / `CLAUDE.md`, so build caches, app source, generated reports, and worktrees are never scanned; if a legacy governance subtree needs bypassing, prefer `--exclude <glob>` over `--skip vendor-audit` so the rest of the category still runs.
 
 **Success criteria**: Preflight completes; JSON file exists at expected path; JSON parses as valid `AuditEnvelope` with `schema` field set to `rhino-cli/repo-governance-audit/v1`.
 
@@ -359,27 +359,27 @@ The AI will invoke agents with iteration controls:
 Typical execution flow:
 
 ```
-Step 0.5: Preflight (cold) → 934 deterministic findings emitted to generated-reports/ (visibility only)
+Step 0.5: Preflight (cold) → 3 governance categories scanned (layer-coherence, traceability-audit, vendor-audit); any deterministic findings emitted to generated-reports/ (visibility only)
 
 Iteration 1:
-  Step 0.5: Preflight (cached, RHINO_AUDIT_NOW=...) → same 934 findings (hash match, skip re-eval)
+  Step 0.5: Preflight (cached, RHINO_AUDIT_NOW=...) → same deterministic findings (SHA-256 hash match, skip re-eval)
   Step 1: AI checks → 5 AI-only findings
   Steps 2-5: Fixer addresses 3 findings
 
 Iteration 2:
-  Step 0.5: Preflight (cached) → same 934 findings
+  Step 0.5: Preflight (cached) → same deterministic findings
   Step 1: AI checks → 2 AI-only findings remaining
   Steps 2-5: Fixer addresses 2 findings
 
 Iteration 3:
-  Step 0.5: Preflight (cached) → same 934 findings
+  Step 0.5: Preflight (cached) → same deterministic findings
   Step 1: AI checks → 0 AI-only findings (consecutive_zero=1)
 
 Iteration 4:
-  Step 0.5: Preflight (cached) → same 934 findings
+  Step 0.5: Preflight (cached) → same deterministic findings
   Step 1: AI checks → 0 AI-only findings (consecutive_zero=2)
 
-Result: PASS (double-zero AI-only; deterministic findings documented in skip-list)
+Result: PASS (double-zero AI-only; any deterministic findings fixed at source or documented in skip-list)
 ```
 
 ## Safety Features
@@ -497,4 +497,6 @@ This workflow ensures repository consistency through iterative validation and fi
 
 ## What changed
 
-Step 0.5 added 2026-05-12 referencing the archived `2026-05-12__optimize-repo-rules-quality-gate-with-rhino-cli` plan. Hardening edits (broken-command fix, visibility-only codification, hash-reuse documentation, arg-name unification, exit-2 recovery, Skip-list Curation Rules section, Observability Metrics section, Step-0.5 numbering rationale, emoji-audit operator hatch) added by this plan: `plans/in-progress/complete-repo-rules-zero-findings/`.
+Step 0.5 added 2026-05-12 referencing the archived `2026-05-12__optimize-repo-rules-quality-gate-with-rhino-cli` plan. Hardening edits (broken-command fix, visibility-only codification, hash-reuse documentation, arg-name unification, exit-2 recovery, Skip-list Curation Rules section, Observability Metrics section, Step-0.5 numbering rationale, operator hatch) added by `plans/done/2026-05-12__complete-repo-rules-zero-findings/`.
+
+Resynced 2026-06-22 after the `rhino-cli` command-surface refactor (`refactor(rhino-cli)!: regroup by scope + uniform verb-first subcommand surface`): Step 0.5 now documents the real three-category `repo-governance audit` orchestrator (`layer-coherence`, `traceability-audit`, `vendor-audit`) instead of a stale nine-category list, and the `vendor-audit` category was fixed to scan only `repo-governance/` + `AGENTS.md` + `CLAUDE.md` (it previously walked the whole repo — build caches, worktrees, app content, generated reports — emitting ~20k noise findings). The operator hatch, exit-2 debug hint, and Iteration Example were corrected to match.
