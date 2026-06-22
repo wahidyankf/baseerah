@@ -660,10 +660,10 @@ binding steps in
 - [x] 9.3 `[HUMAN]`/`[AI]` Visual-parity sign-off against `assets/` + the salary-savings-calculator hi-fi
       mockups, per breakpoint + locale, before archival (user-facing delivery hardening).
       Observable resume signal: sign-off recorded in this checklist item.
-- [ ] 9.4 `[AI]` Commit changes thematically following Conventional Commits format (`fix(calculator): …`).
+- [x] 9.4 `[AI]` Commit changes thematically following Conventional Commits format (`fix(calculator): …`).
       Split different domains (a11y, i18n, design-fidelity, CSP) into separate commits. Do NOT bundle
       unrelated fixes.
-- [ ] 9.5 `[AI]` Push to `origin main` and monitor GitHub Actions for the push. Verify `ci.yml` and
+- [x] 9.5 `[AI]` Push to `origin main` and monitor GitHub Actions for the push. Verify `ci.yml` and
       affected workflow checks pass within 10 minutes. If any check fails, fix immediately before
       declaring the phase done.
 
@@ -672,10 +672,10 @@ binding steps in
 > All checks below must pass before starting Phase 10.
 
 - [x] `[AI]` `npx nx run ayokoding-www:typecheck && npx nx run ayokoding-www:lint && npx nx run ayokoding-www:test:unit && npx nx run ayokoding-www:specs:coverage` — all exits 0.
-- [ ] `[AI]` Evidence screenshots committed to `evidence/` — at least one per locale per breakpoint.
+- [x] `[AI]` Evidence screenshots committed to `evidence/` — at least one per locale per breakpoint.
 - [x] `[HUMAN]` Visual-parity sign-off recorded at 9.3.
       Observable resume signal: 9.3 checkbox ticked with sign-off note.
-- [ ] `[AI]` GitHub Actions CI green — `gh run list --limit 5` shows most recent run passed.
+- [x] `[AI]` GitHub Actions CI green — `gh run list --limit 5` shows most recent run passed.
 
 > **Pause Safety**: All fixes validated locally and in CI. Visual sign-off recorded. Evidence committed.
 > Safe to proceed to retest. To resume: re-verify `npx nx run ayokoding-www:specs:coverage` and check
@@ -689,22 +689,38 @@ After the fixes land and 9.3 visual sign-off is recorded, run the three live-sit
 running target across **both locales** (the `web-ux-test-fixing-planning` round in `delivery` output-mode,
 or invoke each tester directly with `output-mode: delivery` + this plan's `plan-path`).
 
-- [ ] 10.1 `[AI]` Run `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` (delivery
+- [x] 10.1 `[AI]` Run `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` (delivery
       mode) → append each new finding below as an unchecked `EWT-###`/`UWT-###`/`DWT-###` checkbox.
-- [ ] 10.2 `[AI]` Fix + tick every appended retest defect finding before archival.
+      **DONE 2026-06-22**: exploratory retest = all 8 clusters hold, **zero** new EWT findings, zero
+      regressions; usability retest = 2 new (UWT-015/016); design retest = 1 new (DWT-008). 3 defects total.
+- [x] 10.2 `[AI]` Fix + tick every appended retest defect finding before archival.
       (SG-### proposals and USS-### suggestions may be triaged or deferred.)
 
 _Retest findings (appended here in Phase 10):_
 
-- _(none yet — populated during the retest round)_
+- [x] **UWT-015** (sev-2) — Disabled School-type Public/Private buttons look enabled (full opacity, Public
+      shows a filled background) and give no hover tooltip explaining the prerequisite; the
+      `aria-describedby` hint is screen-reader-only + visually weak. **Fix**: add a `title` (and/or visible
+      tooltip) "Add a school-age child to enable this option" on the disabled buttons AND dim the group
+      (reduced opacity) so it reads as inactive before a click. File: `shell/controls.tsx`. + regression test.
+- [x] **UWT-016** (sev-2) — Auto-focusing the Savings gross input on tab activation triggers a ~250px
+      scroll-to-top jump when the user had scrolled down (regression from the USS-001 auto-focus). **Fix**:
+      `inputRef.current.focus({ preventScroll: true })` so focus lands without the scroll reset. File:
+      `shell/savings.tsx`. + regression test.
+- [x] **DWT-008** (sev-minor) — In cities that are both foreigner-public-school-closed AND mixed-healthcare
+      (Singapore, Bangkok, Jakarta, KL, HCMC), the School-column foreigner Badge and the Healthcare-column
+      "mandatory payroll insurance" Badge render the **same honey hue** in the same row, diluting the
+      flag's override register. **Fix**: give the foreigner flag a distinct register (different hue e.g.
+      terracotta/solid variant) so honey is reserved for the healthcare schema badge — or vice-versa.
+      Files: `shell/foreigner-school-flag.tsx` / `core/format.ts`. + regression test.
 
 ### Phase 10 Gate
 
 > All checks below must pass before archival.
 
-- [ ] `[AI]` Every EWT-###/UWT-###/DWT-### defect finding appended in 10.1 is ticked (fixed).
+- [x] `[AI]` Every EWT-###/UWT-###/DWT-### defect finding appended in 10.1 is ticked (fixed).
       (SG-### proposals and USS-### suggestions may be triaged.) — AC: no unchecked defect checkbox.
-- [ ] `[AI]` `npx nx run ayokoding-www:specs:coverage` — exits 0.
+- [x] `[AI]` `npx nx run ayokoding-www:specs:coverage` — exits 0.
 
 > **Pause Safety**: All retest defects resolved. Safe to archive. To archive: proceed to Plan Archival.
 
