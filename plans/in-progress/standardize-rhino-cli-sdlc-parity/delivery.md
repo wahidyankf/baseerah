@@ -68,7 +68,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Encode the [§1.2 testing-architecture standard](./tech-docs.md#12-testing-architecture--target-contents-standard) into `repo-governance/development/infra/nx-targets.md`: the mandatory-seven targets + `echo`-placeholder rule, the `test:quick` = typecheck→lint→test:unit (`parallel: false`) composition, BE service-level / FE-DB-only `test:integration`, `*-e2e`-only `test:e2e`, and the pre-push ≡ PR-gate rule (only `test:quick`; never integration/e2e) — acceptance: all rules present and self-consistent with existing sections (resolve the "expose only needed targets" / no-op-anti-pattern tension explicitly); `npm run lint:md` passes.
   - _Suggested executor: `repo-rules-maker`_
 - [ ] [AI] **RED**: add a feature file under `specs/apps/rhino/behavior/rhino-cli/gherkin/` for the orphan-feature check, and a unit test asserting `specs validate coverage --require-consumption` fails on an unconsumed feature — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails (flag/behaviour not yet implemented).
+  - **Gherkin (binds) →** "An orphan feature file fails the gate"
+
+    ```gherkin
+    Scenario: An orphan feature file fails the gate
+      Given a feature file under specs that no test references
+      When rhino-cli specs:coverage runs with --require-consumption
+      Then it fails and names the orphan feature file
+    ```
+
   - _Suggested executor: `swe-rust-dev`_
+
 - [ ] [AI] **GREEN**: implement the `--require-consumption` behaviour in `specs validate coverage` (rhino-cli `src/`) — every `.feature` under the scanned spec dir must be referenced by ≥1 test; emit `orphan feature: <path> not consumed by any test` and exit non-zero otherwise — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes; `npx nx run rhino-cli:specs:coverage` still exits 0 on the current tree.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **REFACTOR**: default `--require-consumption` on for the `specs:coverage` Nx target across projects; update `specs/apps/rhino/` Gherkin + `docs/reference/sdlc-gate-standard.md` to document the new check — command: `npx nx run rhino-cli:test:quick` — acceptance: all rhino-cli tests pass; `specs:coverage` documents both step-def and consumption checks.
@@ -201,9 +211,10 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 > All checks below must pass before starting Phase 4.
 
 - [ ] [AI] In ose-primer: `npx nx run-many -t typecheck lint test:quick specs:coverage` — exits 0.
-- [ ] [AI] In ose-primer: mandatory-seven present on every project (Phase 2 gate `jq` loop prints no `MISSING`).
+- [ ] [AI] In ose-primer, every project exposes the mandatory-seven: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("format") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
 - [ ] [AI] In ose-primer: `npm run lint:md` and `actionlint` on changed workflows — exit 0.
-- [ ] [AI] Commit thematically in ose-primer; push to `origin main`; verify CI green (incl. new `validate-env.yml`, promoted specs-gate, `main-ci.yml`).
+- [ ] [AI] Commit thematically in ose-primer — acceptance: `git log -1 --oneline` shows a Conventional Commits message; working tree clean.
+- [ ] [AI] Push ose-primer to `origin main` and poll CI: `gh run view --json status,conclusion` every 2 min until complete — acceptance: all checks green (incl. new `validate-env.yml`, promoted specs-gate, `main-ci.yml`).
 
 > **Pause Safety**: ose-public + ose-primer converged and green. Safe to stop. To resume (primer): `npx nx affected -t lint`.
 
@@ -250,9 +261,10 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 > All checks below must pass before starting Phase 5.
 
 - [ ] [AI] In ose-infra: `npx nx run-many -t typecheck lint test:quick specs:coverage` — exits 0.
-- [ ] [AI] In ose-infra: mandatory-seven present on every project (`jq` loop prints no `MISSING`).
+- [ ] [AI] In ose-infra, every project exposes the mandatory-seven: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("format") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
 - [ ] [AI] In ose-infra: `npm run lint:md` and `actionlint` on changed workflows — exit 0.
-- [ ] [AI] Commit thematically in ose-infra (via worktree); push to `origin main`; verify CI green on the self-hosted runner (incl. `main-ci.yml`).
+- [ ] [AI] Commit thematically in ose-infra (via its worktree) — acceptance: `git log -1 --oneline` shows a Conventional Commits message; working tree clean.
+- [ ] [AI] Push ose-infra to `origin main` and poll CI: `gh run view --json status,conclusion` every 2 min until complete — acceptance: all checks green on the self-hosted runner (incl. `main-ci.yml`).
 
 > **Pause Safety**: all three repos converged and green. Safe to stop. To resume (infra): `npx nx affected -t lint`.
 
@@ -283,6 +295,16 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 - [ ] [AI] Commit changes thematically — group by surface (docs / hooks / workflows / Nx targets).
 - [ ] [AI] Follow Conventional Commits: `<type>(<scope>): <description>`.
 - [ ] [AI] Split per repo and per concern; do NOT bundle unrelated fixes.
+
+### Phase 5 Gate
+
+> All checks below must pass before archival.
+
+- [ ] [AI] The parity table shows ✅ on every mechanics row across all three repos (allowed-divergence rows excluded) — acceptance: no ❌ in any mechanics row.
+- [ ] [AI] `docs/reference/sdlc-gate-standard.md` (with the Parity Status table) and `rhino-cli-command-triage.md` exist in all three repos — acceptance: `npm run lint:md` passes in each.
+- [ ] [AI] All three repos green on local gates (`npx nx affected -t typecheck lint test:quick specs:coverage`) and on CI for the latest `main` push — acceptance: each repo's latest `gh run view --json conclusion` reports `success`.
+
+> **Pause Safety**: all three repos converged, parity-verified, and green; nothing half-applied. Safe to stop. To resume: re-run the cross-repo parity verification table (Phase 5 step 1) and confirm all-green.
 
 ### Plan Archival
 
