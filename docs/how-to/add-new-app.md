@@ -287,7 +287,7 @@ TypeScript path mappings are configured in `tsconfig.base.json`.
 
 ### Additional Checklist for Apps with OpenAPI Contracts
 
-Apps that use a shared OpenAPI contract (e.g., `organiclever-be`, `organiclever-web`) must
+Apps that use a shared OpenAPI contract (e.g., `organiclever-be`, `organiclever-app-web`) must
 satisfy these additional requirements:
 
 **Mandatory Nx targets** (all 7 required):

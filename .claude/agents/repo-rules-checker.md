@@ -93,7 +93,7 @@ Outline` `Examples` tables are exempt. `plans/done/` is exempt (immutable archiv
 - Verify agent names match actual agent files
 - Validate skill names match actual skill files
 - Check frontmatter field requirements match actual agent frontmatter
-- **No-Date-Metadata violation**: Flag any of the following in non-website files (per [No Manual Date Metadata Convention](../../repo-governance/conventions/structure/no-date-metadata.md)): (a) `updated:` frontmatter field, (b) `**Last Updated**` footer block, (c) standalone inline body date annotation lines such as `- **Created**: YYYY-MM-DD` or `- **Last Updated**: YYYY-MM-DD` in document body sections (not frontmatter). Website content under `apps/ayokoding-www/`, `apps/ose-www/`, `apps/organiclever-web/`, `apps/wahidyankf-www/` is exempt. Dates inside actual document content (changelog entries, examples, plan steps, commit references) are also exempt. Criticality: HIGH
+- **No-Date-Metadata violation**: Flag any of the following in non-website files (per [No Manual Date Metadata Convention](../../repo-governance/conventions/structure/no-date-metadata.md)): (a) `updated:` frontmatter field, (b) `**Last Updated**` footer block, (c) standalone inline body date annotation lines such as `- **Created**: YYYY-MM-DD` or `- **Last Updated**: YYYY-MM-DD` in document body sections (not frontmatter). Website content under `apps/ayokoding-www/`, `apps/ose-www/`, `apps/organiclever-www/`, `apps/wahidyankf-www/` is exempt. Dates inside actual document content (changelog entries, examples, plan steps, commit references) are also exempt. Criticality: HIGH
 
 **Inconsistencies**:
 

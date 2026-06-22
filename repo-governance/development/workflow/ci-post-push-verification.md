@@ -150,9 +150,9 @@ The following actions are explicitly forbidden under this convention:
 ### PASS: Correct post-push verification
 
 ```
-Agent: Pushed feat(organiclever-web): update hero section to origin main.
+Agent: Pushed feat(organiclever-app-web): update hero section to origin main.
 
-Identifying blast radius: apps/organiclever-web/ changed.
+Identifying blast radius: apps/organiclever-app-web/ changed.
 
 Triggering CI:
   gh workflow run organiclever-app-test-local-deploy-stag.yml
@@ -167,7 +167,7 @@ Result: All steps passed. Work is complete.
 ### FAIL: Declaring done before CI verification
 
 ```
-Agent: Pushed feat(organiclever-web): update hero section to origin main.
+Agent: Pushed feat(organiclever-app-web): update hero section to origin main.
 
 Work is complete.
 ```

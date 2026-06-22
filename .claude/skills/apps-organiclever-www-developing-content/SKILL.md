@@ -1,27 +1,27 @@
 ---
 name: apps-organiclever-www-developing-content
-description: Comprehensive guide for developing organiclever-web, the OrganicLever life journal at www.organiclever.com. Covers DDD bounded-context architecture, PGlite local-first storage, Effect TS, XState, Next.js 16 App Router, and Vercel deployment. Essential for development tasks on organiclever-web.
+description: Comprehensive guide for developing organiclever-www, the OrganicLever life journal at www.organiclever.com. Covers DDD bounded-context architecture, PGlite local-first storage, Effect TS, XState, Next.js 16 App Router, and Vercel deployment. Essential for development tasks on organiclever-www.
 ---
 
-# organiclever-web Development Skill
+# organiclever-www Development Skill
 
 ## Purpose
 
-This Skill provides guidance for developing and managing the **organiclever-web** Next.js 16 application — the OrganicLever life journal at www.organiclever.com. The app is a local-first productivity tracker with PGlite (Postgres-WASM) for in-browser data storage, structured around DDD bounded contexts.
+This Skill provides guidance for developing and managing the **organiclever-www** Next.js 16 application — the OrganicLever life journal at www.organiclever.com. The app is a local-first productivity tracker with PGlite (Postgres-WASM) for in-browser data storage, structured around DDD bounded contexts.
 
 **When to use this Skill:**
 
-- Developing features for organiclever-web
+- Developing features for organiclever-www
 - Understanding the bounded-context DDD architecture
 - Working with PGlite storage or Effect TS service layer
 - Configuring Vercel deployment
-- Understanding organiclever-web specific conventions
+- Understanding organiclever-www specific conventions
 
 ## Core Concepts
 
 ### App Overview
 
-**organiclever-web** (`apps/organiclever-web/`):
+**organiclever-www** (`apps/organiclever-www/`):
 
 - **Framework**: Next.js 16 with App Router
 - **Architecture**: DDD bounded contexts (`domain` / `application` / `infrastructure` / `presentation`)
@@ -49,7 +49,7 @@ This Skill provides guidance for developing and managing the **organiclever-web*
 ## Directory Structure
 
 ```
-apps/organiclever-web/
+apps/organiclever-www/
 ├── src/
 │   ├── app/                        # Next.js App Router (thin wrappers only)
 │   │   ├── app/                    # /app/* routes (home, history, progress, settings, workout…)
@@ -100,10 +100,10 @@ src/contexts/<bc>/
 
 1. Identify which bounded context owns the feature. Consult [`docs/explanation/bounded-context-map.md`](./docs/explanation/bounded-context-map.md).
 2. Ensure the domain term appears in [`specs/apps/organiclever/ddd/ubiquitous-language/<bc>.md`](../../../specs/apps/organiclever/ddd/ubiquitous-language/README.md). Add it if missing — same commit as the code change.
-3. Write or update the Gherkin spec in `specs/apps/organiclever/behavior/organiclever-web/gherkin/<bc>/`.
+3. Write or update the Gherkin spec in `specs/apps/organiclever/behavior/organiclever-www/gherkin/<bc>/`.
 4. Implement: Red (failing step) → Green (minimal code) → Refactor.
 5. Keep all new code inside the correct context layer. If it touches IO, it goes in `infrastructure/`. If it is a use-case, it goes in `application/`. Never break the layer rules.
-6. Run `nx run organiclever-web:lint` to confirm 0 boundary errors before committing.
+6. Run `nx run organiclever-www:lint` to confirm 0 boundary errors before committing.
 
 ### XState machine placement rule
 
@@ -112,14 +112,14 @@ src/contexts/<bc>/
 
 ## Design System
 
-`organiclever-web` uses the OrganicLever warm OKLCH design system. All visual tokens come
+`organiclever-www` uses the OrganicLever warm OKLCH design system. All visual tokens come
 from `@open-sharia-enterprise/web-ui-token`, and all UI components from
 `@open-sharia-enterprise/web-ui`.
 
 ### Token import chain
 
 ```css
-/* apps/organiclever-web/src/app/globals.css */
+/* apps/organiclever-www/src/app/globals.css */
 @import "tailwindcss";
 @source "../../../../libs/web-ui/src/**/*.{ts,tsx}";
 @import "@open-sharia-enterprise/web-ui-token/src/tokens.css"; /* shared neutral baseline */
@@ -341,7 +341,7 @@ Vercel automatically:
 
 ## Comparison with Other Apps
 
-| Aspect              | organiclever-web                      | ayokoding-web                  | ose-web                 |
+| Aspect              | organiclever-www                      | ayokoding-web                  | ose-web                 |
 | ------------------- | ------------------------------------- | ------------------------------ | ----------------------- |
 | **Framework**       | Next.js 16 (App Router)               | Next.js 16 (App Router)        | Next.js 16 (App Router) |
 | **Architecture**    | DDD bounded contexts                  | Feature folders                | Feature folders         |
@@ -361,13 +361,13 @@ Vercel automatically:
 
 ```bash
 # Start development server (http://localhost:3200)
-nx dev organiclever-web
+nx dev organiclever-www
 
 # Build for production (local verification)
-nx build organiclever-web
+nx build organiclever-www
 
 # Type checking
-npx tsc --noEmit --project apps/organiclever-web/tsconfig.json
+npx tsc --noEmit --project apps/organiclever-www/tsconfig.json
 ```
 
 ### Option 2: Docker Compose (containerized, or running alongside the backend)
@@ -376,11 +376,11 @@ Runs the app inside a Node.js 24 Alpine container. Useful when you need the back
 frontend, or want an environment closer to CI.
 
 ```bash
-# From repository root — starts organiclever-web in Docker
-npm run organiclever-web:dev
+# From repository root — starts organiclever-www in Docker
+npm run organiclever-www:dev
 
 # Or start the frontend container only
-docker compose -f infra/dev/organiclever-web/docker-compose.yml up organiclever-web
+docker compose -f infra/dev/organiclever-www/docker-compose.yml up organiclever-www
 ```
 
 **First startup** (~2-4 min): installs npm dependencies inside the container.
@@ -396,7 +396,7 @@ docker compose -f infra/dev/organiclever-web/docker-compose.yml up organiclever-
 ```typescript
 // 1. Add term to specs/apps/organiclever/ddd/ubiquitous-language/<bc>.md (same commit as code)
 
-// 2. Add Gherkin scenario in specs/apps/organiclever/behavior/organiclever-web/gherkin/<bc>/<file>.feature
+// 2. Add Gherkin scenario in specs/apps/organiclever/behavior/organiclever-www/gherkin/<bc>/<file>.feature
 
 // 3. Add step implementation in test/unit/steps/<bc>/<file>.steps.tsx
 
@@ -453,7 +453,7 @@ Before committing changes:
 - [ ] Links use Next.js `<Link>` component (not `<a>` for internal links)
 - [ ] All interactive elements are keyboard accessible
 - [ ] New domain terms added to the relevant ubiquitous-language glossary
-- [ ] `nx run organiclever-web:lint` exits 0 (0 boundary errors)
+- [ ] `nx run organiclever-www:lint` exits 0 (0 boundary errors)
 
 ## Common Mistakes
 
@@ -492,12 +492,12 @@ export default function Counter() {
 
 ## Domain-Driven Design
 
-`apps/organiclever-web` follows Domain-Driven Design. The bounded-context map is canonical at:
+`apps/organiclever-www` follows Domain-Driven Design. The bounded-context map is canonical at:
 
 - **Registry**: [`specs/apps/organiclever/ddd/bounded-contexts.yaml`](../../../specs/apps/organiclever/ddd/bounded-contexts.yaml)
 - **Glossaries**: `specs/apps/organiclever/ddd/ubiquitous-language/<bc>.md`
 - **Design intent (full prose)**: [`plans/done/2026-05-03__organiclever-adopt-ddd/tech-docs.md`](../../../plans/done/2026-05-03__organiclever-adopt-ddd/tech-docs.md)
-- **ADR**: [`apps/organiclever-web/docs/explanation/bounded-context-map.md`](../../../apps/organiclever-web/docs/explanation/bounded-context-map.md)
+- **ADR**: [`apps/organiclever-www/docs/explanation/bounded-context-map.md`](../../../apps/organiclever-www/docs/explanation/bounded-context-map.md)
 - **Enforcement**: [`apps/rhino-cli/README.md`](../../../apps/rhino-cli/README.md) — `rhino-cli ddd bc` and `rhino-cli ddd ul`
 
 ### Bounded contexts
@@ -542,7 +542,7 @@ When you add a new domain term to code OR a Gherkin feature:
 ### Pre-commit checklist
 
 ```bash
-nx run organiclever-web:test:quick
+nx run organiclever-www:test:quick
 # This runs (among other things):
 #   rhino-cli ddd bc organiclever
 #   rhino-cli ddd ul organiclever
@@ -562,15 +562,15 @@ NEVER silence a finding by lowering severity in production. Use `OSE_RHINO_DDD_S
 
 **Project Configuration**:
 
-- [apps/organiclever-web/project.json](../../../apps/organiclever-web/project.json) - Nx project config
-- [apps/organiclever-web/next.config.mjs](../../../apps/organiclever-web/next.config.mjs) - Next.js config
-- [apps/organiclever-web/vercel.json](../../../apps/organiclever-web/vercel.json) - Vercel deployment config
+- [apps/organiclever-www/project.json](../../../apps/organiclever-www/project.json) - Nx project config
+- [apps/organiclever-www/next.config.mjs](../../../apps/organiclever-www/next.config.mjs) - Next.js config
+- [apps/organiclever-www/vercel.json](../../../apps/organiclever-www/vercel.json) - Vercel deployment config
 
 **Infrastructure**:
 
-- [infra/dev/organiclever-web/README.md](../../../infra/dev/organiclever-web/README.md) - Docker Compose setup for frontend
-- [infra/dev/organiclever-web/docker-compose.yml](../../../infra/dev/organiclever-web/docker-compose.yml) - Service definition
-- [infra/dev/organiclever-web/Dockerfile.web.dev](../../../infra/dev/organiclever-web/Dockerfile.web.dev) - Frontend container image
+- [infra/dev/organiclever-www/README.md](../../../infra/dev/organiclever-www/README.md) - Docker Compose setup for frontend
+- [infra/dev/organiclever-www/docker-compose.yml](../../../infra/dev/organiclever-www/docker-compose.yml) - Service definition
+- [infra/dev/organiclever-www/Dockerfile.web.dev](../../../infra/dev/organiclever-www/Dockerfile.web.dev) - Frontend container image
 
 **Related Skills**:
 
@@ -579,10 +579,10 @@ NEVER silence a finding by lowering severity in production. Use `OSE_RHINO_DDD_S
 
 **Related Agents**:
 
-- `apps-organiclever-app-web-deployer` - Deploys organiclever-web to production
+- `apps-organiclever-app-web-deployer` - Deploys organiclever-www to production
 - `swe-typescript-dev` - TypeScript/Next.js development
 - `swe-e2e-dev` - E2E testing with Playwright
 
 ---
 
-This Skill packages essential organiclever-web development knowledge for building and deploying the OrganicLever landing and promotional website at www.organiclever.com.
+This Skill packages essential organiclever-www development knowledge for building and deploying the OrganicLever landing and promotional website at www.organiclever.com.

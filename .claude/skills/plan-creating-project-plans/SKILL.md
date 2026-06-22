@@ -271,7 +271,7 @@ Plans are executed by **execution-grade (sonnet-tier)** agents, not planning-gra
 
 **Every checkbox MUST contain all of the following that apply**:
 
-- **Explicit file path(s)** when the action touches a known file. When the path cannot be determined at authoring time, give the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
+- **Explicit file path(s)** when the action touches a known file. When the path cannot be determined at authoring time, give the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-www/src/lib/` following the pattern of sibling `auth.ts`").
 - **Explicit shell command(s)** verbatim when applicable (e.g., `npx nx run ose-web:test:quick`), not "run the lint".
 - **Concrete acceptance criterion** stating the observable change that proves done (e.g., "all assertions in `trpc.test.ts` pass", "`nx run ose-web:typecheck` exits 0"). No bare "implement X", "set up Y", "configure Z".
 

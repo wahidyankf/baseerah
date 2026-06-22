@@ -73,7 +73,7 @@ The end state is identical on both paths: code under `apps/`/`libs/` never lands
 
 ### 1. Specs (Gherkin Feature Files)
 
-**Location**: `specs/apps/*/behavior/organiclever-be/gherkin/`, `specs/apps/*/behavior/organiclever-web/gherkin/`, `specs/apps/*/behavior/<product>-cli/gherkin/`, `specs/libs/*/`
+**Location**: `specs/apps/*/behavior/organiclever-be/gherkin/`, `specs/apps/*/behavior/organiclever-app-web/gherkin/`, `specs/apps/*/behavior/<product>-cli/gherkin/`, `specs/libs/*/`
 
 **Update when:**
 

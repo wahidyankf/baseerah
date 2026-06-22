@@ -42,7 +42,7 @@ identifier (e.g. `organiclever`, `ayokoding`, `ose`).
   `<product>-<surface>` pattern regardless of whether it is a backend, frontend, CLI,
   or build-time surface. No special cases for single-surface apps.
 - **Consistent with existing compound naming**: The Nx project convention already uses
-  compound names (`organiclever-be`, `organiclever-web`). Spec tree paths that mirror
+  compound names (`organiclever-be`, `organiclever-app-web`). Spec tree paths that mirror
   those names are easier to cross-reference from project README files and step files.
 - **grep locality**: Searching for `organiclever-be` uniquely identifies both the Nx
   project and its spec path. Searching for `be/` matched dozens of unrelated paths.

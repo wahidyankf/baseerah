@@ -52,9 +52,9 @@ Repo maintains **multi-harness compatibility** with Claude Code, OpenCode, and A
 
 **See**: [primary binding agent catalog](./.claude/agents/README.md)
 
-### organiclever-web skill
+### organiclever-www skill
 
-The organiclever-web content development skill is at [.claude/skills/apps-organiclever-www-developing-content/SKILL.md](./.claude/skills/apps-organiclever-www-developing-content/SKILL.md).
+The organiclever-www content development skill is at [.claude/skills/apps-organiclever-www-developing-content/SKILL.md](./.claude/skills/apps-organiclever-www-developing-content/SKILL.md).
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->

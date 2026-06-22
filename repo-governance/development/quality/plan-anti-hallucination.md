@@ -286,7 +286,7 @@ Problems: file path was not verified (probably does not exist); `enableEdgeCache
 ### Good — refuse-on-uncertainty
 
 ```markdown
-- [ ] Add Sharia-compliant interest-free billing model to `apps/organiclever-web/src/components/Pricing.tsx`.
+- [ ] Add Sharia-compliant interest-free billing model to `apps/organiclever-www/src/components/Pricing.tsx`.
       _Unknown — verify Vercel + Stripe Sharia-compliance posture before authoring_ — see follow-up
       research item under Open Questions.
 ```

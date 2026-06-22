@@ -70,11 +70,11 @@ The spec file is the only artefact that humans edit. Generated files are never e
 
 ## Codegen Tooling
 
-| Target                                            | Tool                  | Output Path                | Notes                                     |
-| ------------------------------------------------- | --------------------- | -------------------------- | ----------------------------------------- |
-| TypeScript client (`organiclever-web`, `ose-www`) | `@hey-api/openapi-ts` | `src/generated-contracts/` | Emits typed fetch client + schema types   |
-| F# server (`organiclever-be`)                     | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
-| F# server (`ose-be`)                              | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
+| Target                                                | Tool                  | Output Path                | Notes                                     |
+| ----------------------------------------------------- | --------------------- | -------------------------- | ----------------------------------------- |
+| TypeScript client (`organiclever-app-web`, `ose-www`) | `@hey-api/openapi-ts` | `src/generated-contracts/` | Emits typed fetch client + schema types   |
+| F# server (`organiclever-be`)                         | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
+| F# server (`ose-be`)                                  | `nswag` (F# target)   | `generated-contracts/`     | Emits Giraffe handler types + model types |
 
 Generated directories are committed to the repository. The CI drift check (see below) compares the freshly generated
 output against the committed files and fails if they differ.
@@ -85,7 +85,7 @@ Each app that participates in contract-first development exposes these Nx target
 
 | Target    | App                      | Command                                                      |
 | --------- | ------------------------ | ------------------------------------------------------------ |
-| `codegen` | `organiclever-web`       | Runs `@hey-api/openapi-ts` against the contracts spec        |
+| `codegen` | `organiclever-app-web`   | Runs `@hey-api/openapi-ts` against the contracts spec        |
 | `codegen` | `organiclever-be`        | Runs `nswag` F# target                                       |
 | `codegen` | `ose-www`                | Runs `@hey-api/openapi-ts` against the contracts spec        |
 | `codegen` | `ose-be`                 | Runs `nswag` F# target                                       |
@@ -95,7 +95,7 @@ Each app that participates in contract-first development exposes these Nx target
 Run codegen for a specific app:
 
 ```bash
-nx run organiclever-web:codegen
+nx run organiclever-app-web:codegen
 nx run organiclever-be:codegen
 nx run ose-www:codegen
 nx run ose-be:codegen
@@ -131,10 +131,10 @@ the spec change.
 
 Contract-first development covers these BE↔client pairs:
 
-| Backend           | Client             | Spec                                                        |
-| ----------------- | ------------------ | ----------------------------------------------------------- |
-| `organiclever-be` | `organiclever-web` | `specs/apps/organiclever/containers/contracts/openapi.yaml` |
-| `ose-be`          | `ose-www`          | `specs/apps/ose/containers/contracts/openapi.yaml`          |
+| Backend           | Client                 | Spec                                                        |
+| ----------------- | ---------------------- | ----------------------------------------------------------- |
+| `organiclever-be` | `organiclever-app-web` | `specs/apps/organiclever/containers/contracts/openapi.yaml` |
+| `ose-be`          | `ose-www`              | `specs/apps/ose/containers/contracts/openapi.yaml`          |
 
 Apps outside this table (CLI tools, content-only web apps such as `ayokoding-www` and `ose-www`) do not participate
 in contract-first codegen.

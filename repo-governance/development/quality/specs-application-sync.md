@@ -151,13 +151,13 @@ Use this table when uncertain whether a change requires a spec update:
 
 ### organiclever specs
 
-`specs/apps/organiclever/` serves both the backend (`organiclever-be`) and frontend (`organiclever-web`) from a shared set of specs:
+`specs/apps/organiclever/` serves both the backend (`organiclever-be`) and frontend (`organiclever-app-web`) from a shared set of specs:
 
 - `specs/apps/organiclever/system-context/` — C4 L1 context diagram for OrganicLever
 - `specs/apps/organiclever/containers/` — C4 L2 container diagram and deployment topology
 - `specs/apps/organiclever/components/` — C4 L3 component diagrams (be/, web/)
 - `specs/apps/organiclever/behavior/organiclever-be/gherkin/` — Shared Gherkin scenarios consumed by the backend at unit, integration, and E2E levels
-- `specs/apps/organiclever/behavior/organiclever-web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
+- `specs/apps/organiclever/behavior/organiclever-app-web/gherkin/` — Shared Gherkin scenarios consumed by the frontend
 - `specs/apps/organiclever/containers/contracts/` — OpenAPI 3.1 contract spec that both backend and frontend implement
 
 When a new endpoint is added to the OpenAPI spec in `organiclever-contracts`, both the corresponding Gherkin scenarios and the C4 component diagram must be updated to reflect the new behavior and component.
@@ -219,9 +219,9 @@ The C4 diagram is updated to remove the container if it was represented separate
 
 ### FAIL: Renaming an app without updating specs
 
-The team renames `apps/organiclever-web` to `apps/organiclever-landing`. The `specs/apps/organiclever-web/` folder is not renamed.
+The team renames `apps/organiclever-app-web` to `apps/organiclever-landing`. The `specs/apps/organiclever-app-web/` folder is not renamed.
 
-CI now has a mismatch: the app path and the spec path use different names. Reviewers and new contributors cannot determine whether `specs/apps/organiclever-web/` refers to the current `organiclever-landing` app or a removed app. This is a violation.
+CI now has a mismatch: the app path and the spec path use different names. Reviewers and new contributors cannot determine whether `specs/apps/organiclever-app-web/` refers to the current `organiclever-landing` app or a removed app. This is a violation.
 
 ### PASS: Bug fix with no spec change
 

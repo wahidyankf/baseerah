@@ -339,7 +339,7 @@ Plans are executed by execution-grade (sonnet-tier) agents, not planning-grade a
 
 **Each checkbox MUST contain all of the following that apply:**
 
-- **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/ose-www/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
+- **Explicit file path(s)**: Name the exact file path(s) when known (e.g., `apps/ose-www/src/server/trpc.ts`). When the path cannot be determined at authoring time (e.g., a new file whose location is implementation-dependent), provide the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-www/src/lib/` following the pattern of sibling `auth.ts`").
 - **Explicit shell command(s)**: State the verbatim invocation when a command is involved (e.g., `npx nx run ose-www:test:quick`), not a vague instruction like "run the lint".
 - **Concrete acceptance criterion**: State the observable change that proves done (e.g., "all assertions in `trpc.test.ts` pass" or "`nx run ose-www:typecheck` exits 0"). No bare "implement X", "set up Y", or "configure Z" without a concrete verifiable outcome.
 - **One scenario per behavior cycle + inline Gherkin**: Every behavior-implementing

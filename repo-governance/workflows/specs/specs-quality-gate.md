@@ -6,7 +6,7 @@ termination: "Zero findings at the configured mode threshold on two consecutive 
 inputs:
   - name: folders
     type: file-list
-    description: "Explicit list of spec folders to validate (e.g., [specs/apps/organiclever-be, specs/apps/organiclever-web]). Each folder and its subfolders are validated. Cross-folder consistency is checked between listed folders."
+    description: "Explicit list of spec folders to validate (e.g., [specs/apps/organiclever-be, specs/apps/organiclever]). Each folder and its subfolders are validated. Cross-folder consistency is checked between listed folders."
     required: true
   - name: mode
     type: enum
@@ -91,8 +91,8 @@ the preferred approach when these agents exist as defined delegated agent types.
 
 ```
 User: "Run specs validation for specs/apps/organiclever-be"
-User: "Run specs validation for specs/apps/organiclever-be and specs/apps/organiclever-web in strict mode"
-User: "Run specs validation for specs/apps/organiclever-be, specs/apps/organiclever-web, specs/apps/ayokoding with max-iterations=5"
+User: "Run specs validation for specs/apps/organiclever-be and specs/apps/organiclever in strict mode"
+User: "Run specs validation for specs/apps/organiclever-be, specs/apps/organiclever, specs/apps/ayokoding with max-iterations=5"
 ```
 
 The AI will:
@@ -316,7 +316,7 @@ The AI will:
 ### Multiple Folders — Cross-Folder Consistency
 
 ```
-User: "Run specs validation for specs/apps/organiclever-be and specs/apps/organiclever-web"
+User: "Run specs validation for specs/apps/organiclever-be and specs/apps/organiclever"
 ```
 
 The AI will:
@@ -330,7 +330,7 @@ The AI will:
 ### Strict Mode After Refactor
 
 ```
-User: "Run specs validation for specs/apps/organiclever-be, specs/apps/organiclever-web in strict mode"
+User: "Run specs validation for specs/apps/organiclever-be, specs/apps/organiclever in strict mode"
 ```
 
 The AI will:
@@ -342,7 +342,7 @@ The AI will:
 ### Comprehensive Audit (OCD Mode with Bounds)
 
 ```
-User: "Run specs validation for specs/apps/organiclever-be, specs/apps/organiclever-web, specs/apps/ayokoding in ocd mode with max-iterations=10"
+User: "Run specs validation for specs/apps/organiclever-be, specs/apps/organiclever, specs/apps/ayokoding in ocd mode with max-iterations=10"
 ```
 
 The AI will:
@@ -354,14 +354,14 @@ The AI will:
 
 ## Iteration Example
 
-Typical execution flow (folders: `[specs/apps/organiclever-be, specs/apps/organiclever-web]`):
+Typical execution flow (folders: `[specs/apps/organiclever-be, specs/apps/organiclever]`):
 
 ```
 Iteration 1:
   Check organiclever-be → 4 findings (1 CRITICAL, 2 HIGH, 1 MEDIUM)
     Examples: "Spec Tree Shape: missing containers/ folder [HIGH]",
               "Adoption Gaps: journal context has no Gherkin specs [HIGH]"
-  Check organiclever-web → 3 findings (0 CRITICAL, 2 HIGH, 1 LOW)
+  Check organiclever → 3 findings (0 CRITICAL, 2 HIGH, 1 LOW)
     Examples: "Drift Detection: routes-and-screens.md lists /stats but no matching route in app code [HIGH]"
   Cross-folder check → 5 findings (0 CRITICAL, 3 HIGH, 1 MEDIUM, 1 LOW)
   Total: 12 findings (1 CRITICAL, 7 HIGH, 2 MEDIUM, 2 LOW)

@@ -460,7 +460,7 @@ Every checkbox in `delivery.md` (or the Delivery Checklist section of a single-f
 
 1. **Explicit file path(s)** when the action touches a known file
    - Acceptable: `apps/ose-www/src/server/trpc.ts`, `repo-governance/conventions/structure/plans.md`, etc.
-   - When the path cannot be determined at authoring time, the checkbox MUST give the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-web/src/lib/` following the pattern of sibling `auth.ts`").
+   - When the path cannot be determined at authoring time, the checkbox MUST give the maximum-possible-detail target: parent directory + naming pattern + sibling reference (e.g., "new file under `apps/organiclever-www/src/lib/` following the pattern of sibling `auth.ts`").
    - Bare "the auth file", "the relevant config", "wherever needed": **HIGH** finding.
 
 2. **Explicit shell command(s)** when the action involves a command

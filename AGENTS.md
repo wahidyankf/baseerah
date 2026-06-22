@@ -339,7 +339,7 @@ Make it work → Make it right → Make it fast.
 
 ### Test-Driven Development
 
-Write the failing test first, then make it pass, then refactor — Red → Green → Refactor. Required for all code changes. Mini-TDD passes encouraged: split a feature into several small Red→Green→Refactor cycles. Plan delivery checklists must express code items as TDD-shaped steps; Gherkin acceptance criteria in `prd.md` are the natural source of first failing tests. Every code delivery step uses the explicit three-substep template (RED/GREEN/REFACTOR), each naming a file path, verbatim command, and acceptance criterion.
+Red → Green → Refactor. Required for all code changes. Mini-TDD passes encouraged. Plan delivery checklists express code items as TDD-shaped steps; Gherkin in `prd.md` is the natural source of first failing tests. Every code delivery step uses the explicit three-substep template (RED/GREEN/REFACTOR), each naming a file path, verbatim command, and acceptance criterion.
 
 **See**: [repo-governance/development/workflow/test-driven-development.md](./repo-governance/development/workflow/test-driven-development.md)
 
@@ -356,12 +356,7 @@ Pure refactors, no-behavior-change bumps, and docs/governance-only changes are e
 
 ### Regression Test Mandate (Every Bug Fix)
 
-Every fix for a discovered bug or regression lands with a **reproducing test** (failing before the fix,
-passing after) in the **same commit/PR**. This is **blocking with no exemption** — it applies to all
-defect types including cosmetic/visual, though the test form adapts (Gherkin + consuming test for
-behaviour; DOM/computed-style/component test for visual; string assertion for content/i18n). A fixed bug
-must become impossible to silently reintroduce. Enforced by `swe-code-checker` (Step 6.7) and
-`plan-checker` (Step 16b). This is the bug-driven dual of Specs & Gherkin Completeness above.
+Every bug fix lands with a **reproducing test** (failing before fix, passing after) in the **same commit/PR** — blocking, no exemptions. Test form adapts by defect type: Gherkin + consuming test for behaviour; DOM/computed-style for visual; string assertion for content/i18n. Enforced by `swe-code-checker` (Step 6.7) and `plan-checker` (Step 16b).
 
 **See**: [repo-governance/development/quality/regression-test-mandate.md](./repo-governance/development/quality/regression-test-mandate.md)
 
@@ -392,10 +387,10 @@ Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated 
 ### Manual Verification & CI Blockers
 
 - **Verify behavior**: Playwright MCP for UI, curl for API ([manual-behavioral-verification.md](./repo-governance/development/quality/manual-behavioral-verification.md))
-- **User-facing delivery hardening**: For any user-facing change, follow the fifteen rules — visual-parity sign-off against the design mockups per breakpoint/locale **before archival**, name the design-system primitive, per-breakpoint responsive deliverables, value-bearing tests, mockup-colors-as-theme-tokens, deploy-config-is-code, checkbox lockstep, and — for web-UI feature-change plans — a near-end three-tester retest round (invoke each tester with `output-mode: delivery` and the plan's `plan-path` — the unified in-place append mechanism; alternatively use the `web-ux-test-fixing-planning` workflow for a combined plan-mode run) whose EWT/UWT/DWT findings are appended to `delivery.md` as unchecked task-list items and fixed before archival ([user-facing-delivery-hardening.md](./repo-governance/development/quality/user-facing-delivery-hardening.md))
+- **User-facing delivery hardening**: Follow the fifteen rules for any user-facing change — visual-parity sign-off per breakpoint/locale before archival, design-system primitive naming, value-bearing tests, mockup-colors-as-theme-tokens, deploy-config-is-code. For web-UI feature-change plans: near-end three-tester retest round (`output-mode: delivery`, plan's `plan-path`; or use `web-ux-test-fixing-planning` workflow); EWT/UWT/DWT findings appended to `delivery.md` and fixed before archival ([user-facing-delivery-hardening.md](./repo-governance/development/quality/user-facing-delivery-hardening.md))
 - **CI blockers**: Investigate root cause, fix properly, never bypass ([ci-blocker-resolution.md](./repo-governance/development/quality/ci-blocker-resolution.md))
-- **CI post-push verification**: After pushing app or lib code to `origin main`, trigger relevant GitHub CI workflows and verify they pass before declaring work done — pre-push hook alone is not sufficient ([ci-post-push-verification.md](./repo-governance/development/workflow/ci-post-push-verification.md))
-- **CI monitoring**: Default poll interval is **2 minutes** — schedule a wake-up every 2 min (or slower) and run one `gh run view --json status,conclusion` per wakeup. Never tight-loop poll. **Do not use `gh run watch`** (stream-watching is prohibited for CI monitoring). If rate-limited (HTTP 403): wait ~35 min before retrying ([ci-monitoring.md](./repo-governance/development/workflow/ci-monitoring.md))
+- **CI post-push verification**: After pushing app or lib code, trigger CI and verify it passes — pre-push hook alone is not sufficient ([ci-post-push-verification.md](./repo-governance/development/workflow/ci-post-push-verification.md))
+- **CI monitoring**: Poll every **2 minutes** — one `gh run view --json status,conclusion` per wakeup. Never tight-loop. Do not use `gh run watch`. If rate-limited (HTTP 403): wait ~35 min before retrying ([ci-monitoring.md](./repo-governance/development/workflow/ci-monitoring.md))
 
 ## AI Agents
 

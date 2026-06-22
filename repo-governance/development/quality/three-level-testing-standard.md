@@ -182,7 +182,7 @@ Different project types carry different coverage thresholds, reflecting the prac
 | --------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | 90%       | API backends (`organiclever-be`), Rust CLI apps, Rust libs | Core business logic with high mock isolation; all execution paths reachable in unit tests           |
 | 80%       | Content platforms (`ayokoding-www`, `ose-www`)             | Significant UI rendering code; some React rendering paths are hard to unit-test                     |
-| 70%       | FE apps (`organiclever-web`)                               | API/auth/query layers are fully mocked by design; threshold reflects intentional mocking boundaries |
+| 70%       | FE apps (`organiclever-app-web`)                           | API/auth/query layers are fully mocked by design; threshold reflects intentional mocking boundaries |
 
 ## Mandatory Test Levels Matrix
 
@@ -323,7 +323,7 @@ All UI projects must include static accessibility checks in their `lint` target.
 common accessibility violations at compile time and are enforced at all three gates: pre-push hook,
 PR quality gate, and scheduled Test CI workflows.
 
-- **TypeScript UI projects** (`organiclever-web`, `ayokoding-www`, `ose-www`, `libs/web-ui`):
+- **TypeScript UI projects** (`organiclever-app-web`, `ayokoding-www`, `ose-www`, `libs/web-ui`):
   `oxlint --jsx-a11y-plugin`
 
 ### Runtime Accessibility E2E Tests (via `test:e2e`)
@@ -352,7 +352,7 @@ linting and the enforcement gates.
 
 The following gaps are known and tracked for future resolution:
 
-- **FE unit tests lack Gherkin**: `organiclever-web` does not yet consume Gherkin specs at the unit level. A BDD runner compatible with Vitest-based unit tests needs to be selected.
+- **FE unit tests lack Gherkin**: `organiclever-app-web` does not yet consume Gherkin specs at the unit level. A BDD runner compatible with Vitest-based unit tests needs to be selected.
 - **Content platform Gherkin pending**: `ayokoding-www` and `ose-www` do not yet consume Gherkin specs at any test level. Gherkin consumption for content platforms is planned at the **unit + e2e** tiers (content platforms have no integration tier; `test:integration` is a no-op `echo`).
 - **specs:coverage deferred for some projects**: Some projects have `specs:coverage` temporarily deferred until step implementations are complete. See "Spec-Coverage Validation" above and [Nx Target Standards](../infra/nx-targets.md) for the deferred project list.
 

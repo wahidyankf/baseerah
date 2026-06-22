@@ -22,7 +22,7 @@ Inline skill providing CI/CD standards knowledge from the governance documentati
 | Demo-be backend  | codegen, typecheck, lint, build, test:unit, test:quick, test:integration, specs:coverage |
 | Demo-fe frontend | codegen, typecheck, lint, build, test:unit, test:quick, specs:coverage                   |
 | Fullstack app    | codegen, typecheck, lint, build, test:unit, test:quick, test:integration, specs:coverage |
-| CLI app (Go)     | typecheck, lint, build, test:unit, test:quick, test:integration, specs:coverage          |
+| CLI app (Rust)   | typecheck, lint, build, test:unit, test:quick, test:integration, specs:coverage          |
 | Content platform | typecheck, lint, build, test:unit, test:quick, test:integration, specs:coverage          |
 | Library          | lint, build, test:unit, test:quick                                                       |
 | E2E runner       | lint, test:e2e, test:e2e:ui, specs:coverage                                              |
@@ -31,9 +31,9 @@ Inline skill providing CI/CD standards knowledge from the governance documentati
 
 | Threshold | Projects                                   |
 | --------- | ------------------------------------------ |
-| 90%       | organiclever-be, CLI apps, Go libs         |
-| 80%       | Content platforms (ayokoding-web, ose-web) |
-| 70%       | organiclever-web                           |
+| 90%       | organiclever-be, CLI apps, Rust libs       |
+| 80%       | Content platforms (ayokoding-www, ose-www) |
+| 70%       | organiclever-app-web                       |
 
 ## Docker Setup Requirements
 

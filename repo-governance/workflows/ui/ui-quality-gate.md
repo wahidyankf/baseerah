@@ -6,7 +6,7 @@ termination: "Zero findings on two consecutive validations (max-iterations defau
 inputs:
   - name: scope
     type: string
-    description: Files or directories to validate (e.g., "libs/web-ui/", "apps/organiclever-web/src/components/")
+    description: Files or directories to validate (e.g., "libs/web-ui/", "apps/organiclever-app-web/src/components/")
     required: false
     default: all frontend components
   - name: mode
@@ -57,7 +57,7 @@ outputs:
 
 ```
 User: "Run UI quality gate workflow for libs/web-ui/"
-User: "Run UI quality gate for apps/organiclever-web/src/components/ui/"
+User: "Run UI quality gate for apps/organiclever-app-web/src/components/ui/"
 ```
 
 ## Steps

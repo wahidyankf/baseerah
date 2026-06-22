@@ -48,7 +48,7 @@ the validated scope.
 3. **Missing top-level README.md** — Generate from directory contents using standard template,
    for all five canonical folders (`product/`, `system-context/`, `containers/`, `components/`,
    `behavior/`) and per-surface subfolders (`components/be/`, `components/web/`,
-   `behavior/organiclever-be/gherkin/`, `behavior/organiclever-web/gherkin/`,
+   `behavior/organiclever-be/gherkin/`, `behavior/organiclever-app-web/gherkin/`,
    `behavior/rhino-cli/gherkin/`, `ddd/`, `ddd/ubiquitous-language/`)
 4. **Missing per-surface subfolder README.md** — Generate from directory contents using
    standard template; scaffold all required README files within the validated scope
@@ -138,7 +138,7 @@ the validated scope.
 
 **Finding**: [MEDIUM] Category 9 — ddd/ absent for full-stack app
 **Reason not auto-fixed**: BDD/DDD/Contracts adoption requires explicit team decision
-**Recommended action**: Create a plan item to adopt DDD for organiclever-web, following
+**Recommended action**: Create a plan item to adopt DDD for organiclever-app-web, following
 the organiclever pilot pattern
 **Reference**: App README vs Specs Convention Standard 6
 ```

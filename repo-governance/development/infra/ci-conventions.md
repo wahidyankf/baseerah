@@ -171,7 +171,7 @@ app type realises each level.
 | App Type                                          | Unit (`test:unit`)                                    | Integration (`test:integration`)                                              | E2E (`test:e2e`)                                     |
 | ------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------- |
 | **BE API** (`organiclever-be`)                    | BDD, mocked repos, calls service fns directly         | Real PostgreSQL via docker-compose, calls service fns directly (no HTTP)      | Playwright, real HTTP + real PostgreSQL              |
-| **FE** (`organiclever-web`)                       | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
+| **FE** (`organiclever-app-web`)                   | Vitest, all API calls mocked (MSW / mock services)    | MSW with real DOM; in-process mocking only                                    | Playwright against running FE + BE                   |
 | **CLI** (`*-cli`)                                 | `cargo test`, all I/O mocked via dependency injection | `cargo test` with real filesystem via tmp fixtures, real HTTP via mock server | Not applicable                                       |
 | **Content platform** (`ayokoding-www`, `ose-www`) | Vitest, components and tRPC routes mocked             | MSW, in-process mocking                                                       | Playwright BE E2E (`*-be-e2e`) + FE E2E (`*-fe-e2e`) |
 | **Library** (`rust-commons`)                      | `cargo test`, mock closures                           | `cargo test` with real filesystem fixtures, cacheable                         | Not applicable                                       |
@@ -182,14 +182,14 @@ app type realises each level.
 All testable projects must consume Gherkin specifications at every applicable test level. E2E
 runner projects ARE the Gherkin consumers at the E2E level.
 
-| App Type                   | Unit consumes Gherkin                                              | Integration consumes Gherkin | E2E consumes Gherkin              |
-| -------------------------- | ------------------------------------------------------------------ | ---------------------------- | --------------------------------- |
-| BE API (`organiclever-be`) | Yes — `specs/apps/organiclever/behavior/organiclever-be/gherkin/`  | Yes — same specs             | Yes — same specs                  |
-| FE (`organiclever-web`)    | Yes — `specs/apps/organiclever/behavior/organiclever-web/gherkin/` | Yes — same specs             | Yes — via `organiclever-web-e2e`  |
-| CLI (`*-cli`)              | Yes — `specs/apps/{domain}/behavior/<product>-cli/gherkin/`        | Yes — same specs             | Not applicable                    |
-| Content platform           | Yes — project-local specs                                          | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e` |
-| Library                    | Yes — library-specific specs                                       | Yes — same specs             | Not applicable                    |
-| E2E runner                 | Not applicable                                                     | Not applicable               | Yes — consumes shared specs       |
+| App Type                    | Unit consumes Gherkin                                                  | Integration consumes Gherkin | E2E consumes Gherkin                 |
+| --------------------------- | ---------------------------------------------------------------------- | ---------------------------- | ------------------------------------ |
+| BE API (`organiclever-be`)  | Yes — `specs/apps/organiclever/behavior/organiclever-be/gherkin/`      | Yes — same specs             | Yes — same specs                     |
+| FE (`organiclever-app-web`) | Yes — `specs/apps/organiclever/behavior/organiclever-app-web/gherkin/` | Yes — same specs             | Yes — via `organiclever-app-web-e2e` |
+| CLI (`*-cli`)               | Yes — `specs/apps/{domain}/behavior/<product>-cli/gherkin/`            | Yes — same specs             | Not applicable                       |
+| Content platform            | Yes — project-local specs                                              | Yes — same specs             | Yes — via `*-be-e2e` / `*-fe-e2e`    |
+| Library                     | Yes — library-specific specs                                           | Yes — same specs             | Not applicable                       |
+| E2E runner                  | Not applicable                                                         | Not applicable               | Yes — consumes shared specs          |
 
 ## Coverage Threshold Rationale
 
@@ -197,11 +197,11 @@ Coverage thresholds are enforced by `rhino-cli test-coverage validate` as part o
 Thresholds differ by project type to reflect the realistic upper bound achievable through mocked
 unit tests.
 
-| Threshold | App Types                                              | Rationale                                                                                                                                                                       |
-| --------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **90%**   | BE API backends (`organiclever-be`), CLI apps, Go libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
-| **80%**   | Content platforms (`ayokoding-www`, `ose-www`)         | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
-| **70%**   | FE apps (`organiclever-web`)                           | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
+| Threshold | App Types                                                | Rationale                                                                                                                                                                       |
+| --------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **90%**   | BE API backends (`organiclever-be`), CLI apps, Rust libs | Core business logic with high mock isolation. Service functions operate on pure data structures; 90% is achievable without heroic effort.                                       |
+| **80%**   | Content platforms (`ayokoding-www`, `ose-www`)           | Significant UI rendering code and Next.js route handlers that are harder to unit-test. Some RSC rendering paths are excluded by design.                                         |
+| **70%**   | FE apps (`organiclever-app-web`)                         | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
 
 Coverage is measured via the appropriate reporter for each language and converted to LCOV or
 JaCoCo XML before being passed to `rhino-cli test-coverage validate`. See `CLAUDE.md` for the
@@ -439,7 +439,7 @@ Each app pairs with dedicated E2E runner projects for end-to-end testing.
 | App Type                                           | E2E Pairing                                    |
 | -------------------------------------------------- | ---------------------------------------------- |
 | Backend (`organiclever-be`, `ayokoding-www`, etc.) | Dedicated `*-be-e2e` Playwright runner project |
-| Frontend (`organiclever-web`, etc.)                | Dedicated `*-fe-e2e` Playwright runner project |
+| Frontend (`organiclever-app-web`, etc.)            | Dedicated `*-fe-e2e` Playwright runner project |
 | Content platforms                                  | Both `*-be-e2e` and `*-fe-e2e` runners         |
 
 Each product app has its own dedicated E2E runner (`*-be-e2e`, `*-fe-e2e`) scoped to that product's

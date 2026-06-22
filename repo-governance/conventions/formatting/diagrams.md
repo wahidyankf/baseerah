@@ -89,7 +89,7 @@ ASCII art and Mermaid solve different representational problems.
 
 ```
 apps/
-├── organiclever-web/
+├── organiclever-www/
 │   ├── src/
 │   └── tests/
 └── organiclever-be/

@@ -14,7 +14,7 @@ created: 2026-03-28
 
 # Styling Convention
 
-CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across `organiclever-web` and `ayokoding-www`.
+CSS and Tailwind v4 conventions for all frontend applications in the open-sharia-enterprise monorepo. These rules govern how styles are written, organized, and maintained across `organiclever-www` and `ayokoding-www`.
 
 ## Tailwind v4 Directives
 
@@ -54,7 +54,7 @@ Each app's `globals.css` uses a specific set of Tailwind v4 directives. Use only
 }
 ```
 
-See `apps/organiclever-web/src/app/globals.css` and `apps/ayokoding-www/src/app/globals.css` for the full reference implementations.
+See `apps/organiclever-app-web/src/app/globals.css` and `apps/ayokoding-www/src/app/globals.css` for the full reference implementations.
 
 ## Utility-First Approach
 
@@ -259,7 +259,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-**Known violation**: `organiclever-web/src/app/globals.css` declares `font-family: Arial, Helvetica, sans-serif` inside `@layer utilities`. This is scheduled for removal in favour of a `next/font` declaration in the app's root layout.
+**Known violation**: `organiclever-www/src/app/globals.css` declares `font-family: Arial, Helvetica, sans-serif` inside `@layer utilities`. This is scheduled for removal in favour of a `next/font` declaration in the app's root layout.
 
 ## Fluid Typography
 

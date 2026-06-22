@@ -9,7 +9,6 @@ tags:
   - naming
   - workflow
 created: 2026-03-13
-updated: 2026-06-14
 ---
 
 # GitHub Actions Workflow Naming Convention
@@ -245,8 +244,8 @@ append `.yml` → `organiclever-app-test-local-deploy-stag.yml`. Matches filenam
 ### FAIL: Wrong prefix order (action before domain)
 
 ```yaml
-# File: .github/workflows/test-and-deploy-organiclever-web.yml  ← action first
-name: Test and Deploy - OrganicLever Web
+# File: .github/workflows/test-and-deploy-organiclever-www.yml  ← action first
+name: Test and Deploy - OrganicLever WWW
 ```
 
 The domain (`organiclever-www`) must come first. Correct filename:

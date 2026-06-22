@@ -70,25 +70,25 @@ all use the same MIT text.
 
 #### Current Directory LICENSE Inventory
 
-| Directory                       | License |
-| ------------------------------- | ------- |
-| `LICENSE` (root)                | MIT     |
-| `apps/ayokoding-cli/`           | MIT     |
-| `apps/ayokoding-www/`           | MIT     |
-| `apps/crane-cli/`               | MIT     |
-| `apps/organiclever-be/`         | MIT     |
-| `apps/organiclever-web/`        | MIT     |
-| `apps/ose-cli/`                 | MIT     |
-| `apps/ose-be/`                  | MIT     |
-| `apps/ose-app-web/`             | MIT     |
-| `apps/ose-www/`                 | MIT     |
-| `apps/wahidyankf-www/`          | MIT     |
-| `specs/`                        | MIT     |
-| `libs/clojure-openapi-codegen/` | MIT     |
-| `libs/rust-commons/`            | MIT     |
-| `libs/ts-ui/`                   | MIT     |
-| `libs/web-ui/`                  | MIT     |
-| `libs/web-ui-token/`            | MIT     |
+| Directory                    | License | Notes |
+| ---------------------------- | ------- | ----- |
+| `LICENSE` (root)             | MIT     |       |
+| `apps/ayokoding-cli/`        | MIT     |       |
+| `apps/ayokoding-www/`        | MIT     |       |
+| `apps/crane-cli/`            | MIT     |       |
+| `apps/organiclever-app-web/` | MIT     |       |
+| `apps/organiclever-be/`      | MIT     |       |
+| `apps/organiclever-www/`     | MIT     |       |
+| `apps/ose-cli/`              | MIT     |       |
+| `apps/ose-be/`               | MIT     |       |
+| `apps/ose-app-web/`          | MIT     |       |
+| `apps/ose-www/`              | MIT     |       |
+| `apps/wahidyankf-www/`       | MIT     |       |
+| `specs/`                     | MIT     |       |
+| `libs/fsharp-crane-core/`    | MIT     |       |
+| `libs/rust-commons/`         | MIT     |       |
+| `libs/web-ui/`               | MIT     |       |
+| `libs/web-ui-token/`         | MIT     |       |
 
 Any third-party code that is vendored or archived retains its original license (see LICENSING-NOTICE.md).
 
@@ -149,7 +149,7 @@ the root MIT license by default.
 
 ```
 apps/
-  organiclever-web/
+  organiclever-www/
     LICENSE          <-- MIT (product app)
     src/
     ...

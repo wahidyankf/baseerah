@@ -1,6 +1,6 @@
 {
   "fsharp-crane-core.dll": {
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Convert.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Convert.fs": {
       "CraneCore.Convert": {
         "Microsoft.FSharp.Core.FSharpResult`2<System.String,System.String> CraneCore.Convert::convertPdfToMarkdown(CraneCore.Ports/IPdfPort,CraneCore.Ports/IOcrPort,System.String)": {
           "Lines": {
@@ -49,7 +49,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/PdfExtractionCache.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/PdfExtractionCache.fs": {
       "CraneCore.Logic.PdfExtractionCache": {
         "System.String CraneCore.Logic.PdfExtractionCache::pdfSha256(System.String)": {
           "Lines": {
@@ -426,7 +426,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/SkiplistManager.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/SkiplistManager.fs": {
       "CraneCore.Logic.SkiplistManager": {
         "System.String CraneCore.Logic.SkiplistManager::resolveSkiplistPath()": {
           "Lines": {
@@ -634,7 +634,7 @@
             "62": 14,
             "63": 8,
             "65": 12,
-            "101": 6
+            "103": 6
           },
           "Branches": [
             {
@@ -657,9 +657,7 @@
         },
         "System.String CraneCore.Logic.SkiplistManager::renderEntry(CraneCore.Domain.Report/SkipListEntry)": {
           "Lines": {
-            "104": 9,
             "106": 9,
-            "107": 9,
             "108": 9,
             "109": 9,
             "110": 9,
@@ -689,26 +687,29 @@
             "134": 9,
             "135": 9,
             "136": 9,
-            "138": 9
+            "137": 9,
+            "138": 9,
+            "140": 9
           },
           "Branches": []
         },
         "System.Void CraneCore.Logic.SkiplistManager::appendEntry(System.String,CraneCore.Domain.Report/SkipListEntry)": {
           "Lines": {
-            "141": 9,
             "143": 9,
-            "144": 2,
-            "145": 2,
-            "146": 4,
-            "147": 2,
-            "149": 28,
-            "150": 16,
-            "151": 6,
-            "153": 7
+            "145": 9,
+            "146": 2,
+            "149": 2,
+            "150": 0,
+            "152": 4,
+            "153": 2,
+            "155": 28,
+            "156": 16,
+            "157": 6,
+            "159": 7
           },
           "Branches": [
             {
-              "Line": 143,
+              "Line": 145,
               "Offset": 14,
               "EndOffset": 16,
               "Path": 0,
@@ -716,105 +717,105 @@
               "Hits": 2
             },
             {
-              "Line": 145,
-              "Offset": 39,
-              "EndOffset": 41,
+              "Line": 149,
+              "Offset": 40,
+              "EndOffset": 42,
               "Path": 0,
               "Ordinal": 2,
               "Hits": 0
             },
             {
-              "Line": 145,
-              "Offset": 39,
-              "EndOffset": 53,
+              "Line": 149,
+              "Offset": 40,
+              "EndOffset": 54,
               "Path": 1,
               "Ordinal": 3,
               "Hits": 2
             },
             {
-              "Line": 146,
-              "Offset": 58,
-              "EndOffset": 60,
+              "Line": 152,
+              "Offset": 59,
+              "EndOffset": 61,
               "Path": 0,
               "Ordinal": 4,
               "Hits": 0
             },
             {
-              "Line": 146,
-              "Offset": 58,
-              "EndOffset": 68,
+              "Line": 152,
+              "Offset": 59,
+              "EndOffset": 69,
               "Path": 1,
               "Ordinal": 5,
               "Hits": 2
             },
             {
-              "Line": 143,
+              "Line": 145,
               "Offset": 14,
-              "EndOffset": 89,
+              "EndOffset": 90,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 7
             },
             {
-              "Line": 149,
-              "Offset": 112,
-              "EndOffset": 114,
+              "Line": 155,
+              "Offset": 113,
+              "EndOffset": 115,
               "Path": 0,
               "Ordinal": 6,
               "Hits": 0
             },
             {
-              "Line": 149,
-              "Offset": 112,
-              "EndOffset": 118,
+              "Line": 155,
+              "Offset": 113,
+              "EndOffset": 119,
               "Path": 1,
               "Ordinal": 7,
               "Hits": 7
             },
             {
-              "Line": 149,
-              "Offset": 130,
-              "EndOffset": 132,
+              "Line": 155,
+              "Offset": 131,
+              "EndOffset": 133,
               "Path": 0,
               "Ordinal": 8,
               "Hits": 7
             },
             {
-              "Line": 150,
-              "Offset": 153,
-              "EndOffset": 155,
+              "Line": 156,
+              "Offset": 154,
+              "EndOffset": 156,
               "Path": 0,
               "Ordinal": 10,
               "Hits": 7
             },
             {
-              "Line": 150,
-              "Offset": 153,
-              "EndOffset": 169,
+              "Line": 156,
+              "Offset": 154,
+              "EndOffset": 170,
               "Path": 1,
               "Ordinal": 11,
               "Hits": 0
             },
             {
-              "Line": 150,
-              "Offset": 171,
-              "EndOffset": 173,
+              "Line": 156,
+              "Offset": 172,
+              "EndOffset": 174,
               "Path": 0,
               "Ordinal": 12,
               "Hits": 1
             },
             {
-              "Line": 149,
-              "Offset": 130,
-              "EndOffset": 198,
+              "Line": 155,
+              "Offset": 131,
+              "EndOffset": 199,
               "Path": 1,
               "Ordinal": 9,
               "Hits": 6
             },
             {
-              "Line": 150,
-              "Offset": 171,
-              "EndOffset": 198,
+              "Line": 156,
+              "Offset": 172,
+              "EndOffset": 199,
               "Path": 1,
               "Ordinal": 13,
               "Hits": 6
@@ -823,27 +824,27 @@
         },
         "Microsoft.FSharp.Core.FSharpResult`2<System.Boolean,System.String> CraneCore.Logic.SkiplistManager::add(System.String,System.String,System.String)": {
           "Lines": {
-            "156": 10,
-            "157": 10,
-            "158": 10,
-            "159": 10,
-            "161": 33,
-            "162": 1,
-            "164": 9,
-            "165": 9,
-            "166": 9,
-            "167": 9,
-            "168": 9,
-            "169": 9,
+            "162": 10,
+            "163": 10,
+            "164": 10,
+            "165": 10,
+            "167": 33,
+            "168": 1,
             "170": 9,
+            "171": 9,
             "172": 9,
             "173": 9,
-            "174": 0,
-            "175": 0
+            "174": 9,
+            "175": 9,
+            "176": 9,
+            "178": 9,
+            "179": 9,
+            "180": 0,
+            "181": 0
           },
           "Branches": [
             {
-              "Line": 161,
+              "Line": 167,
               "Offset": 40,
               "EndOffset": 42,
               "Path": 0,
@@ -851,7 +852,7 @@
               "Hits": 1
             },
             {
-              "Line": 161,
+              "Line": 167,
               "Offset": 40,
               "EndOffset": 51,
               "Path": 1,
@@ -862,40 +863,40 @@
         },
         "Microsoft.FSharp.Core.FSharpResult`2<System.Boolean,System.String> CraneCore.Logic.SkiplistManager::check(System.String,System.String,System.String)": {
           "Lines": {
-            "178": 2,
-            "179": 2,
-            "180": 2,
-            "181": 7
+            "184": 2,
+            "185": 2,
+            "186": 2,
+            "187": 7
           },
           "Branches": []
         },
         "Microsoft.FSharp.Core.FSharpResult`2<Microsoft.FSharp.Collections.FSharpList`1<CraneCore.Domain.Report/SkipListEntry>,System.String> CraneCore.Logic.SkiplistManager::list(System.String)": {
           "Lines": {
-            "184": 2,
-            "185": 2,
-            "186": 10
+            "190": 2,
+            "191": 2,
+            "192": 10
           },
           "Branches": []
         }
       },
-      "CraneCore.Logic.SkiplistManager/metaLines@72": {
-        "System.Boolean CraneCore.Logic.SkiplistManager/metaLines@72::Invoke(System.String)": {
+      "CraneCore.Logic.SkiplistManager/metaLines@73": {
+        "System.Boolean CraneCore.Logic.SkiplistManager/metaLines@73::Invoke(System.String)": {
           "Lines": {
-            "72": 160
+            "74": 152
           },
           "Branches": [
             {
-              "Line": 72,
-              "Offset": 16,
-              "EndOffset": 18,
+              "Line": 74,
+              "Offset": 17,
+              "EndOffset": 19,
               "Path": 0,
               "Ordinal": 0,
               "Hits": 72
             },
             {
-              "Line": 72,
-              "Offset": 16,
-              "EndOffset": 38,
+              "Line": 74,
+              "Offset": 17,
+              "EndOffset": 39,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 0
@@ -909,25 +910,27 @@
             "68": 30,
             "69": 6,
             "70": 24,
-            "74": 16,
-            "76": 8,
+            "72": 8,
+            "73": 8,
+            "76": 16,
             "78": 8,
-            "79": 24,
-            "80": 24,
-            "83": 8,
-            "84": 8,
+            "80": 8,
+            "81": 24,
+            "82": 24,
             "85": 8,
+            "86": 8,
             "87": 8,
-            "88": 8,
             "89": 8,
             "90": 8,
             "91": 8,
             "92": 8,
             "93": 8,
+            "94": 8,
             "95": 8,
-            "97": 0,
-            "98": 0,
-            "99": 16
+            "97": 8,
+            "99": 0,
+            "100": 0,
+            "101": 16
           },
           "Branches": [
             {
@@ -941,87 +944,87 @@
             {
               "Line": 68,
               "Offset": 8,
-              "EndOffset": 44,
+              "EndOffset": 45,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 6
             },
             {
               "Line": 70,
-              "Offset": 37,
-              "EndOffset": 51,
+              "Offset": 38,
+              "EndOffset": 52,
               "Path": 0,
               "Ordinal": 2,
               "Hits": 8
             },
             {
-              "Line": 76,
-              "Offset": 116,
-              "EndOffset": 123,
+              "Line": 78,
+              "Offset": 117,
+              "EndOffset": 124,
               "Path": 1,
               "Ordinal": 5,
               "Hits": 8
             },
             {
-              "Line": 79,
-              "Offset": 209,
-              "EndOffset": 213,
+              "Line": 81,
+              "Offset": 210,
+              "EndOffset": 214,
               "Path": 1,
               "Ordinal": 7,
               "Hits": 0
             },
             {
-              "Line": 79,
-              "Offset": 209,
-              "EndOffset": 218,
+              "Line": 81,
+              "Offset": 210,
+              "EndOffset": 219,
               "Path": 0,
               "Ordinal": 6,
               "Hits": 8
             },
             {
-              "Line": 80,
-              "Offset": 259,
-              "EndOffset": 263,
+              "Line": 82,
+              "Offset": 260,
+              "EndOffset": 264,
               "Path": 1,
               "Ordinal": 9,
               "Hits": 0
             },
             {
-              "Line": 80,
-              "Offset": 259,
-              "EndOffset": 268,
+              "Line": 82,
+              "Offset": 260,
+              "EndOffset": 269,
               "Path": 0,
               "Ordinal": 8,
               "Hits": 8
             },
             {
-              "Line": 85,
-              "Offset": 302,
-              "EndOffset": 306,
+              "Line": 87,
+              "Offset": 303,
+              "EndOffset": 307,
               "Path": 1,
               "Ordinal": 11,
               "Hits": 0
             },
             {
-              "Line": 85,
-              "Offset": 302,
-              "EndOffset": 320,
+              "Line": 87,
+              "Offset": 303,
+              "EndOffset": 321,
               "Path": 0,
               "Ordinal": 10,
               "Hits": 8
             },
             {
-              "Line": 76,
-              "Offset": 116,
-              "EndOffset": 368,
+              "Line": 78,
+              "Offset": 117,
+              "EndOffset": 369,
               "Path": 0,
               "Ordinal": 4,
               "Hits": 0
             },
             {
               "Line": 70,
-              "Offset": 37,
-              "EndOffset": 403,
+              "Offset": 38,
+              "EndOffset": 404,
               "Path": 1,
               "Ordinal": 3,
               "Hits": 16
@@ -1035,32 +1038,32 @@
           "Branches": [
             {
               "Line": 48,
-              "Offset": 19,
-              "EndOffset": 21,
+              "Offset": 20,
+              "EndOffset": 22,
               "Path": 0,
               "Ordinal": 0,
               "Hits": 48
             },
             {
               "Line": 51,
-              "Offset": 37,
-              "EndOffset": 39,
+              "Offset": 39,
+              "EndOffset": 41,
               "Path": 0,
               "Ordinal": 2,
               "Hits": 48
             },
             {
               "Line": 51,
-              "Offset": 37,
-              "EndOffset": 83,
+              "Offset": 39,
+              "EndOffset": 85,
               "Path": 1,
               "Ordinal": 3,
               "Hits": 0
             },
             {
               "Line": 48,
-              "Offset": 19,
-              "EndOffset": 85,
+              "Offset": 20,
+              "EndOffset": 87,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 16
@@ -1069,7 +1072,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/ReportManager.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/ReportManager.fs": {
       "CraneCore.Logic.ReportManager": {
         "System.String CraneCore.Logic.ReportManager::getOrExtendChain(System.String)": {
           "Lines": {
@@ -1235,7 +1238,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/OcrAssessor.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/OcrAssessor.fs": {
       "CraneCore.Logic.OcrAssessor": {
         "System.Double CraneCore.Logic.OcrAssessor::estimateOCRErrorRate(System.String)": {
           "Lines": {
@@ -1461,7 +1464,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/MermaidValidator.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/MermaidValidator.fs": {
       "CraneCore.Logic.MermaidValidator": {
         "Microsoft.FSharp.Core.FSharpResult`2<Microsoft.FSharp.Core.Unit,System.String> CraneCore.Logic.MermaidValidator::validateBlock(System.String)": {
           "Lines": {
@@ -1760,7 +1763,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/FigureChecker.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/FigureChecker.fs": {
       "CraneCore.Logic.FigureChecker": {
         "Microsoft.FSharp.Collections.FSharpList`1<CraneCore.Logic.FigureChecker/FigureRef> CraneCore.Logic.FigureChecker::detectFigures(System.String)": {
           "Lines": {
@@ -1906,7 +1909,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/TableChecker.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/TableChecker.fs": {
       "CraneCore.Logic.TableChecker": {
         "System.Boolean CraneCore.Logic.TableChecker::isSeparatorLine(System.String)": {
           "Lines": {
@@ -2144,7 +2147,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/NestingChecker.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/NestingChecker.fs": {
       "CraneCore.Logic.NestingChecker": {
         "Microsoft.FSharp.Collections.FSharpList`1<CraneCore.Logic.NestingChecker/NestingItem> CraneCore.Logic.NestingChecker::extractNestingLevels(System.String)": {
           "Lines": {
@@ -2152,39 +2155,39 @@
             "9": 10,
             "10": 15,
             "11": 10,
-            "12": 32,
-            "13": 14,
-            "14": 14,
-            "15": 14,
-            "16": 14,
-            "17": 10,
-            "18": 11,
-            "19": 10
+            "12": 15,
+            "13": 15,
+            "14": 1,
+            "15": 1,
+            "16": 15,
+            "17": 14,
+            "18": 14,
+            "19": 14,
+            "20": 14,
+            "21": 10,
+            "22": 11,
+            "23": 10
           },
           "Branches": []
         },
         "Microsoft.FSharp.Collections.FSharpList`1<CraneCore.Domain.Finding/Finding> CraneCore.Logic.NestingChecker::checkNesting(System.String,System.String)": {
           "Lines": {
-            "22": 4,
-            "23": 4,
-            "25": 4,
             "26": 4,
             "27": 4,
-            "28": 6,
-            "29": 6,
-            "30": 8,
-            "31": 9,
-            "32": 4,
+            "29": 4,
+            "30": 4,
+            "31": 4,
+            "32": 6,
             "33": 6,
-            "34": 1,
-            "35": 5,
-            "36": 1,
-            "37": 2,
-            "38": 4,
-            "39": 1,
+            "34": 8,
+            "35": 9,
+            "36": 4,
+            "37": 6,
+            "38": 1,
+            "39": 5,
             "40": 1,
-            "41": 1,
-            "42": 1,
+            "41": 2,
+            "42": 4,
             "43": 1,
             "44": 1,
             "45": 1,
@@ -2196,7 +2199,11 @@
             "51": 1,
             "52": 1,
             "53": 1,
-            "54": 8
+            "54": 1,
+            "55": 1,
+            "56": 1,
+            "57": 1,
+            "58": 8
           },
           "Branches": []
         }
@@ -2206,49 +2213,49 @@
           "Lines": {},
           "Branches": [
             {
-              "Line": 12,
-              "Offset": 19,
-              "EndOffset": 21,
+              "Line": 13,
+              "Offset": 20,
+              "EndOffset": 22,
               "Path": 0,
               "Ordinal": 0,
               "Hits": 14
             },
             {
-              "Line": 12,
-              "Offset": 19,
-              "EndOffset": 25,
+              "Line": 13,
+              "Offset": 20,
+              "EndOffset": 26,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 1
             },
             {
-              "Line": 12,
-              "Offset": 37,
-              "EndOffset": 39,
+              "Line": 14,
+              "Offset": 39,
+              "EndOffset": 41,
               "Path": 0,
               "Ordinal": 2,
               "Hits": 14
             },
             {
-              "Line": 12,
-              "Offset": 37,
-              "EndOffset": 43,
+              "Line": 14,
+              "Offset": 39,
+              "EndOffset": 45,
               "Path": 1,
               "Ordinal": 3,
               "Hits": 1
             },
             {
-              "Line": 12,
-              "Offset": 55,
-              "EndOffset": 57,
+              "Line": 15,
+              "Offset": 58,
+              "EndOffset": 60,
               "Path": 0,
               "Ordinal": 4,
               "Hits": 14
             },
             {
-              "Line": 12,
-              "Offset": 55,
-              "EndOffset": 136,
+              "Line": 15,
+              "Offset": 58,
+              "EndOffset": 139,
               "Path": 1,
               "Ordinal": 5,
               "Hits": 1
@@ -2256,12 +2263,12 @@
           ]
         }
       },
-      "CraneCore.Logic.NestingChecker/mdMatch@29": {
-        "System.Boolean CraneCore.Logic.NestingChecker/mdMatch@29::Invoke(CraneCore.Logic.NestingChecker/NestingItem)": {
+      "CraneCore.Logic.NestingChecker/mdMatch@33": {
+        "System.Boolean CraneCore.Logic.NestingChecker/mdMatch@33::Invoke(CraneCore.Logic.NestingChecker/NestingItem)": {
           "Lines": {},
           "Branches": [
             {
-              "Line": 30,
+              "Line": 34,
               "Offset": 23,
               "EndOffset": 25,
               "Path": 0,
@@ -2269,7 +2276,7 @@
               "Hits": 5
             },
             {
-              "Line": 30,
+              "Line": 34,
               "Offset": 23,
               "EndOffset": 27,
               "Path": 1,
@@ -2279,12 +2286,12 @@
           ]
         }
       },
-      "CraneCore.Logic.NestingChecker/checkNesting@26": {
-        "Microsoft.FSharp.Core.FSharpOption`1<CraneCore.Domain.Finding/Finding> CraneCore.Logic.NestingChecker/checkNesting@26::Invoke(CraneCore.Logic.NestingChecker/NestingItem)": {
+      "CraneCore.Logic.NestingChecker/checkNesting@30": {
+        "Microsoft.FSharp.Core.FSharpOption`1<CraneCore.Domain.Finding/Finding> CraneCore.Logic.NestingChecker/checkNesting@30::Invoke(CraneCore.Logic.NestingChecker/NestingItem)": {
           "Lines": {},
           "Branches": [
             {
-              "Line": 33,
+              "Line": 37,
               "Offset": 23,
               "EndOffset": 25,
               "Path": 0,
@@ -2292,7 +2299,7 @@
               "Hits": 5
             },
             {
-              "Line": 33,
+              "Line": 37,
               "Offset": 23,
               "EndOffset": 60,
               "Path": 1,
@@ -2300,7 +2307,7 @@
               "Hits": 1
             },
             {
-              "Line": 35,
+              "Line": 39,
               "Offset": 53,
               "EndOffset": 62,
               "Path": 0,
@@ -2308,7 +2315,7 @@
               "Hits": 1
             },
             {
-              "Line": 37,
+              "Line": 41,
               "Offset": 90,
               "EndOffset": 92,
               "Path": 0,
@@ -2316,7 +2323,7 @@
               "Hits": 1
             },
             {
-              "Line": 37,
+              "Line": 41,
               "Offset": 90,
               "EndOffset": 100,
               "Path": 1,
@@ -2324,7 +2331,7 @@
               "Hits": 0
             },
             {
-              "Line": 35,
+              "Line": 39,
               "Offset": 53,
               "EndOffset": 224,
               "Path": 1,
@@ -2335,7 +2342,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/HeadingChecker.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/HeadingChecker.fs": {
       "CraneCore.Logic.HeadingChecker": {
         "Microsoft.FSharp.Core.FSharpOption`1<System.Tuple`2<System.Int32,System.String>> CraneCore.Logic.HeadingChecker::inferDepthFromNumbering(System.String)": {
           "Lines": {
@@ -2468,16 +2475,16 @@
           "Branches": [
             {
               "Line": 31,
-              "Offset": 19,
-              "EndOffset": 21,
+              "Offset": 20,
+              "EndOffset": 22,
               "Path": 0,
               "Ordinal": 0,
               "Hits": 5
             },
             {
               "Line": 31,
-              "Offset": 19,
-              "EndOffset": 85,
+              "Offset": 20,
+              "EndOffset": 86,
               "Path": 1,
               "Ordinal": 1,
               "Hits": 2
@@ -2580,7 +2587,7 @@
         }
       }
     },
-    "/Users/wkf/ose-projects/ose-public/worktrees/standardize-repo-toolchain-parity/libs/fsharp-crane-core/src/Core/Logic/TextChecker.fs": {
+    "/Users/wkf/ose-projects/ose-public/libs/fsharp-crane-core/src/Core/Logic/TextChecker.fs": {
       "CraneCore.Logic.TextChecker": {
         "System.String CraneCore.Logic.TextChecker::normalize(System.String)": {
           "Lines": {

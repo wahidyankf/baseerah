@@ -49,13 +49,13 @@ WORKDIR /app
 
 # Copy root workspace manifests first for layer caching
 COPY package.json package-lock.json ./
-COPY apps/organiclever-web/package.json ./apps/organiclever-web/
+COPY apps/organiclever-app-web/package.json ./apps/organiclever-app-web/
 
 # Install dependencies (workspace-aware, but symlinks will be replaced below)
-RUN npm ci --workspace=apps/organiclever-web --include-workspace-root
+RUN npm ci --workspace=apps/organiclever-app-web --include-workspace-root
 
 # Copy app source
-COPY apps/organiclever-web/ ./apps/organiclever-web/
+COPY apps/organiclever-app-web/ ./apps/organiclever-app-web/
 
 # Inject shared library source directly into node_modules — bypasses symlinks
 COPY libs/web-ui/src/ ./node_modules/@open-sharia-enterprise/web-ui/src/
@@ -63,7 +63,7 @@ COPY libs/web-ui/package.json ./node_modules/@open-sharia-enterprise/web-ui/
 COPY libs/web-ui-token/src/ ./node_modules/@open-sharia-enterprise/web-ui-token/src/
 COPY libs/web-ui-token/package.json ./node_modules/@open-sharia-enterprise/web-ui-token/
 
-RUN npm run build --workspace=apps/organiclever-web
+RUN npm run build --workspace=apps/organiclever-app-web
 ```
 
 The key insight: Node.js module resolution searches `node_modules/@scope/package/` directly. Once
@@ -77,12 +77,12 @@ from `infra/dev/<app>/`) so that `COPY libs/...` instructions in the Dockerfile 
 `libs/` tree. The `dockerfile` key provides the Dockerfile path relative to the context.
 
 ```yaml
-# infra/dev/organiclever-web/docker-compose.yml
+# infra/dev/organiclever-app-web/docker-compose.yml
 services:
-  organiclever-web:
+  organiclever-app-web:
     build:
       context: ../../.. # repo root — required for COPY libs/...
-      dockerfile: apps/organiclever-web/Dockerfile
+      dockerfile: apps/organiclever-app-web/Dockerfile
 ```
 
 A build context scoped to the app directory (e.g., `context: .`) cannot access `libs/` and will

@@ -135,12 +135,12 @@ specs/apps/<app-family>/
 
 ### Per-Surface Variants
 
-| Surface profile                   | Folders populated                                                                                                                                    | Folders absent or empty                         |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Full-stack (e.g., `organiclever`) | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/organiclever-be/gherkin/` + `behavior/organiclever-web/gherkin/` | None                                            |
-| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-www/gherkin/`                                                  | `containers/contracts/`, `components/be/`       |
-| CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                       | `components/{be,web}/`, `containers/contracts/` |
-| Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, plus web layers if applicable                                                                                                      | Nothing additional omitted                      |
+| Surface profile                   | Folders populated                                                                                                                                        | Folders absent or empty                         |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Full-stack (e.g., `organiclever`) | All five; `components/be/` + `components/web/` + `containers/contracts/`; `behavior/organiclever-be/gherkin/` + `behavior/organiclever-app-web/gherkin/` | None                                            |
+| Web-only (e.g., `wahidyankf`)     | `product/`, `system-context/`, `containers/`, `components/web/`, `behavior/wahidyankf-www/gherkin/`                                                      | `containers/contracts/`, `components/be/`       |
+| CLI-only (e.g., `rhino`)          | `product/`, `system-context/`, `containers/`, `components/cli/`, `behavior/rhino-cli/gherkin/`                                                           | `components/{be,web}/`, `containers/contracts/` |
+| Multi-CLI (e.g., `ayokoding`)     | Same as CLI-only, plus web layers if applicable                                                                                                          | Nothing additional omitted                      |
 
 ## Gherkin Feature File Placement
 
@@ -173,7 +173,7 @@ renamed from the old bare `build-tools/` slug during the `standardize-app-spec-t
 ```
 specs/apps/organiclever/behavior/organiclever-be/gherkin/expenses/expense-management.feature
 specs/apps/organiclever/behavior/organiclever-be/gherkin/authentication/password-login.feature
-specs/apps/organiclever/behavior/organiclever-web/gherkin/authentication/google-login.feature
+specs/apps/organiclever/behavior/organiclever-app-web/gherkin/authentication/google-login.feature
 specs/apps/ayokoding/behavior/ayokoding-www/gherkin/accessibility/accessibility.feature
 ```
 
@@ -360,9 +360,9 @@ The single source of truth for the allowlist is `apps/rhino-cli/src/internal/all
 `specs/apps/<app>/ddd/bounded-contexts.yaml` accepts both scalar and list forms for the `gherkin:` field. A scalar auto-converts to a single-element list at load time:
 
 ```yaml
-gherkin: behavior/organiclever-web/gherkin/content # scalar (most BCs)
+gherkin: behavior/organiclever-app-web/gherkin/content # scalar (most BCs)
 gherkin: # list (multi-perspective BCs)
-  - behavior/organiclever-web/gherkin/content
+  - behavior/organiclever-app-web/gherkin/content
   - behavior/organiclever-be/gherkin/content
 ```
 

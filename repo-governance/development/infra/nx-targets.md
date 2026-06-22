@@ -83,7 +83,7 @@ flowchart TD
 
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: Targets integrate with Nx affected computation, caching, the pre-push hook, and the PR merge gate. Consistent naming allows workspace-level automation (`nx affected -t test:quick`) to work across all project types without special cases.
 
-- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Each project exposes only the targets it actually needs. A Go CLI does not need `dev` or `start`. The full testing spectrum is composed from `test:quick`, `test:unit`, `test:integration`, and `test:e2e` — no aggregate wrapper target needed.
+- **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)**: Each project exposes only the targets it actually needs. A Rust CLI does not need `dev` or `start`. The full testing spectrum is composed from `test:quick`, `test:unit`, `test:integration`, and `test:e2e` — no aggregate wrapper target needed.
 
 ## Conventions Implemented/Respected
 
@@ -104,7 +104,7 @@ Use these canonical names. Aliases (`serve`, `start:dev`, `unit-test`) are anti-
 | `lint`             | Static analysis, code style checks, and static a11y checks (oxlint jsx-a11y for TS UI projects)                  | All projects                      |
 | `test:quick`       | Fast quality gate for pre-push and PR merge; composed of fast checks                                             | All projects                      |
 | `specs:coverage`   | Validate that every Gherkin step has a matching step definition; uses `rhino-cli specs:coverage validate`        | All apps and E2E runners          |
-| `test:unit`        | Isolated unit tests with mocked dependencies; must consume Gherkin specs (demo-be backends and Go CLI apps)      | Projects with unit tests          |
+| `test:unit`        | Isolated unit tests with mocked dependencies; must consume Gherkin specs (demo-be backends and Rust CLI apps)    | Projects with unit tests          |
 | `test:integration` | Demo-be: real PostgreSQL via docker-compose, direct code calls (no HTTP). Others: existing patterns (MSW, Godog) | Projects with integration tests   |
 | `test:e2e`         | Run E2E tests headlessly against a running app; must consume Gherkin specs (demo-be backends) via Playwright     | E2E test projects (`*-e2e`)       |
 | `test:e2e:ui`      | Run E2E tests with interactive Playwright UI                                                                     | E2E test projects                 |
@@ -114,14 +114,14 @@ Use these canonical names. Aliases (`serve`, `start:dev`, `unit-test`) are anti-
 | `run`              | Execute the application directly                                                                                 | CLI applications                  |
 | `codegen`          | Generate code from OpenAPI contract spec into `generated-contracts/`                                             | Demo apps with contract types     |
 | `docs`             | Generate browsable API documentation from contract spec                                                          | Contract spec projects            |
-| `install`          | Install project-local dependencies                                                                               | E2E suites, Go CLIs               |
+| `install`          | Install project-local dependencies                                                                               | E2E suites, Rust CLIs             |
 | `clean`            | Remove build artifacts and caches                                                                                | Projects with large build outputs |
 
 ### Naming Rules
 
 - Use `dev` for the development server — never `serve`, never `start:dev`
 - Use `start` for the production server — never `serve`
-- Use `test:quick` for the fast pre-push gate; `test:unit` for isolated unit tests with mocked dependencies (Go CLI apps consume Gherkin specs via godog at this level); `test:integration` for tests with real infrastructure (demo-be: PostgreSQL via docker-compose) or in-process mocking (MSW, Godog); `test:e2e` for end-to-end tests; `specs:coverage` for Gherkin step definition coverage validation — run targets individually rather than through an aggregate wrapper
+- Use `test:quick` for the fast pre-push gate; `test:unit` for isolated unit tests with mocked dependencies (Rust CLI apps consume Gherkin specs at this level); `test:integration` for tests with real infrastructure (demo-be: PostgreSQL via docker-compose) or in-process mocking (MSW, Godog); `test:e2e` for end-to-end tests; `specs:coverage` for Gherkin step definition coverage validation — run targets individually rather than through an aggregate wrapper
 - Separate target variants with a colon (`build:web`, `test:e2e:ui`), not a hyphen or underscore
 - All target names use lowercase with hyphens for multi-word names (`run-pre-commit`)
 
@@ -184,20 +184,20 @@ Every project declares tags along four dimensions. Each dimension uses a fixed p
 
 ### Current Project Tags
 
-| Project                 | Tags                                                                     |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `ayokoding-www`         | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`         |
-| `ayokoding-cli`         | `["type:app", "platform:cli", "lang:rust", "domain:ayokoding"]`          |
-| `rhino-cli`             | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`            |
-| `organiclever-web`      | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`      |
-| `organiclever-be`       | `["type:app", "platform:giraffe", "lang:dotnet", "domain:organiclever"]` |
-| `organiclever-web-e2e`  | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
-| `organiclever-be-e2e`   | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
-| `ose-cli`               | `["type:app", "platform:cli", "lang:rust", "domain:ose"]`                |
-| `ose-www`               | `["type:app", "platform:nextjs", "lang:ts", "domain:ose"]`               |
-| `wahidyankf-www`        | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`        |
-| `wahidyankf-www-fe-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`    |
-| `rust-commons`          | `["type:lib", "lang:rust"]`                                              |
+| Project                    | Tags                                                                     |
+| -------------------------- | ------------------------------------------------------------------------ |
+| `ayokoding-www`            | `["type:app", "platform:nextjs", "lang:ts", "domain:ayokoding"]`         |
+| `ayokoding-cli`            | `["type:app", "platform:cli", "lang:rust", "domain:ayokoding"]`          |
+| `rhino-cli`                | `["type:app", "platform:cli", "lang:rust", "domain:tooling"]`            |
+| `organiclever-app-web`     | `["type:app", "platform:nextjs", "lang:ts", "domain:organiclever"]`      |
+| `organiclever-be`          | `["type:app", "platform:giraffe", "lang:dotnet", "domain:organiclever"]` |
+| `organiclever-app-web-e2e` | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
+| `organiclever-be-e2e`      | `["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]`  |
+| `ose-cli`                  | `["type:app", "platform:cli", "lang:rust", "domain:ose"]`                |
+| `ose-www`                  | `["type:app", "platform:nextjs", "lang:ts", "domain:ose"]`               |
+| `wahidyankf-www`           | `["type:app", "platform:nextjs", "lang:ts", "domain:wahidyankf"]`        |
+| `wahidyankf-www-fe-e2e`    | `["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"]`    |
+| `rust-commons`             | `["type:lib", "lang:rust"]`                                              |
 
 ### Example: Complete Tag Declaration
 
@@ -210,7 +210,7 @@ An F#/Giraffe backend app declares all four dimensions:
 }
 ```
 
-A Go lib has no platform boundary and no domain, so it omits both:
+A Rust lib has no platform boundary and no domain, so it omits both:
 
 ```json
 {
@@ -239,7 +239,7 @@ Derived from three rules: (1) All apps+libs → unit tests, (2) All apps → int
 | Web UI App   | Yes         | Yes (MSW)          | Yes\*      | Yes          | Yes              | Yes    | Yes     | If typed     |
 | Demo-fe FE   | Yes         | —                  | Yes\*      | Yes          | Yes              | Yes    | Yes     | If typed     |
 | Fullstack    | Yes         | Yes                | Yes\*      | Yes          | Yes              | Yes    | Yes     | If typed     |
-| CLI App      | Yes         | Yes (Godog)        | —          | Yes          | Yes              | Yes    | Yes     | If typed     |
+| CLI App      | Yes         | Yes                | —          | Yes          | Yes              | Yes    | Yes     | If typed     |
 | Library      | Yes         | Optional           | —          | Yes          | Yes              | Yes    | —       | If typed     |
 | E2E Runner   | —           | —                  | Yes        | Yes          | Yes              | Yes    | —       | If typed     |
 
@@ -332,21 +332,21 @@ Rust, .NET, TypeScript apps:
 
 Two integration test patterns exist depending on project type:
 
-| Pattern             | Projects                                                   | Requirement                                                                                                                                                | Cacheable |
-| ------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Docker + PostgreSQL | API backends (`organiclever-be`)                           | Real PostgreSQL via `docker-compose.integration.yml`; calls application code directly (no HTTP layer); runs all shared Gherkin scenarios; fresh DB per run | No        |
-| In-process mocking  | `organiclever-web` (MSW), Go CLIs (Godog), Go libs (Godog) | In-process mocking only (MSW / godog `RunE` / mock fixtures); no real database or external services; fully deterministic                                   | Yes       |
+| Pattern             | Projects                                              | Requirement                                                                                                                                                | Cacheable |
+| ------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Docker + PostgreSQL | API backends (`organiclever-be`)                      | Real PostgreSQL via `docker-compose.integration.yml`; calls application code directly (no HTTP layer); runs all shared Gherkin scenarios; fresh DB per run | No        |
+| In-process mocking  | `organiclever-app-web` (MSW), Rust CLIs (cucumber-rs) | In-process mocking only (MSW / cucumber-rs / mock fixtures); no real database or external services; fully deterministic                                    | Yes       |
 
 **API backends** expose `test:integration` which runs `docker compose -f docker-compose.integration.yml up --abort-on-container-exit --build`. This starts a fresh PostgreSQL container, runs migrations, and executes all shared Gherkin scenarios by calling application service/repository functions directly — no HTTP layer. Each backend has a `docker-compose.integration.yml` (postgres + test runner services) and a `Dockerfile.integration` (language runtime + test execution). Coverage is NOT measured at the integration level — coverage comes from `test:unit` only.
 
 > For polyglot `test:integration` Docker infrastructure patterns across 11 backend languages, see the [ose-primer](https://github.com/wahidyankf/ose-primer) repository.
 
-**Go CLIs** consume Gherkin specs at both test levels. Each command has two test files:
+**Rust CLIs** (`ayokoding-cli`, `ose-cli`, `rhino-cli`) consume Gherkin specs at both test levels. Each command has two test files:
 
-- `{stem}_test.go` (no build tag) — godog unit step definitions; runs in `test:quick` as part of `go test ./...`; mocks all I/O via package-level function variables; coverage measured here
-- `{stem}.integration_test.go` (`//go:build integration`) — godog integration step definitions; drives the command in-process via `cmd.RunE()` against controlled `/tmp` filesystem fixtures; runs in `test:integration` via `-tags=integration -run TestIntegration`
+- `{domain}_{action}_test.rs` (unit, inline `#[cfg(test)]` or separate file) — cucumber-rs unit step definitions; runs in `test:quick` via `cargo test`; mocks all I/O via injected function types; coverage measured here
+- `tests/{domain}_{action}_integration_test.rs` — cucumber-rs integration step definitions; drives the command via process invocation against controlled `/tmp` filesystem fixtures; runs in `test:integration`
 
-Both files are co-located in the same `cmd/` package (not a separate folder) to access unexported package-level flag variables (`output`, `quiet`, `verbose`). Both levels filter scenarios by the same `@tag` from the same feature file. See
+Both levels consume the same feature file `@tag`. See
 [BDD Spec-to-Test Mapping Convention](./bdd-spec-test-mapping.md) for the mandatory 1:1 mapping
 between commands and feature file `@tags`.
 
@@ -356,12 +356,12 @@ directly. Feature files live in `specs/libs/{lib-name}/`.
 
 ### CLI Applications
 
-Go CLIs and similar tools:
+Rust CLIs and similar tools:
 
-| Target    | Requirement                                              |
-| --------- | -------------------------------------------------------- |
-| `run`     | Execute the application (`go run main.go` or equivalent) |
-| `install` | Sync dependencies (`go mod tidy` or equivalent)          |
+| Target    | Requirement                                         |
+| --------- | --------------------------------------------------- |
+| `run`     | Execute the application (`cargo run` or equivalent) |
+| `install` | Sync dependencies (`cargo build` or equivalent)     |
 
 ### E2E Test Projects
 
@@ -406,16 +406,15 @@ the project's feature files has a matching step definition in the implementation
 
 **Project coverage status**:
 
-| Project group                                               | Status   | Notes                                                                                        |
-| ----------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
-| Rust CLI apps (`rhino-cli`)                                 | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                     |
-| Go CLI apps (`ayokoding-cli`, `ose-cli`)                    | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                     |
-| API backends (`organiclever-be`)                            | Enforced | `--shared-steps --exclude-dir test-support`                                                  |
-| E2E runners (`organiclever-be-e2e`, `organiclever-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                               |
-| Content platforms (`ayokoding-www`, `ose-www`)              | Enforced | `--shared-steps`                                                                             |
-| Web UI apps (`organiclever-web`)                            | Enforced | `--shared-steps`                                                                             |
-| Libraries (`rust-commons`)                                  | Enforced | `--shared-steps`                                                                             |
-| Projects with genuine step gaps                             | Deferred | `specs:coverage` target exists but validation deferred until step implementation is complete |
+| Project group                                                   | Status   | Notes                                                                                        |
+| --------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| Rust CLI apps (`rhino-cli`, `ayokoding-cli`, `ose-cli`)         | Enforced | `--shared-steps` only; no `--exclude-dir` needed (no test-support specs)                     |
+| API backends (`organiclever-be`)                                | Enforced | `--shared-steps --exclude-dir test-support`                                                  |
+| E2E runners (`organiclever-be-e2e`, `organiclever-app-web-e2e`) | Enforced | `--shared-steps` only; test-support steps are implemented here                               |
+| Content platforms (`ayokoding-www`, `ose-www`)                  | Enforced | `--shared-steps`                                                                             |
+| Web UI apps (`organiclever-app-web`)                            | Enforced | `--shared-steps`                                                                             |
+| Libraries (`rust-commons`)                                      | Enforced | `--shared-steps`                                                                             |
+| Projects with genuine step gaps                                 | Deferred | `specs:coverage` target exists but validation deferred until step implementation is complete |
 
 All apps and E2E runners are required to have a `specs:coverage` target. Projects with genuine step
 gaps have the target deferred temporarily until step implementations are complete.
@@ -447,9 +446,9 @@ Accessibility testing is compulsory for all UI-related projects. It operates at 
 **Static a11y linting** (enforced via the `lint` target at all three gates: pre-push hook, PR
 quality gate, and scheduled Test CI workflows):
 
-| Project                                                       | Static a11y tool           |
-| ------------------------------------------------------------- | -------------------------- |
-| `organiclever-web`, `ayokoding-www`, `ose-www`, `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
+| Project                                                                               | Static a11y tool           |
+| ------------------------------------------------------------------------------------- | -------------------------- |
+| `organiclever-app-web`, `organiclever-www`, `ayokoding-www`, `ose-www`, `libs/web-ui` | `oxlint --jsx-a11y-plugin` |
 
 Static a11y linting catches common accessibility violations at compile time: missing alt text,
 missing ARIA labels, invalid ARIA attributes, missing form labels, and incorrect role usage.
@@ -534,7 +533,7 @@ Declare the output directory in `project.json` `outputs` to enable Nx cache rest
 
 | Project Type | Output Directory        |
 | ------------ | ----------------------- |
-| Go CLI       | `{projectRoot}/dist/`   |
+| Rust CLI     | `{projectRoot}/dist/`   |
 | Next.js      | `{projectRoot}/.next/`  |
 | Spring Boot  | `{projectRoot}/target/` |
 
@@ -589,7 +588,7 @@ Example for `rhino-cli` `test:unit` inputs:
 ]
 ```
 
-**Go CLI apps** (`ayokoding-cli`, `ose-cli`) also consume Gherkin specs in `test:unit` (godog unit step definitions run without a build tag). Their `test:unit` and `test:quick` inputs must include the CLI's own spec files:
+**Rust CLI apps** (`ayokoding-cli`, `ose-cli`) also consume Gherkin specs in `test:unit`. Their `test:unit` and `test:quick` inputs must include the CLI's own spec files:
 
 | CLI App         | Gherkin specs input                                 |
 | --------------- | --------------------------------------------------- |

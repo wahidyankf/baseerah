@@ -106,7 +106,7 @@ Where:
 | PASS: Correct                                           | FAIL: Incorrect                           | Why                                                            |
 | ------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------- |
 | `2026-06-05-github-actions-nx-affected-stall.md`        | `post-mortem-2026-06-05.md`               | Missing system and failure                                     |
-| `2025-11-01-organiclever-web-vercel-outage.md`          | `2025-11-01__organiclever-web__vercel.md` | Double underscore is plans-folder style, not post-mortem style |
+| `2025-11-01-organiclever-www-vercel-outage.md`          | `2025-11-01__organiclever-www__vercel.md` | Double underscore is plans-folder style, not post-mortem style |
 | `2025-09-14-rhino-cli-coverage-threshold-regression.md` | `2025-09-14-Rhino-CLI.md`                 | Uppercase not allowed                                          |
 
 ### Blameless Principle
@@ -379,7 +379,7 @@ WCAG AA hex codes: `#0173B2` (blue), `#DE8F05` (orange), `#029E73` (teal), `#CC7
 | PASS: Correct                                                 | FAIL: Wrong                                      | Reason                                                        |
 | ------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------- |
 | `2026-06-04-github-actions-nx-affected-stall.md`              | `post-mortem-github-actions-2026.md`             | No incident date prefix; year is not an ISO date              |
-| `2025-11-01-organiclever-web-vercel-deploy-failure.md`        | `2025-11-01__organiclever-web__vercel.md`        | Double underscores are for `plans/` folders, not post-mortems |
+| `2025-11-01-organiclever-www-vercel-deploy-failure.md`        | `2025-11-01__organiclever-www__vercel.md`        | Double underscores are for `plans/` folders, not post-mortems |
 | `2025-09-14-organiclever-be-coverage-threshold-regression.md` | `2025-09-14-OrganicleverBe-Coverage.md`          | Uppercase components                                          |
 | `2026-03-20-amazonq-binding-parity-guard-break.md`            | `docs/how-to/post-mortems/parity-guard-break.md` | Wrong Diátaxis tier; post-mortems are explanation, not how-to |
 

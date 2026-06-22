@@ -9,7 +9,6 @@ tags:
   - git
   - data-protection
 created: 2026-06-01
-updated: 2026-06-10
 ---
 
 # No Secrets in Committed Files

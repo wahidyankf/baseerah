@@ -9,7 +9,6 @@ tags:
   - agents
   - guard-env-file-access
 created: 2026-05-24
-updated: 2026-06-10
 ---
 
 # Environment File Access Convention
