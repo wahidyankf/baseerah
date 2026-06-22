@@ -506,7 +506,13 @@ export function MinRoleTable({
                 <TableHead>{t(locale, "colMedian")}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t(locale, "colP75")}</TableHead>
                 <TableHead>{t(locale, "colEssentialSavings")}</TableHead>
-                <TableHead className="hidden lg:table-cell">{t(locale, "colNonSalaryCompInfo")}</TableHead>
+                {/* Narrow + wrap this verbose info header (overrides TableHead's default
+                    whitespace-nowrap) so the long "Non-salary comp (info, annual, RSU/equity)"
+                    label folds to ~2 lines instead of stretching the column. The body values are
+                    short ("15,000 USD"), so a narrow column is fine. */}
+                <TableHead className="hidden w-48 whitespace-normal lg:table-cell">
+                  {t(locale, "colNonSalaryCompInfo")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
