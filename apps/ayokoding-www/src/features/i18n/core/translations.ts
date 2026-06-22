@@ -63,6 +63,18 @@ const translations: Record<Locale, Record<string, string>> = {
     clearRegion: "Clear",
     regionAutoAdvisory: "Region updated automatically to match the selected country.",
 
+    // Calculator — region display names (UWT-004). The serialized region KEY stays English
+    // (URL stability); only these display labels are localized. MENA/Nordics are expanded.
+    regionAsean: "ASEAN",
+    regionJapan: "Japan",
+    regionEurope: "Europe",
+    regionNordics: "Nordics (Northern Europe)",
+    regionAmericas: "Americas",
+    regionMena: "MENA (Middle East & North Africa)",
+    regionAsia: "Asia",
+    regionOceania: "Oceania",
+    regionAfrica: "Africa",
+
     // Calculator — controls
     labelAdults: "Adults",
     labelPreschoolKids: "Preschool children",
@@ -74,6 +86,7 @@ const translations: Record<Locale, Record<string, string>> = {
     foreignerPublicSchoolNote:
       "Public school isn't open to foreign residents in every country; where it isn't (e.g. UAE, Singapore), the private-school cost is used instead.",
     publicSchoolForeignerFlag: "public n/a → private",
+    publicSchoolForeignerFlagBadge: "Private — public not open to foreigners",
     labelArea: "Area",
     optCenter: "City center",
     optRural: "Rural",
@@ -95,6 +108,8 @@ const translations: Record<Locale, Record<string, string>> = {
     colEssentials: "Essentials",
     colTotal: "Total",
     previewMonthlyEstimate: "estimated monthly essentials",
+    // UWT-006: labels the pre-populated min-role preview panel as illustrative.
+    previewExampleLabel: "Example",
     colRelocationSunk: "Relocation (sunk)",
     colLiquidityReserve: "Liquidity reserve",
     tooltipRelocationSunk:
@@ -140,7 +155,7 @@ const translations: Record<Locale, Record<string, string>> = {
     subNationalIndicator: "(fed+state)",
 
     // Calculator — min-role table
-    labelBaselineSource: "Baseline source",
+    labelBaselineSource: "How to set your target",
     optSavingsTarget: "Monthly savings target",
     optReferenceRole: "Match a role",
     optMySalary: "My salary",
@@ -171,8 +186,17 @@ const translations: Record<Locale, Record<string, string>> = {
     colMedian: "Median",
     colP75: "P75",
     colEssentialSavings: "Essential savings",
-    colNonSalaryCompInfo: "Non-salary comp (info, annual, RSU/equity)",
+    colNonSalaryCompInfo: "Non-salary comp",
     minimumMarker: "← min",
+    // UWT-010: percentile gloss tooltips for the salary-distribution headers.
+    tooltipP25: "25th-percentile monthly salary — a quarter of people in this role earn less.",
+    tooltipMedian: "Median (50th-percentile) monthly salary for this role.",
+    tooltipP75: "75th-percentile monthly salary — a quarter of people in this role earn more.",
+    // UWT-013: expanded Track labels (the table renders these instead of bare "ic"/"mgmt").
+    trackIc: "Individual contributor",
+    trackMgmt: "Management",
+    // UWT-003: gloss for the shortened "Non-salary comp" header.
+    tooltipNonSalaryComp: "RSU/equity + bonus — annual total, informational only, not used in savings math.",
 
     // IA navigation revamp — landing homepage + global nav
     heroHeading: "Learn to build software, the clear way.",
@@ -262,6 +286,18 @@ const translations: Record<Locale, Record<string, string>> = {
     clearRegion: "Hapus",
     regionAutoAdvisory: "Wilayah diperbarui otomatis agar sesuai dengan negara yang dipilih.",
 
+    // Calculator — region display names (UWT-004). The serialized region KEY stays English
+    // (URL stability); only these display labels are localized. MENA/Nordics are expanded.
+    regionAsean: "ASEAN",
+    regionJapan: "Jepang",
+    regionEurope: "Eropa",
+    regionNordics: "Nordik (Eropa Utara)",
+    regionAmericas: "Amerika",
+    regionMena: "Timur Tengah & Afrika Utara",
+    regionAsia: "Asia",
+    regionOceania: "Oseania",
+    regionAfrica: "Afrika",
+
     // Calculator — controls
     labelAdults: "Dewasa",
     labelPreschoolKids: "Anak prasekolah",
@@ -273,6 +309,7 @@ const translations: Record<Locale, Record<string, string>> = {
     foreignerPublicSchoolNote:
       "Sekolah negeri nggak terbuka buat warga asing di semua negara; di tempat yang nggak (mis. UEA, Singapura), biaya sekolah swasta yang dipakai.",
     publicSchoolForeignerFlag: "negeri n/a → swasta",
+    publicSchoolForeignerFlagBadge: "Swasta — negeri tak terbuka untuk WNA",
     labelArea: "Wilayah",
     optCenter: "Pusat kota",
     optRural: "Pedesaan",
@@ -294,6 +331,8 @@ const translations: Record<Locale, Record<string, string>> = {
     colEssentials: "Kebutuhan pokok",
     colTotal: "Total",
     previewMonthlyEstimate: "perkiraan kebutuhan pokok bulanan",
+    // UWT-006: labels the pre-populated min-role preview panel as illustrative.
+    previewExampleLabel: "Contoh",
     colRelocationSunk: "Relokasi (biaya hangus)",
     colLiquidityReserve: "Cadangan likuiditas",
     tooltipRelocationSunk:
@@ -342,7 +381,7 @@ const translations: Record<Locale, Record<string, string>> = {
     subNationalIndicator: "(federal+negara bagian)",
 
     // Calculator — min-role table
-    labelBaselineSource: "Sumber baseline",
+    labelBaselineSource: "Cara menetapkan target",
     optSavingsTarget: "Target tabungan bulanan",
     optReferenceRole: "Samakan jabatan",
     optMySalary: "Gaji saya",
@@ -375,8 +414,18 @@ const translations: Record<Locale, Record<string, string>> = {
     colMedian: "Median",
     colP75: "P75",
     colEssentialSavings: "Tabungan kebutuhan pokok",
-    colNonSalaryCompInfo: "Kompensasi non-gaji (info, tahunan, RSU/ekuitas)",
+    colNonSalaryCompInfo: "Kompensasi non-gaji",
     minimumMarker: "← min",
+    // UWT-010: percentile gloss tooltips for the salary-distribution headers.
+    tooltipP25: "Gaji bulanan persentil ke-25 — seperempat orang di jabatan ini berpenghasilan lebih rendah.",
+    tooltipMedian: "Gaji bulanan median (persentil ke-50) untuk jabatan ini.",
+    tooltipP75: "Gaji bulanan persentil ke-75 — seperempat orang di jabatan ini berpenghasilan lebih tinggi.",
+    // UWT-013: expanded Track labels (the table renders these instead of bare "ic"/"mgmt").
+    trackIc: "Kontributor individu",
+    trackMgmt: "Manajemen",
+    // UWT-003: gloss for the shortened "Non-salary comp" header.
+    tooltipNonSalaryComp:
+      "RSU/ekuitas + bonus — total tahunan, hanya informasi, tidak digunakan dalam perhitungan tabungan.",
 
     // IA navigation revamp — landing homepage + global nav
     heroHeading: "Belajar membangun perangkat lunak, dengan cara yang jelas.",

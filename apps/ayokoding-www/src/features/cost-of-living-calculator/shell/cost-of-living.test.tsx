@@ -223,6 +223,19 @@ describe("CostOfLivingTable", () => {
     expect(oopAbbr).toBeDefined();
   });
 
+  // EWT-004 / UWT-014: the OOP abbr title must be localized — in id it must NOT be the
+  // hardcoded English "out-of-pocket".
+  it("EWT-004: the OOP abbr title is localized in the id locale (not 'out-of-pocket')", () => {
+    const { container } = render(<CostOfLivingTable {...defaultProps} locale="id" />);
+    const abbrElements = Array.from(container.querySelectorAll("abbr"));
+    const oopAbbrs = abbrElements.filter((el) => el.textContent?.trim() === "OOP");
+    expect(oopAbbrs.length).toBeGreaterThan(0);
+    for (const abbr of oopAbbrs) {
+      expect(abbr.getAttribute("title")).not.toBe("out-of-pocket");
+      expect(abbr.getAttribute("title")).toBe("bayar sendiri");
+    }
+  });
+
   // UWT-012 (test-fixing): EVERY rendered "OOP" acronym must be inside an
   // <abbr title="out-of-pocket"> — audits all occurrences incl. the mobile card label.
   it("UWT-012: every rendered 'OOP' acronym is inside an abbr title='out-of-pocket'", () => {
@@ -265,6 +278,21 @@ describe("CostOfLivingTable", () => {
       if (text === "—") continue;
       // Must NOT be all-caps (i.e., text !== text.toUpperCase())
       expect(text).not.toBe(text.toUpperCase());
+    }
+  });
+
+  // UWT-012: the healthcare scheme badge must render in sentence-case visually — the
+  // design-system Badge defaults to `uppercase`, so each scheme badge must opt out via
+  // `normal-case` so a long label ("mandatory payroll insurance") does not read ALL-CAPS
+  // while shorter ones look lower-case.
+  it("UWT-012: every healthcare scheme badge opts out of uppercase (normal-case)", () => {
+    render(<CostOfLivingTable {...defaultProps} />);
+    const badges = screen.getAllByTestId("healthcare-badge");
+    expect(badges.length).toBeGreaterThan(0);
+    for (const badge of badges) {
+      if (badge.textContent?.trim() === "—") continue;
+      expect(badge.className).toContain("normal-case");
+      expect(badge.className).not.toContain("uppercase");
     }
   });
 
@@ -350,6 +378,41 @@ describe("CostOfLivingTable", () => {
       const countryLinks = Array.from(cards.querySelectorAll('a[href*="country="]'));
       const countryTexts = countryLinks.map((l) => l.textContent ?? "");
       expect(countryTexts.some((t) => t === "Singapura")).toBe(true);
+    });
+  });
+
+  // Cluster 3 (UWT-002 / DWT-006): the foreigner private-fallback flag reads as a warning-tone
+  // Badge with plain-language wording, NOT a muted caption with cryptic "public n/a → private".
+  describe("Cluster 3 — foreigner public-school flag (table)", () => {
+    // Singapore (country sg, access "limited") with public school + 1 school-age child triggers
+    // the private-fallback flag.
+    const fallbackProps = {
+      ...defaultProps,
+      household: { adults: 1 as const, preschoolKids: 0 as const, schoolKids: 1 as const },
+      schoolType: "public" as const,
+    };
+
+    it("renders the flag with plain-language wording (en), not the cryptic arrow", () => {
+      render(<CostOfLivingTable {...fallbackProps} />);
+      const flag = screen.getByTestId("school-foreigner-flag-singapore");
+      expect(flag.textContent).toContain("Private — public not open to foreigners");
+      expect(flag.textContent).not.toContain("→");
+    });
+
+    it("renders the flag with plain-language wording (id)", () => {
+      render(<CostOfLivingTable {...fallbackProps} locale="id" />);
+      const flag = screen.getByTestId("school-foreigner-flag-singapore");
+      expect(flag.textContent).toContain("Swasta — negeri tak terbuka untuk WNA");
+    });
+
+    it("flag is a warning-tone Badge (not a text-muted-foreground caption)", () => {
+      render(<CostOfLivingTable {...fallbackProps} />);
+      const flag = screen.getByTestId("school-foreigner-flag-singapore");
+      // The Badge primitive carries data-slot="badge" and a hue style.
+      expect(flag.getAttribute("data-slot")).toBe("badge");
+      expect(flag.className).not.toContain("text-muted-foreground");
+      // Warning hue applied via the --hue-color custom property.
+      expect(flag.getAttribute("style") ?? "").toContain("--hue");
     });
   });
 

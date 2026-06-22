@@ -8,6 +8,7 @@ import { fmtNum } from "../core/format";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 import { cn } from "@/lib/utils";
+import { SelectField } from "./geo-filters";
 
 /** Accessible 2+-option segmented control (radiogroup) matching the hi-fi mockups. */
 export function SegmentedControl<T extends string>({
@@ -16,12 +17,17 @@ export function SegmentedControl<T extends string>({
   options,
   onChange,
   disabled = false,
+  describedById,
 }: {
   label: string;
   value: T;
   options: Array<{ value: T; label: string }>;
   onChange: (v: T) => void;
   disabled?: boolean;
+  /** When the control is disabled, each option is associated with this hint element id via
+      aria-describedby (and the options expose aria-disabled) so assistive tech announces why
+      the control cannot be used. */
+  describedById?: string;
 }) {
   return (
     <div
@@ -32,7 +38,10 @@ export function SegmentedControl<T extends string>({
         // min-h-[44px] + items-center keeps the control the same height as the sibling 44px
         // inputs/selects so it bottom-aligns cleanly in `items-end` field rows (and meets the
         // WCAG 44px touch target), instead of sitting low because it was shorter.
-        "inline-flex min-h-[44px] items-center rounded-lg border border-border bg-muted p-[3px]",
+        // flex-wrap lets a 3+-option control (e.g. baseline source) flow to a second row at
+        // narrow widths while each option keeps its own 44px height (DWT-004), instead of the
+        // box ballooning to fit a single overflowing row.
+        "inline-flex min-h-[44px] flex-wrap items-center gap-y-[3px] rounded-lg border border-border bg-muted p-[3px]",
         disabled && "opacity-50",
       )}
     >
@@ -46,10 +55,17 @@ export function SegmentedControl<T extends string>({
             aria-checked={selected}
             aria-label={opt.label}
             disabled={disabled}
+            aria-disabled={disabled || undefined}
+            aria-describedby={disabled ? describedById : undefined}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "rounded-md px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-              selected ? "bg-primary text-primary-foreground shadow-sm" : "text-foreground/60 hover:text-foreground",
+              // Each option carries its own 44px touch target (EWT-002) and centres its label.
+              "inline-flex min-h-[44px] items-center justify-center rounded-md px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+              selected
+                ? // Active option: brand fill PLUS a non-colour ring indicator (UWT-008) so the
+                  // selection is perceivable without relying on colour alone.
+                  "bg-primary text-primary-foreground shadow-sm ring-1 ring-primary-foreground/60 ring-inset"
+                : "text-foreground/60 hover:text-foreground",
               disabled && "cursor-not-allowed",
             )}
           >
@@ -110,19 +126,21 @@ export function Controls({
 
   return (
     <div className="space-y-2">
-      {/* Household selectors */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 [&_label]:text-sm [&_label]:font-medium [&_select]:rounded-md [&_select]:border [&_select]:border-border [&_select]:bg-background [&_select]:px-2 [&_select]:py-1 [&_select]:text-sm">
+      {/* Household selectors — all wrapped in the shared SelectField chrome (appearance-none +
+          custom chevron) so they match the geo selects (DWT-002). Each select is sized to fit
+          its short numeric options. */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 [&_label]:text-sm [&_label]:font-medium">
         <div className="flex items-center gap-1">
           <label htmlFor="controls-adults">{t(locale, "labelAdults")}</label>
-          <select
+          <SelectField
             id="controls-adults"
-            aria-label={t(locale, "labelAdults")}
-            value={household.adults}
-            className="min-h-[44px]"
-            onChange={(e) =>
+            ariaLabel={t(locale, "labelAdults")}
+            value={String(household.adults)}
+            className="w-20"
+            onChange={(v) =>
               onHouseholdChange({
                 ...household,
-                adults: parseInt(e.target.value, 10) as 1 | 2,
+                adults: parseInt(v, 10) as 1 | 2,
               })
             }
           >
@@ -131,20 +149,20 @@ export function Controls({
                 {n}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
 
         <div className="flex items-center gap-1">
           <label htmlFor="controls-preschool">{t(locale, "labelPreschoolKids")}</label>
-          <select
+          <SelectField
             id="controls-preschool"
-            aria-label={t(locale, "labelPreschoolKids")}
-            value={household.preschoolKids}
-            className="min-h-[44px]"
-            onChange={(e) =>
+            ariaLabel={t(locale, "labelPreschoolKids")}
+            value={String(household.preschoolKids)}
+            className="w-20"
+            onChange={(v) =>
               onHouseholdChange({
                 ...household,
-                preschoolKids: parseInt(e.target.value, 10) as 0 | 1 | 2 | 3,
+                preschoolKids: parseInt(v, 10) as 0 | 1 | 2 | 3,
               })
             }
           >
@@ -153,20 +171,20 @@ export function Controls({
                 {n}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
 
         <div className="flex items-center gap-1">
           <label htmlFor="controls-schoolkids">{t(locale, "labelSchoolKids")}</label>
-          <select
+          <SelectField
             id="controls-schoolkids"
-            aria-label={t(locale, "labelSchoolKids")}
-            value={household.schoolKids}
-            className="min-h-[44px]"
-            onChange={(e) =>
+            ariaLabel={t(locale, "labelSchoolKids")}
+            value={String(household.schoolKids)}
+            className="w-20"
+            onChange={(v) =>
               onHouseholdChange({
                 ...household,
-                schoolKids: parseInt(e.target.value, 10) as 0 | 1 | 2 | 3,
+                schoolKids: parseInt(v, 10) as 0 | 1 | 2 | 3,
               })
             }
           >
@@ -175,7 +193,7 @@ export function Controls({
                 {n}
               </option>
             ))}
-          </select>
+          </SelectField>
         </div>
       </div>
 
@@ -189,13 +207,16 @@ export function Controls({
           value={schoolType}
           onChange={onSchoolTypeChange}
           disabled={household.schoolKids === 0}
+          describedById="school-type-hint"
           options={[
             { value: "public", label: t(locale, "optPublic") },
             { value: "private", label: t(locale, "optPrivate") },
           ]}
         />
         {household.schoolKids === 0 && (
-          <span className="text-xs text-muted-foreground">{t(locale, "schoolTypeHint")}</span>
+          <span id="school-type-hint" className="text-xs text-muted-foreground">
+            {t(locale, "schoolTypeHint")}
+          </span>
         )}
         {/* When "public" is selected and the household has school-age children, explain that
             public schooling is not open to foreign residents everywhere — where it isn't, the
@@ -227,6 +248,11 @@ export function Controls({
           already surface these figures in their own tables. */}
       {showPreview && (
         <div className="space-y-1">
+          {/* UWT-006 (USS-002): explicitly label the pre-populated preview as an example so the
+              illustrative city figures are not mistaken for the user's actual target. */}
+          <p data-testid="min-role-example-caption" className="text-xs font-semibold text-foreground/70">
+            {t(locale, "previewExampleLabel")} ({city.name[locale] ?? city.name.en})
+          </p>
           <p className="text-xs font-medium text-muted-foreground">
             {city.name[locale] ?? city.name.en} — {t(locale, "previewMonthlyEstimate")}
           </p>
@@ -249,7 +275,7 @@ export function Controls({
             </span>
             <span data-testid="preview-healthcare" data-local={String(healthcare)}>
               <span className="text-xs text-muted-foreground">
-                {t(locale, "colHealthcareOOPPrefix")} (<abbr title="out-of-pocket">OOP</abbr>)
+                {t(locale, "colHealthcareOOPPrefix")} (<abbr title={t(locale, "healthcareOutOfPocket")}>OOP</abbr>)
               </span>
               {city.currency} {fmtNum(healthcare)}
             </span>

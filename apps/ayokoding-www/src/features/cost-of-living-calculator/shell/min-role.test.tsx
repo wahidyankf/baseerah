@@ -412,7 +412,8 @@ describe("MinRoleTable", () => {
   // Phase 5: design-system primitives
   it("Phase5: baseline source selector uses a segmented control (role='radiogroup')", () => {
     render(<MinRoleTable {...defaultProps} />);
-    const radiogroup = screen.getByRole("radiogroup", { name: /baseline source/i });
+    // UWT-001: the baseline-source group's accessible name is now the scent-bearing relabel.
+    const radiogroup = screen.getByRole("radiogroup", { name: /how to set your target/i });
     expect(radiogroup).toBeTruthy();
   });
 
@@ -492,6 +493,168 @@ describe("MinRoleTable", () => {
       } finally {
         vi.useRealTimers();
       }
+    });
+  });
+
+  // DWT-003: the min-role currency/ref selects must use the shared SelectField chrome
+  // (appearance-none + custom chevron) so they match the geo selects.
+  describe("DWT-003 — min-role selects use the shared SelectField chrome", () => {
+    function assertStyledSelect(id: string) {
+      const select = document.querySelector(`#${id}`) as HTMLSelectElement | null;
+      expect(select, `select #${id} should exist`).not.toBeNull();
+      expect(select!.classList.contains("appearance-none")).toBe(true);
+      // SelectField wraps the <select> in a `relative` div that also renders the chevron svg.
+      expect(select!.parentElement!.querySelector("svg")).not.toBeNull();
+    }
+
+    it("savings-target currency + display-currency selects are styled", () => {
+      render(
+        <MinRoleTable
+          {...defaultProps}
+          inputs={{ ...DEFAULT_STATE.minRole, baselineSource: "savings_target" }}
+          onInputsChange={() => {}}
+        />,
+      );
+      assertStyledSelect("target-currency-select");
+      assertStyledSelect("display-currency-select");
+    });
+
+    it("reference-role city + role selects are styled", () => {
+      render(
+        <MinRoleTable
+          {...defaultProps}
+          inputs={{ ...DEFAULT_STATE.minRole, baselineSource: "reference_role" }}
+          onInputsChange={() => {}}
+        />,
+      );
+      assertStyledSelect("ref-city-select");
+      assertStyledSelect("ref-role-select");
+    });
+
+    it("my-salary city select is styled", () => {
+      render(
+        <MinRoleTable
+          {...defaultProps}
+          inputs={{ ...DEFAULT_STATE.minRole, baselineSource: "my_salary" }}
+          onInputsChange={() => {}}
+        />,
+      );
+      assertStyledSelect("my-city-select");
+    });
+  });
+
+  // DWT-004: the 3-option baseline-source segmented control must keep each option at 44px and
+  // wrap to a second row at narrow widths instead of ballooning the box height.
+  it("DWT-004: baseline-source control flex-wraps and each option keeps min-h-[44px]", () => {
+    const { container } = render(
+      <MinRoleTable
+        {...defaultProps}
+        inputs={{ ...DEFAULT_STATE.minRole, baselineSource: "savings_target" }}
+        onInputsChange={() => {}}
+      />,
+    );
+    const group = Array.from(container.querySelectorAll("[role='radiogroup']")).find(
+      (g) =>
+        g.getAttribute("aria-label")?.match(/baseline|target/i) &&
+        within(g as HTMLElement).queryAllByRole("radio").length === 3,
+    );
+    expect(group).toBeDefined();
+    expect((group as HTMLElement).classList.contains("flex-wrap")).toBe(true);
+    for (const opt of within(group as HTMLElement).getAllByRole("radio")) {
+      expect(opt.classList.contains("min-h-[44px]")).toBe(true);
+    }
+  });
+
+  // DWT-007: on the my_salary baseline (non-USD city), the salary-currency toggle's field
+  // group must be a direct items-end flex child of the field row, and its label is a <label>
+  // so the column height is deterministic and the toggle bottom-aligns with the gross input.
+  it("DWT-007: salary-currency toggle field group is an items-end flex child with a <label>", () => {
+    const { container } = render(
+      <MinRoleTable
+        {...defaultProps}
+        inputs={{ ...DEFAULT_STATE.minRole, baselineSource: "my_salary" }}
+        onInputsChange={() => {}}
+      />,
+    );
+    // The toggle (a 2-option radiogroup of local/USD) lives in the my_salary field row.
+    const toggle = Array.from(container.querySelectorAll("[role='radiogroup']")).find((g) =>
+      g.getAttribute("aria-label")?.match(/salary currency/i),
+    );
+    expect(toggle).toBeDefined();
+    const fieldGroup = (toggle as HTMLElement).parentElement!;
+    // Its parent field row must be an items-end flex container so the columns bottom-align.
+    const fieldRow = fieldGroup.parentElement!;
+    expect(fieldRow.classList.contains("items-end")).toBe(true);
+    expect(fieldRow.classList.contains("flex")).toBe(true);
+    // The field group's caption must be a <label> (deterministic column height), not a bare span.
+    const caption = fieldGroup.querySelector("label");
+    expect(caption).not.toBeNull();
+    expect(caption!.textContent).toMatch(/salary currency/i);
+  });
+
+  // ─── Cluster 4 — jargon glosses & i18n labels ───────────────────────────────
+  describe("Cluster 4 — jargon glosses & i18n labels", () => {
+    // Reveal the role ladder table by engaging a savings target.
+    async function withTarget(locale?: "en" | "id") {
+      const user = userEvent.setup();
+      render(<MinRoleTable {...defaultProps} locale={locale} />);
+      await user.click(screen.getAllByRole("radio", { name: /monthly savings target|target tabungan bulanan/i })[0]!);
+      const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target|target tabungan bulanan/i });
+      await user.clear(targetInput);
+      await user.type(targetInput, "8000");
+      return user;
+    }
+
+    // UWT-001: "Baseline source" relabelled to a scent-bearing label in both locales.
+    it("UWT-001: baseline-source label reads 'How to set your target' (en)", () => {
+      render(<MinRoleTable {...defaultProps} />);
+      expect(screen.getAllByText("How to set your target").length).toBeGreaterThan(0);
+      expect(screen.queryByText("Baseline source")).toBeNull();
+    });
+
+    it("UWT-001: baseline-source label reads 'Cara menetapkan target' (id)", () => {
+      render(<MinRoleTable {...defaultProps} locale="id" />);
+      expect(screen.getAllByText("Cara menetapkan target").length).toBeGreaterThan(0);
+      expect(screen.queryByText("Sumber baseline")).toBeNull();
+    });
+
+    // UWT-010: P25 / Median / P75 headers carry percentile glosses (title attribute).
+    it("UWT-010: P25/Median/P75 distribution headers carry title glosses", async () => {
+      await withTarget();
+      const headers = screen.getAllByRole("columnheader");
+      for (const re of [/^P25/i, /^Median/i, /^P75/i]) {
+        const header = headers.find((h) => re.test(h.textContent?.trim() ?? ""));
+        expect(header, `header ${re} present`).toBeDefined();
+        const hasTitle = header!.hasAttribute("title") || header!.querySelector("[title]") !== null;
+        expect(hasTitle, `header ${re} has title gloss`).toBe(true);
+      }
+    });
+
+    // UWT-013: the Track column expands ic/mgmt to full localized words (no bare "ic"/"mgmt").
+    it("UWT-013: Track column shows full words, not bare ic/mgmt (en)", async () => {
+      await withTarget();
+      const trackCells = screen.getAllByRole("cell").filter((c) => {
+        const t = c.textContent?.trim() ?? "";
+        return t === "ic" || t === "mgmt";
+      });
+      expect(trackCells.length).toBe(0);
+      expect(screen.getAllByText(/Individual contributor|Management/).length).toBeGreaterThan(0);
+    });
+
+    it("UWT-013: Track column is localized in id", async () => {
+      await withTarget("id");
+      expect(screen.getAllByText(/Kontributor individu|Manajemen/).length).toBeGreaterThan(0);
+    });
+
+    // UWT-003: Non-salary comp header shortened + carries a title expansion.
+    it("UWT-003: Non-salary comp header is shortened and carries a title gloss", async () => {
+      await withTarget();
+      const headers = screen.getAllByRole("columnheader");
+      const nsc = headers.find((h) => /non-salary comp/i.test(h.textContent?.trim() ?? ""));
+      expect(nsc).toBeDefined();
+      expect(nsc!.textContent?.trim()).toBe("Non-salary comp");
+      const hasTitle = nsc!.hasAttribute("title") || nsc!.querySelector("[title]") !== null;
+      expect(hasTitle).toBe(true);
     });
   });
 });

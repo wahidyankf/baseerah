@@ -44,6 +44,51 @@ function ControlsWithState(
 }
 
 describe("Controls", () => {
+  // UWT-006 (USS-002): the min-role preview panel is labelled as an example so the
+  // pre-populated city figures are not mistaken for the user's actual target.
+  it("UWT-006: preview panel carries an example caption naming the city (en)", () => {
+    render(<ControlsWithState previewCityId="singapore" />);
+    const caption = screen.getByTestId("min-role-example-caption");
+    expect(caption.textContent).toMatch(/example/i);
+    expect(caption.textContent).toContain("Singapore");
+  });
+
+  it("UWT-006: example caption is localized in id", () => {
+    render(
+      <Controls
+        dataset={dataset}
+        previewCityId="singapore"
+        household={{ adults: 1, preschoolKids: 0, schoolKids: 0 }}
+        schoolType="public"
+        area="center"
+        locale="id"
+        onHouseholdChange={() => {}}
+        onSchoolTypeChange={() => {}}
+        onAreaChange={() => {}}
+      />,
+    );
+    const caption = screen.getByTestId("min-role-example-caption");
+    expect(caption.textContent).toMatch(/contoh/i);
+    expect(caption.textContent).toContain("Singapura");
+  });
+
+  it("UWT-006: no example caption when the preview is hidden", () => {
+    render(
+      <Controls
+        dataset={dataset}
+        previewCityId="singapore"
+        household={{ adults: 1, preschoolKids: 0, schoolKids: 0 }}
+        schoolType="public"
+        area="center"
+        showPreview={false}
+        onHouseholdChange={() => {}}
+        onSchoolTypeChange={() => {}}
+        onAreaChange={() => {}}
+      />,
+    );
+    expect(screen.queryByTestId("min-role-example-caption")).toBeNull();
+  });
+
   // UWT-010: Area label must not wrap (Indonesian locale has longer text)
   it("UWT-010: the Area label element has whitespace-nowrap class", () => {
     const { container } = render(<ControlsWithState />);
@@ -82,6 +127,76 @@ describe("Controls", () => {
 
     for (const group of Array.from(groups)) {
       expect(group.classList.contains("min-h-[44px]")).toBe(true);
+    }
+  });
+
+  // EWT-002: every segmented-radio button (and not just the radiogroup container) must meet
+  // the 44px WCAG 2.5.8 touch target at mobile widths.
+  it("EWT-002: every segmented-radio button has the min-h-[44px] touch-target class", () => {
+    const { container } = render(<ControlsWithState schoolKids={2} />);
+    const radios = container.querySelectorAll("[role='radio']");
+    expect(radios.length).toBeGreaterThan(0);
+    for (const radio of Array.from(radios)) {
+      expect(radio.classList.contains("min-h-[44px]")).toBe(true);
+    }
+  });
+
+  // UWT-008: the Area segmented control (a radiogroup) must expose aria-checked reflecting the
+  // selected option — active state is otherwise signalled only by colour.
+  it("UWT-008: Area options expose aria-checked reflecting the selected option", () => {
+    const { container } = render(<ControlsWithState area="center" />);
+    const areaGroup = Array.from(container.querySelectorAll("[role='radiogroup']")).find((g) =>
+      g.getAttribute("aria-label")?.match(/area/i),
+    );
+    expect(areaGroup).toBeDefined();
+    const center = within(areaGroup as HTMLElement).getByRole("radio", { name: /city center/i });
+    const rural = within(areaGroup as HTMLElement).getByRole("radio", { name: /rural/i });
+    expect(center.getAttribute("aria-checked")).toBe("true");
+    expect(rural.getAttribute("aria-checked")).toBe("false");
+  });
+
+  // UWT-008: the active segmented option must carry a non-colour active indicator (not colour
+  // alone) so colour-blind users can perceive selection.
+  it("UWT-008: the active segmented option carries a non-colour active indicator class", () => {
+    const { container } = render(<ControlsWithState area="center" />);
+    const areaGroup = Array.from(container.querySelectorAll("[role='radiogroup']")).find((g) =>
+      g.getAttribute("aria-label")?.match(/area/i),
+    );
+    const center = within(areaGroup as HTMLElement).getByRole("radio", { name: /city center/i });
+    const rural = within(areaGroup as HTMLElement).getByRole("radio", { name: /rural/i });
+    // The active option carries a non-colour ring indicator that the inactive option lacks
+    // (a ring-1 ring-primary-foreground inset, not a focus-only ring). Assert the checked
+    // option has a ring-N utility the unchecked option does not.
+    const activeRing = (cls: string) => (cls.match(/(?:^|\s)ring-\d/g) ?? []).length;
+    expect(activeRing(center.className)).toBeGreaterThan(activeRing(rural.className));
+  });
+
+  // UWT-011: the disabled school-type buttons must announce the prerequisite via
+  // aria-describedby → the hint element, and expose aria-disabled.
+  it("UWT-011: disabled school-type buttons reference the hint via aria-describedby and are aria-disabled", () => {
+    render(<ControlsWithState schoolKids={0} />);
+    const hint = screen.getByText(/add school-age children to choose/i);
+    expect(hint.id).toBe("school-type-hint");
+
+    const group = screen.getByRole("radiogroup", { name: /school type/i });
+    const buttons = within(group).getAllByRole("radio");
+    for (const button of buttons) {
+      expect(button.getAttribute("aria-describedby")).toBe("school-type-hint");
+      expect(button.getAttribute("aria-disabled")).toBe("true");
+    }
+  });
+
+  // DWT-002: the household selects must use the shared SelectField chrome (appearance-none +
+  // custom chevron overlay) so they match the geo selects instead of showing the native arrow.
+  it("DWT-002: household selects use appearance-none chrome with a custom chevron overlay", () => {
+    const { container } = render(<ControlsWithState />);
+    const selects = container.querySelectorAll("select");
+    expect(selects.length).toBe(3);
+    for (const select of Array.from(selects)) {
+      expect(select.classList.contains("appearance-none")).toBe(true);
+      // SelectField wraps the <select> in a `relative` container that also holds the chevron svg.
+      const wrapper = select.parentElement!;
+      expect(wrapper.querySelector("svg")).not.toBeNull();
     }
   });
 

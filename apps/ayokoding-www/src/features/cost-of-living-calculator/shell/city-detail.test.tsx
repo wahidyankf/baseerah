@@ -107,6 +107,47 @@ describe("CityDetail", () => {
     expect(backLink.getAttribute("href")).toBe("?tab=cost");
   });
 
+  // Cluster 3 (EWT-003 / UWT-002 / DWT-006): the city-detail school row must render the same
+  // warning-tone foreigner flag (with the shared testid) as the cost-of-living table.
+  describe("Cluster 3 — foreigner public-school flag (city-detail)", () => {
+    // Singapore (country sg, access "limited") with public school + 1 school-age child triggers
+    // the private-fallback flag.
+    const fallbackProps = {
+      ...defaultProps,
+      cityId: "singapore",
+      household: { adults: 1 as const, preschoolKids: 0 as const, schoolKids: 1 as const },
+      schoolType: "public" as const,
+    };
+
+    it("EWT-003: renders the school-foreigner-flag-<cityId> testid for a non-open city", () => {
+      render(<CityDetail {...fallbackProps} />);
+      expect(screen.getByTestId("school-foreigner-flag-singapore")).toBeTruthy();
+    });
+
+    it("UWT-002: flag uses plain-language wording in both locales", () => {
+      const { rerender } = render(<CityDetail {...fallbackProps} />);
+      expect(screen.getByTestId("school-foreigner-flag-singapore").textContent).toContain(
+        "Private — public not open to foreigners",
+      );
+      rerender(<CityDetail {...fallbackProps} locale="id" />);
+      expect(screen.getByTestId("school-foreigner-flag-singapore").textContent).toContain(
+        "Swasta — negeri tak terbuka untuk WNA",
+      );
+    });
+
+    it("DWT-006: flag is a warning-tone Badge, not a muted caption", () => {
+      render(<CityDetail {...fallbackProps} />);
+      const flag = screen.getByTestId("school-foreigner-flag-singapore");
+      expect(flag.getAttribute("data-slot")).toBe("badge");
+      expect(flag.className).not.toContain("text-muted-foreground");
+    });
+
+    it("does NOT render the flag when school type is private or no school-age children", () => {
+      render(<CityDetail {...defaultProps} cityId="singapore" />);
+      expect(screen.queryByTestId("school-foreigner-flag-singapore")).toBeNull();
+    });
+  });
+
   // EWT-007: per-category rows in city-detail must scale for household size so
   // their sum equals the Essentials subtotal shown.
   it("EWT-007: for a 2-adult household, per-category row amounts sum to the essentials subtotal", () => {

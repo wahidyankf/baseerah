@@ -19,13 +19,20 @@ import { fx, fxToUsd } from "../core/data/fx";
 import { DEFAULT_STATE } from "../core/url-state";
 import type { MinRoleInputs, BaselineSource } from "../core/url-state";
 import { fmtCurrencyTrailing } from "../core/format";
-import { localeName } from "./geo-filters";
+import { localeName, SelectField } from "./geo-filters";
 import { SegmentedControl } from "./controls";
 import { useDebouncedField, URL_INPUT_DEBOUNCE_MS } from "./use-debounced-field";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 
 type EngRole = RoleMeta["role"];
+
+// UWT-013: expand the bare "ic"/"mgmt" track codes to full localized words.
+function trackLabel(track: string, locale: Locale): string {
+  if (track === "ic") return t(locale, "trackIc");
+  if (track === "mgmt") return t(locale, "trackMgmt");
+  return track;
+}
 
 type Props = {
   dataset: Dataset;
@@ -219,7 +226,7 @@ export function MinRoleTable({
             </span>
           )}
         </TableCell>
-        <TableCell className="hidden lg:table-cell">{entry.track}</TableCell>
+        <TableCell className="hidden lg:table-cell">{trackLabel(entry.track, locale)}</TableCell>
         <TableCell data-testid="best-city-cell">
           {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
           {(entry.confidence === "proxy" || entry.confidence === "moderate") && (
@@ -258,7 +265,7 @@ export function MinRoleTable({
             {rowLabel}
             {isMin && <span className="ml-1 text-xs font-bold">{t(locale, "minimumMarker")}</span>}
           </span>
-          <span className="text-xs text-primary-foreground/80">{entry.track}</span>
+          <span className="text-xs text-primary-foreground/80">{trackLabel(entry.track, locale)}</span>
         </div>
         <div className="space-y-1 p-3 text-sm">
           <div className="flex items-baseline justify-between">
@@ -338,19 +345,19 @@ export function MinRoleTable({
             <label htmlFor="target-currency-select" className={fieldLabel}>
               {t(locale, "labelTargetCurrency")}
             </label>
-            <select
+            <SelectField
               id="target-currency-select"
-              className={fieldControl}
-              aria-label={t(locale, "labelTargetCurrency")}
+              ariaLabel={t(locale, "labelTargetCurrency")}
               value={targetCurrency}
-              onChange={(e) => setTargetCurrency(e.target.value)}
+              className="w-28"
+              onChange={setTargetCurrency}
             >
               {DISPLAY_CURRENCIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
         </div>
       )}
@@ -362,37 +369,37 @@ export function MinRoleTable({
             <label htmlFor="ref-city-select" className={fieldLabel}>
               {t(locale, "labelRefCity")}
             </label>
-            <select
+            <SelectField
               id="ref-city-select"
-              className={fieldControl}
-              aria-label={t(locale, "labelRefCity")}
+              ariaLabel={t(locale, "labelRefCity")}
               value={refCityId}
-              onChange={(e) => setRefCityId(e.target.value)}
+              className="w-48"
+              onChange={setRefCityId}
             >
               {dataset.cities.map((c) => (
                 <option key={c.id} value={c.id}>
                   {localeName(c.name, locale)}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
           <div className={fieldGroup}>
             <label htmlFor="ref-role-select" className={fieldLabel}>
               {t(locale, "labelRefRole")}
             </label>
-            <select
+            <SelectField
               id="ref-role-select"
-              className={fieldControl}
-              aria-label={t(locale, "labelRefRole")}
+              ariaLabel={t(locale, "labelRefRole")}
               value={refRole}
-              onChange={(e) => setRefRole(e.target.value as EngRole)}
+              className="w-48"
+              onChange={(v) => setRefRole(v as EngRole)}
             >
               {matrix.ladder.map((r) => (
                 <option key={r.role} value={r.role}>
                   {r.label.en}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
         </div>
       )}
@@ -418,7 +425,12 @@ export function MinRoleTable({
               (which follows the selected city) or in USD. Hidden when the city is already USD. */}
           {mySalaryCityCurrency !== "USD" && (
             <div className={fieldGroup}>
-              <span className={fieldLabel}>{t(locale, "labelSalaryInputCurrency")}</span>
+              {/* A real <label> (not a bare span) gives the field column a deterministic height
+                  matching the sibling input/select columns, so the toggle bottom-aligns in the
+                  items-end field row (DWT-007). It labels the segmented group, which carries its
+                  own aria-label, so no htmlFor association is required. */}
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label className={fieldLabel}>{t(locale, "labelSalaryInputCurrency")}</label>
               <SegmentedControl<"local" | "usd">
                 label={t(locale, "labelSalaryInputCurrency")}
                 value={myGrossCurrency}
@@ -434,19 +446,19 @@ export function MinRoleTable({
             <label htmlFor="my-city-select" className={fieldLabel}>
               {t(locale, "labelMySalaryCity")}
             </label>
-            <select
+            <SelectField
               id="my-city-select"
-              className={fieldControl}
-              aria-label={t(locale, "labelMySalaryCity")}
+              ariaLabel={t(locale, "labelMySalaryCity")}
               value={mySalaryCityId}
-              onChange={(e) => setMySalaryCityId(e.target.value)}
+              className="w-48"
+              onChange={setMySalaryCityId}
             >
               {dataset.cities.map((c) => (
                 <option key={c.id} value={c.id}>
                   {localeName(c.name, locale)}
                 </option>
               ))}
-            </select>
+            </SelectField>
           </div>
         </div>
       )}
@@ -456,19 +468,19 @@ export function MinRoleTable({
         <label htmlFor="display-currency-select" className={fieldLabel}>
           {t(locale, "labelDisplayCurrency")}
         </label>
-        <select
+        <SelectField
           id="display-currency-select"
-          className={fieldControl}
-          aria-label={t(locale, "labelDisplayCurrency")}
+          ariaLabel={t(locale, "labelDisplayCurrency")}
           value={displayCurrency}
-          onChange={(e) => setDisplayCurrency(e.target.value)}
+          className="w-28"
+          onChange={setDisplayCurrency}
         >
           {DISPLAY_CURRENCIES.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
           ))}
-        </select>
+        </SelectField>
       </div>
 
       {/* Notes */}
@@ -502,15 +514,22 @@ export function MinRoleTable({
                 <TableHead>{t(locale, "colRole")}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t(locale, "colTrack")}</TableHead>
                 <TableHead>{t(locale, "colBestCity")}</TableHead>
-                <TableHead className="hidden lg:table-cell">{t(locale, "colP25")}</TableHead>
-                <TableHead>{t(locale, "colMedian")}</TableHead>
-                <TableHead className="hidden lg:table-cell">{t(locale, "colP75")}</TableHead>
+                <TableHead className="hidden lg:table-cell" title={t(locale, "tooltipP25")}>
+                  {t(locale, "colP25")}
+                </TableHead>
+                <TableHead title={t(locale, "tooltipMedian")}>{t(locale, "colMedian")}</TableHead>
+                <TableHead className="hidden lg:table-cell" title={t(locale, "tooltipP75")}>
+                  {t(locale, "colP75")}
+                </TableHead>
                 <TableHead>{t(locale, "colEssentialSavings")}</TableHead>
                 {/* Narrow + wrap this verbose info header (overrides TableHead's default
                     whitespace-nowrap) so the long "Non-salary comp (info, annual, RSU/equity)"
                     label folds to ~2 lines instead of stretching the column. The body values are
                     short ("15,000 USD"), so a narrow column is fine. */}
-                <TableHead className="hidden w-48 whitespace-normal lg:table-cell">
+                <TableHead
+                  className="hidden w-48 whitespace-normal lg:table-cell"
+                  title={t(locale, "tooltipNonSalaryComp")}
+                >
                   {t(locale, "colNonSalaryCompInfo")}
                 </TableHead>
               </TableRow>

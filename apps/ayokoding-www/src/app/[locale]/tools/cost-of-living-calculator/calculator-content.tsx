@@ -16,7 +16,7 @@ import { Controls } from "@/features/cost-of-living-calculator/shell/controls";
 import { CalculatorBreadcrumb } from "@/features/cost-of-living-calculator/shell/calculator-breadcrumb";
 import { useLocale } from "@/features/i18n/shell/use-locale";
 import { t } from "@/features/i18n/core/translations";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@open-sharia-enterprise/web-ui";
+import { Tabs, TabsList, TabsTrigger, TabsContent, cn } from "@open-sharia-enterprise/web-ui";
 import {
   decodeState,
   encodeState,
@@ -151,6 +151,18 @@ export function CostOfLivingCalculatorContent() {
     pushState({ ...currentState, area: a });
   }
 
+  // Tab-description className built via `cn()` so the active/inactive `hidden` toggle is a
+  // distinct class token. Building it as a raw template literal previously fused
+  // `text-muted-foreground` with `hidden` into the dead class `text-muted-foregroundhidden`,
+  // so inactive descriptions never hid (EWT-001 ≡ DWT-001).
+  const tabDescClass = (tab: CalculatorState["tab"]) =>
+    cn("mt-1 text-sm text-muted-foreground", activeTab === tab ? undefined : "hidden");
+
+  // Shared min-44px touch-target class for the tab triggers (EWT-002, WCAG 2.5.8). The
+  // brand-primary active styling is layered on per trigger.
+  const tabTriggerClass =
+    "min-h-[44px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground";
+
   // Show city detail view when a city is selected on the cost tab
   const detailCityId = activeTab === "cost" ? cityId : null;
 
@@ -232,50 +244,26 @@ export function CostOfLivingCalculatorContent() {
           aria-label={t(locale, "ariaTabsNav")}
           className="flex w-full max-w-full justify-start overflow-x-auto"
         >
-          <TabsTrigger
-            value="cost"
-            aria-describedby="tab-desc-cost"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
-          >
+          <TabsTrigger value="cost" aria-describedby="tab-desc-cost" className={tabTriggerClass}>
             {t(locale, "tabCostOfLiving")}
           </TabsTrigger>
-          <TabsTrigger
-            value="savings"
-            aria-describedby="tab-desc-savings"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
-          >
+          <TabsTrigger value="savings" aria-describedby="tab-desc-savings" className={tabTriggerClass}>
             {t(locale, "tabSavings")}
           </TabsTrigger>
-          <TabsTrigger
-            value="min-role"
-            aria-describedby="tab-desc-min-role"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground dark:data-[state=active]:!bg-primary dark:data-[state=active]:!text-primary-foreground"
-          >
+          <TabsTrigger value="min-role" aria-describedby="tab-desc-min-role" className={tabTriggerClass}>
             {t(locale, "tabMinRole")}
           </TabsTrigger>
         </TabsList>
         {/* Tab descriptions: visibly rendered and associated with each trigger via
             aria-describedby. Showing only the active tab's description avoids duplicating
             the same prose elsewhere on screen. */}
-        <p
-          id="tab-desc-cost"
-          data-testid="tab-desc-cost"
-          className={`mt-1 text-sm text-muted-foreground${activeTab === "cost" ? "" : "hidden"}`}
-        >
+        <p id="tab-desc-cost" data-testid="tab-desc-cost" className={tabDescClass("cost")}>
           {t(locale, "tabCostDesc")}
         </p>
-        <p
-          id="tab-desc-savings"
-          data-testid="tab-desc-savings"
-          className={`mt-1 text-sm text-muted-foreground${activeTab === "savings" ? "" : "hidden"}`}
-        >
+        <p id="tab-desc-savings" data-testid="tab-desc-savings" className={tabDescClass("savings")}>
           {t(locale, "tabSavingsDesc")}
         </p>
-        <p
-          id="tab-desc-min-role"
-          data-testid="tab-desc-min-role"
-          className={`mt-1 text-sm text-muted-foreground${activeTab === "min-role" ? "" : "hidden"}`}
-        >
+        <p id="tab-desc-min-role" data-testid="tab-desc-min-role" className={tabDescClass("min-role")}>
           {t(locale, "tabMinRoleDesc")}
         </p>
 

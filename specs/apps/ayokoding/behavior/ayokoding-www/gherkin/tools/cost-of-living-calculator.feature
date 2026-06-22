@@ -750,3 +750,119 @@ Feature: Salary savings calculator
     Given I am on the cost-of-living calculator
     When I add one school-age child with public school selected
     Then the Berlin school cost equals its public-school figure with no foreigner flag
+
+  # ── Phase 8: UX-hardening fold-in (SG-001..003, USS-001..004, protected behaviours) ──
+  # Accepted spec proposals from the 2026-06-22 three-lens retest (see plan
+  # ayokoding-www-calculator-ux-hardening). Each scenario protects a behaviour that
+  # landed in Phases 1-7 so feature-change-completeness holds.
+
+  # Cluster 1 / SG-001 — only the active tab description is visible; it follows the tab.
+  Scenario: Only the active tab description is visible
+    Given the cost-of-living calculator is open with the "Cost of living" tab active
+    When the page is rendered
+    Then the "Cost of living" tab description is visible
+    And the "Savings" tab description is not visible
+    And the "Minimum role" tab description is not visible
+
+  Scenario: Active tab description follows the active tab
+    Given the cost-of-living calculator is open with the "Cost of living" tab active
+    When the user selects the "Savings" tab
+    Then only the "Savings" tab description is visible
+
+  # Cluster 2 — touch targets + segmented/sort a11y.
+  Scenario: Interactive controls meet the 44px touch target
+    Given the calculator at 375px
+    When the page is rendered
+    Then every tab trigger is at least 44px tall
+    And every school-type, area, and salary-currency segmented radio is at least 44px tall
+
+  # USS-003 — Area toggle exposes its active state via ARIA.
+  Scenario: Area toggle exposes its pressed state
+    Given "City center" is the active area
+    When the page is rendered
+    Then the "City center" button has aria-pressed "true"
+    And the "Rural" button has aria-pressed "false"
+
+  # USS-004 — disabled school-type buttons announce the prerequisite.
+  Scenario: Disabled school-type buttons announce the prerequisite
+    Given "School-age children" is 0
+    When the page is rendered
+    Then the "Public" and "Private" buttons are aria-disabled
+    And their accessible description names the "add school-age children" prerequisite
+
+  Scenario: Sortable savings column exposes aria-sort
+    Given the Savings tab table is shown
+    When the page is rendered
+    Then the sortable "Savings after essentials" column header has an aria-sort value
+
+  # Cluster 3 — foreigner public-school flag clear, styled, and present in both views.
+  Scenario: Foreigner-school flag is clear, styled, and present in both views
+    Given a city whose country does not open public school to foreigners
+    And school-age children >= 1 and school type "public"
+    When the page is rendered
+    Then the cost-of-living table school cell shows a clearly-worded private-fallback flag
+    And the flag is visually distinct from ordinary caption text
+    And the city-detail school row renders the school-foreigner-flag-<cityId> testid
+
+  # Cluster 4 — jargon glosses, localized OOP abbr title, localized region names.
+  Scenario: Jargon table headers carry an accessible explanation
+    Given the calculator is open
+    When the page is rendered
+    Then the "Healthcare (OOP)" header has a title explaining out-of-pocket (localized)
+    And the "Relocation (sunk)" and "Liquidity reserve" headers carry explanatory titles
+    And the "P25"/"Median"/"P75" headers carry percentile explanations
+    And the "Track" column abbreviations ic/mgmt are expanded or carry abbr titles
+
+  # Protected behaviour — the OOP abbr title is localized (id != literal "out-of-pocket").
+  Scenario: The OOP abbreviation title is localized per locale
+    Given the calculator is open
+    When the page is rendered
+    Then the localized out-of-pocket title differs between the en and id locales
+    And the id-locale out-of-pocket title is not the literal English "out-of-pocket"
+
+  # Protected behaviour — region option display names are localized while the serialized
+  # region key stays English for URL stability.
+  Scenario: Region option display names are localized but the serialized key stays English
+    Given the calculator is open
+    When the region filter renders
+    Then each region option's serialized value is its English key
+    And the region display label differs between the en and id locales
+
+  Scenario: Healthcare scheme badges use consistent casing
+    Given the calculator is open
+    When the page is rendered
+    Then no healthcare-scheme badge is rendered in ALL CAPS while another is lower-case
+
+  # Cluster 5 / USS-001 + USS-002 — UX states.
+  Scenario: Savings tab guides the user to enter a salary
+    Given the Savings tab is activated with no salary entered
+    When the tab activation occurs
+    Then a prominent empty-state prompt is shown in the data area
+    And the gross salary input receives focus
+
+  Scenario: Minimum-role pre-target panel is labelled as an example
+    Given the Minimum-role tab is activated with no target entered
+    When the page is rendered
+    Then any pre-populated city cost panel is labelled as an example (or hidden)
+
+  Scenario: Savings salary input shows its currency at the field
+    Given the Savings tab is shown
+    When the page is rendered
+    Then the gross salary input displays its USD currency inline at the field
+
+  # Cluster 6 / SG-002 + SG-003 — design-system fidelity.
+  Scenario: All selects share the design-system chrome
+    Given the calculator at 1280px
+    When the page is rendered
+    Then every <select> has computed appearance "none" and a custom chevron affordance
+    And no <select> shows the browser's native dropdown arrow
+
+  Scenario: Baseline-source control keeps the 44px rhythm at mobile
+    Given the Minimum-role tab at 320px and 375px
+    When the page is rendered
+    Then the "Baseline source" segmented control height does not exceed 44px
+
+  Scenario: Salary-currency toggle bottom-aligns with its sibling input
+    Given the Minimum-role "My salary" baseline at 1280px
+    When the page is rendered
+    Then the salary-currency toggle bottom-aligns with the gross salary input

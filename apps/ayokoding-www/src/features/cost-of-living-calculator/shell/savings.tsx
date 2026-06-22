@@ -142,10 +142,15 @@ export function SavingsTable({
       <div>
         <Label htmlFor="gross-salary-input">{t(locale, "grossMonthlySalaryLabel")}</Label>
         <div className="flex items-center gap-2">
+          {/* UWT-005 (USS-001): auto-focus the gross input when the Savings tab mounts so the
+              user can start typing their salary immediately. The Savings tab content mounts only
+              when the tab is active, so mount === tab activation. */}
           <Input
             id="gross-salary-input"
             type="number"
             min="0"
+            // eslint-disable-next-line jsx-a11y/no-autofocus -- intentional: USS-001 tab-activation focus
+            autoFocus
             aria-label={t(locale, "grossMonthlySalaryLabel")}
             value={grossField.value || ""}
             onChange={(e) => grossField.onChange(Math.max(0, parseFloat(e.target.value) || 0))}
@@ -171,10 +176,15 @@ export function SavingsTable({
       {/* Shared generic filters follow this tab's own gross-salary input. */}
       {filtersSlot}
 
+      {/* UWT-005: prominent bordered empty-state panel in the data area (not a faint caption)
+          so the prompt clearly guides the user to enter a salary. */}
       {grossMonthly === 0 && (
-        <p data-testid="savings-empty-state" className="py-6 text-center text-sm text-muted-foreground">
+        <div
+          data-testid="savings-empty-state"
+          className="my-4 rounded-lg border border-dashed border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground"
+        >
           {t(locale, "savingsEmptyStateMessage")}
-        </p>
+        </div>
       )}
 
       <p data-testid="non-salary-comp-note" className="text-xs text-muted-foreground">
@@ -191,7 +201,9 @@ export function SavingsTable({
                 <TableHead>{t(locale, "colCity")}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t(locale, "colNet")}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t(locale, "colEssentials")}</TableHead>
-                <TableHead>
+                {/* This column is always the sorted column, so aria-sort reflects the active
+                    direction (EWT-005) — ascending/descending, never "none". */}
+                <TableHead aria-sort={sortAsc ? "ascending" : "descending"}>
                   <button
                     type="button"
                     onClick={() => setSortAsc((v) => !v)}

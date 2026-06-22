@@ -22,6 +22,7 @@ import {
 } from "../core/calc";
 import { fmtDualCurrency } from "../core/format";
 import { fxToUsd } from "../core/data/fx";
+import { ForeignerSchoolFlag } from "./foreigner-school-flag";
 import { localeName } from "./geo-filters";
 import type { Locale } from "@/features/i18n/core/config";
 import type { ReactNode } from "react";
@@ -128,7 +129,7 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                 <TableHead className={tabletHidden}>{t(locale, "colTransport")}</TableHead>
                 <TableHead className={tabletHidden}>{t(locale, "colUtilities")}</TableHead>
                 <TableHead className={tabletHidden}>
-                  {t(locale, "colHealthcareOOPPrefix")} (<abbr title="out-of-pocket">OOP</abbr>)
+                  {t(locale, "colHealthcareOOPPrefix")} (<abbr title={t(locale, "healthcareOutOfPocket")}>OOP</abbr>)
                 </TableHead>
                 <TableHead className={tabletHidden}>{t(locale, "colChildcare")}</TableHead>
                 <TableHead className={tabletHidden}>{t(locale, "colSchool")}</TableHead>
@@ -171,6 +172,7 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                         data-testid="healthcare-badge"
                         variant="outline"
                         hue={healthcareBadgeHue(r.country.healthcareModelType)}
+                        className="normal-case"
                       >
                         {healthcareBadgeLabel(r.country.healthcareModelType, locale)}
                       </Badge>
@@ -227,11 +229,8 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                   >
                     {fmtDualCurrency(r.school, r.city.currency, r.school * r.fxRate)}
                     {r.schoolForeignerFallback && (
-                      <span
-                        data-testid={`school-foreigner-flag-${r.city.id}`}
-                        className="ml-1 block text-xs text-muted-foreground"
-                      >
-                        {t(locale, "publicSchoolForeignerFlag")}
+                      <span className="block">
+                        <ForeignerSchoolFlag cityId={r.city.id} locale={locale} />
                       </span>
                     )}
                   </TableCell>
@@ -269,7 +268,7 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                 <Badge
                   variant="outline"
                   hue={healthcareBadgeHue(r.country.healthcareModelType)}
-                  className="border-white/40 bg-white/15 text-white"
+                  className="border-white/40 bg-white/15 text-white normal-case"
                 >
                   {healthcareBadgeLabel(r.country.healthcareModelType, locale)}
                 </Badge>
@@ -295,7 +294,7 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
               <CardRow
                 label={
                   <>
-                    {t(locale, "colHealthcareOOPPrefix")} (<abbr title="out-of-pocket">OOP</abbr>)
+                    {t(locale, "colHealthcareOOPPrefix")} (<abbr title={t(locale, "healthcareOutOfPocket")}>OOP</abbr>)
                   </>
                 }
                 value={fmtDualCurrency(r.healthcare, r.city.currency, r.healthcare * r.fxRate)}
@@ -308,6 +307,11 @@ export function CostOfLivingTable({ dataset, household, schoolType, area, locale
                 label={t(locale, "colSchool")}
                 value={fmtDualCurrency(r.school, r.city.currency, r.school * r.fxRate)}
               />
+              {r.schoolForeignerFallback && (
+                <div className="flex justify-end">
+                  <ForeignerSchoolFlag cityId={r.city.id} locale={locale} testIdSuffix="-mobile" />
+                </div>
+              )}
               <CardRow
                 label={t(locale, "colEssentials")}
                 value={fmtDualCurrency(r.essentials, r.city.currency, r.essentials * r.fxRate)}

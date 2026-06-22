@@ -342,4 +342,61 @@ describe("GeoFilters", () => {
     expect(clearBtn).toBeTruthy();
     expect(clearBtn.getAttribute("aria-label")).toMatch(/hapus/i);
   });
+
+  // ─── UWT-004 — region display localization (value/key stays English for URL stability) ──
+  describe("UWT-004 — region display names", () => {
+    it("region option DISPLAY labels are localized in id (Japan→Jepang, Europe→Eropa)", () => {
+      render(<ControlledGeoFilters locale="id" />);
+      const regionSelect = screen.getByRole("combobox", { name: /wilayah/i });
+      const options = within(regionSelect).getAllByRole("option");
+      const labelByValue = Object.fromEntries(
+        options.map((o) => [(o as HTMLOptionElement).value, o.textContent?.trim() ?? ""]),
+      );
+      expect(labelByValue["japan"]).toBe("Jepang");
+      expect(labelByValue["europe"]).toBe("Eropa");
+      expect(labelByValue["americas"]).toBe("Amerika");
+      expect(labelByValue["oceania"]).toBe("Oseania");
+      expect(labelByValue["africa"]).toBe("Afrika");
+    });
+
+    it("MENA and Nordics are expanded in both locales", () => {
+      const { rerender } = render(<ControlledGeoFilters locale="en" />);
+      let regionSelect = screen.getByRole("combobox", { name: /region/i });
+      let labels = within(regionSelect)
+        .getAllByRole("option")
+        .map((o) => o.textContent ?? "");
+      expect(labels.some((l) => /Middle East|North Africa/i.test(l))).toBe(true);
+      expect(labels.some((l) => /Northern Europe/i.test(l))).toBe(true);
+
+      rerender(<ControlledGeoFilters locale="id" />);
+      regionSelect = screen.getByRole("combobox", { name: /wilayah/i });
+      labels = within(regionSelect)
+        .getAllByRole("option")
+        .map((o) => o.textContent ?? "");
+      expect(labels.some((l) => /Timur Tengah|Afrika Utara/i.test(l))).toBe(true);
+      expect(labels.some((l) => /Eropa Utara/i.test(l))).toBe(true);
+    });
+
+    it("serialized region VALUE stays English even when displayed in id (URL stability)", () => {
+      render(<ControlledGeoFilters locale="id" />);
+      const regionSelect = screen.getByRole("combobox", { name: /wilayah/i });
+      const values = within(regionSelect)
+        .getAllByRole("option")
+        .map((o) => (o as HTMLOptionElement).value)
+        .filter((v) => v !== "");
+      // The option values must remain the canonical English region keys.
+      expect(values).toEqual(expect.arrayContaining(["asean", "japan", "europe", "americas", "mena", "africa"]));
+    });
+
+    it("selecting a localized region option still round-trips the English region key", async () => {
+      const user = userEvent.setup();
+      const onScopeChange = vi.fn();
+      render(<ControlledGeoFilters onScopeChange={onScopeChange} locale="id" />);
+      const regionSelect = screen.getByRole("combobox", { name: /wilayah/i });
+      // Select by the localized label text — the underlying value must remain "japan".
+      await user.selectOptions(regionSelect, "japan");
+      expect(onScopeChange).toHaveBeenCalledWith(expect.objectContaining({ region: "japan" }));
+      expect(regionSelect).toHaveValue("japan");
+    });
+  });
 });

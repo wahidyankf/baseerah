@@ -183,6 +183,27 @@ describe("SavingsTable", () => {
     expect(sortBtn).toHaveAttribute("aria-pressed", "true");
   });
 
+  // EWT-005: the sortable "Savings after essentials" <th> must expose aria-sort reflecting the
+  // active sort direction so screen-reader users perceive the sorted column.
+  it("EWT-005: the sortable savings column header exposes aria-sort reflecting direction", async () => {
+    const user = userEvent.setup();
+    render(<SavingsTable {...defaultProps} />);
+
+    const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
+    await user.clear(input);
+    await user.type(input, "8000");
+
+    // The <th> wrapping the sort button is the sorted column; default sort is descending.
+    const sortButton = screen.getByRole("button", { name: /sort/i });
+    const th = sortButton.closest("th");
+    expect(th).toBeTruthy();
+    expect(th!.getAttribute("aria-sort")).toBe("descending");
+
+    // Toggling the sort flips the announced direction.
+    await user.click(sortButton);
+    expect(th!.getAttribute("aria-sort")).toBe("ascending");
+  });
+
   // SG-001: when salary is 0, empty-state guidance is shown and no savings table is visible
   it("SG-001: when salary is 0, empty-state guidance is shown and savings table is hidden", () => {
     render(<SavingsTable {...defaultProps} />);
@@ -223,6 +244,35 @@ describe("SavingsTable", () => {
     const explanation = screen.getByTestId("salary-currency-explanation");
     expect(explanation.textContent).toMatch(/USD/);
     expect(explanation.textContent?.toLowerCase()).toContain("semua kota");
+  });
+
+  // ─── Cluster 5 — UX states ──────────────────────────────────────────────────
+  // UWT-005: empty-state prompt is wrapped in a visually-prominent bordered panel.
+  it("UWT-005: savings empty-state is a prominent bordered panel", () => {
+    render(<SavingsTable {...defaultProps} />);
+    const panel = screen.getByTestId("savings-empty-state");
+    expect(panel.className).toMatch(/border/);
+    expect(panel.className).toMatch(/rounded/);
+  });
+
+  // UWT-005 (USS-001): the gross salary input auto-focuses when the Savings tab mounts.
+  it("UWT-005: gross-salary input auto-focuses on mount", () => {
+    render(<SavingsTable {...defaultProps} />);
+    const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
+    expect(input).toHaveFocus();
+  });
+
+  // UWT-007: the USD currency indicator is an inline at-field adornment inside the input row,
+  // a sibling of the gross-salary input (not only a block note below the label).
+  it("UWT-007: USD currency indicator sits inline in the same row as the input", () => {
+    render(<SavingsTable {...defaultProps} />);
+    const input = document.querySelector("#gross-salary-input")!;
+    const indicator = screen.getByTestId("salary-currency-indicator");
+    // Both share the same flex row container.
+    const inputRow = input.closest("div");
+    expect(inputRow).not.toBeNull();
+    expect(inputRow!.contains(indicator)).toBe(true);
+    expect(inputRow!.className).toMatch(/flex/);
   });
 
   // Gherkin (binds): "id-locale tables use Indonesian city and country names"

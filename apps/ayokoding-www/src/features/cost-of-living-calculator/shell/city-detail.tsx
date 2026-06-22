@@ -17,6 +17,7 @@ import { fmtCurrency, fmtDualCurrency, healthcareBadgeHue } from "../core/format
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 import { Badge } from "@open-sharia-enterprise/web-ui";
+import { ForeignerSchoolFlag } from "./foreigner-school-flag";
 
 function Row({
   label,
@@ -112,7 +113,7 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
             data-testid="healthcare-badge"
             variant="outline"
             hue={healthcareBadgeHue(country.healthcareModelType)}
-            className="border-white/40 bg-white/15 text-white"
+            className="border-white/40 bg-white/15 text-white normal-case"
           >
             {healthcareBadgeLabel(country.healthcareModelType, locale)}
           </Badge>
@@ -160,15 +161,16 @@ export function CityDetail({ dataset, cityId, household, schoolType, area, local
             rawValue={childcareAmt}
           />
           <Row
-            label={
-              schoolForeignerFallback
-                ? `${t(locale, "labelSchool")} (${t(locale, "publicSchoolForeignerFlag")})`
-                : t(locale, "labelSchool")
-            }
+            label={t(locale, "labelSchool")}
             value={fmtCurrency(schoolAmt, cur)}
             testId="expense-school"
             rawValue={schoolAmt}
           />
+          {schoolForeignerFallback && (
+            <div className="flex justify-end">
+              <ForeignerSchoolFlag cityId={city.id} locale={locale} />
+            </div>
+          )}
           <Row
             label={t(locale, "labelEssentialsSubtotal")}
             value={fmtCurrency(essentials, cur)}

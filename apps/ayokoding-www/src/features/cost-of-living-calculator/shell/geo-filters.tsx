@@ -8,6 +8,7 @@ import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 import { applyRegionChange, applyCountryChange, applyCityChange, DEFAULT_STATE } from "../core/url-state";
 import type { CalculatorState } from "../core/url-state";
+import { cn } from "@/lib/utils";
 
 type Region = "asean" | "japan" | "europe" | "nordics" | "americas" | "mena" | "asia" | "oceania" | "africa";
 
@@ -26,17 +27,25 @@ type Props = {
   onScopeChange: (scope: GeoScope) => void;
 };
 
-const REGION_LABELS: Record<Region, string> = {
-  asean: "ASEAN",
-  japan: "Japan",
-  europe: "Europe",
-  nordics: "Nordics",
-  americas: "Americas",
-  mena: "MENA",
-  asia: "Asia",
-  oceania: "Oceania",
-  africa: "Africa",
+// UWT-004: region DISPLAY labels are localized, but the serialized region KEY (the <option>
+// value) stays English for URL stability — only the visible text changes. MENA/Nordics are
+// expanded via these i18n values. Maps each region key to its translation key.
+const REGION_LABEL_KEYS: Record<Region, string> = {
+  asean: "regionAsean",
+  japan: "regionJapan",
+  europe: "regionEurope",
+  nordics: "regionNordics",
+  americas: "regionAmericas",
+  mena: "regionMena",
+  asia: "regionAsia",
+  oceania: "regionOceania",
+  africa: "regionAfrica",
 };
+
+/** Localized region display label. The region KEY remains English for URL stability. */
+function regionLabel(region: Region, locale: Locale): string {
+  return t(locale, REGION_LABEL_KEYS[region]);
+}
 
 /** Returns the locale-specific name, falling back to English. */
 export function localeName(name: { en: string; id: string }, locale: Locale): string {
@@ -52,26 +61,32 @@ export function localeName(name: { en: string; id: string }, locale: Locale): st
 // styling contract asserted by unit tests + the design system's 44px control family)
 // and `min-w-0 max-w-full` so the row never forces horizontal overflow. The native
 // dropdown affordance is replaced by a custom ChevronDown rendered by SelectField.
-const GEO_SELECT_CLASS =
+export const GEO_SELECT_CLASS =
   "h-11 min-h-[44px] w-full max-w-full min-w-0 appearance-none rounded-md border border-input bg-transparent py-1 pr-8 pl-3 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 // Wraps a native <select> styled with GEO_SELECT_CLASS and overlays a custom
 // ChevronDown affordance (needed because `appearance-none` strips the native arrow).
-function SelectField({
+// Exported so the household selects (controls.tsx) and the min-role currency/ref selects
+// (min-role.tsx) share the same design-system chrome as the geo selects (DWT-002 / DWT-003).
+export function SelectField({
   id,
   ariaLabel,
   value,
   onChange,
   children,
+  className,
 }: {
   id: string;
   ariaLabel: string;
   value: string;
   onChange: (val: string) => void;
   children: ReactNode;
+  /** Optional wrapper class — lets a call site control the field-column width (e.g. the
+      min-role `fieldGroup`) while keeping the shared select chrome. */
+  className?: string;
 }) {
   return (
-    <div className="relative w-full max-w-full min-w-0">
+    <div className={cn("relative w-full max-w-full min-w-0", className)}>
       <select
         id={id}
         aria-label={ariaLabel}
@@ -170,7 +185,7 @@ export function GeoFilters({ dataset, locale = "en", region, countryId, cityId, 
             <option value="">{labels.allRegions}</option>
             {availableRegions.map((r) => (
               <option key={r} value={r}>
-                {REGION_LABELS[r]}
+                {regionLabel(r, locale)}
               </option>
             ))}
           </SelectField>

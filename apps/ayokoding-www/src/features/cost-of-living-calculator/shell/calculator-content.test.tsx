@@ -685,3 +685,59 @@ describe("Phase 2e — canonicalize on mount", () => {
     });
   });
 });
+
+// ─── Cluster 1 (EWT-001 ≡ DWT-001) — only the active tab description is visible ──
+//
+// Regression: the description className was built with a template literal missing the
+// space before the conditional ("text-muted-foreground${… "hidden"}"), producing the
+// dead class "text-muted-foregroundhidden" so inactive descriptions never hid.
+describe("Cluster 1 — only the active tab description is visible", () => {
+  beforeEach(() => {
+    setupSearchParams({});
+  });
+
+  it("on the cost tab, only the cost description is visible; savings/min-role are hidden", () => {
+    setupSearchParams({ tab: "cost" });
+    render(<CostOfLivingCalculatorContent />);
+
+    const cost = screen.getByTestId("tab-desc-cost");
+    const savings = screen.getByTestId("tab-desc-savings");
+    const minRole = screen.getByTestId("tab-desc-min-role");
+
+    // Active description does NOT carry the `hidden` utility…
+    expect(cost.classList.contains("hidden")).toBe(false);
+    // …inactive descriptions DO (and never the fused dead class).
+    expect(savings.classList.contains("hidden")).toBe(true);
+    expect(minRole.classList.contains("hidden")).toBe(true);
+    // Guard against the original fused-class regression on every description.
+    for (const el of [cost, savings, minRole]) {
+      expect(el.className).not.toContain("text-muted-foregroundhidden");
+    }
+  });
+
+  it("on the savings tab, only the savings description is visible", () => {
+    setupSearchParams({ tab: "savings" });
+    render(<CostOfLivingCalculatorContent />);
+
+    expect(screen.getByTestId("tab-desc-savings").classList.contains("hidden")).toBe(false);
+    expect(screen.getByTestId("tab-desc-cost").classList.contains("hidden")).toBe(true);
+    expect(screen.getByTestId("tab-desc-min-role").classList.contains("hidden")).toBe(true);
+  });
+});
+
+// ─── Cluster 2 (EWT-002) — tab triggers meet the 44px touch target ──────────────
+describe("Cluster 2 — tab triggers meet the 44px touch target", () => {
+  beforeEach(() => {
+    setupSearchParams({});
+  });
+
+  it("every tab trigger carries the min-h-[44px] class", () => {
+    render(<CostOfLivingCalculatorContent />);
+
+    const triggers = screen.getAllByRole("tab");
+    expect(triggers.length).toBe(3);
+    for (const trigger of triggers) {
+      expect(trigger.classList.contains("min-h-[44px]")).toBe(true);
+    }
+  });
+});

@@ -2696,7 +2696,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
 
       When("the tab renders", () => {
-        expect(screen.getByRole("radiogroup", { name: /baseline source/i })).toBeTruthy();
+        // UWT-001: the baseline-source group's accessible name is the scent-bearing relabel.
+        expect(screen.getByRole("radiogroup", { name: /how to set your target/i })).toBeTruthy();
       });
 
       Then("a minimum-role empty-state guidance message is shown", () => {
@@ -2867,7 +2868,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
       Then("the baseline-source control renders as a radiogroup with at least three options", () => {
         // SegmentedControl uses role="radiogroup" with role="radio" children.
-        const baselineGroup = screen.getByRole("radiogroup", { name: /baseline source/i });
+        // UWT-001: accessible name is the scent-bearing relabel ("How to set your target").
+        const baselineGroup = screen.getByRole("radiogroup", { name: /how to set your target/i });
         expect(baselineGroup).toBeTruthy();
         const radios = baselineGroup.querySelectorAll('[role="radio"]');
         expect(radios.length).toBeGreaterThanOrEqual(3);
@@ -2975,6 +2977,503 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       const raw = screen.getByTestId("col-school-berlin").getAttribute("data-raw") ?? "0";
       expect(parseFloat(raw)).toBe(berlin.schoolMedianLocal.public.amount);
       expect(screen.queryByTestId("school-foreigner-flag-berlin")).toBeNull();
+    });
+  });
+
+  // ── Phase 8: UX-hardening fold-in bindings (SG-001..003, USS-001..004, protected) ──
+
+  // Cluster 1 / SG-001 — only the active tab description is visible.
+  Scenario("Only the active tab description is visible", ({ Given, When, Then, And }) => {
+    Given('the cost-of-living calculator is open with the "Cost of living" tab active', () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByTestId("tab-desc-cost")).toBeTruthy();
+    });
+
+    Then('the "Cost of living" tab description is visible', () => {
+      // The active (cost) tab description must NOT carry the `hidden` utility, and must
+      // never carry the fused dead class the bug produced.
+      const cost = screen.getByTestId("tab-desc-cost");
+      expect(cost.className).not.toMatch(/\bhidden\b/);
+      expect(cost.className).not.toContain("text-muted-foregroundhidden");
+    });
+
+    And('the "Savings" tab description is not visible', () => {
+      expect(screen.getByTestId("tab-desc-savings").className).toMatch(/\bhidden\b/);
+    });
+
+    And('the "Minimum role" tab description is not visible', () => {
+      expect(screen.getByTestId("tab-desc-min-role").className).toMatch(/\bhidden\b/);
+    });
+  });
+
+  Scenario("Active tab description follows the active tab", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given('the cost-of-living calculator is open with the "Cost of living" tab active', () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      expect(screen.getByTestId("tab-desc-cost").className).not.toMatch(/\bhidden\b/);
+    });
+
+    When('the user selects the "Savings" tab', async () => {
+      await user.click(screen.getByRole("tab", { name: /savings/i }));
+    });
+
+    Then('only the "Savings" tab description is visible', () => {
+      expect(screen.getByTestId("tab-desc-savings").className).not.toMatch(/\bhidden\b/);
+      expect(screen.getByTestId("tab-desc-cost").className).toMatch(/\bhidden\b/);
+      expect(screen.getByTestId("tab-desc-min-role").className).toMatch(/\bhidden\b/);
+    });
+  });
+
+  // Cluster 2 — touch targets on tab triggers + segmented radios.
+  Scenario("Interactive controls meet the 44px touch target", ({ Given, When, Then, And }) => {
+    Given("the calculator at 375px", () => {
+      // jsdom has no layout engine; the unit tier asserts the 44px styling contract
+      // (min-h-[44px]) on each interactive control. Pixel height is verified at e2e.
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getAllByRole("tab").length).toBe(3);
+    });
+
+    Then("every tab trigger is at least 44px tall", () => {
+      for (const tab of screen.getAllByRole("tab")) {
+        expect(tab.className).toContain("min-h-[44px]");
+      }
+    });
+
+    And("every school-type, area, and salary-currency segmented radio is at least 44px tall", () => {
+      // The school-type + area segmented radios live in the cost-basis controls; every
+      // role=radio button inherits the primitive's min-h-[44px].
+      const radios = screen.getAllByRole("radio");
+      expect(radios.length).toBeGreaterThan(0);
+      for (const radio of radios) {
+        expect(radio.className).toContain("min-h-[44px]");
+      }
+    });
+  });
+
+  // USS-003 — Area toggle exposes its pressed state via ARIA (radiogroup → aria-checked).
+  Scenario("Area toggle exposes its pressed state", ({ Given, When, Then, And }) => {
+    Given('"City center" is the active area', () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("radiogroup", { name: /area/i })).toBeTruthy();
+    });
+
+    Then('the "City center" button has aria-pressed "true"', () => {
+      // The area control is a radiogroup, so active state is exposed via aria-checked
+      // (the radiogroup analogue of aria-pressed for a toggle button).
+      const group = screen.getByRole("radiogroup", { name: /area/i });
+      const center = within(group).getByRole("radio", { name: /city center|center/i });
+      expect(center.getAttribute("aria-checked")).toBe("true");
+    });
+
+    And('the "Rural" button has aria-pressed "false"', () => {
+      const group = screen.getByRole("radiogroup", { name: /area/i });
+      const rural = within(group).getByRole("radio", { name: /rural/i });
+      expect(rural.getAttribute("aria-checked")).toBe("false");
+    });
+  });
+
+  // USS-004 — disabled school-type buttons announce the prerequisite.
+  Scenario("Disabled school-type buttons announce the prerequisite", ({ Given, When, Then, And }) => {
+    Given('"School-age children" is 0', () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("radiogroup", { name: /school type/i })).toBeTruthy();
+    });
+
+    Then('the "Public" and "Private" buttons are aria-disabled', () => {
+      const group = screen.getByRole("radiogroup", { name: /school type/i });
+      const publicBtn = within(group).getByRole("radio", { name: /public/i, hidden: true });
+      const privateBtn = within(group).getByRole("radio", { name: /private/i, hidden: true });
+      expect(publicBtn.getAttribute("aria-disabled")).toBe("true");
+      expect(privateBtn.getAttribute("aria-disabled")).toBe("true");
+    });
+
+    And('their accessible description names the "add school-age children" prerequisite', () => {
+      const group = screen.getByRole("radiogroup", { name: /school type/i });
+      const publicBtn = within(group).getByRole("radio", { name: /public/i, hidden: true });
+      const describedById = publicBtn.getAttribute("aria-describedby");
+      expect(describedById).toBe("school-type-hint");
+      const hint = document.getElementById(describedById!);
+      expect(hint).toBeTruthy();
+      expect(hint!.textContent?.toLowerCase()).toMatch(/school-age children/);
+    });
+  });
+
+  Scenario("Sortable savings column exposes aria-sort", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("the Savings tab table is shown", async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /savings/i }));
+      // Enter a salary so the savings comparison table renders past the empty-state.
+      const input = screen.getByRole("spinbutton", { name: /gross monthly salary/i });
+      await user.clear(input);
+      await user.type(input, "8000");
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("table")).toBeTruthy();
+    });
+
+    Then('the sortable "Savings after essentials" column header has an aria-sort value', () => {
+      // The sortable <th> exposes aria-sort = none | ascending | descending.
+      const sortable = Array.from(document.querySelectorAll("th[aria-sort]"));
+      expect(sortable.length).toBeGreaterThan(0);
+      for (const th of sortable) {
+        expect(["none", "ascending", "descending"]).toContain(th.getAttribute("aria-sort"));
+      }
+    });
+  });
+
+  // Cluster 3 — foreigner public-school flag present in BOTH table and city-detail.
+  Scenario("Foreigner-school flag is clear, styled, and present in both views", async ({ Given, And, When, Then }) => {
+    const user = userEvent.setup();
+    const sg = dataset.cities.find((c) => c.id === "singapore")!;
+
+    Given("a city whose country does not open public school to foreigners", () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    And('school-age children >= 1 and school type "public"', async () => {
+      // School type defaults to "public"; adding a school-age child enables the column.
+      await user.selectOptions(screen.getByRole("combobox", { name: /school-age children/i }), "1");
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("table")).toBeTruthy();
+    });
+
+    Then("the cost-of-living table school cell shows a clearly-worded private-fallback flag", () => {
+      // Singapore is "limited" → a foreigner picking public is charged the PRIVATE figure
+      // and the table flags the cell with the localized warning Badge.
+      const flag = screen.getByTestId("school-foreigner-flag-singapore");
+      expect(flag).toBeTruthy();
+      expect(flag.textContent?.trim()).toBe(t("en", "publicSchoolForeignerFlagBadge"));
+    });
+
+    And("the flag is visually distinct from ordinary caption text", () => {
+      // The flag is a warning-tone Badge (honey hue), NOT plain text-muted-foreground.
+      const flag = screen.getByTestId("school-foreigner-flag-singapore");
+      expect(flag.className).not.toMatch(/\btext-muted-foreground\b/);
+    });
+
+    And("the city-detail school row renders the school-foreigner-flag-<cityId> testid", async () => {
+      // Open Singapore's city detail and confirm the same flag testid renders there (EWT-003 parity).
+      // Tear down the table-view render first so only the city-detail render is mounted.
+      cleanup();
+      navState.params = new URLSearchParams(`city=${sg.id}&schoolkids=1&schooltype=public`);
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+      await waitFor(() => {
+        expect(screen.getByTestId("city-detail")).toBeTruthy();
+      });
+      expect(screen.getByTestId(`school-foreigner-flag-${sg.id}`)).toBeTruthy();
+    });
+  });
+
+  // Cluster 4 — jargon glosses across the cost-of-living + min-role headers.
+  Scenario("Jargon table headers carry an accessible explanation", async ({ Given, When, Then, And }) => {
+    const user = userEvent.setup();
+
+    Given("the calculator is open", () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("table")).toBeTruthy();
+    });
+
+    Then('the "Healthcare (OOP)" header has a title explaining out-of-pocket (localized)', () => {
+      // The OOP abbr carries the localized healthcareOutOfPocket title (not a literal string).
+      const oopAbbr = Array.from(document.querySelectorAll("abbr")).find((a) => a.textContent?.trim() === "OOP");
+      expect(oopAbbr).toBeTruthy();
+      expect(oopAbbr!.getAttribute("title")).toBe(t("en", "healthcareOutOfPocket"));
+    });
+
+    And('the "Relocation (sunk)" and "Liquidity reserve" headers carry explanatory titles', () => {
+      const titled = Array.from(document.querySelectorAll("abbr[title]")).map((a) => a.getAttribute("title") ?? "");
+      expect(titled).toContain(t("en", "tooltipRelocationSunk"));
+      expect(titled).toContain(t("en", "tooltipLiquidityReserve"));
+    });
+
+    And('the "P25"/"Median"/"P75" headers carry percentile explanations', async () => {
+      // P25/Median/P75 live on the Minimum-role table; switch tabs and enter a target.
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+      await user.clear(input);
+      await user.type(input, "1000");
+      const titledHeaders = Array.from(document.querySelectorAll("th[title]")).map(
+        (h) => h.getAttribute("title") ?? "",
+      );
+      expect(titledHeaders).toContain(t("en", "tooltipP25"));
+      expect(titledHeaders).toContain(t("en", "tooltipMedian"));
+      expect(titledHeaders).toContain(t("en", "tooltipP75"));
+    });
+
+    And('the "Track" column abbreviations ic/mgmt are expanded or carry abbr titles', () => {
+      // UWT-013: trackLabel() expands the bare "ic"/"mgmt" codes to full localized words,
+      // so the rendered table cells must NOT show a bare "ic"/"mgmt" token. The expanded
+      // forms are non-empty and distinct from the raw codes.
+      expect(t("en", "trackIc")).not.toBe("ic");
+      expect(t("en", "trackMgmt")).not.toBe("mgmt");
+      const table = screen.getByRole("table");
+      const bareCodes = within(table)
+        .getAllByRole("cell")
+        .filter((c) => {
+          const txt = c.textContent?.trim().toLowerCase();
+          return (txt === "ic" || txt === "mgmt") && !c.querySelector("abbr[title]");
+        });
+      expect(bareCodes.length).toBe(0);
+    });
+  });
+
+  // Protected behaviour — OOP abbr title localized (id != literal English "out-of-pocket").
+  Scenario("The OOP abbreviation title is localized per locale", ({ Given, When, Then, And }) => {
+    Given("the calculator is open", () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("table")).toBeTruthy();
+    });
+
+    Then("the localized out-of-pocket title differs between the en and id locales", () => {
+      expect(t("id", "healthcareOutOfPocket")).not.toBe(t("en", "healthcareOutOfPocket"));
+    });
+
+    And('the id-locale out-of-pocket title is not the literal English "out-of-pocket"', () => {
+      expect(t("id", "healthcareOutOfPocket")).not.toBe("out-of-pocket");
+    });
+  });
+
+  // Protected behaviour — region option display names localized; serialized key stays English.
+  Scenario(
+    "Region option display names are localized but the serialized key stays English",
+    ({ Given, When, Then, And }) => {
+      let regionSelect: HTMLElement;
+
+      Given("the calculator is open", () => {
+        navState.params = new URLSearchParams();
+        navState.setParams(navState.params);
+        renderPage(<CostOfLivingCalculatorPage />);
+      });
+
+      When("the region filter renders", () => {
+        regionSelect = screen.getByRole("combobox", { name: /region/i });
+        expect(regionSelect).toBeTruthy();
+      });
+
+      Then("each region option's serialized value is its English key", () => {
+        // The option value (serialized into the URL) must remain the English region key.
+        const englishKeys = ["africa", "americas", "asean", "asia", "europe", "japan", "mena", "nordics", "oceania"];
+        const values = Array.from(regionSelect.querySelectorAll("option"))
+          .map((o) => (o as HTMLOptionElement).value)
+          .filter((v) => v !== "");
+        for (const v of values) {
+          expect(englishKeys).toContain(v);
+        }
+      });
+
+      And("the region display label differs between the en and id locales", () => {
+        // The display label is localized via t(); at least one region label differs across locales.
+        const keys = ["regionMena", "regionNordics", "regionAfrica"] as const;
+        const anyDiffers = keys.some((k) => t("id", k) !== t("en", k));
+        expect(anyDiffers).toBe(true);
+      });
+    },
+  );
+
+  Scenario("Healthcare scheme badges use consistent casing", ({ Given, When, Then }) => {
+    Given("the calculator is open", () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getAllByTestId("healthcare-badge").length).toBeGreaterThan(0);
+    });
+
+    Then("no healthcare-scheme badge is rendered in ALL CAPS while another is lower-case", () => {
+      // After UWT-012, scheme labels render normal-case; no badge should be fully upper-case.
+      for (const badge of screen.getAllByTestId("healthcare-badge")) {
+        const text = badge.textContent?.trim() ?? "";
+        const hasLetters = /[a-zA-Z]/.test(text);
+        if (hasLetters) {
+          expect(text).not.toBe(text.toUpperCase());
+        }
+      }
+    });
+  });
+
+  // Cluster 5 / USS-001 — Savings empty-state + auto-focus.
+  Scenario("Savings tab guides the user to enter a salary", async ({ Given, When, Then, And }) => {
+    Given("the Savings tab is activated with no salary entered", () => {
+      // Activate the Savings tab via deep link so the tab content mounts (triggering the
+      // gross input's autoFocus) without a competing userEvent click that would steal focus
+      // to the tab trigger. mount === tab activation for this content.
+      navState.params = new URLSearchParams("tab=savings");
+      navState.setParams(navState.params);
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+
+    When("the tab activation occurs", () => {
+      expect(screen.getByRole("main")).toBeTruthy();
+    });
+
+    Then("a prominent empty-state prompt is shown in the data area", () => {
+      const panel = screen.getByTestId("savings-empty-state");
+      expect(panel).toBeTruthy();
+      // "Prominent" = a bordered panel, not a faint caption.
+      expect(panel.className).toMatch(/\bborder\b/);
+      expect(panel.textContent?.trim().length).toBeGreaterThan(0);
+    });
+
+    And("the gross salary input receives focus", async () => {
+      const input = document.getElementById("gross-salary-input");
+      expect(input).toBeTruthy();
+      // autoFocus moves focus on mount; allow the effect to settle.
+      await waitFor(() => expect(document.activeElement).toBe(input));
+    });
+  });
+
+  // USS-002 — Min-role pre-target preview panel labelled as an example.
+  Scenario("Minimum-role pre-target panel is labelled as an example", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("the Minimum-role tab is activated with no target entered", async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("main")).toBeTruthy();
+    });
+
+    Then("any pre-populated city cost panel is labelled as an example (or hidden)", () => {
+      // The pre-target preview panel carries the "Example (<city>)" caption.
+      const caption = screen.getByTestId("min-role-example-caption");
+      expect(caption).toBeTruthy();
+      expect(caption.textContent).toContain(t("en", "previewExampleLabel"));
+    });
+  });
+
+  // UWT-007 — at-field currency indicator on the Savings gross input.
+  Scenario("Savings salary input shows its currency at the field", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("the Savings tab is shown", async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /savings/i }));
+    });
+
+    When("the page is rendered", () => {
+      expect(document.getElementById("gross-salary-input")).toBeTruthy();
+    });
+
+    Then("the gross salary input displays its USD currency inline at the field", () => {
+      const indicator = screen.getByTestId("salary-currency-indicator");
+      expect(indicator.textContent).toMatch(/USD/);
+    });
+  });
+
+  // Cluster 6 / SG-002 — all selects share the design-system chrome (appearance-none + chevron).
+  Scenario("All selects share the design-system chrome", async ({ Given, When, Then, And }) => {
+    const user = userEvent.setup();
+
+    Given("the calculator at 1280px", async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      // Visit the Minimum-role tab too so the currency/ref selects are also exercised.
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getAllByRole("combobox").length).toBeGreaterThan(0);
+    });
+
+    Then('every <select> has computed appearance "none" and a custom chevron affordance', () => {
+      // jsdom cannot compute `appearance`; the styling contract is the appearance-none class.
+      const selects = Array.from(document.querySelectorAll("select"));
+      expect(selects.length).toBeGreaterThan(0);
+      for (const select of selects) {
+        expect(select.className, `${select.id || "select"} must be appearance-none`).toContain("appearance-none");
+        // SelectField overlays a custom ChevronDown svg as a sibling of the <select>.
+        const wrapper = select.parentElement;
+        expect(wrapper?.querySelector("svg"), `${select.id || "select"} must have a custom chevron`).toBeTruthy();
+      }
+    });
+
+    And("no <select> shows the browser's native dropdown arrow", () => {
+      // appearance-none removes the native arrow; asserted by the class on every select above.
+      for (const select of Array.from(document.querySelectorAll("select"))) {
+        expect(select.className).toContain("appearance-none");
+      }
+    });
+  });
+
+  // SG-003 — Baseline-source segmented control keeps the 44px rhythm via flex-wrap.
+  Scenario("Baseline-source control keeps the 44px rhythm at mobile", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("the Minimum-role tab at 320px and 375px", async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("radiogroup", { name: /how to set your target/i })).toBeTruthy();
+    });
+
+    Then('the "Baseline source" segmented control height does not exceed 44px', () => {
+      // jsdom has no layout; the contract is flex-wrap (so 3 options flow to a second row)
+      // with each option keeping min-h-[44px] per row instead of one ballooning row.
+      const group = screen.getByRole("radiogroup", { name: /how to set your target/i });
+      expect(group.className).toContain("flex-wrap");
+      expect(group.className).toContain("min-h-[44px]");
+      for (const radio of group.querySelectorAll('[role="radio"]')) {
+        expect((radio as HTMLElement).className).toContain("min-h-[44px]");
+      }
+    });
+  });
+
+  // DWT-007 — salary-currency toggle bottom-aligns with the gross input (items-end field row).
+  Scenario("Salary-currency toggle bottom-aligns with its sibling input", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given('the Minimum-role "My salary" baseline at 1280px', async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      await user.click(screen.getByRole("radio", { name: /my salary/i }));
+    });
+
+    When("the page is rendered", () => {
+      expect(screen.getByRole("radiogroup", { name: /salary currency/i })).toBeTruthy();
+    });
+
+    Then("the salary-currency toggle bottom-aligns with the gross salary input", () => {
+      // The currency toggle's field row uses items-end so the toggle bottom-aligns with the
+      // taller sibling input. Walk up from the radiogroup to find the items-end flex row.
+      const group = screen.getByRole("radiogroup", { name: /salary currency/i });
+      let el: HTMLElement | null = group;
+      let foundItemsEnd = false;
+      for (let depth = 0; el && depth < 5; depth++) {
+        if (el.className.includes("items-end")) {
+          foundItemsEnd = true;
+          break;
+        }
+        el = el.parentElement;
+      }
+      expect(foundItemsEnd).toBe(true);
     });
   });
 });
