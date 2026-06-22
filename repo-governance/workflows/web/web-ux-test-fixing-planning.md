@@ -521,6 +521,7 @@ Scenario: Systematic coverage matrices and recurrence are enforced
 
 ## Conventions Implemented/Respected
 
+- **[Live-Tester Systematic Coverage](../../development/quality/live-tester-systematic-coverage.md)**: the cross-tester forcing-functions (enumerate-don't-sample matrices, declared-invariant conformance), the recurrence + diff-since-last-run memory, and the cross-tester completeness critic this workflow enforces are defined canonically here.
 - **[Workflow Naming Convention](../../conventions/structure/workflow-naming.md)**: Basename `web-ux-test-fixing-planning` parses as scope=`web`, qualifier=`ux` (the umbrella for the three live-site UX-quality lenses — exploratory correctness, usability, and design), descriptor=`test-fixing`, type=`planning`.
 - **[Plans Organization Convention](../../conventions/structure/plans.md)**: The plan lands at `plans/in-progress/<identifier>/` with no date prefix.
 - **[Feature Change Completeness](../../development/quality/feature-change-completeness.md)**: The delivery checklist carries the specs+Gherkin coverage steps for the exploratory spec-gap proposals.

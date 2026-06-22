@@ -504,6 +504,9 @@ the `local-temp/` path to the orchestrator.
 
 ## Governance Alignment
 
+- **[Live-Tester Systematic Coverage](../../repo-governance/development/quality/live-tester-systematic-coverage.md)** —
+  the canonical practice behind this agent's _Mandatory Systematic Checks_ (the raw/unstyled
+  native-element audit and the intra-form & cross-surface styling-consistency matrix).
 - **[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)** —
   this agent operationalizes the design-fidelity / mockup-parity / design-system-primitive-reuse rules as
   an on-demand, runtime capability; it is one of the three testers the convention's web-UI near-end round

@@ -48,6 +48,8 @@ These standards define **HOW to maintain and validate quality**, covering automa
 - [CI Blocker Resolution Convention](./ci-blocker-resolution.md) - Practice mandating that preexisting CI blockers are investigated at the root cause and fixed properly, never bypassed
 - [Plan Anti-Hallucination Convention](./plan-anti-hallucination.md) - Mandatory pre-write verification rituals, repo-grounding rule, refuse-on-uncertainty, confidence labels, anti-pattern catalog (AP-1 through AP-10), and specialized-executor annotation for AI agents authoring plan content
 - [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) - Fifteen durable rules for planning, executing, verifying, and archiving user-facing feature work so design-parity and behavioral defects cannot ship past green gates (visual-parity gate before archival, name the design-system primitive, per-breakpoint responsive deliverables, value-bearing tests, mockup-colors-as-theme-tokens, deploy-config-is-code, checkbox lockstep, spec-aware exploratory retest before archival)
+- [Regression Test Mandate](./regression-test-mandate.md) - Blocking rule requiring every bug fix to land with a reproducing test in the same commit/PR; the bug-driven dual of Feature Change Completeness, covering all defect types (behavioral, visual, content, API)
+- [Live-Tester Systematic Coverage](./live-tester-systematic-coverage.md) - Six forcing-functions (shared-control matrix, URL round-trip, declared-invariant conformance, styling consistency audit, usability probes, recurrence critic) that convert sampling into enumeration for the three live-site tester agents and the web-ux-test-fixing-planning workflow
 
 ## Companion Documents
 

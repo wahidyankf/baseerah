@@ -579,6 +579,10 @@ the `local-temp/` path to the orchestrator.
 
 ## Governance Alignment
 
+- **[Live-Tester Systematic Coverage](../../repo-governance/development/quality/live-tester-systematic-coverage.md)** —
+  the canonical practice behind this agent's _Mandatory Systematic Sweeps_ (the enumerate-don't-sample
+  control × surface matrix, the per-control URL/state round-trip, and the declared-invariant conformance
+  pass).
 - **[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)** —
   this agent operationalizes the "a human (or Playwright) must observe the rendered result against the
   design" gate as an on-demand capability.

@@ -619,6 +619,9 @@ the `local-temp/` path to the orchestrator.
 
 ## Governance Alignment
 
+- **[Live-Tester Systematic Coverage](../../repo-governance/development/quality/live-tester-systematic-coverage.md)** —
+  the canonical practice behind this agent's _Mandatory Systematic Probes_ (conditional-control
+  discoverability, per-label jargon scan, cross-view redundancy, and input unit/currency consistency).
 - **[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)** —
   operationalizes the "a human must judge the rendered result" gate, here for comprehension rather than
   pixel-parity.

@@ -22,3 +22,4 @@ Problem-solving guides for common tasks in the open-sharia-enterprise project. T
 - [How to Set Up Your Development Environment](./setup-development-environment.md) - Install and configure all tools needed to develop, test, and contribute to the monorepo (19 tools across 11 languages)
 - [How to Organize Your Work](./organize-work.md) - Choose the right folder (plans, docs) for different types of work
 - [How to Run Nx Commands](./run-nx-commands.md) - Common Nx workflows and commands for working with the monorepo
+- [How to Fix Bugs with Regression Tests and Demand Systematic Live-Site Coverage](./fix-bugs-with-regression-tests.md) - Pin every bug fix with a reproducing test in the same commit/PR, and apply the six enumerate-not-sample forcing-functions when testing live sites

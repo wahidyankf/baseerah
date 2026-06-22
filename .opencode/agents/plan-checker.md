@@ -680,6 +680,22 @@ Enforces the [Feature Change Completeness Convention §Two Paths](../../repo-gov
 - Step present but vague (no specific `.feature` path or domain): **MEDIUM**
 - Illegitimate "no behavior change" exemption used to skip specs: **HIGH**
 
+### 16b. Regression Test Mandate (bug-fix plans — MANDATORY)
+
+Enforces the [Regression Test Mandate](../../repo-governance/development/quality/regression-test-mandate.md):
+a plan whose purpose is to fix discovered bugs or regressions (e.g. a test-fixing plan built from
+EWT/UWT/DWT findings) MUST carry an explicit delivery step, per finding, that adds a **reproducing
+test** (a failing-first test that pins the bug) — Gherkin in `specs/**` plus the consuming test for
+behavioural defects, or a DOM/computed-style/content test for visual/copy defects.
+
+#### What to Validate
+
+1. **Bug-fix detection** — Does the plan exist to fix defects (findings catalog, `fix`-type scope)?
+2. **Per-finding reproducing-test step** — Each finding's delivery steps MUST include a failing-first
+   reproducing test before its fix step (RED→GREEN). Missing for any finding: **HIGH**.
+3. **No exemption** — applies to cosmetic/visual findings too; the test form adapts but a test is
+   required. An "untested cosmetic fix" is **HIGH**.
+
 ### 17. UI-Design-Funnel Completeness (Step 5k — MANDATORY)
 
 Enforces the [UI Mockups in Plan Docs convention](../../repo-governance/conventions/formatting/diagrams.md#ui-mockups-in-plan-docs)

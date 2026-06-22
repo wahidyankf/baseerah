@@ -222,3 +222,4 @@ It does not apply to:
 - [Nx Target Standards](../infra/nx-targets.md) -- Canonical target names and caching rules
 - [Implementation Workflow Convention](../workflow/implementation.md) -- Three-stage workflow where completeness is verified at each stage
 - [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) -- Adds per-breakpoint responsive deliverables, labelled outputs, and a pre-archival visual sign-off to the completeness bar for user-facing changes
+- [Regression Test Mandate](./regression-test-mandate.md) -- The bug-driven dual of this convention: a bug fix is not complete without a reproducing test. The two rules together cover all behavior-altering work -- feature changes and defect fixes alike

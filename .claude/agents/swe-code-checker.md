@@ -319,6 +319,24 @@ Completeness Convention — the counterpart to the plan path that `plan-checker`
 - Behavior-preserving refactors, dependency bumps without behavior change, and config-only edits are
   exempt (per the Feature Change Completeness applicability table). Do not flag these.
 
+### Step 6.7: Regression Test Mandate (Bug/Regression Fixes)
+
+**Reference**: [Regression Test Mandate](../../repo-governance/development/quality/regression-test-mandate.md)
+
+When the change set is a **bug or regression fix** (a `fix(...)` commit, or a diff that corrects wrong
+observable behavior), it MUST land with a **reproducing test** in the same change set — one that would
+fail before the fix and pass after. This is **blocking with no exemption**: it applies to ALL defect
+types, including cosmetic/visual, though the _form_ of the test adapts to the defect:
+
+- Behavioural/functional fix → a `specs/**` Gherkin scenario **plus** the consuming unit/integration/e2e
+  test (per the [Three-Level Testing Standard](../../repo-governance/development/quality/three-level-testing-standard.md)).
+- Visual/design/UI fix → a DOM/computed-style or component test (or a Gherkin scenario for the on-design
+  expectation).
+- Content/copy/i18n fix → a test asserting the corrected string/translation.
+
+- **Criticality**: HIGH when a bug/regression fix lands with no reproducing test. Unlike Step 6.6, the
+  pure-refactor exemption does **not** apply — a fix, by definition, changes behavior to correct it.
+
 ### Step 7: Finalize Report
 
 Update report status to "Complete", add summary statistics:

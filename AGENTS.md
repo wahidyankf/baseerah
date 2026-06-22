@@ -354,6 +354,17 @@ Pure refactors, no-behavior-change bumps, and docs/governance-only changes are e
 
 **See**: [repo-governance/development/quality/feature-change-completeness.md](./repo-governance/development/quality/feature-change-completeness.md)
 
+### Regression Test Mandate (Every Bug Fix)
+
+Every fix for a discovered bug or regression lands with a **reproducing test** (failing before the fix,
+passing after) in the **same commit/PR**. This is **blocking with no exemption** — it applies to all
+defect types including cosmetic/visual, though the test form adapts (Gherkin + consuming test for
+behaviour; DOM/computed-style/component test for visual; string assertion for content/i18n). A fixed bug
+must become impossible to silently reintroduce. Enforced by `swe-code-checker` (Step 6.7) and
+`plan-checker` (Step 16b). This is the bug-driven dual of Specs & Gherkin Completeness above.
+
+**See**: [repo-governance/development/quality/regression-test-mandate.md](./repo-governance/development/quality/regression-test-mandate.md)
+
 ### Reproducible Environments
 
 Volta for Node.js/npm pinning, package-lock.json, .env.example.
