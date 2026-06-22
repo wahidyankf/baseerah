@@ -70,6 +70,20 @@ describe("Controls", () => {
     }
   });
 
+  // Regression: the segmented control (radiogroup) must be the same 44px height as the sibling
+  // selects/inputs so it bottom-aligns in `items-end` field rows instead of sitting low (the
+  // "Salary currency" toggle appeared lower than the gross input + salary-city select).
+  it("segmented controls (radiogroups) have the min-h-[44px] touch-target/alignment class", () => {
+    const { container } = render(<ControlsWithState />);
+
+    const groups = container.querySelectorAll("[role='radiogroup']");
+    expect(groups.length).toBeGreaterThan(0);
+
+    for (const group of Array.from(groups)) {
+      expect(group.classList.contains("min-h-[44px]")).toBe(true);
+    }
+  });
+
   // Phase 9 Cluster J — id Area label must be short enough not to wrap at 375px
   it("Phase9J: id locale Area label text is no longer than 10 characters", () => {
     const { container } = render(

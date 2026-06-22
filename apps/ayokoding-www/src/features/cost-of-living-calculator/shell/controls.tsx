@@ -28,7 +28,13 @@ export function SegmentedControl<T extends string>({
       role="radiogroup"
       aria-label={label}
       aria-disabled={disabled || undefined}
-      className={cn("inline-flex rounded-lg border border-border bg-muted p-[3px]", disabled && "opacity-50")}
+      className={cn(
+        // min-h-[44px] + items-center keeps the control the same height as the sibling 44px
+        // inputs/selects so it bottom-aligns cleanly in `items-end` field rows (and meets the
+        // WCAG 44px touch target), instead of sitting low because it was shorter.
+        "inline-flex min-h-[44px] items-center rounded-lg border border-border bg-muted p-[3px]",
+        disabled && "opacity-50",
+      )}
     >
       {options.map((opt) => {
         const selected = opt.value === value;
