@@ -11,6 +11,12 @@ import { URL_INPUT_DEBOUNCE_MS } from "./use-debounced-field";
 
 afterEach(cleanup);
 
+// Include-all renders every (city, role) in scope. With the default unscoped props that is ~90+
+// rows that re-render on each keystroke of `userEvent.type`; under coverage instrumentation a few
+// of these brush past the 5s default. Give the suite headroom — production debounces the URL commit
+// so it never re-renders per keystroke, but these tests drive the uncontrolled (delay-0) path.
+vi.setConfig({ testTimeout: 20000 });
+
 describe("MinRoleTable", () => {
   const defaultProps = {
     dataset,
@@ -41,7 +47,7 @@ describe("MinRoleTable", () => {
     expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
 
     // Minimum marker on the lowest qualifier
-    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
 
     // Non-qualifying rows are de-emphasised
     const dimmedRows = screen.getAllByTestId("non-qualifying-row");
@@ -81,7 +87,7 @@ describe("MinRoleTable", () => {
     expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
 
     // The lowest-clearing role is marked as the minimum.
-    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
   });
 
   // Gherkin (binds): "Roles are labelled as software-engineering roles"
@@ -113,8 +119,8 @@ describe("MinRoleTable", () => {
     expect(headers.some((t) => t.includes("p75") || t.includes("top"))).toBe(true);
   });
 
-  // Gherkin (binds): "Best city shows its country alongside the city name"
-  it("qualifying rows show best city and its country", async () => {
+  // Gherkin (binds): "City rows show the country alongside the city name"
+  it("qualifying rows show the city and its country", async () => {
     const user = userEvent.setup();
     render(<MinRoleTable {...defaultProps} />);
 
@@ -123,17 +129,16 @@ describe("MinRoleTable", () => {
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
 
-    // Qualifying rows should have best city cells
-    const bestCityCells = screen.getAllByTestId("best-city-cell");
-    expect(bestCityCells.length).toBeGreaterThan(0);
-    // Each cell should show both city and country
-    for (const cell of bestCityCells.slice(0, 3)) {
+    // Qualifying rows should have city cells naming both the city and its country
+    const cityCells = screen.getAllByTestId("city-cell");
+    expect(cityCells.length).toBeGreaterThan(0);
+    for (const cell of cityCells.slice(0, 3)) {
       expect(cell.textContent?.length).toBeGreaterThan(0);
     }
   });
 
   // Gherkin (binds): "Geographic filter scopes the candidate cities"
-  it("passing cityScope scopes each role's best city to that set", async () => {
+  it("passing cityScope restricts every row to that city set", async () => {
     const user = userEvent.setup();
     const idCities = dataset.cities.filter((c) => c.countryId === "id");
 
@@ -144,14 +149,58 @@ describe("MinRoleTable", () => {
     await user.clear(targetInput);
     await user.type(targetInput, "500");
 
-    // All best-city cells should reference Indonesian cities
-    const bestCityCells = screen.getAllByTestId("best-city-cell");
+    // Every city cell (qualifying or not) must reference an Indonesian city — nothing leaks in.
+    const cityCells = screen.getAllByTestId("city-cell");
     const idCityNames = idCities.map((c) => c.name.en);
-    for (const cell of bestCityCells) {
+    for (const cell of cityCells) {
       const text = cell.textContent ?? "";
       const isInIndonesia = idCityNames.some((name) => text.includes(name));
       expect(isInIndonesia).toBe(true);
     }
+  });
+
+  // INCLUDE-ALL rule (the reported "only 1 Malaysia entry" bug): with a multi-country scope and a
+  // bar that several countries clear at multiple seniority levels, the table must surface EVERY
+  // qualifying (city, role) — no per-role argmax collapse — so a country is never hidden behind a
+  // higher-saving neighbour, and a country can appear on more than one row.
+  it("INCLUDE-ALL: every qualifying country appears, and a country can occupy multiple rows", async () => {
+    const user = userEvent.setup();
+    const asean = dataset.cities.filter((c) => c.region === "asean");
+    render(<MinRoleTable {...defaultProps} cityScope={asean} />);
+
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
+    const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+    await user.clear(targetInput);
+    await user.type(targetInput, "400");
+
+    const cityCells = screen.getAllByTestId("city-cell");
+    const texts = cityCells.map((c) => c.textContent ?? "");
+    // Multiple ASEAN countries are represented (not collapsed to a single "best" country).
+    const countriesShown = ["Singapore", "Malaysia", "Philippines"].filter((c) => texts.some((t) => t.includes(c)));
+    expect(countriesShown.length).toBeGreaterThanOrEqual(2);
+    // Malaysia clears the bar at several seniority levels → it occupies more than one row.
+    const malaysiaRows = texts.filter((t) => t.includes("Malaysia"));
+    expect(malaysiaRows.length).toBeGreaterThan(1);
+  });
+
+  // The below-bar near-miss rows are capped (they are optional context, not part of the include-all
+  // rule); the hidden remainder is surfaced as a count so nothing is silently dropped. The QUALIFYING
+  // set is never capped.
+  it("caps the below-bar near-miss rows and discloses the hidden count", async () => {
+    const user = userEvent.setup();
+    // Unscoped (all ~31 cities × 15 roles) with a mid bar leaves far more than 12 below-bar pairs.
+    render(<MinRoleTable {...defaultProps} />);
+
+    await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
+    const targetInput = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+    await user.clear(targetInput);
+    await user.type(targetInput, "3000");
+
+    // At most 12 dimmed near-miss rows are shown…
+    expect(screen.getAllByTestId("non-qualifying-row").length).toBeLessThanOrEqual(12);
+    // …and the remainder is disclosed, not silently dropped.
+    const more = screen.getByTestId("non-qualifying-more");
+    expect(more.textContent).toMatch(/^\+\d+/);
   });
 
   // Gherkin (binds): "Non-salary comp does not change the minimum-role ranking"
@@ -207,7 +256,7 @@ describe("MinRoleTable", () => {
     await user.selectOptions(roleSelect, "senior_swe");
 
     // Minimum marker should appear after baseline is set
-    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
   });
 
   // Gherkin (binds): "Minimum role from my own salary"
@@ -228,7 +277,7 @@ describe("MinRoleTable", () => {
     const citySelect = screen.getByRole("combobox", { name: /my salary city/i });
     await user.selectOptions(citySelect, "singapore");
 
-    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
   });
 
   // Gherkin (binds): "My-salary baseline accepts the gross in local currency or USD"
@@ -250,7 +299,7 @@ describe("MinRoleTable", () => {
     const grossInput = screen.getByRole("spinbutton", { name: /my gross monthly/i });
     await user.clear(grossInput);
     await user.type(grossInput, "12000");
-    expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
   });
 
   // Gherkin (binds): "Savings shown in USD, local, and display currency"
@@ -305,14 +354,14 @@ describe("MinRoleTable", () => {
     await user.clear(targetInput);
     await user.type(targetInput, "500");
 
-    const singleMarker = screen.queryByTestId("minimum-marker");
+    // A 500-USD bar is cleared at some seniority, so the minimum role is marked (possibly in
+    // several cities at the same rank — include-all surfaces them all).
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
 
-    // Change household to married with 2 school-age children
+    // Change household to married with 2 school-age children — the cost basis shifts, so the
+    // minimum qualifying role recomputes. The marker must still resolve to a valid minimum.
     rerender(<MinRoleTable {...defaultProps} household={{ adults: 2, preschoolKids: 0, schoolKids: 2 }} />);
-
-    // Min role may have shifted (the component updates based on props)
-    // Just verify the marker still exists (shifted to a more senior role or gone)
-    expect(screen.queryByTestId("minimum-marker") !== singleMarker || true).toBe(true);
+    expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
   });
 
   // Gherkin (binds): "No role can reach the bar"
@@ -375,8 +424,8 @@ describe("MinRoleTable", () => {
     await user.clear(targetInput);
     await user.type(targetInput, "1000");
 
-    const bestCityCells = screen.getAllByTestId("best-city-cell");
-    for (const cell of bestCityCells) {
+    const cityCells = screen.getAllByTestId("city-cell");
+    for (const cell of cityCells) {
       expect(cell.textContent).not.toMatch(/israel|tel aviv/i);
     }
   });
@@ -419,31 +468,31 @@ describe("MinRoleTable", () => {
 
   // Gherkin (binds): "id-locale tables use Indonesian city and country names"
   describe("id locale name rendering", () => {
-    it("renders 'Singapura' in the best-city column when locale=id", async () => {
+    it("renders 'Singapura' in the city column when locale=id", async () => {
       const user = userEvent.setup();
-      // Scope to Singapore only so best-city for every role is Singapore (id: "Singapura")
+      // Scope to Singapore only so every row is Singapore (id: "Singapura")
       const sgCities = dataset.cities.filter((c) => c.countryId === "sg");
       render(<MinRoleTable {...defaultProps} cityScope={sgCities} locale="id" />);
       // savings_target is default; type directly into target input
       const targetInput = document.querySelector("#target-amount-input") as HTMLInputElement;
       await user.clear(targetInput);
       await user.type(targetInput, "500");
-      const bestCityCells = screen.getAllByTestId("best-city-cell");
-      const texts = bestCityCells.map((c) => c.textContent ?? "");
+      const cityCells = screen.getAllByTestId("city-cell");
+      const texts = cityCells.map((c) => c.textContent ?? "");
       expect(texts.some((t) => /Singapura/.test(t))).toBe(true);
     });
 
-    it("renders 'Jepang' in the best-city column when locale=id", async () => {
+    it("renders 'Jepang' in the city column when locale=id", async () => {
       const user = userEvent.setup();
-      // Scope to Japan only so best-city for every role has country name "Jepang" (id locale)
+      // Scope to Japan only so every row has country name "Jepang" (id locale)
       const jpCities = dataset.cities.filter((c) => c.countryId === "jp");
       render(<MinRoleTable {...defaultProps} cityScope={jpCities} locale="id" />);
       // savings_target is default; type directly into target input
       const targetInput = document.querySelector("#target-amount-input") as HTMLInputElement;
       await user.clear(targetInput);
       await user.type(targetInput, "500");
-      const bestCityCells = screen.getAllByTestId("best-city-cell");
-      const texts = bestCityCells.map((c) => c.textContent ?? "");
+      const cityCells = screen.getAllByTestId("city-cell");
+      const texts = cityCells.map((c) => c.textContent ?? "");
       expect(texts.some((t) => /Jepang/.test(t))).toBe(true);
     });
   });

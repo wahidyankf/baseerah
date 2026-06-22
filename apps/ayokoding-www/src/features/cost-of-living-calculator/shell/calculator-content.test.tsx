@@ -174,6 +174,19 @@ describe("UWT-012 — predictive tab labels", () => {
   });
 });
 
+// ─── Regression: single-city essentials preview removed from the Minimum-role tab ──
+// The "Example — estimated monthly essentials" preview only ever rendered on the min-role tab.
+// That tab now lists every qualifying city, so a one-city example is redundant and misleading —
+// it must not render on any tab.
+describe("min-role tab no longer renders the single-city essentials preview", () => {
+  it("does not render the Example essentials preview on the min-role tab", () => {
+    setupSearchParams({ tab: "min-role" });
+    render(<CostOfLivingCalculatorContent />);
+    expect(screen.queryByTestId("min-role-example-caption")).toBeNull();
+    expect(screen.queryByTestId("preview-housing")).toBeNull();
+  });
+});
+
 // ─── UWT-002: H1 subtitle describes the tool as a cost-of-living comparison ──
 
 describe("UWT-002 — subtitle below H1", () => {

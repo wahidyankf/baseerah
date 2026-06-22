@@ -44,9 +44,12 @@ function ControlsWithState(
 }
 
 describe("Controls", () => {
-  // UWT-006 (USS-002): the min-role preview panel is labelled as an example so the
-  // pre-populated city figures are not mistaken for the user's actual target.
-  it("UWT-006: preview panel carries an example caption naming the city (en)", () => {
+  // The single-city essentials preview is no longer rendered by any tab (it was removed from the
+  // min-role tab — its only former consumer — which now lists every qualifying city). The Controls
+  // component RETAINS the capability behind `showPreview` purely as a deterministic probe for the
+  // cost-math tests below; these three tests pin that dormant contract. The product-level guarantee
+  // that no tab shows it lives in calculator-content.test.tsx.
+  it("retained preview capability: carries an example caption naming the city (en)", () => {
     render(<ControlsWithState previewCityId="singapore" />);
     const caption = screen.getByTestId("min-role-example-caption");
     expect(caption.textContent).toMatch(/example/i);

@@ -35,6 +35,23 @@ export type LadderEntry = {
   clears: boolean;
 };
 
+// One (city, role) candidate. UNLIKE LadderEntry there is NO per-role argmax: every city in
+// scope is paired with every role, so each qualifying place surfaces on its own — nothing is
+// collapsed away behind a single "best city". `clears` flags savings ≥ the baseline bar.
+export type CityRoleEntry = {
+  city: City;
+  country: Country;
+  role: EngRole;
+  rank: number;
+  track: "ic" | "mgmt";
+  essentialSavingsUsd: number;
+  distributionUsd: { p25: number; median: number; p75: number };
+  nonSalaryCompUsd: number;
+  totalCompUsd: number;
+  confidence: Confidence;
+  clears: boolean;
+};
+
 // ─── Salary helpers ─────────────────────────────────────────────────────────
 
 // Gross monthly USD using the MEDIAN of the role × country distribution.
@@ -123,7 +140,7 @@ export function bestCityForRole(
 // ─── Baseline resolution ──────────────────────────────────────────────────────
 
 type BaselineInput =
-  | { grossMonthlyUsd: number } // my_salary
+  | { grossMonthlyUsd: number; cityId: string } // my_salary
   | { role: EngRole; cityId: string } // reference_role
   | { amountLocal: number; displayCurrency: string }; // savings_target
 
@@ -135,24 +152,16 @@ export function resolveBaselineUsd(
   matrix: RoleMatrix,
 ): number {
   if (source === "my_salary") {
-    const inp = input as { grossMonthlyUsd: number };
-    // Return the best-city essential savings for this gross salary
-    let best = -Infinity;
-    for (const city of dataset.cities) {
-      const country = dataset.countries.find((c) => c.id === city.countryId);
-      if (!country) continue;
-      const row = savingsRow(
-        inp.grossMonthlyUsd,
-        city,
-        country,
-        dataset.fx,
-        opts.household,
-        opts.schoolType,
-        opts.area,
-      );
-      if (row.essentialSavings > best) best = row.essentialSavings;
-    }
-    return best;
+    const inp = input as { grossMonthlyUsd: number; cityId: string };
+    // "What you do today": essential savings on this gross IN THE USER'S OWN SALARY CITY.
+    // NOT a global best-city optimum — the bar is anchored to where the user actually lives,
+    // mirroring the reference_role baseline (which also resolves savings in its selected city).
+    const city = dataset.cities.find((c) => c.id === inp.cityId);
+    if (!city) throw new Error(`City not found: ${inp.cityId}`);
+    const country = dataset.countries.find((c) => c.id === city.countryId);
+    if (!country) throw new Error(`Country not found for city: ${inp.cityId}`);
+    const row = savingsRow(inp.grossMonthlyUsd, city, country, dataset.fx, opts.household, opts.schoolType, opts.area);
+    return row.essentialSavings;
   }
   if (source === "reference_role") {
     const inp = input as { role: EngRole; cityId: string };
@@ -190,6 +199,55 @@ export function rankLadder(dataset: Dataset, opts: Opts, matrix: RoleMatrix, cit
       clears: false, // set by minimumRole pass; unknown until baseline is set
     };
   });
+}
+
+// ─── City × role enumeration (no argmax collapse) ─────────────────────────────
+
+// Every (city in scope) × (role) as its own candidate row, each carrying its essential savings
+// and a `clears` flag (savings ≥ baselineUsd). This is the inclusion-first counterpart to
+// rankLadder: instead of keeping only each role's single best city, it keeps EVERYTHING, so a
+// place that qualifies at several seniority levels surfaces once per level and no qualifying
+// city is hidden behind another. `cityScope = null` means all dataset cities.
+export function enumerateCityRoleEntries(
+  dataset: Dataset,
+  opts: Opts,
+  matrix: RoleMatrix,
+  cityScope: City[] | null,
+  baselineUsd: number,
+): CityRoleEntry[] {
+  const cities = cityScope ?? dataset.cities;
+  const entries: CityRoleEntry[] = [];
+  for (const city of cities) {
+    const country = dataset.countries.find((c) => c.id === city.countryId);
+    if (!country) continue;
+    for (const rung of matrix.ladder) {
+      const essentialSavingsUsd = candidateEssentialSavingsUsd(dataset.fx, country, city, rung.role, opts, matrix);
+      entries.push({
+        city,
+        country,
+        role: rung.role,
+        rank: rung.rank,
+        track: rung.track,
+        essentialSavingsUsd,
+        distributionUsd: roleSalaryDistributionUsd(dataset.fx, matrix, city, rung.role),
+        nonSalaryCompUsd: roleNonSalaryCompUsd(dataset.fx, matrix, city, rung.role),
+        totalCompUsd: roleTotalCompUsd(dataset.fx, matrix, city, rung.role),
+        confidence: matrix.salaries[city.countryId]?.[rung.role]?.median.confidence ?? "high",
+        clears: essentialSavingsUsd >= baselineUsd,
+      });
+    }
+  }
+  return entries;
+}
+
+// The lowest role rank that clears the bar anywhere in the candidate set — the "minimum role"
+// you'd need given the filter. null when nothing clears.
+export function minimumQualifyingRank(entries: CityRoleEntry[]): number | null {
+  let min: number | null = null;
+  for (const e of entries) {
+    if (e.clears && (min === null || e.rank < min)) min = e.rank;
+  }
+  return min;
 }
 
 // ─── Minimum role ─────────────────────────────────────────────────────────────

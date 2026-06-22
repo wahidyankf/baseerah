@@ -197,7 +197,11 @@ export function CostOfLivingCalculatorContent() {
         onScopeChange={handleScopeChange}
       />
 
-      {/* Shared cost-basis controls */}
+      {/* Shared cost-basis controls.
+          The single-city "Example — estimated monthly essentials" preview is no longer shown on
+          any tab. The min-role tab (its only former consumer) now lists every qualifying city, so a
+          one-city example is redundant and misleading there. Controls keeps the capability for unit
+          tests, but the product never renders it (showPreview is always false). */}
       <Controls
         dataset={dataset}
         previewCityId={detailCityId ?? firstCity.id}
@@ -205,7 +209,7 @@ export function CostOfLivingCalculatorContent() {
         schoolType={schoolType}
         area={area}
         locale={locale}
-        showPreview={activeTab === "min-role"}
+        showPreview={false}
         onHouseholdChange={handleHouseholdChange}
         onSchoolTypeChange={handleSchoolTypeChange}
         onAreaChange={handleAreaChange}

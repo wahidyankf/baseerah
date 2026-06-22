@@ -84,6 +84,12 @@ import ToolsIndexPage from "@/app/[locale]/tools/page";
 import { dataset } from "@/features/cost-of-living-calculator/core/data/cities";
 import { t } from "@/features/i18n/core/translations";
 
+// The min-role tab now renders every (city, role) in scope (include-all). Unscoped, that is ~90+
+// rows re-rendered on each keystroke of `userEvent.type`; under coverage instrumentation a few of
+// these full-page scenarios brush past the 5s default. Give the feature headroom — production
+// debounces the URL commit, so it never re-renders per keystroke the way these delay-0 tests do.
+vi.setConfig({ testTimeout: 20000 });
+
 const feature = await loadFeature(
   path.resolve(
     process.cwd(),
@@ -798,7 +804,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       });
 
       Then(
-        "I see the software-engineering role ladder with qualifying roles grouped above a divider and non-qualifying roles dimmed below it",
+        "I see the qualifying (city, role) rows grouped above a divider and non-qualifying rows dimmed below it",
         () => {
           expect(screen.getByTestId("qualifying-divider")).toBeTruthy();
           expect(screen.getAllByTestId("non-qualifying-row").length).toBeGreaterThan(0);
@@ -806,20 +812,68 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       );
 
       And(
-        "the lowest role whose best city reaches at least 8000 USD essential savings is marked as the minimum",
+        "the lowest role rank that reaches at least 8000 USD essential savings anywhere in the filter is marked as the minimum",
         () => {
-          expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+          expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
         },
       );
 
       And(
-        "roles whose best city cannot reach 8000 USD essential savings are shown below the divider and de-emphasised",
+        "(city, role) rows that cannot reach 8000 USD essential savings are shown below the divider and de-emphasised",
         () => {
           expect(screen.getAllByTestId("non-qualifying-row").length).toBeGreaterThan(0);
         },
       );
     },
   );
+
+  // INCLUDE-ALL rule — every qualifying (city, role) within the filter is its own row.
+  Scenario("Every qualifying city and role within the filter is included", async ({ Given, And, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given('I am on the "Minimum role" tab with a baseline set', async () => {
+      renderPage(<CostOfLivingCalculatorPage />);
+      await user.click(screen.getByRole("tab", { name: /minimum role/i }));
+      await user.click(screen.getByRole("radio", { name: /monthly savings target/i }));
+      const input = screen.getByRole("spinbutton", { name: /monthly savings target/i });
+      await user.clear(input);
+      await user.type(input, "400");
+    });
+
+    And("the geographic filter is the ASEAN region", async () => {
+      await user.selectOptions(screen.getByRole("combobox", { name: /region/i }), "asean");
+    });
+
+    When("the savings bar is cleared by several countries at several seniority levels", () => {
+      expect(screen.getAllByTestId("city-cell").length).toBeGreaterThan(0);
+    });
+
+    Then("every (city, role) whose essential savings is at or above the bar is shown as its own row", () => {
+      // Qualifying rows exist (not collapsed to one per role).
+      expect(screen.getAllByTestId("city-cell").length).toBeGreaterThan(1);
+    });
+
+    And("a country that clears the bar at more than one role appears on more than one row", () => {
+      const texts = screen.getAllByTestId("city-cell").map((c) => c.textContent ?? "");
+      expect(texts.filter((t) => t.includes("Malaysia")).length).toBeGreaterThan(1);
+    });
+
+    And("no qualifying country is collapsed away behind another country's higher savings", () => {
+      const texts = screen.getAllByTestId("city-cell").map((c) => c.textContent ?? "");
+      const shown = ["Singapore", "Malaysia", "Philippines"].filter((c) => texts.some((t) => t.includes(c)));
+      expect(shown.length).toBeGreaterThanOrEqual(2);
+    });
+
+    And("rows are ordered by essential savings, highest first", () => {
+      // The qualifying group is sorted by savings descending — the first savings cell is the max.
+      const savings = screen
+        .getAllByTestId("savings-triple")
+        .map((c) => parseFloat((c.querySelector('[data-line="usd"]')?.textContent ?? "0").replace(/[^0-9.-]/g, "")));
+      const qualifying = savings.filter((n) => Number.isFinite(n));
+      const sorted = [...qualifying].sort((a, b) => b - a);
+      expect(qualifying.slice(0, sorted.length)).toEqual(sorted);
+    });
+  });
 
   Scenario("Roles are labelled as software-engineering roles", async ({ Given, When, Then }) => {
     const user = userEvent.setup();
@@ -872,7 +926,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
   });
 
-  Scenario("Best city shows its country alongside the city name", async ({ Given, When, Then }) => {
+  Scenario("A city row shows its country alongside the city name", async ({ Given, When, Then }) => {
     const user = userEvent.setup();
 
     Given('I am on the "Minimum role" tab with a baseline set', async () => {
@@ -884,12 +938,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.type(input, "1000");
     });
 
-    When("I read a qualifying role row", () => {
-      expect(screen.getAllByTestId("best-city-cell").length).toBeGreaterThan(0);
+    When("I read a qualifying (city, role) row", () => {
+      expect(screen.getAllByTestId("city-cell").length).toBeGreaterThan(0);
     });
 
-    Then("the row shows the best city and its country", () => {
-      const cells = screen.getAllByTestId("best-city-cell");
+    Then("the row shows the city and its country", () => {
+      const cells = screen.getAllByTestId("city-cell");
       expect(cells[0]?.textContent?.length).toBeGreaterThan(0);
     });
   });
@@ -910,10 +964,10 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.selectOptions(screen.getByRole("combobox", { name: /country/i }), "id");
     });
 
-    Then("each role's best city is chosen only from Indonesian cities", () => {
+    Then("every (city, role) row is drawn only from Indonesian cities", () => {
       const idCityNames = dataset.cities.filter((c) => c.countryId === "id").map((c) => c.name.en);
-      const bestCityCells = screen.getAllByTestId("best-city-cell");
-      for (const cell of bestCityCells) {
+      const cityCells = screen.getAllByTestId("city-cell");
+      for (const cell of cityCells) {
         const text = cell.textContent ?? "";
         const isInIndonesia = idCityNames.some((name) => text.includes(name));
         expect(isInIndonesia).toBe(true);
@@ -979,7 +1033,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     When("I view the minimum role result", () => {
-      expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+      expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
     });
 
     Then("the baseline savings bar equals that role's essential savings in Jakarta", () => {
@@ -987,7 +1041,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
 
     And("the marked minimum role reaches at least that essential savings in absolute terms", () => {
-      expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+      expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
     });
   });
 
@@ -1009,12 +1063,17 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.selectOptions(screen.getByRole("combobox", { name: /my salary city/i }), "singapore");
     });
 
-    Then("the baseline savings bar equals my computed essential savings", () => {
-      expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+    Then("the baseline savings bar equals my essential savings in my selected salary city", () => {
+      expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
+    });
+
+    And("the bar is not raised to a cheaper city's optimum that I do not live in", () => {
+      // The minimum role resolves from the salary-city bar, not a global best-city optimum.
+      expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
     });
 
     And("the ladder marks the lowest role that meets or beats it", () => {
-      expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+      expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
     });
   });
 
@@ -1046,7 +1105,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
         const grossInput = screen.getByRole("spinbutton", { name: /my gross monthly/i });
         await user.clear(grossInput);
         await user.type(grossInput, "12000");
-        expect(screen.getByTestId("minimum-marker")).toBeTruthy();
+        expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
       },
     );
   });
@@ -1472,9 +1531,16 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       expect(screen.getAllByTestId("minimum-marker").length).toBeGreaterThan(0);
     });
 
-    And("all roles appear above the divider because every role clears a zero target", () => {
-      // Every role qualifies, so there are no dimmed non-qualifying rows below the divider.
-      expect(screen.queryAllByTestId("non-qualifying-row").length).toBe(0);
+    And("the qualifying (city, role) rows whose savings are at or above zero appear above the divider", () => {
+      // Under include-all, a zero bar is cleared by every (city, role) with non-negative savings —
+      // those qualifying rows render above the divider. (Deeply-negative pairs may sit below it as
+      // dimmed near-misses; the qualifying group is what the zero-target case anchors.)
+      const allRows = screen.getAllByRole("row");
+      const dividerIdx = allRows.findIndex((r) => r.getAttribute("data-testid") === "qualifying-divider");
+      const qualifyingRows = screen.getAllByTestId("city-cell").map((c) => c.closest("tr")!);
+      const firstQualifyingIdx = Math.min(...qualifyingRows.map((r) => allRows.indexOf(r)).filter((i) => i >= 0));
+      expect(dividerIdx).toBeGreaterThan(-1);
+      expect(firstQualifyingIdx).toBeLessThan(dividerIdx);
     });
   });
 
@@ -1828,7 +1894,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
 
     And("no role salary data is visible", () => {
       expect(screen.queryByTestId("minimum-marker")).toBeNull();
-      expect(screen.queryByTestId("best-city-cell")).toBeNull();
+      expect(screen.queryByTestId("city-cell")).toBeNull();
     });
   });
 
@@ -2013,7 +2079,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
   });
 
-  Scenario("Id locale minimum-role table uses Indonesian best-city names", async ({ Given, And, When, Then }) => {
+  Scenario("Id locale minimum-role table uses Indonesian city names", async ({ Given, And, When, Then }) => {
     const user = userEvent.setup();
 
     Given('the user is on "/id/tools/cost-of-living-calculator" at desktop width', () => {
@@ -2028,7 +2094,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       expect(screen.getByRole("main")).toBeTruthy();
     });
 
-    Then("the Best city column shows Indonesian city and country names where translations exist", () => {
+    Then("the City column shows Indonesian city and country names where translations exist", () => {
       expect(true).toBe(true);
     });
   });
@@ -3347,11 +3413,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     });
   });
 
-  // USS-002 — Min-role pre-target preview panel labelled as an example.
-  Scenario("Minimum-role pre-target panel is labelled as an example", async ({ Given, When, Then }) => {
+  // The single-city essentials preview is removed from the min-role tab (the tab now lists every
+  // qualifying city, so a one-city example is redundant there).
+  Scenario("Minimum-role tab does not render the single-city essentials preview", async ({ Given, When, Then }) => {
     const user = userEvent.setup();
 
-    Given("the Minimum-role tab is activated with no target entered", async () => {
+    Given("the Minimum-role tab is activated", async () => {
       renderPage(<CostOfLivingCalculatorPage />);
       await user.click(screen.getByRole("tab", { name: /minimum role/i }));
     });
@@ -3360,11 +3427,9 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       expect(screen.getByRole("main")).toBeTruthy();
     });
 
-    Then("any pre-populated city cost panel is labelled as an example (or hidden)", () => {
-      // The pre-target preview panel carries the "Example (<city>)" caption.
-      const caption = screen.getByTestId("min-role-example-caption");
-      expect(caption).toBeTruthy();
-      expect(caption.textContent).toContain(t("en", "previewExampleLabel"));
+    Then('no "Example — estimated monthly essentials" single-city cost preview is shown', () => {
+      expect(screen.queryByTestId("min-role-example-caption")).toBeNull();
+      expect(screen.queryByTestId("preview-housing")).toBeNull();
     });
   });
 

@@ -13,7 +13,10 @@ import {
   minimumRole,
   orderForDisplay,
   toDisplayCurrencies,
+  enumerateCityRoleEntries,
+  minimumQualifyingRank,
 } from "./role-lookup";
+import { savingsRow } from "./calc";
 
 const fx = dataset.fx;
 const allCities = dataset.cities;
@@ -148,10 +151,51 @@ describe("role-lookup", () => {
   });
 
   describe("resolveBaselineUsd", () => {
-    it("my_salary: returns essential savings of the entered gross salary", () => {
+    it("my_salary: returns essential savings of the entered gross salary IN THE SELECTED city", () => {
       const grossUsd = 10000;
-      const result = resolveBaselineUsd("my_salary", { grossMonthlyUsd: grossUsd }, defaultOpts, dataset, roleMatrix);
-      expect(Number.isFinite(result)).toBe(true);
+      const result = resolveBaselineUsd(
+        "my_salary",
+        { grossMonthlyUsd: grossUsd, cityId: "jakarta" },
+        defaultOpts,
+        dataset,
+        roleMatrix,
+      );
+      // The bar must equal essential savings computed for that exact city — not a global optimum.
+      const jakarta = allCities.find((c) => c.id === "jakarta")!;
+      const id = countries.find((c) => c.id === jakarta.countryId)!;
+      const expected = savingsRow(
+        grossUsd,
+        jakarta,
+        id,
+        fx,
+        defaultOpts.household,
+        defaultOpts.schoolType,
+        defaultOpts.area,
+      ).essentialSavings;
+      expect(result).toBeCloseTo(expected, 6);
+    });
+
+    // Regression (2026-06-22): the my_salary baseline must be anchored to the user's OWN salary
+    // city, never a global best-city optimum. The old code looped all cities and took the max,
+    // so picking Jakarta vs San Francisco produced an identical (Bengaluru-driven) bar — inflating
+    // the min role and surfacing the wrong "best country". A different salary city must move the bar.
+    it("my_salary: the chosen salary city changes the baseline (not a global max)", () => {
+      const grossUsd = 6000;
+      const inJakarta = resolveBaselineUsd(
+        "my_salary",
+        { grossMonthlyUsd: grossUsd, cityId: "jakarta" },
+        defaultOpts,
+        dataset,
+        roleMatrix,
+      );
+      const inSanFrancisco = resolveBaselineUsd(
+        "my_salary",
+        { grossMonthlyUsd: grossUsd, cityId: "san-francisco" },
+        defaultOpts,
+        dataset,
+        roleMatrix,
+      );
+      expect(inJakarta).not.toBeCloseTo(inSanFrancisco, 2);
     });
 
     it("reference_role: returns best-city savings for the reference role (median)", () => {
@@ -247,6 +291,52 @@ describe("role-lookup", () => {
       for (const entry of ranked) {
         expect(["high", "moderate", "proxy"]).toContain(entry.confidence);
       }
+    });
+  });
+
+  describe("enumerateCityRoleEntries (include-all, no argmax)", () => {
+    const asean = allCities.filter((c) => c.region === "asean");
+
+    it("emits one entry per (city in scope) × role — nothing collapsed", () => {
+      const entries = enumerateCityRoleEntries(dataset, defaultOpts, roleMatrix, asean, 0);
+      expect(entries.length).toBe(asean.length * roleMatrix.ladder.length);
+    });
+
+    it("only includes cities within the scope", () => {
+      const entries = enumerateCityRoleEntries(dataset, defaultOpts, roleMatrix, asean, 0);
+      const scopeIds = new Set(asean.map((c) => c.id));
+      for (const e of entries) expect(scopeIds.has(e.city.id)).toBe(true);
+    });
+
+    it("flags clears = (savings ≥ bar) for every entry, both sides of the bar", () => {
+      const bar = 500;
+      const entries = enumerateCityRoleEntries(dataset, defaultOpts, roleMatrix, asean, bar);
+      for (const e of entries) expect(e.clears).toBe(e.essentialSavingsUsd >= bar);
+      // The bar must genuinely split the set — at least one qualifies and at least one does not.
+      expect(entries.some((e) => e.clears)).toBe(true);
+      expect(entries.some((e) => !e.clears)).toBe(true);
+    });
+
+    it("includes a qualifying city at EVERY role it clears — not just its best (the reported bug)", () => {
+      // Malaysia clears the bar across many seniority levels; all must be present, not collapsed.
+      const bar = 400;
+      const entries = enumerateCityRoleEntries(dataset, defaultOpts, roleMatrix, asean, bar);
+      const malaysiaClears = entries.filter((e) => e.country.id === "my" && e.clears);
+      expect(malaysiaClears.length).toBeGreaterThan(1);
+      // And a country that qualifies anywhere is never silently dropped from the candidate set.
+      const countriesPresent = new Set(entries.map((e) => e.country.id));
+      for (const c of asean) expect(countriesPresent.has(c.countryId)).toBe(true);
+    });
+
+    it("minimumQualifyingRank returns the lowest clearing rank, or null when none clear", () => {
+      const entries = enumerateCityRoleEntries(dataset, defaultOpts, roleMatrix, asean, 400);
+      const rank = minimumQualifyingRank(entries);
+      expect(rank).not.toBeNull();
+      const lowestClearing = Math.min(...entries.filter((e) => e.clears).map((e) => e.rank));
+      expect(rank).toBe(lowestClearing);
+
+      const none = enumerateCityRoleEntries(dataset, defaultOpts, roleMatrix, asean, 1_000_000_000);
+      expect(minimumQualifyingRank(none)).toBeNull();
     });
   });
 

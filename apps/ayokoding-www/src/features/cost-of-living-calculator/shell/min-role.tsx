@@ -14,7 +14,13 @@ import {
 import type { Dataset, Household, City } from "../core/data/cities";
 import type { Area, SchoolType } from "../core/calc";
 import type { RoleMeta, RoleMatrix } from "../core/data/roles";
-import { rankLadder, minimumRole, orderForDisplay, resolveBaselineUsd, toDisplayCurrencies } from "../core/role-lookup";
+import {
+  enumerateCityRoleEntries,
+  minimumQualifyingRank,
+  resolveBaselineUsd,
+  toDisplayCurrencies,
+} from "../core/role-lookup";
+import type { CityRoleEntry } from "../core/role-lookup";
 import { fx, fxToUsd } from "../core/data/fx";
 import { DEFAULT_STATE } from "../core/url-state";
 import type { MinRoleInputs, BaselineSource } from "../core/url-state";
@@ -130,7 +136,6 @@ export function MinRoleTable({
       : myGrossMonthly * fxToUsd(fx, mySalaryCityCurrency);
 
   const opts = { household, schoolType, area };
-  const ranked = rankLadder(dataset, opts, matrix, cityScope);
 
   let baselineUsd = 0;
   let baselineReady = false;
@@ -155,18 +160,40 @@ export function MinRoleTable({
       );
       baselineReady = true;
     } else if (baselineSource === "my_salary" && myGrossMonthly > 0 && mySalaryCityId) {
-      baselineUsd = resolveBaselineUsd("my_salary", { grossMonthlyUsd: myGrossUsd }, opts, dataset, matrix);
+      baselineUsd = resolveBaselineUsd(
+        "my_salary",
+        { grossMonthlyUsd: myGrossUsd, cityId: mySalaryCityId },
+        opts,
+        dataset,
+        matrix,
+      );
       baselineReady = true;
     }
   } catch {
     baselineReady = false;
   }
 
-  const minRole = baselineReady ? minimumRole(baselineUsd, ranked) : null;
-  const ordered = orderForDisplay(ranked, minRole);
-  const qualifying = ordered.filter((e) => e.clears);
-  const nonQualifying = ordered.filter((e) => !e.clears);
-  const noQualifiers = baselineReady && minRole === null;
+  // INCLUDE-ALL: every (city in scope) × role is a candidate row — no per-role argmax collapse.
+  // As long as a place clears the bar and passes the geo filter, it appears. Until a baseline is
+  // engaged we pass an unreachable bar so nothing "clears" and the full set renders as muted
+  // context (the savings-target blank case is handled separately by the empty-state below).
+  const entries = enumerateCityRoleEntries(dataset, opts, matrix, cityScope, baselineReady ? baselineUsd : Infinity);
+  const minRank = baselineReady ? minimumQualifyingRank(entries) : null;
+  // Flat list, sorted by essential savings (best money first), split by the bar.
+  const bySavingsDesc = (a: CityRoleEntry, b: CityRoleEntry) => b.essentialSavingsUsd - a.essentialSavingsUsd;
+  const qualifying = entries.filter((e) => e.clears).sort(bySavingsDesc);
+  // Below-bar rows are OPTIONAL near-miss context (the include-all rule only governs qualifying
+  // rows, which are never capped). Show just the handful CLOSEST to the bar — without a geo filter
+  // there can be hundreds of deeply-negative pairs, and dumping them all is noise (and slow). The
+  // hidden remainder is surfaced as a count so nothing is silently dropped.
+  const NON_QUALIFYING_PREVIEW = 12;
+  const nonQualifyingAll = entries.filter((e) => !e.clears).sort(bySavingsDesc);
+  const nonQualifying = nonQualifyingAll.slice(0, NON_QUALIFYING_PREVIEW);
+  const nonQualifyingHidden = nonQualifyingAll.length - nonQualifying.length;
+  const noQualifiers = baselineReady && qualifying.length === 0;
+  // An entry is "the minimum role" when it clears at the lowest qualifying seniority rank. Several
+  // cities can share that rank — each is a valid lowest-seniority way to clear, so all are marked.
+  const isMinEntry = (e: CityRoleEntry) => e.clears && minRank !== null && e.rank === minRank;
 
   // EWT-001: the qualifying divider anchors the qualifying group whenever a baseline is engaged and
   // at least one role qualifies — including the numeric zero-target case where EVERY role clears and
@@ -193,31 +220,27 @@ export function MinRoleTable({
     );
   }
 
-  function SavingsCell({ entry }: { entry: (typeof ordered)[0] }) {
-    const conv = toDisplayCurrencies(fx, entry.bestEssentialSavingsUsd, entry.bestCity.currency, displayCurrency);
+  function SavingsCell({ entry }: { entry: CityRoleEntry }) {
+    const conv = toDisplayCurrencies(fx, entry.essentialSavingsUsd, entry.city.currency, displayCurrency);
     return (
       <TableCell data-testid="savings-triple">
-        <span data-line="usd">{fmtCurrencyTrailing(entry.bestEssentialSavingsUsd, "USD")}</span>
+        <span data-line="usd">{fmtCurrencyTrailing(entry.essentialSavingsUsd, "USD")}</span>
         {displayCurrency !== "USD" && (
           <span data-line="display" className="block text-xs">
             {fmtCurrencyTrailing(conv.display, displayCurrency)}
           </span>
         )}
         <span data-line="local" className="block text-xs text-muted-foreground">
-          {fmtCurrencyTrailing(conv.local, entry.bestCity.currency)}
+          {fmtCurrencyTrailing(conv.local, entry.city.currency)}
         </span>
       </TableCell>
     );
   }
 
-  function RoleRow({ entry, isMin, dimmed }: { entry: (typeof ordered)[0]; isMin: boolean; dimmed: boolean }) {
+  function RoleRow({ entry, isMin, dimmed }: { entry: CityRoleEntry; isMin: boolean; dimmed: boolean }) {
     const rowLabel = matrix.ladder.find((r) => r.role === entry.role)?.label.en ?? entry.role;
     return (
-      <TableRow
-        key={entry.role}
-        data-testid={dimmed ? "non-qualifying-row" : undefined}
-        className={dimmed ? "opacity-50" : undefined}
-      >
+      <TableRow data-testid={dimmed ? "non-qualifying-row" : undefined} className={dimmed ? "opacity-50" : undefined}>
         <TableCell>
           {rowLabel}
           {isMin && (
@@ -227,8 +250,8 @@ export function MinRoleTable({
           )}
         </TableCell>
         <TableCell className="hidden lg:table-cell">{trackLabel(entry.track, locale)}</TableCell>
-        <TableCell data-testid="best-city-cell">
-          {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
+        <TableCell data-testid="city-cell">
+          {localeName(entry.city.name, locale)}, {localeName(entry.country.name, locale)}
           {(entry.confidence === "proxy" || entry.confidence === "moderate") && (
             <span data-testid="confidence-flag" className="ml-1 text-xs text-muted-foreground">
               [{entry.confidence}]
@@ -237,13 +260,13 @@ export function MinRoleTable({
         </TableCell>
         <DualCell
           usdVal={entry.distributionUsd.p25}
-          cityCurrency={entry.bestCity.currency}
+          cityCurrency={entry.city.currency}
           className="hidden lg:table-cell"
         />
-        <DualCell usdVal={entry.distributionUsd.median} cityCurrency={entry.bestCity.currency} />
+        <DualCell usdVal={entry.distributionUsd.median} cityCurrency={entry.city.currency} />
         <DualCell
           usdVal={entry.distributionUsd.p75}
-          cityCurrency={entry.bestCity.currency}
+          cityCurrency={entry.city.currency}
           className="hidden lg:table-cell"
         />
         <SavingsCell entry={entry} />
@@ -254,10 +277,10 @@ export function MinRoleTable({
     );
   }
 
-  function MobileRoleCard({ entry, isMin, dimmed }: { entry: (typeof ordered)[0]; isMin: boolean; dimmed: boolean }) {
+  function MobileRoleCard({ entry, isMin, dimmed }: { entry: CityRoleEntry; isMin: boolean; dimmed: boolean }) {
     const rowLabel = matrix.ladder.find((r) => r.role === entry.role)?.label.en ?? entry.role;
-    const med = toDisplayCurrencies(fx, entry.distributionUsd.median, entry.bestCity.currency, displayCurrency);
-    const sav = toDisplayCurrencies(fx, entry.bestEssentialSavingsUsd, entry.bestCity.currency, displayCurrency);
+    const med = toDisplayCurrencies(fx, entry.distributionUsd.median, entry.city.currency, displayCurrency);
+    const sav = toDisplayCurrencies(fx, entry.essentialSavingsUsd, entry.city.currency, displayCurrency);
     return (
       <div className={`overflow-hidden rounded-lg border bg-card shadow-sm ${dimmed ? "opacity-60" : ""}`}>
         <div className="flex flex-wrap items-center justify-between gap-2 bg-primary px-3 py-2 text-primary-foreground">
@@ -269,9 +292,9 @@ export function MinRoleTable({
         </div>
         <div className="space-y-1 p-3 text-sm">
           <div className="flex items-baseline justify-between">
-            <span className="text-muted-foreground">{t(locale, "colBestCity")}</span>
+            <span className="text-muted-foreground">{t(locale, "colCity")}</span>
             <span>
-              {localeName(entry.bestCity.name, locale)}, {localeName(entry.bestCountry.name, locale)}
+              {localeName(entry.city.name, locale)}, {localeName(entry.country.name, locale)}
             </span>
           </div>
           <div className="flex items-baseline justify-between">
@@ -505,7 +528,7 @@ export function MinRoleTable({
       )}
 
       {/* Tablet + desktop (md+): table. Track / P25 / P75 / non-salary columns collapse on tablet. */}
-      {!showEmptyState && (
+      {baselineReady && (
         <div className="hidden overflow-x-auto md:block">
           <Table>
             <TableCaption data-testid="se-roles-caption">{t(locale, "seRolesCaption")}</TableCaption>
@@ -513,7 +536,7 @@ export function MinRoleTable({
               <TableRow>
                 <TableHead>{t(locale, "colRole")}</TableHead>
                 <TableHead className="hidden lg:table-cell">{t(locale, "colTrack")}</TableHead>
-                <TableHead>{t(locale, "colBestCity")}</TableHead>
+                <TableHead>{t(locale, "colCity")}</TableHead>
                 <TableHead className="hidden lg:table-cell" title={t(locale, "tooltipP25")}>
                   {t(locale, "colP25")}
                 </TableHead>
@@ -536,7 +559,12 @@ export function MinRoleTable({
             </TableHeader>
             <TableBody>
               {qualifying.map((entry) => (
-                <RoleRow key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
+                <RoleRow
+                  key={`${entry.city.id}:${entry.role}`}
+                  entry={entry}
+                  isMin={isMinEntry(entry)}
+                  dimmed={false}
+                />
               ))}
 
               {showDivider && (
@@ -548,18 +576,31 @@ export function MinRoleTable({
               )}
 
               {nonQualifying.map((entry) => (
-                <RoleRow key={entry.role} entry={entry} isMin={false} dimmed={true} />
+                <RoleRow key={`${entry.city.id}:${entry.role}`} entry={entry} isMin={false} dimmed={true} />
               ))}
+
+              {nonQualifyingHidden > 0 && (
+                <TableRow data-testid="non-qualifying-more">
+                  <TableCell colSpan={8} className="text-center text-xs text-muted-foreground">
+                    +{nonQualifyingHidden} {t(locale, "moreBelowBar")}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
       )}
 
       {/* Mobile (<md): stacked role cards (qualifying first, divider, then dimmed below-minimum) */}
-      {!showEmptyState && (
+      {baselineReady && (
         <div data-testid="mobile-role-cards" className="space-y-3 md:hidden">
           {qualifying.map((entry) => (
-            <MobileRoleCard key={entry.role} entry={entry} isMin={entry.role === minRole} dimmed={false} />
+            <MobileRoleCard
+              key={`${entry.city.id}:${entry.role}`}
+              entry={entry}
+              isMin={isMinEntry(entry)}
+              dimmed={false}
+            />
           ))}
 
           {showDivider && (
@@ -569,8 +610,14 @@ export function MinRoleTable({
           )}
 
           {nonQualifying.map((entry) => (
-            <MobileRoleCard key={entry.role} entry={entry} isMin={false} dimmed={true} />
+            <MobileRoleCard key={`${entry.city.id}:${entry.role}`} entry={entry} isMin={false} dimmed={true} />
           ))}
+
+          {nonQualifyingHidden > 0 && (
+            <p data-testid="non-qualifying-more-mobile" className="text-center text-xs text-muted-foreground">
+              +{nonQualifyingHidden} {t(locale, "moreBelowBar")}
+            </p>
+          )}
         </div>
       )}
     </div>

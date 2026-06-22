@@ -170,9 +170,22 @@ Feature: Salary savings calculator
     And I switch to the "Minimum role" tab
     And I set the baseline source to "savings target"
     When I enter a monthly savings target of "8000" USD
-    Then I see the software-engineering role ladder with qualifying roles grouped above a divider and non-qualifying roles dimmed below it
-    And the lowest role whose best city reaches at least 8000 USD essential savings is marked as the minimum
-    And roles whose best city cannot reach 8000 USD essential savings are shown below the divider and de-emphasised
+    Then I see the qualifying (city, role) rows grouped above a divider and non-qualifying rows dimmed below it
+    And the lowest role rank that reaches at least 8000 USD essential savings anywhere in the filter is marked as the minimum
+    And (city, role) rows that cannot reach 8000 USD essential savings are shown below the divider and de-emphasised
+
+  # The reported "only one Malaysia entry / results hidden" bug. Each (city, role) is its own
+  # candidate row — there is NO per-role argmax that keeps only one "best" city per role — so every
+  # place that clears the bar within the filter is shown, a country can occupy several rows (one per
+  # qualifying seniority level), and no qualifying country is hidden behind a higher-saving neighbour.
+  Scenario: Every qualifying city and role within the filter is included
+    Given I am on the "Minimum role" tab with a baseline set
+    And the geographic filter is the ASEAN region
+    When the savings bar is cleared by several countries at several seniority levels
+    Then every (city, role) whose essential savings is at or above the bar is shown as its own row
+    And a country that clears the bar at more than one role appears on more than one row
+    And no qualifying country is collapsed away behind another country's higher savings
+    And rows are ordered by essential savings, highest first
 
   Scenario: Roles are labelled as software-engineering roles
     Given I am on the "Minimum role" tab with a baseline set
@@ -185,15 +198,15 @@ Feature: Salary savings calculator
     Then the role shows its country's p25, median, and p75 salary distribution
     And the row's essential savings is computed from the median salary
 
-  Scenario: Best city shows its country alongside the city name
+  Scenario: A city row shows its country alongside the city name
     Given I am on the "Minimum role" tab with a baseline set
-    When I read a qualifying role row
-    Then the row shows the best city and its country
+    When I read a qualifying (city, role) row
+    Then the row shows the city and its country
 
   Scenario: Geographic filter scopes the candidate cities
     Given I am on the "Minimum role" tab with a baseline set
     When I select the country "Indonesia" in the cascading filters
-    Then each role's best city is chosen only from Indonesian cities
+    Then every (city, role) row is drawn only from Indonesian cities
 
   Scenario: Non-salary comp does not change the minimum-role ranking
     Given I am on the "Minimum role" tab with a baseline set
@@ -217,7 +230,8 @@ Feature: Salary savings calculator
     Given I am on the "Minimum role" tab
     And I set the baseline source to "my salary"
     When I enter my gross salary and its city
-    Then the baseline savings bar equals my computed essential savings
+    Then the baseline savings bar equals my essential savings in my selected salary city
+    And the bar is not raised to a cheaper city's optimum that I do not live in
     And the ladder marks the lowest role that meets or beats it
 
   Scenario: My-salary baseline accepts the gross in local currency or USD
@@ -302,7 +316,7 @@ Feature: Salary savings calculator
     Then the qualifying divider is shown
     And the qualifying divider element is rendered in the role ladder
     And the minimum marker appears on the lowest-ranked role in the ladder
-    And all roles appear above the divider because every role clears a zero target
+    And the qualifying (city, role) rows whose savings are at or above zero appear above the divider
 
   Scenario: Expense preview updates in real time when household controls change
     Given I am on the cost-of-living calculator
@@ -478,11 +492,11 @@ Feature: Salary savings calculator
     Then the Country column shows Indonesian country names where translations exist
     And the City column shows Indonesian city names where translations exist
 
-  Scenario: Id locale minimum-role table uses Indonesian best-city names
+  Scenario: Id locale minimum-role table uses Indonesian city names
     Given the user is on "/id/tools/cost-of-living-calculator" at desktop width
     And the Minimum role tab is active
     When the ladder table renders
-    Then the Best city column shows Indonesian city and country names where translations exist
+    Then the City column shows Indonesian city and country names where translations exist
 
   # prd.md acceptance criteria — design-system controls, locale URL redirect, mobile nav
   Scenario: Gross-salary input uses the design-system Input primitive
@@ -840,10 +854,11 @@ Feature: Salary savings calculator
     Then a prominent empty-state prompt is shown in the data area
     And the gross salary input receives focus
 
-  Scenario: Minimum-role pre-target panel is labelled as an example
-    Given the Minimum-role tab is activated with no target entered
+  Scenario: Minimum-role tab does not render the single-city essentials preview
+    Given the Minimum-role tab is activated
     When the page is rendered
-    Then any pre-populated city cost panel is labelled as an example (or hidden)
+    Then no "Example — estimated monthly essentials" single-city cost preview is shown
+    # The min-role tab now lists every qualifying city, so a one-city example is redundant there.
 
   Scenario: Savings salary input shows its currency at the field
     Given the Savings tab is shown
