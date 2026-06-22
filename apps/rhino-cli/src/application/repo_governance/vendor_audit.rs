@@ -254,6 +254,38 @@ pub fn walk(root: &Path) -> std::result::Result<Vec<Finding>, Error> {
     Ok(findings)
 }
 
+/// Root-level instruction files that are in scope for the vendor audit in
+/// addition to the `repo-governance/` subtree, per the
+/// [Governance Vendor-Independence Convention] "Scope" section.
+///
+/// [Governance Vendor-Independence Convention]: repo-governance/conventions/structure/governance-vendor-independence.md
+const ROOT_INSTRUCTION_SURFACES: &[&str] = &["AGENTS.md", "CLAUDE.md"];
+
+/// Walks the canonical governance audit scope rooted at `repo_root`:
+/// every `.md` file under `repo_root/repo-governance/` plus the root
+/// instruction surfaces in [`ROOT_INSTRUCTION_SURFACES`].
+///
+/// This is the scope the `repo-governance audit` orchestrator uses — narrower
+/// than a whole-repo walk so build caches, app content, worktrees, and
+/// third-party vendored skills are never scanned. Mirrors the default scope of
+/// the standalone `repo-governance validate vendor` command (which defaults to
+/// `repo-governance/`), extended with the two root instruction surfaces the
+/// convention also governs.
+///
+/// # Errors
+///
+/// Returns an error when any in-scope file cannot be read.
+pub fn walk_governance_scope(repo_root: &Path) -> std::result::Result<Vec<Finding>, Error> {
+    let mut findings = walk(&repo_root.join("repo-governance"))?;
+    for name in ROOT_INSTRUCTION_SURFACES {
+        let p = repo_root.join(name);
+        if p.is_file() {
+            findings.extend(scan_file(&p)?);
+        }
+    }
+    Ok(findings)
+}
+
 /// Scans `content` line-by-line for forbidden vendor terms, respecting YAML
 /// frontmatter, code fences, HTML comments, inline code, link URLs, and the
 /// "Platform Binding Examples" heading scope.
@@ -566,5 +598,59 @@ mod tests {
         assert_eq!(fence_line_len("````"), 4);
         assert_eq!(fence_line_len("``"), 0);
         assert_eq!(fence_line_len("text"), 0);
+    }
+
+    #[test]
+    fn governance_scope_walks_in_scope_and_skips_out_of_scope() {
+        // The vendor-independence convention scopes the audit to `repo-governance/`
+        // prose plus the canonical root instruction surfaces `AGENTS.md` and
+        // `CLAUDE.md`. Everything else in the repo (build caches, app content,
+        // worktrees) is out of scope and must NOT be scanned.
+        let tmp = TempDir::new().unwrap();
+        let root = tmp.path();
+
+        // In scope: repo-governance/ subtree.
+        let gov = root.join("repo-governance/conventions");
+        fs::create_dir_all(&gov).unwrap();
+        fs::write(gov.join("foo.md"), "We use Claude Code internally.\n").unwrap();
+
+        // In scope: root instruction surfaces.
+        fs::write(root.join("AGENTS.md"), "Edited with Cursor today.\n").unwrap();
+        fs::write(root.join("CLAUDE.md"), "Powered by Anthropic models.\n").unwrap();
+
+        // Out of scope: build cache, app source, worktree — each with a vendor term.
+        for rel in [".nx/cache/x.md", "apps/web/y.md", "worktrees/wt/z.md"] {
+            let p = root.join(rel);
+            fs::create_dir_all(p.parent().unwrap()).unwrap();
+            fs::write(&p, "Built on OpenCode.\n").unwrap();
+        }
+
+        let findings = walk_governance_scope(root).unwrap();
+
+        // Exactly the three in-scope files contribute findings.
+        let files: std::collections::BTreeSet<String> =
+            findings.iter().map(|f| f.path.replace('\\', "/")).collect();
+        assert_eq!(findings.len(), 3, "expected one finding per in-scope file");
+        assert!(
+            files
+                .iter()
+                .any(|p| p.ends_with("repo-governance/conventions/foo.md"))
+        );
+        assert!(files.iter().any(|p| p.ends_with("/AGENTS.md")));
+        assert!(files.iter().any(|p| p.ends_with("/CLAUDE.md")));
+        // No out-of-scope path leaks in.
+        assert!(!files.iter().any(|p| p.contains("/.nx/")));
+        assert!(!files.iter().any(|p| p.contains("/apps/")));
+        assert!(!files.iter().any(|p| p.contains("/worktrees/")));
+    }
+
+    #[test]
+    fn governance_scope_tolerates_missing_root_files() {
+        // When AGENTS.md / CLAUDE.md are absent, the scoped walk still succeeds
+        // and returns only the repo-governance/ findings (here: none).
+        let tmp = TempDir::new().unwrap();
+        fs::create_dir_all(tmp.path().join("repo-governance")).unwrap();
+        let findings = walk_governance_scope(tmp.path()).unwrap();
+        assert!(findings.is_empty());
     }
 }

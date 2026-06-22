@@ -5,11 +5,17 @@ Feature: Governance Audit Orchestrator
   I want a single command that runs all deterministic governance audits and emits one JSON envelope
   So that the AI checker can consume preflight findings without re-deriving them
 
-  Scenario: Clean repository: all 11 categories pass, total_findings is 0, exit 0
+  Scenario: Clean repository: all categories pass, total_findings is 0, exit 0
     Given a repository where every deterministic governance category reports zero findings
     When the developer runs repo-governance audit
     Then the command exits successfully
     And the output reports total_findings equal to zero across all categories
+
+  Scenario: Vendor-audit scope is limited to governance prose and root instruction surfaces
+    Given a repository with forbidden vendor terms in repo-governance prose and also in out-of-scope paths such as build caches, app source, and worktrees
+    When the developer runs repo-governance audit
+    Then the vendor-audit category reports findings only from repo-governance, AGENTS.md, and CLAUDE.md
+    And forbidden vendor terms in build caches, app source, and worktrees do not appear in the result
 
   Scenario: Mixed findings: some categories pass, some fail; total_findings is the sum; exit 1
     Given a repository where two deterministic governance categories report findings and the rest pass

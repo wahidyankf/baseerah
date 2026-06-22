@@ -19,7 +19,7 @@ use sha2::{Digest, Sha256};
 
 use super::layer_coherence::audit_layer_coherence;
 use super::traceability_audit::audit_traceability;
-use super::vendor_audit::walk as audit_vendor_walk;
+use super::vendor_audit::walk_governance_scope as audit_vendor_walk;
 
 /// JSON schema identifier embedded in every [`AuditEnvelope`].
 pub const AUDIT_ENVELOPE_SCHEMA: &str = "rhino-cli/repo-governance-audit/v1";
