@@ -171,7 +171,7 @@ An HTTP 403 response from any `gh` command during CI monitoring means the rate l
 2. Note the time. The rate limit resets approximately at the top of the next hour from when the window opened (not from when the 403 occurred).
 3. Use `ScheduleWakeup` with `delaySeconds=2100` (35 minutes) to resume CI verification after the reset.
 4. On wakeup, run `gh run list --limit=5` once to verify the rate limit has cleared before proceeding with full monitoring.
-5. If still rate-limited on wakeup, schedule another wakeup for `delaySeconds=1200` (30 minutes) and do not issue further calls.
+5. If still rate-limited on wakeup, schedule another wakeup for `delaySeconds=1800` (30 minutes) and do not issue further calls.
 
 ```bash
 # PASS: Correct recovery — scheduled wait, not retry loop
