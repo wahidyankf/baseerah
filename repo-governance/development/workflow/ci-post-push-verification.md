@@ -58,14 +58,14 @@ When a change touches shared code (a lib, a shared type, a contract), trigger ev
 
 ## Monitoring Without Rate-Limiting
 
-Check every **3-5 minutes** using `ScheduleWakeup(delaySeconds=180)` + one `gh run view <run-id> --json conclusion,status,jobs` per wakeup. Repeat until complete. This uses 7-12 API calls for a 35-min job (0.4% of the 5,000/hour budget).
+Check every **2-5 minutes** using `ScheduleWakeup(delaySeconds=120)` + one `gh run view <run-id> --json conclusion,status,jobs` per wakeup. Repeat until complete. This uses 7-18 API calls for a 35-min job (well under 1% of the 5,000/hour budget).
 
 **`gh run watch` is only safe for jobs <5 min** — it polls every ~3 seconds internally and exhausts the rate limit on any longer job. Tight-loop polling of `gh run view` with no sleep is **forbidden** for the same reason.
 
 See [CI Monitoring Convention](./ci-monitoring.md) for:
 
 - Full rate limit budget facts and window behavior
-- Required approach: `ScheduleWakeup` every 3-5 min (default) vs `gh run watch` for <5 min jobs
+- Required approach: `ScheduleWakeup` every 2-5 min (default) vs `gh run watch` for <5 min jobs
 - Trigger discipline (never trigger the same workflow more than once every 10 minutes)
 - Recovery procedure when rate-limited (HTTP 403): `ScheduleWakeup(delaySeconds=2100)`, not retry loop
 
@@ -81,7 +81,7 @@ gh workflow run ayokoding-www-test-local-deploy-prod.yml
 # List recent runs for a workflow to find the run ID
 gh run list --workflow=ayokoding-www-test-local-deploy-prod.yml --limit=5
 
-# Check run status (call every 3-5 min via ScheduleWakeup — do NOT use gh run watch for long jobs)
+# Check run status (call every 2-5 min via ScheduleWakeup — do NOT use gh run watch for long jobs)
 gh run view <run-id> --json conclusion,status,jobs
 
 # View logs for a failed run
@@ -210,7 +210,7 @@ Result: All steps passed. Work is complete.
 
 ## Related Documentation
 
-- [CI Monitoring Convention](./ci-monitoring.md) — Safe monitoring mechanics: ScheduleWakeup every 3-5 min as default, `gh run watch` only for <5 min jobs, trigger discipline, rate-limit recovery.
+- [CI Monitoring Convention](./ci-monitoring.md) — Safe monitoring mechanics: ScheduleWakeup every 2-5 min as default, `gh run watch` only for <5 min jobs, trigger discipline, rate-limit recovery.
 - [CI Blocker Resolution Convention](../quality/ci-blocker-resolution.md) — How to investigate and fix CI failures found during verification.
 - [Trunk Based Development Convention](./trunk-based-development.md) — Why `main` must remain releasable at all times.
 - [Git Push Default Convention](./git-push-default.md) — Default push behavior (direct to `origin main`, no PR buffer).

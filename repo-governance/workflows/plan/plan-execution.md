@@ -366,7 +366,7 @@ After every push to `main`, verify GitHub Actions.
 1. Identify which GitHub Actions workflows were triggered by the push
 2. Find the run ID: `gh run list --workflow=<workflow-file> --limit=3`
 3. Monitor to completion using the correct approach for the job duration:
-   - **Standard jobs (10–35 min, required default)**: `ScheduleWakeup(delaySeconds=180)` (3 min), check with one `gh run view <run-id> --json conclusion,status,jobs`, repeat every 3-5 min until complete
+   - **Standard jobs (10–35 min, required default)**: `ScheduleWakeup(delaySeconds=120)` (2 min), check with one `gh run view <run-id> --json conclusion,status,jobs`, repeat every 2-5 min until complete
    - **Short jobs (<5 min only)**: `gh run watch <run-id>` — do NOT use for 20–35 min CI jobs
    - Never use `gh run watch` on jobs expected to take 20–35 min — it polls every ~3s and exhausts API quota
 4. If ANY workflow fails:

@@ -216,7 +216,7 @@ It does not apply to:
 
 ## Related Documentation
 
-- [CI Monitoring Convention](../workflow/ci-monitoring.md) -- Safe CI / GitHub Actions monitoring cadence: never poll faster than once every two minutes (3-minute operational default)
+- [CI Monitoring Convention](../workflow/ci-monitoring.md) -- Safe CI / GitHub Actions monitoring cadence: never poll faster than once every two minutes (2-minute operational default)
 - [Code Quality Convention](./code.md) -- Quality gates that this convention protects
 - [Git Push Safety Convention](../workflow/git-push-safety.md) -- Per-instance approval for `--no-verify`
 - [Trunk Based Development Convention](../workflow/trunk-based-development.md) -- Main must always be releasable
