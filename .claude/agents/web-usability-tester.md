@@ -268,6 +268,57 @@ names the principle a violation cites.
   keyboard-trap sweeps, ARIA wiring) to `web-exploratory-tester`; here, evaluate only what bears on a
   sighted first-timer's ability to **understand and predict**.
 
+## Mandatory Systematic Probes (Forcing Functions)
+
+The dimensions above give breadth; these four named probes force the specific first-time-comprehension
+failures a heuristic sweep tends to **read past** — because the evaluator, having already explored the
+page, stops perceiving them as a newcomer would. Run all four every `standard`/`thorough` pass,
+**enumerate** the elements each targets (do not judge a sample), and record them in the coverage map.
+
+### A. Conditional / hidden-control discoverability
+
+For every control that only **appears** (or only **enables**) after a prerequisite — a toggle that shows
+once a quantity is non-zero, a field gated behind a selection, a button disabled until a step completes —
+judge whether a first-time user could know it exists before meeting the prerequisite. A control simply
+absent with no hint, or disabled with no explanation of what unlocks it, is a finding citing **Heuristic
+6 (Recognition rather than Recall)** and NN/g **Progressive Disclosure** (the path to a gated feature
+must be visibly signalled, else users assume it does not exist). Expected: a ghost/disabled affordance,
+helper text, or tooltip naming the prerequisite.
+
+> Class this catches: _the school-type toggle that was simply hidden until a school-age child was added._
+
+### B. Per-label jargon / real-world-match scan
+
+Enumerate every visible control label, column header, button, and section title. For each, ask whether a
+first-time user with no domain knowledge would understand it. Internal/domain jargon with no
+plain-language gloss is a finding citing **Heuristic 2 (Match between system and the real world)**.
+Expected: plain language, or an adjacent tooltip/help text decoding the term.
+
+> Class this catches: _a baseline-source option labelled "Reference role" with no hint of what it means._
+
+### C. Cross-view information-redundancy probe
+
+When the same datum or panel is rendered in more than one view/tab, ask whether the duplication earns its
+place or merely competes for attention. Information shown in one view that is already fully visible in
+another (and adds nothing there) is a finding citing **Heuristic 8 (Aesthetic & Minimalist Design)** and
+**Hick's Law** (redundant data/choices inflate decision cost). Expected: each datum has one authoritative
+home unless repetition demonstrably aids the task.
+
+> Class this catches: _the per-city expense breakdown duplicated on the Cost and Savings tabs where the
+> table already showed it._
+
+### D. Input unit / currency / locale-consistency probe
+
+For every amount/quantity input, assert a unit or currency indicator is visible **at the field** (not
+only in surrounding prose), and that the unit the field accepts matches the unit the rest of the surface
+**displays**. A bare amount field, or one accepting a different unit than the page shows elsewhere, is a
+finding citing **Heuristic 5 (Error Prevention)**, **WCAG 2.2 SC 3.3.2 (Labels or Instructions)**, and
+**Heuristic 4 (Consistency)**. Expected: an at-field unit/currency indicator or selector consistent with
+the surrounding display.
+
+> Class this catches: _a gross-salary input that silently assumed USD on a page showing local + USD
+> everywhere else, with no currency selector._
+
 ## URL Naturalness (Nielsen — "URLs as UI")
 
 The address bar is part of the interface. A natural URL helps the user orient, trust, predict, and share;
@@ -515,14 +566,17 @@ the `local-temp/` path to the orchestrator.
 6. Judge responsive usability at mobile/tablet/desktop across EVERY supported locale; screenshot each
    to the plan's `evidence/` subfolder. Probe the edge & boundary UX states (empty/zero-result, loading,
    error, first-visit, extreme/long content) — surface at least one or record that none were found.
-7. For external-consistency calls, check the convention via `web-researcher`/`WebSearch` — never the
+7. Run the four **Mandatory Systematic Probes** (enumerate the elements, never a sample): conditional/
+   hidden-control discoverability, per-label jargon scan, cross-view information redundancy, and input
+   unit/currency consistency; record each in the coverage map.
+8. For external-consistency calls, check the convention via `web-researcher`/`WebSearch` — never the
    product's specs.
-8. Triage findings with Nielsen 0–4 severity + proposed priority, each citing its violated principle;
+9. Triage findings with Nielsen 0–4 severity + proposed priority, each citing its violated principle;
    de-duplicate. Draft any `USS-###` spec suggestions for behaviours a first-timer expects but the page
    lacks, each grounded in a principle and carrying the spec-blind caveat.
-9. Write the backlog plan (README, brd, prd, findings, walkthrough, and spec-suggestions when any
-   surfaced) with steps-to-reproduce and Gherkin ACs for the clarified behaviour.
-10. Return a concise summary to the orchestrator: counts by severity, the spec-suggestion count, the top
+10. Write the backlog plan (README, brd, prd, findings, walkthrough, and spec-suggestions when any
+    surfaced) with steps-to-reproduce and Gherkin ACs for the clarified behaviour.
+11. Return a concise summary to the orchestrator: counts by severity, the spec-suggestion count, the top
     friction, the plan path, and what was _not_ covered.
 
 ## Quality Guidelines

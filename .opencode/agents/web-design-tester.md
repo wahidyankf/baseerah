@@ -249,6 +249,41 @@ Apply the dimensions relevant to the goal; record which were covered and which w
   "does not break"); intended responsive transformations match the design.
 - **External-source parity** — when an external design source was provided, the live page matches it.
 
+## Mandatory Systematic Checks (Forcing Functions)
+
+The dimensions above give breadth; these two checks force the design-fidelity failures that fall
+**between** "token drift" (wrong token) and "reinvented primitive" (bespoke re-build) and that a
+colour/mockup sweep misses. Run both every `standard`/`thorough` pass, **enumerate** the elements (do not
+sample), and record their matrices in the coverage map.
+
+### A. Raw / unstyled native-element audit
+
+Enumerate every interactive native element on the rendered page — `select`, `input`, `textarea`,
+`button`, checkbox/radio. For each, read its **computed styles** and class list and assert it carries the
+design system's styling (a `libs/web-ui` primitive, or the app's token/utility classes) — NOT browser
+default chrome. A native control rendered with UA defaults (no border-radius from the scale, no token
+background, no consistent padding; an empty or UA-only class list) is a finding citing **Heuristic 4
+(internal Consistency & Standards)**: a raw `<select>`/`<input>` beside styled siblings fragments the
+design language. This is distinct from token drift and primitive reinvention — it is the **absence** of
+any design-system styling. Report the rendered symptom (computed style + bare class list); leave the
+source fix to `swe-ui-checker`.
+
+> Class this catches: _the min-role baseline inputs rendered as bare unstyled HTML controls while the
+> cost/savings inputs were fully styled._
+
+### B. Intra-form & cross-surface styling-consistency matrix
+
+1. **Within a form/region** — enumerate controls of the same kind (all selects, all number inputs, all
+   primary buttons) and assert they share the same computed styling tuple (background, border, radius,
+   font-size, padding within tolerance). An outlier is a consistency finding.
+2. **Across surfaces** — for each control kind that recurs on multiple tabs/views, assert the rendered
+   styling matches across surfaces; a control styled one way on tab A and differently on tab B is a
+   cross-surface consistency finding (Heuristic 4). Record the control-kind × surface styling matrix in
+   the coverage map.
+
+Industry practice for this is visual-regression baselining (e.g. Chromatic); absent that tooling, read
+**computed-style tuples** via Playwright and compare within tolerance.
+
 ## How to Drive the Browser
 
 1. **Baseline** — `WebFetch` the target(s) for rendered HTML/CSS and link discovery; identify the routes
@@ -429,13 +464,15 @@ the `local-temp/` path to the orchestrator.
 4. Compare every observation against the five ground-truth sources; for design practice, cite the
    principle (delegating to `web-researcher` when unsure). Deliberately probe spacing/density ("not
    cramped"), alignment, hierarchy, and cross-surface consistency — not just colour/mockup match.
-5. Detect design-spec gaps: catalog on-design behaviours worth protecting that `specs/**` does not cover,
+5. Run the two **Mandatory Systematic Checks** (enumerate, never sample): the raw/unstyled native-element
+   audit and the intra-form & cross-surface styling-consistency matrix; record each in the coverage map.
+6. Detect design-spec gaps: catalog on-design behaviours worth protecting that `specs/**` does not cover,
    and draft proposed Gherkin for each.
-6. Triage findings with severity + proposed priority, each citing its violated ground truth/principle;
+7. Triage findings with severity + proposed priority, each citing its violated ground truth/principle;
    de-duplicate.
-7. Write the backlog plan (README, brd, prd, findings, spec-gaps when any surfaced) with
+8. Write the backlog plan (README, brd, prd, findings, spec-gaps when any surfaced) with
    steps-to-reproduce and Gherkin ACs for the on-design result.
-8. Return a concise summary to the orchestrator: counts by severity, the spec-gap count, the top design
+9. Return a concise summary to the orchestrator: counts by severity, the spec-gap count, the top design
    risks, the plan path, and what was _not_ covered.
 
 ## Quality Guidelines

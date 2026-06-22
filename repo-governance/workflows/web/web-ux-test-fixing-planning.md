@@ -193,6 +193,28 @@ Decision points that trigger a grill:
 The Phase 4 `plan-maker` invocation performs its own before/after grill as part of authoring; this
 section governs the workflow-level checkpoints around it so no material decision is made silently.
 
+## Systematic Coverage & Recurrence (all three testers)
+
+A standing finding from re-running this workflow on the same target: dimension- and charter-driven
+testing reliably surfaces _representative_ defects yet repeatedly misses the **"enumerate every element
+and assert one property"** class — a shared control that no-ops on one tab, an input whose state never
+reaches the URL, a stated invariant only half-implemented, a raw unstyled control, a hidden affordance,
+a jargon label, a redundantly duplicated panel. The three testers now each carry **mandatory
+forcing-function sweeps** for these (see each tester's _Mandatory Systematic Sweeps/Probes/Checks_
+section). This workflow adds three cross-tester obligations on top:
+
+- **Coverage-matrix artifact** — each tester records its enumerated matrices (control × surface,
+  control × URL-round-trip, element × styling, declared-invariant conformance) in its coverage map; the
+  consolidated plan's `README.md` keeps them so a reviewer can see _what was enumerated_, not just _what
+  was found_. A sampled or empty matrix is not coverage.
+- **Recurrence re-check** — the prior-class list compiled in Phase 0 is handed to every tester as a
+  mandatory re-check, so a target does not keep re-yielding a class a fresh charter would skip.
+- **Changed-surface targeting** — the diff-since-last-run list from Phase 0 directs explicit coverage of
+  features added/changed after the previous test (the highest-risk untested surface).
+
+These obligations are passed to each tester as part of its Phase 1–3 args and verified by the
+cross-tester completeness critic in Phase 3.5.
+
 ## Phases
 
 ### 0. Pre-flight (Sequential)
@@ -208,8 +230,16 @@ section governs the workflow-level checkpoints around it so no material decision
 - Resolve `breakpoints` and `locales` (defaults = testers' own standard coverage; `locales` defaults
   to ALL locales the target supports — discovered from the app's i18n config or locale-prefixed
   routes — never just the default locale).
+- **Recurrence memory** — locate prior findings plans for this target (`plans/**` whose slug names the
+  same app/feature) and extract the **classes** of defect they recorded (e.g. cross-tab consistency,
+  state-not-in-URL, unstyled control, hidden affordance). Hand this class list to all three testers as a
+  **mandatory re-check** so a target does not keep re-yielding the same class a fresh charter would skip.
+- **Diff-since-last-run targeting** — determine what changed in the target's source since the last
+  findings run (`git log`/`git diff` on `apps/<target>/**`, `libs/**`). Features added or changed after
+  the prior test are the **highest-risk untested surface**; direct the testers to cover them explicitly.
 
-**Output**: Targets reachable; plan destination resolved.
+**Output**: Targets reachable; plan destination resolved; prior-class re-check list + changed-surface
+list compiled for the testers.
 
 **On failure**: Dirty tree → ask the user to commit/stash first. Unreachable URL or missing
 merge target → abort with a clear message.
@@ -227,7 +257,10 @@ URL/IA, passive security) plus spec-gap proposals `SG-###` (Gherkin scenarios fo
 behaviour, edge cases especially).
 
 - **Args**: `target-urls: {input.target-urls}`, `testing-goal: {input.testing-goal}`,
-  `breakpoints: {input.breakpoints}`, `locales: {input.locales}`.
+  `breakpoints: {input.breakpoints}`, `locales: {input.locales}`, plus the Phase 0 **recurrence
+  re-check list** (prior-finding classes for this target) and **changed-surface list** (source changed
+  since the last run) as mandatory coverage, and the instruction to record its enumerated coverage
+  matrices in the coverage map.
 - **Output**: Returns its full findings set as structured text (README/brd/prd/findings/spec-gaps
   bodies). Subagents cannot write under `plans/` directly, so the orchestrator captures the returned
   text.
@@ -300,6 +333,25 @@ tester's `SG-###` design-spec proposals into the plan's spec coverage, kept dist
 design `SG-###` proposals captured.
 **On failure**: If the tester fails, record the gap prominently in the plan README and proceed to
 solidification with the exploratory + usability perspectives — never silently drop a perspective.
+
+### 3.5 Cross-tester completeness critic (Sequential)
+
+Before solidifying, run one explicit critic pass over the three integrated result sets and their
+coverage matrices, asking: **"which control, surface, tab, locale, breakpoint, edge state, declared
+invariant, or recurrence-class did NONE of the three testers enumerate?"** Concretely:
+
+- Reconcile the three coverage maps into a single control × surface grid; any cell no tester exercised
+  is either filled by a targeted re-run of the relevant tester or recorded under "areas not covered"
+  with the reason.
+- Confirm every prior-class re-check item (Phase 0 recurrence list) and every changed-surface item
+  (Phase 0 diff list) was actually exercised; re-dispatch the owning tester for any that slipped.
+- Confirm the declared-invariant conformance pass enumerated **every** applicable element, not a sample.
+
+Silent omission reads as "all clear" when it is not — this critic makes the gaps explicit before the
+plan is authored. Record its outcome in the plan `README.md` coverage map.
+
+**Success criteria**: every matrix cell is exercised or explicitly recorded as not-covered with a reason;
+no Phase 0 recurrence/diff item is silently dropped.
 
 ### 4. Solidify — tech-docs, delivery, and (conditional) UI assets (Sequential, delegated)
 
@@ -437,6 +489,14 @@ Scenario: Unreachable target aborts before testing
   When the workflow starts
   Then it aborts in pre-flight with a message to start the server
   And no plan is authored
+
+Scenario: Systematic coverage matrices and recurrence are enforced
+  Given a target that has prior findings plans and source changed since the last run
+  When the workflow runs
+  Then pre-flight compiles a prior-finding-class re-check list and a changed-surface list
+  And each tester receives them as mandatory coverage and records its enumerated coverage matrices
+  And the Phase 3.5 cross-tester completeness critic confirms no matrix cell, recurrence class, or changed surface was silently skipped
+  And the consolidated README coverage map carries the matrices
 ```
 
 ## Related Documents

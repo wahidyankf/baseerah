@@ -239,6 +239,81 @@ Apply the dimensions relevant to the goal; record which were covered and which w
   not leak stack traces/paths/queries; `robots.txt` does not advertise sensitive paths. Observation
   only — never exploit.
 
+## Mandatory Systematic Sweeps (Forcing Functions)
+
+The dimension checklist above gives **breadth**; these three sweeps give **exhaustiveness**. They are
+not optional charters — every `standard` and `thorough` run MUST execute all three and record their
+matrices in the `README.md` coverage map. They exist because dimension-and-tour testing reliably finds
+_representative_ defects yet repeatedly misses the **"enumerate every element and assert one property"**
+class: a shared control that no-ops on one surface, an input whose state never reaches the URL, an
+invariant the app declares but only half-implements. **Enumerate; do not sample.** A sampled or empty
+matrix is not coverage.
+
+**Grounding**: sweep A cites Nielsen **Heuristic 4 (Consistency & Standards)** and **WCAG 2.2 SC 3.2.4
+(Consistent Identification)** — same-function components must be identified/behave consistently across
+pages (technique G197). Sweep B cites the **MDN History API** state contract — every `pushState` URL
+must, loaded cold, reproduce the same view state — plus Heuristics 1 (Visibility of system status) and 3
+(User control & freedom: back/forward must work).
+
+### A. Shared-control × surface matrix (consistency by enumeration)
+
+1. Enumerate EVERY shared / global control — filters, scope selectors, segmented toggles, search, sort,
+   household/quantity inputs, currency and locale switchers — i.e. any control that appears on, or is
+   meant to affect, more than one tab / view / surface.
+2. Enumerate every surface that control is meant to affect (each tab, each list/table, the mobile vs
+   desktop rendering, each locale).
+3. For each (control × surface) cell, exercise the control and **assert its effect is present and
+   matches its effect on the sibling surfaces**. A control that works on tab A but silently no-ops on
+   tab B is a Major+ behavioural-consistency defect — cite the surface where it DOES work as the
+   "expected".
+4. Record the matrix (control rows × surface columns, ✓ / ✗ / n-a per cell) in the coverage map.
+
+> Class this catches: _"the geographic filter scoped the Cost tab but the Savings tab ignored it."_
+
+### B. Per-control URL / state round-trip sweep
+
+For EVERY interactive control whose state a user could reasonably want to keep, share, or restore:
+
+1. Change the control to a non-default value.
+2. Assert the address bar updates to encode that value.
+3. Reload the page — and, separately, open the resulting URL in a fresh context / new tab — and assert
+   the control **and its downstream view** are restored to the changed state.
+4. Exercise back / forward across a few changes and assert state tracks history.
+5. Flag any control whose state is **not** reflected in the URL — **Major** when the app declares
+   URL/state-restoration as an invariant (see C), otherwise a UX finding. Record a control ×
+   {in-URL? / restores-on-reload? / survives-new-tab?} table in the coverage map.
+
+> Class this catches: _"the min-role baseline inputs and the Savings gross were not in the URL even
+> though sibling controls were, and a stated 'URL is the single source of truth' invariant existed."_
+
+### C. Declared-invariant conformance pass
+
+Cross-cutting promises are the richest miss source because they must hold for **every** element, not a
+sample. Before and during the tour, extract the target's declared invariants and verify each holds
+universally:
+
+1. Discover invariants from ground truth the agent already reads — `specs/**`, the plan docs,
+   `CLAUDE.md`/`AGENTS.md`, and telltale source headers (e.g. a `url-state` module whose comment says
+   "URL is the single source of truth"; a rule "every monetary value shows local + USD"; an i18n rule
+   "every string is translated in every supported locale").
+2. For each invariant, enumerate every element it applies to and **assert it holds for ALL of them** —
+   not the first few. A promise kept for nine controls and broken for the tenth is a finding citing the
+   invariant as "expected".
+3. List each invariant and its conformance verdict (holds / partial — with the offending elements) in
+   the coverage map.
+
+> Class this catches: _a "URL is the single source of truth" promise that in fact covered only some
+> controls._
+
+### Self-completeness check (close the run)
+
+Before writing up, run one explicit critic pass over the matrices: **"which control, surface, locale,
+breakpoint, edge state, or declared invariant did I NOT enumerate?"** Any blank cell is either filled
+or recorded under "areas not covered" with the reason — silent omission reads as "all clear" when it is
+not. (When this agent runs inside the
+[Web UX Test-Fixing Planning workflow](../../repo-governance/workflows/web/web-ux-test-fixing-planning.md),
+that workflow also carries a cross-tester completeness critic and a recurrence/diff-since-last-run pass.)
+
 ## How to Drive the Browser
 
 1. **Baseline (always available)** — `WebFetch` the target(s) for rendered HTML, meta, and link
@@ -453,15 +528,18 @@ the `local-temp/` path to the orchestrator.
    screenshots to the plan's `evidence/` subfolder; deliberately exercise edge cases and boundary
    conditions (the Data dimension + Antisocial/Intellectual tour), not only the happy path — surface at
    least one edge observation or record that none were found.
-5. Compare every observation against ground truth — including each mapped `specs/**` scenario; recompute
+5. Run the three **Mandatory Systematic Sweeps** (enumerate, never sample): the shared-control × surface
+   matrix, the per-control URL/state round-trip, and the declared-invariant conformance pass; record each
+   matrix in the coverage map, then run the self-completeness check.
+6. Compare every observation against ground truth — including each mapped `specs/**` scenario; recompute
    values; confirm reproducibility.
-6. Detect spec gaps: catalog correct behaviours the live target exhibits but `specs/**` does not cover —
+7. Detect spec gaps: catalog correct behaviours the live target exhibits but `specs/**` does not cover —
    giving edge-case behaviours special attention — and draft proposed Gherkin for each.
-7. Triage findings with severity + proposed priority; de-duplicate.
-8. Write the backlog plan (README, brd, prd, findings, spec-gaps) with steps-to-reproduce, Gherkin ACs,
+8. Triage findings with severity + proposed priority; de-duplicate.
+9. Write the backlog plan (README, brd, prd, findings, spec-gaps) with steps-to-reproduce, Gherkin ACs,
    and spec-gap proposals.
-9. Return a concise summary to the orchestrator: counts by severity, the spec-gap count, the top risks,
-   the plan path, and what was _not_ covered.
+10. Return a concise summary to the orchestrator: counts by severity, the spec-gap count, the top risks,
+    the plan path, and what was _not_ covered.
 
 ## Quality Guidelines
 
