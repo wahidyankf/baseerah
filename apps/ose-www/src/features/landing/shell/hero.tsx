@@ -10,7 +10,7 @@ export function Hero() {
           <strong>Built in the Open &middot; Sharia-Compliant &middot; Enterprise-Ready</strong>
         </p>
         <p className="mt-4 text-muted-foreground">
-          Source-available platform for Sharia-compliant enterprise solutions. Starting with individual productivity
+          Open-source (MIT) platform for Sharia-compliant enterprise solutions. Starting with individual productivity
           tools, expanding to MSME, then enterprise.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -26,7 +26,7 @@ export function Hero() {
       </div>
 
       <div className="mx-auto mt-16 max-w-xl">
-        <h2 className="text-xl font-semibold">Why Source-Available?</h2>
+        <h2 className="text-xl font-semibold">Why Open Source?</h2>
         <ul className="mt-4 space-y-3 text-muted-foreground">
           <li className="flex gap-2">
             <span className="font-semibold text-foreground">Transparency &amp; Trust</span> &mdash; Full visibility into

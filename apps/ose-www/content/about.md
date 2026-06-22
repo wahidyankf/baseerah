@@ -1,28 +1,28 @@
 ---
 title: "About OSE Platform"
 url: "/about/"
-summary: "Learn about the Open Sharia Enterprise Platform - a source-available Sharia-compliant enterprise solutions platform"
+summary: "Learn about the Open Sharia Enterprise Platform - an open-source (MIT) Sharia-compliant enterprise solutions platform"
 date: 2026-02-22T00:00:00+07:00
 showtoc: true
 ---
 
 # About Open Sharia Enterprise
 
-Open Sharia Enterprise (OSE) Platform is a **source-available** platform for building Sharia-compliant enterprise solutions. Built for Islamic finance institutions and Sharia-compliant businesses, starting with Indonesian regulations and expanding globally.
+Open Sharia Enterprise (OSE) Platform is an **open-source (MIT)** platform for building Sharia-compliant enterprise solutions. Built for Islamic finance institutions and Sharia-compliant businesses, starting with Indonesian regulations and expanding globally.
 
 ## The Opportunity
 
 Islamic finance is a multi-trillion dollar industry growing at double-digit rates, creating massive demand for Sharia-compliant enterprise systems. While purpose-built platforms exist, they're typically proprietary and expensive. Many organizations still struggle with legacy systems retrofitted for Sharia compliance.
 
-**The gap?** Accessible, source-available solutions with built-in compliance and radical transparency.
+**The gap?** Accessible, open-source solutions with built-in compliance and radical transparency.
 
 ## Mission
 
 Our mission is to democratize access to **trustworthy**, Sharia-compliant enterprise technology for organizations of all sizes, regardless of region or industry.
 
-We're building a source-available platform with Sharia-compliance at its core—following a progressive complexity approach from individual users (Phase 1: OrganicLever productivity tracker) to SMB (Phase 2) to enterprise (Phase 3: full ERP and global expansion). Each phase generates revenue to fund the next, ensuring sustainable growth.
+We're building an open-source platform with Sharia-compliance at its core—following a progressive complexity approach from individual users (Phase 1: OrganicLever productivity tracker) to SMB (Phase 2) to enterprise (Phase 3: full ERP and global expansion). Each phase generates revenue to fund the next, ensuring sustainable growth.
 
-## Why Source-Available Matters
+## Why Open Source Matters
 
 **Transparency builds trust in Sharia-compliant systems.** Unlike expensive proprietary solutions, OSE Platform's source code is publicly visible and auditable by anyone.
 
@@ -143,7 +143,7 @@ Full enterprise capabilities with maximum scale:
 
 - 🕌 **Sharia-compliance as a foundation** - Built in from the ground up, not bolted on later
 - 🔓 **Transparency and openness** - Code transparency builds trust
-- 🌐 **Source-available by default** - Radical transparency unless it compromises security/privacy
+- 🌐 **Open-source by default** - Radical transparency unless it compromises security/privacy
 - 🤖 **AI-assisted development** - Leverage AI systematically to enhance productivity
 - 🤝 **Community collaboration** - Accelerate development of accessible tools
 - 🛡️ **Governance and security from day one** - Essential for enterprise solutions
@@ -212,7 +212,7 @@ While we're not yet accepting public contributions, you can stay connected and s
 
 - 📢 Share the project with your network
 - 💬 Discuss with colleagues in Islamic finance and fintech
-- 🤝 Connect with others interested in source-available Sharia-compliant solutions
+- 🤝 Connect with others interested in open-source Sharia-compliant solutions
 
 ## Key Resources
 
