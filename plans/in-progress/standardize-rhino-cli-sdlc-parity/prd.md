@@ -32,6 +32,7 @@ running the target, not a TDD code cycle.
 
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
 - Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (`fmt`→`format`, `{tool}:check` wrappers, `harness:bindings-validation` as an Nx target). [Repo-grounded]
+- Testing-architecture standard: mandatory-seven targets on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit, three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push ≡ PR running only `test:quick`, and rhino-cli feature-consumption enforcement. [Repo-grounded]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, markdown-validate, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_.
 - Convergence edits in all three repos.
 
@@ -102,6 +103,71 @@ Feature: Nx target names are canonical and identical across repos
     Given the converged repos
     When `jq -r '.targets | keys[]' apps/rhino-cli/project.json` is run in each
     Then the sorted key set is identical across ose-public, ose-primer, and ose-infra
+```
+
+```gherkin
+Feature: Every project declares the mandatory seven targets
+
+  Scenario: All apps and libs expose the seven targets
+    Given any direct child folder of apps/ or libs/ registered with Nx
+    When its project.json targets are inspected
+    Then test:unit, test:integration, test:e2e, test:quick, lint, format, and typecheck are all present
+    And targets that do not apply to the project are declared as no-op echo placeholders
+    And test:e2e has a real (non-echo) command only on *-e2e projects
+```
+
+```gherkin
+Feature: test:quick runs typecheck then lint then test:unit
+
+  Scenario: test:quick composes the three in order
+    Given a project's test:quick target
+    When test:quick runs
+    Then it runs typecheck, then lint, then test:unit, in that exact order
+    And it stops at the first failing step
+```
+
+```gherkin
+Feature: The three test levels consume the same Gherkin
+
+  Scenario: unit, integration, and e2e share feature files
+    Given a project with feature files under its specs gherkin directory
+    When test:unit, test:integration, and test:e2e run
+    Then all three consume the same feature files driven by the same tags
+    And test:unit covers BDD step tests plus non-BDD unit tests with coverage measured
+    And BE test:integration exercises behaviour at the service level, never through the HTTP API
+    And the HTTP API surface is exercised only by test:e2e in the *-e2e project
+```
+
+```gherkin
+Feature: Every feature file is consumed by a test
+
+  Scenario: An orphan feature file fails the gate
+    Given a feature file under specs that no test references
+    When rhino-cli specs:coverage runs with --require-consumption
+    Then it fails and names the orphan feature file
+```
+
+```gherkin
+Feature: Pre-push and PR gate run identical fast commands
+
+  Scenario: Both gates run only test:quick for affected projects
+    Given a push and an opened pull request for the same change
+    When the pre-push hook and the PR quality gate run
+    Then both run `nx affected -t test:quick` for the affected projects
+    And neither runs test:integration or test:e2e
+    And test:integration and test:e2e run only on the scheduled CRON pipelines
+```
+
+```gherkin
+Feature: Post-merge CI runs full tests and deploys per project
+
+  Scenario: A merged PR triggers per-project test then staging deploy
+    Given a PR is merged to main touching one or more projects
+    When the post-merge CI runs
+    Then each affected project runs test:quick, then test:integration, then test:e2e in isolation
+    And a project whose tests all pass and that is deployable is deployed to staging independently
+    And a failing project never blocks another project's tests or deploy
+    And the scheduled stag-deploy CRON remains only as a nightly fallback
 ```
 
 ```gherkin
