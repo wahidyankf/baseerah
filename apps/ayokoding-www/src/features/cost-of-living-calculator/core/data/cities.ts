@@ -2,6 +2,8 @@
 // Sources: Numbeo Jun 2026, PwC Worldwide Tax Summaries 2025, OECD 2025, ECB/Xe.com 2026-06-17.
 // FX rates NOT stored here — all USD conversion via fx.ts (city.currency → fxToUsd(fx, currency)).
 // Confidence tiers: high = primary source, moderate = secondary / corroborated, proxy = derived.
+// To (re)source this data, see the prompts in
+// ../../../../../docs/cost-of-living-calculator/data-sourcing-prompt.md
 
 import type { FxTable } from "./fx";
 import { fx } from "./fx";
