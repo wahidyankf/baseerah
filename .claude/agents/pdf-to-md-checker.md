@@ -198,36 +198,12 @@ Add summary:
 
 ## Convergence Safeguards
 
-### Known False Positive Skip List
+See `repo-applying-maker-checker-fixer` Skill for:
 
-Before beginning validation, load the skip list:
-
-```bash
-# Check if a finding is in the skip list (entries live in generated-reports/.known-false-positives.md)
-crane skiplist --check "$MD_BASENAME" "$CATEGORY" "$DESCRIPTION"
-```
-
-- Uses stable SHA256 key derivation for dedup
-- If matched: log as `[PREVIOUSLY ACCEPTED FALSE_POSITIVE — skipped]`
-
-### Re-validation Mode (Scoped Scan)
-
-When UUID chain is multi-part (iteration 2+):
-
-1. Check latest fix report for `## Changed Sections (for Scoped Re-validation)`
-2. If list is non-empty: validate only those changed sections, not the entire document
-3. If list is empty (fixer ran with `Applied (HIGH_CONFIDENCE): 0`): write a **carry-forward
-   audit** that references the prior audit by UUID and reproduces its findings verbatim — no
-   re-scan. The fixer's deterministic no-op outcome means nothing has changed.
-4. If no fix report exists (Step 5 invoked from Step 3 zero-findings confirmation path): run full
-   scan
-
-### Cached Comparison Results (Iterations 2+)
-
-On re-validation:
-
-- Carry forward `[Verified — match confirmed]` segments from iteration 1
-- Only re-check segments that were flagged or that the fixer touched
+- **Known False Positive Skip List**: Load and check `generated-reports/.known-false-positives.md` before every validation step
+- **Scoped Re-validation**: When UUID chain is multi-part, validate only changed files from fix report
+- **Escalation**: After 2+ disagreements on same finding, mark as `[ESCALATED — manual review required]`
+- **Convergence Target**: Stabilize in 3-5 iterations; warn if not converged after 7
 
 ## Report Format
 
