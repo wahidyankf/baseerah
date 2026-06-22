@@ -720,3 +720,19 @@ Feature: Salary savings calculator
     Then the baseline-source control renders as a radiogroup with at least three options
     And the savings-target input is visible when savings target is the selected baseline
     And the reference-role inputs are hidden when savings target is the selected baseline
+
+  # Regression — changing a filter must not scroll the page back to the top. The URL write is
+  # in-page view state, not a page navigation, so it requests { scroll: false }.
+  Scenario: Changing a filter preserves the scroll position
+    Given I am on the cost-of-living calculator
+    When I change the region filter to "Europe"
+    Then the URL update requests no scroll so the page does not jump to the top
+
+  # Regression — typing a salary must not write the URL on every keystroke (the stutter bug).
+  # The field echoes each keystroke instantly while the URL commit is debounced until typing
+  # settles.
+  Scenario: Typing the gross salary echoes instantly but commits to the URL only after typing settles
+    Given I am on the "Savings" tab
+    When I type a gross monthly salary of "7000" without pausing
+    Then the salary field immediately shows "7000"
+    And the gross salary is written to the URL once typing settles

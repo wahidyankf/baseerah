@@ -1,9 +1,11 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { dataset } from "../core/data/cities";
 import { roleMatrix } from "../core/data/roles";
 import { SavingsTable } from "./savings";
+import { URL_INPUT_DEBOUNCE_MS } from "./use-debounced-field";
 
 afterEach(cleanup);
 
@@ -245,6 +247,49 @@ describe("SavingsTable", () => {
       const countryLinks = screen.getAllByRole("link").filter((el) => el.getAttribute("href")?.includes("country="));
       const countryTexts = countryLinks.map((l) => l.textContent ?? "");
       expect(countryTexts.some((t) => t === "Jepang")).toBe(true);
+    });
+  });
+
+  // Regression: in controlled (URL-driven) mode the gross input must debounce its commit so
+  // typing the salary does not write the URL on every keystroke (the stutter bug).
+  describe("controlled gross input debounces its URL commit", () => {
+    function Controlled({ onCommit }: { onCommit: (gross: number) => void }) {
+      const [gross, setGross] = useState(0);
+      return (
+        <SavingsTable
+          {...defaultProps}
+          gross={gross}
+          onGrossChange={(g) => {
+            setGross(g);
+            onCommit(g);
+          }}
+        />
+      );
+    }
+
+    it("typing the gross salary commits once after the debounce window, not per keystroke", () => {
+      vi.useFakeTimers();
+      try {
+        const onCommit = vi.fn();
+        render(<Controlled onCommit={onCommit} />);
+        const input = document.querySelector("#gross-salary-input") as HTMLInputElement;
+
+        fireEvent.change(input, { target: { value: "8" } });
+        fireEvent.change(input, { target: { value: "80" } });
+        fireEvent.change(input, { target: { value: "8000" } });
+
+        // The field echoes the latest keystroke immediately…
+        expect(input.value).toBe("8000");
+        // …but the URL commit has not fired yet.
+        expect(onCommit).not.toHaveBeenCalled();
+
+        act(() => vi.advanceTimersByTime(URL_INPUT_DEBOUNCE_MS));
+
+        expect(onCommit).toHaveBeenCalledTimes(1);
+        expect(onCommit).toHaveBeenLastCalledWith(8000);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

@@ -26,6 +26,10 @@ import { dataset } from "../core/data/cities";
 
 const mockRouterReplace = vi.fn();
 const mockRouterPush = vi.fn();
+// Separate spies capture the navigation options object (e.g. { scroll: false }) without
+// disturbing the url-only assertions that mockRouterReplace/Push back.
+const mockRouterReplaceOpts = vi.fn();
+const mockRouterPushOpts = vi.fn();
 
 // Reactive router state: hoisted so the vi.mock factory closure can access it.
 // push/replace update params AND call setParams to trigger React re-renders.
@@ -40,14 +44,16 @@ const { navState } = vi.hoisted(() => {
 vi.mock("next/navigation", () => ({
   useSearchParams: () => navState.params,
   useRouter: () => ({
-    replace: (url: string) => {
+    replace: (url: string, opts?: unknown) => {
       mockRouterReplace(url);
+      mockRouterReplaceOpts(opts);
       const qs = url.startsWith("?") ? url.slice(1) : url;
       navState.params = new URLSearchParams(qs);
       navState.setParams(navState.params);
     },
-    push: (url: string) => {
+    push: (url: string, opts?: unknown) => {
       mockRouterPush(url);
+      mockRouterPushOpts(opts);
       const qs = url.startsWith("?") ? url.slice(1) : url;
       navState.params = new URLSearchParams(qs);
       navState.setParams(navState.params);
@@ -561,6 +567,48 @@ describe("Phase 2c — cost-basis controls write URL", () => {
     await waitFor(() => {
       expect(mockRouterPush).toHaveBeenCalledWith(expect.stringContaining("schooltype=private"));
     });
+  });
+});
+
+// ─── Regression: filter changes must NOT scroll the page to the top ──────────
+// A filter/view change is in-page state, not a page navigation. The default Next.js
+// router scroll-to-top would yank the viewport away from the control on every change.
+// Every URL write must pass { scroll: false }.
+describe("Regression — filter/tab changes request no scroll (preserve scroll position)", () => {
+  beforeEach(() => {
+    setupSearchParams({});
+  });
+
+  it("a tab change pushes with { scroll: false }", async () => {
+    const user = userEvent.setup();
+    setupSearchParams({});
+
+    render(<CostOfLivingCalculatorContent />);
+
+    await user.click(screen.getByRole("tab", { name: /savings/i }));
+
+    await waitFor(() => {
+      expect(mockRouterPush).toHaveBeenCalledWith(expect.stringContaining("tab=savings"));
+    });
+    expect(mockRouterPushOpts).toHaveBeenLastCalledWith({ scroll: false });
+  });
+
+  it("a geo filter change replaces/pushes with { scroll: false }", async () => {
+    const user = userEvent.setup();
+    setupSearchParams({});
+
+    render(<CostOfLivingCalculatorContent />);
+
+    const regionSelect = screen.getByRole("combobox", { name: /region/i });
+    await user.selectOptions(regionSelect, "europe");
+
+    await waitFor(() => {
+      const allCalls = [...mockRouterPush.mock.calls, ...mockRouterReplace.mock.calls];
+      expect(allCalls.some(([url]) => String(url).includes("region=europe"))).toBe(true);
+    });
+    // Whichever method was used, it must have requested no scroll.
+    const allOpts = [...mockRouterPushOpts.mock.calls, ...mockRouterReplaceOpts.mock.calls];
+    expect(allOpts.every(([opts]) => opts && (opts as { scroll?: boolean }).scroll === false)).toBe(true);
   });
 });
 

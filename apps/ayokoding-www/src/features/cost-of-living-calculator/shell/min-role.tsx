@@ -21,6 +21,7 @@ import type { MinRoleInputs, BaselineSource } from "../core/url-state";
 import { fmtCurrencyTrailing } from "../core/format";
 import { localeName } from "./geo-filters";
 import { SegmentedControl } from "./controls";
+import { useDebouncedField, URL_INPUT_DEBOUNCE_MS } from "./use-debounced-field";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 
@@ -75,17 +76,13 @@ export function MinRoleTable({
   // empty-state) apart from "the user explicitly typed 0" (`targetRaw === "0"` → baseline engaged,
   // every role clears, divider renders). Relying on `targetAmount === 0` alone cannot distinguish
   // these two states because both parse to the number 0.
-  const targetRaw = s.targetRaw;
   const setTargetRaw = (v: string) => update({ targetRaw: v });
-  const targetAmount = parseFloat(targetRaw) || 0;
-  const targetIsBlank = targetRaw.trim() === "";
   const targetCurrency = s.targetCurrency;
   const setTargetCurrency = (v: string) => update({ targetCurrency: v });
   const refCityId = s.refCityId ?? dataset.cities[0]?.id ?? "";
   const setRefCityId = (v: string) => update({ refCityId: v });
   const refRole = s.refRole as EngRole;
   const setRefRole = (v: EngRole) => update({ refRole: v });
-  const myGrossMonthly = s.myGrossMonthly;
   const setMyGrossMonthly = (v: number) => update({ myGrossMonthly: v });
   const mySalaryCityId = s.mySalaryCityId ?? dataset.cities[0]?.id ?? "";
   const setMySalaryCityId = (v: string) => update({ mySalaryCityId: v });
@@ -94,6 +91,26 @@ export function MinRoleTable({
   const setMyGrossCurrency = (v: "local" | "usd") => update({ myGrossCurrency: v });
   const displayCurrency = s.displayCurrency;
   const setDisplayCurrency = (v: string) => update({ displayCurrency: v });
+
+  // Continuous text inputs (savings target, my gross) echo locally and debounce their URL
+  // commit so typing stays smooth while the URL remains the source of truth. The LOCAL echo
+  // (`*.value`) drives both the input AND every downstream derivation below, so the ranked
+  // ladder updates live as the user types; only the URL write is deferred until typing
+  // settles. In the uncontrolled/standalone path the commit is synchronous (delay 0),
+  // preserving the original immediate behaviour. See useDebouncedField for the full rationale.
+  const inputDebounceMs = controlled ? URL_INPUT_DEBOUNCE_MS : 0;
+  const targetField = useDebouncedField(s.targetRaw, setTargetRaw, inputDebounceMs);
+  const myGrossField = useDebouncedField<number>(s.myGrossMonthly, setMyGrossMonthly, inputDebounceMs);
+
+  // UWT-006 / EWT-001 reconciliation: keep the RAW input string separate from the parsed
+  // numeric amount so "no target entered yet" (blank `targetRaw` → empty-state) is
+  // distinguishable from "explicitly typed 0" (`targetRaw === "0"` → baseline engaged, every
+  // role clears, divider renders). Both parse to the number 0, so `targetAmount === 0` alone
+  // cannot tell them apart. Driven by the live echo so the ladder reacts as the user types.
+  const targetRaw = targetField.value;
+  const targetAmount = parseFloat(targetRaw) || 0;
+  const targetIsBlank = targetRaw.trim() === "";
+  const myGrossMonthly = myGrossField.value;
 
   // Currency of the selected salary city; the "local" input option follows this.
   const mySalaryCity = dataset.cities.find((c) => c.id === mySalaryCityId);
@@ -312,8 +329,9 @@ export function MinRoleTable({
               type="number"
               className={fieldControl}
               aria-label={t(locale, "labelMonthlySavingsTarget")}
-              value={targetRaw}
-              onChange={(e) => setTargetRaw(e.target.value)}
+              value={targetField.value}
+              onChange={(e) => targetField.onChange(e.target.value)}
+              onBlur={targetField.flush}
             />
           </div>
           <div className={fieldGroup}>
@@ -391,8 +409,9 @@ export function MinRoleTable({
               type="number"
               className={fieldControl}
               aria-label={t(locale, "labelMyGrossMonthly")}
-              value={myGrossMonthly || ""}
-              onChange={(e) => setMyGrossMonthly(parseFloat(e.target.value) || 0)}
+              value={myGrossField.value || ""}
+              onChange={(e) => myGrossField.onChange(parseFloat(e.target.value) || 0)}
+              onBlur={myGrossField.flush}
             />
           </div>
           {/* Currency toggle — the gross can be entered in the salary city's local currency

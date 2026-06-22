@@ -52,25 +52,31 @@ export function CostOfLivingCalculatorContent() {
     const canonicalParams = encodeState(currentState);
     if (rawParams.toString() !== canonicalParams.toString()) {
       const qs = canonicalParams.toString();
-      router.replace(qs ? `?${qs}` : "?");
+      router.replace(qs ? `?${qs}` : "?", { scroll: false });
     }
     // Run only on mount — exhaustive deps would cause loops; eslint-disable is intentional.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Helper: encode new state and push to URL history.
+  //
+  // `scroll: false` is mandatory: this is in-page filter/view state, not a page change, so
+  // the default Next.js navigation behaviour (scroll to top of document) would yank the
+  // viewport away from the control the user just touched on every filter change. Keeping the
+  // scroll position is the fix for "updating a filter jumps me back to the top".
   function pushState(next: CalculatorState) {
     const params = encodeState(next);
     const qs = params.toString();
-    router.push(qs ? `?${qs}` : "?");
+    router.push(qs ? `?${qs}` : "?", { scroll: false });
   }
 
   // Like pushState but replaces the current history entry — used for continuous inputs
-  // (gross/target text fields) so typing does not spam the browser back stack.
+  // (gross/target text fields) so typing does not spam the browser back stack. Also
+  // `scroll: false` for the same in-page-state reason as pushState above.
   function replaceState(next: CalculatorState) {
     const params = encodeState(next);
     const qs = params.toString();
-    router.replace(qs ? `?${qs}` : "?");
+    router.replace(qs ? `?${qs}` : "?", { scroll: false });
   }
 
   // Build scoped dataset for filtered table views.

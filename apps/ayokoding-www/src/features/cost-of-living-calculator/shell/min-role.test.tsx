@@ -1,9 +1,13 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it } from "vitest";
+import { useState } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { dataset } from "../core/data/cities";
 import { roleMatrix } from "../core/data/roles";
 import { MinRoleTable } from "./min-role";
+import { DEFAULT_STATE } from "../core/url-state";
+import type { MinRoleInputs } from "../core/url-state";
+import { URL_INPUT_DEBOUNCE_MS } from "./use-debounced-field";
 
 afterEach(cleanup);
 
@@ -440,6 +444,54 @@ describe("MinRoleTable", () => {
       const bestCityCells = screen.getAllByTestId("best-city-cell");
       const texts = bestCityCells.map((c) => c.textContent ?? "");
       expect(texts.some((t) => /Jepang/.test(t))).toBe(true);
+    });
+  });
+
+  // Regression: in controlled (URL-driven) mode the text inputs must debounce their commit
+  // so typing the savings target does not write the URL on every keystroke (the stutter bug).
+  describe("controlled inputs debounce their URL commit", () => {
+    function Controlled({ onCommit }: { onCommit: (next: MinRoleInputs) => void }) {
+      const [inputs, setInputs] = useState<MinRoleInputs>({
+        ...DEFAULT_STATE.minRole,
+        baselineSource: "savings_target",
+        targetRaw: "",
+      });
+      return (
+        <MinRoleTable
+          {...defaultProps}
+          inputs={inputs}
+          onInputsChange={(next) => {
+            setInputs(next);
+            onCommit(next);
+          }}
+        />
+      );
+    }
+
+    it("typing the savings target commits once after the debounce window, not per keystroke", () => {
+      vi.useFakeTimers();
+      try {
+        const onCommit = vi.fn();
+        render(<Controlled onCommit={onCommit} />);
+        const input = document.querySelector("#target-amount-input") as HTMLInputElement;
+
+        fireEvent.change(input, { target: { value: "8" } });
+        fireEvent.change(input, { target: { value: "80" } });
+        fireEvent.change(input, { target: { value: "8000" } });
+
+        // The field echoes the latest keystroke immediately for responsiveness…
+        expect(input.value).toBe("8000");
+        // …but the URL commit has not fired — the debounce window has not elapsed.
+        expect(onCommit).not.toHaveBeenCalled();
+
+        act(() => vi.advanceTimersByTime(URL_INPUT_DEBOUNCE_MS));
+
+        // Exactly one commit carrying the final value — the keystroke burst collapsed.
+        expect(onCommit).toHaveBeenCalledTimes(1);
+        expect(onCommit).toHaveBeenLastCalledWith(expect.objectContaining({ targetRaw: "8000" }));
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });

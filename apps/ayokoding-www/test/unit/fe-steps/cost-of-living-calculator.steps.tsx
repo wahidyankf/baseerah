@@ -1,6 +1,6 @@
 import path from "path";
 import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, vi } from "vitest";
 import React from "react";
@@ -20,6 +20,9 @@ const { navState } = vi.hoisted(() => {
     params: new URLSearchParams(),
     // setParams wired by NavigationProvider on mount
     setParams: (_: URLSearchParams) => {},
+    // Records the navigation options ({ scroll: false }) of the most recent push/replace, so
+    // scenarios can assert filter changes do not scroll the page to the top.
+    lastNavOpts: undefined as { scroll?: boolean } | undefined,
   };
   return { navState };
 });
@@ -31,12 +34,14 @@ const NavParamsContext = React.createContext<URLSearchParams>(new URLSearchParam
 // useSearchParams reads from NavParamsContext → context updates trigger re-renders.
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: (url: string) => {
+    push: (url: string, opts?: { scroll?: boolean }) => {
+      navState.lastNavOpts = opts;
       const qs = url.startsWith("?") ? url.slice(1) : url;
       navState.params = new URLSearchParams(qs);
       navState.setParams(navState.params);
     },
-    replace: (url: string) => {
+    replace: (url: string, opts?: { scroll?: boolean }) => {
+      navState.lastNavOpts = opts;
       const qs = url.startsWith("?") ? url.slice(1) : url;
       navState.params = new URLSearchParams(qs);
       navState.setParams(navState.params);
@@ -92,6 +97,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
     // Reset URL state between scenarios so each test starts with empty params
     navState.params = new URLSearchParams();
     navState.setParams = () => {};
+    navState.lastNavOpts = undefined;
   });
 
   // ─── Cost of Living tab scenarios ───────────────────────────────────────────
@@ -1089,10 +1095,14 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.type(grossInput, "12000");
       await user.selectOptions(screen.getByRole("combobox", { name: /my salary city/i }), "singapore");
     });
-    Then("the URL query string includes the baseline source and the entered salary inputs", () => {
-      expect(navState.params.get("baseline")).toBe("my_salary");
-      expect(navState.params.get("mygross")).toBe("12000");
-      expect(navState.params.get("mysalarycity")).toBe("singapore");
+    Then("the URL query string includes the baseline source and the entered salary inputs", async () => {
+      // The gross is a debounced text input — its URL commit lands shortly after typing
+      // settles (or on blur), so wait for it rather than asserting synchronously.
+      await waitFor(() => {
+        expect(navState.params.get("baseline")).toBe("my_salary");
+        expect(navState.params.get("mygross")).toBe("12000");
+        expect(navState.params.get("mysalarycity")).toBe("singapore");
+      });
     });
   });
 
@@ -1108,8 +1118,11 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
       await user.clear(gross);
       await user.type(gross, "5000");
     });
-    Then("the URL query string includes the entered gross salary", () => {
-      expect(navState.params.get("gross")).toBe("5000");
+    Then("the URL query string includes the entered gross salary", async () => {
+      // Debounced text input — its URL commit lands shortly after typing settles.
+      await waitFor(() => {
+        expect(navState.params.get("gross")).toBe("5000");
+      });
     });
   });
 
@@ -2870,6 +2883,53 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, AfterEachScenario }) => {
         // When savings_target is selected, the reference-role city/role selects must not be in the DOM.
         expect(screen.queryByRole("combobox", { name: /reference city/i })).toBeNull();
         expect(screen.queryByRole("combobox", { name: /reference role/i })).toBeNull();
+      });
+    },
+  );
+
+  // Regression — filter changes must not scroll the page to the top.
+  Scenario("Changing a filter preserves the scroll position", async ({ Given, When, Then }) => {
+    const user = userEvent.setup();
+
+    Given("I am on the cost-of-living calculator", () => {
+      navState.params = new URLSearchParams();
+      navState.setParams(navState.params);
+      navState.lastNavOpts = undefined;
+      renderPage(<CostOfLivingCalculatorPage />);
+    });
+    When('I change the region filter to "Europe"', async () => {
+      await user.selectOptions(screen.getByRole("combobox", { name: /region/i }), "europe");
+    });
+    Then("the URL update requests no scroll so the page does not jump to the top", async () => {
+      await waitFor(() => expect(navState.params.get("region")).toBe("europe"));
+      // Every filter write is in-page state, so it must request { scroll: false }.
+      expect(navState.lastNavOpts).toEqual({ scroll: false });
+    });
+  });
+
+  // Regression — typing the salary echoes instantly but debounces the URL write.
+  Scenario(
+    "Typing the gross salary echoes instantly but commits to the URL only after typing settles",
+    async ({ Given, When, Then, And }) => {
+      const user = userEvent.setup();
+
+      Given('I am on the "Savings" tab', async () => {
+        navState.params = new URLSearchParams();
+        navState.setParams(navState.params);
+        renderPage(<CostOfLivingCalculatorPage />);
+        await user.click(screen.getByRole("tab", { name: /savings/i }));
+      });
+      When('I type a gross monthly salary of "7000" without pausing', async () => {
+        const gross = screen.getByRole("spinbutton");
+        await user.clear(gross);
+        await user.type(gross, "7000");
+      });
+      Then('the salary field immediately shows "7000"', () => {
+        // The local echo reflects the typed value synchronously, before any URL commit.
+        expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe("7000");
+      });
+      And("the gross salary is written to the URL once typing settles", async () => {
+        await waitFor(() => expect(navState.params.get("gross")).toBe("7000"));
       });
     },
   );

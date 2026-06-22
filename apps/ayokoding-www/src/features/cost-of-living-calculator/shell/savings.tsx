@@ -20,6 +20,7 @@ import { roleNonSalaryCompUsd } from "../core/role-lookup";
 import { fx } from "../core/data/fx";
 import { fmtNum, fmtDualCurrency } from "../core/format";
 import { localeName } from "./geo-filters";
+import { useDebouncedField, URL_INPUT_DEBOUNCE_MS } from "./use-debounced-field";
 import type { Locale } from "@/features/i18n/core/config";
 import { t } from "@/features/i18n/core/translations";
 
@@ -84,11 +85,19 @@ export function SavingsTable({
     setHydrated(true);
   }, [controlled]);
 
-  const grossMonthly = controlled ? grossProp : internalGross;
+  const committedGross = controlled ? grossProp : internalGross;
   const setGrossMonthly = (n: number) => {
     if (controlled) onGrossChange?.(n);
     else setInternalGross(n);
   };
+
+  // Local echo + debounced URL commit so typing the salary stays smooth while the URL remains
+  // the source of truth. The LOCAL echo (`grossField.value`) is the working value that drives
+  // the input AND every figure in the table below, so results update live as the user types;
+  // only the URL write is deferred until typing settles. Synchronous (delay 0) in the
+  // uncontrolled/standalone path, preserving the original immediate behaviour.
+  const grossField = useDebouncedField(committedGross, setGrossMonthly, controlled ? URL_INPUT_DEBOUNCE_MS : 0);
+  const grossMonthly = grossField.value;
 
   const annualGross = grossMonthlyToAnnual(grossMonthly);
   const countryById = Object.fromEntries(dataset.countries.map((c) => [c.id, c]));
@@ -138,8 +147,9 @@ export function SavingsTable({
             type="number"
             min="0"
             aria-label={t(locale, "grossMonthlySalaryLabel")}
-            value={grossMonthly || ""}
-            onChange={(e) => setGrossMonthly(Math.max(0, parseFloat(e.target.value) || 0))}
+            value={grossField.value || ""}
+            onChange={(e) => grossField.onChange(Math.max(0, parseFloat(e.target.value) || 0))}
+            onBlur={grossField.flush}
           />
           {/* UWT-004: surface the active input currency explicitly instead of hardcoding "USD"
               into the field label. The savings model derives every figure in USD, so this is a
