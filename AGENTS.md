@@ -380,9 +380,13 @@ Every dependency bump follows a three-path tree — A (LTS latest patch), B (60-
 
 Plan mode for non-trivial tasks (3+ steps or architecture decisions), delegated agents for focused subtasks, verify before done, autonomous bug fixing, self-improvement loop after corrections.
 
+**Parallel-by-default**: When work has independent sub-units (multiple reads/edits, searches, or delegated agents), run them **in parallel**, not serially — capped at **3 concurrent** units unless the user explicitly raises it for a batch. 3 is the deliberate optimum: real speedup without burning tokens / hitting Claude API rate limits too fast. Dependent steps stay sequential. Agents MUST NOT self-promote the cap.
+
 **Subagent concurrency**: When spawning background subagents via the Agent tool, cap at **3 concurrent** at any time (user may override for a specific batch). Poll output file mtime every **3 minutes**; if mtime unchanged for 30 minutes, call `TaskStop` and relaunch.
 
-**See**: [repo-governance/development/agents/agent-workflow-orchestration.md](./repo-governance/development/agents/agent-workflow-orchestration.md), [Subagent Orchestration Convention](./repo-governance/development/agents/subagent-orchestration.md)
+**Task-list discipline**: For any non-trivial multi-step work (3+ steps, or spanning multiple files/phases), maintain a live task list from the start (harness Task tool or a plan's delivery checklist) and keep it **continuously in sync** — mark a task in-progress before starting, completed right after verifying, and add discovered tasks on the spot. A stale list is a defect.
+
+**See**: [repo-governance/development/agents/agent-workflow-orchestration.md](./repo-governance/development/agents/agent-workflow-orchestration.md), [Subagent Orchestration Convention](./repo-governance/development/agents/subagent-orchestration.md), [Parallel-by-Default Practice](./repo-governance/development/practice/parallel-by-default.md), [Task List Discipline](./repo-governance/development/practice/task-list-discipline.md)
 
 ### Manual Verification & CI Blockers
 
