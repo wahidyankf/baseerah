@@ -4,8 +4,12 @@
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
 > privileged-credential handling). `[AI+HUMAN]`: agent prepares, human approves or finishes.
 
+<!-- -->
+
 > **Important**: Fix ALL failures found during quality gates, not just those caused by your changes
 > (root-cause orientation — fix preexisting errors encountered during work).
+
+<!-- -->
 
 > **Multi-repo note**: This plan is authored in `ose-public`. Phases 0–2 execute here. Phases 3–4
 > execute in `ose-primer` and `ose-infra` respectively — each begins by propagating this plan folder
