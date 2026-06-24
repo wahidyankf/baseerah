@@ -532,7 +532,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
    - **Example**: 20-line skill that just points to larger skill
 
    d. **Topic Similarity Analysis**:
-   - Extract topics from descriptions ("validation", "Hugo", "content quality")
+   - Extract topics from descriptions ("validation", "linking", "content quality")
    - Group Skills sharing >60% of topic keywords
    - **Trigger**: 2+ Skills with high topic overlap but different names
    - **Example**: Multiple Skills about same framework/platform

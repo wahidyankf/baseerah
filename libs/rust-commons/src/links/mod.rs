@@ -1,4 +1,4 @@
-//! Internal link checking for Hugo/Next.js markdown content.
+//! Internal link checking for Next.js markdown content.
 //!
 //! # Overview
 //!
@@ -181,7 +181,7 @@ fn is_internal_link(target: &str) -> bool {
 }
 
 /// Return `true` when the last path segment of `target` contains a dot,
-/// indicating a link to a static file rather than a Hugo/Next.js page.
+/// indicating a link to a static file rather than a Next.js page.
 fn has_file_extension(target: &str) -> bool {
     let last = match target.rfind('/') {
         Some(idx) => &target[idx + 1..],

@@ -2,7 +2,7 @@
 //!
 //! # Modules
 //!
-//! - [`links`] — internal link checking for Hugo/Next.js markdown content.
+//! - [`links`] — internal link checking for Next.js markdown content.
 #![forbid(unsafe_code)]
 
 pub mod links;

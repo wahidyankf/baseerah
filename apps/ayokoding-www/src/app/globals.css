@@ -63,7 +63,7 @@
       "calt" 1;
   }
 
-  /* Image centering (replicating Hugo custom.css) */
+  /* Image centering (migrated from the previous theme's custom.css) */
   img {
     display: block;
     margin-left: auto;

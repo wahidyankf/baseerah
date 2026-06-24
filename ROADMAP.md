@@ -54,8 +54,8 @@ graph TB
 
 **Website Launches:**
 
-- 🌐 [**ayokoding.com**](https://ayokoding.com) ([`apps/ayokoding-www/`](./apps/ayokoding-www/)) - Bilingual educational platform (Indonesian/English) using Hugo + Hextra theme. Programming tutorials, AI guides, security content
-- 🏢 [**oseplatform.com**](https://oseplatform.com) ([`apps/ose-www/`](./apps/ose-www/)) - Platform marketing website using Hugo + PaperMod theme. Project updates, announcements, landing page
+- 🌐 [**ayokoding.com**](https://ayokoding.com) ([`apps/ayokoding-www/`](./apps/ayokoding-www/)) - Bilingual educational platform (Indonesian/English) built with Next.js 16. Programming tutorials, AI guides, security content
+- 🏢 [**oseplatform.com**](https://oseplatform.com) ([`apps/ose-www/`](./apps/ose-www/)) - Platform marketing website built with Next.js 16. Project updates, announcements, landing page
 
 **CLI Tools:**
 

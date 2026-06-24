@@ -62,7 +62,7 @@
 
     // Rules to Disable (based on repository needs)
     "MD013": false, // Line length - disabled for long links and existing content
-    "MD033": false, // Inline HTML - allowed for Hugo frontmatter and special cases
+    "MD033": false, // Inline HTML - allowed for frontmatter and special cases
     "MD041": false, // First line in a file should be a top-level heading - conflicts with frontmatter
     "MD024": false, // Duplicate headings - common pattern in long documentation with repeated sections
     "MD025": false, // Multiple H1s - some files intentionally have multiple top-level headings

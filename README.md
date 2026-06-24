@@ -48,7 +48,7 @@ npm install
 **Phase 0 (Complete):**
 
 - Node.js & npm (via Volta) - Tooling and development infrastructure
-- Hugo (Extended) - Static sites (ose-web)
+- Next.js 16 - Public websites and content platforms
 - Golang - CLI tools ([ayokoding-cli](./apps/ayokoding-cli/), [rhino-cli](./apps/rhino-cli/)) and future security infrastructure
 
 **Current Phase 1 (OrganicLever):**

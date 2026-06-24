@@ -36,7 +36,6 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 ## Library Specs
 
 - **[golang-commons](./libs/golang-commons/)** — Shared Go utility specifications
-- **[golang-link-commons](./libs/golang-link-commons/)** — Go link-checking utility specifications
 - **[web-ui](./libs/web-ui/)** — Shared web UI component specifications
 
 ## Standard Folder Pattern
