@@ -10,3 +10,4 @@ Complete learning resources for information security tools.
 ## Available Tools
 
 - **[Gobuster](/en/learn/information-security/tools/gobuster)** - Directory/file brute-forcing and DNS subdomain enumeration tool
+- **[Kali Linux](/en/learn/information-security/tools/kali-linux)** - Security-focused Linux distribution with 600+ pre-installed penetration testing tools

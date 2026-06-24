@@ -12,6 +12,7 @@ weight: 103
 - [Tools](/en/c/learn/information-security/tools)
   - [Overview](/en/c/learn/information-security/tools/overview)
   - [Gobuster](/en/c/learn/information-security/tools/gobuster)
+  - [Kali Linux](/en/c/learn/information-security/tools/kali-linux)
 - [Roles](/en/c/learn/information-security/roles)
   - [Red Team](/en/c/learn/information-security/roles/red-team)
   - [Blue Team](/en/c/learn/information-security/roles/blue-team)
