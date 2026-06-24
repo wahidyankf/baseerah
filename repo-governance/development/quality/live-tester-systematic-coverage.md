@@ -240,10 +240,16 @@ shared underlying discipline:
 | `web-exploratory-tester` | Spec-aware correctness (EWT findings)              | FF1, FF2, FF3, FF6        |
 | `web-usability-tester`   | Spec-blind first-time-user friction (UWT findings) | FF5, FF6                  |
 | `web-design-tester`      | Design-aware visual fidelity (DWT findings)        | FF4, FF6                  |
+| `api-exploratory-tester` | Spec/contract-aware API correctness (AET findings) | FF1, FF2, FF3, FF6        |
 
-FF6 (recurrence + diff memory + completeness critic) applies to all three. The `web-ux-test-
-fixing-planning` workflow coordinates the three testers sequentially against the same target URL
-and integrates their findings into a unified fix-ready plan.
+FF6 (recurrence + diff memory + completeness critic) applies to all of them. The `web-ux-test-
+fixing-planning` workflow coordinates the three **web** testers sequentially against the same target
+URL and integrates their findings into a unified fix-ready plan. `api-exploratory-tester` is the
+**API-surface** counterpart — HTTP/curl-driven, never a browser — and applies the same enumerate-don't-
+sample forcing functions to API operations (its three mandatory sweeps are the operation × property
+matrix, the cross-cutting convention round-trip, and the declared-invariant conformance pass). It runs
+as a single specialist (no triad, no dedicated workflow) because the API surface has one exploratory
+lens.
 
 ## Scope
 
@@ -251,6 +257,7 @@ This practice applies to:
 
 - All runs of `web-exploratory-tester`, `web-usability-tester`, and `web-design-tester` against
   any live web surface in `apps/`.
+- All runs of `api-exploratory-tester` against any live REST or GraphQL API in `apps/`.
 - All invocations of the `web-ux-test-fixing-planning` workflow.
 - The Rule-15 near-end retest required by the
   [User-Facing Delivery Hardening Convention](./user-facing-delivery-hardening.md) before plan

@@ -309,6 +309,20 @@ After verifying operational readiness (Step 5b), verify that manual behavioral a
    - CLI/text output and pure governance/agent-definition plans are exempt.
    - Per [User-Facing Delivery Hardening](../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 15.
 
+7. **Rule-16 API Exploratory Retest (API feature-change plans)**
+   - If the plan was an API **feature-change** plan (REST or GraphQL endpoints in a backend or tRPC
+     app), verify it carried a near-end "Rule-16 API exploratory retest" round — `api-exploratory-tester`
+     run with `output-mode: delivery` against the running endpoint(s) with the contract
+     (OpenAPI 3.x / GraphQL SDL) as ground truth — and that every resulting `AET-###` defect checkbox in
+     `delivery.md` is `- [x]` (fixed) before archival. Just as with the rule-15 web-triad findings,
+     these defects MUST be resolved during execution: deferral of an `AET-###` defect finding is NOT
+     permitted — an unfixed defect checkbox at archival time is a **HIGH** finding. (`SG-###` spec-gap
+     proposals are proposals, not defects, and may be triaged or deferred with written rationale.)
+   - An API feature-change plan archived with no API exploratory retest round, or any unfixed rule-16
+     `AET-###` defect checkbox: **HIGH** finding.
+   - Frontend-only, CLI/text output, and pure governance/agent-definition plans are exempt.
+   - Per [User-Facing Delivery Hardening](../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 16.
+
 #### Finding Severity
 
 - Broken UI (JS errors, rendering failures): **CRITICAL**

@@ -799,6 +799,27 @@ Rule 15). This does NOT apply to CLI/text output or pure governance/agent-defini
       triaged or deferred with written rationale
 ```
 
+### For API Feature-Change Plans — Rule-16 API Exploratory Retest
+
+For API **feature-change** plans (REST or GraphQL endpoints in a backend or tRPC app), ALSO include,
+near the end of the checklist before archival (per
+[User-Facing Delivery Hardening Convention](../../repo-governance/development/quality/user-facing-delivery-hardening.md)
+Rule 16). This does NOT apply to pure governance/agent-definition or no-behaviour-change plans. It is
+independent of Rule 15 — a plan that changes BOTH a web UI and its API carries both retest sections:
+
+```markdown
+### Rule-16 API Exploratory Retest (before archival)
+
+- [ ] [AI] Run `api-exploratory-tester` (`output-mode: delivery`, this plan's `plan-path`) against the
+      running API endpoint(s), with its contract (OpenAPI 3.x / GraphQL SDL) as ground truth —
+      acceptance: AET-### findings + SG-### spec-gaps recorded
+- [ ] [AI] Append each finding here as a new unchecked checkbox, source-attributed
+      (`- [ ] AET-NNN: <defect> — fix before archival`) and each SG-### spec-gap into the specs steps
+- [ ] [AI] Fix every rule-16 AET defect finding before archival — deferral requires explicit user
+      permission (only when genuinely impossible); SG-### spec-gap proposals may be triaged or deferred
+      with written rationale
+```
+
 ### Plan Archival Section
 
 ALWAYS include at the end of the delivery checklist:
@@ -812,6 +833,8 @@ ALWAYS include at the end of the delivery checklist:
 - [ ] Verify ALL supported locales were exercised in UI verification (not just the default)
 - [ ] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible)
       for defect findings; SG-### proposals and USS-### suggestions may be triaged or deferred
+- [ ] Verify every rule-16 AET defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible)
+      for defect findings; SG-### spec-gap proposals may be triaged or deferred
 - [ ] Rename and move: `git mv plans/in-progress/[identifier]/ plans/done/YYYY-MM-DD__[identifier]/` using today's date as the completion date (NOT the creation date)
 - [ ] Update `plans/in-progress/README.md` — remove the plan entry
 - [ ] Update `plans/done/README.md` — add the plan entry with completion date

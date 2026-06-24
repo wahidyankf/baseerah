@@ -1,6 +1,6 @@
 ---
 title: "User-Facing Delivery Hardening Convention"
-description: Fifteen durable rules for planning, executing, verifying, and archiving user-facing feature work so design-parity and behavioral defects cannot ship past green gates
+description: Sixteen durable rules for planning, executing, verifying, and archiving user-facing feature work so design-parity and behavioral defects cannot ship past green gates
 category: explanation
 subcategory: development
 tags:
@@ -24,7 +24,10 @@ human opened the live site.
 This convention distills the fourteen lessons from that incident into durable rules for the whole
 **plan → execute → verify → archive** loop, plus a fifteenth rule added afterward to require a
 near-end three-tester retest of the live web UI (the `web-ux-test-fixing-planning` workflow —
-exploratory correctness, usability, and design fidelity) before archival. Each rule names the gap it closes
+exploratory correctness, usability, and design fidelity) before archival, and a sixteenth applying
+the same near-end live-system retest discipline to the **API** surface (a single specialist,
+`api-exploratory-tester`, against the running REST or GraphQL endpoints) for API feature-change plans.
+Each rule names the gap it closes
 and how to apply it, so it can be folded into how we author plans (`plan-maker`), gate them
 (`plan-checker`, `plan-execution-checker`), and execute them (the plan-execution workflow).
 
@@ -62,6 +65,8 @@ and how to apply it, so it can be folded into how we author plans (`plan-maker`)
 ### What This Convention Covers
 
 - Authoring plans for any user-facing change (web UI, rendered output, public-facing CLI text).
+- API feature-change plans (REST or GraphQL endpoints) — the near-end `api-exploratory-tester`
+  retest (Rule 16); an API is a user-facing surface for its client and integrator consumers.
 - Executing, verifying, and archiving those plans.
 - The done/archival criterion for user-facing work.
 
@@ -70,13 +75,14 @@ and how to apply it, so it can be folded into how we author plans (`plan-maker`)
 - Pure library/internal refactors with no observable output (see
   [Manual Behavioral Verification](./manual-behavioral-verification.md) scope).
 - Documentation/governance-only changes.
-- API-only behavior (covered by the curl path in
-  [Manual Behavioral Verification](./manual-behavioral-verification.md)).
+- Incidental API behavior outside a feature change (covered by the curl path in
+  [Manual Behavioral Verification](./manual-behavioral-verification.md)); API **feature-change**
+  plans are covered here — see Rule 16.
 
-## The Fifteen Rules
+## The Sixteen Rules
 
 Rules 1–14 are listed in source order (each maps to the same-numbered lesson from the originating
-incident); rule 15 was added afterward and does not correspond to an incident lesson. A **phase
+incident); rules 15 and 16 were added afterward and do not correspond to incident lessons. A **phase
 tag** marks where each rule binds, and each states the **gap** it closes and **how to apply** it.
 
 1. **(Authoring) A UI plan MUST carry a manual visual-parity gate, executed before archival.** Gap:
@@ -197,6 +203,35 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
     (browser-rendered apps) only — not CLI/text user-facing output (which the testers cannot exercise)
     and not pure governance/agent-definition or no-behaviour-change plans.
 
+16. **(Verification) An API feature-change plan MUST run a near-end `api-exploratory-tester` retest of
+    the running API and fix its findings before archival.** Gap: contract-codegen, unit, and BE E2E
+    gates assert the API does what its fixed tests say — they do not hunt for contract-conformance,
+    status-code, error-envelope, payload-boundary, auth/authz, pagination, idempotency, or (for
+    GraphQL) nullability / partial-error / depth defects on the running build, exactly the classes of
+    defect that ship past green gates on a backend change. An API is a user-facing surface for its
+    client and integrator consumers, so the same near-end live-system retest discipline as Rule 15
+    applies — with a **single specialist tester instead of a triad**, because the API surface has one
+    exploratory lens. Apply: after the API is implemented and its contract (OpenAPI 3.x spec or GraphQL
+    SDL) is updated, run `api-exploratory-tester` against the plan's running endpoint(s) by invoking it
+    with **`output-mode: delivery`** and the executing plan's `plan-path`. **Record each resulting
+    finding in `delivery.md` as a new unchecked task-list checkbox**, source-attributed
+    (`- [ ] AET-NNN: <defect> — fix before archival`), in a labelled "Rule-16 API exploratory-test
+    retest follow-ups" section, and each `SG-###` spec-gap as its own unchecked checkbox folded into the
+    `specs/**` coverage steps per [Feature Change Completeness](./feature-change-completeness.md).
+    During plan-execution these checkboxes materialize 1:1 as harness Task items, are fixed within the
+    same plan, and are ticked (`- [x]`) via the Atomic Sync Ritual. Every `AET-NNN` defect finding MUST
+    be fixed and ticked before archival — deferral requires explicit user permission and is allowed only
+    when the fix is genuinely impossible. (`SG-###` spec-gap proposals are proposals, not defects, and
+    may be triaged or deferred with written rationale recorded under the checkbox.) Archival is blocked
+    until every rule-16 defect checkbox is ticked. `plan-maker` emits this step (with the follow-ups
+    section scaffold); `plan-checker` flags its absence on API feature-change plans;
+    `plan-execution-checker` verifies the retest ran and every rule-16 `AET-###` defect checkbox is
+    fixed (ticked) before archival. Applies to **API feature-change** plans (REST or GraphQL endpoints
+    in a backend or tRPC app) only — not pure governance/agent-definition or no-behaviour-change plans.
+    The API tester is HTTP/curl-driven and never drives a browser, so it does not overlap the Rule 15
+    web triad — a plan that changes BOTH a web UI and its API runs both the Rule 15 and the Rule 16
+    rounds.
+
 ## Examples
 
 ### PASS: A user-facing plan that cannot ship bland
@@ -211,6 +246,7 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
 - Screenshots committed to evidence/ and referenced in delivery.md (Rules 1, 10; Evidence Capture Convention)
 - Deploy-config sweep + live-URL smoke test included (Rule 11)
 - A near-end three-tester round (web-exploratory + web-usability + web-design) runs across ALL locales; every EWT/UWT/DWT defect finding is fixed (ticked) before archival — deferral requires explicit user permission and only when the fix is genuinely impossible (SG-### proposals may be triaged) (Rule 15)
+- For an API change, a near-end api-exploratory-tester round runs against the running endpoint(s); every AET-### defect finding is fixed (ticked) before archival (SG-### proposals may be triaged) (Rule 16)
 ```
 
 ### FAIL: The incident this convention prevents
@@ -237,17 +273,29 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
   a throwaway `findings.md` with no plan paperwork). For the Rule-15 in-place append, invoke each
   tester with **`output-mode: delivery`** and the executing plan's `plan-path`; this is the single
   mechanism that produces the "Rule-15 three-tester retest follow-ups" section in `delivery.md`.
-- **`plan-maker`**: emits the delivery steps for Rules 1–8 and the rule-15 three-tester-retest step
-  for web-UI feature-change plans; includes a locale-coverage note and evidence-capture steps.
+- **`api-exploratory-tester`**: the API-surface counterpart to the web triad — the near-end
+  `api-exploratory-tester` round against the running REST or GraphQL API (Rule 16); HTTP/curl-driven,
+  never a browser; surfaces `AET-###` (contract / functional / status-code / error-envelope / auth /
+  consistency / pagination / performance / GraphQL-schema) findings plus `SG-###` spec-gap proposals;
+  saves redacted request/response captures to the plan's `evidence/` folder. Supports the same
+  selectable **`output-mode`** input; for the Rule-16 in-place append, invoke it with
+  **`output-mode: delivery`** and the executing plan's `plan-path` — the single mechanism that produces
+  the "Rule-16 API exploratory-test retest follow-ups" section in `delivery.md`. A single specialist
+  (no triad, no dedicated workflow) because the API surface has one exploratory lens.
+- **`plan-maker`**: emits the delivery steps for Rules 1–8, the rule-15 three-tester-retest step for
+  web-UI feature-change plans (with a locale-coverage note and evidence-capture steps), and the rule-16
+  api-exploratory retest step for API feature-change plans.
 - **`plan-checker`**: flags missing visual-parity gate, raw-value mockup colors, presence-only
   ordering tests, missing per-breakpoint responsive steps, missing evidence-capture steps, missing
-  locale coverage, and a missing rule-15 three-tester-retest step on web-UI feature-change plans.
+  locale coverage, a missing rule-15 three-tester-retest step on web-UI feature-change plans, and a
+  missing rule-16 api-exploratory-retest step on API feature-change plans.
 - **`plan-execution-checker`**: verifies the production visual sign-off and deploy-config smoke
   test were recorded before archival; verifies evidence/ screenshots exist and are referenced in
   delivery.md; verifies the rule-15 three-tester retest round ran across all locales and that every
-  rule-15 EWT/UWT/DWT defect checkbox is fixed (ticked) before archival — an unfixed defect finding
-  at archival time is a HIGH finding; SG-### spec-gap proposals and USS-### spec-suggestions may be
-  triaged or deferred.
+  rule-15 EWT/UWT/DWT defect checkbox is fixed (ticked) before archival; verifies the rule-16
+  api-exploratory retest ran and every rule-16 `AET-###` defect checkbox is fixed (ticked) before
+  archival — an unfixed defect finding at archival time is a HIGH finding; SG-### spec-gap proposals and
+  USS-### spec-suggestions may be triaged or deferred.
 
 ## References
 
@@ -270,4 +318,5 @@ fix before archival`), in a labelled "Rule-15 three-tester retest follow-ups" se
 **Agents:**
 
 - `plan-maker`, `plan-checker`, `plan-execution-checker`, `swe-ui-maker`, `swe-ui-checker`,
-  `web-exploratory-tester`, `web-usability-tester`, `web-design-tester`.
+  `web-exploratory-tester`, `web-usability-tester`, `web-design-tester` (Rule 15 web triad),
+  `api-exploratory-tester` (Rule 16 API counterpart).

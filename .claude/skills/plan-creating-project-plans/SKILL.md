@@ -776,6 +776,20 @@ defer) before archival. See
 
 **Not applicable** for plans touching only documentation, governance, CLI/text output, or non-code files.
 
+### For API Feature-Change Plans — Rule-16 API Exploratory Retest
+
+Near the end of the checklist, before archival: run `api-exploratory-tester` (`output-mode: delivery`,
+the plan's `plan-path`) against the running REST or GraphQL endpoint(s), with the contract
+(OpenAPI 3.x / GraphQL SDL) as ground truth; append each finding as a new unchecked checkbox,
+source-attributed (`AET-###`), and — exactly as with the rule-15 web-triad findings — fix every defect
+during execution before archival (deferral requires explicit user permission, only when genuinely
+impossible; `SG-###` spec-gap proposals may be triaged). The API counterpart is a single specialist
+tester (no triad, no dedicated workflow), HTTP/curl-driven, never a browser; a plan changing both a web
+UI and its API carries both retest sections. See
+[User-Facing Delivery Hardening Convention](../../../repo-governance/development/quality/user-facing-delivery-hardening.md) Rule 16.
+
+**Not applicable** for frontend-only, documentation, governance, CLI/text output, or non-code plans.
+
 ## Plan Archival (Mandatory Final Section)
 
 Every delivery plan MUST end with a plan archival section:
@@ -789,6 +803,8 @@ Every delivery plan MUST end with a plan archival section:
 - [ ] Verify ALL supported locales were exercised in UI verification (not just the default)
 - [ ] Verify every rule-15 EWT/UWT/DWT defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible)
       for EWT/UWT/DWT defect findings; SG-### proposals and USS-### suggestions may be triaged or deferred
+- [ ] Verify every rule-16 AET defect finding is fixed (ticked) — deferral requires explicit user permission (only when genuinely impossible)
+      for AET defect findings; SG-### spec-gap proposals may be triaged or deferred
 - [ ] Move plan folder from `plans/in-progress/` to `plans/done/` via `git mv` (the `evidence/` subfolder moves with it)
 - [ ] Update `plans/in-progress/README.md` — remove the plan entry
 - [ ] Update `plans/done/README.md` — add the plan entry with completion date

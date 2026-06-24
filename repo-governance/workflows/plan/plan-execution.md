@@ -558,6 +558,13 @@ live or staging environment). Zero automated-gate findings are necessary but not
 [User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md)
 rules 1, 10, and 15.
 
+**API-bearing plan pre-archival gate (rule 16)**: For API feature-change plans (REST or GraphQL
+endpoints in a backend or tRPC app), archival MUST NOT proceed until the near-end
+`api-exploratory-tester` retest has run against the running endpoint(s) and every resulting `AET-###`
+defect checkbox in `delivery.md` is `- [x]` (fixed) — exactly as the rule-15 retest gates UI plans. See
+[User-Facing Delivery Hardening Convention](../../development/quality/user-facing-delivery-hardening.md)
+rule 16.
+
 **Rule-15 web-UI three-tester retest (near-end, before archival)**: For **web-UI feature-change**
 plans specifically, after the implementation lands and the rule-1 visual sign-off is recorded, run a
 **three-tester** round against the running target URL(s) across all supported locales — the
@@ -581,6 +588,32 @@ plans specifically, after the implementation lands and the rule-1 visual sign-of
    are proposals, not defects, and may be triaged or deferred with written rationale recorded under
    the checkbox.)
 4. Archival is blocked until every rule-15 EWT/UWT/DWT defect checkbox is `- [x]` (fixed).
+
+**Rule-16 API exploratory retest (near-end, before archival)**: For **API feature-change** plans
+specifically (REST or GraphQL endpoints in a backend or tRPC app), after the implementation lands and
+the contract (OpenAPI 3.x / GraphQL SDL) is updated, run a near-end `api-exploratory-tester` round
+against the running endpoint(s). This is the API-surface counterpart to the rule-15 web triad — a
+**single specialist tester**, no dedicated workflow, because the API surface has one exploratory lens.
+Invoke it with **`output-mode: delivery`** and the executing plan's `plan-path`; its output is folded
+back into THIS plan's `delivery.md`, not a separate plan, by the same mechanism as Rule 15:
+
+1. `api-exploratory-tester` with `output-mode: delivery` appends each finding to `delivery.md` as a
+   **new unchecked task-list checkbox**, source-attributed (`- [ ] AET-NNN: <defect> — fix before
+archival`), and each `SG-###` spec-gap as its own unchecked checkbox folded into the specs/\*\*
+   coverage steps. Findings land in a clearly labelled "Rule-16 API exploratory-test retest follow-ups"
+   section at the end of the checklist.
+2. Each new checkbox materializes as exactly one harness task per the
+   [Task-Checklist Synchronization](#task-checklist-synchronization) 1:1 mapping, giving the user live
+   visibility of the retest backlog.
+3. Loop back into execution (Steps 2–7) to fix each finding and tick its checkbox via the Atomic Sync
+   Ritual. **Exactly as with the rule-15 web-triad findings, every `AET-NNN` defect finding MUST be
+   fixed and ticked during execution** — deferral of a defect finding requires explicit user permission
+   and is allowed only when the fix is genuinely impossible. (`SG-###` spec-gap proposals are proposals,
+   not defects, and may be triaged or deferred with written rationale recorded under the checkbox.)
+4. Archival is blocked until every rule-16 `AET-###` defect checkbox is `- [x]` (fixed).
+
+A plan that changes BOTH a web UI and its API runs both the rule-15 and the rule-16 rounds, and both
+sets of defect checkboxes must be fixed before archival.
 
 If defects surface after archival, use the reopen path (rule 14) — move the folder back from
 `done/` to `in-progress/`, strip the completion-date prefix, and note the defect in `README.md`.
