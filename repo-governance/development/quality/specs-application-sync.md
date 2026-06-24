@@ -1,6 +1,6 @@
 ---
 title: Specs-Application Sync Convention
-description: Bidirectional synchronization requirement between specs/ and application code in apps/, libs/, and apps-labs/
+description: Bidirectional synchronization requirement between specs/ and application code in apps/ and libs/
 category: explanation
 subcategory: development
 tags:
@@ -15,7 +15,7 @@ created: 2026-03-24
 
 # Specs-Application Sync Convention
 
-The `specs/` directory and application code in `apps/`, `libs/`, and `apps-labs/` must stay in sync. When one changes in a way that affects external behavior or architecture, the other must be updated in the same commit or pull request. This is a bidirectional requirement: code changes that alter observable behavior must be reflected in specs, and spec changes that describe new or modified behavior must be backed by code.
+The `specs/` directory and application code in `apps/` and `libs/` must stay in sync. When one changes in a way that affects external behavior or architecture, the other must be updated in the same commit or pull request. This is a bidirectional requirement: code changes that alter observable behavior must be reflected in specs, and spec changes that describe new or modified behavior must be backed by code.
 
 ## Principles Implemented/Respected
 
@@ -45,7 +45,7 @@ C4 diagrams under `specs/apps/*/system-context/`, `specs/apps/*/containers/`, an
 
 **Update C4 diagrams when:**
 
-- Adding or removing an application (`apps/`, `apps-labs/`) or library (`libs/`)
+- Adding or removing an application (`apps/`) or library (`libs/`)
 - Changing the runtime technology of an existing app (e.g., Hugo → Next.js, Go/Gin → Go/Fiber)
 - Introducing a new data store (PostgreSQL database, Redis cache, S3 bucket)
 - Adding or removing a new external integration (third-party API, authentication provider, CDN)
@@ -99,7 +99,7 @@ The root `specs/README.md` lists all projects with specs. Update it when:
 
 Check and update specs in the same commit as the application change for:
 
-- Adding, removing, or renaming an application (`apps/`, `libs/`, `apps-labs/`)
+- Adding, removing, or renaming an application (`apps/`, `libs/`)
 - Changing framework or runtime technology for an existing application
 - Adding or removing a REST endpoint, tRPC procedure, GraphQL resolver, or equivalent API surface
 - Adding or removing a major UI page or route
@@ -241,7 +241,6 @@ This convention applies to:
 
 - All directories under `apps/`
 - All directories under `libs/`
-- All directories under `apps-labs/`
 - All directories under `specs/`
 
 It does not apply to:

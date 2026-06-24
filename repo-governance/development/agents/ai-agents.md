@@ -509,11 +509,6 @@ See [Agent Naming Convention](../../conventions/structure/agent-naming.md) for t
    - Library-specific validation, testing, documentation
    - Examples: `libs-ts-auth-validator`, `libs-ts-payment-checker`
 
-3. **`apps-labs-[app-name]-`** - Agent works with experimental apps
-   - Future use for prototype-specific agents
-   - Experimental validation, testing workflows
-   - Examples: `apps-labs-prototype-x-tester`
-
 **When NOT to use scope prefixes:**
 
 - **General-purpose agents**: Work across entire repository (docs-maker, repo-rules-checker, plan-execution-checker)

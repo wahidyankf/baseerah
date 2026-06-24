@@ -217,14 +217,12 @@ specs/
 ├── README.md
 ├── apps/
 │   └── <app-family>/         # C4-aware five-folder tree (per app above)
-├── libs/
-│   └── <lib-name>/
-│       ├── README.md
-│       └── gherkin/
-│           └── <package>/
-│               └── <feature>.feature
-└── apps-labs/
-    └── README.md             # Placeholder for experimental apps
+└── libs/
+    └── <lib-name>/
+        ├── README.md
+        └── gherkin/
+            └── <package>/
+                └── <feature>.feature
 ```
 
 ### Which Projects Have Which Directories

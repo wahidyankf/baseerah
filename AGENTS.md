@@ -51,7 +51,6 @@ Polyglot demo apps (11 backend implementations + 3 frontends + 1 fullstack) were
 ```
 ose-public/
 ├── apps/                     # Deployable applications (Nx) — full list in "Current Apps" above
-├── apps-labs/                # Experimental apps (NOT in Nx)
 ├── libs/                     # Reusable libraries (Nx, flat structure)
 │   ├── rust-commons/         # Shared Rust utilities (link-checking, HTTP)
 │   ├── fsharp-crane-core/    # Shared F# PDF-to-Markdown core (PdfPig + Tesseract)
@@ -189,7 +188,6 @@ Uses **Nx** to manage apps and libs:
   - Flat structure, no nesting
   - Import via `@open-sharia-enterprise/ts-[lib-name]`
   - Libs can import other libs (no circular deps)
-- **`apps-labs/`** — Experimental apps outside Nx (framework evaluation, POCs)
 
 **Nx Commands**:
 

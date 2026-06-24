@@ -54,9 +54,6 @@ apps/*/coverage/
 # Generated source artifacts
 **/*.generated.ts
 
-# Experimental
-apps-labs/
-
 # Claude Code worktrees
 .claude/worktrees/
 

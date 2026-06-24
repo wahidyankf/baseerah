@@ -196,7 +196,6 @@ This convention applies to:
 
 - All directories under `apps/`
 - All directories under `libs/`
-- All directories under `apps-labs/`
 - All related artifacts in `specs/`, `docs/`, and `repo-governance/`
 
 It does not apply to:

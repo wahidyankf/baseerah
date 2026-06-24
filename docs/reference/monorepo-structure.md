@@ -21,15 +21,11 @@ This project uses **Nx** as a monorepo build system with a plugin-free "vanilla 
 - `apps/` - Deployable applications
 - `libs/` - Reusable libraries (flat structure with language prefixes)
 
-**Note**: The repository also contains `apps-labs/` directory for experimental applications and POCs that are NOT part of the Nx monorepo. These experimental projects have independent build systems and no Nx workspace integration. See [Experimental Projects vs Monorepo Projects](#experimental-projects-vs-monorepo-projects) section for details.
-
 ## Root Structure
 
 ```
 open-sharia-enterprise/
 ├── apps/                      # Deployable applications (Nx monorepo)
-├── apps-labs/                 # Experimental apps and POCs (NOT in Nx monorepo)
-│   └── README.md             # Labs directory documentation
 ├── libs/                      # Reusable libraries (Nx monorepo, flat structure)
 ├── docs/                      # Documentation (Diátaxis framework)
 ├── plans/                     # Project planning documents
@@ -246,11 +242,7 @@ libs/ts-utils/
 
 Rust (`rust-commons`), F# (`fsharp-crane-core`), and TypeScript (`web-ui`) libraries.
 
-## Experimental Projects vs Monorepo Projects
-
-The repository contains two distinct project structures with different purposes and characteristics:
-
-### Nx Monorepo Projects (`apps/` and `libs/`)
+## Nx Monorepo Projects (`apps/` and `libs/`)
 
 **Purpose**: Integrated projects (TypeScript, Rust, F#) that benefit from shared tooling and workspace integration.
 
@@ -278,59 +270,6 @@ The repository contains two distinct project structures with different purposes 
 - F#/Giraffe backend services
 - Rust CLI tools
 - Reusable Rust, F#, and TypeScript libraries
-
-### Experimental Projects (`apps-labs/`)
-
-**Purpose**: Experimental applications and POCs with independent build systems that are NOT part of the Nx monorepo. Used for framework evaluation, language exploration, and temporary prototypes.
-
-**Characteristics**:
-
-- NOT managed by Nx workspace
-- Independent build systems (Hugo, Python, Rust, etc.)
-- Self-contained configuration
-- Separate deployment pipelines
-- No access to workspace path mappings
-- Not integrated with Nx task commands
-- No cross-project dependencies with monorepo projects
-
-**When to use**:
-
-- Framework evaluation (Next.js vs Remix vs SvelteKit)
-- Language exploration (Python, Rust, etc.)
-- Technology POCs (databases, authentication approaches, etc.)
-- Quick prototypes without monorepo integration overhead
-- Temporary experiments that might be deleted after evaluation
-
-**Note on Nx integration**: Even projects with non-Node.js toolchains (like Rust, F#) can be integrated with Nx using the `nx:run-commands` executor to wrap their CLI commands. This provides benefits like task caching, unified command interface, and dependency graph visualization.
-
-### Key Differences
-
-| Aspect                     | Nx Monorepo (`apps/`, `libs/`)    | Experimental (`apps-labs/`)            |
-| -------------------------- | --------------------------------- | -------------------------------------- |
-| Build System               | Nx workspace                      | Independent (Hugo, Python, Rust, etc.) |
-| Configuration              | Shared `tsconfig.base.json`       | Self-contained                         |
-| Path Mappings              | Yes (`@open-sharia-enterprise/*`) | No                                     |
-| Task Caching               | Yes (Nx cache)                    | No                                     |
-| Cross-project Dependencies | Supported                         | Not supported                          |
-| Deployment                 | Varies by app                     | Independent pipelines                  |
-| Language                   | TypeScript, Rust, F# (current)    | Any language                           |
-
-### Decision Guide
-
-**Use Nx monorepo (`apps/` or `libs/`)** if:
-
-- Project is TypeScript, Rust, or F#-based
-- Project shares code with other monorepo projects
-- Project benefits from task caching
-- Project needs unified tooling
-
-**Use experimental (`apps-labs/`)** if:
-
-- Evaluating framework ergonomics before production decisions
-- Exploring new programming languages
-- Building temporary POCs that might be deleted
-- Testing technology stacks without monorepo integration commitment
-- Quick prototyping without Nx overhead
 
 ## File Format Reference
 

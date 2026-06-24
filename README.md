@@ -65,8 +65,6 @@ This project uses **Nx** to manage applications and libraries:
 ```
 open-sharia-enterprise/
 ├── apps/                  # Deployable applications (Nx monorepo)
-├── apps-labs/             # Experimental apps and POCs (NOT in Nx monorepo)
-│   └── README.md          # Labs directory documentation
 ├── libs/                  # Reusable libraries (Nx monorepo, flat structure)
 ├── docs/                  # Project documentation (Diataxis framework)
 │   ├── tutorials/         # Learning-oriented guides
@@ -90,8 +88,6 @@ open-sharia-enterprise/
 - **Polyglot demo apps**: extracted 2026-04-18 to the downstream [`ose-primer`](https://github.com/wahidyankf/ose-primer) template repository, which is now authoritative for the polyglot showcase (Go, Java, Elixir, F#, Python, Rust, Kotlin, TypeScript, C#, Clojure backends + Next.js, TanStack Start, Flutter Web frontends).
 
 **Libraries** (`libs/`): Reusable shared code
-
-**Labs** (`apps-labs/`): Standalone experiments and POCs (outside Nx)
 
 **Learn More**: [Monorepo Structure Reference](./docs/reference/monorepo-structure.md) | [How to Add New App](./docs/how-to/add-new-app.md) | [How to Add New Library](./docs/how-to/add-new-lib.md) | [How to Run Nx Commands](./docs/how-to/run-nx-commands.md)
 

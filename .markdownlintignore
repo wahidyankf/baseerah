@@ -21,9 +21,6 @@ build/
 # Hugo public directories
 apps/*/public/
 
-# Experimental apps (not in Nx)
-apps-labs/
-
 # Lock files
 package-lock.json
 
