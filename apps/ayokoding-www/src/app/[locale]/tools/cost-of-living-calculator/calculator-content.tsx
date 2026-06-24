@@ -243,10 +243,14 @@ export function CostOfLivingCalculatorContent() {
             locale. The web-ui TabsList defaults to `inline-flex w-fit`, so longer locale
             labels (e.g. id: "Biaya hidup"/"Tabungan"/"Jabatan minimum") overflow at 320px.
             Force a full-width, viewport-bounded box so `overflow-x-auto` scrolls the tabs
-            INTERNALLY instead of widening the page. */}
+            INTERNALLY instead of widening the page.
+            `overflow-y-hidden` is mandatory: per CSS spec, when overflow-x is `auto` the
+            `visible` default of overflow-y computes to `auto` too, so `overflow-x-auto`
+            alone silently shows a vertical scrollbar gutter whenever the triggers are even
+            a pixel taller than the list box. Pin overflow-y so only horizontal scrolls. */}
         <TabsList
           aria-label={t(locale, "ariaTabsNav")}
-          className="flex w-full max-w-full justify-start overflow-x-auto"
+          className="flex w-full max-w-full justify-start overflow-x-auto overflow-y-hidden"
         >
           <TabsTrigger value="cost" aria-describedby="tab-desc-cost" className={tabTriggerClass}>
             {t(locale, "tabCostOfLiving")}

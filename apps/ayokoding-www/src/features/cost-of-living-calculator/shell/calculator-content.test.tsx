@@ -281,6 +281,24 @@ describe("Phase4TF — cost tab description is associated and all tab descriptio
   });
 });
 
+// ─── EWT-R02: the tablist scrolls horizontally only — no vertical scrollbar gutter.
+// Per CSS spec, `overflow-x: auto` promotes a `visible` overflow-y to `auto`, so the
+// TabsList silently grew a vertical scrollbar whenever the triggers were a pixel taller
+// than the list box. The fix pins `overflow-y-hidden`; this guards the regression.
+describe("EWT-R02 — tablist has no vertical scroll gutter", () => {
+  beforeEach(() => {
+    setupSearchParams({});
+  });
+
+  it("EWT-R02: the TabsList pins overflow-y-hidden alongside overflow-x-auto", () => {
+    render(<CostOfLivingCalculatorContent />);
+
+    const tablist = screen.getByRole("tablist");
+    expect(tablist.className).toMatch(/\boverflow-x-auto\b/);
+    expect(tablist.className).toMatch(/\boverflow-y-hidden\b/);
+  });
+});
+
 // ─── Phase 4: Tool identity — H1 and metadata match "Cost of Living Calculator"
 describe("Phase 4 — H1 matches tool identity", () => {
   beforeEach(() => {
