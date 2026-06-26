@@ -117,12 +117,12 @@ identical.
 flowchart TD
     Q["test:quick (parallel: false)"] --> Q1[nx run P:typecheck]
     Q1 --> Q2[nx run P:lint]
-    Q2 --> Q3["nx run P:test:unit (BDD + non-BDD, coverage)"]
+    Q2 --> Q3["nx run P:test:unit (BDD+cov)"]
     PP[pre-push] --> G["nx affected -t test:quick"]
     PR[PR quality gate] --> G
     G --> Q
-    POST[post-merge per affected project + nightly CRON] --> INT[test:integration - BE service-level]
-    POST --> E2E["test:e2e - *-e2e only, HTTP/UI/API"]
+    POST["post-merge/nightly CRON"] --> INT["test:integration (BE)"]
+    POST --> E2E["test:e2e (*-e2e only)"]
     F["specs/.../gherkin/**.feature"] -.same feature files.-> Q3
     F -.same feature files.-> INT
     F -.same feature files.-> E2E
@@ -291,25 +291,19 @@ production. Pre-merge never runs integration/e2e; those run post-merge + the CRO
 
 ```mermaid
 flowchart TD
-    M[PR merged → push to main] --> AF["nx show projects --affected"]
-    AF --> MX{per-project matrix}
-    MX --> J1["project A: test:quick → test:integration → test:e2e"]
-    MX --> J2["project B: test:quick → test:integration → test:e2e"]
-    J1 --> D1{pass & deployable?}
-    J2 --> D2{pass & deployable?}
-    D1 -- yes --> S1[deploy A → staging]
-    D1 -- no/non-deployable --> X1[stop - no deploy]
-    D2 -- yes --> S2[deploy B → staging]
-    D2 -- no/non-deployable --> X2[stop - no deploy]
-    CR[nightly CRON fallback] -.re-test + redeploy.-> S1
-    S1 --> PR2["scheduled test-stag → deploy prod"]
-    S2 --> PR2
+    M[push to main] --> AF[nx affected projects]
+    AF --> J["quick→int→e2e (each)"]
+    J --> D{pass & deployable?}
+    D -- yes --> S[deploy → staging]
+    D -- no --> X[stop]
+    CR[nightly CRON] -.redeploy.-> S
+    S --> PR2[stag → prod]
 
     classDef merge fill:#0072B2,color:#ffffff,stroke:#001f3f
     classDef deploy fill:#009E73,color:#ffffff,stroke:#003f2f
     classDef cron fill:#E69F00,color:#000000,stroke:#5f4200
-    class M,AF,MX,J1,J2 merge
-    class S1,S2,PR2 deploy
+    class M,AF,J merge
+    class S,PR2 deploy
     class CR cron
 ```
 
@@ -343,7 +337,7 @@ automation calls. All leaf subcommands are enumerated from `apps/rhino-cli/src/c
 | 15  | `md audit`                                   | Run all md validators in sequence; aggregate findings                                                                                              | not wired                | manual aggregate                                                                               |
 | 16  | `convention validate emoji`                  | Audit forbidden file types for emoji codepoints                                                                                                    | not wired                | only via `convention audit` (manual)                                                           |
 | 17  | `convention validate license`                | Verify per-directory LICENSE files match the licensing convention                                                                                  | not wired                | only via `convention audit` (manual)                                                           |
-| 18  | `convention validate agents-md-size`         | Audit AGENTS.md size against 30/35/40 KB thresholds                                                                                                | not wired                | only via `convention audit` (manual)                                                           |
+| 18  | `convention validate instruction-size`       | Audit all auto-loaded instruction surfaces against per-surface byte budgets (`instruction-size-budget.yaml`); legacy alias: `agents-md-size`       | **wired**                | Nx `rhino-cli:instruction-size:validation` → pre-push (changed-path gate) + PR gate            |
 | 19  | `convention audit`                           | Run all convention validators; aggregate findings                                                                                                  | not wired                | manual aggregate                                                                               |
 | 20  | `harness validate naming`                    | Validate agent filename suffixes + `.claude`↔`.opencode` mirror parity                                                                             | **wired**                | Nx `naming:harness-validation` → pre-push (scoped) + PR gate                                   |
 | 21  | `harness validate duplication`               | Detect verbatim duplication across agent + skill files                                                                                             | not wired                | only via `harness audit` (manual)                                                              |
@@ -442,26 +436,30 @@ identical across all three repos after Phases 2–4.
 
 ```mermaid
 flowchart TD
-    A[git commit] --> B[commit-msg: commitlint]
+    A[git commit] --> B[commitlint]
     A --> C[pre-commit hook]
-    C --> C1[git-identity-check]
-    C1 --> C2[check-no-env-staged]
-    C2 --> C3[sh / docker / actions check - tool-gated]
-    C3 --> C4[rhino-cli git pre-commit]
-    C4 --> C5[nx affected test:quick]
+    C --> C1[identity + env check]
+    C1 --> C2["sh/docker/actions"]
+    C2 --> C3[rhino-cli pre-commit]
+    C3 --> C4[nx affected test:quick]
+
+    classDef hook fill:#0072B2,color:#ffffff,stroke:#001f3f
+    class B,C,C1,C2,C3,C4 hook
+```
+
+```mermaid
+flowchart TD
     D[git push] --> E[pre-push hook]
-    E --> E1[coverage set: specs:coverage + test-coverage + specs validators]
-    E1 --> E2[lint:md]
-    E2 --> E3[env:validation]
-    E3 --> E4[scoped: naming / workflows / governance-vendor / cross-vendor / bindings]
-    F[PR opened / push to main] --> G[pr-quality-gate.yml]
+    E --> E1["specs:coverage + lint:md"]
+    E1 --> E2["env + naming/vendor/bind"]
+    F[PR / push to main] --> G[pr-quality-gate.yml]
     F --> H[validate-markdown.yml]
     F --> I[validate-env.yml]
-    G --> G1[detect → format → language gates → markdown → naming → env → specs-gate → quality-gate sentinel]
+    G --> G1["detect→gates→sentinel"]
 
     classDef hook fill:#0072B2,color:#ffffff,stroke:#001f3f
     classDef ci fill:#009E73,color:#ffffff,stroke:#003f2f
-    class B,C,C1,C2,C3,C4,C5,E,E1,E2,E3,E4 hook
+    class D,E,E1,E2 hook
     class G,H,I,G1 ci
 ```
 
@@ -469,18 +467,17 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    S1[schedule cron] --> T1[*-test-local-deploy-stag.yml]
-    T1 --> R1[_reusable-app-test-local-deploy-stag]
-    R1 --> P1[force-push stag branch]
-    P1 --> B1[*-be-build-deploy-stag.yml]
-    S2[schedule cron] --> T2[*-test-stag.yml]
-    T2 --> R2[_reusable-app-test-stag]
-    S3[schedule cron] --> T3[*-www-test-local-deploy-prod.yml]
-    T3 --> R3[_reusable-www-test-local-deploy]
+    T1["cron: test-local-deploy-stag"]
+    T1 --> R1[_reusable-app-stag]
+    R1 --> B1[be-build-deploy-stag]
+    T2["cron: test-stag"]
+    T2 --> R2[_reusable-test-stag]
+    T3["cron: www-deploy-prod"]
+    T3 --> R3[_reusable-www-deploy]
 
     classDef cron fill:#E69F00,color:#000000,stroke:#5f4200
     classDef reuse fill:#56B4E9,color:#000000,stroke:#1f4f6f
-    class S1,S2,S3,T1,T2,T3,P1,B1 cron
+    class T1,T2,T3,B1 cron
     class R1,R2,R3 reuse
 ```
 
@@ -488,11 +485,11 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    P0[Phase 0: baseline ose-public] --> P1[Phase 1: author standard + triage docs]
-    P1 --> P2[Phase 2: converge ose-public]
-    P2 --> P3[Phase 3: propagate + converge ose-primer]
-    P3 --> P4[Phase 4: propagate + converge ose-infra]
-    P4 --> P5[Phase 5: cross-repo parity verify + archive]
+    P0[Phase 0: baseline] --> P1[Phase 1: author standard]
+    P1 --> P2[Phase 2: converge public]
+    P2 --> P3[Phase 3: converge primer]
+    P3 --> P4[Phase 4: converge infra]
+    P4 --> P5[Phase 5: parity verify]
 
     classDef phase fill:#009E73,color:#ffffff,stroke:#003f2f
     class P0,P1,P2,P3,P4,P5 phase

@@ -15,8 +15,8 @@
 > execute in `ose-primer` and `ose-infra` respectively — each begins by propagating this plan folder
 > and the two reference docs into the sibling repo (per the
 > [multi-repo parity workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)),
-> then converging that repo in its own working tree. ose-infra is a bare repo + worktree (commit to
-> `main` via its worktree).
+> then converging that repo in its own working tree. ose-infra is a normal repo (not bare) — commit
+> to `main` directly.
 
 ## Worktree
 
@@ -226,7 +226,7 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 
 ## Phase 4: Propagate + Converge ose-infra
 
-> Executes in `ose-infra` (bare repo + worktree; commit to `main` via its worktree). Target state =
+> Executes in `ose-infra` (normal repo; commit to `main` directly). Target state =
 > the [§1.3c infra matrix](./tech-docs.md#13c-per-project-target-matrix-post-implementation-ose-infra).
 > Infra already matches the workflow filenames (`pr-quality-gate.yml`, `validate-markdown.yml`,
 > `validate-env.yml`) + governance-vendor pre-push, but (like public) lacks the `{tool}:check` +
@@ -234,7 +234,7 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 
 ### 4a. Baseline + propagate
 
-- [ ] [AI] Create/enter infra worktree on `main` (bare-repo layout); `npm install && npm run doctor -- --fix`; `npx nx build rhino-cli` — acceptance: doctor green; rhino-cli builds.
+- [ ] [AI] In ose-infra: `npm install && npm run doctor -- --fix`; `npx nx build rhino-cli` — acceptance: doctor green; rhino-cli builds.
 - [ ] [AI] Propagate the artifacts + the `nx-targets.md`/`nx-target-naming.md` additions into ose-infra; replace the matrix with the §1.3c infra matrix; document infra-only IaC gates (terraform/ansible/yamllint) and the self-hosted runner in the divergence section of `docs/reference/sdlc-gate-standard.md` — acceptance: artifacts exist; `npm run lint:md` passes.
 
 ### 4b. Standardize rhino-cli target names
