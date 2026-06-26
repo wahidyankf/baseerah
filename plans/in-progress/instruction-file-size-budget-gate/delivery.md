@@ -390,7 +390,7 @@ Implemented/Respected` (linking
 - [x] **6.3** `[AI]` Confirm the original Claude Code 40k warning no longer fires:
       `wc -c CLAUDE.md AGENTS.md` — resolved tree sum must be ≤ 38,000 B.
       Note: AGENTS.md=25,848 B, CLAUDE.md=6,622 B, resolved tree=32,470 B (WARN zone, under 38,000 B fail ceiling).
-- [ ] **6.4** `[AI]` Stage explicit paths, commit with Conventional Commits, push to
+- [x] **6.4** `[AI]` Stage explicit paths, commit with Conventional Commits, push to
       `ose-public` `origin/main`, and remove the worktree:
 
   ```bash
@@ -406,7 +406,7 @@ Implemented/Respected` (linking
   Acceptance: `git log origin/main --oneline -1` shows the feat(rhino-cli) commit;
   `ls worktrees/` no longer lists `instruction-file-size-budget-gate`.
 
-- [ ] **6.5** `[AI]` Monitor GitHub Actions workflows for the push to `ose-public`
+- [x] **6.5** `[AI]` Monitor GitHub Actions workflows for the push to `ose-public`
       `origin/main`: run `gh run list --limit 5` to identify the triggered run, then poll with
       `gh run view --json status,conclusion` every 2 minutes (per CI monitoring convention).
       Acceptance: `"conclusion": "success"` for the most recent run triggered by the
@@ -417,10 +417,10 @@ Implemented/Respected` (linking
 
 > All checks below must pass before starting Phase 7/8.
 
-- [ ] [AI] `git log origin/main --oneline -1` — acceptance: shows the feat(rhino-cli) commit.
-- [ ] [AI] `gh run view --json status,conclusion` — acceptance: `"conclusion": "success"` for
+- [x] [AI] `git log origin/main --oneline -1` — acceptance: shows the feat(rhino-cli) commit.
+- [x] [AI] `gh run view --json status,conclusion` — acceptance: `"conclusion": "success"` for
       the most recent CI run.
-- [ ] [AI] Worktree removed from `worktrees/instruction-file-size-budget-gate/`.
+- [x] [AI] Worktree removed from `worktrees/instruction-file-size-budget-gate/`.
 
 > **Pause Safety**: All ose-public changes landed on main and CI green. Worktree cleaned up.
 > Ready for Part B. Safe to stop. To resume: `git log origin/main --oneline -1`.
