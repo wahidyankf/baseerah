@@ -3,15 +3,18 @@
 **Status**: In Progress
 **Created**: 2026-06-26
 **Authored in**: `ose-public` (this repo)
-**Type**: Multi-file plan (5 documents)
+**Type**: Multi-file plan (5 documents) — **comprehensive 3-repo plan** (`ose-public` →
+Phases 0–6, `ose-primer` → Phase 7, `ose-infra` → Phase 8, cross-repo verify → Phase 9)
 
 > Generalizes the existing single-file `rhino-cli convention agents-md-size` gate into a
 > **multi-file instruction-file size budget** covering the whole "AGENTS.md-class" of
 > auto-loaded instruction surfaces, recalibrates the thresholds to the real per-harness
-> limits, **forces the gate at pre-push when those files change**, trims `AGENTS.md` back
-> under budget, and formalizes the rule as a governance convention propagated by
-> `repo-rules-maker`, checked by `repo-rules-checker`, and listed in the
-> `repo-rules-quality-gate` workflow.
+> limits, **forces the gate at pre-push when those files change**, also enforces it in the
+> **PR quality gate**, emits it as a **deterministic preflight category** so `repo-rules-checker`
+> and the `repo-rules-quality-gate` workflow track it without AI byte-counting, trims
+> `AGENTS.md` back under budget, names **progressive disclosure** as the sanctioned remediation,
+> and formalizes the rule as a governance convention propagated by `repo-rules-maker`. The same
+> change lands across **all three sibling repos** (`ose-public`, `ose-primer`, `ose-infra`).
 
 ## Context
 
@@ -37,7 +40,7 @@ but it has three gaps:
 
 ## Scope
 
-**In scope** (`ose-public`):
+**In scope** (all three repos — `ose-public`, `ose-primer`, `ose-infra`):
 
 - Generalize `convention agents-md-size` → a config-driven, multi-file
   `convention instruction-size` validator (keep `agents-md-size` as a thin alias).
@@ -47,39 +50,53 @@ but it has three gaps:
 - A **Claude resolved-tree** check (`CLAUDE.md` + recursive `@imports`) against the 40k
   runtime-warning ceiling.
 - **Pre-push enforcement**, changed-path-gated to the instruction-file globs (mirrors the
-  existing naming/parity gates in `.husky/pre-push`). Keep the existing pre-commit + CI
-  placement.
-- **Trim `AGENTS.md`** back under the new ceiling (move inline-expanded content to its
-  already-linked `repo-governance/` homes) so the gate ships green.
+  existing naming/parity gates in `.husky/pre-push`); **PR quality gate** enforcement in
+  `commons-quality-gate.yml`; pre-commit early-catch.
+- A **deterministic preflight category** (`instruction-size` added to `repo-governance audit`)
+  so `repo-rules-checker` and the `repo-rules-quality-gate` workflow consume the finding from
+  the JSON envelope — **no AI byte-counting**.
+- **Progressive disclosure** named as the one sanctioned remediation (surfaced in the gate's
+  `fail` message, the convention, and the checker), forbidding the three anti-fixes.
+- **Fix the existing violation in each repo**: trim each repo's over-budget `AGENTS.md` under
+  the new ceiling (by progressive disclosure) so no repo ships a gate it currently fails.
 - A new **governance convention** authored by `repo-rules-maker`, propagated across all
-  surfaces (AGENTS.md gate list, conventions README index, nx-targets reference).
-- Extend **`repo-rules-checker` Step 6** ("AGENTS.md Size Check" → "Instruction-File Size
-  Budget") and reference the validator in **`repo-rules-quality-gate.md`**.
-- Companion **`specs/apps/rhino`** Gherkin (two-path rule) + `specs:coverage`.
+  surfaces, with a two-way backlink to the Progressive Disclosure principle.
+- Deterministic integration into **`repo-rules-checker` Step 0.5 + Step 6** and
+  **`repo-rules-quality-gate.md`**; companion **`specs/apps/rhino`** Gherkin + `specs:coverage`.
 
-**Out of scope** (flagged, not built here):
+**Execution model**: `ose-public` first (in a worktree → commit + push to `origin/main`), then
+`ose-primer` and `ose-infra` **in parallel**, then cross-repo parity verification + archival.
 
-- `ose-primer` / `ose-infra` parity propagation — the convention + gate + checker + workflow
-  must land downstream too, via the
-  [multi-repo parity planning workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md).
-  Tracked as Phase 6 (parity hand-off note), not executed in this plan.
-- Actually authoring `.cursor/rules`, `.windsurf/rules`, `.github/copilot-instructions.md`,
+**Out of scope**:
+
+- Authoring `.cursor/rules`, `.windsurf/rules`, `.github/copilot-instructions.md`,
   `CONVENTIONS.md` — the budget covers them **if/when added**; their globs are no-ops until
   the files exist.
 
 ## Approach Summary
 
-1. **Phase 0** — environment baseline (`repo-setup-manager`); capture current sizes.
-2. **Phase 1** — author the budget config + generalize the Rust validator (TDD) + the
-   resolved-tree check; keep `agents-md-size` alias green.
-3. **Phase 2** — wire the `instruction-size:validation` Nx target into pre-push
-   (changed-path-gated), pre-commit, and CI.
-4. **Phase 3** — trim `AGENTS.md` under the new ceiling so the gate passes.
-5. **Phase 4** — author the governance convention (`repo-rules-maker`) and propagate
-   references.
-6. **Phase 5** — extend `repo-rules-checker` Step 6 + reference in
-   `repo-rules-quality-gate.md`; companion specs + `specs:coverage`.
-7. **Phase 6** — parity hand-off note for `ose-primer` / `ose-infra` (not executed here).
+**Part A — `ose-public`** (worktree → push to `main`):
+
+- **Phase 0** — worktree + baseline (`repo-setup-manager`); capture current sizes.
+- **Phase 1** — budget config + generalized Rust validator (TDD) + resolved-tree check +
+  deterministic preflight category.
+- **Phase 2** — wire the `instruction-size:validation` Nx target into pre-push
+  (changed-path-gated), pre-commit, and the PR quality gate.
+- **Phase 3** — fix the existing violation: trim `AGENTS.md` under the ceiling.
+- **Phase 4** — author the governance convention (`repo-rules-maker`) + propagate + principle
+  backlink.
+- **Phase 5** — deterministic integration into `repo-rules-checker` Step 0.5 + Step 6 and
+  `repo-rules-quality-gate.md`; companion specs + `specs:coverage`.
+- **Phase 6** — verify + commit + push to `ose-public` `origin/main`; remove worktree.
+
+**Part B — `ose-primer` + `ose-infra`** (in parallel, after Part A lands):
+
+- **Phase 7** — propagate to `ose-primer` (own sub-steps; fixes its own `AGENTS.md`).
+- **Phase 8** — propagate to `ose-infra` (bare repo + worktree; fixes its own `AGENTS.md`).
+
+**Part C:**
+
+- **Phase 9** — cross-repo parity verification + archival.
 
 ## Navigation
 

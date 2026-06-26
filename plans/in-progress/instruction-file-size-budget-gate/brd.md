@@ -23,13 +23,16 @@ at pre-push. The repo has **no budget at all** for the other harnesses' instruct
 
 ## Business Goals
 
-| Goal                                                            | Measure of success                                                                                                  |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| No instruction file silently truncated by any supported harness | Every monitored surface's hard ceiling sits below the tightest harness limit that consumes it                       |
-| The Claude Code 40k warning never fires again                   | Resolved `CLAUDE.md` tree stays under a 38k ceiling (≈5% headroom)                                                  |
-| Drift is caught before it ships, not after                      | The gate blocks `git push` when an over-budget instruction file is in the pushed range                              |
-| The rule is discoverable and governed, not tribal knowledge     | Rule lives as a `repo-governance/` convention, checked by `repo-rules-checker`, listed in the quality-gate workflow |
-| `AGENTS.md` is back within budget                               | `AGENTS.md` ≤ 30,000 bytes (target 24,000) after trim                                                               |
+| Goal                                                            | Measure of success                                                                                                                                          |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No instruction file silently truncated by any supported harness | Every monitored surface's hard ceiling sits below the tightest harness limit that consumes it                                                               |
+| The Claude Code 40k warning never fires again                   | Resolved `CLAUDE.md` tree stays under a 38k ceiling (≈5% headroom)                                                                                          |
+| Drift is caught before it ships, not after                      | The gate blocks `git push` (pre-push) **and** the PR check (`commons-quality-gate.yml`) when an over-budget instruction file is in scope                    |
+| The rule is discoverable and governed, not tribal knowledge     | Rule lives as a `repo-governance/` convention, checked by `repo-rules-checker`, listed in the quality-gate workflow                                         |
+| Governance tracks the budget **deterministically**              | `instruction-size` is a `repo-governance audit` preflight category; checker + quality-gate consume the finding from the JSON envelope, not AI byte-counting |
+| Failures are fixed the right way, not gamed                     | The `fail` message + convention + checker all name **progressive disclosure** as the sole remediation and forbid delete/compress/split                      |
+| Every repo is back within budget                                | `AGENTS.md` ≤ 30,000 bytes (target 24,000) after trim in **each** of `ose-public`, `ose-primer`, `ose-infra`                                                |
+| All three sibling repos stay in parity                          | Same validator, config numbers, target name, gates, and governance wiring land in all three repos                                                           |
 
 ## Stakeholders
 
@@ -38,8 +41,8 @@ at pre-push. The repo has **no budget at all** for the other harnesses' instruct
 - **Repository maintainer** — wants drift blocked automatically and the rule self-documenting.
 - **Human contributors** — get a fast, local, actionable failure instead of a silent
   degradation discovered later.
-- **Downstream `ose-primer` / `ose-infra`** — inherit the convention + gate via the parity
-  loop (hand-off only in this plan).
+- **`ose-primer` / `ose-infra`** — receive the same convention + gate + deterministic
+  integration **in this plan** (Phases 7–8), keeping the three repos in parity.
 
 ## Business Value
 
@@ -59,8 +62,11 @@ at pre-push. The repo has **no budget at all** for the other harnesses' instruct
 3. `AGENTS.md` and the Claude resolved tree are both within their new ceilings, so the gate
    ships green and the Claude Code warning is gone.
 4. The rule is documented as a convention, propagated to all reference surfaces, validated by
-   `repo-rules-checker`, and listed in `repo-rules-quality-gate.md`.
-5. `ose-primer` / `ose-infra` parity is explicitly handed off (not silently dropped).
+   `repo-rules-checker` (deterministically, via the preflight envelope), and listed in
+   `repo-rules-quality-gate.md`.
+5. The validator runs in the PR quality gate, not only locally.
+6. The same change is landed and verified in parity across all three repos
+   (`ose-public`, `ose-primer`, `ose-infra`).
 
 ## Constraints
 
@@ -74,8 +80,8 @@ at pre-push. The repo has **no budget at all** for the other harnesses' instruct
 
 ## Out of Scope
 
-- Executing `ose-primer` / `ose-infra` convergence (Phase 6 is a hand-off note).
-- Creating instruction files for harnesses that don't yet have them.
+- Creating instruction files for harnesses that don't yet have them (the budget covers them
+  as no-op globs until they exist).
 - Changing what any instruction file _says_ — except the mechanical `AGENTS.md` trim, which
   moves already-linked content to its canonical `repo-governance/` homes without altering
   rules.

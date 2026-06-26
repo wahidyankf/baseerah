@@ -131,6 +131,12 @@ fail)` is the existing tier logic, parameterized.
   generalized classifier scoped to `AGENTS.md` (preserves the existing tests + alias).
 - New `commands/convention_validate_instruction_size.rs` — `text`/`json`/`markdown`,
   `SCHEMA = "rhino-cli/instruction-size/v1"`, exit non-zero if any finding is `fail`.
+  - **Every `fail` message carries the remediation pointer** (see
+    [§6.1](#61-remediation-when-the-gate-fails)): it appends
+    `remediate via progressive disclosure (lift detail to its linked canonical doc, keep a
+one-line summary + See link): repo-governance/principles/content/progressive-disclosure.md`.
+    The error line is where a contributor actually looks when the hook blocks them, so the
+    sanctioned fix must live there — not only in the convention doc.
 - `convention_audit.rs` — add `"instruction-size"` to `MEMBERS`; keep `"agents-md-size"` as
   the alias entry (or drop from the audit set and keep only as a standalone alias — decided in
   delivery §I).
@@ -176,28 +182,88 @@ This matches the user's requirement exactly: the gate is **forced at pre-push on
 push range touches an instruction-file surface**, and is a hard (non-cacheable-skippable)
 block.
 
-### 5.3 Pre-commit + CI
+### 5.3 PR quality gate
 
-Keep the validator as a `convention audit` member so it also runs at pre-commit and in the
-markdown/convention CI gate (`markdown-validate.yml` / `commons-quality-gate.yml`) — defense
-in depth. Pre-push is the **hard** gate per the user's instruction; pre-commit/CI are
-backstops.
+The validator must also run in the **PR quality gate**, not only locally. `commons-quality-gate.yml`
+is that gate — it triggers on `pull_request` **and** `push: [main]`, and already runs
+`rhino-cli` validation targets directly (e.g. the "Naming validators" job runs
+`naming:harness-validation` / `naming:workflows-validation`; the "Markdown quality gate" job
+runs the markdown validators). Add a step:
+
+```yaml
+- run: npx nx run rhino-cli:instruction-size:validation
+```
+
+Natural home: the **"Markdown quality gate"** job (instruction files are markdown), or a
+dedicated **"Instruction-size budget"** step. This makes an over-budget instruction file fail
+the PR check — the server-side backstop to the local pre-push hard gate. Keep the validator as
+a `convention audit` member too, so it also runs at **pre-commit** (defense in depth). Tiering:
+pre-push = local hard gate; PR quality gate = server-side hard gate; pre-commit = early local
+catch.
+
+### 5.4 Deterministic preflight integration
+
+To make the **`repo-rules-checker` and the `repo-rules-quality-gate` workflow track the budget
+deterministically** (not via AI byte-counting), `instruction-size` is emitted as a **fourth
+category of the `repo-governance audit` orchestrator**, alongside `layer-coherence`,
+`traceability-audit`, and `vendor-audit`. Consequences:
+
+- `repo-governance audit -o json` (schema `rhino-cli/repo-governance-audit/v1`) carries an
+  `instruction-size` category in `result.categories[]`.
+- The workflow's **Step 0.5 preflight** runs that command, so the size findings land in the
+  deterministic JSON envelope the workflow already consumes — no new workflow machinery.
+- The checker's **Step 0.5 "Consume Deterministic Preflight"** ingests the envelope; the
+  category→skip table gains an `instruction-size` row, so **Step 6 must NOT AI-re-derive byte
+  counts** — it defers to the deterministic finding and judges only qualitative bloat the
+  mechanical gate cannot, recommending progressive disclosure as the fix.
+
+This is the canonical [deterministic-vs-AI split](../../../repo-governance/conventions/structure/deterministic-vs-ai-validation-split.md):
+the byte ceilings are mechanical (deterministic tier); "is this prose bloated even though it
+fits?" is judgement (AI tier). Net: the same finding is computed once, by `rhino-cli`, and
+reused by the pre-push hook, the PR gate, the quality-gate workflow, and the AI checker.
 
 ## 6. Governance propagation
 
-| Surface                                                                 | Change                                                                                                                                                           | Agent / mechanism              |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| `repo-governance/conventions/structure/instruction-file-size-budget.md` | **New convention** — file class, budget table, enforcement points, rationale, `Principles Implemented/Respected`                                                 | `repo-rules-maker`             |
-| `repo-governance/conventions/README.md`                                 | Index entry for the new convention                                                                                                                               | `repo-rules-maker` propagation |
-| `AGENTS.md` "Markdown Quality" / "Cross-Language Lint Gates"            | One-line gate entry + `See` link (no inline expansion — that would re-bloat the file)                                                                            | edit                           |
-| `repo-governance/development/infra/nx-targets.md`                       | Add `instruction-size:validation` to the canonical target list                                                                                                   | edit                           |
-| `.claude/agents/repo-rules-checker.md` Step 6                           | Rename "AGENTS.md Size Check" → "Instruction-File Size Budget"; deterministic-gate annotation points at `instruction-size`; qualitative bloat across whole class | edit                           |
-| `repo-governance/workflows/repo/repo-rules-quality-gate.md`             | Name `instruction-size` among the convention-tier deterministic validators (Step 0.5 paragraph + Step 6 reference)                                               | edit                           |
-| `specs/apps/rhino/**`                                                   | Companion Gherkin for the new validator (two-path rule)                                                                                                          | `specs-maker` / hand           |
+| Surface                                                                 | Change                                                                                                                                                                                                                                                      | Agent / mechanism              |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `repo-governance/conventions/structure/instruction-file-size-budget.md` | **New convention** — file class, budget table, enforcement points, rationale, `Principles Implemented/Respected`                                                                                                                                            | `repo-rules-maker`             |
+| `repo-governance/conventions/README.md`                                 | Index entry for the new convention                                                                                                                                                                                                                          | `repo-rules-maker` propagation |
+| `AGENTS.md` "Markdown Quality" / "Cross-Language Lint Gates"            | One-line gate entry + `See` link (no inline expansion — that would re-bloat the file)                                                                                                                                                                       | edit                           |
+| `repo-governance/development/infra/nx-targets.md`                       | Add `instruction-size:validation` to the canonical target list                                                                                                                                                                                              | edit                           |
+| `.claude/agents/repo-rules-checker.md` Step 0.5 + Step 6                | Step 0.5 category→skip table gains an `instruction-size` row (consume the deterministic preflight; no AI byte math); Step 6 renamed "Instruction-File Size Budget", defers to the finding, judges only qualitative bloat, recommends progressive disclosure | edit                           |
+| `repo-governance/workflows/repo/repo-rules-quality-gate.md`             | List `instruction-size` as a **fourth Step 0.5 preflight category** (deterministic JSON envelope) + Step 6 reference + "What changed" note                                                                                                                  | edit                           |
+| `specs/apps/rhino/**`                                                   | Companion Gherkin for the new validator (two-path rule)                                                                                                                                                                                                     | `specs-maker` / hand           |
+| `repo-governance/principles/content/progressive-disclosure.md`          | Backlink: add the new convention to "Related Conventions" + a "How It Applies → Instruction-File Size Budget" example (two-way traceability)                                                                                                                | `repo-rules-maker` propagation |
 
 Per the [propagate-via-maker memory], the convention is authored by `repo-rules-maker` and
 **all** reference surfaces are swept (not just the obvious ones), then bindings re-synced
 (`npm run generate:bindings`) so `.opencode/` / `.amazonq/` stay in parity.
+
+### 6.1 Remediation when the gate fails
+
+The size budget protects instruction adherence; a careless "fix" can defeat its own purpose.
+So the convention names exactly **one sanctioned remediation — [Progressive
+Disclosure](../../../repo-governance/principles/content/progressive-disclosure.md)** — and
+forbids the three anti-fixes:
+
+| Reaction to a failing gate                                                                                                         | Verdict         | Why                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Lift detail into its canonical `repo-governance/`/`docs/` home; leave a one-line summary + `See` link in the always-loaded surface | ✅ **Required** | The always-loaded file becomes the _top_ disclosure layer; depth lives one link away — exactly Progressive Disclosure |
+| Delete a rule to shrink the file                                                                                                   | ❌ Forbidden    | Loses governance; the rule still exists, it just stops being stated                                                   |
+| Compress prose into dense, unreadable blocks                                                                                       | ❌ Forbidden    | Hurts the very instruction adherence the budget exists to protect                                                     |
+| Split content into another file that is _also_ auto-loaded                                                                         | ❌ Forbidden    | Games the per-file check while the real context cost is unchanged                                                     |
+
+This remediation is surfaced in **three tiers** so it is seen at the moment of failure, not
+only when someone goes looking:
+
+1. **The gate's `fail` message** (rhino-cli) appends the progressive-disclosure pointer +
+   path — the error line a contributor reads when the hook blocks them (see
+   [§4](#4-validator-design-rust-tdd)).
+2. **The convention** carries a "When the gate fails" section mandating the above and a
+   `Principles Implemented/Respected` link to `progressive-disclosure.md` (this also satisfies
+   the repo's convention→principle traceability requirement).
+3. **`repo-rules-checker` Step 6** annotates that the sanctioned remediation is progressive
+   disclosure, so the AI checker recommends the same fix it would expect a human to apply.
 
 ## 7. Flow
 
@@ -226,7 +292,8 @@ Accessible-palette note: render with the repo's color-blind-safe Mermaid theme p
 | `AGENTS.md` trim loses a rule          | Trim only moves inline-expanded content to its **already-linked** `repo-governance/` home; `repo-rules-checker` + `cross-vendor:parity-validation` catch drift |
 | Resolved-tree `@import` parsing wrong  | Unit tests on a fixture `CLAUDE.md` with nested imports; depth cap 4                                                                                           |
 | Threshold bikeshedding                 | Numbers live in one YAML; tuning is a reviewed one-line edit, not a code change                                                                                |
-| Downstream repos silently diverge      | Phase 6 records an explicit parity hand-off note                                                                                                               |
+| Sibling repos silently diverge         | Phases 7–8 port the same validator + config + wiring + convention to `ose-primer` / `ose-infra`; Phase 9 verifies mechanics parity                             |
+| `ose-infra` bare-repo commit mishap    | Commit to `main` via a worktree (the top dir fails `git status`); never operate on the bare dir directly                                                       |
 
 ## 9. Sources
 
@@ -236,3 +303,26 @@ truncation; Windsurf/Devin 12,000-char hard cap; Copilot soft "≤2 pages" (4k c
 2026-06); Junie "20–40 lines"; agents.md standard publishes no size guidance. Full citations
 in the conversation that spawned this plan; the convention doc (Phase 4) will carry the
 durable citation list.
+
+## 10. Multi-repo execution
+
+The three sibling repos each ship the same ported `rhino-cli` and the same governance + SDLC
+machinery, so the same change lands in each. Execution order is **`ose-public` first (in a
+worktree → push to `main`), then `ose-primer` and `ose-infra` in parallel** (they are
+independent of each other; both depend only on `ose-public` having landed).
+
+| Repo         | Nature                     | Per-repo specifics                                                                                                                            |
+| ------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ose-public` | upstream source of truth   | Standard worktree at `worktrees/<name>/` (repo `WorktreeCreate` hook). Trim its own `AGENTS.md` (41,108 B today).                             |
+| `ose-primer` | downstream public template | Same machinery; polyglot-demo template. Trim its own `AGENTS.md` (measure in Phase 7.1). Same budget numbers.                                 |
+| `ose-infra`  | private infra repo         | **Bare repo + worktrees** — commit to `main` via a worktree; the top dir fails `git status`. Trim its own `AGENTS.md` (measure in Phase 8.1). |
+
+**Parity invariants verified in Phase 9**: identical validator surface (`convention
+instruction-size` + `agents-md-size` alias), identical `instruction-size-budget.yaml` numbers,
+identical Nx target name (`instruction-size:validation`), identical pre-push glob gate,
+identical PR-gate step, identical deterministic preflight category, identical
+checker-Step-6 + workflow wiring. **Legitimate divergence**: which instruction surfaces
+actually exist in each repo (the budget globs are no-ops where a surface is absent).
+
+Each repo **fixes its own existing over-budget instruction files** in its trim phase
+(3 / 7.4 / 8.4) so no repo ships a gate it currently fails.

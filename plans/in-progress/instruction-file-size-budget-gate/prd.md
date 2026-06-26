@@ -43,8 +43,16 @@
 - **FR6** — An `instruction-size:validation` Nx target wraps the command.
 - **FR7** — `.husky/pre-push` runs the target **only when** the pushed range touches an
   instruction-file glob.
-- **FR8** — The validator is also a member of pre-commit and the markdown/convention CI gate.
-- **FR9** — After the `AGENTS.md` trim, the gate passes on the current repo (`fail` count = 0).
+- **FR8** — The validator is also a member of pre-commit (early catch) and runs in the **PR
+  quality gate** (`commons-quality-gate.yml`, on `pull_request` + `push:main`).
+- **FR9** — Every `fail` message names **progressive disclosure** as the remediation and
+  includes the path `repo-governance/principles/content/progressive-disclosure.md`.
+- **FR10** — `instruction-size` is emitted as a **category of `repo-governance audit`** so the
+  deterministic JSON envelope (`schema rhino-cli/repo-governance-audit/v1`) carries it;
+  `repo-rules-checker` Step 0.5 consumes it (no AI byte-counting) and Step 6 defers to it.
+- **FR11** — After the `AGENTS.md` trim, the gate passes (`fail` count = 0) in **each** repo.
+- **FR12** — The same validator + config + target + gates + governance wiring land in all
+  three repos (`ose-public`, `ose-primer`, `ose-infra`).
 
 ## Non-Functional Requirements
 
@@ -141,16 +149,57 @@ Feature: Governance of the size-budget rule
 
   Scenario: The quality-gate workflow lists the validator
     When I read "repo-governance/workflows/repo/repo-rules-quality-gate.md"
-    Then the "instruction-size" deterministic validator is named among the
-      convention-tier gates
+    Then the "instruction-size" preflight category is named among the Step 0.5 categories
+```
+
+```gherkin
+Feature: Deterministic preflight tracking
+
+  Scenario: The preflight envelope carries the instruction-size category
+    When I run "rhino-cli repo-governance audit -o json"
+    Then the envelope schema is "rhino-cli/repo-governance-audit/v1"
+    And "result.categories" contains a category named "instruction-size"
+
+  Scenario: The AI checker defers to the deterministic finding
+    Given a preflight envelope containing an "instruction-size" category
+    When "repo-rules-checker" runs Step 0.5
+    Then the "instruction-size" step is added to the deterministic skip set
+    And Step 6 does not AI-re-derive any byte count
+
+  Scenario: A fail message names progressive disclosure
+    Given "AGENTS.md" exceeds its fail ceiling
+    When I run "rhino-cli convention instruction-size"
+    Then the fail message contains "progressive disclosure"
+    And it contains "repo-governance/principles/content/progressive-disclosure.md"
+```
+
+```gherkin
+Feature: PR quality gate and multi-repo parity
+
+  Scenario: The PR quality gate runs the validator
+    Given a pull request that modifies an instruction file over its ceiling
+    When "commons-quality-gate.yml" runs
+    Then the "instruction-size:validation" step fails the PR check
+
+  Scenario: All three repos converge
+    Given the plan is complete
+    When I inspect "ose-public", "ose-primer", and "ose-infra"
+    Then each carries the "convention instruction-size" validator, the
+      "instruction-size-budget.yaml" config, the "instruction-size:validation" target,
+      the pre-push glob gate, the PR-gate step, and the deterministic preflight category
+    And each repo's "instruction-size:validation" exits 0
 ```
 
 ## Definition of Done
 
 - All Gherkin scenarios pass (or have a consuming test).
-- `nx run rhino-cli:instruction-size:validation` exits 0 on the current repo.
-- `AGENTS.md` ≤ 30,000 bytes; resolved Claude tree ≤ 38,000 bytes.
-- Pre-push blocks an over-budget instruction-file push (verified manually per delivery §V).
-- Convention authored + propagated; `repo-rules-checker` Step 6 extended; workflow updated.
-- `specs:coverage` passes for `rhino-cli`.
-- Phase 6 parity hand-off note recorded.
+- `nx run rhino-cli:instruction-size:validation` exits 0 in **each** repo.
+- Each repo's `AGENTS.md` ≤ 30,000 bytes; each resolved Claude tree ≤ 38,000 bytes.
+- Pre-push **and** the PR quality gate block an over-budget instruction-file change.
+- `instruction-size` appears as a `repo-governance audit` preflight category; checker
+  Step 0.5 + Step 6 consume it deterministically.
+- Convention authored + propagated; principle backlinked; `repo-rules-checker` +
+  `repo-rules-quality-gate.md` updated, in all three repos.
+- `specs:coverage` passes for `rhino-cli` in each repo.
+- All changes on `origin/main` in all three repos; worktrees removed; `ose-infra` no longer
+  bare; plan archived.
