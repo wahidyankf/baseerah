@@ -36,17 +36,17 @@ Each surface has three tiers: `target` (ok, silent), `warn` (reported, non-block
 → warn; `warn < size ≤ fail` → warn; `size > fail` → fail (mirrors the existing
 three-tier `classify`).
 
-| Surface / glob                              | target (B) | warn (B) | **fail (B)** | Binding rationale                                                                                                                      |
-| ------------------------------------------- | ---------: | -------: | -----------: | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `AGENTS.md`, `**/AGENTS.md`                 |     24,000 |   27,000 |   **30,000** | Codex `project_doc_max_bytes` = 32,768 silent truncation; 30k keeps margin **and** keeps the Claude tree (`+CLAUDE.md` 6.6k) under 40k |
-| `CLAUDE.md`                                 |      6,000 |    8,000 |   **10,000** | Thin import shim; should hold only binding details + `@AGENTS.md`                                                                      |
-| **resolved tree** (`CLAUDE.md`+`@imports`)  |     30,000 |   34,000 |   **38,000** | Claude Code 40k runtime warning, ≈5% headroom                                                                                          |
-| `CONVENTIONS.md`                            |     10,000 |   13,000 |   **16,000** | No harness hard cap; keep lean                                                                                                         |
-| `.github/copilot-instructions.md`           |      6,000 |    8,000 |   **10,000** | Copilot soft "≤2 pages"                                                                                                                |
-| `.junie/guidelines.md`, `.junie/AGENTS.md`  |      6,000 |    8,000 |   **10,000** | Junie advisory 20–40 lines                                                                                                             |
-| `.cursor/rules/*.mdc`                       |      4,000 |    8,000 |   **12,000** | Cursor "keep rules under 500 lines"                                                                                                    |
-| `.windsurf/rules/*.md`, `.devin/rules/*.md` |      6,000 |    9,000 |   **12,000** | Windsurf **12,000-char hard cap** (silent drop over budget)                                                                            |
-| `.amazonq/rules/*.md`                       |      4,000 |    8,000 |   **12,000** | Generated bridge; must stay tiny                                                                                                       |
+| Surface / glob                              | target (B) | warn (B) | **fail (B)** | Binding rationale                                                                                                                                              |
+| ------------------------------------------- | ---------: | -------: | -----------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AGENTS.md`, `**/AGENTS.md`                 |     24,000 |   27,000 |   **30,000** | [Judgment call: see §9] Codex `project_doc_max_bytes` = 32,768 silent truncation; 30k keeps margin **and** keeps the Claude tree (`+CLAUDE.md` 6.6k) under 40k |
+| `CLAUDE.md`                                 |      6,000 |    8,000 |   **10,000** | Thin import shim; should hold only binding details + `@AGENTS.md`                                                                                              |
+| **resolved tree** (`CLAUDE.md`+`@imports`)  |     30,000 |   34,000 |   **38,000** | Claude Code 40k runtime warning, ≈5% headroom                                                                                                                  |
+| `CONVENTIONS.md`                            |     10,000 |   13,000 |   **16,000** | No harness hard cap; keep lean                                                                                                                                 |
+| `.github/copilot-instructions.md`           |      6,000 |    8,000 |   **10,000** | [Judgment call: see §9] Copilot soft "≤2 pages"                                                                                                                |
+| `.junie/guidelines.md`, `.junie/AGENTS.md`  |      6,000 |    8,000 |   **10,000** | [Judgment call: see §9] Junie advisory 20–40 lines                                                                                                             |
+| `.cursor/rules/*.mdc`                       |      4,000 |    8,000 |   **12,000** | [Judgment call: see §9] Cursor "keep rules under 500 lines"                                                                                                    |
+| `.windsurf/rules/*.md`, `.devin/rules/*.md` |      6,000 |    9,000 |   **12,000** | [Judgment call: see §9] Windsurf **12,000-char hard cap** (silent drop over budget)                                                                            |
+| `.amazonq/rules/*.md`                       |      4,000 |    8,000 |   **12,000** | Generated bridge; must stay tiny                                                                                                                               |
 
 ### 2.1 Why these recalibrate the existing gate
 
@@ -141,10 +141,11 @@ one-line summary + See link): repo-governance/principles/content/progressive-dis
   the alias entry (or drop from the audit set and keep only as a standalone alias — decided in
   delivery §I).
 
-**Coverage**: new modules must clear the 90%-line `lang:rust` gate. Unit tests cover each
-tier boundary per surface, no-match no-op, resolved-tree summation, and the missing-config
-error path. (Per the rhino-cli port convention, the cucumber-rs harness is deferred; unit
-tests + the committed Gherkin under `specs/apps/rhino` are the coverage of record.)
+**Coverage**: new modules must clear the 90%-line coverage gate (run via
+`nx run rhino-cli:test:quick`, which executes `cargo llvm-cov`). Unit tests cover each tier
+boundary per surface, no-match no-op, resolved-tree summation, and the missing-config error
+path. (Per the rhino-cli port convention, the cucumber-rs harness is deferred; unit tests +
+the committed Gherkin under `specs/apps/rhino` are the coverage of record.)
 
 ## 5. Wiring
 
@@ -300,9 +301,12 @@ Accessible-palette note: render with the repo's color-blind-safe Mermaid theme p
 Derived from a web-researched per-harness limit survey (2026-06-26): Claude Code 40k runtime
 warning + "≤200 lines" doc target; Codex CLI `project_doc_max_bytes` 32,768 silent
 truncation; Windsurf/Devin 12,000-char hard cap; Copilot soft "≤2 pages" (4k cap removed
-2026-06); Junie "20–40 lines"; agents.md standard publishes no size guidance. Full citations
-in the conversation that spawned this plan; the convention doc (Phase 4) will carry the
-durable citation list.
+2026-06); Junie "20–40 lines"; agents.md standard publishes no size guidance.
+
+The per-harness claims marked `[Judgment call: see §9]` in the budget table above are derived
+from this survey. Full inline citations with URLs and excerpts are deferred to the convention
+doc authored in Phase 4; until then these entries carry the `[Judgment call]` label per the
+[Plan Anti-Hallucination Convention](../../../repo-governance/development/quality/plan-anti-hallucination.md).
 
 ## 10. Multi-repo execution
 
@@ -326,3 +330,22 @@ actually exist in each repo (the budget globs are no-ops where a surface is abse
 
 Each repo **fixes its own existing over-budget instruction files** in its trim phase
 (3 / 7.4 / 8.4) so no repo ships a gate it currently fails.
+
+```mermaid
+%% Color Palette: Blue #0173B2, Teal #029E73, Orange #DE8F05
+%% Multi-repo parallel execution: Part A lands first, Part B runs in parallel, Part C verifies
+flowchart LR
+  A["Part A<br/>ose-public<br/>Phases 0–6"]:::blue
+  B1["Phase 7<br/>ose-primer"]:::teal
+  B2["Phase 8<br/>ose-infra"]:::teal
+  C["Part C<br/>Phase 9<br/>parity + archival"]:::orange
+
+  A -->|"lands on main"| B1
+  A -->|"lands on main"| B2
+  B1 -->|"gates green"| C
+  B2 -->|"gates green"| C
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef orange fill:#DE8F05,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```

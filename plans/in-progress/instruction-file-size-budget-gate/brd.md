@@ -14,7 +14,8 @@ first user message, on every harness**. When they grow unbounded they:
    triggered this plan.
 3. **Burn context budget** — every byte consumes session tokens that could serve the actual
    task. Vendor guidance (Claude Code "target under 200 lines"; Windsurf 12,000-char hard
-   cap; Junie "20–40 lines") and a 2026 instruction-adherence study converge on the same
+   cap; Junie "20–40 lines") [Judgment call: per-harness limits from a web-research survey,
+   2026-06-26; inline citations deferred to Phase 4 convention doc] converge on the same
    conclusion: keep instruction files lean.
 
 A single-file gate exists (`rhino-cli convention agents-md-size`) but only watches
@@ -85,3 +86,13 @@ at pre-push. The repo has **no budget at all** for the other harnesses' instruct
 - Changing what any instruction file _says_ — except the mechanical `AGENTS.md` trim, which
   moves already-linked content to its canonical `repo-governance/` homes without altering
   rules.
+
+## Business Risks & Mitigations
+
+| Business Risk                                                               | Mitigation                                                                                                                                                          |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AGENTS.md trim loses a governance rule (visibility loss for all harnesses)  | Trim applies progressive disclosure only — inline-expanded content moved to already-linked `repo-governance/` homes; `repo-rules-checker` catches drift before push |
+| All three repos fail the gate simultaneously (blocked merges / pushes)      | Phase ordering ensures each repo trims its own AGENTS.md _before_ the gate is wired green; no repo ships a gate it currently fails                                  |
+| Convention content drifts from the validator thresholds (misaligned docs)   | Thresholds live in a single committed YAML (`instruction-size-budget.yaml`); the convention, checker, and gate all read from the same file                          |
+| The "sanctioned remediation" message is ignored in favor of forbidden fixes | Three-tier reinforcement: gate fail message, convention doc, and `repo-rules-checker` Step 6 all name progressive disclosure as the sole sanctioned remediation     |
+| Budget numbers become stale as harness limits change                        | Thresholds are reviewed on any known harness limit change; the one-YAML architecture makes updates a one-line, reviewed edit — no code change required              |

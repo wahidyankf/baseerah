@@ -1,5 +1,16 @@
 # Product Requirements — Instruction-File Size-Budget Gate
 
+## Product Overview
+
+The instruction-file size-budget gate enforces byte-level ceilings on every auto-loaded AI
+instruction surface in the repository. Without these ceilings, instruction files grow
+unbounded, causing silent truncation for some harnesses and wasted context budget for all. The
+gate blocks any `git push` that would push an instruction file over its per-file ceiling,
+surfacing a precise, actionable failure message that names progressive disclosure as the
+sanctioned remediation. Success means no harness silently truncates its instruction file, the
+Claude Code 40k warning never fires again, and enforcement is governed (not tribal) across all
+three sibling repos.
+
 ## Personas
 
 - **Codex/Copilot/Cursor/Windsurf/Junie agent** — auto-loads an instruction surface at
@@ -58,9 +69,40 @@
 
 - **NFR1** — Deterministic, byte-based measurement; identical result in hook and CI.
 - **NFR2** — Fast: the full scan is a handful of `stat`s + small reads; target < 1s.
-- **NFR3** — Library coverage ≥ 90% lines (rhino-cli `lang:rust` coverage gate).
+- **NFR3** — Library coverage ≥ 90% lines (rhino-cli `test:quick` coverage gate).
 - **NFR4** — No new shell scripts beyond the existing pre-push pattern (avoid shellcheck
   surface growth).
+
+## Product Scope
+
+### In Scope
+
+- The multi-harness file class: every auto-loaded instruction surface configured in
+  `instruction-size-budget.yaml` (AGENTS.md-class files).
+- Per-file size budgets enforced at pre-push (local hard gate), pre-commit (early catch), and
+  PR quality gate (server-side backstop).
+- The Claude resolved tree (`CLAUDE.md` + recursive `@imports`) checked as a composite surface.
+- Deterministic preflight category (`instruction-size`) integrated into the `repo-governance
+audit` orchestrator and consumed by `repo-rules-checker`.
+- Governance: new convention, principle backlink, checker/workflow updates.
+- Parity across all three repos (`ose-public`, `ose-primer`, `ose-infra`).
+
+### Out of Scope
+
+- Creating instruction files for harnesses that do not yet have them (pre-budgeted as no-op
+  globs; only fail when the file exists and exceeds its ceiling).
+- Altering the _content_ of instruction files beyond the mechanical AGENTS.md
+  progressive-disclosure trim (no rule deletions, no compression).
+- Changing what any instruction file says — only its size governance is in scope.
+
+## Product Risks
+
+| Risk                                                                                | Impact                                                          | Mitigation                                                                                                              |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Users game the per-file check by splitting content into another auto-loaded surface | Budget per-file ceiling bypassed; real context cost unchanged   | Convention forbids this anti-fix explicitly; resolved-tree check catches combined size even when split across surfaces  |
+| The sanctioned-remediation message is not prominent enough at the point of failure  | Contributor applies a forbidden fix (delete / compress / split) | Remediation pointer embedded directly in the gate's `fail` message — visible at the moment of failure, not just in docs |
+| The three anti-fixes (delete, compress, split-to-auto-loaded) are applied anyway    | Rules silently lost or real context unchanged                   | `repo-rules-checker` Step 6 reinforces the same message; `cross-vendor:parity-validation` detects split games           |
+| Contributors compress prose to fit below the ceiling                                | Instruction adherence degraded; agents act on ambiguous rules   | Convention explicitly forbids dense-prose compression; Step 6 judges qualitative bloat even below the byte ceiling      |
 
 ## Acceptance Criteria (Gherkin)
 
@@ -142,12 +184,14 @@ Feature: Governance of the size-budget rule
       per-file budgets, and enforcement points
 
   Scenario: repo-rules-checker validates the budget
+    Given the plan is complete
     When "repo-rules-checker" runs Step 6
     Then it reports qualitative bloat concerns across the whole instruction-file class
     And it annotates that the byte ceiling is enforced by the deterministic
       "instruction-size" gate
 
   Scenario: The quality-gate workflow lists the validator
+    Given the plan is complete
     When I read "repo-governance/workflows/repo/repo-rules-quality-gate.md"
     Then the "instruction-size" preflight category is named among the Step 0.5 categories
 ```
@@ -156,6 +200,7 @@ Feature: Governance of the size-budget rule
 Feature: Deterministic preflight tracking
 
   Scenario: The preflight envelope carries the instruction-size category
+    Given a repo with instruction files within the configured budgets
     When I run "rhino-cli repo-governance audit -o json"
     Then the envelope schema is "rhino-cli/repo-governance-audit/v1"
     And "result.categories" contains a category named "instruction-size"
