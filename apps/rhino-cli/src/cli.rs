@@ -4,10 +4,11 @@ use clap::{Parser, Subcommand};
 
 use crate::commands::{
     convention_audit, convention_validate_agents_md_size, convention_validate_emoji,
-    convention_validate_license, doctor, env_backup, env_init, env_restore, env_validate,
-    git_pre_commit, governance_audit, governance_layer_coherence, governance_traceability_audit,
-    governance_vendor_audit, harness_audit, harness_emit_bindings, harness_generate_bindings,
-    harness_sync, harness_validate_bindings, harness_validate_claude, harness_validate_duplication,
+    convention_validate_instruction_size, convention_validate_license, doctor, env_backup,
+    env_init, env_restore, env_validate, git_pre_commit, governance_audit,
+    governance_layer_coherence, governance_traceability_audit, governance_vendor_audit,
+    harness_audit, harness_emit_bindings, harness_generate_bindings, harness_sync,
+    harness_validate_bindings, harness_validate_claude, harness_validate_duplication,
     harness_validate_naming, harness_validate_sync, lang_java_validate_null_safety, md_audit,
     md_validate_frontmatter, md_validate_frontmatter_dates, md_validate_heading_hierarchy,
     md_validate_links, md_validate_mermaid, md_validate_naming, md_validate_readme_index,
@@ -363,6 +364,9 @@ pub enum ConventionValidateCommands {
     /// Audit AGENTS.md size against the 30/35/40 KB thresholds.
     #[command(name = "agents-md-size")]
     AgentsMdSize(convention_validate_agents_md_size::AgentsMdSizeArgs),
+    /// Check per-surface and resolved-tree byte budgets for instruction files.
+    #[command(name = "instruction-size")]
+    InstructionSize(convention_validate_instruction_size::InstructionSizeArgs),
 }
 
 // ---------------------------------------------------------------------------
@@ -513,6 +517,9 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
                 }
                 ConventionValidateCommands::AgentsMdSize(args) => {
                     convention_validate_agents_md_size::run(args, output_format)
+                }
+                ConventionValidateCommands::InstructionSize(args) => {
+                    convention_validate_instruction_size::run(args, output_format)
                 }
             },
             ConventionCommands::Audit(args) => convention_audit::run(args, output_format),

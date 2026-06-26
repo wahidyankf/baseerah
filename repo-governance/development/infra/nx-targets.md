@@ -134,25 +134,26 @@ operation. This distinguishes governance targets from language-level lifecycle t
 
 **Canonical governance and validation targets** (defined on `rhino-cli`):
 
-| Target                                 | What it validates                                                  |
-| -------------------------------------- | ------------------------------------------------------------------ |
-| `specs:coverage`                       | Every Gherkin step has a matching step definition                  |
-| `specs:tree-validation`                | `specs/apps/` directory structure matches app registrations        |
-| `specs:links-validation`               | Internal links in spec `.md` files are valid                       |
-| `specs:counts-validation`              | Spec scenario/step counts match expected thresholds                |
-| `specs:adoption-validation`            | All apps have a spec directory (no orphan app)                     |
-| `specs:gherkin-cardinality-validation` | Each Gherkin keyword used within cardinality bounds                |
-| `links:validation`                     | Internal links in all non-excluded `.md` files                     |
-| `mermaid:validation`                   | Mermaid diagram width, label, and syntax rules (flowchart + state) |
-| `headings:hierarchy-validation`        | Heading nesting in prose allowlist paths                           |
-| `env:validation`                       | `.env.example` surfaces match `env-contract.yaml`                  |
-| `naming:harness-validation`            | Agent definition file names match the naming convention            |
-| `naming:workflows-validation`          | Workflow file names match the naming convention                    |
-| `governance:vendor-audit-validation`   | `repo-governance/` docs contain no vendor-specific content         |
-| `cross-vendor:parity-validation`       | Cross-vendor behavioral parity (Phase 0 deterministic invariants)  |
-| `harness:bindings-validation`          | `.claude/` ↔ `.opencode/` ↔ `.amazonq/` binding parity             |
-| `format:check`                         | `rustfmt --check` (Rust projects only)                             |
-| `msrv:check`                           | Minimum Supported Rust Version compatibility                       |
+| Target                                 | What it validates                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `specs:coverage`                       | Every Gherkin step has a matching step definition                                         |
+| `specs:tree-validation`                | `specs/apps/` directory structure matches app registrations                               |
+| `specs:links-validation`               | Internal links in spec `.md` files are valid                                              |
+| `specs:counts-validation`              | Spec scenario/step counts match expected thresholds                                       |
+| `specs:adoption-validation`            | All apps have a spec directory (no orphan app)                                            |
+| `specs:gherkin-cardinality-validation` | Each Gherkin keyword used within cardinality bounds                                       |
+| `links:validation`                     | Internal links in all non-excluded `.md` files                                            |
+| `mermaid:validation`                   | Mermaid diagram width, label, and syntax rules (flowchart + state)                        |
+| `headings:hierarchy-validation`        | Heading nesting in prose allowlist paths                                                  |
+| `env:validation`                       | `.env.example` surfaces match `env-contract.yaml`                                         |
+| `naming:harness-validation`            | Agent definition file names match the naming convention                                   |
+| `naming:workflows-validation`          | Workflow file names match the naming convention                                           |
+| `governance:vendor-audit-validation`   | `repo-governance/` docs contain no vendor-specific content                                |
+| `cross-vendor:parity-validation`       | Cross-vendor behavioral parity (Phase 0 deterministic invariants)                         |
+| `instruction-size:validation`          | Byte budget on auto-loaded instruction files (`AGENTS.md`, `CLAUDE.md`, harness surfaces) |
+| `harness:bindings-validation`          | `.claude/` ↔ `.opencode/` ↔ `.amazonq/` binding parity                                    |
+| `format:check`                         | `rustfmt --check` (Rust projects only)                                                    |
+| `msrv:check`                           | Minimum Supported Rust Version compatibility                                              |
 
 **Rule**: governance/validation target keys are `{domain}:{work}` where both parts are lowercase
 kebab-case. The domain must be a recognizable noun (the scope); the work must be a verb phrase

@@ -1,0 +1,43 @@
+# Schema: rhino-cli/instruction-size-budget/v1
+surfaces:
+  - glob: "AGENTS.md"
+    target: 24000
+    warn: 27000
+    fail: 30000
+  - glob: "**/AGENTS.md"
+    target: 24000
+    warn: 27000
+    fail: 30000
+  - glob: "CLAUDE.md"
+    target: 6000
+    warn: 8000
+    fail: 10000
+  - glob: ".amazonq/rules/*.md"
+    target: 4000
+    warn: 8000
+    fail: 12000
+  - glob: ".windsurf/rules/*.md"
+    target: 6000
+    warn: 9000
+    fail: 12000
+  - glob: ".cursor/rules/*.mdc"
+    target: 4000
+    warn: 8000
+    fail: 12000
+  - glob: ".junie/guidelines.md"
+    target: 6000
+    warn: 8000
+    fail: 10000
+  - glob: ".github/copilot-instructions.md"
+    target: 6000
+    warn: 8000
+    fail: 10000
+  - glob: "CONVENTIONS.md"
+    target: 10000
+    warn: 13000
+    fail: 16000
+resolved_tree:
+  root: "CLAUDE.md"
+  target: 30000
+  warn: 34000
+  fail: 38000

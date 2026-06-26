@@ -33,4 +33,8 @@ if [ -n "$RANGE" ]; then
   if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|docs/reference/platform-bindings\.md$|\.claude/|\.opencode/|\.codex/|\.github/)'; then
     npm run harness:bindings-validation
   fi
+  # Instruction-size budget gate: run when any auto-loaded instruction surface changes.
+  if echo "$CHANGED" | grep -qE '^(AGENTS\.md$|CLAUDE\.md$|instruction-size-budget\.yaml$|\.amazonq/rules/|\.windsurf/rules/|\.cursor/rules/|\.junie/guidelines\.md$|\.github/copilot-instructions\.md$|CONVENTIONS\.md$)'; then
+    npx nx run rhino-cli:instruction-size:validation
+  fi
 fi

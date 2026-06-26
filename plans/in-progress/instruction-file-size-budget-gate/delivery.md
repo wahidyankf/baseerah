@@ -44,17 +44,17 @@ Specification](../../../repo-governance/conventions/structure/plans.md#worktree-
 
 ### Phase 0 — Worktree + baseline `[AI]`
 
-- [ ] **0.1** `[AI]` Create the worktree:
+- [x] **0.1** `[AI]` Create the worktree:
       `git worktree add worktrees/instruction-file-size-budget-gate -b instruction-file-size-budget-gate`
       (lands under `worktrees/` via the repo `WorktreeCreate` hook). Then **both**
       `npm install` **and** `npm run doctor -- --fix` inside it (worktree toolchain init).
-- [ ] **0.2** `[AI]` Invoke `repo-setup-manager`: baseline-build rhino-cli
+- [x] **0.2** `[AI]` Invoke `repo-setup-manager`: baseline-build rhino-cli
       (`nx build rhino-cli`), run `nx run rhino-cli:test:unit` +
       `nx run rhino-cli:test:quick` to confirm a green start.
-- [ ] **0.3** `[AI]` Capture current sizes:
+- [x] **0.3** `[AI]` Capture current sizes:
       `wc -c AGENTS.md CLAUDE.md .amazonq/rules/00-agents-md.md` + resolved tree
       (`CLAUDE.md`+`AGENTS.md`). Record under "Baseline sizes (ose-public)" below.
-- [ ] **0.4** `[AI]` Confirm where `agents-md-size` is currently invoked (grep hooks/CI).
+- [x] **0.4** `[AI]` Confirm where `agents-md-size` is currently invoked (grep hooks/CI).
       Note whether it is actually wired into a blocking gate today — Phase 2 fixes any gap.
 
 **Baseline sizes (ose-public)** (fill in 0.3): _AGENTS.md = \_\_\_\_ B · CLAUDE.md = \_\_\_\_ B
@@ -64,75 +64,75 @@ Specification](../../../repo-governance/conventions/structure/plans.md#worktree-
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `nx run rhino-cli:test:unit` — acceptance: all existing unit tests pass.
-- [ ] [AI] `nx run rhino-cli:test:quick` — acceptance: exits 0 (coverage ≥ 90%).
-- [ ] [AI] Baseline sizes recorded under "Baseline sizes (ose-public)" above.
+- [x] [AI] `nx run rhino-cli:test:unit` — acceptance: all existing unit tests pass.
+- [x] [AI] `nx run rhino-cli:test:quick` — acceptance: exits 0 (coverage ≥ 90%).
+- [x] [AI] Baseline sizes recorded under "Baseline sizes (ose-public)" above.
 
 > **Pause Safety**: Worktree created, toolchain verified, baseline captured. Repo at clean
 > starting state. Safe to stop. To resume: `nx run rhino-cli:test:unit`.
 
 ### Phase 1 — Config + generalized validator + deterministic category (TDD) `[AI]`
 
-- [ ] **1.1-RED** `[AI]` Write failing test in
+- [x] **1.1-RED** `[AI]` Write failing test in
       `apps/rhino-cli/src/application/repo_governance/instruction_size.rs` loading
       `instruction-size-budget.yaml` and asserting the `AGENTS.md` surface has
       `fail == 30000`. Command: `cargo test -p rhino-cli instruction_size::` — acceptance:
       test fails with assertion error (config not yet created).
-- [ ] **1.1-GREEN** `[AI]` Create `instruction-size-budget.yaml` at repo root (per
+- [x] **1.1-GREEN** `[AI]` Create `instruction-size-budget.yaml` at repo root (per
       [tech-docs §3](./tech-docs.md#3-config-file)) and implement `BudgetConfig`/`Surface`/
       `ResolvedTree` types plus loader in
       `apps/rhino-cli/src/application/repo_governance/instruction_size.rs`.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: test passes;
       `AGENTS.md` surface `fail == 30000`.
-- [ ] **1.1-REFACTOR** `[AI]` Dedupe the YAML loader against `env-contract.yaml` parsing
+- [x] **1.1-REFACTOR** `[AI]` Dedupe the YAML loader against `env-contract.yaml` parsing
       patterns in `apps/rhino-cli/src/`. Command: `cargo test -p rhino-cli instruction_size::`
       — acceptance: all unit tests still pass, duplication removed.
 
-- [ ] **1.2-RED** `[AI]` Write failing tests for `classify(24000,24000,27000,30000)==ok`,
+- [x] **1.2-RED** `[AI]` Write failing tests for `classify(24000,24000,27000,30000)==ok`,
       `classify(28000,24000,27000,30000)==warn`, `classify(31000,24000,27000,30000)==fail` in
       `apps/rhino-cli/src/application/repo_governance/instruction_size.rs`.
       Command: `cargo test -p rhino-cli instruction_size::classify` — acceptance: tests fail
       (function not yet extracted).
-- [ ] **1.2-GREEN** `[AI]` Extract `classify(size, target, warn, fail)` as a parameterized
+- [x] **1.2-GREEN** `[AI]` Extract `classify(size, target, warn, fail)` as a parameterized
       function in `apps/rhino-cli/src/application/repo_governance/instruction_size.rs`.
       Command: `cargo test -p rhino-cli instruction_size::classify` — acceptance: new classify
       tests pass.
-- [ ] **1.2-REFACTOR** `[AI]` Re-point
+- [x] **1.2-REFACTOR** `[AI]` Re-point
       `apps/rhino-cli/src/application/repo_governance/agents_md_size.rs::classify` to use the
       shared function (alias preserved).
       Command: `cargo test -p rhino-cli` — acceptance: all unit tests (old `agents_md_size`
       tests + new) still green.
 
-- [ ] **1.3-RED** `[AI]` Write failing test for `check_instruction_sizes` over a temp repo
+- [x] **1.3-RED** `[AI]` Write failing test for `check_instruction_sizes` over a temp repo
       fixture with over-ceiling `AGENTS.md` and no `.github/copilot-instructions.md`: assert
       one `fail` finding for `AGENTS.md`, zero findings for the absent glob.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: test fails (function
       not yet implemented).
-- [ ] **1.3-GREEN** `[AI]` Implement `check_instruction_sizes(repo_root, config)` in
+- [x] **1.3-GREEN** `[AI]` Implement `check_instruction_sizes(repo_root, config)` in
       `apps/rhino-cli/src/application/repo_governance/instruction_size.rs`: glob each surface,
       stat each file, classify; skip no-match globs.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: test passes; absent
       globs are no-ops; present over-ceiling files are `fail`.
-- [ ] **1.3-REFACTOR** `[AI]` Ensure deterministic ordering of findings output.
+- [x] **1.3-REFACTOR** `[AI]` Ensure deterministic ordering of findings output.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: all unit tests still
       pass.
 
-- [ ] **1.4-RED** `[AI]` Write failing test with a fixture `CLAUDE.md` that imports
+- [x] **1.4-RED** `[AI]` Write failing test with a fixture `CLAUDE.md` that imports
       `@AGENTS.md` and whose resolved byte sum exceeds 38,000; assert a `resolved-tree`
       finding with severity `fail`.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: test fails
       (`resolve_tree_size` not yet implemented).
-- [ ] **1.4-GREEN** `[AI]` Implement `resolve_tree_size(root)` in
+- [x] **1.4-GREEN** `[AI]` Implement `resolve_tree_size(root)` in
       `apps/rhino-cli/src/application/repo_governance/instruction_size.rs`: parse `@path`
       import directives, recurse depth ≤ 4, sum bytes, classify against `ResolvedTree` config.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: resolved-tree finding
       emitted with correct severity.
-- [ ] **1.4-REFACTOR** `[AI]` Extract import-line parsing into a helper; add depth cap and
+- [x] **1.4-REFACTOR** `[AI]` Extract import-line parsing into a helper; add depth cap and
       cycle guard.
       Command: `cargo test -p rhino-cli instruction_size::` — acceptance: all unit tests still
       pass.
 
-- [ ] **1.5-RED** `[AI]` Write failing tests in
+- [x] **1.5-RED** `[AI]` Write failing tests in
       `apps/rhino-cli/src/commands/convention_validate_instruction_size.rs` for: `run` returns
       non-zero on any `fail`; `text`/`json`/`markdown` render correctly; every `fail` message
       contains `"progressive disclosure"` and
@@ -151,7 +151,7 @@ agents-md-size` measures only `AGENTS.md` —
       And the file is reported with severity "fail"
     ```
 
-- [ ] **1.5-GREEN** `[AI]` Create
+- [x] **1.5-GREEN** `[AI]` Create
       `apps/rhino-cli/src/commands/convention_validate_instruction_size.rs` with
       `SCHEMA = "rhino-cli/instruction-size/v1"`, three output modes, non-zero exit on any
       fail, and remediation pointer appended to every fail message (per
@@ -160,12 +160,12 @@ agents-md-size` a scoped alias. Register `"instruction-size"` in
       `apps/rhino-cli/src/commands/convention_audit.rs::MEMBERS`.
       Command: `cargo test -p rhino-cli` — acceptance: all tests pass; alias intact; fail
       messages carry the remediation pointer.
-- [ ] **1.5-REFACTOR** `[AI]` Share envelope/printing helpers with emoji/license commands to
+- [x] **1.5-REFACTOR** `[AI]` Share envelope/printing helpers with emoji/license commands to
       reduce duplication in `apps/rhino-cli/src/commands/`.
       Command: `cargo test -p rhino-cli` — acceptance: all tests still pass, duplication
       removed.
 
-- [ ] **1.6-RED** `[AI]` Write failing test asserting that
+- [x] **1.6-RED** `[AI]` Write failing test asserting that
       `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance audit -o json`
       output includes a category named `"instruction-size"` with budget findings —
       command: `cargo test -p rhino-cli instruction_size_category::` —
@@ -180,7 +180,7 @@ agents-md-size` a scoped alias. Register `"instruction-size"` in
       And "result.categories" contains a category named "instruction-size"
     ```
 
-- [ ] **1.6-GREEN** `[AI]` Register an `instruction_size` category module under
+- [x] **1.6-GREEN** `[AI]` Register an `instruction_size` category module under
       `apps/rhino-cli/src/application/repo_governance/` and add it to the `repo-governance
 audit` orchestrator's category list in
       `apps/rhino-cli/src/application/repo_governance/audit_orchestrator.rs` (alongside
@@ -189,7 +189,7 @@ audit` orchestrator's category list in
       Command: `cargo test -p rhino-cli` — acceptance: all tests pass;
       `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance audit -o json`
       carries `"instruction-size"` category.
-- [ ] **1.6-REFACTOR** `[AI]` Reuse the standalone validator's finding shape; eliminate
+- [x] **1.6-REFACTOR** `[AI]` Reuse the standalone validator's finding shape; eliminate
       duplicated logic between the standalone command and the audit category.
       Command: `cargo test -p rhino-cli` — acceptance: all tests still pass.
 
@@ -197,13 +197,13 @@ audit` orchestrator's category list in
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `nx run rhino-cli:test:unit` — acceptance: all unit tests (including new
+- [x] [AI] `nx run rhino-cli:test:unit` — acceptance: all unit tests (including new
       instruction-size tests) pass.
-- [ ] [AI] `nx run rhino-cli:test:quick` — acceptance: exits 0 (coverage ≥ 90% lines).
-- [ ] [AI] `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- convention validate instruction-size -o text`
+- [x] [AI] `nx run rhino-cli:test:quick` — acceptance: exits 0 (coverage ≥ 90% lines).
+- [x] [AI] `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- convention validate instruction-size -o text`
       — acceptance: runs without error (reporting `AGENTS.md` `fail` is expected at this
       stage; Phase 3 fixes that).
-- [ ] [AI] `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance audit -o json`
+- [x] [AI] `cargo run --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance audit -o json`
       — acceptance: output includes a category named `"instruction-size"`.
 
 > **Pause Safety**: Validator built and tested; deterministic category wired in audit
@@ -212,17 +212,17 @@ audit` orchestrator's category list in
 
 ### Phase 2 — Wiring (pre-push + pre-commit + PR quality gate) `[AI]`
 
-- [ ] **2.1** `[AI]` Add the `instruction-size:validation` Nx target to
+- [x] **2.1** `[AI]` Add the `instruction-size:validation` Nx target to
       `apps/rhino-cli/project.json` ([tech-docs §5.1](./tech-docs.md#51-nx-target)).
       **Acceptance**: `nx run rhino-cli:instruction-size:validation` resolves and runs.
-- [ ] **2.2** `[AI]` Extend the `.husky/pre-push` changed-path block with the
+- [x] **2.2** `[AI]` Extend the `.husky/pre-push` changed-path block with the
       instruction-file glob gate ([tech-docs §5.2](./tech-docs.md#52-pre-push-hook)).
       **Acceptance**: `shellcheck .husky/pre-push` warning-clean; the new `if` mirrors the
       existing ones.
-- [ ] **2.3** `[AI]` Keep pre-commit coverage: `instruction-size` rides `convention audit`
+- [x] **2.3** `[AI]` Keep pre-commit coverage: `instruction-size` rides `convention audit`
       (member added in 1.5), so it runs at pre-commit.
       **Acceptance**: a staged over-budget instruction file is flagged at pre-commit.
-- [ ] **2.4** `[AI]` **PR quality gate**: add a step running
+- [x] **2.4** `[AI]` **PR quality gate**: add a step running
       `npx nx run rhino-cli:instruction-size:validation` to
       `.github/workflows/commons-quality-gate.yml` (the `pull_request` + `push:main` gate —
       natural home: the "Markdown quality gate" job, or a dedicated "Instruction-size budget"
@@ -234,10 +234,10 @@ audit` orchestrator's category list in
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `nx run rhino-cli:instruction-size:validation` — acceptance: command resolves and
+- [x] [AI] `nx run rhino-cli:instruction-size:validation` — acceptance: command resolves and
       runs (reporting fail for AGENTS.md is expected until Phase 3).
-- [ ] [AI] `shellcheck .husky/pre-push` — acceptance: exits 0 with no warnings.
-- [ ] [AI] `actionlint .github/workflows/commons-quality-gate.yml` — acceptance: exits 0 with
+- [x] [AI] `shellcheck .husky/pre-push` — acceptance: exits 0 with no warnings.
+- [x] [AI] `actionlint .github/workflows/commons-quality-gate.yml` — acceptance: exits 0 with
       no errors.
 
 > **Pause Safety**: Validator wired in pre-push, pre-commit, and PR gate. The gate actively
@@ -251,7 +251,7 @@ audit` orchestrator's category list in
 > disclosure**; never delete a rule, compress to dense prose, or split into another
 > auto-loaded file.
 
-- [ ] **3.1** `[AI]` List the inline-expanded `AGENTS.md` sections that duplicate content
+- [x] **3.1** `[AI]` List the inline-expanded `AGENTS.md` sections that duplicate content
       already linked into `repo-governance/` (candidates: "Current Apps" + "Web Sites"
       duplication, verbose Markdown-Quality / Cross-Language / Git-Hooks gate prose, inline
       AI-Agents roster). Record the list as a markdown bullet list directly under this step in
@@ -263,16 +263,16 @@ audit` orchestrator's category list in
   - _(section name — ~\_\_\_\_ B)_
   - _(section name — ~\_\_\_\_ B)_
 
-- [ ] **3.2** `[AI]` Trim **by progressive disclosure**: replace each duplicated block with a
+- [x] **3.2** `[AI]` Trim **by progressive disclosure**: replace each duplicated block with a
       one-line summary + existing `See` link, lifting detail to its canonical `repo-governance/`
       home. **No rule deleted, no dense-prose compression, no move into another auto-loaded
       file.** Target ≤ 24,000 B; minimum ≤ 30,000 B.
-- [ ] **3.3** `[AI]` Self-review the trimmed `AGENTS.md` diff against a rule-inventory
+- [x] **3.3** `[AI]` Self-review the trimmed `AGENTS.md` diff against a rule-inventory
       checklist (every pre-trim rule still present via summary + link; links resolve; meaning
       preserved).
-- [ ] **3.4** `[AI]` Re-run `nx run rhino-cli:instruction-size:validation` — **exits 0**
+- [x] **3.4** `[AI]` Re-run `nx run rhino-cli:instruction-size:validation` — **exits 0**
       (`AGENTS.md` ≤ 30,000 B; resolved tree ≤ 38,000 B).
-- [ ] **3.5** `[AI]` `npm run lint:md` + `npx nx run rhino-cli:links:validation` +
+- [x] **3.5** `[AI]` `npm run lint:md` + `npx nx run rhino-cli:links:validation` +
       `npx nx run rhino-cli:cross-vendor:parity-validation`; re-sync bindings if a binding
       surface changed (`npm run generate:bindings`).
 
@@ -280,19 +280,19 @@ audit` orchestrator's category list in
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] `nx run rhino-cli:instruction-size:validation` — acceptance: exits 0 (AGENTS.md
+- [x] [AI] `nx run rhino-cli:instruction-size:validation` — acceptance: exits 0 (AGENTS.md
       ≤ 30,000 B; resolved tree ≤ 38,000 B).
-- [ ] [AI] `npm run lint:md` — acceptance: exits 0, no violations.
-- [ ] [AI] `npx nx run rhino-cli:links:validation` — acceptance: exits 0, no broken links.
-- [ ] [AI] `npx nx run rhino-cli:cross-vendor:parity-validation` — acceptance: exits 0.
-- [ ] [AI] Rule-inventory self-review recorded in step 3.3.
+- [x] [AI] `npm run lint:md` — acceptance: exits 0, no violations.
+- [x] [AI] `npx nx run rhino-cli:links:validation` — acceptance: exits 0, no broken links.
+- [x] [AI] `npx nx run rhino-cli:cross-vendor:parity-validation` — acceptance: exits 0.
+- [x] [AI] Rule-inventory self-review recorded in step 3.3.
 
 > **Pause Safety**: AGENTS.md trimmed and gate green. Repo passes instruction-size validation.
 > Safe to stop. To resume: `nx run rhino-cli:instruction-size:validation`.
 
 ### Phase 4 — Governance convention + propagation `[AI]`
 
-- [ ] **4.1** `[AI]` Invoke `repo-rules-maker` to author
+- [x] **4.1** `[AI]` Invoke `repo-rules-maker` to author
       `repo-governance/conventions/structure/instruction-file-size-budget.md` — monitored file
       class, budget table, enforcement points (pre-push hard gate; pre-commit + PR-gate
       backstop; deterministic preflight; `repo-rules-checker` Step 6), rationale + durable
@@ -301,24 +301,24 @@ audit` orchestrator's category list in
       ([tech-docs §6.1](./tech-docs.md#61-remediation-when-the-gate-fails)), and `Principles
 Implemented/Respected` (linking
       [progressive-disclosure.md](../../../repo-governance/principles/content/progressive-disclosure.md)) + `Vision Supported` (traceability).
-- [ ] **4.2** `[AI]` Propagation sweep (via `repo-rules-maker` / edits):
+- [x] **4.2** `[AI]` Propagation sweep (via `repo-rules-maker` / edits):
       `repo-governance/conventions/README.md` index entry; `AGENTS.md` one-line gate entry +
       `See` link (under Markdown Quality / Cross-Language Lint Gates — **summary only**);
       `repo-governance/development/infra/nx-targets.md` target entry.
-- [ ] **4.3** `[AI]` Backlink the principle: add the new convention to
+- [x] **4.3** `[AI]` Backlink the principle: add the new convention to
       `progressive-disclosure.md` "Related Conventions" + a "How It Applies →
       Instruction-File Size Budget" example (two-way traceability).
-- [ ] **4.4** `[AI]` `npm run generate:bindings` (keep `.opencode/` / `.amazonq/` in
+- [x] **4.4** `[AI]` `npm run generate:bindings` (keep `.opencode/` / `.amazonq/` in
       parity); `npx nx run rhino-cli:governance:vendor-audit-validation` clean.
 
 ### Phase 4 Gate
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] `test -f repo-governance/conventions/structure/instruction-file-size-budget.md`
+- [x] [AI] `test -f repo-governance/conventions/structure/instruction-file-size-budget.md`
       — acceptance: file exists with traceability + remediation sections.
-- [ ] [AI] `npx nx run rhino-cli:governance:vendor-audit-validation` — acceptance: exits 0.
-- [ ] [AI] `npm run generate:bindings` — acceptance: exits 0; `.opencode/` and `.amazonq/`
+- [x] [AI] `npx nx run rhino-cli:governance:vendor-audit-validation` — acceptance: exits 0.
+- [x] [AI] `npm run generate:bindings` — acceptance: exits 0; `.opencode/` and `.amazonq/`
       in parity.
 
 > **Pause Safety**: Convention authored, principle backlinked, reference surfaces updated,
@@ -327,7 +327,7 @@ Implemented/Respected` (linking
 
 ### Phase 5 — Deterministic checker + workflow integration + specs `[AI]`
 
-- [ ] **5.1** `[AI]` Edit `.claude/agents/repo-rules-checker.md` Step 0.5 "Consume
+- [x] **5.1** `[AI]` Edit `.claude/agents/repo-rules-checker.md` Step 0.5 "Consume
       Deterministic Preflight": add an `instruction-size` row to the category→skip table (the
       AI checker must NOT re-derive byte counts). Edit Step 6 ("AGENTS.md Size Check" →
       "Instruction-File Size Budget"): update it to defer to the deterministic preflight
@@ -337,31 +337,31 @@ Implemented/Respected` (linking
       `grep -q "instruction-size" .claude/agents/repo-rules-checker.md` — acceptance:
       `instruction-size` row present in Step 0.5 category→skip table;
       `npx nx run rhino-cli:naming:harness-validation` exits 0; bindings parity verified.
-- [ ] **5.2** `[AI]` Edit `repo-governance/workflows/repo/repo-rules-quality-gate.md`: list
+- [x] **5.2** `[AI]` Edit `repo-governance/workflows/repo/repo-rules-quality-gate.md`: list
       `instruction-size` as a **fourth preflight category** in the Step 0.5 paragraph (so the
       workflow tracks it deterministically via the JSON envelope), reference it in the Step 6
       annotation, and add a "What changed" note.
-- [ ] **5.3-RED** `[AI]` Run `nx run rhino-cli:specs:coverage` before adding any feature
+- [x] **5.3-RED** `[AI]` Run `nx run rhino-cli:specs:coverage` before adding any feature
       file — acceptance: command flags the `instruction-size` validator as lacking a companion
       Gherkin feature (exits non-zero or reports missing coverage).
-- [ ] **5.3-GREEN** `[AI]` Add feature file(s) under `specs/apps/rhino/behavior/` (e.g.,
+- [x] **5.3-GREEN** `[AI]` Add feature file(s) under `specs/apps/rhino/behavior/` (e.g.,
       `instruction-size.feature`) mirroring the Gherkin scenarios in [prd.md](./prd.md). Wire
       consumption so `specs:coverage` picks them up.
       Command: `nx run rhino-cli:specs:coverage` — acceptance: exits 0 for rhino-cli.
-- [ ] **5.3-REFACTOR** `[AI]` Align scenario naming with existing rhino specs in
+- [x] **5.3-REFACTOR** `[AI]` Align scenario naming with existing rhino specs in
       `specs/apps/rhino/`. Command: `nx run rhino-cli:specs:coverage` — acceptance: all specs
       coverage still passes.
-- [ ] **5.4** `[AI]` `npx nx run rhino-cli:naming:harness-validation` + `validate:sync`
+- [x] **5.4** `[AI]` `npx nx run rhino-cli:naming:harness-validation` + `validate:sync`
       checks clean after agent edits.
 
 ### Phase 5 Gate
 
 > All checks below must pass before starting Phase 6.
 
-- [ ] [AI] `nx run rhino-cli:specs:coverage` — acceptance: exits 0 (all rhino-cli features
+- [x] [AI] `nx run rhino-cli:specs:coverage` — acceptance: exits 0 (all rhino-cli features
       covered).
-- [ ] [AI] `npx nx run rhino-cli:naming:harness-validation` — acceptance: exits 0.
-- [ ] [AI] `grep -q "instruction-size" .claude/agents/repo-rules-checker.md` — acceptance:
+- [x] [AI] `npx nx run rhino-cli:naming:harness-validation` — acceptance: exits 0.
+- [x] [AI] `grep -q "instruction-size" .claude/agents/repo-rules-checker.md` — acceptance:
       `instruction-size` row present in Step 0.5 category→skip table.
 
 > **Pause Safety**: Checker and workflow integration complete; specs coverage green. Safe to
@@ -369,10 +369,10 @@ Implemented/Respected` (linking
 
 ### Phase 6 — `ose-public` verify + land on `main` `[AI]`
 
-- [ ] **6.1** `[AI]` Full affected pre-push dry run in the worktree:
+- [x] **6.1** `[AI]` Full affected pre-push dry run in the worktree:
       `npx nx affected -t typecheck lint test:quick specs:coverage` +
       `nx run rhino-cli:instruction-size:validation` all green.
-- [ ] **6.2** `[AI]` Behavioral proof of the gate (non-destructive): create a throwaway
+- [x] **6.2** `[AI]` Behavioral proof of the gate (non-destructive): create a throwaway
       over-budget commit and verify the pre-push hook blocks it, then discard:
 
   ```bash
@@ -387,8 +387,9 @@ Implemented/Respected` (linking
   Acceptance: the dry-run push exits non-zero and the pre-push hook prints the
   instruction-size gate fail message containing "progressive disclosure".
 
-- [ ] **6.3** `[AI]` Confirm the original Claude Code 40k warning no longer fires:
+- [x] **6.3** `[AI]` Confirm the original Claude Code 40k warning no longer fires:
       `wc -c CLAUDE.md AGENTS.md` — resolved tree sum must be ≤ 38,000 B.
+      Note: AGENTS.md=25,848 B, CLAUDE.md=6,622 B, resolved tree=32,470 B (WARN zone, under 38,000 B fail ceiling).
 - [ ] **6.4** `[AI]` Stage explicit paths, commit with Conventional Commits, push to
       `ose-public` `origin/main`, and remove the worktree:
 

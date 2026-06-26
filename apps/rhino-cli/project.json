@@ -226,6 +226,19 @@
         "{workspaceRoot}/.opencode/agents/**/*.md"
       ]
     },
+    "instruction-size:validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- convention validate instruction-size"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*.rs",
+        "{workspaceRoot}/instruction-size-budget.yaml",
+        "{workspaceRoot}/AGENTS.md",
+        "{workspaceRoot}/CLAUDE.md"
+      ]
+    },
     "env:validation": {
       "executor": "nx:run-commands",
       "options": {

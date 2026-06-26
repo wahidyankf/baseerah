@@ -274,15 +274,16 @@ See `repo-generating-validation-reports` Skill for UUID chain, timestamp, progre
 1. **Read the preflight JSON**. Use `Read` on the path supplied.
 2. **Validate envelope**: confirm `schema` field equals `rhino-cli/repo-governance-audit/v1`. If missing or different, treat preflight as absent and run all Steps 1-8 in full (defensive fallback).
 3. **Extract findings**: parse `result.categories[]` (each carries `name`, `command`, `passed`, `findings[]`) and `result.skipped_false_positives[]`.
-4. **Populate the deterministic skip set** for this run. The `repo-governance audit` orchestrator emits exactly **three** categories; each tells which validation step (or sub-step) is already covered by rhino-cli and MUST NOT be re-evaluated by the AI checker:
+4. **Populate the deterministic skip set** for this run. The `repo-governance audit` orchestrator emits exactly **four** categories; each tells which validation step (or sub-step) is already covered by rhino-cli and MUST NOT be re-evaluated by the AI checker:
 
-   | Preflight category   | Step covered (skip)                                             |
-   | -------------------- | --------------------------------------------------------------- |
-   | `layer-coherence`    | Step 7 layer-coherence portion                                  |
-   | `traceability-audit` | Step 7 traceability portion (Vision/Principles/Conventions)     |
-   | `vendor-audit`       | Step 7 vendor-neutrality portion (governance prose terminology) |
+   | Preflight category   | Step covered (skip)                                                    |
+   | -------------------- | ---------------------------------------------------------------------- |
+   | `layer-coherence`    | Step 7 layer-coherence portion                                         |
+   | `traceability-audit` | Step 7 traceability portion (Vision/Principles/Conventions)            |
+   | `vendor-audit`       | Step 7 vendor-neutrality portion (governance prose terminology)        |
+   | `instruction-size`   | Step 6 byte-count portion (DO NOT re-derive sizes; defer to preflight) |
 
-   **Not in this envelope**: the other deterministic validators — file naming, frontmatter shape, emoji codepoints, heading hierarchy, README index integrity, AGENTS.md size, license presence, and agent/skill verbatim duplication — are NOT part of `repo-governance audit`. They run under the sibling `rhino-cli md`, `convention`, and `harness` subcommands, enforced by the pre-commit and markdown CI gates. Do not look for them in this JSON envelope; the "deterministic-gate annotation" notes in Steps 1, 2, 3, 6, and 8 below say which dedicated gate owns each, so the AI checker can defer to it rather than AI-re-deriving mechanical checks.
+   **Not in this envelope**: the other deterministic validators — file naming, frontmatter shape, emoji codepoints, heading hierarchy, README index integrity, license presence, and agent/skill verbatim duplication — are NOT part of `repo-governance audit`. They run under the sibling `rhino-cli md`, `convention`, and `harness` subcommands, enforced by the pre-commit and markdown CI gates. Do not look for them in this JSON envelope; the "deterministic-gate annotation" notes in Steps 1, 2, 3, 6, and 8 below say which dedicated gate owns each, so the AI checker can defer to it rather than AI-re-deriving mechanical checks.
 
 5. **Embed preflight findings in the final audit verbatim** under a new top-level section `## Deterministic Findings (rhino-cli preflight)` placed before `## AI-Only Findings`. Render each preflight finding as a regular report finding entry (same key/severity/criticality/file/line/message shape).
 6. **Re-validation iteration optimization**: compute `sha256(preflight-json-bytes)`. If identical to the prior iteration's preflight hash (stored under `generated-reports/.preflight-hash-<uuid-chain>`), reuse the prior deterministic findings section unchanged and ONLY re-evaluate AI-only categories. Store the new hash for the next iteration.
@@ -668,15 +669,15 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
    - Suggest new Skill or extension
    - Write findings progressively
 
-### Step 6: AGENTS.md Size Check
+### Step 6: Instruction-File Size Budget
 
-**Deterministic-gate annotation**: AGENTS.md size is enforced by the deterministic `rhino-cli convention agents-md-size` gate at pre-commit and CI — not by this workflow's `repo-governance audit` preflight. Do not AI-re-derive the byte count; flag only qualitative bloat concerns the mechanical gate cannot judge.
+**Deterministic-gate annotation**: Byte counts for all auto-loaded instruction surfaces are enforced by the deterministic `rhino-cli convention validate instruction-size` gate (wired at pre-push, CI, and as `instruction-size` in the `repo-governance audit` preflight). If `instruction-size` is present in the Step 0.5 preflight JSON, its findings are already embedded verbatim in the `## Deterministic Findings` section — DO NOT re-derive byte counts. Judge only qualitative concerns the mechanical gate cannot measure:
 
-1. Read AGENTS.md
-2. Count characters
-3. Calculate percentage of limits
-4. Assess status (Within Target / Warning / CRITICAL)
-5. Write finding if over target
+1. **If `instruction-size` preflight is available**: Skip byte counting entirely. Read the preflight findings section and check only for qualitative bloat: sections that are verbose when a one-line summary + `See` link would suffice, duplicate content already reachable via a link, or structure anti-patterns (all-at-once complexity, no progressive layers).
+2. **If preflight is absent** (fallback): Read all monitored surfaces (`AGENTS.md`, `CLAUDE.md`, and harness-specific surfaces listed in `instruction-size-budget.yaml`). Count bytes. Classify against the thresholds in `instruction-size-budget.yaml`. Emit a finding for any surface exceeding the `fail` ceiling. For surfaces in the `warn` zone, emit a lower-severity advisory.
+3. **Remediation guidance**: When flagging a size violation, the ONLY sanctioned fix is progressive disclosure — replace inline-expanded content with a one-line summary and a `See` link. Document this in the finding. Forbidden anti-fixes (delete rules, dense compression, split into another auto-loaded file) MUST be called out if observed.
+
+See [Instruction-File Size Budget Convention](../../repo-governance/conventions/structure/instruction-file-size-budget.md).
 
 ### Step 7: Rules Governance Validation
 

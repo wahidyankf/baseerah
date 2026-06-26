@@ -198,6 +198,15 @@ jobs:
       - run: npx nx run rhino-cli:naming:harness-validation
       - run: npx nx run rhino-cli:naming:workflows-validation
 
+  instruction-size:
+    name: Instruction-size budget gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run rhino-cli:instruction-size:validation
+
   specs-gate:
     name: Specs gate (BDD+DDD validators)
     runs-on: ubuntu-latest
@@ -210,7 +219,20 @@ jobs:
 
   quality-gate:
     name: Quality gate
-    needs: [detect, shellcheck, hadolint, actionlint, typescript, dotnet, rust, markdown, naming, specs-gate]
+    needs:
+      [
+        detect,
+        shellcheck,
+        hadolint,
+        actionlint,
+        typescript,
+        dotnet,
+        rust,
+        markdown,
+        naming,
+        instruction-size,
+        specs-gate,
+      ]
     if: always()
     runs-on: ubuntu-latest
     steps:

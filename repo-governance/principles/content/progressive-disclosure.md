@@ -239,6 +239,49 @@ What to avoid (for advanced users).
 - PASS: "Advanced Patterns" for experts
 - PASS: Each level optional
 
+### Instruction-File Size Budget
+
+**Context**: Governance instruction files (`AGENTS.md`, `CLAUDE.md`, harness-specific surfaces)
+auto-loaded by coding-agent harnesses. Harnesses impose hard byte limits; content past the limit
+is silently truncated or ignored.
+
+**Progressive Structure**:
+
+When an instruction file exceeds its budget, the mandated fix is progressive disclosure — not
+deletion, dense compression, or splitting into another auto-loaded file:
+
+```markdown
+<!-- BEFORE: 2,700 bytes for a single app block -->
+
+### ose-www
+
+- **URL**: https://oseplatform.com
+- **Production branch**: `prod-ose-www`
+- **Framework**: Next.js 16 (App Router, TypeScript, tRPC)
+- **Deployment**: Vercel
+- **Dev port**: 3100
+
+<!-- AFTER: ~60 bytes; detail moves to app README -->
+
+| `ose-www` | oseplatform.com | 3100 | `prod-ose-www` |
+```
+
+Detail remains fully accessible via `apps/ose-www/README.md` — it is just no longer inlined.
+
+**Why this works**:
+
+- PASS: Every rule still reachable via a `See` link
+- PASS: Harness loads the full instruction file (under budget)
+- PASS: No governance content deleted
+
+**Alternative** (what we avoid):
+
+FAIL: **Delete the rule** — agent behaviour becomes undefined for the deleted case.
+FAIL: **Dense compression** — strips line breaks, degrades readability.
+FAIL: **Split into another auto-loaded file** — moves bytes, does not reduce resolved-tree total.
+
+**See**: [Instruction-File Size Budget Convention](../../conventions/structure/instruction-file-size-budget.md)
+
 ## Anti-Patterns
 
 ### Front-Loading Complexity
@@ -459,6 +502,10 @@ docs/explanation/infrastructure/security/security-basics.md
 - [Diátaxis Framework](../../conventions/structure/diataxis-framework.md) - Four documentation types
 - [File Naming Convention](../../conventions/structure/file-naming.md) - Kebab-case naming rules for documentation files
 - [Tutorial Convention](../../conventions/tutorials/general.md) - Progressive tutorial structure
+- [Instruction-File Size Budget Convention](../../conventions/structure/instruction-file-size-budget.md) -
+  Progressive disclosure is the sole sanctioned remediation when an auto-loaded instruction file
+  exceeds its byte budget; the "Instruction-File Size Budget" example in the "How It Applies"
+  section above demonstrates this pattern
 
 ## References
 
