@@ -7,10 +7,11 @@ A documentation-plus-configuration product: one committed **command triage** doc
 (`.github/workflows/*`), and rhino-cli Nx targets (`apps/rhino-cli/project.json`) so the gate
 mechanics match the standard.
 
-This plan touches **no application or library runtime code** and **no validator logic**. It touches
-shell hooks, YAML workflows, Nx target definitions, and reference docs. Where it edits an
-`apps/rhino-cli` Nx target's wiring (not its Rust source), the change is a config edit verified by
-running the target, not a TDD code cycle.
+This plan primarily standardizes wiring (shell hooks, YAML workflows, Nx target definitions,
+reference docs, config files), with targeted Rust source changes in `apps/rhino-cli/src/` to
+rename, extend, and remove commands as part of the command-set convergence. Where it edits an
+`apps/rhino-cli` Nx target's wiring (not its Rust source), the change is a config edit verified
+by running the target, not a TDD code cycle.
 
 ## Personas
 
@@ -143,18 +144,24 @@ Feature: The three test levels consume the same Gherkin
     Given a project with feature files under its specs gherkin directory
     When test:unit, test:integration, and test:e2e run
     Then all three consume the same feature files driven by the same tags
-    And test:unit covers BDD step tests plus non-BDD unit tests, with coverage gated by the sibling test:coverage target (native ≥90%)
+    And every feature and every scenario is exercised by at least one eligible level
+    And test:unit may additionally carry non-Gherkin unit tests for behaviour not expressed as scenarios
     And BE test:integration exercises behaviour at the service level, never through the HTTP API
     And the HTTP API surface is exercised only by test:e2e in the *-e2e project
 ```
 
 ```gherkin
-Feature: Every feature file is consumed by a test
+Feature: Every feature and scenario is consumed by an eligible test
 
   Scenario: An orphan feature file fails the gate
     Given a feature file under specs that no test references
-    When rhino-cli specs validate behavior-coverage runs with --require-consumption
+    When rhino-cli specs behavior-coverage validate runs with --require-consumption
     Then it fails and names the orphan feature file
+
+  Scenario: An uncovered scenario fails the gate
+    Given a scenario in a binding feature file that no eligible unit, integration, or e2e test exercises
+    When rhino-cli specs behavior-coverage validate runs with --require-consumption
+    Then it fails and names the uncovered feature and scenario
 ```
 
 ```gherkin
@@ -162,7 +169,7 @@ Feature: Backend domain entities are covered (specs:domain:coverage)
 
   Scenario: An uncovered domain entity fails the gate
     Given a *-be project with a domain entity that no domain unit test exercises
-    When rhino-cli specs validate domain-coverage runs
+    When rhino-cli specs domain-coverage validate runs
     Then it fails and names the uncovered domain entity
 ```
 
@@ -210,7 +217,7 @@ Feature: Pre-push and PR gate run identical fast commands
     When the pre-push hook and the PR quality gate run
     Then both run `nx affected -t test:quick` for the affected projects
     And neither runs test:integration or test:e2e
-    And test:integration and test:e2e run only on the scheduled CRON pipelines
+    And test:integration and test:e2e run only post-merge (on push to main) plus the nightly CRON fallback
 ```
 
 ```gherkin
