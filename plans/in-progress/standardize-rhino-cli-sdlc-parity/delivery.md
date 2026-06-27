@@ -42,7 +42,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Provision worktree: `claude --worktree standardize-rhino-cli-sdlc-parity` — acceptance: `worktrees/standardize-rhino-cli-sdlc-parity/` exists.
 - [ ] [AI] Initialize toolchain in the root worktree: `npm install && npm run doctor -- --fix` — acceptance: doctor reports all required tools present (rust, node, shellcheck, hadolint, actionlint).
 - [ ] [AI] Build rhino-cli: `npx nx build rhino-cli` — acceptance: exits 0.
-- [ ] [AI] Record baseline: run `npx nx affected -t typecheck lint test:quick specs:coverage` on a clean tree — acceptance: passes (or preexisting failures noted in implementation notes).
+- [ ] [AI] Record baseline: run `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` on a clean tree — acceptance: passes (or preexisting failures noted in implementation notes).
 
 ### Phase 0 Gate
 
@@ -65,27 +65,47 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Create `docs/reference/sdlc-gate-standard.md` containing [tech-docs §1 standard](./tech-docs.md#1-target-standard-best-of-three-synthesis) + [§3 divergence policy](./tech-docs.md#3-divergence-policy-allowed-vs-drift) — acceptance: file exists; lint:md passes; links:validation passes.
   - _Suggested executor: `docs-maker`_
 - [ ] [AI] Add both new docs to `docs/reference/README.md` index — acceptance: both linked; `npx nx run rhino-cli:headings:hierarchy-validation` and `links:validation` pass.
-- [ ] [AI] Extend the canonical Nx naming scheme to close the two gaps: in `repo-governance/development/infra/nx-targets.md` add `format` to the lifecycle target list (paired with the existing `format:check`) and add `shell:check` / `dockerfiles:check` / `actions:check` to the `{domain}:{work}` governance/validation table — acceptance: both additions present; `npm run lint:md` passes.
+- [ ] [AI] Extend the canonical Nx naming scheme: in `repo-governance/development/infra/nx-targets.md` **drop `format`/`format:check` from the lifecycle target list** (formatting is file-type lint-staged, documented separately) and add `test:coverage`, `specs:behavior:coverage` (renamed from `specs:coverage`), `specs:domain:coverage` (`*-be` only), plus `shell:check` / `dockerfiles:check` / `actions:check` to the `{domain}:{work}` governance/validation table — acceptance: all changes present; `npm run lint:md` passes.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] In `repo-governance/development/infra/nx-target-naming.md` document the `format` (write/`format:check` verify) pairing and the `{tool}:check` derivation (domain = tool, work = `check`) — acceptance: both derivations documented; `npx nx run rhino-cli:links:validation` passes.
+- [ ] [AI] In `repo-governance/development/infra/nx-target-naming.md` document the `{tool}:check` derivation (domain = tool, work = `check`) **and** that formatting is file-type lint-staged (no per-project `format`/`format:check` target) — acceptance: both documented; `npx nx run rhino-cli:links:validation` passes.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] Encode the [§1.2 testing-architecture standard](./tech-docs.md#12-testing-architecture--target-contents-standard) into `repo-governance/development/infra/nx-targets.md`: the mandatory-seven targets + `echo`-placeholder rule, the `test:quick` = typecheck→lint→test:unit (`parallel: false`) composition, BE service-level / FE-DB-only `test:integration`, `*-e2e`-only `test:e2e`, and the pre-push ≡ PR-gate rule (only `test:quick`; never integration/e2e) — acceptance: all rules present and self-consistent with existing sections (resolve the "expose only needed targets" / no-op-anti-pattern tension explicitly); `npm run lint:md` passes.
+- [ ] [AI] Encode the [§1.2 testing-architecture standard](./tech-docs.md#12-testing-architecture--target-contents-standard) into `repo-governance/development/infra/nx-targets.md`: the mandatory targets + `echo`-placeholder rule, the `test:quick` = typecheck→lint→test:unit (`parallel: false`) composition, the native `test:coverage` ≥ 90% gate (replacing the removed rhino-cli `test-coverage`), BE service-level / FE-DB-only `test:integration`, `*-e2e`-only `test:e2e`, the file-type-based `format` via lint-staged (no per-project `format` target), and the pre-push ≡ PR-gate rule (only `test:quick`; never integration/e2e) — acceptance: all rules present and self-consistent with existing sections (resolve the "expose only needed targets" / no-op-anti-pattern tension explicitly); `npm run lint:md` passes.
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] **RED**: add a feature file under `specs/apps/rhino/behavior/rhino-cli/gherkin/` for the orphan-feature check, and a unit test asserting `specs validate coverage --require-consumption` fails on an unconsumed feature — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails (flag/behaviour not yet implemented).
+- [ ] [AI] **RED**: add a feature file under `specs/apps/rhino/behavior/rhino-cli/gherkin/` for the orphan-feature check, and a unit test asserting `specs validate behavior-coverage --require-consumption` fails on an unconsumed feature — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails (flag/behaviour not yet implemented).
   - **Gherkin (binds) →** "An orphan feature file fails the gate"
 
     ```gherkin
     Scenario: An orphan feature file fails the gate
       Given a feature file under specs that no test references
-      When rhino-cli specs:coverage runs with --require-consumption
+      When rhino-cli specs:behavior:coverage runs with --require-consumption
       Then it fails and names the orphan feature file
     ```
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN**: implement the `--require-consumption` behaviour in `specs validate coverage` (rhino-cli `src/`) — every `.feature` under the scanned spec dir must be referenced by ≥1 test; emit `orphan feature: <path> not consumed by any test` and exit non-zero otherwise — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes; `npx nx run rhino-cli:specs:coverage` still exits 0 on the current tree.
+- [ ] [AI] **GREEN**: implement the `--require-consumption` behaviour in `specs validate behavior-coverage` (rhino-cli `src/`) — every `.feature` under the scanned spec dir must be referenced by ≥1 test; emit `orphan feature: <path> not consumed by any test` and exit non-zero otherwise — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes; `npx nx run rhino-cli:specs:behavior:coverage` still exits 0 on the current tree.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: default `--require-consumption` on for the `specs:coverage` Nx target across projects; update `specs/apps/rhino/` Gherkin + `docs/reference/sdlc-gate-standard.md` to document the new check — command: `npx nx run rhino-cli:test:quick` — acceptance: all rhino-cli tests pass; `specs:coverage` documents both step-def and consumption checks.
+- [ ] [AI] **REFACTOR**: default `--require-consumption` on for the `specs:behavior:coverage` Nx target across projects; update `specs/apps/rhino/` Gherkin + `docs/reference/sdlc-gate-standard.md` to document the new check — command: `npx nx run rhino-cli:test:quick` — acceptance: all rhino-cli tests pass; `specs:behavior:coverage` documents both step-def and consumption checks.
+
+### 1b. Rename `specs validate coverage`→`behavior-coverage` + add `specs validate domain-coverage`
+
+- [ ] [AI] Rename the rhino-cli command `specs validate coverage` → `specs validate behavior-coverage` (CLI dispatch + application module + `specs/apps/rhino/**` Gherkin + tests); the Nx target becomes `specs:behavior:coverage` (was `specs:coverage`) — command: `npx nx run rhino-cli:test:quick` — acceptance: `cargo run -- specs validate behavior-coverage` runs; `cargo run -- specs validate coverage` fails ("unrecognized"); all tests pass.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **RED**: add a feature file + unit test asserting `specs validate domain-coverage` fails when a domain entity in `specs/apps/<domain>/domain/**` has no domain unit test — command: `npx nx run rhino-cli:test:unit` — acceptance: test fails (command not yet implemented).
+  - **Gherkin (binds) →** "An uncovered domain entity fails the gate"
+
+    ```gherkin
+    Scenario: An uncovered domain entity fails the gate
+      Given a *-be project with a domain entity that no domain unit test exercises
+      When rhino-cli specs validate domain-coverage runs
+      Then it fails and names the uncovered domain entity
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **GREEN**: implement `specs validate domain-coverage` (rhino-cli `src/`) — for `*-be` projects, every entity in the bounded-context/ubiquitous-language registry under `specs/apps/<domain>/domain/**` must be exercised by ≥1 domain unit test; emit `uncovered domain entity: <name>` and exit non-zero otherwise — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: expose the new command as the Nx target `specs:domain:coverage`, wired **only on `*-be` projects**; document it in `docs/reference/sdlc-gate-standard.md` — command: `npx nx run rhino-cli:test:quick` — acceptance: tests pass; the target resolves for `*-be` projects and is absent on others.
 
 ### Phase 1 Gate
 
@@ -102,16 +122,34 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ## Phase 2: Converge ose-public to the Standard
 
-### 2a. Standardize rhino-cli target names (`fmt`→`format`, add `{tool}:check`, add `harness:bindings-validation`)
+### 2a. Standardize rhino-cli target names (remove `fmt`/`format:check`, add `{tool}:check`, add `harness:bindings-validation`)
 
-- [ ] [AI] Rename the format/write target in `apps/rhino-cli/project.json`: `fmt` → `format` (keep `format:check` as-is) — acceptance: `npx nx run rhino-cli:format` runs `cargo fmt`; `npx nx run rhino-cli:fmt` now fails with "target fmt not found".
+- [ ] [AI] **Remove** the `fmt` and `format:check` targets from `apps/rhino-cli/project.json` (formatting moves to file-type lint-staged, §1.1) — acceptance: `npx nx run rhino-cli:fmt` and `:format:check` both fail with "target not found".
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Grep and update every reference to the old `fmt` target: `grep -rn 'rhino-cli:fmt\b\|nx run rhino-cli:fmt' --include='*.json' --include='*.md' --include='*.sh' --include='*.yml' .` (package.json scripts, hooks, workflows, docs) — acceptance: zero `rhino-cli:fmt` references remain; `npm run lint:md` passes.
+- [ ] [AI] Ensure the shared lint-staged config (`package.json` `lint-staged` block / `.lintstagedrc`) covers `*.rs`→`rustfmt` (and `*.fs`→`fantomas` where F# ships) so the removed Rust/F# `fmt` is replaced by file-type formatting — acceptance: staging a `*.rs` file and committing reformats it via the hook; `grep -rn 'rhino-cli:fmt\b\|rhino-cli:format:check' --include='*.json' --include='*.md' --include='*.sh' --include='*.yml' .` returns zero hits.
+  - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **RED**: run `npx nx run rhino-cli:shell:check` BEFORE adding it — acceptance: fails with "target shell:check not found" (documents the gap).
 - [ ] [AI] **GREEN**: in `apps/rhino-cli/project.json` add targets `shell:check`, `dockerfiles:check`, `actions:check` (shellcheck `--severity=warning`, hadolint `--failure-threshold warning`, actionlint), and `harness:bindings-validation` (`cargo run -- harness validate bindings`) — acceptance: `npx nx run rhino-cli:shell:check`, `:dockerfiles:check`, `:actions:check`, `:harness:bindings-validation` each exit 0.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **REFACTOR**: make the four new targets cacheable and tagged consistently with the existing validation targets in `project.json` — acceptance: `npx nx show project rhino-cli --json | jq '.targets | keys'` lists all four; re-run is a cache-hit.
 - [ ] [AI] Replace the `npm run harness:bindings-validation` invocation in `.husky/pre-push` with `npx nx run rhino-cli:harness:bindings-validation` (mechanism parity with primer) — acceptance: the scoped pre-push step invokes the Nx target; it exits 0.
+
+#### 2a-cov. Remove the rhino-cli `test-coverage` command + Nx target (coverage goes native)
+
+Implements the [§1.1 Coverage-enforcement decision](./tech-docs.md#11-nx-target-name-standard-targets-invoked-by-hooksci) — drop the central rhino-cli coverage parser in favour of each project's native ≥ 90% gate.
+
+- [ ] [AI] **RED**: confirm the command exists today — `npx nx run rhino-cli:test-coverage` (or `cargo run -- test-coverage validate <lcov> 90`) — acceptance: it runs (documents the pre-removal state).
+- [ ] [AI] **GREEN**: remove the `test-coverage validate` command from `apps/rhino-cli/src/` (CLI dispatch + application module + adapter), its `specs/apps/rhino/**` Gherkin, and its unit/integration tests; delete the `test-coverage` Nx target from `apps/rhino-cli/project.json` — command: `npx nx run rhino-cli:test:quick` — acceptance: `cargo run -- test-coverage validate` exits non-zero ("unrecognized subcommand"); `jq -e '.targets|has("test-coverage")|not' apps/rhino-cli/project.json` is true; all remaining rhino-cli tests pass.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: scrub every `test-coverage` / Codecov-algorithm reference from `apps/rhino-cli/README.md` and any `repo-governance/`/docs that describe the removed command (public) — acceptance: `grep -rin 'test-coverage\|codecov' apps/rhino-cli repo-governance docs` returns only `ExcludeFromCodeCoverage`-attribute hits; `npm run lint:md` passes.
+
+#### 2a-cfg. Merge root config files into `repo-config.yml` (§1.1a)
+
+- [ ] [AI] **RED**: add a unit test asserting the rhino-cli config loader reads the `instruction-size`/`env-contract`/`env-injection` sections from `repo-config.yml`, and errors hard when a section is missing — command: `npx nx run rhino-cli:test:unit` — acceptance: test fails (loader still reads the standalone files).
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: create `repo-config.yml` at the repo root with the three namespaced sections (migrate the contents of `instruction-size-budget.yaml`, `env-contract.yaml`, `env-injection.yaml` verbatim under `instruction-size:` / `env-contract:` / `env-injection:`); update the loaders in `apps/rhino-cli/src/` (`convention validate instruction-size`, `env validate`/`init`/`backup`/`restore`, env-injection checker) to read `repo-config.yml` sections — command: `npx nx run rhino-cli:test:unit` — acceptance: test passes; `npx nx run rhino-cli:convention:instruction-size:validation` and `:env:validation` exit 0 against `repo-config.yml`.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: delete the three standalone root files; repoint every Nx-target `inputs` glob and any doc/reference from them to `repo-config.yml` (keep `apps/rhino-cli/tests/fixtures/**` standalone fixtures untouched) — command: `npx nx run rhino-cli:test:quick` — acceptance: `test ! -f instruction-size-budget.yaml && test ! -f env-contract.yaml && test ! -f env-injection.yaml`; `grep -rn 'instruction-size-budget.yaml\|env-contract.yaml\|env-injection.yaml' --include='*.json' --include='*.md' . | grep -v 'tests/fixtures'` returns nothing; gates exit 0.
 
 ### 2b. Rewire pre-commit to use the Nx `{tool}:check` targets
 
@@ -133,14 +171,17 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ### 2e. Apply the testing-architecture target contents to every project (ose-public)
 
 - [ ] [AI] Enumerate projects: `npx nx show projects` — acceptance: the list matches the rows of the [§1.3 per-project target matrix](./tech-docs.md#13-per-project-target-matrix-post-implementation-ose-public); reconcile any new/removed project against the matrix before converging.
-- [ ] [AI] For EACH project's `project.json`, ensure the [§1.2 mandatory-seven targets](./tech-docs.md#12-testing-architecture--target-contents-standard) exist — add `echo` placeholders for any missing among `test:unit`, `test:integration`, `test:e2e`, `test:quick`, `lint`, `format`, `typecheck` — acceptance: `npx nx show project <p> --json | jq '.targets|keys'` includes all seven for every project; `npx nx affected -t format typecheck lint test:unit test:integration test:e2e test:quick` resolves a task (real or echo) for every affected project.
+- [ ] [AI] For EACH project's `project.json`, ensure the [§1.2 mandatory-six targets](./tech-docs.md#12-testing-architecture--target-contents-standard) exist — add `echo` placeholders for any missing among `test:unit`, `test:integration`, `test:e2e`, `test:quick`, `lint`, `typecheck` (**no `format` target** — formatting is lint-staged) — acceptance: `npx nx show project <p> --json | jq '.targets|keys'` includes all six for every project; `npx nx affected -t typecheck lint test:unit test:integration test:e2e test:quick` resolves a task (real or echo) for every affected project.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Set every project's `test:quick` to the sequential composition (`nx:run-commands`, `"parallel": false`, commands `nx run <p>:typecheck` → `nx run <p>:lint` → `nx run <p>:test:unit`) — acceptance: running `test:quick` executes the three in order and stops at the first failure (verify by temporarily breaking lint in one project).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Apply the content rules: `test:e2e` real only on `*-e2e` projects (echo elsewhere); BE `test:integration` is service-level (no HTTP); FE `test:integration` is echo unless DB-backed (keep `organiclever-app-web`'s PGlite integration real); `test:unit` includes BDD + non-BDD with coverage — acceptance: spot-check one BE, one FE-without-DB, `organiclever-app-web`, and one `*-e2e` project match the rules.
+- [ ] [AI] Apply the content rules: `test:e2e` real only on `*-e2e` projects (echo elsewhere); BE `test:integration` is service-level (no HTTP); FE `test:integration` is echo unless DB-backed (keep `organiclever-app-web`'s PGlite integration real); `test:unit` includes BDD + non-BDD (coverage gated by the sibling `test:coverage` target, not here) — acceptance: spot-check one BE, one FE-without-DB, `organiclever-app-web`, and one `*-e2e` project match the rules.
+  - _Suggested executor: `swe-typescript-dev`_
+- [ ] [AI] For EACH project with a real `test:unit`, add a native `test:coverage` target (≥ 90% line via the project's own runner — `vitest --coverage` thresholds, `cargo llvm-cov`/`tarpaulin`, `dotnet test` coverage gate) per the [§1.3 matrix](./tech-docs.md#13-per-project-target-matrix-post-implementation-ose-public) `test:coverage` column; `echo` where `test:unit` is `echo` — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`; a project under 90% fails its `test:coverage`.
+- [ ] [AI] Wire `specs:domain:coverage` (→ `rhino-cli specs validate domain-coverage`) **only on `*-be` backend projects** (`ose-be`, `organiclever-be`) per the §1.3 matrix `specs:domain:coverage` column — acceptance: `npx nx show project ose-be --json | jq -e '.targets|has("specs:domain:coverage")'` is true; a non-`*-be` project (e.g. `ose-www`) does **not** declare it.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Make pre-push and the PR quality gate run the identical per-project code command — `nx affected -t test:quick` — and confirm **neither** runs `test:integration`/`test:e2e`; those stay only on the CRON pipelines. Edit `.husky/pre-push` and `.github/workflows/pr-quality-gate.yml` accordingly per [§1.2 gate rule](./tech-docs.md#12-testing-architecture--target-contents-standard) — acceptance: `grep -n 'test:integration\|test:e2e' .husky/pre-push .github/workflows/pr-quality-gate.yml` returns no gate invocation; both run `test:quick`.
-- [ ] [AI] Run the extended `specs:coverage` (`--require-consumption`) across affected projects and fix any orphan feature files (add the missing consuming test, or remove the dead feature with justification) — command: `npx nx affected -t specs:coverage` — acceptance: exits 0 with no orphan-feature errors.
+- [ ] [AI] Run the extended `specs:behavior:coverage` (`--require-consumption`) across affected projects and fix any orphan feature files (add the missing consuming test, or remove the dead feature with justification) — command: `npx nx affected -t specs:behavior:coverage` — acceptance: exits 0 with no orphan-feature errors.
 
 ### 2f. Post-merge CI + per-project staging deploy (ose-public)
 
@@ -158,12 +199,13 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:coverage` — exits 0 (fix any preexisting failures).
-- [ ] [AI] `npx nx run rhino-cli:format` and `:shell:check` and `:dockerfiles:check` and `:actions:check` and `:harness:bindings-validation` — each exits 0.
-- [ ] [AI] Every project exposes the mandatory-seven targets: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("format") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
+- [ ] [AI] `npx nx affected -t typecheck lint test:quick specs:behavior:coverage` — exits 0 (fix any preexisting failures).
+- [ ] [AI] `npx nx run rhino-cli:shell:check` and `:dockerfiles:check` and `:actions:check` and `:harness:bindings-validation` — each exits 0; `npx nx run rhino-cli:fmt` and `:format:check` both fail (targets removed).
+- [ ] [AI] Every project exposes the mandatory-six targets: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
+- [ ] [AI] Coverage went native: `jq -e '.targets|has("test-coverage")|not' apps/rhino-cli/project.json` is true; every project with a real `test:unit` also exposes `test:coverage`; `grep -rin 'test-coverage\|codecov' apps repo-governance docs --include='*.md' --include='*.json' --include='*.rs' | grep -vi 'ExcludeFromCodeCoverage'` returns nothing — acceptance: no stale `test-coverage`/Codecov references remain in ose-public.
 - [ ] [AI] `actionlint .github/workflows/main-ci.yml` — exits 0; the per-project matrix + staging-deploy legs are well-formed.
 - [ ] [AI] `npm run lint:md` — exits 0.
-- [ ] [AI] Commit thematically: one commit for the rhino-cli target-name standardization (`fmt`→`format`, `:check` targets, bindings target), one for the hook rewire, one for the workflow renames+refs, one for the markdown-validator addition, one for the per-project target-contents (`test:quick` composition + mandatory-seven), one for the gate rule (test:quick-only), one for the post-merge main-ci + staging-deploy workflow.
+- [ ] [AI] Commit thematically: one commit for the rhino-cli target-name standardization (remove `fmt`/`format:check`, add `:check` + bindings targets, remove `test-coverage`, rename `specs:coverage`→`specs:behavior:coverage`, add `specs:domain:coverage`), one for the lint-staged formatter map, one for the `repo-config.yml` merge, one for the hook rewire, one for the workflow renames+refs, one for the markdown-validator addition, one for the per-project target-contents (`test:quick` composition + mandatory-six + native `test:coverage`), one for the gate rule (test:quick-only), one for the post-merge main-ci + staging-deploy workflow.
 - [ ] [AI] Push to `origin main`; monitor GitHub Actions; verify the renamed `pr-quality-gate.yml`, `validate-markdown.yml`, `validate-env.yml` all run green — acceptance: all CI checks pass.
 
 > **Pause Safety**: ose-public is fully converged and green on CI. Safe to stop. To resume: `npx nx affected -t lint`.
@@ -179,30 +221,33 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 ### 3a. Baseline + propagate
 
 - [ ] [AI] Provision primer worktree + toolchain: `npm install && npm run doctor -- --fix` in ose-primer; `npx nx build rhino-cli` — acceptance: doctor green; rhino-cli builds.
-- [ ] [AI] Record primer baseline: `npx nx run-many -t typecheck lint test:quick specs:coverage` — acceptance: pass, or preexisting failures noted.
+- [ ] [AI] Record primer baseline: `npx nx run-many -t typecheck lint test:quick specs:behavior:coverage` — acceptance: pass, or preexisting failures noted.
 - [ ] [AI] Propagate the artifacts: copy `plans/in-progress/standardize-rhino-cli-sdlc-parity/`, `docs/reference/rhino-cli-command-triage.md`, `docs/reference/sdlc-gate-standard.md`, and the `nx-targets.md`/`nx-target-naming.md` additions into ose-primer; replace the §1.3 matrix with the §1.3b primer matrix; adjust triage/standard for primer's app+language set per the divergence policy — acceptance: artifacts exist; `npm run lint:md` passes.
+- [ ] [AI] Apply the same rhino-cli source changes to primer (propagated rhino-cli): merge root configs into `repo-config.yml` + delete the 3 standalone files (§2a-cfg); ensure the lint-staged map covers `*.rs`/`*.fs` (§2a) — acceptance: `test -f repo-config.yml`; the 3 old files absent; `npx nx run rhino-cli:convention:instruction-size:validation`/`:env:validation` exit 0.
 
 ### 3b. Standardize rhino-cli target names
 
-- [ ] [AI] In primer `apps/rhino-cli/project.json`: rename `fmt`→`format`; rename `shell:lint`→`shell:check`, `dockerfiles:lint`→`dockerfiles:check`, `actions:lint`→`actions:check`; update every reference (`grep -rn 'rhino-cli:fmt\b\|:shell:lint\|:dockerfiles:lint\|:actions:lint' --include='*.json' --include='*.yml' --include='*.sh' --include='*.md' .`) — acceptance: `npx nx run rhino-cli:format`/`:shell:check`/`:dockerfiles:check`/`:actions:check` each exit 0; zero stale references.
+- [ ] [AI] In primer `apps/rhino-cli/project.json`: **remove `fmt` + `format:check` targets** (formatting → lint-staged); rename `shell:lint`→`shell:check`, `dockerfiles:lint`→`dockerfiles:check`, `actions:lint`→`actions:check`; update every reference (`grep -rn 'rhino-cli:fmt\b\|rhino-cli:format:check\|:shell:lint\|:dockerfiles:lint\|:actions:lint' --include='*.json' --include='*.yml' --include='*.sh' --include='*.md' .`) — acceptance: `npx nx run rhino-cli:shell:check`/`:dockerfiles:check`/`:actions:check` each exit 0; `:fmt`/`:format:check` fail; zero stale references.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Add the structural targets primer's rhino-cli is **missing** so its key set matches public/infra: `specs:adoption-validation`, `specs:counts-validation`, `specs:links-validation`, `specs:tree-validation`, `test-coverage`, `test:e2e` (echo) — acceptance: `jq -r '.targets|keys[]' apps/rhino-cli/project.json | sort` equals public's sorted key set.
+- [ ] [AI] Add the structural targets primer's rhino-cli is **missing** so its key set matches public/infra: `specs:adoption-validation`, `specs:counts-validation`, `specs:links-validation`, `specs:tree-validation`, `test:e2e` (echo) — and mirror public's coverage decision: **do not** add `test-coverage` (it is removed everywhere); add a native `test:coverage` target instead — acceptance: `jq -r '.targets|keys[]' apps/rhino-cli/project.json | sort` equals public's sorted key set (which contains `test:coverage`, not `test-coverage`).
   - _Suggested executor: `swe-rust-dev`_
 
 ### 3c. Hook + workflow parity
 
 - [ ] [AI] Add `governance:vendor-audit-validation` to primer's `.husky/pre-push` scoped validators (gated on `^repo-governance/.*\.md$`) — acceptance: editing a `repo-governance/*.md` then running pre-push triggers it; exits 0.
-- [ ] [AI] Promote primer's deferred structural specs-gate in `.github/workflows/pr-quality-gate.yml` to the full set (`specs:adoption-validation` + `specs:tree-validation` + `specs:counts-validation` + `specs:links-validation` + `specs:coverage` + `specs:gherkin-cardinality-validation`) — acceptance: `actionlint` passes; job lists all six.
+- [ ] [AI] Promote primer's deferred structural specs-gate in `.github/workflows/pr-quality-gate.yml` to the full set (`specs:adoption-validation` + `specs:tree-validation` + `specs:counts-validation` + `specs:links-validation` + `specs:behavior:coverage` + `specs:gherkin-cardinality-validation`) — acceptance: `actionlint` passes; job lists all six.
 - [ ] [AI] Extract a standalone `.github/workflows/validate-env.yml` from primer's folded-in PR-gate env job (`npx nx run rhino-cli:env:validation` on `pull_request` + `push:main`); remove the duplicated env logic from the PR gate — acceptance: `actionlint` passes; `validate-env.yml` matches the public/infra shape.
 - [ ] [AI] Confirm primer's `validate-markdown.yml` runs the 4-validator set (mermaid + links + headings + gherkin-cardinality) — acceptance: all four present.
-- [ ] [AI] Align primer's PR-gate job skeleton to the standard (detect, format, language gates, markdown, naming, env, specs-gate, quality-gate sentinel); **keep** primer's per-language jobs (golang/jvm/dotnet/python/rust/elixir/clojure/dart — allowed divergence) — acceptance: `actionlint` passes; skeleton matches, language jobs preserved.
+- [ ] [AI] Align primer's PR-gate job skeleton to the standard (detect, language gates, markdown, naming, env, specs-gate, quality-gate sentinel; formatting is enforced by lint-staged at commit, not a PR-gate job); **keep** primer's per-language jobs (golang/jvm/dotnet/python/rust/elixir/clojure/dart — allowed divergence) — acceptance: `actionlint` passes; skeleton matches, language jobs preserved.
 
-### 3d. Mandatory-seven sweep across all 26 primer projects
+### 3d. Mandatory-six sweep across all 26 primer projects
 
-- [ ] [AI] For EACH primer project, bring its `project.json` to the [§1.3b matrix](./tech-docs.md#13b-per-project-target-matrix-post-implementation-ose-primer) — biggest gaps: **add `format` everywhere** (none have it); add `test:e2e` (echo) to the 11 `crud-be-*` + `crud-fs-ts-nextjs`; add `test:integration`+`test:e2e` (echo) to `crud-fe-*`; fill the support libs (`ts-ui-tokens` needs 5: `test:unit`/`test:integration`/`test:e2e` echo + `test:quick` + `format`; `golang-commons`/`clojure-openapi-codegen` need `typecheck` echo + more; `elixir-*` + `ts-ui` need `test:integration`/`test:e2e` echo + `format`); add `specs:coverage` to libs lacking it — acceptance: the mandatory-seven `jq` check (Phase 2 gate) prints no `MISSING` for any primer project.
+- [ ] [AI] For EACH primer project, bring its `project.json` to the [§1.3b matrix](./tech-docs.md#13b-per-project-target-matrix-post-implementation-ose-primer) — biggest gaps: add `test:e2e` (echo) to the 11 `crud-be-*` + `crud-fs-ts-nextjs`; add `test:integration`+`test:e2e` (echo) to `crud-fe-*`; fill the support libs (`ts-ui-tokens` needs 4: `test:unit`/`test:integration`/`test:e2e` echo + `test:quick`; `golang-commons`/`clojure-openapi-codegen` need `typecheck` echo + more; `elixir-*` + `ts-ui` need `test:integration`/`test:e2e` echo); add `specs:behavior:coverage` to libs lacking it; add `specs:domain:coverage` to the 11 `crud-be-*` backends (**no `format` target anywhere** — lint-staged handles it) — acceptance: the mandatory-six `jq` check (Phase 2 gate) prints no `MISSING` for any primer project.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Set every primer project's `test:quick` to the sequential typecheck→lint→test:unit composition (`nx:run-commands`, `parallel:false`) — acceptance: order verified by breaking lint in one project.
-- [ ] [AI] Resolve orphan features: `npx nx run-many -t specs:coverage` with `--require-consumption` — acceptance: no orphan-feature errors.
+- [ ] [AI] Add a native `test:coverage` target (≥ 90% line via each project's own runner; `echo` where `test:unit` is `echo`) to every primer project per the [§1.3b matrix](./tech-docs.md#13b-per-project-target-matrix-post-implementation-ose-primer) `test:coverage` column — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`.
+- [ ] [AI] Wire `specs:domain:coverage` on the 11 `crud-be-*` backend projects (per §1.3b matrix) — acceptance: `npx nx show project crud-be-rust-axum --json | jq -e '.targets|has("specs:domain:coverage")'` is true; `crud-fe-*`/libs do **not** declare it.
+- [ ] [AI] Resolve orphan features: `npx nx run-many -t specs:behavior:coverage` with `--require-consumption` — acceptance: no orphan-feature errors.
 
 ### 3e. Post-merge CI (primer is a template — tests only, deploy is a no-op)
 
@@ -214,8 +259,8 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 
 > All checks below must pass before starting Phase 4.
 
-- [ ] [AI] In ose-primer: `npx nx run-many -t typecheck lint test:quick specs:coverage` — exits 0.
-- [ ] [AI] In ose-primer, every project exposes the mandatory-seven: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("format") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
+- [ ] [AI] In ose-primer: `npx nx run-many -t typecheck lint test:quick specs:behavior:coverage` — exits 0.
+- [ ] [AI] In ose-primer, every project exposes the mandatory-six: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
 - [ ] [AI] In ose-primer: `npm run lint:md` and `actionlint` on changed workflows — exit 0.
 - [ ] [AI] Commit thematically in ose-primer — acceptance: `git log -1 --oneline` shows a Conventional Commits message; working tree clean.
 - [ ] [AI] Push ose-primer to `origin main` and poll CI: `gh run view --json status,conclusion` every 2 min until complete — acceptance: all checks green (incl. new `validate-env.yml`, promoted specs-gate, `main-ci.yml`).
@@ -230,17 +275,24 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 > the [§1.3c infra matrix](./tech-docs.md#13c-per-project-target-matrix-post-implementation-ose-infra).
 > Infra already matches the workflow filenames (`pr-quality-gate.yml`, `validate-markdown.yml`,
 > `validate-env.yml`) + governance-vendor pre-push, but (like public) lacks the `{tool}:check` +
-> `harness:bindings-validation` Nx targets and uses `fmt`. CI runs on the self-hosted runner.
+> `harness:bindings-validation` Nx targets and still has `fmt`/`format:check` (to be removed → lint-staged). CI runs on the self-hosted runner.
 
 ### 4a. Baseline + propagate
 
 - [ ] [AI] In ose-infra: `npm install && npm run doctor -- --fix`; `npx nx build rhino-cli` — acceptance: doctor green; rhino-cli builds.
 - [ ] [AI] Propagate the artifacts + the `nx-targets.md`/`nx-target-naming.md` additions into ose-infra; replace the matrix with the §1.3c infra matrix; document infra-only IaC gates (terraform/ansible/yamllint) and the self-hosted runner in the divergence section of `docs/reference/sdlc-gate-standard.md` — acceptance: artifacts exist; `npm run lint:md` passes.
+- [ ] [AI] Apply the same rhino-cli source changes to infra (propagated rhino-cli): merge root configs into `repo-config.yml` + delete the 3 standalone files (§2a-cfg); ensure the lint-staged map covers `*.rs`/`*.fs` (§2a) — acceptance: `test -f repo-config.yml`; the 3 old files absent; `:convention:instruction-size:validation`/`:env:validation` exit 0.
 
 ### 4b. Standardize rhino-cli target names
 
-- [ ] [AI] In infra `apps/rhino-cli/project.json`: rename `fmt`→`format`; add `shell:check`/`dockerfiles:check`/`actions:check` + `harness:bindings-validation` Nx targets (same defs as public); update references; rewire `.husky/pre-commit` to the `{tool}:check` targets and `.husky/pre-push` to `npx nx run rhino-cli:harness:bindings-validation` — acceptance: `jq -r '.targets|keys[]' apps/rhino-cli/project.json | sort` equals public's sorted key set; each new target exits 0.
+- [ ] [AI] In infra `apps/rhino-cli/project.json`: **remove `fmt` + `format:check` targets** (formatting → lint-staged); add `shell:check`/`dockerfiles:check`/`actions:check` + `harness:bindings-validation` Nx targets (same defs as public); **remove the `test-coverage` target** (the command is gone from the propagated rhino-cli source); update references; rewire `.husky/pre-commit` to the `{tool}:check` targets and `.husky/pre-push` to `npx nx run rhino-cli:harness:bindings-validation` — acceptance: `jq -r '.targets|keys[]' apps/rhino-cli/project.json | sort` equals public's sorted key set (no `fmt`/`format:check`/`test-coverage`); each new target exits 0.
   - _Suggested executor: `swe-rust-dev`_
+
+### 4c-codecov. Remove Codecov residue (infra — last repo still carrying it)
+
+- [ ] [AI] Delete `ose-infra/codecov.yml` (the last live Codecov config across the three repos; public + primer already removed it) — acceptance: `test ! -f codecov.yml`.
+- [ ] [AI] Scrub stale Codecov references from infra governance docs + `apps/rhino-cli/README.md`: remove the `codecov-upload.yml` CRON row/bullets from `repo-governance/development/quality/three-level-testing-standard.md`, the `codecov-upload.yml` upload step from `repo-governance/development/infra/ci-conventions.md`, the "Codecov algorithm"/`test-coverage validate` text from `repo-governance/development/infra/nx-targets.md` and `apps/rhino-cli/README.md` — acceptance: `grep -rin codecov . | grep -vi 'ExcludeFromCodeCoverage'` returns nothing in ose-infra; `npm run lint:md` passes.
+  - _Suggested executor: `repo-rules-fixer`_
 
 ### 4c. Confirm workflow + hook parity (record IaC divergence)
 
@@ -248,11 +300,13 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 - [ ] [AI] Confirm infra's pre-commit/pre-push step order matches the standard, with terraform/ansible/yamllint as **documented allowed additions** (not drift) and the `[self-hosted, linux, ose-infra-runner]` label retained — acceptance: order matches; IaC + runner appear only in the divergence section.
 - [ ] [AI] Fix any gaps found above — acceptance: each fixed gate exits 0 locally.
 
-### 4d. Mandatory-seven sweep across all 7 infra projects
+### 4d. Mandatory-six sweep across all 7 infra projects
 
-- [ ] [AI] Bring each infra project to the [§1.3c matrix](./tech-docs.md#13c-per-project-target-matrix-post-implementation-ose-infra): **add `format` everywhere**; `coralpolyp-be` keeps service-level `test:integration`; `coralpolyp-fe` integration real only if DB-backed else echo; `ts-ui-tokens` gains its 5 missing targets; `ts-ui` gains `test:integration`/`test:e2e` echo + `format`; `*-e2e` keep real `test:e2e`, echo `test:unit`/`test:integration` — acceptance: the mandatory-seven `jq` check prints no `MISSING` for any infra project.
+- [ ] [AI] Bring each infra project to the [§1.3c matrix](./tech-docs.md#13c-per-project-target-matrix-post-implementation-ose-infra): `coralpolyp-be` keeps service-level `test:integration` **and gains `specs:domain:coverage`**; `coralpolyp-fe` integration real only if DB-backed else echo; `ts-ui-tokens` gains its 4 missing targets; `ts-ui` gains `test:integration`/`test:e2e` echo; `*-e2e` keep real `test:e2e`, echo `test:unit`/`test:integration` (**no `format` target anywhere** — lint-staged handles it) — acceptance: the mandatory-six `jq` check prints no `MISSING` for any infra project.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Set every infra project's `test:quick` to the sequential typecheck→lint→test:unit composition; resolve orphan features via `specs:coverage --require-consumption` — acceptance: order verified; no orphan-feature errors.
+- [ ] [AI] Set every infra project's `test:quick` to the sequential typecheck→lint→test:unit composition; resolve orphan features via `specs:behavior:coverage --require-consumption` — acceptance: order verified; no orphan-feature errors.
+- [ ] [AI] Add a native `test:coverage` target (≥ 90% line; `echo` where `test:unit` is `echo`) to every infra project per the [§1.3c matrix](./tech-docs.md#13c-per-project-target-matrix-post-implementation-ose-infra) `test:coverage` column — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`.
+- [ ] [AI] Wire `specs:domain:coverage` on `coralpolyp-be` (the only infra `*-be` backend) per §1.3c matrix — acceptance: `npx nx show project coralpolyp-be --json | jq -e '.targets|has("specs:domain:coverage")'` is true; `coralpolyp-fe`/libs do **not** declare it.
 
 ### 4e. Post-merge CI + coralpolyp staging deploy
 
@@ -264,8 +318,9 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 
 > All checks below must pass before starting Phase 5.
 
-- [ ] [AI] In ose-infra: `npx nx run-many -t typecheck lint test:quick specs:coverage` — exits 0.
-- [ ] [AI] In ose-infra, every project exposes the mandatory-seven: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("format") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
+- [ ] [AI] In ose-infra: `npx nx run-many -t typecheck lint test:quick specs:behavior:coverage` — exits 0.
+- [ ] [AI] In ose-infra, every project exposes the mandatory-six: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:unit") and has("test:integration") and has("test:e2e") and has("test:quick") and has("lint") and has("typecheck")' >/dev/null || echo "MISSING: $p"; done` — acceptance: prints no `MISSING` line.
+- [ ] [AI] In ose-infra, coverage went native + Codecov gone: `jq -e '.targets|has("test-coverage")|not' apps/rhino-cli/project.json` is true; every real-`test:unit` project also exposes `test:coverage`; `test ! -f codecov.yml`; `grep -rin codecov . | grep -vi 'ExcludeFromCodeCoverage'` returns nothing — acceptance: no `test-coverage`/Codecov residue in ose-infra.
 - [ ] [AI] In ose-infra: `npm run lint:md` and `actionlint` on changed workflows — exit 0.
 - [ ] [AI] Commit thematically in ose-infra (via its worktree) — acceptance: `git log -1 --oneline` shows a Conventional Commits message; working tree clean.
 - [ ] [AI] Push ose-infra to `origin main` and poll CI: `gh run view --json status,conclusion` every 2 min until complete — acceptance: all checks green on the self-hosted runner (incl. `main-ci.yml`).
@@ -276,7 +331,7 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 
 ## Phase 5: Cross-Repo Parity Verification & Archival
 
-- [ ] [AI] Build the parity table comparing all three repos across every mechanics row (PR-gate filename, markdown filename, env filename, markdown validator set, specs-gate set, lint invocation mechanism, pre-push governance-vendor presence, hook step order, rhino-cli target-key set, mandatory-seven on every project, `test:quick` = typecheck→lint→test:unit composition, pre-push ≡ PR runs only `test:quick`, `specs:coverage --require-consumption` enabled) — acceptance: a table with a ✅/❌ per repo per row is produced; every mechanics row is ✅ across all three (allowed-divergence rows excluded).
+- [ ] [AI] Build the parity table comparing all three repos across every mechanics row (PR-gate filename, markdown filename, env filename, markdown validator set, specs-gate set, lint invocation mechanism, pre-push governance-vendor presence, hook step order, rhino-cli target-key set, mandatory targets on every project, `test:quick` = typecheck→lint→test:unit composition, native `test:coverage` ≥ 90% gate on every real-`test:unit` project, **no** `test-coverage` target + **no** Codecov anywhere, `format` via file-type lint-staged (no per-project `format` target), pre-push ≡ PR runs only `test:quick`, `specs:behavior:coverage --require-consumption` enabled) — acceptance: a table with a ✅/❌ per repo per row is produced; every mechanics row is ✅ across all three (allowed-divergence rows excluded).
 - [ ] [AI] Record the parity table in each repo's `docs/reference/sdlc-gate-standard.md` under a "Parity Status" heading — acceptance: present in all three; lint:md passes.
 
 ### Local Quality Gates (Before Push)
@@ -284,7 +339,7 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 - [ ] [AI] Run affected typecheck: `npx nx affected -t typecheck` (each repo).
 - [ ] [AI] Run affected linting: `npx nx affected -t lint` (each repo).
 - [ ] [AI] Run affected quick tests: `npx nx affected -t test:quick` (each repo).
-- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:coverage` (each repo).
+- [ ] [AI] Run affected spec coverage: `npx nx affected -t specs:behavior:coverage` (each repo).
 - [ ] [AI] Fix ALL failures found — including preexisting issues not caused by these changes.
 
 ### Post-Push Verification
@@ -305,8 +360,10 @@ Implements the [§1.4 standard](./tech-docs.md#14-post-merge-main-ci--per-projec
 > All checks below must pass before archival.
 
 - [ ] [AI] The parity table shows ✅ on every mechanics row across all three repos (allowed-divergence rows excluded) — acceptance: no ❌ in any mechanics row.
+- [ ] [AI] **CI standardization complete** (plan scope boundary): in each repo the four canonical workflows exist with the exact ose-public names (`pr-quality-gate.yml`, `validate-markdown.yml`, `validate-env.yml`, `main-ci.yml`) and every project resolves into `main-ci.yml`'s affected matrix — acceptance: `for w in pr-quality-gate validate-markdown validate-env main-ci; do test -f .github/workflows/$w.yml || echo "MISSING-CI: $w"; done` prints nothing in each repo; the affected matrix lists every project.
+- [ ] [AI] **Config + coverage cleanup complete**: `repo-config.yml` exists and the 3 standalone config files are absent; no `format`/`format:check`/`test-coverage` targets; `grep -ri codecov` returns only `ExcludeFromCodeCoverage` — in all three repos.
 - [ ] [AI] `docs/reference/sdlc-gate-standard.md` (with the Parity Status table) and `rhino-cli-command-triage.md` exist in all three repos — acceptance: `npm run lint:md` passes in each.
-- [ ] [AI] All three repos green on local gates (`npx nx affected -t typecheck lint test:quick specs:coverage`) and on CI for the latest `main` push — acceptance: each repo's latest `gh run view --json conclusion` reports `success`.
+- [ ] [AI] All three repos green on local gates (`npx nx affected -t typecheck lint test:quick specs:behavior:coverage`) and on CI for the latest `main` push — acceptance: each repo's latest `gh run view --json conclusion` reports `success`.
 
 > **Pause Safety**: all three repos converged, parity-verified, and green; nothing half-applied. Safe to stop. To resume: re-run the cross-repo parity verification table (Phase 5 step 1) and confirm all-green.
 
