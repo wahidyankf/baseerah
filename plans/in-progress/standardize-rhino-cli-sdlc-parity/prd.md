@@ -34,7 +34,8 @@ by running the target, not a TDD code cycle.
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
 - Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), `harness:bindings-validation` as a cacheable Nx target while `harness:bindings-generate` + the env-guard run as direct `cargo run` calls, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
-- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the specs:_ validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `_-e2e`-only e2e, pre-push/PR/main-ci running `test:quick`while pre-commit stays fast (format + tool-lint + guards, no`test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the `specs:*` validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, unit and integration tests in separate folders (`tests/unit` vs `tests/integration`; Rust co-located `#[cfg(test)]` + external `tests/`), BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- rhino-cli surface rationalization: the command triage lists the **target** (end-state) command column before the current-form column, and carries a per-command keep/merge/drop/wire recommendation; the `harness` binding commands cover all 11 supported harnesses (source/generated/native tiers), not just OpenCode + Amazon Q. [Judgment call]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, main-ci, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_ (markdown validation folds into the gates — no standalone markdown workflow).
 - Convergence edits in all three repos.
 
@@ -153,6 +154,42 @@ Feature: The three test levels consume the same Gherkin
     And test:unit may additionally carry non-Gherkin unit tests for behaviour not expressed as scenarios
     And BE test:integration exercises behaviour at the service level, never through the HTTP API
     And the HTTP API surface is exercised only by test:e2e in the *-e2e project
+```
+
+```gherkin
+Feature: Unit and integration tests live in separate folders
+
+  Scenario: A project with both real suites keeps them in disjoint folders
+    Given a project that declares both a real test:unit and a real test:integration
+    When its test source layout is inspected
+    Then the unit tests and integration tests live in physically separate directories
+    And the test:unit and test:integration source globs share no path
+    And for TS/F# projects the folders are tests/unit and tests/integration (or test/unit and test/integration)
+    And for Rust projects unit tests are co-located in #[cfg(test)] while integration tests live in the external tests/ directory
+```
+
+```gherkin
+Feature: rhino-cli triage reads target-first and carries merge/drop verdicts
+
+  Scenario: The triage table puts the target command column before the current one
+    Given the rhino-cli command triage table
+    When its columns are inspected
+    Then the "Command (leaf) — target" column appears before the "Command (leaf) — current" column
+    And each row (or row group) carries a keep/merge/drop/wire recommendation in the merge/drop section
+    And the recommendation collapses redundancy (e.g. harness claude/sync validate fold into harness bindings validate; specs bc/ul fold into specs domain-coverage validate; git pre-commit and test-coverage validate are dropped)
+    And every recommendation stays unratified (❓ in the Decided column) until reviewed one-by-one
+```
+
+```gherkin
+Feature: harness binding commands cover every supported harness
+
+  Scenario: All 11 harnesses are accounted for at their tier
+    Given the harness binding commands and the repo-config.yml harness section
+    When the harness coverage is inspected
+    Then all 11 supported harnesses are listed (Claude Code, OpenCode, Amazon Q, Codex, Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider)
+    And the generated tier (OpenCode, Amazon Q) is regenerated and byte-parity-validated
+    And the native tier (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget
+    And the harness set is data in repo-config.yml, identical across all three repos, not a hard-coded directory list
 ```
 
 ```gherkin
