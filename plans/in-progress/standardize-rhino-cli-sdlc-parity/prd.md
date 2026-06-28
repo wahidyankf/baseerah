@@ -34,8 +34,8 @@ by running the target, not a TDD code cycle.
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
 - Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), `harness:bindings-validation` as a cacheable Nx target while `harness:bindings-generate` + the env-guard run as direct `cargo run` calls, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
-- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:coverage→specs:behavior:coverage (both composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
-- Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, markdown-validate, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_.
+- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the specs:_ validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `_-e2e`-only e2e, pre-push/PR/main-ci running `test:quick`while pre-commit stays fast (format + tool-lint + guards, no`test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, main-ci, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_ (markdown validation folds into the gates — no standalone markdown workflow).
 - Convergence edits in all three repos.
 
 ### Out of Scope
@@ -72,10 +72,12 @@ Feature: PR quality-gate mechanics are identical across repos
 ```gherkin
 Feature: Markdown and env validation run identical validator sets
 
-  Scenario: The markdown validation workflow runs the same validators everywhere
-    Given the standardized markdown-validation workflow
-    When it runs in any of the three repos
-    Then it invokes mermaid, links, heading-hierarchy, and gherkin-cardinality validation
+  Scenario: Markdown validation is folded into the gates, no standalone workflow
+    Given the standardized gates in any of the three repos
+    When markdown is validated
+    Then the per-file validators (markdownlint-cli2, md mermaid validate, md heading-hierarchy validate) and gherkin-cardinality (`.feature` only) run via lint-staged
+    And md links validate runs repo-wide as the md-links gate job (pre-push/PR/main)
+    And no standalone validate-markdown.yml workflow exists
     And the set is identical across all three repos
 ```
 
@@ -129,14 +131,15 @@ Feature: Every project declares the mandatory six targets
 ```
 
 ```gherkin
-Feature: test:quick runs typecheck then lint then test:coverage then specs:behavior:coverage
+Feature: test:quick runs typecheck, lint, test:unit, test:coverage, then test:specs
 
-  Scenario: test:quick composes the four in order
+  Scenario: test:quick composes the five in order
     Given a project's test:quick target
     When test:quick runs
-    Then it runs typecheck, then lint, then test:coverage (≥90% line), then specs:behavior:coverage, in that exact order
+    Then it runs typecheck, then lint, then test:unit, then test:coverage (≥90% line), then test:specs, in that exact order
     And it stops at the first failing step
-    And the unit suite executes once under test:coverage, so test:unit is not re-run inside test:quick
+    And test:specs aggregates the specs:* validators (adoption, tree, counts, links, behavior:coverage, and domain:coverage on *-be)
+    And the specs gate runs inside test:quick, so there is no separate specs-structural gate step
 ```
 
 ```gherkin
@@ -246,8 +249,8 @@ Feature: Every project is covered by a standardized GitHub CI
   Scenario: Canonical CI workflows exist with ose-public naming
     Given a converged repo
     When its .github/workflows directory is inspected
-    Then pr-quality-gate.yml, validate-markdown.yml, validate-env.yml, and main-ci.yml are present with those exact names
-    And every project resolves into main-ci.yml's affected matrix
+    Then pr-quality-gate.yml, validate-env.yml, and main-ci.yml are present with those exact names (no standalone validate-markdown.yml — markdown folds into the gates)
+    And every project is covered by main-ci.yml, which runs `nx run-many --all` (total coverage by construction)
 ```
 
 ```gherkin
@@ -271,12 +274,35 @@ Feature: No quality gate runs heavy tests
     And pre-commit runs the fast file-type set only, without test:quick
     And none of the four gates runs test:integration or test:e2e
 
-  Scenario: Post-merge main CI runs only the fast gate
+  Scenario: Post-merge main CI re-verifies all projects on the fast gate
     Given a PR is merged to main touching one or more projects
     When main-ci.yml runs
-    Then it runs `nx affected -t test:quick` plus the governance/spec validators for affected projects
+    Then it runs `nx run-many --all -t test:quick` plus the governance/spec validators across every project
     And it does not run test:integration or test:e2e
     And it does not deploy
+```
+
+```gherkin
+Feature: Gate scope follows the affected-then-all rule
+
+  Scenario: PR gate is the affected-scope union of pre-commit and pre-push
+    Given the pre-commit and pre-push hooks and the PR quality gate
+    When all three run for the same change
+    Then every check that runs at pre-commit or pre-push also runs in the PR gate
+    And all three operate on the affected project graph via `nx affected`
+
+  Scenario: main gate widens the PR check set to all projects
+    Given the PR quality gate runs the fast check set for affected projects
+    When main-ci.yml runs post-merge
+    Then it runs the same check set across every project via `nx run-many --all`
+    And it runs no check that the PR gate does not also run
+    And neither gate runs test:integration or test:e2e
+
+  Scenario: Gates parallelize their independent checks
+    Given any CI quality gate
+    When it runs
+    Then its independent checks run as parallel jobs
+    And Nx fans test:quick across projects with `--parallel`
 ```
 
 ```gherkin
