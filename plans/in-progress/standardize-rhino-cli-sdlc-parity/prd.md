@@ -32,9 +32,9 @@ by running the target, not a TDD code cycle.
 ### In Scope
 
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
-- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, `{tool}:check` wrappers, `harness:bindings-validation` as an Nx target, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
+- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), `harness:bindings-generate` + `harness:bindings-validation` as Nx targets, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
-- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit, three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, all four gates (pre-commit/pre-push/PR/main-ci) running only `test:quick` (integration/e2e are CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit, three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, markdown-validate, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_.
 - Convergence edits in all three repos.
 
@@ -98,7 +98,7 @@ Feature: Nx target names are canonical and identical across repos
     When the Nx targets invoked by any hook or CI workflow are inspected
     Then each target name comes from the canonical lifecycle or {domain}:{work} scheme in nx-targets.md
     And no project declares a `format` or `format:check` target (formatting is file-type lint-staged)
-    And the shell/Dockerfile/Actions lint wrappers are named `shell:check`, `dockerfiles:check`, `actions:check` in all three
+    And shell/Dockerfile/Actions linting runs as lint-staged file-type entries (`shellcheck`/`hadolint`/`actionlint`), not Nx targets, in all three
     And `harness:bindings-validation` is invoked as an Nx target, not an npm script, in all three
     And the rhino-cli `test-coverage` command and Nx target are absent in all three
 
@@ -184,6 +184,44 @@ Feature: Formatting is file-type based via lint-staged
 ```
 
 ```gherkin
+Feature: Git identity is not mechanically blocked; agents never set it
+
+  Scenario: pre-commit no longer aborts on a per-repo identity override
+    Given a contributor has set a per-repo user.email in .git/config
+    When the pre-commit hook runs
+    Then it does not abort because of the identity override
+    And scripts/git-identity-check.sh does not exist in any repo
+
+  Scenario: agents never set a per-repo git identity
+    Given an AI agent operating in a repo or worktree
+    When it prepares a commit
+    Then it does not run git config to set user.name or user.email at any scope
+    And commit identity comes from the developer's global git config
+    And the Git Identity Guardrail is published in AGENTS.md and a governance convention
+```
+
+```gherkin
+Feature: The staged-.env guard is a rhino-cli command, not inline shell
+
+  Scenario: Committing a real .env file is rejected
+    Given a real .env file is staged for commit
+    When the pre-commit hook runs rhino-cli env staged-guard validate
+    Then it exits non-zero and names the offending file
+    And the commit is aborted
+
+  Scenario: Committing .env.example is allowed
+    Given only .env.example is staged
+    When rhino-cli env staged-guard validate runs
+    Then it exits zero and the commit proceeds
+
+  Scenario: The guard is wired as an Nx target, not a shell script
+    Given the converged repos
+    When the pre-commit hook is inspected
+    Then it invokes nx run rhino-cli:env:staged-guard-validation
+    And scripts/check-no-env-staged.sh does not exist
+```
+
+```gherkin
 Feature: Repo configuration is unified in repo-config.yml
 
   Scenario: rhino-cli reads merged config sections
@@ -226,7 +264,8 @@ Feature: No quality gate runs heavy tests
   Scenario: None of the four gates runs test:integration or test:e2e
     Given the pre-commit, pre-push, PR quality, and post-merge main gates
     When any of them runs
-    Then it runs only test:quick (plus, from pre-push onward, the governance/spec validators)
+    Then from pre-push onward it runs test:quick plus the governance/spec validators
+    And pre-commit runs the fast file-type set only, without test:quick
     And none of the four gates runs test:integration or test:e2e
 
   Scenario: Post-merge main CI runs only the fast gate
