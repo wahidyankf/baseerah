@@ -34,7 +34,7 @@ by running the target, not a TDD code cycle.
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
 - Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, `{tool}:check` wrappers, `harness:bindings-validation` as an Nx target, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
-- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit, three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push ≡ PR running only `test:quick`, and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit, three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, all four gates (pre-commit/pre-push/PR/main-ci) running only `test:quick` (integration/e2e are CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, markdown-validate, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_.
 - Convergence edits in all three repos.
 
@@ -217,19 +217,36 @@ Feature: Pre-push and PR gate run identical fast commands
     When the pre-push hook and the PR quality gate run
     Then both run `nx affected -t test:quick` for the affected projects
     And neither runs test:integration or test:e2e
-    And test:integration and test:e2e run only post-merge (on push to main) plus the nightly CRON fallback
+    And test:integration and test:e2e run only in the scheduled CRON pipelines
 ```
 
 ```gherkin
-Feature: Post-merge CI runs full tests and deploys per project
+Feature: No quality gate runs heavy tests
 
-  Scenario: A merged PR triggers per-project test then staging deploy
+  Scenario: None of the four gates runs test:integration or test:e2e
+    Given the pre-commit, pre-push, PR quality, and post-merge main gates
+    When any of them runs
+    Then it runs only test:quick (plus, from pre-push onward, the governance/spec validators)
+    And none of the four gates runs test:integration or test:e2e
+
+  Scenario: Post-merge main CI runs only the fast gate
     Given a PR is merged to main touching one or more projects
-    When the post-merge CI runs
-    Then each affected project runs test:quick, then test:integration, then test:e2e in isolation
-    And a project whose tests all pass and that is deployable is deployed to staging independently
-    And a failing project never blocks another project's tests or deploy
-    And the scheduled stag-deploy CRON remains only as a nightly fallback
+    When main-ci.yml runs
+    Then it runs `nx affected -t test:quick` plus the governance/spec validators for affected projects
+    And it does not run test:integration or test:e2e
+    And it does not deploy
+```
+
+```gherkin
+Feature: Heavy tests and deploy run only on the scheduled CRON pipeline
+
+  Scenario: The scheduled pipeline runs the full suite then deploys
+    Given the scheduled *-test-local-deploy-stag pipeline runs
+    When it executes
+    Then it runs test:quick, then test:integration, then test:e2e per app in isolation
+    And on success it deploys that app to staging independently
+    And a failing app never blocks another app's tests or deploy
+    And the *-test-stag pipeline promotes a green staging deployment to production
 ```
 
 ```gherkin
