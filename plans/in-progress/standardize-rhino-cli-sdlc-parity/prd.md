@@ -22,19 +22,19 @@ by running the target, not a TDD code cycle.
 ## User Stories
 
 - As Maya, I want every rhino-cli command labelled wired/not-wired so I know which gates are actually enforced.
-- As Maya, I want the PR quality-gate workflow to have the same filename and job structure in all three repos.
-- As Maya, I want the markdown / env validation workflows to run the same validator set everywhere.
-- As Theo, I want a committed standard doc I can diff each repo against.
-- As Sam, I want infra-only gates (terraform/ansible) to stay in infra and not leak into the template.
+- As Maya, I want the PR quality-gate workflow to have the same filename and job structure in all three repos, so that a cross-repo change always targets the same gate file without consulting a per-repo lookup table.
+- As Maya, I want the markdown / env validation workflows to run the same validator set everywhere, so that markdown and env issues surface uniformly regardless of which repo a change lands in.
+- As Theo, I want a committed standard doc I can diff each repo against, so that drift from the standard is detectable mechanically without manual inspection.
+- As Sam, I want infra-only gates (terraform/ansible) to stay in infra and not leak into the template, so that cloned templates remain lean and do not carry IaC tooling requirements irrelevant to their context.
 
 ## Scope
 
 ### In Scope
 
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
-- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), `harness:bindings-generate` + `harness:bindings-validation` as Nx targets, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
+- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), `harness:bindings-validation` as a cacheable Nx target while `harness:bindings-generate` + the env-guard run as direct `cargo run` calls, remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
-- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit, three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:coverage→specs:behavior:coverage (both composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, markdown-validate, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_.
 - Convergence edits in all three repos.
 
@@ -86,7 +86,7 @@ Feature: Hook ordering and invocation mechanism are identical
     Given the standardized .husky/pre-commit and .husky/pre-push hooks
     When a contributor inspects the hooks in any repo
     Then the ordered list of gate steps matches the standard
-    And each shared gate is invoked through the same mechanism (Nx-wrapped rhino-cli target, not inline shell)
+    And each shared gate is invoked through the same mechanism (rhino-cli commands via direct `cargo run`, project targets via `nx affected`, not inline shell)
     And only infra-only IaC steps appear as documented additions in ose-infra
 ```
 
@@ -99,6 +99,7 @@ Feature: Nx target names are canonical and identical across repos
     Then each target name comes from the canonical lifecycle or {domain}:{work} scheme in nx-targets.md
     And no project declares a `format` or `format:check` target (formatting is file-type lint-staged)
     And shell/Dockerfile/Actions linting runs as lint-staged file-type entries (`shellcheck`/`hadolint`/`actionlint`), not Nx targets, in all three
+    And a check is wired into lint-staged only when it is file-type-based and per-file isolated, so cacheable read-only checks (test:quick, harness:bindings-validation) stay Nx targets while always-run commands (harness:bindings-generate, env staged-guard) are invoked directly, the env guard kept as the dedicated first-line secrets gate
     And `harness:bindings-validation` is invoked as an Nx target, not an npm script, in all three
     And the rhino-cli `test-coverage` command and Nx target are absent in all three
 
@@ -116,7 +117,7 @@ Feature: Every project declares the mandatory six targets
     When its project.json targets are inspected
     Then test:unit, test:integration, test:e2e, test:quick, lint, and typecheck are all present
     And no `format` target is present (formatting is file-type lint-staged)
-    And a native test:coverage target is present wherever test:unit is real
+    And a native test:coverage target is present on every project (real ≥90% where test:unit is real, echo elsewhere) since test:quick composes it
     And targets that do not apply to the project are declared as no-op echo placeholders
     And test:e2e has a real (non-echo) command only on *-e2e projects
 
@@ -128,13 +129,14 @@ Feature: Every project declares the mandatory six targets
 ```
 
 ```gherkin
-Feature: test:quick runs typecheck then lint then test:unit
+Feature: test:quick runs typecheck then lint then test:coverage then specs:behavior:coverage
 
-  Scenario: test:quick composes the three in order
+  Scenario: test:quick composes the four in order
     Given a project's test:quick target
     When test:quick runs
-    Then it runs typecheck, then lint, then test:unit, in that exact order
+    Then it runs typecheck, then lint, then test:coverage (≥90% line), then specs:behavior:coverage, in that exact order
     And it stops at the first failing step
+    And the unit suite executes once under test:coverage, so test:unit is not re-run inside test:quick
 ```
 
 ```gherkin
@@ -214,10 +216,11 @@ Feature: The staged-.env guard is a rhino-cli command, not inline shell
     When rhino-cli env staged-guard validate runs
     Then it exits zero and the commit proceeds
 
-  Scenario: The guard is wired as an Nx target, not a shell script
+  Scenario: The guard is a direct rhino-cli call, not a shell script
     Given the converged repos
     When the pre-commit hook is inspected
-    Then it invokes nx run rhino-cli:env:staged-guard-validation
+    Then it invokes the rhino-cli env staged-guard validate command directly as the first step
+    And no nx run wrapper or Nx target is used for it
     And scripts/check-no-env-staged.sh does not exist
 ```
 
