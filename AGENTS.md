@@ -32,7 +32,7 @@ Polyglot demo apps extracted 2026-04-18 to [`ose-primer`](https://github.com/wah
 `apps/` (Nx apps), `libs/` (`rust-commons`, `fsharp-crane-core`, `web-ui`), `docs/` (Diátaxis:
 tutorials/how-to/reference/explanation), `repo-governance/`
 (conventions/development/principles/workflows/vision), `plans/` (backlog/in-progress/done), `.claude/`
-(Claude Code: agents + skills), `.opencode/` (auto-synced from `.claude/`).
+(primary binding: agents + skills), `.opencode/` (auto-synced from `.claude/`).
 
 **See**: [docs/reference/monorepo-structure.md](./docs/reference/monorepo-structure.md)
 
@@ -303,7 +303,7 @@ See [Web Research Delegation Convention](./repo-governance/conventions/writing/w
 
 **agent skills infrastructure**: Two modes — **Inline** (default: inject into current conversation) and
 **Fork** (`context: fork`: delegated isolated context, return summarized results). Agent definition files
-at `.claude/agents/<name>.md`; skill files at `.claude/skills/<name>/SKILL.md`. Skills serve agents
+at `.claude/agents/<name>.md`; skill files at `.claude/skills/<name>/SKILL.md`. Agent skills serve agents
 (service relationship, not governance).
 
 **See**: [repo-governance/development/agents/ai-agents.md](./repo-governance/development/agents/ai-agents.md),
