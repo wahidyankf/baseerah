@@ -35,8 +35,9 @@ by running the target, not a TDD code cycle.
 - Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
 - Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the `specs:*` validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, unit and integration tests in separate folders (`tests/unit` vs `tests/integration`; Rust co-located `#[cfg(test)]` + external `tests/`), BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
-- rhino-cli surface rationalization: the command triage lists the **target** (end-state) command column before the current-form column, and carries a per-command keep/merge/drop/wire recommendation; the `harness` binding commands cover all 11 supported harnesses (source/generated/native tiers), not just OpenCode + Amazon Q. [Judgment call]
+- rhino-cli surface rationalization: the command triage lists the **target** (end-state) command column before the current-form column, and carries a per-command keep/merge/drop/wire recommendation; **every** `harness` command (bindings, naming, instruction-size, duplication, audit) covers all 11 supported harnesses (source/generated/native tiers) via the `repo-config.yml` `harness:` registry — not just OpenCode + Amazon Q, and none hard-coded to a `.claude`/`.opencode` pair. [Judgment call]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, main-ci, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_ (markdown validation folds into the gates — no standalone markdown workflow).
+- Worktree-agnostic guardrail execution: every guardrail runs identically from the primary checkout and a linked worktree (`git rev-parse --show-toplevel` for the current tree root, `--git-common-dir` for shared metadata; never assume `.git/` is a directory or read config from the main checkout), locked by a rhino-cli regression test and verified per repo. [Repo-grounded + Judgment call]
 - Convergence edits in all three repos.
 
 ### Out of Scope
@@ -373,6 +374,27 @@ Feature: Legitimate divergence is preserved
     Then ose-infra retains its terraform, ansible, and yamllint gates
     And each repo retains only the per-app deploy CRON workflows for apps it actually ships
     And these differences are recorded in the divergence policy, not flagged as drift
+```
+
+```gherkin
+Feature: Guardrails run identically inside and outside a linked worktree
+
+  Scenario: The full gate passes from a linked worktree
+    Given a linked git worktree created under worktrees/
+    When the pre-push gate command set and the rhino-cli guardrail commands run from that worktree
+    Then every guardrail resolves the worktree's own toplevel via git rev-parse --show-toplevel
+    And no guardrail assumes .git is a directory or reads config from the main checkout
+    And every guardrail exits with the same result as when run from the primary checkout
+
+  Scenario: A regression test locks worktree-safe execution
+    Given a synthetic linked worktree in the rhino-cli test suite
+    When a guardrail command runs inside it
+    Then it succeeds, proving repo-root and metadata resolution are worktree-aware
+
+  Scenario: A bare worktree-only repo runs the gate
+    Given ose-infra, a bare repository worked only through linked worktrees
+    When the guardrails run from a linked worktree (its sole execution context)
+    Then they pass without a primary checkout present
 ```
 
 ## Product Risks
