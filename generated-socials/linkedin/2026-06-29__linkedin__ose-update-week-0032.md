@@ -21,8 +21,6 @@ The week's main effort: a 5-document plan (README, BRD, PRD, tech docs, delivery
 
 Key decisions: Nx target naming (test:unit / test:integration / test:e2e / test:quick / test:coverage / lint / typecheck) identical everywhere; lint-staged replaces per-project format targets; test folders split (unit vs integration); native coverage ≥90% without a third-party service; command names move to verb-last form; redundant commands merged or dropped; all 11 supported coding-agent harnesses wired; three config files merge into one root repo-config.yml.
 
-Plan quality gate: 0 critical, 0 high, 0 medium. Architecture work — execution begins next.
-
 ayokoding-www: Kali Linux tool tutorial published (overview, quick-start, beginner pages).
 
 🏗️ ose-infra
