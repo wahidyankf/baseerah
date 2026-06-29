@@ -65,7 +65,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] Create `docs/reference/sdlc-gate-standard.md` containing [tech-docs §7 standard](./tech-docs.md#7-target-standard-best-of-three-synthesis) + [§7.1 divergence policy](./tech-docs.md#71-divergence-policy-allowed-vs-drift) — acceptance: file exists; lint:md passes; links:validation passes.
   - _Suggested executor: `docs-maker`_
 - [ ] [AI] Add both new docs to `docs/reference/README.md` index — acceptance: both linked; `npx nx run rhino-cli:headings:hierarchy-validation` and `links:validation` pass.
-- [ ] [AI] Extend the canonical Nx naming scheme: in `repo-governance/development/infra/nx-targets.md` **drop `format`/`format:check` from the lifecycle target list** (formatting is file-type lint-staged, documented separately) and add `test:coverage`, `specs:behavior:coverage` (renamed from `specs:coverage`), `specs:domain:coverage` (`*-be` only), plus document shell/Dockerfile/workflow linting as **lint-staged file-type entries** (not Nx targets) — acceptance: all changes present; `npm run lint:md` passes.
+- [ ] [AI] Extend the canonical Nx naming scheme: in `repo-governance/development/infra/nx-targets.md` **drop `format`/`format:check` from the lifecycle target list** (formatting is file-type lint-staged, documented separately) and add `test:coverage`, `specs:behavior:coverage` (renamed from `specs:coverage`), `specs:domain:coverage` (gated by `domain/**` folder-presence), plus document shell/Dockerfile/workflow linting as **lint-staged file-type entries** (not Nx targets) — acceptance: all changes present; `npm run lint:md` passes.
   - _Suggested executor: `repo-rules-maker`_
 - [ ] [AI] In `repo-governance/development/infra/nx-target-naming.md` document the **lint-staged membership rule** ([tech-docs §5](./tech-docs.md#5-nx-target-name-standard-targets-invoked-by-hooksci)): a check belongs in `lint-staged` **iff** it is file-type-based **and** per-file isolated (no cross-file content dependency); therefore **both formatting and shell/Dockerfile/workflow linting are file-type lint-staged** (no per-project `format`/`format:check` target and no `shell:lint`/`dockerfiles:lint`/`actions:lint` Nx targets — `shellcheck`/`hadolint`/`actionlint` run as lint-staged entries), while project-scoped checks (`test:quick`) and whole-tree regen (`harness:bindings-generate`) stay Nx targets, and the **`env staged-guard` is the one deliberate carve-out** (it qualifies but stays a dedicated first-line secrets gate) — acceptance: the rule + the carve-out are documented; `npx nx run rhino-cli:links:validation` passes.
   - _Suggested executor: `repo-rules-maker`_
@@ -73,57 +73,128 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
   - _Suggested executor: `repo-rules-maker`_
 - [ ] [AI] Author the **Git Identity Guardrail** (replaces the removed `scripts/git-identity-check.sh`): add a guardrail line to `AGENTS.md` and a short subsection to `repo-governance/development/workflow/reproducible-environments.md` (or `conventions/security/secrets-and-env-standards.md`) stating — **no AI agent sets or modifies `user.name`/`user.email` at any scope**; forbids `git config --local user.*`, the **bare** `git config user.*` (writes local by default), and `--global`/`--system` identity, and editing `[user]` in `.git/config`; identity comes from the developer's global `~/.gitconfig` (optionally `includeIf` for per-tree identity); **CI service-account/bot identity configured in workflow YAML is exempt** (e.g. `github-actions[bot]` for the PR-gate format-commit-back). Then `npm run generate:bindings` to sync `.opencode/`/`.amazonq/` — acceptance: the guardrail appears in `AGENTS.md` + the convention; `npm run lint:md` passes; bindings re-synced (no parity drift).
   - _Suggested executor: `repo-rules-maker`_
-- [ ] [AI] **RED**: add a feature file under `specs/apps/rhino/behavior/rhino-cli/gherkin/` for the orphan-feature check, and a unit test asserting `specs behavior-coverage validate --require-consumption` fails on an unconsumed feature — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails (flag/behaviour not yet implemented).
-  - **Gherkin (binds) →** "An orphan feature file fails the gate"
+
+### 1a. Explicit per-level coverage engine (`@covers`) — `specs behavior-coverage validate`
+
+> Implements the [§4.1 per-level coverage model](./tech-docs.md#41-per-level-coverage-model-explicit-covers-no-convention): the `repo-config.yml` `coverage.projects` registry sets each scenario's level envelope `P`; each scenario self-tags its required levels `S` (`S ⊆ P`); each test marks `// @covers <repo-path>:<scenario>`; a scenario's marker-levels must equal `S` exactly; `@wip` is exempt. Scoped to features **outside** `domain/**`. Runs **in addition to** the existing step-gap / orphan-step-impl checks (both must pass). This **supersedes** the prior `--require-consumption` approach — explicit configuration end-to-end, no convention-derived defaults. [Judgment call — explicit-config model]
+
+- [ ] [AI] **RED**: add a unit test + Gherkin asserting an **untagged scenario fails** the gate (a Scenario with no `@unit`/`@integration`/`@e2e` tag is a lint error; feature-level tags do **not** inherit to scenarios) — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails (self-tag rule not yet enforced).
+  - **Gherkin (binds) →** "An untagged scenario fails the gate"
 
     ```gherkin
-    Scenario: An orphan feature file fails the gate
-      Given a feature file under specs that no test references
-      When rhino-cli specs behavior-coverage validate runs with --require-consumption
-      Then it fails and names the orphan feature file
+    Scenario: An untagged scenario fails the gate
+      Given a scenario with no @unit, @integration, or @e2e level tag
+      When rhino-cli specs behavior-coverage validate runs
+      Then it fails and names the untagged scenario
     ```
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **RED**: add a unit test asserting `specs behavior-coverage validate --require-consumption` fails on a feature file that is consumed (its file is referenced by a test) but one of its scenarios is not exercised by any eligible unit/integration/e2e test — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails (per-scenario consumption check not yet implemented).
-  - **Gherkin (binds) →** "An uncovered scenario fails the gate"
+- [ ] [AI] **RED**: add unit tests + Gherkin asserting the **registry-envelope + `S ⊆ P`** rules: a scenario's level envelope `P` = union of `levels` across every `coverage.projects` entry whose `specs` glob matches its feature file (an app `[unit]` + its paired `*-e2e` `[e2e]` give `P = {unit, e2e}`), and a scenario tagged a level **not** in `P` fails — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests fail (registry envelope not yet wired).
+  - **Gherkin (binds) →** "A scenario requiring a level outside the project envelope fails"
 
     ```gherkin
-    Scenario: An uncovered scenario fails the gate
-      Given a scenario in a binding feature file that no eligible unit, integration, or e2e test exercises
-      When rhino-cli specs behavior-coverage validate runs with --require-consumption
-      Then it fails and names the uncovered feature and scenario
+    Scenario: A scenario requiring a level outside the project envelope fails
+      Given a project whose coverage registry declares only the unit level
+      And a scenario in that project tagged @integration
+      When rhino-cli specs behavior-coverage validate runs
+      Then it fails because the scenario requires a level not in the project envelope
     ```
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN**: implement the `--require-consumption` behaviour in `specs behavior-coverage validate` (rhino-cli `src/`) — every `.feature` file **and every scenario** under the scanned binding spec dir must be exercised by ≥1 **eligible** test (unit/integration/e2e, per `@tag`); emit `orphan feature: <path> not consumed by any test` for an unconsumed file and `uncovered scenario: <feature>:<scenario> not exercised by any eligible unit/integration/e2e test` for an unbound scenario, exit non-zero otherwise — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes; `npx nx run rhino-cli:specs:coverage` still exits 0 on the current tree.
+- [ ] [AI] **RED**: add a unit test + Gherkin asserting a scenario **not covered at a required level** fails: each scenario's `// @covers <repo-path>:<scenario>` markers resolve to a set of levels (level = the **owning Nx test target**, a static project-graph lookup) that must include every level in `S`; a level in `S` with no marker fails (uncovered) — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails.
+  - **Gherkin (binds) →** "A scenario not covered at a required level fails"
+
+    ```gherkin
+    Scenario: A scenario not covered at a required level fails
+      Given a scenario tagged @unit and @e2e
+      And a test marks it @covers at the unit level only
+      When rhino-cli specs behavior-coverage validate runs
+      Then it fails and names the missing e2e coverage
+    ```
+
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: default `--require-consumption` on for the `specs:coverage` Nx target across projects; update `specs/apps/rhino/` Gherkin + `docs/reference/sdlc-gate-standard.md` to document the new check — command: `npx nx run rhino-cli:test:quick` — acceptance: all rhino-cli tests pass; `specs:coverage` gate (soon renamed to `specs:behavior:coverage` in §1b) documents both step-def and consumption checks.
+
+- [ ] [AI] **RED**: add a unit test + Gherkin asserting an **`@covers` at an undeclared level** fails (over-coverage): a marker at a level **not** in the scenario's `S` fails — `S` is both floor and ceiling. Also assert a duplicate `(scenario, level)` across two source files fails (counting **source-marker occurrences**, so one parametrized test = one marker is fine) — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails.
+  - **Gherkin (binds) →** "An @covers at an undeclared level fails"
+
+    ```gherkin
+    Scenario: An @covers at an undeclared level fails
+      Given a scenario tagged @unit only
+      And a test marks it @covers at the e2e level
+      When rhino-cli specs behavior-coverage validate runs
+      Then it fails because the e2e level is not declared for that scenario
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **RED**: add a unit test + Gherkin asserting an **orphan `@covers` marker** (referencing a scenario title that no feature file contains — e.g. after a rename) fails loudly — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails.
+  - **Gherkin (binds) →** "An orphan @covers marker fails the gate"
+
+    ```gherkin
+    Scenario: An orphan @covers marker fails the gate
+      Given a test with an @covers marker referencing a scenario title that no feature file contains
+      When rhino-cli specs behavior-coverage validate runs
+      Then it fails and names the orphan marker
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **RED**: add a unit test + Gherkin asserting a **`@wip`/`@pending` scenario is exempt** (excluded from the coverage requirement and reported in an exempt count) — command: `npx nx run rhino-cli:test:unit` — acceptance: new test fails.
+  - **Gherkin (binds) →** "A @wip scenario is exempt from coverage"
+
+    ```gherkin
+    Scenario: A @wip scenario is exempt from coverage
+      Given a scenario tagged @wip with no @covers markers
+      When rhino-cli specs behavior-coverage validate runs
+      Then it does not fail and reports the scenario in the exempt count
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **GREEN**: implement the §4.1 engine in `specs behavior-coverage validate` (rhino-cli `src/`): (1) load `coverage.projects` from `repo-config.yml`; (2) per scenario compute `P` = union of `levels` over entries whose `specs` glob matches its feature path, and `S` = its own level tags; (3) error on untagged scenarios and on `S ⊄ P`; (4) scan all source for `// @covers <repo-path>:<scenario>` (uniform line-comment regex, every language), resolve each marker's level via the **owning Nx test target** (static project-graph lookup — **no suite execution**), and require each scenario's marker-level set to equal `S` exactly (missing / over-coverage / duplicate `(scenario, level)` all error, counting source-marker occurrences); (5) error on orphan markers; (6) exempt `@wip`/`@pending` and report the count; restrict the feature set to paths **outside** `domain/**`; keep the existing step-gap + orphan-step-impl checks running alongside — command: `npx nx run rhino-cli:test:unit` — acceptance: the new tests pass; `npx nx run rhino-cli:specs:coverage` still exits 0 on the current tree once rhino-cli's own scenarios are tagged + `@covers`-marked.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: add the `coverage:` section to `repo-config.yml` (§5.1) with one entry per project (`{name, levels, specs}`, including `*-e2e` projects); update `specs/apps/rhino/**` Gherkin + `docs/reference/sdlc-gate-standard.md` to document the model; warn (not fail) when a declared level has no real (non-`echo`) test target — command: `npx nx run rhino-cli:test:quick` — acceptance: all rhino-cli tests pass; the `specs:coverage` gate (renamed to `specs:behavior:coverage` in §1b) enforces the per-level `@covers` model and documents it.
 
 ### 1b. Rename `specs validate coverage`→`behavior-coverage` + add `specs domain-coverage validate`
 
-- [ ] [AI] **RED**: Write tests in `apps/rhino-cli/tests/` (or the relevant test module) asserting that `cargo run -- specs behavior-coverage validate` succeeds and `cargo run -- specs validate coverage` fails with "unrecognized subcommand" — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests fail (rename not yet applied). _Gherkin binding exempt: this is a pure CLI rename; the underlying behavior (`--require-consumption` orphan/uncovered checks) is already bound to the Gherkin scenarios in Phase 1. No new behavior, no new Gherkin scenario required._
+- [ ] [AI] **RED**: Write tests in `apps/rhino-cli/tests/` (or the relevant test module) asserting that `cargo run -- specs behavior-coverage validate` succeeds and `cargo run -- specs validate coverage` fails with "unrecognized subcommand" — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests fail (rename not yet applied). _Gherkin binding exempt: this is a pure CLI rename; the underlying behavior (the §4.1 per-level `@covers` model) is already bound to the Gherkin scenarios in §1a. No new behavior, no new Gherkin scenario required._
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **GREEN**: Rename the CLI dispatch entry from `coverage` to `behavior-coverage` in `apps/rhino-cli/src/cli.rs` (and the application module it resolves to); update `specs/apps/rhino/**` Gherkin and all unit tests to use the new command name — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests pass; no other tests broken.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **REFACTOR**: Rename the Nx target from `specs:coverage` to `specs:behavior:coverage` in `apps/rhino-cli/project.json`; update all Nx target references (hooks, workflows, `nx-targets.md`) — command: `npx nx run rhino-cli:test:quick` — acceptance: `npx nx run rhino-cli:specs:behavior:coverage` exits 0; `npx nx run rhino-cli:specs:coverage` fails with "target not found"; all tests pass.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED**: add a feature file + unit test asserting `specs domain-coverage validate` fails when a domain entity in `specs/apps/<domain>/domain/**` has no domain unit test — command: `npx nx run rhino-cli:test:unit` — acceptance: test fails (command not yet implemented).
-  - **Gherkin (binds) →** "An uncovered domain entity fails the gate"
+- [ ] [AI] **RED**: add a feature file + unit test asserting `specs domain-coverage validate` runs the same §4.1 per-level `@covers` model scoped to `domain/**` feature files only and fails when a `domain/**` scenario is not covered at its required levels; and asserting eligibility is `domain/**` folder-presence (a project with no `domain/**` feature folder is skipped) — command: `npx nx run rhino-cli:test:unit` — acceptance: test fails (command not yet implemented).
+  - **Gherkin (binds) →** "An uncovered domain scenario fails the gate"
 
     ```gherkin
-    Scenario: An uncovered domain entity fails the gate
-      Given a *-be project with a domain entity that no domain unit test exercises
+    Scenario: An uncovered domain scenario fails the gate
+      Given a project whose spec scope holds a domain feature folder
+      And a domain scenario not covered at its required level by any @covers marker
       When rhino-cli specs domain-coverage validate runs
-      Then it fails and names the uncovered domain entity
+      Then it fails and names the uncovered domain scenario
     ```
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN**: implement `specs domain-coverage validate` (rhino-cli `src/`) — for `*-be` projects, every entity in the bounded-context/ubiquitous-language registry under `specs/apps/<domain>/domain/**` must be exercised by ≥1 domain unit test; emit `uncovered domain entity: <name>` and exit non-zero otherwise — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes.
+- [ ] [AI] **GREEN**: implement `specs domain-coverage validate` as the same `specs_coverage` engine scoped to `domain/**` feature files only (the partition: `behavior-coverage` owns everything outside `domain/**`) — **not** a bespoke second validator; reuse the registry-envelope + self-tag + `@covers` + exact-level machinery from §1a, restricting the scanned feature set to `domain/**` — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes; the engine is shared with behavior-coverage (no duplicated coverage-walk code).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **REFACTOR**: expose the new command as the Nx target `specs:domain:coverage`, wired **only on `*-be` projects**; document it in `docs/reference/sdlc-gate-standard.md` — command: `npx nx run rhino-cli:test:quick` — acceptance: tests pass; the target resolves for `*-be` projects and is absent on others.
+- [ ] [AI] **REFACTOR**: expose the new command as the Nx target `specs:domain:coverage`, wired on every project whose spec scope holds a `domain/**` feature folder (folder-presence trigger, not the `*-be` name suffix); document it in `docs/reference/sdlc-gate-standard.md` — command: `npx nx run rhino-cli:test:quick` — acceptance: tests pass; the target resolves for projects with a `domain/**` feature folder and is absent on others.
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **Structural-validator merge (`adoption` + `tree` + `counts` → `specs structure validate`)** — **RED**: add unit tests in `apps/rhino-cli/tests/` asserting `cargo run -- specs structure validate` runs all three structural rule layers (adoption, tree, counts) over the `apps_with_ddd()` allowlist in **one** invocation and emits a **distinct error label** per failing layer (`adoption:`/`tree:`/`counts:`), and that the three removed leaves `specs validate adoption`/`specs validate tree`/`specs validate counts` no longer parse — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests fail (merged command not yet implemented). _Gherkin binding exempt: pure CLI consolidation of three existing checks — no behavioural change; the underlying rules stay bound to their current specs._
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: implement `specs structure validate` in `apps/rhino-cli/src/` — a single command/dispatch entry that calls `internal::specs::validate_spec_adoption` → `validate_spec_tree` → `validate_spec_counts` in sequence over one tree walk, aggregating failures with per-layer labels; remove the three old `SpecsValidateCommands::{Adoption,Tree,Counts}` dispatch arms + their `specs_validate_{adoption,tree,counts}.rs` CLI wrappers (keep the shared `internal::specs` rule fns) — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests pass; no other tests broken.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: replace the three Nx targets `specs:adoption-validation` + `specs:tree-validation` + `specs:counts-validation` with one `specs:structure-validation` in `apps/rhino-cli/project.json`; update `test:specs` aggregate, hooks, workflows, and `nx-targets.md` to reference the merged target; update `specs/apps/rhino/**` Gherkin + `docs/reference/sdlc-gate-standard.md` — command: `npx nx run rhino-cli:test:quick` — acceptance: `npx nx run rhino-cli:specs:structure-validation` exits 0; the three old targets fail with "target not found"; all tests pass.
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **Drop `specs links validate` (redundant with `md links validate`)** — RED: add a unit test asserting `cargo run -- md links validate` reports a broken relative link (and a broken `#fragment` anchor) seeded in a spec markdown file at `specs/apps/<x>/foo.md`, proving the repo-wide gate already covers spec links; plus a test asserting `cargo run -- specs links validate` no longer parses ("unrecognized subcommand") — command: `npx nx run rhino-cli:test:unit` — acceptance: the `md links validate`-covers-`specs/` test passes immediately (proves redundancy, not assumed) and the no-longer-parses test fails (command not yet removed). _Gherkin binding exempt: removal of a redundant validator — the surviving `md links validate` behaviour is already bound to its own specs._
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: delete the `specs links validate` command from rhino-cli — remove the `SpecsValidateCommands::Links` enum variant + dispatch arm in `apps/rhino-cli/src/cli.rs`, delete `apps/rhino-cli/src/commands/specs_validate_links.rs`, and delete the `validate_spec_links` fn + its unit tests from `apps/rhino-cli/src/application/specs.rs` (its "spec folder exists" check is already covered by `specs structure validate`); confirm **`md links validate`'s exclude list does NOT exclude `specs/`** (it excludes only `plans/done` + the two content dirs) — command: `npx nx run rhino-cli:test:unit` — acceptance: both new tests pass; `cargo run -- specs links validate` errors; no other tests broken.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **REFACTOR**: remove the `specs:links-validation` Nx target from `apps/rhino-cli/project.json`, drop it from the `test:specs` aggregate, and scrub all references (hooks, workflows, `nx-targets.md`, `docs/reference/sdlc-gate-standard.md`) — leaving spec-file link integrity to the repo-wide `md links validate` gate — command: `npx nx run rhino-cli:test:quick` — acceptance: `npx nx run rhino-cli:specs:links-validation` fails with "target not found"; `grep -rn 'specs:links-validation\|specs links validate' apps/rhino-cli .husky .github` returns no hits; `md links validate` still flags a broken link seeded under `specs/`.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **RED**: add a feature file + unit test asserting `env staged-guard validate` exits non-zero and names the file when a real `.env` is staged, and exits zero when only `.env.example` is staged — command: `npx nx run rhino-cli:test:unit` — acceptance: test fails (command not yet implemented).
   - **Gherkin (binds) →** "Committing a real .env file is rejected"
@@ -143,6 +214,20 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] **REFACTOR**: wire it as a **direct `cargo run -- env staged-guard validate`** call in pre-commit step 1 (no Nx target — staged-set-keyed, `cache: false`); document it in `docs/reference/sdlc-gate-standard.md` (pre-commit step 1) — command: `npx nx run rhino-cli:test:quick` — acceptance: `cargo run -- env staged-guard validate` exits 0 on a clean staged tree; staging a real `.env` makes it exit non-zero.
 
 - [ ] [AI] **RED**: add a feature file + unit test asserting `harness bindings validate` covers **all 11 supported harnesses** ([§3.2](./tech-docs.md#32-harness-binding-coverage-standard-all-supported-harnesses)) — generated-tier OpenCode byte-parity (not just Amazon Q) and native-tier no-shadowing for Copilot/Cursor/Windsurf/Junie/Antigravity/Pi/Aider, driven by a `harness:` section in `repo-config.yml`; **plus** color/tier translation-map coverage (every agent `color:`/`model:` token resolves in `ai-agents.md`/`model-selection.md`), absorbed from the `cross-vendor parity` gate (its `.claude`↔`.opencode` name-set/count parity already lives in `harness naming validate`, not added here) — command: `npx nx run rhino-cli:test:unit` — acceptance: test fails (coverage not yet extended).
+  - **Gherkin (binds) →** "All 11 harnesses are accounted for at their tier"
+
+    ```gherkin
+    Scenario: All 11 harnesses are accounted for at their tier
+      Given the harness binding commands and the repo-config.yml harness section
+      When the harness coverage is inspected
+      Then all 11 supported harnesses are listed (Claude Code, OpenCode, Amazon Q, Codex, Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider)
+      And the generated tier (OpenCode, Amazon Q) is regenerated and byte-parity-validated
+      And the native tier (Copilot, Cursor, Windsurf, Junie, Antigravity, Pi, Aider) is validated by the no-shadowing rule plus the AGENTS.md instruction-size budget
+      And the harness set is data in repo-config.yml, identical across all three repos, not a hard-coded directory list
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
 - [ ] [AI] **GREEN**: extend `harness bindings validate` / `harness bindings generate` (rhino-cli `src/`) to the full 11-harness matrix — replace the hard-coded `KNOWN_BINDING_DIRS` with the `repo-config.yml` `harness:` list (tier + artifact path + shadow-file glob per harness); add OpenCode byte-parity to the validator; add native-tier no-shadowing assertions (`.github/copilot-instructions.md`, `.cursor/rules`, `.windsurf/rules`, `.junie/guidelines.md`, `GEMINI.md`, `CONVENTIONS.md` absent or thin-pointer); fold `harness claude validate` + `harness sync validate` into `harness bindings validate`, and **absorb the `cross-vendor parity` gate** — add color/tier translation-map coverage to the validator (its `.claude`↔`.opencode` name-set/count parity already lives in `harness naming validate`, not duplicated here) and `git rm apps/rhino-cli/scripts/validate-cross-vendor-parity.sh` ([§3.2](./tech-docs.md#32-harness-binding-coverage-standard-all-supported-harnesses) / [§3.3](./tech-docs.md#33-merge--drop-recommendations)) — command: `npx nx run rhino-cli:test:unit` — acceptance: new test passes; `cargo run -- harness bindings validate` checks all 11 harnesses plus the color/tier-map invariants; `test ! -f apps/rhino-cli/scripts/validate-cross-vendor-parity.sh`.
 - [ ] [AI] **REFACTOR**: add the `harness:` section to `repo-config.yml` (§5.1) listing each of the 11 harnesses **with the fields every harness command consumes** (`tier`, `agent-dir`, `mirrors`, `instruction`, `shadow`); document the coverage standard in `docs/reference/sdlc-gate-standard.md` — command: `npx nx run rhino-cli:test:quick` — acceptance: tests pass; the harness list is data, not code.
 
@@ -151,8 +236,19 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 Implements the [§3.2 per-command coverage matrix](./tech-docs.md#32-harness-binding-coverage-standard-all-supported-harnesses) — every `harness` command derives its target set from the `repo-config.yml` `harness:` registry, so none is hard-coded to a `.claude`/`.opencode` pair.
 
 - [ ] [AI] **RED**: add unit tests asserting the **other harness commands cover all applicable harnesses**: (a) `harness naming validate` flags a bad role-suffix **and** a missing mirror in **Amazon Q** `.amazonq/cli-agents/` (not just `.claude`/`.opencode`); (b) `harness instruction-size validate` budgets a native surface (e.g. `.cursor/rules`) listed in the registry; (c) `harness duplication validate` reads its source dir set from the registry — command: `npx nx run rhino-cli:test:unit` — acceptance: tests fail (commands still hard-coded — `harness_validate_naming.rs` only reads `.claude/agents` + `.opencode/agents`).
-  - **Gherkin (binds) →** "All 11 harnesses are accounted for at their tier"
+  - **Gherkin (binds) →** "Every harness command is registry-driven, not hard-coded"
+
+    ```gherkin
+    Scenario: Every harness command is registry-driven, not hard-coded
+      Given the repo-config.yml harness section lists an agent-bearing tier (Amazon Q) and a native instruction surface
+      When harness naming validate, harness instruction-size validate, and harness duplication validate run
+      Then each derives its target set from the registry, not a hard-coded .claude/.opencode pair
+      And harness naming validate checks the Amazon Q agent dir and the N-way mirror
+      And a config-only addition of a new agent-bearing tier is covered with no source edit
+    ```
+
   - _Suggested executor: `swe-rust-dev`_
+
 - [ ] [AI] **GREEN**: make each command consume the `harness:` registry instead of hard-coded dirs — `harness naming validate` (`harness_validate_naming.rs`): iterate **every agent-bearing tier** (Claude + each generated tier with an `agent-dir`: OpenCode + **Amazon Q `.amazonq/cli-agents/`**), run the role-suffix check per dir, and assert each generated tier's agent set **mirrors `.claude/agents/`** N-way (via each entry's `mirrors:`); `harness instruction-size validate`: budget **every** surface in the registry `instruction:` lists; `harness duplication validate`: read the source agent/skill dirs from the registry (source tier only) — command: `npx nx run rhino-cli:test:unit` — acceptance: new tests pass; `cargo run -- harness naming validate` validates Amazon Q agent files + the N-way mirror; a config-only addition of a new agent-bearing tier is picked up with **no source edit**.
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **REFACTOR**: confirm `harness audit` (the aggregate) runs the now-registry-driven leaves and that the `instruction-size:` surface list in `repo-config.yml` enumerates **all** native surfaces (`.cursor/rules`, `.windsurf/rules`, `.junie/guidelines.md`, `GEMINI.md`, `.github/copilot-instructions.md`, `CONVENTIONS.md`, `.amazonq/rules`); document in `docs/reference/sdlc-gate-standard.md` — command: `npx nx run rhino-cli:test:quick` — acceptance: `cargo run -- harness audit` runs all leaves and exits 0 on a clean tree; `cargo run -- harness instruction-size validate` budgets every native surface.
@@ -178,9 +274,9 @@ Implements the [§1 Worktree-agnostic execution invariant](./tech-docs.md#1-life
 - [ ] [AI] **GREEN**: fix any worktree-unsafe resolution found in the audit (switch hardcoded `.git/` directory paths to `git rev-parse --show-toplevel`/`--git-common-dir`); if the audit found none, keep the test as a pure regression lock — command: `npx nx run rhino-cli:test:unit` — acceptance: the worktree test passes; `cargo run --release -- env staged-guard validate`/`md links validate` run green from a linked worktree.
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] Commit the rhino-cli source changes: `git commit -m "feat(rhino-cli): add specs behavior-coverage --require-consumption, specs domain-coverage, env staged-guard validate, and all-harness bindings coverage"` — acceptance: `git log --oneline -1` shows this commit; `npx nx run rhino-cli:test:unit` exits 0.
+- [ ] [AI] Commit the rhino-cli source changes: `git commit -m "feat(rhino-cli): add per-level @covers coverage model (behavior + domain), env staged-guard validate, and all-harness bindings coverage"` — acceptance: `git log --oneline -1` shows this commit; `npx nx run rhino-cli:test:unit` exits 0.
 - [ ] [AI] Commit the worktree-agnostic regression test (+ any fix): `git commit -m "test(rhino-cli): lock worktree-agnostic guardrail execution (run guardrail from a synthetic linked worktree)"` — acceptance: `git log --oneline -1` shows this commit; the worktree test passes.
-- [ ] [AI] Commit: `docs(reference): add rhino-cli command triage and SDLC gate standard`.
+- [ ] [AI] Commit the reference docs: `git commit -m "docs(reference): add rhino-cli command triage and SDLC gate standard"` — acceptance: `git log --oneline -1` shows this commit; `npm run lint:md` passes.
 - [ ] [AI] Commit the Git Identity Guardrail: `git commit -m "docs(governance): add Git Identity Guardrail (agents never set git identity); sync bindings"` — acceptance: `git log --oneline -1` shows this commit; the guardrail is in `AGENTS.md` + the convention + synced bindings.
 
 ### Phase 1 Gate
@@ -273,7 +369,7 @@ Implements the [§5 Coverage-enforcement decision](./tech-docs.md#5-nx-target-na
 - [ ] [AI] Enumerate projects: `npx nx show projects` — acceptance: the list matches the rows of the [§2.1 per-project target matrix](./tech-docs.md#21-per-project-target-matrix-post-implementation-ose-public); reconcile any new/removed project against the matrix before converging.
 - [ ] [AI] For EACH project's `project.json`, ensure the [§4 mandatory-six targets](./tech-docs.md#4-testing-architecture--target-contents-standard) exist — add `echo` placeholders for any missing among `test:unit`, `test:integration`, `test:e2e`, `test:quick`, `lint`, `typecheck` (**no `format` target** — formatting is lint-staged) — acceptance: `npx nx show project <p> --json | jq '.targets|keys'` includes all six for every project; `npx nx affected -t typecheck lint test:unit test:integration test:e2e test:quick` resolves a task (real or echo) for every affected project.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Add a `test:specs` target to every project: an aggregate (`nx:run-commands` or `dependsOn`) of the project's `specs:*` validators — `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation`, `specs:behavior:coverage`, and `specs:domain:coverage` (`*-be` only; `echo`/skip elsewhere) — acceptance: `npx nx show project <p> --json | jq -e '.targets|has("test:specs")'` is true for every project; `npx nx run <be>:test:specs` runs all six specs validators; a non-`*-be` project's `test:specs` runs the four structural + behavior:coverage (no domain:coverage).
+- [ ] [AI] Add a `test:specs` target to every project: an aggregate (`nx:run-commands` or `dependsOn`) of the project's `specs:*` validators — `specs:structure-validation` (merged adoption + tree + counts), `specs:behavior:coverage`, and `specs:domain:coverage` (only where a `domain/**` feature folder exists; `echo`/skip elsewhere) — acceptance: `npx nx show project <p> --json | jq -e '.targets|has("test:specs")'` is true for every project; `npx nx run <be>:test:specs` runs all three specs validators; a project without a `domain/**` folder runs structure + behavior:coverage (no domain:coverage). Spec-file links are **not** in `test:specs` — they are covered by the repo-wide `md links validate` gate.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Set every project's `test:quick` to the sequential composition (`nx:run-commands`, `"parallel": false`, commands `nx run <p>:typecheck` → `nx run <p>:lint` → `nx run <p>:test:unit` → `nx run <p>:test:coverage` → `nx run <p>:test:specs`) — acceptance: running `test:quick` executes the five in order and stops at the first failure (verify by temporarily breaking lint in one project); the former separate specs-structural gate step is removed from `.husky/pre-push` and the PR/main workflows (the specs gate now runs inside `test:quick`).
   - _Suggested executor: `swe-typescript-dev`_
@@ -285,10 +381,10 @@ Implements the [§5 Coverage-enforcement decision](./tech-docs.md#5-nx-target-na
 - [ ] [AI] For EACH project with a real `test:unit`, add a native `test:coverage` target (≥ 90% line via the project's own runner — `vitest --coverage` thresholds, `cargo llvm-cov`/`tarpaulin`, `dotnet test` coverage gate) per the [§2.1 matrix](./tech-docs.md#21-per-project-target-matrix-post-implementation-ose-public) `test:coverage` column; `echo` where `test:unit` is `echo` — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`; a project under 90% fails its `test:coverage`.
 - [ ] [AI] Research the correct Nx mechanism to wire `specs/` folders into the project affected graph: query `nx_docs` with "how to mark a project affected by changes outside its root (inputs namedInputs implicitDependencies)" — acceptance: the doc link + chosen mechanism snippet (one of `implicitDependencies`, `inputs`/`namedInputs`, or a project-inference plugin) is recorded in `plans/in-progress/standardize-rhino-cli-sdlc-parity/tech-docs.md §4` before any per-project edit is made.
 - [ ] [AI] **Wire `specs/` into Nx `affected`**: for each project, map its `specs/apps/<domain>/**` (or `specs/libs/<lib>/**`) folder to the project so a feature-only change marks it affected — apply the mechanism confirmed in the research step above (`implicitDependencies` / `inputs`/`namedInputs`) to the project's Nx config — acceptance (**behavioural**): editing only a project's `.feature` file then `npx nx affected -t test:quick --base=HEAD~1 --head=HEAD` includes that project (so `specs:behavior:coverage`/`specs:domain:coverage` actually run on specs-only changes).
-- [ ] [AI] Wire `specs:domain:coverage` (→ `rhino-cli specs domain-coverage validate`) **only on `*-be` backend projects** (`ose-be`, `organiclever-be`) per the §2.1 matrix `specs:domain:coverage` column — acceptance: `npx nx show project ose-be --json | jq -e '.targets|has("specs:domain:coverage")'` is true; a non-`*-be` project (e.g. `ose-www`) does **not** declare it.
+- [ ] [AI] Wire `specs:domain:coverage` (→ `rhino-cli specs domain-coverage validate`) on every project whose spec scope holds a `domain/**` feature folder (folder-presence trigger; today `ose-be`, `organiclever-be`) per the §2.1 matrix `specs:domain:coverage` column — acceptance: `npx nx show project ose-be --json | jq -e '.targets|has("specs:domain:coverage")'` is true; a project with no `domain/**` folder (e.g. `ose-www`) does **not** declare it.
   - _Suggested executor: `swe-typescript-dev`_
 - [ ] [AI] Make pre-push and the PR quality gate run the identical per-project code command — `nx affected -t test:quick` — and confirm **neither** runs `test:integration`/`test:e2e`; those stay only on the CRON pipelines. Edit `.husky/pre-push` and `.github/workflows/pr-quality-gate.yml` accordingly per [§4 gate rule](./tech-docs.md#4-testing-architecture--target-contents-standard) — acceptance: `grep -n 'test:integration\|test:e2e' .husky/pre-push .github/workflows/pr-quality-gate.yml` returns no gate invocation; both run `test:quick`.
-- [ ] [AI] Run the extended `specs:behavior:coverage` (`--require-consumption`) across affected projects and fix any orphan feature files (add the missing consuming test, or remove the dead feature with justification) — command: `npx nx affected -t specs:behavior:coverage` — acceptance: exits 0 with no orphan-feature errors.
+- [ ] [AI] Run the extended `specs:behavior:coverage` (the §4.1 `@covers` model) across affected projects and fix every finding — tag each scenario with its required levels, add the missing `// @covers` markers (or remove a dead scenario with justification), and populate `coverage.projects` for each project — command: `npx nx affected -t specs:behavior:coverage` — acceptance: exits 0 with no untagged-scenario, uncovered-level, over-coverage, duplicate, or orphan-marker errors.
 
 ### 2f. Post-merge main CI (fast); heavy tests + deploy stay CRON-only (ose-public)
 
@@ -342,7 +438,7 @@ Implements the [§6 standard](./tech-docs.md#6-post-merge-main-ci--per-project-s
 
 - [ ] [AI] In primer `apps/rhino-cli/project.json`: **remove `fmt` + `format:check` targets** (formatting → lint-staged); **drop primer's `shell:lint`/`dockerfiles:lint`/`actions:lint` targets** (tool-lint folds into the lint-staged config — add the three linter entries there if missing); ensure `harness:bindings-generate` + the env-guard run as **direct `cargo run` calls** (no Nx targets — parity with public); update every `fmt`/`format:check` reference (`grep -rn 'rhino-cli:fmt\b\|rhino-cli:format:check' --include='*.json' --include='*.yml' --include='*.sh' --include='*.md' .`) — acceptance: `cargo run -- harness bindings generate` regenerates bindings; `:fmt`/`:format:check`/`:shell:lint`/`:dockerfiles:lint`/`:actions:lint`/`:harness:bindings-generate` all fail (not targets); staging a bad `*.sh` aborts the commit; zero stale `fmt`/`format:check` references.
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] Add the structural targets primer's rhino-cli is **missing** so its key set matches public/infra: `specs:adoption-validation`, `specs:counts-validation`, `specs:links-validation`, `specs:tree-validation`, `test:e2e` (echo) — and mirror public's coverage decision: **do not** add `test-coverage` (it is removed everywhere); add a native `test:coverage` target instead — acceptance: `jq -r '.targets|keys[]' apps/rhino-cli/project.json | sort` equals public's sorted key set (which contains `test:coverage`, not `test-coverage`).
+- [ ] [AI] Add the structural targets primer's rhino-cli is **missing** so its key set matches public/infra: `specs:structure-validation` (the merged adoption + tree + counts target), `test:e2e` (echo) — **no** `specs:links-validation` (dropped everywhere; spec links via repo-wide `md links validate`) — and mirror public's coverage decision: **do not** add `test-coverage` (it is removed everywhere); add a native `test:coverage` target instead — acceptance: `jq -r '.targets|keys[]' apps/rhino-cli/project.json | sort` equals public's sorted key set (which contains `test:coverage`, not `test-coverage`).
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] Rename `specs:coverage`→`specs:behavior:coverage` in `ose-primer/apps/rhino-cli/project.json` (propagated from Phase 1b ose-public rename) — acceptance: `jq -e '.targets|has("specs:behavior:coverage") and (has("specs:coverage")|not)' apps/rhino-cli/project.json` is true; `npx nx run rhino-cli:specs:coverage` fails with "target not found"; `npx nx run rhino-cli:specs:behavior:coverage` exits 0.
   - _Suggested executor: `swe-rust-dev`_
@@ -352,7 +448,7 @@ Implements the [§6 standard](./tech-docs.md#6-post-merge-main-ci--per-project-s
 - [ ] [AI] Rewire primer's `.husky/pre-commit`: **fold the shell/Dockerfile/workflow linters into lint-staged** (delete any inline blocks), wire a **direct `cargo run -- env staged-guard validate`** (step 1, replacing the inline `check-no-env-staged.sh`), **replace any `git pre-commit` call with a direct `cargo run -- harness bindings generate`**, **remove the `test:quick` line** (moves to pre-push), **and remove the git-identity guard**: `git rm scripts/check-no-env-staged.sh scripts/git-identity-check.sh` and drop both lines from the hook — acceptance: `test ! -f scripts/check-no-env-staged.sh && test ! -f scripts/git-identity-check.sh`; `grep -cE 'git-identity-check|check-no-env-staged' .husky/pre-commit` returns 0; `grep -c 'test:quick' .husky/pre-commit` returns 0; step order matches [§1](./tech-docs.md#1-lifecycle-stage--exact-commands-post-implementation-identical-across-3-repos). (The `env staged-guard validate` command + the Git Identity Guardrail in `AGENTS.md`, authored in Phase 1, propagate with the plan folder.)
 - [ ] [AI] Add a scoped `cargo run --release -- repo-governance vendor validate` step to primer's `.husky/pre-push` (gated on `^repo-governance/.*\.md$`) — acceptance: editing a `repo-governance/*.md` then running pre-push triggers it; exits 0.
 - [ ] [AI] Remove any `cross-vendor:parity-validation` step from primer's `.husky/pre-push` + Nx target and `git rm` its `validate-cross-vendor-parity.sh` (folded into `harness bindings validate`, propagated from Phase 1) — acceptance: `grep -c 'cross-vendor' .husky/pre-push` returns 0; `test ! -f apps/rhino-cli/scripts/validate-cross-vendor-parity.sh`.
-- [ ] [AI] Promote primer's deferred structural specs-gate in `.github/workflows/pr-quality-gate.yml` to the full set (`specs:adoption-validation` + `specs:tree-validation` + `specs:counts-validation` + `specs:links-validation` + `specs:behavior:coverage` + `specs:gherkin-cardinality-validation`) — acceptance: `actionlint` passes; job lists all six.
+- [ ] [AI] Promote primer's deferred structural specs-gate in `.github/workflows/pr-quality-gate.yml` to the full set (`specs:structure-validation` + `specs:behavior:coverage` + `specs:gherkin-cardinality-validation`; spec links via the repo-wide `md links validate` gate, not a specs target) — acceptance: `actionlint` passes; job lists all three.
 - [ ] [AI] Extract a standalone `.github/workflows/validate-env.yml` from primer's folded-in PR-gate env job (`npx nx run rhino-cli:env:validation` on `pull_request` + `push:main`); remove the duplicated env logic from the PR gate — acceptance: `actionlint` passes; `validate-env.yml` matches the public/infra shape.
 - [ ] [AI] **Delete primer's `validate-markdown.yml`** and fold markdown into the gates (parity with public): per-file md validators + `specs gherkin-cardinality validate` (`.feature`) in lint-staged; `md links validate` as the `md-links` job in `pr-quality-gate.yml`/`main-ci.yml` — acceptance: `test ! -f .github/workflows/validate-markdown.yml`; primer's `.lintstagedrc`/`package.json` carries the per-file md validators; the `md-links` job runs `md links validate`.
 - [ ] [AI] Align primer's PR-gate job skeleton to the standard (detect, language gates, markdown, naming, env, specs-gate, quality-gate sentinel; formatting is enforced by lint-staged at commit, not a PR-gate job); **keep** primer's per-language jobs (golang/jvm/dotnet/python/rust/elixir/clojure/dart — allowed divergence) — acceptance: `actionlint` passes; skeleton matches, language jobs preserved.
@@ -361,10 +457,10 @@ Implements the [§6 standard](./tech-docs.md#6-post-merge-main-ci--per-project-s
 
 - [ ] [AI] For EACH primer project, bring its `project.json` to the [§2.2 matrix](./tech-docs.md#22-per-project-target-matrix-post-implementation-ose-primer) — biggest gaps: add `test:e2e` (echo) to the 11 `crud-be-*` + `crud-fs-ts-nextjs`; add `test:integration`+`test:e2e` (echo) to `crud-fe-*`; fill the support libs (`ts-ui-tokens` needs 4: `test:unit`/`test:integration`/`test:e2e` echo + `test:quick`; `golang-commons`/`clojure-openapi-codegen` need `typecheck` echo + more; `elixir-*` + `ts-ui` need `test:integration`/`test:e2e` echo); add `specs:behavior:coverage` to libs lacking it; add `specs:domain:coverage` to the 11 `crud-be-*` backends (**no `format` target anywhere** — lint-staged handles it) — acceptance: the mandatory-six `jq` check (Phase 2 gate) prints no `MISSING` for any primer project.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Add a `test:specs` target to every primer project (aggregate of its `specs:*` validators, `*-be` adds domain:coverage) and set every primer project's `test:quick` to the sequential typecheck→lint→`test:unit`→`test:coverage`→`test:specs` composition (`nx:run-commands`, `parallel:false`; `test:unit` + `test:coverage` + `test:specs` present everywhere, echo where N/A) — acceptance: `test:specs` present on every project; order verified by breaking lint in one project; no separate specs-structural step in primer's hooks/workflows.
+- [ ] [AI] Add a `test:specs` target to every primer project (aggregate of its `specs:*` validators; projects with a `domain/**` feature folder add domain:coverage) and set every primer project's `test:quick` to the sequential typecheck→lint→`test:unit`→`test:coverage`→`test:specs` composition (`nx:run-commands`, `parallel:false`; `test:unit` + `test:coverage` + `test:specs` present everywhere, echo where N/A) — acceptance: `test:specs` present on every project; order verified by breaking lint in one project; no separate specs-structural step in primer's hooks/workflows.
 - [ ] [AI] Add a native `test:coverage` target (≥ 90% line via each project's own runner; `echo` where `test:unit` is `echo`) to every primer project per the [§2.2 matrix](./tech-docs.md#22-per-project-target-matrix-post-implementation-ose-primer) `test:coverage` column — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`.
-- [ ] [AI] Wire `specs:domain:coverage` on the 11 `crud-be-*` backend projects (per §2.2 matrix) — acceptance: `npx nx show project crud-be-rust-axum --json | jq -e '.targets|has("specs:domain:coverage")'` is true; `crud-fe-*`/libs do **not** declare it.
-- [ ] [AI] Resolve orphan features: `npx nx run-many -t specs:behavior:coverage` with `--require-consumption` — acceptance: no orphan-feature errors.
+- [ ] [AI] Wire `specs:domain:coverage` on every primer project whose spec scope holds a `domain/**` feature folder (folder-presence trigger; today the 11 `crud-be-*` backends, per §2.2 matrix) — acceptance: `npx nx show project crud-be-rust-axum --json | jq -e '.targets|has("specs:domain:coverage")'` is true; a project with no `domain/**` folder (`crud-fe-*`/libs) does **not** declare it.
+- [ ] [AI] Resolve coverage findings: `npx nx run-many -t specs:behavior:coverage` and fix each (tag scenarios with their levels, add `// @covers` markers, populate `coverage.projects`) — acceptance: no untagged-scenario, uncovered-level, over-coverage, duplicate, or orphan-marker errors.
 
 ### 3e. Post-merge main CI (fast); heavy tests CRON-only (primer is a template — deploy is a no-op)
 
@@ -432,9 +528,9 @@ Implements the [§6 standard](./tech-docs.md#6-post-merge-main-ci--per-project-s
 
 - [ ] [AI] Bring each infra project to the [§2.3 matrix](./tech-docs.md#23-per-project-target-matrix-post-implementation-ose-infra): `coralpolyp-be` keeps service-level `test:integration` **and gains `specs:domain:coverage`**; `coralpolyp-fe` integration real only if DB-backed else echo; `ts-ui-tokens` gains its 4 missing targets; `ts-ui` gains `test:integration`/`test:e2e` echo; `*-e2e` keep real `test:e2e`, echo `test:unit`/`test:integration` (**no `format` target anywhere** — lint-staged handles it) — acceptance: the mandatory-six `jq` check prints no `MISSING` for any infra project.
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [AI] Add a `test:specs` target to every infra project (aggregate of its `specs:*` validators, `*-be` adds domain:coverage) and set every infra project's `test:quick` to the sequential typecheck→lint→`test:unit`→`test:coverage`→`test:specs` composition; resolve orphan features via `specs:behavior:coverage --require-consumption` — acceptance: `test:specs` present on every project; order verified; no orphan-feature errors; no separate specs-structural step.
+- [ ] [AI] Add a `test:specs` target to every infra project (aggregate of its `specs:*` validators; projects with a `domain/**` feature folder add domain:coverage) and set every infra project's `test:quick` to the sequential typecheck→lint→`test:unit`→`test:coverage`→`test:specs` composition; resolve coverage findings via `specs:behavior:coverage` (tag scenarios, add `// @covers` markers, populate `coverage.projects`) — acceptance: `test:specs` present on every project; order verified; no coverage errors; no separate specs-structural step.
 - [ ] [AI] Add a native `test:coverage` target (≥ 90% line; `echo` where `test:unit` is `echo`) to every infra project per the [§2.3 matrix](./tech-docs.md#23-per-project-target-matrix-post-implementation-ose-infra) `test:coverage` column — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`.
-- [ ] [AI] Wire `specs:domain:coverage` on `coralpolyp-be` (the only infra `*-be` backend) per §2.3 matrix — acceptance: `npx nx show project coralpolyp-be --json | jq -e '.targets|has("specs:domain:coverage")'` is true; `coralpolyp-fe`/libs do **not** declare it.
+- [ ] [AI] Wire `specs:domain:coverage` on every infra project whose spec scope holds a `domain/**` feature folder (folder-presence trigger; today `coralpolyp-be`) per §2.3 matrix — acceptance: `npx nx show project coralpolyp-be --json | jq -e '.targets|has("specs:domain:coverage")'` is true; a project with no `domain/**` folder (`coralpolyp-fe`/libs) does **not** declare it.
 
 ### 4e. Post-merge main CI (fast); coralpolyp heavy tests + deploy stay CRON-only
 
@@ -465,7 +561,7 @@ Implements the [§6 standard](./tech-docs.md#6-post-merge-main-ci--per-project-s
 
 ## Phase 5: Cross-Repo Parity Verification & Archival
 
-- [ ] [AI] Build the parity table comparing all three repos across every mechanics row (PR-gate filename, markdown filename, env filename, markdown validator set, specs-gate set, lint invocation mechanism, pre-push governance-vendor presence, hook step order, rhino-cli target-key set, **rhino-cli command set verb-last + identical**, **`repo-config.yml` section schema identical**, mandatory targets on every project, `test:quick` = typecheck→lint→`test:unit`→`test:coverage`→`test:specs` composition (test:specs aggregates specs:\*), native `test:coverage` ≥ 90% gate on every real-`test:unit` project, **no** `test-coverage` target + **no** Codecov anywhere, `format` via file-type lint-staged (no per-project `format` target), pre-push ≡ PR runs only `test:quick`, `specs:behavior:coverage --require-consumption` (feature **+ scenario** eligible coverage) enabled, canonical CI workflow names present, **guardrails worktree-agnostic** (full gate green from a linked worktree **and** the primary checkout in each repo)) — acceptance: a table with a ✅/❌ per repo per row is produced; every mechanics row is ✅ across all three (allowed-divergence rows excluded); the standardization layer is confirmed **identical** cross-repo.
+- [ ] [AI] Build the parity table comparing all three repos across every mechanics row (PR-gate filename, markdown filename, env filename, markdown validator set, specs-gate set, lint invocation mechanism, pre-push governance-vendor presence, hook step order, rhino-cli target-key set, **rhino-cli command set verb-last + identical**, **`repo-config.yml` section schema identical**, mandatory targets on every project, `test:quick` = typecheck→lint→`test:unit`→`test:coverage`→`test:specs` composition (test:specs aggregates specs:\*), native `test:coverage` ≥ 90% gate on every real-`test:unit` project, **no** `test-coverage` target + **no** Codecov anywhere, `format` via file-type lint-staged (no per-project `format` target), pre-push ≡ PR runs only `test:quick`, the per-level `@covers` coverage model (`coverage.projects` registry + scenario self-tag + `@covers` exact-level match; behavior outside `domain/**`, domain inside) enabled, canonical CI workflow names present, **guardrails worktree-agnostic** (full gate green from a linked worktree **and** the primary checkout in each repo)) — acceptance: a table with a ✅/❌ per repo per row is produced; every mechanics row is ✅ across all three (allowed-divergence rows excluded); the standardization layer is confirmed **identical** cross-repo.
 - [ ] [AI] Record the parity table in each repo's `docs/reference/sdlc-gate-standard.md` under a "Parity Status" heading — acceptance: present in all three; lint:md passes.
 
 ### Local Quality Gates (Before Push)

@@ -32,9 +32,9 @@ by running the target, not a TDD code cycle.
 ### In Scope
 
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
-- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` on `*-be`). [Repo-grounded]
+- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` gated by `domain/**` folder-presence). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
-- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the `specs:*` validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, unit and integration tests in separate folders (`tests/unit` vs `tests/integration`; Rust co-located `#[cfg(test)]` + external `tests/`), BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli feature-consumption enforcement. [Repo-grounded]
+- Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the `specs:*` validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, unit and integration tests in separate folders (`tests/unit` vs `tests/integration`; Rust co-located `#[cfg(test)]` + external `tests/`), BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli per-level `@covers` coverage enforcement (the §4.1 registry + self-tag + exact-level model). [Repo-grounded]
 - rhino-cli surface rationalization: the command triage lists the **target** (end-state) command column before the current-form column, and carries a per-command keep/merge/drop/wire recommendation; **every** `harness` command (bindings, naming, instruction-size, duplication, audit) covers all 11 supported harnesses (source/generated/native tiers) via the `repo-config.yml` `harness:` registry — not just OpenCode + Amazon Q, and none hard-coded to a `.claude`/`.opencode` pair. [Judgment call]
 - Standardized gate mechanics for: commit-msg, pre-commit, pre-push, PR quality-gate, main-ci, env-validate, and the CRON "test local + deploy stag" / "test stag + deploy prod" pipeline _shape_ (markdown validation folds into the gates — no standalone markdown workflow).
 - Worktree-agnostic guardrail execution: every guardrail runs identically from the primary checkout and a linked worktree (`git rev-parse --show-toplevel` for the current tree root, `--git-common-dir` for shared metadata; never assume `.git/` is a directory or read config from the main checkout), locked by a rhino-cli regression test and verified per repo. [Repo-grounded + Judgment call]
@@ -125,11 +125,11 @@ Feature: Every project declares the mandatory six targets
     And targets that do not apply to the project are declared as no-op echo placeholders
     And test:e2e has a real (non-echo) command only on *-e2e projects
 
-  Scenario: Backend projects additionally declare specs:domain:coverage
-    Given a *-be backend project
+  Scenario: Projects with a domain feature folder declare specs:domain:coverage
+    Given a project whose spec scope holds a domain feature folder
     When its project.json targets are inspected
     Then specs:domain:coverage is present
-    And non-*-be projects do not declare specs:domain:coverage
+    And projects with no domain feature folder do not declare specs:domain:coverage
 ```
 
 ```gherkin
@@ -140,7 +140,7 @@ Feature: test:quick runs typecheck, lint, test:unit, test:coverage, then test:sp
     When test:quick runs
     Then it runs typecheck, then lint, then test:unit, then test:coverage (≥90% line), then test:specs, in that exact order
     And it stops at the first failing step
-    And test:specs aggregates the specs:* validators (adoption, tree, counts, links, behavior:coverage, and domain:coverage on *-be)
+    And test:specs aggregates the specs:* validators (structure-validation [merged adoption + tree + counts], behavior:coverage, and domain:coverage where a domain feature folder exists; spec links are covered repo-wide by md links validate, not in test:specs)
     And the specs gate runs inside test:quick, so there is no separate specs-structural gate step
 ```
 
@@ -151,7 +151,7 @@ Feature: The three test levels consume the same Gherkin
     Given a project with feature files under its specs gherkin directory
     When test:unit, test:integration, and test:e2e run
     Then all three consume the same feature files driven by the same tags
-    And every feature and every scenario is exercised by at least one eligible level
+    And every scenario is covered at exactly its required levels via explicit @covers markers (the §4.1 per-level model)
     And test:unit may additionally carry non-Gherkin unit tests for behaviour not expressed as scenarios
     And BE test:integration exercises behaviour at the service level, never through the HTTP API
     And the HTTP API surface is exercised only by test:e2e in the *-e2e project
@@ -194,26 +194,50 @@ Feature: harness binding commands cover every supported harness
 ```
 
 ```gherkin
-Feature: Every feature and scenario is consumed by an eligible test
+Feature: Every scenario is covered at exactly its required levels (explicit @covers)
 
-  Scenario: An orphan feature file fails the gate
-    Given a feature file under specs that no test references
-    When rhino-cli specs behavior-coverage validate runs with --require-consumption
-    Then it fails and names the orphan feature file
+  Scenario: An untagged scenario fails the gate
+    Given a scenario with no @unit, @integration, or @e2e level tag
+    When rhino-cli specs behavior-coverage validate runs
+    Then it fails and names the untagged scenario
 
-  Scenario: An uncovered scenario fails the gate
-    Given a scenario in a binding feature file that no eligible unit, integration, or e2e test exercises
-    When rhino-cli specs behavior-coverage validate runs with --require-consumption
-    Then it fails and names the uncovered feature and scenario
+  Scenario: A scenario requiring a level outside the project envelope fails
+    Given a project whose coverage registry declares only the unit level
+    And a scenario in that project tagged @integration
+    When rhino-cli specs behavior-coverage validate runs
+    Then it fails because the scenario requires a level not in the project envelope
+
+  Scenario: A scenario not covered at a required level fails
+    Given a scenario tagged @unit and @e2e
+    And a test marks it @covers at the unit level only
+    When rhino-cli specs behavior-coverage validate runs
+    Then it fails and names the missing e2e coverage
+
+  Scenario: An @covers at an undeclared level fails
+    Given a scenario tagged @unit only
+    And a test marks it @covers at the e2e level
+    When rhino-cli specs behavior-coverage validate runs
+    Then it fails because the e2e level is not declared for that scenario
+
+  Scenario: An orphan @covers marker fails the gate
+    Given a test with an @covers marker referencing a scenario title that no feature file contains
+    When rhino-cli specs behavior-coverage validate runs
+    Then it fails and names the orphan marker
+
+  Scenario: A @wip scenario is exempt from coverage
+    Given a scenario tagged @wip with no @covers markers
+    When rhino-cli specs behavior-coverage validate runs
+    Then it does not fail and reports the scenario in the exempt count
 ```
 
 ```gherkin
-Feature: Backend domain entities are covered (specs:domain:coverage)
+Feature: Domain scenarios are covered (specs:domain:coverage)
 
-  Scenario: An uncovered domain entity fails the gate
-    Given a *-be project with a domain entity that no domain unit test exercises
+  Scenario: An uncovered domain scenario fails the gate
+    Given a project whose spec scope holds a domain feature folder
+    And a domain scenario not covered at its required level by any @covers marker
     When rhino-cli specs domain-coverage validate runs
-    Then it fails and names the uncovered domain entity
+    Then it fails and names the uncovered domain scenario
 ```
 
 ```gherkin
