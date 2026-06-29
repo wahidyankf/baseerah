@@ -5,9 +5,10 @@ Window: 2026-06-22 → 2026-06-29 18:00 +0700. ~57 commits across the three repo
 ---
 
 OPEN SHARIA ENTERPRISE
+
 Week 32 / Phase 1, Week 20
 
-Highlights: this week's focal output is a 5-document architecture plan for standardizing rhino-cli SDLC checks and lifecycle commands uniformly across all three OSE repos, quality-gated to a double-zero pass before execution starts.
+Highlights: this week's focal output is a 5-document architecture plan to standardize rhino-cli SDLC checks and lifecycle commands across all three OSE repos, quality-gated to a double-zero pass before execution starts.
 
 🌐 Cross-repo
 
@@ -25,7 +26,7 @@ ayokoding-www: Kali Linux tool tutorial published (overview, quick-start, beginn
 
 🏗️ ose-infra
 
-k3s cluster plan updated with SSH-over-Tailscale access, corrected VM memory (staging bumped to 4 GB for Prometheus headroom), and accurate vCPU and network figures for staging and production.
+k3s cluster plan updated with SSH-over-VPN access, corrected VM memory (staging bumped for Prometheus headroom), and accurate vCPU and network figures for staging and production.
 
 📦 ose-primer
 
