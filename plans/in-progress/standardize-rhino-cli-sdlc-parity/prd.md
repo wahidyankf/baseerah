@@ -32,7 +32,7 @@ by running the target, not a TDD code cycle.
 ### In Scope
 
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
-- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` gated by `domain/**` folder-presence, rename `deny:check`→`deps:audit` and `msrv:check`→`compat:min-version` and make both cross-language present-on-every-project columns — `deps:audit` (CVE + license via each language's native tool) CRON-only because uncacheable, `compat:min-version` (min-version-floor build, real only on Rust + Python) in the gates because cacheable). [Repo-grounded]
+- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` gated by the explicit `specs.domain-areas` allowlist in `repo-config.yml` (not folder-presence, not the `*-be` suffix — explicit-config principle), rename `deny:check`→`deps:audit` and `msrv:check`→`compat:min-version` and make both cross-language present-on-every-project columns — `deps:audit` (CVE + license via each language's native tool) CRON-only because uncacheable, `compat:min-version` (min-version-floor build, real only on Rust + Python) in the gates because cacheable). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
 - Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the `specs:*` validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, unit and integration tests in separate folders (`tests/unit` vs `tests/integration`; Rust co-located `#[cfg(test)]` + external `tests/`), BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli per-level `@covers` coverage enforcement (the §4.1 registry + self-tag + exact-level model). [Repo-grounded]
 - rhino-cli surface rationalization: the command triage lists the **target** (end-state) command column before the current-form column, and carries a per-command keep/merge/drop/wire recommendation; **every** `harness` command (bindings, naming, instruction-size, duplication, audit) covers all 11 supported harnesses (source/generated/native tiers) via the `repo-config.yml` `harness:` registry — not just OpenCode + Amazon Q, and none hard-coded to a `.claude`/`.opencode` pair. [Judgment call]
@@ -125,11 +125,12 @@ Feature: Every project declares the mandatory six targets
     And targets that do not apply to the project are declared as no-op echo placeholders
     And test:e2e has a real (non-echo) command only on *-e2e projects
 
-  Scenario: Projects with a domain feature folder declare specs:domain:coverage
-    Given a project whose spec scope holds a domain feature folder
+  Scenario: Projects listed in specs.domain-areas declare specs:domain:coverage
+    Given a project listed in the repo-config.yml specs.domain-areas allowlist
     When its project.json targets are inspected
     Then specs:domain:coverage is present
-    And projects with no domain feature folder do not declare specs:domain:coverage
+    And projects not listed in specs.domain-areas do not declare specs:domain:coverage
+    And eligibility comes from the explicit allowlist, not folder-presence or the *-be name suffix
 ```
 
 ```gherkin
@@ -140,7 +141,7 @@ Feature: test:quick runs typecheck, lint, test:unit, test:coverage, then test:sp
     When test:quick runs
     Then it runs typecheck, then lint, then test:unit, then test:coverage (≥90% line), then test:specs, in that exact order
     And it stops at the first failing step
-    And test:specs aggregates the specs:* validators (structure-validation [merged adoption + tree + counts], behavior:coverage, and domain:coverage where a domain feature folder exists; spec links are covered repo-wide by md links validate, not in test:specs)
+    And test:specs aggregates the specs:* validators (structure-validation [merged adoption + tree + counts], behavior:coverage, and domain:coverage where the project is listed in specs.domain-areas; spec links are covered repo-wide by md links validate, not in test:specs)
     And the specs gate runs inside test:quick, so there is no separate specs-structural gate step
 ```
 
@@ -214,8 +215,8 @@ Feature: rhino-cli triage reads target-first and carries merge/drop verdicts
     When its columns are inspected
     Then the "Command (leaf) — target" column appears before the "Command (leaf) — current" column
     And each row (or row group) carries a keep/merge/drop/wire recommendation in the merge/drop section
-    And the recommendation collapses redundancy (e.g. harness claude/sync validate fold into harness bindings validate; specs bc/ul fold into specs domain-coverage validate; git pre-commit and test-coverage validate are dropped)
-    And every recommendation stays unratified (❓ in the Decided column) until reviewed one-by-one
+    And the recommendation collapses redundancy (e.g. harness claude/sync validate fold into harness bindings validate; specs bc/ul fold into specs structure validate; git pre-commit and test-coverage validate are dropped)
+    And every verdict is ratified (Decided ✅ in the triage table) after one-by-one maintainer review
 ```
 
 ```gherkin
@@ -271,8 +272,8 @@ Feature: Every scenario is covered at exactly its required levels (explicit @cov
 Feature: Domain scenarios are covered (specs:domain:coverage)
 
   Scenario: An uncovered domain scenario fails the gate
-    Given a project whose spec scope holds a domain feature folder
-    And a domain scenario not covered at its required level by any @covers marker
+    Given a project listed in the repo-config.yml specs.domain-areas allowlist
+    And a domain scenario under domain/** not covered at its required level by any @covers marker
     When rhino-cli specs domain-coverage validate runs
     Then it fails and names the uncovered domain scenario
 ```
