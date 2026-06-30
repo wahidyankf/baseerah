@@ -25,6 +25,7 @@ Technical reference documentation for the open-sharia-enterprise project. These 
 ### Quality Infrastructure
 
 - [Code Coverage](./code-coverage.md) - How coverage is measured locally (rhino-cli), per-project thresholds, exclusion patterns, and troubleshooting
+- [SDLC Gate Standard](./sdlc-gate-standard.md) - Target standard for gate mechanics across all three OSE repos — gate command sequences, divergence policy, and canonical workflow filenames
 
 ### AI Models
 
@@ -39,6 +40,10 @@ Technical reference documentation for the open-sharia-enterprise project. These 
 ### Platform Bindings
 
 - [Platform Bindings](./platform-bindings.md) - Catalog of AI coding agent platform bindings (.claude/, .opencode/, AGENTS.md), binding directories, root instruction files, and mechanical translation artifacts
+
+### CLI Tools
+
+- [rhino-cli Command Triage](./rhino-cli-command-triage.md) - Full triage of all rhino-cli leaf commands: wired vs. not-wired, target verb-last names, invocation sites, harness binding coverage standard, and merge/drop recommendations
 
 ### Ecosystem
 
