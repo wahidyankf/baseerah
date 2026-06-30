@@ -32,7 +32,7 @@ by running the target, not a TDD code cycle.
 ### In Scope
 
 - Triage table covering every leaf subcommand under the 11 rhino-cli families (TestCoverage, RepoGovernance, Md, Convention, Harness, Workflows, Specs, Lang, Git, Env, Doctor), each with a one-line description, wired/not-wired status, and invocation site. [Repo-grounded]
-- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` gated by `domain/**` folder-presence). [Repo-grounded]
+- Nx target-name standardization: canonical lifecycle + `{domain}:{work}` names for every hook/CI-invoked target, identical rhino-cli target sets across the three repos (remove `fmt`/`format:check` → formatting via file-type lint-staged, shell/Dockerfile/workflow linting via lint-staged file-type entries (no `{tool}:lint` Nx targets), the binding validators (`harness bindings validate`/`generate`) + the env-guard run as direct `cargo run` calls (no `harness:bindings-validation`/`harness:bindings-generate` Nx targets), remove `test-coverage` → native `test:coverage`, `specs:coverage`→`specs:behavior:coverage` + new `specs:domain:coverage` gated by `domain/**` folder-presence, rename `deny:check`→`deps:audit` and `msrv:check`→`compat:min-version` and make both cross-language present-on-every-project columns — `deps:audit` (CVE + license via each language's native tool) CRON-only because uncacheable, `compat:min-version` (min-version-floor build, real only on Rust + Python) in the gates because cacheable). [Repo-grounded]
 - Single merged `repo-config.yml` (instruction-size + env-contract + env-injection sections); Codecov fully removed (native coverage only); every project covered by a standardized GitHub CI named per ose-public convention. [Repo-grounded]
 - Testing-architecture standard: mandatory-six targets (no `format`) on every project (echo where N/A), `test:quick` = typecheck→lint→test:unit→test:coverage→test:specs (test:specs aggregates the `specs:*` validators; all composed targets present on every project, echo where N/A), three levels consuming the same Gherkin, unit and integration tests in separate folders (`tests/unit` vs `tests/integration`; Rust co-located `#[cfg(test)]` + external `tests/`), BE service-level integration / FE-DB-only integration / `*-e2e`-only e2e, pre-push/PR/main-ci running `test:quick` while pre-commit stays fast (format + tool-lint + guards, no `test:quick`), no gate running integration/e2e (CRON-only), and rhino-cli per-level `@covers` coverage enforcement (the §4.1 registry + self-tag + exact-level model). [Repo-grounded]
 - rhino-cli surface rationalization: the command triage lists the **target** (end-state) command column before the current-form column, and carries a per-command keep/merge/drop/wire recommendation; **every** `harness` command (bindings, naming, instruction-size, duplication, audit) covers all 11 supported harnesses (source/generated/native tiers) via the `repo-config.yml` `harness:` registry — not just OpenCode + Amazon Q, and none hard-coded to a `.claude`/`.opencode` pair. [Judgment call]
@@ -148,13 +148,50 @@ Feature: test:quick runs typecheck, lint, test:unit, test:coverage, then test:sp
 Feature: The three test levels consume the same Gherkin
 
   Scenario: unit, integration, and e2e share feature files
-    Given a project with feature files under its specs gherkin directory
+    Given an app project keyed to its surface folder specs/apps/<domain>/behavior/<surface>/gherkin (one domain tree per apps/<domain>-* family)
+    Or a lib project keyed to its own specs/libs/<lib>/behavior/gherkin (per-project, identical structure)
     When test:unit, test:integration, and test:e2e run
     Then all three consume the same feature files driven by the same tags
     And every scenario is covered at exactly its required levels via explicit @covers markers (the §4.1 per-level model)
     And test:unit may additionally carry non-Gherkin unit tests for behaviour not expressed as scenarios
     And BE test:integration exercises behaviour at the service level, never through the HTTP API
     And the HTTP API surface is exercised only by test:e2e in the *-e2e project
+```
+
+```gherkin
+Feature: The specs tree uses one identical C4 structure across all projects and repos
+
+  Scenario: Every spec area carries the mandatory identical C4 tree with gherkin
+    Given any spec area (an app domain under specs/apps/<domain> or a lib under specs/libs/<lib>)
+    When specs:structure-validation runs
+    Then the area must contain product, system-context, containers, components, and behavior/.../gherkin folders
+    And every area carries gherkin (behavior is never empty)
+    And the same structure is required identically in all three repos
+    And a missing mandatory folder is a structure error
+
+  Scenario: ddd/ is required only for the explicitly listed ddd-areas
+    Given the repo-config.yml specs.ddd-areas allowlist
+    When specs:structure-validation runs
+    Then an area listed in ddd-areas must contain a ddd/ folder
+    And an area NOT listed must not contain a ddd/ folder
+    And the allowlist replaces the hardcoded apps_with_ddd() (explicit config, no name-suffix inference)
+```
+
+```gherkin
+Feature: Dependency-audit and min-version targets are cross-language and correctly placed
+
+  Scenario: deps:audit runs CRON-only because it is uncacheable
+    Given deps:audit queries a live advisory database (cache: false) and is slow on JVM/Clojure
+    When the gates run (pre-commit, pre-push, PR, main)
+    Then none of them runs deps:audit
+    And deps:audit runs only in the nightly deps-audit.yml CRON across all projects
+    And every project, including *-e2e runners, has a real deps:audit via its language's native CVE+license tool
+
+  Scenario: compat:min-version runs in the gates because it is cacheable
+    Given compat:min-version is a deterministic min-version-floor build
+    When pre-push, the PR gate, and main-ci run
+    Then each runs compat:min-version for its scoped projects
+    And it is real only on Rust (cargo hack) and Python (vermin) projects, echo elsewhere
 ```
 
 ```gherkin
@@ -327,14 +364,15 @@ Feature: Pre-push and PR gate run identical fast commands
 ```
 
 ```gherkin
-Feature: No quality gate runs heavy tests
+Feature: No quality gate runs heavy or uncacheable checks
 
-  Scenario: None of the four gates runs test:integration or test:e2e
+  Scenario: None of the four gates runs test:integration, test:e2e, or deps:audit
     Given the pre-commit, pre-push, PR quality, and post-merge main gates
+    And the gates are cacheable-by-construction so the cache can be warmed before commit/push
     When any of them runs
-    Then from pre-push onward it runs test:quick plus the governance/spec validators
+    Then from pre-push onward it runs test:quick plus compat:min-version (cacheable) plus the governance/spec validators
     And pre-commit runs the fast file-type set only, without test:quick
-    And none of the four gates runs test:integration or test:e2e
+    And none of the four gates runs test:integration, test:e2e, or deps:audit (all heavy or uncacheable)
 
   Scenario: Post-merge main CI re-verifies all projects on the fast gate
     Given a PR is merged to main touching one or more projects
@@ -368,7 +406,7 @@ Feature: Gate scope follows the affected-then-all rule
 ```
 
 ```gherkin
-Feature: Heavy tests and deploy run only on the scheduled CRON pipeline
+Feature: Heavy and uncacheable checks plus deploy run only on the scheduled CRON pipelines
 
   Scenario: The scheduled pipeline runs the full suite then deploys
     Given the scheduled *-test-local-deploy-stag pipeline runs
@@ -377,6 +415,13 @@ Feature: Heavy tests and deploy run only on the scheduled CRON pipeline
     And on success it deploys that app to staging independently
     And a failing app never blocks another app's tests or deploy
     And the *-test-stag pipeline promotes a green staging deployment to production
+
+  Scenario: The nightly deps-audit pipeline scans every project's dependencies
+    Given the scheduled deps-audit.yml pipeline runs nightly
+    When it executes
+    Then it runs deps:audit across all projects (CVE + license) against the live advisory DBs
+    And it fails on any CVE or license violation
+    And it is the only place deps:audit ever runs (never in a gate, because it is uncacheable)
 ```
 
 ```gherkin
