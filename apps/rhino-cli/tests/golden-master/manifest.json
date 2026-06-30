@@ -80,6 +80,10 @@
     "args": ["convention", "validate", "agents-md-size", "--help"]
   },
   {
+    "file": "convention-validate-instruction-size",
+    "args": ["convention", "validate", "instruction-size", "--help"]
+  },
+  {
     "file": "convention-audit",
     "args": ["convention", "audit", "--help"]
   },
@@ -106,6 +110,10 @@
   {
     "file": "harness-validate-bindings",
     "args": ["harness", "validate", "bindings", "--help"]
+  },
+  {
+    "file": "harness-validate-instruction-size",
+    "args": ["harness", "validate", "instruction-size", "--help"]
   },
   {
     "file": "harness-sync",
@@ -148,36 +156,20 @@
     "args": ["specs", "validate", "--help"]
   },
   {
-    "file": "specs-validate-adoption",
-    "args": ["specs", "validate", "adoption", "--help"]
-  },
-  {
-    "file": "specs-validate-counts",
-    "args": ["specs", "validate", "counts", "--help"]
-  },
-  {
-    "file": "specs-validate-links",
-    "args": ["specs", "validate", "links", "--help"]
-  },
-  {
-    "file": "specs-validate-tree",
-    "args": ["specs", "validate", "tree", "--help"]
-  },
-  {
-    "file": "specs-validate-coverage",
-    "args": ["specs", "validate", "coverage", "--help"]
-  },
-  {
-    "file": "specs-validate-bc",
-    "args": ["specs", "validate", "bc", "--help"]
-  },
-  {
-    "file": "specs-validate-ul",
-    "args": ["specs", "validate", "ul", "--help"]
-  },
-  {
     "file": "specs-validate-gherkin-cardinality",
     "args": ["specs", "validate", "gherkin-cardinality", "--help"]
+  },
+  {
+    "file": "specs-structure-validate",
+    "args": ["specs", "structure", "validate", "--help"]
+  },
+  {
+    "file": "specs-behavior-coverage-validate",
+    "args": ["specs", "behavior-coverage", "validate", "--help"]
+  },
+  {
+    "file": "specs-domain-coverage-validate",
+    "args": ["specs", "domain-coverage", "validate", "--help"]
   },
   {
     "file": "specs-audit",
@@ -234,6 +226,10 @@
   {
     "file": "env-validate",
     "args": ["env", "validate", "--help"]
+  },
+  {
+    "file": "env-staged-guard-validate",
+    "args": ["env", "staged-guard", "validate", "--help"]
   },
   {
     "file": "doctor",
