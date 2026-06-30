@@ -31,9 +31,7 @@ harness:
   - { name: opencode, tier: generated, agent-dir: .opencode/agents, mirrors: .claude/agents }
   - name: amazonq
     tier: generated
-    agent-dir: .amazonq/cli-agents
     rules-dir: .amazonq/rules
-    mirrors: .claude/agents
     instruction:
       - .amazonq/rules/*.md
   - name: codex
