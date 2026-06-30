@@ -44,7 +44,7 @@ by running the target, not a TDD code cycle.
 
 - App-set / language-set unification.
 - Validator logic changes.
-- Removing or newly-wiring not-wired commands (triage only).
+- Net-new validator behavior — the §3.3 ratified command removals/merges/wirings are in scope and executed here, but no surviving validator's checks change (no new lint rule or threshold).
 - New automated parity-enforcement tooling (noted as a follow-up).
 
 ## Acceptance Criteria (Gherkin)

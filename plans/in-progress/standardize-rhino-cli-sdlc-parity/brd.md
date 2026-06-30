@@ -51,7 +51,7 @@ truth) can be propagated to the siblings without per-repo translation friction.
 
 - Not changing **what** any validator checks (no new lint rules, no threshold changes).
 - Not unifying the **app set** or **language set** across repos.
-- Not removing not-wired commands — triage only; any removal/wiring decision is a follow-up.
+- Not net-new validator behavior — the §3.3 ratified command removals, merges, and wirings **are** executed by this plan (not deferred to a follow-up); but no surviving validator gains a new rule or threshold. The only deferred item is an optional automated parity-enforcement check (see Business Risks).
 
 ## Business Risks
 
