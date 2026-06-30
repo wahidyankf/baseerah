@@ -50,18 +50,27 @@
         "cwd": "{projectRoot}"
       }
     },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx vitest run --project unit-fe --coverage --coverage.thresholds.lines=80",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "outputs": ["{projectRoot}/coverage"],
+      "inputs": ["{projectRoot}/src/**/*", "{projectRoot}/tests/**/*"]
+    },
     "test:quick": {
       "executor": "nx:run-commands",
-      "dependsOn": ["rhino-cli:build"],
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www/gherkin/**/*.feature"],
-      "outputs": ["{projectRoot}/coverage"],
       "options": {
         "commands": [
-          "npx vitest run --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/organiclever-www/coverage/lcov.info 80)"
+          "npx nx run organiclever-www:typecheck",
+          "npx nx run organiclever-www:lint",
+          "npx nx run organiclever-www:test:unit",
+          "npx nx run organiclever-www:test:coverage"
         ],
-        "parallel": false,
-        "cwd": "{projectRoot}"
+        "parallel": false
       }
     },
     "test:integration": {
@@ -88,10 +97,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

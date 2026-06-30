@@ -73,7 +73,7 @@
         "{workspaceRoot}/specs/apps/crane/behavior/crane-cli/gherkin/**/*.feature"
       ]
     },
-    "test:quick": {
+    "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "dotnet test apps/crane-cli/tests/unit/crane-cli-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line \"/p:ExcludeByFile=**/Adapters/In/CliAdapter.fs%2C**/Adapters/Out/PdfAdapter.fs%2C**/Adapters/Out/OcrAdapter.fs%2C**/Program.fs\""
@@ -85,6 +85,19 @@
         "{projectRoot}/crane-cli.fsproj",
         "{workspaceRoot}/specs/apps/crane/behavior/crane-cli/gherkin/**/*.feature"
       ]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run crane-cli:typecheck",
+          "npx nx run crane-cli:lint",
+          "npx nx run crane-cli:test:unit",
+          "npx nx run crane-cli:test:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -111,10 +124,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "dotnet list apps/crane-cli/crane-cli.fsproj package --vulnerable"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for F#'"
       },
       "cache": true
     }

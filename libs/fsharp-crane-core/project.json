@@ -60,7 +60,7 @@
         "{projectRoot}/fsharp-crane-core.fsproj"
       ]
     },
-    "test:quick": {
+    "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "dotnet test libs/fsharp-crane-core/tests/unit/fsharp-crane-core-unit-tests.fsproj /p:CollectCoverage=true /p:Threshold=95 /p:ThresholdType=line \"/p:ExcludeByFile=**/Adapters/Out/PdfAdapter.fs%2C**/Adapters/Out/OcrAdapter.fs\""
@@ -71,6 +71,19 @@
         "{projectRoot}/tests/unit/**/*.fs",
         "{projectRoot}/fsharp-crane-core.fsproj"
       ]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run fsharp-crane-core:typecheck",
+          "npx nx run fsharp-crane-core:lint",
+          "npx nx run fsharp-crane-core:test:unit",
+          "npx nx run fsharp-crane-core:test:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true
     },
     "specs:coverage": {
       "executor": "nx:run-commands",
@@ -93,10 +106,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "dotnet list libs/fsharp-crane-core/fsharp-crane-core.fsproj package --vulnerable"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for F#'"
       },
       "cache": true
     }

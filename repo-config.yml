@@ -5,14 +5,12 @@
 # project set and surfaces. rhino-cli commands read their relevant section.
 #
 # Sections defined here:
-#   harness    — all-harness binding registry (§3.2); EVERY `harness` command reads this list
-#   coverage   — per-project test-level registry (specs:behavior:coverage + specs:domain:coverage)
-#   specs      — spec-tree structure config (specs:structure-validation)
-#
-# Future sections (not yet active):
-#   instruction-size  — was instruction-size-budget.yaml
-#   env-contract      — was env-contract.yaml
-#   env-injection     — was env-injection.yaml
+#   harness          — all-harness binding registry (§3.2); EVERY `harness` command reads this list
+#   coverage         — per-project test-level registry (specs:behavior:coverage + specs:domain:coverage)
+#   specs            — spec-tree structure config (specs:structure-validation)
+#   instruction-size — per-surface instruction-file byte budgets (rhino-cli harness instruction-size validate)
+#   env-contract     — surface registry for rhino-cli env validate (code↔config drift detection)
+#   env-injection    — value-less injection manifest for rhino-cli env validate (manifest-consistency)
 
 harness:
   # Authoritative harness registry — all 11 supported coding-agent harnesses.
@@ -169,3 +167,178 @@ specs:
   domain-areas:
     - organiclever-be
     - ose-be
+
+instruction-size:
+  surfaces:
+    - glob: "AGENTS.md"
+      target: 24000
+      warn: 27000
+      fail: 30000
+    - glob: "**/AGENTS.md"
+      target: 24000
+      warn: 27000
+      fail: 30000
+    - glob: "CLAUDE.md"
+      target: 6000
+      warn: 8000
+      fail: 10000
+    - glob: ".amazonq/rules/*.md"
+      target: 4000
+      warn: 8000
+      fail: 12000
+    - glob: ".windsurf/rules/*.md"
+      target: 6000
+      warn: 9000
+      fail: 12000
+    - glob: ".cursor/rules/*.mdc"
+      target: 4000
+      warn: 8000
+      fail: 12000
+    - glob: ".junie/guidelines.md"
+      target: 6000
+      warn: 8000
+      fail: 10000
+    - glob: ".github/copilot-instructions.md"
+      target: 6000
+      warn: 8000
+      fail: 10000
+    - glob: "CONVENTIONS.md"
+      target: 10000
+      warn: 13000
+      fail: 16000
+  resolved_tree:
+    root: "CLAUDE.md"
+    target: 30000
+    warn: 34000
+    fail: 38000
+
+env-contract:
+  # Surface registry for rhino-cli env validate (code↔config drift detection).
+  # Companion: env-injection: declares, per app, the injection HOME for each key
+  # at every deploy stage (names only, never values).
+  #
+  # Each surface entry carries:
+  #   root      — path relative to repo root
+  #   kind      — "app" (active); "terraform"/"ansible" are forward-scaffold
+  #   lang      — "rust" or "typescript" (app kind only)
+  #   allowlist — keys exempt from drift detection (framework-injected, test-only, etc.)
+  surfaces:
+    - root: apps/organiclever-be
+      kind: app
+      lang: fsharp
+      allowlist:
+        # Forward-declared config not yet consumed by the Phase 1 F# shell
+        # (wired in later phases); declared in .env.example ahead of use.
+        - ORGANICLEVER_BE_PORT
+        - ORGANICLEVER_BE_CORS_ORIGINS
+
+    - root: apps/ose-be
+      kind: app
+      lang: fsharp
+      allowlist:
+        # Forward-declared config not yet consumed by the Phase 1 F# shell
+        # (port/CORS + OpenRouter wired in later phases); declared ahead of use.
+        - OSE_BE_PORT
+        - OSE_BE_CORS_ORIGINS
+        - OSE_BE_OPENROUTER_API_KEY
+        - OSE_BE_OPENROUTER_MODEL
+        - OSE_BE_OPENROUTER_BASE_URL
+
+    - root: apps/ose-www
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT # framework-reserved Next.js dev-server port
+        - HOSTNAME # framework-reserved Next.js dev-server hostname
+
+    - root: apps/ayokoding-www
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT
+        - HOSTNAME
+
+    - root: apps/organiclever-www
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT # framework-reserved Next.js dev-server port
+        - HOSTNAME # framework-reserved Next.js dev-server hostname
+
+    - root: apps/organiclever-app-web
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT
+        - HOSTNAME
+
+    - root: apps/ose-app-web
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT
+        - HOSTNAME
+
+    - root: apps/wahidyankf-www
+      kind: app
+      lang: typescript
+      allowlist:
+        - PORT
+        - HOSTNAME
+
+env-injection:
+  # Value-less injection contract (extends env-contract:).
+  # Declares, per app, the injection HOME for its env keys at every deploy stage
+  # it runs in — NAMES ONLY, never values.
+  #
+  # Injection homes:
+  #   env-local         — gitignored apps/<app>/.env.local (developer machine)
+  #   compose           — infra/dev/<stack> docker-compose env (local CI), placeholders only
+  #   vercel-preview     — Vercel project env, Preview scope (stag-*-app-web branch)
+  #   vercel-production  — Vercel project env, Production scope (prod-*-www / prod-*-app-web)
+  #   k3s-coralpolyp     — ose-infra coralpolyp secret store (backend k3s rollout)
+  apps:
+    # --- www tier (direct-to-prod; e2e runs on local compose) ---
+    - app: ose-www
+      keys-from: apps/ose-www/.env.example
+      runtime: { local: env-local, local-ci: compose, production: vercel-production }
+    - app: ayokoding-www
+      keys-from: apps/ayokoding-www/.env.example
+      runtime: { local: env-local, local-ci: compose, production: vercel-production }
+    - app: organiclever-www
+      keys-from: apps/organiclever-www/.env.example
+      runtime: { local: env-local, local-ci: compose, production: vercel-production }
+    - app: wahidyankf-www
+      keys-from: apps/wahidyankf-www/.env.example
+      runtime: { local: env-local, local-ci: compose, production: vercel-production }
+
+    # --- app-web tier (gated staging promotion) ---
+    - app: organiclever-app-web
+      keys-from: apps/organiclever-app-web/.env.example
+      runtime: { local: env-local, local-ci: compose, staging: vercel-preview, production: vercel-production }
+    - app: ose-app-web
+      keys-from: apps/ose-app-web/.env.example
+      runtime: { local: env-local, local-ci: compose, staging: vercel-preview, production: vercel-production }
+
+    # --- backend tier (non-Vercel; k3s via ose-infra coralpolyp) ---
+    - app: organiclever-be
+      keys-from: apps/organiclever-be/.env.example
+      runtime: { local-ci: compose, staging: k3s-coralpolyp }
+    - app: ose-be
+      keys-from: apps/ose-be/.env.example
+      runtime: { local-ci: compose, staging: k3s-coralpolyp }
+
+  # CI test-harness keys — test-only, NEVER in any apps/<app>/.env.example.
+  ci-harness:
+    - key: API_BASE_URL
+      class: var
+      environments: [organiclever-app-staging, ose-app-staging]
+    - key: WEB_BASE_URL
+      class: var
+      environments: [organiclever-app-staging, ose-app-staging]
+    - key: VERCEL_AUTOMATION_BYPASS_SECRET
+      class: secret
+      environments: [organiclever-app-staging, ose-app-staging]
+    - key: PLAYWRIGHT_GREP_INVERT
+      class: literal
+      environments: []

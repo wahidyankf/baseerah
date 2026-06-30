@@ -7,7 +7,7 @@
     "codegen": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'No codegen needed — ayokoding-www has no OpenAPI contract'",
+        "command": "echo 'No codegen needed \u2014 ayokoding-www has no OpenAPI contract'",
         "cwd": "{projectRoot}"
       }
     },
@@ -78,22 +78,27 @@
         "cwd": "{projectRoot}"
       }
     },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx vitest run --project unit --project unit-fe --coverage --coverage.thresholds.lines=82",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "outputs": ["{projectRoot}/coverage"],
+      "inputs": ["{projectRoot}/src/**/*", "{projectRoot}/tests/**/*"]
+    },
     "test:quick": {
       "executor": "nx:run-commands",
-      "dependsOn": ["ayokoding-cli:build"],
-      "inputs": [
-        "default",
-        "{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-be/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-www/gherkin/**/*.feature"
-      ],
+      "cache": true,
       "options": {
         "commands": [
-          "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ayokoding-www/coverage/lcov.info 82)",
-          "../../apps/ayokoding-cli/dist/ayokoding-cli links check --content content",
-          "npx tsx src/scripts/generate-indexes.ts --validate"
+          "npx nx run ayokoding-www:typecheck",
+          "npx nx run ayokoding-www:lint",
+          "npx nx run ayokoding-www:test:unit",
+          "npx nx run ayokoding-www:test:coverage"
         ],
-        "parallel": false,
-        "cwd": "{projectRoot}"
+        "parallel": false
       }
     },
     "test:integration": {
@@ -124,10 +129,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

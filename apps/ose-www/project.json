@@ -63,26 +63,28 @@
       "inputs": ["{projectRoot}/src/**/*", "{projectRoot}/test/unit/**/*", "{projectRoot}/vitest.config.ts"],
       "cache": true
     },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx vitest run --project unit --project unit-fe --coverage --coverage.thresholds.lines=86",
+        "cwd": "apps/ose-www"
+      },
+      "cache": true,
+      "outputs": ["{projectRoot}/coverage"],
+      "inputs": ["{projectRoot}/src/**/*", "{projectRoot}/tests/**/*"]
+    },
     "test:quick": {
       "executor": "nx:run-commands",
-      "dependsOn": ["ose-cli:build"],
+      "cache": true,
       "options": {
-        "cwd": "apps/ose-www",
         "commands": [
-          "npx vitest run --project unit --project unit-fe --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ose-www/coverage/lcov.info 86)",
-          "../../apps/ose-cli/dist/ose-cli links check --content content"
+          "npx nx run ose-www:typecheck",
+          "npx nx run ose-www:lint",
+          "npx nx run ose-www:test:unit",
+          "npx nx run ose-www:test:coverage"
         ],
         "parallel": false
-      },
-      "inputs": [
-        "{projectRoot}/src/**/*",
-        "{projectRoot}/test/unit/**/*",
-        "{projectRoot}/content/**/*.md",
-        "{projectRoot}/vitest.config.ts",
-        "{workspaceRoot}/specs/apps/ose/behavior/platform-web/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/ose/behavior/platform-be/gherkin/**/*.feature"
-      ],
-      "cache": true
+      }
     },
     "test:integration": {
       "command": "vitest run --project integration",
@@ -119,10 +121,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

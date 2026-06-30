@@ -56,19 +56,6 @@
         "{projectRoot}/tsconfig.json"
       ]
     },
-    "test:quick": {
-      "executor": "nx:run-commands",
-      "cache": true,
-      "inputs": ["default", "{projectRoot}/src/generated-contracts/**/*"],
-      "outputs": ["{projectRoot}/coverage"],
-      "options": {
-        "commands": [
-          "npx vitest run --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/ose-app-web/coverage/lcov.info 88)"
-        ],
-        "parallel": false,
-        "cwd": "{projectRoot}"
-      }
-    },
     "test:unit": {
       "executor": "nx:run-commands",
       "cache": true,
@@ -78,6 +65,29 @@
         "cwd": "{projectRoot}"
       },
       "dependsOn": []
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx vitest run --coverage --coverage.thresholds.lines=88",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "outputs": ["{projectRoot}/coverage"],
+      "inputs": ["{projectRoot}/src/**/*", "{projectRoot}/tests/**/*"]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "commands": [
+          "npx nx run ose-app-web:typecheck",
+          "npx nx run ose-app-web:lint",
+          "npx nx run ose-app-web:test:unit",
+          "npx nx run ose-app-web:test:coverage"
+        ],
+        "parallel": false
+      }
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -119,10 +129,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

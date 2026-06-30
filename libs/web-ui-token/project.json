@@ -23,6 +23,13 @@
       },
       "cache": true
     },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
@@ -44,10 +51,30 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "commands": [
+          "npx nx run web-ui-token:typecheck",
+          "npx nx run web-ui-token:lint",
+          "npx nx run web-ui-token:test:unit",
+          "npx nx run web-ui-token:test:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true
+    },
+    "deps:audit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

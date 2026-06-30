@@ -56,13 +56,27 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
     },
-    "test:quick": {
+    "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cargo llvm-cov --manifest-path libs/rust-commons/Cargo.toml --lib --fail-under-lines 90"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
+      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"],
+      "outputs": ["{projectRoot}/lcov.info"]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run rust-commons:typecheck",
+          "npx nx run rust-commons:lint",
+          "npx nx run rust-commons:test:unit",
+          "npx nx run rust-commons:test:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true
     },
     "specs:coverage": {
       "executor": "nx:run-commands",
@@ -86,12 +100,20 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "echo 'deps:audit: rust-commons is a workspace library; audited via cargo deny on consumers (rhino-cli, ayokoding-cli, ose-cli)'"
       },
-      "cache": true
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo hack --manifest-path libs/rust-commons/Cargo.toml check --rust-version"
+      },
+      "cache": true,
+      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
     }
   }
 }

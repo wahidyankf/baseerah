@@ -26,12 +26,31 @@
         "cwd": "{projectRoot}"
       }
     },
-    "test:quick": {
+    "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["tsc --noEmit", "npx oxlint@latest ."],
-        "parallel": true,
-        "cwd": "{projectRoot}"
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "commands": [
+          "npx nx run wahidyankf-www-fe-e2e:typecheck",
+          "npx nx run wahidyankf-www-fe-e2e:lint",
+          "npx nx run wahidyankf-www-fe-e2e:test:unit",
+          "npx nx run wahidyankf-www-fe-e2e:test:coverage"
+        ],
+        "parallel": false
       },
       "inputs": ["default", "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature"]
     },
@@ -56,13 +75,6 @@
         "cwd": "{projectRoot}"
       }
     },
-    "test:unit": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
-      },
-      "cache": true
-    },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
@@ -77,10 +89,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

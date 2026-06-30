@@ -26,12 +26,31 @@
       },
       "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature"]
     },
-    "test:quick": {
+    "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["npx oxlint@latest .", "npx bddgen && npx tsc --noEmit"],
-        "parallel": true,
-        "cwd": "apps/organiclever-be-e2e"
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "commands": [
+          "npx nx run organiclever-be-e2e:typecheck",
+          "npx nx run organiclever-be-e2e:lint",
+          "npx nx run organiclever-be-e2e:test:unit",
+          "npx nx run organiclever-be-e2e:test:coverage"
+        ],
+        "parallel": false
       },
       "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature"]
     },
@@ -66,13 +85,6 @@
         "{projectRoot}/steps/**/*.ts"
       ]
     },
-    "test:unit": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
-      },
-      "cache": true
-    },
     "test:integration": {
       "executor": "nx:run-commands",
       "options": {
@@ -80,10 +92,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "npm audit"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
       },
       "cache": true
     }

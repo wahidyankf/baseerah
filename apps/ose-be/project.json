@@ -96,18 +96,26 @@
         "{projectRoot}/src/OseBe/OseBe.fsproj"
       ]
     },
-    "test:quick": {
-      "dependsOn": ["codegen", "typecheck"],
+    "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "dotnet test apps/ose-be/tests/unit/OseBe.UnitTests.fsproj"
+        "command": "dotnet test apps/ose-be/tests/unit/OseBe.UnitTests.fsproj --collect:\"XPlat Code Coverage\" /p:Threshold=80 /p:ThresholdType=line"
       },
       "cache": true,
-      "inputs": [
-        "{projectRoot}/src/**/*.fs",
-        "{projectRoot}/tests/unit/**/*.fs",
-        "{projectRoot}/src/OseBe/OseBe.fsproj"
-      ]
+      "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/tests/unit/**/*.fs"]
+    },
+    "test:quick": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run ose-be:typecheck",
+          "npx nx run ose-be:lint",
+          "npx nx run ose-be:test:unit",
+          "npx nx run ose-be:test:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -139,10 +147,17 @@
       },
       "cache": true
     },
-    "test-coverage": {
+    "deps:audit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "dotnet list apps/ose-be/src/OseBe/OseBe.fsproj package --vulnerable"
+      },
+      "cache": false
+    },
+    "compat:min-version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'compat:min-version: no standard min-version floor for F#'"
       },
       "cache": true
     }
