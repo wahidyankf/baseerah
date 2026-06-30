@@ -10,7 +10,6 @@ npx nx affected -t compat:min-version --parallel="$PARALLEL"
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
-cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
 
 # Naming validators — scoped to pushes that touch the relevant trees.
 # Upstream may be missing on first push of a branch; default to empty range in that case.
@@ -31,6 +30,11 @@ if [ -n "$RANGE" ]; then
   # run when binding or parity-relevant surfaces change.
   if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|CLAUDE\.md$|docs/reference/platform-bindings\.md$|repo-governance/.*\.md$|\.claude/|\.opencode/|\.codex/|\.github/|\.cursor/|\.windsurf/|\.junie/|GEMINI\.md$|CONVENTIONS\.md$)'; then
     cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness bindings validate
+  fi
+  # Duplication gate: run when agent or skill source files change.
+  # Pre-existing structural boilerplate is grandfathered; this gate prevents NEW duplication.
+  if echo "$CHANGED" | grep -qE '^(\.claude/agents/|\.claude/skills/)'; then
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
   fi
   # Instruction-size budget gate: run when any auto-loaded instruction surface changes.
   if echo "$CHANGED" | grep -qE '^(AGENTS\.md$|CLAUDE\.md$|repo-config\.yml$|\.amazonq/rules/|\.windsurf/rules/|\.cursor/rules/|\.junie/guidelines\.md$|\.github/copilot-instructions\.md$|CONVENTIONS\.md$)'; then
