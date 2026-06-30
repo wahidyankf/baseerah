@@ -116,14 +116,25 @@
       },
       "cache": false
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir messaging specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps --exclude-dir messaging specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be"
       },
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature",
+        "{projectRoot}/src/**/*.fs"
+      ]
+    },
+    "specs:domain:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs domain-coverage validate --shared-steps --exclude-dir messaging specs/apps/organiclever/behavior/organiclever-be/gherkin/domain apps/organiclever-be"
+      },
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/domain/**/*.feature",
         "{projectRoot}/src/**/*.fs"
       ]
     },

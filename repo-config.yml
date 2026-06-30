@@ -1,0 +1,171 @@
+# repo-config.yml — schema: rhino-cli/repo-config/v1
+#
+# Unified repository configuration. Structure is byte-identical across all three
+# repos (ose-public, ose-primer, ose-infra); values reflect each repo's actual
+# project set and surfaces. rhino-cli commands read their relevant section.
+#
+# Sections defined here:
+#   harness    — all-harness binding registry (§3.2); EVERY `harness` command reads this list
+#   coverage   — per-project test-level registry (specs:behavior:coverage + specs:domain:coverage)
+#   specs      — spec-tree structure config (specs:structure-validation)
+#
+# Future sections (not yet active):
+#   instruction-size  — was instruction-size-budget.yaml
+#   env-contract      — was env-contract.yaml
+#   env-injection     — was env-injection.yaml
+
+harness:
+  # Authoritative harness registry — all 11 supported coding-agent harnesses.
+  # Fields per entry:
+  #   name        — harness identifier
+  #   tier        — source | generated | source-config | native
+  #   agent-dir   — directory of per-agent files (naming/duplication checks)
+  #   skills-dir  — directory of skill files (source tier only)
+  #   rules-dir   — directory of injected rules (generated tier only)
+  #   mirrors     — source agent-dir this entry must mirror (generated tier)
+  #   config      — config file path (source-config tier)
+  #   forbid-dir  — directory that must NOT exist (source-config tier)
+  #   shadow      — thin-pointer file to check for no-shadowing (native tier)
+  #   instruction — instruction surfaces this harness reads (instruction-size budget)
+  #
+  # Adding a 12th harness = one entry here; every harness command picks it up automatically.
+  - { name: claude-code, tier: source, agent-dir: .claude/agents, skills-dir: .claude/skills, instruction: [CLAUDE.md] }
+  - { name: opencode, tier: generated, agent-dir: .opencode/agents, mirrors: .claude/agents }
+  - name: amazonq
+    tier: generated
+    agent-dir: .amazonq/cli-agents
+    rules-dir: .amazonq/rules
+    mirrors: .claude/agents
+    instruction:
+      - .amazonq/rules/*.md
+  - name: codex
+    tier: source-config
+    config: .codex/config.toml
+    forbid-dir: .codex/agents
+    instruction:
+      - AGENTS.md
+  - {
+      name: copilot,
+      tier: native,
+      shadow: .github/copilot-instructions.md,
+      instruction: [AGENTS.md, .github/copilot-instructions.md],
+    }
+  - { name: cursor, tier: native, shadow: .cursor/rules, instruction: [AGENTS.md, .cursor/rules] }
+  - { name: windsurf, tier: native, shadow: .windsurf/rules, instruction: [AGENTS.md, .windsurf/rules] }
+  - { name: junie, tier: native, shadow: .junie/guidelines.md, instruction: [AGENTS.md, .junie/guidelines.md] }
+  - { name: antigravity, tier: native, shadow: GEMINI.md, instruction: [AGENTS.md, GEMINI.md] }
+  - { name: pi, tier: native, instruction: [AGENTS.md, CLAUDE.md] }
+  - { name: aider, tier: native, shadow: CONVENTIONS.md, instruction: [AGENTS.md, CONVENTIONS.md] }
+
+coverage:
+  # Explicit per-project test-level registry. One entry per Nx project (apps,
+  # libs, *-e2e). No convention-derived defaults — every project is listed.
+  # A scenario's level envelope P = union of `levels` across ALL entries whose
+  # `specs` glob matches that scenario's feature file.
+  # `levels` = the test levels this project runs at.
+  # `specs`  = the feature-file glob this project owns (surface-precise for apps;
+  #             per-project for libs).
+  projects:
+    # rhino-cli (tooling)
+    - name: rhino-cli
+      levels: [unit, integration]
+      specs: "specs/apps/rhino/behavior/rhino-cli/**"
+
+    # ose domain
+    - name: ose-be
+      levels: [unit, integration]
+      specs: "specs/apps/ose/behavior/be/**"
+    - name: ose-be-e2e
+      levels: [e2e]
+      specs: "specs/apps/ose/behavior/be/**"
+    - name: ose-app-web
+      levels: [unit]
+      specs: "specs/apps/ose/behavior/app-web/**"
+    - name: ose-app-web-e2e
+      levels: [e2e]
+      specs: "specs/apps/ose/behavior/app-web/**"
+    - name: ose-www
+      levels: [unit]
+      specs: "specs/apps/ose/behavior/www/**"
+    - name: ose-www-be-e2e
+      levels: [e2e]
+      specs: "specs/apps/ose/behavior/www/**"
+    - name: ose-www-fe-e2e
+      levels: [e2e]
+      specs: "specs/apps/ose/behavior/www/**"
+    - name: ose-cli
+      levels: [unit, integration]
+      specs: "specs/apps/ose/behavior/cli/**"
+
+    # organiclever domain
+    - name: organiclever-be
+      levels: [unit, integration]
+      specs: "specs/apps/organiclever/behavior/be/**"
+    - name: organiclever-be-e2e
+      levels: [e2e]
+      specs: "specs/apps/organiclever/behavior/be/**"
+    - name: organiclever-app-web
+      levels: [unit]
+      specs: "specs/apps/organiclever/behavior/app-web/**"
+    - name: organiclever-app-web-e2e
+      levels: [e2e]
+      specs: "specs/apps/organiclever/behavior/app-web/**"
+    - name: organiclever-www
+      levels: [unit]
+      specs: "specs/apps/organiclever/behavior/www/**"
+    - name: organiclever-www-be-e2e
+      levels: [e2e]
+      specs: "specs/apps/organiclever/behavior/www/**"
+    - name: organiclever-www-fe-e2e
+      levels: [e2e]
+      specs: "specs/apps/organiclever/behavior/www/**"
+
+    # ayokoding domain
+    - name: ayokoding-www
+      levels: [unit]
+      specs: "specs/apps/ayokoding/behavior/www/**"
+    - name: ayokoding-www-be-e2e
+      levels: [e2e]
+      specs: "specs/apps/ayokoding/behavior/www/**"
+    - name: ayokoding-www-fe-e2e
+      levels: [e2e]
+      specs: "specs/apps/ayokoding/behavior/www/**"
+    - name: ayokoding-cli
+      levels: [unit, integration]
+      specs: "specs/apps/ayokoding/behavior/cli/**"
+
+    # wahidyankf domain
+    - name: wahidyankf-www
+      levels: [unit]
+      specs: "specs/apps/wahidyankf/behavior/www/**"
+    - name: wahidyankf-www-fe-e2e
+      levels: [e2e]
+      specs: "specs/apps/wahidyankf/behavior/www/**"
+
+    # crane domain
+    - name: crane-cli
+      levels: [unit, integration]
+      specs: "specs/apps/crane/behavior/cli/**"
+
+    # libs
+    - name: rust-commons
+      levels: [unit]
+      specs: "specs/libs/rust-commons/behavior/**"
+    - name: web-ui
+      levels: [unit]
+      specs: "specs/libs/web-ui/behavior/**"
+
+specs:
+  # Areas that must carry a ddd/ folder (bounded-context registry). Lifts the
+  # hardcoded apps_with_ddd() allowlist into explicit config.
+  # An area NOT listed must NOT carry ddd/ (unlisted area with ddd/ = error).
+  ddd-areas:
+    - organiclever
+    - ose
+
+  # Areas eligible for specs:domain:coverage (explicit allowlist; distinct from
+  # ddd-areas). A project NOT listed is skipped even if it has domain/** features.
+  # Today: the *-be backends that own domain-bounded-context feature files.
+  domain-areas:
+    - organiclever-be
+    - ose-be

@@ -3,10 +3,12 @@
 use std::collections::HashMap;
 use std::fmt::Write as FmtWrite;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Error};
 use sha2::{Digest, Sha256};
+
+use crate::application::repo_config;
 
 /// Number of consecutive normalized lines used as a duplication window.
 pub const DUPLICATION_WINDOW_SIZE: usize = 10;
@@ -101,50 +103,88 @@ pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<Duplicati
     Ok(findings)
 }
 
+/// Return source-tier agent and skill directories derived from `repo-config.yml`.
+///
+/// Falls back to `.claude/agents` + `.claude/skills` when the registry is absent or has no
+/// source-tier entries — preserving pre-registry behavior for callers without a config file.
+fn source_dirs_from_registry(repo_root: &Path) -> (Vec<PathBuf>, Vec<PathBuf>) {
+    let config = repo_config::load_or_default(repo_root);
+    let agent_dirs: Vec<PathBuf> = config
+        .harness
+        .iter()
+        .filter(|e| e.is_source_with_agents())
+        .filter_map(|e| e.agent_dir.as_deref())
+        .map(|d| repo_root.join(d))
+        .collect();
+    let skills_dirs: Vec<PathBuf> = config
+        .harness
+        .iter()
+        .filter(|e| e.tier == "source" && e.skills_dir.is_some())
+        .filter_map(|e| e.skills_dir.as_deref())
+        .map(|d| repo_root.join(d))
+        .collect();
+    let agents = if agent_dirs.is_empty() {
+        vec![repo_root.join(".claude").join("agents")]
+    } else {
+        agent_dirs
+    };
+    let skills = if skills_dirs.is_empty() {
+        vec![repo_root.join(".claude").join("skills")]
+    } else {
+        skills_dirs
+    };
+    (agents, skills)
+}
+
 /// Collect all agent `.md` and skill `SKILL.md` file paths under `repo_root`.
+///
+/// Source dirs are derived from `repo-config.yml` when available; falls back to `.claude/`.
 ///
 /// # Errors
 ///
-/// Returns an error if `.claude/agents/` or `.claude/skills/` exists but cannot be read.
+/// Returns an error if an agent or skill directory exists but cannot be read.
 fn enumerate_agent_and_skill_files(repo_root: &Path) -> std::result::Result<Vec<String>, Error> {
+    let (agent_dirs, skills_dirs) = source_dirs_from_registry(repo_root);
     let mut files = Vec::new();
 
-    let agents_dir = repo_root.join(".claude").join("agents");
-    match fs::read_dir(&agents_dir) {
-        Ok(entries) => {
-            for entry in entries.flatten() {
-                if entry.file_type().is_ok_and(|t| t.is_dir()) {
-                    continue;
+    for agents_dir in &agent_dirs {
+        match fs::read_dir(agents_dir) {
+            Ok(entries) => {
+                for entry in entries.flatten() {
+                    if entry.file_type().is_ok_and(|t| t.is_dir()) {
+                        continue;
+                    }
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    if !name.ends_with(".md") || name == "README.md" {
+                        continue;
+                    }
+                    files.push(entry.path().to_string_lossy().to_string());
                 }
-                let name = entry.file_name().to_string_lossy().to_string();
-                if !name.ends_with(".md") || name == "README.md" {
-                    continue;
-                }
-                files.push(entry.path().to_string_lossy().to_string());
             }
-        }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-        Err(e) => {
-            return Err(Error::msg(format!("read {}: {e}", agents_dir.display())));
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => {
+                return Err(Error::msg(format!("read {}: {e}", agents_dir.display())));
+            }
         }
     }
 
-    let skills_dir = repo_root.join(".claude").join("skills");
-    match fs::read_dir(&skills_dir) {
-        Ok(entries) => {
-            for entry in entries.flatten() {
-                if !entry.file_type().is_ok_and(|t| t.is_dir()) {
-                    continue;
-                }
-                let skill_file = entry.path().join("SKILL.md");
-                if skill_file.exists() {
-                    files.push(skill_file.to_string_lossy().to_string());
+    for skills_dir in &skills_dirs {
+        match fs::read_dir(skills_dir) {
+            Ok(entries) => {
+                for entry in entries.flatten() {
+                    if !entry.file_type().is_ok_and(|t| t.is_dir()) {
+                        continue;
+                    }
+                    let skill_file = entry.path().join("SKILL.md");
+                    if skill_file.exists() {
+                        files.push(skill_file.to_string_lossy().to_string());
+                    }
                 }
             }
-        }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-        Err(e) => {
-            return Err(Error::msg(format!("read {}: {e}", skills_dir.display())));
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+            Err(e) => {
+                return Err(Error::msg(format!("read {}: {e}", skills_dir.display())));
+            }
         }
     }
 
@@ -455,5 +495,36 @@ mod tests {
     fn strip_frontmatter_unclosed_returns_unchanged() {
         let s = "---\nfoo: bar\nbody no close fence\n";
         assert_eq!(strip_frontmatter(s), s);
+    }
+
+    #[test]
+    fn detect_duplication_uses_registry_source_agent_dir() {
+        // RED: detect_duplication must read source agent-dir from repo-config.yml harness: registry.
+        // Fails because current code is hard-coded to .claude/agents/.
+        let tmp = TempDir::new().unwrap();
+        let repo_config = concat!(
+            "harness:\n",
+            "  - { name: my-harness, tier: source, agent-dir: .my-agents,",
+            " skills-dir: .my-skills }\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), repo_config).unwrap();
+        // Duplicate content only in the registry-declared custom agent dir
+        let custom_agents = tmp.path().join(".my-agents");
+        fs::create_dir_all(&custom_agents).unwrap();
+        let dup_body = "---\nname: x\n---\n".to_string()
+            + &(0..15)
+                .map(|i| format!("Line content {i}\n"))
+                .collect::<String>();
+        fs::write(custom_agents.join("foo-maker.md"), &dup_body).unwrap();
+        fs::write(custom_agents.join("bar-maker.md"), &dup_body).unwrap();
+        // Current code: reads .claude/agents (absent) → no findings; registry-driven: finds dups
+        let findings = detect_duplication(tmp.path()).unwrap();
+        assert!(
+            !findings.is_empty(),
+            "detect_duplication must read source agent-dir from harness registry \
+             (RED — not yet implemented)"
+        );
     }
 }

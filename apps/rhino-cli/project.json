@@ -69,10 +69,10 @@
         "command": "cargo run --manifest-path apps/rhino-cli/Cargo.toml --"
       }
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 — specs:coverage stubbed; cucumber tests + validator land in Phase 1'"
+        "command": "echo 'Phase 1 — specs:behavior:coverage stub; full @covers wiring lands in Phase 1b wiring step'"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/rhino/behavior/rhino-cli/gherkin/**/*.feature", "{projectRoot}/**/*.rs"]
@@ -118,37 +118,13 @@
         "command": "cargo check --manifest-path apps/rhino-cli/Cargo.toml --all-targets"
       }
     },
-    "specs:adoption-validation": {
+    "specs:structure-validation": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate adoption"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.feature"]
-    },
-    "specs:tree-validation": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate tree"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
-    },
-    "specs:counts-validation": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate counts"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
-    },
-    "specs:links-validation": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate links"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*.md"]
     },
     "specs:gherkin-cardinality-validation": {
       "executor": "nx:run-commands",
@@ -209,22 +185,6 @@
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/repo-governance/**/*.md"]
-    },
-    "cross-vendor:parity-validation": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bash apps/rhino-cli/scripts/validate-cross-vendor-parity.sh"
-      },
-      "cache": false,
-      "inputs": [
-        "{projectRoot}/src/**/*.rs",
-        "{projectRoot}/scripts/validate-cross-vendor-parity.sh",
-        "{workspaceRoot}/repo-governance/**/*.md",
-        "{workspaceRoot}/AGENTS.md",
-        "{workspaceRoot}/CLAUDE.md",
-        "{workspaceRoot}/.claude/agents/**/*.md",
-        "{workspaceRoot}/.opencode/agents/**/*.md"
-      ]
     },
     "instruction-size:validation": {
       "executor": "nx:run-commands",

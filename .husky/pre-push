@@ -7,7 +7,7 @@ set -e
 # Heavy integration + e2e suites are CRON-only (scheduled tiered pipelines) — never in this hook.
 # If pre-push times out, run the nx commands below manually to warm cache, then push again.
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
-npx nx affected -t specs:coverage test-coverage specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --parallel="$PARALLEL"
+npx nx affected -t specs:behavior:coverage test-coverage specs:structure-validation --parallel="$PARALLEL"
 npm run lint:md
 npx nx run rhino-cli:env:validation
 
@@ -25,12 +25,9 @@ if [ -n "$RANGE" ]; then
   if echo "$CHANGED" | grep -qE '^repo-governance/.*\.md$'; then
     npx nx run rhino-cli:governance:vendor-audit-validation
   fi
-  # Cross-vendor behavioral-parity gate: run when any of the parity-relevant surfaces change.
-  if echo "$CHANGED" | grep -qE '^(repo-governance/.*\.md$|AGENTS\.md$|CLAUDE\.md$|\.claude/agents/|\.opencode/agents/)'; then
-    npx nx run rhino-cli:cross-vendor:parity-validation
-  fi
-  # Harness binding-parity guard (deterministic, no agent): run when binding surfaces change.
-  if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|docs/reference/platform-bindings\.md$|\.claude/|\.opencode/|\.codex/|\.github/)'; then
+  # Harness binding-parity guard + cross-vendor invariants (color/tier maps absorbed):
+  # run when binding or parity-relevant surfaces change.
+  if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|CLAUDE\.md$|docs/reference/platform-bindings\.md$|repo-governance/.*\.md$|\.claude/|\.opencode/|\.codex/|\.github/|\.cursor/|\.windsurf/|\.junie/|GEMINI\.md$|CONVENTIONS\.md$)'; then
     npm run harness:bindings-validation
   fi
   # Instruction-size budget gate: run when any auto-loaded instruction surface changes.

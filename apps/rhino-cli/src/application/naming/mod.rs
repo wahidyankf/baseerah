@@ -119,35 +119,49 @@ pub fn validate_frontmatter_name(path: &str, content: &[u8]) -> Option<Violation
 /// a `"mirror-drift"` `Violation` is emitted.  The returned slice is sorted by
 /// `path`.
 pub fn validate_mirror(claude_files: &[String], opencode_files: &[String]) -> Vec<Violation> {
+    validate_mirror_with_dirs(
+        claude_files,
+        opencode_files,
+        ".claude/agents",
+        ".opencode/agents",
+    )
+}
+
+/// Like [`validate_mirror`] but uses explicit `source_dir` / `target_dir` labels in messages.
+///
+/// Use this for N-way mirror checks (e.g. source → Amazon Q) where the target directory
+/// is not `.opencode/agents/`.
+pub fn validate_mirror_with_dirs(
+    source_files: &[String],
+    target_files: &[String],
+    source_dir: &str,
+    target_dir: &str,
+) -> Vec<Violation> {
     use std::collections::HashMap;
-    let mut claude_set: HashMap<String, String> = HashMap::new();
-    for p in claude_files {
-        claude_set.insert(basename_sans_ext(p), p.clone());
+    let mut source_set: HashMap<String, String> = HashMap::new();
+    for p in source_files {
+        source_set.insert(basename_sans_ext(p), p.clone());
     }
-    let mut opencode_set: HashMap<String, String> = HashMap::new();
-    for p in opencode_files {
-        opencode_set.insert(basename_sans_ext(p), p.clone());
+    let mut target_set: HashMap<String, String> = HashMap::new();
+    for p in target_files {
+        target_set.insert(basename_sans_ext(p), p.clone());
     }
     let mut violations = Vec::new();
-    for (name, path) in &claude_set {
-        if !opencode_set.contains_key(name) {
+    for (name, path) in &source_set {
+        if !target_set.contains_key(name) {
             violations.push(Violation {
                 path: path.clone(),
                 kind: "mirror-drift".to_string(),
-                message: format!(
-                    "{name}.md exists in .claude/agents/ but not in .opencode/agents/"
-                ),
+                message: format!("{name}.md exists in {source_dir}/ but not in {target_dir}/"),
             });
         }
     }
-    for (name, path) in &opencode_set {
-        if !claude_set.contains_key(name) {
+    for (name, path) in &target_set {
+        if !source_set.contains_key(name) {
             violations.push(Violation {
                 path: path.clone(),
                 kind: "mirror-drift".to_string(),
-                message: format!(
-                    "{name}.md exists in .opencode/agents/ but not in .claude/agents/"
-                ),
+                message: format!("{name}.md exists in {target_dir}/ but not in {source_dir}/"),
             });
         }
     }

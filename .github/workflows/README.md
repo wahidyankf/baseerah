@@ -16,11 +16,11 @@ reusable-workflow pattern and the twice-daily WIB CRON schedule (with a 2.5-hour
 
 ## PR and repo-wide gates
 
-| Workflow                   | Trigger             | Role                                                                                    |
-| -------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
-| `commons-quality-gate.yml` | Pull request        | Typecheck, lint, `test:quick`, `specs:coverage`, naming validation (Node + .NET + Rust) |
-| `markdown-validate.yml`    | PR + push to `main` | Mermaid, link, and heading-hierarchy validation via `rhino-cli`                         |
-| `commons-env-validate.yml` | PR + push           | Environment-variable contract validation                                                |
+| Workflow                   | Trigger             | Role                                                                                             |
+| -------------------------- | ------------------- | ------------------------------------------------------------------------------------------------ |
+| `commons-quality-gate.yml` | Pull request        | Typecheck, lint, `test:quick`, `specs:behavior:coverage`, naming validation (Node + .NET + Rust) |
+| `markdown-validate.yml`    | PR + push to `main` | Mermaid, link, and heading-hierarchy validation via `rhino-cli`                                  |
+| `commons-env-validate.yml` | PR + push           | Environment-variable contract validation                                                         |
 
 ## www tier — direct deploy (scheduled callers of `_reusable-www-test-local-deploy.yml`)
 

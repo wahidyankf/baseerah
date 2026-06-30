@@ -48,10 +48,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-      - name: Run specs:coverage for the app group
+      - name: Run specs:behavior:coverage for the app group
         run: |
-          npx nx run ${{ inputs.be-project }}:specs:coverage
-          npx nx run ${{ inputs.web-project }}:specs:coverage
+          npx nx run ${{ inputs.be-project }}:specs:behavior:coverage
+          npx nx run ${{ inputs.web-project }}:specs:behavior:coverage
 
   fe-lint:
     name: FE lint
@@ -193,7 +193,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
-      - run: npx nx run-many -t specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --projects=rhino-cli
+      - run: npx nx run-many -t specs:structure-validation --projects=rhino-cli
 
   deploy:
     name: Deploy to staging (force-push web + be branches)

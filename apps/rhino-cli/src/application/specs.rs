@@ -6,9 +6,7 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
 
-use regex::Regex;
 use walkdir::WalkDir;
 
 /// A single validation finding produced by one of the `validate_spec_*`
@@ -159,6 +157,65 @@ pub fn validate_spec_adoption(repo_root: &Path, app: &str) -> Vec<SpecFinding> {
     findings
 }
 
+/// Config-aware adoption validator: requires `ddd/` only when `is_ddd_area` is true, and
+/// flags an unexpected `ddd/` directory when the area is NOT a ddd-area.
+pub fn validate_spec_adoption_ddd_aware(
+    repo_root: &Path,
+    app: &str,
+    is_ddd_area: bool,
+) -> Vec<SpecFinding> {
+    let mut findings = Vec::new();
+    let base = repo_root.join("specs/apps").join(app);
+    let behavior_dir = base.join("behavior");
+    if !behavior_dir.exists() {
+        findings.push(SpecFinding {
+            category: "adoption".into(),
+            criticality: "HIGH".into(),
+            file: format!("specs/apps/{app}/behavior"),
+            evidence: format!(
+                "no feature files found under specs/apps/{app}/behavior/ (directory does not exist)"
+            ),
+            expected: format!("create specs/apps/{app}/behavior/ with at least one .feature file"),
+        });
+    } else if walk_feature_files(&behavior_dir).is_empty() {
+        findings.push(SpecFinding {
+            category: "adoption".into(),
+            criticality: "HIGH".into(),
+            file: format!("specs/apps/{app}/behavior"),
+            evidence: format!("no feature files found under specs/apps/{app}/behavior/"),
+            expected: format!("add at least one .feature file under specs/apps/{app}/behavior/"),
+        });
+    }
+    let ddd_dir = base.join("ddd");
+    let bc_yaml = ddd_dir.join("bounded-contexts.yaml");
+    if is_ddd_area {
+        if !bc_yaml.exists() {
+            findings.push(SpecFinding {
+                category: "adoption".into(),
+                criticality: "HIGH".into(),
+                file: format!("specs/apps/{app}/ddd"),
+                evidence: format!(
+                    "missing bounded-contexts.yaml at specs/apps/{app}/ddd/bounded-contexts.yaml"
+                ),
+                expected: format!("create specs/apps/{app}/ddd/bounded-contexts.yaml"),
+            });
+        }
+    } else if ddd_dir.exists() {
+        findings.push(SpecFinding {
+            category: "adoption".into(),
+            criticality: "HIGH".into(),
+            file: format!("specs/apps/{app}/ddd"),
+            evidence: format!(
+                "unexpected ddd/ at specs/apps/{app}/ddd — area not listed in specs.ddd-areas"
+            ),
+            expected: format!(
+                "remove specs/apps/{app}/ddd/ or add {app} to specs.ddd-areas in repo-config.yml"
+            ),
+        });
+    }
+    findings
+}
+
 // ---- validate-counts ----
 
 /// Checks that `folder` (resolved against `repo_root` if relative) exists and
@@ -217,75 +274,6 @@ pub fn validate_spec_counts(repo_root: &Path, folder: &str) -> Vec<SpecFinding> 
 
 /// Returns the lazily-compiled regex that matches a Markdown link of the form
 /// `[text](target)`.
-fn markdown_link_re() -> &'static Regex {
-    static R: OnceLock<Regex> = OnceLock::new();
-    R.get_or_init(|| Regex::new(r"\[([^\]]*)\]\(([^)]+)\)").expect("valid hardcoded regex"))
-}
-
-/// Checks all `.md` files under `folder` for broken internal links.
-///
-/// External links (starting with `http://` or `https://`) and anchor-only
-/// links (empty path before `#`) are ignored.  A finding with
-/// `criticality = "HIGH"` is emitted for each link whose resolved target file
-/// does not exist.
-///
-/// `folder` is resolved against `repo_root` if it is a relative path.
-pub fn validate_spec_links(repo_root: &Path, folder: &str) -> Vec<SpecFinding> {
-    let mut findings = Vec::new();
-    let abs = if Path::new(folder).is_absolute() {
-        PathBuf::from(folder)
-    } else {
-        repo_root.join(folder)
-    };
-    if !abs.exists() {
-        findings.push(SpecFinding {
-            category: "links".into(),
-            criticality: "HIGH".into(),
-            file: folder.to_string(),
-            evidence: format!("spec folder does not exist: {folder}"),
-            expected: "create the spec folder".into(),
-        });
-        return findings;
-    }
-    let md_files = walk_md_files(&abs);
-    let re = markdown_link_re();
-    for md in &md_files {
-        let Ok(content) = fs::read(md) else {
-            continue;
-        };
-        let s = String::from_utf8_lossy(&content);
-        for cap in re.captures_iter(&s) {
-            let target_full = cap[2].to_string();
-            let target = match target_full.find('#') {
-                Some(i) => target_full[..i].to_string(),
-                None => target_full,
-            };
-            if target.is_empty() {
-                continue;
-            }
-            if target.starts_with("http://") || target.starts_with("https://") {
-                continue;
-            }
-            let resolved = md.parent().unwrap_or(repo_root).join(&target);
-            if !resolved.exists() {
-                let rel = pathdiff_starts_with(md, repo_root);
-                let base = md
-                    .file_name()
-                    .map(|s| s.to_string_lossy().into_owned())
-                    .unwrap_or_default();
-                findings.push(SpecFinding {
-                    category: "links".into(),
-                    criticality: "HIGH".into(),
-                    file: rel,
-                    evidence: format!("broken link: {base} -> {target} (file not found)"),
-                    expected: format!("fix or remove the link to {target}"),
-                });
-            }
-        }
-    }
-    findings
-}
-
 /// Returns `path` relative to `base` by stripping the `base` prefix from the
 /// string representation.
 ///
@@ -505,31 +493,6 @@ mod tests {
         let f = validate_spec_counts(dir.path(), "specs/apps/x");
         assert_eq!(f.len(), 5);
         assert!(f.iter().all(|x| x.criticality == "MEDIUM"));
-    }
-
-    #[test]
-    fn validate_spec_links_broken() {
-        let dir = tempdir().unwrap();
-        let folder = dir.path().join("specs/apps/x");
-        std::fs::create_dir_all(&folder).unwrap();
-        std::fs::write(
-            folder.join("a.md"),
-            "[bad](./missing.md)\n[good](./other.md)\n",
-        )
-        .unwrap();
-        std::fs::write(folder.join("other.md"), "x").unwrap();
-        let f = validate_spec_links(dir.path(), "specs/apps/x");
-        assert_eq!(f.len(), 1);
-        assert!(f[0].evidence.contains("broken link"));
-    }
-
-    #[test]
-    fn validate_spec_links_ignores_external() {
-        let dir = tempdir().unwrap();
-        let folder = dir.path().join("specs/apps/x");
-        std::fs::create_dir_all(&folder).unwrap();
-        std::fs::write(folder.join("a.md"), "[ok](https://example.com)\n").unwrap();
-        assert!(validate_spec_links(dir.path(), "specs/apps/x").is_empty());
     }
 
     #[test]

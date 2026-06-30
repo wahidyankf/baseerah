@@ -1,28 +1,23 @@
 //! `specs audit` — runs all specs validators in sequence.
 //!
-//! Runs validate-adoption, validate-counts, validate-links, validate-tree,
-//! and gherkin-cardinality with default arguments.  The specs bc, ul, and
-//! coverage validators require domain-specific arguments and are excluded.
+//! Runs structure-validate, validate-links (via md links validate), and gherkin-cardinality
+//! with default arguments. The specs behavior-coverage and domain-coverage validators require
+//! domain-specific positional arguments and are excluded.
 //! Use `--skip <name>` to exclude individual validators.
 
 use anyhow::{Error, anyhow};
 use clap::Args;
 
-use crate::commands::{
-    specs_gherkin_cardinality, specs_validate_adoption, specs_validate_counts,
-    specs_validate_links, specs_validate_tree,
-};
+use crate::commands::{md_validate_links, specs_gherkin_cardinality, specs_structure_validate};
 use crate::domain::cliout::OutputFormat;
 
 /// Member validators run by `specs audit` in order.
 ///
-/// `coverage`, `bc`, and `ul` are intentionally excluded because they require
-/// domain-specific positional arguments that `audit` cannot reasonably default.
+/// `behavior-coverage`, `domain-coverage`, `bc`, and `ul` are intentionally excluded
+/// because they require domain-specific positional arguments that `audit` cannot default.
 const MEMBERS: &[&str] = &[
-    "validate-adoption",
-    "validate-counts",
+    "structure-validate",
     "validate-links",
-    "validate-tree",
     "gherkin-cardinality",
 ];
 
@@ -76,31 +71,17 @@ pub fn run(args: &AuditArgs, output_format: OutputFormat) -> std::result::Result
 /// Dispatch a single validator by name with default arguments.
 fn run_member(name: &str, output_format: OutputFormat) -> std::result::Result<(), Error> {
     match name {
-        "validate-adoption" => specs_validate_adoption::run(
-            &specs_validate_adoption::ValidateAdoptionArgs {
+        "structure-validate" => specs_structure_validate::run(
+            &specs_structure_validate::ValidateStructureArgs {
                 app: None,
                 apps: vec![],
             },
             output_format,
         ),
-        "validate-counts" => specs_validate_counts::run(
-            &specs_validate_counts::ValidateCountsArgs {
-                folder: None,
-                apps: vec![],
-            },
-            output_format,
-        ),
-        "validate-links" => specs_validate_links::run(
-            &specs_validate_links::ValidateLinksArgs {
-                folder: None,
-                apps: vec![],
-            },
-            output_format,
-        ),
-        "validate-tree" => specs_validate_tree::run(
-            &specs_validate_tree::ValidateTreeArgs {
-                app: None,
-                apps: vec![],
+        "validate-links" => md_validate_links::run(
+            &md_validate_links::ValidateLinksArgs {
+                staged_only: false,
+                exclude: vec![],
             },
             output_format,
         ),
@@ -122,15 +103,13 @@ mod tests {
 
     #[test]
     fn members_list_has_expected_count() {
-        assert_eq!(MEMBERS.len(), 5);
+        assert_eq!(MEMBERS.len(), 3);
     }
 
     #[test]
     fn members_list_contains_expected_validators() {
-        assert!(MEMBERS.contains(&"validate-adoption"));
-        assert!(MEMBERS.contains(&"validate-counts"));
+        assert!(MEMBERS.contains(&"structure-validate"));
         assert!(MEMBERS.contains(&"validate-links"));
-        assert!(MEMBERS.contains(&"validate-tree"));
         assert!(MEMBERS.contains(&"gherkin-cardinality"));
     }
 
@@ -163,10 +142,8 @@ mod tests {
         // Skip all but one to trigger failure path.
         let args = AuditArgs {
             skip: vec![
-                "validate-adoption".to_string(),
-                "validate-counts".to_string(),
+                "structure-validate".to_string(),
                 "validate-links".to_string(),
-                "validate-tree".to_string(),
             ],
         };
         // gherkin-cardinality may error (no git root), triggering failure aggregation.
@@ -176,7 +153,7 @@ mod tests {
     #[test]
     fn audit_args_skip_is_vec() {
         let a = AuditArgs {
-            skip: vec!["validate-adoption".to_string()],
+            skip: vec!["structure-validate".to_string()],
         };
         assert_eq!(a.skip.len(), 1);
     }

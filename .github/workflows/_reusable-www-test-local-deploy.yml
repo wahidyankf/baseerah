@@ -43,14 +43,14 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
-      - name: Run specs:coverage for app and E2E runners
+      - name: Run specs:behavior:coverage for app and E2E runners
         run: |
-          npx nx run ${{ inputs.app-name }}:specs:coverage
-          # Run E2E runner specs:coverage if the target exists on the project
+          npx nx run ${{ inputs.app-name }}:specs:behavior:coverage
+          # Run E2E runner specs:behavior:coverage if the target exists on the project
           for suffix in be-e2e fe-e2e; do
             proj="${{ inputs.app-name }}-${suffix}"
-            if npx nx show project "$proj" --json 2>/dev/null | grep -q '"specs:coverage"'; then
-              npx nx run "${proj}:specs:coverage"
+            if npx nx show project "$proj" --json 2>/dev/null | grep -q '"specs:behavior:coverage"'; then
+              npx nx run "${proj}:specs:behavior:coverage"
             fi
           done
 
@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
-      - run: npx nx run-many -t specs:adoption-validation specs:tree-validation specs:counts-validation specs:links-validation --projects=rhino-cli
+      - run: npx nx run-many -t specs:structure-validation --projects=rhino-cli
 
   detect-changes:
     name: Detect changes

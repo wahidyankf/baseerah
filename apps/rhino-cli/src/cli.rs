@@ -5,16 +5,16 @@ use clap::{Parser, Subcommand};
 use crate::commands::{
     convention_audit, convention_validate_agents_md_size, convention_validate_emoji,
     convention_validate_instruction_size, convention_validate_license, doctor, env_backup,
-    env_init, env_restore, env_validate, git_pre_commit, governance_audit,
+    env_init, env_restore, env_staged_guard, env_validate, git_pre_commit, governance_audit,
     governance_layer_coherence, governance_traceability_audit, governance_vendor_audit,
     harness_audit, harness_emit_bindings, harness_generate_bindings, harness_sync,
     harness_validate_bindings, harness_validate_claude, harness_validate_duplication,
-    harness_validate_naming, harness_validate_sync, lang_java_validate_null_safety, md_audit,
-    md_validate_frontmatter, md_validate_frontmatter_dates, md_validate_heading_hierarchy,
-    md_validate_links, md_validate_mermaid, md_validate_naming, md_validate_readme_index,
-    specs_audit, specs_bc, specs_clean_java_imports, specs_coverage, specs_gherkin_cardinality,
-    specs_scaffold_dart, specs_ul, specs_validate_adoption, specs_validate_counts,
-    specs_validate_links, specs_validate_tree, test_coverage_validate, workflows_validate_naming,
+    harness_validate_instruction_size, harness_validate_naming, harness_validate_sync,
+    lang_java_validate_null_safety, md_audit, md_validate_frontmatter,
+    md_validate_frontmatter_dates, md_validate_heading_hierarchy, md_validate_links,
+    md_validate_mermaid, md_validate_naming, md_validate_readme_index, specs_audit,
+    specs_clean_java_imports, specs_coverage, specs_gherkin_cardinality, specs_scaffold_dart,
+    specs_structure_validate, test_coverage_validate, workflows_validate_naming,
 };
 use crate::domain::cliout::OutputFormat;
 
@@ -119,7 +119,7 @@ pub enum GitCommands {
     PreCommit(git_pre_commit::PreCommitArgs),
 }
 
-/// Environment file subcommands (`init`, `backup`, `restore`, `validate`).
+/// Environment file subcommands (`init`, `backup`, `restore`, `validate`, `staged-guard`).
 #[derive(Subcommand, Debug)]
 pub enum EnvCommands {
     /// Create .env files from .env.example templates.
@@ -134,6 +134,17 @@ pub enum EnvCommands {
     /// Check code↔config drift for all surfaces in env-contract.yaml.
     #[command(name = "validate")]
     Validate(env_validate::EnvValidateArgs),
+    /// Guard against committing real .env files.
+    #[command(name = "staged-guard", subcommand)]
+    StagedGuard(EnvStagedGuardCommands),
+}
+
+/// Subcommands for `env staged-guard`.
+#[derive(Subcommand, Debug)]
+pub enum EnvStagedGuardCommands {
+    /// Reject any staged .env* file except .env.example (policy: guard-env-file-access).
+    #[command(name = "validate")]
+    Validate(env_staged_guard::EnvStagedGuardValidateArgs),
 }
 
 // ---------------------------------------------------------------------------
@@ -146,6 +157,15 @@ pub enum SpecsCommands {
     /// Run spec validation rules.
     #[command(name = "validate", subcommand)]
     Validate(SpecsValidateCommands),
+    /// Run all structural validators (adoption + tree + counts) in one pass.
+    #[command(name = "structure", subcommand)]
+    Structure(SpecsStructureCommands),
+    /// Run per-level @covers behavior coverage validation.
+    #[command(name = "behavior-coverage", subcommand)]
+    BehaviorCoverage(SpecsBehaviorCoverageCommands),
+    /// Run per-level @covers coverage validation scoped to domain/** feature files.
+    #[command(name = "domain-coverage", subcommand)]
+    DomainCoverage(SpecsDomainCoverageCommands),
     /// Clean generated contract files (e.g. strip unused Java imports).
     #[command(name = "clean", subcommand)]
     Clean(SpecsCleanCommands),
@@ -155,6 +175,30 @@ pub enum SpecsCommands {
     /// Run all specs validators in sequence and aggregate findings.
     #[command(name = "audit")]
     Audit(specs_audit::AuditArgs),
+}
+
+/// `specs behavior-coverage` subcommands.
+#[derive(Subcommand, Debug)]
+pub enum SpecsBehaviorCoverageCommands {
+    /// Validate that all BDD spec files have matching test implementations at the required levels.
+    #[command(name = "validate")]
+    Validate(specs_coverage::ValidateArgs),
+}
+
+/// `specs domain-coverage` subcommands.
+#[derive(Subcommand, Debug)]
+pub enum SpecsDomainCoverageCommands {
+    /// Validate per-level @covers coverage for domain/** feature files using the domain-areas allowlist.
+    #[command(name = "validate")]
+    Validate(specs_coverage::ValidateArgs),
+}
+
+/// `specs structure` subcommands.
+#[derive(Subcommand, Debug)]
+pub enum SpecsStructureCommands {
+    /// Run adoption + tree + counts structural validators in sequence with per-layer labels.
+    #[command(name = "validate")]
+    Validate(specs_structure_validate::ValidateStructureArgs),
 }
 
 /// Specs clean subcommands.
@@ -176,27 +220,6 @@ pub enum SpecsScaffoldCommands {
 /// Spec tree validate subcommands.
 #[derive(Subcommand, Debug)]
 pub enum SpecsValidateCommands {
-    /// Verify an app has adopted BDD and DDD practices.
-    #[command(name = "adoption")]
-    Adoption(specs_validate_adoption::ValidateAdoptionArgs),
-    /// Validate each required spec subfolder contains at least one spec file.
-    #[command(name = "counts")]
-    Counts(specs_validate_counts::ValidateCountsArgs),
-    /// Check that markdown links in spec files resolve.
-    #[command(name = "links")]
-    Links(specs_validate_links::ValidateLinksArgs),
-    /// Validate canonical C4-aware five-folder spec tree.
-    #[command(name = "tree")]
-    Tree(specs_validate_tree::ValidateTreeArgs),
-    /// Validate that all BDD spec files have matching test implementations.
-    #[command(name = "coverage")]
-    Coverage(specs_coverage::ValidateArgs),
-    /// Validate bounded-context structural parity against the registry.
-    #[command(name = "bc")]
-    Bc(specs_bc::DddBcArgs),
-    /// Validate ubiquitous-language glossary parity against the registry.
-    #[command(name = "ul")]
-    Ul(specs_ul::DddUlArgs),
     /// Audit `.feature` scenarios for repeated primary Given/When/Then keywords.
     #[command(name = "gherkin-cardinality")]
     GherkinCardinality(specs_gherkin_cardinality::GherkinKeywordCardinalityArgs),
@@ -244,6 +267,9 @@ pub enum HarnessValidateCommands {
     /// Validate the Amazon Q binding bridge files and catalog coverage.
     #[command(name = "bindings")]
     Bindings(harness_validate_bindings::ValidateBindingsArgs),
+    /// Check instruction-file sizes against budgets from the harness registry.
+    #[command(name = "instruction-size")]
+    InstructionSize(harness_validate_instruction_size::ValidateInstructionSizeArgs),
 }
 
 /// Harness sync subcommands.
@@ -542,6 +568,11 @@ fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
             EnvCommands::Backup(args) => env_backup::run(args, output_format),
             EnvCommands::Restore(args) => env_restore::run(args, output_format),
             EnvCommands::Validate(args) => env_validate::run(args, output_format),
+            EnvCommands::StagedGuard(sc) => match sc {
+                EnvStagedGuardCommands::Validate(args) => {
+                    env_staged_guard::run(args, output_format)
+                }
+            },
         },
         Commands::Doctor(args) => doctor::run(args, output_format),
     };
@@ -613,6 +644,9 @@ fn dispatch_harness(
             HarnessValidateCommands::Bindings(args) => {
                 harness_validate_bindings::run(args, output_format)
             }
+            HarnessValidateCommands::InstructionSize(args) => {
+                harness_validate_instruction_size::run(args, output_format)
+            }
         },
         HarnessCommands::Sync(sc) => match sc {
             HarnessSyncCommands::Opencode(args) => harness_sync::run(args, output_format),
@@ -639,19 +673,23 @@ fn dispatch_specs(
     output_format: OutputFormat,
 ) -> std::result::Result<(), anyhow::Error> {
     match sc {
-        SpecsCommands::Validate(vc) => match vc {
-            SpecsValidateCommands::Adoption(args) => {
-                specs_validate_adoption::run(args, output_format)
+        SpecsCommands::Structure(sc) => match sc {
+            SpecsStructureCommands::Validate(args) => {
+                specs_structure_validate::run(args, output_format)
             }
-            SpecsValidateCommands::Counts(args) => specs_validate_counts::run(args, output_format),
-            SpecsValidateCommands::Links(args) => specs_validate_links::run(args, output_format),
-            SpecsValidateCommands::Tree(args) => specs_validate_tree::run(args, output_format),
-            SpecsValidateCommands::Coverage(args) => specs_coverage::run(args, output_format),
-            SpecsValidateCommands::Bc(args) => specs_bc::run(args, output_format),
-            SpecsValidateCommands::Ul(args) => specs_ul::run(args, output_format),
+        },
+        SpecsCommands::Validate(vc) => match vc {
             SpecsValidateCommands::GherkinCardinality(args) => {
                 specs_gherkin_cardinality::run(args, output_format)
             }
+        },
+        SpecsCommands::BehaviorCoverage(bc) => match bc {
+            SpecsBehaviorCoverageCommands::Validate(args) => {
+                specs_coverage::run(args, output_format)
+            }
+        },
+        SpecsCommands::DomainCoverage(dc) => match dc {
+            SpecsDomainCoverageCommands::Validate(args) => specs_coverage::run(args, output_format),
         },
         SpecsCommands::Clean(cc) => match cc {
             SpecsCleanCommands::JavaImports(args) => {
@@ -785,8 +823,45 @@ mod cli_uniform_grammar_tests {
     }
 
     #[test]
-    fn new_specs_validate_coverage_passes() {
+    fn new_specs_behavior_coverage_validate_passes() {
+        // behavior-coverage validate requires ≥2 positional args; supply dummy paths.
+        let result = Cli::try_parse_from([
+            "rhino-cli",
+            "specs",
+            "behavior-coverage",
+            "validate",
+            "specs/",
+            "apps/",
+        ]);
+        assert!(
+            result.is_ok(),
+            "specs behavior-coverage validate must parse: {:?}",
+            result.err()
+        );
+    }
+
+    // --- P1-1b rename: new form must PASS, old form must FAIL after rename ---
+
+    #[test]
+    fn specs_behavior_coverage_validate_passes_after_rename() {
         // coverage requires ≥2 positional args; supply dummy paths so parse succeeds.
+        let result = Cli::try_parse_from([
+            "rhino-cli",
+            "specs",
+            "behavior-coverage",
+            "validate",
+            "specs/",
+            "apps/",
+        ]);
+        assert!(
+            result.is_ok(),
+            "specs behavior-coverage validate must parse after rename: {:?}",
+            result.err()
+        );
+    }
+
+    #[test]
+    fn specs_validate_coverage_no_longer_parses_after_rename() {
         let result = Cli::try_parse_from([
             "rhino-cli",
             "specs",
@@ -796,9 +871,114 @@ mod cli_uniform_grammar_tests {
             "apps/",
         ]);
         assert!(
+            result.is_err(),
+            "specs validate coverage must no longer parse after rename to behavior-coverage"
+        );
+    }
+
+    // --- P1-1b-RED2: specs domain-coverage validate must parse after implementation ---
+
+    #[test]
+    fn specs_domain_coverage_validate_parses() {
+        // domain-coverage validate requires ≥2 positional args; supply dummy paths.
+        let result = Cli::try_parse_from([
+            "rhino-cli",
+            "specs",
+            "domain-coverage",
+            "validate",
+            "specs/",
+            "apps/",
+        ]);
+        assert!(
             result.is_ok(),
-            "specs validate coverage must parse: {:?}",
+            "specs domain-coverage validate must parse after implementation: {:?}",
             result.err()
+        );
+    }
+
+    // --- P1-1b-RED3: specs structure validate merged command + old leaves removed ---
+
+    #[test]
+    fn specs_structure_validate_parses() {
+        let result = Cli::try_parse_from(["rhino-cli", "specs", "structure", "validate"]);
+        assert!(
+            result.is_ok(),
+            "specs structure validate must parse after merge: {:?}",
+            result.err()
+        );
+    }
+
+    #[test]
+    fn specs_validate_adoption_no_longer_parses() {
+        let result = Cli::try_parse_from(["rhino-cli", "specs", "validate", "adoption"]);
+        assert!(
+            result.is_err(),
+            "specs validate adoption must no longer parse after merge into specs structure validate"
+        );
+    }
+
+    #[test]
+    fn specs_validate_tree_no_longer_parses() {
+        let result = Cli::try_parse_from(["rhino-cli", "specs", "validate", "tree"]);
+        assert!(
+            result.is_err(),
+            "specs validate tree must no longer parse after merge into specs structure validate"
+        );
+    }
+
+    #[test]
+    fn specs_validate_counts_no_longer_parses() {
+        let result = Cli::try_parse_from(["rhino-cli", "specs", "validate", "counts"]);
+        assert!(
+            result.is_err(),
+            "specs validate counts must no longer parse after merge into specs structure validate"
+        );
+    }
+
+    // --- P1-1b-RED5: specs validate bc / specs validate ul removed from CLI ---
+
+    // --- P1-1b-RED6: specs validate links removed from CLI ---
+
+    #[test]
+    fn specs_validate_links_no_longer_parses() {
+        // RED: specs validate links must not parse after the command is deleted in GREEN6.
+        // Currently still parses (Links variant exists in SpecsValidateCommands) — test fails.
+        let result =
+            Cli::try_parse_from(["rhino-cli", "specs", "validate", "links", "specs/apps/x"]);
+        assert!(
+            result.is_err(),
+            "specs validate links must no longer parse after command removed in GREEN6"
+        );
+    }
+
+    #[test]
+    fn specs_validate_bc_no_longer_parses() {
+        let result = Cli::try_parse_from(["rhino-cli", "specs", "validate", "bc", "my-app"]);
+        assert!(
+            result.is_err(),
+            "specs validate bc must no longer parse after bc check merged into specs structure validate"
+        );
+    }
+
+    // --- P1-1b-RED7: env staged-guard validate not yet wired ---
+
+    #[test]
+    fn env_staged_guard_validate_parses() {
+        // RED: env staged-guard validate must parse after the command is wired in GREEN7.
+        // Currently no StagedGuard variant exists in EnvCommands — test fails.
+        let result = Cli::try_parse_from(["rhino-cli", "env", "staged-guard", "validate"]);
+        assert!(
+            result.is_ok(),
+            "env staged-guard validate must parse after wired in GREEN7; got error"
+        );
+    }
+
+    #[test]
+    fn specs_validate_ul_no_longer_parses() {
+        let result = Cli::try_parse_from(["rhino-cli", "specs", "validate", "ul", "my-app"]);
+        assert!(
+            result.is_err(),
+            "specs validate ul must no longer parse after ul check merged into specs structure validate"
         );
     }
 }

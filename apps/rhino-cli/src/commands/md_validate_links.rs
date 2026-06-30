@@ -86,4 +86,41 @@ mod tests {
         assert_eq!(args.exclude.len(), 2);
         assert_eq!(args.exclude[0], "plans/done");
     }
+
+    // ---- P1-1b-RED6: md links validate covers specs/ paths ---
+
+    #[test]
+    fn md_links_validate_covers_specs_dir() {
+        // Prove md links validate already covers specs/ files — making specs validate links
+        // redundant. Seeds a broken relative link inside specs/apps/x/foo.md and asserts the
+        // scanner flags it. No specs:links-validation Nx target needed once this passes.
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let spec_dir = root.join("specs/apps/x");
+        std::fs::create_dir_all(&spec_dir).unwrap();
+        std::fs::write(
+            spec_dir.join("foo.md"),
+            "# Spec\n\nSee [missing](./nonexistent.md).\n",
+        )
+        .unwrap();
+        let result = validate_all_links(&ScanOptions {
+            repo_root: root.to_path_buf(),
+            staged_only: false,
+            skip_paths: vec![],
+        })
+        .expect("scan must not hard-error on a temp dir");
+        assert!(
+            !result.broken_links.is_empty(),
+            "md links validate must flag broken link inside specs/; got 0 broken links"
+        );
+        let has_specs_hit = result
+            .broken_links
+            .iter()
+            .any(|b| b.source_file.contains("specs"));
+        assert!(
+            has_specs_hit,
+            "at least one broken link must originate from specs/; links: {:?}",
+            result.broken_links
+        );
+    }
 }

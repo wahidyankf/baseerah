@@ -1,22 +1,29 @@
-//! Amazon Q Developer binding bridge generator and parity guard.
+//! Binding generator and all-harness parity guard for rhino-cli.
 //
-// Amazon Q Developer does not read the repository's canonical `AGENTS.md`
-// natively (unlike Claude Code, OpenCode, or Codex). To keep its instruction
-// surface in lock-step with `AGENTS.md` we generate a mechanical "bridge":
+// Covers all 11 supported coding-agent harnesses:
+//   Generated tier (byte-parity enforced):
+//     - OpenCode (.opencode/agents/ mirrors .claude/agents/)
+//     - Amazon Q (.amazonq/rules/ + .amazonq/cli-agents/ — static bridge files)
 //
-//   - `.amazonq/rules/00-agents-md.md`     — a pointer to `AGENTS.md`
-//   - `.amazonq/cli-agents/ose-default.json` — an Amazon Q agent definition
-//     whose `resources` pull in `AGENTS.md` and `.amazonq/rules/`
+//   Native tier (catalog coverage + no-shadowing rule enforced):
+//     - Claude Code (.claude/) — source of truth
+//     - Codex (.codex/)
+//     - Copilot (.github/)
+//     - Cursor (.cursor/)
+//     - Windsurf (.windsurf/)
+//     - Junie (.junie/)
+//     - Antigravity/Gemini (GEMINI.md thin-pointer surface)
+//     - Pi — no per-repo artifact; catalog prose only
+//     - Aider (CONVENTIONS.md thin-pointer surface)
 //
-// `emit_bindings` writes those files deterministically (idempotent overwrite);
-// `validate_bindings` enforces byte-for-byte parity plus catalog coverage so
-// the bridge cannot drift. Both share one source of truth — `expected_bindings`
-// returns the canonical (path, content) pairs used by emit and validate alike.
+// Also validates the color/tier translation maps from validate-cross-vendor-parity.sh
+// (invariants 5a/5b), replacing that shell script.
 
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
+use super::sync_validator::validate_sync;
 use super::types::{ValidationCheck, ValidationResult};
 
 /// Relative path of the Amazon Q rules pointer file (POSIX separators; joined
@@ -33,9 +40,32 @@ const RULES_POINTER_CONTENT: &str = "# Project Instructions Pointer\n\nThe canon
 /// trailing newline) so byte-equality stays stable across emit and validate.
 const AGENT_DEFINITION_CONTENT: &str = "{\n  \"name\": \"ose-default\",\n  \"description\": \"Loads the repository's canonical AGENTS.md instructions and project rules.\",\n  \"prompt\": \"Follow the canonical repository instructions in AGENTS.md and the rules in .amazonq/rules/.\",\n  \"resources\": [\n    \"file://AGENTS.md\",\n    \"file://.amazonq/rules/**/*.md\"\n  ],\n  \"tools\": [\n    \"*\"\n  ]\n}\n";
 
-/// Known binding directories checked for catalog coverage. If a directory in
-/// this list exists on disk, the platform-bindings catalog must reference it.
-pub const KNOWN_BINDING_DIRS: &[&str] = &[".claude", ".opencode", ".codex", ".github", ".amazonq"];
+/// Known binding directories / files checked for catalog coverage. If a path
+/// in this list exists on disk, the platform-bindings catalog must reference it.
+/// Covers all 11 supported harnesses:
+///   - Claude Code (.claude) — source of truth
+///   - OpenCode (.opencode) — generated mirror
+///   - Amazon Q (.amazonq) — generated bridge
+///   - Codex (.codex) — native reads AGENTS.md directly
+///   - Copilot (.github) — native reads AGENTS.md directly
+///   - Cursor (.cursor) — native-tier, no-shadowing rule
+///   - Windsurf (.windsurf) — native-tier, no-shadowing rule
+///   - Junie (.junie) — native-tier, no-shadowing rule
+///   - Antigravity / Gemini (GEMINI.md) — native-tier thin-pointer surface
+///   - Pi — no per-repo artifact (API-configured); listed in catalog prose only
+///   - Aider (CONVENTIONS.md) — native-tier thin-pointer surface
+pub const KNOWN_BINDING_DIRS: &[&str] = &[
+    ".claude",
+    ".opencode",
+    ".codex",
+    ".github",
+    ".amazonq",
+    ".cursor",
+    ".windsurf",
+    ".junie",
+    "GEMINI.md",
+    "CONVENTIONS.md",
+];
 
 /// Relative path (from repo root) of the platform-bindings catalog document.
 pub const PLATFORM_BINDINGS_CATALOG: &str = "docs/reference/platform-bindings.md";
@@ -103,26 +133,162 @@ pub fn emit_bindings(repo_root: &Path) -> Result<EmitResult, String> {
     Ok(result)
 }
 
-/// Validates the committed bridge files against the canonical content and
-/// checks that every present known binding directory is referenced in the
-/// platform-bindings catalog. Exits the caller non-zero when any check fails.
+/// Validates all 11 harnesses:
+/// - Amazon Q bridge files: byte-for-byte parity with `expected_bindings()`
+/// - OpenCode mirror: `.opencode/agents/` mirrors `.claude/agents/` (via `validate_sync`)
+/// - Catalog coverage: every present binding dir referenced in the platform-bindings doc
+/// - No-Codex-agents-dir: `.codex/agents/` must not exist (Codex reads AGENTS.md natively)
+/// - Color/tier translation maps: every `color:` and `model:` value in `.claude/agents/*.md`
+///   resolves in the governance docs (ported from `validate-cross-vendor-parity.sh` §5a/5b)
 #[must_use]
 pub fn validate_bindings(repo_root: &Path) -> ValidationResult {
     let start = Instant::now();
     let mut result = ValidationResult::default();
 
+    // Amazon Q static bridge files (byte-parity)
     for binding in expected_bindings() {
         result.tally(validate_binding_file(repo_root, &binding));
     }
 
+    // OpenCode agent mirror parity (.claude/ ↔ .opencode/)
+    let sync_result = validate_sync(repo_root);
+    for check in sync_result.checks {
+        result.tally(check);
+    }
+
+    // Catalog coverage for every present known binding dir / file
     for dir in KNOWN_BINDING_DIRS {
         result.tally(validate_catalog_coverage(repo_root, dir));
     }
 
     result.tally(validate_no_codex_agents_dir(repo_root));
 
+    // Color/tier translation-map coverage (absorbed from validate-cross-vendor-parity.sh §5a/5b)
+    for check in validate_color_tier_maps(repo_root) {
+        result.tally(check);
+    }
+
     result.duration = start.elapsed();
     result
+}
+
+/// Validates that every `color:` and `model:` value used in `.claude/agents/*.md`
+/// resolves in the governance translation-map documents (§5a/5b of the
+/// cross-vendor parity invariant).
+///
+/// Returns an empty vec when the agents directory does not exist (nothing to check).
+fn validate_color_tier_maps(repo_root: &Path) -> Vec<ValidationCheck> {
+    let agents_dir = repo_root.join(".claude").join("agents");
+    if !agents_dir.is_dir() {
+        return vec![];
+    }
+
+    let color_map_path = repo_root.join("repo-governance/development/agents/ai-agents.md");
+    let tier_map_path = repo_root.join("repo-governance/development/agents/model-selection.md");
+
+    let color_map = fs::read_to_string(&color_map_path).unwrap_or_default();
+    let tier_map = fs::read_to_string(&tier_map_path).unwrap_or_default();
+
+    let mut checks = Vec::new();
+    let mut seen_colors = std::collections::BTreeSet::new();
+    let mut seen_tiers = std::collections::BTreeSet::new();
+
+    let entries = match fs::read_dir(&agents_dir) {
+        Ok(e) => e,
+        Err(_) => return vec![],
+    };
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("md") {
+            continue;
+        }
+        let content = match fs::read_to_string(&path) {
+            Ok(c) => c,
+            Err(_) => continue,
+        };
+        for line in content.lines() {
+            if let Some(color) = line.strip_prefix("color:").map(str::trim) {
+                if !color.is_empty() {
+                    seen_colors.insert(color.to_string());
+                }
+            }
+            if let Some(model) = line.strip_prefix("model:").map(str::trim) {
+                if !model.is_empty() {
+                    seen_tiers.insert(model.to_string());
+                }
+            }
+        }
+    }
+
+    // §5a: color translation map
+    let opencode_direct = [
+        "primary",
+        "success",
+        "warning",
+        "secondary",
+        "error",
+        "info",
+        "accent",
+        "muted",
+    ];
+    for color in &seen_colors {
+        if opencode_direct.contains(&color.as_str()) {
+            checks.push(ValidationCheck::passed(
+                format!("Color translation: {color}"),
+                format!("'{color}' is a valid OpenCode theme token (no mapping needed)"),
+            ));
+            continue;
+        }
+        if color_map.contains(&format!("`{color}`")) {
+            checks.push(ValidationCheck::passed(
+                format!("Color translation: {color}"),
+                format!("'{color}' is mapped in ai-agents.md"),
+            ));
+        } else {
+            checks.push(ValidationCheck::failed(
+                format!("Color translation: {color}"),
+                "color mapped in repo-governance/development/agents/ai-agents.md",
+                format!("'{color}' is NOT in the color translation table"),
+                format!(
+                    "Add a row for '{color}' in the Platform Binding Color Translation table in ai-agents.md"
+                ),
+            ));
+        }
+    }
+    if seen_colors.is_empty() {
+        checks.push(ValidationCheck::passed(
+            "Color translation map",
+            "No agent color values to verify (no agents or all use theme tokens)",
+        ));
+    }
+
+    // §5b: capability-tier map
+    for tier in &seen_tiers {
+        let needle = format!("`{tier}`");
+        if tier_map.contains(&needle) || tier_map.contains(&format!("model: {tier}")) {
+            checks.push(ValidationCheck::passed(
+                format!("Tier mapping: {tier}"),
+                format!("'{tier}' is mapped in model-selection.md"),
+            ));
+        } else {
+            checks.push(ValidationCheck::failed(
+                format!("Tier mapping: {tier}"),
+                "model value mapped in repo-governance/development/agents/model-selection.md",
+                format!("'{tier}' is NOT in the capability-tier map"),
+                format!(
+                    "Add a row for '{tier}' in the capability-tier table in model-selection.md"
+                ),
+            ));
+        }
+    }
+    if seen_tiers.is_empty() {
+        checks.push(ValidationCheck::passed(
+            "Capability-tier map",
+            "No agent model values to verify (all agents use planning-grade inherit)",
+        ));
+    }
+
+    checks
 }
 
 /// Check that the committed file at `binding.rel_path` has the exact expected bytes.
@@ -314,8 +480,11 @@ mod tests {
     fn validate_passes_when_files_match() {
         let dir = tempdir().unwrap();
         let root = dir.path();
+        // Provide empty .claude/agents/ and .opencode/agents/ for OpenCode sync check.
+        std::fs::create_dir_all(root.join(".claude/agents")).unwrap();
+        std::fs::create_dir_all(root.join(".opencode/agents")).unwrap();
         emit_bindings(root).unwrap();
-        // Only .amazonq exists on disk; reference it in the catalog.
+        // Only .amazonq + .claude + .opencode exist on disk; reference them in the catalog.
         write(&root.join(PLATFORM_BINDINGS_CATALOG), &full_catalog());
 
         let result = validate_bindings(root);
@@ -390,6 +559,9 @@ mod tests {
     fn validate_passes_when_catalog_references_all_present_dirs() {
         let dir = tempdir().unwrap();
         let root = dir.path();
+        // Provide empty .claude/agents/ and .opencode/agents/ for OpenCode sync check.
+        std::fs::create_dir_all(root.join(".claude/agents")).unwrap();
+        std::fs::create_dir_all(root.join(".opencode/agents")).unwrap();
         emit_bindings(root).unwrap();
         // Materialize several known binding dirs.
         std::fs::create_dir_all(root.join(".github")).unwrap();
@@ -432,15 +604,18 @@ mod tests {
     fn validate_skips_catalog_check_for_absent_dirs() {
         let dir = tempdir().unwrap();
         let root = dir.path();
+        // Provide empty .claude/agents/ and .opencode/agents/ for OpenCode sync check.
+        std::fs::create_dir_all(root.join(".claude/agents")).unwrap();
+        std::fs::create_dir_all(root.join(".opencode/agents")).unwrap();
         emit_bindings(root).unwrap();
-        // Empty catalog; only .amazonq exists, so reference just it.
+        // Catalog references .amazonq + .claude + .opencode (present); others are absent.
         write(
             &root.join(PLATFORM_BINDINGS_CATALOG),
-            "# Platform Bindings\n\n- `.amazonq` row\n",
+            "# Platform Bindings\n\n- `.amazonq` row\n- `.claude` row\n- `.opencode` row\n",
         );
 
         let result = validate_bindings(root);
-        // .claude/.opencode/.codex/.github absent → those coverage checks pass.
+        // .codex/.github/.cursor/.windsurf/.junie/GEMINI.md/CONVENTIONS.md absent → pass.
         assert_eq!(result.failed_checks, 0, "result: {result:#?}");
     }
 
@@ -450,5 +625,52 @@ mod tests {
         assert_eq!(bindings.len(), 2);
         assert_eq!(bindings[0].rel_path, AMAZONQ_RULES_POINTER);
         assert_eq!(bindings[1].rel_path, AMAZONQ_AGENT_DEFINITION);
+    }
+
+    // ---- P1-1b-RED8 → GREEN8: harness bindings validate covers all 11 harnesses ----
+
+    /// Asserts that all 11 supported harnesses are covered by `harness bindings validate`:
+    /// - Native-tier dirs in KNOWN_BINDING_DIRS (Cursor, Windsurf, Junie, Antigravity, Aider)
+    /// - OpenCode parity checks appear in validate_bindings() result (via validate_sync)
+    /// All 11: Claude Code, OpenCode, Amazon Q, Codex, Copilot, Cursor, Windsurf, Junie,
+    ///         Antigravity, Pi, Aider.
+    #[test]
+    fn harness_bindings_validate_covers_all_11_harnesses() {
+        // Check 1: native-tier dirs are in KNOWN_BINDING_DIRS
+        let native_tier = [
+            ".cursor",        // Cursor
+            ".windsurf",      // Windsurf
+            ".junie",         // JetBrains Junie
+            "GEMINI.md",      // Google Antigravity
+            "CONVENTIONS.md", // Aider
+        ];
+        for harness in &native_tier {
+            assert!(
+                KNOWN_BINDING_DIRS.contains(harness),
+                "native-tier harness {harness:?} not in KNOWN_BINDING_DIRS; must cover all 11"
+            );
+        }
+
+        // Check 2: validate_bindings() produces OpenCode-related checks (via validate_sync)
+        let dir = tempdir().unwrap();
+        let root = dir.path();
+        std::fs::create_dir_all(root.join(".claude/agents")).unwrap();
+        std::fs::create_dir_all(root.join(".opencode/agents")).unwrap();
+        emit_bindings(root).unwrap();
+        write(
+            &root.join(PLATFORM_BINDINGS_CATALOG),
+            "# Platform Bindings\n\n- `.amazonq` row\n",
+        );
+        let result = validate_bindings(root);
+        let has_opencode_check = result.checks.iter().any(|c| {
+            c.name.to_lowercase().contains("opencode")
+                || c.name.to_lowercase().contains("sync")
+                || c.name.to_lowercase().contains("agent")
+        });
+        assert!(
+            has_opencode_check,
+            "validate_bindings must produce an OpenCode/sync/agent check for all-11-harness coverage; got checks: {:?}",
+            result.checks.iter().map(|c| &c.name).collect::<Vec<_>>()
+        );
     }
 }

@@ -64,15 +64,11 @@
       "inputs": [
         "default",
         "{projectRoot}/src/generated-contracts/**/*",
-        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-app-web/gherkin/**/*.feature",
-        "{workspaceRoot}/specs/apps/organiclever/ddd/bounded-contexts.yaml",
-        "{workspaceRoot}/specs/apps/organiclever/ddd/ubiquitous-language/**/*.md"
+        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-app-web/gherkin/**/*.feature"
       ],
       "outputs": ["{projectRoot}/coverage"],
       "options": {
         "commands": [
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- specs validate bc organiclever)",
-          "(cd ../../apps/rhino-cli && cargo run --release --quiet -- specs validate ul organiclever)",
           "node scripts/gen-migrations.mjs && npx vitest run --coverage && (cd ../../apps/rhino-cli && cargo run --release --quiet -- test-coverage validate apps/organiclever-app-web/coverage/lcov.info 74)"
         ],
         "parallel": false,
@@ -121,8 +117,8 @@
       },
       "outputs": ["{projectRoot}/storybook-static"]
     },
-    "specs:coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps specs/apps/organiclever/behavior/organiclever-app-web/gherkin apps/organiclever-app-web",
+    "specs:behavior:coverage": {
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/organiclever/behavior/organiclever-app-web/gherkin apps/organiclever-app-web",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-app-web/gherkin/**/*.feature",

@@ -104,8 +104,8 @@
       },
       "outputs": ["{projectRoot}/storybook-static"]
     },
-    "specs:coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps specs/apps/ose/behavior/app-web/gherkin apps/ose-app-web-e2e",
+    "specs:behavior:coverage": {
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/ose/behavior/app-web/gherkin apps/ose-app-web-e2e",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/ose/behavior/app-web/gherkin/**/*.feature",

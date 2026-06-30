@@ -94,7 +94,7 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs", "{projectRoot}/tests/**/*.rs"]
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'Phase 0 — specs:coverage stubbed; cucumber harness is future work'"

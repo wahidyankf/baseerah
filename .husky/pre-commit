@@ -1,3 +1,4 @@
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env staged-guard validate
 ./scripts/git-identity-check.sh
 ./scripts/check-no-env-staged.sh
 

@@ -73,8 +73,8 @@
         "cwd": "{projectRoot}"
       }
     },
-    "specs:coverage": {
-      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin apps/wahidyankf-www",
+    "specs:behavior:coverage": {
+      "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin apps/wahidyankf-www",
       "cache": true,
       "inputs": [
         "{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature",

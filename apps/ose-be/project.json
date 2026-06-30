@@ -116,13 +116,21 @@
       },
       "cache": false
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs validate coverage --shared-steps --exclude-dir messaging specs/apps/ose/behavior/be/gherkin apps/ose-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps --exclude-dir messaging specs/apps/ose/behavior/be/gherkin apps/ose-be"
       },
       "cache": true,
       "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature", "{projectRoot}/src/**/*.fs"]
+    },
+    "specs:domain:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs domain-coverage validate --shared-steps --exclude-dir messaging specs/apps/ose/behavior/be/gherkin/domain apps/ose-be"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/domain/**/*.feature", "{projectRoot}/src/**/*.fs"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",

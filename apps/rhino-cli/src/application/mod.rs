@@ -6,10 +6,14 @@ pub mod agents;
 pub mod allowlist;
 /// Bounded-context registry loader and validator.
 pub mod bcregistry;
+/// Per-level @covers behavior coverage engine.
+pub mod behavior_coverage;
 /// Documentation validation use cases.
 pub mod docs;
 /// Doctor (toolchain-check) use case.
 pub mod doctor;
+/// `specs domain-coverage validate` — behavior coverage scoped to domain/** feature files.
+pub mod domain_coverage;
 /// Environment-file use cases (backup, validate).
 pub mod env;
 /// Git pre-commit use cases and port definitions.
@@ -20,6 +24,8 @@ pub mod glossary;
 pub mod mermaid;
 /// Agent and workflow naming convention validators.
 pub mod naming;
+/// Unified repo-config.yml loader.
+pub mod repo_config;
 /// Repository governance audit use cases.
 pub mod repo_governance;
 /// Severity level enum and resolution helpers.
