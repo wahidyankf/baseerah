@@ -288,10 +288,9 @@ git -C /path/to/ose-primer config --local --list | grep "^user\." || echo "clean
 
 ## Related Documentation
 
-- [`scripts/git-identity-check.sh`](../../../scripts/git-identity-check.sh) — Identity-agnostic
-  guard that enforces this convention at commit time
-- [`.husky/pre-commit`](../../../.husky/pre-commit) — Husky hook that invokes the guard as its
-  first step
+- [`AGENTS.md` — Git Identity Guardrail](../../../AGENTS.md) — Policy-level guardrail forbidding
+  AI agents from setting or modifying git identity (replaced the former shell guard script)
+- [`.husky/pre-commit`](../../../.husky/pre-commit) — Husky hook for commit-time automation
 - [Code Quality Convention](../quality/code.md) — Git hooks and pre-commit automation
 - [Commit Message Convention](./commit-messages.md) — Conventional Commits format
 - [Reproducible Environments Convention](./reproducible-environments.md) — Deterministic
