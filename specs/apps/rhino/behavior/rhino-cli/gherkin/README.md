@@ -18,7 +18,6 @@ behavior/rhino-cli/gherkin/
 ├── spec-coverage/    # specs coverage command (folded from old spec-coverage subcommand)
 ├── specs/            # specs subcommand family
 ├── system/           # system commands (doctor)
-├── test-coverage/    # test-coverage subcommand family
 └── workflows/        # workflows subcommand family
 ```
 
@@ -98,14 +97,6 @@ behavior/rhino-cli/gherkin/
 | File             | Command(s) | Scenarios |
 | ---------------- | ---------- | --------- |
 | `doctor.feature` | `doctor`   | 9         |
-
-### test-coverage
-
-| File                             | Command(s)               | Scenarios |
-| -------------------------------- | ------------------------ | --------- |
-| `test-coverage-diff.feature`     | `test-coverage diff`     | 4         |
-| `test-coverage-merge.feature`    | `test-coverage merge`    | 3         |
-| `test-coverage-validate.feature` | `test-coverage validate` | 10        |
 
 ### workflows
 

@@ -35,7 +35,6 @@ specs/apps/rhino/
             ├── spec-coverage/    # spec-coverage subcommand family (1 feature)
             ├── specs/            # specs subcommand family (4 features)
             ├── system/           # system commands — doctor (1 feature)
-            ├── test-coverage/    # test-coverage subcommand family (3 features)
             └── workflows/        # workflows subcommand family (1 feature)
 ```
 

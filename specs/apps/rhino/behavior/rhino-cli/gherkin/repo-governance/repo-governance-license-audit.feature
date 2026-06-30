@@ -7,24 +7,24 @@ Feature: Per-Directory License Audit
 
   Scenario: Clean repository where every app/lib/specs has matching LICENSE passes
     Given a repository where every required directory has a matching MIT LICENSE file
-    When the developer runs convention validate license
+    When the developer runs convention license validate
     Then the command exits successfully
     And the output reports zero license findings
 
   Scenario: App directory missing LICENSE file fails
     Given a repository where one app directory is missing its LICENSE file
-    When the developer runs convention validate license
+    When the developer runs convention license validate
     Then the command exits with a failure code
     And the output identifies the missing LICENSE app directory
 
   Scenario: Lib directory missing LICENSE file fails
     Given a repository where one lib directory is missing its LICENSE file
-    When the developer runs convention validate license
+    When the developer runs convention license validate
     Then the command exits with a failure code
     And the output identifies the missing LICENSE lib directory
 
   Scenario: LICENSING-NOTICE.md table row mismatching SPDX in LICENSE fails
     Given a repository where a LICENSING-NOTICE.md table row claims a license that disagrees with the on-disk LICENSE file
-    When the developer runs convention validate license
+    When the developer runs convention license validate
     Then the command exits with a failure code
     And the output identifies the SPDX mismatch
