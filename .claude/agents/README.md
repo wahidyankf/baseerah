@@ -88,6 +88,7 @@ This directory contains specialized AI agents for the open-sharia-enterprise pro
 - **[apps-organiclever-app-web-deployer](apps-organiclever-app-web-deployer.md)** - OrganicLever app-group staging deployment (`stag-organiclever-app-web` + `stag-organiclever-be`; prod CD deferred)
 - **[apps-ose-app-web-deployer](apps-ose-app-web-deployer.md)** - OSE Application app-group staging deployment (`stag-ose-app-web` + `stag-ose-be`; prod CD deferred)
 - **[apps-wahidyankf-www-deployer](apps-wahidyankf-www-deployer.md)** - wahidyankf portfolio deployment (`prod-wahidyankf-www`, Next.js via Vercel)
+- **[apps-web-ui-storybook-deployer](apps-web-ui-storybook-deployer.md)** - web-ui Storybook deployment to Vercel via `prod-web-ui` force-push
 
 ### 💻 Development
 

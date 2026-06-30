@@ -405,3 +405,9 @@ Check that changes:
 - [Conventions Index](../conventions/README.md) - Layer 2: Documentation conventions embodying these principles
 - [Development Index](../development/README.md) - Layer 3: Development practices embodying these principles
 - [Explanation Index](../../docs/explanation/README.md) - All conceptual documentation
+
+## 📂 Subcategory Indexes
+
+- [General Principles Index](./general/README.md) - Universal principles for all problem-solving contexts
+- [Content Principles Index](./content/README.md) - Documentation, education, and communication principles
+- [Software Engineering Principles Index](./software-engineering/README.md) - Technical software development principles

@@ -187,3 +187,13 @@ These companion files exist in each subdirectory: `workflow/`, `quality/`, `patt
 - [Core Principles](../principles/README.md) - Layer 1: Foundational values that govern development practices
 - [Conventions](../conventions/README.md) - Layer 2: Documentation conventions (parallel governance with development)
 - [Workflows](../workflows/README.md) - Layer 5: Multi-step processes composing agents, procedures, and/or other workflows
+
+## 📂 Subdirectory Indexes
+
+- [Workflow Index](./workflow/README.md) - Development workflow practices index
+- [Quality Index](./quality/README.md) - Quality standards index
+- [Pattern Index](./pattern/README.md) - Pattern documentation index
+- [Practice Index](./practice/README.md) - Practice documentation index
+- [Agent Standards Index](./agents/README.md) - Agent standards and conventions index
+- [Infrastructure Index](./infra/README.md) - Infrastructure documentation index
+- [Frontend Index](./frontend/README.md) - Frontend development standards index

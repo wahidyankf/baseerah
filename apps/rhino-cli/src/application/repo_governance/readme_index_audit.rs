@@ -164,6 +164,12 @@ fn audit_one_readme(
     for link in sorted_links {
         if !actual.present(&link) {
             let full = dir.join(&link);
+            // Cross-dir links (e.g. "agents/foo.md") point to files inside a
+            // subdirectory.  If the path exists on disk the link is valid — don't
+            // ghost it.  Only report ghost when the target is genuinely missing.
+            if full.exists() {
+                continue;
+            }
             findings.push(ReadmeIndexFinding {
                 file: full.to_string_lossy().to_string(),
                 severity: "high".to_string(),
@@ -442,6 +448,27 @@ mod tests {
         ));
         assert!(matches_any_glob("a/scratch/b.md", &["scratch".to_string()]));
         assert!(!matches_any_glob("foo/bar.md", &["*.txt".to_string()]));
+    }
+
+    #[test]
+    fn cross_dir_link_to_existing_file_not_ghost() {
+        let tmp = TempDir::new().unwrap();
+        let sub = tmp.path().join("sub");
+        fs::create_dir(&sub).unwrap();
+        fs::write(sub.join("README.md"), "# Sub\n").unwrap();
+        fs::write(sub.join("detail.md"), "# Detail\n").unwrap();
+        // Parent README links to a file inside a subdir: "sub/detail.md"
+        fs::write(
+            tmp.path().join("README.md"),
+            "[sub readme](sub/README.md)\n[sub detail](sub/detail.md)\n",
+        )
+        .unwrap();
+        let findings =
+            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+        assert!(
+            findings.iter().all(|f| f.kind != "ghost"),
+            "cross-dir link to existing file must not be reported as ghost: {findings:?}"
+        );
     }
 
     #[test]

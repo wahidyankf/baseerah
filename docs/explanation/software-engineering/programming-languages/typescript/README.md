@@ -1538,6 +1538,7 @@ async function processDonation(data: DonationInput): Promise<Result<Donation, Er
 - [Rust Documentation](../rust/README.md)
 - [F# Documentation](../f-sharp/README.md)
 - [C# Documentation](../c-sharp/README.md)
+- [Code Templates](./templates/README.md) - Starter templates for TypeScript projects
 
 ---
 

@@ -316,6 +316,7 @@ graph LR
 
 - [Tech Stack Languages Index](../README.md)
 - [Monorepo Structure](../../../../reference/monorepo-structure.md)
+- [Code Templates](./templates/README.md) - Starter templates for Rust projects
 
 ---
 
