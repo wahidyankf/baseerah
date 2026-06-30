@@ -153,7 +153,7 @@ Required for `rhino-cli`, `ose-cli`, `ayokoding-cli`, and `libs/rust-commons`. T
 # Install rustup (if not present)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-# Install additional cargo tools used by test:quick and deny:check
+# Install additional cargo tools used by test:quick and deps:audit
 cargo install cargo-llvm-cov --locked
 cargo install cargo-deny --locked
 

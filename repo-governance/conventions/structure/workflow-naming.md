@@ -101,7 +101,7 @@ find repo-governance/workflows -name '*.md' -not -name 'README.md' -not -path '*
 
 Any non-empty output is a governance violation. Each line printed is a workflow filename whose suffix does not match the Type Vocabulary; each such file MUST be renamed to a compliant name before the checker can pass.
 
-The `rhino-cli workflows validate-naming` subcommand wraps this check plus a frontmatter `name:` field consistency check and is wired into Husky pre-push and the CI quality gate.
+The `rhino-cli repo-governance workflows naming validate` subcommand wraps this check plus a frontmatter `name:` field consistency check and is wired into Husky pre-push and the CI quality gate.
 
 ## Examples
 
@@ -122,4 +122,4 @@ Current workflows, grouped by type, all conforming to the rule:
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)** — The scope and type of every workflow are explicit in its filename; no convention-by-tribal-knowledge.
 - **[Simplicity Over Complexity](../../principles/general/simplicity-over-complexity.md)** — One rule, one type list, one regex. One documented exception (meta).
-- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)** — A single-line `find | grep` decides conformance, enabling mechanical enforcement by `repo-rules-checker` and `rhino-cli workflows validate-naming`.
+- **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)** — A single-line `find | grep` decides conformance, enabling mechanical enforcement by `repo-rules-checker` and `rhino-cli repo-governance workflows naming validate`.

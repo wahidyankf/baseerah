@@ -1,6 +1,6 @@
 ---
 title: "Secrets and Environment-Variable Standards"
-description: The authoritative hub for how this repository handles secrets and environment variables — naming convention, layout, annotation format, startup validation, tooling (rhino-cli env family), tiered injection standard (env-injection.yaml), storage tiers, and the env-contract drift guard.
+description: "The authoritative hub for how this repository handles secrets and environment variables — naming convention, layout, annotation format, startup validation, tooling (rhino-cli env family), tiered injection standard (env-injection: section in repo-config.yml), storage tiers, and the env-contract drift guard."
 category: explanation
 subcategory: conventions
 tags:
@@ -31,8 +31,8 @@ environment variables. The three prior docs that covered overlapping ground now 
   env var is declared by name, class, and type in `.env.example`; startup validators fail fast when a
   required var is absent.
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**: The
-  `rhino-cli env` toolchain (backup, restore, init, validate) and `env-contract.yaml` eliminate
-  manual cross-checking between templates and code.
+  `rhino-cli env` toolchain (backup, restore, init, validate) and the `env-contract:` section in
+  `repo-config.yml` eliminate manual cross-checking between templates and code.
 - **[Root Cause Orientation](../../principles/general/root-cause-orientation.md)**: The drift guard
   (`env validate`) catches mismatches at the source, not in production. The hard no-secrets rule
   prevents exposure at the origin — not just after-the-fact scrubbing.
@@ -185,16 +185,16 @@ import "./src/env";
 
 The full `rhino-cli env` family manages the local secrets lifecycle:
 
-| Command                             | What it does                                                         |
-| ----------------------------------- | -------------------------------------------------------------------- |
-| `rhino-cli env backup [--dry-run]`  | Copies all secret files to `~/<repo-name>-env-backup/`               |
-| `rhino-cli env restore [--dry-run]` | Restores from the backup directory                                   |
-| `rhino-cli env init`                | Scaffolds `.env.local` from every `apps/<app>/.env.example` template |
-| `rhino-cli env validate`            | Checks each surface in `env-contract.yaml` for code↔template drift   |
+| Command                             | What it does                                                                       |
+| ----------------------------------- | ---------------------------------------------------------------------------------- |
+| `rhino-cli env backup [--dry-run]`  | Copies all secret files to `~/<repo-name>-env-backup/`                             |
+| `rhino-cli env restore [--dry-run]` | Restores from the backup directory                                                 |
+| `rhino-cli env init`                | Scaffolds `.env.local` from every `apps/<app>/.env.example` template               |
+| `rhino-cli env validate`            | Checks each surface in `env-contract:` (`repo-config.yml`) for code↔template drift |
 
 ### Backup scope — hybrid floor + registry
 
-Backup coverage = hardcoded floor ∪ `backup_globs` from `env-contract.yaml`:
+Backup coverage = hardcoded floor ∪ `backup_globs` from the `env-contract:` section in `repo-config.yml`:
 
 | Pattern                      | Status                                                  |
 | ---------------------------- | ------------------------------------------------------- |
@@ -208,31 +208,32 @@ The default backup target is `~/<repo-root-basename>-env-backup/` (e.g. `~/ose-p
 This is the canonical per-repo backup directory aligned across the ose-public/ose-primer/ose-infra
 sibling repos.
 
-### `env-contract.yaml` and drift validation
+### `env-contract:` section and drift validation
 
-`env-contract.yaml` at repo root declares each surface to validate:
+The `env-contract:` section in `repo-config.yml` at repo root declares each surface to validate:
 
 ```yaml
-surfaces:
-  - root: apps/organiclever-be
-    kind: app
-    lang: rust
-    allowlist: []
-  - root: apps/ose-www
-    kind: app
-    lang: typescript
-    allowlist: [PORT, HOSTNAME]
-  # Terraform/Ansible: forward-scaffold — activate when IaC is added
+env-contract:
+  surfaces:
+    - root: apps/organiclever-be
+      kind: app
+      lang: rust
+      allowlist: []
+    - root: apps/ose-www
+      kind: app
+      lang: typescript
+      allowlist: [PORT, HOSTNAME]
+    # Terraform/Ansible: forward-scaffold — activate when IaC is added
 ```
 
 `rhino-cli env validate` compares declared keys in `.env.example` against read keys in source code,
 reporting `declared-but-unread` (stale template entry) and `read-but-undeclared` (undocumented read)
-drift findings. Invoked by `.husky/pre-push` and `.github/workflows/commons-env-validate.yml`.
+drift findings. Invoked by `.husky/pre-push` and `.github/workflows/validate-env.yml`.
 
 ## 7. Tiered Injection Standard
 
 The sections above standardize how an app **declares** its env vars locally — naming convention (§2),
-template layout (§3), annotation format (§4), and the `env-contract.yaml` drift guard (§6). This
+template layout (§3), annotation format (§4), and the `env-contract:` drift guard (§6). This
 section closes the remaining gap: how a declared key is **injected** into each running surface across
 GitHub Actions, Vercel, and the backend container / k3s path at each deploy stage.
 
@@ -248,18 +249,18 @@ the value, never by the key name.
 
 The table below extends §2 with the injection home for each class:
 
-| Class                      | Example                                                                     | `.env.example`?    | Injection home                                                                     |
-| -------------------------- | --------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------- |
-| App-runtime (server)       | `DATABASE_URL`, `ORGANICLEVER_BE_NATS_URL`                                  | **yes**            | local `.env.local` · GitHub Env (CI) · Vercel encrypted env · k3s secret           |
-| App-runtime (public build) | `NEXT_PUBLIC_*`                                                             | **yes**            | same homes as server class, but **build-time** bundled by Next.js (never a secret) |
-| CI test-harness            | `WEB_BASE_URL`, `VERCEL_AUTOMATION_BYPASS_SECRET`, `PLAYWRIGHT_GREP_INVERT` | **no** (test-only) | GitHub Environment `vars.`/`secrets.` only; registered in `env-injection.yaml`     |
-| Platform-injected          | `VERCEL_GIT_COMMIT_REF`, `PORT`, `HOSTNAME`                                 | allowlisted        | supplied by the platform or framework; never declared by us, never set by us       |
+| Class                      | Example                                                                     | `.env.example`?    | Injection home                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
+| App-runtime (server)       | `DATABASE_URL`, `ORGANICLEVER_BE_NATS_URL`                                  | **yes**            | local `.env.local` · GitHub Env (CI) · Vercel encrypted env · k3s secret                       |
+| App-runtime (public build) | `NEXT_PUBLIC_*`                                                             | **yes**            | same homes as server class, but **build-time** bundled by Next.js (never a secret)             |
+| CI test-harness            | `WEB_BASE_URL`, `VERCEL_AUTOMATION_BYPASS_SECRET`, `PLAYWRIGHT_GREP_INVERT` | **no** (test-only) | GitHub Environment `vars.`/`secrets.` only; registered in `env-injection:` (`repo-config.yml`) |
+| Platform-injected          | `VERCEL_GIT_COMMIT_REF`, `PORT`, `HOSTNAME`                                 | allowlisted        | supplied by the platform or framework; never declared by us, never set by us                   |
 
 The CI test-harness class is new and important. `WEB_BASE_URL` and
 `VERCEL_AUTOMATION_BYPASS_SECRET` are not app config — they describe the deployed staging target
 that the e2e job probes. They must never appear in `apps/<app>/.env.example`. If they did, the
 drift guard would flag them `declared-but-unread` (the app source code never reads them), producing
-false findings. These keys belong exclusively in their own registry (see `env-injection.yaml` below).
+false findings. These keys belong exclusively in their own registry (see `env-injection:` section below).
 
 `VERCEL_AUTOMATION_BYPASS_SECRET` is **load-bearing, not optional**. Every app-web Vercel deployment
 has Deployment Protection enabled, which returns `401` to unauthenticated requests to the staging or
@@ -286,8 +287,8 @@ The table below maps each app type and stage to its injection platform and value
 Two load-bearing boundaries follow from the matrix:
 
 - **This plan writes only references** — the `environment:` names, the `vars.`/`secrets.` reads,
-  the compose env wiring sourced from committed placeholders, and the value-less `env-injection.yaml`
-  manifest. It creates no real values.
+  the compose env wiring sourced from committed placeholders, and the value-less `env-injection:`
+  manifest (in `repo-config.yml`). It creates no real values.
 - **`wire-vercel` populates the values** — GitHub Environment secrets/vars and Vercel project env
   at each target. **coralpolyp (ose-infra)** owns the backend k3s secret values. The contract (key
   set) is defined here; the cutover plan and ose-infra fill it in.
@@ -318,56 +319,57 @@ by wire-vercel):
 If `{group}-app-local` holds no secrets after wire-vercel completes, **omit the `environment:` key**
 rather than bind an empty environment.
 
-### `env-injection.yaml` — value-less injection manifest
+### `env-injection:` section — value-less injection manifest
 
-A new committed registry at repo root declares, per app, the injection home for every key at every
-stage it runs in — names only, never values. It is the static contract that `commons-env-validate`
-checks for manifest consistency: every app-runtime key in `.env.example` has a documented home at
-each stage the app runs; every CI test-harness key is registered and has no `.env.example` entry.
-It is also the **checklist wire-vercel works from** when populating real values.
+The `env-injection:` section in `repo-config.yml` declares, per app, the injection home for every
+key at every stage it runs in — names only, never values. It is the static contract that
+`validate-env` checks for manifest consistency: every app-runtime key in `.env.example` has a
+documented home at each stage the app runs; every CI test-harness key is registered and has no
+`.env.example` entry. It is also the **checklist wire-vercel works from** when populating real values.
 
 ```yaml
-# env-injection.yaml — value-less injection contract (extends env-contract.yaml)
-apps:
-  - app: organiclever-app-web
-    runtime: { local: env-local, staging: vercel-preview, production: vercel-production }
-    keys-from: apps/organiclever-app-web/.env.example
-  - app: organiclever-be
-    runtime: { local-ci: compose, staging: k3s-coralpolyp }
-    keys-from: apps/organiclever-be/.env.example
-ci-harness:
-  # test-only keys, never in any .env.example
-  - key: WEB_BASE_URL
-    class: var
-    environments: [organiclever-app-staging, ose-app-staging]
-  - key: VERCEL_AUTOMATION_BYPASS_SECRET
-    class: secret
-    environments: [organiclever-app-staging, ose-app-staging]
+# repo-config.yml — env-injection: section (value-less injection contract)
+env-injection:
+  apps:
+    - app: organiclever-app-web
+      runtime: { local: env-local, staging: vercel-preview, production: vercel-production }
+      keys-from: apps/organiclever-app-web/.env.example
+    - app: organiclever-be
+      runtime: { local-ci: compose, staging: k3s-coralpolyp }
+      keys-from: apps/organiclever-be/.env.example
+  ci-harness:
+    # test-only keys, never in any .env.example
+    - key: WEB_BASE_URL
+      class: var
+      environments: [organiclever-app-staging, ose-app-staging]
+    - key: VERCEL_AUTOMATION_BYPASS_SECRET
+      class: secret
+      environments: [organiclever-app-staging, ose-app-staging]
 ```
 
 `rhino-cli env validate` gains a manifest-consistency pass — not a separate Nx target. The manifest
 and `.env.example` are the same conceptual surface (the env contract), and `env validate` is already
-wired into `.husky/pre-push` and `commons-env-validate.yml`, so extending it adds the check with no
+wired into `.husky/pre-push` and `validate-env.yml`, so extending it adds the check with no
 new target wiring. The check remains static and value-free. Actual presence of secret values in
 GitHub, Vercel, or k3s is not machine-checkable from this repo and stays a wire-vercel / ose-infra
 `[HUMAN]` responsibility — the manifest is what they verify against.
 
 ## 8. Secret-Surface Census
 
-| Surface                   | Path                                        | Backing tool       | Backed up          | Validated                       |
-| ------------------------- | ------------------------------------------- | ------------------ | ------------------ | ------------------------------- |
-| App env file              | `apps/<app>/.env.local`                     | dotenvy / Next.js  | Yes (floor)        | Yes (`env validate`)            |
-| Blessed secrets dir       | `.secrets/`                                 | manual             | Yes (floor)        | No                              |
-| Root secrets blob         | `secrets.json`                              | manual             | Yes (floor)        | No                              |
-| Terraform vars            | `infra/terraform/**/*.tfvars`               | Terraform          | Commented scaffold | Commented scaffold              |
-| Ansible inventory         | `infra/ansible/**/inventory`                | Ansible            | Commented scaffold | Commented scaffold              |
-| GitHub Environment secret | `{group}-app-staging` / `{group}-app-local` | GitHub Actions Env | No (platform)      | Manifest (`env-injection.yaml`) |
-| Vercel project env        | Vercel project settings (per target)        | Vercel dashboard   | No (platform)      | Manifest (`env-injection.yaml`) |
-| k3s / coralpolyp secret   | ose-infra secret store                      | k3s + coralpolyp   | No (ose-infra)     | ose-infra cross-repo            |
+| Surface                   | Path                                        | Backing tool       | Backed up          | Validated                                        |
+| ------------------------- | ------------------------------------------- | ------------------ | ------------------ | ------------------------------------------------ |
+| App env file              | `apps/<app>/.env.local`                     | dotenvy / Next.js  | Yes (floor)        | Yes (`env validate`)                             |
+| Blessed secrets dir       | `.secrets/`                                 | manual             | Yes (floor)        | No                                               |
+| Root secrets blob         | `secrets.json`                              | manual             | Yes (floor)        | No                                               |
+| Terraform vars            | `infra/terraform/**/*.tfvars`               | Terraform          | Commented scaffold | Commented scaffold                               |
+| Ansible inventory         | `infra/ansible/**/inventory`                | Ansible            | Commented scaffold | Commented scaffold                               |
+| GitHub Environment secret | `{group}-app-staging` / `{group}-app-local` | GitHub Actions Env | No (platform)      | Manifest (`env-injection:` in `repo-config.yml`) |
+| Vercel project env        | Vercel project settings (per target)        | Vercel dashboard   | No (platform)      | Manifest (`env-injection:` in `repo-config.yml`) |
+| k3s / coralpolyp secret   | ose-infra secret store                      | k3s + coralpolyp   | No (ose-infra)     | ose-infra cross-repo                             |
 
 Template files (`*.env.example`) are tracked in git — they are not secrets. Real gitignored files are
 the backup target. Injection-target rows (GitHub / Vercel / k3s) hold real values outside this repo;
-the manifest (`env-injection.yaml`) is the in-repo record of which key lives where.
+the `env-injection:` section in `repo-config.yml` is the in-repo record of which key lives where.
 
 ## 9. `guard-env-file-access` Policy
 
@@ -381,8 +383,9 @@ See also: [`env-file-access.md`](./env-file-access.md)
 
 ## 10. IaC Forward Scaffold
 
-Terraform and Ansible surfaces are documented in `env-contract.yaml` as **commented forward-scaffold**
-entries — syntactically present but inactive. Uncomment and fill in `root` when IaC surfaces are added
+Terraform and Ansible surfaces are documented in the `env-contract:` section of `repo-config.yml`
+as **commented forward-scaffold** entries — syntactically present but inactive. Uncomment and fill
+in `root` when IaC surfaces are added
 to the repository. This prevents the drift guard from producing false findings before IaC exists while
 ensuring the pattern is immediately available when it does.
 
@@ -392,5 +395,4 @@ ensuring the pattern is immediately available when it does.
 - [`env-file-access.md`](./env-file-access.md) — `guard-env-file-access` agent policy (stub)
 - [`reproducible-environments.md`](../../../repo-governance/development/workflow/reproducible-environments.md) — environment setup (stub for env section)
 - [`docs/explanation/standardize-secrets-and-env-parity-decisions.md`](../../../docs/explanation/standardize-secrets-and-env-parity-decisions.md) — cross-repo parity decisions
-- [`env-contract.yaml`](../../../env-contract.yaml) — surface registry
-- [`env-injection.yaml`](../../../env-injection.yaml) — value-less injection manifest (names only; see §7)
+- [`repo-config.yml`](../../../repo-config.yml) — unified config hub; `env-contract:` section = surface registry; `env-injection:` section = value-less injection manifest (names only; see §7)

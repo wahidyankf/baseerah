@@ -207,11 +207,12 @@ states which tier it serves, and reorganized the reusable workflows around the n
 renamed to drop a misleading `-deploy-prod` suffix — they run the staging E2E gate and stop, because
 production CD is still deferred, so the name now matches the behavior.
 
-Alongside the naming work, a new **`env-injection.yaml`** manifest declares, per app and per deploy
+Alongside the naming work, a new env-injection manifest declares, per app and per deploy
 stage, _where_ each environment key is injected — **names only, never values**. `rhino-cli env
 validate` checks the manifest for internal consistency, giving a drift guard over the env surface
 without putting a single secret in a tracked file. The hard rule that no secret ever lands in a
-git-tracked file held throughout.
+git-tracked file held throughout. (The manifest was later merged into the `env-injection:` section
+of `repo-config.yml`.)
 
 ## Cross-Repo Governance Hardening
 
@@ -296,7 +297,7 @@ What changed in roughly five weeks (2026-05-10 → 2026-06-15):
   even alpha, let alone production-ready.
 - **`crane-be` media service**: stood up, then dropped (media returns to `crane-cli`, which reverted
   Rust → F#).
-- **CI**: domain-first workflow naming + a value-less `env-injection.yaml` manifest with
+- **CI**: domain-first workflow naming + a value-less env-injection manifest (now in `repo-config.yml`) with
   `rhino-cli env validate`; shellcheck/hadolint/actionlint gates added.
 - **Governance**: `governance/` → `repo-governance/`; unified markdown gate; CISA KEV + EPSS
   dependency policy; blameless post-mortem convention.

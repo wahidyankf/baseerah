@@ -107,7 +107,7 @@ Use these canonical names. Aliases (`serve`, `start:dev`, `unit-test`) are anti-
 | `specs:domain:coverage`   | Validate domain-area coverage gated by the explicit `specs.domain-areas` allowlist in `repo-config.yml` (not folder-presence)                                                                                                                                                                                | All apps                           |
 | `test:specs`              | Aggregate of every `specs:*` validator for the project (`specs:structure-validation`, `specs:behavior:coverage`, `specs:domain:coverage` where in the `specs.domain-areas` allowlist; `echo` elsewhere); present on all projects; runs inside `test:quick` — replaces the separate specs-structural gate job | All projects (echo where no specs) |
 | `test:unit`               | Isolated unit tests with mocked dependencies; must consume Gherkin specs; `echo` placeholder where no real unit tests exist                                                                                                                                                                                  | All projects (echo where N/A)      |
-| `test:coverage`           | Native coverage gate (≥ 90% line coverage) per project via native test runner; `echo` where `test:unit` is `echo`; replaces the removed `rhino-cli test-coverage` command                                                                                                                                    | All projects (echo where N/A)      |
+| `test:coverage`           | Native coverage gate (≥ 90% line coverage) per project via native test runner; `echo` where `test:unit` is `echo`                                                                                                                                                                                            | All projects (echo where N/A)      |
 | `test:integration`        | Demo-be: real PostgreSQL via docker-compose, direct code calls (no HTTP); others: in-process mocking (MSW, Godog); `echo` placeholder where no real integration tests exist                                                                                                                                  | All projects (echo where N/A)      |
 | `test:e2e`                | Real Playwright tests driving the running app over HTTP/UI — **only** on `*-e2e` projects; `echo` on all non-e2e projects; runs on scheduled CRON only (never pre-push/PR)                                                                                                                                   | All projects (echo on non-e2e)     |
 | `test:e2e:ui`             | Run E2E tests with interactive Playwright UI                                                                                                                                                                                                                                                                 | E2E test projects                  |
@@ -146,14 +146,14 @@ operation. This distinguishes governance targets from language-level lifecycle t
 | `links:validation`                     | Internal links in all non-excluded `.md` files                                             |
 | `mermaid:validation`                   | Mermaid diagram width, label, and syntax rules (flowchart + state)                         |
 | `headings:hierarchy-validation`        | Heading nesting in prose allowlist paths                                                   |
-| `env:validation`                       | `.env.example` surfaces match `env-contract.yaml`                                          |
+| `env:validation`                       | `.env.example` surfaces match the `env-contract:` section in `repo-config.yml`             |
 | `naming:harness-validation`            | Agent definition file names match the naming convention                                    |
 | `naming:workflows-validation`          | Workflow file names match the naming convention                                            |
 | `governance:vendor-audit-validation`   | `repo-governance/` docs contain no vendor-specific content                                 |
 | `cross-vendor:parity-validation`       | Cross-vendor behavioral parity (Phase 0 deterministic invariants)                          |
 | `instruction-size:validation`          | Byte budget on auto-loaded instruction files (`AGENTS.md`, `CLAUDE.md`, harness surfaces)  |
 | `harness:bindings-validation`          | `.claude/` ↔ `.opencode/` ↔ `.amazonq/` binding parity                                     |
-| `msrv:check`                           | Minimum Supported Rust Version compatibility                                               |
+| `compat:min-version`                   | Minimum Supported Rust Version compatibility                                               |
 
 **Rule**: governance/validation target keys are `{domain}:{work}` where both parts are lowercase
 kebab-case. The domain must be a recognizable noun (the scope); the work must be a verb phrase

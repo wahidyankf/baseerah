@@ -273,7 +273,7 @@ graph LR
 - MUST use `dotnet format --verify-no-changes` in CI/CD (format violations fail the build)
 - MUST include `Microsoft.CodeAnalysis.NetAnalyzers` for Roslyn static analysis
 - SHOULD include `SonarAnalyzer.CSharp` for additional code smell detection
-- MUST achieve >=95% line coverage measured with Coverlet and enforced by `rhino-cli test-coverage validate`
+- MUST achieve >=95% line coverage measured with Coverlet and enforced by the native `test:coverage` Nx target
 
 **Testing Automation (REQUIRED)**:
 
@@ -288,7 +288,7 @@ graph LR
 
 - MUST integrate `dotnet format`, `dotnet build`, and `dotnet test` in CI/CD pipeline
 - SHOULD use Makefile or Taskfile for local development build tasks
-- MUST collect Coverlet coverage and enforce threshold with `rhino-cli test-coverage validate`
+- MUST collect Coverlet coverage and enforce threshold with the native `test:coverage` Nx target
 - SHOULD use pre-commit hooks for `dotnet format` and analyzer validation
 
 **See**: [Automation Over Manual](../../../../../repo-governance/principles/software-engineering/automation-over-manual.md), [Reproducibility First](../../../../../repo-governance/principles/software-engineering/reproducibility.md)
@@ -304,7 +304,7 @@ graph LR
 
 **Code Review Requirements**:
 
-- All C# code MUST pass automated checks (`dotnet format --verify-no-changes`, `dotnet build /p:TreatWarningsAsErrors=true`, `dotnet test`, Coverlet coverage >=95% enforced by `rhino-cli test-coverage validate`)
+- All C# code MUST pass automated checks (`dotnet format --verify-no-changes`, `dotnet build /p:TreatWarningsAsErrors=true`, `dotnet test`, Coverlet coverage >=95% enforced by the native `test:coverage` Nx target)
 - Code reviewers MUST verify compliance with standards in this index
 - Non-compliance with mandatory standards (Coding, Testing, Code Quality) blocks merge
 - Nullable reference type warnings treated as errors MUST be resolved before merge

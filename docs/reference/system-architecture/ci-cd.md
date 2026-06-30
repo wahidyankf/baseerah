@@ -125,7 +125,7 @@ graph LR
 
 ### PR Quality Gate Workflow
 
-**File**: `.github/workflows/commons-quality-gate.yml`
+**File**: `.github/workflows/pr-quality-gate.yml`
 
 **Trigger**: Pull request opened, synchronized, or reopened
 
@@ -136,24 +136,14 @@ graph LR
 3. Install dependencies
 4. Run typecheck, lint, test:quick, specs:coverage for affected projects
 5. Validate agent naming and workflow naming conventions
+6. Run repo-wide markdown link validation (`md-links` gate job)
 
-**Purpose**: Full quality gate on every PR — typecheck, lint, unit tests, coverage, naming validation
+**Purpose**: Full quality gate on every PR — typecheck, lint, unit tests, coverage, naming
+validation, and repo-wide markdown link check
 
-### Validate Markdown Workflow
-
-**File**: `.github/workflows/markdown-validate.yml`
-
-**Trigger**: Pull request and push to `main`
-
-**Steps:**
-
-1. Checkout (full history)
-2. Setup Node and Rust
-3. Validate mermaid diagrams (`nx run rhino-cli:mermaid:validation`)
-4. Validate markdown links (`nx run rhino-cli:links:validation`)
-5. Validate heading hierarchy (`nx run rhino-cli:headings:hierarchy-validation`)
-
-**Purpose**: Block PRs/pushes with broken markdown links, invalid mermaid diagrams, or heading-hierarchy violations
+**Note**: The standalone `markdown-validate.yml` workflow has been deleted. Per-file markdown
+validators (mermaid, heading-hierarchy, markdownlint) now run via lint-staged at commit time; the
+repo-wide `md links validate` check runs as the `md-links` job in this workflow.
 
 ### AyoKoding Web Test + Deploy Workflow
 
@@ -227,13 +217,13 @@ graph LR
 
 **Purpose**: Continuous gated health check of the staging deployment. Despite the `-deploy-prod` name slot reserved for the future promote step, this workflow currently **stops on pass without promoting** — production CD is deferred. It never deploys today.
 
-### Commons Quality Gate Workflow (PR)
+### PR Quality Gate Workflow (duplicate entry)
 
-**File**: `.github/workflows/commons-quality-gate.yml`
+**File**: `.github/workflows/pr-quality-gate.yml`
 
 **Trigger**: Pull request opened, synchronized, or reopened
 
-**Purpose**: Runs affected tests and quality checks for pull requests
+**Purpose**: Runs affected tests and quality checks for pull requests (see primary entry above)
 
 ## Nx Build System
 

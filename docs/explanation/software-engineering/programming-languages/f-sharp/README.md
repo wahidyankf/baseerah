@@ -262,7 +262,7 @@ graph LR
 - SHOULD use FSharpLint for additional style enforcement
 - MUST set `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` in `.fsproj`
 - MUST enable exhaustive pattern match warnings (enabled by default — never suppress)
-- MUST achieve >=95% line coverage measured with Coverlet and enforced by `rhino-cli test-coverage validate`
+- MUST achieve >=95% line coverage measured with Coverlet and enforced by the native `test:coverage` Nx target
 
 **Testing Automation (REQUIRED)**:
 
@@ -292,7 +292,7 @@ graph LR
 
 **Code Review Requirements**:
 
-- All F# code MUST pass automated checks (Fantomas, `dotnet test`, coverage >=95% enforced by `rhino-cli test-coverage validate`)
+- All F# code MUST pass automated checks (Fantomas, `dotnet test`, coverage >=95% enforced by the native `test:coverage` Nx target)
 - Code reviewers MUST verify Fantomas formatting compliance (CI should enforce this automatically)
 - Non-compliance with mandatory standards (Coding, Testing, Code Quality) blocks merge
 - Incomplete pattern match warnings MUST be resolved before merge — never suppressed with `#nowarn`

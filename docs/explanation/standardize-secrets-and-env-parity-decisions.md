@@ -18,7 +18,7 @@ created: 2026-06-10
 
 This document records every cross-repo parity decision from the `standardize-secrets-and-env` plan
 (2026-06-10). The plan ships naming convention, `.env.example` layout, startup validation, the
-`rhino-cli env` toolchain, and the drift guard (`env-contract.yaml`) to ose-public. The full
+`rhino-cli env` toolchain, and the drift guard (`env-contract:` section in `repo-config.yml`) to ose-public. The full
 technical design lives in
 [`plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md`](../../plans/done/2026-06-10__standardize-secrets-and-env/tech-docs.md).
 
@@ -34,14 +34,14 @@ baseline. The four parity-sensitive decisions below required explicit deliberati
 
 ## Decision Matrix
 
-| #   | Dimension                          | ose-public decision                | ose-primer       | ose-infra        | Deviation?                                   |
-| --- | ---------------------------------- | ---------------------------------- | ---------------- | ---------------- | -------------------------------------------- |
-| 1   | Canonical rule doc filename        | `no-secrets-in-committed-files.md` | same             | same (source)    | None — aligned to ose-infra canonical        |
-| 2   | `guard-env-file-access` identifier | unchanged                          | unchanged        | unchanged        | None — shared across all three               |
-| 3   | Hub doc filename                   | `secrets-and-env-standards.md`     | same (propagate) | same             | None                                         |
-| 4   | `env-contract.yaml` format         | `serde_norway` YAML at repo root   | same (propagate) | same             | None                                         |
-| 5   | `DATABASE_URL` exemption           | unprefixed, exempt                 | exempt           | exempt           | None                                         |
-| 6   | Next.js `PORT` vs backend `PORT`   | webs exempt, backends prefixed     | webs exempt      | n/a (no Next.js) | Structural delta (no deviation in principle) |
+| #   | Dimension                          | ose-public decision                      | ose-primer       | ose-infra        | Deviation?                                   |
+| --- | ---------------------------------- | ---------------------------------------- | ---------------- | ---------------- | -------------------------------------------- |
+| 1   | Canonical rule doc filename        | `no-secrets-in-committed-files.md`       | same             | same (source)    | None — aligned to ose-infra canonical        |
+| 2   | `guard-env-file-access` identifier | unchanged                                | unchanged        | unchanged        | None — shared across all three               |
+| 3   | Hub doc filename                   | `secrets-and-env-standards.md`           | same (propagate) | same             | None                                         |
+| 4   | `env-contract:` section format     | `serde_norway` YAML in `repo-config.yml` | same (propagate) | same             | None                                         |
+| 5   | `DATABASE_URL` exemption           | unprefixed, exempt                       | exempt           | exempt           | None                                         |
+| 6   | Next.js `PORT` vs backend `PORT`   | webs exempt, backends prefixed           | webs exempt      | n/a (no Next.js) | Structural delta (no deviation in principle) |
 
 ## Decision Details
 
@@ -88,12 +88,12 @@ via the multi-repo parity planning workflows. `ose-infra` carries its own equiva
 `repo-governance/conventions/security/` is shared across ose-public and ose-primer;
 ose-infra may differ in directory hierarchy.
 
-### 4. `env-contract.yaml` YAML format
+### 4. `env-contract:` section YAML format
 
-**Decision**: `env-contract.yaml` at repo root, parsed with `serde_norway`, one `surfaces:` array,
-each entry with `root`, `kind`, `lang`, and `allowlist` fields.
+**Decision**: `env-contract:` section in `repo-config.yml` at repo root, parsed with `serde_norway`,
+one `surfaces:` array, each entry with `root`, `kind`, `lang`, and `allowlist` fields.
 
-**Why**: A single YAML file at repo root is the simplest discoverable location for
+**Why**: A single config file at repo root is the simplest discoverable location for
 `rhino-cli env validate`. `serde_norway` (a `serde_yaml` fork maintained by the Rust infra team) is
 the canonical YAML parser in this codebase.
 

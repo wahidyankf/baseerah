@@ -1057,7 +1057,7 @@ Diagram uses default colors without `classDef` declarations
 classDef blueBox fill:#0173B2,stroke:#0173B2,color:#fff
 classDef orangeBox fill:#DE8F05,stroke:#DE8F05,color:#fff
 ```
-`````
+````
 
 ````
 
@@ -1270,7 +1270,4 @@ When preflight is unavailable (`[WARN]` logged in Step 0.5), the report uses a s
 
 - [AI Agents Convention](../../repo-governance/development/agents/ai-agents.md)
 - [Maker-Checker-Fixer Pattern](../../repo-governance/development/pattern/maker-checker-fixer.md)
-
-```
-
-```
+`````

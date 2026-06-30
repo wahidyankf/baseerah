@@ -137,7 +137,7 @@ Normative source: [Workflow Naming Convention](../conventions/structure/workflow
 
 Files under `repo-governance/workflows/meta/` are **reference documentation about the workflow system** (e.g., `execution-modes.md`, `workflow-identifier.md`). They describe how workflows work, not workflows themselves. They are exempt from the type-suffix rule.
 
-Enforcement: `rhino-cli workflows validate-naming` (wired into pre-push and CI).
+Enforcement: `rhino-cli repo-governance workflows naming validate` (wired into pre-push and CI).
 
 ## Workflow Families
 

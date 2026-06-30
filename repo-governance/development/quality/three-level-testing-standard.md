@@ -167,10 +167,10 @@ Standards](../infra/nx-targets.md) for the full project-by-project status and co
 
 Coverage is enforced at three gates:
 
-- **Pre-push hook** — `test:quick` runs `test:unit` + `rhino-cli test-coverage validate` before every push
+- **Pre-push hook** — `test:quick` runs `test:unit` + native `test:coverage` before every push
 - **PR quality gate** — same `test:quick` pipeline runs on every pull request in CI
 
-`test:quick` is defined as `test:unit` followed immediately by `rhino-cli test-coverage validate <coverage-file> <threshold>`. The threshold is project-specific (see "Coverage Threshold Rationale" below).
+`test:quick` is defined as `test:unit` followed immediately by `test:coverage` (native per-project coverage gate). The threshold is project-specific (see "Coverage Threshold Rationale" below).
 
 Coverage is measured **only at the unit level**. Integration tests (`test:integration`) and E2E tests (`test:e2e`) do not measure coverage. Their purpose is correctness at different isolation boundaries, not code coverage.
 
@@ -388,7 +388,7 @@ Unit:        Behaviour -> Command Logic -> Mocked I/O dependencies
 Integration: Behaviour -> Command run   -> Real /tmp filesystem
 ```
 
-**Coverage**: Coverage is measured at the unit level (≥90% line coverage via `rhino-cli test-coverage validate` / `cargo-llvm-cov`). Both levels must cover all behaviour for their command.
+**Coverage**: Coverage is measured at the unit level (≥90% line coverage via `cargo-llvm-cov`). Both levels must cover all behaviour for their command.
 
 **Spec directory**: `specs/apps/<cli-name>/` — one feature file per command, organized by domain subdirectory.
 

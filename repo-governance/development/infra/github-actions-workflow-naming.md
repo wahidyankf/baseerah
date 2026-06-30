@@ -98,7 +98,7 @@ execute:
 | `build-deploy-prod` | Same as `build-deploy-stag` for the production target (deferred — see [deploy model](#deploy-model)).                                                                        |
 | `quality-gate`      | The PR quality gate: `typecheck`, `lint`, `test:quick`, `specs:coverage`, and cross-language lint jobs. No integration or e2e tests.                                         |
 | `validate`          | A repo-wide validation job (markdown, links, heading hierarchy, Mermaid).                                                                                                    |
-| `env-validate`      | Validate `.env.example` contracts and the `env-injection.yaml` manifest for internal consistency.                                                                            |
+| `env-validate`      | Validate `.env.example` contracts and the `env-injection:` manifest (in `repo-config.yml`) for internal consistency.                                                         |
 
 ### `name:` Mirrors Filename
 
@@ -212,24 +212,23 @@ canonical set, organized by tier:
 
 ### Cross-cutting workflows
 
-| Filename                   | Domain     | Purpose                                                         |
-| -------------------------- | ---------- | --------------------------------------------------------------- |
-| `commons-quality-gate.yml` | `commons`  | PR gate: typecheck, lint, test:quick, specs:coverage, lint jobs |
-| `commons-env-validate.yml` | `commons`  | `.env.example` contract + `env-injection.yaml` manifest check   |
-| `markdown-validate.yml`    | `markdown` | Mermaid, link, and heading-hierarchy validation                 |
+| Filename              | Domain     | Purpose                                                         |
+| --------------------- | ---------- | --------------------------------------------------------------- |
+| `pr-quality-gate.yml` | `pr`       | PR gate: typecheck, lint, test:quick, specs:coverage, lint jobs |
+| `validate-env.yml`    | `validate` | `.env.example` contract + `env-injection:` manifest check       |
 
 ## Examples
 
 ### PASS: Correctly aligned name and filename (new grammar)
 
 ```yaml
-# File: .github/workflows/commons-quality-gate.yml
-name: Commons - Quality Gate
+# File: .github/workflows/pr-quality-gate.yml
+name: PR - Quality Gate
 ```
 
-Derivation: `Commons - Quality Gate` → lowercase → `commons - quality gate` → spaces to hyphens →
-`commons---quality-gate` → collapse hyphens → `commons-quality-gate` → append `.yml` →
-`commons-quality-gate.yml`. Matches filename.
+Derivation: `PR - Quality Gate` → lowercase → `pr - quality gate` → spaces to hyphens →
+`pr---quality-gate` → collapse hyphens → `pr-quality-gate` → append `.yml` →
+`pr-quality-gate.yml`. Matches filename.
 
 ---
 
@@ -284,19 +283,19 @@ whole segment is lowercased. For example, `(Rust/Axum)` → `rust-axum`.
 
 ### Version Alignment Policy
 
-`commons-quality-gate.yml` is the **source of truth** for language version choices. All scheduled
-test and deploy workflows must use the same language versions as `commons-quality-gate.yml`.
+`pr-quality-gate.yml` is the **source of truth** for language version choices. All scheduled
+test and deploy workflows must use the same language versions as `pr-quality-gate.yml`.
 
-**Rule**: When upgrading a language version in `commons-quality-gate.yml`, update all deploy
+**Rule**: When upgrading a language version in `pr-quality-gate.yml`, update all deploy
 workflows that use that language in the same commit. Version drift creates inconsistencies where CI
 passes on `main` but manually dispatched tests fail (or vice versa).
 
 **Workflows that must stay aligned**:
 
-| Language | `commons-quality-gate.yml` step | Scheduled workflows to update                                                       |
-| -------- | ------------------------------- | ----------------------------------------------------------------------------------- |
-| Node.js  | `node-version`                  | All workflows installing Node.js                                                    |
-| .NET     | `dotnet-version`                | `organiclever-app-test-local-deploy-stag.yml`, `ose-app-test-local-deploy-stag.yml` |
+| Language | `pr-quality-gate.yml` step | Scheduled workflows to update                                                       |
+| -------- | -------------------------- | ----------------------------------------------------------------------------------- |
+| Node.js  | `node-version`             | All workflows installing Node.js                                                    |
+| .NET     | `dotnet-version`           | `organiclever-app-test-local-deploy-stag.yml`, `ose-app-test-local-deploy-stag.yml` |
 
 ### Adding new workflows
 
@@ -313,7 +312,7 @@ When creating a new workflow:
 ## Tools and Automation
 
 `actionlint` validates every `.github/workflows/*.yml` file for syntax, job references, and input
-types — it runs in the PR gate (`commons-quality-gate.yml`) and the local pre-commit Husky hook.
+types — it runs in the PR gate (`pr-quality-gate.yml`) and the local pre-commit Husky hook.
 The `repo-rules-checker` agent validates adherence to this naming convention during governance
 audits.
 

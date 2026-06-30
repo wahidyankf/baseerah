@@ -5,7 +5,6 @@ category: reference
 tags:
   - coverage
   - testing
-  - rhino-cli
   - quality
 created: 2026-03-22
 ---
@@ -23,8 +22,8 @@ How code coverage is measured and validated across all projects in the monorepo.
 
 ## Coverage Algorithm
 
-All projects use `rhino-cli test-coverage validate` which applies a standard
-line-based algorithm:
+Coverage is measured natively by each project's test runner. The standard
+line-based algorithm counts:
 
 - **COVERED**: hit count > 0 AND all branches taken (or no branches)
 - **PARTIAL**: hit count > 0 but some branches not taken
@@ -33,42 +32,17 @@ line-based algorithm:
 
 Partial lines count as NOT covered.
 
-## Supported Formats
-
-`rhino-cli` auto-detects the coverage format from the file:
-
-| Format       | Detection                                                                | Used By             |
-| ------------ | ------------------------------------------------------------------------ | ------------------- |
-| Go cover.out | Default (no other match)                                                 | Go projects         |
-| LCOV (.info) | Filename ends in `.info` or contains `lcov`                              | TypeScript, Rust    |
-| JaCoCo XML   | Filename ends in `.xml` containing `jacoco`, or XML with `<report>` root | (none in this repo) |
-
-## Thresholds
-
-| Project Type         | Threshold | Rationale                               |
-| -------------------- | --------- | --------------------------------------- |
-| CLI tools (Rust)     | >= 90%    | Core business logic                     |
-| Rust libraries       | >= 90%    | Shared utilities                        |
-| organiclever-be      | >= 90%    | F#/Giraffe backend API                  |
-| ose-be               | >= 90%    | F#/Giraffe backend API                  |
-| organiclever-app-web | >= 70%    | Frontend app with MSW integration tests |
-| ayokoding-www        | >= 80%    | Content platform with UI rendering code |
-| ose-www              | >= 80%    | Content platform with UI rendering code |
-| wahidyankf-www       | >= 80%    | Personal portfolio (Next.js)            |
-
 ## Per-Project Coverage Details
 
-### Go Projects
+### Rust Projects
 
-**Tool**: `go test -coverprofile=cover.out`
-**Format**: Go cover.out (statement-based, mode: set)
+**Tool**: `cargo llvm-cov`
+**Format**: LCOV at project `lcov.info`
+**Threshold**: 90% line coverage
 
-| Project       | Coverage File | Threshold | Exclusions |
-| ------------- | ------------- | --------- | ---------- |
-| rhino-cli     | `cover.out`   | 90%       | None       |
-| ayokoding-cli | `cover.out`   | 90%       | None       |
-| ose-cli       | `cover.out`   | 90%       | None       |
-| rust-commons  | `lcov.info`   | 90%       | None       |
+```bash
+cargo llvm-cov --lib --fail-under-lines 90
+```
 
 ### TypeScript Projects
 
@@ -85,37 +59,57 @@ Partial lines count as NOT covered.
 ### F# Projects
 
 **Tool**: NUnit / xUnit + Coverlet
-**Format**: LCOV via `rhino-cli test-coverage validate`
+**Format**: Cobertura XML (enforced via Coverlet threshold flags)
+
+```bash
+dotnet test --collect:"XPlat Code Coverage" \
+  /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
+```
 
 | Project         | Threshold | Notes                      |
 | --------------- | --------- | -------------------------- |
-| organiclever-be | 90%       | Line coverage via Coverlet |
-| ose-be          | 90%       | Line coverage via Coverlet |
+| organiclever-be | 95%       | Line coverage via Coverlet |
+| ose-be          | 95%       | Line coverage via Coverlet |
+
+## Thresholds
+
+| Project Type         | Threshold | Rationale                               |
+| -------------------- | --------- | --------------------------------------- |
+| CLI tools (Rust)     | >= 90%    | Core business logic                     |
+| Rust libraries       | >= 90%    | Shared utilities                        |
+| organiclever-be      | >= 95%    | F#/Giraffe backend API                  |
+| ose-be               | >= 95%    | F#/Giraffe backend API                  |
+| organiclever-app-web | >= 70%    | Frontend app with MSW integration tests |
+| ayokoding-www        | >= 80%    | Content platform with UI rendering code |
+| ose-www              | >= 80%    | Content platform with UI rendering code |
+| wahidyankf-www       | >= 80%    | Personal portfolio (Next.js)            |
 
 ## CI Integration
 
-Coverage is measured during `test:quick` (part of the pre-push hook and main CI).
+Coverage is measured during `test:quick` (part of the pre-push hook and main CI)
+via the native `test:coverage` Nx target per project.
 
 ### Pipeline Flow
 
 1. `test:unit` runs tests and generates the coverage file
-2. `rhino-cli test-coverage validate <file> <threshold>` checks locally
-3. Both steps are combined in `test:quick`
+2. `test:coverage` enforces the threshold natively (per-project tool)
+3. Both steps run sequentially inside `test:quick`
 
 ## Troubleshooting
 
 ### Coverage drops after adding a new file
 
-New source files with no test coverage appear as 0% in rhino-cli. Either
+New source files with no test coverage appear as 0% in the coverage report. Either
 write tests or add the file to the appropriate exclusion config (language
 tool config).
 
-### `rhino-cli --exclude` flag
+### Exclusions
 
-`rhino-cli test-coverage validate` supports `--exclude` glob patterns for
-runtime exclusion without modifying the coverage file. Note: glob matching
-may not work with Go's full module paths in `cover.out` — use `grep -v`
-for Go projects instead.
+Configure exclusions in each project's native coverage tool:
+
+- **Rust**: `--ignore-filename-regex` flag in `cargo llvm-cov`
+- **TypeScript**: `exclude` array in `vitest.config.ts`
+- **C#/F#**: `[ExcludeFromCodeCoverage]` attribute on classes/methods
 
 ## Related Documentation
 

@@ -272,14 +272,13 @@ tests/
 
 ## Coverage Requirements
 
-**MUST** achieve >=95% line coverage, measured with Coverlet and enforced by `rhino-cli test-coverage validate`:
+**MUST** achieve >=95% line coverage, measured with Coverlet and enforced by the native `test:coverage`
+Nx target:
 
 ```bash
-# Run tests with coverage collection
-dotnet test --collect:"XPlat Code Coverage" --results-directory ./coverage
-
-# Validate coverage threshold
-rhino-cli test-coverage validate coverage/coverage.cobertura.xml 95
+# Run tests with coverage collection and threshold enforcement
+dotnet test --collect:"XPlat Code Coverage" --results-directory ./coverage \
+  /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
 ```
 
 **Do NOT** add coverage exclusions to increase the reported percentage. Instead, write the missing tests.
@@ -321,14 +320,14 @@ let ``Zakat calculation returns 2.5 percent`` () =
 
 ## Enforcement
 
-- **Coverlet** - Collects coverage in CI; `rhino-cli test-coverage validate` enforces >=95%
+- **Coverlet** - Collects coverage in CI; native `test:coverage` Nx target enforces >=95%
 - **dotnet test** - Runs Expecto suite as part of Nx `test:quick` target
 - **Code reviews** - Verify property tests exist for domain invariants
 
 **Pre-commit checklist**:
 
 - [ ] All tests pass (`dotnet test`)
-- [ ] Coverage >=95% (`rhino-cli test-coverage validate`)
+- [ ] Coverage >=95% (`nx run <project>:test:coverage`)
 - [ ] Property tests exist for core domain invariants
 - [ ] Async tests use `testAsync` CE
 - [ ] No test doubles for pure domain functions

@@ -21,7 +21,7 @@ principles:
 
 # TypeScript Test-Driven Development
 
-**Quick Reference**: [Overview](#overview) | [Jest](#jest-30x) | [Vitest](#vitest-4x) | [Unit Testing](#unit-testing-patterns) | [Integration Testing](#integration-testing) | [Property-Based Testing](#property-based-testing) | [Mocking](#mocking-strategies) | [Coverage](#test-coverage) | [Related Documentation](#related-documentation)
+**Quick Reference**: [Overview](#overview) | [Jest](#jest-30x) | [Vitest](#vitest-4x) | [Unit Testing](#unit-testing-patterns) | [Integration Testing](#integration-testing) | [Property-Based Testing](#property-based-testing) | [Mocking](#mocking-strategies) | [Coverage](#coverage) | [Related Documentation](#related-documentation)
 
 ## Overview
 
@@ -685,7 +685,7 @@ describe("DonationAnalytics", () => {
 });
 ```
 
-## Test Coverage
+## Coverage
 
 ### Running Coverage
 

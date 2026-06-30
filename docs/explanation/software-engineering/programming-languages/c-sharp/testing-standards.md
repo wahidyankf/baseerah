@@ -449,7 +449,7 @@ public class ZakatApiIntegrationTests(WebApplicationFactory<Program> factory)
 
 ## Code Coverage Requirements
 
-**MUST** achieve >=95% line coverage measured with Coverlet and enforced by `rhino-cli test-coverage validate`.
+**MUST** achieve >=95% line coverage measured with Coverlet and enforced by the native `test:coverage` Nx target.
 
 ```xml
 <!-- OsePlatform.Zakat.Tests.csproj -->
@@ -461,11 +461,9 @@ public class ZakatApiIntegrationTests(WebApplicationFactory<Program> factory)
 ```
 
 ```bash
-# Collect coverage
-dotnet test --collect:"XPlat Code Coverage" --results-directory ./coverage
-
-# Enforce threshold
-rhino-cli test-coverage validate ./coverage/*/coverage.cobertura.xml 95
+# Collect coverage with threshold enforcement
+dotnet test --collect:"XPlat Code Coverage" --results-directory ./coverage \
+  /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
 ```
 
 ## Enforcement
@@ -473,7 +471,7 @@ rhino-cli test-coverage validate ./coverage/*/coverage.cobertura.xml 95
 - **xUnit** - Test discovery and execution
 - **FluentAssertions** - Readable, maintainable assertions (mandatory)
 - **Coverlet** - Coverage measurement in CI/CD
-- **rhino-cli test-coverage validate** - Enforces >=95% threshold
+- **`test:coverage` Nx target** - Enforces >=95% threshold
 
 **Pre-commit checklist**:
 

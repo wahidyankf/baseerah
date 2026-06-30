@@ -40,8 +40,8 @@ consult the relevant harness documentation for authoritative values.
 ## Monitored Surfaces
 
 The surfaces below are auto-loaded by at least one harness. Size thresholds are configured in
-`instruction-size-budget.yaml` at the repo root and enforced by `rhino-cli convention
-validate instruction-size`.
+the `instruction-size:` section of `repo-config.yml` at the repo root and enforced by
+`rhino-cli harness instruction-size validate`.
 
 | Surface                           | Target (✅) | Warn (⚠️)  | Fail (❌)  |
 | --------------------------------- | ----------- | ---------- | ---------- |
@@ -74,7 +74,7 @@ The gate runs at four enforcement points, providing overlapping coverage:
 
 ```bash
 # .husky/pre-push — changed-path gated
-if echo "$CHANGED" | grep -qE '^(AGENTS\.md$|CLAUDE\.md$|instruction-size-budget\.yaml$|...)'; then
+if echo "$CHANGED" | grep -qE '^(AGENTS\.md$|CLAUDE\.md$|repo-config\.yml$|...)'; then
   npx nx run rhino-cli:instruction-size:validation
 fi
 ```
@@ -89,7 +89,7 @@ of four categories. Catches violations staged for commit before they reach the p
 
 ### 3. PR quality gate (CI)
 
-The `instruction-size` CI job in `.github/workflows/commons-quality-gate.yml` runs
+The `instruction-size` CI job in `.github/workflows/pr-quality-gate.yml` runs
 `npx nx run rhino-cli:instruction-size:validation` on every PR and push to `main`. A failing
 job blocks merge.
 
@@ -149,10 +149,11 @@ adjustment with a documented rationale and harness source citation.
 
 ## Updating Thresholds
 
-Thresholds live in `instruction-size-budget.yaml` at the repo root. To change a threshold:
+Thresholds live in the `instruction-size:` section of `repo-config.yml` at the repo root. To change
+a threshold:
 
-1. Edit `instruction-size-budget.yaml` with the new values.
-2. Record the rationale and harness source citation as a comment in the YAML file.
+1. Edit the `instruction-size:` section of `repo-config.yml` with the new values.
+2. Record the rationale and harness source citation as a comment in the YAML.
 3. Run `npx nx run rhino-cli:instruction-size:validation` to confirm the new threshold is
    respected.
 4. Commit and push; CI validates the change.
@@ -177,8 +178,8 @@ development workflow.
   application of this principle to instruction-file governance.
 
 - **[Explicit Over Implicit](../../principles/software-engineering/explicit-over-implicit.md)**:
-  Budget thresholds are declared explicitly in `instruction-size-budget.yaml` rather than
-  embedded in the validator binary. Per-surface entries make limits visible and auditable.
+  Budget thresholds are declared explicitly in the `instruction-size:` section of `repo-config.yml`
+  rather than embedded in the validator binary. Per-surface entries make limits visible and auditable.
 
 - **[Automation Over Manual](../../principles/software-engineering/automation-over-manual.md)**:
   All four enforcement points are automated (pre-push hook, CI job, `convention audit`,

@@ -208,7 +208,7 @@ It does not apply to:
 
 - **`rhino-cli specs coverage`**: Enforces Gherkin spec-to-test mapping. Integrated into `test:quick`.
 - **`codegen` Nx target**: Generates types from OpenAPI specs. Stale contracts cause `typecheck` to fail.
-- **Coverage thresholds**: `rhino-cli test-coverage validate` enforces minimum line coverage per project.
+- **Coverage thresholds**: The native `test:coverage` Nx target enforces minimum line coverage per project.
 - **Nx cache inputs**: Gherkin specs are declared as inputs for test targets, invalidating caches when specs change.
 - **`repo-rules-checker`**: Validates that specs folders exist for apps that require them.
 

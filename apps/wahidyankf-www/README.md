@@ -52,7 +52,7 @@ nx run wahidyankf-www:specs:coverage
   level (feature files under `specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/`)
 - **`@testing-library/react`** + **`@testing-library/jest-dom`** for
   component interaction
-- Coverage enforced at ≥80% via `rhino-cli test-coverage validate` —
+- Coverage enforced at ≥80% via `vitest --coverage.thresholds.lines=80` —
   aligned to `apps/ayokoding-www` and `apps/ose-www`
 
 End-to-end tests live in the sibling project `apps/wahidyankf-www-fe-e2e/`

@@ -193,7 +193,7 @@ runner projects ARE the Gherkin consumers at the E2E level.
 
 ## Coverage Threshold Rationale
 
-Coverage thresholds are enforced by `rhino-cli test-coverage validate` as part of `test:quick`.
+Coverage thresholds are enforced by the native `test:coverage` Nx target as part of `test:quick`.
 Thresholds differ by project type to reflect the realistic upper bound achievable through mocked
 unit tests.
 
@@ -204,8 +204,8 @@ unit tests.
 | **70%**   | FE apps (`organiclever-app-web`)                         | API, auth, and query layers are mocked by design; the mock boundaries limit what can be covered by unit tests. Lower threshold reflects this intentional architecture decision. |
 
 Coverage is measured via the appropriate reporter for each language and converted to LCOV or
-JaCoCo XML before being passed to `rhino-cli test-coverage validate`. See `CLAUDE.md` for the
-exact command per language.
+JaCoCo XML. Coverage enforcement runs inside each project's native `test:coverage` Nx target. See
+`CLAUDE.md` for the exact command per language.
 
 ## Docker Conventions
 
@@ -305,15 +305,16 @@ Broad exclusion prevents accidentally including large directories (e.g., `node_m
 | App staging workflow         | `.github/workflows/{domain}-app-test-local-deploy-stag.yml` | `organiclever-app-test-local-deploy-stag.yml`, `ose-app-test-local-deploy-stag.yml`                                                                                          |
 | App staging-gate workflow    | `.github/workflows/{domain}-app-test-stag.yml`              | `organiclever-app-test-stag.yml`, `ose-app-test-stag.yml`                                                                                                                    |
 | Backend build+deploy         | `.github/workflows/{domain}-be-build-deploy-stag.yml`       | `organiclever-be-build-deploy-stag.yml`, `ose-be-build-deploy-stag.yml`                                                                                                      |
-| Cross-cutting quality gate   | `.github/workflows/commons-quality-gate.yml`                | `commons-quality-gate.yml` (replaces `pr-quality-gate.yml`)                                                                                                                  |
-| Cross-cutting env validation | `.github/workflows/commons-env-validate.yml`                | `commons-env-validate.yml` (replaces `validate-env.yml`)                                                                                                                     |
-| Markdown validation          | `.github/workflows/markdown-validate.yml`                   | `markdown-validate.yml` (replaces `validate-markdown.yml`)                                                                                                                   |
+| Cross-cutting quality gate   | `.github/workflows/pr-quality-gate.yml`                     | `pr-quality-gate.yml` (replaces `pr-quality-gate.yml`)                                                                                                                       |
+| Cross-cutting env validation | `.github/workflows/validate-env.yml`                        | `validate-env.yml` (replaces `commons-env-validate.yml`)                                                                                                                     |
 
-The 17-workflow after-state consists of 4 reusables, 4 www workflows, 2 app local-deploy-stag, 2
-app test-stag-deploy-prod, 2 be-build-deploy-stag, and 3 cross-cutting workflows. The stale files
-`pr-quality-gate.yml`, `validate-env.yml`, `validate-markdown.yml`, `test-and-deploy-*.yml`,
-`test-*-web-staging.yml`, `deploy-*-to-production.yml`, `publish-images.yml`, and
-`test-crane-cli-integration.yml` are removed by this plan.
+The 16-workflow after-state consists of 4 reusables, 4 www workflows, 2 app local-deploy-stag, 2
+app test-stag-deploy-prod, 2 be-build-deploy-stag, and 2 cross-cutting workflows. The stale files
+`pr-quality-gate.yml`, `commons-env-validate.yml`, `validate-markdown.yml`,
+`test-and-deploy-*.yml`, `test-*-web-staging.yml`, `deploy-*-to-production.yml`,
+`publish-images.yml`, and `test-crane-cli-integration.yml` are removed by this plan. Markdown
+validation is folded into lint-staged (per-file validators) and the `md-links` job in
+`pr-quality-gate.yml` — no standalone `markdown-validate.yml` workflow.
 
 The underscore prefix on reusable workflows (`_reusable-*.yml`) visually separates shared
 infrastructure from top-level entry-point workflows in the GitHub Actions UI.
@@ -404,7 +405,7 @@ grammar, allowed tokens, and the rule that the workflow `name:` field must mirro
 | App staging workflow      | `{domain}-app-test-local-deploy-stag.yml`                                                 | `organiclever-app-test-local-deploy-stag.yml`               |
 | App staging-gate workflow | `{domain}-app-test-stag.yml`                                                              | `organiclever-app-test-stag.yml`                            |
 | BE build+deploy workflow  | `{domain}-be-build-deploy-stag.yml`                                                       | `organiclever-be-build-deploy-stag.yml`                     |
-| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `commons-quality-gate.yml`, `markdown-validate.yml`         |
+| Cross-cutting workflow    | `{group}-{action-chain}.yml`                                                              | `pr-quality-gate.yml`, `validate-env.yml`                   |
 | Composite action          | `.github/actions/{name}/action.yml`                                                       | `.github/actions/setup-rust/action.yml`                     |
 
 ## Adding a New App to CI
@@ -475,12 +476,12 @@ must be recorded here with a justification; undocumented deviations are always b
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | All `checkout` steps use `actions/checkout@v6`                                                                                                             | `actionlint` + PR quality gate                                      |
 | Workflow filenames follow the `{domain}-{action-chain}.yml` grammar (see [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md)) | `actionlint` syntax check; code review                              |
-| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                      | `commons-quality-gate.yml` structure                                |
+| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                      | `pr-quality-gate.yml` structure                                     |
 | Per-variant test workflows call reusable workflows (thin callers, ≤40 lines each)                                                                          | Code review; reusable workflow structure                            |
 | All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                          | `actionlint`; PR quality gate                                       |
-| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                         | `commons-quality-gate.yml` job keys                                 |
-| Specs-gate job runs `specs:structure-validation` and `specs:gherkin-cardinality-validation` (spec-file links covered by `links:validation` gate)           | `commons-quality-gate.yml` specs-gate job                           |
-| Full quality gate runs on every push to `main` (direct `push` trigger on `commons-quality-gate.yml`)                                                       | `commons-quality-gate.yml` `on.push` trigger                        |
+| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                         | `pr-quality-gate.yml` job keys                                      |
+| Specs-gate job runs `specs:structure-validation` and `specs:gherkin-cardinality-validation` (spec-file links covered by `links:validation` gate)           | `pr-quality-gate.yml` specs-gate job                                |
+| Full quality gate runs on every push to `main` (direct `push` trigger on `pr-quality-gate.yml`)                                                            | `pr-quality-gate.yml` `on.push` trigger                             |
 | App-tier scheduled workflows use staggered 2× WIB cadence: `*-app-test-local-deploy-stag` at 03:00/15:00, `*-app-test-stag` at 05:30/17:30 (+2.5 h)        | `*-app-test-local-deploy-stag.yml` and `*-app-test-stag-*.yml` CRON |
 | www-tier scheduled workflows run at 06:00/18:00 WIB (23:00/11:00 UTC)                                                                                      | `*-www-test-local-deploy-prod.yml` CRON expressions                 |
 
@@ -512,7 +513,7 @@ tech-docs §"Fast-gate test policy" for the rationale and the current compliance
 | --------------------------------- | --------------------------------------------------------------- | -------------------------------- |
 | `.husky/pre-commit`               | `nx affected -t test:quick`                                     | **never**                        |
 | `.husky/pre-push`                 | `typecheck`, `lint`, `test:quick`, `specs:coverage`             | **never**                        |
-| `commons-quality-gate` (PR gate)  | `typecheck`, `lint`, `test:quick`, `specs:coverage` + lint jobs | **never**                        |
+| `pr-quality-gate` (PR gate)       | `typecheck`, `lint`, `test:quick`, `specs:coverage` + lint jobs | **never**                        |
 | `*-test-local-*` (CRON scheduled) | `test:integration` + `test:e2e` via docker-compose              | **yes**                          |
 | `*-test-stag-*` (CRON scheduled)  | `test:e2e` against deployed staging                             | **yes**                          |
 
@@ -563,10 +564,11 @@ Governance, validation, lint, and format targets use the `{domain}:{work}` schem
 
 Rust-specific renames applied to all Rust `project.json` files:
 
-| Old name     | New name       |
-| ------------ | -------------- |
-| `fmt:check`  | `format:check` |
-| `check:msrv` | `msrv:check`   |
+| Old name     | New name             |
+| ------------ | -------------------- |
+| `fmt:check`  | `format:check`       |
+| `check:msrv` | `compat:min-version` |
+| `deny:check` | `deps:audit`         |
 
 The full naming rationale and complete target catalog are documented in
 [Nx Target Standards](./nx-targets.md).

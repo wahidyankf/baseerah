@@ -11,7 +11,7 @@ use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
 use crate::internal::docs::heading_hierarchy::{
-    DocsHeadingFinding, validate_docs_heading_hierarchy,
+    DocsHeadingFinding, is_prose_allowlisted, validate_docs_heading_hierarchy,
     validate_docs_heading_hierarchy_allowlisted,
 };
 use crate::internal::git;
@@ -74,17 +74,33 @@ pub fn run(
         validate_docs_heading_hierarchy_allowlisted(&repo_root, &args.exclude)
             .context("docs validate-heading-hierarchy failed")?
     } else {
+        // Apply the same allowlist as the repo-wide scan so that content
+        // files (e.g. apps/ose-www/content/ which use frontmatter title as H1)
+        // are silently skipped when lint-staged passes them explicitly.
         let full_paths: Vec<String> = args
             .positional
             .iter()
-            .map(|p| {
-                if Path::new(p).is_absolute() {
+            .filter_map(|p| {
+                let abs = if Path::new(p).is_absolute() {
                     p.clone()
                 } else {
                     repo_root.join(p).to_string_lossy().to_string()
+                };
+                // Compute repo-relative path for allowlist check.
+                let rel = Path::new(&abs).strip_prefix(&repo_root).map_or_else(
+                    |_| abs.replace('\\', "/"),
+                    |r| r.to_string_lossy().replace('\\', "/"),
+                );
+                if is_prose_allowlisted(&rel) {
+                    Some(abs)
+                } else {
+                    None
                 }
             })
             .collect();
+        if full_paths.is_empty() {
+            return Ok(());
+        }
         validate_docs_heading_hierarchy(&full_paths)
             .context("docs validate-heading-hierarchy failed")?
     };
@@ -246,5 +262,26 @@ mod tests {
         };
         assert_eq!(args.exclude.len(), 1);
         assert_eq!(args.exclude[0], "docs");
+    }
+
+    /// Non-allowlisted paths (e.g. apps/ose-www/content/) must be filtered
+    /// out before validation so lint-staged explicit-path calls don't fail
+    /// on CMS content files that use frontmatter title as H1.
+    #[test]
+    fn non_allowlisted_content_path_is_skipped_by_allowlist() {
+        // is_prose_allowlisted should return false for content paths
+        assert!(
+            !is_prose_allowlisted("apps/ose-www/content/updates/2026-06-15-example.md"),
+            "ose-www content must NOT be in the prose allowlist"
+        );
+        assert!(
+            !is_prose_allowlisted("apps/ayokoding-www/content/something.md"),
+            "ayokoding-www content must NOT be in the prose allowlist"
+        );
+        // But docs/ IS allowlisted
+        assert!(
+            is_prose_allowlisted("docs/reference/code-coverage.md"),
+            "docs/ must be in the prose allowlist"
+        );
     }
 }

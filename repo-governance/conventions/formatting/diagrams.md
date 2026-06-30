@@ -81,7 +81,7 @@ ASCII art and Mermaid solve different representational problems.
 
 **File and folder trees** are a direct mirror of filesystem reality. When a reader sees `├── apps/`, they recognize immediately what `ls -la` or `tree` would show. Every markdown renderer — including raw terminal `cat`, GitHub web, offline static sites, and plain-text email — displays ASCII trees identically. No validator, no parser, no width constraint applies.
 
-**Relationship and flow diagrams** encode structure that has no natural text-linear representation. A sequence diagram describes temporal ordering. A dependency-direction diagram encodes which module knows about which. An ER diagram expresses cardinality. ASCII art can approximate these, but it encodes spatial relationships by character-position accident: changing one node forces manual re-alignment of every surrounding character. Mermaid encodes the relationship explicitly in its source, renders the spatial layout automatically, can be validated by `rhino-cli md validate mermaid`, and exposes its structure to screen readers.
+**Relationship and flow diagrams** encode structure that has no natural text-linear representation. A sequence diagram describes temporal ordering. A dependency-direction diagram encodes which module knows about which. An ER diagram expresses cardinality. ASCII art can approximate these, but it encodes spatial relationships by character-position accident: changing one node forces manual re-alignment of every surrounding character. Mermaid encodes the relationship explicitly in its source, renders the spatial layout automatically, can be validated by `rhino-cli md mermaid validate`, and exposes its structure to screen readers.
 
 ### Examples
 
@@ -424,7 +424,7 @@ graph LR
 
 ### Flowchart Width Constraints
 
-The `rhino-cli md validate mermaid` command enforces a maximum horizontal width of **4 nodes** on any single rank level. "Horizontal" is direction-aware:
+The `rhino-cli md mermaid validate` command enforces a maximum horizontal width of **4 nodes** on any single rank level. "Horizontal" is direction-aware:
 
 - **`graph LR` / `graph RL`**: horizontal = **depth** (number of rank columns, i.e., the longest chain)
 - **`graph TD` / `graph TB` / `graph BT`**: horizontal = **span** (maximum nodes at any single rank level)
@@ -436,16 +436,18 @@ The `rhino-cli md validate mermaid` command enforces a maximum horizontal width 
 **Automated enforcement**:
 
 ```bash
-cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md validate mermaid
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate
 ```
 
 Run without flags to perform a repo-wide scan (the Nx target runs with `--exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content` plus the standardized noise-skip set) using defaults (MaxWidth=4, unlimited depth). Pass additional `--exclude <prefix>` flags to suppress noise in project-specific runs.
 
-**Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit hook and in the `markdown-validate.yml` CI workflow (`push`/`pull_request` → `main`) via `npx nx run rhino-cli:mermaid:validation`. Does NOT run at pre-push.
+**Gate location**: Runs at **pre-commit (staged `.md` files only)** via the `rhino-cli` pre-commit
+hook (lint-staged) via `npx nx run rhino-cli:mermaid:validation`. Does NOT run at pre-push or in a
+standalone CI workflow — mermaid validation is folded into lint-staged and `pr-quality-gate.yml`.
 
 ### Width Violation Fix Strategy Guide
 
-When `rhino-cli md validate mermaid` reports a `width_exceeded` violation, select the simplest fix strategy that works:
+When `rhino-cli md mermaid validate` reports a `width_exceeded` violation, select the simplest fix strategy that works:
 
 **Selection decision tree**:
 
@@ -499,7 +501,7 @@ graph LR
 ### State Diagram Width and Label Constraints
 
 `stateDiagram-v2` and `stateDiagram` (v1) diagrams are subject to the same width and label rules
-as flowcharts and are enforced by the same `rhino-cli md validate mermaid` command.
+as flowcharts and are enforced by the same `rhino-cli md mermaid validate` command.
 
 **Width rule**: The validator counts the number of distinct state nodes at each depth level
 (depth = number of transition steps from the initial pseudostate `[*]`). If any depth level has
@@ -527,7 +529,7 @@ Guide apply (see above). Direction flip does not apply to state diagrams (they h
 directive); use Diagram Splitting or Sequential Chaining when width is exceeded.
 
 **Automated enforcement**: Same Nx target and gate location as flowcharts — `mermaid:validation`
-runs at pre-commit (staged `.md` files) and in `markdown-validate.yml` CI.
+runs at pre-commit (staged `.md` files, via lint-staged) and is folded into `pr-quality-gate.yml`.
 
 ### Mermaid Best Practices
 
@@ -1182,7 +1184,7 @@ Before committing documentation with diagrams:
 - [ ] **No style commands in sequence diagrams** (use `box` syntax or switch to flowchart)
 - [ ] **No `\n` in any label** (`\n` renders as literal characters in node labels and edge labels — use `<br/>` for multi-line labels or shorten to single-line)
 - [ ] **No `<br/>` in edge labels** (edge labels do not support HTML — use plain text only)
-- [ ] **Node label lines**: validator enforces ≤ 30 raw chars per line (run `rhino-cli md validate mermaid`); renderers visually clip at ~20 chars — keep displayed text ≤ 20 when possible
+- [ ] **Node label lines**: validator enforces ≤ 30 raw chars per line (run `rhino-cli md mermaid validate`); renderers visually clip at ~20 chars — keep displayed text ≤ 20 when possible
 - [ ] **Edge label strings ≤20 characters** (text inside `|"..."|` must not exceed 20 characters)
 - [ ] **No URL paths or dot-prefixed tokens in edge labels** (leading `.` is parsed as a CSS class selector — describe the action in plain words instead)
 - [ ] Mermaid diagrams tested in GitHub preview or a markdown viewer
@@ -1605,7 +1607,7 @@ Both node label lines (each segment between `<br/>` tags) and edge label strings
 
 Count every character including spaces, colons, slashes, and Unicode.
 
-**Note**: `rhino-cli md validate mermaid` enforces ≤ **30** raw characters per `<br/>`-split line (Mermaid's `wrappingWidth` baseline). Use `--max-label-len 20` for stricter validation to guard against rendering clipping in some environments.
+**Note**: `rhino-cli md mermaid validate` enforces ≤ **30** raw characters per `<br/>`-split line (Mermaid's `wrappingWidth` baseline). Use `--max-label-len 20` for stricter validation to guard against rendering clipping in some environments.
 
 **Safe examples (≤20 chars):**
 
@@ -1708,7 +1710,7 @@ graph TD
 | Node label line (between `<br/>` tags) | Yes                | 20 chars   | Yes (node labels render HTML) |
 | Edge label `\|"text"\|`                | No                 | 20 chars   | No (`.` breaks parser)        |
 
-**Automated enforcement**: Run `rhino-cli md validate mermaid` to check these rules
+**Automated enforcement**: Run `rhino-cli md mermaid validate` to check these rules
 mechanically instead of counting characters manually. Use `--max-label-len 20` to enforce
 the 20-character limit (the default is 30, matching Mermaid's `wrappingWidth`
 baseline). The tool also checks parallel rank width (Rule 2 above) and single-diagram-per-block.

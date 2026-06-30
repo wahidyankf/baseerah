@@ -54,8 +54,8 @@ This document defines **authoritative code quality standards** for C# in the OSE
 dotnet restore --locked-mode
 dotnet build /p:TreatWarningsAsErrors=true
 dotnet format --verify-no-changes
-dotnet test --collect:"XPlat Code Coverage"
-rhino-cli test-coverage validate ./coverage/*/coverage.cobertura.xml 95
+dotnet test --collect:"XPlat Code Coverage" \
+  /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
 ```
 
 ### 2. Explicit Over Implicit
@@ -269,7 +269,7 @@ public sealed class ZakatService
 
 ## Code Coverage Enforcement
 
-**MUST** achieve >=95% line coverage using Coverlet with enforcement via `rhino-cli test-coverage validate`.
+**MUST** achieve >=95% line coverage using Coverlet with enforcement via the native `test:coverage` Nx target.
 
 ```xml
 <!-- Directory.Build.props - add for test projects -->
@@ -281,13 +281,11 @@ public sealed class ZakatService
 ```
 
 ```bash
-# Run tests with coverage collection
+# Run tests with coverage collection and threshold enforcement
 dotnet test --collect:"XPlat Code Coverage" \
     --results-directory ./coverage \
-    --configuration Release
-
-# Enforce threshold
-rhino-cli test-coverage validate ./coverage/*/coverage.cobertura.xml 95
+    --configuration Release \
+    /p:Threshold=95 /p:ThresholdType=line /p:ThresholdStat=Total
 ```
 
 ## SonarAnalyzer Rules

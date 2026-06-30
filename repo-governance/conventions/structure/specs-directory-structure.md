@@ -284,8 +284,8 @@ apps completed migration to the universal domain-subdir layout, then renamed to
 - `crane` — regrouped into domain subdirs (`pdf/`, `content/`, `media/`, `reporting/`,
   `system/`); bare `cli/` renamed to `crane-cli/`.
 - `rhino` — regrouped into domain subdirs (`agents/`, `system/`, `env/`, `git/`, `ddd/`,
-  `docs/`, `spec-coverage/`, `test-coverage/`, `repo-governance/`, `workflows/`); bare `cli/`
-  renamed to `rhino-cli/`.
+  `docs/`, `spec-coverage/`, `repo-governance/`, `workflows/`); bare `cli/` renamed to
+  `rhino-cli/`.
 - `ayokoding-cli` — features at `ayokoding-cli/gherkin/links/`; bare `cli/` renamed to
   `ayokoding-cli/`.
 - `ose-cli` — bare `cli/` renamed to `ose-cli/` under `specs/apps/ose/behavior/`.
@@ -404,7 +404,7 @@ Drift detection commands (`drift-routes`, `drift-endpoints`, `drift-contracts`) 
 Every `validate:specs-*` target runs on all four gating surfaces — no surface lags behind:
 
 - `.husky/pre-push` (every developer push, single line)
-- `.github/workflows/commons-quality-gate.yml` (every PR, dedicated `specs-gate` job in `quality-gate.needs:`)
+- `.github/workflows/pr-quality-gate.yml` (every PR, dedicated `specs-gate` job in `quality-gate.needs:`)
 - `.github/workflows/_reusable-www-test-local-deploy.yml` (called by the www cron deploys, `specs-gate` job in `deploy.needs:`)
 - `.github/workflows/organiclever-app-test-local-deploy-stag.yml` (cron on `main`, `specs-gate` job in `deploy.needs:`)
 

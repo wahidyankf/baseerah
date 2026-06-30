@@ -139,8 +139,8 @@ graph TD
 
 **Location**: `apps/rhino-cli/`
 
-Repository management CLI used by most projects for coverage validation
-(`rhino-cli test-coverage validate`) and spec coverage (`rhino-cli specs coverage`).
+Repository management CLI used by most projects for spec coverage (`rhino-cli specs coverage`)
+and other validation tasks.
 
 - **Dependents**: CLI tools, libs, content platforms, organiclever-app-web
 - **Mechanism**: `implicitDependencies`

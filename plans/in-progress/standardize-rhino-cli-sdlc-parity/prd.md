@@ -334,7 +334,7 @@ Feature: Repo configuration is unified in repo-config.yml
     Given a repo with repo-config.yml at its root
     When rhino-cli runs instruction-size or env validation
     Then it reads the instruction-size / env-contract / env-injection section from repo-config.yml
-    And the standalone instruction-size-budget.yaml / env-contract.yaml / env-injection.yaml files are absent
+    And the standalone yaml config files (instruction-size, env-contract, env-injection) are absent from repo root
 
   Scenario: Codecov is fully removed
     Given any of the three repos

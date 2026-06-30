@@ -135,7 +135,7 @@ git push
 The pre-push hook and the CI quality gate are intentionally redundant for affected-project
 checks. CI is the hard, authoritative gate; the hook gives fast local feedback.
 
-| Check                           | pre-push hook | CI (`commons-quality-gate.yml`)         |
+| Check                           | pre-push hook | CI (`pr-quality-gate.yml`)              |
 | ------------------------------- | ------------- | --------------------------------------- |
 | `typecheck` (affected)          | Yes           | Yes                                     |
 | `lint` (affected)               | Yes           | Yes                                     |
@@ -144,9 +144,9 @@ checks. CI is the hard, authoritative gate; the hook gives fast local feedback.
 | `npm run lint:md`               | Yes           | Yes (`markdown` job)                    |
 | `naming:harness-validation`     | Conditional   | Always                                  |
 | `naming:workflows-validation`   | Conditional   | Always                                  |
-| `mermaid:validation`            | pre-commit    | `markdown-validate.yml`                 |
-| `links:validation`              | pre-commit    | `markdown-validate.yml`                 |
-| `headings:hierarchy-validation` | pre-commit    | `markdown-validate.yml`                 |
+| `mermaid:validation`            | pre-commit    | lint-staged (per-file)                  |
+| `links:validation`              | pre-commit    | `md-links` job in `pr-quality-gate.yml` |
+| `headings:hierarchy-validation` | pre-commit    | lint-staged (per-file)                  |
 | `shellcheck` / `hadolint`       | pre-commit    | Always (`shellcheck` / `hadolint` jobs) |
 | `actionlint`                    | pre-commit    | Always (`actionlint` job)               |
 
