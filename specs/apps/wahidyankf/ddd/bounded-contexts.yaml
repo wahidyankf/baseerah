@@ -1,4 +1,0 @@
-# wahidyankf-www bounded context registry
-# Consumed by: rhino-cli ddd bc wahidyankf
-# Schema: see specs/apps/organiclever/ddd/bounded-contexts.yaml for reference
-contexts: []
