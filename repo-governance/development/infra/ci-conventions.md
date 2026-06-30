@@ -471,18 +471,18 @@ must be recorded here with a justification; undocumented deviations are always b
 
 ### Invariant A — CI Workflow Shape
 
-| Requirement                                                                                                                                                              | Enforced by                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| All `checkout` steps use `actions/checkout@v6`                                                                                                                           | `actionlint` + PR quality gate                                      |
-| Workflow filenames follow the `{domain}-{action-chain}.yml` grammar (see [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md))               | `actionlint` syntax check; code review                              |
-| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                                    | `commons-quality-gate.yml` structure                                |
-| Per-variant test workflows call reusable workflows (thin callers, ≤40 lines each)                                                                                        | Code review; reusable workflow structure                            |
-| All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                                        | `actionlint`; PR quality gate                                       |
-| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                                       | `commons-quality-gate.yml` job keys                                 |
-| Specs-gate job runs `specs:adoption-validation`, `specs:tree-validation`, `specs:counts-validation`, `specs:links-validation` and `specs:gherkin-cardinality-validation` | `commons-quality-gate.yml` specs-gate job                           |
-| Full quality gate runs on every push to `main` (direct `push` trigger on `commons-quality-gate.yml`)                                                                     | `commons-quality-gate.yml` `on.push` trigger                        |
-| App-tier scheduled workflows use staggered 2× WIB cadence: `*-app-test-local-deploy-stag` at 03:00/15:00, `*-app-test-stag` at 05:30/17:30 (+2.5 h)                      | `*-app-test-local-deploy-stag.yml` and `*-app-test-stag-*.yml` CRON |
-| www-tier scheduled workflows run at 06:00/18:00 WIB (23:00/11:00 UTC)                                                                                                    | `*-www-test-local-deploy-prod.yml` CRON expressions                 |
+| Requirement                                                                                                                                                | Enforced by                                                         |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| All `checkout` steps use `actions/checkout@v6`                                                                                                             | `actionlint` + PR quality gate                                      |
+| Workflow filenames follow the `{domain}-{action-chain}.yml` grammar (see [GitHub Actions Workflow Naming Convention](./github-actions-workflow-naming.md)) | `actionlint` syntax check; code review                              |
+| Non-TypeScript projects use `nx affected` (not `run-many`) in PR gate                                                                                      | `commons-quality-gate.yml` structure                                |
+| Per-variant test workflows call reusable workflows (thin callers, ≤40 lines each)                                                                          | Code review; reusable workflow structure                            |
+| All entry-point workflows carry a `concurrency` block: `${{ github.workflow }}-${{ github.ref }}`                                                          | `actionlint`; PR quality gate                                       |
+| CI lint jobs named after the tool they run: `shellcheck`, `hadolint`, `actionlint`                                                                         | `commons-quality-gate.yml` job keys                                 |
+| Specs-gate job runs `specs:structure-validation` and `specs:gherkin-cardinality-validation` (spec-file links covered by `links:validation` gate)           | `commons-quality-gate.yml` specs-gate job                           |
+| Full quality gate runs on every push to `main` (direct `push` trigger on `commons-quality-gate.yml`)                                                       | `commons-quality-gate.yml` `on.push` trigger                        |
+| App-tier scheduled workflows use staggered 2× WIB cadence: `*-app-test-local-deploy-stag` at 03:00/15:00, `*-app-test-stag` at 05:30/17:30 (+2.5 h)        | `*-app-test-local-deploy-stag.yml` and `*-app-test-stag-*.yml` CRON |
+| www-tier scheduled workflows run at 06:00/18:00 WIB (23:00/11:00 UTC)                                                                                      | `*-www-test-local-deploy-prod.yml` CRON expressions                 |
 
 Note: `rhino-cli:naming:workflows-validation` validates `repo-governance/workflows/*.md` naming
 only — it does **not** validate `.github/workflows/` filenames.
@@ -548,7 +548,6 @@ Deprecated prefix→canonical mapping reference:
 | `validate:mermaid`                         | `mermaid:validation`                 |
 | `validate:heading-hierarchy`               | `headings:hierarchy-validation`      |
 | `validate:specs-tree`                      | `specs:tree-validation`              |
-| `validate:specs-links`                     | `specs:links-validation`             |
 | `validate:specs-counts`                    | `specs:counts-validation`            |
 | `validate:specs-adoption`                  | `specs:adoption-validation`          |
 | `validate:naming-agents`                   | `naming:harness-validation`          |

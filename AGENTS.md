@@ -222,7 +222,12 @@ Volta for Node.js/npm pinning, package-lock.json, .env.example. **Hard iron rule
 committed files**: Never commit system secrets to any git-tracked file — history is permanent. Real
 values in uncommitted `.env*` (except `.env.example`). **Guardrail**: Agents must not
 read/write/edit/commit real `.env*` files — only `.env.example` is permitted; scripts under
-`apps/`/`libs/`/`scripts/` are exempt.
+`apps/`/`libs/`/`scripts/` are exempt. **Git Identity Guardrail**: No AI agent sets or modifies
+git identity at any scope — `git config --local user.*`, bare `git config user.*`,
+`git config --global user.*`, `git config --system user.*`, or direct `.git/config [user]`
+edits are all forbidden. Identity comes from the developer's global `~/.gitconfig` (optionally
+`includeIf` for per-tree overrides). CI exemption: workflow YAML service-account identity
+(e.g. `github-actions[bot]`) is not an agent action.
 
 **See**: [repo-governance/development/workflow/reproducible-environments.md](./repo-governance/development/workflow/reproducible-environments.md),
 [Secrets and Env Standards](./repo-governance/conventions/security/secrets-and-env-standards.md)
