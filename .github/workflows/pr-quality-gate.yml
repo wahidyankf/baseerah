@@ -174,8 +174,17 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx affected -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:ts,tag:lang:fsharp,tag:lang:csharp'
-      - run: npx nx run rhino-cli:deny:check
-      - run: npx nx run rhino-cli:msrv:check
+
+  compat-min-version:
+    name: Minimum version compatibility (all affected)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx affected -t compat:min-version
 
   markdown:
     name: Markdown quality gate
@@ -214,7 +223,43 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t specs:structure-validation --projects=rhino-cli
-      - run: npx nx run rhino-cli:specs:gherkin-cardinality-validation
+
+  md-links:
+    name: Markdown link validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
+
+  readme-index:
+    name: README index validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
+
+  harness-duplication:
+    name: Harness duplication validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
+
+  governance:
+    name: Governance validators (vendor audit + license)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor validate repo-governance/
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- convention license validate
 
   quality-gate:
     name: Quality gate
@@ -227,10 +272,15 @@ jobs:
         typescript,
         dotnet,
         rust,
+        compat-min-version,
         markdown,
         naming,
         instruction-size,
         specs-gate,
+        md-links,
+        readme-index,
+        harness-duplication,
+        governance,
       ]
     if: always()
     runs-on: ubuntu-latest

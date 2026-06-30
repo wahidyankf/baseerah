@@ -580,7 +580,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 5. **Report Format**:
 
-```markdown
+````markdown
 ### Finding: Skill Consolidation Opportunity
 
 **Skills Involved**: [skill-1, skill-2, skill-3]
@@ -620,6 +620,7 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 - **Action**: [MERGE / CONSIDER MERGE / KEEP SEPARATE]
 - **Rationale**: [specific reason based on analysis]
 - **Proposed Structure** (if MERGE):
+
 ```
 
 # Merged Skill Name
@@ -637,9 +638,10 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 ```
 
 **Agent Impact**:
+
 - Agents currently referencing these Skills: [list of N agents]
 - After merge: All reference single comprehensive skill
-```
+````
 
 **Domain-Specific Exemptions** (DO NOT flag these):
 
@@ -675,10 +677,10 @@ Validate file naming, linking, emoji usage, convention compliance per existing l
 
 ### Step 6: Instruction-File Size Budget
 
-**Deterministic-gate annotation**: Byte counts for all auto-loaded instruction surfaces are enforced by the deterministic `rhino-cli convention validate instruction-size` gate (wired at pre-push, CI, and as `instruction-size` in the `repo-governance audit` preflight). If `instruction-size` is present in the Step 0.5 preflight JSON, its findings are already embedded verbatim in the `## Deterministic Findings` section — DO NOT re-derive byte counts. Judge only qualitative concerns the mechanical gate cannot measure:
+**Deterministic-gate annotation**: Byte counts for all auto-loaded instruction surfaces are enforced by the deterministic `rhino-cli harness instruction-size validate` gate (wired at pre-push, CI, and as `instruction-size` in the `repo-governance audit` preflight). If `instruction-size` is present in the Step 0.5 preflight JSON, its findings are already embedded verbatim in the `## Deterministic Findings` section — DO NOT re-derive byte counts. Judge only qualitative concerns the mechanical gate cannot measure:
 
 1. **If `instruction-size` preflight is available**: Skip byte counting entirely. Read the preflight findings section and check only for qualitative bloat: sections that are verbose when a one-line summary + `See` link would suffice, duplicate content already reachable via a link, or structure anti-patterns (all-at-once complexity, no progressive layers).
-2. **If preflight is absent** (fallback): Read all monitored surfaces (`AGENTS.md`, `CLAUDE.md`, and harness-specific surfaces listed in `instruction-size-budget.yaml`). Count bytes. Classify against the thresholds in `instruction-size-budget.yaml`. Emit a finding for any surface exceeding the `fail` ceiling. For surfaces in the `warn` zone, emit a lower-severity advisory.
+2. **If preflight is absent** (fallback): Read all monitored surfaces (`AGENTS.md`, `CLAUDE.md`, and harness-specific surfaces listed in the `instruction-size:` section of `repo-config.yml`). Count bytes. Classify against the thresholds in the `instruction-size:` section of `repo-config.yml`. Emit a finding for any surface exceeding the `fail` ceiling. For surfaces in the `warn` zone, emit a lower-severity advisory.
 3. **Remediation guidance**: When flagging a size violation, the ONLY sanctioned fix is progressive disclosure — replace inline-expanded content with a one-line summary and a `See` link. Document this in the finding. Forbidden anti-fixes (delete rules, dense compression, split into another auto-loaded file) MUST be called out if observed.
 
 See [Instruction-File Size Budget Convention](../../repo-governance/conventions/structure/instruction-file-size-budget.md).
@@ -818,11 +820,13 @@ Current frontmatter:
 principles:
   - automation-over-manual
 ```
+````
 
 Expected: Should include explicit-over-implicit given document focuses on security practices
 
 **Recommendation**: Add explicit-over-implicit to principles frontmatter
-````
+
+`````
 
 #### 8.2 Cross-Reference Completeness
 
@@ -1053,7 +1057,7 @@ Diagram uses default colors without `classDef` declarations
 classDef blueBox fill:#0173B2,stroke:#0173B2,color:#fff
 classDef orangeBox fill:#DE8F05,stroke:#DE8F05,color:#fff
 ```
-````
+`````
 
 ````
 
@@ -1220,7 +1224,7 @@ When preflight is supplied (Step 0.5 succeeded), the final audit report is split
 
    **Key**: `<category>|<file>|<short-hash>`
    **Message**: <message>
-   **Source**: `rhino-cli repo-governance validate <category>` (preflight)
+   **Source**: `rhino-cli repo-governance <category> validate` (preflight)
    ```
 
    Findings are grouped under per-category H3 sub-headings to mirror the preflight envelope's `result.categories[]` ordering. Skipped false-positives are listed under an `### [INFO] Skipped (known false positives)` sub-section.
@@ -1266,3 +1270,7 @@ When preflight is unavailable (`[WARN]` logged in Step 0.5), the report uses a s
 
 - [AI Agents Convention](../../repo-governance/development/agents/ai-agents.md)
 - [Maker-Checker-Fixer Pattern](../../repo-governance/development/pattern/maker-checker-fixer.md)
+
+```
+
+```

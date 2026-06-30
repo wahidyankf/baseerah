@@ -1,15 +1,16 @@
 #!/usr/bin/env sh
 set -e
 
-# Pre-push: spec + code-coverage gates, BDD spec validators, markdown lint,
-# env-contract validation, and changed-path-gated governance validators.
-# typecheck/lint/test:unit run in pre-commit (via test:quick) — NOT here.
+# Pre-push: test:quick + spec validators + repo-wide cross-file gates + governance validators.
 # Heavy integration + e2e suites are CRON-only (scheduled tiered pipelines) — never in this hook.
 # If pre-push times out, run the nx commands below manually to warm cache, then push again.
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
-npx nx affected -t specs:behavior:coverage test-coverage specs:structure-validation --parallel="$PARALLEL"
-npm run lint:md
-npx nx run rhino-cli:env:validation
+npx nx affected -t test:quick --parallel="$PARALLEL"
+npx nx affected -t compat:min-version --parallel="$PARALLEL"
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
 
 # Naming validators — scoped to pushes that touch the relevant trees.
 # Upstream may be missing on first push of a branch; default to empty range in that case.
@@ -17,21 +18,22 @@ RANGE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 &
 if [ -n "$RANGE" ]; then
   CHANGED=$(git diff --name-only "$RANGE" 2>/dev/null || echo "")
   if echo "$CHANGED" | grep -qE '^(\.claude/agents/|\.opencode/agent/)'; then
-    npx nx run rhino-cli:naming:harness-validation
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness naming validate
   fi
   if echo "$CHANGED" | grep -qE '^repo-governance/workflows/'; then
-    npx nx run rhino-cli:naming:workflows-validation
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance workflows naming validate
   fi
   if echo "$CHANGED" | grep -qE '^repo-governance/.*\.md$'; then
-    npx nx run rhino-cli:governance:vendor-audit-validation
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor validate repo-governance/
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- convention license validate
   fi
   # Harness binding-parity guard + cross-vendor invariants (color/tier maps absorbed):
   # run when binding or parity-relevant surfaces change.
   if echo "$CHANGED" | grep -qE '^(\.amazonq/|AGENTS\.md$|CLAUDE\.md$|docs/reference/platform-bindings\.md$|repo-governance/.*\.md$|\.claude/|\.opencode/|\.codex/|\.github/|\.cursor/|\.windsurf/|\.junie/|GEMINI\.md$|CONVENTIONS\.md$)'; then
-    npm run harness:bindings-validation
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness bindings validate
   fi
   # Instruction-size budget gate: run when any auto-loaded instruction surface changes.
-  if echo "$CHANGED" | grep -qE '^(AGENTS\.md$|CLAUDE\.md$|instruction-size-budget\.yaml$|\.amazonq/rules/|\.windsurf/rules/|\.cursor/rules/|\.junie/guidelines\.md$|\.github/copilot-instructions\.md$|CONVENTIONS\.md$)'; then
-    npx nx run rhino-cli:instruction-size:validation
+  if echo "$CHANGED" | grep -qE '^(AGENTS\.md$|CLAUDE\.md$|repo-config\.yml$|\.amazonq/rules/|\.windsurf/rules/|\.cursor/rules/|\.junie/guidelines\.md$|\.github/copilot-instructions\.md$|CONVENTIONS\.md$)'; then
+    cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness instruction-size validate
   fi
 fi

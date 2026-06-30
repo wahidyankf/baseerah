@@ -1,0 +1,23 @@
+name: deps-audit
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Dependency audit (all projects)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-dotnet
+      - uses: ./.github/actions/setup-rust
+      - name: Run deps:audit across all projects
+        run: npx nx run-many --all -t deps:audit

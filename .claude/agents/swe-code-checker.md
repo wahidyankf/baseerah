@@ -291,7 +291,7 @@ Completeness Convention — the counterpart to the plan path that `plan-checker`
 #### 6.6.2 specs:coverage Wired and Green
 
 - The affected project MUST have a `specs:coverage` target, and it MUST pass
-  (`rhino-cli specs validate coverage`). A behavior change that breaks `specs:coverage` is **HIGH**.
+  (`rhino-cli specs behavior-coverage validate`). A behavior change that breaks `specs:coverage` is **HIGH**.
 
 #### 6.6.3 Pure-Refactor / No-Behavior-Change Exemption
 

@@ -1,0 +1,215 @@
+name: main-ci
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    name: Shell lint (ShellCheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: ShellCheck (warning threshold — all .sh files)
+        run: |
+          shellcheck --version
+          files=$(find . -name '*.sh' -not -path './node_modules/*' -not -path './.nx/*' -not -path './archived/*' -not -path './.husky/_/*' | sort || true)
+          if [ -z "$files" ]; then echo "No shell scripts found"; exit 0; fi
+          # shellcheck disable=SC2086 # word-splitting the file list is intentional
+          shellcheck --severity=warning $files
+
+  hadolint:
+    name: Dockerfile lint (hadolint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: hadolint (warning threshold — all Dockerfiles)
+        run: |
+          sudo curl -sSL -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-Linux-x86_64
+          sudo chmod +x /usr/local/bin/hadolint
+          hadolint --version
+          files=$(find . -name 'Dockerfile*' -not -path './node_modules/*' -not -path './.nx/*' -not -path './archived/*' | sort || true)
+          if [ -z "$files" ]; then echo "No Dockerfiles found"; exit 0; fi
+          # shellcheck disable=SC2086 # word-splitting the file list is intentional
+          hadolint --failure-threshold warning $files
+
+  actionlint:
+    name: GitHub Actions lint (actionlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: actionlint (all workflow files)
+        run: |
+          curl -sSL -o download-actionlint.bash \
+            https://raw.githubusercontent.com/rhysd/actionlint/v1.7.12/scripts/download-actionlint.bash
+          bash download-actionlint.bash 1.7.12
+          ./actionlint -color .github/workflows/*.yml
+
+  typescript:
+    name: TypeScript quality gate (all projects)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust'
+
+  dotnet:
+    name: .NET quality gate (all projects)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-dotnet
+      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:ts,tag:lang:rust'
+
+  rust:
+    name: Rust quality gate (all projects)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:ts,tag:lang:fsharp,tag:lang:csharp'
+
+  compat-min-version:
+    name: Minimum version compatibility (all projects)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run-many --all -t compat:min-version
+
+  markdown-per-file:
+    name: Markdown per-file validators (all files)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - name: markdownlint-cli2 (all .md)
+        run: npx markdownlint-cli2 "**/*.md" "#node_modules" "#.nx" "#archived"
+      - name: Mermaid diagram validation (all .md)
+        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md mermaid validate
+      - name: Heading hierarchy validation (all .md)
+        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md heading-hierarchy validate
+      - name: Gherkin cardinality validation (all .feature)
+        run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs gherkin-cardinality validate
+
+  naming:
+    name: Naming validators (agents + workflows)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run rhino-cli:naming:harness-validation
+      - run: npx nx run rhino-cli:naming:workflows-validation
+
+  instruction-size:
+    name: Instruction-size budget gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run rhino-cli:instruction-size:validation
+
+  specs-gate:
+    name: Specs gate (structure + gherkin validators)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: npx nx run-many --all -t specs:structure-validation
+
+  env-validate:
+    name: Env contract validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate
+
+  md-links:
+    name: Markdown link validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
+
+  readme-index:
+    name: README index validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
+
+  harness-duplication:
+    name: Harness duplication validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
+
+  governance:
+    name: Governance validators (vendor audit + license)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-governance vendor validate repo-governance/
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- convention license validate
+
+  quality-gate:
+    name: Quality gate
+    needs:
+      [
+        shellcheck,
+        hadolint,
+        actionlint,
+        typescript,
+        dotnet,
+        rust,
+        compat-min-version,
+        markdown-per-file,
+        naming,
+        instruction-size,
+        specs-gate,
+        env-validate,
+        md-links,
+        readme-index,
+        harness-duplication,
+        governance,
+      ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all gates
+        run: |
+          echo "Checking main-ci quality gate results..."
+          if [ "${{ contains(needs.*.result, 'failure') }}" = "true" ]; then
+            echo "One or more main-ci gate jobs failed"
+            exit 1
+          fi
+          echo "All main-ci quality gates passed"
