@@ -1,4 +1,4 @@
-//! `lang java validate null-safety-annotations` — checks Java packages carry
+//! `lang java null-safety-annotations validate` — checks Java packages carry
 //! required null-safety annotations on generated/contract code.
 //!
 //! **Dormant in ose-public** — no JVM source here yet. Ships for union CLI
@@ -9,7 +9,7 @@ use clap::Args;
 
 use crate::domain::cliout::OutputFormat;
 
-/// CLI arguments for `lang java validate null-safety-annotations`.
+/// CLI arguments for `lang java null-safety-annotations validate`.
 #[derive(Args, Debug)]
 pub struct ValidateNullSafetyArgs {
     /// Root directory to scan (defaults to repo root).
@@ -17,7 +17,7 @@ pub struct ValidateNullSafetyArgs {
     pub dir: Option<String>,
 }
 
-/// Run the `lang java validate null-safety-annotations` command.
+/// Run the `lang java null-safety-annotations validate` command.
 ///
 /// # Errors
 ///
@@ -25,7 +25,7 @@ pub struct ValidateNullSafetyArgs {
 pub fn run(args: &ValidateNullSafetyArgs, _output: OutputFormat) -> std::result::Result<(), Error> {
     let dir = args.dir.as_deref().unwrap_or(".");
     println!(
-        "lang java validate null-safety-annotations: dormant in ose-public \
+        "lang java null-safety-annotations validate: dormant in ose-public \
          (no JVM source under {dir}); pass."
     );
     Ok(())

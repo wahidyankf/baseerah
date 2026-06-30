@@ -6,11 +6,11 @@ inputs:
     required: false
     default: "0.8.5"
   cargo-deny-version:
-    description: "cargo-deny version (used by rhino-cli deny:check)"
+    description: "cargo-deny version (used by rhino-cli deps:audit)"
     required: false
     default: "0.18.2"
   cargo-hack-version:
-    description: "cargo-hack version (used by rhino-cli check:msrv)"
+    description: "cargo-hack version (used by rhino-cli compat:min-version)"
     required: false
     default: "0.6.37"
 runs:

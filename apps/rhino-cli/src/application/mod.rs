@@ -34,5 +34,3 @@ pub mod severity;
 pub mod speccoverage;
 /// Spec-tree validators.
 pub mod specs;
-/// Test-coverage analysis use cases.
-pub mod testcoverage;

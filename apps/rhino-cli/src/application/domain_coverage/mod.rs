@@ -12,9 +12,9 @@ pub fn is_eligible(project_name: &str, domain_areas: &[String]) -> bool {
 }
 
 /// Returns only those scenarios whose `feature_path` contains a `domain/` path component.
-pub fn filter_domain_scenarios<'a>(
-    scenarios: &'a [crate::application::behavior_coverage::types::ScenarioSpec],
-) -> Vec<&'a crate::application::behavior_coverage::types::ScenarioSpec> {
+pub fn filter_domain_scenarios(
+    scenarios: &[crate::application::behavior_coverage::types::ScenarioSpec],
+) -> Vec<&crate::application::behavior_coverage::types::ScenarioSpec> {
     scenarios
         .iter()
         .filter(|s| {

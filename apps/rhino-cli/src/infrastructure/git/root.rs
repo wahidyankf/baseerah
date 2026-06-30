@@ -74,7 +74,7 @@ mod tests {
     ///   Then it succeeds, proving repo-root resolution is worktree-aware
     #[test]
     fn find_root_from_worktree_returns_worktree_path() {
-        let main_repo = TempDir::new().unwrap();
+        let main_repo = TempDir::new().expect("tempdir");
         let main = main_repo.path();
 
         // Init a bare-minimum git repo.
@@ -82,44 +82,44 @@ mod tests {
             .args(["init"])
             .current_dir(main)
             .output()
-            .unwrap();
+            .expect("git init");
         Cmd::new("git")
             .args(["config", "user.email", "test@test.com"])
             .current_dir(main)
             .output()
-            .unwrap();
+            .expect("git config email");
         Cmd::new("git")
             .args(["config", "user.name", "Test"])
             .current_dir(main)
             .output()
-            .unwrap();
-        std::fs::write(main.join("README.md"), "test").unwrap();
+            .expect("git config name");
+        std::fs::write(main.join("README.md"), "test").expect("write README");
         Cmd::new("git")
             .args(["add", "."])
             .current_dir(main)
             .output()
-            .unwrap();
+            .expect("git add");
         Cmd::new("git")
             .args(["commit", "-m", "init"])
             .current_dir(main)
             .output()
-            .unwrap();
+            .expect("git commit");
 
         // Create a linked worktree.
-        let wt_dir = TempDir::new().unwrap();
+        let wt_dir = TempDir::new().expect("tempdir wt");
         let wt_path = wt_dir.path();
         let status = Cmd::new("git")
             .args(["worktree", "add", &wt_path.to_string_lossy(), "HEAD"])
             .current_dir(main)
             .status()
-            .unwrap();
+            .expect("git worktree add");
         assert!(status.success(), "git worktree add must succeed");
 
         // find_root_from the worktree path must return the WORKTREE path, not main.
         let resolved = find_root_from(Some(wt_path))
             .expect("find_root_from must succeed inside a linked worktree");
-        let resolved_canonical = std::fs::canonicalize(&resolved).unwrap();
-        let wt_canonical = std::fs::canonicalize(wt_path).unwrap();
+        let resolved_canonical = std::fs::canonicalize(&resolved).expect("canonicalize resolved");
+        let wt_canonical = std::fs::canonicalize(wt_path).expect("canonicalize wt_path");
         assert_eq!(
             resolved_canonical, wt_canonical,
             "find_root_from must return the linked worktree path when invoked from it"

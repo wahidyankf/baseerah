@@ -14,4 +14,3 @@ pub mod repo_governance;
 pub mod severity;
 pub mod speccoverage;
 pub mod specs;
-pub mod testcoverage;

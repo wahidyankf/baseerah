@@ -67,17 +67,30 @@ impl DriftKind {
     }
 }
 
-/// Load and parse `env-contract.yaml` at `repo_root`.
+/// Load and parse the `env-contract:` section from `repo-config.yml` at `repo_root`.
 ///
 /// # Errors
 ///
-/// Returns an error when the file cannot be read or is not valid YAML.
+/// Returns an error when `repo-config.yml` cannot be read, is not valid YAML,
+/// or the `env-contract:` section is absent.
 pub fn load_contract(repo_root: &Path) -> Result<Contract, Error> {
-    let path = repo_root.join("env-contract.yaml");
+    #[derive(Deserialize)]
+    struct Wrapper {
+        #[serde(rename = "env-contract")]
+        env_contract: Option<Contract>,
+    }
+
+    let path = repo_root.join("repo-config.yml");
     let data = fs::read_to_string(&path)
-        .with_context(|| format!("cannot read env-contract.yaml at {}", path.display()))?;
-    serde_norway::from_str(&data)
-        .with_context(|| format!("failed to parse env-contract.yaml at {}", path.display()))
+        .with_context(|| format!("cannot read repo-config.yml at {}", path.display()))?;
+    let wrapper: Wrapper = serde_norway::from_str(&data)
+        .with_context(|| format!("failed to parse repo-config.yml at {}", path.display()))?;
+    wrapper.env_contract.ok_or_else(|| {
+        anyhow::anyhow!(
+            "env-contract: section missing from repo-config.yml at {}",
+            path.display()
+        )
+    })
 }
 
 /// Parse declared keys from a `.env.example` file.
@@ -652,6 +665,51 @@ pub struct Config {
         assert!(
             findings.is_empty(),
             "expected no findings; got {findings:?}"
+        );
+    }
+
+    // ── load_contract from repo-config.yml (RED → GREEN) ─────────────────────
+
+    #[test]
+    fn load_contract_reads_env_contract_section_from_repo_config_yml() {
+        let tmp = TempDir::new().unwrap();
+        let yaml = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "env-contract:\n",
+            "  surfaces:\n",
+            "    - root: apps/myapp\n",
+            "      kind: app\n",
+            "      lang: typescript\n",
+            "      allowlist: []\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), yaml).unwrap();
+        // NO standalone env-contract.yaml — loader must read from repo-config.yml
+        let result = load_contract(tmp.path());
+        assert!(
+            result.is_ok(),
+            "should read env-contract: from repo-config.yml without standalone file: {result:?}"
+        );
+        let contract = result.unwrap();
+        assert_eq!(contract.surfaces.len(), 1);
+        assert_eq!(contract.surfaces[0].root, "apps/myapp");
+    }
+
+    #[test]
+    fn load_contract_errors_when_env_contract_section_missing_from_repo_config_yml() {
+        let tmp = TempDir::new().unwrap();
+        let yaml = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), yaml).unwrap();
+        // NO standalone env-contract.yaml, NO env-contract: section in repo-config.yml
+        let result = load_contract(tmp.path());
+        assert!(
+            result.is_err(),
+            "should error when env-contract: section is absent from repo-config.yml"
         );
     }
 }

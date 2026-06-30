@@ -4,160 +4,212 @@
     "args": ["--help"]
   },
   {
-    "file": "test-coverage-validate",
-    "args": ["test-coverage", "validate", "--help"]
+    "file": "repo-governance-help",
+    "args": ["repo-governance", "--help"]
   },
   {
     "file": "repo-governance-audit",
     "args": ["repo-governance", "audit", "--help"]
   },
   {
-    "file": "repo-governance-validate",
-    "args": ["repo-governance", "validate", "--help"]
+    "file": "repo-governance-vendor",
+    "args": ["repo-governance", "vendor", "--help"]
   },
   {
-    "file": "repo-governance-validate-vendor",
-    "args": ["repo-governance", "validate", "vendor", "--help"]
+    "file": "repo-governance-vendor-validate",
+    "args": ["repo-governance", "vendor", "validate", "--help"]
   },
   {
-    "file": "repo-governance-validate-layer-coherence",
-    "args": ["repo-governance", "validate", "layer-coherence", "--help"]
+    "file": "repo-governance-layer-coherence",
+    "args": ["repo-governance", "layer-coherence", "--help"]
   },
   {
-    "file": "repo-governance-validate-traceability",
-    "args": ["repo-governance", "validate", "traceability", "--help"]
+    "file": "repo-governance-layer-coherence-validate",
+    "args": ["repo-governance", "layer-coherence", "validate", "--help"]
   },
   {
-    "file": "md-validate",
-    "args": ["md", "validate", "--help"]
+    "file": "repo-governance-traceability",
+    "args": ["repo-governance", "traceability", "--help"]
   },
   {
-    "file": "md-validate-naming",
-    "args": ["md", "validate", "naming", "--help"]
+    "file": "repo-governance-traceability-validate",
+    "args": ["repo-governance", "traceability", "validate", "--help"]
   },
   {
-    "file": "md-validate-frontmatter",
-    "args": ["md", "validate", "frontmatter", "--help"]
+    "file": "repo-governance-workflows",
+    "args": ["repo-governance", "workflows", "--help"]
   },
   {
-    "file": "md-validate-heading-hierarchy",
-    "args": ["md", "validate", "heading-hierarchy", "--help"]
+    "file": "repo-governance-workflows-naming",
+    "args": ["repo-governance", "workflows", "naming", "--help"]
   },
   {
-    "file": "md-validate-links",
-    "args": ["md", "validate", "links", "--help"]
+    "file": "repo-governance-workflows-naming-validate",
+    "args": ["repo-governance", "workflows", "naming", "validate", "--help"]
   },
   {
-    "file": "md-validate-mermaid",
-    "args": ["md", "validate", "mermaid", "--help"]
-  },
-  {
-    "file": "md-validate-frontmatter-dates",
-    "args": ["md", "frontmatter-dates", "--help"]
-  },
-  {
-    "file": "md-validate-readme-index",
-    "args": ["md", "readme-index", "--help"]
+    "file": "md-help",
+    "args": ["md", "--help"]
   },
   {
     "file": "md-audit",
     "args": ["md", "audit", "--help"]
   },
   {
-    "file": "convention-validate",
-    "args": ["convention", "validate", "--help"]
+    "file": "md-links",
+    "args": ["md", "links", "--help"]
   },
   {
-    "file": "convention-validate-emoji",
-    "args": ["convention", "validate", "emoji", "--help"]
+    "file": "md-links-validate",
+    "args": ["md", "links", "validate", "--help"]
   },
   {
-    "file": "convention-validate-license",
-    "args": ["convention", "validate", "license", "--help"]
+    "file": "md-mermaid",
+    "args": ["md", "mermaid", "--help"]
   },
   {
-    "file": "convention-validate-agents-md-size",
-    "args": ["convention", "validate", "agents-md-size", "--help"]
+    "file": "md-mermaid-validate",
+    "args": ["md", "mermaid", "validate", "--help"]
   },
   {
-    "file": "convention-validate-instruction-size",
-    "args": ["convention", "validate", "instruction-size", "--help"]
+    "file": "md-heading-hierarchy",
+    "args": ["md", "heading-hierarchy", "--help"]
+  },
+  {
+    "file": "md-heading-hierarchy-validate",
+    "args": ["md", "heading-hierarchy", "validate", "--help"]
+  },
+  {
+    "file": "md-naming",
+    "args": ["md", "naming", "--help"]
+  },
+  {
+    "file": "md-naming-validate",
+    "args": ["md", "naming", "validate", "--help"]
+  },
+  {
+    "file": "md-frontmatter",
+    "args": ["md", "frontmatter", "--help"]
+  },
+  {
+    "file": "md-frontmatter-validate",
+    "args": ["md", "frontmatter", "validate", "--help"]
+  },
+  {
+    "file": "md-frontmatter-dates",
+    "args": ["md", "frontmatter-dates", "--help"]
+  },
+  {
+    "file": "md-frontmatter-dates-validate",
+    "args": ["md", "frontmatter-dates", "validate", "--help"]
+  },
+  {
+    "file": "md-readme-index",
+    "args": ["md", "readme-index", "--help"]
+  },
+  {
+    "file": "md-readme-index-validate",
+    "args": ["md", "readme-index", "validate", "--help"]
+  },
+  {
+    "file": "convention-help",
+    "args": ["convention", "--help"]
   },
   {
     "file": "convention-audit",
     "args": ["convention", "audit", "--help"]
   },
   {
-    "file": "harness-validate",
-    "args": ["harness", "validate", "--help"]
+    "file": "convention-emoji",
+    "args": ["convention", "emoji", "--help"]
   },
   {
-    "file": "harness-validate-naming",
-    "args": ["harness", "validate", "naming", "--help"]
+    "file": "convention-emoji-validate",
+    "args": ["convention", "emoji", "validate", "--help"]
   },
   {
-    "file": "harness-validate-duplication",
-    "args": ["harness", "validate", "duplication", "--help"]
+    "file": "convention-license",
+    "args": ["convention", "license", "--help"]
   },
   {
-    "file": "harness-validate-claude",
-    "args": ["harness", "validate", "claude", "--help"]
+    "file": "convention-license-validate",
+    "args": ["convention", "license", "validate", "--help"]
   },
   {
-    "file": "harness-validate-sync",
-    "args": ["harness", "validate", "sync", "--help"]
-  },
-  {
-    "file": "harness-validate-bindings",
-    "args": ["harness", "validate", "bindings", "--help"]
-  },
-  {
-    "file": "harness-validate-instruction-size",
-    "args": ["harness", "validate", "instruction-size", "--help"]
-  },
-  {
-    "file": "harness-sync",
-    "args": ["harness", "sync", "--help"]
-  },
-  {
-    "file": "harness-sync-opencode",
-    "args": ["harness", "sync", "opencode", "--help"]
-  },
-  {
-    "file": "harness-emit",
-    "args": ["harness", "emit", "--help"]
-  },
-  {
-    "file": "harness-emit-amazonq",
-    "args": ["harness", "emit", "amazonq", "--help"]
-  },
-  {
-    "file": "harness-generate",
-    "args": ["harness", "generate", "--help"]
-  },
-  {
-    "file": "harness-generate-bindings",
-    "args": ["harness", "generate", "bindings", "--help"]
+    "file": "harness-help",
+    "args": ["harness", "--help"]
   },
   {
     "file": "harness-audit",
     "args": ["harness", "audit", "--help"]
   },
   {
-    "file": "workflows-validate",
-    "args": ["workflows", "validate", "--help"]
+    "file": "harness-naming",
+    "args": ["harness", "naming", "--help"]
   },
   {
-    "file": "workflows-validate-naming",
-    "args": ["workflows", "validate", "naming", "--help"]
+    "file": "harness-naming-validate",
+    "args": ["harness", "naming", "validate", "--help"]
   },
   {
-    "file": "specs-validate",
-    "args": ["specs", "validate", "--help"]
+    "file": "harness-duplication",
+    "args": ["harness", "duplication", "--help"]
   },
   {
-    "file": "specs-validate-gherkin-cardinality",
-    "args": ["specs", "validate", "gherkin-cardinality", "--help"]
+    "file": "harness-duplication-validate",
+    "args": ["harness", "duplication", "validate", "--help"]
+  },
+  {
+    "file": "harness-claude",
+    "args": ["harness", "claude", "--help"]
+  },
+  {
+    "file": "harness-claude-validate",
+    "args": ["harness", "claude", "validate", "--help"]
+  },
+  {
+    "file": "harness-sync",
+    "args": ["harness", "sync", "--help"]
+  },
+  {
+    "file": "harness-sync-validate",
+    "args": ["harness", "sync", "validate", "--help"]
+  },
+  {
+    "file": "harness-bindings",
+    "args": ["harness", "bindings", "--help"]
+  },
+  {
+    "file": "harness-bindings-validate",
+    "args": ["harness", "bindings", "validate", "--help"]
+  },
+  {
+    "file": "harness-bindings-generate",
+    "args": ["harness", "bindings", "generate", "--help"]
+  },
+  {
+    "file": "harness-instruction-size",
+    "args": ["harness", "instruction-size", "--help"]
+  },
+  {
+    "file": "harness-instruction-size-validate",
+    "args": ["harness", "instruction-size", "validate", "--help"]
+  },
+  {
+    "file": "specs-help",
+    "args": ["specs", "--help"]
+  },
+  {
+    "file": "specs-audit",
+    "args": ["specs", "audit", "--help"]
+  },
+  {
+    "file": "specs-gherkin-cardinality",
+    "args": ["specs", "gherkin-cardinality", "--help"]
+  },
+  {
+    "file": "specs-gherkin-cardinality-validate",
+    "args": ["specs", "gherkin-cardinality", "validate", "--help"]
   },
   {
     "file": "specs-structure-validate",
@@ -170,10 +222,6 @@
   {
     "file": "specs-domain-coverage-validate",
     "args": ["specs", "domain-coverage", "validate", "--help"]
-  },
-  {
-    "file": "specs-audit",
-    "args": ["specs", "audit", "--help"]
   },
   {
     "file": "specs-clean",
@@ -200,16 +248,12 @@
     "args": ["lang", "java", "--help"]
   },
   {
-    "file": "lang-java-validate",
-    "args": ["lang", "java", "validate", "--help"]
+    "file": "lang-java-null-safety-annotations",
+    "args": ["lang", "java", "null-safety-annotations", "--help"]
   },
   {
-    "file": "lang-java-validate-null-safety-annotations",
-    "args": ["lang", "java", "validate", "null-safety-annotations"]
-  },
-  {
-    "file": "git-pre-commit",
-    "args": ["git", "pre-commit", "--help"]
+    "file": "lang-java-null-safety-annotations-validate",
+    "args": ["lang", "java", "null-safety-annotations", "validate"]
   },
   {
     "file": "env-init",

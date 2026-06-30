@@ -120,17 +120,30 @@ impl ManifestFinding {
     }
 }
 
-/// Load and parse `env-injection.yaml` at `repo_root`.
+/// Load and parse the `env-injection:` section from `repo-config.yml` at `repo_root`.
 ///
 /// # Errors
 ///
-/// Returns an error when the file cannot be read or is not valid YAML.
+/// Returns an error when `repo-config.yml` cannot be read, is not valid YAML,
+/// or the `env-injection:` section is absent.
 pub fn load_manifest(repo_root: &Path) -> Result<Manifest, Error> {
-    let path = repo_root.join("env-injection.yaml");
+    #[derive(Deserialize)]
+    struct Wrapper {
+        #[serde(rename = "env-injection")]
+        env_injection: Option<Manifest>,
+    }
+
+    let path = repo_root.join("repo-config.yml");
     let data = fs::read_to_string(&path)
-        .with_context(|| format!("cannot read env-injection.yaml at {}", path.display()))?;
-    serde_norway::from_str(&data)
-        .with_context(|| format!("failed to parse env-injection.yaml at {}", path.display()))
+        .with_context(|| format!("cannot read repo-config.yml at {}", path.display()))?;
+    let wrapper: Wrapper = serde_norway::from_str(&data)
+        .with_context(|| format!("failed to parse repo-config.yml at {}", path.display()))?;
+    wrapper.env_injection.ok_or_else(|| {
+        anyhow::anyhow!(
+            "env-injection: section missing from repo-config.yml at {}",
+            path.display()
+        )
+    })
 }
 
 /// Tail of a contract surface root: `apps/ose-www` → `ose-www`.
@@ -469,5 +482,54 @@ mod tests {
         );
         assert_eq!(findings[0].subject, "WEB_BASE_URL");
         assert!(findings[0].detail.contains("ose-www"));
+    }
+
+    // ── load_manifest from repo-config.yml (RED → GREEN) ─────────────────────
+
+    #[test]
+    fn load_manifest_reads_env_injection_section_from_repo_config_yml() {
+        use std::fs;
+        use tempfile::TempDir;
+        let tmp = TempDir::new().unwrap();
+        let yaml = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "env-injection:\n",
+            "  apps:\n",
+            "    - app: demo\n",
+            "      keys-from: apps/demo/.env.example\n",
+            "      runtime: { local: env-local }\n",
+            "  ci-harness: []\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), yaml).unwrap();
+        // NO standalone env-injection.yaml — loader must read from repo-config.yml
+        let result = load_manifest(tmp.path());
+        assert!(
+            result.is_ok(),
+            "should read env-injection: from repo-config.yml without standalone file: {result:?}"
+        );
+        let manifest = result.unwrap();
+        assert_eq!(manifest.apps.len(), 1);
+        assert_eq!(manifest.apps[0].app, "demo");
+    }
+
+    #[test]
+    fn load_manifest_errors_when_env_injection_section_missing_from_repo_config_yml() {
+        use std::fs;
+        use tempfile::TempDir;
+        let tmp = TempDir::new().unwrap();
+        let yaml = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), yaml).unwrap();
+        // NO standalone env-injection.yaml, NO env-injection: section in repo-config.yml
+        let result = load_manifest(tmp.path());
+        assert!(
+            result.is_err(),
+            "should error when env-injection: section is absent from repo-config.yml"
+        );
     }
 }

@@ -3,7 +3,6 @@ CLI tools for repository management
 Usage: rhino-cli [OPTIONS] [COMMAND]
 
 Commands:
-  test-coverage    Test coverage commands (validate only)
   repo-governance  Repository governance audits
   md               Markdown validators (naming, frontmatter, heading-hierarchy, links, mermaid,
                    frontmatter-dates, readme-index)

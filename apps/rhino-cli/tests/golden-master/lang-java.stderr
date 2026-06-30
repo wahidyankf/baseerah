@@ -1,5 +1,5 @@
 error: 'rhino-cli lang java' requires a subcommand but one was not provided
-  [subcommands: validate, help]
+  [subcommands: null-safety-annotations, help]
 
 Usage: rhino-cli lang java [OPTIONS] <COMMAND>
 

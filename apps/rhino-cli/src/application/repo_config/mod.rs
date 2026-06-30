@@ -11,6 +11,8 @@ use std::path::Path;
 use anyhow::{Context, Error};
 use serde::Deserialize;
 
+use crate::application::repo_governance::instruction_size::BudgetConfig;
+
 /// A project entry in the `coverage.projects` list.
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 pub struct CoverageProject {
@@ -100,6 +102,9 @@ pub struct RepoConfig {
     /// Spec-tree structure configuration for `specs:structure-validation`.
     #[serde(default)]
     pub specs: SpecsConfig,
+    /// Per-surface instruction-file size budgets (was `instruction-size-budget.yaml`).
+    #[serde(rename = "instruction-size", default)]
+    pub instruction_size: Option<BudgetConfig>,
 }
 
 /// Load and parse `repo-config.yml` at `repo_root`.

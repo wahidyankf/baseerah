@@ -44,7 +44,7 @@ const AGENT_DEFINITION_CONTENT: &str = "{\n  \"name\": \"ose-default\",\n  \"des
 /// in this list exists on disk, the platform-bindings catalog must reference it.
 /// Covers all 11 supported harnesses:
 ///   - Claude Code (.claude) — source of truth
-///   - OpenCode (.opencode) — generated mirror
+///   - `OpenCode` (.opencode) — generated mirror
 ///   - Amazon Q (.amazonq) — generated bridge
 ///   - Codex (.codex) — native reads AGENTS.md directly
 ///   - Copilot (.github) — native reads AGENTS.md directly
@@ -135,7 +135,7 @@ pub fn emit_bindings(repo_root: &Path) -> Result<EmitResult, String> {
 
 /// Validates all 11 harnesses:
 /// - Amazon Q bridge files: byte-for-byte parity with `expected_bindings()`
-/// - OpenCode mirror: `.opencode/agents/` mirrors `.claude/agents/` (via `validate_sync`)
+/// - `OpenCode` mirror: `.opencode/agents/` mirrors `.claude/agents/` (via `validate_sync`)
 /// - Catalog coverage: every present binding dir referenced in the platform-bindings doc
 /// - No-Codex-agents-dir: `.codex/agents/` must not exist (Codex reads AGENTS.md natively)
 /// - Color/tier translation maps: every `color:` and `model:` value in `.claude/agents/*.md`
@@ -177,6 +177,7 @@ pub fn validate_bindings(repo_root: &Path) -> ValidationResult {
 /// cross-vendor parity invariant).
 ///
 /// Returns an empty vec when the agents directory does not exist (nothing to check).
+#[allow(clippy::too_many_lines)]
 fn validate_color_tier_maps(repo_root: &Path) -> Vec<ValidationCheck> {
     let agents_dir = repo_root.join(".claude").join("agents");
     if !agents_dir.is_dir() {
@@ -193,29 +194,27 @@ fn validate_color_tier_maps(repo_root: &Path) -> Vec<ValidationCheck> {
     let mut seen_colors = std::collections::BTreeSet::new();
     let mut seen_tiers = std::collections::BTreeSet::new();
 
-    let entries = match fs::read_dir(&agents_dir) {
-        Ok(e) => e,
-        Err(_) => return vec![],
+    let Ok(entries) = fs::read_dir(&agents_dir) else {
+        return vec![];
     };
     for entry in entries.flatten() {
         let path = entry.path();
         if path.extension().and_then(|e| e.to_str()) != Some("md") {
             continue;
         }
-        let content = match fs::read_to_string(&path) {
-            Ok(c) => c,
-            Err(_) => continue,
+        let Ok(content) = fs::read_to_string(&path) else {
+            continue;
         };
         for line in content.lines() {
-            if let Some(color) = line.strip_prefix("color:").map(str::trim) {
-                if !color.is_empty() {
-                    seen_colors.insert(color.to_string());
-                }
+            if let Some(color) = line.strip_prefix("color:").map(str::trim)
+                && !color.is_empty()
+            {
+                seen_colors.insert(color.to_string());
             }
-            if let Some(model) = line.strip_prefix("model:").map(str::trim) {
-                if !model.is_empty() {
-                    seen_tiers.insert(model.to_string());
-                }
+            if let Some(model) = line.strip_prefix("model:").map(str::trim)
+                && !model.is_empty()
+            {
+                seen_tiers.insert(model.to_string());
             }
         }
     }
@@ -630,10 +629,10 @@ mod tests {
     // ---- P1-1b-RED8 → GREEN8: harness bindings validate covers all 11 harnesses ----
 
     /// Asserts that all 11 supported harnesses are covered by `harness bindings validate`:
-    /// - Native-tier dirs in KNOWN_BINDING_DIRS (Cursor, Windsurf, Junie, Antigravity, Aider)
-    /// - OpenCode parity checks appear in validate_bindings() result (via validate_sync)
-    /// All 11: Claude Code, OpenCode, Amazon Q, Codex, Copilot, Cursor, Windsurf, Junie,
-    ///         Antigravity, Pi, Aider.
+    /// - Native-tier dirs in `KNOWN_BINDING_DIRS` (Cursor, Windsurf, Junie, Antigravity, Aider)
+    /// - `OpenCode` parity checks appear in `validate_bindings()` result (via `validate_sync`)
+    ///   All 11: Claude Code, `OpenCode`, Amazon Q, Codex, Copilot, Cursor, Windsurf, Junie,
+    ///   Antigravity, Pi, Aider.
     #[test]
     fn harness_bindings_validate_covers_all_11_harnesses() {
         // Check 1: native-tier dirs are in KNOWN_BINDING_DIRS

@@ -1,4 +1,4 @@
-//! `workflows validate-naming` — checks that workflow file names carry valid type suffixes.
+//! `repo-governance workflows naming validate` (cross-domain moved from `workflows` domain in §2a-names) — checks that workflow file names carry valid type suffixes.
 //!
 //! Port of `apps/rhino-cli/cmd/workflows_validate_naming.go`.
 
@@ -18,11 +18,11 @@ use crate::internal::naming::reporter::{format_json, format_markdown, format_tex
 /// Accepted type suffixes for workflow file names.
 const WORKFLOW_TYPES: &[&str] = &["quality-gate", "execution", "setup", "planning"];
 
-/// CLI arguments for `workflows validate-naming` (none required).
+/// CLI arguments for `repo-governance workflows naming validate` (cross-domain moved from `workflows` domain in §2a-names) (none required).
 #[derive(Args, Debug)]
 pub struct ValidateNamingArgs {}
 
-/// Run the `workflows validate-naming` command.
+/// Run the `repo-governance workflows naming validate` (cross-domain moved from `workflows` domain in §2a-names) command.
 ///
 /// # Errors
 ///

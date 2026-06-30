@@ -3,17 +3,14 @@ CLI tools for repository management
 Usage: rhino-cli [OPTIONS] [COMMAND]
 
 Commands:
-  test-coverage    Test coverage commands (validate only)
-  repo-governance  Repository governance audits
-  md               Markdown validators (naming, frontmatter, heading-hierarchy, links, mermaid,
-                   frontmatter-dates, readme-index)
-  convention       Convention validators (emoji, license, agents-md-size)
-  harness          Harness (agent binding) validators
-  workflows        Workflow file validators
+  repo-governance  Repository governance audits and validators
+  md               Markdown validators (links, mermaid, heading-hierarchy, naming, frontmatter,
+                   etc.)
+  convention       Convention validators (emoji, license)
+  harness          Harness (agent binding) validators and generators
   specs            Spec tree validators and contract codegen helpers
   lang             Language-source correctness checks, nested by language
-  git              Git hook helpers (pre-commit)
-  env              Environment file helpers (init, backup, restore)
+  env              Environment file helpers (init, backup, restore, validate, staged-guard)
   doctor           Check required tool versions are installed and correct
   help             Print this message or the help of the given subcommand(s)
 

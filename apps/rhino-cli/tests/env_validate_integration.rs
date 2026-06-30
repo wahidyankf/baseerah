@@ -12,14 +12,34 @@ fn write(dir: &TempDir, rel: &str, content: &str) {
     fs::write(p, content).unwrap();
 }
 
-/// Write a minimal `env-injection.yaml` consistent with a single `apps/myapp`
-/// `kind: app` surface, so the manifest-consistency pass stays clean and the
-/// drift-focused assertions below isolate the behavior under test.
-fn write_consistent_manifest(dir: &TempDir) {
-    write(
+/// Write a minimal `repo-config.yml` with both `env-contract:` and `env-injection:` sections
+/// consistent with a single `apps/myapp` `kind: app` surface, so the manifest-consistency
+/// pass stays clean and the drift-focused assertions below isolate the behavior under test.
+fn write_repo_config(dir: &TempDir, contract_surfaces_yaml: &str, injection_apps_yaml: &str) {
+    let content = format!(
+        "env-contract:\n  surfaces:\n{contract_surfaces_yaml}\
+         env-injection:\n  apps:\n{injection_apps_yaml}  ci-harness: []\n"
+    );
+    write(dir, "repo-config.yml", &content);
+}
+
+/// Convenience wrapper for a single `apps/myapp` typescript surface with a consistent
+/// injection manifest — isolates drift-detection behavior from manifest-consistency checks.
+fn write_myapp_repo_config(dir: &TempDir) {
+    write_repo_config(
         dir,
-        "env-injection.yaml",
-        "apps:\n  - app: myapp\n    keys-from: apps/myapp/.env.example\n    runtime: { local: env-local }\nci-harness: []\n",
+        "    - root: apps/myapp\n      kind: app\n      lang: typescript\n      allowlist: []\n",
+        "    - app: myapp\n      keys-from: apps/myapp/.env.example\n      runtime: { local: env-local }\n",
+    );
+}
+
+/// Convenience wrapper for a single `apps/myapp` rust surface with a consistent
+/// injection manifest.
+fn write_myapp_rust_repo_config(dir: &TempDir) {
+    write_repo_config(
+        dir,
+        "    - root: apps/myapp\n      kind: app\n      lang: rust\n      allowlist: []\n",
+        "    - app: myapp\n      keys-from: apps/myapp/.env.example\n      runtime: { local: env-local }\n",
     );
 }
 
@@ -30,13 +50,8 @@ const ARGS_NO_WARN: EnvValidateArgs = EnvValidateArgs { warn_only: false };
 #[test]
 fn integration_matching_typescript_surface_exits_clean() {
     let tmp = TempDir::new().unwrap();
-    write_consistent_manifest(&tmp);
+    write_myapp_repo_config(&tmp);
 
-    write(
-        &tmp,
-        "env-contract.yaml",
-        "surfaces:\n  - root: apps/myapp\n    kind: app\n    lang: typescript\n    allowlist: []\n",
-    );
     write(&tmp, "apps/myapp/.env.example", "MY_KEY=value\n");
     write(
         &tmp,
@@ -58,13 +73,8 @@ fn integration_matching_typescript_surface_exits_clean() {
 #[test]
 fn integration_matching_rust_surface_exits_clean() {
     let tmp = TempDir::new().unwrap();
-    write_consistent_manifest(&tmp);
+    write_myapp_rust_repo_config(&tmp);
 
-    write(
-        &tmp,
-        "env-contract.yaml",
-        "surfaces:\n  - root: apps/myapp\n    kind: app\n    lang: rust\n    allowlist: []\n",
-    );
     write(
         &tmp,
         "apps/myapp/.env.example",
@@ -91,13 +101,8 @@ fn integration_matching_rust_surface_exits_clean() {
 #[test]
 fn integration_declared_but_unread_exits_nonzero_and_names_key() {
     let tmp = TempDir::new().unwrap();
-    write_consistent_manifest(&tmp);
+    write_myapp_repo_config(&tmp);
 
-    write(
-        &tmp,
-        "env-contract.yaml",
-        "surfaces:\n  - root: apps/myapp\n    kind: app\n    lang: typescript\n    allowlist: []\n",
-    );
     // STALE_KEY declared in .env.example but absent from code
     write(&tmp, "apps/myapp/.env.example", "STALE_KEY=value\n");
     write(
@@ -124,13 +129,8 @@ fn integration_declared_but_unread_exits_nonzero_and_names_key() {
 #[test]
 fn integration_read_but_undeclared_exits_nonzero_and_names_key() {
     let tmp = TempDir::new().unwrap();
-    write_consistent_manifest(&tmp);
+    write_myapp_repo_config(&tmp);
 
-    write(
-        &tmp,
-        "env-contract.yaml",
-        "surfaces:\n  - root: apps/myapp\n    kind: app\n    lang: typescript\n    allowlist: []\n",
-    );
     // .env.example is empty; code reads NEW_KEY
     write(&tmp, "apps/myapp/.env.example", "");
     write(
@@ -159,13 +159,8 @@ fn integration_read_but_undeclared_exits_nonzero_and_names_key() {
 #[test]
 fn integration_warn_only_does_not_fail_on_drift() {
     let tmp = TempDir::new().unwrap();
-    write_consistent_manifest(&tmp);
+    write_myapp_repo_config(&tmp);
 
-    write(
-        &tmp,
-        "env-contract.yaml",
-        "surfaces:\n  - root: apps/myapp\n    kind: app\n    lang: typescript\n    allowlist: []\n",
-    );
     write(&tmp, "apps/myapp/.env.example", "STALE_KEY=value\n");
     write(
         &tmp,
@@ -185,7 +180,7 @@ fn integration_warn_only_does_not_fail_on_drift() {
     );
 }
 
-// ── env-injection.yaml manifest-consistency pass (committed fixtures) ──────────
+// ── env-injection manifest-consistency pass (committed fixtures) ──────────────
 
 fn fixture_root(name: &str) -> std::path::PathBuf {
     std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -205,7 +200,7 @@ fn integration_matched_manifest_fixture_exits_clean() {
         String::from_utf8_lossy(&err)
     );
     assert!(
-        String::from_utf8_lossy(&out).contains("env-injection.yaml consistent"),
+        String::from_utf8_lossy(&out).contains("env-injection manifest consistent"),
         "expected consistency notice; got: {}",
         String::from_utf8_lossy(&out)
     );

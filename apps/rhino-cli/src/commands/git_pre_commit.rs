@@ -1,4 +1,4 @@
-//! `git pre-commit` — runs the rhino-cli pre-commit validation suite.
+//! `git pre-commit` — REMOVED in §2a-names. The pre-commit hook now calls individual commands directly.
 //!
 //! Port of `apps/rhino-cli/cmd/git_pre_commit.go`.
 
@@ -9,11 +9,11 @@ use crate::application::git::pre_commit::run;
 use crate::domain::cliout::OutputFormat;
 use crate::infrastructure::git::{make_default_deps, root::find_root};
 
-/// CLI arguments for `git pre-commit` (none required).
+/// CLI arguments for the removed `git pre-commit` command (kept for reference) (none required).
 #[derive(Args, Debug)]
 pub struct PreCommitArgs {}
 
-/// Run the `git pre-commit` command.
+/// Run the removed `git pre-commit` command.
 ///
 /// # Errors
 ///

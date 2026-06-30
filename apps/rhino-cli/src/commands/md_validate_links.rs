@@ -94,15 +94,15 @@ mod tests {
         // Prove md links validate already covers specs/ files — making specs validate links
         // redundant. Seeds a broken relative link inside specs/apps/x/foo.md and asserts the
         // scanner flags it. No specs:links-validation Nx target needed once this passes.
-        let dir = tempfile::tempdir().unwrap();
+        let dir = tempfile::tempdir().expect("tempdir");
         let root = dir.path();
         let spec_dir = root.join("specs/apps/x");
-        std::fs::create_dir_all(&spec_dir).unwrap();
+        std::fs::create_dir_all(&spec_dir).expect("create spec dir");
         std::fs::write(
             spec_dir.join("foo.md"),
             "# Spec\n\nSee [missing](./nonexistent.md).\n",
         )
-        .unwrap();
+        .expect("write spec file");
         let result = validate_all_links(&ScanOptions {
             repo_root: root.to_path_buf(),
             staged_only: false,

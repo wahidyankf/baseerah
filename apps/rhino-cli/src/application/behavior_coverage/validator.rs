@@ -120,8 +120,7 @@ mod tests {
             violations
                 .iter()
                 .any(|v| matches!(v, BehaviorCoverageViolation::UntaggedScenario { .. })),
-            "Expected UntaggedScenario variant, got: {:?}",
-            violations
+            "Expected UntaggedScenario variant, got: {violations:?}"
         );
     }
 
@@ -143,8 +142,7 @@ mod tests {
             violations
                 .iter()
                 .any(|v| matches!(v, BehaviorCoverageViolation::LevelOutsideEnvelope { .. })),
-            "Expected LevelOutsideEnvelope violation, got: {:?}",
-            violations
+            "Expected LevelOutsideEnvelope violation, got: {violations:?}"
         );
     }
 
@@ -179,8 +177,7 @@ mod tests {
                     ..
                 }
             )),
-            "Expected MissingCoverage(e2e) violation, got: {:?}",
-            violations
+            "Expected MissingCoverage(e2e) violation, got: {violations:?}"
         );
     }
 
@@ -211,8 +208,7 @@ mod tests {
                 v,
                 BehaviorCoverageViolation::CoverageAtUndeclaredLevel { .. }
             )),
-            "Expected CoverageAtUndeclaredLevel violation, got: {:?}",
-            violations
+            "Expected CoverageAtUndeclaredLevel violation, got: {violations:?}"
         );
     }
 
@@ -234,8 +230,7 @@ mod tests {
             violations
                 .iter()
                 .any(|v| matches!(v, BehaviorCoverageViolation::OrphanMarker { .. })),
-            "Expected OrphanMarker violation, got: {:?}",
-            violations
+            "Expected OrphanMarker violation, got: {violations:?}"
         );
     }
 
@@ -255,8 +250,7 @@ mod tests {
         // @wip scenarios must NOT produce violations
         assert!(
             violations.is_empty(),
-            "Expected no violations for @wip scenario, got: {:?}",
-            violations
+            "Expected no violations for @wip scenario, got: {violations:?}"
         );
     }
 }

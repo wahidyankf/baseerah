@@ -42,5 +42,4 @@ pub mod specs_gherkin_cardinality;
 pub mod specs_scaffold_dart;
 pub mod specs_structure_validate;
 pub mod specs_ul;
-pub mod test_coverage_validate;
 pub mod workflows_validate_naming;

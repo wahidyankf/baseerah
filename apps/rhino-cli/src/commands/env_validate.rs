@@ -59,7 +59,7 @@ pub fn run_at_root(
     if total == 0 {
         writeln!(
             stdout,
-            "env validate: no drift detected across all surfaces; env-injection.yaml consistent"
+            "env validate: no drift detected across all surfaces; env-injection manifest consistent"
         )?;
         return Ok(());
     }

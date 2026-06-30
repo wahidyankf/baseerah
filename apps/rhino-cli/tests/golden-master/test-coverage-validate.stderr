@@ -1,5 +1,0 @@
-error: the following required arguments were not provided:
-  <COVERAGE_FILE>
-  <THRESHOLD>
-
-Usage: rhino-cli test-coverage validate --help <COVERAGE_FILE> <THRESHOLD>

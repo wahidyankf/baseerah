@@ -1,5 +1,5 @@
-//! `convention validate instruction-size` — checks instruction files against
-//! their byte budgets defined in `instruction-size-budget.yaml`.
+//! `harness instruction-size validate` (cross-domain moved from `convention` domain in §2a-names) — checks instruction files against
+//! their byte budgets defined in the `instruction-size:` section of `repo-config.yml`.
 //!
 //! Reads the per-surface and resolved-tree budgets, globs for each surface
 //! file, classifies sizes, and returns exit code 1 when any file exceeds its
@@ -15,7 +15,7 @@ use serde::Serialize;
 use crate::application::repo_config;
 use crate::application::repo_governance::instruction_size::{
     BudgetConfig, Finding, ResolvedTree, Severity, Surface, check_instruction_sizes,
-    check_resolved_tree, load_budget_config, severity_label,
+    check_resolved_tree, severity_label,
 };
 use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
@@ -23,7 +23,7 @@ use crate::internal::git;
 /// JSON output schema identifier for this command.
 pub const SCHEMA: &str = "rhino-cli/instruction-size/v1";
 
-/// CLI arguments for `convention validate instruction-size` (none required).
+/// CLI arguments for `harness instruction-size validate` (cross-domain moved from `convention` domain in §2a-names) (none required).
 #[derive(Args, Debug)]
 pub struct InstructionSizeArgs;
 
@@ -67,10 +67,10 @@ struct Envelope<'a> {
 // Public command entry-point
 // ---------------------------------------------------------------------------
 
-/// Run the `convention validate instruction-size` command.
+/// Run the `harness instruction-size validate` (cross-domain moved from `convention` domain in §2a-names) command.
 ///
 /// Discovers the git repository root, loads the budget configuration from
-/// `instruction-size-budget.yaml`, and checks all surfaces.
+/// the `instruction-size:` section of `repo-config.yml`, and checks all surfaces.
 ///
 /// # Errors
 ///
@@ -85,18 +85,20 @@ pub fn run(
     run_for_root(&repo_root, output_format)
 }
 
-/// Default budget applied to registry instruction surfaces not listed in `instruction-size-budget.yaml`.
+/// Default budget applied to registry instruction surfaces not covered by `instruction-size:` globs.
 const REGISTRY_DEFAULT_TARGET: u64 = 10_000;
+/// Warning threshold for registry surfaces without an explicit budget.
 const REGISTRY_DEFAULT_WARN: u64 = 13_000;
+/// Hard-fail threshold for registry surfaces without an explicit budget.
 const REGISTRY_DEFAULT_FAIL: u64 = 16_000;
 
-/// Core logic for `convention validate instruction-size`, exposed for testing.
+/// Core logic for `harness instruction-size validate` (cross-domain moved from `convention` domain in §2a-names), exposed for testing.
 ///
 /// Merges two surface sources:
-/// - `instruction-size-budget.yaml` (explicit per-surface budgets, optional).
+/// - `repo-config.yml` `instruction-size:` section (explicit per-surface budgets, optional).
 /// - `repo-config.yml` `harness:` `instruction:` lists (registry-derived surfaces, optional).
 ///
-/// Registry surfaces not covered by a yaml glob receive default budget thresholds.
+/// Registry surfaces not covered by an `instruction-size:` glob receive default budget thresholds.
 /// When neither source is available, the command skips gracefully.
 ///
 /// # Errors
@@ -107,29 +109,22 @@ pub fn run_for_root(
     repo_root: &Path,
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
-    let config_path = repo_root.join("instruction-size-budget.yaml");
-    let yaml_config = if config_path.exists() {
-        Some(load_budget_config(&config_path)?)
-    } else {
-        None
-    };
-
-    // Collect instruction surface globs from the harness registry.
+    // Load instruction-size: section and harness registry from repo-config.yml.
     let harness_config = repo_config::load_or_default(repo_root);
     let registry_globs: Vec<String> = harness_config
         .harness
         .iter()
         .flat_map(|e| e.instruction.iter().cloned())
         .collect();
+    let yaml_config = harness_config.instruction_size;
 
     // If neither source has any surfaces, skip gracefully.
     let yaml_has_surfaces = yaml_config.as_ref().is_some_and(|c| !c.surfaces.is_empty());
     if !yaml_has_surfaces && registry_globs.is_empty() {
         if output_format == OutputFormat::Text {
             println!(
-                "INSTRUCTION SIZE: SKIPPED (no instruction-size-budget.yaml found at {} \
-                 and no harness instruction surfaces in repo-config.yml)",
-                config_path.display()
+                "INSTRUCTION SIZE: SKIPPED (no instruction-size: section in repo-config.yml \
+                 and no harness instruction surfaces in repo-config.yml)"
             );
         }
         return Ok(());
@@ -156,22 +151,22 @@ pub fn run_for_root(
     // Build merged config (resolved_tree carried from yaml if present, else omit from findings).
     let merged_config = BudgetConfig {
         surfaces: merged_surfaces,
-        resolved_tree: yaml_config
-            .as_ref()
-            .map(|c| c.resolved_tree.clone())
-            .unwrap_or(ResolvedTree {
+        resolved_tree: yaml_config.as_ref().map_or_else(
+            || ResolvedTree {
                 root: String::new(),
                 target: u64::MAX,
                 warn: u64::MAX,
                 fail: u64::MAX,
-            }),
+            },
+            |c| c.resolved_tree.clone(),
+        ),
     };
 
     let mut findings = check_instruction_sizes(repo_root, &merged_config);
-    if yaml_config.is_some() {
-        if let Some(tree_finding) = check_resolved_tree(repo_root, &merged_config) {
-            findings.push(tree_finding);
-        }
+    if yaml_config.is_some()
+        && let Some(tree_finding) = check_resolved_tree(repo_root, &merged_config)
+    {
+        findings.push(tree_finding);
     }
 
     let has_fail = findings.iter().any(|f| f.severity == Severity::Fail);
@@ -296,19 +291,23 @@ mod tests {
     }
 
     fn write_budget_yaml(dir: &Path) {
-        let yaml = r#"
-surfaces:
-  - glob: "AGENTS.md"
-    target: 24000
-    warn: 27000
-    fail: 30000
-resolved_tree:
-  root: "CLAUDE.md"
-  target: 30000
-  warn: 34000
-  fail: 38000
-"#;
-        fs::write(dir.join("instruction-size-budget.yaml"), yaml).unwrap();
+        let yaml = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "instruction-size:\n",
+            "  surfaces:\n",
+            "    - glob: \"AGENTS.md\"\n",
+            "      target: 24000\n",
+            "      warn: 27000\n",
+            "      fail: 30000\n",
+            "  resolved_tree:\n",
+            "    root: \"CLAUDE.md\"\n",
+            "    target: 30000\n",
+            "    warn: 34000\n",
+            "    fail: 38000\n",
+        );
+        fs::write(dir.join("repo-config.yml"), yaml).unwrap();
     }
 
     fn write_small_claude(dir: &Path) {
@@ -338,9 +337,9 @@ resolved_tree:
     }
 
     #[test]
-    fn run_returns_ok_when_no_budget_yaml() {
+    fn run_returns_ok_when_no_instruction_size_section() {
         let tmp = TempDir::new().unwrap();
-        // No instruction-size-budget.yaml — should skip gracefully
+        // No instruction-size: section in repo-config.yml — should skip gracefully
         let result = run_for_root(tmp.path(), OutputFormat::Text);
         assert!(result.is_ok());
     }
@@ -465,8 +464,6 @@ resolved_tree:
 
     #[test]
     fn harness_registry_instruction_surface_is_budgeted() {
-        // RED: instruction-size must derive surfaces from repo-config.yml harness: instruction lists.
-        // Fails because current code only reads instruction-size-budget.yaml (skips when absent).
         let tmp = TempDir::new().unwrap();
         let repo_config = concat!(
             "harness:\n",
@@ -479,12 +476,44 @@ resolved_tree:
         fs::create_dir_all(tmp.path().join(".cursor")).unwrap();
         // Oversized .cursor/rules — must be flagged via registry surface list
         fs::write(tmp.path().join(".cursor/rules"), "x".repeat(50_000)).unwrap();
-        // No instruction-size-budget.yaml — surfaces must come from harness registry
+        // No instruction-size-budget.yaml — surfaces come from harness registry
         let result = run_for_root(tmp.path(), OutputFormat::Text);
         assert!(
             result.is_err(),
-            "registry-driven instruction-size must flag oversized .cursor/rules even without \
-             instruction-size-budget.yaml (RED — not yet implemented)"
+            "registry-driven instruction-size must flag oversized .cursor/rules"
+        );
+    }
+
+    // ── instruction-size: section in repo-config.yml (RED → GREEN) ───────────
+
+    #[test]
+    fn run_reads_instruction_size_section_from_repo_config_yml() {
+        let tmp = TempDir::new().unwrap();
+        let repo_cfg = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "instruction-size:\n",
+            "  surfaces:\n",
+            "    - glob: \"AGENTS.md\"\n",
+            "      target: 24000\n",
+            "      warn: 27000\n",
+            "      fail: 30000\n",
+            "  resolved_tree:\n",
+            "    root: \"CLAUDE.md\"\n",
+            "    target: 30000\n",
+            "    warn: 34000\n",
+            "    fail: 38000\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), repo_cfg).unwrap();
+        // NO standalone instruction-size-budget.yaml
+        // AGENTS.md exceeds fail=30000 threshold
+        fs::write(tmp.path().join("AGENTS.md"), "x".repeat(31_000)).unwrap();
+        fs::write(tmp.path().join("CLAUDE.md"), "small\n").unwrap();
+        let result = run_for_root(tmp.path(), OutputFormat::Text);
+        assert!(
+            result.is_err(),
+            "should read instruction-size: from repo-config.yml and flag oversized AGENTS.md"
         );
     }
 }
