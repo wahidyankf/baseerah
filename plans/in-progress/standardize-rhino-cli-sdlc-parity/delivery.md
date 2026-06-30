@@ -2,7 +2,8 @@
 
 > **Legend** — `[AI]`: an agent performs the step (the default; unmarked steps are `[AI]`).
 > `[HUMAN]`: only a human can do it (physical action, out-of-band approval, real-secret or
-> privileged-credential handling). `[AI+HUMAN]`: agent prepares, human approves or finishes.
+> privileged-credential handling). `[HUMAN → AI]`: human performs or supplies input first; agent
+> consumes and continues.
 
 <!-- -->
 
@@ -15,8 +16,9 @@
 > execute in `ose-primer` and `ose-infra` respectively — each begins by propagating this plan folder
 > and the two reference docs into the sibling repo (per the
 > [multi-repo parity workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)),
-> then converging that repo in its own working tree. ose-infra is a normal repo (not bare) — commit
-> to `main` directly.
+> then converging that repo in its own working tree. ose-infra is a **bare** repo worked only
+> through linked worktrees — all operations execute from a linked worktree (the bare top-level
+> directory has no working tree; `git status` there fails), never a direct checkout.
 
 ## Worktree
 
@@ -287,6 +289,7 @@ Implements the [§1 Worktree-agnostic execution invariant](./tech-docs.md#1-life
 
 > All checks below must pass before starting Phase 2.
 
+- [ ] [AI] `npx nx run rhino-cli:test:quick` — exits 0 (Phase 1 adds Rust code: §1a `@covers` model, §1b CLI renames, §1c worktree regression test — verify it builds and passes before Phase 2).
 - [ ] [AI] `npx nx run rhino-cli:links:validation` — exits 0.
 - [ ] [AI] `npx nx run rhino-cli:mermaid:validation` — exits 0 (validates the plan's mermaid diagrams).
 - [ ] [AI] `npm run lint:md` — exits 0.
@@ -383,7 +386,7 @@ Implements the [§5 Coverage-enforcement decision](./tech-docs.md#5-nx-target-na
   - _Suggested executor: `swe-fsharp-dev` / `swe-typescript-dev` / `swe-rust-dev` per project language_
 - [ ] [AI] Apply the content rules: `test:e2e` real only on `*-e2e` projects (echo elsewhere); BE `test:integration` is service-level (no HTTP); FE `test:integration` is echo unless DB-backed (keep `organiclever-app-web`'s PGlite integration real); `test:unit` includes BDD + non-BDD (coverage gated by the sibling `test:coverage` target, not here) — acceptance: `npx nx show project organiclever-www --json | jq -r '.targets["test:integration"].options.command // ""' | grep -q "echo"` (FE-without-DB → echo); `npx nx show project organiclever-app-web --json | jq -e '.targets["test:integration"]'` is a non-echo real test target (PGlite integration remains real); `npx nx show project organiclever-be-e2e --json | jq -r '.targets["test:e2e"].options.command // ""' | grep -vq "echo"` (e2e runner → real command); `npx nx show project organiclever-be --json | jq -r '.targets["test:e2e"].options.command // ""' | grep -q "echo"` (BE non-e2e project → echo).
   - _Suggested executor: `swe-typescript-dev`_
-- [ ] [HUMAN] Confirm `organiclever-be:test:integration` invokes only service/repository functions (no HTTP client in test code): `grep -rn 'axios\|node-fetch\|got\|supertest\|HttpClient' apps/organiclever-be/tests/` — acceptance: returns 0 hits (pure service-level, no HTTP imports). Observable resume signal: zero grep hits; verify before proceeding.
+- [ ] [AI] Confirm `organiclever-be:test:integration` invokes only service/repository functions (no HTTP client in test code): `grep -rn 'axios\|node-fetch\|got\|supertest\|HttpClient' apps/organiclever-be/tests/` — acceptance: returns 0 hits (pure service-level, no HTTP imports). Observable resume signal: zero grep hits; verify before proceeding.
 - [ ] [AI] For EACH project with a real `test:unit`, add a native `test:coverage` target (≥ 90% line via the project's own runner — `vitest --coverage` thresholds, `cargo llvm-cov`/`tarpaulin`, `dotnet test` coverage gate) per the [§2.1 matrix](./tech-docs.md#21-per-project-target-matrix-post-implementation-ose-public) `test:coverage` column; `echo` where `test:unit` is `echo` — acceptance: `for p in $(npx nx show projects); do npx nx show project "$p" --json | jq -e '.targets|has("test:coverage")' >/dev/null || echo "NO-COV: $p"; done` prints no `NO-COV`; a project under 90% fails its `test:coverage`.
 - [ ] [AI] Research the correct Nx mechanism to wire `specs/` folders into the project affected graph: query `nx_docs` with "how to mark a project affected by changes outside its root (inputs namedInputs implicitDependencies)" — acceptance: the doc link + chosen mechanism snippet (one of `implicitDependencies`, `inputs`/`namedInputs`, or a project-inference plugin) is recorded in `plans/in-progress/standardize-rhino-cli-sdlc-parity/tech-docs.md §4` before any per-project edit is made.
 - [ ] [AI] **Wire `specs/` into Nx `affected`**: for each project, map the **surface it owns** — `specs/apps/<domain>/behavior/<surface>/**` for an app project (the same glob as its `coverage.projects` entry, so an edit to one surface does not needlessly mark its domain siblings), or `specs/libs/<lib>/behavior/**` for a lib — so a feature-only change marks it affected; apply the mechanism confirmed in the research step above (`implicitDependencies` / `inputs`/`namedInputs`) to the project's Nx config — acceptance (**behavioural**): editing only a project's surface `.feature` file then `npx nx affected -t test:quick --base=HEAD~1 --head=HEAD` includes that project (so `specs:behavior:coverage`/`specs:domain:coverage` actually run on specs-only changes).
@@ -509,7 +512,8 @@ Implements the [§6 standard](./tech-docs.md#6-post-merge-main-ci--per-project-s
 
 ## Phase 4: Propagate + Converge ose-infra
 
-> Executes in `ose-infra` (normal repo; commit to `main` directly). Target state =
+> Executes in `ose-infra` (**bare** repo; worked only through linked worktrees — all operations
+> from a linked worktree, never the bare top-level directory). Target state =
 > the [§2.3 infra matrix](./tech-docs.md#23-per-project-target-matrix-post-implementation-ose-infra).
 > Infra already matches the workflow filenames (`pr-quality-gate.yml`, `validate-env.yml`; its
 > `validate-markdown.yml` is **deleted** like the others — markdown folds into the gates) +
