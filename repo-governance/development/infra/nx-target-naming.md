@@ -226,7 +226,7 @@ lint-staged entry) for three reasons:
 This is the single deliberate carve-out from the membership rule.
 
 **Normative source**:
-[tech-docs §5](../../../plans/in-progress/standardize-rhino-cli-sdlc-parity/tech-docs.md#5-nx-target-name-standard-targets-invoked-by-hooksci)
+[tech-docs §5](../../../plans/done/2026-07-01__standardize-rhino-cli-sdlc-parity/tech-docs.md#5-nx-target-name-standard-targets-invoked-by-hooksci)
 
 ## Enforcement
 
