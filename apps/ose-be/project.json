@@ -57,20 +57,6 @@
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/OseBe/OseBe.fsproj"]
     },
-    "fmt": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas apps/ose-be/src"
-      }
-    },
-    "format:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas --check apps/ose-be/src"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs"]
-    },
     "dev": {
       "executor": "nx:run-commands",
       "options": {

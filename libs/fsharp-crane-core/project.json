@@ -35,20 +35,6 @@
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/fsharp-crane-core.fsproj"]
     },
-    "fmt": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas libs/fsharp-crane-core/src"
-      }
-    },
-    "format:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas --check libs/fsharp-crane-core/src"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs"]
-    },
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {

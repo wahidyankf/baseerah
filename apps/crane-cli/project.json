@@ -36,20 +36,6 @@
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/crane-cli.fsproj"]
     },
-    "fmt": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas apps/crane-cli/src"
-      }
-    },
-    "format:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas --check apps/crane-cli/src"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs"]
-    },
     "run": {
       "executor": "nx:run-commands",
       "options": {

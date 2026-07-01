@@ -18,20 +18,6 @@
         "command": "cargo fetch --manifest-path apps/ayokoding-cli/Cargo.toml"
       }
     },
-    "fmt": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo fmt --manifest-path apps/ayokoding-cli/Cargo.toml"
-      }
-    },
-    "format:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cargo fmt --manifest-path apps/ayokoding-cli/Cargo.toml -- --check"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs"]
-    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {

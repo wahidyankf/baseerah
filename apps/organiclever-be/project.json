@@ -57,20 +57,6 @@
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/src/OrganicleverBe/OrganicleverBe.fsproj"]
     },
-    "fmt": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas apps/organiclever-be/src"
-      }
-    },
-    "format:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "fantomas --check apps/organiclever-be/src"
-      },
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.fs"]
-    },
     "dev": {
       "executor": "nx:run-commands",
       "options": {
