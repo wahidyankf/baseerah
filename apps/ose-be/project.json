@@ -111,10 +111,12 @@
           "npx nx run ose-be:typecheck",
           "npx nx run ose-be:lint",
           "npx nx run ose-be:test:unit",
-          "npx nx run ose-be:test:coverage"
+          "npx nx run ose-be:test:coverage",
+          "npx nx run ose-be:test:specs"
         ],
         "parallel": false
       },
+      "dependsOn": ["typecheck", "lint"],
       "cache": true
     },
     "test:integration": {
@@ -135,10 +137,10 @@
     "specs:domain:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs domain-coverage validate --shared-steps --exclude-dir messaging specs/apps/ose/behavior/be/gherkin/domain apps/ose-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs domain-coverage validate --shared-steps --exclude-dir messaging specs/apps/ose/behavior/be/gherkin apps/ose-be"
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/domain/**/*.feature", "{projectRoot}/src/**/*.fs"]
+      "inputs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature", "{projectRoot}/src/**/*.fs"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",
@@ -158,6 +160,26 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'compat:min-version: no standard min-version floor for F#'"
+      },
+      "cache": true
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run ose-be:specs:structure-validation",
+          "npx nx run ose-be:specs:behavior:coverage",
+          "npx nx run ose-be:specs:domain:coverage"
+        ],
+        "parallel": false
       },
       "cache": true
     }

@@ -111,10 +111,12 @@
           "npx nx run organiclever-be:typecheck",
           "npx nx run organiclever-be:lint",
           "npx nx run organiclever-be:test:unit",
-          "npx nx run organiclever-be:test:coverage"
+          "npx nx run organiclever-be:test:coverage",
+          "npx nx run organiclever-be:test:specs"
         ],
         "parallel": false
       },
+      "dependsOn": ["typecheck", "lint"],
       "cache": true
     },
     "test:integration": {
@@ -138,11 +140,11 @@
     "specs:domain:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs domain-coverage validate --shared-steps --exclude-dir messaging specs/apps/organiclever/behavior/organiclever-be/gherkin/domain apps/organiclever-be"
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs domain-coverage validate --shared-steps --exclude-dir messaging specs/apps/organiclever/behavior/organiclever-be/gherkin apps/organiclever-be"
       },
       "cache": true,
       "inputs": [
-        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/domain/**/*.feature",
+        "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature",
         "{projectRoot}/src/**/*.fs"
       ]
     },
@@ -164,6 +166,26 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'compat:min-version: no standard min-version floor for F#'"
+      },
+      "cache": true
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run organiclever-be:specs:structure-validation",
+          "npx nx run organiclever-be:specs:behavior:coverage",
+          "npx nx run organiclever-be:specs:domain:coverage"
+        ],
+        "parallel": false
       },
       "cache": true
     }
