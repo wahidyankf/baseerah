@@ -253,7 +253,11 @@ The following variations are not flagged as drift:
 - **App set and per-app deploy CRONs** — `ose-public` ships content/web apps (`ose-www`,
   `ayokoding-www`, `organiclever-www`, `wahidyankf-www`, `*-app-web`, `*-be`); `ose-primer` ships
   polyglot demo backends/frontends; `ose-infra` ships `coralpolyp`. Each repo keeps only the deploy
-  CRON workflows for apps it actually ships.
+  CRON workflows for apps it actually ships. `ose-primer`'s `test-and-deploy-*-development.yml`
+  workflows are a **no-op deploy leg**: the `crud-*` apps are reference/template scaffolding for the
+  polyglot showcase, not live products, so there is no staging/production environment to push to —
+  each job runs the full test suite (quick+integration+e2e) via the shared `_reusable-*` workflows and
+  stops there. `ose-public`/`ose-infra`'s deploy CRONs push to real Vercel/self-hosted environments.
 - **Language gate jobs** — the PR gate's per-language jobs (golang, jvm, dotnet, python, rust, elixir,
   clojure, dart, typescript) exist only for languages present in that repo.
 - **Infra-only IaC gates** — `terraform fmt`/`validate`/`tflint`, `ansible-lint`, `yamllint` exist
