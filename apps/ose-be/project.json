@@ -44,7 +44,7 @@
       ]
     },
     "lint": {
-      "dependsOn": ["codegen"],
+      "dependsOn": ["codegen", "typecheck"],
       "executor": "nx:run-commands",
       "options": {
         "commands": [

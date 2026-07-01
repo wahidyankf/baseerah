@@ -22,6 +22,7 @@
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/fsharp-crane-core.fsproj"]
     },
     "lint": {
+      "dependsOn": ["typecheck"],
       "executor": "nx:run-commands",
       "options": {
         "commands": [
