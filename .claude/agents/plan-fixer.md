@@ -231,10 +231,10 @@ When plan-checker reports missing operational readiness items (Step 5b findings)
 ### 1. Missing Local Quality Gates
 
 Add a delivery checklist section before the final push step, inserting the canonical
-`### Local Quality Gates (Before Push)` template from the
-[plan-creating-project-plans skill's Operational Readiness section](../skills/plan-creating-project-plans/SKILL.md#operational-readiness-mandatory-delivery-sections) —
-adapt the specific targets to what the plan's affected projects require (e.g., add
-`test:integration` or `test:e2e` if the plan scope warrants it).
+`### Local Quality Gates (Before Push)` template from the Operational Readiness section of
+`.claude/skills/plan-creating-project-plans/SKILL.md` — adapt the specific targets to what the
+plan's affected projects require (e.g., add `test:integration` or `test:e2e` if the plan scope
+warrants it).
 
 ### 2. Missing Post-Push CI/CD Steps
 
@@ -515,9 +515,9 @@ When plan-checker reports a missing or malformed `## Worktree` section (Step 5d 
 **Multi-file plans** — insert into `delivery.md` before the first phase heading. **Single-file
 plans** — insert into `README.md` before the `## Delivery Checklist` heading. In both cases, insert
 the verbatim `## Worktree` template (path declaration, optional `claude --worktree <plan-identifier>`
-pre-provisioning block, and the Step-0-gate note) from the
-[plan-creating-project-plans skill's Worktree Specification section](../skills/plan-creating-project-plans/SKILL.md#worktree-specification-mandatory--applies-to-all-plans) —
-that section is the single source of truth for the exact wording; do not paraphrase it.
+pre-provisioning block, and the Step-0-gate note) from the Worktree Specification section of
+`.claude/skills/plan-creating-project-plans/SKILL.md` — that section is the single source of truth
+for the exact wording; do not paraphrase it.
 
 **Deriving `<plan-identifier>`**: strip the date prefix from the plan-folder name. Examples:
 
@@ -558,10 +558,10 @@ For each offending checkbox, derive the missing elements:
 
 ### Rewrite Examples
 
-See the [plan-creating-project-plans skill's Bad / Good Examples](../skills/plan-creating-project-plans/SKILL.md#bad--good-examples)
-for the three canonical before/after pairs (caching, middleware, lint) — apply the same
-transformation shape (add file path + verbatim command + observable acceptance criterion) to the
-offending checkbox.
+See the Bad / Good Examples section of `.claude/skills/plan-creating-project-plans/SKILL.md` for
+the three canonical before/after pairs (caching, middleware, lint) — apply the same transformation
+shape (add file path + verbatim command + observable acceptance criterion) to the offending
+checkbox.
 
 After rewriting, re-read the checkbox and confirm a sonnet-tier agent could execute it without consulting any other section of the plan. If the rewrite still requires lookups, repeat until the checkbox is self-contained.
 

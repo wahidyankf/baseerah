@@ -95,8 +95,8 @@ Three linters were added in 2026-05-10 to strengthen type safety:
 - Interface implementations use `// Code implements [InterfaceName].`
 - `String()` (`fmt.Stringer`) is exempt — recognized as stdlib interface
 
-See the [swe-programming-golang skill's Doc Comments example](../skills/swe-programming-golang/SKILL.md#doc-comments--godot--revive-exported--revive-package-comments-enforce)
-for the canonical `godot`/`revive exported` doc-comment style (package comment, function comment,
+See the Doc Comments example in `.claude/skills/swe-programming-golang/SKILL.md` for the
+canonical `godot`/`revive exported` doc-comment style (package comment, function comment,
 const comment, interface-implementation comment).
 
 Canonical sealed-interface form:

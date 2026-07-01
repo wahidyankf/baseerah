@@ -95,9 +95,9 @@ All Playwright tests MUST follow the platform testing standards:
 Always use Page Object Model for test organization, and follow consistent test-file structure
 (`tests/e2e/<domain>/<flow>.spec.ts` importing its page object). For the canonical `LoginPage`
 class, its usage in a `login.spec.ts` test, and the zakat-calculator / murabaha-contract Islamic
-finance domain examples, see the
-[swe-developing-e2e-test-with-playwright skill's Page Object Model and OSE Platform Context sections](../skills/swe-developing-e2e-test-with-playwright/SKILL.md#page-object-model) —
-that skill is the single source of truth for these worked examples; do not re-derive them.
+finance domain examples, see the Page Object Model and OSE Platform Context sections of
+`.claude/skills/swe-developing-e2e-test-with-playwright/SKILL.md` — that skill is the single
+source of truth for these worked examples; do not re-derive them.
 
 ## Reference Documentation
 

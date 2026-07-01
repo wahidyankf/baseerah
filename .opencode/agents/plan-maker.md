@@ -536,8 +536,8 @@ Every plan MUST declare its worktree path before the delivery checklist begins. 
 
 **Required content**: insert the verbatim `## Worktree` template (path declaration, optional
 `claude --worktree <plan-identifier>` pre-provisioning block, and the Step-0-gate note) from the
-[plan-creating-project-plans skill's Worktree Specification section](../skills/plan-creating-project-plans/SKILL.md#worktree-specification-mandatory--applies-to-all-plans) —
-that section is the single source of truth for the exact wording; do not paraphrase it.
+Worktree Specification section of `.claude/skills/plan-creating-project-plans/SKILL.md` — that
+section is the single source of truth for the exact wording; do not paraphrase it.
 
 **This applies to ALL plans regardless of size** — pure-docs, single-file, and trivial plans included. No exceptions. See
 [Plans Organization Convention §Worktree Specification](../../repo-governance/conventions/structure/plans.md#worktree-specification)
