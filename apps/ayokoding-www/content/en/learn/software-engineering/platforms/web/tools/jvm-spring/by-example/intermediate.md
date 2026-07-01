@@ -1851,7 +1851,7 @@ class OrderService {  # => Defines OrderService class
 **Transaction Propagation Comparison**:
 
 ```mermaid
-graph TD
+graph LR
     subgraph REQUIRED [REQUIRED - Join or Create]
         A1[Outer Transaction exists?] -->|Yes| B1[Join existing transaction]
         A1 -->|No| C1[Create new transaction]
@@ -3220,7 +3220,7 @@ graph TD
     B --> C[Jackson deserializes JSON]
     C --> D{Bean Validation}
     D -->|All constraints pass| E[Method executes]
-    D -->|Constraint violation| F[MethodArgumentNotValidException]
+    D -->|Constraint violation| F[MethodArgumentNotValid<br/>Exception]
 
     E --> G[Return response]
     F --> H[400 Bad Request with errors]

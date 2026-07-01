@@ -606,7 +606,7 @@ public class WebConfig implements WebMvcConfigurer {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Servlet API<br/>Manual Handling] -->|60+ Lines/Endpoint| B[Boilerplate]
     A -->|Manual Parsing| C[No Type Safety]
     A -->|XML Configuration| D[Verbose Setup]

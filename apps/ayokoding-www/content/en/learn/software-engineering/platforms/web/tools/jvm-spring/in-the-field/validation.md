@@ -710,7 +710,7 @@ public class ZakatValidationService {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Manual Validation<br/>if-else Checks] -->|50+ Lines/Method| B[Repetitive]
     A -->|Duplicated Logic| C[Inconsistent]
     A -->|Coupled| D[Mixed Concerns]

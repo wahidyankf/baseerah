@@ -47,7 +47,7 @@ A **Task Processing Pipeline** that:
 ## Project Structure
 
 ```mermaid
-graph TD
+graph LR
     A[Quick Start: F#] --> B[Immutable Values]
     A --> C[Functions]
     A --> D[Pattern Matching]

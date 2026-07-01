@@ -36,7 +36,6 @@ Hierarchical State Machines (HSMs) group states into superstates — a transitio
 
 ```mermaid
 stateDiagram-v2
-    direction LR
     state Active {
         Submitted --> ApprovalPending: request_approval
         ApprovalPending --> Issued: approve
@@ -1077,7 +1076,6 @@ An AND-join fires a transition only when all parallel regions have reached their
 
 ```mermaid
 stateDiagram-v2
-    direction LR
     state fork_state <<fork>>
     state join_state <<join>>
     [*] --> fork_state
@@ -1479,7 +1477,6 @@ A saga is a long-running business transaction spanning multiple aggregates. Mode
 
 ```mermaid
 stateDiagram-v2
-    direction LR
     [*] --> WaitingGRN : po_submitted
     WaitingGRN --> MatchPending : grn_received
     MatchPending --> MatchComplete : match_passed
@@ -2112,7 +2109,7 @@ When the three-way match engine returns a transient error (network timeout, temp
 stateDiagram-v2
     direction LR
     MatchPending --> MatchPending : retry [count < max_retries]
-    MatchPending --> MatchFailed : match_failed [count >= max_retries]
+    MatchPending --> MatchFailed : match_failed [max retries]
     MatchPending --> MatchComplete : match_passed
     note right of MatchPending : exponential backoff\napplied between retries
 ```
@@ -3487,7 +3484,7 @@ Three canonical approaches to FSM implementation each serve different trade-offs
 ```mermaid
 graph TD
     FSM["FSM Implementation Choice"]
-    FSM --> Rust["Rust Typestate\n• Compile-time transitions\n• Zero overhead\n• Safety-critical business logic"]
+    FSM --> Rust["Rust Typestate\n• Compile-time transitions\n• Zero overhead\n• Safety-critical logic"]
     FSM --> Go["Go looplab/fsm\n• Runtime event table\n• Declarative config\n• Application-level workflows"]
     FSM --> C["C QP/C\n• Function-pointer dispatch\n• Q_SUPER hierarchy\n• Embedded/firmware"]
 

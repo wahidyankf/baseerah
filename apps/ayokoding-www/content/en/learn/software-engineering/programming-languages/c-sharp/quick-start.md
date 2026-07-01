@@ -45,7 +45,7 @@ A **Task Management CLI** that:
 ## Project Structure
 
 ```mermaid
-graph TD
+graph LR
     A[Quick Start: C#] --> B[Variables & Types]
     A --> C[Collections]
     A --> D[Classes & Objects]

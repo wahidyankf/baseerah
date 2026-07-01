@@ -26,7 +26,7 @@ Clean Architecture separates concerns into distinct layers with clear dependency
 
 ```mermaid
 graph TD
-    Frameworks["Frameworks & Drivers Layer<br/>(HTTP, Database, External APIs)"] -->|"depends on"| Adapters["Interface Adapters Layer<br/>(Controllers, Presenters, Gateways)"]
+    Frameworks["Frameworks & Drivers Layer<br/>(HTTP, Database, External APIs)"] -->|"depends on"| Adapters["Interface Adapters Layer<br/>(Controllers,<br/>Presenters, Gateways)"]
     Adapters -->|"depends on"| UseCases["Use Cases Layer<br/>(Application Business Rules)"]
     UseCases -->|"depends on"| Domain["Domain Layer<br/>(Enterprise Business Rules)"]
 

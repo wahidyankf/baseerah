@@ -25,7 +25,7 @@ Microservices decompose systems into independently deployable services, requirin
 ## Microservices Communication Flow
 
 ```mermaid
-graph LR
+graph TD
     Client["Client"] -->|"HTTP Request"| Gateway["API Gateway"]
     Gateway -->|"Service Discovery"| Consul["Consul Registry"]
     Consul -->|"Service Address"| Gateway

@@ -719,7 +719,7 @@ end
 ## Visualization - Testing Strategy
 
 ```mermaid
-graph TD
+graph LR
     A[Testing Strategies] --> B[Unit Tests - ExUnit]
     A --> C[Property Tests - StreamData]
     A --> D[Integration Tests - Database]

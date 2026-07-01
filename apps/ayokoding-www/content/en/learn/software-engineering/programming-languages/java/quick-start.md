@@ -36,7 +36,7 @@ By the end of this tutorial, you will have touchpoints for:
 ## Learning Path
 
 ```mermaid
-graph TD
+graph LR
     A[Quick Start: Java] --> B[Classes & Objects]
     A --> C[Methods]
     A --> D[Inheritance]

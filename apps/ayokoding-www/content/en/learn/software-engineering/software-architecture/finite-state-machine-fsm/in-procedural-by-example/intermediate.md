@@ -138,7 +138,7 @@ The factory function establishes the entry point for the Invoice lifecycle. In R
 
 ```mermaid
 stateDiagram-v2
-    [*] --> InvoiceDraft: Invoice::create / CreateInvoice
+    [*] --> InvoiceDraft: Invoice::create/CreateInvoice
 ```
 
 {{< tabs items="Rust,Go" >}}
@@ -1859,7 +1859,7 @@ stateDiagram-v2
     state "Invoice[Submitted, Unverified]" as SU
     state "Invoice[Submitted, Verified]" as SV
     SU --> SV: verify_match (guard passes)
-    SU --> SU: verify_match (guard fails — no transition)
+    SU --> SU: verify_match (guard fails)
 ```
 
 {{< tabs items="Rust,Go" >}}
@@ -2189,8 +2189,8 @@ Tests for the two-dimensional phantom type approach have a unique property: atte
 ```mermaid
 graph TD
     A["Test: draft_can_submit"]:::blue --> B["Invoice::create → .submit()"]:::teal
-    C["Test: submitted_can_verify_then_approve"]:::blue --> D["create → submit → verify_match → approve"]:::teal
-    E["Test: unverified_cannot_approve"]:::blue --> F["compile error in Rust / ErrNotVerified in Go"]:::orange
+    C["Test: submit_verify_approve"]:::blue --> D["create→submit→verify→approve"]:::teal
+    E["Test: unverified_no_approve"]:::blue --> F["Rust err / Go ErrNotVerified"]:::orange
 
     classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
     classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px

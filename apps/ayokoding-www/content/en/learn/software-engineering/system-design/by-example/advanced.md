@@ -812,7 +812,7 @@ print(f"Consensus: {result}")
 Event sourcing stores state changes as an immutable, ordered sequence of events rather than overwriting current state. The current state is derived by replaying events from the log. This provides a complete audit trail, enables temporal queries ("what was the state at time T?"), and supports event-driven integration via projections and read models.
 
 ```mermaid
-graph LR
+graph TD
     CMD["Command<br/>PlaceOrder"]
     AGG["Aggregate<br/>Order"]
     EVT["Event Store<br/>Append-Only Log"]

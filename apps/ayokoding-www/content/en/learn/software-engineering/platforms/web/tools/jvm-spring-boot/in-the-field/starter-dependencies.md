@@ -232,7 +232,7 @@ graph TD
 
     I["Application"] -->|"Declares"| A
     A -->|"Triggers"| J["WebMvcAutoConfiguration"]
-    J -->|"Configures"| K["DispatcherServlet, Embedded Tomcat"]
+    J -->|"Configures"| K["DispatcherServlet, Tomcat"]
 
     style A fill:#0173B2,color:#fff
     style H fill:#DE8F05,color:#fff

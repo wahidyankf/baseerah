@@ -106,7 +106,7 @@ Claude: [Consolidates reports from both agents]
 Integrate Model Context Protocol (MCP) servers to extend Claude's capabilities with custom tools, data sources, or APIs.
 
 ```mermaid
-graph LR
+graph TD
     A[Claude CLI] -->|Load config| B[github MCP server]
     A -->|Load config| C[database MCP server]
     B -->|Query| D[GitHub API: Issues PRs]
@@ -255,8 +255,8 @@ Orchestrate multiple Claude invocations in sequence, each building on previous r
 
 ```mermaid
 graph TD
-    A[Claude Agent 1: Architecture Analysis] -->|JSON| B[Claude Agent 2: Migration Planning]
-    B -->|JSON| C[Claude Agent 3: Risk Assessment]
+    A[Agent 1: Architecture Analysis] -->|JSON| B[Agent 2: Migration Planning]
+    B -->|JSON| C[Agent 3: Risk Assessment]
     C -->|JSON| D[jq consolidate all]
     D -->|Combined JSON| E[Claude Agent 4: Prioritization]
     E -->|Markdown| F[Final Roadmap]
@@ -500,9 +500,9 @@ Manage Claude configuration across environments (dev/staging/prod) with profiles
 
 ```mermaid
 graph TD
-    A[DEPLOY_ENV variable] -->|dev| B[claude-dev.json: haiku write 1USD]
-    A -->|staging| C[claude-staging.json: sonnet read-only 5USD]
-    A -->|prod| D[claude-prod.json: sonnet strict-read 10USD]
+    A[DEPLOY_ENV variable] -->|dev| B[claude-dev: haiku write $1]
+    A -->|staging| C[claude-staging: sonnet RO $5]
+    A -->|prod| D[claude-prod: sonnet strict $10]
     B -->|Fast flexible| E[Development Analysis]
     C -->|Thorough safe| F[Staging Validation]
     D -->|Maximum safety| G[Production Analysis]
@@ -792,6 +792,7 @@ graph TD
     A -->|Generate| D[modules/ecs/main.tf]
     A -->|Generate| E[main.tf: root module]
     A -->|Generate| F[variables.tf + outputs.tf]
+    E -->|Declares| F
     B -->|Public subnets| G[Public AZ-1 + AZ-2]
     B -->|Private subnets| H[Private DB subnets]
     C -->|Uses| H
@@ -937,7 +938,7 @@ graph TD
     B -->|Extract| C[Route patterns: src/api/]
     B -->|Extract| D[Error class: ApiError]
     B -->|Extract| E[Auth: authMiddleware]
-    C -->|Generate| F[.claude/agents/api-developer.md]
+    C -->|Generate| F[.claude/agents/api-developer]
     D -->|Include| F
     E -->|Include| F
     F -->|Used by| G[All team members via claude]
@@ -1435,6 +1436,7 @@ graph TD
     B -->|Categorize| E[docs: 5]
     B -->|Categorize| F[perf: 2]
     B -->|Categorize| G[BREAKING: 1]
+    G -->|Needs migration docs| E
     C -->|Format| H[Release Notes]
     D -->|Format| H
     E -->|Format| H

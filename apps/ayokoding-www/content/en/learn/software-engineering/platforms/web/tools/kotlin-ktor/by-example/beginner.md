@@ -547,7 +547,7 @@ fun Application.configureRouting() {
 Content negotiation lets Ktor automatically serialize response objects to JSON and deserialize request bodies based on `Accept` and `Content-Type` headers. The `kotlinx.serialization` engine is the recommended choice for Kotlin projects.
 
 ```mermaid
-graph LR
+graph TD
   A["Client Request<br/>Content-Type: application/json"] --> B["ContentNegotiation Plugin"]
   B --> C["Deserialize Body<br/>to Data Class"]
   C --> D["Route Handler"]

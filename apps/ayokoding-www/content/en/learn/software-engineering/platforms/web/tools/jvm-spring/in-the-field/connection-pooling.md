@@ -455,15 +455,22 @@ graph TD
     A[DriverManager<br/>No Pooling] -->|50-100ms per Connection| B[Slow]
     A -->|No Reuse| C[High Load]
     A -->|No Health Checks| D[Broken Connections]
+    B --- C
+    C --- D
 
     E[HikariCP<br/>Connection Pool] -->|<1ms per Connection| F[Fast]
     E -->|Reuse Connections| G[Low Load]
     E -->|Health Checks| H[Reliability]
     E -->|Leak Detection| I[Safety]
+    F --- G
+    G --- H
+    H --- I
 
     J[Spring Boot<br/>Auto-Configuration] -->|Zero Config| K[Convention]
     J -->|Externalized Properties| L[Environment-Specific]
     J -->|Actuator Integration| M[Monitoring]
+    K --- L
+    L --- M
 
     style A fill:#DE8F05,stroke:#333,stroke-width:2px,color:#fff
     style E fill:#029E73,stroke:#333,stroke-width:2px,color:#fff

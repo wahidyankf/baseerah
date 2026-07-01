@@ -365,7 +365,7 @@ public class ZakatController {
 ## Spring Security Architecture Diagram
 
 ```mermaid
-graph LR
+graph TD
     A[HTTP Request] --> B[SecurityFilterChain]
     B --> C[BasicAuthenticationFilter]
     C --> D{Credentials Valid?}

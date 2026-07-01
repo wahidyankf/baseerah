@@ -505,7 +505,7 @@ flowchart TD
     B -->|Counter.inc| C[Test Execution Metrics]
     B -->|Histogram.observe| D[Duration Metrics]
     B -->|Gauge.set| E[Flakiness Scores]
-    C --> F[Prometheus Exporter :9464/metrics]
+    C --> F[Prometheus Exporter :9464]
     D --> F
     E --> F
     F -->|HTTP Scrape 15s| G[Prometheus Server]

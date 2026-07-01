@@ -91,7 +91,7 @@ flowchart LR
     subgraph ctx["purchasing context"]
         direction TB
         dom["domain/\n(PurchaseOrder, Money structs)"]:::blue
-        app["app/\n(PurchaseOrderRepository interface)"]:::orange
+        app["app/\n(PO Repository interface)"]:::orange
         adpIn["adapter/in/\n(chi HTTP handler)"]:::teal
         adpOut["adapter/out/\n(postgres.Repo, mem.Repo)"]:::teal
     end

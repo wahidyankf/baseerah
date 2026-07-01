@@ -373,13 +373,15 @@ graph TD
     A[Raw JDBC<br/>Manual Resources] -->|30 Lines of Boilerplate| B[Resource Leaks]
     A -->|Manual Exception Handling| C[Generic SQLException]
     A -->|No Pooling| D[Slow Performance]
+    D -->|Migrate To| E[JdbcTemplate<br/>Automatic Resources]
 
-    E[JdbcTemplate<br/>Automatic Resources] -->|3 Lines| F[No Boilerplate]
+    E -->|3 Lines| F[No Boilerplate]
     E -->|Automatic Cleanup| G[No Resource Leaks]
     E -->|DataAccessException| H[Better Exceptions]
     E -->|Connection Pooling| I[Fast Performance]
+    I -->|Migrate To| J[NamedParameterJdbcTemplate<br/>Named Parameters]
 
-    J[NamedParameterJdbcTemplate<br/>Named Parameters] -->|Readable SQL| K[Maintainable]
+    J -->|Readable SQL| K[Maintainable]
     J -->|IN Clause Support| L[Complex Queries]
     J -->|Batch Operations| M[Bulk Efficiency]
 

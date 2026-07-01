@@ -198,7 +198,7 @@ This isn't opinion or preference—it's the mathematical law that makes accounti
 Different types of accounts increase and decrease differently:
 
 ```mermaid
-flowchart TD
+flowchart LR
  subgraph "Asset Accounts"
   A1[Debit = Increase]
   A2[Credit = Decrease]
@@ -389,7 +389,7 @@ EXPENSES (5000-5999)
 ### Visual Organization
 
 ```mermaid
-flowchart TD
+flowchart LR
  subgraph "1000: Assets"
   A1[1000 Cash]
   A2[1100 Accounts Receivable]
@@ -775,7 +775,7 @@ Final Balance: $450 (Credit)
 ### Ledger Organization
 
 ```mermaid
-flowchart TD
+flowchart LR
  J[Journal Entries<br/>Chronological] --> L{Post to Ledger}
 
  L --> A[Asset Accounts]
@@ -1180,7 +1180,7 @@ Jan 25: Cash 300 / Accounts Receivable 300
 ### Principles Summary
 
 ```mermaid
-flowchart TD
+flowchart LR
  A[Accrual Basis] --> Q[Quality<br/>Financial<br/>Information]
  M[Matching] --> Q
  R[Revenue Recognition] --> Q

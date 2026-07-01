@@ -345,7 +345,7 @@ flowchart TD
     F --> D
 
     E -->|Yes| G[Calculate Backoff Delay]
-    G --> H[delay = min initial * multiplier^attempt, max]
+    G --> H[delay = min(init*mult^n, max)]
     H --> I[Wait for Delay]
     I --> J[Log Retry Attempt]
     J --> A

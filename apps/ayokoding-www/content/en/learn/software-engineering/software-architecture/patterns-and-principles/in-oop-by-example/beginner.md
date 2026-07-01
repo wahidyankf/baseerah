@@ -7556,7 +7556,7 @@ console.log(handleReserve(invService, "Unknown", 1)); // => Reservation failed: 
 A Data Transfer Object (DTO) is a simple container for carrying data between layers or across service boundaries. DTOs have no business logic — they are pure data carriers. Using DTOs decouples the internal domain model from the external representation.
 
 ```mermaid
-graph LR
+graph TD
     Ext["External Client<br/>(API / UI)"]
     DTO["Request DTO<br/>(validated input)"]
     Svc["Service Layer"]

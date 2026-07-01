@@ -178,10 +178,10 @@ graph TD
     C -->|"Lists"| D["Auto-Configuration Classes"]
     D -->|"Loads"| E["DataSourceAutoConfiguration"]
     D -->|"Loads"| F["HibernateJpaAutoConfiguration"]
-    E -->|"Checks"| G["@ConditionalOnClass(DataSource.class)"]
+    E -->|"Checks"| G["@ConditionalOnClass(DataSrc)"]
     G -->|"True: H2/PostgreSQL on classpath"| H["Register DataSource Bean"]
-    F -->|"Checks"| I["@ConditionalOnMissingBean(EntityManagerFactory.class)"]
-    I -->|"True: No manual config"| J["Register EntityManagerFactory Bean"]
+    F -->|"Checks"| I["@ConditionalOnMissingBean(EMF)"]
+    I -->|"True: No manual config"| J["Register EMF Bean"]
 
     style A fill:#0173B2,color:#fff
     style H fill:#029E73,color:#fff

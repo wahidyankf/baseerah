@@ -493,6 +493,7 @@ graph TD
     APIGW -->|"mTLS"| InvAPI
     PurchAPI -->|"TCP/5432"| PG
     PurchAPI -->|"Kafka"| EventBus
+    EventBus -->|"Kafka"| PayWorker
     PayWorker -->|"TCP/5432"| PG
 
     style Buyer fill:#029E73,stroke:#000,color:#fff

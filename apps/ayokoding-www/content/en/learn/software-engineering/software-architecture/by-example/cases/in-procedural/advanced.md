@@ -2658,7 +2658,7 @@ pub fn rate_limit_layer(requests_per_second: u64) -> RateLimitLayer {
 A production container with no resource limits can consume all memory on a node and trigger OOM kills for every other pod. Under-sizing limits causes OOM kills for the service itself. The container image size and the Kubernetes resource envelope are production requirements that must be decided before the first deployment — retrofitting them after a production incident is painful and risky.
 
 ```mermaid
-graph TD
+graph LR
     subgraph Node["Kubernetes Node"]
         subgraph Pod["procurement-service Pod"]
             APP["app container\n(Go/Rust binary)\ncpu: 100m-500m\nmem: 128Mi-256Mi"]:::app

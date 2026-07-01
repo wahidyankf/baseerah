@@ -34,7 +34,7 @@ An invoice in a P2P system must pass a three-way match before it can be approved
 stateDiagram-v2
     [*] --> Received
     Received --> UnderReview: review
-    UnderReview --> Approved: approve (three-way match passes)
+    UnderReview --> Approved: approve (3-way match passes)
     UnderReview --> Disputed: dispute
     Disputed --> UnderReview: resubmit
     Approved --> Paid: pay

@@ -29,8 +29,8 @@ tags:
 
 ```mermaid
 graph TD
-  A["InheritedWidget<br/>AppState data at top"] --> B["Child Widget A<br/>context.dependOnInheritedWidget"]
-  A --> C["Child Widget B<br/>context.dependOnInheritedWidget"]
+  A["InheritedWidget<br/>AppState data at top"] --> B["Child Widget A<br/>dependOnInheritedWidget"]
+  A --> C["Child Widget B<br/>dependOnInheritedWidget"]
   B --> D["GrandChild<br/>inherits state"]
 
   style A fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px

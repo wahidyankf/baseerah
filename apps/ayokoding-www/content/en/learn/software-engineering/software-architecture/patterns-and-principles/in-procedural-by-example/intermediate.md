@@ -602,7 +602,7 @@ A factory selects the correct strategy at runtime based on context — strategie
 
 ```mermaid
 graph TD
-    A["SelectPricingStrategy#40;poType, terms#41;"]:::orange
+    A["Select#40;poType,terms#41;"]:::orange
     B["LumpSumPricing"]:::blue
     C["PerUnitPricing"]:::teal
     D["TieredPricing"]:::purple
@@ -2595,7 +2595,7 @@ Functional options are the idiomatic Go alternative to Builder — variadic func
 
 ```mermaid
 graph TD
-    A["NewHTTPAdapter#40;baseURL, opts...#41;"]:::orange
+    A["NewHTTPAdapter#40;u,opts#41;"]:::orange
     B["defaultHTTPConfig#40;#41;"]:::blue
     C["WithTimeout#40;30s#41;"]:::teal
     D["WithRetry#40;3#41;"]:::teal
@@ -3080,7 +3080,7 @@ impl POBuilder<Present, Present> {
 The Pipeline pattern chains handlers where each processes input and passes to the next — reusable middleware for cross-cutting concerns. Each handler in the chain can inspect, modify, or reject the PO before passing it forward. The pipeline terminates on the first error and does not call subsequent handlers.
 
 ```mermaid
-graph LR
+graph TD
     A["PO Input"]:::blue
     B["ValidationHandler"]:::teal
     C["AuditLogHandler"]:::orange

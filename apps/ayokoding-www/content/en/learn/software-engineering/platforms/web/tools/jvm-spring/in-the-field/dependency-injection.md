@@ -147,7 +147,7 @@ public class Application {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Manual Construction<br/>new Dependencies] -->|Tight Coupling| B[Hard to Test]
     A -->|Spread Across Code| C[Hard to Maintain]
 

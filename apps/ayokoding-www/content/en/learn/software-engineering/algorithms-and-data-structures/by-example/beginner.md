@@ -1173,7 +1173,7 @@ public class Example05 {
 A singly linked list stores elements in nodes, each holding a value and a pointer to the next node. Traversal is O(n); there is no direct index access.
 
 ```mermaid
-graph LR
+graph TD
     H["head"] --> A["Node: 10"]
     A --> B["Node: 20"]
     B --> C["Node: 30"]
@@ -2969,7 +2969,7 @@ public class Example11 {
 A queue enforces First-In First-Out (FIFO) access. `collections.deque` provides O(1) append on the right and O(1) popleft — the correct implementation for production queues.
 
 ```mermaid
-graph LR
+graph TD
     ENQ["Enqueue (rear)"] --> C["30"]
     C --> B["20"]
     B --> A["10"]

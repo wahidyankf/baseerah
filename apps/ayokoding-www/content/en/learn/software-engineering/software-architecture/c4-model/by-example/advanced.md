@@ -102,16 +102,16 @@ The `approve()` method is the most critical method in the aggregate. It enforces
 
 ```mermaid
 flowchart TD
-    Start(["approve#40;approverId#41; called"])
+    Start(["approve#40;approverId#41;"])
     CheckState{"Is status ==<br/>AwaitingApproval?"}
     CheckLevel{"Does approverId<br/>meet ApprovalLevel?"}
     CheckLines{"Does PO have<br/>at least one line?"}
     ThrowState["Throw: InvalidStateTransition<br/>Current state: {status}<br/>Expected: AwaitingApproval"]
-    ThrowAuth["Throw: InsufficientApprovalAuthority<br/>Required: {requiredApprovalLevel}"]
-    ThrowLines["Throw: PurchaseOrderHasNoLines<br/>PO cannot be approved with zero lines"]
+    ThrowAuth["Throw:<br/>InsufficientApprovalAuthority<br/>Req: {requiredApprovalLevel}"]
+    ThrowLines["Throw: PurchaseOrderHasNoLines<br/>Cannot approve with zero lines"]
     SetStatus["Set status = Approved"]
     AppendEvent["Append PurchaseOrderApproved<br/>event to uncommittedEvents"]
-    Return(["Return PurchaseOrderApproved event"])
+    Return(["Return PurchaseOrderApproved"])
 
     Start --> CheckState
     CheckState -->|"No"| ThrowState
@@ -983,7 +983,7 @@ graph TD
         EUKafka["MSK Kafka<br/>3-broker cluster"]
     end
 
-    CrossRegionReplication["Cross-Region Kafka MirrorMaker 2<br/>Replicates events between regions<br/>RPO: 30 seconds"]
+    CrossRegionReplication["Cross-Region MirrorMaker 2<br/>Replicates events cross-region<br/>RPO: 30 seconds"]
 
     DNS -->|"Routes APAC buyers"| APACCluster
     DNS -->|"Routes EU buyers"| EUCluster
@@ -1079,11 +1079,11 @@ graph LR
     end
 
     subgraph Step2["Step 2: Deploy New Code"]
-        D1["Deploy purchasing-api v1.5.0<br/>Reads and writes new_field<br/>Old code still running during rollout"]
+        D1["Deploy purchasing-api v1.5.0<br/>Reads and writes new_field<br/>Old code runs during rollout"]
     end
 
     subgraph Step3["Step 3: Remove Old Compatibility"]
-        M2["ALTER TABLE purchase_orders<br/>ALTER COLUMN new_field SET NOT NULL<br/>Only after 100% of pods on v1.5.0"]
+        M2["ALTER TABLE purchase_orders<br/>ALTER new_field NOT NULL<br/>After 100% pods on v1.5.0"]
     end
 
     Step1 -->|"Migration runs first"| Step2
@@ -1143,6 +1143,7 @@ graph TD
     OtelCollector -->|"Exports metrics [remote_write]"| Prometheus
     OtelCollector -->|"Exports traces [OTLP]"| Tempo
     OtelCollector -->|"Exports logs [OTLP]"| Loki
+    Prometheus -->|"Queries metrics [PromQL]"| Grafana
     Prometheus -->|"Alerts on threshold breach"| OnCall
     Grafana -->|"Displays metrics, traces, logs"| OnCall
 

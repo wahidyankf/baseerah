@@ -241,7 +241,7 @@ services:
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     host["Host machine\n(CI runner or dev)"]:::brown
     compose["docker-compose up\n--abort-on-container-exit"]:::orange
     pg["postgres:17-alpine\n(procurement_platform_test DB)"]:::teal

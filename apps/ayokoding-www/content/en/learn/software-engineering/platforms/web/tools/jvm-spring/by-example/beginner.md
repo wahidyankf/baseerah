@@ -1554,7 +1554,7 @@ graph TD
     E[DonationService needs<br/>PaymentProcessor] -->|@Qualifier cash specified| F[Spring selects CashPayment]
     F --> G[Injects cashProcessor bean]
 
-    H[Without @Qualifier] -->|Multiple beans found| I[NoUniqueBeanDefinitionException]
+    H[Without @Qualifier] -->|Multiple beans found| I[NoUnique<br/>BeanDefinitionException]
 
     style A fill:#0173B2,stroke:#000,color:#fff
     style B fill:#DE8F05,stroke:#000,color:#000
@@ -1847,14 +1847,18 @@ Same? false
 graph TD
     subgraph Singleton [Singleton Scope - Default]
         A1[First getBean call] -->|Creates instance| B1[Bean Instance 1]
-        A2[Second getBean call] -->|Returns cached| B1
-        A3[Third getBean call] -->|Returns cached| B1
+        A1 -->|Then| A2[Second getBean call]
+        A2 -->|Returns cached| B1
+        A2 -->|Then| A3[Third getBean call]
+        A3 -->|Returns cached| B1
     end
 
     subgraph Prototype [Prototype Scope - @Scope<br/>prototype]
         C1[First getBean call] -->|Creates new| D1[Bean Instance 1]
-        C2[Second getBean call] -->|Creates new| D2[Bean Instance 2]
-        C3[Third getBean call] -->|Creates new| D3[Bean Instance 3]
+        C1 -->|Then| C2[Second getBean call]
+        C2 -->|Creates new| D2[Bean Instance 2]
+        C2 -->|Then| C3[Third getBean call]
+        C3 -->|Creates new| D3[Bean Instance 3]
     end
 
     style A1 fill:#0173B2,stroke:#000,color:#fff
@@ -2164,7 +2168,7 @@ Closing context...
 ```mermaid
 stateDiagram-v2
     [*] --> Created: Spring creates bean instance
-    Created --> DependenciesInjected: Inject dependencies via constructor/setter
+    Created --> DependenciesInjected: Inject deps via ctor/setter
     DependenciesInjected --> PostConstructCalled: Call @PostConstruct method
     PostConstructCalled --> Ready: Bean ready for use
     Ready --> PreDestroyCalled: context.close() called

@@ -1918,6 +1918,7 @@ The same PO machine in Python illustrates how the "cancel from any pre-paid stat
 
 ```mermaid
 stateDiagram-v2
+    direction LR
     Draft --> Cancelled: cancel ✓
     AwaitingApproval --> Cancelled: cancel ✓
     Approved --> Cancelled: cancel ✓

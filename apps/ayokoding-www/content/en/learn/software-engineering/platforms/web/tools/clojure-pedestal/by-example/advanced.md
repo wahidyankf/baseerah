@@ -279,7 +279,7 @@ Distributed tracing tracks a request across multiple services. OpenTelemetry pro
 A circuit breaker prevents cascading failures when a downstream service is unavailable. When failures exceed a threshold, the circuit "opens" and immediately rejects requests for a cooling-off period rather than waiting for timeouts.
 
 ```mermaid
-graph LR
+graph TD
   A["Request"] --> B{"Circuit State?"}
   B -->|Closed| C["Call Downstream"]
   B -->|Open| D["Reject: 503"]

@@ -442,7 +442,7 @@ public class ZakatAccountService {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Manual EntityManager<br/>50 Lines per Entity] -->|Boilerplate| B[Repetitive CRUD]
     A -->|Manual JPQL| C[String Queries]
     A -->|Manual Pagination| D[setFirstResult/setMaxResults]

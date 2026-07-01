@@ -18,8 +18,8 @@ The C4 Model provides a hierarchical approach to visualizing software architectu
 ```mermaid
 graph TD
     A["Level 1 — Context<br/>System relationships"]
-    B["Level 2 — Containers<br/>Deployable units and data stores"]
-    C["Level 3 — Components<br/>Internal structure of a container"]
+    B["Level 2 — Containers<br/>Deployable units & data stores"]
+    C["Level 3 — Components<br/>Internal container structure"]
     D["Level 4 — Code<br/>Classes, functions, interfaces"]
 
     A -->|"zoom in"| B
@@ -901,7 +901,7 @@ graph TD
 A single Context diagram that traces the full Procure-to-Pay lifecycle from requisition to accounting entry, showing every person and external system.
 
 ```mermaid
-graph LR
+graph TD
     Buyer["[Person]<br/>Buyer Employee"]
     Manager["[Person]<br/>Approving Manager"]
     Warehouse["[Person]<br/>Warehouse Operator"]
@@ -936,7 +936,7 @@ graph LR
 **Key Elements**:
 
 - **Numbered arrows**: 11-step P2P lifecycle made explicit
-- **Left-to-right layout**: Matches the temporal flow of the business process
+- **Numbered flow layout**: Matches the temporal flow of the business process
 - **All eight actors**: Every person and system involved in P2P in one view
 
 **Design Rationale**: Using numbered arrows transforms a static Context diagram into a process walkthrough. Business stakeholders can trace the flow and immediately spot missing steps or incorrect ordering.
@@ -954,21 +954,25 @@ Explicitly marking what the Procurement Platform owns vs. what external systems 
 ```mermaid
 graph TD
     subgraph InScope["IN SCOPE — Procurement Platform owns"]
-        PRLifecycle["Requisition lifecycle management"]
-        POLifecycle["Purchase order issuance and tracking"]
+        PRLifecycle["Requisition lifecycle mgmt"]
+        POLifecycle["PO issuance and tracking"]
         GRNEntry["Goods receipt recording"]
         InvMatching["Invoice three-way matching"]
         PayRun["Payment run scheduling"]
     end
 
     subgraph OutOfScope["OUT OF SCOPE — External systems own"]
-        ERPAccounting["General ledger and chart of accounts"]
+        ERPAccounting["GL and chart of accounts"]
         BankDisbursement["Actual fund disbursement"]
         EDINetwork["EDI value-added network"]
         InventoryMgmt["Warehouse inventory management"]
     end
 
-    InScope -->|"Integrates via REST and events"| OutOfScope
+    PRLifecycle --> POLifecycle
+    POLifecycle --> GRNEntry
+    GRNEntry --> InvMatching
+    InvMatching --> PayRun
+    PayRun -->|"Integrates via REST and events"| ERPAccounting
 
     style PRLifecycle fill:#0173B2,stroke:#000,color:#fff
     style POLifecycle fill:#0173B2,stroke:#000,color:#fff

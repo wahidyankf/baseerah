@@ -225,7 +225,7 @@ public class ZakatCalculator {
 ```mermaid
 graph TD
     A["application.yml"] -->|"Properties"| B["zakat.nisab.gold=85<br/>zakat.rate=0.025"]
-    B -->|"Spring Boot Startup"| C["@ConfigurationProperties Processor"]
+    B -->|"Spring Boot Startup"| C["@ConfigurationProperties<br/>Processor"]
     C -->|"Binds"| D["ZakatProperties Object"]
     D -->|"Validates"| E["@Validated + JSR-380"]
     E -->|"Pass"| F["Register as Spring Bean"]

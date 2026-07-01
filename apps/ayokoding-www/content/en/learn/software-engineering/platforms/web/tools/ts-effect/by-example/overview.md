@@ -39,7 +39,7 @@ Effect 3.x (the current major version) unified the ecosystem into a single `effe
 
 ```mermaid
 graph TD
-  A["Beginner<br/>Core Effect Concepts<br/>Examples 1-27"] --> B["Intermediate<br/>Services, Streams and Scheduling<br/>Examples 28-55"]
+  A["Beginner<br/>Core Effect Concepts<br/>Examples 1-27"] --> B["Intermediate<br/>Services, Streams, Scheduling<br/>Examples 28-55"]
   B --> C["Advanced<br/>Fibers, Metrics and Production<br/>Examples 56-80"]
   D["0%<br/>No Effect Knowledge"] -.-> A
   C -.-> E["95%<br/>Effect Mastery"]

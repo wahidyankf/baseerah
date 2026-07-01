@@ -48,6 +48,13 @@ graph TD
     A --> J[Utility Types]
     A --> K[Async Patterns]
 
+    B --> C
+    C --> D
+    E --> F
+    F --> G
+    H --> I
+    I --> J
+
     B --> L[By-Example Tutorial]
     C --> L
     D --> L

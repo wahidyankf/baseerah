@@ -565,8 +565,8 @@ flowchart TB
 
     CacheHit --> Metrics
 
-    Note1["Lazy Init: beans created on-demand"]
-    Note2["Connection Pool: 5-20 connections"]
+    Note1["Lazy Init<br/>(beans created on-demand)"]
+    Note2["Connection Pool<br/>(5-20 connections)"]
     Note3["Cache: TTL-based expiration"]
 
     style Cache fill:#0173B2,stroke:#333,stroke-width:2px,color:#fff

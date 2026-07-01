@@ -362,7 +362,7 @@ Pedestal supports all standard HTTP verbs: GET, POST, PUT, PATCH, DELETE, HEAD, 
 An interceptor is a map with up to three keys: `:enter`, `:leave`, and `:error`. Each value is a function that takes the context map and returns a (possibly modified) context map. Pedestal chains interceptors: it runs all `:enter` functions in forward order, then all `:leave` functions in reverse order (like a stack). The `:error` stage only runs when a previous stage threw an exception.
 
 ```mermaid
-graph LR
+graph TD
   subgraph "Enter Stage (forward)"
     A["Interceptor A<br/>:enter"] --> B["Interceptor B<br/>:enter"] --> C["Handler<br/>:enter"]
   end

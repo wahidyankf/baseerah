@@ -6924,7 +6924,7 @@ main = do
 A Data Transfer Object (DTO) is a simple container for carrying data between layers or across service boundaries. DTOs have no business logic — they are pure data carriers. A DTO holds only the fields appropriate for the boundary it crosses; sensitive or internal fields are physically absent from the type. Using DTOs decouples the internal domain model from the external representation.
 
 ```mermaid
-graph LR
+graph TD
     Ext["External Client<br/>(API / CLI)"]
     DTO["CreateUserRequest<br/>(input record)"]
     Svc["Service Layer<br/>(pure functions)"]

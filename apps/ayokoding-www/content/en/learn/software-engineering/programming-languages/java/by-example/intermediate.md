@@ -2394,7 +2394,7 @@ Records provide concise syntax for immutable data carriers, automatically genera
 
 ```mermaid
 graph TD
-    Traditional["Traditional Class<br/>99 lines: constructor, getters,<br/>equals, hashCode, toString"] --> Record["Record<br/>19 lines: compact constructor<br/>+ validation only"]
+    Traditional["Traditional Class<br/>99 lines: constructor,<br/>getters, equals, hashCode,<br/>toString"] --> Record["Record<br/>19 lines: compact constructor<br/>+ validation only"]
 
     Record --> Auto["Auto-generated:<br/>getters, equals,<br/>hashCode, toString"]
 

@@ -706,7 +706,7 @@ public class GlobalExceptionHandler {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Manual Try-Catch<br/>ServletException] -->|50+ Lines/Method| B[Repetitive]
     A -->|Duplicated Logic| C[Inconsistent]
     A -->|Coupled| D[Mixed Concerns]

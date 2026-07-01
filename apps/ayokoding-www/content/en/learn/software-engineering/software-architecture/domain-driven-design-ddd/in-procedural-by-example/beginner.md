@@ -2188,8 +2188,8 @@ Approval enforces the budget cap associated with the approver's level. Before se
 
 ```mermaid
 stateDiagram-v2
-  ApprovalPending --> Issued : approve [totalValue <= budgetCap]
-  ApprovalPending --> ApprovalPending : approve [totalValue > budgetCap, escalate]
+  ApprovalPending --> Issued : approve [total <= cap]
+  ApprovalPending --> ApprovalPending : approve [total>cap, escalate]
   note right of ApprovalPending : Budget cap checked\nAgainst ApprovalLevel
 ```
 

@@ -1796,8 +1796,8 @@ A Saga orchestrates a long-running business process that spans multiple aggregat
 stateDiagram-v2
     [*] --> Initiated
     Initiated --> PendingL1: submit
-    PendingL1 --> PendingL2: l1_approved #40;high-value PO#41;
-    PendingL1 --> Approved: l1_approved #40;standard PO#41;
+    PendingL1 --> PendingL2: l1_approved #40;high-value#41;
+    PendingL1 --> Approved: l1_approved #40;std PO#41;
     PendingL2 --> Approved: l2_approved
     PendingL1 --> Rejected: l1_rejected
     PendingL2 --> Rejected: l2_rejected

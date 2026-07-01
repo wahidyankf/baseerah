@@ -36,7 +36,7 @@ By the end of this tutorial, you will have touchpoints for:
 ## Learning Path
 
 ```mermaid
-graph TD
+graph LR
     A[Quick Start: Kotlin] --> B[Functions & Variables]
     A --> C[Null Safety]
     A --> D[Classes & Objects]

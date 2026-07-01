@@ -361,7 +361,7 @@ public CloudService awsCloudService() {
 ```mermaid
 graph LR
     A[Manual if/else<br/>System.getProperty] -->|Declarative| B[@Profile Beans<br/>Annotation-based]
-    B -->|File-based| C[application-{profile}.properties<br/>External Config]
+    B -->|File-based| C[app-{profile}.properties<br/>External Config]
 
     A -->|Scattered Logic| D[Hard to Maintain]
     B -->|Centralized| E[Easy to Maintain]

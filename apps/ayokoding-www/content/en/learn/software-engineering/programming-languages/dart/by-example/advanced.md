@@ -4200,7 +4200,7 @@ flowchart LR
     end
     subgraph Property["Property Tests"]
         PT1[Zakat ≤ wealth always]
-        PT2[Monotonic: more wealth = more zakat]
+        PT2[Monotonic: wealth->zakat]
     end
     ZakatCalc[ZakatCalculator]
     Unit --> ZakatCalc

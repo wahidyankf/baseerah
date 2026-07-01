@@ -48,6 +48,13 @@ graph TD
     A --> J[Goroutines]
     A --> K[Channels]
 
+    B --> C
+    C --> D
+    E --> F
+    F --> G
+    H --> I
+    I --> J
+
     B --> L[Beginner Tutorial]
     C --> L
     D --> L

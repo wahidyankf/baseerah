@@ -436,7 +436,7 @@ CI_BUILD_ID=local
 ## Cross-Browser Testing Progression Architecture
 
 ```mermaid
-graph TB
+graph LR
     subgraph "Standard: Playwright Projects"
         A[Local Browser Versions] -->|Sequential Execution| B[Chromium 125]
         A -->|Sequential Execution| C[Firefox 124]

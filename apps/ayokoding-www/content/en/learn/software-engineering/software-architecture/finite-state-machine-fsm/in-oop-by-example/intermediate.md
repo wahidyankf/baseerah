@@ -4159,7 +4159,7 @@ stateDiagram-v2
         ScheduledForPayment --> Paid: pay
     }
 
-    Inv --> PO: Paid → emits InvoicePaid domain event
+    Inv --> PO: Paid → emits InvoicePaid event
 
     classDef po fill:#0173B2,stroke:#000,color:#fff
     classDef inv fill:#029E73,stroke:#000,color:#fff

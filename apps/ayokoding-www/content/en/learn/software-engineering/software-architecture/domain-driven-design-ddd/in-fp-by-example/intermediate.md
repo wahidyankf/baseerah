@@ -6407,7 +6407,7 @@ The complete PO lifecycle from Draft to Issued involves three workflow steps: `C
 ```mermaid
 graph LR
     A["createDraft\nDraftPO"] -->|"|> approveDraft"| B["Result<ApprovedPO, string>"]
-    B -->|"Result.map issueApproved"| C["Result<IssuedPO * string, string>"]
+    B -->|"Result.map issueApproved"| C["Result<IssuedPO*string,string>"]
 
     style A fill:#0173B2,stroke:#000,color:#fff
     style B fill:#DE8F05,stroke:#000,color:#000

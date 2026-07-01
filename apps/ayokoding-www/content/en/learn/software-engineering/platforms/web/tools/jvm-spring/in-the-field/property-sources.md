@@ -412,7 +412,7 @@ zakat.rate.general=0.025
 ## Progression Diagram
 
 ```mermaid
-graph LR
+graph TD
     A[Manual Properties<br/>Properties.load] -->|Auto Injection| B[@Value<br/>Placeholder Resolution]
     B -->|Programmatic Access| C[Environment<br/>Abstraction]
     C -->|Type-Safe| D[@ConfigurationProperties<br/>Structured Binding]

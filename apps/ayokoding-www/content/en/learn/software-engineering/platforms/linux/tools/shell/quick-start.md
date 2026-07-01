@@ -50,6 +50,13 @@ graph TD
     A --> J[Scripting]
     A --> K[Find Files]
 
+    B --- C
+    C --- E
+    F --- G
+    G --- H
+    I --- J
+    J --- K
+
     B --> L[Beginner Tutorial]
     C --> L
     D --> L

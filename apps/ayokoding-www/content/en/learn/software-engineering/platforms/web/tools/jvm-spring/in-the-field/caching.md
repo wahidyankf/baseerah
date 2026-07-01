@@ -429,7 +429,7 @@ public class ZakatAccountRepository {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Manual Map Cache<br/>ConcurrentHashMap] -->|No Eviction| B[OutOfMemoryError]
     A -->|No TTL| C[Stale Data]
     A -->|Manual Invalidation| D[Inconsistency Risk]

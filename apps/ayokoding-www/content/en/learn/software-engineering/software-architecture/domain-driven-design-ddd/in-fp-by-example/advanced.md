@@ -6877,7 +6877,7 @@ runDemo = do
 CQRS (Command Query Responsibility Segregation) separates the write model (aggregates, commands, events) from the read model (projections optimised for query). For the procurement dashboard, the read model is a denormalised view of PO status and supplier name.
 
 ```mermaid
-graph LR
+graph TD
     Cmd["Command\n(ApprovePO, IssuePO)"] --> W["Write Model\nPoWriteModel aggregate"]
     W -->|"emits events"| Proj["Projection\napplyStatusChange"]
     Proj --> R["Read Model\nPoDashboardEntry\n(denormalised)"]

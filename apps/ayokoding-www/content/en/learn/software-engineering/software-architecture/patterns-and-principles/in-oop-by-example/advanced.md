@@ -4870,7 +4870,7 @@ each handler either processes the request or forwards it to the next handler in 
 architecture this maps to middleware pipelines, request validation chains, and plugin systems.
 
 ```mermaid
-graph LR
+graph TD
     Req["Request"] --> H1["AuthHandler"]
     H1 -->|"authenticated"| H2["RateLimitHandler"]
     H2 -->|"within limit"| H3["BusinessHandler"]

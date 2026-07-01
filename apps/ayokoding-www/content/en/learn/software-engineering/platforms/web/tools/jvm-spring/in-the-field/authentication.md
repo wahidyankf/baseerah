@@ -670,9 +670,9 @@ graph LR
     B -->|Add Stateless| C[JWT Tokens<br/>No Server State]
     C -->|Add Federation| D[OAuth2/OIDC<br/>External Providers]
 
-    A1[❌ Credentials Per Request] --> A
-    A2[❌ Browser Dialog] --> A
-    A3[❌ No Logout] --> A
+    A --> A1[❌ Credentials Per Request]
+    A --> A2[❌ Browser Dialog]
+    A --> A3[❌ No Logout]
 
     B1[✅ Custom Login Page] --> B
     B2[✅ Session Management] --> B

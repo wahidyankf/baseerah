@@ -698,7 +698,7 @@ public class WebConfig implements WebMvcConfigurer {
 ## Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A[Manual Servlet REST<br/>ObjectMapper +<br/>HttpServletResponse] -->|80+ Lines| B[Manual JSON]
     A -->|Manual Status Codes| C[Boilerplate]
     A -->|No Content Negotiation| D[JSON Only]

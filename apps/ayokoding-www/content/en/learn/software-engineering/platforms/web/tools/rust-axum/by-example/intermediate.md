@@ -752,7 +752,7 @@ async fn main() {
 Axum supports WebSocket upgrades via `axum::extract::ws`. The connection upgrades from HTTP to the WebSocket protocol.
 
 ```mermaid
-graph LR
+graph TD
     A["Client<br/>HTTP Upgrade Request"] --> B["Axum<br/>WebSocket Upgrade"]
     B --> C["ws.on_upgrade<br/>Async Handler"]
     C --> D["send#40;Message#41;<br/>recv#40;#41;"]

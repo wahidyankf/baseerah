@@ -568,7 +568,7 @@ flowchart TD
     C3 --> C4
 
     D --> D1[BrowserStack/Sauce Labs]
-    D --> D2[Appium]
+    D1 --> D2[Appium]
 
     D1 --> D3[Real iOS Devices]
     D1 --> D4[Real Android Devices]

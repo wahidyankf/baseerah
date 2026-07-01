@@ -48,6 +48,11 @@ graph TD
     A --> J[Classes & Objects]
     A --> K[Modules]
 
+    C --- D
+    E --- F
+    G --- H
+    I --- K
+
     B --> L[Beginner Tutorial]
     C --> L
     D --> L

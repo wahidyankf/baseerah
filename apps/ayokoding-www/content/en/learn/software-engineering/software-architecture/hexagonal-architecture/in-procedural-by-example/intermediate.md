@@ -3220,9 +3220,9 @@ mod tests {
 ### Example 50: Full intermediate flow recap — CQRS + query facade + notifier
 
 ```mermaid
-flowchart TD
+flowchart LR
     A["HTTP POST<br/>primary adapter"]:::blue
-    B["IssuePurchaseOrderCommandService<br/>command side"]:::teal
+    B["IssuePOCommandService<br/>command side"]:::teal
     C["PurchaseOrderWriter<br/>output port"]:::orange
     D["PostgresPurchaseOrderRepo<br/>write adapter"]:::teal
     E["SupplierRepository<br/>output port"]:::orange

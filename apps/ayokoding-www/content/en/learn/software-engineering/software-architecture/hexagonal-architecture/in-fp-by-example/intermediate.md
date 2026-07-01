@@ -1137,7 +1137,7 @@ issuePipelineEarly save publish po = do
 A full application service pipeline spans pure domain steps (synchronous, no I/O) and port calls (asynchronous, effectful). ROP unifies both into a single railway — pure functions contribute Result-shaped track switches, port calls contribute Async-Result-shaped track switches.
 
 ```mermaid
-graph LR
+graph TD
     IN["UnvalidatedPO"]:::blue
     V["validatePO\npure fn"]:::teal
     R["loadSupplier port\nAsync Result"]:::purple
@@ -5931,7 +5931,7 @@ demo = do
 This final intermediate example traces a complete `POST /purchase-orders/{id}/issue` request through all zones: HTTP adapter → application service → domain → `PurchaseOrderRepository` → `EventPublisher` → response.
 
 ```mermaid
-graph LR
+graph TD
     HTTP["HTTP Adapter\nPOST /issue"]:::orange
     SVC["issuePO service\nApplication zone"]:::teal
     DOM["validatePO\nDomain zone"]:::blue

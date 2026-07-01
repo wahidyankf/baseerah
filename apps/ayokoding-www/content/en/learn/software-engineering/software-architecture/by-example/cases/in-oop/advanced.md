@@ -186,7 +186,7 @@ main();
 The Testcontainers framework integrates with the test runner via lifecycle annotations (JUnit 5 `@Testcontainers`/`@Container` in Java and Kotlin, `IAsyncLifetime` in C#, `beforeAll`/`afterAll` hooks in TypeScript). The container wrapper manages the full lifecycle — start, wait for the PostgreSQL health probe, expose a random host port, and stop after the test suite finishes:
 
 ```mermaid
-flowchart LR
+flowchart TD
     jvm["JUnit 5\ntest runner"]:::blue
     tc["@Testcontainers\nextension"]:::orange
     pg["PostgreSQLContainer\n(postgres:17-alpine)"]:::teal
@@ -6714,7 +6714,7 @@ export function buildDataSource(): Pool {
 {{< /tabs >}}
 
 ```mermaid
-flowchart LR
+flowchart TD
     k8s["Kubernetes Secret\n(base64-encoded)"]:::purple
     env["JVM environment\n(SPRING_DATASOURCE_*)"]:::orange
     props["DataSourceProperties\n(@ConfigurationProperties)"]:::teal

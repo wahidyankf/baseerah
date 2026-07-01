@@ -199,7 +199,7 @@ jobs:
 The `pull_request` event fires when a PR is opened, synchronized (new commits), or reopened. It is the standard trigger for pre-merge validation checks.
 
 ```mermaid
-graph LR
+graph TD
     A["PR opened / new commit pushed"]:::blue --> B["pull_request event fires"]:::orange
     B --> C["Workflow runs on PR branch"]:::teal
     C --> D{"Checks pass?"}:::orange
@@ -383,9 +383,9 @@ The `schedule` trigger runs workflows on a time-based schedule using cron syntax
 
 ```mermaid
 graph TD
-    A["UTC clock reaches cron expression"]:::blue --> B["GitHub queues scheduled run"]:::orange
+    A["Scheduled time reached"]:::blue --> B["GitHub queues scheduled run"]:::orange
     B --> C["No commit needed — time-based"]:::teal
-    C --> D["Workflow executes on default branch"]:::purple
+    C --> D["Runs on default branch"]:::purple
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff,stroke-width:2px
     classDef orange fill:#DE8F05,stroke:#000,color:#fff,stroke-width:2px
@@ -667,8 +667,8 @@ jobs:
 ```mermaid
 graph LR
     A["Job starts on runner"]:::blue --> B["actions/checkout runs"]:::orange
-    B --> C["Repository cloned to GITHUB_WORKSPACE"]:::teal
-    C --> D["Subsequent steps access source code"]:::purple
+    B --> C["Repo cloned to workspace"]:::teal
+    C --> D["Steps access source code"]:::purple
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff,stroke-width:2px
     classDef orange fill:#DE8F05,stroke:#000,color:#fff,stroke-width:2px
@@ -1128,7 +1128,7 @@ jobs:
 graph TD
     A["Step evaluates if condition"]:::blue --> B{"Condition true?"}:::orange
     B -->|Yes| C["Step executes"]:::teal
-    B -->|No| D["Step skipped — shown as skipped in UI"]:::brown
+    B -->|No| D["Step skipped — shown in UI"]:::brown
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff,stroke-width:2px
     classDef orange fill:#DE8F05,stroke:#000,color:#fff,stroke-width:2px
@@ -1475,7 +1475,7 @@ graph TD
     A --> C["test job"]:::orange
     B --> D{"needs: lint, test"}:::teal
     C --> D
-    D --> E["deploy job — if: main branch only"]:::purple
+    D --> E["deploy job — main branch only"]:::purple
 
     classDef blue fill:#0173B2,stroke:#000,color:#fff,stroke-width:2px
     classDef orange fill:#DE8F05,stroke:#000,color:#fff,stroke-width:2px

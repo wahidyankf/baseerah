@@ -159,7 +159,7 @@ Two-step approval: `RequestApproval` captures which approval chain handles this 
 ```mermaid
 stateDiagram-v2
     Submitted --> ApprovalPending: RequestApproval#40;chain#41;
-    ApprovalPending --> Issued: Approve#40;by#41; [total ≤ cap]
+    ApprovalPending --> Issued: Approve#40;by#41; [total≤cap]
     ApprovalPending --> Rejected: Reject#40;reason#41;
 ```
 
@@ -294,7 +294,7 @@ impl PurchaseOrder {
 ```mermaid
 stateDiagram-v2
     Issued --> Received: MarkReceived#40;grnID#41;
-    Received --> Paid: MarkPaid#40;#41; [grnId present]
+    Received --> Paid: MarkPaid#40;#41; [grnId set]
 ```
 
 {{< tabs items="Go,Rust" >}}

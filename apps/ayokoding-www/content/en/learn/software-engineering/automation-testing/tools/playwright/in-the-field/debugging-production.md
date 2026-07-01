@@ -747,6 +747,8 @@ graph TB
         A -->|Generates| D[Trace]
         A -->|Logs| E[HAR File]
         A -->|Writes| F[Structured Logs]
+        B -.-> E
+        C -.-> F
     end
 
     subgraph "CI Artifact Collection"

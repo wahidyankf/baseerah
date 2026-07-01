@@ -5138,7 +5138,7 @@ circuits with a rejection response — composed with `Result.bind`. In Clojure, 
 higher-order functions that wrap the next handler, threading a request map through the chain.
 
 ```mermaid
-graph LR
+graph TD
     Req["Request"] --> H1["Auth<br/>middleware"]
     H1 -->|"Ok"| H2["RateLimit<br/>middleware"]
     H2 -->|"Ok"| H3["Business<br/>handler"]

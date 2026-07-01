@@ -418,7 +418,7 @@ public class HandlerChainDemo extends AbstractVerticle {
 JSON Web Tokens provide stateless authentication. Vert.x Web's `JWTAuthHandler` validates tokens and populates the routing context with the authenticated user.
 
 ```mermaid
-graph LR
+graph TD
   A["Client POST /auth/login"] --> B["JWTAuth.generateToken#40;#41;"]
   B --> C["Returns JWT Token"]
   C --> D["Client GET /api/resource<br/>Authorization: Bearer token"]
@@ -820,7 +820,7 @@ public class FileUploadVerticle extends AbstractVerticle {
 Vert.x HTTP servers support WebSocket upgrades. Upgraded connections remain open for bidirectional real-time communication without polling.
 
 ```mermaid
-graph LR
+graph TD
   A["Client"] -->|"HTTP Upgrade"| B["Vert.x HTTP Server"]
   B -->|"101 Switching Protocols"| A
   A <-->|"WebSocket Frames"| B

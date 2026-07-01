@@ -115,9 +115,9 @@ public class ZakatController {
 
 ```mermaid
 graph TD
-    A["File Saved: ZakatController.java"] -->|"File Watcher"| B["DevTools Detects Change"]
+    A["File Saved: ZakatController"] -->|"File Watcher"| B["DevTools Detects Change"]
     B -->|"Classpath Modified"| C["Determine Restart Strategy"]
-    C -->|"User Code Changed"| D["Restart Only 'restart' Classloader"]
+    C -->|"User Code Changed"| D["Restart 'restart' Classloader"]
     C -->|"Dependency Changed"| E["Full JVM Restart Required"]
 
     D -->|"Unload"| F["Unload User Classes"]

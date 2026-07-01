@@ -380,6 +380,7 @@ The Supplier FSM state gates which suppliers are selectable for new POs — a gu
 
 ```mermaid
 stateDiagram-v2
+    direction LR
     state "Supplier Eligibility" as Check {
         Pending --> Blocked: supplierEligibleForPO = false
         Approved --> Allowed: supplierEligibleForPO = true
@@ -2842,6 +2843,7 @@ A payment disbursement has two parallel concerns: the financial transfer and the
 
 ```mermaid
 stateDiagram-v2
+    direction LR
     [*] --> Disbursing
     state Disbursing {
         [*] --> Transferring
@@ -3174,7 +3176,7 @@ stateDiagram-v2
     }
 
     Memory --> Store: serialise() on each transition
-    Store --> Memory: deserialise() on process restart
+    Store --> Memory: deserialise() on restart
 
     classDef memory fill:#0173B2,stroke:#000,color:#fff
     classDef store fill:#029E73,stroke:#000,color:#fff
@@ -3731,6 +3733,7 @@ The `Payment` statechart uses all three statechart concepts: a hierarchical `Act
 
 ```mermaid
 stateDiagram-v2
+    direction LR
     [*] --> Active
     state Active {
         [H] --> Disbursing

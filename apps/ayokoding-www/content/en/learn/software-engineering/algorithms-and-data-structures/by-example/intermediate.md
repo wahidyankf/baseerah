@@ -411,7 +411,7 @@ A hash table maps keys to values using a hash function that converts each key in
 graph TD
     K1["Key: apple"] -->|hash mod 5 = 0| B0["Bucket 0: [(apple,1)]"]
     K2["Key: banana"] -->|hash mod 5 = 2| B2["Bucket 2: [(banana,2)]"]
-    K3["Key: cherry"] -->|hash mod 5 = 2| B2C["Bucket 2: [(banana,2),(cherry,3)]"]
+    K3["Key: cherry"] -->|hash mod 5 = 2| B2C["B2: [(banana,2),(cherry,3)]"]
 
     style K1 fill:#0173B2,stroke:#000,color:#fff
     style K2 fill:#DE8F05,stroke:#000,color:#fff
@@ -4335,7 +4335,7 @@ public class MaxSubarrayDC {
 Backtracking builds candidates incrementally and abandons ("backtracks") a candidate the moment it cannot lead to a valid solution. Generating all permutations is the canonical backtracking example.
 
 ```mermaid
-graph TD
+graph LR
     S["Start: []"]
     A["[1]"]
     B["[2]"]
@@ -5029,7 +5029,7 @@ public class ContainerMostWater {
 The sliding window technique maintains a contiguous subarray of fixed or variable size by advancing both ends of the window together. For fixed-size windows, one element leaves and one enters per step, avoiding O(n·k) recomputation.
 
 ```mermaid
-graph LR
+graph TD
     A["[2, 1, 5, 1, 3, 2]"]
     W1["Window 1: [2,1,5] sum=8"]
     W2["Window 2: [1,5,1] sum=7"]
@@ -5399,7 +5399,7 @@ A prefix sum array stores cumulative totals so that any range sum `sum(arr[l..r]
 graph LR
     A["arr: [2,4,3,7,1,5]"]
     P["prefix: [0,2,6,9,16,17,22]"]
-    Q["Query sum#40;2,4#41;: prefix#91;5#93;-prefix#91;2#93;=17-6=11"]
+    Q["Q: sum#40;2,4#41;=17-6=11"]
 
     A -->|build| P
     P -->|O#40;1#41; lookup| Q

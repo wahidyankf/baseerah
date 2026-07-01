@@ -609,7 +609,7 @@ echo '{"a":1,"b":{"c":2,"d":3}}' \
 Processing a GitHub API response to extract pull request data into a structured report.
 
 ```mermaid
-graph LR
+graph TD
     A["GitHub API JSON"]:::blue -->|".[]"| B["Each PR Object"]:::orange
     B -->|"select"| C["Open PRs Only"]:::teal
     C -->|"Object Construction"| D["Report Objects"]:::purple

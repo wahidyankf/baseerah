@@ -487,14 +487,20 @@ graph TD
     A[Manual Transaction<br/>commit/rollback] -->|60+ Lines| B[Boilerplate]
     A -->|Manual Boundaries| C[Error-Prone]
     A -->|No Composition| D[No Propagation]
+    B --- C
+    C --- D
 
     E[@Transactional<br/>Declarative] -->|10 Lines| F[Automatic]
     E -->|Exception-Driven| G[Safe Rollback]
     E -->|Propagation Modes| H[Composable]
+    F --- G
+    G --- H
 
     I[Advanced @Transactional<br/>Isolation + Rollback] -->|SERIALIZABLE| J[Financial Accuracy]
     I -->|rollbackFor| K[Fine-Grained Control]
     I -->|REQUIRES_NEW| L[Independent Commits]
+    J --- K
+    K --- L
 
     style A fill:#DE8F05,stroke:#333,stroke-width:2px,color:#fff
     style E fill:#029E73,stroke:#333,stroke-width:2px,color:#fff

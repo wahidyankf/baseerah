@@ -383,7 +383,7 @@ TOTAL LIABILITIES + EQUITY        $35,000,000
 ### Financial Statement Relationships
 
 ```mermaid
-flowchart TD
+flowchart LR
  IS[Income Statement<br/>Shows: Profitability] --> NI[Net Income]
 
  BS[Balance Sheet<br/>Shows: Financial Position] --> Assets[Assets: $35M]
@@ -558,7 +558,7 @@ flowchart TD
 ### Ratio Analysis Summary
 
 ```mermaid
-flowchart TD
+flowchart LR
  subgraph "Profitability"
   ROA[ROA: 16.07%<br/>Good]
   ROE[ROE: 28.13%<br/>Excellent]

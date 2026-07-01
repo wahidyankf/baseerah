@@ -37,7 +37,7 @@ By the end of this tutorial, you will have touchpoints for:
 ## Learning Path
 
 ```mermaid
-graph TD
+graph LR
     A[Quick Start: Clojure] --> B[Data Structures]
     A --> C[Functions]
     A --> D[Immutability]

@@ -420,7 +420,7 @@ test.describe("User Registration", () => {
 ## Database State Progression Diagram
 
 ```mermaid
-graph TD
+graph LR
     A["Standard Library:<br/>Manual SQL Cleanup"] -->|"Race Conditions"| B["Failed Tests<br/>Data Corruption"]
     A -->|"Manual DELETE"| C["Missed Cleanup<br/>Orphaned Data"]
 

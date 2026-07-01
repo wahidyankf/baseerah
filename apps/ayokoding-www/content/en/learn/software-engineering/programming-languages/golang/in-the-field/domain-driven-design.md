@@ -25,7 +25,7 @@ Domain-Driven Design (DDD) structures complex business domains through explicit 
 ## DDD Building Blocks and Boundaries
 
 ```mermaid
-graph TD
+graph LR
     subgraph Aggregate1["Portfolio Aggregate (Consistency Boundary)"]
         direction TB
         PortfolioRoot["Portfolio<br/>(Aggregate Root)"]

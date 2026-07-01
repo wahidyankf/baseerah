@@ -3223,7 +3223,7 @@ Using cascade notation to perform multiple operations on the same object without
 - **Return value**: Returns target object, not last operation result
 
 ```mermaid
-flowchart LR
+flowchart TD
     Create["Donation()"] -->|..setDonor| A[donor = 'Ahmad']
     A -->|..setAmount| B[amount = 500.0]
     B -->|..setCategory| C[category = 'Zakat']

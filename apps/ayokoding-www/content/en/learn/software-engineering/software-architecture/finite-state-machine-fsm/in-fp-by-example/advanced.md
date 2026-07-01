@@ -348,6 +348,7 @@ The Supplier FSM state gates which suppliers are selectable for new POs — a gu
 
 ```mermaid
 stateDiagram-v2
+    direction LR
     state "Supplier Eligibility" as Check {
         Pending --> Blocked: supplierEligibleForPO = false
         Approved --> Allowed: supplierEligibleForPO = true

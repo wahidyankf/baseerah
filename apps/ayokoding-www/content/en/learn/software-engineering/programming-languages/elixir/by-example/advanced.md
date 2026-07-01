@@ -3902,7 +3902,7 @@ Comprehensions generate collections from enumerables with filtering and transfor
 
 ```mermaid
 graph TD
-    Input["Input: #91;1, 2, 3, 4, 5, 6#93;"] --> Generator["Generator: x from list"]
+    Input["Input: #91;1,2,3,4,5,6#93;"] --> Generator["Generator: x from list"]
     Generator --> Filter1["Filter 1: rem#40;x, 2#41; == 0"]
     Filter1 --> Filter2["Filter 2: x greater than 2"]
     Filter2 --> Transform["Transform: x * 2"]
@@ -3922,9 +3922,9 @@ graph TD
 graph TD
     G1["Element 1: fails filter 1"] --> G2["Element 2: fails filter 2"]
     G2 --> G3["Element 3: fails filter 1"]
-    G3 --> G4["Element 4: passes both, 4*2 = 8"]
+    G3 --> G4["Element 4: passes, 4*2=8"]
     G4 --> G5["Element 5: fails filter 1"]
-    G5 --> G6["Element 6: passes both, 6*2 = 12"]
+    G5 --> G6["Element 6: passes, 6*2=12"]
 
     style G1 fill:#CC78BC,color:#fff
     style G2 fill:#CC78BC,color:#fff
@@ -4042,9 +4042,9 @@ Bitstrings enable binary pattern matching with precise control over bit sizes an
 
 ```mermaid
 graph TD
-    Binary["Binary: #60;#60;1, 2, 3, 4#62;#62;"] --> Match["Pattern Match"]
-    Match --> Parts["Pattern: #60;#60;a::8, b::8, rest::binary#62;#62;"]
-    Parts --> Values["Result: a=1, b=2, rest=#60;#60;3,4#62;#62;"]
+    Binary["Binary #60;#60;1,2,3,4#62;#62;"] --> Match["Pattern Match"]
+    Match --> Parts["Pattern #60;a::8,b::8,rest#62;"]
+    Parts --> Values["a=1,b=2,rest=#60;3,4#62;"]
 
     style Binary fill:#0173B2,color:#fff
     style Match fill:#DE8F05,color:#fff
@@ -4055,7 +4055,7 @@ graph TD
 **Type Specifiers**:
 
 ```mermaid
-graph TD
+graph LR
     Format["Type Specifiers"] --> Int["integer #40;default#41;"]
     Format --> Float["float"]
     Format --> Bin["binary"]

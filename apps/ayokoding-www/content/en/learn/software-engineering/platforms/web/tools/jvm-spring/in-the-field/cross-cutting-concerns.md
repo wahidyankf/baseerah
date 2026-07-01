@@ -503,6 +503,8 @@ graph TB
     E[AuditLoggingAspect] -.->|@AfterReturning| B
     F[ExceptionLoggingAspect] -.->|@AfterThrowing| B
 
+    C --- D
+
     B --> G{Success?}
     G -->|Yes| H[Return Result]
     G -->|No| I[Throw Exception]

@@ -126,15 +126,15 @@ zakat:
 
 ```mermaid
 graph TD
-    A["Application Requests Property: spring.datasource.url"] -->|"Search Priority Order"| B["1. Command-line Args"]
+    A["Request: spring.datasource.url"] -->|"Search Priority Order"| B["1. Command-line Args"]
     B -->|"Not found"| C["2. Environment Variables"]
     C -->|"Not found"| D["3. application-{profile}.yml"]
     D -->|"Not found"| E["4. application.yml"]
-    E -->|"Found"| F["Return: jdbc:postgresql://localhost:5432/zakat_db"]
+    E -->|"Found"| F["localhost:5432/zakat_db"]
 
-    G["Production Deployment"] -->|"Sets"| H["Environment Variable: DB_HOST=rds.amazonaws.com"]
+    G["Production Deployment"] -->|"Sets"| H["DB_HOST=rds.amazonaws.com"]
     H -->|"Overrides"| E
-    E -->|"Resolved"| I["jdbc:postgresql://rds.amazonaws.com:5432/zakat_db"]
+    E -->|"Resolved"| I["rds.amazonaws.com/zakat_db"]
 
     style B fill:#DE8F05,color:#fff
     style C fill:#DE8F05,color:#fff
