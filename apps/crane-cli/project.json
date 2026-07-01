@@ -18,6 +18,7 @@
       "options": {
         "command": "dotnet build apps/crane-cli/crane-cli.fsproj"
       },
+      "dependsOn": ["^typecheck"],
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.fs", "{projectRoot}/crane-cli.fsproj"]
     },
