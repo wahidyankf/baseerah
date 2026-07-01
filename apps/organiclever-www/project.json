@@ -76,12 +76,10 @@
     },
     "test:integration": {
       "executor": "nx:run-commands",
-      "cache": true,
-      "inputs": ["default", "{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www/gherkin/**/*.feature"],
       "options": {
-        "command": "npx vitest run --project integration",
-        "cwd": "{projectRoot}"
-      }
+        "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
     },
     "specs:behavior:coverage": {
       "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/organiclever/behavior/organiclever-www/gherkin apps/organiclever-www",

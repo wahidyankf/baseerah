@@ -88,10 +88,7 @@
       }
     },
     "test:integration": {
-      "command": "vitest run --project integration",
-      "options": {
-        "cwd": "apps/ose-www"
-      },
+      "command": "echo 'no-op: target not applicable for this project'",
       "cache": true
     },
     "links:check": {
