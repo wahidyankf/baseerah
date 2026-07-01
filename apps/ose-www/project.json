@@ -81,7 +81,8 @@
           "npx nx run ose-www:typecheck",
           "npx nx run ose-www:lint",
           "npx nx run ose-www:test:unit",
-          "npx nx run ose-www:test:coverage"
+          "npx nx run ose-www:test:coverage",
+          "npx nx run ose-www:test:specs"
         ],
         "parallel": false
       }
@@ -132,6 +133,22 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
+      },
+      "cache": true
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["npx nx run ose-www:specs:structure-validation", "npx nx run ose-www:specs:behavior:coverage"],
+        "parallel": false
       },
       "cache": true
     }

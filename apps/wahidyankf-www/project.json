@@ -68,7 +68,8 @@
           "npx nx run wahidyankf-www:typecheck",
           "npx nx run wahidyankf-www:lint",
           "npx nx run wahidyankf-www:test:unit",
-          "npx nx run wahidyankf-www:test:coverage"
+          "npx nx run wahidyankf-www:test:coverage",
+          "npx nx run wahidyankf-www:test:specs"
         ],
         "parallel": false
       }
@@ -108,6 +109,25 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'compat:min-version: no standard min-version floor for TypeScript'"
+      },
+      "cache": true
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run wahidyankf-www:specs:structure-validation",
+          "npx nx run wahidyankf-www:specs:behavior:coverage"
+        ],
+        "parallel": false
       },
       "cache": true
     }

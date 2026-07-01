@@ -94,7 +94,8 @@
           "npx nx run ose-cli:typecheck",
           "npx nx run ose-cli:lint",
           "npx nx run ose-cli:test:unit",
-          "npx nx run ose-cli:test:coverage"
+          "npx nx run ose-cli:test:coverage",
+          "npx nx run ose-cli:test:specs"
         ],
         "parallel": false
       },
@@ -111,7 +112,7 @@
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'Phase 0 \u2014 specs:coverage stubbed; cucumber harness is future work'"
+        "command": "echo 'Phase 0 — specs:coverage stubbed; cucumber harness is future work'"
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs"]
@@ -120,6 +121,22 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'no-op: target not applicable for this project'"
+      },
+      "cache": true
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["npx nx run ose-cli:specs:structure-validation", "npx nx run ose-cli:specs:behavior:coverage"],
+        "parallel": false
       },
       "cache": true
     }

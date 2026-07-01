@@ -94,10 +94,12 @@
           "npx nx run crane-cli:typecheck",
           "npx nx run crane-cli:lint",
           "npx nx run crane-cli:test:unit",
-          "npx nx run crane-cli:test:coverage"
+          "npx nx run crane-cli:test:coverage",
+          "npx nx run crane-cli:test:specs"
         ],
         "parallel": false
       },
+      "dependsOn": ["typecheck", "lint"],
       "cache": true
     },
     "test:integration": {
@@ -136,6 +138,22 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'compat:min-version: no standard min-version floor for F#'"
+      },
+      "cache": true
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["npx nx run crane-cli:specs:structure-validation", "npx nx run crane-cli:specs:behavior:coverage"],
+        "parallel": false
       },
       "cache": true
     }

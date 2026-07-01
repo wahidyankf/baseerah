@@ -57,7 +57,14 @@
     "test:quick": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx nx run organiclever-contracts:lint"
+        "commands": [
+          "npx nx run organiclever-contracts:typecheck",
+          "npx nx run organiclever-contracts:lint",
+          "npx nx run organiclever-contracts:test:unit",
+          "npx nx run organiclever-contracts:test:coverage",
+          "npx nx run organiclever-contracts:test:specs"
+        ],
+        "parallel": false
       },
       "cache": true
     },
@@ -72,6 +79,31 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "echo 'compat:min-version: no standard min-version floor'"
+      },
+      "cache": true
+    },
+    "specs:behavior:coverage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'specs:behavior:coverage: no Gherkin behavior specs for this OpenAPI contract project (echo placeholder)'"
+      }
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/apps/rhino-cli/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run organiclever-contracts:specs:structure-validation",
+          "npx nx run organiclever-contracts:specs:behavior:coverage"
+        ],
+        "parallel": false
       },
       "cache": true
     }
