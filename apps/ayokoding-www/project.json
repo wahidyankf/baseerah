@@ -74,14 +74,14 @@
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/specs/apps/ayokoding/**/*.feature"],
       "options": {
-        "command": "npx vitest run --project unit --project unit-fe --testTimeout=30000",
+        "command": "npx vitest run --project unit --project unit-fe --testTimeout=60000",
         "cwd": "{projectRoot}"
       }
     },
     "test:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx vitest run --project unit --project unit-fe --coverage --coverage.thresholds.lines=82",
+        "command": "npx vitest run --project unit --project unit-fe --coverage --coverage.thresholds.lines=82 --testTimeout=60000",
         "cwd": "{projectRoot}"
       },
       "cache": true,

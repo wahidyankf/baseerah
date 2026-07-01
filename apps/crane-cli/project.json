@@ -159,5 +159,5 @@
     }
   },
   "tags": ["type:app", "platform:cli", "lang:fsharp", "domain:crane"],
-  "implicitDependencies": []
+  "implicitDependencies": ["fsharp-crane-core"]
 }
