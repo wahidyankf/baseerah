@@ -147,7 +147,9 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
-      - run: npx nx affected -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust'
+      # --parallel=2: see main-ci.yml's identical flag on the run-many equivalent — bounds peak
+      # memory when many TS projects are affected at once (e.g. a shared-lib change).
+      - run: npx nx affected -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust' --parallel=2
 
   dotnet:
     name: .NET quality gate

@@ -56,7 +56,11 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
-      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust'
+      # --parallel=2: nx's default parallelism runs enough concurrent Vitest/Next.js workers
+      # across ~25 TS projects to exceed the hosted runner's memory, SIGKILLing the process
+      # mid-test-run (no error output, exit code 1) — reproduced 100% of the time at the same
+      # spot in ayokoding-www's heaviest suite; capping concurrency keeps peak memory in bounds.
+      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust' --parallel=2
 
   dotnet:
     name: .NET quality gate (all projects)
