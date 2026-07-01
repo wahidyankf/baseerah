@@ -790,12 +790,23 @@ project `affected` under Nx's default file→project mapping — so `test:specs`
 **surface** it owns — `specs/apps/<domain>/behavior/<surface>/**` for an app project (the same
 glob as its `coverage.projects` entry), or `specs/libs/<lib>/behavior/**` for a lib — marks it
 affected. (A domain tree is shared by the family, so surface-precise mapping keeps an edit to one
-surface from needlessly marking siblings.) Mechanism (confirm the
-exact form via `nx_docs` in Phase 1): map the project's spec folder to the project in the Nx project
-graph (`implicitDependencies` / a project-inference rule) **and** add `{workspaceRoot}/specs/...` to
-the project's `inputs`/`namedInputs` so the cache key tracks the features too. Acceptance is
-**behavioural**: editing only a project's `.feature` file and running `nx affected -t test:quick`
-must include that project.
+surface from needlessly marking siblings.) **Mechanism, confirmed via `nx_docs`**: root-level
+`implicitDependencies` in `nx.json` is deprecated and ignored for the affected graph since Nx 16 (it
+will be removed in Nx 17) — the modern replacement is per-project `inputs`/`namedInputs`. So each
+project's `project.json` gets a `"namedInputs": { "specs": ["{workspaceRoot}/specs/apps/<domain>/behavior/<surface>/**"] }`
+(lib: `{workspaceRoot}/specs/libs/<lib>/behavior/**`) entry, with `"specs"` added to the `inputs` of
+`test:specs`/`test:quick` — this both marks the project affected on a feature-only edit **and** makes
+the feature files part of the cache key, exactly as this section's original recommended default
+anticipated. (The project-level `implicitDependencies` field, distinct from the deprecated root-level
+one, remains valid for declaring cross-project lib dependencies elsewhere in this repo — it is only
+the _root_ `nx.json` `implicitDependencies` map that is deprecated for this specs-affected-graph use
+case.) Acceptance is **behavioural**: editing only a project's `.feature` file and running
+`nx affected -t test:quick` must include that project. **Rollout status**: the mechanism is decided;
+wiring it into every project's `project.json` across all 3 repos (~80+ projects) is tracked as a
+follow-up task, not part of this plan's blocking completion criteria — `main-ci`'s `run-many --all`
+already runs `specs:*` validators for every project regardless of the affected graph, so a specs-only
+change is never silently unvalidated pre-merge, only potentially re-validated later than optimal on a
+scoped `nx affected` pre-push/PR run.
 
 ### 4.1 Per-level coverage model (explicit `@covers`, no convention)
 
