@@ -13,7 +13,7 @@ created: 2026-06-30
 
 # SDLC Gate Standard
 
-> Source of truth: [`tech-docs.md`](../../plans/in-progress/standardize-rhino-cli-sdlc-parity/tech-docs.md)
+> Source of truth: [`tech-docs.md`](../../plans/done/2026-07-01__standardize-rhino-cli-sdlc-parity/tech-docs.md)
 
 This document defines the target standard for SDLC gate mechanics across all three OSE repositories:
 `ose-public`, `ose-primer`, and `ose-infra`. **Identical gate mechanics** means the same check set,
