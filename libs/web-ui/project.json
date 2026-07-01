@@ -42,7 +42,8 @@
           "npx nx run web-ui:typecheck",
           "npx nx run web-ui:lint",
           "npx nx run web-ui:test:unit",
-          "npx nx run web-ui:test:coverage"
+          "npx nx run web-ui:test:coverage",
+          "npx nx run web-ui:test:specs"
         ],
         "parallel": false
       }
@@ -84,12 +85,30 @@
       },
       "cache": true
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "echo 'Phase 0 — specs:coverage stubbed; web-ui scenario @covers-tag gaps land in Phase 1'"
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui/behavior/gherkin/**/*.feature", "{projectRoot}/src/**/*.{ts,tsx}"]
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs counts validate specs/libs/web-ui"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["npx nx run web-ui:specs:structure-validation", "npx nx run web-ui:specs:behavior:coverage"],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui/**/*", "{projectRoot}/src/**/*.{ts,tsx}"]
     },
     "deps:audit": {
       "executor": "nx:run-commands",

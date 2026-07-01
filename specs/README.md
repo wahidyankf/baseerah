@@ -37,6 +37,9 @@ Acceptance specs belong at the monorepo root rather than inside app directories 
 
 - **[golang-commons](./libs/golang-commons/)** — Shared Go utility specifications
 - **[web-ui](./libs/web-ui/)** — Shared web UI component specifications
+- **[web-ui-token](./libs/web-ui-token/)** — Shared design-token package specifications
+- **[rust-commons](./libs/rust-commons/)** — Shared Rust utility crate specifications
+- **[fsharp-crane-core](./libs/fsharp-crane-core/)** — Shared F# PDF-to-Markdown domain/logic core specifications
 
 ## Standard Folder Pattern
 

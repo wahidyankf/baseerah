@@ -80,18 +80,44 @@
           "npx nx run fsharp-crane-core:typecheck",
           "npx nx run fsharp-crane-core:lint",
           "npx nx run fsharp-crane-core:test:unit",
-          "npx nx run fsharp-crane-core:test:coverage"
+          "npx nx run fsharp-crane-core:test:coverage",
+          "npx nx run fsharp-crane-core:test:specs"
         ],
         "parallel": false
       },
+      "dependsOn": ["typecheck", "lint"],
       "cache": true
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'specs:coverage: not applicable for a library'"
+        "command": "echo 'Phase 0 — specs:coverage stubbed; fsharp-crane-core scenario @covers-tag gaps land in Phase 1'"
       },
-      "cache": true
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/specs/libs/fsharp-crane-core/behavior/gherkin/**/*.feature",
+        "{projectRoot}/src/**/*.fs"
+      ]
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs counts validate specs/libs/fsharp-crane-core"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/fsharp-crane-core/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run fsharp-crane-core:specs:structure-validation",
+          "npx nx run fsharp-crane-core:specs:behavior:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/fsharp-crane-core/**/*", "{projectRoot}/src/**/*.fs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",

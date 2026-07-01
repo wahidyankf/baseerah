@@ -44,12 +44,33 @@
       },
       "cache": true
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'no-op: target not applicable for this project'"
+        "command": "echo 'Phase 0 — specs:coverage stubbed; web-ui-token scenario @covers-tag gaps land in Phase 1'"
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui-token/behavior/gherkin/**/*.feature", "{projectRoot}/src/**/*"]
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs counts validate specs/libs/web-ui-token"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui-token/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run web-ui-token:specs:structure-validation",
+          "npx nx run web-ui-token:specs:behavior:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui-token/**/*", "{projectRoot}/src/**/*"]
     },
     "test:quick": {
       "executor": "nx:run-commands",
@@ -58,7 +79,8 @@
           "npx nx run web-ui-token:typecheck",
           "npx nx run web-ui-token:lint",
           "npx nx run web-ui-token:test:unit",
-          "npx nx run web-ui-token:test:coverage"
+          "npx nx run web-ui-token:test:coverage",
+          "npx nx run web-ui-token:test:specs"
         ],
         "parallel": false
       },

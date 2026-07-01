@@ -582,7 +582,7 @@ covering WCAG AA compliance. These tests verify:
 **Gherkin accessibility specs**: UI projects must have an `accessibility.feature` file under a
 domain subdirectory in `specs/apps/<domain>/fe/gherkin/` (e.g., `accessibility/accessibility.feature`
 or `layout/accessibility.feature`). UI component library specs in
-`specs/libs/web-ui/gherkin/<component>/` must include "Has no accessibility violations" scenarios for
+`specs/libs/web-ui/behavior/gherkin/<component>/` must include "Has no accessibility violations" scenarios for
 each component.
 
 ## Workspace-Level Defaults

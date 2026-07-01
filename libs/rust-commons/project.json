@@ -72,19 +72,40 @@
           "npx nx run rust-commons:typecheck",
           "npx nx run rust-commons:lint",
           "npx nx run rust-commons:test:unit",
-          "npx nx run rust-commons:test:coverage"
+          "npx nx run rust-commons:test:coverage",
+          "npx nx run rust-commons:test:specs"
         ],
         "parallel": false
       },
       "cache": true
     },
-    "specs:coverage": {
+    "specs:behavior:coverage": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo 'specs:coverage not applicable for library crate rust-commons'"
+        "command": "echo 'Phase 0 — specs:coverage stubbed; rust-commons scenario @covers-tag gaps land in Phase 1'"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/src/**/*.rs"]
+      "inputs": ["{workspaceRoot}/specs/libs/rust-commons/behavior/gherkin/**/*.feature", "{projectRoot}/src/**/*.rs"]
+    },
+    "specs:structure-validation": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs counts validate specs/libs/rust-commons"
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/rust-commons/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "npx nx run rust-commons:specs:structure-validation",
+          "npx nx run rust-commons:specs:behavior:coverage"
+        ],
+        "parallel": false
+      },
+      "cache": true,
+      "inputs": ["{workspaceRoot}/specs/libs/rust-commons/**/*", "{projectRoot}/src/**/*.rs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",
