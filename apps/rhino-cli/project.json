@@ -10,7 +10,7 @@
       "options": {
         "command": "cargo build --release --manifest-path apps/rhino-cli/Cargo.toml && mkdir -p apps/rhino-cli/dist && cp apps/rhino-cli/target/release/rhino-cli apps/rhino-cli/dist/rhino-cli"
       },
-      "outputs": ["{projectRoot}/dist", "{projectRoot}/target"]
+      "outputs": ["{projectRoot}/dist"]
     },
     "install": {
       "executor": "nx:run-commands",
