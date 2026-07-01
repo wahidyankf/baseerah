@@ -26,6 +26,7 @@ use walkdir::WalkDir;
 const FULL_REPO_SKIP_DIRS: &[&str] = &[
     "node_modules",
     "dist",
+    "build",
     "target",
     ".next",
     "coverage",
@@ -38,6 +39,9 @@ const FULL_REPO_SKIP_DIRS: &[&str] = &[
     "generated-contracts",
     ".nx",
     ".git",
+    "deps",
+    "_build",
+    "cover",
 ];
 
 /// A relative markdown link that could not be resolved to an existing file.
@@ -625,7 +629,7 @@ pub fn format_link_text(result: &LinkValidationResult, _verbose: bool, quiet: bo
     let mut output = String::new();
     if result.broken_links.is_empty() {
         if !quiet {
-            output.push_str("✓ All links valid! No broken links found.\n");
+            output.push_str("All links valid! No broken links found.\n");
         }
         return output;
     }
@@ -1150,13 +1154,15 @@ mod tests {
     }
 
     /// (d2) Emoji heading: slug preserves leading hyphen that results from emoji stripping,
-    /// matching GitHub's actual behavior (e.g. `## 📜 WCAG Standards` → `-wcag-standards`).
+    /// matching GitHub's actual behavior (e.g. a heading starting with a leading pictograph
+    /// becomes a leading hyphen in the slug).
     #[test]
     fn github_slug_emoji_heading_preserves_leading_hyphen() {
         // GitHub strips the emoji (non-alphanumeric/space/hyphen) leaving a leading space,
         // which becomes a leading hyphen. GitHub keeps it; our slug must match.
-        assert_eq!(github_slug("📜 WCAG Standards"), "-wcag-standards");
-        assert_eq!(github_slug("🔒 Security"), "-security");
+        // Unicode escapes (not literal glyphs) per the source-code no-emoji convention.
+        assert_eq!(github_slug("\u{1F4DC} WCAG Standards"), "-wcag-standards");
+        assert_eq!(github_slug("\u{1F512} Security"), "-security");
         // Non-emoji headings must not regress.
         assert_eq!(github_slug("WCAG Standards"), "wcag-standards");
         assert_eq!(github_slug("Setup"), "setup");
