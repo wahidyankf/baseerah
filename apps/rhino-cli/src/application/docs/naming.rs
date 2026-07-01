@@ -3,9 +3,9 @@
 //! Byte-for-byte port of `apps/rhino-cli/internal/docs/naming.go`.
 //!
 //! Enforces the lowercase-kebab-case filename rule (`^[a-z0-9-]+\.md$`) for
-//! every `.md` file found under the supplied root paths.  `README.md` is
-//! always exempt, and callers may supply additional glob patterns to exclude
-//! further filenames.
+//! every `.md` file found under the supplied root paths.  `README.md` and
+//! `SKILL.md` are always exempt, and callers may supply additional glob
+//! patterns to exclude further filenames.
 
 use std::path::Path;
 use std::sync::OnceLock;
@@ -112,9 +112,12 @@ fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFindin
 
 /// Returns `true` when `basename` should be skipped during naming validation.
 ///
-/// `README.md` is always exempt.  Additional exemptions are matched via `exempt_globs`.
+/// `README.md` and `SKILL.md` are always exempt (both are fixed filenames dictated by an
+/// external convention — GitHub-style directory indexes and the Claude Code Agent Skills
+/// spec, respectively — not a naming choice this repo's kebab-case rule governs). Additional
+/// exemptions are matched via `exempt_globs`.
 fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
-    if basename == "README.md" {
+    if basename == "README.md" || basename == "SKILL.md" {
         return true;
     }
     for pat in exempt_globs {
@@ -166,6 +169,18 @@ mod tests {
     fn readme_always_exempt() {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("README.md"), "x").unwrap();
+        let findings =
+            validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    /// Verifies that `SKILL.md` is always exempt from the naming convention.
+    #[test]
+    fn skill_md_always_exempt() {
+        let tmp = TempDir::new().unwrap();
+        let skill_dir = tmp.path().join("some-skill");
+        fs::create_dir_all(&skill_dir).unwrap();
+        fs::write(skill_dir.join("SKILL.md"), "x").unwrap();
         let findings =
             validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());

@@ -87,94 +87,12 @@ All Playwright tests MUST follow the platform testing standards:
 
 ## Testing Patterns
 
-### Page Object Model
-
-Always use Page Object Model for test organization:
-
-```typescript
-// page-objects/pages/LoginPage.ts
-import { Page, Locator } from "@playwright/test";
-
-export class LoginPage {
-  readonly page: Page;
-  readonly emailInput: Locator;
-  readonly passwordInput: Locator;
-  readonly submitButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.emailInput = page.getByRole("textbox", { name: "Email" });
-    this.passwordInput = page.getByRole("textbox", { name: "Password" });
-    this.submitButton = page.getByRole("button", { name: "Sign in" });
-  }
-
-  async goto() {
-    await this.page.goto("/login");
-  }
-
-  async login(email: string, password: string) {
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.submitButton.click();
-  }
-}
-```
-
-### Test Structure
-
-Follow consistent test structure:
-
-```typescript
-// tests/e2e/auth/login.spec.ts
-import { test, expect } from "@playwright/test";
-import { LoginPage } from "../../page-objects/pages/LoginPage";
-
-test.describe("Login", () => {
-  test("successful login redirects to dashboard", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login("user@example.com", "password123");
-
-    await expect(page).toHaveURL("/dashboard");
-  });
-
-  test("invalid credentials show error", async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login("wrong@example.com", "wrongpass");
-
-    await expect(page.getByRole("alert")).toContainText("Invalid credentials");
-  });
-});
-```
-
-### OSE Platform Context
-
-Test Islamic finance features with domain context:
-
-```typescript
-test("zakat calculator computes correctly", async ({ page }) => {
-  await page.goto("/zakat-calculator");
-  await page.getByLabel("Wealth Amount").fill("100000");
-  await page.getByRole("button", { name: "Calculate" }).click();
-
-  // Verify 2.5% calculation
-  await expect(page.getByTestId("zakat-amount")).toHaveText("RM 2,500.00");
-});
-
-test("murabaha contract creation workflow", async ({ page }) => {
-  const murabaha = new MurabahaPage(page);
-  await murabaha.goto();
-  await murabaha.createContract({
-    asset: "Vehicle",
-    cost: 50000,
-    profitRate: 5,
-  });
-
-  await expect(page.getByText("Contract Created")).toBeVisible();
-  await expect(page.getByTestId("total-payment")).toContainText("52,500");
-});
-```
+Always use Page Object Model for test organization, and follow consistent test-file structure
+(`tests/e2e/<domain>/<flow>.spec.ts` importing its page object). For the canonical `LoginPage`
+class, its usage in a `login.spec.ts` test, and the zakat-calculator / murabaha-contract Islamic
+finance domain examples, see the
+[swe-developing-e2e-test-with-playwright skill's Page Object Model and OSE Platform Context sections](../skills/swe-developing-e2e-test-with-playwright/SKILL.md#page-object-model) —
+that skill is the single source of truth for these worked examples; do not re-derive them.
 
 ## Reference Documentation
 

@@ -10,6 +10,7 @@ npx nx affected -t compat:min-version --parallel="$PARALLEL"
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
 
 # Naming validators — scoped to pushes that touch the relevant trees.
 # Upstream may be missing on first push of a branch; default to empty range in that case.

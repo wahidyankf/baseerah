@@ -237,20 +237,11 @@ When plan-checker reports missing operational readiness items (Step 5b findings)
 
 ### 1. Missing Local Quality Gates
 
-Add a delivery checklist section before the final push step:
-
-```markdown
-### Local Quality Gates (Before Push)
-
-- [ ] Run affected typecheck: `nx affected -t typecheck`
-- [ ] Run affected linting: `nx affected -t lint`
-- [ ] Run affected quick tests: `nx affected -t test:quick`
-- [ ] Run affected spec coverage: `nx affected -t specs:coverage`
-- [ ] Fix ALL failures found — including preexisting issues not caused by your changes
-- [ ] Verify all checks pass before pushing
-```
-
-Adapt the specific targets to what the plan's affected projects require (e.g., add `test:integration` or `test:e2e` if the plan scope warrants it).
+Add a delivery checklist section before the final push step, inserting the canonical
+`### Local Quality Gates (Before Push)` template from the
+[plan-creating-project-plans skill's Operational Readiness section](../skills/plan-creating-project-plans/SKILL.md#operational-readiness-mandatory-delivery-sections) —
+adapt the specific targets to what the plan's affected projects require (e.g., add
+`test:integration` or `test:e2e` if the plan scope warrants it).
 
 ### 2. Missing Post-Push CI/CD Steps
 
@@ -528,25 +519,12 @@ When plan-checker reports a missing or malformed `## Worktree` section (Step 5d 
 
 ### How to Fix Missing `## Worktree` Section
 
-**Multi-file plans** — insert into `delivery.md` before the first phase heading:
-
-````markdown
-## Worktree
-
-Worktree path: `worktrees/<plan-identifier>/`
-
-Optional manual pre-provisioning (run from repo root):
-
-```bash
-claude --worktree <plan-identifier>
-```
-
-The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting the worktree after the plan is archived and pushed.
-
-See [Worktree Path Convention](../../repo-governance/conventions/structure/worktree-path.md) and [Plans Organization Convention §Worktree Specification](../../repo-governance/conventions/structure/plans.md#worktree-specification).
-````
-
-**Single-file plans** — insert into `README.md` before the `## Delivery Checklist` heading using the same template as above.
+**Multi-file plans** — insert into `delivery.md` before the first phase heading. **Single-file
+plans** — insert into `README.md` before the `## Delivery Checklist` heading. In both cases, insert
+the verbatim `## Worktree` template (path declaration, optional `claude --worktree <plan-identifier>`
+pre-provisioning block, and the Step-0-gate note) from the
+[plan-creating-project-plans skill's Worktree Specification section](../skills/plan-creating-project-plans/SKILL.md#worktree-specification-mandatory--applies-to-all-plans) —
+that section is the single source of truth for the exact wording; do not paraphrase it.
 
 **Deriving `<plan-identifier>`**: strip the date prefix from the plan-folder name. Examples:
 
@@ -587,46 +565,10 @@ For each offending checkbox, derive the missing elements:
 
 ### Rewrite Examples
 
-**Bad** (HIGH finding):
-
-```markdown
-- [ ] Add caching
-```
-
-**Good** (rewrite):
-
-```markdown
-- [ ] Edit `apps/ose-www/src/server/trpc.ts`: wrap the public router with
-      `unstable_cache(..., { revalidate: 300 })`. Verify by running
-      `npx nx run ose-web:test:quick` — all tests pass.
-```
-
-**Bad**:
-
-```markdown
-- [ ] Implement the rate-limit middleware
-```
-
-**Good**:
-
-```markdown
-- [ ] Create `apps/organiclever-be/src/Middleware/RateLimit.fs` (siblings: `Auth.fs`, `Cors.fs`)
-      implementing token-bucket rate limiting per the spec in `tech-docs.md §Rate Limiting`.
-      Verify by running `npx nx run organiclever-be:test:unit` — new test
-      `RateLimit_RejectsExceedingRequests` passes.
-```
-
-**Bad**:
-
-```markdown
-- [ ] Run the lint
-```
-
-**Good**:
-
-```markdown
-- [ ] Run `npx nx affected -t lint` — exits 0 with no errors reported.
-```
+See the [plan-creating-project-plans skill's Bad / Good Examples](../skills/plan-creating-project-plans/SKILL.md#bad--good-examples)
+for the three canonical before/after pairs (caching, middleware, lint) — apply the same
+transformation shape (add file path + verbatim command + observable acceptance criterion) to the
+offending checkbox.
 
 After rewriting, re-read the checkbox and confirm a sonnet-tier agent could execute it without consulting any other section of the plan. If the rewrite still requires lookups, repeat until the checkbox is self-contained.
 

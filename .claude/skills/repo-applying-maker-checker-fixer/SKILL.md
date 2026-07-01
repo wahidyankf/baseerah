@@ -114,62 +114,14 @@ Final Step: Finalize Report
 
 **Step 0: Initialize Report File**
 
-**CRITICAL FIRST STEP - Execute before any validation begins:**
-
-```bash
-# 1. Generate 6-char UUID
-MY_UUID=$(uuidgen | tr '[:upper:]' '[:lower:]' | head -c 6)
-
-# 2. Determine UUID chain (scope-based)
-SCOPE="${EXECUTION_SCOPE:-agent-family}"
-CHAIN_FILE="generated-reports/.execution-chain-${SCOPE}"
-
-if [ -f "$CHAIN_FILE" ]; then
-  read PARENT_TIME PARENT_CHAIN < "$CHAIN_FILE"
-  CURRENT_TIME=$(date +%s)
-  TIME_DIFF=$((CURRENT_TIME - PARENT_TIME))
-
-  if [ $TIME_DIFF -lt 300 ]; then
-    UUID_CHAIN="${PARENT_CHAIN}_${MY_UUID}"
-  else
-    UUID_CHAIN="$MY_UUID"
-  fi
-else
-  UUID_CHAIN="$MY_UUID"
-fi
-
-echo "$(date +%s) $UUID_CHAIN" > "$CHAIN_FILE"
-
-# 3. Generate UTC+7 timestamp
-TIMESTAMP=$(TZ='Asia/Jakarta' date +"%Y-%m-%d--%H-%M")
-
-# 4. Create report filename
-REPORT_FILE="generated-reports/${AGENT_FAMILY}__${UUID_CHAIN}__${TIMESTAMP}__audit.md"
-
-# 5. Initialize report with header
-cat > "$REPORT_FILE" << 'HEADER'
-# Validation Report: {Agent Name}
-
-**Status**: In Progress
-**Agent**: {agent-name}
-**Scope**: {scope-description}
-**Timestamp**: {YYYY-MM-DD--HH-MM UTC+7}
-**UUID Chain**: {uuid-chain}
-
----
-
-## Findings
-
-[Findings will be written progressively during validation]
-HEADER
-```
-
-**Why Initialize Early?**
-
-- Creates file before validation begins (survives context compaction)
-- Enables progressive writing (append findings as discovered)
-- Provides audit trail even if validation interrupted
-- File is readable throughout execution
+**CRITICAL FIRST STEP - Execute before any validation begins.** The exact UUID-generation, chain-tracking,
+UTC+7 timestamp, filename pattern, and initial-header commands are defined in the
+[repo-generating-validation-reports skill](../repo-generating-validation-reports/SKILL.md#core-knowledge) —
+that skill is the single source of truth for report initialization; do not re-derive it here.
+Initializing early (before validation begins) matters because it: creates the file before validation
+begins (survives context compaction), enables progressive writing (append findings as discovered),
+provides an audit trail even if validation is interrupted, and keeps the file readable throughout
+execution.
 
 **Steps 1-N: Validate Content (Domain-Specific)**
 

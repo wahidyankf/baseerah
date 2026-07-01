@@ -527,21 +527,10 @@ Every plan MUST declare its worktree path before the delivery checklist begins. 
 
 **Path format**: `worktrees/<plan-identifier>/` where `<plan-identifier>` is the slug portion of the folder name (strip the `YYYY-MM-DD__` prefix when present). Example: `backlog/2026-05-15__auth-rewrite/` or `in-progress/auth-rewrite/` → worktree path `worktrees/auth-rewrite/`.
 
-**Required content** (template):
-
-````markdown
-## Worktree
-
-Worktree path: `worktrees/<plan-identifier>/`
-
-Optional manual pre-provisioning (run from repo root):
-
-```bash
-claude --worktree <plan-identifier>
-```
-
-The plan-execution Step 0 gate enters this worktree by default: it auto-provisions from the latest `origin/main` when missing, syncs with `origin/main` before implementing, and prompts before deleting the worktree after the plan is archived and pushed.
-````
+**Required content**: insert the verbatim `## Worktree` template (path declaration, optional
+`claude --worktree <plan-identifier>` pre-provisioning block, and the Step-0-gate note) from the
+[plan-creating-project-plans skill's Worktree Specification section](../skills/plan-creating-project-plans/SKILL.md#worktree-specification-mandatory--applies-to-all-plans) —
+that section is the single source of truth for the exact wording; do not paraphrase it.
 
 **This applies to ALL plans regardless of size** — pure-docs, single-file, and trivial plans included. No exceptions. See
 [Plans Organization Convention §Worktree Specification](../../repo-governance/conventions/structure/plans.md#worktree-specification)

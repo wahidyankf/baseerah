@@ -78,6 +78,9 @@ pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<Duplicati
         if distinct_files.len() < 2 {
             continue;
         }
+        if is_sanctioned_template_family(&distinct_files) {
+            continue;
+        }
         distinct_files.sort_by(|a, b| a.0.cmp(&b.0));
         let paths: Vec<String> = distinct_files.iter().map(|(p, _)| p.clone()).collect();
         let starts: Vec<usize> = distinct_files.iter().map(|(_, s)| *s).collect();
@@ -101,6 +104,77 @@ pub fn detect_duplication(repo_root: &Path) -> std::result::Result<Vec<Duplicati
         }
     });
     Ok(findings)
+}
+
+/// Role suffixes that denote the repo's sanctioned maker-checker-fixer /
+/// swe-dev / web-tester template families — agents in the same role are
+/// *designed* to share large blocks of workflow boilerplate verbatim.
+const SANCTIONED_ROLE_SUFFIXES: &[&str] = &[
+    "-fixer",
+    "-checker",
+    "-maker",
+    "-deployer",
+    "-dev",
+    "-tester",
+];
+
+/// Return a stable label for `path`: `skills/<dir>` for a skill file (skill
+/// content is keyed by its owning directory, since every skill file is
+/// literally named `SKILL.md`), or the bare file stem otherwise.
+fn family_label(path: &str) -> String {
+    let p = Path::new(path);
+    let stem = p
+        .file_stem()
+        .map_or_else(String::new, |s| s.to_string_lossy().into_owned());
+    if p.file_name().and_then(|n| n.to_str()) == Some("SKILL.md") {
+        let dir = p
+            .parent()
+            .and_then(|d| d.file_name())
+            .map_or_else(String::new, |n| n.to_string_lossy().into_owned());
+        return format!("skills/{dir}");
+    }
+    stem
+}
+
+/// Return the sanctioned role suffix at the end of `label`, if any.
+fn role_suffix(label: &str) -> Option<&'static str> {
+    SANCTIONED_ROLE_SUFFIXES
+        .iter()
+        .find(|suf| label.ends_with(*suf))
+        .copied()
+}
+
+/// Return `label` with its role suffix stripped (the "domain" it belongs to),
+/// or `label` unchanged when it carries no recognized role suffix.
+fn domain_prefix(label: &str) -> &str {
+    match role_suffix(label) {
+        Some(suf) => &label[..label.len() - suf.len()],
+        None => label,
+    }
+}
+
+/// Returns `true` when every file in a duplication cluster belongs to the
+/// repo's own sanctioned template family — either all files share the same
+/// role suffix (e.g. all `*-checker.md`) or all files share the same domain
+/// once the role suffix is stripped (e.g. `foo-checker.md` + `foo-fixer.md` +
+/// `foo-maker.md`, the maker-checker-fixer trio for one domain). Duplication
+/// spanning *different* roles or domains still gets reported — only the
+/// architecturally-expected same-family sharing is exempted.
+fn is_sanctioned_template_family(distinct_files: &[(String, usize)]) -> bool {
+    let labels: Vec<String> = distinct_files
+        .iter()
+        .map(|(p, _)| family_label(p))
+        .collect();
+    let same_role = labels
+        .iter()
+        .map(|l| role_suffix(l))
+        .collect::<std::collections::HashSet<_>>();
+    if same_role.len() == 1 && same_role.iter().next().is_some_and(Option::is_some) {
+        return true;
+    }
+    let same_domain: std::collections::HashSet<&str> =
+        labels.iter().map(|l| domain_prefix(l)).collect();
+    same_domain.len() == 1
 }
 
 /// Return source-tier agent and skill directories derived from `repo-config.yml`.
@@ -361,6 +435,78 @@ mod tests {
     }
 
     #[test]
+    fn family_label_uses_parent_dir_for_skill_md() {
+        assert_eq!(
+            family_label("/repo/.claude/skills/plan-creating-project-plans/SKILL.md"),
+            "skills/plan-creating-project-plans"
+        );
+    }
+
+    #[test]
+    fn family_label_uses_file_stem_for_agent_md() {
+        assert_eq!(
+            family_label("/repo/.claude/agents/docs-fixer.md"),
+            "docs-fixer"
+        );
+    }
+
+    #[test]
+    fn role_suffix_matches_known_suffixes() {
+        assert_eq!(role_suffix("docs-fixer"), Some("-fixer"));
+        assert_eq!(role_suffix("apps-ose-www-deployer"), Some("-deployer"));
+        assert_eq!(role_suffix("swe-golang-dev"), Some("-dev"));
+        assert_eq!(role_suffix("web-design-tester"), Some("-tester"));
+        assert_eq!(role_suffix("docs-file-manager"), None);
+        assert_eq!(role_suffix("skills/plan-creating-project-plans"), None);
+    }
+
+    #[test]
+    fn domain_prefix_strips_role_suffix() {
+        assert_eq!(domain_prefix("docs-fixer"), "docs");
+        assert_eq!(domain_prefix("docs-checker"), "docs");
+        assert_eq!(domain_prefix("docs-file-manager"), "docs-file-manager");
+    }
+
+    #[test]
+    fn is_sanctioned_template_family_true_for_same_role() {
+        let files = vec![
+            ("docs-fixer.md".to_string(), 1),
+            ("readme-fixer.md".to_string(), 1),
+        ];
+        assert!(is_sanctioned_template_family(&files));
+    }
+
+    #[test]
+    fn is_sanctioned_template_family_true_for_same_domain_different_roles() {
+        let files = vec![
+            ("specs-checker.md".to_string(), 1),
+            ("specs-fixer.md".to_string(), 1),
+        ];
+        assert!(is_sanctioned_template_family(&files));
+    }
+
+    #[test]
+    fn is_sanctioned_template_family_false_for_different_domain_and_role() {
+        let files = vec![
+            ("swe-e2e-dev.md".to_string(), 1),
+            (
+                ".claude/skills/repo-generating-validation-reports/SKILL.md".to_string(),
+                1,
+            ),
+        ];
+        assert!(!is_sanctioned_template_family(&files));
+    }
+
+    #[test]
+    fn is_sanctioned_template_family_false_for_unrelated_agents() {
+        let files = vec![
+            ("docs-file-manager.md".to_string(), 1),
+            ("docs-maker.md".to_string(), 1),
+        ];
+        assert!(!is_sanctioned_template_family(&files));
+    }
+
+    #[test]
     fn detect_duplication_finds_cross_file_match() {
         let tmp = TempDir::new().unwrap();
         let agents = tmp.path().join(".claude/agents");
@@ -369,8 +515,8 @@ mod tests {
             + &(0..15)
                 .map(|i| format!("Line content {i}\n"))
                 .collect::<String>();
-        fs::write(agents.join("foo-maker.md"), &dup_body).unwrap();
-        fs::write(agents.join("bar-maker.md"), &dup_body).unwrap();
+        fs::write(agents.join("foo-widget.md"), &dup_body).unwrap();
+        fs::write(agents.join("bar-widget.md"), &dup_body).unwrap();
         let findings = detect_duplication(tmp.path()).unwrap();
         assert!(!findings.is_empty());
         assert_eq!(findings[0].window_size, DUPLICATION_WINDOW_SIZE);
@@ -386,7 +532,7 @@ mod tests {
         let body = (0..30)
             .map(|i| format!("Line {}\n", i % 10))
             .collect::<String>();
-        fs::write(agents.join("foo-maker.md"), body).unwrap();
+        fs::write(agents.join("foo-widget.md"), body).unwrap();
         let findings = detect_duplication(tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
@@ -415,10 +561,10 @@ mod tests {
         let agents = tmp.path().join(".claude/agents");
         fs::create_dir_all(&agents).unwrap();
         fs::write(agents.join("README.md"), "x").unwrap();
-        fs::write(agents.join("foo-maker.md"), "x").unwrap();
+        fs::write(agents.join("foo-widget.md"), "x").unwrap();
         let files = enumerate_agent_and_skill_files(tmp.path()).unwrap();
         assert_eq!(files.len(), 1);
-        assert!(files[0].ends_with("foo-maker.md"));
+        assert!(files[0].ends_with("foo-widget.md"));
     }
 
     #[test]
@@ -427,7 +573,7 @@ mod tests {
         let agents = tmp.path().join(".claude/agents");
         fs::create_dir_all(&agents).unwrap();
         fs::write(agents.join("foo.txt"), "x").unwrap();
-        fs::write(agents.join("bar-maker.md"), "x").unwrap();
+        fs::write(agents.join("bar-widget.md"), "x").unwrap();
         let files = enumerate_agent_and_skill_files(tmp.path()).unwrap();
         assert_eq!(files.len(), 1);
     }
@@ -441,9 +587,9 @@ mod tests {
             + &(0..12)
                 .map(|i| format!("Shared content line {i}\n"))
                 .collect::<String>();
-        fs::write(agents.join("foo-maker.md"), &body).unwrap();
-        fs::write(agents.join("bar-maker.md"), &body).unwrap();
-        fs::write(agents.join("baz-maker.md"), &body).unwrap();
+        fs::write(agents.join("foo-widget.md"), &body).unwrap();
+        fs::write(agents.join("bar-widget.md"), &body).unwrap();
+        fs::write(agents.join("baz-widget.md"), &body).unwrap();
         let findings = detect_duplication(tmp.path()).unwrap();
         assert!(findings.iter().any(|f| f.files.len() >= 3));
     }
@@ -462,10 +608,10 @@ mod tests {
             + &(0..12)
                 .map(|i| format!("Body B line {i}\n"))
                 .collect::<String>();
-        fs::write(agents.join("a-maker.md"), &body1).unwrap();
-        fs::write(agents.join("b-maker.md"), &body1).unwrap();
-        fs::write(agents.join("c-maker.md"), &body2).unwrap();
-        fs::write(agents.join("d-maker.md"), &body2).unwrap();
+        fs::write(agents.join("a-widget.md"), &body1).unwrap();
+        fs::write(agents.join("b-widget.md"), &body1).unwrap();
+        fs::write(agents.join("c-widget.md"), &body2).unwrap();
+        fs::write(agents.join("d-widget.md"), &body2).unwrap();
         let findings = detect_duplication(tmp.path()).unwrap();
         // findings sorted by first file alphabetically
         for w in findings.windows(2) {
@@ -517,8 +663,8 @@ mod tests {
             + &(0..15)
                 .map(|i| format!("Line content {i}\n"))
                 .collect::<String>();
-        fs::write(custom_agents.join("foo-maker.md"), &dup_body).unwrap();
-        fs::write(custom_agents.join("bar-maker.md"), &dup_body).unwrap();
+        fs::write(custom_agents.join("foo-widget.md"), &dup_body).unwrap();
+        fs::write(custom_agents.join("bar-widget.md"), &dup_body).unwrap();
         // Current code: reads .claude/agents (absent) → no findings; registry-driven: finds dups
         let findings = detect_duplication(tmp.path()).unwrap();
         assert!(

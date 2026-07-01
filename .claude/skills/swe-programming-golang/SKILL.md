@@ -286,8 +286,8 @@ gopter covers invariants over generated inputs.
 
 ## Related Skills
 
-- docs-applying-content-quality
 - repo-practicing-trunk-based-development
+- docs-applying-content-quality
 
 ## References
 

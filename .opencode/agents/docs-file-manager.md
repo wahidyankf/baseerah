@@ -595,12 +595,9 @@ Proceed anyway? (Please confirm)
 
 ## Reference Documentation
 
-**Project Guidance:**
+**Core Guidance:**
 
 - `AGENTS.md` - Primary guidance for all agents working on this project
-
-**Agent Conventions:**
-
 - `repo-governance/development/agents/ai-agents.md` - AI agents convention (all agents must follow)
 
 **Documentation Conventions:**

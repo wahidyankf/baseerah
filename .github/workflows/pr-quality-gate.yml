@@ -242,6 +242,15 @@ jobs:
       - uses: ./.github/actions/setup-rust
       - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
 
+  harness-duplication:
+    name: Harness duplication validation (repo-wide)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness duplication validate
+
   governance:
     name: Governance validators (vendor audit + license)
     runs-on: ubuntu-latest
@@ -270,6 +279,7 @@ jobs:
         specs-gate,
         md-links,
         readme-index,
+        harness-duplication,
         governance,
       ]
     if: always()
