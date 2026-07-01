@@ -8,6 +8,10 @@ export default defineConfig({
   plugins: sharedPlugins,
   test: {
     passWithNoTests: true,
+    // Reduced Nx cross-project parallelism (--parallel=2, added to bound CI memory) leaves less
+    // CPU per test under contention; userEvent.type()'s per-keystroke re-renders occasionally
+    // exceed the previous default timeout under that load even though the interaction is simple.
+    testTimeout: 30000,
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
