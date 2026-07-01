@@ -48,3 +48,17 @@ runs:
         if ! command -v cargo-hack >/dev/null 2>&1; then
           cargo install --locked --version ${{ inputs.cargo-hack-version }} cargo-hack
         fi
+
+    # No rust-toolchain.toml pins the default toolchain, so it resolves to latest stable — never the
+    # older `rust-version` floor each crate declares. Every `cargo hack check --rust-version` (run in
+    # parallel across projects by `nx run-many`/`nx affected`) therefore races rustup to install the
+    # same missing MSRV toolchain concurrently, corrupting the shared download dir
+    # ("could not rename downloaded file ... No such file or directory"). Pre-install each pinned
+    # rust-version sequentially so the parallel compat:min-version tasks only ever read a toolchain
+    # that is already present.
+    - name: Pre-install pinned MSRV toolchain(s) (avoids rustup download race under parallel cargo-hack)
+      shell: bash
+      run: |
+        for v in $(grep -rhoP '^rust-version\s*=\s*"\K[^"]+' apps/*/Cargo.toml libs/*/Cargo.toml 2>/dev/null | sort -u); do
+          rustup toolchain install "$v" --profile minimal
+        done
