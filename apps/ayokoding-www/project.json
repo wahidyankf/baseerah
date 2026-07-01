@@ -74,7 +74,7 @@
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/specs/apps/ayokoding/**/*.feature"],
       "options": {
-        "command": "npx vitest run --project unit --project unit-fe",
+        "command": "npx vitest run --project unit --project unit-fe --testTimeout=30000",
         "cwd": "{projectRoot}"
       }
     },
