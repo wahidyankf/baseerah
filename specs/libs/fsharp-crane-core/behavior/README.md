@@ -1,7 +1,7 @@
 # Behavior — fsharp-crane-core
 
 Gherkin behavioral specifications for
-[fsharp-crane-core](../../../../libs/fsharp-crane-core/README.md), the shared F# domain/logic
+[fsharp-crane-core](../../../../libs/fsharp-crane-core/project.json), the shared F# domain/logic
 core for PDF-to-Markdown conversion and verification.
 
 ## Structure

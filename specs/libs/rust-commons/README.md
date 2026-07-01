@@ -1,7 +1,7 @@
 # rust-commons Specs
 
 Gherkin behavioral specifications for
-[rust-commons](../../../libs/rust-commons/README.md), the shared Rust utility crate.
+[rust-commons](../../../libs/rust-commons/Cargo.toml), the shared Rust utility crate.
 
 ## Purpose
 
