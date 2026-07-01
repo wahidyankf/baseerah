@@ -93,7 +93,8 @@
           "npx nx run rhino-cli:typecheck",
           "npx nx run rhino-cli:lint",
           "npx nx run rhino-cli:test:unit",
-          "npx nx run rhino-cli:test:coverage"
+          "npx nx run rhino-cli:test:coverage",
+          "npx nx run rhino-cli:test:specs"
         ],
         "parallel": false
       },
@@ -120,6 +121,14 @@
       },
       "cache": true,
       "inputs": ["{projectRoot}/src/**/*.rs", "{workspaceRoot}/specs/apps/**/*"]
+    },
+    "test:specs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["npx nx run rhino-cli:specs:structure-validation", "npx nx run rhino-cli:specs:behavior:coverage"],
+        "parallel": false
+      },
+      "cache": true
     },
     "specs:gherkin-cardinality-validation": {
       "executor": "nx:run-commands",

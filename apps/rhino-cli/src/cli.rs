@@ -12,7 +12,7 @@ use crate::commands::{
     md_validate_frontmatter_dates, md_validate_heading_hierarchy, md_validate_links,
     md_validate_mermaid, md_validate_naming, md_validate_readme_index, specs_audit,
     specs_clean_java_imports, specs_coverage, specs_gherkin_cardinality, specs_scaffold_dart,
-    specs_structure_validate, workflows_validate_naming,
+    specs_structure_validate, specs_validate_counts, workflows_validate_naming,
 };
 use crate::domain::cliout::OutputFormat;
 
@@ -419,6 +419,11 @@ pub enum SpecsCommands {
     /// Run all structural validators (adoption + tree + counts) in one pass.
     #[command(name = "structure", subcommand)]
     Structure(SpecsStructureCommands),
+    /// Validate each required spec subfolder contains at least one spec file. Kept as a
+    /// standalone leaf for spec trees outside `specs/apps/` (e.g. `specs/libs/*`) that
+    /// `specs structure validate` cannot reach.
+    #[command(name = "counts", subcommand)]
+    Counts(SpecsCountsCommands),
     /// Run per-level @covers behavior coverage validation.
     #[command(name = "behavior-coverage", subcommand)]
     BehaviorCoverage(SpecsBehaviorCoverageCommands),
@@ -466,6 +471,14 @@ pub enum SpecsStructureCommands {
     /// Run adoption + tree + counts structural validators in sequence with per-layer labels.
     #[command(name = "validate")]
     Validate(specs_structure_validate::ValidateStructureArgs),
+}
+
+/// `specs counts` subcommands.
+#[derive(Subcommand, Debug)]
+pub enum SpecsCountsCommands {
+    /// Validate each required spec subfolder contains at least one spec file.
+    #[command(name = "validate")]
+    Validate(specs_validate_counts::ValidateCountsArgs),
 }
 
 /// Specs clean subcommands.
@@ -757,6 +770,9 @@ fn dispatch_specs(
             SpecsStructureCommands::Validate(args) => {
                 specs_structure_validate::run(args, output_format)
             }
+        },
+        SpecsCommands::Counts(cc) => match cc {
+            SpecsCountsCommands::Validate(args) => specs_validate_counts::run(args, output_format),
         },
         SpecsCommands::BehaviorCoverage(bc) => match bc {
             SpecsBehaviorCoverageCommands::Validate(args) => {
