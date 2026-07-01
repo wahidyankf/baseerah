@@ -115,7 +115,7 @@ jobs:
           sudo curl -sSL -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-Linux-x86_64
           sudo chmod +x /usr/local/bin/hadolint
           hadolint --version
-          files=$(git diff --diff-filter=ACM --name-only "$NX_BASE"...HEAD | grep -iE 'Dockerfile' | grep -vE '^archived/' || true)
+          files=$(git diff --diff-filter=ACM --name-only "$NX_BASE"...HEAD | grep -iE 'Dockerfile' | grep -vE '^archived/' | grep -v '\.dockerignore$' || true)
           if [ -z "$files" ]; then echo "No changed Dockerfiles — skipping"; exit 0; fi
           # shellcheck disable=SC2086 # word-splitting the file list is intentional
           hadolint --failure-threshold warning $files
