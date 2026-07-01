@@ -56,11 +56,16 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-node
-      # --parallel=2: nx's default parallelism runs enough concurrent Vitest/Next.js workers
-      # across ~25 TS projects to exceed the hosted runner's memory, SIGKILLing the process
-      # mid-test-run (no error output, exit code 1) — reproduced 100% of the time at the same
-      # spot in ayokoding-www's heaviest suite; capping concurrency keeps peak memory in bounds.
-      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust' --parallel=2
+      # --parallel=1: nx's default/higher parallelism runs enough concurrent Vitest/Next.js
+      # workers + rhino-cli cargo subprocesses (test:specs now runs on every TS project, not
+      # just a few) to exceed the hosted runner's memory/CPU headroom — first SIGKILLing the
+      # process outright (no error output, exit code 1), and later (after test:specs rollout
+      # broadened the total concurrent workload) causing ayokoding-www's heaviest suite to miss
+      # its own vitest worker heartbeat under CPU starvation (reports the exact default 20000ms
+      # timeout regardless of --testTimeout, since that's a different vitest-internal signal).
+      # Fully serializing cross-project concurrency removes the contention rather than chasing
+      # ever-larger timeouts.
+      - run: npx nx run-many --all -t typecheck lint test:quick specs:behavior:coverage --exclude='tag:lang:fsharp,tag:lang:csharp,tag:lang:rust' --parallel=1
 
   dotnet:
     name: .NET quality gate (all projects)
