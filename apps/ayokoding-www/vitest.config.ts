@@ -10,7 +10,9 @@ export default defineConfig({
     passWithNoTests: true,
     // Reduced Nx cross-project parallelism (--parallel=2, added to bound CI memory) leaves less
     // CPU per test under contention; userEvent.type()'s per-keystroke re-renders occasionally
-    // exceed the previous default timeout under that load even though the interaction is simple.
+    // exceed the default timeout under that load even though the interaction is simple. This
+    // setting has no effect on the named projects below — vitest's `projects` array replaces
+    // rather than merges the top-level `test` config, so each project repeats it.
     testTimeout: 30000,
     coverage: {
       provider: "v8",
@@ -68,6 +70,9 @@ export default defineConfig({
           include: ["test/unit/be-steps/**/*.steps.ts", "**/*.unit.{test,spec}.{ts,tsx}"],
           exclude: ["node_modules"],
           environment: "node",
+          // vitest's `projects` array replaces rather than merges the top-level `test` config
+          // per project, so testTimeout must be repeated here (see the top-level comment).
+          testTimeout: 30000,
         },
       },
       {
@@ -78,6 +83,7 @@ export default defineConfig({
           exclude: ["node_modules"],
           environment: "jsdom",
           setupFiles: ["./src/test/setup.ts"],
+          testTimeout: 30000,
         },
       },
     ],
