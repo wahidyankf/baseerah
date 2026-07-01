@@ -70,7 +70,7 @@
     "*.fs": "fantomas",
     "*.{ex,exs}": "scripts/format-elixir.sh",
     "*.py": "ruff format",
-    "*.rs": "rustfmt",
+    "*.rs": "rustfmt --edition 2024",
     "*.cs": "dotnet csharpier format",
     "*.clj": "cljfmt fix",
     "*.dart": "dart format",
