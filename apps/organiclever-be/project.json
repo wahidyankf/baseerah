@@ -103,7 +103,8 @@
         "parallel": false
       },
       "dependsOn": ["typecheck", "lint"],
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -173,8 +174,12 @@
         ],
         "parallel": false
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-be/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:giraffe", "lang:fsharp", "domain:organiclever"],
   "implicitDependencies": ["organiclever-contracts", "rhino-cli"]

@@ -70,7 +70,7 @@
         "parallel": false
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/libs/web-ui-token/**/*", "{projectRoot}/src/**/*"]
+      "inputs": ["{workspaceRoot}/specs/libs/web-ui-token/**/*", "{projectRoot}/src/**/*", "specs"]
     },
     "test:quick": {
       "executor": "nx:run-commands",
@@ -84,7 +84,8 @@
         ],
         "parallel": false
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     },
     "deps:audit": {
       "executor": "nx:run-commands",
@@ -100,6 +101,9 @@
       },
       "cache": true
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/libs/web-ui-token/behavior/gherkin/**/*.feature"]
   },
   "tags": ["type:lib", "lang:ts", "domain:ui"]
 }

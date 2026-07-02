@@ -53,7 +53,7 @@
         ],
         "parallel": false
       },
-      "inputs": ["default", "{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature"]
+      "inputs": ["default", "specs"]
     },
     "test:e2e": {
       "executor": "nx:run-commands",
@@ -121,8 +121,12 @@
         ],
         "parallel": false
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ose/behavior/be/gherkin/**/*.feature"]
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
   "implicitDependencies": ["ose-be"]

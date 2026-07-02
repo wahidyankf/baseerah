@@ -63,7 +63,8 @@
         ],
         "parallel": false
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     },
     "specs:behavior:coverage": {
       "executor": "nx:run-commands",
@@ -91,7 +92,7 @@
         "parallel": false
       },
       "cache": true,
-      "inputs": ["{workspaceRoot}/specs/libs/rust-commons/**/*", "{projectRoot}/src/**/*.rs"]
+      "inputs": ["{workspaceRoot}/specs/libs/rust-commons/**/*", "{projectRoot}/src/**/*.rs", "specs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -122,5 +123,8 @@
       "cache": true,
       "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/libs/rust-commons/behavior/gherkin/**/*.feature"]
   }
 }

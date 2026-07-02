@@ -88,7 +88,8 @@
           "npx nx run ose-app-web:test:specs"
         ],
         "parallel": false
-      }
+      },
+      "inputs": ["default", "specs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -161,8 +162,12 @@
         ],
         "parallel": false
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ose/behavior/app-web/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:nextjs", "lang:ts", "domain:ose"],
   "implicitDependencies": ["ose-contracts", "web-ui", "web-ui-token"]

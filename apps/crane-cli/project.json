@@ -87,7 +87,8 @@
         "parallel": false
       },
       "dependsOn": ["typecheck", "lint"],
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     },
     "test:integration": {
       "executor": "nx:run-commands",
@@ -142,8 +143,12 @@
         "commands": ["npx nx run crane-cli:specs:structure-validation", "npx nx run crane-cli:specs:behavior:coverage"],
         "parallel": false
       },
-      "cache": true
+      "cache": true,
+      "inputs": ["default", "specs"]
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/crane/behavior/crane-cli/gherkin/**/*.feature"]
   },
   "tags": ["type:app", "platform:cli", "lang:fsharp", "domain:crane"],
   "implicitDependencies": ["fsharp-crane-core"]
