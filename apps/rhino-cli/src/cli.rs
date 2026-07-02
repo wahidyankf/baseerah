@@ -780,7 +780,9 @@ fn dispatch_specs(
             }
         },
         SpecsCommands::DomainCoverage(dc) => match dc {
-            SpecsDomainCoverageCommands::Validate(args) => specs_coverage::run(args, output_format),
+            SpecsDomainCoverageCommands::Validate(args) => {
+                specs_coverage::run_domain(args, output_format)
+            }
         },
         SpecsCommands::Clean(cc) => match cc {
             SpecsCleanCommands::JavaImports(args) => {

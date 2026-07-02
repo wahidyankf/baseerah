@@ -130,7 +130,7 @@ fn run_level_check(
 
     if has_gaps && matches!(output_format, OutputFormat::Text) {
         eprintln!(
-            "\n❌ [{}] spec coverage gaps found: {} file gap(s), {} scenario gap(s), {} step gap(s), {} orphan step impl(s)",
+            "\nERROR: [{}] spec coverage gaps found: {} file gap(s), {} scenario gap(s), {} step gap(s), {} orphan step impl(s)",
             level.name,
             result.gaps.len(),
             result.scenario_gaps.len(),
@@ -237,25 +237,25 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
         if matches!(output_format, OutputFormat::Text) {
             if !result.gaps.is_empty() {
                 eprintln!(
-                    "\n❌ Found {} spec(s) without matching test files",
+                    "\nERROR: Found {} spec(s) without matching test files",
                     result.gaps.len()
                 );
             }
             if !result.scenario_gaps.is_empty() {
                 eprintln!(
-                    "❌ Found {} scenario(s) without matching test implementations",
+                    "ERROR: Found {} scenario(s) without matching test implementations",
                     result.scenario_gaps.len()
                 );
             }
             if !result.step_gaps.is_empty() {
                 eprintln!(
-                    "❌ Found {} step(s) without matching step definitions",
+                    "ERROR: Found {} step(s) without matching step definitions",
                     result.step_gaps.len()
                 );
             }
             if !result.orphan_step_impls.is_empty() {
                 eprintln!(
-                    "❌ Found {} orphan step implementation(s) (no Gherkin step matches them)",
+                    "ERROR: Found {} orphan step implementation(s) (no Gherkin step matches them)",
                     result.orphan_step_impls.len()
                 );
             }
@@ -269,6 +269,55 @@ pub fn run(args: &ValidateArgs, output_format: OutputFormat) -> std::result::Res
         ));
     }
     Ok(())
+}
+
+/// Run the `specs domain-coverage validate` command.
+///
+/// Gates the scan on `repo-config.yml`'s `specs.domain-areas` allowlist via
+/// [`crate::application::domain_coverage::is_eligible`]: a project absent from
+/// that list is skipped (exit 0) rather than silently duplicating
+/// `specs behavior-coverage validate`'s full scan. An eligible project still
+/// runs the same underlying scan as behavior-coverage today — no `domain/`
+/// subfolder split exists yet in any repo's spec tree to further scope the
+/// scan via [`crate::application::domain_coverage::filter_domain_scenarios`];
+/// that path-based filter has nothing to act on until such content is
+/// physically split out, which is a content-authoring decision tracked as a
+/// separate follow-up, not a mechanical wiring change.
+///
+/// # Errors
+///
+/// Returns an error under the same conditions as [`run`], for eligible projects.
+pub fn run_domain(
+    args: &ValidateArgs,
+    output_format: OutputFormat,
+) -> std::result::Result<(), Error> {
+    let repo_root =
+        git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
+
+    let project_name = args
+        .paths
+        .last()
+        .map(Path::new)
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .ok_or_else(|| anyhow!("could not derive project name from the final app-dir path"))?;
+
+    let config = crate::application::repo_config::load_or_default(&repo_root);
+    if !crate::application::domain_coverage::is_eligible(project_name, &config.specs.domain_areas) {
+        let message = format!(
+            "specs domain-coverage validate: skipped — \"{project_name}\" is not listed in repo-config.yml's specs.domain-areas"
+        );
+        match output_format {
+            OutputFormat::Text => println!("{message}"),
+            OutputFormat::Json => println!(
+                "{{\"skipped\":true,\"project\":\"{project_name}\",\"reason\":\"not in specs.domain-areas\"}}"
+            ),
+            OutputFormat::Markdown => println!("- {message}"),
+        }
+        return Ok(());
+    }
+
+    run(args, output_format)
 }
 
 #[cfg(test)]
@@ -324,6 +373,39 @@ mod tests {
         args.shared_steps = true;
         let err = run(&args, OutputFormat::Json).unwrap_err();
         assert!(err.to_string().contains("spec coverage gaps found"));
+    }
+
+    // @covers specs/apps/rhino/behavior/rhino-cli/gherkin/specs/domain-coverage.feature:A project not in the domain-areas allowlist is skipped
+    #[test]
+    fn run_domain_skips_project_not_in_domain_areas() {
+        let _cwd = CwdLock::acquire();
+        // "rhino-cli" is not listed in repo-config.yml's specs.domain-areas.
+        let args = base_args(vec![
+            "specs/apps/rhino/behavior/rhino-cli/gherkin".to_string(),
+            "apps/rhino-cli".to_string(),
+        ]);
+        let result = run_domain(&args, OutputFormat::Text);
+        assert!(
+            result.is_ok(),
+            "expected Ok (skipped) for a non-domain-area project, got {result:?}"
+        );
+    }
+
+    #[test]
+    fn run_domain_runs_full_scan_for_eligible_project() {
+        let _cwd = CwdLock::acquire();
+        // "ose-be" IS listed in repo-config.yml's specs.domain-areas — falls through to run().
+        let mut args = base_args(vec![
+            "specs/apps/ose/behavior/be/gherkin".to_string(),
+            "apps/ose-be".to_string(),
+        ]);
+        args.shared_steps = true;
+        args.exclude_dir = vec!["messaging".to_string()];
+        let result = run_domain(&args, OutputFormat::Text);
+        assert!(
+            result.is_ok(),
+            "expected the real scan to pass for ose-be (matches its existing Nx target), got {result:?}"
+        );
     }
 
     #[test]
