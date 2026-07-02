@@ -88,7 +88,13 @@ import { t } from "@/features/i18n/core/translations";
 // rows re-rendered on each keystroke of `userEvent.type`; under coverage instrumentation a few of
 // these full-page scenarios brush past the 5s default. Give the feature headroom — production
 // debounces the URL commit, so it never re-renders per keystroke the way these delay-0 tests do.
-vi.setConfig({ testTimeout: 20000 });
+//
+// This must stay at or above the project's `test:unit` target's `--testTimeout=60000` CLI flag
+// (apps/ayokoding-www/project.json): `vi.setConfig` here overrides that CLI flag for this file,
+// so a lower value silently reintroduces the CI headroom the flag was added to provide, causing
+// intermittent timeouts under CI's shared/loaded runner even though this suite passes cleanly and
+// quickly on an unloaded local machine.
+vi.setConfig({ testTimeout: 60000 });
 
 const feature = await loadFeature(
   path.resolve(
