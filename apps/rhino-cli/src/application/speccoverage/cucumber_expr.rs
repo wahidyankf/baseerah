@@ -6,11 +6,31 @@ use std::sync::OnceLock;
 
 use regex::Regex;
 
-/// Returns the lazily-compiled regex that matches a single Cucumber parameter
-/// placeholder such as `{string}` or `{int}`.
-fn cucumber_param_re() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\{[^}]+\}").expect("valid regex"))
+/// Finds the byte range of the next Cucumber parameter placeholder
+/// (`{type}`) in `text`, skipping any `{`/`}` immediately preceded by a
+/// backslash — Cucumber's escape syntax for a literal brace (e.g.
+/// `\{literal\}`), which must not be mistaken for a placeholder.
+fn find_next_param(text: &str) -> Option<(usize, usize)> {
+    let mut chars = text.char_indices();
+    while let Some((i, c)) = chars.next() {
+        if c == '\\' {
+            chars.next();
+            continue;
+        }
+        if c == '{' {
+            while let Some((j, c2)) = chars.next() {
+                if c2 == '\\' {
+                    chars.next();
+                    continue;
+                }
+                if c2 == '}' {
+                    return Some((i, j + c2.len_utf8()));
+                }
+            }
+            return None;
+        }
+    }
+    None
 }
 
 /// Returns the lazily-compiled regex for Python `parsers.parse` format
@@ -62,23 +82,20 @@ pub fn cucumber_param_to_regex(param_name: &str) -> &'static str {
 /// [`cucumber_param_to_regex`]. Literal text segments are regex-escaped and
 /// Cucumber escape sequences are decoded first.
 pub fn cucumber_expr_to_regex(text: &str) -> String {
-    let re = cucumber_param_re();
     let mut sb = String::new();
     let mut remaining = text;
     loop {
-        match re.find(remaining) {
+        match find_next_param(remaining) {
             None => {
                 sb.push_str(&regex::escape(&unescape_cucumber_expr(remaining)));
                 break;
             }
-            Some(m) => {
-                sb.push_str(&regex::escape(&unescape_cucumber_expr(
-                    &remaining[..m.start()],
-                )));
-                let param = &remaining[m.start()..m.end()];
+            Some((start, end)) => {
+                sb.push_str(&regex::escape(&unescape_cucumber_expr(&remaining[..start])));
+                let param = &remaining[start..end];
                 let inner = &param[1..param.len() - 1];
                 sb.push_str(cucumber_param_to_regex(inner));
-                remaining = &remaining[m.end()..];
+                remaining = &remaining[end..];
             }
         }
     }
@@ -88,7 +105,7 @@ pub fn cucumber_expr_to_regex(text: &str) -> String {
 /// Returns `true` if `text` contains at least one Cucumber parameter
 /// placeholder (e.g. `{string}`, `{int}`).
 pub fn has_cucumber_expressions(text: &str) -> bool {
-    cucumber_param_re().is_match(text)
+    find_next_param(text).is_some()
 }
 
 /// Converts a Python `parsers.parse` format string into a regex pattern string
@@ -195,6 +212,26 @@ mod tests {
         let r = cucumber_expr_to_regex(r"\(foo\) {int}");
         assert!(r.contains(r"\(foo\)") || r.contains("\\(foo\\)"));
         assert!(r.contains(r"-?\d+"));
+    }
+
+    #[test]
+    fn escaped_braces_are_not_treated_as_a_parameter() {
+        // `\{expenseId\}` is Cucumber's escape syntax for a literal
+        // `{expenseId}` substring (e.g. a URL path segment the Gherkin
+        // author writes out literally) — it must not be mistaken for an
+        // unescaped `{type}` parameter placeholder.
+        let text = r"GET /expenses/\{expenseId\}";
+        assert!(!has_cucumber_expressions(text));
+        let re = Regex::new(&format!("^{}$", cucumber_expr_to_regex(text))).unwrap();
+        assert!(re.is_match("GET /expenses/{expenseId}"));
+    }
+
+    #[test]
+    fn unescaped_param_still_detected_alongside_escaped_braces() {
+        let text = r"GET /expenses/\{expenseId\} returns {int} results";
+        assert!(has_cucumber_expressions(text));
+        let re = Regex::new(&format!("^{}$", cucumber_expr_to_regex(text))).unwrap();
+        assert!(re.is_match("GET /expenses/{expenseId} returns 5 results"));
     }
 
     #[test]

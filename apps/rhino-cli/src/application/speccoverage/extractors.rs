@@ -231,13 +231,21 @@ pub fn extract_jvm_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result:
     let path_s = path.to_string_lossy();
     for line in content.lines() {
         for caps in jvm_step_re().captures_iter(line) {
-            add_step_to_matcher_with_origin(
-                sm,
-                caps.get(1)
-                    .expect("capture group 1 always present")
-                    .as_str(),
-                &path_s,
-            );
+            let raw = caps
+                .get(1)
+                .expect("capture group 1 always present")
+                .as_str();
+            // Java/Kotlin string literals require a doubled backslash (`\\`)
+            // to embed a single `\` at runtime — e.g. a `^`-anchored regex
+            // source `\\?` (escaped literal `?`) or a Cucumber-expression
+            // source `\\/`/`\\{`/`\\}` (escaped literal `/`/`{`/`}`) both
+            // compile to one runtime backslash. The regex capture pulls raw
+            // source bytes, so it must be unescaped to the true runtime
+            // string value before `add_step_to_matcher_with_origin` decides
+            // whether that value is a regex, a Cucumber expression, or an
+            // exact literal — otherwise doubled backslashes are misread
+            // (e.g. `\\?` as "zero-or-one backslash", never matching `?`).
+            add_step_to_matcher_with_origin(sm, &unescape_string(raw), &path_s);
         }
     }
     Ok(())
@@ -565,6 +573,27 @@ mod tests {
         extract_jvm_step_texts(&p, &mut sm).unwrap();
         assert!(sm.matches("user logs in"));
         assert!(sm.matches(r#"submits "alice""#));
+    }
+
+    #[test]
+    fn jvm_step_regex_unescapes_doubled_backslash_before_literal_question_mark() {
+        // Java/Kotlin source must double a backslash to embed a single `\` in
+        // the compiled regex, so `@When("^...pl\\?from=...$")` in the .java
+        // file is the runtime regex `^...pl\?from=...$` (an escaped literal
+        // `?`). Feeding the raw, un-unescaped source bytes straight to
+        // `Regex::new` turned `\\?` into "zero-or-one literal backslash",
+        // never matching the literal `?` in the Gherkin step text.
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "ReportingSteps.java",
+            "@When(\"^alice sends GET /api/v1/reports/pl\\\\?from=2025-01-01&to=2025-01-31&currency=USD$\")\nvoid step() {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_jvm_step_texts(&p, &mut sm).unwrap();
+        assert!(sm.matches(
+            "alice sends GET /api/v1/reports/pl?from=2025-01-01&to=2025-01-31&currency=USD"
+        ));
     }
 
     #[test]
