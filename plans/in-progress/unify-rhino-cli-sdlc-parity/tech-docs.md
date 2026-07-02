@@ -80,7 +80,7 @@ public/primer carry only a doc-comment "forward-scaffold" stub. Canonical synthe
 | mandatory-six + extras        | 29/29 clean                                                                                   | 26/26 clean                | **6 projects missing** deps:audit/compat:min-version |   ❌    |
 | `namedInputs.specs` rollout   | **16/29**                                                                                     | **20/26**                  | **6/8**                                              |   ❌    |
 | specs C4 structure            | 1 stale orphan (`golang-commons`)                                                             | complete                   | complete                                             |   ❌    |
-| `coverage.projects` registry  | **omits 4 real projects**                                                                     | complete                   | complete                                             |   ❌    |
+| `coverage.projects` registry  | **omits 4 real projects**                                                                     | **omits 6 real projects**  | complete                                             |   ❌    |
 | old 3 config files absent     | ✅                                                                                            | ✅                         | ✅                                                   |   ✅    |
 
 > **Denominator note**: the mandatory-six and `namedInputs.specs` rows are counted against the full
@@ -103,7 +103,14 @@ project `crud-contracts`). infra gaps: 2 (`ts-ui-tokens`, plus the contracts pro
 `coralpolyp-contracts`).
 
 public `coverage.projects` omits: `fsharp-crane-core`, `web-ui-token`, `organiclever-contracts`,
-`ose-contracts` (registry lists 25; `nx show projects` = 29).
+`ose-contracts` (registry lists 25; `nx show projects` = 29). primer `coverage.projects` omits the
+same 6 projects flagged for the `namedInputs.specs` gap above — `clojure-openapi-codegen`,
+`elixir-cabbage`, `elixir-gherkin`, `elixir-openapi-codegen`, `ts-ui-tokens`, `crud-contracts`
+(registry lists 20; `nx show projects` = 26) — each owns a real `specs/**/behavior/gherkin` tree, so
+this is a genuine omission, not a legitimate exemption (verified by diffing `nx show projects` against
+the registry in both directions, and confirming infra's registry — 8/8, exact match — really is
+complete by the same method). **Second-pass correction**: the first-draft audit called primer's
+registry "complete"; a fresh diff against the working tree during Phase 0 execution found this false.
 
 ## 3. The Delta to Close
 
@@ -120,8 +127,9 @@ Everything with an ❌ or ⚠️ above. Grouped by owning phase:
 - **public closeout (Phase 2)**: full `namedInputs.specs`; complete `coverage.projects`; delete the
   `golang-commons` orphan; add `gherkin-cardinality` to the PR gate.
 - **primer propagation (Phase 3)**: copy the canonical rhino-cli (now the union superset) into
-  primer; bump cucumber `0.22.1`→`0.23.0`; full `namedInputs.specs`; fix `.opencode/agent/` bug;
-  agree `*.cs/.clj/.dart` mechanism.
+  primer; bump cucumber `0.22.1`→`0.23.0`; full `namedInputs.specs`; complete `coverage.projects`
+  (same 6-project gap as `namedInputs.specs`, found during the Phase 0 re-audit); fix
+  `.opencode/agent/` bug; agree `*.cs/.clj/.dart` mechanism.
 - **infra propagation (Phase 4)**: regenerate rhino-cli to canonical; relicense to MIT; `npx nx`/`npm
 run` → direct `cargo run`; inline tool-lint → lint-staged; pre-commit shebang/Step comments; add
   `compat-min-version`/`env-validate` jobs; verify/align `gherkin-cardinality` invocation style

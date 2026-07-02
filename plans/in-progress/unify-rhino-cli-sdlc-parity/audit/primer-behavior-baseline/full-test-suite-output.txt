@@ -1,0 +1,2031 @@
+    Finished `release` profile [optimized] target(s) in 0.25s
+     Running unittests src/lib.rs (apps/rhino-cli/target/release/deps/rhino_cli-e41f975b5422ce0f)
+
+running 1006 tests
+test application::agents::agent_validator::tests::validate_agent_read_error ... ok
+test application::agents::agent_validator::tests::validate_color_accepts_known ... ok
+test application::agents::agent_validator::tests::validate_color_rejects_unknown ... ok
+test application::agents::agent_validator::tests::validate_filename_match ... ok
+test application::agents::agent_validator::tests::validate_field_order_fails_required_after_optional ... ok
+test application::agents::agent_validator::tests::validate_field_order_passes ... ok
+test application::agents::agent_validator::tests::validate_field_order_warns_unknown_field ... ok
+test application::agents::agent_validator::tests::validate_no_comments_fails ... ok
+test application::agents::agent_validator::tests::validate_model_accepts_alias ... ok
+test application::agents::agent_validator::tests::validate_generated_reports_tools_fails_missing_write ... ok
+test application::agents::agent_validator::tests::validate_generated_reports_tools_passes ... ok
+test application::agents::agent_validator::tests::validate_all_agents_missing_dir ... ok
+test application::agents::agent_validator::tests::validate_model_rejects_other ... ok
+test application::agents::agent_validator::tests::validate_model_accepts_empty ... ok
+test application::agents::agent_validator::tests::validate_model_accepts_id ... ok
+test application::agents::agent_validator::tests::validate_no_comments_passes ... ok
+test application::agents::agent_validator::tests::validate_required_fields_all_present ... ok
+test application::agents::agent_validator::tests::validate_required_fields_missing_color ... ok
+test application::agents::agent_validator::tests::validate_agent_yaml_formatting_failure_returns_early ... ok
+test application::agents::agent_validator::tests::validate_required_fields_missing_name ... ok
+test application::agents::agent_validator::tests::validate_required_fields_missing_tools ... ok
+test application::agents::agent_validator::tests::validate_required_fields_model_and_skills_may_be_empty ... ok
+test application::agents::agent_validator::tests::validate_skills_missing ... ok
+test application::agents::agent_validator::tests::validate_tools_fails_unknown ... ok
+test application::agents::agent_validator::tests::validate_tools_passes_agent_form ... ok
+test application::agents::agent_validator::tests::validate_tools_passes_known ... ok
+test application::agents::agent_validator::tests::validate_uniqueness_dup ... ok
+test application::agents::bindings::tests::expected_bindings_is_single_source ... ok
+test application::agents::agent_validator::tests::validate_agent_bad_yaml ... ok
+test application::agents::agent_validator::tests::validate_agent_end_to_end_pass ... ok
+test application::agents::agent_validator::tests::validate_all_agents_reads_md_files ... ok
+test application::agents::bindings::tests::emit_agent_definition_is_valid_json ... ok
+test application::agents::bindings::tests::emit_writes_both_files_with_exact_bytes ... ok
+test application::agents::bindings::tests::emit_is_idempotent ... ok
+test application::agents::claude_validator::tests::agents_only_skips_skill_checks ... ok
+test application::agents::converter::tests::agent_name_from_path_strips_extension ... ok
+test application::agents::bindings::tests::validate_fails_when_present_dir_absent_from_catalog ... ok
+test application::agents::bindings::tests::validate_fails_when_a_bridge_file_is_mutated ... ok
+test application::agents::bindings::tests::validate_fails_when_a_bridge_file_is_missing ... ok
+test application::agents::converter::tests::convert_agent_dry_run_does_not_write ... ok
+test application::agents::converter::tests::convert_agent_drops_warn_known_field ... ok
+test application::agents::bindings::tests::validate_fails_when_codex_agents_dir_exists ... ok
+test application::agents::claude_validator::tests::duration_recorded ... ok
+test application::agents::converter::tests::convert_color_passes_through_unknown ... ok
+test application::agents::converter::tests::convert_color_translates_known ... ok
+test application::agents::converter::tests::convert_model_default ... ok
+test application::agents::converter::tests::convert_model_haiku ... ok
+test application::agents::converter::tests::convert_permission_lowercases ... ok
+test application::agents::bindings::tests::validate_skips_catalog_check_for_absent_dirs ... ok
+test application::agents::converter::tests::convert_permission_maps_tools_to_allow ... ok
+test application::agents::converter::tests::convert_permission_skips_empty ... ok
+test application::agents::converter::tests::encode_emits_permission_block_not_tools ... ok
+test application::agents::converter::tests::convert_agent_warns_unknown_field ... ok
+test application::agents::bindings::tests::validate_passes_when_files_match ... ok
+test application::agents::detect_duplication::tests::detect_duplication_missing_dirs_is_empty ... ok
+test application::agents::detect_duplication::tests::domain_prefix_strips_role_suffix ... ok
+test application::agents::claude_validator::tests::skills_only_skips_agent_checks ... ok
+test application::agents::bindings::tests::harness_bindings_validate_covers_all_11_harnesses ... ok
+test application::agents::claude_validator::tests::full_pass ... ok
+test application::agents::detect_duplication::tests::family_label_uses_file_stem_for_agent_md ... ok
+test application::agents::detect_duplication::tests::family_label_uses_parent_dir_for_skill_md ... ok
+test application::agents::converter::tests::convert_agent_writes_opencode_file ... ok
+test application::agents::detect_duplication::tests::hash_window_deterministic ... ok
+test application::agents::detect_duplication::tests::index_of_fence_line_finds_closing ... ok
+test application::agents::detect_duplication::tests::index_of_fence_line_returns_none_when_absent ... ok
+test application::agents::detect_duplication::tests::is_excluded_window_includes_prose ... ok
+test application::agents::detect_duplication::tests::is_excluded_window_skips_blank_only ... ok
+test application::agents::detect_duplication::tests::detect_duplication_skips_within_single_file ... ok
+test application::agents::detect_duplication::tests::is_excluded_window_skips_headings_only ... ok
+test application::agents::detect_duplication::tests::is_sanctioned_template_family_false_for_different_domain_and_role ... ok
+test application::agents::detect_duplication::tests::is_sanctioned_template_family_false_for_unrelated_agents ... ok
+test application::agents::detect_duplication::tests::is_sanctioned_template_family_true_for_same_domain_different_roles ... ok
+test application::agents::detect_duplication::tests::is_sanctioned_template_family_true_for_same_role ... ok
+test application::agents::bindings::tests::validate_passes_when_catalog_references_all_present_dirs ... ok
+test application::agents::detect_duplication::tests::normalize_lines_collapses_blank_runs ... ok
+test application::agents::detect_duplication::tests::normalize_lines_strips_trailing_whitespace ... ok
+test application::agents::detect_duplication::tests::role_suffix_matches_known_suffixes ... ok
+test application::agents::detect_duplication::tests::strip_frontmatter_empty_close_at_eof ... ok
+test application::agents::detect_duplication::tests::strip_frontmatter_handles_crlf ... ok
+test application::agents::detect_duplication::tests::strip_frontmatter_removes_yaml_block ... ok
+test application::agents::detect_duplication::tests::detect_duplication_finds_cross_file_match ... ok
+test application::agents::detect_duplication::tests::strip_frontmatter_unclosed_returns_unchanged ... ok
+test application::agents::detect_duplication::tests::strip_frontmatter_returns_unchanged_when_no_fence ... ok
+test application::agents::frontmatter::tests::extract_frontmatter_no_close_marker ... ok
+test application::agents::frontmatter::tests::extract_frontmatter_no_open_marker ... ok
+test application::agents::frontmatter::tests::extract_frontmatter_too_short ... ok
+test application::agents::frontmatter::tests::normalize_yaml_adds_space ... ok
+test application::agents::frontmatter::tests::normalize_yaml_skips_list_items ... ok
+test application::agents::frontmatter::tests::parse_claude_tools_empty_string ... ok
+test application::agents::frontmatter::tests::parse_claude_tools_from_sequence ... ok
+test application::agents::frontmatter::tests::extract_frontmatter_simple ... ok
+test application::agents::frontmatter::tests::parse_claude_tools_from_string ... ok
+test application::agents::reporter::tests::format_go_duration_1500ms_renders_as_1_5s ... ok
+test application::agents::reporter::tests::format_go_duration_hour ... ok
+test application::agents::reporter::tests::format_go_duration_minute ... ok
+test application::agents::detect_duplication::tests::enumerate_skips_readme_md ... ok
+test application::agents::reporter::tests::format_go_duration_ms ... ok
+test application::agents::reporter::tests::format_go_duration_ns ... ok
+test application::agents::reporter::tests::format_go_duration_zero ... ok
+test application::agents::reporter::tests::format_json_status_success ... ok
+test application::agents::reporter::tests::format_go_duration_second ... ok
+test application::agents::reporter::tests::format_go_duration_us ... ok
+test application::agents::reporter::tests::format_json_shape ... ok
+test application::agents::reporter::tests::format_markdown_banner ... ok
+test application::agents::reporter::tests::format_markdown_verbose_includes_all_checks ... ok
+test application::agents::reporter::tests::format_json_status_warning ... ok
+test application::agents::detect_duplication::tests::enumerate_skips_non_md_files ... ok
+test application::agents::reporter::tests::format_sync_markdown_failure_with_warnings ... ok
+test application::agents::reporter::tests::format_sync_markdown_success ... ok
+test application::agents::reporter::tests::format_sync_text_failed ... ok
+test application::agents::reporter::tests::format_sync_text_quiet_omits_banner ... ok
+test application::agents::reporter::tests::format_sync_json_failure ... ok
+test application::agents::reporter::tests::format_sync_json_success ... ok
+test application::agents::reporter::tests::format_sync_text_success ... ok
+test application::agents::reporter::tests::format_sync_text_verbose_lists_warnings ... ok
+test application::agents::reporter::tests::format_text_emits_status_failed_banner ... ok
+test application::agents::reporter::tests::format_text_quiet_omits_banner ... ok
+test application::agents::reporter::tests::format_text_verbose_lists_all ... ok
+test application::agents::reporter::tests::use_super_conversion_warning ... ok
+test application::agents::detect_duplication::tests::enumerate_includes_skill_files ... ok
+test application::agents::detect_duplication::tests::detect_duplication_three_files_cluster ... ok
+test application::agents::detect_duplication::tests::detect_duplication_sorts_by_first_file_then_start_line ... ok
+test application::agents::skill_validator::tests::validate_all_skills_missing_dir ... ok
+test application::agents::detect_duplication::tests::detect_duplication_uses_registry_source_agent_dir ... ok
+test application::agents::skill_validator::tests::unknown_field_warns ... ok
+test application::agents::skill_validator::tests::valid_skill_passes_all ... ok
+test application::agents::skill_validator::tests::missing_name_fails ... ok
+test application::agents::skill_validator::tests::missing_skill_md_fails ... ok
+test application::agents::skill_validator::tests::name_mismatch_fails ... ok
+test application::agents::skill_validator::tests::missing_description_fails ... ok
+test application::agents::converter::tests::convert_all_agents_iterates ... ok
+test application::agents::skill_validator::tests::bad_name_format_fails ... ok
+test application::agents::sync::tests::sync_all_missing_claude_dir_errors ... ok
+test application::agents::sync_validator::tests::permission_match_basic ... ok
+test application::agents::skill_validator::tests::yaml_formatting_failure_returns_early ... ok
+test application::agents::sync::tests::sync_all_skills_only_noop ... ok
+test application::agents::skill_validator::tests::validate_all_skills_collects_names ... ok
+test application::agents::sync_validator::tests::count_markdown_files_excludes_readme ... ok
+test application::agents::sync::tests::sync_all_dry_run_no_writes ... ok
+test application::agents::sync::tests::sync_all_converts ... ok
+test application::agents::sync::tests::sync_all_collects_warnings ... ok
+test application::agents::sync_validator::tests::validate_agent_equivalence_fails_on_body_mismatch ... ok
+test application::agents::sync_validator::tests::validate_no_stale_agent_dir_fails_when_present_as_dir ... ok
+test application::agents::sync_validator::tests::validate_agent_count_passes ... ok
+test application::agents::sync_validator::tests::full_validate_sync_pass ... ok
+test application::agents::sync_validator::tests::validate_agent_count_fails_with_missing ... ok
+test application::agents::sync_validator::tests::validate_no_stale_agent_dir_fails_when_present_as_file ... ok
+test application::agents::sync_validator::tests::validate_no_stale_agent_dir_passes_when_absent ... ok
+test application::agents::sync_validator::tests::validate_agent_equivalence_fails_on_permission_mismatch ... ok
+test application::agents::sync_validator::tests::validate_agent_equivalence_fails_on_model_mismatch ... ok
+test application::agents::types::tests::agent_tool_pattern_captures_base ... ok
+test application::agents::types::tests::valid_model_alias_empty_string_is_valid ... ok
+test application::agents::types::tests::valid_tools_contains_core_tools ... ok
+test application::agents::sync_validator::tests::validate_agent_equivalence_pass ... ok
+test application::agents::types::tests::valid_model_id_pattern_matches_known_ids ... ok
+test application::agents::yaml_formatting::tests::fails_missing_space ... ok
+test application::agents::yaml_formatting::tests::fails_no_close ... ok
+test application::agents::types::tests::valid_skill_name_pattern_rejects_uppercase ... ok
+test application::agents::yaml_formatting::tests::passes_short_file ... ok
+test application::agents::types::tests::validation_result_tally_buckets ... ok
+test application::agents::yaml_formatting::tests::fails_no_open ... ok
+test application::agents::yaml_formatting::tests::passes_well_formed ... ok
+test application::allowlist::tests::membership ... ok
+test application::agents::sync_validator::tests::validate_agent_equivalence_fails_on_desc_mismatch ... ok
+test application::bcregistry::tests::relationship_kind_asymmetry ... ok
+test application::bcregistry::tests::supported_lang_includes_known ... ok
+test application::bcregistry::tests::validate_code_lang_rejects_unknown ... ok
+test application::agents::sync_validator::tests::validate_agent_equivalence_fails_on_skills_mismatch ... ok
+test application::bcregistry::tests::load_parses_minimal_yaml ... ok
+test application::behavior_coverage::validator::tests::covers_at_undeclared_level_fails ... ok
+test application::behavior_coverage::validator::tests::orphan_covers_marker_fails_gate ... ok
+test application::behavior_coverage::validator::tests::scenario_not_covered_at_required_level_fails ... ok
+test application::behavior_coverage::validator::tests::scenario_requiring_level_outside_envelope_fails ... ok
+test application::behavior_coverage::validator::tests::untagged_scenario_fails_gate ... ok
+test application::behavior_coverage::validator::tests::wip_scenario_is_exempt_from_coverage ... ok
+test application::docs::frontmatter::tests::errors_on_empty_paths ... ok
+test application::bcregistry::tests::validate_all_with_missing_paths_reports ... ok
+test application::bcregistry::tests::load_rejects_empty_code ... ok
+test application::bcregistry::tests::load_gherkin_scalar_becomes_singleton ... ok
+test application::bcregistry::tests::load_rejects_wrong_version ... ok
+test application::docs::frontmatter::tests::has_fail_findings_detects_severity ... ok
+test application::agents::sync_validator::tests::validate_no_synced_skills_passes ... ok
+test application::bcregistry::tests::validate_detects_unknown_relationship_kind ... ok
+test application::agents::sync_validator::tests::validate_no_synced_skills_tolerates_extra_skill ... ok
+test application::docs::frontmatter::tests::governance_title_required_description_warned ... ok
+test application::docs::frontmatter::tests::governance_full_schema_passes ... ok
+test application::agents::sync_validator::tests::validate_no_synced_skills_fails_with_mirror ... ok
+test application::docs::frontmatter::tests::software_missing_required_fields_emit_fails ... ok
+test application::docs::frontmatter::tests::software_full_schema_passes ... ok
+test application::docs::frontmatter::tests::invalid_yaml_emits_fail ... ok
+test application::docs::frontmatter::tests::unknown_area_passes ... ok
+test application::docs::frontmatter::tests::missing_frontmatter_emits_fail ... ok
+test application::docs::heading_hierarchy::tests::detects_duplicate_h1 ... ok
+test application::docs::heading_hierarchy::tests::errors_on_empty_paths ... ok
+test application::docs::heading_hierarchy::tests::agent_file_is_default_deny ... ok
+test application::docs::heading_hierarchy::tests::allowlist_runs_for_docs_file ... ok
+test application::docs::frontmatter::tests::software_deprecated_category_emits_warn ... ok
+test application::docs::heading_hierarchy::tests::empty_file_yields_no_findings ... ok
+test application::docs::heading_hierarchy::tests::parse_fence_open_counts_chars ... ok
+test application::docs::frontmatter::tests::software_wrong_category_emits_fail ... ok
+test application::docs::heading_hierarchy::tests::detects_missing_h1 ... ok
+test application::docs::heading_hierarchy::tests::parse_heading_level_returns_levels ... ok
+test application::docs::heading_hierarchy::tests::detects_skipped_level ... ok
+test application::docs::heading_hierarchy::tests::apps_readme_is_allowlisted ... ok
+test application::bcregistry::tests::validate_all_clean_corpus ... ok
+test application::docs::heading_hierarchy::tests::ignores_headings_inside_code_fence ... ok
+test application::docs::heading_hierarchy::tests::passes_when_one_h1_no_skips ... ok
+test application::docs::links::tests::categorize_returns_categories ... ok
+test application::docs::links::tests::clean_path_resolves_dotdot ... ok
+test application::docs::heading_hierarchy::tests::nested_fence_does_not_close_outer ... ok
+test application::docs::heading_hierarchy::tests::apps_internals_stay_default_deny ... ok
+test application::bcregistry::tests::validate_detects_extra_layer ... ok
+test application::docs::links::tests::extract_links_finds_valid_links ... ok
+test application::docs::heading_hierarchy::tests::exclude_suppresses_docs_but_not_repo_governance ... ok
+test application::docs::links::tests::extract_links_skips_external_urls ... ok
+test application::docs::links::tests::format_link_json_has_status ... ok
+test application::docs::links::tests::broken_same_file_anchor_yields_finding ... ok
+test application::docs::links::tests::format_link_json_with_broken_status_failure ... ok
+test application::docs::links::tests::format_link_markdown_delegates_to_text ... ok
+test application::docs::links::tests::format_link_text_quiet_is_empty_when_clean ... ok
+test application::docs::links::tests::format_link_text_includes_broken_anchor_category ... ok
+test application::docs::links::tests::format_link_text_succeeds_with_no_broken ... ok
+test application::docs::heading_hierarchy::tests::plans_in_progress_is_in_allowlist ... ok
+test application::docs::links::tests::format_link_text_with_broken_renders_report ... ok
+test application::docs::links::tests::github_slug_emoji_heading_preserves_leading_hyphen ... ok
+test application::docs::links::tests::github_slug_handles_duplicate_headings ... ok
+test application::docs::links::tests::github_slug_keeps_underscores ... ok
+test application::docs::links::tests::resolve_link_handles_anchors ... ok
+test application::docs::links::tests::resolve_link_pure_anchor_returns_source ... ok
+test application::docs::links::tests::skip_link_recognises_placeholders ... ok
+test application::docs::links::tests::filter_skip_paths_excludes_listed ... ok
+test application::docs::heading_hierarchy::tests::specs_dir_is_allowlisted ... ok
+test application::docs::links::tests::extract_links_skips_inside_fence ... ok
+test application::docs::heading_hierarchy::tests::skill_file_is_default_deny ... ok
+test application::docs::naming::tests::errors_on_empty_paths ... ok
+test application::docs::links::tests::broken_cross_file_anchor_yields_finding ... ok
+test application::docs::naming::tests::invalid_glob_errors ... ok
+test application::docs::heading_hierarchy::tests::plans_done_is_excluded ... ok
+test application::docs::naming::tests::readme_always_exempt ... ok
+test application::docs::naming::tests::exempt_glob_excludes_match ... ok
+test application::docs::naming::tests::passes_valid_kebab_basename ... ok
+test application::docs::naming::tests::detects_underscore_basename ... ok
+test application::docs::naming::tests::detects_uppercase_basename ... ok
+test application::doctor::checker::tests::compare_exact_match ... ok
+test application::doctor::checker::tests::compare_exact_mismatch ... ok
+test application::docs::links::tests::exclude_suppresses_subtree_but_not_others ... ok
+test application::doctor::checker::tests::compare_exact_no_req ... ok
+test application::doctor::checker::tests::compare_exact_strips_v ... ok
+test application::doctor::checker::tests::compare_gte_equal_ok ... ok
+test application::doctor::checker::tests::compare_gte_higher_ok ... ok
+test application::doctor::checker::tests::compare_gte_falls_back_on_parse_fail ... ok
+test application::doctor::checker::tests::compare_gte_lower_warn ... ok
+test application::doctor::checker::tests::compare_major_gte_higher_ok ... ok
+test application::doctor::checker::tests::compare_major_gte_lower_warn ... ok
+test application::doctor::checker::tests::compare_major_only ... ok
+test application::doctor::checker::tests::parse_docker_strips_comma ... ok
+test application::doctor::checker::tests::parse_java_handles_old_and_new ... ok
+test application::doctor::checker::tests::parse_jq_strips_prefix ... ok
+test application::docs::links::tests::inline_code_span_links_not_reported_as_broken ... ok
+test application::docs::links::tests::validate_all_links_returns_broken ... ok
+test application::doctor::checker::tests::parse_line_word_match ... ok
+test application::doctor::checker::tests::parse_line_word_strips_prefix ... ok
+test application::doctor::checker::tests::parse_trim_strips_v ... ok
+test application::doctor::checker::tests::parse_playwright_word ... ok
+test application::doctor::checker::tests::restored_polyglot_parsers ... ok
+test application::doctor::checker::tests::run_one_def_missing ... ok
+test application::doctor::checker::tests::run_one_def_ok_with_fake_runner ... ok
+test application::doctor::fixer::tests::already_ok_counted ... ok
+test application::doctor::fixer::tests::dry_run_does_not_invoke_runner ... ok
+test application::doctor::fixer::tests::format_summary_pattern ... ok
+test application::doctor::fixer::tests::live_runner_failure_counted ... ok
+test application::doctor::fixer::tests::live_runner_success ... ok
+test application::doctor::fixer::tests::missing_empty_steps_skipped ... ok
+test application::doctor::fixer::tests::missing_no_install_skipped ... ok
+test application::doctor::reporter::tests::json_round_trips ... ok
+test application::docs::links::tests::valid_cross_file_anchor_yields_no_finding ... ok
+test application::doctor::checker::tests::check_all_runs_and_aggregates ... ok
+test application::doctor::reporter::tests::markdown_has_tables ... ok
+test application::doctor::reporter::tests::text_contains_header_when_not_quiet ... ok
+test application::doctor::reporter::tests::overall_status_priority ... ok
+test application::doctor::reporter::tests::text_minimal_scope_marker ... ok
+test application::doctor::reporter::tests::text_omits_header_when_quiet ... ok
+test application::docs::naming::tests::skips_node_modules ... ok
+test application::doctor::reporter::tests::text_verbose_includes_duration ... ok
+test application::doctor::tools::tests::install_docker_macos_empty ... ok
+test application::doctor::tools::tests::install_git_linux ... ok
+test application::doctor::tools::tests::install_git_macos ... ok
+test application::doctor::tools::tests::install_golang_differs_by_platform ... ok
+test application::doctor::tools::tests::install_java_formats_required ... ok
+test application::doctor::tools::tests::install_node_formats_required ... ok
+test application::domain_coverage::tests::domain_area_project_is_eligible ... ok
+test application::domain_coverage::tests::non_domain_area_project_is_skipped ... ok
+test application::docs::links::tests::validate_file_skips_skill_files ... ok
+test application::doctor::checker::tests::read_rust_version_from_cargo ... ok
+test application::doctor::tools::tests::dart_has_no_install_command ... ok
+test application::docs::naming::tests::skill_md_always_exempt ... ok
+test application::doctor::tools::tests::build_returns_all_19_polyglot_tools_in_order ... ok
+test application::env::backup::tests::capitalize_basic ... ok
+test application::env::backup::tests::default_backup_dir_is_ose_public_env_backup ... ok
+test application::doctor::checker::tests::read_dotnet_version_from_global_json ... ok
+test application::doctor::checker::tests::read_node_version_reads_volta_node ... ok
+test application::doctor::tools::tests::java_uses_stderr_others_stdout ... ok
+test application::docs::links::tests::repo_wide_scan_finds_libs_and_skips_node_modules ... ok
+test application::env::backup::tests::backup_rejects_inside_repo ... ok
+test application::env::backup::tests::canonicalize_best_effort_resolves_missing_tail_through_existing_ancestor ... ok
+test application::docs::heading_hierarchy::tests::lib_readme_and_docs_subtrees_are_allowlisted ... ok
+test application::env::backup::tests::canonicalize_best_effort_matches_plain_canonicalize_for_existing_path ... ok
+test application::env::backup::tests::detect_worktree_no_git_fails ... ok
+test application::env::backup::tests::detect_worktree_normal_repo ... ok
+test application::env::backup::tests::discover_finds_pem_file ... ok
+test application::env::backup::tests::expand_tilde_no_change ... ok
+test application::env::backup::tests::expand_tilde_replaces_home ... ok
+test application::env::backup::tests::discover_skips_oversized ... ok
+test application::env::backup::tests::backup_dry_run_writes_nothing ... ok
+test application::env::backup::tests::format_markdown_basic ... ok
+test application::env::backup::tests::format_json_round_trip ... ok
+test application::env::backup::tests::format_markdown_cancelled ... ok
+test application::env::backup::tests::format_text_cancelled ... ok
+test application::env::backup::tests::format_text_default ... ok
+test application::env::backup::tests::detect_worktree_linked ... ok
+test application::env::backup::tests::format_text_quiet_one_line ... ok
+test application::env::backup::tests::format_text_verbose_shows_skipped ... ok
+test application::env::backup::tests::is_inside_repo_false_for_sibling ... ok
+test application::env::backup::tests::is_secret_file_matches_cert_and_key_extensions ... ok
+test application::env::backup::tests::is_inside_repo_true_for_child ... ok
+test application::env::backup::tests::discover_finds_secrets_json ... ok
+test application::env::injection::tests::ci_harness_key_leaking_into_app_is_reported ... ok
+test application::env::injection::tests::empty_runtime_is_reported ... ok
+test application::env::injection::tests::contract_app_missing_from_manifest_is_reported ... ok
+test application::env::backup::tests::discover_config_picks_up_existing ... ok
+test application::env::injection::tests::keys_from_mismatch_is_reported ... ok
+test application::env::backup::tests::backup_copies_files ... ok
+test application::env::injection::tests::keys_from_path_missing_is_reported ... ok
+test application::env::injection::tests::manifest_app_not_a_contract_surface_is_reported ... ok
+test application::env::injection::tests::matched_manifest_has_no_findings ... ok
+test application::env::injection::tests::unknown_home_is_reported ... ok
+test application::env::backup::tests::discover_finds_secrets_dir_file ... ok
+test application::env::backup::tests::restore_errors_when_backup_dir_missing ... ok
+test application::env::backup::tests::find_existing_returns_intersection ... ok
+test application::doctor::checker::tests::restored_polyglot_version_readers ... ok
+test application::env::backup::tests::discover_finds_env_files ... ok
+test application::env::injection::tests::load_manifest_errors_when_env_injection_section_missing_from_repo_config_yml ... ok
+test application::env::validate::tests::load_contract_reads_env_contract_section_from_repo_config_yml ... ok
+test application::env::validate::tests::load_contract_errors_when_env_contract_section_missing_from_repo_config_yml ... ok
+test application::env::injection::tests::load_manifest_reads_env_injection_section_from_repo_config_yml ... ok
+test application::env::validate::tests::parse_commented_optional_key ... ok
+test application::env::backup::tests::discover_skips_skip_dirs ... ok
+test application::env::backup::tests::discover_still_skips_git_dir ... ok
+test application::env::validate::tests::parse_skips_lowercase_key ... ok
+test application::env::validate::tests::parse_active_key ... ok
+test application::env::validate::tests::parse_skips_pure_comment ... ok
+test application::env::backup::tests::restore_copies_back ... ok
+test application::git::pre_commit::tests::run_with_step_timeout_short_circuits_after_total ... ok
+test application::env::validate::tests::scan_rust_finds_env_var_literals ... ok
+test application::env::validate::tests::scan_fsharp_finds_env_var_literals ... ok
+test application::env::validate::tests::scan_rust_finds_envy_struct_fields ... ok
+test application::env::validate::tests::scan_ts_finds_create_env_schema_keys ... ok
+test application::git::pre_commit::tests::step1_skip_when_no_config_changes ... ok
+test application::git::pre_commit::tests::step2_skip_when_no_compose_changes ... ok
+test application::git::pre_commit::tests::step2_skips_nonexistent_compose_file ... ok
+test application::git::pre_commit::tests::step5b_ignores_nested_package_json ... ok
+test application::env::validate::tests::scan_ts_finds_env_property_accesses ... ok
+test application::git::pre_commit::tests::step5b_skip_when_no_app_lockfile_change ... ok
+test application::env::validate::tests::validate_allowlisted_key_is_not_reported ... ok
+test application::env::validate::tests::validate_declared_but_unread_key_is_reported ... ok
+test application::glossary::tests::check_frontmatter_reports_missing ... ok
+test application::env::validate::tests::validate_matching_app_returns_no_findings ... ok
+test application::glossary::tests::check_table_header_extracts_malformed ... ok
+test application::git::pre_commit::tests::step1_runs_when_claude_staged_but_no_files_passes ... ok
+test application::glossary::tests::has_forbidden_for_case_insensitive ... ok
+test application::glossary::tests::is_separator_row_detects_dashes ... ok
+test application::env::validate::tests::validate_read_but_undeclared_key_is_reported ... ok
+test application::glossary::tests::parse_feature_refs_empty_cell ... ok
+test application::glossary::tests::parse_feature_refs_handles_br ... ok
+test application::glossary::tests::parse_backtick_list_extracts_ids ... ok
+test application::glossary::tests::parse_feature_refs_strips_parenthetical ... ok
+test application::glossary::tests::parse_forbidden_entry_quoted_and_unquoted ... ok
+test application::git::pre_commit::tests::step5b_only_handles_apps_with_lockfile ... ok
+test application::git::pre_commit::tests::step_heading_blocks_docs_file_with_duplicate_h1 ... ok
+test application::glossary::tests::split_table_row_strips_pipes ... ok
+test application::glossary::tests::strip_markup_removes_backticks_and_trims ... ok
+test application::git::pre_commit::tests::step_heading_allows_skill_file_with_multiple_h1 ... ok
+test application::glossary::tests::grep_files_counts_matches ... ok
+test application::glossary::tests::parse_malformed_header_reports_error ... ok
+test application::env::validate::tests::validate_rust_matching_config_returns_no_findings ... ok
+test application::glossary::tests::parse_frontmatter_and_terms ... ok
+test application::glossary::tests::parse_forbidden_synonyms_em_dash ... ok
+test application::naming::reporter::tests::format_json_carries_kind_and_count ... ok
+test application::naming::reporter::tests::format_markdown_violations_emits_table ... ok
+test application::naming::reporter::tests::format_markdown_clean_passes ... ok
+test application::glossary::tests::feature_ref_resolves_simple_path ... ok
+test application::naming::reporter::tests::format_text_failed_lists ... ok
+test application::naming::reporter::tests::format_text_passed_non_quiet ... ok
+test application::naming::reporter::tests::format_text_passed_quiet_empty ... ok
+test application::naming::reporter::tests::format_text_verbose_adds_normative_note ... ok
+test application::naming::tests::basename_strips_md_extension ... ok
+test application::naming::tests::extract_frontmatter_handles_crlf ... ok
+test application::naming::tests::extract_frontmatter_missing_closing_returns_empty ... ok
+test application::naming::tests::extract_frontmatter_no_block_returns_empty ... ok
+test application::naming::tests::extract_frontmatter_returns_name ... ok
+test application::naming::tests::extract_frontmatter_strips_quotes ... ok
+test application::naming::tests::validate_frontmatter_name_matches ... ok
+test application::naming::tests::validate_frontmatter_name_no_name_is_none ... ok
+test application::naming::tests::validate_frontmatter_name_mismatch ... ok
+test application::naming::tests::validate_mirror_clean_when_pairs_match ... ok
+test application::naming::tests::validate_mirror_empty_inputs_is_clean ... ok
+test application::naming::tests::validate_mirror_finds_missing_pairs ... ok
+test application::naming::tests::validate_mirror_returns_sorted_by_path ... ok
+test application::naming::tests::validate_suffix_accepts_matching_role ... ok
+test application::naming::tests::validate_suffix_message_includes_all_allowed ... ok
+test application::naming::tests::validate_suffix_rejects_mismatch ... ok
+test application::naming::tests::validate_suffix_matches_multi_word ... ok
+test application::naming::tests::validate_suffix_rejects_bare_suffix ... ok
+test application::repo_governance::agents_md_size::tests::missing_file_errors ... ok
+test application::repo_governance::agents_md_size::tests::fail_over_hard_limit ... ok
+test application::repo_governance::agents_md_size::tests::ok_under_target ... ok
+test application::repo_governance::audit_orchestrator::tests::audit_category_command_returns_expected ... ok
+test application::repo_governance::audit_orchestrator::tests::audit_category_order_is_fixed ... ok
+test application::glossary::tests::validate_all_missing_glossary_reports ... ok
+test application::repo_governance::audit_orchestrator::tests::audit_envelope_json_includes_schema ... ok
+test application::repo_governance::audit_orchestrator::tests::build_audit_key_deterministic ... ok
+test application::repo_governance::audit_orchestrator::tests::clean_path_handles_dot_segments ... ok
+test application::repo_governance::audit_orchestrator::tests::filter_excluded_drops_matches ... ok
+test application::repo_governance::audit_orchestrator::tests::go_filepath_join_drops_dot ... ok
+test application::repo_governance::audit_orchestrator::tests::known_false_positive_pattern_parses_bullets ... ok
+test application::repo_governance::audit_orchestrator::tests::partition_false_positives_moves_keys ... ok
+test application::repo_governance::audit_orchestrator::tests::path_matches_glob_dir_star ... ok
+test application::repo_governance::audit_orchestrator::tests::path_matches_glob_simple ... ok
+test application::repo_governance::audit_orchestrator::tests::resolve_paths_joins_relative ... ok
+test application::repo_governance::agents_md_size::tests::warn_over_target_under_warning ... ok
+test application::git::pre_commit::tests::step_validate_mermaid_uses_standardized_max_depth ... ok
+test application::repo_governance::audit_orchestrator::tests::resolve_paths_override_wins ... ok
+test application::repo_governance::agents_md_size::tests::warn_over_warning_under_hard_limit ... ok
+test application::git::pre_commit::tests::step_mermaid_blocks_malformed_staged_file ... ok
+test application::repo_governance::audit_orchestrator::tests::skip_zero_helper ... ok
+test application::repo_governance::audit_orchestrator::tests::sort_audit_findings_sorts_by_file_then_line ... ok
+test application::repo_governance::emoji_audit::tests::audit_emoji_empty_paths_errors ... ok
+test application::repo_governance::emoji_audit::tests::audit_emoji_finds_codepoint_in_json_file ... ok
+test application::glossary::tests::validate_all_clean_glossary ... ok
+test application::repo_governance::emoji_audit::tests::audit_emoji_skips_node_modules ... ok
+test application::repo_governance::emoji_audit::tests::audit_emoji_skips_non_forbidden_extensions ... ok
+test application::glossary::tests::validate_all_detects_stale_identifier ... ok
+test application::repo_governance::emoji_audit::tests::format_codepoint_pads_under_ffff ... ok
+test application::repo_governance::emoji_audit::tests::is_emoji_rune_classifies_known_blocks ... ok
+test application::repo_governance::frontmatter_audit::tests::audit_frontmatter_empty_paths_errors ... ok
+test application::repo_governance::emoji_audit::tests::audit_emoji_sorts_findings_by_file_line_column ... ok
+test application::repo_governance::frontmatter_audit::tests::detects_forbidden_updated_frontmatter_field ... ok
+test application::repo_governance::frontmatter_audit::tests::detects_last_updated_footer ... ok
+test application::repo_governance::frontmatter_audit::tests::detects_inline_date_annotation ... ok
+test application::repo_governance::frontmatter_audit::tests::find_field_line_locates_updated ... ok
+test application::repo_governance::frontmatter_audit::tests::passes_clean_file ... ok
+test application::repo_governance::frontmatter_audit::tests::split_frontmatter_no_fence ... ok
+test application::repo_governance::frontmatter_audit::tests::split_frontmatter_returns_close_line ... ok
+test application::repo_governance::frontmatter_audit::tests::sorts_findings_by_file_then_line ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::audit_empty_paths_errors ... ok
+test application::repo_governance::frontmatter_audit::tests::unclosed_frontmatter_treated_as_body ... ok
+test application::repo_governance::frontmatter_audit::tests::skips_website_apps ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::continuation_keywords_are_not_primary ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::exempts_background_block ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::exempts_scenario_outline_examples ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::findings_sorted_by_file_then_line ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::flags_scenario_with_multiple_when_lines ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::scan_flags_scenario_outline_steps_outside_examples ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::scan_reports_multiple_keywords_in_one_scenario ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::ignores_keyword_words_in_docstrings_and_comments ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::walk_nonexistent_root_yields_no_findings ... ok
+test application::repo_governance::instruction_size::tests::check_finds_fail_for_large_agents_md ... ok
+test application::repo_governance::instruction_size::tests::check_finds_warn_for_medium_size ... ok
+test application::repo_governance::instruction_size::tests::check_no_finding_for_absent_glob ... ok
+test application::repo_governance::instruction_size::tests::check_no_finding_when_within_target ... ok
+test application::repo_governance::instruction_size::tests::check_resolved_tree_returns_fail_when_large ... ok
+test application::repo_governance::instruction_size::tests::check_resolved_tree_returns_none_when_within_budget ... ok
+test application::repo_governance::instruction_size::tests::classify_fail_at_fail_boundary_plus_one ... ok
+test application::repo_governance::instruction_size::tests::classify_fail_over_fail ... ok
+test application::repo_governance::instruction_size::tests::classify_ok_at_target ... ok
+test application::repo_governance::instruction_size::tests::classify_ok_below_target ... ok
+test application::repo_governance::instruction_size::tests::classify_warn_at_warn_boundary ... ok
+test application::repo_governance::instruction_size::tests::classify_warn_over_target_under_fail ... ok
+test application::repo_governance::instruction_size::tests::load_budget_config_error_on_missing_file ... ok
+test application::repo_governance::instruction_size::tests::fail_message_contains_progressive_disclosure ... ok
+test application::repo_governance::instruction_size::tests::load_budget_config_parses_agents_md_surface ... ok
+test application::repo_governance::instruction_size::tests::resolve_tree_handles_cycle ... ok
+test application::repo_governance::instruction_size::tests::resolve_tree_missing_import_counts_zero ... ok
+test application::repo_governance::instruction_size::tests::severity_label_fail ... ok
+test application::repo_governance::instruction_size::tests::severity_label_ok ... ok
+test application::repo_governance::instruction_size::tests::severity_label_warn ... ok
+test application::repo_governance::instruction_size::tests::resolve_tree_sums_file_and_imports ... ok
+test application::repo_governance::gherkin_keyword_cardinality_audit::tests::walk_skips_excluded_fixture_and_skip_dirs ... ok
+test application::repo_governance::layer_coherence::tests::detects_cross_file_name_mismatch ... ok
+test application::repo_governance::layer_coherence::tests::detects_cross_file_number_mismatch ... ok
+test application::repo_governance::layer_coherence::tests::detects_intra_file_name_conflict ... ok
+test application::repo_governance::layer_coherence::tests::detects_numbering_gap ... ok
+test application::repo_governance::layer_coherence::tests::missing_doc_emits_finding ... ok
+test application::repo_governance::license_audit::tests::classify_recognises_known_licenses ... ok
+test application::repo_governance::license_audit::tests::detects_missing_license ... ok
+test application::repo_governance::layer_coherence::tests::passes_with_matching_docs ... ok
+test application::repo_governance::license_audit::tests::find_columns_locates_headers ... ok
+test application::repo_governance::layer_coherence::tests::sorts_findings_by_file_then_kind ... ok
+test application::repo_governance::license_audit::tests::is_separator_recognises_separators ... ok
+test application::repo_governance::license_audit::tests::licenses_equal_handles_aliases ... ok
+test application::repo_governance::license_audit::tests::normalise_strips_backticks_and_slashes ... ok
+test application::repo_governance::license_audit::tests::owned_by_audit_only_immediate_children ... ok
+test application::repo_governance::license_audit::tests::detects_spdx_mismatch ... ok
+test application::repo_governance::license_audit::tests::skips_exempt_apps_and_e2e ... ok
+test application::repo_governance::license_audit::tests::split_markdown_row_handles_escape ... ok
+test application::repo_governance::license_audit::tests::passes_when_notice_matches ... ok
+test application::repo_governance::readme_index_audit::tests::clean_when_all_linked ... ok
+test application::repo_governance::readme_index_audit::tests::bare_dir_link_recognized ... ok
+test application::repo_governance::readme_index_audit::tests::detects_ghost_link ... ok
+test application::repo_governance::readme_index_audit::tests::errors_on_empty_paths ... ok
+test application::repo_governance::readme_index_audit::tests::cross_dir_link_to_existing_file_not_ghost ... ok
+test application::repo_governance::readme_index_audit::tests::extract_links_skips_parent_paths ... ok
+test application::repo_governance::readme_index_audit::tests::extract_links_skips_urls ... ok
+test application::repo_governance::readme_index_audit::tests::detects_orphan_md_file ... ok
+test application::repo_governance::readme_index_audit::tests::extract_links_strips_fragments ... ok
+test application::repo_governance::readme_index_audit::tests::matches_glob_basename_full_and_component ... ok
+test application::repo_governance::readme_index_audit::tests::excludes_filter_out_files ... ok
+test application::repo_governance::readme_index_audit::tests::subdir_readme_treated_as_target ... ok
+test application::repo_governance::traceability_audit::tests::convention_missing_principles_emits_finding ... ok
+test application::repo_governance::traceability_audit::tests::first_non_empty_line_skips_blanks ... ok
+test application::repo_governance::traceability_audit::tests::development_passes_with_both_sections ... ok
+test application::repo_governance::traceability_audit::tests::development_requires_both_sections ... ok
+test application::repo_governance::traceability_audit::tests::principle_missing_vision_emits_finding ... ok
+test application::repo_governance::traceability_audit::tests::meta_exempt_paths_skip_agent_check ... ok
+test application::repo_governance::traceability_audit::tests::principle_passes_when_vision_section_present ... ok
+test application::repo_governance::traceability_audit::tests::readme_files_are_exempt ... ok
+test application::repo_governance::traceability_audit::tests::workflow_missing_agent_ref_emits_finding ... ok
+test application::repo_governance::traceability_audit::tests::workflow_passes_when_agent_referenced ... ok
+test application::repo_governance::vendor_audit::tests::detects_binding_dir_path ... ok
+test application::repo_governance::vendor_audit::tests::detects_antigravity_in_prose ... ok
+test application::repo_governance::vendor_audit::tests::detects_amazon_q_in_prose ... ok
+test application::repo_governance::vendor_audit::tests::detects_forbidden_brand_in_prose ... ok
+test application::repo_governance::vendor_audit::tests::detects_junie_in_prose ... ok
+test application::repo_governance::vendor_audit::tests::does_not_flag_bare_capital_q ... ok
+test application::repo_governance::vendor_audit::tests::fence_line_len_counts_backticks ... ok
+test application::repo_governance::vendor_audit::tests::does_not_flag_math_constant_pi ... ok
+test application::repo_governance::vendor_audit::tests::parse_heading_recognises_atx_levels ... ok
+test application::repo_governance::vendor_audit::tests::platform_binding_scope_ends_at_same_level_heading ... ok
+test application::repo_governance::vendor_audit::tests::governance_scope_tolerates_missing_root_files ... ok
+test application::repo_governance::vendor_audit::tests::skips_code_fences ... ok
+test application::repo_governance::vendor_audit::tests::skips_frontmatter ... ok
+test application::repo_governance::vendor_audit::tests::skips_html_comments ... ok
+test application::repo_governance::vendor_audit::tests::skips_inline_code_spans ... ok
+test application::repo_governance::vendor_audit::tests::skips_link_urls ... ok
+test application::repo_governance::vendor_audit::tests::skips_multiline_html_comments ... ok
+test application::repo_governance::vendor_audit::tests::skips_nested_quad_fences ... ok
+test application::repo_governance::vendor_audit::tests::skips_new_vendor_in_platform_binding_section ... ok
+test application::repo_governance::vendor_audit::tests::skips_platform_binding_section ... ok
+test application::severity::tests::code_strings ... ok
+test application::severity::tests::parse_error_default ... ok
+test application::severity::tests::parse_warn ... ok
+test application::severity::tests::resolve_default_error ... ok
+test application::severity::tests::resolve_env_emits_audit_for_warn ... ok
+test application::repo_governance::vendor_audit::tests::skip_convention_definition_file ... ok
+test application::severity::tests::resolve_env_error_silent ... ok
+test application::severity::tests::resolve_flag_wins ... ok
+test application::speccoverage::checker::tests::check_all_one_to_one_reports_file_gap ... ok
+test application::speccoverage::checker::tests::check_orphan_step_impls_empty_matcher_returns_empty ... ok
+test application::speccoverage::checker::tests::check_orphan_step_impls_flags_uncovered_exact_entries ... ok
+test application::speccoverage::checker::tests::check_orphan_step_impls_handles_pattern_entries ... ok
+test application::speccoverage::checker::tests::check_all_shared_steps_skips_file_matching ... ok
+test application::speccoverage::checker::tests::collect_feature_files_falls_back_to_specs_dir_when_dirs_empty ... ok
+test application::repo_governance::vendor_audit::tests::governance_scope_walks_in_scope_and_skips_out_of_scope ... ok
+test application::speccoverage::checker::tests::extract_all_step_texts_aggregates_across_languages ... ok
+test application::speccoverage::checker::tests::extract_go_scenario_titles_picks_up_comment ... ok
+test application::speccoverage::checker::tests::extract_ts_scenario_titles_picks_up_double_quoted_title ... ok
+test application::speccoverage::checker::tests::find_all_matching_test_files_returns_empty_for_missing_dir ... ok
+test application::speccoverage::checker::tests::is_in_test_dir_detects_test_segments ... ok
+test application::speccoverage::checker::tests::is_test_file_go ... ok
+test application::speccoverage::checker::tests::extract_scenario_titles_dispatches_by_extension ... ok
+test application::speccoverage::checker::tests::is_test_file_python ... ok
+test application::speccoverage::checker::tests::matches_stem_kebab_snake_pascal_test_prefix ... ok
+test application::speccoverage::checker::tests::is_test_file_typescript ... ok
+test application::speccoverage::checker::tests::step_covered_with_variants_requires_all_to_match ... ok
+test application::speccoverage::checker::tests::strip_js_comments_preserves_strings ... ok
+test application::speccoverage::checker::tests::strip_js_comments_removes_block_and_line_at_line_start ... ok
+test application::speccoverage::checker::tests::to_pascal_case_handles_kebab ... ok
+test application::speccoverage::checker::tests::find_all_matching_test_files_respects_skip_dirs ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_expr_to_regex_escaped_braces_are_literal_not_a_parameter ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_expr_to_regex_escapes_literals ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_expr_to_regex_handles_escape_then_param ... ok
+test application::speccoverage::checker::tests::walk_feature_files_skips_excluded_dirs ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_expr_to_regex_mixes_escaped_braces_and_real_params ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_expr_to_regex_string_param ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_param_float_maps_to_signed_decimal ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_param_int_maps_to_signed_digits ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_param_string_maps_to_quoted ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_param_unknown_maps_to_any ... ok
+test application::speccoverage::cucumber_expr::tests::cucumber_param_word_maps_to_non_whitespace ... ok
+test application::speccoverage::cucumber_expr::tests::has_cucumber_expressions_detects_braces ... ok
+test application::speccoverage::checker::tests::walk_feature_files_returns_features_recursively ... ok
+test application::speccoverage::cucumber_expr::tests::is_python_parsers_detects_format ... ok
+test application::speccoverage::cucumber_expr::tests::python_parsers_g_maps_to_float ... ok
+test application::speccoverage::cucumber_expr::tests::python_parsers_plain_name_maps_to_any ... ok
+test application::speccoverage::cucumber_expr::tests::python_parsers_d_maps_to_digit ... ok
+test application::speccoverage::cucumber_expr::tests::python_parsers_w_maps_to_word ... ok
+test application::speccoverage::cucumber_expr::tests::unescape_basic_escapes ... ok
+test application::speccoverage::extractors::tests::clojure_step_extraction ... ok
+test application::speccoverage::extractors::tests::csharp_verbatim_string_step ... ok
+test application::speccoverage::extractors::tests::dart_step_extraction ... ok
+test application::speccoverage::extractors::tests::elixir_step_extraction ... ok
+test application::speccoverage::extractors::tests::fsharp_inline_step ... ok
+test application::speccoverage::extractors::tests::fsharp_multiline_step ... ok
+test application::speccoverage::extractors::tests::jvm_step_extraction ... ok
+test application::speccoverage::extractors::tests::jvm_step_extraction_decodes_kotlin_escaped_slashes_and_braces ... ok
+test application::speccoverage::extractors::tests::jvm_step_extraction_decodes_kotlin_escaped_raw_regex ... ok
+test application::speccoverage::extractors::tests::jvm_step_extraction_handles_multiline_annotation ... ok
+test application::speccoverage::extractors::tests::python_scenario_titles_extracted ... ok
+test application::speccoverage::extractors::tests::python_step_extraction_with_parsers_parse ... ok
+test application::speccoverage::extractors::tests::rust_literal_step_is_added_as_exact ... ok
+test application::speccoverage::matcher::tests::add_empty_text_is_skipped ... ok
+test application::speccoverage::matcher::tests::add_exact_lookup_via_matches ... ok
+test application::speccoverage::extractors::tests::rust_expr_step_is_compiled_as_cucumber_pattern ... ok
+test application::speccoverage::matcher::tests::add_pattern_via_cucumber_expression ... ok
+test application::speccoverage::extractors::tests::rust_regex_step_uses_raw_pattern ... ok
+test application::speccoverage::matcher::tests::add_pattern_via_raw_caret_regex ... ok
+test application::speccoverage::matcher::tests::python_parsers_d_compiles_correctly ... ok
+test application::speccoverage::parser::tests::missing_file_returns_error ... ok
+test application::speccoverage::parser::tests::background_steps_yield_synthetic_first_scenario ... ok
+test application::speccoverage::parser::tests::expanded_outline_step_texts_returns_all_variants ... ok
+test application::speccoverage::reporter::tests::format_json_status_failure_on_any_gap ... ok
+test application::speccoverage::reporter::tests::format_json_status_success_on_clean ... ok
+test application::speccoverage::parser::tests::outline_steps_get_variants_per_examples_row ... ok
+test application::speccoverage::parser::tests::parses_simple_scenario_with_three_steps ... ok
+test application::speccoverage::reporter::tests::format_markdown_delegates_to_text ... ok
+test application::speccoverage::reporter::tests::format_text_no_gaps_emits_check_message ... ok
+test application::speccoverage::reporter::tests::format_text_no_gaps_quiet_is_empty ... ok
+test application::speccoverage::reporter::tests::format_text_with_gaps_lists_them ... ok
+test application::speccoverage::util::tests::first_non_empty_returns_a_when_present ... ok
+test application::speccoverage::util::tests::normalize_ws_collapses_runs_and_trims ... ok
+test application::speccoverage::util::tests::unescape_string_handles_common_sequences ... ok
+test application::specs::tests::required_folders_5 ... ok
+test application::specs::tests::count_non_readme_md_files_includes_features ... ok
+test application::specs::tests::validate_spec_adoption_missing_all ... ok
+test application::repo_governance::audit_orchestrator::tests::read_git_sha_returns_unknown_in_nongit_dir ... ok
+test application::repo_config::tests::coverage_project_has_correct_fields ... ok
+test application::repo_config::tests::loads_repo_config_from_repo_root ... ok
+test application::specs::tests::validate_spec_counts_missing_folder ... ok
+test application::specs::tests::validate_spec_adoption_clean ... ok
+test application::specs::tests::validate_spec_adoption_empty_behavior ... ok
+test application::specs::tests::validate_spec_counts_reports_each_missing ... ok
+test application::specs::tests::validate_spec_tree_missing ... ok
+test application::specs::tests::validate_spec_gherkin_domains_domain_subdir_accepted ... ok
+test application::specs::tests::validate_spec_gherkin_domains_flat_feature_rejected ... ok
+test cli::cli_uniform_grammar_tests::env_staged_guard_validate_parses ... ok
+test cli::cli_uniform_grammar_tests::new_harness_sync_opencode_passes ... ok
+test application::specs::tests::walk_feature_files_finds_nested ... ok
+test cli::cli_uniform_grammar_tests::new_harness_validate_naming_passes ... ok
+test cli::cli_uniform_grammar_tests::new_md_validate_mermaid_passes ... ok
+test cli::cli_uniform_grammar_tests::new_repo_governance_validate_vendor_passes ... ok
+test cli::cli_uniform_grammar_tests::new_specs_behavior_coverage_validate_passes ... ok
+test cli::cli_uniform_grammar_tests::old_harness_detect_duplication_fails ... ok
+test cli::cli_uniform_grammar_tests::old_md_validate_mermaid_fails ... ok
+test cli::cli_uniform_grammar_tests::old_harness_validate_naming_fails ... ok
+test cli::cli_uniform_grammar_tests::old_repo_governance_vendor_audit_fails ... ok
+test cli::cli_uniform_grammar_tests::old_specs_coverage_fails ... ok
+test cli::cli_uniform_grammar_tests::specs_behavior_coverage_validate_passes_after_rename ... ok
+test cli::cli_uniform_grammar_tests::specs_domain_coverage_validate_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_structure_validate_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_bc_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_counts_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_adoption_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_coverage_no_longer_parses_after_rename ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_links_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_tree_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::test_coverage_validate_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::specs_validate_ul_no_longer_parses ... ok
+test application::specs::tests::walk_md_files_finds_nested ... ok
+test cli::cli_uniform_grammar_tests::verb_last_convention_emoji_validate_parses ... ok
+test cli::cli_uniform_grammar_tests::verb_last_harness_bindings_generate_with_harness_flag_parses ... ok
+test cli::cli_uniform_grammar_tests::verb_last_harness_bindings_validate_parses ... ok
+test cli::cli_uniform_grammar_tests::verb_last_harness_instruction_size_validate_parses ... ok
+test application::specs::tests::validate_spec_counts_empty_subfolder_medium ... ok
+test cli::cli_uniform_grammar_tests::verb_last_repo_governance_workflows_naming_validate_parses ... ok
+test cli::cli_uniform_grammar_tests::verb_middle_convention_validate_instruction_size_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::verb_middle_harness_validate_bindings_no_longer_parses ... ok
+test cli::cli_uniform_grammar_tests::verb_middle_convention_validate_emoji_no_longer_parses ... ok
+test commands::convention_audit::tests::audit_args_skip_is_vec ... ok
+test cli::cli_uniform_grammar_tests::verb_middle_workflows_validate_naming_no_longer_parses ... ok
+test commands::convention_audit::tests::members_list_contains_expected_validators ... ok
+test commands::convention_audit::tests::run_member_unknown_returns_error ... ok
+test commands::convention_audit::tests::members_list_has_expected_count ... ok
+test commands::convention_audit::tests::run_with_all_skipped_succeeds ... ok
+test commands::convention_validate_agents_md_size::tests::status_label_maps_severity_to_label ... ok
+test commands::convention_validate_emoji::tests::format_json_status_failed_on_findings ... ok
+test commands::convention_validate_emoji::tests::format_json_status_passed_on_empty ... ok
+test commands::convention_validate_emoji::tests::format_markdown_passed_when_empty ... ok
+test commands::convention_validate_emoji::tests::format_markdown_table_with_findings ... ok
+test commands::convention_validate_emoji::tests::format_text_fails_with_findings ... ok
+test commands::convention_validate_emoji::tests::format_text_passes_when_no_findings ... ok
+test application::specs::tests::validate_spec_tree_complete ... ok
+test commands::convention_validate_instruction_size::tests::format_json_failed_contains_finding ... ok
+test commands::convention_validate_instruction_size::tests::format_json_passed ... ok
+test commands::convention_validate_instruction_size::tests::format_markdown_passed ... ok
+test commands::convention_validate_instruction_size::tests::format_markdown_with_findings ... ok
+test commands::convention_validate_instruction_size::tests::format_text_passed_when_no_findings ... ok
+test commands::convention_validate_instruction_size::tests::format_text_shows_fail_findings ... ok
+test application::specs::tests::validate_spec_tree_build_tools_surface_accepted ... ok
+test commands::convention_validate_instruction_size::tests::harness_registry_instruction_surface_is_budgeted ... ok
+test commands::convention_validate_instruction_size::tests::run_reads_instruction_size_section_from_repo_config_yml ... ok
+test commands::convention_validate_instruction_size::tests::fail_message_in_run_contains_progressive_disclosure ... ok
+test commands::convention_validate_license::tests::format_json_failed ... ok
+test commands::convention_validate_license::tests::format_json_passed ... ok
+test commands::convention_validate_license::tests::format_markdown_failed ... ok
+test commands::convention_validate_license::tests::format_markdown_passed ... ok
+test commands::convention_validate_license::tests::format_text_failed ... ok
+test commands::convention_validate_license::tests::format_text_passed ... ok
+test commands::doctor::tests::args_default_values ... ok
+test commands::env_backup::tests::args_constructible ... ok
+test commands::convention_validate_instruction_size::tests::run_returns_ok_when_no_instruction_size_section ... ok
+test commands::env_init::tests::args_default ... ok
+test commands::env_restore::tests::args_default ... ok
+test commands::env_staged_guard::tests::empty_staged_set_is_allowed ... ok
+test commands::env_staged_guard::tests::is_offending_allows_dot_env_example ... ok
+test commands::env_staged_guard::tests::is_offending_allows_non_env_files ... ok
+test commands::env_staged_guard::tests::is_offending_detects_dot_env ... ok
+test commands::env_staged_guard::tests::multiple_env_files_all_named ... ok
+test commands::env_staged_guard::tests::policy_message_contains_guard_env_file_access ... ok
+test commands::env_staged_guard::tests::staged_env_example_is_allowed ... ok
+test commands::env_staged_guard::tests::staged_env_file_is_rejected ... ok
+test commands::env_staged_guard::tests::staged_env_file_output_names_the_file ... ok
+test commands::env_validate::tests::args_constructible ... ok
+test commands::convention_validate_instruction_size::tests::run_returns_err_when_agents_md_exceeds_fail ... ok
+test commands::git_pre_commit::tests::args_constructible ... ok
+test commands::governance_audit::tests::json_passes ... ok
+test commands::governance_audit::tests::markdown_failing_with_skipped ... ok
+test commands::governance_audit::tests::markdown_passing ... ok
+test commands::governance_audit::tests::text_failing ... ok
+test commands::governance_audit::tests::text_passing ... ok
+test commands::governance_layer_coherence::tests::format_json_failed ... ok
+test commands::governance_layer_coherence::tests::format_json_passed ... ok
+test commands::governance_layer_coherence::tests::format_markdown_failed ... ok
+test commands::governance_layer_coherence::tests::format_markdown_passed ... ok
+test commands::governance_layer_coherence::tests::format_text_failed ... ok
+test commands::governance_layer_coherence::tests::format_text_passed ... ok
+test commands::governance_traceability_audit::tests::format_json_failed ... ok
+test commands::governance_traceability_audit::tests::format_json_passed ... ok
+test commands::governance_traceability_audit::tests::format_markdown_failed ... ok
+test commands::governance_traceability_audit::tests::format_markdown_passed ... ok
+test commands::governance_traceability_audit::tests::format_text_failed ... ok
+test commands::governance_traceability_audit::tests::format_text_passed ... ok
+test commands::governance_vendor_audit::tests::format_json_failed ... ok
+test commands::governance_vendor_audit::tests::format_json_passed ... ok
+test commands::governance_vendor_audit::tests::format_markdown_failed ... ok
+test commands::governance_vendor_audit::tests::format_markdown_passed ... ok
+test commands::governance_vendor_audit::tests::format_text_failed ... ok
+test commands::governance_vendor_audit::tests::format_text_passed ... ok
+test commands::harness_audit::tests::audit_args_skip_is_vec ... ok
+test commands::harness_audit::tests::members_list_contains_expected_validators ... ok
+test commands::harness_audit::tests::members_list_has_expected_count ... ok
+test commands::convention_validate_instruction_size::tests::run_returns_ok_when_within_budget ... ok
+test commands::harness_audit::tests::run_member_unknown_returns_error ... ok
+test commands::harness_audit::tests::run_with_all_skipped_succeeds ... ok
+test commands::harness_emit_bindings::tests::args_default ... ok
+test commands::harness_emit_bindings::tests::format_json_is_valid ... ok
+test commands::harness_emit_bindings::tests::format_text_lists_files ... ok
+test commands::harness_emit_bindings::tests::format_text_quiet_hides_listing ... ok
+test commands::harness_generate_bindings::tests::amazonq_dry_run_json_output_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::amazonq_dry_run_markdown_output_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::amazonq_dry_run_text_output_runs_without_panic ... ok
+test commands::env_init::tests::collect_examples_finds_apps_env_example ... ok
+test application::repo_governance::audit_orchestrator::tests::run_audit_empty_repo_skip_all_categories ... ok
+test commands::harness_generate_bindings::tests::amazonq_json_output_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::args_defaults ... ok
+test commands::harness_generate_bindings::tests::both_disabled_is_error ... ok
+test commands::convention_audit::tests::run_with_partial_skip_does_not_panic ... ok
+test commands::harness_generate_bindings::tests::dry_run_flag_set_correctly ... ok
+test commands::harness_generate_bindings::tests::amazonq_markdown_output_runs_without_panic ... ok
+test application::git::pre_commit::tests::step7_validate_links_clean_empty_repo ... ok
+test application::git::pre_commit::tests::step7_excludes_plans_done_broken_link ... ok
+test application::repo_governance::audit_orchestrator::tests::run_audit_include_only_filter ... ok
+test commands::harness_generate_bindings::tests::amazonq_only_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::harness_unknown_name_is_error ... ok
+test commands::harness_generate_bindings::tests::dry_run_opencode_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::harness_amazonq_dry_run_via_run_reaches_dry_run_branch ... ok
+test commands::harness_generate_bindings::tests::harness_amazonq_overrides_opencode_flag ... ok
+test commands::harness_generate_bindings::tests::quiet_flag_set_correctly ... ok
+test commands::harness_generate_bindings::tests::verbose_flag_set_correctly ... ok
+test commands::harness_sync::tests::flag_defaults ... ok
+test commands::harness_validate_bindings::tests::args_default ... ok
+test commands::harness_validate_claude::tests::args_flags_default_off ... ok
+test commands::harness_validate_claude::tests::empty_result_renders_passed ... ok
+test commands::harness_validate_claude::tests::validate_claude_options_field_passthrough ... ok
+test commands::harness_validate_duplication::tests::format_json_failed ... ok
+test commands::harness_validate_duplication::tests::format_json_passed ... ok
+test commands::harness_validate_duplication::tests::format_markdown_failed ... ok
+test commands::harness_validate_duplication::tests::format_markdown_passed ... ok
+test commands::harness_validate_duplication::tests::format_text_failed ... ok
+test commands::harness_validate_duplication::tests::format_text_passed ... ok
+test commands::harness_validate_instruction_size::tests::run_for_root_fails_when_registry_surface_oversized ... ok
+test commands::harness_validate_instruction_size::tests::run_for_root_passes_when_within_budget ... ok
+test commands::harness_validate_naming::tests::agents_validate_naming_accepts_researcher_role ... ok
+test commands::harness_validate_naming::tests::agents_validate_naming_accepts_tester_role ... ok
+test commands::harness_validate_naming::tests::agents_validate_naming_detects_suffix_and_mirror ... ok
+test commands::harness_validate_naming::tests::agents_validate_naming_clean_repo_is_empty ... ok
+test commands::harness_validate_naming::tests::harness_naming_validate_checks_amazonq_agent_dir ... ok
+test commands::harness_validate_naming::tests::harness_naming_validate_mirrors_include_amazonq_n_way ... ok
+test commands::harness_validate_naming::tests::list_agent_files_missing_dir_is_empty ... ok
+test commands::harness_validate_sync::tests::args_default ... ok
+test commands::lang_java_validate_null_safety::tests::args_constructible ... ok
+test commands::harness_generate_bindings::tests::both_enabled_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::harness_opencode_overrides_amazonq_flag ... ok
+test commands::harness_validate_naming::tests::list_agent_files_skips_readme_and_subagent ... ok
+test commands::lang_java_validate_null_safety::tests::run_detects_missing_package_info ... ok
+test commands::lang_java_validate_null_safety::tests::run_honors_custom_annotation ... ok
+test commands::md_audit::tests::audit_args_skip_is_vec ... ok
+test commands::md_audit::tests::members_list_contains_expected_validators ... ok
+test commands::md_audit::tests::members_list_has_expected_count ... ok
+test commands::lang_java_validate_null_safety::tests::run_passes_when_all_packages_annotated ... ok
+test commands::md_audit::tests::run_member_unknown_returns_error ... ok
+test commands::md_audit::tests::run_with_all_skipped_succeeds ... ok
+test commands::md_validate_frontmatter::tests::format_json_failed ... ok
+test commands::md_validate_frontmatter::tests::format_json_passed ... ok
+test commands::md_validate_frontmatter::tests::format_markdown_failed ... ok
+test commands::md_validate_frontmatter::tests::format_markdown_passed_empty ... ok
+test commands::md_validate_frontmatter::tests::format_markdown_warn_only ... ok
+test commands::md_validate_frontmatter::tests::format_text_failed ... ok
+test commands::md_validate_frontmatter::tests::format_text_passed_empty ... ok
+test commands::md_validate_frontmatter::tests::format_text_warn_only_passes ... ok
+test commands::md_validate_frontmatter_dates::tests::format_json_status_failed_on_findings ... ok
+test commands::md_validate_frontmatter_dates::tests::format_json_status_passed_on_empty ... ok
+test commands::md_validate_frontmatter_dates::tests::format_markdown_passed_when_empty ... ok
+test commands::md_validate_frontmatter_dates::tests::format_markdown_table_with_findings ... ok
+test commands::md_validate_frontmatter_dates::tests::format_text_fails_with_findings ... ok
+test commands::md_validate_frontmatter_dates::tests::format_text_passes_when_no_findings ... ok
+test commands::md_validate_heading_hierarchy::tests::args_has_exclude_field ... ok
+test commands::md_validate_heading_hierarchy::tests::format_json_failed ... ok
+test application::repo_governance::audit_orchestrator::tests::run_audit_unknown_category_returns_error ... ok
+test commands::md_validate_heading_hierarchy::tests::format_json_passed ... ok
+test commands::md_validate_heading_hierarchy::tests::format_markdown_passed ... ok
+test application::repo_governance::audit_orchestrator::tests::run_category_unknown_returns_error ... ok
+test commands::md_validate_heading_hierarchy::tests::format_markdown_failed ... ok
+test commands::md_validate_heading_hierarchy::tests::format_text_failed ... ok
+test commands::md_validate_heading_hierarchy::tests::non_allowlisted_content_path_is_skipped_by_allowlist ... ok
+test commands::md_validate_links::tests::args_exclude_is_threaded_to_skip_paths ... ok
+test commands::md_validate_heading_hierarchy::tests::format_text_passed ... ok
+test commands::md_validate_links::tests::args_default_staged_only_false ... ok
+test commands::md_validate_links::tests::args_staged_only_can_be_set ... ok
+test commands::md_validate_mermaid::tests::apply_excludes_filters_by_repo_relative_prefix ... ok
+test commands::md_validate_mermaid::tests::apply_excludes_noop_when_empty ... ok
+test commands::md_validate_mermaid::tests::args_verbose_and_quiet_thread_into_format_text_call ... ok
+test commands::md_validate_mermaid::tests::collect_md_files_handles_absolute_paths ... ok
+test commands::md_validate_links::tests::md_links_validate_covers_specs_dir ... ok
+test commands::harness_generate_bindings::tests::opencode_markdown_output_runs_without_panic ... ok
+test commands::harness_generate_bindings::tests::opencode_json_output_runs_without_panic ... ok
+test commands::md_validate_mermaid::tests::filter_md_paths_filters_md_only ... ok
+test commands::md_validate_naming::tests::format_json_failed ... ok
+test commands::md_validate_naming::tests::format_markdown_failed ... ok
+test commands::md_validate_naming::tests::format_json_passed ... ok
+test commands::md_validate_naming::tests::format_markdown_passed ... ok
+test commands::md_validate_readme_index::tests::format_json_failed ... ok
+test commands::md_validate_naming::tests::format_text_failed ... ok
+test commands::md_validate_naming::tests::format_text_passed ... ok
+test commands::md_validate_readme_index::tests::format_json_passed ... ok
+test commands::md_validate_readme_index::tests::format_markdown_failed ... ok
+test commands::md_validate_readme_index::tests::format_markdown_passed ... ok
+test commands::md_validate_mermaid::tests::walk_md_files_skips_node_modules ... ok
+test commands::md_validate_readme_index::tests::format_text_failed ... ok
+test commands::md_validate_readme_index::tests::format_text_passed ... ok
+test commands::specs_audit::tests::audit_args_skip_is_vec ... ok
+test commands::specs_audit::tests::members_list_has_expected_count ... ok
+test commands::specs_audit::tests::members_list_contains_expected_validators ... ok
+test commands::specs_audit::tests::run_member_unknown_returns_error ... ok
+test commands::specs_audit::tests::run_with_all_skipped_succeeds ... ok
+test commands::specs_bc::tests::args_constructible ... ok
+test commands::specs_clean_java_imports::tests::args_constructible ... ok
+test commands::specs_clean_java_imports::tests::format_json_status_reflects_modifications ... ok
+test commands::md_validate_mermaid::tests::collect_md_repo_wide_walks_all_dirs ... ok
+test commands::specs_clean_java_imports::tests::format_markdown_with_and_without_modifications ... ok
+test commands::specs_clean_java_imports::tests::format_text_no_modifications ... ok
+test commands::specs_bc::tests::run_at_root_missing_registry_errors ... ok
+test commands::specs_clean_java_imports::tests::format_text_with_modifications_lists_files ... ok
+test commands::specs_clean_java_imports::tests::run_actually_removes_unused_imports ... ok
+test commands::specs_coverage::tests::partial_level_dirs_returns_err ... ok
+test commands::harness_generate_bindings::tests::opencode_only_runs_without_panic ... ok
+specs structure validate: 0 finding(s) for "crud"
+test commands::md_audit::tests::run_with_partial_skip_skips_named_validators ... ok
+specs structure validate: 0 finding(s) for "rhino"
+test commands::specs_coverage::tests::run_domain_runs_full_scan_for_eligible_project ... ok
+test commands::specs_coverage::tests::run_domain_skips_project_not_in_domain_areas ... ok
+test commands::specs_coverage::tests::run_returns_ok_on_real_rhino_cli_gherkin ... ignored, Real-corpus Gherkin coverage is blocked on the deferred Rust cucumber harness. This test previously passed only because it aggregated the archived/rhino-cli Go step defs, which have now been removed; apps/rhino-cli alone does not yet implement the step definitions. Re-enable once the Rust cucumber harness lands.
+test commands::specs_coverage::tests::run_returns_err_on_too_few_paths ... ok
+test commands::specs_coverage::tests::run_returns_err_with_gaps_when_specs_missing_test_files ... ok
+test commands::specs_coverage::tests::validate_args_requires_two_paths_min ... ok
+test commands::specs_gherkin_cardinality::tests::format_json_status_failed_on_findings ... ok
+test commands::specs_gherkin_cardinality::tests::format_json_status_passed_on_empty ... ok
+test commands::specs_gherkin_cardinality::tests::format_markdown_passed_when_empty ... ok
+test commands::specs_gherkin_cardinality::tests::format_markdown_table_with_findings ... ok
+test commands::specs_gherkin_cardinality::tests::format_text_fails_with_findings ... ok
+test commands::specs_gherkin_cardinality::tests::format_text_passes_when_no_findings ... ok
+test commands::specs_gherkin_cardinality::tests::resolve_scan_paths_defaults_to_repo_root ... ok
+test commands::specs_gherkin_cardinality::tests::resolve_scan_paths_flags_when_no_positional ... ok
+test commands::specs_gherkin_cardinality::tests::resolve_scan_paths_keeps_absolute ... ok
+test commands::specs_gherkin_cardinality::tests::resolve_scan_paths_positional_wins_over_flags ... ok
+test commands::specs_scaffold_dart::tests::args_constructible ... ok
+test commands::specs_scaffold_dart::tests::format_json_shape ... ok
+test commands::specs_scaffold_dart::tests::format_markdown_shapes ... ok
+test commands::specs_scaffold_dart::tests::format_text_lists_model_files ... ok
+test commands::specs_scaffold_dart::tests::run_actually_writes_pubspec_and_barrel ... ok
+test commands::specs_structure_validate::tests::all_spec_areas_discovered_from_filesystem_not_just_ddd_allowlist ... ok
+test commands::specs_structure_validate::tests::ddd_area_emits_bc_label_in_output ... ok
+test commands::specs_coverage::tests::run_returns_err_with_json_output_format ... ok
+test commands::specs_structure_validate::tests::ddd_area_emits_ul_label_in_output ... ok
+test commands::specs_structure_validate::tests::non_ddd_area_with_unexpected_ddd_dir_should_error ... ok
+test commands::specs_structure_validate::tests::resolve_apps_default_discovers_filesystem_areas ... ok
+test commands::specs_structure_validate::tests::non_ddd_area_without_ddd_dir_should_be_clean ... ok
+test commands::specs_structure_validate::tests::resolve_apps_flag ... ok
+test commands::specs_structure_validate::tests::resolve_apps_positional ... ok
+test commands::specs_structure_validate::tests::run_at_root_missing_adoption_emits_adoption_label ... ok
+test commands::specs_ul::tests::args_constructible ... ok
+test commands::specs_ul::tests::run_at_root_missing_registry_errors ... ok
+test commands::specs_validate_counts::tests::resolve_folders_default ... ok
+test commands::specs_validate_counts::tests::resolve_folders_flag ... ok
+test commands::specs_validate_counts::tests::resolve_folders_positional ... ok
+test commands::specs_coverage::tests::three_level_fails_when_integration_and_e2e_missing ... ok
+test commands::specs_validate_counts::tests::run_at_root_missing_folder_errors ... ok
+test commands::workflows_validate_naming::tests::list_workflow_files_skips_meta_and_readme ... ok
+test commands::specs_validate_counts::tests::run_at_root_clean_folder_passes ... ok
+test commands::workflows_validate_naming::tests::workflows_validate_naming_accepts_planning_suffix ... ok
+test commands::workflows_validate_naming::tests::workflows_validate_naming_clean_returns_empty ... ok
+test domain::cliout::tests::code_round_trip ... ok
+test domain::cliout::tests::parse_known_formats ... ok
+test domain::cliout::tests::parse_unknown_format_errors ... ok
+test domain::git::staged_files::tests::has_match_basic ... ok
+test domain::git::staged_files::tests::staged_md_files_filters_by_extension_and_prefix ... ok
+test domain::mermaid::diagram::tests::detect_kind_returns_state_for_state_diagram_v1 ... ok
+test domain::mermaid::diagram::tests::detect_kind_returns_state_for_state_diagram_v2 ... ok
+test domain::mermaid::state::tests::parse_state_11_node_lr_chain_detects_nodes_and_edges ... ok
+test domain::mermaid::tests::direction_parse_handles_unknowns ... ok
+test domain::mermaid::tests::effective_label_len_handles_breaks ... ok
+test domain::mermaid::tests::extract_blocks_finds_mermaid_fences ... ok
+test domain::mermaid::tests::extract_blocks_supports_tilde_fences ... ok
+test domain::mermaid::tests::max_width_simple_tree ... ok
+test domain::mermaid::tests::parse_cartesian_product_edges ... ok
+test domain::mermaid::tests::parse_direction_lr_recognised ... ok
+test domain::mermaid::tests::parse_edge_with_label_text ... ok
+test domain::mermaid::tests::parse_flowchart_detects_nodes_and_edges ... ok
+test commands::workflows_validate_naming::tests::workflows_validate_naming_detects_bad_suffix ... ok
+test domain::mermaid::tests::parse_node_shapes_extract_labels ... ok
+test domain::mermaid::tests::parse_flowchart_handles_pipe_labeled_edges ... ok
+test domain::mermaid::tests::parse_non_flowchart_returns_zero_count ... ok
+test domain::mermaid::tests::parse_state_composite_recorded_as_subgraph ... ok
+test domain::mermaid::tests::parse_state_skips_notes_comments_and_separator ... ok
+test domain::mermaid::tests::rank_assign_handles_back_edge_into_rooted_chain ... ok
+test domain::mermaid::tests::parse_subgraph_with_id_and_label ... ok
+test commands::specs_structure_validate::tests::run_at_root_clean_corpus ... ok
+test domain::mermaid::tests::validate_clean_diagram_no_findings ... ok
+test domain::mermaid::tests::validate_multiple_diagrams ... ok
+test domain::mermaid::tests::validate_label_too_long_emits_violation ... ok
+test domain::mermaid::tests::rank_assign_handles_cycles_via_back_edge_removal ... ok
+test domain::mermaid::tests::validate_state_long_display_label_emits_label_too_long ... ok
+test domain::mermaid::tests::validate_state_long_transition_label_emits_label_too_long ... ok
+test domain::mermaid::tests::validate_state_pseudostates_count_toward_width ... ok
+test domain::mermaid::tests::validate_state_11_node_lr_chain_width_exceeded ... ok
+test domain::mermaid::tests::validate_state_short_colon_label_no_violation ... ok
+test domain::mermaid::tests::violation_kind_codes_match_go ... ok
+test domain::mermaid::tests::warning_kind_codes_match_go ... ok
+test domain::mermaid::tests::validate_subgraph_density_warns ... ok
+test commands::specs_coverage::tests::three_level_passes_when_all_levels_covered ... ok
+test infrastructure::git::root::tests::find_root_via_fs_walk_returns_none_without_a_git_entry ... ok
+test commands::lang_java_validate_null_safety::tests::run_with_dir_none_defaults_to_cwd_without_error ... ok
+test infrastructure::mermaid::reporter::tests::format_json_serializes_clean_result ... ok
+test infrastructure::mermaid::reporter::tests::format_json_with_findings_serializes ... ok
+test commands::specs_clean_java_imports::tests::run_defaults_dir_to_cwd_without_error ... ok
+test infrastructure::mermaid::reporter::tests::format_markdown_clean_yields_passed_message ... ok
+test infrastructure::mermaid::reporter::tests::format_markdown_with_findings_renders_table ... ok
+test infrastructure::mermaid::reporter::tests::format_text_quiet_with_no_findings_empty ... ok
+test infrastructure::mermaid::reporter::tests::format_text_non_quiet_with_no_findings_shows_summary ... ok
+test infrastructure::mermaid::reporter::tests::format_text_verbose_with_no_findings_shows_summary ... ok
+test infrastructure::mermaid::reporter::tests::format_text_with_violations_renders ... ok
+test infrastructure::mermaid::reporter::tests::format_text_with_warnings_only_uses_warn_marker ... ok
+test internal::contracts::dart_scaffold::tests::pubspec_constant_matches_expected_bytes ... ok
+test internal::contracts::dart_scaffold::tests::scaffold_overwrites_existing ... ok
+test internal::contracts::dart_scaffold::tests::scaffold_with_no_model_files ... ok
+test internal::contracts::dart_scaffold::tests::scaffold_with_model_files ... ok
+test internal::contracts::java_clean_imports::tests::empty_directory_no_errors ... ok
+test internal::contracts::java_clean_imports::tests::malformed_import_kept ... ok
+test internal::contracts::java_clean_imports::tests::deduplicates_imports ... ok
+test internal::contracts::java_clean_imports::tests::removes_same_package_imports ... ok
+test internal::contracts::java_clean_imports::tests::removes_unused_imports ... ok
+test internal::contracts::java_clean_imports::tests::static_import_handled ... ok
+test internal::java::reporter::tests::json_failure_lists_violations ... ok
+test internal::contracts::java_clean_imports::tests::unchanged_when_only_required_imports ... ok
+test internal::java::reporter::tests::json_success_no_violations ... ok
+test internal::java::reporter::tests::markdown_no_violations ... ok
+test internal::java::reporter::tests::markdown_with_violations ... ok
+test internal::java::reporter::tests::text_quiet_suppresses_zero_summary ... ok
+test internal::java::reporter::tests::text_violations_always_print_summary ... ok
+test internal::java::reporter::tests::text_valid_uses_tab_and_zero_summary ... ok
+test internal::java::scanner::tests::empty_tree_yields_no_packages ... ok
+test internal::java::scanner::tests::non_java_files_are_ignored ... ok
+test infrastructure::git::root::tests::find_root_from_falls_back_to_fs_walk_when_git_binary_unresolvable ... ok
+test internal::java::validator::tests::bytes_contains_basic ... ok
+test internal::java::scanner::tests::collects_unique_sorted_package_dirs ... ok
+test internal::java::validator::tests::all_packages_valid ... ok
+test internal::java::validator::tests::custom_annotation_matches ... ok
+test internal::java::validator::tests::rel_path_strips_base ... ok
+test internal::java::validator::tests::missing_package_info ... ok
+test internal::java::validator::tests::missing_annotation ... ok
+test infrastructure::git::root::tests::find_root_returns_repo_root ... ok
+test infrastructure::git::staged_files::tests::get_staged_files_empty_no_repo ... ok
+test commands::specs_audit::tests::run_with_partial_skip_does_not_panic ... ok
+Preparing worktree (detached HEAD 6d137d3)
+HEAD is now at 6d137d3 init
+test infrastructure::git::root::tests::find_root_from_worktree_returns_worktree_path ... ok
+test commands::convention_audit::tests::run_member_covers_all_known_names_without_panic ... ok
+test commands::specs_audit::tests::run_member_covers_all_known_names_without_panic ... ok
+test commands::md_audit::tests::run_member_covers_all_known_names_without_panic ... ok
+test commands::harness_audit::tests::run_with_partial_skip_does_not_panic ... ok
+test commands::harness_audit::tests::run_member_covers_all_known_names_without_panic ... ok
+
+test result: ok. 1005 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 1.63s
+
+     Running unittests src/main.rs (apps/rhino-cli/target/release/deps/rhino_cli-4c4bb52c2807a074)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/agents.rs (apps/rhino-cli/target/release/deps/agents-c05beabe3599221b)
+Feature: Harness Binding Emit and Validate
+  Scenario: Emitting bindings writes the expected files
+   ✔  Given a repository with a canonical AGENTS.md at the root
+   ✔  When the developer runs agents emit-bindings
+   ✔  Then the command exits successfully
+   ✔  And the Amazon Q rules pointer and default agent JSON are written
+   ✔  And each generated file references AGENTS.md without duplicating its body
+  Scenario: A dry-run previews the binding files without writing them
+   ✔  Given a repository with a canonical AGENTS.md at the root
+   ✔  When the developer runs agents emit-bindings with the --dry-run flag
+   ✔  Then the command exits successfully
+   ✔  And the output lists the files that would be written
+   ✔  And no binding files are created on disk
+  Scenario: Validation passes when every generated binding matches and the catalog covers each binding directory
+   ✔  Given a repository whose committed binding files match a fresh regenerate
+   ✔  And the platform-bindings catalog documents every binding directory present on disk
+   ✔  When the developer runs agents validate-bindings
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero binding drift and zero catalog gaps
+  Scenario: Validation fails when a committed binding file drifts from its regenerate
+   ✔  Given a repository where a committed binding file no longer matches a regenerate from AGENTS.md
+   ✔  When the developer runs agents validate-bindings
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the drifted binding file
+  Scenario: Validation fails when a binding directory has no catalog row
+   ✔  Given a repository with a binding directory that the platform-bindings catalog does not document
+   ✔  When the developer runs agents validate-bindings
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the binding directory missing from the catalog
+Feature: Agent Configuration Synchronisation
+Rule: agents sync converts .claude/ configuration to .opencode/ format
+    Scenario: Syncing converts agents and skills to OpenCode format
+     ✔  Given a .claude/ directory with valid agents and skills
+     ✔  When the developer runs agents sync
+     ✔  Then the command exits successfully
+     ✔  And the .opencode/ directory contains the converted configuration
+    Scenario: The --dry-run flag previews changes without modifying files
+     ✔  Given a .claude/ directory with agents and skills to convert
+     ✔  When the developer runs agents sync with the --dry-run flag
+     ✔  Then the command exits successfully
+     ✔  And the output describes the planned operations
+     ✔  And no files are written to the .opencode/ directory
+    Scenario: The --agents-only flag syncs agents without touching skills
+     ✔  Given a .claude/ directory with both agents and skills
+     ✔  When the developer runs agents sync with the --agents-only flag
+     ✔  Then the command exits successfully
+     ✔  And only agent files are written to the .opencode/ directory
+    Scenario: Model names are correctly translated to OpenCode equivalents
+     ✔  Given a .claude/ agent configured with the "sonnet" model
+     ✔  When the developer runs agents sync
+     ✔  Then the command exits successfully
+     ✔  And the corresponding .opencode/ agent uses the "opencode-go/minimax-m2.7" model identifier
+Rule: agents validate-sync confirms .claude/ and .opencode/ are semantically equivalent
+    Scenario: Directories that are in sync pass validation
+     ✔  Given .claude/ and .opencode/ configurations that are fully synchronised
+     ✔  When the developer runs agents validate-sync
+     ✔  Then the command exits successfully
+     ✔  And the output reports all sync checks as passing
+    Scenario: A description mismatch between directories fails validation
+     ✔  Given an agent in .claude/ whose description differs from its .opencode/ counterpart
+     ✔  When the developer runs agents validate-sync
+     ✔  Then the command exits with a failure code
+     ✔  And the output identifies the agent with the mismatched description
+    Scenario: A count mismatch between directories fails validation
+     ✔  Given .claude/ containing more agents than .opencode/
+     ✔  When the developer runs agents validate-sync
+     ✔  Then the command exits with a failure code
+     ✔  And the output reports the agent count mismatch
+Feature: Claude Code Agent and Skill Configuration Validation
+  Scenario: A directory with all agents and skills correctly configured passes validation
+   ✔  Given a .claude/ directory where all agents and skills are valid
+   ✔  When the developer runs agents validate-claude
+   ✔  Then the command exits successfully
+   ✔  And the output reports all checks as passing
+  Scenario: An agent file missing a required frontmatter field fails validation
+   ✔  Given a .claude/ directory where one agent is missing the required "tools" field
+   ✔  When the developer runs agents validate-claude
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the agent and the missing field
+  Scenario: Two agents with the same name fail validation
+   ✔  Given a .claude/ directory containing two agent files declaring the same name
+   ✔  When the developer runs agents validate-claude
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports the duplicate agent name
+  Scenario: --agents-only validates agents without checking skills
+   ✔  Given a .claude/ directory where agents are valid but skills have issues
+   ✔  When the developer runs agents validate-claude with the --agents-only flag
+   ✔  Then the command exits successfully
+  Scenario: --skills-only validates skills without checking agents
+   ✔  Given a .claude/ directory where skills are valid but agents have issues
+   ✔  When the developer runs agents validate-claude with the --skills-only flag
+   ✔  Then the command exits successfully
+Feature: Agent Naming Convention Validation
+  Scenario: A tree where every agent obeys the naming rule passes validation
+   ✔  Given a repository where every agent filename ends with an allowed role suffix and mirrors across harnesses
+   ✔  When the developer runs agents validate-naming
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero naming violations
+  Scenario: An agent filename without an allowed role suffix fails validation
+   ✔  Given a repository with one agent whose filename ends in an unknown suffix
+   ✔  When the developer runs agents validate-naming
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the offending agent file and its unknown suffix
+  Scenario: An agent frontmatter name that disagrees with the filename fails validation
+   ✔  Given a repository with a .claude/agents/ file whose frontmatter name differs from its filename
+   ✔  When the developer runs agents validate-naming
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the frontmatter mismatch
+  Scenario: A .claude/agents/ file without a matching .opencode/agent/ mirror fails validation
+   ✔  Given a repository where one .claude/agents/ file has no corresponding .opencode/agent/ file
+   ✔  When the developer runs agents validate-naming
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the mirror-drift violation
+[Summary]
+4 features
+2 rules
+21 scenarios (21 passed)
+86 steps (86 passed)
+     Running tests/contracts.rs (apps/rhino-cli/target/release/deps/contracts-6901c9ff8d53117d)
+Feature: Dart Package Scaffolding for Generated Contracts
+  Scenario: Normal scaffold with model files
+   ✔  Given a generated-contracts directory with model Dart files
+   ✔  When the developer runs contracts dart-scaffold on the directory
+   ✔  Then the command exits successfully
+   ✔  And pubspec.yaml is created with correct content
+   ✔  And the barrel library is created with part directives for each model
+  Scenario: Scaffold with no model files
+   ✔  Given a generated-contracts directory with no model files
+   ✔  When the developer runs contracts dart-scaffold on the directory
+   ✔  Then the command exits successfully
+   ✔  And pubspec.yaml is created
+   ✔  And the barrel library is created without part directives
+  Scenario: Scaffold overwrites existing files
+   ✔  Given an existing generated-contracts directory with old scaffold files
+   ✔  When the developer runs contracts dart-scaffold on the directory
+   ✔  Then the command exits successfully
+   ✔  And the existing files are overwritten with fresh scaffold
+Feature: Java Import Cleaning for Generated Contracts
+  Scenario: Unused imports are removed from generated Java files
+   ✔  Given a generated-contracts directory with Java files containing unused imports
+   ✔  When the developer runs contracts java-clean-imports on the directory
+   ✔  Then the command exits successfully
+   ✔  And unused imports are removed from the Java files
+  Scenario: Same-package imports are removed from generated Java files
+   ✔  Given a generated-contracts directory with Java files containing same-package imports
+   ✔  When the developer runs contracts java-clean-imports on the directory
+   ✔  Then the command exits successfully
+   ✔  And same-package imports are removed from the Java files
+  Scenario: Duplicate imports are deduplicated
+   ✔  Given a generated-contracts directory with Java files containing duplicate imports
+   ✔  When the developer runs contracts java-clean-imports on the directory
+   ✔  Then the command exits successfully
+   ✔  And only one copy of each import remains
+  Scenario: Files with only required imports are unchanged
+   ✔  Given a generated-contracts directory with Java files having only required imports
+   ✔  When the developer runs contracts java-clean-imports on the directory
+   ✔  Then the command exits successfully
+   ✔  And the Java files are unchanged
+  Scenario: Empty directory produces no errors
+   ✔  Given an empty generated-contracts directory
+   ✔  When the developer runs contracts java-clean-imports on the directory
+   ✔  Then the command exits successfully
+   ✔  And the command reports no files modified
+[Summary]
+2 features
+8 scenarios (8 passed)
+34 steps (34 passed)
+     Running tests/docs.rs (apps/rhino-cli/target/release/deps/docs-4ccf098a13417f74)
+Feature: Markdown Heading Hierarchy Validation
+  Scenario: A docs file with two H1s is flagged duplicate-h1
+   ✔  Given a markdown file under docs with two H1 headings
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports a duplicate-h1 finding for that file
+  Scenario: A docs file with zero H1s is flagged missing-h1
+   ✔  Given a markdown file under docs with no H1 heading
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports a missing-h1 finding for that file
+  Scenario: A docs file jumping from H1 to H3 is flagged skipped-level
+   ✔  Given a markdown file under docs that jumps from H1 directly to H3
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports a skipped-level finding for that file
+  Scenario: A .claude/agents file with heading violations is exempt
+   ✔  Given a markdown file under .claude/agents with zero H1 headings
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits successfully
+   ✔  And no missing-h1 finding is reported for that file
+  Scenario: A SKILL.md under .claude/skills with many H1s is exempt
+   ✔  Given a SKILL.md file under .claude/skills with multiple H1 headings
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits successfully
+   ✔  And no duplicate-h1 finding is reported for that file
+  Scenario: A file under plans/done with violations is excluded
+   ✔  Given a markdown file under plans/done with a skipped heading level
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits successfully
+   ✔  And no skipped-level finding is reported for that file
+  Scenario: An app README with a violation is flagged
+   ✔  Given an apps/example/README.md file with a skipped heading level
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports a skipped-level finding for that file
+  Scenario: A deep app internal path with violations is excluded
+   ✔  Given a markdown file at apps/example/src/notes.md with zero H1 headings
+   ✔  When the developer runs docs validate-heading-hierarchy
+   ✔  Then the command exits successfully
+   ✔  And no missing-h1 finding is reported for that file
+  Scenario: With --exclude docs the docs tree findings are suppressed
+   ✔  Given a markdown file under docs with a duplicate H1
+   ✔  And a markdown file under repo-governance with a duplicate H1
+   ✔  When the developer runs docs validate-heading-hierarchy with --exclude docs
+   ✔  Then no finding is reported for the docs file
+   ✔  And the output reports a duplicate-h1 finding for the repo-governance file
+Feature: Markdown Internal Link Validation
+  Scenario: A document set with all valid internal links passes validation
+   ✔  Given markdown files where all internal links point to existing files
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits successfully
+   ✔  And the output reports no broken links found
+  Scenario: A broken internal link is detected and reported
+   ✔  Given a markdown file with a link pointing to a non-existent file
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file containing the broken link
+  Scenario: External URLs are not validated
+   ✔  Given a markdown file containing only external HTTPS links
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits successfully
+   ✔  And the output reports no broken links found
+  Scenario: With --staged-only only staged files are checked
+   ✔  Given a markdown file with a broken link that has not been staged in git
+   ✔  When the developer runs docs validate-links with the --staged-only flag
+   ✔  Then the command exits successfully
+  Scenario: With --exclude an excluded tree is not validated
+   ✔  Given a markdown file with a broken link inside a directory tree
+   ✔  When the developer runs docs validate-links with the --exclude flag for that tree
+   ✔  Then the command exits successfully
+   ✔  And the output reports no broken links found
+  Scenario: A broken link outside the historic scan scope is detected
+   ✔  Given a markdown file under libs with a link pointing to a non-existent file
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file containing the broken link
+  Scenario: A link to a missing anchor in an existing file is reported as a broken anchor
+   ✔  Given a markdown file with a link to an existing file whose anchor matches no heading
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports a broken-anchor finding for the link
+  Scenario: A link to a valid anchor in an existing file passes validation
+   ✔  Given a markdown file with a link to an existing file whose anchor matches a heading
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits successfully
+   ✔  And the output reports no broken links found
+  Scenario: A same-file anchor link with no matching heading is reported as a broken anchor
+   ✔  Given a markdown file with a pure-anchor link that matches no heading in the same file
+   ✔  When the developer runs docs validate-links
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports a broken-anchor finding for the link
+Feature: Mermaid Flowchart Structural Validation
+  Scenario: A flowchart with all short node labels passes validation
+   ✔  Given a markdown file containing a flowchart where every node label is within the limit
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: A node label exceeding the character limit is flagged
+   ✔  Given a markdown file containing a flowchart with a node label longer than the limit
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file, block, and node with the oversized label
+  Scenario: The max label length is configurable via flag
+   ✔  Given a markdown file containing a flowchart with a node label of 35 characters
+   ✔  When the developer runs docs validate-mermaid with --max-label-len 40
+   ✔  Then the command exits successfully
+  Scenario: A deep sequential flowchart (long chain) passes validation regardless of depth
+   ✔  Given a markdown file containing a TB flowchart with 10 nodes chained sequentially
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: A TB flowchart with at most 3 nodes per rank passes validation
+   ✔  Given a markdown file containing a TB flowchart where no rank has more than 3 nodes
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: A TB flowchart with 4 nodes at one rank is flagged
+   ✔  Given a markdown file containing a TB flowchart where one rank has 4 parallel nodes
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file and block with the excessive width
+  Scenario: A LR flowchart with at most 3 nodes per rank passes validation
+   ✔  Given a markdown file containing an LR flowchart where no rank has more than 3 nodes
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: A LR flowchart with 4 rank columns is flagged
+   ✔  Given a markdown file containing an LR flowchart where depth spans 4 levels
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file and block with the excessive width
+  Scenario: The max width is configurable via flag
+   ✔  Given a markdown file containing a flowchart with 4 nodes at one rank
+   ✔  When the developer runs docs validate-mermaid with --max-width 5
+   ✔  Then the command exits successfully
+  Scenario: A flowchart exceeding both width and depth thresholds passes with a warning
+   ✔  Given a markdown file containing a flowchart with 4 nodes at one rank and more than 5 ranks deep
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output contains a warning about diagram complexity
+  Scenario: The max depth threshold for the both-exceeded warning is configurable via flag
+   ✔  Given a markdown file containing a flowchart with 4 nodes at one rank and exactly 4 ranks deep
+   ✔  When the developer runs docs validate-mermaid with --max-depth 3
+   ✔  Then the command exits successfully
+   ✔  And the output contains a warning about diagram complexity
+  Scenario: A mermaid block with a single flowchart passes validation
+   ✔  Given a markdown file containing a mermaid code block with exactly one flowchart diagram
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: A mermaid block with two flowchart declarations is flagged
+   ✔  Given a markdown file containing a mermaid code block with two flowchart declarations
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file and block with multiple diagrams
+  Scenario: A mermaid block using the graph keyword alias is validated identically
+   ✔  Given a markdown file containing a mermaid block using the graph keyword instead of flowchart with no violations
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: Non-flowchart mermaid blocks are ignored
+   ✔  Given a markdown file containing only sequenceDiagram and classDiagram mermaid blocks
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: A markdown file with no mermaid blocks passes validation
+   ✔  Given a markdown file containing no mermaid code blocks
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports no violations
+  Scenario: With --staged-only only staged markdown files are checked
+   ✔  Given a markdown file with a mermaid violation that has not been staged in git
+   ✔  When the developer runs docs validate-mermaid with the --staged-only flag
+   ✔  Then the command exits successfully
+  Scenario: With --changed-only only files changed since upstream are checked
+   ✔  Given a markdown file with a mermaid violation that is not in the push range
+   ✔  When the developer runs docs validate-mermaid with the --changed-only flag
+   ✔  Then the command exits successfully
+  Scenario: JSON output contains structured violation data
+   ✔  Given a markdown file containing a flowchart with a label length violation
+   ✔  When the developer runs docs validate-mermaid with -o json
+   ✔  Then the output is valid JSON
+   ✔  And the JSON contains the violation kind, file path, block index, and node id
+  Scenario: Markdown output produces a formatted table
+   ✔  Given a markdown file containing a flowchart with a label length violation
+   ✔  When the developer runs docs validate-mermaid with -o markdown
+   ✔  Then the output contains a table with File, Block, Line, Severity, Kind, and Detail columns
+  Scenario: Verbose flag includes per-file detail in text output
+   ✔  Given a markdown file containing a flowchart with no violations
+   ✔  When the developer runs docs validate-mermaid with --verbose
+   ✔  Then the command exits successfully
+   ✔  And the output includes per-file scan detail lines
+  Scenario: Quiet flag suppresses non-error output when there are no violations
+   ✔  Given a markdown file containing a flowchart with no violations
+   ✔  When the developer runs docs validate-mermaid with --quiet
+   ✔  Then the command exits successfully
+   ✔  And the output contains no text
+  Scenario: Plans directory is scanned by default
+   ✔  Given a markdown file under plans/ containing a Mermaid flowchart with a label longer than 30 characters
+   ✔  When the developer runs docs validate-mermaid without path arguments
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the file under plans/
+  Scenario: Default scan reports a violation outside the old four-directory scope
+   ✔  Given a markdown file outside the docs, repo-governance, .claude, and plans directories containing a flowchart with a node label longer than the limit
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the violation in that file
+  Scenario: Excluded directory tree is not scanned
+   ✔  Given a markdown file containing a flowchart with a node label longer than the limit placed under a subdirectory to be excluded
+   ✔  When the developer runs docs validate-mermaid with --exclude pointing at that subdirectory
+   ✔  Then the command exits successfully
+  Scenario: A pipe-labeled edge is parsed and the target node is ranked below the source
+   ✔  Given a markdown file containing a flowchart where one edge uses the pipe-label syntax A -->|text| B
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports that node B is ranked one level below node A
+  Scenario: A cyclic diagram is ranked as a chain after back-edge removal
+   ✔  Given a markdown file containing a flowchart with the cycle A-->B-->C-->A
+   ✔  When the developer runs docs validate-mermaid
+   ✔  Then the command exits successfully
+   ✔  And the output reports the diagram has span 1 and depth 3
+[Summary]
+3 features
+45 scenarios (45 passed)
+174 steps (174 passed)
+     Running tests/doctor.rs (apps/rhino-cli/target/release/deps/doctor-3d33ca5df39fbcc2)
+Feature: Development Environment Health Check
+  Scenario: All required tools are installed and versions match
+   ✔  Given all required development tools are present with matching versions
+   ✔  When the developer runs the doctor command
+   ✔  Then the command exits successfully
+   ✔  And the output reports each tool as passing
+  Scenario: A required tool is missing from the environment
+   ✔  Given a required development tool is not found in the system PATH
+   ✔  When the developer runs the doctor command
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the missing tool
+  Scenario: A tool is installed but its version does not match the requirement
+   ✔  Given a required development tool is installed with a non-matching version
+   ✔  When the developer runs the doctor command
+   ✔  Then the command exits successfully
+   ✔  And the output reports the tool as a warning rather than a failure
+  Scenario: JSON output lists all tool check results
+   ✔  Given all required development tools are present with matching versions
+   ✔  When the developer runs the doctor command with JSON output
+   ✔  Then the command exits successfully
+   ✔  And the output is valid JSON
+   ✔  And the JSON lists every checked tool with its status
+  Scenario: Minimal scope checks only core tools
+   ✔  Given all required development tools are present with matching versions
+   ✔  When the developer runs the doctor command with minimal scope
+   ✔  Then the command exits successfully
+   ✔  And the output checks only the minimal tool set
+  Scenario: Full scope is the default behavior
+   ✔  Given all required development tools are present with matching versions
+   ✔  When the developer runs the doctor command
+   ✔  Then the command exits successfully
+   ✔  And the output reports each tool as passing
+  Scenario: Fix installs missing tools
+   ✔  Given a required development tool is not found in the system PATH
+   ✔  When the developer runs the doctor command with the fix flag
+   ✔  Then the output contains fix progress
+  Scenario: Fix with dry-run previews without executing
+   ✔  Given a required development tool is not found in the system PATH
+   ✔  When the developer runs the doctor command with fix and dry-run flags
+   ✔  Then the command exits with a failure code
+   ✔  And the output contains a dry-run preview
+  Scenario: Fix reports nothing to fix when all tools are present
+   ✔  Given all required development tools are present with matching versions
+   ✔  When the developer runs the doctor command with the fix flag
+   ✔  Then the command exits successfully
+   ✔  And the output reports nothing to fix
+[Summary]
+1 feature
+9 scenarios (9 passed)
+36 steps (36 passed)
+     Running tests/env.rs (apps/rhino-cli/target/release/deps/env-671e4f7e986ebc3e)
+Feature: Env file backup
+  Scenario: Backup discovers and copies all .env files
+   ✔  Given a git repository containing .env files at the root and in app subdirectories
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And each .env file is copied to the backup directory preserving its relative path
+   ✔  And the output lists each backed-up file
+  Scenario: Backup with custom directory
+   ✔  Given a git repository containing a .env file at the root
+   ✔  When the developer runs rhino-cli env backup with --dir pointing to a directory outside the repository
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied to the specified directory preserving its relative path
+  Scenario: Backup rejects a directory inside the repository
+   ✔  Given a git repository containing a .env file at the root
+   ✔  When the developer runs rhino-cli env backup with --dir pointing to a path inside the git root
+   ✔  Then the command exits with a failure code
+   ✔  And the output warns that the backup directory must be outside the repository
+  Scenario: Symlinks and oversized files are skipped
+   ✔  Given a git repository containing a symlinked .env file, a .env file larger than 1 MB, and a regular .env file
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And the symlinked .env file is skipped with a warning
+   ✔  And the oversized .env file is skipped with a warning
+   ✔  And the regular .env file is copied to the backup directory
+  Scenario: Backup with zero .env files
+   ✔  Given a git repository containing no .env files
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And the output reports that zero files were backed up
+  Scenario: JSON output for backup
+   ✔  Given a git repository containing a .env file at the root
+   ✔  When the developer runs rhino-cli env backup with --output json
+   ✔  Then the command exits successfully
+   ✔  And the output is valid JSON
+   ✔  And the JSON includes the direction, backup directory, list of files, copied count, and skipped count
+  Scenario: Env files inside auto-generated directories are not discovered
+   ✔  Given a git repository containing .env files inside node_modules, dist, build, .next, __pycache__, target, vendor, coverage, and generated-contracts directories
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And none of the .env files inside auto-generated directories are backed up
+  Scenario: Env files inside nested auto-generated directories are not discovered
+   ✔  Given a git repository where apps/web/node_modules contains a .env file and apps/web contains a .env.local file
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And only apps/web/.env.local is copied to the backup directory
+   ✔  And the .env file inside apps/web/node_modules is not backed up
+  Scenario: Backup works in a git worktree
+   ✔  Given a git worktree containing a .env file at its root
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied to the backup directory with a flat structure
+  Scenario: Worktree-aware backup namespaces by worktree name
+   ✔  Given a git worktree named "feature-branch" containing a .env file at its root
+   ✔  When the developer runs rhino-cli env backup with --worktree-aware
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied under a feature-branch subdirectory inside the backup directory
+  Scenario: Main repo with worktree-aware uses repository directory name
+   ✔  Given the main git repository named "open-sharia-enterprise" containing a .env file at its root
+   ✔  When the developer runs rhino-cli env backup with --worktree-aware
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied under an open-sharia-enterprise subdirectory inside the backup directory
+  Scenario: Backup prompts when destination files already exist
+   ✔  Given a git repository containing a .env file at the root
+   ✔  And the backup directory already contains a backed-up .env file
+   ✔  When the developer runs rhino-cli env backup and confirms the overwrite
+   ✔  Then the command exits successfully
+   ✔  And the .env file is overwritten in the backup directory
+  Scenario: Backup aborts when user declines overwrite
+   ✔  Given a git repository containing a .env file at the root
+   ✔  And the backup directory already contains a backed-up .env file
+   ✔  When the developer runs rhino-cli env backup and declines the overwrite
+   ✔  Then the command exits successfully
+   ✔  And the output reports that backup was cancelled
+   ✔  And the existing backup file is unchanged
+  Scenario: Backup with --force skips confirmation
+   ✔  Given a git repository containing a .env file at the root
+   ✔  And the backup directory already contains a backed-up .env file
+   ✔  When the developer runs rhino-cli env backup with --force
+   ✔  Then the command exits successfully
+   ✔  And the .env file is overwritten in the backup directory without prompting
+  Scenario: Backup proceeds without prompt when no conflicts exist
+   ✔  Given a git repository containing a .env file at the root
+   ✔  And the backup directory is empty
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And no confirmation prompt is shown
+   ✔  And the .env file is copied to the backup directory
+  Scenario: Backup includes config files with --include-config
+   ✔  Given a git repository containing a .env file and a .claude/settings.local.json file
+   ✔  When the developer runs rhino-cli env backup with --include-config and --force
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied to the backup directory
+   ✔  And the .claude/settings.local.json is copied to the backup directory preserving its relative path
+  Scenario: Backup without --include-config ignores config files
+   ✔  Given a git repository containing a .env file and a .claude/settings.local.json file
+   ✔  When the developer runs rhino-cli env backup with --force
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied to the backup directory
+   ✔  And the .claude/settings.local.json is not copied to the backup directory
+  Scenario: Backup with --include-config and no config files found
+   ✔  Given a git repository containing a .env file but no known config files
+   ✔  When the developer runs rhino-cli env backup with --include-config and --force
+   ✔  Then the command exits successfully
+   ✔  And only the .env file is copied to the backup directory
+  Scenario: secrets.json is backed up
+   ✔  Given a git repository containing a secrets.json file at the root
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And secrets.json is copied to the backup directory
+  Scenario: A .pem certificate file is backed up
+   ✔  Given a git repository containing a cert.pem file at the root
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And cert.pem is copied to the backup directory
+  Scenario: A file inside .secrets/ is backed up
+   ✔  Given a git repository containing a .secrets/notes.md file
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And .secrets/notes.md is copied to the backup directory preserving its relative path
+  Scenario: .git/ contents are still skipped during backup
+   ✔  Given a git repository containing a .env file at the root
+   ✔  When the developer runs rhino-cli env backup
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied to the backup directory
+   ✔  And no files from the .git directory are backed up
+  Scenario: Backup with --dry-run lists files without writing anything
+   ✔  Given a git repository containing a .env file and a secrets.json file
+   ✔  When the developer runs rhino-cli env backup with --dry-run
+   ✔  Then the command exits successfully
+   ✔  And no files are written to the backup directory
+   ✔  And the output lists the files that would be backed up
+Feature: Environment File Initialization
+  Scenario: Bootstrap env files from examples
+   ✔  Given .env.example files exist in infra/dev but no .env files
+   ✔  When the developer runs env init
+   ✔  Then the command exits successfully
+   ✔  And .env files are created from each .env.example
+   ✔  And the output lists each created file
+  Scenario: Skip existing env files
+   ✔  Given .env.example files exist in infra/dev and some .env files already exist
+   ✔  When the developer runs env init
+   ✔  Then the command exits successfully
+   ✔  And existing .env files are not overwritten
+   ✔  And the output shows skipped files
+  Scenario: Force overwrite existing env files
+   ✔  Given .env.example files exist in infra/dev and some .env files already exist
+   ✔  When the developer runs env init with the force flag
+   ✔  Then the command exits successfully
+   ✔  And all .env files are created or overwritten
+   ✔  And the output lists each created file
+  Scenario: No env.example files found
+   ✔  Given no .env.example files exist in infra/dev
+   ✔  When the developer runs env init
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero files created
+Feature: Env file restore
+  Scenario: Restore copies files back from backup
+   ✔  Given a backup directory containing previously backed-up .env files from the repository
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And each .env file is copied back to its original path in the repository
+   ✔  And the output lists each restored file
+  Scenario: Restore with custom source directory
+   ✔  Given a backup directory at /tmp/my-env-backup containing a backed-up .env file
+   ✔  When the developer runs rhino-cli env restore with --dir /tmp/my-env-backup
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied back to its original path in the repository
+  Scenario: Restore fails when backup directory does not exist
+   ✔  Given no directory exists at /nonexistent
+   ✔  When the developer runs rhino-cli env restore with --dir /nonexistent
+   ✔  Then the command exits with a failure code
+   ✔  And the output reports that the directory does not exist
+  Scenario: JSON output for restore
+   ✔  Given a backup directory containing a previously backed-up .env file
+   ✔  When the developer runs rhino-cli env restore with --output json
+   ✔  Then the command exits successfully
+   ✔  And the output is valid JSON
+   ✔  And the JSON includes the direction, backup directory, list of files, copied count, and skipped count
+  Scenario: Restore only restores .env files
+   ✔  Given a backup directory containing a backed-up .env file and a README.md file
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And the .env file is copied back to its original path in the repository
+   ✔  And README.md is not restored
+  Scenario: Restore with zero .env files in backup
+   ✔  Given a backup directory containing no .env files
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And the output reports that zero files were restored
+  Scenario: Worktree-aware restore reads from correct namespace
+   ✔  Given a backup directory containing a .env file backed up under a feature-branch namespace
+   ✔  When the developer runs rhino-cli env restore with --worktree-aware from a worktree named "feature-branch"
+   ✔  Then the command exits successfully
+   ✔  And the .env file is read from the feature-branch namespace inside the backup directory
+   ✔  And the .env file is copied back to its original path in the worktree
+  Scenario: Restore prompts when destination files already exist
+   ✔  Given a backup directory containing a previously backed-up .env file
+   ✔  And the repository already contains a .env file at the original path
+   ✔  When the developer runs rhino-cli env restore and confirms the overwrite
+   ✔  Then the command exits successfully
+   ✔  And the .env file in the repository is overwritten with the backup
+  Scenario: Restore aborts when user declines overwrite
+   ✔  Given a backup directory containing a previously backed-up .env file
+   ✔  And the repository already contains a .env file at the original path
+   ✔  When the developer runs rhino-cli env restore and declines the overwrite
+   ✔  Then the command exits successfully
+   ✔  And the output reports that restore was cancelled
+   ✔  And the existing repository file is unchanged
+  Scenario: Restore with --force skips confirmation
+   ✔  Given a backup directory containing a previously backed-up .env file
+   ✔  And the repository already contains a .env file at the original path
+   ✔  When the developer runs rhino-cli env restore with --force
+   ✔  Then the command exits successfully
+   ✔  And the .env file in the repository is overwritten without prompting
+  Scenario: Restore proceeds without prompt when no conflicts exist
+   ✔  Given a backup directory containing a previously backed-up .env file
+   ✔  And the repository does not contain a .env file at the original path
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And no confirmation prompt is shown
+   ✔  And the .env file is restored to the repository
+  Scenario: Restore includes config files with --include-config
+   ✔  Given a backup directory containing a .env file and a .claude/settings.local.json file
+   ✔  When the developer runs rhino-cli env restore with --include-config and --force
+   ✔  Then the command exits successfully
+   ✔  And the .env file is restored to the repository
+   ✔  And the .claude/settings.local.json is restored to the repository preserving its relative path
+  Scenario: Restore without --include-config ignores config files in backup
+   ✔  Given a backup directory containing a .env file and a .claude/settings.local.json file
+   ✔  When the developer runs rhino-cli env restore with --force
+   ✔  Then the command exits successfully
+   ✔  And the .env file is restored to the repository
+   ✔  And the .claude/settings.local.json is not restored to the repository
+  Scenario: secrets.json is restored from backup
+   ✔  Given a backup directory containing a secrets.json file
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And secrets.json is copied back to the repository
+  Scenario: A .pem certificate file is restored from backup
+   ✔  Given a backup directory containing a cert.pem file
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And cert.pem is copied back to the repository
+  Scenario: A file inside .secrets/ is restored from backup
+   ✔  Given a backup directory containing a .secrets/notes.md file
+   ✔  When the developer runs rhino-cli env restore
+   ✔  Then the command exits successfully
+   ✔  And .secrets/notes.md is copied back to the repository preserving its relative path
+  Scenario: Restore with --dry-run lists files without writing anything
+   ✔  Given a backup directory containing a .env file and a secrets.json file
+   ✔  When the developer runs rhino-cli env restore with --dry-run
+   ✔  Then the command exits successfully
+   ✔  And no files are written to the repository
+   ✔  And the output lists the files that would be restored
+Feature: Environment Variable Drift Guard
+  Scenario: Declared-but-unread key causes non-zero exit naming the key
+   ?  Given a fixture app whose .env.example declares FIXTURE_JWT_SECRET but whose source never reads it
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/env/env-validate.feature:10:5
+  Scenario: Read-but-undeclared key causes non-zero exit naming the key
+   ?  Given a fixture app whose source reads FIXTURE_JWT_SECRET but whose .env.example does not declare it
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/env/env-validate.feature:17:5
+  Scenario: Matching declared and read keys exit successfully
+   ?  Given a fixture app whose .env.example declares FIXTURE_JWT_SECRET and whose source reads it
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/env/env-validate.feature:24:5
+  Scenario: Allowlisted keys are ignored during validation
+   ?  Given a fixture app that reads ENABLE_TEST_API and a framework-injected PORT variant but neither is declared in .env.example
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/env/env-validate.feature:31:5
+[Summary]
+4 features
+48 scenarios (44 passed, 4 skipped)
+211 steps (207 passed, 4 skipped)
+     Running tests/env_validate.rs (apps/rhino-cli/target/release/deps/env_validate-4d84258466ebc00c)
+
+running 5 tests
+test integration_warn_only_does_not_fail_on_drift ... ok
+test integration_matching_typescript_surface_exits_clean ... ok
+test integration_declared_but_unread_exits_nonzero_and_names_key ... ok
+test integration_read_but_undeclared_exits_nonzero_and_names_key ... ok
+test integration_matching_rust_surface_exits_clean ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/golden_master.rs (apps/rhino-cli/target/release/deps/golden_master-2980abf40f6453f5)
+
+running 1 test
+test golden_master_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/java.rs (apps/rhino-cli/target/release/deps/java-94ee34926126b3ed)
+Feature: Java Package Null-Safety Annotation Enforcement
+  Scenario: A source tree with all packages annotated passes validation
+   ✔  Given a Java source tree where every package has a @NullMarked-annotated package-info.java
+   ✔  When the developer runs java validate-annotations on the source root
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero violations
+  Scenario: A package missing package-info.java fails validation
+   ✔  Given a Java source tree where one package has no package-info.java file
+   ✔  When the developer runs java validate-annotations on the source root
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the package missing package-info.java
+  Scenario: A package-info.java without the required annotation fails validation
+   ✔  Given a Java source tree where one package has a package-info.java without @NullMarked
+   ✔  When the developer runs java validate-annotations on the source root
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the package with the missing annotation
+  Scenario: A custom annotation can be specified via flag
+   ✔  Given a Java source tree where every package has a @NonNull-annotated package-info.java
+   ✔  When the developer runs java validate-annotations with --annotation NonNull
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero violations
+[Summary]
+1 feature
+4 scenarios (4 passed)
+16 steps (16 passed)
+     Running tests/mermaid_golden_corpus.rs (apps/rhino-cli/target/release/deps/mermaid_golden_corpus-927588dfa926c862)
+
+running 1 test
+test state_diagram_corpus_violations_match_expected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/repo_governance.rs (apps/rhino-cli/target/release/deps/repo_governance-099498bfad885812)
+Feature: Gherkin Keyword Cardinality Audit
+  Scenario: A scenario with two primary When keywords fails the audit
+   ✔  Given a feature file containing a scenario with two primary "When" keywords
+   ✔  When the developer runs repo-governance gherkin-keyword-cardinality on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output names the offending file and scenario
+  Scenario: A conforming feature file passes the audit
+   ✔  Given a feature file whose scenarios each use one primary keyword chained with "And"
+   ✔  When the developer runs repo-governance gherkin-keyword-cardinality on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero cardinality findings
+  Scenario: A Background block with repeated keywords passes the audit
+   ✔  Given a feature file whose Background block repeats the "Given" keyword
+   ✔  When the developer runs repo-governance gherkin-keyword-cardinality on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero cardinality findings
+  Scenario: A Scenario Outline Examples table passes the audit
+   ✔  Given a feature file with a Scenario Outline whose Examples table has many rows
+   ✔  When the developer runs repo-governance gherkin-keyword-cardinality on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero cardinality findings
+  Scenario: Keyword words inside doc-strings and comments pass the audit
+   ✔  Given a feature file whose doc-strings and comments contain primary keyword words
+   ✔  When the developer runs repo-governance gherkin-keyword-cardinality on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero cardinality findings
+  Scenario: A directory of conforming feature files passes the audit
+   ✔  Given a directory of feature files that all obey the one-each keyword rule
+   ✔  When the developer runs repo-governance gherkin-keyword-cardinality on the directory
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero cardinality findings
+Feature: Governance of the instruction-file size-budget rule
+  Scenario: The rule is documented as a convention
+   ?  Given the plan is complete
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-governance.feature:9:5
+  Scenario: repo-rules-checker validates the budget qualitatively
+   ?  Given the plan is complete
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-governance.feature:15:5
+  Scenario: The quality-gate workflow lists the validator as a fourth preflight category
+   ?  Given the plan is complete
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-governance.feature:21:5
+  Scenario: The preflight envelope carries the instruction-size category
+   ?  Given a repo with instruction files within the configured budgets
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-governance.feature:26:5
+  Scenario: The AI checker defers to the deterministic preflight finding
+   ?  Given a preflight JSON contains an "instruction-size" category with findings
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-governance.feature:32:5
+Feature: Pre-push enforcement of the instruction-file size budget
+  Scenario: Pushing an over-budget instruction file is blocked
+   ?  Given my push range modifies "AGENTS.md"
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-pre-push.feature:9:5
+  Scenario: Pushing changes that do not touch instruction files skips the gate
+   ?  Given my push range modifies only "apps/ose-www/src/page.tsx"
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-pre-push.feature:16:5
+  Scenario: Pushing an in-budget instruction-file edit passes
+   ?  Given my push range modifies "AGENTS.md"
+      Step skipped: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size-pre-push.feature:21:5
+Feature: Instruction-file size budget
+  Scenario: A file within target passes silently
+   ?> Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
+      Background step failed: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size.feature:9:5
+  Scenario: A file over target but under the ceiling warns without failing
+   ?> Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
+      Background step failed: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size.feature:9:5
+  Scenario: A file over its hard ceiling fails the command
+   ?> Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
+      Background step failed: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size.feature:9:5
+  Scenario: A configured glob matching no file is a no-op
+   ?> Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
+      Background step failed: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size.feature:9:5
+  Scenario: The resolved tree is checked against the fail ceiling
+   ?> Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
+      Background step failed: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size.feature:9:5
+  Scenario: The legacy alias still works
+   ?> Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
+      Background step failed: Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/repo-governance-instruction-size.feature:9:5
+Feature: Governance Vendor Audit
+  Scenario: A forbidden term in plain prose fails the audit
+   ✔  Given a governance markdown file containing "Claude Code" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario: A forbidden term inside a code fence passes the audit
+   ✔  Given a governance markdown file containing "Claude Code" inside a code fence
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero findings
+  Scenario: A forbidden term inside a binding-example fence passes the audit
+   ✔  Given a governance markdown file containing "Claude Code" inside a binding-example fence
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero findings
+  Scenario: A forbidden term under a Platform Binding Examples heading passes the audit
+   ✔  Given a governance markdown file containing "Claude Code" under a "Platform Binding Examples" heading
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero findings
+  Scenario: A governance directory with no forbidden terms passes the audit
+   ✔  Given a governance directory with no forbidden terms in prose
+   ✔  When the developer runs repo-governance vendor-audit on the directory
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero findings
+  Scenario: Capitalized branded Skills in plain prose fails the audit
+   ✔  Given a governance markdown file containing "Skills" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario: Capitalized Skills inside a code fence passes the audit
+   ✔  Given a governance markdown file containing "Skills" inside a code fence
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero findings
+  Scenario Outline: A new harness vendor name in plain prose fails the audit
+   ✔  Given a governance markdown file containing "Junie" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness vendor name in plain prose fails the audit
+   ✔  Given a governance markdown file containing "JetBrains" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness vendor name in plain prose fails the audit
+   ✔  Given a governance markdown file containing "Amazon Q" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness vendor name in plain prose fails the audit
+   ✔  Given a governance markdown file containing "Antigravity" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness vendor name in plain prose fails the audit
+   ✔  Given a governance markdown file containing "pi.dev" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness vendor name in plain prose fails the audit
+   ✔  Given a governance markdown file containing "Earendil" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness binding path in plain prose fails the audit
+   ✔  Given a governance markdown file containing ".junie/" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness binding path in plain prose fails the audit
+   ✔  Given a governance markdown file containing ".amazonq/" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness binding path in plain prose fails the audit
+   ✔  Given a governance markdown file containing ".pi/" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario Outline: A new harness binding path in plain prose fails the audit
+   ✔  Given a governance markdown file containing ".agents/" in plain prose
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the forbidden term and its location
+  Scenario: A new harness vendor name under a Platform Binding Examples heading passes the audit
+   ✔  Given a governance markdown file containing "Junie" under a "Platform Binding Examples" heading
+   ✔  When the developer runs repo-governance vendor-audit on the file
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero findings
+[Summary]
+5 features
+38 scenarios (24 passed, 14 skipped)
+110 steps (96 passed, 14 skipped)
+     Running tests/spec_coverage.rs (apps/rhino-cli/target/release/deps/spec_coverage-75ea75fb4d7e9b2c)
+Feature: BDD Spec-to-Test Coverage Validation
+  Scenario: All feature files have matching test implementations
+   ✔  Given a specs directory where every feature file has a corresponding test file
+   ✔  When the developer runs spec-coverage validate on the specs and app directories
+   ✔  Then the command exits successfully
+   ✔  And the output reports all specs as covered
+  Scenario: A feature file without a matching test is reported as a gap
+   ✔  Given a specs directory containing a feature file with no corresponding test file
+   ✔  When the developer runs spec-coverage validate on the specs and app directories
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the feature file as an uncovered spec
+  Scenario: A scenario without a matching implementation is reported as a gap
+   ✔  Given a feature file with a scenario whose title does not appear in any test file
+   ✔  When the developer runs spec-coverage validate on the specs and app directories
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the scenario as an unimplemented scenario
+  Scenario: A step without a matching step definition is reported as a gap
+   ✔  Given a feature file with a step text that does not appear in any test file
+   ✔  When the developer runs spec-coverage validate on the specs and app directories
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the step as an undefined step
+  Scenario: Shared-steps mode validates steps across all source files
+   ✔  Given feature files with steps implemented in shared step files
+   ✔  When the developer runs spec-coverage validate with shared-steps flag
+   ✔  Then the command validates steps across all source files without file matching
+  Scenario: Multi-language test file matching recognizes language-specific patterns
+   ✔  Given feature files with test implementations in multiple languages
+   ✔  When the developer runs spec-coverage validate on the specs and app directories
+   ✔  Then test files are matched using language-specific conventions
+[Summary]
+1 feature
+6 scenarios (6 passed)
+22 steps (22 passed)
+     Running tests/workflows.rs (apps/rhino-cli/target/release/deps/workflows-cf1fef0f97963c51)
+Feature: Workflow Naming Convention Validation
+  Scenario: A tree where every workflow obeys the naming rule passes validation
+   ✔  Given a repository where every workflow filename ends with an allowed type suffix
+   ✔  When the developer runs workflows validate-naming
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero naming violations
+  Scenario: A workflow filename without an allowed type suffix fails validation
+   ✔  Given a repository with one workflow whose filename ends in an unknown suffix
+   ✔  When the developer runs workflows validate-naming
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the offending workflow file and its unknown suffix
+  Scenario: A workflow frontmatter name that disagrees with the filename fails validation
+   ✔  Given a repository with a workflow file whose frontmatter name differs from its filename
+   ✔  When the developer runs workflows validate-naming
+   ✔  Then the command exits with a failure code
+   ✔  And the output identifies the frontmatter mismatch
+  Scenario: A file under repo-governance/workflows/meta/ is exempt from the naming rule
+   ✔  Given a repository with a file under repo-governance/workflows/meta/ whose name does not follow the type-suffix rule
+   ✔  When the developer runs workflows validate-naming
+   ✔  Then the command exits successfully
+   ✔  And the output reports zero naming violations
+[Summary]
+1 feature
+4 scenarios (4 passed)
+16 steps (16 passed)
+   Doc-tests rhino_cli
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit:0

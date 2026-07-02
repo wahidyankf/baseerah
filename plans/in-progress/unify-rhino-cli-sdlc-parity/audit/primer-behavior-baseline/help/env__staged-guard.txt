@@ -1,0 +1,6 @@
+error: 'rhino-cli env staged-guard' requires a subcommand but one was not provided
+  [subcommands: validate, help]
+
+Usage: rhino-cli env staged-guard [OPTIONS] <COMMAND>
+
+For more information, try 'help'.

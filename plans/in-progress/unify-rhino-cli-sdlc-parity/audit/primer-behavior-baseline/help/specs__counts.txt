@@ -1,0 +1,6 @@
+error: 'rhino-cli specs counts' requires a subcommand but one was not provided
+  [subcommands: validate, help]
+
+Usage: rhino-cli specs counts [OPTIONS] <COMMAND>
+
+For more information, try 'help'.

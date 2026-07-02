@@ -1,0 +1,6 @@
+error: 'rhino-cli md' requires a subcommand but one was not provided
+  [subcommands: links, mermaid, heading-hierarchy, naming, frontmatter, frontmatter-dates, readme-index, audit, help]
+
+Usage: rhino-cli md [OPTIONS] <COMMAND>
+
+For more information, try 'help'.
