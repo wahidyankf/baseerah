@@ -69,9 +69,11 @@ and canonical GitHub CI — **plus** the following second-pass additions:
   `*-contracts` projects rooted under `specs/apps/*/containers/contracts/`, invisible to a
   directory-only `apps`/`libs` scan) wires the specs input so a specs-only change is caught at
   pre-push/PR, not just main-ci.
-- **`repo-config.yml` schema-parity gate** — a new gate asserting all three configs carry an identical
-  key set (values may differ), so the byte-identical source can safely read config keys without silent
-  runtime breakage.
+- **`repo-config.yml` schema-parity gate** — a new `rhino-cli repo-config validate` command that
+  strict-deserializes `repo-config.yml` against the byte-identical canonical schema, giving all three
+  configs an identical key set as an emergent property (values may differ), so the byte-identical
+  source can safely read config keys without silent runtime breakage. Wired at **pre-commit**
+  (fast path, fires only when `repo-config.yml` is staged) and pre-push/PR (defense-in-depth).
 - **Governance/docs convergence** — the reference docs, governance conventions, and `AGENTS.md`
   sections describing the standard stay identical across the three repos.
 - **Latent-bug fixes** (root-cause, per repo policy) — the `.opencode/agent/` (singular) trigger-path
@@ -148,7 +150,9 @@ tree (see [tech-docs §5.2](./tech-docs.md#52-second-grill-decisions-user-ratifi
 2. **Ban descope** — byte-identity is non-negotiable; the Phase 4 escape hatch is removed.
 3. **Round-trip guard = both** — behavior baseline + file-accounting ledger guard primer ⊇ current-primer.
 4. **Synthesis tiebreak = most-evolved-wins default**; deviations logged in the synthesis ledger.
-5. **Config schema-parity gate** — identical key sets across all three `repo-config.yml`.
+5. **Config schema-parity gate** — new `rhino-cli repo-config validate` command, wired at pre-commit
+   (fires when `repo-config.yml` is staged) and pre-push/PR; gives identical key sets across all three
+   `repo-config.yml` as an emergent property of validating against the shared schema.
 6. **Arm dormant gates via Phase 0 dry-run** — existing violations become explicit remediation items first.
 7. **MIT `LICENSE` scoped to `apps/rhino-cli/`**, identical file in all three repos.
 8. **Golden master regenerated post-synthesis** — guards Phases 3–4 propagation, not the synthesis.

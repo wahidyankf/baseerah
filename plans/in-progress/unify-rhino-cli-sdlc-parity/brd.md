@@ -61,9 +61,12 @@ AI agent) who learns any surface in one repo applies that knowledge unchanged in
   against canonical-primer at the Phase 3 gate, and the file-accounting ledger accounts for every
   current-primer file as ported/merged/explicitly-dropped. [Repo-grounded]
 - **Config schema parity**: all three `repo-config.yml` files carry an identical key set (values may
-  differ), enforced by a schema-parity gate in each repo's pre-push/PR — so the byte-identical source
-  cannot break at runtime on a missing key. Observable check: the schema-parity gate passes in all
-  three repos. [Repo-grounded]
+  differ), enforced by a new `rhino-cli repo-config validate` command — a strict-deserialize check
+  against the byte-identical canonical schema — run at each repo's **pre-commit** (fast path, fires
+  only when `repo-config.yml` is staged) and pre-push/PR (defense-in-depth), so the byte-identical
+  source cannot break at runtime on a missing or misspelled key. Observable check: `rhino-cli
+repo-config validate` exits 0 in all three repos, and rejects a deliberately corrupted
+  `repo-config.yml` at commit time. [Repo-grounded]
 - **SDLC mechanism parity (zero `⚠️`)**: every gate is invoked through the identical mechanism in all
   three repos — no repo using `npx nx run rhino-cli:*` where another uses direct `cargo run`, no
   inline tool-lint where another uses lint-staged. Observable check: the Phase 5 parity table shows ✅

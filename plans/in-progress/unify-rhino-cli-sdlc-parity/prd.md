@@ -62,8 +62,11 @@ code cycle.
 - **Full `namedInputs.specs` rollout** on every Nx-registered project in all 3 repos, enumerated via
   `nx show projects` (including the `*-contracts` projects rooted under
   `specs/apps/*/containers/contracts/`).
-- **Config schema-parity gate**: a gate asserting all three `repo-config.yml` carry an identical key
-  set (values may differ), run in each repo's pre-push/PR.
+- **Config schema-parity gate**: a new `rhino-cli repo-config validate` command that strict-deserializes
+  `repo-config.yml` against the canonical schema (deny-unknown-fields + required/enum checks), giving
+  all three repos an identical key set as an emergent property (values may differ); run on
+  **pre-commit** (fast path, fires only when `repo-config.yml` is staged) and **pre-push/PR**
+  (defense-in-depth).
 - **Missing mandatory targets** added to the 6 infra projects; `coverage.projects` registry completed.
 - **Repo-specific behaviour driven from `repo-config.yml`** (env-validation scan paths, domain/ddd
   areas) so `src/` AND every `project.json` command string are byte-identical (Decision 5).
@@ -204,11 +207,13 @@ Feature: repo-config.yml is byte-identical modulo per-repo data
     And only the per-repo data values (harness list is identical; domain-areas / env globs differ per repo) vary
 
   Scenario: A schema-parity gate enforces the identical key set
-    Given the repo-config.yml schema-parity gate in each repo's pre-push/PR
+    Given "rhino-cli repo-config validate" in each repo's pre-commit and pre-push/PR
     When repo-config.yml is validated
-    Then the gate asserts all three repos' repo-config.yml carry an identical key set
+    Then the command strict-deserializes it against the canonical RepoConfig schema
     And it passes when only values differ
     And it fails when a required key is missing or an unknown key is present
+    And running it independently against the byte-identical schema in all three repos is equivalent to
+      an identical key set across all three repo-config.yml files
 
   Scenario: Repo-specific behaviour is data-driven, not hard-coded
     Given rhino-cli's repo-specific behaviour (env globs, domain/ddd areas)
@@ -304,8 +309,9 @@ validate.rs` in Phase 1, asserted by the "IaC env-validation is preserved in the
   no-op-by-data pattern as SurfaceKind); the Phase 1 RED/GREEN cycle asserts `cargo test` stays green
   in a repo that lacks the toolchain.
 - **Risk: config schema drift makes byte-identical source runtime-broken in one repo.** Mitigation:
-  the schema-parity gate asserts identical key sets across all three configs in every repo's
-  pre-push/PR.
+  `rhino-cli repo-config validate` strict-deserializes each repo's `repo-config.yml` against the
+  byte-identical schema on pre-commit (fast, local, catches the mistake before it's even committed)
+  and again on pre-push/PR as defense-in-depth.
 - **Risk: pulling primer's testcoverage/cucumber into public expands public's rhino-cli surface, and
   the round trip could regress primer.** Mitigation: synthesis is gated by public's own suites; the
   golden-master is regenerated deliberately; the primer round-trip is guarded by the Phase-0 behavior

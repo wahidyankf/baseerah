@@ -161,9 +161,17 @@ carve-outs** (per Decisions 3 + 5). Achieved by:
    validator code no-ops for them **by data, not by stub**, consistent with byte-identical source.
    **Config schema-parity is the real byte-identity boundary**: because the byte-identical source now
    reads config keys, a repo whose `repo-config.yml` is missing a required key (or carries an unknown
-   one) is byte-identical yet runtime-broken. A **schema-parity gate** (Phase 1 deliverable) asserts
-   all three `repo-config.yml` files carry an **identical key set** (values may differ), run in each
-   repo's pre-push/PR; this converts the identity boundary from prose into an enforced check.
+   one) is byte-identical yet runtime-broken. A new **`rhino-cli repo-config validate`** command (Phase
+   1 deliverable) asserts all three `repo-config.yml` files carry an **identical key set** (values may
+   differ); this converts the identity boundary from prose into an enforced check. The mechanism is a
+   **strict deserialize** of `repo-config.yml` against the byte-identical `RepoConfig` struct
+   (`#[serde(deny_unknown_fields)]` + required-non-empty checks on `harness`/`coverage.projects`, plus
+   enum checks on `harness[].tier` and `coverage.projects[].levels`) — because the parsing struct
+   itself is byte-identical source, each repo validating its **own** config against its **own** copy of
+   that struct **is** cross-repo key-set parity, with no separate canonical-key-list artifact to keep
+   in sync. It is wired **twice**: a **pre-commit** fast path (a `lint-staged` entry keyed to the
+   `repo-config.yml` glob, so it only runs when that file is staged) for immediate feedback, and the
+   existing **pre-push/PR** step as defense-in-depth against `--no-verify` bypasses and PR-only edits.
 3. **No carve-outs.** infra's rhino-cli is relicensed to MIT (Decision 3). To keep the grant scope
    unambiguous inside infra's otherwise-proprietary tree, an **MIT `LICENSE` file scoped to
    `apps/rhino-cli/`** is added — and, so the `apps/rhino-cli/` tree stays byte-identical, the **same
@@ -236,18 +244,18 @@ to both siblings (Phases 3–4) — never primer→infra directly.
 
 ### 5.2 Second-grill decisions (user-ratified 2026-07-02, second pass)
 
-| #   | Topic                    | Ratified choice                                                                                                                                                                                                                             |
-| --- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 6   | Cargo.lock identity      | **Keep in byte-identity** — verified achievable (isolated crate, own lockfile, no `[workspace]`); the current size divergence is real work, not a blocker                                                                                   |
-| 7   | Descope vs identity      | **Ban descope** — byte-identity is non-negotiable; the Phase 4 escape hatch is removed. Phase 4 must converge or the plan does not archive                                                                                                  |
-| 8   | Round-trip guard         | **Both** — behavior baseline (Phase 0 snapshot, Phase 3 must pass) **and** file-accounting ledger (Phase 1 records, Phase 3 diffs) — see §4 point 5                                                                                         |
-| 9   | Synthesis tiebreak       | **Most-evolved-wins default**; deviations from most-evolved logged with a reason in the Phase 1 synthesis ledger — see §4 point 1                                                                                                           |
-| 10  | Config schema parity     | **Schema-parity gate** — identical key sets across all three `repo-config.yml` (values may differ), enforced in pre-push/PR — see §4 point 2                                                                                                |
-| 11  | Arming dormant gates     | **Phase 0 dry-run** — run the two fixed validators (naming trigger-path, `gherkin-cardinality`) against the current tree in all 3 repos first; existing violations become explicit remediation items before the gate is armed               |
-| 12  | MIT scope                | **`LICENSE` file scoped to `apps/rhino-cli/`**, identical file added in all three repos — see §4 point 3                                                                                                                                    |
-| 13  | Golden master            | **Regenerate post-synthesis** — the golden-master is regenerated from the canonical rhino-cli after Phase 1, then frozen; it guards Phases 3–4 propagation, not the synthesis (which is guarded by the behavior baseline + unit + cucumber) |
-| 14  | Partial-completion pause | **Mid-plan pause invariant** — each phase gate asserts the just-touched repo passes its own full pre-push + PR gate before the plan may pause at that boundary                                                                              |
-| 15  | Cucumber direction       | **level up to 0.23.0** — adopt primer's wired harness everywhere migrated to the `0.23.0` API (not stripped, not copied verbatim); canonical `.feature` tree = **reconciled union** of all three — see §4 point 4                           |
+| #   | Topic                    | Ratified choice                                                                                                                                                                                                                                                                                                                                    |
+| --- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 6   | Cargo.lock identity      | **Keep in byte-identity** — verified achievable (isolated crate, own lockfile, no `[workspace]`); the current size divergence is real work, not a blocker                                                                                                                                                                                          |
+| 7   | Descope vs identity      | **Ban descope** — byte-identity is non-negotiable; the Phase 4 escape hatch is removed. Phase 4 must converge or the plan does not archive                                                                                                                                                                                                         |
+| 8   | Round-trip guard         | **Both** — behavior baseline (Phase 0 snapshot, Phase 3 must pass) **and** file-accounting ledger (Phase 1 records, Phase 3 diffs) — see §4 point 5                                                                                                                                                                                                |
+| 9   | Synthesis tiebreak       | **Most-evolved-wins default**; deviations from most-evolved logged with a reason in the Phase 1 synthesis ledger — see §4 point 1                                                                                                                                                                                                                  |
+| 10  | Config schema parity     | **`rhino-cli repo-config validate`** — strict-deserialize schema check (deny-unknown-fields + required/enum checks), giving identical key sets across all three `repo-config.yml` (values may differ) as an emergent property; enforced in **pre-commit** (fast path, file-scoped trigger) **and** pre-push/PR (defense-in-depth) — see §4 point 2 |
+| 11  | Arming dormant gates     | **Phase 0 dry-run** — run the two fixed validators (naming trigger-path, `gherkin-cardinality`) against the current tree in all 3 repos first; existing violations become explicit remediation items before the gate is armed                                                                                                                      |
+| 12  | MIT scope                | **`LICENSE` file scoped to `apps/rhino-cli/`**, identical file added in all three repos — see §4 point 3                                                                                                                                                                                                                                           |
+| 13  | Golden master            | **Regenerate post-synthesis** — the golden-master is regenerated from the canonical rhino-cli after Phase 1, then frozen; it guards Phases 3–4 propagation, not the synthesis (which is guarded by the behavior baseline + unit + cucumber)                                                                                                        |
+| 14  | Partial-completion pause | **Mid-plan pause invariant** — each phase gate asserts the just-touched repo passes its own full pre-push + PR gate before the plan may pause at that boundary                                                                                                                                                                                     |
+| 15  | Cucumber direction       | **level up to 0.23.0** — adopt primer's wired harness everywhere migrated to the `0.23.0` API (not stripped, not copied verbatim); canonical `.feature` tree = **reconciled union** of all three — see §4 point 4                                                                                                                                  |
 
 Net effect of 3 + 5 + 12: `apps/rhino-cli` (including `LICENSE`) is 100% byte-identical across all
 three repos, no exceptions. Net effect of 7 + 14: no phase may leave a repo half-converged, and infra
@@ -292,7 +300,8 @@ flowchart LR
   three command surfaces (cucumber migrated to `0.23.0` + testcoverage + infra's IaC validators +
   strict lints + data-driven repo-config + `apps/rhino-cli/LICENSE`), keeping a **synthesis ledger**
   (Decision 9) and a **file-accounting ledger** for primer's contributions (Decision 8); add the
-  **schema-parity gate** (Decision 10); fix latent bugs; **regenerate the golden-master** from the
+  **`repo-config validate` schema-parity gate** wired at pre-commit and pre-push/PR (Decision 10); fix
+  latent bugs; **regenerate the golden-master** from the
   canonical result (Decision 13); finalize canonical docs. RED/GREEN/REFACTOR for every rhino-cli
   source change with companion `.feature` specs.
 - **Phase 2 — public closeout.** `namedInputs.specs` on all 29 projects; complete `coverage.projects`;
@@ -405,7 +414,10 @@ change, not every file in it.
 - Deleted: `specs/libs/golang-commons/gherkin/**` (stale orphan)
 - Modified: `repo-config.yml` (header-comment canonicalization; `coverage.projects` completion;
   env-validation data-driving)
-- New: the `repo-config.yml` schema-parity gate (validator/test + its wiring)
+- New: `apps/rhino-cli/src/commands/repo_config_validate.rs` + `cli.rs` additions (schema-parity
+  gate — `rhino-cli repo-config validate` command + tests)
+- Modified: `package.json` (`lint-staged` entry for `repo-config.yml` → `repo-config validate`)
+- Modified: `.husky/pre-push` (`repo-config validate` step, defense-in-depth)
 - Modified: `.github/workflows/pr-quality-gate.yml` (add `gherkin-cardinality` step)
 - Modified: 13 other projects' `project.json` (add `namedInputs.specs`): `ayokoding-cli`, `ose-cli`,
   9 `*-fe-e2e`/`*-www-be-e2e`/`*-app-web-e2e` runners, plus the 2 contracts projects
