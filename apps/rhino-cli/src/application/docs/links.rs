@@ -647,6 +647,7 @@ pub fn format_link_text(result: &LinkValidationResult, _verbose: bool, quiet: bo
         "workflows/ paths",
         "vision/ paths",
         "conventions README",
+        "broken-anchor",
     ];
 
     for category in &category_order {
@@ -914,6 +915,42 @@ mod tests {
         assert!(s.contains("General/other paths"));
         assert!(s.contains("docs/foo.md"));
         assert!(s.contains("nonexistent.md"));
+    }
+
+    /// Regression test: `category_order` in [`format_link_text`] omitted
+    /// `"broken-anchor"`, so broken-anchor findings silently vanished from
+    /// text/markdown reports — the summary count still reflected them (and
+    /// the command still failed with a non-zero exit code), but the
+    /// file/link responsible was never named. Proves the finding's source
+    /// file and link text now surface.
+    #[test]
+    fn format_link_text_includes_broken_anchor_category() {
+        let anchor_link = BrokenLink {
+            line_number: 3,
+            source_file: "docs/index.md".to_string(),
+            link_text: "./chapter.md#missing-section".to_string(),
+            target_path: "docs/chapter.md#missing-section".to_string(),
+            category: "broken-anchor".to_string(),
+        };
+        let mut by_cat = HashMap::new();
+        by_cat.insert("broken-anchor".to_string(), vec![anchor_link]);
+        let result = LinkValidationResult {
+            total_files: 1,
+            total_links: 1,
+            broken_links: vec![BrokenLink {
+                line_number: 3,
+                source_file: "docs/index.md".to_string(),
+                link_text: "./chapter.md#missing-section".to_string(),
+                target_path: "docs/chapter.md#missing-section".to_string(),
+                category: "broken-anchor".to_string(),
+            }],
+            broken_by_category: by_cat,
+            scan_duration_ms: 10,
+        };
+        let s = format_link_text(&result, false, false);
+        assert!(s.contains("broken-anchor"), "got: {s}");
+        assert!(s.contains("docs/index.md"), "got: {s}");
+        assert!(s.contains("./chapter.md#missing-section"), "got: {s}");
     }
 
     /// Verifies that [`format_link_markdown`] delegates to [`format_link_text`].

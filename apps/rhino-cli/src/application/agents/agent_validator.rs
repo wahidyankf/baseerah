@@ -131,7 +131,7 @@ fn parse_agent_yaml(frontmatter: &str) -> Result<ClaudeAgentFull, String> {
     Ok(agent)
 }
 
-/// Check that `name` and `description` are both non-empty.
+/// Check that `name`, `description`, and `tools` are all non-empty.
 fn validate_required_fields(filename: &str, agent: &ClaudeAgentFull) -> ValidationCheck {
     let mut missing: Vec<&str> = Vec::new();
     if agent.name.is_empty() {
@@ -139,6 +139,9 @@ fn validate_required_fields(filename: &str, agent: &ClaudeAgentFull) -> Validati
     }
     if agent.description.is_empty() {
         missing.push("description");
+    }
+    if agent.tools.is_empty() {
+        missing.push("tools");
     }
     if !missing.is_empty() {
         return ValidationCheck::failed(
@@ -501,10 +504,22 @@ mod tests {
         let agent = ClaudeAgentFull {
             name: "n".to_string(),
             description: "d".to_string(),
+            tools: vec!["Read".to_string()],
             ..Default::default()
         };
         let c = validate_required_fields("x.md", &agent);
         assert_eq!(c.status, "passed");
+    }
+
+    #[test]
+    fn validate_required_fields_missing_tools() {
+        let agent = ClaudeAgentFull {
+            name: "n".to_string(),
+            description: "d".to_string(),
+            ..Default::default()
+        };
+        let c = validate_required_fields("x.md", &agent);
+        assert_eq!(c.status, "failed");
     }
 
     #[test]

@@ -151,35 +151,21 @@ mod tests {
     use super::*;
     use crate::internal::git;
 
+    // Regression: this test used to hard-assert repo-specific domain literals
+    // ("organiclever", "ose-be", ...), which only hold in ose-public's own
+    // repo-config.yml — it failed immediately once rhino-cli's byte-identical
+    // source ran against ose-primer's own repo-config.yml data. `ddd-areas`
+    // and `domain-areas` are legitimately empty in some repos (e.g. a scaffold
+    // repo whose demo backends aren't DDD-structured), so only assert the one
+    // structural property every repo's config must satisfy: at least one
+    // project under test-level coverage (rhino-cli itself, at minimum).
     #[test]
     fn loads_repo_config_from_repo_root() {
         let repo_root = git::root::find_root().expect("must be in a git repo");
         let config = load(&repo_root).expect("repo-config.yml must be loadable");
-        // coverage.projects must have at least one entry
         assert!(
             !config.coverage.projects.is_empty(),
             "coverage.projects must not be empty"
-        );
-        // specs.ddd-areas must include organiclever and ose
-        assert!(
-            config.specs.ddd_areas.contains(&"organiclever".to_string()),
-            "ddd-areas must contain organiclever"
-        );
-        assert!(
-            config.specs.ddd_areas.contains(&"ose".to_string()),
-            "ddd-areas must contain ose"
-        );
-        // specs.domain-areas must include the *-be backends
-        assert!(
-            config
-                .specs
-                .domain_areas
-                .contains(&"organiclever-be".to_string()),
-            "domain-areas must contain organiclever-be"
-        );
-        assert!(
-            config.specs.domain_areas.contains(&"ose-be".to_string()),
-            "domain-areas must contain ose-be"
         );
     }
 

@@ -306,14 +306,15 @@ pub fn canonicalize_best_effort(path: &Path) -> std::result::Result<PathBuf, Err
 /// - `.env` / `.env.*` (any file whose basename starts with `.env`)
 /// - `secrets.json` (exact basename)
 /// - Any file under `.secrets/` (repo-relative path starts with `.secrets/`)
-///
-/// Patterns for future activation (IaC):
-/// ```text
-/// // activate when IaC is added
-/// // rel.ends_with(".tfvars") || rel.ends_with(".tfvars.json")
-/// ```
+/// - `.pem`/`.key`/`.crt`/`.pfx` certificate and key files (any basename)
 fn is_secret_file(rel: &str, base: &str) -> bool {
-    base.starts_with(".env") || base == "secrets.json" || rel.starts_with(".secrets/")
+    if base.starts_with(".env") || base == "secrets.json" || rel.starts_with(".secrets/") {
+        return true;
+    }
+    Path::new(base)
+        .extension()
+        .and_then(|e| e.to_str())
+        .is_some_and(|ext| matches!(ext, "pem" | "key" | "crt" | "pfx"))
 }
 
 /// Walks the repo root and returns all `.env*` files found.
@@ -1013,6 +1014,33 @@ mod tests {
         };
         let e = discover(&opts).unwrap();
         assert_eq!(e.len(), 2);
+    }
+
+    #[test]
+    fn is_secret_file_matches_cert_and_key_extensions() {
+        assert!(is_secret_file("cert.pem", "cert.pem"));
+        assert!(is_secret_file("sub/dir/id.key", "id.key"));
+        assert!(is_secret_file("server.crt", "server.crt"));
+        assert!(is_secret_file("bundle.pfx", "bundle.pfx"));
+        assert!(!is_secret_file("README.md", "README.md"));
+    }
+
+    #[test]
+    fn discover_finds_pem_file() {
+        let dir = tempdir().unwrap();
+        std::fs::write(dir.path().join("cert.pem"), "x").unwrap();
+        let opts = Options {
+            repo_root: dir.path().to_path_buf(),
+            skip_dirs: default_skip_dirs()
+                .iter()
+                .map(std::string::ToString::to_string)
+                .collect(),
+            max_size: DEFAULT_MAX_SIZE,
+            ..Default::default()
+        };
+        let e = discover(&opts).unwrap();
+        assert_eq!(e.len(), 1);
+        assert_eq!(e[0].rel_path, "cert.pem");
     }
 
     #[test]

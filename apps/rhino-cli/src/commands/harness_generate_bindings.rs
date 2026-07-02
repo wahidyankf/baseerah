@@ -11,7 +11,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::domain::cliout::OutputFormat;
-use crate::internal::agents::bindings::emit_bindings;
+use crate::internal::agents::bindings::{emit_bindings, expected_bindings};
 use crate::internal::agents::reporter::{format_sync_json, format_sync_markdown, format_sync_text};
 use crate::internal::agents::sync::{SyncOptions, sync_all};
 use crate::internal::git;
@@ -130,6 +130,10 @@ fn run_amazonq_emit(
     repo_root: &Path,
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
+    if args.dry_run {
+        return report_amazonq_dry_run(args, output_format);
+    }
+
     let result =
         emit_bindings(repo_root).map_err(|e| anyhow!("amazonq emit-bindings failed: {e}"))?;
 
@@ -164,6 +168,56 @@ fn run_amazonq_emit(
                     println!("- `{path}`");
                 }
                 println!("\nWrote {} file(s).", result.written.len());
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Previews the Amazon Q bridge files that `run_amazonq_emit` would write,
+/// without touching the filesystem.
+fn report_amazonq_dry_run(
+    args: &GenerateBindingsArgs,
+    output_format: OutputFormat,
+) -> std::result::Result<(), Error> {
+    let paths: Vec<String> = expected_bindings()
+        .into_iter()
+        .map(|b| b.rel_path.to_string())
+        .collect();
+
+    if !args.quiet {
+        match output_format {
+            OutputFormat::Text => {
+                for path in &paths {
+                    println!("would write {path}");
+                }
+                println!(
+                    "\u{2713} emit-bindings would write {} file(s) (dry-run)",
+                    paths.len()
+                );
+            }
+            OutputFormat::Json => {
+                #[derive(serde::Serialize)]
+                struct Out<'a> {
+                    status: &'a str,
+                    would_write: &'a [String],
+                    count: usize,
+                    dry_run: bool,
+                }
+                let out = Out {
+                    status: "success",
+                    would_write: &paths,
+                    count: paths.len(),
+                    dry_run: true,
+                };
+                println!("{}", serde_json::to_string_pretty(&out)?);
+            }
+            OutputFormat::Markdown => {
+                println!("# Amazon Q Bindings Emit (dry-run)\n");
+                for path in &paths {
+                    println!("- `{path}`");
+                }
+                println!("\nWould write {} file(s).", paths.len());
             }
         }
     }
@@ -394,5 +448,71 @@ mod tests {
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("unknown harness name"));
+    }
+
+    // --- Regression: `--dry-run` must also apply to the Amazon Q emit step, not just
+    // the OpenCode sync step. Previously `run_amazonq_emit` ignored `args.dry_run`
+    // entirely and wrote the binding files unconditionally. ---
+
+    #[test]
+    fn amazonq_dry_run_text_output_runs_without_panic() {
+        let a = GenerateBindingsArgs {
+            opencode: false,
+            amazonq: true,
+            harness: None,
+            dry_run: true,
+            verbose: false,
+            quiet: false,
+        };
+        // report_amazonq_dry_run never touches the filesystem (it lists the canonical
+        // binding paths from `expected_bindings()`), so it is safe to call directly
+        // without a git root, unlike the writing path (`emit_bindings`).
+        let result = report_amazonq_dry_run(&a, OutputFormat::Text);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn amazonq_dry_run_json_output_runs_without_panic() {
+        let a = GenerateBindingsArgs {
+            opencode: false,
+            amazonq: true,
+            harness: None,
+            dry_run: true,
+            verbose: false,
+            quiet: true,
+        };
+        let result = report_amazonq_dry_run(&a, OutputFormat::Json);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn amazonq_dry_run_markdown_output_runs_without_panic() {
+        let a = GenerateBindingsArgs {
+            opencode: false,
+            amazonq: true,
+            harness: None,
+            dry_run: true,
+            verbose: false,
+            quiet: true,
+        };
+        let result = report_amazonq_dry_run(&a, OutputFormat::Markdown);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn harness_amazonq_dry_run_via_run_reaches_dry_run_branch() {
+        // `harness bindings generate --harness amazonq --dry-run` must take the
+        // dry-run branch (no filesystem writes, no git-root-dependent failure from
+        // `emit_bindings`).
+        let a = GenerateBindingsArgs {
+            opencode: false,
+            amazonq: true,
+            harness: Some("amazonq".to_string()),
+            dry_run: true,
+            verbose: false,
+            quiet: true,
+        };
+        let result = run(&a, OutputFormat::Text);
+        assert!(result.is_ok(), "{:?}", result.err());
     }
 }
