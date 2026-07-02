@@ -53,12 +53,16 @@ AI agent) who learns any surface in one repo applies that knowledge unchanged in
   three repos — no repo using `npx nx run rhino-cli:*` where another uses direct `cargo run`, no
   inline tool-lint where another uses lint-staged. Observable check: the Phase 5 parity table shows ✅
   on every mechanics row with **no `⚠️` rows remaining**. [Repo-grounded]
-- **Full `namedInputs.specs` coverage**: every Nx project in every repo wires the specs input.
-  Observable check: the count of projects with `namedInputs.specs` equals the total project count in
-  each repo (currently 16/27, 20/25, 6/7). [Repo-grounded]
+- **Full `namedInputs.specs` coverage**: every Nx-registered project in every repo — enumerated via
+  `nx show projects`, which includes the `*-contracts` projects rooted under
+  `specs/apps/*/containers/contracts/` (invisible to a directory-only `apps`/`libs` scan) — wires the
+  specs input. Observable check: the count of projects with `namedInputs.specs` equals the total
+  `nx show projects` count in each repo (currently 16/29, 20/26, 6/8). [Repo-grounded]
 - **Complete mandatory-target coverage**: no project missing any mandatory target in any repo
-  (currently 5 infra projects have gaps). Observable check: the mandatory-target `jq` loop prints no
-  `MISSING` in any repo. [Repo-grounded]
+  (currently 6 infra projects have gaps, including the `coralpolyp-contracts` project which — like
+  the other `*-contracts` projects — sits outside `apps`/`libs`). Observable check: the
+  mandatory-target `jq` loop (enumerated via `nx show projects`) prints no `MISSING` in any repo.
+  [Repo-grounded]
 - **Latent bugs fixed**: the agent-naming validator fires (trigger path `.opencode/agents/`), and the
   PR gate runs `gherkin-cardinality` in public. Observable check: a renamed agent file trips the
   naming validator; the public PR-gate specs job lists `gherkin-cardinality`. [Repo-grounded]

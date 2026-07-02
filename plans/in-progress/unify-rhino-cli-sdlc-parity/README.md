@@ -53,8 +53,11 @@ and canonical GitHub CI — **plus** the following second-pass additions:
 - **cucumber-rs BDD harness in all three** — primer's fully-wired harness (`tests/*.rs` +
   `specs/apps/rhino/behavior/rhino-cli/gherkin/*.feature`) becomes canonical and is present +
   passing identically in all three repos (public + infra currently declare the dep but wire nothing).
-- **Full `namedInputs.specs` rollout** — every Nx project in every repo (not the current 16/27,
-  20/25, 6/7) wires the specs input so a specs-only change is caught at pre-push/PR, not just main-ci.
+- **Full `namedInputs.specs` rollout** — every Nx-registered project in every repo (not the current
+  16/29, 20/26, 6/8, counted against the full `nx show projects` graph — which includes the
+  `*-contracts` projects rooted under `specs/apps/*/containers/contracts/`, invisible to a
+  directory-only `apps`/`libs` scan) wires the specs input so a specs-only change is caught at
+  pre-push/PR, not just main-ci.
 - **Governance/docs convergence** — the reference docs, governance conventions, and `AGENTS.md`
   sections describing the standard stay identical across the three repos.
 - **Latent-bug fixes** (root-cause, per repo policy) — the `.opencode/agent/` (singular) trigger-path
@@ -93,7 +96,7 @@ and canonical GitHub CI — **plus** the following second-pass additions:
    canonical; `.opencode/agents` path; `*.cs/.clj/.dart` mechanism; full `namedInputs.specs`).
 5. **Phase 4** — propagate to `ose-infra` (**largest workstream**: regenerate rhino-cli to canonical;
    `npx nx`/`npm run` → direct `cargo run`; inline tool-lint → lint-staged; add missing CI jobs;
-   workflow renames; 5 projects' missing targets; full `namedInputs.specs`; wire cucumber). Isolated
+   workflow renames; 6 projects' missing targets; full `namedInputs.specs`; wire cucumber). Isolated
    as a gated phase so it can be descoped without unwinding Phases 1–3.
 6. **Phase 5** — cross-repo byte-identity verification + archival.
 

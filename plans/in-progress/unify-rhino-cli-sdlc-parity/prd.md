@@ -49,8 +49,10 @@ config/wiring edits are verified by running the affected target/hook, not a TDD 
   ose-public; relicense infra's CLI to MIT (Decision 3).
 - **cucumber-rs harness**: adopt primer's wired harness (`tests/*.rs`, fixtures, golden-master,
   `specs/apps/rhino/behavior/rhino-cli/gherkin/*.feature`) as canonical; present + passing in all 3.
-- **Full `namedInputs.specs` rollout** on every Nx project in all 3 repos.
-- **Missing mandatory targets** added to the 5 infra projects; `coverage.projects` registry completed.
+- **Full `namedInputs.specs` rollout** on every Nx-registered project in all 3 repos, enumerated via
+  `nx show projects` (including the `*-contracts` projects rooted under
+  `specs/apps/*/containers/contracts/`).
+- **Missing mandatory targets** added to the 6 infra projects; `coverage.projects` registry completed.
 - **Repo-specific behaviour driven from `repo-config.yml`** (env-validation scan paths, domain/ddd
   areas) so `src/` AND every `project.json` command string are byte-identical (Decision 5).
 - **Latent-bug fixes**: `.opencode/agent/`→`.opencode/agents/` trigger path; public PR-gate
@@ -128,6 +130,7 @@ Feature: Canonical workflow names and jobs are identical
 
   Scenario: Canonical workflows exist with identical names and job skeletons
     Given .github/workflows in all three repos
+    When the workflow files are inspected
     Then pr-quality-gate.yml, validate-env.yml, main-ci.yml, and deps-audit.yml exist with lower-kebab names
     And no validate-markdown.yml / markdown-validate.yml exists
     And pr-quality-gate.yml runs gherkin-cardinality in its specs-gate in all three
@@ -139,9 +142,9 @@ Feature: Canonical workflow names and jobs are identical
 Feature: namedInputs.specs is wired on every project
 
   Scenario: Every Nx project wires the specs input
-    Given every project.json in each repo
+    Given every Nx-registered project in each repo, enumerated via nx show projects (including the *-contracts projects rooted under specs/apps/*/containers/contracts/)
     When namedInputs.specs presence is counted
-    Then the count equals the total project count in that repo
+    Then the count equals the total nx show projects count in that repo
     And a specs-only change marks the owning project affected at pre-push and the PR gate
 ```
 
@@ -149,10 +152,10 @@ Feature: namedInputs.specs is wired on every project
 Feature: Every project declares the mandatory targets
 
   Scenario: No project is missing a mandatory target
-    Given every direct child of apps/ or libs/ registered with Nx in each repo
+    Given every Nx-registered project in each repo, enumerated via nx show projects (not just direct children of apps/ or libs/ — also the *-contracts projects rooted under specs/apps/*/containers/contracts/)
     When its project.json targets are inspected
     Then test:unit, test:integration, test:e2e, test:quick, lint, typecheck, test:coverage, the specs:* targets, deps:audit, and compat:min-version are all present (echo where N/A)
-    And the 5 previously-missing ose-infra projects declare deps:audit and compat:min-version
+    And the 6 previously-missing ose-infra projects declare deps:audit and compat:min-version
 ```
 
 ```gherkin
@@ -168,6 +171,12 @@ Feature: repo-config.yml is byte-identical modulo per-repo data
     Given rhino-cli's repo-specific behaviour (env globs, domain/ddd areas)
     When rhino-cli runs
     Then it reads that behaviour from repo-config.yml, not from source hard-coded per repo
+
+  Scenario: IaC env-validation is preserved in the canonical
+    Given ose-infra declares terraform and ansible surfaces in repo-config.yml
+    When env validate runs
+    Then validate_terraform and validate_ansible execute and report drift
+    And ose-public and ose-primer, which declare no such surfaces, skip validation by data, not by stub
 ```
 
 ```gherkin
@@ -224,8 +233,17 @@ Feature: Legitimate divergence is preserved
 
 - **Risk: the infra rhino-cli regeneration introduces subtle behaviour changes.** Mitigation: the
   canonical carries the cucumber + unit + golden-master suites; infra must pass all three post-port.
-- **Risk: data-driving env-validation paths regresses infra's IaC env scanning.** Mitigation: infra's
-  IaC scan paths move to `repo-config.yml` and are asserted by a `.feature` scenario + the Phase 5
-  diff matrix (which must show zero `apps/rhino-cli` differences).
+- **Risk: the canonical synthesis silently drops infra's real Terraform/Ansible env-drift
+  validators.** public/primer today carry only a doc-comment stub for non-`"app"` surface kinds; a
+  best-of-two synthesis (cucumber + testcoverage only) would regenerate infra to that stub, deleting
+  its only real IaC drift-detection logic without any acceptance criterion catching the loss.
+  Mitigation: the canonical synthesis is explicitly best-of-**three** — `validate_terraform`/
+  `validate_ansible` (+ their tests) are ported from infra into the canonical `application/env/
+validate.rs` in Phase 1, asserted by the "IaC env-validation is preserved in the canonical" scenario
+  above, and infra's env-validation scan paths move to `repo-config.yml` as data, so the same
+  validators activate for infra (which declares `terraform`/`ansible` surfaces) and no-op for
+  public/primer (which do not) — the Phase 5 diff matrix and Phase 4 Gate's
+  `terraform_validator::`/`ansible_validator::` test runs both confirm zero `apps/rhino-cli`
+  differences and functional presence.
 - **Risk: pulling primer's testcoverage/cucumber into public expands public's rhino-cli surface.**
   Mitigation: synthesis is gated by public's own suites; the golden-master is refreshed deliberately.
