@@ -17,15 +17,21 @@ AI agent) who learns any surface in one repo applies that knowledge unchanged in
   see [tech-docs §2](./tech-docs.md#2-current-state-verified-2026-07-02)]
 - **Stale "done" notes erode trust in the plan record.** delivery.md items marked done (e.g.
   rhino-cli command-set "identical") do not match reality. This pass re-audits against the working
-  tree and treats the code, not the notes, as ground truth. [Repo-grounded]
+  tree and treats the code, not the notes, as ground truth. A second, deeper sweep even corrected this
+  plan's own first-draft current-state (the cucumber `.feature` trees diverge structurally, not just
+  in count; primer is on the _older_ cucumber `0.22.1`), reinforcing the code-over-notes discipline.
+  [Repo-grounded]
 - **rhino-cli drift is the highest-leverage divergence.** It is the one tool every gate in every repo
   invokes. If its source, its `Cargo.lock`, and its `project.json` commands differ, every downstream
   gate can behave differently even when the wiring looks the same. Making the tool byte-identical
   makes every gate that calls it identical by construction. [Judgment call]
-- **Cucumber coverage is asymmetric.** primer has a fully-wired BDD harness for rhino-cli's own
-  behaviour (11 `[[test]]` blocks + real `.feature` specs); public and infra declare the dependency
-  and wire nothing. The tool that enforces spec coverage everywhere is itself only spec-covered in one
-  of three repos. [Repo-grounded]
+- **Cucumber coverage is asymmetric.** primer has a wired BDD harness for rhino-cli's own behaviour
+  (11 `[[test]]` blocks); public and infra declare the dependency but don't register the harness. Yet
+  the `.feature` surface is _more_ divergent than that: public carries `ddd`/`specs` feature dirs
+  unique to it (public and primer share `workflows`, which only infra lacks), while primer/infra
+  additionally carry `contracts`/`java`/`test-coverage` dirs public lacks — so the canonical BDD
+  surface is the reconciled union of all three, and the tool that
+  enforces spec coverage everywhere is itself only harness-wired in one of three repos. [Repo-grounded]
 - **Parity-loop cost.** The [multi-repo parity workflow](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
   cannot be near-mechanical while the three rhino-cli codebases are structurally different. Byte
   identity is what makes propagation a copy, not a translation. [Repo-grounded]
@@ -42,13 +48,22 @@ AI agent) who learns any surface in one repo applies that knowledge unchanged in
 ## Business-Level Success Metrics
 
 - **rhino-cli byte-identity (new north star)**: `diff -rq apps/rhino-cli/src` between any two repos is
-  empty; `Cargo.toml`, `Cargo.lock`, and `project.json` are 100% byte-identical with **zero carve-outs**
-  (infra relicensed to MIT; env-validation scan paths data-driven from `repo-config.yml`). Observable
-  check: Phase 5's `diff -rq` + `diff` matrix shows no differences at all. [Repo-grounded]
-- **Cucumber parity**: the same wired cucumber-rs harness + the same `.feature` specs for rhino-cli's
-  own behaviour exist and pass in all three repos. Observable check: `cargo test` runs the cucumber
-  suites in each repo; the `tests/*.rs` set and the `specs/apps/rhino/behavior/rhino-cli/gherkin` tree
-  are identical across repos. [Repo-grounded]
+  empty; `Cargo.toml`, `Cargo.lock`, `project.json`, and `LICENSE` are 100% byte-identical with **zero
+  carve-outs** (infra relicensed to MIT with an `apps/rhino-cli/`-scoped MIT `LICENSE`; env-validation
+  scan paths data-driven from `repo-config.yml`), carrying the full command superset in every repo.
+  Observable check: Phase 5's `diff -rq` + `diff` matrix shows no differences at all. [Repo-grounded]
+- **Cucumber parity**: the same wired cucumber-rs harness (migrated to `0.23.0`) + the same **reconciled
+  union** `.feature` tree for rhino-cli's own behaviour exist and pass in all three repos. Observable
+  check: `cargo test` runs the cucumber suites in each repo; the `tests/*.rs` set and the
+  `specs/apps/rhino/behavior/rhino-cli/gherkin` tree are identical across repos. [Repo-grounded]
+- **Round-trip integrity**: primer ⊇ current-primer after the primer→public→primer round trip.
+  Observable check: the Phase-0 primer behavior baseline (cucumber + golden + CLI output) passes
+  against canonical-primer at the Phase 3 gate, and the file-accounting ledger accounts for every
+  current-primer file as ported/merged/explicitly-dropped. [Repo-grounded]
+- **Config schema parity**: all three `repo-config.yml` files carry an identical key set (values may
+  differ), enforced by a schema-parity gate in each repo's pre-push/PR — so the byte-identical source
+  cannot break at runtime on a missing key. Observable check: the schema-parity gate passes in all
+  three repos. [Repo-grounded]
 - **SDLC mechanism parity (zero `⚠️`)**: every gate is invoked through the identical mechanism in all
   three repos — no repo using `npx nx run rhino-cli:*` where another uses direct `cargo run`, no
   inline tool-lint where another uses lint-staged. Observable check: the Phase 5 parity table shows ✅
@@ -64,8 +79,9 @@ AI agent) who learns any surface in one repo applies that knowledge unchanged in
   mandatory-target `jq` loop (enumerated via `nx show projects`) prints no `MISSING` in any repo.
   [Repo-grounded]
 - **Latent bugs fixed**: the agent-naming validator fires (trigger path `.opencode/agents/`), and the
-  PR gate runs `gherkin-cardinality` in public. Observable check: a renamed agent file trips the
-  naming validator; the public PR-gate specs job lists `gherkin-cardinality`. [Repo-grounded]
+  PR gate runs `gherkin-cardinality` in public — both dry-run in Phase 0 before arming. Observable
+  check: a renamed agent file trips the naming validator; the public PR-gate specs job lists
+  `gherkin-cardinality`. [Repo-grounded]
 - **Reality-grounded record**: Phase 0 produces committed audit evidence; every delivery item cites a
   concrete verification (diff, jq, grep), not a prior "done" note. [Judgment call]
 - **One plan, three repos**: this single plan executes end-to-end across all three repos (Phases
@@ -75,22 +91,28 @@ AI agent) who learns any surface in one repo applies that knowledge unchanged in
 
 ## Business-Scope Non-Goals
 
-- Not changing **what** any validator checks (no new lint rules, thresholds, or validator logic).
+- Not changing **what** any validator checks (no new lint rules, thresholds, or validator logic) —
+  the one new gate is the `repo-config.yml` schema-parity check, which enforces an existing invariant
+  (identical key sets) rather than adding a new rule surface.
 - Not unifying the **app set** or **language set** across repos.
-- Not building **new automated parity-enforcement tooling** — mission is verify-&-closeout, not a
-  drift-guard. A parity-check command remains a possible future follow-up.
+- Not building **new automated parity-enforcement tooling** for rhino-cli byte-identity — mission is
+  verify-&-closeout, not a drift-guard. A parity-check command remains a possible future follow-up.
 
 ## Business Risks
 
 - **Risk: the infra rhino-cli port is large and could destabilize a working repo.** Mitigation: it is
-  isolated as gated **Phase 4** behind a full pre-push + PR-gate verification, and can be descoped to
-  a documented divergence without unwinding Phases 1–3.
+  isolated as gated **Phase 4** behind a full pre-push + PR-gate verification. It is **required, not
+  descopable** (Decision 7) — if large, it is still completed, and Phases 1–3 stand on their own and
+  are never unwound.
 - **Risk: byte-identity conflicts with genuinely repo-specific bits.** Mitigation: every such bit
-  (env-validation scan paths, domain/ddd areas) is driven from `repo-config.yml` data, and infra's CLI
-  is relicensed to MIT — leaving `apps/rhino-cli` with zero carve-outs. The only divergence anywhere is
-  app/language set and the CI runner label.
-- **Risk: pulling primer's advances back into public regresses public.** Mitigation: the synthesis
-  lands behind rhino-cli's own unit + cucumber suites (Phase 1 wires the cucumber suite into public as
-  part of the synthesis) and the golden-master test.
+  (env-validation scan paths, domain/ddd areas) is driven from `repo-config.yml` data (with a
+  schema-parity gate guaranteeing the key set is shared), and infra's CLI is relicensed to MIT with an
+  `apps/rhino-cli/`-scoped `LICENSE` — leaving `apps/rhino-cli` with zero carve-outs. The only
+  divergence anywhere is app/language set and the CI runner label.
+- **Risk: pulling primer's advances back into public regresses public — or the round trip regresses
+  primer.** Mitigation: the synthesis lands behind rhino-cli's own unit + cucumber suites (Phase 1
+  wires the union cucumber suite into public) and the regenerated golden-master test; the primer
+  round-trip is guarded by the Phase-0 behavior baseline + the file-accounting ledger (Decision 8).
 - **Risk: "done" notes mislead again.** Mitigation: every item is verified against the working tree;
-  the delivery checklist requires an evidence command per item.
+  the delivery checklist requires an evidence command per item; the second-pass sweep already caught
+  and corrected two stale current-state claims in this plan's own first draft.
