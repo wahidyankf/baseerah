@@ -89,6 +89,7 @@
     "**/Dockerfile*": "hadolint --failure-threshold warning",
     "*.{json,toml,ts,tsx,js,jsx,mjs,cjs,rs,go,py,cs,clj,dart,ex,exs,fs}": "cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- convention emoji validate",
     "*.feature": "cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- specs gherkin-cardinality validate",
+    "repo-config.yml": "bash -c 'cargo run --release --manifest-path apps/rhino-cli/Cargo.toml -- repo-config validate' --",
     "docker-compose*.{yml,yaml}": "bash -c 'for f; do docker compose -f \"$f\" config > /dev/null; done' --"
   },
   "dependencies": {

@@ -250,6 +250,56 @@ fn is_inside_repo(backup_dir: &Path, repo_root: &Path) -> bool {
     backup_dir.strip_prefix(repo_root).is_ok()
 }
 
+/// Canonicalizes `path`, resolving symlinks even when `path` (or its trailing
+/// components) does not yet exist on disk.
+///
+/// [`std::fs::canonicalize`] requires the full path to exist. A user-supplied
+/// `--dir` for `env backup` is frequently a directory that has not been
+/// created yet, so a plain canonicalize-or-fall-back-to-raw-path approach
+/// silently returns a non-canonical (symlink-preserving) path in that case.
+/// That matters because [`find_root`](crate::infrastructure::git::root::find_root)
+/// shells out to `git rev-parse --show-toplevel`, which always returns the
+/// physical (symlink-resolved) path — e.g. `/private/var/folders/...` rather
+/// than `/var/folders/...` on macOS. Comparing a non-canonical `backup_dir`
+/// against a canonical `repo_root` in [`is_inside_repo`] then silently fails
+/// to detect that the backup directory is inside the repository, defeating
+/// the safety guard the check exists for.
+///
+/// This function walks up to the nearest existing ancestor, canonicalizes
+/// that, and rejoins the missing trailing components, so the result is
+/// always in the same (physical) namespace as [`find_root`](crate::infrastructure::git::root::find_root).
+///
+/// # Errors
+///
+/// Returns an error when no ancestor of `path` exists, which should not
+/// happen for any path derived from an absolute filesystem location.
+pub fn canonicalize_best_effort(path: &Path) -> std::result::Result<PathBuf, Error> {
+    if let Ok(canon) = fs::canonicalize(path) {
+        return Ok(canon);
+    }
+    let mut tail: Vec<std::ffi::OsString> = Vec::new();
+    let mut cursor = path;
+    loop {
+        let Some(parent) = cursor.parent() else {
+            return Err(anyhow!(
+                "no existing ancestor found while canonicalizing {}",
+                path.display()
+            ));
+        };
+        if let Some(name) = cursor.file_name() {
+            tail.push(name.to_os_string());
+        }
+        if let Ok(canon_parent) = fs::canonicalize(parent) {
+            let mut result = canon_parent;
+            for name in tail.iter().rev() {
+                result.push(name);
+            }
+            return Ok(result);
+        }
+        cursor = parent;
+    }
+}
+
 /// Returns `true` for files that belong in a secret backup.
 ///
 /// Matched patterns:

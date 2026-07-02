@@ -2,8 +2,6 @@
 
 /// Agent validation, sync, conversion, and binding use cases.
 pub mod agents;
-/// Allowlist of full-stack applications with DDD bounded-context registries.
-pub mod allowlist;
 /// Bounded-context registry loader and validator.
 pub mod bcregistry;
 /// Per-level @covers behavior coverage engine.
@@ -34,3 +32,5 @@ pub mod severity;
 pub mod speccoverage;
 /// Spec-tree validators.
 pub mod specs;
+/// Test-coverage subsystem: parsers (LCOV/JaCoCo/Cobertura/Go), diff, merge, and reporters.
+pub mod testcoverage;

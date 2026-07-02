@@ -36,6 +36,60 @@ cucumber = "0.23.0"
 assert_cmd = "2.2.2"
 predicates = "3.1.4"
 tempfile = "3.27.0"
+tokio = { version = "1.51.0", features = ["macros", "rt-multi-thread"] }
+
+# --- Cucumber harness suites (harness = false: each test file has its own main) ---
+[[test]]
+name = "agents"
+harness = false
+
+[[test]]
+name = "contracts"
+harness = false
+
+[[test]]
+name = "docs"
+harness = false
+
+[[test]]
+name = "doctor"
+harness = false
+
+[[test]]
+name = "env"
+harness = false
+
+[[test]]
+name = "env_contract"
+harness = false
+
+[[test]]
+name = "repo_config_data_driven"
+harness = false
+
+[[test]]
+name = "repo_config_validate"
+harness = false
+
+[[test]]
+name = "agent_naming_validator"
+harness = false
+
+[[test]]
+name = "java"
+harness = false
+
+[[test]]
+name = "repo_governance"
+harness = false
+
+[[test]]
+name = "spec_coverage"
+harness = false
+
+[[test]]
+name = "workflows"
+harness = false
 
 [lints.rust]
 unsafe_code = "forbid"

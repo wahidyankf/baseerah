@@ -74,6 +74,8 @@ const SKIP_DIRS: &[&str] = &[
 pub fn run(
     args: &ValidateMermaidArgs,
     output_format: OutputFormat,
+    verbose: bool,
+    quiet: bool,
 ) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
@@ -117,7 +119,7 @@ pub fn run(
     result.files_scanned = file_set.len();
 
     match output_format {
-        OutputFormat::Text => print!("{}", format_text(&result, false, false)),
+        OutputFormat::Text => print!("{}", format_text(&result, verbose, quiet)),
         OutputFormat::Json => print!("{}", format_json(&result)?),
         OutputFormat::Markdown => print!("{}", format_markdown(&result)),
     }

@@ -1,10 +1,16 @@
-//! `env validate` — code↔config drift detection for `env-contract.yaml` surfaces.
+//! `env validate` — code↔config drift detection for `env-contract:` surfaces.
 //!
-//! Two validator surfaces ship active (`app` kind); `terraform` and `ansible` branches
-//! are commented forward-scaffold (`// activate when IaC is added`).
+//! Three validator surfaces ship active, dispatched by [`SurfaceKind`]: `app`
+//! (`.env.example` vs Rust/TypeScript/F# code reads), `terraform`
+//! (`terraform.tfvars.example` vs `variable` blocks), and `ansible` (playbook
+//! env lookups vs `.env.example`). The terraform/ansible validators were ported
+//! from `ose-infra` so the canonical source is byte-identical across repos; a
+//! repo that declares no `terraform`/`ansible` surfaces simply never runs them —
+//! the no-op is data-driven (declared surfaces), not a source stub.
 //!
-//! # ENV-VALIDATE CONFIG: `env-contract.yaml` at repo root, parsed with `serde_norway`.
-//! Each surface entry carries `root`, `kind`, `lang`, and `allowlist`.
+//! # ENV-VALIDATE CONFIG: the `env-contract:` section of `repo-config.yml` at the
+//! repo root, parsed with `serde_norway`. Each surface entry carries `root`,
+//! `kind`, `lang` (app only), and `allowlist`.
 
 use std::collections::HashSet;
 use std::fs;
@@ -15,14 +21,34 @@ use regex::Regex;
 use serde::Deserialize;
 use walkdir::WalkDir;
 
-/// A single env-validate surface entry from `env-contract.yaml`.
+/// Surface kind that selects which drift validator runs for an entry.
+///
+/// Deserialized case-insensitively from the lowercase `kind:` value in
+/// `repo-config.yml` (`app`, `terraform`, or `ansible`). Which variants a
+/// repo exercises is pure data: a repo declaring only `app` surfaces never
+/// runs the `IaC` validators, and a repo declaring `terraform`/`ansible`
+/// surfaces runs the real validators against them — no per-repo source
+/// carve-out.
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum SurfaceKind {
+    /// Application surface (Rust / TypeScript / F#): `.env.example` vs code reads.
+    App,
+    /// Terraform surface: `terraform.tfvars.example` vs `variable` blocks.
+    Terraform,
+    /// Ansible surface: playbook env lookups vs `.env.example`.
+    Ansible,
+}
+
+/// A single env-validate surface entry from the `env-contract:` section.
 #[derive(Debug, Deserialize, Clone)]
 pub struct SurfaceConfig {
     /// Path relative to repo root (e.g. `apps/organiclever-be`).
     pub root: String,
-    /// Surface kind: `"app"` (active); `"terraform"` / `"ansible"` are forward-scaffold.
-    pub kind: String,
-    /// Source language for the app validator: `"rust"` or `"typescript"`.
+    /// Surface kind selecting the validator (`app` / `terraform` / `ansible`).
+    pub kind: SurfaceKind,
+    /// Source language for the app validator: `"rust"`, `"typescript"`, or `"fsharp"`.
+    /// Unused for `terraform` / `ansible` surfaces.
     #[serde(default)]
     pub lang: String,
     /// Keys intentionally exempt from drift detection (framework-injected, test-only, etc.).
@@ -30,8 +56,8 @@ pub struct SurfaceConfig {
     pub allowlist: Vec<String>,
 }
 
-/// Top-level `env-contract.yaml` structure.
-#[derive(Debug, Deserialize)]
+/// Top-level `env-contract:` structure.
+#[derive(Debug, Deserialize, Clone)]
 pub struct Contract {
     /// Ordered list of surfaces to validate.
     pub surfaces: Vec<SurfaceConfig>,
@@ -51,10 +77,16 @@ pub struct Finding {
 /// Drift direction for a finding.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DriftKind {
-    /// Key present in `.env.example` but not consumed by any code in the surface.
+    /// App: key present in `.env.example` but not consumed by any code in the surface.
     DeclaredButUnread,
-    /// Key consumed by code but absent from `.env.example`.
+    /// App: key consumed by code but absent from `.env.example`.
     ReadButUndeclared,
+    /// Terraform: key in `terraform.tfvars.example` with no matching `variable` block.
+    ExampleNotDeclared,
+    /// Terraform: required variable (no `default`) missing from `terraform.tfvars.example`.
+    RequiredMissingFromExample,
+    /// Ansible: env lookup in a playbook not declared in `.env.example`.
+    ConsumedNotDeclared,
 }
 
 impl DriftKind {
@@ -63,6 +95,9 @@ impl DriftKind {
         match self {
             Self::DeclaredButUnread => "declared-but-unread",
             Self::ReadButUndeclared => "read-but-undeclared",
+            Self::ExampleNotDeclared => "example-not-declared",
+            Self::RequiredMissingFromExample => "required-missing-from-example",
+            Self::ConsumedNotDeclared => "consumed-not-declared",
         }
     }
 }
@@ -358,7 +393,11 @@ pub fn validate_app_surface(
 
 /// Validate all surfaces declared in `contract`.
 ///
-/// Unknown surface kinds are logged to stderr but do not cause an error.
+/// Dispatches on each surface's [`SurfaceKind`]: `app` surfaces run the
+/// code↔`.env.example` drift scan, `terraform` and `ansible` surfaces run the
+/// real `IaC` drift validators. A repo that declares no `terraform`/`ansible`
+/// surfaces simply never invokes those validators — the no-op is driven by
+/// data (which surfaces are declared), not by a source stub.
 ///
 /// # Errors
 ///
@@ -366,22 +405,289 @@ pub fn validate_app_surface(
 pub fn validate_all(repo_root: &Path, contract: &Contract) -> Result<Vec<Finding>, Error> {
     let mut all = Vec::new();
     for surface in &contract.surfaces {
-        match surface.kind.as_str() {
-            "app" => {
-                all.extend(validate_app_surface(repo_root, surface)?);
+        match surface.kind {
+            SurfaceKind::App => all.extend(validate_app_surface(repo_root, surface)?),
+            SurfaceKind::Terraform => {
+                let root = repo_root.join(&surface.root);
+                let result = validate_terraform(&root, &surface.allowlist)?;
+                all.extend(result_to_findings(&surface.root, &result));
             }
-            // activate when IaC is added
-            // "terraform" => { /* diff tfvars.example keys vs variable blocks */ }
-            // "ansible" => { /* diff env.example keys vs playbook lookup calls */ }
-            other => {
-                eprintln!(
-                    "env validate: unknown surface kind '{}' for {} — skipped",
-                    other, surface.root
-                );
+            SurfaceKind::Ansible => {
+                let root = repo_root.join(&surface.root);
+                let result = validate_ansible(&root, &surface.allowlist)?;
+                all.extend(result_to_findings(&surface.root, &result));
             }
         }
     }
     Ok(all)
+}
+
+/// Aggregated drift for a Terraform or Ansible surface.
+///
+/// Ported (with its unit-test modules) from `ose-infra`'s
+/// `application/env/validate.rs`. App-surface drift is reported through
+/// [`Finding`]/[`DriftKind`]; this struct backs the `IaC` validators and is
+/// converted into [`Finding`]s by [`result_to_findings`] for uniform reporting.
+#[derive(Debug, Default)]
+pub struct ValidationResult {
+    /// Repo-relative or absolute surface root (for diagnostics).
+    pub surface_root: String,
+    /// App: keys in `.env.example` not read by code.
+    pub declared_not_read: Vec<String>,
+    /// App: keys read by code not in `.env.example`.
+    pub read_not_declared: Vec<String>,
+    /// Terraform: keys in `terraform.tfvars.example` not declared in `*.tf` variables.
+    pub example_not_declared: Vec<String>,
+    /// Terraform: required variables (no default) missing from `terraform.tfvars.example`.
+    pub required_missing_from_example: Vec<String>,
+    /// Ansible: env lookups in playbooks not declared in `.env.example`.
+    pub consumed_not_declared: Vec<String>,
+}
+
+impl ValidationResult {
+    /// Returns `true` when the surface has no drift of any kind.
+    pub fn is_clean(&self) -> bool {
+        self.declared_not_read.is_empty()
+            && self.read_not_declared.is_empty()
+            && self.example_not_declared.is_empty()
+            && self.required_missing_from_example.is_empty()
+            && self.consumed_not_declared.is_empty()
+    }
+}
+
+/// Convert a Terraform/Ansible [`ValidationResult`] into [`Finding`]s rooted at
+/// the repo-relative `surface_root`.
+fn result_to_findings(surface_root: &str, result: &ValidationResult) -> Vec<Finding> {
+    let mut findings = Vec::new();
+    for key in &result.example_not_declared {
+        findings.push(Finding {
+            root: PathBuf::from(surface_root),
+            drift: DriftKind::ExampleNotDeclared,
+            key: key.clone(),
+        });
+    }
+    for key in &result.required_missing_from_example {
+        findings.push(Finding {
+            root: PathBuf::from(surface_root),
+            drift: DriftKind::RequiredMissingFromExample,
+            key: key.clone(),
+        });
+    }
+    for key in &result.consumed_not_declared {
+        findings.push(Finding {
+            root: PathBuf::from(surface_root),
+            drift: DriftKind::ConsumedNotDeclared,
+            key: key.clone(),
+        });
+    }
+    findings.sort_by(|a, b| a.key.cmp(&b.key));
+    findings
+}
+
+// ---------------------------------------------------------------------------
+// Terraform validator (ported from ose-infra)
+// ---------------------------------------------------------------------------
+
+/// Validate a Terraform surface.
+///
+/// Scans `*.tf` for `variable "KEY" { }` blocks (detecting `default` lines
+/// inside = optional). Scans `terraform.tfvars.example` for `KEY =` lines.
+///
+/// # Errors
+///
+/// Returns an error when a `*.tf` or `terraform.tfvars.example` file cannot be read.
+pub fn validate_terraform(root: &Path, allowlist: &[String]) -> Result<ValidationResult, Error> {
+    let allow: HashSet<String> = allowlist.iter().cloned().collect();
+
+    let (declared_keys, required_keys) = scan_terraform_variables(root)?;
+    let example_keys = parse_tfvars_example(root)?;
+
+    let mut example_not_declared: Vec<String> = example_keys
+        .difference(&declared_keys)
+        .filter(|k| !allow.contains(*k))
+        .cloned()
+        .collect();
+    example_not_declared.sort();
+
+    let mut required_missing_from_example: Vec<String> = required_keys
+        .difference(&example_keys)
+        .filter(|k| !allow.contains(*k))
+        .cloned()
+        .collect();
+    required_missing_from_example.sort();
+
+    Ok(ValidationResult {
+        surface_root: root.to_string_lossy().into_owned(),
+        example_not_declared,
+        required_missing_from_example,
+        ..Default::default()
+    })
+}
+
+/// Returns `(all_declared, required_only)` variable names from `*.tf` files.
+fn scan_terraform_variables(root: &Path) -> Result<(HashSet<String>, HashSet<String>), Error> {
+    let var_re = Regex::new(r#"^\s*variable\s+"([A-Za-z_][A-Za-z0-9_]*)"\s*\{"#)
+        .expect("static regex is valid");
+    let default_re = Regex::new(r"^\s*default\s*=").expect("static regex is valid");
+
+    let mut all_declared = HashSet::new();
+    let mut required = HashSet::new();
+
+    for entry in WalkDir::new(root)
+        .follow_links(false)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+        .filter(|e| e.file_type().is_file())
+    {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("tf") {
+            continue;
+        }
+        let text =
+            fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+        let lines: Vec<&str> = text.lines().collect();
+        let mut i = 0;
+        while i < lines.len() {
+            let line = lines[i];
+            if let Some(cap) = var_re.captures(line) {
+                let key = cap[1].to_string();
+                all_declared.insert(key.clone());
+                // State machine: scan inside the block for a `default =` line.
+                let open = line.chars().filter(|&c| c == '{').count();
+                let close = line.chars().filter(|&c| c == '}').count();
+                let mut brace_depth: usize = open.saturating_sub(close);
+                let mut has_default = false;
+                i += 1;
+                while i < lines.len() && brace_depth > 0 {
+                    let inner = lines[i];
+                    brace_depth = brace_depth
+                        .saturating_add(inner.chars().filter(|&c| c == '{').count())
+                        .saturating_sub(inner.chars().filter(|&c| c == '}').count());
+                    if default_re.is_match(inner) {
+                        has_default = true;
+                    }
+                    i += 1;
+                }
+                if !has_default {
+                    required.insert(key);
+                }
+            } else {
+                i += 1;
+            }
+        }
+    }
+    Ok((all_declared, required))
+}
+
+/// Parse `KEY =` names from `terraform.tfvars.example`.
+fn parse_tfvars_example(root: &Path) -> Result<HashSet<String>, Error> {
+    let path = root.join("terraform.tfvars.example");
+    if !path.exists() {
+        return Ok(HashSet::new());
+    }
+    let text = fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
+    let key_re = Regex::new(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=").expect("static regex is valid");
+    let keys = text
+        .lines()
+        .filter(|l| !l.trim().is_empty() && !l.trim().starts_with('#'))
+        .filter_map(|l| key_re.captures(l).map(|c| c[1].to_string()))
+        .collect();
+    Ok(keys)
+}
+
+// ---------------------------------------------------------------------------
+// Ansible validator (ported from ose-infra)
+// ---------------------------------------------------------------------------
+
+/// Validate an Ansible surface.
+///
+/// Scans `playbook-*.yml` for `lookup('ansible.builtin.env', 'KEY')` and
+/// `lookup('env', 'KEY')`. Parses `.env.example` allowing commented-out lines
+/// (commented `# KEY=` lines count as declared).
+///
+/// # Errors
+///
+/// Returns an error when a playbook or `.env.example` file cannot be read.
+pub fn validate_ansible(root: &Path, allowlist: &[String]) -> Result<ValidationResult, Error> {
+    let allow: HashSet<String> = allowlist.iter().cloned().collect();
+
+    let consumed = scan_ansible_playbooks(root)?;
+    let declared = parse_env_example_with_comments(root)?;
+
+    let mut consumed_not_declared: Vec<String> = consumed
+        .difference(&declared)
+        .filter(|k| !allow.contains(*k))
+        .cloned()
+        .collect();
+    consumed_not_declared.sort();
+
+    Ok(ValidationResult {
+        surface_root: root.to_string_lossy().into_owned(),
+        consumed_not_declared,
+        ..Default::default()
+    })
+}
+
+/// Scan `playbook-*.yml` files for env lookups.
+fn scan_ansible_playbooks(root: &Path) -> Result<HashSet<String>, Error> {
+    let builtin_re =
+        Regex::new(r"lookup\(\s*'ansible\.builtin\.env'\s*,\s*'([A-Z_][A-Z0-9_]*)'\s*\)")
+            .expect("static regex is valid");
+    let short_re = Regex::new(r"lookup\(\s*'env'\s*,\s*'([A-Z_][A-Z0-9_]*)'\s*\)")
+        .expect("static regex is valid");
+
+    let mut keys = HashSet::new();
+
+    for entry in WalkDir::new(root)
+        .follow_links(false)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+        .filter(|e| e.file_type().is_file())
+    {
+        let path = entry.path();
+        let name = path
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or_default();
+        if !name.starts_with("playbook-") || !name.ends_with(".yml") {
+            continue;
+        }
+        let text =
+            fs::read_to_string(path).with_context(|| format!("reading {}", path.display()))?;
+        for cap in builtin_re.captures_iter(&text) {
+            keys.insert(cap[1].to_string());
+        }
+        for cap in short_re.captures_iter(&text) {
+            keys.insert(cap[1].to_string());
+        }
+    }
+    Ok(keys)
+}
+
+/// Parse `.env.example` including commented-out lines (strip a leading `#`
+/// and whitespace, then apply the same `KEY=` extraction).
+fn parse_env_example_with_comments(root: &Path) -> Result<HashSet<String>, Error> {
+    let path = root.join(".env.example");
+    if !path.exists() {
+        return Ok(HashSet::new());
+    }
+    let text = fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
+    let keys = text
+        .lines()
+        .filter(|l| !l.trim().is_empty())
+        .map(|l| {
+            let stripped = l.trim();
+            if stripped.starts_with('#') {
+                stripped.trim_start_matches('#').trim()
+            } else {
+                stripped
+            }
+        })
+        .filter(|l| l.contains('='))
+        .filter_map(|l| l.split('=').next().map(str::trim).map(String::from))
+        .filter(|k| !k.is_empty())
+        .collect();
+    Ok(keys)
 }
 
 #[cfg(test)]
@@ -559,7 +865,7 @@ let load () =
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
-            kind: "app".to_string(),
+            kind: SurfaceKind::App,
             lang: "typescript".to_string(),
             allowlist: vec![],
         };
@@ -582,7 +888,7 @@ let load () =
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
-            kind: "app".to_string(),
+            kind: SurfaceKind::App,
             lang: "typescript".to_string(),
             allowlist: vec![],
         };
@@ -603,7 +909,7 @@ let load () =
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
-            kind: "app".to_string(),
+            kind: SurfaceKind::App,
             lang: "typescript".to_string(),
             allowlist: vec![],
         };
@@ -625,7 +931,7 @@ let load () =
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
-            kind: "app".to_string(),
+            kind: SurfaceKind::App,
             lang: "typescript".to_string(),
             allowlist: vec!["PORT".to_string()],
         };
@@ -657,7 +963,7 @@ pub struct Config {
         );
         let surface = SurfaceConfig {
             root: "apps/myapp".to_string(),
-            kind: "app".to_string(),
+            kind: SurfaceKind::App,
             lang: "rust".to_string(),
             allowlist: vec![],
         };
@@ -711,5 +1017,174 @@ pub struct Config {
             result.is_err(),
             "should error when env-contract: section is absent from repo-config.yml"
         );
+    }
+
+    // ── terraform_validator (ported from ose-infra) ──────────────────────────
+
+    #[allow(clippy::unwrap_used, clippy::panic)]
+    mod terraform_validator {
+        use super::*;
+        use tempfile::tempdir;
+
+        #[test]
+        fn terraform_validator_flags_example_not_declared() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            // tfvars.example has BOGUS but no variable "BOGUS" in *.tf
+            fs::write(root.join("terraform.tfvars.example"), "BOGUS = \"x\"\n").unwrap();
+            fs::write(root.join("main.tf"), "# no variables\n").unwrap();
+
+            let result = validate_terraform(root, &[]).unwrap();
+            assert!(
+                result.example_not_declared.contains(&"BOGUS".to_string()),
+                "expected BOGUS in example_not_declared, got {:?}",
+                result.example_not_declared
+            );
+        }
+
+        #[test]
+        fn terraform_validator_flags_required_missing_from_example() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            fs::write(
+                root.join("main.tf"),
+                "variable \"REQUIRED_KEY\" {\n  description = \"required\"\n}\n",
+            )
+            .unwrap();
+            // tfvars.example missing REQUIRED_KEY
+            fs::write(root.join("terraform.tfvars.example"), "# empty\n").unwrap();
+
+            let result = validate_terraform(root, &[]).unwrap();
+            assert!(
+                result
+                    .required_missing_from_example
+                    .contains(&"REQUIRED_KEY".to_string()),
+                "expected REQUIRED_KEY in required_missing_from_example, got {:?}",
+                result.required_missing_from_example
+            );
+        }
+
+        #[test]
+        fn terraform_validator_optional_var_not_required() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            fs::write(
+                root.join("main.tf"),
+                "variable \"OPTIONAL_KEY\" {\n  default = \"fallback\"\n}\n",
+            )
+            .unwrap();
+            // tfvars.example doesn't include optional key — should be clean
+            fs::write(root.join("terraform.tfvars.example"), "# empty\n").unwrap();
+
+            let result = validate_terraform(root, &[]).unwrap();
+            assert!(
+                result.required_missing_from_example.is_empty(),
+                "optional vars should not appear in required_missing_from_example: {:?}",
+                result.required_missing_from_example
+            );
+        }
+
+        #[test]
+        fn terraform_validator_clean_when_matched() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            fs::write(
+                root.join("main.tf"),
+                "variable \"DB_URL\" {\n  description = \"db\"\n}\n",
+            )
+            .unwrap();
+            fs::write(root.join("terraform.tfvars.example"), "DB_URL = \"x\"\n").unwrap();
+
+            let result = validate_terraform(root, &[]).unwrap();
+            assert!(result.is_clean(), "expected clean result: {result:?}");
+        }
+    }
+
+    // ── ansible_validator (ported from ose-infra) ────────────────────────────
+
+    #[allow(clippy::unwrap_used, clippy::panic)]
+    mod ansible_validator {
+        use super::*;
+        use tempfile::tempdir;
+
+        #[test]
+        fn ansible_validator_flags_consumed_not_declared() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            // playbook consumes UNDECLARED but .env.example is empty
+            fs::write(
+                root.join("playbook-site.yml"),
+                "- name: test\n  tasks:\n    - debug: msg={{ lookup('ansible.builtin.env', 'UNDECLARED') }}\n",
+            )
+            .unwrap();
+            fs::write(root.join(".env.example"), "# no vars\n").unwrap();
+
+            let result = validate_ansible(root, &[]).unwrap();
+            assert!(
+                result
+                    .consumed_not_declared
+                    .contains(&"UNDECLARED".to_string()),
+                "expected UNDECLARED in consumed_not_declared, got {:?}",
+                result.consumed_not_declared
+            );
+        }
+
+        #[test]
+        fn ansible_validator_counts_commented_lines_as_declared() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            // .env.example has # OPTIONAL_KEY=xxx (commented out)
+            fs::write(root.join(".env.example"), "# OPTIONAL_KEY=xxx\n").unwrap();
+            fs::write(
+                root.join("playbook-site.yml"),
+                "- name: test\n  tasks:\n    - debug: msg={{ lookup('env', 'OPTIONAL_KEY') }}\n",
+            )
+            .unwrap();
+
+            let result = validate_ansible(root, &[]).unwrap();
+            assert!(
+                result.consumed_not_declared.is_empty(),
+                "commented-out env key should be considered declared: {:?}",
+                result.consumed_not_declared
+            );
+        }
+
+        #[test]
+        fn ansible_validator_short_lookup_syntax() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            fs::write(root.join(".env.example"), "SHORT_KEY=val\n").unwrap();
+            fs::write(
+                root.join("playbook-deploy.yml"),
+                "tasks:\n  - set_fact: val={{ lookup('env', 'SHORT_KEY') }}\n",
+            )
+            .unwrap();
+
+            let result = validate_ansible(root, &[]).unwrap();
+            assert!(
+                result.is_clean(),
+                "short lookup syntax should be detected: {result:?}",
+            );
+        }
+
+        #[test]
+        fn ansible_validator_non_playbook_files_skipped() {
+            let dir = tempdir().unwrap();
+            let root = dir.path();
+            // vars file (not playbook-*.yml) with env lookup should not trigger
+            fs::write(
+                root.join("vars.yml"),
+                "tasks:\n  - debug: msg={{ lookup('env', 'SKIPPED_KEY') }}\n",
+            )
+            .unwrap();
+            fs::write(root.join(".env.example"), "# nothing\n").unwrap();
+
+            let result = validate_ansible(root, &[]).unwrap();
+            assert!(
+                result.consumed_not_declared.is_empty(),
+                "non-playbook files should not be scanned: {:?}",
+                result.consumed_not_declared
+            );
+        }
     }
 }

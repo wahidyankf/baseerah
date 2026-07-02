@@ -31,29 +31,29 @@ pub fn validate_sync(repo_root: &Path) -> ValidationResult {
     result
 }
 
-/// Check that the legacy singular `.opencode/agent/` path does not exist.
+/// Check that the legacy singular `.opencode/agent` path does not exist.
 fn validate_no_stale_agent_dir(repo_root: &Path) -> ValidationCheck {
     let stale = repo_root.join(".opencode").join("agent");
     match fs::metadata(&stale) {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => ValidationCheck::passed(
             "No Stale Agent Directory",
-            "Legacy singular .opencode/agent/ does not exist",
+            "Legacy singular .opencode/agent does not exist",
         ),
         Err(e) => ValidationCheck::failed_msg(
             "No Stale Agent Directory",
-            format!("Failed to stat .opencode/agent/: {e}"),
+            format!("Failed to stat .opencode/agent: {e}"),
         ),
         Ok(info) if info.is_dir() => ValidationCheck::failed(
             "No Stale Agent Directory",
-            ".opencode/agent/ does not exist",
-            ".opencode/agent/ exists as a directory",
-            "Stale singular .opencode/agent/ reappeared; canonical OpenCode path is .opencode/agents/ (plural). Remove the stale directory.",
+            ".opencode/agent does not exist",
+            ".opencode/agent exists as a directory",
+            "Stale singular .opencode/agent reappeared; canonical OpenCode path is .opencode/agents/ (plural). Remove the stale directory.",
         ),
         Ok(_) => ValidationCheck::failed(
             "No Stale Agent Directory",
-            ".opencode/agent/ does not exist",
-            ".opencode/agent/ exists",
-            "Stale .opencode/agent/ entry reappeared; canonical OpenCode path is .opencode/agents/ (plural). Remove the stale entry.",
+            ".opencode/agent does not exist",
+            ".opencode/agent exists",
+            "Stale .opencode/agent entry reappeared; canonical OpenCode path is .opencode/agents/ (plural). Remove the stale entry.",
         ),
     }
 }

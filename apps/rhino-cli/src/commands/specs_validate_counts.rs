@@ -9,7 +9,7 @@
 use anyhow::{Error, anyhow};
 use clap::Args;
 
-use crate::application::allowlist::apps_with_ddd;
+use crate::application::repo_config;
 use crate::application::specs::validate_spec_counts;
 use crate::domain::cliout::OutputFormat;
 use crate::internal::git;
@@ -26,12 +26,21 @@ pub struct ValidateCountsArgs {
 }
 
 /// Resolve the list of folders to validate from positional and flag inputs.
-fn resolve_folders(positional: Option<&String>, flag: &[String]) -> Vec<String> {
+///
+/// When neither a positional folder nor `--apps` is given, the default app list
+/// is `default_apps` — read from `repo-config.yml`'s `specs.ddd-areas` by the
+/// caller, so the scan targets are repo data, not a source-hard-coded per-repo
+/// allowlist.
+fn resolve_folders(
+    positional: Option<&String>,
+    flag: &[String],
+    default_apps: &[String],
+) -> Vec<String> {
     if let Some(p) = positional {
         return vec![p.clone()];
     }
     let apps: Vec<String> = if flag.is_empty() {
-        apps_with_ddd().iter().map(|s| (*s).to_string()).collect()
+        default_apps.to_vec()
     } else {
         flag.to_vec()
     };
@@ -61,7 +70,8 @@ pub fn run_at_root(
     args: &ValidateCountsArgs,
     w: &mut dyn std::io::Write,
 ) -> std::result::Result<(), Error> {
-    let folders = resolve_folders(args.folder.as_ref(), &args.apps);
+    let default_apps = repo_config::load_or_default(repo_root).specs.ddd_areas;
+    let folders = resolve_folders(args.folder.as_ref(), &args.apps, &default_apps);
     let mut total = 0usize;
     for folder in &folders {
         let findings = validate_spec_counts(repo_root, folder);
@@ -87,20 +97,28 @@ mod tests {
 
     #[test]
     fn resolve_folders_positional() {
-        let v = resolve_folders(Some(&"x".to_string()), &[]);
+        let v = resolve_folders(Some(&"x".to_string()), &[], &[]);
         assert_eq!(v, vec!["x".to_string()]);
     }
 
     #[test]
-    fn resolve_folders_default() {
-        let v = resolve_folders(None, &[]);
-        assert_eq!(v.len(), 2);
-        assert!(v[0].starts_with("specs/apps/"));
+    fn resolve_folders_default_reads_config_areas() {
+        // The default app list is the config-supplied `specs.ddd-areas`, not a
+        // source-hard-coded allowlist.
+        let default_apps = vec!["organiclever".to_string(), "ose".to_string()];
+        let v = resolve_folders(None, &[], &default_apps);
+        assert_eq!(
+            v,
+            vec![
+                "specs/apps/organiclever".to_string(),
+                "specs/apps/ose".to_string()
+            ]
+        );
     }
 
     #[test]
     fn resolve_folders_flag() {
-        let v = resolve_folders(None, &["a".to_string()]);
+        let v = resolve_folders(None, &["a".to_string()], &[]);
         assert_eq!(v, vec!["specs/apps/a".to_string()]);
     }
 

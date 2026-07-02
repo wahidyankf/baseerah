@@ -13,11 +13,35 @@
 use assert_cmd::Command;
 use serde::Deserialize;
 use std::{fs, path::PathBuf};
+use tempfile::TempDir;
 
 #[derive(Deserialize)]
 struct Entry {
     file: String,
     args: Vec<String>,
+}
+
+/// Sentinel substituted with a freshly created, empty scratch directory before
+/// replaying an entry. Some leaf commands (e.g. `specs scaffold dart`) write
+/// files relative to their `--dir` target unconditionally; running those bare
+/// against the crate's own working directory (the default `cargo test` cwd)
+/// would corrupt the checked-out source tree. The commands that use this
+/// sentinel print only counts/basenames, never the directory path itself, so
+/// their stdout is scratch-path-independent and safe to freeze byte-for-byte.
+const TMPDIR_SENTINEL: &str = "{{TMPDIR}}";
+
+/// Resolves `{{TMPDIR}}` sentinels in `args` to `scratch`'s path, leaving
+/// every other argument untouched.
+fn resolve_args(args: &[String], scratch: &TempDir) -> Vec<String> {
+    args.iter()
+        .map(|a| {
+            if a == TMPDIR_SENTINEL {
+                scratch.path().to_string_lossy().into_owned()
+            } else {
+                a.clone()
+            }
+        })
+        .collect()
 }
 
 fn corpus_dir() -> PathBuf {
@@ -52,9 +76,13 @@ fn golden_master_replay() {
         let expected_stderr = read_corpus(&entry.file, "stderr");
         let expected_exit = read_exit(&entry.file);
 
+        let scratch = TempDir::new().expect("create scratch dir for golden-master replay");
+        let resolved_args = resolve_args(&entry.args, &scratch);
+
         let output = Command::cargo_bin("rhino-cli")
             .expect("binary not found")
-            .args(&entry.args)
+            .args(&resolved_args)
+            .arg("--no-color")
             .output()
             .unwrap_or_else(|e| panic!("failed to run {:?}: {e}", entry.args));
 

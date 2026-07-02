@@ -16,7 +16,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Error};
 use serde::Deserialize;
 
-use super::validate::{Contract, parse_declared_keys};
+use super::validate::{Contract, SurfaceKind, parse_declared_keys};
 
 /// Allowed injection homes for a manifest app's `runtime` map.
 ///
@@ -53,7 +53,7 @@ pub struct CiHarnessKey {
 }
 
 /// Top-level `env-injection.yaml` structure.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Manifest {
     /// Per-app injection entries.
     #[serde(default)]
@@ -173,7 +173,7 @@ pub fn check_consistency(
     let contract_apps: BTreeSet<String> = contract
         .surfaces
         .iter()
-        .filter(|s| s.kind == "app")
+        .filter(|s| s.kind == SurfaceKind::App)
         .map(|s| surface_app_name(&s.root).to_string())
         .collect();
 
@@ -273,7 +273,11 @@ pub fn validate_manifest(
     // Declared keys per contract app surface (used for the ci-harness leak rule).
     let mut app_declared_keys: std::collections::BTreeMap<String, BTreeSet<String>> =
         std::collections::BTreeMap::new();
-    for surface in contract.surfaces.iter().filter(|s| s.kind == "app") {
+    for surface in contract
+        .surfaces
+        .iter()
+        .filter(|s| s.kind == SurfaceKind::App)
+    {
         let app = surface_app_name(&surface.root).to_string();
         let env_example = repo_root.join(&surface.root).join(".env.example");
         let keys: BTreeSet<String> = if env_example.exists() {
@@ -305,13 +309,13 @@ pub fn validate_manifest(
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
-    use crate::application::env::validate::SurfaceConfig;
+    use crate::application::env::validate::{SurfaceConfig, SurfaceKind};
     use std::collections::{BTreeMap, BTreeSet};
 
     fn surface(root: &str) -> SurfaceConfig {
         SurfaceConfig {
             root: root.to_string(),
-            kind: "app".to_string(),
+            kind: SurfaceKind::App,
             lang: "typescript".to_string(),
             allowlist: vec![],
         }

@@ -237,7 +237,7 @@
   },
   {
     "file": "specs-scaffold-dart",
-    "args": ["specs", "scaffold", "dart"]
+    "args": ["specs", "scaffold", "dart", "--dir", "{{TMPDIR}}"]
   },
   {
     "file": "lang",

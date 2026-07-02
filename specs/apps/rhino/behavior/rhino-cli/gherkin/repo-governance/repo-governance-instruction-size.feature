@@ -6,8 +6,7 @@ Feature: Instruction-file size budget
   So that coding-agent harnesses load instruction files completely without silent truncation
 
   Background:
-    Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to
-      target, warn, and fail byte thresholds
+    Given a committed "instruction-size-budget.yaml" mapping instruction-file globs to target, warn, and fail byte thresholds
 
   Scenario: A file within target passes silently
     Given "AGENTS.md" is 24000 bytes

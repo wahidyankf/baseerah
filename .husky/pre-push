@@ -7,6 +7,7 @@ set -e
 PARALLEL=$(( $(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4) - 1 ))
 npx nx affected -t test:quick --parallel="$PARALLEL"
 npx nx affected -t compat:min-version --parallel="$PARALLEL"
+cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-config validate
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md links validate --exclude plans/done --exclude apps/ayokoding-www/content --exclude apps/ose-www/content
 cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- md readme-index validate
@@ -17,7 +18,7 @@ cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness
 RANGE=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 && echo '@{u}..HEAD' || echo "")
 if [ -n "$RANGE" ]; then
   CHANGED=$(git diff --name-only "$RANGE" 2>/dev/null || echo "")
-  if echo "$CHANGED" | grep -qE '^(\.claude/agents/|\.opencode/agent/)'; then
+  if echo "$CHANGED" | grep -qE '^(\.claude/agents/|\.opencode/agents/)'; then
     cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- harness naming validate
   fi
   if echo "$CHANGED" | grep -qE '^repo-governance/workflows/'; then

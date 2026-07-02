@@ -7,8 +7,8 @@ use clap::Args;
 
 use crate::domain::cliout::OutputFormat;
 use crate::internal::envbackup::{
-    DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE, Options, backup, default_skip_dirs, detect_worktree,
-    expand_tilde, format_json, format_markdown, format_text,
+    DEFAULT_BACKUP_DIR, DEFAULT_MAX_SIZE, Options, backup, canonicalize_best_effort,
+    default_skip_dirs, detect_worktree, expand_tilde, format_json, format_markdown, format_text,
 };
 use crate::internal::git;
 
@@ -49,10 +49,15 @@ pub fn run(args: &EnvBackupArgs, output: OutputFormat) -> std::result::Result<()
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let backup_dir = if args.dir.is_empty() {
         let home = expand_tilde("~")?;
-        home.join(DEFAULT_BACKUP_DIR)
+        let default_dir = home.join(DEFAULT_BACKUP_DIR);
+        canonicalize_best_effort(&default_dir).unwrap_or(default_dir)
     } else {
         let expanded = expand_tilde(&args.dir)?;
-        std::fs::canonicalize(&expanded).unwrap_or(expanded)
+        // Best-effort canonicalize (resolving symlinks even when `expanded`
+        // does not exist yet) so the inside-repo check below compares two
+        // paths in the same (physical) namespace as `repo_root`, which
+        // `find_root()` always returns via `git rev-parse --show-toplevel`.
+        canonicalize_best_effort(&expanded).unwrap_or(expanded)
     };
 
     // Force when explicit, non-text output, or unhandled stdin.

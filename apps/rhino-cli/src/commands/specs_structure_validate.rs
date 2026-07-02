@@ -335,9 +335,9 @@ mod tests {
 
     #[test]
     fn all_spec_areas_discovered_from_filesystem_not_just_ddd_allowlist() {
-        // When no args given, command must walk ALL dirs under specs/apps/ (not hardcoded list).
-        // RED: currently resolve_apps(None, &[]) returns apps_with_ddd() (hardcoded), so
-        // "discovered-app" (not in hardcoded list) is never checked and does not appear in output.
+        // When no args given, command must walk ALL dirs under specs/apps/ (not a hardcoded list).
+        // resolve_apps(None, &[]) discovers spec areas from the filesystem, so a
+        // "discovered-app" (not in any hardcoded list) is checked and appears in output.
         let dir = tempfile::tempdir().unwrap();
         let root = dir.path();
         write_repo_config(root, &[]);

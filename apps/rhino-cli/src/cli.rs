@@ -10,9 +10,10 @@ use crate::commands::{
     harness_validate_duplication, harness_validate_instruction_size, harness_validate_naming,
     harness_validate_sync, lang_java_validate_null_safety, md_audit, md_validate_frontmatter,
     md_validate_frontmatter_dates, md_validate_heading_hierarchy, md_validate_links,
-    md_validate_mermaid, md_validate_naming, md_validate_readme_index, specs_audit,
-    specs_clean_java_imports, specs_coverage, specs_gherkin_cardinality, specs_scaffold_dart,
-    specs_structure_validate, specs_validate_counts, workflows_validate_naming,
+    md_validate_mermaid, md_validate_naming, md_validate_readme_index, repo_config_validate,
+    specs_audit, specs_clean_java_imports, specs_coverage, specs_gherkin_cardinality,
+    specs_scaffold_dart, specs_structure_validate, specs_validate_counts, test_coverage_validate,
+    workflows_validate_naming,
 };
 use crate::domain::cliout::OutputFormat;
 
@@ -74,6 +75,9 @@ pub struct Cli {
 /// Top-level CLI subcommands dispatched by the root `Cli` parser.
 #[derive(Subcommand, Debug)]
 pub enum Commands {
+    /// Test coverage commands (validate).
+    #[command(name = "test-coverage", subcommand)]
+    TestCoverage(TestCoverageCommands),
     /// Repository governance audits and validators.
     #[command(name = "repo-governance", subcommand)]
     RepoGovernance(RepoGovernanceCommands),
@@ -92,12 +96,40 @@ pub enum Commands {
     /// Language-source correctness checks, nested by language.
     #[command(name = "lang", subcommand)]
     Lang(LangCommands),
+    /// Repository configuration (`repo-config.yml`) schema-parity validator.
+    #[command(name = "repo-config", subcommand)]
+    RepoConfig(RepoConfigCommands),
     /// Environment file helpers (init, backup, restore, validate, staged-guard).
     #[command(name = "env", subcommand)]
     Env(EnvCommands),
     /// Check required tool versions are installed and correct.
     #[command(name = "doctor")]
     Doctor(doctor::DoctorArgs),
+}
+
+// ---------------------------------------------------------------------------
+// test-coverage (union command surface — the live coverage-gate validator,
+// depended on by per-project coverage targets; diff/merge logic lives in
+// `application::testcoverage` but is not exposed as a command, matching the
+// live surface in the sibling repos)
+// ---------------------------------------------------------------------------
+
+/// Test coverage subcommands (`validate`).
+#[derive(Subcommand, Debug)]
+pub enum TestCoverageCommands {
+    /// Check test coverage against a threshold (standard line-based algorithm).
+    Validate(test_coverage_validate::ValidateArgs),
+}
+
+// ---------------------------------------------------------------------------
+// repo-config (verb-last: repo-config validate) — the schema-parity gate
+// ---------------------------------------------------------------------------
+
+/// Repository configuration subcommands (`validate`).
+#[derive(Subcommand, Debug)]
+pub enum RepoConfigCommands {
+    /// Strict-deserialize `repo-config.yml` against the canonical schema (key-set + enum parity).
+    Validate(repo_config_validate::ValidateArgs),
 }
 
 // ---------------------------------------------------------------------------
@@ -559,7 +591,7 @@ pub fn run() -> i32 {
     }
 
     if let Some(cmd) = &cli.command {
-        return dispatch(cmd, output_format);
+        return dispatch(cmd, output_format, cli.verbose, cli.quiet);
     }
 
     if !cli.say.is_empty() {
@@ -573,14 +605,22 @@ pub fn run() -> i32 {
 /// Route a top-level [`Commands`] variant to its subcommand handler.
 ///
 /// Returns `0` on success or `1` on error.
-fn dispatch(cmd: &Commands, output_format: OutputFormat) -> i32 {
+fn dispatch(cmd: &Commands, output_format: OutputFormat, verbose: bool, quiet: bool) -> i32 {
     let result = match cmd {
+        Commands::TestCoverage(tc) => match tc {
+            TestCoverageCommands::Validate(args) => {
+                test_coverage_validate::run(args, output_format)
+            }
+        },
         Commands::RepoGovernance(rg) => dispatch_repo_governance(rg, output_format),
-        Commands::Md(mc) => dispatch_md(mc, output_format),
+        Commands::Md(mc) => dispatch_md(mc, output_format, verbose, quiet),
         Commands::Convention(cc) => dispatch_convention(cc, output_format),
         Commands::Harness(hc) => dispatch_harness(hc, output_format),
         Commands::Specs(sc) => dispatch_specs(sc, output_format),
         Commands::Lang(lc) => dispatch_lang(lc, output_format),
+        Commands::RepoConfig(rc) => match rc {
+            RepoConfigCommands::Validate(args) => repo_config_validate::run(args, output_format),
+        },
         Commands::Env(ec) => match ec {
             EnvCommands::Init(args) => env_init::run(args, output_format),
             EnvCommands::Backup(args) => env_backup::run(args, output_format),
@@ -647,13 +687,17 @@ fn dispatch_repo_governance(
 fn dispatch_md(
     mc: &MdCommands,
     output_format: OutputFormat,
+    verbose: bool,
+    quiet: bool,
 ) -> std::result::Result<(), anyhow::Error> {
     match mc {
         MdCommands::Links(lc) => match lc {
             MdLinksCommands::Validate(args) => md_validate_links::run(args, output_format),
         },
         MdCommands::Mermaid(mc) => match mc {
-            MdMermaidCommands::Validate(args) => md_validate_mermaid::run(args, output_format),
+            MdMermaidCommands::Validate(args) => {
+                md_validate_mermaid::run(args, output_format, verbose, quiet)
+            }
         },
         MdCommands::HeadingHierarchy(hc) => match hc {
             MdHeadingHierarchyCommands::Validate(args) => {
@@ -1075,15 +1119,16 @@ mod cli_uniform_grammar_tests {
         );
     }
 
-    // --- §2a-cov RED: test-coverage validate command removed ---
+    // --- test-coverage validate is live in the union command surface ---
 
     #[test]
-    fn test_coverage_validate_no_longer_parses() {
+    fn test_coverage_validate_still_parses() {
         let result =
             Cli::try_parse_from(["rhino-cli", "test-coverage", "validate", "cover.xml", "90"]);
         assert!(
-            result.is_err(),
-            "test-coverage validate must no longer parse after command removal"
+            result.is_ok(),
+            "test-coverage validate must parse (union command surface): {:?}",
+            result.err()
         );
     }
 

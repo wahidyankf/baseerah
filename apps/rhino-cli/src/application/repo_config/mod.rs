@@ -11,10 +11,13 @@ use std::path::Path;
 use anyhow::{Context, Error};
 use serde::Deserialize;
 
+use crate::application::env::injection::Manifest as EnvInjectionManifest;
+use crate::application::env::validate::Contract as EnvContract;
 use crate::application::repo_governance::instruction_size::BudgetConfig;
 
 /// A project entry in the `coverage.projects` list.
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct CoverageProject {
     /// Nx project name (e.g. `"rhino-cli"`).
     pub name: String,
@@ -26,6 +29,7 @@ pub struct CoverageProject {
 
 /// The `coverage:` section of `repo-config.yml`.
 #[derive(Debug, Clone, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct CoverageConfig {
     /// Explicit per-project test-level registry.
     pub projects: Vec<CoverageProject>,
@@ -33,9 +37,11 @@ pub struct CoverageConfig {
 
 /// The `specs:` section of `repo-config.yml`.
 #[derive(Debug, Clone, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct SpecsConfig {
-    /// Spec areas that must carry a `ddd/` folder. Replaces the hardcoded
-    /// `apps_with_ddd()` allowlist. An area absent from this list must NOT carry `ddd/`.
+    /// Spec areas that must carry a `ddd/` folder. This is the single source of
+    /// truth for DDD areas — validators read it here instead of a source-hard-coded
+    /// per-repo allowlist. An area absent from this list must NOT carry `ddd/`.
     #[serde(rename = "ddd-areas", default)]
     pub ddd_areas: Vec<String>,
     /// Projects eligible for `specs:domain:coverage`. Distinct from `ddd-areas` —
@@ -46,6 +52,7 @@ pub struct SpecsConfig {
 
 /// One harness entry in the `harness:` section of `repo-config.yml`.
 #[derive(Debug, Clone, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct HarnessEntry {
     /// Harness identifier (e.g. `"claude-code"`, `"opencode"`, `"amazonq"`).
     pub name: String,
@@ -89,9 +96,15 @@ impl HarnessEntry {
     }
 }
 
-/// Parsed `repo-config.yml` (only the sections rhino-cli currently consumes).
-/// Unknown sections are ignored by serde — forward-compatible.
+/// Parsed `repo-config.yml` — the canonical schema, byte-identical across all
+/// three repos. Every top-level section is modeled here, and both this struct
+/// and its nested structs use `#[serde(deny_unknown_fields)]`: an unknown or
+/// misspelled key fails the parse. This makes the struct itself the schema-parity
+/// oracle — each repo validating its own `repo-config.yml` against its own copy of
+/// this (byte-identical) struct is equivalent to an identical key set across all
+/// three files. See `rhino-cli repo-config validate`.
 #[derive(Debug, Clone, Deserialize, Default)]
+#[serde(deny_unknown_fields)]
 pub struct RepoConfig {
     /// All-harness binding registry (§3.2); every `harness` command reads this list.
     #[serde(default)]
@@ -105,6 +118,12 @@ pub struct RepoConfig {
     /// Per-surface instruction-file size budgets (was `instruction-size-budget.yaml`).
     #[serde(rename = "instruction-size", default)]
     pub instruction_size: Option<BudgetConfig>,
+    /// Surface registry for `env validate` (code↔config drift detection).
+    #[serde(rename = "env-contract", default)]
+    pub env_contract: Option<EnvContract>,
+    /// Value-less injection manifest for `env validate` (manifest-consistency pass).
+    #[serde(rename = "env-injection", default)]
+    pub env_injection: Option<EnvInjectionManifest>,
 }
 
 /// Load and parse `repo-config.yml` at `repo_root`.
