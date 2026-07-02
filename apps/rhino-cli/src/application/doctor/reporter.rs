@@ -10,12 +10,13 @@ use serde::Serialize;
 
 use super::{DoctorResult, Scope, ToolCheck, ToolStatus};
 
-/// Returns the Unicode status symbol for `status`: `✓`, `⚠`, or `✗`.
+/// Returns the Unicode status symbol for `status`: U+2713 (ok), U+26A0
+/// (warning), or U+2717 (missing).
 fn symbol_for(status: ToolStatus) -> &'static str {
     match status {
-        ToolStatus::Ok => "\u{2713}",      // ✓
-        ToolStatus::Warning => "\u{26A0}", // ⚠
-        ToolStatus::Missing => "\u{2717}", // ✗
+        ToolStatus::Ok => "\u{2713}",      // check mark
+        ToolStatus::Warning => "\u{26A0}", // warning sign
+        ToolStatus::Missing => "\u{2717}", // ballot X
     }
 }
 

@@ -95,11 +95,11 @@ pub fn format_text(result: &ValidationResult, verbose: bool, quiet: bool) -> Str
             let vs = file_violations.get(&fp);
             let ws = file_warnings.get(&fp);
             if vs.is_some_and(|v| !v.is_empty()) {
-                let _ = writeln!(sb, "✗ {fp}");
+                let _ = writeln!(sb, "[FAIL] {fp}");
             } else if ws.is_some_and(|w| !w.is_empty()) {
-                let _ = writeln!(sb, "⚠ {fp}");
+                let _ = writeln!(sb, "[WARN] {fp}");
             } else {
-                let _ = writeln!(sb, "✓ {fp}");
+                let _ = writeln!(sb, "[OK] {fp}");
             }
             if let Some(vs) = vs {
                 for v in vs {
@@ -455,7 +455,7 @@ mod tests {
             warnings: Vec::new(),
         };
         let s = format_text(&result, false, false);
-        assert!(s.contains("✗ a.md"));
+        assert!(s.contains("[FAIL] a.md"));
         assert!(s.contains("label_too_long"));
         assert!(s.contains("width_exceeded"));
         assert!(s.contains("multiple_diagrams"));
@@ -470,7 +470,7 @@ mod tests {
             warnings: vec![dense_warning(), complex_warning()],
         };
         let s = format_text(&result, false, false);
-        assert!(s.contains("⚠ a.md"));
+        assert!(s.contains("[WARN] a.md"));
         assert!(s.contains("subgraph_density"));
         assert!(s.contains("complex_diagram"));
     }

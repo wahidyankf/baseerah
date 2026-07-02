@@ -27,14 +27,14 @@ pub fn format_text(r: &CheckResult, _verbose: bool, quiet: bool) -> String {
         if !quiet {
             let _ = writeln!(
                 out,
-                "✓ Spec coverage valid! {} specs, {} scenarios, {} steps — all covered.",
+                "Spec coverage valid! {} specs, {} scenarios, {} steps — all covered.",
                 r.total_specs, r.total_scenarios, r.total_steps
             );
         }
         return out;
     }
 
-    out.push_str("✗ Spec coverage gaps found!\n\n");
+    out.push_str("Spec coverage gaps found!\n\n");
 
     if !r.gaps.is_empty() {
         let _ = writeln!(out, "Missing test files ({}):", r.gaps.len());
@@ -304,7 +304,7 @@ mod tests {
         let s = format_text(&r, false, false);
         assert_eq!(
             s,
-            "✓ Spec coverage valid! 3 specs, 10 scenarios, 25 steps — all covered.\n"
+            "Spec coverage valid! 3 specs, 10 scenarios, 25 steps — all covered.\n"
         );
     }
 
@@ -338,7 +338,7 @@ mod tests {
             matcher_text: "orphaned".to_string(),
         });
         let s = format_text(&r, false, false);
-        assert!(s.starts_with("✗ Spec coverage gaps found!"));
+        assert!(s.starts_with("Spec coverage gaps found!"));
         assert!(s.contains("Missing test files (1)"));
         assert!(s.contains("specs/x.feature"));
         assert!(s.contains("Missing scenarios (1)"));

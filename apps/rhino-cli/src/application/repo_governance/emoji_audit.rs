@@ -193,28 +193,32 @@ mod tests {
     use std::fs;
     use tempfile::TempDir;
 
+    // Test fixtures below use \u{...} escapes rather than literal emoji
+    // characters so this detector's own source file doesn't trip the
+    // emoji-in-source-code convention it implements.
+
     #[test]
     fn is_emoji_rune_classifies_known_blocks() {
-        assert!(is_emoji_rune('✓')); // U+2713 Misc Symbols
-        assert!(is_emoji_rune('⚠')); // U+26A0 Warning
-        assert!(is_emoji_rune('❌')); // U+274C Cross
-        assert!(is_emoji_rune('🚀')); // U+1F680
+        assert!(is_emoji_rune('\u{2713}')); // U+2713 Misc Symbols
+        assert!(is_emoji_rune('\u{26A0}')); // U+26A0 Warning
+        assert!(is_emoji_rune('\u{274C}')); // U+274C Cross
+        assert!(is_emoji_rune('\u{1F680}')); // U+1F680
         assert!(!is_emoji_rune('a'));
-        assert!(!is_emoji_rune('日')); // CJK is not emoji
+        assert!(!is_emoji_rune('\u{65E5}')); // CJK is not emoji
     }
 
     #[test]
     fn format_codepoint_pads_under_ffff() {
         assert_eq!(format_codepoint('a'), "U+0061");
-        assert_eq!(format_codepoint('✓'), "U+2713");
-        assert_eq!(format_codepoint('🚀'), "U+1F680");
+        assert_eq!(format_codepoint('\u{2713}'), "U+2713");
+        assert_eq!(format_codepoint('\u{1F680}'), "U+1F680");
     }
 
     #[test]
     fn audit_emoji_finds_codepoint_in_json_file() {
         let tmp = TempDir::new().unwrap();
         let p = tmp.path().join("conf.json");
-        fs::write(&p, "{\n  \"label\": \"hi ✓ there\"\n}\n").unwrap();
+        fs::write(&p, "{\n  \"label\": \"hi \u{2713} there\"\n}\n").unwrap();
         let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].line, 2);
@@ -225,7 +229,7 @@ mod tests {
     #[test]
     fn audit_emoji_skips_non_forbidden_extensions() {
         let tmp = TempDir::new().unwrap();
-        fs::write(tmp.path().join("readme.md"), "# 🚀 Hello\n").unwrap();
+        fs::write(tmp.path().join("readme.md"), "# \u{1F680} Hello\n").unwrap();
         let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert!(findings.is_empty());
     }
@@ -235,7 +239,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let nm = tmp.path().join("node_modules");
         fs::create_dir(&nm).unwrap();
-        fs::write(nm.join("x.json"), "✓\n").unwrap();
+        fs::write(nm.join("x.json"), "\u{2713}\n").unwrap();
         let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert!(findings.is_empty());
     }
@@ -249,8 +253,8 @@ mod tests {
     #[test]
     fn audit_emoji_sorts_findings_by_file_line_column() {
         let tmp = TempDir::new().unwrap();
-        fs::write(tmp.path().join("b.json"), "✓\n").unwrap();
-        fs::write(tmp.path().join("a.json"), "x\n✓\n").unwrap();
+        fs::write(tmp.path().join("b.json"), "\u{2713}\n").unwrap();
+        fs::write(tmp.path().join("a.json"), "x\n\u{2713}\n").unwrap();
         let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 2);
         assert!(findings[0].file.ends_with("a.json"));
