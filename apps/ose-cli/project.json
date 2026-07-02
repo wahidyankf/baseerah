@@ -126,5 +126,8 @@
       },
       "cache": true
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ose/behavior/ose-cli/gherkin/**/*.feature"]
   }
 }

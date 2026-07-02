@@ -124,5 +124,8 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
-  "implicitDependencies": ["ose-www"]
+  "implicitDependencies": ["ose-www"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ose/behavior/platform-web/gherkin/**/*.feature"]
+  }
 }

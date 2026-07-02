@@ -150,6 +150,18 @@ coverage:
     - name: web-ui
       levels: [unit]
       specs: "specs/libs/web-ui/behavior/**"
+    - name: fsharp-crane-core
+      levels: [unit]
+      specs: "specs/libs/fsharp-crane-core/behavior/**"
+
+    # Deliberately excluded, not omitted-by-oversight (Phase 2 closeout, 2026-07-02):
+    #   web-ui-token, organiclever-contracts, ose-contracts — every test-level target
+    #   (test:unit/test:integration/test:e2e) is a documented no-op
+    #   ("target not applicable for this project") for these 3 projects; their real
+    #   quality gate is typecheck (web-ui-token) or lint/bundle — OpenAPI spectral
+    #   linting (the 2 *-contracts projects) — not a Gherkin-driven test level this
+    #   registry models. Adding a levels: [] or levels: [unit] entry here would
+    #   misleadingly claim behavior-spec coverage that doesn't exist.
 
 specs:
   # Areas that must carry a ddd/ folder (bounded-context registry). Lifts the

@@ -126,5 +126,8 @@
       "cache": true
     }
   },
-  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"]
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www-be/gherkin/**/*.feature"]
+  }
 }

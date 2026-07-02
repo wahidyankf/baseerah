@@ -124,5 +124,8 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:organiclever"],
-  "implicitDependencies": ["organiclever-www"]
+  "implicitDependencies": ["organiclever-www"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/organiclever/behavior/organiclever-www/gherkin/**/*.feature"]
+  }
 }

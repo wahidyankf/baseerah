@@ -123,5 +123,8 @@
       "cache": true
     }
   },
-  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ayokoding"]
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ayokoding"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-www/gherkin/**/*.feature"]
+  }
 }

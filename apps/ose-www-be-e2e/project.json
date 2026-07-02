@@ -123,5 +123,8 @@
       "cache": true
     }
   },
-  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"]
+  "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ose"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ose/behavior/platform-web/gherkin/**/*.feature"]
+  }
 }

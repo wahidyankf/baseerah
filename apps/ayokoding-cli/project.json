@@ -129,5 +129,8 @@
       },
       "cache": true
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-cli/gherkin/**/*.feature"]
   }
 }

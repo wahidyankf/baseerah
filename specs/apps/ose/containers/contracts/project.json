@@ -107,5 +107,8 @@
       },
       "cache": true
     }
+  },
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ose/containers/contracts/**"]
   }
 }

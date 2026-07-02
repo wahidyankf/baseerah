@@ -124,5 +124,8 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:ayokoding"],
-  "implicitDependencies": ["ayokoding-www"]
+  "implicitDependencies": ["ayokoding-www"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/ayokoding/behavior/ayokoding-www/gherkin/**/*.feature"]
+  }
 }

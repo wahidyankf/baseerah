@@ -125,5 +125,8 @@
     }
   },
   "tags": ["type:e2e", "platform:playwright", "lang:ts", "domain:wahidyankf"],
-  "implicitDependencies": ["wahidyankf-www"]
+  "implicitDependencies": ["wahidyankf-www"],
+  "namedInputs": {
+    "specs": ["{workspaceRoot}/specs/apps/wahidyankf/behavior/wahidyankf-www/gherkin/**/*.feature"]
+  }
 }

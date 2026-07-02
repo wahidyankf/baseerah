@@ -225,6 +225,7 @@ jobs:
       - uses: ./.github/actions/setup-node
       - uses: ./.github/actions/setup-rust
       - run: npx nx run-many -t specs:structure-validation --projects=rhino-cli
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs gherkin-cardinality validate
 
   md-links:
     name: Markdown link validation (repo-wide)
