@@ -745,6 +745,27 @@ runs as the `specs:behavior:coverage` Nx target, enforced by the pre-push hook a
 genuine step gaps have the target deferred temporarily until step implementations are complete. See
 the "Specs:Behavior:Coverage Projects" section for flags and project-by-project status.
 
+### Cross-Repo rhino-cli Byte-Identity Standard
+
+`apps/rhino-cli` is the one project held to a stricter, cross-repo standard beyond the per-project
+`inputs`/caching rules above. Four rules govern it, in force across `ose-public`, `ose-primer`, and
+`ose-infra`:
+
+1. `apps/rhino-cli`'s `src/`, `Cargo.toml`, `Cargo.lock`, `project.json`, and `LICENSE` MUST be
+   byte-identical across `ose-public`/`ose-primer`/`ose-infra` with zero carve-outs (carrying the
+   union command superset).
+2. Every Nx-registered project in every repo (per `nx show projects` — this includes the
+   `*-contracts` projects rooted under `specs/apps/*/containers/contracts/`, which a directory-only
+   `apps`/`libs` scan cannot see) MUST declare `namedInputs.specs`.
+3. rhino-cli's own behaviour MUST be cucumber-covered in all three repos.
+4. All three `repo-config.yml` files MUST carry an identical key set (the schema-parity gate,
+   enforced by `rhino-cli repo-config validate`).
+
+See [SDLC Gate Standard §rhino-cli Byte-Identity Boundary](../../../docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary)
+for the divergence-policy boundary this standard establishes, and
+[tech-docs.md §4 "rhino-cli Source-Identity Standard"](../../../plans/in-progress/unify-rhino-cli-sdlc-parity/tech-docs.md#4-rhino-cli-source-identity-standard)
+for the full synthesis approach.
+
 ## Codegen Dependency Chain
 
 Apps with OpenAPI contract specs share a `codegen` target that generates types and

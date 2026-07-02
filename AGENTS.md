@@ -391,6 +391,9 @@ Content parity between `ose-public` and `ose-primer` maintained via
 [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
 workflow. `ose-infra` does not participate in the parity loop.
 
+`apps/rhino-cli` is required to be byte-identical (zero carve-outs) across all three repos per the
+[SDLC Gate Standard](./docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary).
+
 See: [Related Repositories reference](./docs/reference/related-repositories.md).
 
 ## Models

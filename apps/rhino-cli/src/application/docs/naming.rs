@@ -3,9 +3,9 @@
 //! Byte-for-byte port of `apps/rhino-cli/internal/docs/naming.go`.
 //!
 //! Enforces the lowercase-kebab-case filename rule (`^[a-z0-9-]+\.md$`) for
-//! every `.md` file found under the supplied root paths.  `README.md` and
-//! `SKILL.md` are always exempt, and callers may supply additional glob
-//! patterns to exclude further filenames.
+//! every `.md` file found under the supplied root paths.  `README.md`,
+//! `SKILL.md`, `AGENTS.md`, and `CLAUDE.md` are always exempt, and callers
+//! may supply additional glob patterns to exclude further filenames.
 
 use std::path::Path;
 use std::sync::OnceLock;
@@ -112,12 +112,17 @@ fn walk_naming_path(root: &str, exempt_globs: &[String]) -> Vec<DocsNamingFindin
 
 /// Returns `true` when `basename` should be skipped during naming validation.
 ///
-/// `README.md` and `SKILL.md` are always exempt (both are fixed filenames dictated by an
-/// external convention — GitHub-style directory indexes and the Claude Code Agent Skills
-/// spec, respectively — not a naming choice this repo's kebab-case rule governs). Additional
-/// exemptions are matched via `exempt_globs`.
+/// `README.md`, `SKILL.md`, `AGENTS.md`, and `CLAUDE.md` are always exempt (all are fixed
+/// filenames dictated by an external convention — GitHub-style directory indexes, the Claude
+/// Code Agent Skills spec, the agents.md standard, and the Claude Code root-instruction shim,
+/// respectively — not a naming choice this repo's kebab-case rule governs; the rule's own stated
+/// scope is "files in `docs/`, `repo-governance/`, and similar repository locations", not
+/// ecosystem-standard root files). Additional exemptions are matched via `exempt_globs`.
 fn is_naming_exempt(basename: &str, exempt_globs: &[String]) -> bool {
-    if basename == "README.md" || basename == "SKILL.md" {
+    if matches!(
+        basename,
+        "README.md" | "SKILL.md" | "AGENTS.md" | "CLAUDE.md"
+    ) {
         return true;
     }
     for pat in exempt_globs {
@@ -181,6 +186,21 @@ mod tests {
         let skill_dir = tmp.path().join("some-skill");
         fs::create_dir_all(&skill_dir).unwrap();
         fs::write(skill_dir.join("SKILL.md"), "x").unwrap();
+        let findings =
+            validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+        assert!(findings.is_empty());
+    }
+
+    /// Regression: `AGENTS.md` and `CLAUDE.md` at repo root must be exempt, matching
+    /// `README.md`/`SKILL.md` — this rule's own stated scope ("files in `docs/`,
+    /// `repo-governance/`, and similar repository locations") never covered ecosystem-standard
+    /// root files, but the exemption list omitted them until a staged `AGENTS.md` edit tripped
+    /// `md naming validate` in the pre-commit hook.
+    #[test]
+    fn agents_and_claude_md_always_exempt() {
+        let tmp = TempDir::new().unwrap();
+        fs::write(tmp.path().join("AGENTS.md"), "x").unwrap();
+        fs::write(tmp.path().join("CLAUDE.md"), "x").unwrap();
         let findings =
             validate_docs_naming(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());
