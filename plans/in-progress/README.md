@@ -4,7 +4,9 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_No active plans._
+- [unify-rhino-cli-sdlc-parity](./unify-rhino-cli-sdlc-parity/README.md) — second pass of the
+  standardize-rhino-cli-sdlc-parity effort; drives all three repos (incl. rhino-cli's own source) to a
+  genuinely byte-identical structure, grounded in a fresh 2026-07-02 re-audit.
 
 ## Instructions
 
