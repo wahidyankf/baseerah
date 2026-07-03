@@ -504,12 +504,18 @@ plus two discovered during this phase, both net-additive (not missing mechanism)
 
 ### Plan Archival
 
-- [ ] [AI] Verify ALL delivery checklist items above are ticked (no descope path exists — Phase 4 is required, so no item may be deferred as a descope).
-- [ ] [AI] Verify ALL quality gates pass (local + CI) in all three repos.
-- [ ] [AI] `git mv` this plan folder to `done/2026-07-DD__unify-rhino-cli-sdlc-parity/` (actual completion date) in all 3 repos.
-- [ ] [AI] Update `plans/in-progress/README.md` in each repo — remove the plan entry.
-- [ ] [AI] Update `plans/done/README.md` in each repo — add the plan entry with completion date.
-- [ ] [AI] Commit: `chore(plans): move unify-rhino-cli-sdlc-parity to done` in each repo.
+- [x] [AI] Verify ALL delivery checklist items above are ticked (no descope path exists — Phase 4 is required, so no item may be deferred as a descope).
+  - **Done** (2026-07-03): swept the full checklist in all 3 repos — zero unticked items outside this Archival section.
+- [x] [AI] Verify ALL quality gates pass (local + CI) in all three repos.
+  - **Done** (2026-07-03): local (Phase 0-5 gates, LQG) all confirmed earlier; CI — public `0c2d4edc5` (all workflows success after a transient Volta-API-500 rerun), primer `5c03d6abc` (all workflows success after a transient Volta-API-500 rerun), infra `0eaf2bc6b` (`main-ci`/`pr-quality-gate` success).
+- [x] [AI] `git mv` this plan folder to `done/2026-07-DD__unify-rhino-cli-sdlc-parity/` (actual completion date) in all 3 repos.
+  - **Done** (2026-07-03): moved to `plans/done/2026-07-03__unify-rhino-cli-sdlc-parity/` in all 3 repos.
+- [x] [AI] Update `plans/in-progress/README.md` in each repo — remove the plan entry.
+  - **Done** (2026-07-03): entry removed in all 3 repos.
+- [x] [AI] Update `plans/done/README.md` in each repo — add the plan entry with completion date.
+  - **Done** (2026-07-03): entry added in all 3 repos.
+- [x] [AI] Commit: `chore(plans): move unify-rhino-cli-sdlc-parity to done` in each repo.
+  - **Done** (2026-07-03): committed and pushed in all 3 repos.
 
 ## Notes
 
