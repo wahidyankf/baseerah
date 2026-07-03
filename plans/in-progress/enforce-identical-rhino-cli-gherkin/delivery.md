@@ -180,7 +180,16 @@ test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-
 > passing on the subprocess path) — not here — because that conversion needs de-hollowed, already-passing
 > scenarios to convert; building the `Fs`/`MockFs` seam above is the prerequisite those sub-steps consume.
 
-### 1a. De-hollow `repo_governance` (61/61 skipped → 0)
+### 1a. De-hollow `repo_governance` (61/61 skipped → 0; corrected to 26/26 post-§1·0-split)
+
+> **Scope correction (2026-07-04)**: the acceptance figures below ("61 scenarios") predate §1·0's
+> discovery that `repo-governance/` actually spans 5 command groups. After §1·0's split, only 4 feature
+> files / **26 scenarios** remain bound to `tests/repo_governance.rs` (`repo-governance-audit.feature` 6,
+> `repo-governance-layer-coherence.feature` 3, `repo-governance-traceability-audit.feature` 5,
+> `repo-governance-vendor-audit.feature` 12); the other 35 of the 61 titles below now belong to
+> `docs.rs`/`agents.rs`/a new `convention.rs` binary's own de-hollow work (§1b/§1c/new §1a2 below). Treat
+> "26 scenarios (26 passed)" as the corrected acceptance target throughout this section and
+> §1a-conversion.
 
 - [ ] [AI] **RED**: in `apps/rhino-cli/tests/repo_governance.rs`, align every `#[given]/#[when]/#[then]`
       string to the canonical feature step text in `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/**`
@@ -189,14 +198,27 @@ test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-
       pattern** (unchanged from today — the in-process conversion is a separate, later sub-step below). Run
       `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test repo_governance`.
       Acceptance: scenarios now **execute** (summary shows passed/failed, not skipped) — failures here are real behaviour assertions to satisfy.
+  - **Done 2026-07-04.** Actual current scope post-§1·0-split: 26 scenarios across 4 feature files
+    (`repo-governance-audit.feature` 6, `-layer-coherence.feature` 3, `-traceability-audit.feature` 5,
+    `-vendor-audit.feature` 12). RED confirmed: baseline showed 26 skipped (stale vendor-audit/
+    gherkin-keyword-cardinality vocab, the latter's feature file no longer exists — moved to future §1f
+    work); after aligning step strings, all 26 executed (no skips). Removed 9 orphaned step defs
+    referencing the now-nonexistent gherkin-keyword-cardinality feature.
   - **Gherkin (binds) →** — aggregate BDD binder for all 61 scenarios in `gherkin/repo-governance/**`:
     "Clean repository: all categories pass, total_findings is 0, exit 0"; "Vendor-audit scope is limited to governance prose and root instruction surfaces"; "Mixed findings: some categories pass, some fail; total_findings is the sum; exit 1"; "Byte-determinism: running the orchestrator 10 times in a row produces byte-identical JSON"; "Skip list honored: false-positive entries do not count toward total_findings"; "Include-category filter: only listed categories run"; "Clean source tree passes"; "Emoji codepoint in a JSON file fails"; "Emoji codepoint in a Go source file fails"; "Multibyte non-emoji unicode does not trigger a finding"; "emoji-audit skips archived directory"; "AGENTS.md within target size passes the audit"; "AGENTS.md over the 30KB target size emits a finding"; "AGENTS.md over the 40KB hard limit fails the command"; "Clean directory passes the audit"; "Frontmatter with forbidden updated field fails"; "Body containing Last Updated footer block fails"; "Body containing standalone Created annotation fails"; "File under website app directory is exempt and passes"; "Pushing an over-budget instruction file is blocked"; "Pushing changes that do not touch instruction files skips the gate"; "Pushing an in-budget instruction-file edit passes"; "Both docs list identical layer numbers and names passes"; "Layer numbering has a gap fails"; "Two docs disagree on a layer name for the same number fails"; "A file within target passes silently"; "A file over target but under the ceiling warns without failing"; "A file over its hard ceiling fails the command"; "A configured glob matching no file is a no-op"; "The resolved tree is checked against the fail ceiling"; "The legacy alias still works"; "A clean repository passes the traceability audit"; "A principle missing the Vision Supported heading fails the audit"; "A convention missing the Principles Implemented/Respected heading fails the audit"; "A development document missing the Conventions Implemented/Respected heading fails the audit"; "A workflow with no agent reference fails the audit"; "The rule is documented as a convention"; "repo-rules-checker validates the budget qualitatively"; "The quality-gate workflow lists the validator as a fourth preflight category"; "The preflight envelope carries the instruction-size category"; "The AI checker defers to the deterministic preflight finding"; "Directory where README.md links cover every sibling .md passes"; "Orphan file: directory has a .md file the README.md does not link to"; "Ghost reference: README.md links to a .md file that does not exist"; "Nested subdirectory README.md is also audited"; "Clean repository where every app/lib/specs has matching LICENSE passes"; "App directory missing LICENSE file fails"; "Lib directory missing LICENSE file fails"; "LICENSING-NOTICE.md table row mismatching SPDX in LICENSE fails"; "A forbidden term in plain prose fails the audit"; "A forbidden term inside a code fence passes the audit"; "A forbidden term inside a binding-example fence passes the audit"; "A forbidden term under a Platform Binding Examples heading passes the audit"; "A governance directory with no forbidden terms passes the audit"; "Capitalized branded Skills in plain prose fails the audit"; "Capitalized Skills inside a code fence passes the audit"; "A newly forbidden coding-agent vendor name in plain prose fails the audit"; "The Amazon Q vendor name in plain prose fails the audit"; "The Antigravity vendor name in plain prose fails the audit"; "The mathematical constant pi in plain prose passes the audit"; "A newly forbidden vendor name under a Platform Binding Examples heading passes the audit"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: resolve each executing failure at root cause (fix the step body / fixture, or the
+- [x] [AI] **GREEN**: resolve each executing failure at root cause (fix the step body / fixture, or the
       validator if a genuine bug surfaces — never re-skip). Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test repo_governance`.
-      Acceptance: `61 scenarios (61 passed)`, `0 skipped`.
-- [ ] [AI] **REFACTOR**: dedupe shared step helpers in `tests/repo_governance.rs`. Command: same.
+      Acceptance: `26 scenarios (26 passed)` (corrected count — see scope note above), `0 skipped`.
+  - **Done 2026-07-04.** All 26 scenarios passed on first execution after step-string alignment — no
+    genuine CLI bugs surfaced; every assertion was derived directly from reading the real production
+    validator code before writing it (`governance_{audit,vendor_audit,layer_coherence,
+traceability_audit}.rs`), corroborated against those validators' own existing unit tests. Suite-wide
+    skip count dropped 121→95 (repo_governance 26→0; no other binary's counts changed).
+- [x] [AI] **REFACTOR**: dedupe shared step helpers in `tests/repo_governance.rs`. Command: same.
       Acceptance: still `0 skipped`, all passed.
+  - **Done 2026-07-04.** Extracted `write_matching_layer_docs()` and `json_array()` shared helpers. Still
+    26 passed, 0 skipped. `clippy -D warnings` and `fmt --check` both clean.
 
 #### 1a-conversion. Mocked-unit conversion (completes Decision 5's `test:unit` target)
 
@@ -235,10 +257,10 @@ work touches their validators).
 - [ ] [AI] **GREEN**: adjust each regressed step assertion to match the in-process validator's real return
       shape (e.g. a `Result<ValidationReport, _>` instead of a process exit code + stdout string),
       preserving the same scenario-level pass/fail semantics as the subprocess version. Command: same.
-      Acceptance: `61 scenarios (61 passed)`, `0 skipped`, and
+      Acceptance: `26 scenarios (26 passed)` (corrected count, see §1a scope note), `0 skipped`, and
       `grep -c assert_cmd apps/rhino-cli/tests/repo_governance.rs` returns 0.
 - [ ] [AI] **REFACTOR**: dedupe any shared `MockFs`-construction helpers introduced across the converted
-      step defs. Command: same. Acceptance: still `61 scenarios (61 passed)`, `0 skipped`.
+      step defs. Command: same. Acceptance: still `26 scenarios (26 passed)` (corrected count, see §1a scope note), `0 skipped`.
 - [ ] [AI] Edit `apps/rhino-cli/project.json`: point `test:unit` at
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
       — verified this combined invocation runs the `--lib` unit tests plus all three named binaries in one
@@ -253,9 +275,36 @@ work touches their validators).
       re-execution of the mocked/newly-wired binaries is harmless (they still pass); `--tests` cannot be
       scoped down without an explicit follow-up edit, which is out of scope for this plan. Acceptance:
       `nx run rhino-cli:test:unit` exits 0, with output showing the `--lib` suite passing plus
-      `repo_governance` (`61 scenarios (61 passed)`), `env_contract`, and `repo_config_data_driven` each
+      `repo_governance` (`26 scenarios (26 passed)` (corrected count, see §1a scope note)), `env_contract`, and `repo_config_data_driven` each
       green; `nx run rhino-cli:test:integration` still exits 0 running all 21 `tests/*.rs` binaries;
       `repo-config.yml` keeps `rhino-cli levels: [unit, integration]`.
+
+### 1a2. De-hollow `convention` (9/9 skipped → 0, new binary discovered by §1·0's split)
+
+> **New subsection (2026-07-04)** — not in the original plan authoring, added because §1·0's split of
+> `repo-governance/` created a `convention/` command group (`convention emoji`/`convention license`) with
+> no prior binary to inherit its scenarios, so a new `tests/convention.rs` binary was added (empty step
+> scaffold) in §1·0. Its 9 scenarios are currently skipped and must be de-hollowed like every other binary
+> before the Phase 1 Gate's `0 skipped` requirement can pass.
+
+- [ ] [AI] **RED**: in `apps/rhino-cli/tests/convention.rs`, add `#[given]/#[when]/#[then]` steps matching
+      the canonical feature step text in `specs/apps/rhino/behavior/rhino-cli/gherkin/convention/**`, with
+      each `#[when]` invoking the real current command (`convention emoji validate` / `convention license
+  validate`) via the `assert_cmd` subprocess-spawn pattern (matching the sibling binaries' existing
+      style — this binary is not Fs-injected, so no MockFs conversion applies here). Command: `cargo test
+  --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test convention`. Acceptance:
+      scenarios execute (not skipped).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 9 scenarios in `gherkin/convention/**`: "Clean
+    source tree passes"; "Emoji codepoint in a JSON file fails"; "Emoji codepoint in a Go source file
+    fails"; "Multibyte non-emoji unicode does not trigger a finding"; "emoji-audit skips archived
+    directory"; "Clean repository where every app/lib/specs has matching LICENSE passes"; "App directory
+    missing LICENSE file fails"; "Lib directory missing LICENSE file fails"; "LICENSING-NOTICE.md table
+    row mismatching SPDX in LICENSE fails"
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: resolve each executing failure at root cause. Command: same. Acceptance: `9 scenarios
+  (9 passed)`, `0 skipped`.
+- [ ] [AI] **REFACTOR**: dedupe shared step helpers in `tests/convention.rs`. Command: same. Acceptance:
+      still `0 skipped`, all passed.
 
 ### 1b. De-hollow `docs` (43/69 skipped → 0)
 
@@ -489,7 +538,7 @@ specs/apps/crane/behavior/crane-cli/gherkin apps/crane-cli`; the bare, argument-
 - [ ] [AI] `nx run rhino-cli:test:unit` — runs
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
       (mocked/in-process, per §1a's "Mocked-unit conversion") and exits 0: `--lib` suite green,
-      `repo_governance` `61 scenarios (61 passed)`, `env_contract` and `repo_config_data_driven` each green
+      `repo_governance` `26 scenarios (26 passed)` (corrected count, see §1a scope note), `env_contract` and `repo_config_data_driven` each green
       — proving the mocked behaviour tier now executes inside the pre-push `test:quick` gate. `nx run
 rhino-cli:test:integration` also exits 0 — its blanket `--tests` flag runs all 21 `tests/*.rs`
       binaries (17 cucumber binaries registered as `[[test]]` entries — 13 pre-existing + 4 new from
