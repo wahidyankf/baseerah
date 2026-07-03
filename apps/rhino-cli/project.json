@@ -104,10 +104,19 @@
     "test:unit": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib"
+        "command": "cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven"
       },
       "cache": true,
-      "inputs": ["{projectRoot}/Cargo.toml", "{projectRoot}/src/**/*.rs"]
+      "inputs": [
+        "{projectRoot}/Cargo.toml",
+        "{projectRoot}/src/**/*.rs",
+        "{projectRoot}/tests/repo_governance.rs",
+        "{projectRoot}/tests/env_contract.rs",
+        "{projectRoot}/tests/repo_config_data_driven.rs",
+        "{workspaceRoot}/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/**/*.feature",
+        "{workspaceRoot}/specs/apps/rhino/behavior/rhino-cli/gherkin/env-contract/**/*.feature",
+        "{workspaceRoot}/specs/apps/rhino/behavior/rhino-cli/gherkin/repo-config/**/*.feature"
+      ]
     },
     "typecheck": {
       "executor": "nx:run-commands",

@@ -231,7 +231,7 @@ unchanged, with no conversion work needed. The remaining 10 `assert_cmd` binarie
 `workflows`) stay on `test:integration` — converting them is out of scope for this plan (no Fs-injection
 work touches their validators).
 
-- [ ] [AI] **RED**: replace every step-def body's subprocess-spawn call
+- [x] [AI] **RED**: replace every step-def body's subprocess-spawn call
       (`std::process::Command::new(cargo_bin("rhino-cli"))`, via the `assert_cmd::cargo::cargo_bin` free
       function) in `apps/rhino-cli/tests/repo_governance.rs` (now de-hollowed and passing above) with a
       direct in-process call to the corresponding Fs-injected
@@ -242,6 +242,9 @@ work touches their validators).
       returns 0; some scenarios regress from passed to failed/mis-asserted (the expected RED signal —
       assertions written against subprocess stdout/exit-code shape do not yet match the in-process
       validator's return shape).
+  - **Done 2026-07-04.** `grep -c assert_cmd` confirmed 0. Every scenario's assertions were mapped directly
+    from reading each validator's real return shape before writing, so no separate fail-then-fix
+    regression was needed — RED and GREEN landed together (26/26 passed on first in-process run).
   - **Gherkin (binds) →** "The mocked behaviour suite runs inside test:quick" (AC-11)
 
     ```gherkin
@@ -254,14 +257,20 @@ work touches their validators).
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN**: adjust each regressed step assertion to match the in-process validator's real return
+- [x] [AI] **GREEN**: adjust each regressed step assertion to match the in-process validator's real return
       shape (e.g. a `Result<ValidationReport, _>` instead of a process exit code + stdout string),
       preserving the same scenario-level pass/fail semantics as the subprocess version. Command: same.
       Acceptance: `26 scenarios (26 passed)` (corrected count, see §1a scope note), `0 skipped`, and
       `grep -c assert_cmd apps/rhino-cli/tests/repo_governance.rs` returns 0.
-- [ ] [AI] **REFACTOR**: dedupe any shared `MockFs`-construction helpers introduced across the converted
+  - **Done 2026-07-04.** `26 scenarios (26 passed)`, `102 steps (102 passed)`, `0 skipped`; `grep -c
+assert_cmd` = 0.
+- [x] [AI] **REFACTOR**: dedupe any shared `MockFs`-construction helpers introduced across the converted
       step defs. Command: same. Acceptance: still `26 scenarios (26 passed)` (corrected count, see §1a scope note), `0 skipped`.
-- [ ] [AI] Edit `apps/rhino-cli/project.json`: point `test:unit` at
+  - **Done 2026-07-04.** Consolidated `MockFs` construction behind `GovernanceWorld::write()`/
+    `write_matching_layer_docs()` + typed accessor helpers `vendor()`/`layer()`/`traceability()`/`audit()`/
+    `passed()`. Still 26/26, 0 skipped. `clippy -D warnings` (fixed 3 redundant-closure lints) + `fmt
+--check` both clean.
+- [x] [AI] Edit `apps/rhino-cli/project.json`: point `test:unit` at
       `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
       — verified this combined invocation runs the `--lib` unit tests plus all three named binaries in one
       process, no subprocess spawn for any of them. Keep `test:integration`'s command text unchanged
@@ -278,6 +287,10 @@ work touches their validators).
       `repo_governance` (`26 scenarios (26 passed)` (corrected count, see §1a scope note)), `env_contract`, and `repo_config_data_driven` each
       green; `nx run rhino-cli:test:integration` still exits 0 running all 21 `tests/*.rs` binaries;
       `repo-config.yml` keeps `rhino-cli levels: [unit, integration]`.
+  - **Done 2026-07-04.** `nx run rhino-cli:test:unit` exits 0 (lib suite + `repo_governance` 26/26 +
+    `env_contract` 1/1 + `repo_config_data_driven` 1/1, all green). `nx run rhino-cli:test:integration`
+    exits 0 (runs all 21 `tests/*.rs` binaries; redundant re-execution of the mocked/newly-wired binaries
+    is harmless). `repo-config.yml`'s `rhino-cli levels: [unit, integration]` confirmed unchanged.
 
 ### 1a2. De-hollow `convention` (9/9 skipped → 0, new binary discovered by §1·0's split)
 
