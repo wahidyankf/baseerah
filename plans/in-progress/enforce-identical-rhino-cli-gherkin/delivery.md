@@ -790,9 +790,25 @@ apps/rhino-cli` invocation. Verified the full target chain: `nx run rhino-cli:sp
 
 ### 1i. Regenerate golden-master
 
-- [ ] [AI] Regenerate `apps/rhino-cli/tests/golden-master/**` from the canonical binary per the
+- [x] [AI] Regenerate `apps/rhino-cli/tests/golden-master/**` from the canonical binary per the
       predecessor's method (`{{TMPDIR}}` sentinel + `--no-color`). Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test golden_master`.
       Acceptance: golden-master test passes; review the diff for intent before freezing.
+  - **Done 2026-07-04.** Replayed all 70 `manifest.json` entries against the release binary
+    (`cargo build --release -p rhino-cli`, then re-ran each entry's args + `--no-color`, resolving the
+    `{{TMPDIR}}` sentinel to a fresh `mktemp -d` per entry, writing `<file>.stdout`/`.stderr`/`.exit` —
+    the exact mechanism documented at the top of `tests/golden_master.rs`). Result: **zero-diff** —
+    `git status`/`git diff` on `apps/rhino-cli/tests/golden-master/` show no changes at all. Root cause:
+    the predecessor plan's `feat(rhino-cli): synthesize the canonical rhino-cli` commit (`b01571c30`)
+    already froze the corpus against the current `convention`/`harness`/`md`/`repo-config` command
+    surface, and none of this plan's own §1a–§1h sub-steps touched `src/cli.rs` (confirmed via
+    `git diff --stat b01571c30..HEAD -- apps/rhino-cli/src/` — only command _implementations_,
+    extractors, and reporters changed, never the clap command tree) — so no new command-surface drift
+    accumulated after that freeze point. The "stale fixtures" premise for this step predates that
+    synthesis commit; by execution time the corpus was already current. `cargo test --release
+--test golden_master` passes (verified 4 consecutive runs, no terminal-width flakiness once run
+    outside a tty). Full suite (`cargo test --release --no-fail-fast`) still 0 failed / 0 skipped
+    (1 pre-existing `#[ignore]`d unit test, unrelated — deferred-cucumber-harness gap, not touched here).
+    `cargo clippy --all-targets -- -D warnings` and `cargo fmt --check` both clean.
 
 ### Phase 1 Gate
 
