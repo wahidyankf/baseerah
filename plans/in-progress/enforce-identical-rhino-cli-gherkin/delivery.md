@@ -423,17 +423,25 @@ warnings` + `fmt --check` clean.
 
 #### 1e-ii. Wire `git` (5 scenarios, 1 feature file)
 
-- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+- [x] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
       `apps/rhino-cli/tests/git_hooks.rs` bound to `gherkin/git/`, with an empty step scaffold. Command:
       `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test git_hooks`. Acceptance: scenarios execute and
       fail/undefined (proving the dir is now bound).
+  - **Done 2026-07-04.** New `[[test]] name = "git_hooks" harness = false` + `tests/git_hooks.rs` scaffold.
+    5 scenarios confirmed skipped/undefined pre-GREEN (proving the dir is now bound, not absent).
   - **Gherkin (binds) →** — aggregate BDD binder for all 5 scenarios in `gherkin/git/**`:
     "Broken-link detection in step 7 reports per-link details"; "staged-mermaid-blocks — staged malformed mermaid diagram blocks commit"; "staged-prose-heading-blocks — staged docs file with bad heading hierarchy blocks commit"; "staged-skill-file-exempt — staged SKILL.md with bad heading hierarchy does not block commit"; "link-step-honors-exclusions — staged plans/done broken link does not block commit"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement step defs against the real staged-file git hook commands. Command: same.
+- [x] [AI] **GREEN**: implement step defs against the real staged-file git hook commands. Command: same.
       Acceptance: all 5 scenarios in `git/` pass, `0 skipped`.
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `git_hooks.rs` step defs.
+  - **Done 2026-07-04.** All 5 pass, `20 steps (20 passed)`. Deviation note: the feature says "stderr
+    output" but `md links validate` prints the detailed per-link report to stdout (only a one-line summary
+    goes to stderr) — implemented Then-steps against combined stdout+stderr (matches how a developer
+    actually sees it during a git hook), documented in the file's module doc rather than altering CLI
+    behavior. Full suite: all 15 cucumber binaries pass, 0 skipped anywhere.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears across the new `git_hooks.rs` step defs.
       Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** No duplication warranted extraction. `clippy -D warnings` + `fmt --check` clean.
 
 #### 1e-iii. Wire `specs` (29 scenarios, 10 feature files)
 
