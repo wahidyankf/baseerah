@@ -153,6 +153,15 @@ jobs:
       - uses: ./.github/actions/setup-rust
       - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- env validate
 
+  repo-config-validate:
+    name: repo-config.yml schema parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-rust
+      - run: cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- repo-config validate
+
   md-links:
     name: Markdown link validation (repo-wide)
     runs-on: ubuntu-latest
@@ -206,6 +215,7 @@ jobs:
         instruction-size,
         specs-gate,
         env-validate,
+        repo-config-validate,
         md-links,
         readme-index,
         harness-duplication,
