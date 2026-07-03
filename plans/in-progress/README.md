@@ -4,7 +4,8 @@ Active project plans currently being worked on.
 
 ## Active Plans
 
-_(none currently)_
+- [enforce-identical-rhino-cli-gherkin](./enforce-identical-rhino-cli-gherkin/README.md) — make rhino-cli's Gherkin behaviour tree byte-identical **and** fully enforcing (0 skipped) across ose-public, ose-primer, ose-infra; extend the SDLC parity gate to cover it. Created 2026-07-03.
+- [enforce-repo-wide-scenario-implementation](./enforce-repo-wide-scenario-implementation/README.md) — roll out `@covers` + level tags + per-tier fail-on-skip across all apps/libs and upgrade `behavior-coverage` to a runtime cross-check so every Gherkin scenario is genuinely implemented. **Depends on** `enforce-identical-rhino-cli-gherkin`. Created 2026-07-03.
 
 ## Instructions
 
