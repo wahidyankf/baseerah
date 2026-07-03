@@ -229,24 +229,29 @@ pub fn extract_rust_step_texts(
 pub fn extract_jvm_step_texts(path: &Path, sm: &mut StepMatcher) -> std::result::Result<(), Error> {
     let content = fs::read_to_string(path)?;
     let path_s = path.to_string_lossy();
-    for line in content.lines() {
-        for caps in jvm_step_re().captures_iter(line) {
-            let raw = caps
-                .get(1)
-                .expect("capture group 1 always present")
-                .as_str();
-            // Java/Kotlin string literals require a doubled backslash (`\\`)
-            // to embed a single `\` at runtime — e.g. a `^`-anchored regex
-            // source `\\?` (escaped literal `?`) or a Cucumber-expression
-            // source `\\/`/`\\{`/`\\}` (escaped literal `/`/`{`/`}`) both
-            // compile to one runtime backslash. The regex capture pulls raw
-            // source bytes, so it must be unescaped to the true runtime
-            // string value before `add_step_to_matcher_with_origin` decides
-            // whether that value is a regex, a Cucumber expression, or an
-            // exact literal — otherwise doubled backslashes are misread
-            // (e.g. `\\?` as "zero-or-one backslash", never matching `?`).
-            add_step_to_matcher_with_origin(sm, &unescape_string(raw), &path_s);
-        }
+    // Scan the whole file content, not line-by-line: formatters routinely
+    // wrap long step strings onto their own line (`@When(\n  "..."\n)`), and
+    // a per-line scan would never see the opening paren, string, and closing
+    // paren in a single match. `jvm_step_re()` needs no dotall flag for this
+    // — it has no `.` metacharacter, and its negated character classes
+    // (`[^"\\]`) already match `\n` — so matching against `&content` (like
+    // `extract_dart_step_texts` already does) is sufficient.
+    for caps in jvm_step_re().captures_iter(&content) {
+        let raw = caps
+            .get(1)
+            .expect("capture group 1 always present")
+            .as_str();
+        // Java/Kotlin string literals require a doubled backslash (`\\`)
+        // to embed a single `\` at runtime — e.g. a `^`-anchored regex
+        // source `\\?` (escaped literal `?`) or a Cucumber-expression
+        // source `\\/`/`\\{`/`\\}` (escaped literal `/`/`{`/`}`) both
+        // compile to one runtime backslash. The regex capture pulls raw
+        // source bytes, so it must be unescaped to the true runtime
+        // string value before `add_step_to_matcher_with_origin` decides
+        // whether that value is a regex, a Cucumber expression, or an
+        // exact literal — otherwise doubled backslashes are misread
+        // (e.g. `\\?` as "zero-or-one backslash", never matching `?`).
+        add_step_to_matcher_with_origin(sm, &unescape_string(raw), &path_s);
     }
     Ok(())
 }
@@ -593,6 +598,30 @@ mod tests {
         extract_jvm_step_texts(&p, &mut sm).unwrap();
         assert!(sm.matches(
             "alice sends GET /api/v1/reports/pl?from=2025-01-01&to=2025-01-31&currency=USD"
+        ));
+    }
+
+    #[test]
+    fn jvm_step_regex_matches_annotation_split_across_lines() {
+        // Kotlin/Java formatters wrap long step strings onto their own line:
+        // `@When(\n  "..."\n)`. The extractor previously scanned line-by-line
+        // (`for line in content.lines()`), so `jvm_step_re()` — which needs
+        // the opening paren, string, and closing paren on one match — never
+        // saw the annotation at all, silently dropping the step definition.
+        // None of the character classes in the pattern need a dotall flag
+        // (there is no `.` metacharacter — `[^"\\]` already matches `\n`),
+        // so scanning the whole file content (like the Dart extractor
+        // already does) is sufficient to fix this.
+        let tmp = TempDir::new().unwrap();
+        let p = write(
+            tmp.path(),
+            "AuthSteps.kt",
+            "@When(\n  \"^the client sends POST /api/v1/auth/login with body \\\\{ \\\"username\\\": \\\"([^\\\"]+)\\\", \\\"password\\\": \\\"([^\\\"]+)\\\" \\\\}$\"\n)\nfun step() {}\n",
+        );
+        let mut sm = StepMatcher::new();
+        extract_jvm_step_texts(&p, &mut sm).unwrap();
+        assert!(sm.matches(
+            r#"the client sends POST /api/v1/auth/login with body { "username": "alice", "password": "Str0ng#Pass1" }"#
         ));
     }
 
