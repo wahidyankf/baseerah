@@ -326,18 +326,32 @@ validate`) via the `assert_cmd` subprocess-spawn pattern (matching the sibling b
     Then steps into one regex-parametrized step. Still 9/9, 0 skipped. `clippy -D warnings` + `fmt --check`
     clean.
 
-### 1b. De-hollow `docs` (43/69 skipped → 0)
+### 1b. De-hollow `docs` (43/69 skipped → 0; corrected to 52/78 post-§1·0-split)
 
-- [ ] [AI] **RED**: align step strings in `apps/rhino-cli/tests/docs.rs` to the `md` command names
+> **Scope correction (2026-07-04)**: post-§1·0-split, `gherkin/md/**` has 7 feature files / 78 scenarios
+> (the original 5 `docs-*.feature` files + 2 split-in `repo-governance-frontmatter-audit.feature` /
+> `repo-governance-readme-index-audit.feature`). Treat "78 scenarios (78 passed)" as the corrected
+> acceptance target below.
+
+- [x] [AI] **RED**: align step strings in `apps/rhino-cli/tests/docs.rs` to the `md` command names
       (`md links validate`, `md mermaid validate`, `md heading-hierarchy validate`, `md naming validate`,
       `md frontmatter validate`, `md frontmatter-dates validate`, `md readme-index validate`, `md audit`).
       Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test docs`. Acceptance: scenarios execute (not skipped).
+  - **Done 2026-07-04.** Confirmed 78 total / 52 skipped baseline exactly. Resolved one prose/command
+    mismatch: `repo-governance-frontmatter-audit.feature`'s text says "md frontmatter validate" but per
+    `gherkin/md/README.md` it actually binds to `md frontmatter-dates validate` — bound to the documented
+    intent, not the literal (misleading) prose.
   - **Gherkin (binds) →** — aggregate BDD binder for all 69 scenarios in `gherkin/md/**`:
     "A flowchart with all short node labels passes validation"; "A node label exceeding the character limit is flagged"; "The max label length is configurable via flag"; "A deep sequential flowchart (long chain) passes validation regardless of depth"; "A TB flowchart with at most 3 nodes per rank passes validation"; "A TB flowchart with 4 nodes at one rank is flagged"; "A LR flowchart with at most 3 nodes per rank passes validation"; "A LR flowchart with a chain 4 levels deep is flagged"; "The max width is configurable via flag"; "A flowchart exceeding both width and depth thresholds passes with a warning"; "The max depth threshold for the both-exceeded warning is configurable via flag"; "A mermaid block with a single flowchart passes validation"; "A mermaid block with two flowchart declarations is flagged"; "A mermaid block using the graph keyword alias is validated identically"; "Non-flowchart mermaid blocks are ignored"; "A markdown file with no mermaid blocks passes validation"; "With --staged-only only staged markdown files are checked"; "With --changed-only only files changed since upstream are checked"; "JSON output contains structured violation data"; "Markdown output produces a formatted table"; "Verbose flag includes per-file detail in text output"; "Quiet flag suppresses non-error output when there are no violations"; "Plans directory is scanned by default"; "A multi-target edge with the & operator expands into separate edges"; "Multi-source and multi-target on both sides expand into a Cartesian product"; "A 5-target fan-out triggers width violation under default threshold"; "A subgraph with 7 child nodes emits subgraph density warning"; "A subgraph with 6 children passes default threshold"; "Subgraph density threshold is configurable"; "Existing diagrams without & or large subgraphs are unaffected"; "exclude flag skips the named subtree"; "repo-wide default scan finds violation outside the legacy default directories"; "A pipe-labeled edge is parsed as an edge"; "A cyclic flowchart ranks as its underlying chain"; "Software-engineering doc with all required frontmatter fields passes"; "Software-engineering doc missing title fails"; "Software-engineering doc missing category field fails"; "Software-engineering doc with category other than software fails"; "Governance doc with only title passes the lighter schema"; "Software-engineering doc with Diataxis tutorial category passes"; "Software-engineering doc with Diataxis how-to category passes"; "Software-engineering doc with Diataxis reference category passes"; "Software-engineering doc with Diataxis explanation category passes"; "Software-engineering doc with deprecated software category emits warn not fail"; "A document set with all valid internal links passes validation"; "A broken internal link is detected and reported"; "External URLs are not validated"; "With --staged-only only staged files are checked"; "exclude flag skips the named subtree"; "repo-wide scan finds broken link outside original three-directory scope"; "valid anchor link passes validation"; "broken anchor link produces a broken-anchor finding"; "same-file anchor with no matching heading produces a broken-anchor finding"; "anchor slugs keep underscores per the GitHub reference algorithm"; "Tree where every .md has exactly one H1 and no skipped levels passes"; "File with two H1 headings fails"; "File with H2 followed directly by H4 (skipping H3) fails"; "Single-line file with no headings is ignored (passes)"; "prose-allowlist-runs — docs file triggers a heading finding"; "agent-skill-file-exempt — no finding for agent or skill files"; "plans-done-excluded — no finding for plans/done files"; "exclude-flag-suppresses-tree — --exclude docs suppresses docs findings"; "specs-allowlisted — specs tree triggers a heading finding"; "app-readme-allowlisted — project-root README triggers a heading finding"; "app-internals-default-deny — deep app files yield no finding"; "project-docs-subtree-allowlisted — app and lib docs trees trigger findings"; "Tree where every markdown file uses lowercase kebab-case passes"; "File with uppercase characters fails"; "README.md is exempt and passes regardless of placement"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: satisfy each executing scenario at root cause. Command: same.
-      Acceptance: `69 scenarios (69 passed)`, `0 skipped`.
-- [ ] [AI] **REFACTOR**: dedupe helpers. Command: same. Acceptance: `0 skipped`.
+- [x] [AI] **GREEN**: satisfy each executing scenario at root cause. Command: same.
+      Acceptance: `78 scenarios (78 passed)` (corrected count), `0 skipped`.
+  - **Done 2026-07-04.** All 78 passed on first execution after step-string alignment — no source code
+    under `src/` required any change; used `rhino_cli::domain::mermaid::{extract_blocks,parse_diagram,
+depth}` directly (not CLI subprocess) for the 4 internal parser-behavior scenarios. Suite-wide skip
+    count: 86→34.
+- [x] [AI] **REFACTOR**: dedupe helpers. Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** Still 78/78, 0 skipped. `clippy -D warnings` + `fmt --check` clean.
 
 ### 1c. De-hollow `agents` (13/28 skipped → 0)
 

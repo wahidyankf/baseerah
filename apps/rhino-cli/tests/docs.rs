@@ -1,10 +1,13 @@
-//! Cucumber-rs integration tests for the `docs validate-links`,
-//! `docs validate-mermaid`, and `docs validate-heading-hierarchy` commands.
+//! Cucumber-rs integration tests for the `md links`, `md mermaid`,
+//! `md heading-hierarchy`, `md naming`, `md frontmatter`, `md frontmatter-dates`,
+//! and `md readme-index` commands.
 //!
 //! Wires the behavior-contract feature files at
 //! `specs/apps/rhino/behavior/rhino-cli/gherkin/md/` to step definitions that
 //! synthesize markdown fixtures inside a fresh git-rooted temp workspace and
 //! drive the compiled `rhino-cli` binary, asserting on output and exit code.
+//! A handful of Mermaid-parser scenarios call the pure `domain::mermaid`
+//! parser directly instead of spawning the binary.
 
 // Test step-definition scaffolding: private World state and step fns are
 // self-documenting via their #[given]/#[when]/#[then] gherkin strings.
@@ -17,6 +20,7 @@ use std::process::Output;
 
 use assert_cmd::cargo::cargo_bin;
 use cucumber::{World as _, given, then, when};
+use rhino_cli::domain::mermaid::{depth as mermaid_depth, extract_blocks, parse_diagram};
 use tempfile::TempDir;
 
 /// Shared scenario state. Each scenario gets a fresh git-rooted temp workspace
@@ -32,19 +36,26 @@ struct DocsWorld {
     /// reachable with non-default thresholds, since the local Go default
     /// `--max-depth` is unlimited.
     mermaid_thresholds: Option<(i64, i64)>,
-    /// When true, the plain `validate-mermaid` run uses the default repo-wide
-    /// scan (no positional `docs` path). Set by fixtures that live outside
-    /// `docs/` and exercise the plan DD-3 repo-wide default scan.
-    mermaid_default_scan: bool,
-    /// Repo-relative path of the fixture file that carries the broken link,
-    /// asserted by the shared "identifies the file" Then step.
-    broken_source: Option<String>,
     /// Link text of the fixture's broken-anchor link, asserted by the
-    /// broken-anchor Then step.
+    /// broken-anchor Then steps.
     broken_anchor_link: Option<String>,
-    /// Repo-relative path of the heading-hierarchy fixture file, asserted by
-    /// the heading-finding Then steps.
-    heading_file: Option<String>,
+    /// Repo-relative path of a fixture file asserted by "identifies"/"mentions"
+    /// Then steps shared across the links, mermaid, heading-hierarchy,
+    /// frontmatter-dates, and readme-index domains.
+    file_a: Option<String>,
+    /// Second repo-relative fixture path, used by scenarios that assert on two
+    /// files simultaneously (e.g. an `--exclude` scenario).
+    file_b: Option<String>,
+    /// Explicit positional target for `md frontmatter-dates validate`, set by
+    /// fixtures that must scan a specific subtree rather than the command's
+    /// default paths.
+    frontmatter_target: Option<String>,
+    /// Edges produced by the last direct `parse_diagram` call, asserted by the
+    /// "the parser processes the file" scenarios.
+    parsed_edges: Vec<(String, String)>,
+    /// Diagram depth (distinct rank count) computed by the last direct
+    /// `parse_diagram` call.
+    parsed_depth: usize,
     output: Option<Output>,
 }
 
@@ -65,10 +76,12 @@ impl DocsWorld {
             work,
             extra_args: Vec::new(),
             mermaid_thresholds: None,
-            mermaid_default_scan: false,
-            broken_source: None,
             broken_anchor_link: None,
-            heading_file: None,
+            file_a: None,
+            file_b: None,
+            frontmatter_target: None,
+            parsed_edges: Vec::new(),
+            parsed_depth: 0,
             output: None,
         }
     }
@@ -137,7 +150,7 @@ fn init_git_repo(dir: &std::path::Path) {
 }
 
 // ===========================================================================
-// validate-links steps
+// md links validate steps
 // ===========================================================================
 
 #[given("markdown files where all internal links point to existing files")]
@@ -152,49 +165,7 @@ fn given_links_broken(w: &mut DocsWorld) {
         "docs/index.md",
         "# Index\nSee [missing](./does-not-exist.md).\n",
     );
-    w.broken_source = Some("docs/index.md".to_string());
-}
-
-#[given("a markdown file with a broken link inside a directory tree")]
-fn given_links_broken_in_tree(w: &mut DocsWorld) {
-    w.write(
-        "legacy/notes.md",
-        "# Notes\nSee [missing](./does-not-exist.md).\n",
-    );
-}
-
-#[given("a markdown file under libs with a link pointing to a non-existent file")]
-fn given_links_broken_under_libs(w: &mut DocsWorld) {
-    w.write(
-        "libs/my-lib/README.md",
-        "# Lib\nSee [missing](./does-not-exist.md).\n",
-    );
-    w.broken_source = Some("libs/my-lib/README.md".to_string());
-}
-
-#[given("a markdown file with a link to an existing file whose anchor matches no heading")]
-fn given_links_broken_anchor(w: &mut DocsWorld) {
-    w.write("docs/chapter.md", "# Chapter\n\n## Real Section\n\ntext\n");
-    w.write(
-        "docs/index.md",
-        "# Index\nSee [X](./chapter.md#missing-section).\n",
-    );
-    w.broken_anchor_link = Some("./chapter.md#missing-section".to_string());
-}
-
-#[given("a markdown file with a link to an existing file whose anchor matches a heading")]
-fn given_links_valid_anchor(w: &mut DocsWorld) {
-    w.write("docs/chapter.md", "# Chapter\n\n## Real Section\n\ntext\n");
-    w.write(
-        "docs/index.md",
-        "# Index\nSee [X](./chapter.md#real-section).\n",
-    );
-}
-
-#[given("a markdown file with a pure-anchor link that matches no heading in the same file")]
-fn given_links_same_file_broken_anchor(w: &mut DocsWorld) {
-    w.write("docs/index.md", "# Title\n\nSee [X](#own-section).\n");
-    w.broken_anchor_link = Some("#own-section".to_string());
+    w.file_a = Some("docs/index.md".to_string());
 }
 
 #[given("a markdown file containing only external HTTPS links")]
@@ -209,7 +180,69 @@ fn given_links_external(w: &mut DocsWorld) {
 fn given_links_broken_unstaged(w: &mut DocsWorld) {
     // The file exists on disk with a broken link but is NOT staged.
     w.write("docs/unstaged.md", "[bad](./nope.md)\n");
-    // Ensure nothing is staged.
+}
+
+#[given("a markdown file under plans/done with a broken internal link")]
+fn given_links_plans_done(w: &mut DocsWorld) {
+    w.write(
+        "plans/done/2024-01-01__old/notes.md",
+        "# Notes\nSee [missing](./does-not-exist.md).\n",
+    );
+    w.file_a = Some("plans/done/2024-01-01__old/notes.md".to_string());
+}
+
+#[given("a markdown file under docs with a different broken internal link")]
+fn given_links_docs_broken(w: &mut DocsWorld) {
+    w.write("docs/other.md", "# Other\nSee [gone](./also-missing.md).\n");
+    w.file_b = Some("docs/other.md".to_string());
+}
+
+#[given("a markdown file under libs with a broken internal link")]
+fn given_links_libs(w: &mut DocsWorld) {
+    w.write(
+        "libs/my-lib/README.md",
+        "# Lib\nSee [missing](./does-not-exist.md).\n",
+    );
+    w.file_a = Some("libs/my-lib/README.md".to_string());
+}
+
+#[given("a markdown file that links to an existing heading anchor in another file")]
+fn given_links_valid_anchor(w: &mut DocsWorld) {
+    w.write("docs/chapter.md", "# Chapter\n\n## Real Section\n\ntext\n");
+    w.write(
+        "docs/index.md",
+        "# Index\nSee [X](./chapter.md#real-section).\n",
+    );
+}
+
+#[given("a markdown file that links to a non-existent heading anchor in an existing file")]
+fn given_links_broken_anchor(w: &mut DocsWorld) {
+    w.write("docs/chapter.md", "# Chapter\n\n## Real Section\n\ntext\n");
+    w.write(
+        "docs/index.md",
+        "# Index\nSee [X](./chapter.md#missing-section).\n",
+    );
+    w.broken_anchor_link = Some("./chapter.md#missing-section".to_string());
+}
+
+#[given("a markdown file containing a same-file anchor link that has no matching heading")]
+fn given_links_same_file_anchor(w: &mut DocsWorld) {
+    w.write("docs/index.md", "# Title\n\nSee [X](#own-section).\n");
+    w.broken_anchor_link = Some("#own-section".to_string());
+}
+
+#[given(
+    "a markdown file that links to the anchor \"#snake_case\" of a file whose heading is \"snake_case\""
+)]
+fn given_links_snake_case_anchor(w: &mut DocsWorld) {
+    // "concepts.md" (not "target.md") — `should_skip_link` treats any link
+    // containing the substring "target" as a placeholder and skips it, which
+    // would make this fixture pass regardless of the underscore-slug behavior.
+    w.write("docs/concepts.md", "# snake_case\n\ntext\n");
+    w.write(
+        "docs/index.md",
+        "# Index\nSee [X](./concepts.md#snake_case).\n",
+    );
 }
 
 #[when("the developer runs docs validate-links")]
@@ -223,11 +256,9 @@ fn when_links_run_staged(w: &mut DocsWorld) {
     w.exec(&["md", "links", "validate"]);
 }
 
-#[when("the developer runs docs validate-links with the --exclude flag for that tree")]
-fn when_links_run_exclude(w: &mut DocsWorld) {
-    w.extra_args.push("--exclude".to_string());
-    w.extra_args.push("legacy".to_string());
-    w.exec(&["md", "links", "validate"]);
+#[when("the developer runs docs validate-links with --exclude plans/done")]
+fn when_links_exclude_plans_done(w: &mut DocsWorld) {
+    w.exec(&["md", "links", "validate", "--exclude", "plans/done"]);
 }
 
 #[then("the output reports no broken links found")]
@@ -241,15 +272,17 @@ fn then_links_none(w: &mut DocsWorld) {
 }
 
 #[then("the output identifies the file containing the broken link")]
+#[then("the output identifies the libs file containing the broken link")]
 fn then_links_identifies(w: &mut DocsWorld) {
     let out = w.stdout();
-    let source = w.broken_source.clone().expect("fixture set broken_source");
+    let source = w.file_a.clone().expect("fixture set file_a");
     assert!(out.contains("Broken Links Report"), "got: {out}");
     assert!(out.contains(&source), "got: {out}");
     assert!(out.contains("./does-not-exist.md"), "got: {out}");
 }
 
-#[then("the output reports a broken-anchor finding for the link")]
+#[then("the output identifies the broken anchor")]
+#[then("the output identifies the broken same-file anchor")]
 fn then_links_broken_anchor(w: &mut DocsWorld) {
     let out = w.stdout();
     let link = w
@@ -261,7 +294,7 @@ fn then_links_broken_anchor(w: &mut DocsWorld) {
 }
 
 // ===========================================================================
-// validate-mermaid steps
+// md mermaid validate steps (CLI-driven)
 // ===========================================================================
 
 fn mermaid_block(body: &str) -> String {
@@ -332,9 +365,10 @@ fn given_m_lr_width_ok(w: &mut DocsWorld) {
     );
 }
 
-#[given("a markdown file containing an LR flowchart where depth spans 4 levels")]
-fn given_m_lr_depth_4(w: &mut DocsWorld) {
-    // LR: horizontal = depth. 6-node chain → depth 6 > 4 → width_exceeded.
+#[given("a markdown file containing an LR flowchart with a chain that is 4 levels deep")]
+fn given_m_lr_chain_deep(w: &mut DocsWorld) {
+    // LR: horizontal = depth. A 6-node chain → depth 6 > default max-width 4 →
+    // width_exceeded (span stays 1, so only the horizontal/depth axis trips).
     let mut body = String::from("flowchart LR");
     for i in 0..5 {
         let _ = write!(body, "\n    N{i} --> N{}", i + 1);
@@ -427,10 +461,7 @@ fn given_m_violation_unstaged(w: &mut DocsWorld) {
 #[given("a markdown file with a mermaid violation that is not in the push range")]
 fn given_m_violation_not_pushed(w: &mut DocsWorld) {
     // Commit the violating file, then mark that commit as the upstream so the
-    // later clean-file commit is the only thing in the push range. The
-    // repo-wide default scan (plan DD-3) means there is no longer any
-    // "outside scanned dirs" location, so the fixture must genuinely sit
-    // upstream of the push range for --changed-only to skip it.
+    // later clean-file commit is the only thing in the push range.
     w.write(
         "outside/d.md",
         &mermaid_block(
@@ -475,71 +506,103 @@ fn given_m_plans_violation(w: &mut DocsWorld) {
     );
 }
 
-#[given(
-    "a markdown file outside the docs, repo-governance, .claude, and plans directories containing a flowchart with a node label longer than the limit"
-)]
-fn given_m_violation_outside_old_dirs(w: &mut DocsWorld) {
-    // Plan DD-3: the default scan is repo-wide, so a violation under a tree
-    // outside the historical four-dir set must be reported.
+#[given("a markdown file with a flowchart \"T --> A & B & C & D & E\"")]
+fn given_m_fanout_5(w: &mut DocsWorld) {
     w.write(
-        "services/notes.md",
-        &mermaid_block(
-            "flowchart TD\n    A[This label is definitely longer than thirty characters total]",
-        ),
+        "docs/d.md",
+        &mermaid_block("flowchart TD\n    T --> A & B & C & D & E"),
     );
-    w.mermaid_default_scan = true;
 }
 
-#[given(
-    "a markdown file containing a flowchart with a node label longer than the limit placed under a subdirectory to be excluded"
-)]
-fn given_m_violation_under_excluded_subdir(w: &mut DocsWorld) {
-    // Plan DD-2: the repo-wide default scan would report this file unless the
-    // When step's --exclude prefix drops it.
+#[given("a markdown file containing a flowchart with a subgraph that holds 7 child nodes")]
+fn given_m_subgraph_7(w: &mut DocsWorld) {
     w.write(
-        "legacy-diagrams/old.md",
+        "docs/d.md",
         &mermaid_block(
-            "flowchart TD\n    A[This label is definitely longer than thirty characters total]",
+            "flowchart TD\n    subgraph WF [Group]\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    F --> G\n    end",
         ),
     );
 }
 
-#[given(
-    "a markdown file containing a flowchart where one edge uses the pipe-label syntax A -->|text| B"
-)]
-fn given_m_pipe_labeled_edge(w: &mut DocsWorld) {
+#[given("a markdown file containing a flowchart with a subgraph that holds exactly 6 child nodes")]
+fn given_m_subgraph_6(w: &mut DocsWorld) {
     w.write(
         "docs/d.md",
-        &mermaid_block("flowchart TD\n    A -->|text| B"),
+        &mermaid_block(
+            "flowchart TD\n    subgraph WF [Group]\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    end",
+        ),
     );
-    // Rank observation (plan DD-14 fix 1): with --max-width 0 --max-depth 1
-    // the complex_diagram warning reports the actual span/depth without
-    // failing the run. A correctly parsed pipe-labeled edge yields the chain
-    // A->B (span 1, depth 2); the old parser dropped the edge and node B.
-    w.mermaid_thresholds = Some((0, 1));
 }
 
-#[given("a markdown file containing a flowchart with the cycle A-->B-->C-->A")]
-fn given_m_cycle(w: &mut DocsWorld) {
+#[given("a markdown file containing a flowchart with a subgraph that holds 5 child nodes")]
+fn given_m_subgraph_5(w: &mut DocsWorld) {
     w.write(
         "docs/d.md",
-        &mermaid_block("flowchart TD\n    A-->B-->C-->A"),
+        &mermaid_block(
+            "flowchart TD\n    subgraph WF [Group]\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    end",
+        ),
     );
-    // Rank observation (plan DD-14 fix 2): with --max-width 0 --max-depth 1
-    // the complex_diagram warning reports the actual span/depth without
-    // failing the run. After back-edge removal the cycle ranks as the chain
-    // A->B->C (span 1, depth 3); the old fallback ranked all nodes 0 (span 3).
-    w.mermaid_thresholds = Some((0, 1));
+}
+
+#[given("a markdown file with a flowchart using only single-target edges and small subgraphs")]
+fn given_m_small_subgraph(w: &mut DocsWorld) {
+    w.write(
+        "docs/d.md",
+        &mermaid_block("flowchart TD\n    A --> B\n    subgraph WF [Group]\n    C --> D\n    end"),
+    );
+}
+
+#[given("a markdown file under plans/done containing a flowchart with a width violation")]
+fn given_m_plans_done_width(w: &mut DocsWorld) {
+    w.write(
+        "plans/done/2024-01-01__old/notes.md",
+        &mermaid_block(
+            "flowchart TD\n    R --> A\n    R --> B\n    R --> C\n    R --> D\n    R --> E",
+        ),
+    );
+    w.file_a = Some("plans/done/2024-01-01__old/notes.md".to_string());
+}
+
+#[given("a markdown file under docs containing a flowchart with a different width violation")]
+fn given_m_docs_width(w: &mut DocsWorld) {
+    w.write(
+        "docs/wide.md",
+        &mermaid_block(
+            "flowchart TD\n    S --> P\n    S --> Q\n    S --> R\n    S --> T\n    S --> U",
+        ),
+    );
+    w.file_b = Some("docs/wide.md".to_string());
+}
+
+#[given("a markdown file under specs/ containing a flowchart with a width violation")]
+fn given_m_specs_width(w: &mut DocsWorld) {
+    w.write(
+        "specs/apps/foo/notes.md",
+        &mermaid_block(
+            "flowchart TD\n    R --> A\n    R --> B\n    R --> C\n    R --> D\n    R --> E",
+        ),
+    );
+    w.file_a = Some("specs/apps/foo/notes.md".to_string());
+}
+
+#[given("a markdown file with a flowchart forming the cycle A --> B --> C --> A")]
+fn given_m_cycle_default(w: &mut DocsWorld) {
+    w.write(
+        "docs/d.md",
+        &mermaid_block("flowchart TD\n    A --> B\n    B --> C\n    C --> A"),
+    );
 }
 
 // --- mermaid When steps ---
 
 #[when("the developer runs docs validate-mermaid")]
 fn when_m_run(w: &mut DocsWorld) {
-    let mut args: Vec<String> = vec!["md".into(), "mermaid".into(), "validate".into()];
-    if !w.mermaid_default_scan {
-        args.push("docs".into());
-    }
+    let mut args: Vec<String> = vec![
+        "md".into(),
+        "mermaid".into(),
+        "validate".into(),
+        "docs".into(),
+    ];
     if let Some((mw, md)) = w.mermaid_thresholds {
         args.push("--max-width".into());
         args.push(mw.to_string());
@@ -617,15 +680,27 @@ fn when_m_no_paths(w: &mut DocsWorld) {
     w.exec(&["md", "mermaid", "validate"]);
 }
 
-#[when("the developer runs docs validate-mermaid with --exclude pointing at that subdirectory")]
-fn when_m_run_exclude(w: &mut DocsWorld) {
-    // Default repo-wide scan with the violating subtree excluded by prefix.
-    w.exec(&["md", "mermaid", "validate", "--exclude", "legacy-diagrams"]);
+#[when("the developer runs docs validate-mermaid with --max-subgraph-nodes 4")]
+fn when_m_subgraph_nodes_4(w: &mut DocsWorld) {
+    w.exec(&[
+        "md",
+        "mermaid",
+        "validate",
+        "docs",
+        "--max-subgraph-nodes",
+        "4",
+    ]);
+}
+
+#[when("the developer runs docs validate-mermaid with --exclude plans/done")]
+fn when_m_exclude_plans_done(w: &mut DocsWorld) {
+    w.exec(&["md", "mermaid", "validate", "--exclude", "plans/done"]);
 }
 
 // --- mermaid Then steps ---
 
 #[then("the output reports no violations")]
+#[then("the output reports no new violations or warnings introduced by these fixes")]
 fn then_m_no_violations(w: &mut DocsWorld) {
     assert!(
         w.stdout().contains("Found 0 violation(s)"),
@@ -717,116 +792,241 @@ fn then_m_plans(w: &mut DocsWorld) {
     assert!(out.contains("label_too_long"), "got: {out}");
 }
 
-#[then("the output identifies the violation in that file")]
-fn then_m_outside_violation(w: &mut DocsWorld) {
+#[then("the output identifies the rank with 5 parallel nodes")]
+fn then_m_fanout_detail(w: &mut DocsWorld) {
     let out = w.stdout();
-    assert!(out.contains("services/notes.md"), "got: {out}");
-    assert!(out.contains("label_too_long"), "got: {out}");
+    assert!(out.contains("width_exceeded"), "got: {out}");
+    assert!(out.contains("span 5"), "got: {out}");
 }
 
-#[then("the output reports that node B is ranked one level below node A")]
-fn then_m_pipe_rank(w: &mut DocsWorld) {
-    // The complex_diagram warning (thresholds set by the Given step) carries
-    // the computed span/depth: a two-node chain means B sits one rank below A.
-    let out = w.stdout();
+#[then("the output contains a warning about subgraph density")]
+fn then_m_subgraph_warn(w: &mut DocsWorld) {
     assert!(
-        out.contains("span 1 (max 0) and depth 2 (max 1) both exceeded"),
-        "got: {out}"
+        w.stdout().contains("subgraph_density"),
+        "got: {}",
+        w.stdout()
     );
 }
 
-#[then("the output reports the diagram has span 1 and depth 3")]
-fn then_m_cycle_chain(w: &mut DocsWorld) {
-    // The complex_diagram warning (thresholds set by the Given step) carries
-    // the computed span/depth: span 1, depth 3 proves the cycle ranked as the
-    // chain A->B->C after back-edge removal.
-    let out = w.stdout();
+#[then("the output contains no subgraph density warning")]
+fn then_m_no_subgraph_warn(w: &mut DocsWorld) {
     assert!(
-        out.contains("span 1 (max 0) and depth 3 (max 1) both exceeded"),
-        "got: {out}"
+        !w.stdout().contains("subgraph_density"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+#[then("the output does not mention the plans/done file")]
+fn then_no_mention_plans_done(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(!out.contains(&f), "got: {out}");
+}
+
+#[then("the output does mention the docs file")]
+fn then_mentions_docs_file(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_b.clone().expect("fixture set file_b");
+    assert!(out.contains(&f), "got: {out}");
+}
+
+#[then("the output identifies the file under specs/")]
+fn then_m_specs_detail(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(out.contains("width_exceeded"), "got: {out}");
+    assert!(out.contains(&f), "got: {out}");
+}
+
+#[then("no width violation is reported for the cycle members")]
+fn then_m_cycle_no_width(w: &mut DocsWorld) {
+    assert!(
+        !w.stdout().contains("width_exceeded"),
+        "got: {}",
+        w.stdout()
     );
 }
 
 // ===========================================================================
-// validate-heading-hierarchy steps
+// md mermaid validate steps (direct parser, no subprocess)
 // ===========================================================================
 
-// --- heading Given steps ---
-
-#[given("a markdown file under docs with two H1 headings")]
-fn given_h_docs_two_h1s(w: &mut DocsWorld) {
-    w.write("docs/guide.md", "# First Title\n\ntext\n\n# Second Title\n");
-    w.heading_file = Some("docs/guide.md".to_string());
-}
-
-#[given("a markdown file under docs with no H1 heading")]
-fn given_h_docs_no_h1(w: &mut DocsWorld) {
-    w.write("docs/notes.md", "## Only A Section\n\ntext\n");
-    w.heading_file = Some("docs/notes.md".to_string());
-}
-
-#[given("a markdown file under docs that jumps from H1 directly to H3")]
-fn given_h_docs_skipped_level(w: &mut DocsWorld) {
-    w.write("docs/jump.md", "# Title\n\n### Jumped Here\n");
-    w.heading_file = Some("docs/jump.md".to_string());
-}
-
-#[given("a markdown file under .claude/agents with zero H1 headings")]
-fn given_h_claude_agent_no_h1(w: &mut DocsWorld) {
+#[given("a markdown file with a flowchart line \"A --> B & C & D\"")]
+fn given_parser_multi_target(w: &mut DocsWorld) {
     w.write(
-        ".claude/agents/swe-rust-dev.md",
-        "## No H1 In Agent Files\n\nbody\n",
+        "docs/parser.md",
+        &mermaid_block("flowchart TD\n    A --> B & C & D"),
     );
-    w.heading_file = Some(".claude/agents/swe-rust-dev.md".to_string());
 }
 
-#[given("a SKILL.md file under .claude/skills with multiple H1 headings")]
-fn given_h_skill_many_h1s(w: &mut DocsWorld) {
+#[given("a markdown file with a flowchart line \"A & B --> C & D\"")]
+fn given_parser_cartesian(w: &mut DocsWorld) {
     w.write(
-        ".claude/skills/example/SKILL.md",
-        "# One\n\n# Two\n\n# Three\n",
+        "docs/parser.md",
+        &mermaid_block("flowchart TD\n    A & B --> C & D"),
     );
-    w.heading_file = Some(".claude/skills/example/SKILL.md".to_string());
 }
 
-#[given("a markdown file under plans/done with a skipped heading level")]
-fn given_h_plans_done_skipped(w: &mut DocsWorld) {
+#[given("a markdown file with a flowchart line \"A -->|yes| B\"")]
+fn given_parser_pipe_label(w: &mut DocsWorld) {
     w.write(
-        "plans/done/2026-01-01__archived/delivery.md",
-        "# Title\n\n### Skipped In Archive\n",
+        "docs/parser.md",
+        &mermaid_block("flowchart TD\n    A -->|yes| B"),
     );
-    w.heading_file = Some("plans/done/2026-01-01__archived/delivery.md".to_string());
 }
 
-#[given("an apps/example/README.md file with a skipped heading level")]
-fn given_h_apps_readme_skipped(w: &mut DocsWorld) {
-    w.write(
-        "apps/example/README.md",
-        "# Example\n\n### Skipped In Readme\n",
-    );
-    w.heading_file = Some("apps/example/README.md".to_string());
+#[when("the parser processes the file")]
+fn when_parser_processes_file(w: &mut DocsWorld) {
+    let content =
+        std::fs::read_to_string(w.work.path().join("docs/parser.md")).expect("read fixture");
+    let blocks = extract_blocks("docs/parser.md", &content);
+    let block = blocks
+        .into_iter()
+        .next()
+        .expect("fixture has one mermaid block");
+    let (diagram, _count) = parse_diagram(block);
+    w.parsed_depth = mermaid_depth(&diagram.nodes, &diagram.edges);
+    w.parsed_edges = diagram
+        .edges
+        .iter()
+        .map(|e| (e.from.clone(), e.to.clone()))
+        .collect();
 }
 
-#[given("a markdown file at apps/example/src/notes.md with zero H1 headings")]
-fn given_h_apps_internal_no_h1(w: &mut DocsWorld) {
-    w.write(
-        "apps/example/src/notes.md",
-        "## Zero H1s Here But Default-Denied\n",
-    );
-    w.heading_file = Some("apps/example/src/notes.md".to_string());
+#[then("three edges are produced: A->B, A->C, A->D")]
+fn then_parser_three_edges(w: &mut DocsWorld) {
+    assert_eq!(w.parsed_edges.len(), 3, "got: {:?}", w.parsed_edges);
+    for pair in [("A", "B"), ("A", "C"), ("A", "D")] {
+        assert!(
+            w.parsed_edges
+                .iter()
+                .any(|(f, t)| f == pair.0 && t == pair.1),
+            "missing edge {pair:?} in {:?}",
+            w.parsed_edges
+        );
+    }
 }
 
-#[given("a markdown file under docs with a duplicate H1")]
-fn given_h_docs_duplicate_h1(w: &mut DocsWorld) {
+#[then("nodes B, C, D each have an in-edge from A")]
+fn then_parser_bcd_in_edges(w: &mut DocsWorld) {
+    for target in ["B", "C", "D"] {
+        assert!(
+            w.parsed_edges.iter().any(|(f, t)| f == "A" && t == target),
+            "node {target} missing in-edge from A: {:?}",
+            w.parsed_edges
+        );
+    }
+}
+
+#[then("four edges are produced: A->C, A->D, B->C, B->D")]
+fn then_parser_four_edges(w: &mut DocsWorld) {
+    assert_eq!(w.parsed_edges.len(), 4, "got: {:?}", w.parsed_edges);
+    for pair in [("A", "C"), ("A", "D"), ("B", "C"), ("B", "D")] {
+        assert!(
+            w.parsed_edges
+                .iter()
+                .any(|(f, t)| f == pair.0 && t == pair.1),
+            "missing edge {pair:?} in {:?}",
+            w.parsed_edges
+        );
+    }
+}
+
+#[then("one edge is produced: A->B")]
+fn then_parser_one_edge(w: &mut DocsWorld) {
+    assert_eq!(
+        w.parsed_edges,
+        vec![("A".to_string(), "B".to_string())],
+        "got: {:?}",
+        w.parsed_edges
+    );
+}
+
+#[then("node B is ranked one level below node A")]
+fn then_parser_b_below_a(w: &mut DocsWorld) {
+    assert_eq!(
+        w.parsed_depth, 2,
+        "expected 2 distinct ranks for a 2-node chain, got {}",
+        w.parsed_depth
+    );
+}
+
+// ===========================================================================
+// md heading-hierarchy validate steps
+// ===========================================================================
+
+#[given(
+    "a documentation tree where every markdown file has exactly one H1 and no skipped heading levels"
+)]
+fn given_h_clean_tree(w: &mut DocsWorld) {
+    w.write("docs/a.md", "# T\n\n## A\n\n### B\n");
+}
+
+#[given("a documentation tree containing a markdown file with two H1 headings")]
+fn given_h_duplicate_h1_tree(w: &mut DocsWorld) {
+    w.write("docs/guide.md", "# First\n\ntext\n\n# Second\n");
+    w.file_a = Some("docs/guide.md".to_string());
+}
+
+#[given("a documentation tree containing a markdown file with an H2 followed directly by an H4")]
+fn given_h_skipped_level_tree(w: &mut DocsWorld) {
+    w.write("docs/jump.md", "## Two\n\n#### Four\n");
+    w.file_a = Some("docs/jump.md".to_string());
+}
+
+#[given("a documentation tree containing a single-line markdown file with no headings")]
+fn given_h_single_line(w: &mut DocsWorld) {
+    w.write("docs/single.md", "Just a single line, no headings here.\n");
+}
+
+#[given("a docs directory containing a markdown file with two H1 headings")]
+fn given_h_docs_dir_duplicate(w: &mut DocsWorld) {
     w.write("docs/excluded.md", "# Doc\n\n# Doc Again\n");
+    w.file_a = Some("docs/excluded.md".to_string());
 }
 
-#[given("a markdown file under repo-governance with a duplicate H1")]
-fn given_h_governance_duplicate_h1(w: &mut DocsWorld) {
+#[given("a .claude/agents directory containing a markdown file with no H1 heading")]
+fn given_h_claude_no_h1(w: &mut DocsWorld) {
+    w.write(".claude/agents/agent.md", "## Section\n\ntext\n");
+}
+
+#[given("a plans/done directory containing a markdown file with a skipped heading level")]
+fn given_h_plans_done_skip(w: &mut DocsWorld) {
+    w.write(
+        "plans/done/2024-01-01__old/delivery.md",
+        "# T\n\n### Skip\n",
+    );
+}
+
+#[given("a repo-governance directory containing a markdown file with two H1 headings")]
+fn given_h_governance_dir_duplicate(w: &mut DocsWorld) {
     w.write("repo-governance/rule.md", "# Rule\n\n# Rule Again\n");
+    w.file_b = Some("repo-governance/rule.md".to_string());
 }
 
-// --- heading When steps ---
+#[given("a specs directory containing a markdown file with two H1 headings")]
+fn given_h_specs_dir_duplicate(w: &mut DocsWorld) {
+    w.write("specs/apps/foo/overview.md", "# A\n\n# B\n");
+    w.file_a = Some("specs/apps/foo/overview.md".to_string());
+}
+
+#[given("an apps/example directory whose README.md contains a skipped heading level")]
+fn given_h_app_readme_skip(w: &mut DocsWorld) {
+    w.write("apps/example/README.md", "# App\n\n### Skip\n");
+    w.file_a = Some("apps/example/README.md".to_string());
+}
+
+#[given("an apps/example/src directory containing a markdown file with no H1 heading")]
+fn given_h_app_internals_no_h1(w: &mut DocsWorld) {
+    w.write("apps/example/src/notes.md", "## No H1 Here\n");
+}
+
+#[given("a libs/example/docs directory containing a markdown file with two H1 headings")]
+fn given_h_lib_docs_duplicate(w: &mut DocsWorld) {
+    w.write("libs/example/docs/guide.md", "# A\n\n# B\n");
+    w.file_a = Some("libs/example/docs/guide.md".to_string());
+}
 
 #[when("the developer runs docs validate-heading-hierarchy")]
 fn when_h_run(w: &mut DocsWorld) {
@@ -838,69 +1038,408 @@ fn when_h_run_exclude_docs(w: &mut DocsWorld) {
     w.exec(&["md", "heading-hierarchy", "validate", "--exclude", "docs"]);
 }
 
-// --- heading Then steps ---
+#[then("the output reports zero docs heading hierarchy findings")]
+fn then_h_zero(w: &mut DocsWorld) {
+    assert!(
+        w.stdout()
+            .contains("DOCS HEADING HIERARCHY VALIDATION PASSED"),
+        "got: {}",
+        w.stdout()
+    );
+}
 
-/// Asserts the report contains a finding of `kind` for the fixture file.
-fn assert_heading_finding(w: &DocsWorld, kind: &str) {
+fn assert_heading_failure(w: &DocsWorld, kind: &str, file: &str) {
     let out = w.stdout();
-    let file = w.heading_file.clone().expect("fixture set heading_file");
     assert!(
         out.contains("DOCS HEADING HIERARCHY VALIDATION FAILED"),
         "got: {out}"
     );
     assert!(out.contains(kind), "got: {out}");
-    assert!(out.contains(&file), "got: {out}");
+    assert!(out.contains(file), "got: {out}");
 }
 
-/// Asserts the report contains NO finding of `kind` for the fixture file.
-fn assert_no_heading_finding(w: &DocsWorld, kind: &str) {
+#[then("the output identifies the offending file and the duplicate H1 violation")]
+fn then_h_offending_duplicate(w: &mut DocsWorld) {
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert_heading_failure(w, "duplicate-h1", &f);
+}
+
+#[then("the output identifies the offending file and the skipped heading level")]
+fn then_h_offending_skipped(w: &mut DocsWorld) {
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert_heading_failure(w, "skipped-level", &f);
+}
+
+#[then("the output identifies the duplicate H1 violation in the docs file")]
+#[then("the output identifies the duplicate H1 violation in the specs file")]
+#[then("the output identifies the duplicate H1 violation in the lib docs file")]
+fn then_h_duplicate_in_file_a(w: &mut DocsWorld) {
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert_heading_failure(w, "duplicate-h1", &f);
+}
+
+#[then("the output identifies the skipped heading level in the app README")]
+fn then_h_skipped_in_app_readme(w: &mut DocsWorld) {
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert_heading_failure(w, "skipped-level", &f);
+}
+
+#[then("the output does not mention the docs file")]
+fn then_h_no_docs_mention(w: &mut DocsWorld) {
     let out = w.stdout();
-    let file = w.heading_file.clone().expect("fixture set heading_file");
-    assert!(!out.contains(kind), "got: {out}");
-    assert!(!out.contains(&file), "got: {out}");
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(!out.contains(&f), "got: {out}");
 }
 
-#[then("the output reports a duplicate-h1 finding for that file")]
-fn then_h_duplicate_h1(w: &mut DocsWorld) {
-    assert_heading_finding(w, "duplicate-h1");
-}
-
-#[then("the output reports a missing-h1 finding for that file")]
-fn then_h_missing_h1(w: &mut DocsWorld) {
-    assert_heading_finding(w, "missing-h1");
-}
-
-#[then("the output reports a skipped-level finding for that file")]
-fn then_h_skipped_level(w: &mut DocsWorld) {
-    assert_heading_finding(w, "skipped-level");
-}
-
-#[then("no missing-h1 finding is reported for that file")]
-fn then_h_no_missing_h1(w: &mut DocsWorld) {
-    assert_no_heading_finding(w, "missing-h1");
-}
-
-#[then("no duplicate-h1 finding is reported for that file")]
-fn then_h_no_duplicate_h1(w: &mut DocsWorld) {
-    assert_no_heading_finding(w, "duplicate-h1");
-}
-
-#[then("no skipped-level finding is reported for that file")]
-fn then_h_no_skipped_level(w: &mut DocsWorld) {
-    assert_no_heading_finding(w, "skipped-level");
-}
-
-#[then("no finding is reported for the docs file")]
-fn then_h_no_docs_finding(w: &mut DocsWorld) {
+#[then("the output identifies the repo-governance file")]
+fn then_h_repo_governance_mention(w: &mut DocsWorld) {
     let out = w.stdout();
-    assert!(!out.contains("docs/excluded.md"), "got: {out}");
+    let f = w.file_b.clone().expect("fixture set file_b");
+    assert!(out.contains(&f), "got: {out}");
 }
 
-#[then("the output reports a duplicate-h1 finding for the repo-governance file")]
-fn then_h_governance_duplicate_h1(w: &mut DocsWorld) {
+// ===========================================================================
+// md naming validate steps
+// ===========================================================================
+
+#[given("a documentation tree where every markdown file uses lowercase kebab-case")]
+fn given_naming_all_valid(w: &mut DocsWorld) {
+    w.write("docs/valid-name.md", "# T\n");
+}
+
+#[given("a documentation tree containing a markdown file whose basename has uppercase characters")]
+fn given_naming_uppercase(w: &mut DocsWorld) {
+    w.write("docs/BadName.md", "# T\n");
+}
+
+#[given("a documentation tree where a nested directory contains only a README.md file")]
+fn given_naming_nested_readme(w: &mut DocsWorld) {
+    w.write("docs/nested/dir/README.md", "# T\n");
+}
+
+#[when("the developer runs docs validate-naming")]
+fn when_naming_run(w: &mut DocsWorld) {
+    w.exec(&["md", "naming", "validate"]);
+}
+
+#[then("the output reports zero docs naming findings")]
+fn then_naming_zero(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("DOCS NAMING VALIDATION PASSED"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+#[then("the output identifies the offending filename and its rule violation")]
+fn then_naming_violation(w: &mut DocsWorld) {
     let out = w.stdout();
-    assert!(out.contains("duplicate-h1"), "got: {out}");
-    assert!(out.contains("repo-governance/rule.md"), "got: {out}");
+    assert!(out.contains("DOCS NAMING VALIDATION FAILED"), "got: {out}");
+    assert!(out.contains("BadName.md"), "got: {out}");
+    assert!(out.contains("lowercase-kebab-case"), "got: {out}");
+}
+
+// ===========================================================================
+// md frontmatter validate steps
+// ===========================================================================
+
+fn write_sw_doc(w: &DocsWorld, frontmatter_lines: &str) {
+    w.write(
+        "docs/explanation/software-engineering/foo.md",
+        &format!("---\n{frontmatter_lines}\n---\n\nBody text.\n"),
+    );
+}
+
+#[given(
+    "a software-engineering doc with title, description, category, subcategory, and tags frontmatter"
+)]
+fn given_fm_sw_full(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: reference\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given("a software-engineering doc whose frontmatter omits the title field")]
+fn given_fm_sw_missing_title(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "description: D\ncategory: reference\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given("a software-engineering doc whose frontmatter omits the category field")]
+fn given_fm_sw_missing_category(w: &mut DocsWorld) {
+    write_sw_doc(w, "title: T\ndescription: D\nsubcategory: S\ntags: [a]");
+}
+
+#[given(
+    "a software-engineering doc whose frontmatter declares category as something other than software"
+)]
+fn given_fm_sw_wrong_category(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: bogus\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given("a governance doc carrying only a title frontmatter field")]
+fn given_fm_gov_title_only(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/conventions/foo.md",
+        "---\ntitle: T\n---\n\nBody.\n",
+    );
+}
+
+#[given(
+    "a software-engineering doc with title, description, category tutorial, subcategory, and tags frontmatter"
+)]
+fn given_fm_sw_tutorial(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: tutorial\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given(
+    "a software-engineering doc with title, description, category how-to, subcategory, and tags frontmatter"
+)]
+fn given_fm_sw_howto(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: how-to\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given(
+    "a software-engineering doc with title, description, category reference, subcategory, and tags frontmatter"
+)]
+fn given_fm_sw_reference(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: reference\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given(
+    "a software-engineering doc with title, description, category explanation, subcategory, and tags frontmatter"
+)]
+fn given_fm_sw_explanation(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: explanation\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[given("a software-engineering doc with all required frontmatter fields")]
+fn given_fm_sw_deprecated_category(w: &mut DocsWorld) {
+    write_sw_doc(
+        w,
+        "title: T\ndescription: D\ncategory: software\nsubcategory: S\ntags: [a]",
+    );
+}
+
+#[when("the developer runs docs validate-frontmatter")]
+fn when_fm_run(w: &mut DocsWorld) {
+    w.exec(&["md", "frontmatter", "validate"]);
+}
+
+#[then("the frontmatter output reports zero fail-level findings")]
+fn then_fm_zero_fail(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("DOCS FRONTMATTER VALIDATION PASSED"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+#[then("the frontmatter output identifies the missing title field")]
+fn then_fm_missing_title(w: &mut DocsWorld) {
+    assert!(w.stdout().contains("missing-title"), "got: {}", w.stdout());
+}
+
+#[then("the frontmatter output identifies the missing category field")]
+fn then_fm_missing_category(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("missing-category"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+#[then("the frontmatter output identifies the wrong category value")]
+fn then_fm_wrong_category(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("wrong-category-value"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+// ===========================================================================
+// md frontmatter-dates validate steps (repo-governance-frontmatter-audit.feature)
+// ===========================================================================
+
+#[given("a governance directory with no forbidden date metadata in markdown files")]
+fn given_fd_clean(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/clean.md",
+        "---\ntitle: T\n---\n\nClean body.\n",
+    );
+}
+
+#[given("a governance markdown file whose frontmatter contains a forbidden updated field")]
+fn given_fd_updated_field(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/dated.md",
+        "---\ntitle: T\nupdated: 2026-01-01\n---\n\nbody\n",
+    );
+    w.file_a = Some("repo-governance/dated.md".to_string());
+}
+
+#[given("a governance markdown file whose body contains a Last Updated footer block")]
+fn given_fd_footer(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/footer.md",
+        "# Title\n\nBody.\n\n**Last Updated**: 2026-01-01\n",
+    );
+    w.file_a = Some("repo-governance/footer.md".to_string());
+}
+
+#[given("a governance markdown file whose body contains a standalone Created date annotation")]
+fn given_fd_created(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/created.md",
+        "# Title\n\n- **Created**: 2026-01-01\n",
+    );
+    w.file_a = Some("repo-governance/created.md".to_string());
+}
+
+#[given("a markdown file with forbidden date metadata under a website app directory")]
+fn given_fd_website_exempt(w: &mut DocsWorld) {
+    w.write(
+        "apps/ayokoding-www/content/post.md",
+        "---\nupdated: 2026-01-01\n---\n",
+    );
+    w.frontmatter_target = Some("apps/ayokoding-www".to_string());
+}
+
+#[when("the developer runs md frontmatter validate on the directory")]
+#[when("the developer runs md frontmatter validate on the file")]
+fn when_fd_run(w: &mut DocsWorld) {
+    if let Some(t) = w.frontmatter_target.clone() {
+        w.exec(&["md", "frontmatter-dates", "validate", &t]);
+    } else {
+        w.exec(&["md", "frontmatter-dates", "validate"]);
+    }
+}
+
+#[then("the output reports zero frontmatter findings")]
+fn then_fd_zero(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("FRONTMATTER AUDIT PASSED"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+#[then("the output identifies the forbidden frontmatter field and its location")]
+fn then_fd_field(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(out.contains("updated:"), "got: {out}");
+    assert!(out.contains(&f), "got: {out}");
+}
+
+#[then("the output identifies the forbidden footer block and its location")]
+fn then_fd_footer(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(out.contains("Last Updated"), "got: {out}");
+    assert!(out.contains(&f), "got: {out}");
+}
+
+#[then("the output identifies the forbidden inline annotation and its location")]
+fn then_fd_inline(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(out.contains("inline date annotation"), "got: {out}");
+    assert!(out.contains(&f), "got: {out}");
+}
+
+// ===========================================================================
+// md readme-index validate steps (repo-governance-readme-index-audit.feature)
+// ===========================================================================
+
+#[given("a governance directory whose README.md links to every sibling markdown file")]
+fn given_ri_clean(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/README.md",
+        "# Title\n\n[Other](other.md)\n",
+    );
+    w.write("repo-governance/other.md", "# Other\n");
+}
+
+#[given("a governance directory containing a markdown file that the README.md does not link to")]
+fn given_ri_orphan(w: &mut DocsWorld) {
+    w.write("repo-governance/README.md", "# Title\n");
+    w.write("repo-governance/orphan.md", "# Orphan\n");
+    w.file_a = Some("repo-governance/orphan.md".to_string());
+}
+
+#[given(
+    "a governance directory whose README.md links to a markdown file that is not present on disk"
+)]
+fn given_ri_ghost(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/README.md",
+        "# Title\n\n[Ghost](ghost.md)\n",
+    );
+    w.file_a = Some("repo-governance/ghost.md".to_string());
+}
+
+#[given(
+    "a governance directory with a nested subdirectory whose own README.md omits a sibling markdown file"
+)]
+fn given_ri_nested(w: &mut DocsWorld) {
+    w.write(
+        "repo-governance/README.md",
+        "# Title\n\n[Sub](sub/README.md)\n",
+    );
+    w.write("repo-governance/sub/README.md", "# Sub\n");
+    w.write("repo-governance/sub/orphan.md", "# Orphan\n");
+    w.file_a = Some("repo-governance/sub/orphan.md".to_string());
+}
+
+#[when("the developer runs md readme-index on the directory")]
+fn when_ri_run(w: &mut DocsWorld) {
+    w.exec(&["md", "readme-index", "validate"]);
+}
+
+#[then("the output reports zero readme-index findings")]
+fn then_ri_zero(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("README INDEX AUDIT PASSED"),
+        "got: {}",
+        w.stdout()
+    );
+}
+
+#[then("the output identifies the orphan file and its location")]
+#[then("the output identifies the orphan file inside the nested subdirectory")]
+fn then_ri_orphan(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(out.contains("orphan"), "got: {out}");
+    assert!(out.contains(&f), "got: {out}");
+}
+
+#[then("the output identifies the ghost reference and its location")]
+fn then_ri_ghost(w: &mut DocsWorld) {
+    let out = w.stdout();
+    let f = w.file_a.clone().expect("fixture set file_a");
+    assert!(out.contains("ghost"), "got: {out}");
+    assert!(out.contains(&f), "got: {out}");
 }
 
 // ===========================================================================
