@@ -381,15 +381,23 @@ depth}` directly (not CLI subprocess) for the 4 internal parser-behavior scenari
 
 ### 1d. De-hollow `workflows` (4/4 skipped → 0)
 
-- [ ] [AI] **RED**: change the `#[when]` string in `apps/rhino-cli/tests/workflows.rs:151` from
+- [x] [AI] **RED**: change the `#[when]` string in `apps/rhino-cli/tests/workflows.rs:151` from
       `the developer runs workflows validate-naming` to `the developer runs repo-governance workflows naming validate`
       (matching the feature) and invoke that command. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test workflows`.
       Acceptance: 4 scenarios execute (not skipped).
+  - **Done 2026-07-04.** Confirmed stale string at line 151, corrected to match the feature file exactly
+    (`WorkflowsWorld::exec()` already invoked the right command — only the annotation string was stale).
+    All 4 scenarios moved from skipped to executing.
   - **Gherkin (binds) →** — aggregate BDD binder for all 4 scenarios in `gherkin/workflows/**`:
     "A tree where every workflow obeys the naming rule passes validation"; "A workflow filename without an allowed type suffix fails validation"; "A workflow frontmatter name that disagrees with the filename fails validation"; "A file under repo-governance/workflows/meta/ is exempt from the naming rule"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: satisfy assertions. Command: same. Acceptance: `4 scenarios (4 passed)`, `0 skipped`.
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears. Command: same. Acceptance: `0 skipped`.
+- [x] [AI] **GREEN**: satisfy assertions. Command: same. Acceptance: `4 scenarios (4 passed)`, `0 skipped`.
+  - **Done 2026-07-04.** `4 scenarios (4 passed)`, `16 steps (16 passed)`, 0 skipped. **This was the last
+    de-hollow section**: a full-suite run confirms **zero skipped scenarios anywhere** across every
+    cucumber binary (repo_governance, convention, docs/md, agents/harness, workflows). `clippy -D
+warnings` + `fmt --check` clean.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears. Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** Single-line fix, no duplication introduced.
 
 ### 1e. Wire the 4 unbound feature dirs (ddd / git / specs / test-coverage)
 
