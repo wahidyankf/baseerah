@@ -18,11 +18,11 @@ available: it converts the whole spec tree from aspirational to enforced.
 
 ## Impact & Affected Roles
 
-| Role                   | Impact                                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------- |
-| Repo maintainer (solo) | A green `specs:coverage` becomes trustworthy repo-wide; unimplemented behaviour can't hide. |
-| AI coding agents       | Feature-change-completeness (specs+tests) is mechanically enforced, not convention-only.    |
-| CI / quality gates     | Skipped/absent tests fail; "covered" requires a real passing test at each declared tier.    |
+| Role                   | Impact                                                                                               |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| Repo maintainer (solo) | A green `specs:behavior:coverage` becomes trustworthy repo-wide; unimplemented behaviour can't hide. |
+| AI coding agents       | Feature-change-completeness (specs+tests) is mechanically enforced, not convention-only.             |
+| CI / quality gates     | Skipped/absent tests fail; "covered" requires a real passing test at each declared tier.             |
 
 ## Business Success Metrics
 

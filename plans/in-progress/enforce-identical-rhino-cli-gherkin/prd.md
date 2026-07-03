@@ -40,7 +40,7 @@ Rule-15/Rule-16 live-tester retests do **not** apply.
 ```gherkin
 Scenario: The rhino-cli cucumber suite executes every scenario in the canonical repo
   Given the rhino-cli cucumber suite in ose-public
-  When a developer runs "cargo test --release -p rhino-cli"
+  When a developer runs "cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli"
   Then every cucumber binary reports zero skipped scenarios
   And the overall test run exits with code 0
 ```

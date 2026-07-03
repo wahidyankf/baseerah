@@ -40,7 +40,7 @@ the anti-drift gate, ends the recurrence.
 ## Business Success Metrics
 
 - **Zero skipped-by-data scenarios** in the rhino-cli cucumber suite in **all three** repos
-  (observable: `cargo test -p rhino-cli` output reports `0 skipped` across every binary). [Judgment call:
+  (observable: `cargo test --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli` output reports `0 skipped` across every binary). [Judgment call:
   target derived directly from the user directive "all behaviour should be enforced"]
 - **Byte-identical Gherkin tree** across all three repos (observable: `diff -rq` of the
   `.feature` + behaviour-`README.md` set reports no differences; md5 manifests match).

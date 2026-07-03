@@ -5,7 +5,7 @@
 - **Mechanism exists**: `rhino-cli specs behavior-coverage validate` — scenarios tag levels
   (`@unit`/`@integration`/`@e2e`); tests carry `// @covers <spec-path>:<scenario-title>`; gate passes when
   marker-levels == tagged levels. Driven by `repo-config.yml` `coverage.projects`; run at pre-push
-  (`specs:coverage`) + CI (`main-ci` `run-many --all -t … specs:behavior:coverage`). [Repo-grounded]
+  (`specs:behavior:coverage`) + CI (`main-ci` `run-many --all -t … specs:behavior:coverage`). [Repo-grounded]
 - **Hole 1 — marker ≠ execution**: the gate checks the marker exists, not that the test ran/passed.
   rhino-cli had 121/228 scenarios skipped while green. No tier configures fail-on-skip. [Repo-grounded]
 - **Hole 2 — adoption**: `@covers` markers exist in 8 files, **all rhino-cli, 0 elsewhere**; non-rhino
@@ -19,6 +19,28 @@ This plan **starts from the end-state** of
 rhino-cli's suite is fully enforcing, `fail_on_skipped` is on, `@covers` is complete for rhino-cli, and
 `test:unit`(mocked) / `test:integration`(temp-fixture) are wired. rhino-cli is therefore the **first
 proving consumer** of the runtime cross-check and the reference pattern for every other project.
+
+### 2.1 Dependency and cross-repo propagation topology
+
+```mermaid
+%% Color palette: Blue #0173B2, Teal #029E73, Brown #CA9161, Gray #808080 (color-blind friendly)
+flowchart LR
+  Dep["enforce-identical-rhino-cli-gherkin<br/>sibling plan<br/>DONE + archived"]:::brown -->|"precondition"| This["This plan<br/>authored in ose-public"]:::blue
+  This --> Engine["Phase 1 engine change<br/>apps/rhino-cli<br/>ose-public"]:::blue
+  Engine -->|"byte-identical<br/>propagation"| Primer["ose-primer<br/>apps/rhino-cli"]:::teal
+  Engine -->|"byte-identical<br/>propagation"| Infra["ose-infra<br/>apps/rhino-cli"]:::teal
+  This --> RolloutPublic["Per-project rollout<br/>ose-public apps/libs"]:::gray
+  This -.->|"independent<br/>per-repo batches"| RolloutPrimer["Per-project rollout<br/>ose-primer apps/libs"]:::gray
+  This -.->|"independent<br/>per-repo batches"| RolloutInfra["Per-project rollout<br/>ose-infra apps/libs"]:::gray
+
+  classDef blue fill:#0173B2,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef teal fill:#029E73,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef brown fill:#CA9161,stroke:#000000,color:#FFFFFF,stroke-width:2px
+  classDef gray fill:#808080,stroke:#000000,color:#FFFFFF,stroke-width:2px
+```
+
+The engine (rhino-cli source) is the only byte-identical artifact across the three repos; per-project
+`@covers`/level-tag rollout batches are independent per repo because each repo's app/lib set differs.
 
 ## 3. Two-part enforcement (Decision: BOTH)
 
@@ -42,12 +64,12 @@ flowchart TD
 
 ### 3.1 Per-tier fail-on-skip (local, fast)
 
-| Tier / tool        | Fail-on-skip mechanism                                                                                                                                         |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| cucumber-rs (Rust) | `.fail_on_skipped()` on the World runner (done for rhino-cli by the dependency plan).                                                                          |
-| Jest / Vitest      | CI run forbids `.only` (`--forbid-only` / config), and treats `.skip`/`.todo` as failures via a lint rule or a custom reporter that exits non-zero on skipped. |
-| Playwright         | `forbidOnly: true` (config) in CI; a reporter/guard that fails the run on `test.skip`.                                                                         |
-| F# test runner     | No `Ignore`/pending tests in CI; runner configured to fail on skipped.                                                                                         |
+| Tier / tool        | Fail-on-skip mechanism                                                                                                                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| cucumber-rs (Rust) | `.fail_on_skipped()` on the World runner (done for rhino-cli by the dependency plan). [Repo-grounded]                                                                                            |
+| Jest / Vitest      | CI run forbids `.only` (`--forbid-only` / config), and treats `.skip`/`.todo` as failures via a lint rule or a custom reporter that exits non-zero on skipped. [Unverified until Phase 0]        |
+| Playwright         | `forbidOnly: !!process.env.CI` **already configured** in all 11 `apps/*-e2e/playwright.config.ts` [Repo-grounded]; only the missing piece is a reporter/guard that fails the run on `test.skip`. |
+| F# test runner     | No `Ignore`/pending tests in CI; runner configured to fail on skipped. [Unverified until Phase 0]                                                                                                |
 
 The exact per-tool switch is confirmed in Phase 0 against each tool's version (verify flags via
 `--help`/docs before authoring — do not assume).
@@ -76,17 +98,17 @@ built or is corrected/removed as an invalid spec (with rationale in the phase no
 
 ## 5. File Impact (representative)
 
-| Path                                                               | Change                                                        |
-| ------------------------------------------------------------------ | ------------------------------------------------------------- |
-| `apps/rhino-cli/src/application/behavior_coverage/**`              | Add the runtime cross-check (byte-identical across 3 repos)   |
-| `apps/rhino-cli/tests/**` + `specs/apps/rhino/**`                  | Spec/tests for the new cross-check behaviour                  |
-| Jest/Vitest config (`apps/*/…`, per project)                       | Fail-on-skip/only in CI                                       |
-| `apps/*-e2e/playwright.config.ts`                                  | `forbidOnly` + skip-guard                                     |
-| F# test projects                                                   | Fail-on-ignored config                                        |
-| `specs/apps/**/*.feature`, `specs/libs/**/*.feature` (per project) | Level tags added where missing                                |
-| test sources across eligible projects                              | `// @covers` markers added                                    |
-| `repo-config.yml` `coverage.projects`                              | Reviewed; adjust levels only if a project's real tiers differ |
-| `.husky/pre-push`, `.github/workflows/*`                           | Wire the runtime cross-check into `specs:coverage`/CI         |
+| Path                                                               | Change                                                         |
+| ------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `apps/rhino-cli/src/application/behavior_coverage/**`              | Add the runtime cross-check (byte-identical across 3 repos)    |
+| `apps/rhino-cli/tests/**` + `specs/apps/rhino/**`                  | Spec/tests for the new cross-check behaviour                   |
+| Jest/Vitest config (`apps/*/…`, per project)                       | Fail-on-skip/only in CI                                        |
+| `apps/*-e2e/playwright.config.ts`                                  | `forbidOnly` + skip-guard                                      |
+| F# test projects                                                   | Fail-on-ignored config                                         |
+| `specs/apps/**/*.feature`, `specs/libs/**/*.feature` (per project) | Level tags added where missing                                 |
+| test sources across eligible projects                              | `// @covers` markers added                                     |
+| `repo-config.yml` `coverage.projects`                              | Reviewed; adjust levels only if a project's real tiers differ  |
+| `.husky/pre-push`, `.github/workflows/*`                           | Wire the runtime cross-check into `specs:behavior:coverage`/CI |
 
 ## 6. Rollback
 

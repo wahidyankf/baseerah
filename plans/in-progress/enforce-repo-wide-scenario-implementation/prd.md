@@ -5,13 +5,26 @@
 Generalize rhino-cli's proven enforcement pattern to every eligible app and lib: level-tag + `@covers`
 every scenario, make every test tier fail-on-skip, and upgrade `rhino-cli specs behavior-coverage` to a
 runtime cross-check so "covered" requires a real test that executed and passed. CLI/tooling + config +
-test-wiring plan — **no web UI, no HTTP API surface is added**, so the UI-design-funnel and Rule-15/16
-live-tester retests do not apply (individual per-project rollout batches that touch a UI app's tests do
-not change its UI).
+test-wiring plan — the primary mechanism (marker/level-tag rollout, per-tier fail-on-skip config, engine
+wiring) adds **no web UI and no HTTP API surface**, so **the UI-design-funnel is conditionally
+applicable, not blanket-exempt**: most batches touch no UI and remain exempt, but if a Phase 3..N batch's
+no-defer TDD path (Decision 4) requires building a genuinely new user-facing screen or component (not
+merely new backend/CLI logic behind an existing screen) to satisfy a previously-unimplemented scenario in
+a UI-bearing project (`ose-www`, `ose-app-web`, `organiclever-www`, `organiclever-app-web`, or their
+`-e2e` counterparts), that batch runs a lightweight design-funnel pass (named low-fi alternatives, a hi-fi
+finalist, a stated selection + rationale, and a responsive strategy) before its RED/GREEN cycle authors
+the new UI. **Rule-15/16 live-tester retests are conditionally applicable, not blanket-exempt**: most
+batches only add markers/level tags to already-passing tests (no behaviour change) and remain exempt, but
+if a Phase 3..N batch's no-defer TDD path (Decision 4) builds genuinely new user-facing behaviour to
+satisfy a previously-unimplemented scenario in a UI-bearing project (`ose-www`, `ose-app-web`,
+`organiclever-www`, `organiclever-app-web`, or their `-e2e` counterparts), that batch runs the Rule-15
+three-tester retest before its gate passes; if the built behaviour instead exposes/changes a REST or
+GraphQL endpoint (`ose-be`, `organiclever-be`), that batch runs the Rule-16 `api-exploratory-tester`
+retest instead.
 
 ## Personas
 
-- **Petra (Platform maintainer, solo)** — wants a green `specs:coverage` to mean "all specified behaviour
+- **Petra (Platform maintainer, solo)** — wants a green `specs:behavior:coverage` to mean "all specified behaviour
   was verified", repo-wide.
 - **Aria (AI coding agent)** — wants feature-change-completeness enforced mechanically so it can't ship a
   scenario without a real passing test.
@@ -73,7 +86,7 @@ Scenario: The runtime cross-check engine is identical in all three repos
 
 ```gherkin
 Scenario: The runtime cross-check runs in the standard gates
-  Given the upgraded specs:coverage target
+  Given the upgraded specs:behavior:coverage target
   When a developer runs the pre-push gate or CI runs
   Then the runtime cross-check executes for every affected project
   And a marked-but-unexecuted scenario blocks the push and the merge

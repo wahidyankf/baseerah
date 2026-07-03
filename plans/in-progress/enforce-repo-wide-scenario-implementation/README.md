@@ -14,7 +14,7 @@ generalizes to every app and lib.
 The repo already ships a **designed** mechanism for scenario coverage — `rhino-cli specs behavior-coverage
 validate`: every scenario self-tags required levels (`@unit`/`@integration`/`@e2e`), tests declare
 `// @covers <spec-path>:<scenario-title>` markers, and the gate passes when marker-levels == tagged
-levels. It is tier-aware and runs repo-wide at pre-push (`specs:coverage`) and CI (`main-ci`
+levels. It is tier-aware and runs repo-wide at pre-push (`specs:behavior:coverage`) and CI (`main-ci`
 `run-many --all`). [Repo-grounded]
 
 Two holes make it toothless today (both found in the rhino-cli audit):
@@ -45,7 +45,7 @@ test ran and passed".**
 - **Central runtime cross-check** — upgrade `rhino-cli specs behavior-coverage` (or add a sibling
   command) to ingest each tier's **run results** and fail unless every `@covers` scenario actually
   **executed and passed** (not merely marked). Authoritative CI gate.
-- **Wiring** — the new runtime cross-check joins pre-push (`specs:coverage`) + CI, repo-wide.
+- **Wiring** — the new runtime cross-check joins pre-push (`specs:behavior:coverage`) + CI, repo-wide.
 - **Per-repo application** — each of `ose-public`/`ose-primer`/`ose-infra` applies the rollout to **its
   own** apps/libs (which differ per repo); the **engine change** (rhino-cli command) is byte-identical
   and propagated to all three (rhino-cli parity, per the dependency plan's boundary).

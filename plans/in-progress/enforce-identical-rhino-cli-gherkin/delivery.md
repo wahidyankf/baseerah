@@ -34,10 +34,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 - [ ] [AI] Provision + initialize toolchain: from repo root run `npm install && npm run doctor -- --fix`.
       Acceptance: doctor reports all tools OK (0 missing, 0 warning).
-- [ ] [AI] Record clean baseline: `cargo test --release -p rhino-cli --no-fail-fast > audit/00-baseline.txt 2>&1`.
+- [ ] [AI] Record clean baseline: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast > audit/00-baseline.txt 2>&1`.
       Acceptance: exit 0; file committed.
-- [ ] [AI] **Command census**: recurse `rhino-cli … --help` for every group/subcommand and write the full
-      leaf-command tree to `audit/01-command-census.md`. Cross-check against
+- [ ] [AI] **Command census**: start with
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- --help`, then recurse into
+      every listed group with `-- <group> --help` (repeat for each nested group until every leaf command
+      is reached — a full recursive help-tree walk, not a single flat command); write the full leaf-command
+      tree to `audit/01-command-census.md`. Cross-check against
       [tech-docs §1.5](./tech-docs.md#15-canonical-command-surface-aligned-with-the-2026-07-01--2026-07-03-plans)
       and the [2026-07-03 synthesis ledger](../../done/2026-07-03__unify-rhino-cli-sdlc-parity/audit/synthesis-ledger.md).
       Acceptance: every leaf command listed; any drift from §1.5 flagged.
@@ -58,12 +61,13 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 > All checks below must pass before starting Phase 1.
 
-- [ ] [AI] `cargo test --release -p rhino-cli` — exits 0 (green baseline recorded).
-- [ ] [AI] All six `audit/0*.md` files exist and are committed.
+- [ ] [AI] `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli` — exits 0 (green baseline recorded).
+- [ ] [AI] All six Phase 0 audit artifacts (`audit/00-baseline.txt` + `audit/01-command-census.md`
+      through `audit/05-cross-repo-diff.md`) exist and are committed.
 - [ ] [AI] `nx affected -t test:quick,lint,typecheck --base=origin/main` — exits 0.
 
 > **Pause Safety**: baseline green, audit evidence committed, no source or spec changes applied. ose-public
-> passes its own affected pre-push gate. Safe to stop. To resume: `cargo test --release -p rhino-cli`.
+> passes its own affected pre-push gate. Safe to stop. To resume: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli`.
 
 ---
 
@@ -78,7 +82,7 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `specs/apps/rhino/behavior/rhino-cli/gherkin/docs/` → `…/gherkin/md/` and `…/gherkin/agents/` →
       `…/gherkin/harness/`, plus any other dir whose name mismatches its command group. Retarget the
       matching `feature_dir()` binding(s) in `apps/rhino-cli/tests/*.rs` (e.g. `tests/docs.rs`,
-      `tests/agents.rs`). Command: `cargo test --release -p rhino-cli --no-fail-fast`. Acceptance: suite
+      `tests/agents.rs`). Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`. Acceptance: suite
       still builds and runs (skip counts unchanged — pure rename, no vocab change yet); no dir name
       mismatches its command group in `audit/04-coverage-map.md`.
   - _Suggested executor: `swe-rust-dev`_
@@ -87,42 +91,124 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 ### 1·0b. Introduce the mock I/O seam + reclassify test:unit (prerequisite — Decision 5)
 
-- [ ] [AI] **RED**: add trait seam(s) (`Fs`, `GitRepo` or similar) in `apps/rhino-cli/src` with a real
-      (imperative-shell) impl and a `Mock*` impl for tests; add one core validator unit test that calls a
-      validator in-process with a mocked FS. Command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`.
+> [Repo-grounded] The repo already has one instance of this exact port/adapter pattern:
+> `apps/rhino-cli/src/application/git/port.rs` defines the `StagedFileProvider` trait, backed by the real
+> impl in `apps/rhino-cli/src/infrastructure/git/`. The new `Fs` seam follows this same pattern for the
+> trait and the real impl; the existing git port is extended, not reinvented. The mock's placement is the
+> one deliberate deviation: the precedent's fake (`FakeStagedFileProvider`) lives inline in its single
+> consumer (`apps/rhino-cli/src/application/git/pre_commit.rs:456`), whereas `MockFs` is consumed by
+> multiple `repo_governance/*.rs` validators, so it lives in its own shared module instead (named below).
+
+- [ ] [AI] **RED**: add an `Fs` trait in a new `apps/rhino-cli/src/application/fs/port.rs` (following the
+      exact pattern of the existing `apps/rhino-cli/src/application/git/port.rs`), with a real
+      (imperative-shell) impl in a new `apps/rhino-cli/src/infrastructure/fs/` module (mirroring
+      `apps/rhino-cli/src/infrastructure/git/`) and a shared `MockFs` impl in a new
+      `apps/rhino-cli/src/application/fs/mock.rs` (a deliberate deviation from `StagedFileProvider`'s
+      inline-per-consumer fake pattern — justified because `MockFs` is consumed by multiple
+      `apps/rhino-cli/src/application/repo_governance/*.rs` validators, not one). Add one core validator
+      unit test that calls `apps/rhino-cli/src/application/repo_governance/agents_md_size.rs` in-process
+      with a mocked `Fs`. Command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`.
       Acceptance: new mocked unit test fails (validator not yet dependency-injected).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: thread the seam through the core validators (functional-core/imperative-shell) so
-      they accept injected `Fs`/`GitRepo`. Command: same. Acceptance: mocked unit test passes; existing
-      `--lib` + `--tests` still green.
-- [ ] [AI] **REFACTOR**: converge duplicated I/O call sites onto the seam. Command: `cargo test --release -p rhino-cli`.
-      Acceptance: all tiers still green.
-- [ ] [AI] Edit `apps/rhino-cli/project.json`: point `test:unit` at the **mocked in-process behaviour
-      suite** (so the pre-push `test:quick` gate runs it) and keep `test:integration` as the temp-fixture
-      (`--tests`) suite. Acceptance: `nx run rhino-cli:test:unit` runs the mocked behaviour scenarios;
-      `nx run rhino-cli:test:integration` runs the temp-fixture suite; `repo-config.yml` keeps
-      `rhino-cli levels: [unit, integration]`.
+- [ ] [AI] **GREEN**: thread the `Fs` seam through `agents_md_size.rs` first (functional-core/imperative-
+      shell), then extend it to the remaining `apps/rhino-cli/src/application/repo_governance/*.rs`
+      validators so they accept an injected `Fs` (the `GitRepo`-equivalent seam already exists as
+      `StagedFileProvider`). Command: same. Acceptance: mocked unit test passes; existing `--lib` +
+      `--tests` still green.
+- [ ] [AI] **REFACTOR**: converge duplicated I/O call sites in the migrated `repo_governance` validators
+      onto the `Fs` seam. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli`. Acceptance: all tiers still green.
+
+> The literal `test:unit`/`apps/rhino-cli/project.json` edit and the concrete conversion of
+> `repo_governance.rs`'s step defs from `assert_cmd` subprocess-spawn to in-process `MockFs` calls happen
+> in **§1a's "Mocked-unit conversion" sub-steps below** (placed after `repo_governance` is de-hollowed and
+> passing on the subprocess path) — not here — because that conversion needs de-hollowed, already-passing
+> scenarios to convert; building the `Fs`/`MockFs` seam above is the prerequisite those sub-steps consume.
 
 ### 1a. De-hollow `repo_governance` (61/61 skipped → 0)
 
 - [ ] [AI] **RED**: in `apps/rhino-cli/tests/repo_governance.rs`, align every `#[given]/#[when]/#[then]`
       string to the canonical feature step text in `specs/apps/rhino/behavior/rhino-cli/gherkin/repo-governance/**`
       and ensure each `#[when]` body invokes the real current command (e.g. `repo-governance workflows naming validate`,
-      `repo-governance vendor validate`, `repo-governance audit`). Run `cargo test --release -p rhino-cli --test repo_governance`.
+      `repo-governance vendor validate`, `repo-governance audit`) **via the existing `assert_cmd` subprocess-spawn
+      pattern** (unchanged from today — the in-process conversion is a separate, later sub-step below). Run
+      `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test repo_governance`.
       Acceptance: scenarios now **execute** (summary shows passed/failed, not skipped) — failures here are real behaviour assertions to satisfy.
+  - **Gherkin (binds) →** — aggregate BDD binder for all 61 scenarios in `gherkin/repo-governance/**`:
+    "Clean repository: all categories pass, total_findings is 0, exit 0"; "Vendor-audit scope is limited to governance prose and root instruction surfaces"; "Mixed findings: some categories pass, some fail; total_findings is the sum; exit 1"; "Byte-determinism: running the orchestrator 10 times in a row produces byte-identical JSON"; "Skip list honored: false-positive entries do not count toward total_findings"; "Include-category filter: only listed categories run"; "Clean source tree passes"; "Emoji codepoint in a JSON file fails"; "Emoji codepoint in a Go source file fails"; "Multibyte non-emoji unicode does not trigger a finding"; "emoji-audit skips archived directory"; "AGENTS.md within target size passes the audit"; "AGENTS.md over the 30KB target size emits a finding"; "AGENTS.md over the 40KB hard limit fails the command"; "Clean directory passes the audit"; "Frontmatter with forbidden updated field fails"; "Body containing Last Updated footer block fails"; "Body containing standalone Created annotation fails"; "File under website app directory is exempt and passes"; "Pushing an over-budget instruction file is blocked"; "Pushing changes that do not touch instruction files skips the gate"; "Pushing an in-budget instruction-file edit passes"; "Both docs list identical layer numbers and names passes"; "Layer numbering has a gap fails"; "Two docs disagree on a layer name for the same number fails"; "A file within target passes silently"; "A file over target but under the ceiling warns without failing"; "A file over its hard ceiling fails the command"; "A configured glob matching no file is a no-op"; "The resolved tree is checked against the fail ceiling"; "The legacy alias still works"; "A clean repository passes the traceability audit"; "A principle missing the Vision Supported heading fails the audit"; "A convention missing the Principles Implemented/Respected heading fails the audit"; "A development document missing the Conventions Implemented/Respected heading fails the audit"; "A workflow with no agent reference fails the audit"; "The rule is documented as a convention"; "repo-rules-checker validates the budget qualitatively"; "The quality-gate workflow lists the validator as a fourth preflight category"; "The preflight envelope carries the instruction-size category"; "The AI checker defers to the deterministic preflight finding"; "Directory where README.md links cover every sibling .md passes"; "Orphan file: directory has a .md file the README.md does not link to"; "Ghost reference: README.md links to a .md file that does not exist"; "Nested subdirectory README.md is also audited"; "Clean repository where every app/lib/specs has matching LICENSE passes"; "App directory missing LICENSE file fails"; "Lib directory missing LICENSE file fails"; "LICENSING-NOTICE.md table row mismatching SPDX in LICENSE fails"; "A forbidden term in plain prose fails the audit"; "A forbidden term inside a code fence passes the audit"; "A forbidden term inside a binding-example fence passes the audit"; "A forbidden term under a Platform Binding Examples heading passes the audit"; "A governance directory with no forbidden terms passes the audit"; "Capitalized branded Skills in plain prose fails the audit"; "Capitalized Skills inside a code fence passes the audit"; "A newly forbidden coding-agent vendor name in plain prose fails the audit"; "The Amazon Q vendor name in plain prose fails the audit"; "The Antigravity vendor name in plain prose fails the audit"; "The mathematical constant pi in plain prose passes the audit"; "A newly forbidden vendor name under a Platform Binding Examples heading passes the audit"
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **GREEN**: resolve each executing failure at root cause (fix the step body / fixture, or the
-      validator if a genuine bug surfaces — never re-skip). Command: `cargo test --release -p rhino-cli --test repo_governance`.
+      validator if a genuine bug surfaces — never re-skip). Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test repo_governance`.
       Acceptance: `61 scenarios (61 passed)`, `0 skipped`.
 - [ ] [AI] **REFACTOR**: dedupe shared step helpers in `tests/repo_governance.rs`. Command: same.
       Acceptance: still `0 skipped`, all passed.
+
+#### 1a-conversion. Mocked-unit conversion (completes Decision 5's `test:unit` target)
+
+`repo_governance` is the only cucumber binary converted to in-process/mocked execution in this plan,
+because it is the only one whose validators are Fs-injected above (§1·0b). `env_contract` and
+`repo_config_data_driven` already call library functions in-process with no `assert_cmd` subprocess spawn
+(tech-docs §1.7, corrected: 11/13, not 13/13, use `assert_cmd`), so they join `test:unit`'s scope
+unchanged, with no conversion work needed. The remaining 10 `assert_cmd` binaries (`agents`, `contracts`,
+`docs`, `doctor`, `env`, `java`, `repo_config_validate`, `agent_naming_validator`, `spec_coverage`,
+`workflows`) stay on `test:integration` — converting them is out of scope for this plan (no Fs-injection
+work touches their validators).
+
+- [ ] [AI] **RED**: replace every step-def body's subprocess-spawn call
+      (`std::process::Command::new(cargo_bin("rhino-cli"))`, via the `assert_cmd::cargo::cargo_bin` free
+      function) in `apps/rhino-cli/tests/repo_governance.rs` (now de-hollowed and passing above) with a
+      direct in-process call to the corresponding Fs-injected
+      `apps/rhino-cli/src/application/repo_governance/*.rs` validator function, constructing it with
+      `MockFs` (from `apps/rhino-cli/src/application/fs/mock.rs`) instead of the real `Fs` impl. Command:
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance`. Acceptance: the
+      binary builds and runs in-process — `grep -c assert_cmd apps/rhino-cli/tests/repo_governance.rs`
+      returns 0; some scenarios regress from passed to failed/mis-asserted (the expected RED signal —
+      assertions written against subprocess stdout/exit-code shape do not yet match the in-process
+      validator's return shape).
+  - **Gherkin (binds) →** "The mocked behaviour suite runs inside test:quick" (AC-11)
+
+    ```gherkin
+    Scenario: The mocked behaviour suite runs inside test:quick
+      Given rhino-cli test:unit rewired to the in-process mocked behaviour suite
+      When a developer runs the pre-push gate (nx affected -t test:quick)
+      Then the rhino-cli behaviour scenarios execute at the unit tier with mocked I/O
+      And test:integration still runs the temp-fixture binary-spawn suite as the heavier tier
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **GREEN**: adjust each regressed step assertion to match the in-process validator's real return
+      shape (e.g. a `Result<ValidationReport, _>` instead of a process exit code + stdout string),
+      preserving the same scenario-level pass/fail semantics as the subprocess version. Command: same.
+      Acceptance: `61 scenarios (61 passed)`, `0 skipped`, and
+      `grep -c assert_cmd apps/rhino-cli/tests/repo_governance.rs` returns 0.
+- [ ] [AI] **REFACTOR**: dedupe any shared `MockFs`-construction helpers introduced across the converted
+      step defs. Command: same. Acceptance: still `61 scenarios (61 passed)`, `0 skipped`.
+- [ ] [AI] Edit `apps/rhino-cli/project.json`: point `test:unit` at
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
+      — verified this combined invocation runs the `--lib` unit tests plus all three named binaries in one
+      process, no subprocess spawn for any of them. Keep `test:integration`'s command text unchanged
+      (`cargo test --manifest-path apps/rhino-cli/Cargo.toml --tests`) — note this is a blanket `--tests`
+      flag, so `test:integration` continues to run **all** `tests/*.rs` binaries, including the now-mocked
+      `repo_governance`, `env_contract`, `repo_config_data_driven` and the four newly-wired
+      `ddd`/`git_hooks`/`specs_tree`/`test_coverage` binaries from §1e — **21 binaries total**: 17
+      cucumber binaries registered as `[[test]]` entries in `Cargo.toml` (13 pre-existing + 4 new from
+      §1e) plus 4 Cargo-auto-discovered plain binaries with no `[[test]]` entry (`cli_smoke.rs`,
+      `golden_master.rs`, `mermaid_golden_corpus.rs`, `env_validate_integration.rs`) — this redundant
+      re-execution of the mocked/newly-wired binaries is harmless (they still pass); `--tests` cannot be
+      scoped down without an explicit follow-up edit, which is out of scope for this plan. Acceptance:
+      `nx run rhino-cli:test:unit` exits 0, with output showing the `--lib` suite passing plus
+      `repo_governance` (`61 scenarios (61 passed)`), `env_contract`, and `repo_config_data_driven` each
+      green; `nx run rhino-cli:test:integration` still exits 0 running all 21 `tests/*.rs` binaries;
+      `repo-config.yml` keeps `rhino-cli levels: [unit, integration]`.
 
 ### 1b. De-hollow `docs` (43/69 skipped → 0)
 
 - [ ] [AI] **RED**: align step strings in `apps/rhino-cli/tests/docs.rs` to the `md` command names
       (`md links validate`, `md mermaid validate`, `md heading-hierarchy validate`, `md naming validate`,
       `md frontmatter validate`, `md frontmatter-dates validate`, `md readme-index validate`, `md audit`).
-      Command: `cargo test --release -p rhino-cli --test docs`. Acceptance: scenarios execute (not skipped).
+      Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test docs`. Acceptance: scenarios execute (not skipped).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 69 scenarios in `gherkin/md/**`:
+    "A flowchart with all short node labels passes validation"; "A node label exceeding the character limit is flagged"; "The max label length is configurable via flag"; "A deep sequential flowchart (long chain) passes validation regardless of depth"; "A TB flowchart with at most 3 nodes per rank passes validation"; "A TB flowchart with 4 nodes at one rank is flagged"; "A LR flowchart with at most 3 nodes per rank passes validation"; "A LR flowchart with a chain 4 levels deep is flagged"; "The max width is configurable via flag"; "A flowchart exceeding both width and depth thresholds passes with a warning"; "The max depth threshold for the both-exceeded warning is configurable via flag"; "A mermaid block with a single flowchart passes validation"; "A mermaid block with two flowchart declarations is flagged"; "A mermaid block using the graph keyword alias is validated identically"; "Non-flowchart mermaid blocks are ignored"; "A markdown file with no mermaid blocks passes validation"; "With --staged-only only staged markdown files are checked"; "With --changed-only only files changed since upstream are checked"; "JSON output contains structured violation data"; "Markdown output produces a formatted table"; "Verbose flag includes per-file detail in text output"; "Quiet flag suppresses non-error output when there are no violations"; "Plans directory is scanned by default"; "A multi-target edge with the & operator expands into separate edges"; "Multi-source and multi-target on both sides expand into a Cartesian product"; "A 5-target fan-out triggers width violation under default threshold"; "A subgraph with 7 child nodes emits subgraph density warning"; "A subgraph with 6 children passes default threshold"; "Subgraph density threshold is configurable"; "Existing diagrams without & or large subgraphs are unaffected"; "exclude flag skips the named subtree"; "repo-wide default scan finds violation outside the legacy default directories"; "A pipe-labeled edge is parsed as an edge"; "A cyclic flowchart ranks as its underlying chain"; "Software-engineering doc with all required frontmatter fields passes"; "Software-engineering doc missing title fails"; "Software-engineering doc missing category field fails"; "Software-engineering doc with category other than software fails"; "Governance doc with only title passes the lighter schema"; "Software-engineering doc with Diataxis tutorial category passes"; "Software-engineering doc with Diataxis how-to category passes"; "Software-engineering doc with Diataxis reference category passes"; "Software-engineering doc with Diataxis explanation category passes"; "Software-engineering doc with deprecated software category emits warn not fail"; "A document set with all valid internal links passes validation"; "A broken internal link is detected and reported"; "External URLs are not validated"; "With --staged-only only staged files are checked"; "exclude flag skips the named subtree"; "repo-wide scan finds broken link outside original three-directory scope"; "valid anchor link passes validation"; "broken anchor link produces a broken-anchor finding"; "same-file anchor with no matching heading produces a broken-anchor finding"; "anchor slugs keep underscores per the GitHub reference algorithm"; "Tree where every .md has exactly one H1 and no skipped levels passes"; "File with two H1 headings fails"; "File with H2 followed directly by H4 (skipping H3) fails"; "Single-line file with no headings is ignored (passes)"; "prose-allowlist-runs — docs file triggers a heading finding"; "agent-skill-file-exempt — no finding for agent or skill files"; "plans-done-excluded — no finding for plans/done files"; "exclude-flag-suppresses-tree — --exclude docs suppresses docs findings"; "specs-allowlisted — specs tree triggers a heading finding"; "app-readme-allowlisted — project-root README triggers a heading finding"; "app-internals-default-deny — deep app files yield no finding"; "project-docs-subtree-allowlisted — app and lib docs trees trigger findings"; "Tree where every markdown file uses lowercase kebab-case passes"; "File with uppercase characters fails"; "README.md is exempt and passes regardless of placement"
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **GREEN**: satisfy each executing scenario at root cause. Command: same.
       Acceptance: `69 scenarios (69 passed)`, `0 skipped`.
@@ -133,7 +219,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] **RED**: align step strings in `apps/rhino-cli/tests/agents.rs` to `harness` command names
       (`harness bindings generate/validate`, `harness naming validate`, `harness duplication validate`,
       `harness sync`, `harness audit`, `harness instruction-size validate`, `harness claude …`).
-      Command: `cargo test --release -p rhino-cli --test agents`. Acceptance: scenarios execute.
+      Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test agents`. Acceptance: scenarios execute.
+  - **Gherkin (binds) →** — aggregate BDD binder for all 28 scenarios in `gherkin/harness/**`:
+    "Set of distinct agents and skills passes"; "Two agents sharing 12 consecutive lines verbatim fails"; "Agent body matching 10+ consecutive lines of a SKILL.md fails (agent-skill duplication)"; "Heading-only or whitespace-only 10-line window does NOT trigger a finding"; "Emitting writes the rules pointer and the agent definition"; "The agent definition loads AGENTS.md and the rules directory as resources"; "Emitting twice is idempotent"; "Bridge files that match the generator pass validation"; "A mutated bridge file fails validation"; "A missing bridge file fails validation"; "A present binding directory absent from the catalog fails validation"; "Absent binding directories require no catalog row"; "A directory with all agents and skills correctly configured passes validation"; "An agent file missing a required frontmatter field fails validation"; "Two agents with the same name fail validation"; "--agents-only validates agents without checking skills"; "--skills-only validates skills without checking agents"; "Syncing converts Claude agents to OpenCode format and leaves skills in place"; "The --dry-run flag previews changes without modifying files"; "The --agents-only flag syncs agents without touching skills"; "Model names are correctly translated to OpenCode equivalents"; "Directories that are in sync pass validation"; "A description mismatch between directories fails validation"; "A count mismatch between directories fails validation"; "A tree where every agent obeys the naming rule passes validation"; "An agent filename without an allowed role suffix fails validation"; "An agent frontmatter name that disagrees with the filename fails validation"; "A .claude/agents/ file without a matching .opencode/agent/ mirror fails validation"
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **GREEN**: satisfy each. Command: same. Acceptance: `28 scenarios (28 passed)`, `0 skipped`.
 - [ ] [AI] **REFACTOR**: dedupe. Command: same. Acceptance: `0 skipped`.
@@ -142,78 +230,227 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 
 - [ ] [AI] **RED**: change the `#[when]` string in `apps/rhino-cli/tests/workflows.rs:151` from
       `the developer runs workflows validate-naming` to `the developer runs repo-governance workflows naming validate`
-      (matching the feature) and invoke that command. Command: `cargo test --release -p rhino-cli --test workflows`.
+      (matching the feature) and invoke that command. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test workflows`.
       Acceptance: 4 scenarios execute (not skipped).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 4 scenarios in `gherkin/workflows/**`:
+    "A tree where every workflow obeys the naming rule passes validation"; "A workflow filename without an allowed type suffix fails validation"; "A workflow frontmatter name that disagrees with the filename fails validation"; "A file under repo-governance/workflows/meta/ is exempt from the naming rule"
   - _Suggested executor: `swe-rust-dev`_
 - [ ] [AI] **GREEN**: satisfy assertions. Command: same. Acceptance: `4 scenarios (4 passed)`, `0 skipped`.
 - [ ] [AI] **REFACTOR**: none needed unless duplication appears. Command: same. Acceptance: `0 skipped`.
 
 ### 1e. Wire the 4 unbound feature dirs (ddd / git / specs / test-coverage)
 
-- [ ] [AI] For each of `ddd`, `git`, `specs`, `test-coverage`: add a cucumber `[[test]]` binary
-      (`harness = false`) in `apps/rhino-cli/Cargo.toml` + a `tests/<name>.rs` following the exact pattern
-      of an existing binary (async `main()` → `World::run(feature_dir())` bound to that dir + step defs).
-      Per [tech-docs §1.5](./tech-docs.md), `test-coverage` diff/merge scenarios assert **internal**
-      behaviour (`application/testcoverage/{diff,merge}.rs`) or scope to `test-coverage validate` — no
-      invented CLI verb.
-  - [ ] [AI] **RED**: register the binary + empty step scaffold; `cargo test --release -p rhino-cli --test <name>`.
-        Acceptance: scenarios execute and fail/undefined (proving the dir is now bound).
-  - [ ] [AI] **GREEN**: implement step defs against real commands/internal behaviour; same command.
-        Acceptance: all scenarios in the dir pass, `0 skipped`.
+> Each of the 4 dirs below is wired as its own independent RED→GREEN cycle (a separate new cucumber
+> binary with its own pass/fail state), per the pattern of an existing binary (async `main()` →
+> `World::run(feature_dir())` bound to that dir + step defs). Per
+> [tech-docs §1.5](./tech-docs.md), `test-coverage` diff/merge scenarios assert **internal** behaviour
+> (`application/testcoverage/{diff,merge}.rs`) or scope to `test-coverage validate` — no invented CLI verb.
+
+#### 1e-i. Wire `ddd` (18 scenarios, 2 feature files)
+
+- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+      `apps/rhino-cli/tests/ddd.rs` bound to `gherkin/ddd/`, with an empty step scaffold. Command:
+      `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test ddd`. Acceptance: scenarios execute and fail/undefined
+      (proving the dir is now bound).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 18 scenarios in `gherkin/ddd/**`:
+    "All glossaries are valid — exits successfully with no findings"; "Glossary is missing a required frontmatter key"; "Terms table has a malformed header"; "A code identifier is stale (not found in BC code path)"; "A feature reference does not resolve to an existing .feature file"; "Same term appears in two glossaries without mutual Forbidden-synonyms cross-link"; "--severity=warn downgrades findings — exits successfully with warnings"; "Clean registry matches filesystem exactly — exits zero"; "Orphan code folder not in registry is flagged"; "Missing glossary file is flagged"; "Missing layer subfolder is flagged"; "Extra layer subfolder not in registry is flagged"; "Missing gherkin folder is flagged"; "Gherkin folder with no feature files is flagged"; "Relationship asymmetry is flagged"; "Severity warn flag downgrades findings to warnings and exits zero"; "OSE_RHINO_DDD_SEVERITY env var overrides default severity"; "Registry file not found for unknown app is an error"
   - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: implement step defs against the real `ddd`/glossary/bounded-context validator
+      commands. Command: same. Acceptance: all 18 scenarios in `ddd/` pass, `0 skipped`.
+- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `ddd.rs` step defs.
+      Command: same. Acceptance: `0 skipped`.
+
+#### 1e-ii. Wire `git` (5 scenarios, 1 feature file)
+
+- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+      `apps/rhino-cli/tests/git_hooks.rs` bound to `gherkin/git/`, with an empty step scaffold. Command:
+      `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test git_hooks`. Acceptance: scenarios execute and
+      fail/undefined (proving the dir is now bound).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 5 scenarios in `gherkin/git/**`:
+    "Broken-link detection in step 7 reports per-link details"; "staged-mermaid-blocks — staged malformed mermaid diagram blocks commit"; "staged-prose-heading-blocks — staged docs file with bad heading hierarchy blocks commit"; "staged-skill-file-exempt — staged SKILL.md with bad heading hierarchy does not block commit"; "link-step-honors-exclusions — staged plans/done broken link does not block commit"
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: implement step defs against the real staged-file git hook commands. Command: same.
+      Acceptance: all 5 scenarios in `git/` pass, `0 skipped`.
+- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `git_hooks.rs` step defs.
+      Command: same. Acceptance: `0 skipped`.
+
+#### 1e-iii. Wire `specs` (29 scenarios, 10 feature files)
+
+- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+      `apps/rhino-cli/tests/specs_tree.rs` bound to `gherkin/specs/`, with an empty step scaffold. Command:
+      `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test specs_tree`. Acceptance: scenarios execute and
+      fail/undefined (proving the dir is now bound).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 29 scenarios in `gherkin/specs/**`:
+    "An untagged scenario fails the gate"; "A scenario requiring a level outside the project envelope fails"; "A scenario not covered at a required level fails"; "An @covers at an undeclared level fails"; "An orphan @covers marker fails the gate"; "A @wip scenario is exempt from coverage"; "Every harness command is registry-driven, not hard-coded"; "app with complete spec tree passes validation"; "app missing a required folder reports a finding"; "app with folder missing README.md reports a finding"; "app with no spec tree at all reports findings for every required folder"; "app with BDD feature files and bounded-contexts.yaml passes validation"; "app missing behavior feature files reports a finding"; "app missing bounded-contexts.yaml reports a finding"; "unknown app with no spec tree at all reports findings for both adoptions"; "Committing a real .env file is rejected"; "Staging .env.example is allowed"; "An uncovered domain scenario fails the gate"; "A project not in the domain-areas allowlist is skipped"; "All 11 harnesses are accounted for at their tier"; "A regression test locks worktree-safe execution"; "folder with spec files in all subfolders passes validation"; "empty subfolder reports a finding"; "missing subfolder reports a finding"; "folder path that does not exist reports an error"; "folder with all valid internal links passes validation"; "markdown file with broken internal link reports a finding"; "markdown file with only external HTTPS links passes validation"; "folder path that does not exist reports an error"
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: implement step defs against the real `specs structure validate`,
+      `specs behavior-coverage validate`, `specs domain-coverage`, `harness bindings validate`, and
+      `env staged-guard` commands (per scenario domain). Command: same. Acceptance: all 29 scenarios in
+      `specs/` pass, `0 skipped`.
+- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `specs_tree.rs` step defs.
+      Command: same. Acceptance: `0 skipped`.
+
+#### 1e-iv. Wire `test-coverage` (17 scenarios, 3 feature files)
+
+- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+      `apps/rhino-cli/tests/test_coverage.rs` bound to `gherkin/test-coverage/`, with an empty step
+      scaffold. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test test_coverage`. Acceptance: scenarios
+      execute and fail/undefined (proving the dir is now bound).
+  - **Gherkin (binds) →** — aggregate BDD binder for all 17 scenarios in `gherkin/test-coverage/**`:
+    "Merging two LCOV files produces correct combined coverage"; "Merging with validation passes when coverage meets threshold"; "Merging with validation fails when coverage is below threshold"; "A Go coverage file above the threshold reports success"; "A Go coverage file below the threshold reports failure"; "An LCOV file above the threshold reports success"; "Coverage at exactly the threshold passes"; "JSON output includes structured coverage metrics"; "Per-file flag shows individual file coverage"; "A Cobertura XML file above the threshold reports success"; "A Cobertura XML file with partial branches classifies correctly"; "Exclude flag removes files from coverage calculation"; "A non-existent coverage file reports an error"; "No changed lines reports 100% coverage"; "Changed lines with full coverage pass threshold"; "Changed lines with missing coverage fail threshold"; "Excluded files are not counted in diff coverage"
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **GREEN**: implement step defs asserting the **internal** `application/testcoverage/{diff,merge}.rs`
+      behaviour directly (or scoped to `test-coverage validate` where a real CLI verb exists) — never
+      invent a non-existent CLI verb. Command: same. Acceptance: all 17 scenarios in `test-coverage/` pass,
+      `0 skipped`.
+- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `test_coverage.rs` step defs.
+      Command: same. Acceptance: `0 skipped`.
 
 ### 1f. Gap-fill uncovered leaf commands
 
-- [ ] [AI] **RED**: from `audit/04-coverage-map.md`, for each leaf command with no scenario add a
-      `.feature` in its existing domain dir. Priority gap: create
-      `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/gherkin-cardinality.feature` for `specs gherkin-cardinality`
-      (modernize primer's stale `repo-governance-gherkin-keyword-cardinality.feature` content to the new command), + a step def in the relevant binary. Command: `cargo test --release -p rhino-cli --test <binary>`.
-      Acceptance: new scenarios execute and fail (RED).
+- [ ] [AI] **RED**: from `audit/04-coverage-map.md`, for each remaining leaf command with no scenario add
+      a `.feature` in its existing domain dir + a step def in the relevant binary. Command:
+      `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test <binary>`. Acceptance: new scenarios execute and fail (RED).
+  - **Gherkin (underpins) →** "Each leaf rhino-cli command has at least one enforcing scenario" (AC-2) —
+    aggregate gap-fill RED covering every newly-authored scenario from the Phase 0 coverage map, beyond
+    the named priority gap below. _Note: this step's scenario set is dynamically discovered by Phase 0's
+    coverage map, so it cannot be enumerated at authoring time — it is neither a pure-core (`underpins`)
+    data/calc unit test nor a single aggregate feature-consuming binder in the sense of the Test-Driven
+    Development Convention's two named multi-scenario exceptions; the `underpins` tag is used here as the
+    closest practical fit for this third, dynamically-scoped case._
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: make each gap-fill scenario pass against the real command. Command: same.
-      Acceptance: all pass, `0 skipped`; every leaf command in `audit/04-coverage-map.md` now marked enforcing.
-- [ ] [AI] Reconcile the env-validate app-drift behaviour (AC-6): ensure `env validate` declared-but-unread /
-      read-but-undeclared behaviour (today only in the plain `tests/env_validate_integration.rs`) owns an
-      **executing cucumber scenario** under `env/` or `env-contract/`. Command: `cargo test --release -p rhino-cli --test env`.
-      Acceptance: the drift behaviour has a passing cucumber scenario.
+- [ ] [AI] **RED (priority gap)**: create
+      `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/gherkin-cardinality.feature` for `specs
+gherkin-cardinality validate`, modernizing primer's stale
+      `repo-governance-gherkin-keyword-cardinality.feature` content (command renamed from
+      `repo-governance gherkin-keyword-cardinality` to `specs gherkin-cardinality validate`) + a step def
+      in the relevant binary. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test <binary>`. Acceptance: the
+      new scenario executes and fails (RED).
+  - **Gherkin (binds) →** "A scenario with two primary When keywords fails the audit"
+
+    ```gherkin
+    Scenario: A scenario with two primary When keywords fails the audit
+      Given a feature file containing a scenario with two primary "When" keywords
+      When the developer runs specs gherkin-cardinality validate on the file
+      Then the command exits with a failure code
+      And the output names the offending file and scenario
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **GREEN**: make each gap-fill scenario (including the priority-gap `specs gherkin-cardinality`
+      scenario) pass against the real command. Command: same. Acceptance: all pass, `0 skipped`; every leaf
+      command in `audit/04-coverage-map.md` now marked enforcing.
+- [ ] [AI] **RED (AC-6)**: author the env-validate app-drift reconciliation scenario under `env/` or
+      `env-contract/` — asserting the `env validate` declared-but-unread / read-but-undeclared behaviour
+      (today only covered by the plain `tests/env_validate_integration.rs`) as an executing cucumber
+      scenario. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test env`. Acceptance: the new scenario
+      executes and fails/is undefined.
+  - **Gherkin (binds) →** "Renamed-command behaviours are re-expressed against current commands" (AC-6)
+
+    ```gherkin
+    Scenario: Renamed-command behaviours are re-expressed against current commands
+      Given primer's stale env/env-validate.feature and repo-governance-gherkin-keyword-cardinality.feature
+      When the canonical tree is finalized
+      Then the env-validate and gherkin-cardinality behaviours each own an executing scenario under the current command name
+      And the two stale files no longer exist under their pre-union names in any repo
+    ```
+
+  - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **GREEN (AC-6)**: implement the step def against the real declared-but-unread/read-but-
+      undeclared check. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test env`. Acceptance: the AC-6
+      scenario passes.
+- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new gap-fill step defs
+      (including the priority-gap and AC-6 step defs). Command: same. Acceptance: `0 skipped`.
 
 ### 1g. Enable cucumber fail-on-skip (lock 0-skip — Decision 6)
 
-- [ ] [AI] Configure every cucumber World runner (`apps/rhino-cli/tests/*.rs`) with `.fail_on_skipped()`
-      (or the 0.23 equivalent) so an undefined/skipped step **fails** the run. Command:
-      `cargo test --release -p rhino-cli --no-fail-fast`. Acceptance: with all scenarios de-hollowed the
-      suite still exits 0; introduce a temporary bogus step to confirm it now **fails** (then revert).
+- [ ] [AI] **RED**: configure every cucumber World runner (`apps/rhino-cli/tests/*.rs`) with
+      `.fail_on_skipped()` (or the 0.23 equivalent); introduce one temporary bogus/undefined step in any
+      binary to confirm the config takes effect. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`.
+      Acceptance: the bogus scenario's binary now **fails** (non-zero exit) — proving `fail_on_skipped` is
+      wired.
+  - **Gherkin (binds) →** "A skipped or undefined cucumber step reddens the build" (AC-12)
+
+    ```gherkin
+    Scenario: A skipped or undefined cucumber step reddens the build
+      Given the cucumber harness configured with fail_on_skipped
+      When a scenario contains a step with no matching step definition
+      Then the test run exits non-zero and names the offending scenario
+      And no scenario can silently skip while the suite reports success
+    ```
+
   - _Suggested executor: `swe-rust-dev`_
+
+- [ ] [AI] **GREEN**: revert the temporary bogus step. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast`.
+      Acceptance: exits 0, `0 skipped` in every binary (all scenarios de-hollowed in 1a–1f).
+- [ ] [AI] **REFACTOR**: none needed unless duplication appears from the temporary bogus-step revert.
+      Command: same. Acceptance: exits 0, `0 skipped` in every binary.
 
 ### 1h. @covers completeness for rhino-cli (Decision 7)
 
 - [ ] [AI] Ensure every rhino-cli scenario carries its `@unit`/`@integration` level tag(s) and a matching
       `// @covers <spec-path>:<scenario-title>` marker at each declared level (per-scenario envelope from
-      `audit/04-coverage-map.md`). Command: `rhino-cli specs behavior-coverage validate`. Acceptance: exit 0
-      with no untagged/uncovered/orphan findings.
+      `audit/04-coverage-map.md`). Command:
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
+      (mirrors every other project's own `specs:behavior:coverage` Nx-target invocation — see e.g.
+      `apps/crane-cli/project.json`'s `specs behavior-coverage validate --shared-steps
+specs/apps/crane/behavior/crane-cli/gherkin apps/crane-cli`). Acceptance: exit 0 with no
+      untagged/uncovered/orphan findings.
+  - _Suggested executor: `swe-rust-dev`_
+- [ ] [AI] **Fix the pre-existing `specs:behavior:coverage` Nx-target stub** (Decision 9 — NO DEFER, NO
+      SHORTCUT; closes the gap where rhino-cli's own pre-push gate silently no-ops its `@covers` check):
+      edit `apps/rhino-cli/project.json`'s `specs:behavior:coverage` target — replace the literal
+      `"echo 'Phase 1 — specs:behavior:coverage stub; full @covers wiring lands in Phase 1b wiring step'"`
+      command with
+      `"cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli"`
+      (the required `<PATHS> <PATHS>...` positional pair — specs-dir then app-dir — mirrors every other
+      project's own target, e.g. `apps/crane-cli/project.json`'s `--shared-steps
+specs/apps/crane/behavior/crane-cli/gherkin apps/crane-cli`; the bare, argument-less form exits 2
+      with a clap usage error and never reaches the coverage logic).
+      Command: `nx run rhino-cli:test:specs` (chains `specs:structure-validation` +
+      `specs:behavior:coverage`). Acceptance: the target's output no longer contains the string `stub`
+      and its exit code equals the real `specs behavior-coverage validate` command's own exit code (verify
+      by comparing `nx run rhino-cli:specs:behavior:coverage` output to a direct
+      `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
+      run); `nx run rhino-cli:test:quick` (the pre-push gate) now genuinely enforces rhino-cli's own
+      `@covers` completeness.
   - _Suggested executor: `swe-rust-dev`_
 
 ### 1i. Regenerate golden-master
 
 - [ ] [AI] Regenerate `apps/rhino-cli/tests/golden-master/**` from the canonical binary per the
-      predecessor's method (`{{TMPDIR}}` sentinel + `--no-color`). Command: `cargo test --release -p rhino-cli --test golden_master`.
+      predecessor's method (`{{TMPDIR}}` sentinel + `--no-color`). Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test golden_master`.
       Acceptance: golden-master test passes; review the diff for intent before freezing.
 
 ### Phase 1 Gate
 
 > All checks below must pass before starting Phase 2.
 
-- [ ] [AI] `cargo test --release -p rhino-cli --no-fail-fast` — exits 0 **with `0 skipped` in every binary**
+- [ ] [AI] `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` — exits 0 **with `0 skipped` in every binary**
       (grep the output: `grep -c "skipped)"` returns 0). **This is the core acceptance of the whole plan.**
-- [ ] [AI] `nx run rhino-cli:test:unit` (mocked, in-process) runs the behaviour suite and passes — proving
-      it now executes inside the pre-push `test:quick` gate; `nx run rhino-cli:test:integration` (temp-fixture)
-      also green.
+- [ ] [AI] `nx run rhino-cli:test:unit` — runs
+      `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
+      (mocked/in-process, per §1a's "Mocked-unit conversion") and exits 0: `--lib` suite green,
+      `repo_governance` `61 scenarios (61 passed)`, `env_contract` and `repo_config_data_driven` each green
+      — proving the mocked behaviour tier now executes inside the pre-push `test:quick` gate. `nx run
+rhino-cli:test:integration` also exits 0 — its blanket `--tests` flag runs all 21 `tests/*.rs`
+      binaries (17 cucumber binaries registered as `[[test]]` entries — 13 pre-existing + 4 new from
+      §1e — plus 4 Cargo-auto-discovered plain binaries with no `[[test]]` entry: `cli_smoke.rs`,
+      `golden_master.rs`, `mermaid_golden_corpus.rs`, `env_validate_integration.rs`), including the
+      now-mocked `repo_governance`/`env_contract`/`repo_config_data_driven` and the four newly-wired §1e
+      binaries (redundant re-execution, harmless since they still pass).
 - [ ] [AI] Cucumber `fail_on_skipped` is active (a bogus undefined step reddens the build).
 - [ ] [AI] `nx affected -t lint,typecheck --base=origin/main` — exits 0 (public's strict clippy/doc lints pass).
-- [ ] [AI] `rhino-cli specs structure validate` + `rhino-cli specs behavior-coverage validate` — exit 0.
+- [ ] [AI] `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs structure validate` + `cargo run --release --quiet --manifest-path apps/rhino-cli/Cargo.toml -- specs behavior-coverage validate --shared-steps specs/apps/rhino/behavior/rhino-cli/gherkin apps/rhino-cli`
+      — both exit 0.
+- [ ] [AI] `nx run rhino-cli:specs:behavior:coverage` genuinely invokes the real `specs behavior-coverage
+validate` command (output does not contain the string `stub`) — proving the pre-existing echo-stub
+      Nx target (1h) is fixed and `nx run rhino-cli:test:quick` no longer silently no-ops this check.
 
 > **Pause Safety**: the canonical tree is fully enforcing (0 skipped), golden-master regenerated, ose-public
-> green on its own gate. Safe to stop. To resume: `cargo test --release -p rhino-cli`.
+> green on its own gate. Safe to stop. To resume: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli`.
 
 ---
 
@@ -226,24 +463,47 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       [`docs/reference/sdlc-gate-standard.md`](../../../docs/reference/sdlc-gate-standard.md) — add
       `specs/apps/rhino/behavior/rhino-cli/gherkin/**` (`.feature` + `README.md`) to the rhino-cli
       byte-identity boundary section. Acceptance: the path appears in the boundary definition.
-  - _Suggested executor: `repo-rules-maker`_
+  - _Suggested executor: `docs-maker`_
 - [ ] [AI] Add a verification step to
       [`repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
       that diffs the Gherkin tree md5-manifest across the three repos. Acceptance: the step is present with an explicit command.
   - _Suggested executor: `repo-workflow-maker`_
-- [ ] [AI] Update the byte-identity notes in `AGENTS.md` + `CLAUDE.md` to mention the Gherkin tree is
-      in-boundary. Acceptance: both files reference it; `npm run generate:bindings` re-synced.
-- [ ] [AI] **Re-place the repo-config schema gate** (Decision 8, closes the 2026-07-03 Decision-5 gap) per
-      [tech-docs §1.6](./tech-docs.md#16-repo-config-schema-parity-gate-is-missing-at-pre-commit):
-      (a) add the staged-gated step to `ose-public/.husky/pre-commit` after the `env staged-guard` step
-      (`git diff --cached --name-only … | grep '^repo-config\.yml$'` → `rhino-cli repo-config validate`);
-      (b) add a standalone `rhino-cli repo-config validate` step to `.github/workflows/pr-quality-gate.yml`
-      and `.github/workflows/main-ci.yml`; (c) **remove** the `repo-config validate` line from
-      `.husky/pre-push` (`ose-public` `:10`). Verify: staging a bogus-key `repo-config.yml` + `sh .husky/pre-commit`
-      rejects it (revert after); `grep -c "repo-config validate" .husky/pre-push` returns 0. Acceptance: gate
-      fires at pre-commit/PR/main, absent from pre-push.
-- [ ] [AI] Run `rhino-cli md links validate` + `rhino-cli md readme-index validate` over the new plan +
-      edited docs. Acceptance: exit 0.
+- [ ] [AI] Update the byte-identity note in `AGENTS.md` §Related Repositories to mention the Gherkin
+      tree (`specs/apps/rhino/behavior/rhino-cli/gherkin/**`) is in-boundary. The note lives solely
+      in `AGENTS.md`; `CLAUDE.md` is a thin shim (`@AGENTS.md` import) with no byte-identity content
+      of its own, so it inherits this update automatically — no separate `CLAUDE.md` edit is needed
+      for this item. Acceptance: `AGENTS.md` §Related Repositories references the Gherkin tree path.
+- [ ] [AI] **Re-place the repo-config schema gate (a) — add the pre-commit staged-gated step** (Decision 8,
+      closes the 2026-07-03 Decision-5 gap) per
+      [tech-docs §1.6](./tech-docs.md#16-repo-config-schema-parity-gate-is-missing-at-pre-commit): add the
+      staged-gated step to `ose-public/.husky/pre-commit` after the existing `env staged-guard` step
+      (`git diff --cached --name-only … | grep '^repo-config\.yml$'` → `rhino-cli repo-config validate`).
+      Verify: staging a bogus-key `repo-config.yml` + `sh .husky/pre-commit` rejects it (revert the bogus
+      key after). Acceptance: the pre-commit gate fires only when `repo-config.yml` is staged.
+- [ ] [AI] **Re-place the repo-config schema gate (b) — add the PR + main workflow steps**: add a
+      standalone `rhino-cli repo-config validate` step to `.github/workflows/pr-quality-gate.yml` and
+      `.github/workflows/main-ci.yml` (unconditional, not staged-gated). Acceptance: both workflow files
+      contain the new step; `grep -c "repo-config validate" .github/workflows/pr-quality-gate.yml
+.github/workflows/main-ci.yml` returns 1 for each file.
+- [ ] [AI] **Re-place the repo-config schema gate (c) — remove the pre-push step**: remove the
+      `repo-config validate` line from `.husky/pre-push` (`ose-public` `:10`). Acceptance:
+      `grep -c "repo-config validate" .husky/pre-push` returns 0.
+- [ ] [AI] **Re-place the repo-config schema gate (d) — correct BOTH stale gate-placement statements**:
+      edit [`docs/reference/sdlc-gate-standard.md`](../../../docs/reference/sdlc-gate-standard.md) at TWO
+      locations to reflect Decision 8's target placement (pre-commit staged-gate + PR quality gate + main
+      quality gate; no longer pre-push): (1) line 254 (rhino-cli Byte-Identity Boundary prose) — replace
+      "run at pre-commit and again at pre-push/PR in every repo" with wording naming pre-commit, PR, and
+      main; (2) line 238 (the `repo-config.yml` schema parity row of the Standardization Layer comparison
+      table) — replace "wired at pre-commit (file-scoped fast path) and pre-push/PR (defense-in-depth)"
+      with wording naming pre-commit, PR, and main, preserving the table row structure. Do NOT touch the
+      unrelated "pre-push/PR" prose at lines 61 and 104 — that text describes other gates and is out of
+      scope for this item. Acceptance: `sed -n '254p' docs/reference/sdlc-gate-standard.md | grep -c
+"pre-push/PR"` returns 0 AND `sed -n '238p' docs/reference/sdlc-gate-standard.md | grep -c
+"pre-push/PR"` returns 0 AND both corrected lines, read back individually, each name all three of
+      pre-commit, PR, and main AND `grep -c "pre-push/PR" docs/reference/sdlc-gate-standard.md` still
+      returns 2 (the untouched, unrelated occurrences at lines 61 and 104).
+- [ ] [AI] Run `rhino-cli md links validate` over the new plan + edited docs. Acceptance: exit 0.
+- [ ] [AI] Run `rhino-cli md readme-index validate` over the new plan + edited docs. Acceptance: exit 0.
 
 ### Phase 2 Gate
 
@@ -260,17 +520,24 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ## Phase 3 — Propagate to ose-primer
 
 - [ ] [AI] Copy canonical `apps/rhino-cli/` (excluding `target/`, `dist/`, `cover.out`, `lcov.info`) from
-      ose-public into `/Users/wkf/ose-projects/ose-primer/apps/rhino-cli/`. Acceptance:
-      `diff -rq --exclude=target --exclude=dist ose-public/apps/rhino-cli ose-primer/apps/rhino-cli` shows
-      only untracked-artifact/README differences (zero source/tests/feature diffs).
+      ose-public into `/Users/wkf/ose-projects/ose-primer/apps/rhino-cli/`. Command:
+      `rsync -a --delete --exclude=target --exclude=dist --exclude=cover.out --exclude=lcov.info
+/Users/wkf/ose-projects/ose-public/apps/rhino-cli/ /Users/wkf/ose-projects/ose-primer/apps/rhino-cli/`.
+      Acceptance: `diff -rq --exclude=target --exclude=dist ose-public/apps/rhino-cli ose-primer/apps/rhino-cli`
+      shows only untracked-artifact/README differences (zero source/tests/feature diffs).
 - [ ] [AI] Replace primer's `specs/apps/rhino/behavior/rhino-cli/gherkin/` tree with the canonical tree
       (`.feature` + behaviour-`README.md`); delete the 2 stale files (`env/env-validate.feature`,
-      `repo-governance/repo-governance-gherkin-keyword-cardinality.feature`). Acceptance:
+      `repo-governance/repo-governance-gherkin-keyword-cardinality.feature`). Command:
+      `rsync -a --delete
+/Users/wkf/ose-projects/ose-public/specs/apps/rhino/behavior/rhino-cli/gherkin/
+/Users/wkf/ose-projects/ose-primer/specs/apps/rhino/behavior/rhino-cli/gherkin/` (the `--delete`
+      flag removes the 2 stale files since they are absent from the canonical source). Acceptance:
       `diff -rq` of the gherkin `.feature`+README set between public and primer is empty.
-- [ ] [AI] Propagate the boundary/workflow/AGENTS/CLAUDE edits **and the pre-commit `repo-config validate`
+- [ ] [AI] Propagate the boundary/workflow/AGENTS edits (`CLAUDE.md` needs no separate edit — it inherits
+      automatically via its `@AGENTS.md` import) **and the pre-commit `repo-config validate`
       staged-gate step** from Phase 2 into primer; run `npm run generate:bindings`. Acceptance: bindings
       synced; primer's `.husky/pre-commit` step is byte-identical to public's.
-- [ ] [AI] Run `cargo test --release -p rhino-cli --no-fail-fast` in ose-primer. Acceptance: exit 0, `0 skipped`.
+- [ ] [AI] Run `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in ose-primer. Acceptance: exit 0, `0 skipped`.
 
 ### Phase 3 Gate
 
@@ -287,16 +554,22 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 ## Phase 4 — Propagate to ose-infra
 
 - [ ] [AI] Copy canonical `apps/rhino-cli/` from ose-public into
-      `/Users/wkf/ose-projects/ose-infra/apps/rhino-cli/` (same exclusions). Acceptance:
-      `diff -rq` shows only untracked-artifact/README differences.
+      `/Users/wkf/ose-projects/ose-infra/apps/rhino-cli/` (same exclusions). Command:
+      `rsync -a --delete --exclude=target --exclude=dist --exclude=cover.out --exclude=lcov.info
+/Users/wkf/ose-projects/ose-public/apps/rhino-cli/ /Users/wkf/ose-projects/ose-infra/apps/rhino-cli/`.
+      Acceptance: `diff -rq` shows only untracked-artifact/README differences.
 - [ ] [AI] Sync infra's gherkin tree to canonical (`.feature` + behaviour-`README.md`). Since infra's
       `.feature` set was already identical to public pre-plan, this applies the de-hollow/gap-fill deltas.
-      Acceptance: `diff -rq` of the `.feature`+README set between public and infra is empty.
-- [ ] [AI] Propagate the boundary/workflow/AGENTS/CLAUDE edits **and the pre-commit `repo-config validate`
+      Command: `rsync -a --delete
+/Users/wkf/ose-projects/ose-public/specs/apps/rhino/behavior/rhino-cli/gherkin/
+/Users/wkf/ose-projects/ose-infra/specs/apps/rhino/behavior/rhino-cli/gherkin/`. Acceptance:
+      `diff -rq` of the `.feature`+README set between public and infra is empty.
+- [ ] [AI] Propagate the boundary/workflow/AGENTS edits (`CLAUDE.md` needs no separate edit — it inherits
+      automatically via its `@AGENTS.md` import) **and the pre-commit `repo-config validate`
       staged-gate step** into infra; run `npm run generate:bindings`. Acceptance: bindings synced; infra's
       `.husky/pre-commit` step is byte-identical to public's (accounting for infra's existing hook-mechanism
       divergence — the added step invokes the same `cargo run … repo-config validate`).
-- [ ] [AI] Run `cargo test --release -p rhino-cli --no-fail-fast` in ose-infra. Acceptance: exit 0, `0 skipped`.
+- [ ] [AI] Run `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in ose-infra. Acceptance: exit 0, `0 skipped`.
 
 ### Phase 4 Gate
 
@@ -320,9 +593,12 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
 - [ ] [AI] **Cross-repo byte-identity matrix**: for all three repos, verify `apps/rhino-cli` (excl.
       artifacts) and the gherkin `.feature`+README set are byte-identical (`diff -rq` pairwise + md5
       manifests all equal `audit/06-canonical-manifest.md`). Acceptance: zero differences across all three.
-- [ ] [AI] **Enforcement matrix**: `cargo test --release -p rhino-cli --no-fail-fast` in each repo reports
+- [ ] [AI] **Enforcement matrix**: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in each repo reports
       `0 skipped` and exit 0. Acceptance: identical scenario counts, all passed, none skipped, in all three.
-- [ ] [AI] Per repo: `nx affected -t typecheck,lint,test:quick,specs:coverage --base=origin/main` — exits 0.
+- [ ] [AI] Per repo: `nx affected -t typecheck,lint,test:quick,test:specs --base=origin/main` — exits 0
+      (the real aggregate spec-coverage target is `test:specs`, not `specs:coverage` — see
+      [nx-targets.md](../../../repo-governance/development/infra/nx-targets.md); verify the
+      project-appropriate real target set per repo if `ose-primer`/`ose-infra` differ).
 
 ### Commit Guidelines
 
@@ -332,6 +608,9 @@ See [Worktree Path Convention](../../../repo-governance/conventions/structure/wo
       `test(specs): make rhino-cli gherkin tree byte-identical across repos`,
       `docs(governance): bring rhino-cli gherkin tree into the SDLC parity boundary`.
 - [ ] [AI] Verify each repo's staged set contains only rhino-cli + specs/gherkin + governance-doc paths.
+      Command: `git diff --cached --name-only`. Acceptance: every listed path is under `apps/rhino-cli/`,
+      `specs/apps/rhino/behavior/rhino-cli/`, or a governance doc named in this plan's file-impact table
+      (`tech-docs.md §6`) — no unrelated paths.
 
 ### Post-Push Verification
 

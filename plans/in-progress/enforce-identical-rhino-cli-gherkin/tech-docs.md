@@ -33,7 +33,7 @@ The behaviour spec they execute lives **outside** that boundary, at
 
 ### 1.3 Enforcement census — 53% of scenarios are hollow
 
-`cargo test --release -p rhino-cli --no-fail-fast` in `ose-public` (exit 0):
+`cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-fast` in `ose-public` (exit 0):
 
 | Cucumber binary           | Feature dir bound       | Scenarios | Passed  | **Skipped**   |
 | ------------------------- | ----------------------- | --------- | ------- | ------------- |
@@ -148,7 +148,9 @@ workflow files.
   behaviour suite.
 - `test:integration` = `cargo test --manifest-path … --tests` — runs the 13 cucumber binaries. Step defs
   spawn the built binary via `assert_cmd::cargo::cargo_bin("rhino-cli")` + real `git` against temp dirs
-  (13/13 use `assert_cmd`).
+  (**11 of 13** use `assert_cmd`; `env_contract` and `repo_config_data_driven` already call library
+  functions in-process — **no subprocess spawn** — a usable precedent for the mocked-unit conversion
+  below).
 - `test:quick` (the pre-push gate) = typecheck + lint + `test:unit` + `test:coverage` + `test:specs` —
   **does not include `test:integration`.** So the 228-scenario behaviour suite runs **neither at
   pre-commit nor pre-push**; only on a direct `cargo test`/CI integration invocation.
@@ -156,14 +158,29 @@ workflow files.
 
 **Target** (Decisions 5–7):
 
-- `test:unit` runs the behaviour suite **in-process against a mocked I/O seam** — a filesystem/git
-  abstraction (trait) injected into the core validators (functional-core/imperative-shell). Fast +
-  deterministic ⇒ the behaviour suite finally runs in the pre-push `test:quick` gate.
-- `test:integration` keeps the temp-fixture/`assert_cmd` binary-spawn suite as the heavier tier.
+- `test:unit` runs a **mocked/in-process behaviour tier** against a mocked I/O seam — a filesystem
+  abstraction (`Fs` trait) injected into the core `repo_governance` validators (functional-core/
+  imperative-shell). **Concrete Phase-1 scope** (§1a's "Mocked-unit conversion" sub-steps in
+  [delivery.md](./delivery.md)): `repo_governance` is the only binary converted, because it is the only
+  one whose validators are Fs-injected in [delivery.md §1·0b](./delivery.md#10b-introduce-the-mock-io-seam--reclassify-testunit-prerequisite--decision-5);
+  `env_contract` and `repo_config_data_driven` join it unchanged, since both already call library
+  functions in-process with no `assert_cmd` subprocess spawn (see above). The literal resulting command,
+  wired as the `test:unit` Nx target:
+  `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib --test repo_governance --test env_contract --test repo_config_data_driven`
+  (verified: this single invocation runs the `--lib` suite plus all three named binaries in one process,
+  no subprocess spawn for any of them). Fast + deterministic ⇒ this tier finally runs in the pre-push
+  `test:quick` gate.
+- `test:integration` keeps the temp-fixture/`assert_cmd` binary-spawn suite as the heavier tier — the
+  remaining 10 `assert_cmd` binaries (`agents`, `contracts`, `docs`, `doctor`, `env`, `java`,
+  `repo_config_validate`, `agent_naming_validator`, `spec_coverage`, `workflows`) plus golden-master.
+  Converting these 10 to mocked/in-process is **out of scope for this plan** — no Fs-injection work
+  touches their validators; a future follow-on plan may extend the seam to them.
 - Cucumber World configured `.fail_on_skipped()` ⇒ an unimplemented/undefined step is a **red build**.
 - Scenarios level-tagged (`@unit`/`@integration`) + `// @covers` markers so `specs behavior-coverage`
   passes meaningfully. Note: a scenario may be tagged for **both** tiers (mocked unit + temp-fixture
-  integration); Phase 1 decides the per-scenario envelope and records it in `audit/04-coverage-map.md`.
+  integration) in general; this plan's concrete scope does not double-tag `repo_governance` (it moves
+  exclusively to the `@unit` tier) — Phase 1 records the actual per-scenario envelope in
+  `audit/04-coverage-map.md`.
 
 **Mockable-seam note**: rhino-cli core today does real I/O directly (`std::fs`, `walkdir`, `git` via
 process). The seam = introduce trait(s) (e.g. `Fs`, `GitRepo`) with a real impl (imperative shell) and a
@@ -189,6 +206,45 @@ flowchart LR
 Because de-hollowing edits `apps/rhino-cli/tests/*.rs` (inside the byte-identity boundary), the **whole
 updated `apps/rhino-cli`** propagates to primer and infra — not just the Gherkin tree — preserving zero
 carve-outs.
+
+## 2.5 Phase & Delivery Flow (6-Phase, 3-Repo Progression)
+
+Phase 0–2 execute in `ose-public` (canonical), then fan out to `ose-primer` (Phase 3) and `ose-infra`
+(Phase 4) in parallel, converging at Phase 5 (cross-repo verification, push, archival). Each phase ends
+with a must-pass gate (diamond) before the next phase may start:
+
+```mermaid
+%% Color palette: Blue #0072B2 (ose-public phases), Orange #E69F00 (ose-primer), Teal #009E73 (ose-infra),
+%% Vermillion #D55E00 (converged Phase 5), Gray #808080 (gate checkpoints) — Okabe-Ito, colorblind-safe.
+flowchart LR
+  P0["Phase 0<br/>Baseline & Audit<br/>(ose-public)"] --> G0{"Phase 0 Gate<br/>baseline green"}
+  G0 --> P1["Phase 1<br/>De-Hollow + Gap-Fill<br/>(ose-public)"]
+  P1 --> G1{"Phase 1 Gate<br/>0 skipped"}
+  G1 --> P2["Phase 2<br/>Freeze + Anti-Drift<br/>(ose-public)"]
+  P2 --> G2{"Phase 2 Gate<br/>manifest frozen"}
+  G2 --> P3["Phase 3<br/>Propagate<br/>(ose-primer)"]
+  G2 --> P4["Phase 4<br/>Propagate<br/>(ose-infra)"]
+  P3 --> G3{"Phase 3 Gate<br/>byte-identical"}
+  P4 --> G4{"Phase 4 Gate<br/>byte-identical"}
+  G3 --> P5["Phase 5<br/>Verify, Push, Archive<br/>(all 3 repos)"]
+  G4 --> P5
+  style P0 fill:#0072B2,color:#ffffff,stroke:#000000,stroke-width:2px
+  style P1 fill:#0072B2,color:#ffffff,stroke:#000000,stroke-width:2px
+  style P2 fill:#0072B2,color:#ffffff,stroke:#000000,stroke-width:2px
+  style P3 fill:#E69F00,color:#000000,stroke:#000000,stroke-width:2px
+  style P4 fill:#009E73,color:#ffffff,stroke:#000000,stroke-width:2px
+  style P5 fill:#D55E00,color:#ffffff,stroke:#000000,stroke-width:2px
+  style G0 fill:#808080,color:#ffffff,stroke:#000000,stroke-width:2px
+  style G1 fill:#808080,color:#ffffff,stroke:#000000,stroke-width:2px
+  style G2 fill:#808080,color:#ffffff,stroke:#000000,stroke-width:2px
+  style G3 fill:#808080,color:#ffffff,stroke:#000000,stroke-width:2px
+  style G4 fill:#808080,color:#ffffff,stroke:#000000,stroke-width:2px
+```
+
+Rectangles are phases (colored by repo: blue = ose-public, orange = ose-primer, teal = ose-infra,
+vermillion = the converged cross-repo Phase 5); diamonds are gate checkpoints (gray) — shape carries the
+phase/gate distinction independent of color, per the repo's color-blind-friendly diagram convention. See
+[delivery.md](./delivery.md) for each phase's full checklist and `### Phase N Gate` verification steps.
 
 ## 3. The De-Hollow Mechanism (root-cause flow)
 
@@ -258,28 +314,32 @@ Changes (docs/process, no new runtime command):
   `specs/apps/rhino/behavior/rhino-cli/gherkin/**` (`.feature` + `README.md`).
 - [`repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md) —
   add a verification step that diffs the Gherkin tree across the three repos (md5 manifest).
-- `AGENTS.md` / `CLAUDE.md` byte-identity note updated to mention the Gherkin tree is in-boundary.
+- `AGENTS.md` byte-identity note updated to mention the Gherkin tree is in-boundary (`CLAUDE.md`
+  inherits automatically via its `@AGENTS.md` import — no separate edit needed for this note).
 
 ## 6. Per-Repo File Impact
 
-| Path                                                                | ose-public                  | ose-primer             | ose-infra            |
-| ------------------------------------------------------------------- | --------------------------- | ---------------------- | -------------------- |
-| `gherkin/docs/`→`md/`, `gherkin/agents/`→`harness/` (+ Phase-0 map) | `git mv` rename             | Rename to canonical    | Rename to canonical  |
-| `apps/rhino-cli/tests/*.rs` (`feature_dir()` rename targets)        | Edit (dir rename)           | Propagate verbatim     | Propagate verbatim   |
-| `apps/rhino-cli/tests/*.rs` (step-def vocab)                        | Edit (de-hollow)            | Propagate verbatim     | Propagate verbatim   |
-| `apps/rhino-cli/Cargo.toml` (`[[test]]` for wired dirs)             | Edit                        | Propagate verbatim     | Propagate verbatim   |
-| `apps/rhino-cli/tests/golden-master/**`                             | Regenerate                  | Propagate verbatim     | Propagate verbatim   |
-| `apps/rhino-cli/src/**` (Fs/GitRepo mock seam, FCIS)                | Edit (refactor)             | Propagate verbatim     | Propagate verbatim   |
-| `apps/rhino-cli/tests/*.rs` (`.fail_on_skipped()` + mocked unit)    | Edit                        | Propagate verbatim     | Propagate verbatim   |
-| `apps/rhino-cli/project.json` (`test:unit` runs mocked behaviour)   | Edit                        | Propagate verbatim     | Propagate verbatim   |
-| `specs/apps/rhino/behavior/rhino-cli/gherkin/**/*.feature`          | Edit (de-hollow + gap-fill) | Overwrite to canonical | Sync to canonical    |
-| `specs/apps/rhino/behavior/rhino-cli/gherkin/**/README.md`          | Canonical                   | Overwrite to canonical | Sync to canonical    |
-| `docs/reference/sdlc-gate-standard.md`                              | Edit (boundary)             | Propagate              | Propagate            |
-| `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md` | Edit                        | Propagate              | Propagate            |
-| `.husky/pre-commit` (staged-gated `repo-config validate`)           | Edit (add step)             | Add step (identical)   | Add step (identical) |
-| `.husky/pre-push` (remove `repo-config validate`)                   | Edit (remove step)          | Remove step            | Remove step          |
-| `.github/workflows/pr-quality-gate.yml` (`repo-config validate`)    | Edit (add step)             | Add step               | Add step             |
-| `.github/workflows/main-ci.yml` (`repo-config validate`)            | Edit (add step)             | Add step               | Add step             |
+| Path                                                                                                                                                                | ose-public                  | ose-primer             | ose-infra            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ---------------------- | -------------------- |
+| `gherkin/docs/`→`md/`, `gherkin/agents/`→`harness/` (+ Phase-0 map)                                                                                                 | `git mv` rename             | Rename to canonical    | Rename to canonical  |
+| `apps/rhino-cli/tests/*.rs` (`feature_dir()` rename targets)                                                                                                        | Edit (dir rename)           | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/tests/*.rs` (step-def vocab)                                                                                                                        | Edit (de-hollow)            | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/Cargo.toml` (`[[test]]` for wired dirs)                                                                                                             | Edit                        | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/tests/golden-master/**`                                                                                                                             | Regenerate                  | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/src/application/fs/port.rs` (new `Fs` trait)                                                                                                        | Create                      | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/src/infrastructure/fs/**` (new real impl only — the shared mock lives in `apps/rhino-cli/src/application/fs/mock.rs`, see `delivery.md` §1·0b)      | Create                      | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/src/application/repo_governance/*.rs` (`Fs`-inject)                                                                                                 | Edit (refactor)             | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/tests/*.rs` (`.fail_on_skipped()` on all 13 binaries)                                                                                               | Edit                        | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/tests/repo_governance.rs` (`assert_cmd` → in-process `MockFs` call, delivery.md §1a "Mocked-unit conversion")                                       | Edit (refactor)             | Propagate verbatim     | Propagate verbatim   |
+| `apps/rhino-cli/project.json` (`test:unit` → `--lib --test repo_governance --test env_contract --test repo_config_data_driven`; fix stub `specs:behavior:coverage`) | Edit                        | Propagate verbatim     | Propagate verbatim   |
+| `specs/apps/rhino/behavior/rhino-cli/gherkin/**/*.feature`                                                                                                          | Edit (de-hollow + gap-fill) | Overwrite to canonical | Sync to canonical    |
+| `specs/apps/rhino/behavior/rhino-cli/gherkin/**/README.md`                                                                                                          | Canonical                   | Overwrite to canonical | Sync to canonical    |
+| `docs/reference/sdlc-gate-standard.md`                                                                                                                              | Edit (boundary)             | Propagate              | Propagate            |
+| `repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`                                                                                                 | Edit                        | Propagate              | Propagate            |
+| `.husky/pre-commit` (staged-gated `repo-config validate`)                                                                                                           | Edit (add step)             | Add step (identical)   | Add step (identical) |
+| `.husky/pre-push` (remove `repo-config validate`)                                                                                                                   | Edit (remove step)          | Remove step            | Remove step          |
+| `.github/workflows/pr-quality-gate.yml` (`repo-config validate`)                                                                                                    | Edit (add step)             | Add step               | Add step             |
+| `.github/workflows/main-ci.yml` (`repo-config validate`)                                                                                                            | Edit (add step)             | Add step               | Add step             |
 
 ## 7. Divergence Policy (unchanged)
 
