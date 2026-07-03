@@ -287,13 +287,15 @@ work touches their validators).
 > scaffold) in §1·0. Its 9 scenarios are currently skipped and must be de-hollowed like every other binary
 > before the Phase 1 Gate's `0 skipped` requirement can pass.
 
-- [ ] [AI] **RED**: in `apps/rhino-cli/tests/convention.rs`, add `#[given]/#[when]/#[then]` steps matching
+- [x] [AI] **RED**: in `apps/rhino-cli/tests/convention.rs`, add `#[given]/#[when]/#[then]` steps matching
       the canonical feature step text in `specs/apps/rhino/behavior/rhino-cli/gherkin/convention/**`, with
       each `#[when]` invoking the real current command (`convention emoji validate` / `convention license
-  validate`) via the `assert_cmd` subprocess-spawn pattern (matching the sibling binaries' existing
+validate`) via the `assert_cmd` subprocess-spawn pattern (matching the sibling binaries' existing
       style — this binary is not Fs-injected, so no MockFs conversion applies here). Command: `cargo test
-  --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test convention`. Acceptance:
+--release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test convention`. Acceptance:
       scenarios execute (not skipped).
+  - **Done 2026-07-04.** Verified real command names via `--help` (`convention emoji validate <path>`,
+    `convention license validate`). All 9 scenarios moved from skipped to executing.
   - **Gherkin (binds) →** — aggregate BDD binder for all 9 scenarios in `gherkin/convention/**`: "Clean
     source tree passes"; "Emoji codepoint in a JSON file fails"; "Emoji codepoint in a Go source file
     fails"; "Multibyte non-emoji unicode does not trigger a finding"; "emoji-audit skips archived
@@ -301,10 +303,15 @@ work touches their validators).
     missing LICENSE file fails"; "Lib directory missing LICENSE file fails"; "LICENSING-NOTICE.md table
     row mismatching SPDX in LICENSE fails"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: resolve each executing failure at root cause. Command: same. Acceptance: `9 scenarios
-  (9 passed)`, `0 skipped`.
-- [ ] [AI] **REFACTOR**: dedupe shared step helpers in `tests/convention.rs`. Command: same. Acceptance:
+- [x] [AI] **GREEN**: resolve each executing failure at root cause. Command: same. Acceptance: `9 scenarios
+(9 passed)`, `0 skipped`.
+  - **Done 2026-07-04.** All 9 scenarios passed on first execution — no genuine CLI bugs, every assertion
+    derived from reading the real production validator code first. Suite-wide skip count: 95→86.
+- [x] [AI] **REFACTOR**: dedupe shared step helpers in `tests/convention.rs`. Command: same. Acceptance:
       still `0 skipped`, all passed.
+  - **Done 2026-07-04.** Deduped emoji-fixture write helper + collapsed 2 near-identical LICENSE-missing
+    Then steps into one regex-parametrized step. Still 9/9, 0 skipped. `clippy -D warnings` + `fmt --check`
+    clean.
 
 ### 1b. De-hollow `docs` (43/69 skipped → 0)
 
