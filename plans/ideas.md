@@ -54,3 +54,7 @@ When an idea is ready for implementation, create a proper plan folder in `backlo
 - Future plan: Volta → mise migration (volta last release Dec 2024).
 - Future plan: Microsoft Defender / dotnet 10.0.300 brew bottle availability (currently install via dotnet-install.sh to ~/.dotnet).
 - Future plan: bump `vite` to 7.4+ across all consumers, then adopt `@vitejs/plugin-react 6.0.1` (this plan reverted plugin-react 6.0.1 → `^5.1.4` because plugin-react 6 requires vite's `./internal` subpath which is unavailable on the installed transitive vite 7.3.1). Caret retained pending the vite bump.
+
+### CI Flakes (added 2026-07-02 by unify-rhino-cli-sdlc-parity after-action)
+
+- Investigate the recurring `*-test-local-deploy-prod` scheduled-workflow E2E failure (`Error: http://localhost:3101 is already used`) hitting `ayokoding-www-test-local-deploy-prod` and `wahidyankf-www-test-local-deploy-prod` — consistently failing on every scheduled run since at least 2026-06-28 regardless of commit SHA, while unit/lint/integration/specs jobs on the same runs pass. Push-triggered gates (`pr-quality-gate`, `main-ci`, `validate-env`) are unaffected and green. Likely a stale dev-server process or self-hosted-runner port collision from a prior/concurrent scheduled run, not a code regression — needs a dedicated investigation, out of scope for `unify-rhino-cli-sdlc-parity`.
