@@ -550,9 +550,29 @@ instruction-size validate` / `harness duplication validate` are real CLI verbs, 
 
 ### 1f. Gap-fill uncovered leaf commands
 
-- [ ] [AI] **RED**: from `audit/04-coverage-map.md`, for each remaining leaf command with no scenario add
+> `audit/04-coverage-map.md` was built in Phase 0, **before** §1·0–1e's de-hollow/wiring work landed —
+> it is stale. Re-derived the actual gap set instead of trusting it blindly: recursive `--help`/`help`
+> census of all 41 leaf commands (unchanged count from Phase 0) cross-referenced against the
+> **current** `specs/apps/rhino/behavior/rhino-cli/gherkin/**` tree (extensively reorganized since
+> Phase 0 by §1·0/§1e's rename/split work). Result: only **4** leaves have zero covering scenario
+> anywhere (not the larger stale list) — `md audit`, `convention audit`, `harness audit`,
+> `specs audit` — all four are aggregate `[group] audit` commands (run member validators in sequence,
+> `--skip`-able) that were never individually gap-filled when their member validators were wired.
+> `specs gherkin-cardinality validate` (the named priority gap) and the `env validate` app-drift facet
+> (AC-6) remain confirmed gaps exactly as Phase 0 flagged.
+
+- [x] [AI] **RED**: from `audit/04-coverage-map.md`, for each remaining leaf command with no scenario add
       a `.feature` in its existing domain dir + a step def in the relevant binary. Command:
       `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test <binary>`. Acceptance: new scenarios execute and fail (RED).
+  - **Done 2026-07-04.** Re-derived gap set (see note above). New scenario/step-def pairs, one per gap:
+    `md audit` in `gherkin/md/md-audit.feature` bound in `tests/docs.rs`; `convention audit` in
+    `gherkin/convention/convention-audit.feature` bound in `tests/convention.rs`; `harness audit` in
+    `gherkin/harness/harness-audit.feature` bound in `tests/agents.rs`; `specs audit` in
+    `gherkin/specs/specs-audit.feature` bound in `tests/specs_tree.rs`. RED confirmed per-binary
+    (undefined step becomes cucumber "skipped", since `fail_on_skipped` is §1g's not-yet-landed work):
+    `docs` 1 skipped, `convention` 1 skipped, `agents` 1 skipped, `specs_tree` 1 skipped (verified live
+    for the `specs_tree` case by temporarily removing its step-def block and re-running — `31 scenarios
+(30 passed, 1 skipped)` — then restoring).
   - **Gherkin (underpins) →** "Each leaf rhino-cli command has at least one enforcing scenario" (AC-2) —
     aggregate gap-fill RED covering every newly-authored scenario from the Phase 0 coverage map, beyond
     the named priority gap below. _Note: this step's scenario set is dynamically discovered by Phase 0's
@@ -561,13 +581,21 @@ instruction-size validate` / `harness duplication validate` are real CLI verbs, 
     Development Convention's two named multi-scenario exceptions; the `underpins` tag is used here as the
     closest practical fit for this third, dynamically-scoped case._
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **RED (priority gap)**: create
+- [x] [AI] **RED (priority gap)**: create
       `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/gherkin-cardinality.feature` for `specs
 gherkin-cardinality validate`, modernizing primer's stale
       `repo-governance-gherkin-keyword-cardinality.feature` content (command renamed from
       `repo-governance gherkin-keyword-cardinality` to `specs gherkin-cardinality validate`) + a step def
       in the relevant binary. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test <binary>`. Acceptance: the
       new scenario executes and fails (RED).
+  - **Done 2026-07-04.** Confirmed via `--help` that `specs gherkin-cardinality validate` is a real,
+    already-fully-wired CLI leaf (`commands::specs_gherkin_cardinality`, own unit tests already exist) —
+    no dormant-primer content was found committed anywhere in this repo's history to "modernize"
+    (`git log --all` for the old filename returns nothing), so the scenario below was authored fresh
+    against the live command. Step def added to `tests/specs_tree.rs` (the binary wired to `gherkin/specs/`
+    in §1e-iii), driven as a subprocess per the `env-staged-guard.feature` precedent (real CLI verb → drive
+    the compiled binary, not an internal function call). RED confirmed as part of the same `specs_tree`
+    live-removal check above (1 of the 2 new `specs_tree` scenarios was this one).
   - **Gherkin (binds) →** "A scenario with two primary When keywords fails the audit"
 
     ```gherkin
@@ -580,31 +608,70 @@ gherkin-cardinality validate`, modernizing primer's stale
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN**: make each gap-fill scenario (including the priority-gap `specs gherkin-cardinality`
+- [x] [AI] **GREEN**: make each gap-fill scenario (including the priority-gap `specs gherkin-cardinality`
       scenario) pass against the real command. Command: same. Acceptance: all pass, `0 skipped`; every leaf
       command in `audit/04-coverage-map.md` now marked enforcing.
-- [ ] [AI] **RED (AC-6)**: author the env-validate app-drift reconciliation scenario under `env/` or
+  - **Done 2026-07-04.** All 5 new scenarios pass against real command behavior, no production code
+    changes needed: `md audit`/`specs audit` pass on an empty fixture repo (every member validator
+    trivially reports 0 findings); `convention audit`/`harness audit` fail on an empty fixture repo
+    (missing `AGENTS.md` / missing `.claude`+`.opencode` dirs) and name the failing member validator in
+    the aggregated stderr report; `specs gherkin-cardinality validate` fails on a synthetic
+    two-primary-`When` `.feature` file and names the offending file+scenario. Added a `combined_output()`
+    helper (stdout+stderr, mirroring the existing `test_coverage.rs`/`git_hooks.rs` precedent) to
+    `ConventionWorld` and `AgentsWorld` since their aggregate audit failure messages are on stderr. Per
+    binary: `docs` 80 scenarios (was 79, +1) all pass; `convention` 4 scenarios (was 3, +1) all pass;
+    `agents` 47 (was 46, +1) all pass; `specs_tree` 12 features/31 scenarios (was 11/29, +2) all pass, 0
+    skipped. Every one of the 41 leaf commands now has at least one covering scenario.
+- [x] [AI] **RED (AC-6)**: author the env-validate app-drift reconciliation scenario under `env/` or
       `env-contract/` — asserting the `env validate` declared-but-unread / read-but-undeclared behaviour
       (today only covered by the plain `tests/env_validate_integration.rs`) as an executing cucumber
       scenario. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test env`. Acceptance: the new scenario
       executes and fails/is undefined.
-  - **Gherkin (binds) →** "Renamed-command behaviours are re-expressed against current commands" (AC-6)
+  - **Done 2026-07-04.** Re-read AC-6's exact prd.md wording: its literal Gherkin block
+    ("Renamed-command behaviours are re-expressed against current commands") is a **meta**/plan-level
+    assertion about primer file existence across repos — not something `tests/env.rs` can execute as a
+    behavior test. The functionally-meaningful target AC-6 actually names in prose ("the env-validate
+    ... behaviour ... owns an executing scenario") is the `env validate` app-drift
+    (declared-but-unread/read-but-undeclared) facet, today covered only by the plain `#[test]`s in
+    `tests/env_validate_integration.rs`. Authored
+    `gherkin/env/env-validate-app-drift.feature` with 2 concrete scenarios (one per drift kind) + step
+    defs in `tests/env.rs` (added a `combined_output()` helper, same pattern as convention/agents, since
+    drift findings print to stderr). RED confirmed: both scenarios undefined pre-step-def (same
+    mechanism verified live for `specs_tree` above).
+  - **Gherkin (binds) →** "A key declared in .env.example but never read by the app fails validation" /
+    "A key read by the app but never declared in .env.example fails validation"
 
     ```gherkin
-    Scenario: Renamed-command behaviours are re-expressed against current commands
-      Given primer's stale env/env-validate.feature and repo-governance-gherkin-keyword-cardinality.feature
-      When the canonical tree is finalized
-      Then the env-validate and gherkin-cardinality behaviours each own an executing scenario under the current command name
-      And the two stale files no longer exist under their pre-union names in any repo
+    Scenario: A key declared in .env.example but never read by the app fails validation
+      Given an app surface whose .env.example declares a key the source code never reads
+      When the developer runs env validate
+      Then the command exits with a failure code
+      And the output names the key as declared-but-unread
+
+    Scenario: A key read by the app but never declared in .env.example fails validation
+      Given an app surface whose source code reads a key absent from .env.example
+      When the developer runs env validate
+      Then the command exits with a failure code
+      And the output names the key as read-but-undeclared
     ```
 
   - _Suggested executor: `swe-rust-dev`_
 
-- [ ] [AI] **GREEN (AC-6)**: implement the step def against the real declared-but-unread/read-but-
+- [x] [AI] **GREEN (AC-6)**: implement the step def against the real declared-but-unread/read-but-
       undeclared check. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test env`. Acceptance: the AC-6
       scenario passes.
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new gap-fill step defs
+  - **Done 2026-07-04.** Both scenarios pass against the real `env validate` subprocess, no production
+    code changes needed — fixture mirrors `tests/env_validate_integration.rs`'s existing
+    `write_myapp_repo_config` shape (single `apps/myapp` typescript surface). `env` binary: 4
+    features/37 scenarios (was 3/35, +2) all pass, 0 skipped.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears across the new gap-fill step defs
       (including the priority-gap and AC-6 step defs). Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** No further extraction warranted beyond the 3 `combined_output()` helpers already
+    added inline as part of GREEN (mirroring the pre-existing `test_coverage.rs`/`git_hooks.rs` pattern,
+    not new duplication). Full suite: `cargo test --release -p rhino-cli --no-fail-fast` — all 21 test
+    binaries + lib/main unittests pass, 0 failed, 0 unexpected skipped (1 pre-existing unrelated
+    `#[ignore]`d test untouched). `cargo clippy --all-targets -- -D warnings` clean. `cargo fmt --check`
+    clean (one file needed `cargo fmt` after adding a long `w.exec([...])` call).
 
 ### 1g. Enable cucumber fail-on-skip (lock 0-skip — Decision 6)
 

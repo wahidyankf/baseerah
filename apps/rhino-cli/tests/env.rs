@@ -1,4 +1,8 @@
-//! Cucumber-rs integration tests for the `env init|backup|restore` commands.
+//! Cucumber-rs integration tests for the `env init|backup|restore` commands,
+//! plus the `env validate` app-drift (declared-but-unread /
+//! read-but-undeclared) reconciliation facet
+//! (`env-validate-app-drift.feature`). The IaC-dispatch facet of `env
+//! validate` (terraform/ansible surfaces) lives in `env_contract.rs` instead.
 //!
 //! Wires the behavior-contract feature files at
 //! `specs/apps/rhino/behavior/rhino-cli/gherkin/env/` to step definitions that build
@@ -111,6 +115,18 @@ impl EnvWorld {
 
     fn stdout(&self) -> String {
         String::from_utf8_lossy(&self.output.as_ref().expect("ran").stdout).into_owned()
+    }
+
+    /// Concatenates stdout and stderr, mirroring how a developer watching the
+    /// terminal sees both streams interleaved. `env validate`'s drift findings
+    /// (`DRIFT ...` / `MANIFEST ...` lines) are written to stderr.
+    fn combined_output(&self) -> String {
+        let out = self.output.as_ref().expect("ran");
+        format!(
+            "{}{}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr)
+        )
     }
 
     fn exit_code(&self) -> i32 {
@@ -784,6 +800,68 @@ fn then_claude_restored(w: &mut EnvWorld) {
 #[then("the .claude/settings.local.json is not restored to the repository")]
 fn then_claude_not_restored(w: &mut EnvWorld) {
     assert!(!w.repo_path().join(".claude/settings.local.json").exists());
+}
+
+// ===========================================================================
+// env validate — app-drift reconciliation (env-validate-app-drift.feature,
+// AC-6 of the enforce-identical-rhino-cli-gherkin plan)
+// ===========================================================================
+
+/// Repo-config declaring a single `apps/myapp` typescript surface with a
+/// consistent injection manifest, shared by both app-drift Given steps below
+/// — isolates drift-detection behavior from manifest-consistency findings.
+const APP_DRIFT_REPO_CONFIG: &str = concat!(
+    "env-contract:\n",
+    "  surfaces:\n",
+    "    - root: apps/myapp\n",
+    "      kind: app\n",
+    "      lang: typescript\n",
+    "      allowlist: []\n",
+    "env-injection:\n",
+    "  apps:\n",
+    "    - app: myapp\n",
+    "      keys-from: apps/myapp/.env.example\n",
+    "      runtime: { local: env-local }\n",
+    "  ci-harness: []\n",
+);
+
+#[given("an app surface whose .env.example declares a key the source code never reads")]
+fn given_env_validate_declared_unread(w: &mut EnvWorld) {
+    w.write("repo-config.yml", APP_DRIFT_REPO_CONFIG);
+    w.write("apps/myapp/.env.example", "STALE_KEY=value\n");
+    w.write(
+        "apps/myapp/src/env.ts",
+        "export const env = createEnv({ server: {}, experimental__runtimeEnv: {} });\n",
+    );
+}
+
+#[given("an app surface whose source code reads a key absent from .env.example")]
+fn given_env_validate_read_undeclared(w: &mut EnvWorld) {
+    w.write("repo-config.yml", APP_DRIFT_REPO_CONFIG);
+    w.write("apps/myapp/.env.example", "");
+    w.write(
+        "apps/myapp/src/env.ts",
+        "export const env = createEnv({\n  server: {\n    NEW_KEY: z.string(),\n  },\n  experimental__runtimeEnv: {},\n});\n",
+    );
+}
+
+#[when("the developer runs env validate")]
+fn when_env_validate_runs(w: &mut EnvWorld) {
+    w.exec(&["env", "validate"]);
+}
+
+#[then("the output names the key as declared-but-unread")]
+fn then_env_validate_names_declared_unread(w: &mut EnvWorld) {
+    let out = w.combined_output();
+    assert!(out.contains("declared-but-unread"), "got: {out}");
+    assert!(out.contains("STALE_KEY"), "got: {out}");
+}
+
+#[then("the output names the key as read-but-undeclared")]
+fn then_env_validate_names_read_undeclared(w: &mut EnvWorld) {
+    let out = w.combined_output();
+    assert!(out.contains("read-but-undeclared"), "got: {out}");
+    assert!(out.contains("NEW_KEY"), "got: {out}");
 }
 
 // ===========================================================================

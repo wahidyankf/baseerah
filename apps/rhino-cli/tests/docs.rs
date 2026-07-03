@@ -1,6 +1,6 @@
 //! Cucumber-rs integration tests for the `md links`, `md mermaid`,
 //! `md heading-hierarchy`, `md naming`, `md frontmatter`, `md frontmatter-dates`,
-//! and `md readme-index` commands.
+//! `md readme-index`, and `md audit` commands.
 //!
 //! Wires the behavior-contract feature files at
 //! `specs/apps/rhino/behavior/rhino-cli/gherkin/md/` to step definitions that
@@ -1440,6 +1440,31 @@ fn then_ri_ghost(w: &mut DocsWorld) {
     let f = w.file_a.clone().expect("fixture set file_a");
     assert!(out.contains("ghost"), "got: {out}");
     assert!(out.contains(&f), "got: {out}");
+}
+
+// ===========================================================================
+// md audit steps (md-audit.feature)
+// ===========================================================================
+
+#[given("a repository containing no markdown files")]
+fn given_md_audit_clean(_w: &mut DocsWorld) {
+    // No-op: `DocsWorld::new()` seeds only a `seed.txt` commit and an empty
+    // `docs/` directory — zero `.md` files — so every `md audit` member
+    // validator trivially reports no findings.
+}
+
+#[when(regex = r#"^the developer runs "rhino-cli md audit"$"#)]
+fn when_md_audit_runs(w: &mut DocsWorld) {
+    w.exec(&["md", "audit"]);
+}
+
+#[then("the output reports all md validators passed")]
+fn then_md_audit_passed(w: &mut DocsWorld) {
+    assert!(
+        w.stdout().contains("MD AUDIT PASSED"),
+        "got: {}",
+        w.stdout()
+    );
 }
 
 // ===========================================================================

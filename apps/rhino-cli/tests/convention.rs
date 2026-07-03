@@ -1,5 +1,6 @@
 //! Cucumber-rs integration tests for the `convention` command group:
-//! `convention emoji validate` and `convention license validate`.
+//! `convention emoji validate`, `convention license validate`, and
+//! `convention audit`.
 //!
 //! Wires the behavior-contract feature files at
 //! `specs/apps/rhino/behavior/rhino-cli/gherkin/convention/` to step
@@ -92,6 +93,18 @@ impl ConventionWorld {
 
     fn stdout(&self) -> String {
         String::from_utf8_lossy(&self.output.as_ref().expect("ran").stdout).into_owned()
+    }
+
+    /// Concatenates stdout and stderr, mirroring how a developer watching the
+    /// terminal sees both streams interleaved. `convention audit`'s aggregate
+    /// pass/fail summary and per-member failure lines are written to stderr.
+    fn combined_output(&self) -> String {
+        let out = self.output.as_ref().expect("ran");
+        format!(
+            "{}{}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr)
+        )
     }
 
     fn exit_code(&self) -> i32 {
@@ -212,6 +225,13 @@ fn when_run_license_validate(w: &mut ConventionWorld) {
     w.exec();
 }
 
+#[when(regex = r#"^the developer runs "rhino-cli convention audit"$"#)]
+fn when_run_convention_audit(w: &mut ConventionWorld) {
+    w.subcommand = vec!["convention", "audit"];
+    w.target = String::new();
+    w.exec();
+}
+
 // ===========================================================================
 // Then steps — shared exit-code assertions
 // ===========================================================================
@@ -277,6 +297,25 @@ fn then_license_spdx_mismatch(w: &mut ConventionWorld) {
     assert!(out.contains("LICENSE AUDIT FAILED"), "got: {out}");
     assert!(out.contains("spdx-mismatch"), "got: {out}");
     assert!(out.contains("apps/foo"), "got: {out}");
+}
+
+// ===========================================================================
+// convention audit steps (convention-audit.feature)
+// ===========================================================================
+
+#[given("a repository with no AGENTS.md file")]
+fn given_convention_audit_no_agents_md(_w: &mut ConventionWorld) {
+    // No-op: a fresh fixture workspace has no `AGENTS.md`, no emoji-forbidden
+    // file types, and no LICENSE-required directories at all, so `emoji` and
+    // `license` trivially pass while `agents-md-size` fails on the missing file.
+}
+
+#[then(regex = r#"^the output names the failing "([a-z-]+)" validator$"#)]
+#[allow(clippy::needless_pass_by_value)] // cucumber-rs binds the capture by value
+fn then_convention_audit_names_failure(w: &mut ConventionWorld, member: String) {
+    let out = w.combined_output();
+    assert!(out.contains("CONVENTION AUDIT FAILED"), "got: {out}");
+    assert!(out.contains(&member), "got: {out}");
 }
 
 #[tokio::main]

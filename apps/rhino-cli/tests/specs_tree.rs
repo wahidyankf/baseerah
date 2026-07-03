@@ -1,6 +1,6 @@
 //! Cucumber-rs integration tests for `specs/apps/rhino/behavior/rhino-cli/gherkin/specs/`.
 //!
-//! Wires all 10 feature files under `gherkin/specs/`, spanning five distinct
+//! Wires all 12 feature files under `gherkin/specs/`, spanning seven distinct
 //! validator domains:
 //!
 //! - `behavior-coverage.feature` / `domain-coverage.feature`: the per-level
@@ -49,6 +49,14 @@
 //!   `find_root_from_worktree_returns_worktree_path` in
 //!   `infrastructure::git::root`, whose own doc comment already quotes this
 //!   exact Gherkin.
+//! - `specs-audit.feature`: the real `specs audit` CLI verb (aggregates
+//!   `structure-validate`, `validate-links`, and `gherkin-cardinality`),
+//!   driven as a subprocess against the same synthetic git-rooted `work`
+//!   fixture the other subprocess-driven domains above share.
+//! - `gherkin-cardinality.feature`: the real `specs gherkin-cardinality
+//!   validate` CLI verb (`application::repo_governance::gherkin_keyword_cardinality_audit`),
+//!   driven as a subprocess against a single synthetic offending `.feature`
+//!   file written into the shared `work` fixture.
 
 // Test step-definition scaffolding: private World state and step fns are
 // self-documenting via their #[given]/#[when]/#[then] gherkin strings.
@@ -1132,6 +1140,65 @@ fn then_specs_output_contains(w: &mut SpecsTreeWorld, needle: String) {
     assert!(
         w.last_output.contains(&needle),
         "expected {needle:?} in output: {}",
+        w.last_output
+    );
+}
+
+// ===========================================================================
+// specs-audit.feature
+// ===========================================================================
+
+#[given("a repository with no spec-tree violations")]
+fn given_specs_audit_clean(_w: &mut SpecsTreeWorld) {
+    // No-op: `SpecsTreeWorld::new()`'s fixture workspace is a freshly
+    // `git init`ed temp dir with no files at all, so `structure-validate`,
+    // `validate-links`, and `gherkin-cardinality` (the three `specs audit`
+    // members) each trivially report zero findings.
+}
+
+#[when("the developer runs rhino-cli specs audit")]
+fn when_specs_audit_runs(w: &mut SpecsTreeWorld) {
+    w.exec(&["specs", "audit"]);
+    let out = w.output.as_ref().expect("ran");
+    w.last_exit_ok = out.status.success();
+    w.last_output = combined_output(out);
+}
+
+// ===========================================================================
+// gherkin-cardinality.feature
+// ===========================================================================
+
+#[given(r#"a feature file containing a scenario with two primary "When" keywords"#)]
+fn given_gc_double_when(w: &mut SpecsTreeWorld) {
+    w.write(
+        "offender.feature",
+        "Feature: Sample\n\n  Scenario: Double when\n    Given a precondition\n    When the first action runs\n    When the second action runs\n    Then the outcome is checked\n",
+    );
+}
+
+#[when("the developer runs specs gherkin-cardinality validate on the file")]
+fn when_gc_validate_runs(w: &mut SpecsTreeWorld) {
+    w.exec(&[
+        "specs",
+        "gherkin-cardinality",
+        "validate",
+        "offender.feature",
+    ]);
+    let out = w.output.as_ref().expect("ran");
+    w.last_exit_ok = out.status.success();
+    w.last_output = combined_output(out);
+}
+
+#[then("the output names the offending file and scenario")]
+fn then_gc_names_offender(w: &mut SpecsTreeWorld) {
+    assert!(
+        w.last_output.contains("offender.feature"),
+        "got: {}",
+        w.last_output
+    );
+    assert!(
+        w.last_output.contains("Double when"),
+        "got: {}",
         w.last_output
     );
 }

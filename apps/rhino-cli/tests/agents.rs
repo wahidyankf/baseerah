@@ -1,8 +1,9 @@
 //! Cucumber-rs integration tests for the whole `harness` command group
 //! (`harness bindings generate/validate`, `harness claude validate`,
 //! `harness sync validate`, `harness naming validate`,
-//! `harness duplication validate`, `harness instruction-size validate`) plus
-//! the governance-meta facts the `instruction-size` gate depends on
+//! `harness duplication validate`, `harness instruction-size validate`,
+//! `harness audit`) plus the governance-meta facts the `instruction-size`
+//! gate depends on
 //! (`repo-governance audit` category wiring, the pre-push hook trigger, and
 //! the convention/workflow/checker docs that describe the gate). Feature file
 //! names and some Gherkin step text still say "agents" or "convention
@@ -130,6 +131,18 @@ impl AgentsWorld {
 
     fn stdout(&self) -> String {
         String::from_utf8_lossy(&self.output.as_ref().expect("ran").stdout).into_owned()
+    }
+
+    /// Concatenates stdout and stderr, mirroring how a developer watching the
+    /// terminal sees both streams interleaved. `harness audit`'s aggregate
+    /// pass/fail summary and per-member failure lines are written to stderr.
+    fn combined_output(&self) -> String {
+        let out = self.output.as_ref().expect("ran");
+        format!(
+            "{}{}",
+            String::from_utf8_lossy(&out.stdout),
+            String::from_utf8_lossy(&out.stderr)
+        )
     }
 
     fn exit_code(&self) -> i32 {
@@ -1336,6 +1349,32 @@ fn then_instruction_size_target_runs_exit_0(w: &mut AgentsWorld) {
 #[then("the push proceeds")]
 fn then_push_proceeds(w: &mut AgentsWorld) {
     assert_eq!(w.exit_code(), 0, "stdout: {}", w.stdout());
+}
+
+// ===========================================================================
+// harness audit steps (harness-audit.feature)
+// ===========================================================================
+
+#[given("a repository with no .claude or .opencode agent directories")]
+fn given_harness_audit_no_dirs(_w: &mut AgentsWorld) {
+    // No-op: a fresh fixture workspace has no `.claude/`, `.opencode/`, or
+    // `repo-config.yml` at all, so `validate-naming` and `detect-duplication`
+    // trivially report zero violations while `validate-claude`,
+    // `validate-sync`, and `validate-bindings` each fail on the missing
+    // directories/catalog.
+}
+
+#[when(regex = r#"^the developer runs "rhino-cli harness audit"$"#)]
+fn when_run_harness_audit(w: &mut AgentsWorld) {
+    w.exec(&["harness", "audit"]);
+}
+
+#[then(regex = r#"^the output names the failing "([a-z-]+)" harness validator$"#)]
+#[allow(clippy::needless_pass_by_value)] // cucumber-rs binds the capture by value
+fn then_harness_audit_names_failure(w: &mut AgentsWorld, member: String) {
+    let out = w.combined_output();
+    assert!(out.contains("HARNESS AUDIT FAILED"), "got: {out}");
+    assert!(out.contains(&member), "got: {out}");
 }
 
 // ===========================================================================
