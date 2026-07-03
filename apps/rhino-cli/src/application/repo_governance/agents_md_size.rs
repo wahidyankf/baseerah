@@ -2,9 +2,9 @@
 //!
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/agents_md_size.go`.
 
-use std::fs;
-
 use anyhow::{Context, Error};
+
+use crate::application::fs::port::Fs;
 
 /// Soft target size for AGENTS.md (30 KB).
 pub const AGENTS_MD_TARGET_SIZE: i64 = 30_000;
@@ -33,9 +33,13 @@ pub struct AgentsMdSizeFinding {
 ///
 /// Returns an error when the file cannot be stat-ed (e.g., it does not exist or
 /// the process lacks permission).
-pub fn check_agents_md_size(path: &str) -> std::result::Result<AgentsMdSizeFinding, Error> {
-    let meta = fs::metadata(path).context("stat AGENTS.md")?;
-    let size = meta.len() as i64;
+pub fn check_agents_md_size(
+    fs: &dyn Fs,
+    path: &str,
+) -> std::result::Result<AgentsMdSizeFinding, Error> {
+    let size = fs
+        .file_size(std::path::Path::new(path))
+        .context("stat AGENTS.md")? as i64;
     let (severity, message) = classify(size);
     Ok(AgentsMdSizeFinding {
         file: path.to_string(),
@@ -77,6 +81,7 @@ fn classify(size: i64) -> (&'static str, String) {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -90,7 +95,7 @@ mod tests {
     fn ok_under_target() {
         let tmp = TempDir::new().unwrap();
         let p = write_size(tmp.path(), 25_000);
-        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        let f = check_agents_md_size(&RealFs, p.to_str().unwrap()).unwrap();
         assert_eq!(f.severity, "ok");
         assert!(f.message.contains("within 30000-byte target"));
     }
@@ -99,7 +104,7 @@ mod tests {
     fn warn_over_target_under_warning() {
         let tmp = TempDir::new().unwrap();
         let p = write_size(tmp.path(), 32_000);
-        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        let f = check_agents_md_size(&RealFs, p.to_str().unwrap()).unwrap();
         assert_eq!(f.severity, "warn");
         assert!(f.message.contains("over 30000-byte target"));
     }
@@ -108,7 +113,7 @@ mod tests {
     fn warn_over_warning_under_hard_limit() {
         let tmp = TempDir::new().unwrap();
         let p = write_size(tmp.path(), 38_000);
-        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        let f = check_agents_md_size(&RealFs, p.to_str().unwrap()).unwrap();
         assert_eq!(f.severity, "warn");
         assert!(f.message.contains("over 35000-byte warning threshold"));
     }
@@ -117,14 +122,25 @@ mod tests {
     fn fail_over_hard_limit() {
         let tmp = TempDir::new().unwrap();
         let p = write_size(tmp.path(), 45_000);
-        let f = check_agents_md_size(p.to_str().unwrap()).unwrap();
+        let f = check_agents_md_size(&RealFs, p.to_str().unwrap()).unwrap();
         assert_eq!(f.severity, "fail");
         assert!(f.message.contains("over 40000-byte hard limit"));
     }
 
     #[test]
     fn missing_file_errors() {
-        let err = check_agents_md_size("/nonexistent").unwrap_err();
+        let err = check_agents_md_size(&RealFs, "/nonexistent").unwrap_err();
         assert!(err.to_string().contains("stat AGENTS.md"));
+    }
+
+    #[test]
+    fn mocked_fs_drives_size_check_without_touching_real_disk() {
+        use crate::application::fs::mock::MockFs;
+
+        let fs = MockFs::new().with_file("/repo/AGENTS.md", "x".repeat(32_000));
+        let finding = check_agents_md_size(&fs, "/repo/AGENTS.md").unwrap();
+        assert_eq!(finding.size, 32_000);
+        assert_eq!(finding.severity, "warn");
+        assert!(finding.message.contains("over 30000-byte target"));
     }
 }

@@ -3,12 +3,13 @@
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/layer_coherence.go`.
 
 use std::collections::{BTreeSet, HashMap};
-use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
 use anyhow::Error;
 use regex::Regex;
+
+use crate::application::fs::port::Fs;
 
 /// A single finding emitted by the layer coherence audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -73,6 +74,7 @@ fn head_re() -> &'static Regex {
 /// Returns an error when either document cannot be read (other than
 /// `NotFound`, which is reported as a `KIND_MISSING_DOC` finding).
 pub fn audit_layer_coherence(
+    fs: &dyn Fs,
     repo_root: &Path,
 ) -> std::result::Result<Vec<LayerCoherenceFinding>, Error> {
     let arch_path = repo_root.join(ARCH_PATH);
@@ -81,9 +83,9 @@ pub fn audit_layer_coherence(
     let readme_path_s = readme_path.to_string_lossy().to_string();
 
     let mut findings = Vec::new();
-    let (arch_map, mut arch_findings) = read_layer_map(&arch_path_s)?;
+    let (arch_map, mut arch_findings) = read_layer_map(fs, &arch_path_s)?;
     findings.append(&mut arch_findings);
-    let (readme_map, mut readme_findings) = read_layer_map(&readme_path_s)?;
+    let (readme_map, mut readme_findings) = read_layer_map(fs, &readme_path_s)?;
     findings.append(&mut readme_findings);
 
     if let (Some(am), Some(rm)) = (arch_map.as_ref(), readme_map.as_ref()) {
@@ -110,8 +112,8 @@ type LayerMapResult = std::result::Result<(Option<LayerMap>, Vec<LayerCoherenceF
 /// # Errors
 ///
 /// Returns an error when the file exists but cannot be read.
-fn read_layer_map(path: &str) -> LayerMapResult {
-    let data = match fs::read_to_string(path) {
+fn read_layer_map(fs: &dyn Fs, path: &str) -> LayerMapResult {
+    let data = match fs.read_to_string(Path::new(path)) {
         Ok(d) => d,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
             return Ok((
@@ -258,6 +260,7 @@ fn check_numbering_gap(
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -277,7 +280,7 @@ mod tests {
             "## Layer 0: Vision (the why)\n## Layer 1: Principles (the values)\n",
             "**Layer 0: Vision**\n**Layer 1: Principles**\n",
         );
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -289,7 +292,7 @@ mod tests {
             "## Layer 0: Vision (a)\n## Layer 0: Mission (b)\n",
             "**Layer 0: Vision**\n",
         );
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -305,7 +308,7 @@ mod tests {
             "## Layer 0: Vision (x)\n## Layer 1: Principles (y)\n",
             "**Layer 0: Vision**\n",
         );
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -317,7 +320,7 @@ mod tests {
     fn detects_cross_file_name_mismatch() {
         let tmp = TempDir::new().unwrap();
         write_docs(&tmp, "## Layer 0: Vision (x)\n", "**Layer 0: Mission**\n");
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -333,7 +336,7 @@ mod tests {
             "## Layer 0: Vision (x)\n## Layer 2: Conventions (y)\n",
             "**Layer 0: Vision**\n**Layer 2: Conventions**\n",
         );
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -348,7 +351,7 @@ mod tests {
         let readme_p = tmp.path().join(README_PATH);
         fs::create_dir_all(readme_p.parent().unwrap()).unwrap();
         fs::write(&readme_p, "**Layer 0: Vision**\n").unwrap();
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         assert!(findings.iter().any(|f| f.kind == KIND_MISSING_DOC));
     }
 
@@ -360,7 +363,7 @@ mod tests {
             "## Layer 0: Vision (x)\n## Layer 2: Conventions (y)\n",
             "**Layer 0: Vision**\n**Layer 1: Principles**\n",
         );
-        let findings = audit_layer_coherence(tmp.path()).unwrap();
+        let findings = audit_layer_coherence(&RealFs, tmp.path()).unwrap();
         // Findings should be in stable sort order.
         for window in findings.windows(2) {
             let (a, b) = (&window[0], &window[1]);

@@ -7,7 +7,6 @@
 //! [`AuditEnvelope`].
 
 use std::collections::BTreeMap;
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
@@ -20,6 +19,7 @@ use sha2::{Digest, Sha256};
 use super::layer_coherence::audit_layer_coherence;
 use super::traceability_audit::audit_traceability;
 use super::vendor_audit::walk_governance_scope as audit_vendor_walk;
+use crate::application::fs::port::Fs;
 
 /// JSON schema identifier embedded in every [`AuditEnvelope`].
 pub const AUDIT_ENVELOPE_SCHEMA: &str = "rhino-cli/repo-governance-audit/v1";
@@ -146,7 +146,7 @@ fn skip_zero(n: &usize) -> bool {
 ///
 /// Returns an error if any category fails to execute (e.g., an IO error while
 /// walking the filesystem or deserialising YAML).
-pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Error> {
+pub fn run_audit(fs: &dyn Fs, opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Error> {
     let ran_at = opts
         .now
         .clone()
@@ -160,7 +160,7 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
         if !opts.include_only.is_empty() && !opts.include_only.iter().any(|s| s == name) {
             continue;
         }
-        let mut findings = run_category(name, opts)?;
+        let mut findings = run_category(fs, name, opts)?;
         findings = filter_excluded(findings, &opts.exclude_globs);
         sort_audit_findings(&mut findings);
         categories.push(AuditCategoryResult {
@@ -171,7 +171,7 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
         });
     }
 
-    let skip_set = load_known_false_positives(opts)?;
+    let skip_set = load_known_false_positives(fs, opts)?;
     let (categories, skipped) = partition_false_positives(categories, &skip_set);
 
     let mut total = 0usize;
@@ -209,24 +209,28 @@ pub fn run_audit(opts: &AuditOptions) -> std::result::Result<AuditEnvelope, Erro
 ///
 /// Returns an error for unrecognised category names or when the delegated
 /// runner propagates an IO or parse error.
-fn run_category(name: &str, opts: &AuditOptions) -> std::result::Result<Vec<AuditFinding>, Error> {
+fn run_category(
+    fs: &dyn Fs,
+    name: &str,
+    opts: &AuditOptions,
+) -> std::result::Result<Vec<AuditFinding>, Error> {
     match name {
         "layer-coherence" => {
-            let findings = audit_layer_coherence(&opts.repo_root)?;
+            let findings = audit_layer_coherence(fs, &opts.repo_root)?;
             Ok(findings
                 .into_iter()
                 .map(|f| new_audit_finding(name, &f.file, 0, &f.message))
                 .collect())
         }
         "traceability-audit" => {
-            let findings = audit_traceability(&opts.repo_root)?;
+            let findings = audit_traceability(fs, &opts.repo_root)?;
             Ok(findings
                 .into_iter()
                 .map(|f| new_audit_finding(name, &f.path, f.line, &f.message))
                 .collect())
         }
         "vendor-audit" => {
-            let findings = audit_vendor_walk(&opts.repo_root)?;
+            let findings = audit_vendor_walk(fs, &opts.repo_root)?;
             Ok(findings
                 .into_iter()
                 .map(|f| {
@@ -439,6 +443,7 @@ fn known_false_positive_pattern() -> &'static Regex {
 ///
 /// Returns an error when the file exists but cannot be read.
 fn load_known_false_positives(
+    fs: &dyn Fs,
     opts: &AuditOptions,
 ) -> std::result::Result<std::collections::HashSet<String>, Error> {
     let path = opts.known_false_positives_path.clone().unwrap_or_else(|| {
@@ -447,7 +452,7 @@ fn load_known_false_positives(
             .join(".known-false-positives.md")
     });
     let mut set = std::collections::HashSet::new();
-    match fs::read_to_string(&path) {
+    match fs.read_to_string(&path) {
         Ok(content) => {
             for cap in known_false_positive_pattern().captures_iter(&content) {
                 set.insert(cap[1].to_string());
@@ -522,6 +527,7 @@ mod hex {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use crate::test_support::CwdLock;
 
     #[test]
@@ -688,7 +694,7 @@ mod tests {
             now: Some("2026-05-23T00:00:00Z".to_string()),
             ..Default::default()
         };
-        let env = run_audit(&opts).unwrap();
+        let env = run_audit(&RealFs, &opts).unwrap();
         assert_eq!(env.status, "ok");
         assert_eq!(env.result.total_findings, 0);
         assert!(env.result.categories.is_empty());
@@ -704,7 +710,7 @@ mod tests {
             now: Some("2026-05-23T00:00:00Z".to_string()),
             ..Default::default()
         };
-        let env = run_audit(&opts).unwrap();
+        let env = run_audit(&RealFs, &opts).unwrap();
         assert_eq!(env.result.categories.len(), 1);
         assert_eq!(env.result.categories[0].name, "layer-coherence");
     }
@@ -722,7 +728,7 @@ mod tests {
             now: Some("2026-05-23T00:00:00Z".to_string()),
             ..Default::default()
         };
-        let env = run_audit(&opts).unwrap();
+        let env = run_audit(&RealFs, &opts).unwrap();
         assert!(env.result.categories.is_empty());
     }
 
@@ -734,7 +740,7 @@ mod tests {
             repo_root: dir.path().to_path_buf(),
             ..Default::default()
         };
-        let r = run_category("nope-not-real", &opts);
+        let r = run_category(&RealFs, "nope-not-real", &opts);
         assert!(r.is_err());
     }
 

@@ -10,6 +10,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::frontmatter_audit::{FrontmatterFinding, audit_frontmatter};
 
@@ -94,7 +95,7 @@ pub fn run(
         })
         .collect();
 
-    let findings = audit_frontmatter(&full_paths).context("frontmatter audit failed")?;
+    let findings = audit_frontmatter(&RealFs, &full_paths).context("frontmatter audit failed")?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),

@@ -2,13 +2,13 @@
 //!
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/governance_vendor_audit.go`.
 
-use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
 use anyhow::{Context, Error};
 use regex::Regex;
-use walkdir::WalkDir;
+
+use crate::application::fs::port::Fs;
 
 /// A single vendor-term finding in a governance Markdown document.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -218,8 +218,10 @@ fn link_url_re() -> &'static Regex {
 /// # Errors
 ///
 /// Returns an error when the file cannot be read.
-pub fn scan_file(path: &Path) -> std::result::Result<Vec<Finding>, Error> {
-    let data = fs::read_to_string(path).with_context(|| format!("read {}", path.display()))?;
+pub fn scan_file(fs: &dyn Fs, path: &Path) -> std::result::Result<Vec<Finding>, Error> {
+    let data = fs
+        .read_to_string(path)
+        .with_context(|| format!("read {}", path.display()))?;
     Ok(scan_lines(&path.to_string_lossy(), &data))
 }
 
@@ -231,25 +233,18 @@ pub fn scan_file(path: &Path) -> std::result::Result<Vec<Finding>, Error> {
 /// # Errors
 ///
 /// Returns an error when any file cannot be read.
-pub fn walk(root: &Path) -> std::result::Result<Vec<Finding>, Error> {
-    if !root.exists() {
-        return Ok(Vec::new());
-    }
+pub fn walk(fs: &dyn Fs, root: &Path) -> std::result::Result<Vec<Finding>, Error> {
     let mut findings = Vec::new();
-    for entry in WalkDir::new(root).into_iter().flatten() {
-        if !entry.file_type().is_file() {
+    for p in fs.walk_files(root, &[]) {
+        let name = p.file_name().map(|n| n.to_string_lossy().to_string());
+        if !name.is_some_and(|n| n.ends_with(".md")) {
             continue;
         }
-        let name = entry.file_name().to_string_lossy().to_string();
-        if !name.ends_with(".md") {
-            continue;
-        }
-        let p = entry.path();
         let p_slash = p.to_string_lossy().replace('\\', "/");
         if p_slash.ends_with(FORBIDDEN_CONVENTION_SUFFIX) {
             continue;
         }
-        findings.extend(scan_file(p)?);
+        findings.extend(scan_file(fs, &p)?);
     }
     Ok(findings)
 }
@@ -275,12 +270,15 @@ const ROOT_INSTRUCTION_SURFACES: &[&str] = &["AGENTS.md", "CLAUDE.md"];
 /// # Errors
 ///
 /// Returns an error when any in-scope file cannot be read.
-pub fn walk_governance_scope(repo_root: &Path) -> std::result::Result<Vec<Finding>, Error> {
-    let mut findings = walk(&repo_root.join("repo-governance"))?;
+pub fn walk_governance_scope(
+    fs: &dyn Fs,
+    repo_root: &Path,
+) -> std::result::Result<Vec<Finding>, Error> {
+    let mut findings = walk(fs, &repo_root.join("repo-governance"))?;
     for name in ROOT_INSTRUCTION_SURFACES {
         let p = repo_root.join(name);
-        if p.is_file() {
-            findings.extend(scan_file(&p)?);
+        if fs.exists(&p) && !fs.is_dir(&p) {
+            findings.extend(scan_file(fs, &p)?);
         }
     }
     Ok(findings)
@@ -451,6 +449,7 @@ fn is_platform_binding_heading(line: &str) -> bool {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -540,7 +539,7 @@ mod tests {
         let p = tmp.path().join(FORBIDDEN_CONVENTION_SUFFIX);
         fs::create_dir_all(p.parent().unwrap()).unwrap();
         fs::write(&p, "Claude Code\n").unwrap();
-        let findings = walk(tmp.path()).unwrap();
+        let findings = walk(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -625,7 +624,7 @@ mod tests {
             fs::write(&p, "Built on OpenCode.\n").unwrap();
         }
 
-        let findings = walk_governance_scope(root).unwrap();
+        let findings = walk_governance_scope(&RealFs, root).unwrap();
 
         // Exactly the three in-scope files contribute findings.
         let files: std::collections::BTreeSet<String> =
@@ -650,7 +649,7 @@ mod tests {
         // and returns only the repo-governance/ findings (here: none).
         let tmp = TempDir::new().unwrap();
         fs::create_dir_all(tmp.path().join("repo-governance")).unwrap();
-        let findings = walk_governance_scope(tmp.path()).unwrap();
+        let findings = walk_governance_scope(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 }

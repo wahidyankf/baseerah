@@ -14,6 +14,8 @@ pub mod doctor;
 pub mod domain_coverage;
 /// Environment-file use cases (backup, validate).
 pub mod env;
+/// Filesystem I/O use cases and port definitions.
+pub mod fs;
 /// Git pre-commit use cases and port definitions.
 pub mod git;
 /// Glossary validator use case.

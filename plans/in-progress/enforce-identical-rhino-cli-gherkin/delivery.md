@@ -145,7 +145,7 @@ test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-
 > consumer (`apps/rhino-cli/src/application/git/pre_commit.rs:456`), whereas `MockFs` is consumed by
 > multiple `repo_governance/*.rs` validators, so it lives in its own shared module instead (named below).
 
-- [ ] [AI] **RED**: add an `Fs` trait in a new `apps/rhino-cli/src/application/fs/port.rs` (following the
+- [x] [AI] **RED**: add an `Fs` trait in a new `apps/rhino-cli/src/application/fs/port.rs` (following the
       exact pattern of the existing `apps/rhino-cli/src/application/git/port.rs`), with a real
       (imperative-shell) impl in a new `apps/rhino-cli/src/infrastructure/fs/` module (mirroring
       `apps/rhino-cli/src/infrastructure/git/`) and a shared `MockFs` impl in a new
@@ -156,12 +156,22 @@ test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --no-fail-
       with a mocked `Fs`. Command: `cargo test --manifest-path apps/rhino-cli/Cargo.toml --lib`.
       Acceptance: new mocked unit test fails (validator not yet dependency-injected).
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: thread the `Fs` seam through `agents_md_size.rs` first (functional-core/imperative-
+  - **Done 2026-07-04.** New files: `application/fs/{port.rs,mock.rs,mod.rs}`,
+    `infrastructure/fs/{real.rs,mod.rs}`. New mocked test on `agents_md_size.rs` failed to compile (E0061 —
+    wrong arg count) before threading, confirming RED as expected.
+- [x] [AI] **GREEN**: thread the `Fs` seam through `agents_md_size.rs` first (functional-core/imperative-
       shell), then extend it to the remaining `apps/rhino-cli/src/application/repo_governance/*.rs`
       validators so they accept an injected `Fs` (the `GitRepo`-equivalent seam already exists as
       `StagedFileProvider`). Command: same. Acceptance: mocked unit test passes; existing `--lib` +
       `--tests` still green.
-- [ ] [AI] **REFACTOR**: converge duplicated I/O call sites in the migrated `repo_governance` validators
+  - **Done 2026-07-04.** Threaded `Fs` through all 11 `repo_governance/*.rs` validators +
+    `audit_orchestrator.rs` + every CLI command call site. `--lib` (1096 tests) and `--tests` (18 binaries)
+    both green; skip count confirmed still 121 (30+9+52+26+4 across cucumber binaries).
+  - **Done 2026-07-04.** No leftover direct `std::fs`/`WalkDir`/`File::open` calls remain in migrated
+    validators, except two documented, justified exceptions in `instruction_size.rs` (`glob::glob` and
+    `path.canonicalize()`, neither has a virtual-filesystem equivalent). Full `--tests` suite still green,
+    still 121 skipped. `clippy -D warnings` and `fmt --check` both clean.
+- [x] [AI] **REFACTOR**: converge duplicated I/O call sites in the migrated `repo_governance` validators
       onto the `Fs` seam. Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli`. Acceptance: all tiers still green.
 
 > The literal `test:unit`/`apps/rhino-cli/project.json` edit and the concrete conversion of

@@ -2,14 +2,11 @@
 //!
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/emoji_audit.go`.
 
-use std::collections::HashSet;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::Path;
-use std::sync::OnceLock;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Error, anyhow};
-use walkdir::WalkDir;
+
+use crate::application::fs::port::Fs;
 
 /// A single emoji violation found in a source or configuration file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,40 +29,33 @@ const EMOJI_FORBIDDEN_EXTENSIONS: &[&str] = &[
     ".rs", ".fs", ".cs", ".dart", ".exs", ".ex", ".clj",
 ];
 
-/// Returns a lazily-initialised set of directory names to skip during the walk.
-fn emoji_skip_dirs() -> &'static HashSet<&'static str> {
-    static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
-    SET.get_or_init(|| {
-        [
-            "node_modules",
-            ".git",
-            ".next",
-            "dist",
-            "build",
-            "target",
-            "generated",
-            "generated-contracts",
-            "generated-sources",
-            "generated-test-sources",
-            "generated-reports",
-            "archived",
-            "test-results",
-            "playwright-report",
-            "coverage",
-            ".venv",
-            "__pycache__",
-            ".pytest_cache",
-            ".dart_tool",
-            "out",
-            ".cache",
-            "storybook-static",
-            ".playwright-mcp",
-            "raw",
-        ]
-        .into_iter()
-        .collect()
-    })
-}
+/// Directory names to skip during the walk.
+const EMOJI_SKIP_DIRS: &[&str] = &[
+    "node_modules",
+    ".git",
+    ".next",
+    "dist",
+    "build",
+    "target",
+    "generated",
+    "generated-contracts",
+    "generated-sources",
+    "generated-test-sources",
+    "generated-reports",
+    "archived",
+    "test-results",
+    "playwright-report",
+    "coverage",
+    ".venv",
+    "__pycache__",
+    ".pytest_cache",
+    ".dart_tool",
+    "out",
+    ".cache",
+    "storybook-static",
+    ".playwright-mcp",
+    "raw",
+];
 
 /// Walks each directory in `paths` and reports any emoji codepoints found in
 /// files with a forbidden extension.
@@ -76,15 +66,16 @@ fn emoji_skip_dirs() -> &'static HashSet<&'static str> {
 ///
 /// Returns an error when `paths` is empty or when a file cannot be read during
 /// the scan.
-pub fn audit_emoji(paths: &[String]) -> std::result::Result<Vec<EmojiFinding>, Error> {
+pub fn audit_emoji(fs: &dyn Fs, paths: &[String]) -> std::result::Result<Vec<EmojiFinding>, Error> {
     if paths.is_empty() {
         return Err(anyhow!("at least one path is required"));
     }
     let mut findings = Vec::new();
     for root in paths {
-        let files = walk_emoji_paths(Path::new(root));
+        let files = walk_emoji_paths(fs, Path::new(root));
         for f in &files {
-            let mut more = scan_emoji_file(f).with_context(|| format!("scan {}", f.display()))?;
+            let mut more =
+                scan_emoji_file(fs, f).with_context(|| format!("scan {}", f.display()))?;
             findings.append(&mut more);
         }
     }
@@ -99,25 +90,15 @@ pub fn audit_emoji(paths: &[String]) -> std::result::Result<Vec<EmojiFinding>, E
 
 /// Recursively walks `root` and returns paths of files that have a forbidden
 /// emoji extension, skipping hidden directories and those listed in
-/// [`emoji_skip_dirs`].
-fn walk_emoji_paths(root: &Path) -> Vec<std::path::PathBuf> {
-    if !root.exists() {
-        return Vec::new();
-    }
-    let mut files: Vec<std::path::PathBuf> = WalkDir::new(root)
+/// [`EMOJI_SKIP_DIRS`].
+fn walk_emoji_paths(fs: &dyn Fs, root: &Path) -> Vec<PathBuf> {
+    let mut files: Vec<PathBuf> = fs
+        .walk_files(root, EMOJI_SKIP_DIRS)
         .into_iter()
-        .filter_entry(|e| {
-            if e.file_type().is_dir() {
-                let name = e.file_name().to_string_lossy();
-                !emoji_skip_dirs().contains(name.as_ref())
-            } else {
-                true
-            }
+        .filter(|p| {
+            p.file_name()
+                .is_some_and(|n| has_forbidden_emoji_extension(&n.to_string_lossy()))
         })
-        .filter_map(std::result::Result::ok)
-        .filter(|e| e.file_type().is_file())
-        .filter(|e| has_forbidden_emoji_extension(&e.file_name().to_string_lossy()))
-        .map(walkdir::DirEntry::into_path)
         .collect();
     files.sort();
     files
@@ -137,11 +118,11 @@ fn has_forbidden_emoji_extension(name: &str) -> bool {
 /// # Errors
 ///
 /// Returns an error when the file cannot be opened.
-fn scan_emoji_file(path: &Path) -> std::result::Result<Vec<EmojiFinding>, Error> {
-    let file = File::open(path)?;
+fn scan_emoji_file(fs: &dyn Fs, path: &Path) -> std::result::Result<Vec<EmojiFinding>, Error> {
+    let lines = fs.read_lines(path)?;
     let path_s = path.to_string_lossy().to_string();
     let mut findings = Vec::new();
-    for (line_idx, raw) in BufReader::new(file).lines().enumerate() {
+    for (line_idx, raw) in lines.into_iter().enumerate() {
         let line_num = line_idx + 1;
         let Ok(line) = raw else { continue };
         for (col_idx, r) in line.chars().enumerate() {
@@ -190,6 +171,7 @@ fn format_codepoint(r: char) -> String {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -219,7 +201,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let p = tmp.path().join("conf.json");
         fs::write(&p, "{\n  \"label\": \"hi \u{2713} there\"\n}\n").unwrap();
-        let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings = audit_emoji(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].line, 2);
         assert_eq!(findings[0].codepoint, "U+2713");
@@ -230,7 +212,7 @@ mod tests {
     fn audit_emoji_skips_non_forbidden_extensions() {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("readme.md"), "# \u{1F680} Hello\n").unwrap();
-        let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings = audit_emoji(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -240,13 +222,13 @@ mod tests {
         let nm = tmp.path().join("node_modules");
         fs::create_dir(&nm).unwrap();
         fs::write(nm.join("x.json"), "\u{2713}\n").unwrap();
-        let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings = audit_emoji(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert!(findings.is_empty());
     }
 
     #[test]
     fn audit_emoji_empty_paths_errors() {
-        let err = audit_emoji(&[]).unwrap_err();
+        let err = audit_emoji(&RealFs, &[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
@@ -255,7 +237,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("b.json"), "\u{2713}\n").unwrap();
         fs::write(tmp.path().join("a.json"), "x\n\u{2713}\n").unwrap();
-        let findings = audit_emoji(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings = audit_emoji(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 2);
         assert!(findings[0].file.ends_with("a.json"));
         assert!(findings[1].file.ends_with("b.json"));

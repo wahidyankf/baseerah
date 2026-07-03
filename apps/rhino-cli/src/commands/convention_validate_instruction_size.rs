@@ -18,6 +18,7 @@ use crate::application::repo_governance::instruction_size::{
     check_resolved_tree, severity_label,
 };
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 
 /// JSON output schema identifier for this command.
@@ -162,9 +163,9 @@ pub fn run_for_root(
         ),
     };
 
-    let mut findings = check_instruction_sizes(repo_root, &merged_config);
+    let mut findings = check_instruction_sizes(&RealFs, repo_root, &merged_config);
     if yaml_config.is_some()
-        && let Some(tree_finding) = check_resolved_tree(repo_root, &merged_config)
+        && let Some(tree_finding) = check_resolved_tree(&RealFs, repo_root, &merged_config)
     {
         findings.push(tree_finding);
     }

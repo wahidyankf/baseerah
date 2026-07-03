@@ -8,6 +8,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::agents_md_size::{AgentsMdSizeFinding, check_agents_md_size};
 
@@ -56,7 +57,8 @@ pub fn run(
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
     let path = repo_root.join("AGENTS.md");
     let path_str = path.to_string_lossy().to_string();
-    let finding = check_agents_md_size(&path_str).context("agents-md-size audit failed")?;
+    let finding =
+        check_agents_md_size(&RealFs, &path_str).context("agents-md-size audit failed")?;
 
     match output_format {
         OutputFormat::Text => print_text(&finding),

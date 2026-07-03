@@ -2,13 +2,13 @@
 //!
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/traceability_audit.go`.
 
-use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
 use anyhow::{Context, Error};
 use regex::Regex;
-use walkdir::WalkDir;
+
+use crate::application::fs::port::Fs;
 
 /// A single finding from the traceability audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -94,19 +94,24 @@ const META_EXEMPT: &[&str] = &["meta/execution-modes.md", "meta/workflow-identif
 ///
 /// Returns an error when any governance document cannot be read.
 pub fn audit_traceability(
+    fs: &dyn Fs,
     repo_root: &Path,
 ) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
     let mut findings = Vec::new();
     findings.extend(audit_principles(
+        fs,
         &repo_root.join("repo-governance/principles"),
     )?);
     findings.extend(audit_conventions(
+        fs,
         &repo_root.join("repo-governance/conventions"),
     )?);
     findings.extend(audit_development(
+        fs,
         &repo_root.join("repo-governance/development"),
     )?);
     findings.extend(audit_workflows(
+        fs,
         &repo_root.join("repo-governance/workflows"),
     )?);
 
@@ -120,11 +125,16 @@ pub fn audit_traceability(
 /// # Errors
 ///
 /// Returns an error when a file cannot be read.
-fn audit_principles(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
-    let files = list_governance_markdown(root)?;
+fn audit_principles(
+    fs: &dyn Fs,
+    root: &Path,
+) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
+    let files = list_governance_markdown(fs, root)?;
     let mut findings = Vec::new();
     for path in files {
-        let data = fs::read_to_string(&path).with_context(|| format!("read {path}"))?;
+        let data = fs
+            .read_to_string(Path::new(&path))
+            .with_context(|| format!("read {path}"))?;
         if !vision_re().is_match(&data) {
             findings.push(TraceabilityFinding {
                 path: path.clone(),
@@ -144,11 +154,16 @@ fn audit_principles(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>
 /// # Errors
 ///
 /// Returns an error when a file cannot be read.
-fn audit_conventions(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
-    let files = list_governance_markdown(root)?;
+fn audit_conventions(
+    fs: &dyn Fs,
+    root: &Path,
+) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
+    let files = list_governance_markdown(fs, root)?;
     let mut findings = Vec::new();
     for path in files {
-        let data = fs::read_to_string(&path).with_context(|| format!("read {path}"))?;
+        let data = fs
+            .read_to_string(Path::new(&path))
+            .with_context(|| format!("read {path}"))?;
         if !principles_re().is_match(&data) {
             findings.push(TraceabilityFinding {
                 path: path.clone(),
@@ -170,11 +185,16 @@ fn audit_conventions(root: &Path) -> std::result::Result<Vec<TraceabilityFinding
 /// # Errors
 ///
 /// Returns an error when a file cannot be read.
-fn audit_development(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
-    let files = list_governance_markdown(root)?;
+fn audit_development(
+    fs: &dyn Fs,
+    root: &Path,
+) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
+    let files = list_governance_markdown(fs, root)?;
     let mut findings = Vec::new();
     for path in files {
-        let data = fs::read_to_string(&path).with_context(|| format!("read {path}"))?;
+        let data = fs
+            .read_to_string(Path::new(&path))
+            .with_context(|| format!("read {path}"))?;
         if !principles_re().is_match(&data) {
             findings.push(TraceabilityFinding {
                 path: path.clone(),
@@ -205,8 +225,11 @@ fn audit_development(root: &Path) -> std::result::Result<Vec<TraceabilityFinding
 /// # Errors
 ///
 /// Returns an error when a file cannot be read.
-fn audit_workflows(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
-    let files = list_governance_markdown(root)?;
+fn audit_workflows(
+    fs: &dyn Fs,
+    root: &Path,
+) -> std::result::Result<Vec<TraceabilityFinding>, Error> {
+    let files = list_governance_markdown(fs, root)?;
     let mut findings = Vec::new();
     for path in files {
         let rel = Path::new(&path)
@@ -216,7 +239,9 @@ fn audit_workflows(root: &Path) -> std::result::Result<Vec<TraceabilityFinding>,
         if META_EXEMPT.contains(&rel.as_str()) {
             continue;
         }
-        let data = fs::read_to_string(&path).with_context(|| format!("read {path}"))?;
+        let data = fs
+            .read_to_string(Path::new(&path))
+            .with_context(|| format!("read {path}"))?;
         if !agent_ref_re().is_match(&data) {
             let line = first_non_empty_line(&data);
             findings.push(TraceabilityFinding {
@@ -251,19 +276,17 @@ fn first_non_empty_line(data: &str) -> usize {
 /// # Errors
 ///
 /// Returns an error when the directory walk fails.
-fn list_governance_markdown(root: &Path) -> std::result::Result<Vec<String>, Error> {
-    if !root.exists() {
-        return Ok(Vec::new());
-    }
-    let mut files: Vec<String> = WalkDir::new(root)
+fn list_governance_markdown(fs: &dyn Fs, root: &Path) -> std::result::Result<Vec<String>, Error> {
+    let mut files: Vec<String> = fs
+        .walk_files(root, &[])
         .into_iter()
-        .filter_map(std::result::Result::ok)
-        .filter(|e| e.file_type().is_file())
-        .filter(|e| {
-            let n = e.file_name().to_string_lossy();
-            n.ends_with(".md") && n != "README.md"
+        .filter(|p| {
+            p.file_name().is_some_and(|n| {
+                let n = n.to_string_lossy();
+                n.ends_with(".md") && n != "README.md"
+            })
         })
-        .map(|e| e.path().to_string_lossy().to_string())
+        .map(|p| p.to_string_lossy().to_string())
         .collect();
     files.sort();
     Ok(files)
@@ -273,6 +296,7 @@ fn list_governance_markdown(root: &Path) -> std::result::Result<Vec<String>, Err
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -288,7 +312,7 @@ mod tests {
             &tmp.path().join("repo-governance/principles/p.md"),
             "# P\n\n## Vision Supported\n\nx\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -296,7 +320,7 @@ mod tests {
     fn principle_missing_vision_emits_finding() {
         let tmp = TempDir::new().unwrap();
         write(&tmp.path().join("repo-governance/principles/p.md"), "# P\n");
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -311,7 +335,7 @@ mod tests {
             &tmp.path().join("repo-governance/conventions/c.md"),
             "# C\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -326,7 +350,7 @@ mod tests {
             &tmp.path().join("repo-governance/development/d.md"),
             "# D\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         let kinds: Vec<&str> = findings.iter().map(|f| f.kind.as_str()).collect();
         assert!(kinds.contains(&KIND_MISSING_PRINCIPLES_IMPLEMENTED));
         assert!(kinds.contains(&KIND_MISSING_CONVENTIONS_IMPLEMENTED));
@@ -339,7 +363,7 @@ mod tests {
             &tmp.path().join("repo-governance/development/d.md"),
             "# D\n\n## Principles Implemented/Respected\n\n## Conventions Implemented/Respected\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -350,7 +374,7 @@ mod tests {
             &tmp.path().join("repo-governance/workflows/w.md"),
             "# W\n\nno agent here\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -365,7 +389,7 @@ mod tests {
             &tmp.path().join("repo-governance/workflows/w.md"),
             "# W\n\nSee `.claude/agents/foo-bar.md`\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -377,7 +401,7 @@ mod tests {
                 .join("repo-governance/workflows/meta/execution-modes.md"),
             "# meta\n\nno agent ref needed\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -388,7 +412,7 @@ mod tests {
             &tmp.path().join("repo-governance/principles/README.md"),
             "# Index\n",
         );
-        let findings = audit_traceability(tmp.path()).unwrap();
+        let findings = audit_traceability(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 

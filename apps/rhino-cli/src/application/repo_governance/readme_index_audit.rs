@@ -4,14 +4,14 @@
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/readme_index_audit.go`.
 
 use std::collections::{BTreeSet, HashSet};
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 use anyhow::{Context, Error, anyhow};
 use glob::Pattern;
 use regex::Regex;
-use walkdir::WalkDir;
+
+use crate::application::fs::port::Fs;
 
 /// A single finding from the README index audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -52,6 +52,7 @@ const SKIP_DIRS: &[&str] = &["node_modules", "target", "dist", "build", ".next",
 ///
 /// Returns an error when `paths` is empty or when any file cannot be read.
 pub fn audit_readme_index(
+    fs: &dyn Fs,
     paths: &[String],
     excludes: &[String],
 ) -> std::result::Result<Vec<ReadmeIndexFinding>, Error> {
@@ -60,13 +61,34 @@ pub fn audit_readme_index(
     }
     let mut findings = Vec::new();
     for root in paths {
-        let readmes = find_readmes(root, excludes)?;
+        let readmes = find_readmes(fs, root, excludes)?;
         for readme in &readmes {
-            findings.extend(audit_one_readme(readme, root, excludes)?);
+            findings.extend(audit_one_readme(fs, readme, root, excludes)?);
         }
     }
     findings.sort_by(|a, b| a.file.cmp(&b.file).then(a.kind.cmp(&b.kind)));
     Ok(findings)
+}
+
+/// Returns `true` when any ancestor directory component of `rel` (a path
+/// relative to the scan root) is hidden (starts with `.`), is listed in
+/// [`SKIP_DIRS`], or matches one of `excludes`.
+fn is_pruned_dir_ancestor(rel: &Path, excludes: &[String]) -> bool {
+    let Some(parent) = rel.parent() else {
+        return false;
+    };
+    let mut acc = PathBuf::new();
+    for component in parent.components() {
+        acc.push(component);
+        let name = component.as_os_str().to_string_lossy();
+        if name.starts_with('.') || SKIP_DIRS.contains(&name.as_ref()) {
+            return true;
+        }
+        if matches_any_glob(&acc.to_string_lossy(), excludes) {
+            return true;
+        }
+    }
+    false
 }
 
 /// Recursively finds all `README.md` files under `root`, respecting `excludes`
@@ -78,48 +100,24 @@ pub fn audit_readme_index(
 ///
 /// Returns an error when the directory walk encounters an unrecoverable IO
 /// error.
-fn find_readmes(root: &str, excludes: &[String]) -> std::result::Result<Vec<String>, Error> {
+fn find_readmes(
+    fs: &dyn Fs,
+    root: &str,
+    excludes: &[String],
+) -> std::result::Result<Vec<String>, Error> {
     let root_p = Path::new(root);
-    if !root_p.exists() {
-        return Ok(Vec::new());
-    }
-    let mut readmes = Vec::new();
-    let walker = WalkDir::new(root_p).into_iter().filter_entry(|e| {
-        let path = e.path();
-        if path == root_p {
-            return true;
-        }
-        let name = e.file_name().to_string_lossy().to_string();
-        if e.file_type().is_dir() {
-            if name.starts_with('.') || SKIP_DIRS.contains(&name.as_str()) {
-                return false;
-            }
-            if path
-                .strip_prefix(root_p)
-                .is_ok_and(|rel| matches_any_glob(&rel.to_string_lossy(), excludes))
-            {
-                return false;
-            }
-        }
-        true
-    });
-    for entry in walker.flatten() {
-        if !entry.file_type().is_file() {
-            continue;
-        }
-        if entry.file_name() != "README.md" {
-            continue;
-        }
-        let path = entry.path();
-        let rel = match path.strip_prefix(root_p) {
-            Ok(r) => r.to_string_lossy().to_string(),
-            Err(_) => continue,
-        };
-        if matches_any_glob(&rel, excludes) {
-            continue;
-        }
-        readmes.push(path.to_string_lossy().to_string());
-    }
+    let mut readmes: Vec<String> = fs
+        .walk_files(root_p, SKIP_DIRS)
+        .into_iter()
+        .filter(|p| p.file_name().is_some_and(|n| n == "README.md"))
+        .filter_map(|p| {
+            let rel = p.strip_prefix(root_p).ok()?.to_path_buf();
+            Some((p, rel))
+        })
+        .filter(|(_, rel)| !is_pruned_dir_ancestor(rel, excludes))
+        .filter(|(_, rel)| !matches_any_glob(&rel.to_string_lossy(), excludes))
+        .map(|(p, _)| p.to_string_lossy().to_string())
+        .collect();
     readmes.sort();
     Ok(readmes)
 }
@@ -132,6 +130,7 @@ fn find_readmes(root: &str, excludes: &[String]) -> std::result::Result<Vec<Stri
 /// Returns an error when `readme_path` has no parent component or when the
 /// file or its sibling directory cannot be read.
 fn audit_one_readme(
+    fs: &dyn Fs,
     readme_path: &str,
     root: &str,
     excludes: &[String],
@@ -139,9 +138,11 @@ fn audit_one_readme(
     let dir = Path::new(readme_path)
         .parent()
         .ok_or_else(|| anyhow!("readme has no parent"))?;
-    let data = fs::read_to_string(readme_path).with_context(|| format!("read {readme_path}"))?;
+    let data = fs
+        .read_to_string(Path::new(readme_path))
+        .with_context(|| format!("read {readme_path}"))?;
     let linked = extract_readme_links(&data);
-    let actual = list_sibling_targets(dir, Path::new(root), excludes)?;
+    let actual = list_sibling_targets(fs, dir, Path::new(root), excludes)?;
 
     let mut findings = Vec::new();
 
@@ -167,7 +168,7 @@ fn audit_one_readme(
             // Cross-dir links (e.g. "agents/foo.md") point to files inside a
             // subdirectory.  If the path exists on disk the link is valid — don't
             // ghost it.  Only report ghost when the target is genuinely missing.
-            if full.exists() {
+            if fs.exists(&full) {
                 continue;
             }
             findings.push(ReadmeIndexFinding {
@@ -274,14 +275,17 @@ impl SiblingTargets {
 ///
 /// Returns an error when `dir` cannot be read.
 fn list_sibling_targets(
+    fs: &dyn Fs,
     dir: &Path,
     root: &Path,
     excludes: &[String],
 ) -> std::result::Result<SiblingTargets, Error> {
     let mut out = SiblingTargets::new();
-    let entries = fs::read_dir(dir).with_context(|| format!("read dir {}", dir.display()))?;
-    for entry in entries.flatten() {
-        let name = entry.file_name().to_string_lossy().to_string();
+    let entries = fs
+        .read_dir(dir)
+        .with_context(|| format!("read dir {}", dir.display()))?;
+    for entry in entries {
+        let name = entry.name;
         let full = dir.join(&name);
         let rel = match full.strip_prefix(root) {
             Ok(r) => r.to_string_lossy().to_string(),
@@ -290,15 +294,12 @@ fn list_sibling_targets(
         if matches_any_glob(&rel, excludes) {
             continue;
         }
-        let Ok(ft) = entry.file_type() else {
-            continue;
-        };
-        if ft.is_dir() {
+        if entry.is_dir {
             if name.starts_with('.') || SKIP_DIRS.contains(&name.as_str()) {
                 continue;
             }
             let sub_readme = full.join("README.md");
-            if sub_readme.exists() {
+            if fs.exists(&sub_readme) {
                 out.sub_dirs
                     .insert(format!("{name}/README.md").replace('\\', "/"));
             }
@@ -359,12 +360,13 @@ fn matches_any_glob(rel: &str, patterns: &[String]) -> bool {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
     #[test]
     fn errors_on_empty_paths() {
-        let err = audit_readme_index(&[], &[]).unwrap_err();
+        let err = audit_readme_index(&RealFs, &[], &[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
@@ -374,7 +376,7 @@ mod tests {
         fs::write(tmp.path().join("README.md"), "# Title\n").unwrap();
         fs::write(tmp.path().join("other.md"), "x\n").unwrap();
         let findings =
-            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+            audit_readme_index(&RealFs, &[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.iter().any(|f| f.kind == "orphan"));
     }
 
@@ -383,7 +385,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         fs::write(tmp.path().join("README.md"), "[ghost](nonexistent.md)\n").unwrap();
         let findings =
-            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+            audit_readme_index(&RealFs, &[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.iter().any(|f| f.kind == "ghost"));
     }
 
@@ -393,7 +395,7 @@ mod tests {
         fs::write(tmp.path().join("README.md"), "[other](other.md)\n").unwrap();
         fs::write(tmp.path().join("other.md"), "x\n").unwrap();
         let findings =
-            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+            audit_readme_index(&RealFs, &[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -404,7 +406,7 @@ mod tests {
         fs::create_dir(tmp.path().join("structure")).unwrap();
         fs::write(tmp.path().join("structure/README.md"), "# Sub\n").unwrap();
         let findings =
-            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+            audit_readme_index(&RealFs, &[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -415,7 +417,7 @@ mod tests {
         fs::create_dir(tmp.path().join("structure")).unwrap();
         fs::write(tmp.path().join("structure/README.md"), "x\n").unwrap();
         let findings =
-            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+            audit_readme_index(&RealFs, &[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         // No orphan/ghost because README links subdir as bare dir.
         assert!(findings.iter().all(|f| f.kind != "ghost"));
     }
@@ -464,7 +466,7 @@ mod tests {
         )
         .unwrap();
         let findings =
-            audit_readme_index(&[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
+            audit_readme_index(&RealFs, &[tmp.path().to_string_lossy().to_string()], &[]).unwrap();
         assert!(
             findings.iter().all(|f| f.kind != "ghost"),
             "cross-dir link to existing file must not be reported as ghost: {findings:?}"
@@ -477,6 +479,7 @@ mod tests {
         fs::write(tmp.path().join("README.md"), "# x\n").unwrap();
         fs::write(tmp.path().join("scratch.tmp.md"), "x\n").unwrap();
         let findings = audit_readme_index(
+            &RealFs,
             &[tmp.path().to_string_lossy().to_string()],
             &["*.tmp.md".to_string()],
         )

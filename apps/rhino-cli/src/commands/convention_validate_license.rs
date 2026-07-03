@@ -9,6 +9,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::license_audit::{LicenseFinding, audit_license};
 
@@ -51,7 +52,7 @@ pub fn run(
 ) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
-    let findings = audit_license(&repo_root).context("license audit failed")?;
+    let findings = audit_license(&RealFs, &repo_root).context("license audit failed")?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),

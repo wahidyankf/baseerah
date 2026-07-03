@@ -8,6 +8,7 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::audit_orchestrator::{
     AuditEnvelope, AuditOptions, run_audit,
@@ -49,7 +50,7 @@ pub fn run(args: &AuditArgs, output_format: OutputFormat) -> std::result::Result
             opts.now = Some(v);
         }
     }
-    let env = run_audit(&opts)?;
+    let env = run_audit(&RealFs, &opts)?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&env)),

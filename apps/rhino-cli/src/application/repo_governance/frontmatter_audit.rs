@@ -2,13 +2,13 @@
 //!
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/frontmatter_audit.go`.
 
-use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
 use anyhow::{Context, Error, anyhow};
 use regex::Regex;
-use walkdir::WalkDir;
+
+use crate::application::fs::port::Fs;
 
 /// A violation found by the frontmatter or body-annotation audit.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -58,14 +58,17 @@ fn inline_date_annotation_re() -> &'static Regex {
 /// # Errors
 ///
 /// Returns an error when `paths` is empty or when a file cannot be read.
-pub fn audit_frontmatter(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
+pub fn audit_frontmatter(
+    fs: &dyn Fs,
+    paths: &[String],
+) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
     if paths.is_empty() {
         return Err(anyhow!("at least one path is required"));
     }
     let mut findings = Vec::new();
     for root in paths {
-        let files = walk_paths(root);
-        let mut more = scan_paths(&files)?;
+        let files = walk_paths(fs, root);
+        let mut more = scan_paths(fs, &files)?;
         findings.append(&mut more);
     }
     findings.sort_by(|a, b| a.file.cmp(&b.file).then(a.line.cmp(&b.line)));
@@ -74,17 +77,16 @@ pub fn audit_frontmatter(paths: &[String]) -> std::result::Result<Vec<Frontmatte
 
 /// Recursively walks `root` and returns sorted paths of `.md` files that are
 /// not inside a website-app directory.
-fn walk_paths(root: &str) -> Vec<String> {
+fn walk_paths(fs: &dyn Fs, root: &str) -> Vec<String> {
     let root_p = Path::new(root);
-    if !root_p.exists() {
-        return Vec::new();
-    }
-    let mut files: Vec<String> = WalkDir::new(root_p)
+    let mut files: Vec<String> = fs
+        .walk_files(root_p, &[])
         .into_iter()
-        .filter_map(std::result::Result::ok)
-        .filter(|e| e.file_type().is_file())
-        .filter(|e| e.file_name().to_string_lossy().ends_with(".md"))
-        .map(|e| e.path().to_string_lossy().to_string())
+        .filter(|p| {
+            p.file_name()
+                .is_some_and(|n| n.to_string_lossy().ends_with(".md"))
+        })
+        .map(|p| p.to_string_lossy().to_string())
         .filter(|p| !is_website_app(p))
         .collect();
     files.sort();
@@ -97,10 +99,15 @@ fn walk_paths(root: &str) -> Vec<String> {
 /// # Errors
 ///
 /// Returns an error when a file cannot be read.
-fn scan_paths(paths: &[String]) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
+fn scan_paths(
+    fs: &dyn Fs,
+    paths: &[String],
+) -> std::result::Result<Vec<FrontmatterFinding>, Error> {
     let mut findings = Vec::new();
     for p in paths {
-        let data = fs::read_to_string(p).with_context(|| format!("read {p}"))?;
+        let data = fs
+            .read_to_string(Path::new(p))
+            .with_context(|| format!("read {p}"))?;
         findings.append(&mut scan_frontmatter_content(p, &data));
     }
     Ok(findings)
@@ -234,12 +241,13 @@ fn is_website_app(path: &str) -> bool {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
     #[test]
     fn audit_frontmatter_empty_paths_errors() {
-        let err = audit_frontmatter(&[]).unwrap_err();
+        let err = audit_frontmatter(&RealFs, &[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
@@ -248,7 +256,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let p = tmp.path().join("doc.md");
         fs::write(&p, "---\ntitle: Doc\nupdated: 2026-01-01\n---\n\n# Body\n").unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 1);
         assert!(findings[0].message.contains("updated:"));
         assert_eq!(findings[0].line, 3);
@@ -260,7 +269,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let p = tmp.path().join("doc.md");
         fs::write(&p, "# Title\n\nBody.\n\n**Last Updated**: 2026-01-01\n").unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 1);
         assert!(findings[0].message.contains("**Last Updated**"));
         assert_eq!(findings[0].line, 5);
@@ -275,7 +285,8 @@ mod tests {
             "# Title\n\n- **Created**: 2026-01-01\n- **Last Updated**: 2026-02-02\n",
         )
         .unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 2);
         assert!(findings[0].message.contains("inline date annotation"));
         assert!(findings[1].message.contains("inline date annotation"));
@@ -287,7 +298,8 @@ mod tests {
         let dir = tmp.path().join("apps/ose-www/content");
         fs::create_dir_all(&dir).unwrap();
         fs::write(dir.join("post.md"), "---\nupdated: 2026-01-01\n---\n").unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -296,7 +308,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let p = tmp.path().join("doc.md");
         fs::write(&p, "---\ntitle: Doc\n---\n\nClean body.\n").unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -309,7 +322,8 @@ mod tests {
             "# T\n\n**Last Updated**: 2026-01-01\n",
         )
         .unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 2);
         assert!(findings[0].file.ends_with("a.md"));
         assert!(findings[1].file.ends_with("b.md"));
@@ -321,7 +335,8 @@ mod tests {
         let p = tmp.path().join("doc.md");
         // Unclosed frontmatter — entire content treated as body.
         fs::write(&p, "---\ntitle: Doc\n\n**Last Updated**: x\n").unwrap();
-        let findings = audit_frontmatter(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+        let findings =
+            audit_frontmatter(&RealFs, &[tmp.path().to_string_lossy().to_string()]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].line, 4);
     }

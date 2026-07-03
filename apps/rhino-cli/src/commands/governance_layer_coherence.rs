@@ -9,6 +9,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::layer_coherence::{
     LayerCoherenceFinding, audit_layer_coherence,
@@ -68,7 +69,8 @@ pub fn run(
 ) -> std::result::Result<(), Error> {
     let repo_root =
         git::root::find_root().map_err(|e| anyhow!("failed to find git repository root: {e}"))?;
-    let findings = audit_layer_coherence(&repo_root).context("layer-coherence audit failed")?;
+    let findings =
+        audit_layer_coherence(&RealFs, &repo_root).context("layer-coherence audit failed")?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),

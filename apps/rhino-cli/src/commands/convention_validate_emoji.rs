@@ -10,6 +10,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::emoji_audit::{EmojiFinding, audit_emoji};
 
@@ -81,7 +82,7 @@ pub fn run(args: &EmojiAuditArgs, output_format: OutputFormat) -> std::result::R
         })
         .collect();
 
-    let findings = audit_emoji(&full_paths).context("emoji audit failed")?;
+    let findings = audit_emoji(&RealFs, &full_paths).context("emoji audit failed")?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),

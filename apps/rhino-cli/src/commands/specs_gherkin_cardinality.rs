@@ -11,6 +11,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::gherkin_keyword_cardinality_audit::{
     GherkinCardinalityFinding, audit_gherkin_keyword_cardinality,
@@ -72,7 +73,7 @@ pub fn run(
 
     let full_paths = resolve_scan_paths(&args.positional, &args.path, &repo_root);
 
-    let findings = audit_gherkin_keyword_cardinality(&full_paths)
+    let findings = audit_gherkin_keyword_cardinality(&RealFs, &full_paths)
         .context("gherkin keyword cardinality audit failed")?;
 
     match output_format {

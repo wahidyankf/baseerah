@@ -3,12 +3,12 @@
 //! Byte-for-byte port of `apps/rhino-cli/internal/repo-governance/license_audit.go`.
 
 use std::collections::HashMap;
-use std::fs;
-use std::io::{BufRead, BufReader};
 use std::path::Path;
 
 use anyhow::{Context, Error};
 use serde::Serialize;
+
+use crate::application::fs::port::Fs;
 
 /// A single finding from the license audit.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -35,14 +35,17 @@ const LICENSE_EXEMPT_APPS: &[&str] = &["rhino-cli"];
 ///
 /// Returns an error when the repository directory structure cannot be read or
 /// when `LICENSING-NOTICE.md` exists but cannot be parsed.
-pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding>, Error> {
+pub fn audit_license(
+    fs: &dyn Fs,
+    repo_root: &Path,
+) -> std::result::Result<Vec<LicenseFinding>, Error> {
     let mut findings = Vec::new();
-    let dirs = required_license_dirs(repo_root)?;
+    let dirs = required_license_dirs(fs, repo_root)?;
     let mut license_by_dir: HashMap<String, String> = HashMap::new();
 
     for rel in &dirs {
         let license_path = repo_root.join(rel).join("LICENSE");
-        match extract_spdx(&license_path) {
+        match extract_spdx(fs, &license_path) {
             Ok(spdx) => {
                 license_by_dir.insert(rel.clone(), spdx);
             }
@@ -68,7 +71,7 @@ pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding
     }
 
     let notice_path = repo_root.join("LICENSING-NOTICE.md");
-    let claims = match parse_licensing_notice(&notice_path) {
+    let claims = match parse_licensing_notice(fs, &notice_path) {
         Ok(c) => c,
         Err(e) => {
             if let Some(io_err) = e.downcast_ref::<std::io::Error>() {
@@ -117,9 +120,9 @@ pub fn audit_license(repo_root: &Path) -> std::result::Result<Vec<LicenseFinding
 ///
 /// Returns an error when the `apps/` or `libs/` directories cannot be listed
 /// or when `specs/` metadata cannot be read.
-fn required_license_dirs(repo_root: &Path) -> std::result::Result<Vec<String>, Error> {
+fn required_license_dirs(fs: &dyn Fs, repo_root: &Path) -> std::result::Result<Vec<String>, Error> {
     let mut dirs = Vec::new();
-    let apps = read_non_hidden_dirs(&repo_root.join("apps"))?;
+    let apps = read_non_hidden_dirs(fs, &repo_root.join("apps"))?;
     for name in &apps {
         if LICENSE_EXEMPT_APPS.contains(&name.as_str()) {
             continue;
@@ -129,18 +132,13 @@ fn required_license_dirs(repo_root: &Path) -> std::result::Result<Vec<String>, E
         }
         dirs.push(format!("apps/{name}"));
     }
-    let libs = read_non_hidden_dirs(&repo_root.join("libs"))?;
+    let libs = read_non_hidden_dirs(fs, &repo_root.join("libs"))?;
     for name in &libs {
         dirs.push(format!("libs/{name}"));
     }
     let specs = repo_root.join("specs");
-    match fs::metadata(&specs) {
-        Ok(m) if m.is_dir() => dirs.push("specs".to_string()),
-        Ok(_) => {}
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-        Err(e) => {
-            return Err(Error::msg(format!("stat {}: {e}", specs.display())));
-        }
+    if fs.exists(&specs) && fs.is_dir(&specs) {
+        dirs.push("specs".to_string());
     }
     dirs.sort();
     Ok(dirs)
@@ -153,22 +151,21 @@ fn required_license_dirs(repo_root: &Path) -> std::result::Result<Vec<String>, E
 /// # Errors
 ///
 /// Returns an error when `dir` exists but cannot be read.
-fn read_non_hidden_dirs(dir: &Path) -> std::result::Result<Vec<String>, Error> {
-    let entries = match fs::read_dir(dir) {
+fn read_non_hidden_dirs(fs: &dyn Fs, dir: &Path) -> std::result::Result<Vec<String>, Error> {
+    let entries = match fs.read_dir(dir) {
         Ok(e) => e,
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
         Err(e) => return Err(Error::msg(format!("read {}: {e}", dir.display()))),
     };
     let mut names = Vec::new();
-    for entry in entries.flatten() {
-        if !entry.file_type().is_ok_and(|t| t.is_dir()) {
+    for entry in entries {
+        if !entry.is_dir {
             continue;
         }
-        let name = entry.file_name().to_string_lossy().to_string();
-        if name.starts_with('.') {
+        if entry.name.starts_with('.') {
             continue;
         }
-        names.push(name);
+        names.push(entry.name);
     }
     names.sort();
     Ok(names)
@@ -181,10 +178,9 @@ fn read_non_hidden_dirs(dir: &Path) -> std::result::Result<Vec<String>, Error> {
 ///
 /// Returns an error when the file cannot be opened, a line cannot be read, or
 /// the file is empty.
-fn extract_spdx(path: &Path) -> std::result::Result<String, Error> {
-    let file = fs::File::open(path)?;
-    let reader = BufReader::new(file);
-    for line in reader.lines() {
+fn extract_spdx(fs: &dyn Fs, path: &Path) -> std::result::Result<String, Error> {
+    let lines = fs.read_lines(path)?;
+    for line in lines {
         let line = line.with_context(|| format!("scan {}", path.display()))?;
         let trimmed = line.trim();
         if trimmed.is_empty() {
@@ -262,8 +258,11 @@ struct LicenseClaim {
 /// # Errors
 ///
 /// Returns an error when the file cannot be read.
-fn parse_licensing_notice(path: &Path) -> std::result::Result<Vec<LicenseClaim>, Error> {
-    let data = fs::read_to_string(path)?;
+fn parse_licensing_notice(
+    fs: &dyn Fs,
+    path: &Path,
+) -> std::result::Result<Vec<LicenseClaim>, Error> {
+    let data = fs.read_to_string(path)?;
     let lines: Vec<&str> = data.split('\n').collect();
     let mut claims = Vec::new();
     let mut path_col: Option<usize> = None;
@@ -448,6 +447,7 @@ fn licenses_equal(identified: &str, claim: &str) -> bool {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -485,7 +485,7 @@ mod tests {
     fn detects_missing_license() {
         let tmp = TempDir::new().unwrap();
         fs::create_dir_all(tmp.path().join("apps/foo")).unwrap();
-        let findings = audit_license(tmp.path()).unwrap();
+        let findings = audit_license(&RealFs, tmp.path()).unwrap();
         assert!(
             findings
                 .iter()
@@ -498,7 +498,7 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         fs::create_dir_all(tmp.path().join("apps/rhino-cli")).unwrap();
         fs::create_dir_all(tmp.path().join("apps/foo-e2e")).unwrap();
-        let findings = audit_license(tmp.path()).unwrap();
+        let findings = audit_license(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 
@@ -511,7 +511,7 @@ mod tests {
             "# Notice\n\n| Path | License |\n| --- | --- |\n| apps/foo | Apache-2.0 |\n",
         )
         .unwrap();
-        let findings = audit_license(tmp.path()).unwrap();
+        let findings = audit_license(&RealFs, tmp.path()).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].kind, "spdx-mismatch");
     }
@@ -525,7 +525,7 @@ mod tests {
             "# Notice\n\n| Path | License |\n| --- | --- |\n| apps/foo | MIT |\n",
         )
         .unwrap();
-        let findings = audit_license(tmp.path()).unwrap();
+        let findings = audit_license(&RealFs, tmp.path()).unwrap();
         assert!(findings.is_empty());
     }
 

@@ -7,13 +7,11 @@
 //! blocks and `Scenario Outline` `Examples` tables are exempt; keyword words
 //! inside doc-strings (`"""`) and comments (`#`) are ignored.
 
-use std::collections::HashSet;
-use std::fs;
 use std::path::Path;
-use std::sync::OnceLock;
 
 use anyhow::{Context, Error, anyhow};
-use walkdir::WalkDir;
+
+use crate::application::fs::port::Fs;
 
 /// A single step-keyword cardinality violation found in a `.feature` file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -42,6 +40,7 @@ pub struct GherkinCardinalityFinding {
 /// Returns an error when `paths` is empty or when a file cannot be read
 /// during the scan.
 pub fn audit_gherkin_keyword_cardinality(
+    fs: &dyn Fs,
     paths: &[String],
 ) -> std::result::Result<Vec<GherkinCardinalityFinding>, Error> {
     if paths.is_empty() {
@@ -49,9 +48,10 @@ pub fn audit_gherkin_keyword_cardinality(
     }
     let mut findings = Vec::new();
     for root in paths {
-        for file in walk_feature_paths(Path::new(root)) {
-            let content =
-                fs::read_to_string(&file).with_context(|| format!("read {}", file.display()))?;
+        for file in walk_feature_paths(fs, Path::new(root)) {
+            let content = fs
+                .read_to_string(&file)
+                .with_context(|| format!("read {}", file.display()))?;
             let mut more = scan_feature_content(&file.to_string_lossy(), &content);
             findings.append(&mut more);
         }
@@ -70,23 +70,16 @@ const PRIMARY_KEYWORDS: [&str; 3] = ["Given", "When", "Then"];
 
 /// Directory names skipped during the walk (build outputs, vendored code,
 /// worktrees, and archived sources).
-fn gherkin_skip_dirs() -> &'static HashSet<&'static str> {
-    static SET: OnceLock<HashSet<&'static str>> = OnceLock::new();
-    SET.get_or_init(|| {
-        [
-            "node_modules",
-            ".git",
-            "bin",
-            "build",
-            "target",
-            "dist",
-            "worktrees",
-            "archived",
-        ]
-        .into_iter()
-        .collect()
-    })
-}
+const GHERKIN_SKIP_DIRS: &[&str] = &[
+    "node_modules",
+    ".git",
+    "bin",
+    "build",
+    "target",
+    "dist",
+    "worktrees",
+    "archived",
+];
 
 /// Path fragments excluded from the scan: BDD-library self-test fixtures
 /// that deliberately use non-conforming Gherkin shapes.
@@ -105,30 +98,15 @@ fn is_excluded_feature_path(path: &str) -> bool {
 }
 
 /// Recursively walks `root` and returns sorted paths of `.feature` files,
-/// skipping directories in [`gherkin_skip_dirs`] and excluded fixture paths.
-fn walk_feature_paths(root: &Path) -> Vec<std::path::PathBuf> {
-    if !root.exists() {
-        return Vec::new();
-    }
-    let mut files: Vec<std::path::PathBuf> = WalkDir::new(root)
+/// skipping directories in [`GHERKIN_SKIP_DIRS`] and excluded fixture paths.
+fn walk_feature_paths(fs: &dyn Fs, root: &Path) -> Vec<std::path::PathBuf> {
+    let mut files: Vec<std::path::PathBuf> = fs
+        .walk_files(root, GHERKIN_SKIP_DIRS)
         .into_iter()
-        .filter_entry(|e| {
-            if e.file_type().is_dir() {
-                let name = e.file_name().to_string_lossy();
-                !gherkin_skip_dirs().contains(name.as_ref())
-            } else {
-                true
-            }
+        .filter(|p| {
+            p.file_name()
+                .is_some_and(|n| n.to_string_lossy().to_lowercase().ends_with(".feature"))
         })
-        .filter_map(std::result::Result::ok)
-        .filter(|e| e.file_type().is_file())
-        .filter(|e| {
-            e.file_name()
-                .to_string_lossy()
-                .to_lowercase()
-                .ends_with(".feature")
-        })
-        .map(walkdir::DirEntry::into_path)
         .filter(|p| !is_excluded_feature_path(&p.to_string_lossy()))
         .collect();
     files.sort();
@@ -317,6 +295,7 @@ fn primary_keyword_index(trimmed: &str) -> Option<usize> {
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
     use super::*;
+    use crate::infrastructure::fs::real::RealFs;
     use std::fs;
     use tempfile::TempDir;
 
@@ -334,7 +313,7 @@ mod tests {
             "sample.feature",
             "Feature: Sample\n\n  Scenario: Double when\n    Given a precondition\n    When the first action runs\n    When the second action runs\n    Then the outcome is checked\n",
         );
-        let findings = audit_gherkin_keyword_cardinality(&[root]).unwrap();
+        let findings = audit_gherkin_keyword_cardinality(&RealFs, &[root]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].keyword, "When");
         assert_eq!(findings[0].count, 2);
@@ -353,7 +332,7 @@ mod tests {
             "background.feature",
             "Feature: Background exemption\n\n  Background:\n    Given a shared precondition\n    Given another shared precondition\n\n  Scenario: Offender\n    When the first action runs\n    When the second action runs\n    Then the outcome is checked\n",
         );
-        let findings = audit_gherkin_keyword_cardinality(&[root]).unwrap();
+        let findings = audit_gherkin_keyword_cardinality(&RealFs, &[root]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].keyword, "When");
         assert_eq!(findings[0].scenario, "Offender");
@@ -369,7 +348,7 @@ mod tests {
             "outline.feature",
             "Feature: Outline exemption\n\n  Scenario Outline: Conforming outline\n    Given a precondition\n    When the action runs with <input>\n    Then the result is <output>\n\n    Examples:\n      | input | output |\n      | When  | Then   |\n      | one   | two    |\n\n  Scenario: Offender\n    Given a precondition\n    When the action runs\n    Then the first check passes\n    Then the second check passes\n",
         );
-        let findings = audit_gherkin_keyword_cardinality(&[root]).unwrap();
+        let findings = audit_gherkin_keyword_cardinality(&RealFs, &[root]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].keyword, "Then");
         assert_eq!(findings[0].scenario, "Offender");
@@ -387,7 +366,7 @@ mod tests {
             "docstring.feature",
             "Feature: Doc-string and comment exemption\n\n  Scenario: Conforming with noise\n    Given a precondition\n    # When this comment must be ignored\n    When the action runs with payload:\n      \"\"\"\n      When embedded in a doc-string\n      Then also embedded in a doc-string\n      \"\"\"\n    Then the outcome is checked\n\n  Scenario: Offender\n    Given the first precondition\n    Given the second precondition\n    When the action runs\n    Then the outcome is checked\n",
         );
-        let findings = audit_gherkin_keyword_cardinality(&[root]).unwrap();
+        let findings = audit_gherkin_keyword_cardinality(&RealFs, &[root]).unwrap();
         assert_eq!(findings.len(), 1);
         assert_eq!(findings[0].keyword, "Given");
         assert_eq!(findings[0].scenario, "Offender");
@@ -401,13 +380,13 @@ mod tests {
             "conforming.feature",
             "Feature: Conforming\n\n  Scenario: One each with continuations\n    Given a precondition\n    And another precondition\n    When the action runs\n    But nothing else happens\n    Then the outcome is checked\n    * the extra outcome is checked\n",
         );
-        let findings = audit_gherkin_keyword_cardinality(&[root]).unwrap();
+        let findings = audit_gherkin_keyword_cardinality(&RealFs, &[root]).unwrap();
         assert!(findings.is_empty());
     }
 
     #[test]
     fn audit_empty_paths_errors() {
-        let err = audit_gherkin_keyword_cardinality(&[]).unwrap_err();
+        let err = audit_gherkin_keyword_cardinality(&RealFs, &[]).unwrap_err();
         assert!(err.to_string().contains("at least one path"));
     }
 
@@ -427,7 +406,8 @@ mod tests {
             fs::write(dir.join("v.feature"), violation).unwrap();
         }
         let findings =
-            audit_gherkin_keyword_cardinality(&[tmp.path().to_string_lossy().to_string()]).unwrap();
+            audit_gherkin_keyword_cardinality(&RealFs, &[tmp.path().to_string_lossy().to_string()])
+                .unwrap();
         assert!(findings.is_empty());
     }
 
@@ -436,7 +416,8 @@ mod tests {
         let tmp = TempDir::new().unwrap();
         let missing = tmp.path().join("does-not-exist");
         let findings =
-            audit_gherkin_keyword_cardinality(&[missing.to_string_lossy().to_string()]).unwrap();
+            audit_gherkin_keyword_cardinality(&RealFs, &[missing.to_string_lossy().to_string()])
+                .unwrap();
         assert!(findings.is_empty());
     }
 
@@ -450,7 +431,7 @@ mod tests {
             "a.feature",
             "Feature: F\n\n  Scenario: Only\n    Given one\n    Given two\n",
         );
-        let findings = audit_gherkin_keyword_cardinality(&[root]).unwrap();
+        let findings = audit_gherkin_keyword_cardinality(&RealFs, &[root]).unwrap();
         assert_eq!(findings.len(), 3);
         assert!(findings[0].file.ends_with("a.feature"));
         assert!(findings[1].file.ends_with("b.feature"));

@@ -10,6 +10,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::vendor_audit::{Finding, walk};
 
@@ -59,7 +60,7 @@ pub fn run(args: &VendorAuditArgs, output_format: OutputFormat) -> std::result::
     } else {
         repo_root.join(scan_path)
     };
-    let findings = walk(&full_path).context("vendor audit failed")?;
+    let findings = walk(&RealFs, &full_path).context("vendor audit failed")?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),

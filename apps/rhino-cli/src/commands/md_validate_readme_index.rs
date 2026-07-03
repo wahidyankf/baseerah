@@ -10,6 +10,7 @@ use clap::Args;
 use serde::Serialize;
 
 use crate::domain::cliout::OutputFormat;
+use crate::infrastructure::fs::real::RealFs;
 use crate::internal::git;
 use crate::internal::repo_governance::readme_index_audit::{
     ReadmeIndexFinding, audit_readme_index,
@@ -98,8 +99,8 @@ pub fn run(
         })
         .collect();
 
-    let findings =
-        audit_readme_index(&full_paths, &args.exclude).context("readme-index audit failed")?;
+    let findings = audit_readme_index(&RealFs, &full_paths, &args.exclude)
+        .context("readme-index audit failed")?;
 
     match output_format {
         OutputFormat::Text => print!("{}", format_text(&findings)),
