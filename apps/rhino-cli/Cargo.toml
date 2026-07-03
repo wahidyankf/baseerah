@@ -107,6 +107,10 @@ harness = false
 name = "ddd"
 harness = false
 
+[[test]]
+name = "specs_tree"
+harness = false
+
 [lints.rust]
 unsafe_code = "forbid"
 missing_docs = "deny"

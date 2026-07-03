@@ -463,19 +463,66 @@ warnings` + `fmt --check` clean.
 
 #### 1e-iii. Wire `specs` (29 scenarios, 10 feature files)
 
-- [ ] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
+- [x] [AI] **RED**: add a cucumber `[[test]]` binary (`harness = false`) in `apps/rhino-cli/Cargo.toml` +
       `apps/rhino-cli/tests/specs_tree.rs` bound to `gherkin/specs/`, with an empty step scaffold. Command:
       `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test specs_tree`. Acceptance: scenarios execute and
       fail/undefined (proving the dir is now bound).
+  - **Done 2026-07-04.** New `[[test]] name = "specs_tree" harness = false` + `tests/specs_tree.rs`
+    scaffold. First run hit **2 parsing errors**: `harness-bindings.feature` and
+    `harness-registry-driven.feature` had steps hand-wrapped across multiple physical lines — Gherkin
+    (the `gherkin` 0.16 crate used here) has no line-continuation syntax, so both files failed to parse
+    entirely. Root-cause fixed by reflowing each wrapped step onto one physical line (no wording
+    change). After the fix, confirmed 10 features / 29 scenarios (29 skipped/undefined) pre-GREEN,
+    proving the dir is now bound, not absent.
   - **Gherkin (binds) →** — aggregate BDD binder for all 29 scenarios in `gherkin/specs/**`:
     "An untagged scenario fails the gate"; "A scenario requiring a level outside the project envelope fails"; "A scenario not covered at a required level fails"; "An @covers at an undeclared level fails"; "An orphan @covers marker fails the gate"; "A @wip scenario is exempt from coverage"; "Every harness command is registry-driven, not hard-coded"; "app with complete spec tree passes validation"; "app missing a required folder reports a finding"; "app with folder missing README.md reports a finding"; "app with no spec tree at all reports findings for every required folder"; "app with BDD feature files and bounded-contexts.yaml passes validation"; "app missing behavior feature files reports a finding"; "app missing bounded-contexts.yaml reports a finding"; "unknown app with no spec tree at all reports findings for both adoptions"; "Committing a real .env file is rejected"; "Staging .env.example is allowed"; "An uncovered domain scenario fails the gate"; "A project not in the domain-areas allowlist is skipped"; "All 11 harnesses are accounted for at their tier"; "A regression test locks worktree-safe execution"; "folder with spec files in all subfolders passes validation"; "empty subfolder reports a finding"; "missing subfolder reports a finding"; "folder path that does not exist reports an error"; "folder with all valid internal links passes validation"; "markdown file with broken internal link reports a finding"; "markdown file with only external HTTPS links passes validation"; "folder path that does not exist reports an error"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: implement step defs against the real `specs structure validate`,
+- [x] [AI] **GREEN**: implement step defs against the real `specs structure validate`,
       `specs behavior-coverage validate`, `specs domain-coverage`, `harness bindings validate`, and
       `env staged-guard` commands (per scenario domain). Command: same. Acceptance: all 29 scenarios in
       `specs/` pass, `0 skipped`.
-- [ ] [AI] **REFACTOR**: none needed unless duplication appears across the new `specs_tree.rs` step defs.
+  - **Done 2026-07-04.** Per-domain command verification via `--help`/`cli.rs`'s own test suite surfaced
+    that several "likely" commands named in this step's acceptance text are stale or differently-scoped,
+    so each domain was bound to what actually exists, per the ddd/test-coverage precedent (call the
+    internal function in-process when no matching CLI verb exists): - `behavior-coverage.feature` / `domain-coverage.feature` (8 scenarios): the live CLI verb `specs
+behavior-coverage validate` is a _different_ command (Gherkin-step-vs-test-implementation gap
+    checking, `commands::specs_coverage::run`) — the real per-level `@covers` engine
+    (`application::behavior_coverage::validator::validate` / `application::domain_coverage`) is
+    dead/unwired CLI code whose own `mod.rs` doc comments already carry `@covers` markers naming these
+    exact scenario titles. Bound in-process. - `env-staged-guard.feature` (2 scenarios): `env staged-guard validate` is a real, live CLI verb —
+    driven as a subprocess against a synthetic git-rooted fixture. - `harness-bindings.feature` (1 scenario): `application::agents::bindings::validate_bindings` driven
+    in-process against the **real repository's** `repo-config.yml` — its own `#[cfg(test)]` module
+    already proves the "all 11 harnesses" claim this feature makes. - `harness-registry-driven.feature` (1 scenario): `harness naming validate` / `harness
+instruction-size validate` / `harness duplication validate` are real CLI verbs, driven as
+    subprocesses against a synthetic `repo-config.yml` with renamed (non-`.claude`/`.opencode`) tier
+    directories, to prove they derive target sets from the registry rather than a hard-coded pair. - `validate-adoption.feature` / `validate-tree.feature` (8 scenarios): `specs validate-adoption` /
+    `specs validate-tree` no longer exist as CLI verbs — `cli.rs`'s own test suite documents both were
+    merged into `specs structure validate`, which also runs unrelated counts/bc/ul layers the
+    scenarios don't set up fixtures for. Bound directly to
+    `application::specs::validate_spec_adoption` / `validate_spec_tree` in-process instead. - `validate-counts.feature` (4 scenarios): `specs counts validate` is a real, still-live standalone
+    CLI leaf (kept for spec trees outside `specs/apps/`, e.g. `specs/libs/*`) — driven via its public
+    `run_at_root` testable entry point. - `validate-links.feature` (4 scenarios): `specs validate-links` was **deleted outright** (not
+    merged) — `md links validate`'s own regression test (`md_links_validate_covers_specs_dir`) proves
+    the generic link validator already covers `specs/**`. No dormant per-folder wrapper exists, so a
+    small test-local helper composes the still-live `application::docs::links::validate_all_links`
+    with a folder-existence precheck to replicate the deleted leaf's historical behavior. - `worktree-agnostic.feature` (1 scenario): replicates the existing regression test
+    `find_root_from_worktree_returns_worktree_path` in `infrastructure::git::root`, whose own doc
+    comment already quotes this exact Gherkin.
+    One genuine fixture-authoring bug surfaced (not a validator bug): the harness-registry-driven
+    duplication fixture initially named its two duplicate-content agent files `foo-maker.md` /
+    `bar-maker.md` — both share the `-maker` role suffix, so
+    `application::agents::detect_duplication::is_sanctioned_template_family` correctly exempted the
+    match (same-role sharing is an intentional, documented exemption, not a bug). Renamed the second
+    file to `widget-checker.md` (different role, different domain) to get a genuine duplication finding.
+    All 29 scenarios pass on the next run, `114 steps (114 passed)`.
+- [x] [AI] **REFACTOR**: none needed unless duplication appears across the new `specs_tree.rs` step defs.
       Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** Extracted 2 shared fixture-construction helpers
+    (`write_required_folders`, `write_required_folders_with_override`) deduping 4 near-identical
+    "loop over required spec folders, special-case one" Given-step bodies across the tree/counts
+    domains. Still `29 scenarios (29 passed)`, `114 steps (114 passed)`. `clippy -D warnings` (fixed a
+    `format_collect` lint and a denied `panic!` in an unreachable match arm, replaced with
+    `unreachable!`) + `fmt --check` clean.
 
 #### 1e-iv. Wire `test-coverage` (17 scenarios, 3 feature files)
 
