@@ -12,10 +12,9 @@ use anyhow::{Error, anyhow};
 use clap::Args;
 use serde::Serialize;
 
-use crate::application::repo_config;
 use crate::application::repo_governance::instruction_size::{
-    BudgetConfig, Finding, ResolvedTree, Severity, Surface, check_instruction_sizes,
-    check_resolved_tree, severity_label,
+    BudgetConfig, Finding, Severity, check_instruction_sizes, check_resolved_tree,
+    merged_budget_config, severity_label,
 };
 use crate::domain::cliout::OutputFormat;
 use crate::infrastructure::fs::real::RealFs;
@@ -86,16 +85,9 @@ pub fn run(
     run_for_root(&repo_root, output_format)
 }
 
-/// Default budget applied to registry instruction surfaces not covered by `instruction-size:` globs.
-const REGISTRY_DEFAULT_TARGET: u64 = 10_000;
-/// Warning threshold for registry surfaces without an explicit budget.
-const REGISTRY_DEFAULT_WARN: u64 = 13_000;
-/// Hard-fail threshold for registry surfaces without an explicit budget.
-const REGISTRY_DEFAULT_FAIL: u64 = 16_000;
-
 /// Core logic for `harness instruction-size validate` (cross-domain moved from `convention` domain in §2a-names), exposed for testing.
 ///
-/// Merges two surface sources:
+/// Merges two surface sources (see [`merged_budget_config`]):
 /// - `repo-config.yml` `instruction-size:` section (explicit per-surface budgets, optional).
 /// - `repo-config.yml` `harness:` `instruction:` lists (registry-derived surfaces, optional).
 ///
@@ -110,18 +102,7 @@ pub fn run_for_root(
     repo_root: &Path,
     output_format: OutputFormat,
 ) -> std::result::Result<(), Error> {
-    // Load instruction-size: section and harness registry from repo-config.yml.
-    let harness_config = repo_config::load_or_default(repo_root);
-    let registry_globs: Vec<String> = harness_config
-        .harness
-        .iter()
-        .flat_map(|e| e.instruction.iter().cloned())
-        .collect();
-    let yaml_config = harness_config.instruction_size;
-
-    // If neither source has any surfaces, skip gracefully.
-    let yaml_has_surfaces = yaml_config.as_ref().is_some_and(|c| !c.surfaces.is_empty());
-    if !yaml_has_surfaces && registry_globs.is_empty() {
+    let Some(merged_config) = merged_budget_config(repo_root) else {
         if output_format == OutputFormat::Text {
             println!(
                 "INSTRUCTION SIZE: SKIPPED (no instruction-size: section in repo-config.yml \
@@ -129,44 +110,10 @@ pub fn run_for_root(
             );
         }
         return Ok(());
-    }
-
-    // Build merged surface list: yaml surfaces first, then any registry glob not already covered.
-    let mut merged_surfaces: Vec<Surface> = yaml_config
-        .as_ref()
-        .map(|c| c.surfaces.clone())
-        .unwrap_or_default();
-    let mut seen_globs: std::collections::HashSet<String> =
-        merged_surfaces.iter().map(|s| s.glob.clone()).collect();
-    for glob in &registry_globs {
-        if seen_globs.insert(glob.clone()) {
-            merged_surfaces.push(Surface {
-                glob: glob.clone(),
-                target: REGISTRY_DEFAULT_TARGET,
-                warn: REGISTRY_DEFAULT_WARN,
-                fail: REGISTRY_DEFAULT_FAIL,
-            });
-        }
-    }
-
-    // Build merged config (resolved_tree carried from yaml if present, else omit from findings).
-    let merged_config = BudgetConfig {
-        surfaces: merged_surfaces,
-        resolved_tree: yaml_config.as_ref().map_or_else(
-            || ResolvedTree {
-                root: String::new(),
-                target: u64::MAX,
-                warn: u64::MAX,
-                fail: u64::MAX,
-            },
-            |c| c.resolved_tree.clone(),
-        ),
     };
 
     let mut findings = check_instruction_sizes(&RealFs, repo_root, &merged_config);
-    if yaml_config.is_some()
-        && let Some(tree_finding) = check_resolved_tree(&RealFs, repo_root, &merged_config)
-    {
+    if let Some(tree_finding) = check_resolved_tree(&RealFs, repo_root, &merged_config) {
         findings.push(tree_finding);
     }
 

@@ -16,10 +16,12 @@ use regex::Regex;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
+use super::instruction_size::{self, Severity as InstructionSeverity};
 use super::layer_coherence::audit_layer_coherence;
 use super::traceability_audit::audit_traceability;
 use super::vendor_audit::walk_governance_scope as audit_vendor_walk;
 use crate::application::fs::port::Fs;
+use crate::infrastructure::fs::real::RealFs;
 
 /// JSON schema identifier embedded in every [`AuditEnvelope`].
 pub const AUDIT_ENVELOPE_SCHEMA: &str = "rhino-cli/repo-governance-audit/v1";
@@ -32,7 +34,12 @@ const AUDIT_CRITICALITY_HIGH: &str = "HIGH";
 ///
 /// Categories are executed in this order by [`run_audit`].
 pub fn audit_category_order() -> &'static [&'static str] {
-    &["layer-coherence", "traceability-audit", "vendor-audit"]
+    &[
+        "layer-coherence",
+        "traceability-audit",
+        "vendor-audit",
+        "instruction-size",
+    ]
 }
 
 /// Maps an audit category `name` to the CLI sub-command that runs it.
@@ -43,6 +50,7 @@ fn audit_category_command(name: &str) -> &'static str {
         "layer-coherence" => "repo-governance validate layer-coherence",
         "traceability-audit" => "repo-governance validate traceability",
         "vendor-audit" => "repo-governance validate vendor",
+        "instruction-size" => "harness instruction-size validate",
         _ => "",
     }
 }
@@ -239,8 +247,32 @@ fn run_category(
                 })
                 .collect())
         }
+        "instruction-size" => Ok(audit_instruction_size(&opts.repo_root)),
         _ => Err(anyhow::anyhow!("unknown category {name}")),
     }
+}
+
+/// Checks all instruction-file size surfaces (per `repo-config.yml`'s
+/// `instruction-size:` section and harness registry) and returns only the
+/// hard-`Fail` findings as [`AuditFinding`]s. `Warn`-severity findings are
+/// advisory (matching `harness instruction-size validate`'s own exit-code
+/// gating) and never block this preflight category.
+///
+/// Returns an empty vector when neither an `instruction-size:` section nor
+/// any harness registry `instruction:` surfaces are configured.
+fn audit_instruction_size(repo_root: &Path) -> Vec<AuditFinding> {
+    let Some(config) = instruction_size::merged_budget_config(repo_root) else {
+        return Vec::new();
+    };
+    let mut findings = instruction_size::check_instruction_sizes(&RealFs, repo_root, &config);
+    if let Some(tree_finding) = instruction_size::check_resolved_tree(&RealFs, repo_root, &config) {
+        findings.push(tree_finding);
+    }
+    findings
+        .into_iter()
+        .filter(|f| f.severity == InstructionSeverity::Fail)
+        .map(|f| new_audit_finding("instruction-size", &f.path, 0, &f.message))
+        .collect()
 }
 
 /// Resolves a search-path list against `repo_root`.
@@ -669,16 +701,21 @@ mod tests {
             audit_category_command("vendor-audit"),
             "repo-governance validate vendor"
         );
+        assert_eq!(
+            audit_category_command("instruction-size"),
+            "harness instruction-size validate"
+        );
         assert_eq!(audit_category_command("unknown"), "");
     }
 
     #[test]
     fn audit_category_order_is_fixed() {
         let o = audit_category_order();
-        assert_eq!(o.len(), 3);
+        assert_eq!(o.len(), 4);
         assert_eq!(o[0], "layer-coherence");
         assert_eq!(o[1], "traceability-audit");
         assert_eq!(o[2], "vendor-audit");
+        assert_eq!(o[3], "instruction-size");
     }
 
     #[test]
@@ -769,6 +806,102 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let s = read_git_sha(dir.path());
         assert_eq!(s, "unknown");
+    }
+
+    // ---- instruction-size category ----
+
+    #[test]
+    fn run_audit_includes_instruction_size_category_with_no_findings_by_default() {
+        let _cwd = CwdLock::acquire();
+        let dir = tempfile::tempdir().unwrap();
+        let opts = AuditOptions {
+            repo_root: dir.path().to_path_buf(),
+            include_only: vec!["instruction-size".to_string()],
+            now: Some("2026-05-23T00:00:00Z".to_string()),
+            ..Default::default()
+        };
+        let env = run_audit(&RealFs, &opts).unwrap();
+        assert_eq!(env.result.categories.len(), 1, "got: {env:?}");
+        assert_eq!(env.result.categories[0].name, "instruction-size");
+        assert!(
+            env.result.categories[0].passed,
+            "no repo-config.yml instruction-size: section — must not fail: {env:?}"
+        );
+    }
+
+    #[test]
+    fn run_audit_instruction_size_reports_fail_finding_for_oversized_surface() {
+        let _cwd = CwdLock::acquire();
+        let dir = tempfile::tempdir().unwrap();
+        let repo_cfg = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "instruction-size:\n",
+            "  surfaces:\n",
+            "    - glob: \"AGENTS.md\"\n",
+            "      target: 24000\n",
+            "      warn: 27000\n",
+            "      fail: 30000\n",
+            "  resolved_tree:\n",
+            "    root: \"CLAUDE.md\"\n",
+            "    target: 30000\n",
+            "    warn: 34000\n",
+            "    fail: 38000\n",
+        );
+        std::fs::write(dir.path().join("repo-config.yml"), repo_cfg).unwrap();
+        std::fs::write(dir.path().join("AGENTS.md"), "x".repeat(31_000)).unwrap();
+        let opts = AuditOptions {
+            repo_root: dir.path().to_path_buf(),
+            include_only: vec!["instruction-size".to_string()],
+            now: Some("2026-05-23T00:00:00Z".to_string()),
+            ..Default::default()
+        };
+        let env = run_audit(&RealFs, &opts).unwrap();
+        let category = &env.result.categories[0];
+        assert_eq!(category.name, "instruction-size");
+        assert!(!category.passed, "got: {env:?}");
+        assert!(
+            category.findings.iter().any(|f| f.file == "AGENTS.md"),
+            "got: {env:?}"
+        );
+    }
+
+    #[test]
+    fn run_audit_instruction_size_ignores_warn_only_findings() {
+        let _cwd = CwdLock::acquire();
+        let dir = tempfile::tempdir().unwrap();
+        let repo_cfg = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "instruction-size:\n",
+            "  surfaces:\n",
+            "    - glob: \"AGENTS.md\"\n",
+            "      target: 24000\n",
+            "      warn: 27000\n",
+            "      fail: 30000\n",
+            "  resolved_tree:\n",
+            "    root: \"CLAUDE.md\"\n",
+            "    target: 30000\n",
+            "    warn: 34000\n",
+            "    fail: 38000\n",
+        );
+        std::fs::write(dir.path().join("repo-config.yml"), repo_cfg).unwrap();
+        // 28000 is over target (24000) but under fail (30000) — Warn only.
+        std::fs::write(dir.path().join("AGENTS.md"), "x".repeat(28_000)).unwrap();
+        let opts = AuditOptions {
+            repo_root: dir.path().to_path_buf(),
+            include_only: vec!["instruction-size".to_string()],
+            now: Some("2026-05-23T00:00:00Z".to_string()),
+            ..Default::default()
+        };
+        let env = run_audit(&RealFs, &opts).unwrap();
+        let category = &env.result.categories[0];
+        assert!(
+            category.passed,
+            "Warn-severity findings must not fail the instruction-size preflight category: {env:?}"
+        );
     }
 
     use std::collections::BTreeMap;

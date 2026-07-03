@@ -1,19 +1,29 @@
-//! Cucumber-rs integration tests for the `harness bindings generate`,
-//! `harness claude validate`, `harness sync validate`, `harness naming validate`,
-//! and `harness bindings validate` commands (the agent/binding-machinery domain;
-//! feature file names and Gherkin step text still say "agents" for historical
-//! reasons — the underlying CLI subcommands live under the `harness` noun today).
+//! Cucumber-rs integration tests for the whole `harness` command group
+//! (`harness bindings generate/validate`, `harness claude validate`,
+//! `harness sync validate`, `harness naming validate`,
+//! `harness duplication validate`, `harness instruction-size validate`) plus
+//! the governance-meta facts the `instruction-size` gate depends on
+//! (`repo-governance audit` category wiring, the pre-push hook trigger, and
+//! the convention/workflow/checker docs that describe the gate). Feature file
+//! names and some Gherkin step text still say "agents" or "convention
+//! agents-md-size" for historical reasons — the underlying CLI subcommands
+//! live under the `harness` noun today; see `gherkin/harness/README.md`.
 //!
 //! Wires the behavior-contract feature files at
 //! `specs/apps/rhino/behavior/rhino-cli/gherkin/harness/` to step definitions that
 //! synthesize `.claude/` and `.opencode/` fixtures inside a fresh git-rooted
 //! temp workspace and drive the compiled `rhino-cli` binary, asserting on
-//! output and exit code.
+//! output and exit code. A handful of scenarios assert facts about the real
+//! repository tree this crate lives in (governance docs, the `.husky/pre-push`
+//! hook) rather than the synthetic fixture — see `real_repo_root()`.
 
 // Test step-definition scaffolding: private World state and step fns are
 // self-documenting via their #[given]/#[when]/#[then] gherkin strings.
 #![allow(clippy::missing_docs_in_private_items)]
 #![allow(clippy::doc_markdown)]
+#![allow(clippy::needless_pass_by_value)] // cucumber-rs binds regex captures by value
+#![allow(clippy::panic)] // panic!() in an unreachable match arm inside a test step
+#![allow(clippy::format_collect)] // idiomatic fixture-body builder: (0..n).map(format!).collect()
 
 use std::fmt::Write as _;
 use std::path::PathBuf;
@@ -21,6 +31,7 @@ use std::process::Output;
 
 use assert_cmd::cargo::cargo_bin;
 use cucumber::{World as _, given, then, when};
+use serde_json::Value;
 use tempfile::TempDir;
 
 /// Shared scenario state. Each scenario gets a fresh git-rooted temp workspace
@@ -32,6 +43,18 @@ struct AgentsWorld {
     /// Extra CLI args (flags) for the next exec.
     extra_args: Vec<String>,
     output: Option<Output>,
+    /// Snapshot of Amazon Q bridge-file bytes captured before a re-emission,
+    /// consumed by the "emitting twice is idempotent" scenario.
+    bindings_snapshot: Vec<(String, Vec<u8>)>,
+    /// Simulated `git diff --name-only` push range for pre-push-hook scenarios.
+    push_range_files: Vec<String>,
+    /// Whether the simulated pre-push instruction-size gate triggered.
+    hook_invoked: bool,
+    /// Directory recorded by a governance-meta "When I look under ..." step.
+    lookup_dir: String,
+    /// Content of the file most recently confirmed to exist by a
+    /// governance-meta "Then ... exists" step; consumed by the following step.
+    lookup_file_content: String,
 }
 
 impl std::fmt::Debug for AgentsWorld {
@@ -50,6 +73,11 @@ impl AgentsWorld {
             work,
             extra_args: Vec::new(),
             output: None,
+            bindings_snapshot: Vec::new(),
+            push_range_files: Vec::new(),
+            hook_invoked: false,
+            lookup_dir: String::new(),
+            lookup_file_content: String::new(),
         }
     }
 
@@ -315,12 +343,12 @@ fn given_all_valid(w: &mut AgentsWorld) {
     w.write_claude_agent("foo-maker", "", &["my-skill"]);
 }
 
-#[given(r#"a .claude/ directory where one agent is missing the required "tools" field"#)]
-fn given_missing_tools(w: &mut AgentsWorld) {
+#[given(r#"a .claude/ directory where one agent is missing the required "description" field"#)]
+fn given_missing_description(w: &mut AgentsWorld) {
     w.write_claude_skill("my-skill");
     w.write(
         ".claude/agents/foo-maker.md",
-        "---\nname: foo-maker\ndescription: d\nmodel:\ncolor: blue\n---\n# Body\n",
+        "---\nname: foo-maker\ntools: Read\nmodel:\ncolor: blue\n---\n# Body\n",
     );
 }
 
@@ -389,7 +417,7 @@ fn then_identifies_missing_field(w: &mut AgentsWorld) {
     let out = w.stdout();
     assert!(out.contains("foo-maker.md"), "got: {out}");
     assert!(out.contains("Required Fields"), "got: {out}");
-    assert!(out.contains("tools"), "got: {out}");
+    assert!(out.contains("description"), "got: {out}");
 }
 
 #[then("the output reports the duplicate agent name")]
@@ -505,89 +533,214 @@ fn then_naming_mirror_drift(w: &mut AgentsWorld) {
 }
 
 // ===========================================================================
-// agents emit-bindings / validate-bindings
+// agents detect-duplication (harness duplication validate)
 // ===========================================================================
 
-impl AgentsWorld {
-    /// Writes a minimal canonical `AGENTS.md` at the repo root.
-    fn write_agents_md(&self) {
-        self.write("AGENTS.md", "# AGENTS.md\n\nCanonical instructions.\n");
-    }
-
-    /// Writes both expected binding files with their canonical content, so a
-    /// fresh regenerate matches byte-for-byte. Drives the actual
-    /// `harness bindings generate --harness amazonq` command rather than a
-    /// hand-maintained literal, so this fixture can never drift out of sync
-    /// with the canonical content in `application::agents::bindings`.
-    fn write_matching_bindings(&mut self) {
-        self.exec(&["harness", "bindings", "generate", "--harness", "amazonq"]);
-    }
-
-    /// Writes a platform-bindings catalog naming every binding directory.
-    fn write_full_catalog(&self) {
-        self.write(
-            "docs/reference/platform-bindings.md",
-            "# Platform Bindings\n\nDirectories: .claude, .opencode, .codex, .github, .amazonq\n",
-        );
-    }
-
-    /// Creates the binding directories that the catalog must document, plus
-    /// empty `agents/` subdirectories under `.claude/` and `.opencode/` so the
-    /// `harness bindings validate` OpenCode-sync-equivalence checks (folded in
-    /// from `harness sync validate`) find readable, trivially-equal directories
-    /// instead of failing with "directory not found".
-    fn make_binding_dirs(&self) {
-        for d in [".claude", ".opencode", ".codex", ".github", ".amazonq"] {
-            std::fs::create_dir_all(self.work.path().join(d)).expect("mk binding dir");
-        }
-        std::fs::create_dir_all(self.work.path().join(".claude/agents")).expect("mk agents dir");
-        std::fs::create_dir_all(self.work.path().join(".opencode/agents")).expect("mk agents dir");
-    }
-}
-
-#[given("a repository with a canonical AGENTS.md at the root")]
-fn given_canonical_agents_md(w: &mut AgentsWorld) {
-    w.write_agents_md();
-}
-
-#[given("a repository whose committed binding files match a fresh regenerate")]
-fn given_bindings_match(w: &mut AgentsWorld) {
-    w.write_agents_md();
-    w.write_matching_bindings();
-    w.make_binding_dirs();
-}
-
-#[given("the platform-bindings catalog documents every binding directory present on disk")]
-fn given_catalog_complete(w: &mut AgentsWorld) {
-    w.write_full_catalog();
-}
-
-#[given(
-    "a repository where a committed binding file no longer matches a regenerate from AGENTS.md"
-)]
-fn given_binding_drift(w: &mut AgentsWorld) {
-    w.write_agents_md();
-    w.write_matching_bindings();
-    w.write_full_catalog();
-    w.make_binding_dirs();
-    // Corrupt one committed binding file so it drifts from the regenerate.
+#[given("a repository with agent and skill files whose bodies share no 10-line verbatim windows")]
+fn given_no_shared_duplication(w: &mut AgentsWorld) {
+    let body_a: String = (0..12)
+        .map(|i| format!("Alpha unique line {i}\n"))
+        .collect();
+    let body_b: String = (0..12)
+        .map(|i| format!("Beta distinct line {i}\n"))
+        .collect();
     w.write(
-        ".amazonq/rules/00-agents-md.md",
-        "# Edited by hand — drifted\n",
+        ".claude/agents/alpha-widget.md",
+        &format!("---\nname: alpha-widget\n---\n{body_a}"),
+    );
+    w.write(
+        ".claude/skills/beta-skill/SKILL.md",
+        &format!("---\nname: beta-skill\n---\n{body_b}"),
+    );
+}
+
+#[given("a repository with two agent files that share 12 consecutive lines verbatim")]
+fn given_two_agents_sharing_12_lines(w: &mut AgentsWorld) {
+    // Different domains ("alpha" vs "beta") AND different role suffixes
+    // (-maker vs -checker) — not exempt as a sanctioned template family.
+    let shared: String = (0..12)
+        .map(|i| format!("Shared workflow line {i}\n"))
+        .collect();
+    w.write(
+        ".claude/agents/alpha-maker.md",
+        &format!("---\nname: alpha-maker\n---\n{shared}"),
+    );
+    w.write(
+        ".claude/agents/beta-checker.md",
+        &format!("---\nname: beta-checker\n---\n{shared}"),
+    );
+}
+
+#[given("a repository with an agent file whose body matches 11 consecutive lines of a SKILL.md")]
+fn given_agent_matches_skill_body(w: &mut AgentsWorld) {
+    let shared: String = (0..11)
+        .map(|i| format!("Shared prose line {i}\n"))
+        .collect();
+    w.write(
+        ".claude/agents/gadget-widget.md",
+        &format!("---\nname: gadget-widget\n---\n{shared}"),
+    );
+    w.write(
+        ".claude/skills/other-thing/SKILL.md",
+        &format!("---\nname: other-thing\n---\n{shared}"),
     );
 }
 
 #[given(
-    "a repository with a binding directory that the platform-bindings catalog does not document"
+    "a repository where two agent files share a 10-line window composed only of headings or blank lines"
 )]
-fn given_catalog_gap(w: &mut AgentsWorld) {
-    w.write_agents_md();
+fn given_heading_only_window(w: &mut AgentsWorld) {
+    let shared: String = (0..10).map(|i| format!("## Heading {i}\n")).collect();
+    w.write(
+        ".claude/agents/one-widget.md",
+        &format!("---\nname: one-widget\n---\n{shared}"),
+    );
+    w.write(
+        ".claude/agents/two-widget.md",
+        &format!("---\nname: two-widget\n---\n{shared}"),
+    );
+}
+
+#[when("the developer runs agents detect-duplication")]
+fn when_detect_duplication(w: &mut AgentsWorld) {
+    w.exec(&["harness", "duplication", "validate"]);
+}
+
+#[then("the output reports zero duplication clusters")]
+fn then_zero_duplication_clusters(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("PASSED: 0 clusters"), "got: {out}");
+}
+
+#[then("the output identifies the duplicated cluster across both agents")]
+fn then_identifies_cluster_across_agents(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("alpha-maker.md"), "got: {out}");
+    assert!(out.contains("beta-checker.md"), "got: {out}");
+}
+
+#[then("the output identifies the duplicated cluster across the agent and the skill")]
+fn then_identifies_cluster_across_agent_and_skill(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("gadget-widget.md"), "got: {out}");
+    assert!(out.contains("SKILL.md"), "got: {out}");
+}
+
+// ===========================================================================
+// agents emit-bindings / validate-bindings
+// ===========================================================================
+
+impl AgentsWorld {
+    /// Writes both expected Amazon Q bridge files with their canonical
+    /// content, so a fresh regenerate matches byte-for-byte. Drives the
+    /// actual `harness bindings generate --harness amazonq` command rather
+    /// than a hand-maintained literal, so this fixture can never drift out of
+    /// sync with the canonical content in `application::agents::bindings`.
+    /// Note: the bridge content is static (a pointer to `AGENTS.md` by path,
+    /// not its bytes) — no `AGENTS.md` fixture file is needed for this.
+    fn write_matching_bindings(&mut self) {
+        self.exec(&["harness", "bindings", "generate", "--harness", "amazonq"]);
+    }
+
+    /// Writes a platform-bindings catalog naming every known binding
+    /// directory (a safe superset — referencing an absent directory is
+    /// harmless; only an undocumented *present* directory fails validation).
+    fn write_full_catalog(&self) {
+        self.write(
+            "docs/reference/platform-bindings.md",
+            "# Platform Bindings\n\nDirectories: .claude, .opencode, .codex, .github, .amazonq, \
+             .cursor, .windsurf, .junie, GEMINI.md, CONVENTIONS.md\n",
+        );
+    }
+
+    /// Creates only the two directories the `OpenCode` sync-equivalence check
+    /// needs (`.claude/agents`, `.opencode/agents`, both empty so 0 == 0
+    /// trivially matches). Leaves every other known binding directory absent.
+    fn make_sync_dirs(&self) {
+        std::fs::create_dir_all(self.work.path().join(".claude/agents")).expect("mk agents dir");
+        std::fs::create_dir_all(self.work.path().join(".opencode/agents")).expect("mk agents dir");
+    }
+
+    /// A fully valid bindings setup: matching bridge files, the sync dirs,
+    /// and a catalog covering everything present. Scenarios that need to
+    /// introduce exactly one corruption build on top of this.
+    fn given_full_valid_bindings_setup(&mut self) {
+        self.write_matching_bindings();
+        self.make_sync_dirs();
+        self.write_full_catalog();
+    }
+}
+
+#[given("a repository without an existing .amazonq/ directory")]
+fn given_no_amazonq_dir(w: &mut AgentsWorld) {
+    assert!(
+        !w.work.path().join(".amazonq").exists(),
+        "fresh fixture workspace must not already have .amazonq/"
+    );
+}
+
+#[given("a repository where the bridge files already exist")]
+fn given_bridge_files_exist(w: &mut AgentsWorld) {
     w.write_matching_bindings();
-    w.make_binding_dirs();
-    // Catalog omits the `.amazonq` directory, which exists on disk.
+    for rel in [
+        ".amazonq/rules/00-agents-md.md",
+        ".amazonq/cli-agents/ose-default.json",
+    ] {
+        let bytes = std::fs::read(w.work.path().join(rel)).expect("read prior emission");
+        w.bindings_snapshot.push((rel.to_string(), bytes));
+    }
+}
+
+#[given("a repository whose bridge files match the generated content")]
+fn given_bridge_files_match(w: &mut AgentsWorld) {
+    w.write_matching_bindings();
+    w.make_sync_dirs();
+}
+
+#[given("the platform-bindings catalog references every present binding directory")]
+fn given_catalog_references_everything_present(w: &mut AgentsWorld) {
+    w.write_full_catalog();
+}
+
+#[given("a repository where a bridge file has been hand-edited away from the generated content")]
+fn given_bridge_file_mutated(w: &mut AgentsWorld) {
+    w.given_full_valid_bindings_setup();
+    w.write(
+        ".amazonq/rules/00-agents-md.md",
+        "# Hand-edited — no longer canonical\n",
+    );
+}
+
+#[given("a repository where a bridge file has been deleted")]
+fn given_bridge_file_deleted(w: &mut AgentsWorld) {
+    w.given_full_valid_bindings_setup();
+    std::fs::remove_file(w.work.path().join(".amazonq/cli-agents/ose-default.json"))
+        .expect("remove bridge file");
+}
+
+#[given(
+    "a repository with a known binding directory that the platform-bindings catalog does not reference"
+)]
+fn given_catalog_missing_dir_row(w: &mut AgentsWorld) {
+    w.write_matching_bindings();
+    w.make_sync_dirs();
+    // `.codex` is present on disk but the catalog below omits it.
+    std::fs::create_dir_all(w.work.path().join(".codex")).expect("mk .codex");
     w.write(
         "docs/reference/platform-bindings.md",
-        "# Platform Bindings\n\nDirectories: .claude, .opencode, .codex, .github\n",
+        "# Platform Bindings\n\nDirectories: .claude, .opencode, .amazonq\n",
+    );
+}
+
+#[given("a repository where some known binding directories do not exist on disk")]
+fn given_some_binding_dirs_absent(w: &mut AgentsWorld) {
+    w.write_matching_bindings();
+    w.make_sync_dirs();
+    // .codex, .github, .cursor, .windsurf, .junie, GEMINI.md, CONVENTIONS.md
+    // are intentionally never created.
+    w.write(
+        "docs/reference/platform-bindings.md",
+        "# Platform Bindings\n\nDirectories: .claude, .opencode, .amazonq\n",
     );
 }
 
@@ -596,94 +749,68 @@ fn when_emit_bindings(w: &mut AgentsWorld) {
     w.exec(&["harness", "bindings", "generate", "--harness", "amazonq"]);
 }
 
-#[when("the developer runs agents emit-bindings with the --dry-run flag")]
-fn when_emit_bindings_dry_run(w: &mut AgentsWorld) {
-    w.exec(&[
-        "harness",
-        "bindings",
-        "generate",
-        "--harness",
-        "amazonq",
-        "--dry-run",
-    ]);
-}
-
 #[when("the developer runs agents validate-bindings")]
 fn when_validate_bindings(w: &mut AgentsWorld) {
-    w.exec(&["harness", "bindings", "validate"]);
+    // `--verbose` so absent-directory "no catalog row required" pass-checks
+    // are visible in the output for the last scenario's assertion; harmless
+    // for every other scenario (only adds an "All Checks:" section).
+    w.exec(&["harness", "bindings", "validate", "--verbose"]);
 }
 
-#[then("the Amazon Q rules pointer and default agent JSON are written")]
-fn then_bindings_written(w: &mut AgentsWorld) {
-    assert!(
-        w.work
-            .path()
-            .join(".amazonq/cli-agents/ose-default.json")
-            .exists(),
-        "stdout: {}",
-        w.stdout()
-    );
-    assert!(
-        w.work
-            .path()
-            .join(".amazonq/rules/00-agents-md.md")
-            .exists(),
-        "stdout: {}",
-        w.stdout()
-    );
+#[then("the file .amazonq/rules/00-agents-md.md is written as a pointer to AGENTS.md")]
+fn then_rules_pointer_written(w: &mut AgentsWorld) {
+    let p = w.work.path().join(".amazonq/rules/00-agents-md.md");
+    assert!(p.exists(), "stdout: {}", w.stdout());
+    let content = std::fs::read_to_string(&p).expect("read rules pointer");
+    assert!(content.contains("AGENTS.md"), "got: {content}");
 }
 
-#[then("each generated file references AGENTS.md without duplicating its body")]
-fn then_bindings_reference_agents_md(w: &mut AgentsWorld) {
-    let json = std::fs::read_to_string(w.work.path().join(".amazonq/cli-agents/ose-default.json"))
-        .expect("read json");
-    let rule = std::fs::read_to_string(w.work.path().join(".amazonq/rules/00-agents-md.md"))
-        .expect("read rule");
-    assert!(json.contains("AGENTS.md"), "json: {json}");
-    assert!(rule.contains("AGENTS.md"), "rule: {rule}");
-    // The generated files point at AGENTS.md rather than copying its body.
-    assert!(!json.contains("Canonical instructions."), "json: {json}");
-    assert!(!rule.contains("Canonical instructions."), "rule: {rule}");
+#[then(
+    "the file .amazonq/cli-agents/ose-default.json is written as a valid Amazon Q agent definition"
+)]
+fn then_agent_definition_written(w: &mut AgentsWorld) {
+    let content =
+        std::fs::read_to_string(w.work.path().join(".amazonq/cli-agents/ose-default.json"))
+            .expect("read agent definition");
+    let json: Value = serde_json::from_str(&content).expect("valid json");
+    assert_eq!(json["name"], "ose-default");
 }
 
-#[then("the output lists the files that would be written")]
-fn then_dry_run_lists_files(w: &mut AgentsWorld) {
-    let out = w.stdout();
+#[then(
+    "the agent definition resources reference file://AGENTS.md and file://.amazonq/rules/**/*.md"
+)]
+fn then_agent_definition_resources(w: &mut AgentsWorld) {
+    let content =
+        std::fs::read_to_string(w.work.path().join(".amazonq/cli-agents/ose-default.json"))
+            .expect("read agent definition");
+    let json: Value = serde_json::from_str(&content).expect("valid json");
+    let resources = json["resources"].as_array().expect("resources array");
+    let strs: Vec<&str> = resources.iter().filter_map(Value::as_str).collect();
+    assert!(strs.contains(&"file://AGENTS.md"), "got: {strs:?}");
     assert!(
-        out.contains("would write .amazonq/cli-agents/ose-default.json"),
-        "got: {out}"
-    );
-    assert!(
-        out.contains("would write .amazonq/rules/00-agents-md.md"),
-        "got: {out}"
+        strs.contains(&"file://.amazonq/rules/**/*.md"),
+        "got: {strs:?}"
     );
 }
 
-#[then("no binding files are created on disk")]
-fn then_no_bindings_on_disk(w: &mut AgentsWorld) {
-    assert!(
-        !w.work
-            .path()
-            .join(".amazonq/cli-agents/ose-default.json")
-            .exists()
-    );
-    assert!(
-        !w.work
-            .path()
-            .join(".amazonq/rules/00-agents-md.md")
-            .exists()
-    );
+#[then("the bridge files are byte-for-byte identical to the previous emission")]
+fn then_bindings_identical_to_previous(w: &mut AgentsWorld) {
+    let snapshot = w.bindings_snapshot.clone();
+    for (rel, expected) in &snapshot {
+        let actual = std::fs::read(w.work.path().join(rel)).expect("read current emission");
+        assert_eq!(&actual, expected, "{rel} changed between emissions");
+    }
 }
 
-#[then("the output reports zero binding drift and zero catalog gaps")]
-fn then_zero_drift_zero_gaps(w: &mut AgentsWorld) {
+#[then("the output reports all binding checks as passing")]
+fn then_all_binding_checks_passing(w: &mut AgentsWorld) {
     let out = w.stdout();
     assert!(out.contains("Failed: 0"), "got: {out}");
     assert!(out.contains("VALIDATION PASSED"), "got: {out}");
 }
 
-#[then("the output identifies the drifted binding file")]
-fn then_identifies_drift(w: &mut AgentsWorld) {
+#[then("the output identifies the drifted bridge file")]
+fn then_identifies_drifted_bridge_file(w: &mut AgentsWorld) {
     let out = w.stdout();
     assert!(
         out.contains("Binding: .amazonq/rules/00-agents-md.md"),
@@ -692,11 +819,523 @@ fn then_identifies_drift(w: &mut AgentsWorld) {
     assert!(out.contains("drifted from canonical content"), "got: {out}");
 }
 
-#[then("the output identifies the binding directory missing from the catalog")]
-fn then_identifies_catalog_gap(w: &mut AgentsWorld) {
+#[then("the output reports the missing bridge file")]
+fn then_reports_missing_bridge_file(w: &mut AgentsWorld) {
     let out = w.stdout();
-    assert!(out.contains("Catalog Coverage: .amazonq"), "got: {out}");
+    assert!(
+        out.contains("Binding: .amazonq/cli-agents/ose-default.json"),
+        "got: {out}"
+    );
+    assert!(
+        out.contains("is missing; run `rhino-cli agents emit-bindings`"),
+        "got: {out}"
+    );
+}
+
+#[then("the output identifies the binding directory missing a catalog row")]
+fn then_identifies_binding_dir_missing_catalog_row(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("Catalog Coverage: .codex"), "got: {out}");
     assert!(out.contains("absent from catalog"), "got: {out}");
+}
+
+#[then("no catalog row is required for the absent binding directories")]
+fn then_no_catalog_row_required_for_absent_dirs(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(
+        out.contains("absent on disk; no catalog row required"),
+        "got: {out}"
+    );
+}
+
+// ===========================================================================
+// Instruction-size shared fixture helper
+// ===========================================================================
+
+/// Writes a `repo-config.yml` with an `instruction-size:` section covering
+/// `AGENTS.md` (with the given `target`/`fail`, `warn` interpolated between
+/// them) and, unless `single_surface` is set, `.github/copilot-instructions.md`
+/// too, plus a `resolved_tree` rooted at `CLAUDE.md` matching the real
+/// convention doc's thresholds
+/// (`repo-governance/conventions/structure/instruction-file-size-budget.md`).
+/// Shared by every `harness instruction-size validate` scenario in this file
+/// (the standalone `instruction-size-budget.yaml` file the Gherkin prose
+/// still names was folded into this `repo-config.yml` section — see
+/// `application/repo_config/mod.rs`).
+fn write_instruction_size_config_scoped(
+    w: &AgentsWorld,
+    target: u64,
+    fail: u64,
+    single_surface: bool,
+) {
+    let warn = target + fail.saturating_sub(target) / 2;
+    let mut yaml = format!(
+        "harness: []\n\
+         coverage:\n  projects: []\n\
+         specs:\n  ddd-areas: []\n  domain-areas: []\n\
+         instruction-size:\n\
+         \x20 surfaces:\n\
+         \x20   - glob: \"AGENTS.md\"\n\
+         \x20     target: {target}\n\
+         \x20     warn: {warn}\n\
+         \x20     fail: {fail}\n"
+    );
+    if !single_surface {
+        yaml.push_str(
+            "\x20   - glob: \".github/copilot-instructions.md\"\n\
+             \x20     target: 6000\n\
+             \x20     warn: 8000\n\
+             \x20     fail: 10000\n",
+        );
+    }
+    yaml.push_str(
+        "\x20 resolved_tree:\n\
+         \x20   root: \"CLAUDE.md\"\n\
+         \x20   target: 30000\n\
+         \x20   warn: 34000\n\
+         \x20   fail: 38000\n",
+    );
+    w.write("repo-config.yml", &yaml);
+}
+
+/// Convenience wrapper for [`write_instruction_size_config_scoped`] covering
+/// both `AGENTS.md` and `.github/copilot-instructions.md` — the shape every
+/// scenario except the "legacy alias" (single-surface) one needs.
+fn write_instruction_size_config(w: &AgentsWorld, target: u64, fail: u64) {
+    write_instruction_size_config_scoped(w, target, fail, false);
+}
+
+/// Root of the real monorepo containing this crate (two levels up from
+/// `apps/rhino-cli`). Used by governance-meta scenarios that assert facts
+/// about the real repository tree — governance docs, workflow docs, agent
+/// instruction files, and `.husky/pre-push` — rather than the synthetic
+/// git-rooted fixture every other scenario in this file drives the binary
+/// against.
+fn real_repo_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .expect("repo root resolvable")
+}
+
+// ===========================================================================
+// AGENTS.md Size Audit (repo-governance-agents-md-size.feature)
+// harness instruction-size validate, scoped to a 30KB target / 40KB fail
+// ceiling matching this feature's own scenario titles.
+// ===========================================================================
+
+#[given(regex = r"^a repository containing an AGENTS\.md file of (\d+) bytes$")]
+fn given_agents_md_file_of_n_bytes(w: &mut AgentsWorld, n: String) {
+    write_instruction_size_config(w, 30_000, 40_000);
+    let n: usize = n.parse().expect("byte count");
+    w.write("AGENTS.md", &"x".repeat(n));
+}
+
+#[when("the developer runs harness instruction-size validate")]
+fn when_instruction_size_validate(w: &mut AgentsWorld) {
+    w.exec(&["harness", "instruction-size", "validate"]);
+}
+
+#[then("the output reports the AGENTS.md size as within target")]
+fn then_reports_within_target(w: &mut AgentsWorld) {
+    // Ok-severity surfaces are intentionally excluded from findings output
+    // (progressive-disclosure quiet-success design — see
+    // `check_instruction_sizes`'s doc comment); the observable signal is the
+    // generic "all surfaces within budget" pass banner.
+    let out = w.stdout();
+    assert!(out.contains("INSTRUCTION SIZE: PASSED"), "got: {out}");
+}
+
+#[then("the output identifies AGENTS.md as over the target size")]
+fn then_identifies_over_target(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("[WARN]"), "got: {out}");
+    assert!(out.contains("AGENTS.md"), "got: {out}");
+}
+
+#[then("the output identifies AGENTS.md as over the hard limit")]
+fn then_identifies_over_hard_limit(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("[FAIL]"), "got: {out}");
+    assert!(out.contains("AGENTS.md"), "got: {out}");
+}
+
+// ===========================================================================
+// Instruction-file size budget (repo-governance-instruction-size.feature)
+// ===========================================================================
+
+#[given(
+    "a committed \"instruction-size-budget.yaml\" mapping instruction-file globs to target, warn, and fail byte thresholds"
+)]
+fn given_instruction_size_budget_committed(w: &mut AgentsWorld) {
+    write_instruction_size_config(w, 24_000, 30_000);
+}
+
+#[given(regex = r#"^"AGENTS\.md" is (\d+) bytes$"#)]
+fn given_agents_md_is_n_bytes(w: &mut AgentsWorld, n: String) {
+    let n: usize = n.parse().expect("byte count");
+    w.write("AGENTS.md", &"x".repeat(n));
+}
+
+#[given(regex = r"^its target is (\d+) and its fail ceiling is (\d+)$")]
+fn given_target_and_fail_ceiling(w: &mut AgentsWorld, target: String, fail: String) {
+    write_instruction_size_config(
+        w,
+        target.parse().expect("target"),
+        fail.parse().expect("fail"),
+    );
+}
+
+#[given(regex = r"^its fail ceiling is (\d+)$")]
+fn given_fail_ceiling(w: &mut AgentsWorld, fail: String) {
+    // No explicit target in this scenario — reuse the Background's default.
+    write_instruction_size_config(w, 24_000, fail.parse().expect("fail"));
+}
+
+#[given(r#"no file exists at ".github/copilot-instructions.md""#)]
+fn given_no_copilot_instructions_file(_w: &mut AgentsWorld) {
+    // Intentionally a no-op: `write_instruction_size_config` already
+    // configures this glob as a surface, but the file itself is never
+    // written — the glob simply matches nothing.
+}
+
+#[given(r#""CLAUDE.md" imports "AGENTS.md" via "@AGENTS.md""#)]
+fn given_claude_md_imports_agents_md(w: &mut AgentsWorld) {
+    // AGENTS.md stays within its own 24000-byte surface target (Ok, silently
+    // excluded from surface-level findings) so only the resolved-tree
+    // finding is expected to fire in this scenario.
+    w.write("AGENTS.md", &"x".repeat(20_000));
+    w.write("CLAUDE.md", &format!("@AGENTS.md\n{}", "y".repeat(20_000)));
+}
+
+#[given("the sum of \"CLAUDE.md\" plus the imported files exceeds the 38000-byte tree ceiling")]
+fn given_sum_exceeds_tree_ceiling(_w: &mut AgentsWorld) {
+    // No-op: the prior step already sized CLAUDE.md (~20KB) + AGENTS.md
+    // (~20KB) to ~40KB, over the Background's 38000-byte resolved-tree fail
+    // ceiling.
+}
+
+#[then(regex = r#"^the file is reported with severity "(ok|warn|fail)"$"#)]
+fn then_file_reported_with_severity(w: &mut AgentsWorld, severity: String) {
+    let out = w.stdout();
+    match severity.as_str() {
+        // Ok findings are excluded from output by design — see
+        // `then_reports_within_target` above for the same reasoning.
+        "ok" => assert!(out.contains("INSTRUCTION SIZE: PASSED"), "got: {out}"),
+        "warn" => {
+            assert!(out.contains("[WARN]"), "got: {out}");
+            assert!(out.contains("AGENTS.md"), "got: {out}");
+        }
+        "fail" => {
+            assert!(out.contains("[FAIL]"), "got: {out}");
+            assert!(out.contains("AGENTS.md"), "got: {out}");
+        }
+        other => panic!("unexpected severity {other}"),
+    }
+}
+
+#[then(r#"no finding is emitted for ".github/copilot-instructions.md""#)]
+fn then_no_finding_for_copilot_instructions(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(!out.contains("copilot-instructions"), "got: {out}");
+}
+
+#[then(r#"a finding with key "resolved-tree" is reported with severity "fail""#)]
+fn then_resolved_tree_finding_fail(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("[FAIL] resolved-tree"), "got: {out}");
+}
+
+#[when("the developer runs convention agents-md-size")]
+fn when_convention_agents_md_size_legacy_alias(w: &mut AgentsWorld) {
+    // `convention agents-md-size` no longer exists as a standalone CLI leaf
+    // (see cli.rs: "agents-md-size removed (superseded); instruction-size
+    // moved to harness domain"). Its behavior lives on as a special case of
+    // `harness instruction-size validate` scoped to just the AGENTS.md
+    // surface — `single_surface: true` configures ONLY that one surface (the
+    // shared two-surface `write_instruction_size_config` also declares
+    // `.github/copilot-instructions.md`) to prove the scoping: an oversized
+    // `.github/copilot-instructions.md` is present but never declared as a
+    // surface, so it must never appear in the output.
+    write_instruction_size_config_scoped(w, 24_000, 30_000, true);
+    w.write("AGENTS.md", &"x".repeat(31_000));
+    w.write(".github/copilot-instructions.md", &"z".repeat(50_000));
+    w.exec(&["harness", "instruction-size", "validate"]);
+}
+
+#[then(r#"only "AGENTS.md" is measured"#)]
+fn then_only_agents_md_measured(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("AGENTS.md"), "got: {out}");
+    assert!(!out.contains("copilot-instructions"), "got: {out}");
+}
+
+#[then("the command behaves as a scoped instruction-size run")]
+fn then_behaves_as_scoped_instruction_size_run(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    assert!(out.contains("INSTRUCTION SIZE"), "got: {out}");
+}
+
+// ===========================================================================
+// Governance of the instruction-file size-budget rule
+// (repo-governance-instruction-size-governance.feature) — asserts facts
+// about the real repository tree this crate lives in, not the synthetic
+// fixture. See `real_repo_root()`.
+// ===========================================================================
+
+#[given("the plan is complete")]
+fn given_the_plan_is_complete(_w: &mut AgentsWorld) {
+    // No-op: this precondition is about the real repository's governance
+    // artifacts already existing — the following `When`/`Then` steps read
+    // them directly from `real_repo_root()`.
+}
+
+#[when(regex = r#"^I look under "([^"]+)"$"#)]
+fn when_i_look_under(w: &mut AgentsWorld, dir: String) {
+    w.lookup_dir = dir;
+}
+
+#[then(regex = r#"^"([^"]+)" exists$"#)]
+fn then_file_exists_under_lookup_dir(w: &mut AgentsWorld, filename: String) {
+    let path = real_repo_root().join(&w.lookup_dir).join(&filename);
+    assert!(path.is_file(), "expected {} to exist", path.display());
+    w.lookup_file_content = std::fs::read_to_string(&path).expect("read looked-up file");
+}
+
+#[then("the file lists the monitored file class, per-file budgets, and enforcement points")]
+fn then_file_lists_class_budgets_enforcement(w: &mut AgentsWorld) {
+    let content = &w.lookup_file_content;
+    assert!(content.contains("Monitored Surfaces"), "got: {content}");
+    assert!(content.contains("Target"), "got: {content}");
+    assert!(content.contains("Fail"), "got: {content}");
+    assert!(content.contains("Enforcement Points"), "got: {content}");
+}
+
+#[when(r#""repo-rules-checker" runs Step 6"#)]
+fn when_repo_rules_checker_runs_step_6(w: &mut AgentsWorld) {
+    w.lookup_file_content =
+        std::fs::read_to_string(real_repo_root().join(".claude/agents/repo-rules-checker.md"))
+            .expect("read repo-rules-checker.md");
+}
+
+#[then("it reports qualitative bloat concerns across the whole instruction-file class")]
+fn then_reports_qualitative_bloat(w: &mut AgentsWorld) {
+    assert!(
+        w.lookup_file_content.contains("qualitative bloat"),
+        "got: {}",
+        w.lookup_file_content
+    );
+}
+
+#[then(r#"it annotates that the byte ceiling is enforced by the deterministic "instruction-size" gate"#)]
+fn then_annotates_deterministic_ceiling(w: &mut AgentsWorld) {
+    let content = &w.lookup_file_content;
+    assert!(
+        content.contains("enforced by the deterministic"),
+        "got: {content}"
+    );
+    assert!(
+        content.contains("harness instruction-size validate"),
+        "got: {content}"
+    );
+}
+
+#[when(regex = r#"^I read "([^"]+)"$"#)]
+fn when_i_read(w: &mut AgentsWorld, path: String) {
+    w.lookup_file_content =
+        std::fs::read_to_string(real_repo_root().join(&path)).unwrap_or_else(|e| {
+            panic!("read {path}: {e}");
+        });
+}
+
+#[then(r#""instruction-size" is named among the Step 0.5 categories"#)]
+fn then_instruction_size_named_in_step_0_5(w: &mut AgentsWorld) {
+    let content = &w.lookup_file_content;
+    let found = content
+        .lines()
+        .any(|line| line.contains("Step 0.5") && line.contains("instruction-size"));
+    assert!(found, "got: {content}");
+}
+
+#[given("a repo with instruction files within the configured budgets")]
+fn given_repo_within_budgets(_w: &mut AgentsWorld) {
+    // No-op: a fresh fixture workspace has no instruction files at all, which
+    // is trivially "within budget" — no `repo-config.yml` means
+    // `merged_budget_config` returns `None` and the instruction-size category
+    // reports zero findings regardless of the other categories.
+}
+
+#[when(r#"the developer runs "rhino-cli repo-governance audit" with JSON output"#)]
+fn when_repo_governance_audit_json(w: &mut AgentsWorld) {
+    w.exec(&["repo-governance", "audit", "--output", "json"]);
+}
+
+#[then(r#"the envelope schema is "rhino-cli/repo-governance-audit/v1""#)]
+fn then_envelope_schema(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    let json: Value = serde_json::from_str(&out).expect("valid json");
+    assert_eq!(json["schema"], "rhino-cli/repo-governance-audit/v1");
+}
+
+#[then(r#""result.categories" contains a category named "instruction-size""#)]
+fn then_result_categories_contains_instruction_size(w: &mut AgentsWorld) {
+    let out = w.stdout();
+    let json: Value = serde_json::from_str(&out).expect("valid json");
+    let categories = json["result"]["categories"]
+        .as_array()
+        .expect("categories array");
+    assert!(
+        categories.iter().any(|c| c["name"] == "instruction-size"),
+        "got: {categories:?}"
+    );
+}
+
+#[given(r#"a preflight JSON contains an "instruction-size" category with findings"#)]
+fn given_preflight_json_has_instruction_size_findings(_w: &mut AgentsWorld) {
+    // No-op: this asserts static Step 0.5 processing-rule prose in
+    // repo-rules-checker.md (read by the `When "repo-rules-checker" runs
+    // Step 0.5` step below), not runnable CLI behavior.
+}
+
+#[when(r#""repo-rules-checker" runs Step 0.5"#)]
+fn when_repo_rules_checker_runs_step_0_5(w: &mut AgentsWorld) {
+    w.lookup_file_content =
+        std::fs::read_to_string(real_repo_root().join(".claude/agents/repo-rules-checker.md"))
+            .expect("read repo-rules-checker.md");
+}
+
+#[then(r#"it populates the deterministic skip set with "instruction-size""#)]
+fn then_populates_deterministic_skip_set(w: &mut AgentsWorld) {
+    let content = &w.lookup_file_content;
+    assert!(content.contains("`instruction-size`"), "got: {content}");
+    assert!(
+        content.contains("Step 6 byte-count portion"),
+        "got: {content}"
+    );
+}
+
+#[then(r#"it embeds the preflight findings verbatim under "Deterministic Findings""#)]
+fn then_embeds_preflight_findings_verbatim(w: &mut AgentsWorld) {
+    assert!(
+        w.lookup_file_content.contains("## Deterministic Findings"),
+        "got: {}",
+        w.lookup_file_content
+    );
+}
+
+#[then("it does not re-derive byte counts in Step 6")]
+fn then_does_not_rederive_byte_counts(w: &mut AgentsWorld) {
+    assert!(
+        w.lookup_file_content
+            .contains("DO NOT re-derive byte counts"),
+        "got: {}",
+        w.lookup_file_content
+    );
+}
+
+// ===========================================================================
+// Pre-push enforcement of the instruction-file size budget
+// (repo-governance-instruction-size-pre-push.feature) — the pre-push gate
+// itself lives in `.husky/pre-push` (a shell script), so these scenarios
+// mirror its literal trigger regex (verified below against the real hook
+// content) and drive the exact command it invokes
+// (`harness instruction-size validate`, wired as the
+// `rhino-cli:instruction-size:validation` Nx target) rather than executing
+// the whole hook end-to-end (which also runs the full `test:quick` suite —
+// wildly disproportionate for a single conditional-dispatch scenario).
+// ===========================================================================
+
+/// Mirrors the instruction-size trigger regex in `.husky/pre-push` verbatim:
+/// `^(AGENTS\.md$|CLAUDE\.md$|repo-config\.yml$|\.amazonq/rules/|\.windsurf/rules/|\.cursor/rules/|\.junie/guidelines\.md$|\.github/copilot-instructions\.md$|CONVENTIONS\.md$)`.
+fn matches_instruction_size_trigger(path: &str) -> bool {
+    path == "AGENTS.md"
+        || path == "CLAUDE.md"
+        || path == "repo-config.yml"
+        || path.starts_with(".amazonq/rules/")
+        || path.starts_with(".windsurf/rules/")
+        || path.starts_with(".cursor/rules/")
+        || path == ".junie/guidelines.md"
+        || path == ".github/copilot-instructions.md"
+        || path == "CONVENTIONS.md"
+}
+
+#[given(r#"my push range modifies "AGENTS.md""#)]
+fn given_push_range_modifies_agents_md(w: &mut AgentsWorld) {
+    w.push_range_files = vec!["AGENTS.md".to_string()];
+}
+
+#[given(r#"my push range modifies only "apps/ose-www/src/page.tsx""#)]
+fn given_push_range_modifies_unrelated_file(w: &mut AgentsWorld) {
+    w.push_range_files = vec!["apps/ose-www/src/page.tsx".to_string()];
+}
+
+#[given(r#""AGENTS.md" exceeds its fail ceiling"#)]
+fn given_agents_md_exceeds_fail_ceiling(w: &mut AgentsWorld) {
+    write_instruction_size_config(w, 24_000, 30_000);
+    w.write("AGENTS.md", &"x".repeat(31_000));
+}
+
+#[given(r#""AGENTS.md" is within its fail ceiling"#)]
+fn given_agents_md_within_fail_ceiling(w: &mut AgentsWorld) {
+    write_instruction_size_config(w, 24_000, 30_000);
+    w.write("AGENTS.md", &"x".repeat(10_000));
+}
+
+#[when("the pre-push hook runs")]
+fn when_pre_push_hook_runs(w: &mut AgentsWorld) {
+    let triggered = w
+        .push_range_files
+        .iter()
+        .any(|f| matches_instruction_size_trigger(f));
+    w.hook_invoked = triggered;
+    if triggered {
+        w.exec(&["harness", "instruction-size", "validate"]);
+    } else {
+        w.output = None;
+    }
+}
+
+#[then("the instruction-size validation Nx target runs")]
+fn then_instruction_size_target_runs(w: &mut AgentsWorld) {
+    assert!(
+        w.hook_invoked,
+        "expected the instruction-size gate to trigger for this push range"
+    );
+    assert!(
+        w.output.is_some(),
+        "expected `harness instruction-size validate` to have executed"
+    );
+    // Golden guard against the real hook drifting from the regex this
+    // scenario mirrors.
+    let hook =
+        std::fs::read_to_string(real_repo_root().join(".husky/pre-push")).expect("read hook");
+    assert!(
+        hook.contains("harness instruction-size validate"),
+        "hook: {hook}"
+    );
+    assert!(hook.contains("AGENTS\\.md"), "hook: {hook}");
+}
+
+#[then("the push is aborted with a non-zero exit")]
+fn then_push_aborted(w: &mut AgentsWorld) {
+    assert_ne!(w.exit_code(), 0, "stdout: {}", w.stdout());
+}
+
+#[then("the instruction-size validation target is not invoked")]
+fn then_instruction_size_target_not_invoked(w: &mut AgentsWorld) {
+    assert!(!w.hook_invoked);
+    assert!(w.output.is_none());
+}
+
+#[then("the instruction-size validation target runs and exits 0")]
+fn then_instruction_size_target_runs_exit_0(w: &mut AgentsWorld) {
+    assert!(w.hook_invoked);
+    assert_eq!(w.exit_code(), 0, "stdout: {}", w.stdout());
+}
+
+#[then("the push proceeds")]
+fn then_push_proceeds(w: &mut AgentsWorld) {
+    assert_eq!(w.exit_code(), 0, "stdout: {}", w.stdout());
 }
 
 // ===========================================================================

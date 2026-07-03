@@ -123,6 +123,72 @@ pub fn load_budget_config(fs: &dyn Fs, path: &Path) -> Result<BudgetConfig, Erro
 }
 
 // ---------------------------------------------------------------------------
+// Merged config: repo-config.yml `instruction-size:` section ∪ harness registry
+// ---------------------------------------------------------------------------
+
+/// Default target budget applied to harness-registry `instruction:` surfaces
+/// that have no explicit `instruction-size:` entry.
+const REGISTRY_DEFAULT_TARGET: u64 = 10_000;
+/// Default warning threshold for registry surfaces without an explicit budget.
+const REGISTRY_DEFAULT_WARN: u64 = 13_000;
+/// Default hard-fail threshold for registry surfaces without an explicit budget.
+const REGISTRY_DEFAULT_FAIL: u64 = 16_000;
+
+/// Merges the `instruction-size:` section of `repo-config.yml` with the
+/// harness-registry `instruction:` glob lists into one [`BudgetConfig`].
+///
+/// Registry globs not already covered by an explicit `instruction-size:`
+/// surface receive the registry default thresholds. When neither source
+/// declares any surfaces, returns `None` (nothing to check). The
+/// `resolved_tree` budget is carried from the `instruction-size:` section
+/// when present; otherwise a sentinel with `u64::MAX` thresholds is used so
+/// [`check_resolved_tree`] never reports a finding for it.
+#[must_use]
+pub fn merged_budget_config(repo_root: &Path) -> Option<BudgetConfig> {
+    let repo_config = crate::application::repo_config::load_or_default(repo_root);
+    let registry_globs: Vec<String> = repo_config
+        .harness
+        .iter()
+        .flat_map(|e| e.instruction.iter().cloned())
+        .collect();
+    let yaml_config = repo_config.instruction_size;
+
+    let yaml_has_surfaces = yaml_config.as_ref().is_some_and(|c| !c.surfaces.is_empty());
+    if !yaml_has_surfaces && registry_globs.is_empty() {
+        return None;
+    }
+
+    let mut merged_surfaces: Vec<Surface> = yaml_config
+        .as_ref()
+        .map(|c| c.surfaces.clone())
+        .unwrap_or_default();
+    let mut seen_globs: HashSet<String> = merged_surfaces.iter().map(|s| s.glob.clone()).collect();
+    for glob in registry_globs {
+        if seen_globs.insert(glob.clone()) {
+            merged_surfaces.push(Surface {
+                glob,
+                target: REGISTRY_DEFAULT_TARGET,
+                warn: REGISTRY_DEFAULT_WARN,
+                fail: REGISTRY_DEFAULT_FAIL,
+            });
+        }
+    }
+
+    Some(BudgetConfig {
+        surfaces: merged_surfaces,
+        resolved_tree: yaml_config.map_or_else(
+            || ResolvedTree {
+                root: String::new(),
+                target: u64::MAX,
+                warn: u64::MAX,
+                fail: u64::MAX,
+            },
+            |c| c.resolved_tree,
+        ),
+    })
+}
+
+// ---------------------------------------------------------------------------
 // classify
 // ---------------------------------------------------------------------------
 
@@ -585,5 +651,86 @@ resolved_tree:
         };
         let finding = check_resolved_tree(&RealFs, tmp.path(), &config);
         assert!(finding.is_none());
+    }
+
+    // ---- merged_budget_config ----
+
+    #[test]
+    fn merged_budget_config_none_when_no_sources() {
+        let tmp = TempDir::new().unwrap();
+        assert!(merged_budget_config(tmp.path()).is_none());
+    }
+
+    #[test]
+    fn merged_budget_config_reads_yaml_section_from_repo_config() {
+        let tmp = TempDir::new().unwrap();
+        let repo_cfg = concat!(
+            "harness: []\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "instruction-size:\n",
+            "  surfaces:\n",
+            "    - glob: \"AGENTS.md\"\n",
+            "      target: 24000\n",
+            "      warn: 27000\n",
+            "      fail: 30000\n",
+            "  resolved_tree:\n",
+            "    root: \"CLAUDE.md\"\n",
+            "    target: 30000\n",
+            "    warn: 34000\n",
+            "    fail: 38000\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), repo_cfg).unwrap();
+        let config = merged_budget_config(tmp.path()).unwrap();
+        assert_eq!(config.surfaces.len(), 1);
+        assert_eq!(config.surfaces[0].glob, "AGENTS.md");
+        assert_eq!(config.resolved_tree.root, "CLAUDE.md");
+    }
+
+    #[test]
+    fn merged_budget_config_adds_registry_globs_with_defaults() {
+        let tmp = TempDir::new().unwrap();
+        let repo_cfg = concat!(
+            "harness:\n",
+            "  - { name: cursor, tier: native, shadow: .cursor/rules,",
+            " instruction: [.cursor/rules] }\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), repo_cfg).unwrap();
+        let config = merged_budget_config(tmp.path()).unwrap();
+        assert_eq!(config.surfaces.len(), 1);
+        assert_eq!(config.surfaces[0].glob, ".cursor/rules");
+        assert_eq!(config.surfaces[0].fail, REGISTRY_DEFAULT_FAIL);
+        // No `instruction-size:` section — resolved_tree sentinel never fails.
+        assert_eq!(config.resolved_tree.fail, u64::MAX);
+    }
+
+    #[test]
+    fn merged_budget_config_yaml_surface_wins_over_registry_default_for_same_glob() {
+        let tmp = TempDir::new().unwrap();
+        let repo_cfg = concat!(
+            "harness:\n",
+            "  - { name: cursor, tier: native, shadow: .cursor/rules,",
+            " instruction: [AGENTS.md] }\n",
+            "coverage:\n  projects: []\n",
+            "specs:\n  ddd-areas: []\n  domain-areas: []\n",
+            "instruction-size:\n",
+            "  surfaces:\n",
+            "    - glob: \"AGENTS.md\"\n",
+            "      target: 24000\n",
+            "      warn: 27000\n",
+            "      fail: 30000\n",
+            "  resolved_tree:\n",
+            "    root: \"CLAUDE.md\"\n",
+            "    target: 30000\n",
+            "    warn: 34000\n",
+            "    fail: 38000\n",
+        );
+        fs::write(tmp.path().join("repo-config.yml"), repo_cfg).unwrap();
+        let config = merged_budget_config(tmp.path()).unwrap();
+        // Only one surface for "AGENTS.md" — the explicit yaml entry, not a duplicate default.
+        assert_eq!(config.surfaces.len(), 1);
+        assert_eq!(config.surfaces[0].fail, 30_000);
     }
 }

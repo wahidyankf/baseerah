@@ -353,17 +353,31 @@ depth}` directly (not CLI subprocess) for the 4 internal parser-behavior scenari
 - [x] [AI] **REFACTOR**: dedupe helpers. Command: same. Acceptance: `0 skipped`.
   - **Done 2026-07-04.** Still 78/78, 0 skipped. `clippy -D warnings` + `fmt --check` clean.
 
-### 1c. De-hollow `agents` (13/28 skipped → 0)
+### 1c. De-hollow `agents` (13/28 skipped → 0; corrected to 30/45 post-§1·0-split)
 
-- [ ] [AI] **RED**: align step strings in `apps/rhino-cli/tests/agents.rs` to `harness` command names
+> **Scope correction (2026-07-04)**: post-§1·0-split, `gherkin/harness/**` has 9 feature files / 45
+> scenarios (original 5 `agents-*` files + 4 split-in `repo-governance-*` files). Treat "45 scenarios (45
+> passed)" as the corrected acceptance target below.
+
+- [x] [AI] **RED**: align step strings in `apps/rhino-cli/tests/agents.rs` to `harness` command names
       (`harness bindings generate/validate`, `harness naming validate`, `harness duplication validate`,
       `harness sync`, `harness audit`, `harness instruction-size validate`, `harness claude …`).
       Command: `cargo test --release --manifest-path apps/rhino-cli/Cargo.toml -p rhino-cli --test agents`. Acceptance: scenarios execute.
+  - **Done 2026-07-04.** Confirmed 45 total / 30 skipped baseline. **Genuine functional bug fixed** (not
+    just a spec-text issue): `repo-governance audit` was missing the `instruction-size` category entirely
+    — `audit_category_order()` hardcoded only 3 categories despite governance docs already documenting 4.
+    Extracted shared `application::repo_governance::instruction_size::merged_budget_config()` (avoiding a
+    commands→application layering violation) and wired a 4th category into `audit_orchestrator.rs`,
+    filtered to `Fail`-severity findings only (consistent with the standalone command's exit-code
+    semantics). Also found `convention agents-md-size` no longer exists as a CLI subcommand — bound the
+    "legacy alias" scenario to the modern `harness instruction-size validate` instead.
   - **Gherkin (binds) →** — aggregate BDD binder for all 28 scenarios in `gherkin/harness/**`:
     "Set of distinct agents and skills passes"; "Two agents sharing 12 consecutive lines verbatim fails"; "Agent body matching 10+ consecutive lines of a SKILL.md fails (agent-skill duplication)"; "Heading-only or whitespace-only 10-line window does NOT trigger a finding"; "Emitting writes the rules pointer and the agent definition"; "The agent definition loads AGENTS.md and the rules directory as resources"; "Emitting twice is idempotent"; "Bridge files that match the generator pass validation"; "A mutated bridge file fails validation"; "A missing bridge file fails validation"; "A present binding directory absent from the catalog fails validation"; "Absent binding directories require no catalog row"; "A directory with all agents and skills correctly configured passes validation"; "An agent file missing a required frontmatter field fails validation"; "Two agents with the same name fail validation"; "--agents-only validates agents without checking skills"; "--skills-only validates skills without checking agents"; "Syncing converts Claude agents to OpenCode format and leaves skills in place"; "The --dry-run flag previews changes without modifying files"; "The --agents-only flag syncs agents without touching skills"; "Model names are correctly translated to OpenCode equivalents"; "Directories that are in sync pass validation"; "A description mismatch between directories fails validation"; "A count mismatch between directories fails validation"; "A tree where every agent obeys the naming rule passes validation"; "An agent filename without an allowed role suffix fails validation"; "An agent frontmatter name that disagrees with the filename fails validation"; "A .claude/agents/ file without a matching .opencode/agent/ mirror fails validation"
   - _Suggested executor: `swe-rust-dev`_
-- [ ] [AI] **GREEN**: satisfy each. Command: same. Acceptance: `28 scenarios (28 passed)`, `0 skipped`.
-- [ ] [AI] **REFACTOR**: dedupe. Command: same. Acceptance: `0 skipped`.
+- [x] [AI] **GREEN**: satisfy each. Command: same. Acceptance: `45 scenarios (45 passed)` (corrected count), `0 skipped`.
+  - **Done 2026-07-04.** All 45 passed. Suite-wide skip count: 34→4 (only `workflows.rs`'s 4, §1d, remain).
+- [x] [AI] **REFACTOR**: dedupe. Command: same. Acceptance: `0 skipped`.
+  - **Done 2026-07-04.** Still 45/45, 0 skipped. `clippy -D warnings` + `fmt --check` clean.
 
 ### 1d. De-hollow `workflows` (4/4 skipped → 0)
 
