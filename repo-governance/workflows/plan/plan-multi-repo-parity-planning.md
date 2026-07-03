@@ -183,6 +183,28 @@ configs, grep the files, run the tools — do not trust docs alone.
 - Governance docs (conventions, development practices) the objective would affect
 - Repo-specific constraints: CI runner type (self-hosted vs GitHub-hosted), private vs public
   visibility, language stack, existing toolchain, dual-CLI parity guards
+- **rhino-cli byte-identity check** (whenever the objective touches `apps/rhino-cli` or its Gherkin
+  behavior tree): diff the `md5` manifest of `apps/rhino-cli`'s tracked files plus every
+  `.feature`/`README.md` under `specs/apps/rhino/behavior/rhino-cli/gherkin/**` across all three
+  repos —
+
+  ```bash
+  git -C ose-public ls-files apps/rhino-cli specs/apps/rhino/behavior/rhino-cli/gherkin \
+    | grep -E '(apps/rhino-cli/.*|gherkin/.*\.feature$|gherkin/.*README\.md$)' | sort \
+    | xargs md5 -q > /tmp/public.md5
+  git -C ose-primer ls-files apps/rhino-cli specs/apps/rhino/behavior/rhino-cli/gherkin \
+    | grep -E '(apps/rhino-cli/.*|gherkin/.*\.feature$|gherkin/.*README\.md$)' | sort \
+    | xargs md5 -q > /tmp/primer.md5
+  git -C ose-infra ls-files apps/rhino-cli specs/apps/rhino/behavior/rhino-cli/gherkin \
+    | grep -E '(apps/rhino-cli/.*|gherkin/.*\.feature$|gherkin/.*README\.md$)' | sort \
+    | xargs md5 -q > /tmp/infra.md5
+  diff /tmp/public.md5 /tmp/primer.md5
+  diff /tmp/public.md5 /tmp/infra.md5
+  ```
+
+  (or compare directly against the frozen `plans/done/*/audit/06-canonical-manifest.md` if one
+  exists). Any diff is drift that MUST become its own deviation-matrix row in Step 2 — surface it
+  before grilling, never silently re-sync it.
 
 **Output**: A per-repo state inventory. Every dimension the objective touches is inventoried for
 every repo. Document what exists, what is absent, and any repo-specific constraint that will

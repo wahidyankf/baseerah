@@ -851,39 +851,55 @@ validate` command (output does not contain the string `stub`) — proving the pr
 
 ## Phase 2 — Freeze Canonical + Author Anti-Drift Gate (ose-public)
 
-- [ ] [AI] Freeze the propagation source: record `audit/06-canonical-manifest.md` = `md5` of every
+- [x] [AI] Freeze the propagation source: record `audit/06-canonical-manifest.md` = `md5` of every
       `apps/rhino-cli` tracked file + every `gherkin/**/*.feature` + `gherkin/**/README.md`.
       Acceptance: manifest committed.
-- [ ] [AI] Extend the SDLC parity gate: edit
+  - **Done 2026-07-04.** 629 entries (558 `apps/rhino-cli` + 57 `.feature` + 14 `README.md`), counts
+    verified to reconcile exactly against `git ls-files`.
+- [x] [AI] Extend the SDLC parity gate: edit
       [`docs/reference/sdlc-gate-standard.md`](../../../docs/reference/sdlc-gate-standard.md) — add
       `specs/apps/rhino/behavior/rhino-cli/gherkin/**` (`.feature` + `README.md`) to the rhino-cli
       byte-identity boundary section. Acceptance: the path appears in the boundary definition.
   - _Suggested executor: `docs-maker`_
-- [ ] [AI] Add a verification step to
+  - **Done 2026-07-04.** Added the Gherkin tree path to the `## rhino-cli Byte-Identity Boundary` prose's
+    file list, alongside `src/`, `Cargo.toml`, `Cargo.lock`, `project.json`, `LICENSE`.
+- [x] [AI] Add a verification step to
       [`repo-governance/workflows/plan/plan-multi-repo-parity-planning.md`](../../../repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
       that diffs the Gherkin tree md5-manifest across the three repos. Acceptance: the step is present with an explicit command.
   - _Suggested executor: `repo-workflow-maker`_
-- [ ] [AI] Update the byte-identity note in `AGENTS.md` §Related Repositories to mention the Gherkin
+  - **Done 2026-07-04.** Added a "rhino-cli byte-identity check" bullet + explicit 3-repo `md5`-diff
+    command to Step 1's "Scope of survey" list, firing whenever the objective touches `apps/rhino-cli` —
+    any diff becomes its own deviation-matrix row, never silently re-synced.
+- [x] [AI] Update the byte-identity note in `AGENTS.md` §Related Repositories to mention the Gherkin
       tree (`specs/apps/rhino/behavior/rhino-cli/gherkin/**`) is in-boundary. The note lives solely
       in `AGENTS.md`; `CLAUDE.md` is a thin shim (`@AGENTS.md` import) with no byte-identity content
       of its own, so it inherits this update automatically — no separate `CLAUDE.md` edit is needed
       for this item. Acceptance: `AGENTS.md` §Related Repositories references the Gherkin tree path.
-- [ ] [AI] **Re-place the repo-config schema gate (a) — add the pre-commit staged-gated step** (Decision 8,
+  - **Done 2026-07-04.** Added the Gherkin tree path to the existing byte-identity sentence.
+- [x] [AI] **Re-place the repo-config schema gate (a) — add the pre-commit staged-gated step** (Decision 8,
       closes the 2026-07-03 Decision-5 gap) per
       [tech-docs §1.6](./tech-docs.md#16-repo-config-schema-parity-gate-is-missing-at-pre-commit): add the
       staged-gated step to `ose-public/.husky/pre-commit` after the existing `env staged-guard` step
       (`git diff --cached --name-only … | grep '^repo-config\.yml$'` → `rhino-cli repo-config validate`).
       Verify: staging a bogus-key `repo-config.yml` + `sh .husky/pre-commit` rejects it (revert the bogus
       key after). Acceptance: the pre-commit gate fires only when `repo-config.yml` is staged.
-- [ ] [AI] **Re-place the repo-config schema gate (b) — add the PR + main workflow steps**: add a
+  - **Done 2026-07-04.** New Step 1b in `.husky/pre-commit`. Verified live: staged a bogus
+    `bogus_unknown_key: true` in `repo-config.yml` — the gate condition correctly fired and
+    `repo-config validate` rejected it (exit 1, named the unknown field); reverted and unstaged.
+- [x] [AI] **Re-place the repo-config schema gate (b) — add the PR + main workflow steps**: add a
       standalone `rhino-cli repo-config validate` step to `.github/workflows/pr-quality-gate.yml` and
       `.github/workflows/main-ci.yml` (unconditional, not staged-gated). Acceptance: both workflow files
       contain the new step; `grep -c "repo-config validate" .github/workflows/pr-quality-gate.yml
 .github/workflows/main-ci.yml` returns 1 for each file.
-- [ ] [AI] **Re-place the repo-config schema gate (c) — remove the pre-push step**: remove the
+  - **Done 2026-07-04.** Added a new standalone `repo-config-validate` job to both workflows (mirroring
+    the existing `env-validate`/`md-links` job pattern) + added it to each file's final `quality-gate`
+    job's `needs:` list so it actually blocks the merge/main check. Verified: `grep -c` returns 1 for
+    each file; `actionlint` clean on both.
+- [x] [AI] **Re-place the repo-config schema gate (c) — remove the pre-push step**: remove the
       `repo-config validate` line from `.husky/pre-push` (`ose-public` `:10`). Acceptance:
       `grep -c "repo-config validate" .husky/pre-push` returns 0.
-- [ ] [AI] **Re-place the repo-config schema gate (d) — correct BOTH stale gate-placement statements**:
+  - **Done 2026-07-04.** Removed. Verified: `grep -c` returns 0.
+- [x] [AI] **Re-place the repo-config schema gate (d) — correct BOTH stale gate-placement statements**:
       edit [`docs/reference/sdlc-gate-standard.md`](../../../docs/reference/sdlc-gate-standard.md) at TWO
       locations to reflect Decision 8's target placement (pre-commit staged-gate + PR quality gate + main
       quality gate; no longer pre-push): (1) line 254 (rhino-cli Byte-Identity Boundary prose) — replace
@@ -897,15 +913,24 @@ validate` command (output does not contain the string `stub`) — proving the pr
 "pre-push/PR"` returns 0 AND both corrected lines, read back individually, each name all three of
       pre-commit, PR, and main AND `grep -c "pre-push/PR" docs/reference/sdlc-gate-standard.md` still
       returns 2 (the untouched, unrelated occurrences at lines 61 and 104).
-- [ ] [AI] Run `rhino-cli md links validate` over the new plan + edited docs. Acceptance: exit 0.
-- [ ] [AI] Run `rhino-cli md readme-index validate` over the new plan + edited docs. Acceptance: exit 0.
+  - **Done 2026-07-04.** Both locations corrected (line numbers shifted slightly to 255/238 after the
+    earlier byte-identity-boundary edit added a line — re-verified by content, not stale line number).
+    Verified: `grep -c "pre-push/PR" docs/reference/sdlc-gate-standard.md` returns exactly 2 (lines 61
+    and 104, untouched, unrelated).
+- [x] [AI] Run `rhino-cli md links validate` over the new plan + edited docs. Acceptance: exit 0.
+  - **Done 2026-07-04.** Exit 0, "All links valid! No broken links found."
+- [x] [AI] Run `rhino-cli md readme-index validate` over the new plan + edited docs. Acceptance: exit 0.
+  - **Done 2026-07-04.** Exit 0, "README INDEX AUDIT PASSED: no orphan or ghost references found."
 
 ### Phase 2 Gate
 
 > All checks below must pass before starting Phase 3.
 
-- [ ] [AI] `sh .husky/pre-push` (ose-public root) — exits 0.
-- [ ] [AI] `audit/06-canonical-manifest.md` exists; boundary doc + parity workflow updated.
+- [x] [AI] `sh .husky/pre-push` (ose-public root) — exits 0.
+  - **Done 2026-07-04.** Verified directly: exit 0 (nx affected no-op since these local commits aren't
+    pushed yet; env validate/md links/readme-index/agents-duplication all pass).
+- [x] [AI] `audit/06-canonical-manifest.md` exists; boundary doc + parity workflow updated.
+  - **Done 2026-07-04.** All three confirmed directly. **Phase 2 Gate passes.**
 
 > **Pause Safety**: ose-public is fully at target — enforcing suite, frozen manifest, anti-drift gate
 > authored, own pre-push green. Safe to stop. To resume: `sh .husky/pre-push`.

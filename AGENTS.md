@@ -391,7 +391,9 @@ Content parity between `ose-public` and `ose-primer` maintained via
 [plan-multi-repo-parity-planning](./repo-governance/workflows/plan/plan-multi-repo-parity-planning.md)
 workflow. `ose-infra` does not participate in the parity loop.
 
-`apps/rhino-cli` is required to be byte-identical (zero carve-outs) across all three repos per the
+`apps/rhino-cli` is required to be byte-identical (zero carve-outs) across all three repos, including
+its Gherkin behavior tree at `specs/apps/rhino/behavior/rhino-cli/gherkin/**` (every `.feature` file and
+every `README.md`), per the
 [SDLC Gate Standard](./docs/reference/sdlc-gate-standard.md#rhino-cli-byte-identity-boundary).
 
 See: [Related Repositories reference](./docs/reference/related-repositories.md).
